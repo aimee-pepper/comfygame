@@ -325,3 +325,12 @@ literally; each band above 25 / 50 / 75 multiplies; 100 is indefinite. Implement
 - **Unwritten targets are rolled, not defaulted.** A sensible default makes every under-specified
   world the same tepid place.
 - **Using a rune does not teach it to you** (Q16). You write the world, you don't learn the word.
+
+### Q20 answered (Aimee, 5 Aug 2026)
+
+**A chance-filled book that rolls a near-dead world is not a bug to fix in the rules.** Chance keeps
+drawing from the whole pool and the steps curve stays literal at the bottom. The fix is
+presentational: world load animations make a short-lived world visible as you enter, and an
+instantly-collapsing one plays out as a scene — the world crumbles as you step through and you get
+back out in time. The gamble stays a gamble; the player just gets to *see* it rather than being
+handed an unreadable number.

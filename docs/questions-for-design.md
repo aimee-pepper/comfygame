@@ -228,89 +228,202 @@ Shipped as-is; no change needed.
 `Sources/Rules/BookRules.swift` (`candidates` vs `writable`).
 
 ---
-
 ## Q17 — Do sites grant a separate research currency, or essence?
 
-`docs/sites-system.md` §2 lists "research points" among a site's contents, but the shipped economy
-has no such currency: research nodes cost **essence plus resources**, and nothing else. Adding a
-parallel currency is a design decision, not an implementation detail, so I didn't make it.
+`docs/sites-system.md` §2 lists "research points" among a site's contents. The shipped economy has
+no such currency: research nodes cost **essence plus resources**, and nothing else.
 
-**Shipped, conservatively:** a site's `essence` field grants essence outright. Old ruins and
-landmarks therefore pay toward research without a new resource type existing.
+**Shipped, conservatively:** a site's `essence` field grants essence outright.
 
-**Worth deciding:** whether "insight" should be its own currency that *only* buys research. Arguments
-for: it separates "I found a place that taught me something" from "I sold ore", and it stops research
-competing directly with book-writing for the same pool. Argument against: it's another number on the
-Base screen, and the research trees are already gated by their DAG.
+### What's actually at stake
+
+Essence is currently doing two jobs. It's the **go-again** currency (it buys the next book) *and*
+the **get-better** currency (it buys research nodes). So every point spent on research is a book you
+didn't write. That's either a good tension or a bad one, and which it is depends on how you want
+research to feel.
+
+There's also a structural problem with sites specifically. **If sites give the same things resource
+nodes give, sites are just big nodes.** A Crystal Cavern that pays out ore is a rich vein with extra
+steps. What makes a site a different kind of object is that it gives a different *kind* of reward —
+and right now Wayfarer's Camp hands you fiber and essence, which is exactly what the ground does.
+
+### The options
+
+1. **Essence only (status quo).** One currency, one number, and a real opportunity cost. The
+   research DAG already gates progression, so nobody rushes the tree just because they're rich.
+   Cost: sites stay flavourful nodes.
+2. **A separate Insight currency, spent only on research.** Research stops competing with play, and
+   sites get a reward identity nothing else has: *nodes give you materials, sites give you
+   understanding*. This is the one that makes a site worth walking to with a full satchel — which
+   feels like the property you actually want, given sites are meant to be destinations.
+   Cost: a new number on the Base screen, and a new thing to balance.
+3. **Differentiate by category instead of by currency.** No new currency. Landmarks and living
+   sites pay in materials (they're places, and places have stuff); **ruins pay in knowledge** —
+   symbols, compounds, diary pages — and never in currency at all. The distinction is carried by
+   what kind of site it is rather than by a new resource.
+   This is the cheapest, and it lines up with `narrative-systems-spec.md`: pages teach compounds,
+   old ruins are where rune knowledge lives. Knowledge is *already* a non-currency reward track.
+
+**My read:** 3 is the strongest for the least new machinery, and 2 is the strongest full stop if
+you're happy adding a number. 3 also has a nice consequence — it means a ruin is never a
+disappointment because you were rich already, which is a failure mode 1 has.
 
 ## Q18 — Should the pre-bind preview show which sites a world can host?
 
-`docs/sites-system.md` §6.3 raises this and leans yes-as-silhouettes, matching the creature preview
-rule. Not built — it changes what the player optimises for, so it wants an explicit answer.
+`docs/sites-system.md` §6.3 leans yes-as-silhouettes, matching the creature preview rule.
 
-**Shipped:** sites are a surprise you walk into. `SiteRules.eligible(in:)` already takes readings
-rather than a map, so the preview can read it the moment you want it to.
+**Shipped:** it doesn't. Sites are a surprise you walk into.
+
+### Why the obvious answer is a trap
+
+The creature preview silhouettes creatures you haven't met, so consistency says do the same here.
+But creature mix and site presence aren't the same shape of information. Creature mix is a
+probability distribution over the whole world — "paper moth, 40%" tells you the texture of the
+place. Site presence is discrete and usually singular, and "Binder's Workshop: possible" is
+enormously more actionable.
+
+Which runs straight into what sites are *for*. From §4:
+
+> Writing toward a condition set is writing toward a *kind of place*, which is why deduction from a
+> sensory clue works.
+
+If the desk lights up a site's name when its conditions are met, that deduction collapses into a
+fiddle-until-it-glows checklist. You'd never read a clue again — you'd just permute symbols and
+watch the panel. The thing the whole system exists to enable is the thing a site list would kill.
+
+But saying nothing has its own failure: a player could reasonably conclude sites are pure random
+scatter and never learn they're condition-gated at all. Then the deduction loop never starts either.
+
+### The option that isn't on the doc's list
+
+**Describe the world, not its contents.** The pressure model already derives what a world is *like*
+— `WorldConstraints.character(of:)` computes ambush-vs-pursuit, wet-cold vs dry-cold, arid syndrome,
+two-niches, iridescence-enabled, and the constraint pass tags things `frozen-over`, `barren`,
+`light-limited`, `thermally-buffered`. That's a qualitative sentence about the world, and it's
+already computed, tested, and shown nowhere.
+
+So the desk says: *"Frozen over. Enclosed, layered stone. Little light, and what lives here doesn't
+need it."* And the clue in your hand says she wrote about a vault under cold stone. **You match a
+description to a description.** That's deduction — you're reading the world, not watching a
+checkbox — and it teaches the conditions themselves rather than the answers.
+
+Then, separately: **once you've found a site, it silhouettes in the preview thereafter.** That's the
+discovery-log pattern already in use, and it means knowledge earned by exploring pays off in
+authoring, which is the direction this game's progression should run.
+
+### The options
+
+1. **Nothing** (status quo). Preserves surprise, risks nobody learning sites are gated.
+2. **Silhouettes when eligible.** Doc's suggestion. Most legible, collapses the deduction loop.
+3. **Describe the world qualitatively; silhouette only sites you've already met.** Preserves
+   deduction, teaches conditions, rewards exploration, and the descriptive half is already built.
+4. **3, plus a bare count** — "this world can hold 2 features you haven't seen." Tells you there's
+   something to find without telling you what.
+
+**My read:** 3, and 4 if playtesting says people aren't noticing sites exist. The world-description
+panel is worth building either way — it's the only place the pressure model becomes visible to the
+player, and right now a world's entire climate and character is invisible.
 
 ## Q19 — Should sites move the Stability headline?
 
-`docs/sites-system.md` §5 proposes charging greed instability on what a world *contains*, sites
-included: "writing toward treasure destabilizes, exactly as writing toward rich substrate does."
+**Shipped:** they don't. `SiteRules.stabilityDelta` is built and tested and one line from being
+switched on in `WorldRun.effectiveStabilityScore`.
 
-I built it, and it broke a rule you'd already stated flatly:
+### The collision, precisely
 
-> *"why is a world where I pick 3 +stabilizing things only 46-55% stable? we need to make things
-> make sense. adding .2 to stability and seeing it go up a weird number is unhelpful as well."*
+Your ruling, session 5:
 
-Sites are rolled at bind, from the seed. So folding them in means the meter shows a number that no
-symbol on the page accounts for — the exact complaint that prompted the whole stability rebalance.
-In practice a world could take two Tears and a Crystal Cavern and lose 32 points the player never
-chose and could not see coming. It also killed a pre-existing force-quit test by collapsing worlds
-inside five steps.
+> *"adding .2 to stability and seeing it go up a weird number is unhelpful"*
 
-**Shipped:** sites do not touch Stability. `SiteRules.stabilityDelta` is built, tested, and is one
-line away from being switched on in `WorldRun.effectiveStabilityScore`.
+which became: a book starts at 100, and a symbol reading −25 moves it to 75. **The number printed on
+the symbol is the number on the meter.** No conversion factor, no hidden term.
 
-**The tension, plainly.** Your rule is *the number on the symbol is the number on the meter*. The
-doc's rule is *the world charges you for what it holds*. Both are good; they can't both be literally
-true while sites are a surprise. Three ways out:
+`sites-system.md` §5, tagged `[PROPOSAL]`:
 
-1. **Sites never affect Stability.** Cleanest meter. Loses the greed-on-total-value idea entirely.
-2. **The preview shows it.** The seed is peekable (`peekNextSeed()` exists for exactly this and is
-   already threaded into `BookProjection`), so the desk *can* be exact about the site contribution
-   before you commit — shown as its own line, "the world itself: −20", separate from the symbol
-   arithmetic. Your rule survives because symbols still sum exactly; the world's charge is just a
-   second, visible term. This is the one I'd pick.
-3. **Sites cost something that isn't Stability** — shorter fuse, more enemies, worse weather.
+> High-value sites (crystal caverns, intact old ruins) add to total world value and therefore to
+> greed instability. Writing toward treasure destabilizes, exactly as writing toward rich substrate
+> does.
 
-Related: Q18, whether the preview names the sites or only their price.
+Sites are rolled at bind from the seed. So switching this on means the meter shows a number no
+symbol on the page accounts for — the exact complaint that prompted the rebalance. In practice a
+world can take two Tears and a Crystal Cavern and lose 32 points nobody chose. When I had it on, it
+was collapsing worlds inside five steps.
 
-## Q20 — A book left to chance can now roll itself a world that dies almost immediately
+### The thing underneath, which is bigger
 
-Not a bug, and not something I changed on purpose — it's a consequence of two decisions meeting.
+§0 of the same doc carries an audit correction that goes further than §5:
 
-Chance now draws from the **whole** catalog (your session-5 correction), and the catalog contains
-Mote Vein (−70) and Rich Ore (−45). A book with slots left open can therefore roll a Stability in
-the single digits, and the steps curve is deliberately literal down there: a 5 means five moves
-before the world is gone. Two unlucky slots and you've paid for a world you can barely enter.
+> Profile everything the generated world actually contains against a baseline and charge instability
+> on the excess — the Mystcraft approach, and self-balancing as the content catalog grows.
 
-It surfaced as a flaky test — a persistence test that departs and takes five steps started failing
-intermittently because the world sometimes collapsed inside those five steps. I pinned the test's
-book rather than touch the rule.
+That's not "sites subtract points." That's **instability should be derived from what the world
+contains, not authored per symbol.** Under it, `stabilityDelta` wouldn't be hand-written on symbols
+at all; it'd fall out of profiling the resolved world.
 
-**The preview is technically honest about this** — an under-specified book shows a Stability range
-that spans the possibilities. But a range of "4–100" isn't information, it's a shrug, and it's the
-opposite of legibility-before-commitment.
+Worth saying plainly: **that correction isn't implemented, sites or no sites.** Symbols carry
+hand-tuned numbers that *approximate* value. Nothing profiles what a world actually ended up
+holding. So Q19 isn't really "do sites count" — it's **is Stability authored or derived?**
 
-**Worth deciding.** Some options, roughly in order of how much they change:
+### The options
 
-1. **Leave it.** Leaving slots open is a gamble, and this is what the gamble means. Consistent, and
-   the flat cheap rate for chance slots already says "you're buying a lottery ticket".
-2. **Chance draws from a weighted pool**, where the wildly destabilising symbols are rare rather
-   than equally likely. Keeps the whole pool reachable — your actual requirement — while making the
-   median chance-fill sane.
-3. **Floor the outcome:** a chance-filled slot can't take a book below some Stability. Simple, but
-   it makes the meter lie about what's in the book.
-4. **Show it better:** the preview reports the *likely* band as well as the extremes, e.g. "usually
-   60–80, as low as 4". More honest than a bare range and doesn't touch the rules.
+1. **Sites never touch Stability.** Perfectly legible meter. Cost: a Crystal Cavern is a free lunch —
+   concentrated value at no price — which quietly undercuts the greed pillar the game is built on.
+   Rich worlds should cost something.
 
-I'd pick 2 and 4 together, but this is squarely yours.
+2. **Preview shows it as its own term.** The desk reads:
+   `Symbols −18 · The world itself −20 · Stability 62`.
+   Your rule survives *literally* — symbols still sum exactly to their printed numbers — and the
+   world's charge is a second, visible term rather than a hidden one. Legibility-before-commitment
+   holds because you see the real number before you pay.
+   **This is already mechanically possible.** `SeedSequence.peekNextSeed()` exists for exactly this
+   and is threaded into `BookProjection`; I built and verified it before backing it out.
+   Two cautions:
+   - It needs memoising. The projection is a computed property SwiftUI may read every frame, and
+     this version runs worldgen.
+   - **Discipline required:** peeking the seed means the preview *could* know the entire world,
+     including your chance-filled slots. It must use that only for aggregate numbers and never to
+     reveal composition, or the surprise dies by accident.
+
+3. **Sites cost something that isn't Stability.** A Crystal Cavern doesn't make the world unstable —
+   it makes it *guarded*. More enemies, a higher tier, a hazard ring. The meter stays clean, greed
+   still has a price, and it composes with machinery that already exists (`enemyTierDelta`, and the
+   guardian mechanic sites already use).
+   Fictionally this may be the best of the three: the world doesn't object to being rich, but rich
+   places have things living in them. It also gives Crystal Cavern and Brood Warren a shared logic.
+
+4. **Go derived, per §0.** Stop authoring `stabilityDelta`; compute instability by profiling the
+   resolved world against a baseline. Self-balancing as the catalog grows, which matters a lot given
+   how much the catalogs are meant to grow. The preview then shows each symbol's *derived*
+   contribution — still exact, still sums, so your rule survives.
+   Cost: you lose hand-tuning, which you have just spent real effort on, and it's the largest change
+   on this list by some distance.
+
+**My read:** **3 now, 4 eventually, 2 if you want §5 as literally written.** Option 3 gets greed
+priced without touching the meter you just fixed, and the fiction is better than the fiction of
+option 2. Option 4 is where this ends up if the catalog reaches the size the research passes
+imagine — but it should be a deliberate migration, not something that happens under a sites feature.
+
+Option 1 is the only one I'd argue against: it makes finding treasure strictly free, and this game's
+whole thesis is that it isn't.
+
+## Q20 — A chance-filled book can roll a world that dies almost immediately — **ANSWERED**
+
+**Aimee, 2026-08-05: leave the rules alone; solve it in presentation.**
+
+> Worlds will get load animations. For a world that would shortly collapse, the animation makes that
+> clearly visible. For an instantly-collapsing one, the animation runs with a message along the lines
+> of *"the world you entered crumbled around you as you stepped through the portal — you jumped back
+> through just in the nick of time."*
+
+Which turns the failure into a scene instead of a number, and it means the gamble stays a real
+gamble without the player feeling cheated by an outcome they couldn't read. No rules change: chance
+keeps drawing from the whole pool, and the steps curve stays literal at the bottom.
+
+**Implementation notes for whoever builds it:**
+- The message implies the player gets *out* rather than dying — so an instant-collapse world needs a
+  distinct outcome from a normal collapse: you keep your essence-paid loss, but you aren't caught by
+  the partial-haul rule, because there was nothing to haul.
+- This wants a threshold in `Tuning` for what counts as "instantly collapsing" (probably
+  `turnsAvailable` below some floor), and a second, softer state for "shortly".
+- The animation is presentation, so it must not be a timer the simulation waits on — pillar 1. The
+  state change happens on the turn; the animation is decoration over an already-settled result.
