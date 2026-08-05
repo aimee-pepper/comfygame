@@ -69,17 +69,37 @@ final class BookRulesTests: XCTestCase {
         }
     }
 
-    /// A slot the player has no symbols for generates nothing at all, rather than crashing or
-    /// silently borrowing from another slot.
-    func testSlotWithNoOwnedSymbolsIsLeftUnfilled() {
+    /// Every slot gets filled, whatever the player knows. A beginner's book is *more* of a
+    /// gamble than an expert's, not a smaller one — they simply have less say in it.
+    func testEverySlotIsFilledEvenForABeginner() {
         let onlyTerrain: Set<SymbolID> = ["plains"]
         let book = BookRules.resolveBook(draft: BookDraft(), ownedSymbols: onlyTerrain, seed: 5)
-        XCTAssertEqual(book.symbols["terrain"], "plains")
-        XCTAssertNil(book.symbols["biome"])
-        XCTAssertEqual(book.allSymbolIDs.count, 1)
 
-        let projection = BookProjection.project(draft: BookDraft(), ownedSymbols: onlyTerrain)
-        XCTAssertTrue(projection.slotPlans.first { $0.slot == "biome" }?.isEmpty ?? false)
+        XCTAssertEqual(book.allSymbolIDs.count, ContentCatalog.shared.slotIDsInOrder.count,
+                       "Chance fills what you couldn't")
+        XCTAssertEqual(book.randomlyFilled.count, ContentCatalog.shared.slotIDsInOrder.count)
+    }
+
+    /// Chance is not a shuffle. A slot left open can hand you a symbol you never learned — which
+    /// is the whole reason under-specification is a surprise rather than an error.
+    func testChanceCanFillASlotWithSomethingYouDoNotOwn() {
+        let onlyPlains: Set<SymbolID> = ["plains"]
+        var seenUnowned = false
+        for seed in (0..<80).map({ UInt64($0) &* 2_654_435_761 }) {
+            let book = BookRules.resolveBook(draft: BookDraft(), ownedSymbols: onlyPlains, seed: seed)
+            if book.allSymbolIDs.contains(where: { !onlyPlains.contains($0) }) { seenUnowned = true; break }
+        }
+        XCTAssertTrue(seenUnowned, "A chance-filled slot must be able to reach beyond what you know")
+    }
+
+    /// …but you can only *deliberately* write what you've learned.
+    func testYouCanOnlyChooseWhatYouOwn() {
+        let onlyPlains: Set<SymbolID> = ["plains"]
+        for slot in ContentCatalog.shared.slotIDsInOrder {
+            for symbol in BookRules.writable(in: slot, ownedSymbols: onlyPlains) {
+                XCTAssertTrue(onlyPlains.contains(symbol.id))
+            }
+        }
     }
 
     // MARK: The risk/reward dial

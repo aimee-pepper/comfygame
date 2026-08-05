@@ -172,8 +172,8 @@ private struct SlotCard: View {
 
     private var subtitle: String {
         if let chosen = plan.chosen { return chosen.blurb }
-        if plan.isEmpty { return "You own no \(slotName.lowercased()) symbols yet." }
-        return "One of \(plan.candidates.count), chosen when you bind."
+        if plan.isEmpty { return "Nothing could fill this." }
+        return "Any of \(plan.candidates.count) — including things you can't write yet."
     }
 }
 
@@ -188,7 +188,7 @@ private struct SymbolPickerView: View {
     @Environment(\.dismiss) private var dismiss
 
     private var owned: [SymbolDef] {
-        BookRules.candidates(for: slot, ownedSymbols: store.state.base.ownedSymbols)
+        BookRules.writable(in: slot, ownedSymbols: store.state.base.ownedSymbols)
     }
 
     private var slotName: String {

@@ -186,6 +186,188 @@ final class PressureTests: XCTestCase {
         XCTAssertEqual(readings["illumination"].peak, 0, "…but nobody lit it")
     }
 
+    // MARK: The teeth — cross-target constraints
+
+    /// Dry caps life, whatever you wrote. Without this, every world is teeming.
+    func testDryWorldsCannotBeTeeming() {
+        let desert = PressureRules.resolve([
+            sigil("sun", "illumination", .great),
+            sigil("sand", "substrate", .overwhelming),
+            sigil("canopy", "vitality", .overwhelming),   // asking for a jungle anyway
+        ])
+        XCTAssertLessThan(desert["vitality"].peak, 60, "A dry world can't carry a jungle")
+        XCTAssertTrue(desert["vitality"].has("water-limited") || desert["vitality"].has("light-limited"))
+    }
+
+    /// …unless something down there is eating rather than photosynthesising. The exemption is the
+    /// interesting case, not a loophole.
+    func testLightlessWorldsNeedANonPhotosyntheticBase() {
+        let deadDark = PressureRules.resolve([
+            sigil("rain", "hydrology", .great),
+            sigil("canopy", "vitality", .great),
+        ])
+        let fungalDark = PressureRules.resolve([
+            sigil("rain", "hydrology", .great),
+            sigil("fungus", "vitality", .great),
+        ])
+
+        XCTAssertTrue(deadDark["vitality"].has("light-limited"),
+                      "No light and no fungus means no food web")
+        XCTAssertFalse(fungalDark["vitality"].has("light-limited"),
+                       "Fungal worlds feed themselves in the dark")
+    }
+
+    /// "Write Sea on a frozen world and you get a glacier whether you asked for one or not."
+    func testHeatDecidesWhatFormWaterTakes() {
+        let frozen = PressureRules.resolve([
+            sigil("sea", "hydrology", .great),
+            sigil("glacier", "thermal", .overwhelming),
+        ])["hydrology"]
+
+        XCTAssertGreaterThan(frozen.share(of: "frozen"), 0, "The sea froze over")
+        XCTAssertLessThan(frozen.availableMagnitude, frozen.peak,
+                          "…and frozen water is water the world can't use")
+        XCTAssertTrue(frozen.has("frozen-over"))
+    }
+
+    /// Thick air holds heat and narrows the swing; thin air widens it. Same sun, opposite worlds.
+    func testAirDecidesHowFarTheTemperatureSwings() {
+        let buffered = PressureRules.resolve([
+            sigil("sun", "illumination"),
+            sigil("cloud", "atmosphere", .great),
+        ])["thermal"]
+        let exposed = PressureRules.resolve([
+            sigil("sun", "illumination"),
+            sigil("thin_air", "atmosphere", .great),
+        ])["thermal"]
+
+        XCTAssertLessThan(buffered.range, exposed.range, "Thin air is a wider swing")
+        XCTAssertTrue(exposed.has("arid-swing"))
+        XCTAssertTrue(buffered.has("thermally-buffered"))
+    }
+
+    // MARK: The energy budget
+
+    /// The one mechanic that stops everything-creatures: size, armour and insulation all draw on
+    /// the same purse, and a cold poor world can't fill it.
+    func testColdAndPoorTogetherCapHowBigThingsGet() {
+        let rich = PressureRules.resolve([
+            sigil("sun", "illumination", .great),
+            sigil("rain", "hydrology", .great),
+            sigil("canopy", "vitality", .great),
+        ])
+        let coldAndPoor = PressureRules.resolve([
+            sigil("glacier", "thermal", .great),
+            sigil("void", "illumination", .great),
+        ])
+
+        XCTAssertGreaterThan(WorldConstraints.maximumCreatureSize(in: rich),
+                             WorldConstraints.maximumCreatureSize(in: coldAndPoor))
+        XCTAssertEqual(WorldConstraints.maximumCreatureSize(in: coldAndPoor), 0, accuracy: 0.001,
+                       "A frozen dead world feeds nothing large")
+    }
+
+    // MARK: Reading a world's character
+
+    /// Openness sets the ambush↔pursuit axis, which then constrains build, reach and crypsis.
+    func testOpenGroundMakesPursuitAndEnclosedGroundMakesAmbush() {
+        let open = WorldConstraints.character(of: PressureRules.resolve([sigil("sea", "relief", .great)]))
+        let enclosed = WorldConstraints.character(of: PressureRules.resolve([sigil("canopy", "relief", .great)]))
+
+        XCTAssertTrue(open.contains("pursuit"))
+        XCTAssertTrue(enclosed.contains("ambush"))
+    }
+
+    /// Cold has four co-valid answers and the *other* targets pick between them — fur fails when
+    /// it's wet, so wet-cold and dry-cold are different worlds.
+    func testWetColdAndDryColdAreDifferentAnswers() {
+        let wet = WorldConstraints.character(of: PressureRules.resolve([
+            sigil("ice", "thermal", .great),
+            sigil("rain", "hydrology", .overwhelming),
+        ]))
+        let dry = WorldConstraints.character(of: PressureRules.resolve([
+            sigil("ice", "thermal", .great),
+            sigil("sand", "substrate", .great),
+        ]))
+
+        XCTAssertTrue(wet.contains("wet-cold"))
+        XCTAssertTrue(dry.contains("dry-cold"))
+    }
+
+    /// Iridescence needs light to signal in *and* something hard to refract it — neither alone.
+    func testIridescenceNeedsBothLightAndHardGround() {
+        let both = WorldConstraints.character(of: PressureRules.resolve([
+            sigil("sun", "illumination", .great),
+            sigil("granite", "substrate", .great),
+        ]))
+        let lightOnly = WorldConstraints.character(of: PressureRules.resolve([
+            sigil("sun", "illumination", .great),
+        ]))
+
+        XCTAssertTrue(both.contains("iridescence-enabled"))
+        XCTAssertFalse(lightOnly.contains("iridescence-enabled"))
+    }
+
+    // MARK: Silence is rolled, not defaulted
+
+    /// A target nobody wrote about is **rolled**, not set to something sensible. Otherwise every
+    /// under-specified world is the same tepid place, and leaving a slot open stops being a
+    /// gamble worth taking.
+    func testAnUnwrittenTargetIsRolledRatherThanDefaulted() {
+        let page = [sigil("sun", "illumination", .great)]
+        var distinct = Set<Double>()
+        for seed in (1...25).map({ UInt64($0) &* 2_654_435_761 }) {
+            distinct.insert(PressureRules.resolve(page, fillingUnwrittenWith: seed)["hydrology"].peak)
+        }
+        XCTAssertGreaterThan(distinct.count, 3,
+                             "Unwritten hydrology should vary between worlds, not sit at a default")
+    }
+
+    /// Same seed, same world — the roll has to be reproducible or the pre-bind preview is lying.
+    func testTheRollIsDeterministicInTheSeed() {
+        let page = [sigil("sun", "illumination")]
+        XCTAssertEqual(PressureRules.resolve(page, fillingUnwrittenWith: 777),
+                       PressureRules.resolve(page, fillingUnwrittenWith: 777))
+        XCTAssertNotEqual(PressureRules.resolve(page, fillingUnwrittenWith: 777),
+                          PressureRules.resolve(page, fillingUnwrittenWith: 778))
+    }
+
+    /// Rolling never *replaces* what you wrote — it only speaks where you didn't.
+    ///
+    /// It can still change what you wrote, though, and deliberately: a rolled source drags its own
+    /// secondaries in with it, so chance rolling heavy ash for the atmosphere will dim the sun you
+    /// carefully specified. The world arguing back is the system working, not a leak.
+    func testRollingSpeaksOnlyWhereYouWereSilent() {
+        let page = [sigil("sun", "illumination", .great)]
+        let rolled = PressureRules.rollUnwritten(after: page, seed: 4242)
+
+        for extra in rolled {
+            XCTAssertNotEqual(extra.target, "illumination", "You already said what the light is")
+            XCTAssertNotEqual(extra.target, "thermal", "…and the sun said what the heat is")
+        }
+    }
+
+    /// The consequence worth having: what chance brings can change the world you thought you wrote.
+    func testWhatChanceBringsCanActOnWhatYouWrote() {
+        let page = [sigil("sun", "illumination", .great)]
+        let alone = PressureRules.resolve(page)["illumination"].peak
+        let withRolls = (1...30).map {
+            PressureRules.resolve(page, fillingUnwrittenWith: UInt64($0) &* 65_537)["illumination"].peak
+        }
+        XCTAssertTrue(withRolls.contains { $0 != alone },
+                      "A rolled source's secondaries should be able to reach the light you wrote")
+    }
+
+    /// Chance draws from the whole pool — including sources the player has no way to write.
+    func testChanceCanReachThingsThePlayerCannotWrite() {
+        let rolled = PressureRules.rollUnwritten(after: [], seed: 99)
+        XCTAssertFalse(rolled.isEmpty)
+        let pool = Set(ContentCatalog.shared.pressureSources.map(\.id))
+        for sigil in rolled {
+            XCTAssertTrue(pool.contains(sigil.source))
+        }
+    }
+
     // MARK: Content
 
     func testEveryTargetResolvesAndOnlyTwoCarryAFloor() {

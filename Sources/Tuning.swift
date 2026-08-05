@@ -73,6 +73,33 @@ enum Tuning {
         static let wideRangeThreshold: Double = 50 // PLACEHOLDER
         /// …and the spread below which nothing ever changes.
         static let flatRangeThreshold: Double = 5  // PLACEHOLDER
+
+        // Cross-target constraints — "the teeth". All PLACEHOLDER.
+        /// How strongly air density pulls the thermal swing together (or, thin, pushes it apart).
+        static let atmosphereThermalRetention: Double = 0.35
+        /// Thermal floor below which standing water freezes.
+        static let freezingFloor: Double = 25
+        /// Thermal peak above which standing water goes airborne.
+        static let evaporatingPeak: Double = 75
+        /// Productivity a world can carry per point of *usable* water, and per point of light.
+        static let vitalityPerWater: Double = 1.4
+        static let vitalityPerLight: Double = 1.2
+        static let barrenThreshold: Double = 10
+
+        // The energy budget: one purse for size, armour, insulation, weapons and ornament.
+        static let budgetPerProductivity: Double = 1.0
+        /// Below this the world is cold enough that staying warm costs real energy.
+        static let comfortableFloor: Double = 40
+        static let insulationCostPerDegree: Double = 0.6
+
+        // Reading a world's character.
+        static let openTerrainThreshold: Double = 55
+        static let coldFloor: Double = 30
+        static let hotPeak: Double = 70
+        static let wetThreshold: Double = 45
+        static let aridThreshold: Double = 25
+        static let iridescenceLight: Double = 40
+        static let aphoticPeak: Double = 10
     }
 
     // MARK: - Worlds

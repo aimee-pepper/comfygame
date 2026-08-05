@@ -213,3 +213,18 @@ starter — a ladder whose middle rung is missing teaches nothing. That makes tw
 the eleven named in the brief (Q2).
 
 Say if it should be researched rather than granted, and I'll move it.
+
+### Q16. Does a chance-filled symbol teach you anything?
+Chance now draws from the **whole** pool, so a slot left open can hand you a symbol you've never
+learned — that's what makes under-specification a surprise rather than a shuffle (Aimee's
+correction). But using one doesn't currently grant it.
+
+**Shipped:** you write the world, you don't learn the word. Ownership stays a research/discovery
+matter.
+
+**Worth considering:** having chance *introduce* vocabulary — a world writes itself with something
+you couldn't have asked for, and you come home able to ask for it. That would make leaving slots
+open a genuine route into the research tree rather than only a cheap gamble, and it fits the wild
+compounds route in the rune spec §10. It also risks making deliberate research feel redundant, so
+it probably wants to be rarer than "any chance-fill teaches you".
+`Sources/Rules/BookRules.swift` (`candidates` vs `writable`).

@@ -17,7 +17,51 @@ enum PressureRules {
 
     // MARK: Resolution
 
+    /// Resolve a page into the world it describes, constraints and all.
+    ///
+    /// The cross-target constraints are applied here rather than left to callers, because a reading
+    /// that hasn't been through them is a reading that says a lightless world is teeming.
     static func resolve(_ sigils: [Sigil]) -> PressureReadings {
+        WorldConstraints.apply(to: resolveUnconstrained(sigils))
+    }
+
+    /// Resolve a page **and roll for everything it didn't mention**.
+    ///
+    /// A target nobody wrote about isn't set to some sensible default — it's *rolled*, from the
+    /// whole pool of sources, at a random intensity. That's what makes an under-specified book a
+    /// surprise rather than a blank: you find out what the world decided, and it may well be
+    /// something you couldn't have written yourself.
+    ///
+    /// Deterministic in the seed, so the pre-bind preview's ranges stay honest and the same book
+    /// always produces the same world.
+    static func resolve(_ sigils: [Sigil], fillingUnwrittenWith seed: UInt64) -> PressureReadings {
+        WorldConstraints.apply(to: resolveUnconstrained(sigils + rollUnwritten(after: sigils, seed: seed)))
+    }
+
+    /// One rolled sigil for each target the page left silent.
+    static func rollUnwritten(after sigils: [Sigil], seed: UInt64) -> [Sigil] {
+        var rng = SeededRNG(seed: seed).derived(0x51611)
+        let written = Set(sigils.flatMap { sigil -> [PressureTargetID] in
+            ContentCatalog.shared.pressureSource(sigil.source)?.targets ?? []
+        })
+
+        var rolled: [Sigil] = []
+        for target in ContentCatalog.shared.pressureTargetsInOrder where !written.contains(target.id) {
+            // Anything that can push on this target, whether or not the player could write it.
+            let pool = ContentCatalog.shared.pressureSources
+                .filter { $0.contribution(to: target.id) != nil }
+                .sorted { $0.id.rawValue < $1.id.rawValue }
+            guard let source = rng.pick(pool) else { continue }
+            let intensity = rng.pick(Intensity.allCases.filter { $0 != .absent }) ?? .moderate
+            rolled.append(Sigil(id: InstanceID(rawValue: rng.next()),
+                                source: source.id, target: target.id, intensity: intensity))
+        }
+        return rolled
+    }
+
+    /// Raw resolution, before the targets are allowed to argue with each other. Exposed for tests
+    /// that need to see a single target's arithmetic in isolation.
+    static func resolveUnconstrained(_ sigils: [Sigil]) -> PressureReadings {
         var readings: [PressureTargetID: PressureReading] = [:]
 
         for target in ContentCatalog.shared.pressureTargets {

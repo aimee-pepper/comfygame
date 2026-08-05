@@ -36,10 +36,21 @@ enum BookRules {
         return book
     }
 
-    /// What a random fill for this slot could draw from. Sorted for determinism.
-    static func candidates(for slot: SlotID, ownedSymbols: Set<SymbolID>) -> [SymbolDef] {
+    /// What you can deliberately put in a slot: only what you've learned to write.
+    static func writable(in slot: SlotID, ownedSymbols: Set<SymbolID>) -> [SymbolDef] {
         ContentCatalog.shared.symbols(in: slot)
             .filter { ownedSymbols.contains($0.id) }
+            .sorted { $0.id.rawValue < $1.id.rawValue }
+    }
+
+    /// What **chance** can put in a slot: anything at all.
+    ///
+    /// Deliberately *not* limited to what the player owns. Under-specification is supposed to be a
+    /// surprise, and a chance-fill that could only ever hand back things you already knew isn't a
+    /// surprise — it's a shuffle. Leaving a slot open is how a world turns out to be something you
+    /// don't yet know how to ask for.
+    static func candidates(for slot: SlotID, ownedSymbols: Set<SymbolID>) -> [SymbolDef] {
+        ContentCatalog.shared.symbols(in: slot)
             .sorted { $0.id.rawValue < $1.id.rawValue }
     }
 

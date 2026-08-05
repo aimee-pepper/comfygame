@@ -40,3 +40,22 @@ Drop everything in `docs/` into the repo's `docs/`. Two of these **replace** fil
 ## Still open (not yours to resolve)
 
 Q-A anchoring timing, the sustain economy, reality-layer reset, permanent-loss policy per layer, the quirk catalog — all still in `open-questions.md`.
+
+---
+
+## Added in the second batch — the story layer
+
+| File | What it is |
+|---|---|
+| `narrative-systems-spec.md` | Travellers, **trails**, clues, diaries, the Library, named places, the great work |
+| `companions-base-anchoring-spec.md` | Companions, recruitment, assignment, tavern, base buildings, **anchoring (Q-A)**, **sustain economy (Q-B)**, **reality reset (Q-C)**, **permanent-loss policy (Q-F)** — all four previously-open questions now have proposed resolutions |
+
+**The structural idea worth reading first:** travellers are static, but they *travelled* before the game began, and their pages are scattered along that historical path. So the search is a **trail** — a page in one world describes the next world along their route, and the final page describes where they stopped. This keeps the honesty invariant trivially true, gives difficulty a natural knob (trail length), and turns clue-following into a chain rather than a lookup.
+
+**Proposed resolutions to the four open questions** (override freely, but they're specced so the game is buildable end-to-end):
+- **Anchoring:** two-step — cheap in-world **tether** preserves the seed, expensive **anchor** performed later at base.
+- **Sustain:** upkeep charged on run completion, paid first from what the world produces via assigned workers; failure means **dormancy, not destruction**.
+- **Reality reset:** player-initiated, knowledge/runes/named places/great work survive, with the gain **previewed before committing**.
+- **Permanent loss:** un-banked haul yes; companions in unstable anchored worlds yes (the price of greed); people in the party, anchored worlds, and all knowledge never.
+
+Build order for the story layer is in §7 of the companions spec.

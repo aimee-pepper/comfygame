@@ -36,6 +36,11 @@
           "tags": [
             "volcanic-winter"
           ]
+        },
+        {
+          "target": "vitality",
+          "character": "suppressing",
+          "peak": -18
         }
       ]
     },
@@ -58,6 +63,25 @@
       ]
     },
     {
+      "id": "bloom",
+      "name": "Bloom",
+      "icon": "camera.macro.circle",
+      "blurb": "Brief, and worth being there for.",
+      "contributions": [
+        {
+          "target": "vitality",
+          "character": "producing",
+          "peak": 20,
+          "aspects": {
+            "dispersion": -20
+          },
+          "tags": [
+            "seasonal"
+          ]
+        }
+      ]
+    },
+    {
       "id": "canopy",
       "name": "Canopy",
       "icon": "tree.fill",
@@ -73,16 +97,30 @@
           ]
         },
         {
-          "target": "vitality",
-          "character": "producing",
-          "peak": 35,
-          "floor": 0
-        },
-        {
           "target": "thermal",
           "character": "retaining",
           "peak": -10,
           "floor": 6
+        },
+        {
+          "target": "relief",
+          "character": "raising",
+          "peak": 12,
+          "aspects": {
+            "openness": -35,
+            "verticality": 30
+          },
+          "tags": [
+            "two-storey"
+          ]
+        },
+        {
+          "target": "vitality",
+          "character": "producing",
+          "peak": 35,
+          "aspects": {
+            "trophicDepth": 15
+          }
         }
       ]
     },
@@ -163,9 +201,12 @@
         },
         {
           "target": "substrate",
-          "character": "hard",
-          "peak": 30,
-          "floor": 0,
+          "character": "volatile",
+          "peak": 25,
+          "aspects": {
+            "dispersion": -20
+          },
+          "form": "volatile",
           "tags": [
             "valuable"
           ]
@@ -191,9 +232,9 @@
           "target": "vitality",
           "character": "decomposing",
           "peak": 20,
-          "floor": 0,
           "tags": [
-            "fungal"
+            "fungal",
+            "decaying"
           ]
         }
       ]
@@ -254,7 +295,73 @@
         {
           "target": "relief",
           "character": "raising",
-          "peak": 25
+          "peak": 25,
+          "aspects": {
+            "openness": -10,
+            "verticality": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "icon": "seal.fill",
+      "blurb": "The reason people write dangerous books.",
+      "contributions": [
+        {
+          "target": "substrate",
+          "character": "ductile",
+          "peak": 40,
+          "aspects": {
+            "dispersion": -20
+          },
+          "form": "ductile",
+          "tags": [
+            "valuable"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "granite",
+      "name": "Granite",
+      "icon": "square.fill",
+      "blurb": "Old, hard, and going nowhere.",
+      "contributions": [
+        {
+          "target": "substrate",
+          "character": "hard",
+          "peak": 8,
+          "aspects": {
+            "dispersion": -5
+          },
+          "form": "hard"
+        },
+        {
+          "target": "relief",
+          "character": "raising",
+          "peak": 20,
+          "aspects": {
+            "openness": -15,
+            "verticality": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "herd",
+      "name": "Herd",
+      "icon": "hare.fill",
+      "blurb": "Something large eats here, so something larger might.",
+      "contributions": [
+        {
+          "target": "vitality",
+          "character": "consuming",
+          "peak": -5,
+          "aspects": {
+            "trophicDepth": 30
+          }
         }
       ]
     },
@@ -278,6 +385,26 @@
           "character": "sinking",
           "peak": -22,
           "floor": -28
+        }
+      ]
+    },
+    {
+      "id": "iron",
+      "name": "Iron",
+      "icon": "wrench.adjustable",
+      "blurb": "Workable, and worth working.",
+      "contributions": [
+        {
+          "target": "substrate",
+          "character": "ductile",
+          "peak": 8,
+          "aspects": {
+            "dispersion": -20
+          },
+          "form": "ductile",
+          "tags": [
+            "valuable"
+          ]
         }
       ]
     },
@@ -321,18 +448,21 @@
           ]
         },
         {
-          "target": "substrate",
-          "character": "volatile",
-          "peak": 25,
-          "floor": 0
-        },
-        {
           "target": "thermal",
           "character": "producing",
           "peak": 60,
           "floor": 45,
           "tags": [
             "geothermal"
+          ]
+        },
+        {
+          "target": "substrate",
+          "character": "volatile",
+          "peak": 25,
+          "form": "volatile",
+          "tags": [
+            "unstable-ground"
           ]
         }
       ]
@@ -363,9 +493,20 @@
           "floor": 8
         },
         {
+          "target": "relief",
+          "character": "flattening",
+          "peak": -8,
+          "aspects": {
+            "openness": 10
+          }
+        },
+        {
           "target": "vitality",
           "character": "producing",
-          "peak": 25
+          "peak": 25,
+          "aspects": {
+            "trophicDepth": 10
+          }
         }
       ]
     },
@@ -382,16 +523,18 @@
           "floor": -4
         },
         {
-          "target": "vitality",
-          "character": "consuming",
-          "peak": -20,
-          "floor": 0
-        },
-        {
           "target": "atmosphere",
           "character": "occluding",
           "peak": 22,
           "floor": 0,
+          "tags": [
+            "toxic"
+          ]
+        },
+        {
+          "target": "vitality",
+          "character": "suppressing",
+          "peak": -20,
           "tags": [
             "toxic"
           ]
@@ -468,15 +611,18 @@
           "form": "airborne"
         },
         {
-          "target": "vitality",
-          "character": "producing",
-          "peak": 30
-        },
-        {
           "target": "illumination",
           "character": "occluding",
           "peak": -8,
           "floor": -2
+        },
+        {
+          "target": "vitality",
+          "character": "producing",
+          "peak": 30,
+          "aspects": {
+            "dispersion": 20
+          }
         }
       ]
     },
@@ -523,14 +669,59 @@
           "form": "flowing"
         },
         {
-          "target": "relief",
-          "character": "cutting",
-          "peak": 20
-        },
-        {
           "target": "vitality",
           "character": "producing",
           "peak": 15
+        },
+        {
+          "target": "relief",
+          "character": "cutting",
+          "peak": 20,
+          "aspects": {
+            "openness": -15,
+            "verticality": 15
+          },
+          "tags": [
+            "broken"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "root",
+      "name": "Root",
+      "icon": "point.3.connected.trianglepath.dotted",
+      "blurb": "Something is holding this place together.",
+      "contributions": [
+        {
+          "target": "vitality",
+          "character": "producing",
+          "peak": 25,
+          "aspects": {
+            "trophicDepth": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "rot",
+      "name": "Rot",
+      "icon": "drop.degreesign.fill",
+      "blurb": "The world eating itself back down.",
+      "contributions": [
+        {
+          "target": "vitality",
+          "character": "decomposing",
+          "peak": 15,
+          "tags": [
+            "decaying"
+          ]
+        },
+        {
+          "target": "substrate",
+          "character": "ductile",
+          "peak": 4,
+          "form": "ductile"
         }
       ]
     },
@@ -540,11 +731,6 @@
       "icon": "cube.fill",
       "blurb": "What's left when the water goes.",
       "contributions": [
-        {
-          "target": "substrate",
-          "character": "hard",
-          "peak": 20
-        },
         {
           "target": "hydrology",
           "character": "draining",
@@ -557,9 +743,18 @@
           ]
         },
         {
+          "target": "substrate",
+          "character": "volatile",
+          "peak": 8,
+          "form": "volatile"
+        },
+        {
           "target": "vitality",
-          "character": "consuming",
-          "peak": -25
+          "character": "suppressing",
+          "peak": -25,
+          "tags": [
+            "barren"
+          ]
         }
       ]
     },
@@ -570,16 +765,28 @@
       "blurb": "It gets into everything and holds nothing.",
       "contributions": [
         {
-          "target": "substrate",
-          "character": "ductile",
-          "peak": 25
-        },
-        {
           "target": "hydrology",
           "character": "draining",
           "peak": -20,
           "aspects": {
             "salinity": 5
+          }
+        },
+        {
+          "target": "substrate",
+          "character": "ductile",
+          "peak": 4,
+          "aspects": {
+            "dispersion": 20
+          },
+          "form": "ductile"
+        },
+        {
+          "target": "relief",
+          "character": "flattening",
+          "peak": -10,
+          "aspects": {
+            "openness": 25
           }
         }
       ]
@@ -608,6 +815,14 @@
           "tags": [
             "thermally-buffered"
           ]
+        },
+        {
+          "target": "relief",
+          "character": "flattening",
+          "peak": -15,
+          "aspects": {
+            "openness": 30
+          }
         }
       ]
     },
@@ -708,6 +923,29 @@
       ]
     },
     {
+      "id": "sulfur",
+      "name": "Sulfur",
+      "icon": "aqi.low",
+      "blurb": "The air tastes of it.",
+      "contributions": [
+        {
+          "target": "substrate",
+          "character": "volatile",
+          "peak": 15,
+          "form": "volatile",
+          "tags": [
+            "toxic",
+            "unstable-ground"
+          ]
+        },
+        {
+          "target": "vitality",
+          "character": "suppressing",
+          "peak": -12
+        }
+      ]
+    },
+    {
       "id": "sun",
       "name": "Sun",
       "icon": "sun.max.fill",
@@ -727,6 +965,25 @@
           "character": "producing",
           "peak": 40,
           "floor": 8
+        }
+      ]
+    },
+    {
+      "id": "swarm",
+      "name": "Swarm",
+      "icon": "ant.fill",
+      "blurb": "Numerous, and not friendly.",
+      "contributions": [
+        {
+          "target": "vitality",
+          "character": "consuming",
+          "peak": -8,
+          "aspects": {
+            "trophicDepth": 20
+          },
+          "tags": [
+            "swarming"
+          ]
         }
       ]
     },
@@ -801,11 +1058,6 @@
           "peak": 35
         },
         {
-          "target": "relief",
-          "character": "raising",
-          "peak": 30
-        },
-        {
           "target": "atmosphere",
           "character": "occluding",
           "peak": 25,
@@ -815,6 +1067,15 @@
           "tags": [
             "choking"
           ]
+        },
+        {
+          "target": "relief",
+          "character": "raising",
+          "peak": 30,
+          "aspects": {
+            "openness": -20,
+            "verticality": 25
+          }
         }
       ]
     },
@@ -836,11 +1097,6 @@
           "peak": -15
         },
         {
-          "target": "vitality",
-          "character": "consuming",
-          "peak": -30
-        },
-        {
           "target": "atmosphere",
           "character": "occluding",
           "peak": 20,
@@ -850,6 +1106,11 @@
           "tags": [
             "choking"
           ]
+        },
+        {
+          "target": "vitality",
+          "character": "suppressing",
+          "peak": -30
         }
       ]
     },
@@ -876,7 +1137,10 @@
         {
           "target": "relief",
           "character": "cutting",
-          "peak": 10
+          "peak": 10,
+          "aspects": {
+            "openness": 10
+          }
         }
       ]
     }

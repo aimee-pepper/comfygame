@@ -65,7 +65,21 @@
       "highLabel": "rich",
       "lowLabel": "barren",
       "order": 3,
-      "baseline": 0
+      "baseline": 0,
+      "forms": [
+        "hard",
+        "ductile",
+        "volatile"
+      ],
+      "aspects": [
+        {
+          "id": "dispersion",
+          "name": "Dispersion",
+          "lowLabel": "veined",
+          "highLabel": "uniform",
+          "baseline": 50
+        }
+      ]
     },
     {
       "id": "relief",
@@ -76,7 +90,23 @@
       "highLabel": "broken",
       "lowLabel": "flat",
       "order": 4,
-      "baseline": 0
+      "baseline": 0,
+      "aspects": [
+        {
+          "id": "openness",
+          "name": "Openness",
+          "lowLabel": "enclosed",
+          "highLabel": "open",
+          "baseline": 60
+        },
+        {
+          "id": "verticality",
+          "name": "Verticality",
+          "lowLabel": "flat",
+          "highLabel": "layered",
+          "baseline": 10
+        }
+      ]
     },
     {
       "id": "vitality",
@@ -87,7 +117,23 @@
       "highLabel": "teeming",
       "lowLabel": "sterile",
       "order": 5,
-      "baseline": 0
+      "baseline": 0,
+      "aspects": [
+        {
+          "id": "trophicDepth",
+          "name": "Food web",
+          "lowLabel": "shallow",
+          "highLabel": "deep",
+          "baseline": 20
+        },
+        {
+          "id": "dispersion",
+          "name": "Dispersion",
+          "lowLabel": "clustered",
+          "highLabel": "even",
+          "baseline": 50
+        }
+      ]
     },
     {
       "id": "atmosphere",
