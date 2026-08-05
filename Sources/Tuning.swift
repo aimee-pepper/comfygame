@@ -190,6 +190,18 @@ enum Tuning {
 
     // MARK: - Encounters
 
+    /// The danger↔time axis (contradiction-danger-spec §5).
+    enum Danger {
+        /// The most stability the danger runes can buy between them, however many are written.
+        ///
+        /// **[PROPOSAL in §5, and it pulls against a ruling — see questions-for-design Q23.]**
+        /// Without a ceiling, six danger runes make an arbitrarily greedy world safe, which is the
+        /// failure Mystcraft capped its scorched/lightning bonus to avoid. With one, a symbol no
+        /// longer moves the meter by exactly its printed number — so the shortfall is reported as
+        /// its own line rather than silently swallowed.
+        static let maximumStabilityGift: Int = 40    // PLACEHOLDER
+    }
+
     enum Contradiction {
         /// The disclosed superlinear term. Small: it exists to say "several at once is worse than
         /// several separately", not to make stacking unthinkable.

@@ -18,6 +18,10 @@ targets:
   Bookbinder:
     type: application
     platform: iOS
+    # Signing lives here so regenerating the project can't clobber it. See the file.
+    configFiles:
+      Debug: Support/Signing.xcconfig
+      Release: Support/Signing.xcconfig
     sources:
       - path: Sources
     settings:
@@ -28,14 +32,12 @@ targets:
         MARKETING_VERSION: "0.1"
         TARGETED_DEVICE_FAMILY: "1" # iPhone only — portrait, one-handed (pillar 3)
         CODE_SIGN_STYLE: Automatic
-        # Aimee's personal (free) Apple ID team, taken from the signing certificate already in the
-        # keychain. Xcode needs the matching Apple ID added under Settings → Accounts before it can
-        # issue a profile — see "Running it on your phone" in the README.
+        # DEVELOPMENT_TEAM deliberately lives in Support/Signing.xcconfig, NOT here.
         #
-        # Free provisioning also means an installed build stops launching after 7 days; rebuilding
-        # from Xcode renews it. If signing ever complains about the team, delete this line and let
-        # Xcode pick.
-        DEVELOPMENT_TEAM: BNV6X8W4QS
+        # The .xcodeproj is generated, so anything set here — or picked in Xcode's Signing & 
+        # Capabilities tab — is overwritten the next time `xcodegen generate` runs. Hardcoding a
+        # team ID here meant every regeneration re-broke signing. The xcconfig is a plain file
+        # xcodegen never rewrites, so a choice made there survives.
         GENERATE_INFOPLIST_FILE: NO
         SWIFT_EMIT_LOC_STRINGS: YES
     info:

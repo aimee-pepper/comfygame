@@ -194,6 +194,7 @@
 		F395689728B586E0D0A7CD61 /* CombatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTests.swift; sourceTree = "<group>"; };
 		F43DADDF1091E89318A12B0D /* ContradictionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionTests.swift; sourceTree = "<group>"; };
 		F978ADFABDF1296849D8F5AB /* GambitEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GambitEngine.swift; sourceTree = "<group>"; };
+		FBE911A8A2C4D05D38EF6192 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -277,6 +278,7 @@
 			isa = PBXGroup;
 			children = (
 				BC0CE529F9D43490953E09A0 /* Sources */,
+				AD5AD96F34050F6073DCC407 /* Support */,
 				D1F197F56457F06C0D463B6A /* Tests */,
 				86D3F0D811C9C291D68E4FB1 /* Products */,
 			);
@@ -347,6 +349,14 @@
 				7294A9FAF1EE19D44BD7C56D /* SeededRNG.swift */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		AD5AD96F34050F6073DCC407 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				FBE911A8A2C4D05D38EF6192 /* Signing.xcconfig */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 		BC0CE529F9D43490953E09A0 /* Sources */ = {
@@ -445,7 +455,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					CF0593DC0240C3C51FDC7CAE = {
-						DevelopmentTeam = BNV6X8W4QS;
+						DevelopmentTeam = CQ892K6L4F;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -683,12 +693,12 @@
 		};
 		575C197AAA81291358FEC6CC /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FBE911A8A2C4D05D38EF6192 /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BNV6X8W4QS;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -781,12 +791,12 @@
 		};
 		F6C045C1371714E19A4D5BD1 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FBE911A8A2C4D05D38EF6192 /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BNV6X8W4QS;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

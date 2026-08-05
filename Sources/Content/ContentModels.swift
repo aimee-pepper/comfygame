@@ -57,9 +57,57 @@ struct SymbolDef: Codable, Equatable, Identifiable, Sendable {
     /// v0 loop. Pressures ride alongside and drive what the older fields can't describe — climate,
     /// creature character, and which sites a world can host.
     var expandsTo: [CompoundComponent]
+    /// How this symbol makes the world hostile — or, for Peace, less so.
+    ///
+    /// The **danger↔time axis** (`contradiction-danger-spec.md` §5). Danger runes accept hostility
+    /// and buy stability; Peace spends stability to buy calm. Danger runes are the release valve
+    /// that makes greedy worlds viable at all: a world rich enough to be worth writing may be too
+    /// unstable to survive, and you buy it time by accepting that it crawls with things.
+    var danger: DangerProfile?
 
     enum Acquisition: String, Codable, Sendable {
         case starter, research, worldDrop
+    }
+}
+
+/// What a symbol does to how hostile a world is.
+///
+/// Deliberately several dials rather than one "danger" number: stacking danger runes is supposed to
+/// **broaden the kinds of danger** rather than multiply one of them, so Swarm and Predation have to
+/// be able to pull in opposite directions on the same axis.
+struct DangerProfile: Codable, Equatable, Sendable {
+    /// Scales how many creatures the world holds. Swarm raises it; Predation lowers it.
+    var spawnMultiplier: Double
+    /// Shifts creature tier. Predation raises it; Swarm lowers it.
+    var tierDelta: Int
+    /// Hazard tiles placed at generation, before any stability-driven crumbling.
+    var hazardTiles: Int
+    /// Damage taken per player turn simply for being here. Miasma's whole idea.
+    var damagePerTurn: Int
+    /// Which description clause this arms, so the panel can say what kind of hostile it is.
+    var flavour: String?
+
+    static let none = DangerProfile(spawnMultiplier: 1, tierDelta: 0, hazardTiles: 0, damagePerTurn: 0)
+
+    /// Peace is recognised by giving stability *back* — it's the only profile that calms.
+    var isCalming: Bool { spawnMultiplier < 1 && tierDelta < 0 }
+
+    init(spawnMultiplier: Double = 1, tierDelta: Int = 0, hazardTiles: Int = 0,
+         damagePerTurn: Int = 0, flavour: String? = nil) {
+        self.spawnMultiplier = spawnMultiplier
+        self.tierDelta = tierDelta
+        self.hazardTiles = hazardTiles
+        self.damagePerTurn = damagePerTurn
+        self.flavour = flavour
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        spawnMultiplier = try c.decodeIfPresent(Double.self, forKey: .spawnMultiplier) ?? 1
+        tierDelta = try c.decodeIfPresent(Int.self, forKey: .tierDelta) ?? 0
+        hazardTiles = try c.decodeIfPresent(Int.self, forKey: .hazardTiles) ?? 0
+        damagePerTurn = try c.decodeIfPresent(Int.self, forKey: .damagePerTurn) ?? 0
+        flavour = try c.decodeIfPresent(String.self, forKey: .flavour)
     }
 }
 

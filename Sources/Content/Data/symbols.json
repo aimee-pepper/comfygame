@@ -415,6 +415,209 @@
           "intensity": "moderate"
         }
       ]
+    },
+    {
+      "id": "storm",
+      "name": "Storm",
+      "slot": "quirk",
+      "blurb": "The weather here has opinions, and acts on them.",
+      "icon": "cloud.bolt.rain",
+      "acquisition": "research",
+      "essenceCost": 4,
+      "yieldModifiers": {},
+      "enemyTableModifiers": {},
+      "enemyTierDelta": 0,
+      "visionDelta": 0,
+      "stabilityDelta": 22,
+      "expandsTo": [
+        {
+          "source": "wind",
+          "target": "atmosphere",
+          "intensity": "great"
+        },
+        {
+          "source": "rain",
+          "target": "hydrology",
+          "intensity": "moderate"
+        }
+      ],
+      "danger": {
+        "hazardTiles": 6,
+        "flavour": "storm"
+      }
+    },
+    {
+      "id": "blight",
+      "name": "Blight",
+      "slot": "quirk",
+      "blurb": "Something is wrong with what grows. It grows anyway.",
+      "icon": "laurel.trailing",
+      "acquisition": "research",
+      "essenceCost": 4,
+      "yieldModifiers": {
+        "fiber": 0.7
+      },
+      "enemyTableModifiers": {},
+      "enemyTierDelta": 0,
+      "visionDelta": 0,
+      "stabilityDelta": 20,
+      "expandsTo": [
+        {
+          "source": "rot",
+          "target": "vitality",
+          "intensity": "great"
+        },
+        {
+          "source": "miasma",
+          "target": "vitality",
+          "intensity": "faint"
+        }
+      ],
+      "danger": {
+        "damagePerTurn": 1,
+        "hazardTiles": 3,
+        "flavour": "blight"
+      }
+    },
+    {
+      "id": "swarm_rune",
+      "name": "Swarm",
+      "slot": "quirk",
+      "blurb": "Not one of anything. Many of everything.",
+      "icon": "ant.fill",
+      "acquisition": "research",
+      "essenceCost": 4,
+      "yieldModifiers": {},
+      "enemyTableModifiers": {},
+      "enemyTierDelta": 0,
+      "visionDelta": 0,
+      "stabilityDelta": 26,
+      "expandsTo": [
+        {
+          "source": "swarm",
+          "target": "vitality",
+          "intensity": "great"
+        }
+      ],
+      "danger": {
+        "spawnMultiplier": 1.9,
+        "tierDelta": -1,
+        "flavour": "swarm"
+      }
+    },
+    {
+      "id": "predation",
+      "name": "Predation",
+      "slot": "quirk",
+      "blurb": "Fewer things live here. They are why.",
+      "icon": "pawprint.fill",
+      "acquisition": "research",
+      "essenceCost": 4,
+      "yieldModifiers": {},
+      "enemyTableModifiers": {},
+      "enemyTierDelta": 0,
+      "visionDelta": 0,
+      "stabilityDelta": 24,
+      "expandsTo": [
+        {
+          "source": "herd",
+          "target": "vitality",
+          "intensity": "moderate"
+        }
+      ],
+      "danger": {
+        "spawnMultiplier": 0.55,
+        "tierDelta": 2,
+        "flavour": "predation"
+      }
+    },
+    {
+      "id": "miasma_rune",
+      "name": "Miasma",
+      "slot": "quirk",
+      "blurb": "The air itself is against you.",
+      "icon": "aqi.high",
+      "acquisition": "research",
+      "essenceCost": 4,
+      "yieldModifiers": {
+        "fiber": 0.8
+      },
+      "enemyTableModifiers": {},
+      "enemyTierDelta": 0,
+      "visionDelta": 0,
+      "stabilityDelta": 18,
+      "expandsTo": [
+        {
+          "source": "miasma",
+          "target": "atmosphere",
+          "intensity": "great"
+        }
+      ],
+      "danger": {
+        "damagePerTurn": 2,
+        "flavour": "miasma"
+      }
+    },
+    {
+      "id": "tremor",
+      "name": "Tremor",
+      "slot": "quirk",
+      "blurb": "The ground opens where it pleases.",
+      "icon": "waveform.path.ecg",
+      "acquisition": "research",
+      "essenceCost": 4,
+      "yieldModifiers": {},
+      "enemyTableModifiers": {},
+      "enemyTierDelta": 0,
+      "visionDelta": 0,
+      "stabilityDelta": 28,
+      "expandsTo": [
+        {
+          "source": "volcano",
+          "target": "relief",
+          "intensity": "moderate"
+        },
+        {
+          "source": "sulfur",
+          "target": "substrate",
+          "intensity": "moderate"
+        }
+      ],
+      "danger": {
+        "hazardTiles": 9,
+        "flavour": "tremor"
+      }
+    },
+    {
+      "id": "peace",
+      "name": "Peace",
+      "slot": "quirk",
+      "blurb": "Nothing here wants anything from you. It will not last.",
+      "icon": "dove.fill",
+      "acquisition": "research",
+      "essenceCost": 4,
+      "yieldModifiers": {},
+      "enemyTableModifiers": {},
+      "enemyTierDelta": 0,
+      "visionDelta": 0,
+      "stabilityDelta": -30,
+      "expandsTo": [
+        {
+          "source": "bloom",
+          "target": "vitality",
+          "intensity": "faint"
+        },
+        {
+          "source": "stars",
+          "target": "illumination",
+          "intensity": "faint"
+        }
+      ],
+      "danger": {
+        "spawnMultiplier": 0.4,
+        "tierDelta": -2,
+        "flavour": "peace"
+      }
     }
   ]
 }

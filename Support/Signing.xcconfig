@@ -1,0 +1,25 @@
+// Code signing — the one build setting that is NOT generated.
+//
+// The .xcodeproj is produced by `xcodegen generate` from project.yml, so anything set in Xcode's
+// Signing & Capabilities tab is thrown away the next time the project is regenerated. That is what
+// kept re-breaking signing: a team ID was hardcoded in project.yml, and every regeneration put it
+// back regardless of what Xcode had been told.
+//
+// This file is a plain xcconfig. xcodegen references it and never rewrites it, so whatever you set
+// here survives.
+//
+// Aimee's personal team, read from the provisioning profile Xcode actually issued.
+//
+// The previous value (BNV6X8W4QS) came from an old signing certificate sitting in the keychain and
+// was never a team Xcode could use — hence "No Account for Team BNV6X8W4QS" on every build.
+//
+// If this ever goes stale, the true value is in Xcode → Settings → Accounts next to the team name,
+// or from a profile on disk:
+//
+//   security cms -D -i ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/*.mobileprovision \
+//     | plutil -extract TeamIdentifier json -o - -
+//
+// Note: a free personal team means an installed build stops launching after 7 days. Rebuilding
+// from Xcode renews it — that is expected, not a bug.
+
+DEVELOPMENT_TEAM = CQ892K6L4F

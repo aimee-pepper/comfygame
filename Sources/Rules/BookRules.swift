@@ -80,6 +80,46 @@ enum BookRules {
         stabilityDelta(symbolIDs: book.allSymbolIDs)
     }
 
+    /// The stability the danger runes are *asking* for, and what they actually get.
+    ///
+    /// Stacking danger is supposed to broaden the kinds of danger, not multiply the reward, so the
+    /// gift is capped. The shortfall is returned rather than folded away because the preview has to
+    /// show it — the same discipline the contradiction escalation term is held to, and for the same
+    /// reason: a player who can't see a non-linear term can't reason about it.
+    static func dangerStabilityGift(symbolIDs: [SymbolID]) -> (claimed: Int, granted: Int) {
+        let claimed = symbolIDs
+            .compactMap { ContentCatalog.shared.symbol($0) }
+            .filter { $0.danger != nil && $0.stabilityDelta > 0 }
+            .reduce(0) { $0 + $1.stabilityDelta }
+        return (claimed, min(claimed, Tuning.Danger.maximumStabilityGift))
+    }
+
+    /// How much the cap took off. Zero unless the player stacked danger runes.
+    static func dangerCapShortfall(symbolIDs: [SymbolID]) -> Int {
+        let gift = dangerStabilityGift(symbolIDs: symbolIDs)
+        return gift.claimed - gift.granted
+    }
+
+    /// Everything the world's danger runes do to how hostile it is, combined.
+    ///
+    /// Multipliers multiply and the rest add, so Swarm and Predation genuinely pull against each
+    /// other on spawn count instead of one simply overriding the other.
+    static func dangerProfile(symbolIDs: [SymbolID]) -> DangerProfile {
+        let profiles = symbolIDs.compactMap { ContentCatalog.shared.symbol($0)?.danger }
+        guard !profiles.isEmpty else { return .none }
+        return DangerProfile(
+            spawnMultiplier: profiles.reduce(1.0) { $0 * $1.spawnMultiplier },
+            tierDelta: profiles.reduce(0) { $0 + $1.tierDelta },
+            hazardTiles: max(0, profiles.reduce(0) { $0 + $1.hazardTiles }),
+            damagePerTurn: max(0, profiles.reduce(0) { $0 + $1.damagePerTurn }),
+            flavour: nil
+        )
+    }
+
+    static func dangerProfile(for book: BoundBook) -> DangerProfile {
+        dangerProfile(symbolIDs: book.allSymbolIDs)
+    }
+
     static func stabilityDelta(symbolIDs: [SymbolID]) -> Int {
         symbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.stabilityDelta ?? 0) }
     }
