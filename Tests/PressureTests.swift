@@ -123,13 +123,16 @@ final class PressureTests: XCTestCase {
 
     /// A sun that does not warm. The most important test here: the *thing you did* has to stay
     /// visible. Read the net alone and this world looks like one nobody wrote.
-    func testContradictionIsVisibleEvenWhenItNetsToNothing() {
+    func testContradictionIsVisibleEvenWhenItNetsToNothing() throws {
         let honest = PressureRules.resolve([sigil("sun", "illumination", .great)])
         let denied = PressureRules.resolve([
             sigil("sun", "illumination", .great, negating: ["thermal"]),
         ])
 
-        XCTAssertEqual(denied["thermal"].peak, 0, "The heat is genuinely gone")
+        let baseline = try XCTUnwrap(ContentCatalog.shared.pressureTarget("thermal")).baseline
+        XCTAssertEqual(denied["thermal"].peak, baseline, accuracy: 0.001,
+                       "The sun's heat is genuinely gone — the world is merely as warm as any other")
+        XCTAssertGreaterThan(honest["thermal"].peak, baseline, "…where an honest sun would have warmed it")
         XCTAssertEqual(honest["thermal"].opposedMagnitude, 0, "Nothing was fought over")
         XCTAssertGreaterThan(denied["thermal"].opposedMagnitude, 0,
                              "…but the force spent denying it must still be on the books")
@@ -169,13 +172,18 @@ final class PressureTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(light.floor, 0)
     }
 
-    func testAnEmptyPageIsAnEmptyWorld() {
+    /// An unwritten page isn't a void — it's every target sitting at its baseline. Thermal starts
+    /// temperate rather than frozen precisely so that every climate has to be *authored*.
+    func testAnUnwrittenPageSitsAtTheBaseline() {
         let readings = PressureRules.resolve([])
-        for reading in readings.inOrder {
-            XCTAssertEqual(reading.peak, 0)
-            XCTAssertEqual(reading.opposedMagnitude, 0)
+        for target in ContentCatalog.shared.pressureTargets {
+            XCTAssertEqual(readings[target.id].peak, target.baseline, accuracy: 0.001,
+                           "'\(target.id)' should start at its baseline")
+            XCTAssertEqual(readings[target.id].opposedMagnitude, 0)
         }
         XCTAssertEqual(readings.totalOpposed, 0)
+        XCTAssertGreaterThan(readings["thermal"].peak, 0, "A world nobody wrote about is temperate")
+        XCTAssertEqual(readings["illumination"].peak, 0, "…but nobody lit it")
     }
 
     // MARK: Content

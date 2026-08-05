@@ -2,137 +2,882 @@
   "_note": "ALL NUMBERS PLACEHOLDER — straight from pressure-model-illumination.md §4.3, which flags them as guesses. This is the Illumination pattern worked in full; the other seven targets are added by extending this file, not by touching code. A source names its own contributions, and every contribution beyond the one you bind is an IMPLICIT SECONDARY that happens whether you asked for it or not — 'you cannot have bright without hot unless you do something about it'. 'character' is per-target and decides HOW a source contributes: illumination's cyclic sources lift only the peak, constant ones lift peak and floor, occluding ones push both down.",
   "sources": [
     {
-      "id": "sun", "name": "Sun", "icon": "sun.max.fill",
-      "blurb": "The default. Hard to have light without heat.",
-      "contributions": [
-        { "target": "illumination", "character": "cyclic", "peak": 55, "floor": 0, "tags": ["celestial"] },
-        { "target": "thermal", "character": "radiating", "peak": 40, "floor": 0 }
-      ]
-    },
-    {
-      "id": "moon", "name": "Moon", "icon": "moon.fill",
-      "blurb": "Enough to see by, barely.",
-      "contributions": [
-        { "target": "illumination", "character": "cyclic", "peak": 12, "floor": 0, "tags": ["celestial"] },
-        { "target": "thermal", "character": "radiating", "peak": 2, "floor": 0 }
-      ]
-    },
-    {
-      "id": "stars", "name": "Stars", "icon": "sparkles",
-      "blurb": "Almost nothing, but not nothing.",
-      "contributions": [
-        { "target": "illumination", "character": "cyclic", "peak": 4, "floor": 0, "tags": ["celestial"] }
-      ]
-    },
-    {
-      "id": "comet", "name": "Comet", "icon": "comet",
-      "blurb": "Comes and goes on its own schedule.",
-      "contributions": [
-        { "target": "illumination", "character": "cyclic", "peak": 15, "floor": 0, "tags": ["celestial", "erratic"] },
-        { "target": "thermal", "character": "radiating", "peak": 5, "floor": 0 },
-        { "target": "cycle", "character": "destabilising", "peak": 10, "floor": 0, "tags": ["arrhythmic"] }
-      ]
-    },
-    {
-      "id": "aurora", "name": "Aurora", "icon": "rays",
-      "blurb": "Light without heat, and no contradiction needed to get it.",
-      "contributions": [
-        { "target": "illumination", "character": "cyclic", "peak": 14, "floor": 0, "tags": ["celestial", "coloured"] }
-      ]
-    },
-    {
-      "id": "second_light", "name": "Second Light", "icon": "circle.dotted.circle",
-      "blurb": "Nobody has explained it.",
-      "contributions": [
-        { "target": "illumination", "character": "cyclic", "peak": 25, "floor": 0, "tags": ["celestial", "unexplained"] },
-        { "target": "thermal", "character": "radiating", "peak": 5, "floor": 0 }
-      ]
-    },
-    {
-      "id": "magma", "name": "Magma", "icon": "flame.fill",
-      "blurb": "Lit from below, always.",
-      "contributions": [
-        { "target": "illumination", "character": "constant", "peak": 30, "floor": 30, "tags": ["sourceless"] },
-        { "target": "thermal", "character": "radiating", "peak": 60, "floor": 20 },
-        { "target": "substrate", "character": "volatile", "peak": 25, "floor": 0 }
-      ]
-    },
-    {
-      "id": "crystal", "name": "Crystal", "icon": "diamond.fill",
-      "blurb": "Cold light out of the rock itself.",
-      "contributions": [
-        { "target": "illumination", "character": "constant", "peak": 18, "floor": 18, "tags": ["sourceless", "valuable"] },
-        { "target": "substrate", "character": "hard", "peak": 30, "floor": 0, "tags": ["valuable"] }
-      ]
-    },
-    {
-      "id": "fungus", "name": "Fungus", "icon": "camera.macro",
-      "blurb": "A lightless world that is nonetheless lit.",
-      "contributions": [
-        { "target": "illumination", "character": "constant", "peak": 12, "floor": 12, "tags": ["sourceless"] },
-        { "target": "vitality", "character": "decomposing", "peak": 20, "floor": 0, "tags": ["fungal"] }
-      ]
-    },
-    {
-      "id": "rift", "name": "Rift", "icon": "bolt.horizontal.fill",
-      "blurb": "Something is open that shouldn't be.",
-      "contributions": [
-        { "target": "illumination", "character": "constant", "peak": 20, "floor": 20, "tags": ["sourceless", "unexplained"] },
-        { "target": "cycle", "character": "destabilising", "peak": 25, "floor": 0, "tags": ["arrhythmic"] }
-      ]
-    },
-    {
-      "id": "cloud", "name": "Cloud", "icon": "cloud.fill",
-      "blurb": "A lid on the sky.",
-      "contributions": [
-        { "target": "illumination", "character": "occluding", "peak": -20, "floor": -5 },
-        { "target": "thermal", "character": "retaining", "peak": -10, "floor": 8 },
-        { "target": "atmosphere", "character": "thickening", "peak": 15, "floor": 0 }
-      ]
-    },
-    {
-      "id": "ash", "name": "Ash", "icon": "aqi.medium",
+      "id": "ash",
+      "name": "Ash",
+      "icon": "aqi.medium",
       "blurb": "Everything under a grey fall.",
       "contributions": [
-        { "target": "illumination", "character": "occluding", "peak": -30, "floor": -8 },
-        { "target": "thermal", "character": "cooling", "peak": -15, "floor": -5 },
-        { "target": "substrate", "character": "ductile", "peak": 10, "floor": 0 },
-        { "target": "atmosphere", "character": "occluding", "peak": 20, "floor": 0, "tags": ["choking"] }
+        {
+          "target": "illumination",
+          "character": "occluding",
+          "peak": -30,
+          "floor": -8
+        },
+        {
+          "target": "substrate",
+          "character": "ductile",
+          "peak": 10,
+          "floor": 0
+        },
+        {
+          "target": "atmosphere",
+          "character": "occluding",
+          "peak": 20,
+          "floor": 0,
+          "tags": [
+            "choking"
+          ]
+        },
+        {
+          "target": "thermal",
+          "character": "retaining",
+          "peak": -18,
+          "floor": 4,
+          "tags": [
+            "volcanic-winter"
+          ]
+        }
       ]
     },
     {
-      "id": "smoke", "name": "Smoke", "icon": "smoke.fill",
-      "blurb": "Something is burning, somewhere.",
+      "id": "aurora",
+      "name": "Aurora",
+      "icon": "rays",
+      "blurb": "Light without heat, and no contradiction needed to get it.",
       "contributions": [
-        { "target": "illumination", "character": "occluding", "peak": -25, "floor": -6 },
-        { "target": "thermal", "character": "radiating", "peak": 5, "floor": 0 },
-        { "target": "atmosphere", "character": "occluding", "peak": 18, "floor": 0, "tags": ["choking"] }
+        {
+          "target": "illumination",
+          "character": "cyclic",
+          "peak": 14,
+          "floor": 0,
+          "tags": [
+            "celestial",
+            "coloured"
+          ]
+        }
       ]
     },
     {
-      "id": "miasma", "name": "Miasma", "icon": "aqi.high",
-      "blurb": "Air that does not want you in it.",
-      "contributions": [
-        { "target": "illumination", "character": "occluding", "peak": -18, "floor": -4 },
-        { "target": "vitality", "character": "consuming", "peak": -20, "floor": 0 },
-        { "target": "atmosphere", "character": "occluding", "peak": 22, "floor": 0, "tags": ["toxic"] }
-      ]
-    },
-    {
-      "id": "canopy", "name": "Canopy", "icon": "tree.fill",
+      "id": "canopy",
+      "name": "Canopy",
+      "icon": "tree.fill",
       "blurb": "Bright above, dim below. Two worlds stacked.",
       "contributions": [
-        { "target": "illumination", "character": "occluding", "peak": -35, "floor": -10, "tags": ["elevation"] },
-        { "target": "thermal", "character": "retaining", "peak": -8, "floor": 6 },
-        { "target": "vitality", "character": "producing", "peak": 35, "floor": 0 }
+        {
+          "target": "illumination",
+          "character": "occluding",
+          "peak": -35,
+          "floor": -10,
+          "tags": [
+            "elevation"
+          ]
+        },
+        {
+          "target": "vitality",
+          "character": "producing",
+          "peak": 35,
+          "floor": 0
+        },
+        {
+          "target": "thermal",
+          "character": "retaining",
+          "peak": -10,
+          "floor": 6
+        }
       ]
     },
     {
-      "id": "void", "name": "Void", "icon": "circle.fill",
+      "id": "cloud",
+      "name": "Cloud",
+      "icon": "cloud.fill",
+      "blurb": "A lid on the sky.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "occluding",
+          "peak": -20,
+          "floor": -5
+        },
+        {
+          "target": "atmosphere",
+          "character": "thickening",
+          "peak": 15,
+          "floor": 0
+        },
+        {
+          "target": "thermal",
+          "character": "retaining",
+          "peak": -12,
+          "floor": 10
+        }
+      ]
+    },
+    {
+      "id": "comet",
+      "name": "Comet",
+      "icon": "comet",
+      "blurb": "Comes and goes on its own schedule.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "cyclic",
+          "peak": 15,
+          "floor": 0,
+          "tags": [
+            "celestial",
+            "erratic"
+          ]
+        },
+        {
+          "target": "thermal",
+          "character": "radiating",
+          "peak": 5,
+          "floor": 0
+        },
+        {
+          "target": "cycle",
+          "character": "destabilising",
+          "peak": 10,
+          "floor": 0,
+          "tags": [
+            "arrhythmic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crystal",
+      "name": "Crystal",
+      "icon": "diamond.fill",
+      "blurb": "Cold light out of the rock itself.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "constant",
+          "peak": 18,
+          "floor": 18,
+          "tags": [
+            "sourceless",
+            "valuable"
+          ]
+        },
+        {
+          "target": "substrate",
+          "character": "hard",
+          "peak": 30,
+          "floor": 0,
+          "tags": [
+            "valuable"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fungus",
+      "name": "Fungus",
+      "icon": "camera.macro",
+      "blurb": "A lightless world that is nonetheless lit.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "constant",
+          "peak": 12,
+          "floor": 12,
+          "tags": [
+            "sourceless"
+          ]
+        },
+        {
+          "target": "vitality",
+          "character": "decomposing",
+          "peak": 20,
+          "floor": 0,
+          "tags": [
+            "fungal"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "geyser",
+      "name": "Geyser",
+      "icon": "humidifier.and.droplets.fill",
+      "blurb": "Steam on its own schedule.",
+      "contributions": [
+        {
+          "target": "thermal",
+          "character": "producing",
+          "peak": 20,
+          "floor": 15,
+          "tags": [
+            "geothermal"
+          ]
+        },
+        {
+          "target": "hydrology",
+          "character": "flowing",
+          "peak": 8,
+          "aspects": {
+            "dispersion": -20,
+            "salinity": 10
+          },
+          "form": "flowing"
+        },
+        {
+          "target": "substrate",
+          "character": "volatile",
+          "peak": 12
+        }
+      ]
+    },
+    {
+      "id": "glacier",
+      "name": "Glacier",
+      "icon": "mountain.2.fill",
+      "blurb": "Soaking wet, and a desert.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "frozen",
+          "peak": 35,
+          "aspects": {
+            "dispersion": -20
+          },
+          "form": "frozen"
+        },
+        {
+          "target": "thermal",
+          "character": "sinking",
+          "peak": -30,
+          "floor": -35
+        },
+        {
+          "target": "relief",
+          "character": "raising",
+          "peak": 25
+        }
+      ]
+    },
+    {
+      "id": "ice",
+      "name": "Ice",
+      "icon": "snowflake",
+      "blurb": "Water the world can't use.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "frozen",
+          "peak": 20,
+          "aspects": {
+            "dispersion": 10
+          },
+          "form": "frozen"
+        },
+        {
+          "target": "thermal",
+          "character": "sinking",
+          "peak": -22,
+          "floor": -28
+        }
+      ]
+    },
+    {
+      "id": "lake",
+      "name": "Lake",
+      "icon": "drop.circle.fill",
+      "blurb": "Still water, and everything that gathers at it.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "standing",
+          "peak": 25,
+          "aspects": {
+            "dispersion": -15,
+            "salinity": 2
+          },
+          "form": "standing"
+        },
+        {
+          "target": "thermal",
+          "character": "retaining",
+          "peak": -7,
+          "floor": 10
+        }
+      ]
+    },
+    {
+      "id": "magma",
+      "name": "Magma",
+      "icon": "flame.fill",
+      "blurb": "Lit from below, always.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "constant",
+          "peak": 30,
+          "floor": 30,
+          "tags": [
+            "sourceless"
+          ]
+        },
+        {
+          "target": "substrate",
+          "character": "volatile",
+          "peak": 25,
+          "floor": 0
+        },
+        {
+          "target": "thermal",
+          "character": "producing",
+          "peak": 60,
+          "floor": 45,
+          "tags": [
+            "geothermal"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "marsh",
+      "name": "Marsh",
+      "icon": "leaf.fill",
+      "blurb": "Neither land nor water, and generous to both.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "standing",
+          "peak": 22,
+          "aspects": {
+            "dispersion": 15,
+            "salinity": 5
+          },
+          "form": "standing",
+          "tags": [
+            "stagnant"
+          ]
+        },
+        {
+          "target": "thermal",
+          "character": "retaining",
+          "peak": -5,
+          "floor": 8
+        },
+        {
+          "target": "vitality",
+          "character": "producing",
+          "peak": 25
+        }
+      ]
+    },
+    {
+      "id": "miasma",
+      "name": "Miasma",
+      "icon": "aqi.high",
+      "blurb": "Air that does not want you in it.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "occluding",
+          "peak": -18,
+          "floor": -4
+        },
+        {
+          "target": "vitality",
+          "character": "consuming",
+          "peak": -20,
+          "floor": 0
+        },
+        {
+          "target": "atmosphere",
+          "character": "occluding",
+          "peak": 22,
+          "floor": 0,
+          "tags": [
+            "toxic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mist",
+      "name": "Mist",
+      "icon": "cloud.fog.fill",
+      "blurb": "You can't see, and everything is damp.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "airborne",
+          "peak": 14,
+          "aspects": {
+            "dispersion": 25
+          },
+          "form": "airborne"
+        },
+        {
+          "target": "illumination",
+          "character": "occluding",
+          "peak": -12,
+          "floor": -3
+        },
+        {
+          "target": "atmosphere",
+          "character": "occluding",
+          "peak": 15,
+          "aspects": {
+            "clarity": -30
+          }
+        }
+      ]
+    },
+    {
+      "id": "moon",
+      "name": "Moon",
+      "icon": "moon.fill",
+      "blurb": "Enough to see by, barely.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "cyclic",
+          "peak": 12,
+          "floor": 0,
+          "tags": [
+            "celestial"
+          ]
+        },
+        {
+          "target": "thermal",
+          "character": "radiating",
+          "peak": 2,
+          "floor": 0
+        }
+      ]
+    },
+    {
+      "id": "rain",
+      "name": "Rain",
+      "icon": "cloud.rain.fill",
+      "blurb": "Wet everywhere, not wet anywhere in particular.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "airborne",
+          "peak": 30,
+          "aspects": {
+            "dispersion": 35
+          },
+          "form": "airborne"
+        },
+        {
+          "target": "vitality",
+          "character": "producing",
+          "peak": 30
+        },
+        {
+          "target": "illumination",
+          "character": "occluding",
+          "peak": -8,
+          "floor": -2
+        }
+      ]
+    },
+    {
+      "id": "rift",
+      "name": "Rift",
+      "icon": "bolt.horizontal.fill",
+      "blurb": "Something is open that shouldn't be.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "constant",
+          "peak": 20,
+          "floor": 20,
+          "tags": [
+            "sourceless",
+            "unexplained"
+          ]
+        },
+        {
+          "target": "cycle",
+          "character": "destabilising",
+          "peak": 25,
+          "floor": 0,
+          "tags": [
+            "arrhythmic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "river",
+      "name": "River",
+      "icon": "arrow.triangle.swap",
+      "blurb": "Water going somewhere, and cutting as it goes.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "flowing",
+          "peak": 20,
+          "aspects": {
+            "dispersion": 5
+          },
+          "form": "flowing"
+        },
+        {
+          "target": "relief",
+          "character": "cutting",
+          "peak": 20
+        },
+        {
+          "target": "vitality",
+          "character": "producing",
+          "peak": 15
+        }
+      ]
+    },
+    {
+      "id": "salt",
+      "name": "Salt",
+      "icon": "cube.fill",
+      "blurb": "What's left when the water goes.",
+      "contributions": [
+        {
+          "target": "substrate",
+          "character": "hard",
+          "peak": 20
+        },
+        {
+          "target": "hydrology",
+          "character": "draining",
+          "peak": -10,
+          "aspects": {
+            "salinity": 40
+          },
+          "tags": [
+            "brine"
+          ]
+        },
+        {
+          "target": "vitality",
+          "character": "consuming",
+          "peak": -25
+        }
+      ]
+    },
+    {
+      "id": "sand",
+      "name": "Sand",
+      "icon": "circle.grid.3x3.fill",
+      "blurb": "It gets into everything and holds nothing.",
+      "contributions": [
+        {
+          "target": "substrate",
+          "character": "ductile",
+          "peak": 25
+        },
+        {
+          "target": "hydrology",
+          "character": "draining",
+          "peak": -20,
+          "aspects": {
+            "salinity": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "sea",
+      "name": "Sea",
+      "icon": "water.waves",
+      "blurb": "The strongest buffer there is. It decides the weather.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "standing",
+          "peak": 45,
+          "aspects": {
+            "dispersion": -30,
+            "salinity": 55
+          },
+          "form": "standing"
+        },
+        {
+          "target": "thermal",
+          "character": "retaining",
+          "peak": -15,
+          "floor": 22,
+          "tags": [
+            "thermally-buffered"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "second_light",
+      "name": "Second Light",
+      "icon": "circle.dotted.circle",
+      "blurb": "Nobody has explained it.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "cyclic",
+          "peak": 25,
+          "floor": 0,
+          "tags": [
+            "celestial",
+            "unexplained"
+          ]
+        },
+        {
+          "target": "thermal",
+          "character": "radiating",
+          "peak": 5,
+          "floor": 0
+        }
+      ]
+    },
+    {
+      "id": "smoke",
+      "name": "Smoke",
+      "icon": "smoke.fill",
+      "blurb": "Something is burning, somewhere.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "occluding",
+          "peak": -25,
+          "floor": -6
+        },
+        {
+          "target": "thermal",
+          "character": "radiating",
+          "peak": 5,
+          "floor": 0
+        },
+        {
+          "target": "atmosphere",
+          "character": "occluding",
+          "peak": 18,
+          "floor": 0,
+          "tags": [
+            "choking"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "snow",
+      "name": "Snow",
+      "icon": "cloud.snow.fill",
+      "blurb": "White, and it makes everything under it white too.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "frozen",
+          "peak": 15,
+          "aspects": {
+            "dispersion": 30
+          },
+          "form": "frozen"
+        },
+        {
+          "target": "thermal",
+          "character": "sinking",
+          "peak": -15,
+          "floor": -18,
+          "tags": [
+            "white-biasing"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stars",
+      "name": "Stars",
+      "icon": "sparkles",
+      "blurb": "Almost nothing, but not nothing.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "cyclic",
+          "peak": 4,
+          "floor": 0,
+          "tags": [
+            "celestial"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sun",
+      "name": "Sun",
+      "icon": "sun.max.fill",
+      "blurb": "The default. Hard to have light without heat.",
+      "contributions": [
+        {
+          "target": "illumination",
+          "character": "cyclic",
+          "peak": 55,
+          "floor": 0,
+          "tags": [
+            "celestial"
+          ]
+        },
+        {
+          "target": "thermal",
+          "character": "producing",
+          "peak": 40,
+          "floor": 8
+        }
+      ]
+    },
+    {
+      "id": "thin_air",
+      "name": "Thin Air",
+      "icon": "wind",
+      "blurb": "Nothing to hold the heat in.",
+      "contributions": [
+        {
+          "target": "atmosphere",
+          "character": "thinning",
+          "peak": -30
+        },
+        {
+          "target": "thermal",
+          "character": "sinking",
+          "peak": -5,
+          "floor": -30,
+          "tags": [
+            "arid-swing"
+          ]
+        },
+        {
+          "target": "hydrology",
+          "character": "draining",
+          "peak": -12,
+          "aspects": {
+            "dispersion": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "void",
+      "name": "Void",
+      "icon": "circle.fill",
       "blurb": "No sun ever rose here.",
       "contributions": [
-        { "target": "illumination", "character": "occluding", "peak": -25, "floor": -15 },
-        { "target": "thermal", "character": "cooling", "peak": -20, "floor": -20 }
+        {
+          "target": "illumination",
+          "character": "occluding",
+          "peak": -25,
+          "floor": -15
+        },
+        {
+          "target": "thermal",
+          "character": "sinking",
+          "peak": -20,
+          "floor": -30
+        }
+      ]
+    },
+    {
+      "id": "volcano",
+      "name": "Volcano",
+      "icon": "mountain.2",
+      "blurb": "The ground has opinions.",
+      "contributions": [
+        {
+          "target": "thermal",
+          "character": "producing",
+          "peak": 45,
+          "floor": 20,
+          "tags": [
+            "geothermal"
+          ]
+        },
+        {
+          "target": "substrate",
+          "character": "volatile",
+          "peak": 35
+        },
+        {
+          "target": "relief",
+          "character": "raising",
+          "peak": 30
+        },
+        {
+          "target": "atmosphere",
+          "character": "occluding",
+          "peak": 25,
+          "aspects": {
+            "clarity": -25
+          },
+          "tags": [
+            "choking"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wildfire",
+      "name": "Wildfire",
+      "icon": "flame",
+      "blurb": "It will come back greener. Later.",
+      "contributions": [
+        {
+          "target": "thermal",
+          "character": "producing",
+          "peak": 30,
+          "floor": 5
+        },
+        {
+          "target": "hydrology",
+          "character": "draining",
+          "peak": -15
+        },
+        {
+          "target": "vitality",
+          "character": "consuming",
+          "peak": -30
+        },
+        {
+          "target": "atmosphere",
+          "character": "occluding",
+          "peak": 20,
+          "aspects": {
+            "clarity": -20
+          },
+          "tags": [
+            "choking"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wind",
+      "name": "Wind",
+      "icon": "wind.snow",
+      "blurb": "Never quite still.",
+      "contributions": [
+        {
+          "target": "atmosphere",
+          "character": "moving",
+          "peak": 15,
+          "aspects": {
+            "motion": 35
+          }
+        },
+        {
+          "target": "thermal",
+          "character": "sinking",
+          "peak": -8,
+          "floor": -6
+        },
+        {
+          "target": "relief",
+          "character": "cutting",
+          "peak": 10
+        }
       ]
     }
   ]

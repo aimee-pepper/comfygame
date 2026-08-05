@@ -336,6 +336,72 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(second.pendingLoot.count, 1, "The choice is still open on relaunch")
     }
 
+    // MARK: Never stranded
+
+    /// The failstate Aimee hit on device: essence only enters the game by coming home from a
+    /// world, so spending your last on a book and returning empty-handed left you at the desk with
+    /// nothing to write and no way to earn any. The game was simply over, silently.
+    func testTheBaseNeverStrandsYou() {
+        let store = GameStore(io: .temporary(name: "stranded-\(UUID().uuidString)"))
+        store.mutate("spend everything") { state in
+            state.base.essence = 0
+            state.base.resources = ResourcePool()
+        }
+
+        store.ensureDepartureIsPossible()
+
+        XCTAssertTrue(store.canBindAndDepart, "There must always be a way back out into a world")
+        XCTAssertGreaterThanOrEqual(store.state.base.essence,
+                                    EconomyRules.minimumBindCost(in: store.state))
+    }
+
+    /// Raw essence you could still refine counts — the Spring shouldn't hand out charity to
+    /// somebody who simply hasn't walked to the Workshop yet.
+    func testTheSpringDoesNotPayForWhatYouAlreadyHave() {
+        let store = GameStore(io: .temporary(name: "hasraw-\(UUID().uuidString)"))
+        store.mutate("plenty of raw, no refined") { state in
+            state.base.essence = 0
+            state.base.resources = ResourcePool()
+            state.base.resources.add(50, of: Resources.essenceRaw)
+        }
+
+        store.ensureDepartureIsPossible()
+
+        XCTAssertEqual(store.state.base.essence, 0, "You can refine your way out of this yourself")
+        XCTAssertTrue(store.needsToRefine, "…and the game has to say so")
+    }
+
+    /// A stranded save left by an earlier build recovers itself rather than needing a wipe.
+    func testAStrandedSaveRecoversOnLaunch() throws {
+        let io = SaveFileIO.temporary(name: "recover-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+
+        let first = GameStore(io: io)
+        first.mutate("strand it", flush: true) { state in
+            state.base.essence = 0
+            state.base.resources = ResourcePool()
+        }
+
+        let second = GameStore(io: io)
+        XCTAssertTrue(second.canBindAndDepart, "Reopening the app has to get you unstuck")
+    }
+
+    /// Coming home broke still leaves you able to leave again.
+    func testReturningWithNothingStillLetsYouDepartAgain() {
+        let store = GameStore(io: .temporary(name: "broke-return-\(UUID().uuidString)"))
+        store.setSymbol("plains", in: "terrain")
+        store.bindAndDepart()
+        store.mutate("spend it all while away") { $0.base.essence = 0 }
+
+        store.portalHome()
+
+        // The guarantee is that *something* is always writable, not that your current draft is.
+        // A fancier book than you can afford is a legible problem with a stated fix; nothing at
+        // all to write is a dead end.
+        store.clearBookDraft()
+        XCTAssertTrue(store.canBindAndDepart, "There must always be a cheapest book you can write")
+    }
+
     // MARK: Constellation
 
     func testBuyingAConstellationNodeSpendsMotesAndSticks() throws {

@@ -56,6 +56,10 @@ final class GameStore: ObservableObject {
             state.meta.launchCount += 1
             state.base.bookDraft.prune()
         }
+
+        // Recover a save that's already stranded — someone who spent their last essence before
+        // this guard existed shouldn't have to start over.
+        ensureDepartureIsPossible()
     }
 
     static func live() -> GameStore { GameStore(io: .documents) }

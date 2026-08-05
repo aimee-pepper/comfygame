@@ -25,6 +25,8 @@ enum PressureRules {
             var positiveFloor: [Double] = [], negativeFloor: [Double] = []
             var deniedForce = 0.0
             var tags: Set<String> = []
+            var aspectDeltas: [String: Double] = [:]
+            var formWeights: [String: Double] = [:]
 
             for sigil in sigils {
                 guard let source = ContentCatalog.shared.pressureSource(sigil.source) else { continue }
@@ -47,17 +49,33 @@ enum PressureRules {
                 if peak >= 0 { positivePeak.append(peak) } else { negativePeak.append(-peak) }
                 if floor >= 0 { positiveFloor.append(floor) } else { negativeFloor.append(-floor) }
                 tags.formUnion(contribution.tags)
+
+                // Aspects are directional pushes rather than magnitudes — dispersion is pulled
+                // toward concentrated or pervasive — so they sum plainly rather than diminishing.
+                for (aspect, delta) in contribution.aspects {
+                    aspectDeltas[aspect, default: 0] += delta * scale
+                }
+                // Form is a share of what this source brought, not a value of its own.
+                if let form = contribution.form, peak > 0 {
+                    formWeights[form, default: 0] += peak
+                }
             }
 
             let peakUp = diminished(positivePeak), peakDown = diminished(negativePeak)
             let floorUp = diminished(positiveFloor), floorDown = diminished(negativeFloor)
 
-            var peak = clamp(peakUp - peakDown)
-            var floor = target.dualValued ? clamp(floorUp - floorDown) : peak
+            var peak = clamp(target.baseline + peakUp - peakDown)
+            var floor = target.dualValued ? clamp(target.baseline + floorUp - floorDown) : peak
 
-            // Floor rule: peak can never resolve below floor. If occlusion drives it under, they
-            // converge — a uniformly murky world rather than an impossible one.
-            if floor > peak { peak = floor }
+            // Floor may never exceed peak. When retention or occlusion drives them past each other
+            // they **converge on the midpoint** — a uniformly murky world, or one with no
+            // meaningful difference between its days and its nights. Snapping one to the other
+            // would invent heat (or light) that nothing in the page asked for.
+            if floor > peak {
+                let midpoint = (peak + floor) / 2
+                peak = midpoint
+                floor = midpoint
+            }
             if !target.dualValued { floor = peak }
 
             // Contradiction has two shapes, and both have to count. Denying a source's own
@@ -68,11 +86,21 @@ enum PressureRules {
                 + min(peakUp, peakDown)
                 + (target.dualValued ? min(floorUp, floorDown) : 0)
 
+            var aspects: [String: Double] = [:]
+            for aspect in target.aspects {
+                aspects[aspect.id] = clamp(aspect.baseline + (aspectDeltas[aspect.id] ?? 0))
+            }
+
+            let formTotal = formWeights.values.reduce(0, +)
+            let forms = formTotal > 0 ? formWeights.mapValues { $0 / formTotal } : [:]
+
             readings[target.id] = PressureReading(
                 target: target.id,
                 peak: peak,
                 floor: floor,
                 opposedMagnitude: opposed,
+                aspects: aspects,
+                forms: forms,
                 tags: tags.union(derivedTags(target: target, peak: peak, floor: floor, tags: tags))
             )
         }
@@ -119,19 +147,31 @@ struct PressureReading: Equatable, Sendable {
     var floor: Double
     /// Force applied in conflicting directions and cancelled. Gross, never net.
     var opposedMagnitude: Double
+    /// Named scalars beyond the magnitude — dispersion, salinity, motion, clarity.
+    var aspects: [String: Double]
+    /// Proportions across the target's form buckets, summing to 1 (or empty).
+    var forms: [String: Double]
     var tags: Set<String>
 
     /// Its own pressure: dim and dark are different, and so are "always the same" and "swings".
     var range: Double { peak - floor }
 
     func has(_ tag: String) -> Bool { tags.contains(tag) }
+    func aspect(_ id: String) -> Double { aspects[id] ?? 0 }
+    func share(of form: String) -> Double { forms[form] ?? 0 }
+
+    /// **Frozen water is water the world can't use.** A glacier world reads as soaking wet and is
+    /// biologically a desert — true of real polar deserts, and the number every downstream pressure
+    /// should actually be reading.
+    var availableMagnitude: Double { peak * (1 - share(of: "frozen")) }
 }
 
 struct PressureReadings: Equatable, Sendable {
     var readings: [PressureTargetID: PressureReading]
 
     subscript(target: PressureTargetID) -> PressureReading {
-        readings[target] ?? PressureReading(target: target, peak: 0, floor: 0, opposedMagnitude: 0, tags: [])
+        readings[target] ?? PressureReading(target: target, peak: 0, floor: 0,
+                                            opposedMagnitude: 0, aspects: [:], forms: [:], tags: [])
     }
 
     var inOrder: [PressureReading] {

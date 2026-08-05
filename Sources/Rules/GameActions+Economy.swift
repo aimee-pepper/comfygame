@@ -23,6 +23,35 @@ extension GameStore {
         refineEssence(rawUnits: state.base.resources[Resources.essenceRaw])
     }
 
+    /// **The base never strands you.**
+    ///
+    /// Essence only enters the game by coming home from a world — the Spring's trickle, or raw
+    /// essence hauled back and refined. So a player who spends their last essence on a book and
+    /// returns empty-handed has no way to write another one, and the game is simply over with no
+    /// message saying so. That's a dead end, and it breaks the pillar that every session has to
+    /// advance *something*.
+    ///
+    /// So when you're home and can't afford even the cheapest possible book — counting the raw
+    /// essence you could still refine — the Spring makes up the difference. It is the one thing in
+    /// the game that gives you something for nothing, and it exists precisely so that nothing else
+    /// has to.
+    func ensureDepartureIsPossible() {
+        guard state.worlds.activeRun == nil else { return }
+        let floor = EconomyRules.minimumBindCost(in: state)
+        guard EconomyRules.spendableEssence(in: state) < floor else { return }
+
+        mutate("the spring provides", flush: true) { state in
+            let shortfall = floor - EconomyRules.spendableEssence(in: state)
+            state.base.essence += max(0, shortfall)
+        }
+    }
+
+    /// True when the only thing standing between the player and a world is a trip to the Refinery.
+    var needsToRefine: Bool {
+        state.base.essence < EconomyRules.minimumBindCost(in: state)
+            && state.base.resources[Resources.essenceRaw] > 0
+    }
+
     // MARK: Research
 
     func isComplete(_ node: ResearchNodeDef) -> Bool { EconomyRules.isComplete(node, in: state) }

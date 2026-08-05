@@ -16,6 +16,22 @@ enum EconomyRules {
         max(0, rawUnits) * Tuning.Economy.essencePerRawEssence
     }
 
+    /// The cheapest book that can possibly be written: every slot left to chance.
+    ///
+    /// Nothing may ever cost less than this, which makes it the floor the base has to keep you
+    /// above — see `GameStore.ensureDepartureIsPossible`.
+    static func minimumBindCost(in state: GameState) -> Int {
+        let fillable = ContentCatalog.shared.slotIDsInOrder.count { slot in
+            !BookRules.candidates(for: slot, ownedSymbols: state.base.ownedSymbols).isEmpty
+        }
+        return BookRules.bindCost(chosenSymbolIDs: [], randomSlots: fillable)
+    }
+
+    /// Everything the player could turn into essence right now without leaving the base.
+    static func spendableEssence(in state: GameState) -> Int {
+        state.base.essence + refine(rawUnits: state.base.resources[Resources.essenceRaw])
+    }
+
     // MARK: Research
 
     /// Whether a node's prerequisites are all met. Locked nodes are shown, not hidden — seeing what

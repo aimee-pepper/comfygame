@@ -111,6 +111,7 @@ extension GameStore {
             state.worlds.activeRun = nil
         }
         recentEvents = []
+        ensureDepartureIsPossible()
     }
 
     /// Caught by the collapse (or carried out unconscious): keep a fraction, chosen at random.
@@ -125,6 +126,7 @@ extension GameStore {
             state.worlds.activeRun = nil
         }
         recentEvents = []
+        ensureDepartureIsPossible()
     }
 
     // MARK: - Turn bookkeeping

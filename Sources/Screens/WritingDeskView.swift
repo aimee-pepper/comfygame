@@ -104,7 +104,11 @@ struct WritingDeskView: View {
 
     private var bindFootnote: String {
         if !store.canBindAndDepart {
-            return "You have \(state.base.essence) essence; this book costs \(projection.cost)."
+            if store.needsToRefine {
+                let raw = state.base.resources[Resources.essenceRaw]
+                return "You have \(state.base.essence) essence and \(raw) raw. Refine it at the Workshop — raw essence can't be written with."
+            }
+            return "You have \(state.base.essence) essence; this book costs \(projection.cost). Leave slots to chance to write something cheaper."
         }
         let count = projection.randomSlots.count
         if count > 0 {

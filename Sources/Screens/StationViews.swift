@@ -23,6 +23,12 @@ struct StorehouseView: View {
                                        label: resource?.name ?? entry.id.rawValue,
                                        value: "\(entry.amount)")
                         }
+                        if base.resources[Resources.essenceRaw] > 0 {
+                            // Raw essence looks like currency and isn't. Say so here rather than
+                            // letting someone stare at a full storehouse and an unaffordable book.
+                            Text("Raw essence can't be written with — refine it at the Workshop first.")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
                     }
                 }
 
