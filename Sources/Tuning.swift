@@ -26,6 +26,8 @@ enum Tuning {
         static let baseBindCostEssence: Int = 10     // PLACEHOLDER
         /// Multiplier applied to each symbol's own essence cost when totalling a bind.
         static let symbolCostMultiplier: Double = 1.0 // PLACEHOLDER
+        /// Converts total instability into the 0–100 "Stability 68" headline in the preview.
+        static let stabilityScorePerInstability: Double = 10.0 // PLACEHOLDER
     }
 
     // MARK: - Worlds
@@ -35,7 +37,16 @@ enum Tuning {
         static let gridHeight: Int = 14              // PLACEHOLDER
         static let startingStability: Double = 100   // PLACEHOLDER
         /// Stability lost per player turn before symbol modifiers.
-        static let baseStabilityDecayPerTurn: Double = 1.0 // PLACEHOLDER
+        static let baseStabilityDecayPerTurn: Double = 2.0 // PLACEHOLDER
+        /// How hard a book's total instability pushes the decay rate around.
+        /// With the current symbol set this spans roughly 100 turns (calm) to 18 (greedy).
+        static let instabilityDecayScale: Double = 0.8     // PLACEHOLDER
+        static let minStabilityDecayPerTurn: Double = 0.5  // PLACEHOLDER — even a calm world ends
+        static let maxStabilityDecayPerTurn: Double = 10.0 // PLACEHOLDER
+        /// Encounter difficulty tier before symbol modifiers.
+        static let baseEnemyTier: Int = 1            // PLACEHOLDER
+        /// Starting weight for every non-Reality resource in a world's yield table.
+        static let baseResourceWeight: Double = 1.0  // PLACEHOLDER
         static let hazardThreshold: Double = 50      // PLACEHOLDER — hazards spawn at map edges
         static let crumbleThreshold: Double = 25     // PLACEHOLDER — tiles crumble inward
         static let collapseThreshold: Double = 0     // collapse (locked: 0 is the floor)

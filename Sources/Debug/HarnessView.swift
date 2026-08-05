@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The milestone-1 force-quit/resume harness.
+/// The force-quit/resume harness. Reached from the wrench in the Base screen's toolbar.
 ///
 /// How to use it (this is the acceptance test from the brief):
 ///  1. Press actions until the state reads as something memorable — mid-encounter is the
@@ -154,43 +154,26 @@ struct HarnessView: View {
                 Row("status", "at base — no active run")
                 Row("runs so far", "\(state.worlds.runIndex)")
                 Row("next seed", String(state.worlds.seeds.peekNextSeed(), radix: 16, uppercase: true))
-                Row("projected bind cost", "\(store.projectedBindCost) essence")
+                Row("draft cost", costRange)
             }
         }
+    }
+
+    private var costRange: String {
+        let cost = store.bookProjection.essenceCost
+        return cost.isPoint ? "\(cost.lowerBound) essence" : "\(cost.lowerBound)–\(cost.upperBound) essence"
     }
 
     // MARK: - Actions
 
     private var actions: some View {
         Card(title: "Actions", icon: "hand.tap.fill") {
-            Text("Placeholder stand-ins for the real loop — milestones 2–5 replace each one.")
+            Text("The world-side actions live on the World screen while a run is active. This screen is reachable only from base.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 4)
 
-            if state.worlds.activeRun == nil {
-                HarnessButton("Bind a book & depart", icon: "book.closed.fill", isEnabled: store.canBindAndDepart) {
-                    store.harnessBindAndDepart()
-                }
-                if !store.canBindAndDepart {
-                    Text("Not enough essence (\(state.base.essence) of \(store.projectedBindCost)).")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                }
-                HarnessButton("Find a mote", icon: "star.fill") { store.harnessGainMote() }
-            } else if state.worlds.activeRun?.activeEncounter != nil {
-                HarnessButton("Fight one round", icon: "burst.fill") { store.harnessEncounterRound() }
-            } else {
-                HarnessButton("Take a world turn", icon: "figure.walk") { store.harnessTakeWorldTurn() }
-                HarnessButton("Harvest a node", icon: "cube.fill") { store.harnessHarvest() }
-                HarnessButton("Bump into an enemy", icon: "burst.fill") { store.harnessEnterEncounter() }
-                HarnessButton("Portal home — bank 100%", icon: "arrow.down.left.circle.fill") { store.harnessPortalHome() }
-                HarnessButton("Collapse — bank \(Int(Tuning.World.collapseHaulKeptFraction * 100))%",
-                              icon: "exclamationmark.triangle.fill",
-                              role: .destructive) {
-                    store.harnessCollapse()
-                }
-            }
+            HarnessButton("Find a mote", icon: "star.fill") { store.harnessGainMote() }
         }
     }
 

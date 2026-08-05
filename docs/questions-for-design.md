@@ -81,3 +81,41 @@ brief only gives an inventory size for the Storehouse at base.
 depart time. A full satchel refusing loot mid-run is a real design moment (do you drop something?),
 so this shouldn't stay accidental.
 `Sources/Model/WorldsState.swift` (`WorldRun.satchelItems`).
+
+---
+
+## Milestone 2 (2026-08-04)
+
+### Q7. How much does the preview reveal about slots left to chance? **(the interesting one)**
+Two locked rules pull against each other. "Legibility before commitment" says show the player what
+they're buying. "Empty slots are random-filled — under-specification is a surprise" says don't.
+
+**Shipped:** an unfilled slot turns every headline number into a **range**. A book with all four
+slots empty reads "Stability 53–100 · holds ~17–104 turns · tier 1–4 · cost 19–28". Fill a slot and
+the ranges narrow; fill them all and they collapse to exact numbers. You always know the bounds
+you're signing up for; you don't know where inside them you'll land. The harvest/inhabitant mixes
+show *expected* shares rather than ranges, because a column of ranged percentages is unreadable.
+
+A test (`BookRulesTests.testEveryPossibleRandomFillLandsInsideTheProjectedRange`) checks 200 seeds
+to prove no actual bind can escape the range the player was shown.
+
+**The sub-question I'd most like answered:** the player is currently **charged for symbols they
+didn't choose**. "Cost scales with total symbol value" reads as including random fills, and the
+bind button quotes the worst case up front — but "you must be able to afford up to 28 for a book
+you didn't specify" may feel like a tax on under-specification, which is meant to be playful. The
+alternative is that random fills are free, which makes leaving slots empty strictly cheaper and
+turns under-specification into the budget option.
+`Sources/Rules/BookProjection.swift`, `Sources/Screens/PreviewPanel.swift`.
+
+---
+
+### Q8. What does the Reality unlock's 5th book slot actually hold?
+"+1 symbol slot in books" is one of the three Constellation nodes, but the slot taxonomy is exactly
+four kinds (Terrain / Biome / Bounty / Quirk). A fifth slot has to be *something* — a second quirk?
+a free choice of any kind? a new kind entirely?
+
+**Shipped:** nothing. `RealityState.bonusBookSlots` exists and is not yet read by the book model,
+which still has exactly four slots. The node is unpurchasable until milestone 5, so this isn't
+blocking — but the answer changes `BookDraft` from a fixed four-key structure into an ordered list,
+which is easier to do before there are saves in the wild.
+`Sources/Model/BaseState.swift` (`BookDraft`), `Sources/Model/RealityState.swift`.

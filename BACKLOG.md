@@ -7,10 +7,13 @@
 - [x] Force-quit/resume harness proven in the simulator (SIGKILL mid-encounter + after banking); **still needs one pass on Aimee's actual iPhone**
 
 ## Milestone 2 — Base & authoring
-- [ ] Base hub (data-driven station list) → Writing Desk, Storehouse, Workshop, Party, Constellation subscreens
-- [ ] Symbol data (starter 10) + book slots + random-fill of empty slots
-- [ ] Pre-bind preview: projected yield mix, enemy tier, stability estimate; Essence bind cost
-- [ ] Essence Spring station (trickle on run return)
+- [x] Base hub (data-driven station list) → Writing Desk, Storehouse, Workshop, Party, Constellation subscreens
+      (spending/editing inside Storehouse, Workshop, Party and Constellation is milestones 4–5; each screen says so)
+- [x] Symbol data (starter 10) + book slots + random-fill of empty slots
+- [x] Pre-bind preview: projected yield mix, enemy tier, stability estimate; Essence bind cost
+      (unfilled slots project a **range** rather than a guess — see questions-for-design Q7)
+- [x] Essence Spring station (trickle on run return)
+- [x] *Stretch, pulled forward:* preview spawn icons silhouette until encountered
 
 ## Milestone 3 — Worlds
 - [ ] Seeded 14×14 gen from book composition; fog of war; nodes/enemies/hazards/portal/locked cache

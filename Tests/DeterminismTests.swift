@@ -72,9 +72,9 @@ final class DeterminismTests: XCTestCase {
         var draft = BookDraft()
         draft[.terrain] = "caverns"
 
-        let first = GameStore.resolveBook(draft: draft, ownedSymbols: owned, seed: 31337)
-        let second = GameStore.resolveBook(draft: draft, ownedSymbols: owned, seed: 31337)
-        let other = GameStore.resolveBook(draft: draft, ownedSymbols: owned, seed: 31338)
+        let first = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 31337)
+        let second = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 31337)
+        let other = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 31338)
 
         XCTAssertEqual(first, second, "Same seed, same book")
         XCTAssertEqual(first.symbols[.terrain], "caverns", "A chosen symbol is never overwritten")
@@ -90,7 +90,7 @@ final class DeterminismTests: XCTestCase {
         let greedy = BoundBook(symbols: [.terrain: "caverns", .biome: "ashen", .bounty: "rich_ore", .quirk: "gilded_veins"],
                                randomlyFilled: [], essencePaid: 0)
 
-        XCTAssertLessThan(GameStore.decayPerTurn(for: calm), GameStore.decayPerTurn(for: greedy),
+        XCTAssertLessThan(BookRules.decayPerTurn(for: calm), BookRules.decayPerTurn(for: greedy),
                           "A greedier book must burn its world down faster")
     }
 }
