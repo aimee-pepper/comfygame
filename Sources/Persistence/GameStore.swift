@@ -48,7 +48,14 @@ final class GameStore: ObservableObject {
 
         // A launch is itself a state change: record it and write immediately, so that even a
         // launch-then-instant-kill leaves a coherent file.
-        mutate("launch", flush: true) { $0.meta.launchCount += 1 }
+        //
+        // Also the moment to reconcile the save with the content it was written against: the slot
+        // taxonomy is being replaced (decisions-log session 2), and a draft referring to slots or
+        // symbols that no longer exist should be dropped here rather than lingering invisibly.
+        mutate("launch", flush: true) { state in
+            state.meta.launchCount += 1
+            state.base.bookDraft.prune()
+        }
     }
 
     static func live() -> GameStore { GameStore(io: .documents) }

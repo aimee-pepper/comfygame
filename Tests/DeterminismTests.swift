@@ -70,24 +70,24 @@ final class DeterminismTests: XCTestCase {
     func testBookResolutionIsStableForASeed() {
         let owned = Set(ContentCatalog.shared.starterSymbolIDs)
         var draft = BookDraft()
-        draft[.terrain] = "caverns"
+        draft["terrain"] = "caverns"
 
         let first = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 31337)
         let second = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 31337)
         let other = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 31338)
 
         XCTAssertEqual(first, second, "Same seed, same book")
-        XCTAssertEqual(first.symbols[.terrain], "caverns", "A chosen symbol is never overwritten")
-        XCTAssertFalse(first.randomlyFilled.contains(.terrain))
-        XCTAssertTrue(first.randomlyFilled.contains(.biome), "Empty slots are random-filled, not left blank")
+        XCTAssertEqual(first.symbols["terrain"], "caverns", "A chosen symbol is never overwritten")
+        XCTAssertFalse(first.randomlyFilled.contains("terrain"))
+        XCTAssertTrue(first.randomlyFilled.contains("biome"), "Empty slots are random-filled, not left blank")
         XCTAssertNotEqual(first.symbols, other.symbols, "Different seeds should fill differently")
     }
 
     /// Two different compositions must produce visibly different worlds (acceptance criterion).
     func testDifferentBooksDecayAtDifferentRates() {
-        let calm = BoundBook(symbols: [.terrain: "plains", .biome: "frostbound", .quirk: "dim_sky"],
+        let calm = BoundBook(symbols: ["terrain": "plains", "biome": "frostbound", "quirk": "dim_sky"],
                              randomlyFilled: [], essencePaid: 0)
-        let greedy = BoundBook(symbols: [.terrain: "caverns", .biome: "ashen", .bounty: "rich_ore", .quirk: "gilded_veins"],
+        let greedy = BoundBook(symbols: ["terrain": "caverns", "biome": "ashen", "bounty": "rich_ore", "quirk": "gilded_veins"],
                                randomlyFilled: [], essencePaid: 0)
 
         XCTAssertLessThan(BookRules.decayPerTurn(for: calm), BookRules.decayPerTurn(for: greedy),

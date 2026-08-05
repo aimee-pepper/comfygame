@@ -26,6 +26,13 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Purchased at the Workshop. Until then the Binder is manual every turn.
     var hasAutomateSelfUnlock: Bool = false
 
+    /// Upgrades bought for the satchel — the bag you carry *into* a world.
+    ///
+    /// Deliberately independent of the Storehouse (decisions-log session 2): carry limit forces
+    /// "keep it or leave it" in-world, storage limit forces "hoard or refine" at home. Two
+    /// pressures, two upgrade paths.
+    var satchelTier: Int = 0
+
     static func newGame() -> BaseState {
         var state = BaseState()
         state.ownedSymbols = Set(ContentCatalog.shared.starterSymbolIDs)
@@ -49,6 +56,12 @@ struct BaseState: Codable, Equatable, Sendable {
             + station(Stations.storehouse).tier * Tuning.Economy.inventorySlotsPerStorehouseTier
     }
 
+    /// How much you can carry into a world. Always smaller than home storage — that gap is the
+    /// point of it.
+    var satchelCapacity: Int {
+        Tuning.Economy.startingSatchelSlots + satchelTier * Tuning.Economy.satchelSlotsPerTier
+    }
+
     /// `Inventory.slots` is the stored capacity (the run satchel has its own), so it has to be
     /// re-synced whenever a Storehouse tier changes. One formula, one assignment — call this
     /// after any station upgrade rather than computing capacity in two places.
@@ -70,6 +83,7 @@ struct BaseState: Codable, Equatable, Sendable {
         bookDraft = try container.decodeIfPresent(BookDraft.self, forKey: .bookDraft) ?? BookDraft()
         companion = try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
+        satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
     }
 }
 
@@ -91,27 +105,30 @@ struct StationState: Codable, Equatable, Sendable {
 
 /// A book being composed. Empty slots are *not* an error — they are random-filled at generation
 /// (the Mystcraft rule: under-specification is a surprise).
+///
+/// Keyed by `SlotID`, so the shape of a book comes from `slots.json`, not from this type.
 struct BookDraft: Codable, Equatable, Sendable {
-    var slots: [SymbolSlot: SymbolID] = [:]
+    var slots: [SlotID: SymbolID] = [:]
 
-    subscript(slot: SymbolSlot) -> SymbolID? {
+    subscript(slot: SlotID) -> SymbolID? {
         get { slots[slot] }
         set { slots[slot] = newValue }
     }
 
     var filledCount: Int { slots.count }
-    func isEmpty(_ slot: SymbolSlot) -> Bool { slots[slot] == nil }
-}
+    func isEmpty(_ slot: SlotID) -> Bool { slots[slot] == nil }
 
-/// The four v0 slot kinds. PLACEHOLDER taxonomy (design brief) — the slot *set* is expected to
-/// grow a lot, so nothing may assume there are exactly four.
-enum SymbolSlot: String, Codable, CaseIterable, Sendable, CodingKeyRepresentable {
-    case terrain, biome, bounty, quirk
-
-    var displayName: String { rawValue.capitalized }
-
-    var codingKey: CodingKey { StringCodingKey(rawValue) }
-    init?<T: CodingKey>(codingKey: T) { self.init(rawValue: codingKey.stringValue) }
+    /// Drops anything the catalog no longer knows about.
+    ///
+    /// Matters because the slot taxonomy is being replaced (decisions-log, session 2): after that
+    /// rewrite, a saved draft can reference slots or symbols that no longer exist. Silently
+    /// ignoring them would leave the player with a book they can see but not explain.
+    mutating func prune(using catalog: ContentCatalog = .shared) {
+        let validSlots = Set(catalog.slots.map(\.id))
+        slots = slots.filter { slot, symbol in
+            validSlots.contains(slot) && catalog.symbol(symbol)?.slot == slot
+        }
+    }
 }
 
 /// The one companion in v0. Party expands in v1+, so this is a struct that can become an array

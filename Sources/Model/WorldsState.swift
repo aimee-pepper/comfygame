@@ -88,13 +88,29 @@ enum StabilityBand: String, Codable, Sendable {
 /// A composed, paid-for book. Every slot is resolved here: symbols the player chose plus the
 /// random fills for slots they left empty, so the world is fully described by (book, seed).
 struct BoundBook: Codable, Equatable, Sendable {
-    var symbols: [SymbolSlot: SymbolID]
+    var symbols: [SlotID: SymbolID]
     /// Slots that were random-filled at bind time — the UI reveals these as surprises.
-    var randomlyFilled: Set<SymbolSlot>
+    var randomlyFilled: Set<SlotID>
     var essencePaid: Int
 
+    /// In catalog order, with anything in an unrecognised slot appended rather than dropped.
+    ///
+    /// A bound world outlives the content that made it: if the slot taxonomy is rewritten while a
+    /// run is in progress, that run's symbols must still count toward its decay and its spawns.
+    /// Silently losing them would change a world under a player mid-visit.
     var allSymbolIDs: [SymbolID] {
-        SymbolSlot.allCases.compactMap { symbols[$0] }
+        let ordered = ContentCatalog.shared.slotIDsInOrder
+        let known = ordered.compactMap { symbols[$0] }
+        let orphans = symbols
+            .filter { !ordered.contains($0.key) }
+            .sorted { $0.key.rawValue < $1.key.rawValue }
+            .map(\.value)
+        return known + orphans
+    }
+
+    /// Slots the player chose deliberately, as opposed to left to chance.
+    var chosenSymbolIDs: [SymbolID] {
+        symbols.filter { !randomlyFilled.contains($0.key) }.map(\.value)
     }
 }
 

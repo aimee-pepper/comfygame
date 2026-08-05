@@ -12,10 +12,10 @@ final class BookRulesTests: XCTestCase {
     /// actually get charged and what the world actually decays at.
     func testFullySpecifiedProjectionMatchesTheBoundBookExactly() {
         var draft = BookDraft()
-        draft[.terrain] = "caverns"
-        draft[.biome] = "ashen"
-        draft[.bounty] = "rich_ore"
-        draft[.quirk] = "gilded_veins"
+        draft["terrain"] = "caverns"
+        draft["biome"] = "ashen"
+        draft["bounty"] = "rich_ore"
+        draft["quirk"] = "gilded_veins"
 
         let projection = BookProjection.project(draft: draft, ownedSymbols: owned)
         XCTAssertTrue(projection.isFullySpecified)
@@ -38,7 +38,11 @@ final class BookRulesTests: XCTestCase {
         let draft = BookDraft() // nothing chosen: maximum uncertainty
         let projection = BookProjection.project(draft: draft, ownedSymbols: owned)
         XCTAssertFalse(projection.isFullySpecified)
-        XCTAssertFalse(projection.essenceCost.isPoint, "An unfilled slot must widen the cost")
+        // Cost is the one thing an unfilled slot does NOT widen: a slot left to chance costs a
+        // flat rate whatever rolls into it (decisions-log session 2). The world stays uncertain;
+        // the price does not.
+        XCTAssertTrue(projection.essenceCost.isPoint, "The price of a book is exact before committing")
+        XCTAssertFalse(projection.stabilityScore.isPoint, "…but what you get for it is not")
 
         for seed in (0..<200).map({ UInt64($0) &* 2_654_435_761 }) {
             let book = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: seed)
@@ -56,12 +60,12 @@ final class BookRulesTests: XCTestCase {
 
     func testChosenSymbolsAreNeverOverwrittenByRandomFill() {
         var draft = BookDraft()
-        draft[.quirk] = "dim_sky"
+        draft["quirk"] = "dim_sky"
 
         for seed in (0..<50).map({ UInt64($0) &* 7_919 }) {
             let book = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: seed)
-            XCTAssertEqual(book.symbols[.quirk], "dim_sky")
-            XCTAssertFalse(book.randomlyFilled.contains(.quirk))
+            XCTAssertEqual(book.symbols["quirk"], "dim_sky")
+            XCTAssertFalse(book.randomlyFilled.contains("quirk"))
         }
     }
 
@@ -70,12 +74,12 @@ final class BookRulesTests: XCTestCase {
     func testSlotWithNoOwnedSymbolsIsLeftUnfilled() {
         let onlyTerrain: Set<SymbolID> = ["plains"]
         let book = BookRules.resolveBook(draft: BookDraft(), ownedSymbols: onlyTerrain, seed: 5)
-        XCTAssertEqual(book.symbols[.terrain], "plains")
-        XCTAssertNil(book.symbols[.biome])
+        XCTAssertEqual(book.symbols["terrain"], "plains")
+        XCTAssertNil(book.symbols["biome"])
         XCTAssertEqual(book.allSymbolIDs.count, 1)
 
         let projection = BookProjection.project(draft: BookDraft(), ownedSymbols: onlyTerrain)
-        XCTAssertTrue(projection.slotPlans.first { $0.slot == .biome }?.isEmpty ?? false)
+        XCTAssertTrue(projection.slotPlans.first { $0.slot == "biome" }?.isEmpty ?? false)
     }
 
     // MARK: The risk/reward dial
@@ -83,16 +87,16 @@ final class BookRulesTests: XCTestCase {
     /// The core tension: a greedier book must be more expensive, more dangerous, and shorter-lived.
     func testGreedierBooksCostMoreAndLastLess() {
         var calm = BookDraft()
-        calm[.terrain] = "plains"
-        calm[.biome] = "frostbound"
-        calm[.bounty] = "sparse_ore"
-        calm[.quirk] = "dim_sky"
+        calm["terrain"] = "plains"
+        calm["biome"] = "frostbound"
+        calm["bounty"] = "sparse_ore"
+        calm["quirk"] = "dim_sky"
 
         var greedy = BookDraft()
-        greedy[.terrain] = "caverns"
-        greedy[.biome] = "ashen"
-        greedy[.bounty] = "rich_ore"
-        greedy[.quirk] = "gilded_veins"
+        greedy["terrain"] = "caverns"
+        greedy["biome"] = "ashen"
+        greedy["bounty"] = "rich_ore"
+        greedy["quirk"] = "gilded_veins"
 
         let calmProjection = BookProjection.project(draft: calm, ownedSymbols: owned)
         let greedyProjection = BookProjection.project(draft: greedy, ownedSymbols: owned)
@@ -106,8 +110,8 @@ final class BookRulesTests: XCTestCase {
     /// A world always ends, however stable the book. "Eventually" is a v1 anchoring question.
     func testEvenTheCalmestBookDecays() {
         var calm = BookDraft()
-        calm[.quirk] = "dim_sky"
-        calm[.biome] = "frostbound"
+        calm["quirk"] = "dim_sky"
+        calm["biome"] = "frostbound"
         let book = BookRules.resolveBook(draft: calm, ownedSymbols: ["dim_sky", "frostbound"], seed: 1)
         XCTAssertGreaterThan(BookRules.decayPerTurn(for: book), 0)
         XCTAssertLessThan(BookRules.turnsUntilCollapse(decayPerTurn: BookRules.decayPerTurn(for: book)), 10_000)
@@ -128,9 +132,9 @@ final class BookRulesTests: XCTestCase {
     /// must produce visibly different worlds).
     func testSymbolsShiftTheHarvestAndEnemyMix() {
         var ore = BookDraft()
-        ore[.bounty] = "rich_ore"
+        ore["bounty"] = "rich_ore"
         var life = BookDraft()
-        life[.bounty] = "teeming_life"
+        life["bounty"] = "teeming_life"
 
         let oreShare = share(of: Resources.ore, in: BookProjection.project(draft: ore, ownedSymbols: owned))
         let lifeOreShare = share(of: Resources.ore, in: BookProjection.project(draft: life, ownedSymbols: owned))
@@ -154,10 +158,10 @@ final class BookRulesTests: XCTestCase {
         let store = GameStore(io: .temporary(name: "bind-\(UUID().uuidString)"))
         defer { SaveFileIO.temporary(name: "unused").deleteEverything() }
 
-        store.setSymbol("caverns", in: .terrain)
-        store.setSymbol("frostbound", in: .biome)
-        store.setSymbol("sparse_ore", in: .bounty)
-        store.setSymbol("dim_sky", in: .quirk)
+        store.setSymbol("caverns", in: "terrain")
+        store.setSymbol("frostbound", in: "biome")
+        store.setSymbol("sparse_ore", in: "bounty")
+        store.setSymbol("dim_sky", in: "quirk")
 
         let essenceBefore = store.state.base.essence
         let quoted = store.bookProjection.essenceCost
@@ -191,21 +195,21 @@ final class BookRulesTests: XCTestCase {
         defer { io.deleteEverything() }
 
         let first = GameStore(io: io)
-        first.setSymbol("archipelago", in: .terrain)
-        first.setSymbol("verdant", in: .biome)
+        first.setSymbol("archipelago", in: "terrain")
+        first.setSymbol("verdant", in: "biome")
         first.flushNow()
 
         let second = GameStore(io: io)
-        XCTAssertEqual(second.state.base.bookDraft[.terrain], "archipelago")
-        XCTAssertEqual(second.state.base.bookDraft[.biome], "verdant")
-        XCTAssertNil(second.state.base.bookDraft[.bounty])
+        XCTAssertEqual(second.state.base.bookDraft["terrain"], "archipelago")
+        XCTAssertEqual(second.state.base.bookDraft["biome"], "verdant")
+        XCTAssertNil(second.state.base.bookDraft["bounty"])
     }
 
     /// The Spring is credited by an action, never by elapsed time.
     @MainActor
     func testEssenceSpringPaysOnReturnHome() {
         let store = GameStore(io: .temporary(name: "spring-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: .terrain)
+        store.setSymbol("plains", in: "terrain")
         store.bindAndDepart()
 
         let essenceInWorld = store.state.base.essence

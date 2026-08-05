@@ -6,6 +6,8 @@ import Foundation
 /// never hardcodes a symbol's numbers. `validate()` runs at load and in the test suite, so a
 /// dangling ID in JSON fails immediately and loudly rather than silently spawning nothing.
 struct ContentCatalog: Sendable {
+    /// The kinds of slot a book has. Content-defined; nothing assumes a count.
+    let slots: [SlotDef]
     let symbols: [SymbolDef]
     let creatures: [CreatureDef]
     let resources: [ResourceDef]
@@ -31,6 +33,7 @@ struct ContentCatalog: Sendable {
 
     private var symbolIndex: [SymbolID: SymbolDef] { Dictionary(uniqueKeysWithValues: symbols.map { ($0.id, $0) }) }
 
+    func slot(_ id: SlotID) -> SlotDef? { slots.first { $0.id == id } }
     func symbol(_ id: SymbolID) -> SymbolDef? { symbols.first { $0.id == id } }
     func creature(_ id: CreatureID) -> CreatureDef? { creatures.first { $0.id == id } }
     func resource(_ id: ResourceID) -> ResourceDef? { resources.first { $0.id == id } }
@@ -41,7 +44,12 @@ struct ContentCatalog: Sendable {
         constellationNodes.first { $0.id == id }
     }
 
-    func symbols(in slot: SymbolSlot) -> [SymbolDef] { symbols.filter { $0.slot == slot } }
+    func symbols(in slot: SlotID) -> [SymbolDef] { symbols.filter { $0.slot == slot } }
+
+    /// The canonical slot order. **The only correct way to iterate a book's slots** — there is no
+    /// `allCases` to reach for, by design.
+    var slotsInOrder: [SlotDef] { slots.sorted { $0.order < $1.order } }
+    var slotIDsInOrder: [SlotID] { slotsInOrder.map(\.id) }
 
     var starterSymbolIDs: [SymbolID] { symbols.filter { $0.acquisition == .starter }.map(\.id) }
     var starterGambitPieceIDs: [GambitPieceID] { gambitPieces.filter { $0.acquisition == .starter }.map(\.id) }
@@ -67,6 +75,7 @@ struct ContentCatalog: Sendable {
 
     static func load(bundle: Bundle = .contentBundle) throws -> ContentCatalog {
         ContentCatalog(
+            slots: try loadFile("slots", key: "slots", bundle: bundle),
             symbols: try loadFile("symbols", key: "symbols", bundle: bundle),
             creatures: try loadFile("creatures", key: "creatures", bundle: bundle),
             resources: try loadFile("resources", key: "resources", bundle: bundle),
@@ -115,6 +124,7 @@ struct ContentCatalog: Sendable {
     // MARK: - Validation
 
     func validate() throws {
+        try requireUniqueIDs(slots.map(\.id.rawValue), label: "slot")
         try requireUniqueIDs(symbols.map(\.id.rawValue), label: "symbol")
         try requireUniqueIDs(creatures.map(\.id.rawValue), label: "creature")
         try requireUniqueIDs(resources.map(\.id.rawValue), label: "resource")
@@ -126,6 +136,14 @@ struct ContentCatalog: Sendable {
         let resourceIDs = Set(resources.map(\.id))
         let creatureIDs = Set(creatures.map(\.id))
         let itemIDs = Set(items.map(\.id))
+
+        let slotIDs = Set(slots.map(\.id))
+        for symbol in symbols where !slotIDs.contains(symbol.slot) {
+            throw ContentError.danglingReference("symbol '\(symbol.id)' sits in unknown slot '\(symbol.slot)'")
+        }
+        guard !slots.isEmpty else {
+            throw ContentError.danglingReference("slots.json defines no slots — books would have nowhere to put a symbol")
+        }
 
         for symbol in symbols {
             for id in symbol.yieldModifiers.keys where !resourceIDs.contains(id) {

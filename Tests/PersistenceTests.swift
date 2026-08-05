@@ -38,7 +38,7 @@ final class PersistenceTests: XCTestCase {
     func testMidEncounterStateSurvivesRoundTrip() throws {
         var state = GameState.newGame()
         var rng = SeededRNG(seed: 42)
-        let book = BoundBook(symbols: [.terrain: "caverns", .bounty: "rich_ore"], randomlyFilled: [.biome], essencePaid: 20)
+        let book = BoundBook(symbols: ["terrain": "caverns", "bounty": "rich_ore"], randomlyFilled: ["biome"], essencePaid: 20)
         let world = Worldgen.generate(book: book, seed: 42)
         var run = WorldRun(
             runIndex: 1,
@@ -68,7 +68,7 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(restored.activeEncounter?.roundNumber, 3)
         XCTAssertEqual(restored.activeEncounter?.foes.first?.currentHP, 9)
         XCTAssertEqual(restored.stability, 61.5)
-        XCTAssertEqual(restored.book.randomlyFilled, [.biome])
+        XCTAssertEqual(restored.book.randomlyFilled, ["biome"])
         XCTAssertEqual(reloaded, state)
     }
 

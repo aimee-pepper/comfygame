@@ -6,7 +6,7 @@ import SwiftUI
 /// pinned to the bottom of the screen in the thumb zone where it can't scroll away.
 struct WritingDeskView: View {
     @EnvironmentObject private var store: GameStore
-    @State private var editingSlot: SymbolSlot?
+    @State private var editingSlot: SlotID?
 
     private var state: GameState { store.state }
     private var projection: BookProjection { store.bookProjection }
@@ -59,7 +59,7 @@ struct WritingDeskView: View {
 
     private var chanceNote: some View {
         Label {
-            Text("Empty slots are filled at random when the book is bound. You see the range now; you find out where in it you landed when you arrive.")
+            Text("Empty slots are filled at random when the book is bound, and cost a flat \(Tuning.Book.randomSlotCostEssence) each however they roll. You know the price now; you find out what you bought when you arrive.")
         } icon: {
             Image(systemName: "dice")
         }
@@ -100,19 +100,17 @@ struct WritingDeskView: View {
         .background(.bar)
     }
 
-    private var costLabel: String {
-        let cost = projection.essenceCost
-        return cost.isPoint ? "\(cost.lowerBound)" : "\(cost.lowerBound)–\(cost.upperBound)"
-    }
+    private var costLabel: String { "\(projection.cost)" }
 
     private var bindFootnote: String {
         if !store.canBindAndDepart {
-            return "You have \(state.base.essence) essence; this book could cost up to \(projection.maximumCost)."
+            return "You have \(state.base.essence) essence; this book costs \(projection.cost)."
         }
-        if projection.essenceCost.isPoint {
-            return "Costs \(projection.essenceCost.lowerBound) essence of your \(state.base.essence)."
+        let count = projection.randomSlots.count
+        if count > 0 {
+            return "Costs \(projection.cost) of your \(state.base.essence) — including \(count) slot\(count == 1 ? "" : "s") left to chance at \(Tuning.Book.randomSlotCostEssence) each."
         }
-        return "You'll be charged what the finished book comes to — at most \(projection.maximumCost)."
+        return "Costs \(projection.cost) essence of your \(state.base.essence)."
     }
 }
 
@@ -123,7 +121,7 @@ private struct SlotCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(plan.slot.displayName.uppercased())
+            Text(slotName.uppercased())
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(.secondary)
 
@@ -154,6 +152,10 @@ private struct SlotCard: View {
         )
     }
 
+    private var slotName: String {
+        ContentCatalog.shared.slot(plan.slot)?.name ?? plan.slot.rawValue
+    }
+
     private var icon: String {
         if let chosen = plan.chosen { return chosen.icon }
         return plan.isEmpty ? "nosign" : "dice"
@@ -166,7 +168,7 @@ private struct SlotCard: View {
 
     private var subtitle: String {
         if let chosen = plan.chosen { return chosen.blurb }
-        if plan.isEmpty { return "You own no \(plan.slot.displayName.lowercased()) symbols yet." }
+        if plan.isEmpty { return "You own no \(slotName.lowercased()) symbols yet." }
         return "One of \(plan.candidates.count), chosen when you bind."
     }
 }
@@ -175,7 +177,7 @@ private struct SlotCard: View {
 
 private struct SymbolPickerView: View {
     @EnvironmentObject private var store: GameStore
-    let slot: SymbolSlot
+    let slot: SlotID
     let chosen: SymbolID?
     let onPick: (SymbolID?) -> Void
 
@@ -183,6 +185,10 @@ private struct SymbolPickerView: View {
 
     private var owned: [SymbolDef] {
         BookRules.candidates(for: slot, ownedSymbols: store.state.base.ownedSymbols)
+    }
+
+    private var slotName: String {
+        ContentCatalog.shared.slot(slot)?.name ?? slot.rawValue
     }
 
     var body: some View {
@@ -205,7 +211,7 @@ private struct SymbolPickerView: View {
                     .buttonStyle(.plain)
                 }
 
-                Section("Your \(slot.displayName.lowercased()) symbols") {
+                Section("Your \(slotName.lowercased()) symbols") {
                     ForEach(owned) { symbol in
                         Button { onPick(symbol.id) } label: {
                             SymbolRow(symbol: symbol, isChosen: symbol.id == chosen)
@@ -214,7 +220,7 @@ private struct SymbolPickerView: View {
                     }
                 }
             }
-            .navigationTitle(slot.displayName)
+            .navigationTitle(slotName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -282,10 +288,6 @@ struct InstabilityTag: View {
         default: .red
         }
     }
-}
-
-extension SymbolSlot: Identifiable {
-    public var id: String { rawValue }
 }
 
 #Preview {

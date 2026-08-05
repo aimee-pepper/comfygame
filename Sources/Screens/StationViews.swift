@@ -98,6 +98,15 @@ struct PartyView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
+                StationCard(title: "Satchel", icon: "bag") {
+                    LabeledRow(icon: "square.grid.2x2", label: "Carried into a world",
+                               value: "\(store.state.base.satchelCapacity) slots")
+                    LabeledRow(icon: "house", label: "Stored at home",
+                               value: "\(store.state.base.inventory.slots) slots")
+                    Text("Your satchel is smaller than your storehouse on purpose — what you can carry back is its own decision.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+
                 StationCard(title: companion.name, icon: "person.fill") {
                     LabeledRow(icon: "heart.fill", label: "Health", value: "\(companion.maxHP)")
                     LabeledRow(icon: "hammer.fill", label: "Weapon", value: "tier \(companion.weaponTier)")

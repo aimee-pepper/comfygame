@@ -4,7 +4,8 @@ import SwiftUI
 ///
 /// Every number here comes from `BookRules`, the same functions the bind itself runs, so the
 /// preview cannot drift from what you actually get. Where a slot is left to chance, the number
-/// becomes a range rather than a guess.
+/// becomes a range rather than a guess — except the price, which is exact either way.
+/// The split is deliberate: **the price is certain, the world is not.**
 struct PreviewPanel: View {
     let projection: BookProjection
     /// Drives the silhouette treatment: creatures you've never met show as a question mark.
@@ -109,10 +110,9 @@ struct PreviewPanel: View {
         return tier.isPoint ? "tier \(tier.lowerBound)" : "tier \(tier.lowerBound)–\(tier.upperBound)"
     }
 
-    private var costText: String {
-        let cost = projection.essenceCost
-        return cost.isPoint ? "\(cost.lowerBound)" : "\(cost.lowerBound)–\(cost.upperBound)"
-    }
+    /// Always exact, even when everything else on this panel is a range — a slot left to chance
+    /// costs a flat rate whatever rolls into it.
+    private var costText: String { "\(projection.cost)" }
 
     // MARK: Mixes
 
@@ -233,7 +233,7 @@ private struct MixBar: View {
     ScrollView {
         PreviewPanel(
             projection: BookProjection.project(
-                draft: BookDraft(slots: [.terrain: "caverns", .bounty: "rich_ore"]),
+                draft: BookDraft(slots: ["terrain": "caverns", "bounty": "rich_ore"]),
                 ownedSymbols: Set(ContentCatalog.shared.starterSymbolIDs)
             ),
             discovery: DiscoveryLog(creatures: ["paper_moth": DiscoveryRecord(firstSeenRunIndex: 1, timesEncountered: 2)])

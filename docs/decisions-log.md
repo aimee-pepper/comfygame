@@ -72,3 +72,80 @@ Nothing is blocked. Continue Milestone 3 as planned.
 **7. Game name — Aimee's call, still open.** "Bookbinder" remains the placeholder. Note that "binding" vocabulary may get crowded once sigils/pressures are the core language.
 
 **8. Satchel size — DECOUPLE from Storehouse.** Satchel should be **smaller** than storage and separately upgradeable. Two distinct pressures: carry limit forces "keep or leave it" decisions in-world; storage limit forces "hoard or refine" decisions at home. Two upgrade paths.
+
+
+## 2026-08-04 — Session 3 (answers to engineering notes + narrative direction)
+## Answers to engineering questions
+
+### 4a. Bestiary key under generated creatures — RESOLVED
+
+**The durable key is the raw trait vector. Identity is a derived view, never the stored key.**
+
+Every creature you encounter is recorded as a **specimen**: its actual trait values, verbatim. The resolved identity ("ambusher," "grazer") is *computed* from that vector at read time, not written into the save.
+
+Why this settles the permanence worry: if identity-resolution rules change in a later build, identities are recomputed from stored specimens and nothing is lost. The Reality layer's promise holds because what's stored is observation, not interpretation.
+
+**This gives both collection feels rather than forcing a choice:**
+- **Identity tier** — a tidy, completable set. Silhouette until you meet your first of that identity, then revealed. This is the Pokédex layer, and it's what the preview panel speaks in.
+- **Specimen tier** — an open-ended field journal beneath each identity. Every variant recorded; supports personal bests/extremes ("largest you've seen," "only prismatic one"). This is where computed-rarity percentiles live (personal + global, both shown).
+
+**Preview sub-question — what silhouette do you show for something never seen?** The identity class. Pressures reliably predict the *class* of creature a world produces, not its specific traits — this mirrors real convergent evolution (same environment → same ecomorph across unrelated lineages; contingency fills in details). So the preview honestly promises "something ambusher-shaped is likely here" while the specific creature stays a surprise. Identity silhouettes are authored art; specimens are generated.
+
+**Implication for content:** identities are authored definitions (a name, a silhouette, and the trait-space region that resolves to them), stored as data like everything else. Expect this catalog to grow.
+
+### 4b. Cost display — CONFIRMED, one exact number
+
+Your reasoning is right and better than the original instruction. One committed number on the Bind button; no range. "The price is certain, the world is not" is exactly the split we want, and watching the price *drop* when you clear a slot makes "precision costs, serendipity is cheap" legible in the moment.
+
+Flat rate at 1 as a `Tuning.swift` placeholder is correct — a constant is right for now. Revisit only if playtesting shows bulk-empty books are dominant.
+
+### 7. Satchel — resources stay stackable and slot-free
+
+Keep the default you proposed. Carry pressure applies to **items only**. Making raw materials compete for slots mid-run is the more aggressive design and it fights the hoarding pillar; instability already taxes greed in *turns*, which is enough pressure for now. Flag for revisit if in-world greed ever feels costless.
+
+Sequencing note acknowledged — capacity split now, decision UI at milestone 5.
+
+### 5. Forward-compat catches — APPROVED, both
+
+Foes carrying resolved stat blocks in the save, and item instances carrying what they *are* rather than a reference: both correct, both consistent with the specimen principle in 4a. Same rule generalizes: **saves store resolved facts, not pointers into regenerable content.**
+
+---
+
+## Narrative direction (new — affects content, not yet code)
+
+Early-stage; nothing here needs building yet. Recorded so content structures aren't designed against it.
+
+**Premise.** The world shattered. Restoration is the long arc; a **great work** must be assembled to avert what's coming next. The catastrophe already happened — the dread is ambient, not a countdown. **No timers, ever.** (Narrative urgency is fine and wanted; mechanical time pressure is not. The only sleep-friendly requirement is that nothing advances while the player is idle.)
+
+**Scattered people.** People were flung into the worlds when it shattered. Some have skills enough to try to make their way home, so they *move between worlds over time* — they are not static pickups.
+
+**Finding them is a search, not a lookup.** A lost person is found in worlds that **satisfy conditions** (cold + dim + mineral-rich), never in one exact reconstructable world. Multiple valid solutions preserve unpredictability and keep authorship from becoming a combination lock.
+
+**Clues: never wrong. Ever.** Partial, sensory, ambiguous, or *stale* — all fine. Deliberately false — never. The failure mode is "she isn't here anymore" or "you read it too loosely," never "the game lied." Because travelers move, a true clue can describe where someone *was*, leaving a further trace. This is how the clue system stays honest while remaining a real deduction challenge.
+
+**Clue sources:** diary pages found in worlds; accounts from other travelers met in worlds; the tavern (unrecruited people you've met turn up and can be asked). Clues are qualitative and sensory — the player translates description into pressures. That translation *is* the gameplay, and it's what makes symbol knowledge feel like literacy rather than inventory.
+
+**NPC types:** hand-authored **named** NPCs (real diaries, real arcs, tied to the great work — some were *doing* something when it hit, so their writings are both breadcrumbs and pieces of the work itself) plus **generic spawning** travelers (procedural, provide ambient clues and recruitment).
+
+**Ties to existing systems:** recovered people are the companions assignable to party/home/worlds; the tavern hosts the unplaced; the great work needs both materials (sourced from increasingly extreme worlds) and people (who know things nobody else does).
+
+### The Library (new base station)
+
+A base station that holds recovered diaries and traveler accounts. It is the **visible face of the restoration arc** — a room that fills up as lost knowledge is recovered — and the natural home for the Reality layer's "knowledge is never taken back" promise.
+
+**Clue highlighting — highlight what matters, never what it means.** Significant sensory phrases are marked in the text ("the stones sang when the cold came"), but the game NEVER translates them into pressures or sigils. The player does that translation; it is the core deduction gameplay and the thing that makes symbol knowledge feel like literacy. Auto-interpretation would destroy it. Side benefit: re-reading old pages after learning more sigils is genuinely rewarding, so the Library stays live content rather than an archive.
+
+**Diaries are collectible sets.** Pages are found scattered across worlds, out of order.
+
+- **Completion is a REWARD, never a GATE.** Partial diaries must always be sufficient to locate a person. Never require a complete diary to find someone — scattered pages plus a hard gate leaves the player stuck with no recourse.
+- Returning a **completed diary to the person it belongs to** is a payoff moment and grants a reward from them (nature TBD). Deliverable at any time, including long after recruitment — so the collection loop survives finding them.
+- Pages found *after* meeting someone still matter (see above).
+- A diary completed for a person **not yet found** is itself a strong lead.
+
+Also likely an achievement (see below).
+
+### Achievements & unlockables — DEFERRED, with a framing to hold
+
+Not being designed yet. When we do: they should be **discovery records, not task lists** — recognizing what the player noticed rather than chores completed. Examples of the right flavor: first prismatic specimen; read a page in the world it describes; found someone from a single stale clue; completed a diary. Precedent: Shattered Pixel Dungeon, where achievements unlock real content (hero classes). Fits the bestiary/library spine.
+
+**Not yet decided:** the nature of the great work; what exactly is coming; whether there's a final confrontation or a completion; how many named NPCs; what completed-diary rewards actually are; the achievement/unlockable list.

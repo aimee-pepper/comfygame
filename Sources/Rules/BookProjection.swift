@@ -9,18 +9,22 @@ import Foundation
 /// bounds you're signing up for, you just don't know where in them you'll land. Fill every slot and
 /// every range collapses to an exact number.
 ///
+/// **Cost is the exception, and deliberately so.** A slot left to chance costs a flat cheap rate
+/// whatever rolls into it (decisions-log session 2), so the price is fully known while you're still
+/// composing. The split that leaves is the honest one: *the price is certain, the world is not.*
+///
 /// Ranges are computed per-slot rather than by enumerating combinations, which is exact because
-/// cost, instability and enemy tier are all additive over slots.
+/// instability and enemy tier are additive over slots.
 struct BookProjection {
 
     struct SlotPlan: Identifiable {
-        var slot: SymbolSlot
+        var slot: SlotID
         /// The symbol the player put here, or nil if the slot is left to chance.
         var chosen: SymbolDef?
         /// What a random fill could draw from (only symbols the player owns).
         var candidates: [SymbolDef]
 
-        var id: SymbolSlot { slot }
+        var id: SlotID { slot }
         var isRandom: Bool { chosen == nil }
         /// A slot with nothing to draw from generates nothing at all.
         var isEmpty: Bool { chosen == nil && candidates.isEmpty }
@@ -44,14 +48,18 @@ struct BookProjection {
 
     /// True when every slot is chosen, so nothing is left to chance and every range is a point.
     var isFullySpecified: Bool { slotPlans.allSatisfy { !$0.isRandom } }
-    var randomSlots: [SymbolSlot] { slotPlans.filter(\.isRandom).map(\.slot) }
-    /// The player must be able to afford the *worst* case before departing.
-    var maximumCost: Int { essenceCost.upperBound }
+    /// Slots that will actually be filled by chance — a slot with nothing to draw from doesn't
+    /// count, and isn't charged for.
+    var randomSlots: [SlotID] { slotPlans.filter { $0.isRandom && !$0.isEmpty }.map(\.slot) }
+    /// What this book will cost, exactly. Known before committing — see the note above.
+    var cost: Int { essenceCost.lowerBound }
+    /// How much of the cost is the flat charge for slots left to chance.
+    var randomSlotCost: Int { randomSlots.count * Tuning.Book.randomSlotCostEssence }
 
     // MARK: - Computation
 
     static func project(draft: BookDraft, ownedSymbols: Set<SymbolID>) -> BookProjection {
-        let plans = SymbolSlot.allCases.map { slot in
+        let plans = ContentCatalog.shared.slotIDsInOrder.map { slot in
             SlotPlan(
                 slot: slot,
                 chosen: draft[slot].flatMap { ContentCatalog.shared.symbol($0) },
@@ -60,15 +68,12 @@ struct BookProjection {
         }
 
         // Additive quantities: summing per-slot extremes gives the exact overall extremes.
-        var costLow = Tuning.Book.baseBindCostEssence, costHigh = Tuning.Book.baseBindCostEssence
         var instabilityLow = 0.0, instabilityHigh = 0.0
         var tierLow = Tuning.World.baseEnemyTier, tierHigh = Tuning.World.baseEnemyTier
 
         for plan in plans {
             let options = plan.chosen.map { [$0] } ?? plan.candidates
             guard !options.isEmpty else { continue }
-            costLow += options.map(\.essenceCost).min() ?? 0
-            costHigh += options.map(\.essenceCost).max() ?? 0
             instabilityLow += options.map(\.instabilityWeight).min() ?? 0
             instabilityHigh += options.map(\.instabilityWeight).max() ?? 0
             tierLow += options.map(\.enemyTierDelta).min() ?? 0
@@ -83,9 +88,15 @@ struct BookProjection {
         let turnsLow = BookRules.turnsUntilCollapse(decayPerTurn: decayFast)
         let turnsHigh = BookRules.turnsUntilCollapse(decayPerTurn: decaySlow)
 
+        // Exact, not ranged: you pay for what you chose, plus a flat rate per slot left to chance.
+        let cost = BookRules.bindCost(
+            chosenSymbolIDs: plans.compactMap { $0.chosen?.id },
+            randomSlots: plans.count { $0.isRandom && !$0.isEmpty }
+        )
+
         return BookProjection(
             slotPlans: plans,
-            essenceCost: costLow...max(costLow, costHigh),
+            essenceCost: cost...cost,
             instability: instabilityLow...max(instabilityLow, instabilityHigh),
             stabilityScore: scoreLow...max(scoreLow, scoreHigh),
             turnsUntilCollapse: turnsLow...max(turnsLow, turnsHigh),

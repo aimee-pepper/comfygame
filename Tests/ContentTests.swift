@@ -27,9 +27,9 @@ final class ContentTests: XCTestCase {
 
     func testEverySlotHasAtLeastOneStarterSymbol() {
         // Random-filling an empty slot needs a candidate the player owns, in every slot.
-        for slot in SymbolSlot.allCases {
+        for slot in ContentCatalog.shared.slotIDsInOrder {
             let owned = ContentCatalog.shared.symbols(in: slot).filter { $0.acquisition == .starter }
-            XCTAssertFalse(owned.isEmpty, "Slot '\(slot.rawValue)' has no starter symbol to random-fill with")
+            XCTAssertFalse(owned.isEmpty, "Slot '\(slot)' has no starter symbol to random-fill with")
         }
     }
 
@@ -108,6 +108,7 @@ final class ContentTests: XCTestCase {
         var broken = catalog.symbols
         broken[0].yieldModifiers = ["not_a_real_resource": 2.0]
         let sabotaged = ContentCatalog(
+            slots: catalog.slots,
             symbols: broken,
             creatures: catalog.creatures,
             resources: catalog.resources,

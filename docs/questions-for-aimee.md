@@ -1,5 +1,7 @@
 # Questions for Aimee
 
+> **STATUS:** **All eight answered** in `decisions-log.md` § Session 2, and the follow-ups in § Session 3. Kept for the record.
+
 Plain-language version of `questions-for-design.md` — same questions, no code in them. Every one of
 these already has a working answer in the build, so nothing is waiting on you. This is just "here's
 where I guessed, tell me if I guessed wrong."

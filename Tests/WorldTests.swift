@@ -6,14 +6,14 @@ final class WorldTests: XCTestCase {
 
     private let owned = Set(ContentCatalog.shared.starterSymbolIDs)
 
-    private func book(_ symbols: [SymbolSlot: SymbolID]) -> BoundBook {
+    private func book(_ symbols: [SlotID: SymbolID]) -> BoundBook {
         BoundBook(symbols: symbols, randomlyFilled: [], essencePaid: 0)
     }
 
     // MARK: Worldgen
 
     func testSameSeedRegeneratesTheSameWorld() {
-        let composition = book([.terrain: "caverns", .biome: "ashen", .bounty: "rich_ore", .quirk: "gilded_veins"])
+        let composition = book(["terrain": "caverns", "biome": "ashen", "bounty": "rich_ore", "quirk": "gilded_veins"])
         let first = Worldgen.generate(book: composition, seed: 8_675_309)
         let second = Worldgen.generate(book: composition, seed: 8_675_309)
 
@@ -23,7 +23,7 @@ final class WorldTests: XCTestCase {
     }
 
     func testDifferentSeedsGiveDifferentWorlds() {
-        let composition = book([.terrain: "plains"])
+        let composition = book(["terrain": "plains"])
         XCTAssertNotEqual(Worldgen.generate(book: composition, seed: 1).map,
                           Worldgen.generate(book: composition, seed: 2).map)
     }
@@ -32,8 +32,8 @@ final class WorldTests: XCTestCase {
     func testGreedyBooksProduceDenserMoreDangerousWorlds() {
         // Averaged over seeds — any single world can be an outlier.
         var calmNodes = 0, greedyNodes = 0, calmEnemies = 0, greedyEnemies = 0
-        let calm = book([.terrain: "plains", .biome: "frostbound", .bounty: "sparse_ore", .quirk: "dim_sky"])
-        let greedy = book([.terrain: "caverns", .biome: "ashen", .bounty: "rich_ore", .quirk: "gilded_veins"])
+        let calm = book(["terrain": "plains", "biome": "frostbound", "bounty": "sparse_ore", "quirk": "dim_sky"])
+        let greedy = book(["terrain": "caverns", "biome": "ashen", "bounty": "rich_ore", "quirk": "gilded_veins"])
 
         for seed in (1...25).map({ UInt64($0) &* 1_000_003 }) {
             let a = Worldgen.generate(book: calm, seed: seed)
@@ -50,7 +50,7 @@ final class WorldTests: XCTestCase {
 
     func testEveryWorldHasAnEntryAndAtLeastOneOtherPortal() {
         for seed in (1...30).map({ UInt64($0) &* 65_537 }) {
-            let world = Worldgen.generate(book: book([.terrain: "plains"]), seed: seed)
+            let world = Worldgen.generate(book: book(["terrain": "plains"]), seed: seed)
             XCTAssertEqual(world.map[world.start].content, .portal(isEntry: true))
             let portals = world.map.tiles.count { $0.content.isPortal }
             XCTAssertGreaterThanOrEqual(portals, 2, "Brief requires at least one exit besides the entry")
@@ -58,7 +58,7 @@ final class WorldTests: XCTestCase {
     }
 
     func testNothingIsPlacedOnTopOfAnythingElse() {
-        let world = Worldgen.generate(book: book([.bounty: "teeming_life"]), seed: 4242)
+        let world = Worldgen.generate(book: book(["bounty": "teeming_life"]), seed: 4242)
         var seen = Set<GridPoint>()
         for point in world.map.allPoints where world.map[point].content != .empty {
             XCTAssertTrue(seen.insert(point).inserted)
@@ -70,7 +70,7 @@ final class WorldTests: XCTestCase {
 
     func testYouDoNotArriveNextToAnEnemy() {
         for seed in (1...30).map({ UInt64($0) &* 2_654_435_761 }) {
-            let world = Worldgen.generate(book: book([.biome: "ashen"]), seed: seed)
+            let world = Worldgen.generate(book: book(["biome": "ashen"]), seed: seed)
             for enemy in world.enemies {
                 XCTAssertGreaterThanOrEqual(
                     enemy.position.chebyshevDistance(to: world.start),
@@ -83,8 +83,8 @@ final class WorldTests: XCTestCase {
 
     /// Dim Sky's paired tradeoff: a longer-lived world costs you a ring of sight.
     func testDimSkyReducesVision() {
-        let plain = book([.terrain: "plains"])
-        let dim = book([.terrain: "plains", .quirk: "dim_sky"])
+        let plain = book(["terrain": "plains"])
+        let dim = book(["terrain": "plains", "quirk": "dim_sky"])
         XCTAssertLessThan(WorldRules.visionRadius(for: dim), WorldRules.visionRadius(for: plain))
         XCTAssertGreaterThanOrEqual(WorldRules.visionRadius(for: dim), Tuning.World.minimumVisionRadius)
 
@@ -97,7 +97,7 @@ final class WorldTests: XCTestCase {
     // MARK: Fog and movement
 
     func testFogRevealsAroundThePlayerAndStaysRevealed() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 31)
+        var state = startedRun(book(["terrain": "plains"]), seed: 31)
         let run = state.worlds.activeRun!
         let start = run.playerPosition
         XCTAssertTrue(run.map[start].isRevealed)
@@ -112,7 +112,7 @@ final class WorldTests: XCTestCase {
     }
 
     func testAStepIsExactlyOneTurn() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 12)
+        var state = startedRun(book(["terrain": "plains"]), seed: 12)
         let before = state.worlds.activeRun!
         let step = before.map.neighbours(of: before.playerPosition).first { WorldRules.canEnter($0, in: before.map) }!
 
@@ -124,7 +124,7 @@ final class WorldTests: XCTestCase {
     }
 
     func testNonAdjacentStepsAreRefused() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 13)
+        var state = startedRun(book(["terrain": "plains"]), seed: 13)
         let run = state.worlds.activeRun!
         let far = run.map.allPoints.first { $0.manhattanDistance(to: run.playerPosition) > 3 }!
 
@@ -135,7 +135,7 @@ final class WorldTests: XCTestCase {
     }
 
     func testPathfindingReachesAndRoutesAroundCrumbledGround() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 14)
+        var state = startedRun(book(["terrain": "plains"]), seed: 14)
         var run = state.worlds.activeRun!
         let start = run.playerPosition
         let target = run.map.allPoints.last { $0 != start && WorldRules.canEnter($0, in: run.map) }!
@@ -162,7 +162,7 @@ final class WorldTests: XCTestCase {
     // MARK: Harvesting
 
     func testHarvestingFillsTheSatchelAndExhaustsTheNode() throws {
-        var state = startedRun(book([.bounty: "teeming_life"]), seed: 99)
+        var state = startedRun(book(["bounty": "teeming_life"]), seed: 99)
         var run = state.worlds.activeRun!
         // Put a known node under the player rather than hunting the map for one.
         run.map[run.playerPosition].content = .node(ResourceNode(resource: Resources.fiber,
@@ -183,7 +183,7 @@ final class WorldTests: XCTestCase {
     }
 
     func testWildDropsArePickedUpByWalkingOverThem() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 21)
+        var state = startedRun(book(["terrain": "plains"]), seed: 21)
         var run = state.worlds.activeRun!
         let target = run.map.neighbours(of: run.playerPosition).first { WorldRules.canEnter($0, in: run.map) }!
         run.map[target].content = .wildDrop(resource: Resources.essenceRaw, amount: 2)
@@ -197,7 +197,7 @@ final class WorldTests: XCTestCase {
     // MARK: The world turning against you
 
     func testHazardsOnlyAppearOnceStabilityFalls() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 55)
+        var state = startedRun(book(["terrain": "plains"]), seed: 55)
         func hazardCount() -> Int { state.worlds.activeRun?.map.tiles.count { $0.content == .hazard } ?? 0 }
 
         // Well above the threshold: nothing changes.
@@ -211,7 +211,7 @@ final class WorldTests: XCTestCase {
     }
 
     func testCrumblingEatsTheMapFromTheOutsideInAndSparesThePlayer() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 56)
+        var state = startedRun(book(["terrain": "plains"]), seed: 56)
         state.worlds.activeRun?.stability = Tuning.World.crumbleThreshold - 1
         state.worlds.activeRun?.playerPosition = GridPoint(x: 7, y: 7) // middle of the map
 
@@ -227,7 +227,7 @@ final class WorldTests: XCTestCase {
     }
 
     func testCollapseIsReportedAtZeroStability() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 57)
+        var state = startedRun(book(["terrain": "plains"]), seed: 57)
         state.worlds.activeRun?.stability = 0.5
         let events = WorldRules.advanceTurn(in: &state)
         XCTAssertTrue(events.contains(.collapsed))
@@ -236,7 +236,7 @@ final class WorldTests: XCTestCase {
     // MARK: Enemies
 
     func testEnemiesSleepUntilYouAreCloseThenWalkAtYou() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 61)
+        var state = startedRun(book(["terrain": "plains"]), seed: 61)
         var run = state.worlds.activeRun!
         run.enemies = []
         run.playerPosition = GridPoint(x: 7, y: 7)
@@ -257,7 +257,7 @@ final class WorldTests: XCTestCase {
     }
 
     func testWalkingIntoAnEnemyOpensAnEncounterAndLogsTheCreature() {
-        var state = startedRun(book([.terrain: "plains"]), seed: 62)
+        var state = startedRun(book(["terrain": "plains"]), seed: 62)
         var run = state.worlds.activeRun!
         let target = run.map.neighbours(of: run.playerPosition).first { WorldRules.canEnter($0, in: run.map) }!
         run.enemies = [WorldEnemy(id: InstanceID(rawValue: 7), creatureID: "ink_hound", position: target, isAwake: true)]
@@ -275,7 +275,7 @@ final class WorldTests: XCTestCase {
     @MainActor
     func testPortalHomeKeepsEverything() {
         let store = GameStore(io: .temporary(name: "portal-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: .terrain)
+        store.setSymbol("plains", in: "terrain")
         store.bindAndDepart()
         store.mutate("stock the satchel") { $0.worlds.activeRun?.satchel.add(9, of: Resources.ore) }
 
@@ -290,7 +290,7 @@ final class WorldTests: XCTestCase {
     @MainActor
     func testCollapseKeepsOnlyAFractionAndBanksMotesToReality() {
         let store = GameStore(io: .temporary(name: "collapse-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: .terrain)
+        store.setSymbol("plains", in: "terrain")
         store.bindAndDepart()
         store.mutate("stock the satchel") { state in
             state.worlds.activeRun?.satchel.add(10, of: Resources.ore)
@@ -314,7 +314,7 @@ final class WorldTests: XCTestCase {
         defer { io.deleteEverything() }
 
         let first = GameStore(io: io)
-        first.setSymbol("caverns", in: .terrain)
+        first.setSymbol("caverns", in: "terrain")
         first.bindAndDepart()
         // Wander a bit so fog, position and RNG have all moved off their initial values.
         for _ in 0..<5 {
@@ -340,7 +340,7 @@ final class WorldTests: XCTestCase {
     @MainActor
     func testNothingHappensWithoutAPlayerAction() async throws {
         let store = GameStore(io: .temporary(name: "idle-\(UUID().uuidString)"))
-        store.setSymbol("gilded_veins", in: .quirk) // fastest-decaying symbol we have
+        store.setSymbol("gilded_veins", in: "quirk") // fastest-decaying symbol we have
         store.bindAndDepart()
         let before = try XCTUnwrap(store.state.worlds.activeRun)
 
@@ -357,7 +357,7 @@ final class WorldTests: XCTestCase {
     @MainActor
     func testDefeatedEnemiesAreRemovedFromTheMap() {
         let store = GameStore(io: .temporary(name: "resolve-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: .terrain)
+        store.setSymbol("plains", in: "terrain")
         store.bindAndDepart()
         store.mutate("place a foe") { state in
             guard var run = state.worlds.activeRun else { return }

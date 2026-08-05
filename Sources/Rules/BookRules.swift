@@ -17,10 +17,13 @@ enum BookRules {
     /// same seed always produces the same book.
     static func resolveBook(draft: BookDraft, ownedSymbols: Set<SymbolID>, seed: UInt64) -> BoundBook {
         var rng = SeededRNG(seed: seed).derived(0xB00C)
-        var symbols: [SymbolSlot: SymbolID] = [:]
-        var randomlyFilled: Set<SymbolSlot> = []
+        var symbols: [SlotID: SymbolID] = [:]
+        var randomlyFilled: Set<SlotID> = []
 
-        for slot in SymbolSlot.allCases {
+        // Slot list comes from content, in its canonical order, so the same seed keeps producing
+        // the same fills. Reordering slots.json would reshuffle them — acceptable, since that's a
+        // deliberate content change, not a runtime one.
+        for slot in ContentCatalog.shared.slotIDsInOrder {
             if let chosen = draft[slot] {
                 symbols[slot] = chosen
             } else if let pick = rng.pick(candidates(for: slot, ownedSymbols: ownedSymbols).map(\.id)) {
@@ -34,7 +37,7 @@ enum BookRules {
     }
 
     /// What a random fill for this slot could draw from. Sorted for determinism.
-    static func candidates(for slot: SymbolSlot, ownedSymbols: Set<SymbolID>) -> [SymbolDef] {
+    static func candidates(for slot: SlotID, ownedSymbols: Set<SymbolID>) -> [SymbolDef] {
         ContentCatalog.shared.symbols(in: slot)
             .filter { ownedSymbols.contains($0.id) }
             .sorted { $0.id.rawValue < $1.id.rawValue }
@@ -43,13 +46,20 @@ enum BookRules {
     // MARK: Costs and decay
 
     static func bindCost(of book: BoundBook) -> Int {
-        bindCost(symbolIDs: book.allSymbolIDs)
+        bindCost(chosenSymbolIDs: book.chosenSymbolIDs, randomSlots: book.randomlyFilled.count)
     }
 
-    static func bindCost(symbolIDs: [SymbolID]) -> Int {
-        let symbolValue = symbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.essenceCost ?? 0) }
+    /// Precision costs, serendipity is cheap.
+    ///
+    /// You pay each symbol's own price for the slots you filled, and a flat cheap rate for each
+    /// slot you left to chance — regardless of what rolls into it. Which means the price of a book
+    /// is fully known while you're still composing it: there is no range, and nothing to discover
+    /// at the moment of payment.
+    static func bindCost(chosenSymbolIDs: [SymbolID], randomSlots: Int) -> Int {
+        let chosenValue = chosenSymbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.essenceCost ?? 0) }
         return Tuning.Book.baseBindCostEssence
-            + Int((Double(symbolValue) * Tuning.Book.symbolCostMultiplier).rounded())
+            + Int((Double(chosenValue) * Tuning.Book.symbolCostMultiplier).rounded())
+            + randomSlots * Tuning.Book.randomSlotCostEssence
     }
 
     static func instability(of book: BoundBook) -> Double {

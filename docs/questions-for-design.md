@@ -1,5 +1,7 @@
 # Questions for Design — from Claude Code
 
+> **STATUS:** **Q1–Q10 answered** in `decisions-log.md` §§ Session 2–3. Kept for the record; see `engineering-notes-session-2.md` and `-session-3.md` for what was built from them.
+
 Ambiguities hit while building. Each one has a **conservative interpretation already shipped**, so
 nothing is blocked; answering just tells me whether to keep or change it. Answers belong in
 `decisions-log.md` (newest entries win).

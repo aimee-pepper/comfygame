@@ -9,7 +9,7 @@ extension GameStore {
     // MARK: - Writing Desk
 
     /// Places a symbol in a slot, or clears it (`nil`) to leave that slot to chance.
-    func setSymbol(_ id: SymbolID?, in slot: SymbolSlot) {
+    func setSymbol(_ id: SymbolID?, in slot: SlotID) {
         // The draft lives in the save, so a force-quit half-way through composing a book resumes
         // with the same half-composed book.
         mutate("compose: \(slot.rawValue) = \(id?.rawValue ?? "random")") { state in
@@ -26,10 +26,10 @@ extension GameStore {
         BookProjection.project(draft: state.base.bookDraft, ownedSymbols: state.base.ownedSymbols)
     }
 
-    /// The player must be able to cover the worst case of an under-specified book, since which
-    /// symbols get random-filled isn't known until the bind happens.
+    /// The price is exact before committing — a slot left to chance costs a flat rate whatever
+    /// rolls into it — so there's no worst case to hold back for.
     var canBindAndDepart: Bool {
-        state.worlds.activeRun == nil && state.base.essence >= bookProjection.maximumCost
+        state.worlds.activeRun == nil && state.base.essence >= bookProjection.cost
     }
 
     /// Binds the current draft and departs into the world it describes.
@@ -63,9 +63,9 @@ extension GameStore {
                 map: world.map,
                 playerPosition: world.start,
                 enemies: world.enemies,
-                // The satchel carries what the Storehouse can hold. Whether that's the right rule
-                // is Q6 in docs/questions-for-design.md.
-                satchelItems: Inventory(slots: state.base.inventory.slots)
+                // The satchel is its own, smaller capacity — separate from home storage, and
+                // separately upgradeable (decisions-log session 2).
+                satchelItems: Inventory(slots: state.base.satchelCapacity)
             )
         }
         return true

@@ -21,11 +21,17 @@ enum Tuning {
     // MARK: - Book authoring
 
     enum Book {
-        static let baseSlotCount: Int = 4            // PLACEHOLDER — Terrain/Biome/Bounty/Quirk
-        static let maxSlotCount: Int = 5             // PLACEHOLDER — 5th via Reality unlock
+        // NOTE: there is deliberately no slot-count constant here. How many slots a book has
+        // is content (`Content/Data/slots.json`), not tuning — see decisions-log session 2.
         static let baseBindCostEssence: Int = 10     // PLACEHOLDER
         /// Multiplier applied to each symbol's own essence cost when totalling a bind.
         static let symbolCostMultiplier: Double = 1.0 // PLACEHOLDER
+        /// Flat charge for a slot left to chance, whatever rolls into it.
+        ///
+        /// Encodes the locked principle "precision costs, serendipity is cheap" (decisions-log
+        /// session 2). It must stay BELOW the cheapest symbol — currently 2 — or leaving a slot
+        /// empty stops being attractive and the pressure valve closes.
+        static let randomSlotCostEssence: Int = 1 // PLACEHOLDER
         /// Converts total instability into the 0–100 "Stability 68" headline in the preview.
         static let stabilityScorePerInstability: Double = 10.0 // PLACEHOLDER
     }
@@ -97,6 +103,10 @@ enum Tuning {
         static let startingEssence: Int = 40         // PLACEHOLDER
         static let startingInventorySlots: Int = 8   // PLACEHOLDER
         static let inventorySlotsPerStorehouseTier: Int = 4 // PLACEHOLDER
+        /// The satchel is what you carry INTO a world, and is deliberately smaller than home
+        /// storage — the gap is what forces "keep it or leave it" (decisions-log session 2).
+        static let startingSatchelSlots: Int = 4    // PLACEHOLDER
+        static let satchelSlotsPerTier: Int = 2     // PLACEHOLDER
         static let identifyCostEssence: Int = 5      // PLACEHOLDER
         /// Essence Spring trickle, credited on each return from a run (in-session event only —
         /// never wall-clock; see pillar 2).
