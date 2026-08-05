@@ -13,6 +13,11 @@ struct GambitRule: Codable, Equatable, Identifiable, Sendable {
     var comparator: GambitComponentID?
     var threshold: GambitComponentID?
     var action: GambitComponentID
+    /// Off rules stay written and stay in position, they just don't fire.
+    ///
+    /// Experimenting with an order means switching one line off and seeing what the rest do —
+    /// deleting it and writing it again is a different, much worse activity.
+    var isEnabled: Bool = true
 
     /// A condition is all-or-nothing: you can't compare without something to compare against.
     var hasCondition: Bool { property != nil && comparator != nil && threshold != nil }

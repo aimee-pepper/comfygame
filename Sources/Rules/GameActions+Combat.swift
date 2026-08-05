@@ -124,6 +124,43 @@ extension GameStore {
     /// Write a new rule from components you own. Refused if any part isn't yours — the grammar is
     /// gated by what you've learned, which is the whole point of it being a grammar.
     @discardableResult
+    /// Change one segment of a rule in place. The whole point of the editor is that you never
+    /// leave the list to do this.
+    func setGambitPart(_ ruleID: InstanceID, kind: GambitComponentDef.Kind,
+                       to component: GambitComponentID?, for owner: Combatant = .companion) {
+        mutate("edit rule", flush: true, withGambits(owner) { rules in
+            guard let index = rules.firstIndex(where: { $0.id == ruleID }) else { return }
+            switch kind {
+            case .subject: if let component { rules[index].subject = component }
+            case .action: if let component { rules[index].action = component }
+            case .property: rules[index].property = component
+            case .comparator: rules[index].comparator = component
+            case .threshold: rules[index].threshold = component
+            }
+        })
+    }
+
+    /// Switch a rule off without losing it, so an order can be tested rather than rebuilt.
+    func setGambitEnabled(_ ruleID: InstanceID, _ isEnabled: Bool, for owner: Combatant = .companion) {
+        mutate("toggle rule", flush: true, withGambits(owner) { rules in
+            guard let index = rules.firstIndex(where: { $0.id == ruleID }) else { return }
+            rules[index].isEnabled = isEnabled
+        })
+    }
+
+    /// Add an unconditional rule using whatever the player owns, ready to be edited in place.
+    ///
+    /// Deliberately not a blank: a rule with no subject and no action can't be rendered as a
+    /// sentence, and a half-sentence is harder to fix than a wrong one.
+    @discardableResult
+    func addBlankGambit(for owner: Combatant = .companion) -> Bool {
+        guard let subject = ownedComponents(.subject).first,
+              let action = ownedComponents(.action).first
+        else { return false }
+        return addGambit(GambitRule(id: InstanceID(rawValue: UInt64(state.meta.mutationCount) &+ 1),
+                                    subject: subject.id, action: action.id), for: owner)
+    }
+
     func addGambit(_ rule: GambitRule, for owner: Combatant = .companion) -> Bool {
         guard canEditGambits, rule.isWritable(with: state.base.ownedGambitComponents) else { return false }
         mutate("write a rule", flush: true, withGambits(owner) { list in

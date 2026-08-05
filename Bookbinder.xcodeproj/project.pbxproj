@@ -28,6 +28,7 @@
 		2849825A00283A75E65E3C88 /* SpilloverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C110827C995BC018EA20B47F /* SpilloverTests.swift */; };
 		28C38A9B1F4133012F86F0AA /* pressure_targets.json in Resources */ = {isa = PBXBuildFile; fileRef = 26FE0502F98B3DB6A7BF0C87 /* pressure_targets.json */; };
 		2AAA4E398F09BD29BAD7816B /* stations.json in Resources */ = {isa = PBXBuildFile; fileRef = 59F1E2A3A08364F9452A684F /* stations.json */; };
+		2C0118338DCCD9231D0DE4D0 /* GambitEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */; };
 		3062AB49BB5A3BBCC3A396BD /* Combat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD3736ADDC83B6481EFAC9A /* Combat.swift */; };
 		332407592859288828CA4B63 /* LibraryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */; };
 		35A27AF646DD34DD1F8A9585 /* Gambit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79874A74B2CF52DA90868DA0 /* Gambit.swift */; };
@@ -41,6 +42,8 @@
 		4A0672467AD72629AC2ABD2F /* Inventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F756C7CBAE86A8565FB12DD /* Inventory.swift */; };
 		4C60516FFB5892091CBE28AC /* research.json in Resources */ = {isa = PBXBuildFile; fileRef = 6A1D054604B637EEC90D24DA /* research.json */; };
 		4DEB17BC13834B4612226A7B /* HarnessActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248394713D4F19F950F25B92 /* HarnessActions.swift */; };
+		4EC3BC573F0634FE82377139 /* ResearchTreeLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CE9E9A2ED4242F8C480AEF /* ResearchTreeLayout.swift */; };
+		4F7559D592DAED143B8AEF88 /* GearAndRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09AD15A5BFBBBD300176004 /* GearAndRulesTests.swift */; };
 		4FD1E53B0D4C2E67BB48FEE9 /* contradictions.json in Resources */ = {isa = PBXBuildFile; fileRef = 9C7793CAA2915E078E230E6D /* contradictions.json */; };
 		51771CB66B64C405544B0B87 /* ResearchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */; };
 		52C1E5841A22ED23AA8245DF /* Tuning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644939D61FCF530C40392FCC /* Tuning.swift */; };
@@ -131,6 +134,7 @@
 		1824E6BFD5550AACCB6416A5 /* DangerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DangerTests.swift; sourceTree = "<group>"; };
 		1AE0FA07FD91558E2F953944 /* GameActions+World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+World.swift"; sourceTree = "<group>"; };
 		1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchViews.swift; sourceTree = "<group>"; };
+		1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GambitEditorView.swift; sourceTree = "<group>"; };
 		1F045A414F1C1CF9A9A916BB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		2227C9E0E4E333249CF7FEFA /* ContradictionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionModels.swift; sourceTree = "<group>"; };
 		224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+Economy.swift"; sourceTree = "<group>"; };
@@ -151,6 +155,7 @@
 		4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldsState.swift; sourceTree = "<group>"; };
 		504332712854230587940F0A /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		541026CEC51423252ED5FAFD /* WorldConstraints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldConstraints.swift; sourceTree = "<group>"; };
+		56CE9E9A2ED4242F8C480AEF /* ResearchTreeLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchTreeLayout.swift; sourceTree = "<group>"; };
 		59F1E2A3A08364F9452A684F /* stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = stations.json; sourceTree = "<group>"; };
 		5D960FCB6727D86D57A82BF4 /* travellers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = travellers.json; sourceTree = "<group>"; };
 		5F756C7CBAE86A8565FB12DD /* Inventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inventory.swift; sourceTree = "<group>"; };
@@ -198,6 +203,7 @@
 		B543B94C8E89980FDE029D9C /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		B664EB59C95581C3098E542B /* BaseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseState.swift; sourceTree = "<group>"; };
 		BE933E91275B1FF990B69BAA /* EncounterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncounterView.swift; sourceTree = "<group>"; };
+		C09AD15A5BFBBBD300176004 /* GearAndRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearAndRulesTests.swift; sourceTree = "<group>"; };
 		C110827C995BC018EA20B47F /* SpilloverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpilloverTests.swift; sourceTree = "<group>"; };
 		C3CC1BB415696E2B7417C43D /* BookRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRules.swift; sourceTree = "<group>"; };
 		C51FE4FBAB98280181089C56 /* DeterminismTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeterminismTests.swift; sourceTree = "<group>"; };
@@ -291,10 +297,12 @@
 			children = (
 				346EEEC616B8EBFE291C4A79 /* BaseView.swift */,
 				BE933E91275B1FF990B69BAA /* EncounterView.swift */,
+				1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */,
 				2CBCB8652F20B361959F9B5C /* LibraryView.swift */,
 				CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */,
 				39D5618B6B6F36DB62CD836B /* PageGridView.swift */,
 				36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */,
+				56CE9E9A2ED4242F8C480AEF /* ResearchTreeLayout.swift */,
 				1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */,
 				D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */,
 				14E466EEC3518F71FDD38EE9 /* RuneGlyph.swift */,
@@ -426,6 +434,7 @@
 				C51FE4FBAB98280181089C56 /* DeterminismTests.swift */,
 				6782235BDB0189FF9A0FFE41 /* EconomyTests.swift */,
 				961E1AC7BEB7E7C4C243CAD1 /* ExclusivityTests.swift */,
+				C09AD15A5BFBBBD300176004 /* GearAndRulesTests.swift */,
 				80DFFB14B396FE04A7C03E01 /* LibraryTests.swift */,
 				FF7811775C7058B692E07EB1 /* PageTests.swift */,
 				606F9667A67D771D03320DDA /* PersistenceTests.swift */,
@@ -580,6 +589,7 @@
 				D9F83617E1060D93E281682F /* EconomyRules.swift in Sources */,
 				2228B642DF268D4AC3E4428C /* EncounterView.swift in Sources */,
 				35A27AF646DD34DD1F8A9585 /* Gambit.swift in Sources */,
+				2C0118338DCCD9231D0DE4D0 /* GambitEditorView.swift in Sources */,
 				E0B21F8C88F40A6B7F9E8212 /* GambitEngine.swift in Sources */,
 				893B4E338D412AE9D298E4A4 /* GameActions+Combat.swift in Sources */,
 				19C9DFC5BC904175AC32B894 /* GameActions+Economy.swift in Sources */,
@@ -604,6 +614,7 @@
 				E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */,
 				0463A21CD6D0C85974C64C81 /* RealityState.swift in Sources */,
 				51771CB66B64C405544B0B87 /* ResearchModels.swift in Sources */,
+				4EC3BC573F0634FE82377139 /* ResearchTreeLayout.swift in Sources */,
 				01E64B915C4AC1BE0A72A935 /* ResearchViews.swift in Sources */,
 				8D526864C54EBC0CB6BDC575 /* RootView.swift in Sources */,
 				EFB68320FEF123CBC8309B55 /* RuleBuilderView.swift in Sources */,
@@ -643,6 +654,7 @@
 				EDF26461D4FD581D2BCFBB0A /* DeterminismTests.swift in Sources */,
 				7345ED98F77854AE5C6FFB34 /* EconomyTests.swift in Sources */,
 				804C3EA48958EDEA3E234F95 /* ExclusivityTests.swift in Sources */,
+				4F7559D592DAED143B8AEF88 /* GearAndRulesTests.swift in Sources */,
 				DEB5615945275C75236426AD /* LibraryTests.swift in Sources */,
 				AC3C0F06CB2BD3D9A9917BA1 /* PageTests.swift in Sources */,
 				0290A7D4A5E8A5E8516E171E /* PersistenceTests.swift in Sources */,

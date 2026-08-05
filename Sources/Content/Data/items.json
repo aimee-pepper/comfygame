@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed).",
+  "_note": "PLACEHOLDER \u2014 the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed).",
   "items": [
     {
       "id": "curio_humming_shard",
@@ -9,7 +9,7 @@
       "blurb": "It hums when you are not listening.",
       "kind": "curio",
       "identifiesInto": "salve_lesser",
-      "unidentifiedName": "A humming shard…"
+      "unidentifiedName": "A humming shard\u2026"
     },
     {
       "id": "curio_bound_knot",
@@ -19,7 +19,7 @@
       "blurb": "Tied by someone who meant it to stay tied.",
       "kind": "curio",
       "identifiesInto": "cache_key",
-      "unidentifiedName": "A knot of something…"
+      "unidentifiedName": "A knot of something\u2026"
     },
     {
       "id": "salve_lesser",
@@ -36,6 +36,78 @@
       "rarity": "rare",
       "blurb": "Fits a lock in a world that is not this one.",
       "kind": "key"
+    },
+    {
+      "id": "blade_chipped",
+      "name": "Chipped Blade",
+      "icon": "hammer",
+      "rarity": "common",
+      "blurb": "Somebody's, once. It still holds an edge on one side.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1
+      }
+    },
+    {
+      "id": "blade_keen",
+      "name": "Keen Blade",
+      "icon": "hammer.fill",
+      "rarity": "uncommon",
+      "blurb": "Balanced, and cared for. Whoever left it did not mean to.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2
+      }
+    },
+    {
+      "id": "blade_binders",
+      "name": "Binder's Edge",
+      "icon": "hammer.circle.fill",
+      "rarity": "rare",
+      "blurb": "Marked along the spine in a hand you almost recognise.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3
+      }
+    },
+    {
+      "id": "guard_padded",
+      "name": "Padded Guard",
+      "icon": "shield",
+      "rarity": "common",
+      "blurb": "Layered cloth and patience. Better than nothing, which is what you had.",
+      "kind": "gear",
+      "gear": {
+        "slot": "armor",
+        "tier": 1
+      }
+    },
+    {
+      "id": "guard_banded",
+      "name": "Banded Guard",
+      "icon": "shield.fill",
+      "rarity": "uncommon",
+      "blurb": "Someone spent a winter on this.",
+      "kind": "gear",
+      "gear": {
+        "slot": "armor",
+        "tier": 2
+      }
+    },
+    {
+      "id": "guard_vault",
+      "name": "Vaultplate",
+      "icon": "shield.lefthalf.filled",
+      "rarity": "rare",
+      "blurb": "Cold to the touch, and stays cold.",
+      "kind": "gear",
+      "gear": {
+        "slot": "armor",
+        "tier": 3
+      }
     }
   ]
 }

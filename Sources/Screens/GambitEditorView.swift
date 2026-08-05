@@ -1,0 +1,164 @@
+import SwiftUI
+
+/// The gambit list, in the shape FF12 got right.
+///
+/// **The whole priority list is visible at once**, numbered, so you read your party's logic top to
+/// bottom without opening anything. **One rule is one row.** **Editing happens in place** — every
+/// segment of the sentence is tappable and opens a compact picker right there, never a modal sheet
+/// you have to leave the list to use. **Reordering is a drag**, because priority is positional and
+/// arranging is the main act of authoring. And a rule can be **switched off** without being deleted,
+/// so an order can be tested rather than rebuilt.
+///
+/// Our rules have five parts where FF12 had two dropdowns. That's a content decision, not a UI one,
+/// so it still has to read as a single line: `Ally · HP · < · 30% → Mend`. Unset parts show as
+/// placeholder chips, so a half-written rule stays readable and you can see what's missing.
+///
+/// Lives here and nowhere else — gambit editing is out-of-combat only, a locked decision.
+struct GambitEditorView: View {
+    @EnvironmentObject private var store: GameStore
+    let owner: Combatant
+
+    private var gambits: [GambitRule] { store.gambits(for: owner) }
+    private var slots: Int { store.activeGambitSlots }
+    private var ownerName: String { owner == .binder ? "Your own rules" : "Quill's rules" }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Label("\(ownerName)", systemImage: "list.number")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("\(min(gambits.count, slots))/\(slots) slots")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+
+            Text("Checked top to bottom. The first rule that fits is the one that fires.")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+
+            if gambits.isEmpty {
+                EmptyNote(owner == .binder
+                          ? "No rules written — you'll keep acting for yourself."
+                          : "No rules written — Quill will stand there.")
+            } else {
+                List {
+                    ForEach(Array(gambits.enumerated()), id: \.element.id) { index, rule in
+                        GambitRow(index: index, rule: rule, isInSlot: index < slots, owner: owner)
+                            .swipeActions(edge: .trailing) {
+                                Button("Delete", role: .destructive) {
+                                    store.removeGambit(at: IndexSet(integer: index), for: owner)
+                                }
+                            }
+                            .listRowInsets(EdgeInsets(top: 2, leading: 0, bottom: 2, trailing: 0))
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    }
+                    // No `.onDelete`: with edit mode active it would put a red minus in front of
+                    // every rule, crowding out the sentence that is the point of the row. Deleting
+                    // is a swipe, which is where a phone user looks for it anyway.
+                    .onMove { store.moveGambit(from: $0, to: $1, for: owner) }
+                }
+                .listStyle(.plain)
+                .environment(\.editMode, .constant(.active))
+                .frame(height: CGFloat(gambits.count) * 48 + 8)
+                .scrollDisabled(true)
+                .disabled(!store.canEditGambits)
+            }
+
+            Button { store.addBlankGambit(for: owner) } label: {
+                Label("Write a rule", systemImage: "plus.circle")
+                    .font(.caption)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .disabled(!store.canEditGambits)
+
+            if gambits.count > slots {
+                Text("Rules past slot \(slots) are written but idle.")
+                    .font(.caption2)
+                    .foregroundStyle(.orange)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+/// One rule, one row: a numbered, tappable sentence.
+private struct GambitRow: View {
+    @EnvironmentObject private var store: GameStore
+    let index: Int
+    let rule: GambitRule
+    let isInSlot: Bool
+    let owner: Combatant
+
+    private var isLive: Bool { isInSlot && rule.isEnabled }
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Button {
+                store.setGambitEnabled(rule.id, !rule.isEnabled, for: owner)
+            } label: {
+                Text("\(index + 1)")
+                    .font(.caption2.monospacedDigit().weight(.bold))
+                    .foregroundStyle(rule.isEnabled ? Color.accentColor : Color.secondary)
+                    .frame(width: 26, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(rule.isEnabled ? "Rule \(index + 1), on. Tap to switch off."
+                                               : "Rule \(index + 1), off. Tap to switch on.")
+
+            // **One rule, one row.** The sentence scrolls sideways rather than wrapping, so every
+            // rule is the same height and the list reads as a numbered priority order at a glance —
+            // which is the whole reason for looking at it.
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 4) {
+                    segment(.subject, current: rule.subject, required: true)
+                    segment(.property, current: rule.property)
+                    segment(.comparator, current: rule.comparator)
+                    segment(.threshold, current: rule.threshold)
+                    Text("→").font(.caption2).foregroundStyle(.secondary)
+                    segment(.action, current: rule.action, required: true)
+                }
+                .padding(.trailing, 8)
+            }
+            .opacity(isLive ? 1 : 0.45)
+        }
+        .frame(height: 44)
+    }
+
+    /// One tappable part of the sentence. A `Menu` keeps the list on screen — this is the "editing
+    /// in place" requirement, and it's why there's no sheet anywhere in this file.
+    private func segment(_ kind: GambitComponentDef.Kind,
+                         current: GambitComponentID?,
+                         required: Bool = false) -> some View {
+        let options = store.ownedComponents(kind)
+        let name = current.flatMap { ContentCatalog.shared.gambitComponent($0)?.name }
+
+        return Menu {
+            ForEach(options) { option in
+                Button(option.name) { store.setGambitPart(rule.id, kind: kind, to: option.id, for: owner) }
+            }
+            if !required {
+                Divider()
+                Button("Any — no condition", role: .destructive) {
+                    store.setGambitPart(rule.id, kind: kind, to: nil, for: owner)
+                }
+            }
+        } label: {
+            Text(name ?? "·\(kind.displayName.lowercased())")
+                .font(.caption2.weight(name == nil ? .regular : .medium))
+                .foregroundStyle(name == nil ? Color.secondary : Color.primary)
+                .lineLimit(1)
+                .padding(.horizontal, 7)
+                .frame(height: 30)
+                .background(name == nil ? Color(.tertiarySystemFill) : Color(.secondarySystemFill),
+                            in: Capsule())
+        }
+        .disabled(options.isEmpty)
+    }
+}

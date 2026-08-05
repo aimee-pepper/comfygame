@@ -29,6 +29,7 @@ private struct ResearchBranchCard: View {
     /// prerequisite edges, reached from different buildings in the village rather than all from the
     /// Workshop. See BACKLOG "Research as actual trees".
     @State private var isExpanded = false
+    @State private var selected: ResearchNodeDef?
 
     var body: some View {
         let progress = store.progress(in: branch)
@@ -56,14 +57,27 @@ private struct ResearchBranchCard: View {
             .buttonStyle(.plain)
 
             if isExpanded {
-                // Ordered so the reachable work floats up and the far future sinks: done, then
-                // available, then locked — within that, cheapest first.
-                ForEach(orderedNodes) { node in
-                    ResearchNodeRow(node: node)
-                }
+                // **An actual tree.** Prerequisites have always been in the data; drawing them is
+                // what makes a branch something you can plan a route through rather than a shop
+                // with extra steps (decisions-session-12 §2). Tapping a node opens what it costs.
+                ResearchTreeView(branch: branch) { selected = $0 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .sheet(item: $selected) { node in
+            NavigationStack {
+                ScrollView { ResearchNodeRow(node: node).padding(16) }
+                    .navigationTitle(node.name)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") { selected = nil }
+                        }
+                    }
+            }
+            .presentationDetents([.medium])
+            .environmentObject(store)
+        }
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
     }

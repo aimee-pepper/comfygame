@@ -243,6 +243,18 @@ enum WorldRules {
                     state.reality.discovery.recordResource(resource, runIndex: run.runIndex)
                     events.append(.pickedUp(resource, amount: amount))
                 }
+                // Items go into the satchel like any other haul, so a site's gear is something
+                // you still have to carry home — and can still lose to a collapse.
+                for itemID in definition.contents.items {
+                    let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()), catalogID: itemID)
+                    if run.satchelItems.add(stack) {
+                        events.append(.pickedUpItem(ContentCatalog.shared.item(itemID)?.name ?? "Something"))
+                    } else {
+                        // No room. The choice is the player's, held in the save until they make it.
+                        run.offeredItems.append(stack)
+                        events.append(.satchelFull(ContentCatalog.shared.item(itemID)?.name ?? "Something"))
+                    }
+                }
                 // Knowledge is banked to Reality immediately rather than carried in the satchel:
                 // literacy is permanent and cannot be lost to a collapse (rune spec §1).
                 for symbol in definition.contents.teaches where !state.base.ownedSymbols.contains(symbol) {

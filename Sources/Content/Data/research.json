@@ -23,13 +23,6 @@
       "order": 2
     },
     {
-      "id": "forge",
-      "name": "The Forge",
-      "icon": "hammer",
-      "blurb": "Edges and guards for the people who walk in with you.",
-      "order": 3
-    },
-    {
       "id": "bargain",
       "name": "The Bargain",
       "icon": "scalemass",
@@ -469,91 +462,6 @@
         {
           "kind": "effect",
           "effect": "essenceSpringTier"
-        }
-      ]
-    },
-    {
-      "id": "edge_one",
-      "branch": "forge",
-      "name": "Quill's edge",
-      "icon": "hammer",
-      "blurb": "Your companion hits harder.",
-      "cost": {
-        "essence": 20,
-        "resources": {
-          "ore": 6
-        }
-      },
-      "requires": [],
-      "grants": [
-        {
-          "kind": "effect",
-          "effect": "companionWeapon"
-        }
-      ]
-    },
-    {
-      "id": "edge_two",
-      "branch": "forge",
-      "name": "Quill's edge, honed",
-      "icon": "hammer.fill",
-      "blurb": "Harder still.",
-      "cost": {
-        "essence": 45,
-        "resources": {
-          "ore": 15
-        }
-      },
-      "requires": [
-        "edge_one"
-      ],
-      "grants": [
-        {
-          "kind": "effect",
-          "effect": "companionWeapon"
-        }
-      ]
-    },
-    {
-      "id": "guard_one",
-      "branch": "forge",
-      "name": "Quill's guard",
-      "icon": "shield",
-      "blurb": "Your companion takes less.",
-      "cost": {
-        "essence": 20,
-        "resources": {
-          "fiber": 6
-        }
-      },
-      "requires": [],
-      "grants": [
-        {
-          "kind": "effect",
-          "effect": "companionArmor"
-        }
-      ]
-    },
-    {
-      "id": "guard_two",
-      "branch": "forge",
-      "name": "Quill's guard, banded",
-      "icon": "shield.fill",
-      "blurb": "Takes less still.",
-      "cost": {
-        "essence": 45,
-        "resources": {
-          "fiber": 15,
-          "ore": 5
-        }
-      },
-      "requires": [
-        "guard_one"
-      ],
-      "grants": [
-        {
-          "kind": "effect",
-          "effect": "companionArmor"
         }
       ]
     },

@@ -1,5 +1,5 @@
 {
-  "_note": "Sites \u2014 the fourth layer (docs/sites-system.md). Things a world CONTAINS, as opposed to things it IS. Conditions are ranges, never exact matches, so a family of worlds can produce a given site and sites are hunted by understanding conditions rather than memorising a recipe. Rarity is emergent: a site needing three simultaneous uncommon conditions is rare because that world is hard to write. All numbers PLACEHOLDER. Q17: ruins pay in KNOWLEDGE and OBJECTS, never currency \u2014 landmarks and living sites pay in materials. And a ruin is never empty: knowledge first, an object always, so a ruin whose knowledge you already hold is still worth the walk.",
+  "_note": "Sites \u2014 the fourth layer (docs/sites-system.md). Things a world CONTAINS, as opposed to things it IS. Conditions are ranges, never exact matches, so a family of worlds can produce a given site and sites are hunted by understanding conditions rather than memorising a recipe. Rarity is emergent: a site needing three simultaneous uncommon conditions is rare because that world is hard to write. All numbers PLACEHOLDER. Q17: ruins pay in KNOWLEDGE and OBJECTS, never currency \u2014 landmarks and living sites pay in materials. And a ruin is never empty: knowledge first, an object always, so a ruin whose knowledge you already hold is still worth the walk. Gear is FOUND, never researched (session 12 \u00a74): ordinary gear comes from encounters and common finds, notably better gear from sites \u2014 especially ruins, where it reads as something left behind by someone.",
   "sites": [
     {
       "id": "wayfarers_camp",
@@ -32,7 +32,8 @@
           "essence_raw": 2
         },
         "items": [
-          "curio_bound_knot"
+          "curio_bound_knot",
+          "blade_chipped"
         ],
         "teaches": [],
         "searchTurns": 2,
@@ -76,7 +77,8 @@
       "contents": {
         "yields": {},
         "items": [
-          "cache_key"
+          "cache_key",
+          "blade_binders"
         ],
         "teaches": [
           "verdigris_bloom"
@@ -119,7 +121,8 @@
           "essence_raw": 3
         },
         "items": [
-          "curio_humming_shard"
+          "curio_humming_shard",
+          "guard_vault"
         ],
         "teaches": [
           "frostbound"
@@ -160,7 +163,9 @@
           "ore": 12,
           "mote": 1
         },
-        "items": [],
+        "items": [
+          "guard_banded"
+        ],
         "teaches": [],
         "searchTurns": 3,
         "essence": 1
@@ -198,7 +203,9 @@
           "essence_raw": 6,
           "ore": 3
         },
-        "items": [],
+        "items": [
+          "guard_padded"
+        ],
         "teaches": [],
         "searchTurns": 2,
         "essence": 0
@@ -236,7 +243,9 @@
           "fiber": 10,
           "essence_raw": 2
         },
-        "items": [],
+        "items": [
+          "blade_keen"
+        ],
         "teaches": [],
         "searchTurns": 2,
         "guardian": "ink_hound",

@@ -107,10 +107,10 @@ enum EconomyRules {
                 bumpStation(Stations.essenceSpring, in: &state)
             case .automateSelf:
                 state.base.hasAutomateSelfUnlock = true
-            case .companionWeapon:
-                state.base.companion.weaponTier += 1
-            case .companionArmor:
-                state.base.companion.armorTier += 1
+            case .companionWeapon, .companionArmor:
+                // Retired: party modification through research was never how this works
+                // (decisions-session-12 §3). Kept as a case so old saves still decode.
+                break
             case .chaining:
                 state.base.hasChainingUnlock = true
             case .finerHand:

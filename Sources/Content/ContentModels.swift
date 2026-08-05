@@ -168,6 +168,20 @@ struct CreatureDef: Codable, Equatable, Identifiable, Sendable {
     var sightRadius: Int
 }
 
+/// What a piece of gear is worth wearing for.
+struct GearDef: Codable, Equatable, Sendable {
+    var slot: GearSlot
+    /// Same units the combat maths already used when research bought these numbers.
+    var tier: Int
+}
+
+enum GearSlot: String, Codable, CaseIterable, Sendable {
+    case weapon, armor
+
+    var displayName: String { self == .weapon ? "Weapon" : "Armor" }
+    var icon: String { self == .weapon ? "hammer" : "shield" }
+}
+
 /// A stackable resource. Never consumes an inventory slot.
 struct ResourceDef: Codable, Equatable, Identifiable, Sendable {
     var id: ResourceID
@@ -189,6 +203,10 @@ struct ItemDef: Codable, Equatable, Identifiable, Sendable {
     var identifiesInto: ItemID?
     /// Teaser name shown before identification ("A humming shard…").
     var unidentifiedName: String?
+    /// What wearing this does. Gear is **found, never researched** (decisions-session-12 §3–4):
+    /// you don't study your way to a better sword, you take one off a ruin floor — and later you
+    /// find a smith who can make one.
+    var gear: GearDef?
 
     enum Kind: String, Codable, Sendable {
         case consumable

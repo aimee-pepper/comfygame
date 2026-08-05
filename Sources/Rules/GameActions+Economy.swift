@@ -196,4 +196,27 @@ extension GameStore {
             state.base.spillover.append(stored)
         }
     }
+
+    // MARK: - Gear
+
+    /// What's in the Storehouse that could be worn in a given slot.
+    func wearable(in slot: GearSlot) -> [ItemStack] {
+        state.base.inventory.stacks.filter {
+            ContentCatalog.shared.item($0.catalogID)?.gear?.slot == slot
+        }
+    }
+
+    /// Put something on. The piece it replaces goes back to the Storehouse rather than vanishing.
+    func equip(_ stack: ItemStack) {
+        guard let slot = ContentCatalog.shared.item(stack.catalogID)?.gear?.slot else { return }
+        mutate("equip \(stack.catalogID.rawValue)", flush: true) { state in
+            state.base.companion.equipped[slot] = stack.catalogID
+        }
+    }
+
+    func unequip(_ slot: GearSlot) {
+        mutate("unequip \(slot.rawValue)", flush: true) { state in
+            state.base.companion.equipped[slot] = nil
+        }
+    }
 }

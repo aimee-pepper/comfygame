@@ -22,7 +22,9 @@ enum GambitEngine {
     static func decide(for actor: Combatant = .companion, in state: GameState) -> Decision? {
         guard let run = state.worlds.activeRun, let encounter = run.activeEncounter else { return nil }
 
-        for rule in rules(for: actor, in: state).prefix(availableSlots(in: state)) {
+        // Disabled rules still occupy their slot and their position — switching one off is a way
+        // of testing an order, not a way of getting a free slot.
+        for rule in rules(for: actor, in: state).prefix(availableSlots(in: state)) where rule.isEnabled {
             guard rule.isWritable(with: state.base.ownedGambitComponents) else { continue }
             guard let target = target(of: rule, actor: actor, run: run, encounter: encounter) else { continue }
             guard let action = action(of: rule, target: target, actor: actor, encounter: encounter) else {

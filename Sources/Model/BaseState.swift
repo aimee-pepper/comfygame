@@ -190,8 +190,19 @@ struct CompanionState: Codable, Equatable, Sendable {
     var maxHP: Int = Tuning.Encounter.companionMaxHP
     /// Ordered gambit list — evaluated top-down, first match fires (FF12 execution model).
     var gambits: [GambitRule] = []
-    var weaponTier: Int = 0
-    var armorTier: Int = 0
+    /// What Quill is wearing. **Tiers come from gear now, not from research** — you find a sword,
+    /// or later you find a smith (decisions-session-12 §3–4).
+    var equipped: [GearSlot: ItemID] = [:]
+
+    /// Derived from what's worn. Nothing stores a tier any more, so nothing can drift from it.
+    var weaponTier: Int { tier(of: .weapon) }
+    var armorTier: Int { tier(of: .armor) }
+
+    private func tier(of slot: GearSlot) -> Int {
+        equipped[slot]
+            .flatMap { ContentCatalog.shared.item($0)?.gear }
+            .map(\.tier) ?? 0
+    }
 
     init() {}
 
@@ -202,8 +213,7 @@ struct CompanionState: Codable, Equatable, Sendable {
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? "Quill"
         maxHP = try container.decodeIfPresent(Int.self, forKey: .maxHP) ?? Tuning.Encounter.companionMaxHP
         gambits = (try? container.decodeIfPresent([GambitRule].self, forKey: .gambits)) ?? GambitStarter.rules
-        weaponTier = try container.decodeIfPresent(Int.self, forKey: .weaponTier) ?? 0
-        armorTier = try container.decodeIfPresent(Int.self, forKey: .armorTier) ?? 0
+        equipped = try container.decodeIfPresent([GearSlot: ItemID].self, forKey: .equipped) ?? [:]
     }
 }
 

@@ -177,6 +177,48 @@ struct WorkshopView: View {
     }
 }
 
+/// One equipment slot: what's worn, and what else could be.
+///
+/// Gear is **found, never researched** (decisions-session-12) — so this is a picker over what you
+/// have hauled home, not a purchase. Better pieces come from sites, especially ruins, where they
+/// read as something left behind by someone.
+private struct GearSlotRow: View {
+    @EnvironmentObject private var store: GameStore
+    let slot: GearSlot
+
+    private var worn: ItemDef? {
+        store.state.base.companion.equipped[slot].flatMap { ContentCatalog.shared.item($0) }
+    }
+
+    var body: some View {
+        let options = store.wearable(in: slot)
+        Menu {
+            ForEach(options) { stack in
+                Button(stack.displayName) { store.equip(stack) }
+            }
+            if worn != nil {
+                Divider()
+                Button("Take it off", role: .destructive) { store.unequip(slot) }
+            }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: worn?.icon ?? slot.icon)
+                    .foregroundStyle(worn == nil ? Color.secondary : Color.accentColor)
+                    .frame(width: 22)
+                Text(worn?.name ?? slot.displayName)
+                    .foregroundStyle(worn == nil ? Color.secondary : Color.primary)
+                Spacer()
+                Text(worn.map { "tier \($0.gear?.tier ?? 0)" } ?? (options.isEmpty ? "nothing to wear" : "choose"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .disabled(options.isEmpty && worn == nil)
+    }
+}
+
 /// Party — companion, gear and (from milestone 4) the gambit editor.
 /// Gambit editing happens *only* here, never inside an encounter. Locked decision.
 struct PartyView: View {
@@ -198,14 +240,15 @@ struct PartyView: View {
 
                 StationCard(title: companion.name, icon: "person.fill") {
                     LabeledRow(icon: "heart.fill", label: "Health", value: "\(companion.maxHP)")
-                    LabeledRow(icon: "hammer.fill", label: "Weapon", value: "tier \(companion.weaponTier)")
-                    LabeledRow(icon: "shield.fill", label: "Armor", value: "tier \(companion.armorTier)")
+                    ForEach(GearSlot.allCases, id: \.self) { slot in
+                        GearSlotRow(slot: slot)
+                    }
                 }
 
-                GambitEditor(owner: .companion)
+                GambitEditorView(owner: .companion)
 
                 if store.state.base.hasAutomateSelfUnlock {
-                    GambitEditor(owner: .binder)
+                    GambitEditorView(owner: .binder)
                 } else {
                     ComingLater("Writing your own hand is studied under Instruction at the Workshop. Until then you act for yourself every turn.")
                 }
@@ -219,94 +262,6 @@ struct PartyView: View {
 
 }
 
-/// The gambit editor. Drag to reorder; order is the whole game.
-///
-/// Lives here and nowhere else — gambit editing is out-of-combat only, a locked decision. The
-/// editor is disabled outright mid-fight rather than merely hidden, so there's no route to it.
-private struct GambitEditor: View {
-    @EnvironmentObject private var store: GameStore
-    @State private var isWriting = false
-    let owner: Combatant
-
-    private var gambits: [GambitRule] { store.gambits(for: owner) }
-    private var slots: Int { store.activeGambitSlots }
-    private var ownerName: String { owner == .binder ? "Your own rules" : "Quill's rules" }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label("\(ownerName) — \(min(gambits.count, slots)) of \(slots) slots", systemImage: "list.number")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-
-            Text("Checked top to bottom. The first rule that fits is the one that fires — so the order is the strategy.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            if gambits.isEmpty {
-                EmptyNote(owner == .binder
-                          ? "No rules written — you'll keep acting for yourself."
-                          : "No rules written — Quill will stand there.")
-            } else {
-                // A real List, so drag-to-reorder is the system gesture rather than an imitation.
-                List {
-                    ForEach(Array(gambits.enumerated()), id: \.element.id) { index, rule in
-                        GambitRow(index: index, rule: rule, isActive: index < slots)
-                    }
-                    .onMove { store.moveGambit(from: $0, to: $1, for: owner) }
-                    .onDelete { store.removeGambit(at: $0, for: owner) }
-                }
-                .listStyle(.plain)
-                .environment(\.editMode, .constant(.active))
-                .frame(height: CGFloat(gambits.count) * 62 + 8)
-                .scrollDisabled(true)
-                .disabled(!store.canEditGambits)
-            }
-
-            Button { isWriting = true } label: {
-                Label("Write a rule", systemImage: "plus.circle")
-                    .frame(maxWidth: .infinity, minHeight: 44)
-            }
-            .buttonStyle(.bordered)
-            .disabled(!store.canEditGambits)
-
-            if gambits.count > slots {
-                Text("Rules past slot \(slots) are written but idle. More slots come from Instruction research and the Constellation.")
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
-        .sheet(isPresented: $isWriting) {
-            RuleBuilderView(owner: owner).environmentObject(store)
-        }
-    }
-}
-
-private struct GambitRow: View {
-    let index: Int
-    let rule: GambitRule
-    let isActive: Bool
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Text("\(index + 1)")
-                .font(.caption.monospacedDigit().weight(.bold))
-                .foregroundStyle(.secondary)
-                .frame(width: 18)
-            VStack(alignment: .leading, spacing: 1) {
-                Text(rule.displayText).font(.callout)
-                if !isActive {
-                    Text("no slot for this yet").font(.caption2).foregroundStyle(.orange)
-                }
-            }
-            Spacer(minLength: 0)
-        }
-        .frame(minHeight: 44)
-        .opacity(isActive ? 1 : 0.5)
-    }
-}
 
 /// Constellation — the Reality layer's only screen. Buying nodes is milestone 5.
 struct ConstellationView: View {

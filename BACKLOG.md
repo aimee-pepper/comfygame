@@ -91,6 +91,16 @@
 - [ ] Research leads, "a world worth writing" and ruin pages are recorded but nothing reads them yet
 - [ ] Recruitment — finding someone is not yet joining with them (companions spec, provisional)
 
+## From session 12
+- [x] Gambit list rebuilt FF12-style: whole list visible, one rule one row, in-place segment
+      editing with no modal, drag to reorder, switch a rule off without deleting it
+- [x] Research branches render as actual trees with visible prerequisite edges
+- [x] Forge branch removed — party modification through research is not how this works
+- [x] Gear is found: worn from the Storehouse, tiers derive from it, sites carry the better pieces
+- [ ] Crafting buildings arrive with the people who staff them (needs recruitment first)
+- [ ] Open: the full list of crafting trades, and whether a specialist *is* the building
+- [ ] Ordinary gear from encounters — currently only sites drop it
+
 ## Writing desk UI
 - [x] Two panes: Write (page + vocabulary) and The world (description, stats, depart)
 - [x] Pick a rune, drag the ghost into place, drag placed runes to move, drag off the page to erase
