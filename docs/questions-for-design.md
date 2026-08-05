@@ -168,3 +168,33 @@ the next rule, so cooldowns are exactly what make rule *order* matter.
 Alternatives if you'd rather: once per encounter; a shared party resource that regenerates per
 round; or charges that refill on returning home (which would tie combat to the run economy).
 `Sources/Content/Data/skills.json`, `Tuning.Encounter`.
+
+---
+
+## Session 4 (2026-08-04) — writing system & named places
+
+Full reasoning in `engineering-notes-session-4.md`. These three are the ones I can't pick a
+conservative default for, because each default forecloses something.
+
+### Q12. Is a named place the same *instance* every time, or the same *recipe*?
+Persistent Reinehaven (fixed seed + state that survives visits) vs. a fresh world generated from a
+fixed signature each time. The first makes named places effectively pre-anchored worlds and needs
+somewhere in the save for per-place state; the second fits the current disposable-world model
+exactly. I lean persistent, for named places only.
+
+### Q13. What is "precision", numerically?
+Proposal: require both **distance** (your pressures near the place's signature) and **coverage**
+(you actually named enough of its defining conditions). Distance alone lets a vague page arrive by
+luck; coverage alone ignores whether you got it right. Together they give the three-tier behaviour
+session 4 asks for — resembles it / is it / somewhere else.
+
+### Q14. Do sigils rotate when placed?
+Unaddressed in the spec, and it changes the packing puzzle a lot. Default I'd take: free rotation.
+
+---
+
+## Answered by the spec, no longer open
+
+- **Q11 (what limits a Skill)** — still open; unaffected by session 4.
+- **Q7/Q8 (slot pricing, fifth slot)** — dissolved by the writing-system redesign. Unwritten targets
+  cost the flat cheap rate, which is the same rule, now expressed in the new vocabulary.
