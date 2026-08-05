@@ -367,6 +367,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					CF0593DC0240C3C51FDC7CAE = {
+						DevelopmentTeam = BNV6X8W4QS;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -579,6 +580,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNV6X8W4QS;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -676,6 +678,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNV6X8W4QS;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

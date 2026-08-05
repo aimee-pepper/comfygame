@@ -14,8 +14,25 @@ xcodegen generate && open Bookbinder.xcodeproj
 Re-run `xcodegen generate` after adding or removing source files — sources are globbed from
 `Sources/`, so new files don't appear in the project until you do.
 
-To run on your iPhone: plug it in, pick it as the run destination, hit ⌘R. Free Apple ID
-provisioning expires after 7 days; rebuild to renew.
+## Running it on your phone
+
+The project is configured and the device build compiles — the only outstanding piece needs your
+Apple ID, which only you can enter.
+
+1. **Xcode → Settings → Accounts → +** and sign in as `pepstar@gmail.com`. (There's already a
+   matching signing certificate in the keychain; Xcode just doesn't have the account attached, which
+   is what stops it issuing a provisioning profile.)
+2. **Plug the phone in, unlock it, and tap Trust** if asked. It has to stay unlocked while Xcode
+   registers it — a free personal team can't create a profile until at least one device is known.
+3. Open `Bookbinder.xcodeproj`, pick **Aimee's Phone** as the run destination, **⌘R**.
+4. First launch only: the phone will refuse to open an untrusted developer app. **Settings → General
+   → VPN & Device Management → Apple Development: pepstar@gmail.com → Trust.**
+
+**Free provisioning expires after 7 days** — the app stops launching and you rebuild from Xcode to
+renew it. A paid developer account removes the expiry and unlocks TestFlight.
+
+If signing complains about the team, delete the `DEVELOPMENT_TEAM` line from `project.yml`, run
+`xcodegen generate`, and let Xcode pick the team itself.
 
 Tests (⌘U in Xcode, or):
 

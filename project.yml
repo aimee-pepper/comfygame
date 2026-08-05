@@ -28,6 +28,14 @@ targets:
         MARKETING_VERSION: "0.1"
         TARGETED_DEVICE_FAMILY: "1" # iPhone only — portrait, one-handed (pillar 3)
         CODE_SIGN_STYLE: Automatic
+        # Aimee's personal (free) Apple ID team, taken from the signing certificate already in the
+        # keychain. Xcode needs the matching Apple ID added under Settings → Accounts before it can
+        # issue a profile — see "Running it on your phone" in the README.
+        #
+        # Free provisioning also means an installed build stops launching after 7 days; rebuilding
+        # from Xcode renews it. If signing ever complains about the team, delete this line and let
+        # Xcode pick.
+        DEVELOPMENT_TEAM: BNV6X8W4QS
         GENERATE_INFOPLIST_FILE: NO
         SWIFT_EMIT_LOC_STRINGS: YES
     info:
