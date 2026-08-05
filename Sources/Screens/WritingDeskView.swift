@@ -2,52 +2,92 @@ import SwiftUI
 
 /// Compose a book, see what it will cost you and what it will become, then commit.
 ///
-/// Layout follows the one-handed pillar: the slots and preview scroll, and the Bind button is
-/// pinned to the bottom of the screen in the thumb zone where it can't scroll away.
+/// **Two panes.** *Write* is the page and the vocabulary — the page fixed at the top, never
+/// scrolling, with the runes you know scrolling beneath it. *The world* is what you're about to
+/// make: its description, its numbers, and the button that commits to it.
+///
+/// Splitting them keeps each one whole on a phone screen. Composing is a spatial job that wants the
+/// page big and everything else out of the way; deciding whether to go is a reading job. Trying to
+/// do both at once left the page squeezed into a third of the screen and the projection half
+/// off-stage.
 struct WritingDeskView: View {
     @EnvironmentObject private var store: GameStore
     @State private var editingSlot: SlotID?
-    /// The mark the next tap on the page will write.
-    @State private var pending: SymbolID?
-    /// Where the page is on screen, so a rune dragged out of the palette can find it.
-    @State private var pageFrame: CGRect = .zero
-    /// A rune currently being dragged from the palette toward the page.
-    @State private var incoming: IncomingRune?
-    /// Cell size, mirrored from the page so the palette's drop maths matches what's drawn.
-    private var cellSide: CGFloat { pageFrame.width / CGFloat(state.base.page.width) }
+    /// The rune picked from the palette and now hovering over the page, waiting to be dragged into
+    /// place. Owned here so choosing from the scrolling list and placing on the fixed page are the
+    /// same act.
+    @State private var ghost: GhostRune?
+    @State private var pane: Pane = .write
+
+    private enum Pane: String, CaseIterable, Identifiable {
+        case write = "Write"
+        case world = "The world"
+        var id: String { rawValue }
+    }
 
     private var state: GameState { store.state }
     private var projection: BookProjection { store.bookProjection }
 
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: 16) {
-                    PageGridView(pending: pending, frame: $pageFrame, incoming: $incoming)
-                    palette
-                    PreviewPanel(projection: projection, discovery: state.reality.discovery)
-                    if state.base.page.runes.isEmpty { blankPageNote }
-                }
-                .padding(16)
-                .padding(.bottom, 8)
+            Picker("", selection: $pane) {
+                ForEach(Pane.allCases) { Text($0.rawValue).tag($0) }
             }
-            bindBar
+            .pickerStyle(.segmented)
+            .padding(.horizontal, 12)
+            .padding(.top, 6)
+            .padding(.bottom, 8)
+
+            switch pane {
+            case .write: writePane
+            case .world: worldPane
+            }
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Writing Desk")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Clear") { store.clearPage() }
+                Button("Clear") { store.clearPage(); ghost = nil }
                     .disabled(state.base.page.runes.isEmpty)
             }
         }
-        .sheet(item: $editingSlot) { slot in
-            SymbolPickerView(slot: slot, chosen: state.base.bookDraft[slot]) { picked in
-                store.setSymbol(picked, in: slot)
-                editingSlot = nil
+    }
+
+    // MARK: Pane 1 — writing
+
+    /// The page is sized from the space the pane actually has, so it fills the width and can't be
+    /// squeezed by the scroll view underneath it.
+    private var writePane: some View {
+        GeometryReader { proxy in
+            let available = proxy.size.width - 32          // pane padding + card padding
+            let byWidth = available / CGFloat(state.base.page.width)
+            let byHeight = (proxy.size.height * 0.52) / CGFloat(state.base.page.height)
+            let side = floor(min(byWidth, byHeight))
+
+            VStack(spacing: 8) {
+                PageGridView(ghost: $ghost, side: side)
+                ScrollView {
+                    palette.padding(.bottom, 8)
+                }
             }
-            .environmentObject(store)
+            .padding(.horizontal, 12)
+        }
+    }
+
+    // MARK: Pane 2 — what you're about to make
+
+    private var worldPane: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 12) {
+                    PreviewPanel(projection: projection, discovery: state.reality.discovery)
+                    if state.base.page.runes.isEmpty { blankPageNote }
+                }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 8)
+            }
+            bindBar
         }
     }
 
@@ -58,46 +98,45 @@ struct WritingDeskView: View {
     /// Deliberately shows the footprint: what a mark *costs in space* is the decision the page
     /// exists to create, and it changes with the hand you're writing in.
     private var palette: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("What you can write")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 6) {
             ForEach(sections, id: \.target.id) { section in
-                Text(section.target.name)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                Text(section.target.name.uppercased())
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.tertiary)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 8)], spacing: 8) {
+                    .padding(.top, 2)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 6)], spacing: 6) {
                     ForEach(section.symbols) { symbol in
                         let fits = store.canWrite(symbol.id)
                         let blocker = store.blockingPrimary(for: symbol.id)
                         Button {
-                            pending = (pending == symbol.id) ? nil : symbol.id
+                            // Choosing puts a ghost on the page. Placing it is a drag, up there,
+                            // where you can see what it will collide with.
+                            ghost = GhostRune.appearing(symbol, hand: state.base.bestHand,
+                                                        on: state.base.page)
                         } label: {
                             HStack(spacing: 6) {
                                 RuneGlyph(id: symbol.id.rawValue).frame(width: 22, height: 22)
                                 VStack(alignment: .leading, spacing: 0) {
-                                    Text(symbol.name).font(.caption.weight(.medium)).lineLimit(1)
+                                    Text(symbol.name)
+                                        .font(.caption2.weight(.medium))
+                                        .lineLimit(1)
                                     // Say *why* it's unavailable. A rule you can learn beats a
                                     // greyed-out button you can only be puzzled by.
-                                    Text(blocker.map { "\($0.name) already decides this" }
+                                    Text(blocker.map { "\($0.name) has this" }
                                          ?? "\(store.footprint(of: symbol.id)) cells")
                                         .font(.caption2).foregroundStyle(.secondary).lineLimit(1)
                                 }
                                 Spacer(minLength: 0)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .frame(minHeight: 44)
-                            .padding(.horizontal, 8)
+                            .frame(height: 44)
+                            .padding(.horizontal, 6)
                         }
                         .buttonStyle(.bordered)
-                        .tint(pending == symbol.id ? .accentColor : .secondary)
+                        .tint(ghost?.symbol == symbol.id ? .accentColor : .secondary)
                         .opacity(fits ? 1 : 0.45)
                         .disabled(!fits)
-                        // Drag straight from the palette onto the page. Tapping still works — it
-                        // arms the rune so the next tap on a square places it — but dragging is
-                        // the natural gesture for fitting a shape into a space.
-                        .gesture(paletteDrag(symbol))
                     }
                 }
             }
@@ -119,26 +158,9 @@ struct WritingDeskView: View {
         }
     }
 
-    /// Carry a rune from the palette to the page, showing whether it will fit as you go.
-    private func paletteDrag(_ symbol: SymbolDef) -> some Gesture {
-        DragGesture(minimumDistance: 6, coordinateSpace: .global)
-            .onChanged { value in
-                guard store.canWrite(symbol.id) else { return }
-                incoming = IncomingRune(symbol: symbol.id, location: value.location)
-            }
-            .onEnded { value in
-                defer { incoming = nil }
-                guard store.canWrite(symbol.id), pageFrame.contains(value.location) else { return }
-                let local = CGPoint(x: value.location.x - pageFrame.minX,
-                                    y: value.location.y - pageFrame.minY)
-                let cell = PageCell(column: Int(local.x / cellSide), row: Int(local.y / cellSide))
-                if store.write(symbol.id, at: cell) { pending = nil }
-            }
-    }
-
     private var blankPageNote: some View {
         Text("A blank page still binds. Everything you don't say, the world decides for itself.")
-            .font(.caption)
+            .font(.caption2)
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
     }

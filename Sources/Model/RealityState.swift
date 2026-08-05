@@ -33,6 +33,9 @@ struct RealityState: Codable, Equatable, Sendable {
     /// In Reality because it's knowledge, and knowledge is never taken back.
     var visitedWorldSeeds: Set<UInt64> = []
 
+    /// Pages read and people found. Knowledge, so it lives here and is never taken back.
+    var library: LibraryState = LibraryState()
+
     static func newGame() -> RealityState { RealityState() }
 
     // MARK: Derived unlocks
@@ -67,6 +70,7 @@ struct RealityState: Codable, Equatable, Sendable {
         analysisTier = try container.decodeIfPresent(Int.self, forKey: .analysisTier)
             ?? Tuning.Analysis.startingTier
         visitedWorldSeeds = try container.decodeIfPresent(Set<UInt64>.self, forKey: .visitedWorldSeeds) ?? []
+        library = try container.decodeIfPresent(LibraryState.self, forKey: .library) ?? LibraryState()
     }
 }
 

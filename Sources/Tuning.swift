@@ -214,6 +214,17 @@ enum Tuning {
         static let compoundFootprintRate: Double = 0.6   // PLACEHOLDER — spec §3
     }
 
+    /// Diaries, pages, and the search for people.
+    enum Library {
+        /// How many pages a world may hold.
+        static let pagesPerWorldRange = 0...2          // PLACEHOLDER
+        /// How much more likely a page is to surface somewhere its author would have been.
+        static let atHomeWeight: Double = 4            // PLACEHOLDER
+        /// After this many worlds without a match, a page stops waiting and surfaces anywhere.
+        /// Nothing may become permanently unreachable through how a player happens to write.
+        static let patienceInWorlds: Int = 8           // PLACEHOLDER
+    }
+
     enum Analysis {
         /// Tier 1 — qualitative only. Sensations, no numbers, no attribution. Deliberately where
         /// everyone starts: the player is meant to write half-blind and learn by observing.

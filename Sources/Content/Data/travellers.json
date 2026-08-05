@@ -1,0 +1,298 @@
+{
+  "_note": "Travellers and their scattered diaries (decisions-session-7). A traveller is AT A CONDITION SIGNATURE, never N worlds away \u2014 difficulty is how hard the signature is to write, so search scales off the writing system. Pages are a GUIDE, NEVER A GATE: write the right world by luck and you find the person without ever reading one. Signature passages are PROSE the player matches against a world description \u2014 never a condition, never a value. All PLACEHOLDER.",
+  "travellers": [
+    {
+      "id": "mara",
+      "name": "Mara",
+      "calling": "a surveyor",
+      "icon": "figure.stand",
+      "blurb": "Measured things for a living. Still does, out of habit.",
+      "signature": [
+        {
+          "condition": {
+            "target": "illumination",
+            "measure": "peak",
+            "minimum": 60
+          },
+          "passage": "There is no shadow anywhere. I have looked."
+        }
+      ],
+      "leansToward": [
+        "locationClue",
+        "worldWorthWriting"
+      ]
+    },
+    {
+      "id": "edren",
+      "name": "Edren",
+      "calling": "an archaeologist",
+      "icon": "figure.stand",
+      "blurb": "Was digging when it happened. Has not stopped.",
+      "signature": [
+        {
+          "condition": {
+            "target": "substrate",
+            "measure": "form",
+            "key": "hard",
+            "minimum": 35
+          },
+          "passage": "Stone all the way down, and worked stone at that."
+        },
+        {
+          "condition": {
+            "target": "thermal",
+            "measure": "floor",
+            "maximum": 25
+          },
+          "passage": "Cold enough that the dark comes with it."
+        }
+      ],
+      "leansToward": [
+        "ruin",
+        "researchLead"
+      ]
+    },
+    {
+      "id": "sela",
+      "name": "Sela",
+      "calling": "a wanderer",
+      "icon": "figure.stand",
+      "blurb": "Was always leaving. This time it took.",
+      "signature": [
+        {
+          "condition": {
+            "target": "hydrology",
+            "measure": "available",
+            "minimum": 30
+          },
+          "passage": "Water, everywhere, and none of it still."
+        },
+        {
+          "condition": {
+            "target": "relief",
+            "measure": "aspect",
+            "key": "openness",
+            "minimum": 65
+          },
+          "passage": "You can see for a very long way."
+        },
+        {
+          "condition": {
+            "target": "vitality",
+            "measure": "peak",
+            "minimum": 35
+          },
+          "passage": "Something is growing. That is a mercy."
+        }
+      ],
+      "leansToward": [
+        "whereabouts",
+        "worldWorthWriting"
+      ]
+    },
+    {
+      "id": "tovin",
+      "name": "Tovin",
+      "calling": "a binder",
+      "icon": "figure.stand",
+      "blurb": "Wrote worlds before you did. Knows what that costs.",
+      "signature": [
+        {
+          "condition": {
+            "target": "illumination",
+            "measure": "peak",
+            "maximum": 15
+          },
+          "passage": "It is dark, and the dark is not empty."
+        },
+        {
+          "condition": {
+            "target": "vitality",
+            "measure": "tag",
+            "key": "fungal",
+            "minimum": 1
+          },
+          "passage": "What grows here does not need the sun."
+        },
+        {
+          "condition": {
+            "target": "substrate",
+            "measure": "peak",
+            "minimum": 40
+          },
+          "passage": "The walls are worth more than the room."
+        },
+        {
+          "condition": {
+            "target": "relief",
+            "measure": "aspect",
+            "key": "openness",
+            "maximum": 35
+          },
+          "passage": "Everything is close. I do not like it."
+        }
+      ],
+      "leansToward": [
+        "symbol",
+        "researchLead"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "id": "mara_where_0",
+      "diary": "mara",
+      "kind": "locationClue",
+      "prose": "There is no shadow anywhere. I have looked.",
+      "about": "mara",
+      "clueIndex": 0,
+      "prefersConditions": []
+    },
+    {
+      "id": "edren_where_0",
+      "diary": "edren",
+      "kind": "locationClue",
+      "prose": "Stone all the way down, and worked stone at that.",
+      "about": "edren",
+      "clueIndex": 0,
+      "prefersConditions": []
+    },
+    {
+      "id": "edren_where_1",
+      "diary": "edren",
+      "kind": "locationClue",
+      "prose": "Cold enough that the dark comes with it.",
+      "about": "edren",
+      "clueIndex": 1,
+      "prefersConditions": []
+    },
+    {
+      "id": "sela_where_0",
+      "diary": "sela",
+      "kind": "locationClue",
+      "prose": "Water, everywhere, and none of it still.",
+      "about": "sela",
+      "clueIndex": 0,
+      "prefersConditions": []
+    },
+    {
+      "id": "sela_where_1",
+      "diary": "sela",
+      "kind": "locationClue",
+      "prose": "You can see for a very long way.",
+      "about": "sela",
+      "clueIndex": 1,
+      "prefersConditions": []
+    },
+    {
+      "id": "sela_where_2",
+      "diary": "sela",
+      "kind": "locationClue",
+      "prose": "Something is growing. That is a mercy.",
+      "about": "sela",
+      "clueIndex": 2,
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_where_0",
+      "diary": "tovin",
+      "kind": "locationClue",
+      "prose": "It is dark, and the dark is not empty.",
+      "about": "tovin",
+      "clueIndex": 0,
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_where_1",
+      "diary": "tovin",
+      "kind": "locationClue",
+      "prose": "What grows here does not need the sun.",
+      "about": "tovin",
+      "clueIndex": 1,
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_where_2",
+      "diary": "tovin",
+      "kind": "locationClue",
+      "prose": "The walls are worth more than the room.",
+      "about": "tovin",
+      "clueIndex": 2,
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_where_3",
+      "diary": "tovin",
+      "kind": "locationClue",
+      "prose": "Everything is close. I do not like it.",
+      "about": "tovin",
+      "clueIndex": 3,
+      "prefersConditions": []
+    },
+    {
+      "id": "mara_word_sela",
+      "diary": "mara",
+      "kind": "whereabouts",
+      "prose": "Sela went on ahead. She always did. If anyone is still walking, it is her.",
+      "about": "sela",
+      "prefersConditions": []
+    },
+    {
+      "id": "edren_ruin_workshop",
+      "diary": "edren",
+      "kind": "ruin",
+      "prose": "There are rooms under the ice that were rooms before the ice.",
+      "site": "glacial_vault",
+      "prefersConditions": [
+        {
+          "target": "thermal",
+          "measure": "floor",
+          "maximum": 25
+        }
+      ]
+    },
+    {
+      "id": "edren_lead",
+      "diary": "edren",
+      "kind": "researchLead",
+      "prose": "The seams run in patterns. Patterns mean somebody put them there.",
+      "researchNode": "study_growth",
+      "prefersConditions": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 35
+        }
+      ]
+    },
+    {
+      "id": "tovin_rune",
+      "diary": "tovin",
+      "kind": "symbol",
+      "prose": "I have been drawing this one wrong for years. Here it is, drawn right.",
+      "teaches": "verdigris_bloom",
+      "prefersConditions": [
+        {
+          "target": "illumination",
+          "measure": "peak",
+          "maximum": 20
+        }
+      ]
+    },
+    {
+      "id": "tovin_word_edren",
+      "diary": "tovin",
+      "kind": "whereabouts",
+      "prose": "Edren is somewhere cold and is, I expect, delighted about it.",
+      "about": "edren",
+      "prefersConditions": []
+    },
+    {
+      "id": "sela_world",
+      "diary": "sela",
+      "kind": "worldWorthWriting",
+      "prose": "Write yourself somewhere with weather. You will understand when you are standing in it.",
+      "prefersConditions": []
+    }
+  ]
+}

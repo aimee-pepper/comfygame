@@ -1,5 +1,5 @@
 {
-  "_note": "The Base screen renders THIS LIST, not hardcoded buttons — v1+ adds blacksmith, tavern, distillery and they should be a JSON edit plus a route. 'route' must match a case of AppRoute. TIER SEMANTICS: tier counts UPGRADES PURCHASED, so tier 0 = built and un-upgraded. Storehouse 0-3 = 8/12/16/20 inventory slots; Essence Spring 0 = the built-in trickle, 1 = the purchasable upgrade. PLACEHOLDER blurbs/tiers.",
+  "_note": "The Base screen renders THIS LIST, not hardcoded buttons \u2014 v1+ adds blacksmith, tavern, distillery and they should be a JSON edit plus a route. 'route' must match a case of AppRoute. TIER SEMANTICS: tier counts UPGRADES PURCHASED, so tier 0 = built and un-upgraded. Storehouse 0-3 = 8/12/16/20 inventory slots; Essence Spring 0 = the built-in trickle, 1 = the purchasable upgrade. PLACEHOLDER blurbs/tiers.",
   "stations": [
     {
       "id": "writing_desk",
@@ -66,6 +66,17 @@
       "startingTier": 0,
       "maxTier": 1,
       "route": "constellation"
+    },
+    {
+      "id": "library",
+      "name": "The Library",
+      "icon": "books.vertical",
+      "blurb": "Everything anybody wrote down about where they went.",
+      "sortOrder": 6,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "library"
     }
   ]
 }

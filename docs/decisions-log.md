@@ -751,3 +751,16 @@ Symbols currently use SF Symbols (`mountain.2`, `leaf`, `snowflake`, `cloud.bolt
 This is the point where the writing system stops being a metaphor: the thing in the palette should be the thing that gets written. It also connects to the illustration work — the crude-hand glyphs are the first asset set needed, and they're needed here before anywhere else.
 
 **Interim, if artwork isn't ready:** a placeholder that is clearly a *glyph* — abstract, monochrome, drawn-looking — rather than a pictographic app icon. A wrong-but-glyph-shaped placeholder is closer to right than a correct-looking SF Symbol.
+
+---
+
+## The eight targets are load-bearing on purpose (Aimee, 5 Aug 2026)
+
+The standing caveat in session 11 §3 — and tier-1 item 1.3 in `audit-claude-invented-assumptions.md`
+— is **answered: the eight pressure targets are confirmed and are meant to be core.**
+
+Illumination · Thermal · Hydrology · Substrate · Relief · Vitality · Atmosphere · Cycle.
+
+They are load-bearing for exclusivity, the palette's sections, all pressure sources, every
+description clause, the contradiction catalogue and the world-description silence rule. That is
+correct and intended, not a risk to be hedged against. Build on them as settled.

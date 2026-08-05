@@ -24,24 +24,29 @@ struct RuneGlyph: View {
             // Three or four strokes between points on a 3x3 lattice — enough variety to tell runes
             // apart at a glance, simple enough to still look like one alphabet.
             var path = Path()
-            let strokes = 3 + Int(rng.next() % 2)
-            var point = lattice(box, index: Int(rng.next() % 9))
+            // Five to seven strokes, and each one has to actually go somewhere — a mark that
+            // doubles back on itself reads as a scratch rather than as writing.
+            let strokes = 5 + Int(rng.next() % 3)
+            var index = Int(rng.next() % 9)
+            var point = lattice(box, index: index)
             path.move(to: point)
             for _ in 0..<strokes {
-                let next = lattice(box, index: Int(rng.next() % 9))
+                var nextIndex = Int(rng.next() % 9)
+                if nextIndex == index { nextIndex = (nextIndex + 1 + Int(rng.next() % 8)) % 9 }
+                let next = lattice(box, index: nextIndex)
                 if rng.next() % 3 == 0 {
-                    let control = lattice(box, index: Int(rng.next() % 9))
-                    path.addQuadCurve(to: next, control: control)
+                    path.addQuadCurve(to: next, control: lattice(box, index: Int(rng.next() % 9)))
                 } else {
                     path.addLine(to: next)
                 }
+                index = nextIndex
                 point = next
             }
             // A detached tick, the way most written scripts have one.
             if rng.next() % 2 == 0 {
                 let tick = lattice(box, index: Int(rng.next() % 9))
                 path.move(to: tick)
-                path.addLine(to: CGPoint(x: tick.x + box.width * 0.22, y: tick.y))
+                path.addLine(to: CGPoint(x: tick.x + box.width * 0.3, y: tick.y + box.height * 0.12))
             }
 
             context.stroke(path, with: .style(.primary),

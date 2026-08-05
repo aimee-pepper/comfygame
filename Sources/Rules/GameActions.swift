@@ -125,10 +125,21 @@ extension GameStore {
 
             // Generated here, once, and saved with the run. Worldgen draws from streams derived
             // from the seed, never from the run's live RNG, so in-run rolls resume cleanly.
-            let world = Worldgen.generate(book: book, seed: seed)
+            let world = Worldgen.generate(book: book, seed: seed, library: state.reality.library)
 
             // Entering unseals this world: from here on its rolled values may be described.
             state.reality.visitedWorldSeeds.insert(seed)
+            // Everyone whose signature this world satisfies is found by arriving. Pages are a
+            // guide, never a gate — writing the right world by luck finds them just the same.
+            for traveller in world.travellers {
+                state.reality.library.foundTravellers.insert(traveller)
+                state.reality.library.knownTravellers.insert(traveller)
+            }
+            // Pages that didn't surface here have waited one world longer.
+            for page in ContentCatalog.shared.diaryPages
+            where !state.reality.library.hasFound(page.id) && !world.pages.contains(page.id) {
+                state.reality.library.pagesWaiting[page.id, default: 0] += 1
+            }
             state.base.essence -= book.essencePaid
             state.worlds.runIndex += 1
             state.reality.lifetime.runsStarted += 1
@@ -141,6 +152,7 @@ extension GameStore {
                 playerPosition: world.start,
                 enemies: world.enemies,
                 sites: world.sites,
+                travellersHere: world.travellers,
                 // The satchel is its own, smaller capacity — separate from home storage, and
                 // separately upgradeable (decisions-log session 2).
                 satchelItems: Inventory(slots: state.base.satchelCapacity)

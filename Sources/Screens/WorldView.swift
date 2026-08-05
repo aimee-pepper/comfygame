@@ -83,6 +83,12 @@ struct WorldView: View {
         case .foundPortal: "A way out."
         case .foundCache: "A cache, locked. The key is somewhere else."
         case .cacheOpened(let what): "The lock gives. \(what)"
+        case .readPage(let id):
+            ContentCatalog.shared.diaryPage(id).map { "A page, in somebody's hand. \"\($0.prose)\"" }
+                ?? "A page from someone's diary."
+        case .foundTraveller(let id):
+            ContentCatalog.shared.traveller(id).map { "\($0.name) is here. \($0.blurb)" }
+                ?? "Someone is here."
         case .foundSite(let site):
             ContentCatalog.shared.site(site).map { "\($0.name). \($0.blurb)" } ?? "Something built."
         case .searchedSite(_, let remaining):
@@ -117,6 +123,7 @@ struct WorldView: View {
         switch event {
         case .pickedUp, .harvested, .foundPortal, .pickedUpItem, .searchedSite, .siteOpened: .primary
         case .foundSite, .learnedSymbol, .gainedEssence: .primary
+        case .readPage, .foundTraveller: .primary
         case .cacheOpened: .purple
         case .satchelFull: .orange
         case .hazardHit, .collapsed, .ejected, .lostToCrumbling: .red
@@ -360,6 +367,7 @@ private struct TileView: View {
         case .hazard: return "exclamationmark.triangle.fill"
         case .portal(let isEntry): return isEntry ? "arrow.down.left.circle" : "circle.circle"
         case .lockedCache: return "lock.fill"
+        case .diaryPage: return "doc.text"
         case .site: return site?.icon ?? "building.columns"
         }
     }
@@ -372,6 +380,7 @@ private struct TileView: View {
         case .portal: return .blue
         case .lockedCache: return .purple
         case .wildDrop: return .teal
+        case .diaryPage: return .indigo
         case .site: return site?.category == .hazard ? .orange : .brown
         default: return .primary.opacity(0.7)
         }

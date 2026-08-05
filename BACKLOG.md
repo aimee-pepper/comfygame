@@ -82,6 +82,21 @@
 - [ ] Retire the slot taxonomy entirely (`setSymbol` writes through to the page as a shim)
 - [ ] The Wild rune — saying "leave this to chance" deliberately
 
+## The search loop (decisions-session-7)
+- [x] Travellers at condition signatures — difficulty is how hard the signature is to write
+- [x] Diaries scattered as pages, one page one unlock, weighted placement with a patience fallback
+- [x] Pages on the map, read by walking over them; knowledge banks to Reality immediately
+- [x] The Library: hint pages that collect and never interpret, gaps shown as gaps, count only
+- [ ] Anchoring as the other reveal trigger, and as a route to a permanent world
+- [ ] Research leads, "a world worth writing" and ruin pages are recorded but nothing reads them yet
+- [ ] Recruitment — finding someone is not yet joining with them (companions spec, provisional)
+
+## Writing desk UI
+- [x] Two panes: Write (page + vocabulary) and The world (description, stats, depart)
+- [x] Pick a rune, drag the ghost into place, drag placed runes to move, drag off the page to erase
+- [x] Compact throughout, 44pt targets kept
+- [ ] Rotating a rune before placing it
+
 ## From the built-vs-specced audit
 - [x] Bug 1 — the desk no longer describes what the world rolls, only what was written
 - [x] Bug 2 — contradictions now cost stability instead of being display-only

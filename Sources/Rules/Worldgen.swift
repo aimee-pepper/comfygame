@@ -16,10 +16,12 @@ enum Worldgen {
         static let enemies: UInt64 = 0x3F0E
         static let features: UInt64 = 0x4CAC
         static let sites: UInt64 = 0x5175
+        static let pages: UInt64 = 0x9A6E
     }
 
-    static func generate(book: BoundBook, seed: UInt64)
-        -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite], start: GridPoint) {
+    static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState())
+        -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite],
+            pages: [DiaryPageID], travellers: [TravellerID], start: GridPoint) {
         let width = Tuning.World.gridWidth
         let height = Tuning.World.gridHeight
         var map = WorldMap(
@@ -35,6 +37,7 @@ enum Worldgen {
         var enemyRNG = root.derived(Salt.enemies)
         var featureRNG = root.derived(Salt.features)
         var siteRNG = root.derived(Salt.sites)
+        var pageRNG = root.derived(Salt.pages)
 
         // 1. Where you arrive: a portal on the edge. It works as an exit too, so retreating the
         //    way you came is always possible — it just costs you the turns to walk back.
@@ -123,7 +126,21 @@ enum Worldgen {
             }
         }
 
-        // 8. Enemies, drawn from the book's enemy table.
+        // 8. Diary pages. Scattered where their author would have been, unless they've waited
+        //    long enough that they'll turn up anywhere — nothing may become unreachable.
+        let pages = LibraryRules.placePages(in: readings, library: library, rng: &pageRNG)
+        var placedPages: [DiaryPageID] = []
+        for page in pages {
+            guard let point = randomFreePoint(in: map, avoiding: occupied, rng: &pageRNG) else { break }
+            map[point].content = .diaryPage(page)
+            occupied.insert(point)
+            placedPages.append(page)
+        }
+
+        // 9. Whoever this world's conditions describe is simply *here*.
+        let travellers = LibraryRules.travellersPresent(in: readings).map(\.id)
+
+        // 10. Enemies, drawn from the book's enemy table.
         let enemyTable = BookRules.enemyTable(for: book)
         let enemyCount = enemyCount(for: book, rng: &enemyRNG)
         var enemies: [WorldEnemy] = guardians
@@ -141,7 +158,7 @@ enum Worldgen {
         }
 
         WorldRules.reveal(around: entry, in: &map, radius: WorldRules.visionRadius(for: book))
-        return (map, enemies, sites, entry)
+        return (map, enemies, sites, placedPages, travellers, entry)
     }
 
     // MARK: Counts

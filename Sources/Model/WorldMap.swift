@@ -71,13 +71,15 @@ enum TileContent: Codable, Equatable, Sendable {
     /// A placed site — a ruin, a landmark, a warren. The world's discrete contents, as opposed to
     /// its conditions. Contents live on the `PlacedSite` in the run, keyed by this id.
     case site(InstanceID)
+    /// A page torn from someone's diary, lying where it fell.
+    case diaryPage(DiaryPageID)
 
     var isPortal: Bool { if case .portal = self { true } else { false } }
 
     /// Whether losing this tile to crumbling costs the player something.
     var isLoseable: Bool {
         switch self {
-        case .node, .wildDrop, .lockedCache, .site: true
+        case .node, .wildDrop, .lockedCache, .site, .diaryPage: true
         case .empty, .hazard, .portal: false
         }
     }

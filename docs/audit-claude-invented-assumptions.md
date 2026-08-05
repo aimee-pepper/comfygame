@@ -18,7 +18,9 @@ The *concept* (finer instruments write smaller) is Aimee's. **The specific footp
 ### 1.2 Sigil grammar is `[qualifiers] → source → Bind → target`
 The whole composition model. Aimee said sigils should be self-contained and gave the example of sun connecting to illumination. **The formal four-part grammar, the Bind rune, and the notion that a sigil binds to exactly one target are Claude's.** Everything in the pressure model assumes it.
 
-### 1.3 There are exactly 8 targets, and they are these 8
+### 1.3 There are exactly 8 targets, and they are these 8 — **CONFIRMED (Aimee, 5 Aug 2026)**
+
+Settled and intentionally load-bearing. See `decisions-log.md`.
 Illumination, Thermal, Hydrology, Substrate, Relief, Vitality, Atmosphere, Cycle. **Claude's list**, pruned from a research candidate set. Aimee never picked these. All 41 built pressure sources, every description clause, and the entire contradiction catalogue key off them.
 
 ### 1.4 Only Illumination and Thermal are two-valued

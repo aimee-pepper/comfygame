@@ -13,6 +13,7 @@ enum AppRoute: String, Codable, Hashable, CaseIterable, Sendable {
     case party
     case essenceSpring
     case constellation
+    case library
     case world
     case encounter
     case settings

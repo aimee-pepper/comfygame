@@ -24,6 +24,8 @@ struct ContentCatalog: Sendable {
     let contradictions: [ContradictionDef]
     let descriptionClauses: [DescriptionClauseDef]
     let runeShapes: [RuneShapeDef]
+    let travellers: [TravellerDef]
+    let diaryPages: [DiaryPageDef]
 
     /// Loaded once at first use. Content is read-only after load, so this is safe to share.
     static let shared: ContentCatalog = {
@@ -66,6 +68,9 @@ struct ContentCatalog: Sendable {
     func site(_ id: SiteID) -> SiteDef? { sites.first { $0.id == id } }
     func contradiction(_ id: ContradictionID) -> ContradictionDef? { contradictions.first { $0.id == id } }
     func runeShape(_ id: String) -> RuneShapeDef? { runeShapes.first { $0.id == id } }
+    func traveller(_ id: TravellerID) -> TravellerDef? { travellers.first { $0.id == id } }
+    func diaryPage(_ id: DiaryPageID) -> DiaryPageDef? { diaryPages.first { $0.id == id } }
+    func diary(of traveller: TravellerID) -> [DiaryPageDef] { diaryPages.filter { $0.diary == traveller } }
     func runeShapes(in hand: Hand) -> [RuneShapeDef] {
         runeShapes.filter { $0.hand == hand }.sorted { $0.id < $1.id }
     }
@@ -124,7 +129,9 @@ struct ContentCatalog: Sendable {
             sites: try loadFile("sites", key: "sites", bundle: bundle),
             contradictions: try loadFile("contradictions", key: "contradictions", bundle: bundle),
             descriptionClauses: try loadFile("descriptions", key: "clauses", bundle: bundle),
-            runeShapes: try loadFile("rune_shapes", key: "shapes", bundle: bundle)
+            runeShapes: try loadFile("rune_shapes", key: "shapes", bundle: bundle),
+            travellers: try loadFile("travellers", key: "travellers", bundle: bundle),
+            diaryPages: try loadFile("travellers", key: "pages", bundle: bundle)
         )
     }
 
@@ -188,6 +195,10 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(contradictions.map(\.id.rawValue), label: "contradiction")
         try requireUniqueIDs(descriptionClauses.map(\.id), label: "description clause")
         try requireUniqueIDs(runeShapes.map(\.id), label: "rune shape")
+        try requireUniqueIDs(travellers.map(\.id.rawValue), label: "traveller")
+        try requireUniqueIDs(diaryPages.map(\.id.rawValue), label: "diary page")
+
+
 
         // A hand with no shapes is a hand nothing can be written in.
         for hand in Hand.allCases where runeShapes(in: hand).isEmpty {
@@ -447,6 +458,62 @@ struct ContentCatalog: Sendable {
         // Each party member needs exactly one Skill, or the action bar has a dead button on it.
         for owner in [SkillDef.Owner.binder, .companion] where skill(ownedBy: owner) == nil {
             throw ContentError.danglingReference("skills.json has no skill for the \(owner.rawValue)")
+        }
+
+        // A traveller with no signature is nowhere; a page that unlocks nothing is not a page.
+        let travellerIDs = Set(travellers.map(\.id))
+        for traveller in travellers {
+            guard !traveller.signature.isEmpty else {
+                throw ContentError.danglingReference("traveller '\(traveller.id)' is nowhere at all")
+            }
+            for clue in traveller.signature {
+                guard targetIDs.contains(clue.condition.target) else {
+                    throw ContentError.danglingReference(
+                        "traveller '\(traveller.id)' sits on unknown target '\(clue.condition.target)'")
+                }
+                guard !clue.passage.isEmpty else {
+                    throw ContentError.danglingReference("traveller '\(traveller.id)' has a wordless clue")
+                }
+                // Passages are read and matched by a person. A value in one turns the search into
+                // arithmetic — see the same rule on description clauses.
+                guard !clue.passage.contains(where: \.isNumber) else {
+                    throw ContentError.danglingReference(
+                        "traveller '\(traveller.id)' names a number in a passage: \(clue.passage)")
+                }
+            }
+        }
+        for page in diaryPages {
+            guard travellerIDs.contains(page.diary) else {
+                throw ContentError.danglingReference("page '\(page.id)' is torn from an unknown diary")
+            }
+            guard !page.prose.isEmpty else {
+                throw ContentError.danglingReference("page '\(page.id)' is blank")
+            }
+            switch page.kind {
+            case .locationClue:
+                guard let about = page.about, let index = page.clueIndex,
+                      let subject = traveller(about), subject.signature.indices.contains(index) else {
+                    throw ContentError.danglingReference("page '\(page.id)' points at no one's location")
+                }
+            case .whereabouts:
+                guard let about = page.about, travellerIDs.contains(about) else {
+                    throw ContentError.danglingReference("page '\(page.id)' speaks of no one")
+                }
+            case .symbol:
+                guard let id = page.teaches, symbolIDs.contains(id) else {
+                    throw ContentError.danglingReference("page '\(page.id)' teaches an unknown rune")
+                }
+            case .researchLead:
+                guard let id = page.researchNode, nodeIDs.contains(id) else {
+                    throw ContentError.danglingReference("page '\(page.id)' leads to unknown study")
+                }
+            case .ruin:
+                guard let id = page.site, siteIDs.contains(id) else {
+                    throw ContentError.danglingReference("page '\(page.id)' names an unknown ruin")
+                }
+            case .worldWorthWriting:
+                break
+            }
         }
     }
 

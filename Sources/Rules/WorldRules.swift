@@ -18,6 +18,8 @@ enum WorldRules {
         case foundCache
         case cacheOpened(String)
         case foundSite(SiteID)
+        case readPage(DiaryPageID)
+        case foundTraveller(TravellerID)
         case searchedSite(SiteID, turnsRemaining: Int)
         case siteOpened(SiteID)
         case learnedSymbol(SymbolID)
@@ -144,6 +146,11 @@ enum WorldRules {
             events.append(.foundPortal)
         case .lockedCache:
             events.append(.foundCache)
+        case .diaryPage(let page):
+            // Reading is the whole interaction: one page, one unlock, and it's yours permanently.
+            events.append(contentsOf: readPage(page, in: &state))
+            run = state.worlds.activeRun ?? run
+            run.map[destination].content = .empty
         case .site(let instance):
             if let site = run.sites.first(where: { $0.id == instance }) {
                 events.append(.foundSite(site.siteID))
@@ -172,6 +179,36 @@ enum WorldRules {
         var events: [Event] = [.harvested(node.resource, amount: node.yieldPerHarvest, exhausted: node.isExhausted)]
         state.worlds.activeRun = run
         events.append(contentsOf: advanceTurn(in: &state))
+        return events
+    }
+
+    /// Take a page into the Library and apply the single thing it unlocks.
+    ///
+    /// **One page, one unlock**, and it lands in Reality immediately — pages are knowledge, and a
+    /// collapse must never cost you something you've already read.
+    static func readPage(_ id: DiaryPageID, in state: inout GameState) -> [Event] {
+        guard !state.reality.library.hasFound(id), let page = ContentCatalog.shared.diaryPage(id) else {
+            return []
+        }
+        state.reality.library.foundPages.append(id)
+        state.reality.library.pagesWaiting[id] = nil
+        var events: [Event] = [.readPage(id)]
+
+        switch page.kind {
+        case .locationClue:
+            // Knowing where someone is means knowing they exist.
+            if let about = page.about { state.reality.library.knownTravellers.insert(about) }
+        case .whereabouts:
+            if let about = page.about { state.reality.library.knownTravellers.insert(about) }
+        case .symbol:
+            if let symbol = page.teaches, !state.base.ownedSymbols.contains(symbol) {
+                state.base.ownedSymbols.insert(symbol)
+                events.append(.learnedSymbol(symbol))
+            }
+        case .researchLead, .ruin, .worldWorthWriting:
+            // Recorded in the Library; the systems that read it come later.
+            break
+        }
         return events
     }
 

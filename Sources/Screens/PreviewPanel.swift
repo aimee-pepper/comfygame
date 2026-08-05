@@ -12,7 +12,7 @@ struct PreviewPanel: View {
     let discovery: DiscoveryLog
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             header
             // Prose first, numbers after: what the world *is* should be the thing you read, and
             // it's the half a hint page can be matched against.
@@ -22,7 +22,7 @@ struct PreviewPanel: View {
                     contradictionEscalation: ContradictionRules.escalation(
                         count: projection.worldDescription.contradictions.count)
                 )
-                .padding(-14)
+                .padding(-10)
             }
             stabilityBlock
             if projection.dangerCapShortfall > 0, projection.worldDescription.showsAttribution {
@@ -37,7 +37,7 @@ struct PreviewPanel: View {
             mixSection(title: "Expected harvest", entries: resourceEntries)
             mixSection(title: "Expected inhabitants", entries: creatureEntries)
         }
-        .padding(14)
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
     }
@@ -45,7 +45,7 @@ struct PreviewPanel: View {
     private var header: some View {
         HStack {
             Label("Projection", systemImage: "eye")
-                .font(.subheadline.weight(.semibold))
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
             Spacer()
             if !projection.isFullySpecified {
@@ -59,16 +59,16 @@ struct PreviewPanel: View {
     // MARK: Stability
 
     private var stabilityBlock: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Stability")
-                    .font(.title3.weight(.semibold))
+                    .font(.subheadline.weight(.semibold))
                 Text(scoreText)
                     .font(.title3.monospacedDigit().weight(.bold))
                     .foregroundStyle(scoreColor)
                 Spacer()
                 Text(holdText)
-                    .font(.subheadline)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
@@ -182,7 +182,7 @@ struct PreviewPanel: View {
 
     @ViewBuilder
     private func mixSection(title: String, entries: [MixEntry]) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
@@ -209,9 +209,9 @@ private struct StatCell: View {
     let icon: String
 
     var body: some View {
-        VStack(spacing: 3) {
-            Image(systemName: icon).font(.caption).foregroundStyle(.secondary)
-            Text(value).font(.subheadline.weight(.medium).monospacedDigit())
+        VStack(spacing: 2) {
+            Image(systemName: icon).font(.caption2).foregroundStyle(.secondary)
+            Text(value).font(.footnote.weight(.medium).monospacedDigit())
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
             Text(label).font(.caption2).foregroundStyle(.secondary)
@@ -227,14 +227,14 @@ private struct MixBar: View {
     let isKnown: Bool
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.footnote)
+                .font(.caption)
                 .frame(width: 20)
                 .foregroundStyle(isKnown ? Color.primary : Color.secondary.opacity(0.5))
 
             Text(name)
-                .font(.footnote)
+                .font(.caption)
                 .foregroundStyle(isKnown ? .primary : .secondary)
                 .frame(width: 96, alignment: .leading)
                 .lineLimit(1)

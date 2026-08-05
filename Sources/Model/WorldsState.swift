@@ -56,6 +56,9 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// rather than the definition, because an anchored world has to remember that *this* ruin is
     /// empty while its ordinary resources replenish (Q12).
     var sites: [PlacedSite] = []
+    /// Travellers whose signature this world satisfies. Found on arrival — a traveller is simply
+    /// *at* a signature, so writing the right world is the whole of finding them.
+    var travellersHere: [TravellerID] = []
 
     /// 0–100, always visible. Decays per *player turn* only — never wall-clock (pillar 2).
     var stability: Double = Tuning.World.startingStability
@@ -101,6 +104,7 @@ struct WorldRun: Codable, Equatable, Sendable {
 
     init(runIndex: Int, book: BoundBook, mapSeed: UInt64, rng: SeededRNG, map: WorldMap,
          playerPosition: GridPoint, enemies: [WorldEnemy] = [], sites: [PlacedSite] = [],
+         travellersHere: [TravellerID] = [],
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)) {
         self.runIndex = runIndex
         self.book = book
@@ -110,6 +114,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.playerPosition = playerPosition
         self.enemies = enemies
         self.sites = sites
+        self.travellersHere = travellersHere
         self.satchelItems = satchelItems
     }
 
@@ -126,6 +131,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         playerPosition = try container.decode(GridPoint.self, forKey: .playerPosition)
         enemies = try container.decodeIfPresent([WorldEnemy].self, forKey: .enemies) ?? []
         sites = try container.decodeIfPresent([PlacedSite].self, forKey: .sites) ?? []
+        travellersHere = try container.decodeIfPresent([TravellerID].self, forKey: .travellersHere) ?? []
         stability = try container.decodeIfPresent(Double.self, forKey: .stability)
             ?? Tuning.World.startingStability
         turnsTaken = try container.decodeIfPresent(Int.self, forKey: .turnsTaken) ?? 0

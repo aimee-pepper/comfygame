@@ -73,6 +73,18 @@ struct PressureSourceID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+/// Someone scattered by the sundering. Found by writing the world they're in.
+struct TravellerID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
+/// One page torn from somebody's diary.
+struct DiaryPageID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 /// A named entry in the contradiction catalogue. Contradiction is authored, never computed.
 struct ContradictionID: StringIdentifier {
     var rawValue: String
