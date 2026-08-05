@@ -283,3 +283,34 @@ true while sites are a surprise. Three ways out:
 3. **Sites cost something that isn't Stability** — shorter fuse, more enemies, worse weather.
 
 Related: Q18, whether the preview names the sites or only their price.
+
+## Q20 — A book left to chance can now roll itself a world that dies almost immediately
+
+Not a bug, and not something I changed on purpose — it's a consequence of two decisions meeting.
+
+Chance now draws from the **whole** catalog (your session-5 correction), and the catalog contains
+Mote Vein (−70) and Rich Ore (−45). A book with slots left open can therefore roll a Stability in
+the single digits, and the steps curve is deliberately literal down there: a 5 means five moves
+before the world is gone. Two unlucky slots and you've paid for a world you can barely enter.
+
+It surfaced as a flaky test — a persistence test that departs and takes five steps started failing
+intermittently because the world sometimes collapsed inside those five steps. I pinned the test's
+book rather than touch the rule.
+
+**The preview is technically honest about this** — an under-specified book shows a Stability range
+that spans the possibilities. But a range of "4–100" isn't information, it's a shrug, and it's the
+opposite of legibility-before-commitment.
+
+**Worth deciding.** Some options, roughly in order of how much they change:
+
+1. **Leave it.** Leaving slots open is a gamble, and this is what the gamble means. Consistent, and
+   the flat cheap rate for chance slots already says "you're buying a lottery ticket".
+2. **Chance draws from a weighted pool**, where the wildly destabilising symbols are rare rather
+   than equally likely. Keeps the whole pool reachable — your actual requirement — while making the
+   median chance-fill sane.
+3. **Floor the outcome:** a chance-filled slot can't take a book below some Stability. Simple, but
+   it makes the meter lie about what's in the book.
+4. **Show it better:** the preview reports the *likely* band as well as the extremes, e.g. "usually
+   60–80, as low as 4". More honest than a bare range and doesn't touch the rules.
+
+I'd pick 2 and 4 together, but this is squarely yours.

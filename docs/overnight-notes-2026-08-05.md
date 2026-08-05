@@ -111,3 +111,32 @@ every layer struct through a JSON object missing each field in turn. Not built �
   granted, because granting it properly means routing through the loot-decision flow you specced.
   Half-doing it would have made a second, worse path for the same decision.
 - **The 44pt audit and haptics** (the rest of Milestone 6) — not started.
+
+## 7. A save test that can't be forgotten
+
+Since the decoder-drift bug in §5 was the second of its kind, it now has tests
+(`Tests/SaveToleranceTests.swift`):
+
+- **Round-trip** a fully-populated save and compare layer by layer. This is the one that would have
+  caught the spillover bug — the field encoded fine and came back empty.
+- **Load a save with the new fields deleted**, standing in for one written before tonight. This is
+  the one that would have caught the `WorldRun` bug.
+- **A tripwire** pinning the current set of fields that genuinely *can't* go missing. If that set
+  grows, someone has added a field to a struct that decodes strictly, and it fails while it's still
+  cheap to fix rather than after you've lost a world.
+
+The tripwire is deliberately not a rule — a map with no `tiles` is corrupt, not old, and there's no
+honest default for it. It's a list that should shrink and must not grow.
+
+## 8. Something the tests found that you should probably look at
+
+A persistence test started failing *intermittently*, which turned out not to be a persistence
+problem at all: a book with slots left to chance can roll Mote Vein (−70) and Rich Ore (−45) and
+arrive at a world that collapses inside five steps.
+
+That's your whole-pool ruling meeting the literal end of the steps curve. Both are working as
+designed; together they mean an under-specified book can be a near-total loss, and the preview's
+honest answer is a range so wide it says nothing. Written up as **Q20** with four options — I'd
+weight the chance pool and improve the preview rather than change either rule, but it's yours.
+
+I pinned the test's book rather than touch the rule.

@@ -318,7 +318,13 @@ final class WorldTests: XCTestCase {
         defer { io.deleteEverything() }
 
         let first = GameStore(io: io)
+        // Every slot filled. This test is about the map surviving a kill, and a book left partly
+        // to chance can roll itself a world that collapses inside these five steps — which fails
+        // it for a reason that has nothing to do with persistence.
         first.setSymbol("caverns", in: "terrain")
+        first.setSymbol("frostbound", in: "biome")
+        first.setSymbol("sparse_ore", in: "bounty")
+        first.setSymbol("dim_sky", in: "quirk")
         first.bindAndDepart()
         // Wander a bit so fog, position and RNG have all moved off their initial values.
         for _ in 0..<5 {
