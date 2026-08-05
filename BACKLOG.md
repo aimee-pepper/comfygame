@@ -58,6 +58,17 @@
 - [x] Q10 banking overflow → Storehouse spillover, never lost silently (ruled, session 5 audit)
 - [x] 44pt audit, thumb-zone action bar (haptics + full acceptance pass still open — needs the on-device force-quit test)
 
+## The page as a spatial grid (writing-system-rune-spec §2-3)
+- [x] Page model: 6x6 grid, polyomino footprints, placement/removal/redraw, save round-trip
+- [x] Three hands — charcoal 4-6 cells, pencil 2-3, fountain pen always 1x1
+- [x] Compound footprints — ceil(sum x 0.6), always worth learning, never free
+- [x] Order invariance held at the page layer: position is packing, never meaning
+- [ ] **The Writing Desk still uses the slot UI.** The page isn't wired into book-writing yet —
+      that means a spatial place/move/remove UI, and replacing BookDraft's slots with a Page.
+- [ ] Page size as a permanent (Reality/base) unlock
+- [ ] Hands as owned instruments, so which hand you can write in is progression
+- [ ] The Wild rune — saying "leave this to chance" deliberately
+
 ## Analysis — the third progression axis (decisions-session-8)
 - [x] Analysis tiers stored in Reality; description always describes, attribution is gated
 - [x] Red/green underlining and named contradictions moved to tier 4, where they belong

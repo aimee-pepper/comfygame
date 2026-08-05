@@ -1,0 +1,20 @@
+{
+  "_note": "Polyomino footprints per hand (writing-system-rune-spec §2-3). The glyph never changes; the INSTRUMENT sets the minimum size at which the mark stays legible — charcoal can't render fine detail, so the same rune must be drawn large. Crude shapes are irregular on purpose: the scrawl is awkward to fit. Cells are [column, row] offsets from the shape's origin. A rune's shape is picked from its hand's list deterministically by rune id, so the same rune always draws the same way without authoring 149 x 3 shapes by hand. All PLACEHOLDER.",
+  "shapes": [
+    { "id": "refined_dot", "hand": "refined", "cells": [[0,0]] },
+
+    { "id": "plain_pair", "hand": "plain", "cells": [[0,0],[1,0]] },
+    { "id": "plain_stack", "hand": "plain", "cells": [[0,0],[0,1]] },
+    { "id": "plain_corner", "hand": "plain", "cells": [[0,0],[1,0],[0,1]] },
+    { "id": "plain_bar", "hand": "plain", "cells": [[0,0],[1,0],[2,0]] },
+    { "id": "plain_column", "hand": "plain", "cells": [[0,0],[0,1],[0,2]] },
+
+    { "id": "crude_block", "hand": "crude", "cells": [[0,0],[1,0],[0,1],[1,1]] },
+    { "id": "crude_tee", "hand": "crude", "cells": [[0,0],[1,0],[2,0],[1,1]] },
+    { "id": "crude_ess", "hand": "crude", "cells": [[1,0],[2,0],[0,1],[1,1]] },
+    { "id": "crude_ell", "hand": "crude", "cells": [[0,0],[0,1],[0,2],[1,2]] },
+    { "id": "crude_sprawl", "hand": "crude", "cells": [[0,0],[1,0],[1,1],[2,1],[2,2]] },
+    { "id": "crude_cross", "hand": "crude", "cells": [[1,0],[0,1],[1,1],[2,1],[1,2]] },
+    { "id": "crude_smear", "hand": "crude", "cells": [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1]] }
+  ]
+}

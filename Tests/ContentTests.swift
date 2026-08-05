@@ -190,7 +190,8 @@ final class ContentTests: XCTestCase {
             constellationNodes: catalog.constellationNodes,
             sites: catalog.sites,
             contradictions: catalog.contradictions,
-            descriptionClauses: catalog.descriptionClauses
+            descriptionClauses: catalog.descriptionClauses,
+            runeShapes: catalog.runeShapes
         )
         XCTAssertThrowsError(try sabotaged.validate())
     }

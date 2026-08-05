@@ -23,6 +23,7 @@ struct ContentCatalog: Sendable {
     let sites: [SiteDef]
     let contradictions: [ContradictionDef]
     let descriptionClauses: [DescriptionClauseDef]
+    let runeShapes: [RuneShapeDef]
 
     /// Loaded once at first use. Content is read-only after load, so this is safe to share.
     static let shared: ContentCatalog = {
@@ -64,6 +65,10 @@ struct ContentCatalog: Sendable {
     func station(_ id: StationID) -> StationDef? { stations.first { $0.id == id } }
     func site(_ id: SiteID) -> SiteDef? { sites.first { $0.id == id } }
     func contradiction(_ id: ContradictionID) -> ContradictionDef? { contradictions.first { $0.id == id } }
+    func runeShape(_ id: String) -> RuneShapeDef? { runeShapes.first { $0.id == id } }
+    func runeShapes(in hand: Hand) -> [RuneShapeDef] {
+        runeShapes.filter { $0.hand == hand }.sorted { $0.id < $1.id }
+    }
     func constellationNode(_ id: ConstellationNodeID) -> ConstellationNodeDef? {
         constellationNodes.first { $0.id == id }
     }
@@ -118,7 +123,8 @@ struct ContentCatalog: Sendable {
             constellationNodes: try loadFile("constellation", key: "nodes", bundle: bundle),
             sites: try loadFile("sites", key: "sites", bundle: bundle),
             contradictions: try loadFile("contradictions", key: "contradictions", bundle: bundle),
-            descriptionClauses: try loadFile("descriptions", key: "clauses", bundle: bundle)
+            descriptionClauses: try loadFile("descriptions", key: "clauses", bundle: bundle),
+            runeShapes: try loadFile("rune_shapes", key: "shapes", bundle: bundle)
         )
     }
 
@@ -181,6 +187,26 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(sites.map(\.id.rawValue), label: "site")
         try requireUniqueIDs(contradictions.map(\.id.rawValue), label: "contradiction")
         try requireUniqueIDs(descriptionClauses.map(\.id), label: "description clause")
+        try requireUniqueIDs(runeShapes.map(\.id), label: "rune shape")
+
+        // A hand with no shapes is a hand nothing can be written in.
+        for hand in Hand.allCases where runeShapes(in: hand).isEmpty {
+            throw ContentError.danglingReference("no rune shape authored for the \(hand.rawValue) hand")
+        }
+        for shape in runeShapes {
+            guard shape.cells.allSatisfy({ $0.count == 2 && $0[0] >= 0 && $0[1] >= 0 }) else {
+                throw ContentError.danglingReference("shape '\(shape.id)' has a malformed cell")
+            }
+            // Snug against its bounding box, rather than required to cover [0,0] — a plus-shape
+            // legitimately leaves its own corner empty, and placement only needs the offsets to
+            // start at zero so `origin + offset` lands where the player tapped.
+            guard shape.cells.map({ $0[0] }).min() == 0, shape.cells.map({ $0[1] }).min() == 0 else {
+                throw ContentError.danglingReference("shape '\(shape.id)' isn't flush with its origin")
+            }
+            guard Set(shape.cells.map { [$0[0], $0[1]] }).count == shape.cells.count else {
+                throw ContentError.danglingReference("shape '\(shape.id)' lists a cell twice")
+            }
+        }
 
         let resourceIDs = Set(resources.map(\.id))
         let creatureIDs = Set(creatures.map(\.id))

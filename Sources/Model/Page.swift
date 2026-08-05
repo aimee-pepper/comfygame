@@ -1,0 +1,103 @@
+import Foundation
+
+/// The instrument a rune is drawn with.
+///
+/// **One alphabet, three hands** (`writing-system-rune-spec.md` §2). The glyph is constant; the
+/// tool sets the minimum size at which the mark survives. Charcoal cannot render fine detail, so
+/// the same rune must be drawn large to stay legible — the size difference is physical, not
+/// symbolic, which is why recognition transfers instantly and nothing is ever relearned.
+enum Hand: String, Codable, CaseIterable, Sendable, Comparable {
+    case crude, plain, refined
+
+    var displayName: String {
+        switch self {
+        case .crude: "Charcoal"
+        case .plain: "Pencil"
+        case .refined: "Fountain pen"
+        }
+    }
+
+    /// Refinement is literacy, not power: a better hand lets you say the same thing in less space.
+    /// It never unlocks a meaning.
+    var order: Int { Hand.allCases.firstIndex(of: self) ?? 0 }
+    static func < (lhs: Hand, rhs: Hand) -> Bool { lhs.order < rhs.order }
+}
+
+/// A footprint: the cells a rune occupies, as offsets from its origin.
+struct RuneShapeDef: Codable, Equatable, Identifiable, Sendable {
+    var id: String
+    var hand: Hand
+    /// `[column, row]` offsets. Always includes `[0,0]`.
+    var cells: [[Int]]
+
+    var offsets: [PageCell] { cells.map { PageCell(column: $0[0], row: $0[1]) } }
+    var footprint: Int { cells.count }
+    var width: Int { (cells.map { $0[0] }.max() ?? 0) + 1 }
+    var height: Int { (cells.map { $0[1] }.max() ?? 0) + 1 }
+}
+
+/// A square on the page.
+struct PageCell: Codable, Equatable, Hashable, Sendable {
+    var column: Int
+    var row: Int
+
+    static func + (lhs: PageCell, rhs: PageCell) -> PageCell {
+        PageCell(column: lhs.column + rhs.column, row: lhs.row + rhs.row)
+    }
+}
+
+/// A rune written on the page, at a position.
+///
+/// **Position is a packing fact, never a meaning.** Nothing about where a rune sits changes the
+/// world it describes — the page is a budget, not a syntax — and `PressureTests` proves it by
+/// resolving permuted pages and requiring identical readings.
+struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
+    var id: InstanceID
+    var sigil: Sigil
+    var hand: Hand
+    var origin: PageCell
+    /// Which authored shape this rune draws as. Stored rather than recomputed so an existing page
+    /// keeps its layout even if the shape catalogue is re-authored around it.
+    var shapeID: String
+
+    var shape: RuneShapeDef? { ContentCatalog.shared.runeShape(shapeID) }
+    var cells: [PageCell] { (shape?.offsets ?? [PageCell(column: 0, row: 0)]).map { origin + $0 } }
+}
+
+/// What the player is capable of writing, as opposed to what they can afford today.
+///
+/// Two different pressures, deliberately both kept: **page size is capability**, essence is the
+/// per-bind consumable. Growing the page is a permanent unlock; paying for a book is not.
+struct Page: Codable, Equatable, Sendable {
+    var width: Int
+    var height: Int
+    var runes: [PlacedRune]
+
+    init(width: Int = Tuning.Page.startingWidth,
+         height: Int = Tuning.Page.startingHeight,
+         runes: [PlacedRune] = []) {
+        self.width = width
+        self.height = height
+        self.runes = runes
+    }
+
+    var capacity: Int { width * height }
+    var usedCells: Int { runes.reduce(0) { $0 + $1.cells.count } }
+    var freeCells: Int { capacity - usedCells }
+
+    var occupied: Set<PageCell> { Set(runes.flatMap(\.cells)) }
+
+    func contains(_ cell: PageCell) -> Bool {
+        cell.column >= 0 && cell.row >= 0 && cell.column < width && cell.row < height
+    }
+
+    /// The sigils this page says, in a stable order.
+    ///
+    /// Sorted by id rather than by position, so resolution cannot accidentally come to depend on
+    /// layout. Reading order is not meaning.
+    var sigils: [Sigil] { runes.sorted { $0.id.rawValue < $1.id.rawValue }.map(\.sigil) }
+
+    func rune(at cell: PageCell) -> PlacedRune? {
+        runes.first { $0.cells.contains(cell) }
+    }
+}

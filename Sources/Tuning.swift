@@ -205,6 +205,15 @@ enum Tuning {
     /// The third progression axis, alongside vocabulary and page space: how much you can *read*
     /// (decisions-session-8). Unlocked by crafted instruments, so the same book is a different
     /// object depending on how well you can read it.
+    /// The page: what you are *capable* of writing, as opposed to what you can afford today.
+    enum Page {
+        static let startingWidth: Int = 6            // PLACEHOLDER — spec §3 proposes 6x6
+        static let startingHeight: Int = 6           // PLACEHOLDER
+        /// A compound costs this fraction of its parts, rounded up. Always worth learning, never
+        /// free.
+        static let compoundFootprintRate: Double = 0.6   // PLACEHOLDER — spec §3
+    }
+
     enum Analysis {
         /// Tier 1 — qualitative only. Sensations, no numbers, no attribution. Deliberately where
         /// everyone starts: the player is meant to write half-blind and learn by observing.
