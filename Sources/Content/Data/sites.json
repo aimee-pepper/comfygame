@@ -1,0 +1,272 @@
+{
+  "_note": "Sites \u2014 the fourth layer (docs/sites-system.md). Things a world CONTAINS, as opposed to things it IS. Conditions are ranges, never exact matches, so a family of worlds can produce a given site and sites are hunted by understanding conditions rather than memorising a recipe. Rarity is emergent: a site needing three simultaneous uncommon conditions is rare because that world is hard to write. All numbers PLACEHOLDER.",
+  "sites": [
+    {
+      "id": "wayfarers_camp",
+      "name": "Wayfarer's Camp",
+      "icon": "tent",
+      "blurb": "Someone slept here, and left in a hurry. The ash is cold.",
+      "category": "recentRuin",
+      "conditions": [
+        {
+          "target": "thermal",
+          "measure": "floor",
+          "minimum": 15
+        },
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 8
+        }
+      ],
+      "weight": 10,
+      "maximumPerWorld": 1,
+      "excludes": [],
+      "placement": {
+        "rule": "anywhere",
+        "minimumDistanceFromEntry": 3
+      },
+      "contents": {
+        "yields": {
+          "fiber": 4,
+          "essence_raw": 2
+        },
+        "items": [],
+        "teaches": [],
+        "searchTurns": 2,
+        "essence": 1
+      },
+      "stabilityDelta": 0
+    },
+    {
+      "id": "binders_workshop",
+      "name": "Binder's Workshop",
+      "icon": "book.closed",
+      "blurb": "A dry stone room, and a hand that wrote before yours.",
+      "category": "oldRuin",
+      "conditions": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "hard",
+          "minimum": 30
+        },
+        {
+          "target": "illumination",
+          "measure": "peak",
+          "minimum": 25
+        },
+        {
+          "target": "thermal",
+          "measure": "floor",
+          "minimum": 10
+        }
+      ],
+      "weight": 3,
+      "maximumPerWorld": 1,
+      "excludes": [
+        "glacial_vault"
+      ],
+      "placement": {
+        "rule": "interior",
+        "minimumDistanceFromEntry": 5
+      },
+      "contents": {
+        "yields": {},
+        "items": [
+          "cache_key"
+        ],
+        "teaches": [
+          "verdigris_bloom"
+        ],
+        "searchTurns": 3,
+        "essence": 4
+      },
+      "stabilityDelta": 0
+    },
+    {
+      "id": "glacial_vault",
+      "name": "Glacial Vault",
+      "icon": "snowflake",
+      "blurb": "Held in the ice, and better preserved for it.",
+      "category": "oldRuin",
+      "conditions": [
+        {
+          "target": "thermal",
+          "measure": "floor",
+          "maximum": 20
+        },
+        {
+          "target": "hydrology",
+          "measure": "form",
+          "key": "frozen",
+          "minimum": 30
+        }
+      ],
+      "weight": 3,
+      "maximumPerWorld": 1,
+      "excludes": [
+        "binders_workshop"
+      ],
+      "placement": {
+        "rule": "interior",
+        "minimumDistanceFromEntry": 5
+      },
+      "contents": {
+        "yields": {
+          "essence_raw": 3
+        },
+        "items": [
+          "curio_humming_shard"
+        ],
+        "teaches": [
+          "frostbound"
+        ],
+        "searchTurns": 3,
+        "essence": 3
+      },
+      "stabilityDelta": 0
+    },
+    {
+      "id": "crystal_cavern",
+      "name": "Crystal Cavern",
+      "icon": "diamond",
+      "blurb": "It makes its own light, and it is worth more than the world around it.",
+      "category": "landmark",
+      "conditions": [
+        {
+          "target": "relief",
+          "measure": "aspect",
+          "key": "openness",
+          "maximum": 45
+        },
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 35
+        }
+      ],
+      "weight": 5,
+      "maximumPerWorld": 1,
+      "excludes": [],
+      "placement": {
+        "rule": "interior",
+        "minimumDistanceFromEntry": 4
+      },
+      "contents": {
+        "yields": {
+          "ore": 12,
+          "mote": 1
+        },
+        "items": [],
+        "teaches": [],
+        "searchTurns": 3,
+        "essence": 1
+      },
+      "stabilityDelta": -8
+    },
+    {
+      "id": "geyser_basin",
+      "name": "Geyser Basin",
+      "icon": "aqi.medium",
+      "blurb": "The ground breathes out, on its own schedule.",
+      "category": "landmark",
+      "conditions": [
+        {
+          "target": "thermal",
+          "measure": "tag",
+          "key": "geothermal",
+          "minimum": 1
+        },
+        {
+          "target": "hydrology",
+          "measure": "available",
+          "minimum": 15
+        }
+      ],
+      "weight": 5,
+      "maximumPerWorld": 2,
+      "excludes": [],
+      "placement": {
+        "rule": "anywhere",
+        "minimumDistanceFromEntry": 3
+      },
+      "contents": {
+        "yields": {
+          "essence_raw": 6,
+          "ore": 3
+        },
+        "items": [],
+        "teaches": [],
+        "searchTurns": 2,
+        "essence": 0
+      },
+      "stabilityDelta": -4
+    },
+    {
+      "id": "brood_warren",
+      "name": "Brood Warren",
+      "icon": "ant",
+      "blurb": "Something dug this, and something is still using it.",
+      "category": "living",
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 45
+        },
+        {
+          "target": "vitality",
+          "measure": "aspect",
+          "key": "trophicDepth",
+          "minimum": 30
+        }
+      ],
+      "weight": 4,
+      "maximumPerWorld": 2,
+      "excludes": [],
+      "placement": {
+        "rule": "anywhere",
+        "minimumDistanceFromEntry": 4
+      },
+      "contents": {
+        "yields": {
+          "fiber": 10,
+          "essence_raw": 2
+        },
+        "items": [],
+        "teaches": [],
+        "searchTurns": 2,
+        "guardian": "ink_hound",
+        "essence": 1
+      },
+      "stabilityDelta": -5
+    },
+    {
+      "id": "the_tear",
+      "name": "Tear",
+      "icon": "bolt.trianglebadge.exclamationmark",
+      "blurb": "Where the world argues with itself, it comes apart.",
+      "category": "hazard",
+      "conditions": [],
+      "minimumContradiction": 40,
+      "weight": 8,
+      "maximumPerWorld": 3,
+      "excludes": [],
+      "placement": {
+        "rule": "anywhere",
+        "minimumDistanceFromEntry": 2
+      },
+      "contents": {
+        "yields": {
+          "mote": 1
+        },
+        "items": [],
+        "teaches": [],
+        "searchTurns": 1,
+        "essence": 2
+      },
+      "stabilityDelta": -12
+    }
+  ]
+}

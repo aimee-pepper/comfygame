@@ -23,6 +23,16 @@ extension GameStore {
 
     var canPortalHere: Bool { tileUnderPlayer?.content.isPortal ?? false }
 
+    /// The site under the player, if there's one still worth searching.
+    var searchableHere: PlacedSite? {
+        guard let run = activeRun,
+              case .site(let instance) = tileUnderPlayer?.content,
+              let site = run.sites.first(where: { $0.id == instance }),
+              !site.isLooted
+        else { return nil }
+        return site
+    }
+
     /// Loot that wouldn't fit and is waiting on a decision.
     var pendingLoot: [ItemStack] { activeRun?.offeredItems ?? [] }
 
@@ -96,6 +106,16 @@ extension GameStore {
         var events: [WorldRules.Event] = []
         mutate("harvest", flush: true) { state in
             events = WorldRules.harvest(in: &state)
+        }
+        finishTurn(events)
+    }
+
+    /// One turn of searching the site underfoot. Contents land on the turn it completes.
+    func searchSite() {
+        guard searchableHere != nil, activeRun?.activeEncounter == nil else { return }
+        var events: [WorldRules.Event] = []
+        mutate("search site", flush: true) { state in
+            events = WorldRules.searchSite(in: &state)
         }
         finishTurn(events)
     }

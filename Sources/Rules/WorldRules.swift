@@ -17,6 +17,11 @@ enum WorldRules {
         case foundPortal
         case foundCache
         case cacheOpened(String)
+        case foundSite(SiteID)
+        case searchedSite(SiteID, turnsRemaining: Int)
+        case siteOpened(SiteID)
+        case learnedSymbol(SymbolID)
+        case gainedEssence(Int)
         case pickedUpItem(String)
         case satchelFull(String)
         case hazardHit(damage: Int)
@@ -139,6 +144,11 @@ enum WorldRules {
             events.append(.foundPortal)
         case .lockedCache:
             events.append(.foundCache)
+        case .site(let instance):
+            if let site = run.sites.first(where: { $0.id == instance }) {
+                events.append(.foundSite(site.siteID))
+                state.reality.discovery.recordSite(site.siteID, runIndex: run.runIndex)
+            }
         case .empty, .node:
             break
         }
@@ -165,6 +175,55 @@ enum WorldRules {
         return events
     }
 
+    /// Searches the site under the player. One turn per pull, like harvesting — a site is worth
+    /// walking to *and* worth standing still for.
+    ///
+    /// Contents land only on the turn the search completes, so a force-quit part-way through
+    /// resumes mid-search with nothing yet granted and nothing lost (pillar 2).
+    static func searchSite(in state: inout GameState) -> [Event] {
+        guard var run = state.worlds.activeRun,
+              case .site(let instance) = run.map[run.playerPosition].content,
+              let index = run.sites.firstIndex(where: { $0.id == instance }),
+              !run.sites[index].isLooted
+        else { return [.blocked("Nothing here to search.")] }
+
+        guard !run.enemies.contains(where: { $0.position == run.playerPosition }) else {
+            return [.blocked("Not while that's standing over you.")]
+        }
+
+        run.sites[index].searchTurnsRemaining -= 1
+        let site = run.sites[index]
+        var events: [Event] = []
+
+        if site.searchTurnsRemaining > 0 {
+            events.append(.searchedSite(site.siteID, turnsRemaining: site.searchTurnsRemaining))
+        } else {
+            run.sites[index].isLooted = true
+            events.append(.siteOpened(site.siteID))
+            if let definition = site.definition {
+                for (resource, amount) in definition.contents.yields.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
+                    run.satchel.add(amount, of: resource)
+                    state.reality.discovery.recordResource(resource, runIndex: run.runIndex)
+                    events.append(.pickedUp(resource, amount: amount))
+                }
+                // Knowledge is banked to Reality immediately rather than carried in the satchel:
+                // literacy is permanent and cannot be lost to a collapse (rune spec §1).
+                for symbol in definition.contents.teaches where !state.base.ownedSymbols.contains(symbol) {
+                    state.base.ownedSymbols.insert(symbol)
+                    events.append(.learnedSymbol(symbol))
+                }
+                if definition.contents.essence > 0 {
+                    state.base.essence += definition.contents.essence
+                    events.append(.gainedEssence(definition.contents.essence))
+                }
+            }
+        }
+
+        state.worlds.activeRun = run
+        events.append(contentsOf: advanceTurn(in: &state))
+        return events
+    }
+
     /// Everything the *world* does after the player acts. The only place a turn is consumed.
     static func advanceTurn(in state: inout GameState) -> [Event] {
         guard var run = state.worlds.activeRun else { return [] }
@@ -174,7 +233,7 @@ enum WorldRules {
         run.turnsTaken += 1
         run.encounterGraceTurns = max(0, run.encounterGraceTurns - 1)
         state.reality.lifetime.worldTurnsTaken += 1
-        run.stability = max(0, run.stability - BookRules.decayPerTurn(for: run.book))
+        run.stability = max(0, run.stability - run.decayPerTurn)
         let bandAfter = run.stabilityBand
         if bandAfter != bandBefore { events.append(.crossedThreshold(bandAfter)) }
 

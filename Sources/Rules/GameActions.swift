@@ -63,6 +63,7 @@ extension GameStore {
                 map: world.map,
                 playerPosition: world.start,
                 enemies: world.enemies,
+                sites: world.sites,
                 // The satchel is its own, smaller capacity — separate from home storage, and
                 // separately upgradeable (decisions-log session 2).
                 satchelItems: Inventory(slots: state.base.satchelCapacity)

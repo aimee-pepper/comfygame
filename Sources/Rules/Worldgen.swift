@@ -15,9 +15,11 @@ enum Worldgen {
         static let nodes: UInt64 = 0x2D0DE
         static let enemies: UInt64 = 0x3F0E
         static let features: UInt64 = 0x4CAC
+        static let sites: UInt64 = 0x5175
     }
 
-    static func generate(book: BoundBook, seed: UInt64) -> (map: WorldMap, enemies: [WorldEnemy], start: GridPoint) {
+    static func generate(book: BoundBook, seed: UInt64)
+        -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite], start: GridPoint) {
         let width = Tuning.World.gridWidth
         let height = Tuning.World.gridHeight
         var map = WorldMap(
@@ -32,6 +34,7 @@ enum Worldgen {
         var nodeRNG = root.derived(Salt.nodes)
         var enemyRNG = root.derived(Salt.enemies)
         var featureRNG = root.derived(Salt.features)
+        var siteRNG = root.derived(Salt.sites)
 
         // 1. Where you arrive: a portal on the edge. It works as an exit too, so retreating the
         //    way you came is always possible — it just costs you the turns to walk back.
@@ -85,10 +88,28 @@ enum Worldgen {
             occupied.insert(point)
         }
 
-        // 6. Enemies, drawn from the book's enemy table.
+        // 6. Sites — the discrete placed things. Eligibility is read off the world's *pressures*
+        //    rather than off its symbols, so a site is found by writing a kind of place rather than
+        //    by writing a specific recipe (docs/sites-system.md §2).
+        let sites = SiteRules.place(in: map, readings: BookRules.readings(for: book, seed: seed),
+                                    avoiding: occupied, rng: &siteRNG)
+        var guardians: [WorldEnemy] = []
+        for site in sites {
+            map[site.position].content = .site(site.id)
+            occupied.insert(site.position)
+            // A guarded site is placed by the site system and statted by the creature system. The
+            // guardian stands *on* the site, so the fight is the price of the search rather than a
+            // separate mechanic.
+            if let creature = site.definition?.contents.guardian {
+                guardians.append(WorldEnemy(id: InstanceID(rawValue: siteRNG.next()),
+                                            creatureID: creature, position: site.position))
+            }
+        }
+
+        // 7. Enemies, drawn from the book's enemy table.
         let enemyTable = BookRules.enemyTable(for: book)
         let enemyCount = enemyCount(for: book, rng: &enemyRNG)
-        var enemies: [WorldEnemy] = []
+        var enemies: [WorldEnemy] = guardians
         for _ in 0..<enemyCount {
             guard let creature = enemyRNG.pickWeighted(enemyTable),
                   let point = randomFreePoint(in: map, avoiding: occupied,
@@ -103,7 +124,7 @@ enum Worldgen {
         }
 
         WorldRules.reveal(around: entry, in: &map, radius: WorldRules.visionRadius(for: book))
-        return (map, enemies, entry)
+        return (map, enemies, sites, entry)
     }
 
     // MARK: Counts

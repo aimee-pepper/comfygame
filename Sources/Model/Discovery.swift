@@ -13,6 +13,9 @@ import Foundation
 struct DiscoveryLog: Codable, Equatable, Sendable {
     var creatures: [CreatureID: DiscoveryRecord] = [:]
     var resources: [ResourceID: DiscoveryRecord] = [:]
+    /// Sites you've stood in. A site you've never met is silhouetted in the preview, same rule as
+    /// creatures — you can be told a world *can* hold something without being told what.
+    var sites: [SiteID: DiscoveryRecord] = [:]
 
     init(creatures: [CreatureID: DiscoveryRecord] = [:], resources: [ResourceID: DiscoveryRecord] = [:]) {
         self.creatures = creatures
@@ -33,6 +36,10 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
 
     mutating func recordCreature(_ id: CreatureID, runIndex: Int) {
         creatures[id, default: DiscoveryRecord()].record(runIndex: runIndex)
+    }
+
+    mutating func recordSite(_ id: SiteID, runIndex: Int) {
+        sites[id, default: DiscoveryRecord()].record(runIndex: runIndex)
     }
 
     mutating func recordResource(_ id: ResourceID, runIndex: Int) {

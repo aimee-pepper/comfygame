@@ -73,6 +73,13 @@ struct PressureSourceID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+/// A discrete placed thing — a ruin, a landmark, a hive. Distinct from a pressure, which is a
+/// condition rather than an object.
+struct SiteID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 struct ResearchBranchID: StringIdentifier {
     var rawValue: String
     init(rawValue: String) { self.rawValue = rawValue }

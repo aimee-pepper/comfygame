@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — Claude-invented stopgaps for v0 feel, not balance; the whole vocabulary is being replaced by pressure sigils. THREE RULES WORTH KEEPING THROUGH THAT REWRITE: (1) 'stabilityDelta' is in the SAME UNITS as the Stability headline and simply adds to it — a book starts at 100 and a symbol reading '+12' moves it by exactly 12. (2) Stability tracks DEVIATION FROM WHAT A WORLD WOULD NATURALLY HAVE: asking for less than the baseline CALMS a world (Sparse Ore is +10), asking for the baseline costs nothing (Ore is 0), asking for more is the greed that destabilises (Rich Ore is −45). This is the Mystcraft greed model from research-pass-3, and it means the bounty slot is a real choice rather than a tax. (3) EVERY symbol trades on SEVERAL axes, never one: Dim Sky buys stability with sight and with things that hunt in the dark; Plains is stability-neutral but lets you see further. A stable world is not an empty one.",
+  "_note": "PLACEHOLDER \u2014 Claude-invented stopgaps for v0 feel, not balance; the whole vocabulary is being replaced by pressure sigils. THREE RULES WORTH KEEPING THROUGH THAT REWRITE: (1) 'stabilityDelta' is in the SAME UNITS as the Stability headline and simply adds to it \u2014 a book starts at 100 and a symbol reading '+12' moves it by exactly 12. (2) Stability tracks DEVIATION FROM WHAT A WORLD WOULD NATURALLY HAVE: asking for less than the baseline CALMS a world (Sparse Ore is +10), asking for the baseline costs nothing (Ore is 0), asking for more is the greed that destabilises (Rich Ore is \u221245). This is the Mystcraft greed model from research-pass-3, and it means the bounty slot is a real choice rather than a tax. (3) EVERY symbol trades on SEVERAL axes, never one: Dim Sky buys stability with sight and with things that hunt in the dark; Plains is stability-neutral but lets you see further. A stable world is not an empty one. 'expandsTo' spells the symbol out in the pressure model's atomic vocabulary \u2014 the rune spec calls these compounds (\u00a79). PLACEHOLDER component choices.",
   "symbols": [
     {
       "id": "plains",
@@ -15,7 +15,19 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 1,
-      "stabilityDelta": 0
+      "stabilityDelta": 0,
+      "expandsTo": [
+        {
+          "source": "wind",
+          "target": "relief",
+          "intensity": "faint"
+        },
+        {
+          "source": "root",
+          "target": "vitality",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "caverns",
@@ -34,7 +46,19 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": -1,
-      "stabilityDelta": -8
+      "stabilityDelta": -8,
+      "expandsTo": [
+        {
+          "source": "granite",
+          "target": "relief",
+          "intensity": "moderate"
+        },
+        {
+          "source": "iron",
+          "target": "substrate",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "archipelago",
@@ -52,7 +76,19 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": -12
+      "stabilityDelta": -12,
+      "expandsTo": [
+        {
+          "source": "sea",
+          "target": "hydrology",
+          "intensity": "moderate"
+        },
+        {
+          "source": "granite",
+          "target": "relief",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "verdant",
@@ -70,7 +106,19 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 0
+      "stabilityDelta": 0,
+      "expandsTo": [
+        {
+          "source": "root",
+          "target": "vitality",
+          "intensity": "moderate"
+        },
+        {
+          "source": "bloom",
+          "target": "vitality",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "ashen",
@@ -89,7 +137,19 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -15
+      "stabilityDelta": -15,
+      "expandsTo": [
+        {
+          "source": "ash",
+          "target": "atmosphere",
+          "intensity": "moderate"
+        },
+        {
+          "source": "wildfire",
+          "target": "thermal",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "frostbound",
@@ -108,13 +168,25 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 8
+      "stabilityDelta": 8,
+      "expandsTo": [
+        {
+          "source": "ice",
+          "target": "thermal",
+          "intensity": "moderate"
+        },
+        {
+          "source": "snow",
+          "target": "hydrology",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "sparse_ore",
       "name": "Sparse Ore",
       "slot": "bounty",
-      "blurb": "A thin seam — less than a world would ordinarily carry. It rests easier for it.",
+      "blurb": "A thin seam \u2014 less than a world would ordinarily carry. It rests easier for it.",
       "icon": "circle.grid.2x1",
       "acquisition": "starter",
       "essenceCost": 2,
@@ -124,7 +196,14 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 10
+      "stabilityDelta": 10,
+      "expandsTo": [
+        {
+          "source": "granite",
+          "target": "substrate",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "common_ore",
@@ -140,7 +219,14 @@
       },
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
-      "visionDelta": 0
+      "visionDelta": 0,
+      "expandsTo": [
+        {
+          "source": "iron",
+          "target": "substrate",
+          "intensity": "moderate"
+        }
+      ]
     },
     {
       "id": "rich_ore",
@@ -158,7 +244,19 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -45
+      "stabilityDelta": -45,
+      "expandsTo": [
+        {
+          "source": "iron",
+          "target": "substrate",
+          "intensity": "great"
+        },
+        {
+          "source": "gold",
+          "target": "substrate",
+          "intensity": "moderate"
+        }
+      ]
     },
     {
       "id": "teeming_life",
@@ -178,7 +276,24 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -35
+      "stabilityDelta": -35,
+      "expandsTo": [
+        {
+          "source": "bloom",
+          "target": "vitality",
+          "intensity": "great"
+        },
+        {
+          "source": "herd",
+          "target": "vitality",
+          "intensity": "moderate"
+        },
+        {
+          "source": "swarm",
+          "target": "vitality",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "dim_sky",
@@ -194,7 +309,14 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": -1,
-      "stabilityDelta": 12
+      "stabilityDelta": 12,
+      "expandsTo": [
+        {
+          "source": "cloud",
+          "target": "illumination",
+          "intensity": "great"
+        }
+      ]
     },
     {
       "id": "gilded_veins",
@@ -213,7 +335,19 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -30
+      "stabilityDelta": -30,
+      "expandsTo": [
+        {
+          "source": "gold",
+          "target": "substrate",
+          "intensity": "great"
+        },
+        {
+          "source": "crystal",
+          "target": "substrate",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "verdigris_bloom",
@@ -232,7 +366,24 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": -10
+      "stabilityDelta": -10,
+      "expandsTo": [
+        {
+          "source": "bloom",
+          "target": "vitality",
+          "intensity": "moderate"
+        },
+        {
+          "source": "rot",
+          "target": "vitality",
+          "intensity": "faint"
+        },
+        {
+          "source": "iron",
+          "target": "substrate",
+          "intensity": "faint"
+        }
+      ]
     },
     {
       "id": "mote_vein",
@@ -251,7 +402,19 @@
       },
       "enemyTierDelta": 2,
       "visionDelta": 0,
-      "stabilityDelta": -70
+      "stabilityDelta": -70,
+      "expandsTo": [
+        {
+          "source": "rift",
+          "target": "illumination",
+          "intensity": "moderate"
+        },
+        {
+          "source": "crystal",
+          "target": "substrate",
+          "intensity": "moderate"
+        }
+      ]
     }
   ]
 }

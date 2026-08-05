@@ -45,9 +45,48 @@ struct SymbolDef: Codable, Equatable, Identifiable, Sendable {
     /// Changes how far the player can see. The paired-tradeoff pattern from the decisions log:
     /// Dim Sky buys a longer-lived world with a ring of your sight.
     var visionDelta: Int
+    /// What this symbol *says*, in the atomic vocabulary of the pressure model.
+    ///
+    /// The rune spec's own definition: "a **compound** is a learned single glyph meaning what
+    /// several components mean together, at a smaller footprint" (§9). Every v0 symbol is exactly
+    /// that — "Frostbound" is Ice and Snow written as one mark. Spelling them out here is
+    /// translating the coarse vocabulary into the fine one, not adding a second system, and it's
+    /// what lets a bound book produce real pressure readings before the page UI exists.
+    ///
+    /// The symbol's own `stabilityDelta`, `yieldModifiers` and the rest stay authoritative for the
+    /// v0 loop. Pressures ride alongside and drive what the older fields can't describe — climate,
+    /// creature character, and which sites a world can host.
+    var expandsTo: [CompoundComponent]
 
     enum Acquisition: String, Codable, Sendable {
         case starter, research, worldDrop
+    }
+}
+
+/// One sigil inside a compound. The same statement a player will one day place by hand.
+struct CompoundComponent: Codable, Equatable, Sendable {
+    var source: PressureSourceID
+    var target: PressureTargetID
+    var intensity: Intensity
+    /// Targets this component explicitly denies — "a sun that does not warm".
+    var negates: Set<PressureTargetID>
+
+    init(source: PressureSourceID,
+         target: PressureTargetID,
+         intensity: Intensity = .moderate,
+         negates: Set<PressureTargetID> = []) {
+        self.source = source
+        self.target = target
+        self.intensity = intensity
+        self.negates = negates
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        source = try container.decode(PressureSourceID.self, forKey: .source)
+        target = try container.decode(PressureTargetID.self, forKey: .target)
+        intensity = try container.decodeIfPresent(Intensity.self, forKey: .intensity) ?? .moderate
+        negates = try container.decodeIfPresent(Set<PressureTargetID>.self, forKey: .negates) ?? []
     }
 }
 

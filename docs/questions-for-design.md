@@ -226,3 +226,27 @@ gamble rather than a shortcut.
 
 Shipped as-is; no change needed.
 `Sources/Rules/BookRules.swift` (`candidates` vs `writable`).
+
+---
+
+## Q17 — Do sites grant a separate research currency, or essence?
+
+`docs/sites-system.md` §2 lists "research points" among a site's contents, but the shipped economy
+has no such currency: research nodes cost **essence plus resources**, and nothing else. Adding a
+parallel currency is a design decision, not an implementation detail, so I didn't make it.
+
+**Shipped, conservatively:** a site's `essence` field grants essence outright. Old ruins and
+landmarks therefore pay toward research without a new resource type existing.
+
+**Worth deciding:** whether "insight" should be its own currency that *only* buys research. Arguments
+for: it separates "I found a place that taught me something" from "I sold ore", and it stops research
+competing directly with book-writing for the same pool. Argument against: it's another number on the
+Base screen, and the research trees are already gated by their DAG.
+
+## Q18 — Should the pre-bind preview show which sites a world can host?
+
+`docs/sites-system.md` §6.3 raises this and leans yes-as-silhouettes, matching the creature preview
+rule. Not built — it changes what the player optimises for, so it wants an explicit answer.
+
+**Shipped:** sites are a surprise you walk into. `SiteRules.eligible(in:)` already takes readings
+rather than a map, so the preview can read it the moment you want it to.

@@ -20,6 +20,7 @@ struct ContentCatalog: Sendable {
     let gambitComponents: [GambitComponentDef]
     let stations: [StationDef]
     let constellationNodes: [ConstellationNodeDef]
+    let sites: [SiteDef]
 
     /// Loaded once at first use. Content is read-only after load, so this is safe to share.
     static let shared: ContentCatalog = {
@@ -59,6 +60,7 @@ struct ContentCatalog: Sendable {
         gambitComponents.filter { $0.kind == kind }
     }
     func station(_ id: StationID) -> StationDef? { stations.first { $0.id == id } }
+    func site(_ id: SiteID) -> SiteDef? { sites.first { $0.id == id } }
     func constellationNode(_ id: ConstellationNodeID) -> ConstellationNodeDef? {
         constellationNodes.first { $0.id == id }
     }
@@ -105,7 +107,8 @@ struct ContentCatalog: Sendable {
             researchNodes: try loadFile("research", key: "nodes", bundle: bundle),
             gambitComponents: try loadFile("gambit_components", key: "components", bundle: bundle),
             stations: try loadFile("stations", key: "stations", bundle: bundle),
-            constellationNodes: try loadFile("constellation", key: "nodes", bundle: bundle)
+            constellationNodes: try loadFile("constellation", key: "nodes", bundle: bundle),
+            sites: try loadFile("sites", key: "sites", bundle: bundle)
         )
     }
 
@@ -165,6 +168,7 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(gambitComponents.map(\.id.rawValue), label: "gambit component")
         try requireUniqueIDs(stations.map(\.id.rawValue), label: "station")
         try requireUniqueIDs(constellationNodes.map(\.id.rawValue), label: "constellation node")
+        try requireUniqueIDs(sites.map(\.id.rawValue), label: "site")
 
         let resourceIDs = Set(resources.map(\.id))
         let creatureIDs = Set(creatures.map(\.id))
@@ -250,6 +254,77 @@ struct ContentCatalog: Sendable {
             }
             for id in symbol.enemyTableModifiers.keys where !creatureIDs.contains(id) {
                 throw ContentError.danglingReference("symbol '\(symbol.id)' references unknown creature '\(id)'")
+            }
+            // A symbol that expands to nothing would generate a world with no pressures at all,
+            // which reads as a bug rather than as a quiet world.
+            guard !symbol.expandsTo.isEmpty else {
+                throw ContentError.danglingReference("symbol '\(symbol.id)' expands to no components")
+            }
+            for component in symbol.expandsTo {
+                guard let source = pressureSource(component.source) else {
+                    throw ContentError.danglingReference(
+                        "symbol '\(symbol.id)' expands to unknown source '\(component.source)'")
+                }
+                guard targetIDs.contains(component.target) else {
+                    throw ContentError.danglingReference(
+                        "symbol '\(symbol.id)' binds to unknown target '\(component.target)'")
+                }
+                // Binding a source to a target it has no opinion about writes a statement the
+                // world can't act on — almost always a typo in one of the two IDs.
+                guard source.contribution(to: component.target) != nil else {
+                    throw ContentError.danglingReference(
+                        "symbol '\(symbol.id)' binds '\(component.source)' to '\(component.target)', which it doesn't affect")
+                }
+            }
+        }
+
+        // Sites reach into nearly every other catalog, so they're the easiest place for a typo to
+        // hide: a dangling ID here would silently place a site that gives nothing.
+        let siteIDs = Set(sites.map(\.id))
+        for site in sites {
+            for condition in site.conditions {
+                guard targetIDs.contains(condition.target) else {
+                    throw ContentError.danglingReference(
+                        "site '\(site.id)' reads unknown pressure target '\(condition.target)'")
+                }
+                switch condition.measure {
+                case .aspect, .form, .tag:
+                    guard let key = condition.key, !key.isEmpty else {
+                        throw ContentError.danglingReference(
+                            "site '\(site.id)' reads \(condition.measure) on '\(condition.target)' without naming which")
+                    }
+                    if condition.measure == .form,
+                       let target = pressureTarget(condition.target), !target.forms.contains(key) {
+                        throw ContentError.danglingReference(
+                            "site '\(site.id)' reads unknown form '\(key)' on '\(condition.target)'")
+                    }
+                    if condition.measure == .aspect,
+                       let target = pressureTarget(condition.target),
+                       !target.aspects.contains(where: { $0.id == key }) {
+                        throw ContentError.danglingReference(
+                            "site '\(site.id)' reads unknown aspect '\(key)' on '\(condition.target)'")
+                    }
+                default:
+                    break
+                }
+            }
+            for id in site.excludes where !siteIDs.contains(id) {
+                throw ContentError.danglingReference("site '\(site.id)' excludes unknown site '\(id)'")
+            }
+            for id in site.contents.yields.keys where !resourceIDs.contains(id) {
+                throw ContentError.danglingReference("site '\(site.id)' yields unknown resource '\(id)'")
+            }
+            for id in site.contents.items where !itemIDs.contains(id) {
+                throw ContentError.danglingReference("site '\(site.id)' holds unknown item '\(id)'")
+            }
+            for id in site.contents.teaches where !symbolIDs.contains(id) {
+                throw ContentError.danglingReference("site '\(site.id)' teaches unknown symbol '\(id)'")
+            }
+            if let guardian = site.contents.guardian, !creatureIDs.contains(guardian) {
+                throw ContentError.danglingReference("site '\(site.id)' is guarded by unknown creature '\(guardian)'")
+            }
+            guard !site.contents.isEmpty else {
+                throw ContentError.danglingReference("site '\(site.id)' contains nothing worth walking to")
             }
         }
 

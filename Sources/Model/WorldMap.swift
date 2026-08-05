@@ -68,13 +68,16 @@ enum TileContent: Codable, Equatable, Sendable {
     case portal(isEntry: Bool)
     /// Opens only with a key found in a *different* world. The delayed-payoff seed.
     case lockedCache
+    /// A placed site — a ruin, a landmark, a warren. The world's discrete contents, as opposed to
+    /// its conditions. Contents live on the `PlacedSite` in the run, keyed by this id.
+    case site(InstanceID)
 
     var isPortal: Bool { if case .portal = self { true } else { false } }
 
     /// Whether losing this tile to crumbling costs the player something.
     var isLoseable: Bool {
         switch self {
-        case .node, .wildDrop, .lockedCache: true
+        case .node, .wildDrop, .lockedCache, .site: true
         case .empty, .hazard, .portal: false
         }
     }

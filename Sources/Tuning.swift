@@ -190,6 +190,16 @@ enum Tuning {
 
     // MARK: - Encounters
 
+    /// Sites — the discrete placed things, as opposed to the pressures that bias what spawns.
+    enum Sites {
+        /// How many sites a world gets, before eligibility and placement have their say. A world
+        /// with nothing in it is a chore to walk across; a world studded with them is a shopping
+        /// list rather than a place.
+        static let perWorldCountRange = 1...3          // PLACEHOLDER
+        /// Turns spent searching that are worth a haptic and a line of narration, not silence.
+        static let searchRevealsContentsAt: Int = 0    // PLACEHOLDER
+    }
+
     enum Encounter {
         static let partySize: Int = 2                // PLACEHOLDER — Binder + 1 companion
         static let maxFoes: Int = 3                  // PLACEHOLDER

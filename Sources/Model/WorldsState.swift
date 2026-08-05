@@ -52,9 +52,25 @@ struct WorldRun: Codable, Equatable, Sendable {
     var playerPosition: GridPoint
     /// Enemies standing on the grid. Removed when defeated in an encounter.
     var enemies: [WorldEnemy] = []
+    /// Discrete placed things — ruins, landmarks, warrens. Looted state lives on the instance
+    /// rather than the definition, because an anchored world has to remember that *this* ruin is
+    /// empty while its ordinary resources replenish (Q12).
+    var sites: [PlacedSite] = []
 
     /// 0–100, always visible. Decays per *player turn* only — never wall-clock (pillar 2).
     var stability: Double = Tuning.World.startingStability
+
+    /// The Stability headline this world actually runs at: what the book asked for, plus what the
+    /// world turned out to contain.
+    ///
+    /// Greed is charged on the world's *total* value, not on the substrate symbol alone (the
+    /// sites-system audit correction) — so a book that happens to place a Crystal Cavern is more
+    /// unstable than the same book that didn't, and the player can see why on the tile.
+    var effectiveStabilityScore: Int {
+        BookRules.stabilityScore(of: book) + SiteRules.stabilityDelta(of: sites)
+    }
+
+    var decayPerTurn: Double { BookRules.decayPerTurn(stabilityScore: effectiveStabilityScore) }
     /// Player turns taken this run. The only clock the game has.
     var turnsTaken: Int = 0
 

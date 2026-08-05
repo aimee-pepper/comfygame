@@ -83,6 +83,15 @@ struct WorldView: View {
         case .foundPortal: "A way out."
         case .foundCache: "A cache, locked. The key is somewhere else."
         case .cacheOpened(let what): "The lock gives. \(what)"
+        case .foundSite(let site):
+            ContentCatalog.shared.site(site).map { "\($0.name). \($0.blurb)" } ?? "Something built."
+        case .searchedSite(_, let remaining):
+            "Searching. \(remaining) more turn\(remaining == 1 ? "" : "s")."
+        case .siteOpened(let site):
+            "You've had everything \(ContentCatalog.shared.site(site)?.name.lowercased() ?? "it") has."
+        case .learnedSymbol(let symbol):
+            "You can write \(ContentCatalog.shared.symbol(symbol)?.name ?? "something new") now."
+        case .gainedEssence(let amount): "\(amount) essence, banked."
         case .pickedUpItem(let what): "\(what) You can't tell what it is."
         case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."
         case .hazardHit(let damage): "The ground turns on you — \(damage) damage."
@@ -106,7 +115,8 @@ struct WorldView: View {
 
     private func colour(for event: WorldRules.Event) -> Color {
         switch event {
-        case .pickedUp, .harvested, .foundPortal, .pickedUpItem: .primary
+        case .pickedUp, .harvested, .foundPortal, .pickedUpItem, .searchedSite, .siteOpened: .primary
+        case .foundSite, .learnedSymbol, .gainedEssence: .primary
         case .cacheOpened: .purple
         case .satchelFull: .orange
         case .hazardHit, .collapsed, .ejected, .lostToCrumbling: .red
@@ -155,6 +165,16 @@ struct WorldView: View {
                         store.harvest()
                     }
                 }
+                if let site = store.searchableHere, let definition = site.definition {
+                    ActionButton("Search the \(definition.name.lowercased())",
+                                 icon: definition.icon,
+                                 detail: site.searchTurnsRemaining == definition.contents.searchTurns
+                                     ? "\(definition.contents.searchTurns) turns"
+                                     : "\(site.searchTurnsRemaining) turns left",
+                                 isProminent: true) {
+                        store.searchSite()
+                    }
+                }
                 if store.canPortalHere {
                     ActionButton("Portal home", icon: "arrow.down.left.circle.fill",
                                  detail: "keep everything", isProminent: true) {
@@ -171,7 +191,8 @@ struct WorldView: View {
                         store.openCacheHere()
                     }
                 }
-                if store.harvestableHere == nil && !store.canPortalHere && !store.isOnLockedCache {
+                if store.harvestableHere == nil && store.searchableHere == nil
+                    && !store.canPortalHere && !store.isOnLockedCache {
                     Text(hint(for: run))
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -231,7 +252,7 @@ private struct StabilityHeader: View {
     }
 
     private var turnsLeft: Int {
-        Int((run.stability / BookRules.decayPerTurn(for: run.book)).rounded(.down))
+        Int((run.stability / run.decayPerTurn).rounded(.down))
     }
 
     private var bandText: String {
@@ -269,6 +290,7 @@ private struct MapGrid: View {
                             let point = GridPoint(x: x, y: y)
                             TileView(tile: run.map[point],
                                      enemy: enemy(at: point),
+                                     site: site(at: point),
                                      isPlayer: point == run.playerPosition,
                                      side: side)
                                 .onTapGesture { onTap(point) }
@@ -284,11 +306,18 @@ private struct MapGrid: View {
     private func enemy(at point: GridPoint) -> WorldEnemy? {
         run.enemies.first { $0.position == point }
     }
+
+    private func site(at point: GridPoint) -> SiteDef? {
+        run.sites.first { $0.position == point }?.definition
+    }
 }
 
 private struct TileView: View {
     let tile: Tile
     let enemy: WorldEnemy?
+    /// Resolved by the caller: the tile only stores an instance id, and the grid is the one place
+    /// that has the run to look it up in.
+    let site: SiteDef?
     let isPlayer: Bool
     let side: CGFloat
 
@@ -325,6 +354,7 @@ private struct TileView: View {
         case .hazard: return "exclamationmark.triangle.fill"
         case .portal(let isEntry): return isEntry ? "arrow.down.left.circle" : "circle.circle"
         case .lockedCache: return "lock.fill"
+        case .site: return site?.icon ?? "building.columns"
         }
     }
 
@@ -336,6 +366,7 @@ private struct TileView: View {
         case .portal: return .blue
         case .lockedCache: return .purple
         case .wildDrop: return .teal
+        case .site: return site?.category == .hazard ? .orange : .brown
         default: return .primary.opacity(0.7)
         }
     }

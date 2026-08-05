@@ -13,8 +13,10 @@ enum BookRules {
     /// Empty slots are random-filled at generation — under-specification is a surprise, not an
     /// error (the Mystcraft rule, locked in decisions-log).
     ///
-    /// Random fills draw only from symbols the player owns, from a sorted candidate list, so the
-    /// same seed always produces the same book.
+    /// Random fills draw from the **whole** catalog, not just what the player owns (Aimee, session
+    /// 5): a chance slot that could only return things you already knew is a shuffle, not a
+    /// surprise. Drawing it does not teach you the symbol — you write the world, you don't learn
+    /// the word (Q16). The candidate list is sorted, so the same seed always produces the same book.
     static func resolveBook(draft: BookDraft, ownedSymbols: Set<SymbolID>, seed: UInt64) -> BoundBook {
         var rng = SeededRNG(seed: seed).derived(0xB00C)
         var symbols: [SlotID: SymbolID] = [:]
@@ -175,6 +177,36 @@ enum BookRules {
     }
 
     /// Normalises any weight table into shares that sum to 1, for the preview's mix bars.
+    // MARK: Pressures
+
+    /// Everything a book says, in the pressure model's atomic vocabulary.
+    ///
+    /// Each symbol is a compound (rune spec §9) and expands to its components. Sigil identity is
+    /// derived from the symbol and its position in the expansion rather than rolled, so the same
+    /// book always yields the same page — no RNG is consumed here.
+    static func sigils(for book: BoundBook) -> [Sigil] {
+        book.allSymbolIDs.enumerated().flatMap { symbolIndex, symbolID -> [Sigil] in
+            guard let symbol = ContentCatalog.shared.symbol(symbolID) else { return [] }
+            return symbol.expandsTo.enumerated().map { componentIndex, component in
+                Sigil(id: InstanceID(rawValue: UInt64(symbolIndex) << 32 | UInt64(componentIndex)),
+                      source: component.source,
+                      target: component.target,
+                      intensity: component.intensity,
+                      negatedTargets: component.negates)
+            }
+        }
+    }
+
+    /// What the world a book describes is actually *like*.
+    ///
+    /// Targets the book says nothing about are rolled from the seed rather than left at baseline
+    /// (Aimee, session 5) — a sensible default would make every under-specified world the same
+    /// tepid place. Derived on demand rather than stored: it's a pure function of the book and the
+    /// seed, and both of those are already in the save.
+    static func readings(for book: BoundBook, seed: UInt64) -> PressureReadings {
+        PressureRules.resolve(sigils(for: book), fillingUnwrittenWith: seed)
+    }
+
     static func shares<T>(_ table: [(value: T, weight: Double)]) -> [(value: T, share: Double)] {
         let total = table.reduce(0) { $0 + max(0, $1.weight) }
         guard total > 0 else { return table.map { (value: $0.value, share: 0) } }
