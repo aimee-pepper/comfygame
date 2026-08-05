@@ -1,0 +1,139 @@
+{
+  "_note": "ALL NUMBERS PLACEHOLDER — straight from pressure-model-illumination.md §4.3, which flags them as guesses. This is the Illumination pattern worked in full; the other seven targets are added by extending this file, not by touching code. A source names its own contributions, and every contribution beyond the one you bind is an IMPLICIT SECONDARY that happens whether you asked for it or not — 'you cannot have bright without hot unless you do something about it'. 'character' is per-target and decides HOW a source contributes: illumination's cyclic sources lift only the peak, constant ones lift peak and floor, occluding ones push both down.",
+  "sources": [
+    {
+      "id": "sun", "name": "Sun", "icon": "sun.max.fill",
+      "blurb": "The default. Hard to have light without heat.",
+      "contributions": [
+        { "target": "illumination", "character": "cyclic", "peak": 55, "floor": 0, "tags": ["celestial"] },
+        { "target": "thermal", "character": "radiating", "peak": 40, "floor": 0 }
+      ]
+    },
+    {
+      "id": "moon", "name": "Moon", "icon": "moon.fill",
+      "blurb": "Enough to see by, barely.",
+      "contributions": [
+        { "target": "illumination", "character": "cyclic", "peak": 12, "floor": 0, "tags": ["celestial"] },
+        { "target": "thermal", "character": "radiating", "peak": 2, "floor": 0 }
+      ]
+    },
+    {
+      "id": "stars", "name": "Stars", "icon": "sparkles",
+      "blurb": "Almost nothing, but not nothing.",
+      "contributions": [
+        { "target": "illumination", "character": "cyclic", "peak": 4, "floor": 0, "tags": ["celestial"] }
+      ]
+    },
+    {
+      "id": "comet", "name": "Comet", "icon": "comet",
+      "blurb": "Comes and goes on its own schedule.",
+      "contributions": [
+        { "target": "illumination", "character": "cyclic", "peak": 15, "floor": 0, "tags": ["celestial", "erratic"] },
+        { "target": "thermal", "character": "radiating", "peak": 5, "floor": 0 },
+        { "target": "cycle", "character": "destabilising", "peak": 10, "floor": 0, "tags": ["arrhythmic"] }
+      ]
+    },
+    {
+      "id": "aurora", "name": "Aurora", "icon": "rays",
+      "blurb": "Light without heat, and no contradiction needed to get it.",
+      "contributions": [
+        { "target": "illumination", "character": "cyclic", "peak": 14, "floor": 0, "tags": ["celestial", "coloured"] }
+      ]
+    },
+    {
+      "id": "second_light", "name": "Second Light", "icon": "circle.dotted.circle",
+      "blurb": "Nobody has explained it.",
+      "contributions": [
+        { "target": "illumination", "character": "cyclic", "peak": 25, "floor": 0, "tags": ["celestial", "unexplained"] },
+        { "target": "thermal", "character": "radiating", "peak": 5, "floor": 0 }
+      ]
+    },
+    {
+      "id": "magma", "name": "Magma", "icon": "flame.fill",
+      "blurb": "Lit from below, always.",
+      "contributions": [
+        { "target": "illumination", "character": "constant", "peak": 30, "floor": 30, "tags": ["sourceless"] },
+        { "target": "thermal", "character": "radiating", "peak": 60, "floor": 20 },
+        { "target": "substrate", "character": "volatile", "peak": 25, "floor": 0 }
+      ]
+    },
+    {
+      "id": "crystal", "name": "Crystal", "icon": "diamond.fill",
+      "blurb": "Cold light out of the rock itself.",
+      "contributions": [
+        { "target": "illumination", "character": "constant", "peak": 18, "floor": 18, "tags": ["sourceless", "valuable"] },
+        { "target": "substrate", "character": "hard", "peak": 30, "floor": 0, "tags": ["valuable"] }
+      ]
+    },
+    {
+      "id": "fungus", "name": "Fungus", "icon": "camera.macro",
+      "blurb": "A lightless world that is nonetheless lit.",
+      "contributions": [
+        { "target": "illumination", "character": "constant", "peak": 12, "floor": 12, "tags": ["sourceless"] },
+        { "target": "vitality", "character": "decomposing", "peak": 20, "floor": 0, "tags": ["fungal"] }
+      ]
+    },
+    {
+      "id": "rift", "name": "Rift", "icon": "bolt.horizontal.fill",
+      "blurb": "Something is open that shouldn't be.",
+      "contributions": [
+        { "target": "illumination", "character": "constant", "peak": 20, "floor": 20, "tags": ["sourceless", "unexplained"] },
+        { "target": "cycle", "character": "destabilising", "peak": 25, "floor": 0, "tags": ["arrhythmic"] }
+      ]
+    },
+    {
+      "id": "cloud", "name": "Cloud", "icon": "cloud.fill",
+      "blurb": "A lid on the sky.",
+      "contributions": [
+        { "target": "illumination", "character": "occluding", "peak": -20, "floor": -5 },
+        { "target": "thermal", "character": "retaining", "peak": -10, "floor": 8 },
+        { "target": "atmosphere", "character": "thickening", "peak": 15, "floor": 0 }
+      ]
+    },
+    {
+      "id": "ash", "name": "Ash", "icon": "aqi.medium",
+      "blurb": "Everything under a grey fall.",
+      "contributions": [
+        { "target": "illumination", "character": "occluding", "peak": -30, "floor": -8 },
+        { "target": "thermal", "character": "cooling", "peak": -15, "floor": -5 },
+        { "target": "substrate", "character": "ductile", "peak": 10, "floor": 0 },
+        { "target": "atmosphere", "character": "occluding", "peak": 20, "floor": 0, "tags": ["choking"] }
+      ]
+    },
+    {
+      "id": "smoke", "name": "Smoke", "icon": "smoke.fill",
+      "blurb": "Something is burning, somewhere.",
+      "contributions": [
+        { "target": "illumination", "character": "occluding", "peak": -25, "floor": -6 },
+        { "target": "thermal", "character": "radiating", "peak": 5, "floor": 0 },
+        { "target": "atmosphere", "character": "occluding", "peak": 18, "floor": 0, "tags": ["choking"] }
+      ]
+    },
+    {
+      "id": "miasma", "name": "Miasma", "icon": "aqi.high",
+      "blurb": "Air that does not want you in it.",
+      "contributions": [
+        { "target": "illumination", "character": "occluding", "peak": -18, "floor": -4 },
+        { "target": "vitality", "character": "consuming", "peak": -20, "floor": 0 },
+        { "target": "atmosphere", "character": "occluding", "peak": 22, "floor": 0, "tags": ["toxic"] }
+      ]
+    },
+    {
+      "id": "canopy", "name": "Canopy", "icon": "tree.fill",
+      "blurb": "Bright above, dim below. Two worlds stacked.",
+      "contributions": [
+        { "target": "illumination", "character": "occluding", "peak": -35, "floor": -10, "tags": ["elevation"] },
+        { "target": "thermal", "character": "retaining", "peak": -8, "floor": 6 },
+        { "target": "vitality", "character": "producing", "peak": 35, "floor": 0 }
+      ]
+    },
+    {
+      "id": "void", "name": "Void", "icon": "circle.fill",
+      "blurb": "No sun ever rose here.",
+      "contributions": [
+        { "target": "illumination", "character": "occluding", "peak": -25, "floor": -15 },
+        { "target": "thermal", "character": "cooling", "peak": -20, "floor": -20 }
+      ]
+    }
+  ]
+}

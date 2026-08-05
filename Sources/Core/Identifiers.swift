@@ -63,6 +63,16 @@ struct ItemID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+struct PressureTargetID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
+struct PressureSourceID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 struct ResearchBranchID: StringIdentifier {
     var rawValue: String
     init(rawValue: String) { self.rawValue = rawValue }

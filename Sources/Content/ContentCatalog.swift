@@ -13,6 +13,8 @@ struct ContentCatalog: Sendable {
     let resources: [ResourceDef]
     let items: [ItemDef]
     let skills: [SkillDef]
+    let pressureTargets: [PressureTargetDef]
+    let pressureSources: [PressureSourceDef]
     let researchBranches: [ResearchBranchDef]
     let researchNodes: [ResearchNodeDef]
     let gambitComponents: [GambitComponentDef]
@@ -43,6 +45,10 @@ struct ContentCatalog: Sendable {
     func item(_ id: ItemID) -> ItemDef? { items.first { $0.id == id } }
     func skill(_ id: SkillID) -> SkillDef? { skills.first { $0.id == id } }
     func skill(ownedBy owner: SkillDef.Owner) -> SkillDef? { skills.first { $0.owner == owner } }
+    func pressureTarget(_ id: PressureTargetID) -> PressureTargetDef? { pressureTargets.first { $0.id == id } }
+    func pressureSource(_ id: PressureSourceID) -> PressureSourceDef? { pressureSources.first { $0.id == id } }
+    var pressureTargetsInOrder: [PressureTargetDef] { pressureTargets.sorted { $0.order < $1.order } }
+
     func researchBranch(_ id: ResearchBranchID) -> ResearchBranchDef? { researchBranches.first { $0.id == id } }
     func researchNode(_ id: ResearchNodeID) -> ResearchNodeDef? { researchNodes.first { $0.id == id } }
     func gambitComponent(_ id: GambitComponentID) -> GambitComponentDef? { gambitComponents.first { $0.id == id } }
@@ -93,6 +99,8 @@ struct ContentCatalog: Sendable {
             resources: try loadFile("resources", key: "resources", bundle: bundle),
             items: try loadFile("items", key: "items", bundle: bundle),
             skills: try loadFile("skills", key: "skills", bundle: bundle),
+            pressureTargets: try loadFile("pressure_targets", key: "targets", bundle: bundle),
+            pressureSources: try loadFile("pressure_sources", key: "sources", bundle: bundle),
             researchBranches: try loadFile("research", key: "branches", bundle: bundle),
             researchNodes: try loadFile("research", key: "nodes", bundle: bundle),
             gambitComponents: try loadFile("gambit_components", key: "components", bundle: bundle),
@@ -150,6 +158,8 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(resources.map(\.id.rawValue), label: "resource")
         try requireUniqueIDs(items.map(\.id.rawValue), label: "item")
         try requireUniqueIDs(skills.map(\.id.rawValue), label: "skill")
+        try requireUniqueIDs(pressureTargets.map(\.id.rawValue), label: "pressure target")
+        try requireUniqueIDs(pressureSources.map(\.id.rawValue), label: "pressure source")
         try requireUniqueIDs(researchBranches.map(\.id.rawValue), label: "research branch")
         try requireUniqueIDs(researchNodes.map(\.id.rawValue), label: "research node")
         try requireUniqueIDs(gambitComponents.map(\.id.rawValue), label: "gambit component")
@@ -166,6 +176,28 @@ struct ContentCatalog: Sendable {
         }
         guard !slots.isEmpty else {
             throw ContentError.danglingReference("slots.json defines no slots — books would have nowhere to put a symbol")
+        }
+
+        // A source that points at a target nobody defined would silently contribute nothing.
+        let targetIDs = Set(pressureTargets.map(\.id))
+        for source in pressureSources {
+            guard !source.contributions.isEmpty else {
+                throw ContentError.danglingReference("pressure source '\(source.id)' does nothing")
+            }
+            for contribution in source.contributions where !targetIDs.contains(contribution.target) {
+                throw ContentError.danglingReference(
+                    "pressure source '\(source.id)' pushes on unknown target '\(contribution.target)'")
+            }
+        }
+        // Only Illumination and Thermal carry a floor; a floor anywhere else would be read and
+        // then thrown away, which is worse than not writing it.
+        for source in pressureSources {
+            for contribution in source.contributions where contribution.floor != 0 {
+                guard pressureTarget(contribution.target)?.dualValued == true else {
+                    throw ContentError.danglingReference(
+                        "'\(source.id)' sets a floor on single-valued target '\(contribution.target)'")
+                }
+            }
         }
 
         // The research tree has to be a real, reachable DAG: no dangling prerequisites, no

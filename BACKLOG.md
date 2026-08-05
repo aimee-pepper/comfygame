@@ -42,7 +42,20 @@
 - [x] Loot from fights is rolled at victory and shown, instead of dropping invisibly
 - [x] Stability rebalanced to Aimee's steps curve (see `Tuning.World.stabilityTurnBands`)
 
+## Milestone 7 — The writing system (language half first, per engineering-notes-session-4 §2)
+- [x] Pressure schema: net values + opposed magnitude (gross) + modality tags, shared 0–100 scale
+- [x] Illumination worked in full as the pattern; sources, characters, implicit secondaries
+- [x] Diminishing returns on stacking; floor rule; contradiction visible when the net is nothing
+- [x] **Order-invariance test** — same sigils, any arrangement, identical world
+- [ ] Thermal, Hydrology (both fully specced in docs) — data, not code
+- [ ] Substrate, Vitality, Relief, Atmosphere, Cycle (rough specs)
+- [ ] Cross-target constraints + the energy budget (`remaining-five.md` — load-bearing, not polish)
+- [ ] Sites system (`sites-system.md`) — separate from pressures, own trigger rules
+- [ ] The page: footprints, packing, instruments, compounds
+- [ ] Unidentified compounds + confidence meter
+
 ## Milestone 6 — Ergonomics
+- [ ] Q10 banking overflow → Storehouse spillover, never lost silently (ruled, session 5 audit)
 - [ ] 44pt audit, thumb-zone action bar, haptics (optional), full acceptance-criteria pass from docs/design-brief-v0.md
 
 ## Stretch

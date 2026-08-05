@@ -58,6 +58,23 @@ enum Tuning {
         static let baseStabilityScore: Int = 100
     }
 
+    // MARK: - Pressures (the writing system's language half)
+
+    enum Pressure {
+        /// Every target speaks the same 0–100 scale, so the preview has one mental model.
+        static let scaleMaximum: Double = 100
+
+        /// Diminishing returns on stacking. Each further contribution to the same target counts for
+        /// this much of the last — three suns are brighter than one but not three times brighter.
+        /// Without it the correct play is always "write the same rune as often as it fits".
+        static let stackingFalloff: Double = 0.6   // PLACEHOLDER
+
+        /// Peak−floor spread at which a world's day and night are meaningfully different runs.
+        static let wideRangeThreshold: Double = 50 // PLACEHOLDER
+        /// …and the spread below which nothing ever changes.
+        static let flatRangeThreshold: Double = 5  // PLACEHOLDER
+    }
+
     // MARK: - Worlds
 
     enum World {

@@ -181,6 +181,8 @@ final class ContentTests: XCTestCase {
             resources: catalog.resources,
             items: catalog.items,
             skills: catalog.skills,
+            pressureTargets: catalog.pressureTargets,
+            pressureSources: catalog.pressureSources,
             researchBranches: catalog.researchBranches,
             researchNodes: catalog.researchNodes,
             gambitComponents: catalog.gambitComponents,
