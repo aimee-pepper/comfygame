@@ -36,6 +36,9 @@ struct BookProjection {
     var stabilityScore: ClosedRange<Int>
     var turnsUntilCollapse: ClosedRange<Int>
     var enemyTier: ClosedRange<Int>
+    /// How far you'll see. A stable world is often a dark one, and that trade has to be on screen
+    /// or the player is only ever shown half of what a symbol does.
+    var visionRadius: ClosedRange<Int>
     var mapWidth: Int
     var mapHeight: Int
     /// Expected share of harvests by resource, descending. Expected, not ranged — a pile of ranged
@@ -69,6 +72,7 @@ struct BookProjection {
         // Additive quantities: summing per-slot extremes gives the exact overall extremes.
         var stabilityLow = 0, stabilityHigh = 0
         var tierLow = Tuning.World.baseEnemyTier, tierHigh = Tuning.World.baseEnemyTier
+        var sightLow = Tuning.World.baseVisionRadius, sightHigh = Tuning.World.baseVisionRadius
 
         for plan in plans {
             let options = plan.chosen.map { [$0] } ?? plan.candidates
@@ -77,12 +81,16 @@ struct BookProjection {
             stabilityHigh += options.map(\.stabilityDelta).max() ?? 0
             tierLow += options.map(\.enemyTierDelta).min() ?? 0
             tierHigh += options.map(\.enemyTierDelta).max() ?? 0
+            sightLow += options.map(\.visionDelta).min() ?? 0
+            sightHigh += options.map(\.visionDelta).max() ?? 0
         }
 
         let scoreLow = BookRules.stabilityScore(delta: stabilityLow)
         let scoreHigh = BookRules.stabilityScore(delta: stabilityHigh)
         let turnsLow = BookRules.turnsAvailable(stabilityScore: scoreLow)
         let turnsHigh = BookRules.turnsAvailable(stabilityScore: scoreHigh)
+        let sightFloor = max(Tuning.World.minimumVisionRadius, sightLow)
+        let sightCeiling = max(sightFloor, sightHigh)
 
         // Exact, not ranged: you pay for what you chose, plus a flat rate per slot left to chance.
         let cost = BookRules.bindCost(
@@ -96,6 +104,7 @@ struct BookProjection {
             stabilityScore: scoreLow...max(scoreLow, scoreHigh),
             turnsUntilCollapse: turnsLow...max(turnsLow, turnsHigh),
             enemyTier: max(1, tierLow)...max(1, max(tierLow, tierHigh)),
+            visionRadius: sightFloor...sightCeiling,
             mapWidth: Tuning.World.gridWidth,
             mapHeight: Tuning.World.gridHeight,
             resourceMix: expectedResourceMix(plans),

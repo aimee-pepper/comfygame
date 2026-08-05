@@ -100,9 +100,16 @@ struct PreviewPanel: View {
     private var statsRow: some View {
         HStack(alignment: .top, spacing: 0) {
             StatCell(label: "Map", value: "\(projection.mapWidth)×\(projection.mapHeight)", icon: "square.grid.3x3")
+            StatCell(label: "Sight", value: sightText, icon: "eye")
             StatCell(label: "Danger", value: tierText, icon: "exclamationmark.triangle")
             StatCell(label: "Cost", value: costText, icon: "drop")
         }
+    }
+
+    /// Stability is often bought with sight — showing one without the other tells half the story.
+    private var sightText: String {
+        let sight = projection.visionRadius
+        return sight.isPoint ? "\(sight.lowerBound) tiles" : "\(sight.lowerBound)–\(sight.upperBound)"
     }
 
     private var tierText: String {

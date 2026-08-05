@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — every number here is a Claude-invented stopgap for v0 feel, not balance. The starter 10 are Aimee's stated set (design-brief-v0). 'stabilityDelta' is in THE SAME UNITS as the Stability headline and simply adds to it: a book starts at 100 and each symbol moves it by exactly the number shown, so Dim Sky reading '+15 stability' moves the meter by 15. Negative = the world resists being asked for this (the Mystcraft 'greed' model from research-pass-3). 'visionDelta' implements the paired-tradeoff pattern: Dim Sky costs you a ring of sight in exchange for a longer-lived world.",
+  "_note": "PLACEHOLDER — Claude-invented stopgaps for v0 feel, not balance; the starter set is Aimee's (design-brief-v0) and the whole vocabulary is being replaced by pressure sigils. TWO RULES WORTH KEEPING THROUGH THAT REWRITE: (1) 'stabilityDelta' is in the SAME UNITS as the Stability headline and simply adds to it — a book starts at 100 and a symbol reading '+18' moves it by exactly 18. (2) EVERY symbol trades on SEVERAL axes, never just one. Dim Sky buys stability with sight and with things that hunt in the dark; Plains is stability-neutral but lets you see further; Caverns hides ore in ground you can't see across. A stable world is not an empty one — it's one that costs you somewhere else. Any axis a symbol touches must be visible in the pre-bind preview.",
   "symbols": [
     {
       "id": "plains",
@@ -14,8 +14,8 @@
       },
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
-      "visionDelta": 0,
-      "stabilityDelta": -5
+      "visionDelta": 1,
+      "stabilityDelta": 0
     },
     {
       "id": "caverns",
@@ -33,8 +33,8 @@
         "ink_hound": 0.5
       },
       "enemyTierDelta": 0,
-      "visionDelta": 0,
-      "stabilityDelta": -12
+      "visionDelta": -1,
+      "stabilityDelta": -8
     },
     {
       "id": "archipelago",
@@ -52,7 +52,7 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": -15
+      "stabilityDelta": -12
     },
     {
       "id": "verdant",
@@ -70,7 +70,7 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 5
+      "stabilityDelta": 0
     },
     {
       "id": "ashen",
@@ -89,7 +89,7 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -18
+      "stabilityDelta": -15
     },
     {
       "id": "frostbound",
@@ -108,7 +108,7 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 10
+      "stabilityDelta": 12
     },
     {
       "id": "sparse_ore",
@@ -124,7 +124,7 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": -25
+      "stabilityDelta": -10
     },
     {
       "id": "rich_ore",
@@ -142,7 +142,7 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -50
+      "stabilityDelta": -60
     },
     {
       "id": "teeming_life",
@@ -162,7 +162,7 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -38
+      "stabilityDelta": -40
     },
     {
       "id": "dim_sky",
@@ -176,9 +176,9 @@
       "enemyTableModifiers": {
         "margin_wraith": 0.6
       },
-      "enemyTierDelta": 0,
+      "enemyTierDelta": 1,
       "visionDelta": -1,
-      "stabilityDelta": 15
+      "stabilityDelta": 18
     },
     {
       "id": "gilded_veins",
@@ -197,7 +197,7 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -30
+      "stabilityDelta": -35
     },
     {
       "id": "verdigris_bloom",
@@ -216,7 +216,7 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": -12
+      "stabilityDelta": -10
     },
     {
       "id": "mote_vein",
@@ -235,7 +235,7 @@
       },
       "enemyTierDelta": 2,
       "visionDelta": 0,
-      "stabilityDelta": -60
+      "stabilityDelta": -75
     }
   ]
 }

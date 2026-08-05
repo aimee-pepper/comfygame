@@ -111,9 +111,10 @@ final class BookRulesTests: XCTestCase {
     /// by.** No conversion factor, nothing to work out. This is what makes a book something you can
     /// reason about while composing rather than after paying.
     func testASymbolMovesTheHeadlineByExactlyItsPrintedNumber() throws {
+        // Deliberately mid-range, away from the 0 and 100 clamps, where the arithmetic is visible.
         var draft = BookDraft()
-        draft["terrain"] = "plains"
-        draft["biome"] = "verdant"
+        draft["terrain"] = "caverns"
+        draft["biome"] = "ashen"
         draft["bounty"] = "sparse_ore"
         draft["quirk"] = "dim_sky"
 
@@ -126,6 +127,8 @@ final class BookRulesTests: XCTestCase {
         let dimSky = try XCTUnwrap(ContentCatalog.shared.symbol("dim_sky")).stabilityDelta
         let gilded = try XCTUnwrap(ContentCatalog.shared.symbol("gilded_veins")).stabilityDelta
         XCTAssertEqual(after - before, gilded - dimSky)
+        XCTAssertGreaterThan(before, 0, "Test book must sit away from the clamps")
+        XCTAssertLessThan(before, 100)
     }
 
     /// Aimee's case: choosing stabilising symbols should read as *clearly* stable, not as a
@@ -142,9 +145,9 @@ final class BookRulesTests: XCTestCase {
         XCTAssertGreaterThan(score.lowerBound, 75, "Three stabilisers should be obviously stable")
     }
 
-    /// You can only write a perfectly stable world by asking it for nothing — and then there's
-    /// nothing in it. That's what keeps "indefinite" out of reach.
-    func testNoWritableBookReachesIndefinite() {
+    /// Stacking neutral and stabilising choices **must** be able to produce a stable world.
+    /// What that costs you is elsewhere — sight, danger, yield — never the possibility.
+    func testStackingNeutralAndStabilisingSymbolsReachesAStableWorld() {
         var best = 0
         for terrain in ContentCatalog.shared.symbols(in: "terrain") {
             for biome in ContentCatalog.shared.symbols(in: "biome") {
@@ -157,8 +160,31 @@ final class BookRulesTests: XCTestCase {
                 }
             }
         }
-        XCTAssertLessThan(best, 100, "Every book asks for something, and asking costs stability")
-        XCTAssertGreaterThan(best, 85, "…but a careful one should still be nearly perfect")
+        XCTAssertEqual(best, 100, "A careful writer can hold a world open indefinitely")
+    }
+
+    /// …and the world they get for it is not empty. A stable world pays elsewhere: in the dark, or
+    /// in what lives there. Collapsing every trade onto one axis is the failure this guards against.
+    func testAStableWorldStillCostsSomethingElse() {
+        var draft = BookDraft()
+        draft["terrain"] = "plains"
+        draft["biome"] = "frostbound"
+        draft["bounty"] = "sparse_ore"
+        draft["quirk"] = "dim_sky"
+
+        let projection = BookProjection.project(draft: draft, ownedSymbols: owned)
+        XCTAssertEqual(projection.stabilityScore.lowerBound, 100)
+
+        // It still yields things…
+        XCTAssertFalse(projection.resourceMix.filter { $0.share > 0.05 }.isEmpty,
+                       "A stable world is not an empty one")
+        // …and it charges for the privilege somewhere else.
+        let plainSight = Tuning.World.baseVisionRadius
+            + (ContentCatalog.shared.symbol("plains")?.visionDelta ?? 0)
+        XCTAssertLessThan(projection.visionRadius.upperBound, plainSight,
+                          "Dim Sky's stability is bought with sight")
+        XCTAssertGreaterThan(projection.enemyTier.lowerBound, Tuning.World.baseEnemyTier,
+                             "…and with what hunts there")
     }
 
     // MARK: Stability is measured in steps
@@ -208,8 +234,6 @@ final class BookRulesTests: XCTestCase {
 
         XCTAssertGreaterThan(calmTurns, tiles / 2, "A stabilised book should reach most of the map")
         XCTAssertLessThan(greedyTurns, tiles / 8, "A gold-hungry one should barely leave the doorstep")
-        XCTAssertLessThan(calmTurns, Tuning.World.indefiniteTurns,
-                          "Indefinite is unreachable with v0 symbols — that's what anchoring is for")
     }
 
     func testMixesAreNormalisedAndSorted() {
