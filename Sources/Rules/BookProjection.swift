@@ -74,6 +74,50 @@ struct BookProjection {
     /// `seed` is the one the next bind will use, peeked rather than consumed. Nothing reads it
     /// yet — it's threaded through so that whatever the answer to Q19 turns out to be, the
     /// projection can be *exact* about it rather than hedging with a range.
+    /// Project what's written on the page.
+    ///
+    /// Every mark is chosen, so nothing here is ranged by *composition* — the only uncertainty
+    /// left is what the world decides about the targets you said nothing about, which is rolled
+    /// from the seed and folded into the description rather than into the numbers.
+    static func project(page: Page,
+                        seed: UInt64 = 0,
+                        analysisTier: Int = Tuning.Analysis.startingTier) -> BookProjection {
+        let book = BookRules.resolveBook(page: page)
+        let written = book.allSymbolIDs
+        let sigils = BookRules.sigils(for: book)
+        let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+
+        let score = BookRules.stabilityScore(delta: BookRules.stabilityDelta(symbolIDs: written))
+        let turns = BookRules.turnsAvailable(stabilityScore: score)
+        let tier = BookRules.enemyTier(symbolIDs: written)
+        let sight = WorldRules.visionRadius(for: book)
+        let cost = book.essencePaid
+
+        let plans = written.enumerated().compactMap { index, id -> SlotPlan? in
+            guard let symbol = ContentCatalog.shared.symbol(id) else { return nil }
+            return SlotPlan(slot: SlotID(rawValue: "mark-\(index)"), chosen: symbol, candidates: [])
+        }
+
+        return BookProjection(
+            slotPlans: plans,
+            essenceCost: cost...cost,
+            stabilityScore: score...score,
+            turnsUntilCollapse: turns...turns,
+            enemyTier: tier...tier,
+            visionRadius: sight...sight,
+            mapWidth: Tuning.World.gridWidth,
+            mapHeight: Tuning.World.gridHeight,
+            worldDescription: DescriptionRules.describe(
+                readings,
+                contradictions: ContradictionRules.fired(in: sigils, readings: readings),
+                analysisTier: analysisTier
+            ),
+            dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: written),
+            resourceMix: expectedResourceMix(plans),
+            creatureMix: expectedCreatureMix(plans)
+        )
+    }
+
     static func project(draft: BookDraft,
                         ownedSymbols: Set<SymbolID>,
                         seed: UInt64 = 0,

@@ -158,6 +158,11 @@ enum StabilityBand: String, Codable, Sendable {
 /// A composed, paid-for book. Every slot is resolved here: symbols the player chose plus the
 /// random fills for slots they left empty, so the world is fully described by (book, seed).
 struct BoundBook: Codable, Equatable, Sendable {
+    /// What was written on the page, in placement order.
+    ///
+    /// This is the composition now. `symbols` below is the old slot taxonomy, kept so worlds bound
+    /// before the page existed still resolve — a bound world outlives the content that made it.
+    var written: [SymbolID] = []
     var symbols: [SlotID: SymbolID]
     /// Slots that were random-filled at bind time — the UI reveals these as surprises.
     var randomlyFilled: Set<SlotID>
@@ -169,6 +174,7 @@ struct BoundBook: Codable, Equatable, Sendable {
     /// run is in progress, that run's symbols must still count toward its decay and its spawns.
     /// Silently losing them would change a world under a player mid-visit.
     var allSymbolIDs: [SymbolID] {
+        if !written.isEmpty { return written }
         let ordered = ContentCatalog.shared.slotIDsInOrder
         let known = ordered.compactMap { symbols[$0] }
         let orphans = symbols
@@ -180,7 +186,30 @@ struct BoundBook: Codable, Equatable, Sendable {
 
     /// Slots the player chose deliberately, as opposed to left to chance.
     var chosenSymbolIDs: [SymbolID] {
-        symbols.filter { !randomlyFilled.contains($0.key) }.map(\.value)
+        if !written.isEmpty { return written }
+        return symbols.filter { !randomlyFilled.contains($0.key) }.map(\.value)
+    }
+
+    init(written: [SymbolID], essencePaid: Int) {
+        self.written = written
+        self.symbols = [:]
+        self.randomlyFilled = []
+        self.essencePaid = essencePaid
+    }
+
+    init(symbols: [SlotID: SymbolID], randomlyFilled: Set<SlotID>, essencePaid: Int) {
+        self.written = []
+        self.symbols = symbols
+        self.randomlyFilled = randomlyFilled
+        self.essencePaid = essencePaid
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        written = try c.decodeIfPresent([SymbolID].self, forKey: .written) ?? []
+        symbols = try c.decodeIfPresent([SlotID: SymbolID].self, forKey: .symbols) ?? [:]
+        randomlyFilled = try c.decodeIfPresent(Set<SlotID>.self, forKey: .randomlyFilled) ?? []
+        essencePaid = try c.decodeIfPresent(Int.self, forKey: .essencePaid) ?? 0
     }
 }
 

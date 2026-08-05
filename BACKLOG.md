@@ -63,10 +63,12 @@
 - [x] Three hands — charcoal 4-6 cells, pencil 2-3, fountain pen always 1x1
 - [x] Compound footprints — ceil(sum x 0.6), always worth learning, never free
 - [x] Order invariance held at the page layer: position is packing, never meaning
-- [ ] **The Writing Desk still uses the slot UI.** The page isn't wired into book-writing yet —
-      that means a spatial place/move/remove UI, and replacing BookDraft's slots with a Page.
-- [ ] Page size as a permanent (Reality/base) unlock
-- [ ] Hands as owned instruments, so which hand you can write in is progression
+- [x] **The Writing Desk writes on the page.** Palette + grid; tap to place, tap to rub out.
+      Books bind from what's written, not from slots.
+- [ ] Drag to place and to move an existing mark (currently tap-to-place, tap-to-erase)
+- [ ] Page size as a permanent (Reality/base) unlock — `base.page` carries it, nothing grants it
+- [ ] Hands as owned instruments — `base.ownedHands` carries it, nothing grants the finer two
+- [ ] Retire the slot taxonomy entirely (`setSymbol` writes through to the page as a shim)
 - [ ] The Wild rune — saying "leave this to chance" deliberately
 
 ## Analysis — the third progression axis (decisions-session-8)

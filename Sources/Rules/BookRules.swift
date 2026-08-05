@@ -17,6 +17,17 @@ enum BookRules {
     /// 5): a chance slot that could only return things you already knew is a shuffle, not a
     /// surprise. Drawing it does not teach you the symbol — you write the world, you don't learn
     /// the word (Q16). The candidate list is sorted, so the same seed always produces the same book.
+    /// Binds what is written on the page.
+    ///
+    /// No slots, no per-slot random fill: the page holds as many marks as you could fit, and what
+    /// you *didn't* say is rolled at resolution by `PressureRules.rollUnwritten`. Under-specifying
+    /// is still a surprise — it just isn't counted in slots any more.
+    static func resolveBook(page: Page) -> BoundBook {
+        var book = BoundBook(written: page.symbolIDs, essencePaid: 0)
+        book.essencePaid = bindCost(of: book)
+        return book
+    }
+
     static func resolveBook(draft: BookDraft, ownedSymbols: Set<SymbolID>, seed: UInt64) -> BoundBook {
         var rng = SeededRNG(seed: seed).derived(0xB00C)
         var symbols: [SlotID: SymbolID] = [:]

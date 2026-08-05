@@ -31,6 +31,18 @@ struct BaseState: Codable, Equatable, Sendable {
 
     /// The book currently being composed at the Writing Desk. Survives a force-quit mid-compose.
     var bookDraft: BookDraft = BookDraft()
+    /// The page being written. **This is the composition surface** — the slot draft above is the
+    /// old taxonomy, kept only so a save written before the page existed still loads.
+    ///
+    /// Page size is *capability*: what you're able to write, as opposed to what you can afford
+    /// today. Growing it is a permanent unlock; essence is still the per-bind consumable.
+    var page: Page = Page()
+    /// Which hands the player owns. Everyone starts with charcoal, and better instruments let you
+    /// say the same things in less space — never new things.
+    var ownedHands: Set<Hand> = [.crude]
+
+    /// The finest hand available. Marks are written in it by default.
+    var bestHand: Hand { ownedHands.max() ?? .crude }
 
     /// The companion's gambit list. Edited on the Party screen, out of combat only.
     var companion: CompanionState = CompanionState()
@@ -106,6 +118,8 @@ struct BaseState: Codable, Equatable, Sendable {
         completedResearch = try container.decodeIfPresent(Set<ResearchNodeID>.self, forKey: .completedResearch) ?? []
         stations = try container.decodeIfPresent([StationID: StationState].self, forKey: .stations) ?? [:]
         bookDraft = try container.decodeIfPresent(BookDraft.self, forKey: .bookDraft) ?? BookDraft()
+        page = try container.decodeIfPresent(Page.self, forKey: .page) ?? Page()
+        ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
         companion = try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0

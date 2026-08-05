@@ -69,6 +69,7 @@
 		983452CD1EE2126ECB5B1973 /* HarnessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638830B7B5223E3065252FC /* HarnessView.swift */; };
 		9A1C08888E52028E0EC6D53C /* slots.json in Resources */ = {isa = PBXBuildFile; fileRef = A38483F6A49BD38B618407D8 /* slots.json */; };
 		A30BFB516414E49CB79270EF /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9142092437E5652D87187DF8 /* Migrations.swift */; };
+		A7B958AF227E4AD7A6E2E900 /* PageGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D5618B6B6F36DB62CD836B /* PageGridView.swift */; };
 		A901EE2297DFB40E48663457 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFBF656255758DFA8E45232 /* Theme.swift */; };
 		AA467E2DFFB389EFACA3B124 /* sites.json in Resources */ = {isa = PBXBuildFile; fileRef = 77957A7595BE1E25AC8CF406 /* sites.json */; };
 		AC3C0F06CB2BD3D9A9917BA1 /* PageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7811775C7058B692E07EB1 /* PageTests.swift */; };
@@ -132,6 +133,7 @@
 		3464FCF84292D7835460EDEE /* GameActions+Combat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+Combat.swift"; sourceTree = "<group>"; };
 		346EEEC616B8EBFE291C4A79 /* BaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseView.swift; sourceTree = "<group>"; };
 		36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPanel.swift; sourceTree = "<group>"; };
+		39D5618B6B6F36DB62CD836B /* PageGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageGridView.swift; sourceTree = "<group>"; };
 		3CD59EA0991C7AFB32B3129C /* BookbinderTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BookbinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		40DDEB42C7E2856E98352341 /* GameActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameActions.swift; sourceTree = "<group>"; };
 		433D570D177BA9841C75DCF9 /* Bookbinder.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Bookbinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -272,6 +274,7 @@
 				346EEEC616B8EBFE291C4A79 /* BaseView.swift */,
 				BE933E91275B1FF990B69BAA /* EncounterView.swift */,
 				CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */,
+				39D5618B6B6F36DB62CD836B /* PageGridView.swift */,
 				36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */,
 				1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */,
 				D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */,
@@ -566,6 +569,7 @@
 				CF22F5AA092E017612B1124E /* LootDecisionView.swift in Sources */,
 				A30BFB516414E49CB79270EF /* Migrations.swift in Sources */,
 				B3127BCE033E785E4B3EA912 /* Page.swift in Sources */,
+				A7B958AF227E4AD7A6E2E900 /* PageGridView.swift in Sources */,
 				F9A397FEF26E5A194578909E /* PageRules.swift in Sources */,
 				87DF0AB9EB7842560291C8A3 /* PressureModels.swift in Sources */,
 				CC74E6778320FB4F70CFDB3F /* PressureRules.swift in Sources */,

@@ -53,15 +53,72 @@ struct PageCell: Codable, Equatable, Hashable, Sendable {
 /// resolving permuted pages and requiring identical readings.
 struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
     var id: InstanceID
-    var sigil: Sigil
+    var content: MarkContent
     var hand: Hand
     var origin: PageCell
-    /// Which authored shape this rune draws as. Stored rather than recomputed so an existing page
+    /// Which authored shape this mark draws as. Stored rather than recomputed so an existing page
     /// keeps its layout even if the shape catalogue is re-authored around it.
     var shapeID: String
 
+    init(id: InstanceID, content: MarkContent, hand: Hand, origin: PageCell, shapeID: String) {
+        self.id = id
+        self.content = content
+        self.hand = hand
+        self.origin = origin
+        self.shapeID = shapeID
+    }
+
+    /// Convenience for the atomic case, which is most of the tests and eventually most of the game.
+    init(id: InstanceID, sigil: Sigil, hand: Hand, origin: PageCell, shapeID: String) {
+        self.init(id: id, content: .rune(sigil), hand: hand, origin: origin, shapeID: shapeID)
+    }
+
     var shape: RuneShapeDef? { ContentCatalog.shared.runeShape(shapeID) }
     var cells: [PageCell] { (shape?.offsets ?? [PageCell(column: 0, row: 0)]).map { origin + $0 } }
+
+    /// What this mark says. A compound says several things at once — that's what makes it a
+    /// compound rather than an abbreviation.
+    var sigils: [Sigil] {
+        switch content {
+        case .rune(let sigil):
+            return [sigil]
+        case .compound(let symbolID):
+            guard let symbol = ContentCatalog.shared.symbol(symbolID) else { return [] }
+            return symbol.expandsTo.enumerated().map { index, component in
+                Sigil(id: InstanceID(rawValue: id.rawValue &* 31 &+ UInt64(index)),
+                      source: component.source, target: component.target,
+                      intensity: component.intensity, negatedTargets: component.negates)
+            }
+        }
+    }
+
+    var symbolID: SymbolID? {
+        if case .compound(let id) = content { id } else { nil }
+    }
+
+    var displayName: String {
+        switch content {
+        case .rune(let sigil): sigil.displayText
+        case .compound(let id): ContentCatalog.shared.symbol(id)?.name ?? id.rawValue
+        }
+    }
+
+    var icon: String {
+        switch content {
+        case .rune: "circle.hexagongrid"
+        case .compound(let id): ContentCatalog.shared.symbol(id)?.icon ?? "questionmark"
+        }
+    }
+}
+
+/// What is actually written in a mark.
+///
+/// A **compound** is one glyph meaning what several runes mean together, at a smaller footprint
+/// (rune spec §9). Every v0 symbol is one, which is what lets the page carry the existing
+/// vocabulary without any of its numbers being re-tuned.
+enum MarkContent: Codable, Equatable, Sendable {
+    case rune(Sigil)
+    case compound(SymbolID)
 }
 
 /// What the player is capable of writing, as opposed to what they can afford today.
@@ -81,6 +138,15 @@ struct Page: Codable, Equatable, Sendable {
         self.runes = runes
     }
 
+    /// Tolerant, per the policy in `Migrations.swift`. Caught by the save-tolerance tripwire
+    /// before it shipped, which is what that test is for.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        width = try c.decodeIfPresent(Int.self, forKey: .width) ?? Tuning.Page.startingWidth
+        height = try c.decodeIfPresent(Int.self, forKey: .height) ?? Tuning.Page.startingHeight
+        runes = try c.decodeIfPresent([PlacedRune].self, forKey: .runes) ?? []
+    }
+
     var capacity: Int { width * height }
     var usedCells: Int { runes.reduce(0) { $0 + $1.cells.count } }
     var freeCells: Int { capacity - usedCells }
@@ -95,7 +161,11 @@ struct Page: Codable, Equatable, Sendable {
     ///
     /// Sorted by id rather than by position, so resolution cannot accidentally come to depend on
     /// layout. Reading order is not meaning.
-    var sigils: [Sigil] { runes.sorted { $0.id.rawValue < $1.id.rawValue }.map(\.sigil) }
+    var sigils: [Sigil] { runes.sorted { $0.id.rawValue < $1.id.rawValue }.flatMap(\.sigils) }
+
+    /// The compounds written here, in the order they were placed. This is the v0 vocabulary, and
+    /// every existing rule — stability, yields, spawn tables — still reads it.
+    var symbolIDs: [SymbolID] { runes.compactMap(\.symbolID) }
 
     func rune(at cell: PageCell) -> PlacedRune? {
         runes.first { $0.cells.contains(cell) }

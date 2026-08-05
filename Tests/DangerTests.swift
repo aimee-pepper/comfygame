@@ -130,7 +130,7 @@ final class DangerTests: XCTestCase {
     func testMiasmaCostsYouHealthEveryTurn() {
         let store = GameStore(io: .temporary(name: "danger-\(UUID().uuidString)"))
         store.mutate("test: fund") { $0.base.essence = 500 }
-        store.setSymbol("miasma_rune", in: "quirk")
+        store.write("miasma_rune")
         store.bindAndDepart()
 
         guard let run = store.state.worlds.activeRun else { return XCTFail("couldn't depart") }

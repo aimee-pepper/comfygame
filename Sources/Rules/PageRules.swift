@@ -46,6 +46,43 @@ enum PageRules {
         }
     }
 
+    /// The shape a **compound** draws as: the closest authored shape to its computed footprint,
+    /// so a compound really is smaller than spelling it out but still takes a real, awkward space.
+    static func shape(forCompound symbol: SymbolDef, hand: Hand) -> RuneShapeDef? {
+        let candidates = ContentCatalog.shared.runeShapes(in: hand)
+        guard !candidates.isEmpty else { return nil }
+        let wanted = footprint(of: symbol, hand: hand)
+        // Nearest footprint, ties broken by id so the same compound always draws the same way.
+        return candidates.min { lhs, rhs in
+            (abs(lhs.footprint - wanted), lhs.id) < (abs(rhs.footprint - wanted), rhs.id)
+        }
+    }
+
+    /// Writes a compound onto the page, or refuses because it doesn't fit.
+    static func place(_ symbol: SymbolDef, hand: Hand, at origin: PageCell, on page: Page) -> Page? {
+        guard let shape = shape(forCompound: symbol, hand: hand),
+              canPlace(shape: shape, at: origin, on: page)
+        else { return nil }
+        var result = page
+        result.runes.append(PlacedRune(id: InstanceID(rawValue: nextMarkID(on: page)),
+                                       content: .compound(symbol.id),
+                                       hand: hand, origin: origin, shapeID: shape.id))
+        return result
+    }
+
+    static func placeAnywhere(_ symbol: SymbolDef, hand: Hand, on page: Page) -> Page? {
+        guard let shape = shape(forCompound: symbol, hand: hand),
+              let origin = validOrigins(for: shape, on: page).first
+        else { return nil }
+        return place(symbol, hand: hand, at: origin, on: page)
+    }
+
+    /// Identity for a newly written mark. Monotonic within a page, so placement order is stable
+    /// and a save round-trips to the same page.
+    private static func nextMarkID(on page: Page) -> UInt64 {
+        (page.runes.map(\.id.rawValue).max() ?? 0) + 1
+    }
+
     /// Writes a rune, or refuses. Returns nil when it doesn't fit, so callers can't half-place.
     static func place(_ sigil: Sigil, hand: Hand, at origin: PageCell, on page: Page) -> Page? {
         guard let shape = shape(for: sigil.source, hand: hand),
@@ -92,9 +129,15 @@ enum PageRules {
     /// A better hand should never cost you a page you'd already laid out, so a refined redraw that
     /// won't sit at the old origin is relocated rather than refused.
     static func redraw(_ id: InstanceID, in hand: Hand, on page: Page) -> Page? {
-        guard let existing = page.runes.first(where: { $0.id == id }),
-              let shape = shape(for: existing.sigil.source, hand: hand)
-        else { return nil }
+        guard let existing = page.runes.first(where: { $0.id == id }) else { return nil }
+        let shape: RuneShapeDef?
+        switch existing.content {
+        case .rune(let sigil):
+            shape = self.shape(for: sigil.source, hand: hand)
+        case .compound(let symbolID):
+            shape = ContentCatalog.shared.symbol(symbolID).flatMap { self.shape(forCompound: $0, hand: hand) }
+        }
+        guard let shape else { return nil }
 
         let without = remove(id, from: page)
         let origin = canPlace(shape: shape, at: existing.origin, on: without)
@@ -103,7 +146,7 @@ enum PageRules {
         guard let origin else { return nil }
 
         var result = without
-        result.runes.append(PlacedRune(id: id, sigil: existing.sigil, hand: hand,
+        result.runes.append(PlacedRune(id: id, content: existing.content, hand: hand,
                                        origin: origin, shapeID: shape.id))
         return result
     }

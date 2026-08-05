@@ -208,4 +208,72 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(reloaded, page)
         XCTAssertEqual(reloaded.sigils, page.sigils)
     }
+
+    // MARK: The desk writes on the page
+
+    @MainActor
+    func testWritingOnThePageIsWhatComposesTheBook() {
+        let store = GameStore(io: .temporary(name: "desk-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 500 }
+
+        XCTAssertTrue(store.write("plains"))
+        XCTAssertTrue(store.write("frostbound"))
+        XCTAssertEqual(store.state.base.page.symbolIDs, ["plains", "frostbound"])
+
+        store.bindAndDepart()
+        let book = store.state.worlds.activeRun?.book
+        XCTAssertEqual(book?.allSymbolIDs, ["plains", "frostbound"],
+                       "the world was bound from something other than the page")
+    }
+
+    @MainActor
+    func testThePageRefusesWhatWillNotFit() {
+        let store = GameStore(io: .temporary(name: "desk-\(UUID().uuidString)"))
+        store.mutate("test: a cramped page") { $0.base.page = Page(width: 2, height: 2) }
+
+        var written = 0
+        for symbol in ContentCatalog.shared.symbols where store.write(symbol.id) { written += 1 }
+        XCTAssertGreaterThan(written, 0, "nothing fitted at all")
+        XCTAssertLessThan(written, ContentCatalog.shared.symbols.count,
+                          "a 2x2 page accepted the entire vocabulary")
+        XCTAssertLessThanOrEqual(store.state.base.page.usedCells, 4)
+    }
+
+    @MainActor
+    func testErasingAMarkTakesItOutOfTheBook() {
+        let store = GameStore(io: .temporary(name: "desk-\(UUID().uuidString)"))
+        store.write("plains")
+        let mark = store.state.base.page.runes[0]
+        store.erase(mark.id)
+        XCTAssertTrue(store.state.base.page.symbolIDs.isEmpty)
+        XCTAssertEqual(store.bookProjection.stabilityScore.lowerBound,
+                       BookRules.stabilityScore(delta: 0))
+    }
+
+    @MainActor
+    func testABlankPageStillBinds() {
+        // Everything you don't say, the world decides. Under-specification is a surprise, not an
+        // error — and with no slots left, a blank page is the extreme case of it.
+        let store = GameStore(io: .temporary(name: "desk-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 500 }
+        XCTAssertTrue(store.canBindAndDepart)
+        store.bindAndDepart()
+        XCTAssertNotNil(store.state.worlds.activeRun)
+    }
+
+    @MainActor
+    func testAHalfWrittenPageSurvivesAForceQuit() throws {
+        let io = SaveFileIO.temporary(name: "page-kill-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        do {
+            let store = GameStore(io: io)
+            store.write("plains")
+            store.write("frostbound")
+            store.flushNow()
+        }
+        let resumed = GameStore(io: io)
+        XCTAssertEqual(resumed.state.base.page.symbolIDs, ["plains", "frostbound"])
+        XCTAssertEqual(resumed.state.base.page.runes.map(\.origin),
+                       resumed.state.base.page.runes.map(\.origin))
+    }
 }

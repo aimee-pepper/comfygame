@@ -7,6 +7,8 @@ import SwiftUI
 struct WritingDeskView: View {
     @EnvironmentObject private var store: GameStore
     @State private var editingSlot: SlotID?
+    /// The mark the next tap on the page will write.
+    @State private var pending: SymbolID?
 
     private var state: GameState { store.state }
     private var projection: BookProjection { store.bookProjection }
@@ -15,9 +17,10 @@ struct WritingDeskView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 16) {
-                    slotGrid
+                    PageGridView(pending: pending)
+                    palette
                     PreviewPanel(projection: projection, discovery: state.reality.discovery)
-                    if !projection.randomSlots.isEmpty { chanceNote }
+                    if state.base.page.runes.isEmpty { blankPageNote }
                 }
                 .padding(16)
                 .padding(.bottom, 8)
@@ -29,8 +32,8 @@ struct WritingDeskView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Clear") { store.clearBookDraft() }
-                    .disabled(state.base.bookDraft.filledCount == 0)
+                Button("Clear") { store.clearPage() }
+                    .disabled(state.base.page.runes.isEmpty)
             }
         }
         .sheet(item: $editingSlot) { slot in
@@ -42,7 +45,60 @@ struct WritingDeskView: View {
         }
     }
 
-    // MARK: Slots
+    // MARK: The palette
+
+    /// What you know how to write. Selecting one arms the page; tapping a cell places it.
+    ///
+    /// Deliberately shows the footprint: what a mark *costs in space* is the decision the page
+    /// exists to create, and it changes with the hand you're writing in.
+    private var palette: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("What you can write")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 8)], spacing: 8) {
+                ForEach(ownedSymbols) { symbol in
+                    let fits = store.canWrite(symbol.id)
+                    Button {
+                        pending = (pending == symbol.id) ? nil : symbol.id
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: symbol.icon)
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(symbol.name).font(.caption.weight(.medium)).lineLimit(1)
+                                Text("\(store.footprint(of: symbol.id)) cells")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 0)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(minHeight: 44)
+                        .padding(.horizontal, 8)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(pending == symbol.id ? .accentColor : .secondary)
+                    .opacity(fits ? 1 : 0.45)
+                    .disabled(!fits)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var ownedSymbols: [SymbolDef] {
+        ContentCatalog.shared.symbols
+            .filter { state.base.ownedSymbols.contains($0.id) }
+            .sorted { $0.name < $1.name }
+    }
+
+    private var blankPageNote: some View {
+        Text("A blank page still binds. Everything you don't say, the world decides for itself.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: Slots — the old taxonomy, no longer the composition surface
 
     private var slotGrid: some View {
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
