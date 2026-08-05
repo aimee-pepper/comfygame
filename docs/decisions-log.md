@@ -36,3 +36,39 @@ Newest entries win over older brief text where they conflict. "Locked" = Aimee's
 
 **Base**
 - Base is a hub of subscreens with unlockable buildings over time (blacksmith for training/crafting/upgrading gear, tavern, distillery, etc.). Locked direction.
+
+
+## 2026-08-04 — Session 2 (answers + redesign heads-up)
+## ⚠️ Heads-up: world composition redesign is coming
+
+**Do not over-invest in the current symbol semantics.** The Terrain / Biome / Bounty / Quirk taxonomy from the v0 brief is a placeholder and will be replaced.
+
+**Where it's going:** sigils will describe **environmental pressures** (temperature, light level, humidity, productivity, predation pressure, terrain openness, substrate, etc. — final axis list still being designed). Pressures shift **probability distributions** over creature and flora trait axes; creatures are then generated part-by-part from those distributions, and coherent part combinations resolve into recognizable identities (e.g. slim build + fangs + dark coloration = an ambusher). Players never specify creature traits directly — only world conditions. Loot derives from the same trait vectors, and recipes will ask for material *properties* rather than named items.
+
+**What this means for you now:**
+- Make book slot **count and slot types fully data-driven** — no hardcoded four-type assumption anywhere (storage, UI, validation, save format).
+- Don't polish the starter symbol set; it will be rewritten.
+- **Unaffected and safe to keep building:** grid generation, movement, fog of war, stability decay/crumble/collapse, banking, encounters, gambits, base/economy scaffolding. Only symbol *semantics* change.
+- Keep creature/resource definitions data-driven for the same reason.
+
+Nothing is blocked. Continue Milestone 3 as planned.
+
+---
+
+## Answers to `questions-for-aimee.md`
+
+**1. Cost of random-filled slots — NEITHER A NOR B.** Empty slots cost a **flat cheap rate** regardless of what rolls (a discount, not free). Rationale: free makes bulk-random the correct broke strategy forever; full price kills the pressure valve. This encodes a design principle — **precision costs, serendipity is cheap** — so leaving slots empty stays attractive even late-game. Keep quoting the worst case on the Bind button, but quote the actual (discounted) charge.
+
+**2. The fifth book slot — DEFERRED, and the question dissolves.** It's an artifact of the placeholder taxonomy. Action: make slot count and types data-driven (see redesign note above); leave the Constellation "+1 slot" unlock's meaning unresolved until the pressure axes are settled. Don't build against a four-type model.
+
+**3. Starter symbols, ten vs. eleven — SHIP ELEVEN.** The brief's "10" was a miscount, not a design intent. Don't polish the set; it's being rewritten.
+
+**4. Bestiary survives reset — YES, confirmed.** Creature knowledge lives in the Reality layer permanently. Knowledge is never taken back; the silhouette→revealed collection is a lifetime record.
+
+**5. Motes safe from collapse — NO, keep them losable.** They're the rare currency and collapse is the one moment greed should hurt. If it playtests as too brutal, the fix is **dropping fewer motes**, not making them immune.
+
+**6. Entry portal also works as an exit — YES, keep as built.** One-way entry under a decay clock is the opposite of sleep-friendly. Retreat should cost **turns**, which is already the currency instability taxes.
+
+**7. Game name — Aimee's call, still open.** "Bookbinder" remains the placeholder. Note that "binding" vocabulary may get crowded once sigils/pressures are the core language.
+
+**8. Satchel size — DECOUPLE from Storehouse.** Satchel should be **smaller** than storage and separately upgradeable. Two distinct pressures: carry limit forces "keep or leave it" decisions in-world; storage limit forces "hoard or refine" decisions at home. Two upgrade paths.
