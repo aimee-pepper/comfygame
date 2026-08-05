@@ -65,11 +65,25 @@
 - [x] Order invariance held at the page layer: position is packing, never meaning
 - [x] **The Writing Desk writes on the page.** Palette + grid; tap to place, tap to rub out.
       Books bind from what's written, not from slots.
-- [ ] Drag to place and to move an existing mark (currently tap-to-place, tap-to-erase)
-- [ ] Page size as a permanent (Reality/base) unlock — `base.page` carries it, nothing grants it
+- [x] Lift and reposition a placed mark; arranging is free until you bind (session 10 §3)
+- [x] The page never grows — that was a Claude invention, corrected in session 10 §1
+- [ ] Exact fixed page dimensions — needs playtesting on device (session 10 open #3)
 - [ ] Hands as owned instruments — `base.ownedHands` carries it, nothing grants the finer two
+- [ ] Compound assembly popup, unlocked in the skill tree (session 10 §4)
+- [ ] Open: refuse an over-hanging placement, or allow it and highlight the overflow? (currently
+      refuses, which is the conservative reading of session 10 open #1)
 - [ ] Retire the slot taxonomy entirely (`setSymbol` writes through to the page as a shim)
 - [ ] The Wild rune — saying "leave this to chance" deliberately
+
+## From the built-vs-specced audit
+- [x] Bug 1 — the desk no longer describes what the world rolls, only what was written
+- [x] Bug 2 — contradictions now cost stability instead of being display-only
+- [x] Bug 3 — the `indefiniteTurns` sentinel no longer reaches the player as "~9999 turns"
+- [x] Bug 4 — Q17 actioned: ruins pay knowledge and objects, never currency, and are never empty
+- [ ] Pressure sources: 41 of 79 built
+- [ ] Danger runes are old-taxonomy symbols rather than pressure sigils
+- [ ] Creature traits — blocks materials, crafting and the specimen tier
+- [ ] The search loop (diaries, pages, Library, hint pages) — independent, buildable today
 
 ## Analysis — the third progression axis (decisions-session-8)
 - [x] Analysis tiers stored in Reality; description always describes, attribution is gated

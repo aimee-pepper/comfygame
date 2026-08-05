@@ -97,6 +97,12 @@ struct PreviewPanel: View {
 
     private var holdText: String {
         let turns = projection.turnsUntilCollapse
+        // `indefiniteTurns` is a sentinel, not a count. Printing it gave the player "holds ~9999
+        // turns", which reads as a bug rather than as a world that will outlast them.
+        if turns.lowerBound >= Tuning.World.indefiniteTurns { return "holds indefinitely" }
+        if turns.upperBound >= Tuning.World.indefiniteTurns {
+            return "holds ~\(turns.lowerBound) turns, perhaps indefinitely"
+        }
         return turns.isPoint
             ? "holds ~\(turns.lowerBound) turns"
             : "holds ~\(turns.lowerBound)–\(turns.upperBound) turns"

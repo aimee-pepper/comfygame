@@ -1,52 +1,44 @@
-# Handoff — 10 docs
+# Handoff — 7 docs. Nothing here has landed yet.
 
-## Important: `[PROPOSAL]` was being treated too casually
+Verified against commit `0a84023` ("Write books on the page"). Sessions 1–9 of the decisions log are in the repo; **everything below is new to you.**
 
-Much of what's in `docs/` was written by the designer Claude, tagged `[PROPOSAL]`, and **never reviewed by Aimee**. Only items attributed to Aimee in `decisions-log.md` are decided. Everything else is provisional and under active review — see `decisions-session-7.md` for the full pending list, in the order Aimee is working through it.
+## ⚠️ Three corrections to the page grid you just built
 
-**Don't deepen or optimise anything on that list.** Build against it where you must, keep it behind data and interfaces.
+The grid landed before session 10 reached you. Three things need changing:
 
-## Decisions (append to `decisions-log.md`)
+1. **The page NEVER grows.** `Tuning.Page.startingWidth/Height` implies a growth model — there isn't one. `writing-system-rune-spec.md` §3 previously said "expanded by permanent unlocks"; **that was Claude's invention and it was wrong**, and it contradicts the instrument ladder. Corrected spec is in this bundle. One fixed page, forever; progression is writing *smaller* on it. Suggest renaming to `Page.width/height` so nothing reintroduces growth later.
+2. **Placed runes must be pick-up-and-moveable.** Currently tap-to-place and tap-to-rub-out only. Arranging should be **exploratory and free** — moving a placed rune costs nothing, and you can shuffle the page as much as you like before binding.
+3. **A rune that won't fit should GLOW RED and not be counted** — not be greyed out and disabled in the palette. You should be able to reach for it and see it refuse, rather than have it quietly unavailable.
 
-| File | Contents |
-|---|---|
-| `decisions-session-6.md` | Q17 site rewards by category · Q18 world-description panel · Q19 rich places are *guarded*, plus a scheduled derived-instability migration |
-| `decisions-session-7.md` | **Search loop corrected** (no hop counts; pages scale with signature complexity; one page one unlock; all pages from diaries; weighted placement with fallback; Library hint pages) · **anchoring via three routes** · the pending-review list |
+Also: **the page must fit on one screen, no scrolling.** 6×6 is fine if it fits comfortably on device with the projection visible.
 
-## Reference — decided
-
-| File | Contents |
-|---|---|
-| `contradiction-danger-spec.md` | Contradiction as an **enumerated catalogue**, never computed from magnitudes · stacking · the danger↔time axis · **Peace and danger runes** (danger runes are the release valve that makes greedy worlds viable) · the live world-description panel with red/green underlining |
-
-## Reference — schema decided, numbers provisional
+## New decision docs
 
 | File | Contents |
 |---|---|
-| `pressure-model.md` | All eight targets in one document. Illumination is the worked pattern — read it first. Also holds the cross-target constraints and the energy budget. |
+| `decisions-session-8.md` | **"Opacity was Mystcraft's failure" is struck from all docs** — opacity is the joy; explanation must not be front-loaded · secondaries are **discovered, not printed on runes** · **analysis is a third progression axis** · **instruments**: field instruments measure worlds you stand in, the page lens predicts and only shows what you've already measured, readings are **permanent knowledge** |
+| `decisions-session-9.md` | **The Atlas** — it anchored the realms, was stolen and destroyed, and that caused the sundering. Rebuilding it **is** the great work · progress measured in **realms re-anchored** · **the cult** · **FINALITY RULE (a pillar): nothing the player has completed can ever be reversed** |
+| `decisions-session-10.md` | The three page-grid corrections above, plus: **compound glyphs are assembled in a popup** inside the page-writing menu, and **assembly is unlocked in the skill tree** |
 
-## Reference — provisional
-
-| File | Notes |
-|---|---|
-| `writing-system-rune-spec.md` | 149 runes; partially audited. **Replaces the copy in the repo.** |
-| `sites-system.md` | Categories, trigger rules |
-| `materials-crafting-spec.md` | Property schema, trait-derived drops, property-based recipes |
-| `narrative-systems-spec.md` | **§1–3 superseded** by session 7 and marked as such in the file. Named places and the great work remain provisional. |
-| `companions-base-anchoring-spec.md` | **§3 superseded** by session 7 and marked as such. Rest provisional. |
-
-## Report
+## Audits
 
 | File | Contents |
 |---|---|
-| `design-audit-session-5.md` | Repo audit against decisions, plus rulings on Q10, Q11, manual override, satchel, rarity |
+| `full-audit-built-vs-specced.md` | **Replaces `design-audit-session-5.md`'s scope.** That audit only checked decided rules and missed that half the specced game doesn't exist. This one has the built-vs-specced table, five bugs, and the dependency order. |
+| `audit-claude-invented-assumptions.md` | Things the designer Claude **stated as fact that Aimee never decided**, tiered by how much rests on them. The page-size error was one of these. Tier 3 items should be re-tagged as proposals in the docs. |
 
-## Suggested working order
+## Updated
 
-Build what rests on decided ground: **pressure model core → world-description panel → contradiction catalogue → Peace/danger runes → the page as a spatial grid → Library, diaries, hint pages → anchoring**.
+| File | Change |
+|---|---|
+| `writing-system-rune-spec.md` | §3 corrected: fixed page, one screen, runes moveable. **Replaces the repo copy.** |
+| `narrative-systems-spec.md` | §5 marked superseded by session 9. |
 
-Defer: the great work, companion wants, sustain economy, reality reset, materials depth. All sit on pending-review items.
+## Bugs from the audit, in priority order
 
-## What we'd like back
+1. **The description reveals rolled content** — chance-filled slots are spoiled before departure. Violates a locked decision.
+2. **Contradictions cost nothing** — `ContradictionRules.penalty` is written, tested, and never read by the stability headline. Hence *Green in the dark* alongside Stability 100.
+3. **`holds ~9999 turns`** — sentinel leaking into the UI.
+4. **Q17 not actioned** — ruins still pay essence (1 / 4 / 3). Should be 0; landmarks and living sites keep theirs.
 
-Where in the pending list would a later change be **expensive**? Anything that would force a save migration or a rewrite should be flagged now, while it's cheap — that's what determines what Aimee reviews first.
+Note on rolling unwritten targets: **that behaviour is correct and stays.** The problem was only ever that four slots couldn't cover eight targets — which the page grid fixes.

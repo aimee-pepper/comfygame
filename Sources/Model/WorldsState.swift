@@ -73,6 +73,7 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// preview is allowed to show it. See questions-for-design Q19.
     var effectiveStabilityScore: Int { BookRules.stabilityScore(of: book) }
 
+
     var decayPerTurn: Double { BookRules.decayPerTurn(stabilityScore: effectiveStabilityScore) }
     /// Player turns taken this run. The only clock the game has.
     var turnsTaken: Int = 0

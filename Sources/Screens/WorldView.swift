@@ -233,7 +233,7 @@ private struct StabilityHeader: View {
                     .font(.footnote)
                     .foregroundStyle(colour)
                 Spacer()
-                Text("~\(turnsLeft) turns left")
+                Text(turnsLeftText)
                     .font(.footnote.monospacedDigit())
                     .foregroundStyle(.secondary)
             }
@@ -252,7 +252,13 @@ private struct StabilityHeader: View {
     }
 
     private var turnsLeft: Int {
-        Int((run.stability / run.decayPerTurn).rounded(.down))
+        guard run.decayPerTurn > 0 else { return Tuning.World.indefiniteTurns }
+        return Int((run.stability / run.decayPerTurn).rounded(.down))
+    }
+
+    /// A world that isn't decaying has no countdown — saying so beats printing the sentinel.
+    private var turnsLeftText: String {
+        turnsLeft >= Tuning.World.indefiniteTurns ? "steady" : "~\(turnsLeft) turns left"
     }
 
     private var bandText: String {

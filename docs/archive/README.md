@@ -19,6 +19,7 @@ archived one.
 | `decisions-session-7.md` | `decisions-log.md` | ” |
 | `decisions-session-8.md` | `decisions-log.md` | ” |
 | `decisions-session-9.md` | `decisions-log.md` | ” |
+| `decisions-session-10.md` | `decisions-log.md` | ” |
 | `questions-for-aimee.md` | `questions-for-design.md` | All eight answered; the plain-language pass was for one round of questions |
 | `engineering-notes-session-2.md` | the code | Implementation reports; what they describe is built and tested |
 | `engineering-notes-session-3.md` | the code | ” |

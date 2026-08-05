@@ -13,6 +13,8 @@ struct PageGridView: View {
     /// What tapping an empty cell will write, if anything.
     let pending: SymbolID?
     var onPlaced: () -> Void = {}
+    /// The mark currently picked up. Tapping a cell puts it down there.
+    @State private var lifted: InstanceID?
 
     private var page: Page { store.state.base.page }
 
@@ -53,7 +55,17 @@ struct PageGridView: View {
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(.secondary)
             Spacer()
-            if let pending, let symbol = ContentCatalog.shared.symbol(pending) {
+            if let lifted, let mark = page.runes.first(where: { $0.id == lifted }) {
+                Text("Holding \(mark.displayName.lowercased())")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Rub out", role: .destructive) {
+                    store.erase(lifted)
+                    self.lifted = nil
+                }
+                .font(.caption)
+                .frame(minHeight: 44)
+            } else if let pending, let symbol = ContentCatalog.shared.symbol(pending) {
                 Text(store.canWrite(pending)
                      ? "Tap to place \(symbol.name.lowercased()) — \(store.footprint(of: pending)) cells"
                      : "No room left for \(symbol.name.lowercased())")
@@ -82,13 +94,15 @@ struct PageGridView: View {
     }
 
     private func markView(_ mark: PlacedRune, side: CGFloat) -> some View {
-        ZStack(alignment: .topLeading) {
+        let isLifted = lifted == mark.id
+        return ZStack(alignment: .topLeading) {
             // One tinted square per cell, so an awkward shape reads as the awkward shape it is.
             ForEach(Array(mark.cells.enumerated()), id: \.offset) { _, cell in
                 RoundedRectangle(cornerRadius: side * 0.12)
-                    .fill(Color.accentColor.opacity(0.28))
+                    .fill(Color.accentColor.opacity(isLifted ? 0.5 : 0.28))
                     .overlay(RoundedRectangle(cornerRadius: side * 0.12)
-                        .stroke(Color.accentColor.opacity(0.65), lineWidth: 1))
+                        .stroke(Color.accentColor.opacity(isLifted ? 1 : 0.65),
+                                lineWidth: isLifted ? 2 : 1))
                     .frame(width: side, height: side)
                     .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
             }
@@ -99,13 +113,16 @@ struct PageGridView: View {
                 .offset(x: CGFloat(mark.origin.column) * side, y: CGFloat(mark.origin.row) * side)
         }
         .contentShape(Rectangle())
-        .onTapGesture { store.erase(mark.id) }
-        .accessibilityLabel("\(mark.displayName), \(mark.cells.count) cells. Tap to rub out.")
+        .onTapGesture { lifted = isLifted ? nil : mark.id }
+        .accessibilityLabel("\(mark.displayName), \(mark.cells.count) cells."
+                            + (isLifted ? " Picked up. Tap a square to put it down."
+                                        : " Tap to pick up."))
     }
 
     private func tap(_ cell: PageCell) {
-        if let existing = page.rune(at: cell) {
-            store.erase(existing.id)
+        if let lifted {
+            // Putting down what's in your hand takes priority over writing something new.
+            if store.move(lifted, to: cell) { self.lifted = nil }
         } else if let pending, store.write(pending, at: cell) {
             onPlaced()
         }

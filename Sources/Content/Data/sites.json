@@ -1,5 +1,5 @@
 {
-  "_note": "Sites \u2014 the fourth layer (docs/sites-system.md). Things a world CONTAINS, as opposed to things it IS. Conditions are ranges, never exact matches, so a family of worlds can produce a given site and sites are hunted by understanding conditions rather than memorising a recipe. Rarity is emergent: a site needing three simultaneous uncommon conditions is rare because that world is hard to write. All numbers PLACEHOLDER.",
+  "_note": "Sites \u2014 the fourth layer (docs/sites-system.md). Things a world CONTAINS, as opposed to things it IS. Conditions are ranges, never exact matches, so a family of worlds can produce a given site and sites are hunted by understanding conditions rather than memorising a recipe. Rarity is emergent: a site needing three simultaneous uncommon conditions is rare because that world is hard to write. All numbers PLACEHOLDER. Q17: ruins pay in KNOWLEDGE and OBJECTS, never currency \u2014 landmarks and living sites pay in materials. And a ruin is never empty: knowledge first, an object always, so a ruin whose knowledge you already hold is still worth the walk.",
   "sites": [
     {
       "id": "wayfarers_camp",
@@ -31,10 +31,12 @@
           "fiber": 4,
           "essence_raw": 2
         },
-        "items": [],
+        "items": [
+          "curio_bound_knot"
+        ],
         "teaches": [],
         "searchTurns": 2,
-        "essence": 1
+        "essence": 0
       },
       "stabilityDelta": 0
     },
@@ -80,7 +82,7 @@
           "verdigris_bloom"
         ],
         "searchTurns": 3,
-        "essence": 4
+        "essence": 0
       },
       "stabilityDelta": 0
     },
@@ -123,7 +125,7 @@
           "frostbound"
         ],
         "searchTurns": 3,
-        "essence": 3
+        "essence": 0
       },
       "stabilityDelta": 0
     },

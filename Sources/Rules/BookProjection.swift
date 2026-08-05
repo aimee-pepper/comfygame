@@ -85,9 +85,15 @@ struct BookProjection {
         let book = BookRules.resolveBook(page: page)
         let written = book.allSymbolIDs
         let sigils = BookRules.sigils(for: book)
-        let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+        // **Written only.** Resolving with the unwritten targets filled would describe the world's
+        // rolled surprises back to the player before they'd paid for them — the panel may only
+        // describe what was actually said.
+        let readings = PressureRules.resolve(sigils)
+        let contradictions = ContradictionRules.fired(in: sigils, readings: readings)
 
-        let score = BookRules.stabilityScore(delta: BookRules.stabilityDelta(symbolIDs: written))
+        let score = BookRules.stabilityScore(
+            delta: BookRules.stabilityDelta(symbolIDs: written)
+                - ContradictionRules.totalPenalty(for: contradictions))
         let turns = BookRules.turnsAvailable(stabilityScore: score)
         let tier = BookRules.enemyTier(symbolIDs: written)
         let sight = WorldRules.visionRadius(for: book)
@@ -109,8 +115,9 @@ struct BookProjection {
             mapHeight: Tuning.World.gridHeight,
             worldDescription: DescriptionRules.describe(
                 readings,
-                contradictions: ContradictionRules.fired(in: sigils, readings: readings),
-                analysisTier: analysisTier
+                contradictions: contradictions,
+                analysisTier: analysisTier,
+                about: DescriptionRules.targetsTouched(by: sigils)
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: written),
             resourceMix: expectedResourceMix(plans),

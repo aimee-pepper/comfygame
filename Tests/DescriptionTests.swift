@@ -190,20 +190,47 @@ final class DescriptionTests: XCTestCase {
     // MARK: The desk shows the same world the bind produces
 
     @MainActor
-    func testTheDeskDescribesTheWorldItIsAboutToMake() {
+    func testTheDeskDescribesWhatYouWroteAndNothingElse() {
         let store = GameStore(io: .temporary(name: "describe-\(UUID().uuidString)"))
-        store.setSymbol("frostbound", in: "biome")
+        store.write("frostbound")
         let promised = store.bookProjection.worldDescription
 
         store.mutate("test: fund") { $0.base.essence = 500 }
         store.bindAndDepart()
-
         guard let run = store.state.worlds.activeRun else { return XCTFail("couldn't depart") }
-        let actual = DescriptionRules.describe(
-            BookRules.readings(for: run.book, seed: run.mapSeed),
-            contradictions: ContradictionRules.fired(in: BookRules.sigils(for: run.book))
+
+        // What the desk said must be exactly the description of what was *written*: resolved
+        // without the unwritten targets filled in, and speaking only about targets the page
+        // actually touches.
+        let sigils = BookRules.sigils(for: run.book)
+        let written = DescriptionRules.describe(
+            PressureRules.resolve(sigils),
+            contradictions: ContradictionRules.fired(in: sigils),
+            about: DescriptionRules.targetsTouched(by: sigils)
         )
-        XCTAssertEqual(promised.clauses.map(\.id), actual.clauses.map(\.id),
-                       "the desk promised a different world than it made")
+        XCTAssertEqual(promised.clauses.map(\.id), written.clauses.map(\.id),
+                       "the desk described something other than what was on the page")
+    }
+
+    /// The locked rule the desk was breaking: a slot left to chance is a **surprise**, so the
+    /// preview must not describe what the world rolled for itself before it's been paid for.
+    @MainActor
+    func testTheDeskNeverSpoilsWhatTheWorldRolls() {
+        let store = GameStore(io: .temporary(name: "spoil-\(UUID().uuidString)"))
+        store.write("frostbound")
+        store.mutate("test: fund") { $0.base.essence = 500 }
+
+        let promised = store.bookProjection.worldDescription
+        store.bindAndDepart()
+        guard let run = store.state.worlds.activeRun else { return XCTFail("couldn't depart") }
+
+        // The world the player actually gets, unwritten targets and all.
+        let rolled = DescriptionRules.describe(BookRules.readings(for: run.book, seed: run.mapSeed))
+        let spoiled = Set(promised.clauses.map(\.group))
+            .subtracting(["hydrology", "thermal"])   // what Frostbound genuinely says
+        XCTAssertTrue(spoiled.isEmpty,
+                      "the desk described \(spoiled), which the player never wrote")
+        XCTAssertGreaterThan(rolled.clauses.count, promised.clauses.count,
+                             "the world should hold more than the page said")
     }
 }

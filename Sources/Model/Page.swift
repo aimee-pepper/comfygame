@@ -121,10 +121,20 @@ enum MarkContent: Codable, Equatable, Sendable {
     case compound(SymbolID)
 }
 
-/// What the player is capable of writing, as opposed to what they can afford today.
+/// The page. One page, your whole life.
 ///
-/// Two different pressures, deliberately both kept: **page size is capability**, essence is the
-/// per-bind consumable. Growing the page is a permanent unlock; paying for a book is not.
+/// **It never grows** (decisions-session-10 §1). An earlier version of the rune spec said the page
+/// expanded through permanent unlocks; that was Claude's invention and it contradicts the actual
+/// design, because it competes with the thing that *is* the progression — learning to write
+/// smaller. Finer instruments shrink footprints and learned compounds compress meaning, and that
+/// ladder is dramatic without the grid ever changing: at 6×6, charcoal fits about seven sigils and
+/// a fountain pen fits thirty-six.
+///
+/// Size is also a **UI constraint rather than a dial**: the whole page has to be visible while
+/// composing, which on a portrait iPhone caps it around seven or eight cells across.
+///
+/// `width` and `height` are stored rather than read from `Tuning` so that an existing save keeps
+/// the page it was written on if the dimensions are ever re-tuned.
 struct Page: Codable, Equatable, Sendable {
     var width: Int
     var height: Int

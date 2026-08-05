@@ -149,7 +149,16 @@ enum BookRules {
     }
 
     static func stabilityScore(of book: BoundBook) -> Int {
-        stabilityScore(delta: stabilityDelta(of: book))
+        stabilityScore(delta: stabilityDelta(of: book) - contradictionPenalty(of: book))
+    }
+
+    /// What a book's contradictions cost it, in the headline's own units.
+    ///
+    /// Base plus the disclosed escalation term (`contradiction-danger-spec.md` §3). This was built
+    /// and tested and then never read by anything, which is how a world could name *Green in the
+    /// dark* and still read Stability 100.
+    static func contradictionPenalty(of book: BoundBook) -> Int {
+        ContradictionRules.totalPenalty(for: ContradictionRules.fired(in: sigils(for: book)))
     }
 
     /// **How many player turns a world of this stability lasts.**

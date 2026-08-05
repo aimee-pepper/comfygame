@@ -47,7 +47,9 @@ Consequences:
 <details>
 <summary><b>3. The page and footprints</b></summary>
 
-- **Page is a grid.** Starting size **[PROPOSAL] 6×6 (36 cells)**, expanded by permanent (Reality/base) unlocks. Page size = what you're *capable* of writing.
+- **Page is a grid of FIXED size.** It never grows. **[CORRECTION — the earlier "expanded by permanent unlocks" line was Claude's invention and contradicted the design.]** You have one page, your whole life; progression is learning to write *smaller* on it via finer instruments and learned compounds. That is the whole point of the instrument ladder.
+- **The page must fit on one screen** (Aimee, session 10). No scrolling. On an iPhone in portrait, with the projection panel also visible, that caps the grid at roughly 7–8 cells across at a comfortable touch size. Size is a UI constraint, not a progression dial.
+- **Sigils can be picked up and moved** freely while composing.
 - **Essence remains the per-bind consumable** — whether you can afford to write it today. Two different pressures, both kept.
 - Footprints per tier as in §2. Crude shapes are irregular *on purpose*: the scrawl is awkward to fit.
 - **Compound footprint:** less than the sum of its parts. **[PROPOSAL]** `ceil(sum × 0.6)`, so compounds are always worth learning but never free. Compounds have their own tiers and compress further.
@@ -230,7 +232,7 @@ Test the programmatic route on a handful of runes first — it's the difference 
 <details>
 <summary><b>12. Open questions</b></summary>
 
-1. **Page size and growth curve.** 6×6 start is a guess; the right answer is whatever makes a *crude* page feel constrained but not miserable. Needs playtesting.
+1. **Page dimensions.** Fixed and non-growing (see §3). The only question is which fixed size makes a *crude* page feel constrained but not miserable while fitting one screen. Needs playtesting.
 2. **Do targets have to be present to be written?** Can you bind Hydrology on a world with no water source at all, or is Hydrology+Absent the way to say "dry"? (I lean: Absent is a qualifier, so yes, you write it explicitly.)
 3. **Does the Duplicate rune scale sublinearly in *footprint* as well as cost?** Probably yes, or high counts become impossible.
 4. **How many sigils can bind one target** before it's incoherent — hard cap, or let contradiction/instability handle it naturally? (I lean: let instability handle it.)

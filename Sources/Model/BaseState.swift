@@ -34,8 +34,8 @@ struct BaseState: Codable, Equatable, Sendable {
     /// The page being written. **This is the composition surface** — the slot draft above is the
     /// old taxonomy, kept only so a save written before the page existed still loads.
     ///
-    /// Page size is *capability*: what you're able to write, as opposed to what you can afford
-    /// today. Growing it is a permanent unlock; essence is still the per-bind consumable.
+    /// The page is a **fixed** grid — it never grows. Progression is learning to write smaller on
+    /// it, through finer hands and learned compounds. Essence remains the per-bind consumable.
     var page: Page = Page()
     /// Which hands the player owns. Everyone starts with charcoal, and better instruments let you
     /// say the same things in less space — never new things.

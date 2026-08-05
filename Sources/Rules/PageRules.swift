@@ -118,6 +118,23 @@ enum PageRules {
         return place(sigil, hand: hand, at: origin, on: page)
     }
 
+    /// Lift a mark and put it down somewhere else.
+    ///
+    /// Arranging is not a one-shot commitment (decisions-session-10 §3) — you can shuffle the page
+    /// as much as you like before binding. Refused rather than nudged if the new spot doesn't fit,
+    /// because where a mark goes is the player's decision.
+    static func move(_ id: InstanceID, to origin: PageCell, on page: Page) -> Page? {
+        guard let existing = page.runes.first(where: { $0.id == id }),
+              let shape = existing.shape,
+              canPlace(shape: shape, at: origin, on: page, ignoring: id)
+        else { return nil }
+
+        var result = page
+        guard let index = result.runes.firstIndex(where: { $0.id == id }) else { return nil }
+        result.runes[index].origin = origin
+        return result
+    }
+
     static func remove(_ id: InstanceID, from page: Page) -> Page {
         var result = page
         result.runes.removeAll { $0.id == id }

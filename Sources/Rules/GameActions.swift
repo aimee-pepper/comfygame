@@ -61,6 +61,14 @@ extension GameStore {
         return true
     }
 
+    /// Pick a mark up and put it down elsewhere. Free, and repeatable, until you bind.
+    @discardableResult
+    func move(_ mark: InstanceID, to cell: PageCell) -> Bool {
+        guard let updated = PageRules.move(mark, to: cell, on: state.base.page) else { return false }
+        mutate("move a mark") { $0.base.page = updated }
+        return true
+    }
+
     func erase(_ mark: InstanceID) {
         mutate("erase mark") { $0.base.page = PageRules.remove(mark, from: $0.base.page) }
     }
