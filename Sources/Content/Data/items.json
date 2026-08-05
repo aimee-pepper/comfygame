@@ -1,0 +1,41 @@
+{
+  "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed).",
+  "items": [
+    {
+      "id": "curio_humming_shard",
+      "name": "Humming Shard",
+      "icon": "waveform",
+      "rarity": "uncommon",
+      "blurb": "It hums when you are not listening.",
+      "kind": "curio",
+      "identifiesInto": "salve_lesser",
+      "unidentifiedName": "A humming shard…"
+    },
+    {
+      "id": "curio_bound_knot",
+      "name": "Bound Knot",
+      "icon": "link",
+      "rarity": "rare",
+      "blurb": "Tied by someone who meant it to stay tied.",
+      "kind": "curio",
+      "identifiesInto": "cache_key",
+      "unidentifiedName": "A knot of something…"
+    },
+    {
+      "id": "salve_lesser",
+      "name": "Lesser Salve",
+      "icon": "cross.vial",
+      "rarity": "common",
+      "blurb": "Restores a little health to one party member.",
+      "kind": "consumable"
+    },
+    {
+      "id": "cache_key",
+      "name": "Cache Key",
+      "icon": "key",
+      "rarity": "rare",
+      "blurb": "Fits a lock in a world that is not this one.",
+      "kind": "key"
+    }
+  ]
+}

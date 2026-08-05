@@ -1,0 +1,71 @@
+{
+  "_note": "The Base screen renders THIS LIST, not hardcoded buttons — v1+ adds blacksmith, tavern, distillery and they should be a JSON edit plus a route. 'route' must match a case of AppRoute. TIER SEMANTICS: tier counts UPGRADES PURCHASED, so tier 0 = built and un-upgraded. Storehouse 0-3 = 8/12/16/20 inventory slots; Essence Spring 0 = the built-in trickle, 1 = the purchasable upgrade. PLACEHOLDER blurbs/tiers.",
+  "stations": [
+    {
+      "id": "writing_desk",
+      "name": "Writing Desk",
+      "icon": "book.closed",
+      "blurb": "Compose a book and bind a world.",
+      "sortOrder": 0,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "writingDesk"
+    },
+    {
+      "id": "storehouse",
+      "name": "Storehouse",
+      "icon": "archivebox",
+      "blurb": "What you hauled back. Identify the strange things.",
+      "sortOrder": 1,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "maxTier": 3,
+      "route": "storehouse"
+    },
+    {
+      "id": "workshop",
+      "name": "Workshop",
+      "icon": "hammer",
+      "blurb": "Spend what you brought home on being able to bring more.",
+      "sortOrder": 2,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "workshop"
+    },
+    {
+      "id": "party",
+      "name": "Party",
+      "icon": "person.2",
+      "blurb": "Gear and gambits. Edited here, never mid-fight.",
+      "sortOrder": 3,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "party"
+    },
+    {
+      "id": "essence_spring",
+      "name": "Essence Spring",
+      "icon": "drop.circle",
+      "blurb": "Trickles a little essence each time you come home.",
+      "sortOrder": 4,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "essenceSpring"
+    },
+    {
+      "id": "constellation",
+      "name": "Constellation",
+      "icon": "sparkles.rectangle.stack",
+      "blurb": "Permanent. Survives everything.",
+      "sortOrder": 5,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "constellation"
+    }
+  ]
+}

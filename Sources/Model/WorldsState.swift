@@ -1,0 +1,125 @@
+import Foundation
+
+/// Layer 3 — Authored Worlds. Instanced runs; every v0 world is disposable.
+///
+/// Anchoring (making a world permanent) is an open design question (docs/open-questions.md Q-A)
+/// and is deliberately NOT modelled here. When it lands it will most likely add a sibling
+/// `anchored: [AnchoredWorld]` collection next to `activeRun`.
+struct WorldsState: Codable, Equatable, Sendable {
+    /// The run in progress, or `nil` when the player is at base. Saving this whole struct is what
+    /// makes "force-quit mid-run, even mid-encounter" resume exactly (pillar 2).
+    var activeRun: WorldRun?
+    /// Monotonic run counter. Stamps discovery records — a turn/run count, never a date.
+    var runIndex: Int = 0
+    /// Deterministic source of world seeds; lives in the save so relaunching cannot re-roll a
+    /// seed the player already saw in a pre-bind preview.
+    var seeds: SeedSequence
+
+    static func newGame(seeds: inout SeedSequence) -> WorldsState {
+        WorldsState(activeRun: nil, runIndex: 0, seeds: seeds)
+    }
+
+    var isInRun: Bool { activeRun != nil }
+
+    init(activeRun: WorldRun?, runIndex: Int, seeds: SeedSequence) {
+        self.activeRun = activeRun
+        self.runIndex = runIndex
+        self.seeds = seeds
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        activeRun = try container.decodeIfPresent(WorldRun.self, forKey: .activeRun)
+        runIndex = try container.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
+        seeds = try container.decodeIfPresent(SeedSequence.self, forKey: .seeds) ?? SeedSequence.newGame()
+    }
+}
+
+/// One instanced world run.
+///
+/// Milestone 1 models the run's *spine* — identity, seed, RNG position, stability, haul, and the
+/// active encounter — because the kill-test has to be meaningful from day one. The tile grid,
+/// movement and harvesting land in milestone 3 and will add a `map` property here.
+struct WorldRun: Codable, Equatable, Sendable {
+    var runIndex: Int
+    /// Composition this world was generated from. Kept so the map can be regenerated from the
+    /// book + seed rather than serialising every tile.
+    var book: BoundBook
+    /// Worldgen input. Same seed + same book ⇒ byte-identical map, every regeneration.
+    var mapSeed: UInt64
+    /// Live stream for in-run rolls (drops, combat). Advances during play and is saved with the
+    /// run, so a resume does not rewind randomness.
+    var rng: SeededRNG
+
+    /// 0–100, always visible. Decays per *player turn* only — never wall-clock (pillar 2).
+    var stability: Double = Tuning.World.startingStability
+    /// Player turns taken this run. The only clock the game has.
+    var turnsTaken: Int = 0
+
+    /// Unbanked haul. Kept 100% on portal exit, `collapseHaulKeptFraction` on collapse.
+    var satchel: ResourcePool = ResourcePool()
+    var satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
+
+    /// Non-nil ⇒ the player is mid-encounter. Force-quitting here must resume into the same
+    /// encounter on the same turn (acceptance criterion).
+    var activeEncounter: EncounterState?
+
+    var binderHP: Int = Tuning.Encounter.binderMaxHP
+    var companionHP: Int = Tuning.Encounter.companionMaxHP
+
+    /// Stability band drives the world's escalating behaviour. Thresholds are tunable.
+    var stabilityBand: StabilityBand {
+        if stability <= Tuning.World.collapseThreshold { return .collapsed }
+        if stability <= Tuning.World.crumbleThreshold { return .crumbling }
+        if stability <= Tuning.World.hazardThreshold { return .hazardous }
+        return .stable
+    }
+}
+
+enum StabilityBand: String, Codable, Sendable {
+    case stable      // > 50
+    case hazardous   // ≤ 50 — hazard tiles spawn at map edges
+    case crumbling   // ≤ 25 — tiles crumble inward
+    case collapsed   // ≤ 0  — run ends, partial haul
+}
+
+/// A composed, paid-for book. Every slot is resolved here: symbols the player chose plus the
+/// random fills for slots they left empty, so the world is fully described by (book, seed).
+struct BoundBook: Codable, Equatable, Sendable {
+    var symbols: [SymbolSlot: SymbolID]
+    /// Slots that were random-filled at bind time — the UI reveals these as surprises.
+    var randomlyFilled: Set<SymbolSlot>
+    var essencePaid: Int
+
+    var allSymbolIDs: [SymbolID] {
+        SymbolSlot.allCases.compactMap { symbols[$0] }
+    }
+}
+
+/// State of a single encounter. Milestone 4 fills in actions, gambit evaluation and the manual
+/// override; milestone 1 needs enough shape to save and restore mid-fight.
+struct EncounterState: Codable, Equatable, Sendable {
+    var id: InstanceID
+    var foes: [FoeState]
+    /// Whose turn it is within the fixed rotation (party → enemies). PLACEHOLDER: no speed stat.
+    var turnCursor: Int = 0
+    var roundNumber: Int = 1
+    /// Rolling battle log shown above the action bar.
+    var log: [String] = []
+
+    var isResolved: Bool { foes.allSatisfy { $0.currentHP <= 0 } }
+}
+
+struct FoeState: Codable, Equatable, Identifiable, Sendable {
+    var id: InstanceID
+    var creatureID: CreatureID
+    var currentHP: Int
+    var maxHP: Int
+}
+
+/// Grid coordinate. Used by milestone 3's map; defined here so the run struct can adopt it
+/// without a save-shape change.
+struct GridPoint: Codable, Equatable, Hashable, Sendable {
+    var x: Int
+    var y: Int
+}

@@ -1,0 +1,73 @@
+import Foundation
+
+/// Every gameplay number lives here so Aimee can rebalance without hunting through logic.
+///
+/// Rules for this file:
+///  - Nothing here is a design decision. Everything is `// PLACEHOLDER` until playtested.
+///  - No number that affects gameplay may be written inline anywhere else in the codebase.
+///  - Nothing in here may be time-based. Decay/instability advances on *player turns only*
+///    (pillar 2). If you ever need a `TimeInterval` for gameplay, it's a design bug.
+enum Tuning {
+
+    // MARK: - Persistence (not gameplay — these are engineering values)
+
+    /// Debounce window for the background save. Brief specifies ≤100ms.
+    static let saveDebounceMilliseconds: Int = 80
+
+    /// Save-file schema version. Bump when `GameState`'s shape changes incompatibly and add a
+    /// step in `Migrations.swift`.
+    static let saveSchemaVersion: Int = 1
+
+    // MARK: - Book authoring
+
+    enum Book {
+        static let baseSlotCount: Int = 4            // PLACEHOLDER — Terrain/Biome/Bounty/Quirk
+        static let maxSlotCount: Int = 5             // PLACEHOLDER — 5th via Reality unlock
+        static let baseBindCostEssence: Int = 10     // PLACEHOLDER
+        /// Multiplier applied to each symbol's own essence cost when totalling a bind.
+        static let symbolCostMultiplier: Double = 1.0 // PLACEHOLDER
+    }
+
+    // MARK: - Worlds
+
+    enum World {
+        static let gridWidth: Int = 14               // PLACEHOLDER
+        static let gridHeight: Int = 14              // PLACEHOLDER
+        static let startingStability: Double = 100   // PLACEHOLDER
+        /// Stability lost per player turn before symbol modifiers.
+        static let baseStabilityDecayPerTurn: Double = 1.0 // PLACEHOLDER
+        static let hazardThreshold: Double = 50      // PLACEHOLDER — hazards spawn at map edges
+        static let crumbleThreshold: Double = 25     // PLACEHOLDER — tiles crumble inward
+        static let collapseThreshold: Double = 0     // collapse (locked: 0 is the floor)
+        /// Fraction of the haul kept when caught in collapse. Portal exit always keeps 100%.
+        static let collapseHaulKeptFraction: Double = 0.5 // PLACEHOLDER
+        /// Turns of tapping to fully harvest a node.
+        static let harvestTurnsRange: ClosedRange<Int> = 1...3 // PLACEHOLDER
+        /// Enemies wake when the player is within this many tiles.
+        static let enemyAggroRadius: Int = 2         // PLACEHOLDER
+    }
+
+    // MARK: - Encounters
+
+    enum Encounter {
+        static let partySize: Int = 2                // PLACEHOLDER — Binder + 1 companion
+        static let maxFoes: Int = 3                  // PLACEHOLDER
+        static let startingGambitSlots: Int = 2      // PLACEHOLDER
+        /// Fleeing always succeeds but costs the run stability.
+        static let fleeStabilityCost: Double = 3     // PLACEHOLDER
+        static let binderMaxHP: Int = 30             // PLACEHOLDER
+        static let companionMaxHP: Int = 24          // PLACEHOLDER
+    }
+
+    // MARK: - Economy
+
+    enum Economy {
+        static let startingEssence: Int = 40         // PLACEHOLDER
+        static let startingInventorySlots: Int = 8   // PLACEHOLDER
+        static let inventorySlotsPerStorehouseTier: Int = 4 // PLACEHOLDER
+        static let identifyCostEssence: Int = 5      // PLACEHOLDER
+        /// Essence Spring trickle, credited on each return from a run (in-session event only —
+        /// never wall-clock; see pillar 2).
+        static let essenceSpringPerReturn: [Int] = [3, 7] // PLACEHOLDER — index = tier - 1
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "_note": "PLACEHOLDER icons/names. Resources are stackable and never consume an inventory slot. Motes are the Reality-layer currency and bank into RealityState, not BaseState.",
+  "resources": [
+    { "id": "ore", "name": "Ore", "icon": "cube", "isRealityCurrency": false },
+    { "id": "fiber", "name": "Fiber", "icon": "scribble", "isRealityCurrency": false },
+    { "id": "essence_raw", "name": "Raw Essence", "icon": "drop", "isRealityCurrency": false },
+    { "id": "mote", "name": "Mote", "icon": "star", "isRealityCurrency": true }
+  ]
+}

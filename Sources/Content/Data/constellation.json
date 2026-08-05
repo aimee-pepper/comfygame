@@ -1,0 +1,29 @@
+{
+  "_note": "PLACEHOLDER unlocks and mote costs (design-brief-v0 flags the whole v0 node set as placeholder). These three are the Reality layer's entire v0 content. The third node's payoff only matters after a base reset — which is Q-C in open-questions.md and NOT to be resolved in code.",
+  "nodes": [
+    {
+      "id": "extra_symbol_slot",
+      "name": "The Fifth Mark",
+      "icon": "plus.diamond",
+      "blurb": "+1 symbol slot in every book you bind.",
+      "maxRank": 1,
+      "moteCostPerRank": [3]
+    },
+    {
+      "id": "extra_gambit_slot",
+      "name": "The Long Instruction",
+      "icon": "list.number",
+      "blurb": "+1 gambit slot for your companion.",
+      "maxRank": 1,
+      "moteCostPerRank": [3]
+    },
+    {
+      "id": "essence_head_start",
+      "name": "The Kept Spring",
+      "icon": "drop.triangle",
+      "blurb": "+10% starting essence after any future reset.",
+      "maxRank": 1,
+      "moteCostPerRank": [5]
+    }
+  ]
+}

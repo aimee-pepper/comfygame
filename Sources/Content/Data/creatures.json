@@ -1,0 +1,32 @@
+{
+  "_note": "PLACEHOLDER — names, icons and stats are Claude-invented. v0 ships exactly three enemy types (design-brief-v0: 'enemy variety beyond 3 types' is explicitly out of scope). Each one needs a stable id because the encounter-flag registry (DiscoveryLog) keys off it.",
+  "creatures": [
+    {
+      "id": "paper_moth",
+      "name": "Paper Moth",
+      "icon": "ladybug",
+      "tier": 1,
+      "maxHP": 8,
+      "attack": 2,
+      "spawnWeight": 1.0
+    },
+    {
+      "id": "ink_hound",
+      "name": "Ink Hound",
+      "icon": "pawprint",
+      "tier": 2,
+      "maxHP": 16,
+      "attack": 4,
+      "spawnWeight": 0.6
+    },
+    {
+      "id": "margin_wraith",
+      "name": "Margin Wraith",
+      "icon": "theatermasks",
+      "tier": 3,
+      "maxHP": 26,
+      "attack": 6,
+      "spawnWeight": 0.25
+    }
+  ]
+}
