@@ -25,9 +25,10 @@
 - [x] Dim Sky's paired tradeoff implemented: −1 vision radius for a longer-lived world
 
 ## Milestone 4 — Encounters
-- [ ] Bump-to-encounter battle screen; party of 2 vs 1–3 foes; Attack/Skill/Item/Flee
-- [ ] Gambit engine (ordered rules, first-match-fires); starter 3 pieces; 2 slots
-- [ ] Party screen gambit editor (drag-reorder) — out of combat only; in-encounter manual override tap
+- [x] Bump-to-encounter battle screen; party of 2 vs 1–3 foes; Attack/Skill/Item/Flee
+      (Skill needed a cooldown to not dominate Attack — see questions-for-design Q11)
+- [x] Gambit engine (ordered rules, first-match-fires); starter 3 pieces; 2 slots
+- [x] Party screen gambit editor (drag-reorder) — out of combat only; in-encounter manual override tap
 
 ## Milestone 5 — Economy & payoff
 - [ ] Workshop purchases (storehouse tiers, gambit slot + 2 pieces, 2 researchable symbols, Automate Self, companion gear)

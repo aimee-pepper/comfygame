@@ -151,3 +151,20 @@ happen yet (items only start dropping in milestone 5), but it will the moment cu
 Options: refuse to bank and make the player choose; overflow into a temporary spillover the
 Storehouse holds until sorted; or auto-convert to essence. This wants an answer before milestone 5.
 `Sources/Rules/GameActions+World.swift` (`bankHaul`).
+
+---
+
+## Milestone 4 (2026-08-04)
+
+### Q11. What limits a Skill?
+The brief gives each party member Attack, **Skill (1 each)**, Item and Flee — but no resource to
+spend on a skill, and v0 has no MP. With no limiter at all, Skill is strictly better than Attack
+every single turn, and the action bar stops containing a decision.
+
+**Shipped:** a **cooldown counted in rounds** (never seconds). The Binder's Unbind is 2 rounds, the
+companion's Mend is 3. It has a nice knock-on: a gambit whose skill is on cooldown falls through to
+the next rule, so cooldowns are exactly what make rule *order* matter.
+
+Alternatives if you'd rather: once per encounter; a shared party resource that regenerates per
+round; or charges that refill on returning home (which would tie combat to the run economy).
+`Sources/Content/Data/skills.json`, `Tuning.Encounter`.
