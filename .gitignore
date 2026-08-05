@@ -5,3 +5,7 @@ build/
 *.xcuserdatad/
 xcuserdata/
 .swiftpm/
+
+# Google Drive sync artefacts
+.tmp.driveupload/
+.tmp.drivedownload/
