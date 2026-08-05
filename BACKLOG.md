@@ -56,7 +56,14 @@
 
 ## Milestone 6 — Ergonomics
 - [x] Q10 banking overflow → Storehouse spillover, never lost silently (ruled, session 5 audit)
-- [ ] 44pt audit, thumb-zone action bar, haptics (optional), full acceptance-criteria pass from docs/design-brief-v0.md
+- [x] 44pt audit, thumb-zone action bar (haptics + full acceptance pass still open — needs the on-device force-quit test)
+
+## Sites (docs/sites-system.md)
+- [x] Site catalog, conditions-as-ranges, placement, exclusions, caps, guardians
+- [x] Symbols expand to pressure components, so worlds have real climate/character
+- [ ] Site items routed through the loot-decision flow (currently catalogued but not granted)
+- [ ] Q19 — whether sites move the Stability headline (built, switched off)
+- [ ] Q18 — whether the preview shows a world's possible sites
 
 ## Stretch
 - [ ] Preview spawn icons with silhouette/revealed states + %

@@ -140,3 +140,23 @@ honest answer is a range so wide it says nothing. Written up as **Q20** with fou
 weight the chance pool and improve the preview rather than change either rule, but it's yours.
 
 I pinned the test's book rather than touch the rule.
+
+## 9. 44pt audit — passes
+
+Checked every interactive control against the brief's ≥44pt rule:
+
+| Control | Size |
+|---|---|
+| `ActionButton` (harvest, search, portal, cache) | 48pt |
+| `DirectionPad` | 46pt |
+| Spillover store / make room / throw away | 44pt |
+| List rows and `NavigationLink`s | 44pt (SwiftUI default) |
+| Map tiles | **27pt** |
+
+The map tiles are the exception, and a deliberate one that predates tonight — there's a comment on
+`DirectionPad` saying so. A 14×14 grid can't have 44pt cells on a portrait iPhone, which is exactly
+why the pad exists: tapping a tile to path there is a convenience, and the pad is the guaranteed
+target for the same action. That's the right resolution and I've left it alone.
+
+Not done: **haptics** (marked optional in the backlog) and the **full acceptance-criteria pass**,
+which needs the on-device force-quit-mid-encounter test — the one thing here I can't run myself.
