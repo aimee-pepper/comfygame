@@ -91,6 +91,24 @@ struct ItemDef: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
+/// One Skill. Each party member has exactly one in v0.
+struct SkillDef: Codable, Equatable, Identifiable, Sendable {
+    var id: SkillID
+    var name: String
+    var icon: String
+    var blurb: String
+    var kind: Kind
+    /// Damage dealt or health restored, before variance.
+    var power: Int
+    /// Rounds before it can be used again. Rounds — never seconds (pillar 1).
+    var cooldownRounds: Int
+    /// Which party member owns it. Moves onto the character when the party grows past two.
+    var owner: Owner
+
+    enum Kind: String, Codable, Sendable { case damage, heal }
+    enum Owner: String, Codable, Sendable { case binder, companion }
+}
+
 /// A gambit piece: one `condition → action` rule the companion can run.
 ///
 /// Conditions and actions are kept as loosely-typed specs on purpose. The engine that interprets

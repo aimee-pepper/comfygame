@@ -113,20 +113,7 @@ struct PartyView: View {
                     LabeledRow(icon: "shield.fill", label: "Armor", value: "tier \(companion.armorTier)")
                 }
 
-                StationCard(title: "Gambits — \(companion.gambits.count) of \(gambitSlots) slots", icon: "list.number") {
-                    if companion.gambits.isEmpty {
-                        EmptyNote("No rules set — the companion will do nothing.")
-                    } else {
-                        ForEach(Array(companion.gambits.enumerated()), id: \.offset) { index, id in
-                            let piece = ContentCatalog.shared.gambitPiece(id)
-                            LabeledRow(icon: piece?.icon ?? "questionmark",
-                                       label: piece?.name ?? id.rawValue,
-                                       value: "\(index + 1)")
-                        }
-                    }
-                }
-
-                ComingLater("Reordering rules by drag — the thing that visibly changes how the companion fights — arrives in milestone 4, alongside encounters.")
+                GambitEditor()
             }
             .padding(16)
         }
@@ -135,8 +122,106 @@ struct PartyView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var gambitSlots: Int {
-        Tuning.Encounter.startingGambitSlots + store.state.reality.bonusGambitSlots
+}
+
+/// The gambit editor. Drag to reorder; order is the whole game.
+///
+/// Lives here and nowhere else — gambit editing is out-of-combat only, a locked decision. The
+/// editor is disabled outright mid-fight rather than merely hidden, so there's no route to it.
+private struct GambitEditor: View {
+    @EnvironmentObject private var store: GameStore
+    @State private var isAdding = false
+
+    private var gambits: [GambitPieceID] { store.state.base.companion.gambits }
+    private var slots: Int { store.activeGambitSlots }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Gambits — \(min(gambits.count, slots)) of \(slots) slots", systemImage: "list.number")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            Text("Checked top to bottom. The first rule that fits is the one that fires — so the order is the strategy.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            if gambits.isEmpty {
+                EmptyNote("No rules set — Quill will stand there.")
+            } else {
+                // A real List, so drag-to-reorder is the system gesture rather than an imitation.
+                List {
+                    ForEach(Array(gambits.enumerated()), id: \.element) { index, id in
+                        GambitRow(index: index, id: id, isActive: index < slots)
+                    }
+                    .onMove { store.moveGambit(from: $0, to: $1) }
+                    .onDelete { store.removeGambit(at: $0) }
+                }
+                .listStyle(.plain)
+                .environment(\.editMode, .constant(.active))
+                .frame(height: CGFloat(gambits.count) * 62 + 8)
+                .scrollDisabled(true)
+                .disabled(!store.canEditGambits)
+            }
+
+            if !unowned.isEmpty {
+                Button { isAdding = true } label: {
+                    Label("Add a rule", systemImage: "plus.circle")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .disabled(!store.canEditGambits)
+            }
+
+            if gambits.count > slots {
+                Text("Rules past slot \(slots) are owned but idle. More slots come from the Workshop and the Constellation.")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .confirmationDialog("Add a rule", isPresented: $isAdding, titleVisibility: .visible) {
+            ForEach(unowned, id: \.id) { piece in
+                Button(piece.name) { store.addGambit(piece.id) }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    /// Owned pieces not currently in the list.
+    private var unowned: [GambitPieceDef] {
+        store.state.base.ownedGambitPieces
+            .filter { !gambits.contains($0) }
+            .compactMap { ContentCatalog.shared.gambitPiece($0) }
+    }
+}
+
+private struct GambitRow: View {
+    let index: Int
+    let id: GambitPieceID
+    let isActive: Bool
+
+    var body: some View {
+        let piece = ContentCatalog.shared.gambitPiece(id)
+        HStack(spacing: 10) {
+            Text("\(index + 1)")
+                .font(.caption.monospacedDigit().weight(.bold))
+                .foregroundStyle(.secondary)
+                .frame(width: 18)
+            Image(systemName: piece?.icon ?? "questionmark")
+                .foregroundStyle(.tint)
+                .frame(width: 22)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(piece?.name ?? id.rawValue).font(.callout)
+                if !isActive {
+                    Text("no slot for this yet").font(.caption2).foregroundStyle(.orange)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(minHeight: 44)
+        .opacity(isActive ? 1 : 0.5)
     }
 }
 

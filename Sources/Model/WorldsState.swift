@@ -66,6 +66,11 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// encounter on the same turn (acceptance criterion).
     var activeEncounter: EncounterState?
 
+    /// Where the player stood before their last step. Fleeing retreats here.
+    var previousPosition: GridPoint?
+    /// Turns before a bump can start another fight. Stops a flee from being undone immediately.
+    var encounterGraceTurns: Int = 0
+
     var binderHP: Int = Tuning.Encounter.binderMaxHP
     var companionHP: Int = Tuning.Encounter.companionMaxHP
 
@@ -112,27 +117,6 @@ struct BoundBook: Codable, Equatable, Sendable {
     var chosenSymbolIDs: [SymbolID] {
         symbols.filter { !randomlyFilled.contains($0.key) }.map(\.value)
     }
-}
-
-/// State of a single encounter. Milestone 4 fills in actions, gambit evaluation and the manual
-/// override; milestone 1 needs enough shape to save and restore mid-fight.
-struct EncounterState: Codable, Equatable, Sendable {
-    var id: InstanceID
-    var foes: [FoeState]
-    /// Whose turn it is within the fixed rotation (party → enemies). PLACEHOLDER: no speed stat.
-    var turnCursor: Int = 0
-    var roundNumber: Int = 1
-    /// Rolling battle log shown above the action bar.
-    var log: [String] = []
-
-    var isResolved: Bool { foes.allSatisfy { $0.currentHP <= 0 } }
-}
-
-struct FoeState: Codable, Equatable, Identifiable, Sendable {
-    var id: InstanceID
-    var creatureID: CreatureID
-    var currentHP: Int
-    var maxHP: Int
 }
 
 /// Grid coordinate. Used by milestone 3's map; defined here so the run struct can adopt it

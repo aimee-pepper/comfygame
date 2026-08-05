@@ -27,11 +27,7 @@ struct WorldView: View {
                     .padding(.top, 8)
                     .padding(.bottom, 12)
                 }
-                if let encounter = run.activeEncounter {
-                    EncounterBar(run: run, encounter: encounter)
-                } else {
-                    controls(run)
-                }
+                controls(run)
             }
         }
         .background(Color(.systemGroupedBackground))
@@ -425,51 +421,6 @@ private struct ActionButton: View {
         .buttonStyle(.bordered)
         .tint(isProminent ? .accentColor : .secondary)
         .disabled(!isEnabled)
-    }
-}
-
-/// Placeholder combat bar. Milestone 4 replaces this with the real encounter screen.
-private struct EncounterBar: View {
-    @EnvironmentObject private var store: GameStore
-    let run: WorldRun
-    let encounter: EncounterState
-
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 12) {
-                ForEach(encounter.foes) { foe in
-                    VStack(spacing: 2) {
-                        Image(systemName: ContentCatalog.shared.creature(foe.creatureID)?.icon ?? "questionmark")
-                            .foregroundStyle(foe.currentHP > 0 ? .red : .secondary)
-                        Text("\(foe.currentHP)/\(foe.maxHP)").font(.caption2.monospacedDigit())
-                    }
-                    .frame(minWidth: 44, minHeight: 44)
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 1) {
-                    Text("round \(encounter.roundNumber)")
-                        .font(.caption.monospacedDigit())
-                    if let last = encounter.log.last {
-                        Text(last).font(.caption2).lineLimit(1)
-                    }
-                }
-                .foregroundStyle(.secondary)
-            }
-            Button {
-                store.harnessEncounterRound()
-            } label: {
-                Label("Fight one round", systemImage: "burst.fill")
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 48)
-            }
-            .buttonStyle(.borderedProminent)
-            Text("Placeholder combat — the real encounter screen is milestone 4.")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(.bar)
     }
 }
 

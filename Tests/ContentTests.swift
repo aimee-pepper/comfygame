@@ -113,6 +113,7 @@ final class ContentTests: XCTestCase {
             creatures: catalog.creatures,
             resources: catalog.resources,
             items: catalog.items,
+            skills: catalog.skills,
             gambitPieces: catalog.gambitPieces,
             stations: catalog.stations,
             constellationNodes: catalog.constellationNodes

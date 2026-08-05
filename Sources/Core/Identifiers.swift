@@ -63,6 +63,11 @@ struct ItemID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+struct SkillID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 struct GambitPieceID: StringIdentifier {
     var rawValue: String
     init(rawValue: String) { self.rawValue = rawValue }

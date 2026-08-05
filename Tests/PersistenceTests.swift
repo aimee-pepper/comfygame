@@ -54,8 +54,12 @@ final class PersistenceTests: XCTestCase {
         run.satchel.add(3, of: Resources.ore)
         run.activeEncounter = EncounterState(
             id: InstanceID(rawValue: rng.next()),
-            foes: [FoeState(id: InstanceID(rawValue: 1), creatureID: "ink_hound", currentHP: 9, maxHP: 16)],
-            turnCursor: 1,
+            foes: [FoeState(id: InstanceID(rawValue: 1),
+                            creatureID: "ink_hound",
+                            stats: CombatStats(displayName: "Ink Hound", icon: "pawprint", maxHP: 16, attack: 4),
+                            currentHP: 9)],
+            order: [.binder, .companion, .foe(InstanceID(rawValue: 1))],
+            turnIndex: 1,
             roundNumber: 3,
             log: ["You hit Ink Hound for 5."]
         )

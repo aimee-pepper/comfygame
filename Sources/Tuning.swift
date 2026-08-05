@@ -93,8 +93,21 @@ enum Tuning {
         static let startingGambitSlots: Int = 2      // PLACEHOLDER
         /// Fleeing always succeeds but costs the run stability.
         static let fleeStabilityCost: Double = 3     // PLACEHOLDER
+        /// Turns after fleeing before a bump can start another fight, so the foe you just escaped
+        /// can't walk straight back into you.
+        static let fleeGraceTurns: Int = 2           // PLACEHOLDER
         static let binderMaxHP: Int = 30             // PLACEHOLDER
         static let companionMaxHP: Int = 24          // PLACEHOLDER
+        static let binderAttack: Int = 6             // PLACEHOLDER
+        static let companionBaseAttack: Int = 5      // PLACEHOLDER
+        static let attackPerWeaponTier: Int = 2      // PLACEHOLDER
+        static let defencePerArmorTier: Int = 1      // PLACEHOLDER
+        static let minimumDamage: Int = 1            // a hit always does something
+        /// Damage and healing wobble by ±this fraction of their power.
+        static let damageVariance: Double = 0.25     // PLACEHOLDER
+        static let consumableHealAmount: Int = 10    // PLACEHOLDER
+        /// Backstop so a misbehaving rule can never hang the app between player inputs.
+        static let maxAutomaticTurnsPerInput: Int = 40
     }
 
     // MARK: - Economy

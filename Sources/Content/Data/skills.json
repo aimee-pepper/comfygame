@@ -1,0 +1,25 @@
+{
+  "_note": "PLACEHOLDER. The brief gives each party member exactly one Skill but no resource to spend on it, so a round-counted COOLDOWN is the stopgap limiter — without one, Skill strictly dominates Attack and the action bar has no decision in it. Counted in rounds, never seconds. 'owner' ties a skill to a party member; when the party expands past two, this moves onto the character instead. See questions-for-design Q11.",
+  "skills": [
+    {
+      "id": "unbind",
+      "name": "Unbind",
+      "icon": "bolt.fill",
+      "blurb": "Pull at the seam holding a thing together.",
+      "kind": "damage",
+      "power": 11,
+      "cooldownRounds": 2,
+      "owner": "binder"
+    },
+    {
+      "id": "mend",
+      "name": "Mend",
+      "icon": "cross.case.fill",
+      "blurb": "Close what's open. Briefly.",
+      "kind": "heal",
+      "power": 12,
+      "cooldownRounds": 3,
+      "owner": "companion"
+    }
+  ]
+}

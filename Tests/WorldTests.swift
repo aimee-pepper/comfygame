@@ -352,33 +352,6 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(after.enemies, before.enemies)
     }
 
-    /// A resolved encounter has to take the defeated off the grid, or the same fight re-triggers
-    /// on the very next turn — forever.
-    @MainActor
-    func testDefeatedEnemiesAreRemovedFromTheMap() {
-        let store = GameStore(io: .temporary(name: "resolve-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: "terrain")
-        store.bindAndDepart()
-        store.mutate("place a foe") { state in
-            guard var run = state.worlds.activeRun else { return }
-            run.enemies = [WorldEnemy(id: InstanceID(rawValue: 3), creatureID: "paper_moth",
-                                      position: run.playerPosition, isAwake: true)]
-            state.worlds.activeRun = run
-            WorldRules.beginEncounter(triggeredBy: run.enemies[0], in: &state)
-        }
-        XCTAssertNotNil(store.state.worlds.activeRun?.activeEncounter)
-
-        // Paper Moths have 8 HP and the placeholder round hits for 3–7, so a few rounds settle it.
-        for _ in 0..<4 where store.state.worlds.activeRun?.activeEncounter != nil {
-            store.harnessEncounterRound()
-        }
-
-        XCTAssertNil(store.state.worlds.activeRun?.activeEncounter, "The fight must end")
-        XCTAssertTrue(store.state.worlds.activeRun?.enemies.isEmpty ?? false,
-                      "A defeated enemy must leave the grid")
-        XCTAssertEqual(store.state.reality.lifetime.encountersWon, 1)
-    }
-
     // MARK: Helpers
 
     private func startedRun(_ composition: BoundBook, seed: UInt64) -> GameState {

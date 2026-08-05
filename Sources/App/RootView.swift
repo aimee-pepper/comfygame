@@ -9,7 +9,9 @@ struct RootView: View {
     @EnvironmentObject private var store: GameStore
 
     var body: some View {
-        if store.state.worlds.isInRun {
+        if store.activeEncounter != nil {
+            EncounterView()
+        } else if store.state.worlds.isInRun {
             WorldView()
         } else {
             NavigationStack {

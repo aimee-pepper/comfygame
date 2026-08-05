@@ -118,6 +118,7 @@ enum WorldRules {
         }
 
         var events: [Event] = [.moved(to: destination)]
+        run.previousPosition = run.playerPosition
         run.playerPosition = destination
         reveal(around: destination, in: &run.map, radius: visionRadius(for: run.book))
 
@@ -168,6 +169,7 @@ enum WorldRules {
 
         let bandBefore = run.stabilityBand
         run.turnsTaken += 1
+        run.encounterGraceTurns = max(0, run.encounterGraceTurns - 1)
         state.reality.lifetime.worldTurnsTaken += 1
         run.stability = max(0, run.stability - BookRules.decayPerTurn(for: run.book))
         let bandAfter = run.stabilityBand
@@ -302,6 +304,8 @@ enum WorldRules {
     /// party's limit. Milestone 4 replaces the combat itself, not this trigger.
     static func beginEncounter(triggeredBy enemy: WorldEnemy, in state: inout GameState) {
         guard var run = state.worlds.activeRun, run.activeEncounter == nil else { return }
+        // Just fled? You get a moment before anything else can catch you.
+        guard run.encounterGraceTurns == 0 else { return }
 
         var group = [enemy]
         for other in run.enemies where other.id != enemy.id && other.isAwake {
@@ -312,37 +316,20 @@ enum WorldRules {
         var foes: [FoeState] = []
         for member in group {
             guard let creature = ContentCatalog.shared.creature(member.creatureID) else { continue }
+            // Stats are resolved here, once, and saved with the foe — not looked up mid-fight.
+            let stats = CombatStats.resolved(from: creature)
             foes.append(FoeState(id: member.id,
                                  creatureID: member.creatureID,
-                                 currentHP: creature.maxHP,
-                                 maxHP: creature.maxHP))
+                                 stats: stats,
+                                 currentHP: stats.maxHP))
             // The encounter-flag registry: this is what turns a silhouette into a real icon in the
             // Writing Desk's preview.
             state.reality.discovery.recordCreature(member.creatureID, runIndex: run.runIndex)
         }
         guard !foes.isEmpty else { return }
 
-        run.activeEncounter = EncounterState(
-            id: InstanceID(rawValue: run.rng.next()),
-            foes: foes,
-            log: [foes.count == 1 ? "Something notices you." : "They close in around you."]
-        )
+        run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()), foes: foes)
         state.worlds.activeRun = run
     }
 
-    /// Closes out a finished encounter.
-    ///
-    /// Defeated foes have to come *off the grid*: a foe shares its id with the `WorldEnemy` that
-    /// spawned it, and leaving it standing on the player's tile would re-trigger the same fight on
-    /// the very next turn, forever. Milestone 4 owns the combat itself, not this.
-    static func concludeEncounter(in state: inout GameState) {
-        guard var run = state.worlds.activeRun, let encounter = run.activeEncounter, encounter.isResolved
-        else { return }
-
-        let defeated = Set(encounter.foes.filter { $0.currentHP <= 0 }.map(\.id))
-        run.enemies.removeAll { defeated.contains($0.id) }
-        run.activeEncounter = nil
-        state.reality.lifetime.encountersWon += 1
-        state.worlds.activeRun = run
-    }
 }

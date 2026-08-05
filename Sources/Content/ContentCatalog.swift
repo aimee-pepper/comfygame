@@ -12,6 +12,7 @@ struct ContentCatalog: Sendable {
     let creatures: [CreatureDef]
     let resources: [ResourceDef]
     let items: [ItemDef]
+    let skills: [SkillDef]
     let gambitPieces: [GambitPieceDef]
     let stations: [StationDef]
     let constellationNodes: [ConstellationNodeDef]
@@ -38,6 +39,8 @@ struct ContentCatalog: Sendable {
     func creature(_ id: CreatureID) -> CreatureDef? { creatures.first { $0.id == id } }
     func resource(_ id: ResourceID) -> ResourceDef? { resources.first { $0.id == id } }
     func item(_ id: ItemID) -> ItemDef? { items.first { $0.id == id } }
+    func skill(_ id: SkillID) -> SkillDef? { skills.first { $0.id == id } }
+    func skill(ownedBy owner: SkillDef.Owner) -> SkillDef? { skills.first { $0.owner == owner } }
     func gambitPiece(_ id: GambitPieceID) -> GambitPieceDef? { gambitPieces.first { $0.id == id } }
     func station(_ id: StationID) -> StationDef? { stations.first { $0.id == id } }
     func constellationNode(_ id: ConstellationNodeID) -> ConstellationNodeDef? {
@@ -80,6 +83,7 @@ struct ContentCatalog: Sendable {
             creatures: try loadFile("creatures", key: "creatures", bundle: bundle),
             resources: try loadFile("resources", key: "resources", bundle: bundle),
             items: try loadFile("items", key: "items", bundle: bundle),
+            skills: try loadFile("skills", key: "skills", bundle: bundle),
             gambitPieces: try loadFile("gambit_pieces", key: "gambitPieces", bundle: bundle),
             stations: try loadFile("stations", key: "stations", bundle: bundle),
             constellationNodes: try loadFile("constellation", key: "nodes", bundle: bundle)
@@ -129,6 +133,7 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(creatures.map(\.id.rawValue), label: "creature")
         try requireUniqueIDs(resources.map(\.id.rawValue), label: "resource")
         try requireUniqueIDs(items.map(\.id.rawValue), label: "item")
+        try requireUniqueIDs(skills.map(\.id.rawValue), label: "skill")
         try requireUniqueIDs(gambitPieces.map(\.id.rawValue), label: "gambit piece")
         try requireUniqueIDs(stations.map(\.id.rawValue), label: "station")
         try requireUniqueIDs(constellationNodes.map(\.id.rawValue), label: "constellation node")
@@ -176,6 +181,10 @@ struct ContentCatalog: Sendable {
         }
         for id in [Resources.ore, Resources.fiber, Resources.essenceRaw, Resources.mote] where resource(id) == nil {
             throw ContentError.danglingReference("resources.json is missing required resource '\(id)'")
+        }
+        // Each party member needs exactly one Skill, or the action bar has a dead button on it.
+        for owner in [SkillDef.Owner.binder, .companion] where skill(ownedBy: owner) == nil {
+            throw ContentError.danglingReference("skills.json has no skill for the \(owner.rawValue)")
         }
     }
 
