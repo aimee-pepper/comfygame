@@ -1,19 +1,20 @@
 import Foundation
 
-/// The companion's automation: an ordered list of `condition → action` rules, evaluated top-down,
-/// **first match fires** (the FF12 execution model, locked in decisions-log).
+/// Automation: an ordered list of assembled rules, evaluated top-down, **first match fires** (the
+/// FF12 execution model, locked in decisions-log).
 ///
 /// One rule that matters more than it looks: **a rule whose action isn't available doesn't fire,
 /// and evaluation continues down the list.** A heal rule while the heal is on cooldown falls
 /// through to the attack rule below it. That's what makes ordering a real decision rather than a
 /// formality — and it's why the Party screen's drag-reorder visibly changes how a fight goes.
 ///
-/// Conditions and actions are interpreted from loose content specs, so the catalog can grow toward
-/// FF12-scale granularity (research pass 3) without touching this file's shape.
+/// Rules are composed from components (`GambitRule`), so this interprets a small grammar rather
+/// than a list of special cases. Adding "Foe: highest HP" or "above 70%" to the game is a content
+/// edit; nothing in here changes.
 enum GambitEngine {
 
     struct Decision: Equatable {
-        var piece: GambitPieceID
+        var rule: GambitRule
         var action: CombatAction
     }
 
@@ -21,20 +22,19 @@ enum GambitEngine {
     static func decide(for actor: Combatant = .companion, in state: GameState) -> Decision? {
         guard let run = state.worlds.activeRun, let encounter = run.activeEncounter else { return nil }
 
-        let slots = availableSlots(in: state)
-        for id in rules(for: actor, in: state).prefix(slots) {
-            guard let piece = ContentCatalog.shared.gambitPiece(id) else { continue }
-            guard let target = evaluate(piece.condition, actor: actor, run: run, encounter: encounter) else { continue }
-            guard let action = action(for: piece.action, target: target, actor: actor, run: run, encounter: encounter) else {
+        for rule in rules(for: actor, in: state).prefix(availableSlots(in: state)) {
+            guard rule.isWritable(with: state.base.ownedGambitComponents) else { continue }
+            guard let target = target(of: rule, actor: actor, run: run, encounter: encounter) else { continue }
+            guard let action = action(of: rule, target: target, actor: actor, encounter: encounter) else {
                 continue // matched, but couldn't act — try the next rule down
             }
-            return Decision(piece: id, action: action)
+            return Decision(rule: rule, action: action)
         }
         return nil
     }
 
-    /// Whose rule list to run. The Binder's is only consulted once "automate self" is bought.
-    static func rules(for actor: Combatant, in state: GameState) -> [GambitPieceID] {
+    /// Whose rule list to run. The Binder's is only consulted once "write your own hand" is learned.
+    static func rules(for actor: Combatant, in state: GameState) -> [GambitRule] {
         switch actor {
         case .companion: state.base.companion.gambits
         case .binder: state.base.hasAutomateSelfUnlock ? state.base.binderGambits : []
@@ -42,86 +42,109 @@ enum GambitEngine {
         }
     }
 
-    /// How many rules the companion is actually running. Gambits past the slot count are owned but
-    /// inactive — that's the progression, and the Party screen shows the cut-off.
+    /// How many rules are actually running. Rules past this are owned but idle — that's the
+    /// progression, and the Party screen shows the cut-off.
     static func availableSlots(in state: GameState) -> Int {
         Tuning.Encounter.startingGambitSlots
-            + state.base.purchasedGambitSlots     // bought at the Workshop; lost in a reset
+            + state.base.purchasedGambitSlots     // researched; lost in a reset
             + state.reality.bonusGambitSlots      // bought with motes; survives everything
     }
 
-    static func describe(_ id: GambitPieceID) -> String {
-        ContentCatalog.shared.gambitPiece(id)?.name ?? id.rawValue
-    }
+    // MARK: - Interpreting a rule
 
-    // MARK: Conditions
-
-    /// What a matched condition points at, which the action then uses.
     private enum Target: Equatable {
         case foe(InstanceID)
         case ally(Combatant)
-        case none
     }
 
-    private static func evaluate(_ condition: GambitConditionSpec,
-                                 actor: Combatant,
-                                 run: WorldRun,
-                                 encounter: EncounterState) -> Target? {
-        let threshold = condition.threshold ?? 0
+    /// Who the rule is about, if anyone satisfies it.
+    private static func target(of rule: GambitRule,
+                               actor: Combatant,
+                               run: WorldRun,
+                               encounter: EncounterState) -> Target? {
+        guard let subject = ContentCatalog.shared.gambitComponent(rule.subject),
+              let selector = subject.selector
+        else { return nil }
 
-        switch condition.kind {
-        case "foe.any":
-            return encounter.livingFoes.first.map { .foe($0.id) }
+        switch selector {
+        case "self":
+            return matches(rule, combatant: actor, run: run) ? .ally(actor) : nil
 
-        case "foe.lowestHP":
-            return encounter.livingFoes.min { $0.currentHP < $1.currentHP }.map { .foe($0.id) }
-                ?? encounter.livingFoes.first.map { .foe($0.id) }
-
-        case "foe.hpBelow":
-            return encounter.livingFoes
-                .filter { fraction($0.currentHP, $0.maxHP) < threshold }
-                .min { $0.currentHP < $1.currentHP }
-                .map { .foe($0.id) }
-
-        case "ally.hpBelow":
-            // Includes the companion itself — "ally: any" in FF12 terms covers the whole party.
-            return [Combatant.binder, .companion]
-                .filter { CombatRules.isAlive($0, in: run) }
-                .filter { member in
-                    let health = CombatRules.health(of: member, in: run)
-                    return fraction(health.current, health.max) < threshold
-                }
-                .min { lhs, rhs in
-                    let l = CombatRules.health(of: lhs, in: run), r = CombatRules.health(of: rhs, in: run)
-                    return fraction(l.current, l.max) < fraction(r.current, r.max)
-                }
+        case "ally.any":
+            // Whoever is worst off among those that match — the obvious intent of "an ally is hurt".
+            return party(in: run)
+                .filter { matches(rule, combatant: $0, run: run) }
+                .min { healthFraction($0, in: run) < healthFraction($1, in: run) }
                 .map { .ally($0) }
 
-        case "self.hpBelow":
-            let health = CombatRules.health(of: actor, in: run)
-            return fraction(health.current, health.max) < threshold ? .ally(actor) : nil
+        case "foe.any":
+            return encounter.livingFoes.first { matches(rule, foe: $0) }.map { .foe($0.id) }
+
+        case "foe.lowestHP":
+            return encounter.livingFoes.filter { matches(rule, foe: $0) }
+                .min { $0.currentHP < $1.currentHP }.map { .foe($0.id) }
+
+        case "foe.highestHP":
+            return encounter.livingFoes.filter { matches(rule, foe: $0) }
+                .max { $0.currentHP < $1.currentHP }.map { .foe($0.id) }
 
         default:
-            // An unknown condition never fires. Content can run ahead of the engine safely.
+            // An unknown selector never fires. Content can run ahead of the engine safely.
             return nil
         }
     }
 
-    private static func fraction(_ current: Int, _ maximum: Int) -> Double {
-        maximum > 0 ? Double(current) / Double(maximum) : 0
+    private static func party(in run: WorldRun) -> [Combatant] {
+        [Combatant.binder, .companion].filter { CombatRules.isAlive($0, in: run) }
+    }
+
+    private static func healthFraction(_ combatant: Combatant, in run: WorldRun) -> Double {
+        let health = CombatRules.health(of: combatant, in: run)
+        return health.max > 0 ? Double(health.current) / Double(health.max) : 0
+    }
+
+    // MARK: Conditions
+
+    private static func matches(_ rule: GambitRule, combatant: Combatant, run: WorldRun) -> Bool {
+        guard rule.hasCondition else { return true }
+        return compare(rule, value: healthFraction(combatant, in: run))
+    }
+
+    private static func matches(_ rule: GambitRule, foe: FoeState) -> Bool {
+        guard rule.hasCondition else { return true }
+        let fraction = foe.maxHP > 0 ? Double(foe.currentHP) / Double(foe.maxHP) : 0
+        return compare(rule, value: fraction)
+    }
+
+    private static func compare(_ rule: GambitRule, value: Double) -> Bool {
+        let catalog = ContentCatalog.shared
+        guard let property = rule.property.flatMap({ catalog.gambitComponent($0) })?.property,
+              let comparator = rule.comparator.flatMap({ catalog.gambitComponent($0) })?.comparator,
+              let threshold = rule.threshold.flatMap({ catalog.gambitComponent($0) })?.value
+        else { return false }
+
+        // Only health exists to measure so far; status and resources are later vocabulary.
+        guard property == "hp" else { return false }
+
+        switch comparator {
+        case "below": return value < threshold
+        case "above": return value > threshold
+        default: return false
+        }
     }
 
     // MARK: Actions
 
-    private static func action(for spec: GambitActionSpec,
+    private static func action(of rule: GambitRule,
                                target: Target,
                                actor: Combatant,
-                               run: WorldRun,
                                encounter: EncounterState) -> CombatAction? {
-        switch spec.kind {
+        guard let kind = ContentCatalog.shared.gambitComponent(rule.action)?.action else { return nil }
+
+        switch kind {
         case "attack":
             if case .foe(let id) = target { return .attack(foe: id) }
-            // A rule like "Ally HP < 50% → Attack" still needs something to hit.
+            // A rule like "Ally hurt → Attack" still needs something to hit.
             return encounter.livingFoes.first.map { .attack(foe: $0.id) }
 
         case "heal":

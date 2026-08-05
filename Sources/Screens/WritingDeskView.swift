@@ -249,7 +249,7 @@ private struct SymbolRow: View {
                     .fixedSize(horizontal: false, vertical: true)
                 HStack(spacing: 10) {
                     Label("\(symbol.essenceCost)", systemImage: "drop")
-                    InstabilityTag(weight: symbol.instabilityWeight)
+                    StabilityTag(delta: symbol.stabilityDelta)
                 }
                 .font(.caption2)
                 .foregroundStyle(.secondary)
@@ -264,27 +264,30 @@ private struct SymbolRow: View {
     }
 }
 
-/// Instability is the whole risk/reward dial, so it gets its own read-at-a-glance treatment.
-struct InstabilityTag: View {
-    let weight: Double
+/// Stability is the whole risk/reward dial, and this prints it **in the same units as the
+/// headline** — pick this symbol and the Stability number moves by exactly this much. Anything
+/// else turns composing a book into guesswork.
+struct StabilityTag: View {
+    let delta: Int
 
     var body: some View {
-        Label(text, systemImage: weight < 0 ? "shield" : "flame")
+        Label(text, systemImage: delta > 0 ? "shield" : (delta == 0 ? "equal" : "flame"))
             .foregroundStyle(color)
     }
 
     private var text: String {
-        if weight == 0 { return "steady" }
-        return weight < 0 ? "stabilising \(formatted)" : "unstable +\(formatted)"
+        switch delta {
+        case 0: "no cost"
+        case 1...: "+\(delta) stability"
+        default: "\(delta) stability" // already carries its minus sign
+        }
     }
 
-    private var formatted: String { String(format: "%.1f", abs(weight)) }
-
     private var color: Color {
-        switch weight {
-        case ..<0: .green
+        switch delta {
+        case 1...: .green
         case 0: .secondary
-        case 0..<1.5: .orange
+        case (-20)...(-1): .orange
         default: .red
         }
     }

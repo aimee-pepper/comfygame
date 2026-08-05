@@ -5,6 +5,11 @@ import XCTest
 @MainActor
 final class EconomyTests: XCTestCase {
 
+    /// The simplest legal rule, for tests that just need the Binder to do *something*.
+    private static let attackAnything = GambitRule(id: InstanceID(rawValue: 99),
+                                                   subject: "subject_foe_any",
+                                                   action: "act_attack")
+
     private func richStore() -> GameStore {
         let store = GameStore(io: .temporary(name: "economy-\(UUID().uuidString)"))
         store.mutate("stock up for testing") { state in
@@ -16,8 +21,16 @@ final class EconomyTests: XCTestCase {
         return store
     }
 
-    private func upgrade(_ id: UpgradeID) throws -> UpgradeDef {
-        try XCTUnwrap(ContentCatalog.shared.upgrade(id))
+    private func node(_ id: ResearchNodeID) throws -> ResearchNodeDef {
+        try XCTUnwrap(ContentCatalog.shared.researchNode(id))
+    }
+
+    /// Complete a node and everything it depends on, so a test can start from a given point in the
+    /// tree without hand-listing the path.
+    private func researchThrough(_ id: ResearchNodeID, in store: GameStore) throws {
+        let target = try node(id)
+        for required in target.requires { try researchThrough(required, in: store) }
+        XCTAssertTrue(store.research(target), "Couldn't research \(id)")
     }
 
     // MARK: Refining
@@ -42,70 +55,92 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(store.state.base.essence, before)
     }
 
-    // MARK: Upgrades
+    // MARK: Research
 
-    func testBuyingAnUpgradeSpendsBothCurrenciesAndApplies() throws {
+    func testResearchingANodeSpendsBothCurrenciesAndGrantsItsEffect() throws {
         let store = richStore()
-        let shelving = try upgrade("storehouse_expansion")
-        let cost = try XCTUnwrap(store.nextCost(of: shelving))
+        let shelving = try node("shelving_one")
         let essenceBefore = store.state.base.essence
         let oreBefore = store.state.base.resources[Resources.ore]
         let slotsBefore = store.state.base.inventory.slots
 
-        XCTAssertTrue(store.buy(shelving))
+        XCTAssertTrue(store.research(shelving))
 
-        XCTAssertEqual(store.state.base.essence, essenceBefore - cost.essence)
-        XCTAssertEqual(store.state.base.resources[Resources.ore], oreBefore - (cost.resources[Resources.ore] ?? 0))
-        XCTAssertEqual(store.rank(of: shelving), 1)
+        XCTAssertEqual(store.state.base.essence, essenceBefore - shelving.cost.essence)
+        XCTAssertEqual(store.state.base.resources[Resources.ore],
+                       oreBefore - (shelving.cost.resources[Resources.ore] ?? 0))
+        XCTAssertTrue(store.isComplete(shelving))
         XCTAssertEqual(store.state.base.inventory.slots,
                        slotsBefore + Tuning.Economy.inventorySlotsPerStorehouseTier,
                        "Capacity has to follow the tier, not drift from it")
     }
 
-    /// Rank is derived from the state the upgrade changes, so it can't disagree with reality.
-    func testRankIsDerivedNotStored() throws {
+    /// The whole point of a tree rather than a list: you can't buy the end before the beginning.
+    func testANodeIsLockedUntilItsPrerequisitesAreDone() throws {
         let store = richStore()
-        let satchel = try upgrade("satchel_expansion")
-        store.buy(satchel)
-        XCTAssertEqual(store.rank(of: satchel), 1)
+        let deeper = try node("shelving_two")
 
-        // Change the underlying state directly; the rank must follow it.
-        store.mutate("meddle") { $0.base.satchelTier = 2 }
-        XCTAssertEqual(store.rank(of: satchel), 2)
+        XCTAssertFalse(store.isAvailable(deeper))
+        XCTAssertFalse(store.research(deeper))
+        XCTAssertFalse(store.missingPrerequisites(for: deeper).isEmpty,
+                       "The UI has to be able to say what's blocking")
+
+        try researchThrough("shelving_one", in: store)
+        XCTAssertTrue(store.isAvailable(deeper))
+        XCTAssertTrue(store.research(deeper))
     }
 
-    func testUpgradesStopAtTheirMaxRank() throws {
+    func testANodeIsOnlyEverResearchedOnce() throws {
         let store = richStore()
-        let gambitSlot = try upgrade("gambit_slot")
-        XCTAssertTrue(store.buy(gambitSlot))
-        XCTAssertNil(store.nextCost(of: gambitSlot), "One rank means one purchase")
-        XCTAssertFalse(store.buy(gambitSlot))
-        XCTAssertEqual(store.rank(of: gambitSlot), gambitSlot.maxRank)
+        let node = try node("reason_about_self")
+        XCTAssertTrue(store.research(node))
+        XCTAssertFalse(store.isAvailable(node))
+        XCTAssertFalse(store.research(node))
     }
 
-    func testCannotBuyWhatYouCannotAfford() throws {
+    func testCannotResearchWhatYouCannotAfford() throws {
         let store = GameStore(io: .temporary(name: "poor-\(UUID().uuidString)"))
         store.mutate("broke") { $0.base.essence = 0 }
-        let shelving = try upgrade("storehouse_expansion")
+        let shelving = try node("shelving_one")
 
-        XCTAssertFalse(store.canBuy(shelving))
-        XCTAssertFalse(store.buy(shelving))
-        XCTAssertFalse(store.shortfall(for: shelving).isEmpty, "The UI has to be able to say what's missing")
-        XCTAssertEqual(store.rank(of: shelving), 0)
+        XCTAssertFalse(store.canResearch(shelving))
+        XCTAssertFalse(store.research(shelving))
+        XCTAssertFalse(store.shortfall(for: shelving).isEmpty)
+        XCTAssertFalse(store.isComplete(shelving))
     }
 
-    func testBuyingAGambitSlotWidensTheCompanionsRules() throws {
+    /// Research grants *components*, not finished rules. Learning one threshold widens everything
+    /// you can already say — that's why it's a grammar and not a shop.
+    func testResearchGrantsComponentsThatWidenTheGrammar() throws {
+        let store = richStore()
+        XCTAssertFalse(store.state.base.ownedGambitComponents.contains("thr_30"))
+
+        try researchThrough("notice_thirty", in: store)
+
+        XCTAssertTrue(store.state.base.ownedGambitComponents.contains("thr_30"))
+        XCTAssertTrue(store.ownedComponents(.threshold).contains { $0.id == "thr_30" },
+                      "The new word is immediately available to the rule builder")
+    }
+
+    func testResearchCanGrantASymbol() throws {
+        let store = richStore()
+        XCTAssertFalse(store.state.base.ownedSymbols.contains("verdigris_bloom"))
+        try researchThrough("study_growth", in: store)
+        XCTAssertTrue(store.state.base.ownedSymbols.contains("verdigris_bloom"))
+    }
+
+    func testResearchingASlotWidensTheRuleList() throws {
         let store = richStore()
         let before = store.activeGambitSlots
-        store.buy(try upgrade("gambit_slot"))
+        try researchThrough("longer_instruction", in: store)
         XCTAssertEqual(store.activeGambitSlots, before + 1)
     }
 
-    /// Two sources of slots, in two layers — and only one of them survives a reset. That's the
-    /// whole point of having both.
-    func testWorkshopSlotsAreLostInAResetAndConstellationSlotsAreNot() throws {
+    /// Two sources of slots, in two layers — and only one survives a reset. That's the whole point
+    /// of having both.
+    func testResearchedSlotsAreLostInAResetAndConstellationSlotsAreNot() throws {
         let store = richStore()
-        store.buy(try upgrade("gambit_slot"))
+        try researchThrough("longer_instruction", in: store)
         let node = try XCTUnwrap(ContentCatalog.shared.constellationNode(ConstellationNodes.extraGambitSlot))
         store.buy(node)
         XCTAssertEqual(store.activeGambitSlots, Tuning.Encounter.startingGambitSlots + 2)
@@ -113,17 +148,18 @@ final class EconomyTests: XCTestCase {
         store.resetBaseKeepingReality()
 
         XCTAssertEqual(store.activeGambitSlots, Tuning.Encounter.startingGambitSlots + 1,
-                       "The Workshop slot goes, the Constellation slot stays")
+                       "The researched slot goes, the Constellation slot stays")
     }
 
-    func testResearchingASymbolGrantsIt() throws {
+    /// A reset should hand back the whole tree, not leave you owning its fruits.
+    func testResettingTheBaseClearsResearch() throws {
         let store = richStore()
-        let symbol = try XCTUnwrap(ContentCatalog.shared.symbols.first { $0.acquisition == .research })
-        XCTAssertFalse(store.state.base.ownedSymbols.contains(symbol.id))
+        try researchThrough("shelving_one", in: store)
+        XCTAssertFalse(store.state.base.completedResearch.isEmpty)
 
-        XCTAssertTrue(store.research(symbol))
-        XCTAssertTrue(store.state.base.ownedSymbols.contains(symbol.id))
-        XCTAssertFalse(store.research(symbol), "…and only once")
+        store.resetBaseKeepingReality()
+        XCTAssertTrue(store.state.base.completedResearch.isEmpty)
+        XCTAssertEqual(store.state.base.inventory.slots, Tuning.Economy.startingInventorySlots)
     }
 
     // MARK: Identifying
@@ -185,7 +221,7 @@ final class EconomyTests: XCTestCase {
         XCTAssertNotNil(store.carriedCacheKey, "The key came from a different world entirely")
 
         let symbolsBefore = store.state.base.ownedSymbols.count
-        let piecesBefore = store.state.base.ownedGambitPieces.count
+        let componentsBefore = store.state.base.ownedGambitComponents.count
         let motesBefore = store.state.reality.motes
         let reward = try XCTUnwrap(store.openCacheHere())
 
@@ -195,7 +231,7 @@ final class EconomyTests: XCTestCase {
         // Guaranteed Rare+: a new symbol, a new rule, or motes. Never nothing.
         switch reward {
         case .symbol: XCTAssertEqual(store.state.base.ownedSymbols.count, symbolsBefore + 1)
-        case .gambitPiece: XCTAssertEqual(store.state.base.ownedGambitPieces.count, piecesBefore + 1)
+        case .gambitComponent: XCTAssertEqual(store.state.base.ownedGambitComponents.count, componentsBefore + 1)
         case .motes(let amount):
             XCTAssertGreaterThan(amount, 0)
             XCTAssertEqual(store.state.reality.motes, motesBefore + amount)
@@ -221,7 +257,7 @@ final class EconomyTests: XCTestCase {
     func testACacheAlwaysPaysSomething() {
         var state = GameState.newGame()
         state.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
-        state.base.ownedGambitPieces = ContentCatalog.shared.gambitPieces.map(\.id)
+        state.base.ownedGambitComponents = Set(ContentCatalog.shared.gambitComponents.map(\.id))
         var rng = SeededRNG(seed: 4242)
 
         for _ in 0..<20 {
@@ -262,10 +298,10 @@ final class EconomyTests: XCTestCase {
     /// The unlock has to actually do something: your own rules, followed without you.
     func testAutomateSelfHandsTheBinderOverToItsOwnRules() throws {
         let store = richStore()
-        store.buy(try upgrade("automate_self"))
+        try researchThrough("automate_self", in: store)
         XCTAssertTrue(store.state.base.hasAutomateSelfUnlock)
 
-        store.mutate("write your own hand") { $0.base.binderGambits = ["foe_any_attack"] }
+        store.mutate("write your own hand") { $0.base.binderGambits = [Self.attackAnything] }
         store.setSymbol("plains", in: "terrain")
         store.bindAndDepart()
         store.mutate("stage a fight") { state in
@@ -284,7 +320,7 @@ final class EconomyTests: XCTestCase {
 
     func testWithoutTheUnlockTheBinderIsAlwaysManual() throws {
         let store = richStore()
-        store.mutate("rules written but not unlocked") { $0.base.binderGambits = ["foe_any_attack"] }
+        store.mutate("rules written but not unlocked") { $0.base.binderGambits = [Self.attackAnything] }
         store.setSymbol("plains", in: "terrain")
         store.bindAndDepart()
         store.mutate("stage a fight") { state in

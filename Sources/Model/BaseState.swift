@@ -10,7 +10,12 @@ struct BaseState: Codable, Equatable, Sendable {
 
     /// Owned catalog entries. Definitions are data; the save stores only which ones are owned.
     var ownedSymbols: Set<SymbolID> = []
-    var ownedGambitPieces: [GambitPieceID] = []
+
+    /// The parts you can build rules out of. Learned from the research tree, or found in the wild.
+    var ownedGambitComponents: Set<GambitComponentID> = []
+
+    /// Research nodes completed. The tree's state, and the only place it's recorded.
+    var completedResearch: Set<ResearchNodeID> = []
 
     /// Per-station progression, keyed by the data-driven station catalog. The Base screen renders
     /// `ContentCatalog.stations` filtered by `isUnlocked`, so adding a v1+ building (blacksmith,
@@ -30,7 +35,7 @@ struct BaseState: Codable, Equatable, Sendable {
     var hasAutomateSelfUnlock: Bool = false
 
     /// The Binder's own rule list. Only consulted once `hasAutomateSelfUnlock` is true.
-    var binderGambits: [GambitPieceID] = []
+    var binderGambits: [GambitRule] = []
 
     /// Upgrades bought for the satchel — the bag you carry *into* a world.
     ///
@@ -46,11 +51,11 @@ struct BaseState: Codable, Equatable, Sendable {
     static func newGame() -> BaseState {
         var state = BaseState()
         state.ownedSymbols = Set(ContentCatalog.shared.starterSymbolIDs)
-        state.ownedGambitPieces = ContentCatalog.shared.starterGambitPieceIDs
+        state.ownedGambitComponents = Set(GambitStarter.components)
         state.stations = ContentCatalog.shared.stations.reduce(into: [:]) { result, station in
             result[station.id] = StationState(isUnlocked: station.unlockedAtStart, tier: station.startingTier)
         }
-        state.companion.gambits = Array(state.ownedGambitPieces.prefix(Tuning.Encounter.startingGambitSlots))
+        state.companion.gambits = GambitStarter.rules
         state.syncInventoryCapacity()
         return state
     }
@@ -88,14 +93,17 @@ struct BaseState: Codable, Equatable, Sendable {
         inventory = try container.decodeIfPresent(Inventory.self, forKey: .inventory)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
         ownedSymbols = try container.decodeIfPresent(Set<SymbolID>.self, forKey: .ownedSymbols) ?? []
-        ownedGambitPieces = try container.decodeIfPresent([GambitPieceID].self, forKey: .ownedGambitPieces) ?? []
+        ownedGambitComponents = try container.decodeIfPresent(Set<GambitComponentID>.self,
+                                                              forKey: .ownedGambitComponents)
+            ?? Set(GambitStarter.components)
+        completedResearch = try container.decodeIfPresent(Set<ResearchNodeID>.self, forKey: .completedResearch) ?? []
         stations = try container.decodeIfPresent([StationID: StationState].self, forKey: .stations) ?? [:]
         bookDraft = try container.decodeIfPresent(BookDraft.self, forKey: .bookDraft) ?? BookDraft()
         companion = try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
         purchasedGambitSlots = try container.decodeIfPresent(Int.self, forKey: .purchasedGambitSlots) ?? 0
-        binderGambits = try container.decodeIfPresent([GambitPieceID].self, forKey: .binderGambits) ?? []
+        binderGambits = try container.decodeIfPresent([GambitRule].self, forKey: .binderGambits) ?? []
     }
 }
 
@@ -152,7 +160,46 @@ struct CompanionState: Codable, Equatable, Sendable {
     /// current-HP field would be a second source of truth that is always full.
     var maxHP: Int = Tuning.Encounter.companionMaxHP
     /// Ordered gambit list — evaluated top-down, first match fires (FF12 execution model).
-    var gambits: [GambitPieceID] = []
+    var gambits: [GambitRule] = []
     var weaponTier: Int = 0
     var armorTier: Int = 0
+
+    init() {}
+
+    /// Tolerant, like the layers above it — a rule list whose *shape* changed (as it did when
+    /// gambits became composed rather than canned) should cost you your rules, not your save.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? "Quill"
+        maxHP = try container.decodeIfPresent(Int.self, forKey: .maxHP) ?? Tuning.Encounter.companionMaxHP
+        gambits = (try? container.decodeIfPresent([GambitRule].self, forKey: .gambits)) ?? GambitStarter.rules
+        weaponTier = try container.decodeIfPresent(Int.self, forKey: .weaponTier) ?? 0
+        armorTier = try container.decodeIfPresent(Int.self, forKey: .armorTier) ?? 0
+    }
+}
+
+/// What a new Binder starts able to say.
+///
+/// Two rules out of six components — enough to be useful, little enough that the first thing you
+/// research visibly widens what you can write.
+enum GambitStarter {
+    static let components: [GambitComponentID] = [
+        "subject_foe_any", "subject_ally_any",
+        "prop_hp", "cmp_below", "thr_50",
+        "act_attack", "act_heal",
+    ]
+
+    static var rules: [GambitRule] {
+        [
+            GambitRule(id: InstanceID(rawValue: 1),
+                       subject: "subject_ally_any",
+                       property: "prop_hp",
+                       comparator: "cmp_below",
+                       threshold: "thr_50",
+                       action: "act_heal"),
+            GambitRule(id: InstanceID(rawValue: 2),
+                       subject: "subject_foe_any",
+                       action: "act_attack"),
+        ]
+    }
 }

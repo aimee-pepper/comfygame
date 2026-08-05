@@ -99,7 +99,8 @@ struct HarnessView: View {
         Card(title: "Base — persists between runs", icon: "house.fill") {
             Row("essence", "\(state.base.essence)")
             Row("symbols owned", "\(state.base.ownedSymbols.count)")
-            Row("gambit pieces", "\(state.base.ownedGambitPieces.count)")
+            Row("rule components", "\(state.base.ownedGambitComponents.count) of \(ContentCatalog.shared.gambitComponents.count)")
+            Row("research done", "\(state.base.completedResearch.count) of \(ContentCatalog.shared.researchNodes.count)")
             Row("inventory", "\(state.base.inventory.stacks.count) / \(state.base.inventory.slots)")
             Row("stations", "\(state.base.stations.values.count(where: { $0.isUnlocked })) unlocked")
             if state.base.resources.isEmpty {

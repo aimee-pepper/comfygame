@@ -86,12 +86,26 @@ extension GameStore {
     /// a locked decision, enforced here rather than only hidden in the UI.
     var canEditGambits: Bool { activeEncounter == nil }
 
-    func gambits(for owner: Combatant) -> [GambitPieceID] {
+    func gambits(for owner: Combatant) -> [GambitRule] {
         owner == .binder ? state.base.binderGambits : state.base.companion.gambits
     }
 
+    /// Components you own, of one kind — what the rule builder can offer you.
+    func ownedComponents(_ kind: GambitComponentDef.Kind) -> [GambitComponentDef] {
+        ContentCatalog.shared.components(kind)
+            .filter { state.base.ownedGambitComponents.contains($0.id) }
+    }
+
+    /// Whether you know enough to write a condition at all. Until you've learned a property, a
+    /// comparator and a threshold, rules are just "subject → action".
+    var canWriteConditions: Bool {
+        !ownedComponents(.property).isEmpty
+            && !ownedComponents(.comparator).isEmpty
+            && !ownedComponents(.threshold).isEmpty
+    }
+
     /// One accessor for both rule lists, so editing can't accidentally diverge between them.
-    private func withGambits(_ owner: Combatant, _ body: @escaping (inout [GambitPieceID]) -> Void) -> (inout GameState) -> Void {
+    private func withGambits(_ owner: Combatant, _ body: @escaping (inout [GambitRule]) -> Void) -> (inout GameState) -> Void {
         { state in
             if owner == .binder { body(&state.base.binderGambits) } else { body(&state.base.companion.gambits) }
         }
@@ -99,20 +113,25 @@ extension GameStore {
 
     func moveGambit(from source: IndexSet, to destination: Int, for owner: Combatant = .companion) {
         guard canEditGambits else { return }
-        mutate("reorder gambits", flush: true, withGambits(owner) { $0.move(fromOffsets: source, toOffset: destination) })
+        mutate("reorder rules", flush: true, withGambits(owner) { $0.move(fromOffsets: source, toOffset: destination) })
     }
 
     func removeGambit(at offsets: IndexSet, for owner: Combatant = .companion) {
         guard canEditGambits else { return }
-        mutate("remove gambit", withGambits(owner) { $0.remove(atOffsets: offsets) })
+        mutate("remove rule", withGambits(owner) { $0.remove(atOffsets: offsets) })
     }
 
-    func addGambit(_ id: GambitPieceID, for owner: Combatant = .companion) {
-        guard canEditGambits, state.base.ownedGambitPieces.contains(id) else { return }
-        mutate("add gambit", withGambits(owner) { list in
-            guard !list.contains(id) else { return }
-            list.append(id)
+    /// Write a new rule from components you own. Refused if any part isn't yours — the grammar is
+    /// gated by what you've learned, which is the whole point of it being a grammar.
+    @discardableResult
+    func addGambit(_ rule: GambitRule, for owner: Combatant = .companion) -> Bool {
+        guard canEditGambits, rule.isWritable(with: state.base.ownedGambitComponents) else { return false }
+        mutate("write a rule", flush: true, withGambits(owner) { list in
+            var written = rule
+            written.id = InstanceID(rawValue: UInt64(list.count + 1) &* 2_654_435_761 &+ UInt64(list.count))
+            list.append(written)
         })
+        return true
     }
 
     /// Rules beyond this index are owned but inactive — the slot count is the progression.

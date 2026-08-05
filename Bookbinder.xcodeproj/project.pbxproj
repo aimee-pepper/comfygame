@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01E64B915C4AC1BE0A72A935 /* ResearchViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */; };
 		0290A7D4A5E8A5E8516E171E /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606F9667A67D771D03320DDA /* PersistenceTests.swift */; };
 		030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7582647B2841DB69559E3968 /* BookRulesTests.swift */; };
 		03705DB034E250EE8C9A5A0B /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867ADA7C98334AD5152A4937 /* AppRoute.swift */; };
@@ -18,14 +19,16 @@
 		19C9DFC5BC904175AC32B894 /* GameActions+Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */; };
 		2228B642DF268D4AC3E4428C /* EncounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE933E91275B1FF990B69BAA /* EncounterView.swift */; };
 		2AAA4E398F09BD29BAD7816B /* stations.json in Resources */ = {isa = PBXBuildFile; fileRef = 59F1E2A3A08364F9452A684F /* stations.json */; };
-		2EB9403AD8A6CC32F54FBFA1 /* upgrades.json in Resources */ = {isa = PBXBuildFile; fileRef = 84E44EC84F5C25D11A62DAC1 /* upgrades.json */; };
 		3062AB49BB5A3BBCC3A396BD /* Combat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD3736ADDC83B6481EFAC9A /* Combat.swift */; };
+		35A27AF646DD34DD1F8A9585 /* Gambit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79874A74B2CF52DA90868DA0 /* Gambit.swift */; };
 		3939EA44678C9E3D7CE7FF86 /* GameActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DDEB42C7E2856E98352341 /* GameActions.swift */; };
 		3E24E2D2D2BEAD60ADE93D0A /* WritingDeskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82ADF2ABC4F75679DADCCBB /* WritingDeskView.swift */; };
 		3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */; };
 		3FD60BA9683F245EBFA14D61 /* SpendingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */; };
 		4A0672467AD72629AC2ABD2F /* Inventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F756C7CBAE86A8565FB12DD /* Inventory.swift */; };
+		4C60516FFB5892091CBE28AC /* research.json in Resources */ = {isa = PBXBuildFile; fileRef = 6A1D054604B637EEC90D24DA /* research.json */; };
 		4DEB17BC13834B4612226A7B /* HarnessActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248394713D4F19F950F25B92 /* HarnessActions.swift */; };
+		51771CB66B64C405544B0B87 /* ResearchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */; };
 		52C1E5841A22ED23AA8245DF /* Tuning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644939D61FCF530C40392FCC /* Tuning.swift */; };
 		56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8946B89F914D32DABAC53D5A /* Worldgen.swift */; };
 		5B91181B627494D599038230 /* constellation.json in Resources */ = {isa = PBXBuildFile; fileRef = DD0C594698AE7E6D06191449 /* constellation.json */; };
@@ -43,7 +46,6 @@
 		890774F4FCDF3A9DAE6BEFDD /* BookbinderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76338986776C016E4422759E /* BookbinderApp.swift */; };
 		893B4E338D412AE9D298E4A4 /* GameActions+Combat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3464FCF84292D7835460EDEE /* GameActions+Combat.swift */; };
 		8D526864C54EBC0CB6BDC575 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F045A414F1C1CF9A9A916BB /* RootView.swift */; };
-		8FFEAFA9BDCBAB82E11ACD27 /* gambit_pieces.json in Resources */ = {isa = PBXBuildFile; fileRef = 9576197010FD2BAC456588C6 /* gambit_pieces.json */; };
 		94381815D9D6D36F24168B83 /* symbols.json in Resources */ = {isa = PBXBuildFile; fileRef = A4270CCCF203CAA8859A086B /* symbols.json */; };
 		983452CD1EE2126ECB5B1973 /* HarnessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638830B7B5223E3065252FC /* HarnessView.swift */; };
 		9A1C08888E52028E0EC6D53C /* slots.json in Resources */ = {isa = PBXBuildFile; fileRef = A38483F6A49BD38B618407D8 /* slots.json */; };
@@ -59,10 +61,12 @@
 		D9F83617E1060D93E281682F /* EconomyRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4461FC8AD054E8E6E494602B /* EconomyRules.swift */; };
 		DDBFEBACC92B746BC023CF6D /* items.json in Resources */ = {isa = PBXBuildFile; fileRef = 89776C411F7BC83CF86396E9 /* items.json */; };
 		E0B21F8C88F40A6B7F9E8212 /* GambitEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F978ADFABDF1296849D8F5AB /* GambitEngine.swift */; };
+		E412FF242D7E09BD9DBB75E8 /* gambit_components.json in Resources */ = {isa = PBXBuildFile; fileRef = 6AE18B24DF2998D5D65F61D0 /* gambit_components.json */; };
 		E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */; };
 		E90526D391BEDFC1166DCE96 /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19DC1448710810CD318671E /* Identifiers.swift */; };
 		EB5A7F017737E52E163C9A5C /* CombatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F395689728B586E0D0A7CD61 /* CombatTests.swift */; };
 		EDF26461D4FD581D2BCFBB0A /* DeterminismTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51FE4FBAB98280181089C56 /* DeterminismTests.swift */; };
+		EFB68320FEF123CBC8309B55 /* RuleBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */; };
 		F9A1322571DBD99F4BF908CB /* ContentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B08032B70636FB2D70EFD6 /* ContentModels.swift */; };
 		FAEB06BFBE5764791F188FF3 /* SaveFileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7F491C849679A2428073CA /* SaveFileIO.swift */; };
 /* End PBXBuildFile section */
@@ -83,6 +87,7 @@
 		04E110F7C0AF0739241A8F94 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		0BD3736ADDC83B6481EFAC9A /* Combat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Combat.swift; sourceTree = "<group>"; };
 		1AE0FA07FD91558E2F953944 /* GameActions+World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+World.swift"; sourceTree = "<group>"; };
+		1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchViews.swift; sourceTree = "<group>"; };
 		1F045A414F1C1CF9A9A916BB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+Economy.swift"; sourceTree = "<group>"; };
 		248394713D4F19F950F25B92 /* HarnessActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HarnessActions.swift; sourceTree = "<group>"; };
@@ -104,12 +109,14 @@
 		644939D61FCF530C40392FCC /* Tuning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tuning.swift; sourceTree = "<group>"; };
 		6638830B7B5223E3065252FC /* HarnessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HarnessView.swift; sourceTree = "<group>"; };
 		6782235BDB0189FF9A0FFE41 /* EconomyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EconomyTests.swift; sourceTree = "<group>"; };
+		6A1D054604B637EEC90D24DA /* research.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = research.json; sourceTree = "<group>"; };
+		6AE18B24DF2998D5D65F61D0 /* gambit_components.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = gambit_components.json; sourceTree = "<group>"; };
 		7294A9FAF1EE19D44BD7C56D /* SeededRNG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeededRNG.swift; sourceTree = "<group>"; };
 		7582647B2841DB69559E3968 /* BookRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRulesTests.swift; sourceTree = "<group>"; };
 		76338986776C016E4422759E /* BookbinderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookbinderApp.swift; sourceTree = "<group>"; };
 		7691C0625AD4AACD2BA46A20 /* ContentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentTests.swift; sourceTree = "<group>"; };
+		79874A74B2CF52DA90868DA0 /* Gambit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gambit.swift; sourceTree = "<group>"; };
 		7B20DAF90C2684826A3C3F21 /* WorldMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldMap.swift; sourceTree = "<group>"; };
-		84E44EC84F5C25D11A62DAC1 /* upgrades.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = upgrades.json; sourceTree = "<group>"; };
 		86093A93DD9720F92E4148D5 /* GameStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStore.swift; sourceTree = "<group>"; };
 		867ADA7C98334AD5152A4937 /* AppRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoute.swift; sourceTree = "<group>"; };
 		8946B89F914D32DABAC53D5A /* Worldgen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Worldgen.swift; sourceTree = "<group>"; };
@@ -118,7 +125,6 @@
 		8DB361F4E36998C9A7F31A44 /* WorldRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldRules.swift; sourceTree = "<group>"; };
 		8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9142092437E5652D87187DF8 /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
-		9576197010FD2BAC456588C6 /* gambit_pieces.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = gambit_pieces.json; sourceTree = "<group>"; };
 		99D023496EC834EA78E9BE63 /* CombatRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatRules.swift; sourceTree = "<group>"; };
 		A38483F6A49BD38B618407D8 /* slots.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = slots.json; sourceTree = "<group>"; };
 		A4270CCCF203CAA8859A086B /* symbols.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = symbols.json; sourceTree = "<group>"; };
@@ -131,8 +137,10 @@
 		C5B08032B70636FB2D70EFD6 /* ContentModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentModels.swift; sourceTree = "<group>"; };
 		C82ADF2ABC4F75679DADCCBB /* WritingDeskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingDeskView.swift; sourceTree = "<group>"; };
 		CAAA1B171F7C380229C20CC5 /* RealityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealityState.swift; sourceTree = "<group>"; };
+		CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchModels.swift; sourceTree = "<group>"; };
 		CFFBF656255758DFA8E45232 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCatalog.swift; sourceTree = "<group>"; };
+		D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleBuilderView.swift; sourceTree = "<group>"; };
 		D9311ACC91B2E555993A3297 /* WorldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldView.swift; sourceTree = "<group>"; };
 		DD0C594698AE7E6D06191449 /* constellation.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = constellation.json; sourceTree = "<group>"; };
 		E19DC1448710810CD318671E /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
@@ -176,6 +184,7 @@
 				95750F5CE1A87553D5246112 /* Data */,
 				D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */,
 				C5B08032B70636FB2D70EFD6 /* ContentModels.swift */,
+				CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */,
 			);
 			path = Content;
 			sourceTree = "<group>";
@@ -186,6 +195,8 @@
 				346EEEC616B8EBFE291C4A79 /* BaseView.swift */,
 				BE933E91275B1FF990B69BAA /* EncounterView.swift */,
 				36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */,
+				1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */,
+				D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */,
 				8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */,
 				03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */,
 				2C9C43310A7E6D0342B11251 /* StationViews.swift */,
@@ -229,6 +240,7 @@
 				B664EB59C95581C3098E542B /* BaseState.swift */,
 				0BD3736ADDC83B6481EFAC9A /* Combat.swift */,
 				8ADC03C0E941B354BFE2EF65 /* Discovery.swift */,
+				79874A74B2CF52DA90868DA0 /* Gambit.swift */,
 				04E110F7C0AF0739241A8F94 /* GameState.swift */,
 				5F756C7CBAE86A8565FB12DD /* Inventory.swift */,
 				CAAA1B171F7C380229C20CC5 /* RealityState.swift */,
@@ -243,14 +255,14 @@
 			children = (
 				DD0C594698AE7E6D06191449 /* constellation.json */,
 				5FD331CEC89F930A1F99C13B /* creatures.json */,
-				9576197010FD2BAC456588C6 /* gambit_pieces.json */,
+				6AE18B24DF2998D5D65F61D0 /* gambit_components.json */,
 				89776C411F7BC83CF86396E9 /* items.json */,
+				6A1D054604B637EEC90D24DA /* research.json */,
 				0486776A4EED6E508F843FB3 /* resources.json */,
 				2C4E5B7DC86948834FDAFFF9 /* skills.json */,
 				A38483F6A49BD38B618407D8 /* slots.json */,
 				59F1E2A3A08364F9452A684F /* stations.json */,
 				A4270CCCF203CAA8859A086B /* symbols.json */,
-				84E44EC84F5C25D11A62DAC1 /* upgrades.json */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -383,14 +395,14 @@
 			files = (
 				5B91181B627494D599038230 /* constellation.json in Resources */,
 				C709E6D127F96D2420ADBC5C /* creatures.json in Resources */,
-				8FFEAFA9BDCBAB82E11ACD27 /* gambit_pieces.json in Resources */,
+				E412FF242D7E09BD9DBB75E8 /* gambit_components.json in Resources */,
 				DDBFEBACC92B746BC023CF6D /* items.json in Resources */,
+				4C60516FFB5892091CBE28AC /* research.json in Resources */,
 				8725C08D01F1574C306CFC5D /* resources.json in Resources */,
 				0A77177F80047BBE6CD74591 /* skills.json in Resources */,
 				9A1C08888E52028E0EC6D53C /* slots.json in Resources */,
 				2AAA4E398F09BD29BAD7816B /* stations.json in Resources */,
 				94381815D9D6D36F24168B83 /* symbols.json in Resources */,
-				2EB9403AD8A6CC32F54FBFA1 /* upgrades.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,6 +426,7 @@
 				CD009883298233F654EE899C /* Discovery.swift in Sources */,
 				D9F83617E1060D93E281682F /* EconomyRules.swift in Sources */,
 				2228B642DF268D4AC3E4428C /* EncounterView.swift in Sources */,
+				35A27AF646DD34DD1F8A9585 /* Gambit.swift in Sources */,
 				E0B21F8C88F40A6B7F9E8212 /* GambitEngine.swift in Sources */,
 				893B4E338D412AE9D298E4A4 /* GameActions+Combat.swift in Sources */,
 				19C9DFC5BC904175AC32B894 /* GameActions+Economy.swift in Sources */,
@@ -428,7 +441,10 @@
 				A30BFB516414E49CB79270EF /* Migrations.swift in Sources */,
 				E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */,
 				0463A21CD6D0C85974C64C81 /* RealityState.swift in Sources */,
+				51771CB66B64C405544B0B87 /* ResearchModels.swift in Sources */,
+				01E64B915C4AC1BE0A72A935 /* ResearchViews.swift in Sources */,
 				8D526864C54EBC0CB6BDC575 /* RootView.swift in Sources */,
+				EFB68320FEF123CBC8309B55 /* RuleBuilderView.swift in Sources */,
 				FAEB06BFBE5764791F188FF3 /* SaveFileIO.swift in Sources */,
 				7334C8A4D81258A4C7FA0885 /* SeededRNG.swift in Sources */,
 				758EC3D9F7314C4018C089B9 /* SettingsView.swift in Sources */,

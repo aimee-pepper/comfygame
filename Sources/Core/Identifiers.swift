@@ -63,17 +63,23 @@ struct ItemID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
-struct UpgradeID: StringIdentifier {
+struct ResearchBranchID: StringIdentifier {
     var rawValue: String
     init(rawValue: String) { self.rawValue = rawValue }
+}
+
+struct ResearchNodeID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
+struct GambitComponentID: StringIdentifier, Identifiable {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+    var id: String { rawValue }
 }
 
 struct SkillID: StringIdentifier {
-    var rawValue: String
-    init(rawValue: String) { self.rawValue = rawValue }
-}
-
-struct GambitPieceID: StringIdentifier {
     var rawValue: String
     init(rawValue: String) { self.rawValue = rawValue }
 }

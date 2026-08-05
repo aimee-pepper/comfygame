@@ -16,26 +16,24 @@ enum EconomyRules {
         max(0, rawUnits) * Tuning.Economy.essencePerRawEssence
     }
 
-    // MARK: Upgrades
+    // MARK: Research
 
-    /// How many times this upgrade has been bought, derived from the state it changes.
-    static func rank(of upgrade: UpgradeDef, in state: GameState) -> Int {
-        switch upgrade.effect {
-        case .storehouseTier: state.base.station(Stations.storehouse).tier
-        case .satchelTier: state.base.satchelTier
-        case .gambitSlot: state.base.purchasedGambitSlots
-        case .essenceSpringTier: state.base.station(Stations.essenceSpring).tier
-        case .automateSelf: state.base.hasAutomateSelfUnlock ? 1 : 0
-        case .companionWeapon: state.base.companion.weaponTier
-        case .companionArmor: state.base.companion.armorTier
-        }
+    /// Whether a node's prerequisites are all met. Locked nodes are shown, not hidden — seeing what
+    /// you can't have yet is most of what makes a tree feel like a tree.
+    static func isAvailable(_ node: ResearchNodeDef, in state: GameState) -> Bool {
+        !isComplete(node, in: state) && node.requires.allSatisfy { state.base.completedResearch.contains($0) }
     }
 
-    /// What the next rank costs, or `nil` if it's fully bought.
-    static func nextCost(of upgrade: UpgradeDef, in state: GameState) -> UpgradeCost? {
-        let current = rank(of: upgrade, in: state)
-        guard current < upgrade.ranks.count else { return nil }
-        return upgrade.ranks[current]
+    static func isComplete(_ node: ResearchNodeDef, in state: GameState) -> Bool {
+        state.base.completedResearch.contains(node.id)
+    }
+
+    /// The prerequisites still missing, by name, so the UI can say what's blocking rather than just
+    /// greying a row out.
+    static func missingPrerequisites(_ node: ResearchNodeDef, in state: GameState) -> [String] {
+        node.requires
+            .filter { !state.base.completedResearch.contains($0) }
+            .compactMap { ContentCatalog.shared.researchNode($0)?.name }
     }
 
     static func canAfford(_ cost: UpgradeCost, in state: GameState) -> Bool {
@@ -64,36 +62,47 @@ enum EconomyRules {
         }
     }
 
-    /// Applies one rank of an upgrade. Assumes it's been paid for.
-    static func apply(_ upgrade: UpgradeDef, in state: inout GameState) {
-        switch upgrade.effect {
-        case .storehouseTier:
-            var station = state.base.station(Stations.storehouse)
-            station.tier += 1
-            state.base.stations[Stations.storehouse] = station
-            // Capacity is stored on the inventory, so it has to be re-synced when the tier moves.
-            state.base.syncInventoryCapacity()
+    /// Completes a node and hands over everything it grants. Assumes it's been paid for.
+    static func complete(_ node: ResearchNodeDef, in state: inout GameState) {
+        state.base.completedResearch.insert(node.id)
+        for grant in node.grants { apply(grant, in: &state) }
+    }
 
-        case .satchelTier:
-            state.base.satchelTier += 1
+    static func apply(_ grant: ResearchGrant, in state: inout GameState) {
+        switch grant.kind {
+        case .gambitComponent:
+            if let id = grant.id { state.base.ownedGambitComponents.insert(GambitComponentID(rawValue: id)) }
 
-        case .gambitSlot:
-            state.base.purchasedGambitSlots += 1
+        case .symbol:
+            if let id = grant.id { state.base.ownedSymbols.insert(SymbolID(rawValue: id)) }
 
-        case .essenceSpringTier:
-            var station = state.base.station(Stations.essenceSpring)
-            station.tier += 1
-            state.base.stations[Stations.essenceSpring] = station
-
-        case .automateSelf:
-            state.base.hasAutomateSelfUnlock = true
-
-        case .companionWeapon:
-            state.base.companion.weaponTier += 1
-
-        case .companionArmor:
-            state.base.companion.armorTier += 1
+        case .effect:
+            guard let effect = grant.effect else { return }
+            switch effect {
+            case .storehouseTier:
+                bumpStation(Stations.storehouse, in: &state)
+                // Capacity is stored on the inventory, so it has to follow the tier.
+                state.base.syncInventoryCapacity()
+            case .satchelTier:
+                state.base.satchelTier += 1
+            case .gambitSlot:
+                state.base.purchasedGambitSlots += 1
+            case .essenceSpringTier:
+                bumpStation(Stations.essenceSpring, in: &state)
+            case .automateSelf:
+                state.base.hasAutomateSelfUnlock = true
+            case .companionWeapon:
+                state.base.companion.weaponTier += 1
+            case .companionArmor:
+                state.base.companion.armorTier += 1
+            }
         }
+    }
+
+    private static func bumpStation(_ id: StationID, in state: inout GameState) {
+        var station = state.base.station(id)
+        station.tier += 1
+        state.base.stations[id] = station
     }
 
     // MARK: Identifying
@@ -116,7 +125,7 @@ enum EconomyRules {
     /// whole point of the cache is that it was worth carrying a key across worlds for.
     enum CacheReward: Equatable {
         case symbol(SymbolID)
-        case gambitPiece(GambitPieceID)
+        case gambitComponent(GambitComponentID)
         case motes(Int)
     }
 
@@ -125,8 +134,9 @@ enum EconomyRules {
             .filter { !state.base.ownedSymbols.contains($0.id) }
             .map(\.id)
             .sorted { $0.rawValue < $1.rawValue }
-        let unownedPieces = ContentCatalog.shared.gambitPieces
-            .filter { !state.base.ownedGambitPieces.contains($0.id) }
+        // Vocabulary found rather than studied — the wild route into the research tree.
+        let unownedComponents = ContentCatalog.shared.gambitComponents
+            .filter { !state.base.ownedGambitComponents.contains($0.id) }
             .map(\.id)
             .sorted { $0.rawValue < $1.rawValue }
 
@@ -136,8 +146,8 @@ enum EconomyRules {
         if let symbol = rng.pick(unownedSymbols) {
             options.append((.symbol(symbol), Tuning.Economy.cacheSymbolWeight))
         }
-        if let piece = rng.pick(unownedPieces) {
-            options.append((.gambitPiece(piece), Tuning.Economy.cacheGambitWeight))
+        if let component = rng.pick(unownedComponents) {
+            options.append((.gambitComponent(component), Tuning.Economy.cacheGambitWeight))
         }
         return rng.pickWeighted(options) ?? .motes(Tuning.Economy.cacheMoteRange.lowerBound)
     }
@@ -145,8 +155,7 @@ enum EconomyRules {
     static func grant(_ reward: CacheReward, in state: inout GameState) {
         switch reward {
         case .symbol(let id): state.base.ownedSymbols.insert(id)
-        case .gambitPiece(let id):
-            if !state.base.ownedGambitPieces.contains(id) { state.base.ownedGambitPieces.append(id) }
+        case .gambitComponent(let id): state.base.ownedGambitComponents.insert(id)
         case .motes(let amount): state.reality.motes += amount
         }
     }
@@ -155,8 +164,8 @@ enum EconomyRules {
         switch reward {
         case .symbol(let id):
             "A symbol you've never written: \(ContentCatalog.shared.symbol(id)?.name ?? id.rawValue)."
-        case .gambitPiece(let id):
-            "A rule you didn't have: \(ContentCatalog.shared.gambitPiece(id)?.name ?? id.rawValue)."
+        case .gambitComponent(let id):
+            "A word you didn't have: \(ContentCatalog.shared.gambitComponent(id)?.name ?? id.rawValue)."
         case .motes(let amount):
             amount == 1 ? "A single mote." : "\(amount) motes."
         }

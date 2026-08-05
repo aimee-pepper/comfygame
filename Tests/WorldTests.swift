@@ -227,8 +227,12 @@ final class WorldTests: XCTestCase {
     }
 
     func testCollapseIsReportedAtZeroStability() {
-        var state = startedRun(book(["terrain": "plains"]), seed: 57)
-        state.worlds.activeRun?.stability = 0.5
+        let composition = book(["terrain": "plains"])
+        var state = startedRun(composition, seed: 57)
+        // Exactly one turn's worth left, whatever this book's rate happens to be — pinning a
+        // literal here would break every time the stability scale is retuned.
+        state.worlds.activeRun?.stability = BookRules.decayPerTurn(for: composition)
+
         let events = WorldRules.advanceTurn(in: &state)
         XCTAssertTrue(events.contains(.collapsed))
     }

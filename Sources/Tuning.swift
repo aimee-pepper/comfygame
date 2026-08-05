@@ -32,24 +32,27 @@ enum Tuning {
         /// session 2). It must stay BELOW the cheapest symbol — currently 2 — or leaving a slot
         /// empty stops being attractive and the pressure valve closes.
         static let randomSlotCostEssence: Int = 1 // PLACEHOLDER
-        // Stability score = the headline number on a book, and now *directly* how long its world
-        // lasts (see `World.stabilityTurnBands`). A book with no instability at all sits at the
-        // neutral score; stabilising symbols push it up, greedy ones drag it down.
-        //
-        // Calibrated against the current symbol set (14×14 = 196 tiles):
-        //
-        //   | book                                          | instability | score | turns |
-        //   |-----------------------------------------------|------------|-------|-------|
-        //   | Plains · Frostbound · Sparse Ore · Dim Sky     |       −1.3 |    55 |   165 |
-        //   | Plains · Verdant · Sparse Ore  (no quirk)      |        0.0 |    45 |    90 |
-        //   | Caverns · Ashen · Rich Ore · Gilded Veins      |       +4.5 |     9 |     9 |
-        //   | everything greedy at once                     |       +7.1 |     0 |     1 |
-        //
-        // So a plain book explores about half the map, a carefully stabilised one nearly all of it,
-        // and a gold-hungry one barely lets you off the doorstep. 100 (indefinite) is deliberately
-        // unreachable with these symbols — a world that never ends is what anchoring is for.
-        static let neutralStabilityScore: Double = 45          // PLACEHOLDER
-        static let stabilityScorePerInstability: Double = 8.0  // PLACEHOLDER
+        /// **A book starts here and every symbol adds its own number to it.** No conversion, no
+        /// hidden multiplier — a symbol reading "−25 stability" moves the headline by exactly 25.
+        ///
+        /// An unwritten world is perfectly stable; instability is the price of *asking a world for
+        /// things* (the Mystcraft "greed" model, research-pass-3). Which is why every bounty symbol
+        /// is expensive and no combination of stabilisers can quite pay one off — writing a
+        /// perfectly stable world is possible only if you ask it for nothing, and then there's
+        /// nothing in it.
+        ///
+        /// Calibrated against the current symbol set (14×14 = 196 tiles):
+        ///
+        ///   | book                                        | score | turns      |
+        ///   |---------------------------------------------|-------|------------|
+        ///   | Plains · Frostbound · Sparse Ore · Dim Sky   |    95 | 380        |
+        ///   | Plains · Verdant · Sparse Ore · Gilded Veins |    45 | 90         |
+        ///   | Caverns · Verdant · Teeming Life · Gilded    |    25 | 25         |
+        ///   | Archipelago · Ashen · Rich Ore · Gilded      |     0 | 1          |
+        ///
+        /// 100 (indefinite) stays out of reach while a book asks for anything at all — a world that
+        /// never ends is what anchoring is for.
+        static let baseStabilityScore: Int = 100
     }
 
     // MARK: - Worlds
@@ -158,6 +161,9 @@ enum Tuning {
         /// Damage and healing wobble by ±this fraction of their power.
         static let damageVariance: Double = 0.25     // PLACEHOLDER
         static let consumableHealAmount: Int = 10    // PLACEHOLDER
+        /// Resource units a defeated foe drops, multiplied by its tier. A tier-1 nuisance gives
+        /// pocket change; a tier-3 horror is worth the fight.
+        static let lootPerTierRange: ClosedRange<Int> = 1...2 // PLACEHOLDER
         /// Backstop so a misbehaving rule can never hang the app between player inputs.
         static let maxAutomaticTurnsPerInput: Int = 40
     }

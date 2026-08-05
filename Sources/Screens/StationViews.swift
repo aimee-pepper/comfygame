@@ -68,34 +68,7 @@ struct WorkshopView: View {
 
                 RefineryCard()
 
-                StationCard(title: "Upgrades", icon: "wrench.and.screwdriver") {
-                    ForEach(ContentCatalog.shared.upgrades) { upgrade in
-                        UpgradeRow(upgrade: upgrade)
-                    }
-                }
-
-                StationCard(title: "Research", icon: "sparkle.magnifyingglass") {
-                    ForEach(ContentCatalog.shared.symbols.filter { $0.acquisition == .research }) { symbol in
-                        PurchaseRow(icon: symbol.icon,
-                                    name: symbol.name,
-                                    detail: symbol.blurb,
-                                    cost: "\(symbol.essenceCost) essence",
-                                    isOwned: store.state.base.ownedSymbols.contains(symbol.id),
-                                    canBuy: store.state.base.essence >= symbol.essenceCost) {
-                            store.research(symbol)
-                        }
-                    }
-                    ForEach(ContentCatalog.shared.gambitPieces.filter { $0.acquisition == .research }) { piece in
-                        PurchaseRow(icon: piece.icon,
-                                    name: piece.name,
-                                    detail: "A rule for the Party screen.",
-                                    cost: "\(piece.essenceCost) essence",
-                                    isOwned: store.state.base.ownedGambitPieces.contains(piece.id),
-                                    canBuy: store.state.base.essence >= piece.essenceCost) {
-                            store.buy(piece)
-                        }
-                    }
-                }
+                ResearchTree()
             }
             .padding(16)
         }
@@ -135,7 +108,7 @@ struct PartyView: View {
                 if store.state.base.hasAutomateSelfUnlock {
                     GambitEditor(owner: .binder)
                 } else {
-                    ComingLater("Automating your own hand is bought at the Workshop. Until then you act for yourself every turn.")
+                    ComingLater("Writing your own hand is studied under Instruction at the Workshop. Until then you act for yourself every turn.")
                 }
             }
             .padding(16)
@@ -153,12 +126,12 @@ struct PartyView: View {
 /// editor is disabled outright mid-fight rather than merely hidden, so there's no route to it.
 private struct GambitEditor: View {
     @EnvironmentObject private var store: GameStore
-    @State private var isAdding = false
+    @State private var isWriting = false
     let owner: Combatant
 
-    private var gambits: [GambitPieceID] { store.gambits(for: owner) }
+    private var gambits: [GambitRule] { store.gambits(for: owner) }
     private var slots: Int { store.activeGambitSlots }
-    private var ownerName: String { owner == .binder ? "Your own rules" : "Quill's gambits" }
+    private var ownerName: String { owner == .binder ? "Your own rules" : "Quill's rules" }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -172,13 +145,13 @@ private struct GambitEditor: View {
 
             if gambits.isEmpty {
                 EmptyNote(owner == .binder
-                          ? "No rules set — you'll keep acting for yourself."
-                          : "No rules set — Quill will stand there.")
+                          ? "No rules written — you'll keep acting for yourself."
+                          : "No rules written — Quill will stand there.")
             } else {
                 // A real List, so drag-to-reorder is the system gesture rather than an imitation.
                 List {
-                    ForEach(Array(gambits.enumerated()), id: \.element) { index, id in
-                        GambitRow(index: index, id: id, isActive: index < slots)
+                    ForEach(Array(gambits.enumerated()), id: \.element.id) { index, rule in
+                        GambitRow(index: index, rule: rule, isActive: index < slots)
                     }
                     .onMove { store.moveGambit(from: $0, to: $1, for: owner) }
                     .onDelete { store.removeGambit(at: $0, for: owner) }
@@ -190,17 +163,15 @@ private struct GambitEditor: View {
                 .disabled(!store.canEditGambits)
             }
 
-            if !unowned.isEmpty {
-                Button { isAdding = true } label: {
-                    Label("Add a rule", systemImage: "plus.circle")
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.bordered)
-                .disabled(!store.canEditGambits)
+            Button { isWriting = true } label: {
+                Label("Write a rule", systemImage: "plus.circle")
+                    .frame(maxWidth: .infinity, minHeight: 44)
             }
+            .buttonStyle(.bordered)
+            .disabled(!store.canEditGambits)
 
             if gambits.count > slots {
-                Text("Rules past slot \(slots) are owned but idle. More slots come from the Workshop and the Constellation.")
+                Text("Rules past slot \(slots) are written but idle. More slots come from Instruction research and the Constellation.")
                     .font(.caption)
                     .foregroundStyle(.orange)
             }
@@ -208,39 +179,25 @@ private struct GambitEditor: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
-        .confirmationDialog("Add a rule", isPresented: $isAdding, titleVisibility: .visible) {
-            ForEach(unowned, id: \.id) { piece in
-                Button(piece.name) { store.addGambit(piece.id, for: owner) }
-            }
-            Button("Cancel", role: .cancel) {}
+        .sheet(isPresented: $isWriting) {
+            RuleBuilderView(owner: owner).environmentObject(store)
         }
-    }
-
-    /// Owned pieces not currently in the list.
-    private var unowned: [GambitPieceDef] {
-        store.state.base.ownedGambitPieces
-            .filter { !gambits.contains($0) }
-            .compactMap { ContentCatalog.shared.gambitPiece($0) }
     }
 }
 
 private struct GambitRow: View {
     let index: Int
-    let id: GambitPieceID
+    let rule: GambitRule
     let isActive: Bool
 
     var body: some View {
-        let piece = ContentCatalog.shared.gambitPiece(id)
         HStack(spacing: 10) {
             Text("\(index + 1)")
                 .font(.caption.monospacedDigit().weight(.bold))
                 .foregroundStyle(.secondary)
                 .frame(width: 18)
-            Image(systemName: piece?.icon ?? "questionmark")
-                .foregroundStyle(.tint)
-                .frame(width: 22)
             VStack(alignment: .leading, spacing: 1) {
-                Text(piece?.name ?? id.rawValue).font(.callout)
+                Text(rule.displayText).font(.callout)
                 if !isActive {
                     Text("no slot for this yet").font(.caption2).foregroundStyle(.orange)
                 }

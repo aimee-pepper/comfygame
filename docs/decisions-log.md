@@ -300,3 +300,19 @@ A rune drawn sideways is still that rune; the fiction doesn't object. Rotation m
 Stability is now measured in **steps you get**, not an abstract decay rate. 5% is five moves,
 literally; each band above 25 / 50 / 75 multiplies; 100 is indefinite. Implemented as
 `Tuning.World.stabilityTurnBands` with the calibration table in `Tuning.Book`. Pinned by tests.
+
+### Aimee's corrections, session 5 (chat)
+
+- **All research is gated behind themed group trees**, never a flat list of purchasable things.
+  Implemented as `research.json`: four branches (Instruction, The Hand, The Hold, The Forge), each a
+  DAG of one-time nodes with prerequisites. Repeatable-feeling upgrades are chained nodes, so
+  "rank" no longer exists as a concept.
+- **Gambit research grants COMPONENTS, never whole rules.** You learn "Self", or "30%", or "Skill",
+  and assemble sentences from what you know — so one new component multiplies with everything you
+  already have. Components can also be found in the wild (locked caches now grant them). Mirrors the
+  writing system: literacy, not inventory.
+- **Loot from mobs was invisible.** It was dropping and never being reported, which is the same as
+  not dropping. Spoils are now rolled at the moment of victory and shown on the victory screen.
+- **Stability units must make sense.** A symbol's printed number is now *the number the headline
+  moves by* — no conversion factor. A book starts at 100 and each symbol adds its own delta. Picking
+  three stabilisers reads 95, not ~50. Pinned by tests.

@@ -75,6 +75,12 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// Rolling battle log shown above the action bar.
     var log: [String] = []
 
+    /// What you won, in plain words, shown on the victory screen.
+    ///
+    /// Rolled the moment the fight is won rather than when it's dismissed — otherwise the payout
+    /// lands after the screen that should be reporting it, which reads as "nothing dropped".
+    var spoils: [String] = []
+
     var livingFoes: [FoeState] { foes.filter(\.isAlive) }
     var isResolved: Bool { foes.allSatisfy { !$0.isAlive } }
     var current: Combatant { order.isEmpty ? .binder : order[turnIndex % order.count] }

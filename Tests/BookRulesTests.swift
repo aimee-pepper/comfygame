@@ -26,7 +26,7 @@ final class BookRulesTests: XCTestCase {
             let book = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: seed)
             XCTAssertEqual(book.essencePaid, projection.essenceCost.lowerBound)
             XCTAssertEqual(BookRules.enemyTier(of: book), projection.enemyTier.lowerBound)
-            XCTAssertEqual(BookRules.stabilityScore(instability: BookRules.instability(of: book)),
+            XCTAssertEqual(BookRules.stabilityScore(of: book),
                            projection.stabilityScore.lowerBound)
             XCTAssertTrue(book.randomlyFilled.isEmpty)
         }
@@ -49,10 +49,10 @@ final class BookRulesTests: XCTestCase {
             XCTAssertTrue(projection.essenceCost.contains(book.essencePaid),
                           "Cost \(book.essencePaid) escaped \(projection.essenceCost)")
             XCTAssertTrue(projection.enemyTier.contains(BookRules.enemyTier(of: book)))
-            let score = BookRules.stabilityScore(instability: BookRules.instability(of: book))
+            let score = BookRules.stabilityScore(of: book)
             XCTAssertTrue(projection.stabilityScore.contains(score),
                           "Stability \(score) escaped \(projection.stabilityScore)")
-            let turns = BookRules.turnsUntilCollapse(decayPerTurn: BookRules.decayPerTurn(for: book))
+            let turns = BookRules.turnsAvailable(for: book)
             XCTAssertTrue(projection.turnsUntilCollapse.contains(turns),
                           "Turns \(turns) escaped \(projection.turnsUntilCollapse)")
         }
@@ -105,6 +105,60 @@ final class BookRulesTests: XCTestCase {
         XCTAssertGreaterThan(calmProjection.stabilityScore.lowerBound, greedyProjection.stabilityScore.lowerBound)
         XCTAssertGreaterThan(calmProjection.turnsUntilCollapse.lowerBound, greedyProjection.turnsUntilCollapse.lowerBound)
         XCTAssertLessThanOrEqual(calmProjection.enemyTier.upperBound, greedyProjection.enemyTier.lowerBound)
+    }
+
+    /// The legibility rule, pinned: **a symbol's printed number is the number the headline moves
+    /// by.** No conversion factor, nothing to work out. This is what makes a book something you can
+    /// reason about while composing rather than after paying.
+    func testASymbolMovesTheHeadlineByExactlyItsPrintedNumber() throws {
+        var draft = BookDraft()
+        draft["terrain"] = "plains"
+        draft["biome"] = "verdant"
+        draft["bounty"] = "sparse_ore"
+        draft["quirk"] = "dim_sky"
+
+        let before = BookProjection.project(draft: draft, ownedSymbols: owned).stabilityScore.lowerBound
+
+        // Swap one symbol and check the headline moves by exactly the difference printed on them.
+        draft["quirk"] = "gilded_veins"
+        let after = BookProjection.project(draft: draft, ownedSymbols: owned).stabilityScore.lowerBound
+
+        let dimSky = try XCTUnwrap(ContentCatalog.shared.symbol("dim_sky")).stabilityDelta
+        let gilded = try XCTUnwrap(ContentCatalog.shared.symbol("gilded_veins")).stabilityDelta
+        XCTAssertEqual(after - before, gilded - dimSky)
+    }
+
+    /// Aimee's case: choosing stabilising symbols should read as *clearly* stable, not as a
+    /// coin-flip. Before the rescale this book came out at about 50.
+    func testABookOfStabilisersReadsAsStable() {
+        var draft = BookDraft()
+        draft["terrain"] = "plains"
+        draft["biome"] = "frostbound"
+        draft["bounty"] = "sparse_ore"
+        draft["quirk"] = "dim_sky"
+
+        let score = BookProjection.project(draft: draft, ownedSymbols: owned).stabilityScore
+        XCTAssertTrue(score.isPoint)
+        XCTAssertGreaterThan(score.lowerBound, 75, "Three stabilisers should be obviously stable")
+    }
+
+    /// You can only write a perfectly stable world by asking it for nothing — and then there's
+    /// nothing in it. That's what keeps "indefinite" out of reach.
+    func testNoWritableBookReachesIndefinite() {
+        var best = 0
+        for terrain in ContentCatalog.shared.symbols(in: "terrain") {
+            for biome in ContentCatalog.shared.symbols(in: "biome") {
+                for bounty in ContentCatalog.shared.symbols(in: "bounty") {
+                    for quirk in ContentCatalog.shared.symbols(in: "quirk") {
+                        let delta = terrain.stabilityDelta + biome.stabilityDelta
+                            + bounty.stabilityDelta + quirk.stabilityDelta
+                        best = max(best, BookRules.stabilityScore(delta: delta))
+                    }
+                }
+            }
+        }
+        XCTAssertLessThan(best, 100, "Every book asks for something, and asking costs stability")
+        XCTAssertGreaterThan(best, 85, "…but a careful one should still be nearly perfect")
     }
 
     // MARK: Stability is measured in steps

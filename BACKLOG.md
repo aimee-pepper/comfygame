@@ -37,6 +37,9 @@
 - [x] Identify flow for 2 unidentified curios; key→locked-cache cross-world payoff; Motes + Constellation (3 nodes)
 - [x] Curios actually drop, from won encounters — otherwise nothing above could happen
 - [x] Automate Self does something: the Binder gets its own rule list once bought
+- [x] **Research rebuilt as themed branch trees** (`research.json`) — no flat shopping list anywhere
+- [x] **Gambits assembled from learned components**, not bought whole; wild components from caches
+- [x] Loot from fights is rolled at victory and shown, instead of dropping invisibly
 - [x] Stability rebalanced to Aimee's steps curve (see `Tuning.World.stabilityTurnBands`)
 
 ## Milestone 6 — Ergonomics

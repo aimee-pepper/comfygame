@@ -32,8 +32,7 @@ struct BookProjection {
 
     var slotPlans: [SlotPlan]
     var essenceCost: ClosedRange<Int>
-    var instability: ClosedRange<Double>
-    /// The 0–100 headline. Note this runs *inverted* against instability, so its bounds swap.
+    /// The 0–100 headline. Same units as the numbers printed on the symbols themselves.
     var stabilityScore: ClosedRange<Int>
     var turnsUntilCollapse: ClosedRange<Int>
     var enemyTier: ClosedRange<Int>
@@ -68,25 +67,22 @@ struct BookProjection {
         }
 
         // Additive quantities: summing per-slot extremes gives the exact overall extremes.
-        var instabilityLow = 0.0, instabilityHigh = 0.0
+        var stabilityLow = 0, stabilityHigh = 0
         var tierLow = Tuning.World.baseEnemyTier, tierHigh = Tuning.World.baseEnemyTier
 
         for plan in plans {
             let options = plan.chosen.map { [$0] } ?? plan.candidates
             guard !options.isEmpty else { continue }
-            instabilityLow += options.map(\.instabilityWeight).min() ?? 0
-            instabilityHigh += options.map(\.instabilityWeight).max() ?? 0
+            stabilityLow += options.map(\.stabilityDelta).min() ?? 0
+            stabilityHigh += options.map(\.stabilityDelta).max() ?? 0
             tierLow += options.map(\.enemyTierDelta).min() ?? 0
             tierHigh += options.map(\.enemyTierDelta).max() ?? 0
         }
 
-        // More instability ⇒ lower stability and fewer turns, so these bounds cross over.
-        let decayFast = BookRules.decayPerTurn(instability: instabilityHigh)
-        let decaySlow = BookRules.decayPerTurn(instability: instabilityLow)
-        let scoreLow = BookRules.stabilityScore(instability: instabilityHigh)
-        let scoreHigh = BookRules.stabilityScore(instability: instabilityLow)
-        let turnsLow = BookRules.turnsUntilCollapse(decayPerTurn: decayFast)
-        let turnsHigh = BookRules.turnsUntilCollapse(decayPerTurn: decaySlow)
+        let scoreLow = BookRules.stabilityScore(delta: stabilityLow)
+        let scoreHigh = BookRules.stabilityScore(delta: stabilityHigh)
+        let turnsLow = BookRules.turnsAvailable(stabilityScore: scoreLow)
+        let turnsHigh = BookRules.turnsAvailable(stabilityScore: scoreHigh)
 
         // Exact, not ranged: you pay for what you chose, plus a flat rate per slot left to chance.
         let cost = BookRules.bindCost(
@@ -97,7 +93,6 @@ struct BookProjection {
         return BookProjection(
             slotPlans: plans,
             essenceCost: cost...cost,
-            instability: instabilityLow...max(instabilityLow, instabilityHigh),
             stabilityScore: scoreLow...max(scoreLow, scoreHigh),
             turnsUntilCollapse: turnsLow...max(turnsLow, turnsHigh),
             enemyTier: max(1, tierLow)...max(1, max(tierLow, tierHigh)),

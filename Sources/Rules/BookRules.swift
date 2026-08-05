@@ -62,21 +62,26 @@ enum BookRules {
             + randomSlots * Tuning.Book.randomSlotCostEssence
     }
 
-    static func instability(of book: BoundBook) -> Double {
-        instability(symbolIDs: book.allSymbolIDs)
+    /// The total the symbols move stability by. Plain addition, in the headline's own units.
+    static func stabilityDelta(of book: BoundBook) -> Int {
+        stabilityDelta(symbolIDs: book.allSymbolIDs)
     }
 
-    static func instability(symbolIDs: [SymbolID]) -> Double {
-        symbolIDs.reduce(0.0) { $0 + (ContentCatalog.shared.symbol($1)?.instabilityWeight ?? 0) }
+    static func stabilityDelta(symbolIDs: [SymbolID]) -> Int {
+        symbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.stabilityDelta ?? 0) }
     }
 
     /// The 0–100 headline number on a book ("Stability 68").
     ///
-    /// Distinct from the in-run meter, which always starts at 100 and empties as you move — but no
-    /// longer *unrelated* to it: the score is what sets how fast that meter empties.
-    static func stabilityScore(instability: Double) -> Int {
-        let score = Tuning.Book.neutralStabilityScore - instability * Tuning.Book.stabilityScorePerInstability
-        return Int(min(100, max(0, score)).rounded())
+    /// Base 100, plus whatever the symbols say. Deliberately the *same units* the symbols are
+    /// labelled in, so a book's number is something you can work out in your head while composing
+    /// rather than something the game reveals afterwards.
+    static func stabilityScore(delta: Int) -> Int {
+        min(100, max(0, Tuning.Book.baseStabilityScore + delta))
+    }
+
+    static func stabilityScore(of book: BoundBook) -> Int {
+        stabilityScore(delta: stabilityDelta(of: book))
     }
 
     /// **How many player turns a world of this stability lasts.**
@@ -93,18 +98,17 @@ enum BookRules {
     }
 
     static func turnsAvailable(for book: BoundBook) -> Int {
-        turnsAvailable(stabilityScore: stabilityScore(instability: instability(of: book)))
+        turnsAvailable(stabilityScore: stabilityScore(of: book))
     }
 
     /// Stability lost per player turn — derived from the turn budget, so the meter empties exactly
     /// as the book promised it would.
     static func decayPerTurn(for book: BoundBook) -> Double {
-        decayPerTurn(instability: instability(of: book))
+        decayPerTurn(stabilityScore: stabilityScore(of: book))
     }
 
-    static func decayPerTurn(instability: Double) -> Double {
-        let turns = turnsAvailable(stabilityScore: stabilityScore(instability: instability))
-        return Tuning.World.startingStability / Double(max(1, turns))
+    static func decayPerTurn(stabilityScore score: Int) -> Double {
+        Tuning.World.startingStability / Double(max(1, turnsAvailable(stabilityScore: score)))
     }
 
     /// How many player turns are left from a full meter. Inverse of `decayPerTurn`, kept so the

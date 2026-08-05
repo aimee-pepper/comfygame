@@ -294,7 +294,7 @@ enum CombatRules {
 
         if let decision = GambitEngine.decide(for: actor, in: state) {
             state.worlds.activeRun?.activeEncounter?.note(
-                "\(actorName(actor, encounter: encounter)): \(GambitEngine.describe(decision.piece))"
+                "\(actorName(actor, encounter: encounter)): \(decision.rule.displayText)"
             )
             perform(decision.action, by: actor, in: &state)
         } else {
@@ -314,6 +314,7 @@ enum CombatRules {
         if encounter.isResolved {
             encounter.outcome = .victory
             encounter.note("Nothing left standing.")
+            awardSpoils(run: &run, encounter: &encounter, state: &state)
         } else if run.binderHP <= 0 && run.companionHP <= 0 {
             // No death state in v0 — you're carried home with what survived.
             encounter.outcome = .defeated
@@ -323,7 +324,43 @@ enum CombatRules {
         state.worlds.activeRun = run
     }
 
-    /// Closes out a finished fight: loot, bestiary, and taking the defeated off the grid.
+    /// Rolls what the fight paid out, straight into the satchel, and records it in plain words.
+    ///
+    /// Loot comes off the *world's own* yield table, so what you win reflects where you are — an
+    /// ore-rich world pays in ore. Tier scales the amount, so a tier-3 horror is worth the fight.
+    private static func awardSpoils(run: inout WorldRun, encounter: inout EncounterState, state: inout GameState) {
+        var gained = ResourcePool()
+        var found: [String] = []
+
+        for foe in encounter.foes {
+            let tier = ContentCatalog.shared.creature(foe.creatureID)?.tier ?? 1
+            let amount = tier * run.rng.int(in: Tuning.Encounter.lootPerTierRange)
+            if let resource = run.rng.pickWeighted(BookRules.yieldTable(for: run.book)) {
+                run.satchel.add(amount, of: resource)
+                gained.add(amount, of: resource)
+                state.reality.discovery.recordResource(resource, runIndex: run.runIndex)
+            }
+            // Curios drop unidentified — this is where keys enter the world, one identify and one
+            // long walk before they open anything.
+            if run.rng.chance(Tuning.Economy.curioDropChance) {
+                let curios = ContentCatalog.shared.items.filter { $0.kind == .curio }
+                    .map(\.id).sorted { $0.rawValue < $1.rawValue }
+                if let curio = run.rng.pick(curios) {
+                    let name = ContentCatalog.shared.item(curio)?.unidentifiedName ?? "Something odd"
+                    let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()),
+                                          catalogID: curio, count: 1, identified: false)
+                    // A full satchel refuses loot rather than silently swallowing it.
+                    found.append(run.satchelItems.add(stack) ? name : "\(name) — no room, left behind")
+                }
+            }
+        }
+
+        encounter.spoils = gained.nonZero.map { entry in
+            "\(entry.amount) \(ContentCatalog.shared.resource(entry.id)?.name.lowercased() ?? entry.id.rawValue)"
+        } + found
+    }
+
+    /// Closes out a finished fight: bestiary, and taking the defeated off the grid.
     ///
     /// Defeated foes must leave the map — a foe shares its id with the `WorldEnemy` that spawned
     /// it, and leaving it standing on the player's tile would re-trigger the same fight forever.
@@ -341,31 +378,8 @@ enum CombatRules {
             let defeated = Set(encounter.foes.map(\.id))
             run.enemies.removeAll { defeated.contains($0.id) }
             state.reality.lifetime.encountersWon += 1
-            // Loot: rolled off the world's own yield table, so what you win reflects where you are.
-            for foe in encounter.foes {
-                let tier = ContentCatalog.shared.creature(foe.creatureID)?.tier ?? 1
-                if let resource = run.rng.pickWeighted(BookRules.yieldTable(for: run.book)) {
-                    run.satchel.add(tier, of: resource)
-                    state.reality.discovery.recordResource(resource, runIndex: run.runIndex)
-                }
-                // Curios drop unidentified — this is where keys enter the world, one identify and
-                // one long walk before they open anything.
-                if run.rng.chance(Tuning.Economy.curioDropChance) {
-                    let curios = ContentCatalog.shared.items.filter { $0.kind == .curio }
-                        .map(\.id).sorted { $0.rawValue < $1.rawValue }
-                    if let curio = run.rng.pick(curios) {
-                        let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()),
-                                              catalogID: curio, count: 1, identified: false)
-                        // A full satchel refuses loot rather than silently swallowing it.
-                        if run.satchelItems.add(stack) {
-                            let name = ContentCatalog.shared.item(curio)?.unidentifiedName ?? "Something odd"
-                            events.append(.pickedUpItem(name))
-                        } else {
-                            events.append(.satchelFull(ContentCatalog.shared.item(curio)?.unidentifiedName ?? "Something odd"))
-                        }
-                    }
-                }
-            }
+            // Spoils were already rolled and banked into the satchel at the moment of victory, so
+            // the victory screen could show them. Nothing left to do but clear the board.
 
         case .fled:
             state.reality.lifetime.encountersFled += 1

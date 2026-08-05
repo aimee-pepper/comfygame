@@ -37,10 +37,53 @@ final class ContentTests: XCTestCase {
         XCTAssertEqual(ContentCatalog.shared.creatures.count, 3, "v0 ships exactly three enemy types")
     }
 
-    func testStarterGambitPiecesMatchTheBrief() {
-        let starters = ContentCatalog.shared.starterGambitPieceIDs
-        XCTAssertEqual(Set(starters), ["foe_any_attack", "ally_hp_below_50_heal", "foe_lowest_hp_attack"])
-        XCTAssertGreaterThanOrEqual(starters.count, Tuning.Encounter.startingGambitSlots)
+    /// You start able to say a little, and everything else is learned. Every starter component
+    /// has to exist, or a new game begins with rules it can't read.
+    func testStarterComponentsAllExist() {
+        for id in GambitStarter.components {
+            XCTAssertNotNil(ContentCatalog.shared.gambitComponent(id), "Unknown starter component '\(id)'")
+        }
+        for rule in GambitStarter.rules {
+            XCTAssertTrue(rule.isWritable(with: Set(GambitStarter.components)),
+                          "A starter rule uses something a new player doesn't have")
+        }
+    }
+
+    /// Every kind of component needs at least one instance or the grammar has a hole in it.
+    func testTheGrammarIsComplete() {
+        for kind in GambitComponentDef.Kind.allCases {
+            XCTAssertFalse(ContentCatalog.shared.components(kind).isEmpty,
+                           "No '\(kind.rawValue)' components exist")
+        }
+    }
+
+    /// All research is gated behind a themed branch — there is no flat shopping list.
+    func testEveryBranchHasReachableWork() {
+        for branch in ContentCatalog.shared.branchesInOrder {
+            let nodes = ContentCatalog.shared.nodes(in: branch.id)
+            XCTAssertFalse(nodes.isEmpty, "Branch '\(branch.id)' has no nodes")
+            XCTAssertTrue(nodes.contains { $0.requires.isEmpty },
+                          "Branch '\(branch.id)' has no entry point — every node is behind another")
+        }
+    }
+
+    /// A prerequisite cycle would make part of the tree permanently unreachable, and it wouldn't
+    /// be obvious from reading the JSON.
+    func testTheResearchTreeHasNoCycles() {
+        var resolved = Set<ResearchNodeID>()
+        var progressed = true
+        while progressed {
+            progressed = false
+            for node in ContentCatalog.shared.researchNodes where !resolved.contains(node.id) {
+                if node.requires.allSatisfy({ resolved.contains($0) }) {
+                    resolved.insert(node.id)
+                    progressed = true
+                }
+            }
+        }
+        let unreachable = ContentCatalog.shared.researchNodes.filter { !resolved.contains($0.id) }
+        XCTAssertTrue(unreachable.isEmpty,
+                      "Unreachable research: \(unreachable.map(\.id.rawValue).joined(separator: ", "))")
     }
 
     func testCuriosIdentifyIntoAConsumableAndAKey() {
@@ -80,7 +123,7 @@ final class ContentTests: XCTestCase {
         let state = GameState.newGame()
         XCTAssertEqual(state.base.ownedSymbols.count, ContentCatalog.shared.starterSymbolIDs.count)
         XCTAssertEqual(state.base.stations.count, ContentCatalog.shared.stations.count)
-        XCTAssertEqual(state.base.companion.gambits.count, Tuning.Encounter.startingGambitSlots)
+        XCTAssertEqual(state.base.companion.gambits.count, GambitStarter.rules.count)
         for id in state.base.ownedSymbols {
             XCTAssertNotNil(ContentCatalog.shared.symbol(id), "New game grants unknown symbol '\(id)'")
         }
@@ -114,8 +157,9 @@ final class ContentTests: XCTestCase {
             resources: catalog.resources,
             items: catalog.items,
             skills: catalog.skills,
-            gambitPieces: catalog.gambitPieces,
-            upgrades: catalog.upgrades,
+            researchBranches: catalog.researchBranches,
+            researchNodes: catalog.researchNodes,
+            gambitComponents: catalog.gambitComponents,
             stations: catalog.stations,
             constellationNodes: catalog.constellationNodes
         )

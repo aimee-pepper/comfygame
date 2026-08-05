@@ -8,13 +8,28 @@ final class CombatTests: XCTestCase {
     // MARK: Setup helpers
 
     /// A store already standing in a world, with a fight in progress against `creatures`.
+    /// Rule shorthands, so tests read as intent rather than as component ids.
+    static let attackAny = GambitRule(id: InstanceID(rawValue: 101),
+                                      subject: "subject_foe_any", action: "act_attack")
+    static let attackWeakest = GambitRule(id: InstanceID(rawValue: 102),
+                                          subject: "subject_foe_lowest", action: "act_attack")
+    static let healHurtAlly = GambitRule(id: InstanceID(rawValue: 103),
+                                         subject: "subject_ally_any",
+                                         property: "prop_hp", comparator: "cmp_below", threshold: "thr_50",
+                                         action: "act_heal")
+
     private func inFight(_ creatures: [CreatureID] = ["paper_moth"],
-                         gambits: [GambitPieceID]? = nil) -> GameStore {
+                         gambits: [GambitRule]? = nil) -> GameStore {
         let store = GameStore(io: .temporary(name: "combat-\(UUID().uuidString)"))
         store.setSymbol("plains", in: "terrain")
         store.bindAndDepart()
         if let gambits {
-            store.mutate("set gambits") { $0.base.companion.gambits = gambits }
+            store.mutate("set rules") { state in
+                // Tests may use components a fresh game hasn't learned; grant them so the rule is
+                // legal to run rather than silently skipped.
+                state.base.ownedGambitComponents = Set(ContentCatalog.shared.gambitComponents.map(\.id))
+                state.base.companion.gambits = gambits
+            }
         }
         store.mutate("stage a fight") { state in
             guard var run = state.worlds.activeRun else { return }
@@ -177,7 +192,7 @@ final class CombatTests: XCTestCase {
     /// 4–8, so it can die before the companion ever gets a turn. That made this test pass or fail on
     /// a damage roll — it was asserting luck, not behaviour.
     func testTheCompanionFightsUnattended() throws {
-        let store = inFight(["ink_hound"], gambits: ["foe_any_attack"])
+        let store = inFight(["ink_hound"], gambits: [Self.attackAny])
 
         var guardCount = 0
         while store.activeEncounter?.outcome == nil, guardCount < 30 {
@@ -194,8 +209,8 @@ final class CombatTests: XCTestCase {
     /// Acceptance criterion: reordering rules visibly changes behaviour.
     func testRuleOrderChangesWhatTheCompanionDoes() throws {
         // Heal-first vs attack-first, with an ally hurt enough to trigger the heal.
-        let healFirst = inFight(["paper_moth"], gambits: ["ally_hp_below_50_heal", "foe_any_attack"])
-        let attackFirst = inFight(["paper_moth"], gambits: ["foe_any_attack", "ally_hp_below_50_heal"])
+        let healFirst = inFight(["paper_moth"], gambits: [Self.healHurtAlly, Self.attackAny])
+        let attackFirst = inFight(["paper_moth"], gambits: [Self.attackAny, Self.healHurtAlly])
 
         for store in [healFirst, attackFirst] {
             store.mutate("hurt the binder") { $0.worlds.activeRun?.binderHP = 5 }
@@ -204,8 +219,8 @@ final class CombatTests: XCTestCase {
         let healDecision = try XCTUnwrap(GambitEngine.decide(in: healFirst.state))
         let attackDecision = try XCTUnwrap(GambitEngine.decide(in: attackFirst.state))
 
-        XCTAssertEqual(healDecision.piece, "ally_hp_below_50_heal")
-        XCTAssertEqual(attackDecision.piece, "foe_any_attack")
+        XCTAssertEqual(healDecision.rule, Self.healHurtAlly)
+        XCTAssertEqual(attackDecision.rule, Self.attackAny)
         XCTAssertNotEqual(healDecision.action, attackDecision.action,
                           "Same rules, different order, different behaviour")
     }
@@ -213,30 +228,30 @@ final class CombatTests: XCTestCase {
     /// The subtle one: a matching rule whose action can't happen falls through to the next rule,
     /// rather than wasting the turn.
     func testARuleThatCannotActFallsThroughToTheNext() throws {
-        let store = inFight(["paper_moth"], gambits: ["ally_hp_below_50_heal", "foe_any_attack"])
+        let store = inFight(["paper_moth"], gambits: [Self.healHurtAlly, Self.attackAny])
         store.mutate("hurt the binder, put the heal on cooldown") { state in
             state.worlds.activeRun?.binderHP = 5
             state.worlds.activeRun?.activeEncounter?.companionSkillCooldown = 2
         }
 
         let decision = try XCTUnwrap(GambitEngine.decide(in: store.state))
-        XCTAssertEqual(decision.piece, "foe_any_attack",
+        XCTAssertEqual(decision.rule, Self.attackAny,
                        "Heal is on cooldown, so the rule below it fires instead")
     }
 
     func testRulesBeyondTheSlotCountDoNotFire() throws {
         // Three rules, two slots: the third is owned but idle.
         let store = inFight(["paper_moth"],
-                            gambits: ["foe_lowest_hp_attack", "foe_any_attack", "ally_hp_below_50_heal"])
+                            gambits: [Self.attackWeakest, Self.attackAny, Self.healHurtAlly])
         store.mutate("hurt the binder") { $0.worlds.activeRun?.binderHP = 1 }
 
         XCTAssertEqual(store.activeGambitSlots, Tuning.Encounter.startingGambitSlots)
         let decision = try XCTUnwrap(GambitEngine.decide(in: store.state))
-        XCTAssertNotEqual(decision.piece, "ally_hp_below_50_heal", "A rule with no slot must not fire")
+        XCTAssertNotEqual(decision.rule, Self.healHurtAlly, "A rule with no slot must not fire")
     }
 
     func testNoMatchingRuleMeansTheCompanionWaits() throws {
-        let store = inFight(["paper_moth"], gambits: ["ally_hp_below_50_heal"])
+        let store = inFight(["paper_moth"], gambits: [Self.healHurtAlly])
         // Everyone is healthy, so the only rule can't match.
         XCTAssertNil(GambitEngine.decide(in: store.state))
     }
@@ -244,7 +259,7 @@ final class CombatTests: XCTestCase {
     // MARK: Manual override
 
     func testOverrideHandsOneTurnToThePlayerThenClears() throws {
-        let store = inFight(["ink_hound"], gambits: ["foe_any_attack"])
+        let store = inFight(["ink_hound"], gambits: [Self.attackAny])
 
         store.toggleCompanionOverride()
         XCTAssertTrue(try XCTUnwrap(store.activeEncounter).isCompanionOverridden)
@@ -263,23 +278,23 @@ final class CombatTests: XCTestCase {
     /// Gambit editing is out-of-combat only. A locked decision, enforced in the store rather than
     /// only hidden in the UI.
     func testGambitsCannotBeEditedMidFight() throws {
-        let store = inFight(["paper_moth"], gambits: ["foe_any_attack", "foe_lowest_hp_attack"])
+        let store = inFight(["paper_moth"], gambits: [Self.attackAny, Self.attackWeakest])
         let before = store.state.base.companion.gambits
 
         XCTAssertFalse(store.canEditGambits)
         store.moveGambit(from: IndexSet(integer: 0), to: 2)
         store.removeGambit(at: IndexSet(integer: 0))
-        store.addGambit("ally_hp_below_50_heal")
+        store.addGambit(Self.healHurtAlly)
 
         XCTAssertEqual(store.state.base.companion.gambits, before, "Nothing may change mid-fight")
     }
 
     func testGambitsCanBeReorderedAtBase() throws {
         let store = GameStore(io: .temporary(name: "party-\(UUID().uuidString)"))
-        store.mutate("set gambits") { $0.base.companion.gambits = ["foe_any_attack", "foe_lowest_hp_attack"] }
+        store.mutate("set rules") { $0.base.companion.gambits = [Self.attackAny, Self.attackWeakest] }
 
         XCTAssertTrue(store.canEditGambits)
         store.moveGambit(from: IndexSet(integer: 1), to: 0)
-        XCTAssertEqual(store.state.base.companion.gambits, ["foe_lowest_hp_attack", "foe_any_attack"])
+        XCTAssertEqual(store.state.base.companion.gambits, [Self.attackWeakest, Self.attackAny])
     }
 }

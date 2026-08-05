@@ -23,52 +23,35 @@ extension GameStore {
         refineEssence(rawUnits: state.base.resources[Resources.essenceRaw])
     }
 
-    func rank(of upgrade: UpgradeDef) -> Int { EconomyRules.rank(of: upgrade, in: state) }
-    func nextCost(of upgrade: UpgradeDef) -> UpgradeCost? { EconomyRules.nextCost(of: upgrade, in: state) }
+    // MARK: Research
 
-    func canBuy(_ upgrade: UpgradeDef) -> Bool {
-        guard let cost = nextCost(of: upgrade) else { return false }
-        return EconomyRules.canAfford(cost, in: state)
+    func isComplete(_ node: ResearchNodeDef) -> Bool { EconomyRules.isComplete(node, in: state) }
+    func isAvailable(_ node: ResearchNodeDef) -> Bool { EconomyRules.isAvailable(node, in: state) }
+    func missingPrerequisites(for node: ResearchNodeDef) -> [String] {
+        EconomyRules.missingPrerequisites(node, in: state)
+    }
+    func shortfall(for node: ResearchNodeDef) -> [String] { EconomyRules.shortfall(node.cost, in: state) }
+
+    func canResearch(_ node: ResearchNodeDef) -> Bool {
+        EconomyRules.isAvailable(node, in: state) && EconomyRules.canAfford(node.cost, in: state)
     }
 
-    func shortfall(for upgrade: UpgradeDef) -> [String] {
-        guard let cost = nextCost(of: upgrade) else { return [] }
-        return EconomyRules.shortfall(cost, in: state)
-    }
-
+    /// Complete a research node. Everything buyable in the game goes through here — there is no
+    /// flat shopping list, only branches with prerequisites.
     @discardableResult
-    func buy(_ upgrade: UpgradeDef) -> Bool {
-        guard let cost = nextCost(of: upgrade), EconomyRules.canAfford(cost, in: state) else { return false }
-        mutate("buy \(upgrade.id.rawValue)", flush: true) { state in
-            EconomyRules.pay(cost, in: &state)
-            EconomyRules.apply(upgrade, in: &state)
+    func research(_ node: ResearchNodeDef) -> Bool {
+        guard canResearch(node) else { return false }
+        mutate("research \(node.id.rawValue)", flush: true) { state in
+            EconomyRules.pay(node.cost, in: &state)
+            EconomyRules.complete(node, in: &state)
         }
         return true
     }
 
-    /// Research a symbol you don't own yet.
-    @discardableResult
-    func research(_ symbol: SymbolDef) -> Bool {
-        guard !state.base.ownedSymbols.contains(symbol.id), state.base.essence >= symbol.essenceCost
-        else { return false }
-        mutate("research \(symbol.id.rawValue)", flush: true) { state in
-            state.base.essence -= symbol.essenceCost
-            state.base.ownedSymbols.insert(symbol.id)
-        }
-        return true
-    }
-
-    /// Buy a gambit piece you don't own yet. Owning it is separate from slotting it — the Party
-    /// screen decides which rules are actually running.
-    @discardableResult
-    func buy(_ piece: GambitPieceDef) -> Bool {
-        guard !state.base.ownedGambitPieces.contains(piece.id), state.base.essence >= piece.essenceCost
-        else { return false }
-        mutate("buy \(piece.id.rawValue)", flush: true) { state in
-            state.base.essence -= piece.essenceCost
-            state.base.ownedGambitPieces.append(piece.id)
-        }
-        return true
+    /// How far along a branch is, for the Workshop's summary line.
+    func progress(in branch: ResearchBranchDef) -> (done: Int, total: Int) {
+        let nodes = ContentCatalog.shared.nodes(in: branch.id)
+        return (nodes.count { isComplete($0) }, nodes.count)
     }
 
     // MARK: - Storehouse

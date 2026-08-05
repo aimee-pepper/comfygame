@@ -1,0 +1,278 @@
+{
+  "_note": "PLACEHOLDER costs. ALL research lives here, gated behind themed branches with prerequisites — there is no flat shopping list anywhere in the game. A node is a one-time unlock; repeatable things (shelving I/II/III) are separate nodes chained by 'requires', which keeps the tree honest and removes the idea of ranks entirely. 'grants' is what unlocking it hands you: a gambit component, a symbol, or an effect on base state.",
+  "branches": [
+    {
+      "id": "instruction",
+      "name": "Instruction",
+      "icon": "list.number",
+      "blurb": "Teaching a hand to act without you. Rules are assembled from what you learn here.",
+      "order": 0
+    },
+    {
+      "id": "hand",
+      "name": "The Hand",
+      "icon": "pencil.and.outline",
+      "blurb": "What you are able to write, and how precisely.",
+      "order": 1
+    },
+    {
+      "id": "hold",
+      "name": "The Hold",
+      "icon": "archivebox",
+      "blurb": "What you can carry, store and keep.",
+      "order": 2
+    },
+    {
+      "id": "forge",
+      "name": "The Forge",
+      "icon": "hammer",
+      "blurb": "Edges and guards for the people who walk in with you.",
+      "order": 3
+    }
+  ],
+  "nodes": [
+    {
+      "id": "reason_about_targets",
+      "branch": "instruction",
+      "name": "Choosing a mark",
+      "icon": "target",
+      "blurb": "Tell a rule which enemy it means.",
+      "cost": { "essence": 12, "resources": { "fiber": 3 } },
+      "requires": [],
+      "grants": [{ "kind": "gambitComponent", "id": "subject_foe_lowest" }]
+    },
+    {
+      "id": "reason_about_the_large",
+      "branch": "instruction",
+      "name": "Choosing the largest",
+      "icon": "arrow.up.right.circle",
+      "blurb": "Go at the biggest thing in the room, on purpose.",
+      "cost": { "essence": 20, "resources": { "fiber": 5 } },
+      "requires": ["reason_about_targets"],
+      "grants": [{ "kind": "gambitComponent", "id": "subject_foe_highest" }]
+    },
+    {
+      "id": "reason_about_self",
+      "branch": "instruction",
+      "name": "Reasoning about yourself",
+      "icon": "person.crop.circle",
+      "blurb": "A rule that looks inward before it looks out.",
+      "cost": { "essence": 18, "resources": { "fiber": 4 } },
+      "requires": [],
+      "grants": [{ "kind": "gambitComponent", "id": "subject_self" }]
+    },
+    {
+      "id": "notice_thirty",
+      "branch": "instruction",
+      "name": "Noticing 30%",
+      "icon": "circle.bottomhalf.filled",
+      "blurb": "A finer mark than half.",
+      "cost": { "essence": 15 },
+      "requires": [],
+      "grants": [{ "kind": "gambitComponent", "id": "thr_30" }]
+    },
+    {
+      "id": "notice_seventy",
+      "branch": "instruction",
+      "name": "Noticing 70%",
+      "icon": "circle.tophalf.filled",
+      "blurb": "Act before things are dire.",
+      "cost": { "essence": 15 },
+      "requires": [],
+      "grants": [{ "kind": "gambitComponent", "id": "thr_70" }]
+    },
+    {
+      "id": "notice_ten",
+      "branch": "instruction",
+      "name": "Noticing 10%",
+      "icon": "circle.dotted",
+      "blurb": "The last moment anything can be done.",
+      "cost": { "essence": 30, "resources": { "fiber": 6 } },
+      "requires": ["notice_thirty"],
+      "grants": [{ "kind": "gambitComponent", "id": "thr_10" }]
+    },
+    {
+      "id": "reason_upward",
+      "branch": "instruction",
+      "name": "Reasoning upward",
+      "icon": "greaterthan",
+      "blurb": "Conditions that trigger on plenty rather than on lack.",
+      "cost": { "essence": 25, "resources": { "fiber": 5 } },
+      "requires": ["notice_seventy"],
+      "grants": [{ "kind": "gambitComponent", "id": "cmp_above" }]
+    },
+    {
+      "id": "instruct_skill",
+      "branch": "instruction",
+      "name": "Instructing a skill",
+      "icon": "sparkles",
+      "blurb": "Rules that reach for something better than a swing.",
+      "cost": { "essence": 22, "resources": { "ore": 4 } },
+      "requires": ["reason_about_targets"],
+      "grants": [{ "kind": "gambitComponent", "id": "act_skill" }]
+    },
+    {
+      "id": "instruct_retreat",
+      "branch": "instruction",
+      "name": "Instructing retreat",
+      "icon": "figure.run",
+      "blurb": "Knowing when to stop is a rule like any other.",
+      "cost": { "essence": 26, "resources": { "fiber": 6 } },
+      "requires": ["reason_about_self"],
+      "grants": [{ "kind": "gambitComponent", "id": "act_flee" }]
+    },
+    {
+      "id": "longer_instruction",
+      "branch": "instruction",
+      "name": "A longer instruction",
+      "icon": "list.number",
+      "blurb": "One more rule your companion will follow.",
+      "cost": { "essence": 30, "resources": { "fiber": 8 } },
+      "requires": ["reason_about_targets"],
+      "grants": [{ "kind": "effect", "effect": "gambitSlot" }]
+    },
+    {
+      "id": "longer_instruction_two",
+      "branch": "instruction",
+      "name": "A longer instruction, again",
+      "icon": "list.bullet.indent",
+      "blurb": "And one more after that.",
+      "cost": { "essence": 65, "resources": { "fiber": 18, "ore": 6 } },
+      "requires": ["longer_instruction"],
+      "grants": [{ "kind": "effect", "effect": "gambitSlot" }]
+    },
+    {
+      "id": "automate_self",
+      "branch": "instruction",
+      "name": "Write your own hand",
+      "icon": "person.crop.circle.badge.checkmark",
+      "blurb": "Your own rules, followed without you. The hardest thing to teach.",
+      "cost": { "essence": 70, "resources": { "ore": 12, "fiber": 12 } },
+      "requires": ["reason_about_self", "longer_instruction"],
+      "grants": [{ "kind": "effect", "effect": "automateSelf" }]
+    },
+
+    {
+      "id": "study_growth",
+      "branch": "hand",
+      "name": "Study: growth",
+      "icon": "camera.macro",
+      "blurb": "Copper-green bloom over everything it touches.",
+      "cost": { "essence": 20, "resources": { "fiber": 8 } },
+      "requires": [],
+      "grants": [{ "kind": "symbol", "id": "verdigris_bloom" }]
+    },
+    {
+      "id": "study_permanence",
+      "branch": "hand",
+      "name": "Study: permanence",
+      "icon": "star.circle",
+      "blurb": "Something that shouldn't be buried, buried anyway.",
+      "cost": { "essence": 60, "resources": { "ore": 20 } },
+      "requires": ["study_growth"],
+      "grants": [{ "kind": "symbol", "id": "mote_vein" }]
+    },
+
+    {
+      "id": "shelving_one",
+      "branch": "hold",
+      "name": "Shelving",
+      "icon": "archivebox",
+      "blurb": "Room at home for more of what you drag back.",
+      "cost": { "essence": 20, "resources": { "ore": 4 } },
+      "requires": [],
+      "grants": [{ "kind": "effect", "effect": "storehouseTier" }]
+    },
+    {
+      "id": "shelving_two",
+      "branch": "hold",
+      "name": "Shelving, deeper",
+      "icon": "archivebox.fill",
+      "blurb": "More still.",
+      "cost": { "essence": 40, "resources": { "ore": 10, "fiber": 6 } },
+      "requires": ["shelving_one"],
+      "grants": [{ "kind": "effect", "effect": "storehouseTier" }]
+    },
+    {
+      "id": "shelving_three",
+      "branch": "hold",
+      "name": "Shelving, to the rafters",
+      "icon": "square.stack.3d.up",
+      "blurb": "There is no more wall.",
+      "cost": { "essence": 75, "resources": { "ore": 20, "fiber": 14 } },
+      "requires": ["shelving_two"],
+      "grants": [{ "kind": "effect", "effect": "storehouseTier" }]
+    },
+    {
+      "id": "satchel_one",
+      "branch": "hold",
+      "name": "Satchel stitching",
+      "icon": "bag",
+      "blurb": "Carry more out of a world before you have to choose.",
+      "cost": { "essence": 15, "resources": { "fiber": 5 } },
+      "requires": [],
+      "grants": [{ "kind": "effect", "effect": "satchelTier" }]
+    },
+    {
+      "id": "satchel_two",
+      "branch": "hold",
+      "name": "Satchel, reinforced",
+      "icon": "bag.fill",
+      "blurb": "It holds. Mostly.",
+      "cost": { "essence": 35, "resources": { "fiber": 12, "ore": 4 } },
+      "requires": ["satchel_one"],
+      "grants": [{ "kind": "effect", "effect": "satchelTier" }]
+    },
+    {
+      "id": "deepen_spring",
+      "branch": "hold",
+      "name": "Deepen the spring",
+      "icon": "drop.circle",
+      "blurb": "More essence waiting each time you come home.",
+      "cost": { "essence": 45, "resources": { "ore": 8, "fiber": 8 } },
+      "requires": ["shelving_one"],
+      "grants": [{ "kind": "effect", "effect": "essenceSpringTier" }]
+    },
+
+    {
+      "id": "edge_one",
+      "branch": "forge",
+      "name": "Quill's edge",
+      "icon": "hammer",
+      "blurb": "Your companion hits harder.",
+      "cost": { "essence": 20, "resources": { "ore": 6 } },
+      "requires": [],
+      "grants": [{ "kind": "effect", "effect": "companionWeapon" }]
+    },
+    {
+      "id": "edge_two",
+      "branch": "forge",
+      "name": "Quill's edge, honed",
+      "icon": "hammer.fill",
+      "blurb": "Harder still.",
+      "cost": { "essence": 45, "resources": { "ore": 15 } },
+      "requires": ["edge_one"],
+      "grants": [{ "kind": "effect", "effect": "companionWeapon" }]
+    },
+    {
+      "id": "guard_one",
+      "branch": "forge",
+      "name": "Quill's guard",
+      "icon": "shield",
+      "blurb": "Your companion takes less.",
+      "cost": { "essence": 20, "resources": { "fiber": 6 } },
+      "requires": [],
+      "grants": [{ "kind": "effect", "effect": "companionArmor" }]
+    },
+    {
+      "id": "guard_two",
+      "branch": "forge",
+      "name": "Quill's guard, banded",
+      "icon": "shield.fill",
+      "blurb": "Takes less still.",
+      "cost": { "essence": 45, "resources": { "fiber": 15, "ore": 5 } },
+      "requires": ["guard_one"],
+      "grants": [{ "kind": "effect", "effect": "companionArmor" }]
+    }
+  ]
+}

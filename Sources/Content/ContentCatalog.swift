@@ -13,8 +13,9 @@ struct ContentCatalog: Sendable {
     let resources: [ResourceDef]
     let items: [ItemDef]
     let skills: [SkillDef]
-    let gambitPieces: [GambitPieceDef]
-    let upgrades: [UpgradeDef]
+    let researchBranches: [ResearchBranchDef]
+    let researchNodes: [ResearchNodeDef]
+    let gambitComponents: [GambitComponentDef]
     let stations: [StationDef]
     let constellationNodes: [ConstellationNodeDef]
 
@@ -42,8 +43,15 @@ struct ContentCatalog: Sendable {
     func item(_ id: ItemID) -> ItemDef? { items.first { $0.id == id } }
     func skill(_ id: SkillID) -> SkillDef? { skills.first { $0.id == id } }
     func skill(ownedBy owner: SkillDef.Owner) -> SkillDef? { skills.first { $0.owner == owner } }
-    func gambitPiece(_ id: GambitPieceID) -> GambitPieceDef? { gambitPieces.first { $0.id == id } }
-    func upgrade(_ id: UpgradeID) -> UpgradeDef? { upgrades.first { $0.id == id } }
+    func researchBranch(_ id: ResearchBranchID) -> ResearchBranchDef? { researchBranches.first { $0.id == id } }
+    func researchNode(_ id: ResearchNodeID) -> ResearchNodeDef? { researchNodes.first { $0.id == id } }
+    func gambitComponent(_ id: GambitComponentID) -> GambitComponentDef? { gambitComponents.first { $0.id == id } }
+
+    var branchesInOrder: [ResearchBranchDef] { researchBranches.sorted { $0.order < $1.order } }
+    func nodes(in branch: ResearchBranchID) -> [ResearchNodeDef] { researchNodes.filter { $0.branch == branch } }
+    func components(_ kind: GambitComponentDef.Kind) -> [GambitComponentDef] {
+        gambitComponents.filter { $0.kind == kind }
+    }
     func station(_ id: StationID) -> StationDef? { stations.first { $0.id == id } }
     func constellationNode(_ id: ConstellationNodeID) -> ConstellationNodeDef? {
         constellationNodes.first { $0.id == id }
@@ -57,7 +65,6 @@ struct ContentCatalog: Sendable {
     var slotIDsInOrder: [SlotID] { slotsInOrder.map(\.id) }
 
     var starterSymbolIDs: [SymbolID] { symbols.filter { $0.acquisition == .starter }.map(\.id) }
-    var starterGambitPieceIDs: [GambitPieceID] { gambitPieces.filter { $0.acquisition == .starter }.map(\.id) }
     var stationsInOrder: [StationDef] { stations.sorted { $0.sortOrder < $1.sortOrder } }
 
     // MARK: - Loading
@@ -86,8 +93,9 @@ struct ContentCatalog: Sendable {
             resources: try loadFile("resources", key: "resources", bundle: bundle),
             items: try loadFile("items", key: "items", bundle: bundle),
             skills: try loadFile("skills", key: "skills", bundle: bundle),
-            gambitPieces: try loadFile("gambit_pieces", key: "gambitPieces", bundle: bundle),
-            upgrades: try loadFile("upgrades", key: "upgrades", bundle: bundle),
+            researchBranches: try loadFile("research", key: "branches", bundle: bundle),
+            researchNodes: try loadFile("research", key: "nodes", bundle: bundle),
+            gambitComponents: try loadFile("gambit_components", key: "components", bundle: bundle),
             stations: try loadFile("stations", key: "stations", bundle: bundle),
             constellationNodes: try loadFile("constellation", key: "nodes", bundle: bundle)
         )
@@ -113,17 +121,22 @@ struct ContentCatalog: Sendable {
         }
     }
 
-    /// Lets `_note` (a string) and the payload array coexist in one JSON object.
+    /// Lets one JSON object hold several things at once: the `_note`, the collection being asked
+    /// for, and other collections of entirely different shapes. `research.json` carries both
+    /// branches and nodes, so a key that doesn't decode as `T` is skipped rather than fatal.
     private enum ContentFileValue<T: Decodable>: Decodable {
         case note(String)
         case entries([T])
+        case somethingElse
 
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             if let text = try? container.decode(String.self) {
                 self = .note(text)
+            } else if let entries = try? container.decode([T].self) {
+                self = .entries(entries)
             } else {
-                self = .entries(try container.decode([T].self))
+                self = .somethingElse
             }
         }
     }
@@ -137,8 +150,9 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(resources.map(\.id.rawValue), label: "resource")
         try requireUniqueIDs(items.map(\.id.rawValue), label: "item")
         try requireUniqueIDs(skills.map(\.id.rawValue), label: "skill")
-        try requireUniqueIDs(gambitPieces.map(\.id.rawValue), label: "gambit piece")
-        try requireUniqueIDs(upgrades.map(\.id.rawValue), label: "upgrade")
+        try requireUniqueIDs(researchBranches.map(\.id.rawValue), label: "research branch")
+        try requireUniqueIDs(researchNodes.map(\.id.rawValue), label: "research node")
+        try requireUniqueIDs(gambitComponents.map(\.id.rawValue), label: "gambit component")
         try requireUniqueIDs(stations.map(\.id.rawValue), label: "station")
         try requireUniqueIDs(constellationNodes.map(\.id.rawValue), label: "constellation node")
 
@@ -154,15 +168,48 @@ struct ContentCatalog: Sendable {
             throw ContentError.danglingReference("slots.json defines no slots — books would have nowhere to put a symbol")
         }
 
-        for upgrade in upgrades {
-            guard !upgrade.ranks.isEmpty else {
-                throw ContentError.danglingReference("upgrade '\(upgrade.id)' has no ranks, so it can never be bought")
+        // The research tree has to be a real, reachable DAG: no dangling prerequisites, no
+        // orphaned branches, and no node that grants something that doesn't exist.
+        let branchIDs = Set(researchBranches.map(\.id))
+        let nodeIDs = Set(researchNodes.map(\.id))
+        let componentIDs = Set(gambitComponents.map(\.id))
+        let symbolIDs = Set(symbols.map(\.id))
+
+        for node in researchNodes {
+            guard branchIDs.contains(node.branch) else {
+                throw ContentError.danglingReference("research node '\(node.id)' is in unknown branch '\(node.branch)'")
             }
-            for rank in upgrade.ranks {
-                for id in rank.resources.keys where !resourceIDs.contains(id) {
-                    throw ContentError.danglingReference("upgrade '\(upgrade.id)' costs unknown resource '\(id)'")
+            for required in node.requires where !nodeIDs.contains(required) {
+                throw ContentError.danglingReference("research node '\(node.id)' requires unknown node '\(required)'")
+            }
+            if node.requires.contains(node.id) {
+                throw ContentError.danglingReference("research node '\(node.id)' requires itself")
+            }
+            for id in node.cost.resources.keys where !resourceIDs.contains(id) {
+                throw ContentError.danglingReference("research node '\(node.id)' costs unknown resource '\(id)'")
+            }
+            guard !node.grants.isEmpty else {
+                throw ContentError.danglingReference("research node '\(node.id)' grants nothing")
+            }
+            for grant in node.grants {
+                switch grant.kind {
+                case .gambitComponent:
+                    guard let id = grant.id, componentIDs.contains(GambitComponentID(rawValue: id)) else {
+                        throw ContentError.danglingReference("node '\(node.id)' grants unknown component '\(grant.id ?? "nil")'")
+                    }
+                case .symbol:
+                    guard let id = grant.id, symbolIDs.contains(SymbolID(rawValue: id)) else {
+                        throw ContentError.danglingReference("node '\(node.id)' grants unknown symbol '\(grant.id ?? "nil")'")
+                    }
+                case .effect:
+                    guard grant.effect != nil else {
+                        throw ContentError.danglingReference("node '\(node.id)' grants an effect with no effect named")
+                    }
                 }
             }
+        }
+        for branch in researchBranches where nodes(in: branch.id).isEmpty {
+            throw ContentError.danglingReference("research branch '\(branch.id)' has no nodes")
         }
 
         for symbol in symbols {

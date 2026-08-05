@@ -1,0 +1,137 @@
+{
+  "_note": "PLACEHOLDER. A rule is ASSEMBLED from these, never bought whole: subject + (property comparator threshold) + action. So research reads 'you learned to reason about Self' or 'you learned to notice 30%', and every new component multiplies with everything you already know rather than adding one more canned line. Mirrors the writing system: literacy, not inventory. Components are granted by research nodes (research.json) or found in the wild.",
+  "components": [
+    {
+      "id": "subject_foe_any",
+      "kind": "subject",
+      "name": "Foe: any",
+      "icon": "target",
+      "blurb": "Whichever enemy is nearest to hand.",
+      "selector": "foe.any"
+    },
+    {
+      "id": "subject_foe_lowest",
+      "kind": "subject",
+      "name": "Foe: lowest HP",
+      "icon": "arrow.down.right.circle",
+      "blurb": "Finish what's already hurt.",
+      "selector": "foe.lowestHP"
+    },
+    {
+      "id": "subject_foe_highest",
+      "kind": "subject",
+      "name": "Foe: highest HP",
+      "icon": "arrow.up.right.circle",
+      "blurb": "Go at the biggest thing in the room.",
+      "selector": "foe.highestHP"
+    },
+    {
+      "id": "subject_ally_any",
+      "kind": "subject",
+      "name": "Ally: any",
+      "icon": "person.2",
+      "blurb": "Anyone on your side, yourself included.",
+      "selector": "ally.any"
+    },
+    {
+      "id": "subject_self",
+      "kind": "subject",
+      "name": "Self",
+      "icon": "person.crop.circle",
+      "blurb": "Reason about your own condition.",
+      "selector": "self"
+    },
+
+    {
+      "id": "prop_hp",
+      "kind": "property",
+      "name": "health",
+      "icon": "heart",
+      "blurb": "How much is left of someone.",
+      "property": "hp"
+    },
+
+    {
+      "id": "cmp_below",
+      "kind": "comparator",
+      "name": "below",
+      "icon": "lessthan",
+      "blurb": "Less than the mark.",
+      "comparator": "below"
+    },
+    {
+      "id": "cmp_above",
+      "kind": "comparator",
+      "name": "above",
+      "icon": "greaterthan",
+      "blurb": "More than the mark.",
+      "comparator": "above"
+    },
+
+    {
+      "id": "thr_50",
+      "kind": "threshold",
+      "name": "50%",
+      "icon": "circle.lefthalf.filled",
+      "blurb": "Half.",
+      "value": 0.5
+    },
+    {
+      "id": "thr_70",
+      "kind": "threshold",
+      "name": "70%",
+      "icon": "circle.tophalf.filled",
+      "blurb": "A little worn.",
+      "value": 0.7
+    },
+    {
+      "id": "thr_30",
+      "kind": "threshold",
+      "name": "30%",
+      "icon": "circle.bottomhalf.filled",
+      "blurb": "Badly hurt.",
+      "value": 0.3
+    },
+    {
+      "id": "thr_10",
+      "kind": "threshold",
+      "name": "10%",
+      "icon": "circle.dotted",
+      "blurb": "Nearly gone.",
+      "value": 0.1
+    },
+
+    {
+      "id": "act_attack",
+      "kind": "action",
+      "name": "Attack",
+      "icon": "figure.fencing",
+      "blurb": "Hit it.",
+      "action": "attack"
+    },
+    {
+      "id": "act_heal",
+      "kind": "action",
+      "name": "Heal",
+      "icon": "cross.case",
+      "blurb": "Use the mending skill, if it's ready.",
+      "action": "heal"
+    },
+    {
+      "id": "act_skill",
+      "kind": "action",
+      "name": "Skill",
+      "icon": "sparkles",
+      "blurb": "Whatever skill they carry, when it's off cooldown.",
+      "action": "skill"
+    },
+    {
+      "id": "act_flee",
+      "kind": "action",
+      "name": "Flee",
+      "icon": "figure.run",
+      "blurb": "Break away. Costs the world some stability.",
+      "action": "flee"
+    }
+  ]
+}

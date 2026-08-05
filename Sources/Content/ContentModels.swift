@@ -29,10 +29,13 @@ struct SymbolDef: Codable, Equatable, Identifiable, Sendable {
     var acquisition: Acquisition
     /// Essence contribution to the bind cost.
     var essenceCost: Int
-    /// Contribution to the world's instability. Negative = stabilising (e.g. Dim Sky).
-    /// Mystcraft's real model is runtime "greed" profiling (research pass 3); v0 uses a flat
-    /// weight per symbol as the tractable stand-in.
-    var instabilityWeight: Double
+    /// How much this symbol moves the book's Stability headline, **in the headline's own units**.
+    ///
+    /// Positive stabilises, negative destabilises, and the numbers simply add: a book starts at 100
+    /// and a symbol reading "−25 stability" moves it to 75. No conversion factor, no separate
+    /// instability scale — the number on the symbol is the number on the meter, because anything
+    /// else makes composing a book guesswork.
+    var stabilityDelta: Int
     /// Multipliers on resource yield, keyed by resource. Absent = 1.0.
     var yieldModifiers: [ResourceID: Double]
     /// Additive weight changes to the enemy spawn table, keyed by creature.
@@ -107,77 +110,6 @@ struct SkillDef: Codable, Equatable, Identifiable, Sendable {
 
     enum Kind: String, Codable, Sendable { case damage, heal }
     enum Owner: String, Codable, Sendable { case binder, companion }
-}
-
-/// A gambit piece: one `condition → action` rule the companion can run.
-///
-/// Conditions and actions are kept as loosely-typed specs on purpose. The engine that interprets
-/// them lands in milestone 4; the catalog is expected to grow toward FF12-scale granularity
-/// (research pass 3, part 2), so new pieces must be addable as data alone.
-struct GambitPieceDef: Codable, Equatable, Identifiable, Sendable {
-    var id: GambitPieceID
-    var name: String
-    var icon: String
-    var acquisition: SymbolDef.Acquisition
-    var essenceCost: Int
-    var condition: GambitConditionSpec
-    var action: GambitActionSpec
-}
-
-struct GambitConditionSpec: Codable, Equatable, Sendable {
-    /// e.g. "foe.any", "foe.lowestHP", "ally.hpBelow", "self.hpBelow", "foe.hpBelow"
-    var kind: String
-    /// Percentage threshold (0–1) for the `*.hpBelow` kinds.
-    var threshold: Double?
-}
-
-struct GambitActionSpec: Codable, Equatable, Sendable {
-    /// e.g. "attack", "heal", "flee", "skill"
-    var kind: String
-    var skillID: String?
-}
-
-/// Something buyable at the Workshop.
-///
-/// `ranks` is one entry per purchase, so an upgrade's depth is a data decision. Costs mix essence
-/// with raw resources on purpose — ore and fibre need somewhere to go.
-struct UpgradeDef: Codable, Equatable, Identifiable, Sendable {
-    var id: UpgradeID
-    var name: String
-    var icon: String
-    var blurb: String
-    var effect: Effect
-    var ranks: [UpgradeCost]
-
-    var maxRank: Int { ranks.count }
-
-    /// What buying it changes. Each case maps to exactly one piece of existing state, so a rank is
-    /// always *derived* from that state rather than stored a second time.
-    enum Effect: String, Codable, Sendable {
-        case storehouseTier
-        case satchelTier
-        case gambitSlot
-        case essenceSpringTier
-        case automateSelf
-        case companionWeapon
-        case companionArmor
-    }
-}
-
-struct UpgradeCost: Codable, Equatable, Sendable {
-    var essence: Int
-    var resources: [ResourceID: Int]
-
-    init(essence: Int, resources: [ResourceID: Int] = [:]) {
-        self.essence = essence
-        self.resources = resources
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        essence = try container.decodeIfPresent(Int.self, forKey: .essence) ?? 0
-        resources = try container.decodeIfPresent([ResourceID: Int].self, forKey: .resources) ?? [:]
-    }
 }
 
 /// A base station. The Base screen is a data-driven list of these, not hardcoded buttons —
