@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -99,7 +99,7 @@
 		36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPanel.swift; sourceTree = "<group>"; };
 		3CD59EA0991C7AFB32B3129C /* BookbinderTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BookbinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		40DDEB42C7E2856E98352341 /* GameActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameActions.swift; sourceTree = "<group>"; };
-		433D570D177BA9841C75DCF9 /* Bookbinder.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Bookbinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		433D570D177BA9841C75DCF9 /* Bookbinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookbinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4461FC8AD054E8E6E494602B /* EconomyRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EconomyRules.swift; sourceTree = "<group>"; };
 		4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldsState.swift; sourceTree = "<group>"; };
 		59F1E2A3A08364F9452A684F /* stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = stations.json; sourceTree = "<group>"; };
@@ -367,7 +367,6 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					CF0593DC0240C3C51FDC7CAE = {
-						DevelopmentTeam = BNV6X8W4QS;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -382,7 +381,6 @@
 			);
 			mainGroup = 45223024247727E345FE8AC7;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -580,7 +578,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BNV6X8W4QS;
+				DEVELOPMENT_TEAM = CQ892K6L4F;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -678,7 +676,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BNV6X8W4QS;
+				DEVELOPMENT_TEAM = CQ892K6L4F;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

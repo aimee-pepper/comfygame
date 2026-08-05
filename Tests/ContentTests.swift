@@ -12,17 +12,34 @@ final class ContentTests: XCTestCase {
     }
 
     func testStarterCollectionMatchesTheBrief() {
-        // The brief heads this list "Starter collection (10 symbols)" and then names ELEVEN
-        // (3 terrain + 3 biome + 3 bounty + 2 quirk). Conservative reading: ship all eleven that
-        // Aimee named rather than silently dropping one to hit the count. See
-        // docs/questions-for-design.md Q2.
+        // The brief names eleven (Q2). "Ore" is a twelfth, added on Aimee's instruction that the
+        // bounty slot needs a neutral middle rung — see questions-for-design Q15.
         let expected: Set<SymbolID> = [
             "plains", "caverns", "archipelago",
             "verdant", "ashen", "frostbound",
-            "sparse_ore", "rich_ore", "teeming_life",
+            "sparse_ore", "common_ore", "rich_ore", "teeming_life",
             "dim_sky", "gilded_veins",
         ]
         XCTAssertEqual(Set(ContentCatalog.shared.starterSymbolIDs), expected)
+    }
+
+    /// The rule that makes the bounty slot a decision instead of a toll: below the baseline calms a
+    /// world, the baseline costs nothing, above it destabilises.
+    func testTheBountyLadderRunsBelowAtAndAboveTheBaseline() throws {
+        let sparse = try XCTUnwrap(ContentCatalog.shared.symbol("sparse_ore"))
+        let ordinary = try XCTUnwrap(ContentCatalog.shared.symbol("common_ore"))
+        let rich = try XCTUnwrap(ContentCatalog.shared.symbol("rich_ore"))
+
+        XCTAssertGreaterThan(sparse.stabilityDelta, 0, "Asking for less than there is calms a world")
+        XCTAssertEqual(ordinary.stabilityDelta, 0, "Asking for what's already there costs nothing")
+        XCTAssertLessThan(rich.stabilityDelta, 0, "Asking for more than there is, is greed")
+
+        // …and the yields have to follow the same ladder, or the names are lying.
+        let sparseOre = sparse.yieldModifiers[Resources.ore] ?? 1
+        let ordinaryOre = ordinary.yieldModifiers[Resources.ore] ?? 1
+        let richOre = rich.yieldModifiers[Resources.ore] ?? 1
+        XCTAssertLessThan(sparseOre, ordinaryOre)
+        XCTAssertLessThan(ordinaryOre, richOre)
     }
 
     func testEverySlotHasAtLeastOneStarterSymbol() {

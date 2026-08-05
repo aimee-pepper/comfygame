@@ -198,3 +198,18 @@ Unaddressed in the spec, and it changes the packing puzzle a lot. Default I'd ta
 - **Q11 (what limits a Skill)** — still open; unaffected by session 4.
 - **Q7/Q8 (slot pricing, fifth slot)** — dissolved by the writing-system redesign. Unwritten targets
   cost the flat cheap rate, which is the same rule, now expressed in the new vocabulary.
+
+---
+
+## Session 5 addendum
+
+### Q15. "Ore" is a twelfth starter symbol
+Aimee's correction: the bounty slot needs a neutral middle rung, because stability tracks *deviation
+from what a world would naturally have* — Sparse Ore asks for less and calms a world (+10), Ore asks
+for the baseline and costs nothing (0), Rich Ore asks for more and destabilises (−45).
+
+That required a symbol that didn't exist. **Shipped:** `common_ore`, display name "Ore", as a
+starter — a ladder whose middle rung is missing teaches nothing. That makes twelve starters against
+the eleven named in the brief (Q2).
+
+Say if it should be researched rather than granted, and I'll move it.

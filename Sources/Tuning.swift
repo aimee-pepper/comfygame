@@ -35,8 +35,11 @@ enum Tuning {
         /// **A book starts here and every symbol adds its own number to it.** No conversion, no
         /// hidden multiplier — a symbol reading "−25 stability" moves the headline by exactly 25.
         ///
-        /// An unwritten world is perfectly stable; instability is the price of *asking a world for
-        /// things* (the Mystcraft "greed" model, research-pass-3).
+        /// **Stability tracks deviation from what a world would naturally have.** Asking for less
+        /// than the baseline calms it, asking for the baseline costs nothing, asking for more is the
+        /// greed that destabilises — the Mystcraft model from research-pass-3, run in both
+        /// directions. Which is why the bounty slot is a decision (Sparse Ore +10, Ore 0, Rich Ore
+        /// −45) rather than a tax you pay for turning up.
         ///
         /// **A fully stable world is reachable, and it is not an empty one.** Stack neutral and
         /// stabilising choices and you can hold a world open indefinitely — what that costs you is
@@ -45,12 +48,13 @@ enum Tuning {
         ///
         /// Calibrated against the current symbol set (14×14 = 196 tiles):
         ///
-        ///   | book                                        | score |      turns | sight | danger |
-        ///   |---------------------------------------------|-------|------------|-------|--------|
-        ///   | Plains · Frostbound · Sparse Ore · Dim Sky   |   100 | indefinite |     3 | tier 2 |
-        ///   | Plains · Verdant · Sparse Ore · Gilded Veins |    55 |        165 |     4 | tier 2 |
-        ///   | Plains · Frostbound · Rich Ore · Dim Sky     |    70 |        210 |     3 | tier 3 |
-        ///   | Archipelago · Ashen · Rich Ore · Gilded      |     0 |          1 |     3 | tier 4 |
+        ///   | book                                      | score |      turns | what it costs you |
+        ///   |-------------------------------------------|-------|------------|-------------------|
+        ///   | Plains · Verdant · Sparse Ore · Dim Sky   |   100 | indefinite | thin seams, dark  |
+        ///   | Plains · Verdant · Ore · Dim Sky          |   100 | indefinite | ordinary, dark    |
+        ///   | Plains · Verdant · Rich Ore · Dim Sky     |    67 |        201 | dark, tier 3      |
+        ///   | Plains · Verdant · Rich Ore · Gilded      |    25 |         25 | tier 3, and brief |
+        ///   | Caverns · Ashen · Rich Ore · Gilded       |     2 |          2 | everything        |
         static let baseStabilityScore: Int = 100
     }
 

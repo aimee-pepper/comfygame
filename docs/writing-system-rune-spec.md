@@ -2,7 +2,7 @@
 
 **Purpose:** a complete rune vocabulary to illustrate from, plus the grammar that assembles them. Everything marked **[PROPOSAL]** is my call where the design hadn't decided; overrule freely. Everything else follows from decisions already made.
 
-**Scale note:** for calibration, Mystcraft's structural vocabulary is roughly 100 symbols, but with one page per block and per biome its real total runs into the several hundreds. This spec lands at **156 base runes**, which is the right order of magnitude for the richness we want. Vocabulary size is driven by what the world model needs to express — not by asset budget.
+**Scale note:** for calibration, Mystcraft's structural vocabulary is roughly 100 symbols, but with one page per block and per biome its real total runs into the several hundreds. This spec lands at **149 base runes**, which is the right order of magnitude for the richness we want. Vocabulary size is driven by what the world model needs to express — not by asset budget.
 
 ---
 
@@ -80,21 +80,23 @@ Few and fixed. Every sigil attaches to exactly one target. These are the pressur
 
 The flavorful nouns, and the set that grows forever. Each attaches to a target.
 
-**Celestial (12)** — Sun · Moon · Stars · Starfield · Comet · Meteor · Aurora · Eclipse · Ring · Shattered Moon · Void (starless dark) · Second Light (an unexplained glow)
+**Celestial (11)** — Sun · Moon · Stars · Comet · Meteor · Aurora · Eclipse · Ring · Shattered Moon · Void (starless dark) · Second Light (an unexplained glow)
 
-**Water (12)** — Sea · Lake · River · Rain · Mist · Ice · Glacier · Snow · Geyser · Spring · Marsh · Waterfall
+**Water (12)** — Sea · Lake · River · Rain · Mist · Ice · Glacier · Snow · Geyser (steam vents folded in) · Spring · Marsh · Waterfall
 
-**Fire & Thermal (10)** — Volcano · Magma · Ember · Wildfire · Hot Spring · Fumarole · Ash · Cinder · Smoke · Heartfire (a hot world-core)
+**Fire & Thermal (7)** — Volcano · Magma · Wildfire · Hot Spring · Ash · Cinder · Smoke
 
 **Stone & Mineral (18)** — Granite · Basalt · Limestone · Chalk · Clay · Sand · Salt · Crystal · Quartz · Obsidian · Iron · Copper · Silver · Gold · Lead · **Mercury** · Sulfur · Adamant
 
-**Air (8)** — Wind · Gale · Stillness · Cloud · Thunder · Weight (dense air) · Thin Air · Miasma
+**Air (6)** — Wind · Stillness · Cloud · Thunder · Thin Air · Miasma
 
 **Living (14)** — Root · Bloom · Grass · Canopy · Fungus · Moss · Vine · Thorn · Coral · Kelp · Swarm · Hive · Herd · Rot
 
-**Strange (12)** — Bone · Amber · Tar · Glass · Mirror · Silk · Chitin · Ruin · Echo · **Song** (resonant stone) · Dream · Rift
+**Strange (11)** — Bone · Amber · Tar · Glass · Mirror · Silk · Chitin · Ruin · Echo · Dream · Rift
 
-*Notes:* Mercury and Song are here because you named them — mercury ponds and singing stone. The Strange set is where rare/late vocabulary lives and where the most evocative worlds come from; expect it to grow most.
+*Notes:* Mercury is here because Aimee named it (mercury ponds). The Strange set is where rare/late vocabulary lives; expect it to grow most. **Rift** is deliberately dangerous to write — unstable, wide variance, feeds contradiction. Every vocabulary wants a few runes that bite.
+
+*Cut in audit (session 5):* Starfield (redundant with Stars + intensity), Gale (redundant with Great Wind), Ember and Heartfire (both covered by Magma + intensity), Fumarole (folded into Geyser), Song (Claude's invention, not requested), Weight/dense air (belongs to the Atmosphere target, not a source).
 
 *Illustration note:* sources are the **pictographic heart** of the script. Crude tier should look like something a frightened person drew on a wall.
 
@@ -202,14 +204,14 @@ This produces the behavior we want: **players invent controlled experiments.** A
 <details>
 <summary><b>11. Asset inventory & suggested illustration order</b></summary>
 
-**Full vocabulary: 156 base runes** — 8 targets, 86 sources, 51 qualifiers, 11 structural.
+**Full vocabulary: 149 base runes** — 8 targets, 79 sources, 51 qualifiers, 11 structural.
 
 Because the three hands are renderings of one form (§2), the drawing count depends on whether hands are generated or drawn:
 
 | Approach | Drawings |
 |---|---|
-| Vector form drawn once, three hands rendered programmatically | **156** |
-| Each hand drawn by hand (structural tier-invariant) | **~446** |
+| Vector form drawn once, three hands rendered programmatically | **149** |
+| Each hand drawn by hand (structural tier-invariant) | **~425** |
 
 Test the programmatic route on a handful of runes first — it's the difference between a large project and an enormous one.
 
