@@ -316,3 +316,12 @@ literally; each band above 25 / 50 / 75 multiplies; 100 is indefinite. Implement
 - **Stability units must make sense.** A symbol's printed number is now *the number the headline
   moves by* — no conversion factor. A book starts at 100 and each symbol adds its own delta. Picking
   three stabilisers reads 95, not ~50. Pinned by tests.
+
+### Aimee's answers, late session 5
+
+- **Chance draws from the whole pool, not just what you own.** A chance-filled slot that could only
+  return things you already knew is a shuffle, not a surprise. Deliberate choice stays limited to
+  what you've learned.
+- **Unwritten targets are rolled, not defaulted.** A sensible default makes every under-specified
+  world the same tepid place.
+- **Using a rune does not teach it to you** (Q16). You write the world, you don't learn the word.

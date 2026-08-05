@@ -219,12 +219,10 @@ Chance now draws from the **whole** pool, so a slot left open can hand you a sym
 learned — that's what makes under-specification a surprise rather than a shuffle (Aimee's
 correction). But using one doesn't currently grant it.
 
-**Shipped:** you write the world, you don't learn the word. Ownership stays a research/discovery
-matter.
+**ANSWERED (Aimee, 2026-08-04): no.** Using a rune does not teach it to you. You write the world,
+you don't learn the word — vocabulary stays something you research or find, never something you
+back into by leaving a slot open. Keeps deliberate study meaningful, and keeps a chance-fill a
+gamble rather than a shortcut.
 
-**Worth considering:** having chance *introduce* vocabulary — a world writes itself with something
-you couldn't have asked for, and you come home able to ask for it. That would make leaving slots
-open a genuine route into the research tree rather than only a cheap gamble, and it fits the wild
-compounds route in the rune spec §10. It also risks making deliberate research feel redundant, so
-it probably wants to be rarer than "any chance-fill teaches you".
+Shipped as-is; no change needed.
 `Sources/Rules/BookRules.swift` (`candidates` vs `writable`).
