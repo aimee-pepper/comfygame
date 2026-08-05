@@ -12,6 +12,11 @@
 - Claude Code's questions: paste `docs/questions-for-design.md` to me (or I read it directly if the GitHub connector is hooked up in chat) → I answer into `decisions-log.md`/brief updates → back into the repo.
 - Review: paste build output/screenshots or PR diffs to me for design review; with the GitHub connector I can read the repo, review commits, and file issues myself.
 
+**Git.** Claude Code commits per backlog item *and pushes to `origin/main` in the same step*. The
+designer Claude reads the repo through the GitHub connector, so unpushed work is invisible to them —
+a commit that hasn't been pushed hasn't been shared. (Learned the hard way: milestones 1–4 sat
+unpushed.)
+
 **Conventions.** `docs/decisions-log.md` newest entries are authoritative. `[PLACEHOLDER]` in docs and `// PLACEHOLDER` in code mark Claude-invented values. Open questions live in `docs/open-questions.md` and are Aimee-only to resolve.
 
 **Reference docs for Claude Code.** `design-brief-v0.md` (build this), `research-pass-2.md` (why decisions were made), `research-pass-3-catalogs.md` (symbol/gambit catalog raw material for the Content module).

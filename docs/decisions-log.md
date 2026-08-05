@@ -222,3 +222,12 @@ Full spec: `writing-system-rune-spec.md` (Aimee's illustration doc). Summary of 
 - **Library highlighting enforced in code** — yes, please build it so there is no code path from a highlight to a sigil. Exactly right that it's cheap now and near-impossible to walk back later.
 - **Specimen tier as an added field** — agreed, nothing to build until traits exist.
 - **Achievements as queries over the specimen tier** — agreed, and it's why that structure was chosen.
+
+### Aimee's direction, session 4 (2026-08-04)
+
+- **Maximise what is playable before assets exist.** Build so the game can be played and felt with
+  placeholder glyphs and list UIs; art arrives into a working game rather than gating it. This is
+  why the writing system is being built language-first, page-second
+  (`engineering-notes-session-4.md` §2 and §7).
+- **Dark mode is required, not a nicety.** Aimee plays before bed. Shipped immediately: Settings →
+  Appearance (System / Light / Dark), preference stored outside the save file.
