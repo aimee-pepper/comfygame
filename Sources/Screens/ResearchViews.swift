@@ -21,7 +21,14 @@ struct ResearchTree: View {
 private struct ResearchBranchCard: View {
     @EnvironmentObject private var store: GameStore
     let branch: ResearchBranchDef
-    @State private var isExpanded = true
+    /// Collapsed by default (Aimee, 5 Aug). Four branches expanded at once is a wall of rows, and
+    /// the point of a branch is that it's a *subject* you choose to look into — the headline plus
+    /// its progress count is what you should be reading first.
+    ///
+    /// Interim shape. These are meant to become real trees — a laid-out DAG with visible
+    /// prerequisite edges, reached from different buildings in the village rather than all from the
+    /// Workshop. See BACKLOG "Research as actual trees".
+    @State private var isExpanded = false
 
     var body: some View {
         let progress = store.progress(in: branch)

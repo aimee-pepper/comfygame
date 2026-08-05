@@ -65,5 +65,16 @@
 - [ ] Q19 — whether sites move the Stability headline (built, switched off)
 - [ ] Q18 — whether the preview shows a world's possible sites
 
+## Research as actual trees (Aimee, 5 Aug 2026)
+- [x] Branches collapsed by default; tap a branch to expand it
+- [ ] **Real tree layout, not a list.** Nodes laid out as a DAG with visible prerequisite edges, so
+      you can see the shape of what you're climbing and what a node unlocks downstream. The data is
+      already a DAG (`research.json` `requires`); only the presentation is a list.
+- [ ] **Split across village buildings.** Each branch lives at the place that owns it rather than
+      all four at the Workshop — so where you go is part of what you're doing, and the village
+      becomes somewhere you move around in.
+- [ ] Open: does a building have to be built/unlocked before its branch is reachable? That would
+      make the village itself a progression track.
+
 ## Stretch
 - [ ] Preview spawn icons with silhouette/revealed states + %
