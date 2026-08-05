@@ -32,7 +32,7 @@
 **Why size differs is now physical, not symbolic:** charcoal cannot render fine detail, so the same mark must be drawn large to stay legible. The glyph is constant; the tool sets the minimum size at which it survives. This is more coherent than tying size to symbol complexity, and it means the player is always reading the same script.
 
 Consequences:
-- **Refinement dissolves the packing puzzle.** At refined tier every rune is 1×1, so late-game pages are pure design freedom while early-game scrawl genuinely fights you.
+- **Refined runes are 1×1**, so the *shape* problem eases as you progress while the *budget* problem remains: you're still choosing what earns its cells. Early pages fight you on both fronts at once; late pages leave you with the pure allocation decision.
 - **The same book rewritten later looks like a different document** — the same words in a better hand. Strong visual progression, and a real reason to revisit old work.
 - **A page can mix hands.** You write in whatever hand you have.
 

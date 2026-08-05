@@ -70,26 +70,48 @@ enum BookRules {
         symbolIDs.reduce(0.0) { $0 + (ContentCatalog.shared.symbol($1)?.instabilityWeight ?? 0) }
     }
 
-    /// Stability lost per player turn. Greedier books burn their world down faster.
+    /// The 0–100 headline number on a book ("Stability 68").
+    ///
+    /// Distinct from the in-run meter, which always starts at 100 and empties as you move — but no
+    /// longer *unrelated* to it: the score is what sets how fast that meter empties.
+    static func stabilityScore(instability: Double) -> Int {
+        let score = Tuning.Book.neutralStabilityScore - instability * Tuning.Book.stabilityScorePerInstability
+        return Int(min(100, max(0, score)).rounded())
+    }
+
+    /// **How many player turns a world of this stability lasts.**
+    ///
+    /// The heart of the rebalance: stability is measured in *steps you get*, not in an abstract
+    /// rate. Low scores are literal — 5 means five moves — and each band above multiplies. See
+    /// `Tuning.World.stabilityTurnBands` for the table and why the cliffs are deliberate.
+    static func turnsAvailable(stabilityScore score: Int) -> Int {
+        guard score < 100 else { return Tuning.World.indefiniteTurns }
+        let multiplier = Tuning.World.stabilityTurnBands
+            .first { score >= $0.minimumScore }?.multiplier ?? 1
+        // Even a stability of zero gives you one turn: you arrive, and then it goes.
+        return max(1, score * multiplier)
+    }
+
+    static func turnsAvailable(for book: BoundBook) -> Int {
+        turnsAvailable(stabilityScore: stabilityScore(instability: instability(of: book)))
+    }
+
+    /// Stability lost per player turn — derived from the turn budget, so the meter empties exactly
+    /// as the book promised it would.
     static func decayPerTurn(for book: BoundBook) -> Double {
         decayPerTurn(instability: instability(of: book))
     }
 
     static func decayPerTurn(instability: Double) -> Double {
-        let raw = Tuning.World.baseStabilityDecayPerTurn + instability * Tuning.World.instabilityDecayScale
-        return min(max(raw, Tuning.World.minStabilityDecayPerTurn), Tuning.World.maxStabilityDecayPerTurn)
+        let turns = turnsAvailable(stabilityScore: stabilityScore(instability: instability))
+        return Tuning.World.startingStability / Double(max(1, turns))
     }
 
-    /// How many player turns the world lasts from full stability to collapse.
+    /// How many player turns are left from a full meter. Inverse of `decayPerTurn`, kept so the
+    /// preview and the in-run header can't disagree.
     static func turnsUntilCollapse(decayPerTurn: Double) -> Int {
-        Int((Tuning.World.startingStability / decayPerTurn).rounded(.down))
-    }
-
-    /// The 0–100 headline number shown before binding ("Stability 68").
-    /// Distinct from the in-run stability meter, which always starts at 100 and ticks down.
-    static func stabilityScore(instability: Double) -> Int {
-        let score = 100 - instability * Tuning.Book.stabilityScorePerInstability
-        return Int(min(100, max(0, score)).rounded())
+        guard decayPerTurn > 0 else { return Tuning.World.indefiniteTurns }
+        return Int((Tuning.World.startingStability / decayPerTurn).rounded(.down))
     }
 
     static func enemyTier(of book: BoundBook) -> Int {

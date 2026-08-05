@@ -31,8 +31,13 @@
 - [x] Party screen gambit editor (drag-reorder) — out of combat only; in-encounter manual override tap
 
 ## Milestone 5 — Economy & payoff
-- [ ] Workshop purchases (storehouse tiers, gambit slot + 2 pieces, 2 researchable symbols, Automate Self, companion gear)
-- [ ] Identify flow for 2 unidentified curios; key→locked-cache cross-world payoff; Motes + Constellation (3 nodes)
+- [x] Workshop purchases (storehouse tiers, gambit slot + 2 pieces, 2 researchable symbols, Automate Self, companion gear)
+      (+ satchel tiers and the Essence Spring upgrade; all data-driven in `upgrades.json`)
+- [x] Refinery: raw essence → essence, the join between harvesting and spending (design brief)
+- [x] Identify flow for 2 unidentified curios; key→locked-cache cross-world payoff; Motes + Constellation (3 nodes)
+- [x] Curios actually drop, from won encounters — otherwise nothing above could happen
+- [x] Automate Self does something: the Binder gets its own rule list once bought
+- [x] Stability rebalanced to Aimee's steps curve (see `Tuning.World.stabilityTurnBands`)
 
 ## Milestone 6 — Ergonomics
 - [ ] 44pt audit, thumb-zone action bar, haptics (optional), full acceptance-criteria pass from docs/design-brief-v0.md

@@ -59,9 +59,11 @@ extension GameStore {
     func endEncounterIfFinished() {
         guard let encounter = activeEncounter, let outcome = encounter.outcome else { return }
 
+        var events: [WorldRules.Event] = []
         mutate("encounter \(outcome.rawValue)", flush: true) { state in
-            CombatRules.conclude(in: &state)
+            events = CombatRules.conclude(in: &state)
         }
+        if !events.isEmpty { recentEvents = events }
 
         if outcome == .defeated {
             // No death state in v0 — you're carried home with a fraction of the haul.
@@ -84,26 +86,33 @@ extension GameStore {
     /// a locked decision, enforced here rather than only hidden in the UI.
     var canEditGambits: Bool { activeEncounter == nil }
 
-    func moveGambit(from source: IndexSet, to destination: Int) {
-        guard canEditGambits else { return }
-        mutate("reorder gambits", flush: true) { state in
-            state.base.companion.gambits.move(fromOffsets: source, toOffset: destination)
+    func gambits(for owner: Combatant) -> [GambitPieceID] {
+        owner == .binder ? state.base.binderGambits : state.base.companion.gambits
+    }
+
+    /// One accessor for both rule lists, so editing can't accidentally diverge between them.
+    private func withGambits(_ owner: Combatant, _ body: @escaping (inout [GambitPieceID]) -> Void) -> (inout GameState) -> Void {
+        { state in
+            if owner == .binder { body(&state.base.binderGambits) } else { body(&state.base.companion.gambits) }
         }
     }
 
-    func removeGambit(at offsets: IndexSet) {
+    func moveGambit(from source: IndexSet, to destination: Int, for owner: Combatant = .companion) {
         guard canEditGambits else { return }
-        mutate("remove gambit") { state in
-            state.base.companion.gambits.remove(atOffsets: offsets)
-        }
+        mutate("reorder gambits", flush: true, withGambits(owner) { $0.move(fromOffsets: source, toOffset: destination) })
     }
 
-    func addGambit(_ id: GambitPieceID) {
+    func removeGambit(at offsets: IndexSet, for owner: Combatant = .companion) {
+        guard canEditGambits else { return }
+        mutate("remove gambit", withGambits(owner) { $0.remove(atOffsets: offsets) })
+    }
+
+    func addGambit(_ id: GambitPieceID, for owner: Combatant = .companion) {
         guard canEditGambits, state.base.ownedGambitPieces.contains(id) else { return }
-        mutate("add gambit") { state in
-            guard !state.base.companion.gambits.contains(id) else { return }
-            state.base.companion.gambits.append(id)
-        }
+        mutate("add gambit", withGambits(owner) { list in
+            guard !list.contains(id) else { return }
+            list.append(id)
+        })
     }
 
     /// Rules beyond this index are owned but inactive — the slot count is the progression.

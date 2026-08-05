@@ -32,7 +32,7 @@ struct StorehouseView: View {
                     } else {
                         ForEach(base.inventory.stacks) { stack in
                             let item = ContentCatalog.shared.item(stack.catalogID)
-                            LabeledRow(icon: item?.icon ?? "questionmark",
+                            LabeledRow(icon: stack.identified ? (item?.icon ?? "questionmark") : "questionmark.diamond",
                                        label: stack.identified
                                            ? (item?.name ?? stack.catalogID.rawValue)
                                            : (item?.unidentifiedName ?? "Something unidentified"),
@@ -41,7 +41,9 @@ struct StorehouseView: View {
                     }
                 }
 
-                ComingLater("Identifying curios, and the key that opens a cache in another world, arrive in milestone 5.")
+                if !store.unidentifiedStacks.isEmpty {
+                    IdentifyCard()
+                }
             }
             .padding(16)
         }
@@ -58,27 +60,42 @@ struct WorkshopView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                CurrencyChip(icon: "drop.fill", label: "Essence", value: "\(store.state.base.essence)", tint: .teal)
+                HStack(spacing: 12) {
+                    CurrencyChip(icon: "drop.fill", label: "Essence", value: "\(store.state.base.essence)", tint: .teal)
+                    CurrencyChip(icon: "cube", label: "Ore", value: "\(store.state.base.resources[Resources.ore])")
+                    CurrencyChip(icon: "scribble", label: "Fiber", value: "\(store.state.base.resources[Resources.fiber])")
+                }
 
-                StationCard(title: "Researchable symbols", icon: "sparkle.magnifyingglass") {
+                RefineryCard()
+
+                StationCard(title: "Upgrades", icon: "wrench.and.screwdriver") {
+                    ForEach(ContentCatalog.shared.upgrades) { upgrade in
+                        UpgradeRow(upgrade: upgrade)
+                    }
+                }
+
+                StationCard(title: "Research", icon: "sparkle.magnifyingglass") {
                     ForEach(ContentCatalog.shared.symbols.filter { $0.acquisition == .research }) { symbol in
-                        LabeledRow(icon: symbol.icon,
-                                   label: symbol.name,
-                                   value: "\(symbol.essenceCost) essence",
-                                   isDimmed: !store.state.base.ownedSymbols.contains(symbol.id))
+                        PurchaseRow(icon: symbol.icon,
+                                    name: symbol.name,
+                                    detail: symbol.blurb,
+                                    cost: "\(symbol.essenceCost) essence",
+                                    isOwned: store.state.base.ownedSymbols.contains(symbol.id),
+                                    canBuy: store.state.base.essence >= symbol.essenceCost) {
+                            store.research(symbol)
+                        }
                     }
-                }
-
-                StationCard(title: "Purchasable gambit pieces", icon: "list.number") {
                     ForEach(ContentCatalog.shared.gambitPieces.filter { $0.acquisition == .research }) { piece in
-                        LabeledRow(icon: piece.icon,
-                                   label: piece.name,
-                                   value: "\(piece.essenceCost) essence",
-                                   isDimmed: !store.state.base.ownedGambitPieces.contains(piece.id))
+                        PurchaseRow(icon: piece.icon,
+                                    name: piece.name,
+                                    detail: "A rule for the Party screen.",
+                                    cost: "\(piece.essenceCost) essence",
+                                    isOwned: store.state.base.ownedGambitPieces.contains(piece.id),
+                                    canBuy: store.state.base.essence >= piece.essenceCost) {
+                            store.buy(piece)
+                        }
                     }
                 }
-
-                ComingLater("Buying these — plus Storehouse tiers, companion gear and the \"automate self\" unlock — arrives in milestone 5.")
             }
             .padding(16)
         }
@@ -113,7 +130,13 @@ struct PartyView: View {
                     LabeledRow(icon: "shield.fill", label: "Armor", value: "tier \(companion.armorTier)")
                 }
 
-                GambitEditor()
+                GambitEditor(owner: .companion)
+
+                if store.state.base.hasAutomateSelfUnlock {
+                    GambitEditor(owner: .binder)
+                } else {
+                    ComingLater("Automating your own hand is bought at the Workshop. Until then you act for yourself every turn.")
+                }
             }
             .padding(16)
         }
@@ -131,13 +154,15 @@ struct PartyView: View {
 private struct GambitEditor: View {
     @EnvironmentObject private var store: GameStore
     @State private var isAdding = false
+    let owner: Combatant
 
-    private var gambits: [GambitPieceID] { store.state.base.companion.gambits }
+    private var gambits: [GambitPieceID] { store.gambits(for: owner) }
     private var slots: Int { store.activeGambitSlots }
+    private var ownerName: String { owner == .binder ? "Your own rules" : "Quill's gambits" }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Gambits — \(min(gambits.count, slots)) of \(slots) slots", systemImage: "list.number")
+            Label("\(ownerName) — \(min(gambits.count, slots)) of \(slots) slots", systemImage: "list.number")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
 
@@ -146,15 +171,17 @@ private struct GambitEditor: View {
                 .foregroundStyle(.secondary)
 
             if gambits.isEmpty {
-                EmptyNote("No rules set — Quill will stand there.")
+                EmptyNote(owner == .binder
+                          ? "No rules set — you'll keep acting for yourself."
+                          : "No rules set — Quill will stand there.")
             } else {
                 // A real List, so drag-to-reorder is the system gesture rather than an imitation.
                 List {
                     ForEach(Array(gambits.enumerated()), id: \.element) { index, id in
                         GambitRow(index: index, id: id, isActive: index < slots)
                     }
-                    .onMove { store.moveGambit(from: $0, to: $1) }
-                    .onDelete { store.removeGambit(at: $0) }
+                    .onMove { store.moveGambit(from: $0, to: $1, for: owner) }
+                    .onDelete { store.removeGambit(at: $0, for: owner) }
                 }
                 .listStyle(.plain)
                 .environment(\.editMode, .constant(.active))
@@ -183,7 +210,7 @@ private struct GambitEditor: View {
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
         .confirmationDialog("Add a rule", isPresented: $isAdding, titleVisibility: .visible) {
             ForEach(unowned, id: \.id) { piece in
-                Button(piece.name) { store.addGambit(piece.id) }
+                Button(piece.name) { store.addGambit(piece.id, for: owner) }
             }
             Button("Cancel", role: .cancel) {}
         }
@@ -235,16 +262,19 @@ struct ConstellationView: View {
                 CurrencyChip(icon: "star.fill", label: "Motes", value: "\(store.state.reality.motes)", tint: .purple)
 
                 ForEach(ContentCatalog.shared.constellationNodes) { node in
-                    let rank = store.state.reality.rank(of: node.id)
-                    StationCard(title: node.name, icon: node.icon) {
-                        Text(node.blurb).font(.callout).foregroundStyle(.secondary)
-                        LabeledRow(icon: "chart.bar", label: "Rank", value: "\(rank) of \(node.maxRank)")
-                        LabeledRow(icon: "star", label: "Cost", value: "\(node.moteCostPerRank.first ?? 0) motes",
-                                   isDimmed: rank >= node.maxRank)
-                    }
+                    ConstellationNodeCard(node: node)
                 }
 
-                ComingLater("These survive everything, including a future base reset. Spending motes on them arrives in milestone 5.")
+                Label {
+                    Text("These survive everything, including a future reset. Nothing else you buy does.")
+                } icon: {
+                    Image(systemName: "infinity")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
             }
             .padding(16)
         }

@@ -81,6 +81,9 @@ struct WorldView: View {
                 + (exhausted ? " The node is spent." : "")
         case .foundPortal: "A way out."
         case .foundCache: "A cache, locked. The key is somewhere else."
+        case .cacheOpened(let what): "The lock gives. \(what)"
+        case .pickedUpItem(let what): "\(what) You can't tell what it is."
+        case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) left behind."
         case .hazardHit(let damage): "The ground turns on you — \(damage) damage."
         case .enemySighted(let creature):
             "\(ContentCatalog.shared.creature(creature)?.name ?? "Something") has noticed you."
@@ -102,7 +105,9 @@ struct WorldView: View {
 
     private func colour(for event: WorldRules.Event) -> Color {
         switch event {
-        case .pickedUp, .harvested, .foundPortal: .primary
+        case .pickedUp, .harvested, .foundPortal, .pickedUpItem: .primary
+        case .cacheOpened: .purple
+        case .satchelFull: .orange
         case .hazardHit, .collapsed, .ejected, .lostToCrumbling: .red
         case .enemySighted, .crossedThreshold, .blocked: .orange
         default: .secondary
@@ -156,9 +161,14 @@ struct WorldView: View {
                     }
                 }
                 if store.isOnLockedCache {
-                    ActionButton("Locked cache", icon: "lock.fill",
-                                 detail: store.carriedCacheKey == nil ? "needs a key from elsewhere" : "you have a key",
-                                 isEnabled: false) {}
+                    let hasKey = store.carriedCacheKey != nil
+                    ActionButton(hasKey ? "Open the cache" : "Locked cache",
+                                 icon: hasKey ? "key.fill" : "lock.fill",
+                                 detail: hasKey ? "spends your key" : "needs a key found elsewhere",
+                                 isProminent: hasKey,
+                                 isEnabled: hasKey) {
+                        store.openCacheHere()
+                    }
                 }
                 if store.harvestableHere == nil && !store.canPortalHere && !store.isOnLockedCache {
                     Text(hint(for: run))

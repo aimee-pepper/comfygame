@@ -228,7 +228,10 @@ enum CombatRules {
     static func needsPlayerInput(_ state: GameState) -> Bool {
         guard let encounter = state.worlds.activeRun?.activeEncounter, encounter.outcome == nil else { return false }
         switch encounter.current {
-        case .binder: return true // the Binder is always manual in v0; "automate self" is milestone 5
+        case .binder:
+            // Manual until you've bought the right to automate yourself, and still manual if you
+            // bought it and set no rules — an empty list shouldn't mean "stand there".
+            return !state.base.hasAutomateSelfUnlock || state.base.binderGambits.isEmpty
         case .companion: return encounter.isCompanionOverridden
         case .foe: return false
         }
@@ -250,10 +253,8 @@ enum CombatRules {
             switch actor {
             case .foe:
                 performFoeTurn(actor, in: &state)
-            case .companion:
-                performCompanionTurn(in: &state)
-            case .binder:
-                return
+            case .companion, .binder:
+                performAutomatedTurn(actor, in: &state)
             }
         }
     }
@@ -288,18 +289,18 @@ enum CombatRules {
         checkOutcome(in: &state)
     }
 
-    private static func performCompanionTurn(in state: inout GameState) {
+    private static func performAutomatedTurn(_ actor: Combatant, in state: inout GameState) {
         guard let run = state.worlds.activeRun, let encounter = run.activeEncounter else { return }
 
-        if let decision = GambitEngine.decide(in: state) {
+        if let decision = GambitEngine.decide(for: actor, in: state) {
             state.worlds.activeRun?.activeEncounter?.note(
-                "\(actorName(.companion, encounter: encounter)): \(GambitEngine.describe(decision.piece))"
+                "\(actorName(actor, encounter: encounter)): \(GambitEngine.describe(decision.piece))"
             )
-            perform(decision.action, by: .companion, in: &state)
+            perform(decision.action, by: actor, in: &state)
         } else {
             // No rule matched, or every matching rule wanted something unavailable. Standing there
             // is the honest outcome — it's what makes rule ORDER matter, and it's visible.
-            state.worlds.activeRun?.activeEncounter?.note("\(actorName(.companion, encounter: encounter)) waits — no rule fits.")
+            state.worlds.activeRun?.activeEncounter?.note("\(actorName(actor, encounter: encounter)) waits — no rule fits.")
             advanceTurn(in: &state)
         }
     }
@@ -326,11 +327,14 @@ enum CombatRules {
     ///
     /// Defeated foes must leave the map — a foe shares its id with the `WorldEnemy` that spawned
     /// it, and leaving it standing on the player's tile would re-trigger the same fight forever.
-    static func conclude(in state: inout GameState) {
+    @discardableResult
+    static func conclude(in state: inout GameState) -> [WorldRules.Event] {
         guard var run = state.worlds.activeRun,
               let encounter = run.activeEncounter,
               let outcome = encounter.outcome
-        else { return }
+        else { return [] }
+
+        var events: [WorldRules.Event] = []
 
         switch outcome {
         case .victory:
@@ -343,6 +347,23 @@ enum CombatRules {
                 if let resource = run.rng.pickWeighted(BookRules.yieldTable(for: run.book)) {
                     run.satchel.add(tier, of: resource)
                     state.reality.discovery.recordResource(resource, runIndex: run.runIndex)
+                }
+                // Curios drop unidentified — this is where keys enter the world, one identify and
+                // one long walk before they open anything.
+                if run.rng.chance(Tuning.Economy.curioDropChance) {
+                    let curios = ContentCatalog.shared.items.filter { $0.kind == .curio }
+                        .map(\.id).sorted { $0.rawValue < $1.rawValue }
+                    if let curio = run.rng.pick(curios) {
+                        let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()),
+                                              catalogID: curio, count: 1, identified: false)
+                        // A full satchel refuses loot rather than silently swallowing it.
+                        if run.satchelItems.add(stack) {
+                            let name = ContentCatalog.shared.item(curio)?.unidentifiedName ?? "Something odd"
+                            events.append(.pickedUpItem(name))
+                        } else {
+                            events.append(.satchelFull(ContentCatalog.shared.item(curio)?.unidentifiedName ?? "Something odd"))
+                        }
+                    }
                 }
             }
 
@@ -362,5 +383,6 @@ enum CombatRules {
 
         run.activeEncounter = nil
         state.worlds.activeRun = run
+        return events
     }
 }

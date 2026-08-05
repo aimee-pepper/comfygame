@@ -14,6 +14,7 @@ struct ContentCatalog: Sendable {
     let items: [ItemDef]
     let skills: [SkillDef]
     let gambitPieces: [GambitPieceDef]
+    let upgrades: [UpgradeDef]
     let stations: [StationDef]
     let constellationNodes: [ConstellationNodeDef]
 
@@ -42,6 +43,7 @@ struct ContentCatalog: Sendable {
     func skill(_ id: SkillID) -> SkillDef? { skills.first { $0.id == id } }
     func skill(ownedBy owner: SkillDef.Owner) -> SkillDef? { skills.first { $0.owner == owner } }
     func gambitPiece(_ id: GambitPieceID) -> GambitPieceDef? { gambitPieces.first { $0.id == id } }
+    func upgrade(_ id: UpgradeID) -> UpgradeDef? { upgrades.first { $0.id == id } }
     func station(_ id: StationID) -> StationDef? { stations.first { $0.id == id } }
     func constellationNode(_ id: ConstellationNodeID) -> ConstellationNodeDef? {
         constellationNodes.first { $0.id == id }
@@ -85,6 +87,7 @@ struct ContentCatalog: Sendable {
             items: try loadFile("items", key: "items", bundle: bundle),
             skills: try loadFile("skills", key: "skills", bundle: bundle),
             gambitPieces: try loadFile("gambit_pieces", key: "gambitPieces", bundle: bundle),
+            upgrades: try loadFile("upgrades", key: "upgrades", bundle: bundle),
             stations: try loadFile("stations", key: "stations", bundle: bundle),
             constellationNodes: try loadFile("constellation", key: "nodes", bundle: bundle)
         )
@@ -135,6 +138,7 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(items.map(\.id.rawValue), label: "item")
         try requireUniqueIDs(skills.map(\.id.rawValue), label: "skill")
         try requireUniqueIDs(gambitPieces.map(\.id.rawValue), label: "gambit piece")
+        try requireUniqueIDs(upgrades.map(\.id.rawValue), label: "upgrade")
         try requireUniqueIDs(stations.map(\.id.rawValue), label: "station")
         try requireUniqueIDs(constellationNodes.map(\.id.rawValue), label: "constellation node")
 
@@ -148,6 +152,17 @@ struct ContentCatalog: Sendable {
         }
         guard !slots.isEmpty else {
             throw ContentError.danglingReference("slots.json defines no slots — books would have nowhere to put a symbol")
+        }
+
+        for upgrade in upgrades {
+            guard !upgrade.ranks.isEmpty else {
+                throw ContentError.danglingReference("upgrade '\(upgrade.id)' has no ranks, so it can never be bought")
+            }
+            for rank in upgrade.ranks {
+                for id in rank.resources.keys where !resourceIDs.contains(id) {
+                    throw ContentError.danglingReference("upgrade '\(upgrade.id)' costs unknown resource '\(id)'")
+                }
+            }
         }
 
         for symbol in symbols {

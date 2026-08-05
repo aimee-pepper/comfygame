@@ -17,15 +17,15 @@ enum GambitEngine {
         var action: CombatAction
     }
 
-    /// What the companion does this turn, or `nil` if no rule both matched and could act.
-    static func decide(in state: GameState) -> Decision? {
+    /// What an automated combatant does this turn, or `nil` if no rule both matched and could act.
+    static func decide(for actor: Combatant = .companion, in state: GameState) -> Decision? {
         guard let run = state.worlds.activeRun, let encounter = run.activeEncounter else { return nil }
 
         let slots = availableSlots(in: state)
-        for id in state.base.companion.gambits.prefix(slots) {
+        for id in rules(for: actor, in: state).prefix(slots) {
             guard let piece = ContentCatalog.shared.gambitPiece(id) else { continue }
-            guard let target = evaluate(piece.condition, run: run, encounter: encounter) else { continue }
-            guard let action = action(for: piece.action, target: target, run: run, encounter: encounter) else {
+            guard let target = evaluate(piece.condition, actor: actor, run: run, encounter: encounter) else { continue }
+            guard let action = action(for: piece.action, target: target, actor: actor, run: run, encounter: encounter) else {
                 continue // matched, but couldn't act — try the next rule down
             }
             return Decision(piece: id, action: action)
@@ -33,10 +33,21 @@ enum GambitEngine {
         return nil
     }
 
+    /// Whose rule list to run. The Binder's is only consulted once "automate self" is bought.
+    static func rules(for actor: Combatant, in state: GameState) -> [GambitPieceID] {
+        switch actor {
+        case .companion: state.base.companion.gambits
+        case .binder: state.base.hasAutomateSelfUnlock ? state.base.binderGambits : []
+        case .foe: []
+        }
+    }
+
     /// How many rules the companion is actually running. Gambits past the slot count are owned but
     /// inactive — that's the progression, and the Party screen shows the cut-off.
     static func availableSlots(in state: GameState) -> Int {
-        Tuning.Encounter.startingGambitSlots + state.reality.bonusGambitSlots
+        Tuning.Encounter.startingGambitSlots
+            + state.base.purchasedGambitSlots     // bought at the Workshop; lost in a reset
+            + state.reality.bonusGambitSlots      // bought with motes; survives everything
     }
 
     static func describe(_ id: GambitPieceID) -> String {
@@ -53,6 +64,7 @@ enum GambitEngine {
     }
 
     private static func evaluate(_ condition: GambitConditionSpec,
+                                 actor: Combatant,
                                  run: WorldRun,
                                  encounter: EncounterState) -> Target? {
         let threshold = condition.threshold ?? 0
@@ -86,8 +98,8 @@ enum GambitEngine {
                 .map { .ally($0) }
 
         case "self.hpBelow":
-            let health = CombatRules.health(of: .companion, in: run)
-            return fraction(health.current, health.max) < threshold ? .ally(.companion) : nil
+            let health = CombatRules.health(of: actor, in: run)
+            return fraction(health.current, health.max) < threshold ? .ally(actor) : nil
 
         default:
             // An unknown condition never fires. Content can run ahead of the engine safely.
@@ -103,6 +115,7 @@ enum GambitEngine {
 
     private static func action(for spec: GambitActionSpec,
                                target: Target,
+                               actor: Combatant,
                                run: WorldRun,
                                encounter: EncounterState) -> CombatAction? {
         switch spec.kind {
@@ -112,18 +125,18 @@ enum GambitEngine {
             return encounter.livingFoes.first.map { .attack(foe: $0.id) }
 
         case "heal":
-            guard CombatRules.isSkillReady(for: .companion, in: encounter),
-                  CombatRules.skill(for: .companion)?.kind == .heal
+            guard CombatRules.isSkillReady(for: actor, in: encounter),
+                  CombatRules.skill(for: actor)?.kind == .heal
             else { return nil } // on cooldown ⇒ this rule can't fire; fall through to the next
             if case .ally(let member) = target { return .healSkill(ally: member) }
-            return .healSkill(ally: .companion)
+            return .healSkill(ally: actor)
 
         case "skill":
-            guard CombatRules.isSkillReady(for: .companion, in: encounter) else { return nil }
-            switch CombatRules.skill(for: .companion)?.kind {
+            guard CombatRules.isSkillReady(for: actor, in: encounter) else { return nil }
+            switch CombatRules.skill(for: actor)?.kind {
             case .heal:
                 if case .ally(let member) = target { return .healSkill(ally: member) }
-                return .healSkill(ally: .companion)
+                return .healSkill(ally: actor)
             case .damage:
                 if case .foe(let id) = target { return .damageSkill(foe: id) }
                 return encounter.livingFoes.first.map { .damageSkill(foe: $0.id) }

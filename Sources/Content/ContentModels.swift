@@ -137,6 +137,49 @@ struct GambitActionSpec: Codable, Equatable, Sendable {
     var skillID: String?
 }
 
+/// Something buyable at the Workshop.
+///
+/// `ranks` is one entry per purchase, so an upgrade's depth is a data decision. Costs mix essence
+/// with raw resources on purpose — ore and fibre need somewhere to go.
+struct UpgradeDef: Codable, Equatable, Identifiable, Sendable {
+    var id: UpgradeID
+    var name: String
+    var icon: String
+    var blurb: String
+    var effect: Effect
+    var ranks: [UpgradeCost]
+
+    var maxRank: Int { ranks.count }
+
+    /// What buying it changes. Each case maps to exactly one piece of existing state, so a rank is
+    /// always *derived* from that state rather than stored a second time.
+    enum Effect: String, Codable, Sendable {
+        case storehouseTier
+        case satchelTier
+        case gambitSlot
+        case essenceSpringTier
+        case automateSelf
+        case companionWeapon
+        case companionArmor
+    }
+}
+
+struct UpgradeCost: Codable, Equatable, Sendable {
+    var essence: Int
+    var resources: [ResourceID: Int]
+
+    init(essence: Int, resources: [ResourceID: Int] = [:]) {
+        self.essence = essence
+        self.resources = resources
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        essence = try container.decodeIfPresent(Int.self, forKey: .essence) ?? 0
+        resources = try container.decodeIfPresent([ResourceID: Int].self, forKey: .resources) ?? [:]
+    }
+}
+
 /// A base station. The Base screen is a data-driven list of these, not hardcoded buttons —
 /// v1+ adds blacksmith, tavern, distillery, and they should be a JSON edit.
 struct StationDef: Codable, Equatable, Identifiable, Sendable {

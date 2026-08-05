@@ -53,7 +53,7 @@ Full spec: `writing-system-rune-spec.md` (Aimee's illustration doc). Summary of 
 
 **A sigil is self-contained:** `[qualifiers] → source → Bind → target`, assembled internally and placed as one unit. **No page-wide adjacency effects** — neighbours never interact. This was a deliberate design choice to keep the page readable on a phone.
 
-**Footprint shrinks with instrument:** crude (charcoal) 4–6 cells and irregular; plain (pencil) 2–3 cells; refined (fountain pen) always 1×1. Same glyph throughout — it's a font change, not a new symbol. Refined tier dissolves the packing puzzle entirely, which is the intended late-game arc.
+**Footprint shrinks with instrument:** crude (charcoal) 4–6 cells and irregular; plain (pencil) 2–3 cells; refined (fountain pen) always 1×1. Same glyph throughout — it's a font change, not a new symbol. Fitting runes on the page is deliberate gameplay; as hands refine, the shape problem eases while the budget problem remains.
 
 **Compounds** are learned single glyphs meaning several components at a reduced footprint (proposal: `ceil(sum × 0.6)`). Stored in a player **runebook**. Acquired by inventing, finding in the wild, learning from diary pages, or from NPCs.
 

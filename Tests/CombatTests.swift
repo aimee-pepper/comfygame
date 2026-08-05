@@ -172,8 +172,12 @@ final class CombatTests: XCTestCase {
     // MARK: Gambits
 
     /// Acceptance criterion: the companion fights a full encounter unattended.
+    ///
+    /// Deliberately an Ink Hound rather than a Paper Moth: a moth has 8 HP and the Binder hits for
+    /// 4–8, so it can die before the companion ever gets a turn. That made this test pass or fail on
+    /// a damage roll — it was asserting luck, not behaviour.
     func testTheCompanionFightsUnattended() throws {
-        let store = inFight(["paper_moth"], gambits: ["foe_any_attack"])
+        let store = inFight(["ink_hound"], gambits: ["foe_any_attack"])
 
         var guardCount = 0
         while store.activeEncounter?.outcome == nil, guardCount < 30 {

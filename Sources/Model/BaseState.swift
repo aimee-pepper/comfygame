@@ -24,7 +24,13 @@ struct BaseState: Codable, Equatable, Sendable {
     var companion: CompanionState = CompanionState()
 
     /// Purchased at the Workshop. Until then the Binder is manual every turn.
+    ///
+    /// Automating yourself is *earned* — a locked design decision, and the reason this is a
+    /// purchase rather than a setting.
     var hasAutomateSelfUnlock: Bool = false
+
+    /// The Binder's own rule list. Only consulted once `hasAutomateSelfUnlock` is true.
+    var binderGambits: [GambitPieceID] = []
 
     /// Upgrades bought for the satchel — the bag you carry *into* a world.
     ///
@@ -32,6 +38,10 @@ struct BaseState: Codable, Equatable, Sendable {
     /// "keep it or leave it" in-world, storage limit forces "hoard or refine" at home. Two
     /// pressures, two upgrade paths.
     var satchelTier: Int = 0
+
+    /// Gambit slots bought at the Workshop. The Constellation grants more on top, and those
+    /// survive a reset while these don't — which is the whole point of the two layers.
+    var purchasedGambitSlots: Int = 0
 
     static func newGame() -> BaseState {
         var state = BaseState()
@@ -84,6 +94,8 @@ struct BaseState: Codable, Equatable, Sendable {
         companion = try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
+        purchasedGambitSlots = try container.decodeIfPresent(Int.self, forKey: .purchasedGambitSlots) ?? 0
+        binderGambits = try container.decodeIfPresent([GambitPieceID].self, forKey: .binderGambits) ?? []
     }
 }
 

@@ -107,14 +107,55 @@ final class BookRulesTests: XCTestCase {
         XCTAssertLessThanOrEqual(calmProjection.enemyTier.upperBound, greedyProjection.enemyTier.lowerBound)
     }
 
-    /// A world always ends, however stable the book. "Eventually" is a v1 anchoring question.
-    func testEvenTheCalmestBookDecays() {
+    // MARK: Stability is measured in steps
+
+    /// Aimee's curve, pinned. Stability isn't an abstract rate — it's how many moves you get.
+    /// The low end is literal; each band above multiplies.
+    func testStabilityScoreConvertsToTurnsOnTheAgreedCurve() {
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 0), 1, "You arrive, and then it goes")
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 5), 5, "5% is five steps, literally")
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 10), 10)
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 25), 25)
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 26), 52, "Past 25 it doubles")
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 50), 100)
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 51), 153, "Past 50 it triples")
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 75), 225)
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 76), 304, "Past 75 it quadruples")
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 100), Tuning.World.indefiniteTurns,
+                       "Full stability is explorable indefinitely")
+    }
+
+    /// The meter has to empty exactly when the book said it would — the preview promises a number
+    /// of turns, and the world has to honour it.
+    func testTheMeterEmptiesExactlyOverThePromisedTurns() {
+        for score in [5, 10, 25, 26, 50, 75, 90] {
+            let turns = BookRules.turnsAvailable(stabilityScore: score)
+            let decay = Tuning.World.startingStability / Double(turns)
+            XCTAssertEqual(BookRules.turnsUntilCollapse(decayPerTurn: decay), turns,
+                           "Score \(score) promised \(turns) turns")
+        }
+    }
+
+    /// The point of the curve: how far you can explore is a decision you make at the desk.
+    func testTheSymbolSetSpansUnexplorableToNearlyComplete() {
+        let tiles = Tuning.World.gridWidth * Tuning.World.gridHeight
+
         var calm = BookDraft()
-        calm["quirk"] = "dim_sky"
-        calm["biome"] = "frostbound"
-        let book = BookRules.resolveBook(draft: calm, ownedSymbols: ["dim_sky", "frostbound"], seed: 1)
-        XCTAssertGreaterThan(BookRules.decayPerTurn(for: book), 0)
-        XCTAssertLessThan(BookRules.turnsUntilCollapse(decayPerTurn: BookRules.decayPerTurn(for: book)), 10_000)
+        calm["terrain"] = "plains"; calm["biome"] = "frostbound"
+        calm["bounty"] = "sparse_ore"; calm["quirk"] = "dim_sky"
+
+        var greedy = BookDraft()
+        greedy["terrain"] = "caverns"; greedy["biome"] = "ashen"
+        greedy["bounty"] = "rich_ore"; greedy["quirk"] = "gilded_veins"
+
+        let owned = Set(ContentCatalog.shared.starterSymbolIDs)
+        let calmTurns = BookRules.turnsAvailable(for: BookRules.resolveBook(draft: calm, ownedSymbols: owned, seed: 1))
+        let greedyTurns = BookRules.turnsAvailable(for: BookRules.resolveBook(draft: greedy, ownedSymbols: owned, seed: 1))
+
+        XCTAssertGreaterThan(calmTurns, tiles / 2, "A stabilised book should reach most of the map")
+        XCTAssertLessThan(greedyTurns, tiles / 8, "A gold-hungry one should barely leave the doorstep")
+        XCTAssertLessThan(calmTurns, Tuning.World.indefiniteTurns,
+                          "Indefinite is unreachable with v0 symbols — that's what anchoring is for")
     }
 
     func testMixesAreNormalisedAndSorted() {

@@ -16,6 +16,9 @@ enum WorldRules {
         case harvested(ResourceID, amount: Int, exhausted: Bool)
         case foundPortal
         case foundCache
+        case cacheOpened(String)
+        case pickedUpItem(String)
+        case satchelFull(String)
         case hazardHit(damage: Int)
         case enemySighted(CreatureID)
         case encounterBegan

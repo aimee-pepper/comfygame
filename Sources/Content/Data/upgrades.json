@@ -1,0 +1,74 @@
+{
+  "_note": "PLACEHOLDER prices. Costs deliberately mix essence with raw resources — before this file existed, ore and fibre had no sink at all and just piled up in the Storehouse. 'ranks' is one entry per purchase; an upgrade with three entries can be bought three times. Current rank is read from the state the upgrade actually changes (see EconomyRules.rank), never stored twice.",
+  "upgrades": [
+    {
+      "id": "storehouse_expansion",
+      "name": "Storehouse shelving",
+      "icon": "archivebox",
+      "blurb": "Room at home for more of what you drag back.",
+      "effect": "storehouseTier",
+      "ranks": [
+        { "essence": 20, "resources": { "ore": 4 } },
+        { "essence": 40, "resources": { "ore": 10, "fiber": 6 } },
+        { "essence": 75, "resources": { "ore": 20, "fiber": 14 } }
+      ]
+    },
+    {
+      "id": "satchel_expansion",
+      "name": "Satchel stitching",
+      "icon": "bag",
+      "blurb": "Carry more out of a world before you have to choose.",
+      "effect": "satchelTier",
+      "ranks": [
+        { "essence": 15, "resources": { "fiber": 5 } },
+        { "essence": 35, "resources": { "fiber": 12, "ore": 4 } }
+      ]
+    },
+    {
+      "id": "gambit_slot",
+      "name": "A longer instruction",
+      "icon": "list.number",
+      "blurb": "One more rule your companion will follow.",
+      "effect": "gambitSlot",
+      "ranks": [{ "essence": 30, "resources": { "fiber": 8 } }]
+    },
+    {
+      "id": "spring_deepening",
+      "name": "Deepen the spring",
+      "icon": "drop.circle",
+      "blurb": "More essence waiting each time you come home.",
+      "effect": "essenceSpringTier",
+      "ranks": [{ "essence": 45, "resources": { "ore": 8, "fiber": 8 } }]
+    },
+    {
+      "id": "automate_self",
+      "name": "Write your own hand",
+      "icon": "person.crop.circle.badge.checkmark",
+      "blurb": "Your own rules, followed without you. Set them on the Party screen.",
+      "effect": "automateSelf",
+      "ranks": [{ "essence": 70, "resources": { "ore": 12, "fiber": 12 } }]
+    },
+    {
+      "id": "companion_weapon",
+      "name": "Quill's edge",
+      "icon": "hammer",
+      "blurb": "Your companion hits harder.",
+      "effect": "companionWeapon",
+      "ranks": [
+        { "essence": 20, "resources": { "ore": 6 } },
+        { "essence": 45, "resources": { "ore": 15 } }
+      ]
+    },
+    {
+      "id": "companion_armor",
+      "name": "Quill's guard",
+      "icon": "shield",
+      "blurb": "Your companion takes less.",
+      "effect": "companionArmor",
+      "ranks": [
+        { "essence": 20, "resources": { "fiber": 6 } },
+        { "essence": 45, "resources": { "fiber": 15, "ore": 5 } }
+      ]
+    }
+  ]
+}
