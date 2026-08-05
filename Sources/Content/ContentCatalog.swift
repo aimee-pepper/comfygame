@@ -22,6 +22,7 @@ struct ContentCatalog: Sendable {
     let constellationNodes: [ConstellationNodeDef]
     let sites: [SiteDef]
     let contradictions: [ContradictionDef]
+    let descriptionClauses: [DescriptionClauseDef]
 
     /// Loaded once at first use. Content is read-only after load, so this is safe to share.
     static let shared: ContentCatalog = {
@@ -77,6 +78,11 @@ struct ContentCatalog: Sendable {
     var starterSymbolIDs: [SymbolID] { symbols.filter { $0.acquisition == .starter }.map(\.id) }
     var stationsInOrder: [StationDef] { stations.sorted { $0.sortOrder < $1.sortOrder } }
 
+    /// Description groups that aren't named after a pressure target. Empty for now — every group
+    /// is a target — but the panel is expected to grow clauses about a world's *character*
+    /// (ambush versus pursuit, and the like), which isn't a target.
+    static let describableGroups: Set<String> = []
+
     // MARK: - Loading
 
     enum ContentError: Error, CustomStringConvertible {
@@ -111,7 +117,8 @@ struct ContentCatalog: Sendable {
             stations: try loadFile("stations", key: "stations", bundle: bundle),
             constellationNodes: try loadFile("constellation", key: "nodes", bundle: bundle),
             sites: try loadFile("sites", key: "sites", bundle: bundle),
-            contradictions: try loadFile("contradictions", key: "contradictions", bundle: bundle)
+            contradictions: try loadFile("contradictions", key: "contradictions", bundle: bundle),
+            descriptionClauses: try loadFile("descriptions", key: "clauses", bundle: bundle)
         )
     }
 
@@ -173,6 +180,7 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(constellationNodes.map(\.id.rawValue), label: "constellation node")
         try requireUniqueIDs(sites.map(\.id.rawValue), label: "site")
         try requireUniqueIDs(contradictions.map(\.id.rawValue), label: "contradiction")
+        try requireUniqueIDs(descriptionClauses.map(\.id), label: "description clause")
 
         let resourceIDs = Set(resources.map(\.id))
         let creatureIDs = Set(creatures.map(\.id))
@@ -279,6 +287,23 @@ struct ContentCatalog: Sendable {
                     throw ContentError.danglingReference(
                         "symbol '\(symbol.id)' binds '\(component.source)' to '\(component.target)', which it doesn't affect")
                 }
+            }
+        }
+
+        // Groups are allowed to say nothing — a world whose air is unremarkable should not be made
+        // to announce that, and "Ordinary atmosphere." in every description would flatten the prose
+        // the panel exists to produce. What *is* checked is that a clause can fire at all.
+        for clause in descriptionClauses {
+            guard !clause.text.isEmpty else {
+                throw ContentError.danglingReference("description clause '\(clause.id)' says nothing")
+            }
+            guard ContentCatalog.describableGroups.contains(clause.group) || pressureTargets.contains(where: { $0.id.rawValue == clause.group }) else {
+                throw ContentError.danglingReference(
+                    "description clause '\(clause.id)' is in unknown group '\(clause.group)'")
+            }
+            for condition in clause.conditions where !targetIDs.contains(condition.target) {
+                throw ContentError.danglingReference(
+                    "description clause '\(clause.id)' reads unknown target '\(condition.target)'")
             }
         }
 

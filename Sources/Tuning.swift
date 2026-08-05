@@ -190,6 +190,13 @@ enum Tuning {
 
     // MARK: - Encounters
 
+    enum Description {
+        /// How many clauses the world-description panel will say at once. The spec's worked example
+        /// is three; a few more leaves room for a world that genuinely is remarkable in several
+        /// ways without turning the panel into a checklist.
+        static let maximumClauses: Int = 5           // PLACEHOLDER
+    }
+
     enum Contradiction {
         /// The disclosed superlinear term. Small: it exists to say "several at once is worse than
         /// several separately", not to make stacking unthinkable.

@@ -14,6 +14,16 @@ struct PreviewPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
+            // Prose first, numbers after: what the world *is* should be the thing you read, and
+            // it's the half a hint page can be matched against.
+            if !projection.worldDescription.isEmpty {
+                WorldDescriptionPanel(
+                    description: projection.worldDescription,
+                    contradictionEscalation: ContradictionRules.escalation(
+                        count: projection.worldDescription.contradictions.count)
+                )
+                .padding(-14)
+            }
             stabilityBlock
             Divider()
             statsRow

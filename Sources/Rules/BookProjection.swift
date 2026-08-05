@@ -42,6 +42,8 @@ struct BookProjection {
     var visionRadius: ClosedRange<Int>
     var mapWidth: Int
     var mapHeight: Int
+    /// What the world will be like, in prose. Derived from the same resolution the bind runs.
+    var worldDescription: WorldDescription
     /// Expected share of harvests by resource, descending. Expected, not ranged — a pile of ranged
     /// percentages is unreadable, and the mix is the qualitative half of the preview.
     var resourceMix: [(resource: ResourceDef, share: Double)]
@@ -104,6 +106,12 @@ struct BookProjection {
             randomSlots: plans.count { $0.isRandom && !$0.isEmpty }
         )
 
+        // Described from what's *written*, with the seed filling the rest — so the panel talks
+        // about the world you'll actually get, chance-filled slots included.
+        let book = BookRules.resolveBook(draft: draft, ownedSymbols: ownedSymbols, seed: seed)
+        let sigils = BookRules.sigils(for: book)
+        let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+
         return BookProjection(
             slotPlans: plans,
             essenceCost: cost...cost,
@@ -113,6 +121,10 @@ struct BookProjection {
             visionRadius: sightFloor...sightCeiling,
             mapWidth: Tuning.World.gridWidth,
             mapHeight: Tuning.World.gridHeight,
+            worldDescription: DescriptionRules.describe(
+                readings,
+                contradictions: ContradictionRules.fired(in: sigils, readings: readings)
+            ),
             resourceMix: expectedResourceMix(plans),
             creatureMix: expectedCreatureMix(plans)
         )

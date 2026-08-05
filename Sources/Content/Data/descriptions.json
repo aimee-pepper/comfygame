@@ -1,0 +1,569 @@
+{
+  "_note": "World-description clauses (contradiction-danger-spec \u00a76, decisions-session-6 Q18). The panel says what a world is LIKE, in prose \u2014 never a condition list, never a sigil value. This is the surface the player matches a Library hint page against, so the wording is gameplay, not flavour text. One clause per group wins, highest priority first; priority 1 with no conditions is the group's fallback. 'polarity' drives the red/green underline. PLACEHOLDER: polarity is authored here, and should become derived once instability is derived (decisions-session-6 Q19, option 4).",
+  "clauses": [
+    {
+      "id": "two_niches",
+      "group": "illumination",
+      "text": "Day and night are different worlds here.",
+      "polarity": "neutral",
+      "priority": 40,
+      "conditions": [
+        {
+          "target": "illumination",
+          "measure": "tag",
+          "key": "two-niches",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "sourceless_glow",
+      "group": "illumination",
+      "text": "Something down here makes its own light.",
+      "polarity": "neutral",
+      "priority": 35,
+      "conditions": [
+        {
+          "target": "illumination",
+          "measure": "tag",
+          "key": "sourceless",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "lightless",
+      "group": "illumination",
+      "text": "Lightless.",
+      "polarity": "stabilising",
+      "priority": 30,
+      "conditions": [
+        {
+          "target": "illumination",
+          "measure": "peak",
+          "maximum": 8
+        }
+      ]
+    },
+    {
+      "id": "dim",
+      "group": "illumination",
+      "text": "A low, held-breath light.",
+      "polarity": "stabilising",
+      "priority": 20,
+      "conditions": [
+        {
+          "target": "illumination",
+          "measure": "peak",
+          "minimum": 8,
+          "maximum": 32
+        }
+      ]
+    },
+    {
+      "id": "blazing",
+      "group": "illumination",
+      "text": "Blazing overhead, and nowhere to be out of it.",
+      "polarity": "neutral",
+      "priority": 20,
+      "conditions": [
+        {
+          "target": "illumination",
+          "measure": "peak",
+          "minimum": 72
+        }
+      ]
+    },
+    {
+      "id": "ordinary_light",
+      "group": "illumination",
+      "text": "Ordinary daylight.",
+      "polarity": "neutral",
+      "priority": 1,
+      "conditions": []
+    },
+    {
+      "id": "arid_swing",
+      "group": "thermal",
+      "text": "Punishing days, bitter nights.",
+      "polarity": "destabilising",
+      "priority": 40,
+      "conditions": [
+        {
+          "target": "thermal",
+          "measure": "tag",
+          "key": "arid-swing",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "geothermal",
+      "group": "thermal",
+      "text": "The ground is warm underfoot.",
+      "polarity": "neutral",
+      "priority": 35,
+      "conditions": [
+        {
+          "target": "thermal",
+          "measure": "tag",
+          "key": "geothermal",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "buffered",
+      "group": "thermal",
+      "text": "The air holds its warmth; the nights are mild.",
+      "polarity": "stabilising",
+      "priority": 30,
+      "conditions": [
+        {
+          "target": "thermal",
+          "measure": "tag",
+          "key": "thermally-buffered",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "frozen_air",
+      "group": "thermal",
+      "text": "Cold enough to hold a world still.",
+      "polarity": "stabilising",
+      "priority": 25,
+      "conditions": [
+        {
+          "target": "thermal",
+          "measure": "floor",
+          "maximum": 14
+        }
+      ]
+    },
+    {
+      "id": "scorching",
+      "group": "thermal",
+      "text": "Scorching.",
+      "polarity": "destabilising",
+      "priority": 25,
+      "conditions": [
+        {
+          "target": "thermal",
+          "measure": "peak",
+          "minimum": 76
+        }
+      ]
+    },
+    {
+      "id": "temperate",
+      "group": "thermal",
+      "text": "Temperate.",
+      "polarity": "neutral",
+      "priority": 1,
+      "conditions": []
+    },
+    {
+      "id": "frozen_over",
+      "group": "hydrology",
+      "text": "Frozen over.",
+      "polarity": "stabilising",
+      "priority": 40,
+      "conditions": [
+        {
+          "target": "hydrology",
+          "measure": "tag",
+          "key": "frozen-over",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "evaporating",
+      "group": "hydrology",
+      "text": "What water there is, is leaving.",
+      "polarity": "destabilising",
+      "priority": 35,
+      "conditions": [
+        {
+          "target": "hydrology",
+          "measure": "tag",
+          "key": "evaporating",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "standing",
+      "group": "hydrology",
+      "text": "Standing water, and a great deal of it.",
+      "polarity": "neutral",
+      "priority": 25,
+      "conditions": [
+        {
+          "target": "hydrology",
+          "measure": "form",
+          "key": "standing",
+          "minimum": 40
+        }
+      ]
+    },
+    {
+      "id": "flowing",
+      "group": "hydrology",
+      "text": "Running water threads through it.",
+      "polarity": "neutral",
+      "priority": 22,
+      "conditions": [
+        {
+          "target": "hydrology",
+          "measure": "form",
+          "key": "flowing",
+          "minimum": 30
+        }
+      ]
+    },
+    {
+      "id": "parched",
+      "group": "hydrology",
+      "text": "Parched.",
+      "polarity": "destabilising",
+      "priority": 20,
+      "conditions": [
+        {
+          "target": "hydrology",
+          "measure": "available",
+          "maximum": 10
+        }
+      ]
+    },
+    {
+      "id": "water_enough",
+      "group": "hydrology",
+      "text": "Water enough.",
+      "polarity": "neutral",
+      "priority": 1,
+      "conditions": []
+    },
+    {
+      "id": "unstable_ground",
+      "group": "substrate",
+      "text": "The ground is not to be trusted.",
+      "polarity": "destabilising",
+      "priority": 40,
+      "conditions": [
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "unstable-ground",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "rich_seams",
+      "group": "substrate",
+      "text": "Rich seams, close enough to the surface to see.",
+      "polarity": "destabilising",
+      "priority": 30,
+      "conditions": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 58
+        }
+      ]
+    },
+    {
+      "id": "hard_stone",
+      "group": "substrate",
+      "text": "Hard stone underfoot.",
+      "polarity": "stabilising",
+      "priority": 22,
+      "conditions": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "hard",
+          "minimum": 40
+        }
+      ]
+    },
+    {
+      "id": "nothing_to_dig",
+      "group": "substrate",
+      "text": "Nothing here worth digging for.",
+      "polarity": "stabilising",
+      "priority": 20,
+      "conditions": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "maximum": 10
+        }
+      ]
+    },
+    {
+      "id": "ordinary_ground",
+      "group": "substrate",
+      "text": "Ordinary ground.",
+      "polarity": "neutral",
+      "priority": 1,
+      "conditions": []
+    },
+    {
+      "id": "layered",
+      "group": "relief",
+      "text": "Layered, and worth the climb.",
+      "polarity": "neutral",
+      "priority": 30,
+      "conditions": [
+        {
+          "target": "relief",
+          "measure": "aspect",
+          "key": "verticality",
+          "minimum": 42
+        }
+      ]
+    },
+    {
+      "id": "enclosed",
+      "group": "relief",
+      "text": "Enclosed \u2014 you will be on top of things before you see them.",
+      "polarity": "neutral",
+      "priority": 25,
+      "conditions": [
+        {
+          "target": "relief",
+          "measure": "aspect",
+          "key": "openness",
+          "maximum": 34
+        }
+      ]
+    },
+    {
+      "id": "open",
+      "group": "relief",
+      "text": "Open ground, and little cover.",
+      "polarity": "neutral",
+      "priority": 22,
+      "conditions": [
+        {
+          "target": "relief",
+          "measure": "aspect",
+          "key": "openness",
+          "minimum": 72
+        }
+      ]
+    },
+    {
+      "id": "gently_broken",
+      "group": "relief",
+      "text": "Gently broken country.",
+      "polarity": "neutral",
+      "priority": 1,
+      "conditions": []
+    },
+    {
+      "id": "barren",
+      "group": "vitality",
+      "text": "Barren.",
+      "polarity": "stabilising",
+      "priority": 40,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "barren",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "teeming",
+      "group": "vitality",
+      "text": "Everything grows, and everything is hungry.",
+      "polarity": "destabilising",
+      "priority": 35,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 64
+        }
+      ]
+    },
+    {
+      "id": "fungal",
+      "group": "vitality",
+      "text": "What lives here eats rather than grows.",
+      "polarity": "neutral",
+      "priority": 30,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "fungal",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "light_limited",
+      "group": "vitality",
+      "text": "Little grows, for want of light.",
+      "polarity": "stabilising",
+      "priority": 25,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "light-limited",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "water_limited",
+      "group": "vitality",
+      "text": "Little grows, for want of water.",
+      "polarity": "stabilising",
+      "priority": 25,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "water-limited",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "toxic_life",
+      "group": "vitality",
+      "text": "What grows here is best not touched.",
+      "polarity": "neutral",
+      "priority": 22,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "toxic",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "life_enough",
+      "group": "vitality",
+      "text": "Life enough to notice.",
+      "polarity": "neutral",
+      "priority": 1,
+      "conditions": []
+    },
+    {
+      "id": "toxic_air",
+      "group": "atmosphere",
+      "text": "The air is not kind.",
+      "polarity": "destabilising",
+      "priority": 40,
+      "conditions": [
+        {
+          "target": "atmosphere",
+          "measure": "tag",
+          "key": "toxic",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "choking",
+      "group": "atmosphere",
+      "text": "Ash and smoke, and you will taste them.",
+      "polarity": "destabilising",
+      "priority": 35,
+      "conditions": [
+        {
+          "target": "atmosphere",
+          "measure": "tag",
+          "key": "choking",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "occluded",
+      "group": "atmosphere",
+      "text": "You will not see far.",
+      "polarity": "neutral",
+      "priority": 25,
+      "conditions": [
+        {
+          "target": "atmosphere",
+          "measure": "aspect",
+          "key": "clarity",
+          "maximum": 38
+        }
+      ]
+    },
+    {
+      "id": "storming",
+      "group": "atmosphere",
+      "text": "The wind does not let up.",
+      "polarity": "destabilising",
+      "priority": 22,
+      "conditions": [
+        {
+          "target": "atmosphere",
+          "measure": "aspect",
+          "key": "motion",
+          "minimum": 62
+        }
+      ]
+    },
+    {
+      "id": "thin_air",
+      "group": "atmosphere",
+      "text": "Thin air, and cold with it.",
+      "polarity": "destabilising",
+      "priority": 20,
+      "conditions": [
+        {
+          "target": "atmosphere",
+          "measure": "peak",
+          "maximum": 24
+        }
+      ]
+    },
+    {
+      "id": "arrhythmic",
+      "group": "cycle",
+      "text": "Nothing here keeps time.",
+      "polarity": "destabilising",
+      "priority": 40,
+      "conditions": [
+        {
+          "target": "cycle",
+          "measure": "tag",
+          "key": "arrhythmic",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "metronomic",
+      "group": "cycle",
+      "text": "Reliable as a clock.",
+      "polarity": "stabilising",
+      "priority": 20,
+      "conditions": [
+        {
+          "target": "cycle",
+          "measure": "aspect",
+          "key": "regularity",
+          "minimum": 78
+        }
+      ]
+    }
+  ]
+}
