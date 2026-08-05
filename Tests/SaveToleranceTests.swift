@@ -80,15 +80,18 @@ final class SaveToleranceTests: XCTestCase {
             if (try? SaveCodec.decode(pruned)) == nil { failures.append(path.joined(separator: ".")) }
         }
 
-        // Known strict as of the sites/spillover work. Each is either genuinely required (a map
-        // without tiles isn't a map) or a struct nobody has needed to extend yet.
+        // Known strict. Each is genuinely required — a map without tiles isn't an old map, it's a
+        // broken one — or belongs to a struct nobody has extended yet.
+        //
+        // **Do not add a field here to make this test pass.** `reality.discovery.*` was on this
+        // list for exactly one commit, and in that commit it ate a real save on a real phone: the
+        // entry was added the same night the field was, so the tripwire reported the bug and got
+        // filed as a known quantity instead of fixed. If a *newly added* field shows up in this
+        // failure, that is the test working. Give its struct a tolerant decoder.
         let known: Set<String> = [
             "base.bookDraft.slots",
             "base.inventory.stacks",
             "base.resources.amounts",
-            "reality.discovery.creatures",
-            "reality.discovery.resources",
-            "reality.discovery.sites",
             "worlds.activeRun.book",
             "worlds.activeRun.book.randomlyFilled",
             "worlds.activeRun.book.symbols",
@@ -109,6 +112,34 @@ final class SaveToleranceTests: XCTestCase {
             written without it is quarantined on launch:
             \(added.sorted().joined(separator: "\n"))
             """)
+    }
+
+    /// A real save, off a real phone, written the night before sites existed.
+    ///
+    /// The synthetic tests above all build their fixture with *today's* code, so they can only ever
+    /// prove that today's saves round-trip. This one is the actual file that got quarantined —
+    /// keeping it means the regression can't come back quietly, and it's a template for every
+    /// future schema change: keep a real save from before it.
+    func testLastNightsRealSaveStillLoads() throws {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appending(path: "Fixtures/save-pre-sites-2026-08-04.json")
+        let state = try SaveCodec.decode(try Data(contentsOf: url))
+
+        // Spot-check each layer, so a partial decode can't pass as a success.
+        XCTAssertEqual(state.base.essence, 87)
+        XCTAssertEqual(state.base.resources[Resources.ore], 81)
+        XCTAssertEqual(state.base.resources[Resources.fiber], 30)
+        XCTAssertEqual(state.base.ownedSymbols.count, 12)
+        XCTAssertEqual(state.base.completedResearch.count, 3)
+        XCTAssertEqual(state.base.inventory.stacks.count, 8)
+        XCTAssertEqual(state.reality.lifetime.encountersWon, 19)
+        XCTAssertEqual(state.reality.lifetime.worldTurnsTaken, 414)
+        XCTAssertEqual(state.worlds.runIndex, 6)
+
+        // Fields that didn't exist when it was written come back empty rather than throwing.
+        XCTAssertTrue(state.reality.discovery.sites.isEmpty)
+        XCTAssertTrue(state.base.spillover.isEmpty)
     }
 
     // MARK: Helpers

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -31,6 +31,7 @@
 		3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */; };
 		3FD60BA9683F245EBFA14D61 /* SpendingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */; };
 		40CDA99CD7F4DFF60EC0EBBB /* SiteModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DA32364644741F03829592 /* SiteModels.swift */; };
+		4961D037BE2924DF53722EA8 /* save-pre-sites-2026-08-04.json in Resources */ = {isa = PBXBuildFile; fileRef = 061FE2BB0FA59B8824641746 /* save-pre-sites-2026-08-04.json */; };
 		4A0672467AD72629AC2ABD2F /* Inventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F756C7CBAE86A8565FB12DD /* Inventory.swift */; };
 		4C60516FFB5892091CBE28AC /* research.json in Resources */ = {isa = PBXBuildFile; fileRef = 6A1D054604B637EEC90D24DA /* research.json */; };
 		4DEB17BC13834B4612226A7B /* HarnessActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248394713D4F19F950F25B92 /* HarnessActions.swift */; };
@@ -99,6 +100,7 @@
 		03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingViews.swift; sourceTree = "<group>"; };
 		0486776A4EED6E508F843FB3 /* resources.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = resources.json; sourceTree = "<group>"; };
 		04E110F7C0AF0739241A8F94 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		061FE2BB0FA59B8824641746 /* save-pre-sites-2026-08-04.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "save-pre-sites-2026-08-04.json"; sourceTree = "<group>"; };
 		0BD3736ADDC83B6481EFAC9A /* Combat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Combat.swift; sourceTree = "<group>"; };
 		1AE0FA07FD91558E2F953944 /* GameActions+World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+World.swift"; sourceTree = "<group>"; };
 		1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchViews.swift; sourceTree = "<group>"; };
@@ -114,7 +116,7 @@
 		36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPanel.swift; sourceTree = "<group>"; };
 		3CD59EA0991C7AFB32B3129C /* BookbinderTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BookbinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		40DDEB42C7E2856E98352341 /* GameActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameActions.swift; sourceTree = "<group>"; };
-		433D570D177BA9841C75DCF9 /* Bookbinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookbinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		433D570D177BA9841C75DCF9 /* Bookbinder.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Bookbinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4461FC8AD054E8E6E494602B /* EconomyRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EconomyRules.swift; sourceTree = "<group>"; };
 		4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldsState.swift; sourceTree = "<group>"; };
 		541026CEC51423252ED5FAFD /* WorldConstraints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldConstraints.swift; sourceTree = "<group>"; };
@@ -177,6 +179,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		01DD7C9C85D04883D2042EFF /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				061FE2BB0FA59B8824641746 /* save-pre-sites-2026-08-04.json */,
+			);
+			path = Fixtures;
+			sourceTree = "<group>";
+		};
 		21AAB30585002EFE1DBBC7F6 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
@@ -333,6 +343,7 @@
 		D1F197F56457F06C0D463B6A /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				01DD7C9C85D04883D2042EFF /* Fixtures */,
 				7582647B2841DB69559E3968 /* BookRulesTests.swift */,
 				F395689728B586E0D0A7CD61 /* CombatTests.swift */,
 				7691C0625AD4AACD2BA46A20 /* ContentTests.swift */,
@@ -365,6 +376,7 @@
 			buildConfigurationList = 601703FB88DE8F854E614D81 /* Build configuration list for PBXNativeTarget "BookbinderTests" */;
 			buildPhases = (
 				FF96F4E350962A659F318514 /* Sources */,
+				AE039BC3019C0F947DD0B411 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -406,6 +418,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					CF0593DC0240C3C51FDC7CAE = {
+						DevelopmentTeam = BNV6X8W4QS;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -420,6 +433,7 @@
 			);
 			mainGroup = 45223024247727E345FE8AC7;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -430,6 +444,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		AE039BC3019C0F947DD0B411 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4961D037BE2924DF53722EA8 /* save-pre-sites-2026-08-04.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F9EB483A0C481DEB209626BD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -630,7 +652,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CQ892K6L4F;
+				DEVELOPMENT_TEAM = BNV6X8W4QS;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -728,7 +750,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CQ892K6L4F;
+				DEVELOPMENT_TEAM = BNV6X8W4QS;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

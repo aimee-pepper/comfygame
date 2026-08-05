@@ -17,9 +17,25 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
     /// creatures — you can be told a world *can* hold something without being told what.
     var sites: [SiteID: DiscoveryRecord] = [:]
 
-    init(creatures: [CreatureID: DiscoveryRecord] = [:], resources: [ResourceID: DiscoveryRecord] = [:]) {
+    init(creatures: [CreatureID: DiscoveryRecord] = [:],
+         resources: [ResourceID: DiscoveryRecord] = [:],
+         sites: [SiteID: DiscoveryRecord] = [:]) {
         self.creatures = creatures
         self.resources = resources
+        self.sites = sites
+    }
+
+    /// Tolerant decoding, per the policy in `Migrations.swift`.
+    ///
+    /// This one has teeth: adding `sites` with synthesised `Codable` quarantined a real save on a
+    /// real device, because a save written before the field existed has no `sites` key and
+    /// synthesised decoding *throws* rather than defaulting. Every field here decodes optionally,
+    /// and every field added here must too.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        creatures = try container.decodeIfPresent([CreatureID: DiscoveryRecord].self, forKey: .creatures) ?? [:]
+        resources = try container.decodeIfPresent([ResourceID: DiscoveryRecord].self, forKey: .resources) ?? [:]
+        sites = try container.decodeIfPresent([SiteID: DiscoveryRecord].self, forKey: .sites) ?? [:]
     }
 
     // MARK: Queries (drive the silhouette/revealed UI)

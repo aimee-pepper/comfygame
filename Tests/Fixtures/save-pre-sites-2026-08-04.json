@@ -1,0 +1,228 @@
+{
+  "base" : {
+    "binderGambits" : [
+
+    ],
+    "bookDraft" : {
+      "slots" : {
+
+      }
+    },
+    "companion" : {
+      "armorTier" : 0,
+      "gambits" : [
+        {
+          "action" : "act_heal",
+          "comparator" : "cmp_below",
+          "id" : {
+            "rawValue" : 1
+          },
+          "property" : "prop_hp",
+          "subject" : "subject_ally_any",
+          "threshold" : "thr_50"
+        },
+        {
+          "action" : "act_attack",
+          "id" : {
+            "rawValue" : 2
+          },
+          "subject" : "subject_foe_any"
+        }
+      ],
+      "maxHP" : 24,
+      "name" : "Quill",
+      "weaponTier" : 0
+    },
+    "completedResearch" : [
+      "satchel_two",
+      "study_growth",
+      "satchel_one"
+    ],
+    "essence" : 87,
+    "hasAutomateSelfUnlock" : false,
+    "inventory" : {
+      "slots" : 8,
+      "stacks" : [
+        {
+          "catalogID" : "cache_key",
+          "count" : 1,
+          "id" : {
+            "rawValue" : 3452235261251287792
+          },
+          "identified" : true
+        },
+        {
+          "catalogID" : "salve_lesser",
+          "count" : 1,
+          "id" : {
+            "rawValue" : 6177713443873989794
+          },
+          "identified" : true
+        },
+        {
+          "catalogID" : "cache_key",
+          "count" : 1,
+          "id" : {
+            "rawValue" : 5625465131905544562
+          },
+          "identified" : true
+        },
+        {
+          "catalogID" : "salve_lesser",
+          "count" : 1,
+          "id" : {
+            "rawValue" : 10161072825503104404
+          },
+          "identified" : true
+        },
+        {
+          "catalogID" : "cache_key",
+          "count" : 1,
+          "id" : {
+            "rawValue" : 11503148321058224822
+          },
+          "identified" : true
+        },
+        {
+          "catalogID" : "salve_lesser",
+          "count" : 1,
+          "id" : {
+            "rawValue" : 3227588304773525913
+          },
+          "identified" : true
+        },
+        {
+          "catalogID" : "curio_humming_shard",
+          "count" : 1,
+          "id" : {
+            "rawValue" : 12910000018996003775
+          },
+          "identified" : false
+        },
+        {
+          "catalogID" : "curio_humming_shard",
+          "count" : 1,
+          "id" : {
+            "rawValue" : 13775481620054398741
+          },
+          "identified" : false
+        }
+      ]
+    },
+    "ownedGambitComponents" : [
+      "prop_hp",
+      "subject_foe_any",
+      "act_heal",
+      "cmp_below",
+      "thr_50",
+      "act_attack",
+      "subject_ally_any"
+    ],
+    "ownedSymbols" : [
+      "dim_sky",
+      "verdant",
+      "rich_ore",
+      "frostbound",
+      "sparse_ore",
+      "gilded_veins",
+      "archipelago",
+      "verdigris_bloom",
+      "caverns",
+      "plains",
+      "teeming_life",
+      "ashen"
+    ],
+    "purchasedGambitSlots" : 0,
+    "resources" : {
+      "amounts" : {
+        "fiber" : 30,
+        "ore" : 81
+      }
+    },
+    "satchelTier" : 2,
+    "stations" : {
+      "constellation" : {
+        "isUnlocked" : true,
+        "tier" : 0
+      },
+      "essence_spring" : {
+        "isUnlocked" : true,
+        "tier" : 0
+      },
+      "party" : {
+        "isUnlocked" : true,
+        "tier" : 0
+      },
+      "storehouse" : {
+        "isUnlocked" : true,
+        "tier" : 0
+      },
+      "workshop" : {
+        "isUnlocked" : true,
+        "tier" : 0
+      },
+      "writing_desk" : {
+        "isUnlocked" : true,
+        "tier" : 0
+      }
+    }
+  },
+  "meta" : {
+    "lastAction" : "refine 20 raw essence",
+    "lastSavedAt" : "2026-08-05T06:25:07Z",
+    "launchCount" : 6,
+    "mutationCount" : 543
+  },
+  "reality" : {
+    "constellation" : {
+
+    },
+    "discovery" : {
+      "creatures" : {
+        "ink_hound" : {
+          "firstSeenRunIndex" : 1,
+          "timesEncountered" : 7
+        },
+        "margin_wraith" : {
+          "firstSeenRunIndex" : 1,
+          "timesEncountered" : 8
+        },
+        "paper_moth" : {
+          "firstSeenRunIndex" : 1,
+          "timesEncountered" : 9
+        }
+      },
+      "resources" : {
+        "essence_raw" : {
+          "firstSeenRunIndex" : 1,
+          "timesEncountered" : 57
+        },
+        "fiber" : {
+          "firstSeenRunIndex" : 1,
+          "timesEncountered" : 21
+        },
+        "ore" : {
+          "firstSeenRunIndex" : 1,
+          "timesEncountered" : 38
+        }
+      }
+    },
+    "lifetime" : {
+      "encountersFled" : 0,
+      "encountersWon" : 19,
+      "runsBankedViaPortal" : 5,
+      "runsLostToCollapse" : 1,
+      "runsStarted" : 6,
+      "worldTurnsTaken" : 414
+    },
+    "motes" : 1
+  },
+  "schemaVersion" : 1,
+  "worlds" : {
+    "runIndex" : 6,
+    "seeds" : {
+      "issued" : 6,
+      "rootSeed" : 6799378270923099460
+    }
+  }
+}
