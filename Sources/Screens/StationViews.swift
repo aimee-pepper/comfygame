@@ -31,12 +31,12 @@ struct StorehouseView: View {
                         EmptyNote("Eight slots, all empty. Items come from worlds.")
                     } else {
                         ForEach(base.inventory.stacks) { stack in
-                            let item = ContentCatalog.shared.item(stack.catalogID)
-                            LabeledRow(icon: stack.identified ? (item?.icon ?? "questionmark") : "questionmark.diamond",
-                                       label: stack.identified
-                                           ? (item?.name ?? stack.catalogID.rawValue)
-                                           : (item?.unidentifiedName ?? "Something unidentified"),
-                                       value: stack.count > 1 ? "×\(stack.count)" : "")
+                            // Rarity reads as the colour of the name (design brief's colour-coded
+                            // ladder), so a Mythic is obvious at a glance in a long list.
+                            LabeledRow(icon: stack.icon,
+                                       label: stack.displayName,
+                                       value: stack.count > 1 ? "×\(stack.count)" : "",
+                                       tint: stack.rarity.tint)
                         }
                     }
                 }
@@ -301,11 +301,14 @@ struct LabeledRow: View {
     let label: String
     var value: String = ""
     var isDimmed: Bool = false
+    /// Colours the label. Used for the rarity ladder — an item's rarity IS the colour of its name.
+    var tint: Color?
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: icon).font(.footnote).frame(width: 20).foregroundStyle(.tint)
-            Text(label).font(.callout)
+            Image(systemName: icon).font(.footnote).frame(width: 20)
+                .foregroundStyle(tint ?? Color.accentColor)
+            Text(label).font(.callout).foregroundStyle(tint ?? Color.primary)
             Spacer(minLength: 8)
             Text(value).font(.callout.monospacedDigit()).foregroundStyle(.secondary)
         }

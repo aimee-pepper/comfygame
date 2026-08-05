@@ -34,6 +34,20 @@ A symbol said "+0.2" and the headline moved by 1.6. Composing a book was guesswo
 
 ---
 
+## Resolved by Aimee (2026-08-04)
+
+- **4. Manual override** — keep option **A**: unattended by default, override is pre-authorised on
+  your own turn. No change needed.
+- **5. Satchel** — build the decision. Done: loot that won't fit is *offered*, and you pick something
+  to drop or leave it behind. The offer is held on the run, so a force-quit while you're deciding
+  resumes with the choice still open.
+- **6. Rarity** — shown as **the colour of the item's name**, everywhere an item appears. Done.
+- **7. Skill cooldown** — fine for now; audit later.
+- **Enemy sight** — moved onto the creature (`CreatureDef.sightRadius`), since later creatures will
+  notice you from further off. Two remains the baseline for all three.
+
+The originals are kept below for the record.
+
 ## Still deviating — these need your call, not mine
 
 ### 4. Manual override happens *before* the companion's turn, not during it ← the real one

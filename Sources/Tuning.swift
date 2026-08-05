@@ -36,22 +36,21 @@ enum Tuning {
         /// hidden multiplier — a symbol reading "−25 stability" moves the headline by exactly 25.
         ///
         /// An unwritten world is perfectly stable; instability is the price of *asking a world for
-        /// things* (the Mystcraft "greed" model, research-pass-3). Which is why every bounty symbol
-        /// is expensive and no combination of stabilisers can quite pay one off — writing a
-        /// perfectly stable world is possible only if you ask it for nothing, and then there's
-        /// nothing in it.
+        /// things* (the Mystcraft "greed" model, research-pass-3).
+        ///
+        /// **A fully stable world is reachable, and it is not an empty one.** Stack neutral and
+        /// stabilising choices and you can hold a world open indefinitely — what that costs you is
+        /// on the other axes: sight, danger, and what lives there. Stability is one dial among
+        /// several, never a straight trade against yield.
         ///
         /// Calibrated against the current symbol set (14×14 = 196 tiles):
         ///
-        ///   | book                                        | score | turns      |
-        ///   |---------------------------------------------|-------|------------|
-        ///   | Plains · Frostbound · Sparse Ore · Dim Sky   |    95 | 380        |
-        ///   | Plains · Verdant · Sparse Ore · Gilded Veins |    45 | 90         |
-        ///   | Caverns · Verdant · Teeming Life · Gilded    |    25 | 25         |
-        ///   | Archipelago · Ashen · Rich Ore · Gilded      |     0 | 1          |
-        ///
-        /// 100 (indefinite) stays out of reach while a book asks for anything at all — a world that
-        /// never ends is what anchoring is for.
+        ///   | book                                        | score |      turns | sight | danger |
+        ///   |---------------------------------------------|-------|------------|-------|--------|
+        ///   | Plains · Frostbound · Sparse Ore · Dim Sky   |   100 | indefinite |     3 | tier 2 |
+        ///   | Plains · Verdant · Sparse Ore · Gilded Veins |    55 |        165 |     4 | tier 2 |
+        ///   | Plains · Frostbound · Rich Ore · Dim Sky     |    70 |        210 |     3 | tier 3 |
+        ///   | Archipelago · Ashen · Rich Ore · Gilded      |     0 |          1 |     3 | tier 4 |
         static let baseStabilityScore: Int = 100
     }
 
@@ -100,8 +99,9 @@ enum Tuning {
         static let collapseHaulKeptFraction: Double = 0.5 // PLACEHOLDER
         /// Turns of tapping to fully harvest a node.
         static let harvestTurnsRange: ClosedRange<Int> = 1...3 // PLACEHOLDER
-        /// Enemies wake when the player is within this many tiles.
-        static let enemyAggroRadius: Int = 2         // PLACEHOLDER
+        /// Fallback for a creature with no sight of its own. Real values live on the creature
+        /// (`CreatureDef.sightRadius`) so that some things can see you coming from further off.
+        static let defaultEnemySightRadius: Int = 2  // PLACEHOLDER
 
         // Worldgen
         static let baseNodeCountRange: ClosedRange<Int> = 8...12   // PLACEHOLDER, scaled by book

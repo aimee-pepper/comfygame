@@ -22,6 +22,28 @@ extension GameStore {
     }
 
     var canPortalHere: Bool { tileUnderPlayer?.content.isPortal ?? false }
+
+    /// Loot that wouldn't fit and is waiting on a decision.
+    var pendingLoot: [ItemStack] { activeRun?.offeredItems ?? [] }
+
+    /// Take the offered item, dropping something you're carrying to make room. The satchel is
+    /// smaller than home storage precisely so this choice exists; making it for the player would
+    /// be the thing that empties the design out.
+    func takeOffered(_ offered: ItemStack, dropping carried: ItemStack) {
+        mutate("swap loot", flush: true) { state in
+            guard var run = state.worlds.activeRun else { return }
+            run.satchelItems.remove(carried.id)
+            _ = run.satchelItems.add(offered)
+            run.offeredItems.removeAll { $0.id == offered.id }
+            state.worlds.activeRun = run
+        }
+    }
+
+    func leaveOffered(_ offered: ItemStack) {
+        mutate("leave loot behind", flush: true) { state in
+            state.worlds.activeRun?.offeredItems.removeAll { $0.id == offered.id }
+        }
+    }
     var isOnLockedCache: Bool { tileUnderPlayer?.content == .lockedCache }
 
     /// Whether the player is carrying anything a cache would take. Keys are found in *other*

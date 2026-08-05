@@ -33,6 +33,13 @@ final class ContentTests: XCTestCase {
         }
     }
 
+    /// Sight belongs to the creature, so later ones can notice you from further off.
+    func testEveryCreatureCanSee() {
+        for creature in ContentCatalog.shared.creatures {
+            XCTAssertGreaterThan(creature.sightRadius, 0, "'\(creature.id)' would never notice you")
+        }
+    }
+
     func testThreeCreatureTypesShip() {
         XCTAssertEqual(ContentCatalog.shared.creatures.count, 3, "v0 ships exactly three enemy types")
     }

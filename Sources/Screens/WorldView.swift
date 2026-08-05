@@ -17,6 +17,7 @@ struct WorldView: View {
                 StabilityHeader(run: run)
                 ScrollView {
                     VStack(spacing: 12) {
+                        LootDecisionCard()
                         MapGrid(run: run) { point in
                             tapped(point, in: run)
                         }
@@ -83,7 +84,7 @@ struct WorldView: View {
         case .foundCache: "A cache, locked. The key is somewhere else."
         case .cacheOpened(let what): "The lock gives. \(what)"
         case .pickedUpItem(let what): "\(what) You can't tell what it is."
-        case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) left behind."
+        case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."
         case .hazardHit(let damage): "The ground turns on you — \(damage) damage."
         case .enemySighted(let creature):
             "\(ContentCatalog.shared.creature(creature)?.name ?? "Something") has noticed you."

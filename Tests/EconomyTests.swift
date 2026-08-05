@@ -269,6 +269,73 @@ final class EconomyTests: XCTestCase {
         }
     }
 
+    // MARK: The satchel decision
+
+    /// A full satchel must hand the player a choice, not make one for them. Silently dropping the
+    /// loot, or silently discarding what you were carrying, both empty out the reason the satchel is
+    /// smaller than home storage in the first place.
+    func testLootThatDoesNotFitBecomesADecision() throws {
+        let store = richStore()
+        store.setSymbol("plains", in: "terrain")
+        store.bindAndDepart()
+
+        let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
+        store.mutate("fill the satchel and offer one more") { state in
+            guard var run = state.worlds.activeRun else { return }
+            run.satchelItems = Inventory(slots: 1, stacks: [
+                ItemStack(id: InstanceID(rawValue: 1), catalogID: curio.id, count: 1, identified: false)
+            ])
+            run.offeredItems = [ItemStack(id: InstanceID(rawValue: 2), catalogID: curio.id,
+                                          count: 1, identified: false)]
+            state.worlds.activeRun = run
+        }
+
+        XCTAssertEqual(store.pendingLoot.count, 1, "The decision is pending, not resolved")
+
+        let offered = try XCTUnwrap(store.pendingLoot.first)
+        let carried = try XCTUnwrap(store.state.worlds.activeRun?.satchelItems.stacks.first)
+        store.takeOffered(offered, dropping: carried)
+
+        let run = try XCTUnwrap(store.state.worlds.activeRun)
+        XCTAssertTrue(run.offeredItems.isEmpty)
+        XCTAssertEqual(run.satchelItems.stacks.map(\.id), [offered.id], "You swapped, not stacked")
+    }
+
+    func testLootCanBeLeftBehind() throws {
+        let store = richStore()
+        store.setSymbol("plains", in: "terrain")
+        store.bindAndDepart()
+        let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
+        store.mutate("offer something") { state in
+            state.worlds.activeRun?.offeredItems = [
+                ItemStack(id: InstanceID(rawValue: 3), catalogID: curio.id, count: 1, identified: false)
+            ]
+        }
+
+        store.leaveOffered(try XCTUnwrap(store.pendingLoot.first))
+        XCTAssertTrue(store.pendingLoot.isEmpty)
+        XCTAssertTrue(store.state.worlds.activeRun?.satchelItems.stacks.isEmpty ?? false)
+    }
+
+    /// A decision you're in the middle of has to survive a force-quit like anything else.
+    func testAPendingLootDecisionSurvivesRelaunch() throws {
+        let io = SaveFileIO.temporary(name: "offer-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+
+        let first = GameStore(io: io)
+        first.setSymbol("plains", in: "terrain")
+        first.bindAndDepart()
+        let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
+        first.mutate("offer something", flush: true) { state in
+            state.worlds.activeRun?.offeredItems = [
+                ItemStack(id: InstanceID(rawValue: 4), catalogID: curio.id, count: 1, identified: false)
+            ]
+        }
+
+        let second = GameStore(io: io)
+        XCTAssertEqual(second.pendingLoot.count, 1, "The choice is still open on relaunch")
+    }
+
     // MARK: Constellation
 
     func testBuyingAConstellationNodeSpendsMotesAndSticks() throws {

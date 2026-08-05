@@ -66,6 +66,11 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// encounter on the same turn (acceptance criterion).
     var activeEncounter: EncounterState?
 
+    /// Loot that wouldn't fit, waiting on you to choose. Held in the save rather than resolved
+    /// on the spot, because "drop something or leave it" is a decision the player makes — and a
+    /// force-quit in the middle of making it has to resume with the choice still open (pillar 2).
+    var offeredItems: [ItemStack] = []
+
     /// Where the player stood before their last step. Fleeing retreats here.
     var previousPosition: GridPoint?
     /// Turns before a bump can start another fight. Stops a flee from being undone immediately.

@@ -260,7 +260,9 @@ enum WorldRules {
             var enemy = run.enemies[index]
             let distance = enemy.position.chebyshevDistance(to: run.playerPosition)
 
-            if !enemy.isAwake, distance <= Tuning.World.enemyAggroRadius {
+            let sight = ContentCatalog.shared.creature(enemy.creatureID)?.sightRadius
+                ?? Tuning.World.defaultEnemySightRadius
+            if !enemy.isAwake, distance <= sight {
                 enemy.isAwake = true
                 if run.map[enemy.position].isRevealed {
                     events.append(.enemySighted(enemy.creatureID))

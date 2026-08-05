@@ -61,6 +61,9 @@ struct CreatureDef: Codable, Equatable, Identifiable, Sendable {
     var attack: Int
     /// Base weight in the spawn table before symbol modifiers.
     var spawnWeight: Double
+    /// How far off it notices you. Two is the baseline; later creatures are expected to see
+    /// further, so this belongs to the creature rather than to `Tuning`.
+    var sightRadius: Int
 }
 
 /// A stackable resource. Never consumes an inventory slot.

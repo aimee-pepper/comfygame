@@ -45,9 +45,9 @@ struct IdentifyCard: View {
             ForEach(store.unidentifiedStacks) { stack in
                 let curio = ContentCatalog.shared.item(stack.catalogID)
                 HStack(spacing: 10) {
-                    Image(systemName: "questionmark.diamond").frame(width: 22).foregroundStyle(.tint)
+                    Image(systemName: stack.icon).frame(width: 22).foregroundStyle(stack.rarity.tint)
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(curio?.unidentifiedName ?? "Something odd").font(.callout)
+                        Text(stack.displayName).font(.callout).foregroundStyle(stack.rarity.tint)
                         Text(curio?.blurb ?? "").font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 8)
@@ -71,7 +71,8 @@ struct IdentifyCard: View {
                 .font(.caption)
                 .foregroundStyle(store.canAffordIdentify ? Color.secondary : Color.orange)
         }
-        .alert("It's a \(revealed?.name ?? "")", isPresented: .constant(revealed != nil)) {
+        .alert("It's a \(revealed?.name ?? "") — \(revealed?.rarity.displayName ?? "")",
+               isPresented: .constant(revealed != nil)) {
             Button("Oh") { revealed = nil }
         } message: {
             Text(revealedMessage)

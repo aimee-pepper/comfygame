@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — names, icons and stats are Claude-invented. v0 ships exactly three enemy types (design-brief-v0: 'enemy variety beyond 3 types' is explicitly out of scope). Each one needs a stable id because the encounter-flag registry (DiscoveryLog) keys off it.",
+  "_note": "PLACEHOLDER — names, icons and stats are Claude-invented. v0 ships exactly three enemy types (design-brief-v0: 'enemy variety beyond 3 types' is explicitly out of scope). Each one needs a stable id because the encounter-flag registry (DiscoveryLog) keys off it. 'sightRadius' is how far this creature notices you from. Two is the baseline; later creatures are expected to see further, which is why it lives on the creature rather than in Tuning.",
   "creatures": [
     {
       "id": "paper_moth",
@@ -8,7 +8,8 @@
       "tier": 1,
       "maxHP": 8,
       "attack": 2,
-      "spawnWeight": 1.0
+      "spawnWeight": 1.0,
+      "sightRadius": 2
     },
     {
       "id": "ink_hound",
@@ -17,7 +18,8 @@
       "tier": 2,
       "maxHP": 16,
       "attack": 4,
-      "spawnWeight": 0.6
+      "spawnWeight": 0.6,
+      "sightRadius": 2
     },
     {
       "id": "margin_wraith",
@@ -26,7 +28,8 @@
       "tier": 3,
       "maxHP": 26,
       "attack": 6,
-      "spawnWeight": 0.25
+      "spawnWeight": 0.25,
+      "sightRadius": 2
     }
   ]
 }

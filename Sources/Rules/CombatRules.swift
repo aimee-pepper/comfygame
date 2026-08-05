@@ -349,8 +349,15 @@ enum CombatRules {
                     let name = ContentCatalog.shared.item(curio)?.unidentifiedName ?? "Something odd"
                     let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()),
                                           catalogID: curio, count: 1, identified: false)
-                    // A full satchel refuses loot rather than silently swallowing it.
-                    found.append(run.satchelItems.add(stack) ? name : "\(name) — no room, left behind")
+                    // A full satchel neither swallows the loot nor discards it — it hands you
+                    // the choice. Held on the run until you make it, so a force-quit mid-decision
+                    // resumes with the decision still open.
+                    if run.satchelItems.add(stack) {
+                        found.append(name)
+                    } else {
+                        run.offeredItems.append(stack)
+                        found.append("\(name) — no room; waiting on you")
+                    }
                 }
             }
         }

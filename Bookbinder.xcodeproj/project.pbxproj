@@ -56,6 +56,7 @@
 		BFB3CF53CC01D5CED466B0C9 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E110F7C0AF0739241A8F94 /* GameState.swift */; };
 		C709E6D127F96D2420ADBC5C /* creatures.json in Resources */ = {isa = PBXBuildFile; fileRef = 5FD331CEC89F930A1F99C13B /* creatures.json */; };
 		CD009883298233F654EE899C /* Discovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADC03C0E941B354BFE2EF65 /* Discovery.swift */; };
+		CF22F5AA092E017612B1124E /* LootDecisionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */; };
 		D469496DC882C482CB83E721 /* WorldMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B20DAF90C2684826A3C3F21 /* WorldMap.swift */; };
 		D4DE88F2BA8D93E6307B66A6 /* GameActions+World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE0FA07FD91558E2F953944 /* GameActions+World.swift */; };
 		D9F83617E1060D93E281682F /* EconomyRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4461FC8AD054E8E6E494602B /* EconomyRules.swift */; };
@@ -138,6 +139,7 @@
 		C82ADF2ABC4F75679DADCCBB /* WritingDeskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingDeskView.swift; sourceTree = "<group>"; };
 		CAAA1B171F7C380229C20CC5 /* RealityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealityState.swift; sourceTree = "<group>"; };
 		CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchModels.swift; sourceTree = "<group>"; };
+		CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LootDecisionView.swift; sourceTree = "<group>"; };
 		CFFBF656255758DFA8E45232 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCatalog.swift; sourceTree = "<group>"; };
 		D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleBuilderView.swift; sourceTree = "<group>"; };
@@ -194,6 +196,7 @@
 			children = (
 				346EEEC616B8EBFE291C4A79 /* BaseView.swift */,
 				BE933E91275B1FF990B69BAA /* EncounterView.swift */,
+				CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */,
 				36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */,
 				1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */,
 				D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */,
@@ -438,6 +441,7 @@
 				983452CD1EE2126ECB5B1973 /* HarnessView.swift in Sources */,
 				E90526D391BEDFC1166DCE96 /* Identifiers.swift in Sources */,
 				4A0672467AD72629AC2ABD2F /* Inventory.swift in Sources */,
+				CF22F5AA092E017612B1124E /* LootDecisionView.swift in Sources */,
 				A30BFB516414E49CB79270EF /* Migrations.swift in Sources */,
 				E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */,
 				0463A21CD6D0C85974C64C81 /* RealityState.swift in Sources */,
