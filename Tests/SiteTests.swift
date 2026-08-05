@@ -167,7 +167,7 @@ final class SiteTests: XCTestCase {
         // Stand on it, with nothing in the way.
         store.mutate("test: teleport") { state in
             state.worlds.activeRun?.playerPosition = site.position
-            state.worlds.activeRun?.enemies.removeAll { $0.position == site.position }
+            state.worlds.activeRun?.enemies.removeAll()
         }
 
         let essenceBefore = store.state.base.essence
@@ -212,10 +212,13 @@ final class SiteTests: XCTestCase {
         store.mutate("test: forget") { state in
             state.base.ownedSymbols.remove(taught)
             state.worlds.activeRun?.playerPosition = site.position
-            state.worlds.activeRun?.enemies.removeAll { $0.position == site.position }
+            // Clear the board entirely: this test is about literacy surviving a collapse, and a
+            // wandering enemy interrupting the search would fail it for the wrong reason.
+            state.worlds.activeRun?.enemies.removeAll()
         }
         for _ in 0..<(site.definition?.contents.searchTurns ?? 1) { store.searchSite() }
-        XCTAssertTrue(store.state.base.ownedSymbols.contains(taught))
+        XCTAssertTrue(store.state.base.ownedSymbols.contains(taught),
+                      "searching a teaching site didn't teach: \(store.recentEvents)")
 
         // Collapse the world out from under them: literacy must not be part of the haul.
         store.mutate("test: collapse") { state in state.worlds.activeRun?.stability = 0 }

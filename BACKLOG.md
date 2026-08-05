@@ -55,7 +55,7 @@
 - [ ] Unidentified compounds + confidence meter
 
 ## Milestone 6 — Ergonomics
-- [ ] Q10 banking overflow → Storehouse spillover, never lost silently (ruled, session 5 audit)
+- [x] Q10 banking overflow → Storehouse spillover, never lost silently (ruled, session 5 audit)
 - [ ] 44pt audit, thumb-zone action bar, haptics (optional), full acceptance-criteria pass from docs/design-brief-v0.md
 
 ## Stretch

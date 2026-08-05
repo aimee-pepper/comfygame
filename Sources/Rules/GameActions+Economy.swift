@@ -151,4 +151,49 @@ extension GameStore {
         }
         return reward
     }
+
+    // MARK: - Spillover
+
+    /// Loot waiting on a decision because the Storehouse was full when it came home.
+    var spillover: [ItemStack] { state.base.spillover }
+
+    /// Move a spilled stack into the Storehouse proper. Refused rather than silently swapped when
+    /// there's still no room — the player has to make space first.
+    @discardableResult
+    func storeSpilled(_ stack: ItemStack) -> Bool {
+        guard !state.base.inventory.isFull,
+              state.base.spillover.contains(where: { $0.id == stack.id })
+        else { return false }
+        mutate("store spilled item", flush: true) { state in
+            guard state.base.inventory.add(stack) else { return }
+            state.base.spillover.removeAll { $0.id == stack.id }
+        }
+        return true
+    }
+
+    /// Throw a spilled stack away. Deliberate, explicit, and the *only* way loot leaves the game
+    /// once it's been banked — nothing may discard on the player's behalf (Q10).
+    func discardSpilled(_ stack: ItemStack) {
+        mutate("discard spilled item", flush: true) { state in
+            state.base.spillover.removeAll { $0.id == stack.id }
+        }
+    }
+
+    /// Swap a spilled stack for one already stored, when the Storehouse is full and the player
+    /// would rather keep the new thing.
+    func swapSpilled(_ spilled: ItemStack, for stored: ItemStack) {
+        mutate("swap spilled item", flush: true) { state in
+            guard state.base.spillover.contains(where: { $0.id == spilled.id }),
+                  state.base.inventory.stacks.contains(where: { $0.id == stored.id })
+            else { return }
+            state.base.inventory.remove(stored.id)
+            guard state.base.inventory.add(spilled) else {
+                // Couldn't place it after all — put the old one back rather than losing both.
+                state.base.inventory.add(stored)
+                return
+            }
+            state.base.spillover.removeAll { $0.id == spilled.id }
+            state.base.spillover.append(stored)
+        }
+    }
 }

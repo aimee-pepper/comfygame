@@ -22,8 +22,12 @@ extension GameStore {
     }
 
     /// What the Writing Desk shows before committing.
+    /// Reads the seed the next bind *will* use, without consuming it — so what the preview
+    /// promises is what the world delivers, sites included.
     var bookProjection: BookProjection {
-        BookProjection.project(draft: state.base.bookDraft, ownedSymbols: state.base.ownedSymbols)
+        BookProjection.project(draft: state.base.bookDraft,
+                               ownedSymbols: state.base.ownedSymbols,
+                               seed: state.worlds.seeds.peekNextSeed())
     }
 
     /// The price is exact before committing — a slot left to chance costs a flat rate whatever

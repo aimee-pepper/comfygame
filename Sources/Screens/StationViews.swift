@@ -4,6 +4,95 @@ import SwiftUI
 // *spending* half of each (identify, purchase, gambit editing, node buying) belongs to milestones
 // 4–5 and is marked as such on screen rather than being silently absent.
 
+/// What came home to a full Storehouse and is waiting to be sorted.
+///
+/// Banking never discards (Q10). The decision lands *here*, at home, with everything visible —
+/// as opposed to the satchel decision, which belongs in the world while the walls are closing in.
+private struct SpilloverCard: View {
+    @EnvironmentObject private var store: GameStore
+    @State private var swapping: ItemStack?
+
+    var body: some View {
+        StationCard(title: "Waiting to be sorted — \(store.spillover.count)", icon: "tray.full") {
+            Text("Your Storehouse was full when this came home. Nothing was thrown away.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            ForEach(store.spillover) { stack in
+                VStack(alignment: .leading, spacing: 8) {
+                    LabeledRow(icon: stack.icon,
+                               label: stack.displayName,
+                               value: stack.count > 1 ? "×\(stack.count)" : "",
+                               tint: stack.rarity.tint)
+                    HStack(spacing: 8) {
+                        if store.state.base.inventory.isFull {
+                            Button("Make room") { swapping = stack }
+                                .buttonStyle(.borderedProminent)
+                                .frame(minHeight: 44)
+                        } else {
+                            Button("Store it") { store.storeSpilled(stack) }
+                                .buttonStyle(.borderedProminent)
+                                .frame(minHeight: 44)
+                        }
+                        Button("Throw away", role: .destructive) { store.discardSpilled(stack) }
+                            .frame(minHeight: 44)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .sheet(item: $swapping) { spilled in
+            SwapSheet(spilled: spilled)
+        }
+    }
+}
+
+/// Full Storehouse: pick what the new thing replaces. The thing it replaces goes back to the
+/// spillover rather than being destroyed — still nothing lost without being asked.
+private struct SwapSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    let spilled: ItemStack
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    LabeledRow(icon: spilled.icon, label: spilled.displayName,
+                               value: "", tint: spilled.rarity.tint)
+                } header: {
+                    Text("Making room for")
+                }
+                Section {
+                    ForEach(store.state.base.inventory.stacks) { stored in
+                        Button {
+                            store.swapSpilled(spilled, for: stored)
+                            dismiss()
+                        } label: {
+                            LabeledRow(icon: stored.icon, label: stored.displayName,
+                                       value: stored.count > 1 ? "×\(stored.count)" : "",
+                                       tint: stored.rarity.tint)
+                        }
+                        .frame(minHeight: 44)
+                    }
+                } header: {
+                    Text("Replaces")
+                } footer: {
+                    Text("Whatever you replace goes back to the waiting pile. Nothing is thrown away here.")
+                }
+            }
+            .navigationTitle("Make room")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
 /// Storehouse — inventory and identification. Identify flow is milestone 5.
 struct StorehouseView: View {
     @EnvironmentObject private var store: GameStore
@@ -45,6 +134,10 @@ struct StorehouseView: View {
                                        tint: stack.rarity.tint)
                         }
                     }
+                }
+
+                if !store.spillover.isEmpty {
+                    SpilloverCard()
                 }
 
                 if !store.unidentifiedStacks.isEmpty {

@@ -21,7 +21,8 @@ struct BookProjection {
         var slot: SlotID
         /// The symbol the player put here, or nil if the slot is left to chance.
         var chosen: SymbolDef?
-        /// What a random fill could draw from (only symbols the player owns).
+        /// What a random fill could draw from — the *whole* catalog, not just what the player
+        /// owns, so a chance slot can surprise you with something you couldn't have written.
         var candidates: [SymbolDef]
 
         var id: SlotID { slot }
@@ -60,7 +61,12 @@ struct BookProjection {
 
     // MARK: - Computation
 
-    static func project(draft: BookDraft, ownedSymbols: Set<SymbolID>) -> BookProjection {
+    /// `seed` is the one the next bind will use, peeked rather than consumed. Nothing reads it
+    /// yet — it's threaded through so that whatever the answer to Q19 turns out to be, the
+    /// projection can be *exact* about it rather than hedging with a range.
+    static func project(draft: BookDraft,
+                        ownedSymbols: Set<SymbolID>,
+                        seed: UInt64 = 0) -> BookProjection {
         let plans = ContentCatalog.shared.slotIDsInOrder.map { slot in
             SlotPlan(
                 slot: slot,

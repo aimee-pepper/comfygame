@@ -181,8 +181,9 @@ extension GameStore {
         let kept = fraction >= 1
             ? run.satchelItems
             : run.satchelItems.randomlyKeeping(fraction: fraction, rng: &rng)
-        for stack in kept.stacks {
-            state.base.inventory.add(stack)
+        for stack in kept.stacks where !state.base.inventory.add(stack) {
+            // Full Storehouse. It waits rather than evaporating — see `BaseState.spillover`.
+            state.base.spillover.append(stack)
         }
     }
 

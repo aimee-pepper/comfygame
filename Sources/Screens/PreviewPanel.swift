@@ -241,7 +241,8 @@ private struct MixBar: View {
         PreviewPanel(
             projection: BookProjection.project(
                 draft: BookDraft(slots: ["terrain": "caverns", "bounty": "rich_ore"]),
-                ownedSymbols: Set(ContentCatalog.shared.starterSymbolIDs)
+                ownedSymbols: Set(ContentCatalog.shared.starterSymbolIDs),
+                seed: 20_260_805
             ),
             discovery: DiscoveryLog(creatures: ["paper_moth": DiscoveryRecord(firstSeenRunIndex: 1, timesEncountered: 2)])
         )

@@ -60,15 +60,18 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// 0–100, always visible. Decays per *player turn* only — never wall-clock (pillar 2).
     var stability: Double = Tuning.World.startingStability
 
-    /// The Stability headline this world actually runs at: what the book asked for, plus what the
-    /// world turned out to contain.
+    /// The Stability headline this world runs at.
     ///
-    /// Greed is charged on the world's *total* value, not on the substrate symbol alone (the
-    /// sites-system audit correction) — so a book that happens to place a Crystal Cavern is more
-    /// unstable than the same book that didn't, and the player can see why on the tile.
-    var effectiveStabilityScore: Int {
-        BookRules.stabilityScore(of: book) + SiteRules.stabilityDelta(of: sites)
-    }
+    /// **Sites deliberately do not move this yet.** `docs/sites-system.md` §5 proposes charging
+    /// greed instability on what a world contains, sites included — but it's tagged [PROPOSAL],
+    /// and it collides head-on with a ruling that isn't: *a symbol moves the headline by exactly
+    /// its printed number*, which is the whole reason stability was rebalanced in session 5. Since
+    /// the sites that land are rolled at bind, folding them in would mean the meter shows a number
+    /// no symbol accounts for — the precise complaint that prompted the rebalance.
+    ///
+    /// `SiteRules.stabilityDelta` is built and tested and ready to be added here the moment the
+    /// preview is allowed to show it. See questions-for-design Q19.
+    var effectiveStabilityScore: Int { BookRules.stabilityScore(of: book) }
 
     var decayPerTurn: Double { BookRules.decayPerTurn(stabilityScore: effectiveStabilityScore) }
     /// Player turns taken this run. The only clock the game has.
@@ -94,6 +97,47 @@ struct WorldRun: Codable, Equatable, Sendable {
 
     var binderHP: Int = Tuning.Encounter.binderMaxHP
     var companionHP: Int = Tuning.Encounter.companionMaxHP
+
+    init(runIndex: Int, book: BoundBook, mapSeed: UInt64, rng: SeededRNG, map: WorldMap,
+         playerPosition: GridPoint, enemies: [WorldEnemy] = [], sites: [PlacedSite] = [],
+         satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)) {
+        self.runIndex = runIndex
+        self.book = book
+        self.mapSeed = mapSeed
+        self.rng = rng
+        self.map = map
+        self.playerPosition = playerPosition
+        self.enemies = enemies
+        self.sites = sites
+        self.satchelItems = satchelItems
+    }
+
+    /// Tolerant decoding, per the policy in `Migrations.swift`: adding a field must never cost a
+    /// player their in-progress world. Synthesised decoding would *throw* on a save written before
+    /// the field existed — which quarantines the whole save, mid-run, on the next launch.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        runIndex = try container.decode(Int.self, forKey: .runIndex)
+        book = try container.decode(BoundBook.self, forKey: .book)
+        mapSeed = try container.decode(UInt64.self, forKey: .mapSeed)
+        rng = try container.decode(SeededRNG.self, forKey: .rng)
+        map = try container.decode(WorldMap.self, forKey: .map)
+        playerPosition = try container.decode(GridPoint.self, forKey: .playerPosition)
+        enemies = try container.decodeIfPresent([WorldEnemy].self, forKey: .enemies) ?? []
+        sites = try container.decodeIfPresent([PlacedSite].self, forKey: .sites) ?? []
+        stability = try container.decodeIfPresent(Double.self, forKey: .stability)
+            ?? Tuning.World.startingStability
+        turnsTaken = try container.decodeIfPresent(Int.self, forKey: .turnsTaken) ?? 0
+        satchel = try container.decodeIfPresent(ResourcePool.self, forKey: .satchel) ?? ResourcePool()
+        satchelItems = try container.decodeIfPresent(Inventory.self, forKey: .satchelItems)
+            ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
+        activeEncounter = try container.decodeIfPresent(EncounterState.self, forKey: .activeEncounter)
+        offeredItems = try container.decodeIfPresent([ItemStack].self, forKey: .offeredItems) ?? []
+        previousPosition = try container.decodeIfPresent(GridPoint.self, forKey: .previousPosition)
+        encounterGraceTurns = try container.decodeIfPresent(Int.self, forKey: .encounterGraceTurns) ?? 0
+        binderHP = try container.decodeIfPresent(Int.self, forKey: .binderHP) ?? Tuning.Encounter.binderMaxHP
+        companionHP = try container.decodeIfPresent(Int.self, forKey: .companionHP) ?? Tuning.Encounter.companionMaxHP
+    }
 
     /// Stability band drives the world's escalating behaviour. Thresholds are tunable.
     var stabilityBand: StabilityBand {

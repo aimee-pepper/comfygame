@@ -250,3 +250,36 @@ rule. Not built — it changes what the player optimises for, so it wants an exp
 
 **Shipped:** sites are a surprise you walk into. `SiteRules.eligible(in:)` already takes readings
 rather than a map, so the preview can read it the moment you want it to.
+
+## Q19 — Should sites move the Stability headline?
+
+`docs/sites-system.md` §5 proposes charging greed instability on what a world *contains*, sites
+included: "writing toward treasure destabilizes, exactly as writing toward rich substrate does."
+
+I built it, and it broke a rule you'd already stated flatly:
+
+> *"why is a world where I pick 3 +stabilizing things only 46-55% stable? we need to make things
+> make sense. adding .2 to stability and seeing it go up a weird number is unhelpful as well."*
+
+Sites are rolled at bind, from the seed. So folding them in means the meter shows a number that no
+symbol on the page accounts for — the exact complaint that prompted the whole stability rebalance.
+In practice a world could take two Tears and a Crystal Cavern and lose 32 points the player never
+chose and could not see coming. It also killed a pre-existing force-quit test by collapsing worlds
+inside five steps.
+
+**Shipped:** sites do not touch Stability. `SiteRules.stabilityDelta` is built, tested, and is one
+line away from being switched on in `WorldRun.effectiveStabilityScore`.
+
+**The tension, plainly.** Your rule is *the number on the symbol is the number on the meter*. The
+doc's rule is *the world charges you for what it holds*. Both are good; they can't both be literally
+true while sites are a surprise. Three ways out:
+
+1. **Sites never affect Stability.** Cleanest meter. Loses the greed-on-total-value idea entirely.
+2. **The preview shows it.** The seed is peekable (`peekNextSeed()` exists for exactly this and is
+   already threaded into `BookProjection`), so the desk *can* be exact about the site contribution
+   before you commit — shown as its own line, "the world itself: −20", separate from the symbol
+   arithmetic. Your rule survives because symbols still sum exactly; the world's charge is just a
+   second, visible term. This is the one I'd pick.
+3. **Sites cost something that isn't Stability** — shorter fuse, more enemies, worse weather.
+
+Related: Q18, whether the preview names the sites or only their price.

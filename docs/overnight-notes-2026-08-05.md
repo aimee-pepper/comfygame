@@ -66,3 +66,48 @@ which sites a world can host — the doc leans yes-as-silhouettes; I left it a s
 `BookRules.resolveBook` still claimed random fills "draw only from symbols the player owns", and
 `BookProjection.SlotPlan.candidates` said the same. Both were describing the behaviour from before
 your correction. The *code* was right; the comments were lying about it.
+
+---
+
+## 4. Q10 spillover — built (Milestone 6)
+
+Banking used to call `inventory.add(stack)` and throw the result away. `add` returns `false` when
+full, so **loot coming home to a full Storehouse was silently deleted** — the exact thing the
+session-5 ruling forbids. Now anything that doesn't fit lands in `base.spillover` and waits.
+
+At the Storehouse it shows as "Waiting to be sorted", with three options per stack: store it (if
+there's room), make room (swap — and the thing you displace goes *back* to the pile, so still
+nothing is destroyed), or throw away, which is the only path that ever removes an item and requires
+a deliberate tap. No auto-conversion to essence, per your ruling that it prices a rare drop at scrap.
+
+7 tests, including one that force-quits with loot in the pile.
+
+## 5. A save-compatibility bug, found by accident
+
+Writing the spillover test turned up something worse than the spillover itself.
+
+`BaseState` has a hand-written `init(from:)`. My new field encoded fine and then **silently decoded
+as empty**, because the decoder didn't know about it. Same class of bug, more serious: `WorldRun`
+used fully synthesised `Codable`, which **throws** when a field is missing rather than defaulting.
+So the build you installed tonight, loading a save written by the build before it, would have failed
+to decode the active run — and `SaveFileIO` would have quarantined the whole save. Mid-run, on
+launch, silently.
+
+`Migrations.swift` already claims this can't happen: *"Every layer struct decodes tolerantly, so
+adding a field never breaks an old save."* `WorldRun` wasn't holding up its end. It has a tolerant
+decoder now, and an explicit memberwise init so adding fields stays cheap.
+
+**Worth knowing:** this means any save from before tonight is fine, but it's the second time a
+hand-written decoder has quietly diverged from its struct. Might be worth a test that round-trips
+every layer struct through a JSON object missing each field in turn. Not built — flagging it.
+
+## 6. What I did NOT do, and why
+
+- **Site instability is switched off.** Long version in Q19. Short version: it broke your "the
+  number on the symbol is the number on the meter" rule, and that rule is a ruling while the sites
+  doc's version is a `[PROPOSAL]`. So yours won and the proposal became a question. The code is
+  built and tested and one line from being switched on once you've picked an option.
+- **Site items don't reach the satchel yet.** `contents.items` is catalogued and validated but not
+  granted, because granting it properly means routing through the loot-decision flow you specced.
+  Half-doing it would have made a second, worse path for the same decision.
+- **The 44pt audit and haptics** (the rest of Milestone 6) — not started.

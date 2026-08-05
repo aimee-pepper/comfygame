@@ -7,6 +7,13 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Raw stockpiles hauled home (Ore, Fiber, Essence-raw…). Motes live in Reality.
     var resources: ResourcePool = ResourcePool()
     var inventory: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
+    /// Loot that came home to a full Storehouse.
+    ///
+    /// **Banking never discards** (Q10, session-5 audit). Anything that doesn't fit waits here
+    /// until the player sorts it, at home, with full information — which is the right place for
+    /// that decision, unlike the satchel one, which belongs in the world. Auto-converting to
+    /// essence would quietly price a rare drop at scrap value, so it doesn't.
+    var spillover: [ItemStack] = []
 
     /// Owned catalog entries. Definitions are data; the save stores only which ones are owned.
     var ownedSymbols: Set<SymbolID> = []
@@ -104,6 +111,7 @@ struct BaseState: Codable, Equatable, Sendable {
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
         purchasedGambitSlots = try container.decodeIfPresent(Int.self, forKey: .purchasedGambitSlots) ?? 0
         binderGambits = try container.decodeIfPresent([GambitRule].self, forKey: .binderGambits) ?? []
+        spillover = try container.decodeIfPresent([ItemStack].self, forKey: .spillover) ?? []
     }
 }
 
