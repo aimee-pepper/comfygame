@@ -38,11 +38,16 @@ final class PersistenceTests: XCTestCase {
     func testMidEncounterStateSurvivesRoundTrip() throws {
         var state = GameState.newGame()
         var rng = SeededRNG(seed: 42)
+        let book = BoundBook(symbols: [.terrain: "caverns", .bounty: "rich_ore"], randomlyFilled: [.biome], essencePaid: 20)
+        let world = Worldgen.generate(book: book, seed: 42)
         var run = WorldRun(
             runIndex: 1,
-            book: BoundBook(symbols: [.terrain: "caverns", .bounty: "rich_ore"], randomlyFilled: [.biome], essencePaid: 20),
+            book: book,
             mapSeed: 42,
-            rng: rng
+            rng: rng,
+            map: world.map,
+            playerPosition: world.start,
+            enemies: world.enemies
         )
         run.stability = 61.5
         run.turnsTaken = 12
@@ -70,10 +75,13 @@ final class PersistenceTests: XCTestCase {
     /// The RNG must resume *where it was*, not rewind — otherwise a force-quit is a re-roll.
     func testRNGPositionSurvivesRoundTrip() throws {
         var state = GameState.newGame()
+        let world = Worldgen.generate(book: BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0), seed: 99)
         var run = WorldRun(runIndex: 1,
                            book: BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0),
                            mapSeed: 99,
-                           rng: SeededRNG(seed: 99))
+                           rng: SeededRNG(seed: 99),
+                           map: world.map,
+                           playerPosition: world.start)
         for _ in 0..<10 { _ = run.rng.next() }
         let expectedNext = { var copy = run.rng; return copy.next() }()
         state.worlds.activeRun = run

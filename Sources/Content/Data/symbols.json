@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — every number here is a Claude-invented stopgap for v0 feel, not balance. The starter 10 are Aimee's stated set (design-brief-v0). The two 'research' entries are placeholder Workshop unlocks. Instability weights follow the DIRECTIONS documented in research-pass-3 (bounty/greed adds, dim/dark subtracts); magnitudes are invented.",
+  "_note": "PLACEHOLDER — every number here is a Claude-invented stopgap for v0 feel, not balance. The starter 10 are Aimee's stated set (design-brief-v0). The two 'research' entries are placeholder Workshop unlocks. Instability weights follow the DIRECTIONS documented in research-pass-3 (bounty/greed adds, dim/dark subtracts); magnitudes are invented. 'visionDelta' implements the paired-tradeoff pattern: Dim Sky costs you a ring of sight in exchange for a longer-lived world.",
   "symbols": [
     {
       "id": "plains",
@@ -10,9 +10,12 @@
       "acquisition": "starter",
       "essenceCost": 2,
       "instabilityWeight": 0.0,
-      "yieldModifiers": { "fiber": 1.2 },
+      "yieldModifiers": {
+        "fiber": 1.2
+      },
       "enemyTableModifiers": {},
-      "enemyTierDelta": 0
+      "enemyTierDelta": 0,
+      "visionDelta": 0
     },
     {
       "id": "caverns",
@@ -23,9 +26,15 @@
       "acquisition": "starter",
       "essenceCost": 3,
       "instabilityWeight": 0.4,
-      "yieldModifiers": { "ore": 1.4, "fiber": 0.6 },
-      "enemyTableModifiers": { "ink_hound": 0.5 },
-      "enemyTierDelta": 0
+      "yieldModifiers": {
+        "ore": 1.4,
+        "fiber": 0.6
+      },
+      "enemyTableModifiers": {
+        "ink_hound": 0.5
+      },
+      "enemyTierDelta": 0,
+      "visionDelta": 0
     },
     {
       "id": "archipelago",
@@ -36,9 +45,14 @@
       "acquisition": "starter",
       "essenceCost": 4,
       "instabilityWeight": 0.6,
-      "yieldModifiers": { "essence_raw": 1.3 },
-      "enemyTableModifiers": { "paper_moth": 0.4 },
-      "enemyTierDelta": 0
+      "yieldModifiers": {
+        "essence_raw": 1.3
+      },
+      "enemyTableModifiers": {
+        "paper_moth": 0.4
+      },
+      "enemyTierDelta": 0,
+      "visionDelta": 0
     },
     {
       "id": "verdant",
@@ -49,9 +63,14 @@
       "acquisition": "starter",
       "essenceCost": 2,
       "instabilityWeight": -0.2,
-      "yieldModifiers": { "fiber": 1.5 },
-      "enemyTableModifiers": { "paper_moth": 0.6 },
-      "enemyTierDelta": 0
+      "yieldModifiers": {
+        "fiber": 1.5
+      },
+      "enemyTableModifiers": {
+        "paper_moth": 0.6
+      },
+      "enemyTierDelta": 0,
+      "visionDelta": 0
     },
     {
       "id": "ashen",
@@ -62,9 +81,15 @@
       "acquisition": "starter",
       "essenceCost": 3,
       "instabilityWeight": 0.5,
-      "yieldModifiers": { "fiber": 0.4, "ore": 1.2 },
-      "enemyTableModifiers": { "ink_hound": 0.8 },
-      "enemyTierDelta": 1
+      "yieldModifiers": {
+        "fiber": 0.4,
+        "ore": 1.2
+      },
+      "enemyTableModifiers": {
+        "ink_hound": 0.8
+      },
+      "enemyTierDelta": 1,
+      "visionDelta": 0
     },
     {
       "id": "frostbound",
@@ -75,9 +100,15 @@
       "acquisition": "starter",
       "essenceCost": 3,
       "instabilityWeight": -0.5,
-      "yieldModifiers": { "fiber": 0.7, "essence_raw": 1.1 },
-      "enemyTableModifiers": { "margin_wraith": 0.3 },
-      "enemyTierDelta": 0
+      "yieldModifiers": {
+        "fiber": 0.7,
+        "essence_raw": 1.1
+      },
+      "enemyTableModifiers": {
+        "margin_wraith": 0.3
+      },
+      "enemyTierDelta": 0,
+      "visionDelta": 0
     },
     {
       "id": "sparse_ore",
@@ -88,9 +119,12 @@
       "acquisition": "starter",
       "essenceCost": 2,
       "instabilityWeight": 0.2,
-      "yieldModifiers": { "ore": 1.3 },
+      "yieldModifiers": {
+        "ore": 1.3
+      },
       "enemyTableModifiers": {},
-      "enemyTierDelta": 0
+      "enemyTierDelta": 0,
+      "visionDelta": 0
     },
     {
       "id": "rich_ore",
@@ -101,9 +135,14 @@
       "acquisition": "starter",
       "essenceCost": 5,
       "instabilityWeight": 1.4,
-      "yieldModifiers": { "ore": 2.2 },
-      "enemyTableModifiers": { "ink_hound": 0.4 },
-      "enemyTierDelta": 1
+      "yieldModifiers": {
+        "ore": 2.2
+      },
+      "enemyTableModifiers": {
+        "ink_hound": 0.4
+      },
+      "enemyTierDelta": 1,
+      "visionDelta": 0
     },
     {
       "id": "teeming_life",
@@ -114,9 +153,16 @@
       "acquisition": "starter",
       "essenceCost": 4,
       "instabilityWeight": 0.9,
-      "yieldModifiers": { "fiber": 2.0, "essence_raw": 1.2 },
-      "enemyTableModifiers": { "paper_moth": 1.0, "ink_hound": 0.5 },
-      "enemyTierDelta": 1
+      "yieldModifiers": {
+        "fiber": 2.0,
+        "essence_raw": 1.2
+      },
+      "enemyTableModifiers": {
+        "paper_moth": 1.0,
+        "ink_hound": 0.5
+      },
+      "enemyTierDelta": 1,
+      "visionDelta": 0
     },
     {
       "id": "dim_sky",
@@ -128,8 +174,11 @@
       "essenceCost": 3,
       "instabilityWeight": -1.0,
       "yieldModifiers": {},
-      "enemyTableModifiers": { "margin_wraith": 0.6 },
-      "enemyTierDelta": 0
+      "enemyTableModifiers": {
+        "margin_wraith": 0.6
+      },
+      "enemyTierDelta": 0,
+      "visionDelta": -1
     },
     {
       "id": "gilded_veins",
@@ -140,9 +189,15 @@
       "acquisition": "starter",
       "essenceCost": 6,
       "instabilityWeight": 2.2,
-      "yieldModifiers": { "ore": 1.6, "essence_raw": 1.4 },
-      "enemyTableModifiers": { "margin_wraith": 0.8 },
-      "enemyTierDelta": 1
+      "yieldModifiers": {
+        "ore": 1.6,
+        "essence_raw": 1.4
+      },
+      "enemyTableModifiers": {
+        "margin_wraith": 0.8
+      },
+      "enemyTierDelta": 1,
+      "visionDelta": 0
     },
     {
       "id": "verdigris_bloom",
@@ -153,9 +208,15 @@
       "acquisition": "research",
       "essenceCost": 5,
       "instabilityWeight": 0.7,
-      "yieldModifiers": { "fiber": 1.4, "ore": 1.3 },
-      "enemyTableModifiers": { "paper_moth": 0.5 },
-      "enemyTierDelta": 0
+      "yieldModifiers": {
+        "fiber": 1.4,
+        "ore": 1.3
+      },
+      "enemyTableModifiers": {
+        "paper_moth": 0.5
+      },
+      "enemyTierDelta": 0,
+      "visionDelta": 0
     },
     {
       "id": "mote_vein",
@@ -166,9 +227,15 @@
       "acquisition": "research",
       "essenceCost": 9,
       "instabilityWeight": 3.0,
-      "yieldModifiers": { "mote": 1.0, "essence_raw": 1.2 },
-      "enemyTableModifiers": { "margin_wraith": 1.2 },
-      "enemyTierDelta": 2
+      "yieldModifiers": {
+        "mote": 1.0,
+        "essence_raw": 1.2
+      },
+      "enemyTableModifiers": {
+        "margin_wraith": 1.2
+      },
+      "enemyTierDelta": 2,
+      "visionDelta": 0
     }
   ]
 }

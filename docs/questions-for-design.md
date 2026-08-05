@@ -119,3 +119,33 @@ which still has exactly four slots. The node is unpurchasable until milestone 5,
 blocking — but the answer changes `BookDraft` from a fixed four-key structure into an ordered list,
 which is easier to do before there are saves in the wild.
 `Sources/Model/BaseState.swift` (`BookDraft`), `Sources/Model/RealityState.swift`.
+
+---
+
+## Milestone 3 (2026-08-04)
+
+### Q9. Is the entry portal a way out?
+The brief gives the entry portal at the edge and "exit portal (always ≥1, revealed on discovery)"
+as separate things, without saying whether the entry works in both directions.
+
+**Shipped:** the entry is also an exit, *and* every world generates 1–2 more portals elsewhere. So
+retreating the way you came always works, it just costs the turns to walk back — and the further in
+you push, the more that retreat costs.
+
+**The tenser alternative:** one-way entry, so you must find an exit or be caught. That makes the
+first portal you find a genuine relief and turns a bad roll into a real emergency. It also means a
+run can strand you, which cuts against sleep-friendliness.
+`Sources/Rules/Worldgen.swift`. Also asked in plain language as Q6 of questions-for-aimee.md.
+
+---
+
+### Q10. What happens to loot that won't fit when you bank it?
+Resources are slot-free, but items aren't, and the Storehouse has a fixed slot count.
+
+**Shipped:** items that don't fit when a run banks are **lost silently**. In practice this can't
+happen yet (items only start dropping in milestone 5), but it will the moment curios exist, and
+"your rare drop evaporated on the way home" is a bad thing to discover by accident.
+
+Options: refuse to bank and make the player choose; overflow into a temporary spillover the
+Storehouse holds until sorted; or auto-convert to essence. This wants an answer before milestone 5.
+`Sources/Rules/GameActions+World.swift` (`bankHaul`).

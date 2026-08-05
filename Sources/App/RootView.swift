@@ -10,7 +10,7 @@ struct RootView: View {
 
     var body: some View {
         if store.state.worlds.isInRun {
-            WorldPlaceholderView()
+            WorldView()
         } else {
             NavigationStack {
                 BaseView()

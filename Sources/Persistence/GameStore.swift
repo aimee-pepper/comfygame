@@ -21,6 +21,12 @@ final class GameStore: ObservableObject {
     @Published private(set) var state: GameState
     @Published private(set) var diagnostics: SaveDiagnostics
 
+    /// What just happened in the world, for the World screen to narrate.
+    ///
+    /// Deliberately *not* in the save: a resumed run should show you where you are, not replay how
+    /// you got there. Losing this to a force-quit costs nothing.
+    @Published var recentEvents: [WorldRules.Event] = []
+
     private let io: SaveFileIO
     private let writeQueue = DispatchQueue(label: "com.aimeepepper.bookbinder.save", qos: .userInitiated)
     private var debounceTask: Task<Void, Never>?

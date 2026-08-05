@@ -36,10 +36,6 @@ struct WorldsState: Codable, Equatable, Sendable {
 }
 
 /// One instanced world run.
-///
-/// Milestone 1 models the run's *spine* — identity, seed, RNG position, stability, haul, and the
-/// active encounter — because the kill-test has to be meaningful from day one. The tile grid,
-/// movement and harvesting land in milestone 3 and will add a `map` property here.
 struct WorldRun: Codable, Equatable, Sendable {
     var runIndex: Int
     /// Composition this world was generated from. Kept so the map can be regenerated from the
@@ -50,6 +46,12 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Live stream for in-run rolls (drops, combat). Advances during play and is saved with the
     /// run, so a resume does not rewind randomness.
     var rng: SeededRNG
+
+    /// The tile grid, with its fog, harvest and crumble state.
+    var map: WorldMap
+    var playerPosition: GridPoint
+    /// Enemies standing on the grid. Removed when defeated in an encounter.
+    var enemies: [WorldEnemy] = []
 
     /// 0–100, always visible. Decays per *player turn* only — never wall-clock (pillar 2).
     var stability: Double = Tuning.World.startingStability

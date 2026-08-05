@@ -48,6 +48,10 @@ extension GameStore {
                 seed: seed
             )
 
+            // Generated here, once, and saved with the run. Worldgen draws from streams derived
+            // from the seed, never from the run's live RNG, so in-run rolls resume cleanly.
+            let world = Worldgen.generate(book: book, seed: seed)
+
             state.base.essence -= book.essencePaid
             state.worlds.runIndex += 1
             state.reality.lifetime.runsStarted += 1
@@ -56,6 +60,9 @@ extension GameStore {
                 book: book,
                 mapSeed: seed,
                 rng: SeededRNG(seed: seed).derived(0xA11CE),
+                map: world.map,
+                playerPosition: world.start,
+                enemies: world.enemies,
                 // The satchel carries what the Storehouse can hold. Whether that's the right rule
                 // is Q6 in docs/questions-for-design.md.
                 satchelItems: Inventory(slots: state.base.inventory.slots)

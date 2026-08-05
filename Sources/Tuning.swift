@@ -56,6 +56,27 @@ enum Tuning {
         static let harvestTurnsRange: ClosedRange<Int> = 1...3 // PLACEHOLDER
         /// Enemies wake when the player is within this many tiles.
         static let enemyAggroRadius: Int = 2         // PLACEHOLDER
+
+        // Worldgen
+        static let baseNodeCountRange: ClosedRange<Int> = 8...12   // PLACEHOLDER, scaled by book
+        static let nodeYieldRange: ClosedRange<Int> = 1...3        // PLACEHOLDER, per pull
+        static let baseEnemyCountRange: ClosedRange<Int> = 3...5   // PLACEHOLDER, scaled by danger
+        static let enemiesPerDangerTier: Int = 2                   // PLACEHOLDER
+        static let exitPortalCountRange: ClosedRange<Int> = 1...2  // brief: always ≥1
+        static let minimumExitPortalDistance: Int = 6              // PLACEHOLDER — worth finding
+        static let enemyFreeRadiusAroundEntry: Int = 3             // PLACEHOLDER — no ambush on arrival
+        static let wildDropCountRange: ClosedRange<Int> = 2...4    // PLACEHOLDER
+        static let wildDropAmountRange: ClosedRange<Int> = 1...2   // PLACEHOLDER
+        static let lockedCacheChance: Double = 0.5                 // PLACEHOLDER
+
+        // Sight
+        static let baseVisionRadius: Int = 2         // PLACEHOLDER
+        static let minimumVisionRadius: Int = 1      // even Dim Sky leaves you your own tile + 1
+        /// Hazard tiles appear this often (in player turns) past the hazard threshold.
+        static let hazardSpawnInterval: Int = 2      // PLACEHOLDER
+        static let hazardDamage: Int = 4             // PLACEHOLDER
+        /// Tiles lost per turn past the crumble threshold.
+        static let crumbleTilesPerTurn: Int = 3      // PLACEHOLDER
     }
 
     // MARK: - Encounters

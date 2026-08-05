@@ -16,10 +16,13 @@
 - [x] *Stretch, pulled forward:* preview spawn icons silhouette until encountered
 
 ## Milestone 3 — Worlds
-- [ ] Seeded 14×14 gen from book composition; fog of war; nodes/enemies/hazards/portal/locked cache
-- [ ] Movement: tap-adjacent + tap-to-path (interrupt on sighting); optional D-pad
-- [ ] Stability decay per player turn; thresholds 50/25/0 (hazards → crumble → collapse); banking 100% via portal / 50% on collapse
-- [ ] Harvest interactions; essence-raw wild drops
+- [x] Seeded 14×14 gen from book composition; fog of war; nodes/enemies/hazards/portal/locked cache
+      (the cache generates and shows as locked; opening it needs the key from milestone 5)
+- [x] Movement: tap-adjacent + tap-to-path (interrupt on sighting); D-pad shipped as the *primary*
+      control, since a 14×14 grid can't give every tile a 44pt target
+- [x] Stability decay per player turn; thresholds 50/25/0 (hazards → crumble → collapse); banking 100% via portal / 50% on collapse
+- [x] Harvest interactions; essence-raw wild drops
+- [x] Dim Sky's paired tradeoff implemented: −1 vision radius for a longer-lived world
 
 ## Milestone 4 — Encounters
 - [ ] Bump-to-encounter battle screen; party of 2 vs 1–3 foes; Attack/Skill/Item/Flee

@@ -209,7 +209,9 @@ final class BookRulesTests: XCTestCase {
         store.bindAndDepart()
 
         let essenceInWorld = store.state.base.essence
-        store.harnessPortalHome()
+        // You arrive standing on a portal, so coming straight home is one tap.
+        XCTAssertTrue(store.canPortalHere, "The entry tile is a portal you can leave through")
+        store.portalHome()
 
         XCTAssertEqual(store.state.base.essence, essenceInWorld + store.essenceSpringYield)
         XCTAssertGreaterThan(store.essenceSpringYield, 0, "Tier 1 of the Spring is built into the base")
