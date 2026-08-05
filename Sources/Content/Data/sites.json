@@ -249,7 +249,6 @@
       "blurb": "Where the world argues with itself, it comes apart.",
       "category": "hazard",
       "conditions": [],
-      "minimumContradiction": 40,
       "weight": 8,
       "maximumPerWorld": 3,
       "excludes": [],
@@ -266,7 +265,8 @@
         "searchTurns": 1,
         "essence": 2
       },
-      "stabilityDelta": -12
+      "stabilityDelta": -12,
+      "minimumNamedContradictions": 1
     }
   ]
 }

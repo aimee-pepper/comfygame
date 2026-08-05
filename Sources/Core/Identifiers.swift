@@ -73,6 +73,12 @@ struct PressureSourceID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+/// A named entry in the contradiction catalogue. Contradiction is authored, never computed.
+struct ContradictionID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 /// A discrete placed thing — a ruin, a landmark, a hive. Distinct from a pressure, which is a
 /// condition rather than an object.
 struct SiteID: StringIdentifier {

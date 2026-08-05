@@ -35,8 +35,10 @@
 		4A0672467AD72629AC2ABD2F /* Inventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F756C7CBAE86A8565FB12DD /* Inventory.swift */; };
 		4C60516FFB5892091CBE28AC /* research.json in Resources */ = {isa = PBXBuildFile; fileRef = 6A1D054604B637EEC90D24DA /* research.json */; };
 		4DEB17BC13834B4612226A7B /* HarnessActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248394713D4F19F950F25B92 /* HarnessActions.swift */; };
+		4FD1E53B0D4C2E67BB48FEE9 /* contradictions.json in Resources */ = {isa = PBXBuildFile; fileRef = 9C7793CAA2915E078E230E6D /* contradictions.json */; };
 		51771CB66B64C405544B0B87 /* ResearchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */; };
 		52C1E5841A22ED23AA8245DF /* Tuning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644939D61FCF530C40392FCC /* Tuning.swift */; };
+		54180CF9C6CE41FEA6C57B60 /* ContradictionRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B2180E4666F5000817D3EC /* ContradictionRules.swift */; };
 		56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8946B89F914D32DABAC53D5A /* Worldgen.swift */; };
 		5B91181B627494D599038230 /* constellation.json in Resources */ = {isa = PBXBuildFile; fileRef = DD0C594698AE7E6D06191449 /* constellation.json */; };
 		5BA053D5F38A0AE4F9E782C3 /* SiteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1BB569F0B672F268545701C /* SiteTests.swift */; };
@@ -48,6 +50,7 @@
 		7345ED98F77854AE5C6FFB34 /* EconomyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6782235BDB0189FF9A0FFE41 /* EconomyTests.swift */; };
 		758EC3D9F7314C4018C089B9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */; };
 		776E19C048AB14D539E2ABC3 /* BookProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B022088C9636578892397C50 /* BookProjection.swift */; };
+		7C72DAD4C55C0D916064E912 /* ContradictionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43DADDF1091E89318A12B0D /* ContradictionTests.swift */; };
 		859010F2D3881FC03F57205F /* ContentCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */; };
 		867F278950814C3D859CEAFD /* ContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7691C0625AD4AACD2BA46A20 /* ContentTests.swift */; };
 		8725C08D01F1574C306CFC5D /* resources.json in Resources */ = {isa = PBXBuildFile; fileRef = 0486776A4EED6E508F843FB3 /* resources.json */; };
@@ -74,6 +77,7 @@
 		D9F83617E1060D93E281682F /* EconomyRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4461FC8AD054E8E6E494602B /* EconomyRules.swift */; };
 		DB65DB08F102D87DE2D51956 /* Sigil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3358F9F069CEED67DA33294D /* Sigil.swift */; };
 		DDBFEBACC92B746BC023CF6D /* items.json in Resources */ = {isa = PBXBuildFile; fileRef = 89776C411F7BC83CF86396E9 /* items.json */; };
+		E03430D101A162FC1F36A8B1 /* ContradictionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2227C9E0E4E333249CF7FEFA /* ContradictionModels.swift */; };
 		E0B21F8C88F40A6B7F9E8212 /* GambitEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F978ADFABDF1296849D8F5AB /* GambitEngine.swift */; };
 		E412FF242D7E09BD9DBB75E8 /* gambit_components.json in Resources */ = {isa = PBXBuildFile; fileRef = 6AE18B24DF2998D5D65F61D0 /* gambit_components.json */; };
 		E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */; };
@@ -105,6 +109,7 @@
 		1AE0FA07FD91558E2F953944 /* GameActions+World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+World.swift"; sourceTree = "<group>"; };
 		1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchViews.swift; sourceTree = "<group>"; };
 		1F045A414F1C1CF9A9A916BB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		2227C9E0E4E333249CF7FEFA /* ContradictionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionModels.swift; sourceTree = "<group>"; };
 		224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+Economy.swift"; sourceTree = "<group>"; };
 		248394713D4F19F950F25B92 /* HarnessActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HarnessActions.swift; sourceTree = "<group>"; };
 		26FE0502F98B3DB6A7BF0C87 /* pressure_targets.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pressure_targets.json; sourceTree = "<group>"; };
@@ -148,7 +153,9 @@
 		8DB361F4E36998C9A7F31A44 /* WorldRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldRules.swift; sourceTree = "<group>"; };
 		8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9142092437E5652D87187DF8 /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
+		92B2180E4666F5000817D3EC /* ContradictionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionRules.swift; sourceTree = "<group>"; };
 		99D023496EC834EA78E9BE63 /* CombatRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatRules.swift; sourceTree = "<group>"; };
+		9C7793CAA2915E078E230E6D /* contradictions.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = contradictions.json; sourceTree = "<group>"; };
 		A29A4F3CFC9073B8F80064F4 /* pressure_sources.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pressure_sources.json; sourceTree = "<group>"; };
 		A38483F6A49BD38B618407D8 /* slots.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = slots.json; sourceTree = "<group>"; };
 		A4270CCCF203CAA8859A086B /* symbols.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = symbols.json; sourceTree = "<group>"; };
@@ -175,6 +182,7 @@
 		E19DC1448710810CD318671E /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		E1BB569F0B672F268545701C /* SiteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteTests.swift; sourceTree = "<group>"; };
 		F395689728B586E0D0A7CD61 /* CombatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTests.swift; sourceTree = "<group>"; };
+		F43DADDF1091E89318A12B0D /* ContradictionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionTests.swift; sourceTree = "<group>"; };
 		F978ADFABDF1296849D8F5AB /* GambitEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GambitEngine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -193,6 +201,7 @@
 				B022088C9636578892397C50 /* BookProjection.swift */,
 				C3CC1BB415696E2B7417C43D /* BookRules.swift */,
 				99D023496EC834EA78E9BE63 /* CombatRules.swift */,
+				92B2180E4666F5000817D3EC /* ContradictionRules.swift */,
 				4461FC8AD054E8E6E494602B /* EconomyRules.swift */,
 				F978ADFABDF1296849D8F5AB /* GambitEngine.swift */,
 				40DDEB42C7E2856E98352341 /* GameActions.swift */,
@@ -225,6 +234,7 @@
 				95750F5CE1A87553D5246112 /* Data */,
 				D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */,
 				C5B08032B70636FB2D70EFD6 /* ContentModels.swift */,
+				2227C9E0E4E333249CF7FEFA /* ContradictionModels.swift */,
 				7042744B96D260184BBE32F3 /* PressureModels.swift */,
 				CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */,
 				A4DA32364644741F03829592 /* SiteModels.swift */,
@@ -299,6 +309,7 @@
 			isa = PBXGroup;
 			children = (
 				DD0C594698AE7E6D06191449 /* constellation.json */,
+				9C7793CAA2915E078E230E6D /* contradictions.json */,
 				5FD331CEC89F930A1F99C13B /* creatures.json */,
 				6AE18B24DF2998D5D65F61D0 /* gambit_components.json */,
 				89776C411F7BC83CF86396E9 /* items.json */,
@@ -347,6 +358,7 @@
 				7582647B2841DB69559E3968 /* BookRulesTests.swift */,
 				F395689728B586E0D0A7CD61 /* CombatTests.swift */,
 				7691C0625AD4AACD2BA46A20 /* ContentTests.swift */,
+				F43DADDF1091E89318A12B0D /* ContradictionTests.swift */,
 				C51FE4FBAB98280181089C56 /* DeterminismTests.swift */,
 				6782235BDB0189FF9A0FFE41 /* EconomyTests.swift */,
 				606F9667A67D771D03320DDA /* PersistenceTests.swift */,
@@ -457,6 +469,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B91181B627494D599038230 /* constellation.json in Resources */,
+				4FD1E53B0D4C2E67BB48FEE9 /* contradictions.json in Resources */,
 				C709E6D127F96D2420ADBC5C /* creatures.json in Resources */,
 				E412FF242D7E09BD9DBB75E8 /* gambit_components.json in Resources */,
 				DDBFEBACC92B746BC023CF6D /* items.json in Resources */,
@@ -489,6 +502,8 @@
 				BE5D3BC36C9F1D8030CFEE81 /* CombatRules.swift in Sources */,
 				859010F2D3881FC03F57205F /* ContentCatalog.swift in Sources */,
 				F9A1322571DBD99F4BF908CB /* ContentModels.swift in Sources */,
+				E03430D101A162FC1F36A8B1 /* ContradictionModels.swift in Sources */,
+				54180CF9C6CE41FEA6C57B60 /* ContradictionRules.swift in Sources */,
 				CD009883298233F654EE899C /* Discovery.swift in Sources */,
 				D9F83617E1060D93E281682F /* EconomyRules.swift in Sources */,
 				2228B642DF268D4AC3E4428C /* EncounterView.swift in Sources */,
@@ -541,6 +556,7 @@
 				030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */,
 				EB5A7F017737E52E163C9A5C /* CombatTests.swift in Sources */,
 				867F278950814C3D859CEAFD /* ContentTests.swift in Sources */,
+				7C72DAD4C55C0D916064E912 /* ContradictionTests.swift in Sources */,
 				EDF26461D4FD581D2BCFBB0A /* DeterminismTests.swift in Sources */,
 				7345ED98F77854AE5C6FFB34 /* EconomyTests.swift in Sources */,
 				0290A7D4A5E8A5E8516E171E /* PersistenceTests.swift in Sources */,

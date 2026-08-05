@@ -6,8 +6,10 @@
 
 ---
 
+> **⚠️ §1–3 SUPERSEDED by `decisions-session-7.md`.** The multi-hop trail model below is wrong — disregard hop counts. A traveller is at a condition signature; difficulty is how hard that signature is to *write*, and the number of location pages scales with signature complexity. Kept for context only; build from session 7.
+
 <details>
-<summary><b>1. Travellers and trails — the core structure</b></summary>
+<summary><b>1. Travellers and trails — SUPERSEDED</b></summary>
 
 ### Travellers are static, but they *travelled*
 

@@ -188,7 +188,8 @@ final class ContentTests: XCTestCase {
             gambitComponents: catalog.gambitComponents,
             stations: catalog.stations,
             constellationNodes: catalog.constellationNodes,
-            sites: catalog.sites
+            sites: catalog.sites,
+            contradictions: catalog.contradictions
         )
         XCTAssertThrowsError(try sabotaged.validate())
     }

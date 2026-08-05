@@ -427,3 +427,39 @@ keeps drawing from the whole pool, and the steps curve stays literal at the bott
   `turnsAvailable` below some floor), and a second, softer state for "shortly".
 - The animation is presentation, so it must not be a timer the simulation waits on — pillar 1. The
   state change happens on the turn; the animation is decoration over an already-settled result.
+
+## Q21 — Chance-filled slots *can* fire assertion contradictions. Confirm that's wanted.
+
+`contradiction-danger-spec.md` §7.2 asks this and leans yes. Now that the catalogue is built, here's
+what actually happens, so the ruling can be made against behaviour rather than a guess.
+
+**Negations can never happen by chance.** You have to write a Negate rune, and chance has no rune to
+write. The spec's central safety claim for its largest category holds, and there's a test pinning it.
+
+**Assertions can.** One chance-filled slot rolls growing things; another rolls the world dark; *green
+in the dark* fires. Nobody chose it. Measured over 200 chance-filled worlds it happens in a minority
+of them — a gamble rather than a tax — and there's a test asserting it stays a minority.
+
+**The argument for leaving it:** an assertion contradiction is a statement about the world, and the
+world doesn't care who wrote it. It also gives leaving slots open a real, legible risk, which is the
+first thing that has made under-specification feel like a gamble rather than a discount.
+
+**The argument against:** the player is charged for a claim they didn't make. Every other penalty in
+the game is something you chose.
+
+**Middle option:** chance-fills participate, and the preview *says so* — "what you've left to chance
+could contradict what you've written." Warned, not prevented. That fits how the rest of the preview
+works, since cost is exact and outcomes are ranged.
+
+**Shipped:** they participate, with a warning not yet built. Tests document it as observed behaviour
+rather than a ruling, and name the one to change if this lands the other way.
+
+## Q22 — Two copies of the pressure model are now in `docs/`
+
+`pressure-model.md` consolidates the four `pressure-model-*.md` files, and the four are still there.
+Same content, two places. Given CLAUDE.md makes `docs/` the source of truth and the newest dated
+entry wins, a stale copy is a real hazard — the next person to update one won't necessarily update
+the other.
+
+Suggest deleting the four originals and keeping the consolidated file. Not done, since deleting your
+docs isn't my call.

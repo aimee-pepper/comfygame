@@ -15,9 +15,10 @@ enum SiteRules {
     ///
     /// This is also what the preview reads, which is why it takes readings rather than a map: you
     /// can be told what *kind* of place you're writing toward before you commit to it.
-    static func eligible(in readings: PressureReadings) -> [SiteDef] {
+    static func eligible(in readings: PressureReadings,
+                         contradictions: [ContradictionDef] = []) -> [SiteDef] {
         ContentCatalog.shared.sites
-            .filter { $0.isEligible(in: readings) }
+            .filter { $0.isEligible(in: readings, contradictions: contradictions) }
             .sorted { ($0.weight, $1.id.rawValue) > ($1.weight, $0.id.rawValue) }
     }
 
@@ -28,9 +29,10 @@ enum SiteRules {
     /// somewhere invalid — a Crystal Cavern on the entry tile is worse than no cavern.
     static func place(in map: WorldMap,
                       readings: PressureReadings,
+                      contradictions: [ContradictionDef] = [],
                       avoiding occupied: Set<GridPoint>,
                       rng: inout SeededRNG) -> [PlacedSite] {
-        var candidates = eligible(in: readings)
+        var candidates = eligible(in: readings, contradictions: contradictions)
         guard !candidates.isEmpty else { return [] }
 
         var placed: [PlacedSite] = []

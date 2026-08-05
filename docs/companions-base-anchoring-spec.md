@@ -78,7 +78,10 @@ Data-driven station list (already built). Buildings unlock via research.
 </details>
 
 <details>
-<summary><b>3. Anchoring (Q-A) — PROPOSED RESOLUTION</b></summary>
+<summary><b>3. Anchoring — SUPERSEDED by `decisions-session-7.md`</b></summary>
+
+> **⚠️ The two-step tether/anchor below is superseded.** Anchoring has three routes: pay at bind for a born-anchored world, find an anchor point in-world, or place one with an expensive crafted item. Kept for context only.
+
 
 **Two-step: a cheap in-world tether, then an expensive anchor from base.**
 

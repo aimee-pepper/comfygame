@@ -1,0 +1,92 @@
+{
+  "_note": "The contradiction catalogue (contradiction-danger-spec §1-2). Contradiction is NEVER computed from opposed magnitudes — it fires only from these named entries. That is the whole safety mechanism: a sunny snowy world is real worldbuilding, not a contradiction, and nothing here fires on it. Every entry is authored, testable, and nameable in the preview. All values PLACEHOLDER.",
+  "contradictions": [
+    {
+      "id": "sun_that_does_not_warm",
+      "name": "A sun that does not warm",
+      "blurb": "Light of that intensity carries heat. You have written it away.",
+      "kind": "negation",
+      "source": "sun",
+      "negatedTarget": "thermal",
+      "instability": 30
+    },
+    {
+      "id": "cold_fire",
+      "name": "Cold fire",
+      "blurb": "Molten rock that gives off no heat.",
+      "kind": "negation",
+      "source": "magma",
+      "negatedTarget": "thermal",
+      "instability": 30
+    },
+    {
+      "id": "ice_that_does_not_chill",
+      "name": "Ice that does not chill",
+      "blurb": "It is frozen, and it takes nothing from the air around it.",
+      "kind": "negation",
+      "source": "ice",
+      "negatedTarget": "thermal",
+      "instability": 25
+    },
+    {
+      "id": "rain_that_does_not_wet",
+      "name": "Rain that does not wet",
+      "blurb": "It falls, and the ground stays dry.",
+      "kind": "negation",
+      "source": "rain",
+      "negatedTarget": "hydrology",
+      "instability": 25
+    },
+    {
+      "id": "forest_that_casts_no_shade",
+      "name": "A forest that casts no shade",
+      "blurb": "The canopy is closed and the light reaches the floor anyway.",
+      "kind": "negation",
+      "source": "canopy",
+      "negatedTarget": "illumination",
+      "instability": 20
+    },
+    {
+      "id": "sea_that_does_not_temper",
+      "name": "A sea that does not temper",
+      "blurb": "That much water, and the nights still turn bitter.",
+      "kind": "negation",
+      "source": "sea",
+      "negatedTarget": "thermal",
+      "instability": 20
+    },
+    {
+      "id": "green_in_the_dark",
+      "name": "Green in the dark",
+      "blurb": "Growing things that photosynthesise, in a world with nothing to photosynthesise by.",
+      "kind": "assertion",
+      "requiresWrittenSource": "root",
+      "conditions": [
+        { "target": "illumination", "measure": "peak", "maximum": 12 }
+      ],
+      "instability": 25
+    },
+    {
+      "id": "rain_without_air",
+      "name": "Rain without air",
+      "blurb": "Moisture held aloft by an atmosphere too thin to hold it.",
+      "kind": "assertion",
+      "requiresWrittenSource": "rain",
+      "conditions": [
+        { "target": "atmosphere", "measure": "peak", "maximum": 20 }
+      ],
+      "instability": 25
+    },
+    {
+      "id": "day_that_never_turns",
+      "name": "A day that never turns",
+      "blurb": "Suns and moons in the sky, and a world that will not rotate beneath them.",
+      "kind": "assertion",
+      "requiresWrittenSource": "sun",
+      "conditions": [
+        { "target": "cycle", "measure": "peak", "maximum": 8 }
+      ],
+      "instability": 20
+    }
+  ]
+}

@@ -13,7 +13,10 @@ final class SiteTests: XCTestCase {
         var unreachable: [SiteID] = []
         for site in catalog.sites {
             let found = (0..<400).contains { seed in
-                site.isEligible(in: PressureRules.resolve([], fillingUnwrittenWith: UInt64(seed)))
+                let sigils = PressureRules.rollUnwritten(after: [], seed: UInt64(seed))
+                let readings = PressureRules.resolve(sigils)
+                return site.isEligible(in: readings,
+                                       contradictions: ContradictionRules.fired(in: sigils, readings: readings))
             }
             if !found { unreachable.append(site.id) }
         }
@@ -54,31 +57,26 @@ final class SiteTests: XCTestCase {
         XCTAssertFalse(vault.isEligible(in: scorched))
     }
 
-    func testHazardSitesNeedContradictionRatherThanConditions() {
-        guard let tear = ContentCatalog.shared.site(SiteID(rawValue: "the_tear")) else {
-            return XCTFail("the_tear missing")
-        }
-        // An honest world, however extreme, does not tear.
-        let honest = PressureRules.resolve([
-            Sigil(id: InstanceID(rawValue: 1), source: PressureSourceID(rawValue: "sun"),
-                  target: PressureTargetID(rawValue: "illumination"), intensity: .overwhelming)
-        ])
-        XCTAssertFalse(tear.isEligible(in: honest))
-
-        // A world that argues with itself does. This is contradiction made walkable.
-        let contradictory = PressureRules.resolve([
-            Sigil(id: InstanceID(rawValue: 1), source: PressureSourceID(rawValue: "sun"),
-                  target: PressureTargetID(rawValue: "illumination"), intensity: .overwhelming),
-            Sigil(id: InstanceID(rawValue: 2), source: PressureSourceID(rawValue: "void"),
-                  target: PressureTargetID(rawValue: "illumination"), intensity: .overwhelming),
-            Sigil(id: InstanceID(rawValue: 3), source: PressureSourceID(rawValue: "magma"),
-                  target: PressureTargetID(rawValue: "thermal"), intensity: .overwhelming),
-            Sigil(id: InstanceID(rawValue: 4), source: PressureSourceID(rawValue: "glacier"),
-                  target: PressureTargetID(rawValue: "thermal"), intensity: .overwhelming)
-        ])
-        XCTAssertGreaterThan(contradictory.totalOpposed, 0)
-        XCTAssertTrue(tear.isEligible(in: contradictory),
-                      "opposed \(contradictory.totalOpposed) should have torn the world")
+    /// Hazard sites key off **named** contradictions, never off opposed force.
+    ///
+    /// This test used to assert the opposite — that piling up opposed magnitude tore the world —
+    /// which `contradiction-danger-spec.md` §1 rules out precisely because it punishes honest
+    /// worldbuilding. The full treatment is in `ContradictionTests`; this keeps the site side
+    /// honest.
+    func testAHazardSiteIgnoresOpposedForce() throws {
+        let tear = try XCTUnwrap(ContentCatalog.shared.site("the_tear"))
+        let violentlyOpposed = [
+            Sigil(id: InstanceID(rawValue: 1), source: "sun", target: "illumination", intensity: .overwhelming),
+            Sigil(id: InstanceID(rawValue: 2), source: "void", target: "illumination", intensity: .overwhelming),
+            Sigil(id: InstanceID(rawValue: 3), source: "magma", target: "thermal", intensity: .overwhelming),
+            Sigil(id: InstanceID(rawValue: 4), source: "glacier", target: "thermal", intensity: .overwhelming)
+        ]
+        let readings = PressureRules.resolve(violentlyOpposed)
+        XCTAssertGreaterThan(readings.totalOpposed, 0, "the test page isn't actually opposed")
+        XCTAssertFalse(
+            tear.isEligible(in: readings,
+                            contradictions: ContradictionRules.fired(in: violentlyOpposed, readings: readings)),
+            "a world can be violently opposed and still perfectly honest — it must not tear")
     }
 
     // MARK: Placement

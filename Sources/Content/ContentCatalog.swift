@@ -21,6 +21,7 @@ struct ContentCatalog: Sendable {
     let stations: [StationDef]
     let constellationNodes: [ConstellationNodeDef]
     let sites: [SiteDef]
+    let contradictions: [ContradictionDef]
 
     /// Loaded once at first use. Content is read-only after load, so this is safe to share.
     static let shared: ContentCatalog = {
@@ -61,6 +62,7 @@ struct ContentCatalog: Sendable {
     }
     func station(_ id: StationID) -> StationDef? { stations.first { $0.id == id } }
     func site(_ id: SiteID) -> SiteDef? { sites.first { $0.id == id } }
+    func contradiction(_ id: ContradictionID) -> ContradictionDef? { contradictions.first { $0.id == id } }
     func constellationNode(_ id: ConstellationNodeID) -> ConstellationNodeDef? {
         constellationNodes.first { $0.id == id }
     }
@@ -108,7 +110,8 @@ struct ContentCatalog: Sendable {
             gambitComponents: try loadFile("gambit_components", key: "components", bundle: bundle),
             stations: try loadFile("stations", key: "stations", bundle: bundle),
             constellationNodes: try loadFile("constellation", key: "nodes", bundle: bundle),
-            sites: try loadFile("sites", key: "sites", bundle: bundle)
+            sites: try loadFile("sites", key: "sites", bundle: bundle),
+            contradictions: try loadFile("contradictions", key: "contradictions", bundle: bundle)
         )
     }
 
@@ -169,6 +172,7 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(stations.map(\.id.rawValue), label: "station")
         try requireUniqueIDs(constellationNodes.map(\.id.rawValue), label: "constellation node")
         try requireUniqueIDs(sites.map(\.id.rawValue), label: "site")
+        try requireUniqueIDs(contradictions.map(\.id.rawValue), label: "contradiction")
 
         let resourceIDs = Set(resources.map(\.id))
         let creatureIDs = Set(creatures.map(\.id))
@@ -275,6 +279,44 @@ struct ContentCatalog: Sendable {
                     throw ContentError.danglingReference(
                         "symbol '\(symbol.id)' binds '\(component.source)' to '\(component.target)', which it doesn't affect")
                 }
+            }
+        }
+
+        // A contradiction that can't fire is worse than a missing one: it reads as authored
+        // content and silently never appears.
+        let sourceIDs = Set(pressureSources.map(\.id))
+        for entry in contradictions {
+            switch entry.kind {
+            case .negation:
+                guard let source = entry.source, sourceIDs.contains(source) else {
+                    throw ContentError.danglingReference(
+                        "contradiction '\(entry.id)' denies unknown source '\(entry.source?.rawValue ?? "nil")'")
+                }
+                guard let target = entry.negatedTarget, targetIDs.contains(target) else {
+                    throw ContentError.danglingReference(
+                        "contradiction '\(entry.id)' negates unknown target '\(entry.negatedTarget?.rawValue ?? "nil")'")
+                }
+                // Denying something a source never did isn't a contradiction, it's a no-op.
+                guard pressureSource(source)?.contribution(to: target) != nil else {
+                    throw ContentError.danglingReference(
+                        "contradiction '\(entry.id)' denies '\(target)' of '\(source)', which it doesn't affect")
+                }
+            case .assertion:
+                guard let required = entry.requiresWrittenSource, sourceIDs.contains(required) else {
+                    throw ContentError.danglingReference(
+                        "contradiction '\(entry.id)' requires unknown source '\(entry.requiresWrittenSource?.rawValue ?? "nil")'")
+                }
+                guard !entry.conditions.isEmpty else {
+                    throw ContentError.danglingReference(
+                        "assertion '\(entry.id)' has no conditions, so it would fire on every world")
+                }
+                for condition in entry.conditions where !targetIDs.contains(condition.target) {
+                    throw ContentError.danglingReference(
+                        "contradiction '\(entry.id)' reads unknown target '\(condition.target)'")
+                }
+            }
+            guard entry.instability > 0 else {
+                throw ContentError.danglingReference("contradiction '\(entry.id)' costs nothing")
             }
         }
 

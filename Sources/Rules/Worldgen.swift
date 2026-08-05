@@ -91,7 +91,11 @@ enum Worldgen {
         // 6. Sites — the discrete placed things. Eligibility is read off the world's *pressures*
         //    rather than off its symbols, so a site is found by writing a kind of place rather than
         //    by writing a specific recipe (docs/sites-system.md §2).
-        let sites = SiteRules.place(in: map, readings: BookRules.readings(for: book, seed: seed),
+        let sigils = BookRules.sigils(for: book)
+        let readings = BookRules.readings(for: book, seed: seed)
+        let sites = SiteRules.place(in: map,
+                                    readings: readings,
+                                    contradictions: ContradictionRules.fired(in: sigils, readings: readings),
                                     avoiding: occupied, rng: &siteRNG)
         var guardians: [WorldEnemy] = []
         for site in sites {

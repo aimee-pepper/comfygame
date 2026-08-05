@@ -18,11 +18,14 @@ struct SiteDef: Codable, Equatable, Identifiable, Sendable {
     var blurb: String
     var category: SiteCategory
     /// Every one of these must hold for the site to be eligible at all.
-    var conditions: [SiteCondition]
-    /// Total force written in conflicting directions, across the whole world, before this site can
-    /// appear. Hazard sites are *produced by* contradiction rather than contributing to it — which
-    /// is what gives contradiction a walkable consequence instead of only a number.
-    var minimumContradiction: Double?
+    var conditions: [PressureCondition]
+    /// How many **named** contradictions the page must contain before this site can appear.
+    ///
+    /// Hazard sites are *produced by* contradiction rather than contributing to it, which gives
+    /// contradiction a walkable consequence instead of only a number. It counts catalogue entries,
+    /// never opposed magnitude: a sunny snowy world is honest worldbuilding and must never tear
+    /// (`contradiction-danger-spec.md` §1).
+    var minimumNamedContradictions: Int?
     /// Relative likelihood once the conditions hold.
     var weight: Double
     /// Most sites are unique; a few (hazards especially) come in numbers.
@@ -37,8 +40,12 @@ struct SiteDef: Codable, Equatable, Identifiable, Sendable {
     var stabilityDelta: Int
 
     /// Whether this site's conditions all hold in a given world.
-    func isEligible(in readings: PressureReadings) -> Bool {
-        if let minimumContradiction, readings.totalOpposed < minimumContradiction { return false }
+    ///
+    /// `contradictions` are the *named* ones the page fired — see `minimumNamedContradictions`.
+    func isEligible(in readings: PressureReadings, contradictions: [ContradictionDef] = []) -> Bool {
+        if let minimumNamedContradictions, contradictions.count < minimumNamedContradictions {
+            return false
+        }
         return conditions.allSatisfy { $0.holds(in: readings) }
     }
 }
@@ -70,8 +77,11 @@ enum SiteCategory: String, Codable, CaseIterable, Sendable {
     }
 }
 
-/// One threshold a world must clear. Deliberately a *range* test — see the note on `SiteDef`.
-struct SiteCondition: Codable, Equatable, Sendable {
+/// One threshold a world must clear.
+///
+/// Deliberately a *range* test rather than an exact match — see the note on `SiteDef`. Shared with
+/// the contradiction catalogue, which asks the same kind of question of a world.
+struct PressureCondition: Codable, Equatable, Sendable {
     var target: PressureTargetID
     /// Which number on the target this reads. Defaults to the headline magnitude.
     var measure: Measure

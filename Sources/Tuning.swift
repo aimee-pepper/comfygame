@@ -190,6 +190,12 @@ enum Tuning {
 
     // MARK: - Encounters
 
+    enum Contradiction {
+        /// The disclosed superlinear term. Small: it exists to say "several at once is worse than
+        /// several separately", not to make stacking unthinkable.
+        static let escalationPerAdditional: Int = 8   // PLACEHOLDER
+    }
+
     /// Sites — the discrete placed things, as opposed to the pressures that bias what spawns.
     enum Sites {
         /// How many sites a world gets, before eligibility and placement have their say. A world
