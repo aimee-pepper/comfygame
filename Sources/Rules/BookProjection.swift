@@ -44,6 +44,9 @@ struct BookProjection {
     var mapHeight: Int
     /// What the world will be like, in prose. Derived from the same resolution the bind runs.
     var worldDescription: WorldDescription
+    /// How much stability the danger-rune cap withheld. Shown on its own line rather than folded
+    /// into the headline — the same rule the contradiction escalation term follows.
+    var dangerCapShortfall: Int
     /// Expected share of harvests by resource, descending. Expected, not ranged — a pile of ranged
     /// percentages is unreadable, and the mix is the qualitative half of the preview.
     var resourceMix: [(resource: ResourceDef, share: Double)]
@@ -87,8 +90,11 @@ struct BookProjection {
             guard !options.isEmpty else { continue }
             stabilityLow += options.map(\.stabilityDelta).min() ?? 0
             stabilityHigh += options.map(\.stabilityDelta).max() ?? 0
-            tierLow += options.map(\.enemyTierDelta).min() ?? 0
-            tierHigh += options.map(\.enemyTierDelta).max() ?? 0
+            // Danger runes carry their tier shift on the profile rather than on `enemyTierDelta`,
+            // and the preview has to cover both or it promises a range the world doesn't honour.
+            let tiers = options.map { $0.enemyTierDelta + ($0.danger?.tierDelta ?? 0) }
+            tierLow += tiers.min() ?? 0
+            tierHigh += tiers.max() ?? 0
             sightLow += options.map(\.visionDelta).min() ?? 0
             sightHigh += options.map(\.visionDelta).max() ?? 0
         }
@@ -125,6 +131,7 @@ struct BookProjection {
                 readings,
                 contradictions: ContradictionRules.fired(in: sigils, readings: readings)
             ),
+            dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: book.allSymbolIDs),
             resourceMix: expectedResourceMix(plans),
             creatureMix: expectedCreatureMix(plans)
         )

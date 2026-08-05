@@ -166,6 +166,7 @@ final class SiteTests: XCTestCase {
         store.mutate("test: teleport") { state in
             state.worlds.activeRun?.playerPosition = site.position
             state.worlds.activeRun?.enemies.removeAll()
+            state.worlds.activeRun?.stability = Tuning.World.startingStability
         }
 
         // Driven off live state rather than off the definition: what matters is that *this* site
@@ -216,6 +217,7 @@ final class SiteTests: XCTestCase {
 
         store.mutate("test: forget") { state in
             state.base.ownedSymbols.remove(taught)
+            state.worlds.activeRun?.stability = Tuning.World.startingStability
             state.worlds.activeRun?.playerPosition = site.position
             // Clear the board entirely: this test is about literacy surviving a collapse, and a
             // wandering enemy interrupting the search would fail it for the wrong reason.
@@ -245,11 +247,22 @@ final class SiteTests: XCTestCase {
     private func makeStoreInWorld(matching wanted: (PlacedSite) -> Bool,
                                   attempts: Int = 60) throws -> (GameStore, PlacedSite) {
         let store = GameStore(io: .temporary(name: "sites-\(UUID().uuidString)"))
+        // One slot written, the rest left to chance — so departures range over genuinely different
+        // worlds and the site being hunted is actually reachable. Pinning the whole book made these
+        // tests skip instead of run, which is barely better than not having them.
         store.setSymbol("plains", in: "terrain")
         for _ in 0..<attempts {
             store.mutate("test: fund") { state in state.base.essence = 500 }
             store.bindAndDepart()
             if let site = store.state.worlds.activeRun?.sites.first(where: wanted) {
+                // Take the teeth out *after* generation: these tests are about how sites behave,
+                // and a world that collapses or kills you mid-search fails them for reasons that
+                // have nothing to do with sites.
+                store.mutate("test: becalm") { state in
+                    state.worlds.activeRun?.stability = Tuning.World.startingStability
+                    state.worlds.activeRun?.enemies.removeAll()
+                    state.worlds.activeRun?.binderHP = Tuning.Encounter.binderMaxHP
+                }
                 return (store, site)
             }
             store.mutate("test: next world") { state in state.worlds.activeRun = nil }

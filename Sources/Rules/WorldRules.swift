@@ -231,6 +231,13 @@ enum WorldRules {
 
         let bandBefore = run.stabilityBand
         run.turnsTaken += 1
+
+        // Miasma and Blight: the world itself costs you, every turn, just for being in it.
+        let damage = BookRules.dangerProfile(for: run.book).damagePerTurn
+        if damage > 0 {
+            run.binderHP = max(0, run.binderHP - damage)
+            events.append(.hazardHit(damage: damage))
+        }
         run.encounterGraceTurns = max(0, run.encounterGraceTurns - 1)
         state.reality.lifetime.worldTurnsTaken += 1
         run.stability = max(0, run.stability - run.decayPerTurn)

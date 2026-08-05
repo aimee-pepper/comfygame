@@ -132,7 +132,10 @@ Decided in session 5; restated for completeness.
 </details>
 
 <details>
-<summary><b>5. The Great Work</b></summary>
+<summary><b>5. The Great Work — SUPERSEDED by `decisions-session-9.md`</b></summary>
+
+> **⚠️ The structure below is superseded.** The great work is **rebuilding the Atlas** that anchored the realms and whose destruction caused the sundering. Progress is measured in **realms re-anchored**, not components assembled. Kept for context only.
+
 
 **[PROPOSAL] — this is the least-decided part of the design and the most load-bearing. Treat as a first draft.**
 

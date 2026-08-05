@@ -564,6 +564,51 @@
           "minimum": 78
         }
       ]
+    },
+    {
+      "id": "storming_hard",
+      "group": "atmosphere",
+      "text": "The wind does not let up, and it carries things.",
+      "polarity": "destabilising",
+      "priority": 45,
+      "conditions": [
+        {
+          "target": "atmosphere",
+          "measure": "aspect",
+          "key": "motion",
+          "minimum": 70
+        }
+      ]
+    },
+    {
+      "id": "swarming",
+      "group": "vitality",
+      "text": "Not one of anything here. Many of everything.",
+      "polarity": "destabilising",
+      "priority": 45,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "swarming",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "stagnant",
+      "group": "hydrology",
+      "text": "The water sits, and has sat a long while.",
+      "polarity": "destabilising",
+      "priority": 30,
+      "conditions": [
+        {
+          "target": "hydrology",
+          "measure": "tag",
+          "key": "stagnant",
+          "minimum": 1
+        }
+      ]
     }
   ]
 }

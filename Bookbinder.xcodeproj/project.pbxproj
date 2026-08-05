@@ -33,6 +33,7 @@
 		3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */; };
 		3FD60BA9683F245EBFA14D61 /* SpendingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */; };
 		40CDA99CD7F4DFF60EC0EBBB /* SiteModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DA32364644741F03829592 /* SiteModels.swift */; };
+		4282AFE6E27E4C97C0EEAEAA /* DangerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1824E6BFD5550AACCB6416A5 /* DangerTests.swift */; };
 		4961D037BE2924DF53722EA8 /* save-pre-sites-2026-08-04.json in Resources */ = {isa = PBXBuildFile; fileRef = 061FE2BB0FA59B8824641746 /* save-pre-sites-2026-08-04.json */; };
 		4A0672467AD72629AC2ABD2F /* Inventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F756C7CBAE86A8565FB12DD /* Inventory.swift */; };
 		4C60516FFB5892091CBE28AC /* research.json in Resources */ = {isa = PBXBuildFile; fileRef = 6A1D054604B637EEC90D24DA /* research.json */; };
@@ -113,6 +114,7 @@
 		061FE2BB0FA59B8824641746 /* save-pre-sites-2026-08-04.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "save-pre-sites-2026-08-04.json"; sourceTree = "<group>"; };
 		0BD3736ADDC83B6481EFAC9A /* Combat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Combat.swift; sourceTree = "<group>"; };
 		0F66F95CC3FEA4D5E13AE410 /* DescriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionModels.swift; sourceTree = "<group>"; };
+		1824E6BFD5550AACCB6416A5 /* DangerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DangerTests.swift; sourceTree = "<group>"; };
 		1AE0FA07FD91558E2F953944 /* GameActions+World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+World.swift"; sourceTree = "<group>"; };
 		1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchViews.swift; sourceTree = "<group>"; };
 		1F045A414F1C1CF9A9A916BB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -383,6 +385,7 @@
 				F395689728B586E0D0A7CD61 /* CombatTests.swift */,
 				7691C0625AD4AACD2BA46A20 /* ContentTests.swift */,
 				F43DADDF1091E89318A12B0D /* ContradictionTests.swift */,
+				1824E6BFD5550AACCB6416A5 /* DangerTests.swift */,
 				D3EB5122AA82F1610E51A10F /* DescriptionTests.swift */,
 				C51FE4FBAB98280181089C56 /* DeterminismTests.swift */,
 				6782235BDB0189FF9A0FFE41 /* EconomyTests.swift */,
@@ -586,6 +589,7 @@
 				EB5A7F017737E52E163C9A5C /* CombatTests.swift in Sources */,
 				867F278950814C3D859CEAFD /* ContentTests.swift in Sources */,
 				7C72DAD4C55C0D916064E912 /* ContradictionTests.swift in Sources */,
+				4282AFE6E27E4C97C0EEAEAA /* DangerTests.swift in Sources */,
 				6D8D7D57D683FAA42DFD1B9F /* DescriptionTests.swift in Sources */,
 				EDF26461D4FD581D2BCFBB0A /* DeterminismTests.swift in Sources */,
 				7345ED98F77854AE5C6FFB34 /* EconomyTests.swift in Sources */,

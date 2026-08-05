@@ -463,3 +463,33 @@ the other.
 
 Suggest deleting the four originals and keeping the consolidated file. Not done, since deleting your
 docs isn't my call.
+
+## Q23 — The danger-rune stability cap breaks "the number on the symbol is the number on the meter"
+
+`contradiction-danger-spec.md` §5 proposes capping each danger rune's stability gift so stacking six
+can't make an arbitrarily greedy world safe — the Mystcraft precedent, where the scorched/lightning
+bonus applies once. That's clearly right in intent: without a ceiling, the release valve becomes a
+cheat code.
+
+But it is the **only** place a symbol stops moving the meter by exactly its printed number, which is
+a ruling and not a proposal.
+
+**Shipped:** capped at a total of 40 (`Tuning.Danger.maximumStabilityGift`), with the shortfall shown
+on its own line in the preview — *"Danger runes can only buy so much time: −N of what they offer."*
+That's the same discipline §3 already requires for the contradiction escalation term, so there's
+precedent for a disclosed non-linear term.
+
+**Worth knowing: the cap cannot currently bite.** All seven runes live in the `quirk` slot and a book
+has one of those, so no book today can write two. It is future-proofing for the page, where several
+runes will fit. If that bothers you, the honest alternative is to drop the cap until the page exists
+and the problem is real.
+
+**Also worth knowing:** stacking still *broadens* the danger — hazards, per-turn damage, spawn
+counts and tiers all accumulate normally. Only the stability gift is bounded, which is what §5 asks
+for ("stacking should broaden the kinds of danger rather than multiply the stability gift").
+
+**The one real cost:** the projection's stability range is computed by summing per-slot extremes,
+which is exact *because* stability is additive. A cap makes it non-additive, so once several runes
+can be written the range has to learn about the cap or the preview will promise a floor it doesn't
+honour. There's a test that catches this (`testEveryPossibleRandomFillLandsInsideTheProjectedRange`)
+and it will start failing the moment the page allows two runes — which is the right time to fix it.

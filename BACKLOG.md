@@ -58,6 +58,15 @@
 - [x] Q10 banking overflow → Storehouse spillover, never lost silently (ruled, session 5 audit)
 - [x] 44pt audit, thumb-zone action bar (haptics + full acceptance pass still open — needs the on-device force-quit test)
 
+## Contradiction, danger and the description panel
+- [x] Contradiction as an enumerated catalogue, never computed from opposed magnitude
+- [x] World-description panel with red/green underlining and named contradictions
+- [x] Danger runes and Peace — the danger↔time axis, in The Bargain research branch
+- [ ] Q23 — whether the danger-rune stability cap is wanted (shipped, disclosed, can't bite yet)
+- [ ] Q21 — whether chance-filled slots should fire assertion contradictions
+- [ ] Contradiction-only materials, and value scaling with danger (spec §4)
+- [ ] "Water that will not freeze" — needs the conversion-vs-contradiction ruling (spec §2.2)
+
 ## Sites (docs/sites-system.md)
 - [x] Site catalog, conditions-as-ranges, placement, exclusions, caps, guardians
 - [x] Symbols expand to pressure components, so worlds have real climate/character

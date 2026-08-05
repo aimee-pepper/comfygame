@@ -121,7 +121,11 @@ enum BookRules {
     }
 
     static func stabilityDelta(symbolIDs: [SymbolID]) -> Int {
-        symbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.stabilityDelta ?? 0) }
+        let printed = symbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.stabilityDelta ?? 0) }
+        // The only place a symbol doesn't move the meter by exactly its printed number. It applies
+        // solely to *stacked* danger runes, and the preview shows the shortfall on its own line —
+        // see `dangerStabilityGift` and questions-for-design Q23.
+        return printed - dangerCapShortfall(symbolIDs: symbolIDs)
     }
 
     /// The 0–100 headline number on a book ("Stability 68").
@@ -177,7 +181,9 @@ enum BookRules {
 
     static func enemyTier(symbolIDs: [SymbolID]) -> Int {
         let delta = symbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.enemyTierDelta ?? 0) }
-        return max(1, Tuning.World.baseEnemyTier + delta)
+        // Danger runes carry their tier shift on the profile rather than on `enemyTierDelta`, so
+        // there's one place a rune's hostility is described.
+        return max(1, Tuning.World.baseEnemyTier + delta + dangerProfile(symbolIDs: symbolIDs).tierDelta)
     }
 
     // MARK: Spawn tables

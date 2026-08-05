@@ -88,7 +88,20 @@ enum Worldgen {
             occupied.insert(point)
         }
 
-        // 6. Sites — the discrete placed things. Eligibility is read off the world's *pressures*
+        // 6. Hazard tiles the *book* asked for, as opposed to the ones a collapsing world grows
+        //    later. Storm and Tremor buy their stability with these.
+        let danger = BookRules.dangerProfile(for: book)
+        for _ in 0..<danger.hazardTiles {
+            guard let point = randomFreePoint(in: map, avoiding: occupied,
+                                              minimumDistanceFrom: entry,
+                                              distance: Tuning.World.enemyFreeRadiusAroundEntry,
+                                              rng: &featureRNG)
+            else { break }
+            map[point].content = .hazard
+            occupied.insert(point)
+        }
+
+        // 7. Sites — the discrete placed things. Eligibility is read off the world's *pressures*
         //    rather than off its symbols, so a site is found by writing a kind of place rather than
         //    by writing a specific recipe (docs/sites-system.md §2).
         let sigils = BookRules.sigils(for: book)
@@ -110,7 +123,7 @@ enum Worldgen {
             }
         }
 
-        // 7. Enemies, drawn from the book's enemy table.
+        // 8. Enemies, drawn from the book's enemy table.
         let enemyTable = BookRules.enemyTable(for: book)
         let enemyCount = enemyCount(for: book, rng: &enemyRNG)
         var enemies: [WorldEnemy] = guardians
@@ -149,7 +162,11 @@ enum Worldgen {
     static func enemyCount(for book: BoundBook, rng: inout SeededRNG) -> Int {
         let tier = BookRules.enemyTier(of: book)
         let base = rng.int(in: Tuning.World.baseEnemyCountRange)
-        return max(1, base + (tier - Tuning.World.baseEnemyTier) * Tuning.World.enemiesPerDangerTier)
+        let scaled = base + (tier - Tuning.World.baseEnemyTier) * Tuning.World.enemiesPerDangerTier
+        // Swarm multiplies the count and drops the tier; Predation does the reverse. Applied after
+        // the tier term so the two really do pull against each other rather than one winning.
+        let multiplied = Double(scaled) * BookRules.dangerProfile(for: book).spawnMultiplier
+        return max(1, Int(multiplied.rounded()))
     }
 
     // MARK: Placement
