@@ -1,31 +1,26 @@
-# Handoff — session 11 (from Aimee testing the page grid)
+# Handoff — 3 docs
 
-One doc. Four issues, in priority order.
+Verified against `a883f81`. Sessions 1–12 are in the repo; these are new.
 
-## 1. The description still leaks — and the rule is absolute
+## Read `audit-what-pressures-actually-do.md` first — it's the big one
 
-**A description may reveal nothing the player did not directly place.** Right now a description appears *before any runes are placed at all*.
+**`PressureReadings` has exactly three consumers:** the description prose, the contradiction catalogue, and site eligibility. **Terrain, flora, fauna, loot, encounters and map layout don't read pressures at all** — they still come from the old symbol fields (`yieldModifiers`, `enemyTableModifiers`, `enemyTierDelta`).
 
-- **Blank page → no description.** Three runes → a description speaking only to those three, silent on everything else.
-- **Rolled values are never surfaced pre-departure** — not as text, not as a hint, not as a number that only makes sense if you know what rolled.
-- **Anchoring the page before entering, or having visited, unseals it.** After either, rolled values are known and may be shown in full.
+So the pressure model describes worlds it doesn't generate. That's why descriptions feel disconnected from what's actually in a world — they are. Every "content pressures" table in `pressure-model.md` is unimplemented intent.
 
-## 2. Sort the palette into sections
+**This is a designer failure, not an engineering one.** The downstream effects were specced and validated by reading the sentences they produced, never by checking they reached generation.
 
-Currently one undifferentiated box of every rune. Should read as a vocabulary, grouped by category.
+**What has to happen:** wire pressures into generation (resource nodes from Substrate, spawns from Vitality and the trait pressures, terrain from Relief, map size possibly from Relief too), then delete the old symbol modifier fields — they're the parallel system keeping the real one decorative.
 
-## 3. NEW MECHANIC — exclusivity and chaining
+## `decisions-session-13.md`
 
-**One main choice per category, then modifiers.** You can't place two land-defining runes in one book. Same for other categories: one primary, plus any modifiers.
+- **Cycle gets real primary sources.** It had none — its primary would have been the sun, already Illumination's. Candidates in `cycle-sources-draft.md`.
+- **Bigger maps AND shorter days**, half measure of each. Starting numbers to tune: **18×18** map, **~40-turn day** (four or five day/night turns per exploration). **Stability must buy proportionally more turns.**
+- **The map no longer has to fit one screen** — only the page does, because you compose on a page and walk through a world. Camera: follow the character, clamped at map edges (recommendation, not yet confirmed).
+- **A minimap** under the movement arrows: explored / unexplored / **nothing there**. The third state is what makes a bigger map navigable.
+- **World size becomes a variable** — proposed as the existing Scale qualifier on the primary Relief source. **Bigger worlds must cost more stability**, so size is a greed-shaped decision.
+- **Night changes vision and spawns.** This is what finally makes Illumination's dynamic range mean anything.
 
-**Chaining is an unlock** — an advanced chaining rune lifts the restriction for its category, so multiple lands in one world becomes an earned capability.
+## `cycle-sources-draft.md`
 
-**Answered:** "category" means **pressure target** — one primary source per target (Illumination, Thermal, Hydrology, Substrate, Relief, Vitality, Atmosphere, Cycle), plus unlimited modifiers on each. **Chaining is a single unlock** lifting the restriction across all targets at once.
-
-**The palette's sections should be these same eight targets**, so organisation and grammar are the same thing.
-
-## 4. Runes need glyph icons, not SF Symbols
-
-`mountain.2`, `leaf`, `snowflake` — these should be the actual rune shapes as they'd be drawn on the page. The thing in the palette should be the thing that gets written.
-
-If artwork isn't ready: use a placeholder that is clearly a **glyph** — abstract, monochrome, drawn-looking. A wrong-but-glyph-shaped placeholder is closer to right than a correct-looking app icon.
+Eleven candidates for Aimee to cut down. Not decided — don't build from it yet.

@@ -97,8 +97,11 @@
 - [x] Research branches render as actual trees with visible prerequisite edges
 - [x] Forge branch removed — party modification through research is not how this works
 - [x] Gear is found: worn from the Storehouse, tiers derive from it, sites carry the better pieces
-- [ ] Crafting buildings arrive with the people who staff them (needs recruitment first)
-- [ ] Open: the full list of crafting trades, and whether a specialist *is* the building
+- [x] Equipping UI: worn, candidates best-first, and the improvement stated in fight units
+- [x] An upgrade nudge on the Party screen, so a better blade doesn't sit unnoticed
+- [ ] Crafting buildings — **a recruited specialist unlocks the ability to BUILD the building**
+      (Aimee, 5 Aug); needs recruitment, and two progressions tracked: found vs built
+- [ ] Open: the full list of crafting trades
 - [ ] Ordinary gear from encounters — currently only sites drop it
 
 ## Writing desk UI

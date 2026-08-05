@@ -87,7 +87,16 @@ struct BaseState: Codable, Equatable, Sendable {
 
     // MARK: Derived
 
-    func station(_ id: StationID) -> StationState { stations[id] ?? StationState(isUnlocked: false, tier: 0) }
+    /// A station's state, falling back to **what the catalog says** rather than to locked.
+    ///
+    /// A station added to `stations.json` after a save was written isn't in that save's dictionary,
+    /// and defaulting to locked meant it could never appear — the Library was invisible on any save
+    /// made before it existed. Content added later should show up, not stay hidden forever.
+    func station(_ id: StationID) -> StationState {
+        stations[id] ?? StationState(
+            isUnlocked: ContentCatalog.shared.station(id)?.unlockedAtStart ?? false,
+            tier: ContentCatalog.shared.station(id)?.startingTier ?? 0)
+    }
 
     /// What the inventory *should* hold given current upgrades. `tier` counts upgrades purchased,
     /// so tier 0 is the un-upgraded Storehouse and grants no bonus.

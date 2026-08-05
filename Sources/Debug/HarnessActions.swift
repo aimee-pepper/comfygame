@@ -15,6 +15,20 @@ extension GameStore {
         }
     }
 
+    /// Drop one of every wearable thing into the Storehouse, so the equipping UI can be seen
+    /// without first walking to a ruin.
+    func harnessGrantGear() {
+        mutate("harness: gear", flush: true) { state in
+            for item in ContentCatalog.shared.items where item.gear != nil {
+                guard !state.base.inventory.stacks.contains(where: { $0.catalogID == item.id }) else { continue }
+                state.base.inventory.slots = max(state.base.inventory.slots,
+                                                 state.base.inventory.stacks.count + 1)
+                state.base.inventory.add(ItemStack(id: InstanceID(rawValue: UInt64(abs(item.id.rawValue.hashValue))),
+                                                   catalogID: item.id))
+            }
+        }
+    }
+
     func harnessGainMote() {
         mutate("found a mote", flush: true) { $0.reality.motes += 1 }
     }

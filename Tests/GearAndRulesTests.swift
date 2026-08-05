@@ -161,4 +161,83 @@ final class GearAndRulesTests: XCTestCase {
         let resumed = GameStore(io: io)
         XCTAssertEqual(resumed.gambits(for: .companion).first { $0.id == ruleID }?.isEnabled, false)
     }
+
+    // MARK: Is it an improvement?
+
+    /// The question the player actually has is "is this better?", and a tier number only answers it
+    /// if you already know the formula. The badge answers it in the units the fight uses.
+    func testTheDeltaIsStatedInFightUnitsNotTiers() throws {
+        let store = GameStore(io: .temporary(name: "delta-\(UUID().uuidString)"))
+        let chipped = try XCTUnwrap(ContentCatalog.shared.item("blade_chipped"))
+        let binders = try XCTUnwrap(ContentCatalog.shared.item("blade_binders"))
+
+        // Nothing worn: the delta is the whole of what it gives.
+        XCTAssertEqual(store.gearDelta(wearing: chipped),
+                       (chipped.gear?.tier ?? 0) * Tuning.Encounter.attackPerWeaponTier)
+
+        store.mutate("test: haul it home") { $0.base.inventory.add(
+            ItemStack(id: InstanceID(rawValue: 1), catalogID: chipped.id)) }
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: chipped.id))
+
+        // Against something worn, it's the difference — and it matches what combat will actually do.
+        let promised = store.gearDelta(wearing: binders)
+        let before = CombatRules.companionAttack(in: store.state)
+        store.mutate("test: haul the better one home") { $0.base.inventory.add(
+            ItemStack(id: InstanceID(rawValue: 2), catalogID: binders.id)) }
+        store.equip(ItemStack(id: InstanceID(rawValue: 2), catalogID: binders.id))
+
+        XCTAssertEqual(CombatRules.companionAttack(in: store.state) - before, promised,
+                       "the badge promised a number the fight didn't deliver")
+    }
+
+    func testAWorsePieceReadsAsWorse() throws {
+        let store = GameStore(io: .temporary(name: "delta-\(UUID().uuidString)"))
+        let good = try XCTUnwrap(ContentCatalog.shared.item("guard_vault"))
+        let poor = try XCTUnwrap(ContentCatalog.shared.item("guard_padded"))
+        store.mutate("test: haul it home") { $0.base.inventory.add(
+            ItemStack(id: InstanceID(rawValue: 1), catalogID: good.id)) }
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: good.id))
+        XCTAssertLessThan(store.gearDelta(wearing: poor), 0)
+    }
+
+    func testTheUpgradeNudgeOnlyFiresWhenSomethingIsActuallyBetter() throws {
+        let store = GameStore(io: .temporary(name: "nudge-\(UUID().uuidString)"))
+        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon), "nudged with an empty storehouse")
+
+        let best = try XCTUnwrap(ContentCatalog.shared.item("blade_binders"))
+        store.mutate("test: haul it home") { $0.base.inventory.add(
+            ItemStack(id: InstanceID(rawValue: 1), catalogID: best.id)) }
+        XCTAssertTrue(store.hasUpgradeAvailable(for: .weapon))
+
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: best.id))
+        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon),
+                       "still nudging about the thing already worn")
+    }
+
+    /// Equipment round-trips as a readable object, not the alternating array Swift defaults to for
+    /// a dictionary whose key isn't a coding key.
+    func testEquipmentRoundTripsThroughASaveAsAnObject() throws {
+        let store = GameStore(io: .temporary(name: "equip-\(UUID().uuidString)"))
+        store.mutate("test: wear it") { $0.base.companion.equipped[.weapon] = "blade_keen" }
+
+        let data = try SaveCodec.encode(store.state)
+        let text = try XCTUnwrap(String(data: data, encoding: .utf8))
+        XCTAssertTrue(text.contains("\"weapon\" : \"blade_keen\"")
+                      || text.contains("\"weapon\": \"blade_keen\""),
+                      "equipment didn't encode as a readable object")
+
+        let reloaded = try SaveCodec.decode(data)
+        XCTAssertEqual(reloaded.base.companion.equipped[.weapon], "blade_keen")
+    }
+
+    func testAStationAddedAfterASaveWasWrittenStillAppears() throws {
+        // The Library was invisible on any save written before it existed, because a station missing
+        // from the save's dictionary defaulted to locked rather than to what the catalog says.
+        var state = GameState.newGame()
+        state.base.stations = [:]
+        for station in ContentCatalog.shared.stations where station.unlockedAtStart {
+            XCTAssertTrue(state.base.station(station.id).isUnlocked,
+                          "\(station.id.rawValue) would be invisible on an older save")
+        }
+    }
 }

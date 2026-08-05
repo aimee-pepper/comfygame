@@ -822,3 +822,20 @@ Suggested distribution: ordinary gear from encounters and common finds; **notabl
 
 - `materials-crafting-spec.md` §6 — building list superseded (see §3 above).
 - Research content — the Forge branch needs removing; its non-party contents may need rehoming.
+
+---
+
+## A recruited specialist unlocks the ability to *build* the building (Aimee, 5 Aug 2026)
+
+Answers the open question in session 12 §3. A specialist is **not** the building, and recruiting one
+does not conjure a workshop. **Finding the smith unlocks the ability to build the smithy** — you
+still have to build it.
+
+Consequences worth building on:
+
+- Recruiting stays a story beat rather than becoming a construction order.
+- Building remains a real cost, so a recruited specialist is a *door opening*, not a reward handed
+  over. That keeps the base a place you develop rather than a list that fills in.
+- It means two separate progressions have to be tracked: who you have found, and what you have
+  built. A specialist recruited but whose building you can't afford yet is a legitimate, and
+  probably common, state.

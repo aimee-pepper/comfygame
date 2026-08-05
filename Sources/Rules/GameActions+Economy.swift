@@ -206,6 +206,29 @@ extension GameStore {
         }
     }
 
+    /// What wearing this would change, in the units the fight actually uses.
+    ///
+    /// A tier number only answers "is this better?" if you already know the formula. This answers
+    /// it directly: **+4 damage**, or **−2 protection**, or no change at all.
+    func gearDelta(wearing candidate: ItemDef) -> Int {
+        guard let gear = candidate.gear else { return 0 }
+        let wornTier = state.base.companion.equipped[gear.slot]
+            .flatMap { ContentCatalog.shared.item($0)?.gear?.tier } ?? 0
+        let step = gear.slot == .weapon
+            ? Tuning.Encounter.attackPerWeaponTier
+            : Tuning.Encounter.defencePerArmorTier
+        return (gear.tier - wornTier) * step
+    }
+
+    /// Whether anything in the Storehouse would be an upgrade — drives the nudge on the Party card
+    /// so a better blade doesn't sit in a list going unnoticed.
+    func hasUpgradeAvailable(for slot: GearSlot) -> Bool {
+        wearable(in: slot).contains { stack in
+            guard let item = ContentCatalog.shared.item(stack.catalogID) else { return false }
+            return gearDelta(wearing: item) > 0
+        }
+    }
+
     /// Put something on. The piece it replaces goes back to the Storehouse rather than vanishing.
     func equip(_ stack: ItemStack) {
         guard let slot = ContentCatalog.shared.item(stack.catalogID)?.gear?.slot else { return }

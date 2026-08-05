@@ -102,6 +102,7 @@
 		E412FF242D7E09BD9DBB75E8 /* gambit_components.json in Resources */ = {isa = PBXBuildFile; fileRef = 6AE18B24DF2998D5D65F61D0 /* gambit_components.json */; };
 		E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */; };
 		E90526D391BEDFC1166DCE96 /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19DC1448710810CD318671E /* Identifiers.swift */; };
+		EAB84410DBECDF38B16E452B /* GearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B71324BA8EC6B7B6732500 /* GearView.swift */; };
 		EB5A7F017737E52E163C9A5C /* CombatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F395689728B586E0D0A7CD61 /* CombatTests.swift */; };
 		EDF26461D4FD581D2BCFBB0A /* DeterminismTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51FE4FBAB98280181089C56 /* DeterminismTests.swift */; };
 		EFB68320FEF123CBC8309B55 /* RuleBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */; };
@@ -224,6 +225,7 @@
 		E19DC1448710810CD318671E /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		E1BB569F0B672F268545701C /* SiteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteTests.swift; sourceTree = "<group>"; };
 		F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryRules.swift; sourceTree = "<group>"; };
+		F1B71324BA8EC6B7B6732500 /* GearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearView.swift; sourceTree = "<group>"; };
 		F395689728B586E0D0A7CD61 /* CombatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTests.swift; sourceTree = "<group>"; };
 		F43DADDF1091E89318A12B0D /* ContradictionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionTests.swift; sourceTree = "<group>"; };
 		F978ADFABDF1296849D8F5AB /* GambitEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GambitEngine.swift; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 				346EEEC616B8EBFE291C4A79 /* BaseView.swift */,
 				BE933E91275B1FF990B69BAA /* EncounterView.swift */,
 				1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */,
+				F1B71324BA8EC6B7B6732500 /* GearView.swift */,
 				2CBCB8652F20B361959F9B5C /* LibraryView.swift */,
 				CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */,
 				39D5618B6B6F36DB62CD836B /* PageGridView.swift */,
@@ -597,6 +600,7 @@
 				3939EA44678C9E3D7CE7FF86 /* GameActions.swift in Sources */,
 				BFB3CF53CC01D5CED466B0C9 /* GameState.swift in Sources */,
 				AD06A15C582B042710CEED9F /* GameStore.swift in Sources */,
+				EAB84410DBECDF38B16E452B /* GearView.swift in Sources */,
 				4DEB17BC13834B4612226A7B /* HarnessActions.swift in Sources */,
 				983452CD1EE2126ECB5B1973 /* HarnessView.swift in Sources */,
 				E90526D391BEDFC1166DCE96 /* Identifiers.swift in Sources */,

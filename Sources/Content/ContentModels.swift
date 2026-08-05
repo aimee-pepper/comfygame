@@ -175,11 +175,17 @@ struct GearDef: Codable, Equatable, Sendable {
     var tier: Int
 }
 
-enum GearSlot: String, Codable, CaseIterable, Sendable {
+/// `CodingKeyRepresentable` so `[GearSlot: ItemID]` encodes as a JSON *object* rather than the
+/// flat alternating array Swift uses by default — the same reason `StringIdentifier` conforms.
+/// Saves stay readable, and a hand-edited one round-trips.
+enum GearSlot: String, Codable, CaseIterable, Sendable, CodingKeyRepresentable {
     case weapon, armor
 
     var displayName: String { self == .weapon ? "Weapon" : "Armor" }
     var icon: String { self == .weapon ? "hammer" : "shield" }
+
+    var codingKey: CodingKey { StringCodingKey(rawValue) }
+    init?<T: CodingKey>(codingKey: T) { self.init(rawValue: codingKey.stringValue) }
 }
 
 /// A stackable resource. Never consumes an inventory slot.

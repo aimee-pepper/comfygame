@@ -177,13 +177,10 @@ struct WorkshopView: View {
     }
 }
 
-/// One equipment slot: what's worn, and what else could be.
-///
-/// Gear is **found, never researched** (decisions-session-12) — so this is a picker over what you
-/// have hauled home, not a purchase. Better pieces come from sites, especially ruins, where they
-/// read as something left behind by someone.
+/// One equipment slot on the Party screen: what's worn, and whether something better is waiting.
 private struct GearSlotRow: View {
     @EnvironmentObject private var store: GameStore
+    @State private var isChoosing = false
     let slot: GearSlot
 
     private var worn: ItemDef? {
@@ -191,31 +188,38 @@ private struct GearSlotRow: View {
     }
 
     var body: some View {
-        let options = store.wearable(in: slot)
-        Menu {
-            ForEach(options) { stack in
-                Button(stack.displayName) { store.equip(stack) }
-            }
-            if worn != nil {
-                Divider()
-                Button("Take it off", role: .destructive) { store.unequip(slot) }
-            }
-        } label: {
+        Button { isChoosing = true } label: {
             HStack(spacing: 10) {
                 Image(systemName: worn?.icon ?? slot.icon)
-                    .foregroundStyle(worn == nil ? Color.secondary : Color.accentColor)
+                    .foregroundStyle(worn?.rarity.tint ?? Color.secondary)
                     .frame(width: 22)
-                Text(worn?.name ?? slot.displayName)
-                    .foregroundStyle(worn == nil ? Color.secondary : Color.primary)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(worn?.name ?? slot.displayName)
+                        .foregroundStyle(worn == nil ? Color.secondary : worn!.rarity.tint)
+                    if let worn, let tier = worn.gear?.tier {
+                        Text("tier \(tier)").font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
                 Spacer()
-                Text(worn.map { "tier \($0.gear?.tier ?? 0)" } ?? (options.isEmpty ? "nothing to wear" : "choose"))
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                // The nudge: a better piece sitting unworn in the Storehouse should not be
+                // something you have to go looking for.
+                if store.hasUpgradeAvailable(for: slot) {
+                    Text("something better")
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.green)
+                        .padding(.horizontal, 7).padding(.vertical, 3)
+                        .background(Color.green.opacity(0.14), in: Capsule())
+                }
+                Image(systemName: "chevron.right")
+                    .font(.caption2).foregroundStyle(.tertiary)
             }
             .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
-        .disabled(options.isEmpty && worn == nil)
+        .buttonStyle(.plain)
+        .sheet(isPresented: $isChoosing) {
+            GearView(slot: slot).environmentObject(store)
+        }
     }
 }
 
