@@ -126,15 +126,54 @@ final class DescriptionTests: XCTestCase {
         XCTAssertEqual(ground.polarity, .stabilising)
     }
 
-    // MARK: Contradictions are named, not folded into a number
+    // MARK: Attribution is earned, not given
 
-    func testAContradictionAppearsByName() {
+    /// Session 8, and a correction to how this shipped: opacity is the *joy*. Working out what your
+    /// own writing did to a world is the game, so the panel starts out describing and nothing more.
+    func testANewPlayerIsToldSomethingIsWrongButNotWhat() {
         let page = [Sigil(id: InstanceID(rawValue: 1), source: "sun", target: "illumination",
                           intensity: .great, negatedTargets: ["thermal"])]
-        let description = DescriptionRules.describe(page: page)
-        XCTAssertEqual(description.contradictions.map(\.name), ["A sun that does not warm"])
-        // And it stays out of the prose — it's its own line, in its own colour.
+        let description = DescriptionRules.describe(page: page)   // starting tier
+
+        XCTAssertFalse(description.contradictions.isEmpty, "the contradiction still happened")
+        XCTAssertTrue(description.namedContradictions.isEmpty, "it was named far too early")
+        XCTAssertTrue(description.hasUnreadableWrongness, "the player got no signal at all")
+        XCTAssertFalse(description.showsAttribution, "red/green underlining is tier 4")
+    }
+
+    func testAContradictionIsNamedOnceYouCanReadThatFar() {
+        let page = [Sigil(id: InstanceID(rawValue: 1), source: "sun", target: "illumination",
+                          intensity: .great, negatedTargets: ["thermal"])]
+        let description = DescriptionRules.describe(page: page,
+                                                    analysisTier: Tuning.Analysis.attributionTier)
+        XCTAssertEqual(description.namedContradictions.map(\.name), ["A sun that does not warm"])
+        XCTAssertTrue(description.showsAttribution)
+        XCTAssertFalse(description.hasUnreadableWrongness)
+        // Still its own line, never folded into the prose.
         XCTAssertFalse(description.sentence.contains("does not warm"))
+    }
+
+    /// The half that must work from the very first book: description is what a clue gets matched
+    /// against, so it can't be gated behind anything.
+    func testDescriptionItselfNeverDependsOnTheAnalysisTier() {
+        let page = [
+            Sigil(id: InstanceID(rawValue: 1), source: "glacier", target: "hydrology", intensity: .overwhelming),
+            Sigil(id: InstanceID(rawValue: 2), source: "ice", target: "thermal", intensity: .overwhelming)
+        ]
+        let novice = DescriptionRules.describe(page: page, analysisTier: Tuning.Analysis.startingTier)
+        let adept = DescriptionRules.describe(page: page, analysisTier: Tuning.Analysis.livingTier)
+        XCTAssertEqual(novice.clauses.map(\.id), adept.clauses.map(\.id))
+        XCTAssertEqual(novice.sentence, adept.sentence)
+    }
+
+    @MainActor
+    func testTheDeskShowsWhatThePlayerCanActuallyRead() {
+        let store = GameStore(io: .temporary(name: "analysis-\(UUID().uuidString)"))
+        XCTAssertEqual(store.state.reality.analysisTier, Tuning.Analysis.startingTier)
+        XCTAssertFalse(store.bookProjection.worldDescription.showsAttribution)
+
+        store.mutate("test: better instruments") { $0.reality.analysisTier = Tuning.Analysis.attributionTier }
+        XCTAssertTrue(store.bookProjection.worldDescription.showsAttribution)
     }
 
     func testAnHonestWorldNamesNoContradictions() {
@@ -142,7 +181,10 @@ final class DescriptionTests: XCTestCase {
             Sigil(id: InstanceID(rawValue: 1), source: "sun", target: "illumination", intensity: .overwhelming),
             Sigil(id: InstanceID(rawValue: 2), source: "glacier", target: "hydrology", intensity: .overwhelming)
         ]
-        XCTAssertTrue(DescriptionRules.describe(page: page).contradictions.isEmpty)
+        let description = DescriptionRules.describe(page: page,
+                                                    analysisTier: Tuning.Analysis.attributionTier)
+        XCTAssertTrue(description.contradictions.isEmpty)
+        XCTAssertFalse(description.hasUnreadableWrongness, "an honest world must not feel wrong")
     }
 
     // MARK: The desk shows the same world the bind produces

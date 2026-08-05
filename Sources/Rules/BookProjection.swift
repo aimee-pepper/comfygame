@@ -1,7 +1,12 @@
 import Foundation
 
 /// Everything the Writing Desk shows before the player commits — pillar 5, legibility before
-/// commitment (the fix for Mystcraft's #1 flaw).
+/// commitment.
+///
+/// Legible about **what you are spending and risking**, which is not the same as explaining the
+/// world to you. What a world turns out to be is meant to be discovered by writing and looking
+/// (decisions-session-8): the price is exact, the outcome is ranged, and *why* it came out that way
+/// is earned through the analysis axis rather than printed here.
 ///
 /// The interesting decision here: **an unfilled slot produces a range, not a guess.** Two locked
 /// rules pull against each other — empty slots are random-filled as a *surprise*, and the player
@@ -71,7 +76,8 @@ struct BookProjection {
     /// projection can be *exact* about it rather than hedging with a range.
     static func project(draft: BookDraft,
                         ownedSymbols: Set<SymbolID>,
-                        seed: UInt64 = 0) -> BookProjection {
+                        seed: UInt64 = 0,
+                        analysisTier: Int = Tuning.Analysis.startingTier) -> BookProjection {
         let plans = ContentCatalog.shared.slotIDsInOrder.map { slot in
             SlotPlan(
                 slot: slot,
@@ -129,7 +135,8 @@ struct BookProjection {
             mapHeight: Tuning.World.gridHeight,
             worldDescription: DescriptionRules.describe(
                 readings,
-                contradictions: ContradictionRules.fired(in: sigils, readings: readings)
+                contradictions: ContradictionRules.fired(in: sigils, readings: readings),
+                analysisTier: analysisTier
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: book.allSymbolIDs),
             resourceMix: expectedResourceMix(plans),

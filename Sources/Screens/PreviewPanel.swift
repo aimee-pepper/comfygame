@@ -25,7 +25,7 @@ struct PreviewPanel: View {
                 .padding(-14)
             }
             stabilityBlock
-            if projection.dangerCapShortfall > 0 {
+            if projection.dangerCapShortfall > 0, projection.worldDescription.showsAttribution {
                 Text("Danger runes can only buy so much time: −\(projection.dangerCapShortfall) of what they offer.")
                     .font(.caption)
                     .foregroundStyle(.orange)

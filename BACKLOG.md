@@ -58,6 +58,14 @@
 - [x] Q10 banking overflow → Storehouse spillover, never lost silently (ruled, session 5 audit)
 - [x] 44pt audit, thumb-zone action bar (haptics + full acceptance pass still open — needs the on-device force-quit test)
 
+## Analysis — the third progression axis (decisions-session-8)
+- [x] Analysis tiers stored in Reality; description always describes, attribution is gated
+- [x] Red/green underlining and named contradictions moved to tier 4, where they belong
+- [ ] Field instruments — per-target, crafted, grade affects precision
+- [ ] The page lens — predicts from readings you've already taken; field work feeds it
+- [ ] Readings as permanent knowledge, stored like specimens (observation stored, meaning derived)
+- [ ] Tiers 2, 3 and 5 (readable targets, sigil attribution incl. secondaries, the living layer)
+
 ## Contradiction, danger and the description panel
 - [x] Contradiction as an enumerated catalogue, never computed from opposed magnitude
 - [x] World-description panel with red/green underlining and named contradictions

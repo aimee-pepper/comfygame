@@ -504,3 +504,147 @@ Flagged so they aren't mistaken for decisions. In rough order of how much rests 
 eight read as "a list wearing a sentence's clothes"; Aimee's ruling is that there's nothing wrong
 with the long version. Cap removed. The natural bound is one clause per pressure target, so a world
 that is remarkable in eight ways says eight things.
+
+---
+
+## Session 8 (2026-08-05)
+---
+
+## 1. Correcting a premise Claude repeated
+
+Claude has repeatedly written that **opacity was Mystcraft's real failure** and designed around "fixing" it. **That is wrong and should be struck from the docs wherever it appears** (`writing-system-rune-spec.md`, `pressure-model.md`, `contradiction-danger-spec.md` §6, `decisions-session-*`).
+
+**Aimee, who played it:** opacity was the *joy*. Figuring out what your own writing had done to a world is the game, not a usability problem to be solved.
+
+Design consequence: **do not front-load explanation.** The player is meant to write half-blind at first and learn by observing.
+
+---
+
+## 2. Implicit secondary effects — CONFIRMED, and **discovered, not printed**
+
+A source bound to one target also affects others (Sun bound to Illumination also warms; Magma feeds Substrate; Canopy lowers Vitality's light ceiling). This stands — it's what makes the system causal rather than a set of sliders, and it's what gives contradiction something to negate.
+
+**Secondaries are NOT listed on the rune.** A Sun rune does not read "light, and warmth." You write suns for a while and work out that your worlds keep coming out hot. That realisation is content.
+
+---
+
+## 3. Analysis is a third progression axis
+
+Alongside **vocabulary** (what you can say) and **page space** (how much you can say), there is now **analysis** — how much you can *read*. Unlocked over the game, so the same book is a different object depending on how well you can read it.
+
+**Rough tiers** (order decided; exact contents **[PLACEHOLDER]**):
+
+1. **Qualitative only.** The world-description panel gives sensations, no numbers. "Frozen over. Little light."
+2. **Targets become readable.** You can see where a world sits on illumination, thermal, and so on.
+3. **Attribution.** Which sigils are responsible for what — *including secondaries*. This is where "the sun has been heating my worlds all along" clicks.
+4. **Instability broken out.** Greed vs. contradiction, and which contributor is which. **The red/green underlining lives here**, not at the start.
+5. **The living layer.** Trait distributions, why this world grows what it grows, predicted spawns.
+
+**The world-description panel always *describes*; what it *attributes* grows with what you've unlocked.** That keeps its deduction job (matching a clue's description to a world's description) intact from the very beginning, while attribution is earned.
+
+---
+
+## 4. Instruments — analysis is crafted, not researched
+
+Analysis comes from **instruments**, crafted from materials, mirroring how pens and inks gate writing. Reading and writing are symmetrical: both crafted, both material-gated.
+
+### 4.1 Field instruments — measure a world you're standing in
+
+- Carried into a world; take readings **after generation**.
+- **Per-target** — a thermometer reads thermal, a hygrometer reads water, and so on. More of them, collectible, each needing materials with matching properties.
+- **Grade matters.** A fine instrument reads more precisely than a crude one. This gives material grade a job beyond gear.
+- **[OPEN]** whether they occupy gear slots or have their own carry allowance.
+
+### 4.2 The page lens — predict before you spend
+
+- A desk instrument. Shows the impact of runes **as you build and change the page**, so you can calibrate before binding and stop wasting materials on experiments.
+- Later-game. Its arrival is a real progression beat: you stop discovering what you made and start deciding it.
+- **The lens only shows you what you have already measured.** Field readings *feed* it. So field work and prediction are **one progression**, not two systems — early measuring is visibly building toward something.
+- Field instruments aren't made worthless; they're superseded gradually, target by target, as your readings accumulate.
+
+### 4.3 Readings are permanent knowledge
+
+**Field readings become permanent, like specimens.** Measuring thermal in a volcanic world teaches you about volcanic worlds generally.
+
+Same storage rule as the bestiary: **store the observation, derive the meaning.** Readings live in the Reality layer and are never taken away — consistent with "knowledge is never taken back."
+
+This connects readings to the specimen model directly and means the analysis axis is built on machinery that already exists.
+
+---
+
+## 5. Consequences for existing docs
+
+- `contradiction-danger-spec.md` §6 — the description panel's red/green underlining is **tier 4**, not a starting feature. The panel still ships early, describing only.
+- Any doc claiming the game should explain instability up front — revise. Explanation is earned.
+- `materials-crafting-spec.md` — instruments join pens, inks and book covers as crafted goods. The Blacksmith and Apothecary are the likely makers; **[OPEN]** whether a dedicated station is wanted.
+
+---
+
+## 6. Open
+
+1. Do field instruments take gear slots, or a separate allowance?
+2. Which building crafts instruments?
+3. Do instrument *grades* map to the analysis tiers, or are tiers separate unlocks that grade only sharpens?
+4. Can readings be shared/traded, or found in ruins as someone else's notes?
+
+---
+
+## Session 9 (2026-08-05)
+The plot is not settled and Aimee is not ready to settle it. What follows is the part that is, plus the mechanical rules that follow from it. Everything marked **[UNDECIDED]** should stay open — don't propose resolutions.
+
+---
+
+## 1. The Atlas — what was broken
+
+There was an **Atlas of the known world** that anchored all the realms together. It was **stolen and destroyed**, and that caused the **sundering**.
+
+**The great work is rebuilding it.** This replaces the invented "5–7 components, each needing a rare material plus a person's knowledge."
+
+Why this is stronger: the player has been rebinding a book the whole game. Every world written is a page; the Atlas is the binding that held them together. It also explains the existing systems without strain:
+
+- **Named places** persist because they were Atlas pages and still partly hold.
+- **Travellers** were scattered because the connections between realms snapped.
+- **Old ruins** belong to the people who maintained it.
+- **Instability** is what worlds do without an Atlas holding them.
+- **Anchoring is literal** — you aren't preserving a world, you're re-binding it into the Atlas.
+
+## 2. Progress is measured in realms re-anchored
+
+A unit of progress is **a realm restored**, not a part assembled: find the people who knew that realm, write your way back to it, bind it in.
+
+This makes the great work's structure the same shape as the rest of the game rather than a parallel crafting track, and it fits restoration as the theme.
+
+## 3. The cult
+
+**Someone — likely a cult — stole the Atlas.** Some died in the sundering; some were **scattered like everyone else**; some **survive and still work against restoration**.
+
+Consequences worth building on:
+
+- They are **stranded too**. That keeps the melancholy intact and means opposition never becomes a siege.
+- Their antagonism is expressed in the game's own language: **un-anchoring, tearing pages out** — not combat set-pieces.
+- **Some ruins are cult ruins**, and their diaries scatter exactly like everyone else's. You may complete a diary and only then realise whose it was. Costs nothing to build; the diary system already exists.
+- **Cultists appear as both mobs and NPCs.**
+- **A turned cult member or two can be recruited** — people whose experience of the sundering changed their minds. Their diaries record that turn happening across scattered pages, and early pages may be read without knowing who wrote them.
+
+## 4. FINALITY RULE — treat as a pillar
+
+**The cult can never un-anchor anything the player has anchored. Completing something is final and must feel secure.**
+
+Reversal is stressful and unfun and is out of bounds — the same principle as knowledge never being taken back.
+
+**So opposition is friction toward things not yet done, never reversal of things done.** Acceptable expressions:
+
+- Realms *they* un-anchored (past tense) are harder to reach or restore
+- They already hold or sit on things you want
+- They interfere with a restoration **in progress**, never a finished one
+
+All of that lands as difficulty. None of it takes anything away.
+
+## 5. [UNDECIDED] — leave open
+
+- **Why they wanted the sundering**, or whether it was incidental to something going wrong during the theft. Aimee's note: possibly leave genuinely uncertain, with the surviving cult **disagreeing among themselves** — some insisting it went as intended, others knowing it didn't. Their diaries can contradict each other while every page stays honest, and the question can be deferred indefinitely.
+- What is coming, if anything.
+- Whether the great work ends in completion, confrontation, or choice.
+- How many realms the Atlas needs.
+
+**Do not propose resolutions to these.** Aimee will decide when she has a firm direction.

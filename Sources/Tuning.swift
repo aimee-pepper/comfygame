@@ -202,6 +202,24 @@ enum Tuning {
         static let maximumStabilityGift: Int = 40    // PLACEHOLDER
     }
 
+    /// The third progression axis, alongside vocabulary and page space: how much you can *read*
+    /// (decisions-session-8). Unlocked by crafted instruments, so the same book is a different
+    /// object depending on how well you can read it.
+    enum Analysis {
+        /// Tier 1 — qualitative only. Sensations, no numbers, no attribution. Deliberately where
+        /// everyone starts: the player is meant to write half-blind and learn by observing.
+        static let startingTier: Int = 1
+        /// Tier 2 — targets become readable.  [not built]
+        static let targetsTier: Int = 2
+        /// Tier 3 — attribution: which sigils are responsible for what, secondaries included.
+        static let sigilAttributionTier: Int = 3
+        /// Tier 4 — instability broken out, greed versus contradiction. **The red/green
+        /// underlining lives here**, not at the start.
+        static let attributionTier: Int = 4
+        /// Tier 5 — the living layer: trait distributions, predicted spawns.  [not built]
+        static let livingTier: Int = 5
+    }
+
     enum Contradiction {
         /// The disclosed superlinear term. Small: it exists to say "several at once is worse than
         /// several separately", not to make stacking unthinkable.

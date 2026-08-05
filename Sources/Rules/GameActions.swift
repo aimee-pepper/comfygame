@@ -27,7 +27,8 @@ extension GameStore {
     var bookProjection: BookProjection {
         BookProjection.project(draft: state.base.bookDraft,
                                ownedSymbols: state.base.ownedSymbols,
-                               seed: state.worlds.seeds.peekNextSeed())
+                               seed: state.worlds.seeds.peekNextSeed(),
+                               analysisTier: state.reality.analysisTier)
     }
 
     /// The price is exact before committing — a slot left to chance costs a flat rate whatever

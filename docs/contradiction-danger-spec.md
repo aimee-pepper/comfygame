@@ -139,7 +139,9 @@ Generated as the player places symbols, updating continuously. This is the panel
 
 So the description doubles as the instability explanation, without a separate table of numbers. You read *why* a world is fragile in the same sentence that tells you what it's like.
 
-**Contradictions get named explicitly** as their own line, not folded into a number: *"The sun you have written does not warm."* Mystcraft's real failure was that you couldn't tell why a world was unstable; this is the fix.
+**Contradictions get named explicitly** as their own line, not folded into a number: *"The sun you have written does not warm."*
+
+**But naming them is tier-4 analysis** (session 8), not a starting feature. Early on the panel says only that something here is wrong; *what* is wrong is something you work out, or later something you can read. Opacity is the joy — figuring out what your own writing did to a world is the game, not a usability problem.
 
 **[PROPOSAL]** If per-clause colour proves fiddly, fall back to: plain description + a separate short list of named contributors, red and green. Less elegant, same information.
 

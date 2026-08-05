@@ -175,6 +175,8 @@ struct HarnessView: View {
                 .padding(.bottom, 4)
 
             HarnessButton("Find a mote", icon: "star.fill") { store.harnessGainMote() }
+            HarnessButton("Analysis tier: \(store.state.reality.analysisTier) of \(Tuning.Analysis.livingTier)",
+                          icon: "eyeglasses") { store.harnessCycleAnalysisTier() }
         }
     }
 

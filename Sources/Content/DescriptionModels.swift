@@ -39,10 +39,22 @@ struct DescriptionClauseDef: Codable, Equatable, Identifiable, Sendable {
 /// What the panel shows: prose about the world, plus any contradictions named outright.
 struct WorldDescription: Equatable, Sendable {
     var clauses: [DescriptionClauseDef]
-    /// Named explicitly, never folded into a number. Mystcraft's real failure was that you couldn't
-    /// tell *why* a world was unstable; this is the fix.
+    /// What the world contradicts. **Shown by name only at analysis tier 4** — below that the
+    /// player is told something is wrong and left to work out what. Figuring out what your own
+    /// writing did to a world is the game, not a usability problem (decisions-session-8).
     var contradictions: [ContradictionDef]
+    /// How well the player can currently *read* a world. Attribution grows with it; description
+    /// never does, so the panel's deduction job works from the very first book.
+    var analysisTier: Int = Tuning.Analysis.startingTier
 
     var sentence: String { clauses.map(\.text).joined(separator: " ") }
     var isEmpty: Bool { clauses.isEmpty && contradictions.isEmpty }
+
+    /// Whether the panel may say *which* things are destabilising — the red/green underlining.
+    var showsAttribution: Bool { analysisTier >= Tuning.Analysis.attributionTier }
+    /// Contradictions the player can currently read by name.
+    var namedContradictions: [ContradictionDef] { showsAttribution ? contradictions : [] }
+    /// Below the attribution tier a contradiction still *registers* — you can tell the world is
+    /// wrong, you just can't tell how. Describing without attributing is the panel's whole job.
+    var hasUnreadableWrongness: Bool { !showsAttribution && !contradictions.isEmpty }
 }

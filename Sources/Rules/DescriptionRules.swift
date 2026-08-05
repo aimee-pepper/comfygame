@@ -13,7 +13,8 @@ enum DescriptionRules {
     /// look. A description whose clauses shuffled by strength would be much harder to compare
     /// against a hint page.
     static func describe(_ readings: PressureReadings,
-                         contradictions: [ContradictionDef] = []) -> WorldDescription {
+                         contradictions: [ContradictionDef] = [],
+                         analysisTier: Int = Tuning.Analysis.startingTier) -> WorldDescription {
         let matching = ContentCatalog.shared.descriptionClauses.filter { $0.holds(in: readings) }
         let byGroup = Dictionary(grouping: matching, by: \.group)
 
@@ -25,14 +26,18 @@ enum DescriptionRules {
                 (lhs.priority, lhs.id) < (rhs.priority, rhs.id)
             }
         }
-        return WorldDescription(clauses: clauses, contradictions: contradictions)
+        return WorldDescription(clauses: clauses, contradictions: contradictions,
+                                analysisTier: analysisTier)
     }
 
     /// Describes what a page says, contradictions included.
-    static func describe(page sigils: [Sigil], seed: UInt64? = nil) -> WorldDescription {
+    static func describe(page sigils: [Sigil], seed: UInt64? = nil,
+                         analysisTier: Int = Tuning.Analysis.startingTier) -> WorldDescription {
         let readings = seed.map { PressureRules.resolve(sigils, fillingUnwrittenWith: $0) }
             ?? PressureRules.resolve(sigils)
-        return describe(readings, contradictions: ContradictionRules.fired(in: sigils, readings: readings))
+        return describe(readings,
+                        contradictions: ContradictionRules.fired(in: sigils, readings: readings),
+                        analysisTier: analysisTier)
     }
 
     /// Group order follows the targets, with each group named for the target it describes.

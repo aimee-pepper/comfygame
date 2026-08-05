@@ -15,6 +15,15 @@ struct RealityState: Codable, Equatable, Sendable {
     /// Permanent tallies. Turn/run counts only — never wall-clock (pillar 2).
     var lifetime: LifetimeStats = LifetimeStats()
 
+    /// How well the player can *read* a world — the third progression axis, alongside vocabulary
+    /// and page space (decisions-session-8).
+    ///
+    /// In the Reality layer because readings are permanent knowledge, like specimens: measuring
+    /// thermal in a volcanic world teaches you about volcanic worlds generally, and knowledge is
+    /// never taken back. Raised by crafted instruments, which aren't built yet — so for now this
+    /// only ever sits at the starting tier, and the Harness can push it up to see the later panels.
+    var analysisTier: Int = Tuning.Analysis.startingTier
+
     static func newGame() -> RealityState { RealityState() }
 
     // MARK: Derived unlocks
@@ -46,6 +55,8 @@ struct RealityState: Codable, Equatable, Sendable {
         constellation = try container.decodeIfPresent([ConstellationNodeID: Int].self, forKey: .constellation) ?? [:]
         discovery = try container.decodeIfPresent(DiscoveryLog.self, forKey: .discovery) ?? DiscoveryLog()
         lifetime = try container.decodeIfPresent(LifetimeStats.self, forKey: .lifetime) ?? LifetimeStats()
+        analysisTier = try container.decodeIfPresent(Int.self, forKey: .analysisTier)
+            ?? Tuning.Analysis.startingTier
     }
 }
 

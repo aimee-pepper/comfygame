@@ -9,11 +9,13 @@ import SwiftUI
 ///    *"Blazing overhead, and nowhere to be out of it."* The player matches description to
 ///    description. That's why it never renders a condition list and never names a sigil or a value
 ///    — reading it has to be the same act as reading a diary page.
-/// 2. **It explains the instability.** Clauses arising from destabilising conditions are underlined
-///    red, stabilising ones green, so *why* a world is fragile is legible in the same sentence that
-///    says what it's like. Mystcraft's real failure was that you couldn't tell why; this is the fix.
+/// 2. **It explains the instability — but only once you can read that far.** The red/green
+///    underlining and the named contradictions are **tier 4** on the analysis axis
+///    (decisions-session-8), not a starting feature. Early on the panel describes and nothing more.
 ///
-/// Contradictions get their own named lines rather than being folded into a number.
+/// That split is the point. Working out what your own writing did to a world *is* the game, so
+/// explanation is earned rather than front-loaded — while the description half, which is what a
+/// clue gets matched against, works from the very first book.
 struct WorldDescriptionPanel: View {
     let description: WorldDescription
     /// The disclosed superlinear stacking term (§3). Shown separately because hidden
@@ -32,9 +34,17 @@ struct WorldDescriptionPanel: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityLabel(description.sentence)
 
-            if !description.contradictions.isEmpty {
+            if description.hasUnreadableWrongness {
+                // Something is wrong and you can't yet tell what. Deliberately unattributed.
+                Text("Something about this world does not sit right.")
+                    .font(.callout.italic())
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if !description.namedContradictions.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
-                    ForEach(description.contradictions) { contradiction in
+                    ForEach(description.namedContradictions) { contradiction in
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.caption2)
@@ -71,7 +81,7 @@ struct WorldDescriptionPanel: View {
         var result = AttributedString()
         for (index, clause) in description.clauses.enumerated() {
             var run = AttributedString(clause.text)
-            if let colour = underline(for: clause.polarity) {
+            if description.showsAttribution, let colour = underline(for: clause.polarity) {
                 run.underlineStyle = Text.LineStyle(pattern: .solid, color: colour)
             }
             if index > 0 { result += AttributedString(" ") }
