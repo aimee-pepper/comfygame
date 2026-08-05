@@ -17,21 +17,15 @@ enum DescriptionRules {
         let matching = ContentCatalog.shared.descriptionClauses.filter { $0.holds(in: readings) }
         let byGroup = Dictionary(grouping: matching, by: \.group)
 
-        let best = groupOrder.compactMap { group in
+        // Say everything there is to say. One clause per group already bounds this at the number
+        // of pressure targets, and Aimee's call (5 Aug) is that a description running the full
+        // length reads fine — a world that is remarkable in eight ways should say eight things.
+        let clauses = groupOrder.compactMap { group in
             byGroup[group]?.max { lhs, rhs in
                 (lhs.priority, lhs.id) < (rhs.priority, rhs.id)
             }
         }
-
-        // Eight clauses is a list wearing a sentence's clothes. Keep the most *telling* ones —
-        // priority is exactly "how much this says about the place", and the fallbacks sit at 1 —
-        // then put them back in target order so the sentence still reads the same way every time.
-        let kept = Set(best.sorted { ($0.priority, $1.id) > ($1.priority, $0.id) }
-            .prefix(Tuning.Description.maximumClauses)
-            .map(\.id))
-
-        return WorldDescription(clauses: best.filter { kept.contains($0.id) },
-                                contradictions: contradictions)
+        return WorldDescription(clauses: clauses, contradictions: contradictions)
     }
 
     /// Describes what a page says, contradictions included.

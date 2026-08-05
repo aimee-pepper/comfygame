@@ -497,3 +497,10 @@ Flagged so they aren't mistaken for decisions. In rough order of how much rests 
 8. **Permanent-loss policy** — the whole table.
 9. **The 149-rune vocabulary** — reviewed only in part.
 10. **System-shaping calls** — source characters, cross-target constraints, energy budget, material properties, crafting buildings, gear slots, site categories, unidentified-compound reveal rule, page size and footprints.
+
+### World-description length (Aimee, 5 Aug 2026)
+
+**A full-length description is fine.** Claude capped the panel at five clauses on the grounds that
+eight read as "a list wearing a sentence's clothes"; Aimee's ruling is that there's nothing wrong
+with the long version. Cap removed. The natural bound is one clause per pressure target, so a world
+that is remarkable in eight ways says eight things.

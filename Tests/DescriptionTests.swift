@@ -69,26 +69,19 @@ final class DescriptionTests: XCTestCase {
         }
     }
 
-    /// The spec's example is three clauses. Eight is a list wearing a sentence's clothes, and it
-    /// stops reading like something a person wrote down.
-    func testADescriptionStaysShortEnoughToRead() {
-        for seed in UInt64(1)...120 {
-            let count = DescriptionRules.describe(page: [], seed: seed).clauses.count
-            XCTAssertLessThanOrEqual(count, Tuning.Description.maximumClauses,
-                                     "seed \(seed) produced a \(count)-clause wall of text")
-        }
-    }
-
-    func testTheMostTellingClausesAreTheOnesKept() {
-        // A world that is frozen *and* has ordinary relief should lead with the frozenness.
+    /// A description says as much as there is to say — bounded by one clause per subject, not by a
+    /// length limit (Aimee, 5 Aug). What it must not do is say something *duller* than it could.
+    func testTheMostTellingClauseWinsWithinASubject() {
+        // Frozen over and gently broken are both true of a glacier world. Within Hydrology, the
+        // frozenness has to beat the generic "water enough" fallback.
         let page = [
             Sigil(id: InstanceID(rawValue: 1), source: "glacier", target: "hydrology", intensity: .overwhelming),
             Sigil(id: InstanceID(rawValue: 2), source: "ice", target: "thermal", intensity: .overwhelming)
         ]
         let description = DescriptionRules.describe(page: page)
         XCTAssertTrue(description.clauses.contains { $0.id == "frozen_over" })
-        XCTAssertFalse(description.clauses.contains { $0.id == "gently_broken" },
-                       "a filler clause crowded out something worth saying")
+        XCTAssertFalse(description.clauses.contains { $0.id == "water_enough" },
+                       "the fallback beat the clause that actually said something")
     }
 
     func testOneClausePerGroupAtMost() {
