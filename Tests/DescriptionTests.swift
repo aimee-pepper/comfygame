@@ -233,4 +233,97 @@ final class DescriptionTests: XCTestCase {
         XCTAssertGreaterThan(rolled.clauses.count, promised.clauses.count,
                              "the world should hold more than the page said")
     }
+
+    // MARK: The description rule — absolute (decisions-session-11 §1)
+
+    /// The leak in its purest form: a description appearing before a single rune is placed.
+    @MainActor
+    func testABlankPageHasNoDescriptionAtAll() {
+        let store = GameStore(io: .temporary(name: "blank-\(UUID().uuidString)"))
+        let description = store.bookProjection.worldDescription
+
+        XCTAssertTrue(description.clauses.isEmpty,
+                      "a blank page described a world: \(description.sentence)")
+        XCTAssertTrue(description.isEmpty, "the panel would still be on screen")
+    }
+
+    /// Place three runes and the description speaks to those three, silent on everything else.
+    @MainActor
+    func testTheDescriptionSpeaksOnlyToWhatIsOnThePage() {
+        let store = GameStore(io: .temporary(name: "spoken-\(UUID().uuidString)"))
+        store.mutate("test: know everything") {
+            $0.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
+        }
+        store.write("frostbound")
+
+        let spoken = Set(store.bookProjection.worldDescription.clauses.map(\.group))
+        let allowed = Set(DescriptionRules
+            .targetsTouched(by: BookRules.sigils(for: BookRules.resolveBook(page: store.state.base.page)))
+            .map(\.rawValue))
+        XCTAssertFalse(spoken.isEmpty, "writing something produced no description")
+        XCTAssertTrue(spoken.isSubset(of: allowed),
+                      "described \(spoken.subtracting(allowed)), which nothing on the page touches")
+    }
+
+    /// Adding a rune may only ever add to what's described.
+    @MainActor
+    func testWritingMoreRevealsMoreAndNeverLess() {
+        let store = GameStore(io: .temporary(name: "growing-\(UUID().uuidString)"))
+        store.mutate("test: know everything") {
+            $0.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
+        }
+        var spokenBefore = Set<String>()
+        for symbol in ContentCatalog.shared.symbols where store.write(symbol.id) {
+            let spoken = Set(store.bookProjection.worldDescription.clauses.map(\.group))
+            XCTAssertTrue(spokenBefore.isSubset(of: spoken),
+                          "writing \(symbol.id.rawValue) took a subject away from the description")
+            spokenBefore = spoken
+        }
+        XCTAssertGreaterThan(spokenBefore.count, 1)
+    }
+
+    /// The stability number must not require knowing what rolled, either.
+    @MainActor
+    func testStabilityIsComputedFromTheWrittenPageAlone() {
+        let store = GameStore(io: .temporary(name: "stab-\(UUID().uuidString)"))
+        store.mutate("test: know everything") {
+            $0.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
+        }
+        store.write("rich_ore")
+        let shown = store.bookProjection.stabilityScore
+        let fromPage = BookRules.stabilityScore(delta: BookRules.stabilityDelta(symbolIDs: ["rich_ore"]))
+        XCTAssertEqual(shown.lowerBound, fromPage)
+        XCTAssertTrue(shown.isPoint, "an exact page should give an exact number")
+    }
+
+    /// **Visiting unseals it.** A world you've been to has no secrets.
+    @MainActor
+    func testAVisitedWorldMayBeDescribedInFull() {
+        let store = GameStore(io: .temporary(name: "visited-\(UUID().uuidString)"))
+        store.mutate("test: know everything") { state in
+            state.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
+            state.base.essence = 500
+        }
+        store.write("frostbound")
+
+        let sealed = store.bookProjection.worldDescription
+        let seed = store.state.worlds.seeds.peekNextSeed()
+
+        store.mutate("test: having been there") { $0.reality.visitedWorldSeeds.insert(seed) }
+        let unsealed = store.bookProjection.worldDescription
+
+        XCTAssertGreaterThan(unsealed.clauses.count, sealed.clauses.count,
+                             "a world already visited should hold nothing back")
+    }
+
+    @MainActor
+    func testDepartingRecordsTheWorldAsVisited() {
+        let store = GameStore(io: .temporary(name: "record-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 500 }
+        let seed = store.state.worlds.seeds.peekNextSeed()
+        store.bindAndDepart()
+        XCTAssertTrue(store.state.reality.visitedWorldSeeds.contains(seed))
+        XCTAssertEqual(store.state.worlds.activeRun?.mapSeed, seed,
+                       "the world recorded as visited isn't the one that was entered")
+    }
 }

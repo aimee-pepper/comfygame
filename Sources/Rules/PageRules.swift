@@ -168,6 +168,22 @@ enum PageRules {
         return result
     }
 
+    // MARK: Exclusivity
+
+    /// Whether a symbol may be written, given what's already on the page.
+    ///
+    /// **One primary per pressure target** (decisions-session-11 §3). You cannot write two things
+    /// that both decide what the ground is; you write one, then modify it. Chaining lifts the
+    /// restriction — a world with two kinds of land in it is an earned capability rather than
+    /// something you could always do.
+    static func exclusivityConflict(writing symbol: SymbolDef, on page: Page,
+                                    chainingUnlocked: Bool) -> SymbolDef? {
+        guard !chainingUnlocked, symbol.isPrimary, let target = symbol.primaryTarget else { return nil }
+        return page.symbolIDs
+            .compactMap { ContentCatalog.shared.symbol($0) }
+            .first { $0.isPrimary && $0.primaryTarget == target }
+    }
+
     // MARK: Compounds
 
     /// What a compound costs to write: less than its parts, never free.

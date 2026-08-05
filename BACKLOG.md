@@ -65,11 +65,18 @@
 - [x] Order invariance held at the page layer: position is packing, never meaning
 - [x] **The Writing Desk writes on the page.** Palette + grid; tap to place, tap to rub out.
       Books bind from what's written, not from slots.
-- [x] Lift and reposition a placed mark; arranging is free until you bind (session 10 §3)
+- [x] Drag to move a mark, and drag it off the page to rub it out
+- [x] Drag straight from the palette onto the page, with a fit preview under your finger
+- [x] Palette sectioned by pressure target, so its organisation and its grammar are one thing
+- [x] One primary per target, plus chaining as a research unlock that lifts it
+- [x] The absolute description rule — a blank page describes nothing; visiting unseals a world
+- [x] Glyph-shaped rune placeholders instead of pictographic SF Symbols
 - [x] The page never grows — that was a Claude invention, corrected in session 10 §1
 - [ ] Exact fixed page dimensions — needs playtesting on device (session 10 open #3)
 - [ ] Hands as owned instruments — `base.ownedHands` carries it, nothing grants the finer two
 - [ ] Compound assembly popup, unlocked in the skill tree (session 10 §4)
+- [ ] Real crude-hand glyph artwork — `RuneGlyph` draws abstract placeholders until it exists
+- [ ] Anchoring as the other reveal trigger (session 11 §1) — visiting is wired, anchoring isn't
 - [ ] Open: refuse an over-hanging placement, or allow it and highlight the overflow? (currently
       refuses, which is the conservative reading of session 10 open #1)
 - [ ] Retire the slot taxonomy entirely (`setSymbol` writes through to the page as a shim)

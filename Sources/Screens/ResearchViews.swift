@@ -160,6 +160,8 @@ private struct ResearchNodeRow: View {
         case .gambitSlot: "+1 rule slot"
         case .essenceSpringTier: "a deeper spring"
         case .automateSelf: "your own rules, followed without you"
+        case .chaining: "more than one primary per subject"
+        case .finerHand: "a finer instrument — the same runes, in less room"
         case .companionWeapon: "+\(Tuning.Encounter.attackPerWeaponTier) companion attack"
         case .companionArmor: "+\(Tuning.Encounter.defencePerArmorTier) companion defence"
         }

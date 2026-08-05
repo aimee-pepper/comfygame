@@ -57,6 +57,21 @@ struct SymbolDef: Codable, Equatable, Identifiable, Sendable {
     /// v0 loop. Pressures ride alongside and drive what the older fields can't describe — climate,
     /// creature character, and which sites a world can host.
     var expandsTo: [CompoundComponent]
+    /// The target this symbol is *primarily* about — the dial it exists to set.
+    ///
+    /// Taken from the first component of its expansion, which is authored first for exactly this
+    /// reason. It drives two things: which section of the palette the symbol appears in, and
+    /// exclusivity — **one primary per target**, so you write one thing that makes light, one that
+    /// shapes the land, one that sets the climate, and then decorate (decisions-session-11 §3).
+    var primaryTarget: PressureTargetID? { expandsTo.first?.target }
+
+    /// Modifiers layer freely; primaries compete for their target's single place.
+    ///
+    /// **[INTERPRETATION]** The spec distinguishes primary sources from modifiers, but the v0
+    /// symbols are compounds and none is authored as a modifier yet, so everything with an
+    /// expansion is currently a primary. When modifier runes exist this becomes a data field.
+    var isPrimary: Bool { primaryTarget != nil }
+
     /// How this symbol makes the world hostile — or, for Peace, less so.
     ///
     /// The **danger↔time axis** (`contradiction-danger-spec.md` §5). Danger runes accept hostility

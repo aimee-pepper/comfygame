@@ -1,51 +1,31 @@
-# docs/ — what's here and which of it is true
+# Handoff — session 11 (from Aimee testing the page grid)
 
-`docs/` is the source of truth for the game (see `CLAUDE.md`). This file is the map.
+One doc. Four issues, in priority order.
 
-**The rule that matters most:** `[PROPOSAL]` is not a decision. Much of what's in here was drafted
-by the designer Claude and hasn't been reviewed. **Only items attributed to Aimee in
-`decisions-log.md` are decided.** Where a proposal and a ruling disagree, the ruling wins — and if
-they disagree in a way that isn't obvious, that's a question for `questions-for-design.md`, not
-something to resolve while building.
+## 1. The description still leaks — and the rule is absolute
 
-## Read first
+**A description may reveal nothing the player did not directly place.** Right now a description appears *before any runes are placed at all*.
 
-| File | What it is |
-|---|---|
-| `design-brief-v0.md` | The pillars and the shape of v0. Start here. |
-| `decisions-log.md` | **Canonical.** Every ruling, newest last. The newest dated entry wins over older text anywhere else. |
-| `open-questions.md` | Design questions not yet answered, and not for the engineer to resolve. |
-| `questions-for-design.md` | Questions raised while building, with the conservative interpretation that shipped. |
-| `../BACKLOG.md` | Worked top-down. |
+- **Blank page → no description.** Three runes → a description speaking only to those three, silent on everything else.
+- **Rolled values are never surfaced pre-departure** — not as text, not as a hint, not as a number that only makes sense if you know what rolled.
+- **Anchoring the page before entering, or having visited, unseals it.** After either, rolled values are known and may be shown in full.
 
-## Decided — build against these
+## 2. Sort the palette into sections
 
-| File | Contents |
-|---|---|
-| `contradiction-danger-spec.md` | Contradiction as an enumerated catalogue, never computed from magnitudes · stacking · the danger↔time axis · Peace and danger runes · the world-description panel |
-| `pressure-model.md` | All eight targets in one document; Illumination is the worked pattern. Cross-target constraints and the energy budget. Schema decided, numbers provisional. |
+Currently one undifferentiated box of every rune. Should read as a vocabulary, grouped by category.
 
-## Provisional — build behind data and interfaces, don't deepen
+## 3. NEW MECHANIC — exclusivity and chaining
 
-| File | Contents |
-|---|---|
-| `writing-system-rune-spec.md` | 149 runes; partially audited |
-| `sites-system.md` | Site categories and trigger rules |
-| `materials-crafting-spec.md` | Property schema, trait-derived drops, property-based recipes |
-| `narrative-systems-spec.md` | **§1–3 superseded** by session 7 — the trail model is gone, replaced by signature difficulty |
-| `companions-base-anchoring-spec.md` | **§3 superseded** by session 7 — anchoring has three routes |
-| `research-pass-2.md`, `research-pass-3-catalogs.md` | Background research the design draws on |
-| `roadmap-v1plus.md` | Past v0 |
+**One main choice per category, then modifiers.** You can't place two land-defining runes in one book. Same for other categories: one primary, plus any modifiers.
 
-## Reports
+**Chaining is an unlock** — an advanced chaining rune lifts the restriction for its category, so multiple lands in one world becomes an earned capability.
 
-| File | What it is |
-|---|---|
-| `README-HANDOFF.md` | Aimee's notes on the most recent batch of docs |
-| `design-audit-session-5.md` | Repo audited against the decisions, with rulings |
-| `deviations-audit.md` | Where the build had drifted from the design, with Aimee's rulings appended |
-| `overnight-notes-2026-08-05.md` | Judgement calls made while Aimee was asleep, for auditing |
+**Answered:** "category" means **pressure target** — one primary source per target (Illumination, Thermal, Hydrology, Substrate, Relief, Vitality, Atmosphere, Cycle), plus unlimited modifiers on each. **Chaining is a single unlock** lifting the restriction across all targets at once.
 
-## `archive/`
+**The palette's sections should be these same eight targets**, so organisation and grammar are the same thing.
 
-Superseded copies, kept for history. Never cite one as current — see `archive/README.md`.
+## 4. Runes need glyph icons, not SF Symbols
+
+`mountain.2`, `leaf`, `snowflake` — these should be the actual rune shapes as they'd be drawn on the page. The thing in the palette should be the thing that gets written.
+
+If artwork isn't ready: use a placeholder that is clearly a **glyph** — abstract, monochrome, drawn-looking. A wrong-but-glyph-shaped placeholder is closer to right than a correct-looking app icon.

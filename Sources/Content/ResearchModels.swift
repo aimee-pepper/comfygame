@@ -71,6 +71,12 @@ struct ResearchGrant: Codable, Equatable, Sendable {
         case automateSelf
         case companionWeapon
         case companionArmor
+        /// Lifts the one-primary-per-target restriction across every target at once. A world with
+        /// two kinds of land in it is an earned capability, not something you could always do.
+        case chaining
+        /// The next instrument up: charcoal → pencil → fountain pen. Refinement is literacy, not
+        /// power — it lets you say the same things in less space, never new things.
+        case finerHand
     }
 }
 

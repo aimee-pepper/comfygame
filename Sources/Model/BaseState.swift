@@ -41,6 +41,12 @@ struct BaseState: Codable, Equatable, Sendable {
     /// say the same things in less space — never new things.
     var ownedHands: Set<Hand> = [.crude]
 
+    /// Lifts the one-primary-per-target restriction across every target at once.
+    ///
+    /// A single unlock for now (session 11 §3); per-target chaining runes stay possible later if
+    /// one blunt switch proves too coarse.
+    var hasChainingUnlock: Bool = false
+
     /// The finest hand available. Marks are written in it by default.
     var bestHand: Hand { ownedHands.max() ?? .crude }
 
@@ -120,6 +126,7 @@ struct BaseState: Codable, Equatable, Sendable {
         bookDraft = try container.decodeIfPresent(BookDraft.self, forKey: .bookDraft) ?? BookDraft()
         page = try container.decodeIfPresent(Page.self, forKey: .page) ?? Page()
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
+        hasChainingUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) ?? false
         companion = try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0

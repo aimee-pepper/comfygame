@@ -24,6 +24,15 @@ struct RealityState: Codable, Equatable, Sendable {
     /// only ever sits at the starting tier, and the Harness can push it up to see the later panels.
     var analysisTier: Int = Tuning.Analysis.startingTier
 
+    /// Seeds of worlds the player has actually stood in.
+    ///
+    /// **The reveal trigger** (decisions-session-11 §1): a world you've been to has no secrets, so
+    /// its rolled values may be shown in full. A world you haven't written and haven't seen has
+    /// nothing but secrets. Anchoring is the other trigger and doesn't exist yet.
+    ///
+    /// In Reality because it's knowledge, and knowledge is never taken back.
+    var visitedWorldSeeds: Set<UInt64> = []
+
     static func newGame() -> RealityState { RealityState() }
 
     // MARK: Derived unlocks
@@ -57,6 +66,7 @@ struct RealityState: Codable, Equatable, Sendable {
         lifetime = try container.decodeIfPresent(LifetimeStats.self, forKey: .lifetime) ?? LifetimeStats()
         analysisTier = try container.decodeIfPresent(Int.self, forKey: .analysisTier)
             ?? Tuning.Analysis.startingTier
+        visitedWorldSeeds = try container.decodeIfPresent(Set<UInt64>.self, forKey: .visitedWorldSeeds) ?? []
     }
 }
 

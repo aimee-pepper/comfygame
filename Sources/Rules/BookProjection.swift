@@ -79,16 +79,23 @@ struct BookProjection {
     /// Every mark is chosen, so nothing here is ranged by *composition* — the only uncertainty
     /// left is what the world decides about the targets you said nothing about, which is rolled
     /// from the seed and folded into the description rather than into the numbers.
+    /// - Parameter revealRolled: true once the world has been **visited or anchored**, at which
+    ///   point it has no secrets left and its rolled values may be shown in full
+    ///   (decisions-session-11 §1). Otherwise the panel is bound by the absolute rule: it may
+    ///   reveal nothing the player did not directly place.
     static func project(page: Page,
                         seed: UInt64 = 0,
-                        analysisTier: Int = Tuning.Analysis.startingTier) -> BookProjection {
+                        analysisTier: Int = Tuning.Analysis.startingTier,
+                        revealRolled: Bool = false) -> BookProjection {
         let book = BookRules.resolveBook(page: page)
         let written = book.allSymbolIDs
         let sigils = BookRules.sigils(for: book)
-        // **Written only.** Resolving with the unwritten targets filled would describe the world's
-        // rolled surprises back to the player before they'd paid for them — the panel may only
-        // describe what was actually said.
-        let readings = PressureRules.resolve(sigils)
+        // **Written only**, unless the world has already been seen. Resolving with the unwritten
+        // targets filled would describe the world's own surprises back to the player before they'd
+        // paid for them.
+        let readings = revealRolled
+            ? PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+            : PressureRules.resolve(sigils)
         let contradictions = ContradictionRules.fired(in: sigils, readings: readings)
 
         let score = BookRules.stabilityScore(
@@ -117,7 +124,7 @@ struct BookProjection {
                 readings,
                 contradictions: contradictions,
                 analysisTier: analysisTier,
-                about: DescriptionRules.targetsTouched(by: sigils)
+                about: revealRolled ? nil : DescriptionRules.targetsTouched(by: sigils)
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: written),
             resourceMix: expectedResourceMix(plans),

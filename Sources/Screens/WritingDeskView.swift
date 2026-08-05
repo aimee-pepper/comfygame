@@ -9,6 +9,12 @@ struct WritingDeskView: View {
     @State private var editingSlot: SlotID?
     /// The mark the next tap on the page will write.
     @State private var pending: SymbolID?
+    /// Where the page is on screen, so a rune dragged out of the palette can find it.
+    @State private var pageFrame: CGRect = .zero
+    /// A rune currently being dragged from the palette toward the page.
+    @State private var incoming: IncomingRune?
+    /// Cell size, mirrored from the page so the palette's drop maths matches what's drawn.
+    private var cellSide: CGFloat { pageFrame.width / CGFloat(state.base.page.width) }
 
     private var state: GameState { store.state }
     private var projection: BookProjection { store.bookProjection }
@@ -17,7 +23,7 @@ struct WritingDeskView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 16) {
-                    PageGridView(pending: pending)
+                    PageGridView(pending: pending, frame: $pageFrame, incoming: $incoming)
                     palette
                     PreviewPanel(projection: projection, discovery: state.reality.discovery)
                     if state.base.page.runes.isEmpty { blankPageNote }
@@ -56,39 +62,78 @@ struct WritingDeskView: View {
             Text("What you can write")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 8)], spacing: 8) {
-                ForEach(ownedSymbols) { symbol in
-                    let fits = store.canWrite(symbol.id)
-                    Button {
-                        pending = (pending == symbol.id) ? nil : symbol.id
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: symbol.icon)
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text(symbol.name).font(.caption.weight(.medium)).lineLimit(1)
-                                Text("\(store.footprint(of: symbol.id)) cells")
-                                    .font(.caption2).foregroundStyle(.secondary)
+            ForEach(sections, id: \.target.id) { section in
+                Text(section.target.name)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 8)], spacing: 8) {
+                    ForEach(section.symbols) { symbol in
+                        let fits = store.canWrite(symbol.id)
+                        let blocker = store.blockingPrimary(for: symbol.id)
+                        Button {
+                            pending = (pending == symbol.id) ? nil : symbol.id
+                        } label: {
+                            HStack(spacing: 6) {
+                                RuneGlyph(id: symbol.id.rawValue).frame(width: 22, height: 22)
+                                VStack(alignment: .leading, spacing: 0) {
+                                    Text(symbol.name).font(.caption.weight(.medium)).lineLimit(1)
+                                    // Say *why* it's unavailable. A rule you can learn beats a
+                                    // greyed-out button you can only be puzzled by.
+                                    Text(blocker.map { "\($0.name) already decides this" }
+                                         ?? "\(store.footprint(of: symbol.id)) cells")
+                                        .font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                                }
+                                Spacer(minLength: 0)
                             }
-                            Spacer(minLength: 0)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(minHeight: 44)
+                            .padding(.horizontal, 8)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .frame(minHeight: 44)
-                        .padding(.horizontal, 8)
+                        .buttonStyle(.bordered)
+                        .tint(pending == symbol.id ? .accentColor : .secondary)
+                        .opacity(fits ? 1 : 0.45)
+                        .disabled(!fits)
+                        // Drag straight from the palette onto the page. Tapping still works — it
+                        // arms the rune so the next tap on a square places it — but dragging is
+                        // the natural gesture for fitting a shape into a space.
+                        .gesture(paletteDrag(symbol))
                     }
-                    .buttonStyle(.bordered)
-                    .tint(pending == symbol.id ? .accentColor : .secondary)
-                    .opacity(fits ? 1 : 0.45)
-                    .disabled(!fits)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var ownedSymbols: [SymbolDef] {
-        ContentCatalog.shared.symbols
+    /// The palette is sectioned **by pressure target** (session 11 §2), which is the same axis
+    /// exclusivity runs on — so the vocabulary's organisation and its grammar are one thing, and
+    /// "one per section" is a rule you can read straight off the screen.
+    private var sections: [(target: PressureTargetDef, symbols: [SymbolDef])] {
+        let owned = ContentCatalog.shared.symbols
             .filter { state.base.ownedSymbols.contains($0.id) }
-            .sorted { $0.name < $1.name }
+        return ContentCatalog.shared.pressureTargetsInOrder.compactMap { target in
+            let symbols = owned
+                .filter { $0.primaryTarget == target.id }
+                .sorted { $0.name < $1.name }
+            return symbols.isEmpty ? nil : (target, symbols)
+        }
+    }
+
+    /// Carry a rune from the palette to the page, showing whether it will fit as you go.
+    private func paletteDrag(_ symbol: SymbolDef) -> some Gesture {
+        DragGesture(minimumDistance: 6, coordinateSpace: .global)
+            .onChanged { value in
+                guard store.canWrite(symbol.id) else { return }
+                incoming = IncomingRune(symbol: symbol.id, location: value.location)
+            }
+            .onEnded { value in
+                defer { incoming = nil }
+                guard store.canWrite(symbol.id), pageFrame.contains(value.location) else { return }
+                let local = CGPoint(x: value.location.x - pageFrame.minX,
+                                    y: value.location.y - pageFrame.minY)
+                let cell = PageCell(column: Int(local.x / cellSide), row: Int(local.y / cellSide))
+                if store.write(symbol.id, at: cell) { pending = nil }
+            }
     }
 
     private var blankPageNote: some View {

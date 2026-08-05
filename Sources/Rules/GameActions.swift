@@ -31,7 +31,18 @@ extension GameStore {
     /// Whether a symbol can still be fitted onto the page in the player's best hand.
     func canWrite(_ id: SymbolID) -> Bool {
         guard let symbol = ContentCatalog.shared.symbol(id) else { return false }
+        guard blockingPrimary(for: id) == nil else { return false }
         return PageRules.placeAnywhere(symbol, hand: state.base.bestHand, on: state.base.page) != nil
+    }
+
+    /// The primary already claiming this symbol's target, if one is in the way.
+    ///
+    /// Surfaced so the palette can say *why* something is unavailable — "Plains already decides the
+    /// land" is a rule you can learn; a greyed-out button is not.
+    func blockingPrimary(for id: SymbolID) -> SymbolDef? {
+        guard let symbol = ContentCatalog.shared.symbol(id) else { return nil }
+        return PageRules.exclusivityConflict(writing: symbol, on: state.base.page,
+                                             chainingUnlocked: state.base.hasChainingUnlock)
     }
 
     /// How many cells a symbol will take in the hand the player writes in.
@@ -44,7 +55,8 @@ extension GameStore {
     /// player's decision, and quietly moving it would make the packing puzzle meaningless.
     @discardableResult
     func write(_ id: SymbolID, at cell: PageCell) -> Bool {
-        guard let symbol = ContentCatalog.shared.symbol(id),
+        guard blockingPrimary(for: id) == nil,
+              let symbol = ContentCatalog.shared.symbol(id),
               let updated = PageRules.place(symbol, hand: state.base.bestHand, at: cell, on: state.base.page)
         else { return false }
         mutate("write \(id.rawValue)") { $0.base.page = updated }
@@ -54,7 +66,8 @@ extension GameStore {
     /// Drop a mark into the first place it fits. For the palette's quick-add.
     @discardableResult
     func write(_ id: SymbolID) -> Bool {
-        guard let symbol = ContentCatalog.shared.symbol(id),
+        guard blockingPrimary(for: id) == nil,
+              let symbol = ContentCatalog.shared.symbol(id),
               let updated = PageRules.placeAnywhere(symbol, hand: state.base.bestHand, on: state.base.page)
         else { return false }
         mutate("write \(id.rawValue)") { $0.base.page = updated }
@@ -87,7 +100,9 @@ extension GameStore {
     var bookProjection: BookProjection {
         BookProjection.project(page: state.base.page,
                                seed: state.worlds.seeds.peekNextSeed(),
-                               analysisTier: state.reality.analysisTier)
+                               analysisTier: state.reality.analysisTier,
+                               revealRolled: state.reality.visitedWorldSeeds
+                                   .contains(state.worlds.seeds.peekNextSeed()))
     }
 
     /// The price is exact before committing — a slot left to chance costs a flat rate whatever
@@ -112,6 +127,8 @@ extension GameStore {
             // from the seed, never from the run's live RNG, so in-run rolls resume cleanly.
             let world = Worldgen.generate(book: book, seed: seed)
 
+            // Entering unseals this world: from here on its rolled values may be described.
+            state.reality.visitedWorldSeeds.insert(seed)
             state.base.essence -= book.essencePaid
             state.worlds.runIndex += 1
             state.reality.lifetime.runsStarted += 1

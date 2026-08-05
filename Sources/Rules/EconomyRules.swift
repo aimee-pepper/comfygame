@@ -111,6 +111,13 @@ enum EconomyRules {
                 state.base.companion.weaponTier += 1
             case .companionArmor:
                 state.base.companion.armorTier += 1
+            case .chaining:
+                state.base.hasChainingUnlock = true
+            case .finerHand:
+                // Next hand up, in order. Owning a finer one never removes the coarser.
+                if let next = Hand.allCases.first(where: { !state.base.ownedHands.contains($0) }) {
+                    state.base.ownedHands.insert(next)
+                }
             }
         }
     }

@@ -35,6 +35,13 @@
       "icon": "scalemass",
       "blurb": "Trading a world's peace for its time, and back again.",
       "order": 4
+    },
+    {
+      "id": "penmanship",
+      "name": "Penmanship",
+      "icon": "hand.draw",
+      "blurb": "Writing smaller, and saying more than one thing at a time.",
+      "order": 5
     }
   ],
   "nodes": [
@@ -701,6 +708,72 @@
         {
           "kind": "symbol",
           "id": "peace"
+        }
+      ]
+    },
+    {
+      "id": "pen_pencil",
+      "branch": "penmanship",
+      "name": "A pencil",
+      "icon": "pencil",
+      "blurb": "Charcoal says everything too loudly. A pencil says the same things in half the room.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "finerHand"
+        }
+      ]
+    },
+    {
+      "id": "pen_fountain",
+      "branch": "penmanship",
+      "name": "A fountain pen",
+      "icon": "pencil.tip",
+      "blurb": "Every rune, one square. The page stops fighting your handwriting and starts being a budget.",
+      "cost": {
+        "essence": 90,
+        "resources": {
+          "ore": 20,
+          "fiber": 12
+        }
+      },
+      "requires": [
+        "pen_pencil"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "finerHand"
+        }
+      ]
+    },
+    {
+      "id": "pen_chaining",
+      "branch": "penmanship",
+      "name": "Chaining",
+      "icon": "link",
+      "blurb": "Two things deciding the same question, held together. One land was always a limitation of the hand, not of the world.",
+      "cost": {
+        "essence": 70,
+        "resources": {
+          "ore": 14,
+          "mote": 1
+        }
+      },
+      "requires": [
+        "pen_pencil"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "chaining"
         }
       ]
     }
