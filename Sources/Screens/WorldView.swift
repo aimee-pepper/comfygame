@@ -285,7 +285,7 @@ private struct TileView: View {
         ZStack {
             Rectangle()
                 .fill(background)
-                .overlay(Rectangle().stroke(Color(.systemBackground).opacity(0.6), lineWidth: 0.5))
+                .overlay(Rectangle().stroke(Palette.mapGrid, lineWidth: 0.5))
             // The player gets a filled disc behind them: at 27pt a bare glyph disappears into the
             // grid, and "where am I" has to be answerable at a glance.
             if isPlayer {
@@ -318,7 +318,7 @@ private struct TileView: View {
     }
 
     private var tint: Color {
-        if isPlayer { return Color(.systemBackground) }
+        if isPlayer { return Palette.mapFloor }
         if enemy != nil { return .red }
         switch tile.content {
         case .hazard: return .orange
@@ -329,12 +329,11 @@ private struct TileView: View {
         }
     }
 
-    /// Three clearly distinct states, in both light and dark: floor you've seen, fog you haven't,
-    /// and holes where the world has already gone.
+    /// Three clearly distinct states in both schemes — see `Palette` for why these can't be
+    /// opacities over `.primary`: the meaning inverts in dark mode.
     private var background: Color {
-        if tile.isCrumbled { return .primary.opacity(0.55) }
-        if !tile.isRevealed { return .primary.opacity(0.16) }
-        return Color(.systemBackground)
+        if tile.isCrumbled { return Palette.mapVoid }
+        return tile.isRevealed ? Palette.mapFloor : Palette.mapFog
     }
 }
 

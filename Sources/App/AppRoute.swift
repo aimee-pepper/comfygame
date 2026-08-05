@@ -15,6 +15,7 @@ enum AppRoute: String, Codable, Hashable, CaseIterable, Sendable {
     case constellation
     case world
     case encounter
+    case settings
     /// The milestone-1 persistence harness. Reachable from the Base screen while in development.
     case harness
 }

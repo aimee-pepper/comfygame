@@ -25,6 +25,12 @@ struct BaseView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: AppRoute.settings) {
+                    Image(systemName: "gearshape")
+                }
+                .accessibilityLabel("Settings")
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 // Development-only entry to the milestone-1 persistence harness.
                 NavigationLink(value: AppRoute.harness) {
                     Image(systemName: "wrench.and.screwdriver")
