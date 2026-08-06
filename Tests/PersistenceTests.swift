@@ -52,17 +52,18 @@ final class PersistenceTests: XCTestCase {
         run.stability = 61.5
         run.turnsTaken = 12
         run.satchel.add(3, of: Resources.ore)
-        run.activeEncounter = EncounterState(
+        var encounter = EncounterState(
             id: InstanceID(rawValue: rng.next()),
             foes: [FoeState(id: InstanceID(rawValue: 1),
                             creatureID: "ink_hound",
                             stats: CombatStats(displayName: "Ink Hound", icon: "pawprint", maxHP: 16, attack: 4),
                             currentHP: 9)],
             order: [.binder, .companion, .foe(InstanceID(rawValue: 1))],
-            turnIndex: 1,
-            roundNumber: 3,
             log: ["You hit Ink Hound for 5."]
         )
+        encounter.turnIndex = 1
+        encounter.roundNumber = 3
+        run.activeEncounter = encounter
         state.worlds.activeRun = run
 
         try io.write(SaveCodec.encode(state))

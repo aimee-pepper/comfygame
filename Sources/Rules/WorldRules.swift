@@ -466,6 +466,18 @@ enum WorldRules {
         return events
     }
 
+    /// Whether the player can see this creature standing there at all.
+    ///
+    /// **Crypsis is a map behaviour, not a combat stat** (spec §7): something matched to the ambient
+    /// doesn't appear until it's on you. In a low-openness world full of `growth` that is genuinely
+    /// tense — and it's what makes writing an overgrown world a decision rather than scenery.
+    static func isVisible(_ enemy: WorldEnemy, in run: WorldRun) -> Bool {
+        guard enemy.traits?.defence == .crypsis else { return true }
+        // Once it has broken cover it stays broken, and it is never invisible in your own square.
+        if enemy.isAwake { return true }
+        return enemy.position.chebyshevDistance(to: run.playerPosition) <= 1
+    }
+
     /// How far off it notices you.
     ///
     /// **Sight is only one way of noticing** (spec §7). A creature that hunts by touch or smell is
@@ -557,6 +569,13 @@ enum WorldRules {
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
                                                         foes: foes, rng: &run.rng)
         state.worlds.activeRun = run
+
+        // **Somebody has to move first, and it may not be you.** Automatic turns used to be kicked
+        // off only by a player tap, which was safe while the party was always first in the order.
+        // With turn order coming off initiative, a fight that opens on a creature's turn would
+        // otherwise sit there waiting on nobody: the player's buttons do nothing, because it isn't
+        // their turn, and nothing else is running.
+        CombatRules.runAutomaticTurns(in: &state)
     }
 
 }

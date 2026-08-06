@@ -442,6 +442,9 @@ enum Tuning {
         /// Rend leaves a wound that keeps costing you.
         static let bleedDamage: Int = 2
         static let bleedRounds: Int = 3
+        /// What each blow is worth when something reaches more than one of you at once.
+        static let multiDeliveryShare: Double = 0.7
+        static let areaDeliveryShare: Double = 0.6
 
         static let baseInitiative: Double = 50
         static let initiativePerSize: Double = 0.3

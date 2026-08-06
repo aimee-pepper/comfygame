@@ -336,8 +336,9 @@ private struct MapGrid: View {
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
     }
 
+    /// Cryptic creatures don't show until they're on you — see `WorldRules.isVisible`.
     private func enemy(at point: GridPoint) -> WorldEnemy? {
-        run.enemies.first { $0.position == point }
+        run.enemies.first { $0.position == point && WorldRules.isVisible($0, in: run) }
     }
 
     private func site(at point: GridPoint) -> SiteDef? {

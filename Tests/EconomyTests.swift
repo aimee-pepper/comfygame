@@ -445,8 +445,11 @@ final class EconomyTests: XCTestCase {
             WorldRules.beginEncounter(triggeredBy: run.enemies[0], in: &state)
         }
 
-        XCTAssertNotNil(GambitEngine.decide(for: .binder, in: store.state),
-                        "The Binder now has rules of its own to follow")
+        // The fight now opens on its own — automatic turns start with the encounter rather than
+        // waiting for a tap — so the proof is that the Binder acted without being asked.
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        XCTAssertTrue(encounter.log.contains { $0.hasPrefix("You:") },
+                      "The Binder now has rules of its own to follow, and nobody tapped anything")
         XCTAssertFalse(CombatRules.needsPlayerInput(store.state),
                        "…and the fight no longer waits on you")
     }

@@ -297,4 +297,172 @@ final class CombatTests: XCTestCase {
         store.moveGambit(from: IndexSet(integer: 1), to: 0)
         XCTAssertEqual(store.state.base.companion.gambits, [Self.attackWeakest, Self.attackAny])
     }
+
+    // MARK: - Fighting what the world grew (creature-system-spec §7)
+
+    /// A fight against a species, rather than against a catalogue entry.
+    private func inFightWith(_ traits: [CreatureTraits]) -> GameStore {
+        let store = GameStore(io: .temporary(name: "traits-\(UUID().uuidString)"))
+        store.setSymbol("plains", in: "terrain")
+        store.bindAndDepart()
+        store.mutate("stage a fight") { state in
+            guard var run = state.worlds.activeRun else { return }
+            run.cast = traits.enumerated().map { index, t in
+                Species(id: InstanceID(rawValue: UInt64(index + 1)), traits: t, worldSeed: 1)
+            }
+            run.enemies = run.cast.map { species in
+                WorldEnemy(id: InstanceID(rawValue: species.id.rawValue), speciesID: species.id,
+                           traits: species.traits, position: run.playerPosition, isAwake: true)
+            }
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: run.enemies[0], in: &state)
+        }
+        return store
+    }
+
+    private func armoured() -> CreatureTraits {
+        var t = CreatureTraits()
+        t.size = 85; t.build = 92; t.boneDensity = 75
+        t.covering = Covering(hardness: 90, length: 15, coverage: 95)
+        t.armament.mix = WeaponMix(pierce: 0, crush: 1, rend: 0)
+        t.armament.setTotal(70)
+        return t
+    }
+
+    func testAFoeGrownByTheWorldFightsFromItsTraits() throws {
+        let store = inFightWith([armoured()])
+        let foe = try XCTUnwrap(foes(store).first)
+
+        XCTAssertNil(foe.creatureID, "a grown creature reached for the old catalogue")
+        XCTAssertNotNil(foe.traits)
+        XCTAssertGreaterThan(foe.stats.armour, 0, "plate that covers 95% of it soaked nothing")
+        XCTAssertEqual(foe.stats.damageKind, .crush)
+        XCTAssertEqual(foe.currentHP, foe.stats.maxHP)
+    }
+
+    /// **Armour makes a fight longer, not unwinnable.** A hit always does something.
+    func testArmourSoaksButNeverStopsYouEntirely() throws {
+        let store = inFightWith([armoured()])
+        let foe = try XCTUnwrap(foes(store).first)
+        let before = foe.currentHP
+        store.takeCombatAction(.attack(foe: foe.id))
+        let after = try XCTUnwrap(foes(store).first).currentHP
+
+        XCTAssertLessThan(after, before, "armour made it untouchable")
+        XCTAssertGreaterThanOrEqual(before - after, Tuning.Encounter.minimumDamage)
+    }
+
+    /// **Warning colours are honest** — hitting something that advertises costs you.
+    func testHittingSomethingThatAdvertisesCostsYou() throws {
+        var toxic = CreatureTraits()
+        toxic.size = 70
+        toxic.isToxic = true
+        toxic.covering = Covering(hardness: 0, length: 0, coverage: 40)
+        let store = inFightWith([toxic])
+        let foe = try XCTUnwrap(foes(store).first)
+        let hpBefore = store.state.worlds.activeRun?.binderHP ?? 0
+
+        store.takeCombatAction(.attack(foe: foe.id))
+
+        XCTAssertLessThan(store.state.worlds.activeRun?.binderHP ?? 0, hpBefore,
+                          "you traded blows with something toxic and paid nothing")
+    }
+
+    /// Reach beats speed at the moment of contact, whatever the initiative says.
+    func testSomethingWithLongReachOpensTheFight() throws {
+        var reacher = CreatureTraits()
+        reacher.size = 90; reacher.boneDensity = 90   // slow by every other measure
+        reacher.armament.reach = .far
+        let store = inFightWith([reacher])
+        let encounter = try XCTUnwrap(store.activeEncounter)
+
+        XCTAssertEqual(encounter.order.first?.foeID, foes(store).first?.id,
+                       "the thing with the longest reach waited its turn")
+    }
+
+    /// Sleek and small goes before you; huge and armoured goes after.
+    func testTurnOrderComesOffWhatThingsAre() throws {
+        var quick = CreatureTraits()
+        quick.size = 12; quick.build = Tuning.Life.sleekBuild; quick.boneDensity = 5
+        quick.covering = Covering(hardness: 0, length: 0, coverage: 20)
+
+        let fast = inFightWith([quick])
+        XCTAssertEqual(try XCTUnwrap(fast.activeEncounter).order.first?.foeID,
+                       foes(fast).first?.id, "something built to run didn't get the jump on you")
+
+        let slow = inFightWith([armoured()])
+        XCTAssertEqual(try XCTUnwrap(slow.activeEncounter).order.first, .binder,
+                       "a huge armoured thing outran you")
+    }
+
+    /// Rend leaves a wound that keeps costing you after the blow lands.
+    func testARendingCreatureLeavesAWoundThatKeepsCosting() throws {
+        var render = CreatureTraits()
+        render.size = 50
+        render.armament.mix = WeaponMix(pierce: 0, crush: 0, rend: 1)
+        render.armament.setTotal(80)
+        let store = inFightWith([render])
+
+        // Let the fight run until it has hit somebody.
+        for _ in 0..<6 where store.activeEncounter?.outcome == nil {
+            if let foe = foes(store).first(where: \.isAlive) {
+                store.takeCombatAction(.attack(foe: foe.id))
+            }
+        }
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        XCTAssertTrue(encounter.binderBleedRounds > 0 || encounter.companionBleedRounds > 0
+                      || encounter.log.contains { $0.contains("bleeding") || $0.contains("won\'t close") },
+                      "nothing rent anybody in six rounds against a pure render")
+    }
+
+    /// **Crypsis is a map behaviour**: it isn't there until it's on you.
+    func testSomethingMatchedToTheGroundDoesntShowUntilItsOnYou() {
+        let store = GameStore(io: .temporary(name: "crypsis-\(UUID().uuidString)"))
+        store.setSymbol("plains", in: "terrain")
+        store.bindAndDepart()
+        store.mutate("hide something") { state in
+            guard var run = state.worlds.activeRun else { return }
+            var hidden = CreatureTraits()
+            hidden.defence = .crypsis
+            let far = GridPoint(x: run.playerPosition.x + 5, y: run.playerPosition.y)
+            let near = GridPoint(x: run.playerPosition.x + 1, y: run.playerPosition.y)
+            run.enemies = [
+                WorldEnemy(id: InstanceID(rawValue: 1), traits: hidden, position: far),
+                WorldEnemy(id: InstanceID(rawValue: 2), traits: hidden, position: near)
+            ]
+            state.worlds.activeRun = run
+        }
+        let run = store.state.worlds.activeRun!
+        XCTAssertFalse(WorldRules.isVisible(run.enemies[0], in: run), "you saw it coming")
+        XCTAssertTrue(WorldRules.isVisible(run.enemies[1], in: run), "it stayed invisible on top of you")
+    }
+
+    /// A mid-encounter save written before a stat existed must still load. This is the acceptance
+    /// criterion the brief names by hand, and the shape of the bug that quarantined a real save.
+    func testAnEncounterMissingEveryNewFieldStillLoads() throws {
+        let json = """
+        {"id": {"rawValue": 1}, "foes": [], "order": []}
+        """
+        let encounter = try SaveCodec.makeDecoder().decode(EncounterState.self, from: Data(json.utf8))
+        XCTAssertEqual(encounter.roundNumber, 1)
+        XCTAssertEqual(encounter.binderBleedRounds, 0)
+        XCTAssertNil(encounter.outcome)
+    }
+
+    /// **A fight is never left waiting on nobody.** Turn order comes off initiative now, so an
+    /// encounter can open on a creature's turn — and if nothing kicks the automatic turns off, the
+    /// player is looking at a screen where their own buttons do nothing.
+    func testAFightThatOpensOnACreaturesTurnStillStarts() throws {
+        var quick = CreatureTraits()
+        quick.size = 10; quick.build = Tuning.Life.sleekBuild; quick.boneDensity = 0
+        quick.covering = Covering(hardness: 0, length: 0, coverage: 10)
+        let store = inFightWith([quick])
+
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        XCTAssertEqual(encounter.order.first?.foeID, foes(store).first?.id,
+                       "this test needs the creature to be first, or it proves nothing")
+        XCTAssertTrue(store.actingCombatant == .binder || encounter.outcome != nil,
+                      "the fight opened on the creature's turn and then nobody moved")
+        XCTAssertGreaterThan(encounter.log.count, 1, "the creature that went first did nothing")
+    }
 }

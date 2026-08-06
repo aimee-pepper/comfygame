@@ -225,3 +225,15 @@ enum IdentityRegion: String, Codable, CaseIterable, Equatable, Sendable {
         return max(0, 1 - distance / Tuning.Life.identityBandTolerance)
     }
 }
+
+extension String {
+    /// Sentence case for the start of a log line.
+    ///
+    /// Derived creature names are lower case by design — *a huge blind armoured walker* is a
+    /// description, not a proper noun — so anything that puts one at the start of a sentence has to
+    /// raise it. `capitalized` would title-case every word and turn descriptions into names.
+    var capitalisedSentence: String {
+        guard let first else { return self }
+        return first.uppercased() + dropFirst()
+    }
+}

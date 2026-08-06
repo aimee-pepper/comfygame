@@ -56,10 +56,15 @@ enum CombatRules {
 
     /// Armour softens what lands on the party. Never below a floor — armour shouldn't make a fight
     /// unloseable, just survivable.
-    static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState) -> Int {
+    ///
+    /// `armourIgnored` is what a piercing attack goes straight through, which is the whole reason
+    /// the weapon triangle exists: the same armour is worth more against some things than others.
+    static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
+                            armourIgnored: Double = 0) -> Int {
         guard actor == .companion else { return max(Tuning.Encounter.minimumDamage, raw) }
-        let reduced = raw - state.base.companion.armorTier * Tuning.Encounter.defencePerArmorTier
-        return max(Tuning.Encounter.minimumDamage, reduced)
+        let armour = Double(state.base.companion.armorTier * Tuning.Encounter.defencePerArmorTier)
+        let effective = Int((armour * (1 - armourIgnored)).rounded())
+        return max(Tuning.Encounter.minimumDamage, raw - effective)
     }
 
     static func skill(for actor: Combatant) -> SkillDef? {
@@ -156,13 +161,54 @@ enum CombatRules {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
         else { return }
 
-        let amount = roll(around: damage, run: &run)
-        encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
-        let name = encounter.foes[index].stats.displayName
+        let foe = encounter.foes[index]
+        let name = foe.stats.displayName
         let who = actorName(actor, encounter: encounter)
-        encounter.note(verb.map { "\(who) — \($0) — hits \(name) for \(amount)." }
-            ?? "\(who) hits \(name) for \(amount).")
+
+        // **Sleek and small is hard to hit.** A miss is the price of chasing something built to run.
+        if run.rng.chance(foe.stats.evasion) {
+            encounter.note("\(who) swings at \(name) and finds nothing there.")
+            return
+        }
+
+        // Armour soaks. Never to nothing — a hit always does something.
+        let raw = roll(around: damage, run: &run)
+        let amount = max(Tuning.Encounter.minimumDamage, raw - foe.stats.armour)
+        encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
+
+        let soaked = raw - amount
+        let note = verb.map { "\(who) — \($0) — hits \(name) for \(amount)." }
+            ?? "\(who) hits \(name) for \(amount)."
+        encounter.note(soaked > 1 ? note + " Its \(armourWord(for: foe)) takes the rest." : note)
+
+        // **Warning colours are honest.** Hitting something that advertises costs you.
+        if foe.stats.retaliation > 0, encounter.foes[index].isAlive {
+            hurt(actor, by: foe.stats.retaliation, run: &run, encounter: &encounter)
+            encounter.note("\(name) is not safe to touch — \(foe.stats.retaliation) back.")
+        }
         if !encounter.foes[index].isAlive { encounter.note("\(name) goes down.") }
+    }
+
+    private static func armourWord(for foe: FoeState) -> String {
+        guard let traits = foe.traits else { return "hide" }
+        if traits.covering.hardness > 70 { return traits.finish.schiller > 30 ? "shell" : "plate" }
+        if traits.covering.length > 55 { return "pelt" }
+        return "hide"
+    }
+
+    /// Damage onto one of the party, wherever it comes from.
+    private static func hurt(_ target: Combatant,
+                             by amount: Int,
+                             run: inout WorldRun,
+                             encounter: inout EncounterState) {
+        switch target {
+        case .binder: run.binderHP = max(0, run.binderHP - amount)
+        case .companion: run.companionHP = max(0, run.companionHP - amount)
+        case .foe(let id):
+            if let index = encounter.foes.firstIndex(where: { $0.id == id }) {
+                encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
+            }
+        }
     }
 
     private static func heal(_ ally: Combatant,
@@ -225,15 +271,17 @@ enum CombatRules {
     static func advanceTurn(in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
 
+        var roundTurned = false
         for step in 1...max(1, encounter.order.count) {
             let next = (encounter.turnIndex + step) % encounter.order.count
-            if next <= encounter.turnIndex { startNewRound(&encounter) }
+            if next <= encounter.turnIndex { startNewRound(&encounter); roundTurned = true }
             encounter.turnIndex = next
             if isAlive(encounter.order[next], in: withEncounter(encounter, on: run)) { break }
         }
 
         run.activeEncounter = encounter
         state.worlds.activeRun = run
+        if roundTurned { bleed(in: &state) }
     }
 
     private static func withEncounter(_ encounter: EncounterState, on run: WorldRun) -> WorldRun {
@@ -246,6 +294,33 @@ enum CombatRules {
         encounter.roundNumber += 1
         encounter.binderSkillCooldown = max(0, encounter.binderSkillCooldown - 1)
         encounter.companionSkillCooldown = max(0, encounter.companionSkillCooldown - 1)
+    }
+
+    /// Wounds that keep costing you, ticked once per round. Run from `advanceTurn` where the round
+    /// actually turns over, so a force-quit between rounds can't skip or double a tick.
+    private static func bleed(in state: inout GameState) {
+        guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+        let damage = Tuning.Encounter.bleedDamage
+
+        if encounter.binderBleedRounds > 0 {
+            encounter.binderBleedRounds -= 1
+            run.binderHP = max(0, run.binderHP - damage)
+            encounter.note("You're still bleeding — \(damage).")
+        }
+        if encounter.companionBleedRounds > 0, run.companionHP > 0 {
+            encounter.companionBleedRounds -= 1
+            run.companionHP = max(0, run.companionHP - damage)
+            encounter.note("Quill is still bleeding — \(damage).")
+        }
+        for index in encounter.foes.indices where encounter.foes[index].bleedRounds > 0
+            && encounter.foes[index].isAlive {
+            encounter.foes[index].bleedRounds -= 1
+            encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - damage)
+            encounter.note("\(encounter.foes[index].stats.displayName.capitalisedSentence) is still bleeding — \(damage).")
+        }
+
+        run.activeEncounter = encounter
+        state.worlds.activeRun = run
     }
 
     /// Whether the current actor is waiting on the player rather than acting for itself.
@@ -283,34 +358,72 @@ enum CombatRules {
         }
     }
 
-    /// Foes attack whoever is standing. PLACEHOLDER AI — the design's automation interest is on
-    /// the player's side of the fight, not this one.
+    /// Foes attack whoever is standing, in the manner their traits decided. PLACEHOLDER target
+    /// selection — the design's automation interest is on the player's side of the fight.
+    ///
+    /// **How it hits you is what it is** (creature-system-spec §7): pierce goes through armour,
+    /// crush lands heavier, rend leaves a wound that keeps costing you, and something that carries
+    /// its own heat or venom isn't stopped by armour at all.
     private static func performFoeTurn(_ actor: Combatant, in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
               let foeID = actor.foeID, let foe = encounter.foes.first(where: { $0.id == foeID })
         else { return }
 
-        let targets: [Combatant] = [.binder, .companion].filter { isAlive($0, in: run) }
-        guard let target = run.rng.pick(targets) else {
+        let standing: [Combatant] = [.binder, .companion].filter { isAlive($0, in: run) }
+        guard let primary = run.rng.pick(standing) else {
             run.activeEncounter = encounter
             state.worlds.activeRun = run
             checkOutcome(in: &state)
             return
         }
 
-        let raw = roll(around: foe.stats.attack, run: &run)
-        let amount = damageTaken(raw, by: target, in: state)
-        switch target {
-        case .binder: run.binderHP = max(0, run.binderHP - amount)
-        case .companion: run.companionHP = max(0, run.companionHP - amount)
-        case .foe: break
+        // Delivery decides how many of you it reaches, and at what cost to each blow.
+        let (targets, share): ([Combatant], Double) = switch foe.stats.delivery {
+        case .single: ([primary], 1)
+        case .multi: (standing, Tuning.Encounter.multiDeliveryShare)
+        case .area: (standing, Tuning.Encounter.areaDeliveryShare)
         }
-        encounter.note("\(foe.stats.displayName) hits \(actorName(target, encounter: encounter).lowercased()) for \(amount).")
+
+        for target in targets {
+            var raw = Double(roll(around: foe.stats.attack, run: &run)) * share
+            if foe.stats.damageKind == .crush { raw *= 1 + Tuning.Encounter.crushDamageBonus }
+
+            let amount: Int
+            if foe.stats.element != nil {
+                // Nothing you're wearing stops caustic, heat or light.
+                amount = max(Tuning.Encounter.minimumDamage, Int(raw.rounded()))
+            } else {
+                let ignored = foe.stats.damageKind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0
+                amount = damageTaken(Int(raw.rounded()), by: target, in: state, armourIgnored: ignored)
+            }
+            hurt(target, by: amount, run: &run, encounter: &encounter)
+
+            let verb = foe.stats.element.map(elementalVerb) ?? foe.stats.damageKind.verb
+            encounter.note("\(foe.stats.displayName.capitalisedSentence) \(verb) \(actorName(target, encounter: encounter).lowercased()) for \(amount).")
+
+            // Rend's wound outlives the blow.
+            if foe.stats.damageKind == .rend {
+                switch target {
+                case .binder: encounter.binderBleedRounds = Tuning.Encounter.bleedRounds
+                case .companion: encounter.companionBleedRounds = Tuning.Encounter.bleedRounds
+                case .foe: break
+                }
+                encounter.note("The wound won't close.")
+            }
+        }
 
         run.activeEncounter = encounter
         state.worlds.activeRun = run
         advanceTurn(in: &state)
         checkOutcome(in: &state)
+    }
+
+    private static func elementalVerb(_ element: EmanationKind) -> String {
+        switch element {
+        case .light: "sears"
+        case .heat: "scorches"
+        case .caustic: "burns"
+        }
     }
 
     private static func performAutomatedTurn(_ actor: Combatant, in state: inout GameState) {

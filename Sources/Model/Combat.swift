@@ -17,6 +17,8 @@ struct CombatStats: Codable, Equatable, Sendable {
     /// Which corner of the weapon triangle it fights from. Pierce ignores some armour, crush hits
     /// hard and slow, rend bleeds.
     var damageKind: DamageKind = .crush
+    /// Whether it hits one of you, several, or everything.
+    var delivery: Delivery = .single
     /// Decides the turn order. Sleek, small and lightly built goes first.
     var initiative: Int = 0
     /// 0–1. Chance an attack simply misses it.
@@ -29,14 +31,16 @@ struct CombatStats: Codable, Equatable, Sendable {
     var element: EmanationKind?
 
     init(displayName: String, icon: String, maxHP: Int, attack: Int, armour: Int = 0,
-         damageKind: DamageKind = .crush, initiative: Int = 0, evasion: Double = 0,
-         retaliation: Int = 0, strikesFirst: Bool = false, element: EmanationKind? = nil) {
+         damageKind: DamageKind = .crush, delivery: Delivery = .single, initiative: Int = 0,
+         evasion: Double = 0, retaliation: Int = 0, strikesFirst: Bool = false,
+         element: EmanationKind? = nil) {
         self.displayName = displayName
         self.icon = icon
         self.maxHP = maxHP
         self.attack = attack
         self.armour = armour
         self.damageKind = damageKind
+        self.delivery = delivery
         self.initiative = initiative
         self.evasion = evasion
         self.retaliation = retaliation
@@ -54,6 +58,7 @@ struct CombatStats: Codable, Equatable, Sendable {
         attack = try c.decodeIfPresent(Int.self, forKey: .attack) ?? 1
         armour = try c.decodeIfPresent(Int.self, forKey: .armour) ?? 0
         damageKind = try c.decodeIfPresent(DamageKind.self, forKey: .damageKind) ?? .crush
+        delivery = try c.decodeIfPresent(Delivery.self, forKey: .delivery) ?? .single
         initiative = try c.decodeIfPresent(Int.self, forKey: .initiative) ?? 0
         evasion = try c.decodeIfPresent(Double.self, forKey: .evasion) ?? 0
         retaliation = try c.decodeIfPresent(Int.self, forKey: .retaliation) ?? 0
@@ -96,10 +101,12 @@ struct CombatStats: Codable, Equatable, Sendable {
             attack: max(0, Int(attack.rounded())),
             armour: Int((traits.covering.armourValue * t.armourPerCovering).rounded()),
             damageKind: traits.armament.dominant,
+            delivery: traits.armament.delivery,
             initiative: Int(initiative.rounded()),
             evasion: evasion,
             retaliation: traits.isToxic ? max(1, Int((traits.size * t.retaliationPerSize).rounded())) : 0,
-            strikesFirst: traits.armament.reach == .far,
+            // Length beats speed at the moment of contact, and so does not being seen coming.
+            strikesFirst: traits.armament.reach == .far || traits.defence == .crypsis,
             element: traits.emanation.map(\.dominant)
         )
     }
@@ -143,7 +150,11 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
     /// How it fights, resolved at spawn. See `CombatStats`.
     var stats: CombatStats
     var currentHP: Int
-    /// Rounds of bleeding left, and how much each costs. Rend's wound outlives the blow.
+    /// Rounds of bleeding left. Rend's wound outlives the blow.
+    ///
+    /// Nothing the party carries rends yet, so today this is only set when creatures fight each
+    /// other — which is `living-worlds-spec.md`, not yet built. The ticker handles it either way so
+    /// that landing predation doesn't need to touch the encounter loop.
     var bleedRounds: Int = 0
 
     var isAlive: Bool { currentHP > 0 }
@@ -180,8 +191,8 @@ struct EncounterState: Codable, Equatable, Sendable {
     var id: InstanceID
     var foes: [FoeState]
 
-    /// Fixed rotation, party then enemies (PLACEHOLDER — there is no speed stat in v0). Stored
-    /// rather than recomputed so that a foe dying mid-round can't shift whose turn it is.
+    /// Resolved from initiative at the start of the fight, and **stored** rather than recomputed so
+    /// that a foe dying mid-round can't shift whose turn it is.
     var order: [Combatant]
     var turnIndex: Int = 0
     var roundNumber: Int = 1
@@ -196,6 +207,11 @@ struct EncounterState: Codable, Equatable, Sendable {
 
     /// Non-nil once the fight is over and waiting to be dismissed.
     var outcome: EncounterOutcome?
+
+    /// Rounds of bleeding left on each of you. Rend's wound outlives the blow, which is what makes
+    /// a rending creature worth fleeing rather than trading with.
+    var binderBleedRounds: Int = 0
+    var companionBleedRounds: Int = 0
 
     /// Rolling battle log shown above the action bar.
     var log: [String] = []
@@ -213,6 +229,37 @@ struct EncounterState: Codable, Equatable, Sendable {
     mutating func note(_ line: String) {
         log.append(line)
         if log.count > 24 { log.removeFirst(log.count - 24) }
+    }
+
+    init(id: InstanceID, foes: [FoeState], order: [Combatant], log: [String] = []) {
+        self.id = id
+        self.foes = foes
+        self.order = order
+        self.log = log
+    }
+
+    /// Tolerant decoding, per the policy in `Migrations.swift`.
+    ///
+    /// **This one had synthesised `Codable` until a bleed counter was added to it**, which is the
+    /// same shape as the bug that quarantined a real save on a real device: a field added here has
+    /// no key in an older save, and synthesised decoding *throws* rather than defaulting. Being
+    /// mid-encounter is the hardest resume case the acceptance criteria name, so it is the last
+    /// place in the save that should be brittle.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(InstanceID.self, forKey: .id)
+        foes = try c.decodeIfPresent([FoeState].self, forKey: .foes) ?? []
+        order = try c.decodeIfPresent([Combatant].self, forKey: .order) ?? [.binder, .companion]
+        turnIndex = try c.decodeIfPresent(Int.self, forKey: .turnIndex) ?? 0
+        roundNumber = try c.decodeIfPresent(Int.self, forKey: .roundNumber) ?? 1
+        binderSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .binderSkillCooldown) ?? 0
+        companionSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .companionSkillCooldown) ?? 0
+        isCompanionOverridden = try c.decodeIfPresent(Bool.self, forKey: .isCompanionOverridden) ?? false
+        outcome = try c.decodeIfPresent(EncounterOutcome.self, forKey: .outcome)
+        binderBleedRounds = try c.decodeIfPresent(Int.self, forKey: .binderBleedRounds) ?? 0
+        companionBleedRounds = try c.decodeIfPresent(Int.self, forKey: .companionBleedRounds) ?? 0
+        log = try c.decodeIfPresent([String].self, forKey: .log) ?? []
+        spoils = try c.decodeIfPresent([String].self, forKey: .spoils) ?? []
     }
 }
 
