@@ -188,8 +188,9 @@
 - [x] **A world written for life is crawling with it** (Aimee, 6 Aug) — see Q38. Dark redirects
       life into fungal growth instead of deleting it, dryness leaves something hardy, and
       population is measured against a vitality that worlds actually reach
-- [ ] **Skills 2 → 12** (`resources-skills-spec.md` §2). Needs new effect kinds in `CombatRules` —
-      `SkillDef.Kind` only knows damage and heal, and Pry/Flense/Ward/Draw Off/Sight all want more
+- [x] **Skills 2 → 13** (`resources-skills-spec.md` §2). Eleven new kinds in `CombatRules`, each
+      answering a specific kind of creature; per-skill cooldowns; a skill list that prints what each
+      one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
 ## The search loop actually pays out (Aimee, 6 Aug 2026)

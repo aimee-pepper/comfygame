@@ -51,6 +51,8 @@ struct ContentCatalog: Sendable {
     func resource(_ id: ResourceID) -> ResourceDef? { resources.first { $0.id == id } }
     func item(_ id: ItemID) -> ItemDef? { items.first { $0.id == id } }
     func skill(_ id: SkillID) -> SkillDef? { skills.first { $0.id == id } }
+    /// **Everything this member can do**, in a stable order. One each used to be the whole game.
+    func skills(ownedBy owner: SkillDef.Owner) -> [SkillDef] { skills.filter { $0.owner == owner } }
     func skill(ownedBy owner: SkillDef.Owner) -> SkillDef? { skills.first { $0.owner == owner } }
     func pressureTarget(_ id: PressureTargetID) -> PressureTargetDef? { pressureTargets.first { $0.id == id } }
     func pressureSource(_ id: PressureSourceID) -> PressureSourceDef? { pressureSources.first { $0.id == id } }

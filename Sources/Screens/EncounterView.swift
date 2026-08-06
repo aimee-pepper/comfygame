@@ -8,6 +8,10 @@ import SwiftUI
 struct EncounterView: View {
     @EnvironmentObject private var store: GameStore
     @State private var targetingAction: TargetingMode?
+    /// The skill you've chosen and are now picking a target for. Nil while attacking.
+    @State private var pendingSkill: SkillDef?
+    /// The skill list, open. Twelve of them won't fit on a key.
+    @State private var isChoosingSkill = false
 
     private var run: WorldRun? { store.state.worlds.activeRun }
     private var encounter: EncounterState? { store.activeEncounter }
@@ -27,6 +31,9 @@ struct EncounterView: View {
                     outcomeBar(outcome)
                 } else {
                     actionBar(run, encounter)
+                        .sheet(isPresented: $isChoosingSkill) {
+                            SkillSheet(onUse: use).environmentObject(store)
+                        }
                 }
             }
         }
@@ -105,10 +112,16 @@ struct EncounterView: View {
         guard let mode = targetingAction, foe.isAlive else { return }
         switch mode {
         case .attack: store.takeCombatAction(.attack(foe: foe.id))
-        case .damageSkill: store.takeCombatAction(.damageSkill(foe: foe.id))
+        case .damageSkill:
+            if let pendingSkill {
+                store.takeCombatAction(.skill(pendingSkill.id, foe: foe.id))
+            } else {
+                store.takeCombatAction(.damageSkill(foe: foe.id))
+            }
         case .item: break // items target allies, handled in the bar
         }
         targetingAction = nil
+        pendingSkill = nil
     }
 
     // MARK: Log
@@ -135,20 +148,23 @@ struct EncounterView: View {
         VStack(spacing: 8) {
             if let mode = targetingAction {
                 HStack {
-                    Text(mode == .attack ? "Choose a target." : "Choose a target for \(store.currentSkill?.name ?? "your skill").")
+                    Text(mode == .attack ? "Choose a target."
+                                        : "Choose a target for \(pendingSkill?.name ?? "your skill").")
                         .font(.footnote)
                     Spacer()
-                    Button("Cancel") { targetingAction = nil }
+                    Button("Cancel") { targetingAction = nil; pendingSkill = nil }
                         .font(.footnote.weight(.semibold))
                 }
                 .frame(minHeight: 44)
             } else if store.actingCombatant != nil {
                 HStack(spacing: 8) {
                     ActionKey("Attack", icon: "figure.fencing") { beginTargeting(.attack) }
-                    ActionKey(store.currentSkill?.name ?? "Skill",
-                              icon: store.currentSkill?.icon ?? "sparkles",
+                    // **Twelve skills don't fit on a key.** Opens the list, which is also where
+                    // each one says what it's *for* — the spec's rule that a skill names the
+                    // problem it solves is worth nothing if the UI doesn't print it.
+                    ActionKey("Skills", icon: "sparkles",
                               detail: skillDetail(encounter),
-                              isEnabled: store.isSkillReady) { useSkill() }
+                              isEnabled: store.hasAnyReadySkill) { isChoosingSkill = true }
                 }
                 HStack(spacing: 8) {
                     ActionKey("Item", icon: "cross.vial",
@@ -171,10 +187,12 @@ struct EncounterView: View {
         .background(.bar)
     }
 
+    /// How many are actually usable this turn — the number you'd want before opening the list.
     private func skillDetail(_ encounter: EncounterState) -> String? {
-        guard let actor = store.actingCombatant else { return nil }
-        let cooldown = CombatRules.skillCooldown(for: actor, in: encounter)
-        return cooldown > 0 ? "\(cooldown) round\(cooldown == 1 ? "" : "s")" : nil
+        let ready = store.readySkills.count
+        let total = store.actorSkills.count
+        guard total > 0 else { return "none" }
+        return ready == 0 ? "all cooling" : "\(ready) of \(total)"
     }
 
     private func beginTargeting(_ mode: TargetingMode) {
@@ -183,7 +201,13 @@ struct EncounterView: View {
             if let only = encounter?.livingFoes.first {
                 switch mode {
                 case .attack: store.takeCombatAction(.attack(foe: only.id))
-                case .damageSkill: store.takeCombatAction(.damageSkill(foe: only.id))
+                case .damageSkill:
+                    if let pendingSkill {
+                        store.takeCombatAction(.skill(pendingSkill.id, foe: only.id))
+                    } else {
+                        store.takeCombatAction(.damageSkill(foe: only.id))
+                    }
+                    pendingSkill = nil
                 case .item: break
                 }
             }
@@ -192,11 +216,16 @@ struct EncounterView: View {
         targetingAction = mode
     }
 
-    private func useSkill() {
-        guard let skill = store.currentSkill else { return }
-        switch skill.kind {
-        case .damage: beginTargeting(.damageSkill)
-        case .heal: store.takeCombatAction(.healSkill(ally: weakestAlly()))
+    /// Chosen from the list. Anything needing a foe goes into targeting; anything else fires now.
+    private func use(_ skill: SkillDef) {
+        isChoosingSkill = false
+        if skill.needsFoe {
+            pendingSkill = skill
+            beginTargeting(.damageSkill)
+        } else if skill.needsAlly {
+            store.takeCombatAction(.skill(skill.id, ally: weakestAlly()))
+        } else {
+            store.takeCombatAction(.skill(skill.id))
         }
     }
 
@@ -394,4 +423,71 @@ private struct ActionKey: View {
 
 #Preview {
     EncounterView().environmentObject(GameStore(io: .temporary(name: "preview-encounter")))
+}
+
+
+/// The skill list.
+///
+/// **Every row says what it's for.** `resources-skills-spec.md` §2 rules that a skill which is good
+/// against everything is just a bigger attack — so each one names the kind of creature it answers,
+/// and the list prints that rather than making you infer it from a power number.
+private struct SkillSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    let onUse: (SkillDef) -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(store.actorSkills) { skill in
+                        let cooling = store.cooldown(of: skill)
+                        Button {
+                            onUse(skill)
+                            dismiss()
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: skill.icon)
+                                    .foregroundStyle(cooling > 0 ? Color.secondary : .accentColor)
+                                    .frame(width: 24)
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(skill.name).font(.callout.weight(.medium))
+                                    // The problem it solves, which is the whole reason to have it.
+                                    Text(skill.answers.isEmpty ? skill.blurb : skill.answers)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                Spacer(minLength: 6)
+                                if cooling > 0 {
+                                    Text("\(cooling)")
+                                        .font(.caption.monospacedDigit())
+                                        .foregroundStyle(.secondary)
+                                        .padding(.horizontal, 8).padding(.vertical, 3)
+                                        .background(Color(.tertiarySystemFill), in: Capsule())
+                                } else if skill.power > 0 {
+                                    Text("\(skill.power)")
+                                        .font(.caption.monospacedDigit())
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .frame(minHeight: 44)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(cooling > 0)
+                        .opacity(cooling > 0 ? 0.5 : 1)
+                    }
+                } footer: {
+                    Text("A number on the right is what it costs you in rounds before you can use it again.")
+                }
+            }
+            .navigationTitle("Skills")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Back") { dismiss() } }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
 }

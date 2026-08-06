@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER. The brief gives each party member exactly one Skill but no resource to spend on it, so a round-counted COOLDOWN is the stopgap limiter — without one, Skill strictly dominates Attack and the action bar has no decision in it. Counted in rounds, never seconds. 'owner' ties a skill to a party member; when the party expands past two, this moves onto the character instead. See questions-for-design Q11.",
+  "_note": "PLACEHOLDER numbers. THE DESIGN RULE (resources-skills-spec.md §2): every skill answers a specific kind of creature. If it is good against everything it is just a bigger attack. 'answers' names the problem it solves and is printed in the skill list, so the rule is visible to the player rather than only to us. Limiter is a round-counted COOLDOWN per skill and nothing else — no mana pool, deliberately: a second resource to track in every fight is the wrong overhead for this game, so stronger skills carry longer cooldowns instead. 'owner' ties a skill to a party member; when the party expands past two this moves onto the character. Fall Back from the spec is NOT here — it swaps ranks, and ranks aren't built (Q34).",
   "skills": [
     {
       "id": "unbind",
@@ -9,7 +9,81 @@
       "kind": "damage",
       "power": 11,
       "cooldownRounds": 2,
-      "owner": "binder"
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Anything. The one that always works."
+    },
+    {
+      "id": "pry",
+      "name": "Pry",
+      "icon": "screwdriver.fill",
+      "blurb": "Find the gap and lever it open.",
+      "kind": "armourIgnoring",
+      "power": 7,
+      "cooldownRounds": 3,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Heavily plated things, whose armour eats an honest swing."
+    },
+    {
+      "id": "overbear",
+      "name": "Overbear",
+      "icon": "figure.strengthtraining.traditional",
+      "blurb": "Everything you have, and you're out of position after.",
+      "kind": "overbear",
+      "power": 19,
+      "cooldownRounds": 4,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Armoured and slow. You'll act last next round."
+    },
+    {
+      "id": "sight",
+      "name": "Sight",
+      "icon": "eye.fill",
+      "blurb": "Look at it properly.",
+      "kind": "reveal",
+      "power": 0,
+      "cooldownRounds": 2,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Anything you haven't met. Tells you what it's wearing."
+    },
+    {
+      "id": "draw_off",
+      "name": "Draw Off",
+      "icon": "hand.raised.fill",
+      "blurb": "Make yourself the obvious problem.",
+      "kind": "taunt",
+      "power": 0,
+      "cooldownRounds": 3,
+      "owner": "binder",
+      "rounds": 2,
+      "answers": "Protecting Quill from something that would finish them."
+    },
+    {
+      "id": "quicken",
+      "name": "Quicken",
+      "icon": "hare.fill",
+      "blurb": "Twice now, nothing next.",
+      "kind": "quicken",
+      "power": 0,
+      "cooldownRounds": 4,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Finishing something before it finishes you."
+    },
+    {
+      "id": "rout",
+      "name": "Rout",
+      "icon": "figure.run.circle.fill",
+      "blurb": "Leave, and the world doesn't notice you going.",
+      "kind": "rout",
+      "power": 0,
+      "cooldownRounds": 5,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "The fight you should never have started. Costs no stability."
     },
     {
       "id": "mend",
@@ -19,7 +93,69 @@
       "kind": "heal",
       "power": 12,
       "cooldownRounds": 3,
-      "owner": "companion"
+      "owner": "companion",
+      "rounds": 1,
+      "answers": "Anyone hurt."
+    },
+    {
+      "id": "flense",
+      "name": "Flense",
+      "icon": "scissors",
+      "blurb": "Open it, and keep it open.",
+      "kind": "bleed",
+      "power": 9,
+      "cooldownRounds": 3,
+      "owner": "companion",
+      "rounds": 3,
+      "answers": "Shaggy, thick-pelted things. Useless on plate."
+    },
+    {
+      "id": "ward",
+      "name": "Ward",
+      "icon": "shield.lefthalf.filled",
+      "blurb": "Set yourself against one kind of harm.",
+      "kind": "ward",
+      "power": 0,
+      "cooldownRounds": 3,
+      "owner": "companion",
+      "rounds": 2,
+      "answers": "Whatever you just learned is coming. Ask Sight first."
+    },
+    {
+      "id": "snuff",
+      "name": "Snuff",
+      "icon": "flame.fill",
+      "blurb": "Put out whatever it's giving off.",
+      "kind": "snuff",
+      "power": 0,
+      "cooldownRounds": 4,
+      "owner": "companion",
+      "rounds": 1,
+      "answers": "Things that burn, glow or reek — the damage armour can't stop."
+    },
+    {
+      "id": "steady",
+      "name": "Steady",
+      "icon": "bandage.fill",
+      "blurb": "Press until it stops.",
+      "kind": "cleanse",
+      "power": 0,
+      "cooldownRounds": 2,
+      "owner": "companion",
+      "rounds": 1,
+      "answers": "A wound that won't close on its own."
+    },
+    {
+      "id": "read",
+      "name": "Read",
+      "icon": "book.fill",
+      "blurb": "Take it in properly. You'll know it again.",
+      "kind": "read",
+      "power": 0,
+      "cooldownRounds": 3,
+      "owner": "companion",
+      "rounds": 1,
+      "answers": "Collecting. A bestiary entry without a kill."
     }
   ]
 }

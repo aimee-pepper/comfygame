@@ -354,15 +354,22 @@ final class CombatTests: XCTestCase {
 
     /// **Warning colours are honest** — hitting something that advertises costs you.
     func testHittingSomethingThatAdvertisesCostsYou() throws {
+        // Big and thick-boned, so it survives the blow — retaliation only happens if there's
+        // something left to retaliate. And the turn is handed to the Binder explicitly, because
+        // initiative decides who swings first and this test isn't about that.
         var toxic = CreatureTraits()
-        toxic.size = 70
+        toxic.size = 90
+        toxic.boneDensity = 90
         toxic.isToxic = true
         toxic.covering = Covering(hardness: 0, length: 0, coverage: 40)
         let store = inFightWith([toxic])
         let foe = try XCTUnwrap(foes(store).first)
+        giveTheTurnTo(.binder, in: store)
         let hpBefore = store.state.worlds.activeRun?.binderHP ?? 0
 
-        store.takeCombatAction(.attack(foe: foe.id))
+        store.mutate("test: swing at it") {
+            CombatRules.perform(.attack(foe: foe.id), by: .binder, in: &$0)
+        }
 
         XCTAssertLessThan(store.state.worlds.activeRun?.binderHP ?? 0, hpBefore,
                           "you traded blows with something toxic and paid nothing")
@@ -578,4 +585,163 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(gear.tier, 2)
     }
 
+
+    // MARK: Skills — every one answers a specific kind of creature
+
+    /// Turn order comes off initiative, so which of you acts first varies with the seed. Tests that
+    /// are about a *skill* shouldn't also be about who got to move.
+    private func giveTheTurnTo(_ actor: Combatant, in store: GameStore) {
+        store.mutate("test: whose turn") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.turnIndex = encounter.order.firstIndex(of: actor) ?? 0
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+    }
+
+    /// A skill that's good against everything is just a bigger attack
+    /// (`resources-skills-spec.md` §2). This is the test that keeps the set honest: **Pry does more
+    /// to a plated thing than Unbind does, and less to a bare one**, which is the definition of
+    /// answering something in particular.
+    func testPryBeatsAnHonestSwingOnlyAgainstArmour() throws {
+        func damageDone(_ skill: SkillID, to traits: CreatureTraits) throws -> Int {
+            let store = inFightWith([traits])
+            let encounter = try XCTUnwrap(store.activeEncounter)
+            let before = try XCTUnwrap(encounter.foes.first).currentHP
+            let foeID = try XCTUnwrap(encounter.foes.first).id
+            giveTheTurnTo(.binder, in: store)
+            store.mutate("test: use it") { CombatRules.perform(.skill(skill, foe: foeID), by: .binder, in: &$0) }
+            let after = store.activeEncounter?.foes.first { $0.id == foeID }?.currentHP ?? 0
+            return before - after
+        }
+
+        var plated = CreatureTraits()
+        plated.size = 70; plated.build = 80
+        plated.covering = Covering(hardness: 95, length: 5, coverage: 95)
+
+        var bare = CreatureTraits()
+        bare.size = 70; bare.build = 80
+        bare.covering = Covering(hardness: 0, length: 0, coverage: 5)
+
+        let pryPlated = try damageDone("pry", to: plated)
+        let swingPlated = try damageDone("unbind", to: plated)
+        let pryBare = try damageDone("pry", to: bare)
+        let swingBare = try damageDone("unbind", to: bare)
+
+        XCTAssertGreaterThan(pryPlated, swingPlated,
+                             "Pry is supposed to be the answer to armour and isn't")
+        XCTAssertLessThan(pryBare, swingBare,
+                          "Pry is beating an honest swing on a bare creature, so it answers nothing")
+    }
+
+    /// **Flense scales with how much there is to open.** Nothing on plate, a great deal on fur —
+    /// the mirror of the creature system's own rend, and what stops it being a universal DOT.
+    func testFlenseOpensFurAndFindsNothingOnPlate() throws {
+        func bleedPerRound(_ traits: CreatureTraits) throws -> Int {
+            let store = inFightWith([traits])
+            let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
+            giveTheTurnTo(.companion, in: store)
+            store.mutate("test: use it") { CombatRules.perform(.skill("flense", foe: foeID), by: .companion, in: &$0) }
+            return store.activeEncounter?.foeBleeds[foeID]?.damage ?? 0
+        }
+
+        var shaggy = CreatureTraits()
+        shaggy.size = 60
+        shaggy.covering = Covering(hardness: 5, length: 95, coverage: 95)
+
+        var plated = CreatureTraits()
+        plated.size = 60
+        plated.covering = Covering(hardness: 95, length: 2, coverage: 95)
+
+        XCTAssertGreaterThan(try bleedPerRound(shaggy), try bleedPerRound(plated) * 2,
+                             "Flense doesn't care what it's cutting, so it answers nothing")
+    }
+
+    /// **Ward turns aside the kind you set it against, and nothing else.** Which is what makes
+    /// Sight worth a round first — guessing wrong costs you the round you spent.
+    func testWardOnlyHelpsAgainstWhatYouSetItFor() {
+        var crusher = CreatureTraits()
+        crusher.size = 80; crusher.build = 90
+        crusher.armament.mix = WeaponMix(pierce: 0, crush: 1, rend: 0)
+        crusher.armament.setTotal(80)
+
+        func binderHPAfterBeingHit(warding against: DamageKind?) -> Int {
+            let store = inFightWith([crusher])
+            store.mutate("test: stand and take it") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+                if let against { encounter.wards[.binder] = WardState(against: against, rounds: 3) }
+                // Force the foe to act next, at the Binder.
+                let foe = encounter.foes[0].id
+                encounter.taunts[foe] = 3
+                encounter.turnIndex = encounter.order.firstIndex(of: .foe(foe)) ?? 0
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+            }
+            store.mutate("test: let it swing") { CombatRules.runAutomaticTurns(in: &$0) }
+            return store.state.worlds.activeRun?.binderHP ?? 0
+        }
+
+        let warded = binderHPAfterBeingHit(warding: .crush)
+        let wrong = binderHPAfterBeingHit(warding: .pierce)
+        XCTAssertGreaterThan(warded, wrong, "a Ward set correctly didn't turn anything aside")
+    }
+
+    /// **Draw Off is the only way to take a hit meant for somebody else.**
+    func testDrawOffMakesItComeForYou() throws {
+        let store = inFightWith([armoured()])
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
+        giveTheTurnTo(.binder, in: store)
+        store.mutate("test: use it") { CombatRules.perform(.skill("draw_off", foe: foeID), by: .binder, in: &$0) }
+        XCTAssertGreaterThan(store.activeEncounter?.taunts[foeID] ?? 0, 0)
+    }
+
+    /// **Read is a bestiary entry without a kill** — the non-violent option, which matters in a game
+    /// whose progression is literacy rather than slaughter.
+    func testReadLearnsACreatureWithoutKillingIt() throws {
+        let store = inFightWith([armoured()])
+        let foe = try XCTUnwrap(store.activeEncounter?.foes.first)
+        // Meeting something already counts it as seen; what Read adds is **the specimen** — this
+        // particular animal, kept so the entry can say how this one compared.
+        let specimensBefore = store.state.reality.discovery.specimens.count
+
+        giveTheTurnTo(.companion, in: store)
+        store.mutate("test: use it") { CombatRules.perform(.skill("read", foe: foe.id), by: .companion, in: &$0) }
+
+        XCTAssertGreaterThan(store.state.reality.discovery.specimens.count, specimensBefore,
+                             "Read didn't write a bestiary specimen")
+        XCTAssertNotNil(store.state.reality.discovery.species[foe.identityKey],
+                        "Read didn't write a bestiary entry")
+        XCTAssertTrue(store.activeEncounter?.foes.first?.isAlive ?? false,
+                      "Read killed it, which is the one thing it must not do")
+    }
+
+    /// Every skill has its own timer. Twelve sharing one would mean using the best and never
+    /// meeting the other eleven.
+    func testSkillsCoolSeparately() throws {
+        let store = inFightWith([armoured()])
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
+        giveTheTurnTo(.binder, in: store)
+        store.mutate("test: use it") { CombatRules.perform(.skill("pry", foe: foeID), by: .binder, in: &$0) }
+
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        let pry = try XCTUnwrap(ContentCatalog.shared.skill("pry"))
+        let sight = try XCTUnwrap(ContentCatalog.shared.skill("sight"))
+        XCTAssertGreaterThan(CombatRules.cooldown(of: pry, for: .binder, in: encounter), 0)
+        XCTAssertEqual(CombatRules.cooldown(of: sight, for: .binder, in: encounter), 0,
+                       "using one skill put another on cooldown")
+    }
+
+    /// The set has to be big enough to be a set, and every one of them has to say what it's for.
+    func testEverySkillNamesTheProblemItSolves() {
+        XCTAssertGreaterThanOrEqual(ContentCatalog.shared.skills.count, 12,
+                                    "the player side of combat is still a couple of buttons")
+        for skill in ContentCatalog.shared.skills {
+            XCTAssertFalse(skill.answers.isEmpty,
+                           "\(skill.name) doesn't say what kind of creature it answers")
+        }
+        // Both of them get a real list, not one a piece.
+        for owner in [SkillDef.Owner.binder, .companion] {
+            XCTAssertGreaterThanOrEqual(ContentCatalog.shared.skills(ownedBy: owner).count, 5)
+        }
+    }
 }

@@ -128,11 +128,25 @@ enum Combatant: Codable, Equatable, Hashable, Sendable {
 
     var isParty: Bool { self == .binder || self == .companion }
     var foeID: InstanceID? { if case .foe(let id) = self { id } else { nil } }
+
+    /// A stable string for dictionary keys inside the encounter — cooldowns, wards, turn debts.
+    var storageKey: String {
+        switch self {
+        case .binder: "binder"
+        case .companion: "companion"
+        case .foe(let id): "foe-\(id.rawValue)"
+        }
+    }
 }
 
-/// What a combatant can do on their turn. `Skill` is one each, per the brief.
+/// What a combatant can do on their turn.
 enum CombatAction: Codable, Equatable, Sendable {
     case attack(foe: InstanceID)
+    /// **A named skill.** Twelve of them now, so which one is part of the action rather than
+    /// something inferred from the single skill a member used to own.
+    case skill(SkillID, foe: InstanceID? = nil, ally: Combatant? = nil)
+    /// The two the gambit vocabulary still speaks in: "use your damage skill", "use your heal".
+    /// Resolved against whatever the member actually carries.
     case damageSkill(foe: InstanceID)
     case healSkill(ally: Combatant)
     case useItem(stack: InstanceID, ally: Combatant)
@@ -223,8 +237,30 @@ struct EncounterState: Codable, Equatable, Sendable {
     var roundNumber: Int = 1
 
     /// Rounds until each side's skill comes back. Counted in *rounds*, never seconds.
+    ///
+    /// **Legacy**: one skill each, one cooldown each. Kept so a save written mid-fight before the
+    /// party had more than two skills between them still loads and still resumes correctly.
     var binderSkillCooldown: Int = 0
     var companionSkillCooldown: Int = 0
+
+    /// Rounds until each *individual* skill comes back, keyed `owner|skill`. Per skill, because
+    /// twelve skills sharing one timer would mean picking the best one and never seeing the rest.
+    var cooldowns: [String: Int] = [:]
+
+    /// **Wounds that keep opening**, per foe. Rend's own trick, now available to you (Flense).
+    var foeBleeds: [InstanceID: BleedState] = [:]
+    /// What each of you is currently turning aside, and for how long (Ward).
+    var wards: [Combatant: WardState] = [:]
+    /// Foes that have to come for the Binder instead of choosing, and for how many rounds
+    /// (Draw Off). The only way to take a hit meant for somebody else.
+    var taunts: [InstanceID: Int] = [:]
+    /// Foes whose traits you've actually looked at (Sight). Nothing else reveals a covering.
+    var revealed: Set<InstanceID> = []
+    /// Foes no longer giving anything off (Snuff).
+    var snuffed: Set<InstanceID> = []
+    /// Extra turns owed, and turns owed back. Quicken buys the first with the second.
+    var extraTurns: [Combatant: Int] = [:]
+    var skippedTurns: [Combatant: Int] = [:]
 
     /// Set by tapping the companion: their next turn is yours to direct instead of the gambits'.
     /// Clears once used — an override is for that turn only (the FF12 rule).
@@ -279,12 +315,55 @@ struct EncounterState: Codable, Equatable, Sendable {
         roundNumber = try c.decodeIfPresent(Int.self, forKey: .roundNumber) ?? 1
         binderSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .binderSkillCooldown) ?? 0
         companionSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .companionSkillCooldown) ?? 0
+        cooldowns = try c.decodeIfPresent([String: Int].self, forKey: .cooldowns) ?? [:]
+        foeBleeds = try c.decodeIfPresent([InstanceID: BleedState].self, forKey: .foeBleeds) ?? [:]
+        wards = try c.decodeIfPresent([Combatant: WardState].self, forKey: .wards) ?? [:]
+        taunts = try c.decodeIfPresent([InstanceID: Int].self, forKey: .taunts) ?? [:]
+        revealed = try c.decodeIfPresent(Set<InstanceID>.self, forKey: .revealed) ?? []
+        snuffed = try c.decodeIfPresent(Set<InstanceID>.self, forKey: .snuffed) ?? []
+        extraTurns = try c.decodeIfPresent([Combatant: Int].self, forKey: .extraTurns) ?? [:]
+        skippedTurns = try c.decodeIfPresent([Combatant: Int].self, forKey: .skippedTurns) ?? [:]
         isCompanionOverridden = try c.decodeIfPresent(Bool.self, forKey: .isCompanionOverridden) ?? false
         outcome = try c.decodeIfPresent(EncounterOutcome.self, forKey: .outcome)
         binderBleedRounds = try c.decodeIfPresent(Int.self, forKey: .binderBleedRounds) ?? 0
         companionBleedRounds = try c.decodeIfPresent(Int.self, forKey: .companionBleedRounds) ?? 0
         log = try c.decodeIfPresent([String].self, forKey: .log) ?? []
         spoils = try c.decodeIfPresent([String].self, forKey: .spoils) ?? []
+    }
+}
+
+/// A wound that keeps opening. Damage per round, and how many rounds are left.
+struct BleedState: Codable, Equatable, Sendable {
+    var damage: Int
+    var rounds: Int
+
+    init(damage: Int, rounds: Int) {
+        self.damage = damage
+        self.rounds = rounds
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        damage = try c.decodeIfPresent(Int.self, forKey: .damage) ?? 0
+        rounds = try c.decodeIfPresent(Int.self, forKey: .rounds) ?? 0
+    }
+}
+
+/// What somebody is turning aside, and for how long. A ward is against **one kind** — the whole
+/// point is that you have to know what's coming.
+struct WardState: Codable, Equatable, Sendable {
+    var against: DamageKind
+    var rounds: Int
+
+    init(against: DamageKind, rounds: Int) {
+        self.against = against
+        self.rounds = rounds
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        against = try c.decodeIfPresent(DamageKind.self, forKey: .against) ?? .pierce
+        rounds = try c.decodeIfPresent(Int.self, forKey: .rounds) ?? 0
     }
 }
 

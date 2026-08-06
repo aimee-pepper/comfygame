@@ -468,7 +468,13 @@ enum Tuning {
         static let companionBaseAttack: Int = 5      // PLACEHOLDER
         static let attackPerWeaponTier: Int = 2      // PLACEHOLDER
         static let defencePerArmorTier: Int = 1      // PLACEHOLDER
-        static let minimumDamage: Int = 1            // a hit always does something
+        static let minimumDamage: Int = 1
+        /// Covering thin enough that a flensing skill finds nothing to open — the reading that
+        /// makes Flense an answer to shaggy things and useless against plated ones.
+        static let thinCovering: Double = 0.2   // PLACEHOLDER — a flensing skill finds nothing to open
+        /// How much a Ward turns aside, when it's set against the right thing. Deliberately short of
+        /// total: setting it correctly should be a good round, not an immunity.
+        static let wardReduction: Double = 0.6  // PLACEHOLDER
         /// Damage and healing wobble by ±this fraction of their power.
         static let damageVariance: Double = 0.25     // PLACEHOLDER
         static let consumableHealAmount: Int = 10    // PLACEHOLDER

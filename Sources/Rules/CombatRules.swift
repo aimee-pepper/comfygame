@@ -120,6 +120,202 @@ enum CombatRules {
         return max(Tuning.Encounter.minimumDamage, raw - effective)
     }
 
+    // MARK: Skills
+
+    /// **Everything this member can do**, in catalogue order.
+    ///
+    /// One each was the whole player side of combat while foes had trait-derived armour, damage
+    /// character, reach and retaliation (`resources-skills-spec.md` §2, audit #9's second priority).
+    static func skills(for actor: Combatant) -> [SkillDef] {
+        switch actor {
+        case .binder: ContentCatalog.shared.skills(ownedBy: .binder)
+        case .companion: ContentCatalog.shared.skills(ownedBy: .companion)
+        case .foe: []
+        }
+    }
+
+    /// The first skill of a kind this member could use *right now*. Nil if they haven't got one or
+    /// it's still cooling.
+    static func ready(_ kind: SkillDef.Kind, for actor: Combatant,
+                      in encounter: EncounterState) -> SkillDef? {
+        skills(for: actor).first { $0.kind == kind && cooldown(of: $0, for: actor, in: encounter) == 0 }
+    }
+
+    /// What a gambit means by "use a skill" now that there are twelve.
+    ///
+    /// Heal a hurt ally if anything is hurt and a heal is up; otherwise the strongest ready thing
+    /// that isn't a heal. Deliberately simple — the player's own rule list is where nuance belongs,
+    /// and inventing a hidden priority order here would fight it.
+    static func bestReadySkill(for actor: Combatant, in encounter: EncounterState,
+                               state: GameState) -> SkillDef? {
+        guard let run = state.worlds.activeRun else { return nil }
+        let hurt = [Combatant.binder, .companion].contains {
+            let hp = health(of: $0, in: run)
+            return hp.current > 0 && hp.current < hp.max
+        }
+        if hurt, let heal = ready(.heal, for: actor, in: encounter) { return heal }
+        return skills(for: actor)
+            .filter { $0.kind != .heal && $0.kind != .rout }
+            .filter { cooldown(of: $0, for: actor, in: encounter) == 0 }
+            .max { $0.power < $1.power }
+    }
+
+    /// Cooldowns are keyed per skill, because twelve sharing one timer means picking the best and
+    /// never seeing the other eleven.
+    static func cooldownKey(_ skill: SkillDef, for actor: Combatant) -> String {
+        "\(actor.storageKey)|\(skill.id.rawValue)"
+    }
+
+    static func cooldown(of skill: SkillDef, for actor: Combatant,
+                         in encounter: EncounterState) -> Int {
+        if let counted = encounter.cooldowns[cooldownKey(skill, for: actor)] { return counted }
+        // **Only** a save written before per-skill timers existed falls back to the single number,
+        // and only while nothing has been used since. Reading the legacy field the moment any key
+        // is missing would put every unused skill on the cooldown of the one you just spent.
+        guard encounter.cooldowns.isEmpty else { return 0 }
+        switch actor {
+        case .binder: return encounter.binderSkillCooldown
+        case .companion: return encounter.companionSkillCooldown
+        case .foe: return 0
+        }
+    }
+
+    static func isReady(_ skill: SkillDef, for actor: Combatant, in encounter: EncounterState) -> Bool {
+        cooldown(of: skill, for: actor, in: encounter) == 0
+    }
+
+    /// **Every skill's effect.**
+    ///
+    /// The design rule the whole set is built on (`resources-skills-spec.md` §2): *every skill
+    /// answers a specific kind of creature.* If it's good against everything it's just a bigger
+    /// attack. So each of these reads something the creature system already computes — its
+    /// covering, its armour, what it gives off — and is worth reaching for exactly when that
+    /// reading is bad news.
+    private static func use(_ skill: SkillDef, by actor: Combatant,
+                            on foeID: InstanceID?, ally: Combatant?,
+                            run: inout WorldRun, encounter: inout EncounterState,
+                            discovery: inout DiscoveryLog, weaponKind: DamageKind?) {
+        let foe = foeID.flatMap { id in encounter.foes.first { $0.id == id && $0.isAlive } }
+
+        switch skill.kind {
+        case .damage:
+            guard let foe else { return }
+            strike(foe.id, damage: skill.power, by: actor, kind: skill.damage ?? weaponKind,
+                   run: &run, encounter: &encounter, verb: skill.name)
+
+        case .heal:
+            let target = ally ?? actor
+            let amount = roll(around: skill.power, run: &run)
+            heal(target, by: amount, run: &run, encounter: &encounter, source: skill.name, healer: actor)
+
+        case .armourIgnoring:
+            // **Pry.** Goes under the plate entirely, and hits for very little. The answer to a
+            // bulwark whose armour is eating four fifths of every honest swing.
+            guard let foe else { return }
+            strike(foe.id, damage: skill.power, by: actor, kind: .pierce,
+                   run: &run, encounter: &encounter, verb: skill.name, ignoresArmour: true)
+
+        case .overbear:
+            // **Overbear.** All your weight behind it, and you're out of position afterwards.
+            guard let foe else { return }
+            strike(foe.id, damage: skill.power, by: actor, kind: .crush,
+                   run: &run, encounter: &encounter, verb: skill.name)
+            encounter.skippedTurns[actor, default: 0] += 1
+            encounter.note("You're off balance.")
+
+        case .bleed:
+            // **Flense.** Scales with how much covering there is to open — nothing on a plated
+            // thing, a great deal on something shaggy. The mirror of the creature system's own rend.
+            guard let foe else { return }
+            let purchase = (foe.traits?.covering.insulation ?? 0) / Tuning.Pressure.scaleMaximum
+            let perRound = max(1, Int((Double(skill.power) * purchase).rounded()))
+            encounter.foeBleeds[foe.id] = BleedState(damage: perRound, rounds: skill.rounds)
+            encounter.note(purchase < Tuning.Encounter.thinCovering
+                           ? "\(skill.name): there's nothing here to open."
+                           : "\(skill.name). \(foe.stats.displayName) is bleeding.")
+
+        case .reveal:
+            // **Sight.** The covering word is what the whole damage triangle is read off, and
+            // without this you only learn it by taking a bad trade first.
+            guard let foe else { return }
+            encounter.revealed.insert(foe.id)
+            remember(foe, in: &discovery, runIndex: run.runIndex)
+            let covering = foe.coveringWord ?? "nothing much"
+            encounter.note("\(foe.stats.displayName): \(covering), and it \(foe.stats.damageKind.verb).")
+
+        case .ward:
+            // **Ward.** Against one kind, which is the point — you have to know what's coming, and
+            // Sight is how you find out.
+            let against = skill.damage ?? mostCommonIncoming(in: encounter)
+            encounter.wards[actor] = WardState(against: against, rounds: skill.rounds)
+            encounter.note("\(skill.name): set against \(against.rawValue).")
+
+        case .taunt:
+            // **Draw Off.** The only way to take a hit meant for somebody else.
+            guard let foe else { return }
+            encounter.taunts[foe.id] = skill.rounds
+            encounter.note("\(foe.stats.displayName) turns on you.")
+
+        case .snuff:
+            // **Snuff.** Puts out whatever it was giving off — which is what was doing damage every
+            // round whether you touched it or not.
+            guard let foe else { return }
+            encounter.snuffed.insert(foe.id)
+            encounter.note("\(foe.stats.displayName) goes dark.")
+
+        case .quicken:
+            // **Quicken.** Borrowed against the round after. Worth it to finish something.
+            encounter.extraTurns[actor, default: 0] += 1
+            encounter.skippedTurns[actor, default: 0] += 1
+            encounter.note("\(skill.name).")
+
+        case .cleanse:
+            // **Steady.** Closes a wound that was still open.
+            let target = ally ?? actor
+            switch target {
+            case .binder: encounter.binderBleedRounds = 0
+            case .companion: encounter.companionBleedRounds = 0
+            case .foe: break
+            }
+            encounter.note("\(skill.name): the bleeding stops.")
+
+        case .rout:
+            // **Rout.** Leaving without the world noticing — the answer to a fight you shouldn't
+            // have started, and the reason fleeing stops being a pure penalty.
+            encounter.note("You break away clean.")
+            encounter.outcome = .fled
+
+        case .read:
+            // **Read.** A bestiary entry without a kill, which makes collecting a thing you can do
+            // *instead* of killing rather than only by killing.
+            guard let foe else { return }
+            encounter.revealed.insert(foe.id)
+            remember(foe, in: &discovery, runIndex: run.runIndex)
+            encounter.note("You take \(foe.stats.displayName) in properly. You'll know it again.")
+        }
+
+        encounter.cooldowns[cooldownKey(skill, for: actor)] = skill.cooldownRounds
+        setCooldown(skill.cooldownRounds, for: actor, in: &encounter)
+    }
+
+    /// A bestiary entry without a kill — which is what makes Read a real alternative to killing
+    /// rather than a convenience.
+    private static func remember(_ foe: FoeState, in discovery: inout DiscoveryLog, runIndex: Int) {
+        discovery.recordSpecies(foe.identityKey, runIndex: runIndex)
+        if let traits = foe.traits {
+            discovery.recordSpecimen(traits, of: foe.identityKey, runIndex: runIndex)
+        }
+    }
+
+    /// What most of what's still standing swings, so a Ward with no stated type guards against the
+    /// likeliest thing rather than nothing.
+    private static func mostCommonIncoming(in encounter: EncounterState) -> DamageKind {
+        let kinds = encounter.livingFoes.map(\.stats.damageKind)
+        return DamageKind.allCases.max { a, b in
+            kinds.count { $0 == a } < kinds.count { $0 == b }
+        } ?? .pierce
+    }
+
     static func skill(for actor: Combatant) -> SkillDef? {
         switch actor {
         case .binder: ContentCatalog.shared.skill(ownedBy: .binder)
@@ -165,18 +361,26 @@ enum CombatRules {
             strike(foeID, damage: baseAttack(of: actor, in: state), by: actor,
                    kind: damageKind(for: actor, in: state), run: &run, encounter: &encounter)
 
+        case .skill(let id, let foeID, let allyID):
+            if let skill = ContentCatalog.shared.skill(id), skills(for: actor).contains(skill),
+               isReady(skill, for: actor, in: encounter) {
+                use(skill, by: actor, on: foeID, ally: allyID, run: &run, encounter: &encounter,
+                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state))
+            }
+
         case .damageSkill(let foeID):
-            if let skill = skill(for: actor), isSkillReady(for: actor, in: encounter) {
-                strike(foeID, damage: skill.power, by: actor, kind: damageKind(for: actor, in: state),
-                       run: &run, encounter: &encounter, verb: skill.name)
-                setCooldown(skill.cooldownRounds, for: actor, in: &encounter)
+            // The gambit vocabulary's "damage skill" — whichever damaging one is up.
+            if let skill = skills(for: actor).first(where: {
+                $0.power > 0 && $0.kind != .heal && isReady($0, for: actor, in: encounter)
+            }) {
+                use(skill, by: actor, on: foeID, ally: nil, run: &run, encounter: &encounter,
+                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state))
             }
 
         case .healSkill(let ally):
-            if let skill = skill(for: actor), isSkillReady(for: actor, in: encounter) {
-                let amount = roll(around: skill.power, run: &run)
-                heal(ally, by: amount, run: &run, encounter: &encounter, source: skill.name, healer: actor)
-                setCooldown(skill.cooldownRounds, for: actor, in: &encounter)
+            if let skill = ready(.heal, for: actor, in: encounter) {
+                use(skill, by: actor, on: nil, ally: ally, run: &run, encounter: &encounter,
+                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state))
             }
 
         case .useItem(let stackID, let ally):
@@ -213,7 +417,8 @@ enum CombatRules {
                                kind: DamageKind?,
                                run: inout WorldRun,
                                encounter: inout EncounterState,
-                               verb: String? = nil) {
+                               verb: String? = nil,
+                               ignoresArmour: Bool = false) {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
         else { return }
 
@@ -231,7 +436,8 @@ enum CombatRules {
         // left — and a piercing weapon goes through a share of that armour rather than all of it.
         let matchup = kind.map { effectiveness(of: $0, against: foe.traits?.covering ?? Covering()) } ?? 1
         let raw = Int((Double(roll(around: damage, run: &run)) * matchup).rounded())
-        let ignored = kind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0
+        // **Pry goes under it entirely**, which is the one thing armour has no answer to.
+        let ignored = ignoresArmour ? 1.0 : (kind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0)
         let armour = Int((Double(foe.stats.armour) * (1 - ignored)).rounded())
         let amount = max(Tuning.Encounter.minimumDamage, raw - armour)
         encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
@@ -340,12 +546,32 @@ enum CombatRules {
     static func advanceTurn(in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
 
+        // **A turn owed is taken before the order moves on** — that's what Quicken buys, and it
+        // has to be spent here rather than by shuffling `order`, which is stored precisely so a
+        // death mid-round can't shift whose turn it is.
+        let acting = encounter.order.isEmpty ? Combatant.binder : encounter.order[encounter.turnIndex % encounter.order.count]
+        if let owed = encounter.extraTurns[acting], owed > 0 {
+            encounter.extraTurns[acting] = owed - 1
+            encounter.note("Again, before it can answer.")
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+            return
+        }
+
         var roundTurned = false
         for step in 1...max(1, encounter.order.count) {
             let next = (encounter.turnIndex + step) % encounter.order.count
             if next <= encounter.turnIndex { startNewRound(&encounter); roundTurned = true }
             encounter.turnIndex = next
-            if isAlive(encounter.order[next], in: withEncounter(encounter, on: run)) { break }
+            let who = encounter.order[next]
+            guard isAlive(who, in: withEncounter(encounter, on: run)) else { continue }
+            // …and a turn borrowed is a turn skipped. Overbear and Quicken both pay here.
+            if let owing = encounter.skippedTurns[who], owing > 0 {
+                encounter.skippedTurns[who] = owing - 1
+                encounter.note("\(actorName(who, encounter: encounter)) is still recovering.")
+                continue
+            }
+            break
         }
 
         run.activeEncounter = encounter
@@ -363,6 +589,15 @@ enum CombatRules {
         encounter.roundNumber += 1
         encounter.binderSkillCooldown = max(0, encounter.binderSkillCooldown - 1)
         encounter.companionSkillCooldown = max(0, encounter.companionSkillCooldown - 1)
+        // Every skill's own timer, and every effect with a clock on it. Rounds, never seconds.
+        for (key, value) in encounter.cooldowns { encounter.cooldowns[key] = max(0, value - 1) }
+        for (who, ward) in encounter.wards {
+            if ward.rounds <= 1 { encounter.wards[who] = nil }
+            else { encounter.wards[who]?.rounds = ward.rounds - 1 }
+        }
+        for (foe, rounds) in encounter.taunts {
+            if rounds <= 1 { encounter.taunts[foe] = nil } else { encounter.taunts[foe] = rounds - 1 }
+        }
     }
 
     /// Wounds that keep costing you, ticked once per round. Run from `advanceTurn` where the round
@@ -370,6 +605,18 @@ enum CombatRules {
     private static func bleed(in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
         let damage = Tuning.Encounter.bleedDamage
+
+        // **Wounds you opened.** Flense's, which are per-foe and carry their own severity — a
+        // shaggy thing bleeds far worse than a plated one, which is the whole reading.
+        for (foeID, state) in encounter.foeBleeds {
+            guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }),
+                  encounter.foes[index].isAlive
+            else { encounter.foeBleeds[foeID] = nil; continue }
+            encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - state.damage)
+            encounter.note("\(encounter.foes[index].stats.displayName) bleeds for \(state.damage).")
+            if state.rounds <= 1 { encounter.foeBleeds[foeID] = nil }
+            else { encounter.foeBleeds[foeID]?.rounds = state.rounds - 1 }
+        }
 
         if encounter.binderBleedRounds > 0 {
             encounter.binderBleedRounds -= 1
@@ -439,7 +686,10 @@ enum CombatRules {
         else { return }
 
         let standing: [Combatant] = [.binder, .companion].filter { isAlive($0, in: run) }
-        guard let primary = run.rng.pick(standing) else {
+        // **Draw Off.** Something you've taunted comes for you and doesn't get a choice — the only
+        // way in the game to take a hit meant for somebody else.
+        let taunted = (encounter.taunts[foeID] ?? 0) > 0 && isAlive(.binder, in: run)
+        guard let primary = taunted ? .binder : run.rng.pick(standing) else {
             run.activeEncounter = encounter
             state.worlds.activeRun = run
             checkOutcome(in: &state)
@@ -457,8 +707,16 @@ enum CombatRules {
             var raw = Double(roll(around: foe.stats.attack, run: &run)) * share
             if foe.stats.damageKind == .crush { raw *= 1 + Tuning.Encounter.crushDamageBonus }
 
+            // **Ward.** Turns aside one kind, so you have to know what's coming — which is what
+            // Sight is for. Guessing wrong costs you the round you spent setting it.
+            if let ward = encounter.wards[target], ward.against == foe.stats.damageKind {
+                raw *= 1 - Tuning.Encounter.wardReduction
+            }
+
             let amount: Int
-            if foe.stats.element != nil {
+            // **Snuff** puts out whatever it was giving off, and with it the damage nothing you
+            // wear could stop.
+            if foe.stats.element != nil, !encounter.snuffed.contains(foeID) {
                 // Nothing you're wearing stops caustic, heat or light.
                 amount = max(Tuning.Encounter.minimumDamage, Int(raw.rounded()))
             } else {
@@ -467,7 +725,8 @@ enum CombatRules {
             }
             hurt(target, by: amount, run: &run, encounter: &encounter)
 
-            let verb = foe.stats.element.map(elementalVerb) ?? foe.stats.damageKind.verb
+            let verb = (encounter.snuffed.contains(foeID) ? nil : foe.stats.element)
+                .map(elementalVerb) ?? foe.stats.damageKind.verb
             // "You" is a pronoun mid-sentence and "Quill" is a name, so only one of them lowers.
             let whom = target == .binder
                 ? actorName(target, encounter: encounter).lowercased()

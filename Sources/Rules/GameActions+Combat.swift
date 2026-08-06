@@ -21,6 +21,24 @@ extension GameStore {
 
     var currentSkill: SkillDef? { actingCombatant.flatMap { CombatRules.skill(for: $0) } }
 
+    /// **Everything whoever's acting could do**, and which of those are up this turn.
+    var actorSkills: [SkillDef] {
+        actingCombatant.map { CombatRules.skills(for: $0) } ?? []
+    }
+
+    var readySkills: [SkillDef] {
+        guard let encounter = activeEncounter, let actor = actingCombatant else { return [] }
+        return CombatRules.skills(for: actor).filter { CombatRules.isReady($0, for: actor, in: encounter) }
+    }
+
+    var hasAnyReadySkill: Bool { !readySkills.isEmpty }
+
+    /// Rounds until a given skill is up again, for the list.
+    func cooldown(of skill: SkillDef) -> Int {
+        guard let encounter = activeEncounter, let actor = actingCombatant else { return 0 }
+        return CombatRules.cooldown(of: skill, for: actor, in: encounter)
+    }
+
     /// Consumables carried into the world. Milestone 5 gives you ways to get them.
     var usableItems: [ItemStack] {
         (state.worlds.activeRun?.satchelItems.stacks ?? []).filter {
@@ -74,6 +92,7 @@ extension GameStore {
     private func label(for action: CombatAction) -> String {
         switch action {
         case .attack: "attack"
+        case .skill(let id, _, _): "skill \(id.rawValue)"
         case .damageSkill, .healSkill: "skill"
         case .useItem: "item"
         case .flee: "flee"

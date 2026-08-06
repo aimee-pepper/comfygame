@@ -398,21 +398,113 @@ struct ItemDef: Codable, Equatable, Identifiable, Sendable {
 }
 
 /// One Skill. Each party member has exactly one in v0.
+/// One thing a party member can do instead of swinging.
+///
+/// **The design rule from `resources-skills-spec.md` §2: every skill answers a specific kind of
+/// creature.** If it's good against everything it's just a bigger attack, and the game had exactly
+/// two of those — one damage, one heal — while foes had trait-derived armour, damage character,
+/// retaliation and reach. The player side of every fight was two buttons.
 struct SkillDef: Codable, Equatable, Identifiable, Sendable {
     var id: SkillID
     var name: String
     var icon: String
     var blurb: String
     var kind: Kind
-    /// Damage dealt or health restored, before variance.
+    /// Damage dealt or health restored, before variance. Zero on skills that do neither.
     var power: Int
     /// Rounds before it can be used again. Rounds — never seconds (pillar 1).
+    ///
+    /// **The only limiter**, deliberately: `resources-skills-spec.md` §2 rules out a mana pool,
+    /// because a second resource to track in every fight is the wrong overhead for this game.
+    /// Stronger skills carry longer cooldowns instead.
     var cooldownRounds: Int
     /// Which party member owns it. Moves onto the character when the party grows past two.
     var owner: Owner
+    /// How many rounds the effect lasts, for the ones that leave something behind.
+    var rounds: Int = 1
+    /// What this is *for*, in one line, shown under the name. The spec insists every skill name the
+    /// problem it solves, so the UI says it rather than making you infer it.
+    var answers: String = ""
+    /// Which corner of the triangle a damaging skill swings in, when it isn't the weapon's own.
+    var damage: DamageKind?
 
-    enum Kind: String, Codable, Sendable { case damage, heal }
+    enum Kind: String, Codable, Sendable {
+        /// Plain damage, using whatever the actor is carrying.
+        case damage
+        case heal
+        /// **Pry** — goes under armour entirely. Low power, and the answer to a plated thing.
+        case armourIgnoring
+        /// **Overbear** — heavy crush, and you act last next round for having swung it.
+        case overbear
+        /// **Flense** — a wound that keeps opening. Scales with how long the covering is.
+        case bleed
+        /// **Sight** — what is this thing actually wearing.
+        case reveal
+        /// **Ward** — turns aside one kind of damage for a while.
+        case ward
+        /// **Draw Off** — it comes for you instead of for them.
+        case taunt
+        /// **Snuff** — puts out whatever it was giving off.
+        case snuff
+        /// **Quicken** — twice next round, nothing the round after.
+        case quicken
+        /// **Steady** — closes a wound that was still open.
+        case cleanse
+        /// **Rout** — leave, and the world doesn't notice.
+        case rout
+        /// **Read** — learn it properly, without killing it.
+        case read
+    }
+
     enum Owner: String, Codable, Sendable { case binder, companion }
+
+    /// Whether using it needs a foe picked out.
+    var needsFoe: Bool {
+        switch kind {
+        case .damage, .armourIgnoring, .overbear, .bleed, .reveal, .taunt, .snuff, .read: true
+        case .heal, .ward, .quicken, .cleanse, .rout: false
+        }
+    }
+
+    /// Whether it needs an ally picked out — the ones you point at your own side.
+    var needsAlly: Bool {
+        switch kind {
+        case .heal, .cleanse: true
+        default: false
+        }
+    }
+
+    init(id: SkillID, name: String, icon: String, blurb: String, kind: Kind, power: Int,
+         cooldownRounds: Int, owner: Owner, rounds: Int = 1, answers: String = "",
+         damage: DamageKind? = nil) {
+        self.id = id
+        self.name = name
+        self.icon = icon
+        self.blurb = blurb
+        self.kind = kind
+        self.power = power
+        self.cooldownRounds = cooldownRounds
+        self.owner = owner
+        self.rounds = rounds
+        self.answers = answers
+        self.damage = damage
+    }
+
+    /// Tolerant, per the policy in `Migrations.swift`.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(SkillID.self, forKey: .id)
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? id.rawValue
+        icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "sparkle"
+        blurb = try c.decodeIfPresent(String.self, forKey: .blurb) ?? ""
+        kind = try c.decodeIfPresent(Kind.self, forKey: .kind) ?? .damage
+        power = try c.decodeIfPresent(Int.self, forKey: .power) ?? 0
+        cooldownRounds = try c.decodeIfPresent(Int.self, forKey: .cooldownRounds) ?? 2
+        owner = try c.decodeIfPresent(Owner.self, forKey: .owner) ?? .binder
+        rounds = try c.decodeIfPresent(Int.self, forKey: .rounds) ?? 1
+        answers = try c.decodeIfPresent(String.self, forKey: .answers) ?? ""
+        damage = try c.decodeIfPresent(DamageKind.self, forKey: .damage)
+    }
 }
 
 /// A base station. The Base screen is a data-driven list of these, not hardcoded buttons —

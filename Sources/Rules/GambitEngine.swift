@@ -27,7 +27,8 @@ enum GambitEngine {
         for rule in rules(for: actor, in: state).prefix(availableSlots(in: state)) where rule.isEnabled {
             guard rule.isWritable(with: state.base.ownedGambitComponents) else { continue }
             guard let target = target(of: rule, actor: actor, run: run, encounter: encounter) else { continue }
-            guard let action = action(of: rule, target: target, actor: actor, encounter: encounter) else {
+            guard let action = action(of: rule, target: target, actor: actor,
+                                      encounter: encounter, state: state) else {
                 continue // matched, but couldn't act — try the next rule down
             }
             return Decision(rule: rule, action: action)
@@ -140,7 +141,8 @@ enum GambitEngine {
     private static func action(of rule: GambitRule,
                                target: Target,
                                actor: Combatant,
-                               encounter: EncounterState) -> CombatAction? {
+                               encounter: EncounterState,
+                               state: GameState) -> CombatAction? {
         guard let kind = ContentCatalog.shared.gambitComponent(rule.action)?.action else { return nil }
 
         switch kind {
@@ -150,24 +152,27 @@ enum GambitEngine {
             return encounter.livingFoes.first.map { .attack(foe: $0.id) }
 
         case "heal":
-            guard CombatRules.isSkillReady(for: actor, in: encounter),
-                  CombatRules.skill(for: actor)?.kind == .heal
+            // The best heal this member is carrying and can actually use right now.
+            guard CombatRules.ready(.heal, for: actor, in: encounter) != nil
             else { return nil } // on cooldown ⇒ this rule can't fire; fall through to the next
             if case .ally(let member) = target { return .healSkill(ally: member) }
             return .healSkill(ally: actor)
 
         case "skill":
-            guard CombatRules.isSkillReady(for: actor, in: encounter) else { return nil }
-            switch CombatRules.skill(for: actor)?.kind {
-            case .heal:
-                if case .ally(let member) = target { return .healSkill(ally: member) }
-                return .healSkill(ally: actor)
-            case .damage:
-                if case .foe(let id) = target { return .damageSkill(foe: id) }
-                return encounter.livingFoes.first.map { .damageSkill(foe: $0.id) }
-            case nil:
-                return nil
+            // **Whatever's ready.** With twelve skills the gambit can't mean "the skill" any more,
+            // so it means "something better than swinging" — heal a hurt ally if that's what's up,
+            // otherwise put a skill into whatever you were aiming at.
+            guard let skill = CombatRules.bestReadySkill(for: actor, in: encounter, state: state)
+            else { return nil }
+            if skill.needsAlly {
+                if case .ally(let member) = target { return .skill(skill.id, ally: member) }
+                return .skill(skill.id, ally: actor)
             }
+            if skill.needsFoe {
+                if case .foe(let id) = target { return .skill(skill.id, foe: id) }
+                return encounter.livingFoes.first.map { .skill(skill.id, foe: $0.id) }
+            }
+            return .skill(skill.id)
 
         case "flee":
             return .flee
