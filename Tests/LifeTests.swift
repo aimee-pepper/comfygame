@@ -1,22 +1,81 @@
 import XCTest
 @testable import Bookbinder
 
-/// Creatures from trait distributions (decisions-session-15, generation-spine §3).
+/// Creatures from budget allocation (creature-system-spec, decisions-session-15).
 final class LifeTests: XCTestCase {
 
-    // MARK: Cast and jitter
+    // MARK: - The budget is the mechanism
 
-    /// **Vitality sets cast size, not spread.** A rich world holds more species; it does not hold
-    /// stranger ones. Abundance and strangeness stay independent knobs.
-    func testARicherWorldHoldsMoreSpeciesButNotStrangerOnes() {
-        let lush = world(["bloom": "vitality", "root": "vitality", "sun": "illumination"])
-        let bare = world(["salt": "hydrology", "void": "illumination"])
+    /// **No world produces an everything-creature.** The budget is the whole reason: a world pushing
+    /// both size and armour cannot have both maxed.
+    func testNothingCostsMoreThanTheWorldCanFeed() {
+        for seed in UInt64(1)...60 {
+            let readings = world([:], seed: seed)
+            let budget = WorldTendencies(readings: readings).budget
+            for species in LifeRules.cast(for: readings, seed: seed) {
+                XCTAssertLessThanOrEqual(species.traits.appetite, budget + 0.001,
+                                         "seed \(seed) fed something it couldn't afford")
+            }
+        }
+    }
 
-        XCTAssertGreaterThan(LifeRules.castSize(for: lush), LifeRules.castSize(for: bare),
-                             "a teeming world held no more species than a barren one")
-        XCTAssertEqual(LifeRules.distribution(from: lush).spread,
-                       LifeRules.distribution(from: bare).spread, accuracy: 0.001,
-                       "vitality widened the spread — abundance and strangeness collapsed into one knob")
+    /// Superlinear cost is what makes extremes rare. The last five points of an axis must cost
+    /// dramatically more than the first five, or every creature maxes everything it's pushed toward.
+    func testExtremesAreExpensive() {
+        var low = CreatureTraits()
+        var high = CreatureTraits()
+        high.size = 90
+        let first = LifeCost.marginal(.size, to: 5, in: low)
+        let last = LifeCost.marginal(.size, to: 95, in: high)
+        XCTAssertGreaterThan(last, first * 3, "the cost curve is nearly linear — extremes are cheap")
+        low.size = 5
+        XCTAssertEqual(low.appetite, first, accuracy: 0.001)
+    }
+
+    /// **[PROPOSAL] spec §4** — size raises the price of covering and bone, so large armoured things
+    /// are genuinely rare rather than merely uncommon.
+    func testGrowingBigRepricesTheArmourYouAlreadyWear() {
+        var small = CreatureTraits()
+        small.covering = Covering(hardness: 60, length: 20, coverage: 60)
+        var large = small
+        large.size = 90
+        XCTAssertGreaterThan(LifeCost.totalCost(of: large) - LifeCost.price(of: .size, at: 90, size: 90),
+                             LifeCost.totalCost(of: small),
+                             "armour cost the same on a huge animal as on a tiny one")
+    }
+
+    /// Spend must telescope exactly to what the vector says it cost, or "appetite" is a fiction.
+    func testWhatWasSpentIsWhatItCost() {
+        var rng = SeededRNG(seed: 99)
+        var traits = CreatureTraits()
+        let weights = Dictionary(uniqueKeysWithValues: CostlyAxis.allCases.map { ($0, 1.0) })
+        LifeRules.allocate(400, across: weights, into: &traits, rng: &rng)
+        XCTAssertLessThanOrEqual(traits.appetite, 400.001)
+        XCTAssertGreaterThan(traits.appetite, 0, "a budget of 400 bought nothing")
+    }
+
+    // MARK: - Cast and jitter
+
+    /// **Vitality changes how many species, never how strange they are** (session 15 §2).
+    /// Abundance and strangeness stay independent knobs, so you can write a teeming ordinary world
+    /// or a sparse bizarre one and have them be different places.
+    func testARicherWorldHoldsMoreSpeciesDrawnTheSameWay() {
+        let poor = world([:], vitality: 10)
+        let rich = world([:], vitality: 95)
+
+        XCTAssertGreaterThan(LifeRules.castSize(for: rich), LifeRules.castSize(for: poor))
+        XCTAssertGreaterThan(WorldTendencies(readings: rich).budget,
+                             WorldTendencies(readings: poor).budget)
+
+        // The *shape* of the draw must not change with wealth. Ornament is the one axis the spec
+        // ties to Vitality directly (costly signalling is only affordable when there's slack), and
+        // the weapon axes move with trophic depth, so the comparison is normalised over the rest.
+        let body: [CostlyAxis] = [.size, .coveringHardness, .coveringLength, .coveringCoverage, .boneDensity]
+        let shapePoor = normalisedWeights(poor, over: body), shapeRich = normalisedWeights(rich, over: body)
+        for axis in body {
+            XCTAssertEqual(shapePoor[axis] ?? 0, shapeRich[axis] ?? 0, accuracy: 0.001,
+                           "wealth changed what \(axis.rawValue) worlds tend to build, not just how much")
+        }
     }
 
     func testEveryWorldHoldsSomething() {
@@ -32,6 +91,7 @@ final class LifeTests: XCTestCase {
         for seed in UInt64(1)...30 {
             let count = LifeRules.cast(for: world([:], seed: seed), seed: seed).count
             XCTAssertLessThanOrEqual(count, Tuning.Life.castSizeRange.upperBound)
+            XCTAssertGreaterThanOrEqual(count, Tuning.Life.castSizeRange.lowerBound)
         }
     }
 
@@ -44,113 +104,219 @@ final class LifeTests: XCTestCase {
         XCTAssertNotEqual(first.map(\.traits), LifeRules.cast(for: readings, seed: 99).map(\.traits))
     }
 
-    /// Jitter is deliberately small: each animal is visibly its own, never enough to change what it
-    /// is or how it fights.
-    func testAnIndividualVariesFromItsSpeciesButNotMuch() {
+    /// **Jitter must never change identity, combat behaviour, or which materials drop** (spec §5).
+    func testAnIndividualVariesFromItsSpeciesButNotInAnythingThatMatters() {
         let species = LifeRules.cast(for: world(["bloom": "vitality"]), seed: 4242)[0]
         var rng = SeededRNG(seed: 7)
-        var seenIdentity = Set<String>()
-        for _ in 0..<40 {
+        for _ in 0..<60 {
             let spawn = LifeRules.spawn(of: species, rng: &rng)
-            XCTAssertLessThanOrEqual(abs(spawn.armament - species.traits.armament),
-                                     Tuning.Life.jitter * 0.4 + 0.001,
-                                     "jitter changed how hard it hits")
-            seenIdentity.insert(CreatureIdentity.name(for: spawn))
+            XCTAssertEqual(spawn.armament, species.traits.armament, "jitter changed how it fights")
+            XCTAssertEqual(spawn.covering, species.traits.covering, "jitter changed what it drops")
+            XCTAssertEqual(spawn.boneDensity, species.traits.boneDensity)
+            XCTAssertEqual(CreatureIdentity.match(spawn).key, CreatureIdentity.match(species.traits).key,
+                           "jitter changed what the animal is")
+            XCTAssertLessThanOrEqual(abs(spawn.size - species.traits.size),
+                                     species.traits.size * Tuning.Life.jitter.sizeFraction + 0.001)
         }
-        XCTAssertLessThanOrEqual(seenIdentity.count, 2, "jitter changed what the animal is")
     }
 
-    // MARK: Pressures shape the animals
-
-    /// Cold shortens extremities — the one thermal effect that isn't confounded by wealth.
-    ///
-    /// **Size deliberately isn't asserted here.** Cold nudges size up, but cold worlds are also
-    /// *poor* worlds (cold caps what can grow, and productivity pays for size), and poverty is the
-    /// stronger of the two. So a cold world's animals usually come out *smaller*, not bigger, which
-    /// may be right — Bergmann's rule is about warm-blooded animals in otherwise liveable places —
-    /// or may mean the thermal nudge is too weak against the vitality term. Flagged as Q25 rather
-    /// than papered over with a test that picks convenient worlds.
-    func testColdShortensExtremities() {
-        let warmth = ["sun": "illumination", "bloom": "vitality"]
-        let cold = LifeRules.distribution(from: world(warmth.merging(["glacier": "thermal"]) { a, _ in a })).centre
-        let hot = LifeRules.distribution(from: world(warmth.merging(["magma": "thermal"]) { a, _ in a })).centre
-        XCTAssertLessThan(cold.reach, hot.reach, "cold didn't shorten extremities")
-        XCTAssertGreaterThan(cold.covering, hot.covering, "cold didn't put anything on its back")
+    func testAnIndividualIsVisiblyItsOwnAnimal() {
+        let species = LifeRules.cast(for: world(["bloom": "vitality"]), seed: 4242)[0]
+        var rng = SeededRNG(seed: 7)
+        let colours = (0..<20).map { _ in LifeRules.spawn(of: species, rng: &rng).coloration }
+        XCTAssertGreaterThan(Set(colours.map { Int($0.depth) }).count, 3,
+                             "twenty spawns and no visible difference between any of them")
     }
 
-    func testDarkWorldsGiveUpOnEyes() {
-        let dark = LifeRules.distribution(from: world(["void": "illumination"])).centre
-        let dim = LifeRules.distribution(from: world(["moon": "illumination"])).centre
+    // MARK: - Pressures shape what a world tends to build
+
+    /// Cold: bigger, better wrapped, shorter reach. Compared against worlds that differ *only* in
+    /// temperature, so the vitality term can't confound the result.
+    func testColdWorldsWrapTheirAnimalsUp() {
+        let cold = WorldTendencies(readings: world([:], thermal: (floor: 4, peak: 20)))
+        let warm = WorldTendencies(readings: world([:], thermal: (floor: 55, peak: 65)))
+        XCTAssertGreaterThan(cold.axisWeights[.coveringLength]!, warm.axisWeights[.coveringLength]!,
+                             "cold put nothing on its back")
+        XCTAssertGreaterThan(cold.axisWeights[.size]!, warm.axisWeights[.size]!)
+        XCTAssertGreaterThan(cold.free.reachWeights[.close]!, warm.free.reachWeights[.close]!,
+                             "cold didn't shorten extremities")
+    }
+
+    /// Fur fails when it's wet, so wet-cold favours bulk and dry-cold favours covering. Both are
+    /// valid answers, which is why the model weights rather than decides.
+    func testWetColdFavoursFatAndDryColdFavoursFur() {
+        let dry = WorldTendencies(readings: world([:], thermal: (floor: 4, peak: 20), hydrology: 5))
+        let wet = WorldTendencies(readings: world([:], thermal: (floor: 4, peak: 20), hydrology: 85))
+        XCTAssertGreaterThan(dry.axisWeights[.coveringLength]!, wet.axisWeights[.coveringLength]!)
+        XCTAssertGreaterThan(wet.free.build, dry.free.build, "wet cold didn't reach for bulk")
+    }
+
+    func testHeatMakesThingsSmallerBarerAndLonger() {
+        let hot = WorldTendencies(readings: world([:], thermal: (floor: 70, peak: 96)))
+        let mild = WorldTendencies(readings: world([:], thermal: (floor: 45, peak: 55)))
+        XCTAssertLessThan(hot.axisWeights[.size]!, mild.axisWeights[.size]!)
+        XCTAssertLessThan(hot.axisWeights[.coveringCoverage]!, mild.axisWeights[.coveringCoverage]!)
+        XCTAssertGreaterThan(hot.free.reachWeights[.far]!, mild.free.reachWeights[.far]!)
+        XCTAssertLessThan(hot.free.colorationDepth, mild.free.colorationDepth, "nothing went pale in the sun")
+    }
+
+    /// Dim worlds grow eyes; dark ones give up on them entirely. Sensory is an allocation, so
+    /// giving up on eyes necessarily buys something else.
+    func testDarkWorldsGiveUpOnEyesAndHuntBySomethingElse() {
+        let dark = WorldTendencies(readings: world([:], illumination: 4)).free.sensory
+        let dim = WorldTendencies(readings: world([:], illumination: 22)).free.sensory
         XCTAssertLessThan(dark.vision, dim.vision, "the dark grew better eyes than the dusk")
-        XCTAssertGreaterThan(dark.nonVisualSense, dark.vision)
-    }
-
-    func testEnclosedCountryMakesAmbushersAndOpenGroundMakesCoursers() {
-        let enclosed = LifeRules.distribution(from: world(["canopy": "vitality", "granite": "substrate"])).centre
-        let open = LifeRules.distribution(from: world(["sand": "substrate", "wind": "atmosphere"])).centre
-        XCTAssertLessThan(enclosed.conspicuousness, open.conspicuousness, "nothing learned to hide")
-        XCTAssertGreaterThan(open.reach, enclosed.reach)
+        XCTAssertGreaterThan(dark.nonVisual, dark.vision)
+        XCTAssertEqual(dark.vision + dark.nonVisual, 100, accuracy: 0.001, "sensory stopped being an allocation")
     }
 
     func testStoneInTheGroundBecomesStoneOnTheAnimal() {
-        let mineral = LifeRules.distribution(from: world(["gold": "substrate", "crystal": "substrate"])).centre
-        let soft = LifeRules.distribution(from: world(["rain": "hydrology"])).centre
-        XCTAssertGreaterThan(mineral.coveringHardness, soft.coveringHardness)
+        let mineral = WorldTendencies(readings: world(["gold": "substrate", "crystal": "substrate"]))
+        let soft = WorldTendencies(readings: world(["rain": "hydrology"]))
+        XCTAssertGreaterThan(mineral.axisWeights[.coveringHardness]!, soft.axisWeights[.coveringHardness]!)
+        XCTAssertGreaterThan(mineral.axisWeights[.boneDensity]!, soft.axisWeights[.boneDensity]!)
     }
 
-    /// A world that swings breeds generalists and widens everything.
-    func testASwingingWorldProducesMoreVariedAnimals() {
-        var restless = world(["rift": "cycle"])
-        var still = world(["stars": "illumination"])
-        restless.readings["cycle"]?.aspects["amplitude"] = 90
-        still.readings["cycle"]?.aspects["amplitude"] = 10
-        XCTAssertGreaterThan(LifeRules.distribution(from: restless).spread,
-                             LifeRules.distribution(from: still).spread)
+    func testEnclosedCountryReachesForAmbushWeaponsAndOpenGroundForDistance() {
+        let enclosed = WorldTendencies(readings: world([:], openness: 15))
+        let open = WorldTendencies(readings: world([:], openness: 90))
+        XCTAssertGreaterThan(enclosed.free.weaponMix.pierce, open.free.weaponMix.pierce)
+        XCTAssertGreaterThan(enclosed.free.patterning, open.free.patterning, "nothing learned to hide")
+        XCTAssertGreaterThan(open.free.reachWeights[.mid]!, enclosed.free.reachWeights[.mid]!)
     }
 
-    // MARK: Identity is derived
+    /// Light with nothing in the sky to come from is the bioluminescence case.
+    func testSourcelessLightIsWhereGlowingThingsComeFrom() {
+        var lit = world([:], illumination: 40, substrate: [:])
+        lit.readings["illumination"]?.floor = 30
+        lit.readings["illumination"]?.tags = ["sourceless"]
+        XCTAssertTrue(WorldTendencies(readings: lit).free.emanationAllowed)
 
-    func testWhatAnAnimalIsIsReadOffItRatherThanAssignedToIt() {
-        var ambusher = CreatureTraits()
-        ambusher.armament = 80
-        ambusher.conspicuousness = 20
-        XCTAssertEqual(CreatureIdentity.name(for: ambusher), "ambusher")
+        var sunlit = world([:], illumination: 40, substrate: [:])
+        sunlit.readings["illumination"]?.floor = 30
+        sunlit.readings["illumination"]?.tags = ["celestial"]
+        XCTAssertFalse(WorldTendencies(readings: sunlit).free.emanationAllowed,
+                       "a world with a sun grew its own light anyway")
+    }
 
-        var lantern = CreatureTraits()
-        lantern.emanation = 80
-        XCTAssertEqual(CreatureIdentity.name(for: lantern), "lantern")
+    /// A world whose ground is volatile is the other route to something that glows.
+    func testVolatileGroundAlsoGrowsGlowingThings() {
+        let volatile = world([:], illumination: 40, substrate: ["volatile": 0.8, "hard": 0.2])
+        XCTAssertTrue(WorldTendencies(readings: volatile).free.emanationAllowed)
+    }
 
-        // Everything resolves to something. A world that made nothing that hunts simply has no
-        // hunters in it — no role is handed out in advance.
+    // MARK: - Defence branching
+
+    /// **One route, never a blend** (spec §3). Blending is what produces mush.
+    func testAThreatenedWorldPicksOneAnswerToPredationPerSpecies() {
+        var dangerous = world(["bloom": "vitality"], vitality: 90)
+        dangerous.readings["vitality"]?.aspects["trophicDepth"] = 85
+        let cast = LifeRules.cast(for: dangerous, seed: 808)
+        XCTAssertTrue(cast.allSatisfy { $0.traits.defence != nil },
+                      "a world full of predators produced species with no answer to them")
+
+        for species in cast where species.traits.defence == .aposematism {
+            XCTAssertTrue(species.traits.isToxic, "warning colours that mean nothing")
+            XCTAssertGreaterThan(species.traits.coloration.patterning, 70)
+        }
+    }
+
+    func testAPeacefulWorldDoesntBotherDefendingItself() {
+        var calm = world([:], vitality: 60)
+        calm.readings["vitality"]?.aspects["trophicDepth"] = 2
+        XCTAssertTrue(LifeRules.cast(for: calm, seed: 5).allSatisfy { $0.traits.defence == nil })
+    }
+
+    /// Crypsis matches the ambient rather than simply going dark — a pale world hides pale things.
+    func testCrypsisMatchesTheWorldItHidesIn() {
+        var traits = CreatureTraits()
+        var rng = SeededRNG(seed: 1)
+        let bright = WorldTendencies(readings: world([:], illumination: 95))
+        LifeRules.applyFreeAxes(of: bright, to: &traits, rng: &rng)
+        let dark = WorldTendencies(readings: world([:], illumination: 2))
+        XCTAssertGreaterThan(dark.free.ambientDepth, bright.free.ambientDepth)
+    }
+
+    // MARK: - Identity is derived, never imposed
+
+    func testASpeciesThatFitsAKnownShapeTakesItsName() {
+        var tank = CreatureTraits()
+        tank.size = 85
+        tank.covering = Covering(hardness: 80, length: 20, coverage: 80)
+        XCTAssertEqual(CreatureIdentity.match(tank).region, .tank)
+
+        var drifter = CreatureTraits()
+        drifter.boneDensity = 10
+        drifter.build = 15
+        drifter.appendages = Appendages(count: 0, type: .finned)
+        XCTAssertEqual(CreatureIdentity.match(drifter).region, .drifter)
+    }
+
+    /// **Unmatched species get composed names.** Forcing a thing into the nearest role is what the
+    /// composed fallback exists to avoid, and free sampling guarantees these will happen.
+    func testAnAnimalNothingHasAWordForGetsDescribedInstead() {
+        var odd = CreatureTraits()
+        odd.size = 88                                       // huge, but
+        odd.covering = Covering(hardness: 5, length: 0, coverage: 5)   // bare
+        odd.boneDensity = 90
+        odd.build = 95                                      // and hulking
+        odd.appendages = Appendages(count: 8, type: .limbed)
+
+        let match = CreatureIdentity.match(odd)
+        XCTAssertTrue(match.isComposed, "an animal with no name for it was forced into \(match.name)")
+        XCTAssertTrue(match.name.contains("huge"), match.name)
+        XCTAssertTrue(match.name.contains("bare") || match.name.contains("many-limbed"), match.name)
+    }
+
+    /// A composed name says the two things you'd actually notice, in plain words.
+    func testAComposedNameDescribesWhatStandsOut() {
+        var blind = CreatureTraits()
+        blind.size = 90
+        blind.sensory = Sensory.allocation(vision: 2, mechano: 60, chemo: 30, thermo: 8)
+        blind.covering = Covering(hardness: 90, length: 10, coverage: 90)
+        XCTAssertEqual(CreatureIdentity.composedName(for: blind), "huge blind armoured walker")
+
+        var glower = CreatureTraits()
+        glower.emanation = Emanation(strength: 80, light: 90, heat: 5, caustic: 5)
+        glower.appendages = Appendages(count: 0, type: .none)
+        glower.build = 20
+        XCTAssertTrue(CreatureIdentity.composedName(for: glower).contains("glowing"))
+    }
+
+    func testEverySpeciesGetsSomeName() {
         var rng = SeededRNG(seed: 3)
-        for _ in 0..<200 {
-            var t = CreatureTraits()
-            t.size = rng.double(in: 0...100); t.armament = rng.double(in: 0...100)
-            t.conspicuousness = rng.double(in: 0...100); t.emanation = rng.double(in: 0...100)
-            XCTAssertFalse(CreatureIdentity.name(for: t).isEmpty)
+        for _ in 0..<400 {
+            var traits = CreatureTraits()
+            for axis in CostlyAxis.allCases { traits[axis] = rng.double(in: 0...100) }
+            traits.build = rng.double(in: 0...100)
+            traits.appendages = Appendages(count: rng.int(in: 0...8),
+                                           type: rng.pick(AppendageType.allCases)!)
+            let match = CreatureIdentity.match(traits)
+            XCTAssertFalse(match.name.isEmpty)
+            XCTAssertFalse(match.key.isEmpty)
         }
     }
 
-    func testAWorldWithNoHuntersSimplyHasNone() {
-        // Barren worlds can't afford armament, so nothing in them hunts. That's the point of
-        // deriving identity rather than assigning it.
-        let barren = world(["salt": "hydrology", "void": "illumination"])
-        let names = LifeRules.cast(for: barren, seed: 11).map(\.identity)
-        XCTAssertFalse(names.contains("courser"), "a dead world produced a pursuit predator")
-    }
-
-    // MARK: The budget
-
-    func testNoWorldProducesAnEverythingCreature() {
-        for seed in UInt64(1)...40 {
-            let readings = world([:], seed: seed)
-            let budget = WorldConstraints.energyBudget(in: readings)
-            for species in LifeRules.cast(for: readings, seed: seed) where budget > 0 {
-                XCTAssertLessThanOrEqual(species.traits.appetite, budget + 0.001,
-                                         "a world fed something it couldn't afford, seed \(seed)")
-            }
+    /// A name has to be the same every time it's read, or an anchored world's animals get renamed
+    /// underneath the player.
+    func testANameIsStableForASpecies() {
+        let cast = LifeRules.cast(for: world(["bloom": "vitality"]), seed: 616)
+        for species in cast {
+            XCTAssertEqual(species.displayName, CreatureIdentity.name(for: species.traits))
+            XCTAssertEqual(species.displayName, species.displayName)
         }
     }
+
+    /// **Free sampling**: no role is decided in advance, so a world that grew nothing that hunts
+    /// simply has no hunters in it.
+    func testAWorldWithNothingToEatGrowsNothingThatHunts() {
+        var barren = world([:], vitality: 3)
+        barren.readings["vitality"]?.aspects["trophicDepth"] = 0
+        let regions = LifeRules.cast(for: barren, seed: 11).compactMap { $0.identity.region }
+        XCTAssertFalse(regions.contains(.apex), "a dead world produced an apex predator")
+    }
+
+    // MARK: - Persistence
 
     func testTraitsRoundTripThroughASave() throws {
         let species = LifeRules.cast(for: world(["bloom": "vitality"]), seed: 5)[0]
@@ -158,14 +324,63 @@ final class LifeTests: XCTestCase {
         XCTAssertEqual(try SaveCodec.makeDecoder().decode(Species.self, from: data), species)
     }
 
-    // MARK: Helpers
+    /// The tolerant-decoding policy, on the newest struct in the save. A vector written before a
+    /// field existed must load, not quarantine somebody's world.
+    func testATraitVectorMissingEveryFieldStillLoads() throws {
+        let data = Data("{}".utf8)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(CreatureTraits.self, from: data),
+                       CreatureTraits())
+    }
 
-    private func world(_ pairs: [String: String], seed: UInt64 = 20_260_805) -> PressureReadings {
-        PressureRules.resolve(pairs.sorted { $0.key < $1.key }.enumerated().map { index, pair in
+    // MARK: - Helpers
+
+    private func normalisedWeights(_ readings: PressureReadings,
+                                   over axes: [CostlyAxis]) -> [CostlyAxis: Double] {
+        let weights = WorldTendencies(readings: readings).axisWeights
+        let total = axes.reduce(0) { $0 + (weights[$1] ?? 0) }
+        return Dictionary(uniqueKeysWithValues: axes.map { ($0, total > 0 ? (weights[$0] ?? 0) / total : 0) })
+    }
+
+    /// A world built from sigils, then overridden on the axes a test wants to isolate — so a claim
+    /// about temperature is tested against worlds that differ *only* in temperature.
+    private func world(_ pairs: [String: String],
+                       seed: UInt64 = 20_260_805,
+                       vitality: Double? = nil,
+                       thermal: (floor: Double, peak: Double)? = nil,
+                       hydrology: Double? = nil,
+                       illumination: Double? = nil,
+                       openness: Double? = nil,
+                       substrate: [String: Double]? = nil) -> PressureReadings {
+        var readings = PressureRules.resolve(pairs.sorted { $0.key < $1.key }.enumerated().map { index, pair in
             Sigil(id: InstanceID(rawValue: UInt64(index + 1)),
                   source: PressureSourceID(rawValue: pair.key),
                   target: PressureTargetID(rawValue: pair.value),
                   intensity: .great)
         }, fillingUnwrittenWith: seed)
+
+        if let vitality {
+            readings.readings["vitality"]?.peak = vitality
+            readings.readings["vitality"]?.floor = vitality
+        }
+        if let thermal {
+            readings.readings["thermal"]?.floor = thermal.floor
+            readings.readings["thermal"]?.peak = thermal.peak
+        }
+        if let hydrology {
+            readings.readings["hydrology"]?.peak = hydrology
+            readings.readings["hydrology"]?.floor = hydrology
+            readings.readings["hydrology"]?.forms = [:]
+        }
+        if let illumination {
+            readings.readings["illumination"]?.peak = illumination
+            readings.readings["illumination"]?.floor = 0
+        }
+        if let openness {
+            readings.readings["relief"]?.aspects["openness"] = openness
+        }
+        if let substrate {
+            readings.readings["substrate"]?.forms = substrate
+        }
+        return readings
     }
 }

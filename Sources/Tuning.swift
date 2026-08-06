@@ -267,21 +267,98 @@ enum Tuning {
 
     /// The turning of a world's day (decisions-session-13 §2 and §6).
     /// Painting the ground. All PLACEHOLDER.
-    /// Sampling the animals in a world. All PLACEHOLDER.
+    /// Sampling the animals in a world. All PLACEHOLDER — creature-system-spec §10 flags most of
+    /// these as the numbers most worth challenging once they can be seen on a phone.
     enum Life {
         /// How many species a world holds — a barren one at the bottom, a teeming one at the top.
         /// Small on purpose: free sampling is only safe because the cast is small, and a strange
         /// animal should be the one you remember from that world.
         static let castSizeRange = 2...6
-        /// How far a species varies from the world's centre.
-        static let baseSpread: Double = 14
-        /// How far a single animal varies from its species. Deliberately small — enough that each
-        /// one is visibly its own, never enough to change what it is.
-        static let jitter: Double = 6
-        /// How much a swinging world widens the draw.
-        static let spreadPerAmplitude: Double = 0.15
-        /// Give up drawing after this many rejections on the energy budget.
-        static let samplingAttempts: Int = 40
+        /// Vitality per species above the floor: 2 at barren, 6 at teeming.
+        static let vitalityPerExtraSpecies: Double = 25
+
+        // MARK: The budget
+
+        /// What even a dead world can spend, so nothing is empty for reasons the player can't see.
+        static let baseBudget: Double = 40
+        static let budgetPerVitality: Double = 2.0
+        /// Superlinear, so extremes are dear. The exponent decides how rare a maxed axis is.
+        static let costExponent: Double = 1.5
+        /// How much bulk raises the price of covering and bone. [PROPOSAL] in spec §4.
+        static let sizeCostCoupling: Double = 1.2
+        /// How much of an axis one purchase buys.
+        static let allocationStep: Double = 5
+        /// The body every creature gets before anything else is bought. A thing has to exist.
+        static let minimumSize: Double = 12
+
+        /// The covering every creature is born in. Skin is not an adaptation — **coverage priced
+        /// like armour left every animal effectively naked**, and since armour and insulation are
+        /// both `hardness × coverage`, a world could buy plate that reached none of the creature.
+        static let baselineCoverage: Double = 35
+
+        /// What each axis costs at full value, before the size coupling. Size dominates; being
+        /// covered in *something* is cheap, and being covered in plate or fur is where it costs.
+        static func axisCost(_ axis: CostlyAxis) -> Double {
+            switch axis {
+            case .size: 120
+            case .coveringHardness: 55
+            case .coveringLength: 40
+            case .coveringCoverage: 25
+            case .boneDensity: 45
+            case .armament: 90
+            case .ornament: 60
+            }
+        }
+
+        /// Where each axis starts before pressures have an opinion.
+        ///
+        /// **Not uniform, because the axes aren't uniform in number.** Covering is three axes and a
+        /// body is one, so equal weights hand covering three times the draws and produce animals
+        /// that are mostly upholstery. These weights are per-*category* fairness, with size ahead
+        /// because it's the axis everything else is measured against.
+        static func baseAxisWeight(_ axis: CostlyAxis) -> Double {
+            switch axis {
+            case .size: 3.0
+            case .coveringHardness, .coveringLength: 0.9
+            case .coveringCoverage: 1.4
+            case .boneDensity: 1.1
+            case .armament: 2.0
+            case .ornament: 0.7
+            }
+        }
+
+        // MARK: Thresholds
+
+        /// Below this the three weapon axes together read as unarmed — a real and common answer.
+        static let unarmedThreshold: Double = 25
+        /// Trophic depth at which species start committing to a defence branch.
+        static let predationThreshold: Double = 30
+        /// What "sleek" means on the sinuous↔bulky axis.
+        static let sleekBuild: Double = 62
+        /// How well a region has to fit before a species takes its name rather than a composed one.
+        static let identityMatchThreshold: Double = 0.78
+        /// How far outside a region's band a value can sit before it stops counting at all.
+        static let identityBandTolerance: Double = 25
+        /// Below this share of sensory allocation, a creature keeps night hours.
+        static let nocturnalVisionCeiling: Double = 28
+        /// Below this it reads as blind.
+        static let blindVisionCeiling: Double = 18
+
+        /// How often a world that permits its own light actually grows some.
+        static let emanationChanceWhenSourceless: Double = 0.55
+        static let emanationChanceWhenVolatile: Double = 0.3
+
+        // MARK: Jitter
+
+        /// How far a single animal varies from its species. **Never enough to change what it is,
+        /// how it fights, or what it drops** — texture only.
+        static let jitter = Jitter()
+
+        struct Jitter: Sendable {
+            var coloration: Double = 10
+            var sizeFraction: Double = 0.05
+            var finish: Double = 5
+        }
     }
 
     enum Terrain {
