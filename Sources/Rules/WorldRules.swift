@@ -438,7 +438,29 @@ enum WorldRules {
             // left-to-right like a progress bar; scattering it feels like the edges closing in,
             // and staying on the seeded stream keeps a force-quit mid-collapse reproducible.
             let candidates = surviving.filter { run.map.ring(of: $0) == outermost }
-            guard let target = run.rng.pick(candidates) else { break }
+
+            // **A spared portal is no use behind a wall.** Entry portals sit on the map edge, which
+            // is the first ring to go — so sparing the portal tile while eating everything around
+            // it left the player looking at an intact way out they could not reach, waiting to be
+            // thrown out. Which is exactly what sparing them was meant to prevent.
+            //
+            // So a tile is only taken if the player can still walk to a portal afterwards.
+            //
+            // **And when nothing is left that can be taken safely, the world takes the player's own
+            // tile.** By then every surviving tile is on the last corridor between them and the way
+            // out, so anything else would sever it and leave them standing on an island waiting to
+            // be thrown out. Being caught is the ending; being stranded is a bug wearing its coat.
+            let safe = candidates.filter { !wouldMaroonPlayer(byCrumbling: $0, in: run) }
+            let target: GridPoint
+            if let pick = run.rng.pick(safe) {
+                target = pick
+            } else if surviving.contains(run.playerPosition) {
+                target = run.playerPosition
+            } else if let pick = run.rng.pick(candidates) {
+                target = pick
+            } else {
+                break
+            }
 
             if run.map[target].content.isLoseable { lost += 1 }
             run.map[target].isCrumbled = true
@@ -449,6 +471,39 @@ enum WorldRules {
             run.enemies.removeAll { $0.position == target }
         }
         return (crumbled, lost)
+    }
+
+    /// Whether taking this tile would leave the player unable to walk to any surviving portal.
+    ///
+    /// The player's own tile is exempt: being caught is the intended ending, and a tile that is
+    /// about to be stood on by nobody can't strand anyone.
+    static func wouldMaroonPlayer(byCrumbling point: GridPoint, in run: WorldRun) -> Bool {
+        guard point != run.playerPosition else { return false }
+        var map = run.map
+        map[point].isCrumbled = true
+        // No portal left to reach means there's nothing left to protect.
+        guard map.allPoints.contains(where: { map[$0].content.isPortal && !map[$0].isCrumbled })
+        else { return false }
+        return !canReachAPortal(from: run.playerPosition, in: map)
+    }
+
+    /// Flood fill from where the player stands to any standing portal.
+    static func canReachAPortal(from start: GridPoint, in map: WorldMap) -> Bool {
+        if map[start].content.isPortal && !map[start].isCrumbled { return true }
+        var seen: Set<GridPoint> = [start]
+        var queue = [start]
+        var head = 0
+        while head < queue.count {
+            let current = queue[head]
+            head += 1
+            for next in map.neighbours(of: current) where !seen.contains(next) {
+                guard canEnter(next, in: map) else { continue }
+                if map[next].content.isPortal { return true }
+                seen.insert(next)
+                queue.append(next)
+            }
+        }
+        return false
     }
 
     /// How fast the world is eating itself, in tiles per turn.

@@ -270,6 +270,36 @@ final class WorldTests: XCTestCase {
         XCTAssertGreaterThan(WorldRules.crumbleRate(in: state.worlds.activeRun!), atOnce)
     }
 
+    /// **A spared portal is no use behind a wall.** Entry portals sit on the map edge, which is the
+    /// first ring to crumble — so sparing the portal tile while eating everything around it left
+    /// the player looking at an intact way out they couldn't reach, waiting to be thrown out. Which
+    /// is exactly what sparing them was meant to prevent.
+    func testAPortalStaysReachableForAsLongAsThePlayerIsStanding() {
+        for seed in [UInt64(3), 57, 909] {
+            var state = startedRun(book(["terrain": "plains"]), seed: seed)
+            state.worlds.activeRun?.stability = 0
+            state.worlds.activeRun?.collapsedOnTurn = 0
+            // **Standing away from the way out**, which is the whole case. The run starts *on* the
+            // entry portal, so a test that leaves the player there proves nothing at all.
+            if let run = state.worlds.activeRun {
+                let middle = run.map.allPoints
+                    .filter { WorldRules.canEnter($0, in: run.map) && !run.map[$0].content.isPortal }
+                    .max { run.map.ring(of: $0) < run.map.ring(of: $1) }
+                if let middle { state.worlds.activeRun?.playerPosition = middle }
+            }
+            XCTAssertFalse(state.worlds.activeRun?.map[state.worlds.activeRun!.playerPosition]
+                .content.isPortal ?? true, "the player has to start away from a portal")
+
+            for _ in 0..<200 {
+                let events = WorldRules.advanceTurn(in: &state)
+                guard let run = state.worlds.activeRun, !events.contains(.floorGaveWay) else { break }
+                XCTAssertTrue(
+                    WorldRules.canReachAPortal(from: run.playerPosition, in: run.map),
+                    "seed \(seed): the player was marooned with a portal standing and their own floor intact")
+            }
+        }
+    }
+
     /// The way out is the last thing to go, or "reach a portal in time" becomes "wait to be thrown
     /// out", which is no decision at all.
     func testPortalsAreTheLastThingToCrumble() {
