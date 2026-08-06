@@ -15,15 +15,12 @@ extension Rarity {
 }
 
 extension ItemStack {
-    /// The name to show, and the colour to show it in. An unidentified curio still has a rarity of
-    /// its own — you can tell it's *interesting* before you can tell what it is.
-    var displayName: String {
-        guard let item = ContentCatalog.shared.item(catalogID) else { return catalogID.rawValue }
-        return identified ? item.name : (item.unidentifiedName ?? "Something odd")
+    /// The colour to show it in. An unidentified curio still has a rarity of its own — you can tell
+    /// it's *interesting* before you can tell what it is. A material's rarity is its grade, so a
+    /// superb plate reads as valuable at a glance.
+    var rarity: Rarity {
+        material?.rarity ?? ContentCatalog.shared.item(catalogID)?.rarity ?? .common
     }
-
-    var rarity: Rarity { ContentCatalog.shared.item(catalogID)?.rarity ?? .common }
-    var icon: String { identified ? (ContentCatalog.shared.item(catalogID)?.icon ?? "questionmark") : "questionmark.diamond" }
 }
 
 /// What happens when loot won't fit: **you choose.**

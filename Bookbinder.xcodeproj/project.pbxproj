@@ -36,6 +36,7 @@
 		332407592859288828CA4B63 /* LibraryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */; };
 		35A27AF646DD34DD1F8A9585 /* Gambit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79874A74B2CF52DA90868DA0 /* Gambit.swift */; };
 		3939EA44678C9E3D7CE7FF86 /* GameActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DDEB42C7E2856E98352341 /* GameActions.swift */; };
+		3C489CD6B833D6CBC9F6DD43 /* Materials.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF377477B4C3C3D11698D3F /* Materials.swift */; };
 		3E24E2D2D2BEAD60ADE93D0A /* WritingDeskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82ADF2ABC4F75679DADCCBB /* WritingDeskView.swift */; };
 		3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */; };
 		3FD60BA9683F245EBFA14D61 /* SpendingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */; };
@@ -95,10 +96,12 @@
 		AD06A15C582B042710CEED9F /* GameStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86093A93DD9720F92E4148D5 /* GameStore.swift */; };
 		AEBED915A9156084389B1BD6 /* LifeRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4002533174316FAE3274D6 /* LifeRules.swift */; };
 		B3127BCE033E785E4B3EA912 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543B94C8E89980FDE029D9C /* Page.swift */; };
+		BCB44A183A64B987C97BC1EA /* MaterialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E14C42A31CF4E0C858F212BF /* MaterialTests.swift */; };
 		BE5D3BC36C9F1D8030CFEE81 /* CombatRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99D023496EC834EA78E9BE63 /* CombatRules.swift */; };
 		BFB3CF53CC01D5CED466B0C9 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E110F7C0AF0739241A8F94 /* GameState.swift */; };
 		C709E6D127F96D2420ADBC5C /* creatures.json in Resources */ = {isa = PBXBuildFile; fileRef = 5FD331CEC89F930A1F99C13B /* creatures.json */; };
 		C8B16AD5D3CDC5B67BE7E320 /* qualifiers.json in Resources */ = {isa = PBXBuildFile; fileRef = 283E3D55623002C01AF8AF98 /* qualifiers.json */; };
+		C9ED9DB51CD49A2457B00B7D /* ButcheryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1FD369C1CCCC28B0A42FC7 /* ButcheryRules.swift */; };
 		CC74E6778320FB4F70CFDB3F /* PressureRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3C5DA8117A704E44B23C91 /* PressureRules.swift */; };
 		CD009883298233F654EE899C /* Discovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADC03C0E941B354BFE2EF65 /* Discovery.swift */; };
 		CF22F5AA092E017612B1124E /* LootDecisionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */; };
@@ -216,6 +219,7 @@
 		A38483F6A49BD38B618407D8 /* slots.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = slots.json; sourceTree = "<group>"; };
 		A4270CCCF203CAA8859A086B /* symbols.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = symbols.json; sourceTree = "<group>"; };
 		A4DA32364644741F03829592 /* SiteModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteModels.swift; sourceTree = "<group>"; };
+		AAF377477B4C3C3D11698D3F /* Materials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Materials.swift; sourceTree = "<group>"; };
 		AE4002533174316FAE3274D6 /* LifeRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeRules.swift; sourceTree = "<group>"; };
 		AE7F491C849679A2428073CA /* SaveFileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveFileIO.swift; sourceTree = "<group>"; };
 		B022088C9636578892397C50 /* BookProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookProjection.swift; sourceTree = "<group>"; };
@@ -243,6 +247,8 @@
 		D5A56C2CA4EF6B5366F86828 /* SiteRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteRules.swift; sourceTree = "<group>"; };
 		D9311ACC91B2E555993A3297 /* WorldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldView.swift; sourceTree = "<group>"; };
 		DD0C594698AE7E6D06191449 /* constellation.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = constellation.json; sourceTree = "<group>"; };
+		DD1FD369C1CCCC28B0A42FC7 /* ButcheryRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButcheryRules.swift; sourceTree = "<group>"; };
+		E14C42A31CF4E0C858F212BF /* MaterialTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialTests.swift; sourceTree = "<group>"; };
 		E19DC1448710810CD318671E /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		E1BB569F0B672F268545701C /* SiteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteTests.swift; sourceTree = "<group>"; };
 		EFEB95F304073E45D3BB22FB /* QualifierModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualifierModels.swift; sourceTree = "<group>"; };
@@ -271,6 +277,7 @@
 			children = (
 				B022088C9636578892397C50 /* BookProjection.swift */,
 				C3CC1BB415696E2B7417C43D /* BookRules.swift */,
+				DD1FD369C1CCCC28B0A42FC7 /* ButcheryRules.swift */,
 				99D023496EC834EA78E9BE63 /* CombatRules.swift */,
 				92B2180E4666F5000817D3EC /* ContradictionRules.swift */,
 				92E6DEE432F7A225C5C28D6E /* DescriptionRules.swift */,
@@ -388,6 +395,7 @@
 				04E110F7C0AF0739241A8F94 /* GameState.swift */,
 				5F756C7CBAE86A8565FB12DD /* Inventory.swift */,
 				504332712854230587940F0A /* Library.swift */,
+				AAF377477B4C3C3D11698D3F /* Materials.swift */,
 				B543B94C8E89980FDE029D9C /* Page.swift */,
 				CAAA1B171F7C380229C20CC5 /* RealityState.swift */,
 				3358F9F069CEED67DA33294D /* Sigil.swift */,
@@ -472,6 +480,7 @@
 				BDFAE95092D158944E000B02 /* GrammarTests.swift */,
 				80DFFB14B396FE04A7C03E01 /* LibraryTests.swift */,
 				7A7229E243E5EB4700C03C4A /* LifeTests.swift */,
+				E14C42A31CF4E0C858F212BF /* MaterialTests.swift */,
 				FF7811775C7058B692E07EB1 /* PageTests.swift */,
 				606F9667A67D771D03320DDA /* PersistenceTests.swift */,
 				B23878A2219B30C376009246 /* PressuresDriveGenerationTests.swift */,
@@ -617,6 +626,7 @@
 				776E19C048AB14D539E2ABC3 /* BookProjection.swift in Sources */,
 				15B201231C024A3C01DBA20A /* BookRules.swift in Sources */,
 				890774F4FCDF3A9DAE6BEFDD /* BookbinderApp.swift in Sources */,
+				C9ED9DB51CD49A2457B00B7D /* ButcheryRules.swift in Sources */,
 				3062AB49BB5A3BBCC3A396BD /* Combat.swift in Sources */,
 				BE5D3BC36C9F1D8030CFEE81 /* CombatRules.swift in Sources */,
 				859010F2D3881FC03F57205F /* ContentCatalog.swift in Sources */,
@@ -649,6 +659,7 @@
 				AAFAB01A37942E4A425FE909 /* LibraryView.swift in Sources */,
 				AEBED915A9156084389B1BD6 /* LifeRules.swift in Sources */,
 				CF22F5AA092E017612B1124E /* LootDecisionView.swift in Sources */,
+				3C489CD6B833D6CBC9F6DD43 /* Materials.swift in Sources */,
 				A30BFB516414E49CB79270EF /* Migrations.swift in Sources */,
 				10EA98516A8B4CB4C9379D71 /* MinimapView.swift in Sources */,
 				B3127BCE033E785E4B3EA912 /* Page.swift in Sources */,
@@ -705,6 +716,7 @@
 				A81656D157A597344E823340 /* GrammarTests.swift in Sources */,
 				DEB5615945275C75236426AD /* LibraryTests.swift in Sources */,
 				A94D38590FAA36B2D274214B /* LifeTests.swift in Sources */,
+				BCB44A183A64B987C97BC1EA /* MaterialTests.swift in Sources */,
 				AC3C0F06CB2BD3D9A9917BA1 /* PageTests.swift in Sources */,
 				0290A7D4A5E8A5E8516E171E /* PersistenceTests.swift in Sources */,
 				AC84C9DF64921B883263CEA5 /* PressureTests.swift in Sources */,

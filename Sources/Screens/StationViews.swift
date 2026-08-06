@@ -23,7 +23,7 @@ private struct SpilloverCard: View {
                 VStack(alignment: .leading, spacing: 8) {
                     LabeledRow(icon: stack.icon,
                                label: stack.displayName,
-                               value: stack.count > 1 ? "×\(stack.count)" : "",
+                               value: stack.detail,
                                tint: stack.rarity.tint)
                     HStack(spacing: 8) {
                         if store.state.base.inventory.isFull {
@@ -71,7 +71,7 @@ private struct SwapSheet: View {
                             dismiss()
                         } label: {
                             LabeledRow(icon: stored.icon, label: stored.displayName,
-                                       value: stored.count > 1 ? "×\(stored.count)" : "",
+                                       value: stored.detail,
                                        tint: stored.rarity.tint)
                         }
                         .frame(minHeight: 44)
@@ -130,7 +130,7 @@ struct StorehouseView: View {
                             // ladder), so a Mythic is obvious at a glance in a long list.
                             LabeledRow(icon: stack.icon,
                                        label: stack.displayName,
-                                       value: stack.count > 1 ? "×\(stack.count)" : "",
+                                       value: stack.detail,
                                        tint: stack.rarity.tint)
                         }
                     }

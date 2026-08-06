@@ -464,6 +464,32 @@ enum Tuning {
         static let retaliationPerSize: Double = 0.06
     }
 
+    /// What a creature leaves behind (creature-system-spec §8). All PLACEHOLDER.
+    enum Materials {
+        /// A creature has to actually be wearing something before it yields any of it.
+        static let minimumCoverageToYield: Double = 15
+        static let minimumArmamentToYield: Double = 30
+        static let minimumBoneToYield: Double = 20
+        static let minimumEmanationToYield: Double = 25
+
+        /// Where the covering tips from one material into another.
+        static let hardCoveringThreshold: Double = 55
+        static let longCoveringThreshold: Double = 45
+        static let denseCoveringThreshold: Double = 50
+        /// Layered iridescence is what makes a hard covering chitin rather than plate.
+        static let schillerThreshold: Double = 25
+
+        /// Quantity scales with size, and nothing else.
+        static let baseQuantity: Double = 1
+        static let quantityPerSize: Double = 3
+
+        /// Grade scales with trait extremity, with a little for a good surface.
+        static let gradePerExtremity: Double = 85
+        static let gradePerLustre: Double = 25
+        /// Above this a property is worth naming on the item's row.
+        static let notableProperty: Double = 35
+    }
+
     // MARK: - What the player has met
 
     enum Discovery {

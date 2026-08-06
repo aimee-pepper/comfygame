@@ -566,6 +566,13 @@ enum Resources {
     static let mote: ResourceID = "mote"
 }
 
+enum Items {
+    /// **Reserved, and deliberately not in `items.json`.** A material is not an authored item: what
+    /// it is and what it's good for came off the animal it was cut from, and travels on the stack
+    /// as a `MaterialSample`. This id exists only so a material can share the slot machinery.
+    static let material: ItemID = "material"
+}
+
 extension Bundle {
     /// Content ships in the app bundle. Unit tests are hosted by the app, so `Bundle.main`
     /// resolves there too; the class-based lookup is the fallback for any non-hosted context.

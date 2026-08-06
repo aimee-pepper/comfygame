@@ -60,12 +60,54 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     var catalogID: ItemID
     var count: Int = 1
     var identified: Bool = true
+    /// Set where this stack is a **material cut off a creature** rather than an authored item.
+    /// Materials have no catalogue entry — what they are and what they're good for came off the
+    /// animal, so the sample travels with the stack (creature-system-spec §8).
+    var material: MaterialSample?
 
-    init(id: InstanceID, catalogID: ItemID, count: Int = 1, identified: Bool = true) {
+    init(id: InstanceID, catalogID: ItemID, count: Int = 1, identified: Bool = true,
+         material: MaterialSample? = nil) {
         self.id = id
         self.catalogID = catalogID
         self.count = count
         self.identified = identified
+        self.material = material
+    }
+
+    /// Tolerant decoding, per the policy in `Migrations.swift`.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(InstanceID.self, forKey: .id)
+        catalogID = try c.decode(ItemID.self, forKey: .catalogID)
+        count = try c.decodeIfPresent(Int.self, forKey: .count) ?? 1
+        identified = try c.decodeIfPresent(Bool.self, forKey: .identified) ?? true
+        material = try c.decodeIfPresent(MaterialSample.self, forKey: .material)
+    }
+
+    /// What to call it. **Materials name themselves** — there is no catalogue entry to ask, because
+    /// what this is came off the animal it was cut from. Everything else asks the catalogue, and an
+    /// unidentified curio gives its teaser name.
+    var displayName: String {
+        if let material { return material.displayName }
+        guard let item = ContentCatalog.shared.item(catalogID) else { return catalogID.rawValue }
+        return identified ? item.name : (item.unidentifiedName ?? "Something odd")
+    }
+
+    var icon: String {
+        if let material { return material.kind.icon }
+        return identified ? (ContentCatalog.shared.item(catalogID)?.icon ?? "questionmark")
+                          : "questionmark.diamond"
+    }
+
+    /// The right-hand column of a list row. **For a material this is what it's good for**, because
+    /// a pelt with nothing said about it is indistinguishable from every other pelt — and the whole
+    /// point is that two pelts aren't the same pelt.
+    var detail: String {
+        let count = self.count > 1 ? "×\(self.count)" : ""
+        guard let material else { return count }
+        let quality = material.properties.dominant
+        guard quality.value > Tuning.Materials.notableProperty else { return count }
+        return count.isEmpty ? quality.name : "\(quality.name)  \(count)"
     }
 }
 

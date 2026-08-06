@@ -463,8 +463,10 @@ enum CombatRules {
 
     /// Rolls what the fight paid out, straight into the satchel, and records it in plain words.
     ///
-    /// Loot comes off the *world's own* yield table, so what you win reflects where you are — an
-    /// ore-rich world pays in ore. Tier scales the amount, so a tier-3 horror is worth the fight.
+    /// Two halves. **Resources** come off the *world's own* yield table, so what you win reflects
+    /// where you are — an ore-rich world pays in ore. **Materials** come off the creature itself
+    /// (creature-system-spec §8): the parts that composed it compose what it leaves, so a world that
+    /// grows monstrous armoured things drops monstrous plates.
     private static func awardSpoils(run: inout WorldRun, encounter: inout EncounterState, state: inout GameState) {
         var gained = ResourcePool()
         var found: [String] = []
@@ -480,6 +482,9 @@ enum CombatRules {
                 run.satchel.add(amount, of: resource)
                 gained.add(amount, of: resource)
                 state.reality.discovery.recordResource(resource, runIndex: run.runIndex)
+            }
+            if let traits = foe.traits {
+                found.append(contentsOf: butcher(traits, named: foe.stats.displayName, run: &run))
             }
             // Curios drop unidentified — this is where keys enter the world, one identify and one
             // long walk before they open anything.
@@ -506,6 +511,31 @@ enum CombatRules {
         encounter.spoils = gained.nonZero.map { entry in
             "\(entry.amount) \(ContentCatalog.shared.resource(entry.id)?.name.lowercased() ?? entry.id.rawValue)"
         } + found
+    }
+
+    /// Cuts a body into the parts it was made of, into the satchel.
+    ///
+    /// A full satchel neither swallows a material nor discards it: it goes onto `offeredItems` and
+    /// waits on the player, the same rule curios follow, so a force-quit mid-decision resumes with
+    /// the decision still open.
+    private static func butcher(_ traits: CreatureTraits, named name: String,
+                                run: inout WorldRun) -> [String] {
+        var lines: [String] = []
+        let count = ButcheryRules.quantity(from: traits, rng: &run.rng)
+
+        for sample in ButcheryRules.materials(from: traits, named: name) {
+            let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()),
+                                  catalogID: Items.material,
+                                  count: count,
+                                  material: sample)
+            if run.satchelItems.add(stack) {
+                lines.append(count > 1 ? "\(sample.displayName) ×\(count)" : sample.displayName)
+            } else {
+                run.offeredItems.append(stack)
+                lines.append("\(sample.displayName) — no room; waiting on you")
+            }
+        }
+        return lines
     }
 
     /// Closes out a finished fight: bestiary, and taking the defeated off the grid.
