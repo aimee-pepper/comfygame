@@ -124,28 +124,42 @@ enum Tuning {
 
         /// **Stability is a number of steps.** Aimee's curve.
         ///
-        /// At the bottom it's literal and brutal: a stability of 5 buys you five moves, 10 buys
-        /// ten. Above each band it multiplies, so climbing out of the danger zone pays off sharply:
+        /// Above each band it multiplies, so climbing out of the danger zone pays off sharply. The
+        /// bands are deliberate cliffs, not a smooth curve: crossing one roughly doubles what you
+        /// get, which gives the player thresholds to aim for rather than a gradient to squint at.
+        ///
+        /// **Rescaled for the bigger map.** Session 13 grew the world from 14×14 to 18×18 — 196
+        /// tiles to 324, a 1.65× increase — and said stability must buy proportionally more turns
+        /// "so runs aren't cut short simply by the map growing". The map grew and these didn't, so
+        /// a stability-25 world bought 25 turns on a map that takes a hundred to cross: an arrival
+        /// and an ejection rather than a tense scramble. **[PLACEHOLDER]** — needs device testing,
+        /// which is where session 13 says the map numbers get settled.
         ///
         ///   | score  | turns            |
         ///   |--------|------------------|
-        ///   | 0      | 1 — you arrive, and it goes |
-        ///   | 5      | 5                |
-        ///   | 25     | 25               |
-        ///   | 26     | 52               |
-        ///   | 50     | 100              |
-        ///   | 75     | 225 (≈ the whole 14×14 map) |
+        ///   | 5      | 60 (the floor)   |
+        ///   | 25     | 60 (the floor)   |
+        ///   | 26     | 91               |
+        ///   | 50     | 175              |
+        ///   | 51     | 255              |
+        ///   | 75     | 375              |
+        ///   | 76     | 532              |
         ///   | 100    | indefinite       |
-        ///
-        /// The bands are deliberate cliffs, not a smooth curve: 25 → 26 doubles what you get, which
-        /// gives the player thresholds to aim for rather than a gradient to squint at. If that ever
-        /// feels too sharp, interpolating between bands is a one-line change here.
-        static let stabilityTurnBands: [(minimumScore: Int, multiplier: Int)] = [
-            (minimumScore: 76, multiplier: 4),
-            (minimumScore: 51, multiplier: 3),
-            (minimumScore: 26, multiplier: 2),
-            (minimumScore: 0, multiplier: 1),
+        static let stabilityTurnBands: [(minimumScore: Int, multiplier: Double)] = [
+            (minimumScore: 76, multiplier: 7),
+            (minimumScore: 51, multiplier: 5),
+            (minimumScore: 26, multiplier: 3.5),
+            (minimumScore: 0, multiplier: 2),
         ]
+
+        /// **No run is shorter than one day plus a traverse.**
+        ///
+        /// A greedy world should be *dangerous*, not pointless. Below this a player doesn't get the
+        /// scramble they wrote — they get an arrival and an ejection, which reads as the game being
+        /// broken rather than as a consequence they chose. It also guarantees every world, however
+        /// reckless, sees at least one nightfall: below the floor the whole day/night system and
+        /// the nocturnal roster were invisible on exactly the worlds most likely to be interesting.
+        static var minimumTurnsPerRun: Int { Tuning.DayNight.turnsPerDay + 20 } // PLACEHOLDER
         /// What "indefinitely explorable" means in practice. Not truly infinite — every v0 world is
         /// disposable, and a world that genuinely never ends is what *anchoring* is for.
         static let indefiniteTurns: Int = 9_999

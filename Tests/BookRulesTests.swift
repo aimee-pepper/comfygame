@@ -209,20 +209,38 @@ final class BookRulesTests: XCTestCase {
 
     // MARK: Stability is measured in steps
 
-    /// Aimee's curve, pinned. Stability isn't an abstract rate — it's how many moves you get.
-    /// The low end is literal; each band above multiplies.
+    /// Aimee's curve: stability isn't an abstract rate, it's how many moves you get. **The bands
+    /// are deliberate cliffs**, so a player has thresholds to aim for rather than a gradient to
+    /// squint at — and there's a floor, because a greedy world should be dangerous rather than
+    /// pointless.
     func testStabilityScoreConvertsToTurnsOnTheAgreedCurve() {
-        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 0), 1, "You arrive, and then it goes")
-        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 5), 5, "5% is five steps, literally")
-        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 10), 10)
-        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 25), 25)
-        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 26), 52, "Past 25 it doubles")
-        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 50), 100)
-        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 51), 153, "Past 50 it triples")
-        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 75), 225)
-        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 76), 304, "Past 75 it quadruples")
+        let floor = Tuning.World.minimumTurnsPerRun
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 0), floor,
+                       "even the most reckless book buys a day and a walk across")
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 25), floor)
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 26), 91)
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 50), 175)
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 51), 255)
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 75), 375)
+        XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 76), 532)
         XCTAssertEqual(BookRules.turnsAvailable(stabilityScore: 100), Tuning.World.indefiniteTurns,
                        "Full stability is explorable indefinitely")
+    }
+
+    /// Every band boundary is a real step up, or there's no threshold worth aiming for.
+    func testEachBandIsACliff() {
+        for edge in [26, 51, 76] {
+            let below = BookRules.turnsAvailable(stabilityScore: edge - 1)
+            let above = BookRules.turnsAvailable(stabilityScore: edge)
+            XCTAssertGreaterThan(above, below + 20, "crossing into \(edge) barely bought anything")
+        }
+    }
+
+    /// **Every world sees a nightfall.** Below the floor the whole day/night system and the
+    /// nocturnal roster were invisible on exactly the worlds most likely to be interesting.
+    func testEvenTheWorstWorldSeesOneNight() {
+        XCTAssertGreaterThan(BookRules.turnsAvailable(stabilityScore: 0),
+                             Tuning.DayNight.turnsPerDay)
     }
 
     /// The meter has to empty exactly when the book said it would — the preview promises a number
@@ -253,7 +271,10 @@ final class BookRulesTests: XCTestCase {
         let greedyTurns = BookRules.turnsAvailable(for: BookRules.resolveBook(draft: greedy, ownedSymbols: owned, seed: 1))
 
         XCTAssertGreaterThan(calmTurns, tiles / 2, "A stabilised book should reach most of the map")
-        XCTAssertLessThan(greedyTurns, tiles / 8, "A gold-hungry one should barely leave the doorstep")
+        // Measured as a *span*, not against an absolute floor: a greedy world is dangerous rather
+        // than pointless now, so what it costs you is most of the map, not the trip itself.
+        XCTAssertLessThan(greedyTurns * 3, calmTurns,
+                          "A gold-hungry book barely costs you anything")
     }
 
     func testMixesAreNormalisedAndSorted() {

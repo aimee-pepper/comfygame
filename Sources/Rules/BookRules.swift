@@ -226,8 +226,9 @@ enum BookRules {
         guard score < 100 else { return Tuning.World.indefiniteTurns }
         let multiplier = Tuning.World.stabilityTurnBands
             .first { score >= $0.minimumScore }?.multiplier ?? 1
-        // Even a stability of zero gives you one turn: you arrive, and then it goes.
-        return max(1, score * multiplier)
+        // Floored, so even the most reckless book buys a day and a walk across. What a greedy
+        // world costs you is safety, not the trip.
+        return max(Tuning.World.minimumTurnsPerRun, Int((Double(score) * multiplier).rounded()))
     }
 
     static func turnsAvailable(for book: BoundBook) -> Int {
@@ -248,7 +249,10 @@ enum BookRules {
     /// preview and the in-run header can't disagree.
     static func turnsUntilCollapse(decayPerTurn: Double) -> Int {
         guard decayPerTurn > 0 else { return Tuning.World.indefiniteTurns }
-        return Int((Tuning.World.startingStability / decayPerTurn).rounded(.down))
+        // **Nearest, not down.** The decay rate is the promised turns divided into the meter, so
+        // dividing back out lands a hair under — 100 / (100/91) is 90.99999, and flooring it made
+        // the world quietly report one turn fewer than the book had promised.
+        return Int((Tuning.World.startingStability / decayPerTurn).rounded())
     }
 
     static func enemyTier(of book: BoundBook) -> Int {
