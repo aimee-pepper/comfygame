@@ -24,6 +24,7 @@ struct ContentCatalog: Sendable {
     let contradictions: [ContradictionDef]
     let descriptionClauses: [DescriptionClauseDef]
     let runeShapes: [RuneShapeDef]
+    let qualifiers: [QualifierDef]
     let travellers: [TravellerDef]
     let diaryPages: [DiaryPageDef]
 
@@ -67,7 +68,30 @@ struct ContentCatalog: Sendable {
     func station(_ id: StationID) -> StationDef? { stations.first { $0.id == id } }
     func site(_ id: SiteID) -> SiteDef? { sites.first { $0.id == id } }
     func contradiction(_ id: ContradictionID) -> ContradictionDef? { contradictions.first { $0.id == id } }
-    func runeShape(_ id: String) -> RuneShapeDef? { runeShapes.first { $0.id == id } }
+    /// A shape by id, deriving rotations on demand.
+    ///
+    /// `crude_ell@90` isn't authored anywhere — it's the authored `crude_ell` turned a quarter
+    /// turn. Resolving it here means a rotated cluster survives a save without four copies of every
+    /// footprint existing in the data.
+    func runeShape(_ id: String) -> RuneShapeDef? {
+        if let exact = runeShapes.first(where: { $0.id == id }) { return exact }
+        let parts = id.split(separator: "@")
+        guard parts.count == 2, let angle = Int(parts[1]),
+              var shape = runeShapes.first(where: { $0.id == String(parts[0]) })
+        else { return nil }
+        for _ in 0..<((angle / 90) % 4) { shape = shape.rotated() }
+        return shape
+    }
+
+    func rotatedShape(of shape: RuneShapeDef) -> RuneShapeDef? { shape.rotated() }
+
+    func qualifier(_ id: QualifierID) -> QualifierDef? { qualifiers.first { $0.id == id } }
+    func qualifiers(on ladder: QualifierDef.Ladder) -> [QualifierDef] {
+        qualifiers.filter { $0.ladder == ladder }.sorted { $0.step < $1.step }
+    }
+    var qualifierLaddersInUse: [QualifierDef.Ladder] {
+        QualifierDef.Ladder.allCases.filter { !qualifiers(on: $0).isEmpty }
+    }
     func traveller(_ id: TravellerID) -> TravellerDef? { travellers.first { $0.id == id } }
     func diaryPage(_ id: DiaryPageID) -> DiaryPageDef? { diaryPages.first { $0.id == id } }
     func diary(of traveller: TravellerID) -> [DiaryPageDef] { diaryPages.filter { $0.diary == traveller } }
@@ -130,6 +154,7 @@ struct ContentCatalog: Sendable {
             contradictions: try loadFile("contradictions", key: "contradictions", bundle: bundle),
             descriptionClauses: try loadFile("descriptions", key: "clauses", bundle: bundle),
             runeShapes: try loadFile("rune_shapes", key: "shapes", bundle: bundle),
+            qualifiers: try loadFile("qualifiers", key: "qualifiers", bundle: bundle),
             travellers: try loadFile("travellers", key: "travellers", bundle: bundle),
             diaryPages: try loadFile("travellers", key: "pages", bundle: bundle)
         )
@@ -195,6 +220,7 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(contradictions.map(\.id.rawValue), label: "contradiction")
         try requireUniqueIDs(descriptionClauses.map(\.id), label: "description clause")
         try requireUniqueIDs(runeShapes.map(\.id), label: "rune shape")
+        try requireUniqueIDs(qualifiers.map(\.id.rawValue), label: "qualifier")
         try requireUniqueIDs(travellers.map(\.id.rawValue), label: "traveller")
         try requireUniqueIDs(diaryPages.map(\.id.rawValue), label: "diary page")
 
@@ -458,6 +484,13 @@ struct ContentCatalog: Sendable {
         // Each party member needs exactly one Skill, or the action bar has a dead button on it.
         for owner in [SkillDef.Owner.binder, .companion] where skill(ownedBy: owner) == nil {
             throw ContentError.danglingReference("skills.json has no skill for the \(owner.rawValue)")
+        }
+
+        for qualifier in qualifiers {
+            for target in qualifier.onlyFor where !targetIDs.contains(target) {
+                throw ContentError.danglingReference(
+                    "qualifier '\(qualifier.id)' is restricted to unknown target '\(target)'")
+            }
         }
 
         // A traveller with no signature is nowhere; a page that unlocks nothing is not a page.

@@ -10,9 +10,14 @@ final class PageTests: XCTestCase {
 
     // MARK: The page is a budget, not a syntax
 
-    /// Position must never reach meaning. `PressureTests` proves resolution is order-invariant;
-    /// this proves the *page* can't smuggle position in by another route.
-    func testWhereARuneSitsNeverChangesWhatItSays() {
+    /// **Superseded in part** (decisions-session-14 §3). Absolute position still carries no
+    /// meaning, which is what this checks — but *relative* position now does, and the rule that
+    /// replaced this one lives in `GrammarTests`: translate or rotate the whole page and it must
+    /// say exactly the same thing.
+    ///
+    /// This case survives because the marks in it are **self-contained** — compounds and
+    /// whole-statement runes say what they say wherever they sit, with or without neighbours.
+    func testSelfContainedMarksSayTheSameThingWhereverTheySit() {
         let sigils = [
             Sigil(id: InstanceID(rawValue: 1), source: "sun", target: "illumination", intensity: .great),
             Sigil(id: InstanceID(rawValue: 2), source: "glacier", target: "hydrology", intensity: .moderate)

@@ -1,0 +1,25 @@
+{
+  "_note": "Qualifiers (writing-system-rune-spec §6, cut down by decisions-session-14 §4). A qualifier earns its place only if no generic ladder covers it — 'bright' is cut, because a great sun IS a bright sun. But 'big' is three different ideas and must not collapse into one word: a big sun is INTENSE, a big sea is EXTENSIVE, a big swarm is NUMEROUS. Hence three generic workhorses that apply across all eight targets, plus the two target-specific ladders no ladder can replace. Qualifier sigils are placed on the page and take space like anything else; they attach to a source by being connected to it.",
+  "qualifiers": [
+    { "id": "faint",        "ladder": "intensity", "name": "Faint",        "step": 0, "icon": "circle" },
+    { "id": "moderate",     "ladder": "intensity", "name": "Moderate",     "step": 1, "icon": "circle.lefthalf.filled" },
+    { "id": "great",        "ladder": "intensity", "name": "Great",        "step": 2, "icon": "circle.fill" },
+    { "id": "overwhelming", "ladder": "intensity", "name": "Overwhelming", "step": 3, "icon": "circle.circle.fill" },
+
+    { "id": "minute", "ladder": "scale", "name": "Minute", "step": 0, "icon": "square.dotted" },
+    { "id": "small",  "ladder": "scale", "name": "Small",  "step": 1, "icon": "square" },
+    { "id": "large",  "ladder": "scale", "name": "Large",  "step": 2, "icon": "square.grid.2x2" },
+    { "id": "vast",   "ladder": "scale", "name": "Vast",   "step": 3, "icon": "square.grid.3x3" },
+
+    { "id": "single",     "ladder": "count", "name": "Single",     "step": 0, "icon": "1.circle" },
+    { "id": "pair",       "ladder": "count", "name": "Pair",       "step": 1, "icon": "2.circle" },
+    { "id": "few",        "ladder": "count", "name": "Few",        "step": 2, "icon": "3.circle" },
+    { "id": "many",       "ladder": "count", "name": "Many",       "step": 3, "icon": "ellipsis.circle" },
+    { "id": "countless",  "ladder": "count", "name": "Countless",  "step": 4, "icon": "infinity.circle" },
+
+    { "id": "frozen",    "ladder": "phase", "name": "Frozen",    "step": 0, "icon": "snowflake",  "onlyFor": ["hydrology"] },
+    { "id": "solid",     "ladder": "phase", "name": "Solid",     "step": 1, "icon": "cube",       "onlyFor": ["hydrology"] },
+    { "id": "liquid",    "ladder": "phase", "name": "Liquid",    "step": 2, "icon": "drop",       "onlyFor": ["hydrology"] },
+    { "id": "vaporous",  "ladder": "phase", "name": "Vaporous",  "step": 3, "icon": "cloud",      "onlyFor": ["hydrology"] }
+  ]
+}

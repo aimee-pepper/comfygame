@@ -30,6 +30,12 @@ struct PageGridView: View {
     @State private var translation: CGSize = .zero
     @State private var ghostDrag: CGSize = .zero
     @State private var willDiscard = false
+    /// Connect mode: tap a sigil, tap an adjacent one, they're joined. Keep tapping to chain.
+    @Binding var isConnecting: Bool
+    /// The mark the next tap will join to.
+    @State private var connectingFrom: InstanceID?
+    /// The cluster last touched, so it can be rotated.
+    @State private var selected: InstanceID?
 
     private var page: Page { store.state.base.page }
     private var pageSize: CGSize {
@@ -69,7 +75,23 @@ struct PageGridView: View {
 
     private var footer: some View {
         HStack(spacing: 10) {
-            if let ghost {
+            if isConnecting {
+                Text(connectingFrom == nil
+                     ? "Tap a sigil, then an adjacent one."
+                     : "Now tap something next to it.")
+                    .font(.caption)
+                    .foregroundStyle(Color.accentColor)
+                Spacer()
+            } else if let selected, PageRules.cluster(containing: selected, on: page).count > 1 {
+                Button {
+                    store.rotateCluster(selected)
+                } label: {
+                    Label("Turn", systemImage: "rotate.right")
+                        .font(.caption)
+                }
+                .frame(minWidth: 60, minHeight: 44)
+                Spacer()
+            } else if let ghost {
                 Text(fits(ghost) ? "Drag into place, then let go" : "Won't fit there")
                     .font(.caption)
                     .foregroundStyle(fits(ghost) ? Color.secondary : Color.orange)
@@ -121,48 +143,109 @@ struct PageGridView: View {
         let shape = mark.shape
         let isDragging = dragging == mark.id
         let tint = isDragging && willDiscard ? Color.red : Color.accentColor
+        // Inside a cluster the individual borders step back, so the outline around the whole thing
+        // is what you read. Adjacent-and-joined has to look unmistakably unlike adjacent-and-not.
+        let inCluster = PageRules.cluster(containing: mark.id, on: page).count > 1
 
         return ZStack(alignment: .topLeading) {
             cells(of: shape, side: side) { cell in
-                RoundedRectangle(cornerRadius: side * 0.12)
+                RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
                     .fill(tint.opacity(isDragging ? 0.45 : 0.28))
-                    .overlay(RoundedRectangle(cornerRadius: side * 0.12)
-                        .stroke(tint.opacity(isDragging ? 1 : 0.65), lineWidth: isDragging ? 2 : 1))
+                    .overlay(RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
+                        .stroke(tint.opacity(isDragging ? 1 : (inCluster ? 0.15 : 0.65)),
+                                lineWidth: isDragging ? 2 : 1))
                     .frame(width: side, height: side)
                     .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
             }
-            RuneGlyph(id: mark.symbolID?.rawValue ?? String(mark.id.rawValue),
-                      lineWidth: max(1.5, side * 0.07))
+            // Drawn in a cell the shape actually occupies. A plus-shaped footprint doesn't cover
+            // its own bounding-box corner, so anchoring the glyph at the origin left it floating
+            // outside its own rune.
+            RuneGlyph(id: mark.glyphID, lineWidth: max(1.5, side * 0.07))
                 .frame(width: side, height: side)
                 .foregroundStyle(tint)
+                .offset(x: CGFloat(glyphCell(shape).column) * side,
+                        y: CGFloat(glyphCell(shape).row) * side)
         }
         .frame(width: CGFloat(shape?.width ?? 1) * side,
                height: CGFloat(shape?.height ?? 1) * side,
                alignment: .topLeading)
-        .contentShape(Rectangle())
-        .offset(x: CGFloat(mark.origin.column) * side + (isDragging ? translation.width : 0),
-                y: CGFloat(mark.origin.row) * side + (isDragging ? translation.height : 0))
+        // The hit area is the rune's **actual cells**, not its bounding box. A plus-shaped
+        // footprint doesn't fill its own box, and a rectangular hit area let it swallow taps on
+        // squares it doesn't occupy — so a neighbour sitting in one of those corners couldn't be
+        // tapped at all.
+        .contentShape(CellsShape(cells: shape?.offsets ?? [PageCell(column: 0, row: 0)], side: side))
+        .offset(x: CGFloat(mark.origin.column) * side + (dragOffset(for: mark).width),
+                y: CGFloat(mark.origin.row) * side + (dragOffset(for: mark).height))
         .zIndex(isDragging ? 2 : 0)
+        .onTapGesture { tapped(mark) }
         .gesture(markDrag(mark, side: side, pageSize: pageSize))
         .accessibilityLabel("\(mark.displayName), \(mark.cells.count) cells. Drag to move, or off the page to rub out.")
+    }
+
+    /// A cluster drags as one, so every mark in it follows the one under the finger.
+    private func dragOffset(for mark: PlacedRune) -> CGSize {
+        guard let dragging,
+              PageRules.cluster(containing: dragging, on: page).contains(where: { $0.id == mark.id })
+        else { return .zero }
+        return translation
+    }
+
+    /// In connect mode a tap joins; otherwise it selects the cluster so it can be turned.
+    private func tapped(_ mark: PlacedRune) {
+        guard isConnecting else {
+            selected = (selected == mark.id) ? nil : mark.id
+            return
+        }
+        guard let from = connectingFrom else { connectingFrom = mark.id; return }
+        if from == mark.id { connectingFrom = nil; return }
+        // Chaining: on success the new mark becomes the anchor, so you can keep going.
+        if store.connect(from, mark.id) { connectingFrom = mark.id }
+    }
+
+    /// The border round a cluster, marking it as one object. Touching-but-unjoined clusters have
+    /// their own borders, so adjacent-and-separate reads differently from adjacent-and-joined.
+    private func clusterOutline(_ group: [PlacedRune], side: CGFloat) -> some View {
+        let cells = Set(group.flatMap(\.cells))
+        return ZStack(alignment: .topLeading) {
+            ForEach(Array(cells).sorted { ($0.row, $0.column) < ($1.row, $1.column) }, id: \.self) { cell in
+                Rectangle()
+                    .fill(Color.primary.opacity(0.07))
+                    .frame(width: side, height: side)
+                    .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
+            }
+        }
+        .overlay(alignment: .topLeading) {
+            ForEach(Array(cells).sorted { ($0.row, $0.column) < ($1.row, $1.column) }, id: \.self) { cell in
+                ClusterEdges(cell: cell, cells: cells, side: side)
+            }
+        }
+        .allowsHitTesting(false)
     }
 
     private func markDrag(_ mark: PlacedRune, side: CGFloat, pageSize: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 2)
             .onChanged { value in
+                guard !isConnecting else { return }
                 dragging = mark.id
                 translation = value.translation
                 willDiscard = !isOverPage(mark, translation: value.translation, side: side, pageSize: pageSize)
             }
             .onEnded { value in
+                guard !isConnecting else { return }
                 let discard = !isOverPage(mark, translation: value.translation, side: side, pageSize: pageSize)
-                let target = PageCell(
-                    column: mark.origin.column + Int((value.translation.width / side).rounded()),
-                    row: mark.origin.row + Int((value.translation.height / side).rounded()))
+                let delta = PageCell(column: Int((value.translation.width / side).rounded()),
+                                     row: Int((value.translation.height / side).rounded()))
                 dragging = nil
                 translation = .zero
                 willDiscard = false
-                if discard { store.erase(mark.id) } else { store.move(mark.id, to: target) }
+                if discard {
+                    store.erase(mark.id)
+                } else if PageRules.cluster(containing: mark.id, on: page).count > 1 {
+                    store.moveCluster(mark.id, by: delta)
+                } else {
+                    store.move(mark.id, to: PageCell(column: mark.origin.column + delta.column,
+                                                     row: mark.origin.row + delta.row))
+                }
             }
     }
 
@@ -194,14 +277,16 @@ struct PageGridView: View {
                     .frame(width: side, height: side)
                     .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
             }
-            RuneGlyph(id: ghost.symbol.rawValue, lineWidth: max(1.5, side * 0.07))
+            RuneGlyph(id: ghost.glyph, lineWidth: max(1.5, side * 0.07))
                 .frame(width: side, height: side)
                 .foregroundStyle(tint)
+                .offset(x: CGFloat(glyphCell(shape).column) * side,
+                        y: CGFloat(glyphCell(shape).row) * side)
         }
         .frame(width: CGFloat(shape?.width ?? 1) * side,
                height: CGFloat(shape?.height ?? 1) * side,
                alignment: .topLeading)
-        .contentShape(Rectangle())
+        .contentShape(CellsShape(cells: shape?.offsets ?? [PageCell(column: 0, row: 0)], side: side))
         .offset(x: CGFloat(ghost.origin.column) * side + ghostDrag.width,
                 y: CGFloat(ghost.origin.row) * side + ghostDrag.height)
         .zIndex(3)
@@ -217,14 +302,14 @@ struct PageGridView: View {
                     moved.origin = target
                     // Let go somewhere it fits and it's written. Somewhere it doesn't, and the
                     // ghost just stays there — still yours to move, nothing lost.
-                    if fits(moved), store.write(ghost.symbol, at: target) {
+                    if fits(moved), store.write(ghost.content, glyph: ghost.glyph, at: target) {
                         self.ghost = nil
                     } else {
                         self.ghost = moved
                     }
                 }
         )
-        .accessibilityLabel("\(ContentCatalog.shared.symbol(ghost.symbol)?.name ?? "A rune"), not yet written. Drag to place.")
+        .accessibilityLabel("Not yet written. Drag to place.")
     }
 
     // MARK: Helpers
@@ -238,9 +323,21 @@ struct PageGridView: View {
         }
     }
 
+    /// Where in a footprint the glyph sits: the middle-most occupied cell, so it reads as the
+    /// centre of the mark rather than as a corner of it.
+    private func glyphCell(_ shape: RuneShapeDef?) -> PageCell {
+        let cells = shape?.offsets ?? [PageCell(column: 0, row: 0)]
+        guard let first = cells.first else { return PageCell(column: 0, row: 0) }
+        let midColumn = Double(cells.map(\.column).reduce(0, +)) / Double(cells.count)
+        let midRow = Double(cells.map(\.row).reduce(0, +)) / Double(cells.count)
+        return cells.min {
+            pow(Double($0.column) - midColumn, 2) + pow(Double($0.row) - midRow, 2)
+                < pow(Double($1.column) - midColumn, 2) + pow(Double($1.row) - midRow, 2)
+        } ?? first
+    }
+
     private func shape(of ghost: GhostRune) -> RuneShapeDef? {
-        ContentCatalog.shared.symbol(ghost.symbol)
-            .flatMap { PageRules.shape(forCompound: $0, hand: store.state.base.bestHand) }
+        PageRules.shape(forGlyph: ghost.glyph, hand: store.state.base.bestHand)
     }
 
     private func fits(_ ghost: GhostRune) -> Bool {
@@ -249,17 +346,52 @@ struct PageGridView: View {
     }
 }
 
-/// A rune picked from the palette and hovering over the page, not yet written.
+/// A sigil picked from the palette and hovering over the page, not yet written.
 struct GhostRune: Equatable {
-    var symbol: SymbolID
+    /// What it draws as, and what it will say once placed.
+    var glyph: String
+    var content: MarkContent
     var origin: PageCell
+}
 
-    /// Where a freshly picked rune appears: the first place it would fit, so it starts somewhere
-    /// legal and the player is adjusting rather than hunting.
-    static func appearing(_ symbol: SymbolDef, hand: Hand, on page: Page) -> GhostRune {
-        let shape = PageRules.shape(forCompound: symbol, hand: hand)
-        let origin = shape.flatMap { PageRules.validOrigins(for: $0, on: page).first }
-            ?? PageCell(column: 0, row: 0)
-        return GhostRune(symbol: symbol.id, origin: origin)
+/// Draws a border only on the outside of a cluster, so the cluster reads as one shape rather than
+/// as a grid of separately-boxed cells.
+private struct ClusterEdges: View {
+    let cell: PageCell
+    let cells: Set<PageCell>
+    let side: CGFloat
+
+    var body: some View {
+        Path { path in
+            let x = CGFloat(cell.column) * side, y = CGFloat(cell.row) * side
+            if !cells.contains(PageCell(column: cell.column, row: cell.row - 1)) {
+                path.move(to: CGPoint(x: x, y: y)); path.addLine(to: CGPoint(x: x + side, y: y))
+            }
+            if !cells.contains(PageCell(column: cell.column, row: cell.row + 1)) {
+                path.move(to: CGPoint(x: x, y: y + side)); path.addLine(to: CGPoint(x: x + side, y: y + side))
+            }
+            if !cells.contains(PageCell(column: cell.column - 1, row: cell.row)) {
+                path.move(to: CGPoint(x: x, y: y)); path.addLine(to: CGPoint(x: x, y: y + side))
+            }
+            if !cells.contains(PageCell(column: cell.column + 1, row: cell.row)) {
+                path.move(to: CGPoint(x: x + side, y: y)); path.addLine(to: CGPoint(x: x + side, y: y + side))
+            }
+        }
+        .stroke(Color.primary, lineWidth: 3)
+    }
+}
+
+/// A hit area made of a rune's occupied cells rather than its bounding box.
+private struct CellsShape: Shape {
+    let cells: [PageCell]
+    let side: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        for cell in cells {
+            path.addRect(CGRect(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side,
+                                width: side, height: side))
+        }
+        return path
     }
 }

@@ -31,6 +31,31 @@ struct RuneShapeDef: Codable, Equatable, Identifiable, Sendable {
     var cells: [[Int]]
 
     var offsets: [PageCell] { cells.map { PageCell(column: $0[0], row: $0[1]) } }
+
+    /// The same footprint turned a quarter turn clockwise, normalised back against its origin.
+    ///
+    /// Derived rather than authored: a shape and its three rotations are the same glyph held at
+    /// different angles, and authoring four copies of each would be four times the work for no
+    /// expressive gain. The id carries the angle so a rotated page round-trips through a save.
+    func rotated() -> RuneShapeDef {
+        let turned = cells.map { [ (height - 1) - $0[1], $0[0] ] }
+        let minColumn = turned.map { $0[0] }.min() ?? 0
+        let minRow = turned.map { $0[1] }.min() ?? 0
+        let normalised = turned.map { [$0[0] - minColumn, $0[1] - minRow] }
+
+        let base = id.split(separator: "@").first.map(String.init) ?? id
+        let previous = id.split(separator: "@").last.flatMap { Int($0) } ?? 0
+        let angle = (previous + 90) % 360
+        return RuneShapeDef(id: angle == 0 ? base : "\(base)@\(angle)",
+                            hand: hand,
+                            cells: normalised)
+    }
+
+    init(id: String, hand: Hand, cells: [[Int]]) {
+        self.id = id
+        self.hand = hand
+        self.cells = cells
+    }
     var footprint: Int { cells.count }
     var width: Int { (cells.map { $0[0] }.max() ?? 0) + 1 }
     var height: Int { (cells.map { $0[1] }.max() ?? 0) + 1 }
@@ -76,10 +101,12 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
     var shape: RuneShapeDef? { ContentCatalog.shared.runeShape(shapeID) }
     var cells: [PageCell] { (shape?.offsets ?? [PageCell(column: 0, row: 0)]).map { origin + $0 } }
 
-    /// What this mark says. A compound says several things at once — that's what makes it a
-    /// compound rather than an abbreviation.
+    /// What this mark says **on its own**. Targets, sources and qualifiers say nothing alone —
+    /// they say something once connected, which is `PageRules.sigils(of:)`'s job.
     var sigils: [Sigil] {
         switch content {
+        case .target, .source, .qualifier:
+            return []
         case .rune(let sigil):
             return [sigil]
         case .compound(let symbolID):
@@ -96,10 +123,28 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
         if case .compound(let id) = content { id } else { nil }
     }
 
+    var targetID: PressureTargetID? {
+        if case .target(let id) = content { id } else { nil }
+    }
+
+    var sourceID: PressureSourceID? {
+        if case .source(let id) = content { id } else { nil }
+    }
+
+    var qualifierID: QualifierID? {
+        if case .qualifier(let id) = content { id } else { nil }
+    }
+
+    /// Whether this mark needs connecting to mean anything.
+    var needsConnection: Bool { sourceID != nil || qualifierID != nil }
+
     var displayName: String {
         switch content {
         case .rune(let sigil): sigil.displayText
         case .compound(let id): ContentCatalog.shared.symbol(id)?.name ?? id.rawValue
+        case .target(let id): ContentCatalog.shared.pressureTarget(id)?.name ?? id.rawValue
+        case .source(let id): ContentCatalog.shared.pressureSource(id)?.name ?? id.rawValue
+        case .qualifier(let id): ContentCatalog.shared.qualifier(id)?.name ?? id.rawValue
         }
     }
 
@@ -107,18 +152,68 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
         switch content {
         case .rune: "circle.hexagongrid"
         case .compound(let id): ContentCatalog.shared.symbol(id)?.icon ?? "questionmark"
+        case .target(let id): ContentCatalog.shared.pressureTarget(id)?.icon ?? "circle"
+        case .source(let id): ContentCatalog.shared.pressureSource(id)?.icon ?? "circle"
+        case .qualifier(let id): ContentCatalog.shared.qualifier(id)?.icon ?? "circle"
+        }
+    }
+
+    /// The identity a glyph is drawn from, so a rune always looks like itself.
+    var glyphID: String {
+        switch content {
+        case .rune(let sigil): sigil.source.rawValue
+        case .compound(let id): id.rawValue
+        case .target(let id): id.rawValue
+        case .source(let id): id.rawValue
+        case .qualifier(let id): id.rawValue
         }
     }
 }
 
 /// What is actually written in a mark.
 ///
+/// The grammar reads **target first, then connected sources** (decisions-session-14 §1): you write
+/// the Illumination sigil and connect sources to it. A qualifier attaches to the source it's
+/// connected to.
+///
 /// A **compound** is one glyph meaning what several runes mean together, at a smaller footprint
 /// (rune spec §9). Every v0 symbol is one, which is what lets the page carry the existing
-/// vocabulary without any of its numbers being re-tuned.
+/// vocabulary — and its balance numbers — while the atomic grammar grows alongside it.
 enum MarkContent: Codable, Equatable, Sendable {
-    case rune(Sigil)
+    /// The dial a cluster is about. The anchor of the composition.
+    case target(PressureTargetID)
+    /// A cause. Says nothing until it's connected to a target.
+    case source(PressureSourceID)
+    /// A rung on a ladder, modifying whichever source it's connected to.
+    case qualifier(QualifierID)
+    /// One glyph meaning several things at once. Self-contained — needs no connections.
     case compound(SymbolID)
+    /// A whole statement written as one mark. The pre-session-14 shape, kept so existing pages
+    /// still resolve.
+    case rune(Sigil)
+}
+
+/// A declared connection between two adjacent marks.
+///
+/// **Adjacency constrains; the connector declares intent** (session 14 §2). Adjacency alone can't
+/// do the job — the page is small, so on a full page nearly everything touches everything, and
+/// everything would join to everything. A connector alone can't either, because you could then link
+/// across the page and relative position would stop meaning anything.
+///
+/// **No page space is spent on a link.** It's a relationship, not an object — which matters a great
+/// deal on a page that holds about seven crude sigils.
+struct MarkLink: Codable, Equatable, Hashable, Sendable {
+    var a: InstanceID
+    var b: InstanceID
+
+    /// Stored smallest-first so a link is the same link whichever way it was drawn.
+    init(_ first: InstanceID, _ second: InstanceID) {
+        if first.rawValue <= second.rawValue { a = first; b = second }
+        else { a = second; b = first }
+    }
+
+    func involves(_ id: InstanceID) -> Bool { a == id || b == id }
+    func other(than id: InstanceID) -> InstanceID? { a == id ? b : (b == id ? a : nil) }
 }
 
 /// The page. One page, your whole life.
@@ -139,13 +234,17 @@ struct Page: Codable, Equatable, Sendable {
     var width: Int
     var height: Int
     var runes: [PlacedRune]
+    /// Declared connections. A cluster is a connected component of this graph.
+    var links: Set<MarkLink> = []
 
     init(width: Int = Tuning.Page.startingWidth,
          height: Int = Tuning.Page.startingHeight,
-         runes: [PlacedRune] = []) {
+         runes: [PlacedRune] = [],
+         links: Set<MarkLink> = []) {
         self.width = width
         self.height = height
         self.runes = runes
+        self.links = links
     }
 
     /// Tolerant, per the policy in `Migrations.swift`. Caught by the save-tolerance tripwire
@@ -155,6 +254,7 @@ struct Page: Codable, Equatable, Sendable {
         width = try c.decodeIfPresent(Int.self, forKey: .width) ?? Tuning.Page.startingWidth
         height = try c.decodeIfPresent(Int.self, forKey: .height) ?? Tuning.Page.startingHeight
         runes = try c.decodeIfPresent([PlacedRune].self, forKey: .runes) ?? []
+        links = try c.decodeIfPresent(Set<MarkLink>.self, forKey: .links) ?? []
     }
 
     var capacity: Int { width * height }
@@ -171,7 +271,12 @@ struct Page: Codable, Equatable, Sendable {
     ///
     /// Sorted by id rather than by position, so resolution cannot accidentally come to depend on
     /// layout. Reading order is not meaning.
-    var sigils: [Sigil] { runes.sorted { $0.id.rawValue < $1.id.rawValue }.flatMap(\.sigils) }
+    /// Everything this page says.
+    ///
+    /// Self-contained marks say what they say; connected clusters are read target-first. Sorted by
+    /// identity rather than by position, because **absolute position carries no meaning** — only
+    /// which sigils touch which does (session 14 §3).
+    var sigils: [Sigil] { PageRules.sigils(of: self) }
 
     /// The compounds written here, in the order they were placed. This is the v0 vocabulary, and
     /// every existing rule — stability, yields, spawn tables — still reads it.

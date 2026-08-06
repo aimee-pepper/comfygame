@@ -192,6 +192,7 @@ final class ContentTests: XCTestCase {
             contradictions: catalog.contradictions,
             descriptionClauses: catalog.descriptionClauses,
             runeShapes: catalog.runeShapes,
+            qualifiers: catalog.qualifiers,
             travellers: catalog.travellers,
             diaryPages: catalog.diaryPages
         )

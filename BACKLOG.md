@@ -91,6 +91,29 @@
 - [ ] Research leads, "a world worth writing" and ruin pages are recorded but nothing reads them yet
 - [ ] Recruitment — finding someone is not yet joining with them (companions spec, provisional)
 
+## The writing grammar (decisions-session-14)
+- [x] Target-first grammar: a cluster is a target sigil with sources connected into it
+- [x] Connection needs adjacency **and** a declared connector; connect mode, tap to chain
+- [x] Links cost no page space — a relationship, not an object
+- [x] A cluster is one object: moves and rotates whole, links can't break by accident
+- [x] Cluster outline, so adjacent-and-joined reads unlike adjacent-and-separate
+- [x] Corrected invariant: translate or rotate the whole page and it says the same thing;
+      breaking a connection changes what it says
+- [x] Qualifier ladders — Intensity, Scale, Count generic; Phase hydrology-only; "Bright" cut
+- [ ] Only Intensity reaches the resolver — Scale and Count are written and read back, but nothing
+      downstream consumes them yet
+- [ ] Open: does breaking a mid-chain link give two clusters or loose sigils?
+- [ ] Open: is the target sigil mandatory, or can an unambiguous source imply its target?
+- [ ] Open: can qualifiers modify the target rather than the source?
+- [ ] Re-audit the 51 qualifiers against §4
+
+## Still to do from session 13
+- [ ] Cycle's own primary sources (candidate list in cycle-sources-draft.md, Aimee to cut)
+- [ ] Variable world size — **needs the modifier/qualifier decision first**
+- [ ] Bigger maps, ~40-turn days, night cutting vision and swapping spawns
+- [ ] Scrolling map with a clamped-follow camera (centred until the player reaches an edge)
+- [ ] Minimap under the movement arrows: explored, unexplored, and empty
+
 ## From session 12
 - [x] Gambit list rebuilt FF12-style: whole list visible, one rule one row, in-place segment
       editing with no modal, drag to reorder, switch a rule off without deleting it

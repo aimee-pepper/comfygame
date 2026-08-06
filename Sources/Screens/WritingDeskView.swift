@@ -18,6 +18,17 @@ struct WritingDeskView: View {
     /// same act.
     @State private var ghost: GhostRune?
     @State private var pane: Pane = .write
+    /// Connect mode. A button, per session 14 §2 — adjacency constrains, this declares intent.
+    @State private var isConnecting = false
+    @State private var vocabulary: Vocabulary = .compounds
+
+    private enum Vocabulary: String, CaseIterable, Identifiable {
+        case compounds = "Compounds"
+        case targets = "Targets"
+        case sources = "Sources"
+        case qualifiers = "Qualifiers"
+        var id: String { rawValue }
+    }
 
     private enum Pane: String, CaseIterable, Identifiable {
         case write = "Write"
@@ -66,7 +77,18 @@ struct WritingDeskView: View {
             let side = floor(min(byWidth, byHeight))
 
             VStack(spacing: 8) {
-                PageGridView(ghost: $ghost, side: side)
+                PageGridView(ghost: $ghost, side: side, isConnecting: $isConnecting)
+                Button {
+                    isConnecting.toggle()
+                    if isConnecting { ghost = nil }
+                } label: {
+                    Label(isConnecting ? "Done connecting" : "Connect",
+                          systemImage: isConnecting ? "checkmark" : "link")
+                        .font(.caption)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .tint(isConnecting ? .accentColor : .secondary)
                 ScrollView {
                     palette.padding(.bottom, 8)
                 }
@@ -99,49 +121,98 @@ struct WritingDeskView: View {
     /// exists to create, and it changes with the hand you're writing in.
     private var palette: some View {
         VStack(alignment: .leading, spacing: 6) {
-            ForEach(sections, id: \.target.id) { section in
-                Text(section.target.name.uppercased())
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 2)
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 6)], spacing: 6) {
-                    ForEach(section.symbols) { symbol in
-                        let fits = store.canWrite(symbol.id)
-                        let blocker = store.blockingPrimary(for: symbol.id)
-                        Button {
-                            // Choosing puts a ghost on the page. Placing it is a drag, up there,
-                            // where you can see what it will collide with.
-                            ghost = GhostRune.appearing(symbol, hand: state.base.bestHand,
-                                                        on: state.base.page)
-                        } label: {
-                            HStack(spacing: 6) {
-                                RuneGlyph(id: symbol.id.rawValue).frame(width: 22, height: 22)
-                                VStack(alignment: .leading, spacing: 0) {
-                                    Text(symbol.name)
-                                        .font(.caption2.weight(.medium))
-                                        .lineLimit(1)
-                                    // Say *why* it's unavailable. A rule you can learn beats a
-                                    // greyed-out button you can only be puzzled by.
-                                    Text(blocker.map { "\($0.name) has this" }
-                                         ?? "\(store.footprint(of: symbol.id)) cells")
-                                        .font(.caption2).foregroundStyle(.secondary).lineLimit(1)
-                                }
-                                Spacer(minLength: 0)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .frame(height: 44)
-                            .padding(.horizontal, 6)
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(ghost?.symbol == symbol.id ? .accentColor : .secondary)
-                        .opacity(fits ? 1 : 0.45)
-                        .disabled(!fits)
-                    }
+            Picker("", selection: $vocabulary) {
+                ForEach(Vocabulary.allCases) { Text($0.rawValue).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .padding(.bottom, 2)
+
+            switch vocabulary {
+            case .targets:
+                Text("The dial a cluster is about. Write one, then connect sources to it.")
+                    .font(.caption2).foregroundStyle(.tertiary)
+                chips(ContentCatalog.shared.pressureTargetsInOrder.map {
+                    Chip(glyph: $0.id.rawValue, name: $0.name, content: .target($0.id))
+                })
+            case .sources:
+                Text("A cause. Says nothing until it's connected to a target.")
+                    .font(.caption2).foregroundStyle(.tertiary)
+                chips(ContentCatalog.shared.pressureSources
+                    .sorted { $0.name < $1.name }
+                    .map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .source($0.id)) })
+            case .qualifiers:
+                Text("Attaches to whichever source you connect it to.")
+                    .font(.caption2).foregroundStyle(.tertiary)
+                ForEach(ContentCatalog.shared.qualifierLaddersInUse, id: \.self) { ladder in
+                    Text(ladder.displayName.uppercased())
+                        .font(.caption2.weight(.semibold)).foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    chips(ContentCatalog.shared.qualifiers(on: ladder).map {
+                        Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id))
+                    })
+                }
+            case .compounds:
+                Text("One glyph meaning several things at once. Needs no connections.")
+                    .font(.caption2).foregroundStyle(.tertiary)
+                ForEach(sections, id: \.target.id) { section in
+                    Text(section.target.name.uppercased())
+                        .font(.caption2.weight(.semibold)).foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    chips(section.symbols.map {
+                        Chip(glyph: $0.id.rawValue, name: $0.name, content: .compound($0.id),
+                             blockedBy: store.blockingPrimary(for: $0.id)?.name)
+                    })
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private struct Chip: Identifiable {
+        var glyph: String
+        var name: String
+        var content: MarkContent
+        var blockedBy: String?
+        var id: String { glyph }
+    }
+
+    private func chips(_ items: [Chip]) -> some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 6)], spacing: 6) {
+            ForEach(items) { item in
+                let fits = item.blockedBy == nil && store.canWrite(glyph: item.glyph)
+                Button {
+                    ghost = GhostRune(glyph: item.glyph, content: item.content,
+                                      origin: firstFreeOrigin(for: item.glyph))
+                    isConnecting = false
+                } label: {
+                    HStack(spacing: 6) {
+                        RuneGlyph(id: item.glyph).frame(width: 22, height: 22)
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(item.name).font(.caption2.weight(.medium)).lineLimit(1)
+                            Text(item.blockedBy.map { "\($0) has this" }
+                                 ?? "\(store.footprint(glyph: item.glyph)) cells")
+                                .font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(height: 44)
+                    .padding(.horizontal, 6)
+                }
+                .buttonStyle(.bordered)
+                .tint(ghost?.glyph == item.glyph ? .accentColor : .secondary)
+                .opacity(fits ? 1 : 0.45)
+                .disabled(!fits)
+            }
+        }
+    }
+
+    private func firstFreeOrigin(for glyph: String) -> PageCell {
+        guard let shape = PageRules.shape(forGlyph: glyph, hand: state.base.bestHand) else {
+            return PageCell(column: 0, row: 0)
+        }
+        return PageRules.validOrigins(for: shape, on: state.base.page).first
+            ?? PageCell(column: 0, row: 0)
     }
 
     /// The palette is sectioned **by pressure target** (session 11 §2), which is the same axis

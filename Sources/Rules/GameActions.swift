@@ -82,8 +82,74 @@ extension GameStore {
         return true
     }
 
+    /// Write a target, source or qualifier sigil at a cell.
+    @discardableResult
+    func write(_ content: MarkContent, glyph: String, at cell: PageCell) -> Bool {
+        guard let shape = PageRules.shape(forGlyph: glyph, hand: state.base.bestHand),
+              PageRules.canPlace(shape: shape, at: cell, on: state.base.page)
+        else { return false }
+        mutate("write \(glyph)") { state in
+            let next = (state.base.page.runes.map(\.id.rawValue).max() ?? 0) + 1
+            state.base.page.runes.append(PlacedRune(id: InstanceID(rawValue: next),
+                                                    content: content,
+                                                    hand: state.base.bestHand,
+                                                    origin: cell, shapeID: shape.id))
+        }
+        return true
+    }
+
+    /// Whether a sigil will fit anywhere at all in the current hand.
+    func canWrite(glyph: String) -> Bool {
+        guard let shape = PageRules.shape(forGlyph: glyph, hand: state.base.bestHand) else { return false }
+        return !PageRules.validOrigins(for: shape, on: state.base.page).isEmpty
+    }
+
+    func footprint(glyph: String) -> Int {
+        PageRules.shape(forGlyph: glyph, hand: state.base.bestHand)?.footprint ?? 0
+    }
+
+    // MARK: Connecting
+
+    /// Join two adjacent marks. Adjacency constrains; this is the declaration of intent.
+    @discardableResult
+    func connect(_ a: InstanceID, _ b: InstanceID) -> Bool {
+        guard let updated = PageRules.connect(a, b, on: state.base.page) else { return false }
+        mutate("connect", flush: true) { $0.base.page = updated }
+        return true
+    }
+
+    func disconnect(_ a: InstanceID, _ b: InstanceID) {
+        mutate("disconnect", flush: true) { $0.base.page = PageRules.disconnect(a, b, on: $0.base.page) }
+    }
+
+    /// Break every link a mark has, splitting it out of its cluster.
+    func disconnectAll(_ mark: InstanceID) {
+        mutate("unlink", flush: true) { state in
+            state.base.page.links = state.base.page.links.filter { !$0.involves(mark) }
+        }
+    }
+
+    /// Move a whole cluster. A cluster is one object, so nothing inside it can come apart.
+    @discardableResult
+    func moveCluster(_ mark: InstanceID, by delta: PageCell) -> Bool {
+        guard let updated = PageRules.move(cluster: mark, by: delta, on: state.base.page) else { return false }
+        mutate("move cluster") { $0.base.page = updated }
+        return true
+    }
+
+    /// Turn a cluster a quarter turn. Where the packing gameplay lives.
+    @discardableResult
+    func rotateCluster(_ mark: InstanceID) -> Bool {
+        guard let updated = PageRules.rotate(cluster: mark, on: state.base.page) else { return false }
+        mutate("rotate cluster", flush: true) { $0.base.page = updated }
+        return true
+    }
+
     func erase(_ mark: InstanceID) {
-        mutate("erase mark") { $0.base.page = PageRules.remove(mark, from: $0.base.page) }
+        mutate("erase mark") { state in
+            state.base.page.links = state.base.page.links.filter { !$0.involves(mark) }
+            state.base.page = PageRules.remove(mark, from: state.base.page)
+        }
     }
 
     func clearPage() {

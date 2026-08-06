@@ -76,7 +76,9 @@
 		983452CD1EE2126ECB5B1973 /* HarnessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638830B7B5223E3065252FC /* HarnessView.swift */; };
 		9A1C08888E52028E0EC6D53C /* slots.json in Resources */ = {isa = PBXBuildFile; fileRef = A38483F6A49BD38B618407D8 /* slots.json */; };
 		A30BFB516414E49CB79270EF /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9142092437E5652D87187DF8 /* Migrations.swift */; };
+		A6C910C0BD0B249F3AE3B0AE /* QualifierModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFEB95F304073E45D3BB22FB /* QualifierModels.swift */; };
 		A7B958AF227E4AD7A6E2E900 /* PageGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D5618B6B6F36DB62CD836B /* PageGridView.swift */; };
+		A81656D157A597344E823340 /* GrammarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFAE95092D158944E000B02 /* GrammarTests.swift */; };
 		A901EE2297DFB40E48663457 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFBF656255758DFA8E45232 /* Theme.swift */; };
 		AA467E2DFFB389EFACA3B124 /* sites.json in Resources */ = {isa = PBXBuildFile; fileRef = 77957A7595BE1E25AC8CF406 /* sites.json */; };
 		AAFAB01A37942E4A425FE909 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CBCB8652F20B361959F9B5C /* LibraryView.swift */; };
@@ -87,6 +89,7 @@
 		BE5D3BC36C9F1D8030CFEE81 /* CombatRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99D023496EC834EA78E9BE63 /* CombatRules.swift */; };
 		BFB3CF53CC01D5CED466B0C9 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E110F7C0AF0739241A8F94 /* GameState.swift */; };
 		C709E6D127F96D2420ADBC5C /* creatures.json in Resources */ = {isa = PBXBuildFile; fileRef = 5FD331CEC89F930A1F99C13B /* creatures.json */; };
+		C8B16AD5D3CDC5B67BE7E320 /* qualifiers.json in Resources */ = {isa = PBXBuildFile; fileRef = 283E3D55623002C01AF8AF98 /* qualifiers.json */; };
 		CC74E6778320FB4F70CFDB3F /* PressureRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3C5DA8117A704E44B23C91 /* PressureRules.swift */; };
 		CD009883298233F654EE899C /* Discovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADC03C0E941B354BFE2EF65 /* Discovery.swift */; };
 		CF22F5AA092E017612B1124E /* LootDecisionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */; };
@@ -141,6 +144,7 @@
 		224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+Economy.swift"; sourceTree = "<group>"; };
 		248394713D4F19F950F25B92 /* HarnessActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HarnessActions.swift; sourceTree = "<group>"; };
 		26FE0502F98B3DB6A7BF0C87 /* pressure_targets.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pressure_targets.json; sourceTree = "<group>"; };
+		283E3D55623002C01AF8AF98 /* qualifiers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = qualifiers.json; sourceTree = "<group>"; };
 		2C4E5B7DC86948834FDAFFF9 /* skills.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = skills.json; sourceTree = "<group>"; };
 		2C9C43310A7E6D0342B11251 /* StationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationViews.swift; sourceTree = "<group>"; };
 		2CBCB8652F20B361959F9B5C /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
@@ -203,6 +207,7 @@
 		B022088C9636578892397C50 /* BookProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookProjection.swift; sourceTree = "<group>"; };
 		B543B94C8E89980FDE029D9C /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		B664EB59C95581C3098E542B /* BaseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseState.swift; sourceTree = "<group>"; };
+		BDFAE95092D158944E000B02 /* GrammarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarTests.swift; sourceTree = "<group>"; };
 		BE933E91275B1FF990B69BAA /* EncounterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncounterView.swift; sourceTree = "<group>"; };
 		C09AD15A5BFBBBD300176004 /* GearAndRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearAndRulesTests.swift; sourceTree = "<group>"; };
 		C110827C995BC018EA20B47F /* SpilloverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpilloverTests.swift; sourceTree = "<group>"; };
@@ -224,6 +229,7 @@
 		DD0C594698AE7E6D06191449 /* constellation.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = constellation.json; sourceTree = "<group>"; };
 		E19DC1448710810CD318671E /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		E1BB569F0B672F268545701C /* SiteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteTests.swift; sourceTree = "<group>"; };
+		EFEB95F304073E45D3BB22FB /* QualifierModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualifierModels.swift; sourceTree = "<group>"; };
 		F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryRules.swift; sourceTree = "<group>"; };
 		F1B71324BA8EC6B7B6732500 /* GearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearView.swift; sourceTree = "<group>"; };
 		F395689728B586E0D0A7CD61 /* CombatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTests.swift; sourceTree = "<group>"; };
@@ -287,6 +293,7 @@
 				2227C9E0E4E333249CF7FEFA /* ContradictionModels.swift */,
 				0F66F95CC3FEA4D5E13AE410 /* DescriptionModels.swift */,
 				7042744B96D260184BBE32F3 /* PressureModels.swift */,
+				EFEB95F304073E45D3BB22FB /* QualifierModels.swift */,
 				CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */,
 				A4DA32364644741F03829592 /* SiteModels.swift */,
 				69C03E6819177D7EABE894A3 /* TravellerModels.swift */,
@@ -378,6 +385,7 @@
 				89776C411F7BC83CF86396E9 /* items.json */,
 				A29A4F3CFC9073B8F80064F4 /* pressure_sources.json */,
 				26FE0502F98B3DB6A7BF0C87 /* pressure_targets.json */,
+				283E3D55623002C01AF8AF98 /* qualifiers.json */,
 				6A1D054604B637EEC90D24DA /* research.json */,
 				0486776A4EED6E508F843FB3 /* resources.json */,
 				68BD0EED52655859C21A0136 /* rune_shapes.json */,
@@ -438,6 +446,7 @@
 				6782235BDB0189FF9A0FFE41 /* EconomyTests.swift */,
 				961E1AC7BEB7E7C4C243CAD1 /* ExclusivityTests.swift */,
 				C09AD15A5BFBBBD300176004 /* GearAndRulesTests.swift */,
+				BDFAE95092D158944E000B02 /* GrammarTests.swift */,
 				80DFFB14B396FE04A7C03E01 /* LibraryTests.swift */,
 				FF7811775C7058B692E07EB1 /* PageTests.swift */,
 				606F9667A67D771D03320DDA /* PersistenceTests.swift */,
@@ -555,6 +564,7 @@
 				DDBFEBACC92B746BC023CF6D /* items.json in Resources */,
 				1BDE5DBB7E79B5D05413B0FE /* pressure_sources.json in Resources */,
 				28C38A9B1F4133012F86F0AA /* pressure_targets.json in Resources */,
+				C8B16AD5D3CDC5B67BE7E320 /* qualifiers.json in Resources */,
 				4C60516FFB5892091CBE28AC /* research.json in Resources */,
 				8725C08D01F1574C306CFC5D /* resources.json in Resources */,
 				8C88D2C21DA68452155D8172 /* rune_shapes.json in Resources */,
@@ -616,6 +626,7 @@
 				87DF0AB9EB7842560291C8A3 /* PressureModels.swift in Sources */,
 				CC74E6778320FB4F70CFDB3F /* PressureRules.swift in Sources */,
 				E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */,
+				A6C910C0BD0B249F3AE3B0AE /* QualifierModels.swift in Sources */,
 				0463A21CD6D0C85974C64C81 /* RealityState.swift in Sources */,
 				51771CB66B64C405544B0B87 /* ResearchModels.swift in Sources */,
 				4EC3BC573F0634FE82377139 /* ResearchTreeLayout.swift in Sources */,
@@ -659,6 +670,7 @@
 				7345ED98F77854AE5C6FFB34 /* EconomyTests.swift in Sources */,
 				804C3EA48958EDEA3E234F95 /* ExclusivityTests.swift in Sources */,
 				4F7559D592DAED143B8AEF88 /* GearAndRulesTests.swift in Sources */,
+				A81656D157A597344E823340 /* GrammarTests.swift in Sources */,
 				DEB5615945275C75236426AD /* LibraryTests.swift in Sources */,
 				AC3C0F06CB2BD3D9A9917BA1 /* PageTests.swift in Sources */,
 				0290A7D4A5E8A5E8516E171E /* PersistenceTests.swift in Sources */,

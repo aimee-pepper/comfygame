@@ -73,6 +73,12 @@ struct PressureSourceID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+/// One rung of a qualifier ladder — Great, Vast, Countless.
+struct QualifierID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 /// Someone scattered by the sundering. Found by writing the world they're in.
 struct TravellerID: StringIdentifier {
     var rawValue: String
