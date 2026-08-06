@@ -170,6 +170,57 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(satchel.stacks[0].count, 3)
     }
 
+
+    // MARK: The hold expands far enough to be worth hoarding in (session 16 §2)
+
+    /// **Three tiers capped storage at twenty slots forever**, which fights the hoarding pillar —
+    /// "expand until you can hoard whatever you want mid-game" can't happen in three steps.
+    @MainActor
+    func testStorageExpandsFarBeyondThreeTiers() {
+        let hold = ContentCatalog.shared.nodes(in: "hold")
+        let shelving = hold.filter { node in
+            node.grants.contains { $0.effect == .storehouseTier }
+        }
+        XCTAssertGreaterThanOrEqual(shelving.count, 8,
+                                    "the storehouse ladder is still short enough to max in an hour")
+
+        let station = ContentCatalog.shared.station(Stations.storehouse)
+        XCTAssertGreaterThanOrEqual(station?.maxTier ?? 0, shelving.count,
+                                    "the ladder has more rungs than the station will accept")
+    }
+
+    /// It gets **steeply** expensive, so storage stays worth investing in across the whole game
+    /// rather than being finished early.
+    @MainActor
+    func testEachRungOfTheLadderCostsMoreThanTheLast() {
+        for effect in [ResearchGrant.Effect.storehouseTier, .satchelTier] {
+            let rungs = ContentCatalog.shared.nodes(in: "hold")
+                .filter { node in node.grants.contains { $0.effect == effect } }
+                .sorted { $0.cost.essence < $1.cost.essence }
+            XCTAssertGreaterThan(rungs.count, 2)
+            for (earlier, later) in zip(rungs, rungs.dropFirst()) {
+                XCTAssertGreaterThan(later.cost.essence, earlier.cost.essence,
+                                     "\(later.id.rawValue) costs no more than \(earlier.id.rawValue)")
+            }
+            // The last rung should be a real investment, not a rounding error above the first.
+            XCTAssertGreaterThan(rungs.last!.cost.essence, rungs.first!.cost.essence * 8)
+        }
+    }
+
+    /// Every rung has to be reachable — a ladder with a missing prerequisite is a ladder you can
+    /// see the top of and never climb.
+    @MainActor
+    func testEveryRungOfTheLadderIsReachable() {
+        let hold = ContentCatalog.shared.nodes(in: "hold")
+        let ids = Set(hold.map(\.id))
+        for node in hold {
+            for requirement in node.requires {
+                XCTAssertTrue(ids.contains(requirement),
+                              "\(node.id.rawValue) needs \(requirement.rawValue), which isn't in the branch")
+            }
+        }
+    }
+
     // MARK: Helpers
 
     private func curio(_ id: String) -> ItemStack {

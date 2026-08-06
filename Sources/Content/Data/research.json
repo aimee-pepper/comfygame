@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER costs. ALL research lives here, gated behind themed branches with prerequisites \u2014 there is no flat shopping list anywhere in the game. A node is a one-time unlock; repeatable things (shelving I/II/III) are separate nodes chained by 'requires', which keeps the tree honest and removes the idea of ranks entirely. 'grants' is what unlocking it hands you: a gambit component, a symbol, or an effect on base state.",
+  "_note": "PLACEHOLDER costs. ALL research lives here, gated behind themed branches with prerequisites — there is no flat shopping list anywhere in the game. A node is a one-time unlock; repeatable things (shelving I/II/III) are separate nodes chained by 'requires', which keeps the tree honest and removes the idea of ranks entirely. 'grants' is what unlocking it hands you: a gambit component, a symbol, or an effect on base state. The Hold's ladder runs long and gets steeply expensive on purpose (decisions-session-16 §2): three tiers capped storage at twenty slots forever, which fights the hoarding pillar. With materials binning by kind the ladder is buying room for *variety* rather than for volume. PLACEHOLDER costs.",
   "branches": [
     {
       "id": "instruction",
@@ -682,6 +682,213 @@
         {
           "kind": "effect",
           "effect": "chaining"
+        }
+      ]
+    },
+    {
+      "id": "shelving_four",
+      "branch": "hold",
+      "name": "Shelving, wall to wall",
+      "icon": "archivebox.fill",
+      "blurb": "Every wall is shelf now. You stopped noticing when.",
+      "cost": {
+        "essence": 130,
+        "resources": {
+          "ore": 34,
+          "fiber": 24
+        }
+      },
+      "requires": [
+        "shelving_three"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "storehouseTier"
+        }
+      ]
+    },
+    {
+      "id": "shelving_five",
+      "branch": "hold",
+      "name": "A second room",
+      "icon": "archivebox.fill",
+      "blurb": "The room next door was never used for anything else anyway.",
+      "cost": {
+        "essence": 210,
+        "resources": {
+          "ore": 55,
+          "fiber": 40
+        }
+      },
+      "requires": [
+        "shelving_four"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "storehouseTier"
+        }
+      ]
+    },
+    {
+      "id": "shelving_six",
+      "branch": "hold",
+      "name": "The undercroft",
+      "icon": "archivebox.fill",
+      "blurb": "Cold, dry, and further down than you remembered digging.",
+      "cost": {
+        "essence": 340,
+        "resources": {
+          "ore": 90,
+          "fiber": 65
+        }
+      },
+      "requires": [
+        "shelving_five"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "storehouseTier"
+        }
+      ]
+    },
+    {
+      "id": "shelving_seven",
+      "branch": "hold",
+      "name": "The undercroft, extended",
+      "icon": "archivebox.fill",
+      "blurb": "It goes back further than the house above it.",
+      "cost": {
+        "essence": 550,
+        "resources": {
+          "ore": 145,
+          "fiber": 105
+        }
+      },
+      "requires": [
+        "shelving_six"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "storehouseTier"
+        }
+      ]
+    },
+    {
+      "id": "shelving_eight",
+      "branch": "hold",
+      "name": "A hall for it",
+      "icon": "archivebox.fill",
+      "blurb": "You could lose something in here and find it again years later.",
+      "cost": {
+        "essence": 890,
+        "resources": {
+          "ore": 235,
+          "fiber": 170
+        }
+      },
+      "requires": [
+        "shelving_seven"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "storehouseTier"
+        }
+      ]
+    },
+    {
+      "id": "shelving_nine",
+      "branch": "hold",
+      "name": "More than you can carry",
+      "icon": "archivebox.fill",
+      "blurb": "There is no longer a question of whether to keep a thing.",
+      "cost": {
+        "essence": 1440,
+        "resources": {
+          "ore": 380,
+          "fiber": 275
+        }
+      },
+      "requires": [
+        "shelving_eight"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "storehouseTier"
+        }
+      ]
+    },
+    {
+      "id": "satchel_three",
+      "branch": "hold",
+      "name": "Satchel, deepened",
+      "icon": "bag.fill",
+      "blurb": "Deeper than it looks, which was the point.",
+      "cost": {
+        "essence": 70,
+        "resources": {
+          "ore": 24,
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "satchel_two"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "satchelTier"
+        }
+      ]
+    },
+    {
+      "id": "satchel_four",
+      "branch": "hold",
+      "name": "A second strap",
+      "icon": "bag.fill",
+      "blurb": "Across the other shoulder. Heavier, and worth it.",
+      "cost": {
+        "essence": 140,
+        "resources": {
+          "ore": 46,
+          "fiber": 18
+        }
+      },
+      "requires": [
+        "satchel_three"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "satchelTier"
+        }
+      ]
+    },
+    {
+      "id": "satchel_five",
+      "branch": "hold",
+      "name": "Panniers",
+      "icon": "bag.fill",
+      "blurb": "Slung either side. You walk differently now.",
+      "cost": {
+        "essence": 280,
+        "resources": {
+          "ore": 88,
+          "fiber": 36
+        }
+      },
+      "requires": [
+        "satchel_four"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "satchelTier"
         }
       ]
     }
