@@ -99,7 +99,14 @@
 - [x] Map size from the page (Scale qualifier), not a constant
 - [x] **Terrain.** Tiles have ground and elevation; Relief, Substrate, Hydrology, Thermal and
       Vitality all write to them. Cover and elevation stop sightlines.
-- [ ] **Creature traits** — the spine's other prerequisite, now fully specced by session 15:
+- [x] **Creature traits.** Twelve axes, a per-world cast drawn from pressure-shaped distributions,
+      small per-spawn jitter, identity derived from the vector, energy budget as the only gate.
+- [ ] **Wire the cast into worldgen** — `LifeRules` produces species and nothing spawns them yet;
+      `WorldEnemy` still carries a `CreatureID` from the authored catalogue.
+- [ ] Loot from traits — now unblocked, nothing built
+- [ ] Specimen tier of the bestiary — species is the entry, spawns are specimens under it
+- [ ] Q25 — cold worlds make smaller animals because cold worlds are poor
+- [ ] ~~Creature traits, specced by session 15:~~
       a small **cast** of species per world plus small per-spawn **jitter**; Vitality sets cast
       *size* not spread, so abundance and strangeness stay independent knobs; **free sampling**
       with identity read off the traits afterwards, because not every world has grazers; anchored

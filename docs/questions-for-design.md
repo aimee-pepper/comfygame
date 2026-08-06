@@ -520,3 +520,27 @@ Three ways to handle it as the catalogue grows, none of which I've picked:
 The invariant that must hold either way, and now has a test: **a world always holds something.** A
 world too poor to feed anything still spawns the cheapest thing in the catalogue, because empty for
 reasons the player can't see is worse than sparse.
+
+## Q25 — Cold worlds make *smaller* animals, because cold worlds are poor
+
+Found while building the trait distributions. Two pressures pull on size in opposite directions and
+one of them wins:
+
+- **Cold nudges size up.** Bergmann's rule — bigger bodies lose heat more slowly. It's in the spine
+  spec's table.
+- **Cold caps vitality.** Light and water caps mean a cold world is usually a poor one, and
+  productivity is what pays for size.
+
+Poverty is currently the stronger term, so a glacial world's animals come out *smaller* than a
+volcanic one's, which is the opposite of what the table implies.
+
+**This may be correct.** Bergmann's rule is about endotherms in places that can still feed them; a
+frozen desert genuinely shouldn't grow anything large. If so, nothing needs changing and the spec's
+table just needs the caveat.
+
+**Or the thermal nudge is too weak** against the vitality term, and cold should win where there's
+anything at all to eat.
+
+Left as-is, and the test asserts only the unconfounded half — cold shortens extremities and thickens
+covering. Not papered over with a test that picks convenient worlds, because the confound is the
+interesting part.

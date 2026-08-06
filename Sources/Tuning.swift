@@ -267,6 +267,23 @@ enum Tuning {
 
     /// The turning of a world's day (decisions-session-13 §2 and §6).
     /// Painting the ground. All PLACEHOLDER.
+    /// Sampling the animals in a world. All PLACEHOLDER.
+    enum Life {
+        /// How many species a world holds — a barren one at the bottom, a teeming one at the top.
+        /// Small on purpose: free sampling is only safe because the cast is small, and a strange
+        /// animal should be the one you remember from that world.
+        static let castSizeRange = 2...6
+        /// How far a species varies from the world's centre.
+        static let baseSpread: Double = 14
+        /// How far a single animal varies from its species. Deliberately small — enough that each
+        /// one is visibly its own, never enough to change what it is.
+        static let jitter: Double = 6
+        /// How much a swinging world widens the draw.
+        static let spreadPerAmplitude: Double = 0.15
+        /// Give up drawing after this many rejections on the energy budget.
+        static let samplingAttempts: Int = 40
+    }
+
     enum Terrain {
         /// The most of a world that water can cover, at full saturation.
         static let maximumWaterCoverage: Double = 0.45
