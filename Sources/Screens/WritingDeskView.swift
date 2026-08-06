@@ -20,14 +20,45 @@ struct WritingDeskView: View {
     @State private var pane: Pane = .write
     /// Connect mode. A button, per session 14 §2 — adjacency constrains, this declares intent.
     @State private var isConnecting = false
-    @State private var vocabulary: Vocabulary = .compounds
+    @State private var bin: Bin = .compounds
 
-    private enum Vocabulary: String, CaseIterable, Identifiable {
-        case compounds = "Compounds"
-        case targets = "Targets"
-        case sources = "Sources"
-        case qualifiers = "Qualifiers"
-        var id: String { rawValue }
+    /// One bin per pressure target, plus compounds and the ladders that apply everywhere.
+    ///
+    /// A target's bin holds **everything you'd write about that target**: the target sigil itself,
+    /// every source that pushes on it, and any modifier that only makes sense there. So writing
+    /// about light means opening one bin, not hunting across three lists.
+    private enum Bin: Hashable, Identifiable {
+        case target(PressureTargetID)
+        case modifiers
+        case compounds
+
+        var id: String {
+            switch self {
+            case .target(let t): t.rawValue
+            case .modifiers: "modifiers"
+            case .compounds: "compounds"
+            }
+        }
+
+        static var all: [Bin] {
+            ContentCatalog.shared.pressureTargetsInOrder.map { .target($0.id) } + [.modifiers, .compounds]
+        }
+
+        var shortName: String {
+            switch self {
+            case .target(let t): ContentCatalog.shared.pressureTarget(t)?.name ?? t.rawValue
+            case .modifiers: "Ladders"
+            case .compounds: "Compounds"
+            }
+        }
+
+        var icon: String {
+            switch self {
+            case .target(let t): ContentCatalog.shared.pressureTarget(t)?.icon ?? "circle"
+            case .modifiers: "slider.horizontal.3"
+            case .compounds: "square.stack.3d.up"
+            }
+        }
     }
 
     private enum Pane: String, CaseIterable, Identifiable {
@@ -71,30 +102,135 @@ struct WritingDeskView: View {
     /// squeezed by the scroll view underneath it.
     private var writePane: some View {
         GeometryReader { proxy in
-            let available = proxy.size.width - 32          // pane padding + card padding
+            let available = proxy.size.width - 24
             let byWidth = available / CGFloat(state.base.page.width)
-            let byHeight = (proxy.size.height * 0.52) / CGFloat(state.base.page.height)
+            let byHeight = (proxy.size.height * 0.46) / CGFloat(state.base.page.height)
             let side = floor(min(byWidth, byHeight))
 
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 PageGridView(ghost: $ghost, side: side, isConnecting: $isConnecting)
-                Button {
-                    isConnecting.toggle()
-                    if isConnecting { ghost = nil }
-                } label: {
-                    Label(isConnecting ? "Done connecting" : "Connect",
-                          systemImage: isConnecting ? "checkmark" : "link")
-                        .font(.caption)
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.bordered)
-                .tint(isConnecting ? .accentColor : .secondary)
-                ScrollView {
-                    palette.padding(.bottom, 8)
-                }
+                actionRow
+                ScrollView { binContents.padding(.bottom, 6) }
+                binTabs
             }
             .padding(.horizontal, 12)
         }
+    }
+
+    /// One thin row for everything you do to the page. The connect button was a full-width slab for
+    /// a control you press twice a session.
+    private var actionRow: some View {
+        HStack(spacing: 8) {
+            // Nothing here unless it's telling you something you can't already see. The empty
+            // squares are the cell count, and the palette greys out whatever won't fit — so the
+            // counter was answering a question the page had already answered. The hand only earns
+            // its place once you own more than one and it's a choice rather than a constant.
+            if state.base.ownedHands.count > 1 {
+                Text(state.base.bestHand.displayName)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+            Spacer()
+            Button {
+                isConnecting.toggle()
+                if isConnecting { ghost = nil }
+            } label: {
+                Image(systemName: isConnecting ? "checkmark" : "link")
+                    .font(.caption)
+                    .frame(width: 44, height: 32)
+            }
+            .buttonStyle(.bordered)
+            .tint(isConnecting ? .accentColor : .secondary)
+        }
+        .frame(height: 34)
+    }
+
+    /// **Static.** The bins don't scroll away — navigating between them is the main thing you do,
+    /// and hunting for a tab that moved is not navigation.
+    private var binTabs: some View {
+        // One scrolling row along the bottom. Tab width is deliberately not a clean division of the
+        // screen, so the next bin always peeks in at the edge — that peek, plus the fade, is what
+        // makes it obvious there's more rather than leaving you to guess.
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 3) {
+                ForEach(Bin.all) { entry in
+                    Button { bin = entry } label: {
+                        VStack(spacing: 2) {
+                            Image(systemName: entry.icon).font(.footnote)
+                            Text(entry.shortName)
+                                .font(.system(size: 9))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
+                        .frame(width: 66, height: 40)
+                        .background(bin == entry ? Color.accentColor.opacity(0.18) : Color.clear,
+                                    in: RoundedRectangle(cornerRadius: 8))
+                        .foregroundStyle(bin == entry ? Color.accentColor : Color.secondary)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 4)
+        }
+        .frame(height: 46)
+        .mask(
+            // Fades at both ends, so a cut-off tab reads as "keep going" rather than as a bug.
+            LinearGradient(stops: [.init(color: .clear, location: 0),
+                                   .init(color: .black, location: 0.035),
+                                   .init(color: .black, location: 0.965),
+                                   .init(color: .clear, location: 1)],
+                           startPoint: .leading, endPoint: .trailing)
+        )
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    /// What's in the open bin.
+    @ViewBuilder
+    private var binContents: some View {
+        switch bin {
+        case .target(let id):
+            let target = ContentCatalog.shared.pressureTarget(id)
+            chips([Chip(glyph: id.rawValue, name: target?.name ?? id.rawValue, content: .target(id))])
+            let sources = ContentCatalog.shared.pressureSources
+                .filter { $0.contribution(to: id) != nil }
+                .sorted { $0.name < $1.name }
+            if !sources.isEmpty {
+                sectionLabel("Causes")
+                chips(sources.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .source($0.id)) })
+            }
+            let narrow = ContentCatalog.shared.qualifiers.filter { !$0.isGeneric && $0.applies(to: id) }
+            if !narrow.isEmpty {
+                sectionLabel("Only here")
+                chips(narrow.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id)) })
+            }
+
+        case .modifiers:
+            ForEach(ContentCatalog.shared.qualifierLaddersInUse, id: \.self) { ladder in
+                let rungs = ContentCatalog.shared.qualifiers(on: ladder).filter(\.isGeneric)
+                if !rungs.isEmpty {
+                    sectionLabel(ladder.displayName)
+                    chips(rungs.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id)) })
+                }
+            }
+
+        case .compounds:
+            ForEach(sections, id: \.target.id) { section in
+                sectionLabel(section.target.name)
+                chips(section.symbols.map {
+                    Chip(glyph: $0.id.rawValue, name: $0.name, content: .compound($0.id),
+                         blockedBy: store.blockingPrimary(for: $0.id)?.name)
+                })
+            }
+        }
+    }
+
+    private func sectionLabel(_ text: String) -> some View {
+        Text(text.uppercased())
+            .font(.system(size: 9).weight(.semibold))
+            .foregroundStyle(.tertiary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 2)
     }
 
     // MARK: Pane 2 — what you're about to make
@@ -119,55 +255,6 @@ struct WritingDeskView: View {
     ///
     /// Deliberately shows the footprint: what a mark *costs in space* is the decision the page
     /// exists to create, and it changes with the hand you're writing in.
-    private var palette: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Picker("", selection: $vocabulary) {
-                ForEach(Vocabulary.allCases) { Text($0.rawValue).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .padding(.bottom, 2)
-
-            switch vocabulary {
-            case .targets:
-                Text("The dial a cluster is about. Write one, then connect sources to it.")
-                    .font(.caption2).foregroundStyle(.tertiary)
-                chips(ContentCatalog.shared.pressureTargetsInOrder.map {
-                    Chip(glyph: $0.id.rawValue, name: $0.name, content: .target($0.id))
-                })
-            case .sources:
-                Text("A cause. Says nothing until it's connected to a target.")
-                    .font(.caption2).foregroundStyle(.tertiary)
-                chips(ContentCatalog.shared.pressureSources
-                    .sorted { $0.name < $1.name }
-                    .map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .source($0.id)) })
-            case .qualifiers:
-                Text("Attaches to whichever source you connect it to.")
-                    .font(.caption2).foregroundStyle(.tertiary)
-                ForEach(ContentCatalog.shared.qualifierLaddersInUse, id: \.self) { ladder in
-                    Text(ladder.displayName.uppercased())
-                        .font(.caption2.weight(.semibold)).foregroundStyle(.tertiary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    chips(ContentCatalog.shared.qualifiers(on: ladder).map {
-                        Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id))
-                    })
-                }
-            case .compounds:
-                Text("One glyph meaning several things at once. Needs no connections.")
-                    .font(.caption2).foregroundStyle(.tertiary)
-                ForEach(sections, id: \.target.id) { section in
-                    Text(section.target.name.uppercased())
-                        .font(.caption2.weight(.semibold)).foregroundStyle(.tertiary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    chips(section.symbols.map {
-                        Chip(glyph: $0.id.rawValue, name: $0.name, content: .compound($0.id),
-                             blockedBy: store.blockingPrimary(for: $0.id)?.name)
-                    })
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
     private struct Chip: Identifiable {
         var glyph: String
         var name: String
@@ -179,10 +266,10 @@ struct WritingDeskView: View {
     private func chips(_ items: [Chip]) -> some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 6)], spacing: 6) {
             ForEach(items) { item in
-                let fits = item.blockedBy == nil && store.canWrite(glyph: item.glyph)
+                let fits = item.blockedBy == nil && store.canWrite(item.content)
                 Button {
                     ghost = GhostRune(glyph: item.glyph, content: item.content,
-                                      origin: firstFreeOrigin(for: item.glyph))
+                                      origin: firstFreeOrigin(for: item.content))
                     isConnecting = false
                 } label: {
                     HStack(spacing: 6) {
@@ -190,7 +277,10 @@ struct WritingDeskView: View {
                         VStack(alignment: .leading, spacing: 0) {
                             Text(item.name).font(.caption2.weight(.medium)).lineLimit(1)
                             Text(item.blockedBy.map { "\($0) has this" }
-                                 ?? "\(store.footprint(glyph: item.glyph)) cells")
+                                 ?? {
+                                     let n = store.footprint(item.content)
+                                     return "\(n) cell\(n == 1 ? "" : "s")"
+                                 }())
                                 .font(.caption2).foregroundStyle(.secondary).lineLimit(1)
                         }
                         Spacer(minLength: 0)
@@ -207,8 +297,8 @@ struct WritingDeskView: View {
         }
     }
 
-    private func firstFreeOrigin(for glyph: String) -> PageCell {
-        guard let shape = PageRules.shape(forGlyph: glyph, hand: state.base.bestHand) else {
+    private func firstFreeOrigin(for content: MarkContent) -> PageCell {
+        guard let shape = PageRules.shape(for: content, hand: state.base.bestHand) else {
             return PageCell(column: 0, row: 0)
         }
         return PageRules.validOrigins(for: shape, on: state.base.page).first

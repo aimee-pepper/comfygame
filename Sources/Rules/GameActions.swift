@@ -85,7 +85,7 @@ extension GameStore {
     /// Write a target, source or qualifier sigil at a cell.
     @discardableResult
     func write(_ content: MarkContent, glyph: String, at cell: PageCell) -> Bool {
-        guard let shape = PageRules.shape(forGlyph: glyph, hand: state.base.bestHand),
+        guard let shape = PageRules.shape(for: content, hand: state.base.bestHand),
               PageRules.canPlace(shape: shape, at: cell, on: state.base.page)
         else { return false }
         mutate("write \(glyph)") { state in
@@ -99,13 +99,13 @@ extension GameStore {
     }
 
     /// Whether a sigil will fit anywhere at all in the current hand.
-    func canWrite(glyph: String) -> Bool {
-        guard let shape = PageRules.shape(forGlyph: glyph, hand: state.base.bestHand) else { return false }
+    func canWrite(_ content: MarkContent) -> Bool {
+        guard let shape = PageRules.shape(for: content, hand: state.base.bestHand) else { return false }
         return !PageRules.validOrigins(for: shape, on: state.base.page).isEmpty
     }
 
-    func footprint(glyph: String) -> Int {
-        PageRules.shape(forGlyph: glyph, hand: state.base.bestHand)?.footprint ?? 0
+    func footprint(_ content: MarkContent) -> Int {
+        PageRules.shape(for: content, hand: state.base.bestHand)?.footprint ?? 0
     }
 
     // MARK: Connecting

@@ -148,6 +148,14 @@
 - [ ] Open: the full list of crafting trades
 - [ ] Ordinary gear from encounters — currently only sites drop it
 
+## Writing desk UI (session 15 feedback)
+- [x] Ten bins, one per target, each with its target sigil, its causes and its own modifiers
+- [x] Bin bar scrolls horizontally along the bottom, with a fade and a peeking tab
+- [x] Target sigils are one square in every hand
+- [x] Cut the header, the instruction strip and the status text; Connect is an icon
+- [ ] The generation spine (`generation-spine-spec.md`) — **Aimee has approved building it**;
+      needs terrain on tiles and traits on creatures first, both of which are prerequisites it names
+
 ## Writing desk UI
 - [x] Two panes: Write (page + vocabulary) and The world (description, stats, depart)
 - [x] Pick a rune, drag the ghost into place, drag placed runes to move, drag off the page to erase

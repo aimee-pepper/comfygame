@@ -938,3 +938,19 @@ Everything else in the 51-qualifier list gets re-examined against this rule. Exp
   as a qualifier sigil — it simply wasn't being read. Session 13 §5's "Scale applied to the Relief
   source" is a *reading* of what already exists.
 - **A tutorial will be needed** at some point. Noted, not scheduled.
+
+---
+
+## Writing desk layout and target footprints (Aimee, 5 Aug 2026)
+
+- **Ten bins, one per pressure target**, each holding everything you'd write about that target: the
+  target sigil itself, every source that pushes on it, and any modifier that only makes sense there.
+  Plus a bin for the generic ladders and one for compounds. Writing about light means opening one
+  bin, not hunting across three lists.
+- **The bin bar is a horizontally scrolling row along the bottom**, with the next bin visibly
+  peeking and fading at the edge so it's obvious there's more.
+- **A target sigil is one square, in every hand, forever.** It's the anchor of a cluster rather than
+  a statement, and charging four cells for saying which dial you mean would tax you for writing at
+  all. The hands still compress everything else, which is where the progression is.
+- **Be economical with space.** Cut anything that repeats what the screen already shows — the cell
+  counter duplicated the empty squares, and the hand name displayed a constant.

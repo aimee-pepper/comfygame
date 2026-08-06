@@ -43,8 +43,7 @@ struct PageGridView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            header
+        VStack(alignment: .leading, spacing: 6) {
             ZStack(alignment: .topLeading) {
                 gridBackground
                 ForEach(page.runes) { mark in
@@ -53,9 +52,11 @@ struct PageGridView: View {
                 if let ghost { ghostView(ghost, side: side) }
             }
             .frame(width: pageSize.width, height: pageSize.height, alignment: .topLeading)
-            footer
+            // Only speaks when there's something to say — an always-present instruction strip is a
+            // permanent tax on the page for a sentence you read once.
+            if hint != nil || dragging != nil || ghost != nil { footer }
         }
-        .padding(10)
+        .padding(8)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
     }
 
@@ -71,6 +72,12 @@ struct PageGridView: View {
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
+    }
+
+    /// Nil when there's nothing worth saying, so the strip disappears entirely.
+    private var hint: String? {
+        if isConnecting { return connectingFrom == nil ? "Tap a sigil, then an adjacent one." : "Now tap something next to it." }
+        return nil
     }
 
     private var footer: some View {
@@ -104,14 +111,9 @@ struct PageGridView: View {
                     .font(.caption)
                     .foregroundStyle(willDiscard ? Color.red : Color.secondary)
                 Spacer()
-            } else {
-                Text("Pick a rune below, then drag it into place.")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-                Spacer()
             }
         }
-        .frame(height: 44)
+        .frame(height: 30)
     }
 
     /// Drawn behind everything, and deliberately not hit-testable — every touch on the page
@@ -337,7 +339,7 @@ struct PageGridView: View {
     }
 
     private func shape(of ghost: GhostRune) -> RuneShapeDef? {
-        PageRules.shape(forGlyph: ghost.glyph, hand: store.state.base.bestHand)
+        PageRules.shape(for: ghost.content, hand: store.state.base.bestHand)
     }
 
     private func fits(_ ghost: GhostRune) -> Bool {

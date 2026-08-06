@@ -21,6 +21,27 @@ enum PageRules {
         shape(forGlyph: source.rawValue, hand: hand)
     }
 
+    /// The shape a mark draws as, given what it is.
+    ///
+    /// **A target sigil is always a single square**, in every hand (Aimee, 5 Aug). It's the anchor
+    /// of a cluster rather than a statement in its own right, and charging four cells for saying
+    /// *which dial you mean* would tax you for writing at all — you'd be paying to open your mouth.
+    /// The hands still compress everything else, which is where the progression lives.
+    static func shape(for content: MarkContent, hand: Hand) -> RuneShapeDef? {
+        switch content {
+        case .target(let id):
+            return shape(forGlyph: id.rawValue, hand: .refined)
+        case .source(let id):
+            return shape(forGlyph: id.rawValue, hand: hand)
+        case .qualifier(let id):
+            return shape(forGlyph: id.rawValue, hand: hand)
+        case .compound(let id):
+            return ContentCatalog.shared.symbol(id).flatMap { shape(forCompound: $0, hand: hand) }
+        case .rune(let sigil):
+            return shape(for: sigil.source, hand: hand)
+        }
+    }
+
     /// The shape any glyph draws as, keyed by its identity.
     ///
     /// One rule for targets, sources and qualifiers alike: which authored footprint a rune gets is
@@ -161,7 +182,7 @@ enum PageRules {
         case .compound(let symbolID):
             shape = ContentCatalog.shared.symbol(symbolID).flatMap { self.shape(forCompound: $0, hand: hand) }
         case .target(let id):
-            shape = self.shape(forGlyph: id.rawValue, hand: hand)
+            shape = self.shape(forGlyph: id.rawValue, hand: .refined)
         case .source(let id):
             shape = self.shape(for: id, hand: hand)
         case .qualifier(let id):
