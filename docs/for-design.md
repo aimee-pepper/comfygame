@@ -62,6 +62,11 @@ parallel ladder?
 **Until then:** capacity is still bought at the Workshop, and the Tannery isn't built — I'd rather
 not ship a dead building.
 
+**Build costs scale with how advanced the trade is** (Aimee, 6 Aug). The Blacksmith is deliberately
+early and cheap enough for one good haul; a late building should be several hauls of setup and want
+something you can only get out of a world too greedy to hold. The ladder is written into the
+`_note` at the top of `stations.json`, which is where you'll be when you add one.
+
 ---
 
 ## 2. Vocabulary that needs *writing*, not deciding
