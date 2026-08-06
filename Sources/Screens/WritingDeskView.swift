@@ -46,7 +46,7 @@ struct WritingDeskView: View {
         var shortName: String {
             switch self {
             case .target(let t): ContentCatalog.shared.pressureTarget(t)?.name ?? t.rawValue
-            case .modifiers: "Ladders"
+            case .modifiers: "Modifiers"
             case .compounds: "Compounds"
             }
         }

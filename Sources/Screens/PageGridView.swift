@@ -53,9 +53,11 @@ struct PageGridView: View {
             .frame(width: pageSize.width, height: pageSize.height, alignment: .topLeading)
             // Only speaks when there's something to say — an always-present instruction strip is a
             // permanent tax on the page for a sentence you read once.
-            if hint != nil || dragging != nil || ghost != nil {
-                footer.foregroundStyle(mode == .off ? Color.secondary : mode.tint)
-            }
+            // Always present, even when it says nothing. Making it conditional saved a strip of
+            // space and cost the page a stable size — the card grew and shrank as you placed and
+            // moved sigils, which is intolerable on the one surface you're trying to arrange things
+            // on.
+            footer.foregroundStyle(mode == .off ? Color.secondary : mode.tint)
         }
         .padding(8)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
@@ -254,20 +256,36 @@ struct PageGridView: View {
     /// their own borders, so adjacent-and-separate reads differently from adjacent-and-joined.
     private func clusterOutline(_ group: [PlacedRune], side: CGFloat) -> some View {
         let cells = Set(group.flatMap(\.cells))
+        let hue = Self.hue(of: group)
         return ZStack(alignment: .topLeading) {
             ForEach(Array(cells).sorted { ($0.row, $0.column) < ($1.row, $1.column) }, id: \.self) { cell in
                 Rectangle()
-                    .fill(Color.primary.opacity(0.07))
+                    .fill(hue.opacity(0.10))
                     .frame(width: side, height: side)
                     .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
             }
         }
         .overlay(alignment: .topLeading) {
             ForEach(Array(cells).sorted { ($0.row, $0.column) < ($1.row, $1.column) }, id: \.self) { cell in
-                ClusterEdges(cell: cell, cells: cells, side: side)
+                ClusterEdges(cell: cell, cells: cells, side: side, hue: hue)
             }
         }
         .allowsHitTesting(false)
+    }
+
+    /// A cluster's own colour, so two joined groups sitting side by side are unmistakably two.
+    ///
+    /// Taken from the target the cluster is about, so an Illumination piece is the same colour every
+    /// time you write one — the hue means something rather than being a rotating palette. Clusters
+    /// with no target fall back to their position in the catalogue.
+    static func hue(of group: [PlacedRune]) -> Color {
+        let targets = ContentCatalog.shared.pressureTargetsInOrder
+        let index = group.compactMap(\.targetID)
+            .compactMap { id in targets.firstIndex { $0.id == id } }
+            .min()
+            ?? Int(group.map(\.id.rawValue).min() ?? 0) % max(1, targets.count)
+        return Color(hue: Double(index) / Double(max(1, targets.count)),
+                     saturation: 0.75, brightness: 0.72)
     }
 
     private func markDrag(_ mark: PlacedRune, side: CGFloat, pageSize: CGSize) -> some Gesture {
@@ -406,6 +424,7 @@ private struct ClusterEdges: View {
     let cell: PageCell
     let cells: Set<PageCell>
     let side: CGFloat
+    let hue: Color
 
     var body: some View {
         Path { path in
@@ -423,7 +442,7 @@ private struct ClusterEdges: View {
                 path.move(to: CGPoint(x: x + side, y: y)); path.addLine(to: CGPoint(x: x + side, y: y + side))
             }
         }
-        .stroke(Color.primary, lineWidth: 3)
+        .stroke(hue, lineWidth: 3)
     }
 }
 

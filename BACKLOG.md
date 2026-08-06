@@ -99,8 +99,11 @@
 - [x] Map size from the page (Scale qualifier), not a constant
 - [x] **Terrain.** Tiles have ground and elevation; Relief, Substrate, Hydrology, Thermal and
       Vitality all write to them. Cover and elevation stop sightlines.
-- [ ] **Creature traits** — the spine's other prerequisite. Still three creatures with flat stats,
-      so every trait pressure writes to nothing. Blocks loot as well.
+- [ ] **Creature traits** — the spine's other prerequisite, now fully specced by session 15:
+      a small **cast** of species per world plus small per-spawn **jitter**; Vitality sets cast
+      *size* not spread, so abundance and strangeness stay independent knobs; **free sampling**
+      with identity read off the traits afterwards, because not every world has grazers; anchored
+      worlds keep their cast forever. Blocks loot as well.
 - [ ] `WorldProfile` — the interface between readings and worldgen the spine specs. Terrain and
       spawns currently read readings directly, which works but won't compose as targets grow.
 - [ ] Movement cost from terrain — passability is in, but crossing growth costs the same as stone
