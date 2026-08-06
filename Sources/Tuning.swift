@@ -62,6 +62,8 @@ enum Tuning {
 
     enum Pressure {
         /// Every target speaks the same 0–100 scale, so the preview has one mental model.
+        /// How much a favoured condition multiplies something's share. **[PLACEHOLDER]**
+        static let affinityBonus: Double = 1.8
         static let scaleMaximum: Double = 100
 
         /// Diminishing returns on stacking. Each further contribution to the same target counts for
@@ -144,6 +146,9 @@ enum Tuning {
         static let baseEnemyTier: Int = 1            // PLACEHOLDER
         /// Starting weight for every non-Reality resource in a world's yield table.
         static let baseResourceWeight: Double = 1.0  // PLACEHOLDER
+        /// How much further things see you across open ground. Openness setting ambush-versus-
+        /// pursuit is specced in the pressure model and did nothing until now.
+        static let sightBonusInOpenGround: Int = 1   // PLACEHOLDER
         static let hazardThreshold: Double = 50      // PLACEHOLDER — hazards spawn at map edges
         static let crumbleThreshold: Double = 25     // PLACEHOLDER — tiles crumble inward
         static let collapseThreshold: Double = 0     // collapse (locked: 0 is the floor)

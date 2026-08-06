@@ -166,6 +166,22 @@ struct CreatureDef: Codable, Equatable, Identifiable, Sendable {
     /// How far off it notices you. Two is the baseline; later creatures are expected to see
     /// further, so this belongs to the creature rather than to `Tuning`.
     var sightRadius: Int
+    /// Conditions without which this doesn't live here at all.
+    var requires: [PressureCondition]
+    /// Conditions that each multiply its share of the roster.
+    var favours: [PressureCondition]
+    /// What it draws from the world's energy budget. A poor world can't afford the expensive things
+    /// — the square-cube law, the defence-mobility trade and costly signalling in one number.
+    var appetite: Double
+
+    /// Whether this world can support it, and how strongly it belongs here.
+    func affinity(in readings: PressureReadings) -> Double {
+        guard requires.allSatisfy({ $0.holds(in: readings) }) else { return 0 }
+        return favours.reduce(spawnWeight) { total, condition in
+            condition.holds(in: readings) ? total * Tuning.Pressure.affinityBonus : total
+        }
+    }
+
     /// Whether this is out at night. **[PLACEHOLDER]** which creatures — the roster swapping at
     /// nightfall is what session 13 §6 asks for; who's in it is content.
     var isNocturnal: Bool
@@ -181,6 +197,9 @@ struct CreatureDef: Codable, Equatable, Identifiable, Sendable {
         spawnWeight = try c.decode(Double.self, forKey: .spawnWeight)
         sightRadius = try c.decodeIfPresent(Int.self, forKey: .sightRadius) ?? 2
         isNocturnal = try c.decodeIfPresent(Bool.self, forKey: .isNocturnal) ?? false
+        requires = try c.decodeIfPresent([PressureCondition].self, forKey: .requires) ?? []
+        favours = try c.decodeIfPresent([PressureCondition].self, forKey: .favours) ?? []
+        appetite = try c.decodeIfPresent(Double.self, forKey: .appetite) ?? 8
     }
 }
 
@@ -258,6 +277,26 @@ struct ResourceDef: Codable, Equatable, Identifiable, Sendable {
     var id: ResourceID
     var name: String
     var icon: String
+    /// The target whose magnitude decides how much of this a world holds.
+    var drivenBy: PressureTargetID?
+    /// Conditions without which there is none at all.
+    var requires: [PressureCondition] = []
+    /// Conditions that each multiply its share.
+    var favours: [PressureCondition] = []
+
+    /// How much of the ground is this, given what the world is made of.
+    ///
+    /// **This is the wiring the pressure model was missing** — until content derived from readings,
+    /// the eight targets described worlds they did not generate
+    /// (`audit-what-pressures-actually-do.md` §4.1).
+    func abundance(in readings: PressureReadings) -> Double {
+        guard requires.allSatisfy({ $0.holds(in: readings) }) else { return 0 }
+        let magnitude = drivenBy.map { readings[$0].peak } ?? Tuning.Pressure.scaleMaximum / 2
+        let base = max(Tuning.World.baseResourceWeight, magnitude / 10)
+        return favours.reduce(base) { total, condition in
+            condition.holds(in: readings) ? total * Tuning.Pressure.affinityBonus : total
+        }
+    }
     /// Motes are the Reality-layer currency and are banked separately from base resources.
     var isRealityCurrency: Bool
 }

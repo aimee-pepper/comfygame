@@ -91,6 +91,18 @@
 - [ ] Research leads, "a world worth writing" and ruin pages are recorded but nothing reads them yet
 - [ ] Recruitment — finding someone is not yet joining with them (companions spec, provisional)
 
+## Pressures drive generation (audit-what-pressures-actually-do §4)
+- [x] Resource nodes from Substrate composition, richness and dispersion — not `yieldModifiers`
+- [x] Creature spawns from Vitality and trait pressures, capped by the energy budget
+- [x] Node density from richness; dispersion decides spread-thin versus gathered
+- [x] Openness sets ambush versus pursuit — things see you further across open ground
+- [x] Map size from the page (Scale qualifier), not a constant
+- [ ] Terrain *layout* from Relief — elevation range and verticality still do nothing to the map
+- [ ] Loot from creature traits — blocked on traits existing
+- [ ] Retire `yieldModifiers` / `enemyTableModifiers` / `enemyTierDelta` now nothing generates from
+      them; `primaryTarget` lives on the same object and must survive the surgery (code-audit-2 §3.2)
+- [ ] Q24 — the energy budget can price a creature out of the worlds it prefers
+
 ## The writing grammar (decisions-session-14)
 - [x] Target-first grammar: a cluster is a target sigil with sources connected into it
 - [x] Connection needs adjacency **and** a declared connector; connect mode, tap to chain

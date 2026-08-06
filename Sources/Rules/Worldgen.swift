@@ -41,6 +41,11 @@ enum Worldgen {
         var siteRNG = root.derived(Salt.sites)
         var pageRNG = root.derived(Salt.pages)
 
+        // Everything below reads the world's *pressures*. What a world is made of and what lives
+        // in it now come from the eight targets rather than from flat per-symbol tables.
+        let sigils = BookRules.sigils(for: book)
+        let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+
         // 1. Where you arrive: a portal on the edge. It works as an exit too, so retreating the
         //    way you came is always possible — it just costs you the turns to walk back.
         //    (Whether that's too forgiving is Q6 in questions-for-aimee.md.)
@@ -61,8 +66,8 @@ enum Worldgen {
 
         // 3. Resource nodes. Count and richness both come from the book — a bounty-heavy book is
         //    visibly denser on the grid, not just better per pull.
-        let yieldTable = BookRules.yieldTable(for: book)
-        let nodeCount = nodeCount(for: book, rng: &nodeRNG)
+        let yieldTable = BookRules.yieldTable(from: readings)
+        let nodeCount = nodeCount(for: readings, rng: &nodeRNG)
         for _ in 0..<nodeCount {
             guard let point = randomFreePoint(in: map, avoiding: occupied, rng: &nodeRNG),
                   let resource = nodeRNG.pickWeighted(yieldTable)
@@ -109,8 +114,6 @@ enum Worldgen {
         // 7. Sites — the discrete placed things. Eligibility is read off the world's *pressures*
         //    rather than off its symbols, so a site is found by writing a kind of place rather than
         //    by writing a specific recipe (docs/sites-system.md §2).
-        let sigils = BookRules.sigils(for: book)
-        let readings = BookRules.readings(for: book, seed: seed)
         let sites = SiteRules.place(in: map,
                                     readings: readings,
                                     contradictions: ContradictionRules.fired(in: sigils, readings: readings),
@@ -143,8 +146,8 @@ enum Worldgen {
         let travellers = LibraryRules.travellersPresent(in: readings).map(\.id)
 
         // 10. Enemies, drawn from the book's enemy table.
-        let enemyTable = BookRules.enemyTable(for: book)
-        let enemyCount = enemyCount(for: book, rng: &enemyRNG)
+        let enemyTable = BookRules.enemyTable(from: readings)
+        let enemyCount = enemyCount(for: book, readings: readings, rng: &enemyRNG)
         var enemies: [WorldEnemy] = guardians
         for _ in 0..<enemyCount {
             guard let creature = enemyRNG.pickWeighted(enemyTable),
@@ -167,24 +170,32 @@ enum Worldgen {
 
     /// Richer books put more nodes on the ground. Scales off the book's yield multipliers so a new
     /// bounty symbol automatically affects density without touching this function.
-    static func nodeCount(for book: BoundBook, rng: inout SeededRNG) -> Int {
-        let generosity = book.allSymbolIDs.reduce(1.0) { total, id in
-            guard let symbol = ContentCatalog.shared.symbol(id), !symbol.yieldModifiers.isEmpty else { return total }
-            let average = symbol.yieldModifiers.values.reduce(0, +) / Double(symbol.yieldModifiers.count)
-            return total * average
-        }
+    /// How much is lying about, from how much the world actually holds.
+    ///
+    /// Dispersion decides whether it's spread thin or gathered into fewer, richer places — which is
+    /// what makes the concentrated↔pervasive axis worth writing.
+    static func nodeCount(for readings: PressureReadings, rng: inout SeededRNG) -> Int {
+        let substrate = readings["substrate"]
+        let vitality = readings["vitality"]
+        let richness = (substrate.peak + vitality.peak) / Tuning.Pressure.scaleMaximum
+        let dispersion = substrate.aspect("dispersion") / Tuning.Pressure.scaleMaximum
+
         let base = Double(rng.int(in: Tuning.World.baseNodeCountRange))
-        return max(1, Int((base * generosity).rounded()))
+        // Pervasive: more nodes, each ordinary. Concentrated: fewer, and worth finding.
+        let spread = 0.6 + dispersion * 0.8
+        return max(1, Int((base * (0.4 + richness) * spread).rounded()))
     }
 
     /// More dangerous books put more enemies on the ground, on top of the nastier spawn table.
-    static func enemyCount(for book: BoundBook, rng: inout SeededRNG) -> Int {
+    static func enemyCount(for book: BoundBook, readings: PressureReadings, rng: inout SeededRNG) -> Int {
         let tier = BookRules.enemyTier(of: book)
         let base = rng.int(in: Tuning.World.baseEnemyCountRange)
         let scaled = base + (tier - Tuning.World.baseEnemyTier) * Tuning.World.enemiesPerDangerTier
         // Swarm multiplies the count and drops the tier; Predation does the reverse. Applied after
         // the tier term so the two really do pull against each other rather than one winning.
-        let multiplied = Double(scaled) * BookRules.dangerProfile(for: book).spawnMultiplier
+        // A world can only feed so much. Vitality is what pays for the roster.
+        let productivity = max(0.25, readings["vitality"].peak / Tuning.Pressure.scaleMaximum)
+        let multiplied = Double(scaled) * BookRules.dangerProfile(for: book).spawnMultiplier * (0.5 + productivity)
         return max(1, Int(multiplied.rounded()))
     }
 

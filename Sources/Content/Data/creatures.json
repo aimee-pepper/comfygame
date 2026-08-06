@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER \u2014 names, icons and stats are Claude-invented. v0 ships exactly three enemy types (design-brief-v0: 'enemy variety beyond 3 types' is explicitly out of scope). Each one needs a stable id because the encounter-flag registry (DiscoveryLog) keys off it. 'sightRadius' is how far this creature notices you from. Two is the baseline; later creatures are expected to see further, which is why it lives on the creature rather than in Tuning. 'isNocturnal' PLACEHOLDER \u2014 the roster swaps at nightfall (session 13 \u00a76); who belongs to which roster is content Aimee should set.",
+  "_note": "PLACEHOLDER \u2014 names, icons and stats are Claude-invented. v0 ships exactly three enemy types (design-brief-v0: 'enemy variety beyond 3 types' is explicitly out of scope). Each one needs a stable id because the encounter-flag registry (DiscoveryLog) keys off it. 'sightRadius' is how far this creature notices you from. Two is the baseline; later creatures are expected to see further, which is why it lives on the creature rather than in Tuning. 'isNocturnal' PLACEHOLDER \u2014 the roster swaps at nightfall (session 13 \u00a76); who belongs to which roster is content Aimee should set. 'requires' are conditions without which this doesn't live here at all; 'favours' each multiply its share of the roster; 'appetite' is what it draws from the world's energy budget, so a poor world simply cannot afford the expensive things (pressure-model, energy budget). PLACEHOLDER. NOTE ON APPETITE: it interacts with the energy budget, which vitality pays for \u2014 and darkness caps vitality. So a creature that PREFERS dark worlds must be cheap enough to be affordable in one, or it is excluded from exactly the worlds it belongs to. The wraith is barely there, so it costs almost nothing.",
   "creatures": [
     {
       "id": "paper_moth",
@@ -10,7 +10,21 @@
       "attack": 2,
       "spawnWeight": 1.0,
       "sightRadius": 2,
-      "isNocturnal": false
+      "isNocturnal": false,
+      "requires": [],
+      "favours": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 20
+        },
+        {
+          "target": "illumination",
+          "measure": "peak",
+          "minimum": 25
+        }
+      ],
+      "appetite": 6
     },
     {
       "id": "ink_hound",
@@ -21,7 +35,29 @@
       "attack": 4,
       "spawnWeight": 0.6,
       "sightRadius": 2,
-      "isNocturnal": false
+      "isNocturnal": false,
+      "requires": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 15
+        }
+      ],
+      "favours": [
+        {
+          "target": "vitality",
+          "measure": "aspect",
+          "key": "trophicDepth",
+          "minimum": 30
+        },
+        {
+          "target": "relief",
+          "measure": "aspect",
+          "key": "openness",
+          "minimum": 55
+        }
+      ],
+      "appetite": 14
     },
     {
       "id": "margin_wraith",
@@ -32,7 +68,22 @@
       "attack": 6,
       "spawnWeight": 0.25,
       "sightRadius": 2,
-      "isNocturnal": true
+      "isNocturnal": true,
+      "requires": [],
+      "favours": [
+        {
+          "target": "illumination",
+          "measure": "peak",
+          "maximum": 25
+        },
+        {
+          "target": "cycle",
+          "measure": "tag",
+          "key": "arrhythmic",
+          "minimum": 1
+        }
+      ],
+      "appetite": 3
     }
   ]
 }

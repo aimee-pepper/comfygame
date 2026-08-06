@@ -215,6 +215,46 @@ enum BookRules {
     // MARK: Spawn tables
 
     /// Relative weights for which resource a harvested node yields.
+    /// What the ground is made of, **derived from what the world is**.
+    ///
+    /// The old version multiplied flat per-symbol `yieldModifiers`, which meant a world could read
+    /// "frozen over, barren, nothing keeps time" while its spawns came from a symbol's table. The
+    /// eight targets now generate the world rather than describing one they don't
+    /// (`audit-what-pressures-actually-do.md` §4.1).
+    static func yieldTable(from readings: PressureReadings) -> [(value: ResourceID, weight: Double)] {
+        ContentCatalog.shared.resources
+            .filter { !$0.isRealityCurrency }
+            .map { (value: $0.id, weight: $0.abundance(in: readings)) }
+            .filter { $0.weight > 0 }
+    }
+
+    /// Who lives here, **derived from what the world is** — and capped by what it can feed.
+    ///
+    /// The energy budget is the reason no world produces an everything-creature: a rich world can
+    /// afford a large armoured thing *or* a gaudy fast one, and a poor world can afford neither.
+    static func enemyTable(from readings: PressureReadings) -> [(value: CreatureDef, weight: Double)] {
+        let budget = WorldConstraints.energyBudget(in: readings)
+        let affordable = ContentCatalog.shared.creatures.filter { $0.appetite <= budget }
+        // A world too poor to feed anything still holds the cheapest thing in it, or it would be
+        // empty for reasons the player can't see.
+        let pool = affordable.isEmpty
+            ? [ContentCatalog.shared.creatures.min { $0.appetite < $1.appetite }].compactMap { $0 }
+            : affordable
+        return pool
+            .map { (value: $0, weight: $0.affinity(in: readings)) }
+            .filter { $0.weight > 0 }
+    }
+
+    /// How far things here notice you.
+    ///
+    /// **Openness sets ambush versus pursuit** — specced since the pressure model and, until now,
+    /// doing nothing. Open ground means you're seen coming; enclosed means you aren't, and neither
+    /// is what's waiting.
+    static func sightRadius(of creature: CreatureDef, in readings: PressureReadings) -> Int {
+        let pursuit = WorldConstraints.character(of: readings).contains("pursuit")
+        return max(1, creature.sightRadius + (pursuit ? Tuning.World.sightBonusInOpenGround : 0))
+    }
+
     static func yieldTable(for book: BoundBook) -> [(value: ResourceID, weight: Double)] {
         var weights: [ResourceID: Double] = [:]
         for resource in ContentCatalog.shared.resources where !resource.isRealityCurrency {

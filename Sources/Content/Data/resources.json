@@ -1,9 +1,105 @@
 {
-  "_note": "PLACEHOLDER icons/names. Resources are stackable and never consume an inventory slot. Motes are the Reality-layer currency and bank into RealityState, not BaseState.",
+  "_note": "PLACEHOLDER icons/names. Resources are stackable and never consume an inventory slot. Motes are the Reality-layer currency and bank into RealityState, not BaseState. 'drivenBy' names the pressure target whose magnitude sets how much of this a world holds; 'requires' are conditions without which there is none at all; 'favours' each multiply its share. This is what makes the eight targets generate a world rather than merely describe one (audit-what-pressures-actually-do \u00a74.1). All PLACEHOLDER.",
   "resources": [
-    { "id": "ore", "name": "Ore", "icon": "cube", "isRealityCurrency": false },
-    { "id": "fiber", "name": "Fiber", "icon": "scribble", "isRealityCurrency": false },
-    { "id": "essence_raw", "name": "Raw Essence", "icon": "drop", "isRealityCurrency": false },
-    { "id": "mote", "name": "Mote", "icon": "star", "isRealityCurrency": true }
+    {
+      "id": "ore",
+      "name": "Ore",
+      "icon": "cube",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 8
+        }
+      ],
+      "favours": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "hard",
+          "minimum": 25
+        },
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "ductile",
+          "minimum": 25
+        }
+      ]
+    },
+    {
+      "id": "fiber",
+      "name": "Fiber",
+      "icon": "scribble",
+      "isRealityCurrency": false,
+      "drivenBy": "vitality",
+      "requires": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 6
+        }
+      ],
+      "favours": [
+        {
+          "target": "vitality",
+          "measure": "aspect",
+          "key": "trophicDepth",
+          "minimum": 25
+        }
+      ]
+    },
+    {
+      "id": "essence_raw",
+      "name": "Raw Essence",
+      "icon": "drop",
+      "isRealityCurrency": false,
+      "drivenBy": "illumination",
+      "requires": [],
+      "favours": [
+        {
+          "target": "illumination",
+          "measure": "tag",
+          "key": "sourceless",
+          "minimum": 1
+        },
+        {
+          "target": "cycle",
+          "measure": "tag",
+          "key": "arrhythmic",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "mote",
+      "name": "Mote",
+      "icon": "star",
+      "isRealityCurrency": true,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 45
+        }
+      ],
+      "favours": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "volatile",
+          "minimum": 20
+        },
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "valuable",
+          "minimum": 1
+        }
+      ]
+    }
   ]
 }

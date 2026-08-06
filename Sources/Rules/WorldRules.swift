@@ -409,7 +409,10 @@ enum WorldRules {
             var enemy = run.enemies[index]
             let distance = enemy.position.chebyshevDistance(to: run.playerPosition)
 
-            let sight = ContentCatalog.shared.creature(enemy.creatureID)?.sightRadius
+            // **Openness sets ambush versus pursuit.** Across open ground you're seen coming;
+            // in enclosed country you aren't, and neither is what's waiting.
+            let sight = ContentCatalog.shared.creature(enemy.creatureID)
+                .map { BookRules.sightRadius(of: $0, in: BookRules.readings(for: run.book, seed: run.mapSeed)) }
                 ?? Tuning.World.defaultEnemySightRadius
             if !enemy.isAwake, distance <= sight {
                 enemy.isAwake = true

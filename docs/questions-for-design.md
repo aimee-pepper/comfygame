@@ -493,3 +493,30 @@ which is exact *because* stability is additive. A cap makes it non-additive, so 
 can be written the range has to learn about the cap or the preview will promise a floor it doesn't
 honour. There's a test that catches this (`testEveryPossibleRandomFillLandsInsideTheProjectedRange`)
 and it will start failing the moment the page allows two runes — which is the right time to fix it.
+
+## Q24 — The energy budget can price a creature out of the worlds it belongs to
+
+Found while wiring pressures into generation, and worth knowing before the creature catalogue grows.
+
+**The chain:** darkness caps vitality (the light cap in `WorldConstraints`), vitality pays for the
+energy budget, and the budget decides what a world can afford to feed. So a creature that *prefers*
+dark worlds is, by default, excluded from them — the Margin Wraith liked the dark and could never be
+afforded there, because the dark is poor.
+
+**Fixed by making the wraith cheap** (appetite 3, below everything else), which is right for a thing
+that's barely there. But the interaction is general and will bite again: **any creature authored to
+like a condition that suppresses vitality has to be cheap enough to survive its own preference.**
+
+Three ways to handle it as the catalogue grows, none of which I've picked:
+
+1. **Author around it** — as now. Cheap things like poor worlds. Simple, and it means appetite
+   quietly encodes "how marginal is this", which is a real and readable idea.
+2. **A creature's requirements exempt it from the budget** — if a thing *needs* the dark, the dark
+   affording it is assumed. Loses the square-cube discipline the budget exists for.
+3. **Fungal-style exemptions on the budget itself** — vitality isn't the only currency; a
+   scavenger's budget could come from `decaying` rather than from productivity. Closest to the
+   biology the pressure model already models, and the most work.
+
+The invariant that must hold either way, and now has a test: **a world always holds something.** A
+world too poor to feed anything still spawns the cheapest thing in the catalogue, because empty for
+reasons the player can't see is worse than sparse.
