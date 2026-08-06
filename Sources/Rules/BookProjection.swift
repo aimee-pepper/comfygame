@@ -118,8 +118,8 @@ struct BookProjection {
             turnsUntilCollapse: turns...turns,
             enemyTier: tier...tier,
             visionRadius: sight...sight,
-            mapWidth: Tuning.World.gridWidth,
-            mapHeight: Tuning.World.gridHeight,
+            mapWidth: book.scale.gridSide,
+            mapHeight: book.scale.gridSide,
             worldDescription: DescriptionRules.describe(
                 readings,
                 contradictions: contradictions,

@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — names, icons and stats are Claude-invented. v0 ships exactly three enemy types (design-brief-v0: 'enemy variety beyond 3 types' is explicitly out of scope). Each one needs a stable id because the encounter-flag registry (DiscoveryLog) keys off it. 'sightRadius' is how far this creature notices you from. Two is the baseline; later creatures are expected to see further, which is why it lives on the creature rather than in Tuning.",
+  "_note": "PLACEHOLDER \u2014 names, icons and stats are Claude-invented. v0 ships exactly three enemy types (design-brief-v0: 'enemy variety beyond 3 types' is explicitly out of scope). Each one needs a stable id because the encounter-flag registry (DiscoveryLog) keys off it. 'sightRadius' is how far this creature notices you from. Two is the baseline; later creatures are expected to see further, which is why it lives on the creature rather than in Tuning. 'isNocturnal' PLACEHOLDER \u2014 the roster swaps at nightfall (session 13 \u00a76); who belongs to which roster is content Aimee should set.",
   "creatures": [
     {
       "id": "paper_moth",
@@ -9,7 +9,8 @@
       "maxHP": 8,
       "attack": 2,
       "spawnWeight": 1.0,
-      "sightRadius": 2
+      "sightRadius": 2,
+      "isNocturnal": false
     },
     {
       "id": "ink_hound",
@@ -19,7 +20,8 @@
       "maxHP": 16,
       "attack": 4,
       "spawnWeight": 0.6,
-      "sightRadius": 2
+      "sightRadius": 2,
+      "isNocturnal": false
     },
     {
       "id": "margin_wraith",
@@ -29,7 +31,8 @@
       "maxHP": 26,
       "attack": 6,
       "spawnWeight": 0.25,
-      "sightRadius": 2
+      "sightRadius": 2,
+      "isNocturnal": true
     }
   ]
 }

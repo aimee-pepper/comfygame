@@ -925,3 +925,16 @@ Everything else in the 51-qualifier list gets re-examined against this rule. Exp
 ## Noted for later — not now
 
 **Footprint numbers** (crude 4–6 cells · plain 2–3 · refined 1×1) are **fine as placeholders**, but need finessing in a later version. They require manual sigil-generation effort until Aimee builds the sigil generator, so tuning them now would be wasted work.
+
+---
+
+## Session 14 answers and additions (Aimee, 5 Aug 2026)
+
+- **A modifier sigil takes up space on the page**, like any other sigil. Modifiers are not attached
+  diacritics that ride along free — they are written, and writing them costs cells.
+- **The target sigil is mandatory** (session 14 open #2). It's the anchor of the cluster; a cluster
+  without one says nothing at all.
+- **World size needs no new mechanism.** Scale was already in the vocabulary and already placeable
+  as a qualifier sigil — it simply wasn't being read. Session 13 §5's "Scale applied to the Relief
+  source" is a *reading* of what already exists.
+- **A tutorial will be needed** at some point. Noted, not scheduled.

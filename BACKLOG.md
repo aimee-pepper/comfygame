@@ -107,12 +107,21 @@
 - [ ] Open: can qualifiers modify the target rather than the source?
 - [ ] Re-audit the 51 qualifiers against §4
 
-## Still to do from session 13
-- [ ] Cycle's own primary sources (candidate list in cycle-sources-draft.md, Aimee to cut)
-- [ ] Variable world size — **needs the modifier/qualifier decision first**
-- [ ] Bigger maps, ~40-turn days, night cutting vision and swapping spawns
-- [ ] Scrolling map with a clamped-follow camera (centred until the player reaches an edge)
-- [ ] Minimap under the movement arrows: explored, unexplored, and empty
+## Session 13
+- [x] Variable world size, read off the Scale qualifier — no new mechanism needed
+- [x] Size costs stability, so a vast world is a greed-shaped decision
+- [x] Bigger maps by default (18 across), and the grid stopped being a constant
+- [x] ~40-turn days; night cuts sight and swaps the creature roster
+- [x] Clamped-follow camera — centred until you reach an edge
+- [x] Minimap: explored, unexplored, and **nothing there**
+- [ ] Cycle's own primary sources — candidate list in cycle-sources-draft.md, **Aimee to cut**
+      before I add them; adding core vocabulary isn't mine to do
+- [ ] Stability→turns curve rescaled against the bigger maps — needs device testing
+- [ ] Exact map size, day length and viewport — all want playtesting
+
+## A tutorial
+- [ ] Needed at some point (Aimee, 5 Aug). Not scheduled. The writing system now has four
+      vocabularies, connection, clusters and rotation — it is not discoverable cold.
 
 ## From session 12
 - [x] Gambit list rebuilt FF12-style: whole list visible, one rule one row, in-place segment

@@ -89,6 +89,8 @@ struct WorldView: View {
         case .foundTraveller(let id):
             ContentCatalog.shared.traveller(id).map { "\($0.name) is here. \($0.blurb)" }
                 ?? "Someone is here."
+        case .nightfall: "The light goes. You can see less of this than you could."
+        case .daybreak: "It comes back around. You can see again."
         case .foundSite(let site):
             ContentCatalog.shared.site(site).map { "\($0.name). \($0.blurb)" } ?? "Something built."
         case .searchedSite(_, let remaining):
@@ -124,6 +126,7 @@ struct WorldView: View {
         case .pickedUp, .harvested, .foundPortal, .pickedUpItem, .searchedSite, .siteOpened: .primary
         case .foundSite, .learnedSymbol, .gainedEssence: .primary
         case .readPage, .foundTraveller: .primary
+        case .nightfall, .daybreak: .secondary
         case .cacheOpened: .purple
         case .satchelFull: .orange
         case .hazardHit, .collapsed, .ejected, .lostToCrumbling: .red
@@ -289,17 +292,35 @@ private struct StabilityHeader: View {
 
 // MARK: - Grid
 
+/// The map, seen through a window that follows you.
+///
+/// **The map no longer has to fit one screen** (decisions-session-13 §3) — only the page does, since
+/// you compose on a page and walk through a world. The camera is **clamped follow**: centred on you
+/// until you reach an edge, where it stops rather than showing empty space past the border.
 private struct MapGrid: View {
     let run: WorldRun
     let onTap: (GridPoint) -> Void
 
+    /// How many tiles across the window is. Small maps show whole; big ones scroll under you.
+    private var viewport: Int { min(Tuning.World.viewportTiles, min(run.map.width, run.map.height)) }
+
+    /// Top-left of the window: centred on the player, then clamped to the map.
+    private var origin: GridPoint {
+        GridPoint(x: clamp(run.playerPosition.x - viewport / 2, run.map.width),
+                  y: clamp(run.playerPosition.y - viewport / 2, run.map.height))
+    }
+
+    private func clamp(_ value: Int, _ extent: Int) -> Int {
+        max(0, min(value, extent - viewport))
+    }
+
     var body: some View {
         GeometryReader { proxy in
-            let side = proxy.size.width / CGFloat(run.map.width)
+            let side = proxy.size.width / CGFloat(viewport)
             VStack(spacing: 0) {
-                ForEach(0..<run.map.height, id: \.self) { y in
+                ForEach(origin.y..<(origin.y + viewport), id: \.self) { y in
                     HStack(spacing: 0) {
-                        ForEach(0..<run.map.width, id: \.self) { x in
+                        ForEach(origin.x..<(origin.x + viewport), id: \.self) { x in
                             let point = GridPoint(x: x, y: y)
                             TileView(tile: run.map[point],
                                      enemy: enemy(at: point),
@@ -312,7 +333,7 @@ private struct MapGrid: View {
                 }
             }
         }
-        .aspectRatio(CGFloat(run.map.width) / CGFloat(run.map.height), contentMode: .fit)
+        .aspectRatio(1, contentMode: .fit)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
     }
 

@@ -81,6 +81,29 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Player turns taken this run. The only clock the game has.
     var turnsTaken: Int = 0
 
+    /// Where in the world's day this turn falls, 0 at dawn and approaching 1 at the next dawn.
+    ///
+    /// Driven by `turnsTaken`, never by wall-clock — the day turns because you moved, which is what
+    /// keeps the interruptibility pillar true.
+    var dayPhase: Double {
+        guard Tuning.DayNight.turnsPerDay > 0 else { return 0 }
+        return Double(turnsTaken % Tuning.DayNight.turnsPerDay) / Double(Tuning.DayNight.turnsPerDay)
+    }
+
+    /// **A world lit by something constant never has a night at all.** Darkness only happens where
+    /// the light comes and goes, which is what finally makes Illumination's dynamic range mean
+    /// something (session 13 §6).
+    var isNight: Bool {
+        guard hasDayAndNight else { return false }
+        return dayPhase >= 1 - Tuning.DayNight.nightFraction
+    }
+
+    /// Whether this world turns at all. A sourceless glow doesn't set.
+    var hasDayAndNight: Bool {
+        let light = BookRules.readings(for: book, seed: mapSeed)["illumination"]
+        return light.range > Tuning.Pressure.wideRangeThreshold && !light.has("sourceless")
+    }
+
     /// Unbanked haul. Kept 100% on portal exit, `collapseHaulKeptFraction` on collapse.
     var satchel: ResourcePool = ResourcePool()
     var satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
@@ -170,6 +193,9 @@ struct BoundBook: Codable, Equatable, Sendable {
     /// This is the composition now. `symbols` below is the old slot taxonomy, kept so worlds bound
     /// before the page existed still resolve — a bound world outlives the content that made it.
     var written: [SymbolID] = []
+    /// How much world this book asked for. Read off the Scale qualifier at bind, and kept, so the
+    /// map is reproducible from the book alone.
+    var scale: WorldScale = .ordinary
     var symbols: [SlotID: SymbolID]
     /// Slots that were random-filled at bind time — the UI reveals these as surprises.
     var randomlyFilled: Set<SlotID>
@@ -197,8 +223,9 @@ struct BoundBook: Codable, Equatable, Sendable {
         return symbols.filter { !randomlyFilled.contains($0.key) }.map(\.value)
     }
 
-    init(written: [SymbolID], essencePaid: Int) {
+    init(written: [SymbolID], scale: WorldScale = .ordinary, essencePaid: Int) {
         self.written = written
+        self.scale = scale
         self.symbols = [:]
         self.randomlyFilled = []
         self.essencePaid = essencePaid
@@ -206,6 +233,7 @@ struct BoundBook: Codable, Equatable, Sendable {
 
     init(symbols: [SlotID: SymbolID], randomlyFilled: Set<SlotID>, essencePaid: Int) {
         self.written = []
+        self.scale = .ordinary
         self.symbols = symbols
         self.randomlyFilled = randomlyFilled
         self.essencePaid = essencePaid
@@ -214,6 +242,7 @@ struct BoundBook: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         written = try c.decodeIfPresent([SymbolID].self, forKey: .written) ?? []
+        scale = try c.decodeIfPresent(WorldScale.self, forKey: .scale) ?? .ordinary
         symbols = try c.decodeIfPresent([SlotID: SymbolID].self, forKey: .symbols) ?? [:]
         randomlyFilled = try c.decodeIfPresent(Set<SlotID>.self, forKey: .randomlyFilled) ?? []
         essencePaid = try c.decodeIfPresent(Int.self, forKey: .essencePaid) ?? 0

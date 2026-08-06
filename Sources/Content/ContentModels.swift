@@ -166,6 +166,71 @@ struct CreatureDef: Codable, Equatable, Identifiable, Sendable {
     /// How far off it notices you. Two is the baseline; later creatures are expected to see
     /// further, so this belongs to the creature rather than to `Tuning`.
     var sightRadius: Int
+    /// Whether this is out at night. **[PLACEHOLDER]** which creatures — the roster swapping at
+    /// nightfall is what session 13 §6 asks for; who's in it is content.
+    var isNocturnal: Bool
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(CreatureID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        icon = try c.decode(String.self, forKey: .icon)
+        tier = try c.decode(Int.self, forKey: .tier)
+        maxHP = try c.decode(Int.self, forKey: .maxHP)
+        attack = try c.decode(Int.self, forKey: .attack)
+        spawnWeight = try c.decode(Double.self, forKey: .spawnWeight)
+        sightRadius = try c.decodeIfPresent(Int.self, forKey: .sightRadius) ?? 2
+        isNocturnal = try c.decodeIfPresent(Bool.self, forKey: .isNocturnal) ?? false
+    }
+}
+
+/// How much world there is.
+///
+/// Not a mechanism of its own — it's a reading of the **Scale** qualifier, which was already in the
+/// vocabulary and already placeable. Bigger is not simply better: a vast world holds more but needs
+/// more turns to cross, so it costs stability. Writing one you can't finish exploring is a real and
+/// instructive mistake (decisions-session-13 §5).
+enum WorldScale: String, Codable, CaseIterable, Sendable {
+    case minute, small, ordinary, large, vast
+
+    /// The rung of the Scale ladder this corresponds to. `ordinary` is what you get by not writing
+    /// one at all, so it has no rung.
+    init?(rung: QualifierID) {
+        switch rung.rawValue {
+        case "minute": self = .minute
+        case "small": self = .small
+        case "large": self = .large
+        case "vast": self = .vast
+        default: return nil
+        }
+    }
+
+    /// Grid edge. **[PLACEHOLDER]** — session 13 §2 starts a middling world around 18 across,
+    /// against the 14 it used to always be.
+    var gridSide: Int {
+        switch self {
+        case .minute: 12
+        case .small: 15
+        case .ordinary: 18
+        case .large: 23
+        case .vast: 28
+        }
+    }
+
+    /// What asking for this much world costs, in the Stability headline's own units. Ordinary is
+    /// free; more than a world would ordinarily carry is the same greed as asking for rich ore.
+    /// **[PLACEHOLDER]**
+    var stabilityDelta: Int {
+        switch self {
+        case .minute: 12
+        case .small: 6
+        case .ordinary: 0
+        case .large: -14
+        case .vast: -30
+        }
+    }
+
+    var displayName: String { rawValue.capitalized }
 }
 
 /// What a piece of gear is worth wearing for.

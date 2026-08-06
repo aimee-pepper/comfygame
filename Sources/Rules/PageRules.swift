@@ -302,6 +302,9 @@ extension PageRules {
             // Self-contained marks — compounds and whole-statement runes — say what they say.
             result += group.sorted { $0.id.rawValue < $1.id.rawValue }.flatMap(\.sigils)
 
+            // **The target sigil is mandatory** (Aimee, 5 Aug). It's the anchor of the cluster,
+            // and a cluster without one says nothing at all — sources with nothing to push on are
+            // words with no sentence around them.
             guard let target = group.compactMap(\.targetID).min(by: { $0.rawValue < $1.rawValue })
             else { continue }
 
@@ -334,6 +337,32 @@ extension PageRules {
         case "overwhelming": return .overwhelming
         default: return .moderate
         }
+    }
+
+    /// The Scale rung a source is written at, if any.
+    ///
+    /// Scale was already in the vocabulary and already placeable — it just wasn't being read.
+    /// Nothing new is needed for world size; this is the reading.
+    static func scale(qualifying mark: PlacedRune, on page: Page) -> QualifierDef? {
+        qualifiers(on: mark.id, page: page).first { $0.ladder == .scale }
+    }
+
+    /// How much world a page asks for.
+    ///
+    /// **Scale attached to the source that shapes the land** (decisions-session-13 §5). Written
+    /// nowhere, the world is ordinary; written on the Relief cluster's source, it's whatever you
+    /// said. Size costs page cells like any other sigil *and* costs stability, which is what makes
+    /// a vast world a greed-shaped decision rather than a free upgrade.
+    static func worldScale(of page: Page) -> WorldScale {
+        for group in clusters(on: page) {
+            guard group.contains(where: { $0.targetID == "relief" }) else { continue }
+            for mark in group where mark.sourceID != nil {
+                if let rung = scale(qualifying: mark, on: page) {
+                    return WorldScale(rung: rung.id) ?? .ordinary
+                }
+            }
+        }
+        return .ordinary
     }
 
     /// Qualifiers joined to a mark, whatever ladder they're on.

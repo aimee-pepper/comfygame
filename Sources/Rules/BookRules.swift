@@ -23,7 +23,9 @@ enum BookRules {
     /// you *didn't* say is rolled at resolution by `PressureRules.rollUnwritten`. Under-specifying
     /// is still a surprise — it just isn't counted in slots any more.
     static func resolveBook(page: Page) -> BoundBook {
-        var book = BoundBook(written: page.symbolIDs, essencePaid: 0)
+        var book = BoundBook(written: page.symbolIDs,
+                             scale: PageRules.worldScale(of: page),
+                             essencePaid: 0)
         book.essencePaid = bindCost(of: book)
         return book
     }
@@ -149,7 +151,11 @@ enum BookRules {
     }
 
     static func stabilityScore(of book: BoundBook) -> Int {
-        stabilityScore(delta: stabilityDelta(of: book) - contradictionPenalty(of: book))
+        // Size is written, and writing more world costs — a vast world needs more turns to cross,
+        // so it has to buy them (decisions-session-13 §5).
+        stabilityScore(delta: stabilityDelta(of: book)
+                       + book.scale.stabilityDelta
+                       - contradictionPenalty(of: book))
     }
 
     /// What a book's contradictions cost it, in the headline's own units.

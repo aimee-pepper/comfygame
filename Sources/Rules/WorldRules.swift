@@ -30,6 +30,8 @@ enum WorldRules {
         case enemySighted(CreatureID)
         case encounterBegan
         case crossedThreshold(StabilityBand)
+        case nightfall
+        case daybreak
         case tilesCrumbled(Int)
         case lostToCrumbling(Int)
         case collapsed
@@ -52,6 +54,14 @@ enum WorldRules {
     static func visionRadius(for book: BoundBook) -> Int {
         let delta = book.allSymbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.visionDelta ?? 0) }
         return max(Tuning.World.minimumVisionRadius, Tuning.World.baseVisionRadius + delta)
+    }
+
+    /// Sight, after the dark has taken its share. **Darkness cuts sight** (session 13 §6) — which is
+    /// what makes a world with blazing days and black nights genuinely play as two worlds.
+    static func visionRadius(in run: WorldRun) -> Int {
+        let base = visionRadius(for: run.book)
+        guard run.isNight else { return base }
+        return max(Tuning.World.minimumVisionRadius, base - Tuning.DayNight.sightLostAtNight)
     }
 
     static func reveal(around point: GridPoint, in map: inout WorldMap, radius: Int) {
@@ -130,7 +140,7 @@ enum WorldRules {
         var events: [Event] = [.moved(to: destination)]
         run.previousPosition = run.playerPosition
         run.playerPosition = destination
-        reveal(around: destination, in: &run.map, radius: visionRadius(for: run.book))
+        reveal(around: destination, in: &run.map, radius: visionRadius(in: run))
 
         // Whatever is underfoot resolves before the world takes its turn.
         switch run.map[destination].content {
@@ -273,13 +283,37 @@ enum WorldRules {
         return events
     }
 
+    /// What replaces a creature when the roster turns over at nightfall.
+    ///
+    /// The world doesn't repopulate — the things that were out in the day go, and the things that
+    /// are out at night arrive in their place. Deterministic in the run's stream, so a resume finds
+    /// the same night.
+    static func swapRoster(in run: inout WorldRun, toNight: Bool) {
+        let table = BookRules.enemyTable(for: run.book)
+            .filter { $0.value.isNocturnal == toNight }
+        guard !table.isEmpty else { return }
+        for index in run.enemies.indices {
+            let current = ContentCatalog.shared.creature(run.enemies[index].creatureID)
+            guard current?.isNocturnal != toNight else { continue }
+            guard let replacement = run.rng.pickWeighted(table) else { continue }
+            run.enemies[index].creatureID = replacement.id
+            run.enemies[index].isAwake = false
+        }
+    }
+
     /// Everything the *world* does after the player acts. The only place a turn is consumed.
     static func advanceTurn(in state: inout GameState) -> [Event] {
         guard var run = state.worlds.activeRun else { return [] }
         var events: [Event] = []
 
         let bandBefore = run.stabilityBand
+        let wasNight = run.isNight
         run.turnsTaken += 1
+        if run.isNight != wasNight {
+            // Vision *and* spawns (session 13 §6) — the nocturnal roster swaps in.
+            swapRoster(in: &run, toNight: run.isNight)
+            events.append(run.isNight ? .nightfall : .daybreak)
+        }
 
         // Miasma and Blight: the world itself costs you, every turn, just for being in it.
         let damage = BookRules.dangerProfile(for: run.book).damagePerTurn

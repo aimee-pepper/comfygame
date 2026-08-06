@@ -22,8 +22,10 @@ enum Worldgen {
     static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState())
         -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite],
             pages: [DiaryPageID], travellers: [TravellerID], start: GridPoint) {
-        let width = Tuning.World.gridWidth
-        let height = Tuning.World.gridHeight
+        // **Size is written, not fixed** (session 13 §5). The book carries the Scale it was
+        // written at, so the same book always makes the same size of world.
+        let width = book.scale.gridSide
+        let height = book.scale.gridSide
         var map = WorldMap(
             width: width,
             height: height,

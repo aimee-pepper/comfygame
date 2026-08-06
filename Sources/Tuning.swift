@@ -105,8 +105,12 @@ enum Tuning {
     // MARK: - Worlds
 
     enum World {
-        static let gridWidth: Int = 14               // PLACEHOLDER
-        static let gridHeight: Int = 14              // PLACEHOLDER
+        /// **No longer the size of a world** — size is written, via the Scale qualifier
+        /// (session 13 §5). These remain only as the fallback for anything that has no book.
+        static let gridWidth: Int = 18               // PLACEHOLDER
+        static let gridHeight: Int = 18              // PLACEHOLDER
+        /// How many tiles of the world are on screen at once.
+        static var viewportTiles: Int { Tuning.Camera.viewportTiles }
         static let startingStability: Double = 100   // PLACEHOLDER
 
         /// **Stability is a number of steps.** Aimee's curve.
@@ -254,6 +258,23 @@ enum Tuning {
         static let perWorldCountRange = 1...3          // PLACEHOLDER
         /// Turns spent searching that are worth a haptic and a line of narration, not silence.
         static let searchRevealsContentsAt: Int = 0    // PLACEHOLDER
+    }
+
+    /// The turning of a world's day (decisions-session-13 §2 and §6).
+    enum Camera {
+        /// Tiles across the window onto the world. **[PLACEHOLDER]** — wants testing on device,
+        /// which is where session 13 says the map numbers get settled.
+        static let viewportTiles: Int = 11
+    }
+
+    enum DayNight {
+        /// Turns in a full day. Short enough that a run sees four or five turns of it, long enough
+        /// that it doesn't strobe. **[PLACEHOLDER]**
+        static let turnsPerDay: Int = 40
+        /// The share of a day that is night.
+        static let nightFraction: Double = 0.4      // PLACEHOLDER
+        /// How much of your sight the dark takes.
+        static let sightLostAtNight: Int = 1        // PLACEHOLDER
     }
 
     enum Encounter {

@@ -15,6 +15,7 @@
 		0573EFC73887107DB190A9DF /* StationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9C43310A7E6D0342B11251 /* StationViews.swift */; };
 		0A77177F80047BBE6CD74591 /* skills.json in Resources */ = {isa = PBXBuildFile; fileRef = 2C4E5B7DC86948834FDAFFF9 /* skills.json */; };
 		0D0B63ACE19B51E89D5321F8 /* TravellerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C03E6819177D7EABE894A3 /* TravellerModels.swift */; };
+		10EA98516A8B4CB4C9379D71 /* MinimapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D238962CB9F8B60B212D9473 /* MinimapView.swift */; };
 		11BD659A05151A43A4F78554 /* WorldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6430D823936296B085FA9EBA /* WorldTests.swift */; };
 		12DA6127DA1CEF02D5108CE9 /* SiteRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A56C2CA4EF6B5366F86828 /* SiteRules.swift */; };
 		15B201231C024A3C01DBA20A /* BookRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CC1BB415696E2B7417C43D /* BookRules.swift */; };
@@ -54,6 +55,7 @@
 		5BAABA4D069D949BB71CA216 /* WorldRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB361F4E36998C9A7F31A44 /* WorldRules.swift */; };
 		601014E078036FCE48CDAF06 /* BaseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B664EB59C95581C3098E542B /* BaseState.swift */; };
 		635C2692AD380102590270C3 /* WorldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9311ACC91B2E555993A3297 /* WorldView.swift */; };
+		66727C83C77239282A12ADBC /* WorldScaleAndNightTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A91FFF6BF680BAFC6742249 /* WorldScaleAndNightTests.swift */; };
 		6D8D7D57D683FAA42DFD1B9F /* DescriptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3EB5122AA82F1610E51A10F /* DescriptionTests.swift */; };
 		6FDB8C79745125AEC66E0C4C /* BaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346EEEC616B8EBFE291C4A79 /* BaseView.swift */; };
 		7334C8A4D81258A4C7FA0885 /* SeededRNG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7294A9FAF1EE19D44BD7C56D /* SeededRNG.swift */; };
@@ -197,6 +199,7 @@
 		92E6DEE432F7A225C5C28D6E /* DescriptionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionRules.swift; sourceTree = "<group>"; };
 		961E1AC7BEB7E7C4C243CAD1 /* ExclusivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExclusivityTests.swift; sourceTree = "<group>"; };
 		99D023496EC834EA78E9BE63 /* CombatRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatRules.swift; sourceTree = "<group>"; };
+		9A91FFF6BF680BAFC6742249 /* WorldScaleAndNightTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldScaleAndNightTests.swift; sourceTree = "<group>"; };
 		9C7793CAA2915E078E230E6D /* contradictions.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = contradictions.json; sourceTree = "<group>"; };
 		9F9F6F9740167F61E0AD0158 /* descriptions.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = descriptions.json; sourceTree = "<group>"; };
 		A29A4F3CFC9073B8F80064F4 /* pressure_sources.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pressure_sources.json; sourceTree = "<group>"; };
@@ -221,6 +224,7 @@
 		CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LootDecisionView.swift; sourceTree = "<group>"; };
 		CFFBF656255758DFA8E45232 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCatalog.swift; sourceTree = "<group>"; };
+		D238962CB9F8B60B212D9473 /* MinimapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimapView.swift; sourceTree = "<group>"; };
 		D2AAB75EDFEC0064219E57D4 /* PageRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageRules.swift; sourceTree = "<group>"; };
 		D3EB5122AA82F1610E51A10F /* DescriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionTests.swift; sourceTree = "<group>"; };
 		D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleBuilderView.swift; sourceTree = "<group>"; };
@@ -310,6 +314,7 @@
 				F1B71324BA8EC6B7B6732500 /* GearView.swift */,
 				2CBCB8652F20B361959F9B5C /* LibraryView.swift */,
 				CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */,
+				D238962CB9F8B60B212D9473 /* MinimapView.swift */,
 				39D5618B6B6F36DB62CD836B /* PageGridView.swift */,
 				36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */,
 				56CE9E9A2ED4242F8C480AEF /* ResearchTreeLayout.swift */,
@@ -454,6 +459,7 @@
 				83F481D57E05D77B109D44FC /* SaveToleranceTests.swift */,
 				E1BB569F0B672F268545701C /* SiteTests.swift */,
 				C110827C995BC018EA20B47F /* SpilloverTests.swift */,
+				9A91FFF6BF680BAFC6742249 /* WorldScaleAndNightTests.swift */,
 				6430D823936296B085FA9EBA /* WorldTests.swift */,
 			);
 			path = Tests;
@@ -620,6 +626,7 @@
 				AAFAB01A37942E4A425FE909 /* LibraryView.swift in Sources */,
 				CF22F5AA092E017612B1124E /* LootDecisionView.swift in Sources */,
 				A30BFB516414E49CB79270EF /* Migrations.swift in Sources */,
+				10EA98516A8B4CB4C9379D71 /* MinimapView.swift in Sources */,
 				B3127BCE033E785E4B3EA912 /* Page.swift in Sources */,
 				A7B958AF227E4AD7A6E2E900 /* PageGridView.swift in Sources */,
 				F9A397FEF26E5A194578909E /* PageRules.swift in Sources */,
@@ -678,6 +685,7 @@
 				FD37C3AEB89A41F874759D37 /* SaveToleranceTests.swift in Sources */,
 				5BA053D5F38A0AE4F9E782C3 /* SiteTests.swift in Sources */,
 				2849825A00283A75E65E3C88 /* SpilloverTests.swift in Sources */,
+				66727C83C77239282A12ADBC /* WorldScaleAndNightTests.swift in Sources */,
 				11BD659A05151A43A4F78554 /* WorldTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
