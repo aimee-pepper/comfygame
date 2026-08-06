@@ -168,7 +168,10 @@ struct WritingDeskView: View {
                 .sorted { $0.name < $1.name }
             if !sources.isEmpty {
                 sectionLabel("Causes")
-                chips(sources.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .source($0.id)) })
+                chips(sources.map {
+                    Chip(glyph: $0.id.rawValue, name: $0.name, content: .source($0.id),
+                         stability: store.stabilityOfWriting($0.id, on: id))
+                })
             }
             let narrow = ContentCatalog.shared.qualifiers.filter { !$0.isGeneric && $0.applies(to: id) }
             if !narrow.isEmpty {
@@ -190,7 +193,8 @@ struct WritingDeskView: View {
                 sectionLabel(section.target.name)
                 chips(section.symbols.map {
                     Chip(glyph: $0.id.rawValue, name: $0.name, content: .compound($0.id),
-                         blockedBy: store.blockingPrimary(for: $0.id)?.name)
+                         blockedBy: store.blockingPrimary(for: $0.id)?.name,
+                         stability: $0.stabilityDelta)
                 })
             }
         }
@@ -231,6 +235,10 @@ struct WritingDeskView: View {
         var name: String
         var content: MarkContent
         var blockedBy: String?
+        /// **What writing this does to the meter**, if anything. Shown on the tile so a book can be
+        /// planned by reading the palette rather than by writing something, tabbing to The World to
+        /// see what it cost, and tabbing back.
+        var stability: Int?
         var id: String { glyph }
     }
 
@@ -251,11 +259,24 @@ struct WritingDeskView: View {
                             .font(.system(size: 9).weight(.medium))
                             .lineLimit(1)
                             .minimumScaleFactor(0.75)
-                        // Footprint as a bare number — the word "cells" was repeated forty times
-                        // down the screen to say something the number already says.
-                        Text(item.blockedBy == nil ? "\(store.footprint(item.content))" : "taken")
+                        // Two bare numbers: what it costs in space, and what it does to the meter.
+                        // The words were repeated forty times down the screen to say what the
+                        // numbers already say.
+                        if let blocked = item.blockedBy, !blocked.isEmpty {
+                            Text("taken")
+                                .font(.system(size: 8))
+                                .foregroundStyle(.secondary)
+                        } else {
+                            HStack(spacing: 4) {
+                                Text("\(store.footprint(item.content))")
+                                    .foregroundStyle(.secondary)
+                                if let stability = item.stability, stability != 0 {
+                                    Text(stability > 0 ? "+\(stability)" : "\(stability)")
+                                        .foregroundStyle(stability > 0 ? Color.green : Color.orange)
+                                }
+                            }
                             .font(.system(size: 8).monospacedDigit())
-                            .foregroundStyle(.secondary)
+                        }
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)

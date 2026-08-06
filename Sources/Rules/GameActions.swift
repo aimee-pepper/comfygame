@@ -108,6 +108,20 @@ extension GameStore {
         PageRules.shape(for: content, hand: state.base.bestHand)?.footprint ?? 0
     }
 
+    /// **What binding this source to that target does to the meter.**
+    ///
+    /// Shown on every palette tile, because otherwise the only way to find out what a sigil costs
+    /// is to write it, switch to The World, read the number, and switch back — for each of
+    /// forty-one sources. A book you can't plan without tabbing back and forth isn't a book you're
+    /// composing, it's one you're discovering by trial.
+    ///
+    /// Priced on its own, at moderate intensity, rather than against what's already on the page:
+    /// a number that changed depending on what else you'd written would be unlearnable, and the
+    /// point of putting it on the tile is that you come to know what a Sun costs.
+    func stabilityOfWriting(_ source: PressureSourceID, on target: PressureTargetID) -> Int {
+        BookRules.greedDelta(for: [Sigil(id: InstanceID(rawValue: 1), source: source, target: target)])
+    }
+
     // MARK: Connecting
 
     /// Join two adjacent marks. Adjacency constrains; this is the declaration of intent.

@@ -83,6 +83,14 @@ extension GameStore {
         return (nodes.count { isComplete($0) }, nodes.count)
     }
 
+    /// How many nodes in a branch you could buy **right now** — so the branch list can say which
+    /// ones are worth opening without you having to open all of them to find out.
+    func availableCount(in branch: ResearchBranchDef) -> Int {
+        ContentCatalog.shared.nodes(in: branch.id).count {
+            !isComplete($0) && isAvailable($0) && shortfall(for: $0).isEmpty
+        }
+    }
+
     // MARK: - Storehouse
 
     var unidentifiedStacks: [ItemStack] { state.base.inventory.stacks.filter { !$0.identified } }
