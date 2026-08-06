@@ -257,6 +257,29 @@ struct GearDef: Codable, Equatable, Sendable {
     var slot: GearSlot
     /// Same units the combat maths already used when research bought these numbers.
     var tier: Int
+    /// **Which corner of the weapon triangle this swings in** (combat-depth-spec §1).
+    ///
+    /// Foes have had a weapon triangle since creatures were generated; the player's weapons had no
+    /// damage type at all, so a plated bulwark and a shaggy browser were fought identically. Nil on
+    /// armour, and on anything that predates the field.
+    var damage: DamageKind?
+    /// How far it reaches. Length beats speed at the moment of contact.
+    var reach: Reach = .close
+
+    init(slot: GearSlot, tier: Int, damage: DamageKind? = nil, reach: Reach = .close) {
+        self.slot = slot
+        self.tier = tier
+        self.damage = damage
+        self.reach = reach
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        slot = try c.decode(GearSlot.self, forKey: .slot)
+        tier = try c.decodeIfPresent(Int.self, forKey: .tier) ?? 0
+        damage = try c.decodeIfPresent(DamageKind.self, forKey: .damage)
+        reach = try c.decodeIfPresent(Reach.self, forKey: .reach) ?? .close
+    }
 }
 
 /// `CodingKeyRepresentable` so `[GearSlot: ItemID]` encodes as a JSON *object* rather than the

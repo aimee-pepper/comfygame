@@ -653,3 +653,40 @@ happened, and nothing on screen explains that it's the dark that stopped it. The
 
 Flagging rather than fixing, because the fix is a design choice: either the preview names the
 constraint that bit ("nothing grows without light"), or it doesn't and learning it is the game.
+
+## Q33 — Only the companion can carry a weapon, so the matchup only half reaches the player
+
+Combat depth §1 is built: weapons carry a damage type, pierce and crush beat hard coverings, rend
+beats thick soft ones, and the encounter prints what a creature is wearing so the matchup is a read
+rather than a guess.
+
+**But `equipped` lives on `CompanionState`.** The Binder has no gear slots at all — its attack is a
+flat `Tuning` constant. The brief puts gear on the Party screen and the Binder is half the party, so
+I've read the equipped weapon as **the party's**: both of them fight with what's in Quill's slots.
+That makes the matchup reach the player's own attacks immediately, and it adds no structure.
+
+It is a reading, though, and the alternatives are yours:
+
+1. **As built** — one weapon, the party swings it. Simple, and "which weapon am I carrying" stays a
+   single decision rather than two.
+2. **The Binder gets its own slots.** More faithful to "power comes from gear", and it doubles the
+   loot that matters — but it's two weapons to think about on a phone, and the Binder's attack has
+   been a constant since the first build.
+3. **Gear stays the companion's** and the Binder is deliberately unarmed. Then the matchup only
+   ever applies to Quill's automated turns, and §1 gives the player nothing to decide — which is
+   the thing the whole spec exists to fix.
+
+## Q34 — I have not built ranks, and the spec is unsure about them too
+
+`combat-depth-spec.md` §3 proposes two ranks — front takes the attacks, back is reachable only by
+far reach or area delivery, swapping costs a turn. §7.2 calls it "the piece I'm least sure of" and
+notes that everything else in the spec reads traits that already exist while ranks are a new
+concept.
+
+**Left unbuilt deliberately.** Everything else in §1–§4 is in: damage types and the matchup, reach
+on weapons, bleed from rending, retaliation from warning colours, elemental attacks that armour
+doesn't stop. Ranks would be the first thing in the fight that isn't derived from something a
+creature or a material already is.
+
+If you want them, it's a contained piece of work. If you don't, say so and I'll strike §3 from the
+spec so it stops looking outstanding.

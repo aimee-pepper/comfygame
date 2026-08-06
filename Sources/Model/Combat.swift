@@ -166,6 +166,22 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
     var isAlive: Bool { currentHP > 0 }
     var maxHP: Int { stats.maxHP }
 
+    /// **What it's wearing, in one word.** The read that turns the damage-type matchup into a
+    /// decision rather than a guess (combat-depth-spec §6.3): plate and shell want pierce or crush,
+    /// a pelt wants rend. Nil where it isn't wearing enough to matter.
+    var coveringWord: String? {
+        guard let traits, traits.covering.coverage > Tuning.Materials.minimumCoverageToYield
+        else { return nil }
+        switch ButcheryRules.coveringMaterial(of: traits) {
+        case .plate: return "plated"
+        case .chitin: return "shelled"
+        case .quill: return "quilled"
+        case .pelt: return "furred"
+        case .down: return "downy"
+        default: return traits.covering.armourValue > 30 ? "hidebound" : nil
+        }
+    }
+
     init(id: InstanceID, creatureID: CreatureID? = nil, identityKey: String = "unknown",
          traits: CreatureTraits? = nil, stats: CombatStats, currentHP: Int,
          qualifier: String? = nil, bleedRounds: Int = 0) {

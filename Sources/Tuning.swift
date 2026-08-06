@@ -463,6 +463,13 @@ enum Tuning {
         static let armourPerCovering: Double = 0.06
         /// What a pierce attack ignores of the *party's* armour, and what pierce ignores of a foe's.
         static let pierceArmourIgnored: Double = 0.5
+        /// How much the right damage type against the right covering is worth, and how much the
+        /// wrong one costs (combat-depth-spec §1). **[PLACEHOLDER]** — big enough that the read is
+        /// worth making, small enough that a bad matchup isn't a wasted fight.
+        static let matchupBonus: Double = 0.6
+        static let matchupPenalty: Double = 0.45
+        /// Nothing is ever completely useless.
+        static let minimumMatchup: Double = 0.4
         /// Crush hits harder and slower: this much extra damage, at a cost to initiative.
         static let crushDamageBonus: Double = 0.2
         static let crushInitiativePenalty: Int = 3

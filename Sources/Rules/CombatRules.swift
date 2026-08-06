@@ -49,6 +49,47 @@ enum CombatRules {
 
     static func binderAttack(in state: GameState) -> Int { Tuning.Encounter.binderAttack }
 
+    /// **What the party is swinging.**
+    ///
+    /// The equipped weapon is the *party's* — the brief puts gear on the Party screen and the
+    /// Binder is half the party. Only the companion has slots today, so both of them fight with
+    /// what's in them; whether the Binder should carry its own is a slot addition and Aimee's call,
+    /// logged in questions-for-design.
+    static func partyDamageKind(in state: GameState) -> DamageKind? {
+        state.base.companion.equipped[.weapon]
+            .flatMap { ContentCatalog.shared.item($0)?.gear }
+            .flatMap(\.damage)
+    }
+
+    static func partyReach(in state: GameState) -> Reach {
+        state.base.companion.equipped[.weapon]
+            .flatMap { ContentCatalog.shared.item($0)?.gear }
+            .map(\.reach) ?? .close
+    }
+
+    /// **How well a damage type does against what a creature is wearing** (combat-depth-spec §1).
+    ///
+    /// | | hard covering | thick soft covering |
+    /// |---|---|---|
+    /// | **pierce** | strong — finds the gaps | weak — passes through without doing much |
+    /// | **crush** | strong — force doesn't care about plate | weak — absorbed by padding |
+    /// | **rend** | weak — can't get purchase | strong — tears |
+    ///
+    /// This is the change that closes the loop: kill a piercing creature, butcher its fang, carry a
+    /// piercing weapon, and it's good against the armoured things and wasteful against the soft
+    /// ones. **You read it off the covering word the encounter already prints.**
+    static func effectiveness(of kind: DamageKind, against covering: Covering) -> Double {
+        let hard = covering.armourValue / Tuning.Pressure.scaleMaximum
+        let padded = covering.insulation / Tuning.Pressure.scaleMaximum
+        let t = Tuning.Encounter.self
+
+        let multiplier: Double = switch kind {
+        case .pierce, .crush: 1 + hard * t.matchupBonus - padded * t.matchupPenalty
+        case .rend: 1 + padded * t.matchupBonus - hard * t.matchupPenalty
+        }
+        return max(t.minimumMatchup, multiplier)
+    }
+
     static func companionAttack(in state: GameState) -> Int {
         Tuning.Encounter.companionBaseAttack
             + state.base.companion.weaponTier * Tuning.Encounter.attackPerWeaponTier
@@ -109,11 +150,13 @@ enum CombatRules {
 
         switch action {
         case .attack(let foeID):
-            strike(foeID, damage: baseAttack(of: actor, in: state), by: actor, run: &run, encounter: &encounter)
+            strike(foeID, damage: baseAttack(of: actor, in: state), by: actor,
+                   kind: partyDamageKind(in: state), run: &run, encounter: &encounter)
 
         case .damageSkill(let foeID):
             if let skill = skill(for: actor), isSkillReady(for: actor, in: encounter) {
-                strike(foeID, damage: skill.power, by: actor, run: &run, encounter: &encounter, verb: skill.name)
+                strike(foeID, damage: skill.power, by: actor, kind: partyDamageKind(in: state),
+                       run: &run, encounter: &encounter, verb: skill.name)
                 setCooldown(skill.cooldownRounds, for: actor, in: &encounter)
             }
 
@@ -155,6 +198,7 @@ enum CombatRules {
     private static func strike(_ foeID: InstanceID,
                                damage: Int,
                                by actor: Combatant,
+                               kind: DamageKind?,
                                run: inout WorldRun,
                                encounter: inout EncounterState,
                                verb: String? = nil) {
@@ -171,9 +215,13 @@ enum CombatRules {
             return
         }
 
-        // Armour soaks. Never to nothing — a hit always does something.
-        let raw = roll(around: damage, run: &run)
-        let amount = max(Tuning.Encounter.minimumDamage, raw - foe.stats.armour)
+        // **The matchup.** What you're swinging against what it's wearing, then armour on what's
+        // left — and a piercing weapon goes through a share of that armour rather than all of it.
+        let matchup = kind.map { effectiveness(of: $0, against: foe.traits?.covering ?? Covering()) } ?? 1
+        let raw = Int((Double(roll(around: damage, run: &run)) * matchup).rounded())
+        let ignored = kind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0
+        let armour = Int((Double(foe.stats.armour) * (1 - ignored)).rounded())
+        let amount = max(Tuning.Encounter.minimumDamage, raw - armour)
         encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
 
         let soaked = raw - amount
@@ -182,6 +230,12 @@ enum CombatRules {
         let note = verb.map { "\(who) — \($0) — \(hits) \(name) for \(amount)." }
             ?? "\(who) \(hits) \(name) for \(amount)."
         encounter.note(soaked > 1 ? note + " Its \(armourWord(for: foe)) takes the rest." : note)
+
+        // Rending tears: the wound goes on costing it after the blow. This is what finally makes
+        // `bleedRounds` live on the foe's side of the fight rather than only on yours.
+        if kind == .rend, encounter.foes[index].isAlive {
+            encounter.foes[index].bleedRounds = Tuning.Encounter.bleedRounds
+        }
 
         // **Warning colours are honest.** Hitting something that advertises costs you.
         if foe.stats.retaliation > 0, encounter.foes[index].isAlive {

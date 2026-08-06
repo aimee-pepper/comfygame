@@ -310,6 +310,13 @@ private struct FoeCard: View {
                 Spacer(minLength: 0)
             }
             HealthBar(current: foe.currentHP, max: foe.maxHP, tint: .red)
+            // **What it's wearing.** Your weapon's damage type is worth more or less against it,
+            // and this is the read that makes choosing one a decision rather than a guess.
+            if let covering = foe.coveringWord {
+                Text(covering)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding(10)
         .frame(minHeight: 60)

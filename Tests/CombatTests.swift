@@ -465,4 +465,110 @@ final class CombatTests: XCTestCase {
                       "the fight opened on the creature's turn and then nobody moved")
         XCTAssertGreaterThan(encounter.log.count, 1, "the creature that went first did nothing")
     }
+
+    // MARK: - Damage types versus armour (combat-depth-spec §1)
+
+    /// **The change that closes the loop.** Pierce and crush beat hard coverings; rend beats thick
+    /// soft ones. A plated bulwark and a shaggy browser were fought identically before this.
+    func testTheRightDamageTypeIsWorthMoreThanTheWrong() {
+        var plated = CreatureTraits()
+        plated.covering = Covering(hardness: 95, length: 5, coverage: 95)
+        var furred = CreatureTraits()
+        furred.covering = Covering(hardness: 5, length: 95, coverage: 95)
+
+        XCTAssertGreaterThan(CombatRules.effectiveness(of: .pierce, against: plated.covering),
+                             CombatRules.effectiveness(of: .rend, against: plated.covering),
+                             "rending a plated thing did as well as piercing it")
+        XCTAssertGreaterThan(CombatRules.effectiveness(of: .rend, against: furred.covering),
+                             CombatRules.effectiveness(of: .pierce, against: furred.covering),
+                             "piercing a pelt did as well as tearing it")
+        XCTAssertGreaterThan(CombatRules.effectiveness(of: .crush, against: plated.covering), 1)
+    }
+
+    /// A bad matchup is wasteful, never useless — a fight you can't win with what you brought is a
+    /// dead end rather than a decision.
+    func testNoMatchupIsEverCompletelyUseless() {
+        var plated = CreatureTraits()
+        plated.covering = Covering(hardness: 100, length: 100, coverage: 100)
+        for kind in DamageKind.allCases {
+            XCTAssertGreaterThanOrEqual(CombatRules.effectiveness(of: kind, against: plated.covering),
+                                        Tuning.Encounter.minimumMatchup)
+        }
+    }
+
+    /// Something wearing nothing much doesn't care what you're swinging.
+    func testABareCreatureIsIndifferentToWhatYouSwing() {
+        let bare = Covering(hardness: 0, length: 0, coverage: 10)
+        let spread = DamageKind.allCases.map { CombatRules.effectiveness(of: $0, against: bare) }
+        XCTAssertEqual(spread.max()! - spread.min()!, 0, accuracy: 0.05)
+    }
+
+    /// The read that makes the matchup a decision: the encounter says what it's wearing.
+    func testTheEncounterSaysWhatItIsWearing() {
+        var plated = CreatureTraits()
+        plated.covering = Covering(hardness: 90, length: 5, coverage: 90)
+        let foe = FoeState(id: InstanceID(rawValue: 1), traits: plated,
+                           stats: CombatStats.derived(from: plated, name: "x", icon: "y"),
+                           currentHP: 10)
+        XCTAssertEqual(foe.coveringWord, "plated")
+
+        var furred = CreatureTraits()
+        furred.covering = Covering(hardness: 5, length: 90, coverage: 90)
+        let soft = FoeState(id: InstanceID(rawValue: 2), traits: furred,
+                            stats: CombatStats.derived(from: furred, name: "x", icon: "y"),
+                            currentHP: 10)
+        XCTAssertEqual(soft.coveringWord, "furred")
+    }
+
+    /// The party's weapon carries its type into the fight, and a rending one leaves a wound.
+    func testARendingWeaponLeavesAWoundOnTheThingYouHit() throws {
+        var thick = CreatureTraits()
+        thick.size = 60
+        thick.covering = Covering(hardness: 5, length: 90, coverage: 90)
+        let store = inFightWith([thick])
+        store.mutate("carry something that tears") { state in
+            state.base.companion.equipped[.weapon] = "blade_chipped"   // rend
+        }
+        let foe = try XCTUnwrap(foes(store).first)
+        store.takeCombatAction(.attack(foe: foe.id))
+
+        XCTAssertTrue(foes(store).first?.bleedRounds ?? 0 > 0 || foes(store).first?.isAlive == false,
+                      "a rending weapon left no wound")
+    }
+
+    /// A piercing weapon goes through a share of plate rather than all of it.
+    func testPiercingGoesThroughSomeOfWhatItIsWearing() throws {
+        var plated = CreatureTraits()
+        plated.size = 70
+        plated.covering = Covering(hardness: 95, length: 5, coverage: 95)
+
+        func damageDealt(with weapon: ItemID?) throws -> Int {
+            let store = inFightWith([plated])
+            store.mutate("equip") { $0.base.companion.equipped[.weapon] = weapon }
+            let foe = try XCTUnwrap(foes(store).first)
+            let before = foe.currentHP
+            store.takeCombatAction(.attack(foe: foe.id))
+            return before - (foes(store).first?.currentHP ?? 0)
+        }
+
+        // Averaged over the damage wobble, piercing plate has to beat tearing at it.
+        var pierce = 0, rend = 0
+        for _ in 0..<12 {
+            pierce += try damageDealt(with: "blade_keen")
+            rend += try damageDealt(with: "blade_chipped")
+        }
+        XCTAssertGreaterThan(pierce, rend, "piercing a plated thing did no better than tearing it")
+    }
+
+    /// Gear written before weapons had a type still loads.
+    func testGearWithNoDamageTypeStillLoads() throws {
+        let json = """
+        {"slot": "weapon", "tier": 2}
+        """
+        let gear = try SaveCodec.makeDecoder().decode(GearDef.self, from: Data(json.utf8))
+        XCTAssertNil(gear.damage)
+        XCTAssertEqual(gear.reach, .close)
+        XCTAssertEqual(gear.tier, 2)
+    }
+
 }

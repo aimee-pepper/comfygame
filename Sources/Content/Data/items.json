@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER \u2014 the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed).",
+  "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). Weapons carry a damage type and a reach (combat-depth-spec §1): pierce and crush beat hard coverings, rend beats thick soft ones, and the covering word the encounter prints is the read that makes the matchup a decision rather than a guess. PLACEHOLDER assignments — which weapon is which corner is content.",
   "items": [
     {
       "id": "curio_humming_shard",
@@ -9,7 +9,7 @@
       "blurb": "It hums when you are not listening.",
       "kind": "curio",
       "identifiesInto": "salve_lesser",
-      "unidentifiedName": "A humming shard\u2026"
+      "unidentifiedName": "A humming shard…"
     },
     {
       "id": "curio_bound_knot",
@@ -19,7 +19,7 @@
       "blurb": "Tied by someone who meant it to stay tied.",
       "kind": "curio",
       "identifiesInto": "cache_key",
-      "unidentifiedName": "A knot of something\u2026"
+      "unidentifiedName": "A knot of something…"
     },
     {
       "id": "salve_lesser",
@@ -46,7 +46,9 @@
       "kind": "gear",
       "gear": {
         "slot": "weapon",
-        "tier": 1
+        "tier": 1,
+        "damage": "rend",
+        "reach": "close"
       }
     },
     {
@@ -58,7 +60,9 @@
       "kind": "gear",
       "gear": {
         "slot": "weapon",
-        "tier": 2
+        "tier": 2,
+        "damage": "pierce",
+        "reach": "close"
       }
     },
     {
@@ -70,7 +74,9 @@
       "kind": "gear",
       "gear": {
         "slot": "weapon",
-        "tier": 3
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "mid"
       }
     },
     {
