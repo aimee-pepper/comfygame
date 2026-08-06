@@ -47,24 +47,32 @@ enum CombatRules {
 
     // MARK: Party numbers
 
-    static func binderAttack(in state: GameState) -> Int { Tuning.Encounter.binderAttack }
-
-    /// **What the party is swinging.**
-    ///
-    /// The equipped weapon is the *party's* — the brief puts gear on the Party screen and the
-    /// Binder is half the party. Only the companion has slots today, so both of them fight with
-    /// what's in them; whether the Binder should carry its own is a slot addition and Aimee's call,
-    /// logged in questions-for-design.
-    static func partyDamageKind(in state: GameState) -> DamageKind? {
-        state.base.companion.equipped[.weapon]
-            .flatMap { ContentCatalog.shared.item($0)?.gear }
-            .flatMap(\.damage)
+    /// **What each of them is wearing.** The Binder has its own slots (Aimee, 5 Aug) — it's half
+    /// the party, and an attack that was a `Tuning` constant meant the damage-type matchup never
+    /// reached the player's own turns, which is the whole point of giving weapons a type.
+    static func equipped(_ slot: GearSlot, for actor: Combatant, in state: GameState) -> GearDef? {
+        let worn: ItemID? = switch actor {
+        case .binder: state.base.binderEquipped[slot]
+        case .companion: state.base.companion.equipped[slot]
+        case .foe: nil
+        }
+        return worn.flatMap { ContentCatalog.shared.item($0)?.gear }
     }
 
-    static func partyReach(in state: GameState) -> Reach {
-        state.base.companion.equipped[.weapon]
-            .flatMap { ContentCatalog.shared.item($0)?.gear }
-            .map(\.reach) ?? .close
+    static func binderAttack(in state: GameState) -> Int {
+        Tuning.Encounter.binderAttack
+            + (equipped(.weapon, for: .binder, in: state)?.tier ?? 0) * Tuning.Encounter.attackPerWeaponTier
+    }
+
+    /// **What this one is swinging.** Each party member's own weapon decides the matchup, so
+    /// carrying a piercing blade while Quill carries a rending one is a real answer to a world that
+    /// grew both plated and furred things.
+    static func damageKind(for actor: Combatant, in state: GameState) -> DamageKind? {
+        equipped(.weapon, for: actor, in: state)?.damage
+    }
+
+    static func reach(for actor: Combatant, in state: GameState) -> Reach {
+        equipped(.weapon, for: actor, in: state)?.reach ?? .close
     }
 
     /// **How well a damage type does against what a creature is wearing** (combat-depth-spec §1).
@@ -102,8 +110,10 @@ enum CombatRules {
     /// the weapon triangle exists: the same armour is worth more against some things than others.
     static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
                             armourIgnored: Double = 0) -> Int {
-        guard actor == .companion else { return max(Tuning.Encounter.minimumDamage, raw) }
-        let armour = Double(state.base.companion.armorTier * Tuning.Encounter.defencePerArmorTier)
+        // **Both of them wear armour now.** Only the companion's counted before, so the Binder
+        // stood in whatever a world threw at it wearing nothing at all.
+        let tier = equipped(.armor, for: actor, in: state)?.tier ?? 0
+        let armour = Double(tier * Tuning.Encounter.defencePerArmorTier)
         let effective = Int((armour * (1 - armourIgnored)).rounded())
         return max(Tuning.Encounter.minimumDamage, raw - effective)
     }
@@ -151,11 +161,11 @@ enum CombatRules {
         switch action {
         case .attack(let foeID):
             strike(foeID, damage: baseAttack(of: actor, in: state), by: actor,
-                   kind: partyDamageKind(in: state), run: &run, encounter: &encounter)
+                   kind: damageKind(for: actor, in: state), run: &run, encounter: &encounter)
 
         case .damageSkill(let foeID):
             if let skill = skill(for: actor), isSkillReady(for: actor, in: encounter) {
-                strike(foeID, damage: skill.power, by: actor, kind: partyDamageKind(in: state),
+                strike(foeID, damage: skill.power, by: actor, kind: damageKind(for: actor, in: state),
                        run: &run, encounter: &encounter, verb: skill.name)
                 setCooldown(skill.cooldownRounds, for: actor, in: &encounter)
             }
@@ -548,6 +558,26 @@ enum CombatRules {
                 found.append(contentsOf: butcher(traits, named: foe.stats.displayName,
                                                  qualifier: foe.qualifier, run: &run))
             }
+            // **Gear drops too** (Aimee, 5 Aug). Sites were the only source, so a run that fought
+            // its way across a world and found no ruin came home with nothing to wear — and now
+            // that weapons carry a damage type, what you're carrying is the decision a fight is
+            // supposed to reward.
+            if run.rng.chance(Tuning.Economy.gearDropChance * Double(tier)) {
+                let gear = ContentCatalog.shared.items
+                    .filter { $0.kind == .gear && ($0.gear?.tier ?? 0) <= tier + 1 }
+                    .map(\.id).sorted { $0.rawValue < $1.rawValue }
+                if let piece = run.rng.pick(gear) {
+                    let name = ContentCatalog.shared.item(piece)?.name ?? "Something worn"
+                    let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()), catalogID: piece)
+                    if run.satchelItems.add(stack) {
+                        found.append(name)
+                    } else {
+                        run.offeredItems.append(stack)
+                        found.append("\(name) — no room; waiting on you")
+                    }
+                }
+            }
+
             // Curios drop unidentified — this is where keys enter the world, one identify and one
             // long walk before they open anything.
             if run.rng.chance(Tuning.Economy.curioDropChance) {

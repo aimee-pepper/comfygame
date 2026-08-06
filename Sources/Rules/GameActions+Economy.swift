@@ -222,13 +222,21 @@ extension GameStore {
         }
     }
 
+    /// What each of them is wearing. **Both carry their own** (Aimee, 5 Aug).
+    func worn(_ slot: GearSlot, by member: PartyMember) -> ItemID? {
+        switch member {
+        case .binder: state.base.binderEquipped[slot]
+        case .companion: state.base.companion.equipped[slot]
+        }
+    }
+
     /// What wearing this would change, in the units the fight actually uses.
     ///
     /// A tier number only answers "is this better?" if you already know the formula. This answers
     /// it directly: **+4 damage**, or **−2 protection**, or no change at all.
-    func gearDelta(wearing candidate: ItemDef) -> Int {
+    func gearDelta(wearing candidate: ItemDef, for member: PartyMember) -> Int {
         guard let gear = candidate.gear else { return 0 }
-        let wornTier = state.base.companion.equipped[gear.slot]
+        let wornTier = worn(gear.slot, by: member)
             .flatMap { ContentCatalog.shared.item($0)?.gear?.tier } ?? 0
         let step = gear.slot == .weapon
             ? Tuning.Encounter.attackPerWeaponTier
@@ -238,24 +246,41 @@ extension GameStore {
 
     /// Whether anything in the Storehouse would be an upgrade — drives the nudge on the Party card
     /// so a better blade doesn't sit in a list going unnoticed.
-    func hasUpgradeAvailable(for slot: GearSlot) -> Bool {
+    func hasUpgradeAvailable(for slot: GearSlot, member: PartyMember) -> Bool {
         wearable(in: slot).contains { stack in
             guard let item = ContentCatalog.shared.item(stack.catalogID) else { return false }
-            return gearDelta(wearing: item) > 0
+            // Something already on somebody else isn't an upgrade waiting to be noticed.
+            guard !isWornByAnyone(stack.catalogID) || worn(slot, by: member) == stack.catalogID
+            else { return false }
+            return gearDelta(wearing: item, for: member) > 0
         }
     }
 
-    /// Put something on. The piece it replaces goes back to the Storehouse rather than vanishing.
-    func equip(_ stack: ItemStack) {
+    /// Whether a piece is already on one of them. Two people can't wear the same sword.
+    func isWornByAnyone(_ id: ItemID) -> Bool {
+        state.base.binderEquipped.values.contains(id) || state.base.companion.equipped.values.contains(id)
+    }
+
+    /// Put something on. The piece it replaces goes back to the Storehouse rather than vanishing,
+    /// and it comes off whoever else was wearing it — there is only one of each.
+    func equip(_ stack: ItemStack, on member: PartyMember) {
         guard let slot = ContentCatalog.shared.item(stack.catalogID)?.gear?.slot else { return }
         mutate("equip \(stack.catalogID.rawValue)", flush: true) { state in
-            state.base.companion.equipped[slot] = stack.catalogID
+            if state.base.binderEquipped[slot] == stack.catalogID { state.base.binderEquipped[slot] = nil }
+            if state.base.companion.equipped[slot] == stack.catalogID { state.base.companion.equipped[slot] = nil }
+            switch member {
+            case .binder: state.base.binderEquipped[slot] = stack.catalogID
+            case .companion: state.base.companion.equipped[slot] = stack.catalogID
+            }
         }
     }
 
-    func unequip(_ slot: GearSlot) {
+    func unequip(_ slot: GearSlot, from member: PartyMember) {
         mutate("unequip \(slot.rawValue)", flush: true) { state in
-            state.base.companion.equipped[slot] = nil
+            switch member {
+            case .binder: state.base.binderEquipped[slot] = nil
+            case .companion: state.base.companion.equipped[slot] = nil
+            }
         }
     }
 }

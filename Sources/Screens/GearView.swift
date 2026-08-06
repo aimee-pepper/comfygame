@@ -10,9 +10,10 @@ struct GearView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     let slot: GearSlot
+    let member: PartyMember
 
     private var worn: ItemDef? {
-        store.state.base.companion.equipped[slot].flatMap { ContentCatalog.shared.item($0) }
+        store.worn(slot, by: member).flatMap { ContentCatalog.shared.item($0) }
     }
 
     var body: some View {
@@ -41,7 +42,7 @@ struct GearView: View {
                     }
                     ForEach(options, id: \.stack.id) { option in
                         Button {
-                            store.equip(option.stack)
+                            store.equip(option.stack, on: member)
                             dismiss()
                         } label: {
                             row(for: option.stack, definition: option.definition, isWorn: false)
@@ -55,7 +56,7 @@ struct GearView: View {
                 if worn != nil {
                     Section {
                         Button("Take it off", role: .destructive) {
-                            store.unequip(slot)
+                            store.unequip(slot, from: member)
                             dismiss()
                         }
                         .frame(minHeight: 44)
@@ -104,7 +105,7 @@ struct GearView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             } else {
-                ImprovementBadge(delta: store.gearDelta(wearing: definition), slot: slot)
+                ImprovementBadge(delta: store.gearDelta(wearing: definition, for: member), slot: slot)
             }
         }
         .frame(minHeight: 44)

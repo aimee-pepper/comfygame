@@ -154,13 +154,32 @@ final class ContentTests: XCTestCase {
     }
 
     /// Tier counts upgrades purchased, so a fresh Storehouse (tier 0) grants no bonus slots.
-    func testInventoryStartsAtEightSlotsAndGrowsPerStorehouseTier() {
+    ///
+    /// The brief's literal eight is superseded — **way more slots, and far more upgrades** (Aimee,
+    /// 5 Aug), because three tiers of four capped the hold at twenty forever and that fights the
+    /// hoarding pillar outright. What's pinned here is the shape, not a number that moves.
+    func testInventoryStartsWorkableAndGrowsPerStorehouseTier() {
         var base = BaseState.newGame()
-        XCTAssertEqual(base.inventory.slots, 8, "The brief specifies 8 starting inventory slots")
+        let starting = base.inventory.slots
+        XCTAssertEqual(starting, Tuning.Economy.startingInventorySlots)
+        XCTAssertGreaterThanOrEqual(starting, 8, "a fresh hold should never be smaller than the brief's")
 
         base.stations[Stations.storehouse] = StationState(isUnlocked: true, tier: 2)
         base.syncInventoryCapacity()
-        XCTAssertEqual(base.inventory.slots, 8 + 2 * Tuning.Economy.inventorySlotsPerStorehouseTier)
+        XCTAssertEqual(base.inventory.slots,
+                       starting + 2 * Tuning.Economy.inventorySlotsPerStorehouseTier)
+    }
+
+    /// **The hold has to end up big enough to hoard in.** A ladder that tops out at twenty slots is
+    /// a ladder you finish in an hour and never think about again.
+    @MainActor
+    func testAFullyUpgradedHoldIsWorthHoardingIn() {
+        let rungs = ContentCatalog.shared.nodes(in: "hold").count { node in
+            node.grants.contains { $0.effect == .storehouseTier }
+        }
+        let full = Tuning.Economy.startingInventorySlots
+            + rungs * Tuning.Economy.inventorySlotsPerStorehouseTier
+        XCTAssertGreaterThan(full, 60, "a fully-studied storehouse still only holds \(full)")
     }
 
     func testStationMaxTiersAreReachable() {

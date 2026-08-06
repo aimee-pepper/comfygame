@@ -545,12 +545,15 @@ enum Tuning {
 
     enum Economy {
         static let startingEssence: Int = 40         // PLACEHOLDER
-        static let startingInventorySlots: Int = 8   // PLACEHOLDER
-        static let inventorySlotsPerStorehouseTier: Int = 4 // PLACEHOLDER
+        /// **Far more room than it used to be** (Aimee, 5 Aug). Eight slots and four per tier
+        /// capped the storehouse at twenty forever, which fights the hoarding pillar outright.
+        static let startingInventorySlots: Int = 16  // PLACEHOLDER
+        static let inventorySlotsPerStorehouseTier: Int = 6 // PLACEHOLDER
         /// The satchel is what you carry INTO a world, and is deliberately smaller than home
-        /// storage — the gap is what forces "keep it or leave it" (decisions-log session 2).
-        static let startingSatchelSlots: Int = 4    // PLACEHOLDER
-        static let satchelSlotsPerTier: Int = 2     // PLACEHOLDER
+        /// storage — the gap is what forces "keep it or leave it" (decisions-log session 2). It
+        /// still grows a long way, or the decision is made for you every single run.
+        static let startingSatchelSlots: Int = 8    // PLACEHOLDER
+        static let satchelSlotsPerTier: Int = 3     // PLACEHOLDER
         static let identifyCostEssence: Int = 5      // PLACEHOLDER
         /// Raw essence refines into this much essence at the Workshop. The join between what
         /// worlds give you and what the base runs on.
@@ -564,6 +567,9 @@ enum Tuning {
 
         /// Chance a won encounter drops an unidentified curio.
         static let curioDropChance: Double = 0.35    // PLACEHOLDER
+        /// Chance a won encounter drops something to wear, **per tier of what you fought**. Sites
+        /// were the only source of gear, so a run that found no ruin came home with nothing.
+        static let gearDropChance: Double = 0.12     // PLACEHOLDER
         /// Essence Spring trickle, credited on each return from a run (in-session event only —
         /// never wall-clock; see pillar 2).
         static let essenceSpringPerReturn: [Int] = [3, 7] // PLACEHOLDER — index = tier - 1

@@ -53,6 +53,14 @@ struct BaseState: Codable, Equatable, Sendable {
     /// The companion's gambit list. Edited on the Party screen, out of combat only.
     var companion: CompanionState = CompanionState()
 
+    /// **What the Binder is wearing** (Aimee, 5 Aug).
+    ///
+    /// Its own slots, separate from Quill's. The Binder is half the party and the brief says power
+    /// comes from gear — an attack that was a `Tuning` constant while the companion had a sword
+    /// meant the damage-type matchup never reached the player's own turns, which is the whole point
+    /// of giving weapons a type at all.
+    var binderEquipped: [GearSlot: ItemID] = [:]
+
     /// Purchased at the Workshop. Until then the Binder is manual every turn.
     ///
     /// Automating yourself is *earned* — a locked design decision, and the reason this is a
@@ -137,6 +145,7 @@ struct BaseState: Codable, Equatable, Sendable {
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
         hasChainingUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) ?? false
         companion = try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()
+        binderEquipped = try container.decodeIfPresent([GearSlot: ItemID].self, forKey: .binderEquipped) ?? [:]
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
         purchasedGambitSlots = try container.decodeIfPresent(Int.self, forKey: .purchasedGambitSlots) ?? 0
@@ -187,6 +196,14 @@ struct BookDraft: Codable, Equatable, Sendable {
             validSlots.contains(slot) && catalog.symbol(symbol)?.slot == slot
         }
     }
+}
+
+/// Who's wearing it. The party is two in v0 and both of them carry their own gear.
+enum PartyMember: String, CaseIterable, Identifiable, Sendable {
+    case binder, companion
+
+    var id: String { rawValue }
+    var combatant: Combatant { self == .binder ? .binder : .companion }
 }
 
 /// The one companion in v0. Party expands in v1+, so this is a struct that can become an array

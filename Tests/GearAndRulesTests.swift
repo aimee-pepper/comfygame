@@ -26,12 +26,12 @@ final class GearAndRulesTests: XCTestCase {
 
         let blade = ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen")
         store.mutate("test: haul it home") { $0.base.inventory.add(blade) }
-        store.equip(blade)
+        store.equip(blade, on: .companion)
 
         let tier = ContentCatalog.shared.item("blade_keen")?.gear?.tier
         XCTAssertEqual(store.state.base.companion.weaponTier, tier)
 
-        store.unequip(.weapon)
+        store.unequip(.weapon, from: .companion)
         XCTAssertEqual(store.state.base.companion.weaponTier, 0, "taking it off left the tier behind")
     }
 
@@ -41,7 +41,7 @@ final class GearAndRulesTests: XCTestCase {
 
         let blade = ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_binders")
         store.mutate("test: haul it home") { $0.base.inventory.add(blade) }
-        store.equip(blade)
+        store.equip(blade, on: .companion)
 
         XCTAssertGreaterThan(CombatRules.companionAttack(in: store.state), bare)
     }
@@ -172,19 +172,19 @@ final class GearAndRulesTests: XCTestCase {
         let binders = try XCTUnwrap(ContentCatalog.shared.item("blade_binders"))
 
         // Nothing worn: the delta is the whole of what it gives.
-        XCTAssertEqual(store.gearDelta(wearing: chipped),
+        XCTAssertEqual(store.gearDelta(wearing: chipped, for: .companion),
                        (chipped.gear?.tier ?? 0) * Tuning.Encounter.attackPerWeaponTier)
 
         store.mutate("test: haul it home") { $0.base.inventory.add(
             ItemStack(id: InstanceID(rawValue: 1), catalogID: chipped.id)) }
-        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: chipped.id))
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: chipped.id), on: .companion)
 
         // Against something worn, it's the difference — and it matches what combat will actually do.
-        let promised = store.gearDelta(wearing: binders)
+        let promised = store.gearDelta(wearing: binders, for: .companion)
         let before = CombatRules.companionAttack(in: store.state)
         store.mutate("test: haul the better one home") { $0.base.inventory.add(
             ItemStack(id: InstanceID(rawValue: 2), catalogID: binders.id)) }
-        store.equip(ItemStack(id: InstanceID(rawValue: 2), catalogID: binders.id))
+        store.equip(ItemStack(id: InstanceID(rawValue: 2), catalogID: binders.id), on: .companion)
 
         XCTAssertEqual(CombatRules.companionAttack(in: store.state) - before, promised,
                        "the badge promised a number the fight didn't deliver")
@@ -196,21 +196,21 @@ final class GearAndRulesTests: XCTestCase {
         let poor = try XCTUnwrap(ContentCatalog.shared.item("guard_padded"))
         store.mutate("test: haul it home") { $0.base.inventory.add(
             ItemStack(id: InstanceID(rawValue: 1), catalogID: good.id)) }
-        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: good.id))
-        XCTAssertLessThan(store.gearDelta(wearing: poor), 0)
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: good.id), on: .companion)
+        XCTAssertLessThan(store.gearDelta(wearing: poor, for: .companion), 0)
     }
 
     func testTheUpgradeNudgeOnlyFiresWhenSomethingIsActuallyBetter() throws {
         let store = GameStore(io: .temporary(name: "nudge-\(UUID().uuidString)"))
-        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon), "nudged with an empty storehouse")
+        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon, member: .companion), "nudged with an empty storehouse")
 
         let best = try XCTUnwrap(ContentCatalog.shared.item("blade_binders"))
         store.mutate("test: haul it home") { $0.base.inventory.add(
             ItemStack(id: InstanceID(rawValue: 1), catalogID: best.id)) }
-        XCTAssertTrue(store.hasUpgradeAvailable(for: .weapon))
+        XCTAssertTrue(store.hasUpgradeAvailable(for: .weapon, member: .companion))
 
-        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: best.id))
-        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon),
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: best.id), on: .companion)
+        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon, member: .companion),
                        "still nudging about the thing already worn")
     }
 
@@ -240,4 +240,68 @@ final class GearAndRulesTests: XCTestCase {
                           "\(station.id.rawValue) would be invisible on an older save")
         }
     }
+
+    // MARK: - Both of them carry their own (Aimee, 5 Aug)
+
+    /// The Binder's attack was a `Tuning` constant while Quill had a sword, so **the damage-type
+    /// matchup never reached the player's own turns** — which is the whole point of giving weapons
+    /// a type at all.
+    @MainActor
+    func testTheBindersOwnWeaponReachesItsOwnAttack() throws {
+        let store = GameStore(io: .temporary(name: "binder-gear-\(UUID().uuidString)"))
+        let before = CombatRules.binderAttack(in: store.state)
+
+        let blade = try XCTUnwrap(ContentCatalog.shared.item("blade_binders"))
+        store.mutate("haul it home") { $0.base.inventory.add(
+            ItemStack(id: InstanceID(rawValue: 1), catalogID: blade.id)) }
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: blade.id), on: .binder)
+
+        XCTAssertGreaterThan(CombatRules.binderAttack(in: store.state), before)
+        XCTAssertEqual(CombatRules.damageKind(for: .binder, in: store.state), blade.gear?.damage)
+    }
+
+    /// They can carry different weapons, which is the answer to a world that grew both plated and
+    /// furred things.
+    @MainActor
+    func testTheTwoOfThemCanCarryDifferentWeapons() {
+        let store = GameStore(io: .temporary(name: "two-\(UUID().uuidString)"))
+        store.mutate("haul two home") { state in
+            state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen"))
+            state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: "blade_chipped"))
+        }
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen"), on: .binder)
+        store.equip(ItemStack(id: InstanceID(rawValue: 2), catalogID: "blade_chipped"), on: .companion)
+
+        XCTAssertEqual(CombatRules.damageKind(for: .binder, in: store.state), .pierce)
+        XCTAssertEqual(CombatRules.damageKind(for: .companion, in: store.state), .rend)
+    }
+
+    /// **There is only one of each.** Handing Quill the sword takes it off you.
+    @MainActor
+    func testOnlyOneOfThemCanWearAThingAtATime() {
+        let store = GameStore(io: .temporary(name: "one-\(UUID().uuidString)"))
+        let stack = ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen")
+        store.mutate("haul it home") { $0.base.inventory.add(stack) }
+
+        store.equip(stack, on: .binder)
+        XCTAssertEqual(store.worn(.weapon, by: .binder), "blade_keen")
+
+        store.equip(stack, on: .companion)
+        XCTAssertEqual(store.worn(.weapon, by: .companion), "blade_keen")
+        XCTAssertNil(store.worn(.weapon, by: .binder), "both of them are wearing the same sword")
+    }
+
+    /// The Binder stood in whatever a world threw at it wearing nothing at all.
+    @MainActor
+    func testTheBindersArmourActuallyProtectsIt() {
+        let store = GameStore(io: .temporary(name: "armour-\(UUID().uuidString)"))
+        let before = CombatRules.damageTaken(10, by: .binder, in: store.state)
+
+        let guardPiece = ItemStack(id: InstanceID(rawValue: 1), catalogID: "guard_vault")
+        store.mutate("haul it home") { $0.base.inventory.add(guardPiece) }
+        store.equip(guardPiece, on: .binder)
+
+        XCTAssertLessThan(CombatRules.damageTaken(10, by: .binder, in: store.state), before)
+    }
+
 }

@@ -205,9 +205,10 @@ private struct GearSlotRow: View {
     @EnvironmentObject private var store: GameStore
     @State private var isChoosing = false
     let slot: GearSlot
+    let member: PartyMember
 
     private var worn: ItemDef? {
-        store.state.base.companion.equipped[slot].flatMap { ContentCatalog.shared.item($0) }
+        store.worn(slot, by: member).flatMap { ContentCatalog.shared.item($0) }
     }
 
     var body: some View {
@@ -226,7 +227,7 @@ private struct GearSlotRow: View {
                 Spacer()
                 // The nudge: a better piece sitting unworn in the Storehouse should not be
                 // something you have to go looking for.
-                if store.hasUpgradeAvailable(for: slot) {
+                if store.hasUpgradeAvailable(for: slot, member: member) {
                     Text("something better")
                         .font(.caption2.weight(.medium))
                         .foregroundStyle(.green)
@@ -241,7 +242,7 @@ private struct GearSlotRow: View {
         }
         .buttonStyle(.plain)
         .sheet(isPresented: $isChoosing) {
-            GearView(slot: slot).environmentObject(store)
+            GearView(slot: slot, member: member).environmentObject(store)
         }
     }
 }
@@ -265,10 +266,21 @@ struct PartyView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
 
+                // **Both of them carry their own** (Aimee, 5 Aug). The Binder is half the party
+                // and power comes from gear; its attack used to be a constant while Quill had a
+                // sword, so the damage-type matchup never reached the player's own turns.
+                StationCard(title: "You", icon: "figure.stand") {
+                    LabeledRow(icon: "heart.fill", label: "Health",
+                               value: "\(Tuning.Encounter.binderMaxHP)")
+                    ForEach(GearSlot.allCases, id: \.self) { slot in
+                        GearSlotRow(slot: slot, member: .binder)
+                    }
+                }
+
                 StationCard(title: companion.name, icon: "person.fill") {
                     LabeledRow(icon: "heart.fill", label: "Health", value: "\(companion.maxHP)")
                     ForEach(GearSlot.allCases, id: \.self) { slot in
-                        GearSlotRow(slot: slot)
+                        GearSlotRow(slot: slot, member: .companion)
                     }
                 }
 
