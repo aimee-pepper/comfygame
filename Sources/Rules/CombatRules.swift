@@ -551,7 +551,13 @@ enum CombatRules {
                 ?? foe.creatureID.flatMap { ContentCatalog.shared.creature($0)?.tier }
                 ?? 1
             let amount = tier * run.rng.int(in: Tuning.Encounter.lootPerTierRange)
-            if let resource = run.rng.pickWeighted(BookRules.yieldTable(for: run.book)) {
+            // **What a world pays comes off its readings, not off a symbol's table.** The
+            // book-level table gives every resource the same flat weight, so with a real catalogue
+            // it would drop adamant off a barren world as readily as rubble — describing a world it
+            // did not generate (`audit-what-pressures-actually-do.md` §4.1). Node placement has read
+            // the pressures since that audit; kill drops hadn't caught up.
+            let paid = BookRules.yieldTable(from: BookRules.readings(for: run.book, seed: run.mapSeed))
+            if let resource = run.rng.pickWeighted(paid) {
                 run.satchel.add(amount, of: resource)
                 gained.add(amount, of: resource)
                 state.reality.discovery.recordResource(resource, runIndex: run.runIndex)

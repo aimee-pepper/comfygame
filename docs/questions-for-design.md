@@ -735,3 +735,41 @@ Rather than ship two dead buttons I've left them out and built the *mechanism* g
 with `builtBy` in `stations.json` is found-then-built, so adding either is a JSON edit plus a
 screen. **The question is whether the Tannery should take capacity upgrades off the Workshop** —
 if it should, that's a real move of an existing system and I'm not doing it unilaterally.
+
+## Q38 — A world written for life is barely alive, and it's the sources doing it
+
+Measured while wiring up the expanded resource catalogue, over 200 seeds on a book that says
+**plains + verdant + teeming_life** — as direct a request for life as the vocabulary allows:
+
+| | vitality peak |
+|---|---|
+| lowest | 0 |
+| **median** | **8** |
+| highest | 92 |
+| below 3 (effectively sterile) | **40% of worlds** |
+
+The cause is in `pressure_sources.json`, not in anything I've built:
+
+```
+teeming_life → bloom (great) + herd (moderate) + swarm (faint)
+   bloom  vitality  peak +20   producing
+   herd   vitality  peak  −5   consuming   (trophicDepth +30)
+   swarm  vitality  peak  −8   consuming   (trophicDepth +20)
+```
+
+**Two of the three sources a symbol called Teeming Life expands to are consumers**, and their
+negative peaks eat most of the producer's. As a model of a food web that's honest — consumers do
+take from producers, and they're what deepens the web. As a *symbol* it doesn't do what it says.
+
+**Not fixed unilaterally**, because the source vocabulary is design. Three ways out, all yours:
+
+1. **Consumers stop suppressing the total** — they add `trophicDepth` and take nothing off `peak`.
+   Vitality then reads as "how much is here" and trophic depth as "how complex it is", which are
+   two different questions and arguably should be.
+2. **`teeming_life` expands to producers only**, and the consumers get their own symbol. The
+   food-web model survives; the symbol stops arguing with itself.
+3. **Raise the producers** so the net clears. Smallest change, but it leaves a symbol whose parts
+   pull against each other for anyone reading the data later.
+
+This is wider than fibre. Vitality feeds the creature cast, butchery, flora when it lands, and
+every organic resource — so a median of 8 is very likely part of why play reads samey (audit #8 §3).

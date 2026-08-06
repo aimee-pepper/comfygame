@@ -1,9 +1,63 @@
 {
-  "_note": "PLACEHOLDER icons/names. Resources are stackable and never consume an inventory slot. Motes are the Reality-layer currency and bank into RealityState, not BaseState. 'drivenBy' names the pressure target whose magnitude sets how much of this a world holds; 'requires' are conditions without which there is none at all; 'favours' each multiply its share. This is what makes the eight targets generate a world rather than merely describe one (audit-what-pressures-actually-do \u00a74.1). All PLACEHOLDER.",
+  "_note": "Resources are stackable and never consume an inventory slot. Motes are the Reality-layer currency and bank into RealityState, not BaseState. 'drivenBy' names the pressure target whose magnitude sets how much of this a world holds; 'requires' are conditions without which there is none at all; 'favours' each multiply its share. THE DESIGN RULE (resources-skills-spec §1): every resource should make you want to write a particular kind of world — if two come from the same conditions, one is redundant. Which is why the exotic ones are gated behind 'requires' rather than merely favoured: an ordinary world still pays ore and fibre, and mercury is something you go and write for. 'ore' keeps its id (it is a research cost and a save key) and is the workhorse metal the spec calls Iron; a separate iron would be the same thing twice. All PLACEHOLDER.",
   "resources": [
     {
+      "id": "rubble",
+      "name": "Rubble",
+      "icon": "square.grid.3x3.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 5
+        }
+      ],
+      "favours": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "hard",
+          "minimum": 30
+        },
+        {
+          "target": "relief",
+          "measure": "peak",
+          "minimum": 30
+        }
+      ]
+    },
+    {
+      "id": "clay",
+      "name": "Clay",
+      "icon": "circle.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 5
+        }
+      ],
+      "favours": [
+        {
+          "target": "hydrology",
+          "measure": "available",
+          "minimum": 30
+        },
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "hard",
+          "maximum": 25
+        }
+      ]
+    },
+    {
       "id": "ore",
-      "name": "Ore",
+      "name": "Iron Ore",
       "icon": "cube",
       "isRealityCurrency": false,
       "drivenBy": "substrate",
@@ -30,8 +84,289 @@
       ]
     },
     {
+      "id": "copper",
+      "name": "Copper",
+      "icon": "circle.hexagongrid.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "ductile",
+          "minimum": 20
+        },
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "volatile",
+          "minimum": 12
+        }
+      ],
+      "favours": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 35
+        }
+      ]
+    },
+    {
+      "id": "silver",
+      "name": "Silver",
+      "icon": "sparkle",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 45
+        },
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "ductile",
+          "minimum": 25
+        }
+      ],
+      "favours": [
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "valuable",
+          "minimum": 1
+        },
+        {
+          "target": "substrate",
+          "measure": "aspect",
+          "key": "dispersion",
+          "maximum": 40
+        }
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "icon": "seal.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 65
+        },
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "ductile",
+          "minimum": 30
+        }
+      ],
+      "favours": [
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "valuable",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "quartz",
+      "name": "Quartz",
+      "icon": "diamond.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 38
+        },
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "hard",
+          "minimum": 30
+        }
+      ],
+      "favours": [
+        {
+          "target": "atmosphere",
+          "measure": "aspect",
+          "key": "clarity",
+          "minimum": 70
+        },
+        {
+          "target": "illumination",
+          "measure": "peak",
+          "minimum": 50
+        }
+      ]
+    },
+    {
+      "id": "obsidian",
+      "name": "Obsidian",
+      "icon": "triangle.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "hard",
+          "minimum": 25
+        },
+        {
+          "target": "thermal",
+          "measure": "peak",
+          "minimum": 55
+        }
+      ],
+      "favours": [
+        {
+          "target": "thermal",
+          "measure": "tag",
+          "key": "geothermal",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "salt",
+      "name": "Salt",
+      "icon": "cube.transparent",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "volatile",
+          "minimum": 18
+        }
+      ],
+      "favours": [
+        {
+          "target": "hydrology",
+          "measure": "aspect",
+          "key": "salinity",
+          "minimum": 45
+        },
+        {
+          "target": "hydrology",
+          "measure": "tag",
+          "key": "brine",
+          "minimum": 1
+        },
+        {
+          "target": "hydrology",
+          "measure": "available",
+          "maximum": 25
+        }
+      ]
+    },
+    {
+      "id": "sulfur",
+      "name": "Sulfur",
+      "icon": "flame.circle",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "volatile",
+          "minimum": 22
+        },
+        {
+          "target": "thermal",
+          "measure": "peak",
+          "minimum": 50
+        }
+      ],
+      "favours": [
+        {
+          "target": "thermal",
+          "measure": "tag",
+          "key": "geothermal",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "mercury",
+      "name": "Mercury",
+      "icon": "drop.circle.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 50
+        },
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "ductile",
+          "minimum": 22
+        },
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "volatile",
+          "minimum": 22
+        }
+      ],
+      "favours": [
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "valuable",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "adamant",
+      "name": "Adamant",
+      "icon": "hexagon.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 78
+        },
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "hard",
+          "minimum": 30
+        }
+      ],
+      "favours": [
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "unstable-ground",
+          "minimum": 1
+        },
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "valuable",
+          "minimum": 1
+        }
+      ]
+    },
+    {
       "id": "fiber",
-      "name": "Fiber",
+      "name": "Fibre",
       "icon": "scribble",
       "isRealityCurrency": false,
       "drivenBy": "vitality",
@@ -39,7 +374,7 @@
         {
           "target": "vitality",
           "measure": "peak",
-          "minimum": 6
+          "minimum": 3
         }
       ],
       "favours": [
@@ -47,7 +382,245 @@
           "target": "vitality",
           "measure": "aspect",
           "key": "trophicDepth",
+          "minimum": 20
+        },
+        {
+          "target": "hydrology",
+          "measure": "available",
           "minimum": 25
+        }
+      ]
+    },
+    {
+      "id": "timber",
+      "name": "Timber",
+      "icon": "rectangle.portrait.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "vitality",
+      "requires": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 25
+        }
+      ],
+      "favours": [
+        {
+          "target": "relief",
+          "measure": "aspect",
+          "key": "verticality",
+          "minimum": 40
+        },
+        {
+          "target": "hydrology",
+          "measure": "available",
+          "minimum": 30
+        }
+      ]
+    },
+    {
+      "id": "pulp",
+      "name": "Pulp",
+      "icon": "doc.plaintext",
+      "isRealityCurrency": false,
+      "drivenBy": "vitality",
+      "requires": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 18
+        }
+      ],
+      "favours": [
+        {
+          "target": "hydrology",
+          "measure": "available",
+          "minimum": 40
+        },
+        {
+          "target": "vitality",
+          "measure": "aspect",
+          "key": "trophicDepth",
+          "minimum": 30
+        }
+      ]
+    },
+    {
+      "id": "resin",
+      "name": "Resin",
+      "icon": "drop.halffull",
+      "isRealityCurrency": false,
+      "drivenBy": "vitality",
+      "requires": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 25
+        },
+        {
+          "target": "thermal",
+          "measure": "peak",
+          "minimum": 45
+        }
+      ],
+      "favours": [
+        {
+          "target": "vitality",
+          "measure": "aspect",
+          "key": "dispersion",
+          "maximum": 40
+        }
+      ]
+    },
+    {
+      "id": "toxin",
+      "name": "Toxin",
+      "icon": "drop.triangle.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "vitality",
+      "requires": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 18
+        }
+      ],
+      "favours": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "toxic",
+          "minimum": 1
+        },
+        {
+          "target": "atmosphere",
+          "measure": "tag",
+          "key": "toxic",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "spore",
+      "name": "Spore",
+      "icon": "circle.dotted",
+      "isRealityCurrency": false,
+      "drivenBy": "vitality",
+      "requires": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "fungal",
+          "minimum": 1
+        }
+      ],
+      "favours": [
+        {
+          "target": "illumination",
+          "measure": "peak",
+          "maximum": 25
+        },
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "decaying",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "reagent",
+      "name": "Reagent",
+      "icon": "testtube.2",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "form",
+          "key": "volatile",
+          "minimum": 35
+        },
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 20
+        }
+      ],
+      "favours": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "fungal",
+          "minimum": 1
+        },
+        {
+          "target": "atmosphere",
+          "measure": "tag",
+          "key": "toxic",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "ichor",
+      "name": "Ichor",
+      "icon": "drop.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "vitality",
+      "requires": [
+        {
+          "target": "vitality",
+          "measure": "peak",
+          "minimum": 38
+        }
+      ],
+      "favours": [
+        {
+          "target": "illumination",
+          "measure": "tag",
+          "key": "sourceless",
+          "minimum": 1
+        },
+        {
+          "target": "illumination",
+          "measure": "tag",
+          "key": "unexplained",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "rift_glass",
+      "name": "Rift-glass",
+      "icon": "burst.fill",
+      "isRealityCurrency": false,
+      "drivenBy": "substrate",
+      "requires": [
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "unstable-ground",
+          "minimum": 1
+        },
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "minimum": 45
+        }
+      ],
+      "favours": [
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "valuable",
+          "minimum": 1
+        },
+        {
+          "target": "cycle",
+          "measure": "tag",
+          "key": "arrhythmic",
+          "minimum": 1
         }
       ]
     },
