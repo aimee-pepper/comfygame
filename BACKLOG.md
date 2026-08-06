@@ -103,6 +103,10 @@
       small per-spawn jitter, identity derived from the vector, energy budget as the only gate.
 - [ ] **Wire the cast into worldgen** — `LifeRules` produces species and nothing spawns them yet;
       `WorldEnemy` still carries a `CreatureID` from the authored catalogue.
+- [ ] **A name generator** (Aimee, 5 Aug) — needed for creatures, flora *and* items. Identity
+      currently resolves to a bare category noun (ambusher, courser, lantern), which reads as a
+      placeholder on screen. Names presumably derive from the same trait vectors, and want to be
+      stable per species so an anchored world's animals keep their names.
 - [ ] Loot from traits — now unblocked, nothing built
 - [ ] Specimen tier of the bestiary — species is the entry, spawns are specimens under it
 - [ ] Q25 — cold worlds make smaller animals because cold worlds are poor
