@@ -164,7 +164,8 @@ enum Worldgen {
         // 10. Enemies, drawn from the world's own cast. It's daytime when you arrive, so it's the
         //     day roster you meet; the night roster swaps in when the world turns.
         let dayRoster = roster(from: cast, nocturnal: false)
-        let enemyCount = enemyCount(for: book, readings: readings, rng: &enemyRNG)
+        let enemyCount = enemyCount(for: book, readings: readings, rng: &enemyRNG,
+                                    tiles: map.width * map.height)
         var enemies: [WorldEnemy] = guardians
         for _ in 0..<enemyCount {
             guard let species = enemyRNG.pickWeighted(dayRoster),
@@ -227,16 +228,29 @@ enum Worldgen {
         return max(1, Int((base * (0.4 + richness) * spread).rounded()))
     }
 
-    /// More dangerous books put more enemies on the ground, on top of the nastier spawn table.
-    static func enemyCount(for book: BoundBook, readings: PressureReadings, rng: inout SeededRNG) -> Int {
+    /// How many things are actually standing in the world.
+    ///
+    /// **Danger says what they are; vitality says how many** (Aimee, 6 Aug: a world written for
+    /// life should be *crawling*). The productivity term used to run `0.5 + vitality/100`, which
+    /// tops out at 1.5 and dips *below* 1 for anything short of teeming — so a barren world and a
+    /// paradise both held about four animals and "teeming life" was a word rather than a
+    /// difference. It now runs from a fifth of the base to three times it.
+    ///
+    /// And it scales with **how much world there is**. The count was flat, so writing a large world
+    /// bought you the same handful of animals spread over four times the ground — the bigger the
+    /// world, the emptier it read.
+    static func enemyCount(for book: BoundBook, readings: PressureReadings, rng: inout SeededRNG,
+                           tiles: Int = Tuning.World.gridWidth * Tuning.World.gridHeight) -> Int {
         let tier = BookRules.enemyTier(of: book)
         let base = rng.int(in: Tuning.World.baseEnemyCountRange)
         let scaled = base + (tier - Tuning.World.baseEnemyTier) * Tuning.World.enemiesPerDangerTier
         // Swarm multiplies the count and drops the tier; Predation does the reverse. Applied after
         // the tier term so the two really do pull against each other rather than one winning.
-        // A world can only feed so much. Vitality is what pays for the roster.
-        let productivity = max(0.25, readings["vitality"].peak / Tuning.Pressure.scaleMaximum)
-        let multiplied = Double(scaled) * BookRules.dangerProfile(for: book).spawnMultiplier * (0.5 + productivity)
+        let productivity = min(1, readings["vitality"].peak / Tuning.World.teemingVitality)
+        let life = Tuning.World.enemyCountAtDeath
+            + productivity * (Tuning.World.enemyCountWhenTeeming - Tuning.World.enemyCountAtDeath)
+        let area = Double(tiles) / Double(Tuning.World.gridWidth * Tuning.World.gridHeight)
+        let multiplied = Double(scaled) * BookRules.dangerProfile(for: book).spawnMultiplier * life * area
         return max(1, Int(multiplied.rounded()))
     }
 

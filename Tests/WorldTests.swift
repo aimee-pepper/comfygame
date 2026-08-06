@@ -32,8 +32,12 @@ final class WorldTests: XCTestCase {
     func testGreedyBooksProduceDenserMoreDangerousWorlds() {
         // Averaged over seeds — any single world can be an outlier.
         var calmNodes = 0, greedyNodes = 0, calmEnemies = 0, greedyEnemies = 0
-        let calm = book(["terrain": "plains", "biome": "frostbound", "bounty": "sparse_ore", "quirk": "dim_sky"])
-        let greedy = book(["terrain": "caverns", "biome": "ashen", "bounty": "rich_ore", "quirk": "gilded_veins"])
+        // **Same terrain and biome on both sides**, so only the greed dials differ — the bounty and
+        // the quirk. Population answers to vitality now (Aimee, 6 Aug), so a pairing that also
+        // swapped verdant for ashen would be measuring how *alive* the two worlds are rather than
+        // how greedy, and an ash-choked world genuinely should hold less.
+        let calm = book(["terrain": "plains", "biome": "verdant", "bounty": "sparse_ore", "quirk": "dim_sky"])
+        let greedy = book(["terrain": "plains", "biome": "verdant", "bounty": "rich_ore", "quirk": "gilded_veins"])
 
         for seed in (1...25).map({ UInt64($0) &* 1_000_003 }) {
             let a = Worldgen.generate(book: calm, seed: seed)

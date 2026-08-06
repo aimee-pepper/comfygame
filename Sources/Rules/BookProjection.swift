@@ -150,7 +150,7 @@ struct BookProjection {
                 about: revealRolled ? nil : DescriptionRules.targetsTouched(by: sigils)
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: written),
-            resourceMix: expectedResourceMix(plans),
+            resourceMix: expectedResourceMix(in: readings),
             life: LifeRules.projection(for: readings),
             marksWritten: page.runes.count,
             marksSpeaking: PageRules.sigils(of: page).count
@@ -229,31 +229,25 @@ struct BookProjection {
                 analysisTier: analysisTier
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: book.allSymbolIDs),
-            resourceMix: expectedResourceMix(plans),
+            resourceMix: expectedResourceMix(in: readings),
             life: LifeRules.projection(for: readings)
         )
     }
 
-    /// Yield modifiers multiply, so an unfilled slot contributes the *average* of its candidates'
-    /// multipliers. Approximate by construction — this drives a bar chart, not a promise.
-    private static func expectedResourceMix(_ plans: [SlotPlan]) -> [(resource: ResourceDef, share: Double)] {
-        var weights: [ResourceID: Double] = [:]
-        for resource in ContentCatalog.shared.resources where !resource.isRealityCurrency {
-            weights[resource.id] = Tuning.World.baseResourceWeight
-        }
-
-        for plan in plans {
-            let options = plan.chosen.map { [$0] } ?? plan.candidates
-            guard !options.isEmpty else { continue }
-            let affected = Set(options.flatMap { $0.yieldModifiers.keys })
-            for resource in affected {
-                let average = options.reduce(0.0) { $0 + ($1.yieldModifiers[resource] ?? 1.0) } / Double(options.count)
-                weights[resource] = (weights[resource] ?? Tuning.World.baseResourceWeight) * average
-            }
-        }
-
-        let table = weights.filter { $0.value > 0 }.map { (value: $0.key, weight: $0.value) }
-        return BookRules.shares(table)
+    /// **What this world will actually pay**, off the same readings the bind will use.
+    ///
+    /// It used to give every resource in the catalogue the same flat weight and then adjust by the
+    /// legacy per-symbol `yieldModifiers`, which almost nothing sets. With four resources that read
+    /// as "a bit of everything"; with twenty-one it promised **Adamant, Gold and Mercury at 5% each
+    /// on a lightless world with no substrate written** — a preview that couldn't come true.
+    ///
+    /// The world's own pressures decide this everywhere else (`audit-what-pressures-actually-do.md`
+    /// §4.1) — node placement since that audit, kill drops as of today. This was the last caller
+    /// still describing a world it wasn't generating.
+    private static func expectedResourceMix(
+        in readings: PressureReadings
+    ) -> [(resource: ResourceDef, share: Double)] {
+        BookRules.shares(BookRules.yieldTable(from: readings))
             .compactMap { entry in
                 ContentCatalog.shared.resource(entry.value).map { (resource: $0, share: entry.share) }
             }

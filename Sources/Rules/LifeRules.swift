@@ -38,7 +38,8 @@ enum LifeRules {
         return species
     }
 
-    /// How many species. **Vitality, and only vitality** — 2 at barren, 6 at teeming.
+    /// How many species. **Vitality, and only vitality** — 2 on dead ground, the full range on a
+    /// world written for life.
     static func castSize(for readings: PressureReadings) -> Int {
         let vitality = readings["vitality"].peak
         let span = Tuning.Life.castSizeRange

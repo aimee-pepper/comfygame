@@ -93,6 +93,17 @@ enum Tuning {
         /// Productivity a world can carry per point of *usable* water, and per point of light.
         static let vitalityPerWater: Double = 1.4
         static let vitalityPerLight: Double = 1.2
+        /// **How much of what you wrote survives the dark.**
+        ///
+        /// Light used to be a hard cap, so a world you wrote for life came out sterile whenever
+        /// illumination — a target you probably didn't write — happened to roll dark. Now darkness
+        /// changes what grows rather than whether anything does: you keep this share of it, and
+        /// what you keep is fungal (Aimee, 6 Aug; the metabolism answer to Q24, early).
+        static let darkLifeFraction: Double = 0.6   // PLACEHOLDER
+        /// **And how much survives no usable water.** Lower than the dark fraction, because
+        /// dryness bites harder than darkness — but a desert or an ice sheet is sparse and hardy,
+        /// not sterile, and usable water goes to zero the moment a world freezes over.
+        static let dryLifeFraction: Double = 0.35   // PLACEHOLDER
         static let barrenThreshold: Double = 10
 
         // The energy budget: one purse for size, armour, insulation, weapons and ornament.
@@ -194,6 +205,19 @@ enum Tuning {
         static let nodeYieldRange: ClosedRange<Int> = 1...3        // PLACEHOLDER, per pull
         static let baseEnemyCountRange: ClosedRange<Int> = 3...5   // PLACEHOLDER, scaled by danger
         static let enemiesPerDangerTier: Int = 2                   // PLACEHOLDER
+        /// **What vitality does to how many things are standing in a world.** Multipliers on the
+        /// base count at nothing-lives-here and at teeming. The old term ran 0.5→1.5 and sat below
+        /// 1 for anything short of a paradise, so a written-for-life world held about as much as a
+        /// dead one — which is what made "Teeming Life" a word rather than a difference.
+        static let enemyCountAtDeath: Double = 0.2                 // PLACEHOLDER
+        static let enemyCountWhenTeeming: Double = 3.0             // PLACEHOLDER
+        /// **The vitality at which a world counts as teeming**, rather than 100.
+        ///
+        /// Nothing reaches 100. Stacking falloff means the sixth contribution to a target counts
+        /// for a fraction of the first, so the strongest life book the vocabulary can write —
+        /// verdant *and* teeming life — resolves around here. Measuring "how alive is this" against
+        /// a ceiling nothing touches made every world read as half-dead. **[PLACEHOLDER]**
+        static let teemingVitality: Double = 55
         static let exitPortalCountRange: ClosedRange<Int> = 1...2  // brief: always ≥1
         static let minimumExitPortalDistance: Int = 6              // PLACEHOLDER — worth finding
         static let enemyFreeRadiusAroundEntry: Int = 3             // PLACEHOLDER — no ambush on arrival
@@ -306,8 +330,9 @@ enum Tuning {
         /// Small on purpose: free sampling is only safe because the cast is small, and a strange
         /// animal should be the one you remember from that world.
         static let castSizeRange = 2...6
-        /// Vitality per species above the floor: 2 at barren, 6 at teeming.
-        static let vitalityPerExtraSpecies: Double = 25
+        /// Vitality per species above the floor. Measured against `teemingVitality`, not against a
+        /// hundred nothing reaches: 2 species on dead ground, the full range on a teeming one.
+        static let vitalityPerExtraSpecies: Double = 13
 
         // MARK: The budget
 

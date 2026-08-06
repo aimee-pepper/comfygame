@@ -80,27 +80,69 @@ enum WorldConstraints {
 
     // MARK: 3. Water and light cap life
 
-    /// Dry caps life. Dark caps life *unless* something is eating rather than photosynthesising —
-    /// which is exactly the interesting case, and why the fungal exemption is worth having.
+    /// Dry caps life. **Dark changes what kind of life it is** rather than deleting it.
+    ///
+    /// It used to delete it. A book saying *plains + verdant + teeming life* — about as direct a
+    /// request for life as the vocabulary allows — resolved to a median vitality of **45 before
+    /// these caps and 8 after**, and 40% of those worlds came out effectively sterile. The cause
+    /// was illumination: a target the page says nothing about is rolled from the seed, plenty of
+    /// illumination sources are occluding, and a dark roll took the light cap to nearly zero. So
+    /// what you didn't write silently voided what you did.
+    ///
+    /// Aimee, 6 Aug: *"a world with verdant and teeming life should be crawling with flora and
+    /// fauna. effectively sterile shouldn't be anything near that."*
+    ///
+    /// **A dark world written for life grows the kind that doesn't need light.** That's the
+    /// metabolism answer the designer already gave for Q24 — photosynthetic, fungal, chemosynthetic
+    /// — arriving ahead of `flora-system-spec.md` because the alternative is dead worlds now. Dark
+    /// still costs you: you keep `darkLifeFraction` of what you wrote, not all of it, and the world
+    /// says out loud that what grows here doesn't need the sun.
+    ///
+    /// **Dry does the same, harder.** It was the other quarter of those sterile worlds: median
+    /// usable water of zero, plenty of light, plenty of life written. Usable water goes to zero when
+    /// a world freezes over or boils off, so a book asking for a meadow that rolled frostbound came
+    /// out dead. Deserts and ice sheets are not sterile — they are *sparse and hardy* — so dryness
+    /// keeps `dryLifeFraction` of what you wrote, less than darkness does, and says so.
     private static func applyLifeCaps(_ readings: inout PressureReadings) {
         let water = readings["hydrology"]
         let light = readings["illumination"]
         guard var life = readings.readings["vitality"] else { return }
 
-        // Frozen water is water the world can't use.
-        let waterCap = water.availableMagnitude * Tuning.Pressure.vitalityPerWater
-        var caps = [waterCap]
+        let written = life.peak
 
-        let feedsInTheDark = life.has("fungal") || life.has("decaying")
-        if !feedsInTheDark {
-            caps.append(light.peak * Tuning.Pressure.vitalityPerLight)
-        }
+        // What the sun alone would support, and the floor under it: life that eats instead of
+        // photosynthesising. Anything already fungal or decaying was never using the sun.
+        let alreadyFeedsInTheDark = life.has("fungal") || life.has("decaying")
+        let photosyntheticCap = light.peak * Tuning.Pressure.vitalityPerLight
+        let lightCap = alreadyFeedsInTheDark
+            ? written
+            : max(photosyntheticCap, written * Tuning.Pressure.darkLifeFraction)
 
-        if let cap = caps.min(), life.peak > cap {
+        // Frozen and airborne water is water the world can't use.
+        let wateredCap = water.availableMagnitude * Tuning.Pressure.vitalityPerWater
+        let waterCap = max(wateredCap, written * Tuning.Pressure.dryLifeFraction)
+
+        let cap = min(waterCap, lightCap)
+        if written > cap {
             life.peak = cap
-            life.floor = cap
-            life.tags.insert(waterCap <= (caps.min() ?? 0) ? "water-limited" : "light-limited")
+            life.floor = min(life.floor, cap)
         }
+        // **What grew instead**, said out loud — a player who wrote for a meadow and got a cellar
+        // of mushrooms, or a crust of hardy scrub, deserves to know which and why.
+        //
+        // Only turns fungal when the dark floor is actually load-bearing. A world merely dimmer
+        // than what it grows is *light-limited*; a world where nothing photosynthetic could account
+        // for what's living in it is fungal, and that's a different sentence.
+        if !alreadyFeedsInTheDark, photosyntheticCap < written * Tuning.Pressure.darkLifeFraction {
+            life.tags.insert("fungal")
+            life.tags.insert("decaying")
+            life.tags.insert("lightless-growth")
+        }
+        if wateredCap < written {
+            life.tags.insert("water-limited")
+            if wateredCap < written * Tuning.Pressure.dryLifeFraction { life.tags.insert("hardy") }
+        }
+        if photosyntheticCap < written, !alreadyFeedsInTheDark { life.tags.insert("light-limited") }
         if life.peak < Tuning.Pressure.barrenThreshold { life.tags.insert("barren") }
         readings.readings["vitality"] = life
     }

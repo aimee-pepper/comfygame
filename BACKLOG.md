@@ -180,6 +180,18 @@
 - [ ] Open: the full list of crafting trades — Tannery and Apothecary specced, unbuilt (Q37)
 - [x] Ordinary gear from encounters — a won fight can drop something to wear, per tier fought
 
+## Content volume — the systems were outrunning what they draw on (audit #8 §3)
+- [x] **Resources 4 → 21.** Each gated on conditions you have to deliberately compose, so a resource
+      is a reason to write one world rather than another. Staples near-universal, adamant at 1%
+- [x] Kill drops and **the Writing Desk's expected harvest** read the world's pressures. Both were
+      still on the flat per-symbol table, so the preview promised adamant on a lightless world
+- [x] **A world written for life is crawling with it** (Aimee, 6 Aug) — see Q38. Dark redirects
+      life into fungal growth instead of deleting it, dryness leaves something hardy, and
+      population is measured against a vitality that worlds actually reach
+- [ ] **Skills 2 → 12** (`resources-skills-spec.md` §2). Needs new effect kinds in `CombatRules` —
+      `SkillDef.Kind` only knows damage and heal, and Pry/Flense/Ward/Draw Off/Sight all want more
+- [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
+
 ## Gear, properly (Aimee, 5–6 Aug 2026)
 - [x] **The Binder has its own slots.** Both of them carry their own; the damage-type matchup now
       reaches the player's own turns instead of only Quill's automated ones

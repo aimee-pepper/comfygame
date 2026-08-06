@@ -736,7 +736,48 @@ with `builtBy` in `stations.json` is found-then-built, so adding either is a JSO
 screen. **The question is whether the Tannery should take capacity upgrades off the Workshop** —
 if it should, that's a real move of an existing system and I'm not doing it unilaterally.
 
-## Q38 — A world written for life is barely alive, and it's the sources doing it
+## Q38 — A world written for life is barely alive — **ANSWERED AND FIXED (Aimee, 6 Aug)**
+
+> *"a world with verdant and teeming life should be crawling with flora and fauna. effectively
+> sterile shouldn't be anything near that."*
+
+Three separate things were doing it, and it turned out **not** to be mainly the consumers I blamed
+below. Measured over the same 200 seeds:
+
+| | before | after |
+|---|---|---|
+| median vitality | 8 | 29 |
+| effectively sterile | 40% | 5% |
+| species in the cast | 3 | 4 |
+| **animals standing in the world** | **5** | **10** |
+| the same book, but ash-choked | 4 | 1 |
+
+1. **Light was a hard cap, not a change of metabolism.** A target you didn't write gets rolled from
+   the seed, plenty of illumination sources are occluding, and a dark roll took the cap to nearly
+   zero — so what you *didn't* write silently voided what you did. Dark now keeps
+   `Tuning.Pressure.darkLifeFraction` of what you wrote and turns it **fungal**, which is the
+   metabolism answer the designer already gave for Q24, arriving ahead of flora. The preview says
+   it out loud: *"What lives here eats rather than grows."*
+2. **Usable water went to zero the moment a world froze over**, which killed the other quarter.
+   Deserts and ice sheets are sparse and hardy, not sterile, so dryness keeps `dryLifeFraction` —
+   less than darkness does — and tags the world `hardy`.
+3. **Population was measured against a vitality of 100 that nothing reaches.** Stacking falloff
+   means the strongest life book the vocabulary can write lands around 55, so every world read as
+   half-dead. `Tuning.World.teemingVitality` is the yardstick now, and the population term runs
+   from a fifth of the base to three times it instead of 0.5→1.5.
+
+**Consumers are life too**, which was the original diagnosis and is still right, just smaller:
+`herd` and `swarm` went from −5 and −8 to +12 and +8, keeping their `trophicDepth` push. A world
+crawling with herds is not less alive than an empty one.
+
+**Still open for you:** whether `teeming_life` should expand to producers only, with the consumers
+getting their own symbol. The numbers work now either way; it's a question about whether a symbol
+should contain its own opposition.
+
+<details>
+<summary>The original write-up, kept for the reasoning</summary>
+
+### A world written for life is barely alive, and it's the sources doing it
 
 Measured while wiring up the expanded resource catalogue, over 200 seeds on a book that says
 **plains + verdant + teeming_life** — as direct a request for life as the vocabulary allows:
@@ -773,3 +814,5 @@ take from producers, and they're what deepens the web. As a *symbol* it doesn't 
 
 This is wider than fibre. Vitality feeds the creature cast, butchery, flora when it lands, and
 every organic resource — so a median of 8 is very likely part of why play reads samey (audit #8 §3).
+
+</details>

@@ -79,6 +79,116 @@ final class ResourceSpreadTests: XCTestCase {
         XCTAssertGreaterThan(grew, 100, "a world written for life almost never grew anything")
     }
 
+    /// Why a world written for life comes out sterile — which cap is doing it.
+    func testReportWhyLifeIsThin() {
+        let lively = BoundBook(symbols: ["terrain": "plains", "biome": "verdant",
+                                         "bounty": "teeming_life"],
+                               randomlyFilled: [], essencePaid: 0)
+        var seeds = SeedSequence(rootSeed: 4242)
+        var uncapped: [Int] = [], capped: [Int] = [], water: [Int] = [], light: [Int] = []
+        var waterLimited = 0, lightLimited = 0
+        for _ in 0..<200 {
+            let seed = seeds.nextSeed()
+            let raw = PressureRules.resolveUnconstrained(
+                BookRules.sigils(for: lively)
+                + PressureRules.rollUnwritten(after: BookRules.sigils(for: lively), seed: seed))
+            let done = BookRules.readings(for: lively, seed: seed)
+            uncapped.append(Int(raw["vitality"].peak))
+            capped.append(Int(done["vitality"].peak))
+            water.append(Int(done["hydrology"].availableMagnitude))
+            light.append(Int(done["illumination"].peak))
+            if done["vitality"].has("water-limited") { waterLimited += 1 }
+            if done["vitality"].has("light-limited") { lightLimited += 1 }
+        }
+        func med(_ a: [Int]) -> Int { a.sorted()[a.count / 2] }
+        let dead = (0..<200).filter { capped[$0] < 3 }
+        print("of the \(dead.count) sterile: median water \(dead.isEmpty ? -1 : med(dead.map { water[$0] })), median light \(dead.isEmpty ? -1 : med(dead.map { light[$0] })), median uncapped life \(dead.isEmpty ? -1 : med(dead.map { uncapped[$0] }))")
+        print("""
+        LIFE PROBE over 200 seeds, book = plains + verdant + teeming_life
+          vitality before caps : median \(med(uncapped))  max \(uncapped.max()!)
+          vitality after  caps : median \(med(capped))   below 3: \(capped.filter { $0 < 3 }.count)
+          water available      : median \(med(water))
+          illumination peak    : median \(med(light))
+          water-limited \(waterLimited)   light-limited \(lightLimited)
+        """)
+    }
+
+    /// **A world written for life has to be crawling with it.**
+    ///
+    /// Aimee, 6 Aug: *"a world with verdant and teeming life should be crawling with flora and
+    /// fauna. effectively sterile shouldn't be anything near that."* It was: a book saying
+    /// *plains + verdant + teeming life* came out effectively sterile 40% of the time, and even
+    /// when it didn't it held about as many animals as an ash-choked cavern.
+    ///
+    /// Three separate things were doing it, and this test guards all three: light was a hard cap
+    /// rather than a change of metabolism, usable water went to zero the moment a world froze, and
+    /// the population term was measured against a vitality of 100 that nothing ever reaches.
+    func testAWorldWrittenForLifeIsCrawlingWithIt() {
+        let lively = BoundBook(symbols: ["terrain": "plains", "biome": "verdant",
+                                         "bounty": "teeming_life"],
+                               randomlyFilled: [], essencePaid: 0)
+        let barren = BoundBook(symbols: ["terrain": "caverns", "biome": "ashen"],
+                               randomlyFilled: [], essencePaid: 0)
+
+        var seeds = SeedSequence(rootSeed: 31337)
+        var sterile = 0, livingAnimals = 0, deadAnimals = 0, livingSpecies = 0
+        let runs = 80
+        for _ in 0..<runs {
+            let seed = seeds.nextSeed()
+            if BookRules.readings(for: lively, seed: seed)["vitality"].peak < 3 { sterile += 1 }
+            let alive = Worldgen.generate(book: lively, seed: seed, library: LibraryState())
+            let dead = Worldgen.generate(book: barren, seed: seed, library: LibraryState())
+            livingAnimals += alive.enemies.count
+            livingSpecies += alive.cast.count
+            deadAnimals += dead.enemies.count
+        }
+        XCTAssertLessThan(sterile, runs / 8,
+                          "a book asking outright for life still came out sterile \(sterile)/\(runs)")
+        XCTAssertGreaterThan(livingAnimals, deadAnimals * 3,
+                             "a written-for-life world held no more than an ash-choked cavern")
+        XCTAssertGreaterThan(livingSpecies, runs * 3,
+                             "a written-for-life world averaged under three species")
+    }
+
+    /// What a world written for life actually *has standing in it* — the number Aimee is asking
+    /// about is not vitality, it's how much wildlife you meet.
+    func testReportWhatALivingWorldHolds() {
+        let lively = BoundBook(symbols: ["terrain": "plains", "biome": "verdant",
+                                         "bounty": "teeming_life"],
+                               randomlyFilled: [], essencePaid: 0)
+        var seeds = SeedSequence(rootSeed: 808)
+        var species: [Int] = [], animals: [Int] = [], budgets: [Int] = []
+        for _ in 0..<60 {
+            let world = Worldgen.generate(book: lively, seed: seeds.nextSeed(),
+                                          library: LibraryState())
+            species.append(world.cast.count)
+            animals.append(world.enemies.count)
+            budgets.append(Int(WorldConstraints.energyBudget(
+                in: BookRules.readings(for: lively, seed: 0))))
+        }
+        var deadSeeds = SeedSequence(rootSeed: 808)
+        let barren = BoundBook(symbols: ["terrain": "caverns", "biome": "ashen"],
+                               randomlyFilled: [], essencePaid: 0)
+        var deadAnimals: [Int] = [], deadSpecies: [Int] = []
+        for _ in 0..<60 {
+            let world = Worldgen.generate(book: barren, seed: deadSeeds.nextSeed(),
+                                          library: LibraryState())
+            deadAnimals.append(world.enemies.count)
+            deadSpecies.append(world.cast.count)
+        }
+        func med(_ a: [Int]) -> Int { a.sorted()[a.count / 2] }
+        print("""
+        A DEAD WORLD holds, same 60 seeds of caverns + ashen:
+          species: median \(med(deadSpecies))   animals: median \(med(deadAnimals))
+        """)
+        print("""
+        A LIVING WORLD holds, over 60 seeds of plains + verdant + teeming_life:
+          species in the cast : median \(med(species))  range \(species.min()!)–\(species.max()!)
+          animals on the map  : median \(med(animals))  range \(animals.min()!)–\(animals.max()!)
+          empty of animals    : \(animals.filter { $0 == 0 }.count) of 60
+        """)
+    }
+
     /// A printout of how often each resource turns up, so a rebalance can be judged rather than
     /// guessed at. Not an assertion — it fails nothing; it tells you what the numbers are.
     func testReportTheSpread() {

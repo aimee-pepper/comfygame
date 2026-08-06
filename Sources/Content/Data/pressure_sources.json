@@ -397,7 +397,7 @@
         {
           "target": "vitality",
           "character": "consuming",
-          "peak": -5,
+          "peak": 12,
           "aspects": {
             "trophicDepth": 30
           }
@@ -1088,7 +1088,7 @@
         {
           "target": "vitality",
           "character": "consuming",
-          "peak": -8,
+          "peak": 8,
           "aspects": {
             "trophicDepth": 20
           },
