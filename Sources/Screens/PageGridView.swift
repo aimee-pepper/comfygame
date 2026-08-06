@@ -46,6 +46,12 @@ struct PageGridView: View {
     @State private var mode: PageMode = .off
     /// The sigil the mode is anchored on — what the next tap joins to or unjoins from.
     @State private var anchor: InstanceID?
+    /// The mark you're holding, whose actions are showing in the footer.
+    ///
+    /// Plain `@State` rather than a gesture state: the row has to stay up while you reach for a
+    /// button, which is the opposite of a gesture's lifetime. Cleared by choosing something,
+    /// cancelling, or touching bare page.
+    @State private var held: InstanceID?
 
 
     private var page: Page { store.state.base.page }
@@ -83,7 +89,7 @@ struct PageGridView: View {
             // space and cost the page a stable size — the card grew and shrank as you placed and
             // moved sigils, which is intolerable on the one surface you're trying to arrange things
             // on.
-            footer.foregroundStyle(footerTint)
+            footer.foregroundStyle(held == nil ? footerTint : Color.primary)
                 // **Pinned to the page's own width.** The footer's text and buttons are wider than
                 // the grid, and a leading-aligned VStack takes the width of its widest child — so
                 // the card grew sideways and shifted the whole page across the moment a ghost
@@ -125,7 +131,23 @@ struct PageGridView: View {
 
     private var footer: some View {
         HStack(spacing: 10) {
-            if let hint = mode.hint {
+            if let held, let mark = page.runes.first(where: { $0.id == held }) {
+                Text(mark.displayName)
+                    .font(.caption2.weight(.medium))
+                    .lineLimit(1)
+                    .layoutPriority(1)
+                Spacer(minLength: 4)
+                actions(for: mark)
+                Button { self.held = nil } label: {
+                    Text("Cancel")
+                        .font(.caption2)
+                        .padding(.horizontal, 6)
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+            else if let hint = mode.hint {
                 Image(systemName: mode.icon).font(.caption2)
                 Text(hint).font(.caption2)
                 Spacer()
@@ -178,8 +200,8 @@ struct PageGridView: View {
         }
         // Hit-testable only while a mode is running, so a tap on bare page can end it — and can't
         // interfere with anything the rest of the time.
-        .allowsHitTesting(mode != .off)
-        .onTapGesture { mode = .off; anchor = nil }
+        .allowsHitTesting(mode != .off || held != nil)
+        .onTapGesture { mode = .off; anchor = nil; held = nil }
     }
 
     // MARK: Written runes
@@ -197,7 +219,7 @@ struct PageGridView: View {
         // Inside a cluster the individual borders step back, so the outline around the whole thing
         // is what you read. Adjacent-and-joined has to look unmistakably unlike adjacent-and-not.
         let inCluster = PageRules.cluster(containing: mark.id, on: page).count > 1
-        let isAnchor = anchor == mark.id && mode != .off
+        let isAnchor = (anchor == mark.id && mode != .off) || held == mark.id
         let actionable = isActionable(mark)
 
         return ZStack(alignment: .topLeading) {
@@ -209,7 +231,10 @@ struct PageGridView: View {
                                 lineWidth: isDragging ? 2 : 1))
                     // What the mode is anchored on, and what it can reach from there.
                     .overlay(RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
-                        .stroke(mode.tint, lineWidth: isAnchor ? 3 : (actionable ? 2 : 0))
+                        // Held with no mode running still has to show which one you're holding, and
+                        // `.off` has no tint of its own.
+                        .stroke(mode == .off ? Color.accentColor : mode.tint,
+                                lineWidth: isAnchor ? 3 : (actionable ? 2 : 0))
                         .opacity(isAnchor ? 1 : (actionable ? 0.85 : 0)))
                     .frame(width: side, height: side)
                     .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
@@ -235,8 +260,14 @@ struct PageGridView: View {
                 y: CGFloat(mark.origin.row) * side + (dragOffset(for: mark).height))
         .zIndex(isDragging ? 2 : 0)
         .onTapGesture { tapped(mark) }
+        // **Hold opens the actions; drag moves it.** Both are attached here and the drag's
+        // minimum distance keeps them apart, so a hold that wanders a little still counts as a hold.
+        .onLongPressGesture(minimumDuration: 0.35) {
+            held = mark.id
+            mode = .off
+            anchor = nil
+        }
         .gesture(markDrag(mark, side: side, pageSize: pageSize))
-        .contextMenu { menu(for: mark) }
         .accessibilityLabel("\(mark.displayName), \(mark.cells.count) cells. Drag to move, or off the page to erase.")
     }
 
@@ -259,32 +290,58 @@ struct PageGridView: View {
     /// Connecting and disconnecting are **modes** rather than one-shot actions: you usually join
     /// several sigils in a row, and a mode lets you keep going instead of reopening a menu for each
     /// one. Tapping bare page leaves the mode.
+    ///
+    /// **This is our own row, not `.contextMenu`, and that's a bug fix.** The system menu snapshots
+    /// the view it's attached to and puts it back on dismissal — and these marks are positioned by
+    /// `.offset` while being dragged, so the restore left the sigil invisible until something else
+    /// forced a layout pass. Aimee reported it twice: *"pressing and holding a sigil and choosing an
+    /// option still vanishes the sigil until you click the screen again."* The same attachment was
+    /// also what swallowed the drag gesture in session 16.
+    ///
+    /// It's better here anyway: the buttons are 44pt in the footer, in the thumb zone, instead of a
+    /// floating menu that covers the page you're trying to read.
     @ViewBuilder
-    private func menu(for mark: PlacedRune) -> some View {
+    private func actions(for mark: PlacedRune) -> some View {
         Button {
             mode = .connecting
             anchor = mark.id
+            held = nil
         } label: {
             Label("Connect", systemImage: "link")
+                .font(.caption2)
+                .padding(.horizontal, 6)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
 
         if page.links.contains(where: { $0.involves(mark.id) }) {
             Button(role: .destructive) {
                 mode = .disconnecting
                 anchor = mark.id
+                held = nil
             } label: {
                 Label("Disconnect", systemImage: "scissors")
+                    .font(.caption2)
+                    .padding(.horizontal, 6)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
         }
 
         if PageRules.rotate(cluster: mark.id, on: page) != nil {
-            Divider()
             Button {
                 store.rotateCluster(mark.id)
+                held = nil
             } label: {
-                Label(PageRules.cluster(containing: mark.id, on: page).count > 1 ? "Turn the piece" : "Turn",
-                      systemImage: "rotate.right")
+                Label("Turn", systemImage: "rotate.right")
+                    .font(.caption2)
+                    .padding(.horizontal, 6)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
         }
     }
 
@@ -354,6 +411,7 @@ struct PageGridView: View {
             .updating($drag) { value, state, _ in
                 state = MarkDrag(id: mark.id, translation: value.translation)
             }
+            .onChanged { _ in if held != nil { held = nil } }
             .onEnded { value in
                 let discard = !isOverPage(mark, translation: value.translation, side: side, pageSize: pageSize)
                 let delta = PageCell(column: Int((value.translation.width / side).rounded()),

@@ -23,6 +23,7 @@
 		19C9DFC5BC904175AC32B894 /* GameActions+Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */; };
 		1BDE5DBB7E79B5D05413B0FE /* pressure_sources.json in Resources */ = {isa = PBXBuildFile; fileRef = A29A4F3CFC9073B8F80064F4 /* pressure_sources.json */; };
 		202BE6BB0588B2D4A952B195 /* DescriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F66F95CC3FEA4D5E13AE410 /* DescriptionModels.swift */; };
+		2133F8A2A985268991F782B5 /* TravellerMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D08A668BC1215643DD63B178 /* TravellerMeetingView.swift */; };
 		2228B642DF268D4AC3E4428C /* EncounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE933E91275B1FF990B69BAA /* EncounterView.swift */; };
 		2591F7421F2C4F2789790209 /* RuneGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E466EEC3518F71FDD38EE9 /* RuneGlyph.swift */; };
 		25C21801E523BEA88A932F39 /* CreatureIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41571D49472E12EE120FF5A8 /* CreatureIdentity.swift */; };
@@ -250,6 +251,7 @@
 		CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchModels.swift; sourceTree = "<group>"; };
 		CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LootDecisionView.swift; sourceTree = "<group>"; };
 		CFFBF656255758DFA8E45232 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		D08A668BC1215643DD63B178 /* TravellerMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravellerMeetingView.swift; sourceTree = "<group>"; };
 		D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCatalog.swift; sourceTree = "<group>"; };
 		D238962CB9F8B60B212D9473 /* MinimapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimapView.swift; sourceTree = "<group>"; };
 		D2AAB75EDFEC0064219E57D4 /* PageRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageRules.swift; sourceTree = "<group>"; };
@@ -363,6 +365,7 @@
 				8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */,
 				03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */,
 				2C9C43310A7E6D0342B11251 /* StationViews.swift */,
+				D08A668BC1215643DD63B178 /* TravellerMeetingView.swift */,
 				0212875D2B95EA338E16F0B2 /* WorldDescriptionPanel.swift */,
 				D9311ACC91B2E555993A3297 /* WorldView.swift */,
 				C82ADF2ABC4F75679DADCCBB /* WritingDeskView.swift */,
@@ -710,6 +713,7 @@
 				0573EFC73887107DB190A9DF /* StationViews.swift in Sources */,
 				6C90C6B086284BE1533023D2 /* TerrainRules.swift in Sources */,
 				A901EE2297DFB40E48663457 /* Theme.swift in Sources */,
+				2133F8A2A985268991F782B5 /* TravellerMeetingView.swift in Sources */,
 				0D0B63ACE19B51E89D5321F8 /* TravellerModels.swift in Sources */,
 				52C1E5841A22ED23AA8245DF /* Tuning.swift in Sources */,
 				2651CFD69611A045AB93B2C7 /* WorldConstraints.swift in Sources */,

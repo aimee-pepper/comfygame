@@ -76,6 +76,22 @@ extension GameStore {
         finishTurn(events)
     }
 
+    /// **Whoever you're standing on**, so the world screen can open the scene.
+    var travellerHere: TravellerDef? {
+        guard let run = activeRun, case .traveller(let id) = run.map[run.playerPosition].content
+        else { return nil }
+        return ContentCatalog.shared.traveller(id)
+    }
+
+    /// Talk them into coming home. The only thing that marks somebody found (Aimee, 6 Aug).
+    func recruit(_ id: TravellerID) {
+        var events: [WorldRules.Event] = []
+        mutate("recruit \(id.rawValue)", flush: true) { state in
+            events = WorldRules.recruit(id, in: &state)
+        }
+        recentEvents = events
+    }
+
     /// Tap-to-path: walk toward a tile turn by turn, stopping the moment anything happens worth
     /// stopping for — an enemy waking, a hazard, a threshold, a fight (SPD-style, locked decision).
     func travel(to destination: GridPoint) {

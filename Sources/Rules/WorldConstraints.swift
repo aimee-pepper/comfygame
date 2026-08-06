@@ -144,6 +144,19 @@ enum WorldConstraints {
         }
         if photosyntheticCap < written, !alreadyFeedsInTheDark { life.tags.insert("light-limited") }
         if life.peak < Tuning.Pressure.barrenThreshold { life.tags.insert("barren") }
+
+        // **Producers set the ceiling on how deep the food web goes** (audit #9's refinement to
+        // Q38). Consumers count as life now, which is right — a world crawling with herds holds
+        // more life than an empty one. But left alone that would let a page of nothing but herds
+        // and swarms describe a rich food web standing on nothing, so depth is capped by what
+        // grows and rots here. Two readings that mean separate things: **vitality is how much life
+        // is here, trophic depth is how complex it is, and the second can't outrun what the first
+        // is standing on.**
+        let carrying = life.producedPeak * Tuning.Pressure.trophicDepthPerProducer
+        if life.aspect("trophicDepth") > carrying {
+            life.aspects["trophicDepth"] = carrying
+            if carrying < Tuning.Pressure.shallowFoodWeb { life.tags.insert("nothing-to-eat") }
+        }
         readings.readings["vitality"] = life
     }
 

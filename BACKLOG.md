@@ -192,6 +192,22 @@
       `SkillDef.Kind` only knows damage and heal, and Pry/Flense/Ward/Draw Off/Sight all want more
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## The search loop actually pays out (Aimee, 6 Aug 2026)
+- [x] **Travellers stand on the map.** They were generated and never placed; arriving in a matching
+      world wrote them into the save silently, so a building appeared for somebody never met
+- [x] **A written scene when you reach them**, and agreeing is what recruits them — see Q39
+- [x] Meetings written for all five travellers
+- [x] `.foundTraveller` was declared, rendered, and never once emitted
+- [ ] Place them somewhere that *means* something — a smith by a landmark, a digger at a ruin
+
+## Interface bugs found in play (Aimee, 6 Aug 2026)
+- [x] **Holding a sigil and choosing an option made it vanish** until you tapped the screen. The
+      system `.contextMenu` snapshots its view and restores it wrong when the view is positioned by
+      `.offset`; replaced with our own 44pt action row in the footer
+- [x] **The map grew off the edge of the screen** once you carried enough variety. A `VStack` takes
+      the width of its widest child, and the haul row grew with resource kinds; it scrolls sideways
+      now, and the event log wraps rather than demanding a line's width
+
 ## Gear, properly (Aimee, 5–6 Aug 2026)
 - [x] **The Binder has its own slots.** Both of them carry their own; the damage-type matchup now
       reaches the player's own turns instead of only Quill's automated ones

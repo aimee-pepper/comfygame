@@ -68,6 +68,7 @@ enum PressureRules {
             var positivePeak: [Double] = [], negativePeak: [Double] = []
             var positiveFloor: [Double] = [], negativeFloor: [Double] = []
             var deniedForce = 0.0
+            var producedPeak = 0.0
             var tags: Set<String> = []
             var aspectDeltas: [String: Double] = [:]
             var formWeights: [String: Double] = [:]
@@ -90,6 +91,12 @@ enum PressureRules {
                     continue
                 }
 
+                // Producers and decomposers are what a food web *stands on*. Kept separately so
+                // the constraints pass can tell "alive because things grow here" from "alive
+                // because I wrote a herd and nothing for it to eat".
+                if peak > 0, contribution.character == "producing" || contribution.character == "decomposing" {
+                    producedPeak += peak
+                }
                 if peak >= 0 { positivePeak.append(peak) } else { negativePeak.append(-peak) }
                 if floor >= 0 { positiveFloor.append(floor) } else { negativeFloor.append(-floor) }
                 tags.formUnion(contribution.tags)
@@ -145,7 +152,8 @@ enum PressureRules {
                 opposedMagnitude: opposed,
                 aspects: aspects,
                 forms: forms,
-                tags: tags.union(derivedTags(target: target, peak: peak, floor: floor, tags: tags))
+                tags: tags.union(derivedTags(target: target, peak: peak, floor: floor, tags: tags)),
+                producedPeak: producedPeak
             )
         }
         return PressureReadings(readings: readings)
@@ -196,6 +204,12 @@ struct PressureReading: Equatable, Sendable {
     /// Proportions across the target's form buckets, summing to 1 (or empty).
     var forms: [String: Double]
     var tags: Set<String>
+    /// **How much of this came from sources that make rather than take.**
+    ///
+    /// Only vitality reads it, and only to cap trophic depth (audit #9's refinement to Q38): a page
+    /// of nothing but herds and swarms shouldn't describe a rich food web with nothing at the
+    /// bottom of it. Producers set the ceiling; consumers fill it.
+    var producedPeak: Double = 0
 
     /// Its own pressure: dim and dark are different, and so are "always the same" and "swings".
     var range: Double { peak - floor }

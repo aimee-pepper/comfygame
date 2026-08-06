@@ -33,7 +33,8 @@ final class LibraryTests: XCTestCase {
         XCTAssertFalse(mara.isFound(in: dark))
     }
 
-    /// **Pages are a guide, never a gate.** Writing the right world by luck finds them just the same.
+    /// **Pages are a guide, never a gate.** Writing the right world by luck puts them in front of
+    /// you just the same.
     func testYouCanFindSomeoneWithoutHavingReadAPage() {
         let store = GameStore(io: .temporary(name: "luck-\(UUID().uuidString)"))
         store.mutate("test: fund") { $0.base.essence = 5000 }
@@ -41,29 +42,83 @@ final class LibraryTests: XCTestCase {
 
         for _ in 0..<40 {
             store.bindAndDepart()
-            if !store.state.reality.library.foundTravellers.isEmpty { break }
+            if !(store.state.worlds.activeRun?.travellersHere.isEmpty ?? true) { return }
             store.mutate("test: next") { $0.worlds.activeRun = nil }
         }
-        XCTAssertFalse(store.state.reality.library.foundTravellers.isEmpty,
-                       "nobody was ever found by chance in forty worlds")
+        XCTFail("nobody turned up by chance in forty worlds")
     }
 
-    func testArrivingRecordsWhoWasThere() {
+    /// **Arriving is not finding** (Aimee, 6 Aug).
+    ///
+    /// Binding a world that matches somebody's signature used to write them straight into
+    /// `foundTravellers`, so a building appeared at the base for a person the player had never laid
+    /// eyes on. Now arriving only tells you they're here — and puts them on a tile.
+    func testArrivingPutsThemOnTheMapWithoutFindingThem() {
         let store = GameStore(io: .temporary(name: "arrive-\(UUID().uuidString)"))
         store.mutate("test: fund") { $0.base.essence = 5000 }
         for _ in 0..<40 {
             store.bindAndDepart()
-            if let here = store.state.worlds.activeRun?.travellersHere, !here.isEmpty {
-                for id in here {
-                    XCTAssertTrue(store.state.reality.library.foundTravellers.contains(id))
+            if let run = store.state.worlds.activeRun, !run.travellersHere.isEmpty {
+                for id in run.travellersHere {
+                    XCTAssertFalse(store.state.reality.library.foundTravellers.contains(id),
+                                   "arriving found somebody the player never met")
                     XCTAssertTrue(store.state.reality.library.knownTravellers.contains(id),
-                                  "found someone without knowing to look for them")
+                                  "arrived where somebody is and didn't learn to look for them")
+                    // …and they are standing somewhere you could walk to.
+                    XCTAssertTrue(run.map.allPoints.contains { run.map[$0].content == .traveller(id) },
+                                  "\(id.rawValue) is in this world and on no tile in it")
                 }
                 return
             }
             store.mutate("test: next") { $0.worlds.activeRun = nil }
         }
         XCTFail("no world in forty held anybody")
+    }
+
+    /// **Walking up to them and agreeing is what finds them**, and that's what raises their
+    /// building — the whole point of the search loop, and the thing that didn't exist.
+    func testRecruitingIsWhatFindsThemAndUnlocksTheirBuilding() {
+        let store = GameStore(io: .temporary(name: "recruit-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 5000 }
+
+        for _ in 0..<40 {
+            store.bindAndDepart()
+            guard let run = store.state.worlds.activeRun,
+                  let id = run.travellersHere.first,
+                  let point = run.map.allPoints.first(where: { run.map[$0].content == .traveller(id) })
+            else {
+                store.mutate("test: next") { $0.worlds.activeRun = nil }
+                continue
+            }
+            // Stand on them. Reaching somebody is a walk; the test takes the short way.
+            store.mutate("test: walk over") { $0.worlds.activeRun?.playerPosition = point }
+            XCTAssertEqual(store.travellerHere?.id, id, "standing on them and the scene never opened")
+
+            store.recruit(id)
+            XCTAssertTrue(store.state.reality.library.foundTravellers.contains(id))
+            XCTAssertFalse(store.state.worlds.activeRun?.map[point].content == .traveller(id),
+                           "recruited them and they're still standing there")
+
+            // And if anything is theirs to build, it's now a building site.
+            if let station = ContentCatalog.shared.stations.first(where: { $0.builtBy == id }) {
+                XCTAssertTrue(store.buildableStations.contains { $0.id == station.id },
+                              "\(station.name) didn't appear after recruiting \(id.rawValue)")
+            }
+            return
+        }
+        XCTFail("no world in forty held anybody")
+    }
+
+    /// You can't raise somebody's building before you've met them — the bug Aimee hit: the forge
+    /// appeared for a smith she'd never seen.
+    func testABuildingNeedsItsPersonFirst() {
+        let store = GameStore(io: .temporary(name: "gate-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 5000 }
+        for station in ContentCatalog.shared.stations where station.builtBy != nil {
+            XCTAssertFalse(store.buildableStations.contains { $0.id == station.id },
+                           "\(station.name) was buildable before anybody was found")
+            XCTAssertFalse(store.build(station), "built \(station.name) without its person")
+        }
     }
 
     // MARK: Pages

@@ -214,10 +214,16 @@ extension GameStore {
 
             // Entering unseals this world: from here on its rolled values may be described.
             state.reality.visitedWorldSeeds.insert(seed)
-            // Everyone whose signature this world satisfies is found by arriving. Pages are a
-            // guide, never a gate — writing the right world by luck finds them just the same.
+            // **Whose signature this world matches — not who you have met.**
+            //
+            // Arriving used to mark them found, silently, in the save. So the forge appeared at
+            // Aimee's base for a smith she had never laid eyes on (6 Aug): *"finding a traveller
+            // should mean actually running across the person as an entity on a world you find them
+            // in."* Quite right — a search loop whose payoff is a database write is not a search.
+            //
+            // They are *placed on the map* now, and finding them means walking up to them. What
+            // arriving buys you is knowing they're here, which is what makes it worth looking.
             for traveller in world.travellers {
-                state.reality.library.foundTravellers.insert(traveller)
                 state.reality.library.knownTravellers.insert(traveller)
             }
             // Pages that didn't surface here have waited one world longer.

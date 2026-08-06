@@ -20,7 +20,27 @@
       "leansToward": [
         "locationClue",
         "worldWorthWriting"
-      ]
+      ],
+      "meeting": {
+        "opening": "She's got a stick planted in the ground and she's sighting along it at nothing. \"Don't move. You're the first fixed point I've had in a long while.\"",
+        "questions": [
+          {
+            "ask": "What are you measuring?",
+            "reply": "\"The drift. Everything here slides about half a pace a day and I'd like to know toward what.\" She marks the stick with her thumbnail. \"It's not a useful thing to know. It's just the only thing I can still do properly.\""
+          },
+          {
+            "ask": "How long have you been here?",
+            "reply": "\"I stopped counting at four hundred. Not days — I don't have days. Four hundred sightings.\" A shrug. \"It's a lot of stick.\""
+          },
+          {
+            "ask": "Did you write this place?",
+            "reply": "\"No. Somebody did. It's too tidy to be an accident and too pointless to be on purpose.\" She looks at you properly for the first time. \"Was it you?\""
+          }
+        ],
+        "offer": "There's a base. Come and measure that instead.",
+        "accepted": "\"A base.\" She pulls the stick out of the ground and holds onto it. \"Right. I'll want to survey the whole thing before I unpack.\"",
+        "declined": "\"Suit yourself. I'm not going anywhere — that's rather the trouble.\""
+      }
     },
     {
       "id": "edren",
@@ -50,7 +70,27 @@
       "leansToward": [
         "ruin",
         "researchLead"
-      ]
+      ],
+      "meeting": {
+        "opening": "He's on his knees with his hands in the dirt and doesn't look up. \"Mind where you tread. There's a floor about eight inches down and I've nearly got the edge of it.\"",
+        "questions": [
+          {
+            "ask": "Whose floor?",
+            "reply": "\"No idea. That's why I'm digging.\" He sits back on his heels. \"Somebody laid it. Somebody knelt where I'm kneeling and pressed each stone down and thought about tomorrow. Then this.\""
+          },
+          {
+            "ask": "Were you digging when it happened?",
+            "reply": "\"Trowel in hand.\" He turns it over, looks at it. \"I've thought about that a great deal. Whether I'd have noticed if I'd been standing up.\""
+          },
+          {
+            "ask": "What have you found?",
+            "reply": "\"Floors, mostly. Everywhere I go there's a floor.\" He almost laughs. \"Do you know what that means? It means everywhere used to be somewhere.\""
+          }
+        ],
+        "offer": "Come home. There'll be more to dig than this.",
+        "accepted": "\"Let me finish this corner.\" He doesn't finish the corner. He's already up.",
+        "declined": "\"Another time, then. The floor'll keep.\""
+      }
     },
     {
       "id": "sela",
@@ -88,7 +128,27 @@
       "leansToward": [
         "whereabouts",
         "worldWorthWriting"
-      ]
+      ],
+      "meeting": {
+        "opening": "She's already walking when she sees you, and she doesn't stop, just changes direction slightly so the two of you converge. \"Oh, good. Company. Keep up.\"",
+        "questions": [
+          {
+            "ask": "Where are you going?",
+            "reply": "\"On.\" A beat. \"I know how that sounds. But I was going on before, as well, and at least now nobody's asking me when I'll settle.\""
+          },
+          {
+            "ask": "Aren't you tired?",
+            "reply": "\"Constantly.\" She grins. \"That was true at home too. The difference is that here it's the walking doing it, and I like the walking.\""
+          },
+          {
+            "ask": "How do you find your way?",
+            "reply": "\"I don't. Finding your way means there's somewhere you're meant to end up.\" She scans the horizon out of pure habit. \"I've made my peace with that. Mostly.\""
+          }
+        ],
+        "offer": "Come with me. You can leave again whenever you like.",
+        "accepted": "\"Now that,\" she says, \"is the first offer anyone's made me that understood the problem.\"",
+        "declined": "\"Fair enough. Mind how you go — and mind the ground here, it lies to you.\""
+      }
     },
     {
       "id": "tovin",
@@ -135,7 +195,27 @@
       "leansToward": [
         "symbol",
         "researchLead"
-      ]
+      ],
+      "meeting": {
+        "opening": "He's sitting with his back to a rock and a closed book on his knees. He looks at you, and then at the sky, and then at you again. \"You wrote this. I can tell by the light — it's got somebody's opinion in it.\"",
+        "questions": [
+          {
+            "ask": "You were a binder.",
+            "reply": "\"I was.\" He taps the cover without opening it. \"Wrote eleven. Held four. Lost all of them, in the end, which is what happens, and anyone who tells you otherwise is selling ink.\""
+          },
+          {
+            "ask": "What went wrong?",
+            "reply": "\"Nothing went wrong. That's the part nobody wants.\" He's quiet a moment. \"I wrote a greedy world because I wanted what was in it, and I stayed in it a little longer than it could hold. Every single time. Knowing better isn't the same as doing better.\""
+          },
+          {
+            "ask": "Why haven't you written your way out?",
+            "reply": "\"With what?\" He opens the book. Every page is blank. \"Paper's the easy part.\""
+          }
+        ],
+        "offer": "I've got ink. Come and use it.",
+        "accepted": "\"Careful,\" he says, getting up. \"I'm going to have opinions about your handwriting.\"",
+        "declined": "\"Go on, then. And listen — when the floor starts going, that's not the warning. That's the second warning.\""
+      }
     },
     {
       "id": "halloway",
@@ -165,7 +245,27 @@
       "leansToward": [
         "worldWorthWriting",
         "locationClue"
-      ]
+      ],
+      "meeting": {
+        "opening": "There's a fire going, banked low and tended, in a place with nothing to burn. She's sitting beside it with her hands out. \"Don't crowd it. It's shy.\"",
+        "questions": [
+          {
+            "ask": "You've kept a fire going out here?",
+            "reply": "\"Nine years of it.\" She feeds it something you don't get a look at. \"A forge isn't a building, whatever anybody tells you. A forge is a fire somebody stayed with.\""
+          },
+          {
+            "ask": "What do you make?",
+            "reply": "\"Nothing, now. Nothing to make it out of and nobody to make it for.\" She says it evenly, which is worse than bitterly. \"I keep my hand in. I heat things and let them cool and heat them again.\""
+          },
+          {
+            "ask": "What would you need?",
+            "reply": "\"Stone and iron and somewhere out of the wind.\" She finally looks up. \"And someone bringing me things worth working. That's the one I've missed.\""
+          }
+        ],
+        "offer": "I'll find you the stone and the iron. Come and build it.",
+        "accepted": "She stands, and she takes the fire with her somehow. \"Then let's not stand about. I've been cold a long time.\"",
+        "declined": "\"Right you are.\" She turns back to the fire. \"It'll be here. So will I.\""
+      }
     }
   ],
   "pages": [

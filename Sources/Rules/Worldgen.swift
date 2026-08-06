@@ -158,8 +158,24 @@ enum Worldgen {
             placedPages.append(page)
         }
 
-        // 9. Whoever this world's conditions describe is simply *here*.
-        let travellers = LibraryRules.travellersPresent(in: readings).map(\.id)
+        // 9. Whoever this world's conditions describe is *standing here*, on a tile, waiting.
+        //
+        // They used to be a list on the run that nothing ever placed, and arriving marked them
+        // found in the save — so the payoff for writing somebody's world was a database write
+        // (Aimee, 6 Aug). Now you have to walk to them, and talk to them.
+        let travellers = LibraryRules.travellersPresent(in: readings)
+            .map(\.id)
+            .filter { !library.foundTravellers.contains($0) }
+        var travellerRNG = SeededRNG(seed: seed).derived(0x7A4E1)
+        for traveller in travellers {
+            guard let point = randomFreePoint(in: map, avoiding: occupied,
+                                              minimumDistanceFrom: entry,
+                                              distance: Tuning.World.travellerMinimumDistance,
+                                              rng: &travellerRNG)
+            else { continue }
+            map[point].content = .traveller(traveller)
+            occupied.insert(point)
+        }
 
         // 10. Enemies, drawn from the world's own cast. It's daytime when you arrive, so it's the
         //     day roster you meet; the night roster swaps in when the world turns.

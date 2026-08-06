@@ -126,6 +126,9 @@ enum TileContent: Codable, Equatable, Sendable {
     case site(InstanceID)
     /// A page torn from someone's diary, lying where it fell.
     case diaryPage(DiaryPageID)
+    /// **Somebody, standing there.** Reaching them opens the meeting; recruiting them is what
+    /// actually finds them (Aimee, 6 Aug).
+    case traveller(TravellerID)
 
     var isPortal: Bool { if case .portal = self { true } else { false } }
 
@@ -133,7 +136,9 @@ enum TileContent: Codable, Equatable, Sendable {
     var isLoseable: Bool {
         switch self {
         case .node, .wildDrop, .lockedCache, .site, .diaryPage: true
-        case .empty, .hazard, .portal: false
+        // A person is not loot, and losing them to the floor is the point of the timer rather
+        // than a cost to be tallied.
+        case .empty, .hazard, .portal, .traveller: false
         }
     }
 }

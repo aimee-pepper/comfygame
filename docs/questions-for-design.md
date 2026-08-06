@@ -816,3 +816,35 @@ This is wider than fibre. Vitality feeds the creature cast, butchery, flora when
 every organic resource — so a median of 8 is very likely part of why play reads samey (audit #8 §3).
 
 </details>
+
+## Q39 — Meeting a traveller: what I built, and the three calls inside it
+
+Aimee, 6 Aug, in three messages: *"finding a traveller should mean actually running across the
+person as an entity on a world you find them in"*, *"they need to be only generated on a map that is
+appropriate to where their sought world location parameters are"*, and *"there should be a text
+interaction where you recruit them."*
+
+**Built.** They stand on a tile, well away from the way in. Walking onto them opens a written scene
+— an opening line, questions you can ask, and an offer. Agreeing is what writes them into the
+Library and raises their building. The signature gating was already exactly what she asked for:
+`LibraryRules.travellersPresent` only returns people **every one of whose conditions holds** in that
+world, so nobody turns up anywhere that isn't theirs.
+
+**The bug this fixes:** arriving used to mark somebody found, silently, in the save. Aimee built a
+forge for a smith she had never laid eyes on and asked, reasonably, when she had met him. The answer
+was "when you bound a world with a hot ductile substrate, and nothing told you."
+
+Three calls inside it, all mine, all cheap to change:
+
+1. **Recruiting costs nothing.** Finding them is the cost — you had to write their world. Adding a
+   price would make the search loop pay twice.
+2. **Declining leaves them standing there**, and the world will take them like any other tile. So
+   "I'll come back for them" is a bet, not a plan. The alternative is that they persist across
+   worlds, which is kinder and much less interesting.
+3. **Once found they stop being generated**, so a world matching Halloway's signature after you have
+   Halloway just doesn't have him in it. Otherwise the fifth meeting is a chore.
+
+**Also worth your attention:** they're currently placed anywhere passable at least
+`Tuning.World.travellerMinimumDistance` from the entry. It would be better if they were *somewhere
+that made sense* — a smith beside a landmark, an archaeologist at a ruin. That's a `sites.json` join
+and I'd like a ruling on whether it should be a preference or a requirement.

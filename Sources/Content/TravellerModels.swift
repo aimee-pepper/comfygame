@@ -27,11 +27,82 @@ struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
     /// particular person's diary can be motivated by what they knew.
     var leansToward: [DiaryPageDef.Kind]
 
+    /// **What they say when you walk up to them** (Aimee, 6 Aug).
+    ///
+    /// Finding somebody used to be a write to the save the instant you arrived in a world matching
+    /// their signature — so a forge appeared at the base for a smith the player had never laid eyes
+    /// on. *"Finding a traveller should mean actually running across the person as an entity on a
+    /// world you find them in"*, and *"there should be a text interaction where you recruit them."*
+    ///
+    /// So they stand on the map, and this is the scene. Nil for anyone not yet written, who then
+    /// joins on a plain acknowledgement rather than in silence.
+    var meeting: TravellerMeeting?
+
     var complexity: Int { signature.count }
 
     /// Whether a world is the one this traveller is in.
     func isFound(in readings: PressureReadings) -> Bool {
         !signature.isEmpty && signature.allSatisfy { $0.condition.holds(in: readings) }
+    }
+
+    /// Tolerant, per the policy in `Migrations.swift` — a travellers file written before anybody
+    /// could be spoken to still loads.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(TravellerID.self, forKey: .id)
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? id.rawValue
+        calling = try c.decodeIfPresent(String.self, forKey: .calling) ?? ""
+        blurb = try c.decodeIfPresent(String.self, forKey: .blurb) ?? ""
+        icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "figure.stand"
+        signature = try c.decodeIfPresent([SignatureClue].self, forKey: .signature) ?? []
+        leansToward = try c.decodeIfPresent([DiaryPageDef.Kind].self, forKey: .leansToward) ?? []
+        meeting = try c.decodeIfPresent(TravellerMeeting.self, forKey: .meeting)
+    }
+}
+
+/// The scene when you reach somebody.
+///
+/// Deliberately small: **an opening, some things you can ask, and a decision.** Nobody is a quest
+/// chain. What makes the moment worth having is that you wrote the world they were standing in.
+///
+/// Everything is prose written by a person, never a system explaining itself — the same rule the
+/// diary pages follow.
+struct TravellerMeeting: Codable, Equatable, Sendable {
+    /// The first thing they say. What you read on walking up.
+    var opening: String
+    /// Things you can ask before deciding. Asking costs nothing and never runs out — the world
+    /// crumbling is the only clock, and it's the same clock as everything else.
+    var questions: [Exchange]
+    /// What you offer. One line, in your voice.
+    var offer: String
+    /// What they say on agreeing.
+    var accepted: String
+    /// What they say if you walk away. They stay where they are — the world will take them, which
+    /// is the whole weight of the decision.
+    var declined: String
+
+    struct Exchange: Codable, Equatable, Sendable, Identifiable {
+        var ask: String
+        var reply: String
+        var id: String { ask }
+    }
+
+    init(opening: String, questions: [Exchange] = [], offer: String,
+         accepted: String, declined: String) {
+        self.opening = opening
+        self.questions = questions
+        self.offer = offer
+        self.accepted = accepted
+        self.declined = declined
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        opening = try c.decodeIfPresent(String.self, forKey: .opening) ?? ""
+        questions = try c.decodeIfPresent([Exchange].self, forKey: .questions) ?? []
+        offer = try c.decodeIfPresent(String.self, forKey: .offer) ?? "Come back with me."
+        accepted = try c.decodeIfPresent(String.self, forKey: .accepted) ?? "All right."
+        declined = try c.decodeIfPresent(String.self, forKey: .declined) ?? "I'll be here."
     }
 }
 

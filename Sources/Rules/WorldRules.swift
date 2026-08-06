@@ -20,6 +20,8 @@ enum WorldRules {
         case foundSite(SiteID)
         case readPage(DiaryPageID)
         case foundTraveller(TravellerID)
+        /// You've walked up to somebody. The scene, not the recruitment.
+        case metTraveller(TravellerID)
         case searchedSite(SiteID, turnsRemaining: Int)
         case siteOpened(SiteID)
         case learnedSymbol(SymbolID)
@@ -199,6 +201,10 @@ enum WorldRules {
                 events.append(.foundSite(site.siteID))
                 state.reality.discovery.recordSite(site.siteID, runIndex: run.runIndex)
             }
+        case .traveller(let id):
+            // **Standing on them opens the scene, and nothing else happens yet.** Being found is
+            // something they agree to, not something walking over a tile does to them.
+            events.append(.metTraveller(id))
         case .empty, .node:
             break
         }
@@ -206,6 +212,27 @@ enum WorldRules {
         state.worlds.activeRun = run
         events.append(contentsOf: advanceTurn(in: &state))
         return events
+    }
+
+    /// **Talking somebody into coming home with you.**
+    ///
+    /// This is what "finding" a traveller means now (Aimee, 6 Aug). Arriving in a world that
+    /// matches their signature only puts them on the map; reaching them opens the scene; agreeing
+    /// is what writes them into the Library and raises their building at the base.
+    ///
+    /// Declining leaves them standing there. They don't move and they don't hold it against you —
+    /// but the world is crumbling, and it will take the tile they're on like any other.
+    static func recruit(_ id: TravellerID, in state: inout GameState) -> [Event] {
+        guard var run = state.worlds.activeRun,
+              case .traveller(let here) = run.map[run.playerPosition].content, here == id
+        else { return [.blocked("Nobody here.")] }
+
+        run.map[run.playerPosition].content = .empty
+        run.travellersHere.removeAll { $0 == id }
+        state.worlds.activeRun = run
+        state.reality.library.foundTravellers.insert(id)
+        state.reality.library.knownTravellers.insert(id)
+        return [.foundTraveller(id)]
     }
 
     /// Harvests the node under the player. One pull per turn.

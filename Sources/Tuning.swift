@@ -105,6 +105,11 @@ enum Tuning {
         /// not sterile, and usable water goes to zero the moment a world freezes over.
         static let dryLifeFraction: Double = 0.35   // PLACEHOLDER
         static let barrenThreshold: Double = 10
+        /// **How deep a food web each point of production can carry.** Consumers add to vitality
+        /// (Q38) and would otherwise be able to describe a rich web with nothing underneath it.
+        static let trophicDepthPerProducer: Double = 1.2  // PLACEHOLDER
+        /// Below this the world says so: things live here and there is nothing for them to eat.
+        static let shallowFoodWeb: Double = 12            // PLACEHOLDER
 
         // The energy budget: one purse for size, armour, insulation, weapons and ornament.
         static let budgetPerProductivity: Double = 1.0
@@ -221,6 +226,9 @@ enum Tuning {
         static let exitPortalCountRange: ClosedRange<Int> = 1...2  // brief: always ≥1
         static let minimumExitPortalDistance: Int = 6              // PLACEHOLDER — worth finding
         static let enemyFreeRadiusAroundEntry: Int = 3             // PLACEHOLDER — no ambush on arrival
+        /// How far from the way in somebody is standing. Far enough that reaching them is a walk
+        /// through a world you wrote for them, which is the entire point of the search loop.
+        static let travellerMinimumDistance: Int = 6               // PLACEHOLDER
         static let wildDropCountRange: ClosedRange<Int> = 2...4    // PLACEHOLDER
         static let wildDropAmountRange: ClosedRange<Int> = 1...2   // PLACEHOLDER
         /// Chance a world contains a locked cache.

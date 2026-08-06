@@ -32,6 +32,12 @@ struct WorldView: View {
             }
         }
         .background(Color(.systemGroupedBackground))
+        // **Standing on somebody opens the scene.** Driven off the map rather than off an event, so
+        // a force-quit mid-conversation resumes with the conversation still open — you are still
+        // standing there, and they are still waiting (pillar 2).
+        .sheet(item: Binding(get: { store.travellerHere }, set: { _ in })) { traveller in
+            TravellerMeetingView(traveller: traveller).environmentObject(store)
+        }
     }
 
     /// Tap an adjacent tile to step; tap anywhere else to walk there turn by turn.
@@ -62,6 +68,10 @@ struct WorldView: View {
                     Text(entry.line)
                         .font(.caption)
                         .foregroundStyle(entry.colour)
+                        // Wraps rather than demanding a line's worth of width. Same hazard the
+                        // haul row had: inside a scrolling `VStack`, a child that wants to be wide
+                        // makes every sibling wide, and the map is the sibling that suffers.
+                        .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
@@ -87,7 +97,10 @@ struct WorldView: View {
             ContentCatalog.shared.diaryPage(id).map { "A page, in somebody's hand. \"\($0.prose)\"" }
                 ?? "A page from someone's diary."
         case .foundTraveller(let id):
-            ContentCatalog.shared.traveller(id).map { "\($0.name) is here. \($0.blurb)" }
+            ContentCatalog.shared.traveller(id).map { "\($0.name) is coming with you." }
+                ?? "They're coming with you."
+        case .metTraveller(let id):
+            ContentCatalog.shared.traveller(id).map { "\($0.name), \($0.calling). \($0.blurb)" }
                 ?? "Someone is here."
         case .nightfall: "The light goes. You can see less of this than you could."
         case .daybreak: "It comes back around. You can see again."
@@ -125,7 +138,7 @@ struct WorldView: View {
         switch event {
         case .pickedUp, .harvested, .foundPortal, .pickedUpItem, .searchedSite, .siteOpened: .primary
         case .foundSite, .learnedSymbol, .gainedEssence: .primary
-        case .readPage, .foundTraveller: .primary
+        case .readPage, .foundTraveller, .metTraveller: .primary
         case .nightfall, .daybreak: .secondary
         case .cacheOpened: .purple
         case .satchelFull: .orange
@@ -137,19 +150,38 @@ struct WorldView: View {
 
     // MARK: Satchel
 
+    /// What you're carrying, and how long you've been at it.
+    ///
+    /// **The haul scrolls sideways.** With four resources in the game this was a fixed row; with
+    /// twenty-three, carrying enough variety made the row wider than the phone — and because a
+    /// `VStack` takes the width of its widest child, the *map* grew to match and walked off the
+    /// edge of the screen (Aimee, 6 Aug). Health and the turn count stay pinned outside the scroll,
+    /// because those two are what you actually check.
     private func satchel(_ run: WorldRun) -> some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             Label("\(run.binderHP)", systemImage: "heart.fill")
                 .foregroundStyle(run.binderHP <= Tuning.Encounter.binderMaxHP / 3 ? .red : .primary)
+                .fixedSize()
+
             if run.satchel.isEmpty {
                 Text("satchel empty").foregroundStyle(.secondary)
+                Spacer(minLength: 0)
             } else {
-                ForEach(run.satchel.nonZero, id: \.id) { entry in
-                    Label("\(entry.amount)", systemImage: ContentCatalog.shared.resource(entry.id)?.icon ?? "cube")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 14) {
+                        ForEach(run.satchel.nonZero, id: \.id) { entry in
+                            Label("\(entry.amount)",
+                                  systemImage: ContentCatalog.shared.resource(entry.id)?.icon ?? "cube")
+                            .fixedSize()
+                        }
+                    }
+                    .padding(.trailing, 4)
                 }
+                // Never lets its content dictate the row's width — the whole point of the fix.
+                .frame(maxWidth: .infinity)
             }
-            Spacer()
-            Text("turn \(run.turnsTaken)").foregroundStyle(.secondary)
+
+            Text("turn \(run.turnsTaken)").foregroundStyle(.secondary).fixedSize()
         }
         .font(.footnote.monospacedDigit())
         .padding(10)
@@ -396,6 +428,8 @@ private struct TileView: View {
         case .lockedCache: return "lock.fill"
         case .diaryPage: return "doc.text"
         case .site: return site?.icon ?? "building.columns"
+        // A person reads as a person, in their own colour — see `tint`.
+        case .traveller(let id): return ContentCatalog.shared.traveller(id)?.icon ?? "figure.wave"
         }
     }
 
@@ -409,6 +443,9 @@ private struct TileView: View {
         case .wildDrop: return .teal
         case .diaryPage: return .indigo
         case .site: return site?.category == .hazard ? .orange : .brown
+        // Green, and nothing else on the map is green. A person standing in a world you wrote is
+        // the single most interesting thing on the grid and has to look like it.
+        case .traveller: return .green
         default: return .primary.opacity(0.7)
         }
     }
