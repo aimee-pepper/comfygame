@@ -15,6 +15,7 @@ struct BaseView: View {
             VStack(spacing: 16) {
                 purse
                 stations
+                buildingSites
                 departure
             }
             .padding(16)
@@ -58,6 +59,23 @@ struct BaseView: View {
                     StationRow(station: station, tier: state.base.station(station.id).tier)
                 }
                 .buttonStyle(.plain)
+            }
+        }
+    }
+
+    // MARK: Building sites
+
+    /// **What you could raise, now that you've met somebody who'd run it** (Aimee, 6 Aug).
+    ///
+    /// Sits under the stations rather than in a shop, because that's what it is: a patch of ground
+    /// with a person standing on it waiting for you to find the iron.
+    @ViewBuilder
+    private var buildingSites: some View {
+        if !store.buildableStations.isEmpty {
+            VStack(spacing: 10) {
+                ForEach(store.buildableStations) { station in
+                    BuildingSiteCard(station: station)
+                }
             }
         }
     }
@@ -138,6 +156,78 @@ private struct StationRow: View {
         .padding(14)
         .frame(minHeight: 60)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+/// A building that could exist, and doesn't yet.
+///
+/// The card carries the *person's* line rather than a shop blurb, because meeting them is what
+/// unlocked it — "Halloway will raise a forge here, if you can find the stone and the iron for it."
+private struct BuildingSiteCard: View {
+    @EnvironmentObject private var store: GameStore
+    let station: StationDef
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                Image(systemName: station.icon)
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 30)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(station.name).font(.headline)
+                    if let person = station.builtBy.flatMap({ ContentCatalog.shared.traveller($0) }) {
+                        Text("\(person.name), \(person.calling)")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                Spacer(minLength: 0)
+                Text("not built")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 7).padding(.vertical, 3)
+                    .background(Color(.tertiarySystemFill), in: Capsule())
+            }
+
+            Text(station.buildBlurb ?? station.blurb)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let cost = station.buildCost {
+                Text(describe(cost))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+
+            let missing = store.shortfall(for: station)
+            if missing.isEmpty {
+                Button { store.build(station) } label: {
+                    Label("Build it", systemImage: "hammer")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
+            } else {
+                // Says what's short rather than greying out a button and leaving you to work it
+                // out — the same promise the research tree makes.
+                Text("Still need \(missing.joined(separator: ", ")).")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(minHeight: 44)
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func describe(_ cost: UpgradeCost) -> String {
+        var parts: [String] = []
+        if cost.essence > 0 { parts.append("\(cost.essence) essence") }
+        for (id, amount) in cost.resources.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
+            parts.append("\(amount) \(ContentCatalog.shared.resource(id)?.name.lowercased() ?? id.rawValue)")
+        }
+        return parts.isEmpty ? "free" : parts.joined(separator: " · ")
     }
 }
 

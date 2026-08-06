@@ -207,9 +207,8 @@ private struct GearSlotRow: View {
     let slot: GearSlot
     let member: PartyMember
 
-    private var worn: ItemDef? {
-        store.worn(slot, by: member).flatMap { ContentCatalog.shared.item($0) }
-    }
+    private var piece: EquippedPiece? { store.worn(slot, by: member) }
+    private var worn: ItemDef? { piece?.definition }
 
     var body: some View {
         Button { isChoosing = true } label: {
@@ -218,10 +217,11 @@ private struct GearSlotRow: View {
                     .foregroundStyle(worn?.rarity.tint ?? Color.secondary)
                     .frame(width: 22)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(worn?.name ?? slot.displayName)
+                    Text(piece?.displayName ?? slot.displayName)
                         .foregroundStyle(worn == nil ? Color.secondary : worn!.rarity.tint)
-                    if let worn, let tier = worn.gear?.tier {
-                        Text("tier \(tier)").font(.caption2).foregroundStyle(.secondary)
+                    if let piece, let worn {
+                        Text("\(worn.rarity.rawValue) · tier \(piece.effectiveTier)")
+                            .font(.caption2).foregroundStyle(.secondary)
                     }
                 }
                 Spacer()

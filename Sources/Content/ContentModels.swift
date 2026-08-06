@@ -285,11 +285,58 @@ struct GearDef: Codable, Equatable, Sendable {
 /// `CodingKeyRepresentable` so `[GearSlot: ItemID]` encodes as a JSON *object* rather than the
 /// flat alternating array Swift uses by default — the same reason `StringIdentifier` conforms.
 /// Saves stay readable, and a hand-edited one round-trips.
+/// **A standard assortment** (Aimee, 6 Aug), rather than a sword and a shirt.
+///
+/// `armor` keeps its old raw value even though it reads as "Body" — it's a key inside every save's
+/// `equipped` dictionary, and renaming it would quietly empty everybody's armour slot.
+///
+/// Tool and Keepsake come from `materials-crafting-spec.md` §7: a tool is what lets you work harder
+/// ground, and a keepsake is somewhere for the singular things to live — the artefact you keep
+/// because there isn't another one.
 enum GearSlot: String, Codable, CaseIterable, Sendable, CodingKeyRepresentable {
-    case weapon, armor
+    case weapon
+    case offhand
+    case head
+    case armor
+    case hands
+    case feet
+    case tool
+    case keepsake
 
-    var displayName: String { self == .weapon ? "Weapon" : "Armor" }
-    var icon: String { self == .weapon ? "hammer" : "shield" }
+    var displayName: String {
+        switch self {
+        case .weapon: "Weapon"
+        case .offhand: "Off-hand"
+        case .head: "Head"
+        case .armor: "Body"
+        case .hands: "Hands"
+        case .feet: "Feet"
+        case .tool: "Tool"
+        case .keepsake: "Keepsake"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .weapon: "hammer"
+        case .offhand: "shield.lefthalf.filled"
+        case .head: "circle.dashed"
+        case .armor: "shield"
+        case .hands: "hand.raised"
+        case .feet: "shoeprints.fill"
+        case .tool: "wrench.and.screwdriver"
+        case .keepsake: "sparkles"
+        }
+    }
+
+    /// Whether this slot contributes to soaking damage. The weapon, the tool and the keepsake do
+    /// other jobs.
+    var isProtective: Bool {
+        switch self {
+        case .offhand, .head, .armor, .hands, .feet: true
+        case .weapon, .tool, .keepsake: false
+        }
+    }
 
     var codingKey: CodingKey { StringCodingKey(rawValue) }
     init?<T: CodingKey>(codingKey: T) { self.init(rawValue: codingKey.stringValue) }
@@ -381,6 +428,54 @@ struct StationDef: Codable, Equatable, Identifiable, Sendable {
     var maxTier: Int
     /// Which screen this station routes to. Matches a case of `AppRoute`.
     var route: String
+
+    /// **Who has to be found before this can be built** (Aimee, 6 Aug).
+    ///
+    /// A forge is not a thing you buy — it's a person you meet out there and persuade to come home
+    /// with you. So the crafting buildings hang off the search loop that already exists: write a
+    /// world matching a traveller's signature, meet them, and the building site appears at the base.
+    /// Nil means the building needs nobody.
+    var builtBy: TravellerID?
+    /// What raising it costs once you have the person. Nil means it costs nothing.
+    var buildCost: UpgradeCost?
+    /// The line on the building site, before it's built. Written from the person's point of view,
+    /// because they're the reason it exists.
+    var buildBlurb: String?
+
+    init(id: StationID, name: String, icon: String, blurb: String, sortOrder: Int,
+         unlockedAtStart: Bool, startingTier: Int, maxTier: Int, route: String,
+         builtBy: TravellerID? = nil, buildCost: UpgradeCost? = nil, buildBlurb: String? = nil) {
+        self.id = id
+        self.name = name
+        self.icon = icon
+        self.blurb = blurb
+        self.sortOrder = sortOrder
+        self.unlockedAtStart = unlockedAtStart
+        self.startingTier = startingTier
+        self.maxTier = maxTier
+        self.route = route
+        self.builtBy = builtBy
+        self.buildCost = buildCost
+        self.buildBlurb = buildBlurb
+    }
+
+    /// Tolerant, per the policy in `Migrations.swift` — a stations file written before buildings
+    /// could be built still loads.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(StationID.self, forKey: .id)
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? id.rawValue
+        icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "square"
+        blurb = try c.decodeIfPresent(String.self, forKey: .blurb) ?? ""
+        sortOrder = try c.decodeIfPresent(Int.self, forKey: .sortOrder) ?? 0
+        unlockedAtStart = try c.decodeIfPresent(Bool.self, forKey: .unlockedAtStart) ?? false
+        startingTier = try c.decodeIfPresent(Int.self, forKey: .startingTier) ?? 0
+        maxTier = try c.decodeIfPresent(Int.self, forKey: .maxTier) ?? 0
+        route = try c.decodeIfPresent(String.self, forKey: .route) ?? "base"
+        builtBy = try c.decodeIfPresent(TravellerID.self, forKey: .builtBy)
+        buildCost = try c.decodeIfPresent(UpgradeCost.self, forKey: .buildCost)
+        buildBlurb = try c.decodeIfPresent(String.self, forKey: .buildBlurb)
+    }
 }
 
 /// A Reality-layer Constellation node.

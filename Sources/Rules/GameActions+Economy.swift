@@ -223,63 +223,168 @@ extension GameStore {
     }
 
     /// What each of them is wearing. **Both carry their own** (Aimee, 5 Aug).
-    func worn(_ slot: GearSlot, by member: PartyMember) -> ItemID? {
-        switch member {
-        case .binder: state.base.binderEquipped[slot]
-        case .companion: state.base.companion.equipped[slot]
-        }
+    func worn(_ slot: GearSlot, by member: PartyMember) -> EquippedPiece? {
+        state.base.worn(slot, by: member)
     }
 
     /// What wearing this would change, in the units the fight actually uses.
     ///
     /// A tier number only answers "is this better?" if you already know the formula. This answers
     /// it directly: **+4 damage**, or **−2 protection**, or no change at all.
-    func gearDelta(wearing candidate: ItemDef, for member: PartyMember) -> Int {
-        guard let gear = candidate.gear else { return 0 }
-        let wornTier = worn(gear.slot, by: member)
-            .flatMap { ContentCatalog.shared.item($0)?.gear?.tier } ?? 0
-        let step = gear.slot == .weapon
+    func gearDelta(wearing stack: ItemStack, for member: PartyMember) -> Int {
+        delta(tier: stack.effectiveTier,
+              slot: ContentCatalog.shared.item(stack.catalogID)?.gear?.slot,
+              for: member)
+    }
+
+    /// The same question about a piece you don't hold — "what would one of these be worth?"
+    func gearDelta(wearing definition: ItemDef, for member: PartyMember) -> Int {
+        delta(tier: definition.gear?.tier ?? 0, slot: definition.gear?.slot, for: member)
+    }
+
+    private func delta(tier: Int, slot: GearSlot?, for member: PartyMember) -> Int {
+        guard let slot else { return 0 }
+        let wornTier = worn(slot, by: member)?.effectiveTier ?? 0
+        let step = slot == .weapon
             ? Tuning.Encounter.attackPerWeaponTier
             : Tuning.Encounter.defencePerArmorTier
-        return (gear.tier - wornTier) * step
+        return (tier - wornTier) * step
     }
 
     /// Whether anything in the Storehouse would be an upgrade — drives the nudge on the Party card
     /// so a better blade doesn't sit in a list going unnoticed.
     func hasUpgradeAvailable(for slot: GearSlot, member: PartyMember) -> Bool {
-        wearable(in: slot).contains { stack in
-            guard let item = ContentCatalog.shared.item(stack.catalogID) else { return false }
-            // Something already on somebody else isn't an upgrade waiting to be noticed.
-            guard !isWornByAnyone(stack.catalogID) || worn(slot, by: member) == stack.catalogID
-            else { return false }
-            return gearDelta(wearing: item, for: member) > 0
-        }
+        wearable(in: slot).contains { gearDelta(wearing: $0, for: member) > 0 }
     }
 
-    /// Whether a piece is already on one of them. Two people can't wear the same sword.
-    func isWornByAnyone(_ id: ItemID) -> Bool {
-        state.base.binderEquipped.values.contains(id) || state.base.companion.equipped.values.contains(id)
-    }
-
-    /// Put something on. The piece it replaces goes back to the Storehouse rather than vanishing,
-    /// and it comes off whoever else was wearing it — there is only one of each.
+    /// Put something on.
+    ///
+    /// **It comes out of the bin**, and whatever it replaces goes back in. That's the fix for a
+    /// real bug: equipping used to claim a piece by *name* and strip it off whoever else was
+    /// wearing one, so a storehouse holding four padded guards could still only dress one person.
+    /// You have four; you can wear four.
     func equip(_ stack: ItemStack, on member: PartyMember) {
         guard let slot = ContentCatalog.shared.item(stack.catalogID)?.gear?.slot else { return }
         mutate("equip \(stack.catalogID.rawValue)", flush: true) { state in
-            if state.base.binderEquipped[slot] == stack.catalogID { state.base.binderEquipped[slot] = nil }
-            if state.base.companion.equipped[slot] == stack.catalogID { state.base.companion.equipped[slot] = nil }
+            guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }),
+                  let taken = state.base.inventory.stacks[index].removing(1)
+            else { return }
+            if state.base.inventory.stacks[index].isEmpty {
+                state.base.inventory.stacks.remove(at: index)
+            }
+            // What was already on goes back to the shelf rather than evaporating.
+            let previous: EquippedPiece?
             switch member {
-            case .binder: state.base.binderEquipped[slot] = stack.catalogID
-            case .companion: state.base.companion.equipped[slot] = stack.catalogID
+            case .binder:
+                previous = state.base.binderEquipped[slot]
+                state.base.binderEquipped[slot] = EquippedPiece(taken)
+            case .companion:
+                previous = state.base.companion.equipped[slot]
+                state.base.companion.equipped[slot] = EquippedPiece(taken)
+            }
+            if let previous {
+                state.base.store(previous.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
+            }
+        }
+    }
+
+    // MARK: - Building sites
+
+    /// **Buildings you could raise, because you've met the person who'd run them** (Aimee, 6 Aug).
+    ///
+    /// A forge isn't bought off a list — it's a smith you found out in a world and brought home.
+    /// Which hangs the crafting buildings off the search loop that already exists: write a world
+    /// matching Halloway's signature, meet Halloway, and the building site appears here.
+    var buildableStations: [StationDef] {
+        ContentCatalog.shared.stationsInOrder.filter { station in
+            guard !state.base.station(station.id).isUnlocked, let person = station.builtBy
+            else { return false }
+            return state.reality.library.foundTravellers.contains(person)
+        }
+    }
+
+    /// Buildings whose person is still out there. Not shown as sites — you don't know they're
+    /// possible yet — but the Library lists who you're missing.
+    func canAfford(_ station: StationDef) -> Bool {
+        guard let cost = station.buildCost else { return true }
+        return EconomyRules.canAfford(cost, in: state)
+    }
+
+    func shortfall(for station: StationDef) -> [String] {
+        guard let cost = station.buildCost else { return [] }
+        return EconomyRules.shortfall(cost, in: state)
+    }
+
+    /// Raise the building. One-way, and cheap to describe: it costs what it says and then it's there.
+    @discardableResult
+    func build(_ station: StationDef) -> Bool {
+        guard buildableStations.contains(where: { $0.id == station.id }), canAfford(station)
+        else { return false }
+        mutate("build \(station.id.rawValue)", flush: true) { state in
+            if let cost = station.buildCost { EconomyRules.pay(cost, in: &state) }
+            state.base.stations[station.id] = StationState(isUnlocked: true,
+                                                           tier: station.startingTier)
+        }
+        return true
+    }
+
+    // MARK: - The Blacksmith
+
+    /// How much stock is on the shelf at all, for the header — a hoard's worth in one number.
+    var materialSampleCount: Int {
+        state.base.inventory.stacks.reduce(0) { $0 + $1.materials.count }
+    }
+
+    /// **Everything the smith could work on**, worn pieces included.
+    ///
+    /// A piece being on somebody is the *most* likely reason to want it reforged, so equipped gear
+    /// is listed alongside stored gear rather than having to be taken off first. Worn pieces are
+    /// presented as the single-instance stacks they'd be if you took them off, which is exactly
+    /// what `reforge` puts back.
+    var reforgeable: [ReforgeTarget] {
+        var targets: [ReforgeTarget] = []
+        for member in PartyMember.allCases {
+            for slot in GearSlot.allCases {
+                if let piece = state.base.worn(slot, by: member) {
+                    targets.append(.worn(slot: slot, member: member, piece: piece))
+                }
+            }
+        }
+        targets += state.base.inventory.stacks
+            .filter { ContentCatalog.shared.item($0.catalogID)?.gear != nil }
+            .map { ReforgeTarget.stored($0) }
+        return targets.sorted { $0.effectiveTier > $1.effectiveTier }
+    }
+
+    func readiness(of target: ReforgeTarget) -> SmithRules.Readiness {
+        SmithRules.readiness(for: target.catalogID, at: target.upgradeLevel, in: state)
+    }
+
+    /// Spend stock and essence to push a piece one tier further.
+    func reforge(_ target: ReforgeTarget) {
+        mutate("reforge \(target.catalogID.rawValue)", flush: true) { state in
+            switch target {
+            case .stored(let stack):
+                SmithRules.reforge(stored: stack, in: &state)
+            case .worn(let slot, let member, _):
+                SmithRules.reforge(worn: slot, on: member, in: &state)
             }
         }
     }
 
     func unequip(_ slot: GearSlot, from member: PartyMember) {
         mutate("unequip \(slot.rawValue)", flush: true) { state in
+            let removed: EquippedPiece?
             switch member {
-            case .binder: state.base.binderEquipped[slot] = nil
-            case .companion: state.base.companion.equipped[slot] = nil
+            case .binder:
+                removed = state.base.binderEquipped[slot]
+                state.base.binderEquipped[slot] = nil
+            case .companion:
+                removed = state.base.companion.equipped[slot]
+                state.base.companion.equipped[slot] = nil
+            }
+            if let removed {
+                state.base.store(removed.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
             }
         }
     }

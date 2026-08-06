@@ -526,8 +526,12 @@ final class CombatTests: XCTestCase {
         thick.size = 60
         thick.covering = Covering(hardness: 5, length: 90, coverage: 90)
         let store = inFightWith([thick])
+        // **Both of them carry it.** Turn order comes off initiative now, so whether the Binder or
+        // Quill swings first varies with the seed — arming only one made this assert about whoever
+        // happened to go first.
         store.mutate("carry something that tears") { state in
             state.base.companion.equipped[.weapon] = "blade_chipped"   // rend
+            state.base.binderEquipped[.weapon] = "blade_chipped"
         }
         let foe = try XCTUnwrap(foes(store).first)
         store.takeCombatAction(.attack(foe: foe.id))
@@ -542,9 +546,12 @@ final class CombatTests: XCTestCase {
         plated.size = 70
         plated.covering = Covering(hardness: 95, length: 5, coverage: 95)
 
-        func damageDealt(with weapon: ItemID?) throws -> Int {
+        func damageDealt(with weapon: EquippedPiece?) throws -> Int {
             let store = inFightWith([plated])
-            store.mutate("equip") { $0.base.companion.equipped[.weapon] = weapon }
+            store.mutate("equip") { state in
+                state.base.companion.equipped[.weapon] = weapon
+                state.base.binderEquipped[.weapon] = weapon
+            }
             let foe = try XCTUnwrap(foes(store).first)
             let before = foe.currentHP
             store.takeCombatAction(.attack(foe: foe.id))

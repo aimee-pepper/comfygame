@@ -173,10 +173,28 @@
 - [x] Gear is found: worn from the Storehouse, tiers derive from it, sites carry the better pieces
 - [x] Equipping UI: worn, candidates best-first, and the improvement stated in fight units
 - [x] An upgrade nudge on the Party screen, so a better blade doesn't sit unnoticed
-- [ ] Crafting buildings — **a recruited specialist unlocks the ability to BUILD the building**
-      (Aimee, 5 Aug); needs recruitment, and two progressions tracked: found vs built
-- [ ] Open: the full list of crafting trades
-- [ ] Ordinary gear from encounters — currently only sites drop it
+- [x] Crafting buildings — **a recruited specialist unlocks the ability to BUILD the building**
+      (Aimee, 5–6 Aug). A station with `builtBy` in `stations.json` is found-then-built: meet the
+      person out in a world, then raise the building at the base for its `buildCost`. Found and
+      built are separate states. Halloway the smith and the Blacksmith are the first pair.
+- [ ] Open: the full list of crafting trades — Tannery and Apothecary specced, unbuilt (Q37)
+- [x] Ordinary gear from encounters — a won fight can drop something to wear, per tier fought
+
+## Gear, properly (Aimee, 5–6 Aug 2026)
+- [x] **The Binder has its own slots.** Both of them carry their own; the damage-type matchup now
+      reaches the player's own turns instead of only Quill's automated ones
+- [x] **Eight slots, not two** — weapon, off-hand, head, body, hands, feet, tool, keepsake
+- [x] **44 pieces**, four rarities deep in every slot: 16 weapons across four damage/reach profiles
+- [x] Defence sums across every protective slot, not just the body piece
+- [x] **Equipping takes an instance out of the bin.** Four padded guards dress four people; one
+      blade dresses one. The old rule claimed a piece by name and stripped whoever else wore one
+- [x] The picker lists each distinct bin with its count, so the best goes to one and the next to
+      the other
+- [x] **The Blacksmith.** Reforging asks for a *property* and never a named thing, spends the worst
+      stock that clears the bar, and is per instance so the blade you carry is the one that grows
+- [x] Storehouse 16 slots + 6/tier (was 8 + 4), satchel 8 + 3/tier; capacity re-derives on load so
+      a rebalance reaches saves that already exist
+- [ ] Salvage — breaking down gear you don't want (spec §9.2, still open)
 
 ## Writing desk UI (session 15 feedback)
 - [x] Ten bins, one per target, each with its target sigil, its causes and its own modifiers

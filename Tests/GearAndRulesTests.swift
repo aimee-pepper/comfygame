@@ -230,6 +230,21 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertEqual(reloaded.base.companion.equipped[.weapon], "blade_keen")
     }
 
+    /// **A rebalance has to reach saves that already exist.**
+    ///
+    /// `Inventory.slots` is stored, so a save written when the storehouse held eight kept holding
+    /// eight forever and raising the number in `Tuning` did nothing for anybody who had already
+    /// played — which is precisely the person the change was for.
+    func testAnOlderSaveGetsTheStorehouseItShouldHave() throws {
+        var old = GameState.newGame()
+        old.base.inventory.slots = 8
+        old.base.inventory.stacks = [ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen")]
+
+        let reloaded = try SaveCodec.decode(try SaveCodec.encode(old))
+        XCTAssertEqual(reloaded.base.inventory.slots, Tuning.Economy.startingInventorySlots)
+        XCTAssertEqual(reloaded.base.inventory.stacks.count, 1, "resizing the shelf emptied it")
+    }
+
     func testAStationAddedAfterASaveWasWrittenStillAppears() throws {
         // The Library was invisible on any save written before it existed, because a station missing
         // from the save's dictionary defaulted to locked rather than to what the catalog says.
@@ -276,9 +291,36 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertEqual(CombatRules.damageKind(for: .companion, in: store.state), .rend)
     }
 
-    /// **There is only one of each.** Handing Quill the sword takes it off you.
+    /// **If you have four, you can wear four.**
+    ///
+    /// Aimee, 6 Aug: *"in storage it shows I have 4 padded guards and two chipped blades but when I
+    /// go to equip my character with those items it unequips them from my companion."* Equipping
+    /// used to claim a piece by catalogue id, so a storehouse holding four of a thing could still
+    /// only dress one person. Equipping now takes **an instance out of the bin**.
     @MainActor
-    func testOnlyOneOfThemCanWearAThingAtATime() {
+    func testAFullBinCanDressBothOfThem() throws {
+        let store = GameStore(io: .temporary(name: "bin-\(UUID().uuidString)"))
+        store.mutate("haul four home") { state in
+            state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1),
+                                               catalogID: "guard_padded", count: 4))
+        }
+
+        let bin = try XCTUnwrap(store.state.base.inventory.stacks.first)
+        store.equip(bin, on: .binder)
+        let after = try XCTUnwrap(store.state.base.inventory.stacks.first)
+        store.equip(after, on: .companion)
+
+        XCTAssertEqual(store.worn(.armor, by: .binder), "guard_padded")
+        XCTAssertEqual(store.worn(.armor, by: .companion), "guard_padded",
+                       "dressing one of them stripped the other")
+        XCTAssertEqual(store.state.base.inventory.stacks.first?.count, 2,
+                       "the two they are wearing didn't come out of the bin")
+    }
+
+    /// **And if you only have one, you can only wear one.** The bin is the truth either way — a
+    /// single blade can't be handed to Quill while you're still holding it.
+    @MainActor
+    func testOneOfAThingOnlyDressesOneOfThem() {
         let store = GameStore(io: .temporary(name: "one-\(UUID().uuidString)"))
         let stack = ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen")
         store.mutate("haul it home") { $0.base.inventory.add(stack) }
@@ -287,8 +329,24 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertEqual(store.worn(.weapon, by: .binder), "blade_keen")
 
         store.equip(stack, on: .companion)
-        XCTAssertEqual(store.worn(.weapon, by: .companion), "blade_keen")
-        XCTAssertNil(store.worn(.weapon, by: .binder), "both of them are wearing the same sword")
+        XCTAssertNil(store.worn(.weapon, by: .companion), "dressed them from an empty shelf")
+        XCTAssertEqual(store.worn(.weapon, by: .binder), "blade_keen",
+                       "the sword was taken off the person actually holding it")
+    }
+
+    /// Taking something off puts it back where it came from, rather than evaporating it.
+    @MainActor
+    func testTakingSomethingOffPutsItBackOnTheShelf() {
+        let store = GameStore(io: .temporary(name: "off-\(UUID().uuidString)"))
+        let stack = ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen")
+        store.mutate("haul it home") { $0.base.inventory.add(stack) }
+
+        store.equip(stack, on: .binder)
+        XCTAssertTrue(store.state.base.inventory.stacks.isEmpty)
+
+        store.unequip(.weapon, from: .binder)
+        XCTAssertEqual(store.state.base.inventory.stacks.first?.catalogID, "blade_keen")
+        XCTAssertNil(store.worn(.weapon, by: .binder))
     }
 
     /// The Binder stood in whatever a world threw at it wearing nothing at all.

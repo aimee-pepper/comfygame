@@ -690,3 +690,48 @@ creature or a material already is.
 
 If you want them, it's a contained piece of work. If you don't, say so and I'll strike §3 from the
 spec so it stops looking outstanding.
+
+## Q35 — Rarity decides how far a piece can be reforged, and that's my call
+
+`materials-crafting-spec.md` §7 asks for **upgrading over replacing** and doesn't say where it
+stops. It has to stop somewhere, or a common blade reforged eight times catches a mythic one and
+finding a mythic stops being worth anything.
+
+**Built:** rarity sets the ceiling — common +1, uncommon +2, rare +3, mythic +5
+(`Tuning.Smith.maximumLevelByRarity`). So rarity means two things at once: where a piece starts,
+and how far it goes. A mythic ends at tier 9, a common at tier 2.
+
+Alternatives if you'd rather:
+
+1. **As built.** Rarity is the ceiling. Finding a mythic stays a real event.
+2. **A flat ceiling for everything** (say +3). Simpler to explain; makes a common piece you like
+   genuinely viable late, at the cost of rarity mattering less.
+3. **No ceiling, rising costs only.** The curve does the limiting. Most generous to attachment —
+   the blade you started with can go all the way — but the numbers have to carry all the weight.
+
+## Q36 — Each slot is judged by one property, and I picked which
+
+§5 says recipes ask for properties. For reforging I needed a mapping from slot → property, and
+chose one that gives every property a job so no part of the hoard is universally junk:
+
+| Slot | Property | Reading |
+|---|---|---|
+| Weapon, Off-hand, Head, Body | hardness | it has to hold an edge or stop one |
+| Hands, Feet | flexibility | armour you still have to move in |
+| Tool | density | mass is what works hard ground |
+| Keepsake | lustre | the singular things |
+
+`SmithRules.workingProperty(for:)`, all PLACEHOLDER. Insulation and reactivity currently have no
+slot — they're waiting on the Tannery and the Apothecary.
+
+## Q37 — The Tannery and the Apothecary are specced and unbuilt
+
+§6 names three crafting buildings. **Only the Blacksmith is built**, because it's the one with a
+job that stands alone: reforging. The other two are specced around things that don't exist yet —
+the Tannery makes "satchel and storehouse upgrades", which the Workshop research tree already
+sells, and the Apothecary makes consumables and inks, which are barely a system yet.
+
+Rather than ship two dead buttons I've left them out and built the *mechanism* generally: a station
+with `builtBy` in `stations.json` is found-then-built, so adding either is a JSON edit plus a
+screen. **The question is whether the Tannery should take capacity upgrades off the Workshop** —
+if it should, that's a real move of an existing system and I'm not doing it unilaterally.

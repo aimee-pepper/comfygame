@@ -12,16 +12,15 @@ struct GearView: View {
     let slot: GearSlot
     let member: PartyMember
 
-    private var worn: ItemDef? {
-        store.worn(slot, by: member).flatMap { ContentCatalog.shared.item($0) }
-    }
+    private var worn: EquippedPiece? { store.worn(slot, by: member) }
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    if let worn {
-                        row(for: nil, definition: worn, isWorn: true)
+                    if let worn, let definition = worn.definition {
+                        row(stack: nil, definition: definition, name: worn.displayName,
+                            delta: nil, count: 1)
                     } else {
                         Text("Nothing worn.")
                             .font(.callout)
@@ -45,7 +44,10 @@ struct GearView: View {
                             store.equip(option.stack, on: member)
                             dismiss()
                         } label: {
-                            row(for: option.stack, definition: option.definition, isWorn: false)
+                            row(stack: option.stack, definition: option.definition,
+                                name: option.stack.displayName,
+                                delta: store.gearDelta(wearing: option.stack, for: member),
+                                count: option.stack.count)
                         }
                         .buttonStyle(.plain)
                     }
@@ -73,43 +75,60 @@ struct GearView: View {
         }
     }
 
-    /// Everything wearable in this slot, best first — so the thing you probably want is at the top
-    /// rather than wherever it happened to land in the satchel.
+    /// **Every distinct piece on the shelf, best first, with how many of it you have.**
+    ///
+    /// Bins are per (piece, upgrade level), so four identical guards are one row saying ×4 and a
+    /// reforged one is its own row — which is exactly what makes "give the best to me and the
+    /// second best to Quill" a choice you can make (Aimee, 6 Aug). Nothing is filtered out for
+    /// being worn by somebody else: if you have four, you can wear four.
     private var candidates: [(stack: ItemStack, definition: ItemDef)] {
         store.wearable(in: slot)
-            .filter { $0.catalogID != worn?.id }
             .compactMap { stack in
                 ContentCatalog.shared.item(stack.catalogID).map { (stack, $0) }
             }
-            .sorted { ($0.definition.gear?.tier ?? 0) > ($1.definition.gear?.tier ?? 0) }
+            .sorted { $0.stack.effectiveTier > $1.stack.effectiveTier }
     }
 
-    private func row(for stack: ItemStack?, definition: ItemDef, isWorn: Bool) -> some View {
+    private func row(stack: ItemStack?, definition: ItemDef, name: String,
+                     delta: Int?, count: Int) -> some View {
         HStack(spacing: 10) {
             Image(systemName: definition.icon)
                 .foregroundStyle(definition.rarity.tint)
                 .frame(width: 24)
             VStack(alignment: .leading, spacing: 1) {
                 // Rarity reads as the colour of the name — the ladder from the design brief.
-                Text(definition.name)
-                    .font(.callout.weight(.medium))
-                    .foregroundStyle(definition.rarity.tint)
-                Text(definition.blurb)
+                HStack(spacing: 6) {
+                    Text(name)
+                        .font(.callout.weight(.medium))
+                        .foregroundStyle(definition.rarity.tint)
+                    // How many of this exact piece you hold, so "the best one to me, the next to
+                    // Quill" is a decision you can see rather than guess at.
+                    if count > 1 {
+                        Text("×\(count)").font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                    }
+                }
+                Text(damageLine(definition) ?? definition.blurb)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
             Spacer(minLength: 6)
-            if isWorn {
-                Text("worn")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+            if let delta {
+                ImprovementBadge(delta: delta, slot: slot)
             } else {
-                ImprovementBadge(delta: store.gearDelta(wearing: definition, for: member), slot: slot)
+                Text("worn").font(.caption2).foregroundStyle(.secondary)
             }
         }
         .frame(minHeight: 44)
         .contentShape(Rectangle())
+    }
+
+    /// A weapon's corner and reach, because that's the matchup read — a blurb won't tell you
+    /// whether this is any use against the plated thing you keep meeting.
+    private func damageLine(_ definition: ItemDef) -> String? {
+        guard let gear = definition.gear, let damage = gear.damage else { return nil }
+        let reach = gear.reach == .close ? "" : " · \(gear.reach.rawValue) reach"
+        return "\(damage.rawValue)\(reach)"
     }
 }
 

@@ -59,7 +59,7 @@ struct BaseState: Codable, Equatable, Sendable {
     /// comes from gear — an attack that was a `Tuning` constant while the companion had a sword
     /// meant the damage-type matchup never reached the player's own turns, which is the whole point
     /// of giving weapons a type at all.
-    var binderEquipped: [GearSlot: ItemID] = [:]
+    var binderEquipped: [GearSlot: EquippedPiece] = [:]
 
     /// Purchased at the Workshop. Until then the Binder is manual every turn.
     ///
@@ -122,6 +122,29 @@ struct BaseState: Codable, Equatable, Sendable {
     /// `Inventory.slots` is the stored capacity (the run satchel has its own), so it has to be
     /// re-synced whenever a Storehouse tier changes. One formula, one assignment — call this
     /// after any station upgrade rather than computing capacity in two places.
+    /// A fresh id for something entering the storehouse. Monotonic over what's already there, so a
+    /// piece coming off somebody can't collide with one already on the shelf.
+    /// What one of them is wearing in a slot. **Both carry their own** (Aimee, 5 Aug).
+    func worn(_ slot: GearSlot, by member: PartyMember) -> EquippedPiece? {
+        switch member {
+        case .binder: binderEquipped[slot]
+        case .companion: companion.equipped[slot]
+        }
+    }
+
+    /// Puts something on the shelf, or into the waiting pile if there's genuinely no room.
+    ///
+    /// **Nothing may be discarded on the player's behalf** (Q10). Plain `inventory.add` returns
+    /// false when the storehouse is full, and every caller that ignored that return was one bad
+    /// day from erasing a mythic blade.
+    mutating func store(_ stack: ItemStack) {
+        if !inventory.add(stack) { spillover.append(stack) }
+    }
+
+    func nextItemID() -> UInt64 {
+        (inventory.stacks.map(\.id.rawValue).max() ?? 0) + 1
+    }
+
     mutating func syncInventoryCapacity() {
         inventory.slots = inventoryCapacity
     }
@@ -145,12 +168,21 @@ struct BaseState: Codable, Equatable, Sendable {
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
         hasChainingUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) ?? false
         companion = try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()
-        binderEquipped = try container.decodeIfPresent([GearSlot: ItemID].self, forKey: .binderEquipped) ?? [:]
+        binderEquipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .binderEquipped) ?? [:]
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
         purchasedGambitSlots = try container.decodeIfPresent(Int.self, forKey: .purchasedGambitSlots) ?? 0
         binderGambits = try container.decodeIfPresent([GambitRule].self, forKey: .binderGambits) ?? []
         spillover = try container.decodeIfPresent([ItemStack].self, forKey: .spillover) ?? []
+
+        // **Capacity is derived, not remembered.**
+        //
+        // `Inventory.slots` is stored, so a save written when the storehouse held eight kept
+        // holding eight forever — raising the number in `Tuning` did nothing for anybody who had
+        // already played. Recomputing it here means a rebalance reaches existing saves, which is
+        // the whole reason the numbers live in one file. It can only ever grow the storehouse:
+        // `syncInventoryCapacity` doesn't touch what's in it.
+        syncInventoryCapacity()
     }
 }
 
@@ -162,6 +194,8 @@ enum Stations {
     static let party: StationID = "party"
     static let essenceSpring: StationID = "essence_spring"
     static let constellation: StationID = "constellation"
+    static let library: StationID = "library"
+    static let blacksmith: StationID = "blacksmith"
 }
 
 struct StationState: Codable, Equatable, Sendable {
@@ -204,6 +238,8 @@ enum PartyMember: String, CaseIterable, Identifiable, Sendable {
 
     var id: String { rawValue }
     var combatant: Combatant { self == .binder ? .binder : .companion }
+    /// What to call them on screen. The companion has a name of its own; you are you.
+    var displayName: String { self == .binder ? "You" : "Companion" }
 }
 
 /// The one companion in v0. Party expands in v1+, so this is a struct that can become an array
@@ -218,17 +254,13 @@ struct CompanionState: Codable, Equatable, Sendable {
     var gambits: [GambitRule] = []
     /// What Quill is wearing. **Tiers come from gear now, not from research** — you find a sword,
     /// or later you find a smith (decisions-session-12 §3–4).
-    var equipped: [GearSlot: ItemID] = [:]
+    var equipped: [GearSlot: EquippedPiece] = [:]
 
     /// Derived from what's worn. Nothing stores a tier any more, so nothing can drift from it.
     var weaponTier: Int { tier(of: .weapon) }
     var armorTier: Int { tier(of: .armor) }
 
-    private func tier(of slot: GearSlot) -> Int {
-        equipped[slot]
-            .flatMap { ContentCatalog.shared.item($0)?.gear }
-            .map(\.tier) ?? 0
-    }
+    private func tier(of slot: GearSlot) -> Int { equipped[slot]?.effectiveTier ?? 0 }
 
     init() {}
 
@@ -239,7 +271,7 @@ struct CompanionState: Codable, Equatable, Sendable {
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? "Quill"
         maxHP = try container.decodeIfPresent(Int.self, forKey: .maxHP) ?? Tuning.Encounter.companionMaxHP
         gambits = (try? container.decodeIfPresent([GambitRule].self, forKey: .gambits)) ?? GambitStarter.rules
-        equipped = try container.decodeIfPresent([GearSlot: ItemID].self, forKey: .equipped) ?? [:]
+        equipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .equipped) ?? [:]
     }
 }
 

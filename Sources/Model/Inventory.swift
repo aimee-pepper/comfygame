@@ -75,6 +75,13 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     var catalogID: ItemID
     var count: Int = 1
     var identified: Bool = true
+    /// **How far this piece has been reforged** at the Blacksmith. Gear only.
+    ///
+    /// Per instance, not per catalogue entry — the point of upgrading over replacing is that *this*
+    /// blade, the one you've carried, grows with you (materials-crafting-spec §7). Which also means
+    /// two otherwise identical blades at different levels are different objects and can't share a
+    /// bin.
+    var upgradeLevel: Int = 0
     /// Every material sample in this bin, in the order they were taken. Empty for ordinary items.
     ///
     /// The bin is the slot; these are what's in it. Crafting picks from among them, so a recipe can
@@ -102,7 +109,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     /// Keys include the **retired singular `material`**, so a save written before binning still
     /// loads: it held one sample and a count, and becomes a bin holding that many of it.
     private enum StoredKeys: String, CodingKey {
-        case id, catalogID, count, identified, materials, material
+        case id, catalogID, count, identified, materials, material, upgradeLevel
     }
 
     /// Tolerant decoding, per the policy in `Migrations.swift`.
@@ -112,6 +119,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         catalogID = try c.decode(ItemID.self, forKey: .catalogID)
         count = try c.decodeIfPresent(Int.self, forKey: .count) ?? 1
         identified = try c.decodeIfPresent(Bool.self, forKey: .identified) ?? true
+        upgradeLevel = try c.decodeIfPresent(Int.self, forKey: .upgradeLevel) ?? 0
         if let many = try c.decodeIfPresent([MaterialSample].self, forKey: .materials) {
             materials = many
         } else if let one = try c.decodeIfPresent(MaterialSample.self, forKey: .material) {
@@ -128,12 +136,14 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     /// What two stacks must agree on to be the same bin.
     enum BinKey: Hashable, Sendable {
         case material(MaterialKind)
-        case item(ItemID, identified: Bool)
+        case item(ItemID, identified: Bool, upgradeLevel: Int)
     }
 
     var binKey: BinKey {
         if let kind = materials.first?.kind { return .material(kind) }
-        return .item(catalogID, identified: identified)
+        // Upgrade level is part of what a piece *is*: a blade you've reforged twice is not
+        // interchangeable with one fresh off the ground.
+        return .item(catalogID, identified: identified, upgradeLevel: upgradeLevel)
     }
 
     /// The best example in the bin — what makes "12 hides · finest superb" possible.
@@ -165,6 +175,11 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
 
     var isEmpty: Bool { materials.isEmpty ? count <= 0 : materials.isEmpty }
 
+    /// The stats this piece actually fights at: what it was found as, plus what you've put into it.
+    var effectiveTier: Int {
+        (ContentCatalog.shared.item(catalogID)?.gear?.tier ?? 0) + upgradeLevel
+    }
+
     /// What to call it. **Materials name themselves** — there is no catalogue entry to ask, because
     /// what this is came off the animal it was cut from. Everything else asks the catalogue, and an
     /// unidentified curio gives its teaser name.
@@ -176,7 +191,8 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
             return count > 1 ? kind.pluralName.capitalisedSentence : kind.displayName
         }
         guard let item = ContentCatalog.shared.item(catalogID) else { return catalogID.rawValue }
-        return identified ? item.name : (item.unidentifiedName ?? "Something odd")
+        let base = identified ? item.name : (item.unidentifiedName ?? "Something odd")
+        return upgradeLevel > 0 ? "\(base) +\(upgradeLevel)" : base
     }
 
     var icon: String {
@@ -253,5 +269,77 @@ struct Inventory: Codable, Equatable, Sendable {
             if !remaining.isEmpty { kept.append(remaining) }
         }
         return Inventory(slots: slots, stacks: kept)
+    }
+}
+
+/// A piece actually on somebody.
+///
+/// Not just a catalogue id: **upgrade level is per instance** (materials-crafting-spec §7), and the
+/// whole point of reforging over replacing is that the blade you've carried is the one that grows.
+/// Storing only the id would have quietly reset every piece the moment it was equipped.
+struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
+    var catalogID: ItemID
+    var upgradeLevel: Int = 0
+
+    private enum StoredKeys: String, CodingKey { case catalogID, upgradeLevel }
+
+    init(stringLiteral value: String) {
+        self.catalogID = ItemID(rawValue: value)
+        self.upgradeLevel = 0
+    }
+
+    init(catalogID: ItemID, upgradeLevel: Int = 0) {
+        self.catalogID = catalogID
+        self.upgradeLevel = upgradeLevel
+    }
+
+    init(_ stack: ItemStack) {
+        self.catalogID = stack.catalogID
+        self.upgradeLevel = stack.upgradeLevel
+    }
+
+    /// **Writes itself as a bare id when there's nothing else to say.**
+    ///
+    /// An untouched piece is exactly what it always was, and a save reading `"weapon": "blade_keen"`
+    /// stays hand-editable and legible — which is worth keeping. Only a reforged piece needs the
+    /// object form, and only then does it stop being readable by an older build.
+    func encode(to encoder: Encoder) throws {
+        guard upgradeLevel != 0 else {
+            var single = encoder.singleValueContainer()
+            try single.encode(catalogID)
+            return
+        }
+        var c = encoder.container(keyedBy: StoredKeys.self)
+        try c.encode(catalogID, forKey: .catalogID)
+        try c.encode(upgradeLevel, forKey: .upgradeLevel)
+    }
+
+    /// Accepts the **bare item id** this used to be, so a save from before pieces could be
+    /// upgraded still arrives wearing what it was wearing.
+    init(from decoder: Decoder) throws {
+        if let id = try? decoder.singleValueContainer().decode(ItemID.self) {
+            catalogID = id
+            upgradeLevel = 0
+            return
+        }
+        let c = try decoder.container(keyedBy: StoredKeys.self)
+        catalogID = try c.decode(ItemID.self, forKey: .catalogID)
+        upgradeLevel = try c.decodeIfPresent(Int.self, forKey: .upgradeLevel) ?? 0
+    }
+
+    var definition: ItemDef? { ContentCatalog.shared.item(catalogID) }
+    var gear: GearDef? { definition?.gear }
+    /// What it actually fights at: found tier plus what you've put into it.
+    var effectiveTier: Int { (gear?.tier ?? 0) + upgradeLevel }
+    var displayName: String {
+        let base = definition?.name ?? catalogID.rawValue
+        return upgradeLevel > 0 ? "\(base) +\(upgradeLevel)" : base
+    }
+
+    /// Back into a carryable stack, keeping the work you put into it.
+    func asStack(id: InstanceID) -> ItemStack {
+        var stack = ItemStack(id: id, catalogID: catalogID)
+        stack.upgradeLevel = upgradeLevel
+        return stack
     }
 }

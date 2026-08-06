@@ -574,4 +574,28 @@ enum Tuning {
         /// never wall-clock; see pillar 2).
         static let essenceSpringPerReturn: [Int] = [3, 7] // PLACEHOLDER — index = tier - 1
     }
+
+    // MARK: - The Blacksmith
+
+    /// Reforging (`materials-crafting-spec.md` §7): making the piece you carry better rather than
+    /// waiting for a better one to drop. All PLACEHOLDER.
+    enum Smith {
+        /// How far a piece can be pushed, indexed by `Rarity.order` — common, uncommon, rare,
+        /// mythic. A common blade finishes; a mythic one keeps going. **This is what stops a
+        /// common piece reforged four times from catching a mythic one**, which would make finding
+        /// a mythic pointless.
+        static let maximumLevelByRarity: [Int] = [1, 2, 3, 5] // PLACEHOLDER
+
+        /// The property bar the first reforging asks stock to clear, and how much it rises each
+        /// time. 0–100, same scale as material properties.
+        static let baseThreshold: Double = 30       // PLACEHOLDER
+        static let thresholdPerLevel: Double = 14   // PLACEHOLDER
+        /// Never so high that no material in the game could clear it.
+        static let maximumThreshold: Double = 82    // PLACEHOLDER
+
+        static let samplesBase: Int = 2             // PLACEHOLDER
+        static let samplesPerLevel: Int = 1         // PLACEHOLDER
+        static let essenceBase: Int = 8             // PLACEHOLDER
+        static let essencePerLevel: Int = 6         // PLACEHOLDER
+    }
 }

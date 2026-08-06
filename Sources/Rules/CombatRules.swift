@@ -50,29 +50,29 @@ enum CombatRules {
     /// **What each of them is wearing.** The Binder has its own slots (Aimee, 5 Aug) — it's half
     /// the party, and an attack that was a `Tuning` constant meant the damage-type matchup never
     /// reached the player's own turns, which is the whole point of giving weapons a type.
-    static func equipped(_ slot: GearSlot, for actor: Combatant, in state: GameState) -> GearDef? {
-        let worn: ItemID? = switch actor {
+    static func equipped(_ slot: GearSlot, for actor: Combatant, in state: GameState) -> EquippedPiece? {
+        switch actor {
         case .binder: state.base.binderEquipped[slot]
         case .companion: state.base.companion.equipped[slot]
         case .foe: nil
         }
-        return worn.flatMap { ContentCatalog.shared.item($0)?.gear }
     }
 
     static func binderAttack(in state: GameState) -> Int {
         Tuning.Encounter.binderAttack
-            + (equipped(.weapon, for: .binder, in: state)?.tier ?? 0) * Tuning.Encounter.attackPerWeaponTier
+            + (equipped(.weapon, for: .binder, in: state)?.effectiveTier ?? 0)
+                * Tuning.Encounter.attackPerWeaponTier
     }
 
     /// **What this one is swinging.** Each party member's own weapon decides the matchup, so
     /// carrying a piercing blade while Quill carries a rending one is a real answer to a world that
     /// grew both plated and furred things.
     static func damageKind(for actor: Combatant, in state: GameState) -> DamageKind? {
-        equipped(.weapon, for: actor, in: state)?.damage
+        equipped(.weapon, for: actor, in: state)?.gear?.damage
     }
 
     static func reach(for actor: Combatant, in state: GameState) -> Reach {
-        equipped(.weapon, for: actor, in: state)?.reach ?? .close
+        equipped(.weapon, for: actor, in: state)?.gear?.reach ?? .close
     }
 
     /// **How well a damage type does against what a creature is wearing** (combat-depth-spec §1).
@@ -110,9 +110,11 @@ enum CombatRules {
     /// the weapon triangle exists: the same armour is worth more against some things than others.
     static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
                             armourIgnored: Double = 0) -> Int {
-        // **Both of them wear armour now.** Only the companion's counted before, so the Binder
-        // stood in whatever a world threw at it wearing nothing at all.
-        let tier = equipped(.armor, for: actor, in: state)?.tier ?? 0
+        // **Everything protective counts**, not just the body piece — a helm and boots are armour
+        // too, and only the companion's chest plate used to be read at all.
+        let tier = GearSlot.allCases
+            .filter(\.isProtective)
+            .reduce(0) { $0 + (equipped($1, for: actor, in: state)?.effectiveTier ?? 0) }
         let armour = Double(tier * Tuning.Encounter.defencePerArmorTier)
         let effective = Int((armour * (1 - armourIgnored)).rounded())
         return max(Tuning.Encounter.minimumDamage, raw - effective)

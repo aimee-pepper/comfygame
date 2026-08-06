@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). Weapons carry a damage type and a reach (combat-depth-spec §1): pierce and crush beat hard coverings, rend beats thick soft ones, and the covering word the encounter prints is the read that makes the matchup a decision rather than a guess. PLACEHOLDER assignments — which weapon is which corner is content.",
+  "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). GEAR: a standard assortment across eight slots (Aimee, 6 Aug), each running common -> uncommon -> rare -> mythic, and every piece upgradeable at the Blacksmith. Weapons cover all three corners of the damage triangle at every quality, so the matchup against a creature's covering is always answerable with something you could plausibly be carrying. PLACEHOLDER names, blurbs and tiers.",
   "items": [
     {
       "id": "curio_humming_shard",
@@ -54,7 +54,7 @@
     {
       "id": "blade_keen",
       "name": "Keen Blade",
-      "icon": "hammer.fill",
+      "icon": "arrowtriangle.up",
       "rarity": "uncommon",
       "blurb": "Balanced, and cared for. Whoever left it did not mean to.",
       "kind": "gear",
@@ -66,9 +66,65 @@
       }
     },
     {
+      "id": "ripping_hook",
+      "name": "Ripping Hook",
+      "icon": "hammer",
+      "rarity": "rare",
+      "blurb": "It was made to open things that did not want opening.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "rend",
+        "reach": "close"
+      }
+    },
+    {
+      "id": "the_long_grievance",
+      "name": "The Long Grievance",
+      "icon": "hammer",
+      "rarity": "mythic",
+      "blurb": "Nobody agrees on what it was first used for.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 4,
+        "damage": "rend",
+        "reach": "close"
+      }
+    },
+    {
+      "id": "bone_awl",
+      "name": "Bone Awl",
+      "icon": "arrowtriangle.up",
+      "rarity": "common",
+      "blurb": "Ground to a point against something harder.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "pierce",
+        "reach": "close"
+      }
+    },
+    {
+      "id": "raking_edge",
+      "name": "Raking Edge",
+      "icon": "hammer",
+      "rarity": "uncommon",
+      "blurb": "Notched all along one side, and the notches are the point.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "rend",
+        "reach": "close"
+      }
+    },
+    {
       "id": "blade_binders",
       "name": "Binder's Edge",
-      "icon": "hammer.circle.fill",
+      "icon": "figure.fencing",
       "rarity": "rare",
       "blurb": "Marked along the spine in a hand you almost recognise.",
       "kind": "gear",
@@ -77,6 +133,228 @@
         "tier": 3,
         "damage": "pierce",
         "reach": "mid"
+      }
+    },
+    {
+      "id": "hairsplitter",
+      "name": "Hairsplitter",
+      "icon": "arrowtriangle.up",
+      "rarity": "mythic",
+      "blurb": "It has never once been resharpened.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 4,
+        "damage": "pierce",
+        "reach": "close"
+      }
+    },
+    {
+      "id": "field_maul",
+      "name": "Field Maul",
+      "icon": "hammer.fill",
+      "rarity": "common",
+      "blurb": "A weight on a handle. It asks nothing of you.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "crush",
+        "reach": "close"
+      }
+    },
+    {
+      "id": "banded_mace",
+      "name": "Banded Mace",
+      "icon": "hammer.fill",
+      "rarity": "uncommon",
+      "blurb": "Ringed against the shock of its own work.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "crush",
+        "reach": "close"
+      }
+    },
+    {
+      "id": "anvilfall",
+      "name": "Anvilfall",
+      "icon": "hammer.fill",
+      "rarity": "rare",
+      "blurb": "Two hands, and a moment's warning.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "crush",
+        "reach": "close"
+      }
+    },
+    {
+      "id": "the_settled_argument",
+      "name": "The Settled Argument",
+      "icon": "hammer.fill",
+      "rarity": "mythic",
+      "blurb": "Heavier than it looks, and it looks heavy.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 4,
+        "damage": "crush",
+        "reach": "close"
+      }
+    },
+    {
+      "id": "long_pick",
+      "name": "Long Pick",
+      "icon": "figure.fencing",
+      "rarity": "common",
+      "blurb": "Reach, at the cost of everything else.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 1,
+        "damage": "pierce",
+        "reach": "mid"
+      }
+    },
+    {
+      "id": "warded_spear",
+      "name": "Warded Spear",
+      "icon": "figure.fencing",
+      "rarity": "uncommon",
+      "blurb": "Keeps the thing you are fighting where it is.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "pierce",
+        "reach": "mid"
+      }
+    },
+    {
+      "id": "parting_needle",
+      "name": "Parting Needle",
+      "icon": "arrowtriangle.up",
+      "rarity": "rare",
+      "blurb": "Goes in where there is no gap, and makes one.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "close"
+      }
+    },
+    {
+      "id": "the_kept_distance",
+      "name": "The Kept Distance",
+      "icon": "figure.fencing",
+      "rarity": "mythic",
+      "blurb": "Whoever carried this was never touched.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 4,
+        "damage": "pierce",
+        "reach": "mid"
+      }
+    },
+    {
+      "id": "split_board",
+      "name": "Split Board",
+      "icon": "shield.lefthalf.filled",
+      "rarity": "common",
+      "blurb": "Held together by habit.",
+      "kind": "gear",
+      "gear": {
+        "slot": "offhand",
+        "tier": 1
+      }
+    },
+    {
+      "id": "banded_buckler",
+      "name": "Banded Buckler",
+      "icon": "shield.lefthalf.filled",
+      "rarity": "uncommon",
+      "blurb": "Small, quick, and enough.",
+      "kind": "gear",
+      "gear": {
+        "slot": "offhand",
+        "tier": 2
+      }
+    },
+    {
+      "id": "tower_guard",
+      "name": "Tower Guard",
+      "icon": "shield.lefthalf.filled",
+      "rarity": "rare",
+      "blurb": "You can put the whole world behind it.",
+      "kind": "gear",
+      "gear": {
+        "slot": "offhand",
+        "tier": 3
+      }
+    },
+    {
+      "id": "the_unarguable",
+      "name": "The Unarguable",
+      "icon": "shield.lefthalf.filled",
+      "rarity": "mythic",
+      "blurb": "Nothing has got past it yet.",
+      "kind": "gear",
+      "gear": {
+        "slot": "offhand",
+        "tier": 4
+      }
+    },
+    {
+      "id": "padded_cap",
+      "name": "Padded Cap",
+      "icon": "circle.dashed",
+      "rarity": "common",
+      "blurb": "Better than the alternative.",
+      "kind": "gear",
+      "gear": {
+        "slot": "head",
+        "tier": 1
+      }
+    },
+    {
+      "id": "ridged_helm",
+      "name": "Ridged Helm",
+      "icon": "circle.dashed",
+      "rarity": "uncommon",
+      "blurb": "Turns a blow rather than taking it.",
+      "kind": "gear",
+      "gear": {
+        "slot": "head",
+        "tier": 2
+      }
+    },
+    {
+      "id": "visored_casque",
+      "name": "Visored Casque",
+      "icon": "circle.dashed",
+      "rarity": "rare",
+      "blurb": "You see less, and you keep seeing.",
+      "kind": "gear",
+      "gear": {
+        "slot": "head",
+        "tier": 3
+      }
+    },
+    {
+      "id": "crown_of_quiet",
+      "name": "Crown of Quiet",
+      "icon": "circle.dashed",
+      "rarity": "mythic",
+      "blurb": "It muffles more than sound.",
+      "kind": "gear",
+      "gear": {
+        "slot": "head",
+        "tier": 4
       }
     },
     {
@@ -94,7 +372,7 @@
     {
       "id": "guard_banded",
       "name": "Banded Guard",
-      "icon": "shield.fill",
+      "icon": "shield",
       "rarity": "uncommon",
       "blurb": "Someone spent a winter on this.",
       "kind": "gear",
@@ -106,13 +384,217 @@
     {
       "id": "guard_vault",
       "name": "Vaultplate",
-      "icon": "shield.lefthalf.filled",
+      "icon": "shield",
       "rarity": "rare",
       "blurb": "Cold to the touch, and stays cold.",
       "kind": "gear",
       "gear": {
         "slot": "armor",
         "tier": 3
+      }
+    },
+    {
+      "id": "the_standing_wall",
+      "name": "The Standing Wall",
+      "icon": "shield",
+      "rarity": "mythic",
+      "blurb": "It has outlived several people who deserved better.",
+      "kind": "gear",
+      "gear": {
+        "slot": "armor",
+        "tier": 4
+      }
+    },
+    {
+      "id": "wrapped_hands",
+      "name": "Wrapped Hands",
+      "icon": "hand.raised",
+      "rarity": "common",
+      "blurb": "Cloth, and knots you tied yourself.",
+      "kind": "gear",
+      "gear": {
+        "slot": "hands",
+        "tier": 1
+      }
+    },
+    {
+      "id": "studded_gloves",
+      "name": "Studded Gloves",
+      "icon": "hand.raised",
+      "rarity": "uncommon",
+      "blurb": "For holding things that object.",
+      "kind": "gear",
+      "gear": {
+        "slot": "hands",
+        "tier": 2
+      }
+    },
+    {
+      "id": "gauntlets_of_hold",
+      "name": "Gauntlets of Hold",
+      "icon": "hand.raised",
+      "rarity": "rare",
+      "blurb": "Your grip is no longer the weak part.",
+      "kind": "gear",
+      "gear": {
+        "slot": "hands",
+        "tier": 3
+      }
+    },
+    {
+      "id": "the_sure_hands",
+      "name": "The Sure Hands",
+      "icon": "hand.raised",
+      "rarity": "mythic",
+      "blurb": "They do not shake. You still might.",
+      "kind": "gear",
+      "gear": {
+        "slot": "hands",
+        "tier": 4
+      }
+    },
+    {
+      "id": "worn_boots",
+      "name": "Worn Boots",
+      "icon": "shoeprints.fill",
+      "rarity": "common",
+      "blurb": "They have been further than you have.",
+      "kind": "gear",
+      "gear": {
+        "slot": "feet",
+        "tier": 1
+      }
+    },
+    {
+      "id": "shod_boots",
+      "name": "Shod Boots",
+      "icon": "shoeprints.fill",
+      "rarity": "uncommon",
+      "blurb": "Iron at the toe, for ground that bites.",
+      "kind": "gear",
+      "gear": {
+        "slot": "feet",
+        "tier": 2
+      }
+    },
+    {
+      "id": "longstriders",
+      "name": "Longstriders",
+      "icon": "shoeprints.fill",
+      "rarity": "rare",
+      "blurb": "The map got smaller when you put them on.",
+      "kind": "gear",
+      "gear": {
+        "slot": "feet",
+        "tier": 3
+      }
+    },
+    {
+      "id": "the_unhurried",
+      "name": "The Unhurried",
+      "icon": "shoeprints.fill",
+      "rarity": "mythic",
+      "blurb": "You arrive when you meant to.",
+      "kind": "gear",
+      "gear": {
+        "slot": "feet",
+        "tier": 4
+      }
+    },
+    {
+      "id": "bent_pick",
+      "name": "Bent Pick",
+      "icon": "wrench.and.screwdriver",
+      "rarity": "common",
+      "blurb": "It works. That is the whole of its case.",
+      "kind": "gear",
+      "gear": {
+        "slot": "tool",
+        "tier": 1
+      }
+    },
+    {
+      "id": "balanced_pick",
+      "name": "Balanced Pick",
+      "icon": "wrench.and.screwdriver",
+      "rarity": "uncommon",
+      "blurb": "Swings where you meant it to.",
+      "kind": "gear",
+      "gear": {
+        "slot": "tool",
+        "tier": 2
+      }
+    },
+    {
+      "id": "corebreaker",
+      "name": "Corebreaker",
+      "icon": "wrench.and.screwdriver",
+      "rarity": "rare",
+      "blurb": "Hard ground stopped being an argument.",
+      "kind": "gear",
+      "gear": {
+        "slot": "tool",
+        "tier": 3
+      }
+    },
+    {
+      "id": "the_willing_edge",
+      "name": "The Willing Edge",
+      "icon": "wrench.and.screwdriver",
+      "rarity": "mythic",
+      "blurb": "It seems to know what you were about to do.",
+      "kind": "gear",
+      "gear": {
+        "slot": "tool",
+        "tier": 4
+      }
+    },
+    {
+      "id": "pressed_leaf",
+      "name": "Pressed Leaf",
+      "icon": "sparkles",
+      "rarity": "common",
+      "blurb": "From somewhere. You remember which.",
+      "kind": "gear",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 1
+      }
+    },
+    {
+      "id": "cold_compass",
+      "name": "Cold Compass",
+      "icon": "sparkles",
+      "rarity": "uncommon",
+      "blurb": "It does not point north. It points somewhere.",
+      "kind": "gear",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 2
+      }
+    },
+    {
+      "id": "someones_ring",
+      "name": "Someone's Ring",
+      "icon": "sparkles",
+      "rarity": "rare",
+      "blurb": "Too small for you. You keep it anyway.",
+      "kind": "gear",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 3
+      }
+    },
+    {
+      "id": "the_first_page",
+      "name": "The First Page",
+      "icon": "sparkles",
+      "rarity": "mythic",
+      "blurb": "Torn out, and kept, and never read aloud.",
+      "kind": "gear",
+      "gear": {
+        "slot": "keepsake",
+        "tier": 4
       }
     }
   ]

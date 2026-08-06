@@ -30,6 +30,7 @@
 		2651CFD69611A045AB93B2C7 /* WorldConstraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541026CEC51423252ED5FAFD /* WorldConstraints.swift */; };
 		2849825A00283A75E65E3C88 /* SpilloverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C110827C995BC018EA20B47F /* SpilloverTests.swift */; };
 		28C38A9B1F4133012F86F0AA /* pressure_targets.json in Resources */ = {isa = PBXBuildFile; fileRef = 26FE0502F98B3DB6A7BF0C87 /* pressure_targets.json */; };
+		2977BFA154F4613F7B75EF67 /* BlacksmithView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CABEB714204FCBDE32F8E4 /* BlacksmithView.swift */; };
 		2AAA4E398F09BD29BAD7816B /* stations.json in Resources */ = {isa = PBXBuildFile; fileRef = 59F1E2A3A08364F9452A684F /* stations.json */; };
 		2C0118338DCCD9231D0DE4D0 /* GambitEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */; };
 		3062AB49BB5A3BBCC3A396BD /* Combat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD3736ADDC83B6481EFAC9A /* Combat.swift */; };
@@ -102,6 +103,7 @@
 		BE5D3BC36C9F1D8030CFEE81 /* CombatRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99D023496EC834EA78E9BE63 /* CombatRules.swift */; };
 		BFB3CF53CC01D5CED466B0C9 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E110F7C0AF0739241A8F94 /* GameState.swift */; };
 		C709E6D127F96D2420ADBC5C /* creatures.json in Resources */ = {isa = PBXBuildFile; fileRef = 5FD331CEC89F930A1F99C13B /* creatures.json */; };
+		C7B3F65E25299A2524857544 /* SmithRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFF9A08573788622472DB26 /* SmithRules.swift */; };
 		C8B16AD5D3CDC5B67BE7E320 /* qualifiers.json in Resources */ = {isa = PBXBuildFile; fileRef = 283E3D55623002C01AF8AF98 /* qualifiers.json */; };
 		C9ED9DB51CD49A2457B00B7D /* ButcheryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1FD369C1CCCC28B0A42FC7 /* ButcheryRules.swift */; };
 		CC74E6778320FB4F70CFDB3F /* PressureRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3C5DA8117A704E44B23C91 /* PressureRules.swift */; };
@@ -125,6 +127,7 @@
 		EDF26461D4FD581D2BCFBB0A /* DeterminismTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51FE4FBAB98280181089C56 /* DeterminismTests.swift */; };
 		EFB68320FEF123CBC8309B55 /* RuleBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */; };
 		F3BBDF3F527FAD220FA4F5D8 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504332712854230587940F0A /* Library.swift */; };
+		F6E366378F5921F9B9EFF410 /* SmithTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6C54531684DE111C33038A /* SmithTests.swift */; };
 		F9A1322571DBD99F4BF908CB /* ContentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B08032B70636FB2D70EFD6 /* ContentModels.swift */; };
 		F9A397FEF26E5A194578909E /* PageRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2AAB75EDFEC0064219E57D4 /* PageRules.swift */; };
 		FAEB06BFBE5764791F188FF3 /* SaveFileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7F491C849679A2428073CA /* SaveFileIO.swift */; };
@@ -231,7 +234,9 @@
 		B23878A2219B30C376009246 /* PressuresDriveGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressuresDriveGenerationTests.swift; sourceTree = "<group>"; };
 		B543B94C8E89980FDE029D9C /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		B664EB59C95581C3098E542B /* BaseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseState.swift; sourceTree = "<group>"; };
+		B9CABEB714204FCBDE32F8E4 /* BlacksmithView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlacksmithView.swift; sourceTree = "<group>"; };
 		BDFAE95092D158944E000B02 /* GrammarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarTests.swift; sourceTree = "<group>"; };
+		BDFF9A08573788622472DB26 /* SmithRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmithRules.swift; sourceTree = "<group>"; };
 		BE933E91275B1FF990B69BAA /* EncounterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncounterView.swift; sourceTree = "<group>"; };
 		C09AD15A5BFBBBD300176004 /* GearAndRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearAndRulesTests.swift; sourceTree = "<group>"; };
 		C110827C995BC018EA20B47F /* SpilloverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpilloverTests.swift; sourceTree = "<group>"; };
@@ -265,6 +270,7 @@
 		F43DADDF1091E89318A12B0D /* ContradictionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionTests.swift; sourceTree = "<group>"; };
 		F7E8A2DF6BF1E7AB1B5B574C /* TerrainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerrainTests.swift; sourceTree = "<group>"; };
 		F978ADFABDF1296849D8F5AB /* GambitEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GambitEngine.swift; sourceTree = "<group>"; };
+		FB6C54531684DE111C33038A /* SmithTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmithTests.swift; sourceTree = "<group>"; };
 		FBE911A8A2C4D05D38EF6192 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		FF7811775C7058B692E07EB1 /* PageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -298,6 +304,7 @@
 				D2AAB75EDFEC0064219E57D4 /* PageRules.swift */,
 				CB3C5DA8117A704E44B23C91 /* PressureRules.swift */,
 				D5A56C2CA4EF6B5366F86828 /* SiteRules.swift */,
+				BDFF9A08573788622472DB26 /* SmithRules.swift */,
 				1FD618ABD859C8D8097F3DC0 /* TerrainRules.swift */,
 				541026CEC51423252ED5FAFD /* WorldConstraints.swift */,
 				8946B89F914D32DABAC53D5A /* Worldgen.swift */,
@@ -338,6 +345,7 @@
 			isa = PBXGroup;
 			children = (
 				346EEEC616B8EBFE291C4A79 /* BaseView.swift */,
+				B9CABEB714204FCBDE32F8E4 /* BlacksmithView.swift */,
 				BE933E91275B1FF990B69BAA /* EncounterView.swift */,
 				1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */,
 				F1B71324BA8EC6B7B6732500 /* GearView.swift */,
@@ -495,6 +503,7 @@
 				64F1E5BF56652C658BFF5484 /* PressureTests.swift */,
 				83F481D57E05D77B109D44FC /* SaveToleranceTests.swift */,
 				E1BB569F0B672F268545701C /* SiteTests.swift */,
+				FB6C54531684DE111C33038A /* SmithTests.swift */,
 				C110827C995BC018EA20B47F /* SpilloverTests.swift */,
 				75F880A764AED5BABB194953 /* StackingTests.swift */,
 				F7E8A2DF6BF1E7AB1B5B574C /* TerrainTests.swift */,
@@ -632,6 +641,7 @@
 				03705DB034E250EE8C9A5A0B /* AppRoute.swift in Sources */,
 				601014E078036FCE48CDAF06 /* BaseState.swift in Sources */,
 				6FDB8C79745125AEC66E0C4C /* BaseView.swift in Sources */,
+				2977BFA154F4613F7B75EF67 /* BlacksmithView.swift in Sources */,
 				776E19C048AB14D539E2ABC3 /* BookProjection.swift in Sources */,
 				15B201231C024A3C01DBA20A /* BookRules.swift in Sources */,
 				890774F4FCDF3A9DAE6BEFDD /* BookbinderApp.swift in Sources */,
@@ -692,6 +702,7 @@
 				DB65DB08F102D87DE2D51956 /* Sigil.swift in Sources */,
 				40CDA99CD7F4DFF60EC0EBBB /* SiteModels.swift in Sources */,
 				12DA6127DA1CEF02D5108CE9 /* SiteRules.swift in Sources */,
+				C7B3F65E25299A2524857544 /* SmithRules.swift in Sources */,
 				3FD60BA9683F245EBFA14D61 /* SpendingViews.swift in Sources */,
 				0573EFC73887107DB190A9DF /* StationViews.swift in Sources */,
 				6C90C6B086284BE1533023D2 /* TerrainRules.swift in Sources */,
@@ -734,6 +745,7 @@
 				6755D6482AEAD387A810DBBD /* PressuresDriveGenerationTests.swift in Sources */,
 				FD37C3AEB89A41F874759D37 /* SaveToleranceTests.swift in Sources */,
 				5BA053D5F38A0AE4F9E782C3 /* SiteTests.swift in Sources */,
+				F6E366378F5921F9B9EFF410 /* SmithTests.swift in Sources */,
 				2849825A00283A75E65E3C88 /* SpilloverTests.swift in Sources */,
 				D70BCC3356D30C3EC0FFA587 /* StackingTests.swift in Sources */,
 				5DEF7F6C69BC916C96535B2D /* TerrainTests.swift in Sources */,
