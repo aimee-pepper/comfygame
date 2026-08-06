@@ -156,9 +156,14 @@ enum Tuning {
         static let collapseHaulKeptFraction: Double = 0.5 // PLACEHOLDER
         /// Turns of tapping to fully harvest a node.
         static let harvestTurnsRange: ClosedRange<Int> = 1...3 // PLACEHOLDER
-        /// Fallback for a creature with no sight of its own. Real values live on the creature
-        /// (`CreatureDef.sightRadius`) so that some things can see you coming from further off.
-        static let defaultEnemySightRadius: Int = 2  // PLACEHOLDER
+        /// What a creature that senses averagely notices you from. Real ranges are derived from a
+        /// creature's own sensory allocation, so a thing that lives by its eyes and a thing that
+        /// hunts by touch notice you from different distances — and at different times of day.
+        static let defaultEnemySightRadius: Int = 4  // PLACEHOLDER
+        /// How much of its eyesight a creature keeps after dark.
+        static let nightVisionFraction: Double = 0.35 // PLACEHOLDER
+        /// How far the non-visual senses reach relative to eyes. Shorter — but night-proof.
+        static let nonVisualSenseReach: Double = 0.7  // PLACEHOLDER
 
         // Worldgen
         static let baseNodeCountRange: ClosedRange<Int> = 8...12   // PLACEHOLDER, scaled by book
@@ -343,6 +348,8 @@ enum Tuning {
         static let nocturnalVisionCeiling: Double = 28
         /// Below this it reads as blind.
         static let blindVisionCeiling: Double = 18
+        /// Appetite per tier of formidability. Five tiers across what the richest world can feed.
+        static let appetitePerTier: Double = 55
 
         /// How often a world that permits its own light actually grows some.
         static let emanationChanceWhenSourceless: Double = 0.55
@@ -410,6 +417,56 @@ enum Tuning {
         static let lootPerTierRange: ClosedRange<Int> = 1...2 // PLACEHOLDER
         /// Backstop so a misbehaving rule can never hang the app between player inputs.
         static let maxAutomaticTurnsPerInput: Int = 40
+
+        // MARK: Traits → combat (creature-system-spec §7). All PLACEHOLDER.
+        //
+        // Scaled against a binder who hits for 6 and has 30 HP: an ordinary animal should take
+        // three or four rounds, a huge armoured one should be a decision rather than a formality.
+
+        static let baseFoeHP: Double = 4
+        static let hpPerSize: Double = 0.22
+        static let hpPerBulk: Double = 6
+        static let hpPerBone: Double = 0.06
+
+        static let baseFoeAttack: Double = 1
+        static let attackPerArmament: Double = 0.055
+        static let attackPerSize: Double = 0.025
+
+        /// Armour soaks flat damage. Kept small — armour should make a fight longer, not unwinnable.
+        static let armourPerCovering: Double = 0.06
+        /// What a pierce attack ignores of the *party's* armour, and what pierce ignores of a foe's.
+        static let pierceArmourIgnored: Double = 0.5
+        /// Crush hits harder and slower: this much extra damage, at a cost to initiative.
+        static let crushDamageBonus: Double = 0.2
+        static let crushInitiativePenalty: Int = 3
+        /// Rend leaves a wound that keeps costing you.
+        static let bleedDamage: Int = 2
+        static let bleedRounds: Int = 3
+
+        static let baseInitiative: Double = 50
+        static let initiativePerSize: Double = 0.3
+        static let initiativePerBone: Double = 0.15
+        static let initiativePerCoverage: Double = 0.12
+        static let initiativePerSleekness: Double = 0.3
+        /// The party's place in the order. Ordinary — some things are faster than you.
+        static let binderInitiative: Int = 42
+        static let companionInitiative: Int = 40
+
+        static let evasionPerSleekness: Double = 0.006
+        static let evasionPerSize: Double = 0.002
+        /// Nothing is untouchable.
+        static let maximumEvasion: Double = 0.35
+
+        /// What hitting a warning-coloured animal costs you, per point of its size.
+        static let retaliationPerSize: Double = 0.06
+    }
+
+    // MARK: - What the player has met
+
+    enum Discovery {
+        /// Specimens kept per identity you've met. The bestiary's percentiles need a population,
+        /// not a complete history, and the save is rewritten after every action.
+        static let specimensKeptPerIdentity: Int = 24 // PLACEHOLDER
     }
 
     // MARK: - Economy

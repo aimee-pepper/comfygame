@@ -59,6 +59,10 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Travellers whose signature this world satisfies. Found on arrival — a traveller is simply
     /// *at* a signature, so writing the right world is the whole of finding them.
     var travellersHere: [TravellerID] = []
+    /// **The species this world settled on** (session 15 §1). Sampled at bind from the readings and
+    /// the seed, and saved with the run so a resume finds the same animals — and so an anchored
+    /// world will keep its cast forever without anything further being built.
+    var cast: [Species] = []
 
     /// 0–100, always visible. Decays per *player turn* only — never wall-clock (pillar 2).
     var stability: Double = Tuning.World.startingStability
@@ -127,7 +131,7 @@ struct WorldRun: Codable, Equatable, Sendable {
 
     init(runIndex: Int, book: BoundBook, mapSeed: UInt64, rng: SeededRNG, map: WorldMap,
          playerPosition: GridPoint, enemies: [WorldEnemy] = [], sites: [PlacedSite] = [],
-         travellersHere: [TravellerID] = [],
+         travellersHere: [TravellerID] = [], cast: [Species] = [],
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)) {
         self.runIndex = runIndex
         self.book = book
@@ -138,7 +142,13 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.enemies = enemies
         self.sites = sites
         self.travellersHere = travellersHere
+        self.cast = cast
         self.satchelItems = satchelItems
+    }
+
+    /// The species a given enemy belongs to, where the run still has it.
+    func species(of enemy: WorldEnemy) -> Species? {
+        enemy.speciesID.flatMap { id in cast.first { $0.id == id } }
     }
 
     /// Tolerant decoding, per the policy in `Migrations.swift`: adding a field must never cost a
@@ -155,6 +165,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         enemies = try container.decodeIfPresent([WorldEnemy].self, forKey: .enemies) ?? []
         sites = try container.decodeIfPresent([PlacedSite].self, forKey: .sites) ?? []
         travellersHere = try container.decodeIfPresent([TravellerID].self, forKey: .travellersHere) ?? []
+        cast = try container.decodeIfPresent([Species].self, forKey: .cast) ?? []
         stability = try container.decodeIfPresent(Double.self, forKey: .stability)
             ?? Tuning.World.startingStability
         turnsTaken = try container.decodeIfPresent(Int.self, forKey: .turnsTaken) ?? 0

@@ -11,7 +11,100 @@ struct CombatStats: Codable, Equatable, Sendable {
     var icon: String
     var maxHP: Int
     var attack: Int
+    /// Soaks damage. `covering.hardness × covering.coverage` — armour that reaches none of the
+    /// animal protects none of it.
+    var armour: Int = 0
+    /// Which corner of the weapon triangle it fights from. Pierce ignores some armour, crush hits
+    /// hard and slow, rend bleeds.
+    var damageKind: DamageKind = .crush
+    /// Decides the turn order. Sleek, small and lightly built goes first.
+    var initiative: Int = 0
+    /// 0–1. Chance an attack simply misses it.
+    var evasion: Double = 0
+    /// Warning colours are honest: hitting it in melee costs you this much.
+    var retaliation: Int = 0
+    /// Far reach strikes first on engagement regardless of initiative.
+    var strikesFirst: Bool = false
+    /// Non-nil where it carries its own light, heat or venom.
+    var element: EmanationKind?
 
+    init(displayName: String, icon: String, maxHP: Int, attack: Int, armour: Int = 0,
+         damageKind: DamageKind = .crush, initiative: Int = 0, evasion: Double = 0,
+         retaliation: Int = 0, strikesFirst: Bool = false, element: EmanationKind? = nil) {
+        self.displayName = displayName
+        self.icon = icon
+        self.maxHP = maxHP
+        self.attack = attack
+        self.armour = armour
+        self.damageKind = damageKind
+        self.initiative = initiative
+        self.evasion = evasion
+        self.retaliation = retaliation
+        self.strikesFirst = strikesFirst
+        self.element = element
+    }
+
+    /// Tolerant decoding, per the policy in `Migrations.swift`. These are saved mid-encounter, which
+    /// is the hardest resume case in the game — a new stat must never cost somebody their fight.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        displayName = try c.decodeIfPresent(String.self, forKey: .displayName) ?? "Something"
+        icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "questionmark"
+        maxHP = try c.decodeIfPresent(Int.self, forKey: .maxHP) ?? 1
+        attack = try c.decodeIfPresent(Int.self, forKey: .attack) ?? 1
+        armour = try c.decodeIfPresent(Int.self, forKey: .armour) ?? 0
+        damageKind = try c.decodeIfPresent(DamageKind.self, forKey: .damageKind) ?? .crush
+        initiative = try c.decodeIfPresent(Int.self, forKey: .initiative) ?? 0
+        evasion = try c.decodeIfPresent(Double.self, forKey: .evasion) ?? 0
+        retaliation = try c.decodeIfPresent(Int.self, forKey: .retaliation) ?? 0
+        strikesFirst = try c.decodeIfPresent(Bool.self, forKey: .strikesFirst) ?? false
+        element = try c.decodeIfPresent(EmanationKind.self, forKey: .element)
+    }
+
+    /// **How a creature fights, read off what it is** (creature-system-spec §7). This is what makes
+    /// a bulky armoured ambusher play differently from a swift fragile pursuer, which was not true
+    /// of anything while every creature carried a flat stat block.
+    static func derived(from traits: CreatureTraits, name: String, icon: String) -> CombatStats {
+        let t = Tuning.Encounter.self
+        let bulk = max(0, traits.build - 50) / 50           // 0 at sleek, 1 at fully bulky
+
+        let hp = t.baseFoeHP
+            + traits.size * t.hpPerSize
+            + bulk * t.hpPerBulk
+            + traits.boneDensity * t.hpPerBone
+
+        // A big animal hits harder with the same weapons. An unarmed one still has mass.
+        let attack = t.baseFoeAttack
+            + traits.armament.total * t.attackPerArmament
+            + traits.size * t.attackPerSize
+
+        // Light, sleek and lightly armoured moves first — and is the thing that dodges.
+        let initiative = t.baseInitiative
+            - traits.size * t.initiativePerSize
+            - traits.boneDensity * t.initiativePerBone
+            - traits.covering.coverage * t.initiativePerCoverage
+            + (50 - abs(traits.build - Tuning.Life.sleekBuild)) * t.initiativePerSleekness
+
+        let evasion = max(0, min(t.maximumEvasion,
+                                 (50 - abs(traits.build - Tuning.Life.sleekBuild)) * t.evasionPerSleekness
+                                 - traits.size * t.evasionPerSize))
+
+        return CombatStats(
+            displayName: name,
+            icon: icon,
+            maxHP: max(1, Int(hp.rounded())),
+            attack: max(0, Int(attack.rounded())),
+            armour: Int((traits.covering.armourValue * t.armourPerCovering).rounded()),
+            damageKind: traits.armament.dominant,
+            initiative: Int(initiative.rounded()),
+            evasion: evasion,
+            retaliation: traits.isToxic ? max(1, Int((traits.size * t.retaliationPerSize).rounded())) : 0,
+            strikesFirst: traits.armament.reach == .far,
+            element: traits.emanation.map(\.dominant)
+        )
+    }
+
+    /// The old authored creatures, kept as the fallback for a world bound before the cast existed.
     static func resolved(from creature: CreatureDef) -> CombatStats {
         CombatStats(displayName: creature.name, icon: creature.icon, maxHP: creature.maxHP, attack: creature.attack)
     }
@@ -39,14 +132,46 @@ enum CombatAction: Codable, Equatable, Sendable {
 
 struct FoeState: Codable, Equatable, Identifiable, Sendable {
     var id: InstanceID
-    /// Which creature this was. Kept for the bestiary — *not* for working out how it fights.
-    var creatureID: CreatureID
+    /// An authored creature. **Legacy**, and nil for anything a world grew itself.
+    var creatureID: CreatureID?
+    /// Which bestiary entry this belongs under. Derived from the traits at spawn and stored, so a
+    /// later change to the identity regions can't rename a creature mid-fight.
+    var identityKey: String = "unknown"
+    /// What it is. Kept for the bestiary and for loot — *not* re-read to work out how it fights,
+    /// which was resolved once into `stats`.
+    var traits: CreatureTraits?
     /// How it fights, resolved at spawn. See `CombatStats`.
     var stats: CombatStats
     var currentHP: Int
+    /// Rounds of bleeding left, and how much each costs. Rend's wound outlives the blow.
+    var bleedRounds: Int = 0
 
     var isAlive: Bool { currentHP > 0 }
     var maxHP: Int { stats.maxHP }
+
+    init(id: InstanceID, creatureID: CreatureID? = nil, identityKey: String = "unknown",
+         traits: CreatureTraits? = nil, stats: CombatStats, currentHP: Int, bleedRounds: Int = 0) {
+        self.id = id
+        self.creatureID = creatureID
+        self.identityKey = identityKey
+        self.traits = traits
+        self.stats = stats
+        self.currentHP = currentHP
+        self.bleedRounds = bleedRounds
+    }
+
+    /// Tolerant decoding — this is the mid-encounter resume case the acceptance criteria name.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(InstanceID.self, forKey: .id)
+        creatureID = try c.decodeIfPresent(CreatureID.self, forKey: .creatureID)
+        identityKey = try c.decodeIfPresent(String.self, forKey: .identityKey)
+            ?? creatureID?.rawValue ?? "unknown"
+        traits = try c.decodeIfPresent(CreatureTraits.self, forKey: .traits)
+        stats = try c.decode(CombatStats.self, forKey: .stats)
+        currentHP = try c.decodeIfPresent(Int.self, forKey: .currentHP) ?? 1
+        bleedRounds = try c.decodeIfPresent(Int.self, forKey: .bleedRounds) ?? 0
+    }
 }
 
 /// A fight in progress. Saved in full — being mid-encounter is the hardest resume case in the game,

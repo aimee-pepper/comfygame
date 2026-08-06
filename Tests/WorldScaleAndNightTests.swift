@@ -87,20 +87,62 @@ final class WorldScaleAndNightTests: XCTestCase {
         XCTAssertLessThan(WorldRules.visionRadius(in: run), byDay)
     }
 
+    /// The world doesn't repopulate at nightfall — what was out in the day goes, and what's out at
+    /// night arrives in its place. Both rosters come from the world's own cast.
     func testTheRosterSwapsAtNightfall() {
         var run = makeRun(book: BoundBook(written: ["dim_sky", "teeming_life"], essencePaid: 0))
-        run.enemies = [WorldEnemy(id: InstanceID(rawValue: 1), creatureID: "paper_moth",
-                                  position: GridPoint(x: 1, y: 1))]
+        run.cast = [species(nocturnal: false, id: 10), species(nocturnal: true, id: 11)]
+        run.enemies = [Worldgen.spawn(run.cast[0], at: GridPoint(x: 1, y: 1), rng: &run.rng)]
+
         WorldRules.swapRoster(in: &run, toNight: true)
 
-        let creature = ContentCatalog.shared.creature(run.enemies[0].creatureID)
-        XCTAssertEqual(creature?.isNocturnal, true, "the day roster stayed out after dark")
+        XCTAssertEqual(run.species(of: run.enemies[0])?.isNocturnal, true,
+                       "the day roster stayed out after dark")
         XCTAssertFalse(run.enemies[0].isAwake, "a swapped-in creature started already hunting")
+        XCTAssertNotNil(run.enemies[0].traits, "the night shift arrived without a body")
     }
 
-    func testSomethingIsNocturnalAtAll() {
-        XCTAssertTrue(ContentCatalog.shared.creatures.contains(where: \.isNocturnal))
-        XCTAssertTrue(ContentCatalog.shared.creatures.contains { !$0.isNocturnal })
+    /// A world whose animals all keep the same hours simply doesn't change shift — better than
+    /// emptying the map at dusk.
+    func testAWorldWithNoNightShiftKeepsWhatItHas() {
+        var run = makeRun()
+        run.cast = [species(nocturnal: false, id: 10)]
+        run.enemies = [Worldgen.spawn(run.cast[0], at: GridPoint(x: 1, y: 1), rng: &run.rng)]
+        let before = run.enemies
+
+        WorldRules.swapRoster(in: &run, toNight: true)
+        XCTAssertEqual(run.enemies, before)
+    }
+
+    /// Nocturnality is **derived**, not authored: a thing that hunts by touch has no reason to keep
+    /// daytime hours, and neither has a thing that carries its own light.
+    func testWhoKeepsNightHoursIsReadOffWhatTheySenseWith() {
+        var eyed = CreatureTraits()
+        eyed.sensory = Sensory.allocation(vision: 80, mechano: 10, chemo: 5, thermo: 5)
+        XCTAssertFalse(CreatureIdentity.isNocturnal(eyed))
+
+        var groper = CreatureTraits()
+        groper.sensory = Sensory.allocation(vision: 4, mechano: 60, chemo: 30, thermo: 6)
+        XCTAssertTrue(CreatureIdentity.isNocturnal(groper))
+    }
+
+    /// Darkness costs a creature that doesn't use its eyes nothing at all.
+    func testTheDarkCostsAnEyedCreatureItsRangeAndABlindOneNothing() {
+        var run = makeRun()
+        guard run.hasDayAndNight else { return }
+        let eyed = Worldgen.spawn(species(nocturnal: false, id: 1), at: GridPoint(x: 1, y: 1), rng: &run.rng)
+        let blind = Worldgen.spawn(species(nocturnal: true, id: 2), at: GridPoint(x: 2, y: 2), rng: &run.rng)
+
+        run.turnsTaken = 0
+        let eyedByDay = WorldRules.detectionRadius(of: eyed, in: run)
+        let blindByDay = WorldRules.detectionRadius(of: blind, in: run)
+        run.turnsTaken = Int(Double(Tuning.DayNight.turnsPerDay) * 0.95)
+        XCTAssertTrue(run.isNight)
+
+        XCTAssertLessThan(WorldRules.detectionRadius(of: eyed, in: run), eyedByDay,
+                          "the dark cost an eyed creature nothing")
+        XCTAssertEqual(WorldRules.detectionRadius(of: blind, in: run), blindByDay,
+                       "the dark blinded something that doesn't use its eyes")
     }
 
     // MARK: Helpers
@@ -108,7 +150,17 @@ final class WorldScaleAndNightTests: XCTestCase {
     private func makeRun(book: BoundBook = BoundBook(written: ["dim_sky"], essencePaid: 0)) -> WorldRun {
         let world = Worldgen.generate(book: book, seed: 20_260_805)
         return WorldRun(runIndex: 1, book: book, mapSeed: 20_260_805,
-                        rng: SeededRNG(seed: 1), map: world.map, playerPosition: world.start)
+                        rng: SeededRNG(seed: 1), map: world.map, playerPosition: world.start,
+                        cast: world.cast)
+    }
+
+    private func species(nocturnal: Bool, id: UInt64) -> Species {
+        var traits = CreatureTraits()
+        traits.size = 40
+        traits.sensory = nocturnal
+            ? Sensory.allocation(vision: 3, mechano: 60, chemo: 30, thermo: 7)
+            : Sensory.allocation(vision: 80, mechano: 10, chemo: 5, thermo: 5)
+        return Species(id: InstanceID(rawValue: id), traits: traits, worldSeed: 1)
     }
 
     private func place(_ content: MarkContent, at origin: PageCell, on page: Page) -> Page? {

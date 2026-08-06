@@ -148,12 +148,76 @@ struct ResourceNode: Codable, Equatable, Sendable {
 }
 
 /// An enemy standing on the grid. Inert until the player comes close, then it walks at you.
+///
+/// **Carries its own trait vector, not a pointer into a catalogue.** One of the run's cast, plus the
+/// jitter that makes this particular animal itself — rolled once at placement and kept, so a resume
+/// finds the same creature even if the sampling rules change underneath it.
 struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
     var id: InstanceID
-    var creatureID: CreatureID
+    /// Which of the run's cast this is one of.
+    var speciesID: InstanceID?
+    /// This animal. `nil` only in worlds bound before the cast existed.
+    var traits: CreatureTraits?
+    /// An authored creature. **Legacy** — kept so a run in progress when the cast landed still
+    /// resolves rather than emptying its map of everything the player was walking toward.
+    var creatureID: CreatureID?
     var position: GridPoint
     /// Woken by the player entering its aggro radius. Never goes back to sleep.
     var isAwake: Bool = false
+
+    init(id: InstanceID, speciesID: InstanceID? = nil, traits: CreatureTraits? = nil,
+         creatureID: CreatureID? = nil, position: GridPoint, isAwake: Bool = false) {
+        self.id = id
+        self.speciesID = speciesID
+        self.traits = traits
+        self.creatureID = creatureID
+        self.position = position
+        self.isAwake = isAwake
+    }
+
+    /// Tolerant decoding, per the policy in `Migrations.swift`.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(InstanceID.self, forKey: .id)
+        speciesID = try c.decodeIfPresent(InstanceID.self, forKey: .speciesID)
+        traits = try c.decodeIfPresent(CreatureTraits.self, forKey: .traits)
+        creatureID = try c.decodeIfPresent(CreatureID.self, forKey: .creatureID)
+        position = try c.decode(GridPoint.self, forKey: .position)
+        isAwake = try c.decodeIfPresent(Bool.self, forKey: .isAwake) ?? false
+    }
+
+    // MARK: What it is
+
+    /// What to call it. Read off the traits where there are any, off the old catalogue otherwise.
+    var displayName: String {
+        if let traits { return CreatureIdentity.name(for: traits) }
+        return creatureID.flatMap { ContentCatalog.shared.creature($0)?.name } ?? "Something"
+    }
+
+    /// The bestiary key. Species are entries; this enemy is a specimen under one.
+    var identityKey: String {
+        if let traits { return CreatureIdentity.match(traits).key }
+        return creatureID?.rawValue ?? "unknown"
+    }
+
+    /// **[PLACEHOLDER]** — session 11 §4 wants glyphs rather than app icons, and that applies here
+    /// as much as to the runes. Until then, how it gets about is the most legible thing about it.
+    var icon: String {
+        guard let traits else {
+            return creatureID.flatMap { ContentCatalog.shared.creature($0)?.icon } ?? "questionmark"
+        }
+        if traits.emanation != nil { return "light.beacon.max" }
+        switch traits.appendages.type {
+        case .finned: return "fish"
+        case .membrane, .feathered: return "bird"
+        case .none: return "circle.hexagongrid"
+        case .limbed:
+            if traits.appendages.count >= 6 { return "ant" }
+            if traits.covering.armourValue > 55 { return "tortoise" }
+            if traits.build > 70 { return "pawprint" }
+            return "lizard"
+        }
+    }
 }
 
 extension GridPoint {

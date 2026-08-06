@@ -219,6 +219,9 @@ extension GameStore {
                 enemies: world.enemies,
                 sites: world.sites,
                 travellersHere: world.travellers,
+                // The species this world settled on, kept with the run so the same animals are
+                // still here after a force-quit — and so anchoring one keeps them forever.
+                cast: world.cast,
                 // The satchel is its own, smaller capacity — separate from home storage, and
                 // separately upgradeable (decisions-log session 2).
                 satchelItems: Inventory(slots: state.base.satchelCapacity)

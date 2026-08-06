@@ -103,8 +103,7 @@ struct WorldView: View {
         case .pickedUpItem(let what): "\(what) You can't tell what it is."
         case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."
         case .hazardHit(let damage): "The ground turns on you — \(damage) damage."
-        case .enemySighted(let creature):
-            "\(ContentCatalog.shared.creature(creature)?.name ?? "Something") has noticed you."
+        case .enemySighted(let name): "A \(name) has noticed you."
         case .encounterBegan: nil // the encounter bar takes over
         case .crossedThreshold(let band):
             switch band {
@@ -380,7 +379,7 @@ private struct TileView: View {
     private var symbol: String? {
         if isPlayer { return "figure.stand" }
         guard tile.isRevealed, !tile.isCrumbled else { return nil }
-        if let enemy { return ContentCatalog.shared.creature(enemy.creatureID)?.icon ?? "questionmark" }
+        if let enemy { return enemy.icon }
         switch tile.content {
         case .empty: return nil
         case .node(let node): return ContentCatalog.shared.resource(node.resource)?.icon ?? "cube"

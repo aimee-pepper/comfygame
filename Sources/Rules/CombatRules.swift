@@ -10,14 +10,38 @@ enum CombatRules {
 
     // MARK: Starting a fight
 
-    static func makeEncounter(id: InstanceID, foes: [FoeState]) -> EncounterState {
-        EncounterState(
+    /// **Turn order comes off initiative** (creature-system-spec §7), not off a fixed party-first
+    /// rotation. Sleek, small and lightly armoured goes before you; a huge armoured thing goes after.
+    /// Anything with far reach strikes first regardless — length beats speed at the moment of
+    /// contact.
+    ///
+    /// The order is resolved once and stored, so a foe dying mid-round can't shift whose turn it is.
+    static func makeEncounter(id: InstanceID, foes: [FoeState], rng: inout SeededRNG) -> EncounterState {
+        var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = [
+            (.binder, Tuning.Encounter.binderInitiative, false),
+            (.companion, Tuning.Encounter.companionInitiative, false)
+        ]
+        for foe in foes {
+            let slow = foe.stats.damageKind == .crush ? Tuning.Encounter.crushInitiativePenalty : 0
+            ranked.append((.foe(foe.id), foe.stats.initiative - slow, foe.stats.strikesFirst))
+        }
+        // Ties broken off the run's own stream rather than by declaration order, so two identical
+        // animals don't always act in the order they happened to be placed.
+        let jittered = ranked.map { ($0, rng.int(in: 0...99)) }
+        let order = jittered
+            .sorted {
+                if $0.0.first != $1.0.first { return $0.0.first }
+                if $0.0.initiative != $1.0.initiative { return $0.0.initiative > $1.0.initiative }
+                return $0.1 > $1.1
+            }
+            .map(\.0.actor)
+
+        return EncounterState(
             id: id,
             foes: foes,
-            // Party first, then enemies, and the order is fixed for the whole fight — a foe dying
-            // mid-round must never shift whose turn it is.
-            order: [.binder, .companion] + foes.map { Combatant.foe($0.id) },
-            log: [foes.count == 1 ? "Something notices you." : "They close in around you."]
+            order: order,
+            log: [foes.count == 1 ? "A \(foes[0].stats.displayName) notices you."
+                                  : "They close in around you."]
         )
     }
 
@@ -333,7 +357,11 @@ enum CombatRules {
         var found: [String] = []
 
         for foe in encounter.foes {
-            let tier = ContentCatalog.shared.creature(foe.creatureID)?.tier ?? 1
+            // How much a kill is worth follows what the world spent making it, rather than an
+            // authored tier — a world that grows monstrous things pays out for monstrous things.
+            let tier = foe.traits.map(CreatureIdentity.tier(of:))
+                ?? foe.creatureID.flatMap { ContentCatalog.shared.creature($0)?.tier }
+                ?? 1
             let amount = tier * run.rng.int(in: Tuning.Encounter.lootPerTierRange)
             if let resource = run.rng.pickWeighted(BookRules.yieldTable(for: run.book)) {
                 run.satchel.add(amount, of: resource)

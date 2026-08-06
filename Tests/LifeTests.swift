@@ -316,7 +316,100 @@ final class LifeTests: XCTestCase {
         XCTAssertFalse(regions.contains(.apex), "a dead world produced an apex predator")
     }
 
+    // MARK: - The cast reaches the world
+
+    /// The point of the whole system: what you meet on the map is what the world grew.
+    func testEverythingOnTheMapComesFromTheWorldsOwnCast() {
+        for seed in UInt64(1)...40 {
+            let world = Worldgen.generate(book: BoundBook(written: ["teeming_life"], essencePaid: 0),
+                                          seed: seed)
+            XCTAssertFalse(world.cast.isEmpty, "seed \(seed) produced a world with no species")
+            for enemy in world.enemies {
+                XCTAssertNotNil(enemy.traits, "an enemy arrived without a body, seed \(seed)")
+                XCTAssertTrue(world.cast.contains { $0.id == enemy.speciesID },
+                              "something not in the cast is standing on the map, seed \(seed)")
+                XCTAssertNil(enemy.creatureID, "worldgen still reached for an authored creature")
+            }
+        }
+    }
+
+    /// Same seed, same animals, in the same places — including their individual jitter.
+    func testTheSameWorldPutsTheSameAnimalsInTheSamePlaces() {
+        let book = BoundBook(written: ["teeming_life"], essencePaid: 0)
+        let first = Worldgen.generate(book: book, seed: 4242)
+        let again = Worldgen.generate(book: book, seed: 4242)
+        XCTAssertEqual(first.cast, again.cast)
+        XCTAssertEqual(first.enemies, again.enemies)
+    }
+
+    /// **Cheap animals are numerous and expensive ones are rare** — the pyramid falls out of the
+    /// same appetite number the budget was spent against.
+    func testTheCheapestThingInAWorldIsTheCommonestThingInIt() {
+        var cheap = CreatureTraits(); cheap.size = 15
+        var dear = CreatureTraits(); dear.size = 95
+        dear.covering = Covering(hardness: 90, length: 60, coverage: 90)
+        let cast = [Species(id: InstanceID(rawValue: 1), traits: cheap, worldSeed: 1),
+                    Species(id: InstanceID(rawValue: 2), traits: dear, worldSeed: 1)]
+
+        let table = Worldgen.roster(from: cast, nocturnal: false)
+        let cheapWeight = table.first { $0.value.id == InstanceID(rawValue: 1) }?.weight ?? 0
+        let dearWeight = table.first { $0.value.id == InstanceID(rawValue: 2) }?.weight ?? 0
+        XCTAssertGreaterThan(cheapWeight, dearWeight,
+                             "the world's most expensive animal was as common as its cheapest")
+    }
+
+    /// How it fights is what it is (spec §7) — not a stat block that happens to travel with it.
+    func testABulkyArmouredThingFightsNothingLikeASwiftBareOne() {
+        var tank = CreatureTraits()
+        tank.size = 90; tank.build = 95; tank.boneDensity = 80
+        tank.covering = Covering(hardness: 85, length: 20, coverage: 90)
+        var runner = CreatureTraits()
+        runner.size = 20; runner.build = Tuning.Life.sleekBuild; runner.boneDensity = 10
+        runner.covering = Covering(hardness: 5, length: 5, coverage: 30)
+
+        let heavy = CombatStats.derived(from: tank, name: "tank", icon: "tortoise")
+        let quick = CombatStats.derived(from: runner, name: "runner", icon: "hare")
+
+        XCTAssertGreaterThan(heavy.maxHP, quick.maxHP * 2)
+        XCTAssertGreaterThan(heavy.armour, quick.armour)
+        XCTAssertGreaterThan(quick.initiative, heavy.initiative, "the tank went first")
+        XCTAssertGreaterThan(quick.evasion, heavy.evasion)
+    }
+
+    /// Warning colours are honest, and far reach beats speed at the moment of contact.
+    func testTraitsThatChangeHowAFightOpens() {
+        var toxic = CreatureTraits()
+        toxic.size = 60
+        toxic.isToxic = true
+        XCTAssertGreaterThan(CombatStats.derived(from: toxic, name: "x", icon: "y").retaliation, 0)
+
+        var reacher = CreatureTraits()
+        reacher.armament.reach = .far
+        XCTAssertTrue(CombatStats.derived(from: reacher, name: "x", icon: "y").strikesFirst)
+    }
+
     // MARK: - Persistence
+
+    /// A run in progress when the cast landed must still resolve — its enemies are catalogue
+    /// creatures with no trait vector, and emptying the map under a player mid-visit is not a
+    /// migration, it's a loss.
+    func testAWorldBoundBeforeTheCastStillHasItsAnimals() {
+        let legacy = WorldEnemy(id: InstanceID(rawValue: 1), creatureID: "paper_moth",
+                                position: GridPoint(x: 2, y: 2))
+        XCTAssertEqual(legacy.displayName, "Paper Moth")
+        XCTAssertEqual(legacy.identityKey, "paper_moth")
+        XCTAssertNotEqual(legacy.icon, "questionmark")
+    }
+
+    func testAnEnemyMissingEveryNewFieldStillLoads() throws {
+        // Exactly the shape a save written before the cast existed holds.
+        let old = OldWorldEnemy(id: InstanceID(rawValue: 7), creatureID: "ink_hound",
+                                position: GridPoint(x: 1, y: 1), isAwake: false)
+        let data = try SaveCodec.makeEncoder().encode(old)
+        let enemy = try SaveCodec.makeDecoder().decode(WorldEnemy.self, from: data)
+        XCTAssertNil(enemy.traits)
+        XCTAssertEqual(enemy.displayName, "Ink Hound")
+    }
 
     func testTraitsRoundTripThroughASave() throws {
         let species = LifeRules.cast(for: world(["bloom": "vitality"]), seed: 5)[0]
@@ -333,6 +426,14 @@ final class LifeTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    /// `WorldEnemy` as it was before worlds grew their own animals.
+    private struct OldWorldEnemy: Codable {
+        var id: InstanceID
+        var creatureID: CreatureID
+        var position: GridPoint
+        var isAwake: Bool
+    }
 
     private func normalisedWeights(_ readings: PressureReadings,
                                    over axes: [CostlyAxis]) -> [CostlyAxis: Double] {

@@ -127,16 +127,25 @@ final class SiteTests: XCTestCase {
         }
     }
 
-    func testGuardedSitesGetTheirGuardian() {
+    /// A guarded site is guarded by **something local** — the most formidable animal the world
+    /// grew, rather than a creature from nowhere standing in a world that made everything else.
+    func testGuardedSitesGetTheirGuardianAndItBelongsThere() {
         for seed in UInt64(1)...120 {
             let world = Worldgen.generate(
                 book: BoundBook(symbols: [SlotID(rawValue: "bounty"): SymbolID(rawValue: "teeming_life")],
                                 randomlyFilled: [], essencePaid: 0), seed: seed)
+            let dearest = world.cast.map { $0.traits.appetite }.max() ?? 0
             for site in world.sites {
-                guard let guardian = site.definition?.contents.guardian else { continue }
-                XCTAssertTrue(
-                    world.enemies.contains { $0.position == site.position && $0.creatureID == guardian },
-                    "\(site.siteID.rawValue) went unguarded, seed \(seed)")
+                guard site.definition?.contents.guardian != nil else { continue }
+                guard let guardian = world.enemies.first(where: { $0.position == site.position }) else {
+                    XCTFail("\(site.siteID.rawValue) went unguarded, seed \(seed)")
+                    continue
+                }
+                XCTAssertTrue(world.cast.contains { $0.id == guardian.speciesID },
+                              "the guardian isn't one of this world's animals, seed \(seed)")
+                XCTAssertEqual(world.cast.first { $0.id == guardian.speciesID }?.traits.appetite ?? -1,
+                               dearest, accuracy: 0.001,
+                               "a ruin got an ordinary tenant rather than the world's worst thing")
             }
         }
     }

@@ -11,16 +11,29 @@ import Foundation
 /// logged in docs/questions-for-design.md (Q1). If the answer is "base", move the two properties
 /// to `BaseState` — nothing else needs to change.
 struct DiscoveryLog: Codable, Equatable, Sendable {
+    /// Authored creatures. **Legacy** — kept so a save from before worlds grew their own animals
+    /// doesn't lose what it had recorded.
     var creatures: [CreatureID: DiscoveryRecord] = [:]
+    /// **The bestiary's first tier: identities are entries** (session 15 §1, spec §6). Keyed by the
+    /// derived identity, so two similar ambushers from different worlds are one entry.
+    var species: [String: DiscoveryRecord] = [:]
+    /// **The second tier: specimens.** One record per animal actually met, which is where personal
+    /// bests and "the largest you've seen" come from. Capped, because this is the only collection in
+    /// the save that grows without bound.
+    var specimens: [SpecimenRecord] = []
     var resources: [ResourceID: DiscoveryRecord] = [:]
     /// Sites you've stood in. A site you've never met is silhouetted in the preview, same rule as
     /// creatures — you can be told a world *can* hold something without being told what.
     var sites: [SiteID: DiscoveryRecord] = [:]
 
     init(creatures: [CreatureID: DiscoveryRecord] = [:],
+         species: [String: DiscoveryRecord] = [:],
+         specimens: [SpecimenRecord] = [],
          resources: [ResourceID: DiscoveryRecord] = [:],
          sites: [SiteID: DiscoveryRecord] = [:]) {
         self.creatures = creatures
+        self.species = species
+        self.specimens = specimens
         self.resources = resources
         self.sites = sites
     }
@@ -34,6 +47,8 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         creatures = try container.decodeIfPresent([CreatureID: DiscoveryRecord].self, forKey: .creatures) ?? [:]
+        species = try container.decodeIfPresent([String: DiscoveryRecord].self, forKey: .species) ?? [:]
+        specimens = try container.decodeIfPresent([SpecimenRecord].self, forKey: .specimens) ?? []
         resources = try container.decodeIfPresent([ResourceID: DiscoveryRecord].self, forKey: .resources) ?? [:]
         sites = try container.decodeIfPresent([SiteID: DiscoveryRecord].self, forKey: .sites) ?? [:]
     }
@@ -42,9 +57,26 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
 
     func hasEncountered(creature id: CreatureID) -> Bool { creatures[id]?.timesEncountered ?? 0 > 0 }
     func hasEncountered(resource id: ResourceID) -> Bool { resources[id]?.timesEncountered ?? 0 > 0 }
+    func hasEncountered(species key: String) -> Bool { species[key]?.timesEncountered ?? 0 > 0 }
 
-    var encounteredCreatureCount: Int { creatures.values.count(where: { $0.timesEncountered > 0 }) }
+    var encounteredCreatureCount: Int {
+        creatures.values.count(where: { $0.timesEncountered > 0 })
+            + species.values.count(where: { $0.timesEncountered > 0 })
+    }
     var encounteredResourceCount: Int { resources.values.count(where: { $0.timesEncountered > 0 }) }
+
+    /// Every specimen you've recorded of one identity, newest last.
+    func specimens(of key: String) -> [SpecimenRecord] { specimens.filter { $0.identityKey == key } }
+
+    /// Where this animal sits against every other one of its kind you've met, 0–1. The percentile
+    /// the bestiary's second tier exists for.
+    func percentile(of specimen: SpecimenRecord, by measure: (SpecimenRecord) -> Double) -> Double {
+        let peers = specimens(of: specimen.identityKey)
+        guard peers.count > 1 else { return 1 }
+        let value = measure(specimen)
+        let below = peers.count(where: { measure($0) < value })
+        return Double(below) / Double(peers.count - 1)
+    }
 
     // MARK: Mutations
     //
@@ -54,12 +86,48 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
         creatures[id, default: DiscoveryRecord()].record(runIndex: runIndex)
     }
 
+    /// A bestiary *entry* — that this kind of animal exists and you've met one.
+    mutating func recordSpecies(_ key: String, runIndex: Int) {
+        species[key, default: DiscoveryRecord()].record(runIndex: runIndex)
+    }
+
+    /// A bestiary *specimen* — this particular animal, kept so the entry can say how this one
+    /// compared. Oldest are dropped first: an unbounded list in a save that's rewritten after every
+    /// action is a slow leak, and the percentile only needs a population, not a complete history.
+    mutating func recordSpecimen(_ traits: CreatureTraits, of key: String, runIndex: Int) {
+        specimens.append(SpecimenRecord(identityKey: key, traits: traits, runIndex: runIndex))
+        let cap = Tuning.Discovery.specimensKeptPerIdentity * max(1, species.count)
+        if specimens.count > cap { specimens.removeFirst(specimens.count - cap) }
+    }
+
     mutating func recordSite(_ id: SiteID, runIndex: Int) {
         sites[id, default: DiscoveryRecord()].record(runIndex: runIndex)
     }
 
     mutating func recordResource(_ id: ResourceID, runIndex: Int) {
         resources[id, default: DiscoveryRecord()].record(runIndex: runIndex)
+    }
+}
+
+/// One animal you actually met. **The bestiary's second tier** — the entry is what it was, this is
+/// which one it was.
+struct SpecimenRecord: Codable, Equatable, Sendable {
+    var identityKey: String
+    var traits: CreatureTraits
+    /// Which run you met it in. A run count, never a date (pillar 2).
+    var runIndex: Int
+
+    init(identityKey: String, traits: CreatureTraits, runIndex: Int) {
+        self.identityKey = identityKey
+        self.traits = traits
+        self.runIndex = runIndex
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        identityKey = try c.decodeIfPresent(String.self, forKey: .identityKey) ?? "unknown"
+        traits = try c.decodeIfPresent(CreatureTraits.self, forKey: .traits) ?? CreatureTraits()
+        runIndex = try c.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
     }
 }
 

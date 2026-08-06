@@ -21,7 +21,7 @@ enum Worldgen {
 
     static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState())
         -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite],
-            pages: [DiaryPageID], travellers: [TravellerID], start: GridPoint) {
+            pages: [DiaryPageID], travellers: [TravellerID], cast: [Species], start: GridPoint) {
         // **Size is written, not fixed** (session 13 §5). The book carries the Scale it was
         // written at, so the same book always makes the same size of world.
         let width = book.scale.gridSide
@@ -124,6 +124,10 @@ enum Worldgen {
                                     readings: readings,
                                     contradictions: ContradictionRules.fired(in: sigils, readings: readings),
                                     avoiding: occupied, rng: &siteRNG)
+        // 7a. **The cast** — the species this world settled on, before anything is placed. Drawn
+        //     from the readings and the seed, so the same world always holds the same animals.
+        let cast = LifeRules.cast(for: readings, seed: seed)
+
         var guardians: [WorldEnemy] = []
         for site in sites {
             map[site.position].content = .site(site.id)
@@ -131,9 +135,15 @@ enum Worldgen {
             // A guarded site is placed by the site system and statted by the creature system. The
             // guardian stands *on* the site, so the fight is the price of the search rather than a
             // separate mechanic.
-            if let creature = site.definition?.contents.guardian {
-                guardians.append(WorldEnemy(id: InstanceID(rawValue: siteRNG.next()),
-                                            creatureID: creature, position: site.position))
+            //
+            // **Guarded by something local.** A world's most formidable animal is what has moved
+            // into its ruins — an authored guardian would be a creature from nowhere, in a world
+            // that grew everything else it holds.
+            if site.definition?.contents.guardian != nil {
+                let guardian = cast.max { $0.traits.appetite < $1.traits.appetite } ?? cast.first
+                if let guardian {
+                    guardians.append(spawn(guardian, at: site.position, rng: &siteRNG))
+                }
             }
         }
 
@@ -151,25 +161,50 @@ enum Worldgen {
         // 9. Whoever this world's conditions describe is simply *here*.
         let travellers = LibraryRules.travellersPresent(in: readings).map(\.id)
 
-        // 10. Enemies, drawn from the book's enemy table.
-        let enemyTable = BookRules.enemyTable(from: readings)
+        // 10. Enemies, drawn from the world's own cast. It's daytime when you arrive, so it's the
+        //     day roster you meet; the night roster swaps in when the world turns.
+        let dayRoster = roster(from: cast, nocturnal: false)
         let enemyCount = enemyCount(for: book, readings: readings, rng: &enemyRNG)
         var enemies: [WorldEnemy] = guardians
         for _ in 0..<enemyCount {
-            guard let creature = enemyRNG.pickWeighted(enemyTable),
+            guard let species = enemyRNG.pickWeighted(dayRoster),
                   let point = randomFreePoint(in: map, avoiding: occupied,
                                               minimumDistanceFrom: entry,
                                               distance: Tuning.World.enemyFreeRadiusAroundEntry,
                                               rng: &enemyRNG)
             else { continue }
-            enemies.append(WorldEnemy(id: InstanceID(rawValue: enemyRNG.next()),
-                                      creatureID: creature.id,
-                                      position: point))
+            enemies.append(spawn(species, at: point, rng: &enemyRNG))
             occupied.insert(point)
         }
 
         WorldRules.reveal(around: entry, in: &map, radius: WorldRules.visionRadius(for: book))
-        return (map, enemies, sites, placedPages, travellers, entry)
+        return (map, enemies, sites, placedPages, travellers, cast, entry)
+    }
+
+    // MARK: The roster
+
+    /// One animal of a species, standing somewhere. Its own jitter is rolled here and kept, so a
+    /// resume finds the same creature rather than re-rolling it.
+    static func spawn(_ species: Species, at point: GridPoint, rng: inout SeededRNG) -> WorldEnemy {
+        WorldEnemy(id: InstanceID(rawValue: rng.next()),
+                   speciesID: species.id,
+                   traits: LifeRules.spawn(of: species, rng: &rng),
+                   position: point)
+    }
+
+    /// Who's out, and how common each of them is.
+    ///
+    /// **Cheap animals are numerous and expensive ones are rare** — the pyramid falls out of the
+    /// same appetite number the budget is spent against, rather than being an authored spawn weight.
+    /// Falls back to the whole cast where a world has nobody on the roster it asked for, because an
+    /// empty world at nightfall is worse than a world whose animals keep odd hours.
+    static func roster(from cast: [Species], nocturnal: Bool) -> [(value: Species, weight: Double)] {
+        let onDuty = cast.filter { $0.isNocturnal == nocturnal }
+        let pool = onDuty.isEmpty ? cast : onDuty
+        guard let dearest = pool.map({ $0.traits.appetite }).max(), dearest > 0 else {
+            return pool.map { (value: $0, weight: 1) }
+        }
+        return pool.map { (value: $0, weight: max(0.15, 1.15 - $0.traits.appetite / dearest)) }
     }
 
     // MARK: Counts

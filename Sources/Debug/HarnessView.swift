@@ -144,8 +144,7 @@ struct HarnessView: View {
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.red)
                     ForEach(encounter.foes) { foe in
-                        Row(ContentCatalog.shared.creature(foe.creatureID)?.name ?? foe.creatureID.rawValue,
-                            "\(foe.currentHP) / \(foe.maxHP) HP")
+                        Row(foe.stats.displayName, "\(foe.currentHP) / \(foe.maxHP) HP")
                     }
                     if let last = encounter.log.last {
                         Text(last).font(.caption).foregroundStyle(.secondary)

@@ -51,6 +51,12 @@ enum CreatureIdentity {
         traits.sensory.vision < Tuning.Life.nocturnalVisionCeiling || traits.emanation != nil
     }
 
+    /// How formidable, 1–5. **What the world spent on it**, so a world that grows monstrous things
+    /// pays out for monstrous things without anyone authoring a tier.
+    static func tier(of traits: CreatureTraits) -> Int {
+        max(1, min(5, 1 + Int(traits.appetite / Tuning.Life.appetitePerTier)))
+    }
+
     // MARK: Composed names
 
     /// `[size] [up to two distinguishing traits] [noun]` — plain words for an animal nobody has a

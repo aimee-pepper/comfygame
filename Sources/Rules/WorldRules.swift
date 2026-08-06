@@ -27,7 +27,9 @@ enum WorldRules {
         case pickedUpItem(String)
         case satchelFull(String)
         case hazardHit(damage: Int)
-        case enemySighted(CreatureID)
+        /// What noticed you, by the name it goes by. A name, not an id — what a creature *is* is
+        /// read off its traits, so there is no longer a catalogue entry to point at.
+        case enemySighted(String)
         case encounterBegan
         case crossedThreshold(StabilityBand)
         case nightfall
@@ -317,15 +319,18 @@ enum WorldRules {
     /// are out at night arrive in their place. Deterministic in the run's stream, so a resume finds
     /// the same night.
     static func swapRoster(in run: inout WorldRun, toNight: Bool) {
-        let table = BookRules.enemyTable(for: run.book)
-            .filter { $0.value.isNocturnal == toNight }
-        guard !table.isEmpty else { return }
+        guard !run.cast.isEmpty else { return }
+        let onDuty = run.cast.filter { $0.isNocturnal == toNight }
+        // Nothing keeps those hours here — the world simply doesn't change shift.
+        guard !onDuty.isEmpty else { return }
+        let table = Worldgen.roster(from: run.cast, nocturnal: toNight)
+
         for index in run.enemies.indices {
-            let current = ContentCatalog.shared.creature(run.enemies[index].creatureID)
+            let current = run.species(of: run.enemies[index])
             guard current?.isNocturnal != toNight else { continue }
             guard let replacement = run.rng.pickWeighted(table) else { continue }
-            run.enemies[index].creatureID = replacement.id
-            run.enemies[index].isAwake = false
+            let position = run.enemies[index].position
+            run.enemies[index] = Worldgen.spawn(replacement, at: position, rng: &run.rng)
         }
     }
 
@@ -439,13 +444,11 @@ enum WorldRules {
 
             // **Openness sets ambush versus pursuit.** Across open ground you're seen coming;
             // in enclosed country you aren't, and neither is what's waiting.
-            let sight = ContentCatalog.shared.creature(enemy.creatureID)
-                .map { BookRules.sightRadius(of: $0, in: BookRules.readings(for: run.book, seed: run.mapSeed)) }
-                ?? Tuning.World.defaultEnemySightRadius
+            let sight = detectionRadius(of: enemy, in: run)
             if !enemy.isAwake, distance <= sight {
                 enemy.isAwake = true
                 if run.map[enemy.position].isRevealed {
-                    events.append(.enemySighted(enemy.creatureID))
+                    events.append(.enemySighted(enemy.displayName))
                 }
             }
             guard enemy.isAwake, distance > 0 else {
@@ -461,6 +464,29 @@ enum WorldRules {
             run.enemies[index] = enemy
         }
         return events
+    }
+
+    /// How far off it notices you.
+    ///
+    /// **Sight is only one way of noticing** (spec §7). A creature that hunts by touch or smell is
+    /// unaffected by darkness, and one that lives by its eyes is half-blind at night — so night
+    /// genuinely changes who has the advantage rather than only changing your own sight radius.
+    static func detectionRadius(of enemy: WorldEnemy, in run: WorldRun) -> Int {
+        guard let traits = enemy.traits else {
+            // Legacy creature from a world bound before the cast.
+            return enemy.creatureID.flatMap { ContentCatalog.shared.creature($0) }
+                .map { BookRules.sightRadius(of: $0, in: BookRules.readings(for: run.book, seed: run.mapSeed)) }
+                ?? Tuning.World.defaultEnemySightRadius
+        }
+        let byEye = traits.sensory.vision / Tuning.Pressure.scaleMaximum
+            * (run.isNight ? Tuning.World.nightVisionFraction : 1)
+        let byEverythingElse = traits.sensory.nonVisual / Tuning.Pressure.scaleMaximum
+            * Tuning.World.nonVisualSenseReach
+        let open = BookRules.readings(for: run.book, seed: run.mapSeed)["relief"].aspect("openness")
+        let inTheOpen = open > Tuning.Pressure.openTerrainThreshold ? Tuning.World.sightBonusInOpenGround : 0
+
+        return max(1, Int((Double(Tuning.World.defaultEnemySightRadius)
+                           * (byEye + byEverythingElse)).rounded()) + inTheOpen)
     }
 
     /// Greedy pursuit: close the bigger gap first, fall back to the other axis when blocked.
@@ -500,20 +526,36 @@ enum WorldRules {
 
         var foes: [FoeState] = []
         for member in group {
-            guard let creature = ContentCatalog.shared.creature(member.creatureID) else { continue }
             // Stats are resolved here, once, and saved with the foe — not looked up mid-fight.
-            let stats = CombatStats.resolved(from: creature)
+            // **Derived from the trait vector**, so how it fights is what it is.
+            let stats: CombatStats
+            if let traits = member.traits {
+                stats = CombatStats.derived(from: traits, name: member.displayName, icon: member.icon)
+            } else if let creature = member.creatureID.flatMap({ ContentCatalog.shared.creature($0) }) {
+                stats = CombatStats.resolved(from: creature)
+            } else {
+                continue
+            }
             foes.append(FoeState(id: member.id,
                                  creatureID: member.creatureID,
+                                 identityKey: member.identityKey,
+                                 traits: member.traits,
                                  stats: stats,
                                  currentHP: stats.maxHP))
             // The encounter-flag registry: this is what turns a silhouette into a real icon in the
-            // Writing Desk's preview.
-            state.reality.discovery.recordCreature(member.creatureID, runIndex: run.runIndex)
+            // Writing Desk's preview. **The species is the entry; this animal is a specimen.**
+            state.reality.discovery.recordSpecies(member.identityKey, runIndex: run.runIndex)
+            if let traits = member.traits {
+                state.reality.discovery.recordSpecimen(traits, of: member.identityKey, runIndex: run.runIndex)
+            }
+            if let legacy = member.creatureID {
+                state.reality.discovery.recordCreature(legacy, runIndex: run.runIndex)
+            }
         }
         guard !foes.isEmpty else { return }
 
-        run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()), foes: foes)
+        run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
+                                                        foes: foes, rng: &run.rng)
         state.worlds.activeRun = run
     }
 
