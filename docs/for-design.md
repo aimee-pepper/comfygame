@@ -97,7 +97,28 @@ correctly.
 
 ---
 
-## 3. Open questions with a real fork in them
+## 3. Newest, and both worth reading first
+
+### Q40 — should every building own its own research tree? *(Aimee's idea)*
+I think yes, and I think it **answers Q37 for free**: if a building owns the branch about it, then
+capacity upgrades live at the Tannery because capacity is what a tanner knows, and it stops being a
+judgement call. It also makes session 12 true rather than nearly true — you find a smith and then
+buy everything she knows from a generic menu that existed before you met her.
+
+Three risks written up in `questions-for-design.md` Q40. The one I'd most like your view on: **what
+is the Workshop for afterwards?**
+
+### Q41 — the Exchange, before I build `merchant-recycler-spec.md`
+Four calls I'd rather not make alone — gold as resource *and* currency, whether the Exchange buys
+gear or only the Recycler does, bulk-sell safety, and confirming "refreshes on run completion" means
+*returning home* rather than binding (anything else is a wall-clock timer in costume).
+
+**And one thing only you can do:** the Trader needs a meeting scene, same as the five in
+`travellers.json`. That's voice.
+
+---
+
+## 4. Open questions with a real fork in them
 
 ### Q29 — do composed fallback names stay long?
 A creature matching no known form currently gets a long composed name that sits oddly beside a
@@ -124,7 +145,7 @@ against each other.** I'll do that sweep and report; if it turns up more, this q
 
 ---
 
-## 4. The hole session 17 opened
+## 5. The hole session 17 opened
 
 `decisions-session-17.md` §7 removes permanent loss entirely for now — companions in unstable
 worlds, animal companions, and displaced tethers are all no longer losable. **That was the thing
@@ -136,7 +157,7 @@ moment it is, and it's the kind of question that's much cheaper to answer before
 
 ---
 
-## 5. Still open from `open-questions.md` (older, and largely still open)
+## 6. Still open from `open-questions.md` (older, and largely still open)
 
 - **Q-A. When does the anchor choice happen?** Marked "the big one" and still unanswered.
 - **Q-B.** Sustain economy specifics — now entangled with §4 above.
@@ -148,7 +169,7 @@ moment it is, and it's the kind of question that's much cheaper to answer before
 
 ---
 
-## 6. Housekeeping
+## 7. Housekeeping
 
 - **Q22 — delete the four `pressure-model-*.md` files.** You've already ruled on this; the
   consolidated `pressure-model.md` is the keeper and a stale duplicate under a "newest wins" rule

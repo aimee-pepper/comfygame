@@ -848,3 +848,67 @@ Three calls inside it, all mine, all cheap to change:
 `Tuning.World.travellerMinimumDistance` from the entry. It would be better if they were *somewhere
 that made sense* — a smith beside a landmark, an archaeologist at a ruin. That's a `sites.json` join
 and I'd like a ruling on whether it should be a preference or a requirement.
+
+## Q40 — Should every building own its own research tree? **[AIMEE'S IDEA, and I think it's right]**
+
+Aimee, 6 Aug: *"maybe all the buildings should be upgradeable and have their own skill trees?"*
+
+**What exists now:** one tree at the Workshop, five branches, 39 nodes — Instruction (12), The Hold
+(15), The Bargain (7), Penmanship (3), The Hand (2). Every station has a `tier` and a `maxTier`
+already, and only the Storehouse's tiers actually do anything, bought from the Workshop's Hold
+branch.
+
+**Why I think this is the right shape and not just a reorganisation:**
+
+1. **It answers Q37 by itself.** Q37 asks whether the Tannery should take satchel and storehouse
+   capacity off the Workshop. If a building owns the branch about it, the question stops being a
+   judgement call: capacity is what a tanner knows, so The Hold lives at the Tannery. Same for The
+   Bargain moving to the Exchange the moment `merchant-recycler-spec.md` is built.
+2. **It makes session 12 true instead of nearly true.** *"You don't research a smithy, you find a
+   smith"* is currently half-implemented: you find the smith, and then everything you learn from her
+   is bought from a generic Workshop menu that existed before you met her. A person bringing their
+   own tree is what makes recruiting one feel like anything.
+3. **It gives the building tiers a job.** `maxTier` is 1 on almost everything and nothing reads it.
+   A building's own tree is the obvious thing tiers should gate.
+
+**Three real risks, and I'd want your call on each:**
+
+- **What is the Workshop for afterwards?** If every branch goes to a building, the Workshop is an
+  empty room. Options: it keeps the writing-side branches (Penmanship, The Hand, Instruction) and
+  becomes specifically *the place you get better at writing*, which is a clean identity; or it
+  becomes the tree for the base itself. **My lean: the first.**
+- **It gates progression behind finding people.** Audit #9 already flagged this for skills-from-
+  companions. If The Hold moves to the Tannery and the tanner is a four-condition signature, a
+  player can be stuck at 16 storehouse slots for a very long time through no error of their own.
+  **My lean: every building's tree has its first rung or two available from the start elsewhere, so
+  finding the person accelerates rather than unblocks.**
+- **Five doors instead of one.** Today "what can I buy" is one screen. Afterwards it's a tour.
+  Worth a single "what can I afford right now" summary on the Base screen — which the station rows
+  are already the right place for.
+
+**What I'd build if you say yes:** `ResearchBranchDef` gains a `station` field, the Workshop shows
+only its own branches, every other station shows its own, and the whole thing is a `research.json`
+edit plus one field. The tree UI is already per-branch and would need no rework. It's a small change
+for something quite structural, which is usually the sign of a good one.
+
+## Q41 — The Exchange: what I need before building `merchant-recycler-spec.md`
+
+The spec is good and mostly buildable as written. Four things I'd rather not decide alone:
+
+1. **Gold is currently a resource in `resources.json`, gated on a rich ductile substrate.** §2 wants
+   it to be the currency as well, with gold ore worth far more than other minerals or minting
+   directly. Minting directly is more evocative and makes one of twenty-three resources structurally
+   unlike the rest. **My lean: it sells at a large multiple rather than minting** — same economic
+   effect, no special case in the code, and "write a gold world" is still a real play.
+2. **Does the Exchange buy gear, or only the Recycler handle it?** (§6.3.) If the Exchange buys
+   gear, the Recycler is competing with it from inside the same building.
+3. **Bulk-sell by grade band** (§6.4) is genuinely needed — selling forty hides one at a time is not
+   a game — but it's the single easiest way to sell something you meant to keep. **My lean: build
+   it, and make it name what it's about to take** (*"14 hides, crude and plain. Your best is not in
+   this."*).
+4. **Stock refreshes on run completion** (§3) — confirm that means *returning home*, not *binding*.
+   Anything else is a wall-clock timer wearing a costume, and pillar 2 forbids it.
+
+**Not blocking:** I can build selling, bin-level selling and the Recycler against the leans above and
+change any of them in an afternoon. What I can't do is invent the Trader's meeting scene — that's
+voice, same as the other five in `travellers.json`.
