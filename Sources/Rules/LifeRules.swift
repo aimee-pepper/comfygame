@@ -46,6 +46,62 @@ enum LifeRules {
         return max(span.lowerBound, min(span.upperBound, raw))
     }
 
+    // MARK: - What the preview may say
+
+    /// What the Writing Desk can honestly promise about a world's animals **before it is bound**.
+    ///
+    /// Read off the *readings* and never off the seed, because the preview describes what you wrote
+    /// and not what was rolled — the seal rule the whole description system runs on. So it can say
+    /// how many kinds of thing a world will hold and what they will tend to be like, and it cannot
+    /// say which ones you'll meet.
+    ///
+    /// This replaces a silhouette list drawn from the old authored spawn table, which by now
+    /// promised three creatures no world could actually contain.
+    struct LifeProjection: Equatable, Sendable {
+        var kindCount: Int
+        /// Plain words, in the order they'd be said aloud.
+        var notes: [String]
+
+        var sentence: String {
+            guard kindCount > 0 else { return "Nothing lives here." }
+            let kinds = kindCount == 1 ? "One kind of thing" : "\(spelled(kindCount)) kinds of thing"
+            guard !notes.isEmpty else { return "\(kinds) lives here." }
+            return "\(kinds), \(notes.joined(separator: ", "))."
+        }
+
+        private func spelled(_ n: Int) -> String {
+            ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"]
+                .indices.contains(n) ? ["Zero", "One", "Two", "Three", "Four", "Five", "Six",
+                                        "Seven", "Eight"][n] : "\(n)"
+        }
+    }
+
+    static func projection(for readings: PressureReadings) -> LifeProjection {
+        let world = WorldTendencies(readings: readings)
+        let base = Tuning.Life.baseAxisWeight
+        var notes: [String] = []
+
+        func ratio(_ axis: CostlyAxis) -> Double {
+            (world.axisWeights[axis] ?? 0) / max(0.0001, base(axis))
+        }
+
+        if ratio(.size) > 1.4 { notes.append("large") }
+        else if ratio(.size) < 0.7 { notes.append("small") }
+
+        if ratio(.coveringHardness) > 1.6 { notes.append("hard-shelled") }
+        else if ratio(.coveringLength) > 1.6 { notes.append("thickly furred") }
+        else if ratio(.coveringCoverage) < 0.7 { notes.append("bare") }
+
+        if world.free.sensory.vision < 20 { notes.append("blind, hunting by touch and scent") }
+        else if world.free.sensory.vision > 60 { notes.append("sharp-eyed") }
+
+        if world.free.emanationAllowed { notes.append("some carrying their own light") }
+        if ratio(.armament) > 1.3 { notes.append("and they hunt each other") }
+        else if ratio(.armament) < 0.6 { notes.append("and nothing among them hunts") }
+
+        return LifeProjection(kindCount: castSize(for: readings), notes: notes)
+    }
+
     // MARK: - One species
 
     /// Allocate the budget across the axes this world favours, then dress the result in the free

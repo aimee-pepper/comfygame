@@ -100,7 +100,10 @@ struct CombatStats: Codable, Equatable, Sendable {
             maxHP: max(1, Int(hp.rounded())),
             attack: max(0, Int(attack.rounded())),
             armour: Int((traits.covering.armourValue * t.armourPerCovering).rounded()),
-            damageKind: traits.armament.dominant,
+            // **An unarmed animal has no weapon corner.** It still has mass and it will barge into
+            // you, but a grazer with nothing to tear you with must not leave a rending wound —
+            // `dominant` always names a corner, so the unarmed case has to be caught here.
+            damageKind: traits.armament.isUnarmed ? .crush : traits.armament.dominant,
             delivery: traits.armament.delivery,
             initiative: Int(initiative.rounded()),
             evasion: evasion,

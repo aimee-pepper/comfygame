@@ -142,6 +142,9 @@ enum Tuning {
         /// What "indefinitely explorable" means in practice. Not truly infinite — every v0 world is
         /// disposable, and a world that genuinely never ends is what *anchoring* is for.
         static let indefiniteTurns: Int = 9_999
+        /// Beyond this the countdown stops being information: no run lasts this long, so a
+        /// five-digit number on the header reads as a bug rather than as safety.
+        static let countdownCeiling: Int = 2_000
         /// Encounter difficulty tier before symbol modifiers.
         static let baseEnemyTier: Int = 1            // PLACEHOLDER
         /// Starting weight for every non-Reality resource in a world's yield table.

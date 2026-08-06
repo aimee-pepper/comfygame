@@ -266,8 +266,13 @@ private struct StabilityHeader: View {
     }
 
     /// A world that isn't decaying has no countdown — saying so beats printing the sentinel.
+    ///
+    /// Measured against a *practical* ceiling rather than the sentinel itself: a world decaying by
+    /// a hundredth of a point a turn lasts ten thousand turns, which is not a countdown, and thirty
+    /// turns in it prints "~9969 turns left" and reads as a bug. The preview already says "holds
+    /// indefinitely" about the same world; these two must agree.
     private var turnsLeftText: String {
-        turnsLeft >= Tuning.World.indefiniteTurns ? "steady" : "~\(turnsLeft) turns left"
+        turnsLeft >= Tuning.World.countdownCeiling ? "steady" : "~\(turnsLeft) turns left"
     }
 
     private var bandText: String {

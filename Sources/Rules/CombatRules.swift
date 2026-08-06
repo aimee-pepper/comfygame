@@ -167,7 +167,7 @@ enum CombatRules {
 
         // **Sleek and small is hard to hit.** A miss is the price of chasing something built to run.
         if run.rng.chance(foe.stats.evasion) {
-            encounter.note("\(who) swings at \(name) and finds nothing there.")
+            encounter.note("\(who) \(actor == .binder ? "swing" : "swings") at \(name) and find\(actor == .binder ? "" : "s") nothing there.")
             return
         }
 
@@ -177,16 +177,18 @@ enum CombatRules {
         encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
 
         let soaked = raw - amount
-        let note = verb.map { "\(who) — \($0) — hits \(name) for \(amount)." }
-            ?? "\(who) hits \(name) for \(amount)."
+        // "You hits" — the log addresses the Binder in the second person, so the verb has to agree.
+        let hits = actor == .binder ? "hit" : "hits"
+        let note = verb.map { "\(who) — \($0) — \(hits) \(name) for \(amount)." }
+            ?? "\(who) \(hits) \(name) for \(amount)."
         encounter.note(soaked > 1 ? note + " Its \(armourWord(for: foe)) takes the rest." : note)
 
         // **Warning colours are honest.** Hitting something that advertises costs you.
         if foe.stats.retaliation > 0, encounter.foes[index].isAlive {
             hurt(actor, by: foe.stats.retaliation, run: &run, encounter: &encounter)
-            encounter.note("\(name) is not safe to touch — \(foe.stats.retaliation) back.")
+            encounter.note("\(name.capitalisedSentence) is not safe to touch — \(foe.stats.retaliation) back.")
         }
-        if !encounter.foes[index].isAlive { encounter.note("\(name) goes down.") }
+        if !encounter.foes[index].isAlive { encounter.note("\(name.capitalisedSentence) goes down.") }
     }
 
     private static func armourWord(for foe: FoeState) -> String {
@@ -399,7 +401,11 @@ enum CombatRules {
             hurt(target, by: amount, run: &run, encounter: &encounter)
 
             let verb = foe.stats.element.map(elementalVerb) ?? foe.stats.damageKind.verb
-            encounter.note("\(foe.stats.displayName.capitalisedSentence) \(verb) \(actorName(target, encounter: encounter).lowercased()) for \(amount).")
+            // "You" is a pronoun mid-sentence and "Quill" is a name, so only one of them lowers.
+            let whom = target == .binder
+                ? actorName(target, encounter: encounter).lowercased()
+                : actorName(target, encounter: encounter)
+            encounter.note("\(foe.stats.displayName.capitalisedSentence) \(verb) \(whom) for \(amount).")
 
             // Rend's wound outlives the blow.
             if foe.stats.damageKind == .rend {

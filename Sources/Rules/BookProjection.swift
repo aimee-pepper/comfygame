@@ -55,9 +55,14 @@ struct BookProjection {
     /// Expected share of harvests by resource, descending. Expected, not ranged — a pile of ranged
     /// percentages is unreadable, and the mix is the qualitative half of the preview.
     var resourceMix: [(resource: ResourceDef, share: Double)]
-    /// Expected share of encounters by creature, descending. The UI silhouettes any creature the
-    /// player has never met (`DiscoveryLog`).
-    var creatureMix: [(creature: CreatureDef, share: Double)]
+    /// **What will live here**, in the terms the preview is allowed to use: how many kinds, and
+    /// what they will tend to be like. Read off the readings, never off the seed, so it describes
+    /// the world you wrote rather than the one that was rolled.
+    ///
+    /// This replaced a silhouette list drawn from the old authored spawn table. Once worlds grew
+    /// their own animals that list promised three creatures no world could contain — the preview
+    /// and the world had quietly stopped agreeing.
+    var life: LifeRules.LifeProjection
 
     /// True when every slot is chosen, so nothing is left to chance and every range is a point.
     var isFullySpecified: Bool { slotPlans.allSatisfy { !$0.isRandom } }
@@ -128,7 +133,7 @@ struct BookProjection {
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: written),
             resourceMix: expectedResourceMix(plans),
-            creatureMix: expectedCreatureMix(plans)
+            life: LifeRules.projection(for: readings)
         )
     }
 
@@ -198,7 +203,7 @@ struct BookProjection {
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: book.allSymbolIDs),
             resourceMix: expectedResourceMix(plans),
-            creatureMix: expectedCreatureMix(plans)
+            life: LifeRules.projection(for: readings)
         )
     }
 
@@ -228,29 +233,6 @@ struct BookProjection {
             .sorted { $0.share > $1.share }
     }
 
-    /// Enemy-table modifiers add, so an unfilled slot contributes the average of its candidates'
-    /// deltas.
-    private static func expectedCreatureMix(_ plans: [SlotPlan]) -> [(creature: CreatureDef, share: Double)] {
-        var weights: [CreatureID: Double] = [:]
-        for creature in ContentCatalog.shared.creatures {
-            weights[creature.id] = creature.spawnWeight
-        }
-
-        for plan in plans {
-            let options = plan.chosen.map { [$0] } ?? plan.candidates
-            guard !options.isEmpty else { continue }
-            let affected = Set(options.flatMap { $0.enemyTableModifiers.keys })
-            for creature in affected {
-                let average = options.reduce(0.0) { $0 + ($1.enemyTableModifiers[creature] ?? 0) } / Double(options.count)
-                weights[creature] = (weights[creature] ?? 0) + average
-            }
-        }
-
-        let table = ContentCatalog.shared.creatures.map { (value: $0, weight: max(0, weights[$0.id] ?? 0)) }
-        return BookRules.shares(table)
-            .map { (creature: $0.value, share: $0.share) }
-            .sorted { $0.share > $1.share }
-    }
 }
 
 extension ClosedRange where Bound: Equatable {

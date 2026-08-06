@@ -222,6 +222,20 @@ struct EncounterView: View {
             Text(outcomeText(outcome))
                 .font(.headline)
                 .foregroundStyle(outcome == .victory ? .green : .orange)
+            // **What you won.** Rolled at the moment of victory precisely so this screen could
+            // report it — and until now nothing did, so every fight paid out invisibly.
+            let spoils = encounter?.spoils ?? []
+            if !spoils.isEmpty {
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(spoils, id: \.self) { line in
+                        Label(line, systemImage: "plus.circle.fill")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(.bottom, 2)
+            }
             Button {
                 store.endEncounterIfFinished()
             } label: {

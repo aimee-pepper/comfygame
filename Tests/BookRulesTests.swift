@@ -263,8 +263,6 @@ final class BookRulesTests: XCTestCase {
         XCTAssertEqual(resourceTotal, 1.0, accuracy: 0.001)
         XCTAssertEqual(projection.resourceMix.map(\.share), projection.resourceMix.map(\.share).sorted(by: >))
 
-        let creatureTotal = projection.creatureMix.reduce(0) { $0 + $1.share }
-        XCTAssertEqual(creatureTotal, 1.0, accuracy: 0.001)
     }
 
     /// Symbols steer the world's contents, not just its numbers (acceptance criterion: two books
@@ -279,11 +277,17 @@ final class BookRulesTests: XCTestCase {
         let lifeOreShare = share(of: Resources.ore, in: BookProjection.project(draft: life, ownedSymbols: owned))
         XCTAssertGreaterThan(oreShare, lifeOreShare, "Rich Ore must actually mean more ore")
 
-        let mothShare = BookProjection.project(draft: life, ownedSymbols: owned)
-            .creatureMix.first { $0.creature.id == "paper_moth" }?.share ?? 0
-        let baseMothShare = BookProjection.project(draft: ore, ownedSymbols: owned)
-            .creatureMix.first { $0.creature.id == "paper_moth" }?.share ?? 0
-        XCTAssertGreaterThan(mothShare, baseMothShare, "Teeming Life must actually mean more life")
+        // The preview no longer lists a roster — worlds grow their own animals — so the claim is
+        // the acceptance criterion itself: two books must produce visibly different worlds, which
+        // now means different animals rather than a different mix of the same three.
+        let lifeWorld = Worldgen.generate(
+            book: BookRules.resolveBook(draft: life, ownedSymbols: owned, seed: 7), seed: 7)
+        let oreWorld = Worldgen.generate(
+            book: BookRules.resolveBook(draft: ore, ownedSymbols: owned, seed: 7), seed: 7)
+        XCTAssertNotEqual(lifeWorld.cast.map(\.traits), oreWorld.cast.map(\.traits),
+                          "Teeming Life and Rich Ore grew exactly the same animals")
+        XCTAssertGreaterThanOrEqual(lifeWorld.cast.count, oreWorld.cast.count,
+                                    "Teeming Life must never mean less life")
     }
 
     private func share(of resource: ResourceID, in projection: BookProjection) -> Double {

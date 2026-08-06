@@ -35,7 +35,7 @@ struct PreviewPanel: View {
             statsRow
             Divider()
             mixSection(title: "Expected harvest", entries: resourceEntries)
-            mixSection(title: "Expected inhabitants", entries: creatureEntries)
+            lifeSection
         }
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -99,7 +99,7 @@ struct PreviewPanel: View {
         let turns = projection.turnsUntilCollapse
         // `indefiniteTurns` is a sentinel, not a count. Printing it gave the player "holds ~9999
         // turns", which reads as a bug rather than as a world that will outlast them.
-        if turns.lowerBound >= Tuning.World.indefiniteTurns { return "holds indefinitely" }
+        if turns.lowerBound >= Tuning.World.countdownCeiling { return "holds indefinitely" }
         if turns.upperBound >= Tuning.World.indefiniteTurns {
             return "holds ~\(turns.lowerBound) turns, perhaps indefinitely"
         }
@@ -167,17 +167,21 @@ struct PreviewPanel: View {
             }
     }
 
-    private var creatureEntries: [MixEntry] {
-        projection.creatureMix
-            .filter { $0.share > 0.001 }
-            .map { entry in
-                let known = discovery.hasEncountered(creature: entry.creature.id)
-                return MixEntry(id: entry.creature.id.rawValue,
-                                name: known ? entry.creature.name : "Unknown",
-                                icon: known ? entry.creature.icon : "questionmark",
-                                share: entry.share,
-                                isKnown: known)
-            }
+    /// **What will live here**, in words rather than as a bar chart of silhouettes.
+    ///
+    /// A world's animals are grown from its pressures, so there is no roster to list — and a list
+    /// of percentages against "Unknown" told the player nothing anyway. This says how many kinds of
+    /// thing the world will hold and what they will tend to be like, which is a claim the preview is
+    /// allowed to make because it comes off what was *written*, not off the seed.
+    private var lifeSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Life")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(projection.life.sentence)
+                .font(.footnote)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     @ViewBuilder
