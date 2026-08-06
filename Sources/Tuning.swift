@@ -210,6 +210,9 @@ enum Tuning {
         static let hazardDamage: Int = 4             // PLACEHOLDER
         /// Tiles lost per turn past the crumble threshold.
         static let crumbleTilesPerTurn: Int = 3      // PLACEHOLDER
+        /// Extra tiles per turn for every turn spent in a world that has already collapsed, so a
+        /// dead world genuinely runs out instead of nibbling its edges while you carry on working.
+        static let crumbleAccelerationPerTurn: Double = 0.6 // PLACEHOLDER
     }
 
     // MARK: - Encounters

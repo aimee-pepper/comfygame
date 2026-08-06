@@ -126,6 +126,12 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Turns before a bump can start another fight. Stops a flee from being undone immediately.
     var encounterGraceTurns: Int = 0
 
+    /// The turn the meter reached zero, or nil while the world is still holding.
+    ///
+    /// Kept so crumbling can accelerate the longer you stay in a world that has already gone —
+    /// stability clamps at zero and can't say how long ago that was.
+    var collapsedOnTurn: Int?
+
     var binderHP: Int = Tuning.Encounter.binderMaxHP
     var companionHP: Int = Tuning.Encounter.companionMaxHP
 
@@ -196,6 +202,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         offeredItems = try container.decodeIfPresent([ItemStack].self, forKey: .offeredItems) ?? []
         previousPosition = try container.decodeIfPresent(GridPoint.self, forKey: .previousPosition)
         encounterGraceTurns = try container.decodeIfPresent(Int.self, forKey: .encounterGraceTurns) ?? 0
+        collapsedOnTurn = try container.decodeIfPresent(Int.self, forKey: .collapsedOnTurn)
         binderHP = try container.decodeIfPresent(Int.self, forKey: .binderHP) ?? Tuning.Encounter.binderMaxHP
         companionHP = try container.decodeIfPresent(Int.self, forKey: .companionHP) ?? Tuning.Encounter.companionMaxHP
     }

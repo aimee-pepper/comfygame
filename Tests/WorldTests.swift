@@ -226,7 +226,9 @@ final class WorldTests: XCTestCase {
         }
     }
 
-    func testCollapseIsReportedAtZeroStability() {
+    /// The meter emptying is announced — and **does not end the run**. You are still standing in a
+    /// world that has begun to come apart, which is the whole of the decision it creates.
+    func testCollapseIsAnnouncedAtZeroStabilityAndDoesNotEndTheRun() {
         let composition = book(["terrain": "plains"])
         var state = startedRun(composition, seed: 57)
         // Exactly one turn's worth left, whatever this book's rate happens to be — pinning a
@@ -235,6 +237,57 @@ final class WorldTests: XCTestCase {
 
         let events = WorldRules.advanceTurn(in: &state)
         XCTAssertTrue(events.contains(.collapsed))
+        XCTAssertFalse(events.contains(.floorGaveWay),
+                       "an empty meter threw the player out of a world that was still there")
+        XCTAssertNotNil(state.worlds.activeRun, "the run ended on a number rather than on the floor")
+    }
+
+    /// **You are only forced out when the block you're standing on goes.**
+    func testYouAreOnlyThrownOutWhenTheFloorUnderYouGoes() {
+        var state = startedRun(book(["terrain": "plains"]), seed: 57)
+        state.worlds.activeRun?.stability = 0
+        state.worlds.activeRun?.collapsedOnTurn = 0
+
+        // Crumble until it reaches the player, which it now can.
+        var events: [WorldRules.Event] = []
+        for _ in 0..<400 where !events.contains(.floorGaveWay) {
+            events = WorldRules.advanceTurn(in: &state)
+            guard state.worlds.activeRun != nil else { break }
+        }
+        XCTAssertTrue(events.contains(.floorGaveWay),
+                      "a world crumbled away entirely and never reached the player standing in it")
+    }
+
+    /// A collapsed world genuinely runs out rather than nibbling its edges forever.
+    func testACollapsedWorldSpeedsUpTheLongerYouStay() {
+        var state = startedRun(book(["terrain": "plains"]), seed: 57)
+        state.worlds.activeRun?.stability = 0
+        state.worlds.activeRun?.collapsedOnTurn = 0
+        state.worlds.activeRun?.turnsTaken = 0
+        let atOnce = WorldRules.crumbleRate(in: state.worlds.activeRun!)
+
+        state.worlds.activeRun?.turnsTaken = 30
+        XCTAssertGreaterThan(WorldRules.crumbleRate(in: state.worlds.activeRun!), atOnce)
+    }
+
+    /// The way out is the last thing to go, or "reach a portal in time" becomes "wait to be thrown
+    /// out", which is no decision at all.
+    func testPortalsAreTheLastThingToCrumble() {
+        var state = startedRun(book(["terrain": "plains"]), seed: 57)
+        state.worlds.activeRun?.stability = 0
+        state.worlds.activeRun?.collapsedOnTurn = 0
+
+        for _ in 0..<60 {
+            _ = WorldRules.advanceTurn(in: &state)
+            guard let run = state.worlds.activeRun else { break }
+            let portalsGone = run.map.allPoints.contains {
+                run.map[$0].isCrumbled && run.map[$0].content.isPortal
+            }
+            let floorLeft = run.map.allPoints.contains {
+                !run.map[$0].isCrumbled && !run.map[$0].content.isPortal
+            }
+            XCTAssertFalse(portalsGone && floorLeft, "a portal went while there was still floor")
+        }
     }
 
     // MARK: Enemies

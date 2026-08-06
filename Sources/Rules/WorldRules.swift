@@ -36,7 +36,10 @@ enum WorldRules {
         case daybreak
         case tilesCrumbled(Int)
         case lostToCrumbling(Int)
+        /// The world has begun to come apart. **Not the end of the run** — see `floorGaveWay`.
         case collapsed
+        /// The tile you were standing on crumbled. This is the only thing that throws you out.
+        case floorGaveWay
         case ejected(reason: String)
 
         /// Events that should stop an auto-path in its tracks. Walking blindly into a fight, a
@@ -364,8 +367,16 @@ enum WorldRules {
         if run.stability <= Tuning.World.hazardThreshold, run.stability > 0 {
             spawnHazard(in: &run)
         }
-        // Past the crumble threshold, the world eats itself from the outside in.
-        if run.stability <= Tuning.World.crumbleThreshold, run.stability > 0 {
+        // Past the crumble threshold, the world eats itself from the outside in — **and it keeps
+        // going after the meter empties**. Stability hitting zero used to end the run on the spot,
+        // with the map still ninety per cent intact: you were thrown out of a world that visibly
+        // hadn't gone anywhere. Now zero is when it starts coming apart in earnest.
+        if run.stability <= Tuning.World.crumbleThreshold {
+            if run.stability <= Tuning.World.collapseThreshold, run.collapsedOnTurn == nil {
+                run.collapsedOnTurn = run.turnsTaken
+                // Said once, the turn it happens: the world has gone, and you are still in it.
+                events.append(.collapsed)
+            }
             let (crumbled, lost) = crumble(in: &run)
             if crumbled > 0 { events.append(.tilesCrumbled(crumbled)) }
             if lost > 0 { events.append(.lostToCrumbling(lost)) }
@@ -379,8 +390,12 @@ enum WorldRules {
             events.append(.encounterBegan)
         }
 
-        if state.worlds.activeRun?.stability ?? 0 <= Tuning.World.collapseThreshold {
-            events.append(.collapsed)
+        // **You are only forced out when the block you're standing on goes** (Aimee, 5 Aug). The
+        // meter emptying is the world starting to come apart, not the end of your visit — you can
+        // keep working, and getting to a portal before the floor reaches you is the decision the
+        // whole collapse exists to create.
+        if state.worlds.activeRun?.map[state.worlds.activeRun?.playerPosition ?? GridPoint(x: 0, y: 0)].isCrumbled == true {
+            events.append(.floorGaveWay)
         } else if state.worlds.activeRun?.binderHP ?? 1 <= 0 {
             // No death state in v0 — running out of health ejects you home with a partial haul,
             // the same as being caught in a collapse.
@@ -407,12 +422,17 @@ enum WorldRules {
     private static func crumble(in run: inout WorldRun) -> (crumbled: Int, lost: Int) {
         var crumbled = 0
         var lost = 0
-        for _ in 0..<Tuning.World.crumbleTilesPerTurn {
-            // Outermost surviving ring first. The player's own tile is never taken out from under
-            // them — being deleted by the floor isn't a decision, it's just a rug-pull.
-            let surviving = run.map.allPoints.filter {
-                !run.map[$0].isCrumbled && $0 != run.playerPosition
-            }
+        for _ in 0..<crumbleRate(in: run) {
+            // **The player's own tile is fair game.** It used to be protected, which meant the only
+            // way a run could end was a number reaching zero while the ground was still there.
+            // Crumbling from the outside in already gives you somewhere to stand and time to use
+            // it; being caught is a consequence of where you chose to be.
+            var surviving = run.map.allPoints.filter { !run.map[$0].isCrumbled }
+            // **Portals go last.** They're the way out, and a collapse that eats them first turns
+            // "get to a portal in time" into "wait to be thrown out", which is no decision at all.
+            let withoutPortals = surviving.filter { !run.map[$0].content.isPortal }
+            if !withoutPortals.isEmpty { surviving = withoutPortals }
+
             guard let outermost = surviving.map({ run.map.ring(of: $0) }).min() else { break }
             // Random *within* the ring, off the run's own RNG. Ring order alone would eat the map
             // left-to-right like a progress bar; scattering it feels like the edges closing in,
@@ -429,6 +449,18 @@ enum WorldRules {
             run.enemies.removeAll { $0.position == target }
         }
         return (crumbled, lost)
+    }
+
+    /// How fast the world is eating itself, in tiles per turn.
+    ///
+    /// **It accelerates once the meter is empty**, so a collapsed world genuinely runs out rather
+    /// than nibbling its edges for a hundred turns while you carry on harvesting. The longer you
+    /// stay past zero the faster it comes.
+    static func crumbleRate(in run: WorldRun) -> Int {
+        let base = Tuning.World.crumbleTilesPerTurn
+        guard let collapsedOn = run.collapsedOnTurn else { return base }
+        let since = max(0, run.turnsTaken - collapsedOn)
+        return base + Int(Double(since) * Tuning.World.crumbleAccelerationPerTurn)
     }
 
     // MARK: - Enemies

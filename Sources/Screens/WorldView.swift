@@ -110,12 +110,13 @@ struct WorldView: View {
             case .stable: nil
             case .hazardous: "The edges are starting to go."
             case .crumbling: "The world is crumbling inward."
-            case .collapsed: "It's over."
+            case .collapsed: "The world is coming apart. Get to a portal while there's floor."
             }
         case .tilesCrumbled(let count): count > 0 ? "\(count) tiles gone." : nil
         case .lostToCrumbling(let count):
             count == 1 ? "Something you hadn't taken went with it." : "\(count) things you hadn't taken went with it."
-        case .collapsed: "The world collapses."
+        case .collapsed: "The world is coming apart. Get to a portal."
+        case .floorGaveWay: "The ground goes out from under you."
         case .ejected(let reason): reason
         }
     }
@@ -128,7 +129,7 @@ struct WorldView: View {
         case .nightfall, .daybreak: .secondary
         case .cacheOpened: .purple
         case .satchelFull: .orange
-        case .hazardHit, .collapsed, .ejected, .lostToCrumbling: .red
+        case .hazardHit, .collapsed, .floorGaveWay, .ejected, .lostToCrumbling: .red
         case .enemySighted, .crossedThreshold, .blocked: .orange
         default: .secondary
         }

@@ -155,8 +155,11 @@ extension GameStore {
     private func finishTurn(_ events: [WorldRules.Event]) {
         recentEvents = Array(events.suffix(GameStore.eventLimit))
 
-        if events.contains(.collapsed) {
-            endRunWithPartialHaul(reason: "collapse")
+        // **Only the floor going out from under you ends a run.** The meter emptying is the world
+        // beginning to come apart — you can keep working, and reaching a portal before the
+        // crumbling reaches you is the decision the collapse exists to create.
+        if events.contains(.floorGaveWay) {
+            endRunWithPartialHaul(reason: "the ground went")
         } else if let ejection = events.first(where: { if case .ejected = $0 { true } else { false } }),
                   case .ejected(let reason) = ejection {
             endRunWithPartialHaul(reason: reason)
