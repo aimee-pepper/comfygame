@@ -970,6 +970,10 @@ mapping, and it now lives on each source as `attachesTo`.
 
 Everything else a source does still happens, as an implicit secondary. You just can't write it.
 
-Also: **long-press a sigil for what you can do with it** — join to a named neighbour, unjoin from
-one, and turn the piece. Replaces connect mode; a mode is something you have to remember
-you're in, and the page already knows which neighbours a sigil isn't joined to.
+Also: **long-press a sigil to enter connection mode or disconnection mode**, or to turn the piece.
+Those two are *modes*, not one-shot actions — you usually join several sigils in a row, so the mode
+stays running and you keep tapping. **Tapping anywhere that isn't a sigil leaves the mode.** The
+running mode is shown: the anchored sigil is outlined, what it can reach is outlined more faintly,
+and a strip names what tapping will do.
+
+Erasing is not in the menu. Erasing is dragging the sigil off the page.

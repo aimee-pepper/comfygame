@@ -30,6 +30,10 @@ struct PageGridView: View {
     @State private var translation: CGSize = .zero
     @State private var ghostDrag: CGSize = .zero
     @State private var willDiscard = false
+    /// Connecting or disconnecting. Entered from a sigil's menu, left by tapping bare page.
+    @State private var mode: PageMode = .off
+    /// The sigil the mode is anchored on — what the next tap joins to or unjoins from.
+    @State private var anchor: InstanceID?
 
 
     private var page: Page { store.state.base.page }
@@ -49,7 +53,9 @@ struct PageGridView: View {
             .frame(width: pageSize.width, height: pageSize.height, alignment: .topLeading)
             // Only speaks when there's something to say — an always-present instruction strip is a
             // permanent tax on the page for a sentence you read once.
-            if hint != nil || dragging != nil || ghost != nil { footer }
+            if hint != nil || dragging != nil || ghost != nil {
+                footer.foregroundStyle(mode == .off ? Color.secondary : mode.tint)
+            }
         }
         .padding(8)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
@@ -70,11 +76,19 @@ struct PageGridView: View {
     }
 
     /// Nil when there's nothing worth saying, so the strip disappears entirely.
-    private var hint: String? { nil }
+    private var hint: String? { mode.hint }
 
     private var footer: some View {
         HStack(spacing: 10) {
-            if let ghost {
+            if let hint = mode.hint {
+                Image(systemName: mode.icon).font(.caption2)
+                Text(hint).font(.caption2)
+                Spacer()
+                Button("Done") { mode = .off; anchor = nil }
+                    .font(.caption2)
+                    .frame(minWidth: 44, minHeight: 30)
+            }
+            else if let ghost {
                 Text(fits(ghost) ? "Drag into place, then let go" : "Won't fit there")
                     .font(.caption)
                     .foregroundStyle(fits(ghost) ? Color.secondary : Color.orange)
@@ -107,7 +121,10 @@ struct PageGridView: View {
                 }
             }
         }
-        .allowsHitTesting(false)
+        // Hit-testable only while a mode is running, so a tap on bare page can end it — and can't
+        // interfere with anything the rest of the time.
+        .allowsHitTesting(mode != .off)
+        .onTapGesture { mode = .off; anchor = nil }
     }
 
     // MARK: Written runes
@@ -124,6 +141,8 @@ struct PageGridView: View {
         // Inside a cluster the individual borders step back, so the outline around the whole thing
         // is what you read. Adjacent-and-joined has to look unmistakably unlike adjacent-and-not.
         let inCluster = PageRules.cluster(containing: mark.id, on: page).count > 1
+        let isAnchor = anchor == mark.id && mode != .off
+        let actionable = isActionable(mark)
 
         return ZStack(alignment: .topLeading) {
             cells(of: shape, side: side) { cell in
@@ -132,6 +151,10 @@ struct PageGridView: View {
                     .overlay(RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
                         .stroke(tint.opacity(isDragging ? 1 : (inCluster ? 0.15 : 0.65)),
                                 lineWidth: isDragging ? 2 : 1))
+                    // What the mode is anchored on, and what it can reach from there.
+                    .overlay(RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
+                        .stroke(mode.tint, lineWidth: isAnchor ? 3 : (actionable ? 2 : 0))
+                        .opacity(isAnchor ? 1 : (actionable ? 0.85 : 0)))
                     .frame(width: side, height: side)
                     .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
             }
@@ -155,6 +178,7 @@ struct PageGridView: View {
         .offset(x: CGFloat(mark.origin.column) * side + (dragOffset(for: mark).width),
                 y: CGFloat(mark.origin.row) * side + (dragOffset(for: mark).height))
         .zIndex(isDragging ? 2 : 0)
+        .onTapGesture { tapped(mark) }
         .gesture(markDrag(mark, side: side, pageSize: pageSize))
         .contextMenu { menu(for: mark) }
         .accessibilityLabel("\(mark.displayName), \(mark.cells.count) cells. Drag to move, or off the page to erase.")
@@ -168,37 +192,26 @@ struct PageGridView: View {
         return translation
     }
 
-    /// Connecting, disconnecting and turning — and nothing else.
+    /// Enter a mode, or turn the piece. Nothing else.
     ///
-    /// Deliberately three things. Erasing isn't here because erasing is dragging the sigil off the
-    /// page, and offering a second route to it would make the drag look like the shortcut rather
-    /// than the way.
-    ///
-    /// It replaces the connect *mode*: a mode is a thing you have to remember you're in, and the
-    /// page already knows which of a sigil's neighbours it isn't joined to, so it can offer them by
-    /// name instead of asking you to point twice.
+    /// Connecting and disconnecting are **modes** rather than one-shot actions: you usually join
+    /// several sigils in a row, and a mode lets you keep going instead of reopening a menu for each
+    /// one. Tapping bare page leaves the mode.
     @ViewBuilder
     private func menu(for mark: PlacedRune) -> some View {
-        let joinable = page.runes.filter { PageRules.canConnect(mark.id, $0.id, on: page) }
-        let joined = page.links.compactMap { $0.other(than: mark.id) }
-            .compactMap { id in page.runes.first { $0.id == id } }
-
-        ForEach(joinable) { neighbour in
-            Button {
-                store.connect(mark.id, neighbour.id)
-            } label: {
-                Label("Join to \(neighbour.displayName)", systemImage: "link")
-            }
+        Button {
+            mode = .connecting
+            anchor = mark.id
+        } label: {
+            Label("Connect", systemImage: "link")
         }
 
-        if !joined.isEmpty {
-            Divider()
-            ForEach(joined) { neighbour in
-                Button(role: .destructive) {
-                    store.disconnect(mark.id, neighbour.id)
-                } label: {
-                    Label("Unjoin from \(neighbour.displayName)", systemImage: "link.badge.plus")
-                }
+        if page.links.contains(where: { $0.involves(mark.id) }) {
+            Button(role: .destructive) {
+                mode = .disconnecting
+                anchor = mark.id
+            } label: {
+                Label("Disconnect", systemImage: "scissors")
             }
         }
 
@@ -210,6 +223,30 @@ struct PageGridView: View {
                 Label(PageRules.cluster(containing: mark.id, on: page).count > 1 ? "Turn the piece" : "Turn",
                       systemImage: "rotate.right")
             }
+        }
+    }
+
+    /// A tap on a sigil while a mode is running.
+    private func tapped(_ mark: PlacedRune) {
+        guard let from = anchor else { anchor = mark.id; return }
+        switch mode {
+        case .off:
+            break
+        case .connecting:
+            // Chaining: whatever you just joined becomes the anchor, so you can keep going.
+            if store.connect(from, mark.id) { anchor = mark.id }
+        case .disconnecting:
+            store.disconnect(from, mark.id)
+        }
+    }
+
+    /// Whether this sigil is something the running mode can act on — drives the highlight.
+    private func isActionable(_ mark: PlacedRune) -> Bool {
+        guard let from = anchor, from != mark.id else { return false }
+        switch mode {
+        case .off: return false
+        case .connecting: return PageRules.canConnect(from, mark.id, on: page)
+        case .disconnecting: return page.links.contains(MarkLink(from, mark.id))
         }
     }
 
@@ -402,5 +439,36 @@ private struct CellsShape: Shape {
                                 width: side, height: side))
         }
         return path
+    }
+}
+
+/// What the page is currently doing to itself.
+enum PageMode: Equatable {
+    case off
+    case connecting
+    case disconnecting
+
+    var hint: String? {
+        switch self {
+        case .off: nil
+        case .connecting: "Tap a neighbouring sigil to join it."
+        case .disconnecting: "Tap a joined sigil to separate it."
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .off: "link"
+        case .connecting: "link"
+        case .disconnecting: "scissors"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .off: .clear
+        case .connecting: .accentColor
+        case .disconnecting: .orange
+        }
     }
 }
