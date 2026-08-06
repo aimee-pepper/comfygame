@@ -490,7 +490,8 @@ enum CombatRules {
                 state.reality.discovery.recordResource(resource, runIndex: run.runIndex)
             }
             if let traits = foe.traits {
-                found.append(contentsOf: butcher(traits, named: foe.stats.displayName, run: &run))
+                found.append(contentsOf: butcher(traits, named: foe.stats.displayName,
+                                                 qualifier: foe.qualifier, run: &run))
             }
             // Curios drop unidentified — this is where keys enter the world, one identify and one
             // long walk before they open anything.
@@ -525,11 +526,11 @@ enum CombatRules {
     /// waits on the player, the same rule curios follow, so a force-quit mid-decision resumes with
     /// the decision still open.
     private static func butcher(_ traits: CreatureTraits, named name: String,
-                                run: inout WorldRun) -> [String] {
+                                qualifier: String?, run: inout WorldRun) -> [String] {
         var lines: [String] = []
         let count = ButcheryRules.quantity(from: traits, rng: &run.rng)
 
-        for sample in ButcheryRules.materials(from: traits, named: name) {
+        for sample in ButcheryRules.materials(from: traits, named: name, qualifier: qualifier) {
             let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()),
                                   catalogID: Items.material,
                                   count: count,

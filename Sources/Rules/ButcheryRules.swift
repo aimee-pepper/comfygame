@@ -11,7 +11,8 @@ import Foundation
 enum ButcheryRules {
 
     /// Everything one creature leaves. Ordered so the most characteristic part comes first.
-    static func materials(from traits: CreatureTraits, named source: String) -> [MaterialSample] {
+    static func materials(from traits: CreatureTraits, named source: String,
+                          qualifier: String? = nil) -> [MaterialSample] {
         var samples: [MaterialSample] = []
         let covering = traits.covering
         let lustre = traits.finish.lustre
@@ -36,7 +37,8 @@ enum ButcheryRules {
                     lustre: lustre
                 ),
                 grade: grade(of: [covering.hardness, covering.length, covering.coverage], lustre: lustre),
-                source: source
+                source: source,
+                qualifier: qualifier
             ))
         }
 
@@ -58,7 +60,8 @@ enum ButcheryRules {
                     reactivity: 0
                 ),
                 grade: grade(of: [traits.armament.total, traits.boneDensity], lustre: lustre),
-                source: source
+                source: source,
+                qualifier: qualifier
             ))
         }
 
@@ -75,7 +78,8 @@ enum ButcheryRules {
                     reactivity: 0
                 ),
                 grade: grade(of: [traits.boneDensity, traits.size], lustre: lustre),
-                source: source
+                source: source,
+                qualifier: qualifier
             ))
         }
 
@@ -92,7 +96,8 @@ enum ButcheryRules {
                     reactivity: emanation.strength
                 ),
                 grade: grade(of: [emanation.strength], lustre: lustre),
-                source: source
+                source: source,
+                qualifier: qualifier
             ))
         }
 

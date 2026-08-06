@@ -88,12 +88,18 @@ struct MaterialSample: Codable, Equatable, Sendable {
     var grade: Double
     /// Which animal it came off, so the storehouse can say where a thing is from.
     var source: String
+    /// **Inherited from the source, not recomputed** (name-generation-spec §5). A pelt off a
+    /// *shaggy browser* is a *shaggy pelt* — that inheritance is what makes loot read as coming
+    /// from somewhere, and what makes you remember where when a recipe asks for it later.
+    var qualifier: String?
 
-    init(kind: MaterialKind, properties: MaterialProperties, grade: Double, source: String) {
+    init(kind: MaterialKind, properties: MaterialProperties, grade: Double,
+         source: String, qualifier: String? = nil) {
         self.kind = kind
         self.properties = properties
         self.grade = grade
         self.source = source
+        self.qualifier = qualifier
     }
 
     init(from decoder: Decoder) throws {
@@ -103,19 +109,26 @@ struct MaterialSample: Codable, Equatable, Sendable {
             ?? MaterialProperties()
         grade = try c.decodeIfPresent(Double.self, forKey: .grade) ?? 0
         source = try c.decodeIfPresent(String.self, forKey: .source) ?? ""
+        qualifier = try c.decodeIfPresent(String.self, forKey: .qualifier)
     }
 
-    /// What it's called on screen. Grade first where it's remarkable, because that's the thing
-    /// worth carrying home.
+    /// `[grade] [qualifier] [kind]` — *fine ashen pelt*, *monstrous ironbound plate*.
     var displayName: String {
-        let quality = switch grade {
-        case ..<25: "poor "
-        case 25..<55: ""
-        case 55..<75: "fine "
-        case 75..<90: "superb "
-        default: "extraordinary "
+        [gradeWord, qualifier, kind.rawValue]
+            .compactMap { $0 }
+            .joined(separator: " ")
+            .capitalisedSentence
+    }
+
+    /// **[PLACEHOLDER]** vocabulary, per name-generation-spec §5.
+    private var gradeWord: String? {
+        switch grade {
+        case ..<25: "crude"
+        case 25..<55: nil          // plain needs no word
+        case 55..<75: "fine"
+        case 75..<90: "superb"
+        default: "monstrous"
         }
-        return "\(quality)\(kind.rawValue)".capitalisedSentence
     }
 
     var rarity: Rarity {

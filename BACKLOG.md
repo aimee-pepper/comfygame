@@ -99,28 +99,38 @@
 - [x] Map size from the page (Scale qualifier), not a constant
 - [x] **Terrain.** Tiles have ground and elevation; Relief, Substrate, Hydrology, Thermal and
       Vitality all write to them. Cover and elevation stop sightlines.
-- [x] **Creature traits.** Twelve axes, a per-world cast drawn from pressure-shaped distributions,
-      small per-spawn jitter, identity derived from the vector, energy budget as the only gate.
-- [ ] **Wire the cast into worldgen** — `LifeRules` produces species and nothing spawns them yet;
-      `WorldEnemy` still carries a `CreatureID` from the authored catalogue.
-- [ ] **A name generator** (Aimee, 5 Aug) — needed for creatures, flora *and* items. Identity
-      currently resolves to a bare category noun (ambusher, courser, lantern), which reads as a
-      placeholder on screen. Names presumably derive from the same trait vectors, and want to be
-      stable per species so an anchored world's animals keep their names.
-- [ ] Loot from traits — now unblocked, nothing built
-- [ ] Specimen tier of the bestiary — species is the entry, spawns are specimens under it
+- [x] **Creature traits.** Budget allocation across costly axes on a superlinear curve, weighted by
+      pressures; a per-world cast, small per-spawn jitter, one defence branch per species, identity
+      derived from the vector. Armament is one costly axis with a free triangle; covering is three.
+- [x] **The cast reaches the world.** The run carries its species; enemies carry a trait vector and
+      their own jitter rather than a `CreatureID`; ruins are guarded by the world's worst animal.
+- [x] **Combat from traits.** HP, damage, damage type, armour, initiative, evasion, delivery,
+      retaliation and detection radius all derived. Crypsis hides a creature on the map until it's
+      on you; non-visual senses are unaffected by darkness.
+- [x] **Loot from traits.** Covering decides plate/quill/pelt/down/hide/chitin, the weapon corner
+      decides fang/tusk/claw, bone and ichor follow. Properties inherited, quantity from size,
+      grade from extremity. No drop tables.
+- [x] **A name generator** (Aimee, 5 Aug) — `[qualifier] [kind]`, with distinctiveness measured
+      against the world's own cast, collisions resolved rather than numbered, and materials
+      inheriting their source's adjective. Creatures done; flora and items reuse `Naming` when they
+      land.
+- [x] **The bestiary's two tiers** — identities are entries, spawns are specimens, with percentiles.
+- [x] Preview reconciled with generation — it describes the life you wrote rather than silhouetting
+      a retired roster (code-audit-3 §3.2)
 - [ ] Q25 — cold worlds make smaller animals because cold worlds are poor
-- [ ] ~~Creature traits, specced by session 15:~~
-      a small **cast** of species per world plus small per-spawn **jitter**; Vitality sets cast
-      *size* not spread, so abundance and strangeness stay independent knobs; **free sampling**
-      with identity read off the traits afterwards, because not every world has grazers; anchored
-      worlds keep their cast forever. Blocks loot as well.
+- [ ] Q26–Q29 — the ornament↔finish direction, the two colour axes I added, the naming vocabulary,
+      and whether composed names should be shortened to match qualified ones
+- [ ] **Flora** (`flora-system-spec.md`) — `growth` is a ground type with nothing producing it, and
+      growth is what makes cover, and therefore ambush terrain, actually exist
+- [ ] **Living worlds** (`living-worlds-spec.md`) — creatures act on each other during a run.
+      `FoeState.bleedRounds` is already ticked and nothing sets it until this lands.
 - [ ] `WorldProfile` — the interface between readings and worldgen the spine specs. Terrain and
       spawns currently read readings directly, which works but won't compose as targets grow.
 - [ ] Movement cost from terrain — passability is in, but crossing growth costs the same as stone
-- [ ] Loot from creature traits — blocked on traits existing
 - [ ] Retire `yieldModifiers` / `enemyTableModifiers` / `enemyTierDelta` now nothing generates from
       them; `primaryTarget` lives on the same object and must survive the surgery (code-audit-2 §3.2)
+- [ ] Retire `creatures.json` — nothing generates from it; it survives only as the fallback for a
+      world bound before the cast existed, which no save will need for long
 - [ ] Q24 — the energy budget can price a creature out of the worlds it prefers
 
 ## The writing grammar (decisions-session-14)

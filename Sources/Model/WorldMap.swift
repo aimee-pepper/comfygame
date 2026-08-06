@@ -189,10 +189,15 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
     // MARK: What it is
 
     /// What to call it. Read off the traits where there are any, off the old catalogue otherwise.
-    var displayName: String {
-        if let traits { return CreatureIdentity.name(for: traits) }
+    ///
+    /// Pass the run's cast where you have it: a name says what sets this one apart **from its own
+    /// world**, so "armoured" is only worth saying where not everything is.
+    func displayName(in context: Naming.Context = .none) -> String {
+        if let traits { return CreatureIdentity.name(for: traits, in: context) }
         return creatureID.flatMap { ContentCatalog.shared.creature($0)?.name } ?? "Something"
     }
+
+    var displayName: String { displayName() }
 
     /// The bestiary key. Species are entries; this enemy is a specimen under one.
     var identityKey: String {

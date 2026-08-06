@@ -22,28 +22,82 @@ enum CreatureIdentity {
         var name: String
         /// Stable key for the bestiary. Region id where matched, slugified name where composed.
         var key: String
+        /// The adjective, kept separately so materials can inherit it: a pelt off a *shaggy browser*
+        /// is a *shaggy pelt*, which is what makes loot read as coming from somewhere.
+        var qualifier: String?
 
         var isComposed: Bool { region == nil }
     }
 
     // MARK: Matching
 
-    static func match(_ traits: CreatureTraits) -> Match {
+    /// `[qualifier] [kind]` (name-generation-spec §1). The kind is the identity class; the qualifier
+    /// is what sets this one apart **from the rest of its world**, so two bulwarks are different
+    /// things and neither of them is just "bulwark".
+    ///
+    /// `context` is the world's own cast. Without one — a specimen in the bestiary long after its
+    /// world is gone — distinctiveness falls back to the unremarkable middle.
+    static func match(_ traits: CreatureTraits,
+                      in context: Naming.Context = .none,
+                      avoiding taken: Set<String> = []) -> Match {
         var best: (region: IdentityRegion, score: Double)?
         for region in IdentityRegion.allCases {
             let score = region.fit(traits)
             if score > (best?.score ?? -1) { best = (region, score) }
         }
 
+        let qualifier = Naming.qualifier(for: traits, in: context, avoiding: taken)
+
         if let best, best.score >= Tuning.Life.identityMatchThreshold {
-            return Match(region: best.region, score: best.score,
-                         name: best.region.displayName, key: best.region.rawValue)
+            let kind = best.region.displayName
+            let name = qualifier.map { "\($0) \(kind)" } ?? kind
+            return Match(region: best.region, score: best.score, name: name,
+                         key: best.region.rawValue, qualifier: qualifier)
         }
+        // Nothing has a word for this one, so describe it instead. Still qualified, because the
+        // fallback must never be a bare "creature" — that's a spreadsheet, not a name.
+        //
+        // **The qualifier is the name's own first word here**, not the one `Naming` picked. A
+        // composed name already says what stands out; taking a *different* word for its materials
+        // would put a "close hide" in the satchel off a "small shape", and the whole point of the
+        // inheritance is that loot reads as coming from something you remember.
         let composed = composedName(for: traits)
-        return Match(region: nil, score: best?.score ?? 0, name: composed, key: slug(composed))
+        let leading = composed.split(separator: " ").dropLast().first.map(String.init)
+        return Match(region: nil, score: best?.score ?? 0, name: composed,
+                     key: slug(composed), qualifier: leading ?? qualifier)
     }
 
-    static func name(for traits: CreatureTraits) -> String { match(traits).name }
+    static func name(for traits: CreatureTraits, in context: Naming.Context = .none) -> String {
+        match(traits, in: context).name
+    }
+
+    /// Names a whole cast at once, so **no two of a world's animals end up called the same thing**.
+    ///
+    /// Two nearly identical species is the hard case: neither is distinctive enough to earn a word
+    /// on its own, so both come out as a bare kind. When that happens the second one is told to
+    /// insist — the bar comes down until something separates them. Never a number.
+    static func names(for cast: [Species]) -> [InstanceID: Match] {
+        let context = Naming.Context(of: cast.map(\.traits))
+        var takenWords: Set<String> = []
+        var takenNames: Set<String> = []
+        var named: [InstanceID: Match] = [:]
+
+        // Stable order, so the same world always resolves its collisions the same way.
+        for species in cast.sorted(by: { $0.id.rawValue < $1.id.rawValue }) {
+            var match = match(species.traits, in: context, avoiding: takenWords)
+            if takenNames.contains(match.name),
+               let forced = Naming.qualifier(for: species.traits, in: context,
+                                             avoiding: takenWords, insisting: true) {
+                match.qualifier = forced
+                match.name = match.region.map { "\(forced) \($0.displayName)" }
+                    ?? "\(forced) \(match.name)"
+            }
+            if let qualifier = match.qualifier { takenWords.insert(qualifier) }
+            takenNames.insert(match.name)
+            named[species.id] = match
+        }
+        return named
+    }
 
     /// Out after dark. Derived from what it senses with rather than authored: a thing that hunts by
     /// touch has no reason to keep daytime hours, and neither has a thing that carries its own light.

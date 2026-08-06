@@ -448,7 +448,7 @@ enum WorldRules {
             if !enemy.isAwake, distance <= sight {
                 enemy.isAwake = true
                 if run.map[enemy.position].isRevealed {
-                    events.append(.enemySighted(enemy.displayName))
+                    events.append(.enemySighted(run.name(of: enemy)))
                 }
             }
             guard enemy.isAwake, distance > 0 else {
@@ -541,8 +541,14 @@ enum WorldRules {
             // Stats are resolved here, once, and saved with the foe — not looked up mid-fight.
             // **Derived from the trait vector**, so how it fights is what it is.
             let stats: CombatStats
+            var qualifier: String?
             if let traits = member.traits {
-                stats = CombatStats.derived(from: traits, name: member.displayName, icon: member.icon)
+                // Named against the whole cast, so two of a world's animals never share a name.
+                let identity = run.identity(of: member)
+                qualifier = identity?.qualifier
+                stats = CombatStats.derived(from: traits,
+                                            name: identity?.name ?? member.displayName,
+                                            icon: member.icon)
             } else if let creature = member.creatureID.flatMap({ ContentCatalog.shared.creature($0) }) {
                 stats = CombatStats.resolved(from: creature)
             } else {
@@ -553,7 +559,8 @@ enum WorldRules {
                                  identityKey: member.identityKey,
                                  traits: member.traits,
                                  stats: stats,
-                                 currentHP: stats.maxHP))
+                                 currentHP: stats.maxHP,
+                                 qualifier: qualifier))
             // The encounter-flag registry: this is what turns a silhouette into a real icon in the
             // Writing Desk's preview. **The species is the entry; this animal is a specimen.**
             state.reality.discovery.recordSpecies(member.identityKey, runIndex: run.runIndex)

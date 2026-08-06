@@ -544,3 +544,66 @@ anything at all to eat.
 Left as-is, and the test asserts only the unconfounded half — cold shortens extremities and thickens
 covering. Not papered over with a test that picks convenient worlds, because the confound is the
 interesting part.
+
+## Q26 — Ornament and finish define each other; I cut the loop one way
+
+`creature-system-spec.md` §2 describes the relationship from both ends: `ornament` is "derived from
+finish brightness and iridescence", and `finish` "feeds `ornament` cost". Those two together are a
+circle — each is computed from the other and neither has a starting value.
+
+**Cut as: allocation spends budget on `ornament`, and `finish` follows from what was spent** (plus
+pressure shifts — a mineral world shines, a volatile one goes iridescent). That's the only reading
+where the costly axis is the one that costs, which is what §4's budget model needs.
+
+The other cut — finish is free, ornament is read off it — would make costly signalling free, and the
+whole point of ornament being a costly axis is that only a rich world can afford to advertise.
+
+Say if it's backwards and I'll turn it round; nothing else depends on the direction.
+
+## Q27 — Colour needs more than a CMY triangle, so I added two axes
+
+The spec's pressure table asks for **pale**, **dark**, **countershaded** and **maximally
+contrasting** colorations. A CMY triangle normalised to sum 100 carries hue and nothing else — it
+has no room for how dark or how patterned a thing is, and crypsis and aposematism are both claims
+about exactly those.
+
+So `Coloration` is the triangle **plus** `depth` (pale ↔ near-black) and `patterning` (flat ↔
+banded). Both are free axes, both shaped by pressures, neither costs budget.
+
+Flagging because it's an addition to a spec structure rather than an implementation of one. If the
+intent was that hue alone should carry it, the crypsis and aposematism branches need rewriting.
+
+## Q28 — The naming vocabulary is voice, and it's yours
+
+`name-generation-spec.md` §8.5 asks whether the word lists are yours to write. They're in
+`Sources/Model/Naming.swift` as `Axis.low` / `Axis.high` — about seventy words across fourteen axes,
+tagged PLACEHOLDER.
+
+**The mechanism doesn't care what any of them say.** Replace every word and nothing else changes:
+the axis a creature is named for, the collision handling, and the inheritance into materials are all
+independent of the vocabulary. Two things worth knowing before rewriting them:
+
+- **Order matters within a band.** Each list runs mildest → strongest, and how far a creature sits
+  from its world's average decides which one it gets. `["great", "vast", "monstrous"]` must stay in
+  that order.
+- **An empty list means "not worth naming in that direction."** `ornament` has no low words, because
+  being *less* decorated than average isn't remarkable — the absence is the default. Same for
+  `nonVisual` and `emanation`.
+
+I also lengthened two of the spec's words: *close* and *stub* became *short-limbed* and
+*stub-limbed*, because "close grazer" doesn't read as English.
+
+## Q29 — Should the composed fallback keep its own adjectives, or take the qualifier?
+
+A creature that matches no identity region gets a composed name — *huge blind armoured walker*. A
+creature that matches one gets *[qualifier] [kind]* — *sable grazer*.
+
+Those are two different naming schemes, and a composed name is longer and more specific than a
+matched one. Right now a composed name keeps its own words and hands its *first* word to its
+materials, so a *small shape* drops a *small hide* rather than a word that appears nowhere in its
+name.
+
+It works, but the two schemes sit oddly next to each other in a list — *sable grazer* and *huge
+blind armoured walker* don't read as the same kind of thing. Which may be exactly right (§8.3 says
+the unmatched ones are the animals players remember) or may want the composed names shortened to
+two words to match.

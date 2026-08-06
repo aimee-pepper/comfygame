@@ -153,6 +153,9 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
     /// How it fights, resolved at spawn. See `CombatStats`.
     var stats: CombatStats
     var currentHP: Int
+    /// The adjective this creature went by, resolved with its world's cast at spawn. Materials
+    /// inherit it: a pelt off a *shaggy browser* is a *shaggy pelt*.
+    var qualifier: String?
     /// Rounds of bleeding left. Rend's wound outlives the blow.
     ///
     /// Nothing the party carries rends yet, so today this is only set when creatures fight each
@@ -164,13 +167,15 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
     var maxHP: Int { stats.maxHP }
 
     init(id: InstanceID, creatureID: CreatureID? = nil, identityKey: String = "unknown",
-         traits: CreatureTraits? = nil, stats: CombatStats, currentHP: Int, bleedRounds: Int = 0) {
+         traits: CreatureTraits? = nil, stats: CombatStats, currentHP: Int,
+         qualifier: String? = nil, bleedRounds: Int = 0) {
         self.id = id
         self.creatureID = creatureID
         self.identityKey = identityKey
         self.traits = traits
         self.stats = stats
         self.currentHP = currentHP
+        self.qualifier = qualifier
         self.bleedRounds = bleedRounds
     }
 
@@ -184,6 +189,7 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
         traits = try c.decodeIfPresent(CreatureTraits.self, forKey: .traits)
         stats = try c.decode(CombatStats.self, forKey: .stats)
         currentHP = try c.decodeIfPresent(Int.self, forKey: .currentHP) ?? 1
+        qualifier = try c.decodeIfPresent(String.self, forKey: .qualifier)
         bleedRounds = try c.decodeIfPresent(Int.self, forKey: .bleedRounds) ?? 0
     }
 }

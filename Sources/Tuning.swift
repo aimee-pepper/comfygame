@@ -493,6 +493,15 @@ enum Tuning {
         static let notableProperty: Double = 35
     }
 
+    /// Naming what a world grew (name-generation-spec). **[PLACEHOLDER]** — and the vocabulary in
+    /// `Naming` is voice rather than mechanism, so it is Aimee's to rewrite.
+    enum Naming {
+        /// How far from its world's average a trait has to sit before it's worth naming.
+        static let minimumDeviation: Double = 8
+        /// How much further out earns the next, stronger word in a band.
+        static let deviationPerWord: Double = 16
+    }
+
     // MARK: - What the player has met
 
     enum Discovery {

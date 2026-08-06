@@ -151,6 +151,26 @@ struct WorldRun: Codable, Equatable, Sendable {
         enemy.speciesID.flatMap { id in cast.first { $0.id == id } }
     }
 
+    /// What this world's animals are like on average — what any one of them gets named against.
+    var namingContext: Naming.Context { Naming.Context(of: cast.map(\.traits)) }
+
+    /// Every species' name, **resolved together** so no two of this world's animals share one.
+    /// Derived rather than stored, per "store the observation, derive the meaning" — expanding the
+    /// vocabulary later gives old worlds better names for free.
+    var castNames: [InstanceID: CreatureIdentity.Match] { CreatureIdentity.names(for: cast) }
+
+    /// What to call one of this world's animals, named against the rest of them.
+    func identity(of enemy: WorldEnemy) -> CreatureIdentity.Match? {
+        guard let id = enemy.speciesID, let match = castNames[id] else {
+            return enemy.traits.map { CreatureIdentity.match($0, in: namingContext) }
+        }
+        return match
+    }
+
+    func name(of enemy: WorldEnemy) -> String {
+        identity(of: enemy)?.name ?? enemy.displayName
+    }
+
     /// Tolerant decoding, per the policy in `Migrations.swift`: adding a field must never cost a
     /// player their in-progress world. Synthesised decoding would *throw* on a save written before
     /// the field existed — which quarantines the whole save, mid-run, on the next launch.

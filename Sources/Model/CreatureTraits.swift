@@ -388,7 +388,13 @@ struct Species: Codable, Equatable, Identifiable, Sendable {
     var isNocturnal: Bool { CreatureIdentity.isNocturnal(traits) }
 
     /// Read off the traits, never stored. See `CreatureIdentity`.
-    var identity: CreatureIdentity.Match { CreatureIdentity.match(traits) }
+    ///
+    /// Pass the world's cast where you have it: a name says what sets this one apart **from its own
+    /// world**, so "armoured" is worth saying only where not everything is.
+    func identity(in context: Naming.Context = .none) -> CreatureIdentity.Match {
+        CreatureIdentity.match(traits, in: context)
+    }
+    var identity: CreatureIdentity.Match { identity() }
     var displayName: String { identity.name }
 
     init(id: InstanceID, traits: CreatureTraits, worldSeed: UInt64) {
