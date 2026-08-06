@@ -7,7 +7,7 @@ Format: **question → why it's blocking → what I've built in the meantime.** 
 waiting on me; if you answer nothing, all of it still ships with the interpretation noted, and I'll
 have chosen conservatively rather than well.
 
-Last updated 6 Aug 2026, after `code-audit-9-and-answers.md`.
+Last updated 6 Aug 2026, after `code-audit-9-and-answers.md` and `backlog-referrals-worked.md`.
 
 ---
 
@@ -38,7 +38,20 @@ class.
 **Until then:** I'm building the twelve skills with an `ownedBy` field that already exists, so
 either answer is a data change rather than a rewrite.
 
-### 1.3 The Tannery taking capacity upgrades off the Workshop — Q37
+### 1.3 The trade list — **and it is also the class list**
+`backlog-referrals-worked.md` §6 spots something worth acting on: session 17 ties a companion's
+class to what they were before the sundering, and session 12 ties crafting buildings to finding the
+person who ran one. **So the list of trades and the list of classes are one list.** Write it once.
+
+Five travellers exist — a surveyor, an archaeologist, a wanderer, a binder and a smith. Each of them
+now has a written meeting scene and could plausibly bring a building, a class, or both.
+
+### 1.4 Cycle has no sources of its own
+`cycle-sources-draft.md` has eleven candidates waiting on you and I'm holding off because adding
+core vocabulary isn't mine to do. The audit's short answer is **Tide, Orrery, Stillness, Drift**.
+Cycle is the only target with no primaries, so it can only ever be written about indirectly.
+
+### 1.5 The Tannery taking capacity upgrades off the Workshop — Q37
 Audit #9 says yes and flags it as yours. Session 12 decided crafting buildings come from **people,
 not research**; satchel and storehouse capacity being research-bought predates that. Moving them
 makes *finding a tanner* a moment with a payoff you can feel.
@@ -71,6 +84,11 @@ It's core vocabulary so I haven't added them unilaterally. **Say the word and th
 
 **Naming vocabulary (Q28)** is explicitly yours: the adjective bands for creature and material
 names, ordered mildest → strongest, where an empty list means "not remarkable in that direction."
+
+**Qualifier ladders**, per `backlog-referrals-worked.md` §1: the seventeen built all pass session
+14's rule, so the shortfall is authoring rather than pruning. Still to write — **Colour** (a set,
+not a ladder), **Constancy**, **Elevation**, **Direction**. Distribution and Finish are cut, and
+correctly.
 
 ---
 
@@ -139,9 +157,16 @@ moment it is, and it's the kind of question that's much cheaper to answer before
 
 In priority order from audit #9, minus what's blocked above:
 
-1. ~~Q38 vitality~~ — **done, 6 Aug.**
-2. **Skills, 2 → 12** — the biggest remaining imbalance. Building the whole starter set from
+1. ~~Q38 vitality~~ — **done, 6 Aug**, including audit #9's trophic-depth refinement and the sweep
+   it asked for (only `blight` fights itself, and there it's the point).
+2. ~~The search loop~~ — **done, 6 Aug.** Travellers stand on the map and are recruited in a written
+   scene; see Q39.
+3. **Skills, 2 → 12** — the biggest remaining imbalance. Building the whole starter set from
    `resources-skills-spec.md` §2, plus the new effect kinds in `CombatRules` they need.
-3. **Session 17** — stats, levels, XP from combat *and* discovery, mob levelling, ranks, the
+4. **Session 17** — stats, levels, XP from combat *and* discovery, mob levelling, ranks, the
    escape item, nobody dies.
-4. Whatever of §2 above you've authored by then.
+5. **Salvage at the Blacksmith**, which the audit proposes and I agree with — breaking down gear you
+   don't want back into stock.
+6. **Over-hanging placement**: a rune that won't fit is currently refused outright; session 11 asked
+   for it to glow red and be refused on the drop. I'll change it — it's legibility, not design.
+7. Whatever of §2 above you've authored by then.
