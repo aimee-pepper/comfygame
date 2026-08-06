@@ -30,12 +30,7 @@ struct PageGridView: View {
     @State private var translation: CGSize = .zero
     @State private var ghostDrag: CGSize = .zero
     @State private var willDiscard = false
-    /// Connect mode: tap a sigil, tap an adjacent one, they're joined. Keep tapping to chain.
-    @Binding var isConnecting: Bool
-    /// The mark the next tap will join to.
-    @State private var connectingFrom: InstanceID?
-    /// The cluster last touched, so it can be rotated.
-    @State private var selected: InstanceID?
+
 
     private var page: Page { store.state.base.page }
     private var pageSize: CGSize {
@@ -75,30 +70,11 @@ struct PageGridView: View {
     }
 
     /// Nil when there's nothing worth saying, so the strip disappears entirely.
-    private var hint: String? {
-        if isConnecting { return connectingFrom == nil ? "Tap a sigil, then an adjacent one." : "Now tap something next to it." }
-        return nil
-    }
+    private var hint: String? { nil }
 
     private var footer: some View {
         HStack(spacing: 10) {
-            if isConnecting {
-                Text(connectingFrom == nil
-                     ? "Tap a sigil, then an adjacent one."
-                     : "Now tap something next to it.")
-                    .font(.caption)
-                    .foregroundStyle(Color.accentColor)
-                Spacer()
-            } else if let selected, PageRules.cluster(containing: selected, on: page).count > 1 {
-                Button {
-                    store.rotateCluster(selected)
-                } label: {
-                    Label("Turn", systemImage: "rotate.right")
-                        .font(.caption)
-                }
-                .frame(minWidth: 60, minHeight: 44)
-                Spacer()
-            } else if let ghost {
+            if let ghost {
                 Text(fits(ghost) ? "Drag into place, then let go" : "Won't fit there")
                     .font(.caption)
                     .foregroundStyle(fits(ghost) ? Color.secondary : Color.orange)
@@ -179,8 +155,8 @@ struct PageGridView: View {
         .offset(x: CGFloat(mark.origin.column) * side + (dragOffset(for: mark).width),
                 y: CGFloat(mark.origin.row) * side + (dragOffset(for: mark).height))
         .zIndex(isDragging ? 2 : 0)
-        .onTapGesture { tapped(mark) }
         .gesture(markDrag(mark, side: side, pageSize: pageSize))
+        .contextMenu { menu(for: mark) }
         .accessibilityLabel("\(mark.displayName), \(mark.cells.count) cells. Drag to move, or off the page to rub out.")
     }
 
@@ -192,16 +168,51 @@ struct PageGridView: View {
         return translation
     }
 
-    /// In connect mode a tap joins; otherwise it selects the cluster so it can be turned.
-    private func tapped(_ mark: PlacedRune) {
-        guard isConnecting else {
-            selected = (selected == mark.id) ? nil : mark.id
-            return
+    /// What you can do to this sigil, given what's around it.
+    ///
+    /// Replaces the connect *mode*. A mode is a thing you have to remember you're in, and the whole
+    /// interaction was two taps plus a button press to say something the page could work out for
+    /// itself: a sigil knows which of its neighbours it isn't joined to, and can simply offer them
+    /// by name.
+    @ViewBuilder
+    private func menu(for mark: PlacedRune) -> some View {
+        let joinable = page.runes.filter { PageRules.canConnect(mark.id, $0.id, on: page) }
+        let joined = page.links.compactMap { $0.other(than: mark.id) }
+            .compactMap { id in page.runes.first { $0.id == id } }
+
+        ForEach(joinable) { neighbour in
+            Button {
+                store.connect(mark.id, neighbour.id)
+            } label: {
+                Label("Join to \(neighbour.displayName)", systemImage: "link")
+            }
         }
-        guard let from = connectingFrom else { connectingFrom = mark.id; return }
-        if from == mark.id { connectingFrom = nil; return }
-        // Chaining: on success the new mark becomes the anchor, so you can keep going.
-        if store.connect(from, mark.id) { connectingFrom = mark.id }
+
+        if !joined.isEmpty {
+            Divider()
+            ForEach(joined) { neighbour in
+                Button(role: .destructive) {
+                    store.disconnect(mark.id, neighbour.id)
+                } label: {
+                    Label("Unjoin from \(neighbour.displayName)", systemImage: "link.badge.plus")
+                }
+            }
+        }
+
+        Divider()
+        if PageRules.rotate(cluster: mark.id, on: page) != nil {
+            Button {
+                store.rotateCluster(mark.id)
+            } label: {
+                Label(PageRules.cluster(containing: mark.id, on: page).count > 1 ? "Turn the piece" : "Turn",
+                      systemImage: "rotate.right")
+            }
+        }
+        Button(role: .destructive) {
+            store.erase(mark.id)
+        } label: {
+            Label("Rub out", systemImage: "eraser")
+        }
     }
 
     /// The border round a cluster, marking it as one object. Touching-but-unjoined clusters have
@@ -227,13 +238,11 @@ struct PageGridView: View {
     private func markDrag(_ mark: PlacedRune, side: CGFloat, pageSize: CGSize) -> some Gesture {
         DragGesture(minimumDistance: 2)
             .onChanged { value in
-                guard !isConnecting else { return }
                 dragging = mark.id
                 translation = value.translation
                 willDiscard = !isOverPage(mark, translation: value.translation, side: side, pageSize: pageSize)
             }
             .onEnded { value in
-                guard !isConnecting else { return }
                 let discard = !isOverPage(mark, translation: value.translation, side: side, pageSize: pageSize)
                 let delta = PageCell(column: Int((value.translation.width / side).rounded()),
                                      row: Int((value.translation.height / side).rounded()))

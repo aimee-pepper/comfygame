@@ -18,8 +18,7 @@ struct WritingDeskView: View {
     /// same act.
     @State private var ghost: GhostRune?
     @State private var pane: Pane = .write
-    /// Connect mode. A button, per session 14 §2 — adjacency constrains, this declares intent.
-    @State private var isConnecting = false
+
     @State private var bin: Bin = .compounds
 
     /// One bin per pressure target, plus compounds and the ladders that apply everywhere.
@@ -72,23 +71,23 @@ struct WritingDeskView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Picker("", selection: $pane) {
-                ForEach(Pane.allCases) { Text($0.rawValue).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 12)
-            .padding(.top, 6)
-            .padding(.bottom, 8)
-
             switch pane {
             case .write: writePane
             case .world: worldPane
             }
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Writing Desk")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            // The pane switch *is* the title. A title bar and a picker underneath it were two rows
+            // spending screen on saying where you are twice.
+            ToolbarItem(placement: .principal) {
+                Picker("", selection: $pane) {
+                    ForEach(Pane.allCases) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 220)
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Clear") { store.clearPage(); ghost = nil }
                     .disabled(state.base.page.runes.isEmpty)
@@ -108,45 +107,15 @@ struct WritingDeskView: View {
             let side = floor(min(byWidth, byHeight))
 
             VStack(spacing: 6) {
-                PageGridView(ghost: $ghost, side: side, isConnecting: $isConnecting)
-                actionRow
-                ScrollView { binContents.padding(.bottom, 6) }
+                PageGridView(ghost: $ghost, side: side)
+                ScrollView { binContents }
                 binTabs
             }
             .padding(.horizontal, 12)
+            .padding(.bottom, 2)
         }
     }
 
-    /// One thin row for everything you do to the page. The connect button was a full-width slab for
-    /// a control you press twice a session.
-    private var actionRow: some View {
-        HStack(spacing: 8) {
-            // Nothing here unless it's telling you something you can't already see. The empty
-            // squares are the cell count, and the palette greys out whatever won't fit — so the
-            // counter was answering a question the page had already answered. The hand only earns
-            // its place once you own more than one and it's a choice rather than a constant.
-            if state.base.ownedHands.count > 1 {
-                Text(state.base.bestHand.displayName)
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-            }
-            Spacer()
-            Button {
-                isConnecting.toggle()
-                if isConnecting { ghost = nil }
-            } label: {
-                Image(systemName: isConnecting ? "checkmark" : "link")
-                    .font(.caption)
-                    .frame(width: 44, height: 32)
-            }
-            .buttonStyle(.bordered)
-            .tint(isConnecting ? .accentColor : .secondary)
-        }
-        .frame(height: 34)
-    }
-
-    /// **Static.** The bins don't scroll away — navigating between them is the main thing you do,
-    /// and hunting for a tab that moved is not navigation.
     private var binTabs: some View {
         // One scrolling row along the bottom. Tab width is deliberately not a clean division of the
         // screen, so the next bin always peeks in at the edge — that peek, plus the fade, is what
@@ -192,8 +161,10 @@ struct WritingDeskView: View {
         case .target(let id):
             let target = ContentCatalog.shared.pressureTarget(id)
             chips([Chip(glyph: id.rawValue, name: target?.name ?? id.rawValue, content: .target(id))])
+            // Only what can be *bound* here. Filtering on "affects this target at all" put rain
+            // under Illumination because rain dims light — true, and not something you'd ever write.
             let sources = ContentCatalog.shared.pressureSources
-                .filter { $0.contribution(to: id) != nil }
+                .filter { $0.attachesTo == id }
                 .sorted { $0.name < $1.name }
             if !sources.isEmpty {
                 sectionLabel("Causes")
@@ -264,34 +235,35 @@ struct WritingDeskView: View {
     }
 
     private func chips(_ items: [Chip]) -> some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 6)], spacing: 6) {
+        // Small tiles, four or five to a row. These were list rows with two lines of prose each,
+        // which meant six sigils filled the screen — for a vocabulary of forty-one sources that is
+        // a scrolling chore rather than a palette. Still a 44pt-plus target.
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 74), spacing: 4)], spacing: 4) {
             ForEach(items) { item in
                 let fits = item.blockedBy == nil && store.canWrite(item.content)
                 Button {
                     ghost = GhostRune(glyph: item.glyph, content: item.content,
                                       origin: firstFreeOrigin(for: item.content))
-                    isConnecting = false
                 } label: {
-                    HStack(spacing: 6) {
-                        RuneGlyph(id: item.glyph).frame(width: 22, height: 22)
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text(item.name).font(.caption2.weight(.medium)).lineLimit(1)
-                            Text(item.blockedBy.map { "\($0) has this" }
-                                 ?? {
-                                     let n = store.footprint(item.content)
-                                     return "\(n) cell\(n == 1 ? "" : "s")"
-                                 }())
-                                .font(.caption2).foregroundStyle(.secondary).lineLimit(1)
-                        }
-                        Spacer(minLength: 0)
+                    VStack(spacing: 1) {
+                        RuneGlyph(id: item.glyph).frame(width: 20, height: 20)
+                        Text(item.name)
+                            .font(.system(size: 9).weight(.medium))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                        // Footprint as a bare number — the word "cells" was repeated forty times
+                        // down the screen to say something the number already says.
+                        Text(item.blockedBy == nil ? "\(store.footprint(item.content))" : "taken")
+                            .font(.system(size: 8).monospacedDigit())
+                            .foregroundStyle(.secondary)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(height: 44)
-                    .padding(.horizontal, 6)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.bordered)
                 .tint(ghost?.glyph == item.glyph ? .accentColor : .secondary)
-                .opacity(fits ? 1 : 0.45)
+                .opacity(fits ? 1 : 0.4)
                 .disabled(!fits)
             }
         }

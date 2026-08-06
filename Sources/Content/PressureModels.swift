@@ -59,6 +59,10 @@ struct PressureSourceDef: Codable, Equatable, Identifiable, Sendable {
     var icon: String
     var blurb: String
     var contributions: [PressureContribution]
+    /// **The one target this may be bound to.** Everything else it does still happens, as an
+    /// implicit secondary — you simply can't *write* rain to make light. The rune spec says each
+    /// source attaches to a target without saying which; this is that mapping.
+    var attachesTo: PressureTargetID?
 
     func contribution(to target: PressureTargetID) -> PressureContribution? {
         contributions.first { $0.target == target }

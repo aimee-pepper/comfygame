@@ -954,3 +954,22 @@ Everything else in the 51-qualifier list gets re-examined against this rule. Exp
   all. The hands still compress everything else, which is where the progression is.
 - **Be economical with space.** Cut anything that repeats what the screen already shows — the cell
   counter duplicated the empty squares, and the hand name displayed a constant.
+
+---
+
+## A source attaches to ONE target (Aimee, 5 Aug 2026)
+
+The rune spec §5 says "each attaches to a target" and then organises the 86 sources by material
+category without ever saying which target each one attaches to. **That mapping was missing**, and
+its absence showed: the palette listed every source that *touched* a target, so Rain appeared under
+Illumination because rain dims light.
+
+**Rain can't illuminate.** A source attaches to the target it *is an instance of* — the spec's own
+Celestial / Water / Fire & Thermal / Stone & Mineral / Air / Living / Strange grouping is the
+mapping, and it now lives on each source as `attachesTo`.
+
+Everything else a source does still happens, as an implicit secondary. You just can't write it.
+
+Also: **long-press a sigil for what you can do with it** — join to a named neighbour, unjoin from
+one, turn the piece, rub it out. Replaces connect mode; a mode is something you have to remember
+you're in, and the page already knows which neighbours a sigil isn't joined to.
