@@ -156,8 +156,13 @@ extension GameStore {
         mutate("clear the page") { $0.base.page = Page(width: $0.base.page.width, height: $0.base.page.height) }
     }
 
+    /// **Clears the page too.** The page *is* the book now, and leaving marks on it after a clear
+    /// meant the cheapest book you could write still carried whatever ink was on the page.
     func clearBookDraft() {
-        mutate("clear book draft") { $0.base.bookDraft = BookDraft() }
+        mutate("clear book draft") {
+            $0.base.bookDraft = BookDraft()
+            $0.base.page = Page()
+        }
     }
 
     /// What the Writing Desk shows before committing.

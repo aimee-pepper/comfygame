@@ -63,6 +63,20 @@ struct BookProjection {
     /// their own animals that list promised three creatures no world could contain — the preview
     /// and the world had quietly stopped agreeing.
     var life: LifeRules.LifeProjection
+    /// How many marks are written on the page, and how many of them are actually **saying**
+    /// something — a mark only speaks as part of a joined cluster with a target in it.
+    ///
+    /// The two numbers differ whenever sigils are written but not joined, which is a page that
+    /// looks full and describes nothing. Without this the preview showed a complete, plausible
+    /// world at full stability built entirely out of the random fill, and there was no way to tell
+    /// it wasn't yours.
+    var marksWritten: Int = 0
+    var marksSpeaking: Int = 0
+
+    /// Whether the page, as it stands, contributes nothing at all to the world.
+    var saysNothing: Bool { marksSpeaking == 0 }
+    /// Marks are written, and none of them are joined into anything that speaks.
+    var isWrittenButSilent: Bool { marksWritten > 0 && marksSpeaking == 0 }
 
     /// True when every slot is chosen, so nothing is left to chance and every range is a point.
     var isFullySpecified: Bool { slotPlans.allSatisfy { !$0.isRandom } }
@@ -103,8 +117,12 @@ struct BookProjection {
             : PressureRules.resolve(sigils)
         let contradictions = ContradictionRules.fired(in: sigils, readings: readings)
 
+        // Greed from abundance, contradiction from opposed magnitude — instability's two origins,
+        // and until now only the second of them reached the headline for a page written in sigils.
         let score = BookRules.stabilityScore(
             delta: BookRules.stabilityDelta(symbolIDs: written)
+                + book.scale.stabilityDelta
+                + BookRules.greedDelta(for: PageRules.clusterSigils(of: page))
                 - ContradictionRules.totalPenalty(for: contradictions))
         let turns = BookRules.turnsAvailable(stabilityScore: score)
         let tier = BookRules.enemyTier(symbolIDs: written)
@@ -133,7 +151,9 @@ struct BookProjection {
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: written),
             resourceMix: expectedResourceMix(plans),
-            life: LifeRules.projection(for: readings)
+            life: LifeRules.projection(for: readings),
+            marksWritten: page.runes.count,
+            marksSpeaking: PageRules.sigils(of: page).count
         )
     }
 
@@ -168,8 +188,15 @@ struct BookProjection {
             sightHigh += options.map(\.visionDelta).max() ?? 0
         }
 
-        let scoreLow = BookRules.stabilityScore(delta: stabilityLow)
-        let scoreHigh = BookRules.stabilityScore(delta: stabilityHigh)
+        // Greed reaches the draft path too, or the preview and the world it binds disagree — the
+        // one thing the shared-implementation rule exists to prevent. Resolved off the chosen
+        // symbols alone, so a chance slot doesn't move a number the player is meant to be able to
+        // work out while composing.
+        // The draft path is the legacy slot vocabulary — all compounds, every one of which prints
+        // its own number — so there is no unpriced abundance in it to charge for.
+        let greed = 0
+        let scoreLow = BookRules.stabilityScore(delta: stabilityLow + greed)
+        let scoreHigh = BookRules.stabilityScore(delta: stabilityHigh + greed)
         let turnsLow = BookRules.turnsAvailable(stabilityScore: scoreLow)
         let turnsHigh = BookRules.turnsAvailable(stabilityScore: scoreHigh)
         let sightFloor = max(Tuning.World.minimumVisionRadius, sightLow)

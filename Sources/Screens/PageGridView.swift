@@ -26,10 +26,22 @@ struct PageGridView: View {
 
     /// The written mark being dragged, and how far. Kept apart from `ghost` so a written rune and
     /// an unwritten one can never be in flight at once.
-    @State private var dragging: InstanceID?
-    @State private var translation: CGSize = .zero
+    ///
+    /// **`@GestureState`, not `@State`, and that is the whole point.** A long press starts this drag
+    /// *and* opens the context menu; the menu then swallows the gesture, so `onEnded` never runs. As
+    /// plain state, the mark stayed "being dragged" at whatever offset it had reached — drawn
+    /// somewhere it isn't, often clean off the page. That was the sigil vanishing when you chose
+    /// Connect. `@GestureState` resets itself when a gesture is cancelled, which is exactly the
+    /// guarantee this needs.
+    @GestureState private var drag: MarkDrag?
     @State private var ghostDrag: CGSize = .zero
-    @State private var willDiscard = false
+
+    private struct MarkDrag: Equatable {
+        var id: InstanceID
+        var translation: CGSize
+    }
+
+    private var dragging: InstanceID? { drag?.id }
     /// Connecting or disconnecting. Entered from a sigil's menu, left by tapping bare page.
     @State private var mode: PageMode = .off
     /// The sigil the mode is anchored on — what the next tap joins to or unjoins from.
@@ -45,8 +57,22 @@ struct PageGridView: View {
         VStack(alignment: .leading, spacing: 6) {
             ZStack(alignment: .topLeading) {
                 gridBackground
+                // **Each joined group gets its own coloured outline** (session 14 §2). Drawn under
+                // the marks so the border reads as around the whole piece. Without this a page's
+                // meaning lives in an invisible adjacency graph: two clusters touching look exactly
+                // like one cluster, and there is no way to tell what you've actually written.
                 ForEach(page.runes) { mark in
                     markView(mark, side: side, pageSize: pageSize)
+                }
+                // **Each joined group gets its own coloured outline** (session 14 §2). Drawn over
+                // the marks rather than under them — underneath, their own borders hid almost all
+                // of it, which defeats the point. Never hit-testable, so it costs no touches.
+                ForEach(Array(PageRules.clusters(on: page).enumerated()), id: \.offset) { _, group in
+                    if group.count > 1 {
+                        clusterOutline(group, side: side)
+                            .offset(x: dragOffset(for: group[0]).width,
+                                    y: dragOffset(for: group[0]).height)
+                    }
                 }
                 if let ghost { ghostView(ghost, side: side) }
             }
@@ -57,8 +83,15 @@ struct PageGridView: View {
             // space and cost the page a stable size — the card grew and shrank as you placed and
             // moved sigils, which is intolerable on the one surface you're trying to arrange things
             // on.
-            footer.foregroundStyle(mode == .off ? Color.secondary : mode.tint)
+            footer.foregroundStyle(footerTint)
+                // **Pinned to the page's own width.** The footer's text and buttons are wider than
+                // the grid, and a leading-aligned VStack takes the width of its widest child — so
+                // the card grew sideways and shifted the whole page across the moment a ghost
+                // appeared or a mode started. The one surface you arrange things on has to hold
+                // still.
+                .frame(width: pageSize.width, alignment: .leading)
         }
+        .frame(width: pageSize.width, alignment: .leading)
         .padding(8)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
     }
@@ -80,6 +113,16 @@ struct PageGridView: View {
     /// Nil when there's nothing worth saying, so the strip disappears entirely.
     private var hint: String? { mode.hint }
 
+    /// Marks are written and none of them are joined into anything with a target in it.
+    private var isWrittenButSilent: Bool {
+        !page.runes.isEmpty && PageRules.sigils(of: page).isEmpty
+    }
+
+    private var footerTint: Color {
+        if mode != .off { return mode.tint }
+        return isWrittenButSilent && ghost == nil && dragging == nil ? .orange : .secondary
+    }
+
     private var footer: some View {
         HStack(spacing: 10) {
             if let hint = mode.hint {
@@ -88,7 +131,7 @@ struct PageGridView: View {
                 Spacer()
                 Button("Done") { mode = .off; anchor = nil }
                     .font(.caption2)
-                    .frame(minWidth: 44, minHeight: 30)
+                    .frame(minWidth: 44, minHeight: 44)
             }
             else if let ghost {
                 Text(fits(ghost) ? "Drag into place, then let go" : "Won't fit there")
@@ -98,14 +141,24 @@ struct PageGridView: View {
                 Button("Cancel") { self.ghost = nil }
                     .font(.caption)
                     .frame(minWidth: 60, minHeight: 44)
+                    .layoutPriority(1)
             } else if dragging != nil {
-                Text(willDiscard ? "Let go to erase" : "Drag off the page to erase")
+                Text("Drag off the page to erase")
                     .font(.caption)
-                    .foregroundStyle(willDiscard ? Color.red : Color.secondary)
+                    .foregroundStyle(.secondary)
+                Spacer()
+            } else if isWrittenButSilent {
+                // **The trap this exists for.** Adjacency alone joins nothing (session 14 §2), so a
+                // page can look full and describe nothing at all — and the world comes out entirely
+                // random, at full stability, exactly as if you had written nothing.
+                Image(systemName: "exclamationmark.triangle.fill").font(.caption2)
+                Text("Not joined — hold a sigil to Connect.")
+                    .font(.caption2)
                 Spacer()
             }
         }
-        .frame(height: 30)
+        .lineLimit(1)
+        .frame(height: 44)
     }
 
     /// Drawn behind everything, and deliberately not hit-testable — every touch on the page
@@ -139,7 +192,8 @@ struct PageGridView: View {
     private func markView(_ mark: PlacedRune, side: CGFloat, pageSize: CGSize) -> some View {
         let shape = mark.shape
         let isDragging = dragging == mark.id
-        let tint = isDragging && willDiscard ? Color.red : Color.accentColor
+        let discarding = willDiscard(mark, side: side, pageSize: pageSize)
+        let tint = discarding ? Color.red : Color.accentColor
         // Inside a cluster the individual borders step back, so the outline around the whole thing
         // is what you read. Adjacent-and-joined has to look unmistakably unlike adjacent-and-not.
         let inCluster = PageRules.cluster(containing: mark.id, on: page).count > 1
@@ -151,7 +205,7 @@ struct PageGridView: View {
                 RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
                     .fill(tint.opacity(isDragging ? 0.45 : 0.28))
                     .overlay(RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
-                        .stroke(tint.opacity(isDragging ? 1 : (inCluster ? 0.15 : 0.65)),
+                        .stroke(tint.opacity(isDragging ? 1 : (inCluster ? 0.06 : 0.65)),
                                 lineWidth: isDragging ? 2 : 1))
                     // What the mode is anchored on, and what it can reach from there.
                     .overlay(RoundedRectangle(cornerRadius: inCluster ? 0 : side * 0.12)
@@ -188,10 +242,16 @@ struct PageGridView: View {
 
     /// A cluster drags as one, so every mark in it follows the one under the finger.
     private func dragOffset(for mark: PlacedRune) -> CGSize {
-        guard let dragging,
-              PageRules.cluster(containing: dragging, on: page).contains(where: { $0.id == mark.id })
+        guard let drag,
+              PageRules.cluster(containing: drag.id, on: page).contains(where: { $0.id == mark.id })
         else { return .zero }
-        return translation
+        return drag.translation
+    }
+
+    /// Whether letting go now would erase what's in flight.
+    private func willDiscard(_ mark: PlacedRune, side: CGFloat, pageSize: CGSize) -> Bool {
+        guard let drag, drag.id == mark.id else { return false }
+        return !isOverPage(mark, translation: drag.translation, side: side, pageSize: pageSize)
     }
 
     /// Enter a mode, or turn the piece. Nothing else.
@@ -260,7 +320,7 @@ struct PageGridView: View {
         return ZStack(alignment: .topLeading) {
             ForEach(Array(cells).sorted { ($0.row, $0.column) < ($1.row, $1.column) }, id: \.self) { cell in
                 Rectangle()
-                    .fill(hue.opacity(0.10))
+                    .fill(hue.opacity(0.16))
                     .frame(width: side, height: side)
                     .offset(x: CGFloat(cell.column) * side, y: CGFloat(cell.row) * side)
             }
@@ -289,19 +349,15 @@ struct PageGridView: View {
     }
 
     private func markDrag(_ mark: PlacedRune, side: CGFloat, pageSize: CGSize) -> some Gesture {
-        DragGesture(minimumDistance: 2)
-            .onChanged { value in
-                dragging = mark.id
-                translation = value.translation
-                willDiscard = !isOverPage(mark, translation: value.translation, side: side, pageSize: pageSize)
+        // Far enough that the long press which opens the context menu doesn't read as a drag.
+        DragGesture(minimumDistance: 8)
+            .updating($drag) { value, state, _ in
+                state = MarkDrag(id: mark.id, translation: value.translation)
             }
             .onEnded { value in
                 let discard = !isOverPage(mark, translation: value.translation, side: side, pageSize: pageSize)
                 let delta = PageCell(column: Int((value.translation.width / side).rounded()),
                                      row: Int((value.translation.height / side).rounded()))
-                dragging = nil
-                translation = .zero
-                willDiscard = false
                 if discard {
                     store.erase(mark.id)
                 } else if PageRules.cluster(containing: mark.id, on: page).count > 1 {
@@ -442,7 +498,7 @@ private struct ClusterEdges: View {
                 path.move(to: CGPoint(x: x + side, y: y)); path.addLine(to: CGPoint(x: x + side, y: y + side))
             }
         }
-        .stroke(hue, lineWidth: 3)
+        .stroke(hue, lineWidth: 4)
     }
 }
 

@@ -24,10 +24,20 @@ enum BookRules {
     /// is still a surprise — it just isn't counted in slots any more.
     static func resolveBook(page: Page) -> BoundBook {
         var book = BoundBook(written: page.symbolIDs,
+                             composition: PageRules.clusterSigils(of: page),
                              scale: PageRules.worldScale(of: page),
                              essencePaid: 0)
-        book.essencePaid = bindCost(of: book)
+        // **What's on the page is what you pay for.** `page.symbolIDs` is compounds only, so a
+        // book written entirely in the sigil vocabulary cost exactly the base rate however much was
+        // on it. Ink is charged by the cell: a six-cell volcano costs more to write than a
+        // one-cell target, which is the same thing the footprint numbers are already telling you.
+        book.essencePaid = bindCost(of: book) + inkCost(of: page)
         return book
+    }
+
+    /// What the marks themselves cost to write, by the space they take up.
+    static func inkCost(of page: Page) -> Int {
+        Int((Double(page.usedCells) * Tuning.Book.essencePerCell).rounded())
     }
 
     static func resolveBook(draft: BookDraft, ownedSymbols: Set<SymbolID>, seed: UInt64) -> BoundBook {
@@ -93,6 +103,38 @@ enum BookRules {
         stabilityDelta(symbolIDs: book.allSymbolIDs)
     }
 
+    /// **Greed: how much more world you asked for than a world naturally has.**
+    ///
+    /// Instability has two origins (decisions-log): *greed* from abundance, and *contradiction*
+    /// from opposed magnitude. Contradiction has been wired since session 5. Greed never was for
+    /// the sigil vocabulary — `page.symbolIDs` returns only compounds, so a page of targets and
+    /// sources moved the meter by exactly nothing and every world it described came out at 100.
+    ///
+    /// Run in **both directions**, which is the Mystcraft model the stability curve is built on:
+    /// asking for less than the baseline calms a world, asking for the baseline costs nothing,
+    /// asking for more is the greed that destabilises. A dim sky is genuinely a stabilising choice.
+    ///
+    /// **Only what you actually wrote is charged for**, and it is resolved *without* the random
+    /// fill. Unwritten targets are rolled at resolution, and a rolled source can push a target you
+    /// did write — so billing off the filled readings would make the headline move with the seed.
+    /// The number has to be one you can work out while composing, from the page alone.
+    /// Charged on the dials you **explicitly bound**, not on everything your sources happen to
+    /// touch. Secondaries are consequences rather than requests — a glacier bound to Thermal is a
+    /// request for cold, and billing it for the water it also brings would make the headline
+    /// something you can't work out while composing, which is the whole point of the number.
+    static func greedDelta(for sigils: [Sigil]) -> Int {
+        let touched = Set(sigils.map(\.target))
+        guard !touched.isEmpty else { return 0 }
+
+        let asWritten = PressureRules.resolve(sigils)
+        let deviation = ContentCatalog.shared.pressureTargets
+            .filter { touched.contains($0.id) }
+            .reduce(0.0) { total, target in
+                total + (target.baseline - asWritten[target.id].peak)
+            }
+        return Int((deviation * Tuning.Book.stabilityPerAbundance).rounded())
+    }
+
     /// The stability the danger runes are *asking* for, and what they actually get.
     ///
     /// Stacking danger is supposed to broaden the kinds of danger, not multiply the reward, so the
@@ -150,11 +192,19 @@ enum BookRules {
         min(100, max(0, Tuning.Book.baseStabilityScore + delta))
     }
 
+    /// The headline. **Independent of the seed** — everything in it comes off what was written.
+    ///
+    /// Greed is charged on `composition` alone, never on the compounds. **A symbol moves the
+    /// headline by exactly its printed number** (session 5, locked) — a compound's printed number
+    /// *is* its declared greed, and charging it twice would break the one rule that makes the meter
+    /// something you can work out in your head. A cluster prints no number, so abundance is the
+    /// only thing there is to read.
     static func stabilityScore(of book: BoundBook) -> Int {
         // Size is written, and writing more world costs — a vast world needs more turns to cross,
         // so it has to buy them (decisions-session-13 §5).
         stabilityScore(delta: stabilityDelta(of: book)
                        + book.scale.stabilityDelta
+                       + greedDelta(for: book.composition)
                        - contradictionPenalty(of: book))
     }
 
@@ -296,7 +346,16 @@ enum BookRules {
     /// Each symbol is a compound (rune spec §9) and expands to its components. Sigil identity is
     /// derived from the symbol and its position in the expansion rather than rolled, so the same
     /// book always yields the same page — no RNG is consumed here.
+    /// Everything a bound book says, in the resolver's own terms.
+    ///
+    /// **The page's own clusters come first**, because they are the composition now; the compound
+    /// expansion below is the legacy vocabulary, still read so that books bound before the page
+    /// existed resolve to the same worlds they always did.
     static func sigils(for book: BoundBook) -> [Sigil] {
+        book.composition + compoundSigils(for: book)
+    }
+
+    private static func compoundSigils(for book: BoundBook) -> [Sigil] {
         book.allSymbolIDs.enumerated().flatMap { symbolIndex, symbolID -> [Sigil] in
             guard let symbol = ContentCatalog.shared.symbol(symbolID) else { return [] }
             return symbol.expandsTo.enumerated().map { componentIndex, component in

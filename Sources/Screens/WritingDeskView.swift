@@ -164,7 +164,7 @@ struct WritingDeskView: View {
             // Only what can be *bound* here. Filtering on "affects this target at all" put rain
             // under Illumination because rain dims light — true, and not something you'd ever write.
             let sources = ContentCatalog.shared.pressureSources
-                .filter { $0.attachesTo == id }
+                .filter { $0.canAttach(to: id) }
                 .sorted { $0.name < $1.name }
             if !sources.isEmpty {
                 sectionLabel("Causes")

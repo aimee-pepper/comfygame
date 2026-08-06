@@ -90,7 +90,8 @@ final class DeterminismTests: XCTestCase {
         let greedy = BoundBook(symbols: ["terrain": "caverns", "biome": "ashen", "bounty": "rich_ore", "quirk": "gilded_veins"],
                                randomlyFilled: [], essencePaid: 0)
 
-        XCTAssertLessThan(BookRules.decayPerTurn(for: calm), BookRules.decayPerTurn(for: greedy),
+        XCTAssertLessThan(BookRules.decayPerTurn(for: calm),
+                          BookRules.decayPerTurn(for: greedy),
                           "A greedier book must burn its world down faster")
     }
 }

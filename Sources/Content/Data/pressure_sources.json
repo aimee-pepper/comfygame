@@ -1,5 +1,5 @@
 {
-  "_note": "ALL NUMBERS PLACEHOLDER \u2014 straight from pressure-model-illumination.md \u00a74.3, which flags them as guesses. This is the Illumination pattern worked in full; the other seven targets are added by extending this file, not by touching code. A source names its own contributions, and every contribution beyond the one you bind is an IMPLICIT SECONDARY that happens whether you asked for it or not \u2014 'you cannot have bright without hot unless you do something about it'. 'character' is per-target and decides HOW a source contributes: illumination's cyclic sources lift only the peak, constant ones lift peak and floor, occluding ones push both down. 'attachesTo' is the ONE target a source may be bound to. The rune spec \u00a75 says 'each attaches to a target' but never says which \u2014 so these follow the spec's own grouping (Celestial, Water, Fire & Thermal, Stone & Mineral, Air, Living, Strange), because a thing attaches to the target it IS an instance of, not to whichever dial it happens to move furthest. Rain can't illuminate. Everything a source does beyond its target still happens as an implicit secondary \u2014 you just can't WRITE it. PLACEHOLDER; the palette and the grammar both follow this field.",
+  "_note": "ALL NUMBERS PLACEHOLDER — straight from pressure-model-illumination.md §4.3, which flags them as guesses. This is the Illumination pattern worked in full; the other seven targets are added by extending this file, not by touching code. A source names its own contributions, and every contribution beyond the one you bind is an IMPLICIT SECONDARY that happens whether you asked for it or not — 'you cannot have bright without hot unless you do something about it'. 'character' is per-target and decides HOW a source contributes: illumination's cyclic sources lift only the peak, constant ones lift peak and floor, occluding ones push both down. 'attachesTo' is the ONE target a source may be bound to. The rune spec §5 says 'each attaches to a target' but never says which — so these follow the spec's own grouping (Celestial, Water, Fire & Thermal, Stone & Mineral, Air, Living, Strange), because a thing attaches to the target it IS an instance of, not to whichever dial it happens to move furthest. Rain can't illuminate. Everything a source does beyond its target still happens as an implicit secondary — you just can't WRITE it. PLACEHOLDER; the palette and the grammar both follow this field. 'attachesTo' is a LIST of the targets a source may be bound to — everything else it does still happens as an implicit secondary. It is a list because some causes belong to more than one target: a volcano is heat and a mountain, a glacier is water and a valley. PLACEHOLDER: Relief currently borrows six sources this way and has no words of its own (volcano, glacier, granite, rift, sand, canopy). Whether it should get its own source runes — mountain, canyon, plain, dune, terrace — is Aimee's call, not mine to invent.",
   "sources": [
     {
       "id": "ash",
@@ -43,7 +43,9 @@
           "peak": -18
         }
       ],
-      "attachesTo": "thermal"
+      "attachesTo": [
+        "thermal"
+      ]
     },
     {
       "id": "aurora",
@@ -62,7 +64,9 @@
           ]
         }
       ],
-      "attachesTo": "illumination"
+      "attachesTo": [
+        "illumination"
+      ]
     },
     {
       "id": "bloom",
@@ -82,7 +86,9 @@
           ]
         }
       ],
-      "attachesTo": "vitality"
+      "attachesTo": [
+        "vitality"
+      ]
     },
     {
       "id": "canopy",
@@ -126,7 +132,10 @@
           }
         }
       ],
-      "attachesTo": "vitality"
+      "attachesTo": [
+        "vitality",
+        "relief"
+      ]
     },
     {
       "id": "cloud",
@@ -153,7 +162,9 @@
           "floor": 10
         }
       ],
-      "attachesTo": "atmosphere"
+      "attachesTo": [
+        "atmosphere"
+      ]
     },
     {
       "id": "comet",
@@ -187,7 +198,9 @@
           ]
         }
       ],
-      "attachesTo": "illumination"
+      "attachesTo": [
+        "illumination"
+      ]
     },
     {
       "id": "crystal",
@@ -218,7 +231,9 @@
           ]
         }
       ],
-      "attachesTo": "substrate"
+      "attachesTo": [
+        "substrate"
+      ]
     },
     {
       "id": "fungus",
@@ -245,7 +260,9 @@
           ]
         }
       ],
-      "attachesTo": "vitality"
+      "attachesTo": [
+        "vitality"
+      ]
     },
     {
       "id": "geyser",
@@ -278,7 +295,9 @@
           "peak": 12
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology"
+      ]
     },
     {
       "id": "glacier",
@@ -311,7 +330,10 @@
           }
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology",
+        "relief"
+      ]
     },
     {
       "id": "gold",
@@ -332,7 +354,9 @@
           ]
         }
       ],
-      "attachesTo": "substrate"
+      "attachesTo": [
+        "substrate"
+      ]
     },
     {
       "id": "granite",
@@ -359,7 +383,10 @@
           }
         }
       ],
-      "attachesTo": "substrate"
+      "attachesTo": [
+        "substrate",
+        "relief"
+      ]
     },
     {
       "id": "herd",
@@ -376,7 +403,9 @@
           }
         }
       ],
-      "attachesTo": "vitality"
+      "attachesTo": [
+        "vitality"
+      ]
     },
     {
       "id": "ice",
@@ -400,7 +429,9 @@
           "floor": -28
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology"
+      ]
     },
     {
       "id": "iron",
@@ -421,7 +452,9 @@
           ]
         }
       ],
-      "attachesTo": "substrate"
+      "attachesTo": [
+        "substrate"
+      ]
     },
     {
       "id": "lake",
@@ -446,7 +479,9 @@
           "floor": 10
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology"
+      ]
     },
     {
       "id": "magma",
@@ -482,7 +517,9 @@
           ]
         }
       ],
-      "attachesTo": "thermal"
+      "attachesTo": [
+        "thermal"
+      ]
     },
     {
       "id": "marsh",
@@ -526,7 +563,10 @@
           }
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology",
+        "relief"
+      ]
     },
     {
       "id": "miasma",
@@ -558,7 +598,9 @@
           ]
         }
       ],
-      "attachesTo": "atmosphere"
+      "attachesTo": [
+        "atmosphere"
+      ]
     },
     {
       "id": "mist",
@@ -590,7 +632,9 @@
           }
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology"
+      ]
     },
     {
       "id": "moon",
@@ -614,7 +658,9 @@
           "floor": 0
         }
       ],
-      "attachesTo": "illumination"
+      "attachesTo": [
+        "illumination"
+      ]
     },
     {
       "id": "rain",
@@ -646,7 +692,9 @@
           }
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology"
+      ]
     },
     {
       "id": "rift",
@@ -674,7 +722,9 @@
           ]
         }
       ],
-      "attachesTo": "cycle"
+      "attachesTo": [
+        "cycle"
+      ]
     },
     {
       "id": "river",
@@ -709,7 +759,10 @@
           ]
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology",
+        "relief"
+      ]
     },
     {
       "id": "root",
@@ -726,7 +779,9 @@
           }
         }
       ],
-      "attachesTo": "vitality"
+      "attachesTo": [
+        "vitality"
+      ]
     },
     {
       "id": "rot",
@@ -749,7 +804,9 @@
           "form": "ductile"
         }
       ],
-      "attachesTo": "vitality"
+      "attachesTo": [
+        "vitality"
+      ]
     },
     {
       "id": "salt",
@@ -783,7 +840,9 @@
           ]
         }
       ],
-      "attachesTo": "substrate"
+      "attachesTo": [
+        "substrate"
+      ]
     },
     {
       "id": "sand",
@@ -817,7 +876,10 @@
           }
         }
       ],
-      "attachesTo": "substrate"
+      "attachesTo": [
+        "substrate",
+        "relief"
+      ]
     },
     {
       "id": "sea",
@@ -853,7 +915,9 @@
           }
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology"
+      ]
     },
     {
       "id": "second_light",
@@ -878,7 +942,9 @@
           "floor": 0
         }
       ],
-      "attachesTo": "illumination"
+      "attachesTo": [
+        "illumination"
+      ]
     },
     {
       "id": "smoke",
@@ -908,7 +974,9 @@
           ]
         }
       ],
-      "attachesTo": "thermal"
+      "attachesTo": [
+        "thermal"
+      ]
     },
     {
       "id": "snow",
@@ -935,7 +1003,9 @@
           ]
         }
       ],
-      "attachesTo": "hydrology"
+      "attachesTo": [
+        "hydrology"
+      ]
     },
     {
       "id": "stars",
@@ -953,7 +1023,9 @@
           ]
         }
       ],
-      "attachesTo": "illumination"
+      "attachesTo": [
+        "illumination"
+      ]
     },
     {
       "id": "sulfur",
@@ -977,7 +1049,9 @@
           "peak": -12
         }
       ],
-      "attachesTo": "substrate"
+      "attachesTo": [
+        "substrate"
+      ]
     },
     {
       "id": "sun",
@@ -1001,7 +1075,9 @@
           "floor": 8
         }
       ],
-      "attachesTo": "illumination"
+      "attachesTo": [
+        "illumination"
+      ]
     },
     {
       "id": "swarm",
@@ -1021,7 +1097,9 @@
           ]
         }
       ],
-      "attachesTo": "vitality"
+      "attachesTo": [
+        "vitality"
+      ]
     },
     {
       "id": "thin_air",
@@ -1052,7 +1130,9 @@
           }
         }
       ],
-      "attachesTo": "atmosphere"
+      "attachesTo": [
+        "atmosphere"
+      ]
     },
     {
       "id": "void",
@@ -1073,7 +1153,9 @@
           "floor": -30
         }
       ],
-      "attachesTo": "illumination"
+      "attachesTo": [
+        "illumination"
+      ]
     },
     {
       "id": "volcano",
@@ -1116,7 +1198,10 @@
           }
         }
       ],
-      "attachesTo": "thermal"
+      "attachesTo": [
+        "thermal",
+        "relief"
+      ]
     },
     {
       "id": "wildfire",
@@ -1152,7 +1237,9 @@
           "peak": -30
         }
       ],
-      "attachesTo": "thermal"
+      "attachesTo": [
+        "thermal"
+      ]
     },
     {
       "id": "wind",
@@ -1183,7 +1270,9 @@
           }
         }
       ],
-      "attachesTo": "atmosphere"
+      "attachesTo": [
+        "atmosphere"
+      ]
     }
   ]
 }

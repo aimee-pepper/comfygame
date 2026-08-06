@@ -607,3 +607,49 @@ It works, but the two schemes sit oddly next to each other in a list — *sable 
 blind armoured walker* don't read as the same kind of thing. Which may be exactly right (§8.3 says
 the unmatched ones are the animals players remember) or may want the composed names shortened to
 two words to match.
+
+## Q30 — Relief has no words of its own, and I borrowed seven rather than invent any
+
+Relief had **no sources attached to it at all**. Its bin was empty on screen, so the shape of the
+land was the one thing in the pressure model you could not write about — with nothing in the UI to
+say why.
+
+`attachesTo` is now a **list** rather than a single target, because some causes genuinely belong to
+more than one: a volcano is a heat source and a mountain, a glacier is water and a valley. Relief
+borrows seven that already contribute to it — *canopy · glacier · granite · marsh · river · sand ·
+volcano*. There's a test now that every target has something you can write about it.
+
+**But Relief still has no words of its own**, and it wants some: *mountain · canyon · plain · dune ·
+terrace · scarp*. Inventing source runes is adding to the core vocabulary, which isn't mine to do.
+Say the word and I'll add whichever of those you want.
+
+## Q31 — Should greed read a target's aspects, or only its magnitude?
+
+Stability now reads **greed from abundance** — how far past a target's baseline you asked it to go.
+It reads the target's *magnitude* only.
+
+It does not read **aspects**. So writing Sand on Relief costs nothing, because sand *flattens*
+(−10 relief) even though it pushes openness to +25 — you asked for a wide open plain and were
+charged for nothing. Same for hydrology's dispersion, atmosphere's motion, cycle's amplitude.
+
+Two readings, and I've taken the first:
+
+1. **Magnitude only** (as built). Aspects describe *what kind* of a thing a world has rather than
+   *how much*, and only how much is greed. Simple, and the number stays workable-out-able.
+2. **Aspects count too.** An extremely open world or a wildly swinging one is asking for something
+   real, and charging nothing for it means whole axes of the vocabulary are free.
+
+Worth deciding before the aspect-heavy sources get written, because it changes what they cost.
+
+## Q32 — A lone cluster can resolve to nothing, and the meter correctly says nothing happened
+
+Writing *Vitality ← Bloom* on an otherwise empty page produces **no life at all**, so it costs no
+stability. That's the cross-target constraints working: illumination's baseline is 0, no light means
+no life, and the cap zeroes it.
+
+The model is right. The *experience* may not be — you wrote a bloom and the world says nothing
+happened, and nothing on screen explains that it's the dark that stopped it. The Life line does say
+"Nothing lives here", which is a hint but not an explanation.
+
+Flagging rather than fixing, because the fix is a design choice: either the preview names the
+constraint that bit ("nothing grows without light"), or it doesn't and learning it is the game.

@@ -56,6 +56,13 @@ enum Tuning {
         ///   | Plains · Verdant · Rich Ore · Gilded      |    25 |         25 | tier 3, and brief |
         ///   | Caverns · Ashen · Rich Ore · Gilded       |     2 |          2 | everything        |
         static let baseStabilityScore: Int = 100
+
+        /// **Stability per point of abundance asked for beyond the baseline** — the greed half of
+        /// instability, which the sigil vocabulary had no other way to express. Runs both
+        /// directions: writing *less* than a world naturally has calms it. **[PLACEHOLDER]**
+        static let stabilityPerAbundance: Double = 0.45
+        /// Essence per cell of the page you actually used. Bigger runes cost more ink.
+        static let essencePerCell: Double = 0.6   // PLACEHOLDER
     }
 
     // MARK: - Pressures (the writing system's language half)

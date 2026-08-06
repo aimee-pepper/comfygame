@@ -217,6 +217,133 @@ final class GrammarTests: XCTestCase {
         }
         return result.runes.flatMap(\.cells).allSatisfy(result.contains) ? result : nil
     }
+
+    // MARK: - What the page says, and whether it says so
+
+    /// **Every target must be writable.** Relief had no sources attached to it at all, so its bin
+    /// was empty on screen and you could not write the shape of the land — with nothing to say why.
+    func testEveryPressureTargetHasSomethingYouCanWriteAboutIt() {
+        for target in ContentCatalog.shared.pressureTargets {
+            let sources = ContentCatalog.shared.pressureSources.filter { $0.canAttach(to: target.id) }
+            XCTAssertFalse(sources.isEmpty,
+                           "\(target.id.rawValue) has no sources — its bin is empty on screen")
+        }
+    }
+
+    /// A source may only be bound to a target it actually touches.
+    func testASourceCanOnlyBeBoundToSomethingItAffects() {
+        for source in ContentCatalog.shared.pressureSources {
+            for target in source.attachesTo {
+                XCTAssertTrue(source.targets.contains(target),
+                              "\(source.id.rawValue) attaches to \(target.rawValue) but doesn't touch it")
+            }
+        }
+    }
+
+    /// **The trap.** Adjacency alone joins nothing, so a page can be full of sigils and describe
+    /// nothing — and the world comes out entirely random, at full stability, exactly as though you
+    /// had written nothing at all. The preview has to be able to say so.
+    func testAPageOfUnjoinedSigilsIsReportedAsSayingNothing() throws {
+        let page = try adjacentButUnjoined()
+        let projection = BookProjection.project(page: page, seed: 1)
+
+        XCTAssertEqual(projection.marksWritten, 2)
+        XCTAssertEqual(projection.marksSpeaking, 0)
+        XCTAssertTrue(projection.saysNothing)
+        XCTAssertTrue(projection.isWrittenButSilent,
+                      "a page of sigils that say nothing must read differently from an empty one")
+    }
+
+    /// …and once they're joined, it speaks.
+    func testJoiningASourceToItsTargetMakesThePageSpeak() throws {
+        let projection = BookProjection.project(page: try sunlitPage(), seed: 1)
+        XCTAssertGreaterThan(projection.marksSpeaking, 0)
+        XCTAssertFalse(projection.saysNothing)
+        XCTAssertFalse(projection.isWrittenButSilent)
+    }
+
+    /// An empty page is a different thing from a silent one, and reads differently.
+    func testAnEmptyPageIsNotTheSameAsASilentOne() {
+        let projection = BookProjection.project(page: Page(), seed: 1)
+        XCTAssertTrue(projection.saysNothing)
+        XCTAssertFalse(projection.isWrittenButSilent)
+    }
+
+
+    // MARK: - What is written reaches the world it binds
+
+    /// **The bug this exists to prevent.** A bound book carried only its *compound* symbol ids,
+    /// because `page.symbolIDs` returns compounds and nothing else — so every target and source
+    /// cluster on the page was dropped on the way into the world. The preview resolved the page
+    /// directly and looked right; the world it bound was generated from the compounds alone.
+    func testWhatIsWrittenOnThePageSurvivesBinding() throws {
+        let page = try sunlitPage()
+        let book = BookRules.resolveBook(page: page)
+
+        XCTAssertFalse(book.composition.isEmpty, "the page's own clusters never reached the book")
+        XCTAssertTrue(BookRules.sigils(for: book).contains { $0.source == "sun" },
+                      "the sun was written and the bound book has never heard of it")
+        XCTAssertGreaterThan(BookRules.readings(for: book, seed: 1)["illumination"].peak,
+                             PressureRules.resolve([], fillingUnwrittenWith: 1)["illumination"].peak,
+                             "writing an overwhelming sun made no difference to the world")
+    }
+
+    /// …and it reaches the world that is actually generated, not merely the readings.
+    func testAWorldGeneratedFromAPageIsTheWorldThePageDescribes() throws {
+        let sunlit = BookRules.resolveBook(page: try sunlitPage())
+        let blank = BookRules.resolveBook(page: Page())
+        XCTAssertNotEqual(Worldgen.generate(book: sunlit, seed: 4242).map.tiles,
+                          Worldgen.generate(book: blank, seed: 4242).map.tiles,
+                          "a written page and an empty one produced the same world")
+    }
+
+    // MARK: - Stability answers to the page
+
+    /// **Greed from abundance** — instability's other origin, and the one the sigil vocabulary had
+    /// no way at all to express. Every world came out at 100 however much you asked for.
+    func testAskingForMoreThanAWorldNaturallyHasCostsStability() throws {
+        let modest = BookRules.stabilityScore(of: BookRules.resolveBook(page: Page()))
+        let greedy = BookRules.stabilityScore(of: BookRules.resolveBook(page: try sunlitPage()))
+        XCTAssertLessThan(greedy, modest, "an overwhelming sun was free")
+    }
+
+    /// It runs in both directions: writing *less* than a world naturally has calms it.
+    func testAskingForLessThanAWorldNaturallyHasCalmsIt() throws {
+        // Thermal's baseline is temperate, so a cold world is asking for less than the default.
+        var page = Page()
+        page = try XCTUnwrap(place(.target("thermal"), at: PageCell(column: 0, row: 0), on: page))
+        page = try XCTUnwrap(place(.source("glacier"), at: PageCell(column: 1, row: 0), on: page))
+        let ids = page.runes.map(\.id)
+        page = try XCTUnwrap(PageRules.connect(ids[0], ids[1], on: page))
+
+        let delta = BookRules.greedDelta(for: PageRules.clusterSigils(of: page))
+        XCTAssertGreaterThan(delta, 0, "a cold world should be a calm one, not a free one")
+    }
+
+    /// **The number must be one you can work out while composing.** Unwritten targets are rolled at
+    /// resolution, and a rolled source can push a target you *did* write — so the headline must be
+    /// computed from the page alone or it moves with the seed.
+    func testTheHeadlineNeverMovesWithTheSeed() throws {
+        let book = BookRules.resolveBook(page: try sunlitPage())
+        let scores = Set([UInt64(1), 99, 4242, 20_260_805].map { _ in BookRules.stabilityScore(of: book) })
+        XCTAssertEqual(scores.count, 1)
+    }
+
+    /// **A symbol moves the headline by exactly its printed number** (session 5, locked). A
+    /// compound's printed number is its declared greed; charging abundance on top would double it.
+    func testACompoundStillMovesTheHeadlineByExactlyItsPrintedNumber() {
+        let book = BoundBook(written: ["rich_ore"], essencePaid: 0)
+        XCTAssertEqual(BookRules.stabilityScore(of: book),
+                       BookRules.stabilityScore(delta: BookRules.stabilityDelta(symbolIDs: ["rich_ore"])))
+    }
+
+    /// Ink is charged by the cell, so a page written in the sigil vocabulary isn't free.
+    func testWhatIsOnThePageIsWhatYouPayFor() throws {
+        let written = BookRules.resolveBook(page: try sunlitPage()).essencePaid
+        let blank = BookRules.resolveBook(page: Page()).essencePaid
+        XCTAssertGreaterThan(written, blank, "a page full of sigils cost the same as an empty one")
+    }
+
 }
 
 private extension Page {

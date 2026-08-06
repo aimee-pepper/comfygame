@@ -59,17 +59,43 @@ struct PressureSourceDef: Codable, Equatable, Identifiable, Sendable {
     var icon: String
     var blurb: String
     var contributions: [PressureContribution]
-    /// **The one target this may be bound to.** Everything else it does still happens, as an
-    /// implicit secondary — you simply can't *write* rain to make light. The rune spec says each
-    /// source attaches to a target without saying which; this is that mapping.
-    var attachesTo: PressureTargetID?
+    /// **The targets this may be bound to.** Everything else it does still happens, as an implicit
+    /// secondary — you simply can't *write* rain to make light. The rune spec says each source
+    /// attaches to a target without saying which; this is that mapping.
+    ///
+    /// A **list**, because some causes genuinely belong to more than one target: a volcano is a heat
+    /// source and a mountain, and a glacier is water and a valley. Treating this as a single target
+    /// left Relief with no vocabulary whatsoever — you could not write the shape of the land at all.
+    var attachesTo: [PressureTargetID] = []
 
     func contribution(to target: PressureTargetID) -> PressureContribution? {
         contributions.first { $0.target == target }
     }
 
+    func canAttach(to target: PressureTargetID) -> Bool { attachesTo.contains(target) }
+
     /// Which targets this source touches at all — the explicit bind must be one of them.
     var targets: [PressureTargetID] { contributions.map(\.target) }
+}
+
+extension PressureSourceDef {
+    /// Accepts the single-target shape this field used to have as well as the list, so content
+    /// written either way loads.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(PressureSourceID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "circle"
+        blurb = try c.decodeIfPresent(String.self, forKey: .blurb) ?? ""
+        contributions = try c.decodeIfPresent([PressureContribution].self, forKey: .contributions) ?? []
+        if let many = try? c.decode([PressureTargetID].self, forKey: .attachesTo) {
+            attachesTo = many
+        } else if let one = try? c.decode(PressureTargetID.self, forKey: .attachesTo) {
+            attachesTo = [one]
+        } else {
+            attachesTo = []
+        }
+    }
 }
 
 /// What a source does to one target.

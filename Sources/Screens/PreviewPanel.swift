@@ -31,6 +31,20 @@ struct PreviewPanel: View {
                     .foregroundStyle(.orange)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            if projection.saysNothing {
+                // **This world would be entirely chance.** The panel is otherwise indistinguishable
+                // from a real projection — full stability, a plausible description, a harvest mix —
+                // because every unwritten target is random-filled. Saying so is the difference
+                // between a preview and a lie.
+                Label(projection.isWrittenButSilent
+                        ? "Nothing on the page is joined, so none of it counts. This world is all chance."
+                        : "Nothing written yet. This world would be all chance.",
+                      systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Divider()
+            }
             Divider()
             statsRow
             Divider()

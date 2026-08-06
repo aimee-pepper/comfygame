@@ -224,6 +224,14 @@ struct BoundBook: Codable, Equatable, Sendable {
     /// This is the composition now. `symbols` below is the old slot taxonomy, kept so worlds bound
     /// before the page existed still resolve — a bound world outlives the content that made it.
     var written: [SymbolID] = []
+    /// **What the page actually said**, resolved at bind and kept.
+    ///
+    /// Without this a bound book carried only its *compound* symbol ids, because `page.symbolIDs`
+    /// returns compounds and nothing else — so every target and source cluster the player wrote was
+    /// dropped on the way into the world. The preview resolved the page directly and looked right;
+    /// the world it bound was generated from the compounds alone. Everything downstream of a bound
+    /// world — terrain, sites, creatures, stability — reads this.
+    var composition: [Sigil] = []
     /// How much world this book asked for. Read off the Scale qualifier at bind, and kept, so the
     /// map is reproducible from the book alone.
     var scale: WorldScale = .ordinary
@@ -254,8 +262,10 @@ struct BoundBook: Codable, Equatable, Sendable {
         return symbols.filter { !randomlyFilled.contains($0.key) }.map(\.value)
     }
 
-    init(written: [SymbolID], scale: WorldScale = .ordinary, essencePaid: Int) {
+    init(written: [SymbolID], composition: [Sigil] = [], scale: WorldScale = .ordinary,
+         essencePaid: Int) {
         self.written = written
+        self.composition = composition
         self.scale = scale
         self.symbols = [:]
         self.randomlyFilled = []
@@ -264,6 +274,7 @@ struct BoundBook: Codable, Equatable, Sendable {
 
     init(symbols: [SlotID: SymbolID], randomlyFilled: Set<SlotID>, essencePaid: Int) {
         self.written = []
+        self.composition = []
         self.scale = .ordinary
         self.symbols = symbols
         self.randomlyFilled = randomlyFilled
@@ -273,6 +284,7 @@ struct BoundBook: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         written = try c.decodeIfPresent([SymbolID].self, forKey: .written) ?? []
+        composition = try c.decodeIfPresent([Sigil].self, forKey: .composition) ?? []
         scale = try c.decodeIfPresent(WorldScale.self, forKey: .scale) ?? .ordinary
         symbols = try c.decodeIfPresent([SlotID: SymbolID].self, forKey: .symbols) ?? [:]
         randomlyFilled = try c.decodeIfPresent(Set<SlotID>.self, forKey: .randomlyFilled) ?? []

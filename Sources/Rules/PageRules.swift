@@ -318,10 +318,22 @@ extension PageRules {
     /// Sorted by identity, never by position: **absolute position carries no meaning**, only the
     /// adjacency graph does (session 14 §3).
     static func sigils(of page: Page) -> [Sigil] {
+        clusterSigils(of: page) + compoundSigils(of: page)
+    }
+
+    /// The self-contained marks — compounds and whole-statement runes — which say what they say
+    /// wherever they sit, joined to anything or not.
+    static func compoundSigils(of page: Page) -> [Sigil] {
+        page.runes.sorted { $0.id.rawValue < $1.id.rawValue }.flatMap(\.sigils)
+    }
+
+    /// **Only what the target-and-source clusters say.** Kept separate from the compounds because
+    /// the two vocabularies price stability differently: a compound prints its own number and that
+    /// number is the whole of its contribution (session 5, locked), while a cluster prints nothing
+    /// and is charged for the abundance it asks for.
+    static func clusterSigils(of page: Page) -> [Sigil] {
         var result: [Sigil] = []
         for group in clusters(on: page) {
-            // Self-contained marks — compounds and whole-statement runes — say what they say.
-            result += group.sorted { $0.id.rawValue < $1.id.rawValue }.flatMap(\.sigils)
 
             // **The target sigil is mandatory** (Aimee, 5 Aug). It's the anchor of the cluster,
             // and a cluster without one says nothing at all — sources with nothing to push on are
