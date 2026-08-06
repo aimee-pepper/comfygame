@@ -266,6 +266,16 @@ enum Tuning {
     }
 
     /// The turning of a world's day (decisions-session-13 §2 and §6).
+    /// Painting the ground. All PLACEHOLDER.
+    enum Terrain {
+        /// The most of a world that water can cover, at full saturation.
+        static let maximumWaterCoverage: Double = 0.45
+        /// How many separate bodies fully-pervasive water breaks into.
+        static let pondsAtFullDispersion: Double = 7
+        /// The most of a world that can be overgrown, at full productivity.
+        static let maximumGrowthCoverage: Double = 0.5
+    }
+
     enum Camera {
         /// Tiles across the window onto the world. **[PLACEHOLDER]** — wants testing on device,
         /// which is where session 13 says the map numbers get settled.

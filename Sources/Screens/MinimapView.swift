@@ -39,7 +39,14 @@ struct MinimapView: View {
         guard tile.isRevealed else { return Color(.systemFill) }        // unexplored
         if tile.isCrumbled { return .clear }                            // gone
         switch tile.content {
-        case .empty: return Palette.mapFloor.opacity(0.35)              // explored, nothing here
+        case .empty:
+            // Explored and empty — but *what* it's made of still matters when you're deciding
+            // where to walk, so water and cover read differently from bare ground.
+            return switch tile.ground {
+            case .deepWater, .water, .ice: Color.blue.opacity(0.35)
+            case .growth, .rubble: Color.green.opacity(0.30)
+            default: Palette.mapFloor.opacity(0.3)
+            }
         case .hazard: return .orange.opacity(0.7)
         case .portal: return .blue.opacity(0.8)
         default: return Palette.mapFloor.opacity(0.95)                  // explored, something here

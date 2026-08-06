@@ -46,14 +46,67 @@ struct WorldMap: Codable, Equatable, Sendable {
     var revealedCount: Int { tiles.count { $0.isRevealed } }
 }
 
+/// What the ground under everything is made of.
+///
+/// Orthogonal to `content`: a resource node sits *on* stone or *in* growth. Deliberately a small
+/// set (`generation-spine-spec.md` §2) — enough for the eight targets to write something legible
+/// into, not a materials system.
+enum GroundType: String, Codable, CaseIterable, Sendable {
+    case stone, soil, sand, ice, ash, water, deepWater, rubble, growth, void
+
+    /// Deep water and the void are the only things you can't walk over.
+    var isPassable: Bool { self != .deepWater && self != .void }
+
+    /// Growth and broken ground break sightlines. This is what makes ambush terrain real rather
+    /// than a word in a description.
+    var blocksSight: Bool { self == .growth || self == .rubble }
+
+    var displayName: String {
+        switch self {
+        case .deepWater: "deep water"
+        default: rawValue
+        }
+    }
+}
+
 struct Tile: Codable, Equatable, Sendable {
     var content: TileContent = .empty
+    /// What this square is made of.
+    var ground: GroundType = .soil
+    /// 0–3. Cover and sightlines — high ground sees over low, and broken country hides things.
+    var elevation: Int = 0
     /// Fog of war. Revealed tiles stay revealed.
     var isRevealed: Bool = false
     /// Crumbled tiles are impassable, and anything unharvested on them is gone.
     var isCrumbled: Bool = false
 
-    var isPassable: Bool { !isCrumbled }
+    init(content: TileContent = .empty, ground: GroundType = .soil, elevation: Int = 0,
+         isRevealed: Bool = false, isCrumbled: Bool = false) {
+        self.content = content
+        self.ground = ground
+        self.elevation = elevation
+        self.isRevealed = isRevealed
+        self.isCrumbled = isCrumbled
+    }
+
+    /// Tolerant: a tile is in every save with a run in it, so adding a field here must not cost
+    /// somebody the world they were standing in.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        content = try c.decodeIfPresent(TileContent.self, forKey: .content) ?? .empty
+        ground = try c.decodeIfPresent(GroundType.self, forKey: .ground) ?? .soil
+        elevation = try c.decodeIfPresent(Int.self, forKey: .elevation) ?? 0
+        isRevealed = try c.decodeIfPresent(Bool.self, forKey: .isRevealed) ?? false
+        isCrumbled = try c.decodeIfPresent(Bool.self, forKey: .isCrumbled) ?? false
+    }
+
+    var isPassable: Bool { !isCrumbled && ground.isPassable }
+
+    /// Whether something standing here can be seen past. Elevation counts: a hill blocks as surely
+    /// as a thicket.
+    func blocksSight(from elevation: Int) -> Bool {
+        ground.blocksSight || self.elevation > elevation
+    }
 }
 
 enum TileContent: Codable, Equatable, Sendable {

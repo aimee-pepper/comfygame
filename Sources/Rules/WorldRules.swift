@@ -64,10 +64,38 @@ enum WorldRules {
         return max(Tuning.World.minimumVisionRadius, base - Tuning.DayNight.sightLostAtNight)
     }
 
+    /// What you can see from where you're standing.
+    ///
+    /// **Cover and elevation stop sight.** Growth and broken ground block it, and anything higher
+    /// than you blocks it — so an open plain reveals itself in a glance and an overgrown, broken
+    /// world has to be walked. This is the ambush/pursuit distinction becoming something you feel
+    /// rather than a tag on a reading.
     static func reveal(around point: GridPoint, in map: inout WorldMap, radius: Int) {
+        let standing = map[point].elevation
+        map[point].isRevealed = true
+
         for candidate in map.allPoints where candidate.chebyshevDistance(to: point) <= radius {
-            map[candidate].isRevealed = true
+            if hasLineOfSight(from: point, to: candidate, in: map, standing: standing) {
+                map[candidate].isRevealed = true
+            }
         }
+    }
+
+    /// Walks the line between two tiles and stops at the first thing that blocks it.
+    ///
+    /// The blocking tile is itself revealed — you can see the thicket, you just can't see past it.
+    private static func hasLineOfSight(from: GridPoint, to: GridPoint, in map: WorldMap,
+                                       standing: Int) -> Bool {
+        let steps = max(abs(to.x - from.x), abs(to.y - from.y))
+        guard steps > 1 else { return true }
+        for step in 1..<steps {
+            let t = Double(step) / Double(steps)
+            let point = GridPoint(x: from.x + Int((Double(to.x - from.x) * t).rounded()),
+                                  y: from.y + Int((Double(to.y - from.y) * t).rounded()))
+            guard map.contains(point) else { continue }
+            if map[point].blocksSight(from: standing) { return false }
+        }
+        return true
     }
 
     // MARK: - Movement

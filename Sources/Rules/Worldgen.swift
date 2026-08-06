@@ -34,6 +34,7 @@ enum Worldgen {
         )
 
         let root = SeededRNG(seed: seed)
+        var terrainRNG = root.derived(0x7E44)
         var layoutRNG = root.derived(Salt.layout)
         var nodeRNG = root.derived(Salt.nodes)
         var enemyRNG = root.derived(Salt.enemies)
@@ -46,10 +47,15 @@ enum Worldgen {
         let sigils = BookRules.sigils(for: book)
         let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
 
+        // 0. The ground itself, before anything is placed on it. Relief, Substrate, Hydrology,
+        //    Thermal and Vitality all write here — this is the surface the pressure model was
+        //    missing, and without it Relief had nothing to say.
+        TerrainRules.paint(&map, readings: readings, rng: &terrainRNG)
+
         // 1. Where you arrive: a portal on the edge. It works as an exit too, so retreating the
         //    way you came is always possible — it just costs you the turns to walk back.
         //    (Whether that's too forgiving is Q6 in questions-for-aimee.md.)
-        let entry = randomEdgePoint(in: map, rng: &layoutRNG)
+        let entry = TerrainRules.firmGround(near: randomEdgePoint(in: map, rng: &layoutRNG), in: map)
         map.entry = entry
         map[entry].content = .portal(isEntry: true)
 
@@ -213,7 +219,8 @@ enum Worldgen {
                                         distance: Int = 0,
                                         rng: inout SeededRNG) -> GridPoint? {
         var candidates = map.allPoints.filter { point in
-            !occupied.contains(point) && map[point].content == .empty
+            // Nothing is placed where nobody can stand.
+            !occupied.contains(point) && map[point].content == .empty && map[point].isPassable
         }
         if let origin, distance > 0 {
             let far = candidates.filter { $0.chebyshevDistance(to: origin) >= distance }

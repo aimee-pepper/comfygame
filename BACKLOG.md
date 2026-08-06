@@ -97,7 +97,13 @@
 - [x] Node density from richness; dispersion decides spread-thin versus gathered
 - [x] Openness sets ambush versus pursuit — things see you further across open ground
 - [x] Map size from the page (Scale qualifier), not a constant
-- [ ] Terrain *layout* from Relief — elevation range and verticality still do nothing to the map
+- [x] **Terrain.** Tiles have ground and elevation; Relief, Substrate, Hydrology, Thermal and
+      Vitality all write to them. Cover and elevation stop sightlines.
+- [ ] **Creature traits** — the spine's other prerequisite. Still three creatures with flat stats,
+      so every trait pressure writes to nothing. Blocks loot as well.
+- [ ] `WorldProfile` — the interface between readings and worldgen the spine specs. Terrain and
+      spawns currently read readings directly, which works but won't compose as targets grow.
+- [ ] Movement cost from terrain — passability is in, but crossing growth costs the same as stone
 - [ ] Loot from creature traits — blocked on traits existing
 - [ ] Retire `yieldModifiers` / `enemyTableModifiers` / `enemyTierDelta` now nothing generates from
       them; `primaryTarget` lives on the same object and must survive the surgery (code-audit-2 §3.2)

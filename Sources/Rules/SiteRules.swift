@@ -73,7 +73,7 @@ enum SiteRules {
                                  avoiding taken: Set<GridPoint>,
                                  rng: inout SeededRNG) -> GridPoint? {
         let free = map.allPoints.filter { point in
-            !taken.contains(point) && map[point].content == .empty && !map[point].isCrumbled
+            !taken.contains(point) && map[point].content == .empty && map[point].isPassable
         }
         var legal = free.filter { point in
             switch site.placement.rule {

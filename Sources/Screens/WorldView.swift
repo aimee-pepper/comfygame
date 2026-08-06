@@ -407,11 +407,29 @@ private struct TileView: View {
         }
     }
 
+    /// The ground under everything. Elevation darkens it, so high country reads as high country.
+    private var groundColour: Color {
+        let base: Color = switch tile.ground {
+        case .stone: Color(red: 0.55, green: 0.55, blue: 0.58)
+        case .soil: Color(red: 0.45, green: 0.38, blue: 0.28)
+        case .sand: Color(red: 0.80, green: 0.72, blue: 0.52)
+        case .ice: Color(red: 0.78, green: 0.87, blue: 0.92)
+        case .ash: Color(red: 0.38, green: 0.36, blue: 0.36)
+        case .water: Color(red: 0.30, green: 0.52, blue: 0.72)
+        case .deepWater: Color(red: 0.16, green: 0.30, blue: 0.52)
+        case .rubble: Color(red: 0.50, green: 0.46, blue: 0.42)
+        case .growth: Color(red: 0.30, green: 0.48, blue: 0.28)
+        case .void: Color(red: 0.10, green: 0.10, blue: 0.12)
+        }
+        return base.opacity(1 - Double(tile.elevation) * 0.13)
+    }
+
     /// Three clearly distinct states in both schemes — see `Palette` for why these can't be
     /// opacities over `.primary`: the meaning inverts in dark mode.
     private var background: Color {
         if tile.isCrumbled { return Palette.mapVoid }
-        return tile.isRevealed ? Palette.mapFloor : Palette.mapFog
+        // Unseen ground stays fog; seen ground shows what it's made of.
+        return tile.isRevealed ? groundColour : Palette.mapFog
     }
 }
 
