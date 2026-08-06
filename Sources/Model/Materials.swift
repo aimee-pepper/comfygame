@@ -25,6 +25,16 @@ enum MaterialKind: String, Codable, CaseIterable, Equatable, Sendable {
 
     var displayName: String { rawValue.capitalisedSentence }
 
+    /// What a binful of them is called. English, not a bolted-on "s" — *down* and *ichor* don't
+    /// take one, and a bin labelled "Downs" reads as a mistake.
+    var pluralName: String {
+        switch self {
+        case .down, .ichor, .timber, .fibre, .pulp, .chitin: rawValue
+        case .toxin, .reagent: rawValue + "s"
+        default: rawValue + "s"
+        }
+    }
+
     /// **[PLACEHOLDER]** — session 11's glyph guidance applies to these too.
     var icon: String {
         switch self {
@@ -121,7 +131,7 @@ struct MaterialSample: Codable, Equatable, Sendable {
     }
 
     /// **[PLACEHOLDER]** vocabulary, per name-generation-spec §5.
-    private var gradeWord: String? {
+    var gradeWord: String? {
         switch grade {
         case ..<25: "crude"
         case 25..<55: nil          // plain needs no word

@@ -105,8 +105,16 @@ extension GameStore {
         mutate("identify \(stack.catalogID.rawValue)", flush: true) { state in
             state.base.essence -= Tuning.Economy.identifyCostEssence
             guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }) else { return }
-            state.base.inventory.stacks[index].catalogID = revealed.id
-            state.base.inventory.stacks[index].identified = true
+            // **One at a time.** Unidentified curios of the same kind share a bin, and you paid to
+            // learn about *one* of them — splitting it out is what keeps the price honest, and the
+            // rest stay a mystery worth another five essence.
+            guard var identified = state.base.inventory.stacks[index].removing(1) else { return }
+            identified.catalogID = revealed.id
+            identified.identified = true
+            if state.base.inventory.stacks[index].isEmpty {
+                state.base.inventory.stacks.remove(at: index)
+            }
+            _ = state.base.inventory.add(identified)
         }
         return revealed
     }

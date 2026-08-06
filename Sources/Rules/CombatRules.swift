@@ -238,9 +238,10 @@ enum CombatRules {
 
         heal(ally, by: Tuning.Encounter.consumableHealAmount, run: &run, encounter: &encounter,
              source: item.name, healer: ally)
-        if run.satchelItems.stacks[index].count > 1 {
-            run.satchelItems.stacks[index].count -= 1
-        } else {
+        // Through the bin rather than by poking `count`, so a stack that also carries samples
+        // can't have its count drift away from what's actually in it.
+        _ = run.satchelItems.stacks[index].removing(1)
+        if run.satchelItems.stacks[index].isEmpty {
             run.satchelItems.stacks.remove(at: index)
         }
     }

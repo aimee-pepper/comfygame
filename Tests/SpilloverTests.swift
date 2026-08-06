@@ -109,8 +109,10 @@ final class SpilloverTests: XCTestCase {
         return store
     }
 
+    /// **Distinct by name**, because items of the same kind now share a bin — three of the same
+    /// curio take one slot, so a test about slot pressure has to use three different things.
     private func stack(_ name: String) -> ItemStack {
         ItemStack(id: InstanceID(rawValue: UInt64(abs(name.hashValue))),
-                  catalogID: ItemID(rawValue: "curio_humming_shard"))
+                  catalogID: ItemID(rawValue: name))
     }
 }

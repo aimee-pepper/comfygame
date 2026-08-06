@@ -96,6 +96,7 @@ private struct SwapSheet: View {
 /// Storehouse — inventory and identification. Identify flow is milestone 5.
 struct StorehouseView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var opened: ItemStack?
 
     private var base: BaseState { store.state.base }
 
@@ -128,10 +129,29 @@ struct StorehouseView: View {
                         ForEach(base.inventory.stacks) { stack in
                             // Rarity reads as the colour of the name (design brief's colour-coded
                             // ladder), so a Mythic is obvious at a glance in a long list.
-                            LabeledRow(icon: stack.icon,
-                                       label: stack.displayName,
-                                       value: stack.detail,
-                                       tint: stack.rarity.tint)
+                            //
+                            // **A material bin opens.** All the hides share one slot, and what's
+                            // actually in it — the grades, the animals they came off — is the thing
+                            // worth having; a row saying "12 hides" would have hidden it.
+                            if stack.materials.count > 1 {
+                                Button { opened = stack } label: {
+                                    HStack(spacing: 0) {
+                                        LabeledRow(icon: stack.icon, label: stack.displayName,
+                                                   value: stack.detail, tint: stack.rarity.tint)
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption2.weight(.semibold))
+                                            .foregroundStyle(.tertiary)
+                                    }
+                                    .frame(minHeight: 44)
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                            } else {
+                                LabeledRow(icon: stack.icon,
+                                           label: stack.displayName,
+                                           value: stack.detail,
+                                           tint: stack.rarity.tint)
+                            }
                         }
                     }
                 }
@@ -147,6 +167,9 @@ struct StorehouseView: View {
             .padding(16)
         }
         .background(Color(.systemGroupedBackground))
+        .sheet(item: $opened) { bin in
+            MaterialBinSheet(bin: bin).environmentObject(store)
+        }
         .navigationTitle("Storehouse")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -396,5 +419,80 @@ struct ComingLater: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(12)
             .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+/// What's actually in a material bin.
+///
+/// Binning by kind is what keeps eight slots usable (session 16 §1), and it only works because
+/// nothing is lost by it: every sample keeps its own grade, its own name and the animal it came
+/// off. This is where you look at them — and sort them, because "which is my best pelt" is the
+/// question a hoard exists to answer.
+struct MaterialBinSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    let bin: ItemStack
+
+    enum Order: String, CaseIterable, Identifiable {
+        case grade = "Grade"
+        case source = "Where from"
+        case order = "Order found"
+        var id: String { rawValue }
+    }
+    @State private var order: Order = .grade
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(Array(sorted.enumerated()), id: \.offset) { _, sample in
+                        HStack(spacing: 10) {
+                            Image(systemName: sample.kind.icon)
+                                .font(.footnote).frame(width: 20)
+                                .foregroundStyle(sample.rarity.tint)
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(sample.displayName)
+                                    .font(.callout)
+                                    .foregroundStyle(sample.rarity.tint)
+                                if !sample.source.isEmpty {
+                                    Text("off a \(sample.source)")
+                                        .font(.caption2).foregroundStyle(.secondary)
+                                }
+                            }
+                            Spacer(minLength: 8)
+                            VStack(alignment: .trailing, spacing: 1) {
+                                Text("\(Int(sample.grade))")
+                                    .font(.callout.monospacedDigit())
+                                Text(sample.properties.dominant.name)
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                        }
+                        .frame(minHeight: 44)
+                    }
+                } header: {
+                    Picker("Sort", selection: $order) {
+                        ForEach(Order.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .textCase(nil)
+                    .padding(.bottom, 4)
+                } footer: {
+                    Text("All \(bin.count) share one slot. Every one keeps its own grade and the animal it came off.")
+                }
+            }
+            .navigationTitle(bin.displayName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
+            }
+        }
+    }
+
+    private var sorted: [MaterialSample] {
+        switch order {
+        case .grade: bin.materials.sorted { $0.grade > $1.grade }
+        case .source: bin.materials.sorted { ($0.source, $0.grade) < ($1.source, $1.grade) }
+        case .order: bin.materials
+        }
     }
 }

@@ -1,0 +1,190 @@
+import XCTest
+@testable import Bookbinder
+
+/// Items stack, and materials bin by kind (decisions-session-16 §1).
+final class StackingTests: XCTestCase {
+
+    // MARK: The bug
+
+    /// **`count` existed from the start and nothing ever incremented it.** Every pickup made a new
+    /// stack in a new slot, so two identical curios ate two of your eight.
+    func testTwoOfTheSameThingShareOneSlot() {
+        var inventory = Inventory(slots: 8)
+        XCTAssertTrue(inventory.add(curio("curio_a")))
+        XCTAssertTrue(inventory.add(curio("curio_a")))
+
+        XCTAssertEqual(inventory.stacks.count, 1, "identical items still took a slot each")
+        XCTAssertEqual(inventory.stacks[0].count, 2)
+    }
+
+    func testDifferentThingsStillTakeDifferentSlots() {
+        var inventory = Inventory(slots: 8)
+        inventory.add(curio("curio_a"))
+        inventory.add(curio("curio_b"))
+        XCTAssertEqual(inventory.stacks.count, 2)
+    }
+
+    /// Identifying one tells you nothing about the other, so it can't share its bin.
+    func testAnIdentifiedThingDoesntShareABinWithAnUnidentifiedOne() {
+        var inventory = Inventory(slots: 8)
+        inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: "curio_a", identified: false))
+        inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: "curio_a", identified: true))
+        XCTAssertEqual(inventory.stacks.count, 2)
+    }
+
+    // MARK: Materials bin by kind
+
+    /// **All hides go in the hide bin**, whatever their grade or whichever animal they came off.
+    /// A world with six species produces a dozen variants; slot pressure has to be proportional to
+    /// *kinds*, not to variants.
+    func testEveryHideSharesOneSlotHoweverDifferentTheyAre() {
+        var inventory = Inventory(slots: 8)
+        inventory.add(material(.hide, grade: 20, source: "pale groper"))
+        inventory.add(material(.hide, grade: 80, source: "shaggy browser"))
+        inventory.add(material(.hide, grade: 55, source: "sable grazer"))
+
+        XCTAssertEqual(inventory.stacks.count, 1, "three hides took three slots")
+        XCTAssertEqual(inventory.stacks[0].count, 3)
+    }
+
+    /// …and **nothing is lost by it**. Every sample keeps its own grade, name and source.
+    func testBinningLosesNothingAboutAnyOfThem() throws {
+        var inventory = Inventory(slots: 8)
+        inventory.add(material(.hide, grade: 20, source: "pale groper"))
+        inventory.add(material(.hide, grade: 80, source: "shaggy browser"))
+
+        let bin = try XCTUnwrap(inventory.stacks.first)
+        XCTAssertEqual(Set(bin.materials.map(\.source)), ["pale groper", "shaggy browser"])
+        XCTAssertEqual(bin.finest?.grade, 80)
+        XCTAssertEqual(bin.finest?.source, "shaggy browser")
+    }
+
+    func testDifferentMaterialKindsGetDifferentSlots() {
+        var inventory = Inventory(slots: 8)
+        inventory.add(material(.hide, grade: 40, source: "x"))
+        inventory.add(material(.bone, grade: 40, source: "x"))
+        inventory.add(material(.fang, grade: 40, source: "x"))
+        XCTAssertEqual(inventory.stacks.count, 3)
+    }
+
+    /// A bin is named for its kind and says what the best thing in it is — "12 hides" tells you how
+    /// much room it takes and nothing about whether it was worth the trip.
+    func testABinSaysWhatKindItIsAndHowGoodItsBestIs() {
+        var inventory = Inventory(slots: 8)
+        inventory.add(material(.hide, grade: 20, source: "x"))
+        inventory.add(material(.hide, grade: 80, source: "y"))
+
+        XCTAssertEqual(inventory.stacks[0].displayName, "Hides")
+        XCTAssertTrue(inventory.stacks[0].detail.contains("superb"), inventory.stacks[0].detail)
+        XCTAssertTrue(inventory.stacks[0].detail.contains("×2"), inventory.stacks[0].detail)
+    }
+
+    // MARK: A full hold still takes more of what it already has
+
+    /// The point of binning: a full storehouse can still accept another hide, because the hide bin
+    /// is already there. Only a *new kind* needs a slot.
+    func testAFullHoldStillTakesMoreOfWhatItAlreadyHolds() {
+        var inventory = Inventory(slots: 1)
+        XCTAssertTrue(inventory.add(material(.hide, grade: 30, source: "x")))
+        XCTAssertTrue(inventory.isFull)
+
+        XCTAssertTrue(inventory.add(material(.hide, grade: 90, source: "y")),
+                      "a full hold refused another of something it was already holding")
+        XCTAssertFalse(inventory.add(material(.bone, grade: 30, source: "x")),
+                       "a full hold accepted a kind it had no room for")
+        XCTAssertEqual(inventory.stacks[0].count, 2)
+    }
+
+    // MARK: Taking things back out
+
+    /// Losses come off the bottom — what a collapse or a trade costs you is what you'd miss least.
+    func testTakingFromABinTakesTheWorstFirst() throws {
+        var bin = ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.material,
+                            materials: [sample(.hide, grade: 10, source: "a"),
+                                        sample(.hide, grade: 90, source: "b"),
+                                        sample(.hide, grade: 50, source: "c")])
+        let taken = try XCTUnwrap(bin.removing(1))
+        XCTAssertEqual(taken.materials.first?.grade, 10)
+        XCTAssertEqual(bin.count, 2)
+        XCTAssertEqual(bin.finest?.grade, 90)
+    }
+
+    /// **A collapse costs half of what you're carrying, not half your slots.** Once a slot can hold
+    /// a dozen hides, dropping half the *slots* takes all twelve or none.
+    func testACollapseCostsThingsRatherThanSlots() {
+        var rng = SeededRNG(seed: 4)
+        var inventory = Inventory(slots: 8)
+        for grade in stride(from: 10.0, through: 100.0, by: 10) {
+            inventory.add(material(.hide, grade: grade, source: "x"))
+        }
+        XCTAssertEqual(inventory.stacks.count, 1)
+
+        let kept = inventory.randomlyKeeping(fraction: 0.5, rng: &rng)
+        XCTAssertEqual(kept.stacks.first?.count, 5, "half of ten hides is five hides")
+        XCTAssertEqual(kept.stacks.first?.finest?.grade, 100, "the collapse took the best ones")
+    }
+
+    // MARK: Persistence
+
+    /// A save written before binning holds a single `material` and a count. It has to load.
+    func testASaveFromBeforeBinningStillLoads() throws {
+        let json = """
+        {"id": {"rawValue": 3}, "catalogID": "material", "count": 4, "identified": true,
+         "material": {"kind": "pelt", "grade": 62, "source": "shaggy browser",
+                      "properties": {"insulation": 70}}}
+        """
+        let stack = try SaveCodec.makeDecoder().decode(ItemStack.self, from: Data(json.utf8))
+        XCTAssertEqual(stack.count, 4)
+        XCTAssertEqual(stack.materials.count, 4, "four pelts became one")
+        XCTAssertEqual(stack.materials.first?.kind, .pelt)
+    }
+
+    func testABinRoundTripsThroughASave() throws {
+        var inventory = Inventory(slots: 8)
+        inventory.add(material(.pelt, grade: 30, source: "a"))
+        inventory.add(material(.pelt, grade: 70, source: "b"))
+
+        let data = try SaveCodec.makeEncoder().encode(inventory)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(Inventory.self, from: data), inventory)
+    }
+
+    // MARK: It reaches the player
+
+    /// The satchel uses the same rule in-world — otherwise carrying is still miserable and the fix
+    /// only helps at home.
+    @MainActor
+    func testTheSatchelBinsTooSoCarryingIsntMiserable() throws {
+        let store = GameStore(io: .temporary(name: "stack-\(UUID().uuidString)"))
+        store.setSymbol("plains", in: "terrain")
+        store.bindAndDepart()
+        store.mutate("haul several of the same thing") { state in
+            guard var run = state.worlds.activeRun else { return }
+            run.satchelItems = Inventory(slots: 2)
+            for grade in [20.0, 55, 90] {
+                _ = run.satchelItems.add(self.material(.hide, grade: grade, source: "x"))
+            }
+            state.worlds.activeRun = run
+        }
+        let satchel = try XCTUnwrap(store.state.worlds.activeRun?.satchelItems)
+        XCTAssertEqual(satchel.stacks.count, 1)
+        XCTAssertEqual(satchel.stacks[0].count, 3)
+    }
+
+    // MARK: Helpers
+
+    private func curio(_ id: String) -> ItemStack {
+        ItemStack(id: InstanceID(rawValue: UInt64.random(in: 1...9_999_999)),
+                  catalogID: ItemID(rawValue: id))
+    }
+
+    private func sample(_ kind: MaterialKind, grade: Double, source: String) -> MaterialSample {
+        MaterialSample(kind: kind, properties: MaterialProperties(hardness: 40),
+                       grade: grade, source: source)
+    }
+
+    private func material(_ kind: MaterialKind, grade: Double, source: String) -> ItemStack {
+        ItemStack(id: InstanceID(rawValue: UInt64.random(in: 1...9_999_999)),
+                  catalogID: Items.material,
+                  materials: [sample(kind, grade: grade, source: source)])
+    }
+}
