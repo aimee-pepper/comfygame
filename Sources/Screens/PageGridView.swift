@@ -83,7 +83,7 @@ struct PageGridView: View {
                     .font(.caption)
                     .frame(minWidth: 60, minHeight: 44)
             } else if dragging != nil {
-                Text(willDiscard ? "Let go to rub it out" : "Drag off the page to rub it out")
+                Text(willDiscard ? "Let go to erase" : "Drag off the page to erase")
                     .font(.caption)
                     .foregroundStyle(willDiscard ? Color.red : Color.secondary)
                 Spacer()
@@ -157,7 +157,7 @@ struct PageGridView: View {
         .zIndex(isDragging ? 2 : 0)
         .gesture(markDrag(mark, side: side, pageSize: pageSize))
         .contextMenu { menu(for: mark) }
-        .accessibilityLabel("\(mark.displayName), \(mark.cells.count) cells. Drag to move, or off the page to rub out.")
+        .accessibilityLabel("\(mark.displayName), \(mark.cells.count) cells. Drag to move, or off the page to erase.")
     }
 
     /// A cluster drags as one, so every mark in it follows the one under the finger.
@@ -168,12 +168,15 @@ struct PageGridView: View {
         return translation
     }
 
-    /// What you can do to this sigil, given what's around it.
+    /// Connecting, disconnecting and turning — and nothing else.
     ///
-    /// Replaces the connect *mode*. A mode is a thing you have to remember you're in, and the whole
-    /// interaction was two taps plus a button press to say something the page could work out for
-    /// itself: a sigil knows which of its neighbours it isn't joined to, and can simply offer them
-    /// by name.
+    /// Deliberately three things. Erasing isn't here because erasing is dragging the sigil off the
+    /// page, and offering a second route to it would make the drag look like the shortcut rather
+    /// than the way.
+    ///
+    /// It replaces the connect *mode*: a mode is a thing you have to remember you're in, and the
+    /// page already knows which of a sigil's neighbours it isn't joined to, so it can offer them by
+    /// name instead of asking you to point twice.
     @ViewBuilder
     private func menu(for mark: PlacedRune) -> some View {
         let joinable = page.runes.filter { PageRules.canConnect(mark.id, $0.id, on: page) }
@@ -199,19 +202,14 @@ struct PageGridView: View {
             }
         }
 
-        Divider()
         if PageRules.rotate(cluster: mark.id, on: page) != nil {
+            Divider()
             Button {
                 store.rotateCluster(mark.id)
             } label: {
                 Label(PageRules.cluster(containing: mark.id, on: page).count > 1 ? "Turn the piece" : "Turn",
                       systemImage: "rotate.right")
             }
-        }
-        Button(role: .destructive) {
-            store.erase(mark.id)
-        } label: {
-            Label("Rub out", systemImage: "eraser")
         }
     }
 

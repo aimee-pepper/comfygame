@@ -971,5 +971,5 @@ mapping, and it now lives on each source as `attachesTo`.
 Everything else a source does still happens, as an implicit secondary. You just can't write it.
 
 Also: **long-press a sigil for what you can do with it** — join to a named neighbour, unjoin from
-one, turn the piece, rub it out. Replaces connect mode; a mode is something you have to remember
+one, and turn the piece. Replaces connect mode; a mode is something you have to remember
 you're in, and the page already knows which neighbours a sigil isn't joined to.

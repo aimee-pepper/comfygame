@@ -63,9 +63,9 @@
 - [x] Three hands — charcoal 4-6 cells, pencil 2-3, fountain pen always 1x1
 - [x] Compound footprints — ceil(sum x 0.6), always worth learning, never free
 - [x] Order invariance held at the page layer: position is packing, never meaning
-- [x] **The Writing Desk writes on the page.** Palette + grid; tap to place, tap to rub out.
+- [x] **The Writing Desk writes on the page.** Palette + grid; tap to place, tap to erase.
       Books bind from what's written, not from slots.
-- [x] Drag to move a mark, and drag it off the page to rub it out
+- [x] Drag to move a mark, and drag it off the page to erase it
 - [x] Drag straight from the palette onto the page, with a fit preview under your finger
 - [x] Palette sectioned by pressure target, so its organisation and its grammar are one thing
 - [x] One primary per target, plus chaining as a research unlock that lifts it
