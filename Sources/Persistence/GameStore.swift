@@ -55,6 +55,9 @@ final class GameStore: ObservableObject {
         mutate("launch", flush: true) { state in
             state.meta.launchCount += 1
             state.base.bookDraft.prune()
+            // **And everybody you've found gets a seat at the fire**, whether or not the version of
+            // the game that found them knew how to give them one. See `seatEveryoneFound`.
+            state.base.seatEveryoneFound(in: state.reality.library)
         }
 
         // Recover a save that's already stranded — someone who spent their last essence before

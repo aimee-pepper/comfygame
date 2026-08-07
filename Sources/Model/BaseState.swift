@@ -148,6 +148,45 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Whether there's room for another person. **Up to five** (Aimee, 6 Aug).
     var canRecruit: Bool { roster.count < Tuning.Party.maximumSize }
 
+    /// Give somebody a place at the fire. Idempotent, and silent if there's no room.
+    @discardableResult
+    mutating func seat(_ id: TravellerID) -> Bool {
+        guard let person = ContentCatalog.shared.traveller(id) else { return false }
+        guard !roster.contains(where: { $0.traveller == id }) else { return false }
+        guard canRecruit else { return false }
+        var joined = CompanionState()
+        joined.name = person.name
+        joined.traveller = id
+        joined.calling = person.calling
+        joined.icon = person.icon
+        joined.gambits = GambitStarter.rules
+        roster.append(joined)
+        return true
+    }
+
+    /// **Everybody you've found has to be somewhere you can see them.**
+    ///
+    /// Aimee, 7 Aug: *"I have FOUND TRAVELERS. that is NOT the issue. the FOUND travelers not
+    /// appearing at the firepit is the issue."*
+    ///
+    /// The roster is newer than the search loop. Anyone recruited before it existed was written into
+    /// `library.foundTravellers` and nowhere else — and because worldgen refuses to place a traveller
+    /// who has already been found, they could never be met again either. Found, gone, and no way
+    /// back: the Firepit was telling the truth about an empty roster, and the truth was the bug.
+    ///
+    /// So the Library is the record of who you found, and the roster is reconciled against it rather
+    /// than trusted to have been kept in step. Runs at launch, and it is idempotent, so it also
+    /// heals any future divergence instead of letting one compound.
+    @discardableResult
+    mutating func seatEveryoneFound(in library: LibraryState) -> [TravellerID] {
+        var seated: [TravellerID] = []
+        // Catalogue order, so which four get seats is stable rather than dependent on set ordering.
+        for person in ContentCatalog.shared.travellers where library.foundTravellers.contains(person.id) {
+            if seat(person.id) { seated.append(person.id) }
+        }
+        return seated
+    }
+
     /// Somebody's character sheet. **Both of them have one** (session 17 §1).
     func character(_ member: PartyMember) -> CharacterState {
         switch member {

@@ -250,6 +250,13 @@ enum WorldRules {
               case .traveller(let here) = run.map[run.playerPosition].content, here == id
         else { return [.blocked("Nobody here.")] }
 
+        // **Marking somebody found is what stops them ever appearing again**, so it must never
+        // happen unless they actually have somewhere to go. A full fire used to mark them found and
+        // then quietly decline to seat them, which loses a person permanently — worldgen filters
+        // found travellers out, so there is no second chance to come back for them.
+        guard state.base.canRecruit || state.base.roster.contains(where: { $0.traveller == id })
+        else { return [.blocked("There's no room at your fire. Come back when there is.")] }
+
         run.map[run.playerPosition].content = .empty
         run.travellersHere.removeAll { $0 == id }
         state.worlds.activeRun = run
@@ -261,16 +268,7 @@ enum WorldRules {
         // Library and nothing else. No roster, no gear, no presence — so Aimee recruited somebody,
         // lost a run, and had "no idea what happened to her". She was never lost; there was simply
         // nothing to show for it, which feels identical.
-        if let person = ContentCatalog.shared.traveller(id), state.base.canRecruit,
-           !state.base.roster.contains(where: { $0.traveller == id }) {
-            var joined = CompanionState()
-            joined.name = person.name
-            joined.traveller = id
-            joined.calling = person.calling
-            joined.icon = person.icon
-            joined.gambits = GambitStarter.rules
-            state.base.roster.append(joined)
-        }
+        state.base.seat(id)
         return [.foundTraveller(id)]
     }
 

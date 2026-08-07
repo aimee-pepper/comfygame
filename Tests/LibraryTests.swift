@@ -631,4 +631,97 @@ final class LibraryTests: XCTestCase {
         }
         XCTAssertFalse(store.state.base.canRecruit, "the party is full and still taking people")
     }
+
+    // MARK: The fire has to hold everybody you found
+
+    /// **Aimee's save, reproduced.** 7 Aug: *"I have FOUND TRAVELERS. that is NOT the issue. the
+    /// FOUND travelers not appearing at the firepit is the issue."*
+    ///
+    /// The roster is newer than the search loop, so anyone recruited before it existed went into
+    /// `library.foundTravellers` and nowhere else — and worldgen refuses to place a traveller who
+    /// has already been found, so there was no way to meet them again either. Found, gone, and no
+    /// route back.
+    @MainActor
+    func testAnOldSaveFullOfFoundTravellersSeatsThemAtTheFire() throws {
+        let io = SaveFileIO.temporary(name: "stranded-\(UUID().uuidString)")
+        let everyone = ContentCatalog.shared.travellers.prefix(3).map(\.id)
+
+        // A save from before the roster existed: found in the Library, nobody at the fire but Quill.
+        do {
+            let store = GameStore(io: io)
+            store.mutate("test: an old save", flush: true) { state in
+                state.reality.library.foundTravellers = Set(everyone)
+                state.reality.library.knownTravellers = Set(everyone)
+                state.base.roster = [CompanionState()]
+            }
+            XCTAssertEqual(store.state.base.roster.count, 1, "fixture didn't take")
+        }
+
+        // Launching the game is what puts it right.
+        let reopened = GameStore(io: io)
+        for id in everyone {
+            let seated = reopened.state.base.roster.first { $0.traveller == id }
+            XCTAssertNotNil(seated, "\(id.rawValue) was found and has nowhere to be")
+            XCTAssertEqual(seated?.name, ContentCatalog.shared.traveller(id)?.name)
+            XCTAssertFalse(seated?.calling.isEmpty ?? true, "seated without being anybody in particular")
+            XCTAssertFalse(seated?.gambits.isEmpty ?? true, "seated with no idea what to do in a fight")
+        }
+        XCTAssertEqual(reopened.state.base.roster.count, 1 + everyone.count)
+
+        // And the Firepit shows them as people you can take, not as one person you already have.
+        let waiting = reopened.state.base.roster.enumerated()
+            .filter { $0.offset != reopened.state.base.activeCompanion }
+        XCTAssertEqual(waiting.count, everyone.count,
+                       "the fire is still empty with \(everyone.count) people found")
+    }
+
+    /// Idempotent: launching twice must not seat anybody twice.
+    @MainActor
+    func testSeatingEveryoneFoundDoesNotDuplicateThem() {
+        let io = SaveFileIO.temporary(name: "reseat-\(UUID().uuidString)")
+        let id = ContentCatalog.shared.travellers[0].id
+        do {
+            let store = GameStore(io: io)
+            store.mutate("test: found one", flush: true) {
+                $0.reality.library.foundTravellers = [id]
+            }
+        }
+        _ = GameStore(io: io)
+        let third = GameStore(io: io)
+        XCTAssertEqual(third.state.base.roster.count { $0.traveller == id }, 1,
+                       "three launches seated the same person more than once")
+    }
+
+    /// **A full fire may not swallow somebody.** Marking them found is what stops them ever being
+    /// placed again, so it must not happen unless they actually get a seat — otherwise the fifth
+    /// person you meet is deleted from the game.
+    @MainActor
+    func testAFullFireLeavesThemStandingThereRatherThanLosingThem() {
+        let store = GameStore(io: .temporary(name: "full-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 5000 }
+        store.mutate("test: a full fire") { state in
+            state.base.roster = (0..<Tuning.Party.maximumSize).map { _ in CompanionState() }
+        }
+        XCTAssertFalse(store.state.base.canRecruit)
+
+        for _ in 0..<40 {
+            store.bindAndDepart()
+            guard let run = store.state.worlds.activeRun,
+                  let id = run.travellersHere.first,
+                  let point = run.map.allPoints.first(where: { run.map[$0].content == .traveller(id) })
+            else {
+                store.mutate("test: next") { $0.worlds.activeRun = nil }
+                continue
+            }
+            store.mutate("test: walk over") { $0.worlds.activeRun?.playerPosition = point }
+            store.recruit(id)
+
+            XCTAssertFalse(store.state.reality.library.foundTravellers.contains(id),
+                           "a full fire marked them found, so they can never be met again")
+            XCTAssertEqual(store.state.worlds.activeRun?.map[point].content, .traveller(id),
+                           "they should still be standing there, waiting for room")
+            return
+        }
+        XCTFail("no world in forty held anybody")
+    }
 }
