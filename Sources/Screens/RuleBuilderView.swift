@@ -113,6 +113,6 @@ struct RuleBuilderView: View {
 }
 
 #Preview {
-    RuleBuilderView(owner: .companion)
+    RuleBuilderView(owner: .companion(0))
         .environmentObject(GameStore(io: .temporary(name: "preview-rules")))
 }

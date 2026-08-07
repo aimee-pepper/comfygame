@@ -16,20 +16,32 @@ struct FirepitView: View {
     @EnvironmentObject private var store: GameStore
 
     private var roster: [CompanionState] { store.state.base.roster }
-    private var activeIndex: Int { store.state.base.activeCompanion }
+    private var coming: [(index: Int, member: CompanionState)] {
+        roster.enumerated().filter { store.isComing($0.offset) }.map { ($0.offset, $0.element) }
+    }
     /// Everybody who isn't currently walking out with you — the point of the screen.
     private var waiting: [(index: Int, member: CompanionState)] {
-        roster.enumerated().filter { $0.offset != activeIndex }.map { ($0.offset, $0.element) }
+        roster.enumerated().filter { !store.isComing($0.offset) }.map { ($0.offset, $0.element) }
+    }
+    /// You count as one of the five, so four is as many as can come with you.
+    private var seatsLeft: Int {
+        max(0, Tuning.Party.maximumSize - 1 - store.state.base.activeParty.count)
     }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
-                StationCard(title: "Who's coming", icon: "figure.walk") {
-                    if roster.indices.contains(activeIndex) {
-                        row(roster[activeIndex], index: activeIndex)
+                StationCard(title: "Who's coming — you and \(coming.count)", icon: "figure.walk") {
+                    if coming.isEmpty {
+                        EmptyNote("Nobody but you.")
                     } else {
-                        EmptyNote("Nobody.")
+                        ForEach(coming, id: \.index) { entry in
+                            row(entry.member, index: entry.index)
+                        }
+                    }
+                    if seatsLeft > 0 {
+                        Text(seatsLeft == 1 ? "Room for one more." : "Room for \(seatsLeft) more.")
+                            .font(.caption2).foregroundStyle(.secondary)
                     }
                 }
 
@@ -71,15 +83,15 @@ struct FirepitView: View {
                     .font(.caption2).foregroundStyle(.secondary)
             }
             Spacer(minLength: 6)
-            if index == activeIndex {
-                Text("with you")
-                    .font(.caption2.weight(.medium)).foregroundStyle(.green)
-                    .padding(.horizontal, 7).padding(.vertical, 3)
-                    .background(Color.green.opacity(0.14), in: Capsule())
-            } else {
-                Button("Take them") { store.setActiveCompanion(index) }
+            if store.isComing(index) {
+                Button("Leave them") { store.setComing(index, false) }
                     .font(.caption2.weight(.medium))
                     .buttonStyle(.bordered)
+            } else {
+                Button("Take them") { store.setComing(index, true) }
+                    .font(.caption2.weight(.medium))
+                    .buttonStyle(.borderedProminent)
+                    .disabled(seatsLeft == 0)
             }
         }
         .frame(minHeight: 44)

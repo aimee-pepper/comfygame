@@ -133,13 +133,18 @@ struct WorldRun: Codable, Equatable, Sendable {
     var collapsedOnTurn: Int?
 
     var binderHP: Int = Tuning.Encounter.binderMaxHP
-    var companionHP: Int = Tuning.Encounter.companionMaxHP
+    /// **Health per person at the fire**, keyed by roster index.
+    ///
+    /// It was one number, which is the other half of why a party of five couldn't exist: there was
+    /// exactly one place to keep a companion's health, so a second one had nowhere to be hurt.
+    /// Anybody absent from the dictionary is at full — joining mid-run shouldn't arrive wounded.
+    var companionHP: [Int: Int] = [:]
 
     init(runIndex: Int, book: BoundBook, mapSeed: UInt64, rng: SeededRNG, map: WorldMap,
          playerPosition: GridPoint, enemies: [WorldEnemy] = [], sites: [PlacedSite] = [],
          travellersHere: [TravellerID] = [], cast: [Species] = [],
          binderHP: Int = Tuning.Encounter.binderMaxHP,
-         companionHP: Int = Tuning.Encounter.companionMaxHP,
+         companionHP: [Int: Int] = [:],
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)) {
         self.runIndex = runIndex
         self.book = book
@@ -208,7 +213,14 @@ struct WorldRun: Codable, Equatable, Sendable {
         encounterGraceTurns = try container.decodeIfPresent(Int.self, forKey: .encounterGraceTurns) ?? 0
         collapsedOnTurn = try container.decodeIfPresent(Int.self, forKey: .collapsedOnTurn)
         binderHP = try container.decodeIfPresent(Int.self, forKey: .binderHP) ?? Tuning.Encounter.binderMaxHP
-        companionHP = try container.decodeIfPresent(Int.self, forKey: .companionHP) ?? Tuning.Encounter.companionMaxHP
+        // A run saved when only one person could come brings that one person's health with it.
+        if let perMember = try? container.decodeIfPresent([Int: Int].self, forKey: .companionHP) {
+            companionHP = perMember ?? [:]
+        } else if let single = try? container.decode(Int.self, forKey: .companionHP) {
+            companionHP = [0: single]
+        } else {
+            companionHP = [:]
+        }
     }
 
     /// Stability band drives the world's escalating behaviour. Thresholds are tunable.

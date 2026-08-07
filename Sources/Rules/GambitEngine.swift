@@ -19,14 +19,14 @@ enum GambitEngine {
     }
 
     /// What an automated combatant does this turn, or `nil` if no rule both matched and could act.
-    static func decide(for actor: Combatant = .companion, in state: GameState) -> Decision? {
+    static func decide(for actor: Combatant = .companion(0), in state: GameState) -> Decision? {
         guard let run = state.worlds.activeRun, let encounter = run.activeEncounter else { return nil }
 
         // Disabled rules still occupy their slot and their position — switching one off is a way
         // of testing an order, not a way of getting a free slot.
         for rule in rules(for: actor, in: state).prefix(availableSlots(in: state)) where rule.isEnabled {
             guard rule.isWritable(with: state.base.ownedGambitComponents) else { continue }
-            guard let target = target(of: rule, actor: actor, run: run, encounter: encounter) else { continue }
+            guard let target = target(of: rule, actor: actor, run: run, encounter: encounter, state: state) else { continue }
             guard let action = action(of: rule, target: target, actor: actor,
                                       encounter: encounter, state: state) else {
                 continue // matched, but couldn't act — try the next rule down
@@ -39,7 +39,8 @@ enum GambitEngine {
     /// Whose rule list to run. The Binder's is only consulted once "write your own hand" is learned.
     static func rules(for actor: Combatant, in state: GameState) -> [GambitRule] {
         switch actor {
-        case .companion: state.base.companion.gambits
+        case .companion(let index):
+            state.base.roster.indices.contains(index) ? state.base.roster[index].gambits : []
         case .binder: state.base.hasAutomateSelfUnlock ? state.base.binderGambits : []
         case .foe: []
         }
@@ -64,7 +65,8 @@ enum GambitEngine {
     private static func target(of rule: GambitRule,
                                actor: Combatant,
                                run: WorldRun,
-                               encounter: EncounterState) -> Target? {
+                               encounter: EncounterState,
+                               state: GameState) -> Target? {
         guard let subject = ContentCatalog.shared.gambitComponent(rule.subject),
               let selector = subject.selector
         else { return nil }
@@ -75,7 +77,7 @@ enum GambitEngine {
 
         case "ally.any":
             // Whoever is worst off among those that match — the obvious intent of "an ally is hurt".
-            return party(in: run)
+            return party(in: run, state: state)
                 .filter { matches(rule, combatant: $0, run: run) }
                 .min { healthFraction($0, in: run) < healthFraction($1, in: run) }
                 .map { .ally($0) }
@@ -97,8 +99,11 @@ enum GambitEngine {
         }
     }
 
-    private static func party(in run: WorldRun) -> [Combatant] {
-        [Combatant.binder, .companion].filter { CombatRules.isAlive($0, in: run) }
+    /// Everybody standing. **The whole party**, not the two the engine used to know about — an
+    /// "ally is hurt" rule that could only ever see one ally is a rule that stops working the
+    /// moment a second person comes along.
+    private static func party(in run: WorldRun, state: GameState) -> [Combatant] {
+        CombatRules.party(of: state).filter { CombatRules.isAlive($0, in: run) }
     }
 
     private static func healthFraction(_ combatant: Combatant, in run: WorldRun) -> Double {

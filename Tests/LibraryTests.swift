@@ -593,10 +593,14 @@ final class LibraryTests: XCTestCase {
             XCTAssertFalse(joined.calling.isEmpty, "they joined without being anybody in particular")
             XCTAssertFalse(joined.gambits.isEmpty, "they joined with no idea what to do in a fight")
 
-            // And you can send them out instead of Quill.
+            // And you can take them **as well as** Quill — a party, not a swap.
             let index = try XCTUnwrap(store.state.base.roster.firstIndex { $0.traveller == id })
-            store.setActiveCompanion(index)
-            XCTAssertEqual(store.state.base.companion.traveller, id)
+            store.setComing(index, true)
+            XCTAssertTrue(store.state.base.activeParty.contains(index),
+                          "recruited them, took them, and they still aren't coming")
+            XCTAssertTrue(store.state.base.activeParty.contains(0),
+                          "taking somebody new pushed Quill out — that's a swap, not a party")
+            XCTAssertEqual(store.state.base.partyMembers.count, 3, "you and two others")
             return
         }
         XCTFail("no world in forty held anybody")

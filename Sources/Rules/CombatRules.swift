@@ -16,11 +16,14 @@ enum CombatRules {
     /// contact.
     ///
     /// The order is resolved once and stored, so a foe dying mid-round can't shift whose turn it is.
-    static func makeEncounter(id: InstanceID, foes: [FoeState], rng: inout SeededRNG) -> EncounterState {
-        var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = [
-            (.binder, Tuning.Encounter.binderInitiative, false),
-            (.companion, Tuning.Encounter.companionInitiative, false)
-        ]
+    /// - Parameter party: everybody who walked out with you. **All of them get a place in the
+    ///   order** — this is where a party of five becomes real, and it used to be a hardcoded two.
+    static func makeEncounter(id: InstanceID, foes: [FoeState], party: [Combatant] = [.binder, .companion(0)],
+                              names: [Int: String] = [:], rng: inout SeededRNG) -> EncounterState {
+        var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = party.map { member in
+            (member, member == .binder ? Tuning.Encounter.binderInitiative
+                                       : Tuning.Encounter.companionInitiative, false)
+        }
         for foe in foes {
             let slow = foe.stats.damageKind == .crush ? Tuning.Encounter.crushInitiativePenalty : 0
             ranked.append((.foe(foe.id), foe.stats.initiative - slow, foe.stats.strikesFirst))
@@ -39,6 +42,7 @@ enum CombatRules {
         return EncounterState(
             id: id,
             foes: foes,
+            partyNames: names,
             order: order,
             log: [foes.count == 1 ? "A \(foes[0].stats.displayName) notices you."
                                   : "They close in around you."]
@@ -53,7 +57,7 @@ enum CombatRules {
     static func equipped(_ slot: GearSlot, for actor: Combatant, in state: GameState) -> EquippedPiece? {
         switch actor {
         case .binder: state.base.binderEquipped[slot]
-        case .companion: state.base.companion.equipped[slot]
+        case .companion(let index): state.base.worn(slot, by: .member(index))
         case .foe: nil
         }
     }
@@ -66,7 +70,7 @@ enum CombatRules {
     static func stats(of actor: Combatant, in state: GameState) -> CharacterStats? {
         switch actor {
         case .binder: state.base.binderCharacter.stats
-        case .companion: state.base.companion.character.stats
+        case .companion(let index): state.base.character(.member(index)).stats
         case .foe: nil
         }
     }
@@ -74,7 +78,7 @@ enum CombatRules {
     static func rank(of actor: Combatant, in state: GameState) -> Rank {
         switch actor {
         case .binder: state.base.binderCharacter.rank
-        case .companion: state.base.companion.character.rank
+        case .companion(let index): state.base.character(.member(index)).rank
         case .foe: .front
         }
     }
@@ -121,11 +125,13 @@ enum CombatRules {
         return max(t.minimumMatchup, multiplier)
     }
 
-    static func companionAttack(in state: GameState) -> Int {
-        Tuning.Encounter.companionBaseAttack
-            + state.base.companion.weaponTier * Tuning.Encounter.attackPerWeaponTier
-            + CharacterRules.damageBonus(state.base.companion.character.stats,
-                                         with: damageKind(for: .companion, in: state))
+    static func companionAttack(_ index: Int, in state: GameState) -> Int {
+        let member = PartyMember.member(index)
+        let weaponTier = state.base.worn(.weapon, by: member)?.effectiveTier ?? 0
+        return Tuning.Encounter.companionBaseAttack
+            + weaponTier * Tuning.Encounter.attackPerWeaponTier
+            + CharacterRules.damageBonus(state.base.character(member).stats,
+                                         with: damageKind(for: .companion(index), in: state))
     }
 
     /// Armour softens what lands on the party. Never below a floor — armour shouldn't make a fight
@@ -215,7 +221,7 @@ enum CombatRules {
     static func bestReadySkill(for actor: Combatant, in encounter: EncounterState,
                                state: GameState) -> SkillDef? {
         guard let run = state.worlds.activeRun else { return nil }
-        let hurt = [Combatant.binder, .companion].contains {
+        let hurt = party(of: state).contains {
             let hp = health(of: $0, in: run)
             return hp.current > 0 && hp.current < hp.max
         }
@@ -373,7 +379,7 @@ enum CombatRules {
             let swapped: Rank = rankNow == .front ? .back : .front
             switch actor {
             case .binder: state.base.binderCharacter.rank = swapped
-            case .companion: state.base.companion.character.rank = swapped
+            case .companion(let index): state.base.withCharacter(.member(index)) { $0.rank = swapped }
             case .foe: break
             }
             encounter.extraTurns[actor, default: 0] += 1
@@ -468,8 +474,11 @@ enum CombatRules {
         switch actor {
         case .binder:
             CharacterRules.maximumHealth(state.base.binderCharacter, base: Tuning.Encounter.binderMaxHP)
-        case .companion:
-            CharacterRules.maximumHealth(state.base.companion.character, base: state.base.companion.maxHP)
+        case .companion(let index):
+            CharacterRules.maximumHealth(state.base.character(.member(index)),
+                                         base: state.base.roster.indices.contains(index)
+                                             ? state.base.roster[index].maxHP
+                                             : Tuning.Encounter.companionMaxHP)
         case .foe:
             0
         }
@@ -478,7 +487,8 @@ enum CombatRules {
     static func health(of actor: Combatant, in run: WorldRun) -> (current: Int, max: Int) {
         switch actor {
         case .binder: (run.binderHP, Tuning.Encounter.binderMaxHP)
-        case .companion: (run.companionHP, Tuning.Encounter.companionMaxHP)
+        case .companion(let index):
+            (run.companionHP[index] ?? Tuning.Encounter.companionMaxHP, Tuning.Encounter.companionMaxHP)
         case .foe(let id):
             run.activeEncounter?.foes.first { $0.id == id }.map { ($0.currentHP, $0.maxHP) } ?? (0, 1)
         }
@@ -551,7 +561,7 @@ enum CombatRules {
         }
 
         // The FF12 rule: an override covers that turn and then hands control back.
-        if actor == .companion { encounter.isCompanionOverridden = false }
+        if actor.rosterIndex != nil { encounter.isCompanionOverridden = false }
 
         run.activeEncounter = encounter
         state.worlds.activeRun = run
@@ -562,7 +572,7 @@ enum CombatRules {
     private static func baseAttack(of actor: Combatant, in state: GameState) -> Int {
         switch actor {
         case .binder: binderAttack(in: state)
-        case .companion: companionAttack(in: state)
+        case .companion(let index): companionAttack(index, in: state)
         case .foe(let id):
             state.worlds.activeRun?.activeEncounter?.foes.first { $0.id == id }?.stats.attack ?? 1
         }
@@ -665,7 +675,8 @@ enum CombatRules {
                              encounter: inout EncounterState) {
         switch target {
         case .binder: run.binderHP = max(0, run.binderHP - amount)
-        case .companion: run.companionHP = max(0, run.companionHP - amount)
+        case .companion(let index):
+            run.companionHP[index] = max(0, (run.companionHP[index] ?? Tuning.Encounter.companionMaxHP) - amount)
         case .foe(let id):
             if let index = encounter.foes.firstIndex(where: { $0.id == id }) {
                 encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
@@ -681,7 +692,9 @@ enum CombatRules {
                              healer: Combatant) {
         switch ally {
         case .binder: run.binderHP = min(Tuning.Encounter.binderMaxHP, run.binderHP + amount)
-        case .companion: run.companionHP = min(Tuning.Encounter.companionMaxHP, run.companionHP + amount)
+        case .companion(let index):
+            run.companionHP[index] = min(Tuning.Encounter.companionMaxHP,
+                                         (run.companionHP[index] ?? Tuning.Encounter.companionMaxHP) + amount)
         case .foe: return
         }
         encounter.note("\(actorName(healer, encounter: encounter)) — \(source) — restores \(amount) to \(actorName(ally, encounter: encounter)).")
@@ -723,9 +736,14 @@ enum CombatRules {
     static func actorName(_ actor: Combatant, encounter: EncounterState) -> String {
         switch actor {
         case .binder: "You"
-        case .companion: "Quill" // PLACEHOLDER — reads from CompanionState once the party grows
+        case .companion(let index): encounter.partyNames[index] ?? "Your companion"
         case .foe(let id): encounter.foes.first { $0.id == id }?.stats.displayName ?? "Something"
         }
+    }
+
+    /// Everybody who came, as combatants. The one place that answers "who is the party".
+    static func party(of state: GameState) -> [Combatant] {
+        state.base.partyMembers.map(\.combatant)
     }
 
     // MARK: Turn order
@@ -829,10 +847,11 @@ enum CombatRules {
             run.binderHP = max(0, run.binderHP - damage)
             encounter.note("You're still bleeding — \(damage).")
         }
-        if encounter.companionBleedRounds > 0, run.companionHP > 0 {
+        if encounter.companionBleedRounds > 0 {
             encounter.companionBleedRounds -= 1
-            run.companionHP = max(0, run.companionHP - damage)
-            encounter.note("Quill is still bleeding — \(damage).")
+            for index in run.companionHP.keys where (run.companionHP[index] ?? 0) > 0 {
+                run.companionHP[index] = max(0, (run.companionHP[index] ?? 0) - damage)
+            }
         }
         for index in encounter.foes.indices where encounter.foes[index].bleedRounds > 0
             && encounter.foes[index].isAlive {
@@ -891,7 +910,7 @@ enum CombatRules {
               let foeID = actor.foeID, let foe = encounter.foes.first(where: { $0.id == foeID })
         else { return }
 
-        let standing: [Combatant] = [.binder, .companion].filter { isAlive($0, in: run) }
+        let standing: [Combatant] = party(of: state).filter { isAlive($0, in: run) }
 
         // **The front rank takes the melee** (session 17 §4). Targeting was uniform, so standing at
         // the back was pure upside — less damage, no more risk of being chosen — which is half a
@@ -954,7 +973,7 @@ enum CombatRules {
             }
             let wasStanding = isAlive(target, in: run)
             hurt(target, by: amount, run: &run, encounter: &encounter)
-            if wasStanding, !isAlive(target, in: run), target == .companion {
+            if wasStanding, !isAlive(target, in: run), target.rosterIndex != nil {
                 encounter.note("\(actorName(target, encounter: encounter)) goes down. They'll be all right at home.")
             }
 
@@ -1052,18 +1071,23 @@ enum CombatRules {
     /// and one who levelled separately would drift out of the party.
     private static func awardExperience(for foes: [FoeState], encounter: inout EncounterState,
                                         state: inout GameState) {
-        let partyLevel = max(state.base.binderCharacter.level, state.base.companion.character.level)
+        let partyLevel = state.base.partyMembers.map { state.base.character($0).level }.max() ?? 1
         let earned = foes.reduce(0) {
             $0 + CharacterRules.experience(forDefeating: $1, partyLevel: partyLevel)
         }
         guard earned > 0 else { return }
 
         var gained: [String] = []
-        for member in PartyMember.allCases {
+        for member in state.base.partyMembers {
             var levels = 0
             state.base.withCharacter(member) { levels = CharacterRules.award(earned, to: &$0) }
             if levels > 0 {
-                let name = member == .binder ? "You are" : "\(state.base.companion.name) is"
+                let name: String
+                if let index = member.rosterIndex, state.base.roster.indices.contains(index) {
+                    name = "\(state.base.roster[index].name) is"
+                } else {
+                    name = "You are"
+                }
                 gained.append("\(name) level \(state.base.character(member).level).")
             }
         }

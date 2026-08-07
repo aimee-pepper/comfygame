@@ -77,13 +77,20 @@ struct EncounterView: View {
                           isActing: encounter.current == .binder && encounter.outcome == nil,
                           badge: nil)
 
-                PartyCard(actor: .companion,
-                          name: store.state.base.companion.name,
-                          icon: "person.fill",
-                          health: CombatRules.health(of: .companion, in: run),
-                          isActing: encounter.current == .companion && encounter.outcome == nil,
-                          badge: encounter.isCompanionOverridden ? "manual" : "auto")
-                    .onTapGesture { store.toggleCompanionOverride() }
+                // **Everybody who came.** One hardcoded card was the last place the party of two
+                // survived — the fight itself already knows how to run five.
+                ForEach(store.state.base.activeParty, id: \.self) { index in
+                    if store.state.base.roster.indices.contains(index) {
+                        PartyCard(actor: .companion(index),
+                                  name: store.state.base.roster[index].name,
+                                  icon: store.state.base.roster[index].icon,
+                                  health: CombatRules.health(of: .companion(index), in: run),
+                                  isActing: encounter.current == .companion(index) && encounter.outcome == nil,
+                                  badge: encounter.isCompanionOverridden ? "manual" : "auto")
+                            .onTapGesture { store.toggleCompanionOverride() }
+                    }
+                }
+                Group { EmptyView() }
                     .overlay(alignment: .bottom) {
                         Text(encounter.isCompanionOverridden ? "tap: back to gambits" : "tap: take over next turn")
                             .font(.caption2)
@@ -259,14 +266,17 @@ struct EncounterView: View {
         store.takeCombatAction(.useItem(stack: stack.id, ally: weakestAlly()))
     }
 
-    /// Healing goes to whoever needs it most — the obvious intent, and one fewer tap.
+    /// Healing goes to whoever needs it most — the obvious intent, and one fewer tap. Across the
+    /// whole party now, rather than a comparison between the only two people who could be hurt.
     private func weakestAlly() -> Combatant {
         guard let run else { return .binder }
-        let binder = CombatRules.health(of: .binder, in: run)
-        let companion = CombatRules.health(of: .companion, in: run)
-        let binderShare = Double(binder.current) / Double(max(1, binder.max))
-        let companionShare = Double(companion.current) / Double(max(1, companion.max))
-        return binderShare <= companionShare ? .binder : .companion
+        func share(_ who: Combatant) -> Double {
+            let health = CombatRules.health(of: who, in: run)
+            return Double(health.current) / Double(max(1, health.max))
+        }
+        return CombatRules.party(of: store.state)
+            .filter { CombatRules.isAlive($0, in: run) }
+            .min { share($0) < share($1) } ?? .binder
     }
 
     // MARK: Outcome

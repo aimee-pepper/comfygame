@@ -82,7 +82,7 @@ final class CombatTests: XCTestCase {
         let encounter = try XCTUnwrap(store.activeEncounter)
 
         XCTAssertEqual(encounter.order.first, .binder)
-        XCTAssertEqual(encounter.order.dropFirst().first, .companion)
+        XCTAssertEqual(encounter.order.dropFirst().first, .companion(0))
         XCTAssertEqual(encounter.order.count, 4)
         XCTAssertEqual(encounter.current, .binder, "The player moves first")
     }
@@ -266,7 +266,7 @@ final class CombatTests: XCTestCase {
 
         // Take the Binder's turn; the game should now stop and wait on the companion.
         store.takeCombatAction(.attack(foe: try XCTUnwrap(foes(store).first).id))
-        XCTAssertEqual(store.actingCombatant, .companion, "The override stops the gambits taking over")
+        XCTAssertEqual(store.actingCombatant, .companion(0), "The override stops the gambits taking over")
 
         store.takeCombatAction(.attack(foe: try XCTUnwrap(foes(store).first).id))
         XCTAssertFalse(store.activeEncounter?.isCompanionOverridden ?? true,
@@ -659,8 +659,8 @@ final class CombatTests: XCTestCase {
         func bleedPerRound(_ traits: CreatureTraits) throws -> Int {
             let store = inFightWith([traits])
             let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
-            giveTheTurnTo(.companion, in: store)
-            store.mutate("test: use it") { CombatRules.perform(.skill("flense", foe: foeID), by: .companion, in: &$0) }
+            giveTheTurnTo(.companion(0), in: store)
+            store.mutate("test: use it") { CombatRules.perform(.skill("flense", foe: foeID), by: .companion(0), in: &$0) }
             return store.activeEncounter?.foeBleeds[foeID]?.damage ?? 0
         }
 
@@ -730,8 +730,8 @@ final class CombatTests: XCTestCase {
         // particular animal, kept so the entry can say how this one compared.
         let specimensBefore = store.state.reality.discovery.specimens.count
 
-        giveTheTurnTo(.companion, in: store)
-        store.mutate("test: use it") { CombatRules.perform(.skill("read", foe: foe.id), by: .companion, in: &$0) }
+        giveTheTurnTo(.companion(0), in: store)
+        store.mutate("test: use it") { CombatRules.perform(.skill("read", foe: foe.id), by: .companion(0), in: &$0) }
 
         XCTAssertGreaterThan(store.state.reality.discovery.specimens.count, specimensBefore,
                              "Read didn't write a bestiary specimen")
@@ -808,8 +808,8 @@ final class CombatTests: XCTestCase {
 
         let store = inFightWith([burning])
         let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
-        giveTheTurnTo(.companion, in: store)
-        store.mutate("test: snuff it") { CombatRules.perform(.skill("snuff", foe: foeID), by: .companion, in: &$0) }
+        giveTheTurnTo(.companion(0), in: store)
+        store.mutate("test: snuff it") { CombatRules.perform(.skill("snuff", foe: foeID), by: .companion(0), in: &$0) }
         forceTheFoeToStrike(in: store)
 
         let carried = store.activeEncounter?.statuses.values.flatMap { $0 } ?? []
@@ -824,8 +824,8 @@ final class CombatTests: XCTestCase {
             state.worlds.activeRun?.activeEncounter?.statuses[.binder] =
                 [StatusState(kind: .poison, damage: 2, rounds: 4)]
         }
-        giveTheTurnTo(.companion, in: store)
-        store.mutate("test: steady") { CombatRules.perform(.skill("steady", ally: .binder), by: .companion, in: &$0) }
+        giveTheTurnTo(.companion(0), in: store)
+        store.mutate("test: steady") { CombatRules.perform(.skill("steady", ally: .binder), by: .companion(0), in: &$0) }
         XCTAssertTrue((store.activeEncounter?.statuses[.binder] ?? []).isEmpty,
                       "Steady left the poison in")
     }
@@ -839,12 +839,12 @@ final class CombatTests: XCTestCase {
         burning.armament.setTotal(60)
 
         let store = inFightWith([burning])
-        giveTheTurnTo(.companion, in: store)
-        store.mutate("test: ward") { CombatRules.perform(.skill("ward"), by: .companion, in: &$0) }
+        giveTheTurnTo(.companion(0), in: store)
+        store.mutate("test: ward") { CombatRules.perform(.skill("ward"), by: .companion(0), in: &$0) }
 
         // With nothing stated, a Ward guards the likeliest harm — and an emanation wins, because
         // nothing you wear stops one.
-        XCTAssertEqual(store.activeEncounter?.wards[.companion]?.harm, .emanation(.heat),
+        XCTAssertEqual(store.activeEncounter?.wards[.companion(0)]?.harm, .emanation(.heat),
                        "the Ward guarded a blow while something was busy setting fire to us")
     }
 
@@ -887,12 +887,12 @@ final class CombatTests: XCTestCase {
     /// their feet at the base — health is run-scoped, so coming home is the revival.
     func testACompanionPassesOutRatherThanDying() throws {
         let store = inFightWith([armoured()])
-        store.mutate("test: they go down") { $0.worlds.activeRun?.companionHP = 0 }
+        store.mutate("test: they go down") { $0.worlds.activeRun?.companionHP[0] = 0 }
         store.mutate("test: check") { CombatRules.checkOutcome(in: &$0) }
 
         let run = try XCTUnwrap(store.state.worlds.activeRun)
         XCTAssertNil(run.activeEncounter?.outcome, "a companion going down ended the fight")
-        XCTAssertTrue(CombatRules.hasPassedOut(.companion, in: run))
+        XCTAssertTrue(CombatRules.hasPassedOut(.companion(0), in: run))
         XCTAssertFalse(CombatRules.hasPassedOut(.binder, in: run))
     }
 
@@ -1043,6 +1043,123 @@ final class CombatTests: XCTestCase {
             encounter.turnIndex = encounter.order.firstIndex(of: .binder) ?? 0
             run.activeEncounter = encounter
             state.worlds.activeRun = run
+        }
+        return store
+    }
+
+    // MARK: A party of five
+
+    /// **Everybody who came gets a turn.** Aimee asked for this repeatedly and I kept deferring it;
+    /// the type was the reason — one nameless `.companion` meant one slot in the order, one place to
+    /// keep health, and one rule list, so choosing four people at the fire could only ever be a lie.
+    @MainActor
+    func testEverybodyWhoCameIsInTheTurnOrder() throws {
+        let store = try storeWithAFullParty()
+        let encounter = try XCTUnwrap(store.activeEncounter)
+
+        for index in store.state.base.activeParty {
+            XCTAssertTrue(encounter.order.contains(.companion(index)),
+                          "roster \(index) came along and never gets to move")
+        }
+        XCTAssertTrue(encounter.order.contains(.binder))
+        XCTAssertEqual(encounter.order.filter(\.isParty).count, store.state.base.partyMembers.count)
+    }
+
+    /// **They are hurt separately.** One shared health field is the other half of why five couldn't
+    /// fight: a second person had nowhere to be wounded.
+    @MainActor
+    func testEachOfThemIsHurtSeparately() throws {
+        let store = try storeWithAFullParty()
+        let party = store.state.base.activeParty
+        XCTAssertGreaterThan(party.count, 1, "fixture: needs more than one of them")
+
+        let first = party[0], second = party[1]
+        store.mutate("test: hurt one of them") { state in
+            let full = state.worlds.activeRun?.companionHP[first] ?? Tuning.Encounter.companionMaxHP
+            state.worlds.activeRun?.companionHP[first] = full - 5
+        }
+        let run = try XCTUnwrap(store.state.worlds.activeRun)
+        XCTAssertLessThan(CombatRules.health(of: .companion(first), in: run).current,
+                          CombatRules.health(of: .companion(second), in: run).current,
+                          "hurting one of them hurt all of them")
+    }
+
+    /// Each of them runs their own rules, and the log says so by name.
+    @MainActor
+    func testEachOfThemActsOnTheirOwnRulesAndIsNamed() throws {
+        let store = try storeWithAFullParty()
+        var guardCount = 0
+        while store.activeEncounter?.outcome == nil, guardCount < 40 {
+            guardCount += 1
+            guard let foe = store.activeEncounter?.livingFoes.first else { break }
+            store.takeCombatAction(.attack(foe: foe.id))
+        }
+        let log = store.activeEncounter?.log.joined(separator: "\n") ?? ""
+        for index in store.state.base.activeParty {
+            let name = store.state.base.roster[index].name
+            XCTAssertTrue(log.contains(name), "\(name) came along and never did anything:\n\(log)")
+        }
+    }
+
+    /// Healing reaches whoever is worst off across the whole party, not whichever of two.
+    @MainActor
+    func testTheWholePartyIsSearchedForWhoeverIsWorstOff() throws {
+        let store = try storeWithAFullParty()
+        let party = store.state.base.activeParty
+        let unlucky = party[party.count - 1]
+        store.mutate("test: nearly out") { state in
+            state.worlds.activeRun?.companionHP[unlucky] = 1
+        }
+        let run = try XCTUnwrap(store.state.worlds.activeRun)
+        let worst = CombatRules.party(of: store.state)
+            .filter { CombatRules.isAlive($0, in: run) }
+            .min { a, b in
+                let ha = CombatRules.health(of: a, in: run), hb = CombatRules.health(of: b, in: run)
+                return Double(ha.current) / Double(ha.max) < Double(hb.current) / Double(hb.max)
+            }
+        XCTAssertEqual(worst, .companion(unlucky),
+                       "the party search stopped at the first two people")
+    }
+
+    /// Three people at the fire, all of them coming, in a fight.
+    @MainActor
+    private func storeWithAFullParty() throws -> GameStore {
+        let store = GameStore(io: .temporary(name: "party5-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 5000 }
+        store.mutate("test: a fire with people at it") { state in
+            var second = CompanionState(); second.name = "Bramwell"; second.gambits = GambitStarter.rules
+            var third = CompanionState(); third.name = "Corvin"; third.gambits = GambitStarter.rules
+            state.base.roster = [CompanionState(), second, third]
+            state.base.activeParty = [0, 1, 2]
+        }
+        store.bindAndDepart()
+        guard store.state.worlds.activeRun != nil else { throw XCTSkip("couldn't depart") }
+
+        var traits = CreatureTraits()
+        traits.covering = Covering(hardness: 10, length: 10, coverage: 20)
+        let stats = CombatStats.derived(from: traits, name: "Thing", icon: "pawprint")
+        store.mutate("test: a fight") { state in
+            guard var run = state.worlds.activeRun else { return }
+            var rng = SeededRNG(seed: 99)
+            // Tough enough that the fight lasts a full round or two — with four of you swinging,
+            // a couple of soft things die before everybody has had a turn.
+            var burly = stats
+            burly.maxHP = 400
+            let foes = (1...2).map {
+                FoeState(id: InstanceID(rawValue: UInt64($0)), traits: traits,
+                         stats: burly, currentHP: burly.maxHP)
+            }
+            run.activeEncounter = CombatRules.makeEncounter(
+                id: InstanceID(rawValue: 7), foes: foes,
+                party: CombatRules.party(of: state),
+                names: state.base.activeParty.reduce(into: [Int: String]()) {
+                    $0[$1] = state.base.roster[$1].name
+                },
+                rng: &rng)
+            state.worlds.activeRun = run
+            // A fight may open on somebody else's turn, and the real path kicks the automatic ones
+            // off after building the encounter. Without this the fixture just stands there.
+            CombatRules.runAutomaticTurns(in: &state)
         }
         return store
     }

@@ -234,7 +234,7 @@ enum WorldRules {
     /// **Finding pays as well as fighting** (session 17 §2). A game whose progression is literacy
     /// shouldn't reward only killing.
     static func awardDiscovery(_ kind: CharacterRules.Discovery, in state: inout GameState) {
-        for member in PartyMember.allCases {
+        for member in state.base.partyMembers {
             state.base.withCharacter(member) { CharacterRules.award(kind.experience, to: &$0) }
         }
     }
@@ -294,8 +294,9 @@ enum WorldRules {
         switch member {
         case .binder:
             run.binderHP = min(CombatRules.maximumHealth(of: .binder, in: state), run.binderHP + healed)
-        case .companion:
-            run.companionHP = min(CombatRules.maximumHealth(of: .companion, in: state), run.companionHP + healed)
+        case .member(let index):
+            let ceiling = CombatRules.maximumHealth(of: .companion(index), in: state)
+            run.companionHP[index] = min(ceiling, (run.companionHP[index] ?? ceiling) + healed)
         }
         _ = run.satchelItems.stacks[index].removing(1)
         if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
@@ -786,8 +787,16 @@ enum WorldRules {
         }
         guard !foes.isEmpty else { return }
 
+        // **Everybody who came gets a place in the order.** This is the line that makes a party of
+        // five a party of five rather than a list on the Firepit screen.
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
-                                                        foes: foes, rng: &run.rng)
+                                                        foes: foes,
+                                                        party: CombatRules.party(of: state),
+                                                        names: state.base.activeParty.reduce(into: [Int: String]()) {
+                                                            guard state.base.roster.indices.contains($1) else { return }
+                                                            $0[$1] = state.base.roster[$1].name
+                                                        },
+                                                        rng: &run.rng)
         state.worlds.activeRun = run
 
         // **Somebody has to move first, and it may not be you.** Automatic turns used to be kicked

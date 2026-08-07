@@ -26,24 +26,24 @@ final class GearAndRulesTests: XCTestCase {
 
         let blade = ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen")
         store.mutate("test: haul it home") { $0.base.inventory.add(blade) }
-        store.equip(blade, on: PartyMember.companion)
+        store.equip(blade, on: PartyMember.member(0))
 
         let tier = ContentCatalog.shared.item("blade_keen")?.gear?.tier
         XCTAssertEqual(store.state.base.companion.weaponTier, tier)
 
-        store.unequip(.weapon, from: PartyMember.companion)
+        store.unequip(.weapon, from: PartyMember.member(0))
         XCTAssertEqual(store.state.base.companion.weaponTier, 0, "taking it off left the tier behind")
     }
 
     func testWearingSomethingActuallyHitsHarder() {
         let store = GameStore(io: .temporary(name: "gear-\(UUID().uuidString)"))
-        let bare = CombatRules.companionAttack(in: store.state)
+        let bare = CombatRules.companionAttack(0, in: store.state)
 
         let blade = ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_binders")
         store.mutate("test: haul it home") { $0.base.inventory.add(blade) }
-        store.equip(blade, on: PartyMember.companion)
+        store.equip(blade, on: PartyMember.member(0))
 
-        XCTAssertGreaterThan(CombatRules.companionAttack(in: store.state), bare)
+        XCTAssertGreaterThan(CombatRules.companionAttack(0, in: store.state), bare)
     }
 
     func testSitesCarryGearAndRuinsCarryTheBest() {
@@ -97,12 +97,12 @@ final class GearAndRulesTests: XCTestCase {
 
     func testASegmentCanBeChangedWithoutRebuildingTheRule() throws {
         let store = GameStore(io: .temporary(name: "rules-\(UUID().uuidString)"))
-        guard let rule = store.gambits(for: .companion).first else { return XCTFail("no starting rules") }
+        guard let rule = store.gambits(for: .companion(0)).first else { return XCTFail("no starting rules") }
         guard let other = store.ownedComponents(.action).first(where: { $0.id != rule.action })
         else { throw XCTSkip("only one action known") }
 
         store.setGambitPart(rule.id, kind: .action, to: other.id)
-        let updated = store.gambits(for: .companion).first
+        let updated = store.gambits(for: .companion(0)).first
         XCTAssertEqual(updated?.action, other.id)
         XCTAssertEqual(updated?.id, rule.id, "editing a part replaced the whole rule")
         XCTAssertEqual(updated?.subject, rule.subject, "editing one part changed another")
@@ -110,20 +110,20 @@ final class GearAndRulesTests: XCTestCase {
 
     func testAConditionCanBeClearedBackToUnconditional() {
         let store = GameStore(io: .temporary(name: "rules-\(UUID().uuidString)"))
-        guard let rule = store.gambits(for: .companion).first(where: { $0.hasCondition })
+        guard let rule = store.gambits(for: .companion(0)).first(where: { $0.hasCondition })
         else { return XCTFail("no conditional starting rule") }
 
         store.setGambitPart(rule.id, kind: .property, to: nil)
-        XCTAssertFalse(store.gambits(for: .companion).first { $0.id == rule.id }?.hasCondition ?? true)
+        XCTAssertFalse(store.gambits(for: .companion(0)).first { $0.id == rule.id }?.hasCondition ?? true)
     }
 
     func testSwitchingARuleOffKeepsItButStopsItFiring() {
         let store = GameStore(io: .temporary(name: "rules-\(UUID().uuidString)"))
-        guard let rule = store.gambits(for: .companion).first else { return XCTFail("no rules") }
-        let countBefore = store.gambits(for: .companion).count
+        guard let rule = store.gambits(for: .companion(0)).first else { return XCTFail("no rules") }
+        let countBefore = store.gambits(for: .companion(0)).count
 
         store.setGambitEnabled(rule.id, false)
-        let after = store.gambits(for: .companion)
+        let after = store.gambits(for: .companion(0))
         XCTAssertEqual(after.count, countBefore, "switching off deleted the rule")
         XCTAssertEqual(after.first?.id, rule.id, "switching off moved the rule")
         XCTAssertFalse(after.first?.isEnabled ?? true)
@@ -136,15 +136,15 @@ final class GearAndRulesTests: XCTestCase {
         guard var state = Optional(store.state), state.worlds.activeRun != nil else {
             return XCTFail("couldn't depart")
         }
-        guard let rule = store.gambits(for: .companion).first else { return XCTFail("no rules") }
+        guard let rule = store.gambits(for: .companion(0)).first else { return XCTFail("no rules") }
 
         // With it on, it's a candidate; with it off, it isn't.
         state.base.companion.gambits = [rule]
-        let live = GambitEngine.rules(for: .companion, in: state).filter(\.isEnabled)
+        let live = GambitEngine.rules(for: .companion(0), in: state).filter(\.isEnabled)
         XCTAssertEqual(live.count, 1)
 
         state.base.companion.gambits[0].isEnabled = false
-        XCTAssertTrue(GambitEngine.rules(for: .companion, in: state).filter(\.isEnabled).isEmpty)
+        XCTAssertTrue(GambitEngine.rules(for: .companion(0), in: state).filter(\.isEnabled).isEmpty)
     }
 
     func testARuleSurvivesAForceQuitWithItsSwitchPosition() throws {
@@ -153,13 +153,13 @@ final class GearAndRulesTests: XCTestCase {
         var ruleID: InstanceID?
         do {
             let store = GameStore(io: io)
-            guard let rule = store.gambits(for: .companion).first else { return XCTFail("no rules") }
+            guard let rule = store.gambits(for: .companion(0)).first else { return XCTFail("no rules") }
             ruleID = rule.id
             store.setGambitEnabled(rule.id, false)
             store.flushNow()
         }
         let resumed = GameStore(io: io)
-        XCTAssertEqual(resumed.gambits(for: .companion).first { $0.id == ruleID }?.isEnabled, false)
+        XCTAssertEqual(resumed.gambits(for: .companion(0)).first { $0.id == ruleID }?.isEnabled, false)
     }
 
     // MARK: Is it an improvement?
@@ -172,21 +172,21 @@ final class GearAndRulesTests: XCTestCase {
         let binders = try XCTUnwrap(ContentCatalog.shared.item("blade_binders"))
 
         // Nothing worn: the delta is the whole of what it gives.
-        XCTAssertEqual(store.gearDelta(wearing: chipped, for: PartyMember.companion),
+        XCTAssertEqual(store.gearDelta(wearing: chipped, for: PartyMember.member(0)),
                        (chipped.gear?.tier ?? 0) * Tuning.Encounter.attackPerWeaponTier)
 
         store.mutate("test: haul it home") { $0.base.inventory.add(
             ItemStack(id: InstanceID(rawValue: 1), catalogID: chipped.id)) }
-        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: chipped.id), on: PartyMember.companion)
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: chipped.id), on: PartyMember.member(0))
 
         // Against something worn, it's the difference — and it matches what combat will actually do.
-        let promised = store.gearDelta(wearing: binders, for: PartyMember.companion)
-        let before = CombatRules.companionAttack(in: store.state)
+        let promised = store.gearDelta(wearing: binders, for: PartyMember.member(0))
+        let before = CombatRules.companionAttack(0, in: store.state)
         store.mutate("test: haul the better one home") { $0.base.inventory.add(
             ItemStack(id: InstanceID(rawValue: 2), catalogID: binders.id)) }
-        store.equip(ItemStack(id: InstanceID(rawValue: 2), catalogID: binders.id), on: PartyMember.companion)
+        store.equip(ItemStack(id: InstanceID(rawValue: 2), catalogID: binders.id), on: PartyMember.member(0))
 
-        XCTAssertEqual(CombatRules.companionAttack(in: store.state) - before, promised,
+        XCTAssertEqual(CombatRules.companionAttack(0, in: store.state) - before, promised,
                        "the badge promised a number the fight didn't deliver")
     }
 
@@ -196,21 +196,21 @@ final class GearAndRulesTests: XCTestCase {
         let poor = try XCTUnwrap(ContentCatalog.shared.item("guard_padded"))
         store.mutate("test: haul it home") { $0.base.inventory.add(
             ItemStack(id: InstanceID(rawValue: 1), catalogID: good.id)) }
-        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: good.id), on: PartyMember.companion)
-        XCTAssertLessThan(store.gearDelta(wearing: poor, for: PartyMember.companion), 0)
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: good.id), on: PartyMember.member(0))
+        XCTAssertLessThan(store.gearDelta(wearing: poor, for: PartyMember.member(0)), 0)
     }
 
     func testTheUpgradeNudgeOnlyFiresWhenSomethingIsActuallyBetter() throws {
         let store = GameStore(io: .temporary(name: "nudge-\(UUID().uuidString)"))
-        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon, member: PartyMember.companion), "nudged with an empty storehouse")
+        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon, member: PartyMember.member(0)), "nudged with an empty storehouse")
 
         let best = try XCTUnwrap(ContentCatalog.shared.item("blade_binders"))
         store.mutate("test: haul it home") { $0.base.inventory.add(
             ItemStack(id: InstanceID(rawValue: 1), catalogID: best.id)) }
-        XCTAssertTrue(store.hasUpgradeAvailable(for: .weapon, member: PartyMember.companion))
+        XCTAssertTrue(store.hasUpgradeAvailable(for: .weapon, member: PartyMember.member(0)))
 
-        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: best.id), on: PartyMember.companion)
-        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon, member: PartyMember.companion),
+        store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: best.id), on: PartyMember.member(0))
+        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon, member: PartyMember.member(0)),
                        "still nudging about the thing already worn")
     }
 
@@ -285,10 +285,10 @@ final class GearAndRulesTests: XCTestCase {
             state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: "blade_chipped"))
         }
         store.equip(ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen"), on: PartyMember.binder)
-        store.equip(ItemStack(id: InstanceID(rawValue: 2), catalogID: "blade_chipped"), on: PartyMember.companion)
+        store.equip(ItemStack(id: InstanceID(rawValue: 2), catalogID: "blade_chipped"), on: PartyMember.member(0))
 
         XCTAssertEqual(CombatRules.damageKind(for: .binder, in: store.state), .pierce)
-        XCTAssertEqual(CombatRules.damageKind(for: .companion, in: store.state), .rend)
+        XCTAssertEqual(CombatRules.damageKind(for: .companion(0), in: store.state), .rend)
     }
 
     /// **If you have four, you can wear four.**
@@ -308,10 +308,10 @@ final class GearAndRulesTests: XCTestCase {
         let bin = try XCTUnwrap(store.state.base.inventory.stacks.first)
         store.equip(bin, on: PartyMember.binder)
         let after = try XCTUnwrap(store.state.base.inventory.stacks.first)
-        store.equip(after, on: PartyMember.companion)
+        store.equip(after, on: PartyMember.member(0))
 
         XCTAssertEqual(store.worn(.armor, by: PartyMember.binder), "guard_padded")
-        XCTAssertEqual(store.worn(.armor, by: PartyMember.companion), "guard_padded",
+        XCTAssertEqual(store.worn(.armor, by: PartyMember.member(0)), "guard_padded",
                        "dressing one of them stripped the other")
         XCTAssertEqual(store.state.base.inventory.stacks.first?.count, 2,
                        "the two they are wearing didn't come out of the bin")
@@ -328,8 +328,8 @@ final class GearAndRulesTests: XCTestCase {
         store.equip(stack, on: PartyMember.binder)
         XCTAssertEqual(store.worn(.weapon, by: PartyMember.binder), "blade_keen")
 
-        store.equip(stack, on: PartyMember.companion)
-        XCTAssertNil(store.worn(.weapon, by: PartyMember.companion), "dressed them from an empty shelf")
+        store.equip(stack, on: PartyMember.member(0))
+        XCTAssertNil(store.worn(.weapon, by: PartyMember.member(0)), "dressed them from an empty shelf")
         XCTAssertEqual(store.worn(.weapon, by: PartyMember.binder), "blade_keen",
                        "the sword was taken off the person actually holding it")
     }

@@ -41,7 +41,7 @@ struct PartyRosterView: View {
     /// Thumbnail and brief stats. Enough to choose who to open, and nothing more.
     private func card(_ slot: PartySlot) -> some View {
         let character = store.character(of: slot)
-        let isComing = slot.combatant(activeCompanion: store.state.base.activeCompanion) != nil
+        let isComing = store.state.base.partyMembers.contains(slot)
         return StationCard(title: store.name(of: slot), icon: icon(slot)) {
             HStack(spacing: 14) {
                 statChip("Level", "\(character.level)")
@@ -212,17 +212,17 @@ private struct CharacterPage: View {
 
     @ViewBuilder
     private var rulesCard: some View {
-        switch slot.combatant(activeCompanion: store.state.base.activeCompanion) {
-        case .companion:
-            GambitEditorView(owner: .companion)
+        switch slot.combatant {
+        case .companion(let index):
+            GambitEditorView(owner: .companion(index))
         case .binder:
             if store.state.base.hasAutomateSelfUnlock {
                 GambitEditorView(owner: .binder)
             } else {
                 ComingLater("Writing your own hand is studied under Instruction at the Workshop. Until then you act for yourself every turn.")
             }
-        case .none:
-            ComingLater("\(store.name(of: slot)) keeps the fire in for now. Their rules matter once all five of you fight together.")
+        case .foe:
+            EmptyView()
         }
     }
 }

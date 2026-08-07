@@ -134,7 +134,8 @@ extension GameStore {
     var canEditGambits: Bool { activeEncounter == nil }
 
     func gambits(for owner: Combatant) -> [GambitRule] {
-        owner == .binder ? state.base.binderGambits : state.base.companion.gambits
+        guard let index = owner.rosterIndex else { return state.base.binderGambits }
+        return state.base.roster.indices.contains(index) ? state.base.roster[index].gambits : []
     }
 
     /// Components you own, of one kind — what the rule builder can offer you.
@@ -152,18 +153,22 @@ extension GameStore {
     }
 
     /// One accessor for both rule lists, so editing can't accidentally diverge between them.
+    /// Whose rule list is being edited. **Everybody at the fire has their own** — it used to be
+    /// "the Binder's, or the companion's", which was fine while there was one of them.
     private func withGambits(_ owner: Combatant, _ body: @escaping (inout [GambitRule]) -> Void) -> (inout GameState) -> Void {
         { state in
-            if owner == .binder { body(&state.base.binderGambits) } else { body(&state.base.companion.gambits) }
+            guard let index = owner.rosterIndex else { return body(&state.base.binderGambits) }
+            guard state.base.roster.indices.contains(index) else { return }
+            body(&state.base.roster[index].gambits)
         }
     }
 
-    func moveGambit(from source: IndexSet, to destination: Int, for owner: Combatant = .companion) {
+    func moveGambit(from source: IndexSet, to destination: Int, for owner: Combatant = .companion(0)) {
         guard canEditGambits else { return }
         mutate("reorder rules", flush: true, withGambits(owner) { $0.move(fromOffsets: source, toOffset: destination) })
     }
 
-    func removeGambit(at offsets: IndexSet, for owner: Combatant = .companion) {
+    func removeGambit(at offsets: IndexSet, for owner: Combatant = .companion(0)) {
         guard canEditGambits else { return }
         mutate("remove rule", withGambits(owner) { $0.remove(atOffsets: offsets) })
     }
@@ -174,7 +179,7 @@ extension GameStore {
     /// Change one segment of a rule in place. The whole point of the editor is that you never
     /// leave the list to do this.
     func setGambitPart(_ ruleID: InstanceID, kind: GambitComponentDef.Kind,
-                       to component: GambitComponentID?, for owner: Combatant = .companion) {
+                       to component: GambitComponentID?, for owner: Combatant = .companion(0)) {
         mutate("edit rule", flush: true, withGambits(owner) { rules in
             guard let index = rules.firstIndex(where: { $0.id == ruleID }) else { return }
             switch kind {
@@ -188,7 +193,7 @@ extension GameStore {
     }
 
     /// Switch a rule off without losing it, so an order can be tested rather than rebuilt.
-    func setGambitEnabled(_ ruleID: InstanceID, _ isEnabled: Bool, for owner: Combatant = .companion) {
+    func setGambitEnabled(_ ruleID: InstanceID, _ isEnabled: Bool, for owner: Combatant = .companion(0)) {
         mutate("toggle rule", flush: true, withGambits(owner) { rules in
             guard let index = rules.firstIndex(where: { $0.id == ruleID }) else { return }
             rules[index].isEnabled = isEnabled
@@ -200,7 +205,7 @@ extension GameStore {
     /// Deliberately not a blank: a rule with no subject and no action can't be rendered as a
     /// sentence, and a half-sentence is harder to fix than a wrong one.
     @discardableResult
-    func addBlankGambit(for owner: Combatant = .companion) -> Bool {
+    func addBlankGambit(for owner: Combatant = .companion(0)) -> Bool {
         guard let subject = ownedComponents(.subject).first,
               let action = ownedComponents(.action).first
         else { return false }
@@ -208,7 +213,7 @@ extension GameStore {
                                     subject: subject.id, action: action.id), for: owner)
     }
 
-    func addGambit(_ rule: GambitRule, for owner: Combatant = .companion) -> Bool {
+    func addGambit(_ rule: GambitRule, for owner: Combatant = .companion(0)) -> Bool {
         guard canEditGambits, rule.isWritable(with: state.base.ownedGambitComponents) else { return false }
         mutate("write a rule", flush: true, withGambits(owner) { list in
             var written = rule

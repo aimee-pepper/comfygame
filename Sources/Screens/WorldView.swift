@@ -599,13 +599,13 @@ private struct UseItemSheet: View {
             List {
                 ForEach(store.carriedConsumables) { stack in
                     Section {
-                        ForEach(PartyMember.allCases) { member in
+                        ForEach(store.partyMembers) { member in
                             Button {
                                 store.useItemInWorld(stack, on: member)
                                 dismiss()
                             } label: {
                                 LabeledRow(icon: "heart.fill",
-                                           label: member == .binder ? "You" : store.state.base.companion.name,
+                                           label: store.name(of: member),
                                            value: health(of: member))
                                 .frame(minHeight: 44)
                                 .contentShape(Rectangle())

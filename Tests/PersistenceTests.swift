@@ -58,7 +58,7 @@ final class PersistenceTests: XCTestCase {
                             creatureID: "ink_hound",
                             stats: CombatStats(displayName: "Ink Hound", icon: "pawprint", maxHP: 16, attack: 4),
                             currentHP: 9)],
-            order: [.binder, .companion, .foe(InstanceID(rawValue: 1))],
+            order: [.binder, .companion(0), .foe(InstanceID(rawValue: 1))],
             log: ["You hit Ink Hound for 5."]
         )
         encounter.turnIndex = 1

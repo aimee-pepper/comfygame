@@ -222,21 +222,10 @@ extension GameStore {
         }
     }
 
-    /// What each of them is wearing. **Both carry their own** (Aimee, 5 Aug).
-    func worn(_ slot: GearSlot, by member: PartyMember) -> EquippedPiece? {
-        state.base.worn(slot, by: member)
-    }
-
     /// What wearing this would change, in the units the fight actually uses.
     ///
     /// A tier number only answers "is this better?" if you already know the formula. This answers
     /// it directly: **+4 damage**, or **−2 protection**, or no change at all.
-    func gearDelta(wearing stack: ItemStack, for member: PartyMember) -> Int {
-        delta(tier: stack.effectiveTier,
-              slot: ContentCatalog.shared.item(stack.catalogID)?.gear?.slot,
-              for: member)
-    }
-
     /// The same question about a piece you don't hold — "what would one of these be worth?"
     func gearDelta(wearing definition: ItemDef, for member: PartyMember) -> Int {
         delta(tier: definition.gear?.tier ?? 0, slot: definition.gear?.slot, for: member)
@@ -255,37 +244,6 @@ extension GameStore {
     /// so a better blade doesn't sit in a list going unnoticed.
     func hasUpgradeAvailable(for slot: GearSlot, member: PartyMember) -> Bool {
         wearable(in: slot).contains { gearDelta(wearing: $0, for: member) > 0 }
-    }
-
-    /// Put something on.
-    ///
-    /// **It comes out of the bin**, and whatever it replaces goes back in. That's the fix for a
-    /// real bug: equipping used to claim a piece by *name* and strip it off whoever else was
-    /// wearing one, so a storehouse holding four padded guards could still only dress one person.
-    /// You have four; you can wear four.
-    func equip(_ stack: ItemStack, on member: PartyMember) {
-        guard let slot = ContentCatalog.shared.item(stack.catalogID)?.gear?.slot else { return }
-        mutate("equip \(stack.catalogID.rawValue)", flush: true) { state in
-            guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }),
-                  let taken = state.base.inventory.stacks[index].removing(1)
-            else { return }
-            if state.base.inventory.stacks[index].isEmpty {
-                state.base.inventory.stacks.remove(at: index)
-            }
-            // What was already on goes back to the shelf rather than evaporating.
-            let previous: EquippedPiece?
-            switch member {
-            case .binder:
-                previous = state.base.binderEquipped[slot]
-                state.base.binderEquipped[slot] = EquippedPiece(taken)
-            case .companion:
-                previous = state.base.companion.equipped[slot]
-                state.base.companion.equipped[slot] = EquippedPiece(taken)
-            }
-            if let previous {
-                state.base.store(previous.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
-            }
-        }
     }
 
     // MARK: - The world history
@@ -422,12 +380,19 @@ extension GameStore {
 
     // MARK: - The party
 
-    /// Who comes with you. **[PLACEHOLDER]** — five fight together eventually (Aimee, 6 Aug); for
-    /// now one does, and this is the choice of which.
-    func setActiveCompanion(_ index: Int) {
+    /// **Who comes with you.** Toggled per person at the fire, up to a party of five including you.
+    func setComing(_ index: Int, _ coming: Bool) {
         guard state.base.roster.indices.contains(index) else { return }
-        mutate("take \(state.base.roster[index].name)", flush: true) { $0.base.activeCompanion = index }
+        let name = state.base.roster[index].name
+        mutate(coming ? "take \(name)" : "leave \(name)", flush: true) {
+            $0.base.setComing(index, coming)
+        }
     }
+
+    func isComing(_ index: Int) -> Bool { state.base.activeParty.contains(index) }
+
+    /// Everybody who is walking out with you, you included.
+    var partyMembers: [PartyMember] { state.base.partyMembers }
 
     /// Front or back. **Set on the character's own page**, never mid-fight — the same rule gambits
     /// follow, and the same place everything else about them lives.
@@ -499,7 +464,7 @@ extension GameStore {
     /// what `reforge` puts back.
     var reforgeable: [ReforgeTarget] {
         var targets: [ReforgeTarget] = []
-        for member in PartyMember.allCases {
+        for member in ([.binder] + state.base.roster.indices.map(PartyMember.member)) {
             for slot in GearSlot.allCases {
                 if let piece = state.base.worn(slot, by: member) {
                     targets.append(.worn(slot: slot, member: member, piece: piece))
@@ -528,20 +493,4 @@ extension GameStore {
         }
     }
 
-    func unequip(_ slot: GearSlot, from member: PartyMember) {
-        mutate("unequip \(slot.rawValue)", flush: true) { state in
-            let removed: EquippedPiece?
-            switch member {
-            case .binder:
-                removed = state.base.binderEquipped[slot]
-                state.base.binderEquipped[slot] = nil
-            case .companion:
-                removed = state.base.companion.equipped[slot]
-                state.base.companion.equipped[slot] = nil
-            }
-            if let removed {
-                state.base.store(removed.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
-            }
-        }
-    }
 }

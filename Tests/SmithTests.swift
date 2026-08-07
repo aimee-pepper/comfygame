@@ -106,12 +106,12 @@ final class SmithTests: XCTestCase {
             state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: "guard_padded"))
         }
         let stack = try XCTUnwrap(store.state.base.inventory.stacks.first { $0.catalogID == "guard_padded" })
-        store.equip(stack, on: PartyMember.companion)
+        store.equip(stack, on: PartyMember.member(0))
 
         let target = try XCTUnwrap(store.reforgeable.first { $0.catalogID == "guard_padded" })
         store.reforge(target)
 
-        XCTAssertEqual(store.worn(.armor, by: PartyMember.companion)?.upgradeLevel, 1)
+        XCTAssertEqual(store.worn(.armor, by: PartyMember.member(0))?.upgradeLevel, 1)
         XCTAssertNil(store.state.base.inventory.stacks.first { $0.catalogID == "guard_padded" },
                      "reforging a worn piece put a second one on the shelf")
     }

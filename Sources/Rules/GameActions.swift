@@ -259,7 +259,9 @@ extension GameStore {
                 // is what "the party heals on returning home" means (Aimee, 6 Aug) — and it reads
                 // the Fortitude they've earned rather than a constant.
                 binderHP: CombatRules.maximumHealth(of: .binder, in: state),
-                companionHP: CombatRules.maximumHealth(of: .companion, in: state),
+                companionHP: state.base.activeParty.reduce(into: [Int: Int]()) { hp, index in
+                    hp[index] = CombatRules.maximumHealth(of: .companion(index), in: state)
+                },
                 // The satchel is its own, smaller capacity — separate from home storage, and
                 // separately upgradeable (decisions-log session 2).
                 satchelItems: Inventory(slots: state.base.satchelCapacity)

@@ -206,7 +206,9 @@ enum SmithRules {
 
         switch member {
         case .binder: state.base.binderEquipped[slot]?.upgradeLevel += 1
-        case .companion: state.base.companion.equipped[slot]?.upgradeLevel += 1
+        case .member(let index):
+            guard state.base.roster.indices.contains(index) else { return false }
+            state.base.roster[index].equipped[slot]?.upgradeLevel += 1
         }
         return true
     }
@@ -224,7 +226,7 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
     var id: String {
         switch self {
         case .stored(let stack): "stored-\(stack.id.rawValue)"
-        case .worn(let slot, let member, _): "worn-\(member.rawValue)-\(slot.rawValue)"
+        case .worn(let slot, let member, _): "worn-\(member.id)-\(slot.rawValue)"
         }
     }
 

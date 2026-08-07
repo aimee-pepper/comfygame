@@ -69,9 +69,34 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Quill is index 0 and always there. Everyone else arrives by being talked into it.
     var roster: [CompanionState] = [CompanionState()]
 
-    /// Which of them is standing beside you. **[PLACEHOLDER]** — a party of five fights together
-    /// (Aimee, 6 Aug) and that's the next piece; today one of them comes along.
-    var activeCompanion: Int = 0
+    /// **Who is walking out with you**, as roster indices, in the order they'll stand.
+    ///
+    /// Aimee asked for this repeatedly and I kept deferring it: *"I still can only add one person
+    /// to my party from the fire pit."* It was one index, so the fire could only ever hand you one
+    /// person however many you had found.
+    var activeParty: [Int] = [0]
+
+    /// The first of them. Kept only for the handful of places that genuinely mean "the one in
+    /// front" — everything about *the party* reads `activeParty`.
+    var activeCompanion: Int { activeParty.first ?? 0 }
+
+    /// Everybody in the fight, you included, in turn-order-agnostic order.
+    var partyMembers: [PartyMember] {
+        [.binder] + activeParty.filter { roster.indices.contains($0) }.map(PartyMember.member)
+    }
+
+    /// How many more can come. The Binder is one of the five.
+    var canTakeAnother: Bool { activeParty.count < Tuning.Party.maximumSize - 1 }
+
+    mutating func setComing(_ index: Int, _ coming: Bool) {
+        guard roster.indices.contains(index) else { return }
+        if coming {
+            guard !activeParty.contains(index), canTakeAnother else { return }
+            activeParty.append(index)
+        } else {
+            activeParty.removeAll { $0 == index }
+        }
+    }
 
     /// Who's fighting beside you, as one value. Kept as a property so the hundred places that read
     /// `base.companion` don't all have to learn about the roster at once.
@@ -208,26 +233,30 @@ struct BaseState: Codable, Equatable, Sendable {
         return seated
     }
 
-    /// Somebody's character sheet. **Both of them have one** (session 17 §1).
+    /// Somebody's character sheet. **Everybody has one** (session 17 §1).
     func character(_ member: PartyMember) -> CharacterState {
         switch member {
         case .binder: binderCharacter
-        case .companion: companion.character
+        case .member(let index):
+            roster.indices.contains(index) ? roster[index].character : CharacterState(rank: .front)
         }
     }
 
     mutating func withCharacter(_ member: PartyMember, _ change: (inout CharacterState) -> Void) {
         switch member {
         case .binder: change(&binderCharacter)
-        case .companion: change(&companion.character)
+        case .member(let index):
+            guard roster.indices.contains(index) else { return }
+            change(&roster[index].character)
         }
     }
 
-    /// What one of them is wearing in a slot. **Both carry their own** (Aimee, 5 Aug).
+    /// What one of them is wearing in a slot. **Everybody carries their own** (Aimee, 5 Aug).
     func worn(_ slot: GearSlot, by member: PartyMember) -> EquippedPiece? {
         switch member {
         case .binder: binderEquipped[slot]
-        case .companion: companion.equipped[slot]
+        case .member(let index):
+            roster.indices.contains(index) ? roster[index].equipped[slot] : nil
         }
     }
 
@@ -261,7 +290,7 @@ struct BaseState: Codable, Equatable, Sendable {
         case essence, resources, inventory, spillover, ownedSymbols, ownedGambitComponents
         case completedResearch, stations, bookDraft, page, ownedHands, hasChainingUnlock
         case ownedSources
-        case roster, activeCompanion, binderEquipped, hasAutomateSelfUnlock, satchelTier
+        case roster, activeCompanion, activeParty, binderEquipped, hasAutomateSelfUnlock, satchelTier
         case purchasedGambitSlots, binderGambits, binderCharacter
         case companion
     }
@@ -282,7 +311,7 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(ownedHands, forKey: .ownedHands)
         try c.encode(hasChainingUnlock, forKey: .hasChainingUnlock)
         try c.encode(roster, forKey: .roster)
-        try c.encode(activeCompanion, forKey: .activeCompanion)
+        try c.encode(activeParty, forKey: .activeParty)
         try c.encode(binderEquipped, forKey: .binderEquipped)
         try c.encode(hasAutomateSelfUnlock, forKey: .hasAutomateSelfUnlock)
         try c.encode(satchelTier, forKey: .satchelTier)
@@ -313,7 +342,11 @@ struct BaseState: Codable, Equatable, Sendable {
         roster = try container.decodeIfPresent([CompanionState].self, forKey: .roster)
             ?? [try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()]
         if roster.isEmpty { roster = [CompanionState()] }
-        activeCompanion = try container.decodeIfPresent(Int.self, forKey: .activeCompanion) ?? 0
+        // A save from when only one person could come brings that one person with it.
+        activeParty = try container.decodeIfPresent([Int].self, forKey: .activeParty)
+            ?? [try container.decodeIfPresent(Int.self, forKey: .activeCompanion) ?? 0]
+        activeParty = activeParty.filter { $0 >= 0 }
+        if activeParty.isEmpty { activeParty = [0] }
         binderEquipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .binderEquipped) ?? [:]
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
@@ -387,7 +420,13 @@ struct BookDraft: Codable, Equatable, Sendable {
 ///
 /// `PartyMember` is the combat vocabulary and knows about exactly two people. This is who *exists*
 /// — the Binder, and everybody at the fire — which is what the Party screen is a list of.
-enum PartySlot: Hashable, Identifiable, Sendable {
+/// **Somebody in the party** — the Binder, or one of the people at the fire.
+///
+/// `PartySlot` and `PartyMember` were two names for this, and the split is what let the party of
+/// five stall: one of them knew about a roster and the other knew about a fight, so nothing could
+/// talk about the same person on both sides of the door. They're one type now, and `PartySlot`
+/// survives as a spelling of it.
+enum PartyMember: Hashable, Identifiable, Sendable, Codable {
     case binder
     case member(Int)
 
@@ -398,24 +437,27 @@ enum PartySlot: Hashable, Identifiable, Sendable {
         }
     }
 
-    /// How this maps onto a fight today: the Binder is the Binder, and whoever came along is the
-    /// companion. **[PLACEHOLDER]** until five fight together.
-    func combatant(activeCompanion: Int) -> PartyMember? {
+    /// Which of the roster this is, if it isn't you.
+    var rosterIndex: Int? { if case .member(let index) = self { index } else { nil } }
+
+    /// Who this is inside a fight.
+    var combatant: Combatant {
         switch self {
         case .binder: .binder
-        case .member(let index): index == activeCompanion ? .companion : nil
+        case .member(let index): .companion(index)
+        }
+    }
+
+    /// What to call them when there's no roster to hand. Everyone else has a name of their own.
+    var displayName: String {
+        switch self {
+        case .binder: "You"
+        case .member: "Companion"
         }
     }
 }
 
-enum PartyMember: String, CaseIterable, Identifiable, Sendable {
-    case binder, companion
-
-    var id: String { rawValue }
-    var combatant: Combatant { self == .binder ? .binder : .companion }
-    /// What to call them on screen. The companion has a name of its own; you are you.
-    var displayName: String { self == .binder ? "You" : "Companion" }
-}
+typealias PartySlot = PartyMember
 
 /// The one companion in v0. Party expands in v1+, so this is a struct that can become an array
 /// element without reshaping the save.
