@@ -12,14 +12,14 @@ final class DangerTests: XCTestCase {
     // MARK: The axis
 
     func testADangerRuneBuysStability() {
-        let bare = BookRules.stabilityDelta(symbolIDs: ["rich_ore"])
-        let stormy = BookRules.stabilityDelta(symbolIDs: ["rich_ore", "storm"])
+        let bare = BookRules.dangerTradeDelta(symbolIDs: ["rich_ore"])
+        let stormy = BookRules.dangerTradeDelta(symbolIDs: ["rich_ore", "storm"])
         XCTAssertGreaterThan(stormy, bare, "a danger rune has to buy time or it has no purpose")
     }
 
     func testPeaceSpendsStabilityToBuyCalm() {
-        let bare = BookRules.stabilityDelta(symbolIDs: ["plains"])
-        let peaceful = BookRules.stabilityDelta(symbolIDs: ["plains", "peace"])
+        let bare = BookRules.dangerTradeDelta(symbolIDs: ["plains"])
+        let peaceful = BookRules.dangerTradeDelta(symbolIDs: ["plains", "peace"])
         XCTAssertLessThan(peaceful, bare, "Peace is not a free upgrade — it costs the world time")
 
         let profile = BookRules.dangerProfile(symbolIDs: ["peace"])
@@ -30,13 +30,17 @@ final class DangerTests: XCTestCase {
 
     /// The greedy world the release valve exists for: unwritable without danger, writable with it.
     func testDangerMakesAGreedyWorldSurvivable() {
-        let greedy: [SymbolID] = ["rich_ore", "teeming_life"]
-        let bought = greedy + ["predation", "tremor"]
+        // **Whole books**, because the trade only means anything against something to trade against:
+        // greed is measured now, so a book judged on its authored numbers alone is a book with no
+        // greed in it at all, and both sides came out at a hundred.
+        let greedy = BoundBook(written: ["rich_ore", "teeming_life"], essencePaid: 0)
+        let bought = BoundBook(written: ["rich_ore", "teeming_life", "predation", "tremor"],
+                               essencePaid: 0)
 
-        let bareTurns = BookRules.turnsAvailable(stabilityScore: BookRules.stabilityScore(
-            delta: BookRules.stabilityDelta(symbolIDs: greedy)))
-        let boughtTurns = BookRules.turnsAvailable(stabilityScore: BookRules.stabilityScore(
-            delta: BookRules.stabilityDelta(symbolIDs: bought)))
+        let bareTurns = BookRules.turnsAvailable(for: greedy)
+        let boughtTurns = BookRules.turnsAvailable(for: bought)
+        XCTAssertLessThan(BookRules.stabilityScore(of: greedy), 60,
+                          "the greedy book has to be in real trouble, or there is nothing to buy")
 
         XCTAssertGreaterThan(boughtTurns, bareTurns,
                              "accepting danger has to visibly buy turns, or nobody will take the trade")
@@ -66,12 +70,52 @@ final class DangerTests: XCTestCase {
         }
     }
 
-    func testASymbolStillMovesTheHeadlineByItsPrintedNumber() throws {
-        // Aimee's rule, and the cap is the single exception to it. Everything else must still sum.
+    /// **A symbol with no danger block moves the meter only by what it asks the world for** (Q44).
+    ///
+    /// This replaces "a symbol moves the headline by exactly its printed number". There is no
+    /// printed number any more: greed is measured off the expansion, and the only thing a symbol may
+    /// still assert by hand is a danger trade. So an ordinary symbol's whole effect on the headline
+    /// has to *be* its greed, with nothing added beside it.
+    func testAnOrdinarySymbolMovesTheMeterOnlyByWhatItAsksFor() throws {
         for symbol in ContentCatalog.shared.symbols where symbol.danger == nil {
-            let alone = BookRules.stabilityScore(delta: BookRules.stabilityDelta(symbolIDs: [symbol.id]))
-            XCTAssertEqual(alone, BookRules.stabilityScore(delta: symbol.stabilityDelta),
-                           "\(symbol.id.rawValue) didn't move the meter by its printed number")
+            XCTAssertEqual(BookRules.stabilityDelta(ofSymbolAlone: symbol.id),
+                           BookRules.greedDelta(for: BookRules.sigils(of: symbol)),
+                           "\(symbol.id.rawValue) moves the meter by something other than its own demand")
+        }
+    }
+
+    /// **No symbol may assert greed by hand.** The structural half of Q44's answer: the split is
+    /// enforceable rather than remembered, because there is nowhere left to type the number.
+    ///
+    /// Written as a test rather than left to the compiler because the *point* is the invariant, and
+    /// a future `stabilityDelta` would be added back for a reason that seemed good at the time.
+    func testTheOnlyHandAuthoredStabilityIsADangerTrade() throws {
+        let json = try XCTUnwrap(Bundle.contentBundle.url(forResource: "symbols", withExtension: "json"))
+        let raw = try JSONSerialization.jsonObject(with: Data(contentsOf: json))
+        let entries = try XCTUnwrap((raw as? [String: Any])?["symbols"] as? [[String: Any]])
+        XCTAssertEqual(entries.count, ContentCatalog.shared.symbols.count)
+
+        for entry in entries {
+            let id = entry["id"] as? String ?? "?"
+            XCTAssertNil(entry["stabilityDelta"],
+                         "\(id) carries a hand-typed greed number; greed is measured (answer-q44.md §1)")
+            if let danger = entry["danger"] as? [String: Any] {
+                XCTAssertNotNil(danger["stabilityTrade"],
+                                "\(id) has a danger block with no trade — it accepts hostility and buys nothing")
+            }
+        }
+    }
+
+    /// The fault Q44 was asked to check for, expressed so it cannot come back: **nothing may be
+    /// charged twice for one sin.** A symbol's authored trade and its measured greed must never both
+    /// be large and pointing the same way — that combination is the double-charge by definition.
+    func testNothingIsChargedTwiceForOneSin() {
+        for symbol in ContentCatalog.shared.symbols {
+            let trade = symbol.danger?.stabilityTrade ?? 0
+            let greed = BookRules.greedDelta(for: BookRules.sigils(of: symbol))
+            let bothLarge = abs(trade) >= 10 && abs(greed) >= 10
+            XCTAssertFalse(bothLarge && (trade < 0) == (greed < 0),
+                           "\(symbol.id.rawValue) is charged twice: trade \(trade), greed \(greed)")
         }
     }
 
@@ -169,10 +213,10 @@ final class DangerTests: XCTestCase {
         for symbol in ContentCatalog.shared.symbols {
             guard let danger = symbol.danger else { continue }
             if danger.isCalming {
-                XCTAssertLessThan(symbol.stabilityDelta, 0,
+                XCTAssertLessThan(danger.stabilityTrade, 0,
                                   "\(symbol.id.rawValue) calms the world and costs nothing")
             } else {
-                XCTAssertGreaterThan(symbol.stabilityDelta, 0,
+                XCTAssertGreaterThan(danger.stabilityTrade, 0,
                                      "\(symbol.id.rawValue) adds danger and buys no time — a strict downgrade")
                 let expresses = danger.hazardTiles > 0 || danger.damagePerTurn > 0
                     || danger.spawnMultiplier != 1 || danger.tierDelta != 0

@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — Claude-invented stopgaps for v0 feel, not balance; the whole vocabulary is being replaced by pressure sigils. THREE RULES WORTH KEEPING THROUGH THAT REWRITE: (1) 'stabilityDelta' is in the SAME UNITS as the Stability headline and simply adds to it — a book starts at 100 and a symbol reading '+12' moves it by exactly 12. (2) Stability tracks DEVIATION FROM WHAT A WORLD WOULD NATURALLY HAVE: asking for less than the baseline CALMS a world (Sparse Ore is +10), asking for the baseline costs nothing (Ore is 0), asking for more is the greed that destabilises (Rich Ore is −45). This is the Mystcraft greed model from research-pass-3, and it means the bounty slot is a real choice rather than a tax. (3) EVERY symbol trades on SEVERAL axes, never one: Dim Sky buys stability with sight and with things that hunt in the dark; Plains is stability-neutral but lets you see further. A stable world is not an empty one. 'expandsTo' spells the symbol out in the pressure model's atomic vocabulary — the rune spec calls these compounds (§9). PLACEHOLDER component choices.",
+  "_note": "PLACEHOLDER \u2014 Claude-invented stopgaps for v0 feel, not balance; the whole vocabulary is being replaced by pressure sigils. NO SYMBOL MAY CARRY A HAND-TYPED GREED NUMBER (Q44, answer-q44.md). 'stabilityDelta' is gone from every entry and from SymbolDef itself, because greed is now MEASURED off what a symbol says rather than asserted beside it: BookRules.greedDelta resolves the expansion and prices it against each subject's neutral. Keeping both meant one world had two prices depending on which vocabulary you wrote it in \u2014 'Rich Ore' cost 45 and the same world spelled out as great iron + gold cost 8. The field is deleted rather than zeroed so this is enforced by the compiler and not by memory. THE ONE NUMBER STILL AUTHORED BY HAND is 'danger.stabilityTrade' on the seven danger runes and Peace, because that is a different axis: it is a bargain with the player (accept hostility, buy time), and nothing in the physical reading of a stormy world can produce it. Peace is its inverse and spends stability to buy calm. TWO RULES WORTH KEEPING: (1) a symbol's contribution to the headline is in the SAME UNITS as the headline and simply adds \u2014 a book starts at 100 and a rune reading '+12' moves it by exactly 12; the aggregate danger cap is the single disclosed exception. (2) EVERY symbol trades on SEVERAL axes, never one: Dim Sky buys stability with sight and with things that hunt in the dark; Plains is stability-neutral but lets you see further. A stable world is not an empty one. 'expandsTo' spells the symbol out in the pressure model's atomic vocabulary \u2014 the rune spec calls these compounds (\u00a79) \u2014 and IT IS NOW WHAT THE SYMBOL COSTS, so an expansion that understates what a symbol's name claims will read as a cheap world. PLACEHOLDER component choices.",
   "symbols": [
     {
       "id": "plains",
@@ -15,7 +15,6 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 1,
-      "stabilityDelta": 0,
       "expandsTo": [
         {
           "source": "wind",
@@ -46,7 +45,6 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": -1,
-      "stabilityDelta": -8,
       "expandsTo": [
         {
           "source": "granite",
@@ -76,7 +74,6 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": -12,
       "expandsTo": [
         {
           "source": "sea",
@@ -106,7 +103,6 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 0,
       "expandsTo": [
         {
           "source": "root",
@@ -137,7 +133,6 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -15,
       "expandsTo": [
         {
           "source": "ash",
@@ -168,7 +163,6 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 8,
       "expandsTo": [
         {
           "source": "ice",
@@ -186,7 +180,7 @@
       "id": "sparse_ore",
       "name": "Sparse Ore",
       "slot": "bounty",
-      "blurb": "A thin seam — less than a world would ordinarily carry. It rests easier for it.",
+      "blurb": "A thin seam \u2014 less than a world would ordinarily carry. It rests easier for it.",
       "icon": "circle.grid.2x1",
       "acquisition": "starter",
       "essenceCost": 2,
@@ -196,12 +190,11 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 10,
       "expandsTo": [
         {
-          "source": "granite",
+          "source": "silt",
           "target": "substrate",
-          "intensity": "faint"
+          "intensity": "moderate"
         }
       ]
     },
@@ -213,7 +206,6 @@
       "icon": "circle.grid.2x2",
       "acquisition": "starter",
       "essenceCost": 3,
-      "stabilityDelta": 0,
       "yieldModifiers": {
         "ore": 1.3
       },
@@ -224,7 +216,7 @@
         {
           "source": "iron",
           "target": "substrate",
-          "intensity": "moderate"
+          "intensity": "faint"
         }
       ]
     },
@@ -244,7 +236,6 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -45,
       "expandsTo": [
         {
           "source": "iron",
@@ -276,7 +267,6 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -35,
       "expandsTo": [
         {
           "source": "bloom",
@@ -309,7 +299,6 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": -1,
-      "stabilityDelta": 12,
       "expandsTo": [
         {
           "source": "cloud",
@@ -335,7 +324,6 @@
       },
       "enemyTierDelta": 1,
       "visionDelta": 0,
-      "stabilityDelta": -30,
       "expandsTo": [
         {
           "source": "gold",
@@ -366,7 +354,6 @@
       },
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": -10,
       "expandsTo": [
         {
           "source": "bloom",
@@ -402,7 +389,6 @@
       },
       "enemyTierDelta": 2,
       "visionDelta": 0,
-      "stabilityDelta": -70,
       "expandsTo": [
         {
           "source": "crystal",
@@ -428,7 +414,6 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 22,
       "expandsTo": [
         {
           "source": "wind",
@@ -442,6 +427,7 @@
         }
       ],
       "danger": {
+        "stabilityTrade": 22,
         "hazardTiles": 6,
         "flavour": "storm"
       }
@@ -460,7 +446,6 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 20,
       "expandsTo": [
         {
           "source": "rot",
@@ -474,6 +459,7 @@
         }
       ],
       "danger": {
+        "stabilityTrade": 20,
         "damagePerTurn": 1,
         "hazardTiles": 3,
         "flavour": "blight"
@@ -491,7 +477,6 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 26,
       "expandsTo": [
         {
           "source": "swarm",
@@ -500,6 +485,7 @@
         }
       ],
       "danger": {
+        "stabilityTrade": 26,
         "spawnMultiplier": 1.9,
         "tierDelta": -1,
         "flavour": "swarm"
@@ -517,7 +503,6 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 24,
       "expandsTo": [
         {
           "source": "herd",
@@ -526,6 +511,7 @@
         }
       ],
       "danger": {
+        "stabilityTrade": 24,
         "spawnMultiplier": 0.55,
         "tierDelta": 2,
         "flavour": "predation"
@@ -545,7 +531,6 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 18,
       "expandsTo": [
         {
           "source": "miasma",
@@ -554,6 +539,7 @@
         }
       ],
       "danger": {
+        "stabilityTrade": 18,
         "damagePerTurn": 2,
         "flavour": "miasma"
       }
@@ -570,7 +556,6 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": 28,
       "expandsTo": [
         {
           "source": "volcano",
@@ -584,6 +569,7 @@
         }
       ],
       "danger": {
+        "stabilityTrade": 28,
         "hazardTiles": 9,
         "flavour": "tremor"
       }
@@ -600,7 +586,6 @@
       "enemyTableModifiers": {},
       "enemyTierDelta": 0,
       "visionDelta": 0,
-      "stabilityDelta": -30,
       "expandsTo": [
         {
           "source": "bloom",
@@ -614,6 +599,7 @@
         }
       ],
       "danger": {
+        "stabilityTrade": -30,
         "spawnMultiplier": 0.4,
         "tierDelta": -2,
         "flavour": "peace"

@@ -120,6 +120,7 @@ enum PressureRules {
                 let peak = contribution.peak * amplitude
                 let floor = (target.dualValued ? contribution.floor : 0) * amplitude
 
+
                 if sigil.negatedTargets.contains(target.id) {
                     // Denial *removes* the contribution rather than inverting it — a sun that does
                     // not warm stops warming; it doesn't start chilling, and it certainly doesn't
@@ -162,8 +163,20 @@ enum PressureRules {
             let peakUp = diminished(positivePeak), peakDown = diminished(negativePeak)
             let floorUp = diminished(positiveFloor), floorDown = diminished(negativeFloor)
 
-            var peak = clamp(target.baseline + peakUp - peakDown)
-            var floor = target.dualValued ? clamp(target.baseline + floorUp - floorDown) : peak
+            // **What was asked for, before the world was allowed to refuse it.**
+            //
+            // Greed bills this rather than the clamped peak. Now that writing starts at the ordinary
+            // value rather than at zero, an extravagant ask runs into the ceiling routinely — gold
+            // written *greatly* on a substrate that already sits at 30 lands past 100 — and billing
+            // the clamped figure would price a world riddled with veins the same as a merely rich
+            // one. You are charged for the demand; the clamp is the world's answer, not your ask.
+            let demand = target.baseline + peakUp - peakDown
+
+            var peak = clamp(demand)
+            // The floor has an ordinary of its own: an unremarkable world is lit by day and dark by
+            // night, and inheriting the daytime ordinary made every night as bright as noon.
+            let floorOrdinary = target.baselineFloor ?? target.baseline
+            var floor = target.dualValued ? clamp(floorOrdinary + floorUp - floorDown) : peak
 
             // Floor may never exceed peak. When retention or occlusion drives them past each other
             // they **converge on the midpoint** — a uniformly murky world, or one with no
@@ -195,6 +208,7 @@ enum PressureRules {
             readings[target.id] = PressureReading(
                 target: target.id,
                 peak: peak,
+                demand: demand,
                 floor: floor,
                 opposedMagnitude: opposed,
                 aspects: aspects,
@@ -242,6 +256,10 @@ struct PressureReading: Equatable, Sendable {
     var target: PressureTargetID
     /// The high value — the brightest, hottest, wettest it gets. Single-valued targets use this.
     var peak: Double
+    /// **What the page asked for, before clamping.** Equal to `peak` inside 0–100, and outside it
+    /// this is the only record of how far past the end of the scale the demand went. Greed reads it;
+    /// everything describing the world reads `peak`, because the world is what it is.
+    var demand: Double = 0
     /// The low value. Equal to `peak` on single-valued targets.
     var floor: Double
     /// Force applied in conflicting directions and cancelled. Gross, never net.
@@ -275,7 +293,7 @@ struct PressureReadings: Equatable, Sendable {
     var readings: [PressureTargetID: PressureReading]
 
     subscript(target: PressureTargetID) -> PressureReading {
-        readings[target] ?? PressureReading(target: target, peak: 0, floor: 0,
+        readings[target] ?? PressureReading(target: target, peak: 0, demand: 0, floor: 0,
                                             opposedMagnitude: 0, aspects: [:], forms: [:], tags: [])
     }
 

@@ -32,38 +32,44 @@ enum Tuning {
         /// session 2). It must stay BELOW the cheapest symbol — currently 2 — or leaving a slot
         /// empty stops being attractive and the pressure valve closes.
         static let randomSlotCostEssence: Int = 1 // PLACEHOLDER
-        /// **A book starts here and every symbol adds its own number to it.** No conversion, no
-        /// hidden multiplier — a symbol reading "−25 stability" moves the headline by exactly 25.
+        /// **A book starts here, and what moves it is measured rather than typed** (Q44).
         ///
-        /// **Stability tracks deviation from what a world would naturally have.** Asking for less
-        /// than the baseline calms it, asking for the baseline costs nothing, asking for more is the
-        /// greed that destabilises — the Mystcraft model from research-pass-3, run in both
-        /// directions. Which is why the bounty slot is a decision (Sparse Ore +10, Ore 0, Rich Ore
-        /// −45) rather than a tax you pay for turning up.
+        /// **Stability tracks deviation from what a world ordinarily has.** Asking for less calms
+        /// it, asking for ordinary costs nothing, asking for more is the greed that destabilises —
+        /// the Mystcraft model from research-pass-3, run in both directions. Which is why the bounty
+        /// ladder is a decision rather than a tax you pay for turning up.
         ///
         /// **A fully stable world is reachable, and it is not an empty one.** Stack neutral and
         /// stabilising choices and you can hold a world open indefinitely — what that costs you is
         /// on the other axes: sight, danger, and what lives there. Stability is one dial among
         /// several, never a straight trade against yield.
         ///
-        /// Calibrated against the current symbol set (14×14 = 196 tiles):
+        /// Measured against the current vocabulary, 7 Aug, after writing was moved to start at an
+        /// ordinary world rather than at nothing:
         ///
         ///   | book                                      | score |      turns | what it costs you |
         ///   |-------------------------------------------|-------|------------|-------------------|
-        ///   | Plains · Verdant · Sparse Ore · Dim Sky   |   100 | indefinite | thin seams, dark  |
-        ///   | Plains · Verdant · Ore · Dim Sky          |   100 | indefinite | ordinary, dark    |
-        ///   | Plains · Verdant · Rich Ore · Dim Sky     |    67 |        201 | dark, tier 3      |
-        ///   | Plains · Verdant · Rich Ore · Gilded      |    25 |         25 | tier 3, and brief |
-        ///   | Caverns · Ashen · Rich Ore · Gilded       |     2 |          2 | everything        |
+        ///   | Sparse Ore alone                          |   100 | indefinite | nothing to dig    |
+        ///   | Plains · Frostbound · Sparse Ore · Dim Sky|   100 | indefinite | thin seams, dark  |
+        ///   | Plains · Verdant · Ore · Dim Sky          |    75 |        375 | ordinary, dark    |
+        ///   | Plains · Verdant · Rich Ore · Dim Sky     |    43 |        151 | dark, tier 3      |
+        ///   | Plains · Verdant · Rich Ore · Gilded      |     0 |         60 | everything        |
+        ///   | Caverns · Ashen · Rich Ore · Gilded       |    15 |         60 | everything        |
+        ///
+        /// **Verdant costs now, and that is the point** (Aimee, 7 Aug: *"a verdant lush world slowly
+        /// scales up destabilization with how much more life than normal it has"*). It used to be
+        /// free because it was hand-typed as free.
         static let baseStabilityScore: Int = 100
 
-        /// **Stability per point of abundance asked for beyond the baseline** — the greed half of
-        /// instability, which the sigil vocabulary had no other way to express. Runs both
-        /// directions: writing *less* than a world naturally has calms it. **[PLACEHOLDER]**
+        /// **Stability per point of abundance asked for beyond ordinary** — the greed half of
+        /// instability. Runs both directions: writing *less* than a world ordinarily has calms it.
+        /// **[PLACEHOLDER]**
         static let stabilityPerAbundance: Double = 0.45
         /// **How heavily an ordinary subject's excess counts** — the deviation axis, applied to
         /// everything. Light, because being *strange* should cost less than being *rich*. Substrate
-        /// and Vitality override it in `pressure_targets.json`.
+        /// and Vitality override it in `pressure_targets.json` at 1.8 and 1.5, which is where the
+        /// two-axis model's *value* half lives: roughly five times the weight, so a gold-veined world
+        /// costs far more than a merely mountainous one. **[PLACEHOLDER]**
         static let ordinaryGreedWeight: Double = 0.35  // PLACEHOLDER
         /// Essence per cell of the page you actually used. Bigger runes cost more ink.
         static let essencePerCell: Double = 0.6   // PLACEHOLDER
@@ -88,7 +94,11 @@ enum Tuning {
         /// Peak−floor spread at which a world's day and night are meaningfully different runs.
         static let wideRangeThreshold: Double = 50 // PLACEHOLDER
         /// …and the spread below which nothing ever changes.
-        static let flatRangeThreshold: Double = 5  // PLACEHOLDER
+        static let flatRangeThreshold: Double = 15 // PLACEHOLDER
+        /// Both are read against an **ordinary** swing of 45 (illumination's day 45, night 0) rather
+        /// than against a world that starts black, so "flat" means a third of ordinary rather than
+        /// nothing at all. Enough cloud closes the day to a range of 13, which is the world the
+        /// `constant` tag exists to name.
 
         // Cross-target constraints — "the teeth". All PLACEHOLDER.
         /// How strongly air density pulls the thermal swing together (or, thin, pushes it apart).

@@ -119,8 +119,11 @@ final class DescriptionTests: XCTestCase {
         let seams = try XCTUnwrap(greedy.clauses.first { $0.group == "substrate" })
         XCTAssertEqual(seams.polarity, .destabilising, "writing toward treasure should read as a risk")
 
+        // **Barren ground has to be written now**, not merely left unmentioned. Ground you say
+        // nothing about is ordinary ground, so it reads neutral; ground you deliberately strip is
+        // the stabilising choice, and Silt is the word for it (7 Aug).
         let bare = DescriptionRules.describe(page: [
-            Sigil(id: InstanceID(rawValue: 1), source: "sun", target: "illumination", intensity: .faint)
+            Sigil(id: InstanceID(rawValue: 1), source: "silt", target: "substrate", intensity: .great)
         ])
         let ground = try XCTUnwrap(bare.clauses.first { $0.group == "substrate" })
         XCTAssertEqual(ground.polarity, .stabilising)
@@ -296,7 +299,7 @@ final class DescriptionTests: XCTestCase {
         }
         store.write("rich_ore")
         let shown = store.bookProjection.stabilityScore
-        let fromPage = BookRules.stabilityScore(delta: BookRules.stabilityDelta(symbolIDs: ["rich_ore"]))
+        let fromPage = BookRules.stabilityScore(delta: BookRules.stabilityDelta(ofSymbolAlone: "rich_ore"))
         XCTAssertTrue(shown.contains(fromPage),
                       "what the page says isn't inside the band the panel shows")
         XCTAssertFalse(shown.isPoint,

@@ -132,10 +132,10 @@ struct BookProjection {
         // Greed from abundance, contradiction from opposed magnitude — instability's two origins,
         // and until now only the second of them reached the headline for a page written in sigils.
         let score = BookRules.stabilityScore(
-            delta: BookRules.stabilityDelta(symbolIDs: written)
-                + book.scale.stabilityDelta
-                + BookRules.greedDelta(for: PageRules.clusterSigils(of: page))
-                - ContradictionRules.totalPenalty(for: contradictions))
+            delta: BookRules.stabilityDelta(
+                of: book,
+                sigils: sigils,
+                contradictionPenalty: ContradictionRules.totalPenalty(for: contradictions)))
         // **Stability is a range, because the world is** (Aimee, 6 Aug: *"why is the world page
         // showing a concrete value for stability rather than the possible range that can occur with
         // roll changes for the undefined values?"*).
@@ -204,15 +204,12 @@ struct BookProjection {
         }
 
         // Additive quantities: summing per-slot extremes gives the exact overall extremes.
-        var stabilityLow = 0, stabilityHigh = 0
         var tierLow = Tuning.World.baseEnemyTier, tierHigh = Tuning.World.baseEnemyTier
         var sightLow = Tuning.World.baseVisionRadius, sightHigh = Tuning.World.baseVisionRadius
 
         for plan in plans {
             let options = plan.chosen.map { [$0] } ?? plan.candidates
             guard !options.isEmpty else { continue }
-            stabilityLow += options.map(\.stabilityDelta).min() ?? 0
-            stabilityHigh += options.map(\.stabilityDelta).max() ?? 0
             // Danger runes carry their tier shift on the profile rather than on `enemyTierDelta`,
             // and the preview has to cover both or it promises a range the world doesn't honour.
             let tiers = options.map { $0.enemyTierDelta + ($0.danger?.tierDelta ?? 0) }
@@ -222,15 +219,31 @@ struct BookProjection {
             sightHigh += options.map(\.visionDelta).max() ?? 0
         }
 
-        // Greed reaches the draft path too, or the preview and the world it binds disagree — the
-        // one thing the shared-implementation rule exists to prevent. Resolved off the chosen
-        // symbols alone, so a chance slot doesn't move a number the player is meant to be able to
-        // work out while composing.
-        // The draft path is the legacy slot vocabulary — all compounds, every one of which prints
-        // its own number — so there is no unpriced abundance in it to charge for.
-        let greed = 0
-        let scoreLow = BookRules.stabilityScore(delta: stabilityLow + greed)
-        let scoreHigh = BookRules.stabilityScore(delta: stabilityHigh + greed)
+        // **Stability is not additive any more**, so it can't be summed slot by slot like the rest.
+        // Greed is measured off resolved abundance, and two ore symbols pushing the same subject
+        // stack with diminishing returns — so the chosen symbols are resolved *together*, exactly as
+        // the bind will resolve them, and only the slots left to chance widen the band.
+        //
+        // A fully specified draft therefore matches its bound book to the point, which is what the
+        // legibility pillar asks for: the preview cannot promise a number the world won't honour.
+        let chosenBook = BoundBook(
+            symbols: plans.reduce(into: [SlotID: SymbolID]()) { if let c = $1.chosen { $0[$1.slot] = c.id } },
+            randomlyFilled: [],
+            essencePaid: 0)
+        let settled = BookRules.stabilityDelta(
+            of: chosenBook,
+            sigils: BookRules.sigils(for: chosenBook),
+            contradictionPenalty: BookRules.contradictionPenalty(of: chosenBook))
+
+        var stabilityLow = settled, stabilityHigh = settled
+        for plan in plans where plan.chosen == nil && !plan.candidates.isEmpty {
+            let deltas = plan.candidates.map { BookRules.stabilityDelta(ofSymbolAlone: $0.id) }
+            stabilityLow += deltas.min() ?? 0
+            stabilityHigh += deltas.max() ?? 0
+        }
+
+        let scoreLow = BookRules.stabilityScore(delta: stabilityLow)
+        let scoreHigh = BookRules.stabilityScore(delta: stabilityHigh)
         let turnsLow = BookRules.turnsAvailable(stabilityScore: scoreLow)
         let turnsHigh = BookRules.turnsAvailable(stabilityScore: scoreHigh)
         let sightFloor = max(Tuning.World.minimumVisionRadius, sightLow)
@@ -283,10 +296,10 @@ struct BookProjection {
             let readings = PressureRules.resolve(filled)
             let fired = ContradictionRules.fired(in: filled, readings: readings)
             let score = BookRules.stabilityScore(
-                delta: BookRules.stabilityDelta(symbolIDs: book.allSymbolIDs)
-                    + book.scale.stabilityDelta
-                    + BookRules.greedDelta(for: filled)
-                    - ContradictionRules.totalPenalty(for: fired))
+                delta: BookRules.stabilityDelta(
+                    of: book,
+                    sigils: filled,
+                    contradictionPenalty: ContradictionRules.totalPenalty(for: fired)))
             lowest = min(lowest, score)
             highest = max(highest, score)
         }

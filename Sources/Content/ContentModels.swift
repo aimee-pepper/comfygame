@@ -29,13 +29,17 @@ struct SymbolDef: Codable, Equatable, Identifiable, Sendable {
     var acquisition: Acquisition
     /// Essence contribution to the bind cost.
     var essenceCost: Int
-    /// How much this symbol moves the book's Stability headline, **in the headline's own units**.
-    ///
-    /// Positive stabilises, negative destabilises, and the numbers simply add: a book starts at 100
-    /// and a symbol reading "−25 stability" moves it to 75. No conversion factor, no separate
-    /// instability scale — the number on the symbol is the number on the meter, because anything
-    /// else makes composing a book guesswork.
-    var stabilityDelta: Int
+    // **There is deliberately no `stabilityDelta` here, and there must never be one again.**
+    //
+    // A symbol used to carry a hand-typed number — Rich Ore −45, Teeming Life −35 — and greed is
+    // now *measured* off what the symbol says (`greedDelta`). Keeping both meant one world had two
+    // prices depending on which vocabulary you happened to write it in: "Rich Ore" cost 45 and the
+    // same world spelled out as *great iron, gold* cost 8. Q44's answer is to let the measurement
+    // price them, and to make that **structural rather than remembered** — with no field to type a
+    // greed number into, "no authored greed" is enforced by the compiler instead of by discipline.
+    //
+    // What a symbol may still assert by hand is `danger.stabilityTrade`, because that is a
+    // different axis and not a restatement of greed. See `DangerProfile`.
     /// Multipliers on resource yield, keyed by resource. Absent = 1.0.
     var yieldModifiers: [ResourceID: Double]
     /// Additive weight changes to the enemy spawn table, keyed by creature.
@@ -91,6 +95,18 @@ struct SymbolDef: Codable, Equatable, Identifiable, Sendable {
 /// **broaden the kinds of danger** rather than multiply one of them, so Swarm and Predation have to
 /// be able to pull in opposite directions on the same axis.
 struct DangerProfile: Codable, Equatable, Sendable {
+    /// **What accepting this hostility buys, in the Stability headline's own units.**
+    ///
+    /// The one number a symbol is still allowed to assert by hand, and it lives here rather than on
+    /// the symbol so it cannot be mistaken for greed (Q44). Greed is measured off what a symbol
+    /// *says*; this is a **trade** — accept that the world crawls with things, and it holds together
+    /// longer. Nothing in the physical reading of a stormy world can produce that number, because
+    /// the bargain is with the player rather than with the world.
+    ///
+    /// Positive on the danger runes. Negative on Peace, which is the inverse: it spends stability to
+    /// buy calm. The positive side is capped in aggregate (`Tuning.Danger.maximumStabilityGift`);
+    /// the negative side is a cost and is never capped.
+    var stabilityTrade: Int
     /// Scales how many creatures the world holds. Swarm raises it; Predation lowers it.
     var spawnMultiplier: Double
     /// Shifts creature tier. Predation raises it; Swarm lowers it.
@@ -102,13 +118,15 @@ struct DangerProfile: Codable, Equatable, Sendable {
     /// Which description clause this arms, so the panel can say what kind of hostile it is.
     var flavour: String?
 
-    static let none = DangerProfile(spawnMultiplier: 1, tierDelta: 0, hazardTiles: 0, damagePerTurn: 0)
+    static let none = DangerProfile(stabilityTrade: 0, spawnMultiplier: 1, tierDelta: 0,
+                                    hazardTiles: 0, damagePerTurn: 0)
 
     /// Peace is recognised by giving stability *back* — it's the only profile that calms.
     var isCalming: Bool { spawnMultiplier < 1 && tierDelta < 0 }
 
-    init(spawnMultiplier: Double = 1, tierDelta: Int = 0, hazardTiles: Int = 0,
-         damagePerTurn: Int = 0, flavour: String? = nil) {
+    init(stabilityTrade: Int = 0, spawnMultiplier: Double = 1, tierDelta: Int = 0,
+         hazardTiles: Int = 0, damagePerTurn: Int = 0, flavour: String? = nil) {
+        self.stabilityTrade = stabilityTrade
         self.spawnMultiplier = spawnMultiplier
         self.tierDelta = tierDelta
         self.hazardTiles = hazardTiles
@@ -118,6 +136,7 @@ struct DangerProfile: Codable, Equatable, Sendable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
+        stabilityTrade = try c.decodeIfPresent(Int.self, forKey: .stabilityTrade) ?? 0
         spawnMultiplier = try c.decodeIfPresent(Double.self, forKey: .spawnMultiplier) ?? 1
         tierDelta = try c.decodeIfPresent(Int.self, forKey: .tierDelta) ?? 0
         hazardTiles = try c.decodeIfPresent(Int.self, forKey: .hazardTiles) ?? 0

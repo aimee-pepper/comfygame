@@ -99,8 +99,8 @@ enum BookRules {
     }
 
     /// The total the symbols move stability by. Plain addition, in the headline's own units.
-    static func stabilityDelta(of book: BoundBook) -> Int {
-        stabilityDelta(symbolIDs: book.allSymbolIDs)
+    static func dangerTradeDelta(of book: BoundBook) -> Int {
+        dangerTradeDelta(symbolIDs: book.allSymbolIDs)
     }
 
     /// **Greed: how much more world you asked for than a world naturally has.**
@@ -122,6 +122,11 @@ enum BookRules {
     /// touch. Secondaries are consequences rather than requests — a glacier bound to Thermal is a
     /// request for cold, and billing it for the water it also brings would make the headline
     /// something you can't work out while composing, which is the whole point of the number.
+    ///
+    /// **Compounds are charged here too**, by their expansion, which is what retiring the authored
+    /// numbers means in practice (Q44). A compound is *one glyph meaning what several runes mean
+    /// together* — so it must cost what those runes cost, or the two vocabularies price the same
+    /// world differently and the cheaper one is simply correct play.
     static func greedDelta(for sigils: [Sigil]) -> Int {
         let touched = Set(sigils.map(\.target))
         guard !touched.isEmpty else { return 0 }
@@ -149,7 +154,9 @@ enum BookRules {
             .filter { touched.contains($0.id) }
             .reduce(0.0) { total, target in
                 let ordinary = target.neutral ?? target.baseline
-                let excess = asWritten[target.id].peak - ordinary
+                // **The demand, not the clamped reading.** A world can refuse to be more than
+                // wholly golden; you are still charged for having asked.
+                let excess = asWritten[target.id].demand - ordinary
                 let weight = target.greedWeight ?? Tuning.Book.ordinaryGreedWeight
                 // Asking for *less* than ordinary calms a world, and by the same measure. A dead,
                 // frozen, lightless world is easy to hold together — there's nothing in it to hold.
@@ -166,9 +173,9 @@ enum BookRules {
     /// reason: a player who can't see a non-linear term can't reason about it.
     static func dangerStabilityGift(symbolIDs: [SymbolID]) -> (claimed: Int, granted: Int) {
         let claimed = symbolIDs
-            .compactMap { ContentCatalog.shared.symbol($0) }
-            .filter { $0.danger != nil && $0.stabilityDelta > 0 }
-            .reduce(0) { $0 + $1.stabilityDelta }
+            .compactMap { ContentCatalog.shared.symbol($0)?.danger?.stabilityTrade }
+            .filter { $0 > 0 }
+            .reduce(0, +)
         return (claimed, min(claimed, Tuning.Danger.maximumStabilityGift))
     }
 
@@ -198,12 +205,18 @@ enum BookRules {
         dangerProfile(symbolIDs: book.allSymbolIDs)
     }
 
-    static func stabilityDelta(symbolIDs: [SymbolID]) -> Int {
-        let printed = symbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.stabilityDelta ?? 0) }
+    /// **What the danger runes trade for**, and the only thing a symbol still asserts by hand.
+    ///
+    /// Everything else a symbol does to the meter is measured from its expansion (`greedDelta`).
+    /// Peace's cost is included and never capped — the ceiling exists so that stacking danger can't
+    /// buy an arbitrarily greedy world, and a cost has no such failure mode.
+    static func dangerTradeDelta(symbolIDs: [SymbolID]) -> Int {
+        let trades = symbolIDs.compactMap { ContentCatalog.shared.symbol($0)?.danger?.stabilityTrade }
+        let costs = trades.filter { $0 < 0 }.reduce(0, +)
         // The only place a symbol doesn't move the meter by exactly its printed number. It applies
         // solely to *stacked* danger runes, and the preview shows the shortfall on its own line —
         // see `dangerStabilityGift` and questions-for-design Q23.
-        return printed - dangerCapShortfall(symbolIDs: symbolIDs)
+        return costs + dangerStabilityGift(symbolIDs: symbolIDs).granted
     }
 
     /// The 0–100 headline number on a book ("Stability 68").
@@ -217,18 +230,44 @@ enum BookRules {
 
     /// The headline. **Independent of the seed** — everything in it comes off what was written.
     ///
-    /// Greed is charged on `composition` alone, never on the compounds. **A symbol moves the
-    /// headline by exactly its printed number** (session 5, locked) — a compound's printed number
-    /// *is* its declared greed, and charging it twice would break the one rule that makes the meter
-    /// something you can work out in your head. A cluster prints no number, so abundance is the
-    /// only thing there is to read.
+    /// Greed is charged on **everything the book says**, clusters and compounds alike, because a
+    /// compound is only a shorthand for the runes inside it. It used to be charged on `composition`
+    /// alone, with compounds paying a hand-typed number instead; that made *Rich Ore* cost 45 and
+    /// the identical world written out as *great iron, gold* cost 8 (Q44).
     static func stabilityScore(of book: BoundBook) -> Int {
+        stabilityScore(delta: stabilityDelta(of: book,
+                                             sigils: sigils(for: book),
+                                             contradictionPenalty: contradictionPenalty(of: book)))
+    }
+
+    /// **Everything that moves the headline, in one place.**
+    ///
+    /// Three callers needed this sum — the bind, the preview, and the preview's rolled band — and
+    /// each had written it out separately. That was survivable while the terms never changed; it
+    /// stopped being survivable the moment they did. The preview cannot drift from the bind if
+    /// there is only one implementation, which is what the legibility pillar actually requires.
+    ///
+    /// `sigils` is passed in rather than derived because the callers legitimately differ: the bind
+    /// and the preview charge what was *written*, while the band charges written-plus-rolled to
+    /// find out how far a roll could move the number.
+    static func stabilityDelta(of book: BoundBook, sigils: [Sigil], contradictionPenalty: Int) -> Int {
         // Size is written, and writing more world costs — a vast world needs more turns to cross,
         // so it has to buy them (decisions-session-13 §5).
-        stabilityScore(delta: stabilityDelta(of: book)
-                       + book.scale.stabilityDelta
-                       + greedDelta(for: book.composition)
-                       - contradictionPenalty(of: book))
+        dangerTradeDelta(of: book)
+            + book.scale.stabilityDelta
+            + greedDelta(for: sigils)
+            - contradictionPenalty
+    }
+
+    /// What one symbol does to the headline **on an otherwise empty page**.
+    ///
+    /// The palette's number, and the draft path's. Not additive across symbols, and it can't be:
+    /// greed is measured off resolved abundance, and two symbols pushing the same subject stack with
+    /// diminishing returns. It was additive when every symbol carried a hand-typed constant, which
+    /// is precisely the false precision that let *Rich Ore* claim −45 for a world it doesn't write.
+    static func stabilityDelta(ofSymbolAlone id: SymbolID) -> Int {
+        guard let symbol = ContentCatalog.shared.symbol(id) else { return 0 }
+        return (symbol.danger?.stabilityTrade ?? 0) + greedDelta(for: sigils(of: symbol))
     }
 
     /// What a book's contradictions cost it, in the headline's own units.
@@ -385,13 +424,18 @@ enum BookRules {
     private static func compoundSigils(for book: BoundBook) -> [Sigil] {
         book.allSymbolIDs.enumerated().flatMap { symbolIndex, symbolID -> [Sigil] in
             guard let symbol = ContentCatalog.shared.symbol(symbolID) else { return [] }
-            return symbol.expandsTo.enumerated().map { componentIndex, component in
-                Sigil(id: InstanceID(rawValue: UInt64(symbolIndex) << 32 | UInt64(componentIndex)),
-                      source: component.source,
-                      target: component.target,
-                      intensity: component.intensity,
-                      negatedTargets: component.negates)
-            }
+            return sigils(of: symbol, index: symbolIndex)
+        }
+    }
+
+    /// What one compound says, spelled out. The same statement a player could place by hand.
+    static func sigils(of symbol: SymbolDef, index: Int = 0) -> [Sigil] {
+        symbol.expandsTo.enumerated().map { componentIndex, component in
+            Sigil(id: InstanceID(rawValue: UInt64(index) << 32 | UInt64(componentIndex)),
+                  source: component.source,
+                  target: component.target,
+                  intensity: component.intensity,
+                  negatedTargets: component.negates)
         }
     }
 

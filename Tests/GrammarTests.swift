@@ -329,12 +329,22 @@ final class GrammarTests: XCTestCase {
         XCTAssertEqual(scores.count, 1)
     }
 
-    /// **A symbol moves the headline by exactly its printed number** (session 5, locked). A
-    /// compound's printed number is its declared greed; charging abundance on top would double it.
-    func testACompoundStillMovesTheHeadlineByExactlyItsPrintedNumber() {
-        let book = BoundBook(written: ["rich_ore"], essencePaid: 0)
-        XCTAssertEqual(BookRules.stabilityScore(of: book),
-                       BookRules.stabilityScore(delta: BookRules.stabilityDelta(symbolIDs: ["rich_ore"])))
+    /// **One world, one price** (Q44) — and this is the invariant that replaces "a symbol moves the
+    /// headline by exactly its printed number".
+    ///
+    /// A compound is *one glyph meaning what several runes mean together* (rune spec §9). So writing
+    /// the compound and writing out its expansion by hand have to cost the same. They did not: Rich
+    /// Ore carried a hand-typed −45 while the identical world spelled out as *great iron, gold*
+    /// measured −8, which made the shorthand a different world from the thing it is shorthand for.
+    func testACompoundCostsExactlyWhatItsExpansionCosts() throws {
+        for symbol in ContentCatalog.shared.symbols where symbol.danger == nil {
+            let compound = BoundBook(written: [symbol.id], essencePaid: 0)
+            let spelledOut = BoundBook(written: [], composition: BookRules.sigils(of: symbol),
+                                       essencePaid: 0)
+            XCTAssertEqual(BookRules.stabilityScore(of: compound),
+                           BookRules.stabilityScore(of: spelledOut),
+                           "\(symbol.id.rawValue) is priced differently from the runes it stands for")
+        }
     }
 
     /// Ink is charged by the cell, so a page written in the sigil vocabulary isn't free.

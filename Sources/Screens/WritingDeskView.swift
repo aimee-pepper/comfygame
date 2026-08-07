@@ -203,9 +203,12 @@ struct WritingDeskView: View {
             ForEach(sections, id: \.target.id) { section in
                 sectionLabel(section.target.name)
                 chips(section.symbols.map {
+                    // **Measured, not printed.** A compound used to carry a hand-typed number;
+                    // it now costs what the runes inside it cost, on the same footing as the
+                    // Focuses section above — what writing this one thing, alone, would do.
                     Chip(glyph: $0.id.rawValue, name: $0.name, content: .compound($0.id),
                          blockedBy: store.blockingPrimary(for: $0.id)?.name,
-                         stability: $0.stabilityDelta)
+                         stability: BookRules.stabilityDelta(ofSymbolAlone: $0.id))
                 })
             }
         }
@@ -541,7 +544,7 @@ private struct SymbolRow: View {
                     .fixedSize(horizontal: false, vertical: true)
                 HStack(spacing: 10) {
                     Label("\(symbol.essenceCost)", systemImage: "drop")
-                    StabilityTag(delta: symbol.stabilityDelta)
+                    StabilityTag(delta: BookRules.stabilityDelta(ofSymbolAlone: symbol.id))
                 }
                 .font(.caption2)
                 .foregroundStyle(.secondary)

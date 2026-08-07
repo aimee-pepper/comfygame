@@ -62,15 +62,32 @@ final class PressureTests: XCTestCase {
         XCTAssertTrue(light.has("wide-range"), "Wide range means a diurnal and a nocturnal niche")
     }
 
-    /// "A lightless world that is nonetheless lit." A constant source lifts both, so nothing is
-    /// ever fully dark — and nothing is ever bright either.
-    func testAConstantSourceLightsTheFloorAndFlattensTheRange() {
+    /// "A lightless world that is nonetheless lit." A constant source lifts both ends together, so
+    /// nothing is ever fully dark.
+    ///
+    /// **It no longer flattens the range on its own**, and that's the floor moving to ordinary: an
+    /// ordinary world already has a lit day and a dark night, and a source that adds the same amount
+    /// to both leaves that swing exactly as it found it. Flattening now takes something that takes
+    /// the *day* away — see the occluding case below, which is what Dim Sky actually writes.
+    func testAConstantSourceLightsTheFloor() {
         let light = PressureRules.resolve([sigil("fungus", "illumination")])["illumination"]
 
-        XCTAssertGreaterThan(light.floor, 0)
-        XCTAssertEqual(light.peak, light.floor, accuracy: 0.001, "No day, no night — just this")
-        XCTAssertTrue(light.has("constant"))
+        XCTAssertGreaterThan(light.floor, 0, "a constant source has to reach the night")
+        XCTAssertGreaterThan(light.peak, light.floor, "…without abolishing the day")
         XCTAssertTrue(light.has("sourceless"), "Lit, but not by anything in the sky")
+    }
+
+    /// **A world with no real day.** Occluding sources take more off the peak than the floor, so
+    /// enough cloud closes the range from above — which is how "no day, no night, just this" is
+    /// written now, and it is exactly what Dim Sky says.
+    func testOccludingTheDayFlattensTheRange() {
+        let ordinary = PressureRules.resolve([])["illumination"]
+        let dim = PressureRules.resolve([sigil("cloud", "illumination", .great)])["illumination"]
+
+        XCTAssertGreaterThan(ordinary.range, 40, "an ordinary world has a day and a night")
+        XCTAssertFalse(ordinary.has("wide-range"), "…but an ordinary swing is not a remarkable one")
+        XCTAssertLessThan(dim.range, ordinary.range, "cloud has to close the swing, not just dim it")
+        XCTAssertTrue(dim.has("constant"), "under enough cloud there is no real day: \(dim.range)")
     }
 
     /// Adding a floor to a cyclic world narrows the range, and takes the true-dark niche with it.
@@ -183,7 +200,11 @@ final class PressureTests: XCTestCase {
         }
         XCTAssertEqual(readings.totalOpposed, 0)
         XCTAssertGreaterThan(readings["thermal"].peak, 0, "A world nobody wrote about is temperate")
-        XCTAssertEqual(readings["illumination"].peak, 0, "…but nobody lit it")
+        // **And it has a sky.** Writing starts at ordinary rather than at nothing, so a page that
+        // says nothing describes a plain unremarkable place instead of a void — the void is what you
+        // get by *writing* one, with the subtractive focuses (Aimee, 7 Aug).
+        XCTAssertEqual(readings["illumination"].peak, 45, accuracy: 0.001, "…and it is daylit")
+        XCTAssertEqual(readings["illumination"].floor, 0, accuracy: 0.001, "…and its nights are dark")
     }
 
     // MARK: The teeth — cross-target constraints

@@ -127,8 +127,14 @@ final class ResourceSpreadTests: XCTestCase {
         let lively = BoundBook(symbols: ["terrain": "plains", "biome": "verdant",
                                          "bounty": "teeming_life"],
                                randomlyFilled: [], essencePaid: 0)
-        let barren = BoundBook(symbols: ["terrain": "caverns", "biome": "ashen"],
-                               randomlyFilled: [], essencePaid: 0)
+        // **The foil is a world written dead**, not merely one written dim. Since writing starts at
+        // an ordinary world rather than at nothing, *caverns and ash* is a dusty, lightless place
+        // that still holds a little of what an ordinary world holds — sterility has to be asked for,
+        // with the suppressing focuses, and asking for it earns stability back (Aimee, 7 Aug).
+        let barren = BoundBook(written: [], composition: [
+            Sigil(id: InstanceID(rawValue: 1), source: "salt", target: "vitality", intensity: .great),
+            Sigil(id: InstanceID(rawValue: 2), source: "wildfire", target: "vitality", intensity: .great),
+        ], essencePaid: 0)
 
         var seeds = SeedSequence(rootSeed: 31337)
         var sterile = 0, livingAnimals = 0, deadAnimals = 0, livingSpecies = 0
@@ -145,7 +151,11 @@ final class ResourceSpreadTests: XCTestCase {
         XCTAssertLessThan(sterile, runs / 8,
                           "a book asking outright for life still came out sterile \(sterile)/\(runs)")
         XCTAssertGreaterThan(livingAnimals, deadAnimals * 3,
-                             "a written-for-life world held no more than an ash-choked cavern")
+                             "a written-for-life world held no more than a salt flat")
+        // And asking for less than a world ordinarily holds has to *calm* it, which is the other
+        // half of the two-axis model and the reason a barren world is worth writing at all.
+        XCTAssertGreaterThan(BookRules.stabilityScore(of: barren), 100 - 1,
+                             "writing a world empty should have given stability back")
         XCTAssertGreaterThan(livingSpecies, runs * 3,
                              "a written-for-life world averaged under three species")
     }

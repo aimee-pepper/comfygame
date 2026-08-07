@@ -127,28 +127,37 @@ final class BookRulesTests: XCTestCase {
         XCTAssertLessThanOrEqual(calmProjection.enemyTier.upperBound, greedyProjection.enemyTier.lowerBound)
     }
 
-    /// The legibility rule, pinned: **a symbol's printed number is the number the headline moves
-    /// by.** No conversion factor, nothing to work out. This is what makes a book something you can
-    /// reason about while composing rather than after paying.
-    func testASymbolMovesTheHeadlineByExactlyItsPrintedNumber() throws {
-        // Deliberately mid-range, away from the 0 and 100 clamps, where the arithmetic is visible.
+    /// **The legibility rule, restated for a measured meter.**
+    ///
+    /// It used to be "a symbol's printed number is the number the headline moves by", and that rule
+    /// died with the printed numbers (Q44): greed is measured off resolved abundance, and two
+    /// symbols pushing the same subject stack with diminishing returns, so nothing is additive any
+    /// more. What legibility needs instead — and what it always actually needed — is that **the
+    /// number you are shown is the number you get**, and that a greedier choice reads as worse.
+    func testTheHeadlineYouAreShownIsTheHeadlineYouGet() throws {
+        // Deliberately mid-range, away from the 0 and 100 clamps, where the movement is visible.
         var draft = BookDraft()
         draft["terrain"] = "caverns"
         draft["biome"] = "ashen"
-        draft["bounty"] = "sparse_ore"
+        draft["bounty"] = "rich_ore"
         draft["quirk"] = "dim_sky"
 
         let before = BookProjection.project(draft: draft, ownedSymbols: owned).stabilityScore.lowerBound
-
-        // Swap one symbol and check the headline moves by exactly the difference printed on them.
-        draft["quirk"] = "gilded_veins"
-        let after = BookProjection.project(draft: draft, ownedSymbols: owned).stabilityScore.lowerBound
-
-        let dimSky = try XCTUnwrap(ContentCatalog.shared.symbol("dim_sky")).stabilityDelta
-        let gilded = try XCTUnwrap(ContentCatalog.shared.symbol("gilded_veins")).stabilityDelta
-        XCTAssertEqual(after - before, gilded - dimSky)
         XCTAssertGreaterThan(before, 0, "Test book must sit away from the clamps")
         XCTAssertLessThan(before, 100)
+
+        // The preview and the bind are the same computation, so they cannot disagree.
+        let boundBefore = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 7)
+        XCTAssertEqual(BookRules.stabilityScore(of: boundBefore), before,
+                       "the panel promised a headline the world doesn't honour")
+
+        // Swapping a dim sky for a seam of gold asks the world for more, and must cost.
+        draft["quirk"] = "gilded_veins"
+        let after = BookProjection.project(draft: draft, ownedSymbols: owned).stabilityScore.lowerBound
+        XCTAssertLessThan(after, before, "trading darkness for gold has to read as the greedier book")
+
+        let boundAfter = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 7)
+        XCTAssertEqual(BookRules.stabilityScore(of: boundAfter), after)
     }
 
     /// Aimee's case: choosing stabilising symbols should read as *clearly* stable, not as a
@@ -173,8 +182,10 @@ final class BookRulesTests: XCTestCase {
             for biome in ContentCatalog.shared.symbols(in: "biome") {
                 for bounty in ContentCatalog.shared.symbols(in: "bounty") {
                     for quirk in ContentCatalog.shared.symbols(in: "quirk") {
-                        let delta = terrain.stabilityDelta + biome.stabilityDelta
-                            + bounty.stabilityDelta + quirk.stabilityDelta
+                        let delta = BookRules.stabilityDelta(ofSymbolAlone: terrain.id)
+                            + BookRules.stabilityDelta(ofSymbolAlone: biome.id)
+                            + BookRules.stabilityDelta(ofSymbolAlone: bounty.id)
+                            + BookRules.stabilityDelta(ofSymbolAlone: quirk.id)
                         best = max(best, BookRules.stabilityScore(delta: delta))
                     }
                 }
@@ -294,8 +305,13 @@ final class BookRulesTests: XCTestCase {
         var life = BookDraft()
         life["bounty"] = "teeming_life"
 
-        let oreShare = share(of: Resources.ore, in: BookProjection.project(draft: ore, ownedSymbols: owned))
-        let lifeOreShare = share(of: Resources.ore, in: BookProjection.project(draft: life, ownedSymbols: owned))
+        // Averaged over seeds, because three of the four slots are left to chance and a single seed
+        // measures the roll rather than the rule.
+        var oreShare = 0.0, lifeOreShare = 0.0
+        for seed in UInt64(1)...40 {
+            oreShare += share(of: Resources.ore, in: BookProjection.project(draft: ore, ownedSymbols: owned, seed: seed))
+            lifeOreShare += share(of: Resources.ore, in: BookProjection.project(draft: life, ownedSymbols: owned, seed: seed))
+        }
         XCTAssertGreaterThan(oreShare, lifeOreShare, "Rich Ore must actually mean more ore")
 
         // The preview no longer lists a roster — worlds grow their own animals — so the claim is

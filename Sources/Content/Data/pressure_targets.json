@@ -1,5 +1,5 @@
 {
-  "_note": "The world's dials (writing-system-rune-spec §4). Every sigil binds to exactly one of these. 'dualValued' is Illumination and Thermal ONLY — for those, dim and dark are different pressures and one number can't say both. Everything is on a shared 0–100 scale so the preview speaks one language. PLACEHOLDER copy throughout. 'baseline' is where a target sits with nothing written about it — Thermal starts temperate rather than frozen so every climate is authored. 'aspects' are extra scalars a target carries that aren't its magnitude; 'forms' are proportional buckets, because a world equally wet as ice or as rain is two different places. 'neutral' is what an ORDINARY world has of this, used only by the greed calculation, and it is NOT 'baseline'. Baseline is physics — illumination really is 0 with no light source. Neutral is judgement — an ordinary world has a sky. Charging greed against the baseline made 'ordinary' mean pitch dark, so a sun cost more than a vein of gold (greed-formula-fix.md, Aimee 7 Aug). 'greedWeight' is the second axis: wealth lives in Substrate and Vitality, and everything else is charged lightly for being merely strange. All PLACEHOLDER.",
+  "_note": "The world's dials (writing-system-rune-spec \u00a74). Every sigil binds to exactly one of these. 'dualValued' is Illumination and Thermal ONLY \u2014 for those, dim and dark are different pressures and one number can't say both. Everything is on a shared 0\u2013100 scale so the preview speaks one language. 'baseline' IS THE ORDINARY VALUE, AND WRITING STARTS THERE (Aimee, 7 Aug: 'the entire issue is that the starting point of writing is 0 rather than neutral'). A page says how a world DIFFERS from an ordinary one: positive focuses ask for more, subtractive ones \u2014 occluding, suppressing, draining, flattening, sinking, thinning \u2014 ask for less. IT USED TO START AT 0 ON FOUR SUBJECTS, and because readings clamp at 0 that made a third of the vocabulary inert: canopy is authored to occlude light by 35, salt to suppress life by 25, and written alone each resolved to exactly nothing, because there was nothing under them to take away. Thirteen focuses wrote literally zero. That is also why symbols carried hand-typed stability numbers \u2014 Dim Sky's +12 was compensating for content that did nothing at all. A completely un-deviated world is now a plain unremarkable place, which is the POINT of ordinary; a void world is one written with negative focuses. Note this does NOT make an under-specified world plain: subjects nobody wrote about are still ROLLED from the whole pool (PressureRules.rollUnwritten). 'neutral' survives only as an OPTIONAL OVERRIDE for the greed calculation, for a subject where what's physically ordinary and what's judged ordinary genuinely differ. Nothing sets it today, and it defaults to baseline. 'greedWeight' is the second axis: wealth lives in Substrate and Vitality, and everything else is charged lightly for being merely strange. 'aspects' are extra scalars a target carries that aren't its magnitude; 'forms' are proportional buckets, because a world equally wet as ice or as rain is two different places. WHEN ADDING A FOCUS, CHECK ITS SUBJECT CAN STILL BE WRITTEN IN BOTH DIRECTIONS \u2014 a subject with no subtractive words can only ever be asked for more. All PLACEHOLDER copy and numbers.",
   "targets": [
     {
       "id": "illumination",
@@ -10,8 +10,8 @@
       "highLabel": "blazing",
       "lowLabel": "lightless",
       "order": 0,
-      "baseline": 0,
-      "neutral": 45
+      "baseline": 45,
+      "baselineFloor": 0
     },
     {
       "id": "thermal",
@@ -23,7 +23,7 @@
       "lowLabel": "frozen",
       "order": 1,
       "baseline": 50,
-      "neutral": 50
+      "baselineFloor": 50
     },
     {
       "id": "hydrology",
@@ -34,7 +34,7 @@
       "highLabel": "drowned",
       "lowLabel": "parched",
       "order": 2,
-      "baseline": 35,
+      "baseline": 40,
       "forms": [
         "standing",
         "flowing",
@@ -56,8 +56,7 @@
           "highLabel": "brine",
           "baseline": 20
         }
-      ],
-      "neutral": 40
+      ]
     },
     {
       "id": "substrate",
@@ -68,7 +67,7 @@
       "highLabel": "rich",
       "lowLabel": "barren",
       "order": 3,
-      "baseline": 0,
+      "baseline": 30,
       "forms": [
         "hard",
         "ductile",
@@ -83,8 +82,7 @@
           "baseline": 50
         }
       ],
-      "neutral": 30,
-      "greedWeight": 1.0
+      "greedWeight": 1.8
     },
     {
       "id": "relief",
@@ -95,7 +93,7 @@
       "highLabel": "broken",
       "lowLabel": "flat",
       "order": 4,
-      "baseline": 0,
+      "baseline": 35,
       "aspects": [
         {
           "id": "openness",
@@ -111,8 +109,7 @@
           "highLabel": "layered",
           "baseline": 10
         }
-      ],
-      "neutral": 35
+      ]
     },
     {
       "id": "vitality",
@@ -123,7 +120,7 @@
       "highLabel": "teeming",
       "lowLabel": "sterile",
       "order": 5,
-      "baseline": 0,
+      "baseline": 40,
       "aspects": [
         {
           "id": "trophicDepth",
@@ -140,8 +137,7 @@
           "baseline": 50
         }
       ],
-      "neutral": 40,
-      "greedWeight": 0.8
+      "greedWeight": 1.5
     },
     {
       "id": "atmosphere",
@@ -168,8 +164,7 @@
           "highLabel": "clear",
           "baseline": 70
         }
-      ],
-      "neutral": 50
+      ]
     },
     {
       "id": "cycle",
@@ -196,8 +191,7 @@
           "highLabel": "metronomic",
           "baseline": 70
         }
-      ],
-      "neutral": 50
+      ]
     }
   ]
 }

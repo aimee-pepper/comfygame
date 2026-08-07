@@ -14,23 +14,39 @@ struct PressureTargetDef: Codable, Equatable, Identifiable, Sendable {
     var dualValued: Bool
     var highLabel: String
     var lowLabel: String
-    /// Where the target sits with nothing written about it. Thermal starts temperate (50) rather
-    /// than frozen, so every interesting climate is *authored* rather than escaped from.
+    /// **The ordinary value — and where writing starts.**
+    ///
+    /// A page says how a world *differs* from an ordinary one. Positive focuses ask for more than
+    /// ordinary; subtractive ones — occluding, suppressing, draining, flattening — ask for less.
+    ///
+    /// **Four subjects used to start at 0** and that was the deepest fault in the writing system
+    /// (Aimee, 7 Aug: *"the entire issue is that the starting point of writing is 0 rather than
+    /// neutral"*). Readings clamp at zero, so subtraction from zero was zero, and a third of the
+    /// authored vocabulary did nothing: `canopy` occludes light by 35 and `salt` suppresses life by
+    /// 25, and written on their own each resolved to exactly nothing. Thirteen focuses wrote
+    /// literally zero. It is also where the hand-typed stability numbers came from — Dim Sky's +12
+    /// was paying for content that did nothing at all.
+    ///
+    /// This does **not** make an under-specified world plain: subjects nobody wrote about are still
+    /// rolled from the whole pool (`PressureRules.rollUnwritten`). It makes an *undeviated* world
+    /// plain, which is the point of ordinary.
     var baseline: Double
 
-    /// **What counts as an unremarkable amount of this**, for the greed calculation only.
+    /// **What an ordinary world's *low* is**, on the two subjects that have one.
     ///
-    /// Not the same thing as `baseline`, and conflating them is the bug Aimee found: *"the sun as a
-    /// focus SHOULD NOT DESTABILIZE SO MUCH MORE THAN EVERYTHING ELSE WHEN IT IS THE MOST STANDARD
-    /// SOURCE OF ILLUMINATION IN ANY WORLD"* (7 Aug).
+    /// Illumination's ordinary day is 45 and its ordinary night is 0 — lit, and then dark — and one
+    /// number cannot say both, which is the same reason these two targets are dual-valued at all.
+    /// Without it, moving the floor to ordinary made every night as bright as noon: a sun's floor
+    /// contribution is zero because a sun *sets*, so the night inherited the daytime ordinary and no
+    /// world was ever dark. Defaults to `baseline`, which is right for every single-valued subject.
+    var baselineFloor: Double?
+
+    /// **An override for what counts as an unremarkable amount of this**, for greed only.
     ///
-    /// `baseline` is **physics** — what a subject reads with nothing written about it. Illumination's
-    /// is genuinely 0: no light source means no light. `neutral` is **judgement** — what an ordinary
-    /// world has. An ordinary world has a sky.
-    ///
-    /// Charging greed against the baseline meant "ordinary" was *pitch dark*, so any light at all
-    /// read as an extravagant demand: a sun cost −25, more than a vein of gold, and more than half
-    /// of Rich Ore, whose entire identity is greed. Defaults to `baseline` where unstated.
+    /// Nothing sets it, and it defaults to `baseline`. It survives for the subject that may one day
+    /// need what is *physically* ordinary and what is *judged* ordinary to differ — the separation
+    /// the Q44 answer argued for. Now that writing starts at the ordinary value the two coincide
+    /// everywhere, and greed is simply the net of what you wrote.
     var neutral: Double?
 
     /// How ordinary this subject is to ask for. **The value axis** — deviation alone would charge a
@@ -57,6 +73,7 @@ struct PressureTargetDef: Codable, Equatable, Identifiable, Sendable {
         highLabel = try container.decodeIfPresent(String.self, forKey: .highLabel) ?? "high"
         lowLabel = try container.decodeIfPresent(String.self, forKey: .lowLabel) ?? "low"
         baseline = try container.decodeIfPresent(Double.self, forKey: .baseline) ?? 0
+        baselineFloor = try container.decodeIfPresent(Double.self, forKey: .baselineFloor)
         neutral = try container.decodeIfPresent(Double.self, forKey: .neutral)
         greedWeight = try container.decodeIfPresent(Double.self, forKey: .greedWeight)
         aspects = try container.decodeIfPresent([PressureAspectDef].self, forKey: .aspects) ?? []

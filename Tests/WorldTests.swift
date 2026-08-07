@@ -67,7 +67,10 @@ final class WorldTests: XCTestCase {
         for point in world.map.allPoints where world.map[point].content != .empty {
             XCTAssertTrue(seen.insert(point).inserted)
         }
-        for enemy in world.enemies {
+        // A guardian stands *on* its site — the fight is the price of the search, not a separate
+        // mechanic (`sites-system.md`). Everything else stands on open ground.
+        let guarded = Set(world.sites.filter { $0.definition?.contents.guardian != nil }.map(\.position))
+        for enemy in world.enemies where !guarded.contains(enemy.position) {
             XCTAssertEqual(world.map[enemy.position].content, .empty, "Enemies stand on open ground")
         }
     }
@@ -578,7 +581,7 @@ final class WorldTests: XCTestCase {
         print("WHAT A BOOK SCORES — authored deltas vs emergent greed")
         for (label, symbols) in books {
             let bound = book(symbols)
-            let authored = BookRules.stabilityDelta(symbolIDs: bound.allSymbolIDs)
+            let authored = BookRules.dangerTradeDelta(symbolIDs: bound.allSymbolIDs)
             let greed = BookRules.greedDelta(for: BookRules.sigils(for: bound))
             print(String(format: "  %-42s authored %+4d   greed %+4d   score %3d",
                          (label as NSString).utf8String!, authored, greed,

@@ -30,9 +30,18 @@ final class ContentTests: XCTestCase {
         let ordinary = try XCTUnwrap(ContentCatalog.shared.symbol("common_ore"))
         let rich = try XCTUnwrap(ContentCatalog.shared.symbol("rich_ore"))
 
-        XCTAssertGreaterThan(sparse.stabilityDelta, 0, "Asking for less than there is calms a world")
-        XCTAssertEqual(ordinary.stabilityDelta, 0, "Asking for what's already there costs nothing")
-        XCTAssertLessThan(rich.stabilityDelta, 0, "Asking for more than there is, is greed")
+        // **Measured, not printed** (Q44). These used to be hand-typed on the symbols, which meant
+        // the ladder was true by assertion; it is now true only if the three expansions really do sit
+        // below, at and above an ordinary amount of rock.
+        XCTAssertGreaterThan(BookRules.stabilityDelta(ofSymbolAlone: sparse.id), 0,
+                             "Asking for less than there is calms a world")
+        // Within a few points rather than exactly nil: every focus deviates from ordinary by
+        // *something*, so a measured meter has no way to spell an exact zero. Ore you can dig is
+        // slightly more rock than a world ordinarily carries, and it should read as costing nothing.
+        XCTAssertEqual(BookRules.stabilityDelta(ofSymbolAlone: ordinary.id), 0, accuracy: 4,
+                       "Asking for what's already there costs nothing")
+        XCTAssertLessThan(BookRules.stabilityDelta(ofSymbolAlone: rich.id), 0,
+                          "Asking for more than there is, is greed")
 
         // …and the yields have to follow the same ladder, or the names are lying.
         let sparseOre = sparse.yieldModifiers[Resources.ore] ?? 1
