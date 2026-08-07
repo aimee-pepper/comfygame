@@ -244,11 +244,12 @@ enum CombatRules {
             encounter.note("\(foe.stats.displayName): \(covering), and it \(foe.stats.damageKind.verb).")
 
         case .ward:
-            // **Ward.** Against one kind, which is the point — you have to know what's coming, and
-            // Sight is how you find out.
-            let against = skill.damage ?? mostCommonIncoming(in: encounter)
+            // **Ward.** Against one of six things, which is the point — you have to know what's
+            // coming, and Sight is how you find out. A ward against "elemental" in general would be
+            // the good-against-everything shape the whole skill set is built to avoid.
+            let against = skill.damage.map(Harm.blow) ?? mostCommonIncoming(in: encounter)
             encounter.wards[actor] = WardState(against: against, rounds: skill.rounds)
-            encounter.note("\(skill.name): set against \(against.rawValue).")
+            encounter.note("\(skill.name): set against \(against.displayName).")
 
         case .taunt:
             // **Draw Off.** The only way to take a hit meant for somebody else.
@@ -270,14 +271,19 @@ enum CombatRules {
             encounter.note("\(skill.name).")
 
         case .cleanse:
-            // **Steady.** Closes a wound that was still open.
+            // **Steady.** Closes whatever is still open — a wound, a burn, a poison, or the
+            // after-image of something that flared at you.
             let target = ally ?? actor
             switch target {
             case .binder: encounter.binderBleedRounds = 0
             case .companion: encounter.companionBleedRounds = 0
             case .foe: break
             }
-            encounter.note("\(skill.name): the bleeding stops.")
+            let carried = encounter.statuses[target] ?? []
+            encounter.statuses[target] = []
+            encounter.note(carried.isEmpty
+                           ? "\(skill.name): the bleeding stops."
+                           : "\(skill.name): the \(carried.map { $0.kind.rawValue }.joined(separator: " and ")) stops.")
 
         case .rout:
             // **Rout.** Leaving without the world noticing — the answer to a fight you shouldn't
@@ -307,13 +313,40 @@ enum CombatRules {
         }
     }
 
-    /// What most of what's still standing swings, so a Ward with no stated type guards against the
-    /// likeliest thing rather than nothing.
-    private static func mostCommonIncoming(in encounter: EncounterState) -> DamageKind {
+    /// What most of what's still standing brings, so a Ward with nothing stated guards the likeliest
+    /// thing rather than nothing. **An emanation wins over a blow** — nothing you wear stops one,
+    /// so it's the harm most worth turning aside.
+    private static func mostCommonIncoming(in encounter: EncounterState) -> Harm {
+        let elements = encounter.livingFoes.compactMap(\.stats.element)
+        if let commonest = EmanationKind.allCases.max(by: { a, b in
+            elements.count { $0 == a } < elements.count { $0 == b }
+        }), elements.contains(commonest) {
+            return .emanation(commonest)
+        }
         let kinds = encounter.livingFoes.map(\.stats.damageKind)
-        return DamageKind.allCases.max { a, b in
+        return .blow(DamageKind.allCases.max { a, b in
             kinds.count { $0 == a } < kinds.count { $0 == b }
-        } ?? .pierce
+        } ?? .pierce)
+    }
+
+    // MARK: Harm that outlives the blow
+
+    /// Lays a status on somebody, replacing a weaker one of the same kind rather than stacking.
+    /// Stacking would make two emanating creatures arithmetic rather than a threat.
+    private static func afflict(_ target: Combatant, with kind: StatusKind, damage: Int,
+                                rounds: Int, encounter: inout EncounterState) {
+        var carried = encounter.statuses[target] ?? []
+        if let index = carried.firstIndex(where: { $0.kind == kind }) {
+            carried[index].damage = max(carried[index].damage, damage)
+            carried[index].rounds = max(carried[index].rounds, rounds)
+        } else {
+            carried.append(StatusState(kind: kind, damage: damage, rounds: rounds))
+        }
+        encounter.statuses[target] = carried
+    }
+
+    static func has(_ kind: StatusKind, _ actor: Combatant, in encounter: EncounterState) -> Bool {
+        (encounter.statuses[actor] ?? []).contains { $0.kind == kind }
     }
 
     static func skill(for actor: Combatant) -> SkillDef? {
@@ -426,6 +459,14 @@ enum CombatRules {
         let name = foe.stats.displayName
         let who = actorName(actor, encounter: encounter)
 
+        // **Dazzled, you swing at where it was.** A light emanation now costs you your accuracy
+        // rather than only a point of health (Q42).
+        let dazzled = has(.dazzle, actor, in: encounter) ? Tuning.Encounter.dazzleMissChance : 0
+        if dazzled > 0, run.rng.chance(dazzled) {
+            encounter.note("\(who) \(actor == .binder ? "swing" : "swings") at where \(name) was.")
+            return
+        }
+
         // **Sleek and small is hard to hit.** A miss is the price of chasing something built to run.
         if run.rng.chance(foe.stats.evasion) {
             encounter.note("\(who) \(actor == .binder ? "swing" : "swings") at \(name) and find\(actor == .binder ? "" : "s") nothing there.")
@@ -455,10 +496,18 @@ enum CombatRules {
             encounter.foes[index].bleedRounds = Tuning.Encounter.bleedRounds
         }
 
-        // **Warning colours are honest.** Hitting something that advertises costs you.
+        // **Warning colours are honest.** Hitting something that advertises costs you — and if it
+        // was advertising *venom*, it costs you for a while (Q42).
         if foe.stats.retaliation > 0, encounter.foes[index].isAlive {
             hurt(actor, by: foe.stats.retaliation, run: &run, encounter: &encounter)
             encounter.note("\(name.capitalisedSentence) is not safe to touch — \(foe.stats.retaliation) back.")
+            if foe.traits?.isToxic == true {
+                afflict(actor, with: .poison,
+                        damage: Tuning.Encounter.statusDamage["poison"] ?? 0,
+                        rounds: Tuning.Encounter.statusRounds["poison"] ?? 3,
+                        encounter: &encounter)
+                encounter.note("It's in you now.")
+            }
         }
         if !encounter.foes[index].isAlive { encounter.note("\(name.capitalisedSentence) goes down.") }
     }
@@ -606,6 +655,24 @@ enum CombatRules {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
         let damage = Tuning.Encounter.bleedDamage
 
+        // **Burns, poisons and dazzles**, ticked with everything else so a force-quit between
+        // rounds can't skip or double one.
+        for (who, carried) in encounter.statuses {
+            var remaining: [StatusState] = []
+            for status in carried {
+                if status.damage > 0, isAlive(who, in: withEncounter(encounter, on: run)) {
+                    hurt(who, by: status.damage, run: &run, encounter: &encounter)
+                    encounter.note("\(actorName(who, encounter: encounter)) \(status.kind.verb) — \(status.damage).")
+                }
+                if status.rounds > 1 {
+                    var next = status
+                    next.rounds -= 1
+                    remaining.append(next)
+                }
+            }
+            encounter.statuses[who] = remaining
+        }
+
         // **Wounds you opened.** Flense's, which are per-foe and carry their own severity — a
         // shaggy thing bleeds far worse than a plated one, which is the whole reading.
         for (foeID, state) in encounter.foeBleeds {
@@ -707,9 +774,11 @@ enum CombatRules {
             var raw = Double(roll(around: foe.stats.attack, run: &run)) * share
             if foe.stats.damageKind == .crush { raw *= 1 + Tuning.Encounter.crushDamageBonus }
 
-            // **Ward.** Turns aside one kind, so you have to know what's coming — which is what
+            // **Ward.** Turns aside one harm, so you have to know what's coming — which is what
             // Sight is for. Guessing wrong costs you the round you spent setting it.
-            if let ward = encounter.wards[target], ward.against == foe.stats.damageKind {
+            let incoming: Harm = (encounter.snuffed.contains(foeID) ? nil : foe.stats.element)
+                .map(Harm.emanation) ?? .blow(foe.stats.damageKind)
+            if encounter.wards[target]?.harm == incoming {
                 raw *= 1 - Tuning.Encounter.wardReduction
             }
 
@@ -741,6 +810,19 @@ enum CombatRules {
                 case .foe: break
                 }
                 encounter.note("The wound won't close.")
+            }
+
+            // **And so does what it gives off** (Q42). Emanation was generated, named in the
+            // description, and did nothing beyond one armour-ignoring hit. Snuff puts a stop to it.
+            if let element = foe.stats.element, !encounter.snuffed.contains(foeID) {
+                let status = StatusKind.from(element)
+                afflict(target, with: status,
+                        damage: Tuning.Encounter.statusDamage[status.rawValue] ?? 0,
+                        rounds: Tuning.Encounter.statusRounds[status.rawValue] ?? 2,
+                        encounter: &encounter)
+                encounter.note(status == .dazzle
+                               ? "The after-image sits in your eyes."
+                               : "It's still \(status == .burn ? "burning" : "spreading").")
             }
         }
 

@@ -152,6 +152,8 @@ enum EconomyRules {
                 state.base.purchasedGambitSlots += 1
             case .essenceSpringTier:
                 bumpStation(Stations.essenceSpring, in: &state)
+            case .scriptoriumTier:
+                bumpStation(Stations.scriptorium, in: &state)
             case .automateSelf:
                 state.base.hasAutomateSelfUnlock = true
             case .companionWeapon, .companionArmor:

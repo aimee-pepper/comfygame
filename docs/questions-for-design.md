@@ -913,7 +913,33 @@ The spec is good and mostly buildable as written. Four things I'd rather not dec
 change any of them in an afternoon. What I can't do is invent the Trader's meeting scene — that's
 voice, same as the other five in `travellers.json`.
 
-## Q42 — Burn, freeze and shock: three statuses or one? **[AIMEE]**
+## Q42 — Burn, freeze and shock: three statuses or one? — **THREE (Aimee, 6 Aug), and built**
+
+> *"q42 is 3 for sure."*
+
+**Built as three — but as the three this game actually produces**, which is the one place I read
+past the audit's wording. `EmanationKind` has exactly three cases and they're generated onto real
+creatures; toxicity is a separate flag. Burn and freeze and shock would have been *two effects with
+nothing in the game making them*, which is the same bug as an inert qualifier, one layer down.
+
+| Status | Produced by | What it does |
+|---|---|---|
+| **Burn** | a **heat** emanation | short and hard, through armour |
+| **Poison** | a **caustic** emanation, and touching anything toxic | slow, long, and armour never helped |
+| **Dazzle** | a **light** emanation | costs you your accuracy rather than your health |
+
+Poison from toxicity is the one that closes a loop: warning colours were already honest — hitting
+something that advertises costs you — and now what it was advertising is venom.
+
+**Ward was widened to match.** It guards a `Harm`, which is a blow *or* an emanation — six things
+rather than three. That's what makes setting one a decision, and what makes spending a round on
+Sight first worth doing. With nothing stated it guards the likeliest incoming harm, and **an
+emanation wins over a blow**, because nothing you wear stops one.
+
+**If you want freeze and shock**, they need producers first — a cold or electric emanation on the
+creature side, which is a `CreatureTraits` change and yours to call.
+
+## (original question)
 
 Audit #11 §3 is right that this is the real gap, and it names the fork exactly. **Producers exist
 and effects don't:** `emanation` is a generated creature trait that appears in descriptions; toxic

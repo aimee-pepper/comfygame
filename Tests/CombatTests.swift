@@ -692,7 +692,7 @@ final class CombatTests: XCTestCase {
             let store = inFightWith([crusher])
             store.mutate("test: stand and take it") { state in
                 guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
-                if let against { encounter.wards[.binder] = WardState(against: against, rounds: 3) }
+                if let against { encounter.wards[.binder] = WardState(against: .blow(against), rounds: 3) }
                 // Force the foe to act next, at the Binder.
                 let foe = encounter.foes[0].id
                 encounter.taunts[foe] = 3
@@ -765,6 +765,104 @@ final class CombatTests: XCTestCase {
         // Both of them get a real list, not one a piece.
         for owner in [SkillDef.Owner.binder, .companion] {
             XCTAssertGreaterThanOrEqual(ContentCatalog.shared.skills(ownedBy: owner).count, 5)
+        }
+    }
+
+    // MARK: Statuses — the producers finally reach the fight
+
+    /// **An emanating creature leaves something behind** (Q42). Emanation is a generated trait that
+    /// reached the creature's description and did nothing in the fight beyond one armour-ignoring
+    /// blow. Three statuses now, one per emanation, because Ward needs something specific to turn
+    /// aside — a ward against "elemental" would be the good-against-everything shape the whole
+    /// skill set exists to avoid.
+    func testWhatACreatureGivesOffKeepsCostingYou() throws {
+        for element in EmanationKind.allCases {
+            var emanating = CreatureTraits()
+            emanating.size = 80; emanating.build = 70
+            emanating.emanation = emanation(of: element)
+            emanating.armament.setTotal(60)
+
+            let store = inFightWith([emanating])
+            guard let foe = store.activeEncounter?.foes.first, foe.stats.element != nil else {
+                XCTFail("\(element.rawValue) didn't survive into the fight's stats")
+                continue
+            }
+            forceTheFoeToStrike(in: store)
+
+            let carried = store.activeEncounter?.statuses.values.flatMap { $0 } ?? []
+            XCTAssertTrue(carried.contains { $0.kind == StatusKind.from(element) },
+                          "a \(element.rawValue) creature hit somebody and left no \(StatusKind.from(element).rawValue)")
+        }
+    }
+
+    /// **Snuff puts it out**, which is what makes it an answer to a specific kind of creature
+    /// rather than a bigger attack.
+    func testSnuffStopsIt() throws {
+        var burning = CreatureTraits()
+        burning.size = 80; burning.build = 70
+        burning.emanation = emanation(of: .heat)
+        burning.armament.setTotal(60)
+
+        let store = inFightWith([burning])
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
+        giveTheTurnTo(.companion, in: store)
+        store.mutate("test: snuff it") { CombatRules.perform(.skill("snuff", foe: foeID), by: .companion, in: &$0) }
+        forceTheFoeToStrike(in: store)
+
+        let carried = store.activeEncounter?.statuses.values.flatMap { $0 } ?? []
+        XCTAssertFalse(carried.contains { $0.kind == .burn },
+                       "snuffed it and it still set somebody on fire")
+    }
+
+    /// **Steady clears them.** Otherwise a status is a tax rather than a problem with an answer.
+    func testSteadyClearsWhatIsStillWorking() throws {
+        let store = inFightWith([armoured()])
+        store.mutate("test: poisoned") { state in
+            state.worlds.activeRun?.activeEncounter?.statuses[.binder] =
+                [StatusState(kind: .poison, damage: 2, rounds: 4)]
+        }
+        giveTheTurnTo(.companion, in: store)
+        store.mutate("test: steady") { CombatRules.perform(.skill("steady", ally: .binder), by: .companion, in: &$0) }
+        XCTAssertTrue((store.activeEncounter?.statuses[.binder] ?? []).isEmpty,
+                      "Steady left the poison in")
+    }
+
+    /// A Ward can be set against an **emanation**, not only a blow — six things to choose between,
+    /// which is what makes spending a round on Sight first worth doing.
+    func testAWardCanBeSetAgainstWhatSomethingGivesOff() throws {
+        var burning = CreatureTraits()
+        burning.size = 80; burning.build = 70
+        burning.emanation = emanation(of: .heat)
+        burning.armament.setTotal(60)
+
+        let store = inFightWith([burning])
+        giveTheTurnTo(.companion, in: store)
+        store.mutate("test: ward") { CombatRules.perform(.skill("ward"), by: .companion, in: &$0) }
+
+        // With nothing stated, a Ward guards the likeliest harm — and an emanation wins, because
+        // nothing you wear stops one.
+        XCTAssertEqual(store.activeEncounter?.wards[.companion]?.harm, .emanation(.heat),
+                       "the Ward guarded a blow while something was busy setting fire to us")
+    }
+
+    /// A creature that gives off one particular thing, strongly enough for it to count.
+    private func emanation(of kind: EmanationKind) -> Emanation {
+        Emanation(strength: 80,
+                  light: kind == .light ? 100 : 0,
+                  heat: kind == .heat ? 100 : 0,
+                  caustic: kind == .caustic ? 100 : 0)
+    }
+
+    /// Hands the turn to whatever foe is present and lets it swing.
+    private func forceTheFoeToStrike(in store: GameStore) {
+        store.mutate("test: their move") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  let foe = encounter.foes.first
+            else { return }
+            encounter.turnIndex = encounter.order.firstIndex(of: .foe(foe.id)) ?? 0
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+            CombatRules.runAutomaticTurns(in: &state)
         }
     }
 }

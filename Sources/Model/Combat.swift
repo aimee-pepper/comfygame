@@ -258,6 +258,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     var revealed: Set<InstanceID> = []
     /// Foes no longer giving anything off (Snuff).
     var snuffed: Set<InstanceID> = []
+    /// **Burns, poisons and dazzles**, per combatant. Emanation was a generated trait that reached
+    /// the prose and never the fight; now it leaves something behind (Q42).
+    var statuses: [Combatant: [StatusState]] = [:]
     /// Extra turns owed, and turns owed back. Quicken buys the first with the second.
     var extraTurns: [Combatant: Int] = [:]
     var skippedTurns: [Combatant: Int] = [:]
@@ -321,6 +324,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         taunts = try c.decodeIfPresent([InstanceID: Int].self, forKey: .taunts) ?? [:]
         revealed = try c.decodeIfPresent(Set<InstanceID>.self, forKey: .revealed) ?? []
         snuffed = try c.decodeIfPresent(Set<InstanceID>.self, forKey: .snuffed) ?? []
+        statuses = try c.decodeIfPresent([Combatant: [StatusState]].self, forKey: .statuses) ?? [:]
         extraTurns = try c.decodeIfPresent([Combatant: Int].self, forKey: .extraTurns) ?? [:]
         skippedTurns = try c.decodeIfPresent([Combatant: Int].self, forKey: .skippedTurns) ?? [:]
         isCompanionOverridden = try c.decodeIfPresent(Bool.self, forKey: .isCompanionOverridden) ?? false
@@ -329,6 +333,80 @@ struct EncounterState: Codable, Equatable, Sendable {
         companionBleedRounds = try c.decodeIfPresent(Int.self, forKey: .companionBleedRounds) ?? 0
         log = try c.decodeIfPresent([String].self, forKey: .log) ?? []
         spoils = try c.decodeIfPresent([String].self, forKey: .spoils) ?? []
+    }
+}
+
+/// **Harm that outlives the blow.** Three of them (Aimee, 6 Aug: *"q42 is 3 for sure"*).
+///
+/// Three rather than one `elemental` status carrying its element, and the reason is Ward: a Ward
+/// that turns aside *elemental in general* is exactly the good-against-everything shape the skill
+/// rule warns against. Three gives it a real question — you watched it sear, so you ward burn.
+///
+/// **These three because these three have producers.** `EmanationKind` is a generated creature
+/// trait with exactly three cases, and toxicity is a separate flag; burn and freeze and shock would
+/// have been two effects with nothing in the game making them, which is the inverse of the bug
+/// this fixes.
+enum StatusKind: String, Codable, Hashable, CaseIterable, Sendable {
+    /// From a **heat** emanation. Burns through armour, briefly and hard.
+    case burn
+    /// From a **caustic** emanation, and from anything toxic you were unwise enough to hit.
+    /// Slower, longer, and armour was never going to help.
+    case poison
+    /// From a **light** emanation. You can't see what you're swinging at.
+    case dazzle
+
+    var displayName: String { rawValue.capitalisedSentence }
+
+    /// What produces it, so a creature's emanation reaches the fight rather than only the prose.
+    static func from(_ element: EmanationKind) -> StatusKind {
+        switch element {
+        case .heat: .burn
+        case .caustic: .poison
+        case .light: .dazzle
+        }
+    }
+
+    var verb: String {
+        switch self {
+        case .burn: "burns"
+        case .poison: "is working through"
+        case .dazzle: "can't see straight"
+        }
+    }
+}
+
+/// One affliction on one combatant.
+struct StatusState: Codable, Equatable, Sendable {
+    var kind: StatusKind
+    /// Per round. Zero for `dazzle`, which costs you accuracy rather than health.
+    var damage: Int
+    var rounds: Int
+
+    init(kind: StatusKind, damage: Int, rounds: Int) {
+        self.kind = kind
+        self.damage = damage
+        self.rounds = rounds
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        kind = try c.decodeIfPresent(StatusKind.self, forKey: .kind) ?? .burn
+        damage = try c.decodeIfPresent(Int.self, forKey: .damage) ?? 0
+        rounds = try c.decodeIfPresent(Int.self, forKey: .rounds) ?? 0
+    }
+}
+
+/// **What a Ward can be set against.** Six things, not two — which is what makes setting one a
+/// decision, and what makes spending a round on Sight first worth doing.
+enum Harm: Codable, Hashable, Sendable {
+    case blow(DamageKind)
+    case emanation(EmanationKind)
+
+    var displayName: String {
+        switch self {
+        case .blow(let kind): kind.rawValue
+        case .emanation(let element): element.rawValue
+        }
     }
 }
 
@@ -352,19 +430,35 @@ struct BleedState: Codable, Equatable, Sendable {
 /// What somebody is turning aside, and for how long. A ward is against **one kind** — the whole
 /// point is that you have to know what's coming.
 struct WardState: Codable, Equatable, Sendable {
-    var against: DamageKind
+    var harm: Harm
     var rounds: Int
 
-    init(against: DamageKind, rounds: Int) {
-        self.against = against
+    init(against harm: Harm, rounds: Int) {
+        self.harm = harm
         self.rounds = rounds
     }
 
+    /// Accepts the bare `DamageKind` this used to hold, so a save written mid-fight before wards
+    /// could guard an emanation still resumes with the ward it had.
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        against = try c.decodeIfPresent(DamageKind.self, forKey: .against) ?? .pierce
         rounds = try c.decodeIfPresent(Int.self, forKey: .rounds) ?? 0
+        if let harm = try c.decodeIfPresent(Harm.self, forKey: .harm) {
+            self.harm = harm
+        } else if let kind = try c.decodeIfPresent(DamageKind.self, forKey: .against) {
+            harm = .blow(kind)
+        } else {
+            harm = .blow(.pierce)
+        }
     }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(harm, forKey: .harm)
+        try c.encode(rounds, forKey: .rounds)
+    }
+
+    private enum CodingKeys: String, CodingKey { case harm, rounds, against }
 }
 
 enum EncounterOutcome: String, Codable, Equatable, Sendable {

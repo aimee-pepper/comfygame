@@ -193,6 +193,13 @@
       one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## Emanation reaches the fight (Q42, Aimee 6 Aug 2026)
+- [x] **Three statuses** — burn, poison, dazzle, one per emanation the game already generates
+- [x] Toxic things poison you when you hit them, which is what they were advertising
+- [x] **Ward guards a `Harm`** — a blow or an emanation, six things rather than three
+- [x] Snuff puts an emanation out; Steady clears what's still working
+- [ ] Freeze and shock need producers first — a cold or electric emanation is a design call
+
 ## The hands, and who teaches them (Aimee, 6 Aug 2026)
 - [x] **Every building owns its own tree** (Q40). Workshop keeps what you work out yourself;
       everything a person teaches went with that person's building
@@ -201,6 +208,8 @@
       free rungs, deliberately, because the hands are what the game is about
 - [x] **The hands repriced.** A pencil was 30 essence and 6 fibre for roughly double what a page
       can say. Each one now names a material from a particular kind of world
+- [x] **Chaining before the fountain pen** (Aimee, 6 Aug) — the branch is a line, not a fork, and
+      the Scriptorium's own two tiers sit in it
 - [ ] Move The Hold to the Tannery once the Tannery exists (Q37, answered yes)
 
 ## Reading what you wrote (Aimee, 6 Aug 2026)

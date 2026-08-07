@@ -157,6 +157,8 @@ struct ResearchGrant: Codable, Equatable, Sendable {
         /// The next instrument up: charcoal → pencil → fountain pen. Refinement is literacy, not
         /// power — it lets you say the same things in less space, never new things.
         case finerHand
+        /// Raises the Scriptorium, which is what gates the rungs above it (Q40's tier rule).
+        case scriptoriumTier
     }
 }
 

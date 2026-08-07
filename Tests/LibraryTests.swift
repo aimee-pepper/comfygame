@@ -392,6 +392,16 @@ final class LibraryTests: XCTestCase {
         }
     }
 
+    /// **Chaining before the fountain pen** — the branch is a line, not a fork.
+    func testTheBranchIsALineWithChainingBeforeTheFinestHand() throws {
+        let fountain = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_fountain"))
+        XCTAssertTrue(fountain.requires.contains("pen_chaining"),
+                      "the fountain pen can be reached without ever learning to join two things")
+        let chaining = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_chaining"))
+        XCTAssertFalse(chaining.requires.contains("pen_fountain"))
+        XCTAssertGreaterThan(EconomyRules.depthOf(fountain), EconomyRules.depthOf(chaining))
+    }
+
     /// …and the last one wants the building upgraded, which is the job `maxTier` never had.
     func testTheFinestHandNeedsTheScriptoriumUpgraded() throws {
         let store = GameStore(io: .temporary(name: "tier-\(UUID().uuidString)"))
@@ -401,7 +411,10 @@ final class LibraryTests: XCTestCase {
                 state.base.resources.add(9_999, of: resource.id)
             }
             state.base.stations[Stations.scriptorium] = StationState(isUnlocked: true, tier: 0)
-            state.base.completedResearch.insert("pen_pencil")
+            // The whole line up to it — chaining comes before the fountain pen (Aimee, 6 Aug):
+            // learning to join two statements is the grammar lesson, writing small enough for it
+            // to matter is the one after.
+            state.base.completedResearch.formUnion(["pen_pencil", "pen_desk", "pen_chaining"])
         }
         let fountain = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_fountain"))
         XCTAssertFalse(store.canResearch(fountain), "the finest hand ignored the building's tier")

@@ -622,76 +622,6 @@
       ]
     },
     {
-      "id": "pen_pencil",
-      "branch": "penmanship",
-      "name": "A pencil",
-      "icon": "pencil",
-      "blurb": "Charcoal says everything too loudly. A pencil says the same things in half the room.",
-      "cost": {
-        "essence": 150,
-        "resources": {
-          "timber": 10,
-          "copper": 8
-        }
-      },
-      "requires": [],
-      "grants": [
-        {
-          "kind": "effect",
-          "effect": "finerHand"
-        }
-      ]
-    },
-    {
-      "id": "pen_fountain",
-      "branch": "penmanship",
-      "name": "A fountain pen",
-      "icon": "pencil.tip",
-      "blurb": "Every rune, one square. The page stops fighting your handwriting and starts being a budget.",
-      "cost": {
-        "essence": 500,
-        "resources": {
-          "resin": 12,
-          "silver": 10,
-          "quartz": 6
-        }
-      },
-      "requires": [
-        "pen_pencil"
-      ],
-      "grants": [
-        {
-          "kind": "effect",
-          "effect": "finerHand"
-        }
-      ],
-      "needsStationTier": 2
-    },
-    {
-      "id": "pen_chaining",
-      "branch": "penmanship",
-      "name": "Chaining",
-      "icon": "link",
-      "blurb": "Two things deciding the same question, held together. One land was always a limitation of the hand, not of the world.",
-      "cost": {
-        "essence": 350,
-        "resources": {
-          "mercury": 4,
-          "mote": 2
-        }
-      },
-      "requires": [
-        "pen_pencil"
-      ],
-      "grants": [
-        {
-          "kind": "effect",
-          "effect": "chaining"
-        }
-      ],
-      "needsStationTier": 1
-    },
-    {
       "id": "shelving_four",
       "branch": "hold",
       "name": "Shelving, wall to wall",
@@ -897,6 +827,123 @@
           "effect": "satchelTier"
         }
       ]
+    },
+    {
+      "id": "pen_pencil",
+      "branch": "penmanship",
+      "name": "A pencil",
+      "icon": "pencil",
+      "blurb": "Lead and a sleeve of wood. Half the room, and Isolde will not stop calling it a beginning.",
+      "cost": {
+        "essence": 150,
+        "resources": {
+          "copper": 8,
+          "timber": 10
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "finerHand"
+        }
+      ]
+    },
+    {
+      "id": "pen_desk",
+      "branch": "penmanship",
+      "name": "A table that doesn't rock",
+      "icon": "tablecells",
+      "blurb": "Isolde's first condition, and she was right about it. Raises the Scriptorium.",
+      "cost": {
+        "essence": 120,
+        "resources": {
+          "clay": 12,
+          "timber": 16
+        }
+      },
+      "requires": [
+        "pen_pencil"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "scriptoriumTier"
+        }
+      ]
+    },
+    {
+      "id": "pen_chaining",
+      "branch": "penmanship",
+      "name": "Chaining",
+      "icon": "link",
+      "blurb": "Joining one statement to another, so a world can have two kinds of land in it.",
+      "cost": {
+        "essence": 350,
+        "resources": {
+          "mercury": 4,
+          "mote": 2
+        }
+      },
+      "requires": [
+        "pen_pencil"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "chaining"
+        }
+      ],
+      "needsStationTier": 1
+    },
+    {
+      "id": "pen_press",
+      "branch": "penmanship",
+      "name": "A ruling frame",
+      "icon": "rectangle.split.3x3",
+      "blurb": "Lines true enough to write a hair's width between them. Raises the Scriptorium again.",
+      "cost": {
+        "essence": 260,
+        "resources": {
+          "quartz": 8,
+          "silver": 6
+        }
+      },
+      "requires": [
+        "pen_chaining"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "scriptoriumTier"
+        }
+      ],
+      "needsStationTier": 1
+    },
+    {
+      "id": "pen_fountain",
+      "branch": "penmanship",
+      "name": "A fountain pen",
+      "icon": "pencil.tip",
+      "blurb": "A nib ground to nothing and a barrel that holds its ink. Everything, in a quarter of the room.",
+      "cost": {
+        "essence": 500,
+        "resources": {
+          "quartz": 6,
+          "resin": 12,
+          "silver": 10
+        }
+      },
+      "requires": [
+        "pen_chaining"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "finerHand"
+        }
+      ],
+      "needsStationTier": 2
     }
   ]
 }

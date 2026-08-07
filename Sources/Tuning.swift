@@ -478,6 +478,13 @@ enum Tuning {
         /// How much a Ward turns aside, when it's set against the right thing. Deliberately short of
         /// total: setting it correctly should be a good round, not an immunity.
         static let wardReduction: Double = 0.6  // PLACEHOLDER
+        /// **Harm that outlives the blow** (Q42, Aimee: three of them). Keyed by `StatusKind`, so a
+        /// fourth is a line here and a case there. Burn is short and hard, poison long and patient,
+        /// dazzle costs accuracy rather than health.
+        static let statusDamage: [String: Int] = ["burn": 4, "poison": 2, "dazzle": 0] // PLACEHOLDER
+        static let statusRounds: [String: Int] = ["burn": 2, "poison": 4, "dazzle": 2]  // PLACEHOLDER
+        /// How often a dazzled swing finds nothing.
+        static let dazzleMissChance: Double = 0.35 // PLACEHOLDER
         /// Damage and healing wobble by ±this fraction of their power.
         static let damageVariance: Double = 0.25     // PLACEHOLDER
         static let consumableHealAmount: Int = 10    // PLACEHOLDER
