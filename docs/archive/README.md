@@ -29,3 +29,18 @@ archived one.
 | `engineering-notes-session-2.md` | the code | Implementation reports; what they describe is built and tested |
 | `engineering-notes-session-3.md` | the code | ” |
 | `engineering-notes-session-4.md` | the code | ” |
+| `code-audit-2.md` … `code-audit-12.md` | the code | Point-in-time reports; every finding is actioned or is tracked in `BACKLOG.md` |
+| `code-audit-9-and-answers.md` | `questions-for-design.md` | Answers folded into the questions they answer |
+| `code-audit-10-and-answers.md` | ” | ” |
+| `answers-q21-q34.md` | `questions-for-design.md` | All fourteen folded in beside their questions |
+| `backlog-referrals-worked.md` | `for-design.md` | Merged into the single referral list |
+| `jargon-audit.md` | `vocabulary-settled.md` | The audit found the words; the settled list is the answer |
+| `hands-and-calligrapher-spec.md` | the code | Built: the Scriptorium, Isolde, the repriced hands |
+| `world-history-and-feedback-spec.md` | the code | Built: the chain readout and the world history |
+| `audit-what-pressures-actually-do.md` | the code | Pressures reach generation now — terrain, nodes, cast, drops |
+| `audit-claude-invented-assumptions.md` | `decisions-log.md` | Resolved by sessions 16–17 |
+| `deviations-audit.md` | the code | Every deviation either fixed or recorded as a decision |
+| `design-audit-session-5.md` | the code | ” |
+| `full-audit-built-vs-specced.md` | `BACKLOG.md` | The gap list lives in the backlog now |
+| `overnight-notes-2026-08-05.md` | the code | Working notes for work that landed |
+| `README-HANDOFF.md` | `README.md` | A handoff for seven docs that have all landed |
