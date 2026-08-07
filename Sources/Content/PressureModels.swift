@@ -17,6 +17,27 @@ struct PressureTargetDef: Codable, Equatable, Identifiable, Sendable {
     /// Where the target sits with nothing written about it. Thermal starts temperate (50) rather
     /// than frozen, so every interesting climate is *authored* rather than escaped from.
     var baseline: Double
+
+    /// **What counts as an unremarkable amount of this**, for the greed calculation only.
+    ///
+    /// Not the same thing as `baseline`, and conflating them is the bug Aimee found: *"the sun as a
+    /// focus SHOULD NOT DESTABILIZE SO MUCH MORE THAN EVERYTHING ELSE WHEN IT IS THE MOST STANDARD
+    /// SOURCE OF ILLUMINATION IN ANY WORLD"* (7 Aug).
+    ///
+    /// `baseline` is **physics** — what a subject reads with nothing written about it. Illumination's
+    /// is genuinely 0: no light source means no light. `neutral` is **judgement** — what an ordinary
+    /// world has. An ordinary world has a sky.
+    ///
+    /// Charging greed against the baseline meant "ordinary" was *pitch dark*, so any light at all
+    /// read as an extravagant demand: a sun cost −25, more than a vein of gold, and more than half
+    /// of Rich Ore, whose entire identity is greed. Defaults to `baseline` where unstated.
+    var neutral: Double?
+
+    /// How ordinary this subject is to ask for. **The value axis** — deviation alone would charge a
+    /// mountainous world the same as a gold-veined one, which is the other half of the fault:
+    /// *"greed was supposed to mean you asked the world for wealth. It currently means you asked
+    /// the world for anything."*
+    var greedWeight: Double?
     /// Extra scalars this target carries that aren't its magnitude — Hydrology's dispersion and
     /// salinity, Atmosphere's motion and clarity. Same 0–100 scale, same machinery.
     var aspects: [PressureAspectDef]
@@ -36,6 +57,8 @@ struct PressureTargetDef: Codable, Equatable, Identifiable, Sendable {
         highLabel = try container.decodeIfPresent(String.self, forKey: .highLabel) ?? "high"
         lowLabel = try container.decodeIfPresent(String.self, forKey: .lowLabel) ?? "low"
         baseline = try container.decodeIfPresent(Double.self, forKey: .baseline) ?? 0
+        neutral = try container.decodeIfPresent(Double.self, forKey: .neutral)
+        greedWeight = try container.decodeIfPresent(Double.self, forKey: .greedWeight)
         aspects = try container.decodeIfPresent([PressureAspectDef].self, forKey: .aspects) ?? []
         forms = try container.decodeIfPresent([String].self, forKey: .forms) ?? []
         order = try container.decodeIfPresent(Int.self, forKey: .order) ?? 0
@@ -49,6 +72,27 @@ struct PressureAspectDef: Codable, Equatable, Identifiable, Sendable {
     var lowLabel: String
     var highLabel: String
     var baseline: Double
+
+    /// **What counts as an unremarkable amount of this**, for the greed calculation only.
+    ///
+    /// Not the same thing as `baseline`, and conflating them is the bug Aimee found: *"the sun as a
+    /// focus SHOULD NOT DESTABILIZE SO MUCH MORE THAN EVERYTHING ELSE WHEN IT IS THE MOST STANDARD
+    /// SOURCE OF ILLUMINATION IN ANY WORLD"* (7 Aug).
+    ///
+    /// `baseline` is **physics** — what a subject reads with nothing written about it. Illumination's
+    /// is genuinely 0: no light source means no light. `neutral` is **judgement** — what an ordinary
+    /// world has. An ordinary world has a sky.
+    ///
+    /// Charging greed against the baseline meant "ordinary" was *pitch dark*, so any light at all
+    /// read as an extravagant demand: a sun cost −25, more than a vein of gold, and more than half
+    /// of Rich Ore, whose entire identity is greed. Defaults to `baseline` where unstated.
+    var neutral: Double?
+
+    /// How ordinary this subject is to ask for. **The value axis** — deviation alone would charge a
+    /// mountainous world the same as a gold-veined one, which is the other half of the fault:
+    /// *"greed was supposed to mean you asked the world for wealth. It currently means you asked
+    /// the world for anything."*
+    var greedWeight: Double?
 }
 
 /// A concrete cause. Sources contribute to several targets at once — the ones you didn't bind are

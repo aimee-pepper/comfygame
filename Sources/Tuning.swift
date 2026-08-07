@@ -61,6 +61,10 @@ enum Tuning {
         /// instability, which the sigil vocabulary had no other way to express. Runs both
         /// directions: writing *less* than a world naturally has calms it. **[PLACEHOLDER]**
         static let stabilityPerAbundance: Double = 0.45
+        /// **How heavily an ordinary subject's excess counts** — the deviation axis, applied to
+        /// everything. Light, because being *strange* should cost less than being *rich*. Substrate
+        /// and Vitality override it in `pressure_targets.json`.
+        static let ordinaryGreedWeight: Double = 0.35  // PLACEHOLDER
         /// Essence per cell of the page you actually used. Bigger runes cost more ink.
         static let essencePerCell: Double = 0.6   // PLACEHOLDER
         /// How many rolls of the unwritten subjects the preview samples to find the stability band.

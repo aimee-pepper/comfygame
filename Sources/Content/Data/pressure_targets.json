@@ -1,5 +1,5 @@
 {
-  "_note": "The world's dials (writing-system-rune-spec §4). Every sigil binds to exactly one of these. 'dualValued' is Illumination and Thermal ONLY — for those, dim and dark are different pressures and one number can't say both. Everything is on a shared 0–100 scale so the preview speaks one language. PLACEHOLDER copy throughout. 'baseline' is where a target sits with nothing written about it — Thermal starts temperate rather than frozen so every climate is authored. 'aspects' are extra scalars a target carries that aren't its magnitude; 'forms' are proportional buckets, because a world equally wet as ice or as rain is two different places.",
+  "_note": "The world's dials (writing-system-rune-spec §4). Every sigil binds to exactly one of these. 'dualValued' is Illumination and Thermal ONLY — for those, dim and dark are different pressures and one number can't say both. Everything is on a shared 0–100 scale so the preview speaks one language. PLACEHOLDER copy throughout. 'baseline' is where a target sits with nothing written about it — Thermal starts temperate rather than frozen so every climate is authored. 'aspects' are extra scalars a target carries that aren't its magnitude; 'forms' are proportional buckets, because a world equally wet as ice or as rain is two different places. 'neutral' is what an ORDINARY world has of this, used only by the greed calculation, and it is NOT 'baseline'. Baseline is physics — illumination really is 0 with no light source. Neutral is judgement — an ordinary world has a sky. Charging greed against the baseline made 'ordinary' mean pitch dark, so a sun cost more than a vein of gold (greed-formula-fix.md, Aimee 7 Aug). 'greedWeight' is the second axis: wealth lives in Substrate and Vitality, and everything else is charged lightly for being merely strange. All PLACEHOLDER.",
   "targets": [
     {
       "id": "illumination",
@@ -10,7 +10,8 @@
       "highLabel": "blazing",
       "lowLabel": "lightless",
       "order": 0,
-      "baseline": 0
+      "baseline": 0,
+      "neutral": 45
     },
     {
       "id": "thermal",
@@ -21,7 +22,8 @@
       "highLabel": "scorching",
       "lowLabel": "frozen",
       "order": 1,
-      "baseline": 50
+      "baseline": 50,
+      "neutral": 50
     },
     {
       "id": "hydrology",
@@ -54,7 +56,8 @@
           "highLabel": "brine",
           "baseline": 20
         }
-      ]
+      ],
+      "neutral": 40
     },
     {
       "id": "substrate",
@@ -79,7 +82,9 @@
           "highLabel": "uniform",
           "baseline": 50
         }
-      ]
+      ],
+      "neutral": 30,
+      "greedWeight": 1.0
     },
     {
       "id": "relief",
@@ -106,7 +111,8 @@
           "highLabel": "layered",
           "baseline": 10
         }
-      ]
+      ],
+      "neutral": 35
     },
     {
       "id": "vitality",
@@ -133,7 +139,9 @@
           "highLabel": "even",
           "baseline": 50
         }
-      ]
+      ],
+      "neutral": 40,
+      "greedWeight": 0.8
     },
     {
       "id": "atmosphere",
@@ -160,7 +168,8 @@
           "highLabel": "clear",
           "baseline": 70
         }
-      ]
+      ],
+      "neutral": 50
     },
     {
       "id": "cycle",
@@ -187,7 +196,8 @@
           "highLabel": "metronomic",
           "baseline": 70
         }
-      ]
+      ],
+      "neutral": 50
     }
   ]
 }

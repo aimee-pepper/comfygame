@@ -124,6 +124,28 @@ it's made of, and it doesn't — found gear is a catalogue entry and crafting do
 insulation and reactivity are **authored on the gear** for now, and become the crafted piece's own
 material properties when crafting lands.
 
+### Worth your review: why the audits didn't catch these either
+
+Aimee's question, and a fair one. All six deviations were in code that had been audited — several of
+them more than once — and none was flagged. A guess at why, offered as something to check rather
+than a conclusion:
+
+**The audits read what the code says it does, and the code said the right thing.** Every one of
+these has a correct-sounding comment above it. "Back rank is protected" was true; the missing half
+was that nothing *else* changed. An audit reading `damageTaken` sees a rank being honoured.
+
+**The missing halves live in a different file from the half that was built.** Rank protection is in
+`damageTaken`; rank targeting is in `performFoeTurn`. Discovery XP is defined in `CharacterRules`
+and awarded in `WorldRules`. A reviewer following the change follows the built half.
+
+**The one that would have caught all six is the one the fossil audit just proposed** — *does this
+thing's output get consumed?* `.species` and `.page` were enum cases nobody called; back-rank
+targeting was a stat nobody read. That's the same shape as `bonusBookSlots`, and it's mechanical.
+
+**Suggestion:** an audit pass that starts from the *decision* rather than the code — take a numbered
+clause from a session doc and ask what would be different if it were false. "Front takes the melee
+hits" is false-able in one test, and the test didn't exist.
+
 ## 4. Newest, and both worth reading first
 
 ### Q40 — should every building own its own research tree? *(Aimee's idea)*

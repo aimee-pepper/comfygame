@@ -549,4 +549,89 @@ final class WorldTests: XCTestCase {
         XCTAssertLessThan(many, one,
                           "writing every subject left as much uncertainty as writing one")
     }
+
+    func testReportWhatEachFocusCostsNow() {
+        let cases: [(PressureSourceID, PressureTargetID)] = [
+            ("sun","illumination"), ("gold","substrate"), ("magma","illumination"),
+            ("root","vitality"), ("crystal","illumination"), ("sea","hydrology"),
+            ("granite","substrate"), ("ice","hydrology"), ("wind","atmosphere"),
+            ("salt","vitality"), ("granite","relief"),
+        ]
+        print("WHAT A FOCUS COSTS (was: sun −25, gold −18, wind +16)")
+        for (source, target) in cases {
+            let cost = BookRules.greedDelta(for: [Sigil(id: InstanceID(rawValue: 1),
+                                                        source: source, target: target)])
+            print(String(format: "  %-10s on %-13s %+d", (source.rawValue as NSString).utf8String!,
+                         (target.rawValue as NSString).utf8String!, cost))
+        }
+    }
+
+    func testReportWhatARealBookCostsNow() {
+        let books: [(String, [SlotID: SymbolID])] = [
+            ("plains · verdant · sparse ore · dim sky",
+             ["terrain": "plains", "biome": "verdant", "bounty": "sparse_ore", "quirk": "dim_sky"]),
+            ("plains · verdant · rich ore · gilded",
+             ["terrain": "plains", "biome": "verdant", "bounty": "rich_ore", "quirk": "gilded_veins"]),
+            ("caverns · ashen · rich ore · gilded",
+             ["terrain": "caverns", "biome": "ashen", "bounty": "rich_ore", "quirk": "gilded_veins"]),
+        ]
+        print("WHAT A BOOK SCORES — authored deltas vs emergent greed")
+        for (label, symbols) in books {
+            let bound = book(symbols)
+            let authored = BookRules.stabilityDelta(symbolIDs: bound.allSymbolIDs)
+            let greed = BookRules.greedDelta(for: BookRules.sigils(for: bound))
+            print(String(format: "  %-42s authored %+4d   greed %+4d   score %3d",
+                         (label as NSString).utf8String!, authored, greed,
+                         BookRules.stabilityScore(delta: authored + greed)))
+        }
+    }
+
+    /// **A sun is not an outrage** (Aimee, 7 Aug: *"the sun as a focus SHOULD NOT DESTABILIZE SO
+    /// MUCH MORE THAN EVERYTHING ELSE WHEN IT IS THE MOST STANDARD SOURCE OF ILLUMINATION IN ANY
+    /// WORLD"*).
+    ///
+    /// Greed was charged against each subject's *baseline*, and four of eight baselines are zero —
+    /// so "ordinary" meant pitch dark, and any light at all read as an extravagant demand. A sun
+    /// cost −25: more than a vein of gold, and more than half of Rich Ore, whose whole identity is
+    /// greed. The meter was teaching that light is reckless and darkness is safe, which is exactly
+    /// backwards from the fiction.
+    func testASunCostsLessThanAVeinOfGold() {
+        func cost(_ source: PressureSourceID, _ target: PressureTargetID) -> Int {
+            BookRules.greedDelta(for: [Sigil(id: InstanceID(rawValue: 1),
+                                             source: source, target: target)])
+        }
+        let sun = cost("sun", "illumination")
+        let gold = cost("gold", "substrate")
+        XCTAssertGreaterThan(sun, gold, "a sunny world is greedier than a gold-veined one")
+        XCTAssertGreaterThan(sun, -10, "a plain sun is still being charged like a demand")
+    }
+
+    /// **A world resists being asked for more; it does not resist being asked for less.**
+    ///
+    /// So a barren world is a gift and a teeming one scales — which is the half Aimee described:
+    /// *"a barren world increases stability since it's worse than the norm, and a verdant lush
+    /// world slowly scales up destabilization."*
+    func testAskingForLessThanOrdinaryCalmsAWorld() {
+        let teeming = BookRules.greedDelta(for: [
+            Sigil(id: InstanceID(rawValue: 1), source: "bloom", target: "vitality", intensity: .great),
+            Sigil(id: InstanceID(rawValue: 2), source: "root", target: "vitality", intensity: .great),
+        ])
+        let barren = BookRules.greedDelta(for: [
+            Sigil(id: InstanceID(rawValue: 1), source: "salt", target: "vitality", intensity: .great),
+        ])
+        XCTAssertLessThan(teeming, 0, "a lush world costs nothing to hold open")
+        XCTAssertGreaterThan(barren, 0, "a dead world isn't easier to hold than a living one")
+    }
+
+    /// **Wealth is charged heavily; strangeness lightly.** Deviation alone would bill a mountainous
+    /// world like a gold-veined one, which is the other half of the fault — greed was supposed to
+    /// mean *you asked the world for wealth*, and it meant *you asked the world for anything*.
+    func testWealthCostsMoreThanMereStrangeness() {
+        func cost(_ source: PressureSourceID, _ target: PressureTargetID) -> Int {
+            BookRules.greedDelta(for: [Sigil(id: InstanceID(rawValue: 1), source: source,
+                                             target: target, intensity: .great)])
+        }
+        XCTAssertLessThan(cost("gold", "substrate"), cost("granite", "relief"),
+                          "a mountain is billed like a gold seam")
+    }
 }

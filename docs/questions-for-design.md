@@ -980,3 +980,54 @@ peak ≤ 45` — a world that never gets properly dark, with thin still air. Tha
 writable early, but it's also a *specific* pair, and if the starting vocabulary can't reach one of
 them the gate closes. Worth your eye on whether the passages point at the right targets, which is
 §3.3 of the feedback spec.
+
+## Q44 — The greed fix landed, and it makes the authored deltas the whole meter
+
+`greed-formula-fix.md` is built: two axes, a `neutral` per subject separate from its baseline, and
+a heavier weight on Substrate and Vitality. Aimee's complaint is fixed —
+
+| Focus | Was | Now |
+|---|---|---|
+| **Sun** on illumination | **−25** | **−2** |
+| Gold on substrate | −18 | −5 |
+| Granite on relief | −4 | **+2** |
+| Salt on vitality | — | **+14** |
+
+A sun is a slight excess rather than an outrage, a mountain is nearly free, and a dead world is a
+gift. §3's predictions all hold.
+
+**But §6.4's open question is now the live one, and I have numbers for it.** Measured over three
+real books:
+
+| Book | Authored `stabilityDelta` | Emergent greed | Score |
+|---|---|---|---|
+| Plains · Verdant · Sparse Ore · Dim Sky | **+22** | +25 | 100 |
+| Plains · Verdant · Rich Ore · Gilded | **−75** | −22 | 3 |
+| Caverns · Ashen · Rich Ore · Gilded | **−98** | −32 | 0 |
+
+**The authored numbers are three to four times the emergent ones**, and they were tuned when greed
+was the old formula — so a greedy book is now charged twice for the same greed, once by hand and
+once by measurement, and both greedy books bottom out at nothing.
+
+§3 says the authored values *"become unnecessary"* and §6.4 lists retiring them as open. **I've not
+retired them**, because that's the meter's headline behaviour and it's a design call, not a
+refactor. But the two can't both stay at these magnitudes: either the authored deltas go and
+stability becomes fully emergent (which is the profiling model, and self-balances as the vocabulary
+grows), or they shrink to a flavour adjustment on top.
+
+**My lean: retire them.** The whole argument for the two-axis model is that a focus added next year
+is priced correctly the moment it exists. Hand-tuned deltas are exactly what stops that being true.
+
+### One thing I did differently from the spec, on purpose
+
+§3 says *"the baselines are the actual bug"* and proposes moving them. **I added a separate
+`neutral` instead and left the baselines alone**, because `baseline` is what a subject reads with
+nothing written about it — physics — and it feeds the whole world model: terrain, life caps,
+creature budgets, descriptions. Moving illumination's from 0 to 45 would mean an unwritten world is
+*mid-lit*, which is a much larger change than the meter fix and would need its own round of
+measuring.
+
+`neutral` is judgement — what an ordinary world has — and it's the thing greed should measure
+against. They genuinely differ: a world with no light source really is dark, and an ordinary world
+really does have a sky. **Say if you want the baselines moved as well** and I'll do it as its own
+piece, with the numbers first.

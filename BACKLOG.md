@@ -193,6 +193,20 @@
       one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## Greed stops billing you for daylight (Aimee, 7 Aug 2026)
+- [x] **Two axes.** Deviation on everything lightly, value on Substrate and Vitality heavily —
+      *"greed was supposed to mean you asked the world for wealth; it meant you asked for anything"*
+- [x] **A `neutral` per subject, separate from its baseline.** Baseline is physics — no light source
+      means no light. Neutral is judgement — an ordinary world has a sky. Charging against the
+      baseline made "ordinary" mean pitch dark, so a sun cost more than a vein of gold
+- [x] Greed is charged on the **demand**, not the outcome — otherwise over-reaching in a world that
+      can't support it comes out cheaper than a modest ask
+- [x] Sun −25 → −2 · gold −18 → −5 · a mountain is nearly free · a salt-dead world is a gift
+- [ ] **Q44: the authored `stabilityDelta` values are now three to four times the emergent ones**
+      and were tuned for the old formula, so a greedy book is charged twice. Retiring them is the
+      designer's call, with measurements logged
+- [ ] Moving the physical baselines as well (§3) — a much larger change; needs its own measuring
+
 ## Deviations from the stated design — self-audit, 7 Aug 2026
 - [x] **The front rank takes the melee.** Targeting was uniform, so the back rank was pure upside
 - [x] **Nobody dies**: a companion at zero has passed out; the Binder at zero ends the run, which is

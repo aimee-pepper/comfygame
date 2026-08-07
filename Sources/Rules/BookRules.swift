@@ -126,13 +126,36 @@ enum BookRules {
         let touched = Set(sigils.map(\.target))
         guard !touched.isEmpty else { return 0 }
 
-        let asWritten = PressureRules.resolve(sigils)
-        let deviation = ContentCatalog.shared.pressureTargets
+        // **Two axes** (`greed-formula-fix.md` §3). A world resists being asked for *more*; it
+        // does not resist being asked for less.
+        //
+        // **Deviation** — how far past ordinary, lightly, on everything. A strange world is hard to
+        // hold, whether it's strange with mountains or strange with light.
+        //
+        // **Value** — how much of what you asked for is wealth, heavily, and only on the subjects
+        // that carry any: Substrate and Vitality. `pressure-model.md` §4.4 said this outright and it
+        // was never implemented — *"Sun does not contribute; sunlight isn't loot"* — so the formula
+        // billed you for daylight at the same rate as gold.
+        //
+        // Deviation alone charges a mountainous world like a gold-veined one. Value alone lets you
+        // write a blazing, drowned, shattered world for nothing as long as it's poor. Together they
+        // say the true thing: **a strange world is hard to hold, and a rich one is harder.**
+        // **What you asked for, not what the world could manage.** Resolved without the
+        // constraints pass: a lush world written in the dark gets its vitality capped, and charging
+        // greed on the capped figure would make an over-reach *cheaper* than a modest ask. You are
+        // billed for the demand — that is what greed is.
+        let asWritten = PressureRules.resolveUnconstrained(sigils)
+        let greed = ContentCatalog.shared.pressureTargets
             .filter { touched.contains($0.id) }
             .reduce(0.0) { total, target in
-                total + (target.baseline - asWritten[target.id].peak)
+                let ordinary = target.neutral ?? target.baseline
+                let excess = asWritten[target.id].peak - ordinary
+                let weight = target.greedWeight ?? Tuning.Book.ordinaryGreedWeight
+                // Asking for *less* than ordinary calms a world, and by the same measure. A dead,
+                // frozen, lightless world is easy to hold together — there's nothing in it to hold.
+                return total - excess * weight
             }
-        return Int((deviation * Tuning.Book.stabilityPerAbundance).rounded())
+        return Int((greed * Tuning.Book.stabilityPerAbundance).rounded())
     }
 
     /// The stability the danger runes are *asking* for, and what they actually get.
