@@ -604,23 +604,37 @@ final class CombatTests: XCTestCase {
     /// to a plated thing than Unbind does, and less to a bare one**, which is the definition of
     /// answering something in particular.
     func testPryBeatsAnHonestSwingOnlyAgainstArmour() throws {
+        /// Summed over several fresh fights, and **only over fights that were still running**.
+        ///
+        /// Damage carries variance, a creature can evade, and Quill may well have finished the
+        /// thing before the Binder ever gets a turn — none of which this test is about. Sampling
+        /// once measured the dice; counting a fight that was already over measured nothing at all.
         func damageDone(_ skill: SkillID, to traits: CreatureTraits) throws -> Int {
-            let store = inFightWith([traits])
-            let encounter = try XCTUnwrap(store.activeEncounter)
-            let before = try XCTUnwrap(encounter.foes.first).currentHP
-            let foeID = try XCTUnwrap(encounter.foes.first).id
-            giveTheTurnTo(.binder, in: store)
-            store.mutate("test: use it") { CombatRules.perform(.skill(skill, foe: foeID), by: .binder, in: &$0) }
-            let after = store.activeEncounter?.foes.first { $0.id == foeID }?.currentHP ?? 0
-            return before - after
+            var total = 0, sampled = 0
+            for _ in 0..<20 where sampled < 12 {
+                let store = inFightWith([traits])
+                guard let encounter = store.activeEncounter, encounter.outcome == nil,
+                      let foe = encounter.foes.first, foe.isAlive
+                else { continue }
+                sampled += 1
+                let before = foe.currentHP
+                giveTheTurnTo(.binder, in: store)
+                store.mutate("test: use it") { CombatRules.perform(.skill(skill, foe: foe.id), by: .binder, in: &$0) }
+                let after = store.activeEncounter?.foes.first { $0.id == foe.id }?.currentHP ?? 0
+                total += before - after
+            }
+            XCTAssertGreaterThan(sampled, 6, "too few usable fights to say anything")
+            return total
         }
 
+        // Both big and thick-boned, so neither dies inside a sample and the comparison is about
+        // armour rather than about who got the first swing.
         var plated = CreatureTraits()
-        plated.size = 70; plated.build = 80
+        plated.size = 95; plated.build = 90; plated.boneDensity = 95
         plated.covering = Covering(hardness: 95, length: 5, coverage: 95)
 
         var bare = CreatureTraits()
-        bare.size = 70; bare.build = 80
+        bare.size = 95; bare.build = 90; bare.boneDensity = 95
         bare.covering = Covering(hardness: 0, length: 0, coverage: 5)
 
         let pryPlated = try damageDone("pry", to: plated)
@@ -637,6 +651,8 @@ final class CombatTests: XCTestCase {
     /// **Flense scales with how much there is to open.** Nothing on plate, a great deal on fur —
     /// the mirror of the creature system's own rend, and what stops it being a universal DOT.
     func testFlenseOpensFurAndFindsNothingOnPlate() throws {
+        // Flense's severity is read straight off the covering, with no roll in it — so one
+        // sample is the whole answer here.
         func bleedPerRound(_ traits: CreatureTraits) throws -> Int {
             let store = inFightWith([traits])
             let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
@@ -665,7 +681,14 @@ final class CombatTests: XCTestCase {
         crusher.armament.mix = WeaponMix(pierce: 0, crush: 1, rend: 0)
         crusher.armament.setTotal(80)
 
+        // Also summed: a single blow's roll can swamp a 60% reduction.
         func binderHPAfterBeingHit(warding against: DamageKind?) -> Int {
+            var total = 0
+            for _ in 0..<8 { total += onceHit(warding: against) }
+            return total
+        }
+
+        func onceHit(warding against: DamageKind?) -> Int {
             let store = inFightWith([crusher])
             store.mutate("test: stand and take it") { state in
                 guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }

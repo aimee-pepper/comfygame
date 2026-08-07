@@ -72,6 +72,8 @@ struct BookProjection {
     /// it wasn't yours.
     var marksWritten: Int = 0
     var marksSpeaking: Int = 0
+    /// **The chains you placed**, so the world panel can show cause beside effect (Aimee, 6 Aug).
+    var chains: [WrittenChain] = []
 
     /// Whether the page, as it stands, contributes nothing at all to the world.
     var saysNothing: Bool { marksSpeaking == 0 }
@@ -153,7 +155,8 @@ struct BookProjection {
             resourceMix: expectedResourceMix(in: readings),
             life: LifeRules.projection(for: readings),
             marksWritten: page.runes.count,
-            marksSpeaking: PageRules.sigils(of: page).count
+            marksSpeaking: PageRules.sigils(of: page).count,
+            chains: PageRules.chains(on: page)
         )
     }
 

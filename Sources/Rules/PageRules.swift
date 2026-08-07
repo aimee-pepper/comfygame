@@ -354,8 +354,14 @@ extension PageRules {
 
     /// The intensity a source is written at, from whichever Intensity qualifier is joined to it.
     ///
-    /// Only Intensity reaches the resolver today — Scale and Count are written and read back, but
-    /// nothing downstream consumes them yet. Noted rather than faked.
+    /// **Intensity is the ladder that means "how much"**, and it's the only one the resolver reads.
+    ///
+    /// Scale means *world size* and is read off the Relief cluster alone; it is now marked
+    /// relief-only in the data so it can't be written anywhere it would do nothing. That trap cost
+    /// a real session: Aimee read Mara's clue correctly, wrote *a giant sun*, and got a plain one,
+    /// because "giant" reads as scale in English and needs to be intensity here (6 Aug).
+    ///
+    /// **Count is still consumed by nothing** and is the next one to either wire or hide.
     static func intensity(qualifying mark: PlacedRune, on page: Page) -> Intensity {
         let attached = page.links
             .compactMap { $0.other(than: mark.id) }
@@ -370,6 +376,66 @@ extension PageRules {
         case "overwhelming": return .overwhelming
         default: return .moderate
         }
+    }
+
+    /// **What you actually wrote**, one line per joined cluster, in the page's own vocabulary.
+    ///
+    /// Aimee, 6 Aug: *"the 'The World' page should list the sigil chains you've placed on the
+    /// page."* The description panel says what the world is *like* and deliberately never names a
+    /// sigil — it's the deduction surface, matched against a diary passage. But that left the
+    /// player with an oracle and no readout of their own writing, so a wrong deduction taught
+    /// nothing: you wrote *a giant sun*, the world came out dim, and there was no way to see that
+    /// "giant" was a Scale rung doing nothing.
+    ///
+    /// This is the readout. *Illumination ← great Sun* — the level at which *vast* versus *great*
+    /// is visible.
+    static func chains(on page: Page) -> [WrittenChain] {
+        clusters(on: page).compactMap { group in
+            guard let targetID = group.compactMap(\.targetID).first,
+                  let target = ContentCatalog.shared.pressureTarget(targetID)
+            else { return nil }
+
+            let parts: [WrittenChain.Part] = group.compactMap { mark in
+                guard let sourceID = mark.sourceID,
+                      let source = ContentCatalog.shared.pressureSource(sourceID)
+                else { return nil }
+                let rungs = qualifiers(on: mark.id, page: page)
+                return WrittenChain.Part(
+                    source: source.name,
+                    qualifiers: rungs.map { rung in
+                        WrittenChain.Rung(name: rung.name,
+                                          isInert: !rung.ladder.changesAnything(for: targetID))
+                    },
+                    negates: []
+                )
+            }
+            guard !parts.isEmpty else { return nil }
+            return WrittenChain(target: target.name, parts: parts)
+        }
+        .sorted { $0.target < $1.target }
+    }
+
+    /// **Qualifiers written where they say nothing**, with the cluster they're in.
+    ///
+    /// The page already warns about marks that aren't joined into anything — a page that looks full
+    /// and describes nothing. This is the same trap one level down: a mark that *is* joined, in a
+    /// cluster that resolves, carrying a rung that changes nothing about that target. *Vast* on a
+    /// Sun is the case that cost a session.
+    static func inertQualifiers(on page: Page) -> [(qualifier: QualifierDef, target: PressureTargetDef)] {
+        var found: [(QualifierDef, PressureTargetDef)] = []
+        for group in clusters(on: page) {
+            guard let targetID = group.compactMap(\.targetID).first,
+                  let target = ContentCatalog.shared.pressureTarget(targetID)
+            else { continue }
+            for mark in group {
+                guard let id = mark.qualifierID,
+                      let qualifier = ContentCatalog.shared.qualifier(id),
+                      !qualifier.ladder.changesAnything(for: targetID)
+                else { continue }
+                found.append((qualifier, target))
+            }
+        }
+        return found
     }
 
     /// The Scale rung a source is written at, if any.
@@ -479,4 +545,37 @@ extension PageRules {
         }
         return result
     }
+}
+
+
+/// One joined cluster, as a line you can read back: *Illumination ← great Sun*.
+///
+/// The description panel is prose on purpose (it's what a diary passage gets matched against). This
+/// is the other half — **what you wrote**, so cause and effect sit on one screen and a wrong
+/// deduction can be traced (Aimee, 6 Aug).
+struct WrittenChain: Equatable, Identifiable, Sendable {
+    var target: String
+    var parts: [Part]
+
+    var id: String { target }
+
+    struct Part: Equatable, Sendable {
+        var source: String
+        var qualifiers: [Rung]
+        /// Targets this source explicitly denies — "a sun that does not warm".
+        var negates: [String]
+
+        /// *great Sun*, or *vast Sun* with the vast marked as saying nothing.
+        var phrase: String {
+            (qualifiers.map(\.name) + [source]).joined(separator: " ")
+        }
+    }
+
+    struct Rung: Equatable, Sendable {
+        var name: String
+        /// Written here, and changing nothing here. The whole reason this readout exists.
+        var isInert: Bool
+    }
+
+    var hasInertRung: Bool { parts.contains { $0.qualifiers.contains { $0.isInert } } }
 }

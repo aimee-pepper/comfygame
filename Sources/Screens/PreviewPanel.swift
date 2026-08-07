@@ -20,7 +20,8 @@ struct PreviewPanel: View {
                 WorldDescriptionPanel(
                     description: projection.worldDescription,
                     contradictionEscalation: ContradictionRules.escalation(
-                        count: projection.worldDescription.contradictions.count)
+                        count: projection.worldDescription.contradictions.count),
+                    chains: projection.chains
                 )
                 .padding(-10)
             }

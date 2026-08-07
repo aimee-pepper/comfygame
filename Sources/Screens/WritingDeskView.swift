@@ -180,6 +180,9 @@ struct WritingDeskView: View {
             }
 
         case .modifiers:
+            // **Generic rungs only.** A narrow qualifier belongs in its own target's "Only here"
+            // section — Scale lives on Relief and nowhere else, and offering it beside a Sun is how
+            // "a giant sun" became a thing you could write that did nothing at all (Aimee, 6 Aug).
             ForEach(ContentCatalog.shared.qualifierLaddersInUse, id: \.self) { ladder in
                 let rungs = ContentCatalog.shared.qualifiers(on: ladder).filter(\.isGeneric)
                 if !rungs.isEmpty {

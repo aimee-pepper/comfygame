@@ -21,6 +21,13 @@ struct WorldDescriptionPanel: View {
     /// The disclosed superlinear stacking term (§3). Shown separately because hidden
     /// superlinearity is the failure mode — a player who can't see it can't reason about it.
     var contradictionEscalation: Int = 0
+    /// **What you wrote to get this**, one line per joined cluster.
+    ///
+    /// The prose above is the deduction surface and never names a sigil, which is right — but on
+    /// its own it made the panel an oracle. A wrong deduction taught nothing: you wrote *a giant
+    /// sun*, the world came out dim, and there was nowhere to see that "giant" was a Scale rung
+    /// doing nothing at all (Aimee, 6 Aug). Cause and effect belong on one screen.
+    var chains: [WrittenChain] = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -33,6 +40,8 @@ struct WorldDescriptionPanel: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityLabel(description.sentence)
+
+            if !chains.isEmpty { written }
 
             if description.hasUnreadableWrongness {
                 // Something is wrong and you can't yet tell what. Deliberately unattributed.
@@ -77,6 +86,51 @@ struct WorldDescriptionPanel: View {
 
     /// One attributed string, so the sentence wraps as prose rather than as a stack of chips —
     /// the underline is a mark *on the writing*, not a badge beside it.
+    /// The chains, as read-back lines. Deliberately plain — this is a readout, not a second
+    /// description, and it has to look like the page rather than like prose.
+    private var written: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Divider()
+            Text("What you wrote")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            ForEach(chains) { chain in
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(chain.target)
+                        .font(.caption.weight(.medium))
+                    Image(systemName: "arrow.left")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                    // An inert rung is struck through where it sits, so the mistake is visible in
+                    // the phrase rather than in a note underneath it.
+                    Text(phrase(for: chain))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 0)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func phrase(for chain: WrittenChain) -> AttributedString {
+        var line = AttributedString()
+        for (index, part) in chain.parts.enumerated() {
+            if index > 0 { line += AttributedString(" · ") }
+            for rung in part.qualifiers {
+                var word = AttributedString(rung.name + " ")
+                if rung.isInert {
+                    word.strikethroughStyle = .single
+                    word.foregroundColor = .orange
+                }
+                line += word
+            }
+            line += AttributedString(part.source)
+        }
+        return line
+    }
+
     private var sentence: AttributedString {
         var result = AttributedString()
         for (index, clause) in description.clauses.enumerated() {

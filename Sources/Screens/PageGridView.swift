@@ -124,9 +124,16 @@ struct PageGridView: View {
         !page.runes.isEmpty && PageRules.sigils(of: page).isEmpty
     }
 
+    /// A rung written where it changes nothing about the target it's joined to. Same class of trap
+    /// as an unjoined mark, one level down, and it cost a real session (6 Aug).
+    private var inert: (qualifier: QualifierDef, target: PressureTargetDef)? {
+        PageRules.inertQualifiers(on: page).first
+    }
+
     private var footerTint: Color {
         if mode != .off { return mode.tint }
-        return isWrittenButSilent && ghost == nil && dragging == nil ? .orange : .secondary
+        guard ghost == nil, dragging == nil else { return .secondary }
+        return isWrittenButSilent || inert != nil ? .orange : .secondary
     }
 
     private var footer: some View {
@@ -169,6 +176,15 @@ struct PageGridView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
+            } else if let inert {
+                // **Says what it does instead**, rather than only that it doesn't. Hiding the rung
+                // would fight session 14, which makes Scale a generic workhorse; naming the mistake
+                // where it was made teaches the grammar.
+                Image(systemName: "exclamationmark.triangle.fill").font(.caption2)
+                Text("\(inert.qualifier.name) says nothing about \(inert.target.name). \(inert.qualifier.ladder.displayName) sets \(inert.qualifier.ladder.job).")
+                    .font(.caption2)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer()
             } else if isWrittenButSilent {
                 // **The trap this exists for.** Adjacency alone joins nothing (session 14 §2), so a
                 // page can look full and describe nothing at all — and the world comes out entirely
@@ -179,8 +195,8 @@ struct PageGridView: View {
                 Spacer()
             }
         }
-        .lineLimit(1)
-        .frame(height: 44)
+        .lineLimit(2)
+        .frame(minHeight: 44)
     }
 
     /// Drawn behind everything, and deliberately not hit-testable — every touch on the page
