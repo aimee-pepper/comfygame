@@ -343,10 +343,15 @@ extension PageRules {
 
             for mark in group.sorted(by: { $0.id.rawValue < $1.id.rawValue }) {
                 guard let source = mark.sourceID else { continue }
+                let modifiers = qualifiers(on: mark.id, page: page)
                 result.append(Sigil(id: mark.id,
                                     source: source,
                                     target: target,
-                                    intensity: intensity(qualifying: mark, on: page)))
+                                    intensity: intensity(qualifying: mark, on: page),
+                                    // Stored one above the rung, because step 0 is a real rung
+                                    // (*minute*, *single*) and 0 has to mean "nothing written".
+                                    scale: modifiers.first { $0.ladder == .scale }.map { $0.step + 1 } ?? 0,
+                                    count: modifiers.first { $0.ladder == .count }.map { $0.step + 1 } ?? 0))
             }
         }
         return result
@@ -378,6 +383,39 @@ extension PageRules {
         }
     }
 
+    /// **What one mark is**, in a phrase — for the box under the page.
+    ///
+    /// Aimee: *"clicking on a sigil should tell you its name in the little dynamic text box."* It
+    /// matters more than it sounds: the glyphs are abstract placeholders now and will be abstract
+    /// *by design* once the real hand artwork lands. A player has to be able to ask what one is.
+    static func reading(of mark: PlacedRune, on page: Page) -> String? {
+        let modifiers = qualifiers(on: mark.id, page: page).map(\.name)
+        switch mark.content {
+        case .target(let id):
+            let subject = ContentCatalog.shared.pressureTarget(id)?.name ?? id.rawValue
+            let focuses = cluster(containing: mark.id, on: page)
+                .compactMap(\.sourceID)
+                .compactMap { ContentCatalog.shared.pressureSource($0)?.name }
+            return focuses.isEmpty
+                ? "A subject, with nothing focused on it yet."
+                : "\(subject), focused on \(focuses.joined(separator: " and "))."
+        case .source(let id):
+            let focus = ContentCatalog.shared.pressureSource(id)?.name ?? id.rawValue
+            let subject = cluster(containing: mark.id, on: page)
+                .compactMap(\.targetID).first
+                .flatMap { ContentCatalog.shared.pressureTarget($0)?.name }
+            let described = (modifiers + [focus]).joined(separator: " ")
+            return subject.map { "\(described), on \($0)." } ?? "\(described) — joined to no subject."
+        case .qualifier(let id):
+            let modifier = ContentCatalog.shared.qualifier(id)
+            return modifier.map { "\($0.name) — \($0.ladder.displayName) sets \($0.ladder.job)." }
+        case .compound(let id):
+            return ContentCatalog.shared.symbol(id)?.blurb
+        case .rune(let sigil):
+            return sigil.displayText
+        }
+    }
+
     /// **What you actually wrote**, one line per joined cluster, in the page's own vocabulary.
     ///
     /// Aimee, 6 Aug: *"the 'The World' page should list the sigil chains you've placed on the
@@ -404,7 +442,8 @@ extension PageRules {
                     source: source.name,
                     qualifiers: rungs.map { rung in
                         WrittenChain.Rung(name: rung.name,
-                                          isInert: !rung.ladder.changesAnything(for: targetID))
+                                          isInert: !rung.ladder.changesAnything(for: targetID)
+                                              || !rung.applies(to: targetID))
                     },
                     negates: []
                 )
@@ -428,9 +467,13 @@ extension PageRules {
                   let target = ContentCatalog.shared.pressureTarget(targetID)
             else { continue }
             for mark in group {
+                // Inert two ways: a *ladder* that does nothing to this subject, or a **narrow**
+                // modifier written outside the subjects it was authored for. Phase says what form
+                // water takes and nothing whatever about light.
                 guard let id = mark.qualifierID,
                       let qualifier = ContentCatalog.shared.qualifier(id),
                       !qualifier.ladder.changesAnything(for: targetID)
+                        || !qualifier.applies(to: targetID)
                 else { continue }
                 found.append((qualifier, target))
             }
@@ -577,5 +620,5 @@ struct WrittenChain: Equatable, Identifiable, Sendable {
         var isInert: Bool
     }
 
-    var hasInertRung: Bool { parts.contains { $0.qualifiers.contains { $0.isInert } } }
+    var hasInertModifier: Bool { parts.contains { $0.qualifiers.contains { $0.isInert } } }
 }

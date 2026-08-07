@@ -61,6 +61,40 @@ enum PressureRules {
 
     /// Raw resolution, before the targets are allowed to argue with each other. Exposed for tests
     /// that need to see a single target's arithmetic in isolation.
+    /// The aspect Scale and Count push on, for subjects that have one.
+    static let extentAspect = "dispersion"
+
+    /// **What Scale does to a subject.**
+    ///
+    /// Where a subject has an extent separate from its amount — water, rock, life — Scale spreads
+    /// it and leaves the magnitude alone. Where it doesn't, extent *is* magnitude: a vaster sun is
+    /// a brighter one, and pretending otherwise is a rule nobody can learn by playing
+    /// (`writing-desk-fixes.md` §3).
+    static func scaleMultiplier(_ sigil: Sigil, target: PressureTargetDef) -> Double {
+        guard sigil.scale > 0 else { return 1 }
+        let rungsAboveMiddle = Double(sigil.scale) - Tuning.Pressure.middleRung
+        // Relief keeps its old job — Scale on the land is world size, read elsewhere.
+        guard !target.aspects.contains(where: { $0.id == Self.extentAspect }), target.id != "relief"
+        else { return 1 }
+        return max(0.2, 1 + rungsAboveMiddle * Tuning.Pressure.magnitudePerScaleRung)
+    }
+
+    /// **What Count does.** Sublinear, deliberately: two suns are brighter than one and not twice
+    /// as bright, or Count is simply a bigger Intensity.
+    static func countMultiplier(_ sigil: Sigil) -> Double {
+        guard sigil.count > 1 else { return 1 }
+        return pow(Double(sigil.count), Tuning.Pressure.countExponent)
+    }
+
+    /// How far toward *scattered* this sigil pushes a subject's extent. Scale spreads, and so does
+    /// Count — many small springs are dispersed in a way one great lake is not.
+    static func extentPush(_ sigil: Sigil) -> Double {
+        var push = 0.0
+        if sigil.scale > 0 { push += Double(sigil.scale) - Tuning.Pressure.middleRung }
+        if sigil.count > 1 { push += Double(sigil.count) - 1 }
+        return push
+    }
+
     static func resolveUnconstrained(_ sigils: [Sigil]) -> PressureReadings {
         var readings: [PressureTargetID: PressureReading] = [:]
 
@@ -77,9 +111,14 @@ enum PressureRules {
                 guard let source = ContentCatalog.shared.pressureSource(sigil.source) else { continue }
                 guard let contribution = source.contribution(to: target.id) else { continue }
 
-                let scale = sigil.intensity.multiplier
-                let peak = contribution.peak * scale
-                let floor = (target.dualValued ? contribution.floor : 0) * scale
+                // **Intensity, Scale and Count all reach the resolver now.** Two of the three used
+                // to be written, displayed and consumed by nothing, which made *vast sun* a plain
+                // sun and *countless suns* one sun (Aimee, 6 Aug).
+                let amplitude = sigil.intensity.multiplier
+                    * scaleMultiplier(sigil, target: target)
+                    * countMultiplier(sigil)
+                let peak = contribution.peak * amplitude
+                let floor = (target.dualValued ? contribution.floor : 0) * amplitude
 
                 if sigil.negatedTargets.contains(target.id) {
                     // Denial *removes* the contribution rather than inverting it — a sun that does
@@ -104,7 +143,15 @@ enum PressureRules {
                 // Aspects are directional pushes rather than magnitudes — dispersion is pulled
                 // toward concentrated or pervasive — so they sum plainly rather than diminishing.
                 for (aspect, delta) in contribution.aspects {
-                    aspectDeltas[aspect, default: 0] += delta * scale
+                    aspectDeltas[aspect, default: 0] += delta * amplitude
+                }
+                // **Scale spreads a subject that has an extent; Count scatters anything.** *A vast
+                // sea* is a different world from *a great sea* at the same volume, and *many small
+                // springs* is different again — which is the distinction session 14 was protecting
+                // when it refused to collapse the three ladders into one word.
+                if target.aspects.contains(where: { $0.id == Self.extentAspect }) {
+                    aspectDeltas[Self.extentAspect, default: 0] +=
+                        extentPush(sigil) * Tuning.Pressure.extentPerRung
                 }
                 // Form is a share of what this source brought, not a value of its own.
                 if let form = contribution.form, peak > 0 {

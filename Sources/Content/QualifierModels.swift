@@ -54,9 +54,13 @@ struct QualifierDef: Codable, Equatable, Identifiable, Sendable {
         /// nothing. It is **named on the page**, so the mistake is visible where it was made.
         func changesAnything(for target: PressureTargetID) -> Bool {
             switch self {
-            case .intensity: true
-            case .scale: target == "relief"
-            case .count: false          // written, read back, consumed by nothing. Wire it or cut it.
+            // **Nothing generic is inert any more** (`writing-desk-fixes.md` §3). Scale spreads a
+            // subject that has an extent and brightens one that doesn't; Count multiplies presence
+            // everywhere. Aimee: *"I should be able to make a giant overwhelming sun"* and *"I
+            // should be able to have a ton of suns."*
+            case .intensity, .scale, .count: true
+            // The narrow ones stay narrow, and the warning stays for them — Phase on Illumination
+            // should still say so. The fix removed the cases, not the mechanism.
             case .phase, .direction: true
             }
         }
@@ -65,8 +69,8 @@ struct QualifierDef: Codable, Equatable, Identifiable, Sendable {
         var job: String {
             switch self {
             case .intensity: "how much of a thing there is"
-            case .scale: "world size, and only on Relief"
-            case .count: "nothing yet"
+            case .scale: "how far it spreads, or how big it is where it can't spread"
+            case .count: "how many of them there are"
             case .phase: "what form the water takes"
             case .direction: "which way it faces"
             }

@@ -38,6 +38,18 @@ struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
     /// joins on a plain acknowledgement rather than in silence.
     var meeting: TravellerMeeting?
 
+    /// **The game does not continue without them.**
+    ///
+    /// True only for Isolde today (`hands-and-calligrapher-spec.md` §3). A required character is
+    /// the one thing that can wedge a save, so `LibraryTests` asserts a much stronger invariant
+    /// about them than about anybody else: **every condition must be satisfiable with the symbols
+    /// a player starts with**, not merely writable on the page they start with.
+    ///
+    /// That distinction is the whole bug. Her signature asked for thin air; nothing in the starting
+    /// twelve can lower atmosphere below its baseline of 50, so the only route was to leave it
+    /// unwritten and hope — a coin flip, not a deduction. And the clue pointed straight at it.
+    var isRequired: Bool = false
+
     var complexity: Int { signature.count }
 
     /// Whether a world is the one this traveller is in.
@@ -57,6 +69,7 @@ struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
         signature = try c.decodeIfPresent([SignatureClue].self, forKey: .signature) ?? []
         leansToward = try c.decodeIfPresent([DiaryPageDef.Kind].self, forKey: .leansToward) ?? []
         meeting = try c.decodeIfPresent(TravellerMeeting.self, forKey: .meeting)
+        isRequired = try c.decodeIfPresent(Bool.self, forKey: .isRequired) ?? false
     }
 }
 

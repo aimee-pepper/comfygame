@@ -70,6 +70,10 @@ struct BaseState: Codable, Equatable, Sendable {
     /// The Binder's own rule list. Only consulted once `hasAutomateSelfUnlock` is true.
     var binderGambits: [GambitRule] = []
 
+    /// **Who the Binder is.** Half the party, and it had no more of a character sheet than a
+    /// constant — the same gap session 17 §1 names for the companion.
+    var binderCharacter: CharacterState = CharacterState(rank: .front)
+
     /// Upgrades bought for the satchel — the bag you carry *into* a world.
     ///
     /// Deliberately independent of the Storehouse (decisions-log session 2): carry limit forces
@@ -117,6 +121,21 @@ struct BaseState: Codable, Equatable, Sendable {
     /// point of it.
     var satchelCapacity: Int {
         Tuning.Economy.startingSatchelSlots + satchelTier * Tuning.Economy.satchelSlotsPerTier
+    }
+
+    /// Somebody's character sheet. **Both of them have one** (session 17 §1).
+    func character(_ member: PartyMember) -> CharacterState {
+        switch member {
+        case .binder: binderCharacter
+        case .companion: companion.character
+        }
+    }
+
+    mutating func withCharacter(_ member: PartyMember, _ change: (inout CharacterState) -> Void) {
+        switch member {
+        case .binder: change(&binderCharacter)
+        case .companion: change(&companion.character)
+        }
     }
 
     /// What one of them is wearing in a slot. **Both carry their own** (Aimee, 5 Aug).
@@ -173,6 +192,8 @@ struct BaseState: Codable, Equatable, Sendable {
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
         purchasedGambitSlots = try container.decodeIfPresent(Int.self, forKey: .purchasedGambitSlots) ?? 0
         binderGambits = try container.decodeIfPresent([GambitRule].self, forKey: .binderGambits) ?? []
+        binderCharacter = try container.decodeIfPresent(CharacterState.self, forKey: .binderCharacter)
+            ?? CharacterState(rank: .front)
         spillover = try container.decodeIfPresent([ItemStack].self, forKey: .spillover) ?? []
 
         // **Capacity is derived, not remembered.**
@@ -251,6 +272,8 @@ struct CompanionState: Codable, Equatable, Sendable {
     /// the brief says HP persists during a run and returning home fully heals — so a base-side
     /// current-HP field would be a second source of truth that is always full.
     var maxHP: Int = Tuning.Encounter.companionMaxHP
+    /// **Who they are** (session 17 §1) — stats, level, and where they stand.
+    var character: CharacterState = CharacterState(rank: .front)
     /// Ordered gambit list — evaluated top-down, first match fires (FF12 execution model).
     var gambits: [GambitRule] = []
     /// What Quill is wearing. **Tiers come from gear now, not from research** — you find a sword,
@@ -273,6 +296,8 @@ struct CompanionState: Codable, Equatable, Sendable {
         maxHP = try container.decodeIfPresent(Int.self, forKey: .maxHP) ?? Tuning.Encounter.companionMaxHP
         gambits = (try? container.decodeIfPresent([GambitRule].self, forKey: .gambits)) ?? GambitStarter.rules
         equipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .equipped) ?? [:]
+        character = try container.decodeIfPresent(CharacterState.self, forKey: .character)
+            ?? CharacterState(rank: .front)
     }
 }
 

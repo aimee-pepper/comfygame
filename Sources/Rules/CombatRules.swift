@@ -58,10 +58,33 @@ enum CombatRules {
         }
     }
 
+    /// **What somebody is, on top of what they're holding** (session 17 §1).
+    ///
+    /// Might for crush, Finesse for pierce and rend — so a character and their weapon want to
+    /// agree, and a high-Might character carrying a piercing blade is wasting half of what they
+    /// are. That's a real equipping decision rather than "wear the highest tier".
+    static func stats(of actor: Combatant, in state: GameState) -> CharacterStats? {
+        switch actor {
+        case .binder: state.base.binderCharacter.stats
+        case .companion: state.base.companion.character.stats
+        case .foe: nil
+        }
+    }
+
+    static func rank(of actor: Combatant, in state: GameState) -> Rank {
+        switch actor {
+        case .binder: state.base.binderCharacter.rank
+        case .companion: state.base.companion.character.rank
+        case .foe: .front
+        }
+    }
+
     static func binderAttack(in state: GameState) -> Int {
         Tuning.Encounter.binderAttack
             + (equipped(.weapon, for: .binder, in: state)?.effectiveTier ?? 0)
                 * Tuning.Encounter.attackPerWeaponTier
+            + CharacterRules.damageBonus(state.base.binderCharacter.stats,
+                                         with: damageKind(for: .binder, in: state))
     }
 
     /// **What this one is swinging.** Each party member's own weapon decides the matchup, so
@@ -101,6 +124,8 @@ enum CombatRules {
     static func companionAttack(in state: GameState) -> Int {
         Tuning.Encounter.companionBaseAttack
             + state.base.companion.weaponTier * Tuning.Encounter.attackPerWeaponTier
+            + CharacterRules.damageBonus(state.base.companion.character.stats,
+                                         with: damageKind(for: .companion, in: state))
     }
 
     /// Armour softens what lands on the party. Never below a floor — armour shouldn't make a fight
@@ -108,6 +133,13 @@ enum CombatRules {
     ///
     /// `armourIgnored` is what a piercing attack goes straight through, which is the whole reason
     /// the weapon triangle exists: the same armour is worth more against some things than others.
+    /// Whether a blow simply misses somebody. **Finesse, on the party's side of the fight** — the
+    /// mirror of a creature's evasion, which has existed since creatures were generated.
+    static func evades(_ actor: Combatant, in state: GameState, run: inout WorldRun) -> Bool {
+        guard let stats = stats(of: actor, in: state) else { return false }
+        return run.rng.chance(CharacterRules.evasion(stats))
+    }
+
     static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
                             armourIgnored: Double = 0) -> Int {
         // **Everything protective counts**, not just the body piece — a helm and boots are armour
@@ -115,9 +147,18 @@ enum CombatRules {
         let tier = GearSlot.allCases
             .filter(\.isProtective)
             .reduce(0) { $0 + (equipped($1, for: actor, in: state)?.effectiveTier ?? 0) }
-        let armour = Double(tier * Tuning.Encounter.defencePerArmorTier)
+        // **Fortitude decides what that armour is worth to you** (session 17 §1). The same plate
+        // does more for a sturdy character than a slight one, which is what stops Fortitude being a
+        // second health bar.
+        let sturdiness = stats(of: actor, in: state).map(CharacterRules.armourMultiplier) ?? 1
+        let armour = Double(tier * Tuning.Encounter.defencePerArmorTier) * sturdiness
         let effective = Int((armour * (1 - armourIgnored)).rounded())
-        return max(Tuning.Encounter.minimumDamage, raw - effective)
+
+        // **Standing at the back is worth something**, and only against something in reach
+        // (session 17 §4).
+        var incoming = Double(raw)
+        if rank(of: actor, in: state) == .back { incoming *= 1 - Tuning.Encounter.backRankProtection }
+        return max(Tuning.Encounter.minimumDamage, Int(incoming.rounded()) - effective)
     }
 
     // MARK: Skills
@@ -194,32 +235,39 @@ enum CombatRules {
     private static func use(_ skill: SkillDef, by actor: Combatant,
                             on foeID: InstanceID?, ally: Combatant?,
                             run: inout WorldRun, encounter: inout EncounterState,
-                            discovery: inout DiscoveryLog, weaponKind: DamageKind?) {
+                            discovery: inout DiscoveryLog, weaponKind: DamageKind?,
+                            stats: CharacterStats?, standingBack: Bool, reach: Reach) {
         let foe = foeID.flatMap { id in encounter.foes.first { $0.id == id && $0.isAlive } }
+        // **Wit is what a skill is worth in your hands** (session 17 §1) — potency here, and the
+        // cooldown at the bottom of this function.
+        let power = stats.map { CharacterRules.skillPower(skill.power, $0) } ?? skill.power
 
         switch skill.kind {
         case .damage:
             guard let foe else { return }
-            strike(foe.id, damage: skill.power, by: actor, kind: skill.damage ?? weaponKind,
-                   run: &run, encounter: &encounter, verb: skill.name)
+            strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
+                   run: &run, encounter: &encounter, verb: skill.name,
+                   standingBack: standingBack, reachOfActor: reach)
 
         case .heal:
             let target = ally ?? actor
-            let amount = roll(around: skill.power, run: &run)
+            let amount = roll(around: power, run: &run)
             heal(target, by: amount, run: &run, encounter: &encounter, source: skill.name, healer: actor)
 
         case .armourIgnoring:
             // **Pry.** Goes under the plate entirely, and hits for very little. The answer to a
             // bulwark whose armour is eating four fifths of every honest swing.
             guard let foe else { return }
-            strike(foe.id, damage: skill.power, by: actor, kind: .pierce,
-                   run: &run, encounter: &encounter, verb: skill.name, ignoresArmour: true)
+            strike(foe.id, damage: power, by: actor, kind: .pierce,
+                   run: &run, encounter: &encounter, verb: skill.name, ignoresArmour: true,
+                   standingBack: standingBack, reachOfActor: reach)
 
         case .overbear:
             // **Overbear.** All your weight behind it, and you're out of position afterwards.
             guard let foe else { return }
-            strike(foe.id, damage: skill.power, by: actor, kind: .crush,
-                   run: &run, encounter: &encounter, verb: skill.name)
+            strike(foe.id, damage: power, by: actor, kind: .crush,
+                   run: &run, encounter: &encounter, verb: skill.name,
+                   standingBack: standingBack, reachOfActor: reach)
             encounter.skippedTurns[actor, default: 0] += 1
             encounter.note("You're off balance.")
 
@@ -228,7 +276,7 @@ enum CombatRules {
             // thing, a great deal on something shaggy. The mirror of the creature system's own rend.
             guard let foe else { return }
             let purchase = (foe.traits?.covering.insulation ?? 0) / Tuning.Pressure.scaleMaximum
-            let perRound = max(1, Int((Double(skill.power) * purchase).rounded()))
+            let perRound = max(1, Int((Double(power) * purchase).rounded()))
             encounter.foeBleeds[foe.id] = BleedState(damage: perRound, rounds: skill.rounds)
             encounter.note(purchase < Tuning.Encounter.thinCovering
                            ? "\(skill.name): there's nothing here to open."
@@ -300,8 +348,9 @@ enum CombatRules {
             encounter.note("You take \(foe.stats.displayName) in properly. You'll know it again.")
         }
 
-        encounter.cooldowns[cooldownKey(skill, for: actor)] = skill.cooldownRounds
-        setCooldown(skill.cooldownRounds, for: actor, in: &encounter)
+        let cooling = stats.map { CharacterRules.cooldown(skill.cooldownRounds, $0) } ?? skill.cooldownRounds
+        encounter.cooldowns[cooldownKey(skill, for: actor)] = cooling
+        setCooldown(cooling, for: actor, in: &encounter)
     }
 
     /// A bestiary entry without a kill — which is what makes Read a real alternative to killing
@@ -392,13 +441,18 @@ enum CombatRules {
         switch action {
         case .attack(let foeID):
             strike(foeID, damage: baseAttack(of: actor, in: state), by: actor,
-                   kind: damageKind(for: actor, in: state), run: &run, encounter: &encounter)
+                   kind: damageKind(for: actor, in: state), run: &run, encounter: &encounter,
+                   standingBack: rank(of: actor, in: state) == .back,
+                   reachOfActor: reach(for: actor, in: state))
 
         case .skill(let id, let foeID, let allyID):
             if let skill = ContentCatalog.shared.skill(id), skills(for: actor).contains(skill),
                isReady(skill, for: actor, in: encounter) {
                 use(skill, by: actor, on: foeID, ally: allyID, run: &run, encounter: &encounter,
-                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state))
+                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state),
+                    stats: stats(of: actor, in: state),
+                    standingBack: rank(of: actor, in: state) == .back,
+                    reach: reach(for: actor, in: state))
             }
 
         case .damageSkill(let foeID):
@@ -407,13 +461,19 @@ enum CombatRules {
                 $0.power > 0 && $0.kind != .heal && isReady($0, for: actor, in: encounter)
             }) {
                 use(skill, by: actor, on: foeID, ally: nil, run: &run, encounter: &encounter,
-                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state))
+                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state),
+                    stats: stats(of: actor, in: state),
+                    standingBack: rank(of: actor, in: state) == .back,
+                    reach: reach(for: actor, in: state))
             }
 
         case .healSkill(let ally):
             if let skill = ready(.heal, for: actor, in: encounter) {
                 use(skill, by: actor, on: nil, ally: ally, run: &run, encounter: &encounter,
-                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state))
+                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state),
+                    stats: stats(of: actor, in: state),
+                    standingBack: rank(of: actor, in: state) == .back,
+                    reach: reach(for: actor, in: state))
             }
 
         case .useItem(let stackID, let ally):
@@ -451,7 +511,9 @@ enum CombatRules {
                                run: inout WorldRun,
                                encounter: inout EncounterState,
                                verb: String? = nil,
-                               ignoresArmour: Bool = false) {
+                               ignoresArmour: Bool = false,
+                               standingBack: Bool = false,
+                               reachOfActor: Reach = .close) {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
         else { return }
 
@@ -476,7 +538,11 @@ enum CombatRules {
         // **The matchup.** What you're swinging against what it's wearing, then armour on what's
         // left — and a piercing weapon goes through a share of that armour rather than all of it.
         let matchup = kind.map { effectiveness(of: $0, against: foe.traits?.covering ?? Covering()) } ?? 1
-        let raw = Int((Double(roll(around: damage, run: &run)) * matchup).rounded())
+        var swing = Double(roll(around: damage, run: &run)) * matchup
+        // **From the back you can barely reach it** — unless what you're holding is long. That's
+        // what makes reach worth having on a weapon rather than only on a creature.
+        if standingBack, reachOfActor != .far { swing *= 1 - Tuning.Encounter.backRankMeleePenalty }
+        let raw = Int(swing.rounded())
         // **Pry goes under it entirely**, which is the one thing armour has no answer to.
         let ignored = ignoresArmour ? 1.0 : (kind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0)
         let armour = Int((Double(foe.stats.armour) * (1 - ignored)).rounded())
@@ -771,6 +837,12 @@ enum CombatRules {
         }
 
         for target in targets {
+            // **Not where the blow landed** (session 17 §1). Finesse on the party's side, the
+            // mirror of the evasion creatures have had since they were generated.
+            if evades(target, in: state, run: &run) {
+                encounter.note("\(foe.stats.displayName.capitalisedSentence) finds nothing where \(actorName(target, encounter: encounter).lowercased()) was.")
+                continue
+            }
             var raw = Double(roll(around: foe.stats.attack, run: &run)) * share
             if foe.stats.damageKind == .crush { raw *= 1 + Tuning.Encounter.crushDamageBonus }
 
@@ -866,13 +938,40 @@ enum CombatRules {
             encounter.outcome = .victory
             encounter.note("Nothing left standing.")
             awardSpoils(run: &run, encounter: &encounter, state: &state)
+            awardExperience(for: encounter.foes, encounter: &encounter, state: &state)
         } else if run.binderHP <= 0 && run.companionHP <= 0 {
-            // No death state in v0 — you're carried home with what survived.
+            // **Nobody dies** (session 17 §6). You're carried home with what survived.
             encounter.outcome = .defeated
             encounter.note("You can't go on.")
         }
         run.activeEncounter = encounter
         state.worlds.activeRun = run
+    }
+
+    /// **What the fight was worth**, scaled by what you beat rather than flat — picking on
+    /// something far below you stops paying (session 17 §2).
+    ///
+    /// Both of them get it. A companion who levelled only when you did wouldn't be a character,
+    /// and one who levelled separately would drift out of the party.
+    private static func awardExperience(for foes: [FoeState], encounter: inout EncounterState,
+                                        state: inout GameState) {
+        let partyLevel = max(state.base.binderCharacter.level, state.base.companion.character.level)
+        let earned = foes.reduce(0) {
+            $0 + CharacterRules.experience(forDefeating: $1, partyLevel: partyLevel)
+        }
+        guard earned > 0 else { return }
+
+        var gained: [String] = []
+        for member in PartyMember.allCases {
+            var levels = 0
+            state.base.withCharacter(member) { levels = CharacterRules.award(earned, to: &$0) }
+            if levels > 0 {
+                let name = member == .binder ? "You are" : "\(state.base.companion.name) is"
+                gained.append("\(name) level \(state.base.character(member).level).")
+            }
+        }
+        encounter.note("\(earned) experience.")
+        for line in gained { encounter.note(line) }
     }
 
     /// Rolls what the fight paid out, straight into the satchel, and records it in plain words.

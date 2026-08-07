@@ -193,6 +193,25 @@
       one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## The writing desk says what you meant (Aimee, 6 Aug 2026)
+- [x] **A vast sun is a brighter sun.** Scale spreads a subject with an extent of its own and
+      brightens one without — nothing generic is inert now
+- [x] **Count does something.** Many suns are brighter than one and nothing like four times as
+      bright, and they scatter what they touch
+- [x] **One tap disconnects.** It borrowed connect's two-tap shape, where it doesn't fit
+- [x] **Tapping a sigil names it** — the focus, its subject, and its modifiers
+- [ ] Count should reach the *description* — a world with three suns should say so
+
+## Isolde was unreachable (code-audit-13, 6 Aug 2026)
+- [x] **`atmosphere ≤ 45` was impossible.** Atmosphere's baseline is 50 and every starter that
+      touches air raises it — measured: the starting kit reaches 50–100 and nothing lower
+- [x] Her signature is relief ≥ 18 and substrate ≥ 30 — the two subjects starters can only push up
+- [x] **The invariant that would have caught it**: a required character's every condition must be
+      satisfiable with *starting symbols*, and survive whatever the unwritten subjects roll. My
+      charcoal test measured footprints, which is fit, not reachability
+- [x] Passages point at one measure each. "Thin and terribly still" pointed at two, and neither
+      was writable
+
 ## The settled vocabulary (Aimee, 6 Aug 2026)
 - [x] **Subject · Focus · Main focus · Modifier · Compound** — the palette says "Focuses" and names
       the subject it's showing, which it never did

@@ -105,6 +105,18 @@ enum Tuning {
         /// not sterile, and usable water goes to zero the moment a world freezes over.
         static let dryLifeFraction: Double = 0.35   // PLACEHOLDER
         static let barrenThreshold: Double = 10
+
+        // **What Scale and Count are worth** (`writing-desk-fixes.md` §3). Both were written,
+        // displayed and consumed by nothing.
+        /// The middle of a four-rung ladder, so *small* reduces and *vast* increases.
+        static let middleRung: Double = 2
+        /// How much a rung of Scale moves magnitude, on subjects with no separate extent.
+        static let magnitudePerScaleRung: Double = 0.35 // PLACEHOLDER
+        /// **Sublinear**, or Count is just a bigger Intensity: two suns are brighter than one and
+        /// nothing like twice as bright.
+        static let countExponent: Double = 0.55         // PLACEHOLDER
+        /// How far a rung of either ladder pushes a subject's extent toward scattered.
+        static let extentPerRung: Double = 9            // PLACEHOLDER
         /// **How deep a food web each point of production can carry.** Consumers add to vitality
         /// (Q38) and would otherwise be able to describe a rich web with nothing underneath it.
         static let trophicDepthPerProducer: Double = 1.2  // PLACEHOLDER
@@ -485,6 +497,10 @@ enum Tuning {
         static let statusRounds: [String: Int] = ["burn": 2, "poison": 4, "dazzle": 2]  // PLACEHOLDER
         /// How often a dazzled swing finds nothing.
         static let dazzleMissChance: Double = 0.35 // PLACEHOLDER
+        /// **Ranks** (session 17 §4). Standing at the back turns aside this much of a melee blow,
+        /// and costs you this much of your own — protected, and weaker at arm's length.
+        static let backRankProtection: Double = 0.45  // PLACEHOLDER
+        static let backRankMeleePenalty: Double = 0.5 // PLACEHOLDER
         /// Damage and healing wobble by ±this fraction of their power.
         static let damageVariance: Double = 0.25     // PLACEHOLDER
         static let consumableHealAmount: Int = 10    // PLACEHOLDER
@@ -622,6 +638,56 @@ enum Tuning {
         /// Essence Spring trickle, credited on each return from a run (in-session event only —
         /// never wall-clock; see pillar 2).
         static let essenceSpringPerReturn: [Int] = [3, 7] // PLACEHOLDER — index = tier - 1
+    }
+
+    // MARK: - Characters
+
+    /// Stats, levels, and what the world levels to (`decisions-session-17.md` §1–3).
+    /// All PLACEHOLDER — the shape is the decision, the numbers are Aimee's to move.
+    enum Character {
+        /// Where every stat starts, so a bonus is a *deviation* from ordinary and zero means zero.
+        static let startingStat: Int = 10
+        static let maximumLevel: Int = 30
+
+        /// Experience for the second level, and how sharply the cost rises. Superlinear: early
+        /// levels arrive from ordinary play, later ones are gone and earned.
+        static let experienceForSecondLevel: Int = 60
+        static let experienceCurve: Double = 1.6
+        /// How many stats a level raises, chosen by what somebody already leans toward — never
+        /// rolled, because a bad level-up is a punishment for playing.
+        static let statsPerLevel: Int = 2
+
+        // What a point is worth. Each of these feeds something combat already computed.
+        static let damagePerPoint: Double = 0.6
+        static let healthPerFortitude: Int = 2
+        static let armourPerFortitude: Double = 0.04
+        static let evasionPerPoint: Double = 0.012
+        static let maximumEvasion: Double = 0.35
+        static let resiliencePerPoint: Double = 0.03
+        static let maximumResilience: Double = 0.6
+        static let perceptionPerSightTile: Int = 6
+        static let skillPowerPerWit: Double = 0.04
+        static let witPerCooldownRound: Int = 8
+        static let minimumCooldown: Int = 1
+        static let witPerGambitSlot: Int = 6
+
+        // What a fight and a discovery are worth.
+        static let experiencePerFoe: Int = 12
+        static let experiencePerLevelGap: Double = 0.25
+        static let minimumExperienceScale: Double = 0.1
+        /// **Finding pays too** (§2) — a game whose progression is literacy shouldn't reward only
+        /// killing. A first sighting is worth about a fight; a person is worth a great deal more.
+        static let experienceForSpecies: Int = 14
+        static let experienceForSite: Int = 20
+        static let experienceForPage: Int = 25
+        static let experienceForTraveller: Int = 120
+
+        // What the world levels to (§3). Instability and greed already price risk; now they price
+        // difficulty, which is a far more legible expression of the same trade.
+        static let foeLevelPerPartyLevel: Double = 0.8
+        static let stabilityPerFoeLevel: Double = 18
+        static let greedPerFoeLevel: Double = 25
+        static let foeStatPerLevel: Double = 1.09
     }
 
     // MARK: - The Blacksmith

@@ -400,4 +400,63 @@ private extension Page {
         XCTAssertEqual(world.inertModifiers, ["Vast on Illumination"],
                        "renaming the field dropped the one line that says a word did nothing")
     }
+
+    // MARK: Scale and Count — written, displayed, and no longer inert
+
+    /// **A vast sun is a brighter sun** (Aimee, 6 Aug: *"I do think I should be able to make a
+    /// giant overwhelming sun"*).
+    ///
+    /// Scale used to mean world size and nothing else, so *vast* on a sun was a word you could
+    /// write, that was accepted and displayed, and that did nothing at all. For a sun, extent and
+    /// magnitude are the same thing — the split only holds for subjects with an extent separate
+    /// from their amount.
+    func testAVastSunIsABrighterSun() {
+        func brightness(scale: Int) -> Double {
+            PressureRules.resolve([Sigil(id: InstanceID(rawValue: 1), source: "sun",
+                                         target: "illumination", scale: scale)])["illumination"].peak
+        }
+        let plain = brightness(scale: 0)
+        XCTAssertGreaterThan(brightness(scale: 4), plain, "a vast sun is no brighter than a plain one")
+        XCTAssertLessThan(brightness(scale: 1), plain, "a minute sun is no dimmer than a plain one")
+    }
+
+    /// **Many suns are brighter than one, and nothing like twice as bright** (Aimee: *"I should be
+    /// able to have a ton of suns or other things. Count should absolutely do something!"*).
+    ///
+    /// Sublinear on purpose — linear would make Count a second Intensity, which is the collapse
+    /// session 14 refused.
+    func testManySunsAreBrighterThanOneButNotProportionally() {
+        func brightness(count: Int) -> Double {
+            PressureRules.resolve([Sigil(id: InstanceID(rawValue: 1), source: "sun",
+                                         target: "illumination", count: count)])["illumination"].peak
+        }
+        let one = brightness(count: 0)
+        let four = brightness(count: 4)
+        XCTAssertGreaterThan(four, one, "four suns are no brighter than one")
+        XCTAssertLessThan(four, one * 4, "four suns are four times as bright, so Count is just Intensity")
+    }
+
+    /// **A vast sea spreads; a great sea deepens.** The distinction session 14 was protecting when
+    /// it refused to collapse the ladders — and it only applies where a subject has an extent of
+    /// its own.
+    func testScaleSpreadsASubjectThatHasAnExtent() {
+        func dispersion(scale: Int) -> Double {
+            PressureRules.resolve([Sigil(id: InstanceID(rawValue: 1), source: "sea",
+                                         target: "hydrology", scale: scale)])["hydrology"]
+                .aspect("dispersion")
+        }
+        XCTAssertGreaterThan(dispersion(scale: 4), dispersion(scale: 1),
+                             "a vast sea is no more spread out than a minute one")
+    }
+
+    /// Nothing generic is inert any more, which is what makes the warning meaningful when it does
+    /// fire — it now only ever means a genuinely narrow modifier in the wrong place.
+    func testTheGenericLaddersDoSomethingEverywhere() {
+        for target in ContentCatalog.shared.pressureTargets {
+            for ladder in [QualifierDef.Ladder.intensity, .scale, .count] {
+                XCTAssertTrue(ladder.changesAnything(for: target.id),
+                              "\(ladder.rawValue) still does nothing on \(target.name)")
+            }
+        }
+    }
 }

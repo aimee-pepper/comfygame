@@ -276,19 +276,19 @@
       "signature": [
         {
           "condition": {
-            "target": "illumination",
-            "measure": "floor",
-            "minimum": 35
+            "target": "relief",
+            "measure": "peak",
+            "minimum": 18
           },
-          "passage": "It never gets properly dark. You could work all night, if there were work."
+          "passage": "Stone above, stone below. Nothing here moves but me."
         },
         {
           "condition": {
-            "target": "atmosphere",
+            "target": "substrate",
             "measure": "peak",
-            "maximum": 45
+            "minimum": 30
           },
-          "passage": "The air is thin and terribly still. Nothing here disturbs a page."
+          "passage": "There is something in the rock that holds a light. I have not needed a candle since I came."
         }
       ],
       "leansToward": [
@@ -314,7 +314,8 @@
         "offer": "Come and teach me. I'll find the lead and the silver.",
         "accepted": "\"You'll want a room with light in it. And a table that doesn't rock — I'm going to be difficult about the table.\" She's already up. \"Charcoal. Honestly.\"",
         "declined": "\"Go on then.\" She picks the board back up. \"You'll be back when the page runs out. They always are.\""
-      }
+      },
+      "isRequired": true
     }
   ],
   "pages": [
@@ -510,7 +511,7 @@
       "id": "isolde_where_0",
       "diary": "isolde",
       "kind": "locationClue",
-      "prose": "It never gets properly dark here. You could work all night, if there were work.",
+      "prose": "Stone above, stone below. Nothing here moves but me.",
       "about": "isolde",
       "clueIndex": 0,
       "prefersConditions": []
@@ -519,7 +520,7 @@
       "id": "isolde_where_1",
       "diary": "isolde",
       "kind": "locationClue",
-      "prose": "The air is thin and terribly still. Nothing here disturbs a page.",
+      "prose": "There is something in the rock that holds a light. I have not needed a candle since I came.",
       "about": "isolde",
       "clueIndex": 1,
       "prefersConditions": []
@@ -535,7 +536,7 @@
       "id": "tovin_about_isolde",
       "diary": "tovin",
       "kind": "locationClue",
-      "prose": "Isolde taught me. Whatever you think of my handwriting, it was worse. She would have gone somewhere with steady light — she could never work by a fire, said the flicker got into the line.",
+      "prose": "Isolde taught me. Whatever you think of my handwriting, it was worse. She would have gone to ground somewhere — she could never work by a fire, said the flicker got into the line, and she wanted stone she could see by.",
       "about": "isolde",
       "clueIndex": 0,
       "prefersConditions": []

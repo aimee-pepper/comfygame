@@ -65,8 +65,15 @@ enum WorldRules {
 
     /// Sight, after the dark has taken its share. **Darkness cuts sight** (session 13 §6) — which is
     /// what makes a world with blazing days and black nights genuinely play as two worlds.
-    static func visionRadius(in run: WorldRun) -> Int {
-        let base = visionRadius(for: run.book)
+    /// **What the party's own eyes add.** Perception is the one stat that does anything outside a
+    /// fight (session 17 §1), which is deliberate — a party built to look at things finds more.
+    static func sightBonus(in state: GameState) -> Int {
+        max(CharacterRules.sightBonus(state.base.binderCharacter.stats),
+            CharacterRules.sightBonus(state.base.companion.character.stats))
+    }
+
+    static func visionRadius(in run: WorldRun, party: Int = 0) -> Int {
+        let base = visionRadius(for: run.book) + party
         guard run.isNight else { return base }
         return max(Tuning.World.minimumVisionRadius, base - Tuning.DayNight.sightLostAtNight)
     }
@@ -175,7 +182,8 @@ enum WorldRules {
         var events: [Event] = [.moved(to: destination)]
         run.previousPosition = run.playerPosition
         run.playerPosition = destination
-        reveal(around: destination, in: &run.map, radius: visionRadius(in: run))
+        reveal(around: destination, in: &run.map,
+               radius: visionRadius(in: run, party: sightBonus(in: state)))
 
         // Whatever is underfoot resolves before the world takes its turn.
         switch run.map[destination].content {
@@ -199,7 +207,9 @@ enum WorldRules {
         case .site(let instance):
             if let site = run.sites.first(where: { $0.id == instance }) {
                 events.append(.foundSite(site.siteID))
+                let isNew = state.reality.discovery.sites[site.siteID] == nil
                 state.reality.discovery.recordSite(site.siteID, runIndex: run.runIndex)
+                if isNew { awardDiscovery(.site, in: &state) }
             }
         case .traveller(let id):
             // **Standing on them opens the scene, and nothing else happens yet.** Being found is
@@ -212,6 +222,14 @@ enum WorldRules {
         state.worlds.activeRun = run
         events.append(contentsOf: advanceTurn(in: &state))
         return events
+    }
+
+    /// **Finding pays as well as fighting** (session 17 §2). A game whose progression is literacy
+    /// shouldn't reward only killing.
+    static func awardDiscovery(_ kind: CharacterRules.Discovery, in state: inout GameState) {
+        for member in PartyMember.allCases {
+            state.base.withCharacter(member) { CharacterRules.award(kind.experience, to: &$0) }
+        }
     }
 
     /// **Talking somebody into coming home with you.**
@@ -232,6 +250,7 @@ enum WorldRules {
         state.worlds.activeRun = run
         state.reality.library.foundTravellers.insert(id)
         state.reality.library.knownTravellers.insert(id)
+        awardDiscovery(.traveller, in: &state)
         return [.foundTraveller(id)]
     }
 
@@ -650,6 +669,14 @@ enum WorldRules {
             if other.position.chebyshevDistance(to: enemy.position) <= 1 { group.append(other) }
         }
 
+        // **What this world raises its animals to** (session 17 §3). Slowly with the party, and
+        // further in worlds that are unstable or greedy — so the risk you priced into those two
+        // when you wrote the book comes back as difficulty, not only as more things on the ground.
+        let level = CharacterRules.foeLevel(
+            partyLevel: max(state.base.binderCharacter.level, state.base.companion.character.level),
+            stability: run.stability,
+            greed: Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book))))
+
         var foes: [FoeState] = []
         for member in group {
             // Stats are resolved here, once, and saved with the foe — not looked up mid-fight.
@@ -668,13 +695,22 @@ enum WorldRules {
             } else {
                 continue
             }
+            // Levelling touches the *derived* numbers, never the traits — so a levelled animal is
+            // recognisably the same animal, wearing the same covering, swinging the same corner of
+            // the triangle. It is simply more of it.
+            var levelled = stats
+            levelled.maxHP = CharacterRules.scaled(stats.maxHP, toLevel: level)
+            levelled.attack = CharacterRules.scaled(stats.attack, toLevel: level)
+            levelled.armour = CharacterRules.scaled(stats.armour, toLevel: level)
+
             foes.append(FoeState(id: member.id,
                                  creatureID: member.creatureID,
                                  identityKey: member.identityKey,
                                  traits: member.traits,
-                                 stats: stats,
-                                 currentHP: stats.maxHP,
-                                 qualifier: qualifier))
+                                 stats: levelled,
+                                 currentHP: levelled.maxHP,
+                                 qualifier: qualifier,
+                                 level: level))
             // The encounter-flag registry: this is what turns a silhouette into a real icon in the
             // Writing Desk's preview. **The species is the entry; this animal is a specimen.**
             state.reality.discovery.recordSpecies(member.identityKey, runIndex: run.runIndex)

@@ -295,8 +295,13 @@ final class LibraryTests: XCTestCase {
                        "nothing is marked as rolled, so the history can't answer 'what got me'")
     }
 
-    /// A rung that changed nothing is in the record, because that's a mistake in the *writing* and
-    /// you shouldn't need an instrument to be told a word you wrote did nothing.
+    /// A modifier that changed nothing is in the record, because that's a mistake in the *writing*
+    /// and you shouldn't need an instrument to be told a word you wrote did nothing.
+    ///
+    /// **Written with Phase, not Scale.** Scale on a sun works now — a vast sun is a bright one
+    /// (Aimee, 6 Aug) — so the only genuinely narrow modifiers left are the ones that are narrow on
+    /// purpose. Phase says what form water takes and says nothing at all about light, which is
+    /// exactly the case the warning still exists for.
     func testTheHistoryRemembersAWordThatSaidNothing() throws {
         let store = GameStore(io: .temporary(name: "inert-\(UUID().uuidString)"))
         store.mutate("test: fund") { $0.base.essence = 500 }
@@ -307,7 +312,7 @@ final class LibraryTests: XCTestCase {
                            hand: .crude, origin: PageCell(column: 0, row: 0), shapeID: "crude_block"),
                 PlacedRune(id: InstanceID(rawValue: 2), content: .source("sun"),
                            hand: .crude, origin: PageCell(column: 2, row: 0), shapeID: "crude_block"),
-                PlacedRune(id: InstanceID(rawValue: 3), content: .qualifier("vast"),
+                PlacedRune(id: InstanceID(rawValue: 3), content: .qualifier("frozen"),
                            hand: .crude, origin: PageCell(column: 0, row: 2), shapeID: "crude_block"),
             ]
             page.links = [MarkLink(InstanceID(rawValue: 1), InstanceID(rawValue: 2)),
@@ -317,7 +322,7 @@ final class LibraryTests: XCTestCase {
 
         // The page itself says so, before you ever bind it.
         let inert = PageRules.inertQualifiers(on: store.state.base.page)
-        XCTAssertEqual(inert.first?.qualifier.id, "vast")
+        XCTAssertEqual(inert.first?.qualifier.id, "frozen")
         XCTAssertEqual(inert.first?.target.id, "illumination")
 
         store.bindAndDepart()
@@ -346,6 +351,86 @@ final class LibraryTests: XCTestCase {
     }
 
     // MARK: The Calligrapher — a required gate needs a guaranteed road
+
+    /// **The invariant that would have caught the deadlock.**
+    ///
+    /// My charcoal test measured *footprints* — whether her signature fits the page you start with.
+    /// It does. What it never asked was whether the starting **vocabulary** can express the
+    /// conditions at all, and it couldn't: she wanted `atmosphere ≤ 45`, atmosphere's baseline is
+    /// 50, and **every starter symbol that touches air raises it**. The only route was to leave it
+    /// unwritten and hope — a coin flip, not a deduction — while the clue pointed straight at the
+    /// thing that made it worse (`code-audit-13.md`).
+    ///
+    /// So: for every **required** character, some combination of *starting symbols* must satisfy
+    /// every one of their conditions. Fit is not reachability.
+    func testEveryRequiredCharacterIsReachableWithTheStartingVocabulary() {
+        let starters = ContentCatalog.shared.symbols.filter { $0.acquisition == .starter }
+        let required = ContentCatalog.shared.travellers.filter(\.isRequired)
+        XCTAssertFalse(required.isEmpty, "nobody is marked required, so this test proves nothing")
+
+        for traveller in required {
+            var found = false
+            outer: for a in starters {
+                for b in starters {
+                    for intensity in [Intensity.moderate, .great, .overwhelming] {
+                        var sigils: [Sigil] = []
+                        var next: UInt64 = 1
+                        for symbol in (a.id == b.id ? [a] : [a, b]) {
+                            for component in symbol.expandsTo {
+                                sigils.append(Sigil(id: InstanceID(rawValue: next),
+                                                    source: component.source,
+                                                    target: component.target,
+                                                    intensity: intensity))
+                                next += 1
+                            }
+                        }
+                        if traveller.isFound(in: PressureRules.resolve(sigils)) {
+                            found = true
+                            break outer
+                        }
+                    }
+                }
+            }
+            XCTAssertTrue(found,
+                          "\(traveller.name) is required and no two starting symbols can reach them")
+        }
+    }
+
+    /// …and reachable **reliably**, not on a lucky roll. Every unwritten subject is rolled from the
+    /// seed, and a rolled occluder is exactly what ate Mara's sunlight — so a required character's
+    /// conditions have to survive whatever the world decides for itself.
+    func testARequiredCharacterSurvivesWhateverTheWorldRolls() {
+        let starters = ContentCatalog.shared.symbols.filter { $0.acquisition == .starter }
+        for traveller in ContentCatalog.shared.travellers.filter(\.isRequired) {
+            var worstCase = 0, tried = 0
+            for a in starters {
+                for b in starters where a.id != b.id {
+                    var sigils: [Sigil] = []
+                    var next: UInt64 = 1
+                    for symbol in [a, b] {
+                        for component in symbol.expandsTo {
+                            sigils.append(Sigil(id: InstanceID(rawValue: next),
+                                                source: component.source, target: component.target,
+                                                intensity: .great))
+                            next += 1
+                        }
+                    }
+                    guard traveller.isFound(in: PressureRules.resolve(sigils)) else { continue }
+                    tried += 1
+                    // Twenty different rolls of everything they didn't write.
+                    let held = (1...20).count { seed in
+                        traveller.isFound(in: PressureRules.resolve(sigils,
+                                                                    fillingUnwrittenWith: UInt64(seed) &* 7919))
+                    }
+                    worstCase = max(worstCase, held)
+                }
+            }
+            XCTAssertGreaterThan(tried, 0, "\(traveller.name): no pair of starters reaches them at all")
+            XCTAssertGreaterThanOrEqual(worstCase, 18,
+                "\(traveller.name) can be written for and still missed \(20 - worstCase) times in 20 — "
+                + "a required gate must not be a coin flip")
+        }
+    }
 
     /// **The hands are behind the Calligrapher, deliberately** (Aimee, 6 Aug: *"the player MUST
     /// meet the calligrapher to progress. it's core to the game"*), and that makes her the one
@@ -435,6 +520,45 @@ final class LibraryTests: XCTestCase {
             XCTAssertFalse(node.cost.resources.isEmpty, "\(node.name) asks for no materials at all")
             XCTAssertTrue(node.cost.resources.keys.contains { !staples.contains($0) },
                           "\(node.name) is buyable out of what an ordinary world already pays")
+        }
+    }
+
+    /// What a brand-new player can actually reach, per subject, using only starting symbols.
+    func testReportWhatTheStartingKitCanReach() {
+        let starters = ContentCatalog.shared.symbols.filter { $0.acquisition == .starter }
+        var lows: [PressureTargetID: Double] = [:], highs: [PressureTargetID: Double] = [:]
+        var floorLows: [PressureTargetID: Double] = [:], floorHighs: [PressureTargetID: Double] = [:]
+
+        // Every one, every pair, at every intensity a modifier can reach.
+        for a in starters {
+            for b in starters {
+                for intensity in [Intensity.moderate, .great, .overwhelming] {
+                    var sigils: [Sigil] = []
+                    var next: UInt64 = 1
+                    for symbol in (a.id == b.id ? [a] : [a, b]) {
+                        for component in symbol.expandsTo {
+                            sigils.append(Sigil(id: InstanceID(rawValue: next),
+                                                source: component.source, target: component.target,
+                                                intensity: intensity))
+                            next += 1
+                        }
+                    }
+                    let readings = PressureRules.resolve(sigils)
+                    for reading in readings.inOrder {
+                        lows[reading.target] = min(lows[reading.target] ?? 999, reading.peak)
+                        highs[reading.target] = max(highs[reading.target] ?? -999, reading.peak)
+                        floorLows[reading.target] = min(floorLows[reading.target] ?? 999, reading.floor)
+                        floorHighs[reading.target] = max(floorHighs[reading.target] ?? -999, reading.floor)
+                    }
+                }
+            }
+        }
+        print("WHAT THE STARTING KIT CAN REACH (peak range | floor range)")
+        for target in ContentCatalog.shared.pressureTargetsInOrder {
+            print(String(format: "  %-14s peak %3.0f–%3.0f   floor %3.0f–%3.0f",
+                         (target.name as NSString).utf8String!,
+                         lows[target.id] ?? 0, highs[target.id] ?? 0,
+                         floorLows[target.id] ?? 0, floorHighs[target.id] ?? 0))
         }
     }
 }

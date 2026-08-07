@@ -167,6 +167,10 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
     /// How it fights, resolved at spawn. See `CombatStats`.
     var stats: CombatStats
     var currentHP: Int
+    /// **What the world raised it to** (session 17 §3). Scaled with the party, and further in
+    /// worlds that are unstable or greedy — so the risk already priced into those two shows up as
+    /// difficulty rather than only as hazard frequency.
+    var level: Int = 1
     /// The adjective this creature went by, resolved with its world's cast at spawn. Materials
     /// inherit it: a pelt off a *shaggy browser* is a *shaggy pelt*.
     var qualifier: String?
@@ -198,7 +202,7 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
 
     init(id: InstanceID, creatureID: CreatureID? = nil, identityKey: String = "unknown",
          traits: CreatureTraits? = nil, stats: CombatStats, currentHP: Int,
-         qualifier: String? = nil, bleedRounds: Int = 0) {
+         qualifier: String? = nil, bleedRounds: Int = 0, level: Int = 1) {
         self.id = id
         self.creatureID = creatureID
         self.identityKey = identityKey
@@ -207,6 +211,7 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
         self.currentHP = currentHP
         self.qualifier = qualifier
         self.bleedRounds = bleedRounds
+        self.level = level
     }
 
     /// Tolerant decoding — this is the mid-encounter resume case the acceptance criteria name.
@@ -221,6 +226,7 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
         currentHP = try c.decodeIfPresent(Int.self, forKey: .currentHP) ?? 1
         qualifier = try c.decodeIfPresent(String.self, forKey: .qualifier)
         bleedRounds = try c.decodeIfPresent(Int.self, forKey: .bleedRounds) ?? 0
+        level = try c.decodeIfPresent(Int.self, forKey: .level) ?? 1
     }
 }
 

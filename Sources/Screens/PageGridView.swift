@@ -139,10 +139,18 @@ struct PageGridView: View {
     private var footer: some View {
         HStack(spacing: 10) {
             if let held, let mark = page.runes.first(where: { $0.id == held }) {
-                Text(mark.displayName)
-                    .font(.caption2.weight(.medium))
-                    .lineLimit(1)
-                    .layoutPriority(1)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(mark.displayName)
+                        .font(.caption2.weight(.medium))
+                    // What it *is*, in the settled words — the focus, what it's joined to, and any
+                    // modifiers on it. The cheapest possible discoverability for a vocabulary
+                    // heading toward 149 runes.
+                    if let reading = PageRules.reading(of: mark, on: page) {
+                        Text(reading).font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
+                .lineLimit(1)
+                .layoutPriority(1)
                 Spacer(minLength: 4)
                 actions(for: mark)
                 Button { self.held = nil } label: {
@@ -362,16 +370,28 @@ struct PageGridView: View {
     }
 
     /// A tap on a sigil while a mode is running.
+    ///
+    /// **Connecting names a pair; disconnecting doesn't.** Disconnect used to borrow connect's
+    /// shape — set an anchor, then tap a second sigil — so the first tap looked inert and the
+    /// second only worked if that sigil happened to be joined to the anchor. Aimee: *"disconnecting
+    /// a sigil only works on the first sigil I click I think? It should disconnect anything I
+    /// click."* One tap, and it comes loose from everything.
+    ///
+    /// That also answers session 14's open question about breaking a mid-chain link: the tapped
+    /// sigil comes loose and whatever remains splits as its own geometry dictates. One rule.
     private func tapped(_ mark: PlacedRune) {
-        guard let from = anchor else { anchor = mark.id; return }
         switch mode {
         case .off:
-            break
+            // **Naming what you touched.** The glyphs are abstract on purpose and will stay
+            // abstract once the real hand lands — so "what is this one?" has to have an answer, or
+            // an alphabet you learn to read is just an unreadable one.
+            held = mark.id
         case .connecting:
+            guard let from = anchor else { anchor = mark.id; return }
             // Chaining: whatever you just joined becomes the anchor, so you can keep going.
             if store.connect(from, mark.id) { anchor = mark.id }
         case .disconnecting:
-            store.disconnect(from, mark.id)
+            store.disconnectAll(mark.id)
         }
     }
 
