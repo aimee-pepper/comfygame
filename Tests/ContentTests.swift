@@ -135,8 +135,15 @@ final class ContentTests: XCTestCase {
         }
     }
 
-    func testConstellationHasThreeNodes() {
-        XCTAssertEqual(ContentCatalog.shared.constellationNodes.count, 3, "v0 Constellation ships three nodes")
+    /// **One node, and it does something** — which is better than three where two didn't.
+    ///
+    /// The Fifth Mark granted a book slot for books that stopped having slots when the page grid
+    /// replaced them, and the Kept Spring pays out after a reset the game can't perform. Both cut
+    /// (`fossil-audit.md`). The count isn't the property worth asserting; `EconomyTests` asserts
+    /// the one that is — that every node's effect is read by something.
+    func testTheConstellationHasSomethingToBuy() {
+        XCTAssertFalse(ContentCatalog.shared.constellationNodes.isEmpty,
+                       "nothing left to spend motes on")
         for node in ContentCatalog.shared.constellationNodes {
             XCTAssertEqual(node.moteCostPerRank.count, node.maxRank, "Node '\(node.id)' needs a cost per rank")
         }

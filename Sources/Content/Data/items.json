@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). GEAR: a standard assortment across eight slots (Aimee, 6 Aug), each running common -> uncommon -> rare -> mythic, and every piece upgradeable at the Blacksmith. Weapons cover all three corners of the damage triangle at every quality, so the matchup against a creature's covering is always answerable with something you could plausibly be carrying. PLACEHOLDER names, blurbs and tiers.",
+  "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). GEAR: a standard assortment across eight slots (Aimee, 6 Aug), each running common -> uncommon -> rare -> mythic, and every piece upgradeable at the Blacksmith. Weapons cover all three corners of the damage triangle at every quality, so the matchup against a creature's covering is always answerable with something you could plausibly be carrying. PLACEHOLDER names, blurbs and tiers. INSULATION AND REACTIVITY on gear are Q36's addition (audit #9): the other four material properties each decide what the Blacksmith asks for, and these two decided nothing, so a warm pelt and a volatile ichor were worth nothing to wear. Insulation on anything protective turns aside a heat emanation; reactivity on a weapon leaves something in the wound. Authored here because found gear is a catalogue entry — crafting doesn't exist yet, and when it does these become the crafted piece's own material properties. PLACEHOLDER values.",
   "items": [
     {
       "id": "curio_humming_shard",
@@ -90,7 +90,8 @@
         "slot": "weapon",
         "tier": 4,
         "damage": "rend",
-        "reach": "close"
+        "reach": "close",
+        "reactivity": 70
       }
     },
     {
@@ -146,7 +147,8 @@
         "slot": "weapon",
         "tier": 4,
         "damage": "pierce",
-        "reach": "close"
+        "reach": "close",
+        "reactivity": 70
       }
     },
     {
@@ -202,7 +204,8 @@
         "slot": "weapon",
         "tier": 4,
         "damage": "crush",
-        "reach": "close"
+        "reach": "close",
+        "reactivity": 70
       }
     },
     {
@@ -258,7 +261,8 @@
         "slot": "weapon",
         "tier": 4,
         "damage": "pierce",
-        "reach": "mid"
+        "reach": "mid",
+        "reactivity": 70
       }
     },
     {
@@ -318,7 +322,8 @@
       "kind": "gear",
       "gear": {
         "slot": "head",
-        "tier": 1
+        "tier": 1,
+        "insulation": 65
       }
     },
     {
@@ -366,7 +371,8 @@
       "kind": "gear",
       "gear": {
         "slot": "armor",
-        "tier": 1
+        "tier": 1,
+        "insulation": 65
       }
     },
     {
@@ -414,7 +420,8 @@
       "kind": "gear",
       "gear": {
         "slot": "hands",
-        "tier": 1
+        "tier": 1,
+        "insulation": 65
       }
     },
     {

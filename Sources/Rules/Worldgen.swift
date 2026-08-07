@@ -168,11 +168,24 @@ enum Worldgen {
             .filter { !library.foundTravellers.contains($0) }
         var travellerRNG = SeededRNG(seed: seed).derived(0x7A4E1)
         for traveller in travellers {
-            guard let point = randomFreePoint(in: map, avoiding: occupied,
-                                              minimumDistanceFrom: entry,
-                                              distance: Tuning.World.travellerMinimumDistance,
-                                              rng: &travellerRNG)
-            else { continue }
+            // **Beside something, where there is something to be beside** (Q39.4, answered).
+            //
+            // A smith found next to a landmark is much better than a smith on a random tile — but
+            // only as a *preference*: as a requirement it would mean a world that satisfies
+            // somebody's signature and happens to generate no suitable site silently can't host
+            // them, which is the marooning bug's shape. Right in the common case, dead end in the
+            // uncommon one.
+            let beside = sites
+                .filter { $0.position.chebyshevDistance(to: entry) >= Tuning.World.travellerMinimumDistance }
+                .flatMap { site in map.neighbours(of: site.position) }
+                .filter { !occupied.contains($0) && map[$0].content == .empty && map[$0].isPassable }
+
+            let point = travellerRNG.pick(beside)
+                ?? randomFreePoint(in: map, avoiding: occupied,
+                                   minimumDistanceFrom: entry,
+                                   distance: Tuning.World.travellerMinimumDistance,
+                                   rng: &travellerRNG)
+            guard let point else { continue }
             map[point].content = .traveller(traveller)
             occupied.insert(point)
         }

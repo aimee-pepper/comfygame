@@ -204,6 +204,9 @@ enum WorldRules {
         case .diaryPage(let page):
             // Reading is the whole interaction: one page, one unlock, and it's yours permanently.
             events.append(contentsOf: readPage(page, in: &state))
+            // **Finding pays** (session 17 §2). `.page` and `.species` were defined and never
+            // awarded, so two of the three stated sources of discovery experience paid nothing.
+            awardDiscovery(.page, in: &state)
             run = state.worlds.activeRun ?? run
             run.map[destination].content = .empty
         case .site(let instance):
@@ -762,7 +765,13 @@ enum WorldRules {
                                  level: level))
             // The encounter-flag registry: this is what turns a silhouette into a real icon in the
             // Writing Desk's preview. **The species is the entry; this animal is a specimen.**
+            //
+            // A *first* sighting is worth experience (session 17 §2) — a careful explorer should
+            // advance as surely as a fighter, and meeting something new is the explorer's version
+            // of a win.
+            let isNewSpecies = state.reality.discovery.species[member.identityKey] == nil
             state.reality.discovery.recordSpecies(member.identityKey, runIndex: run.runIndex)
+            if isNewSpecies { awardDiscovery(.species, in: &state) }
             if let traits = member.traits {
                 state.reality.discovery.recordSpecimen(traits, of: member.identityKey, runIndex: run.runIndex)
             }

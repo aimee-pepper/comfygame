@@ -474,9 +474,10 @@ struct ContentCatalog: Sendable {
         for id in requiredStations where station(id) == nil {
             throw ContentError.danglingReference("stations.json is missing required station '\(id)'")
         }
-        let requiredNodes = [
-            ConstellationNodes.extraSymbolSlot, ConstellationNodes.extraGambitSlot, ConstellationNodes.essenceHead,
-        ]
+        // Only nodes gameplay actually names. Two were cut on 7 Aug for granting values nothing
+        // read (`fossil-audit.md` §1–2), and this list is exactly where a fossil hides: it made
+        // their absence a build failure rather than a cleanup.
+        let requiredNodes = [ConstellationNodes.extraGambitSlot]
         for id in requiredNodes where constellationNode(id) == nil {
             throw ContentError.danglingReference("constellation.json is missing required node '\(id)'")
         }

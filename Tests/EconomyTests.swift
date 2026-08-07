@@ -470,4 +470,51 @@ final class EconomyTests: XCTestCase {
         XCTAssertNil(GambitEngine.decide(for: .binder, in: store.state))
         XCTAssertTrue(CombatRules.needsPlayerInput(store.state), "Automating yourself is earned")
     }
+
+    /// **Nothing may grant a value nothing reads** (`fossil-audit.md` §6).
+    ///
+    /// The Fifth Mark sold *"+1 symbol slot in every book you bind"* for three motes. Books stopped
+    /// having symbol slots when the page grid replaced them — and `bonusBookSlots` was never read
+    /// by anything even before that. It was dead on arrival and survived the system it belonged to.
+    ///
+    /// This is the cheap guard the audit asked for: a Constellation node whose effect nothing
+    /// consumes is a fossil by definition, and the research tree already has the equivalent check.
+    func testEveryConstellationNodeActuallyDoesSomething() throws {
+        let sources = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()      // Tests/
+            .deletingLastPathComponent()      // repo root
+            .appendingPathComponent("Sources")
+        var code = ""
+        if let walker = FileManager.default.enumerator(at: sources,
+                                                       includingPropertiesForKeys: nil) {
+            for case let file as URL in walker where file.pathExtension == "swift" {
+                code += (try? String(contentsOf: file, encoding: .utf8)) ?? ""
+            }
+        }
+        XCTAssertFalse(code.isEmpty, "couldn't read the source to check against")
+
+        // **The check is on what a node grants, not on the node.** Every node is mentioned
+        // somewhere — its own constant, the catalogue, the screen that draws it. What tells you
+        // it's a fossil is that the *value* it produces is read by nobody.
+        //
+        // `RealityState` exposes one accessor per purchasable effect; each has to be consumed
+        // outside the file that declares it, or the purchase buys nothing.
+        let realityFile = sources.appendingPathComponent("Model/RealityState.swift")
+        let reality = (try? String(contentsOf: realityFile, encoding: .utf8)) ?? ""
+        let accessors = reality
+            .components(separatedBy: "\n")
+            .filter { $0.contains("rank(of: ConstellationNodes") }
+            .compactMap { line -> String? in
+                guard let name = line.components(separatedBy: "var ").last?
+                    .components(separatedBy: ":").first else { return nil }
+                return name.trimmingCharacters(in: .whitespaces)
+            }
+        XCTAssertFalse(accessors.isEmpty, "no constellation effects found to check")
+
+        let elsewhere = code.replacingOccurrences(of: reality, with: "")
+        for accessor in accessors {
+            XCTAssertTrue(elsewhere.contains(accessor),
+                          "\(accessor) is bought with motes and read by nothing — a fossil")
+        }
+    }
 }

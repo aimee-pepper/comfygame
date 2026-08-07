@@ -193,6 +193,27 @@
       one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## Deviations from the stated design — self-audit, 7 Aug 2026
+- [x] **The front rank takes the melee.** Targeting was uniform, so the back rank was pure upside
+- [x] **Nobody dies**: a companion at zero has passed out; the Binder at zero ends the run, which is
+      what session 17 §6 says. It used to need both of them down
+- [x] **Species sighted and pages read pay experience** — both were defined and never awarded
+- [x] **Travellers stand beside a site where there is one**, per Q39.4's answer. Preference, never
+      requirement, or a matching world with no site silently can't host them
+- [x] **Insulation and reactivity do something** (Q36): what you wear turns aside heat, what you
+      swing leaves something in the wound. Authored on gear until crafting exists
+- [x] **Fall Back** — the twelfth skill, held back for ranks that then landed
+
+## The fossil audit, actioned (7 Aug 2026)
+- [x] **The Fifth Mark cut.** It granted a book slot; books stopped having slots when the page grid
+      replaced them, and `bonusBookSlots` was read by nothing even before that
+- [x] **The Kept Spring cut** until a reset exists — three motes for an event the game can't perform
+- [x] **A test that every Constellation effect is consumed**, which is the guard the audit asked for
+      and would have caught both
+- [ ] `symbol.slot` and `slots.json` — inert since the page grid; retire with the draft path
+- [ ] The old draft/slot projection path — **holds the only correct stability-range logic**, now
+      also in the page path, so it can go
+
 ## A page is about one thing (Aimee, 6 Aug 2026)
 - [x] **The Party screen is a roster** — thumbnail, level, health, rank and the five stats, with a
       nudge when something better is on the shelf

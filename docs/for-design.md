@@ -97,7 +97,34 @@ correctly.
 
 ---
 
-## 3. Newest, and both worth reading first
+## 3. What I had got wrong — a self-audit, 7 Aug
+
+Aimee asked me to audit for places I'd disregarded the stated design before doing anything else.
+**Six, all now fixed**, and they cluster: I built the half of a decision that was easy to reach from
+where I was standing, and left the half that needed a second system.
+
+| Deviation | The stated design | What I'd built |
+|---|---|---|
+| **Ranks** | *"Front takes the melee hits"* (s17 §4) | Both damage halves, and **uniform targeting** — so the back rank was pure upside |
+| **Nobody dies** | Companions pass out and revive; the Binder passing out is treated as a collapse (s17 §6) | Defeat only when **both** were down, so a Binder at zero kept walking on Quill's legs |
+| **Discovery XP** | Species sighted, sites entered, pages recovered (s17 §2) | Sites and travellers. `.species` and `.page` were **defined and never awarded** |
+| **Traveller placement** | *"At a fitting site when one exists; fall back when none does"* (Q39.4) | Only the fallback — the part the answer existed to correct |
+| **Q36's addition** | *"Don't wait for new slots — give insulation and reactivity secondary effects on gear"* | Nothing. Two of six material properties did nothing outside the Blacksmith |
+| **Fall Back** | The twelfth skill | Held back for ranks, which then landed and I didn't come back |
+
+**The pattern worth naming:** four of the six are *half* of a decision. Ranks without targeting,
+"nobody dies" without the Binder clause, discovery XP without two of its three sources, placement
+without the preference. Each looked done from inside the change that made it.
+
+**Each now has a test**, because that's the only thing that would have caught them — they all
+compiled, shipped, and read correctly in the code.
+
+**One thing I couldn't build as specced**, flagged rather than fudged: Q36 assumes gear knows what
+it's made of, and it doesn't — found gear is a catalogue entry and crafting doesn't exist. So
+insulation and reactivity are **authored on the gear** for now, and become the crafted piece's own
+material properties when crafting lands.
+
+## 4. Newest, and both worth reading first
 
 ### Q40 — should every building own its own research tree? *(Aimee's idea)*
 I think yes, and I think it **answers Q37 for free**: if a building owns the branch about it, then
@@ -118,7 +145,7 @@ gear or only the Recycler does, bulk-sell safety, and confirming "refreshes on r
 
 ---
 
-## 4. Open questions with a real fork in them
+## 5. Open questions with a real fork in them
 
 ### Q29 — do composed fallback names stay long?
 A creature matching no known form currently gets a long composed name that sits oddly beside a
@@ -145,7 +172,7 @@ against each other.** I'll do that sweep and report; if it turns up more, this q
 
 ---
 
-## 5. The hole session 17 opened
+## 6. The hole session 17 opened
 
 `decisions-session-17.md` §7 removes permanent loss entirely for now — companions in unstable
 worlds, animal companions, and displaced tethers are all no longer losable. **That was the thing
@@ -157,7 +184,7 @@ moment it is, and it's the kind of question that's much cheaper to answer before
 
 ---
 
-## 6. Still open from `open-questions.md` (older, and largely still open)
+## 7. Still open from `open-questions.md` (older, and largely still open)
 
 - **Q-A. When does the anchor choice happen?** Marked "the big one" and still unanswered.
 - **Q-B.** Sustain economy specifics — now entangled with §4 above.
@@ -169,7 +196,7 @@ moment it is, and it's the kind of question that's much cheaper to answer before
 
 ---
 
-## 7. One collision the jargon audit missed
+## 8. One collision the jargon audit missed
 
 **"Subject" was already taken.** The gambit rule builder has used *Subject* since it was written,
 meaning *who a rule is about* — a foe, an ally. `vocabulary-settled.md` now gives *subject* to the
@@ -181,7 +208,7 @@ meaning is the one worth protecting, since it's the one that makes a page read a
 
 Say if you'd rather it went the other way.
 
-## 8. Housekeeping
+## 9. Housekeeping
 
 - **Q22 — delete the four `pressure-model-*.md` files.** You've already ruled on this; the
   consolidated `pressure-model.md` is the keeper and a stale duplicate under a "newest wins" rule

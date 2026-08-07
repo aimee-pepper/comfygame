@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER numbers. THE DESIGN RULE (resources-skills-spec.md §2): every skill answers a specific kind of creature. If it is good against everything it is just a bigger attack. 'answers' names the problem it solves and is printed in the skill list, so the rule is visible to the player rather than only to us. Limiter is a round-counted COOLDOWN per skill and nothing else — no mana pool, deliberately: a second resource to track in every fight is the wrong overhead for this game, so stronger skills carry longer cooldowns instead. 'owner' ties a skill to a party member; when the party expands past two this moves onto the character. Fall Back from the spec is NOT here — it swaps ranks, and ranks aren't built (Q34).",
+  "_note": "PLACEHOLDER numbers. THE DESIGN RULE (resources-skills-spec.md §2): every skill answers a specific kind of creature. If it is good against everything it is just a bigger attack. 'answers' names the problem it solves and is printed in the skill list, so the rule is visible to the player rather than only to us. Limiter is a round-counted COOLDOWN per skill and nothing else — no mana pool, deliberately: a second resource to track in every fight is the wrong overhead for this game, so stronger skills carry longer cooldowns instead. 'owner' ties a skill to a party member; when the party expands past two this moves onto the character. Fall Back swaps ranks without spending the turn — it was the one skill held back until ranks existed, and they do now.",
   "skills": [
     {
       "id": "unbind",
@@ -156,6 +156,18 @@
       "owner": "companion",
       "rounds": 1,
       "answers": "Collecting. A bestiary entry without a kill."
+    },
+    {
+      "id": "fall_back",
+      "name": "Fall Back",
+      "icon": "arrow.uturn.backward",
+      "blurb": "Change where you're standing, and still get your turn.",
+      "kind": "reposition",
+      "power": 0,
+      "cooldownRounds": 3,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Being caught in the front rank by something you can't trade with."
     }
   ]
 }

@@ -44,12 +44,13 @@ struct RealityState: Codable, Equatable, Sendable {
 
     func rank(of node: ConstellationNodeID) -> Int { constellation[node] ?? 0 }
 
-    /// +1 book slot per rank. PLACEHOLDER effect shape.
-    var bonusBookSlots: Int { rank(of: ConstellationNodes.extraSymbolSlot) }
     /// +1 gambit slot per rank. PLACEHOLDER effect shape.
+    ///
+    /// **The only one left**, and that's the point (`fossil-audit.md` §6). Two others sold effects
+    /// nothing read: a book slot for books that stopped having slots when the page grid landed, and
+    /// a starting-essence bonus that pays out after a reset the game cannot perform. Every accessor
+    /// here must be consumed somewhere outside this file — `EconomyTests` asserts it.
     var bonusGambitSlots: Int { rank(of: ConstellationNodes.extraGambitSlot) }
-    /// Starting-essence bonus applied after a future reset. PLACEHOLDER effect shape.
-    var startingEssenceMultiplier: Double { 1.0 + 0.10 * Double(rank(of: ConstellationNodes.essenceHead)) }
 
     init(motes: Int = 0,
          constellation: [ConstellationNodeID: Int] = [:],
@@ -77,9 +78,7 @@ struct RealityState: Codable, Equatable, Sendable {
 /// Well-known node IDs. The *definitions* (name, cost, blurb, max rank) are data; these
 /// constants exist only so gameplay code can ask about a specific node without a magic string.
 enum ConstellationNodes {
-    static let extraSymbolSlot: ConstellationNodeID = "extra_symbol_slot"
     static let extraGambitSlot: ConstellationNodeID = "extra_gambit_slot"
-    static let essenceHead: ConstellationNodeID = "essence_head_start"
 }
 
 struct LifetimeStats: Codable, Equatable, Sendable {

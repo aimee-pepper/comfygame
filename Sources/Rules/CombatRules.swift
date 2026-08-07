@@ -133,6 +133,31 @@ enum CombatRules {
     ///
     /// `armourIgnored` is what a piercing attack goes straight through, which is the whole reason
     /// the weapon triangle exists: the same armour is worth more against some things than others.
+    /// **What a piece is made of, beyond its tier** (Q36's addition, audit #9: *"for insulation and
+    /// reactivity, don't wait for new slots — give them secondary effects on existing gear"*).
+    ///
+    /// Four of the six material properties had a job: hardness, flexibility, density and lustre
+    /// each decide what the Blacksmith asks for. Insulation and reactivity had none at all outside
+    /// that one bar, so a warm pelt and a volatile ichor were worth nothing to wear.
+    ///
+    /// Now they are: **insulation on what you wear turns aside heat**, and **reactivity on what you
+    /// swing carries a status into the wound.** Which ties gear to the world it came from — a cold
+    /// world is one you dress for.
+    static func insulation(of actor: Combatant, in state: GameState) -> Double {
+        GearSlot.allCases
+            .filter(\.isProtective)
+            .compactMap { equipped($0, for: actor, in: state)?.gear?.insulation }
+            .reduce(0, +) / Tuning.Pressure.scaleMaximum
+    }
+
+    /// What the weapon in somebody's hand is volatile enough to leave behind.
+    static func coating(of actor: Combatant, in state: GameState) -> StatusKind? {
+        guard let reactivity = equipped(.weapon, for: actor, in: state)?.gear?.reactivity,
+              reactivity >= Tuning.Encounter.coatingReactivity
+        else { return nil }
+        return .poison
+    }
+
     /// Whether a blow simply misses somebody. **Finesse, on the party's side of the fight** — the
     /// mirror of a creature's evasion, which has existed since creatures were generated.
     static func evades(_ actor: Combatant, in state: GameState, run: inout WorldRun) -> Bool {
@@ -235,12 +260,14 @@ enum CombatRules {
     private static func use(_ skill: SkillDef, by actor: Combatant,
                             on foeID: InstanceID?, ally: Combatant?,
                             run: inout WorldRun, encounter: inout EncounterState,
-                            discovery: inout DiscoveryLog, weaponKind: DamageKind?,
-                            stats: CharacterStats?, standingBack: Bool, reach: Reach) {
+                            weaponKind: DamageKind?, stats: CharacterStats?,
+                            standingBack: Bool, reach: Reach,
+                            state: inout GameState) {
         let foe = foeID.flatMap { id in encounter.foes.first { $0.id == id && $0.isAlive } }
         // **Wit is what a skill is worth in your hands** (session 17 §1) — potency here, and the
         // cooldown at the bottom of this function.
         let power = stats.map { CharacterRules.skillPower(skill.power, $0) } ?? skill.power
+        let rankNow: Rank = standingBack ? .back : .front
 
         switch skill.kind {
         case .damage:
@@ -287,7 +314,7 @@ enum CombatRules {
             // without this you only learn it by taking a bad trade first.
             guard let foe else { return }
             encounter.revealed.insert(foe.id)
-            remember(foe, in: &discovery, runIndex: run.runIndex)
+            remember(foe, in: &state.reality.discovery, runIndex: run.runIndex)
             let covering = foe.coveringWord ?? "nothing much"
             encounter.note("\(foe.stats.displayName): \(covering), and it \(foe.stats.damageKind.verb).")
 
@@ -339,12 +366,25 @@ enum CombatRules {
             encounter.note("You break away clean.")
             encounter.outcome = .fled
 
+        case .reposition:
+            // **Fall Back.** The last of the twelve, and it was waiting on ranks rather than on
+            // anything else (`resources-skills-spec.md` §2). Swapping where you stand *without*
+            // spending the turn is the whole point — otherwise you'd just take the hit.
+            let swapped: Rank = rankNow == .front ? .back : .front
+            switch actor {
+            case .binder: state.base.binderCharacter.rank = swapped
+            case .companion: state.base.companion.character.rank = swapped
+            case .foe: break
+            }
+            encounter.extraTurns[actor, default: 0] += 1
+            encounter.note(swapped == .back ? "You give ground." : "You step up.")
+
         case .read:
             // **Read.** A bestiary entry without a kill, which makes collecting a thing you can do
             // *instead* of killing rather than only by killing.
             guard let foe else { return }
             encounter.revealed.insert(foe.id)
-            remember(foe, in: &discovery, runIndex: run.runIndex)
+            remember(foe, in: &state.reality.discovery, runIndex: run.runIndex)
             encounter.note("You take \(foe.stats.displayName) in properly. You'll know it again.")
         }
 
@@ -448,6 +488,12 @@ enum CombatRules {
         health(of: actor, in: run).current > 0
     }
 
+    /// **Out of the fight, not out of the game** (session 17 §6). Nobody dies here — a companion at
+    /// zero has passed out, takes no more turns, and is on their feet again at the base.
+    static func hasPassedOut(_ actor: Combatant, in run: WorldRun) -> Bool {
+        actor.isParty && health(of: actor, in: run).current <= 0
+    }
+
     // MARK: Resolving one action
 
     /// Applies an action and hands the turn on. The only way an encounter advances.
@@ -460,16 +506,17 @@ enum CombatRules {
             strike(foeID, damage: baseAttack(of: actor, in: state), by: actor,
                    kind: damageKind(for: actor, in: state), run: &run, encounter: &encounter,
                    standingBack: rank(of: actor, in: state) == .back,
-                   reachOfActor: reach(for: actor, in: state))
+                   reachOfActor: reach(for: actor, in: state),
+                   coating: coating(of: actor, in: state))
 
         case .skill(let id, let foeID, let allyID):
             if let skill = ContentCatalog.shared.skill(id), skills(for: actor).contains(skill),
                isReady(skill, for: actor, in: encounter) {
                 use(skill, by: actor, on: foeID, ally: allyID, run: &run, encounter: &encounter,
-                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state),
+                    weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
                     standingBack: rank(of: actor, in: state) == .back,
-                    reach: reach(for: actor, in: state))
+                    reach: reach(for: actor, in: state), state: &state)
             }
 
         case .damageSkill(let foeID):
@@ -478,19 +525,19 @@ enum CombatRules {
                 $0.power > 0 && $0.kind != .heal && isReady($0, for: actor, in: encounter)
             }) {
                 use(skill, by: actor, on: foeID, ally: nil, run: &run, encounter: &encounter,
-                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state),
+                    weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
                     standingBack: rank(of: actor, in: state) == .back,
-                    reach: reach(for: actor, in: state))
+                    reach: reach(for: actor, in: state), state: &state)
             }
 
         case .healSkill(let ally):
             if let skill = ready(.heal, for: actor, in: encounter) {
                 use(skill, by: actor, on: nil, ally: ally, run: &run, encounter: &encounter,
-                    discovery: &state.reality.discovery, weaponKind: damageKind(for: actor, in: state),
+                    weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
                     standingBack: rank(of: actor, in: state) == .back,
-                    reach: reach(for: actor, in: state))
+                    reach: reach(for: actor, in: state), state: &state)
             }
 
         case .useItem(let stackID, let ally):
@@ -530,7 +577,8 @@ enum CombatRules {
                                verb: String? = nil,
                                ignoresArmour: Bool = false,
                                standingBack: Bool = false,
-                               reachOfActor: Reach = .close) {
+                               reachOfActor: Reach = .close,
+                               coating: StatusKind? = nil) {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
         else { return }
 
@@ -572,6 +620,14 @@ enum CombatRules {
         let note = verb.map { "\(who) — \($0) — \(hits) \(name) for \(amount)." }
             ?? "\(who) \(hits) \(name) for \(amount)."
         encounter.note(soaked > 1 ? note + " Its \(armourWord(for: foe)) takes the rest." : note)
+
+        // **A volatile weapon leaves something in the wound** (Q36). What your blade was made of
+        // reaches the fight, which is what makes an ichor worth carrying home.
+        if let coating, encounter.foes[index].isAlive {
+            encounter.foeBleeds[foe.id] = BleedState(damage: Tuning.Encounter.statusDamage["poison"] ?? 2,
+                                                     rounds: Tuning.Encounter.statusRounds["poison"] ?? 3)
+            encounter.note("Whatever that blade is made of is in the wound now.")
+        }
 
         // Rending tears: the wound goes on costing it after the blow. This is what finally makes
         // `bleedRounds` live on the foe's side of the fight rather than only on yours.
@@ -836,10 +892,19 @@ enum CombatRules {
         else { return }
 
         let standing: [Combatant] = [.binder, .companion].filter { isAlive($0, in: run) }
+
+        // **The front rank takes the melee** (session 17 §4). Targeting was uniform, so standing at
+        // the back was pure upside — less damage, no more risk of being chosen — which is half a
+        // rank system. Something with far reach ignores the line entirely, which is what reach is
+        // *for*, and if everybody is at the back there's nobody to hide behind.
+        let front = standing.filter { rank(of: $0, in: state) == .front }
+        let reachesPast = foe.stats.strikesFirst || foe.stats.element != nil
+        let reachable = (reachesPast || front.isEmpty) ? standing : front
+
         // **Draw Off.** Something you've taunted comes for you and doesn't get a choice — the only
         // way in the game to take a hit meant for somebody else.
         let taunted = (encounter.taunts[foeID] ?? 0) > 0 && isAlive(.binder, in: run)
-        guard let primary = taunted ? .binder : run.rng.pick(standing) else {
+        guard let primary = taunted ? .binder : run.rng.pick(reachable) else {
             run.activeEncounter = encounter
             state.worlds.activeRun = run
             checkOutcome(in: &state)
@@ -863,6 +928,12 @@ enum CombatRules {
             var raw = Double(roll(around: foe.stats.attack, run: &run)) * share
             if foe.stats.damageKind == .crush { raw *= 1 + Tuning.Encounter.crushDamageBonus }
 
+            // **What you're wearing turns aside heat**, whatever it was made of (Q36).
+            if foe.stats.element == .heat {
+                raw *= 1 - min(Tuning.Encounter.maximumInsulation,
+                               insulation(of: target, in: state) * Tuning.Encounter.insulationPerPoint)
+            }
+
             // **Ward.** Turns aside one harm, so you have to know what's coming — which is what
             // Sight is for. Guessing wrong costs you the round you spent setting it.
             let incoming: Harm = (encounter.snuffed.contains(foeID) ? nil : foe.stats.element)
@@ -881,7 +952,11 @@ enum CombatRules {
                 let ignored = foe.stats.damageKind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0
                 amount = damageTaken(Int(raw.rounded()), by: target, in: state, armourIgnored: ignored)
             }
+            let wasStanding = isAlive(target, in: run)
             hurt(target, by: amount, run: &run, encounter: &encounter)
+            if wasStanding, !isAlive(target, in: run), target == .companion {
+                encounter.note("\(actorName(target, encounter: encounter)) goes down. They'll be all right at home.")
+            }
 
             let verb = (encounter.snuffed.contains(foeID) ? nil : foe.stats.element)
                 .map(elementalVerb) ?? foe.stats.damageKind.verb
@@ -956,10 +1031,15 @@ enum CombatRules {
             encounter.note("Nothing left standing.")
             awardSpoils(run: &run, encounter: &encounter, state: &state)
             awardExperience(for: encounter.foes, encounter: &encounter, state: &state)
-        } else if run.binderHP <= 0 && run.companionHP <= 0 {
-            // **Nobody dies** (session 17 §6). You're carried home with what survived.
+        } else if run.binderHP <= 0 {
+            // **Nobody dies, and the Binder going down ends the run** (session 17 §6): *"companions
+            // can never die. They pass out and are revived back in town. If the Binder passes out,
+            // it's treated exactly like a world collapsing."*
+            //
+            // This used to require **both** of you to be down, which meant a Binder at zero kept
+            // walking around a world on Quill's legs. The Binder is the one holding the book.
             encounter.outcome = .defeated
-            encounter.note("You can't go on.")
+            encounter.note("You go down. Somebody gets you home.")
         }
         run.activeEncounter = encounter
         state.worlds.activeRun = run

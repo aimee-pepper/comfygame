@@ -504,6 +504,13 @@ enum Tuning {
         /// and costs you this much of your own — protected, and weaker at arm's length.
         static let backRankProtection: Double = 0.45  // PLACEHOLDER
         static let backRankMeleePenalty: Double = 0.5 // PLACEHOLDER
+        /// **What insulation and reactivity are worth on gear** (Q36's addition). Four of the six
+        /// material properties decide what the Blacksmith asks for; these two had no job at all, so
+        /// a warm pelt and a volatile ichor were worth nothing to wear.
+        static let insulationPerPoint: Double = 0.25  // PLACEHOLDER
+        static let maximumInsulation: Double = 0.6    // PLACEHOLDER
+        /// How volatile a weapon's stock has to be before it leaves something in the wound.
+        static let coatingReactivity: Double = 55     // PLACEHOLDER
         /// Damage and healing wobble by ±this fraction of their power.
         static let damageVariance: Double = 0.25     // PLACEHOLDER
         static let consumableHealAmount: Int = 10    // PLACEHOLDER

@@ -265,12 +265,24 @@ struct GearDef: Codable, Equatable, Sendable {
     var damage: DamageKind?
     /// How far it reaches. Length beats speed at the moment of contact.
     var reach: Reach = .close
+    /// **What it's made of, in the two properties that had no job** (Q36's addition, audit #9).
+    ///
+    /// Hardness, flexibility, density and lustre each decide what the Blacksmith asks for.
+    /// Insulation and reactivity decided nothing at all, so a warm pelt and a volatile ichor were
+    /// worth nothing to wear. Authored here rather than read off a material because **found gear
+    /// isn't made of anything yet** — crafting doesn't exist, and a piece off the ground is a
+    /// catalogue entry. When crafting lands these become the crafted piece's own properties.
+    var insulation: Double = 0
+    var reactivity: Double = 0
 
-    init(slot: GearSlot, tier: Int, damage: DamageKind? = nil, reach: Reach = .close) {
+    init(slot: GearSlot, tier: Int, damage: DamageKind? = nil, reach: Reach = .close,
+         insulation: Double = 0, reactivity: Double = 0) {
         self.slot = slot
         self.tier = tier
         self.damage = damage
         self.reach = reach
+        self.insulation = insulation
+        self.reactivity = reactivity
     }
 
     init(from decoder: Decoder) throws {
@@ -279,6 +291,8 @@ struct GearDef: Codable, Equatable, Sendable {
         tier = try c.decodeIfPresent(Int.self, forKey: .tier) ?? 0
         damage = try c.decodeIfPresent(DamageKind.self, forKey: .damage)
         reach = try c.decodeIfPresent(Reach.self, forKey: .reach) ?? .close
+        insulation = try c.decodeIfPresent(Double.self, forKey: .insulation) ?? 0
+        reactivity = try c.decodeIfPresent(Double.self, forKey: .reactivity) ?? 0
     }
 }
 
@@ -454,6 +468,8 @@ struct SkillDef: Codable, Equatable, Identifiable, Sendable {
         case rout
         /// **Read** — learn it properly, without killing it.
         case read
+        /// **Fall Back** — change where you're standing without spending the turn on it.
+        case reposition
     }
 
     enum Owner: String, Codable, Sendable { case binder, companion }
@@ -462,7 +478,7 @@ struct SkillDef: Codable, Equatable, Identifiable, Sendable {
     var needsFoe: Bool {
         switch kind {
         case .damage, .armourIgnoring, .overbear, .bleed, .reveal, .taunt, .snuff, .read: true
-        case .heal, .ward, .quicken, .cleanse, .rout: false
+        case .heal, .ward, .quicken, .cleanse, .rout, .reposition: false
         }
     }
 

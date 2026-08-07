@@ -868,4 +868,98 @@ final class CombatTests: XCTestCase {
             CombatRules.runAutomaticTurns(in: &state)
         }
     }
+
+    // MARK: Deviations from the stated design, caught by audit
+
+    /// **Nobody dies, and the Binder going down ends the run** (session 17 §6).
+    ///
+    /// Defeat used to require *both* of you at zero, so a Binder at zero kept walking a world on
+    /// Quill's legs. The Binder is the one holding the book.
+    func testTheBinderGoingDownEndsIt() throws {
+        let store = inFightWith([armoured()])
+        store.mutate("test: you're finished") { $0.worlds.activeRun?.binderHP = 0 }
+        store.mutate("test: check") { CombatRules.checkOutcome(in: &$0) }
+        XCTAssertEqual(store.activeEncounter?.outcome, .defeated,
+                       "the Binder is down and the fight carried on")
+    }
+
+    /// …and a companion at zero has **passed out**, not died. They take no more turns and are on
+    /// their feet at the base — health is run-scoped, so coming home is the revival.
+    func testACompanionPassesOutRatherThanDying() throws {
+        let store = inFightWith([armoured()])
+        store.mutate("test: they go down") { $0.worlds.activeRun?.companionHP = 0 }
+        store.mutate("test: check") { CombatRules.checkOutcome(in: &$0) }
+
+        let run = try XCTUnwrap(store.state.worlds.activeRun)
+        XCTAssertNil(run.activeEncounter?.outcome, "a companion going down ended the fight")
+        XCTAssertTrue(CombatRules.hasPassedOut(.companion, in: run))
+        XCTAssertFalse(CombatRules.hasPassedOut(.binder, in: run))
+    }
+
+    /// **The front rank takes the melee** (session 17 §4).
+    ///
+    /// Targeting was uniform, so standing at the back was pure upside — less damage taken and no
+    /// less chance of being chosen. That's half a rank system.
+    func testTheFrontRankTakesTheHits() {
+        var brute = CreatureTraits()
+        brute.size = 80; brute.build = 85
+        brute.armament.mix = WeaponMix(pierce: 0, crush: 1, rend: 0)
+        brute.armament.setTotal(70)
+
+        var hitTheBack = 0
+        for _ in 0..<14 {
+            let store = inFightWith([brute])
+            store.mutate("test: Quill up front, you behind") { state in
+                state.base.binderCharacter.rank = .back
+                state.base.companion.character.rank = .front
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                      let foe = encounter.foes.first
+                else { return }
+                encounter.turnIndex = encounter.order.firstIndex(of: .foe(foe.id)) ?? 0
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                CombatRules.runAutomaticTurns(in: &state)
+            }
+            let hp = store.state.worlds.activeRun?.binderHP ?? 0
+            if hp < CombatRules.maximumHealth(of: .binder, in: store.state) { hitTheBack += 1 }
+        }
+        XCTAssertLessThan(hitTheBack, 4,
+                          "something in melee reached past the front rank \(hitTheBack) times in 14")
+    }
+
+    /// **Fall Back** — the twelfth skill, held back only until ranks existed. It swaps where you
+    /// stand *without* spending the turn, which is the whole point of it.
+    func testFallBackChangesWhereYouStandAndGivesTheTurnBack() throws {
+        let store = inFightWith([armoured()])
+        giveTheTurnTo(.binder, in: store)
+        XCTAssertEqual(store.state.base.binderCharacter.rank, .front)
+
+        store.mutate("test: give ground") { CombatRules.perform(.skill("fall_back"), by: .binder, in: &$0) }
+        XCTAssertEqual(store.state.base.binderCharacter.rank, .back)
+        // **And it's still your move.** The owed turn is spent the instant the order tries to move
+        // on, which is what "without spending the turn" means from the player's side.
+        XCTAssertEqual(store.activeEncounter?.current, .binder,
+                       "Fall Back cost the turn it exists to save")
+    }
+
+    /// **Q36's addition** (audit #9): the two material properties with no job now have one. What
+    /// you wear turns aside heat; what you swing leaves something in the wound.
+    func testWhatYourGearIsMadeOfReachesTheFight() throws {
+        let warm = ContentCatalog.shared.items.first { ($0.gear?.insulation ?? 0) > 0 }
+        XCTAssertNotNil(warm, "nothing in the game is warm to wear")
+        let volatile = ContentCatalog.shared.items.first { ($0.gear?.reactivity ?? 0) > 0 }
+        XCTAssertNotNil(volatile, "nothing in the game is volatile to swing")
+
+        // A volatile blade leaves a wound that goes on costing.
+        let store = inFightWith([armoured()])
+        let blade = try XCTUnwrap(volatile)
+        store.mutate("test: carry it") { state in
+            state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: blade.id)
+        }
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
+        giveTheTurnTo(.binder, in: store)
+        store.mutate("test: swing") { CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0) }
+        XCTAssertNotNil(store.activeEncounter?.foeBleeds[foeID],
+                        "a volatile weapon left nothing behind")
+    }
 }
