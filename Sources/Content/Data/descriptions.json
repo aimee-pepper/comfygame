@@ -609,6 +609,56 @@
           "minimum": 1
         }
       ]
+    },
+    {
+      "id": "riven_ground",
+      "group": "substrate",
+      "text": "There is more hole here than floor. Whatever leaves, leaves the way it came.",
+      "polarity": "stabilising",
+      "priority": 45,
+      "conditions": [
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "broken-ground",
+          "minimum": 1
+        },
+        {
+          "target": "substrate",
+          "measure": "peak",
+          "maximum": 4
+        }
+      ]
+    },
+    {
+      "id": "broken_ground",
+      "group": "substrate",
+      "text": "The ground gives out in places. Mind the edges.",
+      "polarity": "stabilising",
+      "priority": 42,
+      "conditions": [
+        {
+          "target": "substrate",
+          "measure": "tag",
+          "key": "broken-ground",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "stopped_clock",
+      "group": "cycle",
+      "text": "Nothing turns. No day comes, and none goes.",
+      "polarity": "stabilising",
+      "priority": 40,
+      "conditions": [
+        {
+          "target": "cycle",
+          "measure": "tag",
+          "key": "frozen-in-time",
+          "minimum": 1
+        }
+      ]
     }
   ]
 }

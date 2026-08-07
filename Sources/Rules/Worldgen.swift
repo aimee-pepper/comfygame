@@ -46,11 +46,14 @@ enum Worldgen {
         // in it now come from the eight targets rather than from flat per-symbol tables.
         let sigils = BookRules.sigils(for: book)
         let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+        // The same world with nothing rolled into it. Chasms read this as a floor, and the exit rule
+        // reads it alone — see `TerrainRules.isRiven(asWritten:)`.
+        let asWritten = PressureRules.resolve(sigils)
 
         // 0. The ground itself, before anything is placed on it. Relief, Substrate, Hydrology,
         //    Thermal and Vitality all write here — this is the surface the pressure model was
         //    missing, and without it Relief had nothing to say.
-        TerrainRules.paint(&map, readings: readings, rng: &terrainRNG)
+        TerrainRules.paint(&map, readings: readings, asWritten: asWritten, rng: &terrainRNG)
 
         // 1. Where you arrive: a portal on the edge. It works as an exit too, so retreating the
         //    way you came is always possible — it just costs you the turns to walk back.
@@ -59,9 +62,20 @@ enum Worldgen {
         map.entry = entry
         map[entry].content = .portal(isEntry: true)
 
-        // 2. At least one more portal, placed away from the entry so it's worth finding.
+        // 1a. **Nothing may be stranded.** Chasms are carved from several mouths and can cut a world
+        //     into islands, so the way is opened until most of the solid ground is walkable-to — and
+        //     everything that can't be reached is then treated as occupied, which is the one line
+        //     that stops a node, a site, a page or a person being placed somewhere you can't go.
+        let walkable = TerrainRules.openTheWay(from: entry, in: &map, rng: &terrainRNG)
         var occupied: Set<GridPoint> = [entry]
-        let exitCount = layoutRNG.int(in: Tuning.World.exitPortalCountRange)
+        occupied.formUnion(map.allPoints.filter { !walkable.contains($0) })
+
+        // 2. At least one more portal, placed away from the entry so it's worth finding — unless the
+        //    world is so full of empty holes that the only way out is the way you came in (Aimee, 7
+        //    Aug). That world is not a trap: the entry has always worked as an exit. It just costs
+        //    you the whole walk back, which is what writing a world that riven is worth.
+        let exitCount = TerrainRules.isRiven(asWritten: asWritten)
+            ? 0 : layoutRNG.int(in: Tuning.World.exitPortalCountRange)
         for _ in 0..<exitCount {
             guard let point = randomFreePoint(in: map, avoiding: occupied, minimumDistanceFrom: entry,
                                               distance: Tuning.World.minimumExitPortalDistance, rng: &layoutRNG)

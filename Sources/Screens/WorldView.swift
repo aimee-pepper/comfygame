@@ -481,7 +481,7 @@ private struct TileView: View {
         case .deepWater: Color(red: 0.16, green: 0.30, blue: 0.52)
         case .rubble: Color(red: 0.50, green: 0.46, blue: 0.42)
         case .growth: Color(red: 0.30, green: 0.48, blue: 0.28)
-        case .void: Color(red: 0.10, green: 0.10, blue: 0.12)
+        case .chasm: Color(red: 0.06, green: 0.06, blue: 0.09)
         }
         return base.opacity(1 - Double(tile.elevation) * 0.13)
     }

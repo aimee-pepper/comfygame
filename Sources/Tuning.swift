@@ -467,6 +467,27 @@ enum Tuning {
         static let pondsAtFullDispersion: Double = 7
         /// The most of a world that can be overgrown, at full productivity.
         static let maximumGrowthCoverage: Double = 0.5
+
+        // **Chasms** — Substrate's word for less (Aimee, 7 Aug). All PLACEHOLDER.
+
+        /// The most of a world that can be hole. Kept under half: past that a map stops being a
+        /// place with holes in it and becomes a corridor puzzle, which is a different game.
+        static let chasmCoverageCeiling: Double = 0.45
+        /// How far past ordinary the substrate demand has to fall for the ceiling to be reached,
+        /// as a multiple of ordinary. At 2 an *overwhelming* Chasm is the maximum, a *great* one is
+        /// most of the way, and a moderate one is a world with some serious holes in it.
+        static let chasmFullDeficitMultiple: Double = 2.0
+        /// Coverage at which the only way out is the way you came in.
+        static let rivenChasmCoverage: Double = 0.42
+        /// Separate mouths the holes open from, at full coverage. A chasm is something the ground
+        /// did in a place, not a uniform porosity.
+        static let chasmMouthsAtFullCoverage: Double = 8
+        /// How much of a world's solid ground has to be walkable-to from where you arrive before
+        /// the generator stops bridging holes. Not 1: a shoal cut off by deep water can't be
+        /// bridged by filling a chasm, and placement already refuses to strand anything.
+        static let reachableGroundFraction: Double = 0.85
+        /// A ceiling on the bridging loop, so a world of islands can't spin it.
+        static let maximumChasmBridges: Int = 60
     }
 
     enum Camera {

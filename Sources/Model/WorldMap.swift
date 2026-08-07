@@ -52,10 +52,14 @@ struct WorldMap: Codable, Equatable, Sendable {
 /// set (`generation-spine-spec.md` §2) — enough for the eight targets to write something legible
 /// into, not a materials system.
 enum GroundType: String, Codable, CaseIterable, Sendable {
-    case stone, soil, sand, ice, ash, water, deepWater, rubble, growth, void
+    case stone, soil, sand, ice, ash, water, deepWater, rubble, growth
+    /// **A hole where the ground should be.** Written with the Chasm focus, which is Substrate's
+    /// first word for *less* (Aimee, 7 Aug). It was called `void` and was produced by nothing at
+    /// all — an impassable ground type that no world could contain, waiting for a way to ask for it.
+    case chasm
 
-    /// Deep water and the void are the only things you can't walk over.
-    var isPassable: Bool { self != .deepWater && self != .void }
+    /// Deep water and open chasm are the only things you can't walk over.
+    var isPassable: Bool { self != .deepWater && self != .chasm }
 
     /// Growth and broken ground break sightlines. This is what makes ambush terrain real rather
     /// than a word in a description.
@@ -66,6 +70,14 @@ enum GroundType: String, Codable, CaseIterable, Sendable {
         case .deepWater: "deep water"
         default: rawValue
         }
+    }
+
+    /// Tolerant, per the policy in `Migrations.swift`. A ground type is stored on every tile of
+    /// every world in progress, so a renamed or retired case must not cost somebody the world they
+    /// are standing in — it costs them one square, painted as soil.
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = GroundType(rawValue: raw) ?? .soil
     }
 }
 
