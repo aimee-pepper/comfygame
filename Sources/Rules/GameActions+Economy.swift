@@ -313,8 +313,22 @@ extension GameStore {
     ///
     /// A slot rather than a `PartyMember`, because `PartyMember` is the *combat* vocabulary and
     /// only two people fight today. This is who exists.
+    /// **Who is actually in the party** — you, and whoever is walking out with you.
+    ///
+    /// Aimee, 7 Aug: *"the party menu shows all available companions which is not how it should
+    /// function. It should be the active party members."* It was listing the whole fire, which made
+    /// the Party screen a second roster and left no screen answering "who am I taking".
+    ///
+    /// Choosing is the Firepit's job; this is the sheet for the people you chose.
     var partySlots: [PartySlot] {
-        [.binder] + state.base.roster.indices.map(PartySlot.member)
+        [.binder] + state.base.roster.indices
+            .filter { $0 == state.base.activeCompanion }
+            .map(PartySlot.member)
+    }
+
+    /// Everybody at the fire, in or out. The Firepit's list.
+    var everyoneAtTheFire: [PartySlot] {
+        state.base.roster.indices.map(PartySlot.member)
     }
 
     func name(of slot: PartySlot) -> String {
