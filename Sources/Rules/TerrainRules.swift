@@ -55,7 +55,11 @@ enum TerrainRules {
     /// axis reaching the map rather than only the description.
     private static func paintWater(_ map: inout WorldMap, water: PressureReading,
                                    freezing: Bool, rng: inout SeededRNG) {
-        let coverage = water.availableMagnitude / 100 * Tuning.Terrain.maximumWaterCoverage
+        // **How much water there is, not how much of it is usable.** `availableMagnitude` excludes
+        // frozen and airborne water because that's what *life* can drink — but a glacier is still
+        // very much on the map. Painting from it meant a fully frozen world had no water tiles at
+        // all: write Sea and Glacier together and you got bare rock (6 Aug).
+        let coverage = water.peak / 100 * Tuning.Terrain.maximumWaterCoverage
         guard coverage > 0.01 else { return }
 
         let wet: GroundType = freezing || water.share(of: "frozen") > 0.5 ? .ice : .water

@@ -63,6 +63,9 @@ enum Tuning {
         static let stabilityPerAbundance: Double = 0.45
         /// Essence per cell of the page you actually used. Bigger runes cost more ink.
         static let essencePerCell: Double = 0.6   // PLACEHOLDER
+        /// How many rolls of the unwritten subjects the preview samples to find the stability band.
+        /// Runs on every keystroke at the desk, so it's a handful rather than a hundred.
+        static let stabilitySamples: Int = 20     // PLACEHOLDER
     }
 
     // MARK: - Pressures (the writing system's language half)

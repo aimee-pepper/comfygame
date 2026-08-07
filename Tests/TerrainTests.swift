@@ -33,10 +33,15 @@ final class TerrainTests: XCTestCase {
     }
 
     /// Write "Sea" on a frozen world and you get a glacier whether you asked for one or not.
+    ///
+    /// The cold is written rather than rolled. This used to lean on a rolled atmosphere to get the
+    /// thermal floor under freezing, which meant editing an unrelated source could break it.
     func testAFrozenWorldsWaterIsIce() {
-        let frozen = ground(in: world(["sea": "hydrology", "glacier": "thermal", "ice": "thermal"]))
+        let frozen = ground(in: world(["sea": "hydrology", "glacier": "thermal",
+                                       "ice": "thermal", "snow": "thermal"]))
         XCTAssertEqual(frozen[.water, default: 0], 0, "liquid water survived a frozen world")
-        XCTAssertGreaterThan(frozen[.ice, default: 0], 0)
+        XCTAssertGreaterThan(frozen[.ice, default: 0], 0,
+                             "a world of sea and glacier came out as bare rock")
     }
 
     // MARK: Vitality is cover
@@ -130,13 +135,22 @@ final class TerrainTests: XCTestCase {
         BoundBook(written: symbols, essencePaid: 0)
     }
 
-    private func world(_ pairs: [String: String]) -> PressureReadings {
-        PressureRules.resolve(pairs.sorted { $0.key < $1.key }.enumerated().map { index, pair in
+    /// - Parameter rollingTheRest: whether the subjects you didn't write are filled from a seed.
+    ///
+    ///   **Off by default.** A test asserting *"a frozen world's water is ice"* is about what was
+    ///   written, and letting six other subjects roll around it means the assertion can be broken by
+    ///   editing an unrelated source — which is exactly what happened when Second Light and Rift
+    ///   were cut and a fixed seed started picking different focuses (6 Aug).
+    private func world(_ pairs: [String: String], rollingTheRest: Bool = false) -> PressureReadings {
+        let sigils = pairs.sorted { $0.key < $1.key }.enumerated().map { index, pair in
             Sigil(id: InstanceID(rawValue: UInt64(index + 1)),
                   source: PressureSourceID(rawValue: pair.key),
                   target: PressureTargetID(rawValue: pair.value),
                   intensity: .great)
-        }, fillingUnwrittenWith: 20_260_805)
+        }
+        return rollingTheRest
+            ? PressureRules.resolve(sigils, fillingUnwrittenWith: 20_260_805)
+            : PressureRules.resolve(sigils)
     }
 
     /// Share of the map given over to each ground type.

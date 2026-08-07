@@ -193,6 +193,28 @@
       one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## A page is about one thing (Aimee, 6 Aug 2026)
+- [x] **The Party screen is a roster** — thumbnail, level, health, rank and the five stats, with a
+      nudge when something better is on the shelf
+- [x] **Each person has their own page**, with Gear and Rules on tabs, and **you can swipe between
+      them**. One page held two people's sixteen gear slots and two rule lists, heading for five
+- [x] **Clues grey out once you've found somebody**, even with pages still missing — the directions
+      become a keepsake rather than reading as live instructions
+- [x] **The panel says nothing about what you left to chance.** Life and Expected harvest were
+      describing worlds the player never wrote
+
+## Illumination, and a glacier that wasn't there (6 Aug 2026)
+- [x] **Second Light cut** — Count says "a pair of suns" better, and it never had an identity
+- [x] **Rift folded into Void**, which keeps the identity it always had: no sun ever rose here
+- [x] **The moon lifts the night floor**, or "the moon is the counter-cyclic light" isn't true
+- [x] The moon attaches to Cycle too — Rift was Cycle's only source and folding it emptied the bin
+- [x] **A frozen world had no ice on it.** Terrain painted from *usable* water, which excludes
+      frozen — so Sea plus Glacier came out as bare rock
+- [x] **Stability is a range**, because every unwritten subject is rolled at bind. Writing more
+      narrows it; writing everything closes it to a point
+- [ ] Void as a **cap** rather than a subtraction — write a sun into it and the sun isn't there
+- [ ] Light and Shadow sections in the Illumination bin
+
 ## Recruiting delivers somebody (Aimee, 6 Aug 2026)
 - [x] **A roster, not one hardcoded companion slot.** Recruiting used to be two writes to the
       Library — she was kept, in Reality, but there was nothing to show for it

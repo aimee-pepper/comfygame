@@ -320,6 +320,31 @@ struct BookDraft: Codable, Equatable, Sendable {
 }
 
 /// Who's wearing it. The party is two in v0 and both of them carry their own gear.
+/// **Somebody in the party**, as opposed to somebody in a fight.
+///
+/// `PartyMember` is the combat vocabulary and knows about exactly two people. This is who *exists*
+/// — the Binder, and everybody at the fire — which is what the Party screen is a list of.
+enum PartySlot: Hashable, Identifiable, Sendable {
+    case binder
+    case member(Int)
+
+    var id: String {
+        switch self {
+        case .binder: "binder"
+        case .member(let index): "member-\(index)"
+        }
+    }
+
+    /// How this maps onto a fight today: the Binder is the Binder, and whoever came along is the
+    /// companion. **[PLACEHOLDER]** until five fight together.
+    func combatant(activeCompanion: Int) -> PartyMember? {
+        switch self {
+        case .binder: .binder
+        case .member(let index): index == activeCompanion ? .companion : nil
+        }
+    }
+}
+
 enum PartyMember: String, CaseIterable, Identifiable, Sendable {
     case binder, companion
 

@@ -132,6 +132,7 @@
 		EBC7C77E4438C75730F0DCCA /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB4AFF044956272A3767B70 /* Character.swift */; };
 		EDF26461D4FD581D2BCFBB0A /* DeterminismTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51FE4FBAB98280181089C56 /* DeterminismTests.swift */; };
 		EFB68320FEF123CBC8309B55 /* RuleBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */; };
+		F1FD0C88EB8BB5568F3725C3 /* PartyRosterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B6F502E8B3B230294A2874A /* PartyRosterView.swift */; };
 		F3BBDF3F527FAD220FA4F5D8 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504332712854230587940F0A /* Library.swift */; };
 		F6E366378F5921F9B9EFF410 /* SmithTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6C54531684DE111C33038A /* SmithTests.swift */; };
 		F9A1322571DBD99F4BF908CB /* ContentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B08032B70636FB2D70EFD6 /* ContentModels.swift */; };
@@ -178,6 +179,7 @@
 		346EEEC616B8EBFE291C4A79 /* BaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseView.swift; sourceTree = "<group>"; };
 		36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPanel.swift; sourceTree = "<group>"; };
 		39D5618B6B6F36DB62CD836B /* PageGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageGridView.swift; sourceTree = "<group>"; };
+		3B6F502E8B3B230294A2874A /* PartyRosterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartyRosterView.swift; sourceTree = "<group>"; };
 		3CD59EA0991C7AFB32B3129C /* BookbinderTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BookbinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		40DDEB42C7E2856E98352341 /* GameActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameActions.swift; sourceTree = "<group>"; };
 		41571D49472E12EE120FF5A8 /* CreatureIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatureIdentity.swift; sourceTree = "<group>"; };
@@ -367,6 +369,7 @@
 				CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */,
 				D238962CB9F8B60B212D9473 /* MinimapView.swift */,
 				39D5618B6B6F36DB62CD836B /* PageGridView.swift */,
+				3B6F502E8B3B230294A2874A /* PartyRosterView.swift */,
 				36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */,
 				56CE9E9A2ED4242F8C480AEF /* ResearchTreeLayout.swift */,
 				1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */,
@@ -706,6 +709,7 @@
 				B3127BCE033E785E4B3EA912 /* Page.swift in Sources */,
 				A7B958AF227E4AD7A6E2E900 /* PageGridView.swift in Sources */,
 				F9A397FEF26E5A194578909E /* PageRules.swift in Sources */,
+				F1FD0C88EB8BB5568F3725C3 /* PartyRosterView.swift in Sources */,
 				87DF0AB9EB7842560291C8A3 /* PressureModels.swift in Sources */,
 				CC74E6778320FB4F70CFDB3F /* PressureRules.swift in Sources */,
 				E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */,

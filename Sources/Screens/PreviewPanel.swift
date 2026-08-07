@@ -49,7 +49,7 @@ struct PreviewPanel: View {
             Divider()
             statsRow
             Divider()
-            mixSection(title: "Expected harvest", entries: resourceEntries)
+            harvestSection
             lifeSection
         }
         .padding(10)
@@ -169,8 +169,18 @@ struct PreviewPanel: View {
         var isKnown: Bool
     }
 
+    /// **Only what you asked for.**
+    ///
+    /// A resource is driven by a subject and gated on conditions; if you wrote nothing about those
+    /// subjects, the world decides and the panel has no business estimating it (Aimee, 6 Aug). What
+    /// remains is an honest estimate for the pressures you actually wrote.
     private var resourceEntries: [MixEntry] {
         projection.resourceMix
+            .filter { entry in
+                let subjects = Set([entry.resource.drivenBy].compactMap { $0 }
+                                   + entry.resource.requires.map(\.target))
+                return subjects.isEmpty || !subjects.isDisjoint(with: projection.writtenSubjects)
+            }
             .filter { $0.share > 0.001 }
             .map { entry in
                 // Resources are named on sight, so anything in the mix is legible immediately.
@@ -188,7 +198,40 @@ struct PreviewPanel: View {
     /// of percentages against "Unknown" told the player nothing anyway. This says how many kinds of
     /// thing the world will hold and what they will tend to be like, which is a claim the preview is
     /// allowed to make because it comes off what was *written*, not off the seed.
+    /// Says what you'd get from what you wrote, or says plainly that you wrote nothing about it.
+    @ViewBuilder
+    private var harvestSection: some View {
+        if resourceEntries.isEmpty {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Expected harvest")
+                    .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                Text("You haven't written anything that decides what's here. Whatever the world has, it chose.")
+                    .font(.callout).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            mixSection(title: "Expected harvest", entries: resourceEntries)
+        }
+    }
+
+    @ViewBuilder
     private var lifeSection: some View {
+        if !projection.canDescribeLife {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Life")
+                    .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                Text("You've said nothing about what lives here, so it isn't yours to know yet.")
+                    .font(.callout).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            writtenLifeSection
+        }
+    }
+
+    private var writtenLifeSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Life")
                 .font(.caption.weight(.semibold))

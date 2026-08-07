@@ -10,7 +10,7 @@ struct GearView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     let slot: GearSlot
-    let member: PartyMember
+    let member: PartySlot
 
     private var worn: EquippedPiece? { store.worn(slot, by: member) }
 

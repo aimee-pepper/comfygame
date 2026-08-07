@@ -282,9 +282,14 @@ final class DescriptionTests: XCTestCase {
         XCTAssertGreaterThan(spokenBefore.count, 1)
     }
 
-    /// The stability number must not require knowing what rolled, either.
+    /// The stability number must not require knowing what rolled — **and it must not pretend to
+    /// know either** (Aimee, 6 Aug).
+    ///
+    /// It's a band now, because every unwritten subject is rolled at bind and a rolled focus
+    /// carries its own delta, greed and contradictions. What you wrote sits inside the band; the
+    /// band says nothing about *which* thing might roll, so the no-leaking rule still holds.
     @MainActor
-    func testStabilityIsComputedFromTheWrittenPageAlone() {
+    func testStabilityBracketsWhatThePageAloneSays() {
         let store = GameStore(io: .temporary(name: "stab-\(UUID().uuidString)"))
         store.mutate("test: know everything") {
             $0.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
@@ -292,8 +297,10 @@ final class DescriptionTests: XCTestCase {
         store.write("rich_ore")
         let shown = store.bookProjection.stabilityScore
         let fromPage = BookRules.stabilityScore(delta: BookRules.stabilityDelta(symbolIDs: ["rich_ore"]))
-        XCTAssertEqual(shown.lowerBound, fromPage)
-        XCTAssertTrue(shown.isPoint, "an exact page should give an exact number")
+        XCTAssertTrue(shown.contains(fromPage),
+                      "what the page says isn't inside the band the panel shows")
+        XCTAssertFalse(shown.isPoint,
+                       "seven subjects unwritten and stability is shown as a certainty")
     }
 
     /// **Visiting unseals it.** A world you've been to has no secrets.

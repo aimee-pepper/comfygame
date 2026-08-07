@@ -466,4 +466,87 @@ final class WorldTests: XCTestCase {
         )
         return state
     }
+
+    /// **Stability is a range, because the world is** (Aimee, 6 Aug).
+    ///
+    /// The headline counted only what you wrote, which is right — the panel must not reveal rolled
+    /// content. But every unwritten subject is rolled at bind, and a rolled focus carries its own
+    /// stability delta, its own greed, and its own capacity to contradict what you wrote. Six of
+    /// eight unwritten is normal, so the number shown could be off by a lot.
+    ///
+    /// The design is careful about this everywhere else: **the price is certain, the world is not.**
+    func testStabilityIsRangedWhileTheWorldIsUnwritten() {
+        var page = Page()
+        page.runes = [
+            PlacedRune(id: InstanceID(rawValue: 1), content: .target("illumination"),
+                       hand: .crude, origin: PageCell(column: 0, row: 0), shapeID: "crude_block"),
+            PlacedRune(id: InstanceID(rawValue: 2), content: .source("sun"),
+                       hand: .crude, origin: PageCell(column: 2, row: 0), shapeID: "crude_block"),
+        ]
+        page.links = [MarkLink(InstanceID(rawValue: 1), InstanceID(rawValue: 2))]
+
+        let sparse = BookProjection.project(page: page, seed: 99)
+        XCTAssertLessThan(sparse.stabilityScore.lowerBound, sparse.stabilityScore.upperBound,
+                          "one subject written of eight and stability is shown as a certainty")
+        XCTAssertLessThanOrEqual(sparse.turnsUntilCollapse.lowerBound,
+                                 sparse.turnsUntilCollapse.upperBound)
+    }
+
+    /// Write every subject and there is nothing left to roll — so the band closes to a point, and
+    /// the promise "the price is certain, the world is not" becomes "and you can make it certain".
+    func testAFullyWrittenPageIsCertain() {
+        var page = Page()
+        var next: UInt64 = 1
+        let pairs: [(PressureTargetID, PressureSourceID)] = [
+            ("illumination", "sun"), ("thermal", "magma"), ("hydrology", "sea"),
+            ("substrate", "granite"), ("relief", "granite"), ("vitality", "root"),
+            ("atmosphere", "wind"), ("cycle", "moon"),
+        ]
+        for (index, pair) in pairs.enumerated() {
+            page.runes.append(PlacedRune(id: InstanceID(rawValue: next), content: .target(pair.0),
+                                         hand: .crude, origin: PageCell(column: 0, row: index),
+                                         shapeID: "refined_dot"))
+            let target = next
+            next += 1
+            page.runes.append(PlacedRune(id: InstanceID(rawValue: next), content: .source(pair.1),
+                                         hand: .crude, origin: PageCell(column: 1, row: index),
+                                         shapeID: "refined_dot"))
+            page.links.insert(MarkLink(InstanceID(rawValue: target), InstanceID(rawValue: next)))
+            next += 1
+        }
+        XCTAssertTrue(BookProjection.project(page: page, seed: 7).stabilityScore.isPoint,
+                      "nothing left unwritten and the world is still uncertain")
+    }
+
+    /// **And writing more narrows the band** — which makes the value of specificity a number for
+    /// the first time.
+    func testWritingMoreSubjectsNarrowsTheStabilityBand() {
+        func band(_ subjects: [(PressureTargetID, PressureSourceID)]) -> Int {
+            var page = Page()
+            var next: UInt64 = 1
+            for (index, pair) in subjects.enumerated() {
+                page.runes.append(PlacedRune(id: InstanceID(rawValue: next), content: .target(pair.0),
+                                             hand: .crude,
+                                             origin: PageCell(column: 0, row: index * 2),
+                                             shapeID: "refined_dot"))
+                let target = next
+                next += 1
+                page.runes.append(PlacedRune(id: InstanceID(rawValue: next), content: .source(pair.1),
+                                             hand: .crude,
+                                             origin: PageCell(column: 1, row: index * 2),
+                                             shapeID: "refined_dot"))
+                page.links.insert(MarkLink(InstanceID(rawValue: target), InstanceID(rawValue: next)))
+                next += 1
+            }
+            let projection = BookProjection.project(page: page, seed: 4242)
+            return projection.stabilityScore.upperBound - projection.stabilityScore.lowerBound
+        }
+
+        let one = band([("illumination", "sun")])
+        let many = band([("illumination", "sun"), ("thermal", "magma"), ("hydrology", "sea"),
+                         ("substrate", "granite"), ("relief", "granite"), ("vitality", "root"),
+                         ("atmosphere", "wind"), ("cycle", "moon")])
+        XCTAssertLessThan(many, one,
+                          "writing every subject left as much uncertainty as writing one")
+    }
 }

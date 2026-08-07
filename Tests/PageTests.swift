@@ -251,8 +251,9 @@ final class PageTests: XCTestCase {
         let mark = store.state.base.page.runes[0]
         store.erase(mark.id)
         XCTAssertTrue(store.state.base.page.symbolIDs.isEmpty)
-        XCTAssertEqual(store.bookProjection.stabilityScore.lowerBound,
-                       BookRules.stabilityScore(delta: 0))
+        // A blank page is the *most* uncertain world there is — everything rolls — so what it says
+        // has to sit inside the band rather than be the band.
+        XCTAssertTrue(store.bookProjection.stabilityScore.contains(BookRules.stabilityScore(delta: 0)))
     }
 
     @MainActor

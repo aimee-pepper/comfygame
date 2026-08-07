@@ -307,6 +307,105 @@ extension GameStore {
         }
     }
 
+    // MARK: - Gear, per person in the roster
+
+    /// **Everybody in the party, in one list** — the Binder first, then everyone at the fire.
+    ///
+    /// A slot rather than a `PartyMember`, because `PartyMember` is the *combat* vocabulary and
+    /// only two people fight today. This is who exists.
+    var partySlots: [PartySlot] {
+        [.binder] + state.base.roster.indices.map(PartySlot.member)
+    }
+
+    func name(of slot: PartySlot) -> String {
+        switch slot {
+        case .binder: "You"
+        case .member(let index): state.base.roster.indices.contains(index)
+            ? state.base.roster[index].name : "—"
+        }
+    }
+
+    func character(of slot: PartySlot) -> CharacterState {
+        switch slot {
+        case .binder: state.base.binderCharacter
+        case .member(let index): state.base.roster.indices.contains(index)
+            ? state.base.roster[index].character : CharacterState()
+        }
+    }
+
+    func worn(_ gearSlot: GearSlot, by slot: PartySlot) -> EquippedPiece? {
+        switch slot {
+        case .binder: state.base.binderEquipped[gearSlot]
+        case .member(let index): state.base.roster.indices.contains(index)
+            ? state.base.roster[index].equipped[gearSlot] : nil
+        }
+    }
+
+    /// What wearing this would change, for whoever you're looking at.
+    func gearDelta(wearing stack: ItemStack, for slot: PartySlot) -> Int {
+        guard let gear = ContentCatalog.shared.item(stack.catalogID)?.gear else { return 0 }
+        let wornTier = worn(gear.slot, by: slot)?.effectiveTier ?? 0
+        let step = gear.slot == .weapon
+            ? Tuning.Encounter.attackPerWeaponTier
+            : Tuning.Encounter.defencePerArmorTier
+        return (stack.effectiveTier - wornTier) * step
+    }
+
+    func hasUpgradeAvailable(for gearSlot: GearSlot, slot: PartySlot) -> Bool {
+        wearable(in: gearSlot).contains { gearDelta(wearing: $0, for: slot) > 0 }
+    }
+
+    /// Put something on somebody. Takes the piece out of the bin, puts back what it replaces —
+    /// the same rule as before, now aimed at anybody in the party.
+    func equip(_ stack: ItemStack, on slot: PartySlot) {
+        guard let gearSlot = ContentCatalog.shared.item(stack.catalogID)?.gear?.slot else { return }
+        mutate("equip \(stack.catalogID.rawValue)", flush: true) { state in
+            guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }),
+                  let taken = state.base.inventory.stacks[index].removing(1)
+            else { return }
+            if state.base.inventory.stacks[index].isEmpty {
+                state.base.inventory.stacks.remove(at: index)
+            }
+            let previous = Self.swapIn(EquippedPiece(taken), gearSlot, slot, in: &state)
+            if let previous {
+                state.base.store(previous.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
+            }
+        }
+    }
+
+    func unequip(_ gearSlot: GearSlot, from slot: PartySlot) {
+        mutate("unequip \(gearSlot.rawValue)", flush: true) { state in
+            if let removed = Self.swapIn(nil, gearSlot, slot, in: &state) {
+                state.base.store(removed.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
+            }
+        }
+    }
+
+    /// Writes a piece into a slot and hands back whatever was there.
+    private static func swapIn(_ piece: EquippedPiece?, _ gearSlot: GearSlot,
+                               _ slot: PartySlot, in state: inout GameState) -> EquippedPiece? {
+        switch slot {
+        case .binder:
+            let previous = state.base.binderEquipped[gearSlot]
+            state.base.binderEquipped[gearSlot] = piece
+            return previous
+        case .member(let index):
+            guard state.base.roster.indices.contains(index) else { return nil }
+            let previous = state.base.roster[index].equipped[gearSlot]
+            state.base.roster[index].equipped[gearSlot] = piece
+            return previous
+        }
+    }
+
+    /// Somebody's rule list, and where it's written back to.
+    func gambits(of slot: PartySlot) -> [GambitRule] {
+        switch slot {
+        case .binder: state.base.binderGambits
+        case .member(let index): state.base.roster.indices.contains(index)
+            ? state.base.roster[index].gambits : []
+        }
+    }
+
     // MARK: - The party
 
     /// Who comes with you. **[PLACEHOLDER]** — five fight together eventually (Aimee, 6 Aug); for

@@ -82,14 +82,14 @@ final class SmithTests: XCTestCase {
             state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen"))
         }
         let stack = try XCTUnwrap(store.state.base.inventory.stacks.first { $0.catalogID == "blade_keen" })
-        store.equip(stack, on: .binder)
+        store.equip(stack, on: PartyMember.binder)
 
         let before = CombatRules.binderAttack(in: store.state)
         let target = try XCTUnwrap(store.reforgeable.first { $0.catalogID == "blade_keen" })
         XCTAssertTrue(store.readiness(of: target).isReady)
         store.reforge(target)
 
-        XCTAssertEqual(store.worn(.weapon, by: .binder)?.upgradeLevel, 1)
+        XCTAssertEqual(store.worn(.weapon, by: PartyMember.binder)?.upgradeLevel, 1)
         XCTAssertEqual(CombatRules.binderAttack(in: store.state) - before,
                        Tuning.Encounter.attackPerWeaponTier,
                        "the anvil promised a tier the fight didn't deliver")
@@ -106,12 +106,12 @@ final class SmithTests: XCTestCase {
             state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: "guard_padded"))
         }
         let stack = try XCTUnwrap(store.state.base.inventory.stacks.first { $0.catalogID == "guard_padded" })
-        store.equip(stack, on: .companion)
+        store.equip(stack, on: PartyMember.companion)
 
         let target = try XCTUnwrap(store.reforgeable.first { $0.catalogID == "guard_padded" })
         store.reforge(target)
 
-        XCTAssertEqual(store.worn(.armor, by: .companion)?.upgradeLevel, 1)
+        XCTAssertEqual(store.worn(.armor, by: PartyMember.companion)?.upgradeLevel, 1)
         XCTAssertNil(store.state.base.inventory.stacks.first { $0.catalogID == "guard_padded" },
                      "reforging a worn piece put a second one on the shelf")
     }
@@ -202,13 +202,13 @@ final class SmithTests: XCTestCase {
             state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_keen"))
         }
         let stack = try XCTUnwrap(store.state.base.inventory.stacks.first { $0.catalogID == "blade_keen" })
-        store.equip(stack, on: .binder)
+        store.equip(stack, on: PartyMember.binder)
         // `reforge` already writes through (flush: true) — a force-quit at the anvil is the case.
         store.reforge(try XCTUnwrap(store.reforgeable.first { $0.catalogID == "blade_keen" }))
 
         let resumed = GameStore(io: io)
-        XCTAssertEqual(resumed.worn(.weapon, by: .binder)?.upgradeLevel, 1)
-        XCTAssertEqual(resumed.worn(.weapon, by: .binder)?.displayName, "Keen Blade +1")
+        XCTAssertEqual(resumed.worn(.weapon, by: PartyMember.binder)?.upgradeLevel, 1)
+        XCTAssertEqual(resumed.worn(.weapon, by: PartyMember.binder)?.displayName, "Keen Blade +1")
     }
 
     /// An untouched piece still writes itself as a bare id, so a save stays legible and an older

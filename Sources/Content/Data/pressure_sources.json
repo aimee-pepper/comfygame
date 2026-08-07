@@ -1,5 +1,5 @@
 {
-  "_note": "ALL NUMBERS PLACEHOLDER — straight from pressure-model-illumination.md §4.3, which flags them as guesses. This is the Illumination pattern worked in full; the other seven targets are added by extending this file, not by touching code. A source names its own contributions, and every contribution beyond the one you bind is an IMPLICIT SECONDARY that happens whether you asked for it or not — 'you cannot have bright without hot unless you do something about it'. 'character' is per-target and decides HOW a source contributes: illumination's cyclic sources lift only the peak, constant ones lift peak and floor, occluding ones push both down. 'attachesTo' is the ONE target a source may be bound to. The rune spec §5 says 'each attaches to a target' but never says which — so these follow the spec's own grouping (Celestial, Water, Fire & Thermal, Stone & Mineral, Air, Living, Strange), because a thing attaches to the target it IS an instance of, not to whichever dial it happens to move furthest. Rain can't illuminate. Everything a source does beyond its target still happens as an implicit secondary — you just can't WRITE it. PLACEHOLDER; the palette and the grammar both follow this field. 'attachesTo' is a LIST of the targets a source may be bound to — everything else it does still happens as an implicit secondary. It is a list because some causes belong to more than one target: a volcano is heat and a mountain, a glacier is water and a valley. PLACEHOLDER: Relief currently borrows six sources this way and has no words of its own (volcano, glacier, granite, rift, sand, canopy). Whether it should get its own source runes — mountain, canyon, plain, dune, terrace — is Aimee's call, not mine to invent.",
+  "_note": "ALL NUMBERS PLACEHOLDER — straight from pressure-model-illumination.md §4.3, which flags them as guesses. This is the Illumination pattern worked in full; the other seven targets are added by extending this file, not by touching code. A source names its own contributions, and every contribution beyond the one you bind is an IMPLICIT SECONDARY that happens whether you asked for it or not — 'you cannot have bright without hot unless you do something about it'. 'character' is per-target and decides HOW a source contributes: illumination's cyclic sources lift only the peak, constant ones lift peak and floor, occluding ones push both down. 'attachesTo' is the ONE target a source may be bound to. The rune spec §5 says 'each attaches to a target' but never says which — so these follow the spec's own grouping (Celestial, Water, Fire & Thermal, Stone & Mineral, Air, Living, Strange), because a thing attaches to the target it IS an instance of, not to whichever dial it happens to move furthest. Rain can't illuminate. Everything a source does beyond its target still happens as an implicit secondary — you just can't WRITE it. PLACEHOLDER; the palette and the grammar both follow this field. 'attachesTo' is a LIST of the targets a source may be bound to — everything else it does still happens as an implicit secondary. It is a list because some causes belong to more than one target: a volcano is heat and a mountain, a glacier is water and a valley. PLACEHOLDER: Relief currently borrows six sources this way and has no words of its own (volcano, glacier, granite, rift, sand, canopy). Whether it should get its own source runes — mountain, canyon, plain, dune, terrace — is Aimee's call, not mine to invent. SECOND LIGHT IS CUT and RIFT IS FOLDED INTO VOID (Aimee, 6 Aug). Second Light was a nameless extra sun and Count now says 'a pair of suns' better. Rift and Void both meant 'hole in reality' and did opposite things; Void keeps the identity it always had — no sun ever rose here. Rift's arrhythmic Cycle contribution needs rehoming when Cycle gets primaries of its own (cycle-sources-draft.md). THE MOON LIFTS THE NIGHT FLOOR: floor 0 made it a dim sun, and 'the moon is the counter-cyclic light' has to be true in the data.",
   "sources": [
     {
       "id": "ash",
@@ -646,7 +646,7 @@
           "target": "illumination",
           "character": "cyclic",
           "peak": 12,
-          "floor": 0,
+          "floor": 4,
           "tags": [
             "celestial"
           ]
@@ -656,10 +656,20 @@
           "character": "radiating",
           "peak": 2,
           "floor": 0
+        },
+        {
+          "target": "cycle",
+          "character": "cyclic",
+          "peak": 30,
+          "floor": 0,
+          "tags": [
+            "regular"
+          ]
         }
       ],
       "attachesTo": [
-        "illumination"
+        "illumination",
+        "cycle"
       ]
     },
     {
@@ -694,36 +704,6 @@
       ],
       "attachesTo": [
         "hydrology"
-      ]
-    },
-    {
-      "id": "rift",
-      "name": "Rift",
-      "icon": "bolt.horizontal.fill",
-      "blurb": "Something is open that shouldn't be.",
-      "contributions": [
-        {
-          "target": "illumination",
-          "character": "constant",
-          "peak": 20,
-          "floor": 20,
-          "tags": [
-            "sourceless",
-            "unexplained"
-          ]
-        },
-        {
-          "target": "cycle",
-          "character": "destabilising",
-          "peak": 25,
-          "floor": 0,
-          "tags": [
-            "arrhythmic"
-          ]
-        }
-      ],
-      "attachesTo": [
-        "cycle"
       ]
     },
     {
@@ -920,33 +900,6 @@
       ]
     },
     {
-      "id": "second_light",
-      "name": "Second Light",
-      "icon": "circle.dotted.circle",
-      "blurb": "Nobody has explained it.",
-      "contributions": [
-        {
-          "target": "illumination",
-          "character": "cyclic",
-          "peak": 25,
-          "floor": 0,
-          "tags": [
-            "celestial",
-            "unexplained"
-          ]
-        },
-        {
-          "target": "thermal",
-          "character": "radiating",
-          "peak": 5,
-          "floor": 0
-        }
-      ],
-      "attachesTo": [
-        "illumination"
-      ]
-    },
-    {
       "id": "smoke",
       "name": "Smoke",
       "icon": "smoke.fill",
@@ -1138,7 +1091,7 @@
       "id": "void",
       "name": "Void",
       "icon": "circle.fill",
-      "blurb": "No sun ever rose here.",
+      "blurb": "No sun ever rose here, and none will.",
       "contributions": [
         {
           "target": "illumination",

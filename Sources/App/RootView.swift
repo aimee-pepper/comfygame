@@ -29,7 +29,7 @@ struct RootView: View {
         case .writingDesk: WritingDeskView()
         case .storehouse: StorehouseView()
         case .workshop: WorkshopView()
-        case .party: PartyView()
+        case .party: PartyRosterView()
         case .essenceSpring: EssenceSpringView()
         case .constellation: ConstellationView()
         case .library: LibraryView()

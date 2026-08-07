@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER \u2014 Claude-invented stopgaps for v0 feel, not balance; the whole vocabulary is being replaced by pressure sigils. THREE RULES WORTH KEEPING THROUGH THAT REWRITE: (1) 'stabilityDelta' is in the SAME UNITS as the Stability headline and simply adds to it \u2014 a book starts at 100 and a symbol reading '+12' moves it by exactly 12. (2) Stability tracks DEVIATION FROM WHAT A WORLD WOULD NATURALLY HAVE: asking for less than the baseline CALMS a world (Sparse Ore is +10), asking for the baseline costs nothing (Ore is 0), asking for more is the greed that destabilises (Rich Ore is \u221245). This is the Mystcraft greed model from research-pass-3, and it means the bounty slot is a real choice rather than a tax. (3) EVERY symbol trades on SEVERAL axes, never one: Dim Sky buys stability with sight and with things that hunt in the dark; Plains is stability-neutral but lets you see further. A stable world is not an empty one. 'expandsTo' spells the symbol out in the pressure model's atomic vocabulary \u2014 the rune spec calls these compounds (\u00a79). PLACEHOLDER component choices.",
+  "_note": "PLACEHOLDER — Claude-invented stopgaps for v0 feel, not balance; the whole vocabulary is being replaced by pressure sigils. THREE RULES WORTH KEEPING THROUGH THAT REWRITE: (1) 'stabilityDelta' is in the SAME UNITS as the Stability headline and simply adds to it — a book starts at 100 and a symbol reading '+12' moves it by exactly 12. (2) Stability tracks DEVIATION FROM WHAT A WORLD WOULD NATURALLY HAVE: asking for less than the baseline CALMS a world (Sparse Ore is +10), asking for the baseline costs nothing (Ore is 0), asking for more is the greed that destabilises (Rich Ore is −45). This is the Mystcraft greed model from research-pass-3, and it means the bounty slot is a real choice rather than a tax. (3) EVERY symbol trades on SEVERAL axes, never one: Dim Sky buys stability with sight and with things that hunt in the dark; Plains is stability-neutral but lets you see further. A stable world is not an empty one. 'expandsTo' spells the symbol out in the pressure model's atomic vocabulary — the rune spec calls these compounds (§9). PLACEHOLDER component choices.",
   "symbols": [
     {
       "id": "plains",
@@ -186,7 +186,7 @@
       "id": "sparse_ore",
       "name": "Sparse Ore",
       "slot": "bounty",
-      "blurb": "A thin seam \u2014 less than a world would ordinarily carry. It rests easier for it.",
+      "blurb": "A thin seam — less than a world would ordinarily carry. It rests easier for it.",
       "icon": "circle.grid.2x1",
       "acquisition": "starter",
       "essenceCost": 2,
@@ -405,7 +405,7 @@
       "stabilityDelta": -70,
       "expandsTo": [
         {
-          "source": "rift",
+          "source": "crystal",
           "target": "illumination",
           "intensity": "moderate"
         },

@@ -444,7 +444,10 @@ final class LifeTests: XCTestCase {
 
     /// A world built from sigils, then overridden on the axes a test wants to isolate — so a claim
     /// about temperature is tested against worlds that differ *only* in temperature.
+    /// - Parameter rollingTheRest: see `TerrainTests` — off by default, so a test about what was
+    ///   written isn't also a test of what rolled.
     private func world(_ pairs: [String: String],
+                       rollingTheRest: Bool = false,
                        seed: UInt64 = 20_260_805,
                        vitality: Double? = nil,
                        thermal: (floor: Double, peak: Double)? = nil,
@@ -452,12 +455,15 @@ final class LifeTests: XCTestCase {
                        illumination: Double? = nil,
                        openness: Double? = nil,
                        substrate: [String: Double]? = nil) -> PressureReadings {
-        var readings = PressureRules.resolve(pairs.sorted { $0.key < $1.key }.enumerated().map { index, pair in
+        let sigils = pairs.sorted { $0.key < $1.key }.enumerated().map { index, pair in
             Sigil(id: InstanceID(rawValue: UInt64(index + 1)),
                   source: PressureSourceID(rawValue: pair.key),
                   target: PressureTargetID(rawValue: pair.value),
                   intensity: .great)
-        }, fillingUnwrittenWith: seed)
+        }
+        var readings = rollingTheRest
+            ? PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+            : PressureRules.resolve(sigils)
 
         if let vitality {
             readings.readings["vitality"]?.peak = vitality

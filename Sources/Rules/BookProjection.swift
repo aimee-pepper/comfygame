@@ -74,6 +74,16 @@ struct BookProjection {
     var marksSpeaking: Int = 0
     /// **The chains you placed**, so the world panel can show cause beside effect (Aimee, 6 Aug).
     var chains: [WrittenChain] = []
+    /// **Which subjects you actually wrote about.**
+    ///
+    /// The panel may only describe what you asked for. Aimee, 6 Aug: *"under life and expected
+    /// harvest it shouldn't offer info on what's there if it hasn't been selected by the player and
+    /// is left up to chance."* Quite right — a confident sentence about the animals of a world whose
+    /// vitality you never touched is the panel inventing a world and reading it back to you.
+    var writtenSubjects: Set<PressureTargetID> = []
+
+    /// Whether the panel can say anything about what lives here.
+    var canDescribeLife: Bool { writtenSubjects.contains("vitality") }
 
     /// Whether the page, as it stands, contributes nothing at all to the world.
     var saysNothing: Bool { marksSpeaking == 0 }
@@ -126,7 +136,27 @@ struct BookProjection {
                 + book.scale.stabilityDelta
                 + BookRules.greedDelta(for: PageRules.clusterSigils(of: page))
                 - ContradictionRules.totalPenalty(for: contradictions))
-        let turns = BookRules.turnsAvailable(stabilityScore: score)
+        // **Stability is a range, because the world is** (Aimee, 6 Aug: *"why is the world page
+        // showing a concrete value for stability rather than the possible range that can occur with
+        // roll changes for the undefined values?"*).
+        //
+        // The score above counts only what you wrote — correctly, since the panel must not reveal
+        // rolled content. But **every unwritten subject is rolled at bind**, and a rolled focus can
+        // carry its own stability delta, add greed if something valuable lands, or fire a
+        // contradiction against what you wrote. Six of eight subjects unwritten is normal, and the
+        // number shown could be off by a lot.
+        //
+        // The design has been careful about this everywhere else: **the price is certain, the world
+        // is not.** Cost is a point because page space is physical and known. Stability isn't, and
+        // showing it as one was a lie of precision.
+        //
+        // It also makes a real decision legible for the first time: **writing more subjects narrows
+        // the band.** That's the value of specificity, as a number.
+        let rolled = rolledStabilitySpread(sigils: sigils, page: page, book: book, seed: seed)
+        let worst = min(score, rolled.lowerBound)
+        let best = max(score, rolled.upperBound)
+        let turnsWorst = BookRules.turnsAvailable(stabilityScore: worst)
+        let turnsBest = BookRules.turnsAvailable(stabilityScore: best)
         let tier = BookRules.enemyTier(symbolIDs: written)
         let sight = WorldRules.visionRadius(for: book)
         let cost = book.essencePaid
@@ -139,8 +169,8 @@ struct BookProjection {
         return BookProjection(
             slotPlans: plans,
             essenceCost: cost...cost,
-            stabilityScore: score...score,
-            turnsUntilCollapse: turns...turns,
+            stabilityScore: worst...best,
+            turnsUntilCollapse: turnsWorst...turnsBest,
             enemyTier: tier...tier,
             visionRadius: sight...sight,
             mapWidth: book.scale.gridSide,
@@ -156,7 +186,8 @@ struct BookProjection {
             life: LifeRules.projection(for: readings),
             marksWritten: page.runes.count,
             marksSpeaking: PageRules.sigils(of: page).count,
-            chains: PageRules.chains(on: page)
+            chains: PageRules.chains(on: page),
+            writtenSubjects: Set(sigils.map(\.target))
         )
     }
 
@@ -235,6 +266,32 @@ struct BookProjection {
             resourceMix: expectedResourceMix(in: readings),
             life: LifeRules.projection(for: readings)
         )
+    }
+
+    /// **How far a roll could move the headline**, sampled across seeds.
+    ///
+    /// Sampled rather than derived: what an unwritten subject rolls is a whole sigil with its own
+    /// deltas and its own capacity to contradict what you wrote, and there's no closed form for
+    /// that. Twenty seeds is enough to find the shape of the band without being expensive — this
+    /// runs on every keystroke at the Writing Desk.
+    private static func rolledStabilitySpread(sigils: [Sigil], page: Page, book: BoundBook,
+                                              seed: UInt64) -> ClosedRange<Int> {
+        var lowest = Int.max, highest = Int.min
+        for sample in 0..<Tuning.Book.stabilitySamples {
+            let seeded = seed &+ UInt64(sample) &* 0x9E3779B97F4A7C15
+            let filled = sigils + PressureRules.rollUnwritten(after: sigils, seed: seeded)
+            let readings = PressureRules.resolve(filled)
+            let fired = ContradictionRules.fired(in: filled, readings: readings)
+            let score = BookRules.stabilityScore(
+                delta: BookRules.stabilityDelta(symbolIDs: book.allSymbolIDs)
+                    + book.scale.stabilityDelta
+                    + BookRules.greedDelta(for: filled)
+                    - ContradictionRules.totalPenalty(for: fired))
+            lowest = min(lowest, score)
+            highest = max(highest, score)
+        }
+        guard lowest <= highest else { return 0...0 }
+        return lowest...highest
     }
 
     /// **What this world will actually pay**, off the same readings the bind will use.

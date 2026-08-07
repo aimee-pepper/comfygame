@@ -63,8 +63,14 @@ struct LibraryView: View {
             ForEach(Array(hint.passages.enumerated()), id: \.offset) { _, passage in
                 if let passage {
                     // Their own words, verbatim. This is what gets matched against a world.
+                    //
+                    // **Dimmed once you've found them**, even where the diary is unfinished
+                    // (Aimee, 6 Aug). The clues are directions to somebody; once they're at your
+                    // fire the directions are a keepsake, and reading as live instructions makes a
+                    // finished search look unfinished.
                     Text("“\(passage)”")
                         .font(.callout.italic())
+                        .foregroundStyle(hint.isFound ? .tertiary : .primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
