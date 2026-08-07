@@ -193,6 +193,19 @@
       one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## Recruiting delivers somebody (Aimee, 6 Aug 2026)
+- [x] **A roster, not one hardcoded companion slot.** Recruiting used to be two writes to the
+      Library — she was kept, in Reality, but there was nothing to show for it
+- [x] **The Firepit**, present from the start and built by nobody — the one exception to
+      found-then-built, because you need somewhere to put the first person
+- [x] Room for five; you choose who comes with you; ranks are set at the fire, never mid-fight
+- [x] **The party is restored on coming home**, reading the Fortitude they've earned. One place,
+      so staged recovery or a healer is a change there rather than a hunt
+- [x] **Consumables usable out in the world**, costing a turn — you could only heal by starting
+      another fight
+- [ ] **All five fight together** — the combat generalisation, and the next piece
+- [ ] The Tavernkeeper, and the firepit upgrading into a tavern
+
 ## The writing desk says what you meant (Aimee, 6 Aug 2026)
 - [x] **A vast sun is a brighter sun.** Scale spreads a subject with an extent of its own and
       brightens one without — nothing generic is inert now

@@ -640,6 +640,13 @@ enum Tuning {
         static let essenceSpringPerReturn: [Int] = [3, 7] // PLACEHOLDER — index = tier - 1
     }
 
+    // MARK: - The party
+
+    enum Party {
+        /// **Up to five** (Aimee, 6 Aug). Quill is one of them, so four can be found.
+        static let maximumSize: Int = 5 // PLACEHOLDER
+    }
+
     // MARK: - Characters
 
     /// Stats, levels, and what the world levels to (`decisions-session-17.md` §1–3).

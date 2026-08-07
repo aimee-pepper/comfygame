@@ -307,6 +307,27 @@ extension GameStore {
         }
     }
 
+    // MARK: - The party
+
+    /// Who comes with you. **[PLACEHOLDER]** — five fight together eventually (Aimee, 6 Aug); for
+    /// now one does, and this is the choice of which.
+    func setActiveCompanion(_ index: Int) {
+        guard state.base.roster.indices.contains(index) else { return }
+        mutate("take \(state.base.roster[index].name)", flush: true) { $0.base.activeCompanion = index }
+    }
+
+    /// Front or back, set at the fire and never mid-fight — the same rule gambits follow.
+    func setRank(_ rank: Rank, forMemberAt index: Int) {
+        guard state.base.roster.indices.contains(index), activeEncounter == nil else { return }
+        mutate("rank", flush: true) { $0.base.roster[index].character.rank = rank }
+    }
+
+    /// Where the Binder stands.
+    func setBinderRank(_ rank: Rank) {
+        guard activeEncounter == nil else { return }
+        mutate("rank", flush: true) { $0.base.binderCharacter.rank = rank }
+    }
+
     // MARK: - Building sites
 
     /// **Buildings you could raise, because you've met the person who'd run them** (Aimee, 6 Aug).

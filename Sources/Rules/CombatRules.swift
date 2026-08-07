@@ -418,6 +418,23 @@ enum CombatRules {
         skill(for: actor) != nil && skillCooldown(for: actor, in: encounter) == 0
     }
 
+    /// **What somebody can take**, which is Fortitude on top of the base (session 17 §1).
+    ///
+    /// **This is also where the party is put right.** A run begins at these values and health is
+    /// run-scoped, so coming home restores everybody — the run is the unit of risk and the base is
+    /// where things are mended (Aimee, 6 Aug). Deliberately one place: staged recovery, a healer to
+    /// pay, or resting at the tavern are all a change here rather than a hunt.
+    static func maximumHealth(of actor: Combatant, in state: GameState) -> Int {
+        switch actor {
+        case .binder:
+            CharacterRules.maximumHealth(state.base.binderCharacter, base: Tuning.Encounter.binderMaxHP)
+        case .companion:
+            CharacterRules.maximumHealth(state.base.companion.character, base: state.base.companion.maxHP)
+        case .foe:
+            0
+        }
+    }
+
     static func health(of actor: Combatant, in run: WorldRun) -> (current: Int, max: Int) {
         switch actor {
         case .binder: (run.binderHP, Tuning.Encounter.binderMaxHP)

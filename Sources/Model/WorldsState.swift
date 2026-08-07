@@ -138,6 +138,8 @@ struct WorldRun: Codable, Equatable, Sendable {
     init(runIndex: Int, book: BoundBook, mapSeed: UInt64, rng: SeededRNG, map: WorldMap,
          playerPosition: GridPoint, enemies: [WorldEnemy] = [], sites: [PlacedSite] = [],
          travellersHere: [TravellerID] = [], cast: [Species] = [],
+         binderHP: Int = Tuning.Encounter.binderMaxHP,
+         companionHP: Int = Tuning.Encounter.companionMaxHP,
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)) {
         self.runIndex = runIndex
         self.book = book
@@ -149,6 +151,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.sites = sites
         self.travellersHere = travellersHere
         self.cast = cast
+        self.binderHP = binderHP
+        self.companionHP = companionHP
         self.satchelItems = satchelItems
     }
 

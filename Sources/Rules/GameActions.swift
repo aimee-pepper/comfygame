@@ -255,6 +255,11 @@ extension GameStore {
                 // The species this world settled on, kept with the run so the same animals are
                 // still here after a force-quit — and so anchoring one keeps them forever.
                 cast: world.cast,
+                // **Everybody comes home mended.** Health is run-scoped, so opening a run at full
+                // is what "the party heals on returning home" means (Aimee, 6 Aug) — and it reads
+                // the Fortitude they've earned rather than a constant.
+                binderHP: CombatRules.maximumHealth(of: .binder, in: state),
+                companionHP: CombatRules.maximumHealth(of: .companion, in: state),
                 // The satchel is its own, smaller capacity — separate from home storage, and
                 // separately upgradeable (decisions-log session 2).
                 satchelItems: Inventory(slots: state.base.satchelCapacity)

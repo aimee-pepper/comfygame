@@ -76,6 +76,23 @@ extension GameStore {
         finishTurn(events)
     }
 
+    /// What's in the satchel that could be used right now, out in the world.
+    var carriedConsumables: [ItemStack] {
+        (activeRun?.satchelItems.stacks ?? []).filter {
+            $0.identified && ContentCatalog.shared.item($0.catalogID)?.kind == .consumable
+        }
+    }
+
+    /// Use something out here. Costs a turn, like everything else the world charges for.
+    func useItemInWorld(_ stack: ItemStack, on member: PartyMember) {
+        guard activeRun?.activeEncounter == nil else { return }
+        var events: [WorldRules.Event] = []
+        mutate("use \(stack.catalogID.rawValue)", flush: true) { state in
+            events = WorldRules.useItem(stack.id, on: member, in: &state)
+        }
+        finishTurn(events)
+    }
+
     /// **Whoever you're standing on**, so the world screen can open the scene.
     var travellerHere: TravellerDef? {
         guard let run = activeRun, case .traveller(let id) = run.map[run.playerPosition].content

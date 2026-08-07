@@ -561,4 +561,74 @@ final class LibraryTests: XCTestCase {
                          floorLows[target.id] ?? 0, floorHighs[target.id] ?? 0))
         }
     }
+
+    // MARK: Recruiting has to deliver somebody
+
+    /// **The payoff of the whole search loop.**
+    ///
+    /// Recruiting used to be two writes to the Library and nothing else — no roster, no gear, no
+    /// presence. Aimee found somebody, lost a run, and had *"no idea what happened to her"*
+    /// (6 Aug). She was never lost: `foundTravellers` lives in Reality and nothing takes it. There
+    /// was simply nothing to show for it, which feels identical to losing her.
+    func testRecruitingPutsThemInYourParty() throws {
+        let store = GameStore(io: .temporary(name: "join-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 5000 }
+        XCTAssertEqual(store.state.base.roster.count, 1, "somebody is at the fire before you found them")
+
+        for _ in 0..<40 {
+            store.bindAndDepart()
+            guard let run = store.state.worlds.activeRun,
+                  let id = run.travellersHere.first,
+                  let point = run.map.allPoints.first(where: { run.map[$0].content == .traveller(id) })
+            else {
+                store.mutate("test: next") { $0.worlds.activeRun = nil }
+                continue
+            }
+            store.mutate("test: walk over") { $0.worlds.activeRun?.playerPosition = point }
+            store.recruit(id)
+
+            let joined = try XCTUnwrap(store.state.base.roster.first { $0.traveller == id },
+                                       "recruited somebody and they didn't join the party")
+            XCTAssertEqual(joined.name, ContentCatalog.shared.traveller(id)?.name)
+            XCTAssertFalse(joined.calling.isEmpty, "they joined without being anybody in particular")
+            XCTAssertFalse(joined.gambits.isEmpty, "they joined with no idea what to do in a fight")
+
+            // And you can send them out instead of Quill.
+            let index = try XCTUnwrap(store.state.base.roster.firstIndex { $0.traveller == id })
+            store.setActiveCompanion(index)
+            XCTAssertEqual(store.state.base.companion.traveller, id)
+            return
+        }
+        XCTFail("no world in forty held anybody")
+    }
+
+    /// A collapse can't take them. They're in the Base layer, and the Library entry is in Reality.
+    func testAPersonSurvivesACollapse() throws {
+        let store = GameStore(io: .temporary(name: "survive-\(UUID().uuidString)"))
+        store.mutate("test: somebody is with you") { state in
+            var joined = CompanionState()
+            joined.name = "Halloway"
+            joined.traveller = "halloway"
+            state.base.roster.append(joined)
+            state.reality.library.foundTravellers.insert("halloway")
+        }
+        store.setSymbol("plains", in: "terrain")
+        store.mutate("test: fund") { $0.base.essence = 500 }
+        store.bindAndDepart()
+        store.endRunWithPartialHaul(reason: "test: the floor took you")
+
+        XCTAssertTrue(store.state.base.roster.contains { $0.traveller == "halloway" },
+                      "a collapse took somebody out of the party")
+    }
+
+    /// Room for five, and no more (Aimee, 6 Aug).
+    func testThePartyHoldsFive() {
+        let store = GameStore(io: .temporary(name: "five-\(UUID().uuidString)"))
+        store.mutate("test: fill it") { state in
+            while state.base.roster.count < Tuning.Party.maximumSize {
+                state.base.roster.append(CompanionState())
+            }
+        }
+        XCTAssertFalse(store.state.base.canRecruit, "the party is full and still taking people")
+    }
 }

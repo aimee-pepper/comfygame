@@ -24,6 +24,7 @@
 		1BDE5DBB7E79B5D05413B0FE /* pressure_sources.json in Resources */ = {isa = PBXBuildFile; fileRef = A29A4F3CFC9073B8F80064F4 /* pressure_sources.json */; };
 		202BE6BB0588B2D4A952B195 /* DescriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F66F95CC3FEA4D5E13AE410 /* DescriptionModels.swift */; };
 		2133F8A2A985268991F782B5 /* TravellerMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D08A668BC1215643DD63B178 /* TravellerMeetingView.swift */; };
+		216755285A99AB45B7D20AC8 /* FirepitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6F843AB65D2D26E6F5A56 /* FirepitView.swift */; };
 		2228B642DF268D4AC3E4428C /* EncounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE933E91275B1FF990B69BAA /* EncounterView.swift */; };
 		2591F7421F2C4F2789790209 /* RuneGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E466EEC3518F71FDD38EE9 /* RuneGlyph.swift */; };
 		25C21801E523BEA88A932F39 /* CreatureIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41571D49472E12EE120FF5A8 /* CreatureIdentity.swift */; };
@@ -271,6 +272,7 @@
 		E14C42A31CF4E0C858F212BF /* MaterialTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialTests.swift; sourceTree = "<group>"; };
 		E19DC1448710810CD318671E /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		E1BB569F0B672F268545701C /* SiteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteTests.swift; sourceTree = "<group>"; };
+		E5F6F843AB65D2D26E6F5A56 /* FirepitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirepitView.swift; sourceTree = "<group>"; };
 		E615DD7D8BEAA7A4E5EB939E /* ResourceSpreadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceSpreadTests.swift; sourceTree = "<group>"; };
 		EFEB95F304073E45D3BB22FB /* QualifierModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualifierModels.swift; sourceTree = "<group>"; };
 		F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryRules.swift; sourceTree = "<group>"; };
@@ -358,6 +360,7 @@
 				346EEEC616B8EBFE291C4A79 /* BaseView.swift */,
 				B9CABEB714204FCBDE32F8E4 /* BlacksmithView.swift */,
 				BE933E91275B1FF990B69BAA /* EncounterView.swift */,
+				E5F6F843AB65D2D26E6F5A56 /* FirepitView.swift */,
 				1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */,
 				F1B71324BA8EC6B7B6732500 /* GearView.swift */,
 				2CBCB8652F20B361959F9B5C /* LibraryView.swift */,
@@ -676,6 +679,7 @@
 				CD009883298233F654EE899C /* Discovery.swift in Sources */,
 				D9F83617E1060D93E281682F /* EconomyRules.swift in Sources */,
 				2228B642DF268D4AC3E4428C /* EncounterView.swift in Sources */,
+				216755285A99AB45B7D20AC8 /* FirepitView.swift in Sources */,
 				35A27AF646DD34DD1F8A9585 /* Gambit.swift in Sources */,
 				2C0118338DCCD9231D0DE4D0 /* GambitEditorView.swift in Sources */,
 				E0B21F8C88F40A6B7F9E8212 /* GambitEngine.swift in Sources */,

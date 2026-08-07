@@ -50,8 +50,30 @@ struct BaseState: Codable, Equatable, Sendable {
     /// The finest hand available. Marks are written in it by default.
     var bestHand: Hand { ownedHands.max() ?? .crude }
 
-    /// The companion's gambit list. Edited on the Party screen, out of combat only.
-    var companion: CompanionState = CompanionState()
+    /// **Everybody who has come home with you.**
+    ///
+    /// Recruiting used to write a name into the Library and do nothing else — no roster, no gear,
+    /// no presence. Aimee found somebody, lost a run, and had *"no idea what happened to her"*
+    /// (6 Aug). She was kept, in Reality, where nothing can take her; there was simply nothing to
+    /// show for it, which is indistinguishable from losing her.
+    ///
+    /// Quill is index 0 and always there. Everyone else arrives by being talked into it.
+    var roster: [CompanionState] = [CompanionState()]
+
+    /// Which of them is standing beside you. **[PLACEHOLDER]** — a party of five fights together
+    /// (Aimee, 6 Aug) and that's the next piece; today one of them comes along.
+    var activeCompanion: Int = 0
+
+    /// Who's fighting beside you, as one value. Kept as a property so the hundred places that read
+    /// `base.companion` don't all have to learn about the roster at once.
+    var companion: CompanionState {
+        get { roster.indices.contains(activeCompanion) ? roster[activeCompanion] : CompanionState() }
+        set {
+            if roster.isEmpty { roster = [newValue] }
+            else if roster.indices.contains(activeCompanion) { roster[activeCompanion] = newValue }
+            else { roster[0] = newValue }
+        }
+    }
 
     /// **What the Binder is wearing** (Aimee, 5 Aug).
     ///
@@ -123,6 +145,9 @@ struct BaseState: Codable, Equatable, Sendable {
         Tuning.Economy.startingSatchelSlots + satchelTier * Tuning.Economy.satchelSlotsPerTier
     }
 
+    /// Whether there's room for another person. **Up to five** (Aimee, 6 Aug).
+    var canRecruit: Bool { roster.count < Tuning.Party.maximumSize }
+
     /// Somebody's character sheet. **Both of them have one** (session 17 §1).
     func character(_ member: PartyMember) -> CharacterState {
         switch member {
@@ -170,6 +195,40 @@ struct BaseState: Codable, Equatable, Sendable {
 
     init() {}
 
+    /// Explicit because `companion` is no longer stored — it's a window onto the roster — and the
+    /// decoder still has to be able to read it out of a save written before the roster existed.
+    private enum CodingKeys: String, CodingKey {
+        case essence, resources, inventory, spillover, ownedSymbols, ownedGambitComponents
+        case completedResearch, stations, bookDraft, page, ownedHands, hasChainingUnlock
+        case roster, activeCompanion, binderEquipped, hasAutomateSelfUnlock, satchelTier
+        case purchasedGambitSlots, binderGambits, binderCharacter
+        case companion
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(essence, forKey: .essence)
+        try c.encode(resources, forKey: .resources)
+        try c.encode(inventory, forKey: .inventory)
+        try c.encode(spillover, forKey: .spillover)
+        try c.encode(ownedSymbols, forKey: .ownedSymbols)
+        try c.encode(ownedGambitComponents, forKey: .ownedGambitComponents)
+        try c.encode(completedResearch, forKey: .completedResearch)
+        try c.encode(stations, forKey: .stations)
+        try c.encode(bookDraft, forKey: .bookDraft)
+        try c.encode(page, forKey: .page)
+        try c.encode(ownedHands, forKey: .ownedHands)
+        try c.encode(hasChainingUnlock, forKey: .hasChainingUnlock)
+        try c.encode(roster, forKey: .roster)
+        try c.encode(activeCompanion, forKey: .activeCompanion)
+        try c.encode(binderEquipped, forKey: .binderEquipped)
+        try c.encode(hasAutomateSelfUnlock, forKey: .hasAutomateSelfUnlock)
+        try c.encode(satchelTier, forKey: .satchelTier)
+        try c.encode(purchasedGambitSlots, forKey: .purchasedGambitSlots)
+        try c.encode(binderGambits, forKey: .binderGambits)
+        try c.encode(binderCharacter, forKey: .binderCharacter)
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         essence = try container.decodeIfPresent(Int.self, forKey: .essence) ?? Tuning.Economy.startingEssence
@@ -186,7 +245,12 @@ struct BaseState: Codable, Equatable, Sendable {
         page = try container.decodeIfPresent(Page.self, forKey: .page) ?? Page()
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
         hasChainingUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) ?? false
-        companion = try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()
+        // A save written before the roster existed holds exactly one companion; she becomes the
+        // roster, and keeps everything she had.
+        roster = try container.decodeIfPresent([CompanionState].self, forKey: .roster)
+            ?? [try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()]
+        if roster.isEmpty { roster = [CompanionState()] }
+        activeCompanion = try container.decodeIfPresent(Int.self, forKey: .activeCompanion) ?? 0
         binderEquipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .binderEquipped) ?? [:]
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0
@@ -218,6 +282,7 @@ enum Stations {
     static let library: StationID = "library"
     static let blacksmith: StationID = "blacksmith"
     static let scriptorium: StationID = "scriptorium"
+    static let firepit: StationID = "firepit"
 }
 
 struct StationState: Codable, Equatable, Sendable {
@@ -268,6 +333,11 @@ enum PartyMember: String, CaseIterable, Identifiable, Sendable {
 /// element without reshaping the save.
 struct CompanionState: Codable, Equatable, Sendable {
     var name: String = "Quill" // PLACEHOLDER name
+    /// Who they were out in the worlds. Nil for Quill, who was always here.
+    var traveller: TravellerID?
+    /// What they were before the sundering, in their own words — *a smith*, *a surveyor*.
+    var calling: String = ""
+    var icon: String = "person.fill"
     /// Only the *maximum* lives here. Current HP is run-scoped (`WorldRun.companionHP`) because
     /// the brief says HP persists during a run and returning home fully heals — so a base-side
     /// current-HP field would be a second source of truth that is always full.
@@ -293,6 +363,9 @@ struct CompanionState: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? "Quill"
+        traveller = try container.decodeIfPresent(TravellerID.self, forKey: .traveller)
+        calling = try container.decodeIfPresent(String.self, forKey: .calling) ?? ""
+        icon = try container.decodeIfPresent(String.self, forKey: .icon) ?? "person.fill"
         maxHP = try container.decodeIfPresent(Int.self, forKey: .maxHP) ?? Tuning.Encounter.companionMaxHP
         gambits = (try? container.decodeIfPresent([GambitRule].self, forKey: .gambits)) ?? GambitStarter.rules
         equipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .equipped) ?? [:]

@@ -22,6 +22,8 @@ enum WorldRules {
         case foundTraveller(TravellerID)
         /// You've walked up to somebody. The scene, not the recruitment.
         case metTraveller(TravellerID)
+        /// Something used out in the world rather than mid-fight.
+        case usedItem(String, on: PartyMember)
         case searchedSite(SiteID, turnsRemaining: Int)
         case siteOpened(SiteID)
         case learnedSymbol(SymbolID)
@@ -251,7 +253,54 @@ enum WorldRules {
         state.reality.library.foundTravellers.insert(id)
         state.reality.library.knownTravellers.insert(id)
         awardDiscovery(.traveller, in: &state)
+
+        // **And she joins you.** This used to be the whole of recruitment: two writes to the
+        // Library and nothing else. No roster, no gear, no presence — so Aimee recruited somebody,
+        // lost a run, and had "no idea what happened to her". She was never lost; there was simply
+        // nothing to show for it, which feels identical.
+        if let person = ContentCatalog.shared.traveller(id), state.base.canRecruit,
+           !state.base.roster.contains(where: { $0.traveller == id }) {
+            var joined = CompanionState()
+            joined.name = person.name
+            joined.traveller = id
+            joined.calling = person.calling
+            joined.icon = person.icon
+            joined.gambits = GambitStarter.rules
+            state.base.roster.append(joined)
+        }
         return [.foundTraveller(id)]
+    }
+
+    /// **Using something out in the world, not only mid-fight.**
+    ///
+    /// Consumables could only be used inside an encounter, so a player who finished a fight hurt
+    /// walked the rest of the world hurt, and the only way to use a salve was to start another
+    /// fight (Aimee, 6 Aug: *"no way to access items outside of combat either so I can't heal
+    /// then"*).
+    ///
+    /// **It costs a turn** — the currency the world is already charging. That keeps healing from
+    /// being free and makes patching yourself up mid-collapse a real decision.
+    static func useItem(_ stackID: InstanceID, on member: PartyMember, in state: inout GameState) -> [Event] {
+        guard var run = state.worlds.activeRun, run.activeEncounter == nil,
+              let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID }),
+              let item = ContentCatalog.shared.item(run.satchelItems.stacks[index].catalogID),
+              item.kind == .consumable
+        else { return [.blocked("Nothing to use.")] }
+
+        let healed = Tuning.Encounter.consumableHealAmount
+        switch member {
+        case .binder:
+            run.binderHP = min(CombatRules.maximumHealth(of: .binder, in: state), run.binderHP + healed)
+        case .companion:
+            run.companionHP = min(CombatRules.maximumHealth(of: .companion, in: state), run.companionHP + healed)
+        }
+        _ = run.satchelItems.stacks[index].removing(1)
+        if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
+
+        state.worlds.activeRun = run
+        var events: [Event] = [.usedItem(item.name, on: member)]
+        events.append(contentsOf: advanceTurn(in: &state))
+        return events
     }
 
     /// Harvests the node under the player. One pull per turn.

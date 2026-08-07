@@ -1,5 +1,5 @@
 {
-  "_note": "The Base screen renders THIS LIST, not hardcoded buttons — v1+ adds tannery, apothecary, tavern and they should be a JSON edit plus a route. 'route' must match a case of AppRoute. TIER SEMANTICS: tier counts UPGRADES PURCHASED, so tier 0 = built and un-upgraded. Essence Spring 0 = the built-in trickle, 1 = the purchasable upgrade. A station with 'builtBy' is NOT bought — you find that person out in a world (their signature is in travellers.json), talk them into coming home, and THEN raise the building for 'buildCost'. BUILD COST LADDER (Aimee, 6 Aug): the more advanced the trade, the more it takes. Early ~30 essence + ~18 raw (the Blacksmith, deliberately reachable on an early haul); middling ~80 + ~60 and wants an uncommon resource; late ~200 + ~150 and wants something you can only get out of a world too greedy to be stable. A late building should be several hauls of setup, not one. All PLACEHOLDER.",
+  "_note": "The Base screen renders THIS LIST, not hardcoded buttons — v1+ adds tannery, apothecary, tavern and they should be a JSON edit plus a route. 'route' must match a case of AppRoute. TIER SEMANTICS: tier counts UPGRADES PURCHASED, so tier 0 = built and un-upgraded. Essence Spring 0 = the built-in trickle, 1 = the purchasable upgrade. A station with 'builtBy' is NOT bought — you find that person out in a world (their signature is in travellers.json), talk them into coming home, and THEN raise the building for 'buildCost'. BUILD COST LADDER (Aimee, 6 Aug): the more advanced the trade, the more it takes. Early ~30 essence + ~18 raw (the Blacksmith, deliberately reachable on an early haul); middling ~80 + ~60 and wants an uncommon resource; late ~200 + ~150 and wants something you can only get out of a world too greedy to be stable. A late building should be several hauls of setup, not one. All PLACEHOLDER. THE FIREPIT IS THE ONE EXCEPTION to found-then-built (Aimee, 6 Aug): you need somewhere to put the first person before anyone can build anything, so it is present from the start and built by nobody. It upgrades into the Tavern once the Tavernkeeper is found — the firepit holds your people, the tavern brings you other people's.",
   "stations": [
     {
       "id": "writing_desk",
@@ -117,6 +117,17 @@
         }
       },
       "buildBlurb": "Isolde needs a room with good light and a table that doesn't rock. She is very specific about the table."
+    },
+    {
+      "id": "firepit",
+      "name": "The Firepit",
+      "icon": "flame.fill",
+      "blurb": "Somewhere for the people you bring home.",
+      "sortOrder": 4,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "firepit"
     }
   ]
 }

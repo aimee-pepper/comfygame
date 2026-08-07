@@ -8,6 +8,8 @@ import SwiftUI
 /// zone, which the brief offers for exactly this reason. Every button is ≥44pt.
 struct WorldView: View {
     @EnvironmentObject private var store: GameStore
+    /// Open when you're rummaging for something to use. Out here, not only mid-fight.
+    @State private var isUsingItem = false
 
     private var run: WorldRun? { store.state.worlds.activeRun }
 
@@ -37,6 +39,9 @@ struct WorldView: View {
         // standing there, and they are still waiting (pillar 2).
         .sheet(item: Binding(get: { store.travellerHere }, set: { _ in })) { traveller in
             TravellerMeetingView(traveller: traveller).environmentObject(store)
+        }
+        .sheet(isPresented: $isUsingItem) {
+            UseItemSheet().environmentObject(store)
         }
     }
 
@@ -99,6 +104,8 @@ struct WorldView: View {
         case .foundTraveller(let id):
             ContentCatalog.shared.traveller(id).map { "\($0.name) is coming with you." }
                 ?? "They're coming with you."
+        case .usedItem(let what, let member):
+            "\(what). \(member == .binder ? "You feel" : "They feel") better."
         case .metTraveller(let id):
             ContentCatalog.shared.traveller(id).map { "\($0.name), \($0.calling). \($0.blurb)" }
                 ?? "Someone is here."
@@ -139,6 +146,7 @@ struct WorldView: View {
         case .pickedUp, .harvested, .foundPortal, .pickedUpItem, .searchedSite, .siteOpened: .primary
         case .foundSite, .learnedSymbol, .gainedEssence: .primary
         case .readPage, .foundTraveller, .metTraveller: .primary
+        case .usedItem: .green
         case .nightfall, .daybreak: .secondary
         case .cacheOpened: .purple
         case .satchelFull: .orange
@@ -181,6 +189,17 @@ struct WorldView: View {
                 .frame(maxWidth: .infinity)
             }
 
+            if !store.carriedConsumables.isEmpty {
+                Button { isUsingItem = true } label: {
+                    Label("\(store.carriedConsumables.count)", systemImage: "cross.vial")
+                        .labelStyle(.titleAndIcon)
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.green)
+                .fixedSize()
+            }
             Text("turn \(run.turnsTaken)").foregroundStyle(.secondary).fixedSize()
         }
         .font(.footnote.monospacedDigit())
@@ -564,4 +583,50 @@ private struct ActionButton: View {
 
 #Preview {
     WorldView().environmentObject(GameStore(io: .temporary(name: "preview-world")))
+}
+
+
+/// Using something out in the world. **A turn is the price** — the currency the world already
+/// charges, which keeps healing from being free and makes patching up mid-collapse a decision.
+private struct UseItemSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(store.carriedConsumables) { stack in
+                    Section {
+                        ForEach(PartyMember.allCases) { member in
+                            Button {
+                                store.useItemInWorld(stack, on: member)
+                                dismiss()
+                            } label: {
+                                LabeledRow(icon: "heart.fill",
+                                           label: member == .binder ? "You" : store.state.base.companion.name,
+                                           value: health(of: member))
+                                .frame(minHeight: 44)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    } header: {
+                        Text("\(stack.displayName)\(stack.count > 1 ? " ×\(stack.count)" : "")")
+                    }
+                }
+            }
+            .navigationTitle("Use something")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Back") { dismiss() } }
+            }
+        }
+        .presentationDetents([.medium])
+    }
+
+    private func health(of member: PartyMember) -> String {
+        guard let run = store.state.worlds.activeRun else { return "" }
+        let hp = CombatRules.health(of: member.combatant, in: run)
+        return "\(hp.current) / \(hp.max)"
+    }
 }
