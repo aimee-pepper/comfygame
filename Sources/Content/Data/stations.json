@@ -97,6 +97,26 @@
         }
       },
       "buildBlurb": "Halloway will raise a forge here, if you can find the stone and the iron for it."
+    },
+    {
+      "id": "scriptorium",
+      "name": "The Scriptorium",
+      "icon": "pencil.and.outline",
+      "blurb": "Learn to write smaller, and to say more with less.",
+      "sortOrder": 8,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 2,
+      "route": "scriptorium",
+      "builtBy": "isolde",
+      "buildCost": {
+        "essence": 60,
+        "resources": {
+          "timber": 14,
+          "clay": 10
+        }
+      },
+      "buildBlurb": "Isolde needs a room with good light and a table that doesn't rock. She is very specific about the table."
     }
   ]
 }

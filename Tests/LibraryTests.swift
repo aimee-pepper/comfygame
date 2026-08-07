@@ -344,4 +344,84 @@ final class LibraryTests: XCTestCase {
         XCTAssertTrue(library.visitedWorlds.contains { $0.id == InstanceID(rawValue: 1) },
                       "a kept world was dropped, which is the one thing keeping it prevents")
     }
+
+    // MARK: The Calligrapher — a required gate needs a guaranteed road
+
+    /// **The hands are behind the Calligrapher, deliberately** (Aimee, 6 Aug: *"the player MUST
+    /// meet the calligrapher to progress. it's core to the game"*), and that makes her the one
+    /// character who can deadlock a save if her own trail is unreachable.
+    ///
+    /// So: her signature has to be **writable in the hand you start with**. A required character
+    /// behind a signature you'd need the pencil to reach is a circle.
+    func testTheCalligraphersOwnWorldIsWritableInCharcoal() throws {
+        let isolde = try XCTUnwrap(ContentCatalog.shared.traveller("isolde"))
+
+        // A cluster is a target plus a source, and in charcoal each of those is a big footprint.
+        // Measured off the actual shapes rather than a constant, so re-authoring them re-checks it.
+        let smallestCrude = ContentCatalog.shared.runeShapes(in: .crude)
+            .map(\.offsets.count).min() ?? 6
+        let needed = isolde.signature.count * 2 * smallestCrude
+        XCTAssertLessThanOrEqual(needed, Page().capacity,
+                                 "Isolde is required and her world can't be written in charcoal — "
+                                 + "needs \(needed) cells of \(Page().capacity)")
+
+        // And her trail exists, in more than one diary, so an unlucky page distribution can't
+        // hide the one character the game insists you meet.
+        let aboutHer = ContentCatalog.shared.diaryPages.filter { $0.about == "isolde" }
+        XCTAssertGreaterThan(aboutHer.count, isolde.signature.count,
+                             "no spare page names Isolde — one bad roll could hide her for good")
+        XCTAssertGreaterThan(Set(aboutHer.map(\.diary)).count, 1,
+                             "every page naming Isolde is in her own diary")
+    }
+
+    /// Nothing in Penmanship is reachable before you've met her — the stated exception to Q40's
+    /// "first rungs are free" rule.
+    func testNoHandCanBeLearnedBeforeTheScriptoriumIsBuilt() {
+        let store = GameStore(io: .temporary(name: "hands-\(UUID().uuidString)"))
+        store.mutate("test: rich") { state in
+            state.base.essence = 100_000
+            for resource in ContentCatalog.shared.resources {
+                state.base.resources.add(9_999, of: resource.id)
+            }
+        }
+        for node in ContentCatalog.shared.nodes(in: "penmanship") {
+            XCTAssertFalse(store.canResearch(node),
+                           "\(node.name) is buyable without the Calligrapher")
+            XCTAssertTrue(store.missingPrerequisites(for: node).contains { $0.contains("Isolde") },
+                          "\(node.name) is blocked and doesn't say it's Isolde you need")
+        }
+    }
+
+    /// …and the last one wants the building upgraded, which is the job `maxTier` never had.
+    func testTheFinestHandNeedsTheScriptoriumUpgraded() throws {
+        let store = GameStore(io: .temporary(name: "tier-\(UUID().uuidString)"))
+        store.mutate("test: built, un-upgraded, and rich") { state in
+            state.base.essence = 100_000
+            for resource in ContentCatalog.shared.resources {
+                state.base.resources.add(9_999, of: resource.id)
+            }
+            state.base.stations[Stations.scriptorium] = StationState(isUnlocked: true, tier: 0)
+            state.base.completedResearch.insert("pen_pencil")
+        }
+        let fountain = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_fountain"))
+        XCTAssertFalse(store.canResearch(fountain), "the finest hand ignored the building's tier")
+
+        store.mutate("test: upgrade it") { state in
+            state.base.stations[Stations.scriptorium] = StationState(isUnlocked: true, tier: 2)
+        }
+        XCTAssertTrue(store.canResearch(fountain), "upgraded the Scriptorium and still can't learn it")
+    }
+
+    /// The hands are the biggest capability jump in the game and cost less than a storehouse tier
+    /// (Aimee, 6 Aug: *"WAY too cheap"*). Each one should now want a world you went and wrote.
+    func testEachHandCostsARareMaterialFromAParticularKindOfWorld() throws {
+        let staples: Set<ResourceID> = ["ore", "fiber", "rubble", "clay", "essence_raw"]
+        for node in ContentCatalog.shared.nodes(in: "penmanship") {
+            XCTAssertGreaterThan(node.cost.essence, Tuning.Economy.startingEssence * 2,
+                                 "\(node.name) is pocket change")
+            XCTAssertFalse(node.cost.resources.isEmpty, "\(node.name) asks for no materials at all")
+            XCTAssertTrue(node.cost.resources.keys.contains { !staples.contains($0) },
+                          "\(node.name) is buyable out of what an ordinary world already pays")
+        }
+    }
 }

@@ -30,6 +30,54 @@ struct ResearchBranchDef: Codable, Equatable, Identifiable, Sendable {
     var icon: String
     var blurb: String
     var order: Int
+
+    /// **Which building teaches this** (Q40, Aimee's idea, answered yes 6 Aug).
+    ///
+    /// One tree at the Workshop made session 12 only half true: you find a smith, and then buy
+    /// everything she knows from a generic menu that existed before you met her. A building owning
+    /// the branch about it fixes that, and settles Q37 without a judgement call — capacity is what
+    /// a tanner knows, so The Hold belongs at the Tannery.
+    ///
+    /// The split: **everything you learn yourself lives at the Workshop; everything you learn from
+    /// a person lives with that person's building.** Nil means the Workshop.
+    var station: StationID?
+
+    /// **How many rungs are reachable before you've found the person**, counted from the roots.
+    ///
+    /// Q40's gating rule: finding somebody *accelerates and deepens, it never unblocks*. Nobody
+    /// should sit at 16 storehouse slots because a four-condition tanner hasn't turned up.
+    ///
+    /// **Zero is the deliberate exception.** `hands-and-calligrapher-spec.md` §3: *"the player MUST
+    /// meet the calligrapher to progress. it's core to the game."* The hands aren't a convenience
+    /// the game withholds — they are what the game is about, and a Binder who can only scrawl in
+    /// charcoal hasn't been blocked by a missing shopkeeper, they haven't yet found the person who
+    /// teaches the Art.
+    var freeRungs: Int = 99
+
+    init(id: ResearchBranchID, name: String, icon: String, blurb: String, order: Int,
+         station: StationID? = nil, freeRungs: Int = 99) {
+        self.id = id
+        self.name = name
+        self.icon = icon
+        self.blurb = blurb
+        self.order = order
+        self.station = station
+        self.freeRungs = freeRungs
+    }
+
+    /// Tolerant, per the policy in `Migrations.swift` — and this one bit immediately. A property
+    /// with a default is *not* optional to synthesised decoding: every branch already in the file
+    /// lacked the new keys and the whole catalogue refused to load.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(ResearchBranchID.self, forKey: .id)
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? id.rawValue
+        icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "book"
+        blurb = try c.decodeIfPresent(String.self, forKey: .blurb) ?? ""
+        order = try c.decodeIfPresent(Int.self, forKey: .order) ?? 0
+        station = try c.decodeIfPresent(StationID.self, forKey: .station)
+        freeRungs = try c.decodeIfPresent(Int.self, forKey: .freeRungs) ?? 99
+    }
 }
 
 /// One unlock in a branch.
@@ -46,6 +94,38 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
     /// Nodes that must be completed first. Empty = available from the start of the branch.
     var requires: [ResearchNodeID]
     var grants: [ResearchGrant]
+    /// **The tier its building must have reached.** `maxTier` has never had a job; this is it
+    /// (Q40). The fountain pen wants a Scriptorium at tier 2 — Aimee's "last upgrade gated behind
+    /// a shop upgrade".
+    var needsStationTier: Int = 0
+
+    init(id: ResearchNodeID, branch: ResearchBranchID, name: String, icon: String, blurb: String,
+         cost: UpgradeCost, requires: [ResearchNodeID] = [], grants: [ResearchGrant] = [],
+         needsStationTier: Int = 0) {
+        self.id = id
+        self.branch = branch
+        self.name = name
+        self.icon = icon
+        self.blurb = blurb
+        self.cost = cost
+        self.requires = requires
+        self.grants = grants
+        self.needsStationTier = needsStationTier
+    }
+
+    /// Tolerant, per the policy in `Migrations.swift`.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(ResearchNodeID.self, forKey: .id)
+        branch = try c.decode(ResearchBranchID.self, forKey: .branch)
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? id.rawValue
+        icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "circle"
+        blurb = try c.decodeIfPresent(String.self, forKey: .blurb) ?? ""
+        cost = try c.decodeIfPresent(UpgradeCost.self, forKey: .cost) ?? UpgradeCost(essence: 0)
+        requires = try c.decodeIfPresent([ResearchNodeID].self, forKey: .requires) ?? []
+        grants = try c.decodeIfPresent([ResearchGrant].self, forKey: .grants) ?? []
+        needsStationTier = try c.decodeIfPresent(Int.self, forKey: .needsStationTier) ?? 0
+    }
 }
 
 /// What completing a node hands you.

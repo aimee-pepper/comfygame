@@ -35,6 +35,7 @@ struct RootView: View {
         case .library: LibraryView()
         case .blacksmith: BlacksmithView()
         case .worldHistory: WorldHistoryView()
+        case .scriptorium: ScriptoriumView()
         case .settings: SettingsView()
         case .harness: HarnessView()
         // Reached as state, not as a pushed destination.

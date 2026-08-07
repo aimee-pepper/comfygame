@@ -16,6 +16,7 @@ enum AppRoute: String, Codable, Hashable, CaseIterable, Sendable {
     case library
     case blacksmith
     case worldHistory
+    case scriptorium
     case world
     case encounter
     case settings

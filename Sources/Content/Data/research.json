@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER costs. ALL research lives here, gated behind themed branches with prerequisites — there is no flat shopping list anywhere in the game. A node is a one-time unlock; repeatable things (shelving I/II/III) are separate nodes chained by 'requires', which keeps the tree honest and removes the idea of ranks entirely. 'grants' is what unlocking it hands you: a gambit component, a symbol, or an effect on base state. The Hold's ladder runs long and gets steeply expensive on purpose (decisions-session-16 §2): three tiers capped storage at twenty slots forever, which fights the hoarding pillar. With materials binning by kind the ladder is buying room for *variety* rather than for volume. PLACEHOLDER costs.",
+  "_note": "PLACEHOLDER costs. ALL research lives here, gated behind themed branches with prerequisites — there is no flat shopping list anywhere in the game. A node is a one-time unlock; repeatable things (shelving I/II/III) are separate nodes chained by 'requires', which keeps the tree honest and removes the idea of ranks entirely. 'grants' is what unlocking it hands you: a gambit component, a symbol, or an effect on base state. The Hold's ladder runs long and gets steeply expensive on purpose (decisions-session-16 §2): three tiers capped storage at twenty slots forever, which fights the hoarding pillar. With materials binning by kind the ladder is buying room for *variety* rather than for volume. PLACEHOLDER costs. PENMANSHIP LIVES AT THE SCRIPTORIUM and has NO free rungs (Aimee, 6 Aug: 'the player MUST meet the calligrapher to progress. it's core to the game'). That is a stated exception to Q40's rule that a building's first rungs stay reachable — the rule protects capacity, and the hands are not a convenience, they are what the game is about. The hands were also badly underpriced: a pencil roughly doubles what a page can say and cost less than a storehouse tier. Each hand now names a rare material from a specific kind of world, so upgrading your hand means going and writing for it. 'lead' from the spec is copper here — the ductile metal that already exists. 'needsStationTier' gates a node on its building's tier, which is the job maxTier never had.",
   "branches": [
     {
       "id": "instruction",
@@ -33,8 +33,10 @@
       "id": "penmanship",
       "name": "Penmanship",
       "icon": "hand.draw",
-      "blurb": "Writing smaller, and saying more than one thing at a time.",
-      "order": 5
+      "blurb": "Writing smaller, and saying more than one thing at a time. Taught, never worked out alone.",
+      "order": 5,
+      "station": "scriptorium",
+      "freeRungs": 0
     }
   ],
   "nodes": [
@@ -626,9 +628,10 @@
       "icon": "pencil",
       "blurb": "Charcoal says everything too loudly. A pencil says the same things in half the room.",
       "cost": {
-        "essence": 30,
+        "essence": 150,
         "resources": {
-          "fiber": 6
+          "timber": 10,
+          "copper": 8
         }
       },
       "requires": [],
@@ -646,10 +649,11 @@
       "icon": "pencil.tip",
       "blurb": "Every rune, one square. The page stops fighting your handwriting and starts being a budget.",
       "cost": {
-        "essence": 90,
+        "essence": 500,
         "resources": {
-          "ore": 20,
-          "fiber": 12
+          "resin": 12,
+          "silver": 10,
+          "quartz": 6
         }
       },
       "requires": [
@@ -660,7 +664,8 @@
           "kind": "effect",
           "effect": "finerHand"
         }
-      ]
+      ],
+      "needsStationTier": 2
     },
     {
       "id": "pen_chaining",
@@ -669,10 +674,10 @@
       "icon": "link",
       "blurb": "Two things deciding the same question, held together. One land was always a limitation of the hand, not of the world.",
       "cost": {
-        "essence": 70,
+        "essence": 350,
         "resources": {
-          "ore": 14,
-          "mote": 1
+          "mercury": 4,
+          "mote": 2
         }
       },
       "requires": [
@@ -683,7 +688,8 @@
           "kind": "effect",
           "effect": "chaining"
         }
-      ]
+      ],
+      "needsStationTier": 1
     },
     {
       "id": "shelving_four",

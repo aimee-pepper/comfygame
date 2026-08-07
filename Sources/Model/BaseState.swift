@@ -119,11 +119,6 @@ struct BaseState: Codable, Equatable, Sendable {
         Tuning.Economy.startingSatchelSlots + satchelTier * Tuning.Economy.satchelSlotsPerTier
     }
 
-    /// `Inventory.slots` is the stored capacity (the run satchel has its own), so it has to be
-    /// re-synced whenever a Storehouse tier changes. One formula, one assignment — call this
-    /// after any station upgrade rather than computing capacity in two places.
-    /// A fresh id for something entering the storehouse. Monotonic over what's already there, so a
-    /// piece coming off somebody can't collide with one already on the shelf.
     /// What one of them is wearing in a slot. **Both carry their own** (Aimee, 5 Aug).
     func worn(_ slot: GearSlot, by member: PartyMember) -> EquippedPiece? {
         switch member {
@@ -141,10 +136,15 @@ struct BaseState: Codable, Equatable, Sendable {
         if !inventory.add(stack) { spillover.append(stack) }
     }
 
+    /// A fresh id for something entering the storehouse. Monotonic over what's already there, so a
+    /// piece coming off somebody can't collide with one already on the shelf.
     func nextItemID() -> UInt64 {
         (inventory.stacks.map(\.id.rawValue).max() ?? 0) + 1
     }
 
+    /// `Inventory.slots` is the stored capacity (the run satchel has its own), so it has to be
+    /// re-synced whenever a Storehouse tier changes. One formula, one assignment — call this
+    /// after any station upgrade rather than computing capacity in two places.
     mutating func syncInventoryCapacity() {
         inventory.slots = inventoryCapacity
     }
@@ -196,6 +196,7 @@ enum Stations {
     static let constellation: StationID = "constellation"
     static let library: StationID = "library"
     static let blacksmith: StationID = "blacksmith"
+    static let scriptorium: StationID = "scriptorium"
 }
 
 struct StationState: Codable, Equatable, Sendable {

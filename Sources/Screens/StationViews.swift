@@ -191,6 +191,14 @@ struct WorkshopView: View {
                 RefineryCard()
 
                 ResearchTree()
+
+                // **The Workshop is where you get better at writing, and nothing else** (Q40).
+                // Anything a person teaches went with that person's building.
+                ForEach(ContentCatalog.shared.branchesInOrder.filter { $0.station != nil }) { branch in
+                    if let id = branch.station, let elsewhere = ContentCatalog.shared.station(id) {
+                        ComingLater("\(branch.name) is taught at \(elsewhere.name), not here.")
+                    }
+                }
             }
             .padding(16)
         }
@@ -301,6 +309,44 @@ struct PartyView: View {
 
 }
 
+
+/// The Scriptorium — where the hands are learned.
+///
+/// Its own building because `hands-and-calligrapher-spec.md` makes it one, and its own *gate*
+/// because Aimee decided so: *"the player MUST meet the calligrapher to progress. it's core to the
+/// game."* That's a deliberate exception to Q40's rule that a building's first rungs stay reachable
+/// — the rule protects capacity, and the hands aren't a convenience the game withholds. They are
+/// what the game is about.
+struct ScriptoriumView: View {
+    @EnvironmentObject private var store: GameStore
+
+    private var tier: Int { store.state.base.station(Stations.scriptorium).tier }
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                HStack(spacing: 12) {
+                    CurrencyChip(icon: "drop.fill", label: "Essence",
+                                 value: "\(store.state.base.essence)", tint: .teal)
+                    CurrencyChip(icon: "pencil", label: "Hand",
+                                 value: store.state.base.bestHand.displayName)
+                }
+
+                StationCard(title: "The Art", icon: "pencil.and.outline") {
+                    Text("A finer hand doesn't let you say new things. It lets you say the same things in less room — and a page is the only thing in this game that never gets bigger.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    LabeledRow(icon: "chart.bar", label: "Tier", value: "\(tier)")
+                }
+
+                ResearchTree(station: Stations.scriptorium)
+            }
+            .padding(16)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("The Scriptorium")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
 
 /// Constellation — the Reality layer's only screen. Buying nodes is milestone 5.
 struct ConstellationView: View {

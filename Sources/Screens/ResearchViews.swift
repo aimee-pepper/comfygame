@@ -10,10 +10,19 @@ import SwiftUI
 /// The list of branches is a list; each one **opens onto its own screen**. Expanding four trees
 /// inside a scrolling card gave every one of them a fifth of the screen to draw itself in, and the
 /// trees were laid out sideways to cope — so reading a branch meant scrolling horizontally.
+/// The branches taught at one building.
+///
+/// **Every building owns the branch about it** (Q40, answered 6 Aug). The split: everything you
+/// work out yourself lives at the Workshop; everything you learn from a person lives with that
+/// person's building. Which is what makes finding a smith mean something — she arrives with what
+/// she knows, rather than you buying it from a menu that existed before you met her.
 struct ResearchTree: View {
+    /// Nil for the Workshop, which teaches everything nobody else does.
+    var station: StationID?
+
     var body: some View {
         VStack(spacing: 10) {
-            ForEach(ContentCatalog.shared.branchesInOrder) { branch in
+            ForEach(ContentCatalog.shared.branchesInOrder.filter { $0.station == station }) { branch in
                 ResearchBranchRow(branch: branch)
             }
         }

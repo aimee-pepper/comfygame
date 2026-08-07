@@ -266,6 +266,55 @@
         "accepted": "She stands, and she takes the fire with her somehow. \"Then let's not stand about. I've been cold a long time.\"",
         "declined": "\"Right you are.\" She turns back to the fire. \"It'll be here. So will I.\""
       }
+    },
+    {
+      "id": "isolde",
+      "name": "Isolde",
+      "calling": "a calligrapher",
+      "icon": "pencil.and.outline",
+      "blurb": "Taught the Art before there was anything left to write about. Still teaching, to nobody.",
+      "signature": [
+        {
+          "condition": {
+            "target": "illumination",
+            "measure": "floor",
+            "minimum": 35
+          },
+          "passage": "It never gets properly dark. You could work all night, if there were work."
+        },
+        {
+          "condition": {
+            "target": "atmosphere",
+            "measure": "peak",
+            "maximum": 45
+          },
+          "passage": "The air is thin and terribly still. Nothing here disturbs a page."
+        }
+      ],
+      "leansToward": [
+        "worldWorthWriting",
+        "locationClue"
+      ],
+      "meeting": {
+        "opening": "She has a board across her knees and she is ruling lines on it with a bone stylus. There is no paper. \"Don't speak for a moment. I'm nearly at the bottom.\"",
+        "questions": [
+          {
+            "ask": "There's nothing on that board.",
+            "reply": "\"There is on my side of it.\" She finishes the line anyway. \"The hand goes first, you know. Before the eyes, before anything. If I stop, that's it — I don't get it back.\""
+          },
+          {
+            "ask": "You taught this?",
+            "reply": "\"Forty years. Mostly to people who wanted to write faster.\" A short laugh. \"You cannot write faster. You can only write *smaller*, which is a different thing entirely and takes twice as long to learn.\""
+          },
+          {
+            "ask": "I've been writing in charcoal.",
+            "reply": "She looks at you for the first time. \"Charcoal.\" A long pause. \"Then you've been saying about two things at once and calling it a world.\" She sets the board down. \"Show me your hands.\""
+          }
+        ],
+        "offer": "Come and teach me. I'll find the lead and the silver.",
+        "accepted": "\"You'll want a room with light in it. And a table that doesn't rock — I'm going to be difficult about the table.\" She's already up. \"Charcoal. Honestly.\"",
+        "declined": "\"Go on then.\" She picks the board back up. \"You'll be back when the page runs out. They always are.\""
+      }
     }
   ],
   "pages": [
@@ -455,6 +504,40 @@
       "diary": "halloway",
       "kind": "worldWorthWriting",
       "prose": "Write somewhere hot, with soft ground under it. Everything else can be carried in.",
+      "prefersConditions": []
+    },
+    {
+      "id": "isolde_where_0",
+      "diary": "isolde",
+      "kind": "locationClue",
+      "prose": "It never gets properly dark here. You could work all night, if there were work.",
+      "about": "isolde",
+      "clueIndex": 0,
+      "prefersConditions": []
+    },
+    {
+      "id": "isolde_where_1",
+      "diary": "isolde",
+      "kind": "locationClue",
+      "prose": "The air is thin and terribly still. Nothing here disturbs a page.",
+      "about": "isolde",
+      "clueIndex": 1,
+      "prefersConditions": []
+    },
+    {
+      "id": "isolde_worth_0",
+      "diary": "isolde",
+      "kind": "worldWorthWriting",
+      "prose": "A hand is not a tool you buy. It is a habit you are given, by somebody who had it first.",
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_about_isolde",
+      "diary": "tovin",
+      "kind": "locationClue",
+      "prose": "Isolde taught me. Whatever you think of my handwriting, it was worse. She would have gone somewhere with steady light — she could never work by a fire, said the flicker got into the line.",
+      "about": "isolde",
+      "clueIndex": 0,
       "prefersConditions": []
     }
   ]

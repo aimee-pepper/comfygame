@@ -193,6 +193,16 @@
       one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## The hands, and who teaches them (Aimee, 6 Aug 2026)
+- [x] **Every building owns its own tree** (Q40). Workshop keeps what you work out yourself;
+      everything a person teaches went with that person's building
+- [x] `needsStationTier` gates a node on its building's tier — the job `maxTier` never had
+- [x] **The Scriptorium**, raised by Isolde the Calligrapher, and **required**: Penmanship has no
+      free rungs, deliberately, because the hands are what the game is about
+- [x] **The hands repriced.** A pencil was 30 essence and 6 fibre for roughly double what a page
+      can say. Each one now names a material from a particular kind of world
+- [ ] Move The Hold to the Tannery once the Tannery exists (Q37, answered yes)
+
 ## Reading what you wrote (Aimee, 6 Aug 2026)
 - [x] **Scale was accepted, displayed and inert.** A giant sun was a plain sun, and a wrong
       deduction taught nothing. The page names it now rather than hiding it

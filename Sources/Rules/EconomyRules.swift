@@ -37,7 +37,52 @@ enum EconomyRules {
     /// Whether a node's prerequisites are all met. Locked nodes are shown, not hidden — seeing what
     /// you can't have yet is most of what makes a tree feel like a tree.
     static func isAvailable(_ node: ResearchNodeDef, in state: GameState) -> Bool {
-        !isComplete(node, in: state) && node.requires.allSatisfy { state.base.completedResearch.contains($0) }
+        !isComplete(node, in: state)
+            && node.requires.allSatisfy { state.base.completedResearch.contains($0) }
+            && buildingAllows(node, in: state) == nil
+    }
+
+    /// **Whether the building that teaches this is built, and built far enough** (Q40).
+    ///
+    /// Returns the reason it's blocked, or nil if it isn't — because a greyed-out row that doesn't
+    /// say *"the Scriptorium isn't built"* is indistinguishable from a bug.
+    ///
+    /// A branch's first `freeRungs` nodes stay reachable without the building, so finding somebody
+    /// accelerates rather than unblocks. Penmanship sets that to **zero**, deliberately: the hands
+    /// are what the game is about, and meeting the Calligrapher is a story beat that happens to be
+    /// a gate (`hands-and-calligrapher-spec.md` §3).
+    static func buildingAllows(_ node: ResearchNodeDef, in state: GameState) -> String? {
+        guard let branch = ContentCatalog.shared.researchBranch(node.branch),
+              let stationID = branch.station,
+              let station = ContentCatalog.shared.station(stationID)
+        else { return nil }
+
+        let depth = depthOf(node)
+        if depth < branch.freeRungs, node.needsStationTier == 0 { return nil }
+
+        let built = state.base.station(stationID)
+        guard built.isUnlocked else {
+            // Named by the person rather than the building where there is one — you're looking for
+            // somebody, not shopping for premises.
+            let who = station.builtBy.flatMap { ContentCatalog.shared.traveller($0)?.name }
+            return who.map { "\($0) hasn't been found" } ?? "the \(station.name) isn't built"
+        }
+        if built.tier < node.needsStationTier {
+            return "the \(station.name) needs upgrading"
+        }
+        return nil
+    }
+
+    /// How far down its branch a node sits, counted through `requires`. Cheap because branches are
+    /// tens of nodes, not thousands.
+    static func depthOf(_ node: ResearchNodeDef, seen: Set<ResearchNodeID> = []) -> Int {
+        guard !node.requires.isEmpty, !seen.contains(node.id) else { return 0 }
+        var visited = seen
+        visited.insert(node.id)
+        return 1 + (node.requires
+            .compactMap { ContentCatalog.shared.researchNode($0) }
+            .map { depthOf($0, seen: visited) }
+            .max() ?? 0)
     }
 
     static func isComplete(_ node: ResearchNodeDef, in state: GameState) -> Bool {
@@ -47,9 +92,11 @@ enum EconomyRules {
     /// The prerequisites still missing, by name, so the UI can say what's blocking rather than just
     /// greying a row out.
     static func missingPrerequisites(_ node: ResearchNodeDef, in state: GameState) -> [String] {
-        node.requires
+        var missing = node.requires
             .filter { !state.base.completedResearch.contains($0) }
             .compactMap { ContentCatalog.shared.researchNode($0)?.name }
+        if let blocked = buildingAllows(node, in: state) { missing.append(blocked) }
+        return missing
     }
 
     static func canAfford(_ cost: UpgradeCost, in state: GameState) -> Bool {

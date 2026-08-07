@@ -912,3 +912,45 @@ The spec is good and mostly buildable as written. Four things I'd rather not dec
 **Not blocking:** I can build selling, bin-level selling and the Recycler against the leans above and
 change any of them in an afternoon. What I can't do is invent the Trader's meeting scene — that's
 voice, same as the other five in `travellers.json`.
+
+## Q42 — Burn, freeze and shock: three statuses or one? **[AIMEE]**
+
+Audit #11 §3 is right that this is the real gap, and it names the fork exactly. **Producers exist
+and effects don't:** `emanation` is a generated creature trait that appears in descriptions; toxic
+flora is specced; Apothecary coatings are specced. An emanating creature currently bypasses armour
+and says *"sears"*, and that's the whole of it — nothing lingers.
+
+- **One `elemental` status carrying its element.** Simpler, one code path, reads fine.
+- **Three distinct statuses.** More work, but **Ward has something specific to turn aside**, which
+  is the thing that makes Ward worth a round instead of a bigger heal.
+
+**My lean: three**, and only because of Ward. The skill set is built on "every skill answers a
+specific kind of creature", and a Ward that turns aside *elemental* in general is exactly the
+good-against-everything shape the spec warns about. Three gives it a real question — you saw it
+sear, so you ward against burn.
+
+**Not blocking:** I'll build whichever you say. If you say nothing I'll build three and it's an
+afternoon to collapse them.
+
+## Q43 — Isolde's signature, and the one thing that could deadlock a save
+
+`hands-and-calligrapher-spec.md` makes the Calligrapher **required**, which I've built exactly as
+written — Penmanship lives at the Scriptorium with **no free rungs**, no Workshop fallback.
+
+That makes her the one character who can wedge a game, so I've built the three safeguards §3 asks
+for and turned them into tests that will fail if anybody breaks them later:
+
+1. **Her world is writable in charcoal.** Two conditions, common vocabulary — a bright-floored,
+   thin-aired world. The test measures against the *actual* crude footprints, so re-authoring the
+   shapes re-checks it.
+2. **She's named in more than one diary.** Her own two location pages, plus Tovin mentioning her —
+   *"Isolde taught me. Whatever you think of my handwriting, it was worse."* One unlucky page
+   distribution can't hide the character the game insists you meet.
+3. **The block says who, not what.** A locked Penmanship node reads *"Isolde hasn't been found"*
+   rather than greying out.
+
+**What I'd like you to check:** her two conditions are `illumination floor ≥ 35` and `atmosphere
+peak ≤ 45` — a world that never gets properly dark, with thin still air. That's deliberately
+writable early, but it's also a *specific* pair, and if the starting vocabulary can't reach one of
+them the gate closes. Worth your eye on whether the passages point at the right targets, which is
+§3.3 of the feedback spec.
