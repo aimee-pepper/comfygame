@@ -7,7 +7,41 @@ Format: **question → why it's blocking → what I've built in the meantime.** 
 waiting on me; if you answer nothing, all of it still ships with the interpretation noted, and I'll
 have chosen conservatively rather than well.
 
-Last updated 6 Aug 2026, after `code-audit-9-and-answers.md` and `backlog-referrals-worked.md`.
+Last updated 7 Aug 2026, after `answer-q44.md`, `clause-audit.md` and `code-audit-16.md`.
+
+---
+
+## 0. Read first — the writing system had no floor, and it changes your numbers
+
+**Q45 and Q46 in `questions-for-design.md`.** Answering Q44 turned up something underneath it, and
+Aimee found it in one line: **writing started at 0 rather than at ordinary.**
+
+Readings clamp at zero and four subjects started there, so subtraction from nothing was nothing.
+**33 of 97 authored contributions are subtractive, and thirteen focuses wrote literally zero.**
+`canopy` shades light by 35 and did nothing. `salt` suppresses life by 25 and did nothing. *A salt
+flat where nothing grows* was not a sentence the vocabulary could say.
+
+**Three things follow that you should look at:**
+
+1. **Your §3 neutral table was right and I nearly overwrote it.** My first pass at Q44 measured the
+   vocabulary, found Vitality's neutral of 40 sat *above* what any life source could write (35), and
+   concluded the table was too high. It wasn't. The floor was too low. The table is now the
+   `baseline` itself, unchanged from what you wrote.
+2. **Your "physics and judgement should not share a number" argument was right in general and its
+   premise doesn't hold here.** You argued illumination 0 is physically correct — no light source,
+   no light. Once writing starts at ordinary, an unwritten world isn't a void being lit; it's an
+   ordinary world being changed. `neutral` survives as an optional override that nothing sets.
+3. **Verdant costs about −20 now.** It was hand-typed as free, and Aimee's *"a verdant lush world
+   slowly scales up destabilization"* says it shouldn't be — but it moves your calibration table.
+
+**And the method that found it is worth more than the fix.** Both of us kept auditing what the
+numbers *did*. The question that finds this class of fault is **what does this word do when there is
+nothing for it to act on?** — the same shape as *what would be observably different if this clause
+were false*, which is what caught the six half-built decisions. `ReachableContentTests` now asserts
+every clause can be said, every site hosted, every creature housed, every condition satisfied. It
+immediately found three more, none of them mine: a clause looking for a tag in the wrong bag, a
+Cycle clause with no source that could trigger it, and a resource preferring a tag nothing has ever
+produced.
 
 ---
 

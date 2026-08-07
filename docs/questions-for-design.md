@@ -1031,3 +1031,131 @@ measuring.
 against. They genuinely differ: a world with no light source really is dark, and an ordinary world
 really does have a sky. **Say if you want the baselines moved as well** and I'll do it as its own
 piece, with the numbers first.
+
+### **ANSWERED (`answer-q44.md`), and the answer led somewhere much larger — see Q45**
+
+Both halves are built. The eleven greed deltas are gone, the seven danger ones live on
+`danger.stabilityTrade`, and `SymbolDef.stabilityDelta` is **deleted rather than zeroed** so "no
+authored greed" is enforced by the compiler instead of by memory. `DangerTests` asserts it against
+the raw JSON as well, because the field would come back one day for a reason that seemed good.
+
+Greed is now charged on **everything a book says, compounds included**. That had to follow: with the
+authored numbers gone, a compound that isn't priced by its expansion is priced at nothing, and Rich
+Ore would have become free. Writing *Rich Ore* and writing out *great iron, gold* are now the same
+world at the same price — they were 45 and 8.
+
+**On the two things you asked me to re-check:** they still balance, and I'd have got that wrong by
+eyeballing it. The cap is +40 against a greediest writable book of −100. Before any of this it was
++40 against −98. One danger rune is still paid in full; six still hit the ceiling. **No rescale.**
+
+---
+
+## Q45 — Writing started at nothing, not at ordinary, and a third of the vocabulary did not exist
+
+**[AIMEE, 7 Aug, and she is right]** — *"the entire issue is that the starting point of writing is
+0 rather than neutral."*
+
+This is the thing under Q44, and neither of us had it. I was measuring what the numbers *did*; the
+question that would have found it is **what does a subtractive word do when there is nothing beneath
+it?**
+
+**33 of 97 authored contributions are subtractive** — occluding, suppressing, draining, flattening,
+sinking, thinning. Readings clamp at zero, and four subjects started at zero. So subtraction from
+nothing was nothing:
+
+```
+WRITES illumination: ash=0 canopy=0 cloud=0 miasma=0 mist=0 rain=0 smoke=0 void=0 · stars=4 … sun=55
+WRITES vitality:     ash=0 miasma=0 salt=0 sulfur=0 wildfire=0 · swarm=8 … canopy=35
+```
+
+**Thirteen focuses wrote literally nothing** when written on their own. `canopy` is authored to
+shade light by 35 and did nothing. `salt` suppresses life by 25 and did nothing. *A salt flat where
+nothing grows* was not a sentence the vocabulary could say — you could only decline to mention life.
+
+**And it is where the hand-typed numbers came from.** Dim Sky is `cloud, great`, which resolved to
+**0**, and carried `+12` to pay for it. The constants were propping up a broken floor, which is why
+they looked necessary right up until the floor was fixed.
+
+### What changed
+
+`baseline` **is** the ordinary value now, and a page says how a world *differs* from an ordinary one.
+Your §3 table was right all along — it was the floor that was wrong. Illumination 45, Thermal 50,
+Hydrology 40, Substrate 30, Relief 35, Vitality 40, Atmosphere 50, Cycle 50.
+
+Three consequences worth your eye:
+
+1. **The floor needed a floor.** An unremarkable world is lit by day and dark by night, and one
+   number can't say both, so dual-valued subjects carry a separate `baselineFloor` (illumination 0).
+   Without it a sun's floor contribution is zero *because a sun sets*, so every night was noon.
+2. **Greed bills the demand, not the reading.** Peaks clamp at 100 far more often now, and a world
+   riddled with veins would otherwise cost the same as a merely rich one.
+3. **`neutral` survives as an optional override and nothing sets it.** Your "physics and judgement
+   should not share a number" argument was right in general and its premise doesn't hold here: once
+   writing starts at ordinary, the two coincide. The field is there for the subject that ever needs
+   them apart.
+
+**Aimee's correction to me, which I had wrong and is worth recording:** this does *not* make an
+under-specified world plain. Subjects nobody wrote about are still rolled from the whole pool. It
+makes an **undeviated** world plain, which is the point of ordinary — and a void world is one you
+write with negative focuses.
+
+### Measured, before and after
+
+| | before | now |
+|---|---|---|
+| Sparse Ore | +10 authored, −1 measured | **+8** |
+| Common Ore | 0 authored, −4 measured | **−4** |
+| Rich Ore | −45 authored, −8 measured | **−21** |
+| Gilded Veins | −30 authored, −18 measured | **−32** |
+| a world written dead | unwritable | **+27, and it holds 2 animals against 14** |
+
+### Two things I decided, and would like overruled if they're wrong
+
+- **Substrate and Vitality carry a greed weight of 1.8 and 1.5** against everything else's 0.35 —
+  about five to one, which is where the two-axis model's *value* half lives. Set by measuring until
+  the six outcomes your §3 promises came true, not by taste.
+- **Verdant now costs about −20.** It was hand-typed as free. Aimee's *"a verdant lush world slowly
+  scales up destabilization"* says it shouldn't be, so I let it cost — but it does mean the old
+  calibration table's *Plains · Verdant · Ore · Dim Sky = 100* is now 75.
+
+---
+
+## Q46 — Three subjects could only ever be asked for *more* of, and I have authored five words
+
+**[AIMEE, 7 Aug]** — *"if no source subtracts then we've been building this wrong from the start"*
+and *"author the missing words."*
+
+Once the floor moved I measured which subjects could be written downward at all. **Substrate and
+Cycle could not** — every focus touching them raised them. So Sparse Ore was a *greedy* choice, and
+"Reliable as a clock" was a sentence with nothing to trigger it.
+
+**Authored, all `[PLACEHOLDER]`:**
+
+| Focus | Subject | What it says |
+|---|---|---|
+| **Chasm** | Substrate ↓30 | More hole than floor. Aimee asked for this one by name |
+| **Silt** | Substrate ↓18 | Sorted fine and washed through. Nothing hard left in it |
+| **Stillness** | Cycle ↓35 | Nothing turns. Your own standout in `cycle-sources-draft.md` |
+| **Tide** | Cycle ↑, regularity ↑ | The world moves to a pull |
+| **Orrery** | Cycle, regularity ↑↑ | A great clockwork, still running |
+
+**Sparse Ore expands to Silt now**, so it means what its name says. **Common Ore is faint iron**
+rather than moderate, so the ladder has a middle: below, at, above.
+
+Chasms are real ground — impassable, per Aimee. Pathing is guaranteed two ways: holes are bridged
+until most of the solid ground is walkable-to, and *nothing is placed outside the reachable region*,
+which also fixes an older bug where a site could land on a shoal behind deep water. At **maximum
+chasm the world has no exit portal** and you leave the way you came, exactly as she described — read
+off what was *written*, never the chance fill, so a rolled focus can put holes in your world but
+can't close the door behind you.
+
+### What I'd like from you
+
+1. **The rest of the Cycle list.** Your draft's open Q1 asks how many ship; I took Stillness, Tide
+   and Orrery because you named them the tightest, and left Drift, Pulse, Procession, Breath,
+   Cascade, Echo and Unwinding alone. **Drift** is the obvious fourth.
+2. **Are Chasm and Silt the right two words for poor ground?** They're mine, and the vocabulary is
+   yours.
+3. **Relief, Hydrology and Atmosphere each have exactly one or two subtractive words.** They work,
+   but they're thin — a subject you can only really write upward is the fault we just fixed, in
+   slower motion.
