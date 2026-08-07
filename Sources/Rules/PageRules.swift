@@ -407,8 +407,12 @@ extension PageRules {
             let described = (modifiers + [focus]).joined(separator: " ")
             return subject.map { "\(described), on \($0)." } ?? "\(described) — joined to no subject."
         case .qualifier(let id):
+            // **Not the name again** — the row above already says it. This line is for what the
+            // modifier is *for*.
+            // Just the job. The name above already says which ladder it's a rung of — *Countless*
+            // is plainly Count — and the strip has room for one clause, not two.
             let modifier = ContentCatalog.shared.qualifier(id)
-            return modifier.map { "\($0.name) — \($0.ladder.displayName) sets \($0.ladder.job)." }
+            return modifier.map { $0.ladder.job.capitalisedSentence + "." }
         case .compound(let id):
             return ContentCatalog.shared.symbol(id)?.blurb
         case .rune(let sigil):

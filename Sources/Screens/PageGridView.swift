@@ -146,21 +146,21 @@ struct PageGridView: View {
                     // modifiers on it. The cheapest possible discoverability for a vocabulary
                     // heading toward 149 runes.
                     if let reading = PageRules.reading(of: mark, on: page) {
-                        Text(reading).font(.caption2).foregroundStyle(.secondary)
+                        Text(reading)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            // Two lines, and the strip is tall enough for them whatever it's
+                            // showing — the card must not change shape as you touch things.
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
-                .lineLimit(1)
-                .layoutPriority(1)
-                Spacer(minLength: 4)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 actions(for: mark)
-                Button { self.held = nil } label: {
-                    Text("Cancel")
-                        .font(.caption2)
-                        .padding(.horizontal, 6)
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
+                // **An icon, not the word.** "Cancel" was being squeezed to "Ca n…" beside three
+                // icons on a page-width row (Aimee, 6 Aug).
+                iconButton("xmark", "Done with this sigil") { self.held = nil }
             }
             else if let hint = mode.hint {
                 Image(systemName: mode.icon).font(.caption2)
@@ -204,7 +204,10 @@ struct PageGridView: View {
             }
         }
         .lineLimit(2)
-        .frame(minHeight: 44)
+        // **Fixed, not minimum.** Reserved for the tallest thing it ever shows, so the page above
+        // it never moves — the card changing shape as you arrange sigils was intolerable on the one
+        // surface you arrange things on.
+        .frame(height: 48)
     }
 
     /// Drawn behind everything, and deliberately not hit-testable — every touch on the page
@@ -326,47 +329,45 @@ struct PageGridView: View {
     /// floating menu that covers the page you're trying to read.
     @ViewBuilder
     private func actions(for mark: PlacedRune) -> some View {
-        Button {
+        iconButton("link", "Connect") {
             mode = .connecting
             anchor = mark.id
             held = nil
-        } label: {
-            Label("Connect", systemImage: "link")
-                .font(.caption2)
-                .padding(.horizontal, 6)
-                .frame(minHeight: 44)
-                .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
 
         if page.links.contains(where: { $0.involves(mark.id) }) {
-            Button(role: .destructive) {
+            // **One tap severs.** Entering the mode is only so you can keep going down a chain.
+            iconButton("scissors", "Disconnect", tint: .red) {
                 mode = .disconnecting
-                anchor = mark.id
+                anchor = nil
                 held = nil
-            } label: {
-                Label("Disconnect", systemImage: "scissors")
-                    .font(.caption2)
-                    .padding(.horizontal, 6)
-                    .frame(minHeight: 44)
-                    .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
         }
 
         if PageRules.rotate(cluster: mark.id, on: page) != nil {
-            Button {
+            iconButton("rotate.right", "Turn") {
                 store.rotateCluster(mark.id)
                 held = nil
-            } label: {
-                Label("Turn", systemImage: "rotate.right")
-                    .font(.caption2)
-                    .padding(.horizontal, 6)
-                    .frame(minHeight: 44)
-                    .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
         }
+    }
+
+    /// A square 44pt tap target with a glyph in it, and a spoken name for VoiceOver.
+    ///
+    /// Icons rather than labels because the row shares a page-width strip with the sigil's name —
+    /// four words and three glyphs don't fit, and what got squeezed was the text.
+    private func iconButton(_ systemName: String, _ label: String,
+                            tint: Color = .accentColor,
+                            action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.footnote)
+                .foregroundStyle(tint)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
     }
 
     /// A tap on a sigil while a mode is running.

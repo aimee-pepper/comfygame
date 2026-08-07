@@ -68,10 +68,12 @@ struct QualifierDef: Codable, Equatable, Identifiable, Sendable {
         /// What it *does* do, for the line that says so.
         var job: String {
             switch self {
-            case .intensity: "how much of a thing there is"
-            case .scale: "how far it spreads, or how big it is where it can't spread"
-            case .count: "how many of them there are"
-            case .phase: "what form the water takes"
+            // Terse on purpose: this sits in a strip that shares its width with a sigil's name and
+            // four buttons, and anything longer clipped mid-word (Aimee, 6 Aug).
+            case .intensity: "how much there is"
+            case .scale: "how far it spreads"
+            case .count: "how many there are"
+            case .phase: "what form water takes"
             case .direction: "which way it faces"
             }
         }
