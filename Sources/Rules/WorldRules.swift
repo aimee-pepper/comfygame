@@ -27,6 +27,8 @@ enum WorldRules {
         case searchedSite(SiteID, turnsRemaining: Int)
         case siteOpened(SiteID)
         case learnedSymbol(SymbolID)
+        /// A word for the page, carved somewhere out there.
+        case learnedFocus(PressureSourceID)
         case gainedEssence(Int)
         case pickedUpItem(String)
         case satchelFull(String)
@@ -399,6 +401,11 @@ enum WorldRules {
                 for symbol in definition.contents.teaches where !state.base.ownedSymbols.contains(symbol) {
                     state.base.ownedSymbols.insert(symbol)
                     events.append(.learnedSymbol(symbol))
+                }
+                for focus in definition.contents.teachesFocuses
+                where !state.base.ownedSources.contains(focus) {
+                    state.base.ownedSources.insert(focus)
+                    events.append(.learnedFocus(focus))
                 }
                 if definition.contents.essence > 0 {
                     state.base.essence += definition.contents.essence

@@ -139,6 +139,9 @@ enum EconomyRules {
         case .symbol:
             if let id = grant.id { state.base.ownedSymbols.insert(SymbolID(rawValue: id)) }
 
+        case .focus:
+            if let id = grant.id { state.base.ownedSources.insert(PressureSourceID(rawValue: id)) }
+
         case .effect:
             guard let effect = grant.effect else { return }
             switch effect {
@@ -197,6 +200,11 @@ enum EconomyRules {
     /// whole point of the cache is that it was worth carrying a key across worlds for.
     enum CacheReward: Equatable {
         case symbol(SymbolID)
+        /// **A word for the page.** The repeatable route into the vocabulary — sites teach specific
+        /// focuses and the Workshop sells a few, but neither is enough on its own to guarantee that
+        /// every word in the catalogue can eventually be had, and a word you can never learn is
+        /// worse than one you were given.
+        case focus(PressureSourceID)
         case gambitComponent(GambitComponentID)
         case motes(Int)
     }
@@ -212,9 +220,17 @@ enum EconomyRules {
             .map(\.id)
             .sorted { $0.rawValue < $1.rawValue }
 
+        let unownedFocuses = ContentCatalog.shared.pressureSources
+            .filter { $0.acquisition != .research && !state.base.ownedSources.contains($0.id) }
+            .map(\.id)
+            .sorted { $0.rawValue < $1.rawValue }
+
         var options: [(value: CacheReward, weight: Double)] = [
             (.motes(rng.int(in: Tuning.Economy.cacheMoteRange)), Tuning.Economy.cacheMoteWeight)
         ]
+        if let focus = rng.pick(unownedFocuses) {
+            options.append((.focus(focus), Tuning.Economy.cacheFocusWeight))
+        }
         if let symbol = rng.pick(unownedSymbols) {
             options.append((.symbol(symbol), Tuning.Economy.cacheSymbolWeight))
         }
@@ -227,6 +243,7 @@ enum EconomyRules {
     static func grant(_ reward: CacheReward, in state: inout GameState) {
         switch reward {
         case .symbol(let id): state.base.ownedSymbols.insert(id)
+        case .focus(let id): state.base.ownedSources.insert(id)
         case .gambitComponent(let id): state.base.ownedGambitComponents.insert(id)
         case .motes(let amount): state.reality.motes += amount
         }
@@ -236,6 +253,8 @@ enum EconomyRules {
         switch reward {
         case .symbol(let id):
             "A symbol you've never written: \(ContentCatalog.shared.symbol(id)?.name ?? id.rawValue)."
+        case .focus(let id):
+            "A word you didn't have: \(ContentCatalog.shared.pressureSource(id)?.name ?? id.rawValue)."
         case .gambitComponent(let id):
             "A word you didn't have: \(ContentCatalog.shared.gambitComponent(id)?.name ?? id.rawValue)."
         case .motes(let amount):

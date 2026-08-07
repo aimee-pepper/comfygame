@@ -281,6 +281,11 @@ private struct ResearchOutlineRow: View {
                 guard let id = grant.id,
                       let symbol = ContentCatalog.shared.symbol(SymbolID(rawValue: id)) else { return nil }
                 return "learn the \(symbol.name) symbol"
+            case .focus:
+                guard let id = grant.id,
+                      let focus = ContentCatalog.shared.pressureSource(PressureSourceID(rawValue: id))
+                else { return nil }
+                return "learn to write \(focus.name)"
             case .effect:
                 return grant.effect.map(ResearchWording.describe)
             }

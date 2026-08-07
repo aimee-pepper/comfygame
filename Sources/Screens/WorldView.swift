@@ -119,6 +119,8 @@ struct WorldView: View {
             "You've had everything \(ContentCatalog.shared.site(site)?.name.lowercased() ?? "it") has."
         case .learnedSymbol(let symbol):
             "You can write \(ContentCatalog.shared.symbol(symbol)?.name ?? "something new") now."
+        case .learnedFocus(let focus):
+            "A word you didn't have: \(ContentCatalog.shared.pressureSource(focus)?.name ?? "something new")."
         case .gainedEssence(let amount): "\(amount) essence, banked."
         case .pickedUpItem(let what): "\(what) You can't tell what it is."
         case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."
@@ -144,7 +146,7 @@ struct WorldView: View {
     private func colour(for event: WorldRules.Event) -> Color {
         switch event {
         case .pickedUp, .harvested, .foundPortal, .pickedUpItem, .searchedSite, .siteOpened: .primary
-        case .foundSite, .learnedSymbol, .gainedEssence: .primary
+        case .foundSite, .learnedSymbol, .learnedFocus, .gainedEssence: .primary
         case .readPage, .foundTraveller, .metTraveller: .primary
         case .usedItem: .green
         case .nightfall, .daybreak: .secondary

@@ -168,8 +168,12 @@ struct WritingDeskView: View {
             chips([Chip(glyph: id.rawValue, name: target?.name ?? id.rawValue, content: .target(id))])
             // Only what can be *bound* here. Filtering on "affects this target at all" put rain
             // under Illumination because rain dims light — true, and not something you'd ever write.
+            // **Only what you've learned.** Hidden rather than shown-and-locked, matching how the
+            // compounds bin has always treated `ownedSymbols`: a word you don't have isn't a thing
+            // to want, it's a thing you haven't met yet.
             let sources = ContentCatalog.shared.pressureSources
                 .filter { $0.canAttach(to: id) }
+                .filter { store.state.base.ownedSources.contains($0.id) }
                 .sorted { $0.name < $1.name }
             if !sources.isEmpty {
                 // **Focuses**, settled 6 Aug (`vocabulary-settled.md`). A page reads as a sentence:

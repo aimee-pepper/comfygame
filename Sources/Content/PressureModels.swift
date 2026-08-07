@@ -120,6 +120,26 @@ struct PressureSourceDef: Codable, Equatable, Identifiable, Sendable {
     var icon: String
     var blurb: String
     var contributions: [PressureContribution]
+
+    /// **How the player comes to know this word.**
+    ///
+    /// Rune spec principle 2: *"Every **discovered** rune stays writable forever."* Discovery was
+    /// the missing half — every focus in the catalogue was writable from the first minute, so the
+    /// vocabulary was not a progression at all and the page's whole *depth versus breadth* tension
+    /// arrived complete on turn one.
+    ///
+    /// Mirrors `SymbolDef.Acquisition` deliberately rather than inventing a second scheme: the
+    /// symbols got this right and the focuses that replaced them never inherited it.
+    var acquisition: Acquisition = .starter
+
+    enum Acquisition: String, Codable, Sendable {
+        /// What you can already say. Enough to write every subject in both directions, and no more.
+        case starter
+        /// Bought at the Workshop.
+        case research
+        /// Found out there — in a site, a cache, or somebody's diary.
+        case worldDrop
+    }
     /// **The targets this may be bound to.** Everything else it does still happens, as an implicit
     /// secondary — you simply can't *write* rain to make light. The rune spec says each source
     /// attaches to a target without saying which; this is that mapping.
@@ -149,6 +169,7 @@ extension PressureSourceDef {
         icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "circle"
         blurb = try c.decodeIfPresent(String.self, forKey: .blurb) ?? ""
         contributions = try c.decodeIfPresent([PressureContribution].self, forKey: .contributions) ?? []
+        acquisition = try c.decodeIfPresent(Acquisition.self, forKey: .acquisition) ?? .starter
         if let many = try? c.decode([PressureTargetID].self, forKey: .attachesTo) {
             attachesTo = many
         } else if let one = try? c.decode(PressureTargetID.self, forKey: .attachesTo) {

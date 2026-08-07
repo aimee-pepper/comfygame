@@ -44,8 +44,11 @@
         }
       ],
       "attachesTo": [
-        "thermal"
-      ]
+        "illumination",
+        "thermal",
+        "vitality"
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "aurora",
@@ -66,7 +69,8 @@
       ],
       "attachesTo": [
         "illumination"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "bloom",
@@ -88,7 +92,8 @@
       ],
       "attachesTo": [
         "vitality"
-      ]
+      ],
+      "acquisition": "research"
     },
     {
       "id": "canopy",
@@ -133,9 +138,11 @@
         }
       ],
       "attachesTo": [
-        "vitality",
-        "relief"
-      ]
+        "illumination",
+        "relief",
+        "vitality"
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "chasm",
@@ -178,9 +185,10 @@
         }
       ],
       "attachesTo": [
-        "substrate",
-        "relief"
-      ]
+        "relief",
+        "substrate"
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "cloud",
@@ -208,8 +216,10 @@
         }
       ],
       "attachesTo": [
-        "atmosphere"
-      ]
+        "atmosphere",
+        "illumination"
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "comet",
@@ -245,7 +255,8 @@
       ],
       "attachesTo": [
         "illumination"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "crystal",
@@ -278,7 +289,8 @@
       ],
       "attachesTo": [
         "substrate"
-      ]
+      ],
+      "acquisition": "research"
     },
     {
       "id": "fungus",
@@ -307,7 +319,8 @@
       ],
       "attachesTo": [
         "vitality"
-      ]
+      ],
+      "acquisition": "research"
     },
     {
       "id": "geyser",
@@ -342,7 +355,8 @@
       ],
       "attachesTo": [
         "hydrology"
-      ]
+      ],
+      "acquisition": "research"
     },
     {
       "id": "glacier",
@@ -377,8 +391,10 @@
       ],
       "attachesTo": [
         "hydrology",
-        "relief"
-      ]
+        "relief",
+        "thermal"
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "gold",
@@ -401,7 +417,8 @@
       ],
       "attachesTo": [
         "substrate"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "granite",
@@ -429,9 +446,10 @@
         }
       ],
       "attachesTo": [
-        "substrate",
-        "relief"
-      ]
+        "relief",
+        "substrate"
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "herd",
@@ -450,7 +468,8 @@
       ],
       "attachesTo": [
         "vitality"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "ice",
@@ -475,8 +494,10 @@
         }
       ],
       "attachesTo": [
-        "hydrology"
-      ]
+        "hydrology",
+        "thermal"
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "iron",
@@ -499,7 +520,8 @@
       ],
       "attachesTo": [
         "substrate"
-      ]
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "lake",
@@ -526,7 +548,8 @@
       ],
       "attachesTo": [
         "hydrology"
-      ]
+      ],
+      "acquisition": "research"
     },
     {
       "id": "magma",
@@ -564,7 +587,8 @@
       ],
       "attachesTo": [
         "thermal"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "marsh",
@@ -611,7 +635,8 @@
       "attachesTo": [
         "hydrology",
         "relief"
-      ]
+      ],
+      "acquisition": "research"
     },
     {
       "id": "miasma",
@@ -644,8 +669,11 @@
         }
       ],
       "attachesTo": [
-        "atmosphere"
-      ]
+        "atmosphere",
+        "illumination",
+        "vitality"
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "mist",
@@ -678,8 +706,10 @@
         }
       ],
       "attachesTo": [
-        "hydrology"
-      ]
+        "hydrology",
+        "illumination"
+      ],
+      "acquisition": "research"
     },
     {
       "id": "moon",
@@ -713,9 +743,10 @@
         }
       ],
       "attachesTo": [
-        "illumination",
-        "cycle"
-      ]
+        "cycle",
+        "illumination"
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "orrery",
@@ -750,7 +781,8 @@
       ],
       "attachesTo": [
         "cycle"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "rain",
@@ -784,7 +816,8 @@
       ],
       "attachesTo": [
         "hydrology"
-      ]
+      ],
+      "acquisition": "research"
     },
     {
       "id": "river",
@@ -822,7 +855,8 @@
       "attachesTo": [
         "hydrology",
         "relief"
-      ]
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "root",
@@ -841,7 +875,8 @@
       ],
       "attachesTo": [
         "vitality"
-      ]
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "rot",
@@ -866,7 +901,8 @@
       ],
       "attachesTo": [
         "vitality"
-      ]
+      ],
+      "acquisition": "research"
     },
     {
       "id": "salt",
@@ -901,8 +937,11 @@
         }
       ],
       "attachesTo": [
-        "substrate"
-      ]
+        "hydrology",
+        "substrate",
+        "vitality"
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "sand",
@@ -937,9 +976,11 @@
         }
       ],
       "attachesTo": [
-        "substrate",
-        "relief"
-      ]
+        "hydrology",
+        "relief",
+        "substrate"
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "sea",
@@ -977,7 +1018,8 @@
       ],
       "attachesTo": [
         "hydrology"
-      ]
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "silt",
@@ -1017,7 +1059,8 @@
       ],
       "attachesTo": [
         "substrate"
-      ]
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "smoke",
@@ -1048,8 +1091,10 @@
         }
       ],
       "attachesTo": [
+        "illumination",
         "thermal"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "snow",
@@ -1077,8 +1122,10 @@
         }
       ],
       "attachesTo": [
-        "hydrology"
-      ]
+        "hydrology",
+        "thermal"
+      ],
+      "acquisition": "research"
     },
     {
       "id": "stars",
@@ -1098,7 +1145,8 @@
       ],
       "attachesTo": [
         "illumination"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "stillness",
@@ -1134,7 +1182,8 @@
       ],
       "attachesTo": [
         "cycle"
-      ]
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "sulfur",
@@ -1159,8 +1208,10 @@
         }
       ],
       "attachesTo": [
-        "substrate"
-      ]
+        "substrate",
+        "vitality"
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "sun",
@@ -1186,7 +1237,8 @@
       ],
       "attachesTo": [
         "illumination"
-      ]
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "swarm",
@@ -1208,7 +1260,8 @@
       ],
       "attachesTo": [
         "vitality"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "thin_air",
@@ -1240,8 +1293,10 @@
         }
       ],
       "attachesTo": [
-        "atmosphere"
-      ]
+        "atmosphere",
+        "hydrology"
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "tide",
@@ -1281,7 +1336,8 @@
       ],
       "attachesTo": [
         "cycle"
-      ]
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "void",
@@ -1303,8 +1359,10 @@
         }
       ],
       "attachesTo": [
-        "illumination"
-      ]
+        "illumination",
+        "thermal"
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "volcano",
@@ -1348,9 +1406,10 @@
         }
       ],
       "attachesTo": [
-        "thermal",
-        "relief"
-      ]
+        "relief",
+        "thermal"
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "wildfire",
@@ -1387,8 +1446,11 @@
         }
       ],
       "attachesTo": [
-        "thermal"
-      ]
+        "hydrology",
+        "thermal",
+        "vitality"
+      ],
+      "acquisition": "starter"
     },
     {
       "id": "wind",
@@ -1421,7 +1483,8 @@
       ],
       "attachesTo": [
         "atmosphere"
-      ]
+      ],
+      "acquisition": "starter"
     }
   ]
 }

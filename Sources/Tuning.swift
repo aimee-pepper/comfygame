@@ -683,6 +683,9 @@ enum Tuning {
 
         // Locked caches — guaranteed Rare+ (design brief).
         static let cacheMoteRange: ClosedRange<Int> = 1...2 // PLACEHOLDER
+        /// How often a cache holds a word for the page. Highest of the three, because the
+        /// vocabulary is the deepest progression and caches are its only repeatable source.
+        static let cacheFocusWeight: Double = 3.0   // PLACEHOLDER
         static let cacheSymbolWeight: Double = 1.0   // PLACEHOLDER
         static let cacheGambitWeight: Double = 1.0   // PLACEHOLDER
         static let cacheMoteWeight: Double = 0.8     // PLACEHOLDER — the fallback, so never a dud

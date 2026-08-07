@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		01649DA229D4F9B920409CF5 /* CreatureTraits.swift in Sources */ = {isa = PBXBuildFile; fileRef = F308F3AB5ABAC31BC6DE4938 /* CreatureTraits.swift */; };
+		01A65B5074EBFC458F077A59 /* VocabularyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */; };
 		01E64B915C4AC1BE0A72A935 /* ResearchViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */; };
 		0290A7D4A5E8A5E8516E171E /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606F9667A67D771D03320DDA /* PersistenceTests.swift */; };
 		030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7582647B2841DB69559E3968 /* BookRulesTests.swift */; };
@@ -249,6 +250,7 @@
 		B543B94C8E89980FDE029D9C /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		B664EB59C95581C3098E542B /* BaseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseState.swift; sourceTree = "<group>"; };
 		B9CABEB714204FCBDE32F8E4 /* BlacksmithView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlacksmithView.swift; sourceTree = "<group>"; };
+		BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyTests.swift; sourceTree = "<group>"; };
 		BDFAE95092D158944E000B02 /* GrammarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarTests.swift; sourceTree = "<group>"; };
 		BDFF9A08573788622472DB26 /* SmithRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmithRules.swift; sourceTree = "<group>"; };
 		BE933E91275B1FF990B69BAA /* EncounterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncounterView.swift; sourceTree = "<group>"; };
@@ -534,6 +536,7 @@
 				C110827C995BC018EA20B47F /* SpilloverTests.swift */,
 				75F880A764AED5BABB194953 /* StackingTests.swift */,
 				F7E8A2DF6BF1E7AB1B5B574C /* TerrainTests.swift */,
+				BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */,
 				9A91FFF6BF680BAFC6742249 /* WorldScaleAndNightTests.swift */,
 				6430D823936296B085FA9EBA /* WorldTests.swift */,
 			);
@@ -785,6 +788,7 @@
 				2849825A00283A75E65E3C88 /* SpilloverTests.swift in Sources */,
 				D70BCC3356D30C3EC0FFA587 /* StackingTests.swift in Sources */,
 				5DEF7F6C69BC916C96535B2D /* TerrainTests.swift in Sources */,
+				01A65B5074EBFC458F077A59 /* VocabularyTests.swift in Sources */,
 				66727C83C77239282A12ADBC /* WorldScaleAndNightTests.swift in Sources */,
 				11BD659A05151A43A4F78554 /* WorldTests.swift in Sources */,
 			);

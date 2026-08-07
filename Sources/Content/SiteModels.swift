@@ -168,6 +168,10 @@ struct SiteContents: Codable, Equatable, Sendable {
     var items: [ItemID]
     /// Symbols the site can teach outright. This is where rune knowledge lives instead of a shop.
     var teaches: [SymbolID]
+    /// **Focuses the site can teach** — the words themselves, as opposed to a compound of them.
+    /// The vocabulary is a progression, and finding a word carved on a wall is the best of the
+    /// three ways into it.
+    var teachesFocuses: [PressureSourceID] = []
     /// Essence granted outright. `docs/sites-system.md` says "research points", but research
     /// costs *essence* in the shipped economy and inventing a parallel currency is a design call —
     /// so this grants essence and the question is logged. See questions-for-design Q17.
@@ -178,7 +182,34 @@ struct SiteContents: Codable, Equatable, Sendable {
     var guardian: CreatureID?
 
     var isEmpty: Bool {
-        yields.isEmpty && items.isEmpty && teaches.isEmpty && essence == 0
+        yields.isEmpty && items.isEmpty && teaches.isEmpty && teachesFocuses.isEmpty && essence == 0
+    }
+
+    init(yields: [ResourceID: Int] = [:], items: [ItemID] = [], teaches: [SymbolID] = [],
+         teachesFocuses: [PressureSourceID] = [], essence: Int = 0, searchTurns: Int = 1,
+         guardian: CreatureID? = nil) {
+        self.yields = yields
+        self.items = items
+        self.teaches = teaches
+        self.teachesFocuses = teachesFocuses
+        self.essence = essence
+        self.searchTurns = searchTurns
+        self.guardian = guardian
+    }
+
+    /// Tolerant, per the policy in `Migrations.swift`. **A property with a default is not optional
+    /// to synthesised decoding** — adding `teachesFocuses` with `= []` and nothing else would have
+    /// made every site in `sites.json` fail to decode, which is exactly how a defaulted field once
+    /// took the entire content catalogue down.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        yields = try c.decodeIfPresent([ResourceID: Int].self, forKey: .yields) ?? [:]
+        items = try c.decodeIfPresent([ItemID].self, forKey: .items) ?? []
+        teaches = try c.decodeIfPresent([SymbolID].self, forKey: .teaches) ?? []
+        teachesFocuses = try c.decodeIfPresent([PressureSourceID].self, forKey: .teachesFocuses) ?? []
+        essence = try c.decodeIfPresent(Int.self, forKey: .essence) ?? 0
+        searchTurns = try c.decodeIfPresent(Int.self, forKey: .searchTurns) ?? 1
+        guardian = try c.decodeIfPresent(CreatureID.self, forKey: .guardian)
     }
 }
 

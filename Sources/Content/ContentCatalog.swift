@@ -112,6 +112,9 @@ struct ContentCatalog: Sendable {
     var slotIDsInOrder: [SlotID] { slotsInOrder.map(\.id) }
 
     var starterSymbolIDs: [SymbolID] { symbols.filter { $0.acquisition == .starter }.map(\.id) }
+    var starterSourceIDs: [PressureSourceID] {
+        pressureSources.filter { $0.acquisition == .starter }.map(\.id)
+    }
     var stationsInOrder: [StationDef] { stations.sorted { $0.sortOrder < $1.sortOrder } }
 
     /// Description groups that aren't named after a pressure target. Empty for now — every group
@@ -313,6 +316,11 @@ struct ContentCatalog: Sendable {
                 case .symbol:
                     guard let id = grant.id, symbolIDs.contains(SymbolID(rawValue: id)) else {
                         throw ContentError.danglingReference("node '\(node.id)' grants unknown symbol '\(grant.id ?? "nil")'")
+                    }
+                case .focus:
+                    guard let id = grant.id,
+                          pressureSource(PressureSourceID(rawValue: id)) != nil else {
+                        throw ContentError.danglingReference("node '\(node.id)' grants unknown focus '\(grant.id ?? "nil")'")
                     }
                 case .effect:
                     guard grant.effect != nil else {

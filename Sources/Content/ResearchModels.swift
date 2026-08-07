@@ -139,6 +139,9 @@ struct ResearchGrant: Codable, Equatable, Sendable {
     enum Kind: String, Codable, Sendable {
         case gambitComponent
         case symbol
+        /// A focus — a word for the page. The vocabulary is a progression now, and the Workshop is
+        /// one of the three ways into it (the others being found in a world, and taught by a site).
+        case focus
         case effect
     }
 

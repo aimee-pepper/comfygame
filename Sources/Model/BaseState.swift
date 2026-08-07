@@ -18,6 +18,15 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Owned catalog entries. Definitions are data; the save stores only which ones are owned.
     var ownedSymbols: Set<SymbolID> = []
 
+    /// **The words you can actually write.**
+    ///
+    /// Rune spec principle 2 is *"every **discovered** rune stays writable forever"*, and discovery
+    /// was the half that never existed: the palette listed the entire catalogue, so a new player
+    /// had all forty-two focuses on their first page. The page's central tension — depth against
+    /// breadth, what earns its cells — arrived complete on turn one, and nothing found out in a
+    /// world could ever be a word you didn't have.
+    var ownedSources: Set<PressureSourceID> = []
+
     /// The parts you can build rules out of. Learned from the research tree, or found in the wild.
     var ownedGambitComponents: Set<GambitComponentID> = []
 
@@ -110,6 +119,7 @@ struct BaseState: Codable, Equatable, Sendable {
     static func newGame() -> BaseState {
         var state = BaseState()
         state.ownedSymbols = Set(ContentCatalog.shared.starterSymbolIDs)
+        state.ownedSources = Set(ContentCatalog.shared.starterSourceIDs)
         state.ownedGambitComponents = Set(GambitStarter.components)
         state.stations = ContentCatalog.shared.stations.reduce(into: [:]) { result, station in
             result[station.id] = StationState(isUnlocked: station.unlockedAtStart, tier: station.startingTier)
@@ -162,6 +172,17 @@ struct BaseState: Codable, Equatable, Sendable {
         joined.gambits = GambitStarter.rules
         roster.append(joined)
         return true
+    }
+
+    /// **Whatever the game currently calls a starting word, you have it.**
+    ///
+    /// The same shape as `seatEveryoneFound` and for the same reason: which focuses are starters is
+    /// content, it will be re-cut during balancing, and a save written against an older list must
+    /// not end up unable to say something the game considers basic. Grows the vocabulary only —
+    /// nothing is ever taken back, which is the rune spec's own promise.
+    mutating func learnEveryStarterWord() {
+        ownedSources.formUnion(ContentCatalog.shared.starterSourceIDs)
+        ownedSymbols.formUnion(ContentCatalog.shared.starterSymbolIDs)
     }
 
     /// **Everybody you've found has to be somewhere you can see them.**
@@ -239,6 +260,7 @@ struct BaseState: Codable, Equatable, Sendable {
     private enum CodingKeys: String, CodingKey {
         case essence, resources, inventory, spillover, ownedSymbols, ownedGambitComponents
         case completedResearch, stations, bookDraft, page, ownedHands, hasChainingUnlock
+        case ownedSources
         case roster, activeCompanion, binderEquipped, hasAutomateSelfUnlock, satchelTier
         case purchasedGambitSlots, binderGambits, binderCharacter
         case companion
@@ -251,6 +273,7 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(inventory, forKey: .inventory)
         try c.encode(spillover, forKey: .spillover)
         try c.encode(ownedSymbols, forKey: .ownedSymbols)
+        try c.encode(ownedSources, forKey: .ownedSources)
         try c.encode(ownedGambitComponents, forKey: .ownedGambitComponents)
         try c.encode(completedResearch, forKey: .completedResearch)
         try c.encode(stations, forKey: .stations)
@@ -275,6 +298,7 @@ struct BaseState: Codable, Equatable, Sendable {
         inventory = try container.decodeIfPresent(Inventory.self, forKey: .inventory)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
         ownedSymbols = try container.decodeIfPresent(Set<SymbolID>.self, forKey: .ownedSymbols) ?? []
+        ownedSources = try container.decodeIfPresent(Set<PressureSourceID>.self, forKey: .ownedSources) ?? []
         ownedGambitComponents = try container.decodeIfPresent(Set<GambitComponentID>.self,
                                                               forKey: .ownedGambitComponents)
             ?? Set(GambitStarter.components)

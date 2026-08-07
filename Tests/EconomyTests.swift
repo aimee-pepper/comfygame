@@ -221,6 +221,7 @@ final class EconomyTests: XCTestCase {
         XCTAssertNotNil(store.carriedCacheKey, "The key came from a different world entirely")
 
         let symbolsBefore = store.state.base.ownedSymbols.count
+        let sourcesBefore = store.state.base.ownedSources.count
         let componentsBefore = store.state.base.ownedGambitComponents.count
         let motesBefore = store.state.reality.motes
         let reward = try XCTUnwrap(store.openCacheHere())
@@ -228,8 +229,9 @@ final class EconomyTests: XCTestCase {
         XCTAssertNil(store.carriedCacheKey, "The key is spent")
         XCTAssertFalse(store.isOnLockedCache, "The cache is opened, not reopenable")
 
-        // Guaranteed Rare+: a new symbol, a new rule, or motes. Never nothing.
+        // Guaranteed Rare+: a word, a symbol, a new rule, or motes. Never nothing.
         switch reward {
+        case .focus: XCTAssertEqual(store.state.base.ownedSources.count, sourcesBefore + 1)
         case .symbol: XCTAssertEqual(store.state.base.ownedSymbols.count, symbolsBefore + 1)
         case .gambitComponent: XCTAssertEqual(store.state.base.ownedGambitComponents.count, componentsBefore + 1)
         case .motes(let amount):
@@ -257,6 +259,7 @@ final class EconomyTests: XCTestCase {
     func testACacheAlwaysPaysSomething() {
         var state = GameState.newGame()
         state.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
+        state.base.ownedSources = Set(ContentCatalog.shared.pressureSources.map(\.id))
         state.base.ownedGambitComponents = Set(ContentCatalog.shared.gambitComponents.map(\.id))
         var rng = SeededRNG(seed: 4242)
 

@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER costs. ALL research lives here, gated behind themed branches with prerequisites — there is no flat shopping list anywhere in the game. A node is a one-time unlock; repeatable things (shelving I/II/III) are separate nodes chained by 'requires', which keeps the tree honest and removes the idea of ranks entirely. 'grants' is what unlocking it hands you: a gambit component, a symbol, or an effect on base state. The Hold's ladder runs long and gets steeply expensive on purpose (decisions-session-16 §2): three tiers capped storage at twenty slots forever, which fights the hoarding pillar. With materials binning by kind the ladder is buying room for *variety* rather than for volume. PLACEHOLDER costs. PENMANSHIP LIVES AT THE SCRIPTORIUM and has NO free rungs (Aimee, 6 Aug: 'the player MUST meet the calligrapher to progress. it's core to the game'). That is a stated exception to Q40's rule that a building's first rungs stay reachable — the rule protects capacity, and the hands are not a convenience, they are what the game is about. The hands were also badly underpriced: a pencil roughly doubles what a page can say and cost less than a storehouse tier. Each hand now names a rare material from a specific kind of world, so upgrading your hand means going and writing for it. 'lead' from the spec is copper here — the ductile metal that already exists. 'needsStationTier' gates a node on its building's tier, which is the job maxTier never had.",
+  "_note": "PLACEHOLDER costs. ALL research lives here, gated behind themed branches with prerequisites \u2014 there is no flat shopping list anywhere in the game. A node is a one-time unlock; repeatable things (shelving I/II/III) are separate nodes chained by 'requires', which keeps the tree honest and removes the idea of ranks entirely. 'grants' is what unlocking it hands you: a gambit component, a symbol, or an effect on base state. The Hold's ladder runs long and gets steeply expensive on purpose (decisions-session-16 \u00a72): three tiers capped storage at twenty slots forever, which fights the hoarding pillar. With materials binning by kind the ladder is buying room for *variety* rather than for volume. PLACEHOLDER costs. PENMANSHIP LIVES AT THE SCRIPTORIUM and has NO free rungs (Aimee, 6 Aug: 'the player MUST meet the calligrapher to progress. it's core to the game'). That is a stated exception to Q40's rule that a building's first rungs stay reachable \u2014 the rule protects capacity, and the hands are not a convenience, they are what the game is about. The hands were also badly underpriced: a pencil roughly doubles what a page can say and cost less than a storehouse tier. Each hand now names a rare material from a specific kind of world, so upgrading your hand means going and writing for it. 'lead' from the spec is copper here \u2014 the ductile metal that already exists. 'needsStationTier' gates a node on its building's tier, which is the job maxTier never had.",
   "branches": [
     {
       "id": "instruction",
@@ -21,6 +21,13 @@
       "icon": "archivebox",
       "blurb": "What you can carry, store and keep.",
       "order": 2
+    },
+    {
+      "id": "lexicon",
+      "name": "The Lexicon",
+      "icon": "character.book.closed",
+      "blurb": "Words for the page. Every one of them is a thing you could already see; what you buy here is the way to say it.",
+      "order": 3
     },
     {
       "id": "bargain",
@@ -944,6 +951,218 @@
         }
       ],
       "needsStationTier": 2
+    },
+    {
+      "id": "study_weather",
+      "branch": "lexicon",
+      "name": "Weather",
+      "icon": "cloud.rain",
+      "blurb": "Rain, and what it does to everything under it.",
+      "cost": {
+        "essence": 18,
+        "resources": {
+          "fiber": 4
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "rain"
+        }
+      ]
+    },
+    {
+      "id": "study_snowfall",
+      "branch": "lexicon",
+      "name": "Snowfall",
+      "icon": "snowflake",
+      "blurb": "Water that falls slowly and stays.",
+      "cost": {
+        "essence": 26,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [
+        "study_weather"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "snow"
+        }
+      ]
+    },
+    {
+      "id": "study_haar",
+      "branch": "lexicon",
+      "name": "Haar",
+      "icon": "cloud.fog",
+      "blurb": "The air holding water without letting go of it.",
+      "cost": {
+        "essence": 24,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [
+        "study_weather"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "mist"
+        }
+      ]
+    },
+    {
+      "id": "study_standing",
+      "branch": "lexicon",
+      "name": "Standing water",
+      "icon": "drop.circle",
+      "blurb": "Water that stops, and what collects around it.",
+      "cost": {
+        "essence": 22,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "lake"
+        }
+      ]
+    },
+    {
+      "id": "study_wetland",
+      "branch": "lexicon",
+      "name": "Wetland",
+      "icon": "leaf.arrow.circlepath",
+      "blurb": "Ground that never decides whether it is water.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "fiber": 7
+        }
+      },
+      "requires": [
+        "study_standing"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "marsh"
+        }
+      ]
+    },
+    {
+      "id": "study_springs",
+      "branch": "lexicon",
+      "name": "Springs",
+      "icon": "humidity",
+      "blurb": "Water arriving from underneath, hot.",
+      "cost": {
+        "essence": 34,
+        "resources": {
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "study_standing"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "geyser"
+        }
+      ]
+    },
+    {
+      "id": "study_flowering",
+      "branch": "lexicon",
+      "name": "Flowering",
+      "icon": "camera.macro",
+      "blurb": "Things that grow for the sake of being seen.",
+      "cost": {
+        "essence": 20,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "bloom"
+        }
+      ]
+    },
+    {
+      "id": "study_decay",
+      "branch": "lexicon",
+      "name": "Decay",
+      "icon": "aqi.low",
+      "blurb": "What happens after. It is not nothing.",
+      "cost": {
+        "essence": 24,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [
+        "study_flowering"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "rot"
+        }
+      ]
+    },
+    {
+      "id": "study_mycology",
+      "branch": "lexicon",
+      "name": "Mycology",
+      "icon": "circle.hexagongrid",
+      "blurb": "What grows where there is no sun to grow by.",
+      "cost": {
+        "essence": 32,
+        "resources": {
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "study_decay"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "fungus"
+        }
+      ]
+    },
+    {
+      "id": "study_lattice",
+      "branch": "lexicon",
+      "name": "Lattice",
+      "icon": "diamond",
+      "blurb": "Stone that grew rather than settled.",
+      "cost": {
+        "essence": 36,
+        "resources": {
+          "fiber": 9
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "crystal"
+        }
+      ]
     }
   ]
 }
