@@ -1,0 +1,205 @@
+import XCTest
+@testable import Bookbinder
+
+/// **Everything authored must be reachable by something writable.**
+///
+/// The generalisation of the Constellation fossil guard (`fossil-audit.md` §6): a thing that exists
+/// in the catalogue and can never occur is a lie the game tells about itself, and grep can't find it
+/// because the thing is *there*.
+///
+/// It also guards a whole class of silent breakage. Every clause, site and creature is gated on
+/// absolute readings — "substrate above 58", "illumination below 10" — and those numbers were
+/// authored against a scale where four subjects started at zero. Moving the floor to ordinary (7
+/// Aug) shifted illumination by 45, substrate by 30, relief by 35 and vitality by 40 in one motion.
+/// Nothing would have thrown. Content would just have quietly stopped happening.
+final class ReachableContentTests: XCTestCase {
+
+    /// A broad sweep of worlds: every source written against every target it can attach to, at each
+    /// intensity, plus pairs, plus the compounds, plus a long tail of rolled worlds.
+    private func sampleWorlds() -> [PressureReadings] {
+        var out: [PressureReadings] = []
+        var id: UInt64 = 0
+        func sigil(_ s: PressureSourceID, _ t: PressureTargetID, _ i: Intensity) -> Sigil {
+            id += 1
+            return Sigil(id: InstanceID(rawValue: id), source: s, target: t, intensity: i)
+        }
+
+        let sources = ContentCatalog.shared.pressureSources.sorted { $0.id.rawValue < $1.id.rawValue }
+
+        // One word at a time, at every strength.
+        for source in sources {
+            for target in source.attachesTo {
+                for intensity in Intensity.allCases where intensity != .absent {
+                    out.append(PressureRules.resolve([sigil(source.id, target, intensity)]))
+                }
+            }
+        }
+
+        // Two words at a time, at full strength — where the extremes live.
+        for a in sources {
+            for b in sources where b.id.rawValue > a.id.rawValue {
+                guard let ta = a.attachesTo.first, let tb = b.attachesTo.first else { continue }
+                out.append(PressureRules.resolve([
+                    sigil(a.id, ta, .overwhelming), sigil(b.id, tb, .overwhelming),
+                ]))
+            }
+        }
+
+        // Every compound.
+        for symbol in ContentCatalog.shared.symbols {
+            out.append(PressureRules.resolve(BookRules.sigils(of: symbol)))
+        }
+
+        // And a tail of worlds nobody wrote, which is most of them.
+        for seed in UInt64(1)...300 {
+            out.append(PressureRules.resolve([], fillingUnwrittenWith: seed))
+        }
+        return out
+    }
+
+    // MARK: Descriptions
+
+    /// A clause the world can never satisfy is a sentence the game will never say.
+    func testEveryDescriptionClauseCanBeSaid() {
+        let worlds = sampleWorlds()
+        var said: Set<String> = []
+        for world in worlds {
+            for clause in DescriptionRules.describe(world, contradictions: []).clauses {
+                said.insert(clause.id)
+            }
+        }
+        let never = ContentCatalog.shared.descriptionClauses
+            .map(\.id).filter { !said.contains($0) }.sorted()
+        XCTAssertTrue(never.isEmpty, "clauses no world can ever say: \(never.joined(separator: ", "))")
+    }
+
+    /// …and one that fires for *every* world says nothing at all. Exempted: the per-group fallbacks,
+    /// whose whole job is to have something to say when nothing else applies.
+    func testNoDescriptionClauseFiresForEveryWorld() {
+        let worlds = sampleWorlds()
+        var count: [String: Int] = [:]
+        for world in worlds {
+            for clause in DescriptionRules.describe(world, contradictions: []).clauses {
+                count[clause.id, default: 0] += 1
+            }
+        }
+        let fallbacks = Set(ContentCatalog.shared.descriptionClauses
+            .filter { $0.conditions.isEmpty }.map(\.id))
+        for (id, fired) in count where !fallbacks.contains(id) {
+            XCTAssertLessThan(fired, worlds.count,
+                              "'\(id)' is true of every world, so it distinguishes nothing")
+        }
+    }
+
+    // MARK: Sites
+
+    func testEverySiteCanOccurSomewhere() {
+        let worlds = sampleWorlds()
+        // Some sites are gated on the world having *argued with itself*, so the sample has to carry
+        // a contradiction as well as a set of readings.
+        let named = Array(ContentCatalog.shared.contradictions.prefix(1))
+        var possible: Set<SiteID> = []
+        for world in worlds {
+            for site in ContentCatalog.shared.sites where site.isEligible(in: world, contradictions: named) {
+                possible.insert(site.id)
+            }
+        }
+        let never = ContentCatalog.shared.sites
+            .map(\.id).filter { !possible.contains($0) }
+            .map(\.rawValue).sorted()
+        XCTAssertTrue(never.isEmpty, "sites no world can host: \(never.joined(separator: ", "))")
+    }
+
+    // MARK: Creatures and resources
+
+    func testEveryCreatureCanLiveSomewhere() {
+        let worlds = sampleWorlds()
+        var possible: Set<CreatureID> = []
+        for world in worlds {
+            for creature in ContentCatalog.shared.creatures where creature.affinity(in: world) > 0 {
+                possible.insert(creature.id)
+            }
+        }
+        let never = ContentCatalog.shared.creatures
+            .map(\.id).filter { !possible.contains($0) }
+            .map(\.rawValue).sorted()
+        XCTAssertTrue(never.isEmpty, "creatures with nowhere to live: \(never.joined(separator: ", "))")
+    }
+
+    func testEveryResourceCanBeFoundSomewhere() {
+        let worlds = sampleWorlds()
+        var possible: Set<ResourceID> = []
+        for world in worlds {
+            for resource in ContentCatalog.shared.resources where resource.abundance(in: world) > 0 {
+                possible.insert(resource.id)
+            }
+        }
+        let never = ContentCatalog.shared.resources
+            .filter { !$0.isRealityCurrency }
+            .map(\.id).filter { !possible.contains($0) }
+            .map(\.rawValue).sorted()
+        XCTAssertTrue(never.isEmpty, "resources no world yields: \(never.joined(separator: ", "))")
+    }
+
+    // MARK: Contradictions
+
+    func testEveryContradictionCanFire() {
+        var fired: Set<ContradictionID> = []
+        var id: UInt64 = 0
+        func sigil(_ s: PressureSourceID, _ t: PressureTargetID, _ i: Intensity,
+                   negating: Set<PressureTargetID> = []) -> Sigil {
+            id += 1
+            return Sigil(id: InstanceID(rawValue: id), source: s, target: t, intensity: i,
+                         negatedTargets: negating)
+        }
+        let sources = ContentCatalog.shared.pressureSources.sorted { $0.id.rawValue < $1.id.rawValue }
+
+        // Opposed pairs, and denials — the two shapes a contradiction has.
+        for a in sources {
+            for b in sources where b.id.rawValue > a.id.rawValue {
+                guard let ta = a.attachesTo.first, let tb = b.attachesTo.first else { continue }
+                let page = [sigil(a.id, ta, .overwhelming), sigil(b.id, tb, .overwhelming)]
+                for c in ContradictionRules.fired(in: page) { fired.insert(c.id) }
+            }
+            for target in a.attachesTo {
+                for denied in ContentCatalog.shared.pressureTargets.map(\.id) {
+                    let page = [sigil(a.id, target, .overwhelming, negating: [denied])]
+                    for c in ContradictionRules.fired(in: page) { fired.insert(c.id) }
+                }
+            }
+        }
+
+        let never = ContentCatalog.shared.contradictions
+            .map(\.id).filter { !fired.contains($0) }
+            .map(\.rawValue).sorted()
+        XCTAssertTrue(never.isEmpty, "contradictions nothing can trigger: \(never.joined(separator: ", "))")
+    }
+
+    // MARK: Conditions
+
+    /// **A condition that can never hold is a rule that does nothing**, and it is invisible: the
+    /// content it gates still occurs, just never for the reason it claims. Ichor preferred worlds
+    /// with an `unexplained` light tag that nothing has ever produced.
+    ///
+    /// This is the measurement that found it, kept as a test — the same move as the Constellation
+    /// guard, applied to every gate in the catalogue rather than to one of them.
+    func testEveryAuthoredConditionCanHoldSomewhere() {
+        let worlds = sampleWorlds()
+        var dead: [String] = []
+        func check(_ label: String, _ conditions: [(String, PressureCondition)]) {
+            for (owner, condition) in conditions where !worlds.contains(where: { condition.holds(in: $0) }) {
+                dead.append("\(label) \(owner): \(condition)")
+            }
+        }
+        check("creature", ContentCatalog.shared.creatures.flatMap { c in
+            (c.requires + c.favours).map { (c.id.rawValue, $0) } })
+        check("resource", ContentCatalog.shared.resources.flatMap { r in
+            (r.requires + r.favours).map { (r.id.rawValue, $0) } })
+        check("site", ContentCatalog.shared.sites.flatMap { s in
+            s.conditions.map { (s.id.rawValue, $0) } })
+        check("clause", ContentCatalog.shared.descriptionClauses.flatMap { c in
+            c.conditions.map { (c.id, $0) } })
+
+        XCTAssertTrue(dead.isEmpty, "conditions no world can satisfy:\n" + dead.joined(separator: "\n"))
+    }
+}

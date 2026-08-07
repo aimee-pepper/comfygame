@@ -64,10 +64,13 @@ final class PressuresDriveGenerationTests: XCTestCase {
     }
 
     func testTheRosterFollowsTheWorldRatherThanTheSymbol() {
-        // Worlds as they're actually bound: whatever the page didn't say, the world decided. A bare
-        // resolve leaves illumination at nothing, and the life caps then correctly zero the world.
-        let dark = lived(["void": "illumination"])
-        let bright = lived(["sun": "illumination"])
+        // **Bare resolves now**, which is what moving the floor to ordinary bought: this used to
+        // need the chance fill, because a page that said nothing left illumination at zero and the
+        // life caps correctly emptied the world. An unwritten subject sits at ordinary now, so the
+        // two worlds differ by exactly the thing under test — and the assertion stops sampling the
+        // dice, which was making it fail whenever a roll put a moon in the dark world.
+        let dark = readings(["void": "illumination"])
+        let bright = readings(["sun": "illumination"])
         func share(_ id: CreatureID, _ r: PressureReadings) -> Double {
             let table = BookRules.enemyTable(from: r)
             let total = table.reduce(0) { $0 + $1.weight }

@@ -718,6 +718,41 @@
       ]
     },
     {
+      "id": "orrery",
+      "name": "Orrery",
+      "icon": "gearshape.2",
+      "blurb": "A great clockwork, still running. Whoever built it is long gone.",
+      "contributions": [
+        {
+          "target": "cycle",
+          "character": "keeping",
+          "peak": 15,
+          "aspects": {
+            "amplitude": -10,
+            "regularity": 28
+          },
+          "tags": [
+            "seasonal"
+          ]
+        },
+        {
+          "target": "substrate",
+          "character": "hard",
+          "peak": 6,
+          "form": "hard"
+        },
+        {
+          "target": "illumination",
+          "character": "cyclic",
+          "peak": 8,
+          "floor": 0
+        }
+      ],
+      "attachesTo": [
+        "cycle"
+      ]
+    },
+    {
       "id": "rain",
       "name": "Rain",
       "icon": "cloud.rain.fill",
@@ -1206,6 +1241,46 @@
       ],
       "attachesTo": [
         "atmosphere"
+      ]
+    },
+    {
+      "id": "tide",
+      "name": "Tide",
+      "icon": "water.waves",
+      "blurb": "The world moves to a pull. Everything rises and falls with it.",
+      "contributions": [
+        {
+          "target": "cycle",
+          "character": "driving",
+          "peak": 20,
+          "aspects": {
+            "amplitude": 30,
+            "regularity": 15
+          },
+          "tags": [
+            "tidal"
+          ]
+        },
+        {
+          "target": "hydrology",
+          "character": "flowing",
+          "peak": 12,
+          "form": "flowing",
+          "aspects": {
+            "dispersion": 10
+          }
+        },
+        {
+          "target": "relief",
+          "character": "flattening",
+          "peak": -8,
+          "aspects": {
+            "openness": 10
+          }
+        }
+      ],
+      "attachesTo": [
+        "cycle"
       ]
     },
     {

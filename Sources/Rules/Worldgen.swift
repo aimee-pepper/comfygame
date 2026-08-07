@@ -95,7 +95,8 @@ enum Worldgen {
             map[point].content = .node(ResourceNode(
                 resource: resource,
                 remainingHarvests: nodeRNG.int(in: Tuning.World.harvestTurnsRange),
-                yieldPerHarvest: nodeRNG.int(in: Tuning.World.nodeYieldRange)
+                yieldPerHarvest: nodeYield(dispersion: readings["substrate"].aspect("dispersion"),
+                                           rng: &nodeRNG)
             ))
             occupied.insert(point)
         }
@@ -267,8 +268,25 @@ enum Worldgen {
 
         let base = Double(rng.int(in: Tuning.World.baseNodeCountRange))
         // Pervasive: more nodes, each ordinary. Concentrated: fewer, and worth finding.
-        let spread = 0.6 + dispersion * 0.8
+        //
+        // **Narrower than it was**, because the two terms could cancel outright: a scattered poor
+        // world and a concentrated rich one came out at 277 and 276 nodes, so "a greedier book puts
+        // more on the ground" stopped being true. Spread decides how the same wealth is *arranged*;
+        // richness decides how much of it there is, and has to be the louder of the two.
+        let spread = Tuning.World.nodeSpreadFloor
+            + dispersion * (1 - Tuning.World.nodeSpreadFloor) * 2
         return max(1, Int((base * (0.4 + richness) * spread).rounded()))
+    }
+
+    /// **What one node is worth, given how the world arranged its wealth.**
+    ///
+    /// The other half of the same sentence, and it was never built: "concentrated: fewer, and worth
+    /// finding" set the count and left every node paying the same flat roll, so concentration was
+    /// all cost and no reward.
+    static func nodeYield(dispersion: Double, rng: inout SeededRNG) -> Int {
+        let concentration = 1 - min(1, max(0, dispersion / Tuning.Pressure.scaleMaximum))
+        let bonus = 1 + concentration * Tuning.World.nodeYieldConcentrationBonus
+        return max(1, Int((Double(rng.int(in: Tuning.World.nodeYieldRange)) * bonus).rounded()))
     }
 
     /// How many things are actually standing in the world.

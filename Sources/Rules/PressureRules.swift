@@ -247,6 +247,18 @@ enum PressureRules {
         if range <= Tuning.Pressure.flatRangeThreshold { derived.insert("constant") }
         // Lit, but not by anything in the sky.
         if target.id == "illumination", floor > 0, !tags.contains("celestial") { derived.insert("sourceless") }
+        // **A diurnal and a nocturnal population in one world.** Bright days and true dark, so there
+        // are two livings to be made here rather than one.
+        //
+        // It lived in `WorldConstraints.character(of:)` as a creature trait, while the description
+        // clause that names it looked for it here as a tag — two bags with the same word in them, so
+        // "Day and night are different worlds here" was a sentence the game could never say. It is
+        // derived once, in the place the reading is made, and both consumers read it.
+        if target.id == "illumination",
+           floor < Tuning.Pressure.trueDarkFloor,
+           range >= Tuning.Pressure.wideRangeThreshold {
+            derived.insert("two-niches")
+        }
         return derived
     }
 }

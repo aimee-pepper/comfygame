@@ -93,12 +93,16 @@ enum Tuning {
 
         /// Peak−floor spread at which a world's day and night are meaningfully different runs.
         static let wideRangeThreshold: Double = 50 // PLACEHOLDER
+        /// The floor below which a night counts as **true dark** — dark enough that living in it is
+        /// a different trade from living in the day, which is what makes a nocturnal niche real.
+        static let trueDarkFloor: Double = 5       // PLACEHOLDER
         /// …and the spread below which nothing ever changes.
-        static let flatRangeThreshold: Double = 15 // PLACEHOLDER
+        ///
         /// Both are read against an **ordinary** swing of 45 (illumination's day 45, night 0) rather
         /// than against a world that starts black, so "flat" means a third of ordinary rather than
         /// nothing at all. Enough cloud closes the day to a range of 13, which is the world the
         /// `constant` tag exists to name.
+        static let flatRangeThreshold: Double = 15 // PLACEHOLDER
 
         // Cross-target constraints — "the teeth". All PLACEHOLDER.
         /// How strongly air density pulls the thermal swing together (or, thin, pushes it apart).
@@ -237,6 +241,14 @@ enum Tuning {
         // Worldgen
         static let baseNodeCountRange: ClosedRange<Int> = 8...12   // PLACEHOLDER, scaled by book
         static let nodeYieldRange: ClosedRange<Int> = 1...3        // PLACEHOLDER, per pull
+        /// How much richer a node is in a world that keeps its wealth in a few places. The reward
+        /// half of "concentrated: fewer, and worth finding" — the cost half was built and this
+        /// wasn't, so concentration was pure downside. **[PLACEHOLDER]**
+        static let nodeYieldConcentrationBonus: Double = 1.2
+        /// The least the spread term can scale node count by, at full concentration. Kept close to 1
+        /// so arrangement can't outshout richness: at 0.6 a scattered poor world and a concentrated
+        /// rich one produced the same number of nodes. **[PLACEHOLDER]**
+        static let nodeSpreadFloor: Double = 0.8
         static let baseEnemyCountRange: ClosedRange<Int> = 3...5   // PLACEHOLDER, scaled by danger
         static let enemiesPerDangerTier: Int = 2                   // PLACEHOLDER
         /// **What vitality does to how many things are standing in a world.** Multipliers on the

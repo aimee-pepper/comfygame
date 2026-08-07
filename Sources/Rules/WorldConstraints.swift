@@ -221,9 +221,9 @@ enum WorldConstraints {
         if light.has("sourceless") || light.peak < Tuning.Pressure.aphoticPeak {
             traits.insert("emanation-favoured")
         }
-        if light.floor < 5, light.range > Tuning.Pressure.wideRangeThreshold {
-            traits.insert("two-niches") // a diurnal and a nocturnal population in one world
-        }
+        // Derived where the reading is made, so the description and the creature system agree about
+        // what a two-niche world is rather than each deciding for itself.
+        if light.has("two-niches") { traits.insert("two-niches") }
         return traits
     }
 }
