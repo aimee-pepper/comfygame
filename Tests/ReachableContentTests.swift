@@ -202,4 +202,49 @@ final class ReachableContentTests: XCTestCase {
 
         XCTAssertTrue(dead.isEmpty, "conditions no world can satisfy:\n" + dead.joined(separator: "\n"))
     }
+
+    // MARK: Travellers
+
+    /// **A signature clue has to discriminate.** Both directions matter and the guard above only
+    /// caught one of them: a clue nothing satisfies hides a person forever, and a clue *everything*
+    /// satisfies is not a clue at all — it just means the search loop hands them to you.
+    ///
+    /// This is the case that got past me twice. Isolde's threshold was `substrate ≥ 30` while
+    /// substrate's ordinary value is exactly 30, so "there is something in the rock that holds a
+    /// light" was true of any world with ordinary rock in it, and she turned up in two thirds of
+    /// blank books. I set that number when substrate started at zero; moving the floor emptied it
+    /// without touching the file.
+    func testEverySignatureClueTellsWorldsApart() {
+        var worlds: [PressureReadings] = []
+        for seed in UInt64(1)...400 {
+            worlds.append(BookRules.readings(for: BookRules.resolveBook(page: Page()), seed: seed))
+        }
+        for traveller in ContentCatalog.shared.travellers {
+            for clue in traveller.signature {
+                let hits = worlds.count { clue.condition.holds(in: $0) }
+                let share = Double(hits) / Double(worlds.count)
+                XCTAssertGreaterThan(share, 0.01,
+                    "\(traveller.id.rawValue): '\(clue.passage)' is true of almost nothing, so they can't be found")
+                XCTAssertLessThan(share, 0.85,
+                    "\(traveller.id.rawValue): '\(clue.passage)' is true of \(Int(share * 100))% of worlds, "
+                    + "so it isn't a clue — check it against the subject's ordinary value")
+            }
+        }
+    }
+
+    /// And nobody may be *so* easy to run into that the search loop isn't a search.
+    func testNobodyTurnsUpInMostWorlds() {
+        var worlds: [PressureReadings] = []
+        for seed in UInt64(1)...400 {
+            worlds.append(BookRules.readings(for: BookRules.resolveBook(page: Page()), seed: seed))
+        }
+        for traveller in ContentCatalog.shared.travellers {
+            let hits = worlds.count { traveller.isFound(in: $0) }
+            let share = Double(hits) / Double(worlds.count)
+            XCTAssertLessThan(share, 0.4,
+                "\(traveller.name) is standing in \(Int(share * 100))% of blank books — that isn't a search")
+            XCTAssertGreaterThan(share, 0.02,
+                "\(traveller.name) turns up in \(Int(share * 100))% of blank books — that may be a wall")
+        }
+    }
 }

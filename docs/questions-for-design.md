@@ -1159,3 +1159,69 @@ can't close the door behind you.
 3. **Relief, Hydrology and Atmosphere each have exactly one or two subtractive words.** They work,
    but they're thin — a subject you can only really write upward is the fault we just fixed, in
    slower motion.
+
+---
+
+## Q47 — You meet everybody far too easily, and progression has no pace
+
+**[AIMEE, 7 Aug]** — *"82% of blank book worlds containing a traveller is too high. we need there
+to be game progression."*
+
+She's right, and I measured it while chasing the firepit bug. **Writing nothing at all — a blank
+book, which is what a new player binds while learning — put somebody in front of you in 82% of
+worlds.** Median run to first meeting: **1**. Median runs to have met all six: **19**.
+
+The search loop is the spine of the game: read a diary, work out what world its author was standing
+in, write that world, walk up to them. At these rates you don't do any of that. You bind whatever
+and people are simply there.
+
+### Where it came from, and the part I've already fixed
+
+One character accounted for most of it. Isolde was in **67%** of blank books; everybody else was
+9–25%.
+
+| | clue 1 | clue 2 | overall |
+|---|---|---|---|
+| Isolde | `relief ≥ 18` (ordinary **35**) — 87% | `substrate ≥ 30` (ordinary **30**) — 76% | **67%** |
+| Mara | `illumination ≥ 60` (ordinary 45) — 25% | | 25% |
+| Sela | three clues, 41–63% each | | 16% |
+| Halloway | `thermal ≥ 60` — 48% · `substrate.hard ≥ 35` — 27% | | 11% |
+| Edren | `substrate.hard ≥ 35` — 28% · `thermal.floor ≤ 25` — 27% | | 9% |
+| Tovin | four clues, 32–67% each | | 9% |
+
+**Both of Isolde's thresholds sat at or below her subject's ordinary value**, so *"There is something
+in the rock that holds a light"* was true of any world with ordinary rock in it. That is a defect
+rather than a pacing choice, and it is mine twice over: I set those numbers when relief and
+substrate started at **0**, and moving the floor to ordinary (Q45) emptied them without touching the
+file. **Fixed** — `relief ≥ 55`, `substrate ≥ 55`, which is what *"stone above, stone below"* and
+*"something in the rock"* actually describe. She lands at **26%**, and the two guards that stop her
+deadlocking a save — writable in charcoal, holds through 18 of 20 rolls — are both still green.
+
+**A guard now covers the whole class**, because I had already missed this once in the other
+direction: `ReachableContentTests` asserts every signature clue is true of between 1% and 85% of
+worlds, and that nobody stands in more than 40% of blank books. A clue that is always true is as
+dead as one that is never true, and only the second kind is visible.
+
+### What's left is yours, because it's pacing
+
+Even fixed, the numbers are **Isolde 26%, Mara 25%, Sela 16%, Halloway 11%, Edren 9%, Tovin 9%** —
+so *somebody* is present in roughly half of all blank books, and six characters take about 19 runs
+to collect without ever reading a diary.
+
+**Three levers, and I don't think this is my call:**
+
+1. **Clue count.** Tovin needs four conditions and lands at 9%; Mara needs one and lands at 25%.
+   The cheapest lever, and the most legible to the player — more clues means more diary pages to
+   find, which is the loop working.
+2. **Should a blank book find anybody at all?** The strongest version of the search loop is that
+   people only stand in worlds somebody *wrote for them* — signatures tight enough that chance
+   almost never satisfies them. That makes every meeting earned, and makes the diary pages
+   load-bearing rather than a hint system you can ignore.
+3. **Should finding them need the clue in hand?** Right now a traveller is placed whenever the
+   world matches, whether or not you've read a page naming them. Gating placement on
+   `knownTravellers` would mean the diary is genuinely how you find people, and the world you wrote
+   by accident holds nobody.
+
+**My lean is 2 and 3 together**, with 1 as the tuning underneath — but progression pace is the
+thing the whole game's shape hangs off, so I've changed nothing beyond the broken thresholds and
+left the rest here.

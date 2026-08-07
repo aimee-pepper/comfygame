@@ -1,5 +1,5 @@
 {
-  "_note": "Travellers and their scattered diaries (decisions-session-7). A traveller is AT A CONDITION SIGNATURE, never N worlds away — difficulty is how hard the signature is to write, so search scales off the writing system. Pages are a GUIDE, NEVER A GATE: write the right world by luck and you find the person without ever reading one. Signature passages are PROSE the player matches against a world description — never a condition, never a value. All PLACEHOLDER.",
+  "_note": "Travellers and their scattered diaries (decisions-session-7). A traveller is AT A CONDITION SIGNATURE, never N worlds away \u2014 difficulty is how hard the signature is to write, so search scales off the writing system. Pages are a GUIDE, NEVER A GATE: write the right world by luck and you find the person without ever reading one. Signature passages are PROSE the player matches against a world description \u2014 never a condition, never a value. All PLACEHOLDER.",
   "travellers": [
     {
       "id": "mara",
@@ -30,7 +30,7 @@
           },
           {
             "ask": "How long have you been here?",
-            "reply": "\"I stopped counting at four hundred. Not days — I don't have days. Four hundred sightings.\" A shrug. \"It's a lot of stick.\""
+            "reply": "\"I stopped counting at four hundred. Not days \u2014 I don't have days. Four hundred sightings.\" A shrug. \"It's a lot of stick.\""
           },
           {
             "ask": "Did you write this place?",
@@ -39,7 +39,7 @@
         ],
         "offer": "There's a base. Come and measure that instead.",
         "accepted": "\"A base.\" She pulls the stick out of the ground and holds onto it. \"Right. I'll want to survey the whole thing before I unpack.\"",
-        "declined": "\"Suit yourself. I'm not going anywhere — that's rather the trouble.\""
+        "declined": "\"Suit yourself. I'm not going anywhere \u2014 that's rather the trouble.\""
       }
     },
     {
@@ -147,7 +147,7 @@
         ],
         "offer": "Come with me. You can leave again whenever you like.",
         "accepted": "\"Now that,\" she says, \"is the first offer anyone's made me that understood the problem.\"",
-        "declined": "\"Fair enough. Mind how you go — and mind the ground here, it lies to you.\""
+        "declined": "\"Fair enough. Mind how you go \u2014 and mind the ground here, it lies to you.\""
       }
     },
     {
@@ -197,7 +197,7 @@
         "researchLead"
       ],
       "meeting": {
-        "opening": "He's sitting with his back to a rock and a closed book on his knees. He looks at you, and then at the sky, and then at you again. \"You wrote this. I can tell by the light — it's got somebody's opinion in it.\"",
+        "opening": "He's sitting with his back to a rock and a closed book on his knees. He looks at you, and then at the sky, and then at you again. \"You wrote this. I can tell by the light \u2014 it's got somebody's opinion in it.\"",
         "questions": [
           {
             "ask": "You were a binder.",
@@ -214,7 +214,7 @@
         ],
         "offer": "I've got ink. Come and use it.",
         "accepted": "\"Careful,\" he says, getting up. \"I'm going to have opinions about your handwriting.\"",
-        "declined": "\"Go on, then. And listen — when the floor starts going, that's not the warning. That's the second warning.\""
+        "declined": "\"Go on, then. And listen \u2014 when the floor starts going, that's not the warning. That's the second warning.\""
       }
     },
     {
@@ -278,7 +278,7 @@
           "condition": {
             "target": "relief",
             "measure": "peak",
-            "minimum": 18
+            "minimum": 55
           },
           "passage": "Stone above, stone below. Nothing here moves but me."
         },
@@ -286,7 +286,7 @@
           "condition": {
             "target": "substrate",
             "measure": "peak",
-            "minimum": 30
+            "minimum": 55
           },
           "passage": "There is something in the rock that holds a light. I have not needed a candle since I came."
         }
@@ -300,7 +300,7 @@
         "questions": [
           {
             "ask": "There's nothing on that board.",
-            "reply": "\"There is on my side of it.\" She finishes the line anyway. \"The hand goes first, you know. Before the eyes, before anything. If I stop, that's it — I don't get it back.\""
+            "reply": "\"There is on my side of it.\" She finishes the line anyway. \"The hand goes first, you know. Before the eyes, before anything. If I stop, that's it \u2014 I don't get it back.\""
           },
           {
             "ask": "You taught this?",
@@ -312,7 +312,7 @@
           }
         ],
         "offer": "Come and teach me. I'll find the lead and the silver.",
-        "accepted": "\"You'll want a room with light in it. And a table that doesn't rock — I'm going to be difficult about the table.\" She's already up. \"Charcoal. Honestly.\"",
+        "accepted": "\"You'll want a room with light in it. And a table that doesn't rock \u2014 I'm going to be difficult about the table.\" She's already up. \"Charcoal. Honestly.\"",
         "declined": "\"Go on then.\" She picks the board back up. \"You'll be back when the page runs out. They always are.\""
       },
       "isRequired": true
@@ -536,7 +536,7 @@
       "id": "tovin_about_isolde",
       "diary": "tovin",
       "kind": "locationClue",
-      "prose": "Isolde taught me. Whatever you think of my handwriting, it was worse. She would have gone to ground somewhere — she could never work by a fire, said the flicker got into the line, and she wanted stone she could see by.",
+      "prose": "Isolde taught me. Whatever you think of my handwriting, it was worse. She would have gone to ground somewhere \u2014 she could never work by a fire, said the flicker got into the line, and she wanted stone she could see by.",
       "about": "isolde",
       "clueIndex": 0,
       "prefersConditions": []
