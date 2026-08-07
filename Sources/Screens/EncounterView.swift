@@ -146,19 +146,22 @@ struct EncounterView: View {
     @ViewBuilder
     private func actionBar(_ run: WorldRun, _ encounter: EncounterState) -> some View {
         VStack(spacing: 8) {
-            if let mode = targetingAction {
+            if targetingAction != nil {
+                // **The keys stay put while you're choosing**, so pressing Attack a second time is
+                // literally the same button in the same place rather than a new affordance to find.
                 HStack {
-                    Text(mode == .attack ? "Choose a target."
-                                        : "Choose a target for \(pendingSkill?.name ?? "your skill").")
+                    Text(secondTapPrompt)
                         .font(.footnote)
-                    Spacer()
-                    Button("Cancel") { targetingAction = nil; pendingSkill = nil }
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                    Button("Cancel") { stopTargeting() }
                         .font(.footnote.weight(.semibold))
                 }
-                .frame(minHeight: 44)
-            } else if store.actingCombatant != nil {
+                .frame(minHeight: 32)
+            }
+            if store.actingCombatant != nil {
                 HStack(spacing: 8) {
-                    ActionKey("Attack", icon: "figure.fencing") { beginTargeting(.attack) }
+                    ActionKey("Attack", icon: "figure.fencing") { attackPressed() }
                     // **Twelve skills don't fit on a key.** Opens the list, which is also where
                     // each one says what it's *for* — the spec's rule that a skill names the
                     // problem it solves is worth nothing if the UI doesn't print it.
@@ -169,10 +172,10 @@ struct EncounterView: View {
                 HStack(spacing: 8) {
                     ActionKey("Item", icon: "cross.vial",
                               detail: store.usableItems.isEmpty ? "none carried" : "\(store.usableItems.count)",
-                              isEnabled: !store.usableItems.isEmpty) { useFirstItem() }
+                              isEnabled: !store.usableItems.isEmpty) { stopTargeting(); useFirstItem() }
                     ActionKey("Flee", icon: "figure.run",
                               detail: "−\(Int(Tuning.Encounter.fleeStabilityCost)) stability",
-                              isDestructive: true) { store.takeCombatAction(.flee) }
+                              isDestructive: true) { stopTargeting(); store.takeCombatAction(.flee) }
                 }
             } else {
                 Text("…")
@@ -193,6 +196,28 @@ struct EncounterView: View {
         let total = store.actorSkills.count
         guard total > 0 else { return "none" }
         return ready == 0 ? "all cooling" : "\(ready) of \(total)"
+    }
+
+    private func stopTargeting() { targetingAction = nil; pendingSkill = nil }
+
+    /// What the second tap will do, said before it's pressed rather than after.
+    private var secondTapPrompt: String {
+        if let pendingSkill {
+            return "Choose a target — or tap Attack to use \(pendingSkill.name) on the first."
+        }
+        return store.wouldActOnOwnRules
+            ? "Choose a target — or tap Attack again to follow your own rules."
+            : "Choose a target — or tap Attack again to take the first."
+    }
+
+    /// **First press picks a target; second press stops asking.**
+    private func attackPressed() {
+        guard targetingAction != nil else { return beginTargeting(.attack) }
+        if let action = store.defaultCombatAction(pendingSkill: pendingSkill?.id) {
+            store.takeCombatAction(action)
+        }
+        targetingAction = nil
+        pendingSkill = nil
     }
 
     private func beginTargeting(_ mode: TargetingMode) {

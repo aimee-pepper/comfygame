@@ -52,6 +52,34 @@ extension GameStore {
     /// A finished fight is deliberately *not* dismissed here. The result stays on screen — who fell,
     /// what it cost — until the player taps through it. Clearing the board the instant the last foe
     /// drops would swallow the one moment the fight was building to.
+    /// **What a second tap means: "you pick."**
+    ///
+    /// Aimee, 7 Aug: *"if you just hit the attack button again it auto attacks either the first mob
+    /// or it uses whatever self applied gambit logic exists if there is any."*
+    ///
+    /// Choosing between four identical wolves is not a decision, it's a tap — and it's the tap you
+    /// make most often in the game. So the second press commits, and what it commits to is, in
+    /// order:
+    ///
+    ///  1. **The skill you already picked**, if one is pending. You chose the verb; the noun is the
+    ///     part that wasn't worth asking about.
+    ///  2. **Your own rule list**, if you've learned to write one. This is the nice one: the game
+    ///     already has a system for *act without me*, and the second tap is exactly that question,
+    ///     so it should be answered by the rules you wrote rather than by a hidden default.
+    ///  3. **The first thing standing**, which is what the list is showing you anyway.
+    func defaultCombatAction(pendingSkill: SkillID? = nil) -> CombatAction? {
+        guard let encounter = activeEncounter, let first = encounter.livingFoes.first else { return nil }
+        if let pendingSkill { return .skill(pendingSkill, foe: first.id) }
+        if let decided = GambitEngine.decide(for: .binder, in: state)?.action { return decided }
+        return .attack(foe: first.id)
+    }
+
+    /// Whether a second tap would hand the turn to your own rules rather than to the default —
+    /// so the prompt can say which, instead of the player having to find out by pressing it.
+    var wouldActOnOwnRules: Bool {
+        GambitEngine.decide(for: .binder, in: state) != nil
+    }
+
     func takeCombatAction(_ action: CombatAction) {
         guard let actor = actingCombatant else { return }
         mutate("combat: \(label(for: action))", flush: true) { state in

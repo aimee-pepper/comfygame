@@ -962,4 +962,88 @@ final class CombatTests: XCTestCase {
         XCTAssertNotNil(store.activeEncounter?.foeBleeds[foeID],
                         "a volatile weapon left nothing behind")
     }
+
+    // MARK: The second tap
+
+    /// **Choosing between four identical wolves is a tap, not a decision** (Aimee, 7 Aug: *"if you
+    /// just hit the attack button again it auto attacks either the first mob or it uses whatever
+    /// self applied gambit logic exists if there is any."*).
+    @MainActor
+    func testTheSecondTapTakesTheFirstThingStanding() throws {
+        let store = try storeInAFightWithSeveralFoes()
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        XCTAssertGreaterThan(encounter.livingFoes.count, 1, "fixture: needs a choice to skip")
+
+        let first = try XCTUnwrap(encounter.livingFoes.first)
+        let action = try XCTUnwrap(store.defaultCombatAction())
+        XCTAssertEqual(action, .attack(foe: first.id),
+                       "with no rules of your own, the second tap takes the first thing standing")
+    }
+
+    /// The nicer half: the game already has a system for *act without me*, so the second tap is
+    /// answered by the rules you wrote rather than by a hidden default.
+    @MainActor
+    func testTheSecondTapFollowsYourOwnRulesOnceYouHaveThem() throws {
+        let store = try storeInAFightWithSeveralFoes()
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        let weakest = try XCTUnwrap(encounter.livingFoes.min { $0.currentHP < $1.currentHP })
+        XCTAssertNotEqual(weakest.id, encounter.livingFoes.first?.id,
+                          "fixture: the rule has to disagree with the plain default")
+
+        XCTAssertFalse(store.wouldActOnOwnRules, "you haven't learned to write your own hand yet")
+
+        store.mutate("test: write your own hand") { state in
+            state.base.hasAutomateSelfUnlock = true
+            state.base.binderGambits = [
+                GambitRule(id: InstanceID(rawValue: 1), subject: "subject_foe_lowest", action: "act_attack")
+            ]
+            state.base.ownedGambitComponents.insert("subject_foe_lowest")
+        }
+
+        XCTAssertTrue(store.wouldActOnOwnRules, "the prompt would lie about what a second tap does")
+        XCTAssertEqual(store.defaultCombatAction(), .attack(foe: weakest.id),
+                       "the second tap ignored the rules the player wrote")
+    }
+
+    /// A verb you already chose doesn't get re-asked either.
+    @MainActor
+    func testTheSecondTapCommitsAPendingSkill() throws {
+        let store = try storeInAFightWithSeveralFoes()
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        let first = try XCTUnwrap(encounter.livingFoes.first)
+        let skill = try XCTUnwrap(ContentCatalog.shared.skills.first { $0.needsFoe })
+
+        XCTAssertEqual(store.defaultCombatAction(pendingSkill: skill.id),
+                       .skill(skill.id, foe: first.id),
+                       "you picked the verb; it shouldn't make you pick the noun as well")
+    }
+
+    /// A fight with three things in it, one of them nearly dead, so "the first thing standing" and
+    /// "the weakest" are different answers and the test can tell them apart.
+    @MainActor
+    private func storeInAFightWithSeveralFoes() throws -> GameStore {
+        let store = GameStore(io: .temporary(name: "secondtap-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 5000 }
+        store.bindAndDepart()
+        guard store.state.worlds.activeRun != nil else { throw XCTSkip("couldn't depart") }
+
+        var traits = CreatureTraits()
+        traits.covering = Covering(hardness: 20, length: 20, coverage: 40)
+        let stats = CombatStats.derived(from: traits, name: "Thing", icon: "pawprint")
+
+        store.mutate("test: three of them") { state in
+            guard var run = state.worlds.activeRun else { return }
+            var rng = SeededRNG(seed: 4242)
+            let foes = (1...3).map {
+                FoeState(id: InstanceID(rawValue: UInt64($0)), traits: traits,
+                         stats: stats, currentHP: stats.maxHP)
+            }
+            var encounter = CombatRules.makeEncounter(id: InstanceID(rawValue: 7), foes: foes, rng: &rng)
+            encounter.foes[encounter.foes.count - 1].currentHP = 1
+            encounter.turnIndex = encounter.order.firstIndex(of: .binder) ?? 0
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        return store
+    }
 }
