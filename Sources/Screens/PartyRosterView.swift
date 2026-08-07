@@ -192,6 +192,21 @@ private struct CharacterPage: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
+
+            // **Where they stand**, with the rest of the character rather than in the room they're
+            // standing in. Set here and never mid-fight, the same rule gambits follow.
+            Divider()
+            Text("Where they stand")
+                .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            Picker("", selection: Binding(get: { character.rank },
+                                          set: { store.setRank($0, of: slot) })) {
+                ForEach(Rank.allCases, id: \.self) { Text($0.displayName).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .frame(minHeight: 44)
+            Text(character.rank.blurb)
+                .font(.caption2).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 

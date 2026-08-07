@@ -1,36 +1,53 @@
 import SwiftUI
 
-/// Where the people you brought home are.
+/// Where the people you've brought home are, and who you can take with you.
 ///
-/// **The one building that isn't found first** (Aimee, 6 Aug). Every other station comes from
-/// meeting somebody who'd run it — but you need somewhere to put the first person before anyone can
-/// build anything, so the firepit is simply here, from the start, built by nobody.
+/// **It is not a second Party screen.** The Party screen is where somebody's gear, rules and stats
+/// live; this is the room they're standing in. Aimee, 7 Aug: *"there are STILL NO AVAILABLE
+/// COMPANIONS around the firepit. It just shows a MASSIVE panel for the party member you ALREADY
+/// HAVE and a front/back row selector for some reason?"* — she was right on both counts. It was
+/// duplicating the roster in a bigger form, and rank belongs with the character, not with the room.
 ///
-/// It exists because recruiting somebody used to be two writes to the Library and nothing else.
-/// Aimee found a companion, lost a run, and had *"no idea what happened to her."* She had never
-/// been lost — `foundTravellers` lives in Reality and nothing takes it — but there was nowhere she
-/// visibly *was*, which feels exactly the same as losing her.
+/// **The one building that isn't found first.** Every other station comes from meeting somebody
+/// who'd run it, but you need somewhere to put the first person before anyone can build anything,
+/// so the firepit is simply here from the start. It becomes the Tavern when the Keeper turns up —
+/// the firepit holds *your* people, the tavern brings you other people's.
 struct FirepitView: View {
     @EnvironmentObject private var store: GameStore
 
     private var roster: [CompanionState] { store.state.base.roster }
+    private var activeIndex: Int { store.state.base.activeCompanion }
+    /// Everybody who isn't currently walking out with you — the point of the screen.
+    private var waiting: [(index: Int, member: CompanionState)] {
+        roster.enumerated().filter { $0.offset != activeIndex }.map { ($0.offset, $0.element) }
+    }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                StationCard(title: "Around the fire", icon: "flame.fill") {
-                    Text(roster.count == 1
-                         ? "Just the two of you, so far. People are found out in the worlds — write the one somebody is standing in, and walk up to them."
-                         : "\(roster.count) of you, and room for \(Tuning.Party.maximumSize - roster.count) more.")
-                        .font(.caption).foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+            VStack(spacing: 12) {
+                StationCard(title: "Who's coming", icon: "figure.walk") {
+                    if roster.indices.contains(activeIndex) {
+                        row(roster[activeIndex], index: activeIndex)
+                    } else {
+                        EmptyNote("Nobody.")
+                    }
                 }
 
-                ForEach(Array(roster.enumerated()), id: \.offset) { index, member in
-                    personCard(member, index: index)
+                StationCard(title: "Around the fire — \(waiting.count)", icon: "flame.fill") {
+                    if waiting.isEmpty {
+                        EmptyNote("Nobody else, yet. People are out in the worlds: read a diary, write the world it describes, and walk up to whoever is standing in it.")
+                    } else {
+                        ForEach(waiting, id: \.index) { entry in
+                            row(entry.member, index: entry.index)
+                        }
+                    }
                 }
 
-                ComingLater("All five of you will fight together. For now one comes along, and the rest keep the fire in.")
+                if !store.state.base.canRecruit {
+                    ComingLater("The fire is full — five is as many as you can keep.")
+                }
+
+                ComingLater("A tavern would bring other people's travellers through, to be asked for directions. Somebody has to keep it, and you haven't met them yet.")
             }
             .padding(16)
         }
@@ -39,42 +56,32 @@ struct FirepitView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private func personCard(_ member: CompanionState, index: Int) -> some View {
-        let isActive = index == store.state.base.activeCompanion
-        return StationCard(title: member.name, icon: member.icon) {
-            if !member.calling.isEmpty {
-                Text(member.calling.capitalisedSentence)
-                    .font(.caption).foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+    /// One person, in one line. Their sheet is on the Party screen; this is just who they are and
+    /// whether they're coming.
+    private func row(_ member: CompanionState, index: Int) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: member.icon)
+                .foregroundStyle(.orange)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(member.name).font(.callout.weight(.medium))
+                Text(member.calling.isEmpty
+                     ? "Level \(member.character.level)"
+                     : "\(member.calling.capitalisedSentence) · level \(member.character.level)")
+                    .font(.caption2).foregroundStyle(.secondary)
             }
-
-            LabeledRow(icon: "chart.bar", label: "Level", value: "\(member.character.level)")
-            LabeledRow(icon: "heart.fill", label: "Health", value: "\(member.maxHP)")
-            LabeledRow(icon: member.character.rank == .front ? "shield.lefthalf.filled" : "figure.stand",
-                       label: member.character.rank.displayName,
-                       value: member.character.rank.blurb)
-
-            // Ranks, changed here rather than mid-fight — the same rule gambits follow.
-            Picker("Where they stand", selection: Binding(
-                get: { member.character.rank },
-                set: { store.setRank($0, forMemberAt: index) }
-            )) {
-                ForEach(Rank.allCases, id: \.self) { Text($0.displayName).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .frame(minHeight: 44)
-
-            if isActive {
-                Text("Coming with you.")
-                    .font(.caption2.weight(.medium))
-                    .foregroundStyle(.green)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(minHeight: 44)
+            Spacer(minLength: 6)
+            if index == activeIndex {
+                Text("with you")
+                    .font(.caption2.weight(.medium)).foregroundStyle(.green)
+                    .padding(.horizontal, 7).padding(.vertical, 3)
+                    .background(Color.green.opacity(0.14), in: Capsule())
             } else {
-                Button("Take them instead") { store.setActiveCompanion(index) }
-                    .frame(maxWidth: .infinity, minHeight: 44)
+                Button("Take them") { store.setActiveCompanion(index) }
+                    .font(.caption2.weight(.medium))
                     .buttonStyle(.bordered)
             }
         }
+        .frame(minHeight: 44)
     }
 }

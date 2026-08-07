@@ -415,16 +415,19 @@ extension GameStore {
         mutate("take \(state.base.roster[index].name)", flush: true) { $0.base.activeCompanion = index }
     }
 
-    /// Front or back, set at the fire and never mid-fight — the same rule gambits follow.
-    func setRank(_ rank: Rank, forMemberAt index: Int) {
-        guard state.base.roster.indices.contains(index), activeEncounter == nil else { return }
-        mutate("rank", flush: true) { $0.base.roster[index].character.rank = rank }
-    }
-
-    /// Where the Binder stands.
-    func setBinderRank(_ rank: Rank) {
+    /// Front or back. **Set on the character's own page**, never mid-fight — the same rule gambits
+    /// follow, and the same place everything else about them lives.
+    func setRank(_ rank: Rank, of slot: PartySlot) {
         guard activeEncounter == nil else { return }
-        mutate("rank", flush: true) { $0.base.binderCharacter.rank = rank }
+        mutate("rank", flush: true) { state in
+            switch slot {
+            case .binder:
+                state.base.binderCharacter.rank = rank
+            case .member(let index):
+                guard state.base.roster.indices.contains(index) else { return }
+                state.base.roster[index].character.rank = rank
+            }
+        }
     }
 
     // MARK: - Building sites
