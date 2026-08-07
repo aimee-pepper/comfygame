@@ -350,4 +350,54 @@ private extension Page {
     var allCellsInReadingOrder: [PageCell] {
         (0..<height).flatMap { row in (0..<width).map { PageCell(column: $0, row: row) } }
     }
+
+    // MARK: The settled vocabulary
+
+    /// **A word invented in a spec is either defined in the interface or renamed before it reaches
+    /// it** (`jargon-audit.md`, the rule adopted 6 Aug). *Rung* failed that twice — coined in a
+    /// spec, into code comments, then into a field name feeding a player-facing string, and nobody
+    /// had ever defined it for Aimee.
+    ///
+    /// This test guards the *content*, which is the half that grows. Code identifiers may stay
+    /// technical; what a player reads may not.
+    func testNoContentSpeaksInSpecJargon() {
+        // Retired in `vocabulary-settled.md`: subject, focus, main focus, modifier, compound.
+        let retired = ["rung", "primary", "pressure target", "qualifier ladder"]
+
+        func check(_ text: String, _ label: String) {
+            for word in retired where text.lowercased().contains(word) {
+                XCTFail("\(label) says \"\(word)\" — spec jargon on a screen")
+            }
+        }
+        for target in ContentCatalog.shared.pressureTargets {
+            check(target.name, "subject \(target.id.rawValue)")
+        }
+        for source in ContentCatalog.shared.pressureSources {
+            check(source.name, "focus \(source.id.rawValue)")
+        }
+        for qualifier in ContentCatalog.shared.qualifiers {
+            check(qualifier.name, "modifier \(qualifier.id.rawValue)")
+        }
+        for node in ContentCatalog.shared.researchNodes {
+            check(node.name, "research node \(node.id.rawValue)")
+            check(node.blurb, "research node \(node.id.rawValue)")
+        }
+        for symbol in ContentCatalog.shared.symbols {
+            check(symbol.name, "compound \(symbol.id.rawValue)")
+            check(symbol.blurb, "compound \(symbol.id.rawValue)")
+        }
+    }
+
+    /// A history written before *rung* was renamed still reads. The record is the answer key, and
+    /// silently losing the one line that says a word did nothing would be the worst thing to drop.
+    func testAWorldRecordedBeforeTheRenameStillReads() throws {
+        let json = """
+        {"id":{"rawValue":7},"seed":7,"runIndex":1,"descriptionSentence":"Bright.",
+         "written":["Illumination ← Vast Sun"],"inertRungs":["Vast on Illumination"],
+         "readings":{},"travellersPresent":[],"isKept":false}
+        """
+        let world = try JSONDecoder().decode(VisitedWorld.self, from: Data(json.utf8))
+        XCTAssertEqual(world.inertModifiers, ["Vast on Illumination"],
+                       "renaming the field dropped the one line that says a word did nothing")
+    }
 }

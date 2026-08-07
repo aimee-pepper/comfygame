@@ -98,6 +98,7 @@ struct HintPage: Equatable, Sendable {
 /// better instruments than you had at the time. Kept deliberately small: the chains as text and the
 /// readings as numbers, not the map — a map is a thing you were in, not a thing you can learn from.
 struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
+
     var id: InstanceID
     /// The world's own seed. Its identity, and what would let it be written again.
     var seed: UInt64
@@ -107,8 +108,13 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
     var descriptionSentence: String
     /// The chains you placed, flattened to text — *Illumination ← Vast Sun*.
     var written: [String]
-    /// A rung written where it changed nothing. The thing you most want to find later.
-    var inertRungs: [String]
+    /// **A modifier written where it changed nothing.** The thing you most want to find later.
+    ///
+    /// Called `inertRungs` until 6 Aug — *rung* was a spec coinage nobody had ever defined for the
+    /// player, and it was one field away from surfacing on screen (`jargon-audit.md`). The rule
+    /// now: a word invented in a spec is either defined in the interface or renamed before it
+    /// reaches it.
+    var inertModifiers: [String]
     /// Every target's peak and floor, for when you can read that far.
     var readings: [String: ReadingSnapshot]
     /// Who was standing in it, whether or not you reached them.
@@ -143,17 +149,37 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
     }
 
     init(id: InstanceID, seed: UInt64, runIndex: Int, descriptionSentence: String,
-         written: [String], inertRungs: [String], readings: [String: ReadingSnapshot],
+         written: [String], inertModifiers: [String], readings: [String: ReadingSnapshot],
          travellersPresent: [TravellerID], isKept: Bool = false) {
         self.id = id
         self.seed = seed
         self.runIndex = runIndex
         self.descriptionSentence = descriptionSentence
         self.written = written
-        self.inertRungs = inertRungs
+        self.inertModifiers = inertModifiers
         self.readings = readings
         self.travellersPresent = travellersPresent
         self.isKept = isKept
+    }
+
+    /// Includes the retired `inertRungs`, so a history written before the rename still reads.
+    private enum CodingKeys: String, CodingKey {
+        case id, seed, runIndex, descriptionSentence, written, inertModifiers, readings
+        case travellersPresent, isKept
+        case inertRungs
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(seed, forKey: .seed)
+        try c.encode(runIndex, forKey: .runIndex)
+        try c.encode(descriptionSentence, forKey: .descriptionSentence)
+        try c.encode(written, forKey: .written)
+        try c.encode(inertModifiers, forKey: .inertModifiers)
+        try c.encode(readings, forKey: .readings)
+        try c.encode(travellersPresent, forKey: .travellersPresent)
+        try c.encode(isKept, forKey: .isKept)
     }
 
     /// Tolerant, per the policy in `Migrations.swift`.
@@ -164,7 +190,8 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         runIndex = try c.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
         descriptionSentence = try c.decodeIfPresent(String.self, forKey: .descriptionSentence) ?? ""
         written = try c.decodeIfPresent([String].self, forKey: .written) ?? []
-        inertRungs = try c.decodeIfPresent([String].self, forKey: .inertRungs) ?? []
+        inertModifiers = try c.decodeIfPresent([String].self, forKey: .inertModifiers)
+            ?? c.decodeIfPresent([String].self, forKey: .inertRungs) ?? []
         readings = try c.decodeIfPresent([String: ReadingSnapshot].self, forKey: .readings) ?? [:]
         travellersPresent = try c.decodeIfPresent([TravellerID].self, forKey: .travellersPresent) ?? []
         isKept = try c.decodeIfPresent(Bool.self, forKey: .isKept) ?? false

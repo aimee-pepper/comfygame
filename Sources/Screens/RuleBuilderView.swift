@@ -21,7 +21,11 @@ struct RuleBuilderView: View {
         NavigationStack {
             Form {
                 Section("When") {
-                    picker("Subject", kind: .subject, selection: $subject)
+                    // **"Who", not "Subject".** *Subject* is now the settled word for one of the
+                    // eight things a world has (`vocabulary-settled.md`), and a rule's subject is a
+                    // person or a creature — two meanings, two screens, one word. "Who" is clearer
+                    // here anyway: a rule is about somebody.
+                    picker("Who", kind: .subject, selection: $subject)
 
                     if store.canWriteConditions {
                         Toggle("Only if…", isOn: $wantsCondition.animation(.snappy))
@@ -32,7 +36,7 @@ struct RuleBuilderView: View {
                             picker("Than", kind: .threshold, selection: $threshold)
                         }
                     } else {
-                        Text("You haven't learned to measure anything yet — rules are simply *subject → action* until you study a property, a comparator and a threshold.")
+                        Text("You haven't learned to measure anything yet — a rule is simply *who → what they do* until you study a property, a comparator and a threshold.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

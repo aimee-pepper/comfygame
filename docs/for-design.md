@@ -169,7 +169,19 @@ moment it is, and it's the kind of question that's much cheaper to answer before
 
 ---
 
-## 7. Housekeeping
+## 7. One collision the jargon audit missed
+
+**"Subject" was already taken.** The gambit rule builder has used *Subject* since it was written,
+meaning *who a rule is about* — a foe, an ally. `vocabulary-settled.md` now gives *subject* to the
+eight things a world has. Two meanings, two screens, one word.
+
+I've renamed the **gambit** one to **Who**, which is clearer in its own right — a rule is about
+somebody, and *"Who: any foe → Attack"* reads better than *"Subject: any foe"*. The writing-desk
+meaning is the one worth protecting, since it's the one that makes a page read as a sentence.
+
+Say if you'd rather it went the other way.
+
+## 8. Housekeeping
 
 - **Q22 — delete the four `pressure-model-*.md` files.** You've already ruled on this; the
   consolidated `pressure-model.md` is the keeper and a stale duplicate under a "newest wins" rule

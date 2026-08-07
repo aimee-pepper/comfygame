@@ -193,6 +193,17 @@
       one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## The settled vocabulary (Aimee, 6 Aug 2026)
+- [x] **Subject · Focus · Main focus · Modifier · Compound** — the palette says "Focuses" and names
+      the subject it's showing, which it never did
+- [x] `inertRungs` → `inertModifiers`, reading the retired key so a history survives the rename
+- [x] "more than one primary per subject" → "more than one main focus per subject"
+- [x] **The gambit builder's "Subject" is now "Who"** — a collision the jargon audit missed
+- [x] A test that content never speaks in spec jargon, since content is the half that grows
+- [ ] Session 17's **Focus** stat lands as **Wit** — Might · Finesse · Fortitude · Perception · Wit
+- [ ] **Greed** and **opposed magnitude** are keepers, and want introducing properly when analysis
+      tier 4 makes instability attribution visible
+
 ## Emanation reaches the fight (Q42, Aimee 6 Aug 2026)
 - [x] **Three statuses** — burn, poison, dazzle, one per emanation the game already generates
 - [x] Toxic things poison you when you hit them, which is what they were advertising

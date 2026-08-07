@@ -93,7 +93,7 @@ enum LibraryRules {
             written: chains.map { chain in
                 "\(chain.target) ← " + chain.parts.map(\.phrase).joined(separator: " · ")
             },
-            inertRungs: chains.flatMap { chain in
+            inertModifiers: chains.flatMap { chain in
                 chain.parts.flatMap(\.qualifiers).filter(\.isInert).map { "\($0.name) on \(chain.target)" }
             },
             readings: Dictionary(uniqueKeysWithValues: readings.inOrder.map { reading in

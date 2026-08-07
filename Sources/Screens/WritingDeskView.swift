@@ -160,6 +160,11 @@ struct WritingDeskView: View {
         switch bin {
         case .target(let id):
             let target = ContentCatalog.shared.pressureTarget(id)
+            // **The word the palette never said out loud.** The eight bins are the eight things a
+            // world has, and the player sees them constantly — but the category had no name, and
+            // strings said *target* in one place and *subject* in another
+            // (`jargon-audit.md`). Settled: **subject**, so the page reads as a sentence.
+            sectionLabel("Subject")
             chips([Chip(glyph: id.rawValue, name: target?.name ?? id.rawValue, content: .target(id))])
             // Only what can be *bound* here. Filtering on "affects this target at all" put rain
             // under Illumination because rain dims light — true, and not something you'd ever write.
@@ -167,7 +172,10 @@ struct WritingDeskView: View {
                 .filter { $0.canAttach(to: id) }
                 .sorted { $0.name < $1.name }
             if !sources.isEmpty {
-                sectionLabel("Causes")
+                // **Focuses**, settled 6 Aug (`vocabulary-settled.md`). A page reads as a sentence:
+                // a subject, its main focus, and modifiers. "Causes" was my word and Aimee's answer
+                // was that it doesn't make sense.
+                sectionLabel("Focuses")
                 chips(sources.map {
                     Chip(glyph: $0.id.rawValue, name: $0.name, content: .source($0.id),
                          stability: store.stabilityOfWriting($0.id, on: id))
@@ -175,7 +183,7 @@ struct WritingDeskView: View {
             }
             let narrow = ContentCatalog.shared.qualifiers.filter { !$0.isGeneric && $0.applies(to: id) }
             if !narrow.isEmpty {
-                sectionLabel("Only here")
+                sectionLabel("Modifiers, only here")
                 chips(narrow.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id)) })
             }
 

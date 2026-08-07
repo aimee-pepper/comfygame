@@ -362,17 +362,20 @@ final class CombatTests: XCTestCase {
         toxic.boneDensity = 90
         toxic.isToxic = true
         toxic.covering = Covering(hardness: 0, length: 0, coverage: 40)
-        let store = inFightWith([toxic])
-        let foe = try XCTUnwrap(foes(store).first)
-        giveTheTurnTo(.binder, in: store)
-        let hpBefore = store.state.worlds.activeRun?.binderHP ?? 0
-
-        store.mutate("test: swing at it") {
-            CombatRules.perform(.attack(foe: foe.id), by: .binder, in: &$0)
+        // Summed over several fights: a swing can simply miss, and a miss is not a trade.
+        var paid = 0
+        for _ in 0..<10 {
+            let store = inFightWith([toxic])
+            guard let foe = foes(store).first, foe.isAlive else { continue }
+            giveTheTurnTo(.binder, in: store)
+            let hpBefore = store.state.worlds.activeRun?.binderHP ?? 0
+            store.mutate("test: swing at it") {
+                CombatRules.perform(.attack(foe: foe.id), by: .binder, in: &$0)
+            }
+            paid += hpBefore - (store.state.worlds.activeRun?.binderHP ?? 0)
         }
-
-        XCTAssertLessThan(store.state.worlds.activeRun?.binderHP ?? 0, hpBefore,
-                          "you traded blows with something toxic and paid nothing")
+        XCTAssertGreaterThan(paid, 0,
+                             "you traded blows with something toxic ten times and paid nothing")
     }
 
     /// Reach beats speed at the moment of contact, whatever the initiative says.

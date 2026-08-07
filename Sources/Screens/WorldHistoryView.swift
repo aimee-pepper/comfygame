@@ -127,8 +127,8 @@ private struct VisitedWorldSheet: View {
                     // **The one thing worth surfacing at any tier**, because it's a mistake in the
                     // writing rather than a fact about the world — you don't need an instrument to
                     // be told a word you wrote did nothing.
-                    if !world.inertRungs.isEmpty {
-                        Text("Said nothing: \(world.inertRungs.joined(separator: ", ")).")
+                    if !world.inertModifiers.isEmpty {
+                        Text("Said nothing: \(world.inertModifiers.joined(separator: ", ")).")
                             .foregroundStyle(.orange)
                     }
                 }

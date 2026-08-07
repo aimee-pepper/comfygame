@@ -322,7 +322,7 @@ final class LibraryTests: XCTestCase {
 
         store.bindAndDepart()
         let recorded = try XCTUnwrap(store.state.reality.library.visitedWorlds.last)
-        XCTAssertFalse(recorded.inertRungs.isEmpty,
+        XCTAssertFalse(recorded.inertModifiers.isEmpty,
                        "wrote a word that did nothing and the record doesn't mention it")
         XCTAssertTrue(recorded.written.contains { $0.contains("Sun") },
                       "the chain you wrote isn't in the record")
@@ -333,7 +333,7 @@ final class LibraryTests: XCTestCase {
         var library = LibraryState()
         func world(_ index: Int, kept: Bool) -> VisitedWorld {
             VisitedWorld(id: InstanceID(rawValue: UInt64(index)), seed: UInt64(index),
-                         runIndex: index, descriptionSentence: "", written: [], inertRungs: [],
+                         runIndex: index, descriptionSentence: "", written: [], inertModifiers: [],
                          readings: [:], travellersPresent: [], isKept: kept)
         }
         library.record(world: world(1, kept: true))
