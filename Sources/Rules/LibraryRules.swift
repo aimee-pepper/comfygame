@@ -72,6 +72,40 @@ enum LibraryRules {
     ///
     /// A traveller you've never heard of doesn't appear at all — the Library is what you know, not
     /// a checklist of what exists.
+    /// Snapshot a world at the moment you enter it: what you wrote, and what it became.
+    ///
+    /// Taken here rather than at the Writing Desk because **the readings must include what rolled
+    /// against you** — the unwritten targets the world decided for itself. That's the half a player
+    /// can't see at the time and most wants to read later.
+    static func record(book: BoundBook, page: Page, seed: UInt64, runIndex: Int,
+                       travellers: [TravellerID]) -> VisitedWorld {
+        let sigils = BookRules.sigils(for: book)
+        let written = Set(sigils.map(\.target))
+        let readings = BookRules.readings(for: book, seed: seed)
+        let chains = PageRules.chains(on: page)
+
+        return VisitedWorld(
+            id: InstanceID(rawValue: seed),
+            seed: seed,
+            runIndex: runIndex,
+            descriptionSentence: DescriptionRules.describe(readings, contradictions: [],
+                                                           analysisTier: Tuning.Analysis.startingTier).sentence,
+            written: chains.map { chain in
+                "\(chain.target) ← " + chain.parts.map(\.phrase).joined(separator: " · ")
+            },
+            inertRungs: chains.flatMap { chain in
+                chain.parts.flatMap(\.qualifiers).filter(\.isInert).map { "\($0.name) on \(chain.target)" }
+            },
+            readings: Dictionary(uniqueKeysWithValues: readings.inOrder.map { reading in
+                (reading.target.rawValue,
+                 VisitedWorld.ReadingSnapshot(peak: reading.peak, floor: reading.floor,
+                                              wasWritten: written.contains(reading.target),
+                                              tags: reading.tags.sorted()))
+            }),
+            travellersPresent: travellers
+        )
+    }
+
     static func hintPages(in library: LibraryState) -> [HintPage] {
         ContentCatalog.shared.travellers
             .filter { library.knownTravellers.contains($0.id) || library.foundTravellers.contains($0.id) }

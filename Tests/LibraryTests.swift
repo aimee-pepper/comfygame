@@ -272,4 +272,76 @@ final class LibraryTests: XCTestCase {
         XCTAssertTrue(resumed.state.reality.library.hasFound(page.id),
                       "a page already read was lost — knowledge must never be taken back")
     }
+
+    // MARK: The history of what you wrote
+
+    /// **A wrong deduction has to leave evidence.** Aimee read Mara's clue correctly, wrote a
+    /// *giant* sun, and got a dim world — with no way to learn why (6 Aug). The history is the
+    /// delayed answer key: what you wrote, what it became, and crucially **which targets you never
+    /// wrote at all**, which is the answer to "what rolled over me".
+    func testEveryWorldYouEnterIsRecordedWithWhatYouWroteAndWhatItBecame() throws {
+        let store = GameStore(io: .temporary(name: "history-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 500 }
+        store.setSymbol("plains", in: "terrain")
+        store.bindAndDepart()
+
+        let recorded = try XCTUnwrap(store.state.reality.library.visitedWorlds.last)
+        XCTAssertFalse(recorded.descriptionSentence.isEmpty, "recorded a world with nothing to read")
+        XCTAssertFalse(recorded.readings.isEmpty, "recorded a world with no readings")
+
+        // The half a player can't see at the time: some targets they wrote, some the world chose.
+        let rolled = recorded.readings.values.filter { !$0.wasWritten }
+        XCTAssertFalse(rolled.isEmpty,
+                       "nothing is marked as rolled, so the history can't answer 'what got me'")
+    }
+
+    /// A rung that changed nothing is in the record, because that's a mistake in the *writing* and
+    /// you shouldn't need an instrument to be told a word you wrote did nothing.
+    func testTheHistoryRemembersAWordThatSaidNothing() throws {
+        let store = GameStore(io: .temporary(name: "inert-\(UUID().uuidString)"))
+        store.mutate("test: fund") { $0.base.essence = 500 }
+        store.mutate("test: a vast sun") { state in
+            var page = Page()
+            page.runes = [
+                PlacedRune(id: InstanceID(rawValue: 1), content: .target("illumination"),
+                           hand: .crude, origin: PageCell(column: 0, row: 0), shapeID: "crude_block"),
+                PlacedRune(id: InstanceID(rawValue: 2), content: .source("sun"),
+                           hand: .crude, origin: PageCell(column: 2, row: 0), shapeID: "crude_block"),
+                PlacedRune(id: InstanceID(rawValue: 3), content: .qualifier("vast"),
+                           hand: .crude, origin: PageCell(column: 0, row: 2), shapeID: "crude_block"),
+            ]
+            page.links = [MarkLink(InstanceID(rawValue: 1), InstanceID(rawValue: 2)),
+                          MarkLink(InstanceID(rawValue: 2), InstanceID(rawValue: 3))]
+            state.base.page = page
+        }
+
+        // The page itself says so, before you ever bind it.
+        let inert = PageRules.inertQualifiers(on: store.state.base.page)
+        XCTAssertEqual(inert.first?.qualifier.id, "vast")
+        XCTAssertEqual(inert.first?.target.id, "illumination")
+
+        store.bindAndDepart()
+        let recorded = try XCTUnwrap(store.state.reality.library.visitedWorlds.last)
+        XCTAssertFalse(recorded.inertRungs.isEmpty,
+                       "wrote a word that did nothing and the record doesn't mention it")
+        XCTAssertTrue(recorded.written.contains { $0.contains("Sun") },
+                      "the chain you wrote isn't in the record")
+    }
+
+    /// Kept worlds survive the cap; unkept ones age out. The list is curated rather than infinite.
+    func testKeptWorldsSurviveAClearOut() {
+        var library = LibraryState()
+        func world(_ index: Int, kept: Bool) -> VisitedWorld {
+            VisitedWorld(id: InstanceID(rawValue: UInt64(index)), seed: UInt64(index),
+                         runIndex: index, descriptionSentence: "", written: [], inertRungs: [],
+                         readings: [:], travellersPresent: [], isKept: kept)
+        }
+        library.record(world: world(1, kept: true))
+        for index in 2...(Tuning.Library.worldsRemembered + 20) {
+            library.record(world: world(index, kept: false))
+        }
+        XCTAssertLessThanOrEqual(library.visitedWorlds.count, Tuning.Library.worldsRemembered)
+        XCTAssertTrue(library.visitedWorlds.contains { $0.id == InstanceID(rawValue: 1) },
+                      "a kept world was dropped, which is the one thing keeping it prevents")
+    }
 }

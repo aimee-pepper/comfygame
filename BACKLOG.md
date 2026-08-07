@@ -193,6 +193,16 @@
       one is *for*. Fall Back is the only one held back — it swaps ranks, and ranks aren't built
 - [ ] Pressure sources: 41 of a specced 79 · rune shapes don't cover every symbol
 
+## Reading what you wrote (Aimee, 6 Aug 2026)
+- [x] **Scale was accepted, displayed and inert.** A giant sun was a plain sun, and a wrong
+      deduction taught nothing. The page names it now rather than hiding it
+- [x] **The World page lists the chains you placed**, with an inert rung struck through
+- [x] **A history of visited worlds in the Library** — what you wrote, what it became, who was
+      standing in it, keepable and erasable. What you can read of it grows with your analysis tier
+- [ ] **Count is the next inert one** — written, read back, consumed by nothing
+- [ ] Say when a signature was *nearly* met (spec §3.2) — Aimee's call, may be too generous
+- [ ] A pass over the passages: ambiguity about *how much* is good, about *which target* is a trap
+
 ## The search loop actually pays out (Aimee, 6 Aug 2026)
 - [x] **Travellers stand on the map.** They were generated and never placed; arriving in a matching
       world wrote them into the save silently, so a building appeared for somebody never met

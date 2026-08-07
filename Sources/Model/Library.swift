@@ -18,6 +18,18 @@ struct LibraryState: Codable, Equatable, Sendable {
     /// waiting and will surface anywhere.
     var pagesWaiting: [DiaryPageID: Int] = [:]
 
+    /// **Every world you've been to, and what you wrote to get it** (Aimee, 6 Aug).
+    ///
+    /// The answer key, and it's a good one because it's **delayed**. Nothing here explains your
+    /// mistake at the moment you make it — that would break "explanation is earned". It records the
+    /// evidence, and what you can read of it grows with your analysis tier. The world where Mara
+    /// wasn't becomes, later, the world where you can finally see that Atmosphere rolled ash and
+    /// ate your sunlight.
+    ///
+    /// Which also makes the analysis instruments worth far more: they don't only help with the next
+    /// world, they unlock every world you've already written.
+    var visitedWorlds: [VisitedWorld] = []
+
     init() {}
 
     init(from decoder: Decoder) throws {
@@ -26,9 +38,26 @@ struct LibraryState: Codable, Equatable, Sendable {
         foundTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .foundTravellers) ?? []
         knownTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .knownTravellers) ?? []
         pagesWaiting = try c.decodeIfPresent([DiaryPageID: Int].self, forKey: .pagesWaiting) ?? [:]
+        visitedWorlds = try c.decodeIfPresent([VisitedWorld].self, forKey: .visitedWorlds) ?? []
     }
 
     func hasFound(_ page: DiaryPageID) -> Bool { foundPages.contains(page) }
+
+    /// Adds a world to the history, dropping the oldest **unkept** ones past the cap.
+    ///
+    /// Capped because the save is rewritten after every action and an unbounded list of every world
+    /// ever written would grow without limit. Kept worlds are never dropped — that's what keeping
+    /// one is for.
+    mutating func record(world: VisitedWorld) {
+        visitedWorlds.append(world)
+        var overflow = visitedWorlds.count - Tuning.Library.worldsRemembered
+        guard overflow > 0 else { return }
+        visitedWorlds.removeAll { candidate in
+            guard overflow > 0, !candidate.isKept else { return false }
+            overflow -= 1
+            return true
+        }
+    }
 
     /// The pieces of a traveller's location the player has actually read.
     func knownClueIndices(for traveller: TravellerID) -> Set<Int> {
@@ -60,4 +89,84 @@ struct HintPage: Equatable, Sendable {
 
     /// Enough to write toward, even with gaps: what you don't know, you leave to chance.
     var canBeAttempted: Bool { knownCount > 0 }
+}
+
+
+/// One world you wrote and stood in.
+///
+/// Holds **what you wrote** and **what it became**, so the two can be read side by side later with
+/// better instruments than you had at the time. Kept deliberately small: the chains as text and the
+/// readings as numbers, not the map — a map is a thing you were in, not a thing you can learn from.
+struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
+    var id: InstanceID
+    /// The world's own seed. Its identity, and what would let it be written again.
+    var seed: UInt64
+    /// Which run this was, so the list reads in the order you lived it.
+    var runIndex: Int
+    /// The prose you were shown at the time.
+    var descriptionSentence: String
+    /// The chains you placed, flattened to text — *Illumination ← Vast Sun*.
+    var written: [String]
+    /// A rung written where it changed nothing. The thing you most want to find later.
+    var inertRungs: [String]
+    /// Every target's peak and floor, for when you can read that far.
+    var readings: [String: ReadingSnapshot]
+    /// Who was standing in it, whether or not you reached them.
+    var travellersPresent: [TravellerID]
+    /// **Kept on purpose.** The list is curated rather than infinite (Aimee, 6 Aug) — a kept world
+    /// survives a clear-out.
+    var isKept: Bool = false
+
+    struct ReadingSnapshot: Codable, Equatable, Sendable {
+        var peak: Double
+        var floor: Double
+        /// Whether the page said anything at all about this target, or the world decided for you.
+        /// **The single most useful thing in the whole record** — it's the answer to "what rolled
+        /// over me".
+        var wasWritten: Bool
+        var tags: [String]
+
+        init(peak: Double, floor: Double, wasWritten: Bool, tags: [String]) {
+            self.peak = peak
+            self.floor = floor
+            self.wasWritten = wasWritten
+            self.tags = tags
+        }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            peak = try c.decodeIfPresent(Double.self, forKey: .peak) ?? 0
+            floor = try c.decodeIfPresent(Double.self, forKey: .floor) ?? 0
+            wasWritten = try c.decodeIfPresent(Bool.self, forKey: .wasWritten) ?? false
+            tags = try c.decodeIfPresent([String].self, forKey: .tags) ?? []
+        }
+    }
+
+    init(id: InstanceID, seed: UInt64, runIndex: Int, descriptionSentence: String,
+         written: [String], inertRungs: [String], readings: [String: ReadingSnapshot],
+         travellersPresent: [TravellerID], isKept: Bool = false) {
+        self.id = id
+        self.seed = seed
+        self.runIndex = runIndex
+        self.descriptionSentence = descriptionSentence
+        self.written = written
+        self.inertRungs = inertRungs
+        self.readings = readings
+        self.travellersPresent = travellersPresent
+        self.isKept = isKept
+    }
+
+    /// Tolerant, per the policy in `Migrations.swift`.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(InstanceID.self, forKey: .id)
+        seed = try c.decodeIfPresent(UInt64.self, forKey: .seed) ?? 0
+        runIndex = try c.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
+        descriptionSentence = try c.decodeIfPresent(String.self, forKey: .descriptionSentence) ?? ""
+        written = try c.decodeIfPresent([String].self, forKey: .written) ?? []
+        inertRungs = try c.decodeIfPresent([String].self, forKey: .inertRungs) ?? []
+        readings = try c.decodeIfPresent([String: ReadingSnapshot].self, forKey: .readings) ?? [:]
+        travellersPresent = try c.decodeIfPresent([TravellerID].self, forKey: .travellersPresent) ?? []
+        isKept = try c.decodeIfPresent(Bool.self, forKey: .isKept) ?? false
+    }
 }

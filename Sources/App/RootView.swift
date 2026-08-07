@@ -34,6 +34,7 @@ struct RootView: View {
         case .constellation: ConstellationView()
         case .library: LibraryView()
         case .blacksmith: BlacksmithView()
+        case .worldHistory: WorldHistoryView()
         case .settings: SettingsView()
         case .harness: HarnessView()
         // Reached as state, not as a pushed destination.

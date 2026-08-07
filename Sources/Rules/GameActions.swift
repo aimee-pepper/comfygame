@@ -226,6 +226,14 @@ extension GameStore {
             for traveller in world.travellers {
                 state.reality.library.knownTravellers.insert(traveller)
             }
+            // **Recorded, before anything is spent.** The page you wrote and the world it became,
+            // kept so you can come back with better instruments and read your own failure (Aimee,
+            // 6 Aug). Nothing here is explained now — that would break "explanation is earned".
+            state.reality.library.record(
+                world: LibraryRules.record(book: book, page: state.base.page, seed: seed,
+                                           runIndex: state.worlds.runIndex + 1,
+                                           travellers: world.travellers))
+
             // Pages that didn't surface here have waited one world longer.
             for page in ContentCatalog.shared.diaryPages
             where !state.reality.library.hasFound(page.id) && !world.pages.contains(page.id) {

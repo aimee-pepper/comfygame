@@ -289,6 +289,9 @@ enum Tuning {
 
     /// Diaries, pages, and the search for people.
     enum Library {
+        /// How many worlds the history keeps before it starts dropping the oldest **unkept** ones.
+        /// The save is rewritten after every action, so this can't be unbounded.
+        static let worldsRemembered: Int = 40          // PLACEHOLDER
         /// How many pages a world may hold.
         static let pagesPerWorldRange = 0...2          // PLACEHOLDER
         /// How much more likely a page is to surface somewhere its author would have been.

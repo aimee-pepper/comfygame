@@ -25,6 +25,25 @@ struct LibraryView: View {
                         hintCard(hint)
                     }
                 }
+                // **A tab into the history** (Aimee, 6 Aug). The Library collects what other
+                // people wrote down; this is what *you* wrote down, which belongs beside it.
+                NavigationLink(value: AppRoute.worldHistory) {
+                    StationCard(title: "Worlds you've written", icon: "clock.arrow.circlepath") {
+                        HStack {
+                            Text(library.visitedWorlds.isEmpty
+                                 ? "Nothing yet. Every world you bind is recorded."
+                                 : "\(library.visitedWorlds.count) recorded — what you wrote, and what it became.")
+                                .font(.caption).foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 6)
+                            Image(systemName: "chevron.right")
+                                .font(.caption2).foregroundStyle(.tertiary)
+                        }
+                        .frame(minHeight: 30)
+                    }
+                }
+                .buttonStyle(.plain)
+
                 if !library.foundPages.isEmpty { loosePages }
             }
             .padding(16)

@@ -288,6 +288,25 @@ extension GameStore {
         }
     }
 
+    // MARK: - The world history
+
+    /// Keep a world so a clear-out never drops it, or stop keeping it. Curated rather than
+    /// infinite, which is what Aimee asked for.
+    func keepWorld(_ id: InstanceID, kept: Bool) {
+        mutate("keep world \(id.rawValue)", flush: true) { state in
+            guard let index = state.reality.library.visitedWorlds.firstIndex(where: { $0.id == id })
+            else { return }
+            state.reality.library.visitedWorlds[index].isKept = kept
+        }
+    }
+
+    /// Erase one, deliberately. The only way a world leaves the history other than aging out.
+    func forgetWorld(_ id: InstanceID) {
+        mutate("forget world \(id.rawValue)", flush: true) { state in
+            state.reality.library.visitedWorlds.removeAll { $0.id == id }
+        }
+    }
+
     // MARK: - Building sites
 
     /// **Buildings you could raise, because you've met the person who'd run them** (Aimee, 6 Aug).
