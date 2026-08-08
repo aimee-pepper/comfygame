@@ -362,4 +362,49 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertLessThan(CombatRules.damageTaken(10, by: .binder, in: store.state), before)
     }
 
+
+    /// **Everybody you took is on the Party screen**, or there is no way to give them gear.
+    ///
+    /// Aimee, 7 Aug: *"I added people to the party at the firepit but they're not showing up on the
+    /// party page so I can't give them gear."* `partySlots` filtered on `activeCompanion`, which is
+    /// only the *first* of the party — written before a party could hold more than one person, and
+    /// it quietly outlived that. Nothing asserted on it, so nothing caught it.
+    @MainActor
+    func testEverybodyYouTookIsOnThePartyScreen() {
+        let store = GameStore(io: .temporary(name: "slots-\(UUID().uuidString)"))
+        store.mutate("test: a fire with people at it") { state in
+            var b = CompanionState(); b.name = "Bramwell"
+            var c = CompanionState(); c.name = "Corvin"
+            state.base.roster = [CompanionState(), b, c]
+            state.base.activeParty = [0]
+        }
+        XCTAssertEqual(store.partySlots.count, 2, "you and Quill")
+
+        store.setComing(1, true)
+        store.setComing(2, true)
+
+        XCTAssertEqual(store.partySlots, [.binder, .member(0), .member(1), .member(2)],
+                       "took three and the screen shows \(store.partySlots.count - 1)")
+        // And each of them is a real page: a name, a sheet, and gear slots that answer.
+        for slot in store.partySlots {
+            XCTAssertFalse(store.name(of: slot).isEmpty, "a blank row on the Party screen")
+            XCTAssertGreaterThan(store.character(of: slot).level, 0)
+            for gearSlot in GearSlot.allCases {
+                _ = store.worn(gearSlot, by: slot)   // must not trap on anybody in the party
+            }
+        }
+    }
+
+    /// Leaving somebody takes them off it again.
+    @MainActor
+    func testLeavingSomebodyTakesThemOffThePartyScreen() {
+        let store = GameStore(io: .temporary(name: "unslot-\(UUID().uuidString)"))
+        store.mutate("test: two of them") { state in
+            state.base.roster = [CompanionState(), CompanionState()]
+            state.base.activeParty = [0, 1]
+        }
+        XCTAssertEqual(store.partySlots.count, 3)
+        store.setComing(1, false)
+        XCTAssertEqual(store.partySlots, [.binder, .member(0)])
+    }
 }

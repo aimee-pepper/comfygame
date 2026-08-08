@@ -278,11 +278,11 @@ extension GameStore {
     /// the Party screen a second roster and left no screen answering "who am I taking".
     ///
     /// Choosing is the Firepit's job; this is the sheet for the people you chose.
-    var partySlots: [PartySlot] {
-        [.binder] + state.base.roster.indices
-            .filter { $0 == state.base.activeCompanion }
-            .map(PartySlot.member)
-    }
+    /// **All of them.** This filtered on `activeCompanion` — which is only the *first* of the
+    /// party — so taking three people at the fire showed one on the Party screen and left the other
+    /// two with no way to be given gear. Written before the party could hold more than one person,
+    /// and it quietly outlived that.
+    var partySlots: [PartySlot] { state.base.partyMembers }
 
     /// Everybody at the fire, in or out. The Firepit's list.
     var everyoneAtTheFire: [PartySlot] {
