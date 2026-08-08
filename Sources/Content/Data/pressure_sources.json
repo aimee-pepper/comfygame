@@ -222,43 +222,6 @@
       "acquisition": "starter"
     },
     {
-      "id": "comet",
-      "name": "Comet",
-      "icon": "comet",
-      "blurb": "Comes and goes on its own schedule.",
-      "contributions": [
-        {
-          "target": "illumination",
-          "character": "cyclic",
-          "peak": 15,
-          "floor": 0,
-          "tags": [
-            "celestial",
-            "erratic"
-          ]
-        },
-        {
-          "target": "thermal",
-          "character": "radiating",
-          "peak": 5,
-          "floor": 0
-        },
-        {
-          "target": "cycle",
-          "character": "destabilising",
-          "peak": 10,
-          "floor": 0,
-          "tags": [
-            "arrhythmic"
-          ]
-        }
-      ],
-      "attachesTo": [
-        "illumination"
-      ],
-      "acquisition": "worldDrop"
-    },
-    {
       "id": "crystal",
       "name": "Crystal",
       "icon": "diamond.fill",
@@ -290,7 +253,7 @@
       "attachesTo": [
         "substrate"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "research"
     },
     {
       "id": "drift",
@@ -669,6 +632,59 @@
         "relief"
       ],
       "acquisition": "research"
+    },
+    {
+      "id": "meteor",
+      "name": "Meteor",
+      "icon": "arrow.down.right.circle.fill",
+      "blurb": "The sky arrives. It leaves something behind, and a hole where it landed.",
+      "contributions": [
+        {
+          "target": "substrate",
+          "character": "hard",
+          "peak": 22,
+          "form": "hard",
+          "aspects": {
+            "dispersion": 25
+          },
+          "tags": [
+            "impact"
+          ]
+        },
+        {
+          "target": "relief",
+          "character": "cratering",
+          "peak": 14,
+          "aspects": {
+            "openness": -10,
+            "verticality": 18
+          },
+          "tags": [
+            "impact"
+          ]
+        },
+        {
+          "target": "thermal",
+          "character": "radiating",
+          "peak": 8,
+          "floor": 0
+        },
+        {
+          "target": "illumination",
+          "character": "cyclic",
+          "peak": 6,
+          "floor": 0,
+          "tags": [
+            "celestial",
+            "erratic"
+          ]
+        }
+      ],
+      "attachesTo": [
+        "substrate",
+        "relief"
+      ],
+      "acquisition": "worldDrop"
     },
     {
       "id": "miasma",

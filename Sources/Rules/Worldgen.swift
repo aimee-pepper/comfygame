@@ -121,8 +121,14 @@ enum Worldgen {
 
         // 6. Hazard tiles the *book* asked for, as opposed to the ones a collapsing world grows
         //    later. Storm and Tremor buy their stability with these.
+        // **And the ones the sky put there.** A meteor is a hazard rather than a light (Aimee):
+        // falling rock that damages, cracks the ground, and leaves material behind. Written as a
+        // tag rather than a danger profile because it is a *focus* — danger profiles belong to the
+        // seven runes that trade hostility for time, and a meteor isn't a bargain, it's a thing
+        // that happened.
         let danger = BookRules.dangerProfile(for: book)
-        for _ in 0..<danger.hazardTiles {
+        let impacts = readings["substrate"].has("impact") ? Tuning.World.meteorCraters : 0
+        for _ in 0..<(danger.hazardTiles + impacts) {
             guard let point = randomFreePoint(in: map, avoiding: occupied,
                                               minimumDistanceFrom: entry,
                                               distance: Tuning.World.enemyFreeRadiusAroundEntry,

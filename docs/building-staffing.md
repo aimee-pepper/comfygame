@@ -34,16 +34,55 @@
 - **Scales with their level**, so a well-levelled specialist posted at home is a large saving.
 - **Applies only to their own building.** A smith at the forge doesn't discount the Apothecary.
 
-### In your party — the building's XP
+### In your party — the building levels alongside them (Aimee)
 
-- They gain XP normally (combat *and* discovery, session 17).
-- **A share of it accrues to their building** as progress toward its next tier.
-- **[PLACEHOLDER] a tier can be reached either way, or both** — pay the full resource cost, let them earn it, or part-pay and let the remainder accrue. **Paying is always available.**
-- **They keep their own levels regardless.** The building's progress is a second track, not a diversion.
+**Their earning is not taxed.** They level exactly as they would anywhere — no share diverted, no slower growth for being someone's keeper.
 
-### What happens at neither
+**Instead, the building rises with them, slowly.** A building's tier is a function of two independent things:
 
-A trade companion **assigned to an anchored world** gets neither — no discount, no building XP. They're harvesting instead. **Three postings, three different returns**, which is what makes the assignment screen worth opening.
+```
+building tier  =  what you have paid for  +  a slow function of its keeper's level
+```
+
+**So a keeper who has been out in the world has a better building, and has lost nothing for it.** That's a cleaner mechanic than a split — nobody is choosing between their own growth and their shop's, and there's no bookkeeping about what fraction went where.
+
+**Paying is always available** and always immediate. The keeper's level is a second, slower track that arrives whether or not you spend.
+
+### What "posted" means
+
+**A word I introduced without defining** — the same failure as *rung*. A companion is in exactly one of **three places**:
+
+| Posting | Where they are | What you get |
+|---|---|---|
+| **Party** | With you, in worlds | They fight, they level, **their building rises with them** |
+| **Home** | At their own building | **A discount** on everything it does |
+| **World** | Working an anchored world | Passive harvest over runs |
+
+**"Posted" has meant *"assigned somewhere that isn't the party."*** If a plainer word is wanted — **stationed**, **kept**, or simply **assigned** — it should be chosen now, before it reaches the interface.
+
+## 3a. Levels, trees, and what a companion can become
+
+### Maximum level follows the combat trees — settled (Aimee)
+
+> ***"they need to reach the end of each tree on any one branch per tree."***
+
+**One branch to the end, in each of the three trees.** A fully-levelled companion has **three completed branches out of nine**, and max level is whatever number of points that takes.
+
+**Builds stay distinct forever** — 27 combinations, no convergence, and a party of five can never cover all nine branches. **Who you bring stays a decision at every point in the game.**
+
+Full detail in `combat-trees.md` §7.
+
+### Wild companions arrive at your level (Aimee)
+
+> *"wild companions are found at the same level as the player character I think? which means their skill trees should be partially filled already."*
+
+**Yes, and it solves a real problem:** a wild companion found at level 14 who arrives at level 1 is worthless, so late-game finds would be pointless.
+
+- **Found at the player's current level**, with the corresponding points **already spent**.
+- **Spent coherently, not randomly** — **[PROPOSAL]** each has a hidden lean, and their points follow it, so a wild companion arrives as a recognisable *build* rather than a scattering. You meet a skirmisher, not a bag of points.
+- **[AIMEE]** whether the player can **respec** them. *(Leaning yes — otherwise a wild companion is a lottery on someone else's choices, and you've never liked lotteries in this game.)*
+
+**Named travellers are a separate question** — they may arrive at a fixed level appropriate to their phase, since when you meet them is deduced rather than chanced.
 
 ## 4. Consequences worth noticing
 
@@ -55,8 +94,11 @@ A trade companion **assigned to an anchored world** gets neither — no discount
 
 ## 5. Open
 
-1. **Discount size**, and whether it scales with their level or the building's tier.
-2. **The XP share** — how much of their earning goes to the building.
-3. **Decided:** a building can always be levelled by paying. The keeper's XP is an alternative route, never the only one.
+1. **Discount size** — **[AIMEE: TBD, balanced per building.]** A discount at the Blacksmith and one at the Library aren't worth the same, so it can't be one number.
+2. ~~The XP share~~ — **settled:** there is no share. They level fully; the building rises alongside.
+3. **Settled:** a building can always be levelled by paying. The keeper's level is an additional slow track, never the only route.
+6. ~~Max level~~ — **settled:** three complete branches, one per tree. The remaining unknown is **branch depth**, which sets the actual number.
 4. **Whether animals can be posted** — probably to worlds only.
-5. **Whether the Firepit and Tavern behave differently**, since they hold *other people* rather than doing work.
+5. ~~Whether the Firepit and Tavern behave differently~~ — **settled (Aimee): the Tavern *is* the upgraded Firepit.** One building, two tiers. So the Tavernkeeper doesn't build something new; she **upgrades what you already have**, which is a better arrival than another door on the base screen.
+
+   **Consequence:** the Firepit needs no keeper and gives no discount at tier 1 — it's the one building that exists before anyone. Once it's a Tavern, Orsa can be posted to it like anyone else.

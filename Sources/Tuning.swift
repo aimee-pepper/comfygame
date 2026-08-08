@@ -270,6 +270,9 @@ enum Tuning {
         /// How far from the way in somebody is standing. Far enough that reaching them is a walk
         /// through a world you wrote for them, which is the entire point of the search loop.
         static let travellerMinimumDistance: Int = 6               // PLACEHOLDER
+        /// Craters a meteor leaves. Hazards, and the reason to write one anyway is what it puts in
+        /// the ground — it is the only sky focus that changes the ground. **[PLACEHOLDER]**
+        static let meteorCraters: Int = 4
         static let wildDropCountRange: ClosedRange<Int> = 2...4    // PLACEHOLDER
         static let wildDropAmountRange: ClosedRange<Int> = 1...2   // PLACEHOLDER
         /// Chance a world contains a locked cache.

@@ -111,9 +111,42 @@ Trade companions unlock **buildings**; every companion uses **the same nine bran
 
 *My lean is 1 and 3: fighters start further along and bring a way of thinking, rather than a locked technique.*
 
-## 7. Open
+## 7. Max level is derived from these trees (Aimee)
 
-1. **Branch depth** — how many nodes each.
-2. **Point income** — per level, and whether respec exists.
+> *"we'll have to determine max levels after determining the combat trees. we want all companions to be able to max out 3 trees."* — clarified: ***"they need to reach the end of each tree on any one branch per tree."***
+
+**Settled: one branch to the end, in each of the three trees.**
+
+So a fully-levelled companion has **three completed branches** — one from Offense, one from Defense, one from Craft — and **six they never touched**.
+
+| | |
+|---|---|
+| **Max level** | Enough points to complete **exactly three branches**, one per tree |
+| **A finished companion** | 3 of 9 branches, at full depth |
+| **Aimee's rogue** | Swiftness *(Offense)* · Evasion *(Defense)* · Shadow *(Craft)* — complete, and permanently not a knight |
+
+### Why this is the right shape
+
+**Builds stay distinct forever.** There is no convergence point where every companion is the same — a rogue can never also be a knight, and that holds at maximum level with a party of five and a roster of twenty-eight.
+
+**Every companion is a real choice, not an order-of-operations puzzle.** With nine branches and three slots there are **27 combinations**, before counting *how far* you'd gone in each along the way.
+
+**And it makes the party composition question permanent.** Five companions, three completed branches each, chosen from nine — you cannot cover everything, so who you bring stays a decision at every point in the game.
+
+**[PROPOSAL] Partial investment should be possible en route.** Nothing should force you to finish a branch before touching another; the cap is on *total points*, so spreading them means three unfinished branches rather than three finished ones. **The commitment is the interesting part** — and a player who spreads has made a real, slightly worse choice rather than an illegal one.
+
+## 8. Wild companions arrive already built (Aimee)
+
+Found at **the player's current level**, with their points **already spent** — otherwise a level-14 find who arrives at level 1 is worthless, and late-game recruiting would be pointless.
+
+**[PROPOSAL] spent coherently**, following a hidden lean, so a wild companion arrives as a recognisable build — *you meet a skirmisher, not a bag of points.*
+
+**[AIMEE]** whether they can be respecced. *(Leaning yes: otherwise a wild companion is a lottery on someone else's choices.)*
+
+## 9. Open
+
+1. **Branch depth** — how many nodes each. **This decides the level cap**: max level = enough points for three complete branches.
+2. **Point income** per level, and whether respec exists.
 3. **Whether animals use these trees** or a simpler one.
 4. **Whether the branch names are right** — Kindling especially. *(Craft's third branch is elemental, and "kindling" leans fiery when it also covers freezing and shock.)*
+

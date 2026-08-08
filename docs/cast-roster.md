@@ -18,7 +18,7 @@
 | 2 | **Edren** ✅ | archaeologist | **The Reliquary** | Site locations revealed · richer site rewards · reading old ruins · **the people who came before** | **Ruin** | opening · 2 |
 | 3 | **Halloway** ✅ | smith | **The Blacksmith** | Reforging · salvage · **instruments and nibs** | **Gold ore** | opening · 2 |
 | 4 | **Isolde** ✅ | calligrapher | **The Scriptorium** | **The hands** — pencil, pen, chaining, compounds | **Gleam** *(see §3)* | **start of mid** · 2 |
-| 6 | **Orsa** | keeper | **The Tavern** | Visitors · clues · wants satisfied · resting | **Hive** | mid · 3 |
+| 6 | **Orsa** | keeper | **The Tavern** — *upgrades the Firepit* | Visitors · clues · wants satisfied · resting | **Hive** | mid · 3 |
 | 7 | **Vance** | trader | **The Exchange** *(+ Recycler)* | Selling · buying · bulk · recycling | **Amber** | mid · 3 |
 | 8 | **Sela** ✅ | forager | **The Forager's Shed** | Organic yields · flora identified on sight · capacity | **Pond** | mid · 3 |
 | 9 | **Corrin** | tanner | **The Tannery** | **Satchel and storehouse capacity** · light armour | **Chitin** | mid · 4 |
@@ -127,9 +127,13 @@ So the **Branch teaches** column above should be read as **a starting lean**, no
 **Every trade companion above is worth having in two different places**, and they're mutually exclusive:
 
 - **Posted to their building** → a **discount** on everything it does
-- **In your party** → their XP **levels the building** instead of you paying for it
+- **In your party** → **the building rises alongside them**, slowly, as they level
 
-Full system in `building-staffing.md`. The short version: **cheaper now, or better later** — and it's the reason to take a smith into a world rather than leaving her at the forge.
+**Their earning is never taxed.** They level exactly as they would anywhere; the building benefits from their growth without taking anything from it. And **paying for a tier outright is always available** — the keeper's level is an additional slow track, never a requirement.
+
+**Orsa is the exception in shape:** the **Tavern is the upgraded Firepit**, so she doesn't add a building — she raises the one you started with.
+
+Full system in `building-staffing.md`.
 
 ## 7. Random companions (Aimee)
 

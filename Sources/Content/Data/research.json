@@ -1353,6 +1353,26 @@
           "id": "drift"
         }
       ]
+    },
+    {
+      "id": "study_lattice",
+      "branch": "lexicon",
+      "name": "Lattice",
+      "icon": "diamond",
+      "blurb": "Stone that grew rather than settled, and holds a light without being lit.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "fiber": 7
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "crystal"
+        }
+      ]
     }
   ]
 }
