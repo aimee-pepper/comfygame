@@ -247,6 +247,30 @@ enum Worldgen {
                                     tiles: map.width * map.height)
         var enemies: [WorldEnemy] = guardians
             + plantPredators(flora, in: map, avoiding: &occupied, clearOf: entry, rng: &enemyRNG)
+
+        // 9a. **Something this world cannot afford** (`apex-encounters.md`). Drawn by the things
+        //     that already mean *dangerous and worth it* — greed above all, which gives the
+        //     stability dial a third consequence after instability and loot. At most one: two
+        //     makes them scenery.
+        var apexRNG = SeededRNG(seed: seed).derived(0xA9E00)
+        let apexChance = ApexRules.chance(
+            greed: BookRules.greedDelta(for: sigils),
+            stabilityScore: BookRules.stabilityScore(of: book),
+            dangerTiles: danger.hazardTiles,
+            sites: sites.count)
+        if let apex = ApexRules.sample(for: readings, seed: seed, chance: apexChance),
+           let point = randomFreePoint(in: map, avoiding: occupied,
+                                       minimumDistanceFrom: entry,
+                                       distance: Tuning.Apex.minimumDistanceFromEntry,
+                                       rng: &apexRNG) {
+            var standing = spawn(apex, at: point, rng: &apexRNG)
+            standing.isApex = true
+            enemies.append(standing)
+            occupied.insert(point)
+            // Revealed from the moment you can see that far — you are meant to be able to look at
+            // it and decide not to.
+            map[point].isRevealed = true
+        }
         for _ in 0..<enemyCount {
             guard let species = enemyRNG.pickWeighted(dayRoster),
                   let point = randomFreePoint(in: map, avoiding: occupied,

@@ -5,7 +5,8 @@ the working list: everything specced-or-decided and not yet built, in the order 
 what blocks what. Kept current by the implementation engineer.
 
 **Last updated 7 Aug 2026.** Order set by Aimee: flora → instruments → apexes → the traveller roster.
-**Flora is done.** Next up is the instrument system, and Mara's Survey Post has to exist first.
+**Flora, instruments and apexes are done**, along with the fossil audit. What's left at the top of
+the list is the **traveller roster**, which is blocked on Aimee for names, voices and diary passages.
 
 ---
 
@@ -32,7 +33,18 @@ harvest by tissue, defended flora.
 **Open, logged as Q48:** whether flora and creatures should share one world-wide life budget. It is
 the better design and it retunes every existing creature number, so it isn't a thing to do quietly.
 
-### 2. The real instrument system — **replaces a placeholder I shipped**
+### ~~2. The real instrument system~~ — **built**
+
+Eight field instruments at **Mara's Survey Post**, one per subject; four page-lens tiers at the
+Scriptorium, gated on how many instruments you own; and the lens only ever shows subjects you have
+actually been out and measured. Mara has a building. Sight and Read scale with the lens.
+
+### ~~3. Apex encounters~~ — **built**
+
+The creature, the restraint rules, the greed draw, and the eight weapons. Five of the eight rules are
+wired; three are authored and inert pending decisions — logged as **Q49**.
+
+### The instrument system as it was — kept for reference
 
 F2 is closed but crudely: four generic nodes at the forge, each +1 analysis tier.
 `crafting-spec.md` PART TWO specs the real thing, and it's better:

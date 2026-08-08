@@ -320,9 +320,11 @@ final class LifeTests: XCTestCase {
 
     /// The point of the whole system: what you meet on the map is what the world grew.
     ///
-    /// **Either cast counts.** A predatory plant is grown by the flora system and fought by the
-    /// creature system (`flora-system-spec.md` §9.3), so it stands on the map without belonging to
-    /// the animal cast — and it is still something this world grew, which is the claim.
+    /// **Three legitimate origins.** A predatory plant is grown by the flora system and fought by
+    /// the creature system (`flora-system-spec.md` §9.3), and an apex is deliberately *not* in the
+    /// cast at all — it is the one thing a world holds that it could never have afforded to grow
+    /// (`apex-encounters.md` §1), which is the whole point of it. What the claim rules out is an
+    /// animal from nowhere: something authored, standing in a world that made everything else.
     func testEverythingOnTheMapComesFromTheWorldsOwnCast() {
         for seed in UInt64(1)...40 {
             let world = Worldgen.generate(book: BoundBook(written: ["teeming_life"], essencePaid: 0),
@@ -332,8 +334,8 @@ final class LifeTests: XCTestCase {
                 XCTAssertNotNil(enemy.traits, "an enemy arrived without a body, seed \(seed)")
                 let animal = world.cast.contains { $0.id == enemy.speciesID }
                 let plant = world.flora.contains { $0.id == enemy.floraID }
-                XCTAssertTrue(animal || plant,
-                              "something not in either cast is standing on the map, seed \(seed)")
+                XCTAssertTrue(animal || plant || enemy.isApex,
+                              "something from nowhere is standing on the map, seed \(seed)")
                 XCTAssertNil(enemy.creatureID, "worldgen still reached for an authored creature")
             }
         }

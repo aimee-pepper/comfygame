@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). GEAR: a standard assortment across eight slots (Aimee, 6 Aug), each running common -> uncommon -> rare -> mythic, and every piece upgradeable at the Blacksmith. Weapons cover all three corners of the damage triangle at every quality, so the matchup against a creature's covering is always answerable with something you could plausibly be carrying. PLACEHOLDER names, blurbs and tiers. INSULATION AND REACTIVITY on gear are Q36's addition (audit #9): the other four material properties each decide what the Blacksmith asks for, and these two decided nothing, so a warm pelt and a volatile ichor were worth nothing to wear. Insulation on anything protective turns aside a heat emanation; reactivity on a weapon leaves something in the wound. Authored here because found gear is a catalogue entry — crafting doesn't exist yet, and when it does these become the crafted piece's own material properties. PLACEHOLDER values.",
+  "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). GEAR: a standard assortment across eight slots (Aimee, 6 Aug), each running common -> uncommon -> rare -> mythic, and every piece upgradeable at the Blacksmith. Weapons cover all three corners of the damage triangle at every quality, so the matchup against a creature's covering is always answerable with something you could plausibly be carrying. PLACEHOLDER names, blurbs and tiers. INSULATION AND REACTIVITY on gear are Q36's addition (audit #9): the other four material properties each decide what the Blacksmith asks for, and these two decided nothing, so a warm pelt and a volatile ichor were worth nothing to wear. Insulation on anything protective turns aside a heat emanation; reactivity on a weapon leaves something in the wound. Authored here because found gear is a catalogue entry — crafting doesn't exist yet, and when it does these become the crafted piece's own material properties. PLACEHOLDER values. 7 Aug: EIGHT WILD-ONLY WEAPONS (apex-encounters.md §4). Each breaks exactly one rule a crafted piece cannot break, and each is deliberately MID-TIER: you are buying the rule, not the numbers, so a two-natured blade at tier 3 is a real trade against a superb crafted one. They drop guaranteed from an apex and vanishingly rarely from anything else. ALL TIERS PLACEHOLDER.",
   "items": [
     {
       "id": "curio_humming_shard",
@@ -602,6 +602,128 @@
       "gear": {
         "slot": "keepsake",
         "tier": 4
+      }
+    },
+    {
+      "id": "two_natured_blade",
+      "name": "Two-Natured Blade",
+      "icon": "tuningfork",
+      "rarity": "rare",
+      "blurb": "One edge bites and the other tears. Nothing you could forge is two things at once.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "close",
+        "breaks": "twoNatured"
+      }
+    },
+    {
+      "id": "long_fang",
+      "name": "Long Fang",
+      "icon": "arrow.up.right",
+      "rarity": "rare",
+      "blurb": "A tooth as long as your forearm, hafted short. It should not reach as far as it does.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "far",
+        "breaks": "reachWithoutHaft"
+      }
+    },
+    {
+      "id": "ranked_spear",
+      "name": "Ranked Spear",
+      "icon": "arrow.right.to.line",
+      "rarity": "rare",
+      "blurb": "It goes through, and keeps going. Whoever was standing behind finds that out.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "pierce",
+        "reach": "mid",
+        "breaks": "bothRanks"
+      }
+    },
+    {
+      "id": "rimed_edge",
+      "name": "Rimed Edge",
+      "icon": "snowflake",
+      "rarity": "rare",
+      "blurb": "The frost on it never melts and never runs out. You have stopped trying to work out why.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "rend",
+        "reach": "close",
+        "breaks": "innateStatus",
+        "statusKind": "freeze"
+      }
+    },
+    {
+      "id": "living_hook",
+      "name": "Living Hook",
+      "icon": "arrow.triangle.turn.up.right.circle",
+      "rarity": "mythic",
+      "blurb": "It is sharper than it was last week. You have not sharpened it.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "rend",
+        "reach": "close",
+        "breaks": "growingGrade"
+      }
+    },
+    {
+      "id": "quiet_knife",
+      "name": "Quiet Knife",
+      "icon": "moon.fill",
+      "rarity": "rare",
+      "blurb": "It makes no sound going in and none coming out. Nothing notices you using it.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 2,
+        "damage": "pierce",
+        "reach": "close",
+        "breaks": "quietStrike"
+      }
+    },
+    {
+      "id": "bloodletter",
+      "name": "Bloodletter",
+      "icon": "drop.triangle",
+      "rarity": "rare",
+      "blurb": "What it opens does not close. Not on its own, and not in time.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "rend",
+        "reach": "close",
+        "breaks": "endlessBleed"
+      }
+    },
+    {
+      "id": "warded_haft",
+      "name": "Warded Haft",
+      "icon": "shield.lefthalf.filled",
+      "rarity": "rare",
+      "blurb": "Something is written down the shaft in a hand older than yours. Crush blows slide off it.",
+      "kind": "gear",
+      "gear": {
+        "slot": "weapon",
+        "tier": 3,
+        "damage": "crush",
+        "reach": "mid",
+        "breaks": "wardWhileHeld",
+        "wardsAgainst": "crush"
       }
     }
   ]

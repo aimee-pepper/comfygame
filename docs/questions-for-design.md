@@ -1282,3 +1282,42 @@ word should be worth something.
 **Measured across 150 worlds:** 54 photosynthetic, 48 fungal, 43 chemosynthetic, 5 that can make no
 living at all. The last of those is the state the metabolism axis exists to make reachable, and it's
 about 3% of worlds — rare, and writable on purpose.
+
+---
+
+## Q49 — Apexes: three of the eight weapon rules aren't wired, and one is a design question
+
+**Built and working:** the apex itself (`LifeRules` sampling with the budget lifted — no new creature
+model), all three restraint rules from §2, one-per-world, never near the entry, drawn to greed, the
+guaranteed drop, the lottery from ordinary kills, and the world-character weighting so a cold world's
+rare drop is the rimed edge.
+
+**Five of the eight weapon rules are live:** two-natured (picks whichever edge the covering likes
+least), reach-without-haft, innate status, endless bleed, quiet strike.
+
+### Three are authored and inert, and each wants a decision
+
+| Weapon | Rule | What it needs |
+|---|---|---|
+| **Ranked Spear** | strikes both ranks | Targeting can hit one combatant. Reaching the back rank *through* the front is new machinery, and it interacts with `backRankProtection` — does the second hit take the penalty? |
+| **Living Hook** | grade rises as you use it | There is nowhere to keep a per-instance counter on worn gear. `EquippedPiece` carries a tier; a *used* count is a save-shape change, and I'd rather you chose whether it rises with hits, with kills, or with fights won |
+| **Warded Haft** | turns aside one damage type while held | This one is nearly free — but Ward is a *skill* with a duration, and a permanent version raises whether it should stack with the skill or replace it |
+
+They drop, they're described, and they read as what they are; they just don't do the thing yet.
+Nothing is broken by that — a player who finds one has a mid-tier weapon with a good line on it.
+
+### And the open question that's actually yours
+
+`apex-encounters.md` §8.5: **should the strongest apexes require specific world conditions**, so
+hunting one means *writing* toward it? That would make apex hunting a use for the writing system
+rather than a thing that happens to you, and it's the best idea in the document. It's also a
+different feature from what I built — right now an apex is drawn by greed and danger, which are
+numbers, not by conditions you'd deliberately compose.
+
+**My lean is yes, and later**: the current draw is the right default, and condition-gated apexes want
+the named-places machinery Q12 is already circling.
+
+### Numbers to look at
+
+All PLACEHOLDER in `Tuning.Apex`. The one worth checking first is `baseChance` at 4% with greed
+taking it to a 55% ceiling — measured across 60 greedy worlds, roughly one in three held one.

@@ -281,15 +281,25 @@ struct GearDef: Codable, Equatable, Sendable {
     /// catalogue entry. When crafting lands these become the crafted piece's own properties.
     var insulation: Double = 0
     var reactivity: Double = 0
+    /// **The rule this piece breaks**, on the eight wild-only weapons and nowhere else
+    /// (`apex-encounters.md` §4). Nil on everything you can make.
+    var breaks: WildRule?
+    /// What `innateStatus` leaves in the wound, and what `wardWhileHeld` turns aside.
+    var statusKind: String?
+    var wardsAgainst: DamageKind?
 
     init(slot: GearSlot, tier: Int, damage: DamageKind? = nil, reach: Reach = .close,
-         insulation: Double = 0, reactivity: Double = 0) {
+         insulation: Double = 0, reactivity: Double = 0, breaks: WildRule? = nil,
+         statusKind: String? = nil, wardsAgainst: DamageKind? = nil) {
         self.slot = slot
         self.tier = tier
         self.damage = damage
         self.reach = reach
         self.insulation = insulation
         self.reactivity = reactivity
+        self.breaks = breaks
+        self.statusKind = statusKind
+        self.wardsAgainst = wardsAgainst
     }
 
     init(from decoder: Decoder) throws {
@@ -300,6 +310,9 @@ struct GearDef: Codable, Equatable, Sendable {
         reach = try c.decodeIfPresent(Reach.self, forKey: .reach) ?? .close
         insulation = try c.decodeIfPresent(Double.self, forKey: .insulation) ?? 0
         reactivity = try c.decodeIfPresent(Double.self, forKey: .reactivity) ?? 0
+        breaks = try c.decodeIfPresent(WildRule.self, forKey: .breaks)
+        statusKind = try c.decodeIfPresent(String.self, forKey: .statusKind)
+        wardsAgainst = try c.decodeIfPresent(DamageKind.self, forKey: .wardsAgainst)
     }
 }
 

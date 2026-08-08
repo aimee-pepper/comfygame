@@ -102,6 +102,12 @@ enum CombatRules {
         equipped(.weapon, for: actor, in: state)?.gear?.reach ?? .close
     }
 
+    /// **The rule this hand is breaking**, on the eight wild-only weapons and nowhere else
+    /// (`apex-encounters.md` §4). Nil on everything you can make.
+    static func wildRule(for actor: Combatant, in state: GameState) -> WildRule? {
+        equipped(.weapon, for: actor, in: state)?.gear?.breaks
+    }
+
     /// **How well a damage type does against what a creature is wearing** (combat-depth-spec §1).
     ///
     /// | | hard covering | thick soft covering |
@@ -113,6 +119,16 @@ enum CombatRules {
     /// This is the change that closes the loop: kill a piercing creature, butcher its fang, carry a
     /// piercing weapon, and it's good against the armoured things and wasteful against the soft
     /// ones. **You read it off the covering word the encounter already prints.**
+    /// **A two-natured blade picks whichever hurts more** — the one thing no material can do,
+    /// because nothing has two dominant armaments (`apex-encounters.md` §4).
+    static func effectiveness(of kind: DamageKind, against covering: Covering,
+                              breaking rule: WildRule?) -> Double {
+        guard rule == .twoNatured else { return effectiveness(of: kind, against: covering) }
+        return DamageKind.allCases
+            .map { effectiveness(of: $0, against: covering) }
+            .max() ?? effectiveness(of: kind, against: covering)
+    }
+
     static func effectiveness(of kind: DamageKind, against covering: Covering) -> Double {
         let hard = covering.armourValue / Tuning.Pressure.scaleMaximum
         let padded = covering.insulation / Tuning.Pressure.scaleMaximum
@@ -614,7 +630,9 @@ enum CombatRules {
                    kind: damageKind(for: actor, in: state), run: &run, encounter: &encounter,
                    standingBack: rank(of: actor, in: state) == .back,
                    reachOfActor: reach(for: actor, in: state),
-                   coating: coating(of: actor, in: state))
+                   coating: coating(of: actor, in: state),
+                   breaking: wildRule(for: actor, in: state),
+                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind)
 
         case .skill(let id, let foeID, let allyID):
             if let skill = ContentCatalog.shared.skill(id), skills(for: actor, in: state).contains(skill),
@@ -688,7 +706,12 @@ enum CombatRules {
                                ignoresArmour: Bool = false,
                                standingBack: Bool = false,
                                reachOfActor: Reach = .close,
-                               coating: StatusKind? = nil) {
+                               coating: StatusKind? = nil,
+                               /// The rule the attacker's weapon breaks, where it breaks one. Passed
+                               /// in rather than looked up, because `strike` has no `state` — the
+                               /// same reason `coating` is.
+                               breaking: WildRule? = nil,
+                               innateStatus: String? = nil) {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
         else { return }
 
@@ -741,8 +764,27 @@ enum CombatRules {
 
         // Rending tears: the wound goes on costing it after the blow. This is what finally makes
         // `bleedRounds` live on the foe's side of the fight rather than only on yours.
+        //
+        // **The Bloodletter's doesn't stop.** Every status in the game has a duration; this is the
+        // one thing in it that doesn't, which is the sentence it exists to say.
         if kind == .rend, encounter.foes[index].isAlive {
-            encounter.foes[index].bleedRounds = Tuning.Encounter.bleedRounds
+            encounter.foes[index].bleedRounds = breaking == .endlessBleed
+                ? Tuning.Encounter.endlessBleedRounds
+                : Tuning.Encounter.bleedRounds
+        }
+
+        // **Something in the wound, with nothing consumed to put it there.** Coatings are spent;
+        // the Rimed Edge simply is what it is.
+        if breaking == .innateStatus, encounter.foes[index].isAlive, let named = innateStatus {
+            encounter.foeBleeds[foe.id] = BleedState(
+                damage: Tuning.Encounter.statusDamage[named] ?? 2,
+                rounds: Tuning.Encounter.statusRounds[named] ?? 2)
+            encounter.note("The cold of it stays in the wound.")
+        }
+
+        // **Attacking out of cover, and staying in it.** Nothing else in Shadow allows this.
+        if breaking == .quietStrike, (encounter.concealed[actor] ?? 0) > 0 {
+            encounter.concealed[actor, default: 0] += 1
         }
 
         // **Warning colours are honest.** Hitting something that advertises costs you — and if it
@@ -1255,6 +1297,25 @@ enum CombatRules {
                 if let piece = run.rng.pick(gear) {
                     let name = ContentCatalog.shared.item(piece)?.name ?? "Something worn"
                     let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()), catalogID: piece)
+                    if run.satchelItems.add(stack) {
+                        found.append(name)
+                    } else {
+                        run.offeredItems.append(stack)
+                        found.append("\(name) — no room; waiting on you")
+                    }
+                }
+            }
+
+            // **What an apex leaves, and what luck occasionally leaves instead** (`apex-encounters.md`
+            // §4–5). The apex is the *reliable* path and the lottery is the surprise: a player who
+            // never fights one still occasionally finds something they cannot make, and that is a
+            // better memory than a guaranteed drop precisely because it wasn't earned.
+            let hunted = foe.isApex
+            if hunted || run.rng.chance(Tuning.Apex.ordinaryCreatureChance) {
+                let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
+                if let id = ApexRules.weapon(for: readings, rng: &run.rng) {
+                    let name = ContentCatalog.shared.item(id)?.name ?? "Something you couldn't make"
+                    let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()), catalogID: id)
                     if run.satchelItems.add(stack) {
                         found.append(name)
                     } else {

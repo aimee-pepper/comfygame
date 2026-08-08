@@ -198,6 +198,9 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
     /// The adjective this creature went by, resolved with its world's cast at spawn. Materials
     /// inherit it: a pelt off a *shaggy browser* is a *shaggy pelt*.
     var qualifier: String?
+    /// **Something the world couldn't afford** (`apex-encounters.md`). Carried into the fight so the
+    /// spoils know to pay out the thing you can't make, and so the encounter can say what this is.
+    var isApex: Bool = false
     /// Rounds of bleeding left. Rend's wound outlives the blow.
     ///
     /// Nothing the party carries rends yet, so today this is only set when creatures fight each
@@ -226,7 +229,8 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
 
     init(id: InstanceID, creatureID: CreatureID? = nil, identityKey: String = "unknown",
          traits: CreatureTraits? = nil, stats: CombatStats, currentHP: Int,
-         qualifier: String? = nil, bleedRounds: Int = 0, level: Int = 1) {
+         qualifier: String? = nil, bleedRounds: Int = 0, level: Int = 1,
+         isApex: Bool = false) {
         self.id = id
         self.creatureID = creatureID
         self.identityKey = identityKey
@@ -234,6 +238,7 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
         self.stats = stats
         self.currentHP = currentHP
         self.qualifier = qualifier
+        self.isApex = isApex
         self.bleedRounds = bleedRounds
         self.level = level
     }
@@ -249,6 +254,7 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
         stats = try c.decode(CombatStats.self, forKey: .stats)
         currentHP = try c.decodeIfPresent(Int.self, forKey: .currentHP) ?? 1
         qualifier = try c.decodeIfPresent(String.self, forKey: .qualifier)
+        isApex = try c.decodeIfPresent(Bool.self, forKey: .isApex) ?? false
         bleedRounds = try c.decodeIfPresent(Int.self, forKey: .bleedRounds) ?? 0
         level = try c.decodeIfPresent(Int.self, forKey: .level) ?? 1
     }

@@ -638,6 +638,44 @@ enum Tuning {
         static let identityBandTolerance: Double = 25
     }
 
+    /// **Apex encounters** (`apex-encounters.md`). All PLACEHOLDER — §8 flags how many and how often
+    /// as the open questions.
+    enum Apex {
+        /// How often a perfectly ordinary world is holding something it can't feed. Low: an apex
+        /// you meet every run is a difficulty setting, not an event.
+        static let baseChance: Double = 0.04
+        /// …and what the things that mean *dangerous and worth it* add to that. The greed term is
+        /// the important one — it gives the stability dial a third consequence after instability
+        /// and loot.
+        static let chancePerGreed: Double = 0.30
+        static let greedForFullDraw: Double = 60
+        static let chancePerInstability: Double = 0.14
+        static let chanceWhenDangerWritten: Double = 0.10
+        static let chanceWhenSitePresent: Double = 0.08
+        /// Never a certainty. Writing the greediest, most dangerous world in the game should make
+        /// one *likely*, never guaranteed — a guaranteed apex is a chore with a health bar.
+        static let maximumChance: Double = 0.55
+
+        /// **What the budget is multiplied by.** This is the whole mechanism: `LifeRules` filters
+        /// on what a world can feed, and this is the number that breaks the filter on purpose.
+        static let budgetMultiple: Double = 3.2
+        /// …and the floor under it, so a barren world's apex is still an apex.
+        static let minimumBudget: Double = 90
+        static let sizeWeighting: Double = 1.6
+        static let armamentWeighting: Double = 1.8
+
+        /// How far from the way in it stands. **Never near the entry portal** (§3): you should have
+        /// to go in.
+        static let minimumDistanceFromEntry: Int = 8
+        /// How much likelier a world's own character makes its matching wild weapon.
+        static let characterBonus: Double = 2.5
+
+        /// **The unlucky route** (§5). Same items, vanishingly rare, from two sources — the apex is
+        /// the reliable path and the lottery is the surprise.
+        static let ordinaryCreatureChance: Double = 0.004
+        static let lockedCacheChance: Double = 0.03
+    }
+
     enum Terrain {
         /// The most of a world that water can cover, at full saturation.
         static let maximumWaterCoverage: Double = 0.45
@@ -770,6 +808,10 @@ enum Tuning {
         /// Rend leaves a wound that keeps costing you.
         static let bleedDamage: Int = 2
         static let bleedRounds: Int = 3
+        /// **What "doesn't expire" means in practice.** Longer than any fight, so within an
+        /// encounter it is the promise it makes — without needing a special case in the tick that
+        /// could never end. **[PLACEHOLDER]**
+        static let endlessBleedRounds: Int = 99
         /// What each blow is worth when something reaches more than one of you at once.
         static let multiDeliveryShare: Double = 0.7
         static let areaDeliveryShare: Double = 0.6

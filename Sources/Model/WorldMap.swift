@@ -212,10 +212,17 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
     var isSessile: Bool = false
     /// The plant it is, where it is one. Lets the world name it and the harvest read it.
     var floraID: InstanceID?
+    /// **Something this world cannot afford** (`apex-encounters.md`).
+    ///
+    /// Three behaviours hang off this and nothing else: it is **visible from range** rather than
+    /// hidden by fog, it **never ambushes** however cryptic its colouring, and it **doesn't hunt
+    /// you** — it holds its ground. Approach is the commitment, and stepping adjacent is the only
+    /// thing that starts it. An apex that jumps you isn't a choice.
+    var isApex: Bool = false
 
     init(id: InstanceID, speciesID: InstanceID? = nil, traits: CreatureTraits? = nil,
          creatureID: CreatureID? = nil, position: GridPoint, isAwake: Bool = false,
-         isSessile: Bool = false, floraID: InstanceID? = nil) {
+         isSessile: Bool = false, floraID: InstanceID? = nil, isApex: Bool = false) {
         self.id = id
         self.speciesID = speciesID
         self.traits = traits
@@ -224,6 +231,7 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
         self.isAwake = isAwake
         self.isSessile = isSessile
         self.floraID = floraID
+        self.isApex = isApex
     }
 
     /// Tolerant decoding, per the policy in `Migrations.swift`.
@@ -237,6 +245,7 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
         isAwake = try c.decodeIfPresent(Bool.self, forKey: .isAwake) ?? false
         isSessile = try c.decodeIfPresent(Bool.self, forKey: .isSessile) ?? false
         floraID = try c.decodeIfPresent(InstanceID.self, forKey: .floraID)
+        isApex = try c.decodeIfPresent(Bool.self, forKey: .isApex) ?? false
     }
 
     // MARK: What it is

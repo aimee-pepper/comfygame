@@ -466,7 +466,8 @@ enum WorldRules {
             // **A plant keeps no hours.** It grew there; it is still there at midnight. Swapping it
             // out would replace the thicket you have been walking round with an animal, and take
             // its growth tile's meaning with it.
-            guard !run.enemies[index].isSessile else { continue }
+            // A plant keeps no hours, and an apex is not on anybody's roster.
+            guard !run.enemies[index].isSessile, !run.enemies[index].isApex else { continue }
             let current = run.species(of: run.enemies[index])
             guard current?.isNocturnal != toNight else { continue }
             guard let replacement = run.rng.pickWeighted(table) else { continue }
@@ -677,17 +678,20 @@ enum WorldRules {
 
             // **Openness sets ambush versus pursuit.** Across open ground you're seen coming;
             // in enclosed country you aren't, and neither is what's waiting.
-            let sight = detectionRadius(of: enemy, in: run)
+            // An apex never ambushes, so it is never woken by proximity — only by you stepping
+            // into it, which the bump handles like any other fight.
+            let sight = enemy.isApex ? 0 : detectionRadius(of: enemy, in: run)
             if !enemy.isAwake, distance <= sight {
                 enemy.isAwake = true
                 if run.map[enemy.position].isRevealed {
                     events.append(.enemySighted(run.name(of: enemy)))
                 }
             }
-            // **Rooted things don't follow.** A predatory plant grew where it is and stays there:
-            // waking means it is ready, not that it is coming. This is the whole of what keeps
-            // active-defence flora a hazard you walk into rather than one that hunts you.
-            guard enemy.isAwake, distance > 0, !enemy.isSessile else {
+            // **Rooted things don't follow, and neither does an apex.** A predatory plant grew
+            // where it is; an apex holds its ground because it has no reason not to. Waking means
+            // it is ready, not that it is coming — for both, the approach is the commitment
+            // (`apex-encounters.md` §2), which is what keeps them hazards you walk *into*.
+            guard enemy.isAwake, distance > 0, !enemy.isSessile, !enemy.isApex else {
                 run.enemies[index] = enemy
                 continue
             }
@@ -708,6 +712,10 @@ enum WorldRules {
     /// doesn't appear until it's on you. In a low-openness world full of `growth` that is genuinely
     /// tense — and it's what makes writing an overgrown world a decision rather than scenery.
     static func isVisible(_ enemy: WorldEnemy, in run: WorldRun) -> Bool {
+        // **An apex is marked from the moment its tile is revealed**, whatever it is wearing
+        // (`apex-encounters.md` §2). You must be able to see it and walk away — that is the rule
+        // that makes hunting one a choice rather than a thing that happens to you.
+        if enemy.isApex { return true }
         guard enemy.traits?.defence == .crypsis else { return true }
         // Once it has broken cover it stays broken, and it is never invisible in your own square.
         if enemy.isAwake { return true }
@@ -813,7 +821,8 @@ enum WorldRules {
                                  stats: levelled,
                                  currentHP: levelled.maxHP,
                                  qualifier: qualifier,
-                                 level: level))
+                                 level: level,
+                                 isApex: member.isApex))
             // The encounter-flag registry: this is what turns a silhouette into a real icon in the
             // Writing Desk's preview. **The species is the entry; this animal is a specimen.**
             //

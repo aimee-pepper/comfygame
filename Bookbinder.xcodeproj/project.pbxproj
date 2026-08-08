@@ -42,6 +42,7 @@
 		3333DDA45D780B04AC00F1C2 /* CombatTreeRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72CF1DBF72334A81AE35B198 /* CombatTreeRules.swift */; };
 		35A27AF646DD34DD1F8A9585 /* Gambit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79874A74B2CF52DA90868DA0 /* Gambit.swift */; };
 		3939EA44678C9E3D7CE7FF86 /* GameActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DDEB42C7E2856E98352341 /* GameActions.swift */; };
+		3A849B10B8A116F089F9D49C /* ApexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9D12FE35D80EBAAD321DB4 /* ApexTests.swift */; };
 		3C489CD6B833D6CBC9F6DD43 /* Materials.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF377477B4C3C3D11698D3F /* Materials.swift */; };
 		3C4C4E838448237D91492B61 /* CharacterRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB1CD7D6C91CDD187B2410F /* CharacterRules.swift */; };
 		3E24E2D2D2BEAD60ADE93D0A /* WritingDeskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82ADF2ABC4F75679DADCCBB /* WritingDeskView.swift */; };
@@ -96,6 +97,7 @@
 		8F6B0EF541120D379B1FD06B /* BestiaryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A588AFCFC47B584CE07F3B4E /* BestiaryRules.swift */; };
 		91761E73D4647CB7D2741D93 /* FloraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87254230F32E20320932D7 /* FloraTests.swift */; };
 		94381815D9D6D36F24168B83 /* symbols.json in Resources */ = {isa = PBXBuildFile; fileRef = A4270CCCF203CAA8859A086B /* symbols.json */; };
+		95D1663E471A6098FA803AA9 /* ApexRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E261DE325914CF72D32BD5 /* ApexRules.swift */; };
 		983452CD1EE2126ECB5B1973 /* HarnessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638830B7B5223E3065252FC /* HarnessView.swift */; };
 		9CB21084FFC26A6CCB93F47E /* CombatTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E50FD84F29FE6729623D70EB /* CombatTreeTests.swift */; };
 		9F43622A2E66874204BCCDC7 /* NamingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56058E017000066A61CD5F0 /* NamingTests.swift */; };
@@ -269,6 +271,7 @@
 		B4E29CCF27C6C3CDFCED5311 /* FloraTraits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloraTraits.swift; sourceTree = "<group>"; };
 		B543B94C8E89980FDE029D9C /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		B664EB59C95581C3098E542B /* BaseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseState.swift; sourceTree = "<group>"; };
+		B8E261DE325914CF72D32BD5 /* ApexRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApexRules.swift; sourceTree = "<group>"; };
 		B9CABEB714204FCBDE32F8E4 /* BlacksmithView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlacksmithView.swift; sourceTree = "<group>"; };
 		BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyTests.swift; sourceTree = "<group>"; };
 		BDFAE95092D158944E000B02 /* GrammarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarTests.swift; sourceTree = "<group>"; };
@@ -280,6 +283,7 @@
 		C51FE4FBAB98280181089C56 /* DeterminismTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeterminismTests.swift; sourceTree = "<group>"; };
 		C5B08032B70636FB2D70EFD6 /* ContentModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentModels.swift; sourceTree = "<group>"; };
 		C82ADF2ABC4F75679DADCCBB /* WritingDeskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingDeskView.swift; sourceTree = "<group>"; };
+		CA9D12FE35D80EBAAD321DB4 /* ApexTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApexTests.swift; sourceTree = "<group>"; };
 		CAAA1B171F7C380229C20CC5 /* RealityState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealityState.swift; sourceTree = "<group>"; };
 		CB3C5DA8117A704E44B23C91 /* PressureRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureRules.swift; sourceTree = "<group>"; };
 		CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchModels.swift; sourceTree = "<group>"; };
@@ -331,6 +335,7 @@
 		21AAB30585002EFE1DBBC7F6 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				B8E261DE325914CF72D32BD5 /* ApexRules.swift */,
 				A588AFCFC47B584CE07F3B4E /* BestiaryRules.swift */,
 				B022088C9636578892397C50 /* BookProjection.swift */,
 				C3CC1BB415696E2B7417C43D /* BookRules.swift */,
@@ -540,6 +545,7 @@
 			isa = PBXGroup;
 			children = (
 				01DD7C9C85D04883D2042EFF /* Fixtures */,
+				CA9D12FE35D80EBAAD321DB4 /* ApexTests.swift */,
 				74D9F704438225E8CFD8268D /* BestiaryTests.swift */,
 				7582647B2841DB69559E3968 /* BookRulesTests.swift */,
 				53634CFCB3CD23CDD115C001 /* ChasmTests.swift */,
@@ -704,6 +710,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				95D1663E471A6098FA803AA9 /* ApexRules.swift in Sources */,
 				03705DB034E250EE8C9A5A0B /* AppRoute.swift in Sources */,
 				601014E078036FCE48CDAF06 /* BaseState.swift in Sources */,
 				6FDB8C79745125AEC66E0C4C /* BaseView.swift in Sources */,
@@ -804,6 +811,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A849B10B8A116F089F9D49C /* ApexTests.swift in Sources */,
 				52A3E7BA47AED80B02C9FFDA /* BestiaryTests.swift in Sources */,
 				030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */,
 				F6AE3DF4E00E397B950A1CBC /* ChasmTests.swift in Sources */,
