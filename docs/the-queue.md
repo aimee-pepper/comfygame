@@ -4,6 +4,9 @@
 the working list: everything specced-or-decided and not yet built, in the order I'd take it, with
 what blocks what. Kept current by the implementation engineer.
 
+**For the overview** — where the whole build stands, what's blocked on a decision, and the long-term
+plan — read `state-of-the-build.md` first. This file is the detail under it.
+
 **Last updated 7 Aug 2026.** Order set by Aimee: flora → instruments → apexes → the traveller roster.
 **Flora, instruments and apexes are done**, along with the fossil audit. What's left at the top of
 the list is the **traveller roster**, which is blocked on Aimee for names, voices and diary passages.
