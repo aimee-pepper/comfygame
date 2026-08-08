@@ -288,20 +288,18 @@ struct BoundBook: Codable, Equatable, Sendable {
     var randomlyFilled: Set<SlotID>
     var essencePaid: Int
 
-    /// In catalog order, with anything in an unrecognised slot appended rather than dropped.
+    /// Everything this book says, in a stable order.
     ///
-    /// A bound world outlives the content that made it: if the slot taxonomy is rewritten while a
-    /// run is in progress, that run's symbols must still count toward its decay and its spawns.
-    /// Silently losing them would change a world under a player mid-visit.
+    /// **A bound world outlives the content that made it.** The slot taxonomy it was written in is
+    /// gone — `slots.json` and `SlotDef` went with the fossil audit — and a run that was in progress
+    /// when that happened still has to count its symbols toward its decay and its spawns. Silently
+    /// losing them would change a world under a player mid-visit.
+    ///
+    /// So the ordering is by slot *name* rather than by a catalogue order that no longer exists.
+    /// Order only decides how a legacy book reads out; nothing downstream depends on it.
     var allSymbolIDs: [SymbolID] {
         if !written.isEmpty { return written }
-        let ordered = ContentCatalog.shared.slotIDsInOrder
-        let known = ordered.compactMap { symbols[$0] }
-        let orphans = symbols
-            .filter { !ordered.contains($0.key) }
-            .sorted { $0.key.rawValue < $1.key.rawValue }
-            .map(\.value)
-        return known + orphans
+        return symbols.sorted { $0.key.rawValue < $1.key.rawValue }.map(\.value)
     }
 
     /// Slots the player chose deliberately, as opposed to left to chance.

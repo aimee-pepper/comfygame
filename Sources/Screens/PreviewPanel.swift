@@ -63,8 +63,12 @@ struct PreviewPanel: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
             Spacer()
+            // **Ranges come from the subjects you didn't write about**, which are rolled at bind.
+            // This counted *slots* left to chance, and slots stopped existing when the page grid
+            // replaced them — so it read "fully specified" over a book with one word on it.
             if !projection.isFullySpecified {
-                Text("ranges — \(projection.randomSlots.count) slot\(projection.randomSlots.count == 1 ? "" : "s") to chance")
+                let rolled = projection.unwrittenSubjects.count
+                Text("ranges — \(rolled) subject\(rolled == 1 ? "" : "s") to chance")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -328,13 +332,19 @@ private struct MixBar: View {
 }
 
 #Preview {
-    ScrollView {
+    // **Written on a page**, like everything else. This was the last thing in the codebase holding
+    // the old slot-and-draft path alive — a SwiftUI preview building a two-slot book nobody could
+    // write (`fossil-audit.md` §5). Its one genuinely good idea, modelling what unwritten subjects
+    // could do to the stability band, moved to the page path before the rest of it went.
+    let page = ["caverns", "rich_ore"].reduce(into: Page()) { page, id in
+        guard let symbol = ContentCatalog.shared.symbol(SymbolID(rawValue: id)),
+              let placed = PageRules.placeAnywhere(symbol, hand: .refined, on: page)
+        else { return }
+        page = placed
+    }
+    return ScrollView {
         PreviewPanel(
-            projection: BookProjection.project(
-                draft: BookDraft(slots: ["terrain": "caverns", "bounty": "rich_ore"]),
-                ownedSymbols: Set(ContentCatalog.shared.starterSymbolIDs),
-                seed: 20_260_805
-            ),
+            projection: BookProjection.project(page: page, seed: 20_260_805),
             discovery: DiscoveryLog(creatures: ["paper_moth": DiscoveryRecord(firstSeenRunIndex: 1, timesEncountered: 2)])
         )
         .padding()

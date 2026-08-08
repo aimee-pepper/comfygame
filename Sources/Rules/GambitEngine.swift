@@ -24,7 +24,7 @@ enum GambitEngine {
 
         // Disabled rules still occupy their slot and their position — switching one off is a way
         // of testing an order, not a way of getting a free slot.
-        for rule in rules(for: actor, in: state).prefix(availableSlots(in: state)) where rule.isEnabled {
+        for rule in rules(for: actor, in: state).prefix(availableSlots(for: actor, in: state)) where rule.isEnabled {
             guard rule.isWritable(with: state.base.ownedGambitComponents) else { continue }
             guard let target = target(of: rule, actor: actor, run: run, encounter: encounter, state: state) else { continue }
             guard let action = action(of: rule, target: target, actor: actor,
@@ -46,12 +46,27 @@ enum GambitEngine {
         }
     }
 
-    /// How many rules are actually running. Rules past this are owned but idle — that's the
-    /// progression, and the Party screen shows the cut-off.
-    static func availableSlots(in state: GameState) -> Int {
-        Tuning.Encounter.startingGambitSlots
+    /// How many rules are actually running, **for the person holding the list**. Rules past this are
+    /// owned but idle — that's the progression, and the Party screen shows the cut-off.
+    ///
+    /// **Four sources, and each says something different** (`fossil-audit.md` §3 asked which of them
+    /// wins; the answer is that they add, because they are not the same claim):
+    ///
+    ///  - the **base** is what anybody can hold
+    ///  - **research** is what your base has learned, and is lost in a reset
+    ///  - the **Constellation** is permanent and survives everything
+    ///  - **Wit** is who *this person* is — a sharper companion holds a longer hand (session 17 §1)
+    ///
+    /// The Wit term is why this takes an actor at all. `CharacterRules.gambitSlots` was written for
+    /// session 17 and then **read by nothing**: the slot count was one global number, so the stat
+    /// that was supposed to govern rule length did nothing, and every one of a party of five held
+    /// exactly the same length of list however sharp they were.
+    static func availableSlots(for actor: Combatant, in state: GameState) -> Int {
+        let shared = Tuning.Encounter.startingGambitSlots
             + state.base.purchasedGambitSlots     // researched; lost in a reset
             + state.reality.bonusGambitSlots      // bought with motes; survives everything
+        guard actor.isParty else { return shared }
+        return shared + CharacterRules.gambitSlots(state.base.character(actor.member).stats)
     }
 
     // MARK: - Interpreting a rule

@@ -96,7 +96,6 @@
 		91761E73D4647CB7D2741D93 /* FloraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87254230F32E20320932D7 /* FloraTests.swift */; };
 		94381815D9D6D36F24168B83 /* symbols.json in Resources */ = {isa = PBXBuildFile; fileRef = A4270CCCF203CAA8859A086B /* symbols.json */; };
 		983452CD1EE2126ECB5B1973 /* HarnessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638830B7B5223E3065252FC /* HarnessView.swift */; };
-		9A1C08888E52028E0EC6D53C /* slots.json in Resources */ = {isa = PBXBuildFile; fileRef = A38483F6A49BD38B618407D8 /* slots.json */; };
 		9CB21084FFC26A6CCB93F47E /* CombatTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E50FD84F29FE6729623D70EB /* CombatTreeTests.swift */; };
 		9F43622A2E66874204BCCDC7 /* NamingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56058E017000066A61CD5F0 /* NamingTests.swift */; };
 		9F5DC7673BF8A93B1EF8ED6B /* WorldHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51F4BCA8A3D72D7B108E2E1 /* WorldHistoryView.swift */; };
@@ -253,7 +252,6 @@
 		9DB4AFF044956272A3767B70 /* Character.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Character.swift; sourceTree = "<group>"; };
 		9F9F6F9740167F61E0AD0158 /* descriptions.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = descriptions.json; sourceTree = "<group>"; };
 		A29A4F3CFC9073B8F80064F4 /* pressure_sources.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pressure_sources.json; sourceTree = "<group>"; };
-		A38483F6A49BD38B618407D8 /* slots.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = slots.json; sourceTree = "<group>"; };
 		A4270CCCF203CAA8859A086B /* symbols.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = symbols.json; sourceTree = "<group>"; };
 		A4DA32364644741F03829592 /* SiteModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteModels.swift; sourceTree = "<group>"; };
 		A501ADE475726C1A73D812A2 /* Naming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Naming.swift; sourceTree = "<group>"; };
@@ -496,7 +494,6 @@
 				68BD0EED52655859C21A0136 /* rune_shapes.json */,
 				77957A7595BE1E25AC8CF406 /* sites.json */,
 				2C4E5B7DC86948834FDAFFF9 /* skills.json */,
-				A38483F6A49BD38B618407D8 /* slots.json */,
 				59F1E2A3A08364F9452A684F /* stations.json */,
 				A4270CCCF203CAA8859A086B /* symbols.json */,
 				5D960FCB6727D86D57A82BF4 /* travellers.json */,
@@ -691,7 +688,6 @@
 				8C88D2C21DA68452155D8172 /* rune_shapes.json in Resources */,
 				AA467E2DFFB389EFACA3B124 /* sites.json in Resources */,
 				0A77177F80047BBE6CD74591 /* skills.json in Resources */,
-				9A1C08888E52028E0EC6D53C /* slots.json in Resources */,
 				2AAA4E398F09BD29BAD7816B /* stations.json in Resources */,
 				94381815D9D6D36F24168B83 /* symbols.json in Resources */,
 				CFFD06DFE407E96C28AB6464 /* travellers.json in Resources */,

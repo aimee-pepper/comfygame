@@ -51,12 +51,16 @@ final class ContentTests: XCTestCase {
         XCTAssertLessThan(ordinaryOre, richOre)
     }
 
-    func testEverySlotHasAtLeastOneStarterSymbol() {
-        // Random-filling an empty slot needs a candidate the player owns, in every slot.
-        for slot in ContentCatalog.shared.slotIDsInOrder {
-            let owned = ContentCatalog.shared.symbols(in: slot).filter { $0.acquisition == .starter }
-            XCTAssertFalse(owned.isEmpty, "Slot '\(slot)' has no starter symbol to random-fill with")
-        }
+    /// **You must be able to write something on the first turn.**
+    ///
+    /// This used to assert one starter symbol per *slot*, and slots are gone (`fossil-audit.md` §4).
+    /// The claim underneath it survives and is stronger: a new game has to arrive with enough
+    /// vocabulary to say something, or the writing desk opens onto nothing.
+    func testANewGameCanWriteSomething() {
+        XCTAssertFalse(ContentCatalog.shared.starterSymbolIDs.isEmpty,
+                       "a new game has no symbols and the desk opens onto nothing")
+        XCTAssertFalse(ContentCatalog.shared.starterSourceIDs.isEmpty,
+                       "a new game has no words for the page")
     }
 
     /// Sight belongs to the creature, so later ones can notice you from further off.
@@ -210,7 +214,6 @@ final class ContentTests: XCTestCase {
         var broken = catalog.symbols
         broken[0].yieldModifiers = ["not_a_real_resource": 2.0]
         let sabotaged = ContentCatalog(
-            slots: catalog.slots,
             symbols: broken,
             creatures: catalog.creatures,
             resources: catalog.resources,

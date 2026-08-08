@@ -164,10 +164,10 @@ final class SaveToleranceTests: XCTestCase {
             state.reality.motes = 3
         }
         // Fully specified, so the book is the same every run and nothing is left to chance.
-        store.setSymbol("caverns", in: "terrain")
-        store.setSymbol("frostbound", in: "biome")
-        store.setSymbol("common_ore", in: "bounty")
-        store.setSymbol("dim_sky", in: "quirk")
+        store.write("caverns")
+        store.write("frostbound")
+        store.write("common_ore")
+        store.write("dim_sky")
         store.bindAndDepart()
         store.mutate("test: populate the run") { state in
             state.worlds.activeRun?.satchel.add(4, of: Resources.fiber)

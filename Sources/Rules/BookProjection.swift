@@ -22,21 +22,6 @@ import Foundation
 /// instability and enemy tier are additive over slots.
 struct BookProjection {
 
-    struct SlotPlan: Identifiable {
-        var slot: SlotID
-        /// The symbol the player put here, or nil if the slot is left to chance.
-        var chosen: SymbolDef?
-        /// What a random fill could draw from — the *whole* catalog, not just what the player
-        /// owns, so a chance slot can surprise you with something you couldn't have written.
-        var candidates: [SymbolDef]
-
-        var id: SlotID { slot }
-        var isRandom: Bool { chosen == nil }
-        /// A slot with nothing to draw from generates nothing at all.
-        var isEmpty: Bool { chosen == nil && candidates.isEmpty }
-    }
-
-    var slotPlans: [SlotPlan]
     var essenceCost: ClosedRange<Int>
     /// The 0–100 headline. Same units as the numbers printed on the symbols themselves.
     var stabilityScore: ClosedRange<Int>
@@ -94,15 +79,21 @@ struct BookProjection {
     /// Marks are written, and none of them are joined into anything that speaks.
     var isWrittenButSilent: Bool { marksWritten > 0 && marksSpeaking == 0 }
 
-    /// True when every slot is chosen, so nothing is left to chance and every range is a point.
-    var isFullySpecified: Bool { slotPlans.allSatisfy { !$0.isRandom } }
-    /// Slots that will actually be filled by chance — a slot with nothing to draw from doesn't
-    /// count, and isn't charged for.
-    var randomSlots: [SlotID] { slotPlans.filter { $0.isRandom && !$0.isEmpty }.map(\.slot) }
+    /// **The subjects this page says nothing about**, which are the ones that will be rolled.
+    ///
+    /// This is the page's answer to a question the old slot taxonomy used to ask: what is left to
+    /// chance. It was `slotPlans.allSatisfy { !$0.isRandom }` — and on a page every plan carries a
+    /// mark, so the preview said "fully specified" about a book with one word on it and seven
+    /// subjects still to roll. Uncertainty moved from slots to subjects and the readout didn't.
+    var unwrittenSubjects: [PressureTargetID] {
+        ContentCatalog.shared.pressureTargetsInOrder
+            .map(\.id)
+            .filter { !writtenSubjects.contains($0) }
+    }
+    /// True when the page speaks to every subject, so nothing is rolled and every range is a point.
+    var isFullySpecified: Bool { unwrittenSubjects.isEmpty }
     /// What this book will cost, exactly. Known before committing — see the note above.
     var cost: Int { essenceCost.lowerBound }
-    /// How much of the cost is the flat charge for slots left to chance.
-    var randomSlotCost: Int { randomSlots.count * Tuning.Book.randomSlotCostEssence }
 
     // MARK: - Computation
 
@@ -165,13 +156,7 @@ struct BookProjection {
         let sight = WorldRules.visionRadius(for: book)
         let cost = book.essencePaid
 
-        let plans = written.enumerated().compactMap { index, id -> SlotPlan? in
-            guard let symbol = ContentCatalog.shared.symbol(id) else { return nil }
-            return SlotPlan(slot: SlotID(rawValue: "mark-\(index)"), chosen: symbol, candidates: [])
-        }
-
         return BookProjection(
-            slotPlans: plans,
             essenceCost: cost...cost,
             stabilityScore: worst...best,
             turnsUntilCollapse: turnsWorst...turnsBest,
@@ -196,121 +181,70 @@ struct BookProjection {
         )
     }
 
-    static func project(draft: BookDraft,
-                        ownedSymbols: Set<SymbolID>,
-                        seed: UInt64 = 0,
-                        analysisTier: Int = Tuning.Analysis.startingTier) -> BookProjection {
-        let plans = ContentCatalog.shared.slotIDsInOrder.map { slot in
-            SlotPlan(
-                slot: slot,
-                chosen: draft[slot].flatMap { ContentCatalog.shared.symbol($0) },
-                candidates: BookRules.candidates(for: slot, ownedSymbols: ownedSymbols)
-            )
-        }
-
-        // Additive quantities: summing per-slot extremes gives the exact overall extremes.
-        var tierLow = Tuning.World.baseEnemyTier, tierHigh = Tuning.World.baseEnemyTier
-        var sightLow = Tuning.World.baseVisionRadius, sightHigh = Tuning.World.baseVisionRadius
-
-        for plan in plans {
-            let options = plan.chosen.map { [$0] } ?? plan.candidates
-            guard !options.isEmpty else { continue }
-            // Danger runes carry their tier shift on the profile rather than on `enemyTierDelta`,
-            // and the preview has to cover both or it promises a range the world doesn't honour.
-            let tiers = options.map { $0.enemyTierDelta + ($0.danger?.tierDelta ?? 0) }
-            tierLow += tiers.min() ?? 0
-            tierHigh += tiers.max() ?? 0
-            sightLow += options.map(\.visionDelta).min() ?? 0
-            sightHigh += options.map(\.visionDelta).max() ?? 0
-        }
-
-        // **Stability is not additive any more**, so it can't be summed slot by slot like the rest.
-        // Greed is measured off resolved abundance, and two ore symbols pushing the same subject
-        // stack with diminishing returns — so the chosen symbols are resolved *together*, exactly as
-        // the bind will resolve them, and only the slots left to chance widen the band.
-        //
-        // A fully specified draft therefore matches its bound book to the point, which is what the
-        // legibility pillar asks for: the preview cannot promise a number the world won't honour.
-        let chosenBook = BoundBook(
-            symbols: plans.reduce(into: [SlotID: SymbolID]()) { if let c = $1.chosen { $0[$1.slot] = c.id } },
-            randomlyFilled: [],
-            essencePaid: 0)
-        let settled = BookRules.stabilityDelta(
-            of: chosenBook,
-            sigils: BookRules.sigils(for: chosenBook),
-            contradictionPenalty: BookRules.contradictionPenalty(of: chosenBook))
-
-        var stabilityLow = settled, stabilityHigh = settled
-        for plan in plans where plan.chosen == nil && !plan.candidates.isEmpty {
-            let deltas = plan.candidates.map { BookRules.stabilityDelta(ofSymbolAlone: $0.id) }
-            stabilityLow += deltas.min() ?? 0
-            stabilityHigh += deltas.max() ?? 0
-        }
-
-        let scoreLow = BookRules.stabilityScore(delta: stabilityLow)
-        let scoreHigh = BookRules.stabilityScore(delta: stabilityHigh)
-        let turnsLow = BookRules.turnsAvailable(stabilityScore: scoreLow)
-        let turnsHigh = BookRules.turnsAvailable(stabilityScore: scoreHigh)
-        let sightFloor = max(Tuning.World.minimumVisionRadius, sightLow)
-        let sightCeiling = max(sightFloor, sightHigh)
-
-        // Exact, not ranged: you pay for what you chose, plus a flat rate per slot left to chance.
-        let cost = BookRules.bindCost(
-            chosenSymbolIDs: plans.compactMap { $0.chosen?.id },
-            randomSlots: plans.count { $0.isRandom && !$0.isEmpty }
-        )
-
-        // Described from what's *written*, with the seed filling the rest — so the panel talks
-        // about the world you'll actually get, chance-filled slots included.
-        let book = BookRules.resolveBook(draft: draft, ownedSymbols: ownedSymbols, seed: seed)
-        let sigils = BookRules.sigils(for: book)
-        let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
-
-        return BookProjection(
-            slotPlans: plans,
-            essenceCost: cost...cost,
-            stabilityScore: scoreLow...max(scoreLow, scoreHigh),
-            turnsUntilCollapse: turnsLow...max(turnsLow, turnsHigh),
-            enemyTier: max(1, tierLow)...max(1, max(tierLow, tierHigh)),
-            visionRadius: sightFloor...sightCeiling,
-            mapWidth: Tuning.World.gridWidth,
-            mapHeight: Tuning.World.gridHeight,
-            worldDescription: DescriptionRules.describe(
-                readings,
-                contradictions: ContradictionRules.fired(in: sigils, readings: readings),
-                analysisTier: analysisTier
-            ),
-            dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: book.allSymbolIDs),
-            resourceMix: expectedResourceMix(in: readings),
-            life: LifeRules.projection(for: readings),
-            flora: FloraRules.projection(for: readings)
-        )
-    }
-
-    /// **How far a roll could move the headline**, sampled across seeds.
+    /// **How far a roll could move the headline** — the *worst and best cases*, not a sample of them.
     ///
-    /// Sampled rather than derived: what an unwritten subject rolls is a whole sigil with its own
-    /// deltas and its own capacity to contradict what you wrote, and there's no closed form for
-    /// that. Twenty seeds is enough to find the shape of the band without being expensive — this
-    /// runs on every keystroke at the Writing Desk.
+    /// **This was sampled, and sampling is not a bound.** Twenty seeds found the shape of the band
+    /// and missed its tails: a page with one mark on it was shown `3–100` and could resolve to `0`,
+    /// which is the legibility pillar broken — *the preview may not promise a number the world
+    /// won't honour*. The old slot path got this right by taking the extremes of what each empty
+    /// slot could hold, and `fossil-audit.md` §5 warned that it held "the only correct
+    /// stability-range logic in the codebase". It was right. This is that logic, on the page.
+    ///
+    /// For each silent subject, the calmest and the greediest thing that could land on it is found
+    /// **in isolation** — that ranking is a property of the vocabulary, not of this page — and then
+    /// the two extreme worlds are resolved *whole*, so diminishing returns and contradiction are
+    /// priced exactly as the bind will price them. Two resolutions instead of twenty, and it runs
+    /// on every keystroke at the desk.
     private static func rolledStabilitySpread(sigils: [Sigil], page: Page, book: BoundBook,
                                               seed: UInt64) -> ClosedRange<Int> {
-        var lowest = Int.max, highest = Int.min
-        for sample in 0..<Tuning.Book.stabilitySamples {
-            let seeded = seed &+ UInt64(sample) &* 0x9E3779B97F4A7C15
-            let filled = sigils + PressureRules.rollUnwritten(after: sigils, seed: seeded)
+        var calmest: [Sigil] = [], greediest: [Sigil] = []
+        var identifier: UInt64 = 0
+
+        let written = Set(sigils.flatMap { sigil in
+            ContentCatalog.shared.pressureSource(sigil.source)?.targets ?? []
+        })
+        for target in ContentCatalog.shared.pressureTargetsInOrder where !written.contains(target.id) {
+            let pool = ContentCatalog.shared.pressureSources
+                .filter { $0.contribution(to: target.id) != nil }
+                .sorted { $0.id.rawValue < $1.id.rawValue }
+            guard !pool.isEmpty else { continue }
+
+            // Every intensity a roll can produce, since a great sun and a faint one are not the
+            // same ask — `rollUnwritten` picks both the source and how loudly it speaks.
+            let intensities = Intensity.allCases.filter { $0 != .absent }
+            var best: (Sigil, Int)?, worst: (Sigil, Int)?
+            for source in pool {
+                for intensity in intensities {
+                    identifier += 1
+                    let candidate = Sigil(id: InstanceID(rawValue: identifier),
+                                          source: source.id, target: target.id, intensity: intensity)
+                    let delta = BookRules.stabilityDelta(of: book, sigils: [candidate],
+                                                         contradictionPenalty: 0)
+                    if best == nil || delta > best!.1 { best = (candidate, delta) }
+                    if worst == nil || delta < worst!.1 { worst = (candidate, delta) }
+                }
+            }
+            if let best { calmest.append(best.0) }
+            if let worst { greediest.append(worst.0) }
+        }
+        guard !calmest.isEmpty else {
+            let settled = BookRules.stabilityScore(of: book)
+            return settled...settled
+        }
+
+        // …and then price each extreme world whole, because stability is not additive.
+        func score(_ rolled: [Sigil]) -> Int {
+            let filled = sigils + rolled
             let readings = PressureRules.resolve(filled)
             let fired = ContradictionRules.fired(in: filled, readings: readings)
-            let score = BookRules.stabilityScore(
+            return BookRules.stabilityScore(
                 delta: BookRules.stabilityDelta(
                     of: book,
                     sigils: filled,
                     contradictionPenalty: ContradictionRules.totalPenalty(for: fired)))
-            lowest = min(lowest, score)
-            highest = max(highest, score)
         }
-        guard lowest <= highest else { return 0...0 }
-        return lowest...highest
+        let low = score(greediest), high = score(calmest)
+        return min(low, high)...max(low, high)
     }
 
     /// **What this world will actually pay**, off the same readings the bind will use.

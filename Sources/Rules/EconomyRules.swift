@@ -16,15 +16,18 @@ enum EconomyRules {
         max(0, rawUnits) * Tuning.Economy.essencePerRawEssence
     }
 
-    /// The cheapest book that can possibly be written: every slot left to chance.
+    /// **The cheapest book that can possibly be written: an empty page.**
     ///
     /// Nothing may ever cost less than this, which makes it the floor the base has to keep you
     /// above — see `GameStore.ensureDepartureIsPossible`.
+    ///
+    /// It used to price *the old slot taxonomy* — one flat chance-charge per slot you owned
+    /// anything for — which stopped being what a book costs the moment the page grid replaced
+    /// slots. The floor the base guaranteed you was the price of a book nobody can write, and it
+    /// happened to be higher than the real one, so the guard was generous by accident rather than
+    /// by design. A blank page costs the base rate and no ink, because there are no marks on it.
     static func minimumBindCost(in state: GameState) -> Int {
-        let fillable = ContentCatalog.shared.slotIDsInOrder.count { slot in
-            !BookRules.candidates(for: slot, ownedSymbols: state.base.ownedSymbols).isEmpty
-        }
-        return BookRules.bindCost(chosenSymbolIDs: [], randomSlots: fillable)
+        BookRules.bindCost(chosenSymbolIDs: [], randomSlots: 0)
     }
 
     /// Everything the player could turn into essence right now without leaving the base.

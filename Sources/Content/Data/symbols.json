@@ -1,10 +1,9 @@
 {
-  "_note": "PLACEHOLDER \u2014 Claude-invented stopgaps for v0 feel, not balance; the whole vocabulary is being replaced by pressure sigils. NO SYMBOL MAY CARRY A HAND-TYPED GREED NUMBER (Q44, answer-q44.md). 'stabilityDelta' is gone from every entry and from SymbolDef itself, because greed is now MEASURED off what a symbol says rather than asserted beside it: BookRules.greedDelta resolves the expansion and prices it against each subject's neutral. Keeping both meant one world had two prices depending on which vocabulary you wrote it in \u2014 'Rich Ore' cost 45 and the same world spelled out as great iron + gold cost 8. The field is deleted rather than zeroed so this is enforced by the compiler and not by memory. THE ONE NUMBER STILL AUTHORED BY HAND is 'danger.stabilityTrade' on the seven danger runes and Peace, because that is a different axis: it is a bargain with the player (accept hostility, buy time), and nothing in the physical reading of a stormy world can produce it. Peace is its inverse and spends stability to buy calm. TWO RULES WORTH KEEPING: (1) a symbol's contribution to the headline is in the SAME UNITS as the headline and simply adds \u2014 a book starts at 100 and a rune reading '+12' moves it by exactly 12; the aggregate danger cap is the single disclosed exception. (2) EVERY symbol trades on SEVERAL axes, never one: Dim Sky buys stability with sight and with things that hunt in the dark; Plains is stability-neutral but lets you see further. A stable world is not an empty one. 'expandsTo' spells the symbol out in the pressure model's atomic vocabulary \u2014 the rune spec calls these compounds (\u00a79) \u2014 and IT IS NOW WHAT THE SYMBOL COSTS, so an expansion that understates what a symbol's name claims will read as a cheap world. PLACEHOLDER component choices.",
+  "_note": "PLACEHOLDER — Claude-invented stopgaps for v0 feel, not balance; the whole vocabulary is being replaced by pressure sigils. NO SYMBOL MAY CARRY A HAND-TYPED GREED NUMBER (Q44, answer-q44.md). 'stabilityDelta' is gone from every entry and from SymbolDef itself, because greed is now MEASURED off what a symbol says rather than asserted beside it: BookRules.greedDelta resolves the expansion and prices it against each subject's neutral. Keeping both meant one world had two prices depending on which vocabulary you wrote it in — 'Rich Ore' cost 45 and the same world spelled out as great iron + gold cost 8. The field is deleted rather than zeroed so this is enforced by the compiler and not by memory. THE ONE NUMBER STILL AUTHORED BY HAND is 'danger.stabilityTrade' on the seven danger runes and Peace, because that is a different axis: it is a bargain with the player (accept hostility, buy time), and nothing in the physical reading of a stormy world can produce it. Peace is its inverse and spends stability to buy calm. TWO RULES WORTH KEEPING: (1) a symbol's contribution to the headline is in the SAME UNITS as the headline and simply adds — a book starts at 100 and a rune reading '+12' moves it by exactly 12; the aggregate danger cap is the single disclosed exception. (2) EVERY symbol trades on SEVERAL axes, never one: Dim Sky buys stability with sight and with things that hunt in the dark; Plains is stability-neutral but lets you see further. A stable world is not an empty one. 'expandsTo' spells the symbol out in the pressure model's atomic vocabulary — the rune spec calls these compounds (§9) — and IT IS NOW WHAT THE SYMBOL COSTS, so an expansion that understates what a symbol's name claims will read as a cheap world. PLACEHOLDER component choices. 7 Aug (fossil-audit §4): every symbol carried a `slot`, and the page grid replaced slots two systems ago — the palette groups by subject. Removed, along with slots.json, so the next person to read this file isn't told about a taxonomy that no longer decides anything.",
   "symbols": [
     {
       "id": "plains",
       "name": "Plains",
-      "slot": "terrain",
       "blurb": "Open ground. Easy to cross, little to hide behind.",
       "icon": "mountain.2",
       "acquisition": "starter",
@@ -31,7 +30,6 @@
     {
       "id": "caverns",
       "name": "Caverns",
-      "slot": "terrain",
       "blurb": "Winding stone. Ore runs close to the surface here.",
       "icon": "square.split.bottomrightquarter",
       "acquisition": "starter",
@@ -61,7 +59,6 @@
     {
       "id": "archipelago",
       "name": "Archipelago",
-      "slot": "terrain",
       "blurb": "Scattered islands. Long walks between rich places.",
       "icon": "water.waves",
       "acquisition": "starter",
@@ -90,7 +87,6 @@
     {
       "id": "verdant",
       "name": "Verdant",
-      "slot": "biome",
       "blurb": "Growing things, and things that eat them.",
       "icon": "leaf",
       "acquisition": "starter",
@@ -119,7 +115,6 @@
     {
       "id": "ashen",
       "name": "Ashen",
-      "slot": "biome",
       "blurb": "Burnt over. What survives here is mean.",
       "icon": "flame",
       "acquisition": "starter",
@@ -149,7 +144,6 @@
     {
       "id": "frostbound",
       "name": "Frostbound",
-      "slot": "biome",
       "blurb": "Cold enough to hold a world still a while longer.",
       "icon": "snowflake",
       "acquisition": "starter",
@@ -179,8 +173,7 @@
     {
       "id": "sparse_ore",
       "name": "Sparse Ore",
-      "slot": "bounty",
-      "blurb": "A thin seam \u2014 less than a world would ordinarily carry. It rests easier for it.",
+      "blurb": "A thin seam — less than a world would ordinarily carry. It rests easier for it.",
       "icon": "circle.grid.2x1",
       "acquisition": "starter",
       "essenceCost": 2,
@@ -201,7 +194,6 @@
     {
       "id": "common_ore",
       "name": "Ore",
-      "slot": "bounty",
       "blurb": "About as much stone-metal as anywhere else. Nothing a world would notice.",
       "icon": "circle.grid.2x2",
       "acquisition": "starter",
@@ -223,7 +215,6 @@
     {
       "id": "rich_ore",
       "name": "Rich Ore",
-      "slot": "bounty",
       "blurb": "Greedy. Worlds notice being asked for this much.",
       "icon": "circle.grid.3x3.fill",
       "acquisition": "starter",
@@ -252,7 +243,6 @@
     {
       "id": "teeming_life",
       "name": "Teeming Life",
-      "slot": "bounty",
       "blurb": "Everything grows. Everything is hungry.",
       "icon": "ant",
       "acquisition": "starter",
@@ -288,7 +278,6 @@
     {
       "id": "dim_sky",
       "name": "Dim Sky",
-      "slot": "quirk",
       "blurb": "A low, held-breath light. The world lasts longer; you see less of it.",
       "icon": "moon.stars",
       "acquisition": "starter",
@@ -310,7 +299,6 @@
     {
       "id": "gilded_veins",
       "name": "Gilded Veins",
-      "slot": "quirk",
       "blurb": "Rare seams, everywhere you look. It will not hold.",
       "icon": "sparkles",
       "acquisition": "starter",
@@ -340,7 +328,6 @@
     {
       "id": "verdigris_bloom",
       "name": "Verdigris Bloom",
-      "slot": "biome",
       "blurb": "Copper-green growth over everything. PLACEHOLDER research symbol.",
       "icon": "camera.macro",
       "acquisition": "research",
@@ -375,7 +362,6 @@
     {
       "id": "mote_vein",
       "name": "Mote Vein",
-      "slot": "bounty",
       "blurb": "Something permanent, buried where it should not be. PLACEHOLDER research symbol.",
       "icon": "star.circle",
       "acquisition": "research",
@@ -405,7 +391,6 @@
     {
       "id": "storm",
       "name": "Storm",
-      "slot": "quirk",
       "blurb": "The weather here has opinions, and acts on them.",
       "icon": "cloud.bolt.rain",
       "acquisition": "research",
@@ -435,7 +420,6 @@
     {
       "id": "blight",
       "name": "Blight",
-      "slot": "quirk",
       "blurb": "Something is wrong with what grows. It grows anyway.",
       "icon": "laurel.trailing",
       "acquisition": "research",
@@ -468,7 +452,6 @@
     {
       "id": "swarm_rune",
       "name": "Swarm",
-      "slot": "quirk",
       "blurb": "Not one of anything. Many of everything.",
       "icon": "ant.fill",
       "acquisition": "research",
@@ -494,7 +477,6 @@
     {
       "id": "predation",
       "name": "Predation",
-      "slot": "quirk",
       "blurb": "Fewer things live here. They are why.",
       "icon": "pawprint.fill",
       "acquisition": "research",
@@ -520,7 +502,6 @@
     {
       "id": "miasma_rune",
       "name": "Miasma",
-      "slot": "quirk",
       "blurb": "The air itself is against you.",
       "icon": "aqi.high",
       "acquisition": "research",
@@ -547,7 +528,6 @@
     {
       "id": "tremor",
       "name": "Tremor",
-      "slot": "quirk",
       "blurb": "The ground opens where it pleases.",
       "icon": "waveform.path.ecg",
       "acquisition": "research",
@@ -577,7 +557,6 @@
     {
       "id": "peace",
       "name": "Peace",
-      "slot": "quirk",
       "blurb": "Nothing here wants anything from you. It will not last.",
       "icon": "dove.fill",
       "acquisition": "research",

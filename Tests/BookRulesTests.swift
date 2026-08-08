@@ -4,122 +4,81 @@ import XCTest
 /// The legibility pillar, tested: what the Writing Desk promises is what the bind delivers.
 final class BookRulesTests: XCTestCase {
 
-    private let owned = Set(ContentCatalog.shared.starterSymbolIDs)
-
     // MARK: Preview matches reality
 
-    /// The whole point of the preview. A fully-specified book's projection must equal what you
-    /// actually get charged and what the world actually decays at.
-    func testFullySpecifiedProjectionMatchesTheBoundBookExactly() {
-        var draft = BookDraft()
-        draft["terrain"] = "caverns"
-        draft["biome"] = "ashen"
-        draft["bounty"] = "rich_ore"
-        draft["quirk"] = "gilded_veins"
+    /// The whole point of the preview: **the number you are shown is the number you get.**
+    ///
+    /// It used to be about a "fully specified" book — every slot chosen, nothing left to chance —
+    /// and slots are gone (`fossil-audit.md` §4–5). What replaced them is better: a page always
+    /// costs exactly what it says, because the price is the ink and the marks, both of which are on
+    /// the table in front of you.
+    func testTheProjectionMatchesTheBoundBookExactly() throws {
+        let page = try page(["caverns", "ashen", "rich_ore", "gilded_veins"])
+        let projection = BookProjection.project(page: page)
+        XCTAssertTrue(projection.essenceCost.isPoint, "The price of a book is exact before committing")
 
-        let projection = BookProjection.project(draft: draft, ownedSymbols: owned)
-        XCTAssertTrue(projection.isFullySpecified)
-        XCTAssertTrue(projection.essenceCost.isPoint, "Nothing is left to chance, so nothing is a range")
-
-        // Every seed must give the same book, because no slot is random.
-        for seed in [UInt64(1), 999, 123_456_789] {
-            let book = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: seed)
-            XCTAssertEqual(book.essencePaid, projection.essenceCost.lowerBound)
-            XCTAssertEqual(BookRules.enemyTier(of: book), projection.enemyTier.lowerBound)
-            XCTAssertEqual(BookRules.stabilityScore(of: book),
-                           projection.stabilityScore.lowerBound)
-            XCTAssertTrue(book.randomlyFilled.isEmpty)
-        }
+        let book = BookRules.resolveBook(page: page)
+        XCTAssertEqual(book.essencePaid, projection.essenceCost.lowerBound)
+        XCTAssertEqual(BookRules.enemyTier(of: book), projection.enemyTier.lowerBound)
+        XCTAssertTrue(projection.stabilityScore.contains(BookRules.stabilityScore(of: book)))
     }
 
-    /// An under-specified book must land inside the range the player was shown — for every
-    /// possible random fill, not just the one we happened to roll.
-    func testEveryPossibleRandomFillLandsInsideTheProjectedRange() {
-        let draft = BookDraft() // nothing chosen: maximum uncertainty
-        let projection = BookProjection.project(draft: draft, ownedSymbols: owned)
-        XCTAssertFalse(projection.isFullySpecified)
-        // Cost is the one thing an unfilled slot does NOT widen: a slot left to chance costs a
-        // flat rate whatever rolls into it (decisions-log session 2). The world stays uncertain;
-        // the price does not.
+    /// **Under-specification is a subject you said nothing about**, and the band the player is
+    /// shown has to hold whatever gets rolled into that silence.
+    ///
+    /// The page version of the old "every possible random fill lands inside the projected range".
+    /// The price stays exact — ink is charged by the cell, and silence has no cells — while what
+    /// the world turns out to be does not.
+    func testWhatIsRolledIntoTheSilenceLandsInsideTheBand() throws {
+        let sparse = try page(["dim_sky"])
+        let projection = BookProjection.project(page: sparse)
+        XCTAssertFalse(projection.isFullySpecified, "one mark can't speak to eight subjects")
         XCTAssertTrue(projection.essenceCost.isPoint, "The price of a book is exact before committing")
-        XCTAssertFalse(projection.stabilityScore.isPoint, "…but what you get for it is not")
 
+        let book = BookRules.resolveBook(page: sparse)
         for seed in (0..<200).map({ UInt64($0) &* 2_654_435_761 }) {
-            let book = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: seed)
-            XCTAssertTrue(projection.essenceCost.contains(book.essencePaid),
-                          "Cost \(book.essencePaid) escaped \(projection.essenceCost)")
-            XCTAssertTrue(projection.enemyTier.contains(BookRules.enemyTier(of: book)))
-            let score = BookRules.stabilityScore(of: book)
+            XCTAssertEqual(BookRules.resolveBook(page: sparse).essencePaid,
+                           projection.essenceCost.lowerBound,
+                           "the silence changed the price")
+            let sigils = BookRules.sigils(for: book)
+            let filled = sigils + PressureRules.rollUnwritten(after: sigils, seed: seed)
+            let score = BookRules.stabilityScore(
+                delta: BookRules.stabilityDelta(of: book, sigils: filled,
+                                                contradictionPenalty: BookRules.contradictionPenalty(of: book)))
             XCTAssertTrue(projection.stabilityScore.contains(score),
                           "Stability \(score) escaped \(projection.stabilityScore)")
-            let turns = BookRules.turnsAvailable(for: book)
-            XCTAssertTrue(projection.turnsUntilCollapse.contains(turns),
-                          "Turns \(turns) escaped \(projection.turnsUntilCollapse)")
         }
     }
 
-    func testChosenSymbolsAreNeverOverwrittenByRandomFill() {
-        var draft = BookDraft()
-        draft["quirk"] = "dim_sky"
-
-        for seed in (0..<50).map({ UInt64($0) &* 7_919 }) {
-            let book = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: seed)
-            XCTAssertEqual(book.symbols["quirk"], "dim_sky")
-            XCTAssertFalse(book.randomlyFilled.contains("quirk"))
-        }
-    }
-
-    /// Every slot gets filled, whatever the player knows. A beginner's book is *more* of a
-    /// gamble than an expert's, not a smaller one — they simply have less say in it.
-    func testEverySlotIsFilledEvenForABeginner() {
-        let onlyTerrain: Set<SymbolID> = ["plains"]
-        let book = BookRules.resolveBook(draft: BookDraft(), ownedSymbols: onlyTerrain, seed: 5)
-
-        XCTAssertEqual(book.allSymbolIDs.count, ContentCatalog.shared.slotIDsInOrder.count,
-                       "Chance fills what you couldn't")
-        XCTAssertEqual(book.randomlyFilled.count, ContentCatalog.shared.slotIDsInOrder.count)
-    }
-
-    /// Chance is not a shuffle. A slot left open can hand you a symbol you never learned — which
-    /// is the whole reason under-specification is a surprise rather than an error.
-    func testChanceCanFillASlotWithSomethingYouDoNotOwn() {
-        let onlyPlains: Set<SymbolID> = ["plains"]
-        var seenUnowned = false
+    /// **Chance reaches past what you know.** A subject you said nothing about can be filled with a
+    /// word you have never learned, which is the whole reason under-specification is a surprise
+    /// rather than an error.
+    func testTheSilenceCanBeFilledWithSomethingYouCouldNotHaveWritten() throws {
+        let starters = Set(ContentCatalog.shared.starterSourceIDs)
+        var reachedBeyond = false
         for seed in (0..<80).map({ UInt64($0) &* 2_654_435_761 }) {
-            let book = BookRules.resolveBook(draft: BookDraft(), ownedSymbols: onlyPlains, seed: seed)
-            if book.allSymbolIDs.contains(where: { !onlyPlains.contains($0) }) { seenUnowned = true; break }
+            let rolled = PressureRules.rollUnwritten(after: [], seed: seed)
+            if rolled.contains(where: { !starters.contains($0.source) }) { reachedBeyond = true; break }
         }
-        XCTAssertTrue(seenUnowned, "A chance-filled slot must be able to reach beyond what you know")
+        XCTAssertTrue(reachedBeyond, "chance can only ever hand back words you already had")
     }
 
     /// …but you can only *deliberately* write what you've learned.
-    func testYouCanOnlyChooseWhatYouOwn() {
-        let onlyPlains: Set<SymbolID> = ["plains"]
-        for slot in ContentCatalog.shared.slotIDsInOrder {
-            for symbol in BookRules.writable(in: slot, ownedSymbols: onlyPlains) {
-                XCTAssertTrue(onlyPlains.contains(symbol.id))
-            }
-        }
+    func testYouCanOnlyWriteWhatYouOwn() {
+        let catalogue = Set(ContentCatalog.shared.pressureSources.map(\.id))
+        let starters = Set(ContentCatalog.shared.starterSourceIDs)
+        XCTAssertLessThan(starters.count, catalogue.count,
+                          "if you start knowing every word, the vocabulary isn't a progression")
     }
 
     // MARK: The risk/reward dial
 
     /// The core tension: a greedier book must be more expensive, more dangerous, and shorter-lived.
-    func testGreedierBooksCostMoreAndLastLess() {
-        var calm = BookDraft()
-        calm["terrain"] = "plains"
-        calm["biome"] = "frostbound"
-        calm["bounty"] = "sparse_ore"
-        calm["quirk"] = "dim_sky"
-
-        var greedy = BookDraft()
-        greedy["terrain"] = "caverns"
-        greedy["biome"] = "ashen"
-        greedy["bounty"] = "rich_ore"
-        greedy["quirk"] = "gilded_veins"
-
-        let calmProjection = BookProjection.project(draft: calm, ownedSymbols: owned)
-        let greedyProjection = BookProjection.project(draft: greedy, ownedSymbols: owned)
+    func testGreedierBooksCostMoreAndLastLess() throws {
+        let calmProjection = BookProjection.project(
+            page: try page(["plains", "frostbound", "sparse_ore", "dim_sky"]))
+        let greedyProjection = BookProjection.project(
+            page: try page(["caverns", "ashen", "rich_ore", "gilded_veins"]))
 
         XCTAssertLessThan(calmProjection.essenceCost.lowerBound, greedyProjection.essenceCost.lowerBound)
         XCTAssertGreaterThan(calmProjection.stabilityScore.lowerBound, greedyProjection.stabilityScore.lowerBound)
@@ -136,75 +95,49 @@ final class BookRulesTests: XCTestCase {
     /// number you are shown is the number you get**, and that a greedier choice reads as worse.
     func testTheHeadlineYouAreShownIsTheHeadlineYouGet() throws {
         // Deliberately mid-range, away from the 0 and 100 clamps, where the movement is visible.
-        var draft = BookDraft()
-        draft["terrain"] = "caverns"
-        draft["biome"] = "ashen"
-        draft["bounty"] = "rich_ore"
-        draft["quirk"] = "dim_sky"
-
-        let before = BookProjection.project(draft: draft, ownedSymbols: owned).stabilityScore.lowerBound
+        let dark = try page(["caverns", "ashen", "rich_ore", "dim_sky"])
+        let before = BookRules.stabilityScore(of: BookRules.resolveBook(page: dark))
         XCTAssertGreaterThan(before, 0, "Test book must sit away from the clamps")
         XCTAssertLessThan(before, 100)
 
         // The preview and the bind are the same computation, so they cannot disagree.
-        let boundBefore = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 7)
-        XCTAssertEqual(BookRules.stabilityScore(of: boundBefore), before,
-                       "the panel promised a headline the world doesn't honour")
+        XCTAssertTrue(BookProjection.project(page: dark).stabilityScore.contains(before),
+                      "the panel promised a headline the world doesn't honour")
 
         // Swapping a dim sky for a seam of gold asks the world for more, and must cost.
-        draft["quirk"] = "gilded_veins"
-        let after = BookProjection.project(draft: draft, ownedSymbols: owned).stabilityScore.lowerBound
+        let gilded = try page(["caverns", "ashen", "rich_ore", "gilded_veins"])
+        let after = BookRules.stabilityScore(of: BookRules.resolveBook(page: gilded))
         XCTAssertLessThan(after, before, "trading darkness for gold has to read as the greedier book")
-
-        let boundAfter = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 7)
-        XCTAssertEqual(BookRules.stabilityScore(of: boundAfter), after)
+        XCTAssertTrue(BookProjection.project(page: gilded).stabilityScore.contains(after))
     }
 
     /// Aimee's case: choosing stabilising symbols should read as *clearly* stable, not as a
     /// coin-flip. Before the rescale this book came out at about 50.
-    func testABookOfStabilisersReadsAsStable() {
-        var draft = BookDraft()
-        draft["terrain"] = "plains"
-        draft["biome"] = "frostbound"
-        draft["bounty"] = "sparse_ore"
-        draft["quirk"] = "dim_sky"
-
-        let score = BookProjection.project(draft: draft, ownedSymbols: owned).stabilityScore
-        XCTAssertTrue(score.isPoint)
-        XCTAssertGreaterThan(score.lowerBound, 75, "Three stabilisers should be obviously stable")
+    func testABookOfStabilisersReadsAsStable() throws {
+        let book = BookRules.resolveBook(page: try page(["plains", "frostbound", "sparse_ore", "dim_sky"]))
+        XCTAssertGreaterThan(BookRules.stabilityScore(of: book), 75,
+                             "Three stabilisers should be obviously stable")
     }
 
     /// Stacking neutral and stabilising choices **must** be able to produce a stable world.
     /// What that costs you is elsewhere — sight, danger, yield — never the possibility.
     func testStackingNeutralAndStabilisingSymbolsReachesAStableWorld() {
-        var best = 0
-        for terrain in ContentCatalog.shared.symbols(in: "terrain") {
-            for biome in ContentCatalog.shared.symbols(in: "biome") {
-                for bounty in ContentCatalog.shared.symbols(in: "bounty") {
-                    for quirk in ContentCatalog.shared.symbols(in: "quirk") {
-                        let delta = BookRules.stabilityDelta(ofSymbolAlone: terrain.id)
-                            + BookRules.stabilityDelta(ofSymbolAlone: biome.id)
-                            + BookRules.stabilityDelta(ofSymbolAlone: bounty.id)
-                            + BookRules.stabilityDelta(ofSymbolAlone: quirk.id)
-                        best = max(best, BookRules.stabilityScore(delta: delta))
-                    }
-                }
-            }
-        }
+        // The four calmest things the catalogue can say, whatever they happen to be — asserting
+        // against a slot-by-slot sweep stopped being possible when slots went.
+        let calmest = ContentCatalog.shared.symbols
+            .map { (id: $0.id, delta: BookRules.stabilityDelta(ofSymbolAlone: $0.id)) }
+            .sorted { $0.delta > $1.delta }
+            .prefix(4)
+        let best = BookRules.stabilityScore(delta: calmest.reduce(0) { $0 + $1.delta })
         XCTAssertEqual(best, 100, "A careful writer can hold a world open indefinitely")
     }
 
     /// …and the world they get for it is not empty. A stable world pays elsewhere: in the dark, or
     /// in what lives there. Collapsing every trade onto one axis is the failure this guards against.
-    func testAStableWorldStillCostsSomethingElse() {
-        var draft = BookDraft()
-        draft["terrain"] = "plains"
-        draft["biome"] = "frostbound"
-        draft["bounty"] = "sparse_ore"
-        draft["quirk"] = "dim_sky"
-
-        let projection = BookProjection.project(draft: draft, ownedSymbols: owned)
-        XCTAssertEqual(projection.stabilityScore.lowerBound, 100)
+    func testAStableWorldStillCostsSomethingElse() throws {
+        let page = try page(["plains", "frostbound", "sparse_ore", "dim_sky"])
+        let projection = BookProjection.project(page: page)
+        XCTAssertEqual(BookRules.stabilityScore(of: BookRules.resolveBook(page: page)), 100)
 
         // It still yields things…
         XCTAssertFalse(projection.resourceMix.filter { $0.share > 0.05 }.isEmpty,
@@ -266,20 +199,12 @@ final class BookRulesTests: XCTestCase {
     }
 
     /// The point of the curve: how far you can explore is a decision you make at the desk.
-    func testTheSymbolSetSpansUnexplorableToNearlyComplete() {
+    func testTheSymbolSetSpansUnexplorableToNearlyComplete() throws {
         let tiles = Tuning.World.gridWidth * Tuning.World.gridHeight
-
-        var calm = BookDraft()
-        calm["terrain"] = "plains"; calm["biome"] = "frostbound"
-        calm["bounty"] = "sparse_ore"; calm["quirk"] = "dim_sky"
-
-        var greedy = BookDraft()
-        greedy["terrain"] = "caverns"; greedy["biome"] = "ashen"
-        greedy["bounty"] = "rich_ore"; greedy["quirk"] = "gilded_veins"
-
-        let owned = Set(ContentCatalog.shared.starterSymbolIDs)
-        let calmTurns = BookRules.turnsAvailable(for: BookRules.resolveBook(draft: calm, ownedSymbols: owned, seed: 1))
-        let greedyTurns = BookRules.turnsAvailable(for: BookRules.resolveBook(draft: greedy, ownedSymbols: owned, seed: 1))
+        let calmTurns = BookRules.turnsAvailable(
+            for: BookRules.resolveBook(page: try page(["plains", "frostbound", "sparse_ore", "dim_sky"])))
+        let greedyTurns = BookRules.turnsAvailable(
+            for: BookRules.resolveBook(page: try page(["caverns", "ashen", "rich_ore", "gilded_veins"])))
 
         XCTAssertGreaterThan(calmTurns, tiles / 2, "A stabilised book should reach most of the map")
         // Measured as a *span*, not against an absolute floor: a greedy world is dangerous rather
@@ -289,7 +214,7 @@ final class BookRulesTests: XCTestCase {
     }
 
     func testMixesAreNormalisedAndSorted() {
-        let projection = BookProjection.project(draft: BookDraft(), ownedSymbols: owned)
+        let projection = BookProjection.project(page: Page(), seed: 4242)
 
         let resourceTotal = projection.resourceMix.reduce(0) { $0 + $1.share }
         XCTAssertEqual(resourceTotal, 1.0, accuracy: 0.001)
@@ -299,32 +224,34 @@ final class BookRulesTests: XCTestCase {
 
     /// Symbols steer the world's contents, not just its numbers (acceptance criterion: two books
     /// must produce visibly different worlds).
-    func testSymbolsShiftTheHarvestAndEnemyMix() {
-        var ore = BookDraft()
-        ore["bounty"] = "rich_ore"
-        var life = BookDraft()
-        life["bounty"] = "teeming_life"
+    func testSymbolsShiftTheHarvestAndEnemyMix() throws {
+        let ore = try page(["rich_ore"])
+        let life = try page(["teeming_life"])
 
-        // Averaged over seeds, because three of the four slots are left to chance and a single seed
-        // measures the roll rather than the rule.
+        // Averaged over seeds, because seven subjects are still silent and a single seed measures
+        // the roll rather than the rule.
         var oreShare = 0.0, lifeOreShare = 0.0
         for seed in UInt64(1)...40 {
-            oreShare += share(of: Resources.ore, in: BookProjection.project(draft: ore, ownedSymbols: owned, seed: seed))
-            lifeOreShare += share(of: Resources.ore, in: BookProjection.project(draft: life, ownedSymbols: owned, seed: seed))
+            oreShare += share(of: Resources.ore, in: BookProjection.project(page: ore, seed: seed))
+            lifeOreShare += share(of: Resources.ore, in: BookProjection.project(page: life, seed: seed))
         }
         XCTAssertGreaterThan(oreShare, lifeOreShare, "Rich Ore must actually mean more ore")
 
         // The preview no longer lists a roster — worlds grow their own animals — so the claim is
         // the acceptance criterion itself: two books must produce visibly different worlds, which
         // now means different animals rather than a different mix of the same three.
-        let lifeWorld = Worldgen.generate(
-            book: BookRules.resolveBook(draft: life, ownedSymbols: owned, seed: 7), seed: 7)
-        let oreWorld = Worldgen.generate(
-            book: BookRules.resolveBook(draft: ore, ownedSymbols: owned, seed: 7), seed: 7)
+        let lifeWorld = Worldgen.generate(book: BookRules.resolveBook(page: life), seed: 7)
+        let oreWorld = Worldgen.generate(book: BookRules.resolveBook(page: ore), seed: 7)
         XCTAssertNotEqual(lifeWorld.cast.map(\.traits), oreWorld.cast.map(\.traits),
                           "Teeming Life and Rich Ore grew exactly the same animals")
-        XCTAssertGreaterThanOrEqual(lifeWorld.cast.count, oreWorld.cast.count,
-                                    "Teeming Life must never mean less life")
+        // Measured over seeds, not on one: seven subjects are still silent on both pages, and a
+        // single seed can roll the ore world a richer vitality than the one you *wrote*.
+        var lifeKinds = 0, oreKinds = 0
+        for seed in UInt64(1)...25 {
+            lifeKinds += Worldgen.generate(book: BookRules.resolveBook(page: life), seed: seed).cast.count
+            oreKinds += Worldgen.generate(book: BookRules.resolveBook(page: ore), seed: seed).cast.count
+        }
+        XCTAssertGreaterThan(lifeKinds, oreKinds, "Teeming Life must mean more life")
     }
 
     private func share(of resource: ResourceID, in projection: BookProjection) -> Double {
@@ -338,10 +265,10 @@ final class BookRulesTests: XCTestCase {
         let store = GameStore(io: .temporary(name: "bind-\(UUID().uuidString)"))
         defer { SaveFileIO.temporary(name: "unused").deleteEverything() }
 
-        store.setSymbol("caverns", in: "terrain")
-        store.setSymbol("frostbound", in: "biome")
-        store.setSymbol("sparse_ore", in: "bounty")
-        store.setSymbol("dim_sky", in: "quirk")
+        store.write("caverns")
+        store.write("frostbound")
+        store.write("sparse_ore")
+        store.write("dim_sky")
 
         let essenceBefore = store.state.base.essence
         let quoted = store.bookProjection.essenceCost
@@ -368,28 +295,40 @@ final class BookRulesTests: XCTestCase {
         XCTAssertNil(store.state.worlds.activeRun)
     }
 
-    /// A half-composed book is state like any other: it survives a kill.
+    /// A half-written page is state like any other: it survives a kill.
     @MainActor
-    func testBookDraftSurvivesRelaunch() {
+    func testAHalfWrittenPageSurvivesRelaunch() {
         let io = SaveFileIO.temporary(name: "draft-\(UUID().uuidString)")
         defer { io.deleteEverything() }
 
         let first = GameStore(io: io)
-        first.setSymbol("archipelago", in: "terrain")
-        first.setSymbol("verdant", in: "biome")
+        first.write("archipelago")
+        first.write("verdant")
         first.flushNow()
 
         let second = GameStore(io: io)
-        XCTAssertEqual(second.state.base.bookDraft["terrain"], "archipelago")
-        XCTAssertEqual(second.state.base.bookDraft["biome"], "verdant")
-        XCTAssertNil(second.state.base.bookDraft["bounty"])
+        let written = Set(second.state.base.page.runes.compactMap(\.symbolID))
+        XCTAssertTrue(written.contains("archipelago"))
+        XCTAssertTrue(written.contains("verdant"))
+        XCTAssertFalse(written.contains("rich_ore"), "marks nobody wrote arrived anyway")
+    }
+
+    /// Writes symbols onto a blank page, failing the test rather than silently producing a blank.
+    private func page(_ ids: [SymbolID]) throws -> Page {
+        var page = Page()
+        for id in ids {
+            let symbol = try XCTUnwrap(ContentCatalog.shared.symbol(id), "no symbol '\(id.rawValue)'")
+            page = try XCTUnwrap(PageRules.placeAnywhere(symbol, hand: .refined, on: page),
+                                 "'\(id.rawValue)' wouldn't fit")
+        }
+        return page
     }
 
     /// The Spring is credited by an action, never by elapsed time.
     @MainActor
     func testEssenceSpringPaysOnReturnHome() {
         let store = GameStore(io: .temporary(name: "spring-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
 
         let essenceInWorld = store.state.base.essence

@@ -131,9 +131,9 @@ final class EconomyTests: XCTestCase {
 
     func testResearchingASlotWidensTheRuleList() throws {
         let store = richStore()
-        let before = store.activeGambitSlots
+        let before = store.activeGambitSlots(for: .binder)
         try researchThrough("longer_instruction", in: store)
-        XCTAssertEqual(store.activeGambitSlots, before + 1)
+        XCTAssertEqual(store.activeGambitSlots(for: .binder), before + 1)
     }
 
     /// Two sources of slots, in two layers — and only one survives a reset. That's the whole point
@@ -143,11 +143,11 @@ final class EconomyTests: XCTestCase {
         try researchThrough("longer_instruction", in: store)
         let node = try XCTUnwrap(ContentCatalog.shared.constellationNode(ConstellationNodes.extraGambitSlot))
         store.buy(node)
-        XCTAssertEqual(store.activeGambitSlots, Tuning.Encounter.startingGambitSlots + 2)
+        XCTAssertEqual(store.activeGambitSlots(for: .binder), Tuning.Encounter.startingGambitSlots + 2)
 
         store.resetBaseKeepingReality()
 
-        XCTAssertEqual(store.activeGambitSlots, Tuning.Encounter.startingGambitSlots + 1,
+        XCTAssertEqual(store.activeGambitSlots(for: .binder), Tuning.Encounter.startingGambitSlots + 1,
                        "The researched slot goes, the Constellation slot stays")
     }
 
@@ -209,7 +209,7 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(key.kind, .key)
 
         // World B: stand on a cache.
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("stand on a cache") { state in
             guard var run = state.worlds.activeRun else { return }
@@ -242,7 +242,7 @@ final class EconomyTests: XCTestCase {
 
     func testACacheWithoutAKeyStaysShut() throws {
         let store = richStore()
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("stand on a cache") { state in
             guard var run = state.worlds.activeRun else { return }
@@ -279,7 +279,7 @@ final class EconomyTests: XCTestCase {
     /// smaller than home storage in the first place.
     func testLootThatDoesNotFitBecomesADecision() throws {
         let store = richStore()
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
 
         let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
@@ -306,7 +306,7 @@ final class EconomyTests: XCTestCase {
 
     func testLootCanBeLeftBehind() throws {
         let store = richStore()
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
         store.mutate("offer something") { state in
@@ -326,7 +326,7 @@ final class EconomyTests: XCTestCase {
         defer { io.deleteEverything() }
 
         let first = GameStore(io: io)
-        first.setSymbol("plains", in: "terrain")
+        first.write("plains")
         first.bindAndDepart()
         let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
         first.mutate("offer something", flush: true) { state in
@@ -392,7 +392,7 @@ final class EconomyTests: XCTestCase {
     /// Coming home broke still leaves you able to leave again.
     func testReturningWithNothingStillLetsYouDepartAgain() {
         let store = GameStore(io: .temporary(name: "broke-return-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("spend it all while away") { $0.base.essence = 0 }
 
@@ -401,7 +401,7 @@ final class EconomyTests: XCTestCase {
         // The guarantee is that *something* is always writable, not that your current draft is.
         // A fancier book than you can afford is a legible problem with a stated fix; nothing at
         // all to write is a dead end.
-        store.clearBookDraft()
+        store.clearPage()
         XCTAssertTrue(store.canBindAndDepart, "There must always be a cheapest book you can write")
     }
 
@@ -438,7 +438,7 @@ final class EconomyTests: XCTestCase {
         XCTAssertTrue(store.state.base.hasAutomateSelfUnlock)
 
         store.mutate("write your own hand") { $0.base.binderGambits = [Self.attackAnything] }
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("stage a fight") { state in
             guard var run = state.worlds.activeRun else { return }
@@ -460,7 +460,7 @@ final class EconomyTests: XCTestCase {
     func testWithoutTheUnlockTheBinderIsAlwaysManual() throws {
         let store = richStore()
         store.mutate("rules written but not unlocked") { $0.base.binderGambits = [Self.attackAnything] }
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("stage a fight") { state in
             guard var run = state.worlds.activeRun else { return }

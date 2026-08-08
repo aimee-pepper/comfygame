@@ -224,5 +224,9 @@ extension GameStore {
     }
 
     /// Rules beyond this index are owned but inactive — the slot count is the progression.
-    var activeGambitSlots: Int { GambitEngine.availableSlots(in: state) }
+    /// **Whose list this is decides how long it may be.** Wit governs rule length, so the number
+    /// differs per person — which is the whole reason the stat exists.
+    func activeGambitSlots(for actor: Combatant) -> Int {
+        GambitEngine.availableSlots(for: actor, in: state)
+    }
 }

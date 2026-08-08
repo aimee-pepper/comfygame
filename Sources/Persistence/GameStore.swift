@@ -49,12 +49,12 @@ final class GameStore: ObservableObject {
         // A launch is itself a state change: record it and write immediately, so that even a
         // launch-then-instant-kill leaves a coherent file.
         //
-        // Also the moment to reconcile the save with the content it was written against: the slot
-        // taxonomy is being replaced (decisions-log session 2), and a draft referring to slots or
-        // symbols that no longer exist should be dropped here rather than lingering invisibly.
+        // Also the moment to reconcile the save with the content it was written against. The book
+        // *draft* used to be pruned here — it referred to slots, and the slot taxonomy is gone
+        // (`fossil-audit.md` §5), so there is nothing left to prune: a save written before the page
+        // simply drops the field, which is what tolerant decoding is for.
         mutate("launch", flush: true) { state in
             state.meta.launchCount += 1
-            state.base.bookDraft.prune()
             // **And everybody you've found gets a seat at the fire**, whether or not the version of
             // the game that found them knew how to give them one. See `seatEveryoneFound`.
             state.base.seatEveryoneFound(in: state.reality.library)

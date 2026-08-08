@@ -6,22 +6,10 @@ import Foundation
 //
 // All numbers in the JSON are `// PLACEHOLDER` stopgaps.
 
-/// A kind of slot a book has.
-///
-/// Content, not code — see `SlotID`. Adding, removing or renaming a slot is a `slots.json` edit;
-/// books, the Writing Desk, the projection and the save format all follow.
-struct SlotDef: Codable, Equatable, Identifiable, Sendable {
-    var id: SlotID
-    var name: String
-    var blurb: String
-    var order: Int
-}
-
-/// A symbol the player can drop into a book slot.
+/// A symbol the player can write on a page.
 struct SymbolDef: Codable, Equatable, Identifiable, Sendable {
     var id: SymbolID
     var name: String
-    var slot: SlotID
     var blurb: String
     /// SF Symbol name — v0 has no art (design brief: SF Symbols/emoji + colour).
     var icon: String

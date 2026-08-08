@@ -105,16 +105,23 @@ struct BaseView: View {
         .padding(.top, 4)
     }
 
+    /// **Counted in marks and subjects**, because that is what a page is made of.
+    ///
+    /// It used to count slots — filled against total — and the page grid replaced slots two systems
+    /// ago. On a page every "slot" carried a mark, so this always said *"N of N chosen"* however
+    /// much of the world you had actually written about.
     private var departureHint: String {
         let projection = store.bookProjection
-        let filled = projection.slotPlans.count { !$0.isRandom }
-        if filled == 0 {
-            return "No symbols placed — the book will be written entirely by chance."
+        let marks = projection.marksSpeaking
+        let rolled = projection.unwrittenSubjects.count
+        if marks == 0 {
+            return "Nothing written — the world will be entirely what it decides."
         }
-        if projection.isFullySpecified {
-            return "A book of \(filled) symbols is waiting at the desk."
+        let written = marks == 1 ? "One mark speaking" : "\(marks) marks speaking"
+        if rolled == 0 {
+            return "\(written), and nothing left to chance. Waiting at the desk."
         }
-        return "\(filled) of \(projection.slotPlans.count) slots chosen; the rest are left to chance."
+        return "\(written); \(rolled) subject\(rolled == 1 ? "" : "s") still to roll."
     }
 }
 

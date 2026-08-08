@@ -155,7 +155,7 @@ final class StackingTests: XCTestCase {
     @MainActor
     func testTheSatchelBinsTooSoCarryingIsntMiserable() throws {
         let store = GameStore(io: .temporary(name: "stack-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("haul several of the same thing") { state in
             guard var run = state.worlds.activeRun else { return }

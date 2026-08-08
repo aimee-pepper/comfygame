@@ -282,7 +282,7 @@ final class LibraryTests: XCTestCase {
     func testEveryWorldYouEnterIsRecordedWithWhatYouWroteAndWhatItBecame() throws {
         let store = GameStore(io: .temporary(name: "history-\(UUID().uuidString)"))
         store.mutate("test: fund") { $0.base.essence = 500 }
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
 
         let recorded = try XCTUnwrap(store.state.reality.library.visitedWorlds.last)
@@ -616,7 +616,7 @@ final class LibraryTests: XCTestCase {
             state.base.roster.append(joined)
             state.reality.library.foundTravellers.insert("halloway")
         }
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.mutate("test: fund") { $0.base.essence = 500 }
         store.bindAndDepart()
         store.endRunWithPartialHaul(reason: "test: the floor took you")

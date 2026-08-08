@@ -123,7 +123,7 @@ final class MaterialTests: XCTestCase {
     @MainActor
     func testWinningAFightPutsThePartsInYourSatchel() throws {
         let store = GameStore(io: .temporary(name: "loot-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("stage a fight against something worth skinning") { state in
             guard var run = state.worlds.activeRun else { return }

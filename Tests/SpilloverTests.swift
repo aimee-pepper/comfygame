@@ -104,7 +104,7 @@ final class SpilloverTests: XCTestCase {
     private func makeStore() -> GameStore {
         let store = GameStore(io: .temporary(name: "spillover-\(UUID().uuidString)"))
         store.mutate("test: fund") { state in state.base.essence = 500 }
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         return store
     }

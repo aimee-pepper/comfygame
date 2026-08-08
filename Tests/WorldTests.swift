@@ -380,7 +380,7 @@ final class WorldTests: XCTestCase {
     @MainActor
     func testPortalHomeKeepsEverything() {
         let store = GameStore(io: .temporary(name: "portal-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("stock the satchel") { $0.worlds.activeRun?.satchel.add(9, of: Resources.ore) }
 
@@ -395,7 +395,7 @@ final class WorldTests: XCTestCase {
     @MainActor
     func testCollapseKeepsOnlyAFractionAndBanksMotesToReality() {
         let store = GameStore(io: .temporary(name: "collapse-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("stock the satchel") { state in
             state.worlds.activeRun?.satchel.add(10, of: Resources.ore)
@@ -422,10 +422,10 @@ final class WorldTests: XCTestCase {
         // Every slot filled. This test is about the map surviving a kill, and a book left partly
         // to chance can roll itself a world that collapses inside these five steps — which fails
         // it for a reason that has nothing to do with persistence.
-        first.setSymbol("caverns", in: "terrain")
-        first.setSymbol("frostbound", in: "biome")
-        first.setSymbol("sparse_ore", in: "bounty")
-        first.setSymbol("dim_sky", in: "quirk")
+        first.write("caverns")
+        first.write("frostbound")
+        first.write("sparse_ore")
+        first.write("dim_sky")
         first.bindAndDepart()
         // Wander a bit so fog, position and RNG have all moved off their initial values.
         for _ in 0..<5 {
@@ -451,7 +451,7 @@ final class WorldTests: XCTestCase {
     @MainActor
     func testNothingHappensWithoutAPlayerAction() async throws {
         let store = GameStore(io: .temporary(name: "idle-\(UUID().uuidString)"))
-        store.setSymbol("gilded_veins", in: "quirk") // fastest-decaying symbol we have
+        store.write("gilded_veins") // fastest-decaying symbol we have
         store.bindAndDepart()
         let before = try XCTUnwrap(store.state.worlds.activeRun)
 

@@ -38,8 +38,6 @@ struct BaseState: Codable, Equatable, Sendable {
     /// tavern, distillery) is a JSON edit, not a new hardcoded button.
     var stations: [StationID: StationState] = [:]
 
-    /// The book currently being composed at the Writing Desk. Survives a force-quit mid-compose.
-    var bookDraft: BookDraft = BookDraft()
     /// The page being written. **This is the composition surface** — the slot draft above is the
     /// old taxonomy, kept only so a save written before the page existed still loads.
     ///
@@ -292,7 +290,7 @@ struct BaseState: Codable, Equatable, Sendable {
     /// decoder still has to be able to read it out of a save written before the roster existed.
     private enum CodingKeys: String, CodingKey {
         case essence, resources, inventory, spillover, ownedSymbols, ownedGambitComponents
-        case completedResearch, stations, bookDraft, page, ownedHands, hasChainingUnlock
+        case completedResearch, stations, page, ownedHands, hasChainingUnlock
         case ownedSources
         case roster, activeCompanion, activeParty, binderEquipped, hasAutomateSelfUnlock, satchelTier
         case purchasedGambitSlots, binderGambits, binderCharacter
@@ -310,7 +308,6 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(ownedGambitComponents, forKey: .ownedGambitComponents)
         try c.encode(completedResearch, forKey: .completedResearch)
         try c.encode(stations, forKey: .stations)
-        try c.encode(bookDraft, forKey: .bookDraft)
         try c.encode(page, forKey: .page)
         try c.encode(ownedHands, forKey: .ownedHands)
         try c.encode(hasChainingUnlock, forKey: .hasChainingUnlock)
@@ -337,7 +334,6 @@ struct BaseState: Codable, Equatable, Sendable {
             ?? Set(GambitStarter.components)
         completedResearch = try container.decodeIfPresent(Set<ResearchNodeID>.self, forKey: .completedResearch) ?? []
         stations = try container.decodeIfPresent([StationID: StationState].self, forKey: .stations) ?? [:]
-        bookDraft = try container.decodeIfPresent(BookDraft.self, forKey: .bookDraft) ?? BookDraft()
         page = try container.decodeIfPresent(Page.self, forKey: .page) ?? Page()
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
         hasChainingUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) ?? false
@@ -389,34 +385,6 @@ struct StationState: Codable, Equatable, Sendable {
     var isUnlocked: Bool
     /// 0 = built but un-upgraded. Storehouse tiers 1–3 are the v0 example.
     var tier: Int
-}
-
-/// A book being composed. Empty slots are *not* an error — they are random-filled at generation
-/// (the Mystcraft rule: under-specification is a surprise).
-///
-/// Keyed by `SlotID`, so the shape of a book comes from `slots.json`, not from this type.
-struct BookDraft: Codable, Equatable, Sendable {
-    var slots: [SlotID: SymbolID] = [:]
-
-    subscript(slot: SlotID) -> SymbolID? {
-        get { slots[slot] }
-        set { slots[slot] = newValue }
-    }
-
-    var filledCount: Int { slots.count }
-    func isEmpty(_ slot: SlotID) -> Bool { slots[slot] == nil }
-
-    /// Drops anything the catalog no longer knows about.
-    ///
-    /// Matters because the slot taxonomy is being replaced (decisions-log, session 2): after that
-    /// rewrite, a saved draft can reference slots or symbols that no longer exist. Silently
-    /// ignoring them would leave the player with a book they can see but not explain.
-    mutating func prune(using catalog: ContentCatalog = .shared) {
-        let validSlots = Set(catalog.slots.map(\.id))
-        slots = slots.filter { slot, symbol in
-            validSlots.contains(slot) && catalog.symbol(symbol)?.slot == slot
-        }
-    }
 }
 
 /// Who's wearing it. The party is two in v0 and both of them carry their own gear.

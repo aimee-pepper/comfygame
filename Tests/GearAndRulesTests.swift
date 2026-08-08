@@ -67,7 +67,7 @@ final class GearAndRulesTests: XCTestCase {
             state.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
             state.base.essence = 5000
         }
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
 
         for _ in 0..<60 {
             store.bindAndDepart()

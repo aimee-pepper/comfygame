@@ -12,7 +12,6 @@ import SwiftUI
 /// off-stage.
 struct WritingDeskView: View {
     @EnvironmentObject private var store: GameStore
-    @State private var editingSlot: SlotID?
     /// The rune picked from the palette and now hovering over the page, waiting to be dragged into
     /// place. Owned here so choosing from the scrolling list and placing on the fixed page are the
     /// same act.
@@ -337,36 +336,6 @@ struct WritingDeskView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    // MARK: Slots — the old taxonomy, no longer the composition surface
-
-    private var slotGrid: some View {
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-            ForEach(projection.slotPlans) { plan in
-                Button {
-                    editingSlot = plan.slot
-                } label: {
-                    SlotCard(plan: plan)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    private var chanceNote: some View {
-        Label {
-            Text("Empty slots are filled at random when the book is bound, and cost a flat \(Tuning.Book.randomSlotCostEssence) each however they roll. You know the price now; you find out what you bought when you arrive.")
-        } icon: {
-            Image(systemName: "dice")
-        }
-        .font(.caption)
-        .foregroundStyle(.secondary)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-    }
-
-    // MARK: Bind
-
     private var bindBar: some View {
         VStack(spacing: 6) {
             Button {
@@ -403,163 +372,9 @@ struct WritingDeskView: View {
                 let raw = state.base.resources[Resources.essenceRaw]
                 return "You have \(state.base.essence) essence and \(raw) raw. Refine it at the Workshop — raw essence can't be written with."
             }
-            return "You have \(state.base.essence) essence; this book costs \(projection.cost). Leave slots to chance to write something cheaper."
-        }
-        let count = projection.randomSlots.count
-        if count > 0 {
-            return "Costs \(projection.cost) of your \(state.base.essence) — including \(count) slot\(count == 1 ? "" : "s") left to chance at \(Tuning.Book.randomSlotCostEssence) each."
+            return "You have \(state.base.essence) essence; this book costs \(projection.cost). Erase a mark or two to write something cheaper."
         }
         return "Costs \(projection.cost) essence of your \(state.base.essence)."
-    }
-}
-
-// MARK: - Slot card
-
-private struct SlotCard: View {
-    let plan: BookProjection.SlotPlan
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(slotName.uppercased())
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(.secondary)
-
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundStyle(plan.chosen == nil ? Color.secondary : Color.accentColor)
-                    .frame(width: 26)
-                Text(title)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(plan.chosen == nil ? .secondary : .primary)
-                    .lineLimit(1)
-            }
-
-            Text(subtitle)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(2, reservesSpace: true)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(minHeight: 92)
-        .padding(12)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(plan.chosen == nil ? Color.secondary.opacity(0.25) : Color.accentColor.opacity(0.5),
-                              style: StrokeStyle(lineWidth: 1.5, dash: plan.chosen == nil ? [4, 3] : []))
-        )
-    }
-
-    private var slotName: String {
-        ContentCatalog.shared.slot(plan.slot)?.name ?? plan.slot.rawValue
-    }
-
-    private var icon: String {
-        if let chosen = plan.chosen { return chosen.icon }
-        return plan.isEmpty ? "nosign" : "dice"
-    }
-
-    private var title: String {
-        if let chosen = plan.chosen { return chosen.name }
-        return plan.isEmpty ? "Nothing to draw on" : "Left to chance"
-    }
-
-    private var subtitle: String {
-        if let chosen = plan.chosen { return chosen.blurb }
-        if plan.isEmpty { return "Nothing could fill this." }
-        return "Any of \(plan.candidates.count) — including things you can't write yet."
-    }
-}
-
-// MARK: - Symbol picker
-
-private struct SymbolPickerView: View {
-    @EnvironmentObject private var store: GameStore
-    let slot: SlotID
-    let chosen: SymbolID?
-    let onPick: (SymbolID?) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-
-    private var owned: [SymbolDef] {
-        BookRules.writable(in: slot, ownedSymbols: store.state.base.ownedSymbols)
-    }
-
-    private var slotName: String {
-        ContentCatalog.shared.slot(slot)?.name ?? slot.rawValue
-    }
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    Button { onPick(nil) } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: "dice").frame(width: 26)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Leave to chance").font(.body)
-                                Text("Filled at random when you bind").font(.caption).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            if chosen == nil { Image(systemName: "checkmark").foregroundStyle(.tint) }
-                        }
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                Section("Your \(slotName.lowercased()) symbols") {
-                    ForEach(owned) { symbol in
-                        Button { onPick(symbol.id) } label: {
-                            SymbolRow(symbol: symbol, isChosen: symbol.id == chosen)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-            .navigationTitle(slotName)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
-        }
-        .presentationDetents([.medium, .large])
-    }
-}
-
-private struct SymbolRow: View {
-    let symbol: SymbolDef
-    let isChosen: Bool
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: symbol.icon)
-                .font(.body)
-                .frame(width: 26)
-                .foregroundStyle(.tint)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(symbol.name).font(.body)
-                Text(symbol.blurb).font(.caption).foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 10) {
-                    Label("\(symbol.essenceCost)", systemImage: "drop")
-                    StabilityTag(delta: BookRules.stabilityDelta(ofSymbolAlone: symbol.id))
-                }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .padding(.top, 1)
-            }
-
-            Spacer(minLength: 8)
-            if isChosen { Image(systemName: "checkmark").foregroundStyle(.tint) }
-        }
-        .frame(minHeight: 44)
-        .contentShape(Rectangle())
     }
 }
 

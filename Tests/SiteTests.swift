@@ -162,6 +162,31 @@ final class SiteTests: XCTestCase {
         XCTAssertEqual(SiteRules.stabilityDelta(of: []), 0)
     }
 
+    /// **The loaded gun** (`comprehensive-audit.md` §4).
+    ///
+    /// `sites.json` carries real `stabilityDelta` values — landmark −8, living −5, hazard −12 — and
+    /// `SiteRules.stabilityDelta` is built, tested, and *deliberately not wired*. Q19 chose guarding
+    /// now and derived instability later, and this is that decision held rather than drifted.
+    ///
+    /// The audit's point was that the comment saying so lives in Swift while the values live in
+    /// JSON, and those are read by different people. **A comment can't fail; this can.** The moment
+    /// somebody adds the call, sites start destabilising worlds and the ruling silently reverses —
+    /// so it has to reverse *loudly*, by breaking here.
+    @MainActor
+    func testWhatASiteWouldCostIsAuthoredAndDeliberatelyNotCharged() throws {
+        let authored = ContentCatalog.shared.sites.filter { $0.stabilityDelta != 0 }
+        XCTAssertFalse(authored.isEmpty, "sites.json stopped carrying the values Q19 is waiting on")
+
+        let store = GameStore(io: .temporary(name: "q19-\(UUID().uuidString)"))
+        store.write("caverns")
+        store.bindAndDepart()
+        let run = try XCTUnwrap(store.state.worlds.activeRun)
+
+        XCTAssertEqual(run.effectiveStabilityScore, BookRules.stabilityScore(of: run.book),
+                       "a site moved the headline — Q19 says the book's own words move it and "
+                       + "nothing else, until the preview is allowed to show what a world contains")
+    }
+
     // MARK: Searching
 
     @MainActor
@@ -259,7 +284,7 @@ final class SiteTests: XCTestCase {
         // One slot written, the rest left to chance — so departures range over genuinely different
         // worlds and the site being hunted is actually reachable. Pinning the whole book made these
         // tests skip instead of run, which is barely better than not having them.
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         for _ in 0..<attempts {
             store.mutate("test: fund") { state in state.base.essence = 500 }
             store.bindAndDepart()

@@ -122,9 +122,14 @@ final class DangerTests: XCTestCase {
     /// The shortfall has to be *visible*. Hidden non-linearity is the failure mode the spec calls
     /// out for stacking contradictions, and the same reasoning applies here.
     func testThePreviewReportsWhatTheCapWithheld() {
-        var draft = BookDraft()
-        draft.slots = ["quirk": "tremor", "bounty": "rich_ore"]
-        let projection = BookProjection.project(draft: draft, ownedSymbols: [], seed: 1)
+        var page = Page()
+        for id in ["tremor", "rich_ore"] as [SymbolID] {
+            guard let symbol = ContentCatalog.shared.symbol(id),
+                  let placed = PageRules.placeAnywhere(symbol, hand: .refined, on: page)
+            else { return XCTFail("couldn't write \(id.rawValue)") }
+            page = placed
+        }
+        let projection = BookProjection.project(page: page, seed: 1)
         XCTAssertEqual(projection.dangerCapShortfall,
                        BookRules.dangerCapShortfall(symbolIDs: ["tremor", "rich_ore"]))
     }

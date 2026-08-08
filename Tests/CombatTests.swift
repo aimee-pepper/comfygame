@@ -36,7 +36,7 @@ final class CombatTests: XCTestCase {
                          gambits: [GambitRule]? = nil) -> GameStore {
         let store = GameStore(io: .temporary(name: "combat-\(UUID().uuidString)"))
         store.mutate("test: everything learned") { Self.learnEverything(&$0) }
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         if let gambits {
             store.mutate("set rules") { state in
@@ -185,7 +185,7 @@ final class CombatTests: XCTestCase {
         defer { io.deleteEverything() }
 
         let first = GameStore(io: io)
-        first.setSymbol("caverns", in: "terrain")
+        first.write("caverns")
         first.bindAndDepart()
         first.mutate("stage a fight") { state in
             guard var run = state.worlds.activeRun else { return }
@@ -266,7 +266,7 @@ final class CombatTests: XCTestCase {
                             gambits: [Self.attackWeakest, Self.attackAny, Self.healHurtAlly])
         store.mutate("hurt the binder") { $0.worlds.activeRun?.binderHP = 1 }
 
-        XCTAssertEqual(store.activeGambitSlots, Tuning.Encounter.startingGambitSlots)
+        XCTAssertEqual(store.activeGambitSlots(for: .companion(0)), Tuning.Encounter.startingGambitSlots)
         let decision = try XCTUnwrap(GambitEngine.decide(in: store.state))
         XCTAssertNotEqual(decision.rule, Self.healHurtAlly, "A rule with no slot must not fire")
     }
@@ -325,7 +325,7 @@ final class CombatTests: XCTestCase {
     private func inFightWith(_ traits: [CreatureTraits]) -> GameStore {
         let store = GameStore(io: .temporary(name: "traits-\(UUID().uuidString)"))
         store.mutate("test: everything learned") { Self.learnEverything(&$0) }
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("stage a fight") { state in
             guard var run = state.worlds.activeRun else { return }
@@ -455,7 +455,7 @@ final class CombatTests: XCTestCase {
     /// **Crypsis is a map behaviour**: it isn't there until it's on you.
     func testSomethingMatchedToTheGroundDoesntShowUntilItsOnYou() {
         let store = GameStore(io: .temporary(name: "crypsis-\(UUID().uuidString)"))
-        store.setSymbol("plains", in: "terrain")
+        store.write("plains")
         store.bindAndDepart()
         store.mutate("hide something") { state in
             guard var run = state.worlds.activeRun else { return }

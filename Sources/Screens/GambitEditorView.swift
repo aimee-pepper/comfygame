@@ -19,8 +19,13 @@ struct GambitEditorView: View {
     let owner: Combatant
 
     private var gambits: [GambitRule] { store.gambits(for: owner) }
-    private var slots: Int { store.activeGambitSlots }
-    private var ownerName: String { owner == .binder ? "Your own rules" : "Quill's rules" }
+    /// **This person's list, this person's length.** Wit governs how long a rule list somebody can
+    /// hold, so a sharper companion has more slots than a duller one standing next to them.
+    private var slots: Int { store.activeGambitSlots(for: owner) }
+    /// **By name.** Every list said "Quill's rules" whoever was holding it — written when there was
+    /// one companion and left standing when the roster grew to five.
+    private var person: String { store.name(of: owner.member) }
+    private var ownerName: String { owner == .binder ? "Your own rules" : "\(person)'s rules" }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -41,7 +46,7 @@ struct GambitEditorView: View {
             if gambits.isEmpty {
                 EmptyNote(owner == .binder
                           ? "No rules written — you'll keep acting for yourself."
-                          : "No rules written — Quill will stand there.")
+                          : "No rules written — \(person) will stand there.")
             } else {
                 List {
                     ForEach(Array(gambits.enumerated()), id: \.element.id) { index, rule in

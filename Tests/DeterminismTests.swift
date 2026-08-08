@@ -66,21 +66,40 @@ final class DeterminismTests: XCTestCase {
         XCTAssertEqual(decoded.nextSeed(), expected, "Relaunching must not re-roll the next world seed")
     }
 
-    /// Random-filling empty book slots is part of worldgen, so it has to be seed-stable too.
-    func testBookResolutionIsStableForASeed() {
-        let owned = Set(ContentCatalog.shared.starterSymbolIDs)
-        var draft = BookDraft()
-        draft["terrain"] = "caverns"
+    /// **The same page always makes the same book**, which is what the whole seeded-worldgen
+    /// pillar stands on.
+    ///
+    /// This used to test random-filling empty *book slots*, and slots are gone — under-specification
+    /// is a page that says nothing about a subject now, and the roll happens in
+    /// `PressureRules.rollUnwritten` rather than at bind. So the seed-stability claim moved with it:
+    /// a book is a pure function of its page, and what the *world* does with the silence is a
+    /// function of the seed.
+    func testBookResolutionIsStableForAPage() throws {
+        let page = try pageWriting(["caverns"])
+        XCTAssertEqual(BookRules.resolveBook(page: page), BookRules.resolveBook(page: page),
+                       "Same page, same book")
 
-        let first = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 31337)
-        let second = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 31337)
-        let other = BookRules.resolveBook(draft: draft, ownedSymbols: owned, seed: 31338)
+        let book = BookRules.resolveBook(page: page)
+        XCTAssertEqual(book.allSymbolIDs, ["caverns"])
 
-        XCTAssertEqual(first, second, "Same seed, same book")
-        XCTAssertEqual(first.symbols["terrain"], "caverns", "A chosen symbol is never overwritten")
-        XCTAssertFalse(first.randomlyFilled.contains("terrain"))
-        XCTAssertTrue(first.randomlyFilled.contains("biome"), "Empty slots are random-filled, not left blank")
-        XCTAssertNotEqual(first.symbols, other.symbols, "Different seeds should fill differently")
+        // And the silence resolves differently per seed, which is the surprise it exists to be.
+        let sigils = BookRules.sigils(for: book)
+        let one = PressureRules.resolve(sigils, fillingUnwrittenWith: 31337)
+        let again = PressureRules.resolve(sigils, fillingUnwrittenWith: 31337)
+        let other = PressureRules.resolve(sigils, fillingUnwrittenWith: 31338)
+        XCTAssertEqual(one, again, "Same seed, same world")
+        XCTAssertNotEqual(one, other, "Different seeds should fill the silence differently")
+    }
+
+    /// Writes symbols onto a fresh page, failing the test rather than silently producing a blank.
+    private func pageWriting(_ ids: [SymbolID]) throws -> Page {
+        var page = Page()
+        for id in ids {
+            let symbol = try XCTUnwrap(ContentCatalog.shared.symbol(id), "no symbol '\(id.rawValue)'")
+            page = try XCTUnwrap(PageRules.placeAnywhere(symbol, hand: .refined, on: page),
+                                 "'\(id.rawValue)' wouldn't fit on a blank page")
+        }
+        return page
     }
 
     /// Two different compositions must produce visibly different worlds (acceptance criterion).
