@@ -149,6 +149,11 @@ enum EconomyRules {
                 bumpStation(Stations.storehouse, in: &state)
                 // Capacity is stored on the inventory, so it has to follow the tier.
                 state.base.syncInventoryCapacity()
+            case .analysisTier:
+                // **Reality, not Base.** A reading is knowledge, and knowledge is never taken back —
+                // the same reason visited seeds and the Library live there.
+                state.reality.analysisTier = min(Tuning.Analysis.livingTier,
+                                                 state.reality.analysisTier + 1)
             case .satchelTier:
                 state.base.satchelTier += 1
             case .gambitSlot:

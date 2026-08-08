@@ -334,6 +334,7 @@ enum ResearchWording {
         case .chaining: "more than one main focus per subject"
         case .finerHand: "a finer instrument — the same runes, in less room"
         case .scriptoriumTier: "a better Scriptorium, and what it lets Isolde teach next"
+        case .analysisTier: "an instrument — you can read more off a world before you write it"
         case .companionWeapon: "+\(Tuning.Encounter.attackPerWeaponTier) companion attack"
         case .companionArmor: "+\(Tuning.Encounter.defencePerArmorTier) companion defence"
         }

@@ -162,6 +162,11 @@ struct ResearchGrant: Codable, Equatable, Sendable {
         case finerHand
         /// Raises the Scriptorium, which is what gates the rungs above it (Q40's tier rule).
         case scriptoriumTier
+        /// **The instruments.** Raises how well you can *read* a world — the third progression axis
+        /// (session 8), which had all five tiers implemented and no way in: `analysisTier` was
+        /// written by a save decoder and the debug harness, and by nothing else in the game
+        /// (`clause-audit.md` F2). Tiers 3 and 4 were finished work no player could reach.
+        case analysisTier
     }
 }
 

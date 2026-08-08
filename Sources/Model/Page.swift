@@ -148,15 +148,11 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
         }
     }
 
-    var icon: String {
-        switch content {
-        case .rune: "circle.hexagongrid"
-        case .compound(let id): ContentCatalog.shared.symbol(id)?.icon ?? "questionmark"
-        case .target(let id): ContentCatalog.shared.pressureTarget(id)?.icon ?? "circle"
-        case .source(let id): ContentCatalog.shared.pressureSource(id)?.icon ?? "circle"
-        case .qualifier(let id): ContentCatalog.shared.qualifier(id)?.icon ?? "circle"
-        }
-    }
+    // **There is deliberately no `icon` here.** A mark on the page is drawn as a *glyph* — see
+    // `glyphID` and `RuneGlyph` — because a rune is a written word and an SF Symbol of a mountain is
+    // a picture of a thing (decisions-session-11 §4). This used to return one per mark and was read
+    // by nothing at all, which is what `clause-audit.md` F4 was actually looking at: the writing
+    // surface had already moved to glyphs and left the accessor behind.
 
     /// The identity a glyph is drawn from, so a rune always looks like itself.
     var glyphID: String {

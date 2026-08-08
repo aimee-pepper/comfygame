@@ -520,4 +520,47 @@ final class EconomyTests: XCTestCase {
                           "\(accessor) is bought with motes and read by nothing — a fossil")
         }
     }
+
+    // MARK: Every progression axis has a door
+
+    /// **The fault `clause-audit.md` F2 found**, expressed so it can't come back: all five analysis
+    /// tiers were implemented, tiers 3 and 4 did real work, and `analysisTier` was written by a save
+    /// decoder and the debug harness and by nothing a player could reach. Finished work nobody could
+    /// see.
+    @MainActor
+    func testAnalysisCanActuallyBeRaisedInPlay() throws {
+        let store = GameStore(io: .temporary(name: "analysis-\(UUID().uuidString)"))
+        XCTAssertEqual(store.state.reality.analysisTier, Tuning.Analysis.startingTier)
+
+        let instruments = ContentCatalog.shared.researchNodes.filter {
+            $0.grants.contains { $0.effect == .analysisTier }
+        }
+        XCTAssertFalse(instruments.isEmpty, "nothing in the game raises how well you can read a world")
+
+        var state = store.state
+        for node in instruments { EconomyRules.apply(node.grants[0], in: &state) }
+        XCTAssertEqual(state.reality.analysisTier, Tuning.Analysis.livingTier,
+                       "the instruments don't reach the top tier, so two of them are still unreachable")
+    }
+
+    /// And the tiers that do the most work have to be among the ones you can get to.
+    @MainActor
+    func testTheTiersThatDoWorkAreReachable() {
+        let reachable = ContentCatalog.shared.researchNodes
+            .filter { $0.grants.contains { $0.effect == .analysisTier } }.count
+            + Tuning.Analysis.startingTier
+        XCTAssertGreaterThanOrEqual(reachable, Tuning.Analysis.attributionTier,
+                                    "the red/green attribution tier is still finished work nobody can see")
+    }
+
+    /// **Knowledge is never taken back.** Analysis lives in Reality, like visited seeds and the
+    /// Library, so a future base reset can't cost you an instrument you ground yourself.
+    @MainActor
+    func testAnInstrumentSurvivesABaseReset() {
+        let store = GameStore(io: .temporary(name: "analysis-reset-\(UUID().uuidString)"))
+        store.mutate("test: an instrument") { $0.reality.analysisTier = Tuning.Analysis.attributionTier }
+        store.resetBaseKeepingReality()
+        XCTAssertEqual(store.state.reality.analysisTier, Tuning.Analysis.attributionTier,
+                       "a base reset took back something that was learned")
+    }
 }

@@ -44,6 +44,15 @@
       "order": 5,
       "station": "scriptorium",
       "freeRungs": 0
+    },
+    {
+      "id": "instruments",
+      "name": "Instruments",
+      "icon": "eyeglasses",
+      "blurb": "Lenses, rules and gauges. What you can read off a world depends on what you have to read it with.",
+      "order": 6,
+      "station": "blacksmith",
+      "freeRungs": 0
     }
   ],
   "nodes": [
@@ -1371,6 +1380,100 @@
         {
           "kind": "focus",
           "id": "crystal"
+        }
+      ]
+    },
+    {
+      "id": "grind_a_lens",
+      "branch": "instruments",
+      "name": "Grind a lens",
+      "icon": "circle.circle",
+      "blurb": "Crystal, worked flat and true. You can put a number to what you could only feel before.",
+      "cost": {
+        "essence": 40,
+        "resources": {
+          "ore": 6,
+          "quartz": 2
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "analysisTier"
+        }
+      ]
+    },
+    {
+      "id": "rule_and_gauge",
+      "branch": "instruments",
+      "name": "Rule and gauge",
+      "icon": "ruler",
+      "blurb": "Marked, and marked accurately. Which of the things you wrote did what.",
+      "cost": {
+        "essence": 70,
+        "resources": {
+          "ore": 10,
+          "quartz": 4,
+          "silver": 2
+        }
+      },
+      "requires": [
+        "grind_a_lens"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "analysisTier"
+        }
+      ]
+    },
+    {
+      "id": "the_fine_scale",
+      "branch": "instruments",
+      "name": "The fine scale",
+      "icon": "gauge.with.needle",
+      "blurb": "Fine enough to weigh a world's argument with itself against its appetite.",
+      "cost": {
+        "essence": 110,
+        "resources": {
+          "ore": 14,
+          "quartz": 6,
+          "silver": 4
+        }
+      },
+      "requires": [
+        "rule_and_gauge"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "analysisTier"
+        }
+      ]
+    },
+    {
+      "id": "the_long_glass",
+      "branch": "instruments",
+      "name": "The long glass",
+      "icon": "binoculars",
+      "blurb": "You can see what a world will grow before it has grown it.",
+      "cost": {
+        "essence": 160,
+        "resources": {
+          "ore": 20,
+          "quartz": 10,
+          "rift_glass": 1,
+          "silver": 6
+        }
+      },
+      "requires": [
+        "the_fine_scale"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "analysisTier"
         }
       ]
     }
