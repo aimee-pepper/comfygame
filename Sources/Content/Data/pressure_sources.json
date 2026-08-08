@@ -93,7 +93,7 @@
       "attachesTo": [
         "vitality"
       ],
-      "acquisition": "research"
+      "acquisition": "starter"
     },
     {
       "id": "canopy",
@@ -290,6 +290,38 @@
       "attachesTo": [
         "substrate"
       ],
+      "acquisition": "worldDrop"
+    },
+    {
+      "id": "drift",
+      "name": "Drift",
+      "icon": "clock.badge.questionmark",
+      "blurb": "Time passes, but not evenly. Some spans stretch.",
+      "contributions": [
+        {
+          "target": "cycle",
+          "character": "wandering",
+          "peak": -18,
+          "aspects": {
+            "regularity": -35,
+            "amplitude": 10
+          },
+          "tags": [
+            "arrhythmic"
+          ]
+        },
+        {
+          "target": "atmosphere",
+          "character": "unsettling",
+          "peak": 6,
+          "aspects": {
+            "motion": 10
+          }
+        }
+      ],
+      "attachesTo": [
+        "cycle"
+      ],
       "acquisition": "research"
     },
     {
@@ -469,7 +501,7 @@
       "attachesTo": [
         "vitality"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "starter"
     },
     {
       "id": "ice",
@@ -549,7 +581,7 @@
       "attachesTo": [
         "hydrology"
       ],
-      "acquisition": "research"
+      "acquisition": "starter"
     },
     {
       "id": "magma",
@@ -588,7 +620,7 @@
       "attachesTo": [
         "thermal"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "research"
     },
     {
       "id": "marsh",
@@ -673,7 +705,7 @@
         "illumination",
         "vitality"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "research"
     },
     {
       "id": "mist",
@@ -743,7 +775,6 @@
         }
       ],
       "attachesTo": [
-        "cycle",
         "illumination"
       ],
       "acquisition": "starter"
@@ -782,7 +813,7 @@
       "attachesTo": [
         "cycle"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "research"
     },
     {
       "id": "rain",
@@ -817,7 +848,7 @@
       "attachesTo": [
         "hydrology"
       ],
-      "acquisition": "research"
+      "acquisition": "starter"
     },
     {
       "id": "river",
@@ -856,7 +887,7 @@
         "hydrology",
         "relief"
       ],
-      "acquisition": "starter"
+      "acquisition": "research"
     },
     {
       "id": "root",
@@ -941,7 +972,7 @@
         "substrate",
         "vitality"
       ],
-      "acquisition": "starter"
+      "acquisition": "research"
     },
     {
       "id": "sand",
@@ -1060,7 +1091,7 @@
       "attachesTo": [
         "substrate"
       ],
-      "acquisition": "starter"
+      "acquisition": "research"
     },
     {
       "id": "smoke",
@@ -1125,7 +1156,7 @@
         "hydrology",
         "thermal"
       ],
-      "acquisition": "research"
+      "acquisition": "starter"
     },
     {
       "id": "stars",
@@ -1146,7 +1177,7 @@
       "attachesTo": [
         "illumination"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "research"
     },
     {
       "id": "stillness",
@@ -1183,7 +1214,7 @@
       "attachesTo": [
         "cycle"
       ],
-      "acquisition": "starter"
+      "acquisition": "worldDrop"
     },
     {
       "id": "sulfur",
@@ -1211,7 +1242,7 @@
         "substrate",
         "vitality"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "research"
     },
     {
       "id": "sun",
@@ -1261,7 +1292,7 @@
       "attachesTo": [
         "vitality"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "research"
     },
     {
       "id": "thin_air",
@@ -1296,7 +1327,7 @@
         "atmosphere",
         "hydrology"
       ],
-      "acquisition": "starter"
+      "acquisition": "research"
     },
     {
       "id": "tide",
@@ -1337,7 +1368,7 @@
       "attachesTo": [
         "cycle"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "research"
     },
     {
       "id": "void",
@@ -1409,7 +1440,7 @@
         "relief",
         "thermal"
       ],
-      "acquisition": "worldDrop"
+      "acquisition": "research"
     },
     {
       "id": "wildfire",
@@ -1450,7 +1481,7 @@
         "thermal",
         "vitality"
       ],
-      "acquisition": "starter"
+      "acquisition": "research"
     },
     {
       "id": "wind",

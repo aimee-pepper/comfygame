@@ -13,36 +13,68 @@ final class VocabularyTests: XCTestCase {
 
     private var starters: Set<PressureSourceID> { Set(ContentCatalog.shared.starterSourceIDs) }
 
-    // MARK: You can say something about everything, from the first minute
+    // MARK: What you start with, and what you don't
 
-    /// **No subject may be unwritable.** The starting set is small on purpose, but a subject you
-    /// cannot say a word about is a subject that doesn't exist for you — and eight of them are the
-    /// whole world model.
-    func testEverySubjectCanBeWrittenWithWhatYouStartWith() {
+    /// **Not every subject is writable at the start, and that is the design** (Aimee, via
+    /// `sigil-vocabulary.md` §4): *"A starting player has coarse words for some subjects and nothing
+    /// at all for others… a subject you can't write is a subject that's always rolled, so early
+    /// worlds have more chance in them, and every new subject you learn is a piece of the world
+    /// moving from luck into your hands."*
+    ///
+    /// I had asserted the opposite — every subject writable both ways on turn one — which was my own
+    /// rule, cut by measurement while filling the subtractive gaps, and it is overruled. What
+    /// survives is the half that was never mine: **Cycle in particular should start unwritable**, so
+    /// learning to name a world's rhythm is a thing that happens to you.
+    func testSomeSubjectsStartUnwritableAndThatIsThePoint() {
+        let starters = Set(ContentCatalog.shared.starterSourceIDs)
+        let writable = Set(ContentCatalog.shared.pressureTargets.map(\.id).filter { target in
+            ContentCatalog.shared.pressureSources.contains { starters.contains($0.id) && $0.canAttach(to: target) }
+        })
+        XCTAssertFalse(writable.contains("cycle"),
+                       "a world's rhythm should be rolled until you learn to name it")
+        XCTAssertGreaterThan(writable.count, 4, "…but most of a world has to be sayable on day one")
+        XCTAssertLessThan(writable.count, ContentCatalog.shared.pressureTargets.count,
+                          "everything is writable at the start, so nothing is ever learned")
+    }
+
+    /// **A capability rune must be reliable, not rare** (`sigil-vocabulary.md` §3): *"Missing one
+    /// doesn't make the game harder; it makes part of it unavailable. This is exactly what
+    /// deadlocked Isolde."*
+    ///
+    /// So: wherever a subject can be pushed in a direction by only one word, that word must be
+    /// bought rather than found. A single point of failure that only turns up in the wild is a
+    /// deadlock waiting for an unlucky player.
+    func testTheOnlyWordForADirectionIsNeverLeftToLuck() {
         for target in ContentCatalog.shared.pressureTargets {
-            let words = ContentCatalog.shared.pressureSources
-                .filter { starters.contains($0.id) && $0.canAttach(to: target.id) }
-            XCTAssertFalse(words.isEmpty,
-                           "nothing in the starting vocabulary can be bound to \(target.id.rawValue)")
+            for wantsMore in [true, false] {
+                let words = ContentCatalog.shared.pressureSources.filter { source in
+                    guard source.canAttach(to: target.id) else { return false }
+                    let sigil = Sigil(id: InstanceID(rawValue: 1), source: source.id, target: target.id)
+                    let peak = PressureRules.resolve([sigil])[target.id].peak
+                    return wantsMore ? peak > target.baseline + 1 : peak < target.baseline - 1
+                }
+                guard words.count == 1, let only = words.first else { continue }
+                XCTAssertNotEqual(only.acquisition, .worldDrop,
+                    "\(only.id.rawValue) is the ONLY way to write \(target.id.rawValue) "
+                    + (wantsMore ? "upward" : "downward") + " and it can only be found by luck")
+            }
         }
     }
 
-    /// **And in both directions.** The fault that started all of this was a subject that could only
-    /// ever be asked for *more* of; shipping a starting set with the same shape would rebuild it
-    /// one layer up.
-    func testEverySubjectCanBeWrittenBothWaysWithWhatYouStartWith() {
+    /// And every subject has to be sayable in both directions **eventually**, or half of it is
+    /// decoration however long you play. This is the fault that started all of it, checked against
+    /// the whole vocabulary rather than against the starting slice.
+    func testEverySubjectCanEventuallyBeWrittenBothWays() {
         for target in ContentCatalog.shared.pressureTargets {
-            let ordinary = target.baseline
             var up = false, down = false
-            for source in ContentCatalog.shared.pressureSources
-            where starters.contains(source.id) && source.canAttach(to: target.id) {
+            for source in ContentCatalog.shared.pressureSources where source.canAttach(to: target.id) {
                 let sigil = Sigil(id: InstanceID(rawValue: 1), source: source.id, target: target.id)
                 let peak = PressureRules.resolve([sigil])[target.id].peak
-                if peak > ordinary + 1 { up = true }
-                if peak < ordinary - 1 { down = true }
+                if peak > target.baseline + 1 { up = true }
+                if peak < target.baseline - 1 { down = true }
             }
-            XCTAssertTrue(up, "\(target.id.rawValue) can't be asked for MORE of with a starting word")
-            XCTAssertTrue(down, "\(target.id.rawValue) can't be asked for LESS of with a starting word")
+            XCTAssertTrue(up, "\(target.id.rawValue) can never be asked for MORE of")
+            XCTAssertTrue(down, "\(target.id.rawValue) can never be asked for LESS of")
         }
     }
 

@@ -953,11 +953,31 @@
       "needsStationTier": 2
     },
     {
+      "id": "study_starlight",
+      "branch": "lexicon",
+      "name": "Starlight",
+      "icon": "sparkles",
+      "blurb": "The faintest mark that a world has a sky at all.",
+      "cost": {
+        "essence": 14,
+        "resources": {
+          "fiber": 3
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "stars"
+        }
+      ]
+    },
+    {
       "id": "study_weather",
       "branch": "lexicon",
       "name": "Weather",
       "icon": "cloud.rain",
-      "blurb": "Rain, and what it does to everything under it.",
+      "blurb": "Mist, and the river it becomes.",
       "cost": {
         "essence": 18,
         "resources": {
@@ -968,71 +988,29 @@
       "grants": [
         {
           "kind": "focus",
-          "id": "rain"
-        }
-      ]
-    },
-    {
-      "id": "study_snowfall",
-      "branch": "lexicon",
-      "name": "Snowfall",
-      "icon": "snowflake",
-      "blurb": "Water that falls slowly and stays.",
-      "cost": {
-        "essence": 26,
-        "resources": {
-          "fiber": 6
-        }
-      },
-      "requires": [
-        "study_weather"
-      ],
-      "grants": [
-        {
-          "kind": "focus",
-          "id": "snow"
-        }
-      ]
-    },
-    {
-      "id": "study_haar",
-      "branch": "lexicon",
-      "name": "Haar",
-      "icon": "cloud.fog",
-      "blurb": "The air holding water without letting go of it.",
-      "cost": {
-        "essence": 24,
-        "resources": {
-          "fiber": 5
-        }
-      },
-      "requires": [
-        "study_weather"
-      ],
-      "grants": [
-        {
-          "kind": "focus",
           "id": "mist"
         }
       ]
     },
     {
-      "id": "study_standing",
+      "id": "study_rivers",
       "branch": "lexicon",
-      "name": "Standing water",
-      "icon": "drop.circle",
-      "blurb": "Water that stops, and what collects around it.",
+      "name": "Rivers",
+      "icon": "water.waves",
+      "blurb": "Water that goes somewhere.",
       "cost": {
         "essence": 22,
         "resources": {
           "fiber": 5
         }
       },
-      "requires": [],
+      "requires": [
+        "study_weather"
+      ],
       "grants": [
         {
           "kind": "focus",
-          "id": "lake"
+          "id": "river"
         }
       ]
     },
@@ -1043,13 +1021,13 @@
       "icon": "leaf.arrow.circlepath",
       "blurb": "Ground that never decides whether it is water.",
       "cost": {
-        "essence": 30,
+        "essence": 28,
         "resources": {
-          "fiber": 7
+          "fiber": 6
         }
       },
       "requires": [
-        "study_standing"
+        "study_rivers"
       ],
       "grants": [
         {
@@ -1071,7 +1049,7 @@
         }
       },
       "requires": [
-        "study_standing"
+        "study_wetland"
       ],
       "grants": [
         {
@@ -1081,11 +1059,137 @@
       ]
     },
     {
-      "id": "study_flowering",
+      "id": "study_thin_air",
       "branch": "lexicon",
-      "name": "Flowering",
-      "icon": "camera.macro",
-      "blurb": "Things that grow for the sake of being seen.",
+      "name": "Thin air",
+      "icon": "wind",
+      "blurb": "Air that is barely there. Nothing else thins a sky.",
+      "cost": {
+        "essence": 26,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "thin_air"
+        }
+      ]
+    },
+    {
+      "id": "study_burning",
+      "branch": "lexicon",
+      "name": "Burning",
+      "icon": "flame",
+      "blurb": "Fire in a landscape, and what it takes with it.",
+      "cost": {
+        "essence": 24,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "wildfire"
+        }
+      ]
+    },
+    {
+      "id": "study_the_vent",
+      "branch": "lexicon",
+      "name": "The vent",
+      "icon": "mountain.2.fill",
+      "blurb": "Rock that has not finished moving.",
+      "cost": {
+        "essence": 38,
+        "resources": {
+          "fiber": 9
+        }
+      },
+      "requires": [
+        "study_burning"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "volcano"
+        }
+      ]
+    },
+    {
+      "id": "study_the_melt",
+      "branch": "lexicon",
+      "name": "The melt",
+      "icon": "flame.fill",
+      "blurb": "Stone as a liquid.",
+      "cost": {
+        "essence": 44,
+        "resources": {
+          "fiber": 10
+        }
+      },
+      "requires": [
+        "study_the_vent"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "magma"
+        }
+      ]
+    },
+    {
+      "id": "study_salt",
+      "branch": "lexicon",
+      "name": "Salt",
+      "icon": "cube",
+      "blurb": "What is left where water was, and what it does to life.",
+      "cost": {
+        "essence": 20,
+        "resources": {
+          "fiber": 4
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "salt"
+        }
+      ]
+    },
+    {
+      "id": "study_brimstone",
+      "branch": "lexicon",
+      "name": "Brimstone",
+      "icon": "aqi.high",
+      "blurb": "The yellow rock, and the air around it.",
+      "cost": {
+        "essence": 28,
+        "resources": {
+          "fiber": 6
+        }
+      },
+      "requires": [
+        "study_salt"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "sulfur"
+        }
+      ]
+    },
+    {
+      "id": "study_silt",
+      "branch": "lexicon",
+      "name": "Silt",
+      "icon": "aqi.low",
+      "blurb": "Ground sorted fine and washed through.",
       "cost": {
         "essence": 20,
         "resources": {
@@ -1096,7 +1200,7 @@
       "grants": [
         {
           "kind": "focus",
-          "id": "bloom"
+          "id": "silt"
         }
       ]
     },
@@ -1104,17 +1208,15 @@
       "id": "study_decay",
       "branch": "lexicon",
       "name": "Decay",
-      "icon": "aqi.low",
+      "icon": "leaf.fill",
       "blurb": "What happens after. It is not nothing.",
       "cost": {
-        "essence": 24,
+        "essence": 22,
         "resources": {
-          "fiber": 6
+          "fiber": 5
         }
       },
-      "requires": [
-        "study_flowering"
-      ],
+      "requires": [],
       "grants": [
         {
           "kind": "focus",
@@ -1145,22 +1247,110 @@
       ]
     },
     {
-      "id": "study_lattice",
+      "id": "study_the_swarm",
       "branch": "lexicon",
-      "name": "Lattice",
-      "icon": "diamond",
-      "blurb": "Stone that grew rather than settled.",
+      "name": "The swarm",
+      "icon": "ant.fill",
+      "blurb": "Small things, and a great many of them.",
+      "cost": {
+        "essence": 24,
+        "resources": {
+          "fiber": 5
+        }
+      },
+      "requires": [
+        "study_decay"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "swarm"
+        }
+      ]
+    },
+    {
+      "id": "study_the_foul",
+      "branch": "lexicon",
+      "name": "The foul air",
+      "icon": "smoke.fill",
+      "blurb": "Air that does not want you in it.",
       "cost": {
         "essence": 36,
         "resources": {
-          "fiber": 9
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "study_thin_air"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "miasma"
+        }
+      ]
+    },
+    {
+      "id": "study_the_pull",
+      "branch": "lexicon",
+      "name": "The pull",
+      "icon": "moon.circle",
+      "blurb": "A world that rises and falls to something.",
+      "cost": {
+        "essence": 30,
+        "resources": {
+          "fiber": 7
         }
       },
       "requires": [],
       "grants": [
         {
           "kind": "focus",
-          "id": "crystal"
+          "id": "tide"
+        }
+      ]
+    },
+    {
+      "id": "study_clockwork",
+      "branch": "lexicon",
+      "name": "Clockwork",
+      "icon": "gearshape.2",
+      "blurb": "Somebody built a thing that keeps time, and it runs still.",
+      "cost": {
+        "essence": 42,
+        "resources": {
+          "fiber": 10
+        }
+      },
+      "requires": [
+        "study_the_pull"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "orrery"
+        }
+      ]
+    },
+    {
+      "id": "study_drift",
+      "branch": "lexicon",
+      "name": "Drift",
+      "icon": "clock.badge.questionmark",
+      "blurb": "A world whose hours are not the same length. You can feel it before you can measure it.",
+      "cost": {
+        "essence": 34,
+        "resources": {
+          "fiber": 8
+        }
+      },
+      "requires": [
+        "study_the_pull"
+      ],
+      "grants": [
+        {
+          "kind": "focus",
+          "id": "drift"
         }
       ]
     }
