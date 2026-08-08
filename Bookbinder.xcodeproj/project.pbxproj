@@ -53,6 +53,7 @@
 		4419D5E216F811B6E590C273 /* Naming.swift in Sources */ = {isa = PBXBuildFile; fileRef = A501ADE475726C1A73D812A2 /* Naming.swift */; };
 		4961D037BE2924DF53722EA8 /* save-pre-sites-2026-08-04.json in Resources */ = {isa = PBXBuildFile; fileRef = 061FE2BB0FA59B8824641746 /* save-pre-sites-2026-08-04.json */; };
 		4A0672467AD72629AC2ABD2F /* Inventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F756C7CBAE86A8565FB12DD /* Inventory.swift */; };
+		4ACDDD4EBDA5E3DA0229186A /* InstrumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782AA9BD3C2F5ECE4D38436E /* InstrumentTests.swift */; };
 		4C60516FFB5892091CBE28AC /* research.json in Resources */ = {isa = PBXBuildFile; fileRef = 6A1D054604B637EEC90D24DA /* research.json */; };
 		4DEB17BC13834B4612226A7B /* HarnessActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248394713D4F19F950F25B92 /* HarnessActions.swift */; };
 		4EC3BC573F0634FE82377139 /* ResearchTreeLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CE9E9A2ED4242F8C480AEF /* ResearchTreeLayout.swift */; };
@@ -230,6 +231,7 @@
 		76338986776C016E4422759E /* BookbinderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookbinderApp.swift; sourceTree = "<group>"; };
 		7691C0625AD4AACD2BA46A20 /* ContentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentTests.swift; sourceTree = "<group>"; };
 		77957A7595BE1E25AC8CF406 /* sites.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = sites.json; sourceTree = "<group>"; };
+		782AA9BD3C2F5ECE4D38436E /* InstrumentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentTests.swift; sourceTree = "<group>"; };
 		79874A74B2CF52DA90868DA0 /* Gambit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gambit.swift; sourceTree = "<group>"; };
 		7A7229E243E5EB4700C03C4A /* LifeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeTests.swift; sourceTree = "<group>"; };
 		7B20DAF90C2684826A3C3F21 /* WorldMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldMap.swift; sourceTree = "<group>"; };
@@ -553,6 +555,7 @@
 				DB87254230F32E20320932D7 /* FloraTests.swift */,
 				C09AD15A5BFBBBD300176004 /* GearAndRulesTests.swift */,
 				BDFAE95092D158944E000B02 /* GrammarTests.swift */,
+				782AA9BD3C2F5ECE4D38436E /* InstrumentTests.swift */,
 				80DFFB14B396FE04A7C03E01 /* LibraryTests.swift */,
 				7A7229E243E5EB4700C03C4A /* LifeTests.swift */,
 				E14C42A31CF4E0C858F212BF /* MaterialTests.swift */,
@@ -816,6 +819,7 @@
 				91761E73D4647CB7D2741D93 /* FloraTests.swift in Sources */,
 				4F7559D592DAED143B8AEF88 /* GearAndRulesTests.swift in Sources */,
 				A81656D157A597344E823340 /* GrammarTests.swift in Sources */,
+				4ACDDD4EBDA5E3DA0229186A /* InstrumentTests.swift in Sources */,
 				DEB5615945275C75236426AD /* LibraryTests.swift in Sources */,
 				A94D38590FAA36B2D274214B /* LifeTests.swift in Sources */,
 				BCB44A183A64B987C97BC1EA /* MaterialTests.swift in Sources */,

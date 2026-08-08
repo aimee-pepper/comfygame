@@ -20,9 +20,26 @@ struct RealityState: Codable, Equatable, Sendable {
     ///
     /// In the Reality layer because readings are permanent knowledge, like specimens: measuring
     /// thermal in a volcanic world teaches you about volcanic worlds generally, and knowledge is
-    /// never taken back. Raised by crafted instruments, which aren't built yet — so for now this
-    /// only ever sits at the starting tier, and the Harness can push it up to see the later panels.
+    /// never taken back. **Raised by the page lens** at Isolde's Scriptorium, which is itself gated
+    /// on how many field instruments you have built — see `instruments` below.
     var analysisTier: Int = Tuning.Analysis.startingTier
+
+    /// **The subjects you own a field instrument for** (`crafting-spec.md` PART TWO).
+    ///
+    /// One instrument per subject, made at Mara's Survey Post: a Sunglass reads Illumination, a
+    /// Chronometer reads Cycle. Two families, and the second is fed by the first — **field
+    /// instruments measure the world you are standing in, and the page lens only shows you what you
+    /// have already measured.** So going out and measuring is how prediction is earned, and the
+    /// lens grows subject by subject as the field kit does rather than in one jump.
+    ///
+    /// **[PLACEHOLDER] In Reality rather than Base**, alongside `analysisTier`, because they are the
+    /// same axis and splitting them would leave a reset with a lens and nothing to feed it. An
+    /// instrument is also a made object, and made objects are usually Base — so if a base reset ever
+    /// should take your kit away, this is the line to move. Logged for Aimee.
+    var instruments: Set<PressureTargetID> = []
+
+    /// Whether this subject's numbers are readable at all. The lens shows what you have measured.
+    func measures(_ target: PressureTargetID) -> Bool { instruments.contains(target) }
 
     /// Seeds of worlds the player has actually stood in.
     ///
@@ -70,6 +87,7 @@ struct RealityState: Codable, Equatable, Sendable {
         lifetime = try container.decodeIfPresent(LifetimeStats.self, forKey: .lifetime) ?? LifetimeStats()
         analysisTier = try container.decodeIfPresent(Int.self, forKey: .analysisTier)
             ?? Tuning.Analysis.startingTier
+        instruments = try container.decodeIfPresent(Set<PressureTargetID>.self, forKey: .instruments) ?? []
         visitedWorldSeeds = try container.decodeIfPresent(Set<UInt64>.self, forKey: .visitedWorldSeeds) ?? []
         library = try container.decodeIfPresent(LibraryState.self, forKey: .library) ?? LibraryState()
     }

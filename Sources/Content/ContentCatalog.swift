@@ -303,6 +303,12 @@ struct ContentCatalog: Sendable {
                     guard let id = grant.id, symbolIDs.contains(SymbolID(rawValue: id)) else {
                         throw ContentError.danglingReference("node '\(node.id)' grants unknown symbol '\(grant.id ?? "nil")'")
                     }
+                case .instrument:
+                    // An instrument reads exactly one subject, and a subject nobody defined is an
+                    // instrument that measures nothing.
+                    guard let id = grant.id, targetIDs.contains(PressureTargetID(rawValue: id)) else {
+                        throw ContentError.danglingReference("node '\(node.id)' measures unknown subject '\(grant.id ?? "nil")'")
+                    }
                 case .focus:
                     guard let id = grant.id,
                           pressureSource(PressureSourceID(rawValue: id)) != nil else {

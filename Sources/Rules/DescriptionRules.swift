@@ -21,9 +21,12 @@ enum DescriptionRules {
     ///   Secondaries count as written. If you wrote Sun and the world comes out hot, the panel says
     ///   so; that's exactly how the implicit effects are meant to be discovered rather than printed
     ///   on the rune (decisions-session-8 §2).
+    /// - Parameter measuring: the subjects the player owns a field instrument for. The lens shows
+    ///   numbers for these and for nothing else, however finely it is ground.
     static func describe(_ readings: PressureReadings,
                          contradictions: [ContradictionDef] = [],
                          analysisTier: Int = Tuning.Analysis.startingTier,
+                         measuring instruments: Set<PressureTargetID> = [],
                          about targets: Set<PressureTargetID>? = nil) -> WorldDescription {
         let speakable = targets.map { Set($0.map(\.rawValue)) }
         let matching = ContentCatalog.shared.descriptionClauses.filter { clause in
@@ -39,18 +42,35 @@ enum DescriptionRules {
                 (lhs.priority, lhs.id) < (rhs.priority, rhs.id)
             }
         }
+        // **What you have measured, at a lens that can show it.** Both halves are required: an
+        // instrument with no lens gives you a reading you can't put on a page, and a lens with no
+        // instruments has nothing to show — which is exactly the dependency the pair is built on.
+        let readable: [WorldDescription.Reading] = analysisTier >= Tuning.Analysis.targetsTier
+            ? ContentCatalog.shared.pressureTargetsInOrder
+                .filter { instruments.contains($0.id) }
+                .map { target in
+                    let reading = readings[target.id]
+                    return WorldDescription.Reading(target: target.id, name: target.name,
+                                                    icon: target.icon, peak: reading.peak,
+                                                    floor: reading.floor,
+                                                    hasFloor: target.dualValued)
+                }
+            : []
+
         return WorldDescription(clauses: clauses, contradictions: contradictions,
-                                analysisTier: analysisTier)
+                                analysisTier: analysisTier, measured: readable)
     }
 
     /// Describes what a page says, contradictions included.
     static func describe(page sigils: [Sigil], seed: UInt64? = nil,
-                         analysisTier: Int = Tuning.Analysis.startingTier) -> WorldDescription {
+                         analysisTier: Int = Tuning.Analysis.startingTier,
+                         measuring instruments: Set<PressureTargetID> = []) -> WorldDescription {
         let readings = seed.map { PressureRules.resolve(sigils, fillingUnwrittenWith: $0) }
             ?? PressureRules.resolve(sigils)
         return describe(readings,
                         contradictions: ContradictionRules.fired(in: sigils, readings: readings),
-                        analysisTier: analysisTier)
+                        analysisTier: analysisTier,
+                        measuring: instruments)
     }
 
     /// Group order follows the targets, with each group named for the target it describes.

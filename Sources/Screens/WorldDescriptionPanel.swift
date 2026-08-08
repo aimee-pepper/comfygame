@@ -43,6 +43,36 @@ struct WorldDescriptionPanel: View {
 
             if !chains.isEmpty { written }
 
+            // **What the lens can put a number to.** Tier 2 and above, and only for the subjects
+            // you own a field instrument for — measuring out there is what buys reading at home.
+            if !description.measured.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Measured")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    ForEach(description.measured) { reading in
+                        HStack(spacing: 8) {
+                            Image(systemName: reading.icon)
+                                .font(.caption2)
+                                .frame(width: 18)
+                                .foregroundStyle(.secondary)
+                            Text(reading.name).font(.caption)
+                            Spacer(minLength: 8)
+                            Text(reading.text)
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(minHeight: 20)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else if description.showsNumbers {
+                Text("The lens is ground, and you have measured nothing to read with it.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
             if description.hasUnreadableWrongness {
                 // Something is wrong and you can't yet tell what. Deliberately unattributed.
                 Text("Something about this world does not sit right.")

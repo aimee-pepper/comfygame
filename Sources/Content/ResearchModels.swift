@@ -98,10 +98,17 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
     /// (Q40). The fountain pen wants a Scriptorium at tier 2 — Aimee's "last upgrade gated behind
     /// a shop upgrade".
     var needsStationTier: Int = 0
+    /// **How many field instruments you must own first** (`crafting-spec.md` PART TWO).
+    ///
+    /// The rule that makes the whole analysis axis good: *field readings are the currency
+    /// prediction is bought with.* The page lens predicts before you spend, and it can only be
+    /// raised by having gone out and measured things — so the two instrument families feed each
+    /// other rather than sitting side by side.
+    var needsInstruments: Int = 0
 
     init(id: ResearchNodeID, branch: ResearchBranchID, name: String, icon: String, blurb: String,
          cost: UpgradeCost, requires: [ResearchNodeID] = [], grants: [ResearchGrant] = [],
-         needsStationTier: Int = 0) {
+         needsStationTier: Int = 0, needsInstruments: Int = 0) {
         self.id = id
         self.branch = branch
         self.name = name
@@ -111,6 +118,7 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
         self.requires = requires
         self.grants = grants
         self.needsStationTier = needsStationTier
+        self.needsInstruments = needsInstruments
     }
 
     /// Tolerant, per the policy in `Migrations.swift`.
@@ -125,6 +133,7 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
         requires = try c.decodeIfPresent([ResearchNodeID].self, forKey: .requires) ?? []
         grants = try c.decodeIfPresent([ResearchGrant].self, forKey: .grants) ?? []
         needsStationTier = try c.decodeIfPresent(Int.self, forKey: .needsStationTier) ?? 0
+        needsInstruments = try c.decodeIfPresent(Int.self, forKey: .needsInstruments) ?? 0
     }
 }
 
@@ -143,6 +152,11 @@ struct ResearchGrant: Codable, Equatable, Sendable {
         /// one of the three ways into it (the others being found in a world, and taught by a site).
         case focus
         case effect
+        /// **A field instrument**, named by the subject it measures. One per subject
+        /// (`crafting-spec.md` PART TWO): a Sunglass reads Illumination, a Chronometer reads Cycle.
+        /// What it buys is *this* subject, out in the world, in numbers — and owning enough of them
+        /// is what the page lens is gated on.
+        case instrument
     }
 
     /// Effects mutate base state directly. Each maps to exactly one field, so nothing is stored twice.

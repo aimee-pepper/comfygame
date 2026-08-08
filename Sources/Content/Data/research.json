@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER costs. ALL research lives here, gated behind themed branches with prerequisites \u2014 there is no flat shopping list anywhere in the game. A node is a one-time unlock; repeatable things (shelving I/II/III) are separate nodes chained by 'requires', which keeps the tree honest and removes the idea of ranks entirely. 'grants' is what unlocking it hands you: a gambit component, a symbol, or an effect on base state. The Hold's ladder runs long and gets steeply expensive on purpose (decisions-session-16 \u00a72): three tiers capped storage at twenty slots forever, which fights the hoarding pillar. With materials binning by kind the ladder is buying room for *variety* rather than for volume. PLACEHOLDER costs. PENMANSHIP LIVES AT THE SCRIPTORIUM and has NO free rungs (Aimee, 6 Aug: 'the player MUST meet the calligrapher to progress. it's core to the game'). That is a stated exception to Q40's rule that a building's first rungs stay reachable \u2014 the rule protects capacity, and the hands are not a convenience, they are what the game is about. The hands were also badly underpriced: a pencil roughly doubles what a page can say and cost less than a storehouse tier. Each hand now names a rare material from a specific kind of world, so upgrading your hand means going and writing for it. 'lead' from the spec is copper here \u2014 the ductile metal that already exists. 'needsStationTier' gates a node on its building's tier, which is the job maxTier never had.",
+  "_note": "PLACEHOLDER costs. ALL research lives here, gated behind themed branches with prerequisites — there is no flat shopping list anywhere in the game. A node is a one-time unlock; repeatable things (shelving I/II/III) are separate nodes chained by 'requires', which keeps the tree honest and removes the idea of ranks entirely. 'grants' is what unlocking it hands you: a gambit component, a symbol, or an effect on base state. The Hold's ladder runs long and gets steeply expensive on purpose (decisions-session-16 §2): three tiers capped storage at twenty slots forever, which fights the hoarding pillar. With materials binning by kind the ladder is buying room for *variety* rather than for volume. PLACEHOLDER costs. PENMANSHIP LIVES AT THE SCRIPTORIUM and has NO free rungs (Aimee, 6 Aug: 'the player MUST meet the calligrapher to progress. it's core to the game'). That is a stated exception to Q40's rule that a building's first rungs stay reachable — the rule protects capacity, and the hands are not a convenience, they are what the game is about. The hands were also badly underpriced: a pencil roughly doubles what a page can say and cost less than a storehouse tier. Each hand now names a rare material from a specific kind of world, so upgrading your hand means going and writing for it. 'lead' from the spec is copper here — the ductile metal that already exists. 'needsStationTier' gates a node on its building's tier, which is the job maxTier never had. 7 Aug: the four generic 'instruments' nodes at the Workshop were a placeholder for clause-audit F2 — each +1 analysis tier, bought from a menu. crafting-spec.md PART TWO specs the real thing and it is better: EIGHT FIELD INSTRUMENTS at Mara's Survey Post, one per subject, and FOUR PAGE LENS tiers at Isolde's Scriptorium gated on how many instruments you own. Field readings are the currency prediction is bought with, so the lens grows subject by subject as the kit does. Quartz is in six of eight instruments — it is the lens material, which is the job sigil-vocabulary.md gave it. Mercury and adamant gate the late ones, which is right: reading time should be the hardest thing to learn. ALL COSTS PLACEHOLDER.",
   "branches": [
     {
       "id": "instruction",
@@ -47,11 +47,20 @@
     },
     {
       "id": "instruments",
-      "name": "Instruments",
-      "icon": "eyeglasses",
-      "blurb": "Lenses, rules and gauges. What you can read off a world depends on what you have to read it with.",
+      "name": "Field Instruments",
+      "icon": "ruler.fill",
+      "blurb": "One for each subject. Each reads the world you are standing in.",
       "order": 6,
-      "station": "blacksmith",
+      "station": "survey_post",
+      "freeRungs": 0
+    },
+    {
+      "id": "lens",
+      "name": "The Page Lens",
+      "icon": "circle.circle.fill",
+      "blurb": "Read a page before you spend it. It shows you only what you have already been out and measured.",
+      "order": 8,
+      "station": "scriptorium",
       "freeRungs": 0
     }
   ],
@@ -1384,16 +1393,187 @@
       ]
     },
     {
-      "id": "grind_a_lens",
+      "id": "sunglass",
       "branch": "instruments",
-      "name": "Grind a lens",
-      "icon": "circle.circle",
-      "blurb": "Crystal, worked flat and true. You can put a number to what you could only feel before.",
+      "name": "Sunglass",
+      "icon": "sun.max.fill",
+      "blurb": "Smoked quartz in a copper ring. You can look at a sky and put a number to it.",
       "cost": {
-        "essence": 40,
+        "essence": 30,
         "resources": {
-          "ore": 6,
+          "copper": 3,
           "quartz": 2
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "instrument",
+          "id": "illumination"
+        }
+      ]
+    },
+    {
+      "id": "level",
+      "branch": "instruments",
+      "name": "Level",
+      "icon": "mountain.2.fill",
+      "blurb": "A bubble in a tube of oil, in a timber frame. How much of this country is uphill.",
+      "cost": {
+        "essence": 35,
+        "resources": {
+          "copper": 2,
+          "timber": 6
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "instrument",
+          "id": "relief"
+        }
+      ]
+    },
+    {
+      "id": "thermoscope",
+      "branch": "instruments",
+      "name": "Thermoscope",
+      "icon": "thermometer.medium",
+      "blurb": "Mercury in a sealed stem. It reads the cold as readily as the heat, which is the hard part.",
+      "cost": {
+        "essence": 55,
+        "resources": {
+          "mercury": 2,
+          "quartz": 3
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "instrument",
+          "id": "thermal"
+        }
+      ]
+    },
+    {
+      "id": "hygrometer",
+      "branch": "instruments",
+      "name": "Hygrometer",
+      "icon": "humidity.fill",
+      "blurb": "A hair under tension, and a silver needle. It measures how much water a world will actually give you.",
+      "cost": {
+        "essence": 55,
+        "resources": {
+          "fiber": 8,
+          "silver": 2
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "instrument",
+          "id": "hydrology"
+        }
+      ]
+    },
+    {
+      "id": "loupe",
+      "branch": "instruments",
+      "name": "Loupe",
+      "icon": "circle.hexagongrid.fill",
+      "blurb": "Close work. What the ground is made of, seen properly rather than guessed at from the colour.",
+      "cost": {
+        "essence": 60,
+        "resources": {
+          "quartz": 4,
+          "silver": 2
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "instrument",
+          "id": "substrate"
+        }
+      ]
+    },
+    {
+      "id": "vivometer",
+      "branch": "instruments",
+      "name": "Vivometer",
+      "icon": "leaf.fill",
+      "blurb": "Resin, ichor and a lens. It answers the only question that matters about a world: what does it feed.",
+      "cost": {
+        "essence": 90,
+        "resources": {
+          "ichor": 2,
+          "quartz": 4,
+          "resin": 4
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "instrument",
+          "id": "vitality"
+        }
+      ]
+    },
+    {
+      "id": "barometer",
+      "branch": "instruments",
+      "name": "Barometer",
+      "icon": "wind",
+      "blurb": "A column of mercury against a silvered scale. Air has a weight, and the weight tells you the rest.",
+      "cost": {
+        "essence": 95,
+        "resources": {
+          "mercury": 3,
+          "quartz": 3,
+          "silver": 3
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "instrument",
+          "id": "atmosphere"
+        }
+      ]
+    },
+    {
+      "id": "chronometer",
+      "branch": "instruments",
+      "name": "Chronometer",
+      "icon": "clock.fill",
+      "blurb": "Adamant escapement, silver train. **Reading time is the hardest thing to learn**, so it is the last.",
+      "cost": {
+        "essence": 150,
+        "resources": {
+          "adamant": 2,
+          "quartz": 5,
+          "silver": 5
+        }
+      },
+      "requires": [],
+      "grants": [
+        {
+          "kind": "instrument",
+          "id": "cycle"
+        }
+      ]
+    },
+    {
+      "id": "lens_targets",
+      "branch": "lens",
+      "name": "Ground and true",
+      "icon": "circle.circle",
+      "blurb": "Flat glass, honestly worked. The page starts giving you numbers — for the subjects you have been out and measured, and no others.",
+      "cost": {
+        "essence": 70,
+        "resources": {
+          "quartz": 6,
+          "silver": 2
         }
       },
       "requires": [],
@@ -1402,80 +1582,83 @@
           "kind": "effect",
           "effect": "analysisTier"
         }
-      ]
-    },
-    {
-      "id": "rule_and_gauge",
-      "branch": "instruments",
-      "name": "Rule and gauge",
-      "icon": "ruler",
-      "blurb": "Marked, and marked accurately. Which of the things you wrote did what.",
-      "cost": {
-        "essence": 70,
-        "resources": {
-          "ore": 10,
-          "quartz": 4,
-          "silver": 2
-        }
-      },
-      "requires": [
-        "grind_a_lens"
       ],
-      "grants": [
-        {
-          "kind": "effect",
-          "effect": "analysisTier"
-        }
-      ]
+      "needsInstruments": 2
     },
     {
-      "id": "the_fine_scale",
-      "branch": "instruments",
-      "name": "The fine scale",
-      "icon": "gauge.with.needle",
-      "blurb": "Fine enough to weigh a world's argument with itself against its appetite.",
+      "id": "lens_attribution",
+      "branch": "lens",
+      "name": "Silvered back",
+      "icon": "circle.lefthalf.filled",
+      "blurb": "Which of the things you wrote did what, secondaries included. The page stops being a list and starts being an argument.",
       "cost": {
-        "essence": 110,
+        "essence": 120,
         "resources": {
-          "ore": 14,
-          "quartz": 6,
+          "mercury": 2,
+          "quartz": 8,
           "silver": 4
         }
       },
       "requires": [
-        "rule_and_gauge"
+        "lens_targets"
       ],
       "grants": [
         {
           "kind": "effect",
           "effect": "analysisTier"
         }
-      ]
+      ],
+      "needsInstruments": 4
     },
     {
-      "id": "the_long_glass",
-      "branch": "instruments",
-      "name": "The long glass",
-      "icon": "binoculars",
-      "blurb": "You can see what a world will grow before it has grown it.",
+      "id": "lens_instability",
+      "branch": "lens",
+      "name": "The fine scale",
+      "icon": "gauge.with.needle",
+      "blurb": "Greed on one side of the beam and contradiction on the other. You can finally see which of the two is eating your world.",
       "cost": {
-        "essence": 160,
+        "essence": 180,
         "resources": {
-          "ore": 20,
+          "adamant": 2,
           "quartz": 10,
-          "rift_glass": 1,
-          "silver": 6
+          "rift_glass": 1
         }
       },
       "requires": [
-        "the_fine_scale"
+        "lens_attribution"
       ],
       "grants": [
         {
           "kind": "effect",
           "effect": "analysisTier"
         }
-      ]
+      ],
+      "needsInstruments": 6
+    },
+    {
+      "id": "lens_living",
+      "branch": "lens",
+      "name": "The long glass",
+      "icon": "binoculars.fill",
+      "blurb": "What a world will grow, before it has grown it. The last thing a page can be made to say.",
+      "cost": {
+        "essence": 260,
+        "resources": {
+          "adamant": 4,
+          "ichor": 4,
+          "quartz": 14
+        }
+      },
+      "requires": [
+        "lens_instability"
+      ],
+      "grants": [
+        {
+          "kind": "effect",
+          "effect": "analysisTier"
+        }
+      ],
+      "needsInstruments": 8
     }
   ]
 }

@@ -347,7 +347,18 @@ enum CombatRules {
             encounter.revealed.insert(foe.id)
             remember(foe, in: &state.reality.discovery, runIndex: run.runIndex)
             let covering = foe.coveringWord ?? "nothing much"
-            encounter.note("\(foe.stats.displayName): \(covering), and it \(foe.stats.damageKind.verb).")
+            // **Knowledge as equipment** (`crafting-spec.md` PART TWO). Sight fits no combat branch
+            // and was never meant to: what it tells you scales with how well you can *read*, so a
+            // low tier says "plated" and a high one gives you the numbers behind it. That is the
+            // payoff for the analysis axis reaching outside the writing desk.
+            var line = "\(foe.stats.displayName): \(covering), and it \(foe.stats.damageKind.verb)."
+            if state.reality.analysisTier >= Tuning.Analysis.targetsTier {
+                line += " \(foe.currentHP) of \(foe.stats.maxHP) health, \(foe.stats.armour) armour."
+            }
+            if state.reality.analysisTier >= Tuning.Analysis.sigilAttributionTier {
+                line += " It strikes for about \(foe.stats.attack)."
+            }
+            encounter.note(line)
 
         case .ward:
             // **Ward.** Against one of six things, which is the point — you have to know what's

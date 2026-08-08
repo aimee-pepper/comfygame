@@ -46,6 +46,34 @@ struct WorldDescription: Equatable, Sendable {
     /// How well the player can currently *read* a world. Attribution grows with it; description
     /// never does, so the panel's deduction job works from the very first book.
     var analysisTier: Int = Tuning.Analysis.startingTier
+    /// **The numbers, for the subjects you own an instrument for** (`crafting-spec.md` PART TWO).
+    ///
+    /// Tier 2 of the page lens is *"target values for subjects you own the field instrument for"*,
+    /// and that gate is the best idea in the whole analysis axis: **the lens only shows you what you
+    /// have already been out and measured**, so field readings are the currency prediction is bought
+    /// with, and the lens grows subject by subject as the kit does rather than in one jump.
+    ///
+    /// Empty below tier 2, and empty for anything unmeasured however high the lens goes.
+    var measured: [Reading] = []
+
+    /// One subject, read off properly.
+    struct Reading: Equatable, Identifiable, Sendable {
+        var target: PressureTargetID
+        var name: String
+        var icon: String
+        var peak: Double
+        var floor: Double
+        /// True for Illumination and Thermal, the two that have a day and a night.
+        var hasFloor: Bool
+
+        var id: PressureTargetID { target }
+        var text: String {
+            hasFloor ? "\(Int(peak.rounded())) / \(Int(floor.rounded()))" : "\(Int(peak.rounded()))"
+        }
+    }
+
+    /// Whether the lens is ground finely enough to put numbers on anything at all.
+    var showsNumbers: Bool { analysisTier >= Tuning.Analysis.targetsTier }
 
     var sentence: String { clauses.map(\.text).joined(separator: " ") }
     var isEmpty: Bool { clauses.isEmpty && contradictions.isEmpty }

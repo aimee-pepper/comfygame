@@ -37,6 +37,7 @@ struct RootView: View {
         case .blacksmith: BlacksmithView()
         case .worldHistory: WorldHistoryView()
         case .scriptorium: ScriptoriumView()
+        case .surveyPost: SurveyPostView()
         case .firepit: FirepitView()
         case .settings: SettingsView()
         case .harness: HarnessView()

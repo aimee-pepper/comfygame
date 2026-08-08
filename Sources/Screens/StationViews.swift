@@ -246,6 +246,56 @@ struct ScriptoriumView: View {
     }
 }
 
+/// **Mara's Survey Post** (`crafting-spec.md` PART TWO).
+///
+/// The field half of the analysis axis: one instrument per subject, each raising what you can read
+/// about *that* subject out in a world you are standing in. It is also the reason Mara exists —
+/// she was a surveyor who unlocked nothing.
+///
+/// The rule that makes the pair good: **field readings are the currency prediction is bought with.**
+/// The page lens at Isolde's is gated on how many of these you own, so it grows subject by subject
+/// as the kit does rather than arriving in one jump.
+struct SurveyPostView: View {
+    @EnvironmentObject private var store: GameStore
+
+    private var measured: [PressureTargetDef] {
+        ContentCatalog.shared.pressureTargetsInOrder
+            .filter { store.state.reality.measures($0.id) }
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                HStack(spacing: 12) {
+                    CurrencyChip(icon: "drop.fill", label: "Essence",
+                                 value: "\(store.state.base.essence)", tint: .teal)
+                    CurrencyChip(icon: "ruler", label: "Instruments",
+                                 value: "\(store.state.reality.instruments.count) of \(ContentCatalog.shared.pressureTargets.count)")
+                }
+
+                StationCard(title: "What you can measure", icon: "ruler.fill") {
+                    Text("An instrument reads one subject, in the world you're standing in. What you measure out there is what the lens at the Scriptorium will show you before you write.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    if measured.isEmpty {
+                        Text("Nothing yet. You are reading the world by eye.")
+                            .font(.caption).foregroundStyle(.tertiary)
+                    } else {
+                        ForEach(measured) { target in
+                            LabeledRow(icon: target.icon, label: target.name, value: "measured")
+                        }
+                    }
+                }
+
+                ResearchTree(station: Stations.surveyPost)
+            }
+            .padding(16)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("The Survey Post")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 /// Constellation — the Reality layer's only screen. Buying nodes is milestone 5.
 struct ConstellationView: View {
     @EnvironmentObject private var store: GameStore

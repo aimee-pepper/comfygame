@@ -286,6 +286,11 @@ private struct ResearchOutlineRow: View {
                       let focus = ContentCatalog.shared.pressureSource(PressureSourceID(rawValue: id))
                 else { return nil }
                 return "learn to write \(focus.name)"
+            case .instrument:
+                guard let id = grant.id,
+                      let target = ContentCatalog.shared.pressureTarget(PressureTargetID(rawValue: id))
+                else { return nil }
+                return "measure \(target.name.lowercased()) out there, in numbers"
             case .effect:
                 return grant.effect.map(ResearchWording.describe)
             }
@@ -334,7 +339,7 @@ enum ResearchWording {
         case .chaining: "more than one main focus per subject"
         case .finerHand: "a finer instrument — the same runes, in less room"
         case .scriptoriumTier: "a better Scriptorium, and what it lets Isolde teach next"
-        case .analysisTier: "an instrument — you can read more off a world before you write it"
+        case .analysisTier: "another tier of the page lens — you can read more off a page before you spend it"
         case .companionWeapon: "+\(Tuning.Encounter.attackPerWeaponTier) companion attack"
         case .companionArmor: "+\(Tuning.Encounter.defencePerArmorTier) companion defence"
         }

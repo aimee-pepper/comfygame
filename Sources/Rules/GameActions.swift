@@ -159,6 +159,7 @@ extension GameStore {
         BookProjection.project(page: state.base.page,
                                seed: state.worlds.seeds.peekNextSeed(),
                                analysisTier: state.reality.analysisTier,
+                               measuring: state.reality.instruments,
                                revealRolled: state.reality.visitedWorldSeeds
                                    .contains(state.worlds.seeds.peekNextSeed()))
     }

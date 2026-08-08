@@ -379,6 +379,7 @@ enum Stations {
     static let blacksmith: StationID = "blacksmith"
     static let scriptorium: StationID = "scriptorium"
     static let firepit: StationID = "firepit"
+    static let surveyPost: StationID = "survey_post"
 }
 
 struct StationState: Codable, Equatable, Sendable {

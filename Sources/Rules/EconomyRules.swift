@@ -43,6 +43,19 @@ enum EconomyRules {
         !isComplete(node, in: state)
             && node.requires.allSatisfy { state.base.completedResearch.contains($0) }
             && buildingAllows(node, in: state) == nil
+            && kitAllows(node, in: state) == nil
+    }
+
+    /// **Whether you have measured enough to be worth predicting with** (`crafting-spec.md` PART TWO).
+    ///
+    /// The page lens is bought with field readings: each tier of it asks for more instruments than
+    /// the last, so prediction is earned by having gone out and taken the measurements rather than
+    /// by paying for it at home. Returns the reason it's blocked, or nil.
+    static func kitAllows(_ node: ResearchNodeDef, in state: GameState) -> String? {
+        let owned = state.reality.instruments.count
+        guard node.needsInstruments > owned else { return nil }
+        let short = node.needsInstruments - owned
+        return "\(short) more field instrument\(short == 1 ? "" : "s") to grind it against"
     }
 
     /// **Whether the building that teaches this is built, and built far enough** (Q40).
@@ -99,6 +112,7 @@ enum EconomyRules {
             .filter { !state.base.completedResearch.contains($0) }
             .compactMap { ContentCatalog.shared.researchNode($0)?.name }
         if let blocked = buildingAllows(node, in: state) { missing.append(blocked) }
+        if let unmeasured = kitAllows(node, in: state) { missing.append(unmeasured) }
         return missing
     }
 
@@ -144,6 +158,11 @@ enum EconomyRules {
 
         case .focus:
             if let id = grant.id { state.base.ownedSources.insert(PressureSourceID(rawValue: id)) }
+
+        case .instrument:
+            // **Reality, like the lens it feeds.** What an instrument buys you is the ability to
+            // read one subject, and a reading is knowledge.
+            if let id = grant.id { state.reality.instruments.insert(PressureTargetID(rawValue: id)) }
 
         case .effect:
             guard let effect = grant.effect else { return }

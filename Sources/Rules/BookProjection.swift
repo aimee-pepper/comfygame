@@ -112,6 +112,7 @@ struct BookProjection {
     static func project(page: Page,
                         seed: UInt64 = 0,
                         analysisTier: Int = Tuning.Analysis.startingTier,
+                        measuring instruments: Set<PressureTargetID> = [],
                         revealRolled: Bool = false) -> BookProjection {
         let book = BookRules.resolveBook(page: page)
         let written = book.allSymbolIDs
@@ -168,6 +169,7 @@ struct BookProjection {
                 readings,
                 contradictions: contradictions,
                 analysisTier: analysisTier,
+                measuring: instruments,
                 about: revealRolled ? nil : DescriptionRules.targetsTouched(by: sigils)
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: written),
