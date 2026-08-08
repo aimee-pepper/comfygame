@@ -92,6 +92,14 @@ struct PressureCondition: Codable, Equatable, Sendable {
 
     enum Measure: String, Codable, Sendable {
         case peak, floor, range, available, opposed, aspect, form, tag
+        /// **What actually grows here**, as opposed to what merely lives here.
+        ///
+        /// `peak` counts herds and swarms; `produced` counts only the sources that *make* rather
+        /// than take. The six organic resources were driven by vitality's peak, so a world with a
+        /// herd, no plants and nothing growing still yielded **timber** — and every consumable,
+        /// binding and haft in the material economy is downstream of that
+        /// (`crafting-spec.md` PART FIVE).
+        case produced
     }
 
     func holds(in readings: PressureReadings) -> Bool {
@@ -99,6 +107,7 @@ struct PressureCondition: Codable, Equatable, Sendable {
         let value: Double
         switch measure {
         case .peak: value = reading.peak
+        case .produced: value = reading.producedPeak
         case .floor: value = reading.floor
         case .range: value = reading.range
         case .available: value = reading.availableMagnitude
@@ -123,6 +132,7 @@ struct PressureCondition: Codable, Equatable, Sendable {
         let name = ContentCatalog.shared.pressureTarget(target)?.name ?? target.rawValue
         let subject = switch measure {
         case .peak: "\(name) peak"
+        case .produced: "what grows in the \(name.lowercased())"
         case .floor: "\(name) floor"
         case .range: "\(name) swing"
         case .available: "usable \(name)"

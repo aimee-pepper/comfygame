@@ -373,7 +373,7 @@
       "requires": [
         {
           "target": "vitality",
-          "measure": "peak",
+          "measure": "produced",
           "minimum": 3
         }
       ],
@@ -400,7 +400,7 @@
       "requires": [
         {
           "target": "vitality",
-          "measure": "peak",
+          "measure": "produced",
           "minimum": 25
         }
       ],
@@ -427,7 +427,7 @@
       "requires": [
         {
           "target": "vitality",
-          "measure": "peak",
+          "measure": "produced",
           "minimum": 18
         }
       ],
@@ -454,7 +454,7 @@
       "requires": [
         {
           "target": "vitality",
-          "measure": "peak",
+          "measure": "produced",
           "minimum": 25
         },
         {
@@ -481,7 +481,7 @@
       "requires": [
         {
           "target": "vitality",
-          "measure": "peak",
+          "measure": "produced",
           "minimum": 18
         }
       ],

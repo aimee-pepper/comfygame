@@ -227,4 +227,41 @@ final class ResourceSpreadTests: XCTestCase {
             XCTAssertFalse(paid.contains(exotic), "a barren world paid out \(exotic.rawValue)")
         }
     }
+
+    // MARK: What grows, versus what merely lives
+
+    /// **A world with a herd and no plants must not yield timber.**
+    ///
+    /// The six organic resources were driven by vitality's *peak*, which counts herds and swarms —
+    /// so a plain full of grazing animals and nothing growing produced fibre, timber, resin and
+    /// toxin. Every consumable, binding and haft in the material economy is downstream of that
+    /// (`crafting-spec.md` PART FIVE), which is what makes flora a blocker rather than scenery.
+    func testAWorldOfAnimalsAndNoPlantsGrowsNothing() {
+        // Herds and swarms only: alive, and nothing in it makes anything.
+        let grazed = PressureRules.resolve([
+            Sigil(id: InstanceID(rawValue: 1), source: "herd", target: "vitality", intensity: .overwhelming),
+            Sigil(id: InstanceID(rawValue: 2), source: "swarm", target: "vitality", intensity: .great),
+        ])
+        XCTAssertGreaterThan(grazed["vitality"].peak, 40, "fixture: this world is supposed to be alive")
+
+        for organic: ResourceID in ["fiber", "timber", "pulp", "resin", "toxin"] {
+            let resource = ContentCatalog.shared.resource(organic)
+            XCTAssertEqual(resource?.abundance(in: grazed), 0,
+                           "\(organic.rawValue) grew in a world with nothing growing in it")
+        }
+    }
+
+    /// …and a world written for growth yields all of it.
+    func testAWorldWrittenForGrowthYieldsWhatGrows() {
+        let grown = PressureRules.resolve([
+            Sigil(id: InstanceID(rawValue: 1), source: "root", target: "vitality", intensity: .overwhelming),
+            Sigil(id: InstanceID(rawValue: 2), source: "bloom", target: "vitality", intensity: .great),
+            Sigil(id: InstanceID(rawValue: 3), source: "wildfire", target: "thermal", intensity: .moderate),
+        ])
+        for organic: ResourceID in ["fiber", "timber", "pulp", "toxin"] {
+            let resource = ContentCatalog.shared.resource(organic)
+            XCTAssertGreaterThan(resource?.abundance(in: grown) ?? 0, 0,
+                                 "\(organic.rawValue) didn't grow in a world written for growing")
+        }
+    }
 }
