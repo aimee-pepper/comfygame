@@ -1225,3 +1225,60 @@ to collect without ever reading a diary.
 **My lean is 2 and 3 together**, with 1 as the tuning underneath — but progression pace is the
 thing the whole game's shape hangs off, so I've changed nothing beyond the broken thresholds and
 left the rest here.
+
+---
+
+## Q48 — Flora: three calls I made building it, and the one I'd most like back
+
+**Context.** The terrain half of `flora-system-spec.md` is built: the trait model, metabolism,
+growth writing the ground, harvest by tissue, and defended flora. Three of the spec's own
+"what I'd want challenged" items had to be answered to build it at all. I took the conservative
+reading each time and they're all cheap to reverse.
+
+### 1. §9.5 — one ground type with a hidden property, or two? **Two.**
+
+`growth` now means *tall enough to hide something* and a new `groundcover` means *you can see over
+it*. The spec proposed one type with stature deciding sight-blocking; two is what shipped, because
+a hidden property on `growth` would also have quietly reinterpreted every tile in every save that
+already had one — a world in progress would have changed its sightlines under the player.
+
+**The cost:** the ground vocabulary is one word longer. **The gain:** an overgrown world reads at a
+glance, on the map and the minimap, without the player having to learn an invisible rule.
+
+### 2. §9.3 — does a plant that attacks you belong in the creature system? **Both, and neither is a
+copy.**
+
+An active-defence plant is *grown* by the flora system and *fought* by the creature system: its
+combat vector is derived from its flora traits, so there is no second combat model and no second
+loot table. What the map adds is one flag — it is rooted where it stands. Waking it means it is
+ready, not that it is coming, which is what keeps it a hazard you walk *into*.
+
+**Measured:** 12 of them across 150 generated worlds, so about one world in twelve holds one. The
+spec asked for rare and that's rare.
+
+### 3. §9.4 — should flora draw from the same budget as creatures? **No, for now.**
+
+They have separate budgets, both scaled by Vitality. One shared world-wide life budget split between
+producers and consumers would be more ecologically honest *and* more constraining — a world of
+enormous animals would have to be a world of thin plants — and I think it's the better design. I
+didn't do it because it changes every existing creature-budget number at once, and rebalancing the
+whole animal cast is not a thing to do quietly inside a flora commit.
+
+**This is the one I'd like an answer on.** If you want it, it's a small change to
+`GrowingConditions.budget` and `WorldTendencies.budget` plus a retune.
+
+### And one thing I changed that you should know about
+
+**Chemosynthesis lifts both life caps.** A world lit by nothing and floored in sulfur used to be
+capped twice over — once for darkness, once for dryness — for two reasons neither of which applies
+to something eating basalt. It now keeps all the life it was written with and says
+*"whatever grows here is eating the rock."*
+
+Fungal darkness deliberately does **not** get that exemption: `darkLifeFraction` already keeps most
+of a dark world's life and tells you it grew mushrooms, and exempting damp-and-dark outright would
+have erased the difference between *writing* Fungus and happening to roll a dark world. Writing the
+word should be worth something.
+
+**Measured across 150 worlds:** 54 photosynthetic, 48 fungal, 43 chemosynthetic, 5 that can make no
+living at all. The last of those is the state the metabolism axis exists to make reachable, and it's
+about 3% of worlds — rare, and writable on purpose.

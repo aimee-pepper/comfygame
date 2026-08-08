@@ -1,5 +1,5 @@
 {
-  "_note": "World-description clauses (contradiction-danger-spec \u00a76, decisions-session-6 Q18). The panel says what a world is LIKE, in prose \u2014 never a condition list, never a sigil value. This is the surface the player matches a Library hint page against, so the wording is gameplay, not flavour text. One clause per group wins, highest priority first; priority 1 with no conditions is the group's fallback. 'polarity' drives the red/green underline. PLACEHOLDER: polarity is authored here, and should become derived once instability is derived (decisions-session-6 Q19, option 4).",
+  "_note": "World-description clauses (contradiction-danger-spec §6, decisions-session-6 Q18). The panel says what a world is LIKE, in prose — never a condition list, never a sigil value. This is the surface the player matches a Library hint page against, so the wording is gameplay, not flavour text. One clause per group wins, highest priority first; priority 1 with no conditions is the group's fallback. 'polarity' drives the red/green underline. PLACEHOLDER: polarity is authored here, and should become derived once instability is derived (decisions-session-6 Q19, option 4).",
   "clauses": [
     {
       "id": "two_niches",
@@ -329,7 +329,7 @@
     {
       "id": "enclosed",
       "group": "relief",
-      "text": "Enclosed \u2014 you will be on top of things before you see them.",
+      "text": "Enclosed — you will be on top of things before you see them.",
       "polarity": "neutral",
       "priority": 25,
       "conditions": [
@@ -404,6 +404,51 @@
           "target": "vitality",
           "measure": "tag",
           "key": "fungal",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "chemosynthetic",
+      "group": "vitality",
+      "text": "Whatever grows here is eating the rock. It has no use for the sun.",
+      "polarity": "neutral",
+      "priority": 42,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "chemosynthetic",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "no_producers",
+      "group": "vitality",
+      "text": "Nothing grows here. Nothing can.",
+      "polarity": "stabilising",
+      "priority": 44,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "no-producers",
+          "minimum": 1
+        }
+      ]
+    },
+    {
+      "id": "nothing_to_eat",
+      "group": "vitality",
+      "text": "Things live here, and there is nothing for them to eat.",
+      "polarity": "neutral",
+      "priority": 33,
+      "conditions": [
+        {
+          "target": "vitality",
+          "measure": "tag",
+          "key": "nothing-to-eat",
           "minimum": 1
         }
       ]

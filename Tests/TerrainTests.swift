@@ -44,11 +44,47 @@ final class TerrainTests: XCTestCase {
                              "a world of sea and glacier came out as bare rock")
     }
 
-    // MARK: Vitality is cover
+    // MARK: Vitality is cover — through the plants it grows
 
     func testAProductiveWorldIsOvergrown() {
         let lush = ground(in: world(["bloom": "vitality", "root": "vitality", "sun": "illumination"]))
-        XCTAssertGreaterThan(lush[.growth, default: 0], 0, "nothing grew in a teeming world")
+        let covered = lush[.growth, default: 0] + lush[.groundcover, default: 0]
+        XCTAssertGreaterThan(covered, 0, "nothing grew in a teeming world")
+    }
+
+    /// **Nothing paints growth but flora.** `growth` used to be scattered per-tile straight off
+    /// Vitality, so cover was a uniform porosity with nothing to do with what grew here — which is
+    /// the fault `flora-system-spec.md` §5 opens with.
+    func testGroundIsOnlyOvergrownWhereSomethingGrows() {
+        let readings = world(["bloom": "vitality", "root": "vitality", "sun": "illumination"])
+        var map = WorldMap(width: 18, height: 18,
+                           tiles: Array(repeating: Tile(), count: 324),
+                           entry: GridPoint(x: 0, y: 0))
+        var rng = SeededRNG(seed: 99)
+        TerrainRules.paint(&map, readings: readings, flora: [], rng: &rng)
+        XCTAssertFalse(map.tiles.contains { $0.ground.isOvergrown },
+                       "a world with no flora was overgrown anyway")
+    }
+
+    /// Every overgrown tile knows which plant is on it — which is what lets the harvest, the hazard
+    /// and the description all read the same thing.
+    func testEveryOvergrownTileKnowsWhatIsGrowingOnIt() {
+        let world = Worldgen.generate(book: book(["teeming_life", "sun"]), seed: 4242)
+        let grown = Set(world.flora.map(\.id))
+        XCTAssertFalse(grown.isEmpty, "a teeming lit world grew nothing")
+        for point in world.map.allPoints where world.map[point].ground.isOvergrown {
+            guard let id = world.map[point].flora else {
+                return XCTFail("overgrown ground with nothing growing on it at \(point)")
+            }
+            XCTAssertTrue(grown.contains(id), "a tile pointed at a plant this world doesn't have")
+        }
+    }
+
+    /// **Stature decides whether cover hides anything** (§5). Groundcover shouldn't; canopy should.
+    func testShortGrowthDoesNotBreakASightlineAndTallGrowthDoes() {
+        XCTAssertFalse(GroundType.groundcover.blocksSight, "you couldn't see over a lawn")
+        XCTAssertTrue(GroundType.growth.blocksSight)
+        XCTAssertTrue(GroundType.groundcover.isOvergrown && GroundType.growth.isOvergrown)
     }
 
     // MARK: Relief writes elevation
@@ -154,12 +190,16 @@ final class TerrainTests: XCTestCase {
     }
 
     /// Share of the map given over to each ground type.
+    ///
+    /// Flora is sampled from the same readings, because that is how a world is painted now: cover
+    /// comes from what grows, not from Vitality directly.
     private func ground(in readings: PressureReadings) -> [GroundType: Double] {
         var map = WorldMap(width: 18, height: 18,
                            tiles: Array(repeating: Tile(), count: 324),
                            entry: GridPoint(x: 0, y: 0))
         var rng = SeededRNG(seed: 99)
-        TerrainRules.paint(&map, readings: readings, rng: &rng)
+        TerrainRules.paint(&map, readings: readings,
+                           flora: FloraRules.cast(for: readings, seed: 99), rng: &rng)
         var counts: [GroundType: Double] = [:]
         for tile in map.tiles { counts[tile.ground, default: 0] += 1 / Double(map.tiles.count) }
         return counts

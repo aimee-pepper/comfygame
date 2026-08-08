@@ -120,8 +120,10 @@
 - [ ] Q25 — cold worlds make smaller animals because cold worlds are poor
 - [ ] Q26–Q29 — the ornament↔finish direction, the two colour axes I added, the naming vocabulary,
       and whether composed names should be shortened to match qualified ones
-- [ ] **Flora** (`flora-system-spec.md`) — `growth` is a ground type with nothing producing it, and
-      growth is what makes cover, and therefore ambush terrain, actually exist
+- [x] **Flora** (`flora-system-spec.md`) — the trait model, metabolism, growth writing the ground,
+      harvest by tissue, and defended flora. `growth` had nothing producing it; now plants do, and
+      the metabolism axis lets a lightless volcanic world teem instead of being capped twice over.
+      Open, and logged as Q48: whether flora and creatures should share one world-wide life budget
 - [ ] **Living worlds** (`living-worlds-spec.md`) — creatures act on each other during a run.
       `FoeState.bleedRounds` is already ticked and nothing sets it until this lands.
 - [ ] `WorldProfile` — the interface between readings and worldgen the spine specs. Terrain and

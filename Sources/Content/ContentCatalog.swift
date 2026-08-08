@@ -578,9 +578,18 @@ struct ContentCatalog: Sendable {
 /// Well-known resource IDs. Definitions live in `Content/Data/resources.json`.
 enum Resources {
     static let ore: ResourceID = "ore"
-    static let fiber: ResourceID = "fiber"
     static let essenceRaw: ResourceID = "essence_raw"
     static let mote: ResourceID = "mote"
+
+    // **What grows.** Named here because `FloraRules` decides which of them a given plant yields,
+    // and that mapping is logic rather than content — the tissue triangle picks the corner.
+    static let fiber: ResourceID = "fiber"
+    static let timber: ResourceID = "timber"
+    static let pulp: ResourceID = "pulp"
+    static let resin: ResourceID = "resin"
+    static let toxin: ResourceID = "toxin"
+    static let spore: ResourceID = "spore"
+    static let reagent: ResourceID = "reagent"
 }
 
 enum Items {

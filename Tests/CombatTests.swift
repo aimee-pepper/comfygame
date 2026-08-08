@@ -329,6 +329,11 @@ final class CombatTests: XCTestCase {
         store.bindAndDepart()
         store.mutate("stage a fight") { state in
             guard var run = state.worlds.activeRun else { return }
+            // **Pinned, so a fight in a test is the same fight every time.** A new game draws its
+            // seed sequence from real entropy, so every combat roll — evasion above all — came out
+            // differently on each run, and any test asserting a consequence of *hitting* failed a
+            // fifth of the time. Flaky tests are worse than missing ones: they train you to re-run.
+            run.rng = SeededRNG(seed: 0xC0FFEE)
             run.cast = traits.enumerated().map { index, t in
                 Species(id: InstanceID(rawValue: UInt64(index + 1)), traits: t, worldSeed: 1)
             }
@@ -812,9 +817,17 @@ final class CombatTests: XCTestCase {
                 XCTFail("\(element.rawValue) didn't survive into the fight's stats")
                 continue
             }
-            forceTheFoeToStrike(in: store)
-
-            let carried = store.activeEncounter?.statuses.values.flatMap { $0 } ?? []
+            // **Until it connects.** The claim is that a blow which lands leaves something behind,
+            // not that every swing lands — and the party evades on a roll off a stream seeded from
+            // real entropy at new-game, so a single strike made this assert fail about one run in
+            // five. It was flaky before flora and it is not flora's; it is a test that asserted a
+            // consequence of hitting after an action that can miss.
+            var carried: [StatusState] = []
+            for _ in 0..<12 {
+                forceTheFoeToStrike(in: store)
+                carried = store.activeEncounter?.statuses.values.flatMap { $0 } ?? []
+                if carried.contains(where: { $0.kind == StatusKind.from(element) }) { break }
+            }
             XCTAssertTrue(carried.contains { $0.kind == StatusKind.from(element) },
                           "a \(element.rawValue) creature hit somebody and left no \(StatusKind.from(element).rawValue)")
         }

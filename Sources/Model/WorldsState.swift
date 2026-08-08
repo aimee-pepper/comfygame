@@ -63,6 +63,15 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// the seed, and saved with the run so a resume finds the same animals — and so an anchored
     /// world will keep its cast forever without anything further being built.
     var cast: [Species] = []
+    /// **What grows here.** Every overgrown tile points into this by id, so the harvest knows
+    /// whether a thicket is timber or poison and the map knows what you are standing in.
+    var flora: [Flora] = []
+    /// Turns of lingering harm from something toxic you walked through.
+    ///
+    /// **Chemical defence is the one that stays with you** (`flora-system-spec.md` §6) — thorns cost
+    /// you once and poison keeps costing — and a counter on the run is the only place that can
+    /// survive a force-quit halfway through it.
+    var floraPoisonTurns: Int = 0
 
     /// 0–100, always visible. Decays per *player turn* only — never wall-clock (pillar 2).
     var stability: Double = Tuning.World.startingStability
@@ -142,7 +151,7 @@ struct WorldRun: Codable, Equatable, Sendable {
 
     init(runIndex: Int, book: BoundBook, mapSeed: UInt64, rng: SeededRNG, map: WorldMap,
          playerPosition: GridPoint, enemies: [WorldEnemy] = [], sites: [PlacedSite] = [],
-         travellersHere: [TravellerID] = [], cast: [Species] = [],
+         travellersHere: [TravellerID] = [], cast: [Species] = [], flora: [Flora] = [],
          binderHP: Int = Tuning.Encounter.binderMaxHP,
          companionHP: [Int: Int] = [:],
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)) {
@@ -156,6 +165,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.sites = sites
         self.travellersHere = travellersHere
         self.cast = cast
+        self.flora = flora
         self.binderHP = binderHP
         self.companionHP = companionHP
         self.satchelItems = satchelItems
@@ -165,6 +175,15 @@ struct WorldRun: Codable, Equatable, Sendable {
     func species(of enemy: WorldEnemy) -> Species? {
         enemy.speciesID.flatMap { id in cast.first { $0.id == id } }
     }
+
+    /// The plant a given tile is overgrown with, where the run still has it.
+    func plant(at point: GridPoint) -> Flora? {
+        guard map.contains(point), let id = map[point].flora else { return nil }
+        return flora.first { $0.id == id }
+    }
+
+    /// Every plant's name, resolved together so no two of this world's plants share one.
+    var floraNames: [InstanceID: FloraIdentity.Match] { FloraIdentity.names(for: flora) }
 
     /// What this world's animals are like on average — what any one of them gets named against.
     var namingContext: Naming.Context { Naming.Context(of: cast.map(\.traits)) }
@@ -183,7 +202,11 @@ struct WorldRun: Codable, Equatable, Sendable {
     }
 
     func name(of enemy: WorldEnemy) -> String {
-        identity(of: enemy)?.name ?? enemy.displayName
+        // **A plant that stands up is still a plant.** It fights through the creature system, but
+        // naming it off its combat vector would call it "a hulking limbless shape" — it is the
+        // thing you have been walking past all afternoon, and it should say so.
+        if let floraID = enemy.floraID, let match = floraNames[floraID] { return match.name }
+        return identity(of: enemy)?.name ?? enemy.displayName
     }
 
     /// Tolerant decoding, per the policy in `Migrations.swift`: adding a field must never cost a
@@ -201,6 +224,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         sites = try container.decodeIfPresent([PlacedSite].self, forKey: .sites) ?? []
         travellersHere = try container.decodeIfPresent([TravellerID].self, forKey: .travellersHere) ?? []
         cast = try container.decodeIfPresent([Species].self, forKey: .cast) ?? []
+        flora = try container.decodeIfPresent([Flora].self, forKey: .flora) ?? []
+        floraPoisonTurns = try container.decodeIfPresent(Int.self, forKey: .floraPoisonTurns) ?? 0
         stability = try container.decodeIfPresent(Double.self, forKey: .stability)
             ?? Tuning.World.startingStability
         turnsTaken = try container.decodeIfPresent(Int.self, forKey: .turnsTaken) ?? 0

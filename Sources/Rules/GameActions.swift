@@ -255,6 +255,9 @@ extension GameStore {
                 // The species this world settled on, kept with the run so the same animals are
                 // still here after a force-quit — and so anchoring one keeps them forever.
                 cast: world.cast,
+                // …and what grows here, for the same reasons. Every growth tile points into this,
+                // so losing it would leave the world overgrown with nothing in particular.
+                flora: world.flora,
                 // **Everybody comes home mended.** Health is run-scoped, so opening a run at full
                 // is what "the party heals on returning home" means (Aimee, 6 Aug) — and it reads
                 // the Fortitude they've earned rather than a constant.

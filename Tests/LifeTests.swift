@@ -319,6 +319,10 @@ final class LifeTests: XCTestCase {
     // MARK: - The cast reaches the world
 
     /// The point of the whole system: what you meet on the map is what the world grew.
+    ///
+    /// **Either cast counts.** A predatory plant is grown by the flora system and fought by the
+    /// creature system (`flora-system-spec.md` §9.3), so it stands on the map without belonging to
+    /// the animal cast — and it is still something this world grew, which is the claim.
     func testEverythingOnTheMapComesFromTheWorldsOwnCast() {
         for seed in UInt64(1)...40 {
             let world = Worldgen.generate(book: BoundBook(written: ["teeming_life"], essencePaid: 0),
@@ -326,11 +330,42 @@ final class LifeTests: XCTestCase {
             XCTAssertFalse(world.cast.isEmpty, "seed \(seed) produced a world with no species")
             for enemy in world.enemies {
                 XCTAssertNotNil(enemy.traits, "an enemy arrived without a body, seed \(seed)")
-                XCTAssertTrue(world.cast.contains { $0.id == enemy.speciesID },
-                              "something not in the cast is standing on the map, seed \(seed)")
+                let animal = world.cast.contains { $0.id == enemy.speciesID }
+                let plant = world.flora.contains { $0.id == enemy.floraID }
+                XCTAssertTrue(animal || plant,
+                              "something not in either cast is standing on the map, seed \(seed)")
                 XCTAssertNil(enemy.creatureID, "worldgen still reached for an authored creature")
             }
         }
+    }
+
+    /// **Rooted things don't follow.** A predatory plant grew where it is: waking means it is ready,
+    /// not that it is coming. It is what keeps active-defence flora a hazard you walk *into*.
+    func testAPlantThatFightsBackStaysWhereItGrew() {
+        var run = WorldRun(runIndex: 1,
+                           book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 5,
+                           rng: SeededRNG(seed: 5),
+                           map: WorldMap(width: 6, height: 1,
+                                         tiles: Array(repeating: Tile(), count: 6),
+                                         entry: GridPoint(x: 0, y: 0)),
+                           playerPosition: GridPoint(x: 0, y: 0))
+        var thorns = FloraTraits()
+        thorns.stature = 60
+        thorns.defence = 80
+        thorns.defenceType = .active
+        run.enemies = [WorldEnemy(id: InstanceID(rawValue: 1),
+                                  traits: FloraRules.combatant(from: thorns),
+                                  position: GridPoint(x: 3, y: 0),
+                                  isAwake: true,
+                                  isSessile: true)]
+
+        var state = GameState.newGame()
+        state.worlds.activeRun = run
+        for _ in 0..<4 { _ = WorldRules.advanceTurn(in: &state) }
+
+        XCTAssertEqual(state.worlds.activeRun?.enemies.first?.position, GridPoint(x: 3, y: 0),
+                       "the undergrowth came after you")
     }
 
     /// Same seed, same animals, in the same places — including their individual jitter.

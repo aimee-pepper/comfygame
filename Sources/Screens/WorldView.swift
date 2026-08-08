@@ -125,6 +125,11 @@ struct WorldView: View {
         case .pickedUpItem(let what): "\(what) You can't tell what it is."
         case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."
         case .hazardHit(let damage): "The ground turns on you — \(damage) damage."
+        case .scratchedByGrowth(let name, let damage, let lingers):
+            lingers
+                ? "You push through the \(name). \(damage) damage, and it's still working."
+                : "The \(name) tears at you — \(damage) damage."
+        case .poisonWorking(let damage): "Whatever that was is still in you — \(damage) damage."
         case .enemySighted(let name): "A \(name) has noticed you."
         case .encounterBegan: nil // the encounter bar takes over
         case .crossedThreshold(let band):
@@ -153,6 +158,7 @@ struct WorldView: View {
         case .cacheOpened: .purple
         case .satchelFull: .orange
         case .hazardHit, .collapsed, .floorGaveWay, .ejected, .lostToCrumbling: .red
+        case .scratchedByGrowth, .poisonWorking: .red
         case .enemySighted, .crossedThreshold, .blocked: .orange
         default: .secondary
         }
@@ -483,6 +489,9 @@ private struct TileView: View {
         case .deepWater: Color(red: 0.16, green: 0.30, blue: 0.52)
         case .rubble: Color(red: 0.50, green: 0.46, blue: 0.42)
         case .growth: Color(red: 0.30, green: 0.48, blue: 0.28)
+        // Lighter and yellower than a thicket — you can see over it, and it should look like you
+        // can. The difference has to be legible at a glance or the sightline rule is a surprise.
+        case .groundcover: Color(red: 0.47, green: 0.58, blue: 0.34)
         case .chasm: Color(red: 0.06, green: 0.06, blue: 0.09)
         }
         return base.opacity(1 - Double(tile.elevation) * 0.13)

@@ -63,6 +63,10 @@ struct BookProjection {
     /// their own animals that list promised three creatures no world could contain — the preview
     /// and the world had quietly stopped agreeing.
     var life: LifeRules.LifeProjection
+    /// **What will grow here**, on the same terms and for the same reason. Read first in the panel,
+    /// because a world's animals stand on its plants: no viable metabolism means no producers, and
+    /// no producers means nothing above them either (`flora-system-spec.md` §7).
+    var flora: FloraRules.FloraProjection = FloraRules.FloraProjection(kindCount: 0, metabolism: nil, notes: [])
     /// How many marks are written on the page, and how many of them are actually **saying**
     /// something — a mark only speaks as part of a joined cluster with a target in it.
     ///
@@ -184,6 +188,7 @@ struct BookProjection {
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: written),
             resourceMix: expectedResourceMix(in: readings),
             life: LifeRules.projection(for: readings),
+            flora: FloraRules.projection(for: readings),
             marksWritten: page.runes.count,
             marksSpeaking: PageRules.sigils(of: page).count,
             chains: PageRules.chains(on: page),
@@ -277,7 +282,8 @@ struct BookProjection {
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: book.allSymbolIDs),
             resourceMix: expectedResourceMix(in: readings),
-            life: LifeRules.projection(for: readings)
+            life: LifeRules.projection(for: readings),
+            flora: FloraRules.projection(for: readings)
         )
     }
 

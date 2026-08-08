@@ -21,7 +21,8 @@ enum Worldgen {
 
     static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState())
         -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite],
-            pages: [DiaryPageID], travellers: [TravellerID], cast: [Species], start: GridPoint) {
+            pages: [DiaryPageID], travellers: [TravellerID], cast: [Species], flora: [Flora],
+            start: GridPoint) {
         // **Size is written, not fixed** (session 13 §5). The book carries the Scale it was
         // written at, so the same book always makes the same size of world.
         let width = book.scale.gridSide
@@ -50,10 +51,17 @@ enum Worldgen {
         // reads it alone — see `TerrainRules.isRiven(asWritten:)`.
         let asWritten = PressureRules.resolve(sigils)
 
-        // 0. The ground itself, before anything is placed on it. Relief, Substrate, Hydrology,
+        // 0. **What grows here, before the ground is painted.** Flora is sampled first because it
+        //    writes terrain: cover, and therefore ambush, and therefore the whole openness axis.
+        //    A world with no viable metabolism grows nothing, and that is a real answer rather than
+        //    a failure — see `FloraRules.viability`.
+        let flora = FloraRules.cast(for: readings, seed: seed)
+
+        // 0a. The ground itself, before anything is placed on it. Relief, Substrate, Hydrology,
         //    Thermal and Vitality all write here — this is the surface the pressure model was
         //    missing, and without it Relief had nothing to say.
-        TerrainRules.paint(&map, readings: readings, asWritten: asWritten, rng: &terrainRNG)
+        TerrainRules.paint(&map, readings: readings, asWritten: asWritten, flora: flora,
+                           rng: &terrainRNG)
 
         // 1. Where you arrive: a portal on the edge. It works as an exit too, so retreating the
         //    way you came is always possible — it just costs you the turns to walk back.
@@ -86,17 +94,38 @@ enum Worldgen {
 
         // 3. Resource nodes. Count and richness both come from the book — a bounty-heavy book is
         //    visibly denser on the grid, not just better per pull.
+        //
+        //    **Organic nodes stand where something is actually growing** (`flora-system-spec.md`
+        //    §6). Which one it is comes off the plant on that tile rather than off the yield table:
+        //    a thicket of woody stuff is timber, and the same thicket somewhere toxic is poison. The
+        //    table still decides *whether* this world holds a given resource at all; the flora
+        //    decides which of them this particular node is.
         let yieldTable = BookRules.yieldTable(from: readings)
         let nodeCount = nodeCount(for: readings, rng: &nodeRNG)
+        let floraByID = Dictionary(uniqueKeysWithValues: flora.map { ($0.id, $0) })
         for _ in 0..<nodeCount {
-            guard let point = randomFreePoint(in: map, avoiding: occupied, rng: &nodeRNG),
-                  let resource = nodeRNG.pickWeighted(yieldTable)
+            guard var resource = nodeRNG.pickWeighted(yieldTable) else { continue }
+            let organic = FloraRules.isFloraResource(resource)
+            guard let point = randomFreePoint(in: map, avoiding: occupied,
+                                              preferringGrowth: organic, rng: &nodeRNG)
             else { continue }
+            // Standing in it, or standing next to it — a thicket is harvested from its edge as
+            // readily as from inside.
+            let plant = organic ? growth(nearest: point, in: map, from: floraByID) : nil
+            if organic {
+                // Nothing grows on this square, so nothing organic comes off it. Better a slightly
+                // thinner world than timber lying on bare rock.
+                guard let plant else { continue }
+                resource = FloraRules.yield(of: plant.traits)
+            }
             map[point].content = .node(ResourceNode(
                 resource: resource,
                 remainingHarvests: nodeRNG.int(in: Tuning.World.harvestTurnsRange),
-                yieldPerHarvest: nodeYield(dispersion: readings["substrate"].aspect("dispersion"),
-                                           rng: &nodeRNG)
+                // **Quantity from stature**, where a plant is what you're cutting. Otherwise the
+                // substrate's concentration decides, as it always has.
+                yieldPerHarvest: plant.map { FloraRules.harvestQuantity(of: $0.traits) }
+                    ?? nodeYield(dispersion: readings["substrate"].aspect("dispersion"),
+                                 rng: &nodeRNG)
             ))
             occupied.insert(point)
         }
@@ -217,6 +246,7 @@ enum Worldgen {
         let enemyCount = enemyCount(for: book, readings: readings, rng: &enemyRNG,
                                     tiles: map.width * map.height)
         var enemies: [WorldEnemy] = guardians
+            + plantPredators(flora, in: map, avoiding: &occupied, clearOf: entry, rng: &enemyRNG)
         for _ in 0..<enemyCount {
             guard let species = enemyRNG.pickWeighted(dayRoster),
                   let point = randomFreePoint(in: map, avoiding: occupied,
@@ -229,7 +259,7 @@ enum Worldgen {
         }
 
         WorldRules.reveal(around: entry, in: &map, radius: WorldRules.visionRadius(for: book))
-        return (map, enemies, sites, placedPages, travellers, cast, entry)
+        return (map, enemies, sites, placedPages, travellers, cast, flora, entry)
     }
 
     // MARK: The roster
@@ -329,10 +359,16 @@ enum Worldgen {
     }
 
     /// A point with nothing on it yet, optionally kept clear of somewhere.
+    ///
+    /// - Parameter preferringGrowth: weights the draw toward ground something is growing on or
+    ///   beside. A *preference* rather than a filter, for the same reason travellers prefer sites:
+    ///   as a requirement it would mean a world whose growth all happens to be occupied silently
+    ///   drops its organic nodes, which is the marooning bug's shape.
     private static func randomFreePoint(in map: WorldMap,
                                         avoiding occupied: Set<GridPoint>,
                                         minimumDistanceFrom origin: GridPoint? = nil,
                                         distance: Int = 0,
+                                        preferringGrowth: Bool = false,
                                         rng: inout SeededRNG) -> GridPoint? {
         var candidates = map.allPoints.filter { point in
             // Nothing is placed where nobody can stand.
@@ -344,6 +380,63 @@ enum Worldgen {
             // crowded map the distance constraint can be unsatisfiable.
             if !far.isEmpty { candidates = far }
         }
-        return rng.pick(candidates)
+        guard preferringGrowth else { return rng.pick(candidates) }
+        let weighted = candidates.map { point in
+            (value: point,
+             weight: isNearGrowth(point, in: map) ? Tuning.Flora.nodeGrowthPreference : 1)
+        }
+        return rng.pickWeighted(weighted)
+    }
+
+    private static func isNearGrowth(_ point: GridPoint, in map: WorldMap) -> Bool {
+        map[point].ground.isOvergrown || map.neighbours(of: point).contains { map[$0].ground.isOvergrown }
+    }
+
+    /// **What is growing here, or failing that, next door.** A thicket is harvested from its edge as
+    /// readily as from inside it, which is what lets a node sit *beside* growth rather than only on
+    /// it (`flora-system-spec.md` §6).
+    private static func growth(nearest point: GridPoint, in map: WorldMap,
+                               from cast: [InstanceID: Flora]) -> Flora? {
+        if let here = map[point].flora, let plant = cast[here] { return plant }
+        for neighbour in map.neighbours(of: point) {
+            if let there = map[neighbour].flora, let plant = cast[there] { return plant }
+        }
+        return nil
+    }
+
+    /// **The undergrowth that stands up.**
+    ///
+    /// Grown by the flora system, fought by the creature system (`flora-system-spec.md` §9.3), so
+    /// there is no second combat model. It stands on its own growth, it is rooted there, and it is
+    /// awake from the start — you are not ambushed by it, you walk into it.
+    private static func plantPredators(_ flora: [Flora], in map: WorldMap,
+                                       avoiding occupied: inout Set<GridPoint>,
+                                       clearOf entry: GridPoint,
+                                       rng: inout SeededRNG) -> [WorldEnemy] {
+        let predatory = flora.filter { $0.traits.isPredatory }.sorted { $0.id.rawValue < $1.id.rawValue }
+        guard !predatory.isEmpty else { return [] }
+
+        var standing: [WorldEnemy] = []
+        for plant in predatory {
+            let tiles = map.allPoints.filter { point in
+                map[point].flora == plant.id
+                    && !occupied.contains(point)
+                    && map[point].content == .empty
+                    && map[point].isPassable
+                    && point.chebyshevDistance(to: entry) >= Tuning.World.enemyFreeRadiusAroundEntry
+            }
+            // Rare, and rarer still per world: a patch of it, not a field.
+            for _ in 0..<Tuning.Flora.predatorsPerKind {
+                guard let point = rng.pick(tiles.filter { !occupied.contains($0) }) else { break }
+                standing.append(WorldEnemy(id: InstanceID(rawValue: rng.next()),
+                                           traits: FloraRules.combatant(from: plant.traits),
+                                           position: point,
+                                           isAwake: true,
+                                           isSessile: true,
+                                           floraID: plant.id))
+                occupied.insert(point)
+            }
+        }
+        return standing
     }
 }

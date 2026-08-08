@@ -1,5 +1,5 @@
 {
-  "_note": "Resources are stackable and never consume an inventory slot. Motes are the Reality-layer currency and bank into RealityState, not BaseState. 'drivenBy' names the pressure target whose magnitude sets how much of this a world holds; 'requires' are conditions without which there is none at all; 'favours' each multiply its share. THE DESIGN RULE (resources-skills-spec \u00a71): every resource should make you want to write a particular kind of world \u2014 if two come from the same conditions, one is redundant. Which is why the exotic ones are gated behind 'requires' rather than merely favoured: an ordinary world still pays ore and fibre, and mercury is something you go and write for. 'ore' keeps its id (it is a research cost and a save key) and is the workhorse metal the spec calls Iron; a separate iron would be the same thing twice. All PLACEHOLDER.",
+  "_note": "Resources are stackable and never consume an inventory slot. Motes are the Reality-layer currency and bank into RealityState, not BaseState. 'drivenBy' names the pressure target whose magnitude sets how much of this a world holds; 'requires' are conditions without which there is none at all; 'favours' each multiply its share. THE DESIGN RULE (resources-skills-spec §1): every resource should make you want to write a particular kind of world — if two come from the same conditions, one is redundant. Which is why the exotic ones are gated behind 'requires' rather than merely favoured: an ordinary world still pays ore and fibre, and mercury is something you go and write for. 'ore' keeps its id (it is a research cost and a save key) and is the workhorse metal the spec calls Iron; a separate iron would be the same thing twice. All PLACEHOLDER.",
   "resources": [
     {
       "id": "rubble",
@@ -551,7 +551,7 @@
         {
           "target": "vitality",
           "measure": "tag",
-          "key": "fungal",
+          "key": "chemosynthetic",
           "minimum": 1
         },
         {

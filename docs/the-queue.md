@@ -5,27 +5,32 @@ the working list: everything specced-or-decided and not yet built, in the order 
 what blocks what. Kept current by the implementation engineer.
 
 **Last updated 7 Aug 2026.** Order set by Aimee: flora → instruments → apexes → the traveller roster.
+**Flora is done.** Next up is the instrument system, and Mara's Survey Post has to exist first.
 
 ---
 
 ## The order, and why
 
-### 1. Flora — **the biggest blocker in the game**
+### ~~1. Flora~~ — **built**
 
-Not a terrain feature. **Six resources depend on it and it doesn't exist**, so most of crafting is
-standing on nothing. Verified:
+The material half first: the six organic resources stopped reading vitality's `peak` (which counts
+herds) and started reading `produced`, so a world of grazing animals and no plants no longer yields
+timber. Then the terrain half — the trait model, the metabolism axis, growth writing the ground,
+harvest by tissue, defended flora.
 
-```
-fiber vitality≥3   timber vitality≥25   pulp vitality≥18
-resin vitality≥25  toxin  vitality≥18   spore vitality≥1
-```
+**What it changed that's worth knowing:**
 
-Every one is driven by **vitality alone**, so a world with a herd, no plants and nothing growing
-still yields **timber**. Every consumable, binding and haft in `crafting-spec.md` is downstream of
-this.
+- **Nothing paints growth but plants.** Cover used to be scattered per-tile off Vitality, so it had
+  nothing to do with what grew there. Habit now decides patterning and stature decides whether it
+  breaks a sightline — a world can be topographically open and still be a maze
+- **A lightless volcanic world teems.** Chemosynthesis lifts both life caps, because eating basalt
+  needs neither light nor water. It was capped twice over for two reasons that don't apply
+- **A world with nowhere to make a living carries no food web** — no producers, therefore no
+  herbivores, therefore no predators. ~3% of worlds, and writable on purpose
+- **Organic nodes stand where something is growing**, and which one it is comes off the plant
 
-Spec: `flora-system-spec.md`. **Blocks:** consumables, weapon recipes, coatings, most of the
-material economy.
+**Open, logged as Q48:** whether flora and creatures should share one world-wide life budget. It is
+the better design and it retunes every existing creature number, so it isn't a thing to do quietly.
 
 ### 2. The real instrument system — **replaces a placeholder I shipped**
 
@@ -118,6 +123,7 @@ a starting lean *(the lean mechanism is built)*.
 | | Question |
 |---|---|
 | **Q47** | Traveller pacing — should a blank book find anybody? Should placement need the clue in hand? |
+| **Q48** | Should flora and creatures share **one** world-wide life budget? More honest, more constraining, and it retunes every creature number |
 | **Branch depth / point income** | 8 nodes and 1/level are proposals; they set the level cap at 25 |
 | **Whether animals use the combat trees** | Leaning a reduced set |
 | **Kindling's name** | It leans fiery when it also covers freezing and shock |

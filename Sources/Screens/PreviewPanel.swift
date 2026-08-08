@@ -236,6 +236,13 @@ struct PreviewPanel: View {
             Text("Life")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
+            // **What grows comes first, because everything else stands on it.** A world that can
+            // make no living at all holds no herbivores and therefore no predators, and reading
+            // "nothing grows here" above "nothing lives here" is the causal order the flora system
+            // put into the world (`flora-system-spec.md` §7).
+            Text(projection.flora.sentence)
+                .font(.footnote)
+                .frame(maxWidth: .infinity, alignment: .leading)
             Text(projection.life.sentence)
                 .font(.footnote)
                 .frame(maxWidth: .infinity, alignment: .leading)

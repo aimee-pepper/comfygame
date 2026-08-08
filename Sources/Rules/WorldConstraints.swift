@@ -112,15 +112,24 @@ enum WorldConstraints {
 
         // What the sun alone would support, and the floor under it: life that eats instead of
         // photosynthesising. Anything already fungal or decaying was never using the sun.
-        let alreadyFeedsInTheDark = life.has("fungal") || life.has("decaying")
+        //
+        // **And anything eating the rock was never using it either** (`flora-system-spec.md` §2).
+        // This is what the metabolism axis is *for*: a lightless world with volatile substrate grows
+        // chemosynthetic things and is not barren. Before this, a world lit by nothing and floored
+        // in magma had no way to be full of life — it was capped for darkness *and* for dryness,
+        // twice over, for two reasons neither of which applies to something eating basalt. It is the
+        // strangest and most writable place the vocabulary can describe, and it was unreachable.
+        let eatsTheRock = FloraRules.eatsTheRock(readings)
+        let alreadyFeedsInTheDark = life.has("fungal") || life.has("decaying") || eatsTheRock
         let photosyntheticCap = light.peak * Tuning.Pressure.vitalityPerLight
         let lightCap = alreadyFeedsInTheDark
             ? written
             : max(photosyntheticCap, written * Tuning.Pressure.darkLifeFraction)
 
-        // Frozen and airborne water is water the world can't use.
+        // Frozen and airborne water is water the world can't use — unless the world isn't using
+        // water either.
         let wateredCap = water.availableMagnitude * Tuning.Pressure.vitalityPerWater
-        let waterCap = max(wateredCap, written * Tuning.Pressure.dryLifeFraction)
+        let waterCap = eatsTheRock ? written : max(wateredCap, written * Tuning.Pressure.dryLifeFraction)
 
         let cap = min(waterCap, lightCap)
         if written > cap {
@@ -138,21 +147,39 @@ enum WorldConstraints {
             life.tags.insert("decaying")
             life.tags.insert("lightless-growth")
         }
-        if wateredCap < written {
+        // …and it is not short of water either, so don't say it is. The cap lifting and the sentence
+        // have to agree, or the description contradicts the world it is describing.
+        if wateredCap < written, !eatsTheRock {
             life.tags.insert("water-limited")
             if wateredCap < written * Tuning.Pressure.dryLifeFraction { life.tags.insert("hardy") }
         }
         if photosyntheticCap < written, !alreadyFeedsInTheDark { life.tags.insert("light-limited") }
         if life.peak < Tuning.Pressure.barrenThreshold { life.tags.insert("barren") }
 
+        // **What this world's base of the food chain actually runs on**, said out loud, so a player
+        // who wrote a lightless world and found it teeming can tell why.
+        readings.readings["vitality"] = life
+        if let metabolism = FloraRules.dominantMetabolism(in: readings) {
+            life.tags.insert(metabolism.rawValue)
+        } else {
+            // Nothing can make a living here at all. Whatever stands in this world came with you or
+            // subsists on something that isn't in it.
+            life.tags.insert("no-producers")
+        }
+        readings.readings["vitality"] = life
+
         // **Producers set the ceiling on how deep the food web goes** (audit #9's refinement to
-        // Q38). Consumers count as life now, which is right — a world crawling with herds holds
-        // more life than an empty one. But left alone that would let a page of nothing but herds
-        // and swarms describe a rich food web standing on nothing, so depth is capped by what
-        // grows and rots here. Two readings that mean separate things: **vitality is how much life
-        // is here, trophic depth is how complex it is, and the second can't outrun what the first
-        // is standing on.**
-        let carrying = life.producedPeak * Tuning.Pressure.trophicDepthPerProducer
+        // Q38, extended by `flora-system-spec.md` §7). Consumers count as life now, which is right —
+        // a world crawling with herds holds more life than an empty one. But left alone that would
+        // let a page of nothing but herds and swarms describe a rich food web standing on nothing.
+        //
+        // **And it is flora productivity rather than raw producer demand.** A world can be written
+        // full of producers and still have nowhere for them to make a living: no light, no damp, no
+        // volatile rock. Then there is no flora, therefore no herbivores, therefore no predators —
+        // which is exactly the "not every world has grazers" point, and the number that makes it
+        // true. Two readings that mean separate things: **vitality is how much life is here, trophic
+        // depth is how complex it is, and the second can't outrun what the first is standing on.**
+        let carrying = FloraRules.productivity(in: readings) * Tuning.Pressure.trophicDepthPerProducer
         if life.aspect("trophicDepth") > carrying {
             life.aspects["trophicDepth"] = carrying
             if carrying < Tuning.Pressure.shallowFoodWeb { life.tags.insert("nothing-to-eat") }

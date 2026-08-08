@@ -488,13 +488,169 @@ enum Tuning {
         }
     }
 
+    /// **What grows** (`flora-system-spec.md`). All PLACEHOLDER — §9 flags metabolism, cast size and
+    /// the sight-blocking threshold as the three most worth challenging once they can be walked
+    /// through on a phone.
+    enum Flora {
+
+        // MARK: The cast
+
+        /// How many kinds of plant a world holds. Smaller than the animal cast on purpose: flora is
+        /// mostly terrain, and §9.2 asks whether it needs a cast at all.
+        static let castSizeRange = 1...4
+        /// Vitality per extra kind, measured against `teemingVitality` rather than a hundred nothing
+        /// reaches — 1 kind on thin ground, 4 on a teeming world.
+        static let vitalityPerExtraSpecies: Double = 18
+
+        // MARK: Metabolism — whether a world can live at all
+
+        /// Below this, a route to a living is not on the table. What makes "nothing grows here" a
+        /// state a world can actually be in.
+        static let viabilityFloor: Double = 0.08
+        /// Light at which photosynthesis starts paying, and at which it is doing all it can.
+        static let photosynthesisFloor: Double = 8
+        static let photosynthesisFull: Double = 55
+        /// Usable water at which rot is doing all it can, and how much a decaying world adds outright.
+        static let fungalFullMoisture: Double = 45
+        /// **How far rot gets in full daylight, and in the dark.** Fungi live in a meadow too; they
+        /// are simply not what the meadow stands on. The gap between these two is the difference
+        /// between "there are mushrooms here" and "this world runs on mushrooms".
+        static let fungalInLight: Double = 0.3
+        static let fungalCeiling: Double = 0.85
+        static let fungalDecayBonus: Double = 0.25
+        /// Volatile share and substrate magnitude at which chemosynthesis is doing all it can. Both
+        /// terms matter: a volatile share of a world with no rock in it is a share of nothing.
+        static let chemosynthesisFullShare: Double = 0.45
+        static let chemosynthesisFullSubstrate: Double = 40
+        /// How well a world has to feed itself in the dark before the light cap stops applying at
+        /// all. **This is the number that lets a lightless volcanic world teem.**
+        static let darkFeedingThreshold: Double = 0.45
+
+        // MARK: The budget
+
+        /// What even a thin world can grow, so nothing is bare for reasons the player can't see.
+        static let baseBudget: Double = 30
+        static let budgetPerVitality: Double = 1.6
+        static let costExponent: Double = 1.5
+        /// How much height raises the price of tissue. Holding yourself up costs more the taller you
+        /// get, which is why a canopy is expensive and a mat is not.
+        static let statureCostCoupling: Double = 1.4
+        static let allocationStep: Double = 5
+        /// The tissue every plant is made of before anything else is bought.
+        static let minimumTissue: Double = 15
+
+        /// What each axis costs at full value. Stature dominates.
+        static func axisCost(_ axis: FloraAxis) -> Double {
+            switch axis {
+            case .stature: 110
+            case .tissue: 70
+            case .defence: 65
+            }
+        }
+
+        /// Where each axis starts before pressures have an opinion.
+        static func baseAxisWeight(_ axis: FloraAxis) -> Double {
+            switch axis {
+            case .stature: 2.4
+            case .tissue: 2.0
+            case .defence: 1.2
+            }
+        }
+
+        // MARK: Pressures → growth
+
+        /// What the stature weight is multiplied by in the dark and in full light. **Light is a
+        /// race**: where there is plenty of it, the way to get it is to be taller than your
+        /// neighbour, which is why a lit world grows canopy and a dark one grows mats.
+        static let statureInDark: Double = 0.45
+        static let statureInFullLight: Double = 2.2
+        /// Substrate below this counts as poor ground — the resource availability hypothesis's
+        /// trigger, where slow growth defends what it cannot replace.
+        static let poorSubstrate: Double = 0.35
+        /// Trophic depth at which things eating you starts overriding what the soil said, and how
+        /// much it overrides by. **Herbivore pressure wins** (§3).
+        static let grazingThreshold: Double = 0.2
+        static let defenceUnderGrazing: Double = 1.8
+
+        // MARK: Defence
+
+        /// Defence at which a plant is worth walking around at all.
+        static let defendedThreshold: Double = 30
+        /// …and at which it might stand up instead. Doubly gated (§6): a world where the undergrowth
+        /// attacks you is a world you remember, and it shouldn't be common.
+        static let activeDefenceThreshold: Double = 60
+        static let activeDefenceWeight: Double = 0.5
+        static let activeDefenceVitality: Double = 40
+        static let activeDefenceGrazing: Double = 0.35
+        /// How many of each predatory kind actually stand up in one world. A patch, not a field.
+        static let predatorsPerKind: Int = 2
+        /// What walking into it costs, at full defence. Thorns hurt more at once; poison less, and
+        /// then it stays with you.
+        static let thornDamage: Double = 6
+        static let toxinDamage: Double = 3
+        static let toxinRounds: Int = 3
+        /// What one turn of that poison still working costs. Small, and it is the *duration* that
+        /// makes it worth going round rather than the bite.
+        static let poisonPerTurn: Int = 2
+
+        // MARK: Flora → terrain
+
+        /// The most of a world's passable ground that flora can take, at full productivity. Read
+        /// against `Tuning.Terrain.maximumGrowthCoverage`, which this replaces.
+        static let maximumCoverage: Double = 0.55
+        /// Stature at or above which growth breaks a sightline. Below it the ground is covered and
+        /// you can still see across it — **groundcover shouldn't hide anything; canopy should**
+        /// (§5), built as two ground types rather than one with a hidden property (§9.5).
+        static let sightBlockingStature: Double = 40
+        /// How far one patch runs, by habit. Spreading makes swathes, clustered makes thickets,
+        /// solitary makes single tiles.
+        static let spreadingPatchLength: Int = 14
+        static let clusteredPatchLength: Int = 5
+
+        // MARK: Flora → harvest
+
+        /// Stature at which woody tissue is worth cutting for timber rather than stripping for fibre.
+        static let timberStature: Double = 45
+        static let baseHarvest: Double = 1
+        static let harvestPerStature: Double = 3
+        /// How much likelier an organic node is to sit on ground that actually grows something.
+        static let nodeGrowthPreference: Double = 6
+
+        /// What harvested tissue is worth as a material. Same six properties gear reads.
+        static let hardnessPerWoody: Double = 0.8
+        static let densityPerWoody: Double = 0.6
+        static let insulationPerFleshy: Double = 0.7
+        static let flexibilityPerFibrous: Double = 0.9
+        /// What eating rock leaves in the flask, before defence adds to it.
+        static let chemosyntheticReactivity: Double = 45
+
+        // MARK: A plant that fights back
+
+        /// How a predatory plant reads to the creature system. It is armed with its defence and
+        /// armoured by its woodiness, and it does not move — which the map enforces, not the traits.
+        static let armamentFromDefence: Double = 1.6
+        static let boneFromWoody: Double = 0.7
+        static let sessileBuild: Double = 88
+
+        // MARK: Naming
+
+        static let identityMatchThreshold: Double = 0.76
+        static let identityBandTolerance: Double = 25
+    }
+
     enum Terrain {
         /// The most of a world that water can cover, at full saturation.
         static let maximumWaterCoverage: Double = 0.45
         /// How many separate bodies fully-pervasive water breaks into.
         static let pondsAtFullDispersion: Double = 7
-        /// The most of a world that can be overgrown, at full productivity.
-        static let maximumGrowthCoverage: Double = 0.5
+        /// **How much of the ground the growth shades**, at no height and at full height. A canopy
+        /// takes more of a world than a mat of the same abundance does. The ceiling itself is
+        /// `Tuning.Flora.maximumCoverage`, since it is flora that paints it now.
+        static let coverageAtGroundLevel: Double = 0.7
+        static let coveragePerStature: Double = 0.6
+        /// A backstop on the patch loop, so a world with more growing budget than open ground to
+        /// spend it on can't spin.
+        static let maximumGrowthPatches: Int = 200
 
         // **Chasms** — Substrate's word for less (Aimee, 7 Aug). All PLACEHOLDER.
 

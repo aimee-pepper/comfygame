@@ -44,7 +44,10 @@ struct MinimapView: View {
             // where to walk, so water and cover read differently from bare ground.
             return switch tile.ground {
             case .deepWater, .water, .ice: Color.blue.opacity(0.35)
+            // Cover you can't see past reads stronger than cover you can — on a minimap, "where
+            // are my sightlines" is most of what you're asking.
             case .growth, .rubble: Color.green.opacity(0.30)
+            case .groundcover: Color.green.opacity(0.15)
             default: Palette.mapFloor.opacity(0.3)
             }
         case .hazard: return .orange.opacity(0.7)

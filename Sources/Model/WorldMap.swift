@@ -57,17 +57,29 @@ enum GroundType: String, Codable, CaseIterable, Sendable {
     /// first word for *less* (Aimee, 7 Aug). It was called `void` and was produced by nothing at
     /// all — an impassable ground type that no world could contain, waiting for a way to ask for it.
     case chasm
+    /// **Growth you can see over.**
+    ///
+    /// Stature decides whether what grows here hides anything (`flora-system-spec.md` §5):
+    /// groundcover shouldn't, canopy should. The spec's §9.5 asks whether that is clearer as two
+    /// ground types or as one with a hidden property, and two is the answer — a hidden property on
+    /// `growth` would also have quietly reinterpreted every tile in every save that already had one.
+    case groundcover
 
     /// Deep water and open chasm are the only things you can't walk over.
     var isPassable: Bool { self != .deepWater && self != .chasm }
 
     /// Growth and broken ground break sightlines. This is what makes ambush terrain real rather
-    /// than a word in a description.
+    /// than a word in a description. Groundcover deliberately doesn't: it is cover for a beetle.
     var blocksSight: Bool { self == .growth || self == .rubble }
+
+    /// Whether something is actually growing here — either height of it. What flora nodes sit on,
+    /// and what the harvest reads.
+    var isOvergrown: Bool { self == .growth || self == .groundcover }
 
     var displayName: String {
         switch self {
         case .deepWater: "deep water"
+        case .groundcover: "ground cover"
         default: rawValue
         }
     }
@@ -85,6 +97,13 @@ struct Tile: Codable, Equatable, Sendable {
     var content: TileContent = .empty
     /// What this square is made of.
     var ground: GroundType = .soil
+    /// **Which of the world's plants is growing here.**
+    ///
+    /// Points into the run's flora cast. Without it a growth tile is anonymous, and three separate
+    /// things fall over: the harvest can't know whether this thicket is timber or fibre, the hazard
+    /// can't know whether it is thorned or toxic, and the description can't name what you are
+    /// standing in. Nil on bare ground, and on worlds bound before flora existed.
+    var flora: InstanceID?
     /// 0–3. Cover and sightlines — high ground sees over low, and broken country hides things.
     var elevation: Int = 0
     /// Fog of war. Revealed tiles stay revealed.
@@ -92,10 +111,11 @@ struct Tile: Codable, Equatable, Sendable {
     /// Crumbled tiles are impassable, and anything unharvested on them is gone.
     var isCrumbled: Bool = false
 
-    init(content: TileContent = .empty, ground: GroundType = .soil, elevation: Int = 0,
-         isRevealed: Bool = false, isCrumbled: Bool = false) {
+    init(content: TileContent = .empty, ground: GroundType = .soil, flora: InstanceID? = nil,
+         elevation: Int = 0, isRevealed: Bool = false, isCrumbled: Bool = false) {
         self.content = content
         self.ground = ground
+        self.flora = flora
         self.elevation = elevation
         self.isRevealed = isRevealed
         self.isCrumbled = isCrumbled
@@ -107,6 +127,7 @@ struct Tile: Codable, Equatable, Sendable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         content = try c.decodeIfPresent(TileContent.self, forKey: .content) ?? .empty
         ground = try c.decodeIfPresent(GroundType.self, forKey: .ground) ?? .soil
+        flora = try c.decodeIfPresent(InstanceID.self, forKey: .flora)
         elevation = try c.decodeIfPresent(Int.self, forKey: .elevation) ?? 0
         isRevealed = try c.decodeIfPresent(Bool.self, forKey: .isRevealed) ?? false
         isCrumbled = try c.decodeIfPresent(Bool.self, forKey: .isCrumbled) ?? false
@@ -181,15 +202,28 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
     var position: GridPoint
     /// Woken by the player entering its aggro radius. Never goes back to sleep.
     var isAwake: Bool = false
+    /// **It is rooted where it stands.**
+    ///
+    /// A predatory plant is grown by the flora system and fought by the creature system
+    /// (`flora-system-spec.md` §9.3), so there is no second combat model and no second loot table —
+    /// but a thing that grew where it is does not then walk after you. Waking it means it is ready,
+    /// not that it is coming. **This is what keeps active-defence flora a hazard you walk into
+    /// rather than one that hunts you.**
+    var isSessile: Bool = false
+    /// The plant it is, where it is one. Lets the world name it and the harvest read it.
+    var floraID: InstanceID?
 
     init(id: InstanceID, speciesID: InstanceID? = nil, traits: CreatureTraits? = nil,
-         creatureID: CreatureID? = nil, position: GridPoint, isAwake: Bool = false) {
+         creatureID: CreatureID? = nil, position: GridPoint, isAwake: Bool = false,
+         isSessile: Bool = false, floraID: InstanceID? = nil) {
         self.id = id
         self.speciesID = speciesID
         self.traits = traits
         self.creatureID = creatureID
         self.position = position
         self.isAwake = isAwake
+        self.isSessile = isSessile
+        self.floraID = floraID
     }
 
     /// Tolerant decoding, per the policy in `Migrations.swift`.
@@ -201,6 +235,8 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
         creatureID = try c.decodeIfPresent(CreatureID.self, forKey: .creatureID)
         position = try c.decode(GridPoint.self, forKey: .position)
         isAwake = try c.decodeIfPresent(Bool.self, forKey: .isAwake) ?? false
+        isSessile = try c.decodeIfPresent(Bool.self, forKey: .isSessile) ?? false
+        floraID = try c.decodeIfPresent(InstanceID.self, forKey: .floraID)
     }
 
     // MARK: What it is

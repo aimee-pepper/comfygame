@@ -33,6 +33,11 @@ enum WorldRules {
         case pickedUpItem(String)
         case satchelFull(String)
         case hazardHit(damage: Int)
+        /// **Something you walked into**, by name. Thorns cost you once; poison stays with you, and
+        /// says so (`flora-system-spec.md` §6).
+        case scratchedByGrowth(String, damage: Int, lingers: Bool)
+        /// One turn of that poison still working.
+        case poisonWorking(damage: Int)
         /// What noticed you, by the name it goes by. A name, not an id — what a creature *is* is
         /// read off its traits, so there is no longer a catalogue entry to point at.
         case enemySighted(String)
@@ -189,6 +194,11 @@ enum WorldRules {
         reveal(around: destination, in: &run.map,
                radius: visionRadius(in: run, party: sightBonus(in: state)))
 
+        // **Defended flora fights back the moment you're in it** (`flora-system-spec.md` §6), and
+        // before anything else on the tile resolves — you push through the thorns to reach whatever
+        // was growing behind them. Thorns cost you once; poison keeps costing.
+        events.append(contentsOf: walkInto(destination, in: &run))
+
         // Whatever is underfoot resolves before the world takes its turn.
         switch run.map[destination].content {
         case .wildDrop(let resource, let amount):
@@ -229,6 +239,26 @@ enum WorldRules {
         state.worlds.activeRun = run
         events.append(contentsOf: advanceTurn(in: &state))
         return events
+    }
+
+    /// **What it costs to walk into what's growing here** (`flora-system-spec.md` §6).
+    ///
+    /// Three defences, three different experiences of the same square. **Physical** hurts once, on
+    /// the way in. **Chemical** hurts less and then stays with you for a few turns, which is what
+    /// makes a toxic thicket a different decision from a thorn hedge rather than the same one at
+    /// another number. **Active** does nothing here at all — it stands up and fights, and that is a
+    /// `WorldEnemy` standing on the tile rather than a property of the tile.
+    static func walkInto(_ point: GridPoint, in run: inout WorldRun) -> [Event] {
+        guard let plant = run.plant(at: point) else { return [] }
+        let harm = FloraRules.harm(of: plant.traits)
+        guard harm.isSomething else { return [] }
+
+        run.binderHP = max(0, run.binderHP - harm.immediate)
+        // Walking back into it renews the poison rather than stacking it — the same rule statuses
+        // follow in a fight.
+        if harm.lingering > 0 { run.floraPoisonTurns = max(run.floraPoisonTurns, harm.lingering) }
+        let name = run.floraNames[plant.id]?.name ?? plant.displayName
+        return [.scratchedByGrowth(name, damage: harm.immediate, lingers: harm.lingering > 0)]
     }
 
     /// **Finding pays as well as fighting** (session 17 §2). A game whose progression is literacy
@@ -433,6 +463,10 @@ enum WorldRules {
         let table = Worldgen.roster(from: run.cast, nocturnal: toNight)
 
         for index in run.enemies.indices {
+            // **A plant keeps no hours.** It grew there; it is still there at midnight. Swapping it
+            // out would replace the thicket you have been walking round with an animal, and take
+            // its growth tile's meaning with it.
+            guard !run.enemies[index].isSessile else { continue }
             let current = run.species(of: run.enemies[index])
             guard current?.isNocturnal != toNight else { continue }
             guard let replacement = run.rng.pickWeighted(table) else { continue }
@@ -460,6 +494,14 @@ enum WorldRules {
         if damage > 0 {
             run.binderHP = max(0, run.binderHP - damage)
             events.append(.hazardHit(damage: damage))
+        }
+        // Whatever you pushed through is still working. Ticked on the world's turn like everything
+        // else, so it advances because you moved rather than because time passed (pillar 2).
+        if run.floraPoisonTurns > 0 {
+            run.floraPoisonTurns -= 1
+            let bite = Tuning.Flora.poisonPerTurn
+            run.binderHP = max(0, run.binderHP - bite)
+            events.append(.poisonWorking(damage: bite))
         }
         run.encounterGraceTurns = max(0, run.encounterGraceTurns - 1)
         state.reality.lifetime.worldTurnsTaken += 1
@@ -642,7 +684,10 @@ enum WorldRules {
                     events.append(.enemySighted(run.name(of: enemy)))
                 }
             }
-            guard enemy.isAwake, distance > 0 else {
+            // **Rooted things don't follow.** A predatory plant grew where it is and stays there:
+            // waking means it is ready, not that it is coming. This is the whole of what keeps
+            // active-defence flora a hazard you walk into rather than one that hunts you.
+            guard enemy.isAwake, distance > 0, !enemy.isSessile else {
                 run.enemies[index] = enemy
                 continue
             }

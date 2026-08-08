@@ -13,7 +13,9 @@ import Foundation
 ///   volatile ground adds ash.
 /// - **Hydrology** paints water, with dispersion deciding one lake or many ponds.
 /// - **Thermal** overrides: freezing turns water to ice, and extreme heat turns soil to sand.
-/// - **Vitality** lays growth over passable ground — which is the cover that makes ambush work.
+/// - **Vitality**, through the **flora** it grows, lays cover over passable ground — which is what
+///   makes ambush work. Vitality doesn't paint it directly any more: *plants* do, and which plants
+///   decides whether the cover hides anything.
 enum TerrainRules {
 
     /// - Parameter asWritten: the same world resolved **without the chance fill**. Only chasms read
@@ -21,8 +23,11 @@ enum TerrainRules {
     ///   nothing, and a rolled vein of magma would otherwise quietly fill in what you asked for.
     ///   Chance can still add holes to a page that said nothing about the ground — that's the
     ///   surprise under-specification is for.
+    /// - Parameter flora: what grows here. **Painting has to run with or after the ground** (spec
+    ///   §5), because it converts passable ground to growth and needs to know what's passable.
     static func paint(_ map: inout WorldMap, readings: PressureReadings,
-                      asWritten: PressureReadings? = nil, rng: inout SeededRNG) {
+                      asWritten: PressureReadings? = nil, flora: [Flora] = [],
+                      rng: inout SeededRNG) {
         let substrate = readings["substrate"]
         let water = readings["hydrology"]
         let thermal = readings["thermal"]
@@ -55,7 +60,7 @@ enum TerrainRules {
                         asWritten.map { chasmCoverage(in: $0) } ?? 0)
         paintChasms(&map, coverage: holes, rng: &rng)
         paintWater(&map, water: water, freezing: freezing, rng: &rng)
-        paintGrowth(&map, life: life, rng: &rng)
+        paintGrowth(&map, life: life, flora: flora, rng: &rng)
     }
 
     // MARK: Chasms — Substrate's word for less
@@ -202,12 +207,65 @@ enum TerrainRules {
         }
     }
 
-    /// Growth over ground that can carry it. Cover, and therefore ambush.
-    private static func paintGrowth(_ map: inout WorldMap, life: PressureReading, rng: inout SeededRNG) {
-        let density = life.peak / 100 * Tuning.Terrain.maximumGrowthCoverage
-        guard density > 0.01 else { return }
-        for point in map.allPoints where map[point].ground.isPassable && map[point].ground != .water {
-            if rng.chance(density) { map[point].ground = .growth }
+    // MARK: Growth — what the plants put on the ground
+
+    /// **The piece the terrain system was missing** (`flora-system-spec.md` §5).
+    ///
+    /// `growth` was a ground type with **nothing producing it**: it was scattered per-tile straight
+    /// off Vitality, so cover was a uniform porosity that had nothing to do with what grew here. Now
+    /// the world's flora paints it, and three things follow that could not before:
+    ///
+    ///  - **Habit decides patterning.** *Spreading* makes large connected swathes, *clustered* makes
+    ///    thickets with gaps, *solitary* makes scattered single tiles.
+    ///  - **Stature decides whether it hides anything.** Groundcover doesn't break a sightline;
+    ///    canopy does.
+    ///  - **Every growth tile knows which plant is on it**, which is what lets the harvest, the
+    ///    hazard and the description all read the same thing.
+    ///
+    /// The consequence worth naming: **openness as written by Relief is now modified by flora.** A
+    /// world can be topographically open and still be a maze because it is overgrown, and that
+    /// combination is a genuinely distinct place from either alone.
+    private static func paintGrowth(_ map: inout WorldMap, life: PressureReading,
+                                    flora: [Flora], rng: inout SeededRNG) {
+        guard !flora.isEmpty else { return }
+        let ground = map.allPoints.filter { map[$0].ground.isPassable && map[$0].ground != .water }
+        guard !ground.isEmpty else { return }
+
+        // Cover density is productivity, shaded by how tall the growth is: a canopy takes more of
+        // the ground than a mat of the same abundance does.
+        let productivity = life.peak / Tuning.Pressure.scaleMaximum
+        let meanStature = flora.reduce(0) { $0 + $1.traits.stature } / Double(flora.count)
+        let shading = Tuning.Terrain.coverageAtGroundLevel
+            + Tuning.Terrain.coveragePerStature * (meanStature / Tuning.Pressure.scaleMaximum)
+        let density = min(1, productivity * Tuning.Flora.maximumCoverage * shading)
+        var budget = Int(Double(ground.count) * density)
+        guard budget > 0 else { return }
+
+        // Each kind takes its turn, so a world of four plants isn't three-quarters one of them.
+        // Stable order so the same seed paints the same world.
+        let kinds = flora.sorted { $0.id.rawValue < $1.id.rawValue }
+        var index = 0
+        while budget > 0 {
+            let plant = kinds[index % kinds.count]
+            index += 1
+            // A patch, grown outward from one tile. How far it runs is the habit.
+            guard var head = rng.pick(ground) else { return }
+            let cover: GroundType = plant.traits.blocksSight ? .growth : .groundcover
+            for _ in 0..<plant.traits.habit.patchLength {
+                guard budget > 0 else { break }
+                guard map.contains(head), map[head].ground.isPassable, map[head].ground != .water,
+                      !map[head].ground.isOvergrown
+                else {
+                    head = rng.pick(map.neighbours(of: head)) ?? head
+                    continue
+                }
+                map[head].ground = cover
+                map[head].flora = plant.id
+                budget -= 1
+                head = rng.pick(map.neighbours(of: head)) ?? head
+            }
+            // A world with more budget than open ground would otherwise spin here.
+            if index > kinds.count * Tuning.Terrain.maximumGrowthPatches { return }
         }
     }
 

@@ -95,9 +95,20 @@ final class WorldTests: XCTestCase {
         XCTAssertLessThan(WorldRules.visionRadius(for: dim), WorldRules.visionRadius(for: plain))
         XCTAssertGreaterThanOrEqual(WorldRules.visionRadius(for: dim), Tuning.World.minimumVisionRadius)
 
-        let dimWorld = Worldgen.generate(book: dim, seed: 77)
-        let plainWorld = Worldgen.generate(book: plain, seed: 77)
-        XCTAssertLessThan(dimWorld.map.revealedCount, plainWorld.map.revealedCount,
+        // **Measured on one map, at the two radii.** Comparing two generated worlds used to work and
+        // no longer does: flora paints cover now, and a dim world grows low mats you can see over
+        // where a lit one grows thickets you can't — so the dim world can honestly reveal *more*
+        // ground while seeing a shorter distance. That is the flora system working, and it makes
+        // "arrived seeing less" the wrong instrument for a claim about sight.
+        let world = Worldgen.generate(book: plain, seed: 77)
+        func revealed(radius: Int) -> Int {
+            var map = world.map
+            map.tiles.indices.forEach { map.tiles[$0].isRevealed = false }
+            WorldRules.reveal(around: world.start, in: &map, radius: radius)
+            return map.revealedCount
+        }
+        XCTAssertLessThan(revealed(radius: WorldRules.visionRadius(for: dim)),
+                          revealed(radius: WorldRules.visionRadius(for: plain)),
                           "You arrive seeing less of a dim world")
     }
 
