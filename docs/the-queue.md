@@ -1,0 +1,140 @@
+# The Queue — everything still to build
+
+**What this is.** `BACKLOG.md` is the milestone plan and is authoritative for *what v0 is*. This is
+the working list: everything specced-or-decided and not yet built, in the order I'd take it, with
+what blocks what. Kept current by the implementation engineer.
+
+**Last updated 7 Aug 2026.** Order set by Aimee: flora → instruments → apexes → the traveller roster.
+
+---
+
+## The order, and why
+
+### 1. Flora — **the biggest blocker in the game**
+
+Not a terrain feature. **Six resources depend on it and it doesn't exist**, so most of crafting is
+standing on nothing. Verified:
+
+```
+fiber vitality≥3   timber vitality≥25   pulp vitality≥18
+resin vitality≥25  toxin  vitality≥18   spore vitality≥1
+```
+
+Every one is driven by **vitality alone**, so a world with a herd, no plants and nothing growing
+still yields **timber**. Every consumable, binding and haft in `crafting-spec.md` is downstream of
+this.
+
+Spec: `flora-system-spec.md`. **Blocks:** consumables, weapon recipes, coatings, most of the
+material economy.
+
+### 2. The real instrument system — **replaces a placeholder I shipped**
+
+F2 is closed but crudely: four generic nodes at the forge, each +1 analysis tier.
+`crafting-spec.md` PART TWO specs the real thing, and it's better:
+
+- **Field instruments**, one per subject, at Mara's Survey Post — a Sunglass reads Illumination, a
+  Chronometer reads Cycle
+- **The page lens**, four tiers at the Scriptorium, gated on *how many field instruments you own*
+
+**The rule that makes it good:** the lens only shows subjects you have actually measured, so field
+readings are the currency prediction is bought with. It grows subject by subject rather than in one
+jump.
+
+Also the home for **Sight and Read** — knowledge as equipment, per Aimee, rather than combat
+options. Their payoff is that a low tier says *"plated"* and a high one gives numbers.
+
+**Needs first:** Mara's Survey Post doesn't exist, so she still unlocks nothing.
+
+### 3. Apex encounters
+
+`apex-encounters.md`. Leans entirely on machinery that exists — an apex is `LifeRules` sampling with
+the energy budget lifted, so there's no new creature model.
+
+The restraint rules are the design: **visible from range, never ambushes, doesn't hunt you, one per
+world.** Drops break a *rule* each rather than carrying bigger numbers — eight sentences a crafted
+weapon can't say.
+
+Draws to **high greed**, which gives the stability meter a third consequence after instability and
+loot.
+
+### 4. The traveller roster — **6 of ~28**
+
+`cast-roster.md` and `the-cast.md`. The cast is what the search loop is *for*, and four of the six
+who exist unlock nothing. Needs, per traveller: signature, diary pages, a meeting scene, a building,
+a starting lean *(the lean mechanism is built)*.
+
+**Blocked on Aimee** for names, voices and diary passages.
+
+---
+
+## Everything else, grouped
+
+### Specced and unbuilt
+
+| | Where | Note |
+|---|---|---|
+| **Crafting recipes** | `crafting-spec.md` | 0 exist. ~60 proposed; property-based recipes should cover several outputs each |
+| **Consumables** | `crafting-spec.md` PART FOUR | **1 exists**, 18 specced. Includes the escape item (Waystone) |
+| **Building staffing** | `building-staffing.md` | Posted → a discount; in the party → their XP levels the building |
+| **Compound assembly** | session 10 §4 | Ungated, and the *assembly* half doesn't exist. Gating a feature that isn't built would be a dead button, so both go together |
+| **Per-building research trees** | Q40 | Each building its own branch |
+| **The Exchange / Recycler** | `merchant-recycler-spec.md` | Vance's, and the way gear returns to materials |
+| **The Tavern** | | Firepit → Tavern upgrade; the Keeper brings other people's travellers through |
+| **Predation** | `creature-system-spec.md` | Creatures eating each other |
+| **Anchoring** | `companions-base-anchoring-spec.md` | Three routes; also the only thing that makes a world permanent |
+| **Random companions** | `cast-roster.md` §7 | Found before any named traveller; cost a want; no diary |
+| **Wild companions pre-spent** | `combat-trees-full.md` §6 | Arrive at the player's level with points already spent, coherently |
+
+### The writing system
+
+| | Note |
+|---|---|
+| **Rune pacing** | The needed set, pity toward *the next rune for the next companion*, the hard floor |
+| **"You don't have the words for this one"** | The Library marker. Without it a player short a rune can't tell a missing word from a misread clue |
+| **Void as a cap** | Write a sun into it and the sun isn't there — the first rune that constrains rather than contributes |
+| **Light and Shadow sections** | And the same treatment for Thermal (warming/cooling) and Vitality (growing/consuming) |
+| **Count reaching the description** | A world with three suns should say so |
+| **The moon's night floor** | It lifts the night by +4, which is nothing. Should mean what its name suggests |
+| **The vocabulary rename** | `pressure_sources.json` → `focuses.json`; retire `symbols.json` and the old taxonomy |
+
+### Identification and knowledge
+
+| | Note |
+|---|---|
+| **Identification becomes knowledge** | N of a kind identified = known permanently, stored in Reality |
+| **Use-to-identify** | The second route: find out what it is by using it |
+| **Sight and Read scale with analysis** | Low tier says *"plated"*; high tier gives numbers |
+
+### Fossils and guards
+
+| | Note |
+|---|---|
+| **Site `stabilityDelta`** | Authored in `sites.json`, deliberately unwired per Q19. The comment is in Swift and the values are in JSON — needs a *test*, since a comment can't fail |
+| **`symbol.slot` / `slots.json`** | The slot taxonomy is gone; every symbol still declares one |
+| **The old draft/slot path** | `BookProjection.project(draft:)` survives for one SwiftUI preview |
+
+### Awaiting the designer
+
+| | Question |
+|---|---|
+| **Q47** | Traveller pacing — should a blank book find anybody? Should placement need the clue in hand? |
+| **Branch depth / point income** | 8 nodes and 1/level are proposals; they set the level cap at 25 |
+| **Whether animals use the combat trees** | Leaning a reduced set |
+| **Kindling's name** | It leans fiery when it also covers freezing and shock |
+| **Adamant's load** | Endgame material *and* anchoring material may be too much for one resource |
+| **Glass** | New resource, or quartz serves |
+
+---
+
+## Recently closed
+
+All four `clause-audit.md` findings, and the two Aimee raised directly:
+
+- **F1** — the bestiary had no screen at all; built, with personal *and* global percentiles
+- **F2** — analysis had no door; instruments at the forge *(placeholder, see item 2 above)*
+- **F3** — compound assembly's gate; folded into the assembly work, since a gate on a missing
+  feature is a dead button
+- **F4** — stale: the writing surface already drew glyphs, and the SF Symbol accessor behind it was
+  read by nothing
+- **The party of five**, and the Party screen showing the party
+- **Found travellers stranded** — marked found, never seated, and never placed again
