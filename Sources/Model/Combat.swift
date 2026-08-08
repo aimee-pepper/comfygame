@@ -299,6 +299,16 @@ struct EncounterState: Codable, Equatable, Sendable {
     var statuses: [Combatant: [StatusState]] = [:]
     /// Extra turns owed, and turns owed back. Quicken buys the first with the second.
     var extraTurns: [Combatant: Int] = [:]
+    /// **What the Craft and Defense branches leave on somebody**, in rounds remaining.
+    ///
+    /// One shape for five effects rather than five fields: bracing softens everything, dodging eats
+    /// the next blow outright, concealment takes you off the target list, interposing puts you in
+    /// front of the back rank, and a coated weapon poisons what it touches.
+    var braced: [Combatant: Int] = [:]
+    var dodging: [Combatant: Int] = [:]
+    var concealed: [Combatant: Int] = [:]
+    var interposing: [Combatant: Int] = [:]
+    var envenomed: [Combatant: Int] = [:]
     var skippedTurns: [Combatant: Int] = [:]
 
     /// Set by tapping the companion: their next turn is yours to direct instead of the gambits'.
@@ -358,6 +368,11 @@ struct EncounterState: Codable, Equatable, Sendable {
         binderSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .binderSkillCooldown) ?? 0
         companionSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .companionSkillCooldown) ?? 0
         cooldowns = try c.decodeIfPresent([String: Int].self, forKey: .cooldowns) ?? [:]
+        braced = try c.decodeIfPresent([Combatant: Int].self, forKey: .braced) ?? [:]
+        dodging = try c.decodeIfPresent([Combatant: Int].self, forKey: .dodging) ?? [:]
+        concealed = try c.decodeIfPresent([Combatant: Int].self, forKey: .concealed) ?? [:]
+        interposing = try c.decodeIfPresent([Combatant: Int].self, forKey: .interposing) ?? [:]
+        envenomed = try c.decodeIfPresent([Combatant: Int].self, forKey: .envenomed) ?? [:]
         foeBleeds = try c.decodeIfPresent([InstanceID: BleedState].self, forKey: .foeBleeds) ?? [:]
         wards = try c.decodeIfPresent([Combatant: WardState].self, forKey: .wards) ?? [:]
         taunts = try c.decodeIfPresent([InstanceID: Int].self, forKey: .taunts) ?? [:]

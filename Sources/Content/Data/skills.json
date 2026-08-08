@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER numbers. THE DESIGN RULE (resources-skills-spec.md §2): every skill answers a specific kind of creature. If it is good against everything it is just a bigger attack. 'answers' names the problem it solves and is printed in the skill list, so the rule is visible to the player rather than only to us. Limiter is a round-counted COOLDOWN per skill and nothing else — no mana pool, deliberately: a second resource to track in every fight is the wrong overhead for this game, so stronger skills carry longer cooldowns instead. 'owner' ties a skill to a party member; when the party expands past two this moves onto the character. Fall Back swaps ranks without spending the turn — it was the one skill held back until ranks existed, and they do now.",
+  "_note": "PLACEHOLDER numbers. THE DESIGN RULE (resources-skills-spec.md \u00a72): every skill answers a specific kind of creature. If it is good against everything it is just a bigger attack. 'answers' names the problem it solves and is printed in the skill list, so the rule is visible to the player rather than only to us. Limiter is a round-counted COOLDOWN per skill and nothing else \u2014 no mana pool, deliberately: a second resource to track in every fight is the wrong overhead for this game, so stronger skills carry longer cooldowns instead. 'owner' ties a skill to a party member; when the party expands past two this moves onto the character. Fall Back swaps ranks without spending the turn \u2014 it was the one skill held back until ranks existed, and they do now.",
   "skills": [
     {
       "id": "unbind",
@@ -131,7 +131,7 @@
       "cooldownRounds": 4,
       "owner": "companion",
       "rounds": 1,
-      "answers": "Things that burn, glow or reek — the damage armour can't stop."
+      "answers": "Things that burn, glow or reek \u2014 the damage armour can't stop."
     },
     {
       "id": "steady",
@@ -168,6 +168,128 @@
       "owner": "binder",
       "rounds": 1,
       "answers": "Being caught in the front rank by something you can't trade with."
+    },
+    {
+      "id": "shatter",
+      "name": "Shatter",
+      "icon": "hammer.circle.fill",
+      "blurb": "What it was wearing is not what it is wearing now.",
+      "kind": "sunder",
+      "power": 4,
+      "cooldownRounds": 3,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Anything plated. Permanently, for this fight.",
+      "damage": "crush"
+    },
+    {
+      "id": "finish",
+      "name": "Finish",
+      "icon": "arrow.down.right.circle",
+      "blurb": "It was nearly over.",
+      "kind": "execute",
+      "power": 14,
+      "cooldownRounds": 3,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Something already hurt. Ends it early.",
+      "damage": "pierce"
+    },
+    {
+      "id": "first_strike",
+      "name": "First Strike",
+      "icon": "forward.fill",
+      "blurb": "Before it has decided anything.",
+      "kind": "preempt",
+      "power": 0,
+      "cooldownRounds": 4,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "The opening exchange. You go, then it does."
+    },
+    {
+      "id": "brace",
+      "name": "Brace",
+      "icon": "figure.stand",
+      "blurb": "You take the next one properly.",
+      "kind": "brace",
+      "power": 0,
+      "cooldownRounds": 3,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "A round you know is going to hurt."
+    },
+    {
+      "id": "sidestep",
+      "name": "Sidestep",
+      "icon": "arrow.turn.up.right",
+      "blurb": "That one misses.",
+      "kind": "dodge",
+      "power": 0,
+      "cooldownRounds": 3,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "A single heavy hitter, once."
+    },
+    {
+      "id": "interpose",
+      "name": "Interpose",
+      "icon": "shield.lefthalf.filled",
+      "blurb": "Not them.",
+      "kind": "intercept",
+      "power": 0,
+      "cooldownRounds": 3,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "A back rank about to lose somebody."
+    },
+    {
+      "id": "envenom",
+      "name": "Envenom",
+      "icon": "drop.triangle.fill",
+      "blurb": "Properly coated, for a while.",
+      "kind": "envenom",
+      "power": 3,
+      "cooldownRounds": 4,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "High-HP foes, and anything armour would blunt."
+    },
+    {
+      "id": "conceal",
+      "name": "Conceal",
+      "icon": "moon.fill",
+      "blurb": "Not there, for a moment.",
+      "kind": "conceal",
+      "power": 0,
+      "cooldownRounds": 4,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Being the thing everything is looking at."
+    },
+    {
+      "id": "ambush",
+      "name": "Ambush",
+      "icon": "eye.slash.fill",
+      "blurb": "The fight starts with your turn.",
+      "kind": "ambush",
+      "power": 8,
+      "cooldownRounds": 5,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Opening a fight on your terms."
+    },
+    {
+      "id": "elemental_strike",
+      "name": "Elemental Strike",
+      "icon": "bolt.fill",
+      "blurb": "Burn, freeze or shock, as it suits.",
+      "kind": "elemental",
+      "power": 9,
+      "cooldownRounds": 3,
+      "owner": "binder",
+      "rounds": 1,
+      "answers": "Warded foes, and anything a plain blade bounces off."
     }
   ]
 }

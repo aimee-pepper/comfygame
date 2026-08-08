@@ -120,6 +120,18 @@ struct GambitComponentID: StringIdentifier, Identifiable {
     var id: String { rawValue }
 }
 
+/// A combat tree — Offense, Defense, Craft.
+struct CombatTreeID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
+/// One of the nine branches. **A class is which three of these you finished.**
+struct CombatBranchID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 struct SkillID: StringIdentifier {
     var rawValue: String
     init(rawValue: String) { self.rawValue = rawValue }

@@ -166,13 +166,27 @@ enum CombatRules {
 
     /// Whether a blow simply misses somebody. **Finesse, on the party's side of the fight** — the
     /// mirror of a creature's evasion, which has existed since creatures were generated.
-    static func evades(_ actor: Combatant, in state: GameState, run: inout WorldRun) -> Bool {
+    static func evades(_ actor: Combatant, in state: GameState, run: inout WorldRun,
+                       encounter: EncounterState? = nil) -> Bool {
+        // **Sidestep and Ghost are certainties, not chances.** A skill that says "that one misses"
+        // has to mean it, or it is a slightly better Footwork.
+        if let encounter {
+            if (encounter.dodging[actor] ?? 0) > 0 { return true }
+            let ghost = loadout(of: actor, in: state).firstAttackAlwaysMisses
+            if ghost, encounter.roundNumber == 1 { return true }
+        }
         guard let stats = stats(of: actor, in: state) else { return false }
-        return run.rng.chance(CharacterRules.evasion(stats))
+        let fromTree = loadout(of: actor, in: state).evasion
+        return run.rng.chance(min(0.85, CharacterRules.evasion(stats) + fromTree))
     }
 
     static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
                             armourIgnored: Double = 0) -> Int {
+        // **Iron Skin, and Immovable.** The capstone is the one thing in the game that makes armour
+        // work against a piercing blow, which is what "armour is armour, whatever it is against"
+        // has to mean if it is worth eight points.
+        let tree = loadout(of: actor, in: state)
+        let ignored = tree.armourAppliesToEverything ? 0 : armourIgnored
         // **Everything protective counts**, not just the body piece — a helm and boots are armour
         // too, and only the companion's chest plate used to be read at all.
         let tier = GearSlot.allCases
@@ -183,7 +197,8 @@ enum CombatRules {
         // second health bar.
         let sturdiness = stats(of: actor, in: state).map(CharacterRules.armourMultiplier) ?? 1
         let armour = Double(tier * Tuning.Encounter.defencePerArmorTier) * sturdiness
-        let effective = Int((armour * (1 - armourIgnored)).rounded())
+            + Double(tree.armour)
+        let effective = Int((armour * (1 - ignored)).rounded())
 
         // **Standing at the back is worth something**, and only against something in reach
         // (session 17 §4).
@@ -198,19 +213,29 @@ enum CombatRules {
     ///
     /// One each was the whole player side of combat while foes had trait-derived armour, damage
     /// character, reach and retaliation (`resources-skills-spec.md` §2, audit #9's second priority).
-    static func skills(for actor: Combatant) -> [SkillDef] {
-        switch actor {
-        case .binder: ContentCatalog.shared.skills(ownedBy: .binder)
-        case .companion: ContentCatalog.shared.skills(ownedBy: .companion)
-        case .foe: []
+    /// **What somebody can do, from where they spent** (`docs/combat-trees-full.md`).
+    ///
+    /// It used to read `SkillDef.Owner` — *the Binder's skills, or the companion's* — which was a
+    /// fossil of a party that was exactly two people with fixed lists. Skills come from branches
+    /// now, so a smith who spent in Shadow can Conceal and a soldier who didn't, can't.
+    ///
+    /// **Two are deliberately untreed.** Unbind and Mend are the baseline everybody has. Sight and
+    /// Read are knowledge rather than fighting and Aimee ruled them *object* skills — they belong to
+    /// an instrument once instruments exist, and until then they stay baseline rather than
+    /// unreachable, which would be worse.
+    static func skills(for actor: Combatant, in state: GameState) -> [SkillDef] {
+        guard actor.isParty else { return [] }
+        let learned = CombatTreeRules.loadout(for: state.base.character(actor.member)).skills
+        return ContentCatalog.shared.skills.filter {
+            Tuning.TreeSkills.baseline.contains($0.id.rawValue) || learned.contains($0.id)
         }
     }
 
     /// The first skill of a kind this member could use *right now*. Nil if they haven't got one or
     /// it's still cooling.
     static func ready(_ kind: SkillDef.Kind, for actor: Combatant,
-                      in encounter: EncounterState) -> SkillDef? {
-        skills(for: actor).first { $0.kind == kind && cooldown(of: $0, for: actor, in: encounter) == 0 }
+                      in encounter: EncounterState, state: GameState) -> SkillDef? {
+        skills(for: actor, in: state).first { $0.kind == kind && cooldown(of: $0, for: actor, in: encounter) == 0 }
     }
 
     /// What a gambit means by "use a skill" now that there are twelve.
@@ -225,8 +250,8 @@ enum CombatRules {
             let hp = health(of: $0, in: run)
             return hp.current > 0 && hp.current < hp.max
         }
-        if hurt, let heal = ready(.heal, for: actor, in: encounter) { return heal }
-        return skills(for: actor)
+        if hurt, let heal = ready(.heal, for: actor, in: encounter, state: state) { return heal }
+        return skills(for: actor, in: state)
             .filter { $0.kind != .heal && $0.kind != .rout }
             .filter { cooldown(of: $0, for: actor, in: encounter) == 0 }
             .max { $0.power < $1.power }
@@ -392,6 +417,65 @@ enum CombatRules {
             encounter.revealed.insert(foe.id)
             remember(foe, in: &state.reality.discovery, runIndex: run.runIndex)
             encounter.note("You take \(foe.stats.displayName) in properly. You'll know it again.")
+
+        // MARK: The ten the combat trees teach
+
+        case .sunder:
+            // **Shatter.** The one thing that changes what a foe *is* for the rest of the fight.
+            guard let foe, let index = encounter.foes.firstIndex(where: { $0.id == foe.id }) else { return }
+            let taken = min(encounter.foes[index].stats.armour, max(1, power))
+            encounter.foes[index].stats.armour -= taken
+            encounter.note("\(skill.name). \(foe.stats.displayName) is \(taken) less protected than it was.")
+
+        case .execute:
+            // **Finish.** Large, and only against something already nearly gone — so it rewards
+            // having done the work rather than replacing it.
+            guard let foe else { return }
+            let share = Double(foe.currentHP) / Double(max(1, foe.stats.maxHP))
+            let scaled = share <= Tuning.TreeSkills.finishThreshold ? power : power / 3
+            strike(foe.id, damage: scaled, by: actor, kind: skill.damage ?? weaponKind,
+                   run: &run, encounter: &encounter, verb: skill.name,
+                   standingBack: standingBack, reachOfActor: reach)
+
+        case .preempt, .ambush:
+            // **First Strike / Ambush.** A turn you didn't have. Ambush also lands a blow with it.
+            encounter.extraTurns[actor, default: 0] += 1
+            if skill.kind == .ambush, let foe {
+                strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
+                       run: &run, encounter: &encounter, verb: skill.name,
+                       standingBack: standingBack, reachOfActor: reach)
+            } else {
+                encounter.note("\(skill.name): you move before they do.")
+            }
+
+        case .brace:
+            encounter.braced[actor] = skill.rounds
+            encounter.note("\(skill.name): you set yourself.")
+
+        case .dodge:
+            encounter.dodging[actor] = skill.rounds
+            encounter.note("\(skill.name): the next one finds nothing.")
+
+        case .conceal:
+            encounter.concealed[actor] = skill.rounds
+            encounter.note("\(skill.name): they lose sight of you.")
+
+        case .intercept:
+            encounter.interposing[actor] = skill.rounds
+            encounter.note("\(skill.name): you step in front.")
+
+        case .envenom:
+            encounter.envenomed[actor] = skill.rounds + Tuning.TreeSkills.envenomExtraRounds
+            encounter.note("\(skill.name): coated, and it will last a while.")
+
+        case .elemental:
+            // **Elemental Strike.** The answer to a warded foe: a different kind of harm entirely.
+            guard let foe else { return }
+            strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
+                   run: &run, encounter: &encounter, verb: skill.name,
+                   standingBack: standingBack, reachOfActor: reach)
+            encounter.statuses[.foe(foe.id), default: []]
+                .append(StatusState(kind: .burn, damage: max(1, power / 4), rounds: skill.rounds + 1))
         }
 
         let cooling = stats.map { CharacterRules.cooldown(skill.cooldownRounds, $0) } ?? skill.cooldownRounds
@@ -474,11 +558,13 @@ enum CombatRules {
         switch actor {
         case .binder:
             CharacterRules.maximumHealth(state.base.binderCharacter, base: Tuning.Encounter.binderMaxHP)
+                + loadout(of: actor, in: state).maxHP
         case .companion(let index):
             CharacterRules.maximumHealth(state.base.character(.member(index)),
                                          base: state.base.roster.indices.contains(index)
                                              ? state.base.roster[index].maxHP
                                              : Tuning.Encounter.companionMaxHP)
+                + loadout(of: actor, in: state).maxHP
         case .foe:
             0
         }
@@ -520,7 +606,7 @@ enum CombatRules {
                    coating: coating(of: actor, in: state))
 
         case .skill(let id, let foeID, let allyID):
-            if let skill = ContentCatalog.shared.skill(id), skills(for: actor).contains(skill),
+            if let skill = ContentCatalog.shared.skill(id), skills(for: actor, in: state).contains(skill),
                isReady(skill, for: actor, in: encounter) {
                 use(skill, by: actor, on: foeID, ally: allyID, run: &run, encounter: &encounter,
                     weaponKind: damageKind(for: actor, in: state),
@@ -531,7 +617,7 @@ enum CombatRules {
 
         case .damageSkill(let foeID):
             // The gambit vocabulary's "damage skill" — whichever damaging one is up.
-            if let skill = skills(for: actor).first(where: {
+            if let skill = skills(for: actor, in: state).first(where: {
                 $0.power > 0 && $0.kind != .heal && isReady($0, for: actor, in: encounter)
             }) {
                 use(skill, by: actor, on: foeID, ally: nil, run: &run, encounter: &encounter,
@@ -542,7 +628,7 @@ enum CombatRules {
             }
 
         case .healSkill(let ally):
-            if let skill = ready(.heal, for: actor, in: encounter) {
+            if let skill = ready(.heal, for: actor, in: encounter, state: state) {
                 use(skill, by: actor, on: nil, ally: ally, run: &run, encounter: &encounter,
                     weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
@@ -555,7 +641,10 @@ enum CombatRules {
 
         case .flee:
             // Always succeeds — it costs the run, not a dice roll.
-            run.stability = max(0, run.stability - Tuning.Encounter.fleeStabilityCost)
+            // **Vanish.** Leaving costs the world nothing if you were never really there.
+            if !loadout(of: actor, in: state).freeFlee {
+                run.stability = max(0, run.stability - Tuning.Encounter.fleeStabilityCost)
+            }
             encounter.note("You break away. The world notices.")
             encounter.outcome = .fled
         }
@@ -741,6 +830,13 @@ enum CombatRules {
         }
     }
 
+    /// **What somebody's spent points are worth**, in the fight. One lookup so a node's effect
+    /// reaches combat rather than only the tree screen.
+    static func loadout(of actor: Combatant, in state: GameState) -> CombatTreeRules.Loadout {
+        guard actor.isParty else { return CombatTreeRules.Loadout() }
+        return CombatTreeRules.loadout(for: state.base.character(actor.member))
+    }
+
     /// Everybody who came, as combatants. The one place that answers "who is the party".
     static func party(of state: GameState) -> [Combatant] {
         state.base.partyMembers.map(\.combatant)
@@ -803,6 +899,16 @@ enum CombatRules {
         }
         for (foe, rounds) in encounter.taunts {
             if rounds <= 1 { encounter.taunts[foe] = nil } else { encounter.taunts[foe] = rounds - 1 }
+        }
+        // The five the trees leave on somebody. **A clock that never ticks is a permanent effect**,
+        // which is what Brace and Conceal would silently have become.
+        tick(&encounter.braced); tick(&encounter.dodging); tick(&encounter.concealed)
+        tick(&encounter.interposing); tick(&encounter.envenomed)
+    }
+
+    private static func tick(_ clock: inout [Combatant: Int]) {
+        for (who, rounds) in clock {
+            if rounds <= 1 { clock[who] = nil } else { clock[who] = rounds - 1 }
         }
     }
 

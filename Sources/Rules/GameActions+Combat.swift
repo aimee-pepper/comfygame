@@ -23,12 +23,12 @@ extension GameStore {
 
     /// **Everything whoever's acting could do**, and which of those are up this turn.
     var actorSkills: [SkillDef] {
-        actingCombatant.map { CombatRules.skills(for: $0) } ?? []
+        actingCombatant.map { CombatRules.skills(for: $0, in: state) } ?? []
     }
 
     var readySkills: [SkillDef] {
         guard let encounter = activeEncounter, let actor = actingCombatant else { return [] }
-        return CombatRules.skills(for: actor).filter { CombatRules.isReady($0, for: actor, in: encounter) }
+        return CombatRules.skills(for: actor, in: state).filter { CombatRules.isReady($0, for: actor, in: encounter) }
     }
 
     var hasAnyReadySkill: Bool { !readySkills.isEmpty }

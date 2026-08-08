@@ -1,0 +1,743 @@
+{
+  "_note": "The combat trees (docs/combat-trees-full.md). THREE TREES, THREE BRANCHES EACH, EIGHT NODES PER BRANCH. A class is where you spent \u2014 nobody is assigned one. Max level is derived from this shape (Aimee): enough points to complete exactly three branches, one per tree, so a finished companion has 3 of 9 branches at full depth and six untouched, and builds stay permanently distinct. Nodes cost one point each and are bought in order within a branch; depth comes from nodes getting STRONGER, not costlier. Partial investment is legal \u2014 the cap is on total points, so spreading gives three unfinished branches rather than three finished ones: a worse choice, never an illegal one. EVERY NODE'S EFFECT KIND MUST BE READ BY CombatTreeRules \u2014 a node granting a value nothing consumes is a fossil, and a test asserts it. Sight and Read are deliberately absent: they are knowledge rather than fighting, and Aimee ruled them object skills that come from instruments (7 Aug). All numbers PLACEHOLDER.",
+  "trees": [
+    {
+      "id": "offense",
+      "name": "Offense",
+      "icon": "flame.fill",
+      "blurb": "What you do to them.",
+      "branches": [
+        {
+          "id": "force",
+          "name": "Force",
+          "icon": "hammer.fill",
+          "blurb": "Crush, stagger, weight. Answers armoured foes; costs initiative.",
+          "nodes": [
+            {
+              "index": 1,
+              "name": "Heavy Hand",
+              "blurb": "You hit like something heavier than you are.",
+              "effect": {
+                "kind": "damageOfKind",
+                "damageKind": "crush",
+                "amount": 2
+              }
+            },
+            {
+              "index": 2,
+              "name": "Follow Through",
+              "blurb": "Armour is something to go through, not around.",
+              "effect": {
+                "kind": "damageVersusArmour",
+                "above": 8,
+                "amount": 3
+              }
+            },
+            {
+              "index": 3,
+              "name": "Overbear",
+              "blurb": "Everything behind the swing, and you pay for it next turn.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "overbear"
+            },
+            {
+              "index": 4,
+              "name": "Bracing Stance",
+              "blurb": "You did not move, and it shows.",
+              "effect": {
+                "kind": "damageIfHeldRank",
+                "amount": 3
+              }
+            },
+            {
+              "index": 5,
+              "name": "Stagger",
+              "blurb": "Enough weight and they lose their footing.",
+              "effect": {
+                "kind": "staggerChance",
+                "chance": 0.3
+              }
+            },
+            {
+              "index": 6,
+              "name": "Shatter",
+              "blurb": "What it was wearing is not what it is wearing now.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "shatter"
+            },
+            {
+              "index": 7,
+              "name": "Momentum",
+              "blurb": "Slow, and worse for it.",
+              "effect": {
+                "kind": "damagePerMissingInitiative",
+                "amount": 0.4
+              }
+            },
+            {
+              "index": 8,
+              "name": "Breaking Blow",
+              "blurb": "Through the armour and off their feet.",
+              "effect": {
+                "kind": "capstoneBreakingBlow"
+              }
+            }
+          ]
+        },
+        {
+          "id": "precision",
+          "name": "Precision",
+          "icon": "scope",
+          "blurb": "Pierce, gaps, finishing. Answers plated foes; costs raw damage.",
+          "nodes": [
+            {
+              "index": 1,
+              "name": "Keen Eye",
+              "blurb": "You can see where it isn't covered.",
+              "effect": {
+                "kind": "damageOfKind",
+                "damageKind": "pierce",
+                "amount": 2
+              }
+            },
+            {
+              "index": 2,
+              "name": "Weak Point",
+              "blurb": "The thicker it is, the more it has to hide.",
+              "effect": {
+                "kind": "damageVersusCovering",
+                "above": 50,
+                "amount": 3
+              }
+            },
+            {
+              "index": 3,
+              "name": "Pry",
+              "blurb": "Under the armour entirely.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "pry"
+            },
+            {
+              "index": 4,
+              "name": "Steady Hand",
+              "blurb": "You do not waste the opening.",
+              "effect": {
+                "kind": "critChance",
+                "chance": 0.12
+              }
+            },
+            {
+              "index": 5,
+              "name": "Exploit",
+              "blurb": "Something already wrong with it is something to work with.",
+              "effect": {
+                "kind": "damageVersusAfflicted",
+                "amount": 4
+              }
+            },
+            {
+              "index": 6,
+              "name": "Finish",
+              "blurb": "It was nearly over.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "finish"
+            },
+            {
+              "index": 7,
+              "name": "Anatomy",
+              "blurb": "You know where everything is, and what it is worth.",
+              "effect": {
+                "kind": "butcheryYield",
+                "amount": 0.35
+              }
+            },
+            {
+              "index": 8,
+              "name": "Killing Stroke",
+              "blurb": "Below a certain point, there is no fight left in it.",
+              "effect": {
+                "kind": "capstoneKillingStroke",
+                "threshold": 0.15
+              }
+            }
+          ]
+        },
+        {
+          "id": "swiftness",
+          "name": "Swiftness",
+          "icon": "hare.fill",
+          "blurb": "Initiative, extra actions, several targets. Answers swarms.",
+          "nodes": [
+            {
+              "index": 1,
+              "name": "Quick Step",
+              "blurb": "First, more often than not.",
+              "effect": {
+                "kind": "initiative",
+                "amount": 4
+              }
+            },
+            {
+              "index": 2,
+              "name": "Light Touch",
+              "blurb": "Heavy gear stops slowing you down so much.",
+              "effect": {
+                "kind": "gearInitiativeRelief",
+                "amount": 0.5
+              }
+            },
+            {
+              "index": 3,
+              "name": "Quicken",
+              "blurb": "Twice now, nothing after.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "quicken"
+            },
+            {
+              "index": 4,
+              "name": "Second Wind",
+              "blurb": "A kill puts something back.",
+              "effect": {
+                "kind": "healOnKill",
+                "amount": 3
+              }
+            },
+            {
+              "index": 5,
+              "name": "Flurry",
+              "blurb": "The swing carries into the next one.",
+              "effect": {
+                "kind": "splashDamage",
+                "fraction": 0.4
+              }
+            },
+            {
+              "index": 6,
+              "name": "First Strike",
+              "blurb": "Before it has decided anything.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "first_strike"
+            },
+            {
+              "index": 7,
+              "name": "Cascade",
+              "blurb": "Each one makes the next quicker.",
+              "effect": {
+                "kind": "initiativeOnKill",
+                "amount": 3
+              }
+            },
+            {
+              "index": 8,
+              "name": "Blur",
+              "blurb": "Two whole turns, once, when it matters.",
+              "effect": {
+                "kind": "capstoneBlur"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "defense",
+      "name": "Defense",
+      "icon": "shield.fill",
+      "blurb": "What they cannot do to you.",
+      "branches": [
+        {
+          "id": "fortitude",
+          "name": "Fortitude",
+          "icon": "figure.stand",
+          "blurb": "Health, armour, resistance. Answers attrition; costs speed.",
+          "nodes": [
+            {
+              "index": 1,
+              "name": "Thick Hide",
+              "blurb": "There is more of you to get through.",
+              "effect": {
+                "kind": "maxHP",
+                "amount": 6
+              }
+            },
+            {
+              "index": 2,
+              "name": "Iron Skin",
+              "blurb": "Less of what lands, lands.",
+              "effect": {
+                "kind": "armour",
+                "amount": 2
+              }
+            },
+            {
+              "index": 3,
+              "name": "Brace",
+              "blurb": "You take the next one properly.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "brace"
+            },
+            {
+              "index": 4,
+              "name": "Constitution",
+              "blurb": "Whatever is in the wound does not stay long.",
+              "effect": {
+                "kind": "statusResistance",
+                "amount": 0.5
+              }
+            },
+            {
+              "index": 5,
+              "name": "Endurance",
+              "blurb": "Hurt, and harder to hurt further.",
+              "effect": {
+                "kind": "damageReductionWhenHurt",
+                "amount": 0.25
+              }
+            },
+            {
+              "index": 6,
+              "name": "Ward",
+              "blurb": "Set against one thing, and set well.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "ward"
+            },
+            {
+              "index": 7,
+              "name": "Unyielding",
+              "blurb": "Once, you simply do not fall.",
+              "effect": {
+                "kind": "surviveOnce"
+              }
+            },
+            {
+              "index": 8,
+              "name": "Immovable",
+              "blurb": "Armour is armour, whatever it is against.",
+              "effect": {
+                "kind": "capstoneImmovable"
+              }
+            }
+          ]
+        },
+        {
+          "id": "evasion",
+          "name": "Evasion",
+          "icon": "figure.run",
+          "blurb": "Dodging, initiative, moving. Answers single heavy hitters.",
+          "nodes": [
+            {
+              "index": 1,
+              "name": "Footwork",
+              "blurb": "Not where the blow is.",
+              "effect": {
+                "kind": "evasion",
+                "amount": 0.06
+              }
+            },
+            {
+              "index": 2,
+              "name": "Light Frame",
+              "blurb": "Nothing on you that you don't need.",
+              "effect": {
+                "kind": "initiative",
+                "amount": 3
+              }
+            },
+            {
+              "index": 3,
+              "name": "Sidestep",
+              "blurb": "That one misses.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "sidestep"
+            },
+            {
+              "index": 4,
+              "name": "Slippery",
+              "blurb": "The things that wait for you wait badly.",
+              "effect": {
+                "kind": "ambushResistance",
+                "amount": 0.5
+              }
+            },
+            {
+              "index": 5,
+              "name": "Fall Back",
+              "blurb": "Somewhere else, and still your turn.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "fall_back"
+            },
+            {
+              "index": 6,
+              "name": "Feint",
+              "blurb": "Swinging leaves you harder to hit, not easier.",
+              "effect": {
+                "kind": "evasionAfterAttacking",
+                "amount": 0.1
+              }
+            },
+            {
+              "index": 7,
+              "name": "Untouchable",
+              "blurb": "The longer they miss, the more they miss.",
+              "effect": {
+                "kind": "evasionPerCleanRound",
+                "amount": 0.05
+              }
+            },
+            {
+              "index": 8,
+              "name": "Ghost",
+              "blurb": "The first thing that comes for you finds nothing.",
+              "effect": {
+                "kind": "capstoneGhost"
+              }
+            }
+          ]
+        },
+        {
+          "id": "protection",
+          "name": "Protection",
+          "icon": "shield.lefthalf.filled",
+          "blurb": "Guarding, drawing, sharing. Answers a fragile back rank.",
+          "nodes": [
+            {
+              "index": 1,
+              "name": "Bulwark",
+              "blurb": "Standing near you is worth something.",
+              "effect": {
+                "kind": "allyArmour",
+                "amount": 2
+              }
+            },
+            {
+              "index": 2,
+              "name": "Watchful",
+              "blurb": "You see them before they move.",
+              "effect": {
+                "kind": "partyAmbushResistance",
+                "amount": 0.4
+              }
+            },
+            {
+              "index": 3,
+              "name": "Draw Off",
+              "blurb": "It comes for you instead.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "draw_off"
+            },
+            {
+              "index": 4,
+              "name": "Cover",
+              "blurb": "Some of what was meant for them lands on you.",
+              "effect": {
+                "kind": "shareBackRankDamage",
+                "fraction": 0.3
+              }
+            },
+            {
+              "index": 5,
+              "name": "Shieldwall",
+              "blurb": "While you're standing, the line holds.",
+              "effect": {
+                "kind": "frontRankArmour",
+                "amount": 2
+              }
+            },
+            {
+              "index": 6,
+              "name": "Interpose",
+              "blurb": "Not them.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "interpose"
+            },
+            {
+              "index": 7,
+              "name": "Rally",
+              "blurb": "A kill of yours puts something back into everyone.",
+              "effect": {
+                "kind": "partyHealOnKill",
+                "amount": 2
+              }
+            },
+            {
+              "index": 8,
+              "name": "Guardian",
+              "blurb": "Nothing reaches past you at all.",
+              "effect": {
+                "kind": "capstoneGuardian"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "craft",
+      "name": "Craft",
+      "icon": "flask.fill",
+      "blurb": "Not magic \u2014 this world has none. Alchemy, concealment and emanation.",
+      "branches": [
+        {
+          "id": "venom",
+          "name": "Venom",
+          "icon": "drop.triangle.fill",
+          "blurb": "Toxins, wounds that keep opening, coatings. Answers high-HP foes.",
+          "nodes": [
+            {
+              "index": 1,
+              "name": "Tainted Edge",
+              "blurb": "There is always something on the blade.",
+              "effect": {
+                "kind": "poisonOnHit",
+                "amount": 1
+              }
+            },
+            {
+              "index": 2,
+              "name": "Apothecary's Hand",
+              "blurb": "The same draught goes further with you holding it.",
+              "effect": {
+                "kind": "consumablePotency",
+                "amount": 0.5
+              }
+            },
+            {
+              "index": 3,
+              "name": "Envenom",
+              "blurb": "Properly coated, for a while.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "envenom"
+            },
+            {
+              "index": 4,
+              "name": "Virulence",
+              "blurb": "It does not wear off when they'd like.",
+              "effect": {
+                "kind": "statusDuration",
+                "amount": 2
+              }
+            },
+            {
+              "index": 5,
+              "name": "Flense",
+              "blurb": "A wound that keeps opening.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "flense"
+            },
+            {
+              "index": 6,
+              "name": "Corrode",
+              "blurb": "What you put on them eats what they're wearing.",
+              "effect": {
+                "kind": "poisonReducesArmour",
+                "amount": 1
+              }
+            },
+            {
+              "index": 7,
+              "name": "Distiller",
+              "blurb": "You waste less making it.",
+              "effect": {
+                "kind": "coatingCostRelief",
+                "amount": 0.4
+              }
+            },
+            {
+              "index": 8,
+              "name": "Blight",
+              "blurb": "It spreads.",
+              "effect": {
+                "kind": "capstoneBlight"
+              }
+            }
+          ]
+        },
+        {
+          "id": "shadow",
+          "name": "Shadow",
+          "icon": "moon.fill",
+          "blurb": "Concealment, ambush, not being there. Answers fights you'd rather not have.",
+          "nodes": [
+            {
+              "index": 1,
+              "name": "Quiet Step",
+              "blurb": "Fewer things notice you at all.",
+              "effect": {
+                "kind": "encounterChance",
+                "amount": -0.25
+              }
+            },
+            {
+              "index": 2,
+              "name": "Low Profile",
+              "blurb": "They see you late.",
+              "effect": {
+                "kind": "sightedAtRange",
+                "amount": -1
+              }
+            },
+            {
+              "index": 3,
+              "name": "Conceal",
+              "blurb": "Not there, for a moment.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "conceal"
+            },
+            {
+              "index": 4,
+              "name": "Opportunist",
+              "blurb": "Coming out of nowhere is worth extra.",
+              "effect": {
+                "kind": "damageFromConcealment",
+                "amount": 5
+              }
+            },
+            {
+              "index": 5,
+              "name": "Ambush",
+              "blurb": "The fight starts with your turn.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "ambush"
+            },
+            {
+              "index": 6,
+              "name": "Vanish",
+              "blurb": "You leave, and the world doesn't charge you for it.",
+              "effect": {
+                "kind": "freeFlee"
+              }
+            },
+            {
+              "index": 7,
+              "name": "Shadowed",
+              "blurb": "All of you are harder to notice.",
+              "effect": {
+                "kind": "partySightedAtRange",
+                "amount": -1
+              }
+            },
+            {
+              "index": 8,
+              "name": "Unseen",
+              "blurb": "Every fight begins with them looking for you.",
+              "effect": {
+                "kind": "capstoneUnseen"
+              }
+            }
+          ]
+        },
+        {
+          "id": "kindling",
+          "name": "Kindling",
+          "icon": "bolt.fill",
+          "blurb": "Burn, freeze, shock, and holding them off. Answers warded and elemental foes.",
+          "nodes": [
+            {
+              "index": 1,
+              "name": "Sparkhand",
+              "blurb": "Something catches where you touch.",
+              "effect": {
+                "kind": "burnOnHit",
+                "amount": 1
+              }
+            },
+            {
+              "index": 2,
+              "name": "Insulation",
+              "blurb": "One of the three stops mattering so much.",
+              "effect": {
+                "kind": "elementResistance",
+                "amount": 0.35
+              }
+            },
+            {
+              "index": 3,
+              "name": "Elemental Strike",
+              "blurb": "Burn, freeze or shock, as it suits.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "elemental_strike"
+            },
+            {
+              "index": 4,
+              "name": "Attunement",
+              "blurb": "What you carry burns hotter.",
+              "effect": {
+                "kind": "elementalDamage",
+                "amount": 3
+              }
+            },
+            {
+              "index": 5,
+              "name": "Snuff",
+              "blurb": "Whatever it was giving off, it isn't now.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "snuff"
+            },
+            {
+              "index": 6,
+              "name": "Quench",
+              "blurb": "You take it back out of them.",
+              "effect": {
+                "kind": "skill"
+              },
+              "grantsSkill": "steady"
+            },
+            {
+              "index": 7,
+              "name": "Conduction",
+              "blurb": "It carries to the next one.",
+              "effect": {
+                "kind": "elementalChain",
+                "fraction": 0.5
+              }
+            },
+            {
+              "index": 8,
+              "name": "Emanant",
+              "blurb": "You give something off now. Permanently.",
+              "effect": {
+                "kind": "capstoneEmanant"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

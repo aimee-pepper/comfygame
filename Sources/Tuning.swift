@@ -308,6 +308,19 @@ enum Tuning {
     // MARK: - Encounters
 
     /// The danger↔time axis (contradiction-danger-spec §5).
+    /// What the tree-taught skills need. All PLACEHOLDER.
+    enum TreeSkills {
+        /// Below this share of its health, Finish is worth the turn.
+        static let finishThreshold: Double = 0.35
+        /// Rounds a coating lasts beyond the skill's own.
+        static let envenomExtraRounds: Int = 2
+        /// **What everybody can do without spending a point.** Unbind and Mend are the floor; Sight
+        /// and Read are here only until instruments exist to carry them (Aimee: they're object
+        /// skills). Leaving them out entirely would make them unreachable, which is worse than
+        /// leaving them free.
+        static let baseline: Set<String> = ["unbind", "mend", "sight", "read"]
+    }
+
     enum Danger {
         /// The most stability the danger runes can buy between them, however many are written.
         ///
@@ -723,7 +736,30 @@ enum Tuning {
     enum Character {
         /// Where every stat starts, so a bonus is a *deviation* from ordinary and zero means zero.
         static let startingStat: Int = 10
-        static let maximumLevel: Int = 30
+
+        // **The combat trees, and the level cap they imply** (`docs/combat-trees-full.md`).
+
+        /// One point a level. Depth comes from nodes getting stronger, not costlier.
+        static let treePointsPerLevel: Int = 1
+        /// **Derived, not chosen** (Aimee: *"they need to reach the end of each tree on any one
+        /// branch per tree"*). Nine branches of eight nodes; three complete branches is 24 points,
+        /// one a level with the first free — so the cap is 25, and a finished companion has three
+        /// branches at full depth and six they never touched. It was 30, picked before the trees
+        /// existed to derive it from.
+        static let maximumLevel: Int = 25
+        /// What a finished build is called. **Emergent** — nothing is authored per companion, and a
+        /// combination nobody named is still a real build; it just gets the general word.
+        static let emergentClasses: [(String, Set<String>)] = [
+            ("Rogue",       ["swiftness", "evasion", "shadow"]),
+            ("Knight",      ["force", "fortitude", "kindling"]),
+            ("Hunter",      ["precision", "evasion", "venom"]),
+            ("Bulwark",     ["force", "protection", "fortitude"]),
+            ("Assassin",    ["precision", "fortitude", "shadow"]),
+            ("Skirmisher",  ["swiftness", "protection", "kindling"]),
+            ("Duelist",     ["force", "evasion", "venom"]),
+            ("Warden",      ["precision", "protection", "kindling"]),
+            ("Harrier",     ["swiftness", "fortitude", "venom"]),
+        ]
 
         /// Experience for the second level, and how sharply the cost rises. Superlinear: early
         /// levels arrive from ordinary play, later ones are gone and earned.

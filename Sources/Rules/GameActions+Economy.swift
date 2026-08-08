@@ -391,6 +391,19 @@ extension GameStore {
 
     func isComing(_ index: Int) -> Bool { state.base.activeParty.contains(index) }
 
+    /// **Spend a point.** Bought in order within a branch, one at a time, and never mid-fight —
+    /// the same rule gambits follow, and for the same reason: a build is a decision you make about
+    /// the next fight, not during this one.
+    func spendPoint(in branch: CombatBranchID, for member: PartyMember) {
+        guard activeEncounter == nil,
+              let definition = ContentCatalog.shared.combatBranch(branch) else { return }
+        mutate("learn in \(definition.name)", flush: true) { state in
+            state.base.withCharacter(member) {
+                CombatTreeRules.buyNext(in: definition, for: &$0)
+            }
+        }
+    }
+
     /// Everybody who is walking out with you, you included.
     var partyMembers: [PartyMember] { state.base.partyMembers }
 

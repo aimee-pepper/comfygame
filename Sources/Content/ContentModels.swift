@@ -489,6 +489,28 @@ struct SkillDef: Codable, Equatable, Identifiable, Sendable {
         case read
         /// **Fall Back** — change where you're standing without spending the turn on it.
         case reposition
+
+        // The ten the combat trees teach (`docs/combat-trees-full.md`).
+        /// **Shatter** — what it was wearing is not what it is wearing now.
+        case sunder
+        /// **Finish** — large damage to something already nearly gone.
+        case execute
+        /// **First Strike** — act before the exchange properly begins.
+        case preempt
+        /// **Brace** — take everything softer for a turn.
+        case brace
+        /// **Sidestep** — the next one misses outright.
+        case dodge
+        /// **Interpose** — take a hit meant for somebody else.
+        case intercept
+        /// **Envenom** — coat a weapon, for several hits.
+        case envenom
+        /// **Conceal** — untargetable for a turn.
+        case conceal
+        /// **Ambush** — open a fight with a free attack.
+        case ambush
+        /// **Elemental Strike** — burn, freeze or shock.
+        case elemental
     }
 
     enum Owner: String, Codable, Sendable { case binder, companion }
@@ -496,15 +518,18 @@ struct SkillDef: Codable, Equatable, Identifiable, Sendable {
     /// Whether using it needs a foe picked out.
     var needsFoe: Bool {
         switch kind {
-        case .damage, .armourIgnoring, .overbear, .bleed, .reveal, .taunt, .snuff, .read: true
-        case .heal, .ward, .quicken, .cleanse, .rout, .reposition: false
+        case .damage, .armourIgnoring, .overbear, .bleed, .reveal, .taunt, .snuff, .read,
+             .sunder, .execute, .ambush, .elemental: true
+        case .heal, .ward, .quicken, .cleanse, .rout, .reposition,
+             .preempt, .brace, .dodge, .envenom, .conceal: false
+        case .intercept: false
         }
     }
 
     /// Whether it needs an ally picked out — the ones you point at your own side.
     var needsAlly: Bool {
         switch kind {
-        case .heal, .cleanse: true
+        case .heal, .cleanse, .intercept: true
         default: false
         }
     }

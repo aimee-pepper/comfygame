@@ -23,6 +23,7 @@ struct ContentCatalog: Sendable {
     let sites: [SiteDef]
     let contradictions: [ContradictionDef]
     let descriptionClauses: [DescriptionClauseDef]
+    let combatTrees: [CombatTreeDef]
     let runeShapes: [RuneShapeDef]
     let qualifiers: [QualifierDef]
     let travellers: [TravellerDef]
@@ -69,6 +70,10 @@ struct ContentCatalog: Sendable {
     }
     func station(_ id: StationID) -> StationDef? { stations.first { $0.id == id } }
     func site(_ id: SiteID) -> SiteDef? { sites.first { $0.id == id } }
+    /// The nine, flattened. A branch is the unit everything else deals in — a class is which three
+    /// of these you finished.
+    var combatBranches: [CombatBranchDef] { combatTrees.flatMap(\.branches) }
+    func combatBranch(_ id: CombatBranchID) -> CombatBranchDef? { combatBranches.first { $0.id == id } }
     func contradiction(_ id: ContradictionID) -> ContradictionDef? { contradictions.first { $0.id == id } }
     /// A shape by id, deriving rotations on demand.
     ///
@@ -158,6 +163,7 @@ struct ContentCatalog: Sendable {
             sites: try loadFile("sites", key: "sites", bundle: bundle),
             contradictions: try loadFile("contradictions", key: "contradictions", bundle: bundle),
             descriptionClauses: try loadFile("descriptions", key: "clauses", bundle: bundle),
+            combatTrees: try loadFile("combat_trees", key: "trees", bundle: bundle),
             runeShapes: try loadFile("rune_shapes", key: "shapes", bundle: bundle),
             qualifiers: try loadFile("qualifiers", key: "qualifiers", bundle: bundle),
             travellers: try loadFile("travellers", key: "travellers", bundle: bundle),

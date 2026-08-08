@@ -158,7 +158,7 @@ enum GambitEngine {
 
         case "heal":
             // The best heal this member is carrying and can actually use right now.
-            guard CombatRules.ready(.heal, for: actor, in: encounter) != nil
+            guard CombatRules.ready(.heal, for: actor, in: encounter, state: state) != nil
             else { return nil } // on cooldown ⇒ this rule can't fire; fall through to the next
             if case .ally(let member) = target { return .healSkill(ally: member) }
             return .healSkill(ally: actor)

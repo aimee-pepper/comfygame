@@ -18,9 +18,24 @@ final class CombatTests: XCTestCase {
                                          property: "prop_hp", comparator: "cmp_below", threshold: "thr_50",
                                          action: "act_heal")
 
+
+    /// **Skills come from the trees now**, so a test about *what a skill does* has to buy it first.
+    /// Everything, at full depth: these tests are about behaviour, not about unlocking.
+    private static func learnEverything(_ state: inout GameState) {
+        var depths: [CombatBranchID: Int] = [:]
+        for branch in ContentCatalog.shared.combatBranches { depths[branch.id] = branch.nodes.count }
+        // **Depths only, not levels.** Foes scale to the party's level (session 17 §3), so raising
+        // it here would quietly turn every stat test into a test about levelling.
+        state.base.binderCharacter.branchDepth = depths
+        for index in state.base.roster.indices {
+            state.base.roster[index].character.branchDepth = depths
+        }
+    }
+
     private func inFight(_ creatures: [CreatureID] = ["paper_moth"],
                          gambits: [GambitRule]? = nil) -> GameStore {
         let store = GameStore(io: .temporary(name: "combat-\(UUID().uuidString)"))
+        store.mutate("test: everything learned") { Self.learnEverything(&$0) }
         store.setSymbol("plains", in: "terrain")
         store.bindAndDepart()
         if let gambits {
@@ -133,6 +148,12 @@ final class CombatTests: XCTestCase {
         let stabilityBefore = try XCTUnwrap(store.state.worlds.activeRun).stability
         let retreat = try XCTUnwrap(store.state.worlds.activeRun?.previousPosition)
 
+        // Vanish (Shadow 6) makes leaving free, and the fixture hands out every branch — so for
+        // *this* test, unlearn it. That the capstone branch removes the cost is its own test.
+        store.mutate("test: no shadow") { state in
+            state.base.binderCharacter.branchDepth["shadow"] = 0
+            for index in state.base.roster.indices { state.base.roster[index].character.branchDepth["shadow"] = 0 }
+        }
         store.takeCombatAction(.flee)
         XCTAssertEqual(store.activeEncounter?.outcome, .fled)
         store.endEncounterIfFinished()
@@ -303,6 +324,7 @@ final class CombatTests: XCTestCase {
     /// A fight against a species, rather than against a catalogue entry.
     private func inFightWith(_ traits: [CreatureTraits]) -> GameStore {
         let store = GameStore(io: .temporary(name: "traits-\(UUID().uuidString)"))
+        store.mutate("test: everything learned") { Self.learnEverything(&$0) }
         store.setSymbol("plains", in: "terrain")
         store.bindAndDepart()
         store.mutate("stage a fight") { state in

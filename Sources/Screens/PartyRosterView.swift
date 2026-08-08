@@ -140,6 +140,7 @@ private struct CharacterPage: View {
 
     private enum Tab: String, CaseIterable, Identifiable {
         case gear = "Gear"
+        case training = "Training"
         case rules = "Rules"
         var id: String { rawValue }
     }
@@ -163,6 +164,11 @@ private struct CharacterPage: View {
                             GearSlotRow(gearSlot: gearSlot, slot: slot)
                         }
                     }
+                case .training:
+                    // **Where you spent, which is what a class is.** Its own tab rather than a
+                    // section, because nine branches of eight nodes is a screen, not a card.
+                    CombatTreeView(member: slot).environmentObject(store)
+                        .frame(minHeight: 520)
                 case .rules:
                     rulesCard
                 }

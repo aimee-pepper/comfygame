@@ -138,6 +138,13 @@ struct CharacterState: Codable, Equatable, Sendable {
     /// Front or back. Front takes the melee and deals it; back is protected and weaker in melee.
     var rank: Rank = .front
 
+    /// **How far into each branch this person has bought**, keyed by branch.
+    ///
+    /// A depth rather than a set of node ids, because nodes are bought in order — so the depth *is*
+    /// the purchase history, an out-of-order state is unrepresentable, and a re-cut branch can't
+    /// leave somebody holding a node that no longer exists.
+    var branchDepth: [CombatBranchID: Int] = [:]
+
     init(stats: CharacterStats = CharacterStats(), level: Int = 1,
          experience: Int = 0, rank: Rank = .front) {
         self.stats = stats
@@ -152,6 +159,7 @@ struct CharacterState: Codable, Equatable, Sendable {
         level = try c.decodeIfPresent(Int.self, forKey: .level) ?? 1
         experience = try c.decodeIfPresent(Int.self, forKey: .experience) ?? 0
         rank = try c.decodeIfPresent(Rank.self, forKey: .rank) ?? .front
+        branchDepth = try c.decodeIfPresent([CombatBranchID: Int].self, forKey: .branchDepth) ?? [:]
     }
 
     /// What the next level costs, and how far along you are.
