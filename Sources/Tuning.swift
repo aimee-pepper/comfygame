@@ -658,6 +658,12 @@ enum Tuning {
     // MARK: - What the player has met
 
     enum Discovery {
+        /// How many worlds to sample when building the reference distribution the global percentile
+        /// is measured against. Enough for a stable tail, cheap enough to compute once on first
+        /// look. **[PLACEHOLDER]**
+        static let globalSampleWorlds: UInt64 = 240
+        /// Where a measurement stops being ordinary and becomes worth a word.
+        static let remarkablePercentile: Double = 0.9   // PLACEHOLDER
         /// Specimens kept per identity you've met. The bestiary's percentiles need a population,
         /// not a complete history, and the save is rewritten after every action.
         static let specimensKeptPerIdentity: Int = 24 // PLACEHOLDER

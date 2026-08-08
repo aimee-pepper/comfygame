@@ -1,5 +1,5 @@
 {
-  "_note": "The Base screen renders THIS LIST, not hardcoded buttons — v1+ adds tannery, apothecary, tavern and they should be a JSON edit plus a route. 'route' must match a case of AppRoute. TIER SEMANTICS: tier counts UPGRADES PURCHASED, so tier 0 = built and un-upgraded. Essence Spring 0 = the built-in trickle, 1 = the purchasable upgrade. A station with 'builtBy' is NOT bought — you find that person out in a world (their signature is in travellers.json), talk them into coming home, and THEN raise the building for 'buildCost'. BUILD COST LADDER (Aimee, 6 Aug): the more advanced the trade, the more it takes. Early ~30 essence + ~18 raw (the Blacksmith, deliberately reachable on an early haul); middling ~80 + ~60 and wants an uncommon resource; late ~200 + ~150 and wants something you can only get out of a world too greedy to be stable. A late building should be several hauls of setup, not one. All PLACEHOLDER. THE FIREPIT IS THE ONE EXCEPTION to found-then-built (Aimee, 6 Aug): you need somewhere to put the first person before anyone can build anything, so it is present from the start and built by nobody. It upgrades into the Tavern once the Tavernkeeper is found — the firepit holds your people, the tavern brings you other people's.",
+  "_note": "The Base screen renders THIS LIST, not hardcoded buttons \u2014 v1+ adds tannery, apothecary, tavern and they should be a JSON edit plus a route. 'route' must match a case of AppRoute. TIER SEMANTICS: tier counts UPGRADES PURCHASED, so tier 0 = built and un-upgraded. Essence Spring 0 = the built-in trickle, 1 = the purchasable upgrade. A station with 'builtBy' is NOT bought \u2014 you find that person out in a world (their signature is in travellers.json), talk them into coming home, and THEN raise the building for 'buildCost'. BUILD COST LADDER (Aimee, 6 Aug): the more advanced the trade, the more it takes. Early ~30 essence + ~18 raw (the Blacksmith, deliberately reachable on an early haul); middling ~80 + ~60 and wants an uncommon resource; late ~200 + ~150 and wants something you can only get out of a world too greedy to be stable. A late building should be several hauls of setup, not one. All PLACEHOLDER. THE FIREPIT IS THE ONE EXCEPTION to found-then-built (Aimee, 6 Aug): you need somewhere to put the first person before anyone can build anything, so it is present from the start and built by nobody. It upgrades into the Tavern once the Tavernkeeper is found \u2014 the firepit holds your people, the tavern brings you other people's.",
   "stations": [
     {
       "id": "writing_desk",
@@ -128,6 +128,17 @@
       "startingTier": 0,
       "maxTier": 1,
       "route": "firepit"
+    },
+    {
+      "id": "bestiary",
+      "name": "The Bestiary",
+      "icon": "pawprint.fill",
+      "blurb": "Everything you have met out there, and how the one you met compared.",
+      "sortOrder": 7,
+      "unlockedAtStart": true,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "bestiary"
     }
   ]
 }

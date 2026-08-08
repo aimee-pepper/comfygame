@@ -33,6 +33,7 @@ struct RootView: View {
         case .essenceSpring: EssenceSpringView()
         case .constellation: ConstellationView()
         case .library: LibraryView()
+        case .bestiary: BestiaryView()
         case .blacksmith: BlacksmithView()
         case .worldHistory: WorldHistoryView()
         case .scriptorium: ScriptoriumView()
