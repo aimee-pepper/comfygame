@@ -56,6 +56,23 @@ enum CombatTreeRules {
         return node
     }
 
+    /// **Unspending.** Aimee, 7 Aug: *"people should be able to be respec'd at the spring in town."*
+    ///
+    /// All of it at once rather than node by node: the decision the trees exist to make is *which
+    /// three branches*, and refunding one point at a time would turn that into a fiddle. It costs
+    /// essence, so changing your mind is a real cost and not a free retry — but it is always
+    /// available, because a misspent point before anybody knows what a branch does is a harsh thing
+    /// to make permanent.
+    static func respecCost(for character: CharacterState) -> Int {
+        let spent = spentPoints(character)
+        guard spent > 0 else { return 0 }
+        return Tuning.Character.respecBaseCost + spent * Tuning.Character.respecCostPerPoint
+    }
+
+    static func forget(_ character: inout CharacterState) {
+        character.branchDepth = [:]
+    }
+
     /// **Partial investment is legal.** The cap is on total points, so spreading across nine
     /// branches gives you nine shallow ones rather than three deep — a worse choice, never an
     /// illegal one. The commitment is the interesting part.

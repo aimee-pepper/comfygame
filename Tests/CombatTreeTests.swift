@@ -208,4 +208,51 @@ final class CombatTreeTests: XCTestCase {
         // Field-by-field rather than `==`, which is deliberately narrow on `Loadout`.
         String(describing: a) == String(describing: b)
     }
+
+    // MARK: Changing your mind
+
+    /// Aimee, 7 Aug: *"people should be able to be respec'd at the spring in town."*
+    @MainActor
+    func testTheSpringTakesBackWhatSomebodyLearned() {
+        let store = GameStore(io: .temporary(name: "respec-\(UUID().uuidString)"))
+        store.mutate("test: a build, and money") { state in
+            state.base.essence = 5000
+            state.base.binderCharacter.level = Tuning.Character.maximumLevel
+            state.base.binderCharacter.branchDepth = ["force": 8, "fortitude": 4]
+        }
+        XCTAssertEqual(CombatTreeRules.spentPoints(store.state.base.binderCharacter), 12)
+        XCTAssertTrue(store.state.base.binderCharacter.branchDepth["force"] == 8)
+
+        let cost = store.respecCost(for: .binder)
+        XCTAssertGreaterThan(cost, 0, "unlearning has to cost, or it's a free retry")
+        let purse = store.state.base.essence
+
+        store.respec(.binder)
+        XCTAssertEqual(CombatTreeRules.spentPoints(store.state.base.binderCharacter), 0)
+        XCTAssertEqual(CombatTreeRules.unspentPoints(store.state.base.binderCharacter),
+                       CombatTreeRules.totalPoints(atLevel: Tuning.Character.maximumLevel),
+                       "the points came back")
+        XCTAssertEqual(store.state.base.essence, purse - cost)
+        XCTAssertTrue(CombatRules.skills(for: .binder, in: store.state).allSatisfy {
+            Tuning.TreeSkills.baseline.contains($0.id.rawValue)
+        }, "unlearned the branch and kept the skills")
+    }
+
+    /// Nothing to take back, and nothing to pay for it with, are both refusals rather than crashes.
+    @MainActor
+    func testUnlearningNothingCostsNothingAndIsRefused() {
+        let store = GameStore(io: .temporary(name: "respec0-\(UUID().uuidString)"))
+        XCTAssertEqual(store.respecCost(for: .binder), 0)
+        XCTAssertFalse(store.canRespec(.binder))
+
+        store.mutate("test: a build, and no money") { state in
+            state.base.essence = 0
+            state.base.binderCharacter.level = 10
+            state.base.binderCharacter.branchDepth = ["force": 5]
+        }
+        XCTAssertFalse(store.canRespec(.binder), "afforded a respec with an empty purse")
+        store.respec(.binder)
+        XCTAssertEqual(CombatTreeRules.spentPoints(store.state.base.binderCharacter), 5,
+                       "respecced without paying")
+    }
 }

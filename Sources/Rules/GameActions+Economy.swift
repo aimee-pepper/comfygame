@@ -391,6 +391,26 @@ extension GameStore {
 
     func isComing(_ index: Int) -> Bool { state.base.activeParty.contains(index) }
 
+    /// What unlearning everything would cost this person, and whether you can afford it.
+    func respecCost(for member: PartyMember) -> Int {
+        CombatTreeRules.respecCost(for: state.base.character(member))
+    }
+
+    func canRespec(_ member: PartyMember) -> Bool {
+        let cost = respecCost(for: member)
+        return activeEncounter == nil && cost > 0 && state.base.essence >= cost
+    }
+
+    /// **The Spring takes it back.** Every point returns and can be spent again.
+    func respec(_ member: PartyMember) {
+        guard canRespec(member) else { return }
+        let cost = respecCost(for: member)
+        mutate("respec \(name(of: member))", flush: true) { state in
+            state.base.essence -= cost
+            state.base.withCharacter(member) { CombatTreeRules.forget(&$0) }
+        }
+    }
+
     /// **Spend a point.** Bought in order within a branch, one at a time, and never mid-fight —
     /// the same rule gambits follow, and for the same reason: a build is a decision you make about
     /// the next fight, not during this one.

@@ -303,6 +303,34 @@ struct EssenceSpringView: View {
                 .padding(12)
                 .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
 
+                // **Changing your mind, for a price** (Aimee, 7 Aug: *"people should be able to be
+                // respec'd at the spring in town"*). Everybody at the fire, not just who's coming —
+                // the point of rethinking somebody is often that you're about to take them.
+                StationCard(title: "Unlearning", icon: "arrow.uturn.backward.circle") {
+                    Text("The Spring takes back what somebody learned, and they can spend it again. It costs, so it isn't a free retry.")
+                        .font(.caption2).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    ForEach([PartyMember.binder] + store.state.base.roster.indices.map(PartyMember.member)) { member in
+                        let cost = store.respecCost(for: member)
+                        HStack(spacing: 8) {
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(store.name(of: member)).font(.callout)
+                                Text(cost == 0
+                                     ? "nothing spent yet"
+                                     : "\(CombatTreeRules.spentPoints(store.character(of: member))) points learned")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 6)
+                            Button(cost == 0 ? "—" : "\(cost) essence") { store.respec(member) }
+                                .font(.caption2.weight(.medium))
+                                .buttonStyle(.bordered)
+                                .disabled(!store.canRespec(member))
+                        }
+                        .frame(minHeight: 44)
+                    }
+                }
+
                 ComingLater("The tier 2 upgrade is bought at the Workshop in milestone 5.")
             }
             .padding(16)

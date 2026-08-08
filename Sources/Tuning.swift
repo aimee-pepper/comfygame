@@ -747,6 +747,11 @@ enum Tuning {
         /// branches at full depth and six they never touched. It was 30, picked before the trees
         /// existed to derive it from.
         static let maximumLevel: Int = 25
+        /// **What changing your mind costs**, at the Spring. Enough to be a decision, never enough
+        /// to make a build permanent — nobody should be stuck with points they spent before they
+        /// knew what a branch did. Scales with how much you are unspending. **[PLACEHOLDER]**
+        static let respecBaseCost: Int = 20
+        static let respecCostPerPoint: Int = 8
         /// What a finished build is called. **Emergent** — nothing is authored per companion, and a
         /// combination nobody named is still a real build; it just gets the general word.
         static let emergentClasses: [(String, Set<String>)] = [
