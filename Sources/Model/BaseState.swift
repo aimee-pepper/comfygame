@@ -195,6 +195,10 @@ struct BaseState: Codable, Equatable, Sendable {
         joined.calling = person.calling
         joined.icon = person.icon
         joined.gambits = GambitStarter.rules
+        // **What their trade already taught them.** Free rather than deducted: a lean is who they
+        // were before you met them, and charging it would make a smith arrive behind a stranger.
+        joined.character.branchDepth = person.lean
+        joined.character.freePoints = person.lean.values.reduce(0, +)
         roster.append(joined)
         return true
     }

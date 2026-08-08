@@ -145,6 +145,11 @@ struct CharacterState: Codable, Equatable, Sendable {
     /// leave somebody holding a node that no longer exists.
     var branchDepth: [CombatBranchID: Int] = [:]
 
+    /// Points that didn't come from levelling — a calling's starting lean. Kept as a count rather
+    /// than baked into `branchDepth` alone, so the budget stays honest and a respec hands them back
+    /// rather than quietly deleting them.
+    var freePoints: Int = 0
+
     init(stats: CharacterStats = CharacterStats(), level: Int = 1,
          experience: Int = 0, rank: Rank = .front) {
         self.stats = stats
@@ -160,6 +165,7 @@ struct CharacterState: Codable, Equatable, Sendable {
         experience = try c.decodeIfPresent(Int.self, forKey: .experience) ?? 0
         rank = try c.decodeIfPresent(Rank.self, forKey: .rank) ?? .front
         branchDepth = try c.decodeIfPresent([CombatBranchID: Int].self, forKey: .branchDepth) ?? [:]
+        freePoints = try c.decodeIfPresent(Int.self, forKey: .freePoints) ?? 0
     }
 
     /// What the next level costs, and how far along you are.

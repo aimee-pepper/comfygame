@@ -40,6 +40,10 @@
         "offer": "There's a base. Come and measure that instead.",
         "accepted": "\"A base.\" She pulls the stick out of the ground and holds onto it. \"Right. I'll want to survey the whole thing before I unpack.\"",
         "declined": "\"Suit yourself. I'm not going anywhere \u2014 that's rather the trouble.\""
+      },
+      "lean": {
+        "shadow": 1,
+        "swiftness": 1
       }
     },
     {
@@ -90,6 +94,10 @@
         "offer": "Come home. There'll be more to dig than this.",
         "accepted": "\"Let me finish this corner.\" He doesn't finish the corner. He's already up.",
         "declined": "\"Another time, then. The floor'll keep.\""
+      },
+      "lean": {
+        "fortitude": 1,
+        "precision": 1
       }
     },
     {
@@ -148,6 +156,10 @@
         "offer": "Come with me. You can leave again whenever you like.",
         "accepted": "\"Now that,\" she says, \"is the first offer anyone's made me that understood the problem.\"",
         "declined": "\"Fair enough. Mind how you go \u2014 and mind the ground here, it lies to you.\""
+      },
+      "lean": {
+        "evasion": 1,
+        "venom": 1
       }
     },
     {
@@ -215,6 +227,10 @@
         "offer": "I've got ink. Come and use it.",
         "accepted": "\"Careful,\" he says, getting up. \"I'm going to have opinions about your handwriting.\"",
         "declined": "\"Go on, then. And listen \u2014 when the floor starts going, that's not the warning. That's the second warning.\""
+      },
+      "lean": {
+        "fortitude": 1,
+        "kindling": 1
       }
     },
     {
@@ -265,6 +281,9 @@
         "offer": "I'll find you the stone and the iron. Come and build it.",
         "accepted": "She stands, and she takes the fire with her somehow. \"Then let's not stand about. I've been cold a long time.\"",
         "declined": "\"Right you are.\" She turns back to the fire. \"It'll be here. So will I.\""
+      },
+      "lean": {
+        "force": 2
       }
     },
     {
@@ -315,7 +334,11 @@
         "accepted": "\"You'll want a room with light in it. And a table that doesn't rock \u2014 I'm going to be difficult about the table.\" She's already up. \"Charcoal. Honestly.\"",
         "declined": "\"Go on then.\" She picks the board back up. \"You'll be back when the page runs out. They always are.\""
       },
-      "isRequired": true
+      "isRequired": true,
+      "lean": {
+        "precision": 1,
+        "shadow": 1
+      }
     }
   ],
   "pages": [

@@ -25,7 +25,7 @@ enum CombatTreeRules {
     }
 
     static func unspentPoints(_ character: CharacterState) -> Int {
-        max(0, totalPoints(atLevel: character.level) - spentPoints(character))
+        max(0, totalPoints(atLevel: character.level) + character.freePoints - spentPoints(character))
     }
 
     // MARK: Spending

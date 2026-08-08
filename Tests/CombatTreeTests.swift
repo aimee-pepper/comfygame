@@ -255,4 +255,65 @@ final class CombatTreeTests: XCTestCase {
         XCTAssertEqual(CombatTreeRules.spentPoints(store.state.base.binderCharacter), 5,
                        "respecced without paying")
     }
+
+    // MARK: Callings
+
+    /// *"A calling gives a starting lean, never a limit"* (`combat-trees-full.md` §6). Halloway
+    /// begins in Force because she has swung a hammer for a living.
+    @MainActor
+    func testRecruitingSomebodyBringsTheirTradeWithThem() throws {
+        let halloway = try XCTUnwrap(ContentCatalog.shared.traveller("halloway"))
+        XCTAssertFalse(halloway.lean.isEmpty, "a smith joined knowing nothing about anything")
+
+        var base = BaseState.newGame()
+        base.seat("halloway")
+        let seated = try XCTUnwrap(base.roster.first { $0.traveller == "halloway" })
+        XCTAssertEqual(seated.character.branchDepth, halloway.lean)
+        XCTAssertGreaterThan(CombatTreeRules.spentPoints(seated.character), 0)
+    }
+
+    /// **Free, not deducted.** Charging a lean against the level budget would make an experienced
+    /// tradesperson arrive *behind* a stranger, which is backwards.
+    @MainActor
+    func testALeanDoesNotCostThemTheirFirstLevels() throws {
+        var base = BaseState.newGame()
+        base.seat("halloway")
+        let smith = try XCTUnwrap(base.roster.first { $0.traveller == "halloway" }).character
+        let stranger = CharacterState()
+
+        XCTAssertEqual(CombatTreeRules.unspentPoints(smith),
+                       CombatTreeRules.unspentPoints(stranger),
+                       "the smith paid for her own trade out of her levelling")
+        XCTAssertGreaterThan(CombatTreeRules.spentPoints(smith), CombatTreeRules.spentPoints(stranger))
+    }
+
+    /// A lean is a lean, not a class: the Spring can move it like anything else.
+    @MainActor
+    func testALeanCanBeRespeccedLikeAnythingElse() throws {
+        let store = GameStore(io: .temporary(name: "lean-\(UUID().uuidString)"))
+        store.mutate("test: a smith, and money") { state in
+            state.base.essence = 5000
+            state.base.seat("halloway")
+        }
+        let index = try XCTUnwrap(store.state.base.roster.firstIndex { $0.traveller == "halloway" })
+        let member = PartyMember.member(index)
+        XCTAssertGreaterThan(store.respecCost(for: member), 0)
+
+        store.respec(member)
+        XCTAssertTrue(store.character(of: member).branchDepth.isEmpty, "the lean stuck")
+        XCTAssertGreaterThan(CombatTreeRules.unspentPoints(store.character(of: member)), 0,
+                             "unlearning a lean deleted the points instead of returning them")
+    }
+
+    /// Nobody joins as a blank. A traveller without a lean is a person with no past.
+    func testEveryTravellerHasATrade() {
+        for traveller in ContentCatalog.shared.travellers {
+            XCTAssertFalse(traveller.lean.isEmpty,
+                           "\(traveller.name) has a calling and no lean to show for it")
+            for branch in traveller.lean.keys {
+                XCTAssertNotNil(ContentCatalog.shared.combatBranch(branch),
+                                "\(traveller.name) leans into '\(branch.rawValue)', which isn't a branch")
+            }
+        }
+    }
 }
