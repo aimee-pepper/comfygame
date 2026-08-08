@@ -238,6 +238,23 @@ final class PressureTests: XCTestCase {
                        "Fungal worlds feed themselves in the dark")
     }
 
+    /// **A moon has to be worth writing.**
+    ///
+    /// Its night floor was 4, and `trueDarkFloor` is 5 — so writing a moon left the night *below the
+    /// threshold the game itself calls pitch dark*. It lifted the night by four points and changed
+    /// nothing about it, which is the opposite of what the word promises.
+    func testAMoonlitNightIsNotATrueDarkOne() {
+        let moonlit = PressureRules.resolve([
+            sigil("sun", "illumination", .great),
+            sigil("moon", "illumination", .great)
+        ])
+        let starless = PressureRules.resolve([sigil("sun", "illumination", .great)])
+
+        XCTAssertGreaterThan(moonlit["illumination"].floor, Tuning.Pressure.trueDarkFloor,
+                             "a moon left the night as dark as no moon at all")
+        XCTAssertGreaterThan(moonlit["illumination"].floor, starless["illumination"].floor)
+    }
+
     /// "Write Sea on a frozen world and you get a glacier whether you asked for one or not."
     func testHeatDecidesWhatFormWaterTakes() {
         let frozen = PressureRules.resolve([

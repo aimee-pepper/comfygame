@@ -81,7 +81,6 @@ a starting lean *(the lean mechanism is built)*.
 | **Void as a cap** | Write a sun into it and the sun isn't there — the first rune that constrains rather than contributes |
 | **Light and Shadow sections** | And the same treatment for Thermal (warming/cooling) and Vitality (growing/consuming) |
 | **Count reaching the description** | A world with three suns should say so |
-| **The moon's night floor** | It lifts the night by +4, which is nothing. Should mean what its name suggests |
 | **The vocabulary rename** | `pressure_sources.json` → `focuses.json`; retire `symbols.json` and the old taxonomy |
 
 ### Identification and knowledge
