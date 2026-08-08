@@ -44,37 +44,7 @@ actually been out and measured. Mara has a building. Sight and Read scale with t
 The creature, the restraint rules, the greed draw, and the eight weapons. Five of the eight rules are
 wired; three are authored and inert pending decisions — logged as **Q49**.
 
-### The instrument system as it was — kept for reference
-
-F2 is closed but crudely: four generic nodes at the forge, each +1 analysis tier.
-`crafting-spec.md` PART TWO specs the real thing, and it's better:
-
-- **Field instruments**, one per subject, at Mara's Survey Post — a Sunglass reads Illumination, a
-  Chronometer reads Cycle
-- **The page lens**, four tiers at the Scriptorium, gated on *how many field instruments you own*
-
-**The rule that makes it good:** the lens only shows subjects you have actually measured, so field
-readings are the currency prediction is bought with. It grows subject by subject rather than in one
-jump.
-
-Also the home for **Sight and Read** — knowledge as equipment, per Aimee, rather than combat
-options. Their payoff is that a low tier says *"plated"* and a high one gives numbers.
-
-**Needs first:** Mara's Survey Post doesn't exist, so she still unlocks nothing.
-
-### 3. Apex encounters
-
-`apex-encounters.md`. Leans entirely on machinery that exists — an apex is `LifeRules` sampling with
-the energy budget lifted, so there's no new creature model.
-
-The restraint rules are the design: **visible from range, never ambushes, doesn't hunt you, one per
-world.** Drops break a *rule* each rather than carrying bigger numbers — eight sentences a crafted
-weapon can't say.
-
-Draws to **high greed**, which gives the stability meter a third consequence after instability and
-loot.
-
-### 4. The traveller roster — **6 of ~28**
+### 4. The traveller roster — **6 of ~28**, and now the top of the list
 
 `cast-roster.md` and `the-cast.md`. The cast is what the search loop is *for*, and four of the six
 who exist unlock nothing. Needs, per traveller: signature, diary pages, a meeting scene, a building,
@@ -120,15 +90,6 @@ a starting lean *(the lean mechanism is built)*.
 |---|---|
 | **Identification becomes knowledge** | N of a kind identified = known permanently, stored in Reality |
 | **Use-to-identify** | The second route: find out what it is by using it |
-| **Sight and Read scale with analysis** | Low tier says *"plated"*; high tier gives numbers |
-
-### Fossils and guards
-
-| | Note |
-|---|---|
-| **Site `stabilityDelta`** | Authored in `sites.json`, deliberately unwired per Q19. The comment is in Swift and the values are in JSON — needs a *test*, since a comment can't fail |
-| **`symbol.slot` / `slots.json`** | The slot taxonomy is gone; every symbol still declares one |
-| **The old draft/slot path** | `BookProjection.project(draft:)` survives for one SwiftUI preview |
 
 ### Awaiting the designer
 
@@ -136,6 +97,7 @@ a starting lean *(the lean mechanism is built)*.
 |---|---|
 | **Q47** | Traveller pacing — should a blank book find anybody? Should placement need the clue in hand? |
 | **Q48** | Should flora and creatures share **one** world-wide life budget? More honest, more constraining, and it retunes every creature number |
+| **Q49** | Three apex weapon rules need a decision before they can be wired — and whether the strongest apexes should require worlds you deliberately *write* toward |
 | **Branch depth / point income** | 8 nodes and 1/level are proposals; they set the level cap at 25 |
 | **Whether animals use the combat trees** | Leaning a reduced set |
 | **Kindling's name** | It leans fiery when it also covers freezing and shock |
@@ -146,7 +108,11 @@ a starting lean *(the lean mechanism is built)*.
 
 ## Recently closed
 
-All four `clause-audit.md` findings, and the two Aimee raised directly:
+**The whole fossil audit** — the slot taxonomy and everything that only made sense inside it, the
+Constellation node written for one companion, and the site-`stabilityDelta` guard the comprehensive
+audit asked for. Plus **flora**, **the instruments** and **apexes**.
+
+And before those, all four `clause-audit.md` findings and the two Aimee raised directly:
 
 - **F1** — the bestiary had no screen at all; built, with personal *and* global percentiles
 - **F2** — analysis had no door; instruments at the forge *(placeholder, see item 2 above)*
