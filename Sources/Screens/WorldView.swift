@@ -17,30 +17,43 @@ struct WorldView: View {
 #if DEBUG
     @State private var isShowingDiagnostics = false
 #endif
+    @State private var mapViewportHeight: CGFloat = 0
 
     private var run: WorldRun? { store.state.worlds.activeRun }
 
     var body: some View {
-        VStack(spacing: 0) {
-            if let run {
-                StabilityHeader(run: run)
-                PartyHealthStrip(run: run, state: store.state)
-                ScrollView {
-                    VStack(spacing: 12) {
-                        LootDecisionCard()
-                        MapGrid(run: run) { point in
-                            tapped(point, in: run)
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                if let run {
+                    StabilityHeader(run: run)
+                    PartyHealthStrip(run: run, state: store.state)
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            LootDecisionCard()
+                            MapGrid(
+                                run: run,
+                                maximumSide: WorldMapLayout.maximumSide(
+                                    containerWidth: geometry.size.width,
+                                    viewportHeight: mapViewportHeight > 0
+                                        ? mapViewportHeight : geometry.size.height,
+                                    minimumScrollableSide: 128
+                                )
+                            ) { point in
+                                tapped(point, in: run)
+                            }
+                            eventLog
+                            satchel(run)
                         }
-                        eventLog
-                        satchel(run)
+                        .padding(.horizontal, 12)
+                        .padding(.top, 8)
+                        .padding(.bottom, 12)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.top, 8)
-                    .padding(.bottom, 12)
+                    .measureWorldMapViewport()
+                    controls(run)
                 }
-                controls(run)
             }
         }
+        .onPreferenceChange(WorldMapViewportHeightKey.self) { mapViewportHeight = $0 }
         .background(Color(.systemGroupedBackground))
 #if DEBUG
         .toolbar {
@@ -647,6 +660,42 @@ private struct StabilityHeader: View {
 
 // MARK: - Grid
 
+enum WorldMapLayout {
+    /// Keeps the entire square map visible above the fixed navigation tools on compact portrait
+    /// screens. Width alone used to choose the square, so moving the minimap below the D-pad made
+    /// the last map row fall below the scroll viewport on a phone. Art still composes at 16px and
+    /// uses nearest-neighbour sampling; this changes only its presented point size.
+    static func maximumSide(containerWidth: CGFloat, viewportHeight: CGFloat,
+                            minimumScrollableSide: CGFloat) -> CGFloat {
+        let widthBound = max(0, containerWidth - 24)
+        // The measured ScrollView frame already reflects safe areas, the fixed controls, and a
+        // tutorial card's safe-area inset. Subtracting any of those again would double-charge it.
+        let heightBound = max(0, viewportHeight - 16)
+        if heightBound >= minimumScrollableSide {
+            return min(widthBound, heightBound)
+        }
+        // A genuinely cramped/Dynamic-Type layout scrolls a still-useful square instead of clipping
+        // it at the fixed controls. Ordinary portrait sizes never take this branch.
+        return min(widthBound, minimumScrollableSide)
+    }
+}
+
+private struct WorldMapViewportHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat { 0 }
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+}
+
+private extension View {
+    func measureWorldMapViewport() -> some View {
+        background {
+            GeometryReader { geometry in
+                Color.clear.preference(key: WorldMapViewportHeightKey.self,
+                                       value: geometry.size.height)
+            }
+        }
+    }
+}
+
 /// The map, seen through a window that follows you.
 ///
 /// **The map no longer has to fit one screen** (decisions-session-13 §3) — only the page does, since
@@ -654,6 +703,7 @@ private struct StabilityHeader: View {
 /// until you reach an edge, where it stops rather than showing empty space past the border.
 private struct MapGrid: View {
     let run: WorldRun
+    let maximumSide: CGFloat
     let onTap: (GridPoint) -> Void
 
     /// How many tiles across the window is. Small maps show whole; big ones scroll under you.
@@ -688,7 +738,8 @@ private struct MapGrid: View {
                 }
             }
         }
-        .aspectRatio(1, contentMode: .fit)
+        .frame(width: maximumSide, height: maximumSide)
+        .frame(maxWidth: .infinity)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
     }
 

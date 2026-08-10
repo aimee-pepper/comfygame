@@ -245,6 +245,27 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(softened.enemies.count, natural.enemies.count)
     }
 
+    func testPhoneSafeAreaConstrainsMapByHeightWithoutChangingViewport() {
+        let tutorialPhone = WorldMapLayout.maximumSide(containerWidth: 368, viewportHeight: 156,
+                                                        minimumScrollableSide: 128)
+        XCTAssertEqual(tutorialPhone, 140, accuracy: 0.001,
+                       "The 368×800 tutorial layout keeps its last row above fixed controls")
+
+        let ordinary = WorldMapLayout.maximumSide(containerWidth: 368, viewportHeight: 500,
+                                                   minimumScrollableSide: 128)
+        XCTAssertEqual(ordinary, 344, accuracy: 0.001,
+                       "An ordinary phone keeps the useful full-width square when it fits")
+
+        let dynamicType = WorldMapLayout.maximumSide(containerWidth: 320, viewportHeight: 100,
+                                                      minimumScrollableSide: 128)
+        XCTAssertEqual(dynamicType, 128, accuracy: 0.001,
+                       "A genuinely constrained layout scrolls a useful square instead of clipping")
+
+        let roomy = WorldMapLayout.maximumSide(containerWidth: 1_024, viewportHeight: 1_100,
+                                                minimumScrollableSide: 128)
+        XCTAssertEqual(roomy, 1_000, accuracy: 0.001)
+    }
+
     // MARK: Fog and movement
 
     func testFogRevealsAroundThePlayerAndStaysRevealed() {
