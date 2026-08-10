@@ -17,23 +17,21 @@ struct HarnessView: View {
     private var state: GameState { store.state }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    saveStatus
-                    realityCard
-                    baseCard
-                    worldsCard
-                    actions
-                    dangerZone
-                    footnote
-                }
-                .padding(16)
+        ScrollView {
+            VStack(spacing: 16) {
+                saveStatus
+                realityCard
+                baseCard
+                worldsCard
+                actions
+                dangerZone
+                footnote
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Persistence Harness")
-            .navigationBarTitleDisplayMode(.inline)
+            .padding(16)
         }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Persistence Harness")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Save status
@@ -363,6 +361,8 @@ private struct DiscoveryStrip: View {
 }
 
 #Preview {
-    HarnessView()
-        .environmentObject(GameStore(io: .temporary(name: "preview")))
+    NavigationStack {
+        HarnessView()
+            .environmentObject(GameStore(io: .temporary(name: "preview")))
+    }
 }
