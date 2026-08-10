@@ -108,6 +108,7 @@ final class ConsumableCraftingTests: XCTestCase {
         let enemy = WorldEnemy(id: InstanceID(rawValue: 902), speciesID: InstanceID(rawValue: 903),
                                traits: traits, position: GridPoint(x: 0, y: 0), isAwake: false)
         state.worlds.activeRun?.enemies = [enemy]
+        state.worlds.activeRun?.map[enemy.position].isRevealed = true
         let id = try XCTUnwrap(state.worlds.activeRun?.satchelItems.stacks.first?.id)
         let before = try XCTUnwrap(state.worlds.activeRun?.turnsTaken)
 
@@ -116,6 +117,43 @@ final class ConsumableCraftingTests: XCTestCase {
         XCTAssertEqual(state.worlds.activeRun?.turnsTaken, before + 1)
         XCTAssertTrue(state.worlds.activeRun?.enemies.first?.isAwake == true)
         XCTAssertTrue(state.worlds.activeRun?.satchelItems.stacks.isEmpty == true)
+    }
+
+    func testLureIgnoresHiddenCrypsisAndConsumesNothingWithoutAVisibleTarget() throws {
+        var state = fieldState(item: "lure")
+        state.worlds.activeRun?.map = WorldMap(width: 15, height: 15,
+            tiles: Array(repeating: Tile(isRevealed: false), count: 225),
+            entry: GridPoint(x: 7, y: 7))
+        state.worlds.activeRun?.playerPosition = GridPoint(x: 7, y: 7)
+        var hiddenTraits = CreatureTraits()
+        hiddenTraits.defence = .crypsis
+        let hidden = WorldEnemy(id: InstanceID(rawValue: 910), traits: hiddenTraits,
+                                position: GridPoint(x: 7, y: 14))
+        let visibleTraits = CreatureTraits()
+        let visible = WorldEnemy(id: InstanceID(rawValue: 911), traits: visibleTraits,
+                                 position: GridPoint(x: 0, y: 0))
+        state.worlds.activeRun?.enemies = [hidden, visible]
+        state.worlds.activeRun?.map[hidden.position].isRevealed = true
+        state.worlds.activeRun?.map[visible.position].isRevealed = true
+        let id = try XCTUnwrap(state.worlds.activeRun?.satchelItems.stacks.first?.id)
+
+        _ = WorldRules.useItem(id, on: .binder, in: &state)
+        XCTAssertFalse(state.worlds.activeRun?.enemies[0].isAwake ?? true)
+        XCTAssertTrue(state.worlds.activeRun?.enemies[1].isAwake == true)
+
+        var onlyHidden = fieldState(item: "lure")
+        onlyHidden.worlds.activeRun?.map = WorldMap(width: 15, height: 15,
+            tiles: Array(repeating: Tile(isRevealed: false), count: 225),
+            entry: GridPoint(x: 7, y: 7))
+        onlyHidden.worlds.activeRun?.playerPosition = GridPoint(x: 7, y: 7)
+        onlyHidden.worlds.activeRun?.enemies = [hidden]
+        onlyHidden.worlds.activeRun?.map[hidden.position].isRevealed = true
+        let hiddenLure = try XCTUnwrap(onlyHidden.worlds.activeRun?.satchelItems.stacks.first?.id)
+        let before = try XCTUnwrap(onlyHidden.worlds.activeRun?.turnsTaken)
+        let blocked = WorldRules.useItem(hiddenLure, on: .binder, in: &onlyHidden)
+        XCTAssertEqual(blocked, [.blocked("No visible roaming creature answers the lure.")])
+        XCTAssertEqual(onlyHidden.worlds.activeRun?.turnsTaken, before)
+        XCTAssertNotNil(onlyHidden.worlds.activeRun?.satchelItems.stacks.first)
     }
 
     private func stockedState(for recipe: ItemID) -> GameState {

@@ -201,6 +201,12 @@ struct ResourceNode: Codable, Equatable, Sendable {
 /// jitter that makes this particular animal itself — rolled once at placement and kept, so a resume
 /// finds the same creature even if the sampling rules change underneath it.
 struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
+    enum Awareness: Codable, Equatable, Sendable {
+        enum Reason: String, Codable, Equatable, Sendable { case quietStep, maskedScent, disturbance }
+        case unaware
+        case alert(turn: Int, reason: Reason)
+        case pursuing
+    }
     var id: InstanceID
     /// Which of the run's cast this is one of.
     var speciesID: InstanceID?
@@ -211,7 +217,13 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
     var creatureID: CreatureID?
     var position: GridPoint
     /// Woken by the player entering its aggro radius. Never goes back to sleep.
-    var isAwake: Bool = false
+    var awareness: Awareness = .unaware
+    var quietStepHesitationUsed = false
+    var maskedScentContact = false
+    var isAwake: Bool {
+        get { awareness == .pursuing }
+        set { awareness = newValue ? .pursuing : .unaware }
+    }
     /// **It is rooted where it stands.**
     ///
     /// A predatory plant is grown by the flora system and fought by the creature system
@@ -238,7 +250,7 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
         self.traits = traits
         self.creatureID = creatureID
         self.position = position
-        self.isAwake = isAwake
+        self.awareness = isAwake ? .pursuing : .unaware
         self.isSessile = isSessile
         self.floraID = floraID
         self.isApex = isApex
@@ -252,10 +264,34 @@ struct WorldEnemy: Codable, Equatable, Identifiable, Sendable {
         traits = try c.decodeIfPresent(CreatureTraits.self, forKey: .traits)
         creatureID = try c.decodeIfPresent(CreatureID.self, forKey: .creatureID)
         position = try c.decode(GridPoint.self, forKey: .position)
-        isAwake = try c.decodeIfPresent(Bool.self, forKey: .isAwake) ?? false
+        awareness = try c.decodeIfPresent(Awareness.self, forKey: .awareness)
+            ?? ((try c.decodeIfPresent(Bool.self, forKey: .isAwake) ?? false) ? .pursuing : .unaware)
+        quietStepHesitationUsed = try c.decodeIfPresent(Bool.self, forKey: .quietStepHesitationUsed) ?? false
+        maskedScentContact = try c.decodeIfPresent(Bool.self, forKey: .maskedScentContact) ?? false
         isSessile = try c.decodeIfPresent(Bool.self, forKey: .isSessile) ?? false
         floraID = try c.decodeIfPresent(InstanceID.self, forKey: .floraID)
         isApex = try c.decodeIfPresent(Bool.self, forKey: .isApex) ?? false
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, speciesID, traits, creatureID, position, awareness, isAwake
+        case quietStepHesitationUsed, maskedScentContact, isSessile, floraID, isApex
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encodeIfPresent(speciesID, forKey: .speciesID)
+        try c.encodeIfPresent(traits, forKey: .traits)
+        try c.encodeIfPresent(creatureID, forKey: .creatureID)
+        try c.encode(position, forKey: .position)
+        try c.encode(awareness, forKey: .awareness)
+        try c.encode(isAwake, forKey: .isAwake)
+        try c.encode(quietStepHesitationUsed, forKey: .quietStepHesitationUsed)
+        try c.encode(maskedScentContact, forKey: .maskedScentContact)
+        try c.encode(isSessile, forKey: .isSessile)
+        try c.encodeIfPresent(floraID, forKey: .floraID)
+        try c.encode(isApex, forKey: .isApex)
     }
 
     // MARK: What it is

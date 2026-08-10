@@ -803,6 +803,77 @@ final class WorldTests: XCTestCase {
         XCTAssertLessThan(enemy.position.chebyshevDistance(to: GridPoint(x: 7, y: 7)), 2)
     }
 
+    func testQuietStepCreatesOnePersistedAlertTurnRatherThanAnInvisibleRoll() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 6_101)
+        state.base.binderCharacter.level = 3
+        state.base.binderCharacter.branchDepth["shadow"] = 1
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.enemies = []
+        run.playerPosition = GridPoint(x: 7, y: 7)
+        let position = GridPoint(x: 7, y: 9)
+        run.map[position].isRevealed = true
+        run.enemies = [WorldEnemy(id: InstanceID(rawValue: 61), creatureID: "paper_moth",
+                                  position: position)]
+        state.worlds.activeRun = run
+
+        let first = WorldRules.advanceTurn(in: &state)
+        let alerted = try XCTUnwrap(state.worlds.activeRun?.enemies.first)
+        if case .alert(_, let reason) = alerted.awareness { XCTAssertEqual(reason, .quietStep) }
+        else { XCTFail("Quiet Step did not create an alert state") }
+        XCTAssertTrue(alerted.quietStepHesitationUsed)
+        XCTAssertEqual(alerted.position, position)
+        XCTAssertTrue(first.contains { if case .enemyAlerted = $0 { true } else { false } })
+
+        var cryptic = alerted
+        var crypticTraits = CreatureTraits()
+        crypticTraits.defence = .crypsis
+        cryptic.traits = crypticTraits
+        XCTAssertTrue(WorldRules.isVisible(cryptic, in: try XCTUnwrap(state.worlds.activeRun)),
+                      "The earned alert warned about a creature the map still hid")
+
+        _ = WorldRules.advanceTurn(in: &state)
+        XCTAssertTrue(state.worlds.activeRun?.enemies.first?.isAwake == true)
+
+        let data = try JSONEncoder().encode(state.worlds.activeRun?.enemies.first)
+        let resumed = try JSONDecoder().decode(WorldEnemy.self, from: data)
+        XCTAssertTrue(resumed.isAwake)
+        XCTAssertTrue(resumed.quietStepHesitationUsed)
+    }
+
+    func testOldEnemyAwakeFlagMigratesToSingleAwarenessAuthority() throws {
+        let awake = WorldEnemy(id: InstanceID(rawValue: 71), creatureID: "paper_moth",
+                               position: GridPoint(x: 1, y: 1), isAwake: true)
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(awake)) as? [String: Any])
+        object.removeValue(forKey: "awareness")
+        let migrated = try JSONDecoder().decode(WorldEnemy.self,
+            from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertEqual(migrated.awareness, .pursuing)
+        migrated.isAwake ? XCTAssertTrue(true) : XCTFail("Legacy awake state was lost")
+
+        var sleepingObject = object
+        sleepingObject["isAwake"] = false
+        let sleeping = try JSONDecoder().decode(WorldEnemy.self,
+            from: JSONSerialization.data(withJSONObject: sleepingObject))
+        XCTAssertEqual(sleeping.awareness, .unaware)
+    }
+
+    func testFieldRadiusSkillsArePartyScopedNonstackingAndHomeDoesNotHelp() {
+        var state = GameState.newGame()
+        state.base.binderCharacter.level = 5
+        state.base.binderCharacter.branchDepth["shadow"] = 2
+        XCTAssertEqual(WorldRules.fieldConcealment(in: state).radiusReduction, 1)
+
+        var traveller = CompanionState()
+        traveller.character.level = 10
+        traveller.character.branchDepth["shadow"] = 7
+        state.base.roster = [traveller, traveller]
+        state.base.activeParty = [0]
+        XCTAssertEqual(WorldRules.fieldConcealment(in: state).radiusReduction, 2)
+        state.base.activeParty = []
+        XCTAssertEqual(WorldRules.fieldConcealment(in: state).radiusReduction, 1,
+                       "A skilled person left at Home affected the travelling party")
+    }
+
     func testWalkingIntoAnEnemyOpensAnEncounterAndLogsTheCreature() {
         var state = startedRun(book(["terrain": "plains"]), seed: 62)
         var run = state.worlds.activeRun!

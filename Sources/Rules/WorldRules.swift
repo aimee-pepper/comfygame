@@ -46,6 +46,7 @@ enum WorldRules {
         /// What noticed you, by the name it goes by. A name, not an id — what a creature *is* is
         /// read off its traits, so there is no longer a catalogue entry to point at.
         case enemySighted(String)
+        case enemyAlerted(String)
         case encounterBegan
         case crossedThreshold(StabilityBand)
         case nightfall
@@ -394,10 +395,15 @@ enum WorldRules {
             reveal(around: destination, in: &run.map, radius: max(1, effect.potency))
         case .lureCreature:
             guard let nearest = run.enemies.indices
-                .filter({ !run.enemies[$0].isSessile && !run.enemies[$0].isApex })
+                .filter({ index in
+                    let enemy = run.enemies[index]
+                    return !enemy.isSessile && !enemy.isApex
+                        && run.map[enemy.position].isRevealed
+                        && isVisible(enemy, in: run)
+                })
                 .min(by: { run.enemies[$0].position.manhattanDistance(to: run.playerPosition)
                     < run.enemies[$1].position.manhattanDistance(to: run.playerPosition) })
-            else { return [.blocked("Nothing roaming answers the lure.")] }
+            else { return [.blocked("No visible roaming creature answers the lure.")] }
             run.enemies[nearest].isAwake = true
         case .returnHome, .clearPoison, .clearElemental, .clearAnyStatus, .preventStatus,
              .coatPoison, .coatBurn, .coatBleed, .coatDazzle, .identifyCurio:
@@ -663,7 +669,8 @@ enum WorldRules {
             if lost > 0 { events.append(.lostToCrumbling(lost)) }
         }
 
-        events.append(contentsOf: moveEnemies(in: &run))
+        let concealment = fieldConcealment(in: state)
+        events.append(contentsOf: moveEnemies(in: &run, concealment: concealment))
         state.worlds.activeRun = run
 
         if let bumped = enemyOnPlayer(in: run) {
@@ -834,7 +841,24 @@ enum WorldRules {
     // MARK: - Enemies
 
     /// Inert until the player is within the aggro radius, then one step toward them per turn.
-    private static func moveEnemies(in run: inout WorldRun) -> [Event] {
+    struct FieldConcealment: Equatable, Sendable {
+        var quietStep = false
+        var radiusReduction = 0
+    }
+
+    static func fieldConcealment(in state: GameState) -> FieldConcealment {
+        var result = FieldConcealment()
+        for actor in CombatRules.party(of: state) {
+            let loadout = CombatRules.loadout(of: actor, in: state)
+            result.quietStep = result.quietStep || loadout.encounterChance < 0
+            if loadout.sightedAtRange < 0 { result.radiusReduction = max(result.radiusReduction, 1) }
+            if loadout.partySightedAtRange < 0 { result.radiusReduction = max(result.radiusReduction, 2) }
+        }
+        return result
+    }
+
+    private static func moveEnemies(in run: inout WorldRun,
+                                    concealment: FieldConcealment) -> [Event] {
         var events: [Event] = []
         var taken = Set(run.enemies.map(\.position))
 
@@ -846,12 +870,35 @@ enum WorldRules {
             // in enclosed country you aren't, and neither is what's waiting.
             // An apex never ambushes, so it is never woken by proximity — only by you stepping
             // into it, which the bump handles like any other fight.
-            let sight = enemy.isApex ? 0 : detectionRadius(of: enemy, in: run)
-            if !enemy.isAwake, distance <= sight {
-                enemy.isAwake = true
-                if run.map[enemy.position].isRevealed {
-                    events.append(.enemySighted(run.name(of: enemy)))
+            let baseSight = enemy.isApex ? 0 : detectionRadius(of: enemy, in: run)
+            let skillReduction = enemy.isSessile ? 0 : concealment.radiusReduction
+            let sight = max(1, baseSight - skillReduction)
+            switch enemy.awareness {
+            case .unaware where !enemy.isApex && distance <= sight:
+                let canHesitate = concealment.quietStep && !enemy.isSessile
+                    && !enemy.quietStepHesitationUsed && distance > 1
+                if canHesitate {
+                    enemy.awareness = .alert(turn: run.turnsTaken, reason: .quietStep)
+                    enemy.quietStepHesitationUsed = true
+                    if run.map[enemy.position].isRevealed {
+                        events.append(.enemyAlerted(run.name(of: enemy)))
+                    }
+                } else {
+                    enemy.awareness = .pursuing
+                    if run.map[enemy.position].isRevealed {
+                        events.append(.enemySighted(run.name(of: enemy)))
+                    }
                 }
+            case .alert(let turn, _):
+                if distance > sight {
+                    enemy.awareness = .unaware
+                } else if run.turnsTaken > turn {
+                    enemy.awareness = .pursuing
+                    if run.map[enemy.position].isRevealed {
+                        events.append(.enemySighted(run.name(of: enemy)))
+                    }
+                }
+            default: break
             }
             // **Rooted things don't follow, and neither does an apex.** A predatory plant grew
             // where it is; an apex holds its ground because it has no reason not to. Waking means
@@ -884,7 +931,7 @@ enum WorldRules {
         if enemy.isApex { return true }
         guard enemy.traits?.defence == .crypsis else { return true }
         // Once it has broken cover it stays broken, and it is never invisible in your own square.
-        if enemy.isAwake { return true }
+        if enemy.awareness != .unaware { return true }
         return enemy.position.chebyshevDistance(to: run.playerPosition) <= 1
     }
 

@@ -64,7 +64,7 @@ struct WorldView: View {
             }
         }
         .sheet(isPresented: $isShowingDiagnostics) {
-            if let run { WorldDiagnosticsView(run: run) }
+            if let run { WorldDiagnosticsView(run: run, concealment: WorldRules.fieldConcealment(in: store.state)) }
         }
 #endif
         // **Standing on somebody opens the scene.** Driven off the map rather than off an event, so
@@ -215,6 +215,7 @@ struct WorldView: View {
                 : "The \(name) tears at you — \(damage) damage."
         case .poisonWorking(let damage): "Whatever that was is still in you — \(damage) damage."
         case .enemySighted(let name): "A \(name) has noticed you."
+        case .enemyAlerted(let name): "A \(name) pauses, alert to your movement."
         case .encounterBegan: nil // the encounter bar takes over
         case .crossedThreshold(let band):
             switch band {
@@ -244,7 +245,7 @@ struct WorldView: View {
         case .satchelFull: .orange
         case .hazardHit, .collapsed, .floorGaveWay, .ejected, .lostToCrumbling: .red
         case .scratchedByGrowth, .poisonWorking: .red
-        case .enemySighted, .crossedThreshold, .blocked: .orange
+        case .enemySighted, .enemyAlerted, .crossedThreshold, .blocked: .orange
         default: .secondary
         }
     }
@@ -448,6 +449,7 @@ struct WorldView: View {
 private struct WorldDiagnosticsView: View {
     @Environment(\.dismiss) private var dismiss
     let run: WorldRun
+    let concealment: WorldRules.FieldConcealment
 
     private var nodes: [ResourceID: Int] {
         run.map.tiles.reduce(into: [:]) { result, tile in
@@ -485,6 +487,20 @@ private struct WorldDiagnosticsView: View {
                     LabeledRow(icon: "leaf", label: "Flora species / instances",
                                value: "\(report.floraSpeciesCount) / \(report.floraInstancesPlaced)")
                     LabeledRow(icon: "burst", label: "Active flora placed", value: "\(report.activeFloraPlaced)")
+                }
+                Section("Field awareness") {
+                    LabeledRow(icon: "figure.walk", label: "Quiet Step / radius reduction",
+                               value: "\(concealment.quietStep ? "yes" : "no") / -\(concealment.radiusReduction)")
+                    ForEach(run.enemies) { enemy in
+                        let state: String = switch enemy.awareness {
+                        case .unaware: "unaware"
+                        case .pursuing: "pursuing"
+                        case .alert(_, let reason): "alert · \(reason.rawValue)"
+                        }
+                        LabeledRow(icon: enemy.isApex ? "crown" : "eye",
+                                   label: run.name(of: enemy),
+                                   value: "\(state) · base r\(WorldRules.detectionRadius(of: enemy, in: run)) · quiet used \(enemy.quietStepHesitationUsed ? "yes" : "no")")
+                    }
                 }
                 Section("World duration") {
                     LabeledRow(icon: "gauge", label: "Stability score", value: "\(run.effectiveStabilityScore)")
@@ -826,6 +842,15 @@ private struct TileView: View {
                 Circle()
                     .fill(Color.accentColor)
                     .padding(side * 0.14)
+            }
+            if let enemy, case .alert = enemy.awareness {
+                Circle()
+                    .stroke(Color.orange, style: StrokeStyle(lineWidth: max(2, side * 0.08), dash: [3, 2]))
+                    .padding(side * 0.08)
+                Image(systemName: "exclamationmark")
+                    .font(.system(size: side * 0.28, weight: .black))
+                    .foregroundStyle(.orange)
+                    .offset(x: side * 0.30, y: -side * 0.30)
             }
             if let symbol {
                 Image(systemName: symbol)
