@@ -16,9 +16,8 @@ struct TravellerMeetingView: View {
     @Environment(\.dismiss) private var dismiss
     let traveller: TravellerDef
 
-    /// Which questions have been asked, so their answers stay on screen. Local to the sheet: a
-    /// conversation you walked away from is one you can have again.
-    @State private var asked: Set<String> = []
+    @State private var conversation = TravellerMeetingConversation()
+    @State private var blockedReason: String?
 
     private var meeting: TravellerMeeting? { traveller.meeting }
 
@@ -31,21 +30,25 @@ struct TravellerMeetingView: View {
                     if let meeting {
                         said(meeting.opening)
 
-                        ForEach(meeting.questions) { exchange in
-                            if asked.contains(exchange.id) {
+                        ForEach(conversation.orderedExchangeIDs, id: \.self) { id in
+                            if let exchange = meeting.questions.first(where: { $0.id == id }) {
                                 youSaid(exchange.ask)
                                 said(exchange.reply)
                             }
                         }
 
+                        if let terminal = conversation.terminal {
+                            said(terminal == .accepted ? meeting.accepted : meeting.declined)
+                        }
+
                         // Everything left to ask. Asking is free and doesn't take a turn — the
                         // world's own clock is the only pressure here, and it's enough.
-                        let remaining = meeting.questions.filter { !asked.contains($0.id) }
-                        if !remaining.isEmpty {
+                        let remaining = meeting.questions.filter { !conversation.orderedExchangeIDs.contains($0.id) }
+                        if conversation.terminal == nil, !remaining.isEmpty {
                             VStack(spacing: 8) {
                                 ForEach(remaining) { exchange in
                                     Button {
-                                        withAnimation { _ = asked.insert(exchange.id) }
+                                        withAnimation { conversation.ask(exchange.id) }
                                     } label: {
                                         Text(exchange.ask)
                                             .font(.callout)
@@ -110,25 +113,41 @@ struct TravellerMeetingView: View {
     /// world is coming apart, so "I'll come back" is a bet rather than a plan.
     private var decision: some View {
         VStack(spacing: 8) {
-            Button {
-                store.recruit(traveller.id)
-                dismiss()
-            } label: {
-                Text(meeting?.offer ?? "Come back with me.")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
+            if conversation.terminal == nil {
+                Button {
+                    store.recruit(traveller.id)
+                    if store.state.reality.library.foundTravellers.contains(traveller.id) {
+                        blockedReason = nil
+                        withAnimation { conversation.accept() }
+                    } else {
+                        blockedReason = store.recentEvents.reversed().compactMap {
+                            if case .blocked(let reason) = $0 { reason } else { nil }
+                        }.first ?? "They cannot come with you yet."
+                    }
+                } label: {
+                    Text(meeting?.offer ?? "Come back with me.")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 52)
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button("Leave them") {
+                    blockedReason = nil
+                    withAnimation { conversation.decline() }
+                }
+                    .font(.callout)
+                    .frame(minHeight: 44)
+            } else {
+                Button(conversation.terminal == .declined ? "Leave" : "Continue") { dismiss() }
+                    .buttonStyle(.borderedProminent)
                     .frame(minHeight: 52)
             }
-            .buttonStyle(.borderedProminent)
 
-            Button("Leave them") { dismiss() }
-                .font(.callout)
-                .frame(minHeight: 44)
-
-            if let declined = meeting?.declined {
-                Text(declined)
+            if let blockedReason {
+                Text(blockedReason)
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.red)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -138,4 +157,18 @@ struct TravellerMeetingView: View {
         .padding(.bottom, 12)
         .background(.bar)
     }
+}
+
+struct TravellerMeetingConversation: Equatable {
+    enum Terminal: Equatable { case accepted, declined }
+    private(set) var orderedExchangeIDs: [String] = []
+    private(set) var terminal: Terminal?
+
+    mutating func ask(_ id: String) {
+        guard terminal == nil, !orderedExchangeIDs.contains(id) else { return }
+        orderedExchangeIDs.append(id)
+    }
+
+    mutating func accept() { guard terminal == nil else { return }; terminal = .accepted }
+    mutating func decline() { guard terminal == nil else { return }; terminal = .declined }
 }

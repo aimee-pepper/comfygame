@@ -125,9 +125,21 @@ struct TravellerMeeting: Codable, Equatable, Sendable {
     var declined: String
 
     struct Exchange: Codable, Equatable, Sendable, Identifiable {
+        var id: String
         var ask: String
         var reply: String
-        var id: String { ask }
+
+        init(id: String, ask: String, reply: String) {
+            self.id = id; self.ask = ask; self.reply = reply
+        }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            ask = try c.decode(String.self, forKey: .ask)
+            reply = try c.decode(String.self, forKey: .reply)
+            // Tolerates old external fixtures. Bundled content validation requires explicit IDs.
+            id = try c.decodeIfPresent(String.self, forKey: .id) ?? "legacy.\(ask)"
+        }
     }
 
     init(opening: String, questions: [Exchange] = [], offer: String,

@@ -11,6 +11,38 @@ final class ContentTests: XCTestCase {
         XCTAssertNoThrow(try catalog.validate())
     }
 
+    func testMeetingConversationPreservesTapOrderAndFreezesAtDecision() {
+        var first = TravellerMeetingConversation()
+        first.ask("isolde.charcoal_hand")
+        first.ask("isolde.blank_board")
+        first.ask("isolde.teacher")
+        XCTAssertEqual(first.orderedExchangeIDs,
+                       ["isolde.charcoal_hand", "isolde.blank_board", "isolde.teacher"])
+        first.ask("isolde.blank_board")
+        XCTAssertEqual(first.orderedExchangeIDs.count, 3, "an exchange appeared twice")
+        first.accept()
+        first.ask("later")
+        first.decline()
+        XCTAssertEqual(first.terminal, .accepted)
+        XCTAssertFalse(first.orderedExchangeIDs.contains("later"))
+
+        var second = TravellerMeetingConversation()
+        second.ask("isolde.teacher")
+        second.ask("isolde.charcoal_hand")
+        second.decline()
+        XCTAssertEqual(second.orderedExchangeIDs, ["isolde.teacher", "isolde.charcoal_hand"])
+        XCTAssertEqual(second.terminal, .declined)
+    }
+
+    func testMeetingExchangeIdentitySurvivesCopyRevision() throws {
+        let before = try JSONDecoder().decode(TravellerMeeting.Exchange.self, from: Data(
+            #"{"id":"isolde.teacher","ask":"You taught this?","reply":"Forty years."}"#.utf8))
+        let after = try JSONDecoder().decode(TravellerMeeting.Exchange.self, from: Data(
+            #"{"id":"isolde.teacher","ask":"Were you a teacher?","reply":"For forty years."}"#.utf8))
+        XCTAssertEqual(before.id, after.id)
+        XCTAssertNotEqual(before.ask, after.ask)
+    }
+
     func testStarterCollectionMatchesTheBrief() {
         // The brief names eleven (Q2). "Ore" is a twelfth, added on Aimee's instruction that the
         // bounty slot needs a neutral middle rung — see questions-for-design Q15.

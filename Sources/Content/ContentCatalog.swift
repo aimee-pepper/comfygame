@@ -211,6 +211,15 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(travellers.map(\.id.rawValue), label: "traveller")
         try requireUniqueIDs(diaryPages.map(\.id.rawValue), label: "diary page")
 
+        for traveller in travellers {
+            guard let meeting = traveller.meeting else { continue }
+            let ids = meeting.questions.map(\.id)
+            guard ids.allSatisfy({ !$0.isEmpty && !$0.hasPrefix("legacy.") }) else {
+                throw ContentError.danglingReference("traveller '\(traveller.id)' has a meeting exchange without an explicit id")
+            }
+            try requireUniqueIDs(ids, label: "meeting exchange for \(traveller.id.rawValue)")
+        }
+
 
 
         // A hand with no shapes is a hand nothing can be written in.
