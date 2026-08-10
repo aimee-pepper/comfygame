@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bookbinder.local/assetlab/render-request.schema.json",
+  "title": "Bookbinder Asset Render Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["identityDescriptor", "profile", "pixelWidth", "pixelHeight"],
+  "properties": {
+    "identityDescriptor": { "$ref": "identity-descriptor.schema.json" },
+    "profile": { "enum": ["world", "fight"] },
+    "pixelWidth": { "type": "integer", "minimum": 1 },
+    "pixelHeight": { "type": "integer", "minimum": 1 }
+  }
+}

@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { combatUIFixture,validateCombatUI,accessibilityLabel,conditionLabel,conditionOrder,voiceOverOrder } from "../src/combat-ui-generator.js";
+const fixture=combatUIFixture();assert.deepEqual(validateCombatUI(fixture),[]);
+assert.equal(fixture.action.kind,"gambit");assert.ok(fixture.members.some(member=>member.passedOut&&member.hp===0));
+for(const condition of conditionOrder)assert.ok(fixture.members.some(member=>member.statuses.includes(condition)),`missing ${condition}`);
+assert.deepEqual(voiceOverOrder,["encounter","currentActor","action","target","party","foes"]);
+assert.match(accessibilityLabel(fixture.members.find(member=>member.passedOut)),/passed out/);
+assert.match(accessibilityLabel(fixture.members.find(member=>member.statuses.includes("ground"))),/Ground/);
+assert.equal(conditionLabel("burn"),"Burn");assert.equal(conditionLabel("poison"),"Poison");assert.equal(conditionLabel("dazzle"),"Dazzle");
+const contradictory=structuredClone(fixture);contradictory.members[0].passedOut=true;assert.ok(validateCombatUI(contradictory).some(issue=>issue.includes("passed-out")));
+console.log("Asset Lab combat-UI tests passed.");

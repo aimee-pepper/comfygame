@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bookbinder World Lab</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+  <header><div><p class="eyebrow">Bookbinder · isolated authoring tool</p><h1>World Lab</h1><p class="subtitle">One transitioned terrain family and one stable flora species.</p></div><div class="header-actions"><a class="nav-link" href="index.html">Creature Lab</a><a class="nav-link" href="places.html">Place Lab</a><a class="nav-link" href="regression.html">Golden Review</a><a class="nav-link" href="combat.html">Combat Proof</a><button id="reroll-world" class="primary">Reroll world</button><button id="reset-flora">Reset flora</button></div></header>
+  <main>
+    <aside class="panel controls-panel">
+      <div class="panel-heading"><div><p class="eyebrow">Flora descriptor</p><h2>Species grammar</h2></div><span id="flora-hash" class="hash"></span></div>
+      <label class="seed-field world-seed"><span></span><span>Species seed</span><input id="flora-seed" type="number" min="0" max="4294967295"></label>
+      <label class="preset-field"><span>Identity-region preset</span><select id="flora-preset"><option value="">Custom</option></select></label>
+      <div id="flora-controls"></div>
+      <div id="flora-warnings" class="warnings" aria-live="polite"></div>
+      <details><summary>Flora JSON</summary><textarea id="flora-json" spellcheck="false"></textarea><div class="row-actions"><button id="apply-flora-json">Apply</button><button id="download-flora-json">Download</button><button id="download-world-manifest">Manifest</button><label class="file-button">Import<input id="import-flora-json" type="file" accept="application/json"></label></div><p id="flora-status" class="status" aria-live="polite"></p></details>
+    </aside>
+    <section class="workspace">
+      <div class="panel preview-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Stable identity</p><h2>Flora profiles</h2></div><span>Placement changes; species pixels do not.</span></div>
+        <div class="flora-profile-grid"><article class="profile-card"><div class="profile-title"><h3>World tile</h3><span>16×16 · top-down</span></div><div class="canvas-stage checker"><canvas id="flora-world" width="16" height="16"></canvas></div><div class="card-footer"><span id="flora-world-hash" class="hash"></span><button data-world-export="flora-world">PNG</button></div></article><article class="profile-card"><div class="profile-title"><h3>Neutral overhead</h3><span>48×48 · top-down · no active-defence disclosure</span></div><div class="canvas-stage checker"><canvas id="flora-detail" width="48" height="48"></canvas></div><div class="card-footer"><span id="flora-detail-hash" class="hash"></span><button data-world-export="flora-detail">PNG</button></div></article><article class="profile-card"><div class="profile-title"><h3>Triggered overhead pose</h3><span>48×48 · same camera · only after activation</span></div><div class="canvas-stage checker"><canvas id="flora-hostile" width="48" height="48"></canvas></div><div class="card-footer"><span id="flora-hostile-hash" class="hash"></span><button data-world-export="flora-hostile">PNG</button></div></article></div>
+        <div class="grayscale-heading"><strong>Overhead identity evidence</strong><span>All three profiles in color/grayscale plus live map ownership.</span></div><div class="checker"><canvas id="flora-overhead-proof" width="384" height="168"></canvas></div><div class="row-actions"><button id="save-flora-overhead-proof">Save workspace PNG</button><span id="flora-overhead-proof-status" class="status"></span></div>
+      </div>
+      <div class="panel environment-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Flora breadth</p><h2>Seven live identity regions</h2></div><span>bramble · canopy tree · succulent · mat · fungal bloom · reed · crust</span></div>
+        <div class="checker flora-catalogue-stage"><canvas id="flora-catalogue" width="112" height="16"></canvas></div>
+      </div>
+      <div class="panel environment-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Adjacency proof</p><h2>Water transition masks</h2></div><span>16 neighbour combinations · N/E/S/W</span></div>
+        <div class="checker transition-stage"><canvas id="transitions" width="64" height="64"></canvas></div>
+      </div>
+      <div class="panel environment-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Live ground catalogue</p><h2>All 12 terrain facts</h2></div><span>stone · soil · sand · ice · ash · shallow/deep water · rubble · mud · tall/short growth · chasm</span></div>
+        <div class="checker terrain-catalogue-stage"><canvas id="terrain-catalogue" width="64" height="48"></canvas></div>
+      </div>
+      <div class="panel environment-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Semantic overlay proof</p><h2>Ten tile-content families</h2></div><span>ordinary · grayscale · disclosed minimap · rule-edge collisions</span></div>
+        <div class="checker"><canvas id="tile-content-proof" width="320" height="144"></canvas></div>
+        <p>empty · node · wild drop · hazard · portal entry/exit · locked cache · site · diary page · found writing · traveller</p>
+        <div class="row-actions"><button id="save-tile-content-proof">Save workspace PNG</button><span id="tile-content-proof-status" class="status"></span></div>
+      </div>
+      <div class="panel environment-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Native phone proof</p><h2>Resolved top-down map</h2></div><div class="header-actions"><label>Flora species <select id="species-count"><option>1</option><option>2</option><option>3</option><option selected>4</option></select></label><label><input id="show-cracks" type="checkbox"> cracking</label><button id="export-map">Export map</button></div></div>
+        <div class="world-proof-grid"><div><div class="checker phone-map-stage"><canvas id="phone-map" width="144" height="144"></canvas></div><p>9×9 tiles at native 16px. <span id="species-proof-status"></span></p></div><div><div class="minimap-stage"><canvas id="minimap" width="36" height="36"></canvas></div><p>Symbolic minimap: terrain, growth, route, portal, site, and party—not species identity.</p></div></div>
+        <div class="grayscale-heading"><strong>Grayscale readability</strong><span>Value-only proof at the same native resolution.</span></div><div class="checker grayscale-stage"><canvas id="grayscale-map" width="144" height="144"></canvas></div>
+        <div class="grayscale-heading"><strong>Complete review export</strong><span>Lossless color + grayscale + minimap with review-only legend.</span></div><div class="checker"><canvas id="multi-species-proof" width="384" height="206"></canvas></div><button id="export-multi-species-proof">Export complete PNG</button>
+      </div>
+      <div class="panel diagnostics"><div><span id="world-bounds-dot" class="dot"></span><strong>Bounds</strong><small id="world-bounds-status"></small></div><div><span id="flora-stability-dot" class="dot"></span><strong>Flora stability</strong><small id="flora-stability-status"></small></div><div><span id="terrain-read-dot" class="dot"></span><strong>Terrain states</strong><small id="terrain-read-status"></small></div></div>
+    </section>
+  </main>
+  <script type="module" src="src/world-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://bookbinder.local/assetlab/render-hints.schema.json","title":"Bookbinder Visual Render Hints","type":"object","additionalProperties":false,"required":["schemaVersion"],"properties":{"schemaVersion":{"const":1},"topology":{"enum":["quadruped","biped","serpentine","segmented","radial","piscine","winged","amorphous"]}}
+}

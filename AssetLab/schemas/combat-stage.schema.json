@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bookbinder.local/assetlab/combat-stage.schema.json",
+  "title": "Bookbinder Combat Stage Proof",
+  "type": "object",
+  "required": ["schemaVersion", "stageVersion", "versions", "metrics", "fixtures", "output"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "stageVersion": { "type": "string", "minLength": 1 },
+    "versions": { "type": "object", "minProperties": 1, "additionalProperties": { "type": ["string", "integer"] } },
+    "metrics": {
+      "type": "object",
+      "required": ["width", "height", "spriteSize", "hitSize", "partyBackX", "partyFrontX", "foeFrontX", "foeBackX", "laneYs"],
+      "additionalProperties": false,
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 },
+        "spriteSize": { "type": "integer", "minimum": 1 }, "hitSize": { "type": "integer", "minimum": 44 },
+        "partyBackX": { "type": "integer", "minimum": 0 }, "partyFrontX": { "type": "integer", "minimum": 0 },
+        "foeFrontX": { "type": "integer", "minimum": 0 }, "foeBackX": { "type": "integer", "minimum": 0 },
+        "laneYs": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 0 } }
+      }
+    },
+    "fixtures": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/fixture" } },
+    "output": {
+      "type": "object", "required": ["profile", "file", "pixelWidth", "pixelHeight", "colorSpace", "format", "pixelHash"], "additionalProperties": false,
+      "properties": {
+        "profile": { "const": "static-combat-review" }, "file": { "type": "string", "minLength": 1 },
+        "pixelWidth": { "type": "integer", "minimum": 1 }, "pixelHeight": { "type": "integer", "minimum": 1 },
+        "colorSpace": { "const": "sRGB" }, "format": { "const": "RGBA PNG" }, "pixelHash": { "type": "string", "pattern": "^[0-9a-f]{8}$" }
+      }
+    }
+  },
+  "$defs": {
+    "fixture": {
+      "type": "object", "required": ["mode", "actors"], "additionalProperties": false,
+      "properties": { "mode": { "enum": ["5v3", "2v1"] }, "actors": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/actor" } } }
+    },
+    "actor": {
+      "type": "object", "required": ["id", "side", "rank", "lane", "kind", "state"], "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 }, "side": { "enum": ["party", "foe"] }, "rank": { "enum": ["front", "back"] },
+        "lane": { "type": "integer", "minimum": 0 }, "kind": { "type": "string", "minLength": 1 },
+        "state": { "type": "object", "required": ["selected", "legal", "cannotReach", "protected", "unknown"], "additionalProperties": false,
+          "properties": { "selected": { "type": "boolean" }, "legal": { "type": "boolean" }, "cannotReach": { "type": "boolean" }, "protected": { "type": "boolean" }, "unknown": { "type": "boolean" } }
+        }
+      }
+    }
+  }
+}

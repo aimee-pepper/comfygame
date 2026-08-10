@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bookbinder Golden Review</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+  <header><div><p class="eyebrow">Bookbinder · isolated authoring tool</p><h1>Golden Review</h1><p class="subtitle">Human-visible evidence for every canonical hash.</p></div><div class="header-actions"><a class="nav-link" href="index.html">Creature Lab</a><a class="nav-link" href="world.html">World Lab</a><button id="export-golden-png" class="primary">Export PNG</button><button id="export-golden-report">Export report</button></div></header>
+  <main class="review-main">
+    <aside class="panel review-summary"><p class="eyebrow">Regression gate</p><h2 id="golden-result">Checking…</h2><p id="golden-note" class="subtitle"></p><div id="golden-counts" class="review-counts"></div><p class="control-help">A matching hash proves deterministic visible commands, not artistic quality. Promote or replace a baseline only after reviewing this sheet at native size and integer zoom.</p></aside>
+    <section class="workspace">
+      <div class="panel preview-panel"><div class="panel-heading"><div><p class="eyebrow">Canonical evidence</p><h2>Creature, flora, terrain, and combat contracts</h2></div><span>Native pixels · JSON cards mark semantic fixtures</span></div><div class="golden-stage checker"><canvas id="golden-sheet" width="768" height="576"></canvas></div></div>
+      <div class="panel preview-panel"><div class="panel-heading"><div><p class="eyebrow">Hash report</p><h2>Changed outputs</h2></div></div><pre id="golden-changes" class="report-output"></pre></div>
+    </section>
+  </main>
+  <script type="module" src="src/regression-app.js"></script>
+</body>
+</html>

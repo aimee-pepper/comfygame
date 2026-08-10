@@ -1,0 +1,10 @@
+{
+  "name": "bookbinder-asset-lab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "node server.js",
+    "test": "node tests/generator.test.js && node tests/world-generator.test.js && node tests/live-contract.test.js && node tests/tile-content.test.js && node tests/resource-kit.test.js && node tests/place-kit.test.js && node tests/character-kit.test.js && node tests/splash-kit.test.js && node tests/combat-generator.test.js && node tests/combat-ui-generator.test.js && node tests/regression.test.js",
+    "regression": "node scripts/regression-report.mjs"
+  }
+}

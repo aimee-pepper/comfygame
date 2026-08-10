@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bookbinder.local/assetlab/terrain-render.schema.json",
+  "title": "Bookbinder Terrain Render Facts",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "ground", "speciesSeed", "revealed", "cracking", "crumbled", "elevation", "adjacency"],
+  "properties": {
+    "schemaVersion": { "const": 1 }, "kind": { "const": "terrain" },
+    "ground": { "enum": ["stone", "soil", "sand", "ice", "ash", "water", "deepWater", "rubble", "mud", "growth", "chasm", "groundcover"] },
+    "speciesSeed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "revealed": { "type": "boolean" }, "cracking": { "type": "boolean" }, "crumbled": { "type": "boolean" },
+    "elevation": { "type": "integer", "minimum": 0, "maximum": 3 },
+    "adjacency": { "type": "integer", "minimum": 0, "maximum": 15, "description": "N=1, E=2, S=4, W=8 for same-ground neighbours." }
+  }
+}

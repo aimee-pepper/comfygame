@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bookbinder.local/assetlab/flora-identity.schema.json",
+  "title": "Bookbinder Flora Identity Descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "logicalID", "speciesSeed", "traits"],
+  "properties": {
+    "schemaVersion": { "const": 1 }, "kind": { "const": "flora" },
+    "logicalID": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "speciesSeed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "traits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["stature", "tissueAmount", "woody", "fibrous", "fleshy", "defence", "defenceType", "habit", "cyan", "magenta", "yellow", "colorDepth", "patterning", "opacity", "shine", "schiller", "metabolism"],
+      "properties": {
+        "stature": { "$ref": "#/$defs/percent" }, "tissueAmount": { "$ref": "#/$defs/percent" },
+        "woody": { "$ref": "#/$defs/percent" }, "fibrous": { "$ref": "#/$defs/percent" }, "fleshy": { "$ref": "#/$defs/percent" },
+        "defence": { "$ref": "#/$defs/percent" }, "defenceType": { "enum": ["physical", "chemical", "active"] },
+        "habit": { "enum": ["spreading", "clustered", "solitary"] },
+        "cyan": { "$ref": "#/$defs/percent" }, "magenta": { "$ref": "#/$defs/percent" }, "yellow": { "$ref": "#/$defs/percent" },
+        "colorDepth": { "$ref": "#/$defs/percent" }, "patterning": { "$ref": "#/$defs/percent" },
+        "opacity": { "$ref": "#/$defs/percent" }, "shine": { "$ref": "#/$defs/percent" }, "schiller": { "$ref": "#/$defs/percent" },
+        "metabolism": { "enum": ["photosynthetic", "fungal", "chemosynthetic"] }
+      }
+    }
+  },
+  "$defs": { "percent": { "type": "integer", "minimum": 0, "maximum": 100 } }
+}

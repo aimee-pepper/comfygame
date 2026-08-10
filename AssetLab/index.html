@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bookbinder Asset Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div>
+      <p class="eyebrow">Bookbinder · isolated authoring tool</p>
+      <h1>Asset Lab</h1>
+      <p class="subtitle">Shape one visual identity; inspect every view.</p>
+    </div>
+    <div class="header-actions">
+      <a class="nav-link" href="world.html">Open World Lab</a>
+      <a class="nav-link" href="regression.html">Golden Review</a>
+      <a class="nav-link" href="combat.html">Combat Proof</a>
+      <a class="nav-link" href="combat-ui.html">Combat UI</a>
+      <button id="randomize" class="primary">Randomize unlocked</button>
+      <button id="reroll-species">Reroll species</button>
+      <button id="reroll-specimen">Reroll specimen</button>
+      <button id="reset">Reset</button>
+    </div>
+  </header>
+
+  <main>
+    <aside class="panel controls-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Identity descriptor</p>
+          <h2>Creature genome</h2>
+        </div>
+        <span id="descriptor-hash" class="hash"></span>
+      </div>
+      <label class="preset-field">Anatomy preset
+        <select id="preset"><option value="">Custom</option></select>
+      </label>
+      <p id="anatomy-summary" class="anatomy-summary"></p>
+      <p class="control-help"><span class="lock-symbol">◆</span> Locked fields stay fixed when you randomize.</p>
+      <label class="seed-field"><input id="species-seed-lock" class="lock" type="checkbox" aria-label="Lock species seed when randomizing"><span>Species seed</span>
+        <input id="species-seed" type="number" min="0" max="4294967295" step="1">
+      </label>
+      <label class="seed-field"><input id="specimen-seed-lock" class="lock" type="checkbox" aria-label="Lock specimen seed"><span>Specimen seed</span>
+        <input id="specimen-seed" type="number" min="0" max="4294967295" step="1">
+      </label>
+      <div id="controls"></div>
+      <div id="warnings" class="warnings" aria-live="polite"></div>
+      <details>
+        <summary>Descriptor JSON</summary>
+        <textarea id="json" spellcheck="false"></textarea>
+        <div class="row-actions">
+          <button id="apply-json">Apply JSON</button>
+          <button id="copy-json">Copy</button>
+          <button id="download-json">Download</button>
+          <button id="download-manifest">Manifest</button>
+          <button id="save-workspace">Save workspace</button>
+          <button id="load-workspace">Load workspace</button>
+          <label class="file-button">Import<input id="import-json" type="file" accept="application/json"></label>
+        </div>
+        <p id="json-status" class="status" aria-live="polite"></p>
+      </details>
+    </aside>
+
+    <section class="workspace">
+      <div class="panel preview-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Shared identity</p>
+            <h2>Creature profiles</h2>
+          </div>
+          <label>Preview scale
+            <select id="scale">
+              <option value="1">1× native</option>
+              <option value="2">2×</option>
+              <option value="4" selected>4×</option>
+              <option value="6">6×</option>
+              <option value="8">8×</option>
+            </select>
+          </label>
+        </div>
+        <div class="profile-grid">
+          <article class="profile-card">
+            <div class="profile-title"><h3>World</h3><span>16×16 · top-down</span></div>
+            <div class="canvas-stage checker"><canvas id="world" width="16" height="16"></canvas></div>
+            <div class="card-footer"><span id="world-hash" class="hash"></span><button data-export="world">PNG</button></div>
+          </article>
+          <article class="profile-card fight-card">
+            <div class="profile-title"><h3>Fight</h3><span>48×48 · side view</span></div>
+            <div class="canvas-stage checker"><canvas id="fight" width="48" height="48"></canvas></div>
+            <div class="card-footer"><span id="fight-hash" class="hash"></span><button data-export="fight">PNG</button></div>
+          </article>
+        </div>
+        <div class="comparison-heading">
+          <div><strong>Candidate comparison</strong><span>Pin the current creature, then keep editing.</span></div>
+          <button id="pin-candidate">Pin current</button>
+        </div>
+        <div class="comparison-stage checker"><canvas id="comparison" width="104" height="52"></canvas></div>
+      </div>
+
+      <div class="panel environment-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Vertical slice</p><h2>World vocabulary</h2></div>
+          <span>16×16 native tiles</span>
+        </div>
+        <div class="tile-strip">
+          <article><div class="checker tile-stage"><canvas id="terrain-soil" width="16" height="16"></canvas></div><h3>Soil</h3></article>
+          <article><div class="checker tile-stage"><canvas id="terrain-water" width="16" height="16"></canvas></div><h3>Water</h3></article>
+          <article><div class="checker tile-stage"><canvas id="terrain-stone" width="16" height="16"></canvas></div><h3>Stone</h3></article>
+          <article><div class="checker tile-stage"><canvas id="flora" width="16" height="16"></canvas></div><h3>Flora</h3></article>
+        </div>
+      </div>
+
+      <div class="panel population-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Sameness check</p><h2>Population contact sheet</h2></div>
+          <div class="header-actions"><select id="population-mode"><option value="ecosystem">Ecosystem diversity</option><option value="species">Species consistency</option></select><button id="export-population">Export PNG</button></div>
+        </div>
+        <div class="checker population-stage"><canvas id="population" width="192" height="96"></canvas></div>
+        <p id="population-note" class="population-note"></p>
+      </div>
+
+      <div class="panel diagnostics">
+        <div><span id="determinism-dot" class="dot"></span><strong>Determinism</strong><small id="determinism-status"></small></div>
+        <div><span id="bounds-dot" class="dot"></span><strong>Sprite bounds</strong><small id="bounds-status"></small></div>
+        <div><span id="allocation-dot" class="dot"></span><strong>Allocations</strong><small id="allocation-status"></small></div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bookbinder.local/assetlab/identity-descriptor.schema.json",
+  "title": "Bookbinder Creature Identity Descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "logicalID", "speciesSeed", "specimenSeed", "traits"],
+  "properties": {
+    "schemaVersion": { "const": 4 },
+    "kind": { "const": "creature" },
+    "logicalID": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "speciesSeed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "specimenSeed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "traits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["topology", "size", "build", "boneDensity", "ornament", "coveringHardness", "coveringLength", "coveringCoverage", "appendageCount", "appendageType", "pierce", "crush", "rend", "reach", "delivery", "cyan", "magenta", "yellow", "colorDepth", "patterning", "opacity", "shine", "schiller", "vision", "mechano", "chemo", "thermo", "emanationStrength", "emanationKind", "emanationLight", "emanationHeat", "emanationCaustic", "defence", "toxic"],
+      "properties": {
+        "topology": { "enum": ["quadruped", "biped", "serpentine", "segmented", "radial", "piscine", "winged", "amorphous"] },
+        "size": { "$ref": "#/$defs/percent" }, "build": { "$ref": "#/$defs/percent" }, "boneDensity": { "$ref": "#/$defs/percent" }, "ornament": { "$ref": "#/$defs/percent" },
+        "coveringHardness": { "$ref": "#/$defs/percent" }, "coveringLength": { "$ref": "#/$defs/percent" }, "coveringCoverage": { "$ref": "#/$defs/percent" },
+        "appendageCount": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "appendageType": { "enum": ["limbed", "finned", "feathered", "membrane", "none"] },
+        "pierce": { "$ref": "#/$defs/percent" }, "crush": { "$ref": "#/$defs/percent" }, "rend": { "$ref": "#/$defs/percent" },
+        "reach": { "enum": ["close", "mid", "far"] }, "delivery": { "enum": ["single", "multi", "area"] },
+        "cyan": { "$ref": "#/$defs/percent" }, "magenta": { "$ref": "#/$defs/percent" }, "yellow": { "$ref": "#/$defs/percent" },
+        "colorDepth": { "$ref": "#/$defs/percent" }, "patterning": { "$ref": "#/$defs/percent" }, "opacity": { "$ref": "#/$defs/percent" }, "shine": { "$ref": "#/$defs/percent" }, "schiller": { "$ref": "#/$defs/percent" },
+        "vision": { "$ref": "#/$defs/percent" }, "mechano": { "$ref": "#/$defs/percent" }, "chemo": { "$ref": "#/$defs/percent" }, "thermo": { "$ref": "#/$defs/percent" },
+        "emanationStrength": { "$ref": "#/$defs/percent" }, "emanationKind": { "enum": ["light", "heat", "caustic"] },
+        "emanationLight": { "$ref": "#/$defs/percent" }, "emanationHeat": { "$ref": "#/$defs/percent" }, "emanationCaustic": { "$ref": "#/$defs/percent" },
+        "defence": { "enum": ["none", "armour", "speed", "crypsis", "aposematism"] }, "toxic": { "type": "boolean" }
+      }
+    }
+  },
+  "$defs": { "percent": { "type": "integer", "minimum": 0, "maximum": 100 } }
+}

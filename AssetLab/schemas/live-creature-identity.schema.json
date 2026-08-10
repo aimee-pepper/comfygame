@@ -1,0 +1,14 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://bookbinder.local/assetlab/live-creature-identity.schema.json","title":"Live Creature Identity Adapter Output","type":"object","additionalProperties":false,
+  "required":["size","covering","boneDensity","armament","ornament","build","appendages","coloration","finish","sensory","emanation","defence","isToxic"],
+  "properties":{
+    "size":{"$ref":"#/$defs/percent"},"boneDensity":{"$ref":"#/$defs/percent"},"ornament":{"$ref":"#/$defs/percent"},"build":{"$ref":"#/$defs/percent"},
+    "covering":{"$ref":"#/$defs/triplePercent"},
+    "armament":{"type":"object","required":["pierce","crush","rend","reach","delivery","mix"],"properties":{"pierce":{"$ref":"#/$defs/percent"},"crush":{"$ref":"#/$defs/percent"},"rend":{"$ref":"#/$defs/percent"},"reach":{"enum":["close","mid","far"]},"delivery":{"enum":["single","multi","area"]},"mix":{"$ref":"#/$defs/tripleUnit"}},"additionalProperties":false},
+    "appendages":{"type":"object","required":["count","type"],"properties":{"count":{"type":"integer","minimum":0,"maximum":8},"type":{"enum":["limbed","finned","feathered","membrane","none"]}},"additionalProperties":false},
+    "coloration":{"type":"object"},"finish":{"$ref":"#/$defs/triplePercent"},"sensory":{"type":"object"},
+    "emanation":{"anyOf":[{"type":"null"},{"type":"object","required":["strength","light","heat","caustic"],"additionalProperties":false,"properties":{"strength":{"$ref":"#/$defs/percent"},"light":{"$ref":"#/$defs/percent"},"heat":{"$ref":"#/$defs/percent"},"caustic":{"$ref":"#/$defs/percent"}}}]},
+    "defence":{"type":["string","null"]},"isToxic":{"type":"boolean"}
+  },
+  "$defs":{"percent":{"type":"number","minimum":0,"maximum":100},"triplePercent":{"type":"object","minProperties":3},"tripleUnit":{"type":"object","minProperties":3}}
+}

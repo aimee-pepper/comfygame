@@ -1,0 +1,5 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://bookbinder.local/assetlab/live-flora-identity.schema.json","title":"Live Flora Identity Adapter Output","type":"object","additionalProperties":false,
+  "required":["stature","tissue","defence","defenceType","habit","coloration","finish","metabolism"],
+  "properties":{"stature":{"type":"number"},"tissue":{"type":"object"},"defence":{"type":"string"},"defenceType":{"type":"string"},"habit":{"type":"string"},"coloration":{"type":"object"},"finish":{"type":"object"},"metabolism":{"type":"string"}}
+}
