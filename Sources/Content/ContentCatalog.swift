@@ -97,6 +97,13 @@ struct ContentCatalog: Sendable {
         QualifierDef.Ladder.allCases.filter { !qualifiers(on: $0).isEmpty }
     }
     func traveller(_ id: TravellerID) -> TravellerDef? { travellers.first { $0.id == id } }
+    var travellersInAuthoredOrder: [TravellerDef] {
+        travellers.sorted {
+            let lhs = $0.authoredOrder ?? Int.max
+            let rhs = $1.authoredOrder ?? Int.max
+            return lhs == rhs ? $0.id.rawValue < $1.id.rawValue : lhs < rhs
+        }
+    }
     func diaryPage(_ id: DiaryPageID) -> DiaryPageDef? { diaryPages.first { $0.id == id } }
     func diary(of traveller: TravellerID) -> [DiaryPageDef] { diaryPages.filter { $0.diary == traveller } }
     func runeShapes(in hand: Hand) -> [RuneShapeDef] {
@@ -168,35 +175,16 @@ struct ContentCatalog: Sendable {
         }
         do {
             let data = try Data(contentsOf: url)
-            let wrapper = try JSONDecoder().decode([String: ContentFileValue<T>].self, from: data)
-            guard case .entries(let entries)? = wrapper[key] else {
+            guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let rawEntries = object[key] else {
                 throw ContentError.decodeFailed(name, underlying: ContentError.missingFile(key))
             }
-            return entries
+            let entriesData = try JSONSerialization.data(withJSONObject: rawEntries)
+            return try JSONDecoder().decode([T].self, from: entriesData)
         } catch let error as ContentError {
             throw error
         } catch {
             throw ContentError.decodeFailed(name, underlying: error)
-        }
-    }
-
-    /// Lets one JSON object hold several things at once: the `_note`, the collection being asked
-    /// for, and other collections of entirely different shapes. `research.json` carries both
-    /// branches and nodes, so a key that doesn't decode as `T` is skipped rather than fatal.
-    private enum ContentFileValue<T: Decodable>: Decodable {
-        case note(String)
-        case entries([T])
-        case somethingElse
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            if let text = try? container.decode(String.self) {
-                self = .note(text)
-            } else if let entries = try? container.decode([T].self) {
-                self = .entries(entries)
-            } else {
-                self = .somethingElse
-            }
         }
     }
 
@@ -317,6 +305,16 @@ struct ContentCatalog: Sendable {
                 case .effect:
                     guard grant.effect != nil else {
                         throw ContentError.danglingReference("node '\(node.id)' grants an effect with no effect named")
+                    }
+                    if grant.effect == .stationTier {
+                        guard let id = grant.id, station(StationID(rawValue: id)) != nil,
+                              let tier = grant.tier, tier > 0 else {
+                            throw ContentError.danglingReference("node '\(node.id)' upgrades unknown station '\(grant.id ?? "nil")'")
+                        }
+                    }
+                case .capability:
+                    guard let id = grant.id, !id.isEmpty else {
+                        throw ContentError.danglingReference("node '\(node.id)' grants an unnamed capability")
                     }
                 }
             }
@@ -455,7 +453,7 @@ struct ContentCatalog: Sendable {
             if let guardian = site.contents.guardian, !creatureIDs.contains(guardian) {
                 throw ContentError.danglingReference("site '\(site.id)' is guarded by unknown creature '\(guardian)'")
             }
-            guard !site.contents.isEmpty else {
+            guard !site.contents.isEmpty || site.providesNaturalAnchor else {
                 throw ContentError.danglingReference("site '\(site.id)' contains nothing worth walking to")
             }
         }
@@ -498,7 +496,18 @@ struct ContentCatalog: Sendable {
 
         // A traveller with no signature is nowhere; a page that unlocks nothing is not a page.
         let travellerIDs = Set(travellers.map(\.id))
+        let authoredOrders = travellers.compactMap(\.authoredOrder)
+        guard authoredOrders.count == travellers.count,
+              Set(authoredOrders).count == authoredOrders.count,
+              authoredOrders.allSatisfy({ $0 > 0 }) else {
+            throw ContentError.danglingReference(
+                "every traveller needs a unique positive authoredOrder")
+        }
         for traveller in travellers {
+            guard traveller.campaignPhase != nil else {
+                throw ContentError.danglingReference(
+                    "traveller '\(traveller.id)' has no campaignPhase")
+            }
             guard !traveller.signature.isEmpty else {
                 throw ContentError.danglingReference("traveller '\(traveller.id)' is nowhere at all")
             }
@@ -525,6 +534,24 @@ struct ContentCatalog: Sendable {
             guard !page.prose.isEmpty else {
                 throw ContentError.danglingReference("page '\(page.id)' is blank")
             }
+            let rewardCount = [
+                page.about != nil,
+                page.teaches != nil,
+                page.teachesFocus != nil,
+                page.teachesGambit != nil,
+                page.teachesPattern != nil,
+                page.researchNode != nil,
+                page.site != nil,
+            ].filter { $0 }.count
+            let expectedRewardCount = (page.kind == .worldWorthWriting || page.kind == .account
+                                       || page.kind == .turn) ? 0 : 1
+            guard rewardCount == expectedRewardCount else {
+                throw ContentError.danglingReference(
+                    "page '\(page.id)' grants \(rewardCount) things; expected \(expectedRewardCount)")
+            }
+            guard page.kind == .locationClue || page.clueIndex == nil else {
+                throw ContentError.danglingReference("page '\(page.id)' has a clue index but is not a location clue")
+            }
             switch page.kind {
             case .locationClue:
                 guard let about = page.about, let index = page.clueIndex,
@@ -539,6 +566,18 @@ struct ContentCatalog: Sendable {
                 guard let id = page.teaches, symbolIDs.contains(id) else {
                     throw ContentError.danglingReference("page '\(page.id)' teaches an unknown rune")
                 }
+            case .focus:
+                guard let id = page.teachesFocus, sourceIDs.contains(id) else {
+                    throw ContentError.danglingReference("page '\(page.id)' teaches an unknown focus")
+                }
+            case .gambit:
+                guard let id = page.teachesGambit, componentIDs.contains(id) else {
+                    throw ContentError.danglingReference("page '\(page.id)' teaches an unknown gambit phrase")
+                }
+            case .pattern:
+                guard page.teachesPattern == "maud_fitting_pattern" else {
+                    throw ContentError.danglingReference("page '\(page.id)' teaches an unknown pattern")
+                }
             case .researchLead:
                 guard let id = page.researchNode, nodeIDs.contains(id) else {
                     throw ContentError.danglingReference("page '\(page.id)' leads to unknown study")
@@ -547,7 +586,7 @@ struct ContentCatalog: Sendable {
                 guard let id = page.site, siteIDs.contains(id) else {
                     throw ContentError.danglingReference("page '\(page.id)' names an unknown ruin")
                 }
-            case .worldWorthWriting:
+            case .worldWorthWriting, .account, .turn:
                 break
             }
         }
@@ -576,9 +615,19 @@ enum Resources {
     static let toxin: ResourceID = "toxin"
     static let spore: ResourceID = "spore"
     static let reagent: ResourceID = "reagent"
+    static let quartz: ResourceID = "quartz"
+    static let sulfur: ResourceID = "sulfur"
+    static let silver: ResourceID = "silver"
+    static let ichor: ResourceID = "ichor"
 }
 
 enum Items {
+    static let anchorFrame: ItemID = "anchor_frame"
+    static let essenceCrystal: ItemID = "essence_crystal"
+    static let heatCore: ItemID = "heat_core"
+    static let causticCore: ItemID = "caustic_core"
+    static let lightCore: ItemID = "light_core"
+    static let conduitFixture: ItemID = "conduit_fixture"
     /// **Reserved, and deliberately not in `items.json`.** A material is not an authored item: what
     /// it is and what it's good for came off the animal it was cut from, and travels on the stack
     /// as a `MaterialSample`. This id exists only so a material can share the slot machinery.

@@ -3,7 +3,7 @@ import SwiftUI
 /// **Where you spend, which is what a class is.**
 ///
 /// Nine branches shared by everybody (`docs/combat-trees-full.md`). Nobody is handed a role: a
-/// rogue is Swiftness, Evasion and Shadow, and a knight is Force, Fortitude and Kindling, and the
+/// rogue is Swiftness, Evasion and Shadow, and a knight is Force, Fortitude and Emanation, and the
 /// game never says either word until you've finished three.
 ///
 /// One tree at a time on a phone, because three columns of eight nodes is not a portrait layout.
@@ -134,5 +134,5 @@ struct CombatTreeView: View {
 }
 
 private extension ShapeStyle where Self == Color {
-    static var tertiaryLabel: Color { Color(.tertiaryLabel) }
+    static var tertiaryLabel: Color { Color(uiColor: .tertiaryLabel) }
 }

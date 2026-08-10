@@ -32,4 +32,54 @@ extension GameStore {
     func harnessGainMote() {
         mutate("found a mote", flush: true) { $0.reality.motes += 1 }
     }
+
+    /// A reproducible visual state for the Survey Post's crafting rows. Debug-only stock, kept out
+    /// of production progression so interactive checks do not require finding Mara and butchering
+    /// several unusually lustrous creatures first.
+    func harnessPrepareInstrumentCrafting() {
+        mutate("harness: instrument crafting", flush: true) { state in
+            state.base.stations[Stations.surveyPost] = StationState(isUnlocked: true, tier: 1)
+            state.base.essence = max(state.base.essence, 100)
+            let target: PressureTargetID = "illumination"
+            state.reality.instruments.insert(target)
+            state.reality.instrumentPrecisions[target] = .crude
+            state.base.instrumentLoadout.insert(target)
+            let samples = (0..<5).map { index in
+                MaterialSample(kind: .chitin,
+                               properties: MaterialProperties(lustre: 45 + Double(index) * 10),
+                               grade: 45 + Double(index) * 10,
+                               source: "harness specimen")
+            }
+            state.base.inventory.slots = max(state.base.inventory.slots,
+                                             state.base.inventory.stacks.count + 1)
+            _ = state.base.inventory.add(ItemStack(
+                id: InstanceID(rawValue: state.base.nextItemID()),
+                catalogID: Items.material,
+                materials: samples))
+        }
+    }
+
+    func harnessPrepareApothecary() {
+        mutate("harness: apothecary", flush: true) { state in
+            state.base.stations[Stations.apothecary] = StationState(isUnlocked: true, tier: 0)
+            state.base.essence = max(state.base.essence, 500)
+            state.reality.motes = max(state.reality.motes, 3)
+            for resource in ContentCatalog.shared.resources where resource.id != Resources.mote {
+                state.base.resources.add(10, of: resource.id)
+            }
+            let samples = MaterialProperty.allCases.flatMap { property in
+                (0..<3).map { index -> MaterialSample in
+                    var properties = MaterialProperties()
+                    properties[property] = 80 + Double(index)
+                    return MaterialSample(kind: .reagent, properties: properties,
+                                          grade: 80 + Double(index), source: "harness specimen")
+                }
+            }
+            state.base.inventory.slots = max(state.base.inventory.slots,
+                                             state.base.inventory.stacks.count + 1)
+            _ = state.base.inventory.add(ItemStack(id: InstanceID(rawValue: state.base.nextItemID()),
+                                                   catalogID: Items.material, materials: samples))
+            state.base.knownConsumableRecipes = Set(ConsumableCraftingRules.recipes.map(\.output))
+        }
+    }
 }

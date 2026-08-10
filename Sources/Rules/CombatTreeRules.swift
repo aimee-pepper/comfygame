@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Nine branches shared by everybody, three trees of three, eight nodes deep
 /// (`docs/combat-trees-full.md`). Nobody is assigned a class: a rogue is Swiftness, Evasion and
-/// Shadow; a knight is Force, Fortitude and Kindling. Neither was authored — both fall out of the
+/// Shadow; a knight is Force, Fortitude and Emanation. Neither was authored — both fall out of the
 /// same nine branches, and there are twenty-seven such combinations.
 ///
 /// **Max level falls out of the shape** (Aimee): *"they need to reach the end of each tree on any

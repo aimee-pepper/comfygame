@@ -44,14 +44,11 @@ enum SmithRules {
         }
     }
 
-    /// **How far a piece can be pushed, set by its rarity.**
-    ///
-    /// A common blade takes one reforging and is then simply a good common blade; a mythic one keeps
-    /// going. This is what makes rarity worth caring about beyond the tier it starts at — otherwise
-    /// a common piece reforged enough times catches a mythic, and finding one stops mattering.
-    /// **[PLACEHOLDER]** — the ladder is a call, logged in `questions-for-design.md`.
+    /// Every physical piece has the same three within-tier ranks. Construction tier remains the
+    /// specialist hierarchy; reforging can improve a piece but can never promote it across that
+    /// boundary.
     static func maximumLevel(for definition: ItemDef) -> Int {
-        Tuning.Smith.maximumLevelByRarity[definition.rarity.order]
+        Tuning.Smith.maximumReforgeRank
     }
 
     /// What the next step up costs. Nil when the piece is finished, or isn't gear at all.
@@ -167,8 +164,9 @@ enum SmithRules {
     /// its unreforged twin — and the other three in the bin haven't been touched.
     @discardableResult
     static func reforge(stored stack: ItemStack, in state: inout GameState) -> ItemStack? {
-        guard case .ready = readiness(for: stack.catalogID, at: stack.upgradeLevel, in: state),
-              let requirement = requirement(for: stack.catalogID, at: stack.upgradeLevel),
+        let rank = stack.gearProfile?.reforgeRank ?? stack.upgradeLevel
+        guard case .ready = readiness(for: stack.catalogID, at: rank, in: state),
+              let requirement = requirement(for: stack.catalogID, at: rank),
               let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id })
         else { return nil }
 
@@ -182,8 +180,8 @@ enum SmithRules {
             state.base.store(taken)
             return nil
         }
-        taken.id = InstanceID(rawValue: state.base.nextItemID())
-        taken.upgradeLevel += 1
+        taken.gearProfile?.reforgeRank += 1
+        taken.upgradeLevel = taken.gearProfile?.reforgeRank ?? (taken.upgradeLevel + 1)
         // A reforged piece is its own bin, so it may need a slot the storehouse hasn't got. It
         // goes to the waiting pile rather than nowhere.
         state.base.store(taken)
@@ -198,17 +196,25 @@ enum SmithRules {
     @discardableResult
     static func reforge(worn slot: GearSlot, on member: PartyMember,
                         in state: inout GameState) -> Bool {
-        guard let piece = state.base.worn(slot, by: member),
-              case .ready = readiness(for: piece.catalogID, at: piece.upgradeLevel, in: state),
-              let requirement = requirement(for: piece.catalogID, at: piece.upgradeLevel),
+        guard let piece = state.base.worn(slot, by: member) else { return false }
+        let rank = piece.gearProfile?.reforgeRank ?? piece.upgradeLevel
+        guard case .ready = readiness(for: piece.catalogID, at: rank, in: state),
+              let requirement = requirement(for: piece.catalogID, at: rank),
               pay(requirement, in: &state)
         else { return false }
 
         switch member {
-        case .binder: state.base.binderEquipped[slot]?.upgradeLevel += 1
+        case .binder:
+            guard var reforged = state.base.binderEquipped[slot] else { return false }
+            reforged.gearProfile?.reforgeRank += 1
+            reforged.upgradeLevel = reforged.gearProfile?.reforgeRank ?? (piece.upgradeLevel + 1)
+            state.base.binderEquipped[slot] = reforged
         case .member(let index):
             guard state.base.roster.indices.contains(index) else { return false }
-            state.base.roster[index].equipped[slot]?.upgradeLevel += 1
+            guard var reforged = state.base.roster[index].equipped[slot] else { return false }
+            reforged.gearProfile?.reforgeRank += 1
+            reforged.upgradeLevel = reforged.gearProfile?.reforgeRank ?? (piece.upgradeLevel + 1)
+            state.base.roster[index].equipped[slot] = reforged
         }
         return true
     }
@@ -239,19 +245,32 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
 
     var upgradeLevel: Int {
         switch self {
-        case .stored(let stack): stack.upgradeLevel
-        case .worn(_, _, let piece): piece.upgradeLevel
+        case .stored(let stack): stack.gearProfile?.reforgeRank ?? stack.upgradeLevel
+        case .worn(_, _, let piece): piece.gearProfile?.reforgeRank ?? piece.upgradeLevel
         }
     }
 
     var definition: ItemDef? { ContentCatalog.shared.item(catalogID) }
-    var effectiveTier: Int { (definition?.gear?.tier ?? 0) + upgradeLevel }
+    var effectivePower: Double {
+        switch self {
+        case .stored(let stack): stack.effectivePower
+        case .worn(_, _, let piece): piece.effectivePower
+        }
+    }
+    var effectiveTier: Int { Int(effectivePower.rounded()) }
+    var constructionTier: Int {
+        switch self {
+        case .stored(let stack): stack.constructionTier
+        case .worn(_, _, let piece): piece.constructionTier
+        }
+    }
     var rarity: Rarity { definition?.rarity ?? .common }
     var icon: String { definition?.icon ?? "questionmark" }
 
     var displayName: String {
         let base = definition?.name ?? catalogID.rawValue
-        return upgradeLevel > 0 ? "\(base) +\(upgradeLevel)" : base
+        let suffix = upgradeLevel > 0 ? " · Reforged \(upgradeLevel)/3" : ""
+        return "\(base) · Tier \(constructionTier)\(suffix)"
     }
 
     /// How many of this exact piece are in the bin — nothing, for a worn one.
@@ -304,13 +323,103 @@ enum MaterialProperty: String, CaseIterable, Codable, Sendable {
 
 extension MaterialProperties {
     subscript(property: MaterialProperty) -> Double {
-        switch property {
-        case .hardness: hardness
-        case .density: density
-        case .insulation: insulation
-        case .flexibility: flexibility
-        case .lustre: lustre
-        case .reactivity: reactivity
+        get {
+            switch property {
+            case .hardness: hardness
+            case .density: density
+            case .insulation: insulation
+            case .flexibility: flexibility
+            case .lustre: lustre
+            case .reactivity: reactivity
+            }
         }
+        set {
+            switch property {
+            case .hardness: hardness = newValue
+            case .density: density = newValue
+            case .insulation: insulation = newValue
+            case .flexibility: flexibility = newValue
+            case .lustre: lustre = newValue
+            case .reactivity: reactivity = newValue
+            }
+        }
+    }
+}
+
+/// Tovin's carried certainty route. Six different samples are assigned to six property slots;
+/// one exceptional sample can never satisfy two rows of the recipe.
+enum AnchorFrameRules {
+    struct Need: Equatable, Sendable {
+        var property: MaterialProperty
+        var minimum: Double
+    }
+
+    static let essenceCost = 60
+    static let needs: [Need] = [
+        Need(property: .hardness, minimum: 65), Need(property: .hardness, minimum: 65),
+        Need(property: .density, minimum: 65), Need(property: .density, minimum: 65),
+        Need(property: .flexibility, minimum: 55), Need(property: .reactivity, minimum: 65),
+    ]
+
+    static func selectedSamples(in state: GameState) -> [SmithRules.Candidate]? {
+        let slots = needs.enumerated().sorted { lhs, rhs in
+            candidates(for: lhs.element, in: state).count < candidates(for: rhs.element, in: state).count
+        }
+        func assign(_ position: Int, used: Set<String>, chosen: [SmithRules.Candidate])
+            -> [SmithRules.Candidate]? {
+            guard position < slots.count else { return chosen }
+            for candidate in candidates(for: slots[position].element, in: state) {
+                let key = "\(candidate.binID.rawValue):\(candidate.index)"
+                guard !used.contains(key) else { continue }
+                if let result = assign(position + 1, used: used.union([key]), chosen: chosen + [candidate]) {
+                    return result
+                }
+            }
+            return nil
+        }
+        return assign(0, used: [], chosen: [])
+    }
+
+    private static func candidates(for need: Need, in state: GameState) -> [SmithRules.Candidate] {
+        SmithRules.candidates(for: .init(property: need.property, minimum: need.minimum,
+                                         count: 1, essence: 0, level: 0), in: state)
+    }
+
+    static func canCraft(in state: GameState) -> Bool {
+        state.base.station(Stations.anchorage).isUnlocked
+            && state.base.essence >= essenceCost
+            && selectedSamples(in: state) != nil
+    }
+
+    static func shortfall(in state: GameState) -> [String] {
+        var missing: [String] = []
+        for group in Dictionary(grouping: needs, by: { "\($0.property.rawValue):\($0.minimum)" }).values {
+            guard let need = group.first else { continue }
+            let have = candidates(for: need, in: state).count
+            if have < group.count {
+                missing.append("\(group.count - have) × \(need.property.stockWord) \(Int(need.minimum))+")
+            }
+        }
+        if selectedSamples(in: state) == nil && missing.isEmpty {
+            missing.append("six distinct qualifying samples")
+        }
+        if state.base.essence < essenceCost { missing.append("\(essenceCost - state.base.essence) essence") }
+        return missing.sorted()
+    }
+
+    static func craft(in state: inout GameState) -> Bool {
+        guard canCraft(in: state), let spending = selectedSamples(in: state) else { return false }
+        for (binID, candidates) in Dictionary(grouping: spending, by: \.binID) {
+            guard let bin = state.base.inventory.stacks.firstIndex(where: { $0.id == binID }) else { return false }
+            for candidate in candidates.sorted(by: { $0.index > $1.index }) {
+                state.base.inventory.stacks[bin].materials.remove(at: candidate.index)
+            }
+            state.base.inventory.stacks[bin].count = state.base.inventory.stacks[bin].materials.count
+        }
+        state.base.inventory.stacks.removeAll { $0.count == 0 }
+        state.base.essence -= essenceCost
+        state.base.store(ItemStack(id: InstanceID(rawValue: state.base.nextItemID()),
+                                   catalogID: Items.anchorFrame))
+        return true
     }
 }

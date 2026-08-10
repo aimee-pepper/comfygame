@@ -170,6 +170,7 @@ final class ReachableContentTests: XCTestCase {
         }
 
         let never = ContentCatalog.shared.contradictions
+            .filter(\.enabled)
             .map(\.id).filter { !fired.contains($0) }
             .map(\.rawValue).sorted()
         XCTAssertTrue(never.isEmpty, "contradictions nothing can trigger: \(never.joined(separator: ", "))")
@@ -232,8 +233,9 @@ final class ReachableContentTests: XCTestCase {
         }
     }
 
-    /// And nobody may be *so* easy to run into that the search loop isn't a search.
-    func testNobodyTurnsUpInMostWorlds() {
+    /// Accidental matches should remain uncommon, while early travellers must still be
+    /// discoverable before the player has access to the broader authored vocabulary.
+    func testTravellerAccidentalMatchRateFitsCampaignPhase() {
         var worlds: [PressureReadings] = []
         for seed in UInt64(1)...400 {
             worlds.append(BookRules.readings(for: BookRules.resolveBook(page: Page()), seed: seed))
@@ -243,8 +245,25 @@ final class ReachableContentTests: XCTestCase {
             let share = Double(hits) / Double(worlds.count)
             XCTAssertLessThan(share, 0.4,
                 "\(traveller.name) is standing in \(Int(share * 100))% of blank books — that isn't a search")
-            XCTAssertGreaterThan(share, 0.02,
-                "\(traveller.name) turns up in \(Int(share * 100))% of blank books — that may be a wall")
+
+            let minimumAccidentalShare: Double
+            switch traveller.campaignPhase {
+            case .opening:
+                minimumAccidentalShare = 0.02
+            case .earlyMid, .startOfMid:
+                minimumAccidentalShare = 0.005
+            case .mid:
+                minimumAccidentalShare = 0.001
+            case .midLate, .late, .endgame, nil:
+                // Later hunts may require deliberate writing. Joint reachability is validated
+                // separately; a mandatory blank-book accident would make the clue system a lie.
+                minimumAccidentalShare = 0
+            }
+            let percentage = String(format: "%.2f", share * 100)
+            let phase = traveller.campaignPhase?.rawValue ?? "unphased"
+            XCTAssertGreaterThanOrEqual(share, minimumAccidentalShare,
+                "\(traveller.name) turns up in \(percentage)% of blank books — "
+                + "that may be a wall for a \(phase) traveller")
         }
     }
 }

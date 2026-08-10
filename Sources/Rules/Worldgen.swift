@@ -19,9 +19,10 @@ enum Worldgen {
         static let pages: UInt64 = 0x9A6E
     }
 
-    static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState())
+    static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState(),
+                         tuning: DebugTuningProfile = .defaults)
         -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite],
-            pages: [DiaryPageID], travellers: [TravellerID], cast: [Species], flora: [Flora],
+            pages: [DiaryPageID], writings: [FoundWritingRecord], travellers: [TravellerID], cast: [Species], flora: [Flora],
             start: GridPoint) {
         // **Size is written, not fixed** (session 13 §5). The book carries the Scale it was
         // written at, so the same book always makes the same size of world.
@@ -92,6 +93,57 @@ enum Worldgen {
             occupied.insert(point)
         }
 
+        // 2a. Found writing reserves its host before optional resources, sites and creatures can
+        //     consume every useful tile. Content is still selected first; host selection then uses
+        //     the nearest third of the start-connected region, beyond the first two steps.
+        let diaryCandidates = LibraryRules.placePages(in: readings, library: library,
+                                                      additionalPageChance: 1,
+                                                      patienceInWorlds: tuning.diaryPatienceWorlds,
+                                                      rng: &pageRNG)
+        var pages: [DiaryPageID] = []
+        var noteCount = 0
+        if let first = diaryCandidates.first, pageRNG.chance(tuning.diaryWritingShare) {
+            pages.append(first)
+        } else {
+            noteCount = 1
+        }
+        if pageRNG.chance(tuning.additionalPageChance) {
+            if pages.isEmpty, let first = diaryCandidates.first {
+                pages.append(first)
+            } else {
+                noteCount += 1
+            }
+        }
+
+        var placedPages: [DiaryPageID] = []
+        for page in pages {
+            guard let point = writingPoint(in: map, from: entry, avoiding: occupied, rng: &pageRNG)
+            else { continue }
+            map[point].content = .diaryPage(page)
+            occupied.insert(point)
+            placedPages.append(page)
+        }
+        var foundWritings: [FoundWritingRecord] = []
+        for index in 0..<noteCount {
+            guard let point = writingPoint(in: map, from: entry, avoiding: occupied, rng: &pageRNG)
+            else { continue }
+            let id = FoundWritingID(rawValue: "world_\(seed)_field_\(index)")
+            let record = FoundWritingRecord(id: id, family: .fieldNote,
+                                            prose: fieldNoteProse(index: index), position: point)
+            map[point].content = .foundWriting(id)
+            occupied.insert(point)
+            foundWritings.append(record)
+        }
+        if placedPages.isEmpty, foundWritings.isEmpty,
+           let point = writingPoint(in: map, from: entry, avoiding: occupied, rng: &pageRNG) {
+            let id = FoundWritingID(rawValue: "world_\(seed)_field_fallback")
+            let record = FoundWritingRecord(id: id, family: .fieldNote,
+                                            prose: fieldNoteProse(index: 0), position: point)
+            map[point].content = .foundWriting(id)
+            occupied.insert(point)
+            foundWritings.append(record)
+        }
+
         // 3. Resource nodes. Count and richness both come from the book — a bounty-heavy book is
         //    visibly denser on the grid, not just better per pull.
         //
@@ -101,7 +153,8 @@ enum Worldgen {
         //    table still decides *whether* this world holds a given resource at all; the flora
         //    decides which of them this particular node is.
         let yieldTable = BookRules.yieldTable(from: readings)
-        let nodeCount = nodeCount(for: readings, rng: &nodeRNG)
+        let nodeCount = nodeCount(for: readings, multiplier: tuning.resourceNodeDensityMultiplier,
+                                  rng: &nodeRNG)
         let floraByID = Dictionary(uniqueKeysWithValues: flora.map { ($0.id, $0) })
         for _ in 0..<nodeCount {
             guard var resource = nodeRNG.pickWeighted(yieldTable) else { continue }
@@ -132,11 +185,13 @@ enum Worldgen {
 
         // 4. Wild drops — single pickups you get just by walking over them. Raw essence arrives
         //    this way (Aimee's stated design), so it's a reason to wander off your path.
-        let wildCount = featureRNG.int(in: Tuning.World.wildDropCountRange)
+        let wildCount = scaled(featureRNG.int(in: Tuning.World.wildDropCountRange),
+                               by: tuning.rawEssenceFrequencyMultiplier)
         for _ in 0..<wildCount {
             guard let point = randomFreePoint(in: map, avoiding: occupied, rng: &featureRNG) else { continue }
             map[point].content = .wildDrop(resource: Resources.essenceRaw,
-                                           amount: featureRNG.int(in: Tuning.World.wildDropAmountRange))
+                                           amount: scaled(featureRNG.int(in: Tuning.World.wildDropAmountRange),
+                                                          by: tuning.rawEssenceYieldMultiplier))
             occupied.insert(point)
         }
 
@@ -170,10 +225,14 @@ enum Worldgen {
         // 7. Sites — the discrete placed things. Eligibility is read off the world's *pressures*
         //    rather than off its symbols, so a site is found by writing a kind of place rather than
         //    by writing a specific recipe (docs/sites-system.md §2).
-        let sites = SiteRules.place(in: map,
+        var sites = SiteRules.place(in: map,
                                     readings: readings,
                                     contradictions: ContradictionRules.fired(in: sigils, readings: readings),
                                     avoiding: occupied, rng: &siteRNG)
+        let sitePositions = occupied.union(sites.map(\.position))
+        if let anchor = SiteRules.placeNaturalAnchor(in: map, avoiding: sitePositions, rng: &siteRNG) {
+            sites.append(anchor)
+        }
         // 7a. **The cast** — the species this world settled on, before anything is placed. Drawn
         //     from the readings and the seed, so the same world always holds the same animals.
         let cast = LifeRules.cast(for: readings, seed: seed)
@@ -195,17 +254,6 @@ enum Worldgen {
                     guardians.append(spawn(guardian, at: site.position, rng: &siteRNG))
                 }
             }
-        }
-
-        // 8. Diary pages. Scattered where their author would have been, unless they've waited
-        //    long enough that they'll turn up anywhere — nothing may become unreachable.
-        let pages = LibraryRules.placePages(in: readings, library: library, rng: &pageRNG)
-        var placedPages: [DiaryPageID] = []
-        for page in pages {
-            guard let point = randomFreePoint(in: map, avoiding: occupied, rng: &pageRNG) else { break }
-            map[point].content = .diaryPage(page)
-            occupied.insert(point)
-            placedPages.append(page)
         }
 
         // 9. Whoever this world's conditions describe is *standing here*, on a tile, waiting.
@@ -243,21 +291,23 @@ enum Worldgen {
         // 10. Enemies, drawn from the world's own cast. It's daytime when you arrive, so it's the
         //     day roster you meet; the night roster swaps in when the world turns.
         let dayRoster = roster(from: cast, nocturnal: false)
-        let enemyCount = enemyCount(for: book, readings: readings, rng: &enemyRNG,
-                                    tiles: map.width * map.height)
+        let enemyCount = enemyCount(for: book, readings: readings,
+                                    multiplier: tuning.creatureDensityMultiplier,
+                                    rng: &enemyRNG, tiles: map.width * map.height)
         var enemies: [WorldEnemy] = guardians
-            + plantPredators(flora, in: map, avoiding: &occupied, clearOf: entry, rng: &enemyRNG)
+            + plantPredators(flora, in: map, avoiding: &occupied, clearOf: entry,
+                             multiplier: tuning.activeFloraFrequencyMultiplier, rng: &enemyRNG)
 
         // 9a. **Something this world cannot afford** (`apex-encounters.md`). Drawn by the things
         //     that already mean *dangerous and worth it* — greed above all, which gives the
         //     stability dial a third consequence after instability and loot. At most one: two
         //     makes them scenery.
         var apexRNG = SeededRNG(seed: seed).derived(0xA9E00)
-        let apexChance = ApexRules.chance(
+        let apexChance = min(1, ApexRules.chance(
             greed: BookRules.greedDelta(for: sigils),
             stabilityScore: BookRules.stabilityScore(of: book),
             dangerTiles: danger.hazardTiles,
-            sites: sites.count)
+            sites: sites.count) * max(0, tuning.apexChanceMultiplier))
         if let apex = ApexRules.sample(for: readings, seed: seed, chance: apexChance),
            let point = randomFreePoint(in: map, avoiding: occupied,
                                        minimumDistanceFrom: entry,
@@ -282,8 +332,45 @@ enum Worldgen {
             occupied.insert(point)
         }
 
-        WorldRules.reveal(around: entry, in: &map, radius: WorldRules.visionRadius(for: book))
-        return (map, enemies, sites, placedPages, travellers, cast, flora, entry)
+        WorldRules.reveal(around: entry, in: &map,
+                          radius: WorldRules.visionRadius(for: book,
+                                                          base: tuning.baseVisionRadius))
+        return (map, enemies, sites, placedPages, foundWritings, travellers, cast, flora, entry)
+    }
+
+    private static func writingPoint(in map: WorldMap, from entry: GridPoint,
+                                     avoiding occupied: Set<GridPoint>, rng: inout SeededRNG) -> GridPoint? {
+        var distances: [GridPoint: Int] = [entry: 0]
+        var queue = [entry]
+        var cursor = 0
+        while cursor < queue.count {
+            let point = queue[cursor]
+            cursor += 1
+            for next in map.neighbours(of: point)
+            where map[next].isPassable && distances[next] == nil {
+                distances[next] = (distances[point] ?? 0) + map[next].ground.movementCost
+                queue.append(next)
+            }
+        }
+        let candidates = map.allPoints.filter {
+            !occupied.contains($0) && map[$0].isPassable && map[$0].content == .empty
+                && $0.chebyshevDistance(to: entry) > 2
+                && distances[$0] != nil
+        }.sorted {
+            let left = distances[$0] ?? .max
+            let right = distances[$1] ?? .max
+            return (left, $0.y, $0.x) < (right, $1.y, $1.x)
+        }
+        guard !candidates.isEmpty else { return nil }
+        return rng.pick(Array(candidates.prefix(max(1, candidates.count / 3))))
+    }
+
+    private static func fieldNoteProse(index: Int) -> String {
+        switch index % 3 {
+        case 0: "Someone marked the firmer way through this place, then carried on."
+        case 1: "A second hand noted where the ground changed, and chose the steadier edge."
+        default: "The marks turn back from broken footing and resume where the path holds."
+        }
     }
 
     // MARK: The roster
@@ -320,7 +407,8 @@ enum Worldgen {
     ///
     /// Dispersion decides whether it's spread thin or gathered into fewer, richer places — which is
     /// what makes the concentrated↔pervasive axis worth writing.
-    static func nodeCount(for readings: PressureReadings, rng: inout SeededRNG) -> Int {
+    static func nodeCount(for readings: PressureReadings, multiplier: Double = 1,
+                          rng: inout SeededRNG) -> Int {
         let substrate = readings["substrate"]
         let vitality = readings["vitality"]
         let richness = (substrate.peak + vitality.peak) / Tuning.Pressure.scaleMaximum
@@ -335,7 +423,7 @@ enum Worldgen {
         // richness decides how much of it there is, and has to be the louder of the two.
         let spread = Tuning.World.nodeSpreadFloor
             + dispersion * (1 - Tuning.World.nodeSpreadFloor) * 2
-        return max(1, Int((base * (0.4 + richness) * spread).rounded()))
+        return max(1, Int((base * (0.4 + richness) * spread * multiplier).rounded()))
     }
 
     /// **What one node is worth, given how the world arranged its wealth.**
@@ -360,7 +448,8 @@ enum Worldgen {
     /// And it scales with **how much world there is**. The count was flat, so writing a large world
     /// bought you the same handful of animals spread over four times the ground — the bigger the
     /// world, the emptier it read.
-    static func enemyCount(for book: BoundBook, readings: PressureReadings, rng: inout SeededRNG,
+    static func enemyCount(for book: BoundBook, readings: PressureReadings,
+                           multiplier: Double = 1, rng: inout SeededRNG,
                            tiles: Int = Tuning.World.gridWidth * Tuning.World.gridHeight) -> Int {
         let tier = BookRules.enemyTier(of: book)
         let base = rng.int(in: Tuning.World.baseEnemyCountRange)
@@ -371,8 +460,13 @@ enum Worldgen {
         let life = Tuning.World.enemyCountAtDeath
             + productivity * (Tuning.World.enemyCountWhenTeeming - Tuning.World.enemyCountAtDeath)
         let area = Double(tiles) / Double(Tuning.World.gridWidth * Tuning.World.gridHeight)
-        let multiplied = Double(scaled) * BookRules.dangerProfile(for: book).spawnMultiplier * life * area
+        let multiplied = Double(scaled) * BookRules.dangerProfile(for: book).spawnMultiplier
+            * life * area * multiplier
         return max(1, Int(multiplied.rounded()))
+    }
+
+    private static func scaled(_ value: Int, by multiplier: Double) -> Int {
+        max(1, Int((Double(value) * multiplier).rounded()))
     }
 
     // MARK: Placement
@@ -433,9 +527,10 @@ enum Worldgen {
     /// Grown by the flora system, fought by the creature system (`flora-system-spec.md` §9.3), so
     /// there is no second combat model. It stands on its own growth, it is rooted there, and it is
     /// awake from the start — you are not ambushed by it, you walk into it.
-    private static func plantPredators(_ flora: [Flora], in map: WorldMap,
+    static func plantPredators(_ flora: [Flora], in map: WorldMap,
                                        avoiding occupied: inout Set<GridPoint>,
                                        clearOf entry: GridPoint,
+                                       multiplier: Double,
                                        rng: inout SeededRNG) -> [WorldEnemy] {
         let predatory = flora.filter { $0.traits.isPredatory }.sorted { $0.id.rawValue < $1.id.rawValue }
         guard !predatory.isEmpty else { return [] }
@@ -450,7 +545,8 @@ enum Worldgen {
                     && point.chebyshevDistance(to: entry) >= Tuning.World.enemyFreeRadiusAroundEntry
             }
             // Rare, and rarer still per world: a patch of it, not a field.
-            for _ in 0..<Tuning.Flora.predatorsPerKind {
+            let count = max(0, Int((Double(Tuning.Flora.predatorsPerKind) * multiplier).rounded()))
+            for _ in 0..<count {
                 guard let point = rng.pick(tiles.filter { !occupied.contains($0) }) else { break }
                 standing.append(WorldEnemy(id: InstanceID(rawValue: rng.next()),
                                            traits: FloraRules.combatant(from: plant.traits),

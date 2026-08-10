@@ -133,6 +133,30 @@
       "stabilityDelta": 0
     },
     {
+      "id": "spent_emanation_housing",
+      "name": "Spent Emanation Housing",
+      "icon": "heater.vertical",
+      "blurb": "The housing is empty. The stone around it is not.",
+      "category": "oldRuin",
+      "conditions": [
+        { "target": "thermal", "measure": "peak", "minimum": 65 },
+        { "target": "substrate", "measure": "form", "key": "volatile", "minimum": 35 },
+        { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 30 }
+      ],
+      "weight": 2,
+      "maximumPerWorld": 1,
+      "excludes": [],
+      "placement": { "rule": "interior", "minimumDistanceFromEntry": 5 },
+      "contents": {
+        "yields": { "essence_raw": 3, "ore": 2 },
+        "items": [],
+        "teaches": [],
+        "searchTurns": 2,
+        "essence": 0
+      },
+      "stabilityDelta": -4
+    },
+    {
       "id": "crystal_cavern",
       "name": "Crystal Cavern",
       "icon": "diamond",
@@ -278,6 +302,21 @@
       },
       "stabilityDelta": -12,
       "minimumNamedContradictions": 1
+    },
+    {
+      "id": "natural_anchor",
+      "name": "Atlas Seam",
+      "icon": "point.3.connected.trianglepath.dotted",
+      "blurb": "The world is already fastened here. Tovin's binding can follow the old join.",
+      "category": "landmark",
+      "conditions": [],
+      "weight": 0,
+      "maximumPerWorld": 1,
+      "excludes": [],
+      "placement": { "rule": "anywhere", "minimumDistanceFromEntry": 5 },
+      "contents": { "yields": {}, "items": [], "teaches": [], "searchTurns": 0, "essence": 0 },
+      "stabilityDelta": 0,
+      "isNaturalAnchor": true
     }
   ]
 }

@@ -34,12 +34,68 @@
       "selector": "ally.any"
     },
     {
+      "id": "subject_ally_back_rank",
+      "kind": "subject",
+      "name": "Ally: rank = back",
+      "icon": "person.2.fill",
+      "blurb": "Whichever ally in the back rank is worst off.",
+      "selector": "ally.backRank"
+    },
+    {
       "id": "subject_self",
       "kind": "subject",
       "name": "Self",
       "icon": "person.crop.circle",
       "blurb": "Reason about your own condition.",
       "selector": "self"
+    },
+    {
+      "id": "subject_self_recovery_complete",
+      "kind": "subject",
+      "name": "Self: recovery complete",
+      "icon": "arrow.clockwise.circle.fill",
+      "blurb": "The first action after all skipped-turn recovery has been paid.",
+      "selector": "self.recoveryComplete"
+    },
+    {
+      "id": "subject_foe_cannot_reach_self",
+      "kind": "subject",
+      "name": "Foe: cannot reach me",
+      "icon": "arrow.left.and.right",
+      "blurb": "A foe whose currently usable attacks cannot reach your rank.",
+      "selector": "foe.cannotReachSelf"
+    },
+    {
+      "id": "subject_foes_present_at_least_3",
+      "kind": "subject",
+      "name": "Foes present: at least 3",
+      "icon": "person.3.fill",
+      "blurb": "Any relevant foe while at least three hostile foes are still standing.",
+      "selector": "foes.presentAtLeast3"
+    },
+    {
+      "id": "subject_foe_unrecorded_species",
+      "kind": "subject",
+      "name": "Foe: unrecorded species",
+      "icon": "book.closed",
+      "blurb": "A species absent from the bestiary when this encounter began.",
+      "selector": "foe.unrecordedSpecies"
+    },
+    {
+      "id": "subject_foe_emanating",
+      "kind": "subject",
+      "name": "Foe: emanating",
+      "icon": "rays",
+      "blurb": "A foe whose emanation is active right now.",
+      "selector": "foe.emanating"
+    },
+    {
+      "id": "subject_ally_hp_below_any",
+      "kind": "subject",
+      "name": "Ally: HP below threshold, any",
+      "icon": "heart.slash",
+      "blurb": "True when any living ally is below the threshold; action targeting remains separate.",
+      "selector": "ally.hpBelowAny"
     },
 
     {

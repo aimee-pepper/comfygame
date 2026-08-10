@@ -660,9 +660,9 @@
         },
         {
           "id": "kindling",
-          "name": "Kindling",
+          "name": "Emanation",
           "icon": "bolt.fill",
-          "blurb": "Burn, freeze, shock, and holding them off. Answers warded and elemental foes.",
+          "blurb": "Heat, caustic and light emanations—and holding them off. Answers warded and emanating foes.",
           "nodes": [
             {
               "index": 1,
@@ -684,8 +684,8 @@
             },
             {
               "index": 3,
-              "name": "Elemental Strike",
-              "blurb": "Burn, freeze or shock, as it suits.",
+              "name": "Emanation Strike",
+              "blurb": "Strike through a ward with a searing emanation.",
               "effect": {
                 "kind": "skill"
               },

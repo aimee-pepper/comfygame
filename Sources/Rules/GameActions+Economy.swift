@@ -2,6 +2,38 @@ import Foundation
 
 /// Spending actions: the Workshop, the Storehouse, the Constellation, and opening a cache.
 extension GameStore {
+    @discardableResult func crystalliseEssence() -> Bool {
+        guard DistilleryRules.canCrystallise(in: state) else { return false }
+        var made = false
+        mutate("crystallise essence", flush: true) { made = DistilleryRules.crystallise(in: &$0) }
+        return made
+    }
+
+    @discardableResult func attuneCore(_ attunement: CoreAttunement,
+                                       candidate: DistilleryRules.Candidate,
+                                       catalyst: ResourceID) -> Bool {
+        guard DistilleryRules.canAttune(attunement, candidate: candidate, catalyst: catalyst, in: state) else { return false }
+        var made = false
+        mutate("attune \(attunement.rawValue) core", flush: true) {
+            made = DistilleryRules.attune(attunement, candidate: candidate, catalyst: catalyst, in: &$0)
+        }
+        return made
+    }
+
+    @discardableResult func constructConduitFixture() -> Bool {
+        var made = false
+        mutate("construct conduit fixture", flush: true) { made = DistilleryRules.constructConduit(in: &$0) }
+        return made
+    }
+
+    @discardableResult
+    func craftAnchorFrame() -> Bool {
+        guard AnchorFrameRules.canCraft(in: state) else { return false }
+        var crafted = false
+        mutate("craft Anchor Frame", flush: true) { crafted = AnchorFrameRules.craft(in: &$0) }
+        return crafted
+    }
+
 
     // MARK: - Workshop
 
@@ -55,14 +87,20 @@ extension GameStore {
     // MARK: Research
 
     func isComplete(_ node: ResearchNodeDef) -> Bool { EconomyRules.isComplete(node, in: state) }
+    func isSuppliedByKeeper(_ node: ResearchNodeDef) -> Bool {
+        !isComplete(node) && EconomyRules.stationTierAlreadySupplied(by: node, in: state)
+    }
     func isAvailable(_ node: ResearchNodeDef) -> Bool { EconomyRules.isAvailable(node, in: state) }
     func missingPrerequisites(for node: ResearchNodeDef) -> [String] {
         EconomyRules.missingPrerequisites(node, in: state)
     }
-    func shortfall(for node: ResearchNodeDef) -> [String] { EconomyRules.shortfall(node.cost, in: state) }
+    func paidCost(for node: ResearchNodeDef) -> UpgradeCost { EconomyRules.paidCost(for: node, in: state) }
+    func shortfall(for node: ResearchNodeDef) -> [String] {
+        EconomyRules.shortfall(paidCost(for: node), in: state)
+    }
 
     func canResearch(_ node: ResearchNodeDef) -> Bool {
-        EconomyRules.isAvailable(node, in: state) && EconomyRules.canAfford(node.cost, in: state)
+        EconomyRules.isAvailable(node, in: state) && EconomyRules.canAfford(paidCost(for: node), in: state)
     }
 
     /// Complete a research node. Everything buyable in the game goes through here — there is no
@@ -71,7 +109,7 @@ extension GameStore {
     func research(_ node: ResearchNodeDef) -> Bool {
         guard canResearch(node) else { return false }
         mutate("research \(node.id.rawValue)", flush: true) { state in
-            EconomyRules.pay(node.cost, in: &state)
+            EconomyRules.pay(EconomyRules.paidCost(for: node, in: state), in: &state)
             EconomyRules.complete(node, in: &state)
         }
         return true
@@ -80,7 +118,7 @@ extension GameStore {
     /// How far along a branch is, for the Workshop's summary line.
     func progress(in branch: ResearchBranchDef) -> (done: Int, total: Int) {
         let nodes = ContentCatalog.shared.nodes(in: branch.id)
-        return (nodes.count { isComplete($0) }, nodes.count)
+        return (nodes.count { isComplete($0) || isSuppliedByKeeper($0) }, nodes.count)
     }
 
     /// How many nodes in a branch you could buy **right now** — so the branch list can say which
@@ -89,6 +127,41 @@ extension GameStore {
         ContentCatalog.shared.nodes(in: branch.id).count {
             !isComplete($0) && isAvailable($0) && shortfall(for: $0).isEmpty
         }
+    }
+
+    func instrumentCraftingReadiness(for target: PressureTargetID) -> InstrumentCraftingRules.Readiness {
+        InstrumentCraftingRules.readiness(for: target, in: state)
+    }
+
+    @discardableResult
+    func improveInstrument(_ target: PressureTargetID) -> Bool {
+        guard instrumentCraftingReadiness(for: target).isReady else { return false }
+        var made = false
+        mutate("improve instrument \(target.rawValue)", flush: true) { state in
+            made = InstrumentCraftingRules.craftUpgrade(for: target, in: &state)
+        }
+        return made
+    }
+
+    func discoverConsumableRecipes() {
+        let inferred = Set(ConsumableCraftingRules.recipes.filter {
+            ConsumableCraftingRules.canInfer($0, in: state)
+        }.map(\.output))
+        let new = inferred.subtracting(state.base.knownConsumableRecipes)
+        guard !new.isEmpty else { return }
+        mutate("infer apothecary recipes", flush: true) {
+            $0.base.knownConsumableRecipes.formUnion(new)
+        }
+    }
+
+    @discardableResult
+    func craftConsumable(_ recipe: ConsumableCraftingRules.Recipe) -> Bool {
+        guard ConsumableCraftingRules.shortfall(recipe, in: state).isEmpty else { return false }
+        var crafted = false
+        mutate("prepare \(recipe.output.rawValue)", flush: true) {
+            crafted = ConsumableCraftingRules.craft(recipe, in: &$0)
+        }
+        return crafted
     }
 
     // MARK: - Storehouse
@@ -152,9 +225,16 @@ extension GameStore {
         guard isOnLockedCache, let key = carriedCacheKey, activeEncounter == nil else { return nil }
 
         var reward: EconomyRules.CacheReward?
+        var bonusName: String?
         mutate("open locked cache", flush: true) { state in
             guard var run = state.worlds.activeRun else { return }
             let rolled = EconomyRules.rollCacheReward(in: state, rng: &run.rng)
+            let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
+            if let id = ApexRules.cacheBonus(for: readings, rng: &run.rng) {
+                    let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()), catalogID: id)
+                    bonusName = ContentCatalog.shared.item(id)?.name ?? "Something you couldn't make"
+                    if !run.satchelItems.add(stack) { run.offeredItems.append(stack) }
+            }
             run.map[run.playerPosition].content = .empty
             state.worlds.activeRun = run
 
@@ -163,7 +243,8 @@ extension GameStore {
             reward = rolled
         }
         if let reward {
-            recentEvents = [.cacheOpened(EconomyRules.describe(reward))]
+            let bonus = bonusName.map { " A wild weapon was tucked beside it: \($0)." } ?? ""
+            recentEvents = [.cacheOpened(EconomyRules.describe(reward) + bonus)]
         }
         return reward
     }
@@ -228,16 +309,16 @@ extension GameStore {
     /// it directly: **+4 damage**, or **−2 protection**, or no change at all.
     /// The same question about a piece you don't hold — "what would one of these be worth?"
     func gearDelta(wearing definition: ItemDef, for member: PartyMember) -> Int {
-        delta(tier: definition.gear?.tier ?? 0, slot: definition.gear?.slot, for: member)
+        delta(power: Double(definition.gear?.tier ?? 0), slot: definition.gear?.slot, for: member)
     }
 
-    private func delta(tier: Int, slot: GearSlot?, for member: PartyMember) -> Int {
+    private func delta(power: Double, slot: GearSlot?, for member: PartyMember) -> Int {
         guard let slot else { return 0 }
-        let wornTier = worn(slot, by: member)?.effectiveTier ?? 0
+        let wornPower = worn(slot, by: member)?.effectivePower ?? 0
         let step = slot == .weapon
             ? Tuning.Encounter.attackPerWeaponTier
             : Tuning.Encounter.defencePerArmorTier
-        return (tier - wornTier) * step
+        return Int(((power - wornPower) * Double(step)).rounded())
     }
 
     /// Whether anything in the Storehouse would be an upgrade — drives the nudge on the Party card
@@ -262,6 +343,7 @@ extension GameStore {
     func forgetWorld(_ id: InstanceID) {
         mutate("forget world \(id.rawValue)", flush: true) { state in
             state.reality.library.visitedWorlds.removeAll { $0.id == id }
+            TutorialRules.reconcileComparisonPair(in: &state)
         }
     }
 
@@ -316,11 +398,11 @@ extension GameStore {
     /// What wearing this would change, for whoever you're looking at.
     func gearDelta(wearing stack: ItemStack, for slot: PartySlot) -> Int {
         guard let gear = ContentCatalog.shared.item(stack.catalogID)?.gear else { return 0 }
-        let wornTier = worn(gear.slot, by: slot)?.effectiveTier ?? 0
+        let wornPower = worn(gear.slot, by: slot)?.effectivePower ?? 0
         let step = gear.slot == .weapon
             ? Tuning.Encounter.attackPerWeaponTier
             : Tuning.Encounter.defencePerArmorTier
-        return (stack.effectiveTier - wornTier) * step
+        return Int(((stack.effectivePower - wornPower) * Double(step)).rounded())
     }
 
     func hasUpgradeAvailable(for gearSlot: GearSlot, slot: PartySlot) -> Bool {
@@ -478,6 +560,25 @@ extension GameStore {
             if let cost = station.buildCost { EconomyRules.pay(cost, in: &state) }
             state.base.stations[station.id] = StationState(isUnlocked: true,
                                                            tier: station.startingTier)
+            if station.id == Stations.tannery {
+                // A completed building must have an immediate verb. Wear is Corrin's free root;
+                // the later fit, Carry and Keep capabilities remain authored research choices.
+                state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearRoot)
+            }
+            if station.id == Stations.weaponsmith {
+                state.base.completedResearch.insert(PhysicalGearCraftingRules.weaponsmithPointRoot)
+            }
+            if station.id == Stations.channelworks {
+                let restored = DistilledCore(attunement: .heat, potency: 40,
+                                             sampleKind: "authored fixture",
+                                             sampleSource: "Oda's damaged conduit",
+                                             sampleQualifier: "intact, non-recoverable core",
+                                             catalystID: nil, catalystCount: 0,
+                                             recipeVersion: 0, stationID: Stations.channelworks)
+                state.base.store(ItemStack(id: InstanceID(rawValue: state.base.nextItemID()),
+                                           catalogID: Items.conduitFixture,
+                                           distilledCore: restored))
+            }
         }
         return true
     }
@@ -487,6 +588,29 @@ extension GameStore {
     /// How much stock is on the shelf at all, for the header — a hoard's worth in one number.
     var materialSampleCount: Int {
         state.base.inventory.stacks.reduce(0) { $0 + $1.materials.count }
+    }
+
+    func physicalGearReadiness(_ recipe: PhysicalGearCraftingRules.Recipe)
+        -> PhysicalGearCraftingRules.Readiness {
+        PhysicalGearCraftingRules.readiness(recipe, in: state)
+    }
+
+    @discardableResult
+    func craftPhysicalGear(_ preview: PhysicalGearCraftingRules.Preview) -> Bool {
+        var output: ItemStack?
+        mutate("craft \(preview.recipe.id)", flush: true) { state in
+            output = PhysicalGearCraftingRules.craft(preview, in: &state)
+        }
+        return output != nil
+    }
+
+    @discardableResult
+    func rebuildArmoury(_ preview: ArmouryRules.Preview, allowLegacyLoss: Bool) -> Bool {
+        var succeeded = false
+        mutate("armoury rebuild \(preview.target.id)", flush: true) { state in
+            succeeded = ArmouryRules.rebuild(preview, allowLegacyLoss: allowLegacyLoss, in: &state)
+        }
+        return succeeded
     }
 
     /// **Everything the smith could work on**, worn pieces included.

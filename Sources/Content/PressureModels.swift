@@ -139,6 +139,8 @@ struct PressureSourceDef: Codable, Equatable, Identifiable, Sendable {
         case research
         /// Found out there — in a site, a cache, or somebody's diary.
         case worldDrop
+        /// Taught by one authored diary page. Random caches must not pre-empt its owner.
+        case diary
     }
     /// **The targets this may be bound to.** Everything else it does still happens, as an implicit
     /// secondary — you simply can't *write* rain to make light. The rune spec says each source

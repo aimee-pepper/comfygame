@@ -3,6 +3,12 @@ import XCTest
 
 /// The legibility pillar, tested: what the Writing Desk promises is what the bind delivers.
 final class BookRulesTests: XCTestCase {
+    func testRawEssenceNeverConsumesCurrentOrLegacyHarvestNodeWeight() {
+        let readings = PressureRules.resolve([])
+        XCTAssertFalse(BookRules.yieldTable(from: readings).contains { $0.value == Resources.essenceRaw })
+        let legacy = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
+        XCTAssertFalse(BookRules.yieldTable(for: legacy).contains { $0.value == Resources.essenceRaw })
+    }
 
     // MARK: Preview matches reality
 
@@ -21,6 +27,19 @@ final class BookRulesTests: XCTestCase {
         XCTAssertEqual(book.essencePaid, projection.essenceCost.lowerBound)
         XCTAssertEqual(BookRules.enemyTier(of: book), projection.enemyTier.lowerBound)
         XCTAssertTrue(projection.stabilityScore.contains(BookRules.stabilityScore(of: book)))
+    }
+
+    func testTierFourBreakdownUsesTheSameTermsAsTheHeadline() throws {
+        let page = try page(["caverns", "ashen", "rich_ore", "gilded_veins"])
+        let projection = BookProjection.project(page: page,
+                                                analysisTier: Tuning.Analysis.attributionTier)
+        let book = BookRules.resolveBook(page: page)
+        let sigils = BookRules.sigils(for: book)
+        let expected = BookRules.stabilityDelta(of: book, sigils: sigils,
+                                                contradictionPenalty: projection.contradictionPenalty)
+        XCTAssertEqual(projection.greedStabilityDelta + projection.sizeStabilityDelta
+                       + projection.dangerStabilityDelta - projection.contradictionPenalty,
+                       expected)
     }
 
     /// **Under-specification is a subject you said nothing about**, and the band the player is
@@ -283,6 +302,33 @@ final class BookRulesTests: XCTestCase {
         XCTAssertEqual(run?.stability, Tuning.World.startingStability)
         XCTAssertEqual(store.state.reality.lifetime.runsStarted, 1)
         XCTAssertFalse(store.canBindAndDepart, "Can't bind a second book while already in a world")
+    }
+
+    @MainActor
+    func testBornAnchoredBindingPaysThePreviewedPremiumAndKeepsTheRealm() throws {
+        let store = GameStore(io: .temporary(name: "anchor-bind-\(UUID().uuidString)"))
+        store.mutate("prepare anchorage") { state in
+            state.base.stations[Stations.anchorage] = StationState(isUnlocked: true, tier: 0)
+            state.base.essence = 1_000
+        }
+        let essenceBefore = store.state.base.essence
+        let total = store.bookProjection.cost + store.bornAnchoredPremium
+
+        XCTAssertTrue(store.canBindAndDepart(bornAnchored: true))
+        XCTAssertTrue(store.bindAndDepart(bornAnchored: true))
+
+        let run = try XCTUnwrap(store.state.worlds.activeRun)
+        let realm = try XCTUnwrap(store.state.worlds.anchoredRealms.first)
+        XCTAssertEqual(store.state.base.essence, essenceBefore - total)
+        XCTAssertEqual(realm.runIndex, run.runIndex)
+        XCTAssertEqual(realm.route, .bornAnchored)
+        XCTAssertTrue(realm.world.satchelItems.stacks.isEmpty,
+                      "carried expedition supplies are not part of the permanent realm")
+
+        store.mutate("simulate return") { $0.worlds.activeRun = nil }
+        XCTAssertTrue(store.revisitAnchoredRealm(realm.id))
+        XCTAssertEqual(store.state.worlds.activeRun?.map, realm.world.map,
+                       "revisiting restores the saved realm instead of generating another world")
     }
 
     @MainActor

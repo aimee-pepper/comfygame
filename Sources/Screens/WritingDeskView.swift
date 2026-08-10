@@ -17,6 +17,8 @@ struct WritingDeskView: View {
     /// same act.
     @State private var ghost: GhostRune?
     @State private var pane: Pane = .write
+    @State private var bornAnchored = false
+    @State private var tutorialLesson: TutorialLessonID?
 
     @State private var bin: Bin = .compounds
 
@@ -91,6 +93,29 @@ struct WritingDeskView: View {
                 Button("Clear") { store.clearPage(); ghost = nil }
                     .disabled(state.base.page.runes.isEmpty)
             }
+        }
+        .safeAreaInset(edge: .bottom) {
+            if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
+                TutorialCard(lesson: lesson,
+                             gotIt: { tutorialLesson = nil },
+                             notNow: { store.deferTutorial(id); tutorialLesson = nil })
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 4)
+            }
+        }
+        .onAppear { presentWritingRequestIfNeeded() }
+        .onChange(of: ghost?.glyph) { _, glyph in
+            guard glyph != nil else { return }
+            present(.writingPageSpace)
+        }
+        .onChange(of: state.base.page.runes.count) { _, count in
+            if count > 0 { store.completeTutorial(.writingPageSpace, fact: "mark_placed") }
+        }
+        .onChange(of: pane) { _, pane in
+            guard pane == .world else { return }
+            present(.writingPreview)
+            store.completeTutorial(.writingPreview, fact: "world_pane_opened")
+            store.openedComparisonPreview()
         }
     }
 
@@ -184,7 +209,7 @@ struct WritingDeskView: View {
                          stability: store.stabilityOfWriting($0.id, on: id))
                 })
             }
-            let narrow = ContentCatalog.shared.qualifiers.filter { !$0.isGeneric && $0.applies(to: id) }
+            let narrow = PageRules.writableQualifiers(for: id).filter { !$0.isGeneric }
             if !narrow.isEmpty {
                 sectionLabel("Modifiers, only here")
                 chips(narrow.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id)) })
@@ -195,7 +220,7 @@ struct WritingDeskView: View {
             // section — Scale lives on Relief and nowhere else, and offering it beside a Sun is how
             // "a giant sun" became a thing you could write that did nothing at all (Aimee, 6 Aug).
             ForEach(ContentCatalog.shared.qualifierLaddersInUse, id: \.self) { ladder in
-                let rungs = ContentCatalog.shared.qualifiers(on: ladder).filter(\.isGeneric)
+                let rungs = PageRules.writableQualifiers().filter { $0.ladder == ladder && $0.isGeneric }
                 if !rungs.isEmpty {
                     sectionLabel(ladder.displayName)
                     chips(rungs.map { Chip(glyph: $0.id.rawValue, name: $0.name, content: .qualifier($0.id)) })
@@ -338,8 +363,22 @@ struct WritingDeskView: View {
 
     private var bindBar: some View {
         VStack(spacing: 6) {
+            if state.base.station(Stations.anchorage).isUnlocked {
+                Toggle(isOn: $bornAnchored) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Born anchored").font(.subheadline.weight(.semibold))
+                        Text("Keep this world in the Atlas · +\(store.bornAnchoredPremium) essence")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.horizontal, 4)
+                .accessibilityIdentifier("writing.born-anchored")
+            }
             Button {
-                store.bindAndDepart()
+                if store.bindAndDepart(bornAnchored: bornAnchored) {
+                    store.completeTutorial(.writingPageRequest, fact: "first_bind")
+                    store.completeTutorial(.writingBind, fact: "first_run_created")
+                }
             } label: {
                 HStack {
                     Label("Bind & Depart", systemImage: "book.closed.fill")
@@ -351,11 +390,11 @@ struct WritingDeskView: View {
                 .padding(.horizontal, 4)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(!store.canBindAndDepart)
+            .disabled(!store.canBindAndDepart(bornAnchored: bornAnchored))
 
             Text(bindFootnote)
                 .font(.caption)
-                .foregroundStyle(store.canBindAndDepart ? Color.secondary : Color.orange)
+                .foregroundStyle(store.canBindAndDepart(bornAnchored: bornAnchored) ? Color.secondary : Color.orange)
                 .multilineTextAlignment(.center)
         }
         .padding(.horizontal, 16)
@@ -364,17 +403,29 @@ struct WritingDeskView: View {
         .background(.bar)
     }
 
-    private var costLabel: String { "\(projection.cost)" }
+    private var totalCost: Int { projection.cost + (bornAnchored ? store.bornAnchoredPremium : 0) }
+    private var costLabel: String { "\(totalCost)" }
 
     private var bindFootnote: String {
-        if !store.canBindAndDepart {
+        if !store.canBindAndDepart(bornAnchored: bornAnchored) {
             if store.needsToRefine {
                 let raw = state.base.resources[Resources.essenceRaw]
                 return "You have \(state.base.essence) essence and \(raw) raw. Refine it at the Workshop — raw essence can't be written with."
             }
-            return "You have \(state.base.essence) essence; this book costs \(projection.cost). Erase a mark or two to write something cheaper."
+            return "You have \(state.base.essence) essence; this binding costs \(totalCost). Erase a mark or bind it without anchoring."
         }
-        return "Costs \(projection.cost) essence of your \(state.base.essence)."
+        return "Costs \(totalCost) essence of your \(state.base.essence)."
+    }
+
+    private func presentWritingRequestIfNeeded() {
+        store.tutorialEligible(.writingPageRequest)
+        present(.writingPageRequest)
+    }
+
+    private func present(_ id: TutorialLessonID) {
+        guard tutorialLesson == nil, store.state.tutorial[id].status != .completed else { return }
+        store.tutorialEligible(id)
+        tutorialLesson = id
     }
 }
 

@@ -7,6 +7,7 @@ import SwiftUI
 /// never a new button welded into this file.
 struct BaseView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var routeCardHidden = false
 
     private var state: GameState { store.state }
 
@@ -14,6 +15,7 @@ struct BaseView: View {
         ScrollView {
             VStack(spacing: 16) {
                 purse
+                firstReturnRouteCard
                 stations
                 buildingSites
                 departure
@@ -24,6 +26,7 @@ struct BaseView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Base")
         .navigationBarTitleDisplayMode(.large)
+        .onAppear { routeCardHidden = false }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink(value: AppRoute.settings) {
@@ -50,15 +53,59 @@ struct BaseView: View {
         }
     }
 
+    @ViewBuilder private var firstReturnRouteCard: some View {
+        if !routeCardHidden,
+           let context = state.tutorial.firstReturnContext,
+           state.tutorial[.returnPersistenceBoundary].status == .completed,
+           state.tutorial[.baseFirstResultRoute].status != .completed {
+            let route = TutorialRules.destination(for: context.route)
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Follow what returned").font(.headline)
+                Text(TutorialRules.routeCopy(context, in: state)).font(.subheadline)
+                HStack {
+                    Button("Not now") {
+                        store.deferTutorial(.baseFirstResultRoute)
+                        routeCardHidden = true
+                    }
+                    Spacer()
+                    NavigationLink(value: route) {
+                        Text("Open \(destinationName(context.route))")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .simultaneousGesture(TapGesture().onEnded {
+                        store.openedFirstReturnDestination(route)
+                    })
+                }
+            }
+            .padding(14)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(.tint.opacity(0.35)))
+        }
+    }
+
+    private func destinationName(_ route: FirstReturnTutorialContext.Route) -> String {
+        switch route {
+        case .library: "Library"
+        case .storehouse: "Storehouse"
+        case .workshop: "Workshop"
+        case .firepit: "Firepit"
+        case .writingDesk: "Writing Desk"
+        }
+    }
+
     // MARK: Stations
 
     private var stations: some View {
         VStack(spacing: 10) {
             ForEach(unlockedStations) { station in
-                NavigationLink(value: AppRoute(rawValue: station.route) ?? .base) {
+                let route = AppRoute(rawValue: station.route) ?? .base
+                NavigationLink(value: route) {
                     StationRow(station: station, tier: state.base.station(station.id).tier)
                 }
                 .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded {
+                    store.openedFirstReturnDestination(route)
+                })
             }
         }
     }
@@ -95,6 +142,9 @@ struct BaseView: View {
                     .frame(minHeight: 56) // primary action, thumb zone, well over 44pt
             }
             .buttonStyle(.borderedProminent)
+            .simultaneousGesture(TapGesture().onEnded {
+                store.openedFirstReturnDestination(.writingDesk)
+            })
 
             Text(departureHint)
                 .font(.caption)

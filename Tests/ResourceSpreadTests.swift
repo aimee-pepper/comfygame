@@ -39,8 +39,10 @@ final class ResourceSpreadTests: XCTestCase {
     func testEveryResourceIsReachableBySomeWorld() {
         var unreachable = Set(ContentCatalog.shared.resources.map(\.id))
         var seeds = SeedSequence(rootSeed: 99)
-        // Motes are banked separately and never appear in the yield table.
+        // Motes are banked separately; Raw Essence is an independently placed wild drop. Neither
+        // is allowed to consume an ordinary harvest-node draw.
         unreachable.remove(Resources.mote)
+        unreachable.remove(Resources.essenceRaw)
         for _ in 0..<400 {
             for id in yields(rolled(seeds.nextSeed())) { unreachable.remove(id) }
         }

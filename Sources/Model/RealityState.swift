@@ -5,6 +5,25 @@ import Foundation
 /// Only put something here if losing it in a reset would feel like losing the *player's* history
 /// rather than the *character's* possessions.
 struct RealityState: Codable, Equatable, Sendable {
+    enum InstrumentPrecision: Int, Codable, Comparable, Sendable {
+        case crude = 1, good = 2, fine = 3
+
+        static func < (lhs: Self, rhs: Self) -> Bool { lhs.rawValue < rhs.rawValue }
+    }
+
+    struct SubjectObservation: Codable, Equatable, Sendable {
+        var count: Int
+        var lowest: Double
+        var highest: Double
+        var bestPrecision: InstrumentPrecision
+
+        mutating func add(peak: Double, floor: Double, precision: InstrumentPrecision) {
+            count += 1
+            lowest = min(lowest, floor)
+            highest = max(highest, peak)
+            bestPrecision = max(bestPrecision, precision)
+        }
+    }
     /// Rare currency; spent only on Constellation nodes.
     var motes: Int = 0
     /// Purchased rank per Constellation node (absent = unpurchased). Data-driven: node
@@ -38,8 +57,21 @@ struct RealityState: Codable, Equatable, Sendable {
     /// should take your kit away, this is the line to move. Logged for Aimee.
     var instruments: Set<PressureTargetID> = []
 
-    /// Whether this subject's numbers are readable at all. The lens shows what you have measured.
-    func measures(_ target: PressureTargetID) -> Bool { instruments.contains(target) }
+    /// The best physical instrument owned for each subject. Kept beside `instruments` for tolerant
+    /// migration: old saves still decode their owned set, and each old instrument begins crude.
+    var instrumentPrecisions: [PressureTargetID: InstrumentPrecision] = [:]
+
+    func instrumentPrecision(for target: PressureTargetID) -> InstrumentPrecision {
+        instrumentPrecisions[target] ?? .crude
+    }
+
+    /// Compact permanent field knowledge. Ownership lets an instrument work in a world; an entry
+    /// here means the player has actually taken that reading and calibrated the desk lens with it.
+    var observations: [PressureTargetID: SubjectObservation] = [:]
+
+    /// Whether this subject's numbers are readable at home. Buying the tool alone is not a reading.
+    func measures(_ target: PressureTargetID) -> Bool { observations[target] != nil }
+    var calibratedSubjects: Set<PressureTargetID> { Set(observations.keys) }
 
     /// Seeds of worlds the player has actually stood in.
     ///
@@ -88,6 +120,10 @@ struct RealityState: Codable, Equatable, Sendable {
         analysisTier = try container.decodeIfPresent(Int.self, forKey: .analysisTier)
             ?? Tuning.Analysis.startingTier
         instruments = try container.decodeIfPresent(Set<PressureTargetID>.self, forKey: .instruments) ?? []
+        instrumentPrecisions = try container.decodeIfPresent(
+            [PressureTargetID: InstrumentPrecision].self, forKey: .instrumentPrecisions) ?? [:]
+        observations = try container.decodeIfPresent([PressureTargetID: SubjectObservation].self,
+                                                      forKey: .observations) ?? [:]
         visitedWorldSeeds = try container.decodeIfPresent(Set<UInt64>.self, forKey: .visitedWorldSeeds) ?? []
         library = try container.decodeIfPresent(LibraryState.self, forKey: .library) ?? LibraryState()
     }

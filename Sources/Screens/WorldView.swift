@@ -8,8 +8,15 @@ import SwiftUI
 /// zone, which the brief offers for exactly this reason. Every button is ≥44pt.
 struct WorldView: View {
     @EnvironmentObject private var store: GameStore
-    /// Open when you're rummaging for something to use. Out here, not only mid-fight.
-    @State private var isUsingItem = false
+    /// Everything that crossed the threshold and can be consulted or used outside combat.
+    @State private var isShowingFieldKit = false
+    @State private var isConfirmingAtlasSeam = false
+    @State private var isConfirmingAnchorFrame = false
+    @State private var tutorialLesson: TutorialLessonID?
+    @State private var dismissedTutorials: Set<TutorialLessonID> = []
+#if DEBUG
+    @State private var isShowingDiagnostics = false
+#endif
 
     private var run: WorldRun? { store.state.worlds.activeRun }
 
@@ -17,6 +24,7 @@ struct WorldView: View {
         VStack(spacing: 0) {
             if let run {
                 StabilityHeader(run: run)
+                PartyHealthStrip(run: run, state: store.state)
                 ScrollView {
                     VStack(spacing: 12) {
                         LootDecisionCard()
@@ -34,14 +42,68 @@ struct WorldView: View {
             }
         }
         .background(Color(.systemGroupedBackground))
+#if DEBUG
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { isShowingDiagnostics = true } label: { Image(systemName: "stethoscope") }
+                    .accessibilityLabel("World diagnostics")
+            }
+        }
+        .sheet(isPresented: $isShowingDiagnostics) {
+            if let run { WorldDiagnosticsView(run: run) }
+        }
+#endif
         // **Standing on somebody opens the scene.** Driven off the map rather than off an event, so
         // a force-quit mid-conversation resumes with the conversation still open — you are still
         // standing there, and they are still waiting (pillar 2).
         .sheet(item: Binding(get: { store.travellerHere }, set: { _ in })) { traveller in
             TravellerMeetingView(traveller: traveller).environmentObject(store)
         }
-        .sheet(isPresented: $isUsingItem) {
-            UseItemSheet().environmentObject(store)
+        .sheet(isPresented: $isShowingFieldKit) {
+            FieldKitSheet().environmentObject(store)
+        }
+        .alert("Bind this world at the Atlas Seam?", isPresented: $isConfirmingAtlasSeam) {
+            Button("Cancel", role: .cancel) {}
+            Button("Anchor for \(store.naturalAnchorCost) essence") {
+                store.anchorAtNaturalPoint()
+            }
+        } message: {
+            Text("The realm will remain in Tovin's Anchorage and can be revisited after this expedition ends.")
+        }
+        .alert("Place the Anchor Frame here?", isPresented: $isConfirmingAnchorFrame) {
+            Button("Cancel", role: .cancel) {}
+            Button("Place frame") { store.placeAnchorFrame() }
+        } message: {
+            Text("The frame will be consumed and this realm will remain in the Anchorage. No additional essence is charged.")
+        }
+        .safeAreaInset(edge: .bottom) {
+            if let id = tutorialLesson, let lesson = TutorialRules.definition(id), !tutorialSuppressed {
+                TutorialCard(lesson: lesson,
+                             gotIt: { dismissedTutorials.insert(id); tutorialLesson = nil },
+                             notNow: {
+                                 dismissedTutorials.insert(id)
+                                 store.deferTutorial(id)
+                                 tutorialLesson = nil
+                             })
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 4)
+            }
+        }
+        .onAppear { presentNextWorldLesson() }
+        .onChange(of: run?.playerPosition) { old, new in
+            guard old != new else { return }
+            if store.state.tutorial[.worldNavigation].status != .completed {
+                present(.worldNavigation)
+                store.completeTutorial(.worldNavigation, fact: "first_movement")
+            }
+            presentNextWorldLesson()
+        }
+        .onChange(of: run?.turnsTaken) { old, new in
+            guard let old, let new, new > old else { return }
+            if store.state.tutorial[.worldStability].status != .completed {
+                present(.worldStability)
+                store.completeTutorial(.worldStability, fact: "post_turn_meter_seen")
+            }
         }
     }
 
@@ -89,6 +151,7 @@ struct WorldView: View {
     private func narrate(_ event: WorldRules.Event) -> String? {
         switch event {
         case .moved: nil // the map already says where you are
+        case .enteredSlowGround(let ground): "Crossing \(ground) took an extra turn."
         case .blocked(let why): why
         case .pickedUp(let resource, let amount):
             "Picked up \(amount) \(ContentCatalog.shared.resource(resource)?.name.lowercased() ?? "something")."
@@ -101,11 +164,14 @@ struct WorldView: View {
         case .readPage(let id):
             ContentCatalog.shared.diaryPage(id).map { "A page, in somebody's hand. \"\($0.prose)\"" }
                 ?? "A page from someone's diary."
+        case .readFoundWriting(_, let prose): "A weathered field note. \"\(prose)\""
         case .foundTraveller(let id):
             ContentCatalog.shared.traveller(id).map { "\($0.name) is coming with you." }
                 ?? "They're coming with you."
         case .usedItem(let what, let member):
             "\(what). \(member == .binder ? "You feel" : "They feel") better."
+        case .surveyed(let readings):
+            "Surveyed: " + readings.map { "\($0.name) \($0.text)" }.joined(separator: ", ") + "."
         case .metTraveller(let id):
             ContentCatalog.shared.traveller(id).map { "\($0.name), \($0.calling). \($0.blurb)" }
                 ?? "Someone is here."
@@ -121,6 +187,9 @@ struct WorldView: View {
             "You can write \(ContentCatalog.shared.symbol(symbol)?.name ?? "something new") now."
         case .learnedFocus(let focus):
             "A word you didn't have: \(ContentCatalog.shared.pressureSource(focus)?.name ?? "something new")."
+        case .learnedGambit(let component):
+            "A gambit phrase you didn't have: \(ContentCatalog.shared.gambitComponent(component)?.name ?? "something new")."
+        case .learnedPattern: "A workshop pattern you didn't have."
         case .gainedEssence(let amount): "\(amount) essence, banked."
         case .pickedUpItem(let what): "\(what) You can't tell what it is."
         case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."
@@ -151,9 +220,10 @@ struct WorldView: View {
     private func colour(for event: WorldRules.Event) -> Color {
         switch event {
         case .pickedUp, .harvested, .foundPortal, .pickedUpItem, .searchedSite, .siteOpened: .primary
-        case .foundSite, .learnedSymbol, .learnedFocus, .gainedEssence: .primary
+        case .foundSite, .learnedSymbol, .learnedFocus, .learnedGambit, .learnedPattern, .gainedEssence: .primary
         case .readPage, .foundTraveller, .metTraveller: .primary
-        case .usedItem: .green
+        case .usedItem, .surveyed: .green
+        case .enteredSlowGround: .orange
         case .nightfall, .daybreak: .secondary
         case .cacheOpened: .purple
         case .satchelFull: .orange
@@ -175,10 +245,6 @@ struct WorldView: View {
     /// because those two are what you actually check.
     private func satchel(_ run: WorldRun) -> some View {
         HStack(spacing: 12) {
-            Label("\(run.binderHP)", systemImage: "heart.fill")
-                .foregroundStyle(run.binderHP <= Tuning.Encounter.binderMaxHP / 3 ? .red : .primary)
-                .fixedSize()
-
             if run.satchel.isEmpty {
                 Text("satchel empty").foregroundStyle(.secondary)
                 Spacer(minLength: 0)
@@ -197,17 +263,16 @@ struct WorldView: View {
                 .frame(maxWidth: .infinity)
             }
 
-            if !store.carriedConsumables.isEmpty {
-                Button { isUsingItem = true } label: {
-                    Label("\(store.carriedConsumables.count)", systemImage: "cross.vial")
+            Button { isShowingFieldKit = true } label: {
+                    Label("Field Kit", systemImage: "backpack.fill")
                         .labelStyle(.titleAndIcon)
                         .frame(minHeight: 44)
                         .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.green)
-                .fixedSize()
             }
+            .buttonStyle(.plain)
+            .foregroundStyle(.teal)
+            .fixedSize()
+            .accessibilityIdentifier("world.field-kit")
             Text("turn \(run.turnsTaken)").foregroundStyle(.secondary).fixedSize()
         }
         .font(.footnote.monospacedDigit())
@@ -220,17 +285,30 @@ struct WorldView: View {
 
     private func controls(_ run: WorldRun) -> some View {
         HStack(alignment: .bottom, spacing: 14) {
-            DirectionPad { direction in
-                store.step(to: GridPoint(x: run.playerPosition.x + direction.dx,
-                                         y: run.playerPosition.y + direction.dy))
+            VStack(spacing: 8) {
+                DirectionPad { direction in
+                    store.step(to: GridPoint(x: run.playerPosition.x + direction.dx,
+                                             y: run.playerPosition.y + direction.dy))
+                }
+                MinimapView(run: run)
             }
 
             VStack(spacing: 8) {
+                if store.canSurvey {
+                    ActionButton("Survey", icon: "scope",
+                                 detail: "\(run.carriedInstruments.count) instruments · 1 turn",
+                                 isProminent: false) {
+                        completeInteraction()
+                        store.survey()
+                    }
+                    .accessibilityIdentifier("world.survey")
+                }
                 if let node = store.harvestableHere {
                     ActionButton("Harvest \(ContentCatalog.shared.resource(node.resource)?.name ?? "")",
                                  icon: "cube.fill",
                                  detail: "\(node.remainingHarvests) left",
                                  isProminent: true) {
+                        completeInteraction()
                         store.harvest()
                     }
                 }
@@ -241,12 +319,36 @@ struct WorldView: View {
                                      ? "\(definition.contents.searchTurns) turns"
                                      : "\(site.searchTurnsRemaining) turns left",
                                  isProminent: true) {
+                        completeInteraction()
                         store.searchSite()
+                    }
+                }
+                if let anchor = store.naturalAnchorHere, anchor.definition != nil {
+                    ActionButton("Use the Atlas Seam", icon: "point.3.connected.trianglepath.dotted",
+                                 detail: store.canUseNaturalAnchor
+                                     ? "\(store.naturalAnchorCost) essence"
+                                     : "needs the Anchorage and \(store.naturalAnchorCost) essence",
+                                 isProminent: true,
+                                 isEnabled: store.canUseNaturalAnchor) {
+                        completeInteraction()
+                        isConfirmingAtlasSeam = true
+                    }
+                }
+                if store.carriedAnchorFrame != nil {
+                    ActionButton("Place Anchor Frame", icon: "square.on.square.intersection.dashed",
+                                 detail: store.canPlaceAnchorFrame
+                                     ? "anchor this world here"
+                                     : "needs clear, ordinary ground",
+                                 isProminent: store.canPlaceAnchorFrame,
+                                 isEnabled: store.canPlaceAnchorFrame) {
+                        completeInteraction()
+                        isConfirmingAnchorFrame = true
                     }
                 }
                 if store.canPortalHere {
                     ActionButton("Portal home", icon: "arrow.down.left.circle.fill",
                                  detail: "keep everything", isProminent: true) {
+                        store.completeTutorial(.worldReturn, fact: "first_expedition_outcome")
                         store.portalHome()
                     }
                 }
@@ -257,10 +359,11 @@ struct WorldView: View {
                                  detail: hasKey ? "spends your key" : "needs a key found elsewhere",
                                  isProminent: hasKey,
                                  isEnabled: hasKey) {
+                        completeInteraction()
                         store.openCacheHere()
                     }
                 }
-                if store.harvestableHere == nil && store.searchableHere == nil
+                if store.harvestableHere == nil && store.searchableHere == nil && store.naturalAnchorHere == nil
                     && !store.canPortalHere && !store.isOnLockedCache {
                     Text(hint(for: run))
                         .font(.caption)
@@ -284,6 +387,164 @@ struct WorldView: View {
         case .crumbling: "The world is falling in. Find a portal."
         case .collapsed: "Gone."
         }
+    }
+
+    private var tutorialSuppressed: Bool {
+        guard let run else { return true }
+        return run.activeEncounter != nil || !run.offeredItems.isEmpty
+    }
+
+    private var hasActionHere: Bool {
+        store.canSurvey || store.harvestableHere != nil || store.searchableHere != nil
+            || store.naturalAnchorHere != nil || store.canPlaceAnchorFrame || store.canPortalHere
+            || store.isOnLockedCache
+    }
+
+    private func present(_ id: TutorialLessonID) {
+        guard tutorialLesson == nil, !tutorialSuppressed,
+              !dismissedTutorials.contains(id),
+              store.state.tutorial[id].status != .completed else { return }
+        store.tutorialEligible(id)
+        tutorialLesson = id
+    }
+
+    private func presentNextWorldLesson() {
+        guard tutorialLesson == nil, !tutorialSuppressed, let run else { return }
+        if store.state.tutorial[.worldNavigation].status != .completed {
+            present(.worldNavigation)
+        } else if run.turnsTaken > 0 && store.state.tutorial[.worldStability].status != .completed {
+            present(.worldStability)
+        } else if hasActionHere && store.state.tutorial[.worldInteraction].status != .completed {
+            present(.worldInteraction)
+        } else if store.canPortalHere && store.state.tutorial[.worldReturn].status != .completed {
+            present(.worldReturn)
+        }
+    }
+
+    private func completeInteraction() {
+        store.completeTutorial(.worldInteraction, fact: "first_valid_world_action")
+        if tutorialLesson == .worldInteraction { tutorialLesson = nil }
+    }
+}
+
+#if DEBUG
+private struct WorldDiagnosticsView: View {
+    @Environment(\.dismiss) private var dismiss
+    let run: WorldRun
+
+    private var nodes: [ResourceID: Int] {
+        run.map.tiles.reduce(into: [:]) { result, tile in
+            if case .node(let node) = tile.content {
+                result[node.resource, default: 0] += node.remainingHarvests * node.yieldPerHarvest
+            }
+        }
+    }
+    private var pageCount: Int { run.map.tiles.count { if case .diaryPage = $0.content { true } else { false } } }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Identity") {
+                    LabeledRow(icon: "number", label: "Seed", value: "\(run.mapSeed)")
+                    LabeledRow(icon: "clock", label: "Turn", value: "\(run.turnsTaken)")
+                }
+                Section("Writing") {
+                    LabeledRow(icon: "book.pages", label: "Diary pages remaining", value: "\(pageCount)")
+                    LabeledRow(icon: "note.text", label: "Other-writing records generated", value: "\(run.foundWritings.count)")
+                    LabeledRow(icon: "percent", label: "Diary mix snapshot",
+                               value: run.tuning.diaryWritingShare.formatted(.percent.precision(.fractionLength(0))))
+                    LabeledRow(icon: "hourglass", label: "Patience floor", value: "\(run.tuning.diaryPatienceWorlds) worlds")
+                }
+                Section("Population") {
+                    LabeledRow(icon: "hare", label: "Creature species", value: "\(run.cast.count)")
+                    LabeledRow(icon: "pawprint", label: "Creature instances", value: "\(run.enemies.count)")
+                    LabeledRow(icon: "crown", label: "Apex result", value: run.enemies.contains(where: \.isApex) ? "placed" : "none")
+                    LabeledRow(icon: "leaf", label: "Flora records", value: "\(run.flora.count)")
+                    LabeledRow(icon: "burst", label: "Active flora", value: "\(run.enemies.count(where: \.isSessile))")
+                }
+                Section("World duration") {
+                    LabeledRow(icon: "gauge", label: "Stability score", value: "\(run.effectiveStabilityScore)")
+                    LabeledRow(icon: "timer", label: "Turns remaining",
+                               value: "\(max(0, Int(ceil(run.stability / max(0.01, run.decayPerTurn)))))")
+                    LabeledRow(icon: "shippingbox", label: "Collapse recovery",
+                               value: run.tuning.collapseRecoveryFraction.formatted(.percent.precision(.fractionLength(0))))
+                }
+                Section("Placed resources") {
+                    let rawDrops = run.map.tiles.compactMap { tile -> Int? in
+                        if case .wildDrop(let resource, let amount) = tile.content,
+                           resource == Resources.essenceRaw { return amount }
+                        return nil
+                    }
+                    LabeledRow(icon: "drop.fill", label: "Raw Essence wild drops",
+                               value: "\(rawDrops.count) · \(rawDrops.reduce(0, +)) obtainable")
+                    if nodes.isEmpty { Text("None") }
+                    ForEach(nodes.keys.sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { id in
+                        LabeledRow(icon: ContentCatalog.shared.resource(id)?.icon ?? "cube",
+                                   label: ContentCatalog.shared.resource(id)?.name ?? id.rawValue,
+                                   value: "\(nodes[id] ?? 0)")
+                    }
+                }
+                Section("Traveller placement") {
+                    if run.travellersHere.isEmpty { Text("No travellers placed") }
+                    ForEach(run.travellersHere, id: \.self) { id in
+                        Text(ContentCatalog.shared.traveller(id)?.name ?? id.rawValue)
+                    }
+                }
+            }
+            .navigationTitle("World diagnostics")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+        }
+    }
+}
+#endif
+
+private struct PartyHealthStrip: View {
+    let run: WorldRun
+    let state: GameState
+
+    var body: some View {
+        HStack(spacing: 14) {
+            health("You", icon: "person.fill", current: run.binderHP,
+                   maximum: CombatRules.maximumHealth(of: .binder, in: state))
+            ForEach(state.base.activeParty, id: \.self) { index in
+                let member = state.base.roster[index]
+                health(member.name, icon: member.icon,
+                       current: run.companionHP[index] ?? CombatRules.maximumHealth(of: .companion(index), in: state),
+                       maximum: CombatRules.maximumHealth(of: .companion(index), in: state))
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+        .background(.bar)
+    }
+
+    private func health(_ name: String, icon: String, current: Int, maximum: Int) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.caption)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text(name).lineLimit(1)
+                    Spacer(minLength: 4)
+                    Text("\(current)/\(maximum)").monospacedDigit()
+                }
+                .font(.caption2)
+                GeometryReader { proxy in
+                    Capsule()
+                        .fill(Color(.tertiarySystemFill))
+                        .overlay(alignment: .leading) {
+                            Capsule()
+                                .fill(current <= maximum / 3 ? Color.red : Color.green)
+                                .frame(width: proxy.size.width * min(1, max(0, Double(current) / Double(maximum))))
+                        }
+                }
+                .frame(height: 5)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(name) health \(current) of \(maximum)")
     }
 }
 
@@ -437,6 +698,13 @@ private struct TileView: View {
                     .font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
                     .foregroundStyle(tint)
             }
+            if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
+                CrackShape()
+                    .stroke(Color.orange.opacity(0.95), style: StrokeStyle(lineWidth: max(1, side * 0.07),
+                                                                          lineCap: .round,
+                                                                          lineJoin: .round))
+                    .padding(side * 0.12)
+            }
         }
         .frame(width: side, height: side)
         .contentShape(Rectangle())
@@ -454,6 +722,7 @@ private struct TileView: View {
         case .portal(let isEntry): return isEntry ? "arrow.down.left.circle" : "circle.circle"
         case .lockedCache: return "lock.fill"
         case .diaryPage: return "doc.text"
+        case .foundWriting: return "note.text"
         case .site: return site?.icon ?? "building.columns"
         // A person reads as a person, in their own colour — see `tint`.
         case .traveller(let id): return ContentCatalog.shared.traveller(id)?.icon ?? "figure.wave"
@@ -469,6 +738,7 @@ private struct TileView: View {
         case .lockedCache: return .purple
         case .wildDrop: return .teal
         case .diaryPage: return .indigo
+        case .foundWriting: return .cyan
         case .site: return site?.category == .hazard ? .orange : .brown
         // Green, and nothing else on the map is green. A person standing in a world you wrote is
         // the single most interesting thing on the grid and has to look like it.
@@ -488,6 +758,7 @@ private struct TileView: View {
         case .water: Color(red: 0.30, green: 0.52, blue: 0.72)
         case .deepWater: Color(red: 0.16, green: 0.30, blue: 0.52)
         case .rubble: Color(red: 0.50, green: 0.46, blue: 0.42)
+        case .mud: Color(red: 0.31, green: 0.25, blue: 0.18)
         case .growth: Color(red: 0.30, green: 0.48, blue: 0.28)
         // Lighter and yellower than a thicket — you can see over it, and it should look like you
         // can. The difference has to be legible at a glance or the sightline rule is a surprise.
@@ -503,6 +774,22 @@ private struct TileView: View {
         if tile.isCrumbled { return Palette.mapVoid }
         // Unseen ground stays fog; seen ground shows what it's made of.
         return tile.isRevealed ? groundColour : Palette.mapFog
+    }
+}
+
+/// A deliberately simple fissure that stays readable at tiny map-tile sizes.
+private struct CrackShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX * 0.9, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.midX * 1.12, y: rect.height * 0.32))
+        path.addLine(to: CGPoint(x: rect.midX * 0.78, y: rect.height * 0.56))
+        path.addLine(to: CGPoint(x: rect.midX * 1.05, y: rect.maxY))
+        path.move(to: CGPoint(x: rect.midX * 0.78, y: rect.height * 0.56))
+        path.addLine(to: CGPoint(x: rect.width * 0.18, y: rect.height * 0.72))
+        path.move(to: CGPoint(x: rect.midX * 1.12, y: rect.height * 0.32))
+        path.addLine(to: CGPoint(x: rect.width * 0.82, y: rect.height * 0.18))
+        return path
     }
 }
 
@@ -597,25 +884,80 @@ private struct ActionButton: View {
 }
 
 
-/// Using something out in the world. **A turn is the price** — the currency the world already
-/// charges, which keeps healing from being free and makes patching up mid-collapse a decision.
-private struct UseItemSheet: View {
+/// A truthful inventory of what crossed the threshold. Instruments are fixed for the trip;
+/// consumables can be used here, outside combat, for one world turn.
+private struct FieldKitSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    let instruments = ContentCatalog.shared.pressureTargetsInOrder.filter {
+                        store.activeRun?.carriedInstruments.contains($0.id) == true
+                    }
+                    if instruments.isEmpty {
+                        Text("No instruments packed for this trip.")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(instruments) { target in
+                            LabeledRow(icon: target.icon, label: target.name, value: "carried")
+                        }
+                    }
+                } header: {
+                    Text("Instruments")
+                } footer: {
+                    Text("Choose next trip's instruments at Mara's Survey Post.")
+                }
+
+                if store.carriedConsumables.isEmpty {
+                    Section("Consumables") {
+                        Text("No usable items carried.").foregroundStyle(.secondary)
+                    }
+                }
                 ForEach(store.carriedConsumables) { stack in
                     Section {
-                        ForEach(store.partyMembers) { member in
+                        if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .heal {
+                            ForEach(store.partyMembers) { member in
+                                Button {
+                                    store.useItemInWorld(stack, on: member)
+                                    dismiss()
+                                } label: {
+                                    LabeledRow(icon: "heart.fill",
+                                               label: store.name(of: member),
+                                               value: health(of: member))
+                                    .frame(minHeight: 44)
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        } else if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .identifyCurio {
+                            if store.carriedUnidentifiedCurios.isEmpty {
+                                Text("No unidentified curios carried.")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                ForEach(store.carriedUnidentifiedCurios) { curio in
+                                    Button {
+                                        store.useSolventInWorld(stack, on: curio)
+                                        dismiss()
+                                    } label: {
+                                        LabeledRow(icon: curio.icon, label: curio.displayName,
+                                                   value: "identify")
+                                            .frame(minHeight: 44)
+                                            .contentShape(Rectangle())
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                        } else {
                             Button {
-                                store.useItemInWorld(stack, on: member)
+                                store.useItemInWorld(stack, on: .binder)
                                 dismiss()
                             } label: {
-                                LabeledRow(icon: "heart.fill",
-                                           label: store.name(of: member),
-                                           value: health(of: member))
+                                LabeledRow(icon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "sparkles",
+                                           label: "Use now",
+                                           value: fieldEffectDetail(stack.catalogID))
                                 .frame(minHeight: 44)
                                 .contentShape(Rectangle())
                             }
@@ -626,18 +968,30 @@ private struct UseItemSheet: View {
                     }
                 }
             }
-            .navigationTitle("Use something")
+            .navigationTitle("Field Kit")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Back") { dismiss() } }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
     }
 
     private func health(of member: PartyMember) -> String {
         guard let run = store.state.worlds.activeRun else { return "" }
         let hp = CombatRules.health(of: member.combatant, in: run)
         return "\(hp.current) / \(hp.max)"
+    }
+
+    private func fieldEffectDetail(_ id: ItemID) -> String {
+        switch ContentCatalog.shared.item(id)?.consumable?.effect {
+        case .restoreStability: "restore stability"
+        case .returnHome: "return with full haul"
+        case .lightWorld: "raise vision"
+        case .farsight: "reveal nearest site"
+        case .lureCreature: "draw nearest creature"
+        case .identifyCurio: "identify one curio"
+        default: ""
+        }
     }
 }

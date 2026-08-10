@@ -1,10 +1,6 @@
 import Foundation
 
-/// Layer 3 — Authored Worlds. Instanced runs; every v0 world is disposable.
-///
-/// Anchoring (making a world permanent) is an open design question (docs/open-questions.md Q-A)
-/// and is deliberately NOT modelled here. When it lands it will most likely add a sibling
-/// `anchored: [AnchoredWorld]` collection next to `activeRun`.
+/// Layer 3 — Authored Worlds. Instanced expeditions plus realms rebound into the Atlas.
 struct WorldsState: Codable, Equatable, Sendable {
     /// The run in progress, or `nil` when the player is at base. Saving this whole struct is what
     /// makes "force-quit mid-run, even mid-encounter" resume exactly (pillar 2).
@@ -14,17 +10,28 @@ struct WorldsState: Codable, Equatable, Sendable {
     /// Deterministic source of world seeds; lives in the save so relaunching cannot re-roll a
     /// seed the player already saw in a pre-bind preview.
     var seeds: SeedSequence
+    /// The last trip's ending, kept until acknowledged so routing home cannot swallow why it ended.
+    var lastExit: RunExitSummary?
+    /// Durable world snapshots. They survive expedition endings and never age by wall clock.
+    var anchoredRealms: [AnchoredRealm] = []
+    /// A return-time player decision. Never resolved by a clock or hidden automatic spending.
+    var pendingAnchorSettlement: Bool = false
 
     static func newGame(seeds: inout SeedSequence) -> WorldsState {
-        WorldsState(activeRun: nil, runIndex: 0, seeds: seeds)
+        WorldsState(activeRun: nil, runIndex: 0, seeds: seeds, lastExit: nil,
+                    anchoredRealms: [], pendingAnchorSettlement: false)
     }
 
     var isInRun: Bool { activeRun != nil }
 
-    init(activeRun: WorldRun?, runIndex: Int, seeds: SeedSequence) {
+    init(activeRun: WorldRun?, runIndex: Int, seeds: SeedSequence, lastExit: RunExitSummary? = nil,
+         anchoredRealms: [AnchoredRealm] = [], pendingAnchorSettlement: Bool = false) {
         self.activeRun = activeRun
         self.runIndex = runIndex
         self.seeds = seeds
+        self.lastExit = lastExit
+        self.anchoredRealms = anchoredRealms
+        self.pendingAnchorSettlement = pendingAnchorSettlement
     }
 
     init(from decoder: Decoder) throws {
@@ -32,6 +39,254 @@ struct WorldsState: Codable, Equatable, Sendable {
         activeRun = try container.decodeIfPresent(WorldRun.self, forKey: .activeRun)
         runIndex = try container.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
         seeds = try container.decodeIfPresent(SeedSequence.self, forKey: .seeds) ?? SeedSequence.newGame()
+        lastExit = try container.decodeIfPresent(RunExitSummary.self, forKey: .lastExit)
+        anchoredRealms = try container.decodeIfPresent([AnchoredRealm].self, forKey: .anchoredRealms) ?? []
+        pendingAnchorSettlement = try container.decodeIfPresent(Bool.self, forKey: .pendingAnchorSettlement) ?? false
+    }
+}
+
+/// How a realm was rebound. This is history only: every route produces the same durable realm.
+enum AnchorRoute: String, Codable, Equatable, Sendable {
+    case bornAnchored
+    case naturalPoint
+    case craftedFrame
+}
+
+/// A permanent realm in Tovin's Anchorage.
+///
+/// The complete run snapshot preserves authored layout and depleted unique finds. Transient
+/// expedition fields are normalised when anchoring/revisiting lands, rather than throwing away
+/// information here that later persistence rules may need.
+struct AnchoredRealm: Codable, Equatable, Identifiable, Sendable {
+    var runIndex: Int
+    var name: String
+    var route: AnchorRoute
+    var isDormant: Bool
+    var sustainObligation: Int
+    var productionContribution: Int
+    var assignedCompanions: [Int]
+    var world: WorldRun
+
+    var id: Int { runIndex }
+    var projectedShortfall: Int { max(0, sustainObligation - productionContribution) }
+
+    init(runIndex: Int, name: String, route: AnchorRoute, isDormant: Bool = false,
+         sustainObligation: Int = 0, productionContribution: Int = 0,
+         assignedCompanions: [Int] = [], world: WorldRun) {
+        self.runIndex = runIndex
+        self.name = name
+        self.route = route
+        self.isDormant = isDormant
+        self.sustainObligation = sustainObligation
+        self.productionContribution = productionContribution
+        self.assignedCompanions = assignedCompanions
+        self.world = world
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        runIndex = try c.decode(Int.self, forKey: .runIndex)
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? "Realm \(runIndex)"
+        route = try c.decodeIfPresent(AnchorRoute.self, forKey: .route) ?? .naturalPoint
+        isDormant = try c.decodeIfPresent(Bool.self, forKey: .isDormant) ?? false
+        sustainObligation = try c.decodeIfPresent(Int.self, forKey: .sustainObligation) ?? 0
+        productionContribution = try c.decodeIfPresent(Int.self, forKey: .productionContribution) ?? 0
+        assignedCompanions = try c.decodeIfPresent([Int].self, forKey: .assignedCompanions) ?? []
+        world = try c.decode(WorldRun.self, forKey: .world)
+    }
+}
+
+struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
+    enum Kind: String, Codable, Equatable, Sendable {
+        case portal, waystone, defeat, collapse, abandon
+
+        var title: String {
+            switch self {
+            case .portal: "Returned through a portal"
+            case .waystone: "Returned by Waystone"
+            case .defeat: "Carried home"
+            case .collapse: "Lost to the collapsing world"
+            case .abandon: "Expedition abandoned"
+            }
+        }
+    }
+
+    var runIndex: Int
+    var kind: Kind
+    var reason: String
+    var turnsTaken: Int
+    var haulKeptFraction: Double
+    var resources: [RunExitGain] = []
+    var items: [RunExitGain] = []
+    var lostResources: [RunExitGain] = []
+    var lostItems: [RunExitGain] = []
+    var progress: [RunProgressGain] = []
+    var pages: [DiaryPageID] = []
+
+    var id: Int { runIndex }
+
+    init(runIndex: Int, kind: Kind, reason: String, turnsTaken: Int, haulKeptFraction: Double,
+         resources: [RunExitGain] = [], items: [RunExitGain] = [],
+         lostResources: [RunExitGain] = [], lostItems: [RunExitGain] = [],
+         progress: [RunProgressGain] = [],
+         pages: [DiaryPageID] = []) {
+        self.runIndex = runIndex
+        self.kind = kind
+        self.reason = reason
+        self.turnsTaken = turnsTaken
+        self.haulKeptFraction = haulKeptFraction
+        self.resources = resources
+        self.items = items
+        self.lostResources = lostResources
+        self.lostItems = lostItems
+        self.progress = progress
+        self.pages = pages
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        runIndex = try c.decode(Int.self, forKey: .runIndex)
+        let fraction = try c.decode(Double.self, forKey: .haulKeptFraction)
+        kind = try c.decodeIfPresent(Kind.self, forKey: .kind) ?? (fraction >= 1 ? .portal : .collapse)
+        reason = try c.decode(String.self, forKey: .reason)
+        turnsTaken = try c.decode(Int.self, forKey: .turnsTaken)
+        haulKeptFraction = fraction
+        resources = try c.decodeIfPresent([RunExitGain].self, forKey: .resources) ?? []
+        items = try c.decodeIfPresent([RunExitGain].self, forKey: .items) ?? []
+        lostResources = try c.decodeIfPresent([RunExitGain].self, forKey: .lostResources) ?? []
+        lostItems = try c.decodeIfPresent([RunExitGain].self, forKey: .lostItems) ?? []
+        progress = try c.decodeIfPresent([RunProgressGain].self, forKey: .progress) ?? []
+        pages = try c.decodeIfPresent([DiaryPageID].self, forKey: .pages) ?? []
+    }
+}
+
+struct RunExitGain: Codable, Equatable, Identifiable, Sendable {
+    var name: String
+    var icon: String
+    var count: Int
+    var id: String { "\(name)-\(icon)" }
+}
+
+struct RunProgressGain: Codable, Equatable, Identifiable, Sendable {
+    var member: PartyMember
+    var name: String
+    var experience: Int
+    var levels: Int
+    var finalLevel: Int
+    var id: String { member.id }
+}
+
+struct RunProgressStart: Codable, Equatable, Sendable {
+    var member: PartyMember
+    var name: String
+    var experience: Int
+    var level: Int
+}
+
+/// A world's deterministic, turn-driven phase schedule.
+///
+/// `entryTurn` and `entryPhase` are migration anchors as well as useful explicit state. New worlds
+/// begin at dawn. A save made under the former fixed forty-turn clock begins the new schedule at
+/// precisely the phase it had when decoded, so updating cannot jump somebody into darkness.
+struct WorldClock: Codable, Equatable, Sendable {
+    var cyclePeak: Double
+    var regularity: Double
+    var amplitude: Double
+    var entryTurn: Int
+    var entryPhase: Double
+    var entryIsNight: Bool
+    var seed: UInt64
+
+    var isStopped: Bool { cyclePeak <= Tuning.DayNight.stoppedMaximumPeak }
+
+    init(cyclePeak: Double, regularity: Double, amplitude: Double = 40,
+         entryTurn: Int = 0, entryPhase: Double = 0, entryIsNight: Bool = false,
+         seed: UInt64) {
+        self.cyclePeak = cyclePeak
+        self.regularity = regularity
+        self.amplitude = amplitude
+        self.entryTurn = entryTurn
+        self.entryPhase = entryPhase
+        self.entryIsNight = entryIsNight
+        self.seed = seed
+    }
+
+    var basePeriod: Int {
+        switch cyclePeak {
+        case ...Tuning.DayNight.stoppedMaximumPeak: 0
+        case ...Tuning.DayNight.slowMaximumPeak: Tuning.DayNight.slowTurnsPerCycle
+        case ...Tuning.DayNight.measuredMaximumPeak: Tuning.DayNight.measuredTurnsPerCycle
+        case ...Tuning.DayNight.quickMaximumPeak: Tuning.DayNight.quickTurnsPerCycle
+        default: Tuning.DayNight.restlessTurnsPerCycle
+        }
+    }
+
+    var bandName: String {
+        switch cyclePeak {
+        case ...Tuning.DayNight.stoppedMaximumPeak: "Stopped"
+        case ...Tuning.DayNight.slowMaximumPeak: "Slow"
+        case ...Tuning.DayNight.measuredMaximumPeak: "Measured"
+        case ...Tuning.DayNight.quickMaximumPeak: "Quick"
+        default: "Restless"
+        }
+    }
+
+    init(book: BoundBook, seed: UInt64) {
+        let readings = BookRules.readings(for: book, seed: seed)
+        let cycle = readings["cycle"]
+        let light = readings["illumination"]
+        cyclePeak = cycle.peak
+        regularity = cycle.aspect("regularity")
+        amplitude = cycle.aspect("amplitude")
+        entryTurn = 0
+        entryPhase = 0
+        // A stopped sky with no usable light holds dark. A cyclic or constant usable light holds
+        // at day; the source remains present, it simply does not traverse the sky.
+        entryIsNight = light.peak < Tuning.Pressure.trueDarkFloor
+        self.seed = seed
+    }
+
+    static func migratingLegacy(book: BoundBook, seed: UInt64, turnsTaken: Int) -> WorldClock {
+        var clock = WorldClock(book: book, seed: seed)
+        let oldPeriod = max(1, Tuning.DayNight.turnsPerDay)
+        clock.entryTurn = turnsTaken
+        clock.entryPhase = Double(turnsTaken % oldPeriod) / Double(oldPeriod)
+        let light = BookRules.readings(for: book, seed: seed)["illumination"]
+        let oldHadNight = light.range > Tuning.Pressure.wideRangeThreshold && !light.has("sourceless")
+        clock.entryIsNight = oldHadNight
+            && clock.entryPhase >= 1 - Tuning.DayNight.nightFraction
+        return clock
+    }
+
+    /// The length of one complete cycle. Each index has its own stable draw; querying the clock
+    /// never consumes the run's live RNG or depends on how many times the UI redraws.
+    func period(forCycle index: Int) -> Int {
+        guard !isStopped else { return 0 }
+        let clampedRegularity = min(100, max(0, regularity))
+        let jitter = Tuning.DayNight.maximumJitterFraction * (1 - clampedRegularity / 100)
+        var rng = SeededRNG(seed: seed).derived(0xC1C1E &+ UInt64(max(0, index)))
+        let multiplier = rng.double(in: (1 - jitter)...(1 + jitter))
+        return max(Tuning.DayNight.minimumTurnsPerCycle,
+                   Int((Double(basePeriod) * multiplier).rounded()))
+    }
+
+    /// Phase in `[0, 1)`, monotonically advancing and wrapping only at a completed cycle.
+    func phase(at turn: Int) -> Double {
+        guard !isStopped else { return entryPhase }
+        var remaining = max(0, turn - entryTurn)
+        var phase = min(0.999_999, max(0, entryPhase))
+        var index = 0
+        while remaining > 0 {
+            let period = period(forCycle: index)
+            let turnsToBoundary = max(1, Int(ceil((1 - phase) * Double(period))))
+            if remaining < turnsToBoundary {
+                return min(0.999_999, phase + Double(remaining) / Double(period))
+            }
+            remaining -= turnsToBoundary
+            phase = 0
+            index += 1
+        }
+        return phase
     }
 }
 
@@ -46,6 +301,13 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Live stream for in-run rolls (drops, combat). Advances during play and is saved with the
     /// run, so a resume does not rewind randomness.
     var rng: SeededRNG
+    /// Development-only creation profile snapshotted into the run. Defaults in release and for
+    /// old saves; keeping it here is what makes changing Settings unable to rewrite a live world.
+    var tuning: DebugTuningProfile
+    /// The resolved Cycle pressure made operational. Stored with the run so phase scheduling is
+    /// deterministic across saves and anchored revisits, while old runs can preserve their phase
+    /// at the migration boundary.
+    var clock: WorldClock
 
     /// The tile grid, with its fog, harvest and crumble state.
     var map: WorldMap
@@ -66,6 +328,7 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// **What grows here.** Every overgrown tile points into this by id, so the harvest knows
     /// whether a thicket is timber or poison and the map knows what you are standing in.
     var flora: [Flora] = []
+    var foundWritings: [FoundWritingRecord] = []
     /// Turns of lingering harm from something toxic you walked through.
     ///
     /// **Chemical defence is the one that stays with you** (`flora-system-spec.md` §6) — thorns cost
@@ -90,7 +353,10 @@ struct WorldRun: Codable, Equatable, Sendable {
     var effectiveStabilityScore: Int { BookRules.stabilityScore(of: book) }
 
 
-    var decayPerTurn: Double { BookRules.decayPerTurn(stabilityScore: effectiveStabilityScore) }
+    var decayPerTurn: Double {
+        BookRules.decayPerTurn(stabilityScore: effectiveStabilityScore)
+            / max(0.01, tuning.stabilityDurationMultiplier)
+    }
     /// Player turns taken this run. The only clock the game has.
     var turnsTaken: Int = 0
 
@@ -99,14 +365,14 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Driven by `turnsTaken`, never by wall-clock — the day turns because you moved, which is what
     /// keeps the interruptibility pillar true.
     var dayPhase: Double {
-        guard Tuning.DayNight.turnsPerDay > 0 else { return 0 }
-        return Double(turnsTaken % Tuning.DayNight.turnsPerDay) / Double(Tuning.DayNight.turnsPerDay)
+        clock.phase(at: turnsTaken)
     }
 
     /// **A world lit by something constant never has a night at all.** Darkness only happens where
     /// the light comes and goes, which is what finally makes Illumination's dynamic range mean
     /// something (session 13 §6).
     var isNight: Bool {
+        if clock.isStopped { return clock.entryIsNight }
         guard hasDayAndNight else { return false }
         return dayPhase >= 1 - Tuning.DayNight.nightFraction
     }
@@ -114,12 +380,39 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Whether this world turns at all. A sourceless glow doesn't set.
     var hasDayAndNight: Bool {
         let light = BookRules.readings(for: book, seed: mapSeed)["illumination"]
-        return light.range > Tuning.Pressure.wideRangeThreshold && !light.has("sourceless")
+        return !clock.isStopped
+            && light.range > Tuning.Pressure.wideRangeThreshold && !light.has("sourceless")
+    }
+
+    /// Read-only debug schedule. It deliberately derives rather than mutates, so opening the
+    /// diagnostics screen cannot consume RNG or advance the world.
+    func nextLightTransitions(count: Int = 2) -> [(turn: Int, isNight: Bool)] {
+        guard count > 0, hasDayAndNight else { return [] }
+        var result: [(Int, Bool)] = []
+        var previous = isNight
+        var turn = turnsTaken
+        let searchLimit = turnsTaken + max(256, clock.basePeriod * (count + 2))
+        while result.count < count && turn < searchLimit {
+            turn += 1
+            let phase = clock.phase(at: turn)
+            let night = phase >= 1 - Tuning.DayNight.nightFraction
+            if night != previous {
+                result.append((turn, night))
+                previous = night
+            }
+        }
+        return result
     }
 
     /// Unbanked haul. Kept 100% on portal exit, `collapseHaulKeptFraction` on collapse.
     var satchel: ResourcePool = ResourcePool()
     var satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
+    /// Frozen at departure: changing next trip's kit cannot alter a world already in progress.
+    var carriedInstruments: Set<PressureTargetID> = []
+    /// Grade is frozen at departure along with the packing choice.
+    var carriedInstrumentPrecisions: [PressureTargetID: RealityState.InstrumentPrecision] = [:]
+    /// Extra sight granted by a torch for the rest of this trip.
+    var torchVisionBonus: Int = 0
 
     /// Non-nil ⇒ the player is mid-encounter. Force-quitting here must resume into the same
     /// encounter on the same turn (acceptance criterion).
@@ -148,17 +441,36 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// exactly one place to keep a companion's health, so a second one had nowhere to be hurt.
     /// Anybody absent from the dictionary is at full — joining mid-run shouldn't arrive wounded.
     var companionHP: [Int: Int] = [:]
+    /// Progress when the party crossed the threshold, for the return-home recap.
+    var partyProgressAtStart: [RunProgressStart] = []
+    /// Items deliberately brought from home, excluded from the "loot obtained" recap.
+    var carriedItemCountsAtStart: [ItemID: Int] = [:]
+    /// Pages already known on departure, so the recap can name only discoveries from this trip.
+    var foundPagesAtStart: Set<DiaryPageID> = []
+    var foundWritingsAtStart: Set<FoundWritingID> = []
+    var foundTravellersAtStart: Set<TravellerID> = []
 
     init(runIndex: Int, book: BoundBook, mapSeed: UInt64, rng: SeededRNG, map: WorldMap,
          playerPosition: GridPoint, enemies: [WorldEnemy] = [], sites: [PlacedSite] = [],
          travellersHere: [TravellerID] = [], cast: [Species] = [], flora: [Flora] = [],
+         foundWritings: [FoundWritingRecord] = [],
          binderHP: Int = Tuning.Encounter.binderMaxHP,
          companionHP: [Int: Int] = [:],
-         satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)) {
+         satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots),
+         carriedInstruments: Set<PressureTargetID> = [],
+         carriedInstrumentPrecisions: [PressureTargetID: RealityState.InstrumentPrecision] = [:],
+         partyProgressAtStart: [RunProgressStart] = [],
+         carriedItemCountsAtStart: [ItemID: Int] = [:],
+         foundPagesAtStart: Set<DiaryPageID> = [],
+         foundWritingsAtStart: Set<FoundWritingID> = [],
+         foundTravellersAtStart: Set<TravellerID> = [],
+         tuning: DebugTuningProfile = .defaults) {
         self.runIndex = runIndex
         self.book = book
         self.mapSeed = mapSeed
         self.rng = rng
+        self.tuning = tuning
+        self.clock = WorldClock(book: book, seed: mapSeed)
         self.map = map
         self.playerPosition = playerPosition
         self.enemies = enemies
@@ -166,9 +478,17 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.travellersHere = travellersHere
         self.cast = cast
         self.flora = flora
+        self.foundWritings = foundWritings
         self.binderHP = binderHP
         self.companionHP = companionHP
         self.satchelItems = satchelItems
+        self.carriedInstruments = carriedInstruments
+        self.carriedInstrumentPrecisions = carriedInstrumentPrecisions
+        self.partyProgressAtStart = partyProgressAtStart
+        self.carriedItemCountsAtStart = carriedItemCountsAtStart
+        self.foundPagesAtStart = foundPagesAtStart
+        self.foundWritingsAtStart = foundWritingsAtStart
+        self.foundTravellersAtStart = foundTravellersAtStart
     }
 
     /// The species a given enemy belongs to, where the run still has it.
@@ -218,6 +538,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         book = try container.decode(BoundBook.self, forKey: .book)
         mapSeed = try container.decode(UInt64.self, forKey: .mapSeed)
         rng = try container.decode(SeededRNG.self, forKey: .rng)
+        tuning = try container.decodeIfPresent(DebugTuningProfile.self, forKey: .tuning) ?? .defaults
         map = try container.decode(WorldMap.self, forKey: .map)
         playerPosition = try container.decode(GridPoint.self, forKey: .playerPosition)
         enemies = try container.decodeIfPresent([WorldEnemy].self, forKey: .enemies) ?? []
@@ -225,19 +546,51 @@ struct WorldRun: Codable, Equatable, Sendable {
         travellersHere = try container.decodeIfPresent([TravellerID].self, forKey: .travellersHere) ?? []
         cast = try container.decodeIfPresent([Species].self, forKey: .cast) ?? []
         flora = try container.decodeIfPresent([Flora].self, forKey: .flora) ?? []
+        foundWritings = try container.decodeIfPresent([FoundWritingRecord].self,
+                                                       forKey: .foundWritings) ?? []
         floraPoisonTurns = try container.decodeIfPresent(Int.self, forKey: .floraPoisonTurns) ?? 0
         stability = try container.decodeIfPresent(Double.self, forKey: .stability)
             ?? Tuning.World.startingStability
         turnsTaken = try container.decodeIfPresent(Int.self, forKey: .turnsTaken) ?? 0
+        clock = try container.decodeIfPresent(WorldClock.self, forKey: .clock)
+            ?? WorldClock.migratingLegacy(book: book, seed: mapSeed, turnsTaken: turnsTaken)
         satchel = try container.decodeIfPresent(ResourcePool.self, forKey: .satchel) ?? ResourcePool()
         satchelItems = try container.decodeIfPresent(Inventory.self, forKey: .satchelItems)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
+        carriedInstruments = try container.decodeIfPresent(Set<PressureTargetID>.self,
+                                                            forKey: .carriedInstruments) ?? []
+        carriedInstrumentPrecisions = try container.decodeIfPresent(
+            [PressureTargetID: RealityState.InstrumentPrecision].self,
+            forKey: .carriedInstrumentPrecisions) ?? [:]
+        torchVisionBonus = try container.decodeIfPresent(Int.self, forKey: .torchVisionBonus) ?? 0
         activeEncounter = try container.decodeIfPresent(EncounterState.self, forKey: .activeEncounter)
         offeredItems = try container.decodeIfPresent([ItemStack].self, forKey: .offeredItems) ?? []
         previousPosition = try container.decodeIfPresent(GridPoint.self, forKey: .previousPosition)
         encounterGraceTurns = try container.decodeIfPresent(Int.self, forKey: .encounterGraceTurns) ?? 0
         collapsedOnTurn = try container.decodeIfPresent(Int.self, forKey: .collapsedOnTurn)
         binderHP = try container.decodeIfPresent(Int.self, forKey: .binderHP) ?? Tuning.Encounter.binderMaxHP
+        partyProgressAtStart = try container.decodeIfPresent([RunProgressStart].self,
+                                                              forKey: .partyProgressAtStart) ?? []
+        carriedItemCountsAtStart = try container.decodeIfPresent([ItemID: Int].self,
+                                                                  forKey: .carriedItemCountsAtStart) ?? [:]
+        // Saves already in a world predate per-stack protection. Reconstruct conservatively from
+        // their departure counts: never risk deleting an item that may have crossed from Home.
+        if !carriedItemCountsAtStart.isEmpty,
+           satchelItems.stacks.allSatisfy({ $0.protectedReturnCount == 0 }) {
+            var remaining = carriedItemCountsAtStart
+            for index in satchelItems.stacks.indices {
+                let id = satchelItems.stacks[index].catalogID
+                let protected = min(satchelItems.stacks[index].count, remaining[id] ?? 0)
+                satchelItems.stacks[index].protectedReturnCount = protected
+                remaining[id, default: 0] -= protected
+            }
+        }
+        foundPagesAtStart = try container.decodeIfPresent(Set<DiaryPageID>.self,
+                                                           forKey: .foundPagesAtStart) ?? []
+        foundWritingsAtStart = try container.decodeIfPresent(Set<FoundWritingID>.self,
+                                                              forKey: .foundWritingsAtStart) ?? []
+        foundTravellersAtStart = try container.decodeIfPresent(Set<TravellerID>.self,
+                                                                forKey: .foundTravellersAtStart) ?? []
         // A run saved when only one person could come brings that one person's health with it.
         if let perMember = try? container.decodeIfPresent([Int: Int].self, forKey: .companionHP) {
             companionHP = perMember ?? [:]
@@ -254,6 +607,23 @@ struct WorldRun: Codable, Equatable, Sendable {
         if stability <= Tuning.World.crumbleThreshold { return .crumbling }
         if stability <= Tuning.World.hazardThreshold { return .hazardous }
         return .stable
+    }
+}
+
+extension WorldRun {
+    /// The durable world, stripped of things that belong to one expedition rather than the realm.
+    var anchoredSnapshot: WorldRun {
+        var snapshot = self
+        snapshot.satchel = ResourcePool()
+        snapshot.satchelItems = Inventory(slots: Tuning.Economy.startingSatchelSlots)
+        snapshot.carriedInstruments = []
+        snapshot.carriedInstrumentPrecisions = [:]
+        snapshot.activeEncounter = nil
+        snapshot.offeredItems = []
+        snapshot.partyProgressAtStart = []
+        snapshot.carriedItemCountsAtStart = [:]
+        snapshot.foundPagesAtStart = []
+        return snapshot
     }
 }
 

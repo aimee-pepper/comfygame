@@ -144,6 +144,9 @@ struct ResearchGrant: Codable, Equatable, Sendable {
     var id: String?
     /// The state change, for `effect`.
     var effect: Effect?
+    /// Authored target for `stationTier`; setting a target avoids incrementing from stale paid
+    /// state when keeper-earned progression has already supplied lower tiers.
+    var tier: Int?
 
     enum Kind: String, Codable, Sendable {
         case gambitComponent
@@ -157,6 +160,9 @@ struct ResearchGrant: Codable, Equatable, Sendable {
         /// What it buys is *this* subject, out in the world, in numbers — and owning enough of them
         /// is what the page lens is gated on.
         case instrument
+        /// A named station capability. Completion of the node is the single source of truth;
+        /// this grant makes that consequence explicit to validation and player-facing copy.
+        case capability
     }
 
     /// Effects mutate base state directly. Each maps to exactly one field, so nothing is stored twice.
@@ -181,6 +187,9 @@ struct ResearchGrant: Codable, Equatable, Sendable {
         /// written by a save decoder and the debug harness, and by nothing else in the game
         /// (`clause-audit.md` F2). Tiers 3 and 4 were finished work no player could reach.
         case analysisTier
+        /// Raises the station named by the grant's `id`. Used by specialist shop progression;
+        /// the station remains the single stored tier.
+        case stationTier
     }
 }
 

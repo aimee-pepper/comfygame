@@ -41,7 +41,8 @@ enum EconomyRules {
     /// you can't have yet is most of what makes a tree feel like a tree.
     static func isAvailable(_ node: ResearchNodeDef, in state: GameState) -> Bool {
         !isComplete(node, in: state)
-            && node.requires.allSatisfy { state.base.completedResearch.contains($0) }
+            && !stationTierAlreadySupplied(by: node, in: state)
+            && node.requires.allSatisfy { prerequisiteSatisfied($0, in: state) }
             && buildingAllows(node, in: state) == nil
             && kitAllows(node, in: state) == nil
     }
@@ -52,10 +53,10 @@ enum EconomyRules {
     /// the last, so prediction is earned by having gone out and taken the measurements rather than
     /// by paying for it at home. Returns the reason it's blocked, or nil.
     static func kitAllows(_ node: ResearchNodeDef, in state: GameState) -> String? {
-        let owned = state.reality.instruments.count
-        guard node.needsInstruments > owned else { return nil }
-        let short = node.needsInstruments - owned
-        return "\(short) more field instrument\(short == 1 ? "" : "s") to grind it against"
+        let measured = state.reality.observations.count
+        guard node.needsInstruments > measured else { return nil }
+        let short = node.needsInstruments - measured
+        return "\(short) more field reading\(short == 1 ? "" : "s") to grind it against"
     }
 
     /// **Whether the building that teaches this is built, and built far enough** (Q40).
@@ -83,7 +84,7 @@ enum EconomyRules {
             let who = station.builtBy.flatMap { ContentCatalog.shared.traveller($0)?.name }
             return who.map { "\($0) hasn't been found" } ?? "the \(station.name) isn't built"
         }
-        if built.tier < node.needsStationTier {
+        if StationStaffingRules.effectiveTier(for: station, in: state) < node.needsStationTier {
             return "the \(station.name) needs upgrading"
         }
         return nil
@@ -109,16 +110,41 @@ enum EconomyRules {
     /// greying a row out.
     static func missingPrerequisites(_ node: ResearchNodeDef, in state: GameState) -> [String] {
         var missing = node.requires
-            .filter { !state.base.completedResearch.contains($0) }
+            .filter { !prerequisiteSatisfied($0, in: state) }
             .compactMap { ContentCatalog.shared.researchNode($0)?.name }
         if let blocked = buildingAllows(node, in: state) { missing.append(blocked) }
         if let unmeasured = kitAllows(node, in: state) { missing.append(unmeasured) }
         return missing
     }
 
+    static func prerequisiteSatisfied(_ id: ResearchNodeID, in state: GameState) -> Bool {
+        if state.base.completedResearch.contains(id) { return true }
+        guard let node = ContentCatalog.shared.researchNode(id) else { return false }
+        return stationTierAlreadySupplied(by: node, in: state)
+    }
+
+    static func stationTierAlreadySupplied(by node: ResearchNodeDef, in state: GameState) -> Bool {
+        guard let grant = node.grants.first(where: { $0.effect == .stationTier }),
+              let id = grant.id, let target = grant.tier,
+              let station = ContentCatalog.shared.station(StationID(rawValue: id)) else { return false }
+        return StationStaffingRules.effectiveTier(for: station, in: state) >= target
+    }
+
     static func canAfford(_ cost: UpgradeCost, in state: GameState) -> Bool {
         guard state.base.essence >= cost.essence else { return false }
         return cost.resources.allSatisfy { state.base.resources[$0.key] >= $0.value }
+    }
+
+    static func paidCost(for node: ResearchNodeDef, in state: GameState) -> UpgradeCost {
+        guard let branch = ContentCatalog.shared.researchBranch(node.branch),
+              let stationID = branch.station,
+              let station = ContentCatalog.shared.station(stationID)
+        else { return node.cost }
+        return UpgradeCost(
+            essence: StationStaffingRules.discounted(node.cost.essence, at: station, in: state),
+            resources: node.cost.resources.mapValues {
+                StationStaffingRules.discounted($0, at: station, in: state)
+            })
     }
 
     /// What you're short of, for the UI to say so plainly instead of just greying a button out.
@@ -162,7 +188,18 @@ enum EconomyRules {
         case .instrument:
             // **Reality, like the lens it feeds.** What an instrument buys you is the ability to
             // read one subject, and a reading is knowledge.
-            if let id = grant.id { state.reality.instruments.insert(PressureTargetID(rawValue: id)) }
+            if let id = grant.id {
+                let target = PressureTargetID(rawValue: id)
+                state.reality.instruments.insert(target)
+                state.reality.instrumentPrecisions[target] = .crude
+                // A newly made tool is useful immediately; the player can leave it home later.
+                state.base.instrumentLoadout.insert(target)
+            }
+
+        case .capability:
+            // The completed research node is the durable capability flag. Do not mirror it into
+            // another save field that could drift out of sync.
+            break
 
         case .effect:
             guard let effect = grant.effect else { return }
@@ -184,6 +221,13 @@ enum EconomyRules {
                 bumpStation(Stations.essenceSpring, in: &state)
             case .scriptoriumTier:
                 bumpStation(Stations.scriptorium, in: &state)
+            case .stationTier:
+                if let id = grant.id, let target = grant.tier {
+                    let stationID = StationID(rawValue: id)
+                    var station = state.base.station(stationID)
+                    station.tier = max(station.tier, target)
+                    state.base.stations[stationID] = station
+                }
             case .automateSelf:
                 state.base.hasAutomateSelfUnlock = true
             case .companionWeapon, .companionArmor:
@@ -248,7 +292,7 @@ enum EconomyRules {
             .sorted { $0.rawValue < $1.rawValue }
 
         let unownedFocuses = ContentCatalog.shared.pressureSources
-            .filter { $0.acquisition != .research && !state.base.ownedSources.contains($0.id) }
+            .filter { $0.acquisition == .worldDrop && !state.base.ownedSources.contains($0.id) }
             .map(\.id)
             .sorted { $0.rawValue < $1.rawValue }
 

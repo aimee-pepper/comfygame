@@ -12,6 +12,7 @@ struct EncounterView: View {
     @State private var pendingSkill: SkillDef?
     /// The skill list, open. Twelve of them won't fit on a key.
     @State private var isChoosingSkill = false
+    @State private var isChoosingItem = false
 
     private var run: WorldRun? { store.state.worlds.activeRun }
     private var encounter: EncounterState? { store.activeEncounter }
@@ -33,6 +34,9 @@ struct EncounterView: View {
                     actionBar(run, encounter)
                         .sheet(isPresented: $isChoosingSkill) {
                             SkillSheet(onUse: use).environmentObject(store)
+                        }
+                        .sheet(isPresented: $isChoosingItem) {
+                            CombatItemSheet(onUse: use).environmentObject(store)
                         }
                 }
             }
@@ -179,7 +183,10 @@ struct EncounterView: View {
                 HStack(spacing: 8) {
                     ActionKey("Item", icon: "cross.vial",
                               detail: store.usableItems.isEmpty ? "none carried" : "\(store.usableItems.count)",
-                              isEnabled: !store.usableItems.isEmpty) { stopTargeting(); useFirstItem() }
+                              isEnabled: !store.usableItems.isEmpty) {
+                        stopTargeting()
+                        isChoosingItem = true
+                    }
                     ActionKey("Flee", icon: "figure.run",
                               detail: "−\(Int(Tuning.Encounter.fleeStabilityCost)) stability",
                               isDestructive: true) { stopTargeting(); store.takeCombatAction(.flee) }
@@ -261,9 +268,9 @@ struct EncounterView: View {
         }
     }
 
-    private func useFirstItem() {
-        guard let stack = store.usableItems.first else { return }
-        store.takeCombatAction(.useItem(stack: stack.id, ally: weakestAlly()))
+    private func use(_ stack: ItemStack, on ally: Combatant) {
+        isChoosingItem = false
+        store.takeCombatAction(.useItem(stack: stack.id, ally: ally))
     }
 
     /// Healing goes to whoever needs it most — the obvious intent, and one fewer tap. Across the
@@ -524,5 +531,87 @@ private struct SkillSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+    }
+}
+
+/// Combat items are a deliberate choice of both remedy and recipient. Auto-using the first stack
+/// made status cures effectively inaccessible whenever a salve sorted ahead of them.
+private struct CombatItemSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    let onUse: (ItemStack, Combatant) -> Void
+
+    private var livingParty: [Combatant] {
+        guard let run = store.activeRun else { return [] }
+        return CombatRules.party(of: store.state).filter { CombatRules.isAlive($0, in: run) }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(store.usableItems) { stack in
+                    if let item = ContentCatalog.shared.item(stack.catalogID) {
+                        Section {
+                            ForEach(livingParty, id: \.self) { ally in
+                                Button {
+                                    onUse(stack, ally)
+                                    dismiss()
+                                } label: {
+                                    HStack {
+                                        Text("Use on \(name(of: ally))")
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundStyle(.tertiary)
+                                    }
+                                    .frame(minHeight: 36)
+                                }
+                            }
+                        } header: {
+                            Text(stack.count > 1 ? "\(item.name) ×\(stack.count)" : item.name)
+                        } footer: {
+                            Text(itemEffect(item))
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Carried remedies")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Back") { dismiss() } }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func name(of actor: Combatant) -> String {
+        switch actor {
+        case .binder: return "You"
+        case .companion(let index):
+            return store.state.base.roster.indices.contains(index)
+                ? store.state.base.roster[index].name : "Companion"
+        case .foe: return "Foe"
+        }
+    }
+
+    private func itemEffect(_ item: ItemDef) -> String {
+        guard let consumable = item.consumable else { return "Consumable." }
+        switch consumable.effect {
+        case .heal: return "Restores \(consumable.potency) health."
+        case .clearPoison: return "Clears poison and bleeding."
+        case .clearElemental: return "Clears burning and dazzle."
+        case .clearAnyStatus: return "Clears one affliction."
+        case .restoreStability: return "Restores world stability outside combat."
+        case .returnHome: return "Returns the party home outside combat."
+        case .lightWorld: return "Expands vision outside combat."
+        case .farsight: return "Reveals a distant site outside combat."
+        case .preventStatus: return "Prevents the next affliction, including bleeding."
+        case .coatPoison: return "Poisons the next foe this party member strikes."
+        case .coatBurn: return "Burns the next foe this party member strikes."
+        case .coatBleed: return "Makes the next strike leave a bleeding wound."
+        case .coatDazzle: return "Dazzles the next foe this party member strikes."
+        case .identifyCurio: return "Identifies a curio outside combat."
+        case .lureCreature: return "Draws a roaming creature outside combat."
+        }
     }
 }

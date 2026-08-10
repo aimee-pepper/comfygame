@@ -18,8 +18,21 @@ enum SiteRules {
     static func eligible(in readings: PressureReadings,
                          contradictions: [ContradictionDef] = []) -> [SiteDef] {
         ContentCatalog.shared.sites
-            .filter { $0.isEligible(in: readings, contradictions: contradictions) }
+            .filter { !$0.providesNaturalAnchor && $0.isEligible(in: readings, contradictions: contradictions) }
             .sorted { ($0.weight, $1.id.rawValue) > ($1.weight, $0.id.rawValue) }
+    }
+
+    /// Natural anchors are their own sparse world feature, not ordinary weighted loot. Keeping
+    /// this draw separate makes their frequency a legible tuning value and prevents a larger site
+    /// catalogue from silently changing it.
+    static func placeNaturalAnchor(in map: WorldMap, avoiding occupied: Set<GridPoint>,
+                                   rng: inout SeededRNG) -> PlacedSite? {
+        guard rng.chance(Tuning.Anchoring.naturalAnchorChance),
+              let definition = ContentCatalog.shared.sites.first(where: \.providesNaturalAnchor),
+              let point = position(for: definition, in: map, avoiding: occupied, rng: &rng)
+        else { return nil }
+        return PlacedSite(id: InstanceID(rawValue: rng.next()), siteID: definition.id,
+                          position: point, searchTurnsRemaining: 0)
     }
 
     /// Choose and place the sites for one world.

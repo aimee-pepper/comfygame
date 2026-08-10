@@ -16,6 +16,7 @@ struct LibraryView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
+                firstReturnWritingCard
                 if hints.isEmpty {
                     StationCard(title: "The Library", icon: "books.vertical") {
                         EmptyNote("Nothing yet. Pages turn up in worlds — somebody's diary, scattered.")
@@ -45,12 +46,31 @@ struct LibraryView: View {
                 .buttonStyle(.plain)
 
                 if !library.foundPages.isEmpty { loosePages }
+                if !library.foundWritings.isEmpty { worldNotes }
             }
             .padding(16)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Library")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder private var firstReturnWritingCard: some View {
+        if let context = store.state.tutorial.firstReturnContext,
+           context.route == .library,
+           store.state.tutorial[.libraryFirstWriting].status != .completed {
+            if let copy = TutorialRules.libraryCopy(context, in: store.state) {
+                StationCard(title: "What this writing carries", icon: "doc.text.magnifyingglass") {
+                    Text(copy).font(.callout)
+                }
+                .onAppear { store.displayedFirstReturnWriting() }
+            } else {
+                StationCard(title: "Recovered writing", icon: "doc.questionmark") {
+                    Text("The record selected by an older return is not present in this save. The Library will not guess what kind of writing it was.")
+                        .font(.callout).foregroundStyle(.secondary)
+                }
+            }
+        }
     }
 
     private func hintCard(_ hint: HintPage) -> some View {
@@ -117,6 +137,23 @@ struct LibraryView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 2)
                 }
+            }
+        }
+    }
+
+    private var worldNotes: some View {
+        StationCard(title: "World notes — \(library.foundWritings.count)", icon: "note.text") {
+            ForEach(library.foundWritings) { writing in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(writing.family == .fieldNote ? "Field note" : writing.family.rawValue)
+                        .font(.caption.weight(.medium))
+                    Text("“\(writing.prose)”")
+                        .font(.caption.italic())
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 2)
             }
         }
     }

@@ -42,7 +42,11 @@ extension GameStore {
     /// Consumables carried into the world. Milestone 5 gives you ways to get them.
     var usableItems: [ItemStack] {
         (state.worlds.activeRun?.satchelItems.stacks ?? []).filter {
-            $0.identified && ContentCatalog.shared.item($0.catalogID)?.kind == .consumable
+            guard $0.identified,
+                  let effect = ContentCatalog.shared.item($0.catalogID)?.consumable?.effect
+            else { return false }
+            return [.heal, .clearPoison, .clearElemental, .clearAnyStatus, .preventStatus,
+                    .coatPoison, .coatBurn, .coatBleed, .coatDazzle].contains(effect)
         }
     }
 
@@ -113,7 +117,7 @@ extension GameStore {
 
         if outcome == .defeated {
             // No death state in v0 — you're carried home with a fraction of the haul.
-            endRunWithPartialHaul(reason: "You were carried home.")
+            endRunWithPartialHaul(reason: "You were carried home.", kind: .defeat)
         }
     }
 

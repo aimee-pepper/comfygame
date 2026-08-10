@@ -6,6 +6,7 @@ import XCTest
 /// `LifeRules` filters on what a world can feed. An apex breaks that filter on purpose, which is
 /// both the mechanic and the fiction: something too large for this world to feed either came from
 /// somewhere else or is eating everything else, and both are true of what it does to the map.
+@MainActor
 final class ApexTests: XCTestCase {
 
     // MARK: What it is
@@ -133,6 +134,69 @@ final class ApexTests: XCTestCase {
                        "a rule nothing breaks: \(Set(WildRule.allCases).subtracting(broken))")
     }
 
+    func testThroughstrokeCarriesHalfTheHitIntoAnotherFoe() throws {
+        let store = combatStore(weapon: "ranked_spear", foeCount: 2)
+        let targets = try XCTUnwrap(store.activeEncounter?.foes)
+        let primary = targets[0]
+        let secondBefore = targets[1].currentHP
+
+        store.mutate("throughstroke") { state in
+            CombatRules.perform(.attack(foe: primary.id), by: .binder, in: &state)
+        }
+
+        XCTAssertLessThan(store.activeEncounter?.foes[1].currentHP ?? secondBefore, secondBefore)
+    }
+
+    func testLivingHookGrowsFromWinsAndStopsAfterTwoTiers() throws {
+        let store = combatStore(weapon: "living_hook", foeCount: 1)
+        for _ in 0..<3 {
+            store.mutate("win with hook") { state in
+                state.worlds.activeRun?.activeEncounter?.foes[0].currentHP = 0
+                state.worlds.activeRun?.activeEncounter?.outcome = nil
+                CombatRules.checkOutcome(in: &state)
+            }
+        }
+        XCTAssertEqual(store.state.base.binderEquipped[.weapon]?.wildGrowth, 2)
+    }
+
+    func testWardedHaftOnlyTurnsAsideItsAuthoredBlow() {
+        var state = GameState.newGame()
+        state.base.binderEquipped[.weapon] = "warded_haft"
+        XCTAssertEqual(CombatRules.wardedHaftMultiplier(against: .crush, for: .binder, in: state),
+                       1 - Tuning.Apex.wardedHaftReduction)
+        XCTAssertEqual(CombatRules.wardedHaftMultiplier(against: .pierce, for: .binder, in: state), 1)
+    }
+
+    func testApexSightingsBadgeTheDerivedSpeciesAndDeduplicateReads() {
+        var log = DiscoveryLog()
+        let id = InstanceID(rawValue: 99)
+        log.recordSpecies("glass-hare", runIndex: 4)
+        log.recordApex(id, species: "glass-hare", runIndex: 4)
+        log.recordApex(id, species: "glass-hare", runIndex: 4)
+        let entry = BestiaryRules.entries(in: log).first
+        XCTAssertEqual(entry?.apexSightings, 1)
+        XCTAssertTrue(entry?.isApexSpecies == true)
+    }
+
+    func testCacheWeaponIsAnIndependentBonusLottery() {
+        let readings = world(["bloom": "vitality"])
+        var never = SeededRNG(seed: 8)
+        var certain = SeededRNG(seed: 8)
+        XCTAssertNil(ApexRules.cacheBonus(for: readings, chance: 0, rng: &never))
+        XCTAssertNotNil(ApexRules.cacheBonus(for: readings, chance: 1, rng: &certain))
+    }
+
+    func testLivingHookGrowthSurvivesUnequippingAndSaving() throws {
+        var piece = EquippedPiece(catalogID: "living_hook", wildGrowth: 2)
+        let stack = piece.asStack(id: InstanceID(rawValue: 7))
+        let data = try SaveCodec.makeEncoder().encode(stack)
+        let restored = try SaveCodec.makeDecoder().decode(ItemStack.self, from: data)
+        XCTAssertEqual(restored.wildGrowth, 2)
+        piece = EquippedPiece(restored)
+        XCTAssertEqual(piece.effectiveTier,
+                       (ContentCatalog.shared.item("living_hook")?.gear?.tier ?? 0) + 2)
+    }
+
     /// **You're buying the rule, not the numbers** (§4). A wild weapon must not simply out-stat the
     /// best thing you could otherwise find, or the trade it exists to offer isn't a trade.
     func testAWildWeaponIsNotSimplyBetter() throws {
@@ -147,17 +211,27 @@ final class ApexTests: XCTestCase {
         }
     }
 
-    /// **Weighted toward the world's own character** (§5), so a cold world's rare drop is the rimed
-    /// edge. It should feel like it came from *there*.
-    func testAColdWorldsRareDropFeelsLikeItCameFromThere() {
-        let cold = world(["glacier": "thermal", "snow": "thermal", "ice": "thermal"])
-        let temperate = world(["sun": "illumination"])
-        func rimed(_ readings: PressureReadings) -> Int {
-            var rng = SeededRNG(seed: 1234)
-            return (0..<400).count { _ in ApexRules.weapon(for: readings, rng: &rng) == "rimed_edge" }
+    private func combatStore(weapon: ItemID, foeCount: Int) -> GameStore {
+        let store = GameStore(io: .temporary(name: "apex-weapon-\(UUID().uuidString)"))
+        store.write("plains")
+        _ = store.bindAndDepart()
+        store.mutate("stage wild weapon") { state in
+            state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: weapon)
+            guard var run = state.worlds.activeRun else { return }
+            let enemies = (0..<foeCount).map { index in
+                WorldEnemy(id: InstanceID(rawValue: UInt64(index + 1)), creatureID: "paper_moth",
+                           position: run.playerPosition, isAwake: true)
+            }
+            run.enemies = enemies
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemies[0], in: &state)
+            state.worlds.activeRun?.activeEncounter?.foes.indices.forEach {
+                state.worlds.activeRun?.activeEncounter?.foes[$0].stats.evasion = 0
+                state.worlds.activeRun?.activeEncounter?.foes[$0].stats.armour = 0
+                state.worlds.activeRun?.activeEncounter?.foes[$0].currentHP = 100
+            }
         }
-        XCTAssertGreaterThan(rimed(cold), rimed(temperate),
-                             "a frozen world was no likelier to leave a frozen blade")
+        return store
     }
 
     /// A two-natured blade picks whichever edge the covering likes least — the one thing no

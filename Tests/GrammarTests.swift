@@ -79,6 +79,20 @@ final class GrammarTests: XCTestCase {
         XCTAssertEqual(PageRules.clusters(on: page).count, 1)
     }
 
+    func testFocusStabilityMarksAreDerivedFromTheActualPage() throws {
+        let page = try sunlitPage()
+        let sigils = PageRules.clusterSigils(of: page)
+        let total = BookRules.greedDelta(for: sigils)
+        let chains = PageRules.chains(on: page)
+        let parts = chains.flatMap(\.parts)
+        XCTAssertEqual(parts.count, sigils.count)
+        for (part, sigil) in zip(parts, sigils) {
+            let expected = total - BookRules.greedDelta(for: sigils.filter { $0.id != sigil.id })
+            XCTAssertEqual(part.stabilityDelta, expected,
+                           "the UI marked \(part.source) from authored prose rather than page arithmetic")
+        }
+    }
+
     // MARK: A cluster is one object
 
     func testMovingAClusterMovesAllOfItAndKeepsItsLinks() throws {
@@ -137,6 +151,55 @@ final class GrammarTests: XCTestCase {
         page = try XCTUnwrap(PageRules.connect(ids[1], ids[2], on: page))
 
         XCTAssertEqual(page.sigils.first?.intensity, .overwhelming)
+    }
+
+    func testProspectiveConnectionsRejectAmbiguousGrammar() throws {
+        var page = Page()
+        page = try XCTUnwrap(place(.target("illumination"), at: .init(column: 0, row: 0), on: page, hand: .refined))
+        page = try XCTUnwrap(place(.source("sun"), at: .init(column: 1, row: 0), on: page, hand: .refined))
+        page = try XCTUnwrap(place(.target("thermal"), at: .init(column: 2, row: 0), on: page, hand: .refined))
+        let ids = page.runes.map(\.id)
+        page = try XCTUnwrap(PageRules.connect(ids[0], ids[1], on: page))
+        XCTAssertEqual(PageRules.connectionIssue(ids[1], ids[2], on: page), .multipleTargets)
+
+        var duplicate = Page()
+        duplicate = try XCTUnwrap(place(.source("sun"), at: .init(column: 1, row: 1), on: duplicate, hand: .refined))
+        duplicate = try XCTUnwrap(place(.qualifier("great"), at: .init(column: 0, row: 1), on: duplicate, hand: .refined))
+        duplicate = try XCTUnwrap(place(.qualifier("faint"), at: .init(column: 2, row: 1), on: duplicate, hand: .refined))
+        let duplicateIDs = duplicate.runes.map(\.id)
+        duplicate = try XCTUnwrap(PageRules.connect(duplicateIDs[0], duplicateIDs[1], on: duplicate))
+        XCTAssertEqual(PageRules.connectionIssue(duplicateIDs[0], duplicateIDs[2], on: duplicate),
+                       .duplicateModifierLadder)
+    }
+
+    func testSecondFocusRequiresChainingAndMustFitSubject() throws {
+        var page = Page()
+        page = try XCTUnwrap(place(.target("illumination"), at: .init(column: 0, row: 0), on: page, hand: .refined))
+        page = try XCTUnwrap(place(.source("sun"), at: .init(column: 1, row: 0), on: page, hand: .refined))
+        page = try XCTUnwrap(place(.source("moon"), at: .init(column: 2, row: 0), on: page, hand: .refined))
+        let ids = page.runes.map(\.id)
+        page = try XCTUnwrap(PageRules.connect(ids[0], ids[1], on: page))
+        XCTAssertEqual(PageRules.connectionIssue(ids[1], ids[2], on: page), .chainingRequired)
+        XCTAssertNil(PageRules.connectionIssue(ids[1], ids[2], on: page, chainingUnlocked: true))
+    }
+
+    func testPhaseRemainsDecodableButIsNotOfferedForWriting() {
+        XCTAssertFalse(ContentCatalog.shared.qualifiers(on: .phase).isEmpty)
+        XCTAssertFalse(PageRules.writableQualifiers().contains { $0.ladder == .phase })
+    }
+
+    func testLegacyAmbiguousGraphStillResolvesButWarns() throws {
+        var page = Page()
+        page = try XCTUnwrap(place(.target("illumination"), at: .init(column: 0, row: 0), on: page, hand: .refined))
+        page = try XCTUnwrap(place(.source("sun"), at: .init(column: 1, row: 0), on: page, hand: .refined))
+        page = try XCTUnwrap(place(.target("thermal"), at: .init(column: 2, row: 0), on: page, hand: .refined))
+        let ids = page.runes.map(\.id)
+        // Simulate a saved graph authored before strict prospective validation.
+        page.links = [MarkLink(ids[0], ids[1]), MarkLink(ids[1], ids[2])]
+
+        XCTAssertFalse(page.sigils.isEmpty, "tolerant legacy writing stopped loading")
+        XCTAssertTrue(PageRules.grammarWarnings(on: page, chainingUnlocked: false)
+            .contains("A joined statement has more than one subject."))
     }
 
     func testTheThreeGenericLaddersApplyEverywhereAndTheNarrowOnesDoNot() {

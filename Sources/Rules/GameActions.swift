@@ -1,5 +1,13 @@
 import Foundation
 
+enum ReliquaryRules {
+    static func revealSites(on map: inout WorldMap, sites: [PlacedSite]) {
+        for site in sites where map.contains(site.position) {
+            map[site.position].isRevealed = true
+        }
+    }
+}
+
 /// Real player actions — the ones the shipping UI calls. Anything still faked lives in
 /// `Sources/Debug/` and says so.
 ///
@@ -109,9 +117,20 @@ extension GameStore {
     /// Join two adjacent marks. Adjacency constrains; this is the declaration of intent.
     @discardableResult
     func connect(_ a: InstanceID, _ b: InstanceID) -> Bool {
-        guard let updated = PageRules.connect(a, b, on: state.base.page) else { return false }
+        guard let updated = PageRules.connect(a, b, on: state.base.page,
+                                              chainingUnlocked: state.base.hasChainingUnlock)
+        else { return false }
         mutate("connect", flush: true) { $0.base.page = updated }
         return true
+    }
+
+    func connectionIssue(_ a: InstanceID, _ b: InstanceID) -> PageRules.ConnectionIssue? {
+        PageRules.connectionIssue(a, b, on: state.base.page,
+                                  chainingUnlocked: state.base.hasChainingUnlock)
+    }
+
+    func canConnect(_ a: InstanceID, _ b: InstanceID) -> Bool {
+        connectionIssue(a, b) == nil
     }
 
     func disconnect(_ a: InstanceID, _ b: InstanceID) {
@@ -159,7 +178,9 @@ extension GameStore {
         BookProjection.project(page: state.base.page,
                                seed: state.worlds.seeds.peekNextSeed(),
                                analysisTier: state.reality.analysisTier,
-                               measuring: state.reality.instruments,
+                               measuring: state.reality.calibratedSubjects,
+                               precision: state.reality.observations.mapValues(\.bestPrecision),
+                               tuning: DebugTuningProfile.active,
                                revealRolled: state.reality.visitedWorldSeeds
                                    .contains(state.worlds.seeds.peekNextSeed()))
     }
@@ -170,13 +191,31 @@ extension GameStore {
         state.worlds.activeRun == nil && state.base.essence >= bookProjection.cost
     }
 
+    var bornAnchoredPremium: Int {
+        Self.bornAnchoredPremium(forBookCost: bookProjection.cost)
+    }
+
+    nonisolated static func bornAnchoredPremium(forBookCost cost: Int) -> Int {
+        max(Tuning.Economy.bornAnchoredBasePremium,
+            cost * Tuning.Economy.bornAnchoredBookCostMultiplier)
+    }
+
+    func canBindAndDepart(bornAnchored: Bool) -> Bool {
+        let anchorageReady = state.base.station(Stations.anchorage).isUnlocked
+        let total = bookProjection.cost + (bornAnchored ? bornAnchoredPremium : 0)
+        return state.worlds.activeRun == nil
+            && (!bornAnchored || anchorageReady)
+            && state.base.essence >= total
+    }
+
     /// Binds the current draft and departs into the world it describes.
     ///
     /// Flushed to disk before it returns: this is the commitment point where essence turns into a
     /// world, and it's the last thing that should ever be lost to a kill.
     @discardableResult
-    func bindAndDepart() -> Bool {
-        guard canBindAndDepart else { return false }
+    func bindAndDepart(bornAnchored: Bool = false) -> Bool {
+        guard canBindAndDepart(bornAnchored: bornAnchored) else { return false }
+        let anchorPremium = bornAnchored ? bornAnchoredPremium : 0
 
         mutate("bind book & depart", flush: true) { state in
             let seed = state.worlds.seeds.nextSeed()
@@ -184,7 +223,14 @@ extension GameStore {
 
             // Generated here, once, and saved with the run. Worldgen draws from streams derived
             // from the seed, never from the run's live RNG, so in-run rolls resume cleanly.
-            let world = Worldgen.generate(book: book, seed: seed, library: state.reality.library)
+            let tuning = DebugTuningProfile.active
+            var world = Worldgen.generate(book: book, seed: seed, library: state.reality.library,
+                                          tuning: tuning)
+            // Edren reads the field before the party reaches it: sites are known destinations, not
+            // surprises hidden behind fog. Their contents still require travel and a full search.
+            if state.base.station(Stations.reliquary).isUnlocked {
+                ReliquaryRules.revealSites(on: &world.map, sites: world.sites)
+            }
 
             // Entering unseals this world: from here on its rolled values may be described.
             state.reality.visitedWorldSeeds.insert(seed)
@@ -203,20 +249,43 @@ extension GameStore {
             // **Recorded, before anything is spent.** The page you wrote and the world it became,
             // kept so you can come back with better instruments and read your own failure (Aimee,
             // 6 Aug). Nothing here is explained now — that would break "explanation is earned".
-            state.reality.library.record(
-                world: LibraryRules.record(book: book, page: state.base.page, seed: seed,
-                                           runIndex: state.worlds.runIndex + 1,
-                                           travellers: world.travellers))
+            let historyRecord = LibraryRules.record(book: book, page: state.base.page, seed: seed,
+                                                    runIndex: state.worlds.runIndex + 1,
+                                                    travellers: world.travellers)
+            state.reality.library.record(world: historyRecord)
+            TutorialRules.reconcileComparisonPair(in: &state)
+            TutorialRules.pairNewWorld(historyRecord, in: &state)
 
-            // Pages that didn't surface here have waited one world longer.
-            for page in ContentCatalog.shared.diaryPages
-            where !state.reality.library.hasFound(page.id) && !world.pages.contains(page.id) {
-                state.reality.library.pagesWaiting[page.id, default: 0] += 1
-            }
+            LibraryRules.advancePatience(after: world.pages, library: &state.reality.library)
             state.base.essence -= book.essencePaid
+            state.base.essence -= anchorPremium
             state.worlds.runIndex += 1
             state.reality.lifetime.runsStarted += 1
-            state.worlds.activeRun = WorldRun(
+            state.worlds.lastExit = nil
+
+            // There is no packing screen yet, so leaving every salve in the Storehouse made the
+            // world and combat item buttons truthfully show nothing forever. Until loadouts exist,
+            // identified consumables automatically occupy their own bins in the run satchel.
+            var packedItems = Inventory(slots: state.base.satchelCapacity)
+            let consumables = state.base.inventory.stacks.filter {
+                $0.identified && (ContentCatalog.shared.item($0.catalogID)?.kind == .consumable
+                                  || $0.catalogID == Items.anchorFrame)
+            }
+            for stack in consumables where packedItems.add(stack) {
+                state.base.inventory.remove(stack.id)
+            }
+            let progressAtStart = state.base.partyMembers.map { member in
+                let character = state.base.character(member)
+                let name = member.rosterIndex.flatMap { index in
+                    state.base.roster.indices.contains(index) ? state.base.roster[index].name : nil
+                } ?? "You"
+                return RunProgressStart(member: member, name: name,
+                                        experience: character.experience, level: character.level)
+            }
+            for index in packedItems.stacks.indices {
+                packedItems.stacks[index].protectedReturnCount = packedItems.stacks[index].count
+            }
+            let departingRun = WorldRun(
                 runIndex: state.worlds.runIndex,
                 book: book,
                 mapSeed: seed,
@@ -232,6 +301,7 @@ extension GameStore {
                 // …and what grows here, for the same reasons. Every growth tile points into this,
                 // so losing it would leave the world overgrown with nothing in particular.
                 flora: world.flora,
+                foundWritings: world.writings,
                 // **Everybody comes home mended.** Health is run-scoped, so opening a run at full
                 // is what "the party heals on returning home" means (Aimee, 6 Aug) — and it reads
                 // the Fortitude they've earned rather than a constant.
@@ -241,8 +311,40 @@ extension GameStore {
                 },
                 // The satchel is its own, smaller capacity — separate from home storage, and
                 // separately upgradeable (decisions-log session 2).
-                satchelItems: Inventory(slots: state.base.satchelCapacity)
+                satchelItems: packedItems,
+                carriedInstruments: (state.base.hasConfiguredInstrumentLoadout
+                                     ? state.base.instrumentLoadout
+                                     : state.reality.instruments)
+                    .intersection(state.reality.instruments),
+                carriedInstrumentPrecisions: Dictionary(uniqueKeysWithValues:
+                    ((state.base.hasConfiguredInstrumentLoadout
+                        ? state.base.instrumentLoadout
+                        : state.reality.instruments)
+                     .intersection(state.reality.instruments))
+                    .map { ($0, state.reality.instrumentPrecision(for: $0)) }),
+                partyProgressAtStart: progressAtStart,
+                carriedItemCountsAtStart: packedItems.stacks.reduce(into: [:]) {
+                    $0[$1.catalogID, default: 0] += $1.count
+                },
+                foundPagesAtStart: Set(state.reality.library.foundPages),
+                foundWritingsAtStart: Set(state.reality.library.foundWritings.map(\.id)),
+                foundTravellersAtStart: state.reality.library.foundTravellers,
+                tuning: tuning
             )
+            state.worlds.activeRun = departingRun
+            state.tutorial.complete(.writingPageRequest, fact: "first_bind")
+            state.tutorial.complete(.writingPreview, fact: "world_pane_opened")
+            state.tutorial.complete(.writingBind, fact: "first_run_created")
+            if bornAnchored {
+                state.worlds.anchoredRealms.append(
+                    AnchoredRealm(runIndex: departingRun.runIndex,
+                                  name: "Realm \(departingRun.runIndex)",
+                                  route: .bornAnchored,
+                                  sustainObligation: Self.sustainObligation(
+                                    forExistingRealmCount: state.worlds.anchoredRealms.count),
+                                  world: departingRun.anchoredSnapshot)
+                )
+            }
         }
         return true
     }

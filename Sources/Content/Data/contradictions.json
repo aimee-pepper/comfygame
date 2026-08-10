@@ -60,6 +60,7 @@
       "name": "Green in the dark",
       "blurb": "Growing things that photosynthesise, in a world with nothing to photosynthesise by.",
       "kind": "assertion",
+      "enabled": false,
       "requiresWrittenSource": "root",
       "conditions": [
         { "target": "illumination", "measure": "peak", "maximum": 12 }

@@ -32,6 +32,14 @@ struct BaseState: Codable, Equatable, Sendable {
 
     /// Research nodes completed. The tree's state, and the only place it's recorded.
     var completedResearch: Set<ResearchNodeID> = []
+    /// Recipes inferred from stock once the Apothecary exists. Once understood, never forgotten.
+    var knownConsumableRecipes: Set<ItemID> = []
+
+    /// Instruments selected at the Survey Post for the next departure. This is a Base-layer
+    /// packing choice; the instruments themselves and the knowledge they produce remain Reality.
+    var instrumentLoadout: Set<PressureTargetID> = []
+    /// Distinguishes an intentional empty kit from a save made before loadouts existed.
+    var hasConfiguredInstrumentLoadout = false
 
     /// Per-station progression, keyed by the data-driven station catalog. The Base screen renders
     /// `ContentCatalog.stations` filtered by `isUnlocked`, so adding a v1+ building (blacksmith,
@@ -176,21 +184,23 @@ struct BaseState: Codable, Equatable, Sendable {
     /// point of it.
     var satchelCapacity: Int {
         Tuning.Economy.startingSatchelSlots + satchelTier * Tuning.Economy.satchelSlotsPerTier
+            + (station(Stations.wayfarersTable).isUnlocked ? Tuning.Economy.fieldcraftSatchelBonus : 0)
     }
 
-    /// Whether there's room for another person. **Up to five** (Aimee, 6 Aug).
-    var canRecruit: Bool { roster.count < Tuning.Party.maximumSize }
+    /// Named travellers all have a durable place at Home. Five limits the active combat party,
+    /// including the Binder; it is not a lifetime roster cap.
+    var canRecruit: Bool { true }
 
-    /// Give somebody a place at the fire. Idempotent, and silent if there's no room.
+    /// Give somebody a place at Home. Idempotent; active-party capacity is managed separately.
     @discardableResult
     mutating func seat(_ id: TravellerID) -> Bool {
         guard let person = ContentCatalog.shared.traveller(id) else { return false }
         guard !roster.contains(where: { $0.traveller == id }) else { return false }
-        guard canRecruit else { return false }
         var joined = CompanionState()
         joined.name = person.name
         joined.traveller = id
         joined.calling = person.calling
+        joined.worldwork = person.worldwork
         joined.icon = person.icon
         joined.gambits = GambitStarter.rules
         // **What their trade already taught them.** Free rather than deducted: a lean is who they
@@ -229,7 +239,7 @@ struct BaseState: Codable, Equatable, Sendable {
     mutating func seatEveryoneFound(in library: LibraryState) -> [TravellerID] {
         var seated: [TravellerID] = []
         // Catalogue order, so which four get seats is stable rather than dependent on set ordering.
-        for person in ContentCatalog.shared.travellers where library.foundTravellers.contains(person.id) {
+        for person in ContentCatalog.shared.travellersInAuthoredOrder where library.foundTravellers.contains(person.id) {
             if seat(person.id) { seated.append(person.id) }
         }
         return seated
@@ -274,7 +284,10 @@ struct BaseState: Codable, Equatable, Sendable {
     /// A fresh id for something entering the storehouse. Monotonic over what's already there, so a
     /// piece coming off somebody can't collide with one already on the shelf.
     func nextItemID() -> UInt64 {
-        (inventory.stacks.map(\.id.rawValue).max() ?? 0) + 1
+        let stored = inventory.stacks.map(\.id.rawValue) + spillover.map(\.id.rawValue)
+        let worn = Array(binderEquipped.values).compactMap { $0.gearProfile?.stableInstanceID.rawValue }
+            + roster.flatMap { $0.equipped.values.compactMap { $0.gearProfile?.stableInstanceID.rawValue } }
+        return ((stored + worn).max() ?? 0) + 1
     }
 
     /// `Inventory.slots` is the stored capacity (the run satchel has its own), so it has to be
@@ -290,7 +303,8 @@ struct BaseState: Codable, Equatable, Sendable {
     /// decoder still has to be able to read it out of a save written before the roster existed.
     private enum CodingKeys: String, CodingKey {
         case essence, resources, inventory, spillover, ownedSymbols, ownedGambitComponents
-        case completedResearch, stations, page, ownedHands, hasChainingUnlock
+        case completedResearch, knownConsumableRecipes, stations, page, ownedHands, hasChainingUnlock, instrumentLoadout
+        case hasConfiguredInstrumentLoadout
         case ownedSources
         case roster, activeCompanion, activeParty, binderEquipped, hasAutomateSelfUnlock, satchelTier
         case purchasedGambitSlots, binderGambits, binderCharacter
@@ -307,6 +321,8 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(ownedSources, forKey: .ownedSources)
         try c.encode(ownedGambitComponents, forKey: .ownedGambitComponents)
         try c.encode(completedResearch, forKey: .completedResearch)
+        try c.encode(instrumentLoadout, forKey: .instrumentLoadout)
+        try c.encode(hasConfiguredInstrumentLoadout, forKey: .hasConfiguredInstrumentLoadout)
         try c.encode(stations, forKey: .stations)
         try c.encode(page, forKey: .page)
         try c.encode(ownedHands, forKey: .ownedHands)
@@ -317,6 +333,7 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(hasAutomateSelfUnlock, forKey: .hasAutomateSelfUnlock)
         try c.encode(satchelTier, forKey: .satchelTier)
         try c.encode(purchasedGambitSlots, forKey: .purchasedGambitSlots)
+        try c.encode(knownConsumableRecipes, forKey: .knownConsumableRecipes)
         try c.encode(binderGambits, forKey: .binderGambits)
         try c.encode(binderCharacter, forKey: .binderCharacter)
     }
@@ -333,7 +350,21 @@ struct BaseState: Codable, Equatable, Sendable {
                                                               forKey: .ownedGambitComponents)
             ?? Set(GambitStarter.components)
         completedResearch = try container.decodeIfPresent(Set<ResearchNodeID>.self, forKey: .completedResearch) ?? []
+        knownConsumableRecipes = try container.decodeIfPresent(Set<ItemID>.self,
+                                                                forKey: .knownConsumableRecipes) ?? []
+        instrumentLoadout = try container.decodeIfPresent(Set<PressureTargetID>.self,
+                                                          forKey: .instrumentLoadout) ?? []
+        hasConfiguredInstrumentLoadout = try container.decodeIfPresent(Bool.self,
+                                                                        forKey: .hasConfiguredInstrumentLoadout) ?? false
         stations = try container.decodeIfPresent([StationID: StationState].self, forKey: .stations) ?? [:]
+        // Migration for saves from the brief window where a built Tannery existed before its
+        // immediate Wear capability. Idempotent and free: the player already paid for the room.
+        if stations[Stations.tannery]?.isUnlocked == true {
+            completedResearch.insert("tannery_wear_root")
+        }
+        if stations[Stations.weaponsmith]?.isUnlocked == true {
+            completedResearch.insert("weaponsmith_point_root")
+        }
         page = try container.decodeIfPresent(Page.self, forKey: .page) ?? Page()
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
         hasChainingUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) ?? false
@@ -356,6 +387,8 @@ struct BaseState: Codable, Equatable, Sendable {
             ?? CharacterState(rank: .front)
         spillover = try container.decodeIfPresent([ItemStack].self, forKey: .spillover) ?? []
 
+        migrateEquippedGearProfiles()
+
         // **Capacity is derived, not remembered.**
         //
         // `Inventory.slots` is stored, so a save written when the storehouse held eight kept
@@ -364,6 +397,76 @@ struct BaseState: Codable, Equatable, Sendable {
         // the whole reason the numbers live in one file. It can only ever grow the storehouse:
         // `syncInventoryCapacity` doesn't touch what's in it.
         syncInventoryCapacity()
+    }
+
+    /// Equipped legacy saves had no instance id. Assign one once, after every storage location has
+    /// decoded, and freeze the catalogue combat shape into the shared profile. Subsequent
+    /// equip/unequip cycles preserve this id rather than minting a new history for the same piece.
+    private mutating func migrateEquippedGearProfiles() {
+        var used = Set(inventory.stacks.map(\.id.rawValue) + spillover.map(\.id.rawValue))
+        for profile in inventory.stacks.compactMap(\.gearProfile) { used.insert(profile.stableInstanceID.rawValue) }
+        for profile in spillover.compactMap(\.gearProfile) { used.insert(profile.stableInstanceID.rawValue) }
+        var next = (used.max() ?? 0) + 1
+
+        // A very old save could hold several identical pieces in one stack. Physical gear now has
+        // per-instance history, so expand that legacy quantity losslessly before assigning worn
+        // IDs. The first copy keeps its old identity; each additional copy gets a durable fresh one.
+        func splitLegacyGear(_ stacks: [ItemStack]) -> [ItemStack] {
+            var expanded: [ItemStack] = []
+            for stack in stacks {
+                guard stack.gearProfile != nil, stack.count > 1 else {
+                    expanded.append(stack)
+                    continue
+                }
+                for copyIndex in 0..<stack.count {
+                    var copy = stack
+                    copy.count = 1
+                    copy.protectedReturnCount = min(copy.protectedReturnCount, 1)
+                    if copyIndex > 0 {
+                        while used.contains(next) { next += 1 }
+                        copy.id = InstanceID(rawValue: next)
+                        copy.gearProfile?.stableInstanceID = copy.id
+                        used.insert(next)
+                        next += 1
+                    }
+                    expanded.append(copy)
+                }
+            }
+            return expanded
+        }
+
+        inventory.stacks = splitLegacyGear(inventory.stacks)
+        spillover = splitLegacyGear(spillover)
+
+        func migrated(_ piece: EquippedPiece) -> EquippedPiece {
+            var result = piece
+            guard let definition = ContentCatalog.shared.item(piece.catalogID), definition.gear != nil
+            else { return result }
+            if result.gearProfile == nil {
+                result.gearProfile = GearInstanceProfile(stableInstanceID: InstanceID(rawValue: next),
+                                                         definition: definition,
+                                                         legacyUpgradeLevel: piece.upgradeLevel)
+                used.insert(next)
+                next += 1
+            } else if result.gearProfile?.stableInstanceID.rawValue == 0 {
+                while used.contains(next) { next += 1 }
+                result.gearProfile?.stableInstanceID = InstanceID(rawValue: next)
+                used.insert(next)
+                next += 1
+            }
+            return result
+        }
+
+        for slot in Array(binderEquipped.keys) {
+            if let piece = binderEquipped[slot] { binderEquipped[slot] = migrated(piece) }
+        }
+        for index in roster.indices {
+            for slot in Array(roster[index].equipped.keys) {
+                if let piece = roster[index].equipped[slot] {
+                    roster[index].equipped[slot] = migrated(piece)
+                }
+            }
+        }
     }
 }
 
@@ -377,9 +480,19 @@ enum Stations {
     static let constellation: StationID = "constellation"
     static let library: StationID = "library"
     static let blacksmith: StationID = "blacksmith"
+    static let tannery: StationID = "tannery"
+    static let bowyer: StationID = "bowyer"
+    static let armoury: StationID = "armoury"
+    static let weaponsmith: StationID = "weaponsmith"
     static let scriptorium: StationID = "scriptorium"
     static let firepit: StationID = "firepit"
     static let surveyPost: StationID = "survey_post"
+    static let apothecary: StationID = "apothecary"
+    static let reliquary: StationID = "reliquary"
+    static let wayfarersTable: StationID = "wayfarers_table"
+    static let anchorage: StationID = "anchorage"
+    static let distillery: StationID = "distillery"
+    static let channelworks: StationID = "channelworks"
 }
 
 struct StationState: Codable, Equatable, Sendable {
@@ -441,6 +554,8 @@ struct CompanionState: Codable, Equatable, Sendable {
     /// What they were before the sundering, in their own words — *a smith*, *a surveyor*.
     var calling: String = ""
     var icon: String = "person.fill"
+    /// Visible anchored-realm aptitude. Old and generated companions default to ordinary (1).
+    var worldwork: Int = 1
     /// Only the *maximum* lives here. Current HP is run-scoped (`WorldRun.companionHP`) because
     /// the brief says HP persists during a run and returning home fully heals — so a base-side
     /// current-HP field would be a second source of truth that is always full.
@@ -469,6 +584,7 @@ struct CompanionState: Codable, Equatable, Sendable {
         traveller = try container.decodeIfPresent(TravellerID.self, forKey: .traveller)
         calling = try container.decodeIfPresent(String.self, forKey: .calling) ?? ""
         icon = try container.decodeIfPresent(String.self, forKey: .icon) ?? "person.fill"
+        worldwork = min(3, max(0, try container.decodeIfPresent(Int.self, forKey: .worldwork) ?? 1))
         maxHP = try container.decodeIfPresent(Int.self, forKey: .maxHP) ?? Tuning.Encounter.companionMaxHP
         gambits = (try? container.decodeIfPresent([GambitRule].self, forKey: .gambits)) ?? GambitStarter.rules
         equipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .equipped) ?? [:]

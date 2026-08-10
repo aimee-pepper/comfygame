@@ -4,6 +4,89 @@ import XCTest
 /// Items stack, and materials bin by kind (decisions-session-16 §1).
 final class StackingTests: XCTestCase {
 
+    func testDistilledCoresStackOnlyWhenDisplayProvenanceMatches() {
+        var inventory = Inventory(slots: 8)
+        let first = DistilledCore(attunement: .heat, potency: 70, sampleKind: "reagent",
+                                  sampleSource: "ashen bloom", catalystID: Resources.sulfur,
+                                  catalystCount: 2)
+        let otherOrigin = DistilledCore(attunement: .heat, potency: 70, sampleKind: "reagent",
+                                        sampleSource: "red fungus", catalystID: Resources.sulfur,
+                                        catalystCount: 2)
+        inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.heatCore, distilledCore: first))
+        inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: Items.heatCore, distilledCore: first))
+        inventory.add(ItemStack(id: InstanceID(rawValue: 3), catalogID: Items.heatCore, distilledCore: otherOrigin))
+        XCTAssertEqual(inventory.stacks.count, 2)
+        XCTAssertEqual(inventory.stacks.first?.count, 2)
+    }
+
+    func testDistilleryCoreProvenanceSurvivesSave() throws {
+        let core = DistilledCore(attunement: .light, potency: 86, sampleKind: "chitin",
+                                sampleSource: "glassback", sampleQualifier: "lustrous",
+                                catalystID: Resources.silver, catalystCount: 2)
+        let stack = ItemStack(id: InstanceID(rawValue: 9), catalogID: Items.lightCore,
+                              distilledCore: core)
+        let data = try SaveCodec.makeEncoder().encode(stack)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(ItemStack.self, from: data), stack)
+    }
+
+    func testAttuningConsumesExactInputsAndRecordsSelectedSample() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
+        state.base.essence = 100
+        state.base.resources.add(2, of: Resources.sulfur)
+        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.essenceCrystal,
+                                           distilledCore: DistilledCore(attunement: nil, potency: 0)))
+        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: Items.material,
+                                           material: MaterialSample(kind: .reagent,
+                                               properties: MaterialProperties(insulation: 30, reactivity: 80),
+                                               grade: 70, source: "ashen bloom")))
+        let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
+        XCTAssertTrue(DistilleryRules.attune(.heat, candidate: candidate,
+                                             catalyst: Resources.sulfur, in: &state))
+        XCTAssertEqual(state.base.essence, 85)
+        XCTAssertEqual(state.base.resources[Resources.sulfur], 0)
+        let core = try XCTUnwrap(state.base.inventory.stacks.first { $0.catalogID == Items.heatCore }?.distilledCore)
+        XCTAssertEqual(core.potency, 73)
+        XCTAssertEqual(core.sampleSource, "ashen bloom")
+    }
+
+    func testFullStorehouseRefusesAttunementAtomically() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
+        state.base.essence = 100
+        state.base.resources.add(2, of: Resources.sulfur)
+        state.base.inventory = Inventory(slots: 2)
+        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.essenceCrystal,
+                                           count: 2, distilledCore: DistilledCore(attunement: nil, potency: 0)))
+        let qualifying = MaterialSample(kind: .reagent,
+            properties: MaterialProperties(insulation: 30, reactivity: 80), grade: 70, source: "a")
+        let spare = MaterialSample(kind: .reagent, properties: MaterialProperties(), grade: 10, source: "b")
+        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: Items.material,
+                                           identified: true, materials: [qualifying, spare]))
+        let before = state
+        let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
+        XCTAssertFalse(DistilleryRules.attune(.heat, candidate: candidate,
+                                              catalyst: Resources.sulfur, in: &state))
+        XCTAssertEqual(state, before)
+    }
+
+    @MainActor func testBuildingChannelworksRestoresOdasFixtureExactlyOnce() throws {
+        let store = GameStore(io: .temporary(name: "channelworks-\(UUID().uuidString)"))
+        let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.channelworks))
+        store.mutate("prepare Oda build") { state in
+            state.reality.library.foundTravellers.insert("oda")
+            state.base.essence = 1_000
+            for (id, amount) in station.buildCost?.resources ?? [:] { state.base.resources.add(amount, of: id) }
+        }
+        XCTAssertTrue(store.build(station))
+        let fixtures = store.state.base.inventory.stacks.filter { $0.catalogID == Items.conduitFixture }
+        XCTAssertEqual(fixtures.reduce(0) { $0 + $1.count }, 1)
+        XCTAssertEqual(fixtures.first?.distilledCore?.recipeVersion, 0)
+        XCTAssertFalse(store.build(station))
+        XCTAssertEqual(store.state.base.inventory.stacks.filter { $0.catalogID == Items.conduitFixture }
+            .reduce(0) { $0 + $1.count }, 1)
+    }
+
     // MARK: The bug
 
     /// **`count` existed from the start and nothing ever incremented it.** Every pickup made a new
@@ -215,8 +298,10 @@ final class StackingTests: XCTestCase {
         let ids = Set(hold.map(\.id))
         for node in hold {
             for requirement in node.requires {
-                XCTAssertTrue(ids.contains(requirement),
-                              "\(node.id.rawValue) needs \(requirement.rawValue), which isn't in the branch")
+                let crossStationCapability = ContentCatalog.shared.researchNode(requirement)?
+                    .grants.contains { $0.kind == .capability } == true
+                XCTAssertTrue(ids.contains(requirement) || crossStationCapability,
+                              "\(node.id.rawValue) needs \(requirement.rawValue), which is neither in the branch nor an explicit station capability")
             }
         }
     }

@@ -44,6 +44,14 @@ final class TerrainTests: XCTestCase {
                              "a world of sea and glacier came out as bare rock")
     }
 
+    func testLiquidWaterMakesAVisibleMudEdgeButIceDoesNot() {
+        let wet = ground(in: world(["sea": "hydrology", "rain": "hydrology"]))
+        let frozen = ground(in: world(["sea": "hydrology", "glacier": "thermal",
+                                       "ice": "thermal", "snow": "thermal"]))
+        XCTAssertGreaterThan(wet[.mud, default: 0], 0, "liquid water met soil without making mud")
+        XCTAssertEqual(frozen[.mud, default: 0], 0, "a frozen shore somehow made mud")
+    }
+
     // MARK: Vitality is cover — through the plants it grows
 
     func testAProductiveWorldIsOvergrown() {

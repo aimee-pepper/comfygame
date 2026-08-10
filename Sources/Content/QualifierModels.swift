@@ -61,7 +61,10 @@ struct QualifierDef: Codable, Equatable, Identifiable, Sendable {
             case .intensity, .scale, .count: true
             // The narrow ones stay narrow, and the warning stays for them — Phase on Illumination
             // should still say so. The fix removed the cases, not the mechanism.
-            case .phase, .direction: true
+            // Phase remains decodable for old pages, but has no honest mapping to the live
+            // hydrology model. It is hidden from new writing and warned about when loaded.
+            case .phase: false
+            case .direction: true
             }
         }
 

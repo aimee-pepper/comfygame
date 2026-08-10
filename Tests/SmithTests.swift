@@ -62,12 +62,13 @@ final class SmithTests: XCTestCase {
         XCTAssertGreaterThan(third.essence, first.essence)
     }
 
-    /// **Rarity says how far a piece goes.** Otherwise a common blade reforged enough times catches
-    /// a mythic one and finding a mythic stops mattering.
-    func testACommonPieceFinishesAndAMythicKeepsGoing() {
+    /// Reforging is an equal three-rank within-tier track. Rarity and construction tier describe
+    /// what was built; neither lets smith work promote an item into another specialist's tier.
+    func testEveryPhysicalPieceHasTheSameThreeRankReforgeTrack() {
         let common = SmithRules.maximumLevel(for: ContentCatalog.shared.item("blade_chipped")!)
         let mythic = SmithRules.maximumLevel(for: ContentCatalog.shared.item("the_long_grievance")!)
-        XCTAssertGreaterThan(mythic, common)
+        XCTAssertEqual(common, 3)
+        XCTAssertEqual(mythic, 3)
         XCTAssertNil(SmithRules.requirement(for: "blade_chipped", at: common),
                      "a finished piece was still offering another reforging")
     }
@@ -75,7 +76,7 @@ final class SmithTests: XCTestCase {
     // MARK: Doing it
 
     @MainActor
-    func testReforgingRaisesTheTierAndTheFightFeelsIt() throws {
+    func testReforgingRaisesRankWithoutChangingConstructionTier() throws {
         let store = store()
         stocked(store)
         store.mutate("test: carry it") { state in
@@ -84,15 +85,17 @@ final class SmithTests: XCTestCase {
         let stack = try XCTUnwrap(store.state.base.inventory.stacks.first { $0.catalogID == "blade_keen" })
         store.equip(stack, on: PartyMember.binder)
 
-        let before = CombatRules.binderAttack(in: store.state)
+        let beforePower = try XCTUnwrap(store.worn(.weapon, by: PartyMember.binder)?.effectivePower)
+        let beforeTier = try XCTUnwrap(store.worn(.weapon, by: PartyMember.binder)?.constructionTier)
         let target = try XCTUnwrap(store.reforgeable.first { $0.catalogID == "blade_keen" })
         XCTAssertTrue(store.readiness(of: target).isReady)
         store.reforge(target)
 
         XCTAssertEqual(store.worn(.weapon, by: PartyMember.binder)?.upgradeLevel, 1)
-        XCTAssertEqual(CombatRules.binderAttack(in: store.state) - before,
-                       Tuning.Encounter.attackPerWeaponTier,
-                       "the anvil promised a tier the fight didn't deliver")
+        let afterPower = try XCTUnwrap(store.worn(.weapon, by: PartyMember.binder)?.effectivePower)
+        XCTAssertEqual(afterPower, beforePower + 0.2, accuracy: 0.000_001)
+        XCTAssertEqual(store.worn(.weapon, by: PartyMember.binder)?.constructionTier, beforeTier,
+                       "reforging crossed a construction-tier boundary")
     }
 
     /// A worn piece is reforged **in place**. The thing you most want improved is the one you're
@@ -180,16 +183,18 @@ final class SmithTests: XCTestCase {
         let store = store()
         stocked(store)
         store.mutate("test: three the same") { state in
-            state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1),
-                                               catalogID: "guard_padded", count: 3))
+            for id in 1...3 {
+                state.base.inventory.add(ItemStack(id: InstanceID(rawValue: UInt64(id)),
+                                                   catalogID: "guard_padded"))
+            }
         }
         let target = try XCTUnwrap(store.reforgeable.first { $0.catalogID == "guard_padded" })
         store.reforge(target)
 
         let bins = store.state.base.inventory.stacks.filter { $0.catalogID == "guard_padded" }
-        XCTAssertEqual(bins.count, 2, "the reforged one went back in with the plain ones")
+        XCTAssertEqual(bins.count, 3, "physical gear instances merged and lost their own histories")
         XCTAssertEqual(bins.first { $0.upgradeLevel == 1 }?.count, 1)
-        XCTAssertEqual(bins.first { $0.upgradeLevel == 0 }?.count, 2)
+        XCTAssertEqual(bins.filter { $0.upgradeLevel == 0 }.reduce(0) { $0 + $1.count }, 2)
     }
 
     /// The work survives a force-quit — pillar 2, and the piece is worthless if it doesn't.
@@ -208,19 +213,20 @@ final class SmithTests: XCTestCase {
 
         let resumed = GameStore(io: io)
         XCTAssertEqual(resumed.worn(.weapon, by: PartyMember.binder)?.upgradeLevel, 1)
-        XCTAssertEqual(resumed.worn(.weapon, by: PartyMember.binder)?.displayName, "Keen Blade +1")
+        XCTAssertEqual(resumed.worn(.weapon, by: PartyMember.binder)?.displayName,
+                       "Keen Blade · Tier 2 · Reforged 1/3")
     }
 
-    /// An untouched piece still writes itself as a bare id, so a save stays legible and an older
-    /// build can still read what everybody is wearing.
+    /// Once loaded, even an untouched equipped piece writes its durable instance profile. Bare IDs
+    /// remain accepted as a legacy input, but cannot preserve identity on their own.
     @MainActor
     func testAnUntouchedPieceStillSavesAsABareID() throws {
         let store = store()
         store.mutate("test: wear it") { $0.base.companion.equipped[.weapon] = "blade_keen" }
-        let text = try XCTUnwrap(String(data: try SaveCodec.encode(store.state), encoding: .utf8))
-        XCTAssertTrue(text.contains("\"weapon\" : \"blade_keen\"")
-                      || text.contains("\"weapon\": \"blade_keen\""),
-                      "an unmodified piece stopped being readable in the save")
+        let migrated = try SaveCodec.decode(SaveCodec.encode(store.state))
+        let text = try XCTUnwrap(String(data: try SaveCodec.encode(migrated), encoding: .utf8))
+        XCTAssertTrue(text.contains("\"gearProfile\""),
+                      "an equipped piece omitted its durable instance profile")
     }
 
     // MARK: The building

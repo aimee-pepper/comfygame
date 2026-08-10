@@ -22,6 +22,9 @@ struct GameState: Codable, Equatable, Sendable {
     var base: BaseState
     /// Layer 3 — instanced runs; disposable in v0.
     var worlds: WorldsState
+    /// Versioned, durable contextual-help progress. It is neither world simulation nor campaign
+    /// progression, and old saves infer already-accomplished lessons without presenting them.
+    var tutorial: TutorialState
 
     static func newGame() -> GameState {
         var seeds = SeedSequence.newGame()
@@ -30,7 +33,8 @@ struct GameState: Codable, Equatable, Sendable {
             meta: SaveMeta(),
             reality: RealityState.newGame(),
             base: BaseState.newGame(),
-            worlds: WorldsState.newGame(seeds: &seeds)
+            worlds: WorldsState.newGame(seeds: &seeds),
+            tutorial: TutorialState()
         )
     }
 
@@ -44,14 +48,26 @@ struct GameState: Codable, Equatable, Sendable {
         base = try container.decodeIfPresent(BaseState.self, forKey: .base) ?? .newGame()
         var seeds = SeedSequence.newGame()
         worlds = try container.decodeIfPresent(WorldsState.self, forKey: .worlds) ?? .newGame(seeds: &seeds)
+        if let savedTutorial = try container.decodeIfPresent(TutorialState.self, forKey: .tutorial) {
+            tutorial = savedTutorial
+        } else {
+            // Only pre-tutorial saves infer completed notes. Re-running inference on every decode
+            // would mutate an explicitly saved (and deliberately resettable) tutorial record.
+            tutorial = TutorialState()
+            var reconciled = tutorial
+            reconciled.reconcile(with: self)
+            tutorial = reconciled
+        }
     }
 
-    init(schemaVersion: Int, meta: SaveMeta, reality: RealityState, base: BaseState, worlds: WorldsState) {
+    init(schemaVersion: Int, meta: SaveMeta, reality: RealityState, base: BaseState, worlds: WorldsState,
+         tutorial: TutorialState = TutorialState()) {
         self.schemaVersion = schemaVersion
         self.meta = meta
         self.reality = reality
         self.base = base
         self.worlds = worlds
+        self.tutorial = tutorial
     }
 }
 

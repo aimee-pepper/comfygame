@@ -52,7 +52,7 @@ struct WorldMap: Codable, Equatable, Sendable {
 /// set (`generation-spine-spec.md` §2) — enough for the eight targets to write something legible
 /// into, not a materials system.
 enum GroundType: String, Codable, CaseIterable, Sendable {
-    case stone, soil, sand, ice, ash, water, deepWater, rubble, growth
+    case stone, soil, sand, ice, ash, water, deepWater, rubble, mud, growth
     /// **A hole where the ground should be.** Written with the Chasm focus, which is Substrate's
     /// first word for *less* (Aimee, 7 Aug). It was called `void` and was produced by nothing at
     /// all — an impassable ground type that no world could contain, waiting for a way to ask for it.
@@ -76,10 +76,14 @@ enum GroundType: String, Codable, CaseIterable, Sendable {
     /// and what the harvest reads.
     var isOvergrown: Bool { self == .growth || self == .groundcover }
 
+    /// World turns spent entering this tile. Tall growth and mud both make one step take two.
+    var movementCost: Int { self == .growth || self == .mud ? 2 : 1 }
+
     var displayName: String {
         switch self {
         case .deepWater: "deep water"
         case .groundcover: "ground cover"
+        case .growth: "tall growth"
         default: rawValue
         }
     }
@@ -110,15 +114,19 @@ struct Tile: Codable, Equatable, Sendable {
     var isRevealed: Bool = false
     /// Crumbled tiles are impassable, and anything unharvested on them is gone.
     var isCrumbled: Bool = false
+    /// A one-turn warning. A tile must crack on an earlier world turn before it may disappear.
+    var isCracking: Bool = false
 
     init(content: TileContent = .empty, ground: GroundType = .soil, flora: InstanceID? = nil,
-         elevation: Int = 0, isRevealed: Bool = false, isCrumbled: Bool = false) {
+         elevation: Int = 0, isRevealed: Bool = false, isCrumbled: Bool = false,
+         isCracking: Bool = false) {
         self.content = content
         self.ground = ground
         self.flora = flora
         self.elevation = elevation
         self.isRevealed = isRevealed
         self.isCrumbled = isCrumbled
+        self.isCracking = isCracking
     }
 
     /// Tolerant: a tile is in every save with a run in it, so adding a field here must not cost
@@ -131,6 +139,7 @@ struct Tile: Codable, Equatable, Sendable {
         elevation = try c.decodeIfPresent(Int.self, forKey: .elevation) ?? 0
         isRevealed = try c.decodeIfPresent(Bool.self, forKey: .isRevealed) ?? false
         isCrumbled = try c.decodeIfPresent(Bool.self, forKey: .isCrumbled) ?? false
+        isCracking = try c.decodeIfPresent(Bool.self, forKey: .isCracking) ?? false
     }
 
     var isPassable: Bool { !isCrumbled && ground.isPassable }
@@ -159,6 +168,7 @@ enum TileContent: Codable, Equatable, Sendable {
     case site(InstanceID)
     /// A page torn from someone's diary, lying where it fell.
     case diaryPage(DiaryPageID)
+    case foundWriting(FoundWritingID)
     /// **Somebody, standing there.** Reaching them opens the meeting; recruiting them is what
     /// actually finds them (Aimee, 6 Aug).
     case traveller(TravellerID)
@@ -168,7 +178,7 @@ enum TileContent: Codable, Equatable, Sendable {
     /// Whether losing this tile to crumbling costs the player something.
     var isLoseable: Bool {
         switch self {
-        case .node, .wildDrop, .lockedCache, .site, .diaryPage: true
+        case .node, .wildDrop, .lockedCache, .site, .diaryPage, .foundWriting: true
         // A person is not loot, and losing them to the floor is the point of the timer rather
         // than a cost to be tallied.
         case .empty, .hazard, .portal, .traveller: false

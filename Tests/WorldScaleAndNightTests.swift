@@ -5,6 +5,14 @@ import XCTest
 @MainActor
 final class WorldScaleAndNightTests: XCTestCase {
 
+    func testWrittenScaleRungsStraddleUnwrittenOrdinary() {
+        XCTAssertEqual(PressureRules.scaleOffset(0), 0)
+        XCTAssertEqual(PressureRules.scaleOffset(1), -2)
+        XCTAssertEqual(PressureRules.scaleOffset(2), -1)
+        XCTAssertEqual(PressureRules.scaleOffset(3), 1)
+        XCTAssertEqual(PressureRules.scaleOffset(4), 2)
+    }
+
     // MARK: Size is written, and costs
 
     /// Scale was already in the vocabulary and already placeable. This is the reading of it.
@@ -53,11 +61,85 @@ final class WorldScaleAndNightTests: XCTestCase {
 
     func testTheDayIsDrivenByTurnsAndNeverByTheClock() {
         var run = makeRun()
+        run.clock = WorldClock(cyclePeak: 50, regularity: 100, seed: run.mapSeed)
         let phase = run.dayPhase
         // Wall-clock time passing changes nothing; only a turn does.
         XCTAssertEqual(run.dayPhase, phase)
         run.turnsTaken += Tuning.DayNight.turnsPerDay / 2
         XCTAssertNotEqual(run.dayPhase, phase)
+    }
+
+    func testCyclePeakEightStopsAndNineRunsSlowly() {
+        let stopped = WorldClock(cyclePeak: 8, regularity: 70, seed: 1)
+        let slow = WorldClock(cyclePeak: 9, regularity: 70, seed: 1)
+        XCTAssertTrue(stopped.isStopped)
+        XCTAssertEqual(stopped.basePeriod, 0)
+        XCTAssertFalse(slow.isStopped)
+        XCTAssertEqual(slow.basePeriod, 64)
+    }
+
+    func testClockScheduleIsDeterministicAndSurvivesSaveRoundTrip() throws {
+        let clock = WorldClock(cyclePeak: 50, regularity: 12, seed: 5515)
+        let phases = (0...180).map(clock.phase(at:))
+        let data = try SaveCodec.makeEncoder().encode(clock)
+        let restored = try SaveCodec.makeDecoder().decode(WorldClock.self, from: data)
+        XCTAssertEqual((0...180).map(restored.phase(at:)), phases)
+        XCTAssertEqual((0...5).map(clock.period(forCycle:)),
+                       (0...5).map(restored.period(forCycle:)))
+    }
+
+    func testLowRegularityJittersPeriodsWithinTheAuthoredBound() {
+        let clock = WorldClock(cyclePeak: 50, regularity: 0, seed: 991)
+        let periods = (0..<12).map(clock.period(forCycle:))
+        XCTAssertGreaterThan(Set(periods).count, 1)
+        XCTAssertTrue(periods.allSatisfy { (24...56).contains($0) }, "got \(periods)")
+    }
+
+    func testStoppedClockNeverChangesPhaseOrSwapsRoster() {
+        var run = makeRun()
+        run.clock = WorldClock(cyclePeak: 8, regularity: 70, entryPhase: 0.75,
+                               entryIsNight: false, seed: run.mapSeed)
+        run.cast = [species(nocturnal: false, id: 10), species(nocturnal: true, id: 11)]
+        run.enemies = [Worldgen.spawn(run.cast[0], at: GridPoint(x: 1, y: 1), rng: &run.rng)]
+        var state = GameState.newGame()
+        state.worlds.activeRun = run
+
+        let events = WorldRules.advanceTurn(in: &state)
+        XCTAssertEqual(state.worlds.activeRun?.dayPhase, 0.75)
+        XCTAssertFalse(events.contains(.nightfall))
+        XCTAssertFalse(events.contains(.daybreak))
+        XCTAssertEqual(state.worlds.activeRun?.species(of: state.worlds.activeRun!.enemies[0])?.isNocturnal,
+                       false)
+    }
+
+    func testPreviewNamesClockBandOnlyForWrittenCalibratedCycle() throws {
+        var page = Page()
+        page = try XCTUnwrap(place(.target("cycle"), at: PageCell(column: 0, row: 0), on: page))
+        page = try XCTUnwrap(place(.source("tide"), at: PageCell(column: 1, row: 0), on: page))
+        page = try XCTUnwrap(PageRules.connect(page.runes[0].id, page.runes[1].id, on: page))
+
+        XCTAssertNil(BookProjection.project(page: page,
+                                             analysisTier: Tuning.Analysis.targetsTier,
+                                             measuring: []).clockBand)
+        XCTAssertNotNil(BookProjection.project(page: page,
+                                                analysisTier: Tuning.Analysis.targetsTier,
+                                                measuring: ["cycle"]).clockBand)
+        XCTAssertNil(BookProjection.project(page: Page(),
+                                             analysisTier: Tuning.Analysis.targetsTier,
+                                             measuring: ["cycle"]).clockBand,
+                     "an unwritten rolled Cycle leaked into the pre-bind preview")
+    }
+
+    func testTransitionDiagnosticsAreReadOnlyAndStoppedWorldsHaveNone() {
+        var run = makeRun()
+        run.clock = WorldClock(cyclePeak: 50, regularity: 20, seed: run.mapSeed)
+        let before = run
+        let transitions = run.nextLightTransitions()
+        XCTAssertEqual(transitions.count, run.hasDayAndNight ? 2 : 0)
+        XCTAssertEqual(run, before, "reading diagnostics changed the run")
+
+        run.clock = WorldClock(cyclePeak: 8, regularity: 70, seed: run.mapSeed)
+        XCTAssertTrue(run.nextLightTransitions().isEmpty)
     }
 
     /// A world whose light never varies has no night at all — which is what finally makes

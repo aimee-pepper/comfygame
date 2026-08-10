@@ -27,7 +27,9 @@ enum DescriptionRules {
                          contradictions: [ContradictionDef] = [],
                          analysisTier: Int = Tuning.Analysis.startingTier,
                          measuring instruments: Set<PressureTargetID> = [],
-                         about targets: Set<PressureTargetID>? = nil) -> WorldDescription {
+                         about targets: Set<PressureTargetID>? = nil,
+                         derivedPolarity: [String: DescriptionClauseDef.Polarity] = [:],
+                         precision: [PressureTargetID: RealityState.InstrumentPrecision] = [:]) -> WorldDescription {
         let speakable = targets.map { Set($0.map(\.rawValue)) }
         let matching = ContentCatalog.shared.descriptionClauses.filter { clause in
             (speakable?.contains(clause.group) ?? true) && clause.holds(in: readings)
@@ -53,12 +55,14 @@ enum DescriptionRules {
                     return WorldDescription.Reading(target: target.id, name: target.name,
                                                     icon: target.icon, peak: reading.peak,
                                                     floor: reading.floor,
-                                                    hasFloor: target.dualValued)
+                                                    hasFloor: target.dualValued,
+                                                    precision: precision[target.id] ?? .fine)
                 }
             : []
 
         return WorldDescription(clauses: clauses, contradictions: contradictions,
-                                analysisTier: analysisTier, measured: readable)
+                                analysisTier: analysisTier, measured: readable,
+                                derivedPolarity: derivedPolarity)
     }
 
     /// Describes what a page says, contradictions included.
@@ -70,7 +74,21 @@ enum DescriptionRules {
         return describe(readings,
                         contradictions: ContradictionRules.fired(in: sigils, readings: readings),
                         analysisTier: analysisTier,
-                        measuring: instruments)
+                        measuring: instruments,
+                        derivedPolarity: stabilityPolarity(for: sigils))
+    }
+
+    /// Mark a subject from the stability change caused by the focuses explicitly bound to it.
+    /// This is contextual and marginal, so stacking is accounted for; no prose label decides it.
+    static func stabilityPolarity(for sigils: [Sigil]) -> [String: DescriptionClauseDef.Polarity] {
+        let total = BookRules.greedDelta(for: sigils)
+        let targets = Set(sigils.map(\.target))
+        return Dictionary(uniqueKeysWithValues: targets.compactMap { target in
+            let without = BookRules.greedDelta(for: sigils.filter { $0.target != target })
+            let delta = total - without
+            guard delta != 0 else { return nil }
+            return (target.rawValue, delta < 0 ? .destabilising : .stabilising)
+        })
     }
 
     /// Group order follows the targets, with each group named for the target it describes.

@@ -300,7 +300,7 @@ enum BookRules {
     /// (`audit-what-pressures-actually-do.md` §4.1).
     static func yieldTable(from readings: PressureReadings) -> [(value: ResourceID, weight: Double)] {
         ContentCatalog.shared.resources
-            .filter { !$0.isRealityCurrency }
+            .filter { !$0.isRealityCurrency && $0.id != Resources.essenceRaw }
             .map { (value: $0.id, weight: $0.abundance(in: readings)) }
             .filter { $0.weight > 0 }
     }
@@ -334,13 +334,15 @@ enum BookRules {
 
     static func yieldTable(for book: BoundBook) -> [(value: ResourceID, weight: Double)] {
         var weights: [ResourceID: Double] = [:]
-        for resource in ContentCatalog.shared.resources where !resource.isRealityCurrency {
+        for resource in ContentCatalog.shared.resources
+        where !resource.isRealityCurrency && resource.id != Resources.essenceRaw {
             weights[resource.id] = Tuning.World.baseResourceWeight
         }
         for id in book.allSymbolIDs {
             guard let symbol = ContentCatalog.shared.symbol(id) else { continue }
             for (resource, multiplier) in symbol.yieldModifiers {
                 // A symbol can introduce a resource the base table doesn't carry (Mote Vein).
+                guard resource != Resources.essenceRaw else { continue }
                 weights[resource] = (weights[resource] ?? Tuning.World.baseResourceWeight) * multiplier
             }
         }

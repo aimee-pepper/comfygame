@@ -26,6 +26,9 @@ struct PreviewPanel: View {
                 .padding(-10)
             }
             stabilityBlock
+            if projection.worldDescription.analysisTier >= Tuning.Analysis.attributionTier {
+                stabilityBreakdown
+            }
             if projection.dangerCapShortfall > 0, projection.worldDescription.showsAttribution {
                 Text("Danger runes can only buy so much time: −\(projection.dangerCapShortfall) of what they offer.")
                     .font(.caption)
@@ -48,6 +51,11 @@ struct PreviewPanel: View {
             }
             Divider()
             statsRow
+            if let clockBand = projection.clockBand {
+                Label("World clock: \(clockBand)", systemImage: "clock.arrow.circlepath")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             Divider()
             harvestSection
             lifeSection
@@ -108,6 +116,32 @@ struct PreviewPanel: View {
     }
 
     private func fraction(_ score: Int) -> Double { Double(score) / 100.0 }
+
+    private var stabilityBreakdown: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text("Why stability moved")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            breakdownRow("What you asked of the world", projection.greedStabilityDelta)
+            breakdownRow("Contradictions", -projection.contradictionPenalty)
+            breakdownRow("World size", projection.sizeStabilityDelta)
+            breakdownRow("Danger accepted", projection.dangerStabilityDelta)
+        }
+        .padding(10)
+        .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+        .accessibilityIdentifier("projection.stability-breakdown")
+    }
+
+    private func breakdownRow(_ label: String, _ value: Int) -> some View {
+        HStack {
+            Text(label)
+            Spacer()
+            Text(value > 0 ? "+\(value)" : "\(value)")
+                .monospacedDigit()
+                .foregroundStyle(value < 0 ? Color.red : (value > 0 ? Color.green : Color.secondary))
+        }
+        .font(.caption)
+    }
 
     private var scoreText: String {
         let range = projection.stabilityScore
@@ -250,6 +284,11 @@ struct PreviewPanel: View {
             Text(projection.life.sentence)
                 .font(.footnote)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            if projection.worldDescription.analysisTier >= Tuning.Analysis.livingTier,
+               !projection.livingAnalysis.isEmpty {
+                Divider().padding(.vertical, 3)
+                LivingAnalysisView(analysis: projection.livingAnalysis)
+            }
         }
     }
 

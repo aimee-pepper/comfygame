@@ -2,6 +2,82 @@ import Foundation
 
 /// Player actions inside a world. Each one is a turn, and each one is saved.
 extension GameStore {
+    /// Re-enter a permanent realm without regenerating it. Layout, depleted sites and named life
+    /// come from the saved snapshot; health, carried supplies and recap baselines belong to the
+    /// new expedition and are rebuilt at the threshold.
+    func revisitAnchoredRealm(_ id: Int) -> Bool {
+        guard state.worlds.activeRun == nil,
+              let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }),
+              !realm.isDormant else { return false }
+
+        mutate("revisit anchored realm", flush: true) { state in
+            guard let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }),
+                  !realm.isDormant else { return }
+            var run = realm.world
+            run.activeEncounter = nil
+            run.offeredItems = []
+            run.binderHP = CombatRules.maximumHealth(of: .binder, in: state)
+            run.companionHP = state.base.activeParty.reduce(into: [:]) { hp, index in
+                hp[index] = CombatRules.maximumHealth(of: .companion(index), in: state)
+            }
+
+            var packedItems = Inventory(slots: state.base.satchelCapacity)
+            let consumables = state.base.inventory.stacks.filter {
+                $0.identified && (ContentCatalog.shared.item($0.catalogID)?.kind == .consumable
+                                  || $0.catalogID == Items.anchorFrame)
+            }
+            for stack in consumables where packedItems.add(stack) {
+                state.base.inventory.remove(stack.id)
+            }
+            for index in packedItems.stacks.indices {
+                packedItems.stacks[index].protectedReturnCount = packedItems.stacks[index].count
+            }
+            run.satchelItems = packedItems
+            run.carriedItemCountsAtStart = packedItems.stacks.reduce(into: [:]) {
+                $0[$1.catalogID, default: 0] += $1.count
+            }
+            run.carriedInstruments = (state.base.hasConfiguredInstrumentLoadout
+                                      ? state.base.instrumentLoadout
+                                      : state.reality.instruments)
+                .intersection(state.reality.instruments)
+            run.carriedInstrumentPrecisions = Dictionary(uniqueKeysWithValues:
+                run.carriedInstruments.map { ($0, state.reality.instrumentPrecision(for: $0)) })
+            run.partyProgressAtStart = state.base.partyMembers.map { member in
+                let character = state.base.character(member)
+                let name = member.rosterIndex.flatMap { index in
+                    state.base.roster.indices.contains(index) ? state.base.roster[index].name : nil
+                } ?? "You"
+                return RunProgressStart(member: member, name: name,
+                                        experience: character.experience, level: character.level)
+            }
+            run.foundPagesAtStart = Set(state.reality.library.foundPages)
+            run.foundWritingsAtStart = Set(state.reality.library.foundWritings.map(\.id))
+            run.foundTravellersAtStart = state.reality.library.foundTravellers
+            state.reality.lifetime.runsStarted += 1
+            state.worlds.lastExit = nil
+            state.worlds.activeRun = run
+        }
+        return true
+    }
+
+
+    var selectedInstrumentLoadout: Set<PressureTargetID> {
+        state.base.hasConfiguredInstrumentLoadout
+            ? state.base.instrumentLoadout.intersection(state.reality.instruments)
+            : state.reality.instruments
+    }
+
+    func setInstrument(_ target: PressureTargetID, carried: Bool) {
+        guard state.reality.instruments.contains(target), activeRun == nil else { return }
+        mutate("change field kit", flush: true) { state in
+            if !state.base.hasConfiguredInstrumentLoadout {
+                state.base.instrumentLoadout = state.reality.instruments
+                state.base.hasConfiguredInstrumentLoadout = true
+            }
+            if carried { state.base.instrumentLoadout.insert(target) }
+            else { state.base.instrumentLoadout.remove(target) }
+        }
+    }
 
     var activeRun: WorldRun? { state.worlds.activeRun }
 
@@ -23,11 +99,54 @@ extension GameStore {
 
     var canPortalHere: Bool { tileUnderPlayer?.content.isPortal ?? false }
 
+    var naturalAnchorHere: PlacedSite? {
+        guard let run = activeRun,
+              case .site(let instance) = tileUnderPlayer?.content,
+              let site = run.sites.first(where: { $0.id == instance }),
+              site.definition?.providesNaturalAnchor == true else { return nil }
+        return site
+    }
+
+    var canUseNaturalAnchor: Bool {
+        naturalAnchorHere != nil
+            && state.base.station(Stations.anchorage).isUnlocked
+            && state.base.essence >= naturalAnchorCost
+            && !(activeRun.map { run in state.worlds.anchoredRealms.contains { $0.runIndex == run.runIndex } } ?? true)
+    }
+
+    var naturalAnchorCost: Int {
+        guard let run = activeRun else { return Tuning.Anchoring.naturalAnchorMinimumCost }
+        let premium = Self.bornAnchoredPremium(forBookCost: run.book.essencePaid)
+        let quarterRoundedUp = (premium + Tuning.Anchoring.naturalAnchorPremiumDivisor - 1)
+            / Tuning.Anchoring.naturalAnchorPremiumDivisor
+        return max(Tuning.Anchoring.naturalAnchorMinimumCost, quarterRoundedUp)
+    }
+
+    func anchorAtNaturalPoint() -> Bool {
+        guard canUseNaturalAnchor else { return false }
+        let cost = naturalAnchorCost
+        mutate("anchor realm at natural point", flush: true) { state in
+            guard let run = state.worlds.activeRun,
+                  !state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }),
+                  state.base.essence >= cost else { return }
+            state.base.essence -= cost
+            state.worlds.anchoredRealms.append(
+                AnchoredRealm(runIndex: run.runIndex, name: "Realm \(run.runIndex)",
+                              route: .naturalPoint,
+                              sustainObligation: Self.sustainObligation(
+                                forExistingRealmCount: state.worlds.anchoredRealms.count),
+                              world: run.anchoredSnapshot)
+            )
+        }
+        return true
+    }
+
     /// The site under the player, if there's one still worth searching.
     var searchableHere: PlacedSite? {
         guard let run = activeRun,
               case .site(let instance) = tileUnderPlayer?.content,
               let site = run.sites.first(where: { $0.id == instance }),
+              site.definition?.providesNaturalAnchor != true,
               !site.isLooted
         else { return nil }
         return site
@@ -79,13 +198,103 @@ extension GameStore {
     /// What's in the satchel that could be used right now, out in the world.
     var carriedConsumables: [ItemStack] {
         (activeRun?.satchelItems.stacks ?? []).filter {
-            $0.identified && ContentCatalog.shared.item($0.catalogID)?.kind == .consumable
+            guard $0.identified,
+                  let item = ContentCatalog.shared.item($0.catalogID),
+                  item.kind == .consumable,
+                  let effect = item.consumable?.effect else { return false }
+            return [.heal, .restoreStability, .returnHome, .lightWorld, .farsight,
+                    .identifyCurio, .lureCreature].contains(effect)
         }
+    }
+
+    var carriedUnidentifiedCurios: [ItemStack] {
+        (activeRun?.satchelItems.stacks ?? []).filter {
+            !$0.identified && EconomyRules.identification(of: $0) != nil
+        }
+    }
+
+    var carriedAnchorFrame: ItemStack? {
+        activeRun?.satchelItems.stacks.first { $0.catalogID == Items.anchorFrame && $0.count > 0 }
+    }
+
+    var canPlaceAnchorFrame: Bool {
+        guard let run = activeRun, run.activeEncounter == nil, carriedAnchorFrame != nil,
+              state.base.station(Stations.anchorage).isUnlocked,
+              !state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }),
+              !run.map[run.playerPosition].isCrumbled,
+              run.map[run.playerPosition].content == .empty else { return false }
+        return true
+    }
+
+    func placeAnchorFrame() -> Bool {
+        guard canPlaceAnchorFrame, let frame = carriedAnchorFrame else { return false }
+        mutate("place Anchor Frame", flush: true) { state in
+            guard var run = state.worlds.activeRun,
+                  run.map[run.playerPosition].content == .empty,
+                  !run.map[run.playerPosition].isCrumbled,
+                  !state.worlds.anchoredRealms.contains(where: { $0.runIndex == run.runIndex }),
+                  let index = run.satchelItems.stacks.firstIndex(where: { $0.id == frame.id })
+            else { return }
+            _ = run.satchelItems.stacks[index].removing(1)
+            if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
+            state.worlds.anchoredRealms.append(
+                AnchoredRealm(runIndex: run.runIndex, name: "Realm \(run.runIndex)",
+                              route: .craftedFrame,
+                              sustainObligation: Self.sustainObligation(
+                                forExistingRealmCount: state.worlds.anchoredRealms.count),
+                              world: run.anchoredSnapshot)
+            )
+            state.worlds.activeRun = run
+        }
+        return true
+    }
+
+    /// Solvent performs the Storehouse's identification transformation in the field. Both the
+    /// solvent and one curio leave their bins atomically, and the revealed item goes back into the
+    /// same satchel before the world charges its turn.
+    func useSolventInWorld(_ solvent: ItemStack, on curio: ItemStack) {
+        guard activeRun?.activeEncounter == nil,
+              ContentCatalog.shared.item(solvent.catalogID)?.consumable?.effect == .identifyCurio
+        else { return }
+        var events: [WorldRules.Event] = []
+        mutate("use solvent", flush: true) { state in
+            guard var run = state.worlds.activeRun,
+                  let revealed = EconomyRules.identification(of: curio),
+                  run.satchelItems.stacks.contains(where: { $0.id == solvent.id }),
+                  let curioIndex = run.satchelItems.stacks.firstIndex(where: { $0.id == curio.id }),
+                  var transformed = run.satchelItems.stacks[curioIndex].removing(1)
+            else { return }
+
+            transformed.catalogID = revealed.id
+            transformed.identified = true
+            if run.satchelItems.stacks[curioIndex].isEmpty {
+                run.satchelItems.stacks.remove(at: curioIndex)
+            }
+            // Resolve the solvent again because removing the curio may shift its array index.
+            guard let currentSolvent = run.satchelItems.stacks.firstIndex(where: { $0.id == solvent.id })
+            else { return }
+            _ = run.satchelItems.stacks[currentSolvent].removing(1)
+            if run.satchelItems.stacks[currentSolvent].isEmpty {
+                run.satchelItems.stacks.remove(at: currentSolvent)
+            }
+            _ = run.satchelItems.add(transformed)
+            state.worlds.activeRun = run
+            events = [.usedItem("Solvent", on: .binder)]
+            events.append(contentsOf: WorldRules.advanceTurn(in: &state))
+        }
+        finishTurn(events)
     }
 
     /// Use something out here. Costs a turn, like everything else the world charges for.
     func useItemInWorld(_ stack: ItemStack, on member: PartyMember) {
         guard activeRun?.activeEncounter == nil else { return }
+        if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .returnHome {
+            returnHomeWithFullHaul(
+                reason: "A Waystone carried you home before the world could close.",
+                kind: .waystone,
+                consuming: stack.id)
+            return
+        }
         var events: [WorldRules.Event] = []
         mutate("use \(stack.catalogID.rawValue)", flush: true) { state in
             events = WorldRules.useItem(stack.id, on: member, in: &state)
@@ -115,7 +324,8 @@ extension GameStore {
         guard let run = activeRun, run.activeEncounter == nil else { return }
         guard destination != run.playerPosition else { return }
 
-        let route = WorldRules.path(from: run.playerPosition, to: destination, in: run.map)
+        let route = WorldRules.path(from: run.playerPosition, to: destination, in: run.map,
+                                    slowGroundExtraTurns: run.tuning.slowGroundExtraTurns)
         guard !route.isEmpty else {
             recentEvents = [.blocked("No way through.")]
             return
@@ -124,6 +334,15 @@ extension GameStore {
         var events: [WorldRules.Event] = []
         mutate("travel") { state in
             for next in route {
+                if let current = state.worlds.activeRun,
+                   current.map[next].ground.movementCost > 1,
+                   current.enemies.contains(where: {
+                       $0.position.manhattanDistance(to: next) <= 2
+                           && WorldRules.isVisible($0, in: current)
+                   }) {
+                    events.append(.blocked("\(current.map[next].ground.displayName.capitalized) ahead. Something dangerous is nearby; step into it deliberately."))
+                    break
+                }
                 let stepEvents = WorldRules.step(to: next, in: &state)
                 events.append(contentsOf: stepEvents)
                 if stepEvents.contains(where: \.interruptsTravel) { break }
@@ -153,33 +372,182 @@ extension GameStore {
         finishTurn(events)
     }
 
+    var canSurvey: Bool {
+        activeRun?.activeEncounter == nil && !(activeRun?.carriedInstruments.isEmpty ?? true)
+    }
+
+    func survey() {
+        guard canSurvey else { return }
+        var events: [WorldRules.Event] = []
+        mutate("survey world", flush: true) { state in
+            events = WorldRules.survey(in: &state)
+        }
+        finishTurn(events)
+    }
+
     /// Leave through a portal, keeping the whole haul. The good ending.
-    func portalHome() {
+    func portalHome(reason: String = "You returned through a portal.") {
         guard canPortalHere, activeRun?.activeEncounter == nil else { return }
-        mutate("portal home", flush: true) { state in
-            guard let run = state.worlds.activeRun else { return }
-            GameStore.bankHaul(of: run, into: &state, fraction: 1.0)
-            state.reality.lifetime.runsBankedViaPortal += 1
+        returnHomeWithFullHaul(reason: reason, kind: .portal)
+    }
+
+    /// Banks a successful return as one save transaction. Waystones can call this away from a
+    /// portal and are consumed inside the same mutation, so a crash cannot leave the stone gone
+    /// while the party remains stranded in the world.
+    private func returnHomeWithFullHaul(reason: String, kind: RunExitSummary.Kind,
+                                        consuming stackID: InstanceID? = nil) {
+        mutate("return home", flush: true) { state in
+            guard var run = state.worlds.activeRun else { return }
+            if let stackID {
+                guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID })
+                else { return }
+                _ = run.satchelItems.stacks[index].removing(1)
+                if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
+            }
+            let banked = GameStore.bankHaul(of: run, into: &state, fraction: 1.0)
+            if let index = state.worlds.anchoredRealms.firstIndex(where: { $0.runIndex == run.runIndex }) {
+                state.worlds.anchoredRealms[index].world = run.anchoredSnapshot
+            }
+            if kind == .portal { state.reality.lifetime.runsBankedViaPortal += 1 }
             GameStore.creditEssenceSpring(&state)
+            state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex,
+                                                   kind: kind,
+                                                   reason: reason,
+                                                   turnsTaken: run.turnsTaken,
+                                                   haulKeptFraction: 1,
+                                                   resources: banked.resources,
+                                                   items: banked.items,
+                                                   lostResources: banked.lostResources,
+                                                   lostItems: banked.lostItems,
+                                                   progress: GameStore.progressGained(in: run, state: state),
+                                                   pages: GameStore.pagesFound(in: run, state: state))
+            TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
+            TutorialRules.recordExpeditionOutcome(in: &state)
             state.worlds.activeRun = nil
+            Self.prepareAnchorSettlement(in: &state)
         }
         recentEvents = []
         ensureDepartureIsPossible()
     }
 
     /// Caught by the collapse (or carried out unconscious): keep a fraction, chosen at random.
-    func endRunWithPartialHaul(reason: String) {
+    func endRunWithPartialHaul(reason: String, kind: RunExitSummary.Kind = .collapse) {
         guard activeRun != nil else { return }
         mutate("run ended: \(reason)", flush: true) { state in
             guard var run = state.worlds.activeRun else { return }
-            let fraction = Tuning.World.collapseHaulKeptFraction
-            GameStore.bankHaul(of: run, into: &state, fraction: fraction, rng: &run.rng)
-            state.reality.lifetime.runsLostToCollapse += 1
+            let fraction = min(1, max(0, run.tuning.collapseRecoveryFraction))
+            let banked = GameStore.bankHaul(of: run, into: &state, fraction: fraction, rng: &run.rng)
+            if let index = state.worlds.anchoredRealms.firstIndex(where: { $0.runIndex == run.runIndex }) {
+                state.worlds.anchoredRealms[index].world = run.anchoredSnapshot
+            }
+            if kind == .collapse { state.reality.lifetime.runsLostToCollapse += 1 }
             GameStore.creditEssenceSpring(&state)
+            state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex,
+                                                   kind: kind,
+                                                   reason: reason,
+                                                   turnsTaken: run.turnsTaken,
+                                                   haulKeptFraction: fraction,
+                                                   resources: banked.resources,
+                                                   items: banked.items,
+                                                   lostResources: banked.lostResources,
+                                                   lostItems: banked.lostItems,
+                                                   progress: GameStore.progressGained(in: run, state: state),
+                                                   pages: GameStore.pagesFound(in: run, state: state))
+            TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
+            TutorialRules.recordExpeditionOutcome(in: &state)
             state.worlds.activeRun = nil
+            Self.prepareAnchorSettlement(in: &state)
         }
         recentEvents = []
         ensureDepartureIsPossible()
+    }
+
+    func dismissRunExitSummary() {
+        mutate("dismiss run summary", flush: true) { $0.worlds.lastExit = nil }
+    }
+
+    nonisolated static func sustainObligation(forExistingRealmCount count: Int) -> Int {
+        count * Tuning.Anchoring.sustainPerAdditionalRealm
+    }
+
+    nonisolated static func prepareAnchorSettlement(in state: inout GameState) {
+        recalculateAnchorProduction(in: &state)
+        state.worlds.pendingAnchorSettlement = state.worlds.anchoredRealms.contains {
+            !$0.isDormant && $0.projectedShortfall > 0
+        }
+    }
+
+    func settleAnchoredRealms(paying ids: Set<Int>) -> Bool {
+        guard state.worlds.pendingAnchorSettlement else { return false }
+        let due = state.worlds.anchoredRealms
+            .filter { ids.contains($0.id) && !$0.isDormant }
+            .reduce(0) { $0 + $1.projectedShortfall }
+        guard due <= state.base.essence else { return false }
+        mutate("settle anchored realms", flush: true) { state in
+            state.base.essence -= due
+            for index in state.worlds.anchoredRealms.indices {
+                guard state.worlds.anchoredRealms[index].projectedShortfall > 0,
+                      !state.worlds.anchoredRealms[index].isDormant else { continue }
+                if !ids.contains(state.worlds.anchoredRealms[index].id) {
+                    state.worlds.anchoredRealms[index].isDormant = true
+                    state.worlds.anchoredRealms[index].assignedCompanions = []
+                }
+            }
+            Self.recalculateAnchorProduction(in: &state)
+            state.worlds.pendingAnchorSettlement = false
+        }
+        return true
+    }
+
+    func reactivateAnchoredRealm(_ id: Int) -> Bool {
+        guard let realm = state.worlds.anchoredRealms.first(where: { $0.id == id && $0.isDormant }) else {
+            return false
+        }
+        let cost = max(Tuning.Anchoring.minimumReactivationCost, realm.projectedShortfall)
+        guard state.base.essence >= cost else { return false }
+        mutate("reactivate anchored realm", flush: true) { state in
+            guard let index = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
+            state.base.essence -= cost
+            state.worlds.anchoredRealms[index].isDormant = false
+        }
+        return true
+    }
+
+    func assignCompanion(_ companion: Int, toAnchoredRealm id: Int) -> Bool {
+        guard state.base.roster.indices.contains(companion),
+              state.worlds.anchoredRealms.contains(where: { $0.id == id && !$0.isDormant }) else {
+            return false
+        }
+        mutate("assign companion to anchored realm", flush: true) { state in
+            state.base.activeParty.removeAll { $0 == companion }
+            for index in state.worlds.anchoredRealms.indices {
+                state.worlds.anchoredRealms[index].assignedCompanions.removeAll { $0 == companion }
+            }
+            guard let target = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
+            state.worlds.anchoredRealms[target].assignedCompanions.append(companion)
+            Self.recalculateAnchorProduction(in: &state)
+        }
+        return true
+    }
+
+    func unassignCompanion(_ companion: Int, fromAnchoredRealm id: Int) {
+        mutate("return companion from anchored realm", flush: true) { state in
+            guard let target = state.worlds.anchoredRealms.firstIndex(where: { $0.id == id }) else { return }
+            state.worlds.anchoredRealms[target].assignedCompanions.removeAll { $0 == companion }
+            Self.recalculateAnchorProduction(in: &state)
+        }
+    }
+
+    nonisolated static func recalculateAnchorProduction(in state: inout GameState) {
+        for index in state.worlds.anchoredRealms.indices {
+            state.worlds.anchoredRealms[index].productionContribution =
+                state.worlds.anchoredRealms[index].assignedCompanions.reduce(0) { total, companion in
+                    guard state.base.roster.indices.contains(companion) else { return total }
+                    let worker = state.base.roster[companion]
+                    return total + Tuning.Anchoring.worldworkBaseContribution + worker.worldwork
+                        + max(0, worker.character.level - 1) / Tuning.Anchoring.levelsPerWorldworkBonus
+                }
+        }
     }
 
     // MARK: - Turn bookkeeping
@@ -192,10 +560,11 @@ extension GameStore {
         // beginning to come apart — you can keep working, and reaching a portal before the
         // crumbling reaches you is the decision the collapse exists to create.
         if events.contains(.floorGaveWay) {
-            endRunWithPartialHaul(reason: "the ground went")
+            endRunWithPartialHaul(reason: "You stepped on a block as it crumbled away beneath you.",
+                                  kind: .collapse)
         } else if let ejection = events.first(where: { if case .ejected = $0 { true } else { false } }),
                   case .ejected(let reason) = ejection {
-            endRunWithPartialHaul(reason: reason)
+            endRunWithPartialHaul(reason: reason, kind: .defeat)
         }
     }
 
@@ -203,28 +572,99 @@ extension GameStore {
     ///
     /// With a fraction below 1 the item loss is rolled off the run's own RNG, so a kill during the
     /// collapse resumes to the same outcome rather than re-rolling in the player's favour.
+    struct BankedHaul: Equatable, Sendable {
+        var resources: [RunExitGain]
+        var items: [RunExitGain]
+        var lostResources: [RunExitGain]
+        var lostItems: [RunExitGain]
+        var unidentifiedItemIDs: [ItemID]
+        var returnedRawEssence: Bool
+    }
+
+    @discardableResult
     nonisolated static func bankHaul(of run: WorldRun,
                                      into state: inout GameState,
                                      fraction: Double,
-                                     rng: inout SeededRNG) {
-        for (id, amount) in run.satchel.scaled(by: fraction).nonZero {
+                                     rng: inout SeededRNG) -> BankedHaul {
+        let keptResources = run.satchel.scaled(by: fraction)
+        let resourceGains = keptResources.nonZero.map { id, amount in
+            let definition = ContentCatalog.shared.resource(id)
+            return RunExitGain(name: definition?.name ?? id.rawValue,
+                               icon: definition?.icon ?? "cube", count: amount)
+        }
+        let lostResourceGains = run.satchel.nonZero.compactMap { id, amount -> RunExitGain? in
+            let lost = amount - keptResources[id]
+            guard lost > 0 else { return nil }
+            let definition = ContentCatalog.shared.resource(id)
+            return RunExitGain(name: definition?.name ?? id.rawValue,
+                               icon: definition?.icon ?? "cube", count: lost)
+        }
+        for (id, amount) in keptResources.nonZero {
             if ContentCatalog.shared.resource(id)?.isRealityCurrency == true {
                 state.reality.motes += amount
             } else {
                 state.base.resources.add(amount, of: id)
             }
         }
-        let kept = fraction >= 1
-            ? run.satchelItems
-            : run.satchelItems.randomlyKeeping(fraction: fraction, rng: &rng)
-        for stack in kept.stacks where !state.base.inventory.add(stack) {
+        var guaranteed = Inventory(slots: run.satchelItems.slots)
+        var exposed = Inventory(slots: run.satchelItems.slots)
+        for stack in run.satchelItems.stacks {
+            let parts = stack.partitionedForReturn()
+            if let safe = parts.protected { _ = guaranteed.add(safe) }
+            if let risk = parts.atRisk { _ = exposed.add(risk) }
+        }
+        let retainedRisk = fraction >= 1 ? exposed
+            : exposed.randomlyKeeping(fraction: fraction, rng: &rng)
+        var kept = guaranteed
+        for stack in retainedRisk.stacks { _ = kept.add(stack) }
+        let itemGains = retainedRisk.stacks.compactMap { stack -> RunExitGain? in
+            guard stack.count > 0 else { return nil }
+            return RunExitGain(name: stack.displayName,
+                               icon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "shippingbox",
+                               count: stack.count)
+        }
+        let retainedCounts = retainedRisk.stacks.reduce(into: [ItemID: Int]()) {
+            $0[$1.catalogID, default: 0] += $1.count
+        }
+        let exposedCounts = exposed.stacks.reduce(into: [ItemID: Int]()) {
+            $0[$1.catalogID, default: 0] += $1.count
+        }
+        let lostItemGains = exposedCounts.compactMap { id, amount -> RunExitGain? in
+            let lost = amount - (retainedCounts[id] ?? 0)
+            guard lost > 0 else { return nil }
+            return RunExitGain(name: ContentCatalog.shared.item(id)?.name ?? id.rawValue,
+                               icon: ContentCatalog.shared.item(id)?.icon ?? "shippingbox", count: lost)
+        }
+        for var stack in kept.stacks {
+            stack.protectedReturnCount = 0
+            guard !state.base.inventory.add(stack) else { continue }
             // Full Storehouse. It waits rather than evaporating — see `BaseState.spillover`.
             state.base.spillover.append(stack)
         }
+        return BankedHaul(resources: resourceGains, items: itemGains,
+                          lostResources: lostResourceGains, lostItems: lostItemGains,
+                          unidentifiedItemIDs: retainedRisk.stacks.filter { !$0.identified }.map(\.catalogID),
+                          returnedRawEssence: keptResources[Resources.essenceRaw] > 0)
     }
 
-    nonisolated static func bankHaul(of run: WorldRun, into state: inout GameState, fraction: Double) {
+    @discardableResult
+    nonisolated static func bankHaul(of run: WorldRun, into state: inout GameState,
+                                     fraction: Double) -> BankedHaul {
         var unused = run.rng
-        bankHaul(of: run, into: &state, fraction: fraction, rng: &unused)
+        return bankHaul(of: run, into: &state, fraction: fraction, rng: &unused)
+    }
+
+    nonisolated static func progressGained(in run: WorldRun, state: GameState) -> [RunProgressGain] {
+        run.partyProgressAtStart.map { start in
+            let current = state.base.character(start.member)
+            return RunProgressGain(member: start.member, name: start.name,
+                                   experience: max(0, current.experience - start.experience),
+                                   levels: max(0, current.level - start.level),
+                                   finalLevel: current.level)
+        }
+    }
+
+    nonisolated static func pagesFound(in run: WorldRun, state: GameState) -> [DiaryPageID] {
+        state.reality.library.foundPages.filter { !run.foundPagesAtStart.contains($0) }
     }
 }

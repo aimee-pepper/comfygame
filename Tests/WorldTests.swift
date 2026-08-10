@@ -95,21 +95,67 @@ final class WorldTests: XCTestCase {
         XCTAssertLessThan(WorldRules.visionRadius(for: dim), WorldRules.visionRadius(for: plain))
         XCTAssertGreaterThanOrEqual(WorldRules.visionRadius(for: dim), Tuning.World.minimumVisionRadius)
 
-        // **Measured on one map, at the two radii.** Comparing two generated worlds used to work and
-        // no longer does: flora paints cover now, and a dim world grows low mats you can see over
-        // where a lit one grows thickets you can't — so the dim world can honestly reveal *more*
-        // ground while seeing a shorter distance. That is the flora system working, and it makes
-        // "arrived seeing less" the wrong instrument for a claim about sight.
-        let world = Worldgen.generate(book: plain, seed: 77)
+        // Measure the two radii on deliberately open ground. A generated fixture makes this claim
+        // depend on whichever chance-filled focuses happen to exist in the content catalogue: a
+        // ridge or thicket beside the entry can hide both outer rings and make the counts equal.
+        let centre = GridPoint(x: 5, y: 5)
+        let openMap = WorldMap(width: 11, height: 11,
+                               tiles: Array(repeating: Tile(), count: 121), entry: centre)
         func revealed(radius: Int) -> Int {
-            var map = world.map
-            map.tiles.indices.forEach { map.tiles[$0].isRevealed = false }
-            WorldRules.reveal(around: world.start, in: &map, radius: radius)
+            var map = openMap
+            WorldRules.reveal(around: centre, in: &map, radius: radius)
             return map.revealedCount
         }
         XCTAssertLessThan(revealed(radius: WorldRules.visionRadius(for: dim)),
                           revealed(radius: WorldRules.visionRadius(for: plain)),
                           "You arrive seeing less of a dim world")
+    }
+
+    func testExpeditionTuningChangesProjectionAndIsSnapshottedOnTheRun() throws {
+        let composition = book(["terrain": "plains"])
+        var tuning = DebugTuningProfile.defaults
+        tuning.stabilityDurationMultiplier = 2
+        tuning.collapseRecoveryFraction = 1
+        tuning.baseVisionRadius = 6
+        tuning.slowGroundExtraTurns = 3
+        tuning.activeFloraFrequencyMultiplier = 0
+        tuning.floraHazardSeverityMultiplier = 2
+
+        let ordinary = BookProjection.project(page: Page(), seed: 991)
+        let tuned = BookProjection.project(page: Page(), seed: 991, tuning: tuning)
+        XCTAssertEqual(tuned.turnsUntilCollapse.lowerBound,
+                       ordinary.turnsUntilCollapse.lowerBound * 2)
+        XCTAssertGreaterThan(tuned.visionRadius.lowerBound, ordinary.visionRadius.lowerBound)
+
+        let generated = Worldgen.generate(book: composition, seed: 991, tuning: tuning)
+        let run = WorldRun(runIndex: 1, book: composition, mapSeed: 991,
+                           rng: SeededRNG(seed: 991), map: generated.map,
+                           playerPosition: generated.start, tuning: tuning)
+        let baseline = WorldRun(runIndex: 1, book: composition, mapSeed: 991,
+                                rng: SeededRNG(seed: 991), map: generated.map,
+                                playerPosition: generated.start)
+        XCTAssertEqual(run.decayPerTurn, baseline.decayPerTurn / 2, accuracy: 0.000_001)
+        XCTAssertGreaterThan(WorldRules.visionRadius(in: run), WorldRules.visionRadius(in: baseline))
+
+        let data = try SaveCodec.makeEncoder().encode(run)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(WorldRun.self, from: data).tuning, tuning)
+    }
+
+    func testSlowGroundDebugCostUsesTheRunSnapshot() {
+        XCTAssertEqual(WorldRules.movementCost(.growth, slowGroundExtraTurns: 0), 1)
+        XCTAssertEqual(WorldRules.movementCost(.mud, slowGroundExtraTurns: 3), 4)
+        XCTAssertEqual(WorldRules.movementCost(.stone, slowGroundExtraTurns: 3), 1)
+    }
+
+    func testZeroApexMultiplierActuallyMeansNone() {
+        var tuning = DebugTuningProfile.defaults
+        tuning.apexChanceMultiplier = 0
+        let greedy = book(["terrain": "caverns", "biome": "verdant",
+                           "bounty": "rich_ore", "quirk": "gilded_veins"])
+        for seed in UInt64(1)...40 {
+            XCTAssertFalse(Worldgen.generate(book: greedy, seed: seed, tuning: tuning)
+                .enemies.contains(where: \.isApex))
+        }
     }
 
     // MARK: Fog and movement
@@ -139,6 +185,41 @@ final class WorldTests: XCTestCase {
 
         XCTAssertEqual(after.turnsTaken, before.turnsTaken + 1)
         XCTAssertEqual(after.stability, before.stability - BookRules.decayPerTurn(for: before.book), accuracy: 0.0001)
+    }
+
+    func testTallGrowthAndMudEachCostTwoTurns() {
+        for ground in [GroundType.growth, .mud] {
+            var state = startedRun(book(["terrain": "plains"]), seed: 120)
+            let before = state.worlds.activeRun!
+            let step = before.map.neighbours(of: before.playerPosition)
+                .first { WorldRules.canEnter($0, in: before.map) }!
+            state.worlds.activeRun?.map[step].ground = ground
+
+            let events = WorldRules.step(to: step, in: &state)
+
+            XCTAssertEqual(state.worlds.activeRun?.turnsTaken, before.turnsTaken + 2)
+            XCTAssertTrue(events.contains(.enteredSlowGround(ground.displayName)))
+        }
+    }
+
+    func testPathfindingPrefersAQuickerRouteAroundSlowGround() {
+        var map = WorldMap(width: 5, height: 3,
+                           tiles: Array(repeating: Tile(), count: 15),
+                           entry: GridPoint(x: 0, y: 1))
+        let start = GridPoint(x: 0, y: 1)
+        let destination = GridPoint(x: 4, y: 1)
+        for x in 1...3 { map[GridPoint(x: x, y: 1)].ground = .growth }
+
+        let route = WorldRules.path(from: start, to: destination, in: map)
+
+        XCTAssertFalse(route.dropLast().contains { map[$0].ground == .growth },
+                       "the route chose fewer squares even though they cost more turns")
+        XCTAssertEqual(route.last, destination)
+
+        let freeSlowRoute = WorldRules.path(from: start, to: destination, in: map,
+                                            slowGroundExtraTurns: 0)
+        XCTAssertTrue(freeSlowRoute.dropLast().contains { map[$0].ground == .growth },
+                      "path weights ignored the zero-extra-turn run snapshot")
     }
 
     func testNonAdjacentStepsAreRefused() {
@@ -200,6 +281,23 @@ final class WorldTests: XCTestCase {
                        "A spent node clears itself off the map")
     }
 
+    func testWayfarersTableImprovesOrganicHarvestAndPacking() throws {
+        var state = startedRun(book(["bounty": "teeming_life"]), seed: 99)
+        let ordinaryCapacity = state.base.satchelCapacity
+        state.base.stations[Stations.wayfarersTable] = StationState(isUnlocked: true, tier: 0)
+        XCTAssertEqual(state.base.satchelCapacity,
+                       ordinaryCapacity + Tuning.Economy.fieldcraftSatchelBonus)
+
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.map[run.playerPosition].content = .node(ResourceNode(resource: Resources.fiber,
+                                                                 remainingHarvests: 1,
+                                                                 yieldPerHarvest: 3))
+        state.worlds.activeRun = run
+        _ = WorldRules.harvest(in: &state)
+        XCTAssertEqual(state.worlds.activeRun?.satchel[Resources.fiber],
+                       3 + Tuning.Economy.fieldcraftOrganicYieldBonus)
+    }
+
     func testWildDropsArePickedUpByWalkingOverThem() {
         var state = startedRun(book(["terrain": "plains"]), seed: 21)
         var run = state.worlds.activeRun!
@@ -228,7 +326,7 @@ final class WorldTests: XCTestCase {
         XCTAssertGreaterThan(hazardCount(), 0, "Past the threshold, hazards spawn at the edges")
     }
 
-    func testCrumblingEatsTheMapFromTheOutsideInAndSparesThePlayer() {
+    func testCrumblingWarnsTheOutsideRingBeforeItFalls() {
         var state = startedRun(book(["terrain": "plains"]), seed: 56)
         state.worlds.activeRun?.stability = Tuning.World.crumbleThreshold - 1
         state.worlds.activeRun?.playerPosition = GridPoint(x: 7, y: 7) // middle of the map
@@ -236,12 +334,49 @@ final class WorldTests: XCTestCase {
         _ = WorldRules.advanceTurn(in: &state)
         let run = state.worlds.activeRun!
 
-        let crumbled = run.map.allPoints.filter { run.map[$0].isCrumbled }
-        XCTAssertFalse(crumbled.isEmpty)
-        for point in crumbled {
+        let cracking = run.map.allPoints.filter { run.map[$0].isCracking }
+        XCTAssertFalse(cracking.isEmpty)
+        XCTAssertTrue(run.map.allPoints.allSatisfy { !run.map[$0].isCrumbled },
+                      "a tile vanished on the same turn its warning appeared")
+        for point in cracking {
             XCTAssertEqual(run.map.ring(of: point), 0, "Crumbling starts at the outermost ring")
-            XCTAssertNotEqual(point, run.playerPosition, "The floor is never pulled from under the player")
         }
+    }
+
+    func testThePlayersTileGetsAFullWarningTurnBeforeItFalls() {
+        var state = startedRun(book(["terrain": "plains"]), seed: 561)
+        state.worlds.activeRun?.stability = 0
+        state.worlds.activeRun?.collapsedOnTurn = 0
+        guard let player = state.worlds.activeRun?.playerPosition else { return XCTFail("no player") }
+        // Leave only the player's block, forcing it to be the next target.
+        for point in state.worlds.activeRun!.map.allPoints where point != player {
+            state.worlds.activeRun?.map[point].isCrumbled = true
+        }
+
+        var events = WorldRules.advanceTurn(in: &state)
+        XCTAssertTrue(state.worlds.activeRun?.map[player].isCracking == true)
+        XCTAssertFalse(state.worlds.activeRun?.map[player].isCrumbled == true)
+        XCTAssertFalse(events.contains(.floorGaveWay))
+
+        events = WorldRules.advanceTurn(in: &state)
+        XCTAssertTrue(events.contains(.floorGaveWay))
+    }
+
+    func testCrackWarningsDoNotHalveSteadyStateCollapseSpeed() {
+        var state = startedRun(book(["terrain": "plains"]), seed: 562)
+        state.worlds.activeRun?.stability = 0
+        state.worlds.activeRun?.collapsedOnTurn = 0
+
+        _ = WorldRules.advanceTurn(in: &state) // primes the warning pipeline
+        guard let primed = state.worlds.activeRun else { return XCTFail("run ended while priming") }
+        let expected = WorldRules.crumbleRate(in: primed)
+        let before = primed.map.allPoints.count { primed.map[$0].isCrumbled }
+        _ = WorldRules.advanceTurn(in: &state)
+        guard let afterRun = state.worlds.activeRun else { return XCTFail("run ended too early") }
+        let after = afterRun.map.allPoints.count { afterRun.map[$0].isCrumbled }
+        XCTAssertEqual(after - before, expected)
+        XCTAssertGreaterThan(afterRun.map.allPoints.count { afterRun.map[$0].isCracking }, 0,
+                             "collapse removed the warned wave but failed to warn the next one")
     }
 
     /// The meter emptying is announced — and **does not end the run**. You are still standing in a
@@ -410,6 +545,94 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(store.state.reality.motes, Int(4 * Tuning.World.collapseHaulKeptFraction),
                        "Motes bank to Reality, not Base")
         XCTAssertEqual(store.state.reality.lifetime.runsLostToCollapse, 1)
+        XCTAssertEqual(store.state.worlds.lastExit?.kind, .collapse)
+        XCTAssertEqual(store.state.worlds.lastExit?.lostResources.reduce(0) { $0 + $1.count }, 7,
+                       "the recap should list the five ore and two motes that did not return")
+    }
+
+    @MainActor
+    func testCollapseUsesTheRecoveryFractionFrozenIntoTheRun() {
+        let store = GameStore(io: .temporary(name: "collapse-tuning-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        store.mutate("tune this fixture") { state in
+            state.worlds.activeRun?.tuning.collapseRecoveryFraction = 1
+            state.worlds.activeRun?.satchel.add(10, of: Resources.ore)
+        }
+
+        store.endRunWithPartialHaul(reason: "collapse")
+
+        XCTAssertEqual(store.state.base.resources[Resources.ore], 10)
+        XCTAssertEqual(store.state.worlds.lastExit?.haulKeptFraction, 1)
+        XCTAssertTrue(store.state.worlds.lastExit?.lostResources.isEmpty == true)
+    }
+
+    @MainActor
+    func testDefeatIsNotCountedAsCollapse() {
+        let store = GameStore(io: .temporary(name: "defeat-outcome-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+
+        store.endRunWithPartialHaul(reason: "You were carried home.", kind: .defeat)
+
+        XCTAssertEqual(store.state.worlds.lastExit?.kind, .defeat)
+        XCTAssertEqual(store.state.reality.lifetime.runsLostToCollapse, 0)
+    }
+
+    func testPartialHaulAlwaysReturnsUnusedStartingItems() {
+        var state = GameState.newGame()
+        state.base.inventory.stacks = []
+        var run = WorldRun(runIndex: 1, book: book([:]), mapSeed: 1, rng: SeededRNG(seed: 1),
+                           map: WorldMap(width: 1, height: 1, tiles: [Tile()],
+                                         entry: GridPoint(x: 0, y: 0)),
+                           playerPosition: GridPoint(x: 0, y: 0))
+        var salves = ItemStack(id: InstanceID(rawValue: 10), catalogID: "salve", count: 2)
+        salves.protectedReturnCount = 2
+        run.satchelItems = Inventory(slots: 4, stacks: [salves])
+        var rng = SeededRNG(seed: 3)
+
+        GameStore.bankHaul(of: run, into: &state, fraction: 0, rng: &rng)
+
+        XCTAssertEqual(state.base.inventory.stacks.first { $0.catalogID == "salve" }?.count, 2)
+        XCTAssertEqual(state.base.inventory.stacks.first?.protectedReturnCount, 0)
+    }
+
+    func testConsumedStartingItemsDoNotDuplicateOnPartialReturn() {
+        var state = GameState.newGame()
+        state.base.inventory.stacks = []
+        var run = WorldRun(runIndex: 1, book: book([:]), mapSeed: 1, rng: SeededRNG(seed: 1),
+                           map: WorldMap(width: 1, height: 1, tiles: [Tile()],
+                                         entry: GridPoint(x: 0, y: 0)),
+                           playerPosition: GridPoint(x: 0, y: 0))
+        var salves = ItemStack(id: InstanceID(rawValue: 10), catalogID: "salve", count: 2)
+        salves.protectedReturnCount = 2
+        _ = salves.removing(1)
+        run.satchelItems = Inventory(slots: 4, stacks: [salves])
+        var rng = SeededRNG(seed: 3)
+
+        GameStore.bankHaul(of: run, into: &state, fraction: 0, rng: &rng)
+
+        XCTAssertEqual(state.base.inventory.stacks.first { $0.catalogID == "salve" }?.count, 1)
+    }
+
+    func testNewLootMergedIntoStartingStackRemainsAtRisk() {
+        var state = GameState.newGame()
+        state.base.inventory.stacks = []
+        var run = WorldRun(runIndex: 1, book: book([:]), mapSeed: 1, rng: SeededRNG(seed: 1),
+                           map: WorldMap(width: 1, height: 1, tiles: [Tile()],
+                                         entry: GridPoint(x: 0, y: 0)),
+                           playerPosition: GridPoint(x: 0, y: 0))
+        var salves = ItemStack(id: InstanceID(rawValue: 10), catalogID: "salve", count: 2)
+        salves.protectedReturnCount = 2
+        run.satchelItems = Inventory(slots: 4, stacks: [salves])
+        _ = run.satchelItems.add(ItemStack(id: InstanceID(rawValue: 11), catalogID: "salve", count: 2))
+        var rng = SeededRNG(seed: 3)
+
+        let banked = GameStore.bankHaul(of: run, into: &state, fraction: 0, rng: &rng)
+
+        XCTAssertEqual(state.base.inventory.stacks.first { $0.catalogID == "salve" }?.count, 2,
+                       "the packed pair returns, while the acquired pair is exposed to loss")
+        XCTAssertEqual(banked.lostItems.first { $0.name == "Salve" }?.count, 2)
     }
 
     /// The pillar, at world scale: a kill mid-run resumes on the same tile of the same map.
@@ -647,5 +870,147 @@ final class WorldTests: XCTestCase {
         }
         XCTAssertLessThan(cost("gold", "substrate"), cost("granite", "relief"),
                           "a mountain is billed like a gold seam")
+    }
+
+    @MainActor
+    func testNaturalAnchorIsAVisibleCheaperRouteToTheSameDurableRealm() throws {
+        let blank = book([:])
+        var found: (seed: UInt64, map: WorldMap, sites: [PlacedSite], anchor: PlacedSite)?
+        for seed in UInt64(1)...200 {
+            let world = Worldgen.generate(book: blank, seed: seed)
+            if let anchor = world.sites.first(where: { $0.definition?.providesNaturalAnchor == true }) {
+                found = (seed, world.map, world.sites, anchor)
+                break
+            }
+        }
+        let seeded = try XCTUnwrap(found)
+        let store = GameStore(io: .temporary(name: "natural-anchor-\(UUID().uuidString)"))
+        store.mutate("stand at an anchor point") { state in
+            state.base.stations[Stations.anchorage] = StationState(isUnlocked: true, tier: 0)
+            state.base.essence = 100
+            state.worlds.runIndex = 1
+            state.worlds.activeRun = WorldRun(runIndex: 1, book: blank, mapSeed: seeded.seed,
+                                               rng: SeededRNG(seed: seeded.seed), map: seeded.map,
+                                               playerPosition: seeded.anchor.position,
+                                               sites: seeded.sites)
+        }
+
+        XCTAssertNotNil(store.naturalAnchorHere)
+        let cost = store.naturalAnchorCost
+        XCTAssertEqual(cost, 25, "a blank book's 100-essence born premium makes a 25-essence seam")
+        XCTAssertTrue(store.anchorAtNaturalPoint())
+        XCTAssertEqual(store.state.base.essence, 100 - cost)
+        XCTAssertEqual(store.state.worlds.anchoredRealms.first?.route, .naturalPoint)
+        XCTAssertEqual(store.state.worlds.anchoredRealms.first?.world.map, seeded.map)
+        XCTAssertFalse(store.anchorAtNaturalPoint(), "one realm cannot be paid for twice")
+    }
+
+    @MainActor
+    func testAnchorFrameOnlyConsumesOnValidOrdinaryGroundAndChargesNoEssence() throws {
+        let blank = book([:])
+        let generated = Worldgen.generate(book: blank, seed: 404)
+        let clear = try XCTUnwrap(generated.map.allPoints.first {
+            generated.map[$0].content == .empty && !generated.map[$0].isCrumbled
+        })
+        var run = WorldRun(runIndex: 1, book: blank, mapSeed: 404, rng: SeededRNG(seed: 404),
+                           map: generated.map, playerPosition: generated.start)
+        XCTAssertTrue(run.satchelItems.add(ItemStack(id: InstanceID(rawValue: 77),
+                                                     catalogID: Items.anchorFrame)))
+        let store = GameStore(io: .temporary(name: "anchor-frame-\(UUID().uuidString)"))
+        store.mutate("carry frame") { state in
+            state.base.stations[Stations.anchorage] = StationState(isUnlocked: true, tier: 0)
+            state.base.essence = 63
+            state.worlds.activeRun = run
+        }
+
+        XCTAssertFalse(store.placeAnchorFrame(), "a portal is not a valid placement tile")
+        XCTAssertNotNil(store.carriedAnchorFrame, "an invalid attempt must not consume the frame")
+        store.mutate("step onto clear ground") { $0.worlds.activeRun?.playerPosition = clear }
+
+        XCTAssertTrue(store.placeAnchorFrame())
+        XCTAssertNil(store.carriedAnchorFrame)
+        XCTAssertEqual(store.state.base.essence, 63, "the crafted frame has no second essence cost")
+        XCTAssertEqual(store.state.worlds.anchoredRealms.first?.route, .craftedFrame)
+    }
+
+    @MainActor
+    func testAnchorFrameRecipeUsesSixDistinctWeakestQualifyingSamples() throws {
+        func sample(hardness: Double = 0, density: Double = 0,
+                    flexibility: Double = 0, reactivity: Double = 0) -> MaterialSample {
+            MaterialSample(kind: .chitin,
+                           properties: MaterialProperties(hardness: hardness, density: density,
+                                                          flexibility: flexibility, reactivity: reactivity),
+                           grade: max(hardness, density, flexibility, reactivity), source: "test world")
+        }
+        let store = GameStore(io: .temporary(name: "frame-recipe-\(UUID().uuidString)"))
+        store.mutate("stock Anchorage") { state in
+            state.base.stations[Stations.anchorage] = StationState(isUnlocked: true, tier: 0)
+            state.base.essence = 100
+            state.base.inventory.stacks = [ItemStack(
+                id: InstanceID(rawValue: 800), catalogID: Items.material,
+                materials: [sample(hardness: 65), sample(hardness: 66),
+                            sample(density: 65), sample(density: 66),
+                            sample(flexibility: 55), sample(reactivity: 65),
+                            sample(hardness: 100, density: 100, flexibility: 100, reactivity: 100)])]
+        }
+
+        XCTAssertTrue(store.craftAnchorFrame())
+        XCTAssertEqual(store.state.base.essence, 40)
+        XCTAssertEqual(store.state.base.inventory.stacks.first(where: { $0.catalogID == Items.material })?
+            .materials.map(\.grade), [100], "weakest qualifying stock should be consumed first")
+        XCTAssertEqual(store.state.base.inventory.stacks.first(where: { $0.catalogID == Items.anchorFrame })?.count, 1)
+    }
+
+    @MainActor
+    func testSustainSettlementSpendsOnlyChosenEssenceAndDormancyNeverDeletes() {
+        let blank = book([:])
+        let generated = Worldgen.generate(book: blank, seed: 9)
+        let run = WorldRun(runIndex: 1, book: blank, mapSeed: 9, rng: SeededRNG(seed: 9),
+                           map: generated.map, playerPosition: generated.start)
+        let store = GameStore(io: .temporary(name: "sustain-\(UUID().uuidString)"))
+        store.mutate("prepare settlement") { state in
+            state.base.essence = 40
+            state.worlds.anchoredRealms = [
+                AnchoredRealm(runIndex: 1, name: "First", route: .bornAnchored, world: run),
+                AnchoredRealm(runIndex: 2, name: "Chosen", route: .naturalPoint,
+                              sustainObligation: 10, world: run),
+                AnchoredRealm(runIndex: 3, name: "Resting", route: .craftedFrame,
+                              sustainObligation: 20, assignedCompanions: [0], world: run),
+            ]
+            state.worlds.pendingAnchorSettlement = true
+        }
+
+        XCTAssertTrue(store.settleAnchoredRealms(paying: [2]))
+        XCTAssertEqual(store.state.base.essence, 30)
+        XCTAssertFalse(store.state.worlds.anchoredRealms[1].isDormant)
+        XCTAssertTrue(store.state.worlds.anchoredRealms[2].isDormant)
+        XCTAssertTrue(store.state.worlds.anchoredRealms[2].assignedCompanions.isEmpty)
+        XCTAssertEqual(store.state.worlds.anchoredRealms.count, 3, "dormancy must never delete a realm")
+        XCTAssertTrue(store.reactivateAnchoredRealm(3))
+        XCTAssertFalse(store.state.worlds.anchoredRealms[2].isDormant)
+    }
+
+    @MainActor
+    func testRealmAssignmentIsExclusiveAndProductionIsVisible() {
+        let blank = book([:])
+        let generated = Worldgen.generate(book: blank, seed: 12)
+        let run = WorldRun(runIndex: 1, book: blank, mapSeed: 12, rng: SeededRNG(seed: 12),
+                           map: generated.map, playerPosition: generated.start)
+        let store = GameStore(io: .temporary(name: "realm-assignment-\(UUID().uuidString)"))
+        store.mutate("prepare realms") { state in
+            state.worlds.anchoredRealms = [
+                AnchoredRealm(runIndex: 1, name: "One", route: .bornAnchored, world: run),
+                AnchoredRealm(runIndex: 2, name: "Two", route: .naturalPoint, world: run),
+            ]
+        }
+
+        XCTAssertTrue(store.assignCompanion(0, toAnchoredRealm: 1))
+        XCTAssertFalse(store.state.base.activeParty.contains(0))
+        XCTAssertEqual(store.state.worlds.anchoredRealms[0].productionContribution,
+                       Tuning.Anchoring.worldworkBaseContribution + store.state.base.roster[0].worldwork)
+        XCTAssertTrue(store.assignCompanion(0, toAnchoredRealm: 2))
+        XCTAssertTrue(store.state.worlds.anchoredRealms[0].assignedCompanions.isEmpty)
+        XCTAssertEqual(store.state.worlds.anchoredRealms[0].productionContribution, 0)
+        XCTAssertEqual(store.state.worlds.anchoredRealms[1].assignedCompanions, [0])
     }
 }

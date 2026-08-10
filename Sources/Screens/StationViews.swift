@@ -1,5 +1,264 @@
 import SwiftUI
 
+struct DistilleryView: View {
+    @EnvironmentObject private var store: GameStore
+    @State private var selected: [CoreAttunement: String] = [:]
+    @State private var causticCatalyst: ResourceID = Resources.toxin
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                StationCard(title: "Crystallise", icon: "diamond.fill") {
+                    Text("A stable blank. Quartz is the lattice; essence remains the thing being held.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    LabeledRow(icon: "drop.fill", label: "Essence", value: "40")
+                    LabeledRow(icon: "diamond", label: "Quartz", value: "2")
+                    Button("Crystallise essence") { store.crystalliseEssence() }
+                        .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
+                        .disabled(!DistilleryRules.canCrystallise(in: store.state))
+                }
+                ForEach(CoreAttunement.allCases, id: \.self) { attunement in
+                    attunementCard(attunement)
+                }
+                ComingLater("Infusion is deliberately held until a named crafted profile has a designed trade-off.")
+            }.padding(16)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("The Distillery")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder private func attunementCard(_ attunement: CoreAttunement) -> some View {
+        let candidates = DistilleryRules.candidates(for: attunement, in: store.state)
+        let chosen = candidates.first(where: { $0.id == selected[attunement] }) ?? candidates.first
+        let catalyst = attunement == .caustic ? causticCatalyst : DistilleryRules.catalystOptions(for: attunement)[0].0
+        StationCard(title: "\(attunement.displayName) core", icon: coreIcon(attunement)) {
+            Text(requirement(attunement)).font(.caption).foregroundStyle(.secondary)
+            if candidates.isEmpty {
+                EmptyNote("No qualifying provenanced world sample.")
+            } else {
+                Picker("Selected sample", selection: Binding(
+                    get: { chosen?.id ?? "" }, set: { selected[attunement] = $0 })) {
+                    ForEach(candidates) { candidate in
+                        Text("\(candidate.sample.displayName) · \(candidate.sample.source)").tag(candidate.id)
+                    }
+                }
+                if attunement == .caustic {
+                    Picker("Catalyst", selection: $causticCatalyst) {
+                        Text("2 Toxin").tag(Resources.toxin)
+                        Text("1 Ichor").tag(Resources.ichor)
+                    }.pickerStyle(.segmented)
+                }
+                if let chosen {
+                    let preview = DistilledCore(attunement: attunement,
+                                                potency: DistilleryRules.potency(for: chosen))
+                    LabeledRow(icon: "gauge.with.dots.needle.50percent", label: "Potency",
+                               value: "\(preview.potency) · \(preview.potencyBand)")
+                    Button("Attune \(attunement.displayName) core") {
+                        store.attuneCore(attunement, candidate: chosen, catalyst: catalyst)
+                    }.buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
+                        .disabled(!DistilleryRules.canAttune(attunement, candidate: chosen,
+                                                            catalyst: catalyst, in: store.state))
+                }
+            }
+        }
+    }
+
+    private func requirement(_ value: CoreAttunement) -> String {
+        switch value {
+        case .heat: "15 essence · 2 Sulfur · reactive 60+, insulating 25+ sample"
+        case .caustic: "15 essence · 2 Toxin or 1 Ichor · reactive reagent/toxin/ichor sample"
+        case .light: "15 essence · 2 Silver · lustrous 60+, hard 30+ sample"
+        }
+    }
+    private func coreIcon(_ value: CoreAttunement) -> String {
+        switch value { case .heat: "flame.circle.fill"; case .caustic: "drop.triangle.fill"; case .light: "sun.max.circle.fill" }
+    }
+}
+
+struct ChannelworksView: View {
+    @EnvironmentObject private var store: GameStore
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                StationCard(title: "Conduit housing", icon: "point.3.connected.trianglepath.dotted") {
+                    Text("The first fixture is Oda's own damaged Heat Conduit, restored when this station is raised. Its core is intact and cannot be recovered.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Text("Oda consumes one Heat core and transfers its attunement, potency and origin receipt into a contained fixture.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Button("Construct Heat Conduit fixture") { store.constructConduitFixture() }
+                        .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
+                        .disabled(!store.state.base.inventory.stacks.contains { $0.catalogID == Items.heatCore })
+                }
+                ComingLater("Contact and Projection housings follow after this first Conduit construction path is proven.")
+            }.padding(16)
+        }.background(Color(.systemGroupedBackground))
+            .navigationTitle("The Channelworks").navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct ReliquaryView: View {
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                StationCard(title: "Field interpretation", icon: "building.columns.fill") {
+                    LabeledRow(icon: "map", label: "Site locations", value: "revealed on arrival")
+                    LabeledRow(icon: "shippingbox", label: "Recovered resources",
+                               value: "+\(Tuning.Economy.reliquarySiteYieldBonus) each")
+                    Text("Edren marks where a world shows signs of habitation. Reaching and searching each place is still fieldwork.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }.padding(16)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("The Reliquary")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct WayfarersTableView: View {
+    @EnvironmentObject private var store: GameStore
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                StationCard(title: "Packed for the route", icon: "map.fill") {
+                    LabeledRow(icon: "backpack.fill", label: "Satchel capacity",
+                               value: "\(store.state.base.satchelCapacity) slots")
+                    LabeledRow(icon: "leaf.fill", label: "Organic harvests",
+                               value: "+\(Tuning.Economy.fieldcraftOrganicYieldBonus) each")
+                    Text("Sela leaves routes, provisions and field notes here for whoever goes next. The table is useful precisely because nobody has to remain behind it.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }.padding(16)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("The Wayfarer's Table")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct AnchorageView: View {
+    @EnvironmentObject private var store: GameStore
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                StationCard(title: "Anchor Frame", icon: "square.on.square.intersection.dashed") {
+                    Text("A carried binding for a world with no usable Atlas Seam. Six different pieces of world-made stock are consumed.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    LabeledRow(icon: "diamond", label: "Hardness 65+", value: "2 distinct")
+                    LabeledRow(icon: "circle.fill", label: "Density 65+", value: "2 distinct")
+                    LabeledRow(icon: "wave.3.right", label: "Flexibility 55+", value: "1")
+                    LabeledRow(icon: "bolt", label: "Reactivity 65+", value: "1")
+                    LabeledRow(icon: "drop.fill", label: "Essence", value: "60")
+                    let missing = AnchorFrameRules.shortfall(in: store.state)
+                    if !missing.isEmpty {
+                        Text("Still needed: \(missing.joined(separator: " · "))")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    Button {
+                        store.craftAnchorFrame()
+                    } label: {
+                        Label("Craft Anchor Frame", systemImage: "hammer.fill")
+                            .frame(maxWidth: .infinity).frame(minHeight: 44)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!AnchorFrameRules.canCraft(in: store.state))
+                }
+                if store.state.worlds.anchoredRealms.isEmpty {
+                    StationCard(title: "The Atlas waits", icon: "book.closed.fill") {
+                        Text("No worlds have been rebound yet. A realm anchored before or during an expedition will remain here after you return.")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    ForEach(store.state.worlds.anchoredRealms) { realm in
+                        StationCard(title: realm.name,
+                                    icon: realm.isDormant ? "moon.zzz.fill" : "globe.americas.fill") {
+                            LabeledRow(icon: "link", label: "State",
+                                       value: realm.isDormant ? "Dormant" : "Active")
+                            LabeledRow(icon: "clock.arrow.circlepath", label: "Anchored by",
+                                       value: realm.route.displayName)
+                            LabeledRow(icon: "scalemass", label: "Sustain",
+                                       value: realm.projectedShortfall == 0
+                                       ? "covered" : "short by \(realm.projectedShortfall)")
+                            LabeledRow(icon: "person.2", label: "Assigned companions",
+                                       value: "\(realm.assignedCompanions.count)")
+                            ForEach(realm.assignedCompanions, id: \.self) { index in
+                                if store.state.base.roster.indices.contains(index) {
+                                    let worker = store.state.base.roster[index]
+                                    let contribution = Tuning.Anchoring.worldworkBaseContribution
+                                        + worker.worldwork
+                                        + max(0, worker.character.level - 1)
+                                            / Tuning.Anchoring.levelsPerWorldworkBonus
+                                    HStack {
+                                        Text(store.state.base.roster[index].name)
+                                        Spacer()
+                                        Text("Worldwork \(worker.worldwork) · +\(contribution)")
+                                            .foregroundStyle(.secondary)
+                                        Button("Return") { store.unassignCompanion(index, fromAnchoredRealm: realm.id) }
+                                    }
+                                    .font(.caption)
+                                }
+                            }
+                            if !realm.isDormant && !store.state.base.roster.isEmpty {
+                                Menu {
+                                    ForEach(store.state.base.roster.indices, id: \.self) { index in
+                                        Button(store.state.base.roster[index].name) {
+                                            store.assignCompanion(index, toAnchoredRealm: realm.id)
+                                        }
+                                    }
+                                } label: {
+                                    Label("Assign companion", systemImage: "person.badge.plus")
+                                        .frame(maxWidth: .infinity).frame(minHeight: 44)
+                                }
+                                Text("Assignment moves them out of the active party. Current realm work has no injury or permanent-loss risk.")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Button {
+                                store.revisitAnchoredRealm(realm.id)
+                            } label: {
+                                Label("Revisit realm", systemImage: "arrow.up.forward.circle.fill")
+                                    .frame(maxWidth: .infinity)
+                                    .frame(minHeight: 44)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(realm.isDormant)
+                            if realm.isDormant {
+                                let cost = max(Tuning.Anchoring.minimumReactivationCost,
+                                               realm.projectedShortfall)
+                                Button {
+                                    store.reactivateAnchoredRealm(realm.id)
+                                } label: {
+                                    Label("Reactivate · \(cost) essence", systemImage: "sunrise.fill")
+                                        .frame(maxWidth: .infinity).frame(minHeight: 44)
+                                }
+                                .buttonStyle(.bordered)
+                                .disabled(store.state.base.essence < cost)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(16)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("The Anchorage")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private extension AnchorRoute {
+    var displayName: String {
+        switch self {
+        case .bornAnchored: "at binding"
+        case .naturalPoint: "natural anchor"
+        case .craftedFrame: "Anchor Frame"
+        }
+    }
+}
+
 // The remaining stations. Each one is reachable, saved, and shows the real state it owns; the
 // *spending* half of each (identify, purchase, gambit editing, node buying) belongs to milestones
 // 4–5 and is marked as such on screen rather than being silently absent.
@@ -270,7 +529,7 @@ struct SurveyPostView: View {
                     CurrencyChip(icon: "drop.fill", label: "Essence",
                                  value: "\(store.state.base.essence)", tint: .teal)
                     CurrencyChip(icon: "ruler", label: "Instruments",
-                                 value: "\(store.state.reality.instruments.count) of \(ContentCatalog.shared.pressureTargets.count)")
+                                 value: "\(store.state.reality.instruments.count) owned · \(store.state.reality.observations.count) calibrated")
                 }
 
                 StationCard(title: "What you can measure", icon: "ruler.fill") {
@@ -286,6 +545,40 @@ struct SurveyPostView: View {
                     }
                 }
 
+                StationCard(title: "Pack for the next world", icon: "backpack.fill") {
+                    Text("Choose which instruments cross the threshold with you. The selection is frozen for the whole trip.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    if store.state.reality.instruments.isEmpty {
+                        Text("Build an instrument below to begin a field kit.")
+                            .font(.caption).foregroundStyle(.tertiary)
+                    } else {
+                        ForEach(ContentCatalog.shared.pressureTargetsInOrder.filter {
+                            store.state.reality.instruments.contains($0.id)
+                        }) { target in
+                            Toggle(isOn: Binding(
+                                get: { store.selectedInstrumentLoadout.contains(target.id) },
+                                set: { store.setInstrument(target.id, carried: $0) }
+                            )) {
+                                Label(target.name, systemImage: target.icon)
+                            }
+                            .accessibilityIdentifier("field-kit.toggle.\(target.id.rawValue)")
+                        }
+                    }
+                }
+
+                if !store.state.reality.instruments.isEmpty {
+                    StationCard(title: "Improve the instruments", icon: "wrench.and.screwdriver.fill") {
+                        Text("Mara can rebuild an instrument around any material whose properties suit the work. She uses the least exceptional qualifying pieces first.")
+                            .font(.caption).foregroundStyle(.secondary)
+
+                        ForEach(ContentCatalog.shared.pressureTargetsInOrder.filter {
+                            store.state.reality.instruments.contains($0.id)
+                        }) { target in
+                            InstrumentUpgradeRow(target: target)
+                        }
+                    }
+                }
+
                 ResearchTree(station: Stations.surveyPost)
             }
             .padding(16)
@@ -293,6 +586,60 @@ struct SurveyPostView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Survey Post")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct InstrumentUpgradeRow: View {
+    @EnvironmentObject private var store: GameStore
+    let target: PressureTargetDef
+
+    private var precision: RealityState.InstrumentPrecision {
+        store.state.reality.instrumentPrecision(for: target.id)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Label(instrumentName, systemImage: target.icon)
+                    .font(.callout.weight(.medium))
+                Spacer()
+                Text(precision.displayName).font(.caption).foregroundStyle(.secondary)
+            }
+            if let recipe = InstrumentCraftingRules.recipe(for: target.id, in: store.state) {
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Next: \(recipe.output.displayName) · \(recipe.summary)")
+                        Text("\(recipe.essence) essence")
+                    }
+                    .font(.caption2).foregroundStyle(.secondary)
+                    Spacer(minLength: 8)
+                    Button("Improve") { store.improveInstrument(target.id) }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                        .disabled(!store.instrumentCraftingReadiness(for: target.id).isReady)
+                        .accessibilityIdentifier("instrument.improve.\(target.id.rawValue)")
+                }
+                if let shortageText { Text(shortageText).font(.caption2).foregroundStyle(.tertiary) }
+            } else {
+                Text("As precise as Mara can make it.")
+                    .font(.caption2).foregroundStyle(.tertiary)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var instrumentName: String {
+        ContentCatalog.shared.researchNodes.first { node in
+            node.grants.contains { $0.kind == .instrument && $0.id == target.id.rawValue }
+        }?.name ?? target.name
+    }
+
+    private var shortageText: String? {
+        switch store.instrumentCraftingReadiness(for: target.id) {
+        case .needsMaterials(let have, let need): "Qualifying stock: \(have) of \(need)"
+        case .needsEssence(let have, let need): "Essence: \(have) of \(need)"
+        default: nil
+        }
     }
 }
 

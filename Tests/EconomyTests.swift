@@ -90,6 +90,52 @@ final class EconomyTests: XCTestCase {
         XCTAssertTrue(store.research(deeper))
     }
 
+    func testAdvancedCapacityRequiresTheMatchingTanneryCapability() throws {
+        let store = richStore()
+        store.mutate("build tannery and finish early capacity") { state in
+            state.base.stations[Stations.tannery] = StationState(isUnlocked: true, tier: 0)
+            state.base.completedResearch.formUnion([
+                "shelving_one", "shelving_two", "shelving_three",
+                "satchel_one", "satchel_two"
+            ])
+        }
+        let shelving = try node("shelving_four")
+        let satchel = try node("satchel_three")
+        XCTAssertFalse(store.isAvailable(shelving))
+        XCTAssertFalse(store.isAvailable(satchel))
+        XCTAssertTrue(store.research(try node("tannery_keep_root")))
+        XCTAssertTrue(store.isAvailable(shelving))
+        XCTAssertTrue(store.research(try node("tannery_carry_root")))
+        XCTAssertTrue(store.isAvailable(satchel))
+    }
+
+    func testLegacyPurchasedCapacityRemainsCompleteWithoutNewTanneryPrerequisite() throws {
+        let store = richStore()
+        store.mutate("legacy capacity") { state in
+            state.base.completedResearch.insert("satchel_three")
+            state.base.satchelTier = 3
+        }
+        let node = try node("satchel_three")
+        XCTAssertTrue(store.isComplete(node))
+        XCTAssertEqual(store.state.base.satchelTier, 3)
+        XCTAssertFalse(store.isAvailable(node))
+    }
+
+    func testBowyerResearchRaisesStoredStationTierOncePerRung() throws {
+        let store = richStore()
+        store.mutate("build and stock bowyer") { state in
+            state.base.stations[Stations.bowyer] = StationState(isUnlocked: true, tier: 0)
+            state.base.resources.add(100, of: "timber")
+            state.base.resources.add(100, of: "resin")
+        }
+        XCTAssertTrue(store.research(try node("bowyer_broaden")))
+        XCTAssertEqual(store.state.base.station(Stations.bowyer).tier, 1)
+        XCTAssertFalse(store.research(try node("bowyer_broaden")))
+        XCTAssertEqual(store.state.base.station(Stations.bowyer).tier, 1)
+        XCTAssertTrue(store.research(try node("bowyer_masterwork")))
+        XCTAssertEqual(store.state.base.station(Stations.bowyer).tier, 2)
+    }
+
     func testANodeIsOnlyEverResearchedOnce() throws {
         let store = richStore()
         let node = try node("reason_about_self")

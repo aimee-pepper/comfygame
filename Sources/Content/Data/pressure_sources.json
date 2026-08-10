@@ -256,6 +256,104 @@
       "acquisition": "research"
     },
     {
+      "id": "scarp",
+      "name": "Scarp",
+      "icon": "mountain.2.fill",
+      "blurb": "A high face of land, abrupt enough to stop a route.",
+      "contributions": [
+        {
+          "target": "relief",
+          "character": "sheer",
+          "peak": 28,
+          "aspects": { "openness": -25, "verticality": 38 },
+          "tags": ["broken-ground", "unclimbable"]
+        }
+      ],
+      "attachesTo": ["relief"],
+      "acquisition": "diary"
+    },
+    {
+      "id": "ruin",
+      "name": "Ruin",
+      "icon": "building.columns.fill",
+      "blurb": "Worked ground, broken open by weather and time.",
+      "contributions": [
+        {
+          "target": "relief",
+          "character": "worked-and-weathered",
+          "peak": 8,
+          "aspects": { "openness": -12, "verticality": 8 },
+          "tags": ["broken-ground", "worked-ground", "ruined"]
+        },
+        {
+          "target": "substrate",
+          "character": "worked-and-weathered",
+          "peak": -10,
+          "aspects": { "dispersion": 24 },
+          "tags": ["broken-ground", "worked-ground", "ruined"]
+        }
+      ],
+      "attachesTo": ["relief"],
+      "acquisition": "diary"
+    },
+    {
+      "id": "gold_ore",
+      "name": "Gold ore",
+      "icon": "seal.fill",
+      "blurb": "A precious vein concentrated tightly enough to follow.",
+      "contributions": [
+        {
+          "target": "substrate",
+          "character": "concentrated",
+          "peak": 42,
+          "aspects": { "dispersion": -35 },
+          "form": "ductile",
+          "tags": ["valuable", "precious", "ore-bearing"]
+        }
+      ],
+      "attachesTo": ["substrate"],
+      "acquisition": "diary"
+    },
+    {
+      "id": "hush",
+      "name": "Hush",
+      "icon": "wind.circle",
+      "blurb": "Air held quiet enough that nothing disturbs the page.",
+      "contributions": [
+        {
+          "target": "atmosphere",
+          "character": "stilled",
+          "peak": -5,
+          "aspects": { "motion": -40, "clarity": 8 },
+          "tags": ["calm-air"]
+        }
+      ],
+      "attachesTo": ["atmosphere"],
+      "acquisition": "diary"
+    },
+    {
+      "id": "pond",
+      "name": "Pond",
+      "icon": "drop.circle.fill",
+      "blurb": "A small body of standing water, gathered rather than spread.",
+      "contributions": [
+        {
+          "target": "hydrology",
+          "character": "small-standing",
+          "peak": 14,
+          "aspects": { "dispersion": -30, "salinity": 0 },
+          "form": "standing"
+        },
+        {
+          "target": "vitality",
+          "character": "producing",
+          "peak": 8
+        }
+      ],
+      "attachesTo": ["hydrology"],
+      "acquisition": "diary"
+    },
+    {
       "id": "drift",
       "name": "Drift",
       "icon": "clock.badge.questionmark",
@@ -285,7 +383,136 @@
       "attachesTo": [
         "cycle"
       ],
-      "acquisition": "research"
+      "acquisition": "diary"
+    },
+    {
+      "id": "hive",
+      "name": "Hive",
+      "icon": "hexagon.grid.fill",
+      "blurb": "Many lives returning to one repeatedly used structure.",
+      "contributions": [
+        {
+          "target": "vitality", "character": "concentrating", "peak": 24,
+          "aspects": { "trophicDepth": 12, "dispersion": -32 },
+          "tags": ["colonial-life", "recurring-shelter"]
+        }
+      ],
+      "attachesTo": ["vitality"],
+      "acquisition": "diary"
+    },
+    {
+      "id": "amber",
+      "name": "Amber",
+      "icon": "diamond.fill",
+      "blurb": "Living traces held apart from ordinary circulation.",
+      "contributions": [
+        {
+          "target": "vitality", "character": "preserving", "peak": 6,
+          "aspects": { "dispersion": -18 }, "tags": ["preserved-organic"]
+        },
+        {
+          "target": "substrate", "character": "inclusion-bearing", "peak": 10,
+          "aspects": { "dispersion": -12 }, "form": "hard", "tags": ["inclusion-bearing"]
+        },
+        {
+          "target": "cycle", "character": "slowing", "peak": 0,
+          "aspects": { "regularity": 10 }, "tags": ["slow-change"]
+        }
+      ],
+      "attachesTo": ["vitality", "substrate"],
+      "acquisition": "diary"
+    },
+    {
+      "id": "chitin", "name": "Chitin", "icon": "shield.lefthalf.filled",
+      "blurb": "Jointed protection grown by a body that still has to move.",
+      "contributions": [
+        { "target": "vitality", "character": "armouring", "peak": 20, "aspects": { "trophicDepth": 18, "dispersion": -8 }, "tags": ["armoured-life", "molting"] },
+        { "target": "substrate", "character": "jointing", "peak": 7, "form": "hard", "tags": ["jointed-organic"] }
+      ],
+      "attachesTo": ["vitality"], "acquisition": "diary"
+    },
+    {
+      "id": "thorn", "name": "Thorn", "icon": "leaf.arrow.triangle.circlepath",
+      "blurb": "Living growth that makes contact consequential.",
+      "contributions": [
+        { "target": "vitality", "character": "defending", "peak": 18, "aspects": { "trophicDepth": 6, "dispersion": -12 }, "tags": ["defended-flora", "contact-hazard"] }
+      ],
+      "attachesTo": ["vitality"], "acquisition": "diary"
+    },
+    {
+      "id": "bone", "name": "Bone", "icon": "fossil.shell.fill",
+      "blurb": "Bodily support accumulated into the ground after death.",
+      "contributions": [
+        { "target": "substrate", "character": "osseous", "peak": 18, "aspects": { "dispersion": -16 }, "form": "hard", "tags": ["osseous"] },
+        { "target": "vitality", "character": "remaining", "peak": -6, "aspects": { "trophicDepth": 10 }, "tags": ["remains", "past-mortality"] }
+      ],
+      "attachesTo": ["substrate", "vitality"], "acquisition": "diary"
+    },
+    {
+      "id": "silk", "name": "Silk", "icon": "point.3.connected.trianglepath.dotted",
+      "blurb": "Continuous flexible load made by living processes.",
+      "contributions": [
+        { "target": "vitality", "character": "spinning", "peak": 14, "aspects": { "trophicDepth": 10, "dispersion": 8 }, "tags": ["spinning-life"] },
+        { "target": "substrate", "character": "tension-bearing", "peak": 6, "form": "ductile", "tags": ["fibrous", "tension-bearing"] }
+      ],
+      "attachesTo": ["vitality", "substrate"], "acquisition": "diary"
+    },
+    {
+      "id": "coral", "name": "Coral", "icon": "water.waves.and.arrow.trianglehead.up",
+      "blurb": "Many small lives building persistent aquatic structure.",
+      "contributions": [
+        { "target": "vitality", "character": "colonising", "peak": 26, "aspects": { "trophicDepth": 14, "dispersion": -24 }, "tags": ["aquatic-colony", "living-structure"] },
+        { "target": "hydrology", "character": "sheltering", "peak": 10, "aspects": { "dispersion": -10 }, "form": "standing", "tags": ["shallow-habitat"] },
+        { "target": "substrate", "character": "biogenic", "peak": 8, "form": "hard", "tags": ["biogenic"] }
+      ],
+      "attachesTo": ["vitality", "hydrology"], "acquisition": "diary"
+    },
+    {
+      "id": "mercury", "name": "Mercury", "icon": "drop.triangle.fill",
+      "blurb": "Concentrated metal moving through connected low seams.",
+      "contributions": [
+        { "target": "substrate", "character": "flowing", "peak": 24, "aspects": { "dispersion": -30 }, "form": "volatile", "tags": ["liquid-metal", "chaining", "toxic"] },
+        { "target": "hydrology", "character": "contaminating", "peak": 4, "aspects": { "dispersion": -12 }, "tags": ["contaminated-seam"] }
+      ],
+      "attachesTo": ["substrate"], "acquisition": "diary"
+    },
+    {
+      "id": "brine", "name": "Brine", "icon": "drop.degreesign.fill",
+      "blurb": "Concentrated saline water as an altered carrier.",
+      "contributions": [
+        { "target": "hydrology", "character": "concentrating", "peak": 18, "aspects": { "salinity": 42, "dispersion": -22 }, "form": "standing", "tags": ["brine", "concentrated"] },
+        { "target": "vitality", "character": "stressing", "peak": -8, "tags": ["salt-stressed"] }
+      ],
+      "attachesTo": ["hydrology"], "acquisition": "diary"
+    },
+    {
+      "id": "echo", "name": "Echo", "icon": "waveform.path",
+      "blurb": "A recurrence changed by the world that returns it.",
+      "contributions": [
+        { "target": "cycle", "character": "recurring", "peak": 4, "aspects": { "regularity": 24, "amplitude": 8 }, "tags": ["recurring", "context-shifted"] },
+        { "target": "atmosphere", "character": "reverberating", "peak": 3, "aspects": { "clarity": -5 }, "tags": ["reverberant"] }
+      ],
+      "attachesTo": ["cycle"], "acquisition": "diary"
+    },
+    {
+      "id": "mirror", "name": "Mirror", "icon": "rectangle.portrait.on.rectangle.portrait",
+      "blurb": "Returned light that appears exact while reversing its frame.",
+      "contributions": [
+        { "target": "illumination", "character": "reflecting", "peak": 12, "floor": 8, "tags": ["reflected", "reversing"] },
+        { "target": "substrate", "character": "reflective", "peak": 10, "aspects": { "dispersion": -14 }, "form": "hard", "tags": ["reflective-surface"] },
+        { "target": "atmosphere", "character": "clarifying", "peak": 0, "aspects": { "clarity": 10 }, "tags": ["exact-looking"] }
+      ],
+      "attachesTo": ["illumination", "substrate"], "acquisition": "diary"
+    },
+    {
+      "id": "dream", "name": "Dream", "icon": "moon.stars.fill",
+      "blurb": "Associative change felt before its logic can be explained.",
+      "contributions": [
+        { "target": "cycle", "character": "associating", "peak": 2, "aspects": { "regularity": -22, "amplitude": 18 }, "tags": ["oneiric", "associative"] },
+        { "target": "illumination", "character": "sourceless", "peak": 8, "floor": 8, "tags": ["sourceless"] },
+        { "target": "atmosphere", "character": "obscuring", "peak": 2, "aspects": { "clarity": -12 }, "tags": ["felt-before-explained"] }
+      ],
+      "attachesTo": ["cycle", "illumination"], "acquisition": "diary"
     },
     {
       "id": "fungus",

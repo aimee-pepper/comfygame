@@ -51,6 +51,61 @@ enum Rarity: String, Codable, CaseIterable, Sendable, Comparable {
     static func < (lhs: Rarity, rhs: Rarity) -> Bool { lhs.order < rhs.order }
 }
 
+/// Frozen identity and construction facts shared by stored and equipped physical gear.
+///
+/// Catalogue definitions remain a fallback for old/found pieces, but once this profile exists the
+/// instance no longer changes shape because content data or station rules changed later.
+struct GearInstanceProfile: Codable, Equatable, Sendable {
+    var version: Int = 1
+    var stableInstanceID: InstanceID
+    var familyID: String?
+    var constructionTier: Int
+    var reforgeRank: Int = 0
+    var legacyPowerCredit: Int = 0
+    var slot: GearSlot
+    var damage: DamageKind?
+    var reach: Reach
+    var insulation: Double
+    var reactivity: Double
+    var consumedSamples: [MaterialSample] = []
+    var recipeVersion: Int?
+    var specialistProfile: String?
+    var displayProvenance: String?
+    var authoredUniqueRuleID: String?
+
+    init(stableInstanceID: InstanceID, definition: ItemDef, legacyUpgradeLevel: Int = 0) {
+        let gear = definition.gear!
+        let legacySmithPower = gear.tier + max(0, legacyUpgradeLevel)
+        self.stableInstanceID = stableInstanceID
+        self.constructionTier = min(4, max(1, legacySmithPower))
+        self.legacyPowerCredit = max(0, legacySmithPower - 4)
+        self.slot = gear.slot
+        self.damage = gear.damage
+        self.reach = gear.reach
+        self.insulation = gear.insulation
+        self.reactivity = gear.reactivity
+        self.authoredUniqueRuleID = gear.breaks?.rawValue
+    }
+
+    var effectivePower: Double {
+        Double(constructionTier + legacyPowerCredit)
+            + Double(reforgeRank) * Tuning.Smith.powerPerReforgeRank
+    }
+
+    var legacyLabel: String? {
+        legacyPowerCredit > 0 ? "Legacy masterwork +\(legacyPowerCredit)" : nil
+    }
+
+    var protectivePower: Double {
+        let offset: Double = switch specialistProfile {
+        case "armoury_balanced_laminate_v1": -0.5
+        case "armoury_insulated_layer_v1": -1.0
+        default: 0
+        }
+        return max(0, effectivePower + offset)
+    }
+}
+
 /// One slot-consuming item instance. `catalogID` points at `Content/Data/items.json`.
 ///
 /// Unidentified items are the delayed-payoff seed: a curio drops as `identified == false` with a
@@ -82,20 +137,34 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     /// two otherwise identical blades at different levels are different objects and can't share a
     /// bin.
     var upgradeLevel: Int = 0
+    /// Encounters won while carrying a Living Hook. Separate from smithing work and capped at 2.
+    var wildGrowth: Int = 0
+    /// New physical-gear schema. Nil only for non-gear and transitional in-memory fixtures.
+    var gearProfile: GearInstanceProfile? = nil
     /// Every material sample in this bin, in the order they were taken. Empty for ordinary items.
     ///
     /// The bin is the slot; these are what's in it. Crafting picks from among them, so a recipe can
     /// be satisfied cheaply or generously, and "the finest pelt you've recovered" stays a question
     /// with an answer.
     var materials: [MaterialSample] = []
+    /// Quantity in this bin that crossed the expedition threshold from Home and must return unless
+    /// actually consumed. New pickups merging into the bin do not increase it.
+    var protectedReturnCount: Int = 0
+    /// Distillery-made identity. Nil for found and ordinary crafted items; present on blank and
+    /// attuned cores so saves retain what was consumed and unlike cores never merge.
+    var distilledCore: DistilledCore?
 
     init(id: InstanceID, catalogID: ItemID, count: Int = 1, identified: Bool = true,
-         material: MaterialSample? = nil) {
+         material: MaterialSample? = nil, distilledCore: DistilledCore? = nil) {
         self.id = id
         self.catalogID = catalogID
         self.identified = identified
         self.materials = material.map { Array(repeating: $0, count: max(1, count)) } ?? []
+        self.distilledCore = distilledCore
         self.count = materials.isEmpty ? count : materials.count
+        if let definition = ContentCatalog.shared.item(catalogID), definition.gear != nil {
+            self.gearProfile = GearInstanceProfile(stableInstanceID: id, definition: definition)
+        }
     }
 
     init(id: InstanceID, catalogID: ItemID, identified: Bool = true, materials: [MaterialSample]) {
@@ -109,7 +178,8 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     /// Keys include the **retired singular `material`**, so a save written before binning still
     /// loads: it held one sample and a count, and becomes a bin holding that many of it.
     private enum StoredKeys: String, CodingKey {
-        case id, catalogID, count, identified, materials, material, upgradeLevel
+        case id, catalogID, count, identified, materials, material, upgradeLevel, wildGrowth
+        case distilledCore, protectedReturnCount, gearProfile
     }
 
     /// Tolerant decoding, per the policy in `Migrations.swift`.
@@ -120,6 +190,15 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         count = try c.decodeIfPresent(Int.self, forKey: .count) ?? 1
         identified = try c.decodeIfPresent(Bool.self, forKey: .identified) ?? true
         upgradeLevel = try c.decodeIfPresent(Int.self, forKey: .upgradeLevel) ?? 0
+        wildGrowth = try c.decodeIfPresent(Int.self, forKey: .wildGrowth) ?? 0
+        gearProfile = try c.decodeIfPresent(GearInstanceProfile.self, forKey: .gearProfile)
+        if gearProfile == nil, let definition = ContentCatalog.shared.item(catalogID), definition.gear != nil {
+            gearProfile = GearInstanceProfile(stableInstanceID: id, definition: definition,
+                                              legacyUpgradeLevel: upgradeLevel)
+        }
+        distilledCore = try c.decodeIfPresent(DistilledCore.self, forKey: .distilledCore)
+        protectedReturnCount = min(count, max(0, try c.decodeIfPresent(Int.self,
+                                                    forKey: .protectedReturnCount) ?? 0))
         if let many = try c.decodeIfPresent([MaterialSample].self, forKey: .materials) {
             materials = many
         } else if let one = try c.decodeIfPresent(MaterialSample.self, forKey: .material) {
@@ -136,14 +215,19 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     /// What two stacks must agree on to be the same bin.
     enum BinKey: Hashable, Sendable {
         case material(MaterialKind)
-        case item(ItemID, identified: Bool, upgradeLevel: Int)
+        case distilledCore(ItemID, DistilledCore)
+        case item(ItemID, identified: Bool, upgradeLevel: Int, wildGrowth: Int)
+        case gear(InstanceID)
     }
 
     var binKey: BinKey {
         if let kind = materials.first?.kind { return .material(kind) }
+        if let distilledCore { return .distilledCore(catalogID, distilledCore) }
+        if let gearProfile { return .gear(gearProfile.stableInstanceID) }
         // Upgrade level is part of what a piece *is*: a blade you've reforged twice is not
         // interchangeable with one fresh off the ground.
-        return .item(catalogID, identified: identified, upgradeLevel: upgradeLevel)
+        return .item(catalogID, identified: identified, upgradeLevel: upgradeLevel,
+                     wildGrowth: wildGrowth)
     }
 
     /// The best example in the bin — what makes "12 hides · finest superb" possible.
@@ -153,6 +237,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     mutating func absorb(_ other: ItemStack) {
         materials.append(contentsOf: other.materials)
         count = materials.isEmpty ? count + other.count : materials.count
+        protectedReturnCount = min(count, protectedReturnCount + other.protectedReturnCount)
     }
 
     /// Splits `amount` off this bin, taking the **worst** samples first — what you'd hand over or
@@ -161,8 +246,16 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         guard amount > 0 else { return nil }
         if materials.isEmpty {
             let taken = min(amount, count)
+            let protectedTaken = min(taken, protectedReturnCount)
             count -= taken
-            return ItemStack(id: id, catalogID: catalogID, count: taken, identified: identified)
+            protectedReturnCount -= protectedTaken
+            var result = ItemStack(id: id, catalogID: catalogID, count: taken, identified: identified,
+                                   distilledCore: distilledCore)
+            result.upgradeLevel = upgradeLevel
+            result.wildGrowth = wildGrowth
+            result.gearProfile = gearProfile
+            result.protectedReturnCount = protectedTaken
+            return result
         }
         let ordered = materials.sorted { $0.grade < $1.grade }
         let taken = Array(ordered.prefix(amount))
@@ -175,9 +268,44 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
 
     var isEmpty: Bool { materials.isEmpty ? count <= 0 : materials.isEmpty }
 
+    /// Separates supplies guaranteed home from haul exposed to partial-retention RNG.
+    func partitionedForReturn() -> (protected: ItemStack?, atRisk: ItemStack?) {
+        let safeCount = min(count, max(0, protectedReturnCount))
+        var safe: ItemStack?
+        var risk: ItemStack?
+        if safeCount > 0 {
+            var copy = self
+            copy.count = safeCount
+            copy.protectedReturnCount = 0
+            safe = copy
+        }
+        let riskCount = count - safeCount
+        if riskCount > 0 {
+            var copy = self
+            copy.count = riskCount
+            copy.protectedReturnCount = 0
+            // Packed items are ordinary slot items; material bins remain wholly at risk. This
+            // defensive slice keeps counts coherent if that policy expands later.
+            if !copy.materials.isEmpty { copy.materials = Array(copy.materials.suffix(riskCount)) }
+            risk = copy
+        }
+        return (safe, risk)
+    }
+
     /// The stats this piece actually fights at: what it was found as, plus what you've put into it.
+    var constructionTier: Int {
+        gearProfile?.constructionTier ?? (ContentCatalog.shared.item(catalogID)?.gear?.tier ?? 0)
+    }
+
+    var effectivePower: Double {
+        (gearProfile?.effectivePower
+         ?? Double((ContentCatalog.shared.item(catalogID)?.gear?.tier ?? 0) + upgradeLevel))
+            + Double(wildGrowth)
+    }
+
+    /// Compatibility display boundary for older callers. Combat uses `effectivePower` directly.
     var effectiveTier: Int {
-        (ContentCatalog.shared.item(catalogID)?.gear?.tier ?? 0) + upgradeLevel
+        Int(effectivePower.rounded())
     }
 
     /// What to call it. **Materials name themselves** — there is no catalogue entry to ask, because
@@ -191,8 +319,14 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
             return count > 1 ? kind.pluralName.capitalisedSentence : kind.displayName
         }
         guard let item = ContentCatalog.shared.item(catalogID) else { return catalogID.rawValue }
-        let base = identified ? item.name : (item.unidentifiedName ?? "Something odd")
-        return upgradeLevel > 0 ? "\(base) +\(upgradeLevel)" : base
+        let catalogBase = identified ? item.name : (item.unidentifiedName ?? "Something odd")
+        let base = gearProfile?.displayProvenance ?? catalogBase
+        if let profile = gearProfile {
+            let suffix = profile.reforgeRank > 0 ? " · Reforged \(profile.reforgeRank)/3" : ""
+            return "\(base) · Tier \(profile.constructionTier)\(suffix)"
+        }
+        let bonus = upgradeLevel + wildGrowth
+        return bonus > 0 ? "\(base) +\(bonus)" : base
     }
 
     var icon: String {
@@ -209,6 +343,10 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     /// flagged in questions-for-design.
     var detail: String {
         let tally = count > 1 ? "×\(count)" : ""
+        if let core = distilledCore {
+            let identity = core.attunement == nil ? "blank · Distillery" : "\(core.potencyBand) · \(core.sampleSource ?? "world sample")"
+            return tally.isEmpty ? identity : "\(identity)  \(tally)"
+        }
         guard let finest else {
             guard let material else { return tally }
             let quality = material.properties.dominant
@@ -217,6 +355,29 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         }
         let best = finest.gradeWord.map { "finest \($0)" } ?? finest.properties.dominant.name
         return tally.isEmpty ? best : "\(best)  \(tally)"
+    }
+}
+
+enum CoreAttunement: String, Codable, CaseIterable, Hashable, Sendable {
+    case heat, caustic, light
+    var displayName: String { rawValue.capitalisedSentence }
+}
+
+/// Immutable receipt for a Distillery output. Values used for stacking are deliberately display
+/// provenance, not an instance pointer: equivalent work may share a bin and remains legible.
+struct DistilledCore: Codable, Equatable, Hashable, Sendable {
+    var attunement: CoreAttunement?
+    var potency: Int
+    var sampleKind: String? = nil
+    var sampleSource: String? = nil
+    var sampleQualifier: String? = nil
+    var catalystID: ResourceID? = nil
+    var catalystCount: Int = 0
+    var recipeVersion: Int = 1
+    var stationID: StationID = "distillery"
+
+    var potencyBand: String {
+        switch potency { case ..<40: "faint"; case 40..<65: "clear"; case 65..<85: "strong"; default: "brilliant" }
     }
 }
 
@@ -280,22 +441,30 @@ struct Inventory: Codable, Equatable, Sendable {
 struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
     var catalogID: ItemID
     var upgradeLevel: Int = 0
+    var wildGrowth: Int = 0
+    var gearProfile: GearInstanceProfile?
 
-    private enum StoredKeys: String, CodingKey { case catalogID, upgradeLevel }
+    private enum StoredKeys: String, CodingKey { case catalogID, upgradeLevel, wildGrowth, gearProfile }
 
     init(stringLiteral value: String) {
         self.catalogID = ItemID(rawValue: value)
         self.upgradeLevel = 0
+        self.wildGrowth = 0
+        self.gearProfile = nil
     }
 
-    init(catalogID: ItemID, upgradeLevel: Int = 0) {
+    init(catalogID: ItemID, upgradeLevel: Int = 0, wildGrowth: Int = 0) {
         self.catalogID = catalogID
         self.upgradeLevel = upgradeLevel
+        self.wildGrowth = wildGrowth
+        self.gearProfile = nil
     }
 
     init(_ stack: ItemStack) {
         self.catalogID = stack.catalogID
         self.upgradeLevel = stack.upgradeLevel
+        self.wildGrowth = stack.wildGrowth
+        self.gearProfile = stack.gearProfile
     }
 
     /// **Writes itself as a bare id when there's nothing else to say.**
@@ -304,7 +473,7 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
     /// stays hand-editable and legible — which is worth keeping. Only a reforged piece needs the
     /// object form, and only then does it stop being readable by an older build.
     func encode(to encoder: Encoder) throws {
-        guard upgradeLevel != 0 else {
+        guard upgradeLevel != 0 || wildGrowth != 0 || gearProfile != nil else {
             var single = encoder.singleValueContainer()
             try single.encode(catalogID)
             return
@@ -312,6 +481,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         var c = encoder.container(keyedBy: StoredKeys.self)
         try c.encode(catalogID, forKey: .catalogID)
         try c.encode(upgradeLevel, forKey: .upgradeLevel)
+        try c.encode(wildGrowth, forKey: .wildGrowth)
+        try c.encodeIfPresent(gearProfile, forKey: .gearProfile)
     }
 
     /// Accepts the **bare item id** this used to be, so a save from before pieces could be
@@ -320,26 +491,58 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         if let id = try? decoder.singleValueContainer().decode(ItemID.self) {
             catalogID = id
             upgradeLevel = 0
+            wildGrowth = 0
+            gearProfile = nil
             return
         }
         let c = try decoder.container(keyedBy: StoredKeys.self)
         catalogID = try c.decode(ItemID.self, forKey: .catalogID)
         upgradeLevel = try c.decodeIfPresent(Int.self, forKey: .upgradeLevel) ?? 0
+        wildGrowth = try c.decodeIfPresent(Int.self, forKey: .wildGrowth) ?? 0
+        gearProfile = try c.decodeIfPresent(GearInstanceProfile.self, forKey: .gearProfile)
+        if gearProfile == nil, let definition = ContentCatalog.shared.item(catalogID), definition.gear != nil {
+            // BaseState assigns a collision-free stable id after every equipped slot is decoded.
+            gearProfile = GearInstanceProfile(stableInstanceID: InstanceID(rawValue: 0),
+                                              definition: definition,
+                                              legacyUpgradeLevel: upgradeLevel)
+        }
     }
 
     var definition: ItemDef? { ContentCatalog.shared.item(catalogID) }
     var gear: GearDef? { definition?.gear }
     /// What it actually fights at: found tier plus what you've put into it.
-    var effectiveTier: Int { (gear?.tier ?? 0) + upgradeLevel }
+    var constructionTier: Int { gearProfile?.constructionTier ?? (gear?.tier ?? 0) }
+    var effectivePower: Double {
+        (gearProfile?.effectivePower ?? Double((gear?.tier ?? 0) + upgradeLevel)) + Double(wildGrowth)
+    }
+    var effectiveTier: Int { Int(effectivePower.rounded()) }
+    var frozenSlot: GearSlot? { gearProfile?.slot ?? gear?.slot }
+    var frozenDamage: DamageKind? { gearProfile?.damage ?? gear?.damage }
+    var frozenReach: Reach { gearProfile?.reach ?? gear?.reach ?? .close }
+    var frozenInsulation: Double { gearProfile?.insulation ?? gear?.insulation ?? 0 }
+    var frozenReactivity: Double { gearProfile?.reactivity ?? gear?.reactivity ?? 0 }
     var displayName: String {
-        let base = definition?.name ?? catalogID.rawValue
-        return upgradeLevel > 0 ? "\(base) +\(upgradeLevel)" : base
+        let base = gearProfile?.displayProvenance ?? definition?.name ?? catalogID.rawValue
+        if let profile = gearProfile {
+            let suffix = profile.reforgeRank > 0 ? " · Reforged \(profile.reforgeRank)/3" : ""
+            return "\(base) · Tier \(profile.constructionTier)\(suffix)"
+        }
+        let bonus = upgradeLevel + wildGrowth
+        return bonus > 0 ? "\(base) +\(bonus)" : base
     }
 
     /// Back into a carryable stack, keeping the work you put into it.
     func asStack(id: InstanceID) -> ItemStack {
-        var stack = ItemStack(id: id, catalogID: catalogID)
+        let stableID = gearProfile?.stableInstanceID.rawValue == 0
+            ? id : (gearProfile?.stableInstanceID ?? id)
+        var stack = ItemStack(id: stableID, catalogID: catalogID)
         stack.upgradeLevel = upgradeLevel
+        stack.wildGrowth = wildGrowth
+        stack.gearProfile = gearProfile.map { profile in
+            var kept = profile
+            if kept.stableInstanceID.rawValue == 0 { kept.stableInstanceID = stableID }
+            return kept
+        }
         return stack
     }
 }

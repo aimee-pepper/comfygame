@@ -50,6 +50,10 @@ struct BestiaryView: View {
                 .frame(width: 24)
             VStack(alignment: .leading, spacing: 1) {
                 Text(entry.name.capitalisedSentence).font(.callout.weight(.medium))
+                if entry.isApexSpecies {
+                    Label("Apex encountered", systemImage: "crown.fill")
+                        .font(.caption2.weight(.semibold)).foregroundStyle(.orange)
+                }
                 Text(entry.timesEncountered == 1
                      ? "met once"
                      : "met \(entry.timesEncountered) times · \(entry.specimens.count) kept")
@@ -75,6 +79,12 @@ private struct EntrySheet: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 12) {
+                    if entry.isApexSpecies {
+                        StationCard(title: "Apex sightings — \(entry.apexSightings)", icon: "crown.fill") {
+                            Text("You have met a version of this species that its world could not afford.")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
                     if let finest = entry.finest {
                         StationCard(title: "The best you've found", icon: "star.fill") {
                             measures(of: finest)

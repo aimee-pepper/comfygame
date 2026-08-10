@@ -81,6 +81,19 @@ final class SiteTests: XCTestCase {
 
     // MARK: Placement
 
+    func testReliquaryRevealsSiteLocationsWithoutOpeningThem() throws {
+        let generated = (UInt64(1)...200).lazy
+            .map { Worldgen.generate(book: BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0), seed: $0) }
+            .first { !$0.sites.isEmpty }
+        var world = try XCTUnwrap(generated)
+        for site in world.sites { world.map[site.position].isRevealed = false }
+
+        ReliquaryRules.revealSites(on: &world.map, sites: world.sites)
+
+        XCTAssertTrue(world.sites.allSatisfy { world.map[$0.position].isRevealed })
+        XCTAssertTrue(world.sites.allSatisfy { !$0.isLooted })
+    }
+
     func testPlacementIsDeterministicInTheSeed() {
         let book = BoundBook(symbols: [SlotID(rawValue: "biome"): SymbolID(rawValue: "frostbound")],
                              randomlyFilled: [], essencePaid: 0)
@@ -238,6 +251,24 @@ final class SiteTests: XCTestCase {
         store.searchSite()
         XCTAssertEqual(store.state.worlds.activeRun?.turnsTaken, before,
                        "searching under a guardian shouldn't even cost a turn")
+    }
+
+    @MainActor
+    func testReliquaryRecoversMoreFromAuthoredSiteYields() throws {
+        let (store, site) = try makeStoreInWorld {
+            !($0.definition?.contents.yields.isEmpty ?? true)
+        }
+        let yields = try XCTUnwrap(site.definition?.contents.yields)
+        store.mutate("test: build reliquary and enter site") { state in
+            state.base.stations[Stations.reliquary] = StationState(isUnlocked: true, tier: 0)
+            state.worlds.activeRun?.playerPosition = site.position
+            state.worlds.activeRun?.enemies.removeAll()
+        }
+        for _ in 0..<(site.definition?.contents.searchTurns ?? 1) { store.searchSite() }
+        for (resource, authored) in yields {
+            XCTAssertEqual(store.state.worlds.activeRun?.satchel[resource],
+                           authored + Tuning.Economy.reliquarySiteYieldBonus)
+        }
     }
 
     @MainActor

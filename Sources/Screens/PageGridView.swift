@@ -52,6 +52,7 @@ struct PageGridView: View {
     /// button, which is the opposite of a gesture's lifetime. Cleared by choosing something,
     /// cancelling, or touching bare page.
     @State private var held: InstanceID?
+    @State private var connectionError: String?
 
 
     private var page: Page { store.state.base.page }
@@ -130,10 +131,15 @@ struct PageGridView: View {
         PageRules.inertQualifiers(on: page).first
     }
 
+    private var grammarWarning: String? {
+        PageRules.grammarWarnings(on: page,
+                                  chainingUnlocked: store.state.base.hasChainingUnlock).first
+    }
+
     private var footerTint: Color {
         if mode != .off { return mode.tint }
         guard ghost == nil, dragging == nil else { return .secondary }
-        return isWrittenButSilent || inert != nil ? .orange : .secondary
+        return isWrittenButSilent || inert != nil || grammarWarning != nil ? .orange : .secondary
     }
 
     private var footer: some View {
@@ -162,11 +168,11 @@ struct PageGridView: View {
                 // icons on a page-width row (Aimee, 6 Aug).
                 iconButton("xmark", "Done with this sigil") { self.held = nil }
             }
-            else if let hint = mode.hint {
+            else if let hint = connectionError ?? mode.hint {
                 Image(systemName: mode.icon).font(.caption2)
                 Text(hint).font(.caption2)
                 Spacer()
-                Button("Done") { mode = .off; anchor = nil }
+                Button("Done") { mode = .off; anchor = nil; connectionError = nil }
                     .font(.caption2)
                     .frame(minWidth: 44, minHeight: 44)
             }
@@ -190,6 +196,12 @@ struct PageGridView: View {
                 // where it was made teaches the grammar.
                 Image(systemName: "exclamationmark.triangle.fill").font(.caption2)
                 Text("\(inert.qualifier.name) says nothing about \(inert.target.name). \(inert.qualifier.ladder.displayName) sets \(inert.qualifier.ladder.job).")
+                    .font(.caption2)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer()
+            } else if let grammarWarning {
+                Image(systemName: "exclamationmark.triangle.fill").font(.caption2)
+                Text("Loaded writing: \(grammarWarning)")
                     .font(.caption2)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer()
@@ -228,7 +240,7 @@ struct PageGridView: View {
         // Hit-testable only while a mode is running, so a tap on bare page can end it — and can't
         // interfere with anything the rest of the time.
         .allowsHitTesting(mode != .off || held != nil)
-        .onTapGesture { mode = .off; anchor = nil; held = nil }
+        .onTapGesture { mode = .off; anchor = nil; held = nil; connectionError = nil }
     }
 
     // MARK: Written runes
@@ -388,9 +400,15 @@ struct PageGridView: View {
             // an alphabet you learn to read is just an unreadable one.
             held = mark.id
         case .connecting:
-            guard let from = anchor else { anchor = mark.id; return }
+            guard let from = anchor else { anchor = mark.id; connectionError = nil; return }
             // Chaining: whatever you just joined becomes the anchor, so you can keep going.
-            if store.connect(from, mark.id) { anchor = mark.id }
+            if store.connect(from, mark.id) {
+                anchor = mark.id
+                connectionError = nil
+            } else {
+                connectionError = store.connectionIssue(from, mark.id)?.message
+                    ?? "Those marks cannot be joined."
+            }
         case .disconnecting:
             store.disconnectAll(mark.id)
         }
@@ -401,7 +419,7 @@ struct PageGridView: View {
         guard let from = anchor, from != mark.id else { return false }
         switch mode {
         case .off: return false
-        case .connecting: return PageRules.canConnect(from, mark.id, on: page)
+        case .connecting: return store.canConnect(from, mark.id)
         case .disconnecting: return page.links.contains(MarkLink(from, mark.id))
         }
     }

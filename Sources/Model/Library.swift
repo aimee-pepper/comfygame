@@ -7,16 +7,23 @@ import Foundation
 struct LibraryState: Codable, Equatable, Sendable {
     /// Pages recovered, in the order found.
     var foundPages: [DiaryPageID] = []
+    /// Anonymous notes recovered from worlds. These never affect diary completion or patience.
+    var foundWritings: [FoundWritingRecord] = []
     /// Travellers found — you have written the world they were in and gone there.
     var foundTravellers: Set<TravellerID> = []
     /// Travellers you know to look for, whether or not you know where they are.
     var knownTravellers: Set<TravellerID> = []
+    /// Singular authored workshop patterns learned from diary pages.
+    var knownPatterns: Set<String> = []
     /// How many worlds have been generated since each page became eligible to appear.
     ///
     /// Pages prefer worlds relevant to their author, but nothing may be permanently unreachable
     /// because of how a player happens to write — so once this passes a threshold the page stops
     /// waiting and will surface anywhere.
     var pagesWaiting: [DiaryPageID: Int] = [:]
+    /// Only this page accrues the mismatched-world patience fallback. One queue, not twenty-four
+    /// independent clocks that all become universally eligible together.
+    var patiencePage: DiaryPageID?
 
     /// **Every world you've been to, and what you wrote to get it** (Aimee, 6 Aug).
     ///
@@ -35,9 +42,12 @@ struct LibraryState: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         foundPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .foundPages) ?? []
+        foundWritings = try c.decodeIfPresent([FoundWritingRecord].self, forKey: .foundWritings) ?? []
         foundTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .foundTravellers) ?? []
         knownTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .knownTravellers) ?? []
+        knownPatterns = try c.decodeIfPresent(Set<String>.self, forKey: .knownPatterns) ?? []
         pagesWaiting = try c.decodeIfPresent([DiaryPageID: Int].self, forKey: .pagesWaiting) ?? [:]
+        patiencePage = try c.decodeIfPresent(DiaryPageID.self, forKey: .patiencePage)
         visitedWorlds = try c.decodeIfPresent([VisitedWorld].self, forKey: .visitedWorlds) ?? []
     }
 
@@ -66,6 +76,14 @@ struct LibraryState: Codable, Equatable, Sendable {
             .filter { $0.kind == .locationClue && $0.about == traveller }
             .compactMap(\.clueIndex))
     }
+}
+
+struct FoundWritingRecord: Codable, Equatable, Identifiable, Sendable {
+    enum Family: String, Codable, Sendable { case fieldNote, routeMark, siteFragment, workingScrap }
+    var id: FoundWritingID
+    var family: Family
+    var prose: String
+    var position: GridPoint
 }
 
 /// The Library's page for one diary: everything known about where its author is.
@@ -108,6 +126,8 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
     var descriptionSentence: String
     /// The chains you placed, flattened to text — *Illumination ← Vast Sun*.
     var written: [String]
+    /// Normalized target chains used for semantic comparison. Old records fall back to `written`.
+    var semanticRequests: [String]
     /// **A modifier written where it changed nothing.** The thing you most want to find later.
     ///
     /// Called `inertRungs` until 6 Aug — *rung* was a spec coinage nobody had ever defined for the
@@ -117,6 +137,18 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
     var inertModifiers: [String]
     /// Every target's peak and floor, for when you can read that far.
     var readings: [String: ReadingSnapshot]
+    /// Tier-3 cause-and-effect lines captured while the page's focus structure is available.
+    /// Retained for tolerant decoding of saves written before attributions carried target IDs.
+    var focusAttributions: [String] = []
+    /// Structured attributions allow History to apply the player's *current* calibration gate:
+    /// returning with a new instrument can reveal an old world's secondary without saving it in
+    /// already-disclosed prose.
+    var focusEffects: [RecordedFocusEffect] = []
+    /// Captured while the complete pressure readings still exist; old records simply lack it.
+    var livingAnalysis: LivingAnalysis?
+    /// Resolved after arrival, retained independently of the simulation object so History can
+    /// explain the world's clock as the player's Cycle instrument becomes readable.
+    var clockAnalysis: ClockAnalysis?
     /// Who was standing in it, whether or not you reached them.
     var travellersPresent: [TravellerID]
     /// **Kept on purpose.** The list is curated rather than infinite (Aimee, 6 Aug) — a kept world
@@ -150,22 +182,29 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
 
     init(id: InstanceID, seed: UInt64, runIndex: Int, descriptionSentence: String,
          written: [String], inertModifiers: [String], readings: [String: ReadingSnapshot],
-         travellersPresent: [TravellerID], isKept: Bool = false) {
+         travellersPresent: [TravellerID], isKept: Bool = false,
+         focusAttributions: [String] = [], focusEffects: [RecordedFocusEffect] = [],
+         semanticRequests: [String]? = nil) {
         self.id = id
         self.seed = seed
         self.runIndex = runIndex
         self.descriptionSentence = descriptionSentence
         self.written = written
+        self.semanticRequests = semanticRequests ?? written
         self.inertModifiers = inertModifiers
         self.readings = readings
         self.travellersPresent = travellersPresent
         self.isKept = isKept
+        self.focusAttributions = focusAttributions
+        self.focusEffects = focusEffects
+        self.livingAnalysis = nil
+        self.clockAnalysis = nil
     }
 
     /// Includes the retired `inertRungs`, so a history written before the rename still reads.
     private enum CodingKeys: String, CodingKey {
-        case id, seed, runIndex, descriptionSentence, written, inertModifiers, readings
-        case travellersPresent, isKept
+        case id, seed, runIndex, descriptionSentence, written, semanticRequests, inertModifiers, readings
+        case travellersPresent, isKept, focusAttributions, focusEffects, livingAnalysis, clockAnalysis
         case inertRungs
     }
 
@@ -176,8 +215,13 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         try c.encode(runIndex, forKey: .runIndex)
         try c.encode(descriptionSentence, forKey: .descriptionSentence)
         try c.encode(written, forKey: .written)
+        try c.encode(semanticRequests, forKey: .semanticRequests)
         try c.encode(inertModifiers, forKey: .inertModifiers)
         try c.encode(readings, forKey: .readings)
+        try c.encode(focusAttributions, forKey: .focusAttributions)
+        try c.encode(focusEffects, forKey: .focusEffects)
+        try c.encodeIfPresent(livingAnalysis, forKey: .livingAnalysis)
+        try c.encodeIfPresent(clockAnalysis, forKey: .clockAnalysis)
         try c.encode(travellersPresent, forKey: .travellersPresent)
         try c.encode(isKept, forKey: .isKept)
     }
@@ -190,10 +234,35 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         runIndex = try c.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
         descriptionSentence = try c.decodeIfPresent(String.self, forKey: .descriptionSentence) ?? ""
         written = try c.decodeIfPresent([String].self, forKey: .written) ?? []
+        semanticRequests = try c.decodeIfPresent([String].self, forKey: .semanticRequests) ?? written
         inertModifiers = try c.decodeIfPresent([String].self, forKey: .inertModifiers)
             ?? c.decodeIfPresent([String].self, forKey: .inertRungs) ?? []
         readings = try c.decodeIfPresent([String: ReadingSnapshot].self, forKey: .readings) ?? [:]
+        focusAttributions = try c.decodeIfPresent([String].self, forKey: .focusAttributions) ?? []
+        focusEffects = try c.decodeIfPresent([RecordedFocusEffect].self, forKey: .focusEffects) ?? []
+        livingAnalysis = try c.decodeIfPresent(LivingAnalysis.self, forKey: .livingAnalysis)
+        clockAnalysis = try c.decodeIfPresent(ClockAnalysis.self, forKey: .clockAnalysis)
         travellersPresent = try c.decodeIfPresent([TravellerID].self, forKey: .travellersPresent) ?? []
         isKept = try c.decodeIfPresent(Bool.self, forKey: .isKept) ?? false
+    }
+}
+
+struct ClockAnalysis: Codable, Equatable, Sendable {
+    var band: String
+    var basePeriod: Int
+    var regularity: Double
+    var amplitude: Double
+    var isStopped: Bool
+}
+
+struct RecordedFocusEffect: Codable, Equatable, Sendable {
+    var source: String
+    var targetID: PressureTargetID
+    var target: String
+    var text: String
+    var isPrimary: Bool
+
+    var line: String {
+        "\(source) → \(target) \(text)" + (isPrimary ? "" : " · secondary")
     }
 }

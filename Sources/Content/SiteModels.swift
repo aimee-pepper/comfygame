@@ -38,6 +38,10 @@ struct SiteDef: Codable, Equatable, Identifiable, Sendable {
     var contents: SiteContents
     /// Some sites are dangerous to have written. Same units as the Stability headline.
     var stabilityDelta: Int
+    /// A discoverable place where this world can be rebound into the Atlas.
+    var isNaturalAnchor: Bool?
+
+    var providesNaturalAnchor: Bool { isNaturalAnchor == true }
 
     /// Whether this site's conditions all hold in a given world.
     ///

@@ -55,6 +55,9 @@ struct WorldDescription: Equatable, Sendable {
     ///
     /// Empty below tier 2, and empty for anything unmeasured however high the lens goes.
     var measured: [Reading] = []
+    /// Tier-4 sentence marking derived from the page's actual greed arithmetic, keyed by subject.
+    /// Empty on descriptions that have no written page context (and below the tier it is ignored).
+    var derivedPolarity: [String: DescriptionClauseDef.Polarity] = [:]
 
     /// One subject, read off properly.
     struct Reading: Equatable, Identifiable, Sendable {
@@ -65,10 +68,49 @@ struct WorldDescription: Equatable, Sendable {
         var floor: Double
         /// True for Illumination and Thermal, the two that have a day and a night.
         var hasFloor: Bool
+        var precision: RealityState.InstrumentPrecision = .fine
 
         var id: PressureTargetID { target }
         var text: String {
-            hasFloor ? "\(Int(peak.rounded())) / \(Int(floor.rounded()))" : "\(Int(peak.rounded()))"
+            Self.text(peak: peak, floor: floor, hasFloor: hasFloor, precision: precision)
+        }
+
+        static func text(peak: Double, floor: Double, hasFloor: Bool,
+                         precision: RealityState.InstrumentPrecision) -> String {
+            switch precision {
+            case .crude:
+                let midpoint = (peak + floor) / 2
+                let band: String = switch midpoint {
+                case ..<25: "very low"
+                case ..<45: "low"
+                case ..<60: "middling"
+                case ..<80: "high"
+                default: "very high"
+                }
+                let values = hasFloor
+                    ? "\(broad(peak)) / \(broad(floor))"
+                    : broad(peak)
+                return "\(band) · \(values)"
+            case .good:
+                let values = hasFloor
+                    ? "\(narrow(peak)) / \(narrow(floor))"
+                    : narrow(peak)
+                return values
+            case .fine:
+                return hasFloor
+                    ? "\(Int(peak.rounded())) / \(Int(floor.rounded()))"
+                    : "\(Int(peak.rounded()))"
+            }
+        }
+
+        private static func broad(_ value: Double) -> String {
+            let low = max(0, Int((value / 20).rounded(.down) * 20))
+            let high = min(100, low + 20)
+            return "\(low)–\(high)"
+        }
+
+        private static func narrow(_ value: Double) -> String {
+            "\(max(0, Int(value.rounded()) - 5))–\(min(100, Int(value.rounded()) + 5))"
         }
     }
 

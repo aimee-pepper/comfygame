@@ -253,11 +253,42 @@ final class FloraTests: XCTestCase {
                              FloraRules.harm(of: toxic).immediate)
         XCTAssertEqual(FloraRules.harm(of: thorned).lingering, 0)
         XCTAssertGreaterThan(FloraRules.harm(of: toxic).lingering, 0)
+        XCTAssertGreaterThan(FloraRules.harm(of: thorned, severity: 2).immediate,
+                             FloraRules.harm(of: thorned, severity: 0.5).immediate)
+        XCTAssertGreaterThan(FloraRules.harm(of: toxic, severity: 2).lingering,
+                             FloraRules.harm(of: toxic, severity: 0.5).lingering)
 
         // Something you can walk through without noticing shouldn't cost anything at all.
         var open = thorned
         open.defence = 5
         XCTAssertFalse(FloraRules.harm(of: open).isSomething)
+    }
+
+    func testActiveFloraFrequencyTouchesOnlyActiveDefendersAndIsDeterministic() {
+        var activeTraits = plant(stature: 60)
+        activeTraits.defence = 100
+        activeTraits.defenceType = .active
+        var thornTraits = activeTraits
+        thornTraits.defenceType = .physical
+        let active = Flora(id: InstanceID(rawValue: 501), traits: activeTraits, worldSeed: 7)
+        let thorn = Flora(id: InstanceID(rawValue: 502), traits: thornTraits, worldSeed: 7)
+        let entry = GridPoint(x: 0, y: 0)
+        var map = WorldMap(width: 8, height: 8,
+                           tiles: Array(repeating: Tile(), count: 64), entry: entry)
+        for point in map.allPoints where point.chebyshevDistance(to: entry) >= 3 {
+            map[point].flora = point.x.isMultiple(of: 2) ? active.id : thorn.id
+        }
+        func spawned(multiplier: Double) -> [WorldEnemy] {
+            var occupied: Set<GridPoint> = []
+            var rng = SeededRNG(seed: 88)
+            return Worldgen.plantPredators([active, thorn], in: map, avoiding: &occupied,
+                                           clearOf: entry, multiplier: multiplier, rng: &rng)
+        }
+        XCTAssertTrue(spawned(multiplier: 0).isEmpty)
+        let first = spawned(multiplier: 1)
+        XCTAssertEqual(first, spawned(multiplier: 1))
+        XCTAssertFalse(first.isEmpty)
+        XCTAssertTrue(first.allSatisfy { $0.floraID == active.id && $0.isSessile })
     }
 
     /// Walking into it costs you, and the poison goes on working turn by turn — **because you

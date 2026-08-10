@@ -298,11 +298,20 @@ struct EncounterState: Codable, Equatable, Sendable {
     var taunts: [InstanceID: Int] = [:]
     /// Foes whose traits you've actually looked at (Sight). Nothing else reveals a covering.
     var revealed: Set<InstanceID> = []
+    /// Species absent from the bestiary when this fight began. World encounter setup records a
+    /// sighting before the first gambit can run, so this snapshot preserves the meaningful
+    /// "first encounter" window for Kestrel's subject.
+    var initiallyUnrecordedSpecies: Set<String> = []
     /// Foes no longer giving anything off (Snuff).
     var snuffed: Set<InstanceID> = []
     /// **Burns, poisons and dazzles**, per combatant. Emanation was a generated trait that reached
     /// the prose and never the fight; now it leaves something behind (Q42).
     var statuses: [Combatant: [StatusState]] = [:]
+    /// One prepared refusal of the next affliction. Kept as a count-shaped value so a future
+    /// upgrade can grant more than one without changing the save shape; Stonebark currently sets 1.
+    var statusGuards: [Combatant: Int] = [:]
+    /// Consumed by this combatant's next successful weapon strike, including a weapon skill.
+    var preparedCoatings: [Combatant: PreparedCoating] = [:]
     /// Extra turns owed, and turns owed back. Quicken buys the first with the second.
     var extraTurns: [Combatant: Int] = [:]
     /// **What the Craft and Defense branches leave on somebody**, in rounds remaining.
@@ -314,8 +323,12 @@ struct EncounterState: Codable, Equatable, Sendable {
     var dodging: [Combatant: Int] = [:]
     var concealed: [Combatant: Int] = [:]
     var interposing: [Combatant: Int] = [:]
+    /// Ashe's consented interception of one active emanation event aimed at somebody else.
+    var grounding: [Combatant: Int] = [:]
     var envenomed: [Combatant: Int] = [:]
     var skippedTurns: [Combatant: Int] = [:]
+    /// First actionable turn after the last skipped-turn debt was paid.
+    var recoveryComplete: Set<Combatant> = []
 
     /// Set by tapping the companion: their next turn is yours to direct instead of the gambits'.
     /// Clears once used — an override is for that turn only (the FF12 rule).
@@ -348,11 +361,12 @@ struct EncounterState: Codable, Equatable, Sendable {
     }
 
     init(id: InstanceID, foes: [FoeState], partyNames: [Int: String] = [:],
-         order: [Combatant], log: [String] = []) {
+         order: [Combatant], initiallyUnrecordedSpecies: Set<String> = [], log: [String] = []) {
         self.id = id
         self.foes = foes
         self.partyNames = partyNames
         self.order = order
+        self.initiallyUnrecordedSpecies = initiallyUnrecordedSpecies
         self.log = log
     }
 
@@ -378,15 +392,22 @@ struct EncounterState: Codable, Equatable, Sendable {
         dodging = try c.decodeIfPresent([Combatant: Int].self, forKey: .dodging) ?? [:]
         concealed = try c.decodeIfPresent([Combatant: Int].self, forKey: .concealed) ?? [:]
         interposing = try c.decodeIfPresent([Combatant: Int].self, forKey: .interposing) ?? [:]
+        grounding = try c.decodeIfPresent([Combatant: Int].self, forKey: .grounding) ?? [:]
         envenomed = try c.decodeIfPresent([Combatant: Int].self, forKey: .envenomed) ?? [:]
         foeBleeds = try c.decodeIfPresent([InstanceID: BleedState].self, forKey: .foeBleeds) ?? [:]
         wards = try c.decodeIfPresent([Combatant: WardState].self, forKey: .wards) ?? [:]
         taunts = try c.decodeIfPresent([InstanceID: Int].self, forKey: .taunts) ?? [:]
         revealed = try c.decodeIfPresent(Set<InstanceID>.self, forKey: .revealed) ?? []
+        initiallyUnrecordedSpecies = try c.decodeIfPresent(Set<String>.self,
+                                                           forKey: .initiallyUnrecordedSpecies) ?? []
         snuffed = try c.decodeIfPresent(Set<InstanceID>.self, forKey: .snuffed) ?? []
         statuses = try c.decodeIfPresent([Combatant: [StatusState]].self, forKey: .statuses) ?? [:]
+        statusGuards = try c.decodeIfPresent([Combatant: Int].self, forKey: .statusGuards) ?? [:]
+        preparedCoatings = try c.decodeIfPresent([Combatant: PreparedCoating].self,
+                                                 forKey: .preparedCoatings) ?? [:]
         extraTurns = try c.decodeIfPresent([Combatant: Int].self, forKey: .extraTurns) ?? [:]
         skippedTurns = try c.decodeIfPresent([Combatant: Int].self, forKey: .skippedTurns) ?? [:]
+        recoveryComplete = try c.decodeIfPresent(Set<Combatant>.self, forKey: .recoveryComplete) ?? []
         isCompanionOverridden = try c.decodeIfPresent(Bool.self, forKey: .isCompanionOverridden) ?? false
         outcome = try c.decodeIfPresent(EncounterOutcome.self, forKey: .outcome)
         binderBleedRounds = try c.decodeIfPresent(Int.self, forKey: .binderBleedRounds) ?? 0
@@ -433,6 +454,12 @@ enum StatusKind: String, Codable, Hashable, CaseIterable, Sendable {
         case .dazzle: "can't see straight"
         }
     }
+}
+
+/// A prepared one-hit weapon treatment. Bleed remains separate because it predates the newer
+/// status list and has its own wound timing; the other three use `StatusKind` when they land.
+enum PreparedCoating: String, Codable, Hashable, Sendable {
+    case poison, burn, bleed, dazzle
 }
 
 /// One affliction on one combatant.

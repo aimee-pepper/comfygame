@@ -421,6 +421,9 @@ struct ItemDef: Codable, Equatable, Identifiable, Sendable {
     /// you don't study your way to a better sword, you take one off a ruin floor — and later you
     /// find a smith who can make one.
     var gear: GearDef?
+    /// What using this item does. Optional so every pre-consumable save and ordinary catalogue
+    /// entry remains valid; the legacy Lesser Salve is authored explicitly in content.
+    var consumable: ConsumableDef?
 
     enum Kind: String, Codable, Sendable {
         case consumable
@@ -429,6 +432,30 @@ struct ItemDef: Codable, Equatable, Identifiable, Sendable {
         case gear
         case treasure
     }
+}
+
+struct ConsumableDef: Codable, Equatable, Sendable {
+    enum Effect: String, Codable, Sendable {
+        case heal
+        case restoreStability
+        case returnHome
+        case lightWorld
+        case farsight
+        case clearPoison
+        case clearElemental
+        case clearAnyStatus
+        case preventStatus
+        case coatPoison
+        case coatBurn
+        case coatBleed
+        case coatDazzle
+        case identifyCurio
+        case lureCreature
+    }
+
+    var effect: Effect
+    /// HP, stability, vision radius, or revealed radius depending on the effect.
+    var potency: Int = 0
 }
 
 /// One Skill. Each party member has exactly one in v0.
@@ -504,13 +531,14 @@ struct SkillDef: Codable, Equatable, Identifiable, Sendable {
         case dodge
         /// **Interpose** — take a hit meant for somebody else.
         case intercept
+        case ground
         /// **Envenom** — coat a weapon, for several hits.
         case envenom
         /// **Conceal** — untargetable for a turn.
         case conceal
         /// **Ambush** — open a fight with a free attack.
         case ambush
-        /// **Elemental Strike** — burn, freeze or shock.
+        /// **Emanation Strike** — heat, caustic or light; currently delivered as burn.
         case elemental
     }
 
@@ -523,7 +551,7 @@ struct SkillDef: Codable, Equatable, Identifiable, Sendable {
              .sunder, .execute, .ambush, .elemental: true
         case .heal, .ward, .quicken, .cleanse, .rout, .reposition,
              .preempt, .brace, .dodge, .envenom, .conceal: false
-        case .intercept: false
+        case .intercept, .ground: false
         }
     }
 
@@ -594,10 +622,16 @@ struct StationDef: Codable, Equatable, Identifiable, Sendable {
     /// The line on the building site, before it's built. Written from the person's point of view,
     /// because they're the reason it exists.
     var buildBlurb: String?
+    var keeperLevelForTier: [Int]
+    var homeDiscountBase: Double
+    var homeDiscountPerKeeperLevel: Double
+    var homeDiscountCap: Double
 
     init(id: StationID, name: String, icon: String, blurb: String, sortOrder: Int,
          unlockedAtStart: Bool, startingTier: Int, maxTier: Int, route: String,
-         builtBy: TravellerID? = nil, buildCost: UpgradeCost? = nil, buildBlurb: String? = nil) {
+         builtBy: TravellerID? = nil, buildCost: UpgradeCost? = nil, buildBlurb: String? = nil,
+         keeperLevelForTier: [Int] = [8, 16, 24], homeDiscountBase: Double = 0.10,
+         homeDiscountPerKeeperLevel: Double = 0.005, homeDiscountCap: Double = 0.20) {
         self.id = id
         self.name = name
         self.icon = icon
@@ -610,6 +644,10 @@ struct StationDef: Codable, Equatable, Identifiable, Sendable {
         self.builtBy = builtBy
         self.buildCost = buildCost
         self.buildBlurb = buildBlurb
+        self.keeperLevelForTier = keeperLevelForTier
+        self.homeDiscountBase = homeDiscountBase
+        self.homeDiscountPerKeeperLevel = homeDiscountPerKeeperLevel
+        self.homeDiscountCap = homeDiscountCap
     }
 
     /// Tolerant, per the policy in `Migrations.swift` — a stations file written before buildings
@@ -628,6 +666,11 @@ struct StationDef: Codable, Equatable, Identifiable, Sendable {
         builtBy = try c.decodeIfPresent(TravellerID.self, forKey: .builtBy)
         buildCost = try c.decodeIfPresent(UpgradeCost.self, forKey: .buildCost)
         buildBlurb = try c.decodeIfPresent(String.self, forKey: .buildBlurb)
+        keeperLevelForTier = try c.decodeIfPresent([Int].self, forKey: .keeperLevelForTier) ?? [8, 16, 24]
+        homeDiscountBase = try c.decodeIfPresent(Double.self, forKey: .homeDiscountBase) ?? 0.10
+        homeDiscountPerKeeperLevel = try c.decodeIfPresent(Double.self,
+                                                            forKey: .homeDiscountPerKeeperLevel) ?? 0.005
+        homeDiscountCap = try c.decodeIfPresent(Double.self, forKey: .homeDiscountCap) ?? 0.20
     }
 }
 

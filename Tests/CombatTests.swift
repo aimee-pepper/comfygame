@@ -17,6 +17,28 @@ final class CombatTests: XCTestCase {
                                          subject: "subject_ally_any",
                                          property: "prop_hp", comparator: "cmp_below", threshold: "thr_50",
                                          action: "act_heal")
+    static let attackAfterRecovery = GambitRule(id: InstanceID(rawValue: 104),
+                                                subject: "subject_self_recovery_complete",
+                                                action: "act_attack")
+    static let healBackRank = GambitRule(id: InstanceID(rawValue: 105),
+                                         subject: "subject_ally_back_rank",
+                                         action: "act_heal")
+    static let attackOutOfReach = GambitRule(id: InstanceID(rawValue: 106),
+                                             subject: "subject_foe_cannot_reach_self",
+                                             action: "act_attack")
+    static let attackWhenCrowded = GambitRule(id: InstanceID(rawValue: 107),
+                                              subject: "subject_foes_present_at_least_3",
+                                              action: "act_attack")
+    static let attackUnrecorded = GambitRule(id: InstanceID(rawValue: 108),
+                                             subject: "subject_foe_unrecorded_species",
+                                             action: "act_attack")
+    static let healWhenAnyoneLow = GambitRule(id: InstanceID(rawValue: 109),
+                                              subject: "subject_ally_hp_below_any",
+                                              property: "prop_hp", comparator: "cmp_below",
+                                              threshold: "thr_50", action: "act_heal")
+    static let attackEmanating = GambitRule(id: InstanceID(rawValue: 110),
+                                            subject: "subject_foe_emanating",
+                                            action: "act_attack")
 
 
     /// **Skills come from the trees now**, so a test about *what a skill does* has to buy it first.
@@ -275,6 +297,94 @@ final class CombatTests: XCTestCase {
         let store = inFight(["paper_moth"], gambits: [Self.healHurtAlly])
         // Everyone is healthy, so the only rule can't match.
         XCTAssertNil(GambitEngine.decide(in: store.state))
+    }
+
+    func testBackRankSubjectTargetsOnlyAnAllyInTheBackRank() throws {
+        let store = inFight(["paper_moth"], gambits: [Self.healBackRank])
+        store.mutate("put only the binder in back") { state in
+            state.base.binderCharacter.rank = .back
+            state.base.companion.character.rank = .front
+        }
+
+        XCTAssertEqual(GambitEngine.decide(in: store.state)?.action, .healSkill(ally: .binder))
+
+        store.mutate("move the binder forward") { $0.base.binderCharacter.rank = .front }
+        XCTAssertNil(GambitEngine.decide(in: store.state))
+    }
+
+    func testCannotReachSubjectReadsTheCurrentRanksAndFoeAction() throws {
+        let store = inFight(["paper_moth"], gambits: [Self.attackOutOfReach])
+        store.mutate("hold behind a front line") { state in
+            state.base.binderCharacter.rank = .front
+            state.base.companion.character.rank = .back
+        }
+        XCTAssertEqual(GambitEngine.decide(in: store.state)?.rule, Self.attackOutOfReach)
+
+        store.mutate("leave nobody in front") { $0.base.binderCharacter.rank = .back }
+        XCTAssertNil(GambitEngine.decide(in: store.state),
+                     "a foe can close when the whole standing party is in back")
+    }
+
+    func testThreeFoesSubjectStopsWhenTheCrowdThins() {
+        let store = inFight(["paper_moth", "paper_moth", "paper_moth"],
+                            gambits: [Self.attackWhenCrowded])
+        XCTAssertEqual(GambitEngine.decide(in: store.state)?.rule, Self.attackWhenCrowded)
+
+        store.mutate("one foe falls") { $0.worlds.activeRun?.activeEncounter?.foes[0].currentHP = 0 }
+        XCTAssertNil(GambitEngine.decide(in: store.state))
+    }
+
+    func testUnrecordedSpeciesSubjectUsesTheEncounterOpeningSnapshot() {
+        let store = inFight(["paper_moth"], gambits: [Self.attackUnrecorded])
+        XCTAssertEqual(GambitEngine.decide(in: store.state)?.rule, Self.attackUnrecorded,
+                       "encounter setup records the sighting before gambits evaluate")
+
+        store.mutate("stage a species already known before this fight") {
+            $0.worlds.activeRun?.activeEncounter?.initiallyUnrecordedSpecies = []
+        }
+        XCTAssertNil(GambitEngine.decide(in: store.state))
+    }
+
+    func testAnyLowAllySubjectQualifiesWithoutRetargetingTheAction() {
+        let store = inFight(["paper_moth"], gambits: [Self.healWhenAnyoneLow])
+        store.mutate("hurt someone other than the actor") { $0.worlds.activeRun?.binderHP = 1 }
+
+        XCTAssertEqual(GambitEngine.decide(in: store.state)?.action,
+                       .healSkill(ally: .companion(0)),
+                       "the global subject must not secretly select the qualifying ally")
+
+        store.mutate("everyone is healthy") { state in
+            state.worlds.activeRun?.binderHP = Tuning.Encounter.binderMaxHP
+        }
+        XCTAssertNil(GambitEngine.decide(in: store.state))
+    }
+
+    func testRecoveryCompleteMatchesOnlyFirstActionAfterFinalSkippedTurn() throws {
+        let store = inFight(["ink_hound"], gambits: [Self.attackAfterRecovery, Self.attackAny])
+        store.mutate("owe two recovery turns") { state in
+            state.worlds.activeRun?.activeEncounter?.skippedTurns[.companion(0)] = 2
+            CombatRules.advanceTurn(in: &state)
+        }
+        XCTAssertFalse(try XCTUnwrap(store.activeEncounter).recoveryComplete.contains(.companion(0)),
+                       "earlier debt in a stack must not mark recovery complete")
+
+        store.mutate("reach the final recovery turn") { state in
+            guard var encounter = state.worlds.activeRun?.activeEncounter,
+                  let beforeCompanion = encounter.order.firstIndex(of: .binder) else { return }
+            encounter.turnIndex = beforeCompanion
+            state.worlds.activeRun?.activeEncounter = encounter
+            CombatRules.advanceTurn(in: &state)
+        }
+        store.mutate("make the recovered companion actionable") { state in
+            guard var encounter = state.worlds.activeRun?.activeEncounter,
+                  let index = encounter.order.firstIndex(of: .companion(0)) else { return }
+            encounter.turnIndex = index
+            state.worlds.activeRun?.activeEncounter = encounter
+        }
+        XCTAssertEqual(GambitEngine.decide(in: store.state)?.rule, Self.attackAfterRecovery)
+        let action = try XCTUnwrap(GambitEngine.decide(in: store.state)?.action)
+        store.mutate("complete recovered action") { CombatRules.perform(action, by: .companion(0), in: &$0) }
+        XCTAssertFalse(try XCTUnwrap(store.activeEncounter).recoveryComplete.contains(.companion(0)))
     }
 
     // MARK: Manual override
@@ -800,6 +910,77 @@ final class CombatTests: XCTestCase {
 
     // MARK: Statuses — the producers finally reach the fight
 
+    func testStonebarkBlocksExactlyOneAfflictionButNotTheHit() throws {
+        var burning = CreatureTraits()
+        burning.size = 80; burning.build = 70
+        burning.emanation = emanation(of: .heat)
+        burning.armament.setTotal(60)
+        let store = inFightWith([burning])
+        let tonic = ItemStack(id: InstanceID(rawValue: 70_001), catalogID: "stonebark_tonic")
+        store.mutate("test: carry tonic") { state in
+            _ = state.worlds.activeRun?.satchelItems.add(tonic)
+            guard let foe = state.worlds.activeRun?.activeEncounter?.foes.first else { return }
+            state.worlds.activeRun?.activeEncounter?.order = [.binder, .foe(foe.id)]
+            state.worlds.activeRun?.activeEncounter?.turnIndex = 0
+        }
+
+        let hpBefore = try XCTUnwrap(store.activeRun).binderHP
+        store.mutate("test: drink tonic") {
+            CombatRules.perform(.useItem(stack: tonic.id, ally: .binder), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(store.activeEncounter?.statusGuards[.binder], 1)
+
+        // Stage only the foe's immediate action so automatic companion turns cannot obscure which
+        // body was protected. Repeat for evasion; the guard is spent only when an affliction lands.
+        store.mutate("test: foe only") { state in
+            guard let foe = state.worlds.activeRun?.activeEncounter?.foes.first else { return }
+            state.worlds.activeRun?.activeEncounter?.order = [.binder, .foe(foe.id)]
+            state.worlds.activeRun?.activeEncounter?.turnIndex = 1
+        }
+        for _ in 0..<12 where (store.activeEncounter?.statusGuards[.binder] ?? 0) > 0 {
+            forceTheFoeToStrike(in: store)
+        }
+
+        XCTAssertLessThan(store.activeRun?.binderHP ?? hpBefore, hpBefore, "Stonebark stopped attack damage")
+        XCTAssertNil(store.activeEncounter?.statusGuards[.binder])
+        XCTAssertTrue((store.activeEncounter?.statuses[.binder] ?? []).isEmpty)
+    }
+
+    func testEachPreparedCoatingMapsToItsExistingCombatEffectAndIsSpent() throws {
+        let cases: [(ItemID, PreparedCoating)] = [
+            ("venom", .poison), ("firebrand", .burn),
+            ("briar_oil", .bleed), ("flashsalt", .dazzle)
+        ]
+        for (itemID, expected) in cases {
+            let store = inFightWith([armoured()])
+            let stack = ItemStack(id: InstanceID(rawValue: 71_000 + UInt64(cases.firstIndex { $0.0 == itemID } ?? 0)),
+                                  catalogID: itemID)
+            store.mutate("test: carry coating") { state in
+                _ = state.worlds.activeRun?.satchelItems.add(stack)
+            }
+            giveTheTurnTo(.binder, in: store)
+            store.mutate("test: prepare coating") {
+                CombatRules.perform(.useItem(stack: stack.id, ally: .binder), by: .binder, in: &$0)
+            }
+            XCTAssertEqual(store.activeEncounter?.preparedCoatings[.binder], expected)
+
+            let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+            for _ in 0..<12 where store.activeEncounter?.preparedCoatings[.binder] != nil {
+                giveTheTurnTo(.binder, in: store)
+                store.mutate("test: coated strike") {
+                    CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0)
+                }
+            }
+            XCTAssertNil(store.activeEncounter?.preparedCoatings[.binder], "\(itemID) was not spent")
+            if expected == .bleed {
+                XCTAssertGreaterThan(store.activeEncounter?.foes.first?.bleedRounds ?? 0, 0)
+            } else {
+                let kind: StatusKind = expected == .poison ? .poison : (expected == .burn ? .burn : .dazzle)
+                XCTAssertTrue((store.activeEncounter?.statuses[.foe(foeID)] ?? []).contains { $0.kind == kind })
+            }
+        }
+    }
+
     /// **An emanating creature leaves something behind** (Q42). Emanation is a generated trait that
     /// reached the creature's description and did nothing in the fight beyond one armour-ignoring
     /// blow. Three statuses now, one per emanation, because Ward needs something specific to turn
@@ -889,6 +1070,52 @@ final class CombatTests: XCTestCase {
                   light: kind == .light ? 100 : 0,
                   heat: kind == .heat ? 100 : 0,
                   caustic: kind == .caustic ? 100 : 0)
+    }
+
+    func testGroundBelongsToAsheAndReceivesOneEmanationEvent() throws {
+        var burning = CreatureTraits()
+        burning.size = 80; burning.build = 70
+        burning.emanation = emanation(of: .heat)
+        burning.armament.setTotal(60)
+        let store = inFightWith([burning])
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("test: companion is Ashe") { state in
+            state.base.roster[0].traveller = "ashe"
+            state.base.roster[0].name = "Ashe"
+            state.worlds.activeRun?.activeEncounter?.taunts[foeID] = 1
+        }
+        XCTAssertTrue(CombatRules.skills(for: .companion(0), in: store.state).contains { $0.id == "ground" })
+
+        let binderBefore = try XCTUnwrap(store.activeRun).binderHP
+        let asheBefore = try XCTUnwrap(try XCTUnwrap(store.activeRun).companionHP[0])
+        giveTheTurnTo(.companion(0), in: store)
+        store.mutate("test: ground") {
+            CombatRules.perform(.skill("ground"), by: .companion(0), in: &$0)
+            CombatRules.runAutomaticTurns(in: &$0)
+        }
+
+        XCTAssertEqual(store.activeRun?.binderHP, binderBefore, "the protected target still took the event")
+        XCTAssertLessThan(store.activeRun?.companionHP[0] ?? asheBefore, asheBefore,
+                          "Ashe did not receive the redirected damage")
+        XCTAssertNil(store.activeEncounter?.grounding[.companion(0)], "Ground caught more than one event")
+        XCTAssertTrue((store.activeEncounter?.statuses[.companion(0)] ?? []).contains { $0.kind == .burn },
+                      "the redirected affliction did not follow the event")
+    }
+
+    func testEmanatingSubjectStopsMatchingWhenSnuffed() throws {
+        var burning = CreatureTraits()
+        burning.emanation = emanation(of: .heat)
+        let store = inFightWith([burning])
+        store.mutate("test: teach rule") { state in
+            state.base.ownedGambitComponents = Set(ContentCatalog.shared.gambitComponents.map(\.id))
+            state.base.roster[0].gambits = [Self.attackEmanating]
+        }
+        XCTAssertNotNil(GambitEngine.decide(for: .companion(0), in: store.state))
+        store.mutate("test: snuffed") { state in
+            guard let foe = state.worlds.activeRun?.activeEncounter?.foes.first else { return }
+            state.worlds.activeRun?.activeEncounter?.snuffed.insert(foe.id)
+        }
+        XCTAssertNil(GambitEngine.decide(for: .companion(0), in: store.state))
     }
 
     /// Hands the turn to whatever foe is present and lets it swing.
@@ -996,6 +1223,26 @@ final class CombatTests: XCTestCase {
         store.mutate("test: swing") { CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0) }
         XCTAssertNotNil(store.activeEncounter?.foeBleeds[foeID],
                         "a volatile weapon left nothing behind")
+    }
+
+    func testBarbedEdgeLeavesLegacyBleedWithoutAConsumedCoating() throws {
+        let edge = try XCTUnwrap(ContentCatalog.shared.item("rimed_edge"))
+        XCTAssertEqual(edge.name, "Barbed Edge")
+        XCTAssertEqual(edge.gear?.statusKind, "bleed")
+
+        let store = inFightWith([armoured()])
+        store.mutate("test: equip barbed edge") {
+            $0.base.binderEquipped[.weapon] = EquippedPiece(catalogID: edge.id)
+        }
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        for _ in 0..<12 where store.activeEncounter?.foeBleeds[foeID] == nil {
+            giveTheTurnTo(.binder, in: store)
+            store.mutate("test: strike with barbed edge") {
+                CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0)
+            }
+        }
+        XCTAssertNotNil(store.activeEncounter?.foeBleeds[foeID])
+        XCTAssertNil(store.activeEncounter?.preparedCoatings[.binder])
     }
 
     // MARK: The second tap

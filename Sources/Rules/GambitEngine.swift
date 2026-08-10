@@ -74,6 +74,8 @@ enum GambitEngine {
     private enum Target: Equatable {
         case foe(InstanceID)
         case ally(Combatant)
+        /// A global subject matched, but deliberately selected no action target.
+        case condition
     }
 
     /// Who the rule is about, if anyone satisfies it.
@@ -90,9 +92,20 @@ enum GambitEngine {
         case "self":
             return matches(rule, combatant: actor, run: run) ? .ally(actor) : nil
 
+        case "self.recoveryComplete":
+            guard encounter.recoveryComplete.contains(actor) else { return nil }
+            return matches(rule, combatant: actor, run: run) ? .ally(actor) : nil
+
         case "ally.any":
             // Whoever is worst off among those that match — the obvious intent of "an ally is hurt".
             return party(in: run, state: state)
+                .filter { matches(rule, combatant: $0, run: run) }
+                .min { healthFraction($0, in: run) < healthFraction($1, in: run) }
+                .map { .ally($0) }
+
+        case "ally.backRank":
+            return party(in: run, state: state)
+                .filter { CombatRules.rank(of: $0, in: state) == .back }
                 .filter { matches(rule, combatant: $0, run: run) }
                 .min { healthFraction($0, in: run) < healthFraction($1, in: run) }
                 .map { .ally($0) }
@@ -107,6 +120,34 @@ enum GambitEngine {
         case "foe.highestHP":
             return encounter.livingFoes.filter { matches(rule, foe: $0) }
                 .max { $0.currentHP < $1.currentHP }.map { .foe($0.id) }
+
+        case "foe.cannotReachSelf":
+            return encounter.livingFoes
+                .filter { !CombatRules.canReach(actor, foe: $0, in: state, run: run) }
+                .first { matches(rule, foe: $0) }
+                .map { .foe($0.id) }
+
+        case "foes.presentAtLeast3":
+            guard encounter.livingFoes.count >= 3 else { return nil }
+            return encounter.livingFoes.first { matches(rule, foe: $0) }.map { .foe($0.id) }
+
+        case "foe.unrecordedSpecies":
+            return encounter.livingFoes
+                .filter { encounter.initiallyUnrecordedSpecies.contains($0.identityKey) }
+                .first { matches(rule, foe: $0) }
+                .map { .foe($0.id) }
+
+        case "foe.emanating":
+            return encounter.livingFoes
+                .filter { $0.stats.element != nil && !encounter.snuffed.contains($0.id) }
+                .first { matches(rule, foe: $0) }
+                .map { .foe($0.id) }
+
+        case "ally.hpBelowAny":
+            guard party(in: run, state: state).contains(where: {
+                matches(rule, combatant: $0, run: run)
+            }) else { return nil }
+            return .condition
 
         default:
             // An unknown selector never fires. Content can run ahead of the engine safely.

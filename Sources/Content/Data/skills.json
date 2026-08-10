@@ -244,6 +244,18 @@
       "answers": "A back rank about to lose somebody."
     },
     {
+      "id": "ground",
+      "name": "Ground",
+      "icon": "bolt.shield.fill",
+      "blurb": "Receive the next emanation meant for somebody else.",
+      "kind": "ground",
+      "power": 0,
+      "cooldownRounds": 4,
+      "owner": "companion",
+      "rounds": 2,
+      "answers": "One active emanation event aimed at another party member."
+    },
+    {
       "id": "envenom",
       "name": "Envenom",
       "icon": "drop.triangle.fill",
@@ -281,9 +293,9 @@
     },
     {
       "id": "elemental_strike",
-      "name": "Elemental Strike",
+      "name": "Emanation Strike",
       "icon": "bolt.fill",
-      "blurb": "Burn, freeze or shock, as it suits.",
+      "blurb": "Strike through a ward with a searing emanation.",
       "kind": "elemental",
       "power": 9,
       "cooldownRounds": 3,

@@ -19,7 +19,9 @@ enum CombatRules {
     /// - Parameter party: everybody who walked out with you. **All of them get a place in the
     ///   order** — this is where a party of five becomes real, and it used to be a hardcoded two.
     static func makeEncounter(id: InstanceID, foes: [FoeState], party: [Combatant] = [.binder, .companion(0)],
-                              names: [Int: String] = [:], rng: inout SeededRNG) -> EncounterState {
+                              names: [Int: String] = [:],
+                              initiallyUnrecordedSpecies: Set<String> = [],
+                              rng: inout SeededRNG) -> EncounterState {
         var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = party.map { member in
             (member, member == .binder ? Tuning.Encounter.binderInitiative
                                        : Tuning.Encounter.companionInitiative, false)
@@ -44,6 +46,7 @@ enum CombatRules {
             foes: foes,
             partyNames: names,
             order: order,
+            initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
             log: [foes.count == 1 ? "A \(foes[0].stats.displayName) notices you."
                                   : "They close in around you."]
         )
@@ -84,28 +87,49 @@ enum CombatRules {
     }
 
     static func binderAttack(in state: GameState) -> Int {
-        Tuning.Encounter.binderAttack
-            + (equipped(.weapon, for: .binder, in: state)?.effectiveTier ?? 0)
-                * Tuning.Encounter.attackPerWeaponTier
+        let power = equipped(.weapon, for: .binder, in: state)?.effectivePower ?? 0
+        let total = Double(Tuning.Encounter.binderAttack
             + CharacterRules.damageBonus(state.base.binderCharacter.stats,
-                                         with: damageKind(for: .binder, in: state))
+                                         with: damageKind(for: .binder, in: state)))
+            + power * Double(Tuning.Encounter.attackPerWeaponTier)
+        return Int(total.rounded())
     }
 
     /// **What this one is swinging.** Each party member's own weapon decides the matchup, so
     /// carrying a piercing blade while Quill carries a rending one is a real answer to a world that
     /// grew both plated and furred things.
     static func damageKind(for actor: Combatant, in state: GameState) -> DamageKind? {
-        equipped(.weapon, for: actor, in: state)?.gear?.damage
+        equipped(.weapon, for: actor, in: state)?.frozenDamage
     }
 
     static func reach(for actor: Combatant, in state: GameState) -> Reach {
-        equipped(.weapon, for: actor, in: state)?.gear?.reach ?? .close
+        equipped(.weapon, for: actor, in: state)?.frozenReach ?? .close
+    }
+
+    /// Whether this foe can include a party member in any attack it can currently perform. Foes
+    /// have one derived hostile action today: single delivery respects the front line, while area
+    /// and multi delivery, emanation, and first-strike reach can cross it.
+    static func canReach(_ target: Combatant, foe: FoeState,
+                         in state: GameState, run: WorldRun) -> Bool {
+        let standing = party(of: state).filter { isAlive($0, in: run) }
+        guard standing.contains(target) else { return false }
+        if rank(of: target, in: state) == .front { return true }
+        if standing.allSatisfy({ rank(of: $0, in: state) == .back }) { return true }
+        if foe.stats.delivery != .single { return true }
+        return foe.stats.strikesFirst || foe.stats.element != nil
     }
 
     /// **The rule this hand is breaking**, on the eight wild-only weapons and nowhere else
     /// (`apex-encounters.md` §4). Nil on everything you can make.
     static func wildRule(for actor: Combatant, in state: GameState) -> WildRule? {
         equipped(.weapon, for: actor, in: state)?.gear?.breaks
+    }
+
+    static func wardedHaftMultiplier(against kind: DamageKind, for actor: Combatant,
+                                     in state: GameState) -> Double {
+        let weapon = equipped(.weapon, for: actor, in: state)
+        return weapon?.gear?.breaks == .wardWhileHeld && weapon?.gear?.wardsAgainst == kind
+            ? 1 - Tuning.Apex.wardedHaftReduction : 1
     }
 
     /// **How well a damage type does against what a creature is wearing** (combat-depth-spec §1).
@@ -143,11 +167,12 @@ enum CombatRules {
 
     static func companionAttack(_ index: Int, in state: GameState) -> Int {
         let member = PartyMember.member(index)
-        let weaponTier = state.base.worn(.weapon, by: member)?.effectiveTier ?? 0
-        return Tuning.Encounter.companionBaseAttack
-            + weaponTier * Tuning.Encounter.attackPerWeaponTier
+        let power = state.base.worn(.weapon, by: member)?.effectivePower ?? 0
+        let total = Double(Tuning.Encounter.companionBaseAttack
             + CharacterRules.damageBonus(state.base.character(member).stats,
-                                         with: damageKind(for: .companion(index), in: state))
+                                         with: damageKind(for: .companion(index), in: state)))
+            + power * Double(Tuning.Encounter.attackPerWeaponTier)
+        return Int(total.rounded())
     }
 
     /// Armour softens what lands on the party. Never below a floor — armour shouldn't make a fight
@@ -168,14 +193,14 @@ enum CombatRules {
     static func insulation(of actor: Combatant, in state: GameState) -> Double {
         GearSlot.allCases
             .filter(\.isProtective)
-            .compactMap { equipped($0, for: actor, in: state)?.gear?.insulation }
+            .compactMap { equipped($0, for: actor, in: state)?.frozenInsulation }
             .reduce(0, +) / Tuning.Pressure.scaleMaximum
     }
 
     /// What the weapon in somebody's hand is volatile enough to leave behind.
     static func coating(of actor: Combatant, in state: GameState) -> StatusKind? {
-        guard let reactivity = equipped(.weapon, for: actor, in: state)?.gear?.reactivity,
-              reactivity >= Tuning.Encounter.coatingReactivity
+        guard let weapon = equipped(.weapon, for: actor, in: state),
+              weapon.frozenReactivity >= Tuning.Encounter.coatingReactivity
         else { return nil }
         return .poison
     }
@@ -205,14 +230,17 @@ enum CombatRules {
         let ignored = tree.armourAppliesToEverything ? 0 : armourIgnored
         // **Everything protective counts**, not just the body piece — a helm and boots are armour
         // too, and only the companion's chest plate used to be read at all.
-        let tier = GearSlot.allCases
+        let power = GearSlot.allCases
             .filter(\.isProtective)
-            .reduce(0) { $0 + (equipped($1, for: actor, in: state)?.effectiveTier ?? 0) }
+            .reduce(0.0) { total, slot in
+                guard let piece = equipped(slot, for: actor, in: state) else { return total }
+                return total + (piece.gearProfile?.protectivePower ?? piece.effectivePower)
+            }
         // **Fortitude decides what that armour is worth to you** (session 17 §1). The same plate
         // does more for a sturdy character than a slight one, which is what stops Fortitude being a
         // second health bar.
         let sturdiness = stats(of: actor, in: state).map(CharacterRules.armourMultiplier) ?? 1
-        let armour = Double(tier * Tuning.Encounter.defencePerArmorTier) * sturdiness
+        let armour = power * Double(Tuning.Encounter.defencePerArmorTier) * sturdiness
             + Double(tree.armour)
         let effective = Int((armour * (1 - ignored)).rounded())
 
@@ -244,6 +272,9 @@ enum CombatRules {
         let learned = CombatTreeRules.loadout(for: state.base.character(actor.member)).skills
         return ContentCatalog.shared.skills.filter {
             Tuning.TreeSkills.baseline.contains($0.id.rawValue) || learned.contains($0.id)
+                || ($0.id.rawValue == "ground" && actor.rosterIndex.flatMap {
+                    state.base.roster.indices.contains($0) ? state.base.roster[$0].traveller : nil
+                } == TravellerID(rawValue: "ashe"))
         }
     }
 
@@ -491,12 +522,16 @@ enum CombatRules {
             encounter.interposing[actor] = skill.rounds
             encounter.note("\(skill.name): you step in front.")
 
+        case .ground:
+            encounter.grounding[actor] = skill.rounds
+            encounter.note("\(skill.name): Ashe prepares to receive what escapes its housing.")
+
         case .envenom:
             encounter.envenomed[actor] = skill.rounds + Tuning.TreeSkills.envenomExtraRounds
             encounter.note("\(skill.name): coated, and it will last a while.")
 
         case .elemental:
-            // **Elemental Strike.** The answer to a warded foe: a different kind of harm entirely.
+            // **Emanation Strike.** The answer to a warded foe: emanated harm delivered by a blade.
             guard let foe else { return }
             strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
                    run: &run, encounter: &encounter, verb: skill.name,
@@ -514,6 +549,7 @@ enum CombatRules {
     /// rather than a convenience.
     private static func remember(_ foe: FoeState, in discovery: inout DiscoveryLog, runIndex: Int) {
         discovery.recordSpecies(foe.identityKey, runIndex: runIndex)
+        if foe.isApex { discovery.recordApex(foe.id, species: foe.identityKey, runIndex: runIndex) }
         if let traits = foe.traits {
             discovery.recordSpecimen(traits, of: foe.identityKey, runIndex: runIndex)
         }
@@ -539,8 +575,10 @@ enum CombatRules {
 
     /// Lays a status on somebody, replacing a weaker one of the same kind rather than stacking.
     /// Stacking would make two emanating creatures arithmetic rather than a threat.
+    @discardableResult
     private static func afflict(_ target: Combatant, with kind: StatusKind, damage: Int,
-                                rounds: Int, encounter: inout EncounterState) {
+                                rounds: Int, encounter: inout EncounterState) -> Bool {
+        if consumeStatusGuard(on: target, encounter: &encounter) { return false }
         var carried = encounter.statuses[target] ?? []
         if let index = carried.firstIndex(where: { $0.kind == kind }) {
             carried[index].damage = max(carried[index].damage, damage)
@@ -549,6 +587,16 @@ enum CombatRules {
             carried.append(StatusState(kind: kind, damage: damage, rounds: rounds))
         }
         encounter.statuses[target] = carried
+        return true
+    }
+
+    private static func consumeStatusGuard(on target: Combatant,
+                                           encounter: inout EncounterState) -> Bool {
+        guard (encounter.statusGuards[target] ?? 0) > 0 else { return false }
+        encounter.statusGuards[target, default: 0] -= 1
+        if encounter.statusGuards[target] == 0 { encounter.statusGuards[target] = nil }
+        encounter.note("The Stonebark holds; the affliction does not take.")
+        return true
     }
 
     static func has(_ kind: StatusKind, _ actor: Combatant, in encounter: EncounterState) -> Bool {
@@ -680,6 +728,8 @@ enum CombatRules {
 
         // The FF12 rule: an override covers that turn and then hands control back.
         if actor.rosterIndex != nil { encounter.isCompanionOverridden = false }
+        // Recovery knowledge describes exactly the first completed action after the debt cleared.
+        encounter.recoveryComplete.remove(actor)
 
         run.activeEncounter = encounter
         state.worlds.activeRun = run
@@ -735,7 +785,9 @@ enum CombatRules {
 
         // **The matchup.** What you're swinging against what it's wearing, then armour on what's
         // left — and a piercing weapon goes through a share of that armour rather than all of it.
-        let matchup = kind.map { effectiveness(of: $0, against: foe.traits?.covering ?? Covering()) } ?? 1
+        let matchup = kind.map {
+            effectiveness(of: $0, against: foe.traits?.covering ?? Covering(), breaking: breaking)
+        } ?? 1
         var swing = Double(roll(around: damage, run: &run)) * matchup
         // **From the back you can barely reach it** — unless what you're holding is long. That's
         // what makes reach worth having on a weapon rather than only on a creature.
@@ -754,12 +806,52 @@ enum CombatRules {
             ?? "\(who) \(hits) \(name) for \(amount)."
         encounter.note(soaked > 1 ? note + " Its \(armourWord(for: foe)) takes the rest." : note)
 
+        // **Throughstroke.** It carries the damage that actually landed through the selected foe,
+        // rather than rolling a second attack or inventing enemy ranks for one weapon.
+        if breaking == .bothRanks,
+           let second = encounter.foes.indices.first(where: { $0 != index && encounter.foes[$0].isAlive }) {
+            let carried = max(Tuning.Encounter.minimumDamage, amount / 2)
+            let secondName = encounter.foes[second].stats.displayName
+            encounter.foes[second].currentHP = max(0, encounter.foes[second].currentHP - carried)
+            encounter.note("The point keeps going into \(secondName) for \(carried).")
+            if !encounter.foes[second].isAlive {
+                encounter.note("\(secondName.capitalisedSentence) goes down.")
+            }
+        }
+
         // **A volatile weapon leaves something in the wound** (Q36). What your blade was made of
         // reaches the fight, which is what makes an ichor worth carrying home.
         if let coating, encounter.foes[index].isAlive {
-            encounter.foeBleeds[foe.id] = BleedState(damage: Tuning.Encounter.statusDamage["poison"] ?? 2,
-                                                     rounds: Tuning.Encounter.statusRounds["poison"] ?? 3)
+            // Reactive material predates the general status collection and is intentionally a
+            // wound payload. Preserve that save/behavior contract; prepared Apothecary coatings
+            // below use their explicit poison/burn/bleed/dazzle mapping.
+            encounter.foeBleeds[foe.id] = BleedState(
+                damage: Tuning.Encounter.statusDamage[coating.rawValue] ?? 2,
+                rounds: Tuning.Encounter.statusRounds[coating.rawValue] ?? 3)
             encounter.note("Whatever that blade is made of is in the wound now.")
+        }
+
+        // Apothecary coatings are prepared choices, not material properties. One successful
+        // weapon strike spends the treatment even when the blow itself finishes the foe.
+        if let prepared = encounter.preparedCoatings.removeValue(forKey: actor),
+           encounter.foes[index].isAlive {
+            switch prepared {
+            case .bleed:
+                encounter.foes[index].bleedRounds = max(encounter.foes[index].bleedRounds,
+                                                        Tuning.Encounter.bleedRounds)
+            case .poison, .burn, .dazzle:
+                let kind: StatusKind = switch prepared {
+                case .poison: .poison
+                case .burn: .burn
+                case .dazzle: .dazzle
+                case .bleed: .poison // unreachable; keeps the switch total
+                }
+                afflict(.foe(foe.id), with: kind,
+                        damage: Tuning.Encounter.statusDamage[kind.rawValue] ?? 0,
+                        rounds: Tuning.Encounter.statusRounds[kind.rawValue] ?? 2,
+                        encounter: &encounter)
+            }
+            encounter.note("The \(prepared.rawValue) coating leaves the weapon in the wound.")
         }
 
         // Rending tears: the wound goes on costing it after the blow. This is what finally makes
@@ -774,12 +866,12 @@ enum CombatRules {
         }
 
         // **Something in the wound, with nothing consumed to put it there.** Coatings are spent;
-        // the Rimed Edge simply is what it is.
+        // the Barbed Edge simply is what it is. Its code ID remains `rimed_edge` for old saves.
         if breaking == .innateStatus, encounter.foes[index].isAlive, let named = innateStatus {
             encounter.foeBleeds[foe.id] = BleedState(
                 damage: Tuning.Encounter.statusDamage[named] ?? 2,
                 rounds: Tuning.Encounter.statusRounds[named] ?? 2)
-            encounter.note("The cold of it stays in the wound.")
+            encounter.note("The barbs stay in the wound.")
         }
 
         // **Attacking out of cover, and staying in it.** Nothing else in Shadow allows this.
@@ -851,13 +943,54 @@ enum CombatRules {
               item.kind == .consumable
         else { return }
 
-        heal(ally, by: Tuning.Encounter.consumableHealAmount, run: &run, encounter: &encounter,
-             source: item.name, healer: ally)
+        guard let effect = item.consumable else { return }
+        switch effect.effect {
+        case .heal:
+            heal(ally, by: effect.potency, run: &run, encounter: &encounter,
+                 source: item.name, healer: ally)
+        case .clearPoison:
+            encounter.statuses[ally]?.removeAll { $0.kind == .poison }
+            clearBleed(on: ally, encounter: &encounter)
+            encounter.note("\(item.name) clears the wound and the poison.")
+        case .clearElemental:
+            encounter.statuses[ally]?.removeAll { $0.kind == .burn || $0.kind == .dazzle }
+            encounter.note("\(item.name) quenches what was clinging to \(actorName(ally, encounter: encounter)).")
+        case .clearAnyStatus:
+            if !(encounter.statuses[ally]?.isEmpty ?? true) {
+                encounter.statuses[ally]?.removeFirst()
+            } else {
+                clearBleed(on: ally, encounter: &encounter)
+            }
+            encounter.note("\(item.name) draws one affliction out.")
+        case .preventStatus:
+            encounter.statusGuards[ally] = max(1, effect.potency)
+            encounter.note("\(item.name) will turn aside the next affliction.")
+        case .coatPoison, .coatBurn, .coatBleed, .coatDazzle:
+            let coating: PreparedCoating = switch effect.effect {
+            case .coatPoison: .poison
+            case .coatBurn: .burn
+            case .coatBleed: .bleed
+            case .coatDazzle: .dazzle
+            default: .poison
+            }
+            encounter.preparedCoatings[ally] = coating
+            encounter.note("\(item.name) is ready on \(actorName(ally, encounter: encounter))'s weapon.")
+        case .restoreStability, .returnHome, .lightWorld, .farsight, .identifyCurio, .lureCreature:
+            return
+        }
         // Through the bin rather than by poking `count`, so a stack that also carries samples
         // can't have its count drift away from what's actually in it.
         _ = run.satchelItems.stacks[index].removing(1)
         if run.satchelItems.stacks[index].isEmpty {
             run.satchelItems.stacks.remove(at: index)
+        }
+    }
+
+    private static func clearBleed(on ally: Combatant, encounter: inout EncounterState) {
+        switch ally {
+        case .binder: encounter.binderBleedRounds = 0
+        case .companion: encounter.companionBleedRounds = 0
+        case .foe: break
         }
     }
 
@@ -923,6 +1056,7 @@ enum CombatRules {
             // …and a turn borrowed is a turn skipped. Overbear and Quicken both pay here.
             if let owing = encounter.skippedTurns[who], owing > 0 {
                 encounter.skippedTurns[who] = owing - 1
+                if owing == 1 { encounter.recoveryComplete.insert(who) }
                 encounter.note("\(actorName(who, encounter: encounter)) is still recovering.")
                 continue
             }
@@ -956,7 +1090,7 @@ enum CombatRules {
         // The five the trees leave on somebody. **A clock that never ticks is a permanent effect**,
         // which is what Brace and Conceal would silently have become.
         tick(&encounter.braced); tick(&encounter.dodging); tick(&encounter.concealed)
-        tick(&encounter.interposing); tick(&encounter.envenomed)
+        tick(&encounter.interposing); tick(&encounter.grounding); tick(&encounter.envenomed)
     }
 
     private static func tick(_ clock: inout [Combatant: Int]) {
@@ -1096,7 +1230,20 @@ enum CombatRules {
         case .area: (standing, Tuning.Encounter.areaDeliveryShare)
         }
 
-        for target in targets {
+        for originalTarget in targets {
+            var target = originalTarget
+            var grounded = false
+            if foe.stats.element != nil, !encounter.snuffed.contains(foeID),
+               let ashe = standing.first(where: { member in
+                   member.rosterIndex.flatMap {
+                       state.base.roster.indices.contains($0) ? state.base.roster[$0].traveller : nil
+                   } == TravellerID(rawValue: "ashe")
+               }), originalTarget != ashe, (encounter.grounding[ashe] ?? 0) > 0 {
+                encounter.grounding.removeValue(forKey: ashe)
+                target = ashe
+                grounded = true
+                encounter.note("Ground: Ashe receives the emanation meant for \(actorName(originalTarget, encounter: encounter).lowercased()).")
+            }
             // **Not where the blow landed** (session 17 §1). Finesse on the party's side, the
             // mirror of the evasion creatures have had since they were generated.
             if evades(target, in: state, run: &run) {
@@ -1104,6 +1251,7 @@ enum CombatRules {
                 continue
             }
             var raw = Double(roll(around: foe.stats.attack, run: &run)) * share
+            if grounded { raw *= 0.5 }
             if foe.stats.damageKind == .crush { raw *= 1 + Tuning.Encounter.crushDamageBonus }
 
             // **What you're wearing turns aside heat**, whatever it was made of (Q36).
@@ -1118,6 +1266,11 @@ enum CombatRules {
                 .map(Harm.emanation) ?? .blow(foe.stats.damageKind)
             if encounter.wards[target]?.harm == incoming {
                 raw *= 1 - Tuning.Encounter.wardReduction
+            }
+            // The Haft is a modest continuous ward against one authored blow type. Applied after
+            // the skill ward so the two stack multiplicatively rather than replacing each other.
+            if case .blow(let kind) = incoming {
+                raw *= wardedHaftMultiplier(against: kind, for: target, in: state)
             }
 
             let amount: Int
@@ -1146,25 +1299,29 @@ enum CombatRules {
 
             // Rend's wound outlives the blow.
             if foe.stats.damageKind == .rend {
-                switch target {
-                case .binder: encounter.binderBleedRounds = Tuning.Encounter.bleedRounds
-                case .companion: encounter.companionBleedRounds = Tuning.Encounter.bleedRounds
-                case .foe: break
+                if !consumeStatusGuard(on: target, encounter: &encounter) {
+                    switch target {
+                    case .binder: encounter.binderBleedRounds = Tuning.Encounter.bleedRounds
+                    case .companion: encounter.companionBleedRounds = Tuning.Encounter.bleedRounds
+                    case .foe: break
+                    }
+                    encounter.note("The wound won't close.")
                 }
-                encounter.note("The wound won't close.")
             }
 
             // **And so does what it gives off** (Q42). Emanation was generated, named in the
             // description, and did nothing beyond one armour-ignoring hit. Snuff puts a stop to it.
             if let element = foe.stats.element, !encounter.snuffed.contains(foeID) {
                 let status = StatusKind.from(element)
-                afflict(target, with: status,
-                        damage: Tuning.Encounter.statusDamage[status.rawValue] ?? 0,
-                        rounds: Tuning.Encounter.statusRounds[status.rawValue] ?? 2,
-                        encounter: &encounter)
-                encounter.note(status == .dazzle
-                               ? "The after-image sits in your eyes."
-                               : "It's still \(status == .burn ? "burning" : "spreading").")
+                let landed = afflict(target, with: status,
+                                     damage: Tuning.Encounter.statusDamage[status.rawValue] ?? 0,
+                                     rounds: Tuning.Encounter.statusRounds[status.rawValue] ?? 2,
+                                     encounter: &encounter)
+                if landed {
+                    encounter.note(status == .dazzle
+                                   ? "The after-image sits in your eyes."
+                                   : "It's still \(status == .burn ? "burning" : "spreading").")
+                }
             }
         }
 
@@ -1209,6 +1366,8 @@ enum CombatRules {
             encounter.note("Nothing left standing.")
             awardSpoils(run: &run, encounter: &encounter, state: &state)
             awardExperience(for: encounter.foes, encounter: &encounter, state: &state)
+            let grown = growLivingHooks(in: &state)
+            encounter.spoils.append(contentsOf: grown)
         } else if run.binderHP <= 0 {
             // **Nobody dies, and the Binder going down ends the run** (session 17 §6): *"companions
             // can never die. They pass out and are revived back in town. If the Binder passes out,
@@ -1221,6 +1380,24 @@ enum CombatRules {
         }
         run.activeEncounter = encounter
         state.worlds.activeRun = run
+    }
+
+    /// One growth credit per won encounter, regardless of hits or killing blows. Growth belongs to
+    /// the equipped instance and is distinct from Blacksmith upgrades.
+    private static func growLivingHooks(in state: inout GameState) -> [String] {
+        var lines: [String] = []
+        func grow(_ piece: inout EquippedPiece?) {
+            guard piece?.gear?.breaks == .growingGrade,
+                  let current = piece?.wildGrowth,
+                  current < Tuning.Apex.livingHookGrowthCap else { return }
+            piece?.wildGrowth = current + 1
+            if let name = piece?.displayName { lines.append("\(name) grew after the fight") }
+        }
+        grow(&state.base.binderEquipped[.weapon])
+        for index in state.base.activeParty where state.base.roster.indices.contains(index) {
+            grow(&state.base.roster[index].equipped[.weapon])
+        }
+        return lines
     }
 
     /// **What the fight was worth**, scaled by what you beat rather than flat — picking on

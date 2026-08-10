@@ -16,6 +16,9 @@ struct ContradictionDef: Codable, Equatable, Identifiable, Sendable {
     var name: String
     var blurb: String
     var kind: Kind
+    /// Stable catalogue rows may be held when their current mechanical predicate cannot honestly
+    /// establish the fiction they claim. They remain decodable/referenceable but never fire.
+    var enabled: Bool
     /// `negation` only: the source whose nature is being denied.
     var source: PressureSourceID?
     /// `negation` only: the target the player wrote a Negate rune against.
@@ -36,6 +39,7 @@ struct ContradictionDef: Codable, Equatable, Identifiable, Sendable {
         name = try container.decode(String.self, forKey: .name)
         blurb = try container.decodeIfPresent(String.self, forKey: .blurb) ?? ""
         kind = try container.decode(Kind.self, forKey: .kind)
+        enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled) ?? true
         source = try container.decodeIfPresent(PressureSourceID.self, forKey: .source)
         negatedTarget = try container.decodeIfPresent(PressureTargetID.self, forKey: .negatedTarget)
         requiresWrittenSource = try container.decodeIfPresent(PressureSourceID.self, forKey: .requiresWrittenSource)
@@ -58,6 +62,7 @@ struct ContradictionDef: Codable, Equatable, Identifiable, Sendable {
     /// player *asserted*, not on the resolved world. A world that ends up dark because of a
     /// chance-filled slot hasn't contradicted anything — nobody claimed otherwise.
     func fires(sigils: [Sigil], readings: PressureReadings) -> Bool {
+        guard enabled else { return false }
         switch kind {
         case .negation:
             guard let source, let negatedTarget else { return false }

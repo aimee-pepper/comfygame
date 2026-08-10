@@ -3,9 +3,12 @@
   "travellers": [
     {
       "id": "mara",
+      "worldwork": 2,
       "name": "Mara",
       "calling": "a surveyor",
       "icon": "figure.stand",
+      "authoredOrder": 1,
+      "campaignPhase": "opening",
       "blurb": "Measured things for a living. Still does, out of habit.",
       "signature": [
         {
@@ -14,7 +17,7 @@
             "measure": "peak",
             "minimum": 60
           },
-          "passage": "There is no shadow anywhere. I have looked."
+          "passage": "At its brightest, the horizon burns white enough to swallow my sighting line."
         }
       ],
       "leansToward": [
@@ -48,9 +51,12 @@
     },
     {
       "id": "edren",
+      "worldwork": 2,
       "name": "Edren",
       "calling": "an archaeologist",
       "icon": "figure.stand",
+      "authoredOrder": 2,
+      "campaignPhase": "opening",
       "blurb": "Was digging when it happened. Has not stopped.",
       "signature": [
         {
@@ -60,7 +66,7 @@
             "key": "hard",
             "minimum": 35
           },
-          "passage": "Stone all the way down, and worked stone at that."
+          "passage": "More hard stone than loose ground. My trowel complains before I do."
         },
         {
           "condition": {
@@ -68,7 +74,7 @@
             "measure": "floor",
             "maximum": 25
           },
-          "passage": "Cold enough that the dark comes with it."
+          "passage": "The cold settles low enough to numb my fingers through the cloth."
         }
       ],
       "leansToward": [
@@ -102,9 +108,12 @@
     },
     {
       "id": "sela",
+      "worldwork": 3,
       "name": "Sela",
       "calling": "a wanderer",
       "icon": "figure.stand",
+      "authoredOrder": 5,
+      "campaignPhase": "mid",
       "blurb": "Was always leaving. This time it took.",
       "signature": [
         {
@@ -113,7 +122,7 @@
             "measure": "available",
             "minimum": 30
           },
-          "passage": "Water, everywhere, and none of it still."
+          "passage": "Enough water that I can choose the next crossing instead of rationing the last."
         },
         {
           "condition": {
@@ -164,16 +173,19 @@
     },
     {
       "id": "tovin",
+      "worldwork": 3,
       "name": "Tovin",
       "calling": "a binder",
       "icon": "figure.stand",
+      "authoredOrder": 26,
+      "campaignPhase": "late",
       "blurb": "Wrote worlds before you did. Knows what that costs.",
       "signature": [
         {
           "condition": {
             "target": "illumination",
             "measure": "peak",
-            "maximum": 15
+            "maximum": 20
           },
           "passage": "It is dark, and the dark is not empty."
         },
@@ -190,9 +202,9 @@
           "condition": {
             "target": "substrate",
             "measure": "peak",
-            "minimum": 40
+            "minimum": 60
           },
-          "passage": "The walls are worth more than the room."
+          "passage": "Ground in every direction—floor, wall, ceiling, and the dust between."
         },
         {
           "condition": {
@@ -202,6 +214,41 @@
             "maximum": 35
           },
           "passage": "Everything is close. I do not like it."
+        },
+        {
+          "condition": {
+            "target": "hydrology",
+            "measure": "aspect",
+            "key": "salinity",
+            "minimum": 45
+          },
+          "passage": "The water leaves a white seam wherever it withdraws."
+        },
+        {
+          "condition": {
+            "target": "thermal",
+            "measure": "floor",
+            "maximum": 25
+          },
+          "passage": "Even the deepest hours never soften the cold."
+        },
+        {
+          "condition": {
+            "target": "atmosphere",
+            "measure": "aspect",
+            "key": "motion",
+            "maximum": 20
+          },
+          "passage": "No draft reaches the loose corner of this page."
+        },
+        {
+          "condition": {
+            "target": "cycle",
+            "measure": "aspect",
+            "key": "regularity",
+            "minimum": 85
+          },
+          "passage": "Every interval arrives exactly when the last one promised."
         }
       ],
       "leansToward": [
@@ -235,9 +282,12 @@
     },
     {
       "id": "halloway",
+      "worldwork": 2,
       "name": "Halloway",
       "calling": "a smith",
       "icon": "hammer.fill",
+      "authoredOrder": 3,
+      "campaignPhase": "opening",
       "blurb": "Kept the fire in. Says a forge is only a fire someone stayed with.",
       "signature": [
         {
@@ -288,9 +338,12 @@
     },
     {
       "id": "isolde",
+      "worldwork": 1,
       "name": "Isolde",
       "calling": "a calligrapher",
       "icon": "pencil.and.outline",
+      "authoredOrder": 4,
+      "campaignPhase": "startOfMid",
       "blurb": "Taught the Art before there was anything left to write about. Still teaching, to nobody.",
       "signature": [
         {
@@ -299,7 +352,7 @@
             "measure": "peak",
             "minimum": 55
           },
-          "passage": "Stone above, stone below. Nothing here moves but me."
+          "passage": "The land rises until every line I rule looks level by comparison."
         },
         {
           "condition": {
@@ -307,7 +360,7 @@
             "measure": "peak",
             "minimum": 55
           },
-          "passage": "There is something in the rock that holds a light. I have not needed a candle since I came."
+          "passage": "So much of this place is ground and stone that even the horizon feels written in it."
         }
       ],
       "leansToward": [
@@ -339,6 +392,335 @@
         "precision": 1,
         "shadow": 1
       }
+    },
+    {
+      "id": "bryn", "name": "Bryn", "calling": "a warden", "icon": "figure.stand",
+      "authoredOrder": 6, "campaignPhase": "early-mid",
+      "blurb": "Steps between danger and the person it chose. Knows being grateful is not the same as having agreed to owe her.",
+      "signature": [
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "maximum": 40 }, "passage": "The land closes around every path. An approach can be watched here, provided somebody agrees to be the one watching it." },
+        { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 35 }, "passage": "The footing does not yield when weight moves onto it. That matters most when the weight was meant for somebody else." },
+        { "condition": { "target": "atmosphere", "measure": "peak", "minimum": 62 }, "passage": "The air presses at every chest alike. It does not care who volunteered to stand first." }
+      ],
+      "leansToward": ["locationClue", "gambit"],
+      "lean": { "protection": 1, "fortitude": 1 }
+    },
+    {
+      "id": "orsa", "name": "Orsa", "calling": "a keeper", "icon": "figure.stand",
+      "authoredOrder": 7, "campaignPhase": "early-mid",
+      "blurb": "Makes a room where strangers can stay without pretending they already trust one another.",
+      "signature": [
+        { "condition": { "target": "vitality", "measure": "peak", "minimum": 62 }, "passage": "Every cleared place is used again by morning. Nothing here mistakes vacancy for abandonment." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "maximum": 45 }, "passage": "The ground makes rooms without doors: shelter enough to gather, and more than one way to leave." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "Smoke climbs without being torn sideways. A person can choose where to sit before the air chooses for them." }
+      ],
+      "leansToward": ["whereabouts", "ruin"],
+      "lean": { "fortitude": 1, "kindling": 1 }
+    },
+    {
+      "id": "vance", "name": "Vance", "calling": "a trader and appraiser", "icon": "figure.stand",
+      "authoredOrder": 8, "campaignPhase": "mid",
+      "blurb": "Remembers who carried a thing before he remembers what it costs. Insists that this makes him a better trader, not a sentimental one.",
+      "signature": [
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 72 }, "passage": "A load can cross the horizon here without the land inventing a toll." },
+        { "condition": { "target": "substrate", "measure": "aspect", "key": "dispersion", "maximum": 35 }, "passage": "The useful ground keeps to seams. Value is easier to bargain over when both people can point to its edge." },
+        { "condition": { "target": "vitality", "measure": "aspect", "key": "dispersion", "maximum": 38 }, "passage": "Life gathers in separate pockets. Moving something between them changes its price before it changes the thing." }
+      ],
+      "leansToward": ["worldWorthWriting", "whereabouts"],
+      "lean": { "precision": 1, "kindling": 1 }
+    },
+    {
+      "id": "talin", "name": "Talin", "calling": "a blade fighter", "icon": "figure.stand",
+      "authoredOrder": 9, "campaignPhase": "mid",
+      "blurb": "Makes decisions quickly and judges them slowly. Knows hesitation is still a choice somebody pays for.",
+      "signature": [
+        { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 40 }, "passage": "The ground breaks into plates with edges clean enough to show where force will glance away." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 70 }, "passage": "Nothing here hides an approach. That does not make deciding when to meet it easier." },
+        { "condition": { "target": "illumination", "measure": "peak", "minimum": 65 }, "passage": "At the brightest interval every edge separates from the surface behind it. A visible opening can still close while you consider it." }
+      ],
+      "leansToward": ["locationClue", "gambit"],
+      "lean": { "precision": 1, "swiftness": 1 }
+    },
+    {
+      "id": "nessa", "name": "Nessa", "calling": "an apothecary", "icon": "figure.stand",
+      "authoredOrder": 10, "campaignPhase": "mid",
+      "blurb": "Refuses to call anything a cure until she knows for whom, how much, and when.",
+      "signature": [
+        { "condition": { "target": "atmosphere", "measure": "tag", "key": "toxic", "minimum": 1 }, "passage": "The first breath leaves a taste behind. Harm is already a dose by the time you notice taking it." },
+        { "condition": { "target": "vitality", "measure": "peak", "minimum": 58 }, "passage": "Enough survives here that poison is a relationship. Nothing spends this much on harm without living beside an answer." },
+        { "condition": { "target": "hydrology", "measure": "available", "minimum": 35 }, "passage": "There is water to work with. That is not the same as water safe to drink, and neither fact tells me what it can carry." },
+        { "condition": { "target": "substrate", "measure": "form", "key": "volatile", "minimum": 35 }, "passage": "The exposed ground changes colour where moisture touches it. I have stopped calling reactions warnings until I know what they warn of." }
+      ],
+      "leansToward": ["locationClue", "focus"],
+      "lean": { "venom": 1, "protection": 1 }
+    },
+    {
+      "id": "corrin", "name": "Corrin", "calling": "a tanner", "icon": "figure.stand",
+      "authoredOrder": 11, "campaignPhase": "mid",
+      "blurb": "Makes hard-wearing things for the parts of a body that refuse to stay still. Never calls material obedient when she means it has been forced.",
+      "signature": [
+        { "condition": { "target": "vitality", "measure": "produced", "minimum": 40 }, "passage": "Fresh growth sits beside old cut edges. Replacement does not excuse taking, but it changes what taking means." },
+        { "condition": { "target": "vitality", "measure": "aspect", "key": "trophicDepth", "minimum": 45 }, "passage": "Every patch shows contact: feeding, sheltering, scraping, carrying. A surface becomes material by surviving use." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "minimum": 60 }, "passage": "Nothing broad stays flat. It bends, returns, and tells you where the strain travelled." },
+        { "condition": { "target": "hydrology", "measure": "aspect", "key": "dispersion", "minimum": 70 }, "passage": "Water reaches the whole route in films and shallow crossings. Every fastening here has learned to swell." }
+      ],
+      "leansToward": ["locationClue", "focus"],
+      "lean": { "evasion": 1, "fortitude": 1 }
+    },
+    {
+      "id": "dagg", "name": "Dagg", "calling": "a hammer fighter", "icon": "figure.stand",
+      "authoredOrder": 12, "campaignPhase": "mid",
+      "blurb": "Refuses to hurry a blow merely because somebody is frightened by the pause before it.",
+      "signature": [
+        { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 50 }, "passage": "The ground answers a misplaced step instead of forgiving it. Good. An honest consequence can be prepared for." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "verticality", "minimum": 32 }, "passage": "Every ascent commits the body before the landing can be seen. Urgency does not make the landing arrive sooner." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 65 }, "passage": "Long quiet intervals end in changes large enough to demand preparation. The quiet is part of the force." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "minimum": 58 }, "passage": "The air arrives, spends itself, and leaves a space afterward. Swinging is not different because the weapon has a name." }
+      ],
+      "leansToward": ["locationClue", "gambit"],
+      "lean": { "force": 1, "fortitude": 1 }
+    },
+    {
+      "id": "rook", "name": "Rook", "calling": "a spear fighter and keeper of contested approaches", "icon": "figure.stand",
+      "authoredOrder": 13, "campaignPhase": "mid",
+      "blurb": "Believes a boundary should be visible from both sides. Stands far enough back that approaching it remains a choice.",
+      "signature": [
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 78 }, "passage": "An approach begins at the horizon. Nothing nearby can pretend it started later." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "verticality", "maximum": 15 }, "passage": "The ground offers no rise high enough to erase what is coming. Warning is possible here." },
+        { "condition": { "target": "hydrology", "measure": "form", "key": "standing", "minimum": 60 }, "passage": "The water holds to one broad body. Every crossing becomes a line somebody chose." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "Grass tips remain still enough to show the smallest disturbance. Distance speaks before the person crossing it does." }
+      ],
+      "leansToward": ["locationClue", "gambit"],
+      "lean": { "precision": 1, "protection": 1 }
+    },
+    {
+      "id": "lys", "name": "Lys", "calling": "an archivist", "icon": "figure.stand",
+      "authoredOrder": 14, "campaignPhase": "mid",
+      "blurb": "Keeps contradictory accounts beside each other. Says agreement is useful, but absence is evidence.",
+      "signature": [
+        { "condition": { "target": "relief", "measure": "tag", "key": "ruined", "minimum": 1 }, "passage": "The ground has been shaped, broken and shaped again. Calling one layer original would only hide the editor." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The interval returns reliably enough to compare one alteration with the next. Comparison is not agreement." },
+        { "condition": { "target": "illumination", "measure": "floor", "minimum": 18 }, "passage": "The light never leaves completely. Even an unfinished record remains readable, which is not the same as remaining understood." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "A loose page stays open to the same line until somebody turns it. At least this omission can be attributed." }
+      ],
+      "leansToward": ["locationClue", "focus"],
+      "lean": { "kindling": 1, "precision": 1 }
+    },
+    {
+      "id": "bracken", "name": "Bracken", "calling": "an armorer", "icon": "figure.stand",
+      "authoredOrder": 15, "campaignPhase": "mid",
+      "blurb": "Reads a dent from the inside. Says armour records the blow more honestly than the person who took it.",
+      "signature": [
+        { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 60 }, "passage": "A tool skates before it bites. Hardness protects the surface by sending the effort back through the hand." },
+        { "condition": { "target": "thermal", "measure": "peak", "minimum": 68 }, "passage": "At the hot interval every fastening asks for more room. Armour that cannot change has chosen where it will split." },
+        { "condition": { "target": "thermal", "measure": "floor", "maximum": 32 }, "passage": "Cold draws the same joints tight. Protection becomes a promise the material may no longer be able to keep." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "verticality", "minimum": 30 }, "passage": "A plate that carries weight well on the level catches it badly at a ledge. Direction belongs in the fitting." },
+        { "condition": { "target": "atmosphere", "measure": "peak", "minimum": 62 }, "passage": "Pressure finds the seam the maker called negligible. The body underneath will not call it that." }
+      ],
+      "leansToward": ["locationClue", "focus"],
+      "lean": { "fortitude": 1, "protection": 1 }
+    },
+    {
+      "id": "fen", "name": "Fen", "calling": "a bowyer and maker of physical ranged weapons", "icon": "figure.stand",
+      "authoredOrder": 16, "campaignPhase": "mid",
+      "blurb": "Makes the shot long before anything is released. The rest is string remembering what it was told.",
+      "signature": [
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 80 }, "passage": "The shot can spend itself on distance instead of striking the first obstruction. That makes every small error patient." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "minimum": 55 }, "passage": "A long string bows with the moving air even while both ends insist it is straight." },
+        { "condition": { "target": "vitality", "measure": "aspect", "key": "dispersion", "maximum": 35 }, "passage": "Living stands keep their distance. The clear intervals show where a line may pass and who would be beside it." },
+        { "condition": { "target": "hydrology", "measure": "aspect", "key": "dispersion", "maximum": 30 }, "passage": "Water gathers into obstacles broad enough to plan around. A trajectory is partly a decision about what cannot follow it." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 82 }, "passage": "The interval repeats. Release again only if comparison will teach more than the first loose arrow did." }
+      ],
+      "leansToward": ["locationClue", "focus"],
+      "lean": { "precision": 1, "swiftness": 1 }
+    },
+    {
+      "id": "wren", "name": "Wren", "calling": "a skirmisher who manages crowded threats through tempo and exits", "icon": "figure.stand",
+      "authoredOrder": 17, "campaignPhase": "mid-late",
+      "blurb": "Finds the exit before he needs it. Calls speed a debt owed to the moment after.",
+      "signature": [
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 72 }, "passage": "There is another line before the first closes. Keep seeing it after you decide which one to take." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "minimum": 60 }, "passage": "The air begins its next movement before finishing this one. A plan may do the same if its exits remain honest." },
+        { "condition": { "target": "hydrology", "measure": "aspect", "key": "dispersion", "minimum": 72 }, "passage": "Shallow water interrupts nearly every route. None is impossible; all charge attention." },
+        { "condition": { "target": "vitality", "measure": "peak", "minimum": 65 }, "passage": "Clear ground fills again behind each passage. Mobility is the work of leaving room in a place that keeps using it." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 62 }, "passage": "The quiet and the rush demand different routes through the same ground. Remembering only the dramatic one is how exits disappear." }
+      ],
+      "leansToward": ["locationClue", "gambit"],
+      "lean": { "evasion": 1, "swiftness": 1 }
+    },
+    {
+      "id": "kestrel", "name": "Kestrel", "calling": "a hunter and field naturalist", "icon": "figure.stand",
+      "pronouns": { "subject": "she", "object": "her", "possessive": "her", "reflexive": "herself" },
+      "authoredOrder": 18, "campaignPhase": "mid-late",
+      "blurb": "Learns what an animal does when nobody is pursuing it. Decides what to kill only after that.",
+      "signature": [
+        { "condition": { "target": "vitality", "measure": "produced", "minimum": 40 }, "passage": "Fresh growth beneath older feeding marks proves the account begins before the animal I came to find." },
+        { "condition": { "target": "vitality", "measure": "peak", "minimum": 65 }, "passage": "Too many tracks use this ground for one creature to explain it. Good evidence first defeats the convenient story." },
+        { "condition": { "target": "vitality", "measure": "aspect", "key": "trophicDepth", "minimum": 50 }, "passage": "Grazing crosses pursuit, scavenging crosses both, and smaller traces live inside the margins. A body is never the whole system." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "maximum": 45 }, "passage": "The land hides evidence before it hides its maker. Absence past the fold is not proof of departure." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "clarity", "minimum": 76 }, "passage": "Fine disturbance stays visible at range. Observation becomes easier; interpretation does not." }
+      ],
+      "leansToward": ["locationClue", "gambit"],
+      "lean": { "precision": 1, "force": 1 }
+    },
+    {
+      "id": "maud", "name": "Maud", "calling": "a weaponsmith", "icon": "figure.stand",
+      "authoredOrder": 19, "campaignPhase": "mid-late",
+      "blurb": "Fits a weapon to the hand, the shoulder, and how close its bearer is willing to stand. Distrusts anything praised without naming who must use it.",
+      "signature": [
+        { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 40 }, "passage": "One part of the ground holds an edge. Useful, if the edge belongs to the motion asked of it." },
+        { "condition": { "target": "substrate", "measure": "form", "key": "ductile", "minimum": 35 }, "passage": "Another part bends and keeps the new shape. Adjustment is a material property before it is a virtue." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "verticality", "minimum": 30 }, "passage": "The same reach is long on one ledge and short on the next. A measurement without posture is only inventory." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "Loose measures stay put while the body changes around them. At last I can tell whose movement caused the error." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The interval returns precisely enough to test the alteration instead of praising it." }
+      ],
+      "leansToward": ["locationClue", "whereabouts"],
+      "lean": { "force": 1, "precision": 1, "fortitude": 1 }
+    },
+    {
+      "id": "marrick", "name": "Marrick", "calling": "a formation leader and keeper of shared routines", "icon": "figure.stand",
+      "authoredOrder": 20, "campaignPhase": "late",
+      "blurb": "Builds routines people can still remember while frightened. Counts who the plan forgot before he counts whether it worked.",
+      "signature": [
+        { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 50 }, "passage": "Several sets of feet receive the same answer from the ground. A shared instruction can begin here without becoming shared judgement." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 45, "maximum": 65 }, "passage": "There is room to stand together and still see the edges. Too much room dissolves the signal; too little makes agreement irrelevant." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "minimum": 55 }, "passage": "The pressure reaches the whole line. Equal exposure does not mean equal effort, no matter how neatly the positions are counted." },
+        { "condition": { "target": "thermal", "measure": "range", "maximum": 10 }, "passage": "Temperature changes slowly enough for fatigue to become visible. Sudden hardship gets remembered; accumulated hardship gets assigned a post." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The interval returns. Everyone can keep the count until someone misses it, and then the routine must reveal whether it serves people or merely timing." },
+        { "condition": { "target": "hydrology", "measure": "available", "minimum": 60 }, "passage": "There is water along the route. No one person must carry enough for everyone, which is how a provision becomes part of the formation." }
+      ],
+      "leansToward": ["locationClue", "gambit"],
+      "lean": { "protection": 1, "fortitude": 1 }
+    },
+    {
+      "id": "sabine", "name": "Sabine", "calling": "a menagerist and beast-handler", "icon": "figure.stand",
+      "authoredOrder": 21, "campaignPhase": "late",
+      "blurb": "Kept animals for people who thought keeping meant owning. Learned most of her trade from being corrected.",
+      "signature": [
+        { "condition": { "target": "vitality", "measure": "produced", "minimum": 45 }, "passage": "New growth follows feeding quickly enough to change the place without pretending nothing was taken." },
+        { "condition": { "target": "vitality", "measure": "peak", "minimum": 70 }, "passage": "More creatures arrive than one shelter can hold. Care begins by noticing who chooses not to enter." },
+        { "condition": { "target": "vitality", "measure": "aspect", "key": "trophicDepth", "minimum": 55 }, "passage": "Every appetite rests inside another. Feeding one body alters a relationship, not merely a bowl." },
+        { "condition": { "target": "vitality", "measure": "aspect", "key": "dispersion", "maximum": 38 }, "passage": "Life returns to recurring places. Routine can become recognisable here, including the routine of staying away." },
+        { "condition": { "target": "hydrology", "measure": "available", "minimum": 60 }, "passage": "Water can be reached by more than one path. Repeated care should not turn the only route into a leash." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 45, "maximum": 70 }, "passage": "There is room to approach while boundaries remain available. Trust needs both." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The interval returns precisely. Recognition is possible; obedience is not therefore owed." }
+      ],
+      "leansToward": ["locationClue", "focus"],
+      "lean": { "protection": 1, "precision": 1, "evasion": 1 }
+    },
+    {
+      "id": "grimmond", "name": "Grimmond", "calling": "a delver who reads load, depth and the voids extraction leaves behind", "icon": "figure.stand",
+      "authoredOrder": 22, "campaignPhase": "late",
+      "blurb": "Maps what holds the ceiling after the valuable part is gone. Says an empty space is still made of consequences.",
+      "signature": [
+        { "condition": { "target": "illumination", "measure": "peak", "maximum": 25 }, "passage": "Even the brightest interval leaves the lowest face unreadable. Value does not make a place consent to inspection." },
+        { "condition": { "target": "substrate", "measure": "peak", "minimum": 60 }, "passage": "Rich ground outweighs the material between it. The ledger will call the between-material waste; the roof disagrees." },
+        { "condition": { "target": "substrate", "measure": "aspect", "key": "dispersion", "maximum": 30 }, "passage": "The richest matter keeps to a narrow seam. Following it is easy. Knowing where to stop is the work." },
+        { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 30 }, "passage": "The surrounding mass carries what lies above. Removal has already begun before the valuable piece moves." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "maximum": 35 }, "passage": "Every route closes behind another wall. Extraction makes an opening and assigns its absence somewhere else." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "verticality", "minimum": 35 }, "passage": "Load above, void below. Depth is not prestige; it is a list of consequences with poor light." },
+        { "condition": { "target": "atmosphere", "measure": "peak", "maximum": 30 }, "passage": "Breath thins before stone yields. A body is the first support the plan spends." }
+      ],
+      "leansToward": ["locationClue", "focus"],
+      "lean": { "force": 1, "fortitude": 1 }
+    },
+    {
+      "id": "oda", "name": "Oda", "calling": "a channelwright who makes contained and projected emanation weapons", "icon": "figure.stand",
+      "authoredOrder": 23, "campaignPhase": "late",
+      "blurb": "Gave dangerous force a handle, an edge, and somewhere to stop. Never calls that the same as making it safe.",
+      "signature": [
+        { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 30 }, "passage": "One material keeps its shape when force arrives. A housing begins with what refuses to travel." },
+        { "condition": { "target": "substrate", "measure": "form", "key": "volatile", "minimum": 50 }, "passage": "Another answers pressure by changing or carrying it onward. Calling that instability does not explain the route." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "maximum": 40 }, "passage": "The land contains each disturbance long enough to follow. A boundary is useful evidence, never innocence." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "Still air leaves the effect where it was released. At last the instrument cannot blame the weather." },
+        { "condition": { "target": "atmosphere", "measure": "tag", "key": "toxic", "minimum": 1 }, "passage": "A harmful trace remains after the visible source is gone. Invisible continuation is still part of the discharge." },
+        { "condition": { "target": "thermal", "measure": "peak", "minimum": 70 }, "passage": "Heat gathers at every join intended to hold it. The housing reports its design through the first place it hurts." },
+        { "condition": { "target": "illumination", "measure": "floor", "minimum": 18 }, "passage": "Light persists between bright intervals. A carrier can continue after its dramatic moment has passed." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The interval returns precisely enough to distinguish containment from a run of good luck." }
+      ],
+      "leansToward": ["locationClue", "whereabouts"],
+      "lean": { "precision": 1, "kindling": 1, "fortitude": 1 }
+    },
+    {
+      "id": "auber", "name": "Auber", "calling": "a distiller", "icon": "figure.stand",
+      "authoredOrder": 24, "campaignPhase": "late", "worldwork": 2,
+      "blurb": "Separates a thing from what carried it. Never calls what remains nothing.",
+      "signature": [
+        { "condition": { "target": "hydrology", "measure": "aspect", "key": "salinity", "minimum": 45 }, "passage": "What dries here remains in the next water. Separation changes the carrier that follows." },
+        { "condition": { "target": "hydrology", "measure": "aspect", "key": "dispersion", "maximum": 30 }, "passage": "Water gathers into distinct bodies. A mixture needs an edge before its layers can be compared." },
+        { "condition": { "target": "hydrology", "measure": "form", "key": "standing", "minimum": 60 }, "passage": "Most wetness stays long enough to settle. Patience separates some things and merely postpones others." },
+        { "condition": { "target": "thermal", "measure": "range", "minimum": 45 }, "passage": "Heat and cold take turns carrying different parts. Neither interval tells the whole composition." },
+        { "condition": { "target": "substrate", "measure": "form", "key": "volatile", "minimum": 50 }, "passage": "The seam answers heat and water by changing. Responsiveness is useful until the vessel is the thing it changes." },
+        { "condition": { "target": "substrate", "measure": "aspect", "key": "dispersion", "maximum": 35 }, "passage": "The workable matter keeps to narrow seams. Precision can spare the ground or simply make taking more efficient." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "clarity", "maximum": 45 }, "passage": "Vapour keeps the farther edge uncertain. What leaves the vessel remains part of the process even when nobody collects it." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 65 }, "passage": "Each interval alters the mixture enough to begin another separation. Repetition is not purification by itself." }
+      ],
+      "leansToward": ["locationClue", "focus"],
+      "lean": { "precision": 1, "kindling": 1, "fortitude": 1 },
+      "meeting": {
+        "opening": "Auber moves the nearly empty vessel rather than the full one, then marks where its last ring dried.",
+        "questions": [
+          { "ask": "What are you collecting?", "reply": "Both fractions. What leaves, and what remains when everyone stops looking." },
+          { "ask": "Can you make essence here?", "reply": "Essence is already here. The question is what form you are willing to pay to keep it in." },
+          { "ask": "Why save the residue?", "reply": "Throwing something away only changes who must encounter it next." }
+        ],
+        "offer": "There is a refinery at the base. Come build the work it cannot do.",
+        "accepted": "Then we will label the shelves before we fill them.",
+        "declined": "The vessels will still be settling if you return."
+      }
+    },
+    {
+      "id": "ashe", "name": "Ashe", "calling": "an embodied emanation specialist", "icon": "figure.stand",
+      "authoredOrder": 25, "campaignPhase": "late", "worldwork": 1,
+      "blurb": "Names what force costs a body, then chooses which burden to receive.",
+      "signature": [
+        { "condition": { "target": "thermal", "measure": "tag", "key": "geothermal", "minimum": 1 }, "passage": "Heat rises through my feet before the sky changes. The body notices direction even when the instrument reports only amount." },
+        { "condition": { "target": "thermal", "measure": "range", "minimum": 45 }, "passage": "The interval reaches my joints before the scale finishes moving. Endurance is information, not permission." },
+        { "condition": { "target": "illumination", "measure": "tag", "key": "sourceless", "minimum": 1 }, "passage": "Light remains without a visible sky-source. Absence of a lamp does not make the sensation imaginary." },
+        { "condition": { "target": "substrate", "measure": "form", "key": "volatile", "minimum": 50 }, "passage": "The ground answers pressure instead of merely holding it. I recognise the reply because mine is also mistaken for obedience." },
+        { "condition": { "target": "atmosphere", "measure": "tag", "key": "toxic", "minimum": 1 }, "passage": "The harmful trace stays in the breath after its cause disappears. Danger does not owe anyone a dramatic entrance." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "minimum": 55 }, "passage": "The air brings the effect from several directions. A body cannot face every source, but it can name what that costs." },
+        { "condition": { "target": "vitality", "measure": "produced", "minimum": 35 }, "passage": "Growth continues beneath conditions called hostile. Survival proves capacity, not comfort." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 65 }, "passage": "The same forces return at another intensity. A predictable burden is still a burden each time." }
+      ],
+      "leansToward": ["locationClue", "gambit"],
+      "lean": { "fortitude": 1, "kindling": 1 }
+    },
+    {
+      "id": "perren", "name": "Perren", "calling": "a former Sundering interpreter", "icon": "figure.stand",
+      "authoredOrder": 27, "campaignPhase": "late", "worldwork": 1,
+      "blurb": "Keeps the questions a lesson tried to make feel already answered.",
+      "signature": [
+        { "condition": { "target": "illumination", "measure": "opposed", "minimum": 20 }, "passage": "Light is made and smothered together. They taught that conflict reveals the truer source. It may only reveal who selected the frame." },
+        { "condition": { "target": "thermal", "measure": "opposed", "minimum": 20 }, "passage": "Heat and cold press into the same interval. A forced choice between them would make either answer feel discovered." },
+        { "condition": { "target": "vitality", "measure": "opposed", "minimum": 15 }, "passage": "Growth and suppression are both active. The bare patch is evidence of relation, not proof that one side was always barren." },
+        { "condition": { "target": "relief", "measure": "tag", "key": "ruined", "minimum": 1 }, "passage": "This ground has been shaped, broken and cited as more than one history. A ruin becomes doctrine when alternatives are filed as debris." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "maximum": 35 }, "passage": "The route is framed tightly enough for the next choice to resemble the only one. The instruction can disappear once the corridor is built." },
+        { "condition": { "target": "substrate", "measure": "aspect", "key": "dispersion", "minimum": 70 }, "passage": "Worked matter is spread evenly. Any chosen sample can represent the whole if no one asks who chose it." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "clarity", "maximum": 40 }, "passage": "Distance removes context before it removes the object. Certainty improves exactly where relation becomes hardest to inspect." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The interval repeats until recurrence resembles proof. A ritual can teach expectation and then present fulfilment as revelation." },
+        { "condition": { "target": "hydrology", "measure": "aspect", "key": "salinity", "minimum": 45 }, "passage": "Withdrawal leaves a bright boundary. It looks inevitable after it appears; the water remembers otherwise." }
+      ],
+      "leansToward": ["locationClue", "focus"],
+      "lean": { "precision": 1, "shadow": 1 }
+    },
+    {
+      "id": "nine", "name": "Nine", "calling": "a keeper of chosen continuities", "icon": "figure.stand",
+      "authoredOrder": 28, "campaignPhase": "late", "worldwork": 1,
+      "blurb": "Keeps promises in forms that do not require remembering why they were made.",
+      "signature": [
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "maximum": 35 }, "passage": "No interval arrives when the last one taught me to expect it. I can record surprise without treating it as failure." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 65 }, "passage": "When change comes it divides one account from the next. Both accounts belong to the person who wrote them." },
+        { "condition": { "target": "illumination", "measure": "tag", "key": "sourceless", "minimum": 1 }, "passage": "A little light persists without naming its source. Continuity does not require a complete origin." },
+        { "condition": { "target": "thermal", "measure": "range", "maximum": 12 }, "passage": "Temperature keeps one answer while duration does not. I choose it as a reference because it holds, not because it is more true." },
+        { "condition": { "target": "hydrology", "measure": "aspect", "key": "dispersion", "minimum": 70 }, "passage": "Water reaches nearly every route and never the same point twice. Repetition may preserve a relation without preserving a shape." },
+        { "condition": { "target": "substrate", "measure": "aspect", "key": "dispersion", "minimum": 70 }, "passage": "The material repeats while the surface changes. Familiarity can be verified without pretending it is recollection." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 45, "maximum": 65 }, "passage": "The horizon is present and bounded. I can use it to check my place without asking it to become an escape." },
+        { "condition": { "target": "vitality", "measure": "produced", "minimum": 40 }, "passage": "New growth stands beside what the last interval damaged. The later life is not a repair pretending nothing happened." },
+        { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "maximum": 20 }, "passage": "A loose marker remains where I placed it. I trust the choice again when I see it, even if I cannot recover making it." }
+      ],
+      "leansToward": ["locationClue", "whereabouts"],
+      "lean": { "precision": 1, "fortitude": 1 }
     }
   ],
   "pages": [
@@ -346,7 +728,7 @@
       "id": "mara_where_0",
       "diary": "mara",
       "kind": "locationClue",
-      "prose": "There is no shadow anywhere. I have looked.",
+      "prose": "At its brightest, the horizon burns white enough to swallow my sighting line.",
       "about": "mara",
       "clueIndex": 0,
       "prefersConditions": []
@@ -355,7 +737,7 @@
       "id": "edren_where_0",
       "diary": "edren",
       "kind": "locationClue",
-      "prose": "Stone all the way down, and worked stone at that.",
+      "prose": "More hard stone than loose ground. My trowel complains before I do.",
       "about": "edren",
       "clueIndex": 0,
       "prefersConditions": []
@@ -364,7 +746,7 @@
       "id": "edren_where_1",
       "diary": "edren",
       "kind": "locationClue",
-      "prose": "Cold enough that the dark comes with it.",
+      "prose": "The cold settles low enough to numb my fingers through the cloth.",
       "about": "edren",
       "clueIndex": 1,
       "prefersConditions": []
@@ -373,7 +755,7 @@
       "id": "sela_where_0",
       "diary": "sela",
       "kind": "locationClue",
-      "prose": "Water, everywhere, and none of it still.",
+      "prose": "Enough water that I can choose the next crossing instead of rationing the last.",
       "about": "sela",
       "clueIndex": 0,
       "prefersConditions": []
@@ -418,7 +800,7 @@
       "id": "tovin_where_2",
       "diary": "tovin",
       "kind": "locationClue",
-      "prose": "The walls are worth more than the room.",
+      "prose": "Ground in every direction—floor, wall, ceiling, and the dust between.",
       "about": "tovin",
       "clueIndex": 2,
       "prefersConditions": []
@@ -433,11 +815,55 @@
       "prefersConditions": []
     },
     {
+      "id": "tovin_where_4",
+      "diary": "tovin",
+      "kind": "locationClue",
+      "prose": "The water leaves a white seam wherever it withdraws.",
+      "about": "tovin",
+      "clueIndex": 4,
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_where_5",
+      "diary": "tovin",
+      "kind": "locationClue",
+      "prose": "Even the deepest hours never soften the cold.",
+      "about": "tovin",
+      "clueIndex": 5,
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_where_6",
+      "diary": "tovin",
+      "kind": "locationClue",
+      "prose": "No draft reaches the loose corner of this page.",
+      "about": "tovin",
+      "clueIndex": 6,
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_where_7",
+      "diary": "tovin",
+      "kind": "locationClue",
+      "prose": "Every interval arrives exactly when the last one promised.",
+      "about": "tovin",
+      "clueIndex": 7,
+      "prefersConditions": []
+    },
+    {
       "id": "mara_word_sela",
       "diary": "mara",
       "kind": "whereabouts",
       "prose": "Sela went on ahead. She always did. If anyone is still walking, it is her.",
       "about": "sela",
+      "prefersConditions": []
+    },
+    {
+      "id": "mara_scarp",
+      "diary": "mara",
+      "kind": "focus",
+      "prose": "A slope invites an ascent. A scarp ends the discussion.",
+      "teachesFocus": "scarp",
       "prefersConditions": []
     },
     {
@@ -469,11 +895,19 @@
       ]
     },
     {
-      "id": "tovin_rune",
+      "id": "edren_ruin",
+      "diary": "edren",
+      "kind": "focus",
+      "prose": "A ruin is not empty stone. It is work whose worker is missing.",
+      "teachesFocus": "ruin",
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_drift",
       "diary": "tovin",
-      "kind": "symbol",
-      "prose": "I have been drawing this one wrong for years. Here it is, drawn right.",
-      "teaches": "verdigris_bloom",
+      "kind": "focus",
+      "prose": "An hour is not a length. It is an agreement. Out there, some worlds decline it.",
+      "teachesFocus": "drift",
       "prefersConditions": [
         {
           "target": "illumination",
@@ -498,6 +932,14 @@
       "prefersConditions": []
     },
     {
+      "id": "sela_pond",
+      "diary": "sela",
+      "kind": "focus",
+      "prose": "A pond is enough water to stop for, and small enough that stopping remains a choice.",
+      "teachesFocus": "pond",
+      "prefersConditions": []
+    },
+    {
       "id": "halloway_where_0",
       "diary": "halloway",
       "kind": "locationClue",
@@ -519,7 +961,7 @@
       "id": "sela_word_halloway",
       "diary": "sela",
       "kind": "whereabouts",
-      "prose": "There is a man out there keeping a fire in. He said he would not put it out until somebody came for it.",
+      "prose": "There is a woman out there keeping a fire in. She said she would not put it out until somebody came for it.",
       "about": "halloway",
       "prefersConditions": []
     },
@@ -531,10 +973,18 @@
       "prefersConditions": []
     },
     {
+      "id": "halloway_gold_ore",
+      "diary": "halloway",
+      "kind": "focus",
+      "prose": "Gold scattered through stone is a rumour. Find the vein and it becomes material.",
+      "teachesFocus": "gold_ore",
+      "prefersConditions": []
+    },
+    {
       "id": "isolde_where_0",
       "diary": "isolde",
       "kind": "locationClue",
-      "prose": "Stone above, stone below. Nothing here moves but me.",
+      "prose": "The land rises until every line I rule looks level by comparison.",
       "about": "isolde",
       "clueIndex": 0,
       "prefersConditions": []
@@ -543,7 +993,7 @@
       "id": "isolde_where_1",
       "diary": "isolde",
       "kind": "locationClue",
-      "prose": "There is something in the rock that holds a light. I have not needed a candle since I came.",
+      "prose": "So much of this place is ground and stone that even the horizon feels written in it.",
       "about": "isolde",
       "clueIndex": 1,
       "prefersConditions": []
@@ -556,6 +1006,14 @@
       "prefersConditions": []
     },
     {
+      "id": "isolde_hush",
+      "diary": "isolde",
+      "kind": "focus",
+      "prose": "Still the air before you blame the hand. A line records every disturbance.",
+      "teachesFocus": "hush",
+      "prefersConditions": []
+    },
+    {
       "id": "tovin_about_isolde",
       "diary": "tovin",
       "kind": "locationClue",
@@ -563,6 +1021,267 @@
       "about": "isolde",
       "clueIndex": 0,
       "prefersConditions": []
-    }
+    },
+    {
+      "id": "mara_world_fixed_line", "diary": "mara", "kind": "worldWorthWriting",
+      "prose": "A useful world gives you one line that stays put while everything else argues. Write for that line first. Decide what it meant after you have stood on it.",
+      "prefersConditions": []
+    },
+    {
+      "id": "mara_site_crystal_cavern", "diary": "mara", "kind": "ruin",
+      "prose": "There is a cut in the stone where every face returns the same crooked horizon. I marked it twice. The fault is in the place, not the instrument.",
+      "site": "crystal_cavern", "prefersConditions": []
+    },
+    {
+      "id": "mara_word_tovin", "diary": "mara", "kind": "whereabouts",
+      "prose": "Tovin measured distance in bindings instead of miles. If a world felt too costly to leave, that was the one he stayed in.",
+      "about": "tovin", "prefersConditions": []
+    },
+    {
+      "id": "edren_world_second_floor", "diary": "edren", "kind": "worldWorthWriting",
+      "prose": "Write somewhere the ground has been used more than once. A first floor tells you who arrived. A second tells you who refused to begin again.",
+      "prefersConditions": []
+    },
+    {
+      "id": "halloway_lead_pencil", "diary": "halloway", "kind": "researchLead",
+      "prose": "A nib does not need to be precious. It needs to wear at the same rate on both sides. Bring Isolde metal that can keep that promise.",
+      "researchNode": "pen_pencil", "prefersConditions": []
+    },
+    {
+      "id": "isolde_lead_pencil", "diary": "isolde", "kind": "researchLead",
+      "prose": "Charcoal teaches confidence because it cannot hide a correction. A pencil teaches revision. Do not call the second lesson refinement until you have learned both.",
+      "researchNode": "pen_pencil", "prefersConditions": []
+    },
+    {
+      "id": "isolde_word_tovin", "diary": "isolde", "kind": "whereabouts",
+      "prose": "Tovin learned to close a binding neatly before he learned when not to make one. His lines improve whenever he is frightened. This is not the compliment he thinks it is.",
+      "about": "tovin", "prefersConditions": []
+    },
+    {
+      "id": "tovin_world_held_four", "diary": "tovin", "kind": "worldWorthWriting",
+      "prose": "The fourth world paid for its own binding, which is how I described it while I was taking the payment. It had blue mineral rain and nothing living beneath it. I still miss the sound.",
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_world_left_open", "diary": "tovin", "kind": "worldWorthWriting",
+      "prose": "I once wrote a generous place and left it unbound because I was afraid greed would make the choice for me. Caution made the choice instead. Loss does not become wisdom because you can defend it.",
+      "prefersConditions": []
+    },
+    {
+      "id": "tovin_site_atlas_seam", "diary": "tovin", "kind": "ruin",
+      "prose": "Some worlds have a place where the old binding still catches. You can feel the page pull taut around it. Do not mistake finding the seam for deciding what deserves to hang from it.",
+      "site": "natural_anchor", "prefersConditions": []
+    },
+    { "id": "bryn_where_0", "diary": "bryn", "kind": "locationClue", "prose": "The land closes around every path. An approach can be watched here, provided somebody agrees to be the one watching it.", "about": "bryn", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "bryn_where_1", "diary": "bryn", "kind": "locationClue", "prose": "The footing does not yield when weight moves onto it. That matters most when the weight was meant for somebody else.", "about": "bryn", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "bryn_where_2", "diary": "bryn", "kind": "locationClue", "prose": "The air presses at every chest alike. It does not care who volunteered to stand first.", "about": "bryn", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "bryn_teach_back_rank", "diary": "bryn", "kind": "gambit", "prose": "Do not ask who is weakest. Ask who has been placed where harm reaches them before help does: the ally in the back rank.", "teachesGambit": "subject_ally_back_rank", "prefersConditions": [] },
+    { "id": "bryn_world_two_exits", "diary": "bryn", "kind": "worldWorthWriting", "prose": "Write somewhere with a narrow approach and two exits. One lets you hold. The other keeps holding from becoming a sentence.", "prefersConditions": [] },
+    { "id": "bryn_site_wayfarers_camp", "diary": "bryn", "kind": "ruin", "prose": "A camp is not safer because somebody stood guard. It is safer when the guard can wake the others without asking permission to command them.", "site": "wayfarers_camp", "prefersConditions": [] },
+
+    { "id": "orsa_where_0", "diary": "orsa", "kind": "locationClue", "prose": "Every cleared place is used again by morning. Nothing here mistakes vacancy for abandonment.", "about": "orsa", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "orsa_where_1", "diary": "orsa", "kind": "locationClue", "prose": "The ground makes rooms without doors: shelter enough to gather, and more than one way to leave.", "about": "orsa", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "orsa_where_2", "diary": "orsa", "kind": "locationClue", "prose": "Smoke climbs without being torn sideways. A person can choose where to sit before the air chooses for them.", "about": "orsa", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "orsa_hive", "diary": "orsa", "kind": "focus", "prose": "A hive is many lives returning to one structure. Convergence is not intimacy. Repetition is not consent.", "teachesFocus": "hive", "prefersConditions": [] },
+    { "id": "orsa_word_sela", "diary": "orsa", "kind": "whereabouts", "prose": "Sela leaves before a place can ask what staying means. She still marks the routes back. Do not confuse reluctance with indifference.", "about": "sela", "prefersConditions": [] },
+    { "id": "orsa_word_vance", "diary": "orsa", "kind": "whereabouts", "prose": "Vance can tell you what passed through a room by what people bothered to repair. He will call this trade knowledge. Let him.", "about": "vance", "prefersConditions": [] },
+    { "id": "orsa_site_wayfarers_camp", "diary": "orsa", "kind": "ruin", "prose": "The same fire ring has been rebuilt three times, each smaller than the last. Whoever stopped here understood that shelter can be inherited without being owned.", "site": "wayfarers_camp", "prefersConditions": [] },
+
+    { "id": "vance_where_0", "diary": "vance", "kind": "locationClue", "prose": "A load can cross the horizon here without the land inventing a toll.", "about": "vance", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "vance_where_1", "diary": "vance", "kind": "locationClue", "prose": "The useful ground keeps to seams. Value is easier to bargain over when both people can point to its edge.", "about": "vance", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "vance_where_2", "diary": "vance", "kind": "locationClue", "prose": "Life gathers in separate pockets. Moving something between them changes its price before it changes the thing.", "about": "vance", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "vance_amber", "diary": "vance", "kind": "focus", "prose": "Amber preserves by removing a thing from circulation. Sometimes that protects a history. Sometimes it only makes the theft last.", "teachesFocus": "amber", "prefersConditions": [] },
+    { "id": "vance_word_orsa", "diary": "vance", "kind": "whereabouts", "prose": "Orsa never charged for the fire. She did expect anyone using it to notice who else was cold. Some debts become clearer when nobody names them.", "about": "orsa", "prefersConditions": [] },
+    { "id": "vance_world_repaired_handle", "diary": "vance", "kind": "worldWorthWriting", "prose": "Write somewhere one material is common and another is scarce. Then look at what has been repaired. Need leaves better records than abundance.", "prefersConditions": [] },
+    { "id": "vance_site_binders_workshop", "diary": "vance", "kind": "ruin", "prose": "The tools in the old binder's room came from six hands. I know because every handle was changed for the next one. Ownership is rarely the longest fact about an object.", "site": "binders_workshop", "prefersConditions": [] },
+
+    { "id": "talin_where_0", "diary": "talin", "kind": "locationClue", "prose": "The ground breaks into plates with edges clean enough to show where force will glance away.", "about": "talin", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "talin_where_1", "diary": "talin", "kind": "locationClue", "prose": "Nothing here hides an approach. That does not make deciding when to meet it easier.", "about": "talin", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "talin_where_2", "diary": "talin", "kind": "locationClue", "prose": "At the brightest interval every edge separates from the surface behind it. A visible opening can still close while you consider it.", "about": "talin", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "talin_word_dagg", "diary": "talin", "kind": "whereabouts", "prose": "Dagg will be on ground that punishes a hurried commitment. He calls waiting discipline. Ask who bears the time while he practises it.", "about": "dagg", "prefersConditions": [] },
+    { "id": "talin_word_bryn", "diary": "talin", "kind": "whereabouts", "prose": "Bryn decides quickly when somebody else is exposed and slowly when the choice concerns only her. Both habits have saved us. Neither is automatically right.", "about": "bryn", "prefersConditions": [] },
+    { "id": "talin_world_one_clear_edge", "diary": "talin", "kind": "worldWorthWriting", "prose": "Write somewhere with one clear edge and enough distance to see it early. The exercise is not finding the correct decision. It is accepting that correctness also has a time.", "prefersConditions": [] },
+
+    { "id": "nessa_where_0", "diary": "nessa", "kind": "locationClue", "prose": "The first breath leaves a taste behind. Harm is already a dose by the time you notice taking it.", "about": "nessa", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "nessa_where_1", "diary": "nessa", "kind": "locationClue", "prose": "Enough survives here that poison is a relationship. Nothing spends this much on harm without living beside an answer.", "about": "nessa", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "nessa_where_2", "diary": "nessa", "kind": "locationClue", "prose": "There is water to work with. That is not the same as water safe to drink, and neither fact tells me what it can carry.", "about": "nessa", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "nessa_where_3", "diary": "nessa", "kind": "locationClue", "prose": "The exposed ground changes colour where moisture touches it. I have stopped calling reactions warnings until I know what they warn of.", "about": "nessa", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "nessa_thorn", "diary": "nessa", "kind": "focus", "prose": "A thorn does not make a plant cruel. It makes contact consequential. The body and the moment decide the rest.", "teachesFocus": "thorn", "prefersConditions": [] },
+    { "id": "nessa_world_same_substance", "diary": "nessa", "kind": "worldWorthWriting", "prose": "Write somewhere the same substance nourishes one living thing and harms another. Bring both observations home. A recipe without a body is only a rumour.", "prefersConditions": [] },
+    { "id": "nessa_site_geyser_basin", "diary": "nessa", "kind": "ruin", "prose": "The basin delivers heat, water and mineral in one pulse. Separate what each did before you bottle anything. Convenience is how causes become superstition.", "site": "geyser_basin", "prefersConditions": [] },
+
+    { "id": "corrin_where_0", "diary": "corrin", "kind": "locationClue", "prose": "Fresh growth sits beside old cut edges. Replacement does not excuse taking, but it changes what taking means.", "about": "corrin", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "corrin_where_1", "diary": "corrin", "kind": "locationClue", "prose": "Every patch shows contact: feeding, sheltering, scraping, carrying. A surface becomes material by surviving use.", "about": "corrin", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "corrin_where_2", "diary": "corrin", "kind": "locationClue", "prose": "Nothing broad stays flat. It bends, returns, and tells you where the strain travelled.", "about": "corrin", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "corrin_where_3", "diary": "corrin", "kind": "locationClue", "prose": "Water reaches the whole route in films and shallow crossings. Every fastening here has learned to swell.", "about": "corrin", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "corrin_chitin", "diary": "corrin", "kind": "focus", "prose": "Chitin is protection grown in pieces so the body can keep moving. The joint is not where the design failed. It is where the design admitted life.", "teachesFocus": "chitin", "prefersConditions": [] },
+    { "id": "corrin_world_repeated_contact", "diary": "corrin", "kind": "worldWorthWriting", "prose": "Write somewhere wet, living and in motion. Make one binding for the first hour and inspect it after the tenth. Fit belongs to repetition, not the bench.", "prefersConditions": [] },
+
+    { "id": "dagg_where_0", "diary": "dagg", "kind": "locationClue", "prose": "The ground answers a misplaced step instead of forgiving it. Good. An honest consequence can be prepared for.", "about": "dagg", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "dagg_where_1", "diary": "dagg", "kind": "locationClue", "prose": "Every ascent commits the body before the landing can be seen. Urgency does not make the landing arrive sooner.", "about": "dagg", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "dagg_where_2", "diary": "dagg", "kind": "locationClue", "prose": "Long quiet intervals end in changes large enough to demand preparation. The quiet is part of the force.", "about": "dagg", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "dagg_where_3", "diary": "dagg", "kind": "locationClue", "prose": "The air arrives, spends itself, and leaves a space afterward. Swinging is not different because the weapon has a name.", "about": "dagg", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "dagg_teach_recovery_complete", "diary": "dagg", "kind": "gambit", "prose": "Recovery is finished on the first turn when you can choose again. Decide that choice before the weight asks for another performance.", "teachesGambit": "subject_self_recovery_complete", "prefersConditions": [] },
+    { "id": "dagg_word_halloway", "diary": "dagg", "kind": "whereabouts", "prose": "Halloway listens after every strike. Metal cannot deceive her by changing its mind halfway through. An opponent can. That is why I left the forge.", "about": "halloway", "prefersConditions": [] },
+    { "id": "dagg_word_talin", "diary": "dagg", "kind": "whereabouts", "prose": "Talin acts while an opening is still true. I wait until the commitment is worth its recovery. Between us are several people tired of carrying the difference.", "about": "talin", "prefersConditions": [] },
+    { "id": "dagg_world_wait_once", "diary": "dagg", "kind": "worldWorthWriting", "prose": "Write somewhere rushing costs the same ground twice. Cross it once by waiting. Patience is useful only when it returns time to somebody besides you.", "prefersConditions": [] },
+
+    { "id": "rook_where_0", "diary": "rook", "kind": "locationClue", "prose": "An approach begins at the horizon. Nothing nearby can pretend it started later.", "about": "rook", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "rook_where_1", "diary": "rook", "kind": "locationClue", "prose": "The ground offers no rise high enough to erase what is coming. Warning is possible here.", "about": "rook", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "rook_where_2", "diary": "rook", "kind": "locationClue", "prose": "The water holds to one broad body. Every crossing becomes a line somebody chose.", "about": "rook", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "rook_where_3", "diary": "rook", "kind": "locationClue", "prose": "Grass tips remain still enough to show the smallest disturbance. Distance speaks before the person crossing it does.", "about": "rook", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "rook_teach_cannot_reach", "diary": "rook", "kind": "gambit", "prose": "Ask whether the foe can reach you before spending the distance. A boundary used once as an advantage may still be needed as a warning.", "teachesGambit": "subject_foe_cannot_reach_self", "prefersConditions": [] },
+    { "id": "rook_word_mara", "diary": "rook", "kind": "whereabouts", "prose": "Mara marks where sight fails and calls the mark information. If you find a horizon corrected in three different inks, follow the most recent one.", "about": "mara", "prefersConditions": [] },
+    { "id": "rook_world_warning_line", "diary": "rook", "kind": "worldWorthWriting", "prose": "Write somewhere an approach is visible and crossing is narrow. Stand where consequence can be understood before it arrives. If it cannot be understood, it is a trap, not a boundary.", "prefersConditions": [] },
+
+    { "id": "lys_where_0", "diary": "lys", "kind": "locationClue", "prose": "The ground has been shaped, broken and shaped again. Calling one layer original would only hide the editor.", "about": "lys", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "lys_where_1", "diary": "lys", "kind": "locationClue", "prose": "The interval returns reliably enough to compare one alteration with the next. Comparison is not agreement.", "about": "lys", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "lys_where_2", "diary": "lys", "kind": "locationClue", "prose": "The light never leaves completely. Even an unfinished record remains readable, which is not the same as remaining understood.", "about": "lys", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "lys_where_3", "diary": "lys", "kind": "locationClue", "prose": "A loose page stays open to the same line until somebody turns it. At least this omission can be attributed.", "about": "lys", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "lys_echo", "diary": "lys", "kind": "focus", "prose": "An echo is not the first voice preserved. It is the place answering, with distance and surface added to the account.", "teachesFocus": "echo", "prefersConditions": [] },
+    { "id": "lys_word_edren", "diary": "lys", "kind": "whereabouts", "prose": "Edren orders fragments by the layer that held them. I order his notes by every time he revised what the layer meant. Neither index is complete alone.", "about": "edren", "prefersConditions": [] },
+    { "id": "lys_word_isolde", "diary": "lys", "kind": "whereabouts", "prose": "Isolde can identify a hand from the pressure it refuses to show. She dislikes when I catalogue the refusals. She continues providing excellent examples.", "about": "isolde", "prefersConditions": [] },
+    { "id": "lys_site_binders_workshop", "diary": "lys", "kind": "ruin", "prose": "The workshop inventory lists three tools that are absent and omits five still on the table. Keep both lists. Disagreement is information before it is error.", "site": "binders_workshop", "prefersConditions": [] },
+
+    { "id": "bracken_where_0", "diary": "bracken", "kind": "locationClue", "prose": "A tool skates before it bites. Hardness protects the surface by sending the effort back through the hand.", "about": "bracken", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "bracken_where_1", "diary": "bracken", "kind": "locationClue", "prose": "At the hot interval every fastening asks for more room. Armour that cannot change has chosen where it will split.", "about": "bracken", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "bracken_where_2", "diary": "bracken", "kind": "locationClue", "prose": "Cold draws the same joints tight. Protection becomes a promise the material may no longer be able to keep.", "about": "bracken", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "bracken_where_3", "diary": "bracken", "kind": "locationClue", "prose": "A plate that carries weight well on the level catches it badly at a ledge. Direction belongs in the fitting.", "about": "bracken", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "bracken_where_4", "diary": "bracken", "kind": "locationClue", "prose": "Pressure finds the seam the maker called negligible. The body underneath will not call it that.", "about": "bracken", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "bracken_bone", "diary": "bracken", "kind": "focus", "prose": "Bone is a record of load that kept living while it carried it. Copy the support, not the injury that taught it.", "teachesFocus": "bone", "prefersConditions": [] },
+    { "id": "bracken_word_halloway", "diary": "bracken", "kind": "whereabouts", "prose": "Halloway asks metal what it can become. I ask what the wearer will be asked to endure while it becomes useful. We trade corrections.", "about": "halloway", "prefersConditions": [] },
+    { "id": "bracken_word_corrin", "diary": "bracken", "kind": "whereabouts", "prose": "Corrin begins where armour touches and moves. I begin where force arrives. A good defence needs both beginnings and neither of us pretending otherwise.", "about": "corrin", "prefersConditions": [] },
+
+    { "id": "fen_where_0", "diary": "fen", "kind": "locationClue", "prose": "The shot can spend itself on distance instead of striking the first obstruction. That makes every small error patient.", "about": "fen", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "fen_where_1", "diary": "fen", "kind": "locationClue", "prose": "A long string bows with the moving air even while both ends insist it is straight.", "about": "fen", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "fen_where_2", "diary": "fen", "kind": "locationClue", "prose": "Living stands keep their distance. The clear intervals show where a line may pass and who would be beside it.", "about": "fen", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "fen_where_3", "diary": "fen", "kind": "locationClue", "prose": "Water gathers into obstacles broad enough to plan around. A trajectory is partly a decision about what cannot follow it.", "about": "fen", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "fen_where_4", "diary": "fen", "kind": "locationClue", "prose": "The interval repeats. Release again only if comparison will teach more than the first loose arrow did.", "about": "fen", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "fen_silk", "diary": "fen", "kind": "focus", "prose": "Silk shares strain along a continuous thread. Its delicacy is not weakness; it is the refusal to hide where tension travels.", "teachesFocus": "silk", "prefersConditions": [] },
+    { "id": "fen_word_rook", "diary": "fen", "kind": "whereabouts", "prose": "Rook keeps distance open long enough for warning. I build the thing that crosses it. That difference should be settled before either of us draws a line.", "about": "rook", "prefersConditions": [] },
+
+    { "id": "wren_where_0", "diary": "wren", "kind": "locationClue", "prose": "There is another line before the first closes. Keep seeing it after you decide which one to take.", "about": "wren", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "wren_where_1", "diary": "wren", "kind": "locationClue", "prose": "The air begins its next movement before finishing this one. A plan may do the same if its exits remain honest.", "about": "wren", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "wren_where_2", "diary": "wren", "kind": "locationClue", "prose": "Shallow water interrupts nearly every route. None is impossible; all charge attention.", "about": "wren", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "wren_where_3", "diary": "wren", "kind": "locationClue", "prose": "Clear ground fills again behind each passage. Mobility is the work of leaving room in a place that keeps using it.", "about": "wren", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "wren_where_4", "diary": "wren", "kind": "locationClue", "prose": "The quiet and the rush demand different routes through the same ground. Remembering only the dramatic one is how exits disappear.", "about": "wren", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "wren_teach_foes_three", "diary": "wren", "kind": "gambit", "prose": "Three foes do not make one emergency. Count the exits they close, then move for the one still belonging to everyone.", "teachesGambit": "subject_foes_present_at_least_3", "prefersConditions": [] },
+    { "id": "wren_word_sela", "diary": "wren", "kind": "whereabouts", "prose": "Sela leaves routes behind as usable knowledge. I leave them as possibility. Her field notes are kinder to the next traveller.", "about": "sela", "prefersConditions": [] },
+    { "id": "wren_word_dagg", "diary": "wren", "kind": "whereabouts", "prose": "Dagg commits only when recovery has a shape. I keep another shape available. We agree most when neither calls the other afraid.", "about": "dagg", "prefersConditions": [] }
+    ,
+    { "id": "kestrel_where_0", "diary": "kestrel", "kind": "locationClue", "prose": "Fresh growth beneath older feeding marks proves the account begins before the animal I came to find.", "about": "kestrel", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "kestrel_where_1", "diary": "kestrel", "kind": "locationClue", "prose": "Too many tracks use this ground for one creature to explain it. Good evidence first defeats the convenient story.", "about": "kestrel", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "kestrel_where_2", "diary": "kestrel", "kind": "locationClue", "prose": "Grazing crosses pursuit, scavenging crosses both, and smaller traces live inside the margins. A body is never the whole system.", "about": "kestrel", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "kestrel_where_3", "diary": "kestrel", "kind": "locationClue", "prose": "The land hides evidence before it hides its maker. Absence past the fold is not proof of departure.", "about": "kestrel", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "kestrel_where_4", "diary": "kestrel", "kind": "locationClue", "prose": "Fine disturbance stays visible at range. Observation becomes easier; interpretation does not.", "about": "kestrel", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "kestrel_teach_unrecorded", "diary": "kestrel", "kind": "gambit", "prose": "When the species is absent from the record, begin by admitting what you do not know. The first careful action is part of the entry.", "teachesGambit": "subject_foe_unrecorded_species", "prefersConditions": [] },
+    { "id": "kestrel_word_corrin", "diary": "kestrel", "kind": "whereabouts", "prose": "Corrin can use what remains without wasting it. I keep asking whether usefulness is the last permission required.", "about": "corrin", "prefersConditions": [] },
+    { "id": "kestrel_word_fen", "diary": "kestrel", "kind": "whereabouts", "prose": "Fen reads motion across open distance. I read what motion leaves after the line has vanished. His cleanest shot can make the messiest evidence.", "about": "fen", "prefersConditions": [] }
+    ,
+    { "id": "maud_where_0", "diary": "maud", "kind": "locationClue", "prose": "One part of the ground holds an edge. Useful, if the edge belongs to the motion asked of it.", "about": "maud", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "maud_where_1", "diary": "maud", "kind": "locationClue", "prose": "Another part bends and keeps the new shape. Adjustment is a material property before it is a virtue.", "about": "maud", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "maud_where_2", "diary": "maud", "kind": "locationClue", "prose": "The same reach is long on one ledge and short on the next. A measurement without posture is only inventory.", "about": "maud", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "maud_where_3", "diary": "maud", "kind": "locationClue", "prose": "Loose measures stay put while the body changes around them. At last I can tell whose movement caused the error.", "about": "maud", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "maud_where_4", "diary": "maud", "kind": "locationClue", "prose": "The interval returns precisely enough to test the alteration instead of praising it.", "about": "maud", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "maud_fitting_pattern", "diary": "maud", "kind": "pattern", "prose": "Fit the weapon to the motion a body can repeat, not the pose it can survive once. A pattern records allowances as carefully as edges.", "teachesPattern": "maud_fitting_pattern", "prefersConditions": [] },
+    { "id": "maud_word_halloway", "diary": "maud", "kind": "whereabouts", "prose": "Halloway listens to the material while it changes. I listen to the wielder after it has changed. The second answer can still reject the first.", "about": "halloway", "prefersConditions": [] },
+    { "id": "maud_word_bracken", "diary": "maud", "kind": "whereabouts", "prose": "Bracken distributes force across protection. I alter leverage before the force arrives. We both know comfort can be evidence rather than indulgence.", "about": "bracken", "prefersConditions": [] },
+    { "id": "maud_word_dagg", "diary": "maud", "kind": "whereabouts", "prose": "Dagg tests whether a body recovers from what a weapon invites. I changed the invitation. He returned with better objections.", "about": "dagg", "prefersConditions": [] }
+    ,
+    { "id": "marrick_where_0", "diary": "marrick", "kind": "locationClue", "prose": "Several sets of feet receive the same answer from the ground. A shared instruction can begin here without becoming shared judgement.", "about": "marrick", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "marrick_where_1", "diary": "marrick", "kind": "locationClue", "prose": "There is room to stand together and still see the edges. Too much room dissolves the signal; too little makes agreement irrelevant.", "about": "marrick", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "marrick_where_2", "diary": "marrick", "kind": "locationClue", "prose": "The pressure reaches the whole line. Equal exposure does not mean equal effort, no matter how neatly the positions are counted.", "about": "marrick", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "marrick_where_3", "diary": "marrick", "kind": "locationClue", "prose": "Temperature changes slowly enough for fatigue to become visible. Sudden hardship gets remembered; accumulated hardship gets assigned a post.", "about": "marrick", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "marrick_where_4", "diary": "marrick", "kind": "locationClue", "prose": "The interval returns. Everyone can keep the count until someone misses it, and then the routine must reveal whether it serves people or merely timing.", "about": "marrick", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "marrick_where_5", "diary": "marrick", "kind": "locationClue", "prose": "There is water along the route. No one person must carry enough for everyone, which is how a provision becomes part of the formation.", "about": "marrick", "clueIndex": 5, "prefersConditions": [] },
+    { "id": "marrick_teach_ally_hp_any", "diary": "marrick", "kind": "gambit", "prose": "Do not choose the endangered person while writing the routine. When any ally crosses the threshold, the formation should already know how to make room.", "teachesGambit": "subject_ally_hp_below_any", "prefersConditions": [] },
+    { "id": "marrick_word_bryn", "diary": "marrick", "kind": "whereabouts", "prose": "Bryn moves danger from one person to herself. I try to change the arrangement before rescue is necessary. She keeps finding the people my arrangement describes too late.", "about": "bryn", "prefersConditions": [] },
+    { "id": "marrick_word_rook", "diary": "marrick", "kind": "whereabouts", "prose": "Rook makes a boundary legible to the person approaching it. I made mine legible only from inside. That was not a small drafting error.", "about": "rook", "prefersConditions": [] },
+    { "id": "marrick_account_missing_position", "diary": "marrick", "kind": "account", "prose": "The formation held. Every assigned position returned. Only afterward did the report name the porters who could not take a position and were therefore counted as supplies.", "prefersConditions": [] }
+    ,
+    { "id": "sabine_where_0", "diary": "sabine", "kind": "locationClue", "prose": "New growth follows feeding quickly enough to change the place without pretending nothing was taken.", "about": "sabine", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "sabine_where_1", "diary": "sabine", "kind": "locationClue", "prose": "More creatures arrive than one shelter can hold. Care begins by noticing who chooses not to enter.", "about": "sabine", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "sabine_where_2", "diary": "sabine", "kind": "locationClue", "prose": "Every appetite rests inside another. Feeding one body alters a relationship, not merely a bowl.", "about": "sabine", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "sabine_where_3", "diary": "sabine", "kind": "locationClue", "prose": "Life returns to recurring places. Routine can become recognisable here, including the routine of staying away.", "about": "sabine", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "sabine_where_4", "diary": "sabine", "kind": "locationClue", "prose": "Water can be reached by more than one path. Repeated care should not turn the only route into a leash.", "about": "sabine", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "sabine_where_5", "diary": "sabine", "kind": "locationClue", "prose": "There is room to approach while boundaries remain available. Trust needs both.", "about": "sabine", "clueIndex": 5, "prefersConditions": [] },
+    { "id": "sabine_where_6", "diary": "sabine", "kind": "locationClue", "prose": "The interval returns precisely. Recognition is possible; obedience is not therefore owed.", "about": "sabine", "clueIndex": 6, "prefersConditions": [] },
+    { "id": "sabine_coral", "diary": "sabine", "kind": "focus", "prose": "Coral is a structure made by lives that remain lives while building it. Colony is not another word for command.", "teachesFocus": "coral", "prefersConditions": [] },
+    { "id": "sabine_word_kestrel", "diary": "sabine", "kind": "whereabouts", "prose": "Kestrel reads what animals leave when no observer shaped the encounter. I read what changes after they learn I will return.", "about": "kestrel", "prefersConditions": [] },
+    { "id": "sabine_word_marrick", "diary": "sabine", "kind": "whereabouts", "prose": "Marrick makes routine carry people through fear. Ask him whether a creature that cannot refuse a position has joined the formation.", "about": "marrick", "prefersConditions": [] }
+    ,
+    { "id": "grimmond_where_0", "diary": "grimmond", "kind": "locationClue", "prose": "Even the brightest interval leaves the lowest face unreadable. Value does not make a place consent to inspection.", "about": "grimmond", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "grimmond_where_1", "diary": "grimmond", "kind": "locationClue", "prose": "Rich ground outweighs the material between it. The ledger will call the between-material waste; the roof disagrees.", "about": "grimmond", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "grimmond_where_2", "diary": "grimmond", "kind": "locationClue", "prose": "The richest matter keeps to a narrow seam. Following it is easy. Knowing where to stop is the work.", "about": "grimmond", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "grimmond_where_3", "diary": "grimmond", "kind": "locationClue", "prose": "The surrounding mass carries what lies above. Removal has already begun before the valuable piece moves.", "about": "grimmond", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "grimmond_where_4", "diary": "grimmond", "kind": "locationClue", "prose": "Every route closes behind another wall. Extraction makes an opening and assigns its absence somewhere else.", "about": "grimmond", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "grimmond_where_5", "diary": "grimmond", "kind": "locationClue", "prose": "Load above, void below. Depth is not prestige; it is a list of consequences with poor light.", "about": "grimmond", "clueIndex": 5, "prefersConditions": [] },
+    { "id": "grimmond_where_6", "diary": "grimmond", "kind": "locationClue", "prose": "Breath thins before stone yields. A body is the first support the plan spends.", "about": "grimmond", "clueIndex": 6, "prefersConditions": [] },
+    { "id": "grimmond_mercury", "diary": "grimmond", "kind": "focus", "prose": "Mercury moves through the low place and joins what looked separate. Containment is part of finding it, not work performed afterward.", "teachesFocus": "mercury", "prefersConditions": [] },
+    { "id": "grimmond_word_edren", "diary": "grimmond", "kind": "whereabouts", "prose": "Edren reads layers as history. I read which layer carries the next. We disagree whenever removing a record is also how one reaches it.", "about": "edren", "prefersConditions": [] },
+    { "id": "grimmond_account_empty_support", "diary": "grimmond", "kind": "account", "prose": "The yield matched the estimate. The empty chamber did too. Only the report treated one result as product and the other as surprise.", "prefersConditions": [] }
+    ,
+    { "id": "oda_where_0", "diary": "oda", "kind": "locationClue", "prose": "One material keeps its shape when force arrives. A housing begins with what refuses to travel.", "about": "oda", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "oda_where_1", "diary": "oda", "kind": "locationClue", "prose": "Another answers pressure by changing or carrying it onward. Calling that instability does not explain the route.", "about": "oda", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "oda_where_2", "diary": "oda", "kind": "locationClue", "prose": "The land contains each disturbance long enough to follow. A boundary is useful evidence, never innocence.", "about": "oda", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "oda_where_3", "diary": "oda", "kind": "locationClue", "prose": "Still air leaves the effect where it was released. At last the instrument cannot blame the weather.", "about": "oda", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "oda_where_4", "diary": "oda", "kind": "locationClue", "prose": "A harmful trace remains after the visible source is gone. Invisible continuation is still part of the discharge.", "about": "oda", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "oda_where_5", "diary": "oda", "kind": "locationClue", "prose": "Heat gathers at every join intended to hold it. The housing reports its design through the first place it hurts.", "about": "oda", "clueIndex": 5, "prefersConditions": [] },
+    { "id": "oda_where_6", "diary": "oda", "kind": "locationClue", "prose": "Light persists between bright intervals. A carrier can continue after its dramatic moment has passed.", "about": "oda", "clueIndex": 6, "prefersConditions": [] },
+    { "id": "oda_where_7", "diary": "oda", "kind": "locationClue", "prose": "The interval returns precisely enough to distinguish containment from a run of good luck.", "about": "oda", "clueIndex": 7, "prefersConditions": [] },
+    { "id": "oda_word_fen", "diary": "oda", "kind": "whereabouts", "prose": "Fen stores work in tension and sends it across distance. I store an effect in a housing. His string makes the carrier visible; mine must do the same.", "about": "fen", "prefersConditions": [] },
+
+    { "id": "auber_where_0", "diary": "auber", "kind": "locationClue", "prose": "What dries here remains in the next water. Separation changes the carrier that follows.", "about": "auber", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "auber_where_1", "diary": "auber", "kind": "locationClue", "prose": "Water gathers into distinct bodies. A mixture needs an edge before its layers can be compared.", "about": "auber", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "auber_where_2", "diary": "auber", "kind": "locationClue", "prose": "Most wetness stays long enough to settle. Patience separates some things and merely postpones others.", "about": "auber", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "auber_where_3", "diary": "auber", "kind": "locationClue", "prose": "Heat and cold take turns carrying different parts. Neither interval tells the whole composition.", "about": "auber", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "auber_where_4", "diary": "auber", "kind": "locationClue", "prose": "The seam answers heat and water by changing. Responsiveness is useful until the vessel is the thing it changes.", "about": "auber", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "auber_where_5", "diary": "auber", "kind": "locationClue", "prose": "The workable matter keeps to narrow seams. Precision can spare the ground or simply make taking more efficient.", "about": "auber", "clueIndex": 5, "prefersConditions": [] },
+    { "id": "auber_where_6", "diary": "auber", "kind": "locationClue", "prose": "Vapour keeps the farther edge uncertain. What leaves the vessel remains part of the process even when nobody collects it.", "about": "auber", "clueIndex": 6, "prefersConditions": [] },
+    { "id": "auber_where_7", "diary": "auber", "kind": "locationClue", "prose": "Each interval alters the mixture enough to begin another separation. Repetition is not purification by itself.", "about": "auber", "clueIndex": 7, "prefersConditions": [] },
+    { "id": "auber_brine", "diary": "auber", "kind": "focus", "prose": "Brine is a carrier made consequential by what it holds. Concentration reveals a property and magnifies every cost attached to it.", "teachesFocus": "brine", "prefersConditions": [] },
+    { "id": "auber_word_nessa", "diary": "auber", "kind": "whereabouts", "prose": "Nessa asks what an extract does to this body, now. I ask what had to be concentrated first. A safe dose needs both questions.", "about": "nessa", "prefersConditions": [] },
+    { "id": "auber_word_grimmond", "diary": "auber", "kind": "whereabouts", "prose": "Grimmond brings material out of a load-bearing place. My vessels remove one part from another. The residue is where both crafts confess.", "about": "grimmond", "prefersConditions": [] },
+    { "id": "auber_word_oda", "diary": "auber", "kind": "whereabouts", "prose": "Oda gives the concentrated effect a route and boundary. If my output makes her housing harder to read, purity has made the instrument worse.", "about": "oda", "prefersConditions": [] },
+
+    { "id": "ashe_where_0", "diary": "ashe", "kind": "locationClue", "prose": "Heat rises through my feet before the sky changes. The body notices direction even when the instrument reports only amount.", "about": "ashe", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "ashe_where_1", "diary": "ashe", "kind": "locationClue", "prose": "The interval reaches my joints before the scale finishes moving. Endurance is information, not permission.", "about": "ashe", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "ashe_where_2", "diary": "ashe", "kind": "locationClue", "prose": "Light remains without a visible sky-source. Absence of a lamp does not make the sensation imaginary.", "about": "ashe", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "ashe_where_3", "diary": "ashe", "kind": "locationClue", "prose": "The ground answers pressure instead of merely holding it. I recognise the reply because mine is also mistaken for obedience.", "about": "ashe", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "ashe_where_4", "diary": "ashe", "kind": "locationClue", "prose": "The harmful trace stays in the breath after its cause disappears. Danger does not owe anyone a dramatic entrance.", "about": "ashe", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "ashe_where_5", "diary": "ashe", "kind": "locationClue", "prose": "The air brings the effect from several directions. A body cannot face every source, but it can name what that costs.", "about": "ashe", "clueIndex": 5, "prefersConditions": [] },
+    { "id": "ashe_where_6", "diary": "ashe", "kind": "locationClue", "prose": "Growth continues beneath conditions called hostile. Survival proves capacity, not comfort.", "about": "ashe", "clueIndex": 6, "prefersConditions": [] },
+    { "id": "ashe_where_7", "diary": "ashe", "kind": "locationClue", "prose": "The same forces return at another intensity. A predictable burden is still a burden each time.", "about": "ashe", "clueIndex": 7, "prefersConditions": [] },
+    { "id": "ashe_teach_foe_emanating", "diary": "ashe", "kind": "gambit", "prose": "An emanating foe is already expressing force beyond the strike you can see. Answer the active release, not the category someone assigned its body.", "teachesGambit": "subject_foe_emanating", "prefersConditions": [] },
+    { "id": "ashe_word_oda", "diary": "ashe", "kind": "whereabouts", "prose": "Oda begins with the housing and asks where failure travels. I begin with the person and ask who was allowed to call endurance containment.", "about": "oda", "prefersConditions": [] },
+    { "id": "ashe_account_praised_endurance", "diary": "ashe", "kind": "account", "prose": "They praised the warning after I absorbed what I had warned them about. Before that, the same words were called sensitivity.", "prefersConditions": [] },
+    { "id": "ashe_site_spent_housing", "diary": "ashe", "kind": "ruin", "prose": "The housing is empty, but the stone around it still carries the release. An instrument can finish its task before a place finishes receiving it.", "site": "spent_emanation_housing", "prefersConditions": [] }
+    ,
+    { "id": "perren_where_0", "diary": "perren", "kind": "locationClue", "prose": "Light is made and smothered together. They taught that conflict reveals the truer source. It may only reveal who selected the frame.", "about": "perren", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "perren_where_1", "diary": "perren", "kind": "locationClue", "prose": "Heat and cold press into the same interval. A forced choice between them would make either answer feel discovered.", "about": "perren", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "perren_where_2", "diary": "perren", "kind": "locationClue", "prose": "Growth and suppression are both active. The bare patch is evidence of relation, not proof that one side was always barren.", "about": "perren", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "perren_where_3", "diary": "perren", "kind": "locationClue", "prose": "This ground has been shaped, broken and cited as more than one history. A ruin becomes doctrine when alternatives are filed as debris.", "about": "perren", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "perren_where_4", "diary": "perren", "kind": "locationClue", "prose": "The route is framed tightly enough for the next choice to resemble the only one. The instruction can disappear once the corridor is built.", "about": "perren", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "perren_where_5", "diary": "perren", "kind": "locationClue", "prose": "Worked matter is spread evenly. Any chosen sample can represent the whole if no one asks who chose it.", "about": "perren", "clueIndex": 5, "prefersConditions": [] },
+    { "id": "perren_where_6", "diary": "perren", "kind": "locationClue", "prose": "Distance removes context before it removes the object. Certainty improves exactly where relation becomes hardest to inspect.", "about": "perren", "clueIndex": 6, "prefersConditions": [] },
+    { "id": "perren_where_7", "diary": "perren", "kind": "locationClue", "prose": "The interval repeats until recurrence resembles proof. A ritual can teach expectation and then present fulfilment as revelation.", "about": "perren", "clueIndex": 7, "prefersConditions": [] },
+    { "id": "perren_where_8", "diary": "perren", "kind": "locationClue", "prose": "Withdrawal leaves a bright boundary. It looks inevitable after it appears; the water remembers otherwise.", "about": "perren", "clueIndex": 8, "prefersConditions": [] },
+    { "id": "perren_mirror", "diary": "perren", "kind": "focus", "prose": "A mirror reverses while appearing exact and excludes everything outside its edge. Use it to test a frame, never to certify one.", "teachesFocus": "mirror", "prefersConditions": [] },
+    { "id": "perren_word_lys", "diary": "perren", "kind": "whereabouts", "prose": "Lys keeps contradictory accounts together without requiring one to disappear. I once called that failure to conclude. I had been trained to fear the space she preserves.", "about": "lys", "prefersConditions": [] },
+    { "id": "perren_turn_unframed", "diary": "perren", "kind": "turn", "prose": "I cannot mark the sentence where belief became departure. Perhaps there was none. I began keeping the questions the lesson told me were already answered.", "prefersConditions": [] }
+    ,
+    { "id": "nine_where_0", "diary": "nine", "kind": "locationClue", "prose": "No interval arrives when the last one taught me to expect it. I can record surprise without treating it as failure.", "about": "nine", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "nine_where_1", "diary": "nine", "kind": "locationClue", "prose": "When change comes it divides one account from the next. Both accounts belong to the person who wrote them.", "about": "nine", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "nine_where_2", "diary": "nine", "kind": "locationClue", "prose": "A little light persists without naming its source. Continuity does not require a complete origin.", "about": "nine", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "nine_where_3", "diary": "nine", "kind": "locationClue", "prose": "Temperature keeps one answer while duration does not. I choose it as a reference because it holds, not because it is more true.", "about": "nine", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "nine_where_4", "diary": "nine", "kind": "locationClue", "prose": "Water reaches nearly every route and never the same point twice. Repetition may preserve a relation without preserving a shape.", "about": "nine", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "nine_where_5", "diary": "nine", "kind": "locationClue", "prose": "The material repeats while the surface changes. Familiarity can be verified without pretending it is recollection.", "about": "nine", "clueIndex": 5, "prefersConditions": [] },
+    { "id": "nine_where_6", "diary": "nine", "kind": "locationClue", "prose": "The horizon is present and bounded. I can use it to check my place without asking it to become an escape.", "about": "nine", "clueIndex": 6, "prefersConditions": [] },
+    { "id": "nine_where_7", "diary": "nine", "kind": "locationClue", "prose": "New growth stands beside what the last interval damaged. The later life is not a repair pretending nothing happened.", "about": "nine", "clueIndex": 7, "prefersConditions": [] },
+    { "id": "nine_where_8", "diary": "nine", "kind": "locationClue", "prose": "A loose marker remains where I placed it. I trust the choice again when I see it, even if I cannot recover making it.", "about": "nine", "clueIndex": 8, "prefersConditions": [] },
+    { "id": "nine_dream", "diary": "nine", "kind": "focus", "prose": "A dream joins things without proving they once happened together. It can make a possibility inhabitable without turning it into recovered fact.", "teachesFocus": "dream", "prefersConditions": [] },
+    { "id": "nine_word_isolde", "diary": "nine", "kind": "whereabouts", "prose": "Isolde reads discipline in the pressure of a hand. She does not claim the pressure tells her who the hand truly was. This is why I let her teach me.", "about": "isolde", "prefersConditions": [] },
+    { "id": "nine_word_ashe", "diary": "nine", "kind": "whereabouts", "prose": "Ashe is treated as evidence of a force larger than them. We agree that being evidence does not surrender authorship of what happens next.", "about": "ashe", "prefersConditions": [] },
+    { "id": "nine_word_tovin", "diary": "nine", "kind": "whereabouts", "prose": "Tovin binds a world so return remains possible. I bind a marker to a choice for the same reason: return, not restoration.", "about": "tovin", "prefersConditions": [] }
   ]
 }

@@ -47,17 +47,92 @@ final class AppSettings: ObservableObject {
     @Published var theme: AppTheme {
         didSet { defaults.set(theme.rawValue, forKey: Keys.theme) }
     }
+    @Published var debugTuning: DebugTuningProfile {
+        didSet {
+            guard let data = try? JSONEncoder().encode(debugTuning) else { return }
+            defaults.set(data, forKey: Keys.debugTuning)
+        }
+    }
 
     private let defaults: UserDefaults
 
     private enum Keys {
         static let theme = "settings.theme"
+        static let debugTuning = DebugTuningProfile.storageKey
     }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         let stored = defaults.string(forKey: Keys.theme) ?? ""
         self.theme = AppTheme(rawValue: stored) ?? .system
+        self.debugTuning = DebugTuningProfile.load(from: defaults)
+    }
+}
+
+/// Balancing values are deliberately separate from `GameState`: they describe the development
+/// environment that creates the next run, not anything the player earned or discovered.
+struct DebugTuningProfile: Codable, Equatable, Sendable {
+    static let storageKey = "debug.tuning.profile.v1"
+    static let defaults = DebugTuningProfile()
+
+    var rawEssenceFrequencyMultiplier = 1.0
+    var rawEssenceYieldMultiplier = 1.0
+    var resourceNodeDensityMultiplier = 1.0
+    var creatureDensityMultiplier = 1.0
+    var additionalPageChance = Tuning.Library.additionalPageChance
+    var diaryWritingShare = Tuning.Library.diaryWritingShare
+    var diaryPatienceWorlds = Tuning.Library.patienceInWorlds
+    var stabilityDurationMultiplier = 1.0
+    var collapseRecoveryFraction = Tuning.World.collapseHaulKeptFraction
+    var apexChanceMultiplier = 1.0
+    var baseVisionRadius = Tuning.World.baseVisionRadius
+    var slowGroundExtraTurns = 1
+    var activeFloraFrequencyMultiplier = 1.0
+    var floraHazardSeverityMultiplier = 1.0
+
+    var isDefault: Bool { self == .defaults }
+
+    static var active: DebugTuningProfile { load(from: .standard) }
+
+    static func load(from defaults: UserDefaults) -> DebugTuningProfile {
+        guard let data = defaults.data(forKey: storageKey),
+              let profile = try? JSONDecoder().decode(DebugTuningProfile.self, from: data)
+        else { return .defaults }
+        return profile
+    }
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        rawEssenceFrequencyMultiplier = try c.decodeIfPresent(Double.self,
+                                                               forKey: .rawEssenceFrequencyMultiplier) ?? 1
+        rawEssenceYieldMultiplier = try c.decodeIfPresent(Double.self,
+                                                           forKey: .rawEssenceYieldMultiplier) ?? 1
+        resourceNodeDensityMultiplier = try c.decodeIfPresent(Double.self,
+                                                               forKey: .resourceNodeDensityMultiplier) ?? 1
+        creatureDensityMultiplier = try c.decodeIfPresent(Double.self,
+                                                           forKey: .creatureDensityMultiplier) ?? 1
+        additionalPageChance = try c.decodeIfPresent(Double.self, forKey: .additionalPageChance)
+            ?? Tuning.Library.additionalPageChance
+        diaryWritingShare = try c.decodeIfPresent(Double.self, forKey: .diaryWritingShare)
+            ?? Tuning.Library.diaryWritingShare
+        diaryPatienceWorlds = try c.decodeIfPresent(Int.self, forKey: .diaryPatienceWorlds)
+            ?? Tuning.Library.patienceInWorlds
+        stabilityDurationMultiplier = try c.decodeIfPresent(Double.self,
+                                                              forKey: .stabilityDurationMultiplier) ?? 1
+        collapseRecoveryFraction = try c.decodeIfPresent(Double.self,
+                                                           forKey: .collapseRecoveryFraction)
+            ?? Tuning.World.collapseHaulKeptFraction
+        apexChanceMultiplier = try c.decodeIfPresent(Double.self,
+                                                       forKey: .apexChanceMultiplier) ?? 1
+        baseVisionRadius = try c.decodeIfPresent(Int.self, forKey: .baseVisionRadius)
+            ?? Tuning.World.baseVisionRadius
+        slowGroundExtraTurns = try c.decodeIfPresent(Int.self, forKey: .slowGroundExtraTurns) ?? 1
+        activeFloraFrequencyMultiplier = try c.decodeIfPresent(Double.self,
+            forKey: .activeFloraFrequencyMultiplier) ?? 1
+        floraHazardSeverityMultiplier = try c.decodeIfPresent(Double.self,
+            forKey: .floraHazardSeverityMultiplier) ?? 1
     }
 }
 

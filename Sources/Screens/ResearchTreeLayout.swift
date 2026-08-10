@@ -165,6 +165,7 @@ private struct ResearchOutlineRow: View {
     var body: some View {
         let node = row.node
         let isDone = store.isComplete(node)
+        let isSupplied = store.isSuppliedByKeeper(node)
         let isAvailable = store.isAvailable(node)
         let missing = store.shortfall(for: node)
 
@@ -185,7 +186,7 @@ private struct ResearchOutlineRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
-                    Image(systemName: isDone ? "checkmark.circle.fill" : (isAvailable ? node.icon : "lock.fill"))
+                    Image(systemName: isDone ? "checkmark.circle.fill" : (isSupplied ? "person.crop.circle.badge.checkmark" : (isAvailable ? node.icon : "lock.fill")))
                         .font(.footnote)
                         .frame(width: 18)
                         .foregroundStyle(isDone ? Color.green : (isAvailable ? Color.accentColor : Color.secondary))
@@ -193,7 +194,11 @@ private struct ResearchOutlineRow: View {
                     VStack(alignment: .leading, spacing: 1) {
                         Text(node.name)
                             .font(.subheadline.weight(.medium))
-                        if !grantText.isEmpty {
+                        if isSupplied {
+                            Text("Supplied by keeper")
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(.teal)
+                        } else if !grantText.isEmpty {
                             Text(grantText)
                                 .font(.caption2)
                                 .foregroundStyle(isAvailable || isDone ? Color.accentColor : Color.secondary)
@@ -218,7 +223,7 @@ private struct ResearchOutlineRow: View {
                     }
                 }
 
-                if !isDone {
+                if !isDone && !isSupplied {
                     if isAvailable && missing.isEmpty {
                         Button { store.research(node) } label: {
                             HStack(spacing: 6) {
@@ -291,6 +296,9 @@ private struct ResearchOutlineRow: View {
                       let target = ContentCatalog.shared.pressureTarget(PressureTargetID(rawValue: id))
                 else { return nil }
                 return "measure \(target.name.lowercased()) out there, in numbers"
+            case .capability:
+                guard let id = grant.id else { return nil }
+                return "unlock \(id.replacingOccurrences(of: "_", with: " "))"
             case .effect:
                 return grant.effect.map(ResearchWording.describe)
             }
@@ -298,9 +306,10 @@ private struct ResearchOutlineRow: View {
     }
 
     private var costText: String {
+        let paid = store.paidCost(for: row.node)
         var parts: [String] = []
-        if row.node.cost.essence > 0 { parts.append("\(row.node.cost.essence) essence") }
-        for (id, amount) in row.node.cost.resources.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
+        if paid.essence > 0 { parts.append("\(paid.essence) essence") }
+        for (id, amount) in paid.resources.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
             parts.append("\(amount) \(ContentCatalog.shared.resource(id)?.name.lowercased() ?? id.rawValue)")
         }
         return parts.isEmpty ? "free" : parts.joined(separator: " · ")
@@ -340,6 +349,7 @@ enum ResearchWording {
         case .finerHand: "a finer instrument — the same runes, in less room"
         case .scriptoriumTier: "a better Scriptorium, and what it lets Isolde teach next"
         case .analysisTier: "another tier of the page lens — you can read more off a page before you spend it"
+        case .stationTier: "a deeper specialist capability at this station"
         case .companionWeapon: "+\(Tuning.Encounter.attackPerWeaponTier) companion attack"
         case .companionArmor: "+\(Tuning.Encounter.defencePerArmorTier) companion defence"
         }

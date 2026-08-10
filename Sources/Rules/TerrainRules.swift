@@ -60,6 +60,7 @@ enum TerrainRules {
                         asWritten.map { chasmCoverage(in: $0) } ?? 0)
         paintChasms(&map, coverage: holes, rng: &rng)
         paintWater(&map, water: water, freezing: freezing, rng: &rng)
+        paintMud(&map, freezing: freezing)
         paintGrowth(&map, life: life, flora: flora, rng: &rng)
     }
 
@@ -205,6 +206,18 @@ enum TerrainRules {
                 head = rng.pick(map.neighbours(of: head)) ?? head
             }
         }
+    }
+
+    /// A narrow, legible marsh edge where liquid water meets soil. Frozen hydrology makes ice,
+    /// never mud; growth may later cover some of this, but only with an actual plant.
+    private static func paintMud(_ map: inout WorldMap, freezing: Bool) {
+        guard !freezing else { return }
+        let wet = Set(map.allPoints.filter { map[$0].ground == .water || map[$0].ground == .deepWater })
+        guard !wet.isEmpty else { return }
+        let muddy = map.allPoints.filter { point in
+            map[point].ground == .soil && map.neighbours(of: point).contains(where: wet.contains)
+        }
+        for point in muddy { map[point].ground = .mud }
     }
 
     // MARK: Growth — what the plants put on the ground

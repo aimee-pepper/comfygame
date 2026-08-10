@@ -30,6 +30,9 @@ struct BookProjection {
     /// How far you'll see. A stable world is often a dark one, and that trade has to be on screen
     /// or the player is only ever shown half of what a symbol does.
     var visionRadius: ClosedRange<Int>
+    /// Earned qualitative Cycle readout. Nil when Cycle was left to chance or has not been
+    /// calibrated, so the preview never names an unwritten roll.
+    var clockBand: String?
     var mapWidth: Int
     var mapHeight: Int
     /// What the world will be like, in prose. Derived from the same resolution the bind runs.
@@ -37,6 +40,12 @@ struct BookProjection {
     /// How much stability the danger-rune cap withheld. Shown on its own line rather than folded
     /// into the headline — the same rule the contradiction escalation term follows.
     var dangerCapShortfall: Int
+    /// Tier-4 explanation of the written page's stability terms. Kept separate so the headline
+    /// remains readable while the lens can reveal the arithmetic underneath it.
+    var greedStabilityDelta: Int = 0
+    var contradictionPenalty: Int = 0
+    var sizeStabilityDelta: Int = 0
+    var dangerStabilityDelta: Int = 0
     /// Expected share of harvests by resource, descending. Expected, not ranged — a pile of ranged
     /// percentages is unreadable, and the mix is the qualitative half of the preview.
     var resourceMix: [(resource: ResourceDef, share: Double)]
@@ -52,6 +61,8 @@ struct BookProjection {
     /// because a world's animals stand on its plants: no viable metabolism means no producers, and
     /// no producers means nothing above them either (`flora-system-spec.md` §7).
     var flora: FloraRules.FloraProjection = FloraRules.FloraProjection(kindCount: 0, metabolism: nil, notes: [])
+    /// Tier-5 distributions from the same trait allocators used by worldgen.
+    var livingAnalysis: LivingAnalysis = LivingAnalysis(creatureTraits: [], ecologicalRoles: [], floraTraits: [])
     /// How many marks are written on the page, and how many of them are actually **saying**
     /// something — a mark only speaks as part of a joined cluster with a target in it.
     ///
@@ -113,6 +124,8 @@ struct BookProjection {
                         seed: UInt64 = 0,
                         analysisTier: Int = Tuning.Analysis.startingTier,
                         measuring instruments: Set<PressureTargetID> = [],
+                        precision: [PressureTargetID: RealityState.InstrumentPrecision] = [:],
+                        tuning: DebugTuningProfile = .defaults,
                         revealRolled: Bool = false) -> BookProjection {
         let book = BookRules.resolveBook(page: page)
         let written = book.allSymbolIDs
@@ -151,11 +164,19 @@ struct BookProjection {
         let rolled = rolledStabilitySpread(sigils: sigils, page: page, book: book, seed: seed)
         let worst = min(score, rolled.lowerBound)
         let best = max(score, rolled.upperBound)
-        let turnsWorst = BookRules.turnsAvailable(stabilityScore: worst)
-        let turnsBest = BookRules.turnsAvailable(stabilityScore: best)
+        func tunedTurns(_ turns: Int) -> Int {
+            guard turns < Tuning.World.indefiniteTurns else { return turns }
+            return max(1, Int((Double(turns) * tuning.stabilityDurationMultiplier).rounded()))
+        }
+        let turnsWorst = tunedTurns(BookRules.turnsAvailable(stabilityScore: worst))
+        let turnsBest = tunedTurns(BookRules.turnsAvailable(stabilityScore: best))
         let tier = BookRules.enemyTier(symbolIDs: written)
-        let sight = WorldRules.visionRadius(for: book)
+        let sight = WorldRules.visionRadius(for: book, base: tuning.baseVisionRadius)
         let cost = book.essencePaid
+        let clock = WorldClock(book: book, seed: seed)
+        let clockBand: String? = analysisTier >= Tuning.Analysis.targetsTier
+            && instruments.contains("cycle") && sigils.contains(where: { $0.target == "cycle" })
+            ? clock.bandName : nil
 
         return BookProjection(
             essenceCost: cost...cost,
@@ -163,6 +184,7 @@ struct BookProjection {
             turnsUntilCollapse: turnsWorst...turnsBest,
             enemyTier: tier...tier,
             visionRadius: sight...sight,
+            clockBand: clockBand,
             mapWidth: book.scale.gridSide,
             mapHeight: book.scale.gridSide,
             worldDescription: DescriptionRules.describe(
@@ -170,15 +192,24 @@ struct BookProjection {
                 contradictions: contradictions,
                 analysisTier: analysisTier,
                 measuring: instruments,
-                about: revealRolled ? nil : DescriptionRules.targetsTouched(by: sigils)
+                about: revealRolled ? nil : DescriptionRules.targetsTouched(by: sigils),
+                derivedPolarity: DescriptionRules.stabilityPolarity(for: sigils),
+                precision: precision
             ),
             dangerCapShortfall: BookRules.dangerCapShortfall(symbolIDs: written),
+            greedStabilityDelta: BookRules.greedDelta(for: sigils),
+            contradictionPenalty: ContradictionRules.totalPenalty(for: contradictions),
+            sizeStabilityDelta: book.scale.stabilityDelta,
+            dangerStabilityDelta: BookRules.dangerTradeDelta(of: book),
             resourceMix: expectedResourceMix(in: readings),
             life: LifeRules.projection(for: readings),
             flora: FloraRules.projection(for: readings),
+            livingAnalysis: analysisTier >= Tuning.Analysis.livingTier
+                ? LivingAnalysisRules.analyze(readings)
+                : LivingAnalysis(creatureTraits: [], ecologicalRoles: [], floraTraits: []),
             marksWritten: page.runes.count,
             marksSpeaking: PageRules.sigils(of: page).count,
-            chains: PageRules.chains(on: page),
+            chains: PageRules.chains(on: page).map { $0.disclosingEffects(measured: instruments) },
             writtenSubjects: Set(sigils.map(\.target))
         )
     }

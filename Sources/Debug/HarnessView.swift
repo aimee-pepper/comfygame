@@ -124,6 +124,19 @@ struct HarnessView: View {
                     ? "none"
                     : run.book.randomlyFilled.map(\.rawValue).sorted().joined(separator: ", "))
                 Row("turns taken", "\(run.turnsTaken)")
+                Row("cycle", "\(run.clock.bandName) · base \(run.clock.isStopped ? "—" : "\(run.clock.basePeriod)t")")
+                Row("cycle pressure", "peak \(Int(run.clock.cyclePeak.rounded())) · regularity \(Int(run.clock.regularity.rounded())) · amplitude \(Int(run.clock.amplitude.rounded()))")
+                Row("day phase", run.clock.isStopped
+                    ? (run.isNight ? "held dark" : "held day")
+                    : run.dayPhase.formatted(.percent.precision(.fractionLength(0))))
+                let transitions = run.nextLightTransitions()
+                Row("next transitions", transitions.isEmpty
+                    ? "none"
+                    : transitions.map { "t\($0.turn) \($0.isNight ? "nightfall" : "daybreak")" }
+                        .joined(separator: " · "))
+                Row("life", "\(run.cast.count) species · \(run.enemies.count) instances · \(run.flora.count) flora")
+                Row("apex", run.enemies.contains(where: \.isApex) ? "placed" : "none")
+                Row("writing", "\(run.map.allPoints.count { point in if case .diaryPage = run.map[point].content { true } else { false } }) diary · \(run.foundWritings.count) other")
                 Row("binder HP", "\(run.binderHP) / \(Tuning.Encounter.binderMaxHP)")
                 Row("rng draws", "\(run.rng.drawCount)")
 
@@ -175,6 +188,12 @@ struct HarnessView: View {
 
             HarnessButton("Find a mote", icon: "star.fill") { store.harnessGainMote() }
             HarnessButton("Grant every piece of gear", icon: "shield.lefthalf.filled") { store.harnessGrantGear() }
+            HarnessButton("Prepare instrument crafting", icon: "wrench.adjustable.fill") {
+                store.harnessPrepareInstrumentCrafting()
+            }
+            HarnessButton("Prepare the Apothecary", icon: "cross.vial.fill") {
+                store.harnessPrepareApothecary()
+            }
             HarnessButton("Analysis tier: \(store.state.reality.analysisTier) of \(Tuning.Analysis.livingTier)",
                           icon: "eyeglasses") { store.harnessCycleAnalysisTier() }
         }

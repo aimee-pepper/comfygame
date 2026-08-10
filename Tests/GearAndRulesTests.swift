@@ -227,7 +227,9 @@ final class GearAndRulesTests: XCTestCase {
                       "equipment didn't encode as a readable object")
 
         let reloaded = try SaveCodec.decode(data)
-        XCTAssertEqual(reloaded.base.companion.equipped[.weapon], "blade_keen")
+        XCTAssertEqual(reloaded.base.companion.equipped[.weapon]?.catalogID, "blade_keen")
+        XCTAssertNotEqual(reloaded.base.companion.equipped[.weapon]?
+            .gearProfile?.stableInstanceID.rawValue, 0)
     }
 
     /// **A rebalance has to reach saves that already exist.**
@@ -291,7 +293,8 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertEqual(CombatRules.damageKind(for: .companion(0), in: store.state), .rend)
     }
 
-    /// **If you have four, you can wear four.**
+    /// **If you have four, you can wear four.** Physical gear is four durable instances rather
+    /// than a quantity bin, because each piece can acquire its own provenance and reforge history.
     ///
     /// Aimee, 6 Aug: *"in storage it shows I have 4 padded guards and two chipped blades but when I
     /// go to equip my character with those items it unequips them from my companion."* Equipping
@@ -301,8 +304,10 @@ final class GearAndRulesTests: XCTestCase {
     func testAFullBinCanDressBothOfThem() throws {
         let store = GameStore(io: .temporary(name: "bin-\(UUID().uuidString)"))
         store.mutate("haul four home") { state in
-            state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1),
-                                               catalogID: "guard_padded", count: 4))
+            for id in 1...4 {
+                state.base.inventory.add(ItemStack(id: InstanceID(rawValue: UInt64(id)),
+                                                   catalogID: "guard_padded"))
+            }
         }
 
         let bin = try XCTUnwrap(store.state.base.inventory.stacks.first)
@@ -310,10 +315,10 @@ final class GearAndRulesTests: XCTestCase {
         let after = try XCTUnwrap(store.state.base.inventory.stacks.first)
         store.equip(after, on: PartyMember.member(0))
 
-        XCTAssertEqual(store.worn(.armor, by: PartyMember.binder), "guard_padded")
-        XCTAssertEqual(store.worn(.armor, by: PartyMember.member(0)), "guard_padded",
+        XCTAssertEqual(store.worn(.armor, by: PartyMember.binder)?.catalogID, "guard_padded")
+        XCTAssertEqual(store.worn(.armor, by: PartyMember.member(0))?.catalogID, "guard_padded",
                        "dressing one of them stripped the other")
-        XCTAssertEqual(store.state.base.inventory.stacks.first?.count, 2,
+        XCTAssertEqual(store.state.base.inventory.stacks.filter { $0.catalogID == "guard_padded" }.count, 2,
                        "the two they are wearing didn't come out of the bin")
     }
 
@@ -326,11 +331,11 @@ final class GearAndRulesTests: XCTestCase {
         store.mutate("haul it home") { $0.base.inventory.add(stack) }
 
         store.equip(stack, on: PartyMember.binder)
-        XCTAssertEqual(store.worn(.weapon, by: PartyMember.binder), "blade_keen")
+        XCTAssertEqual(store.worn(.weapon, by: PartyMember.binder)?.catalogID, "blade_keen")
 
         store.equip(stack, on: PartyMember.member(0))
         XCTAssertNil(store.worn(.weapon, by: PartyMember.member(0)), "dressed them from an empty shelf")
-        XCTAssertEqual(store.worn(.weapon, by: PartyMember.binder), "blade_keen",
+        XCTAssertEqual(store.worn(.weapon, by: PartyMember.binder)?.catalogID, "blade_keen",
                        "the sword was taken off the person actually holding it")
     }
 

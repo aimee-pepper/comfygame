@@ -105,12 +105,14 @@ final class ContradictionTests: XCTestCase {
 
     // MARK: Assertions — enumerated only, and only on what was written
 
-    func testGreenInTheDarkFiresOnlyWhenBothHalvesAreWritten() {
+    func testGreenInTheDarkStableEntryIsDisabledUntilPhotosynthesisCanBeTested() {
         let darkAndGrowing = [
             Sigil(id: InstanceID(rawValue: 1), source: "root", target: "vitality", intensity: .great),
             Sigil(id: InstanceID(rawValue: 2), source: "void", target: "illumination", intensity: .overwhelming)
         ]
-        XCTAssertTrue(ContradictionRules.fired(in: darkAndGrowing).contains { $0.id == "green_in_the_dark" })
+        XCTAssertNotNil(ContentCatalog.shared.contradiction("green_in_the_dark"),
+                        "stable catalogue ID was removed rather than held")
+        XCTAssertFalse(ContradictionRules.fired(in: darkAndGrowing).contains { $0.id == "green_in_the_dark" })
 
         // Same darkness, nothing asserted to grow in it.
         let justDark = [darkAndGrowing[1]]

@@ -365,18 +365,19 @@ enum FloraRules {
         var isSomething: Bool { immediate > 0 || lingering > 0 }
     }
 
-    static func harm(of traits: FloraTraits) -> Harm {
+    static func harm(of traits: FloraTraits, severity: Double = 1) -> Harm {
         guard traits.isDefended else { return .none }
         let bite = traits.defence / Tuning.Pressure.scaleMaximum
         switch traits.defenceType {
         case .physical:
-            return Harm(immediate: max(1, Int((bite * Tuning.Flora.thornDamage).rounded())),
+            return Harm(immediate: max(1, Int((bite * Tuning.Flora.thornDamage * max(0, severity)).rounded())),
                         lingering: 0)
         case .chemical:
             // Less on the way in, and it stays with you — which is what makes toxic growth a
             // different decision from a thorn hedge rather than the same one at another number.
-            return Harm(immediate: max(1, Int((bite * Tuning.Flora.toxinDamage).rounded())),
-                        lingering: Tuning.Flora.toxinRounds)
+            return Harm(immediate: max(1, Int((bite * Tuning.Flora.toxinDamage * max(0, severity)).rounded())),
+                        lingering: max(1, Int((Double(Tuning.Flora.toxinRounds)
+                                              * max(0, severity)).rounded())))
         case .active:
             return .none
         }

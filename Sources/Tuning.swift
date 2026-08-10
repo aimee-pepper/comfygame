@@ -349,8 +349,9 @@ enum Tuning {
         /// How many worlds the history keeps before it starts dropping the oldest **unkept** ones.
         /// The save is rewritten after every action, so this can't be unbounded.
         static let worldsRemembered: Int = 40          // PLACEHOLDER
-        /// How many pages a world may hold.
-        static let pagesPerWorldRange = 0...2          // PLACEHOLDER
+        /// Every world holds one writing; this is the chance that it holds a second.
+        static let additionalPageChance: Double = 0.10 // PLACEHOLDER
+        static let diaryWritingShare: Double = 0.70     // PLACEHOLDER
         /// How much more likely a page is to surface somewhere its author would have been.
         static let atHomeWeight: Double = 4            // PLACEHOLDER
         /// After this many worlds without a match, a page stops waiting and surfaces anywhere.
@@ -387,6 +388,16 @@ enum Tuning {
         static let perWorldCountRange = 1...3          // PLACEHOLDER
         /// Turns spent searching that are worth a haptic and a line of narration, not silence.
         static let searchRevealsContentsAt: Int = 0    // PLACEHOLDER
+    }
+
+    enum Anchoring {
+        static let naturalAnchorChance: Double = 0.25 // PLACEHOLDER
+        static let naturalAnchorMinimumCost: Int = 10 // PLACEHOLDER
+        static let naturalAnchorPremiumDivisor: Int = 4 // 25% of born-anchored premium
+        static let sustainPerAdditionalRealm: Int = 10 // PLACEHOLDER essence per settlement
+        static let minimumReactivationCost: Int = 10 // PLACEHOLDER
+        static let worldworkBaseContribution: Int = 1 // PLACEHOLDER
+        static let levelsPerWorldworkBonus: Int = 5 // PLACEHOLDER
     }
 
     /// The turning of a world's day (decisions-session-13 §2 and §6).
@@ -674,6 +685,9 @@ enum Tuning {
         /// the reliable path and the lottery is the surprise.
         static let ordinaryCreatureChance: Double = 0.004
         static let lockedCacheChance: Double = 0.03
+        /// Passive reduction for the Warded Haft's authored blow type. Ward multiplies after this.
+        static let wardedHaftReduction: Double = 0.20
+        static let livingHookGrowthCap: Int = 2
     }
 
     enum Terrain {
@@ -722,6 +736,16 @@ enum Tuning {
         /// Turns in a full day. Short enough that a run sees four or five turns of it, long enough
         /// that it doesn't strobe. **[PLACEHOLDER]**
         static let turnsPerDay: Int = 40
+        static let stoppedMaximumPeak: Double = 8
+        static let slowMaximumPeak: Double = 29
+        static let measuredMaximumPeak: Double = 69
+        static let quickMaximumPeak: Double = 84
+        static let slowTurnsPerCycle: Int = 64
+        static let measuredTurnsPerCycle: Int = 40
+        static let quickTurnsPerCycle: Int = 28
+        static let restlessTurnsPerCycle: Int = 20
+        static let minimumTurnsPerCycle: Int = 12
+        static let maximumJitterFraction: Double = 0.40
         /// The share of a day that is night.
         static let nightFraction: Double = 0.4      // PLACEHOLDER
         /// How much of your sight the dark takes.
@@ -896,6 +920,12 @@ enum Tuning {
         /// still grows a long way, or the decision is made for you every single run.
         static let startingSatchelSlots: Int = 8    // PLACEHOLDER
         static let satchelSlotsPerTier: Int = 3     // PLACEHOLDER
+        static let fieldcraftSatchelBonus: Int = 2  // PLACEHOLDER — Sela's route packing
+        static let fieldcraftOrganicYieldBonus: Int = 1 // PLACEHOLDER — per harvest
+        static let reliquarySiteYieldBonus: Int = 1 // PLACEHOLDER — per authored resource yield
+        /// Highest-certainty anchoring route: paid before the generated world is seen.
+        static let bornAnchoredBasePremium: Int = 100 // PLACEHOLDER
+        static let bornAnchoredBookCostMultiplier: Int = 2 // PLACEHOLDER
         static let identifyCostEssence: Int = 5      // PLACEHOLDER
         /// Raw essence refines into this much essence at the Workshop. The join between what
         /// worlds give you and what the base runs on.
@@ -1010,12 +1040,9 @@ enum Tuning {
     /// Reforging (`materials-crafting-spec.md` §7): making the piece you carry better rather than
     /// waiting for a better one to drop. All PLACEHOLDER.
     enum Smith {
-        /// How far a piece can be pushed, indexed by `Rarity.order` — common, uncommon, rare,
-        /// mythic. A common blade finishes; a mythic one keeps going. **This is what stops a
-        /// common piece reforged four times from catching a mythic one**, which would make finding
-        /// a mythic pointless.
-        static let maximumLevelByRarity: [Int] = [1, 2, 3, 5] // PLACEHOLDER
-
+        /// Reforging improves within a construction tier and never promotes into a specialist tier.
+        static let maximumReforgeRank: Int = 3
+        static let powerPerReforgeRank: Double = 0.2
         /// The property bar the first reforging asks stock to clear, and how much it rises each
         /// time. 0–100, same scale as material properties.
         static let baseThreshold: Double = 30       // PLACEHOLDER

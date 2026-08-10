@@ -34,6 +34,40 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(reloaded, original, "A save round-trip must be lossless")
     }
 
+    func testAnchoredRealmSurvivesSaveRoundTrip() throws {
+        var state = GameState.newGame()
+        let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
+        let generated = Worldgen.generate(book: book, seed: 73)
+        let run = WorldRun(runIndex: 7, book: book, mapSeed: 73, rng: SeededRNG(seed: 73),
+                           map: generated.map, playerPosition: generated.start)
+        state.worlds.anchoredRealms = [
+            AnchoredRealm(runIndex: 7, name: "The Quiet Reach", route: .craftedFrame,
+                          sustainObligation: 3, productionContribution: 1,
+                          assignedCompanions: [0], world: run)
+        ]
+
+        try io.write(SaveCodec.encode(state))
+        let reloaded = try XCTUnwrap(io.load().state)
+
+        XCTAssertEqual(reloaded.worlds.anchoredRealms, state.worlds.anchoredRealms)
+        XCTAssertEqual(reloaded.worlds.anchoredRealms.first?.projectedShortfall, 2)
+    }
+
+    func testSaveFromBeforeAnchoringLoadsWithAnEmptyAtlas() throws {
+        let state = GameState.newGame()
+        let encoded = try SaveCodec.encode(state)
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        worlds.removeValue(forKey: "anchoredRealms")
+        root["worlds"] = worlds
+        let legacy = try JSONSerialization.data(withJSONObject: root)
+
+        try io.write(legacy)
+        let reloaded = try XCTUnwrap(io.load().state)
+
+        XCTAssertEqual(reloaded.worlds.anchoredRealms, [])
+    }
+
     /// The acceptance criterion: killed mid-encounter, we come back mid-encounter.
     func testMidEncounterStateSurvivesRoundTrip() throws {
         var state = GameState.newGame()

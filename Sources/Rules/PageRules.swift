@@ -242,6 +242,27 @@ enum PageRules {
 
 extension PageRules {
 
+    enum ConnectionIssue: Equatable {
+        case unavailable, notAdjacent, completeStatement, multipleTargets, incompatibleFocus
+        case chainingRequired, modifierMustAttachToFocus, modifierAlreadyAttached
+        case duplicateModifierLadder, incompatibleModifier
+
+        var message: String {
+            switch self {
+            case .unavailable: "Those marks cannot be joined."
+            case .notAdjacent: "Move the marks next to each other before joining them."
+            case .completeStatement: "That mark is already a complete statement."
+            case .multipleTargets: "A statement can have exactly one subject."
+            case .incompatibleFocus: "That focus cannot be written on this subject."
+            case .chainingRequired: "Learn Chaining before joining more than one focus."
+            case .modifierMustAttachToFocus: "A modifier must join directly to one focus."
+            case .modifierAlreadyAttached: "That modifier is already attached to a focus."
+            case .duplicateModifierLadder: "A focus can use only one rung from each modifier ladder."
+            case .incompatibleModifier: "That modifier cannot be used with this subject."
+            }
+        }
+    }
+
     /// Whether two marks are close enough to be joined.
     ///
     /// **Adjacency constrains, the connector declares intent** (session 14 §2). Two things touching
@@ -256,16 +277,59 @@ extension PageRules {
         }
     }
 
-    static func canConnect(_ a: InstanceID, _ b: InstanceID, on page: Page) -> Bool {
+    static func connectionIssue(_ a: InstanceID, _ b: InstanceID, on page: Page,
+                                chainingUnlocked: Bool = false) -> ConnectionIssue? {
         guard a != b, !page.links.contains(MarkLink(a, b)),
               let first = page.runes.first(where: { $0.id == a }),
               let second = page.runes.first(where: { $0.id == b })
-        else { return false }
-        return areAdjacent(first, second)
+        else { return .unavailable }
+        guard areAdjacent(first, second) else { return .notAdjacent }
+        guard first.sourceID != nil || first.targetID != nil || first.qualifierID != nil,
+              second.sourceID != nil || second.targetID != nil || second.qualifierID != nil
+        else { return .completeStatement }
+
+        var proposed = page
+        proposed.links.insert(MarkLink(a, b))
+        let group = cluster(containing: a, on: proposed)
+        let targets = group.compactMap(\.targetID)
+        let focuses = group.filter { $0.sourceID != nil }
+        let modifiers = group.filter { $0.qualifierID != nil }
+
+        guard targets.count <= 1 else { return .multipleTargets }
+        if focuses.count > 1 && !chainingUnlocked { return .chainingRequired }
+        if let target = targets.first {
+            guard focuses.allSatisfy({ mark in
+                mark.sourceID.flatMap(ContentCatalog.shared.pressureSource)?.canAttach(to: target) == true
+            }) else { return .incompatibleFocus }
+        }
+
+        for modifierMark in modifiers {
+            let neighbours = proposed.links.compactMap { $0.other(than: modifierMark.id) }
+                .compactMap { id in proposed.runes.first { $0.id == id } }
+            guard neighbours.count == 1, let focus = neighbours.first, focus.sourceID != nil else {
+                return page.links.contains(where: { $0.a == modifierMark.id || $0.b == modifierMark.id })
+                    ? .modifierAlreadyAttached : .modifierMustAttachToFocus
+            }
+            guard let qualifierID = modifierMark.qualifierID,
+                  let qualifier = ContentCatalog.shared.qualifier(qualifierID)
+            else { return .unavailable }
+            if let target = targets.first, !qualifier.applies(to: target) { return .incompatibleModifier }
+            let attached = qualifiers(on: focus.id, page: proposed)
+            if attached.filter({ $0.ladder == qualifier.ladder }).count > 1 {
+                return .duplicateModifierLadder
+            }
+        }
+        return nil
     }
 
-    static func connect(_ a: InstanceID, _ b: InstanceID, on page: Page) -> Page? {
-        guard canConnect(a, b, on: page) else { return nil }
+    static func canConnect(_ a: InstanceID, _ b: InstanceID, on page: Page,
+                           chainingUnlocked: Bool = false) -> Bool {
+        connectionIssue(a, b, on: page, chainingUnlocked: chainingUnlocked) == nil
+    }
+
+    static func connect(_ a: InstanceID, _ b: InstanceID, on page: Page,
+                        chainingUnlocked: Bool = false) -> Page? {
+        guard canConnect(a, b, on: page, chainingUnlocked: chainingUnlocked) else { return nil }
         var result = page
         result.links.insert(MarkLink(a, b))
         return result
@@ -432,7 +496,10 @@ extension PageRules {
     /// This is the readout. *Illumination ← great Sun* — the level at which *vast* versus *great*
     /// is visible.
     static func chains(on page: Page) -> [WrittenChain] {
-        clusters(on: page).compactMap { group in
+        let allSigils = clusterSigils(of: page)
+        let resolvedSigils = Dictionary(uniqueKeysWithValues: allSigils.map { ($0.id, $0) })
+        let totalGreed = BookRules.greedDelta(for: allSigils)
+        return clusters(on: page).compactMap { group -> WrittenChain? in
             guard let targetID = group.compactMap(\.targetID).first,
                   let target = ContentCatalog.shared.pressureTarget(targetID)
             else { return nil }
@@ -442,6 +509,22 @@ extension PageRules {
                       let source = ContentCatalog.shared.pressureSource(sourceID)
                 else { return nil }
                 let rungs = qualifiers(on: mark.id, page: page)
+                let effects: [WrittenChain.Effect] = resolvedSigils[mark.id].map { sigil in
+                    source.contributions.compactMap { contribution -> WrittenChain.Effect? in
+                        guard let affected = ContentCatalog.shared.pressureTarget(contribution.target) else {
+                            return nil
+                        }
+                        let amplitude = sigil.intensity.multiplier
+                            * PressureRules.scaleMultiplier(sigil, target: affected)
+                            * PressureRules.countMultiplier(sigil)
+                        return WrittenChain.Effect(targetID: affected.id,
+                                                   target: affected.name,
+                                                   peak: contribution.peak * amplitude,
+                                                   floor: contribution.floor * amplitude,
+                                                   hasFloor: affected.dualValued,
+                                                   isPrimary: contribution.target == targetID)
+                    }
+                } ?? []
                 return WrittenChain.Part(
                     source: source.name,
                     qualifiers: rungs.map { rung in
@@ -449,7 +532,10 @@ extension PageRules {
                                           isInert: !rung.ladder.changesAnything(for: targetID)
                                               || !rung.applies(to: targetID))
                     },
-                    negates: []
+                    negates: [], effects: effects,
+                    stabilityDelta: resolvedSigils[mark.id].map { sigil in
+                        totalGreed - BookRules.greedDelta(for: allSigils.filter { $0.id != sigil.id })
+                    } ?? 0
                 )
             }
             guard !parts.isEmpty else { return nil }
@@ -518,6 +604,50 @@ extension PageRules {
             .compactMap { id in page.runes.first { $0.id == id } }
             .compactMap(\.qualifierID)
             .compactMap { ContentCatalog.shared.qualifier($0) }
+            .sorted { ($0.ladder.rawValue, $0.step, $0.id.rawValue) <
+                ($1.ladder.rawValue, $1.step, $1.id.rawValue) }
+    }
+
+    /// Vocabulary offered for new writing. Dormant ladders remain in the catalogue so old saves
+    /// decode, but cannot create more inert statements.
+    static func writableQualifiers(for target: PressureTargetID? = nil) -> [QualifierDef] {
+        ContentCatalog.shared.qualifiers.filter { qualifier in
+            qualifier.ladder != .phase && target.map { qualifier.applies(to: $0) } != false
+        }
+    }
+
+    /// Diagnostics for tolerant legacy pages. Old saves are not rewritten merely because today's
+    /// editor would refuse their graph; they remain readable and say where they are ambiguous.
+    static func grammarWarnings(on page: Page, chainingUnlocked: Bool) -> [String] {
+        var warnings: Set<String> = []
+        for group in clusters(on: page) {
+            let targets = group.compactMap(\.targetID)
+            let focuses = group.filter { $0.sourceID != nil }
+            if targets.count > 1 { warnings.insert("A joined statement has more than one subject.") }
+            if focuses.count > 1 && !chainingUnlocked {
+                warnings.insert("A joined statement uses multiple focuses without Chaining.")
+            }
+            if let target = targets.sorted(by: { $0.rawValue < $1.rawValue }).first,
+               focuses.contains(where: { mark in
+                   mark.sourceID.flatMap(ContentCatalog.shared.pressureSource)?.canAttach(to: target) != true
+               }) {
+                warnings.insert("A focus is incompatible with its joined subject.")
+            }
+            for modifier in group.filter({ $0.qualifierID != nil }) {
+                let neighbours = page.links.compactMap { $0.other(than: modifier.id) }
+                    .compactMap { id in page.runes.first { $0.id == id } }
+                if neighbours.count != 1 || neighbours.first?.sourceID == nil {
+                    warnings.insert("A modifier is not attached directly to exactly one focus.")
+                }
+            }
+            for focus in focuses {
+                let rungs = qualifiers(on: focus.id, page: page)
+                if Dictionary(grouping: rungs, by: \.ladder).values.contains(where: { $0.count > 1 }) {
+                    warnings.insert("A focus has more than one rung from the same modifier ladder.")
+                }
+            }
+        }
+        return warnings.sorted()
     }
 
     // MARK: Moving and rotating a cluster
@@ -611,10 +741,31 @@ struct WrittenChain: Equatable, Identifiable, Sendable {
         var qualifiers: [Rung]
         /// Targets this source explicitly denies — "a sun that does not warm".
         var negates: [String]
+        var effects: [Effect] = []
+        /// This focus's marginal contribution to the page's greed term, in headline units.
+        var stabilityDelta: Int = 0
 
         /// *great Sun*, or *vast Sun* with the vast marked as saying nothing.
         var phrase: String {
             (qualifiers.map(\.name) + [source]).joined(separator: " ")
+        }
+    }
+
+    struct Effect: Equatable, Sendable {
+        var targetID: PressureTargetID
+        var target: String
+        var peak: Double
+        var floor: Double
+        var hasFloor: Bool
+        var isPrimary: Bool
+
+        var text: String {
+            hasFloor ? "\(Self.signed(peak)) / \(Self.signed(floor))" : Self.signed(peak)
+        }
+
+        private static func signed(_ value: Double) -> String {
+            let number = Int(value.rounded())
+            return number > 0 ? "+\(number)" : "\(number)"
         }
     }
 
@@ -625,4 +776,17 @@ struct WrittenChain: Equatable, Identifiable, Sendable {
     }
 
     var hasInertModifier: Bool { parts.contains { $0.qualifiers.contains { $0.isInert } } }
+
+    /// Keep the authored page link visible, but disclose numeric consequences only for subjects
+    /// the player has learned to measure in the field. In particular, an undiscovered secondary
+    /// must disappear completely rather than leaving an "unknown effect" breadcrumb.
+    func disclosingEffects(measured subjects: Set<PressureTargetID>) -> WrittenChain {
+        var disclosed = self
+        disclosed.parts = parts.map { part in
+            var part = part
+            part.effects = part.effects.filter { subjects.contains($0.targetID) }
+            return part
+        }
+        return disclosed
+    }
 }

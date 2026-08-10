@@ -9,7 +9,7 @@ import Foundation
 /// A material is a *kind* plus the properties it inherited from the animal it came off, so two
 /// plates are not interchangeable. That's the whole economy of this: what you can make depends on
 /// where you've been.
-enum MaterialKind: String, Codable, CaseIterable, Equatable, Sendable {
+enum MaterialKind: String, Codable, CaseIterable, Equatable, Hashable, Sendable {
     // From covering
     case plate, quill, pelt, down, hide, chitin
     // From armament

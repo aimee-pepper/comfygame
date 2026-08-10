@@ -62,9 +62,173 @@
       "order": 8,
       "station": "scriptorium",
       "freeRungs": 0
+    },
+    {
+      "id": "tannery_wear",
+      "name": "Wear",
+      "icon": "tshirt",
+      "blurb": "Fit flexible living material into useful protection.",
+      "order": 9,
+      "station": "tannery",
+      "freeRungs": 0
+    },
+    {
+      "id": "tannery_carry",
+      "name": "Carry",
+      "icon": "bag.fill",
+      "blurb": "Prepare fitted straps and expansions for a deeper field pack.",
+      "order": 10,
+      "station": "tannery",
+      "freeRungs": 0
+    },
+    {
+      "id": "tannery_keep",
+      "name": "Keep",
+      "icon": "archivebox.fill",
+      "blurb": "Line and bind storage so the room can safely hold more.",
+      "order": 11,
+      "station": "tannery",
+      "freeRungs": 0
+    },
+    {
+      "id": "bowyer_craft",
+      "name": "The Bowyer's Craft",
+      "icon": "arrow.up.right.circle",
+      "blurb": "Broaden the far-reaching forms Fen can fit, then learn to carry their best stock honestly.",
+      "order": 12,
+      "station": "bowyer",
+      "freeRungs": 0
+    },
+    {
+      "id": "armoury_craft",
+      "name": "Defensive Profiles",
+      "icon": "shield.lefthalf.filled",
+      "blurb": "Broaden Bracken's defensive choices, then retain the finest stock honestly.",
+      "order": 13,
+      "station": "armoury",
+      "freeRungs": 0
+    },
+    {
+      "id": "weaponsmith_craft",
+      "name": "Fitting and Leverage",
+      "icon": "hammer.fill",
+      "blurb": "Broaden Maud's close forms, then retain exceptional stock without changing what fitting means.",
+      "order": 14,
+      "station": "weaponsmith",
+      "freeRungs": 0
     }
   ],
   "nodes": [
+    {
+      "id": "tannery_wear_root",
+      "branch": "tannery_wear",
+      "name": "A fitted beginning",
+      "icon": "tshirt",
+      "blurb": "Corrin can fit a supple coat, working gloves and working boots from the exact stock you choose.",
+      "cost": { "essence": 12, "resources": { "fiber": 4 } },
+      "requires": [],
+      "grants": [{ "kind": "capability", "id": "tannery_wear" }]
+    },
+    {
+      "id": "bowyer_broaden",
+      "branch": "bowyer_craft",
+      "name": "Three answers at range",
+      "icon": "arrow.triangle.branch",
+      "blurb": "Add the sling and throwing set while keeping every result within Tier 3.",
+      "cost": { "essence": 55, "resources": { "timber": 12, "fiber": 8, "resin": 4 } },
+      "requires": [],
+      "grants": [{ "kind": "effect", "effect": "stationTier", "id": "bowyer", "tier": 1 }]
+    },
+    {
+      "id": "armoury_broaden",
+      "branch": "armoury_craft",
+      "name": "Protection by purpose",
+      "icon": "shield.checkered",
+      "blurb": "Add Insulated layer and Balanced laminate while keeping every result within Tier 3.",
+      "cost": { "essence": 60, "resources": { "ore": 12, "clay": 8, "copper": 4 } },
+      "requires": [],
+      "grants": [{ "kind": "effect", "effect": "stationTier", "id": "armoury", "tier": 1 }]
+    },
+    {
+      "id": "weaponsmith_point_root",
+      "branch": "weaponsmith_craft",
+      "name": "Fitted point",
+      "icon": "scope",
+      "blurb": "Fit a close piercing point around repeatable Finesse-led motion.",
+      "cost": { "essence": 0 },
+      "requires": [],
+      "grants": [{ "kind": "capability", "id": "weaponsmith_fitted_point" }]
+    },
+    {
+      "id": "weaponsmith_broaden",
+      "branch": "weaponsmith_craft",
+      "name": "Balance and consequence",
+      "icon": "arrow.triangle.branch",
+      "blurb": "Add fitted edge and maul forms while keeping results within Tier 3.",
+      "cost": { "essence": 75, "resources": { "ore": 16, "copper": 6, "gold": 2 } },
+      "requires": ["weaponsmith_point_root"],
+      "grants": [{ "kind": "effect", "effect": "stationTier", "id": "weaponsmith", "tier": 1 }]
+    },
+    {
+      "id": "weaponsmith_masterwork",
+      "branch": "weaponsmith_craft",
+      "name": "Masterwork leverage",
+      "icon": "hammer.fill",
+      "blurb": "Let exceptional selected stock retain its natural Tier 4 construction quality.",
+      "cost": { "essence": 150, "resources": { "ore": 28, "copper": 10, "gold": 4 } },
+      "requires": ["weaponsmith_broaden"],
+      "grants": [{ "kind": "effect", "effect": "stationTier", "id": "weaponsmith", "tier": 2 }]
+    },
+    {
+      "id": "armoury_masterwork",
+      "branch": "armoury_craft",
+      "name": "Masterwork protection",
+      "icon": "shield.fill",
+      "blurb": "Let exceptional selected stock retain its natural Tier 4 construction quality.",
+      "cost": { "essence": 120, "resources": { "ore": 22, "clay": 14, "copper": 8 } },
+      "requires": ["armoury_broaden"],
+      "grants": [{ "kind": "effect", "effect": "stationTier", "id": "armoury", "tier": 2 }]
+    },
+    {
+      "id": "bowyer_masterwork",
+      "branch": "bowyer_craft",
+      "name": "Masterwork draw",
+      "icon": "arrow.up.right.and.arrow.down.left",
+      "blurb": "Let exceptional selected stock retain its natural Tier 4 construction quality.",
+      "cost": { "essence": 110, "resources": { "timber": 20, "fiber": 14, "resin": 8 } },
+      "requires": ["bowyer_broaden"],
+      "grants": [{ "kind": "effect", "effect": "stationTier", "id": "bowyer", "tier": 2 }]
+    },
+    {
+      "id": "tannery_carry_root",
+      "branch": "tannery_carry",
+      "name": "Fitted expansion",
+      "icon": "bag.fill",
+      "blurb": "Corrin can prepare the bindings required by advanced satchel projects.",
+      "cost": { "essence": 18, "resources": { "fiber": 6 } },
+      "requires": [],
+      "grants": [{ "kind": "capability", "id": "tannery_carry" }]
+    },
+    {
+      "id": "tannery_wear_tier_two",
+      "branch": "tannery_wear",
+      "name": "Fitted layers",
+      "icon": "square.2.layers.3d",
+      "blurb": "Fit several qualities together closely enough for Tier 2 flexible construction.",
+      "cost": { "essence": 28, "resources": { "fiber": 10, "salt": 4 } },
+      "requires": ["tannery_wear_root"],
+      "grants": [{ "kind": "capability", "id": "tannery_tier_two" }]
+    },
+    {
+      "id": "tannery_keep_root",
+      "branch": "tannery_keep",
+      "name": "Lined storage",
+      "icon": "archivebox.fill",
+      "blurb": "Corrin can prepare the lining and bindings required by advanced Storehouse projects.",
+      "cost": { "essence": 18, "resources": { "fiber": 6 } },
+      "requires": [],
+      "grants": [{ "kind": "capability", "id": "tannery_keep" }]
+    },
     {
       "id": "reason_about_targets",
       "branch": "instruction",
@@ -660,7 +824,8 @@
         }
       },
       "requires": [
-        "shelving_three"
+        "shelving_three",
+        "tannery_keep_root"
       ],
       "grants": [
         {
@@ -798,7 +963,8 @@
         }
       },
       "requires": [
-        "satchel_two"
+        "satchel_two",
+        "tannery_carry_root"
       ],
       "grants": [
         {
@@ -1347,28 +1513,6 @@
         {
           "kind": "focus",
           "id": "orrery"
-        }
-      ]
-    },
-    {
-      "id": "study_drift",
-      "branch": "lexicon",
-      "name": "Drift",
-      "icon": "clock.badge.questionmark",
-      "blurb": "A world whose hours are not the same length. You can feel it before you can measure it.",
-      "cost": {
-        "essence": 34,
-        "resources": {
-          "fiber": 8
-        }
-      },
-      "requires": [
-        "study_the_pull"
-      ],
-      "grants": [
-        {
-          "kind": "focus",
-          "id": "drift"
         }
       ]
     },

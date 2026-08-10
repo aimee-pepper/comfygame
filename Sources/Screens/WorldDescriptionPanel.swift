@@ -40,6 +40,7 @@ struct WorldDescriptionPanel: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityLabel(description.sentence)
+                .accessibilityValue(stabilityAccessibilityValue)
 
             if !chains.isEmpty { written }
 
@@ -125,19 +126,43 @@ struct WorldDescriptionPanel: View {
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)
             ForEach(chains) { chain in
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(chain.target)
-                        .font(.caption.weight(.medium))
-                    Image(systemName: "arrow.left")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                    // An inert rung is struck through where it sits, so the mistake is visible in
-                    // the phrase rather than in a note underneath it.
-                    Text(phrase(for: chain))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Spacer(minLength: 0)
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(chain.target)
+                            .font(.caption.weight(.medium))
+                        Image(systemName: "arrow.left")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                        Text(phrase(for: chain))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 0)
+                    }
+                    if description.analysisTier >= Tuning.Analysis.sigilAttributionTier {
+                        ForEach(Array(chain.parts.enumerated()), id: \.offset) { _, part in
+                            if description.analysisTier >= Tuning.Analysis.attributionTier,
+                               part.stabilityDelta != 0 {
+                                HStack(spacing: 5) {
+                                    Image(systemName: part.stabilityDelta < 0
+                                          ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
+                                    Text("\(part.source): \(signed(part.stabilityDelta)) stability")
+                                }
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(part.stabilityDelta < 0 ? Color.red : Color.green)
+                            }
+                            ForEach(Array(part.effects.enumerated()), id: \.offset) { _, effect in
+                                HStack(spacing: 5) {
+                                    Image(systemName: effect.isPrimary ? "arrow.right" : "arrow.turn.down.right")
+                                    Text("\(part.source) → \(effect.target)")
+                                    Spacer(minLength: 4)
+                                    Text(effect.text).monospacedDigit()
+                                }
+                                .font(.caption2)
+                                .foregroundStyle(effect.isPrimary ? Color.secondary : Color.indigo)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -165,7 +190,9 @@ struct WorldDescriptionPanel: View {
         var result = AttributedString()
         for (index, clause) in description.clauses.enumerated() {
             var run = AttributedString(clause.text)
-            if description.showsAttribution, let colour = underline(for: clause.polarity) {
+            if description.showsAttribution,
+               let polarity = description.derivedPolarity[clause.group],
+               let colour = underline(for: polarity) {
                 run.underlineStyle = Text.LineStyle(pattern: .solid, color: colour)
             }
             if index > 0 { result += AttributedString(" ") }
@@ -174,7 +201,22 @@ struct WorldDescriptionPanel: View {
         return result
     }
 
-    /// Neutral clauses are left unmarked on purpose: underlining everything would say nothing.
+    private var stabilityAccessibilityValue: String {
+        guard description.showsAttribution else { return "" }
+        return description.clauses.compactMap { clause in
+            guard let polarity = description.derivedPolarity[clause.group] else { return nil }
+            switch polarity {
+            case .stabilising: return "\(clause.text), stabilising"
+            case .destabilising: return "\(clause.text), destabilising"
+            case .neutral: return nil
+            }
+        }.joined(separator: "; ")
+    }
+
+    private func signed(_ value: Int) -> String {
+        value > 0 ? "+\(value)" : "\(value)"
+    }
+
     private func underline(for polarity: DescriptionClauseDef.Polarity) -> Color? {
         switch polarity {
         case .destabilising: .red

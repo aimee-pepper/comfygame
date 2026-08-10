@@ -11,6 +11,7 @@ enum WorldRules {
     /// Things that happened during a turn, for the UI to narrate and for travel to interrupt on.
     enum Event: Equatable {
         case moved(to: GridPoint)
+        case enteredSlowGround(String)
         case blocked(String)
         case pickedUp(ResourceID, amount: Int)
         case harvested(ResourceID, amount: Int, exhausted: Bool)
@@ -19,16 +20,20 @@ enum WorldRules {
         case cacheOpened(String)
         case foundSite(SiteID)
         case readPage(DiaryPageID)
+        case readFoundWriting(FoundWritingID, String)
         case foundTraveller(TravellerID)
         /// You've walked up to somebody. The scene, not the recruitment.
         case metTraveller(TravellerID)
         /// Something used out in the world rather than mid-fight.
         case usedItem(String, on: PartyMember)
+        case surveyed([SurveyReading])
         case searchedSite(SiteID, turnsRemaining: Int)
         case siteOpened(SiteID)
         case learnedSymbol(SymbolID)
         /// A word for the page, carved somewhere out there.
         case learnedFocus(PressureSourceID)
+        case learnedGambit(GambitComponentID)
+        case learnedPattern(String)
         case gainedEssence(Int)
         case pickedUpItem(String)
         case satchelFull(String)
@@ -57,19 +62,26 @@ enum WorldRules {
         /// hazard, or a world starting to fall apart is exactly what the interrupt is for.
         var interruptsTravel: Bool {
             switch self {
-            case .moved, .pickedUp, .harvested, .tilesCrumbled: false
+            case .moved, .enteredSlowGround, .pickedUp, .harvested, .tilesCrumbled: false
             default: true
             }
         }
+    }
+
+    struct SurveyReading: Equatable, Sendable {
+        var target: PressureTargetID
+        var name: String
+        var text: String
     }
 
     // MARK: - Vision
 
     /// How far the player can see. Dim Sky trades visibility for a longer-lived world — the paired
     /// tradeoff pattern from the decisions log, and the reason `visionDelta` exists on symbols.
-    static func visionRadius(for book: BoundBook) -> Int {
+    static func visionRadius(for book: BoundBook,
+                             base: Int = Tuning.World.baseVisionRadius) -> Int {
         let delta = book.allSymbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.visionDelta ?? 0) }
-        return max(Tuning.World.minimumVisionRadius, Tuning.World.baseVisionRadius + delta)
+        return max(Tuning.World.minimumVisionRadius, base + delta)
     }
 
     /// Sight, after the dark has taken its share. **Darkness cuts sight** (session 13 §6) — which is
@@ -82,7 +94,8 @@ enum WorldRules {
     }
 
     static func visionRadius(in run: WorldRun, party: Int = 0) -> Int {
-        let base = visionRadius(for: run.book) + party
+        let base = visionRadius(for: run.book, base: run.tuning.baseVisionRadius)
+            + party + run.torchVisionBonus
         guard run.isNight else { return base }
         return max(Tuning.World.minimumVisionRadius, base - Tuning.DayNight.sightLostAtNight)
     }
@@ -131,48 +144,56 @@ enum WorldRules {
         a.manhattanDistance(to: b) == 1
     }
 
-    /// Breadth-first path, returning the steps *after* the start. Empty if unreachable.
+    /// Lowest-turn path, returning the steps *after* the start. Empty if unreachable.
     ///
     /// Prefers routes that avoid known hazards, but will walk through one rather than claim there's
     /// no way — being told "no path" when a path exists is worse than taking the damage.
-    static func path(from start: GridPoint, to destination: GridPoint, in map: WorldMap) -> [GridPoint] {
-        let safe = search(from: start, to: destination, in: map, avoidingHazards: true)
-        return safe.isEmpty ? search(from: start, to: destination, in: map, avoidingHazards: false) : safe
+    static func path(from start: GridPoint, to destination: GridPoint, in map: WorldMap,
+                     slowGroundExtraTurns: Int = 1) -> [GridPoint] {
+        let safe = search(from: start, to: destination, in: map, avoidingHazards: true,
+                          slowGroundExtraTurns: slowGroundExtraTurns)
+        return safe.isEmpty ? search(from: start, to: destination, in: map, avoidingHazards: false,
+                                     slowGroundExtraTurns: slowGroundExtraTurns) : safe
     }
 
     private static func search(from start: GridPoint,
                                to destination: GridPoint,
                                in map: WorldMap,
-                               avoidingHazards: Bool) -> [GridPoint] {
+                               avoidingHazards: Bool,
+                               slowGroundExtraTurns: Int) -> [GridPoint] {
         guard start != destination, canEnter(destination, in: map) else { return [] }
 
         var cameFrom: [GridPoint: GridPoint] = [:]
-        var visited: Set<GridPoint> = [start]
-        var queue = [start]
-        var head = 0
+        var cost: [GridPoint: Int] = [start: 0]
+        var frontier: Set<GridPoint> = [start]
 
-        while head < queue.count {
-            let current = queue[head]
-            head += 1
-            for next in map.neighbours(of: current) where !visited.contains(next) {
+        while let current = frontier.min(by: {
+            let left = cost[$0, default: .max]
+            let right = cost[$1, default: .max]
+            return left == right ? ($0.y, $0.x) < ($1.y, $1.x) : left < right
+        }) {
+            frontier.remove(current)
+            for next in map.neighbours(of: current) {
                 guard canEnter(next, in: map) else { continue }
                 // The destination is always enterable even if it's the hazard you're aiming at.
                 if avoidingHazards, next != destination, map[next].content == .hazard { continue }
-                visited.insert(next)
-                cameFrom[next] = current
-                if next == destination {
-                    var path = [next]
-                    var step = next
-                    while let previous = cameFrom[step], previous != start {
-                        path.append(previous)
-                        step = previous
-                    }
-                    return path.reversed()
+                let candidate = cost[current, default: .max]
+                    + movementCost(map[next].ground, slowGroundExtraTurns: slowGroundExtraTurns)
+                if candidate < cost[next, default: .max] {
+                    cost[next] = candidate
+                    cameFrom[next] = current
+                    frontier.insert(next)
                 }
-                queue.append(next)
             }
         }
-        return []
+        guard cost[destination] != nil else { return [] }
+        var path = [destination]
+        var step = destination
+        while let previous = cameFrom[step], previous != start {
+            path.append(previous)
+            step = previous
+        }
+        return path.reversed()
     }
 
     // MARK: - The turn
@@ -188,7 +209,10 @@ enum WorldRules {
             return [.blocked("Crumbled away — nothing to stand on.")]
         }
 
+        let movementCost = movementCost(run.map[destination].ground,
+                                        slowGroundExtraTurns: run.tuning.slowGroundExtraTurns)
         var events: [Event] = [.moved(to: destination)]
+        if movementCost > 1 { events.append(.enteredSlowGround(run.map[destination].ground.displayName)) }
         run.previousPosition = run.playerPosition
         run.playerPosition = destination
         reveal(around: destination, in: &run.map,
@@ -221,6 +245,15 @@ enum WorldRules {
             awardDiscovery(.page, in: &state)
             run = state.worlds.activeRun ?? run
             run.map[destination].content = .empty
+        case .foundWriting(let id):
+            if let writing = run.foundWritings.first(where: { $0.id == id }),
+               !state.reality.library.foundWritings.contains(where: { $0.id == id }) {
+                state.reality.library.foundWritings.append(writing)
+                events.append(.readFoundWriting(id, writing.prose))
+                awardDiscovery(.page, in: &state)
+                run = state.worlds.activeRun ?? run
+            }
+            run.map[destination].content = .empty
         case .site(let instance):
             if let site = run.sites.first(where: { $0.id == instance }) {
                 events.append(.foundSite(site.siteID))
@@ -237,7 +270,16 @@ enum WorldRules {
         }
 
         state.worlds.activeRun = run
-        events.append(contentsOf: advanceTurn(in: &state))
+        for _ in 0..<movementCost {
+            let turn = advanceTurn(in: &state)
+            events.append(contentsOf: turn)
+            if turn.contains(where: { event in
+                if case .floorGaveWay = event { return true }
+                if case .ejected = event { return true }
+                if case .encounterBegan = event { return true }
+                return false
+            }) { break }
+        }
         return events
     }
 
@@ -250,7 +292,8 @@ enum WorldRules {
     /// `WorldEnemy` standing on the tile rather than a property of the tile.
     static func walkInto(_ point: GridPoint, in run: inout WorldRun) -> [Event] {
         guard let plant = run.plant(at: point) else { return [] }
-        let harm = FloraRules.harm(of: plant.traits)
+        let harm = FloraRules.harm(of: plant.traits,
+                                   severity: run.tuning.floraHazardSeverityMultiplier)
         guard harm.isSomething else { return [] }
 
         run.binderHP = max(0, run.binderHP - harm.immediate)
@@ -259,6 +302,10 @@ enum WorldRules {
         if harm.lingering > 0 { run.floraPoisonTurns = max(run.floraPoisonTurns, harm.lingering) }
         let name = run.floraNames[plant.id]?.name ?? plant.displayName
         return [.scratchedByGrowth(name, damage: harm.immediate, lingers: harm.lingering > 0)]
+    }
+
+    static func movementCost(_ ground: GroundType, slowGroundExtraTurns: Int) -> Int {
+        ground.movementCost > 1 ? 1 + max(0, slowGroundExtraTurns) : 1
     }
 
     /// **Finding pays as well as fighting** (session 17 §2). A game whose progression is literacy
@@ -320,13 +367,41 @@ enum WorldRules {
               item.kind == .consumable
         else { return [.blocked("Nothing to use.")] }
 
-        let healed = Tuning.Encounter.consumableHealAmount
-        switch member {
-        case .binder:
-            run.binderHP = min(CombatRules.maximumHealth(of: .binder, in: state), run.binderHP + healed)
-        case .member(let index):
-            let ceiling = CombatRules.maximumHealth(of: .companion(index), in: state)
-            run.companionHP[index] = min(ceiling, (run.companionHP[index] ?? ceiling) + healed)
+        guard let effect = item.consumable else { return [.blocked("That has no field use.")] }
+        switch effect.effect {
+        case .heal:
+            let healed = effect.potency
+            switch member {
+            case .binder:
+                run.binderHP = min(CombatRules.maximumHealth(of: .binder, in: state), run.binderHP + healed)
+            case .member(let index):
+                let ceiling = CombatRules.maximumHealth(of: .companion(index), in: state)
+                run.companionHP[index] = min(ceiling, (run.companionHP[index] ?? ceiling) + healed)
+            }
+        case .restoreStability:
+            run.stability = min(Tuning.World.startingStability,
+                                run.stability + Double(effect.potency))
+        case .lightWorld:
+            run.torchVisionBonus = max(run.torchVisionBonus, effect.potency)
+            reveal(around: run.playerPosition, in: &run.map,
+                   radius: visionRadius(in: run, party: sightBonus(in: state)))
+        case .farsight:
+            let destination = run.sites
+                .filter { !run.map[$0.position].isRevealed }
+                .min { $0.position.manhattanDistance(to: run.playerPosition)
+                    < $1.position.manhattanDistance(to: run.playerPosition) }?.position
+                ?? run.playerPosition
+            reveal(around: destination, in: &run.map, radius: max(1, effect.potency))
+        case .lureCreature:
+            guard let nearest = run.enemies.indices
+                .filter({ !run.enemies[$0].isSessile && !run.enemies[$0].isApex })
+                .min(by: { run.enemies[$0].position.manhattanDistance(to: run.playerPosition)
+                    < run.enemies[$1].position.manhattanDistance(to: run.playerPosition) })
+            else { return [.blocked("Nothing roaming answers the lure.")] }
+            run.enemies[nearest].isAwake = true
+        case .returnHome, .clearPoison, .clearElemental, .clearAnyStatus, .preventStatus,
+             .coatPoison, .coatBurn, .coatBleed, .coatDazzle, .identifyCurio:
+            return [.blocked("Use that at the appropriate moment.")]
         }
         _ = run.satchelItems.stacks[index].removing(1)
         if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
@@ -344,15 +419,52 @@ enum WorldRules {
         else { return [.blocked("Nothing here to harvest.")] }
 
         node.remainingHarvests -= 1
-        run.satchel.add(node.yieldPerHarvest, of: node.resource)
+        let fieldcraftBonus = state.base.station(Stations.wayfarersTable).isUnlocked
+            && FloraRules.isFloraResource(node.resource)
+            ? Tuning.Economy.fieldcraftOrganicYieldBonus : 0
+        let harvested = node.yieldPerHarvest + fieldcraftBonus
+        run.satchel.add(harvested, of: node.resource)
         state.reality.discovery.recordResource(node.resource, runIndex: run.runIndex)
         run.map[run.playerPosition].content = node.isExhausted ? .empty : .node(node)
 
-        var events: [Event] = [.harvested(node.resource, amount: node.yieldPerHarvest, exhausted: node.isExhausted)]
+        var events: [Event] = [.harvested(node.resource, amount: harvested, exhausted: node.isExhausted)]
         state.worlds.activeRun = run
         events.append(contentsOf: advanceTurn(in: &state))
         return events
     }
+
+    /// Use every instrument in the field kit at once. The readings become permanent knowledge and
+    /// the world advances exactly once, however many subjects were measured.
+    static func survey(in state: inout GameState) -> [Event] {
+        guard let run = state.worlds.activeRun, run.activeEncounter == nil else {
+            return [.blocked("You can't survey now.")]
+        }
+        let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
+        var report: [SurveyReading] = []
+        for target in ContentCatalog.shared.pressureTargetsInOrder
+        where run.carriedInstruments.contains(target.id) {
+            let value = readings[target.id]
+            let precision = run.carriedInstrumentPrecisions[target.id] ?? .crude
+            if var known = state.reality.observations[target.id] {
+                known.add(peak: value.peak, floor: value.floor, precision: precision)
+                state.reality.observations[target.id] = known
+            } else {
+                state.reality.observations[target.id] = .init(count: 1, lowest: value.floor,
+                                                               highest: value.peak,
+                                                               bestPrecision: precision)
+            }
+            report.append(SurveyReading(
+                target: target.id, name: target.name,
+                text: WorldDescription.Reading.text(peak: value.peak, floor: value.floor,
+                                                    hasFloor: target.dualValued,
+                                                    precision: precision)))
+        }
+        guard !report.isEmpty else { return [.blocked("You brought no field instruments.")] }
+        var events: [Event] = [.surveyed(report)]
+        events.append(contentsOf: advanceTurn(in: &state))
+        return events
+    }
+
 
     /// Take a page into the Library and apply the single thing it unlocks.
     ///
@@ -364,6 +476,9 @@ enum WorldRules {
         }
         state.reality.library.foundPages.append(id)
         state.reality.library.pagesWaiting[id] = nil
+        if state.reality.library.patiencePage == id {
+            state.reality.library.patiencePage = nil
+        }
         var events: [Event] = [.readPage(id)]
 
         switch page.kind {
@@ -377,7 +492,24 @@ enum WorldRules {
                 state.base.ownedSymbols.insert(symbol)
                 events.append(.learnedSymbol(symbol))
             }
-        case .researchLead, .ruin, .worldWorthWriting:
+        case .focus:
+            if let focus = page.teachesFocus, !state.base.ownedSources.contains(focus) {
+                state.base.ownedSources.insert(focus)
+                events.append(.learnedFocus(focus))
+            }
+        case .gambit:
+            if let component = page.teachesGambit,
+               !state.base.ownedGambitComponents.contains(component) {
+                state.base.ownedGambitComponents.insert(component)
+                events.append(.learnedGambit(component))
+            }
+        case .pattern:
+            if let pattern = page.teachesPattern,
+               !state.reality.library.knownPatterns.contains(pattern) {
+                state.reality.library.knownPatterns.insert(pattern)
+                events.append(.learnedPattern(pattern))
+            }
+        case .researchLead, .ruin, .worldWorthWriting, .account, .turn:
             // Recorded in the Library; the systems that read it come later.
             break
         }
@@ -411,9 +543,11 @@ enum WorldRules {
             events.append(.siteOpened(site.siteID))
             if let definition = site.definition {
                 for (resource, amount) in definition.contents.yields.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
-                    run.satchel.add(amount, of: resource)
+                    let interpreted = amount + (state.base.station(Stations.reliquary).isUnlocked
+                                                ? Tuning.Economy.reliquarySiteYieldBonus : 0)
+                    run.satchel.add(interpreted, of: resource)
                     state.reality.discovery.recordResource(resource, runIndex: run.runIndex)
-                    events.append(.pickedUp(resource, amount: amount))
+                    events.append(.pickedUp(resource, amount: interpreted))
                 }
                 // Items go into the satchel like any other haul, so a site's gear is something
                 // you still have to carry home — and can still lose to a collapse.
@@ -546,7 +680,15 @@ enum WorldRules {
         } else if state.worlds.activeRun?.binderHP ?? 1 <= 0 {
             // No death state in v0 — running out of health ejects you home with a partial haul,
             // the same as being caught in a collapse.
-            events.append(.ejected(reason: "You can't go on."))
+            let reason: String
+            if events.contains(where: { if case .poisonWorking = $0 { true } else { false } }) {
+                reason = "Poison overcame you. You were carried home."
+            } else if events.contains(where: { if case .hazardHit = $0 { true } else { false } }) {
+                reason = "The world's toxic air overwhelmed you. You were carried home."
+            } else {
+                reason = "Your injuries overwhelmed you. You were carried home."
+            }
+            events.append(.ejected(reason: reason))
         }
         return events
     }
@@ -569,18 +711,17 @@ enum WorldRules {
     private static func crumble(in run: inout WorldRun) -> (crumbled: Int, lost: Int) {
         var crumbled = 0
         var lost = 0
-        for _ in 0..<crumbleRate(in: run) {
-            // **The player's own tile is fair game.** It used to be protected, which meant the only
-            // way a run could end was a number reaching zero while the ground was still there.
-            // Crumbling from the outside in already gives you somewhere to stand and time to use
-            // it; being caught is a consequence of where you chose to be.
-            var surviving = run.map.allPoints.filter { !run.map[$0].isCrumbled }
+        let rate = crumbleRate(in: run)
+        let warnedAtStart = Set(run.map.allPoints.filter { run.map[$0].isCracking })
+        var selected: Set<GridPoint> = []
+
+        func pickTarget(from eligible: [GridPoint]) -> GridPoint? {
+            var surviving = eligible.filter { !run.map[$0].isCrumbled && !selected.contains($0) }
             // **Portals go last.** They're the way out, and a collapse that eats them first turns
             // "get to a portal in time" into "wait to be thrown out", which is no decision at all.
             let withoutPortals = surviving.filter { !run.map[$0].content.isPortal }
             if !withoutPortals.isEmpty { surviving = withoutPortals }
-
-            guard let outermost = surviving.map({ run.map.ring(of: $0) }).min() else { break }
+            guard let outermost = surviving.map({ run.map.ring(of: $0) }).min() else { return nil }
             // Random *within* the ring, off the run's own RNG. Ring order alone would eat the map
             // left-to-right like a progress bar; scattering it feels like the edges closing in,
             // and staying on the seeded stream keeps a force-quit mid-collapse reproducible.
@@ -597,25 +738,50 @@ enum WorldRules {
             // tile.** By then every surviving tile is on the last corridor between them and the way
             // out, so anything else would sever it and leave them standing on an island waiting to
             // be thrown out. Being caught is the ending; being stranded is a bug wearing its coat.
-            let safe = candidates.filter { !wouldMaroonPlayer(byCrumbling: $0, in: run) }
-            let target: GridPoint
-            if let pick = run.rng.pick(safe) {
-                target = pick
-            } else if surviving.contains(run.playerPosition) {
-                target = run.playerPosition
-            } else if let pick = run.rng.pick(candidates) {
-                target = pick
-            } else {
-                break
+            let safe = candidates.filter { candidate in
+                var projected = run
+                // During the warning phase, several cracks are chosen in one turn. Judge each
+                // against the whole wave already selected, or individually-safe cracks can form
+                // a collectively impassable wall when they fall together next turn.
+                for point in selected { projected.map[point].isCrumbled = true }
+                return !wouldMaroonPlayer(byCrumbling: candidate, in: projected)
             }
+            if let pick = run.rng.pick(safe) {
+                return pick
+            }
+            if eligible.contains(run.playerPosition), !selected.contains(run.playerPosition) {
+                return run.playerPosition
+            }
+            return run.rng.pick(candidates)
+        }
 
+        // Pipeline phase one: previously warned tiles give way at the original crumble rate.
+        // A tile opened below is not in `warnedAtStart`, so acceleration can never warn and remove
+        // it in the same player turn.
+        for _ in 0..<rate {
+            let eligible = run.map.allPoints.filter { warnedAtStart.contains($0) }
+            guard let target = pickTarget(from: eligible) else { break }
+            selected.insert(target)
             if run.map[target].content.isLoseable { lost += 1 }
             run.map[target].isCrumbled = true
+            run.map[target].isCracking = false
             run.map[target].content = .empty
             crumbled += 1
 
             // Anything standing there goes with it.
             run.enemies.removeAll { $0.position == target }
+        }
+
+        // Pipeline phase two: open the next wave of cracks. Once primed, collapse keeps its
+        // original tiles-per-turn pace while every individual tile still gets a full warning.
+        selected.removeAll()
+        for _ in 0..<rate {
+            let eligible = run.map.allPoints.filter {
+                !run.map[$0].isCrumbled && !run.map[$0].isCracking
+            }
+            guard let target = pickTarget(from: eligible) else { break }
+            selected.insert(target)
+            run.map[target].isCracking = true
         }
         return (crumbled, lost)
     }
@@ -789,6 +955,7 @@ enum WorldRules {
             greed: Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book))))
 
         var foes: [FoeState] = []
+        var initiallyUnrecordedSpecies: Set<String> = []
         for member in group {
             // Stats are resolved here, once, and saved with the foe — not looked up mid-fight.
             // **Derived from the trait vector**, so how it fights is what it is.
@@ -830,6 +997,7 @@ enum WorldRules {
             // advance as surely as a fighter, and meeting something new is the explorer's version
             // of a win.
             let isNewSpecies = state.reality.discovery.species[member.identityKey] == nil
+            if isNewSpecies { initiallyUnrecordedSpecies.insert(member.identityKey) }
             state.reality.discovery.recordSpecies(member.identityKey, runIndex: run.runIndex)
             if isNewSpecies { awardDiscovery(.species, in: &state) }
             if let traits = member.traits {
@@ -850,6 +1018,7 @@ enum WorldRules {
                                                             guard state.base.roster.indices.contains($1) else { return }
                                                             $0[$1] = state.base.roster[$1].name
                                                         },
+                                                        initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
                                                         rng: &run.rng)
         state.worlds.activeRun = run
 

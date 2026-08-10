@@ -91,6 +91,12 @@ struct DiaryPageID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+/// One persisted piece of anonymous world writing, distinct from every traveller diary.
+struct FoundWritingID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 /// A named entry in the contradiction catalogue. Contradiction is authored, never computed.
 struct ContradictionID: StringIdentifier {
     var rawValue: String

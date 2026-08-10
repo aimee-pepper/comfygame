@@ -44,11 +44,12 @@ final class ChasmTests: XCTestCase {
         }
     }
 
-    func testAnOrdinaryWorldHasNoHolesInIt() {
+    func testWritingOrdinaryGroundDoesNotMakeHoles() {
+        let ordinaryGround = BoundBook(written: [], composition: [
+            Sigil(id: InstanceID(rawValue: 1), source: "granite", target: "substrate")
+        ], essencePaid: 0)
         for seed in seeds(8) {
-            let world = Worldgen.generate(book: BoundBook(symbols: ["terrain": "plains"],
-                                                          randomlyFilled: [], essencePaid: 0),
-                                          seed: seed)
+            let world = Worldgen.generate(book: ordinaryGround, seed: seed)
             XCTAssertEqual(world.map.tiles.count { $0.ground == .chasm }, 0)
         }
     }

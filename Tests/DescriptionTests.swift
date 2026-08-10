@@ -156,6 +156,20 @@ final class DescriptionTests: XCTestCase {
         XCTAssertFalse(description.sentence.contains("does not warm"))
     }
 
+    func testTierFourPolarityComesFromPageArithmeticNotAuthoredProse() {
+        let greedy = [Sigil(id: InstanceID(rawValue: 1), source: "gold", target: "substrate",
+                            intensity: .overwhelming)]
+        let description = DescriptionRules.describe(page: greedy,
+                                                     analysisTier: Tuning.Analysis.attributionTier)
+        XCTAssertEqual(description.derivedPolarity["substrate"], .destabilising)
+
+        let calm = [Sigil(id: InstanceID(rawValue: 2), source: "void", target: "illumination",
+                          intensity: .overwhelming)]
+        let calmDescription = DescriptionRules.describe(page: calm,
+                                                         analysisTier: Tuning.Analysis.attributionTier)
+        XCTAssertEqual(calmDescription.derivedPolarity["illumination"], .stabilising)
+    }
+
     /// The half that must work from the very first book: description is what a clue gets matched
     /// against, so it can't be gated behind anything.
     func testDescriptionItselfNeverDependsOnTheAnalysisTier() {

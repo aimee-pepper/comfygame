@@ -99,6 +99,78 @@
       "buildBlurb": "Halloway will raise a forge here, if you can find the stone and the iron for it."
     },
     {
+      "id": "tannery",
+      "name": "The Tannery",
+      "icon": "scissors",
+      "blurb": "Fit flexible living material into protection and carrying work.",
+      "sortOrder": 8,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "tannery",
+      "builtBy": "corrin",
+      "buildCost": {
+        "essence": 80,
+        "resources": {
+          "timber": 12,
+          "fiber": 20,
+          "salt": 8
+        }
+      },
+      "buildBlurb": "Corrin needs beams, fibre and salt enough to prepare a clean working room."
+    },
+    {
+      "id": "bowyer",
+      "name": "The Bowyer",
+      "icon": "arrow.up.right.circle",
+      "blurb": "Fit far-reaching physical weapons without an ammunition inventory.",
+      "sortOrder": 9,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 2,
+      "route": "bowyer",
+      "builtBy": "fen",
+      "buildCost": {
+        "essence": 110,
+        "resources": { "timber": 24, "fiber": 18, "resin": 8 }
+      },
+      "buildBlurb": "Fen needs straight stock, patient fibres and enough resin to make every draw hold."
+    },
+    {
+      "id": "armoury",
+      "name": "The Armoury",
+      "icon": "shield.lefthalf.filled",
+      "blurb": "Rebuild one familiar protective piece around a deliberate defensive profile.",
+      "sortOrder": 10,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 2,
+      "route": "armoury",
+      "builtBy": "bracken",
+      "buildCost": {
+        "essence": 120,
+        "resources": { "ore": 28, "clay": 12, "copper": 8 }
+      },
+      "buildBlurb": "Bracken needs iron, clay and copper enough to rebuild protection without pretending its old shape was sacred."
+    },
+    {
+      "id": "weaponsmith",
+      "name": "The Weaponsmith",
+      "icon": "hammer.fill",
+      "blurb": "Fit advanced physical weapons to repeatable motion, reach and consequence.",
+      "sortOrder": 11,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 2,
+      "route": "weaponsmith",
+      "builtBy": "maud",
+      "buildCost": {
+        "essence": 150,
+        "resources": { "ore": 32, "copper": 12, "gold": 4 }
+      },
+      "buildBlurb": "Maud needs enough iron and copper to test the alteration, and a little gold for the measures that must not drift."
+    },
+    {
       "id": "scriptorium",
       "name": "The Scriptorium",
       "icon": "pencil.and.outline",
@@ -160,6 +232,102 @@
         }
       },
       "buildBlurb": "Mara wants somewhere flat, out of the wind, with a clear line to the horizon. She has been carrying the lenses this whole time."
+    },
+    {
+      "id": "apothecary",
+      "name": "The Apothecary",
+      "icon": "cross.vial.fill",
+      "blurb": "Remedies and preparations made from what the worlds grew.",
+      "sortOrder": 10,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "apothecary"
+    },
+    {
+      "id": "reliquary",
+      "name": "The Reliquary",
+      "icon": "building.columns.fill",
+      "blurb": "Edren's record of where people once stood, and what they left behind.",
+      "sortOrder": 11,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "reliquary",
+      "builtBy": "edren",
+      "buildCost": {
+        "essence": 45,
+        "resources": { "ore": 12, "clay": 8 }
+      },
+      "buildBlurb": "Edren needs shelves for fragments, broad tables for plans, and somewhere every recovered thing can keep its place."
+    },
+    {
+      "id": "wayfarers_table",
+      "name": "The Wayfarer's Table",
+      "icon": "map.fill",
+      "blurb": "Routes, provisions and field notes arranged for whoever is leaving next.",
+      "sortOrder": 12,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "wayfarersTable",
+      "builtBy": "sela",
+      "buildCost": {
+        "essence": 70,
+        "resources": { "timber": 14, "fiber": 12, "pulp": 6 }
+      },
+      "buildBlurb": "Sela wants one table for maps and packing lists—not a counter, and not somewhere she is expected to stay."
+    },
+    {
+      "id": "distillery",
+      "name": "The Distillery",
+      "icon": "flask.fill",
+      "blurb": "Crystallise essence and attune it through world-made samples.",
+      "sortOrder": 14,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "distillery",
+      "builtBy": "auber",
+      "buildCost": {
+        "essence": 200,
+        "resources": { "quartz": 30, "silver": 20, "clay": 30 }
+      },
+      "buildBlurb": "Auber needs vessels that make every fraction visible, and shelves where no residue is mistaken for nothing."
+    },
+    {
+      "id": "channelworks",
+      "name": "The Channelworks",
+      "icon": "point.3.connected.trianglepath.dotted",
+      "blurb": "Oda gives concentrated emanations a route and a boundary.",
+      "sortOrder": 15,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "channelworks",
+      "builtBy": "oda",
+      "buildCost": {
+        "essence": 200,
+        "resources": { "ore": 50, "quartz": 20, "silver": 20 }
+      },
+      "buildBlurb": "Oda needs a bench where a live core can be contained before it is given reach."
+    },
+    {
+      "id": "anchorage",
+      "name": "The Anchorage",
+      "icon": "point.3.connected.trianglepath.dotted",
+      "blurb": "Worlds rebound into the Atlas, kept where they can be reached again.",
+      "sortOrder": 13,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 1,
+      "route": "anchorage",
+      "builtBy": "tovin",
+      "buildCost": {
+        "essence": 200,
+        "resources": { "ore": 40, "quartz": 20, "pulp": 18 }
+      },
+      "buildBlurb": "Tovin needs a quiet room for the Atlas and a frame stout enough to hold open a way that should have closed."
     }
   ]
 }

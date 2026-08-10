@@ -80,8 +80,8 @@ final class VocabularyTests: XCTestCase {
 
     // MARK: Everything else is gettable
 
-    /// **A word you can never learn is worse than a word you were given.** Every focus has to have
-    /// a route: it's a starter, the Workshop sells it, a site teaches it, or a cache can hold it.
+    /// Every shipped focus has an explicit route. Diary-exclusive focuses may deliberately arrive
+    /// before their later owner packet, but a random cache must never pre-empt that authored reward.
     func testEveryFocusCanBeLearned() {
         let taughtByResearch = Set(ContentCatalog.shared.researchNodes
             .flatMap(\.grants)
@@ -89,6 +89,7 @@ final class VocabularyTests: XCTestCase {
             .compactMap { $0.id }
             .map { PressureSourceID(rawValue: $0) })
         let taughtBySites = Set(ContentCatalog.shared.sites.flatMap { $0.contents.teachesFocuses })
+        let taughtByDiaries = Set(ContentCatalog.shared.diaryPages.compactMap(\.teachesFocus))
 
         for source in ContentCatalog.shared.pressureSources {
             switch source.acquisition {
@@ -100,6 +101,10 @@ final class VocabularyTests: XCTestCase {
             case .worldDrop:
                 XCTAssertTrue(taughtBySites.contains(source.id) || canComeFromACache(source.id),
                               "\(source.id.rawValue) is found out there by nothing")
+            case .diary:
+                if taughtByDiaries.contains(source.id) { continue }
+                XCTAssertFalse(canComeFromACache(source.id),
+                               "\(source.id.rawValue) escaped its deferred diary route through a cache")
             }
         }
     }

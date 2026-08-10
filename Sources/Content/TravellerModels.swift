@@ -10,12 +10,27 @@ import Foundation
 /// So search difficulty scales off the writing system, and finding someone is always the same act —
 /// write the world they are in.
 struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
+    enum CampaignPhase: String, Codable, CaseIterable, Sendable {
+        case opening
+        case earlyMid = "early-mid"
+        case startOfMid
+        case mid
+        case midLate = "mid-late"
+        case late
+        case endgame
+    }
+
     var id: TravellerID
     var name: String
     /// Who they were. Leans what their diary tends to contain.
     var calling: String
     var blurb: String
     var icon: String
+    /// Stable campaign sequencing. JSON array order is an authoring convenience, never progression.
+    var authoredOrder: Int?
+    var campaignPhase: CampaignPhase?
+    /// Visible fit for maintaining an anchored realm, 0–3. Everyone may still do the work.
+    var worldwork: Int = 1
     /// Where they are. **Every condition must hold** for the world to be the one they're in.
     ///
     /// Complexity *is* difficulty: one condition means one page says it all, six means assembling
@@ -77,6 +92,9 @@ struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
         calling = try c.decodeIfPresent(String.self, forKey: .calling) ?? ""
         blurb = try c.decodeIfPresent(String.self, forKey: .blurb) ?? ""
         icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "figure.stand"
+        authoredOrder = try c.decodeIfPresent(Int.self, forKey: .authoredOrder)
+        campaignPhase = try c.decodeIfPresent(CampaignPhase.self, forKey: .campaignPhase)
+        worldwork = min(3, max(0, try c.decodeIfPresent(Int.self, forKey: .worldwork) ?? 1))
         signature = try c.decodeIfPresent([SignatureClue].self, forKey: .signature) ?? []
         leansToward = try c.decodeIfPresent([DiaryPageDef.Kind].self, forKey: .leansToward) ?? []
         lean = try c.decodeIfPresent([CombatBranchID: Int].self, forKey: .lean) ?? [:]
@@ -161,6 +179,12 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
     var clueIndex: Int?
     /// `symbol`: taught outright.
     var teaches: SymbolID?
+    /// `focus`: a word for the pressure grammar, taught outright.
+    var teachesFocus: PressureSourceID?
+    /// `gambit`: one phrase in the combat rule grammar, taught outright.
+    var teachesGambit: GambitComponentID?
+    /// A complete, singular authored workshop pattern. This is not research progress.
+    var teachesPattern: String?
     /// `researchLead`: partial progress toward a node, never the finished thing.
     var researchNode: ResearchNodeID?
     /// `ruin`: a site whose existence this page reveals.
@@ -177,10 +201,20 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
         case whereabouts
         /// A specific world worth writing.
         case worldWorthWriting
+        /// A personal account with no mechanical unlock.
+        case account
+        /// An authored change of mind or interpretive turn, with no mechanical unlock.
+        case turn
         /// A ruin's existence.
         case ruin
         /// A symbol, taught outright.
         case symbol
+        /// A focus, taught outright.
+        case focus
+        /// A gambit phrase, taught outright.
+        case gambit
+        /// A singular authored workshop pattern, taught outright.
+        case pattern
         /// A head start on a research node — partial progress, not the finished thing.
         case researchLead
 
@@ -189,8 +223,13 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
             case .locationClue: "Where someone is"
             case .whereabouts: "Word of someone"
             case .worldWorthWriting: "A world worth writing"
+            case .account: "An account"
+            case .turn: "A turn"
             case .ruin: "Somewhere built"
             case .symbol: "A rune"
+            case .focus: "A focus"
+            case .gambit: "A gambit phrase"
+            case .pattern: "A workshop pattern"
             case .researchLead: "A line of study"
             }
         }

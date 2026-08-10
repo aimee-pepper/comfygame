@@ -58,17 +58,6 @@ struct PartyRosterView: View {
             }
             .frame(minHeight: 30)
 
-            // The five stats, small — the "brief stats" half of the ask.
-            HStack(spacing: 10) {
-                ForEach(Stat.allCases, id: \.self) { stat in
-                    VStack(spacing: 1) {
-                        Image(systemName: stat.icon).font(.caption2).foregroundStyle(.secondary)
-                        Text("\(character.stats[stat])").font(.caption.monospacedDigit())
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-            }
-
             // A nudge if something better is sitting unworn, so you know which card to open.
             if GearSlot.allCases.contains(where: { store.hasUpgradeAvailable(for: $0, slot: slot) }) {
                 Text("Something better is on the shelf.")
@@ -112,6 +101,7 @@ private struct CharacterPager: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     @State private var slot: PartySlot
+    @State private var tab: CharacterPageTab = .gear
 
     init(start: PartySlot) { _slot = State(initialValue: start) }
 
@@ -119,7 +109,7 @@ private struct CharacterPager: View {
         NavigationStack {
             TabView(selection: $slot) {
                 ForEach(store.partySlots) { member in
-                    CharacterPage(slot: member).tag(member)
+                    CharacterPage(slot: member, tab: $tab).tag(member)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: store.partySlots.count > 1 ? .always : .never))
@@ -133,26 +123,25 @@ private struct CharacterPager: View {
     }
 }
 
+private enum CharacterPageTab: String, CaseIterable, Identifiable {
+    case gear = "Gear"
+    case training = "Training"
+    case stats = "Stats"
+    case gambits = "Gambits"
+    var id: String { rawValue }
+}
+
 /// Stats, gear and rules for one person, on tabs — so a page is about one thing at a time.
 private struct CharacterPage: View {
     @EnvironmentObject private var store: GameStore
     let slot: PartySlot
-
-    private enum Tab: String, CaseIterable, Identifiable {
-        case gear = "Gear"
-        case training = "Training"
-        case rules = "Rules"
-        var id: String { rawValue }
-    }
-    @State private var tab: Tab = .gear
+    @Binding var tab: CharacterPageTab
 
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
-                statsCard
-
                 Picker("", selection: $tab) {
-                    ForEach(Tab.allCases) { Text($0.rawValue).tag($0) }
+                    ForEach(CharacterPageTab.allCases) { Text($0.rawValue).tag($0) }
                 }
                 .pickerStyle(.segmented)
                 .frame(minHeight: 44)
@@ -169,7 +158,9 @@ private struct CharacterPage: View {
                     // section, because nine branches of eight nodes is a screen, not a card.
                     CombatTreeView(member: slot).environmentObject(store)
                         .frame(minHeight: 520)
-                case .rules:
+                case .stats:
+                    statsCard
+                case .gambits:
                     rulesCard
                 }
             }

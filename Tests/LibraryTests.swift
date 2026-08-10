@@ -123,6 +123,16 @@ final class LibraryTests: XCTestCase {
 
     // MARK: Pages
 
+    func testTravellerProgressionUsesExplicitAuthoredOrder() {
+        XCTAssertEqual(ContentCatalog.shared.travellersInAuthoredOrder.map(\.id),
+                       ["mara", "edren", "halloway", "isolde", "sela",
+                        "bryn", "orsa", "vance", "talin", "nessa", "corrin", "dagg", "rook",
+                        "lys", "bracken", "fen", "wren", "kestrel", "maud", "marrick", "sabine", "grimmond", "oda", "auber", "ashe", "tovin", "perren", "nine"])
+        XCTAssertTrue(ContentCatalog.shared.travellersInAuthoredOrder.allSatisfy {
+            $0.authoredOrder != nil && $0.campaignPhase != nil
+        })
+    }
+
     func testEveryLocationPieceHasAPageThatNamesIt() {
         // Complexity is difficulty only if the pieces are actually findable.
         for traveller in ContentCatalog.shared.travellers {
@@ -135,6 +145,20 @@ final class LibraryTests: XCTestCase {
         }
     }
 
+    func testEveryLocationPageQuotesItsSignatureVerbatim() throws {
+        // The diary is the player's evidence, so its wording must not drift away from the
+        // condition passage ultimately shown on the hint page.
+        for traveller in ContentCatalog.shared.travellers {
+            for index in traveller.signature.indices {
+                let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.first {
+                    $0.kind == .locationClue && $0.about == traveller.id && $0.clueIndex == index
+                })
+                XCTAssertEqual(page.prose, traveller.signature[index].passage,
+                               "\(traveller.id.rawValue) clue \(index) tells two different stories")
+            }
+        }
+    }
+
     func testEveryPageComesFromSomebodysDiary() {
         // There is no separate class of found writing — everything is somebody's diary.
         for page in ContentCatalog.shared.diaryPages {
@@ -143,23 +167,125 @@ final class LibraryTests: XCTestCase {
         }
     }
 
-    func testReadingAPageIsPermanentAndUnlocksExactlyOneThing() {
-        let store = GameStore(io: .temporary(name: "read-\(UUID().uuidString)"))
-        let page = ContentCatalog.shared.diaryPages.first { $0.kind == .symbol }!
-        store.mutate("test: forget") { $0.base.ownedSymbols.remove(page.teaches!) }
+    func testExhaustedDiaryPoolFallsBackToPersistedReachableWorldWriting() throws {
+        var library = LibraryState()
+        library.foundPages = ContentCatalog.shared.diaryPages.map(\.id)
+        let generated = Worldgen.generate(
+            book: BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0),
+            seed: 20_260_809, library: library)
 
-        store.mutate("test: read") { state in
-            _ = WorldRules.readPage(page.id, in: &state)
+        XCTAssertTrue(generated.pages.isEmpty)
+        let writing = try XCTUnwrap(generated.writings.first)
+        XCTAssertEqual(generated.map[writing.position].content, .foundWriting(writing.id))
+        XCTAssertGreaterThan(WorldRules.path(from: generated.start, to: writing.position,
+                                             in: generated.map).count, 2)
+
+        let data = try SaveCodec.makeEncoder().encode(generated.writings)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode([FoundWritingRecord].self, from: data),
+                       generated.writings, "reload rerolled the writing's prose or host")
+    }
+
+    func testEveryWorldGetsOneOrTwoDistinctReachableWritings() {
+        let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
+        for seed in UInt64(1)...40 {
+            let generated = Worldgen.generate(book: book, seed: seed)
+            let positions = generated.map.allPoints.filter { point in
+                switch generated.map[point].content {
+                case .diaryPage, .foundWriting: true
+                default: false
+                }
+            }
+            XCTAssertTrue((1...2).contains(positions.count), "seed \(seed) broke the writing promise")
+            XCTAssertEqual(Set(positions).count, positions.count)
+            XCTAssertTrue(positions.allSatisfy {
+                WorldRules.path(from: generated.start, to: $0, in: generated.map).count > 2
+            }, "seed \(seed) placed writing outside the eligible exploration band")
         }
+    }
+
+    func testGuaranteedWritingUsesConfiguredDiaryOtherMix() {
+        var tuning = DebugTuningProfile.defaults
+        tuning.additionalPageChance = 0
+        let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
+        let diaryWorlds = (UInt64(1)...100).reduce(into: 0) { count, seed in
+            if !Worldgen.generate(book: book, seed: seed, tuning: tuning).pages.isEmpty { count += 1 }
+        }
+        XCTAssertTrue((55...85).contains(diaryWorlds),
+                      "70/30 selection drifted to \(diaryWorlds)% diary")
+    }
+
+    func testDiaryMixCanForceEitherSideWithoutBreakingTheGuarantee() {
+        let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
+        var allDiary = DebugTuningProfile.defaults
+        allDiary.additionalPageChance = 0
+        allDiary.diaryWritingShare = 1
+        var allOther = allDiary
+        allOther.diaryWritingShare = 0
+
+        for seed in UInt64(1)...20 {
+            let diary = Worldgen.generate(book: book, seed: seed, tuning: allDiary)
+            XCTAssertEqual(diary.pages.count, 1)
+            XCTAssertTrue(diary.writings.isEmpty)
+            let other = Worldgen.generate(book: book, seed: seed, tuning: allOther)
+            XCTAssertTrue(other.pages.isEmpty)
+            XCTAssertEqual(other.writings.count, 1)
+        }
+    }
+
+    func testCustomPatienceFloorChangesOnlyTheNominatedPage() {
+        let fussy = ContentCatalog.shared.diaryPages.filter { !$0.prefersConditions.isEmpty }
+        guard fussy.count >= 2 else { return XCTFail("fixture needs two condition-bound pages") }
+        var library = LibraryState()
+        library.patiencePage = fussy[0].id
+        library.pagesWaiting = [fussy[0].id: 2, fussy[1].id: 2]
+        let eligible = LibraryRules.eligiblePages(in: PressureRules.resolve([]), library: library,
+                                                  patienceInWorlds: 2).map(\.id)
+        XCTAssertTrue(eligible.contains(fussy[0].id))
+        XCTAssertFalse(eligible.contains(fussy[1].id))
+    }
+
+    func testReadingAFocusPageMakesItsWordPermanentlyWritable() throws {
+        let store = GameStore(io: .temporary(name: "read-focus-\(UUID().uuidString)"))
+        let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.first { $0.kind == .focus })
+        let focus = try XCTUnwrap(page.teachesFocus)
+        store.mutate("test: forget focus") { $0.base.ownedSources.remove(focus) }
+
+        store.mutate("test: read focus") { _ = WorldRules.readPage(page.id, in: &$0) }
+
+        XCTAssertTrue(store.state.base.ownedSources.contains(focus))
         XCTAssertTrue(store.state.reality.library.hasFound(page.id))
-        XCTAssertTrue(store.state.base.ownedSymbols.contains(page.teaches!))
 
-        // Reading it twice must not double anything.
         let before = store.state.reality.library.foundPages.count
-        store.mutate("test: read again") { state in
-            _ = WorldRules.readPage(page.id, in: &state)
-        }
+        store.mutate("test: read focus again") { _ = WorldRules.readPage(page.id, in: &$0) }
         XCTAssertEqual(store.state.reality.library.foundPages.count, before)
+    }
+
+    func testReadingAGambitPageMakesItsPhrasePermanentlyWritable() throws {
+        let store = GameStore(io: .temporary(name: "read-gambit-\(UUID().uuidString)"))
+        let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.first { $0.kind == .gambit })
+        let component = try XCTUnwrap(page.teachesGambit)
+        store.mutate("test: forget gambit phrase") { $0.base.ownedGambitComponents.remove(component) }
+
+        store.mutate("test: read gambit") { _ = WorldRules.readPage(page.id, in: &$0) }
+
+        XCTAssertTrue(store.state.base.ownedGambitComponents.contains(component))
+        XCTAssertTrue(store.state.reality.library.hasFound(page.id))
+    }
+
+    func testImplementedTravellersOwnTheirApprovedDiaryFocuses() throws {
+        let expected: [TravellerID: PressureSourceID] = [
+            "mara": "scarp", "edren": "ruin", "halloway": "gold_ore",
+            "isolde": "hush", "sela": "pond", "orsa": "hive", "vance": "amber",
+            "nessa": "thorn", "corrin": "chitin", "lys": "echo", "bracken": "bone", "fen": "silk", "sabine": "coral", "grimmond": "mercury",
+            "tovin": "drift"
+        ]
+        for (traveller, focus) in expected {
+            let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.first {
+                $0.diary == traveller && $0.kind == .focus && $0.teachesFocus == focus
+            })
+            XCTAssertFalse(page.prose.isEmpty)
+            XCTAssertEqual(ContentCatalog.shared.pressureSource(focus)?.acquisition, .diary)
+        }
     }
 
     func testAPageAboutSomeoneMakesThemWorthLookingFor() {
@@ -180,9 +306,31 @@ final class LibraryTests: XCTestCase {
                        "a fussy page turned up somewhere it had no business being, immediately")
 
         impatient.pagesWaiting[fussy.id] = Tuning.Library.patienceInWorlds
+        impatient.patiencePage = fussy.id
         XCTAssertTrue(LibraryRules.eligiblePages(in: wrongWorld, library: impatient)
             .contains { $0.id == fussy.id },
                       "a page waited past the threshold and still never appeared")
+    }
+
+    func testEveryWorldPlacesAtLeastOneWritingWhileAnyRemain() {
+        let readings = PressureRules.resolve([])
+        for seed in UInt64(1)...100 {
+            var rng = SeededRNG(seed: seed)
+            XCTAssertFalse(LibraryRules.placePages(in: readings, library: LibraryState(), rng: &rng).isEmpty,
+                           "seed \(seed) generated a world with no writing")
+        }
+    }
+
+    func testOnlyTheNominatedPageGetsThePatienceFallback() {
+        let fussy = ContentCatalog.shared.diaryPages.filter { !$0.prefersConditions.isEmpty }
+        guard fussy.count >= 2 else { return XCTFail("fixture needs two condition-bound pages") }
+        var library = LibraryState()
+        library.patiencePage = fussy[0].id
+        library.pagesWaiting = [fussy[0].id: Tuning.Library.patienceInWorlds,
+                                fussy[1].id: Tuning.Library.patienceInWorlds]
+        let eligible = LibraryRules.eligiblePages(in: PressureRules.resolve([]), library: library).map(\.id)
+        XCTAssertTrue(eligible.contains(fussy[0].id))
+        XCTAssertFalse(eligible.contains(fussy[1].id))
     }
 
     func testAPageAlreadyReadNeverSurfacesAgain() {
@@ -331,6 +479,10 @@ final class LibraryTests: XCTestCase {
                        "wrote a word that did nothing and the record doesn't mention it")
         XCTAssertTrue(recorded.written.contains { $0.contains("Sun") },
                       "the chain you wrote isn't in the record")
+        XCTAssertTrue(recorded.focusAttributions.contains { $0.contains("Sun → Illumination") })
+        XCTAssertTrue(recorded.focusAttributions.contains { $0.contains("Sun → Thermal") && $0.contains("secondary") },
+                      "tier 3 cannot reveal the sun's implicit warmth")
+        XCTAssertEqual(Set(recorded.focusEffects.map(\.targetID)), ["illumination", "thermal"])
     }
 
     /// Kept worlds survive the cap; unkept ones age out. The list is curated rather than infinite.
@@ -430,6 +582,39 @@ final class LibraryTests: XCTestCase {
                 "\(traveller.name) can be written for and still missed \(20 - worstCase) times in 20 — "
                 + "a required gate must not be a coin flip")
         }
+    }
+
+    /// Perren deliberately asks for several forces to oppose one another. That interpretive hunt
+    /// may be difficult, but the authored route must still buy enough actual turns to reach the
+    /// person it places; per-condition reachability alone cannot prove that.
+    func testPerrensAuthoredOpposedWorldIsSurvivable() throws {
+        let statements: [(PressureSourceID, PressureTargetID)] = [
+            ("sun", "illumination"), ("void", "illumination"),
+            ("sun", "thermal"), ("ice", "thermal"),
+            ("bloom", "vitality"), ("miasma", "vitality"),
+            ("ruin", "relief"), ("chasm", "relief"), ("scarp", "relief"),
+            ("granite", "relief"),
+            ("ruin", "substrate"), ("sand", "substrate"),
+            ("mist", "atmosphere"), ("orrery", "cycle"),
+            ("sea", "hydrology"), ("salt", "hydrology")
+        ]
+        let sigils = statements.enumerated().map { index, statement in
+            Sigil(id: InstanceID(rawValue: UInt64(index + 1)), source: statement.0,
+                  target: statement.1, intensity: .great)
+        }
+        let perren = try XCTUnwrap(ContentCatalog.shared.traveller("perren"))
+        let readings = PressureRules.resolve(sigils)
+        let openness = readings["relief"].aspect("openness")
+        for clue in perren.signature {
+            XCTAssertTrue(clue.condition.holds(in: readings),
+                          "fixture misses \(clue.condition.displayText); openness is \(openness)")
+        }
+        XCTAssertTrue(perren.isFound(in: readings), "the documented deliberate route does not find Perren")
+
+        let book = BoundBook(written: [], composition: sigils, essencePaid: 0)
+        let turns = BookRules.turnsAvailable(for: book)
+        XCTAssertGreaterThanOrEqual(turns, 10,
+            "Perren's opposed arrival buys only \(turns) turns; the clue is writable but not safely reachable")
     }
 
     /// **The hands are behind the Calligrapher, deliberately** (Aimee, 6 Aug: *"the player MUST
@@ -625,15 +810,35 @@ final class LibraryTests: XCTestCase {
                       "a collapse took somebody out of the party")
     }
 
-    /// Room for five, and no more (Aimee, 6 Aug).
-    func testThePartyHoldsFive() {
+    func testRunRecapListsOnlyPagesFoundThisTrip() throws {
+        let store = GameStore(io: .temporary(name: "recap-pages-\(UUID().uuidString)"))
+        let pages = ContentCatalog.shared.diaryPages
+        let old = try XCTUnwrap(pages.first)
+        let fresh = try XCTUnwrap(pages.dropFirst().first)
+        store.mutate("already known") { $0.reality.library.foundPages = [old.id] }
+        store.mutate("fund") { $0.base.essence = 500 }
+        XCTAssertTrue(store.bindAndDepart())
+        store.mutate("read in this world") { _ = WorldRules.readPage(fresh.id, in: &$0) }
+
+        store.endRunWithPartialHaul(reason: "test")
+
+        XCTAssertEqual(store.state.worlds.lastExit?.pages, [fresh.id])
+        XCTAssertTrue(store.state.reality.library.hasFound(fresh.id),
+                      "collapse removed permanent page knowledge")
+    }
+
+    /// Five is the expedition party including the Binder, not the number of people who may live at Home.
+    func testTheActivePartyHoldsFiveWhileTheRosterKeepsGrowing() {
         let store = GameStore(io: .temporary(name: "five-\(UUID().uuidString)"))
         store.mutate("test: fill it") { state in
-            while state.base.roster.count < Tuning.Party.maximumSize {
+            while state.base.roster.count < Tuning.Party.maximumSize + 3 {
                 state.base.roster.append(CompanionState())
             }
+            for index in 1..<state.base.roster.count { state.base.setComing(index, true) }
         }
-        XCTAssertFalse(store.state.base.canRecruit, "the party is full and still taking people")
+        XCTAssertEqual(store.state.base.partyMembers.count, Tuning.Party.maximumSize)
+        XCTAssertFalse(store.state.base.canTakeAnother)
+        XCTAssertTrue(store.state.base.canRecruit)
     }
 
     // MARK: The fire has to hold everybody you found
@@ -696,36 +901,13 @@ final class LibraryTests: XCTestCase {
                        "three launches seated the same person more than once")
     }
 
-    /// **A full fire may not swallow somebody.** Marking them found is what stops them ever being
-    /// placed again, so it must not happen unless they actually get a seat — otherwise the fifth
-    /// person you meet is deleted from the game.
-    @MainActor
-    func testAFullFireLeavesThemStandingThereRatherThanLosingThem() {
-        let store = GameStore(io: .temporary(name: "full-\(UUID().uuidString)"))
-        store.mutate("test: fund") { $0.base.essence = 5000 }
-        store.mutate("test: a full fire") { state in
-            state.base.roster = (0..<Tuning.Party.maximumSize).map { _ in CompanionState() }
-        }
-        XCTAssertFalse(store.state.base.canRecruit)
+    func testEveryNamedTravellerCanJoinBeyondFiveTotalResidents() {
+        var base = BaseState()
+        let travellers = Array(ContentCatalog.shared.travellersInAuthoredOrder.prefix(7))
 
-        for _ in 0..<40 {
-            store.bindAndDepart()
-            guard let run = store.state.worlds.activeRun,
-                  let id = run.travellersHere.first,
-                  let point = run.map.allPoints.first(where: { run.map[$0].content == .traveller(id) })
-            else {
-                store.mutate("test: next") { $0.worlds.activeRun = nil }
-                continue
-            }
-            store.mutate("test: walk over") { $0.worlds.activeRun?.playerPosition = point }
-            store.recruit(id)
+        for traveller in travellers { XCTAssertTrue(base.seat(traveller.id)) }
 
-            XCTAssertFalse(store.state.reality.library.foundTravellers.contains(id),
-                           "a full fire marked them found, so they can never be met again")
-            XCTAssertEqual(store.state.worlds.activeRun?.map[point].content, .traveller(id),
-                           "they should still be standing there, waiting for room")
-            return
-        }
-        XCTFail("no world in forty held anybody")
+        XCTAssertEqual(base.roster.count, travellers.count + 1, "Quill plus every named recruit")
+        XCTAssertTrue(base.canRecruit)
     }
 }

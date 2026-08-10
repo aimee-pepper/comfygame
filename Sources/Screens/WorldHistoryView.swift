@@ -14,6 +14,7 @@ import SwiftUI
 struct WorldHistoryView: View {
     @EnvironmentObject private var store: GameStore
     @State private var opened: VisitedWorld?
+    @State private var comparing = false
 
     private var worlds: [VisitedWorld] {
         store.state.reality.library.visitedWorlds.reversed()
@@ -32,6 +33,16 @@ struct WorldHistoryView: View {
                             .font(.caption).foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+                    if comparisonWorlds != nil {
+                        Button {
+                            comparing = true
+                            store.openedWorldComparison()
+                        } label: {
+                            Label(comparisonTitle, systemImage: "rectangle.split.2x1")
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
                     ForEach(worlds) { world in
                         Button { opened = world } label: { row(world) }
                             .buttonStyle(.plain)
@@ -46,6 +57,24 @@ struct WorldHistoryView: View {
         .sheet(item: $opened) { world in
             VisitedWorldSheet(world: world).environmentObject(store)
         }
+        .sheet(isPresented: $comparing) {
+            if let pair = comparisonWorlds {
+                WorldComparisonSheet(origin: pair.0, partner: pair.1).environmentObject(store)
+            }
+        }
+    }
+
+    private var comparisonWorlds: (VisitedWorld, VisitedWorld)? {
+        guard let pair = store.state.tutorial.comparisonPair,
+              let first = store.state.reality.library.visitedWorlds.first(where: { $0.id == pair.originID }),
+              let second = store.state.reality.library.visitedWorlds.first(where: { $0.id == pair.partnerID })
+        else { return nil }
+        return (first, second)
+    }
+
+    private var comparisonTitle: String {
+        store.state.tutorial.comparisonPair?.isOneChangeExercise == true
+            ? "Read the two records together" : "Compare these pages"
     }
 
     /// Says what this screen can currently tell you, so the instruments have a visible reason to
@@ -57,7 +86,7 @@ struct WorldHistoryView: View {
         case ..<Tuning.Analysis.sigilAttributionTier:
             "You can read the numbers now. Attribution — which of your marks did what — comes later."
         default:
-            "You can read all of it, including what the world decided for itself while you weren't looking."
+            "You can trace the effects you have learned to measure, including what the world decided for itself."
         }
     }
 
@@ -91,6 +120,100 @@ struct WorldHistoryView: View {
                 Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
             }
             .frame(minHeight: 24)
+        }
+    }
+}
+
+struct WorldComparisonSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    let origin: VisitedWorld
+    let partner: VisitedWorld
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 14) {
+                    Text("Unwritten subjects and other chance may differ between worlds.")
+                        .font(.callout).foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    ViewThatFits(in: .horizontal) {
+                        HStack(alignment: .top, spacing: 10) {
+                            column(origin, other: partner, role: "Earlier", isLater: false)
+                            column(partner, other: origin, role: "Later", isLater: true)
+                        }
+                        VStack(spacing: 10) {
+                            column(origin, other: partner, role: "Earlier", isLater: false)
+                            column(partner, other: origin, role: "Later", isLater: true)
+                        }
+                    }
+                }.padding(16)
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("World comparison")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+        }
+    }
+
+    private func column(_ world: VisitedWorld, other: VisitedWorld, role: String,
+                        isLater: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("\(role) · World \(world.runIndex)").font(.headline)
+            Text(world.descriptionSentence).font(.caption)
+            Divider()
+            Text("What you wrote").font(.caption.weight(.semibold))
+            ForEach(changes(for: world, against: other, isLater: isLater), id: \.line) { change in
+                Label(change.line, systemImage: change.icon)
+                    .font(.caption)
+                    .foregroundStyle(change.kind == "Unchanged" ? .secondary : .primary)
+                    .accessibilityLabel("\(change.kind): \(change.line)")
+            }
+            if store.state.reality.analysisTier >= Tuning.Analysis.targetsTier {
+                Divider()
+                Text("Measured").font(.caption.weight(.semibold))
+                ForEach(measured(world), id: \.name) { entry in
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(entry.name).font(.caption2).foregroundStyle(.secondary)
+                        Text(entry.value).font(.caption.monospacedDigit())
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .padding(10).background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    static func labelledChanges(for world: VisitedWorld, against other: VisitedWorld,
+                                isLater: Bool) -> [(line: String, kind: String, icon: String)] {
+        func keyed(_ lines: [String]) -> [String: String] {
+            Dictionary(lines.map { ($0.components(separatedBy: " ← ").first ?? $0, $0) },
+                       uniquingKeysWith: { _, new in new })
+        }
+        let mine = keyed(world.semanticRequests), theirs = keyed(other.semanticRequests)
+        return mine.keys.sorted().map { key in
+            let line = mine[key]!
+            if theirs[key] == line { return (line, "Unchanged", "equal.circle") }
+            if theirs[key] == nil {
+                return isLater ? (line, "Added", "plus.circle") : (line, "Removed", "minus.circle")
+            }
+            return (line, "Replaced", "arrow.triangle.2.circlepath")
+        }
+    }
+
+    private func changes(for world: VisitedWorld, against other: VisitedWorld,
+                         isLater: Bool) -> [(line: String, kind: String, icon: String)] {
+        Self.labelledChanges(for: world, against: other, isLater: isLater)
+    }
+
+    private func measured(_ world: VisitedWorld) -> [(name: String, value: String)] {
+        ContentCatalog.shared.pressureTargetsInOrder.compactMap { target in
+            guard store.state.reality.measures(target.id),
+                  let snapshot = world.readings[target.id.rawValue] else { return nil }
+            let precision = store.state.reality.observations[target.id]?.bestPrecision ?? .crude
+            return (target.name, WorldDescription.Reading.text(peak: snapshot.peak, floor: snapshot.floor,
+                                                               hasFloor: target.dualValued,
+                                                               precision: precision))
         }
     }
 }
@@ -133,7 +256,7 @@ private struct VisitedWorldSheet: View {
                     }
                 }
 
-                if tier >= Tuning.Analysis.targetsTier {
+                if tier >= Tuning.Analysis.targetsTier && !readings.isEmpty {
                     Section {
                         ForEach(readings, id: \.name) { entry in
                             LabeledRow(icon: entry.wasWritten ? "pencil" : "dice",
@@ -150,10 +273,50 @@ private struct VisitedWorldSheet: View {
                     }
                 } else {
                     Section {
-                        EmptyNote("The numbers underneath are here, and you can't read them yet. Better instruments are studied at the Workshop.")
+                        EmptyNote(tier < Tuning.Analysis.targetsTier
+                            ? "The numbers underneath are here, and you can't read them yet. Improve the page lens at the Scriptorium."
+                            : "You never measured these subjects in the field. Survey a world to calibrate the lens.")
                             .frame(minHeight: 44)
                     } header: {
                         Text("What it came out as")
+                    }
+                }
+
+                if tier >= Tuning.Analysis.sigilAttributionTier,
+                   !focusAttributions.isEmpty {
+                    Section {
+                        ForEach(Array(focusAttributions.enumerated()), id: \.offset) { _, line in
+                            Text(line).font(.caption.monospacedDigit())
+                        }
+                    } header: {
+                        Text("What each focus did")
+                    } footer: {
+                        Text("Secondary effects are consequences of a focus beyond the subject it was joined to.")
+                    }
+                }
+
+                if tier >= Tuning.Analysis.targetsTier,
+                   store.state.reality.measures("cycle"),
+                   let clock = world.clockAnalysis {
+                    Section {
+                        LabeledRow(icon: "clock.arrow.circlepath", label: "Clock", value: clock.band)
+                        LabeledRow(icon: "metronome", label: "Base cycle",
+                                   value: clock.isStopped ? "no transition" : "\(clock.basePeriod) turns")
+                    } header: {
+                        Text("World clock")
+                    } footer: {
+                        Text("Irregular worlds vary around the base cycle without reversing time.")
+                    }
+                }
+
+                if tier >= Tuning.Analysis.livingTier,
+                   let analysis = world.livingAnalysis, !analysis.isEmpty {
+                    Section {
+                        LivingAnalysisView(analysis: analysis)
+                    } header: {
+                        Text("Living analysis")
+                    } footer: {
+                        Text("Likely distributions, derived from the same trait budgets that grew this world's species.")
                     }
                 }
 
@@ -201,11 +364,31 @@ private struct VisitedWorldSheet: View {
 
     private var readings: [(name: String, value: String, wasWritten: Bool)] {
         ContentCatalog.shared.pressureTargetsInOrder.compactMap { target in
+            guard store.state.reality.measures(target.id) else { return nil }
             guard let snapshot = world.readings[target.id.rawValue] else { return nil }
-            let value = snapshot.peak == snapshot.floor
-                ? "\(Int(snapshot.peak))"
-                : "\(Int(snapshot.floor))–\(Int(snapshot.peak))"
+            let precision = store.state.reality.observations[target.id]?.bestPrecision ?? .crude
+            let value = WorldDescription.Reading.text(peak: snapshot.peak, floor: snapshot.floor,
+                                                      hasFloor: target.dualValued,
+                                                      precision: precision)
             return (target.name, value, snapshot.wasWritten)
+        }
+    }
+
+    private var focusAttributions: [String] {
+        let measured = store.state.reality.calibratedSubjects
+        if !world.focusEffects.isEmpty {
+            return world.focusEffects
+                .filter { measured.contains($0.targetID) }
+                .map(\.line)
+        }
+
+        // Older saves only have display strings. Recover the affected subject from the exact
+        // authored name after the arrow; ambiguous/unrecognised lines stay hidden rather than
+        // bypassing calibration.
+        return world.focusAttributions.filter { line in
+            ContentCatalog.shared.pressureTargetsInOrder.contains { target in
+                measured.contains(target.id) && line.contains("→ \(target.name) ")
+            }
         }
     }
 }

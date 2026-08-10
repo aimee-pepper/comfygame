@@ -72,11 +72,11 @@ enum PressureRules {
     /// (`writing-desk-fixes.md` §3).
     static func scaleMultiplier(_ sigil: Sigil, target: PressureTargetDef) -> Double {
         guard sigil.scale > 0 else { return 1 }
-        let rungsAboveMiddle = Double(sigil.scale) - Tuning.Pressure.middleRung
+        let writtenOffset = scaleOffset(sigil.scale)
         // Relief keeps its old job — Scale on the land is world size, read elsewhere.
         guard !target.aspects.contains(where: { $0.id == Self.extentAspect }), target.id != "relief"
         else { return 1 }
-        return max(0.2, 1 + rungsAboveMiddle * Tuning.Pressure.magnitudePerScaleRung)
+        return max(0.2, 1 + writtenOffset * Tuning.Pressure.magnitudePerScaleRung)
     }
 
     /// **What Count does.** Sublinear, deliberately: two suns are brighter than one and not twice
@@ -90,9 +90,21 @@ enum PressureRules {
     /// Count — many small springs are dispersed in a way one great lake is not.
     static func extentPush(_ sigil: Sigil) -> Double {
         var push = 0.0
-        if sigil.scale > 0 { push += Double(sigil.scale) - Tuning.Pressure.middleRung }
+        if sigil.scale > 0 { push += scaleOffset(sigil.scale) }
         if sigil.count > 1 { push += Double(sigil.count) - 1 }
         return push
+    }
+
+    /// Scale's four written rungs straddle an unwritten ordinary middle. The encoded value is
+    /// `step + 1`, leaving zero for "no Scale word", so this cannot be ordinary subtraction.
+    static func scaleOffset(_ encodedScale: Int) -> Double {
+        switch encodedScale {
+        case 1: -2 // Minute
+        case 2: -1 // Small
+        case 3: 1  // Large
+        case 4: 2  // Vast
+        default: 0 // unwritten, or a tolerant legacy/unknown value
+        }
     }
 
     static func resolveUnconstrained(_ sigils: [Sigil]) -> PressureReadings {

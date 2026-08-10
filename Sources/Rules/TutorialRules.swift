@@ -1,0 +1,277 @@
+import Foundation
+
+struct TutorialLessonDefinition: Identifiable, Sendable {
+    enum Group: String, CaseIterable, Sendable { case writing = "Writing", worlds = "Worlds" }
+    let id: TutorialLessonID
+    let group: Group
+    let title: String
+    let body: String
+    let anchorLabel: String
+}
+
+enum TutorialRules {
+    static let definitions: [TutorialLessonDefinition] = [
+        .init(id: .writingPageRequest, group: .writing, title: "A page is a request",
+              body: "Choose a word and place its mark—or leave subjects unwritten and let the world decide.",
+              anchorLabel: "Page grid"),
+        .init(id: .writingPageSpace, group: .writing, title: "Marks take room",
+              body: "The number on a word is its footprint; one page cannot hold every request.",
+              anchorLabel: "Palette footprint"),
+        .init(id: .writingPreview, group: .writing, title: "Reading the preview",
+              body: "Written subjects are described; unwritten subjects remain ranges until binding.",
+              anchorLabel: "The world pane"),
+        .init(id: .writingBind, group: .writing, title: "Binding an expedition",
+              body: "Binding spends the shown essence and opens one expedition. The book and everything you learn remain recorded after the trip ends.",
+              anchorLabel: "Bind & Depart"),
+        .init(id: .worldNavigation, group: .worlds, title: "Moving through a world",
+              body: "Tap a reachable space to travel there, or use the arrows one step at a time. Movement spends world turns and stops when something needs you.",
+              anchorLabel: "Map and direction arrows"),
+        .init(id: .worldStability, group: .worlds, title: "Stability and collapse",
+              body: "World actions spend turns. At zero Stability the world starts coming apart; you may still race for a portal while floor remains.",
+              anchorLabel: "Stability meter"),
+        .init(id: .worldInteraction, group: .worlds, title: "Actions where you stand",
+              body: "Standing somewhere useful reveals what you can do here. Each action says whether it spends a turn or consumes something.",
+              anchorLabel: "World actions"),
+        .init(id: .worldReturn, group: .worlds, title: "Returning home",
+              body: "A portal returns the full haul. If defeat or the collapsing floor carries you home, knowledge stays and only part of what you found may be lost.",
+              anchorLabel: "Portal home"),
+        .init(id: .returnPersistenceBoundary, group: .worlds, title: "What crossed home",
+              body: "Resources and objects cross into the Base. Writing, discoveries and people are remembered in Reality even when part of a haul was lost.",
+              anchorLabel: "Expedition recap"),
+        .init(id: .baseFirstResultRoute, group: .worlds, title: "Follow what returned",
+              body: "Your first result points to one place at the Base. The route stays the same if you visit it later.",
+              anchorLabel: "Base destination"),
+        .init(id: .libraryFirstWriting, group: .worlds, title: "Reading recovered writing",
+              body: "The Library keeps recovered words as written. It does not translate traveller passages into checklists.",
+              anchorLabel: "Recovered record"),
+        .init(id: .writingCompareRequest, group: .writing, title: "Change one request and compare",
+              body: "Add, remove or replace one focus under a subject, then inspect The world. Everything left unwritten may still roll differently.",
+              anchorLabel: "Page and The world"),
+        .init(id: .historyCompareWorlds, group: .writing, title: "Read two records together",
+              body: "Changed writing is emphasized; other differences may have come from what neither page controlled.",
+              anchorLabel: "World History comparison")
+    ]
+
+    static func freezeFirstReturnContext(run: WorldRun, banked: GameStore.BankedHaul,
+                                         in state: inout GameState) {
+        guard state.tutorial.firstReturnContext == nil else { return }
+        let authoredPageOrder = Dictionary(uniqueKeysWithValues:
+            ContentCatalog.shared.diaryPages.enumerated().map { ($0.element.id, $0.offset) })
+        let newPages = state.reality.library.foundPages
+            .filter { !run.foundPagesAtStart.contains($0) }
+            .sorted { (authoredPageOrder[$0] ?? .max, $0.rawValue)
+                    < (authoredPageOrder[$1] ?? .max, $1.rawValue) }
+        let newWritings = state.reality.library.foundWritings.filter {
+            !run.foundWritingsAtStart.contains($0.id)
+        }
+        let newTravellers = state.reality.library.foundTravellers
+            .subtracting(run.foundTravellersAtStart)
+        let context: FirstReturnTutorialContext
+        if let page = newPages.first {
+            context = .init(runIndex: run.runIndex, route: .library, reason: .diaryPage,
+                            writingID: page.rawValue)
+        } else if let writing = newWritings.first {
+            let reason: FirstReturnTutorialContext.Reason = switch writing.family {
+            case .fieldNote: .fieldNote
+            case .routeMark: .routeMark
+            case .siteFragment: .siteFragment
+            case .workingScrap: .workingScrap
+            }
+            context = .init(runIndex: run.runIndex, route: .library, reason: reason,
+                            writingID: String(writing.id.rawValue))
+        } else if let item = banked.unidentifiedItemIDs.first {
+            context = .init(runIndex: run.runIndex, route: .storehouse,
+                            reason: .unidentifiedObject, writingID: item.rawValue)
+        } else if banked.returnedRawEssence
+                    && state.base.essence < EconomyRules.minimumBindCost(in: state) {
+            context = .init(runIndex: run.runIndex, route: .workshop,
+                            reason: .rawEssence, writingID: nil)
+        } else if let traveller = newTravellers.sorted(by: { $0.rawValue < $1.rawValue }).first {
+            context = .init(runIndex: run.runIndex, route: .firepit,
+                            reason: .traveller, writingID: traveller.rawValue)
+        } else {
+            context = .init(runIndex: run.runIndex, route: .writingDesk,
+                            reason: .ordinaryReturn, writingID: nil)
+        }
+        state.tutorial.firstReturnContext = context
+        state.tutorial.becameEligible(.returnPersistenceBoundary, runIndex: run.runIndex)
+    }
+
+    static func destination(for route: FirstReturnTutorialContext.Route) -> AppRoute {
+        switch route {
+        case .library: .library
+        case .storehouse: .storehouse
+        case .workshop: .workshop
+        case .firepit: .firepit
+        case .writingDesk: .writingDesk
+        }
+    }
+
+    static func routeCopy(_ context: FirstReturnTutorialContext, in state: GameState) -> String {
+        switch context.route {
+        case .library:
+            return libraryCopy(context, in: state)
+                ?? "You brought back writing. The Library keeps its words beside everything else you have learned. The selected record is not present in this migrated save."
+        case .storehouse: return "Something returned without a known name. The Storehouse is where an object can be identified without guessing at its use."
+        case .workshop: return "Raw essence cannot bind a page. Refine what returned at the Workshop."
+        case .firepit: return "Someone new is at the Base. The Firepit is where you choose who travels; Party holds their stats, gear, rank and gambits."
+        case .writingDesk: return "This journey is now part of World History. Bind again when you want another comparison."
+        }
+    }
+
+    static func libraryCopy(_ context: FirstReturnTutorialContext, in state: GameState) -> String? {
+        guard context.route == .library, let rawID = context.writingID else { return nil }
+        if context.reason == .diaryPage {
+            let id = DiaryPageID(rawValue: rawID)
+            guard state.reality.library.foundPages.contains(id),
+                  let page = ContentCatalog.shared.diaryPage(id) else { return nil }
+            let author = ContentCatalog.shared.traveller(page.diary)?.name ?? page.diary.rawValue
+            if page.kind == .locationClue, let about = page.about,
+               let traveller = ContentCatalog.shared.traveller(about) {
+                return "Every world holds some kind of writing. This passage describes one part of a world where \(traveller.name) can be found. Compare its words with world descriptions; the Library will not translate it into a checklist."
+            }
+            return "This page belongs to \(author)'s book. Its heading shows what kind of knowledge it carries; it is not necessarily a location clue."
+        }
+        guard let writing = state.reality.library.foundWritings.first(where: { $0.id.rawValue == rawID })
+        else { return nil }
+        return switch writing.family {
+        case .fieldNote: "A Field note remembers one truthful relation from the place where it was found. It can help you read worlds, but it is not part of a traveller's location."
+        case .routeMark: "A Route mark preserves one short path from that world. It reveals no destination beyond the marked ground."
+        case .siteFragment: "A Site fragment records words tied to a place you could already see. It does not reveal what the site contains."
+        case .workingScrap: "A Working scrap teaches one ordinary recipe. It grants the knowledge, not the item or the materials to make it."
+        }
+    }
+
+    static func definition(_ id: TutorialLessonID) -> TutorialLessonDefinition? {
+        definitions.first { $0.id == id }
+    }
+
+    static func recordExpeditionOutcome(in state: inout GameState) {
+        state.tutorial.complete(.worldReturn, fact: "first_expedition_outcome")
+    }
+
+    static func semanticRequests(on page: Page) -> [String] {
+        PageRules.chains(on: page).map { chain in
+            "\(chain.target) ← " + chain.parts.map { part in
+                (part.qualifiers.map(\.name) + [part.source] + part.negates.sorted().map { "not \($0)" })
+                    .joined(separator: " · ")
+            }.joined(separator: " + ")
+        }.sorted()
+    }
+
+    /// Count changed subject requests, independent of mark identity, position, rotation or hand.
+    static func semanticChangeCount(from old: [String], to new: [String]) -> Int {
+        func keyed(_ lines: [String]) -> [String: String] {
+            Dictionary(lines.map { line in
+                let subject = line.components(separatedBy: " ← ").first ?? line
+                return (subject, line)
+            }, uniquingKeysWith: { _, latter in latter })
+        }
+        let lhs = keyed(old), rhs = keyed(new)
+        return Set(lhs.keys).union(rhs.keys).reduce(0) { count, key in
+            count + (lhs[key] == rhs[key] ? 0 : 1)
+        }
+    }
+
+    static func noteComparisonPreview(page: Page, in state: inout GameState) {
+        guard state.tutorial.comparisonPair == nil,
+              let origin = state.reality.library.visitedWorlds.last else { return }
+        state.tutorial.becameEligible(.writingCompareRequest, runIndex: state.worlds.runIndex)
+        let count = semanticChangeCount(from: origin.semanticRequests,
+                                        to: semanticRequests(on: page))
+        guard count > 0 else { return }
+        state.tutorial.pendingComparisonOriginID = origin.id
+        state.tutorial.pendingComparisonIsOneChange = count == 1
+        if count == 1 {
+            state.tutorial.complete(.writingCompareRequest, fact: "one_semantic_request_changed")
+        }
+    }
+
+    static func pairNewWorld(_ partner: VisitedWorld, in state: inout GameState) {
+        guard let origin = state.tutorial.pendingComparisonOriginID,
+              origin != partner.id,
+              let originRecord = state.reality.library.visitedWorlds.first(where: { $0.id == origin }) else { return }
+        let actualChangeCount = semanticChangeCount(from: originRecord.semanticRequests,
+                                                    to: partner.semanticRequests)
+        guard actualChangeCount > 0 else {
+            state.tutorial.pendingComparisonOriginID = nil
+            state.tutorial.pendingComparisonIsOneChange = false
+            return
+        }
+        state.tutorial.comparisonPair = .init(originID: origin, partnerID: partner.id,
+                                              isOneChangeExercise: actualChangeCount == 1)
+        state.tutorial.pendingComparisonOriginID = nil
+        state.tutorial.pendingComparisonIsOneChange = false
+        state.tutorial.becameEligible(.historyCompareWorlds, runIndex: partner.runIndex)
+    }
+
+    static func reconcileComparisonPair(in state: inout GameState) {
+        guard let pair = state.tutorial.comparisonPair else { return }
+        let ids = Set(state.reality.library.visitedWorlds.map(\.id))
+        if !ids.contains(pair.originID) || !ids.contains(pair.partnerID) {
+            state.tutorial.comparisonPair = nil
+        }
+    }
+}
+
+extension GameStore {
+    func tutorialEligible(_ id: TutorialLessonID) {
+        mutate("tutorial eligible: \(id.rawValue)") { state in
+            state.tutorial.becameEligible(id, runIndex: state.worlds.runIndex)
+        }
+    }
+
+    func deferTutorial(_ id: TutorialLessonID) {
+        mutate("tutorial deferred: \(id.rawValue)") { $0.tutorial.deferLesson(id) }
+    }
+
+    func completeTutorial(_ id: TutorialLessonID, fact: String) {
+        mutate("tutorial completed: \(id.rawValue)") { $0.tutorial.complete(id, fact: fact) }
+    }
+
+    func replayTutorial(_ id: TutorialLessonID) {
+        mutate("tutorial replay: \(id.rawValue)") { state in
+            var progress = state.tutorial[id]
+            progress.status = .deferred
+            state.tutorial[id] = progress
+        }
+    }
+
+    func acknowledgeFirstReturnRecap() {
+        mutate("acknowledge first return recap", flush: true) { state in
+            if state.tutorial.firstReturnContext != nil {
+                state.tutorial.complete(.returnPersistenceBoundary, fact: "first_recap_acknowledged")
+                state.tutorial.becameEligible(.baseFirstResultRoute,
+                                              runIndex: state.worlds.lastExit?.runIndex
+                                                ?? state.worlds.runIndex)
+            }
+            state.worlds.lastExit = nil
+        }
+    }
+
+    func openedFirstReturnDestination(_ route: AppRoute) {
+        mutate("opened first return destination") { state in
+            guard let context = state.tutorial.firstReturnContext,
+                  TutorialRules.destination(for: context.route) == route else { return }
+            state.tutorial.complete(.baseFirstResultRoute, fact: "first_result_destination_opened")
+        }
+    }
+
+    func displayedFirstReturnWriting() {
+        mutate("displayed first return writing") { state in
+            guard let context = state.tutorial.firstReturnContext,
+                  TutorialRules.libraryCopy(context, in: state) != nil else { return }
+            state.tutorial.complete(.libraryFirstWriting, fact: "first_writing_displayed")
+        }
+    }
+
+    func openedComparisonPreview() {
+        mutate("opened semantic comparison preview") { state in
+            TutorialRules.noteComparisonPreview(page: state.base.page, in: &state)
+        }
+    }
+
+    func openedWorldComparison() {
+        completeTutorial(.historyCompareWorlds, fact: "comparison_opened")
+    }
+}

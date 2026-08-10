@@ -122,6 +122,8 @@ enum BestiaryRules {
         var firstSeenRunIndex: Int?
         var timesEncountered: Int
         var specimens: [SpecimenRecord]
+        var apexSightings: Int
+        var isApexSpecies: Bool { apexSightings > 0 }
 
         /// The one worth talking about: your best by any measure.
         var finest: SpecimenRecord? { specimens.max { $0.traits.appetite < $1.traits.appetite } }
@@ -140,7 +142,8 @@ enum BestiaryRules {
                     icon: traits.map(icon(for:)) ?? "pawprint",
                     firstSeenRunIndex: record.firstSeenRunIndex,
                     timesEncountered: record.timesEncountered,
-                    specimens: specimens
+                    specimens: specimens,
+                    apexSightings: discovery.apexSightings(of: key).count
                 )
             }
             .sorted { $0.name < $1.name }

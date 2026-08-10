@@ -21,6 +21,8 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
     /// bests and "the largest you've seen" come from. Capped, because this is the only collection in
     /// the save that grows without bound.
     var specimens: [SpecimenRecord] = []
+    /// Apexes remain their derived species, but their exceptional sightings are collected too.
+    var apexSightings: [ApexSighting] = []
     var resources: [ResourceID: DiscoveryRecord] = [:]
     /// Sites you've stood in. A site you've never met is silhouetted in the preview, same rule as
     /// creatures — you can be told a world *can* hold something without being told what.
@@ -29,11 +31,13 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
     init(creatures: [CreatureID: DiscoveryRecord] = [:],
          species: [String: DiscoveryRecord] = [:],
          specimens: [SpecimenRecord] = [],
+         apexSightings: [ApexSighting] = [],
          resources: [ResourceID: DiscoveryRecord] = [:],
          sites: [SiteID: DiscoveryRecord] = [:]) {
         self.creatures = creatures
         self.species = species
         self.specimens = specimens
+        self.apexSightings = apexSightings
         self.resources = resources
         self.sites = sites
     }
@@ -49,6 +53,8 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
         creatures = try container.decodeIfPresent([CreatureID: DiscoveryRecord].self, forKey: .creatures) ?? [:]
         species = try container.decodeIfPresent([String: DiscoveryRecord].self, forKey: .species) ?? [:]
         specimens = try container.decodeIfPresent([SpecimenRecord].self, forKey: .specimens) ?? []
+        apexSightings = try container.decodeIfPresent([ApexSighting].self,
+                                                       forKey: .apexSightings) ?? []
         resources = try container.decodeIfPresent([ResourceID: DiscoveryRecord].self, forKey: .resources) ?? [:]
         sites = try container.decodeIfPresent([SiteID: DiscoveryRecord].self, forKey: .sites) ?? [:]
     }
@@ -67,6 +73,9 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
 
     /// Every specimen you've recorded of one identity, newest last.
     func specimens(of key: String) -> [SpecimenRecord] { specimens.filter { $0.identityKey == key } }
+    func apexSightings(of key: String) -> [ApexSighting] {
+        apexSightings.filter { $0.identityKey == key }
+    }
 
     /// Where this animal sits against every other one of its kind you've met, 0–1. The percentile
     /// the bestiary's second tier exists for.
@@ -100,6 +109,11 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
         if specimens.count > cap { specimens.removeFirst(specimens.count - cap) }
     }
 
+    mutating func recordApex(_ id: InstanceID, species key: String, runIndex: Int) {
+        guard !apexSightings.contains(where: { $0.id == id && $0.runIndex == runIndex }) else { return }
+        apexSightings.append(ApexSighting(id: id, identityKey: key, runIndex: runIndex))
+    }
+
     mutating func recordSite(_ id: SiteID, runIndex: Int) {
         sites[id, default: DiscoveryRecord()].record(runIndex: runIndex)
     }
@@ -107,6 +121,12 @@ struct DiscoveryLog: Codable, Equatable, Sendable {
     mutating func recordResource(_ id: ResourceID, runIndex: Int) {
         resources[id, default: DiscoveryRecord()].record(runIndex: runIndex)
     }
+}
+
+struct ApexSighting: Codable, Equatable, Identifiable, Sendable {
+    var id: InstanceID
+    var identityKey: String
+    var runIndex: Int
 }
 
 /// One animal you actually met. **The bestiary's second tier** — the entry is what it was, this is

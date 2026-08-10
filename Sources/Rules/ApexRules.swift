@@ -74,17 +74,18 @@ enum ApexRules {
     /// Which of them this world would grow, weighted toward its own character.
     ///
     /// **[PROPOSAL] weighted toward the world's own character** (§5), so a cold world's rare drop is
-    /// the rimed edge. It should feel like it came from *there* — the alternative is a lottery that
+    /// the wild weapon. It should feel like it came from *there* — the alternative is a lottery that
     /// happens to pay out in this world rather than one that belongs to it.
     static func weapon(for readings: PressureReadings, rng: inout SeededRNG) -> ItemID? {
-        let thermal = readings["thermal"], relief = readings["relief"], light = readings["illumination"]
+        let relief = readings["relief"], light = readings["illumination"]
         var table: [(value: ItemID, weight: Double)] = wildWeapons.map { (value: $0, weight: 1) }
 
         func favour(_ id: ItemID, _ bonus: Double) {
             guard let index = table.firstIndex(where: { $0.value == id }) else { return }
             table[index].weight += bonus
         }
-        if thermal.floor < Tuning.Pressure.coldFloor { favour("rimed_edge", Tuning.Apex.characterBonus) }
+        // `rimed_edge` is the save-compatible ID of Barbed Edge. Its old cold affinity belonged to
+        // the retired frost fiction; give it a new authored hunting signature in the later affinity pass.
         if light.peak < Tuning.Pressure.aphoticPeak { favour("quiet_knife", Tuning.Apex.characterBonus) }
         if relief.aspect("openness") > Tuning.Pressure.openTerrainThreshold {
             favour("long_fang", Tuning.Apex.characterBonus)
@@ -94,6 +95,15 @@ enum ApexRules {
             favour("bloodletter", Tuning.Apex.characterBonus)
         }
         return rng.pickWeighted(table)
+    }
+
+    /// The cache lottery is deliberately a separate gate so its weapon can sit beside the cache's
+    /// guaranteed progression reward rather than replacing it.
+    static func cacheBonus(for readings: PressureReadings,
+                           chance: Double = Tuning.Apex.lockedCacheChance,
+                           rng: inout SeededRNG) -> ItemID? {
+        guard rng.chance(chance) else { return nil }
+        return weapon(for: readings, rng: &rng)
     }
 }
 

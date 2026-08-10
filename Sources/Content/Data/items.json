@@ -2,6 +2,46 @@
   "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). GEAR: a standard assortment across eight slots (Aimee, 6 Aug), each running common -> uncommon -> rare -> mythic, and every piece upgradeable at the Blacksmith. Weapons cover all three corners of the damage triangle at every quality, so the matchup against a creature's covering is always answerable with something you could plausibly be carrying. PLACEHOLDER names, blurbs and tiers. INSULATION AND REACTIVITY on gear are Q36's addition (audit #9): the other four material properties each decide what the Blacksmith asks for, and these two decided nothing, so a warm pelt and a volatile ichor were worth nothing to wear. Insulation on anything protective turns aside a heat emanation; reactivity on a weapon leaves something in the wound. Authored here because found gear is a catalogue entry — crafting doesn't exist yet, and when it does these become the crafted piece's own material properties. PLACEHOLDER values. 7 Aug: EIGHT WILD-ONLY WEAPONS (apex-encounters.md §4). Each breaks exactly one rule a crafted piece cannot break, and each is deliberately MID-TIER: you are buying the rule, not the numbers, so a two-natured blade at tier 3 is a real trade against a superb crafted one. They drop guaranteed from an apex and vanishingly rarely from anything else. ALL TIERS PLACEHOLDER.",
   "items": [
     {
+      "id": "essence_crystal",
+      "name": "Essence Crystal",
+      "icon": "diamond.fill",
+      "rarity": "rare",
+      "blurb": "Essence held in a stable quartz lattice. Auber records what made it possible.",
+      "kind": "treasure"
+    },
+    {
+      "id": "heat_core",
+      "name": "Heat Core",
+      "icon": "flame.circle.fill",
+      "rarity": "rare",
+      "blurb": "A provenanced concentration of heat, prepared for a Channelworks housing.",
+      "kind": "treasure"
+    },
+    {
+      "id": "caustic_core",
+      "name": "Caustic Core",
+      "icon": "drop.triangle.fill",
+      "rarity": "rare",
+      "blurb": "A provenanced caustic concentration, prepared for a Channelworks housing.",
+      "kind": "treasure"
+    },
+    {
+      "id": "light_core",
+      "name": "Light Core",
+      "icon": "sun.max.circle.fill",
+      "rarity": "rare",
+      "blurb": "A provenanced concentration of light, prepared for a Channelworks housing.",
+      "kind": "treasure"
+    },
+    {
+      "id": "conduit_fixture",
+      "name": "Heat Conduit Fixture",
+      "icon": "point.3.connected.trianglepath.dotted",
+      "rarity": "rare",
+      "blurb": "Oda's first contained Conduit housing, carrying the receipt of the core inside it.",
+      "kind": "treasure"
+    },
+    {
       "id": "curio_humming_shard",
       "name": "Humming Shard",
       "icon": "waveform",
@@ -27,7 +67,152 @@
       "icon": "cross.vial",
       "rarity": "common",
       "blurb": "Restores a little health to one party member.",
-      "kind": "consumable"
+      "kind": "consumable",
+      "consumable": { "effect": "heal", "potency": 10 }
+    },
+    {
+      "id": "salve",
+      "name": "Salve",
+      "icon": "cross.vial.fill",
+      "rarity": "uncommon",
+      "blurb": "Restores a useful measure of health to one party member.",
+      "kind": "consumable",
+      "consumable": { "effect": "heal", "potency": 24 }
+    },
+    {
+      "id": "salve_greater",
+      "name": "Greater Salve",
+      "icon": "medical.thermometer.fill",
+      "rarity": "rare",
+      "blurb": "Enough medicine to turn a grave injury into a survivable one.",
+      "kind": "consumable",
+      "consumable": { "effect": "heal", "potency": 45 }
+    },
+    {
+      "id": "draught_clearing",
+      "name": "Draught of Clearing",
+      "icon": "drop.triangle.fill",
+      "rarity": "uncommon",
+      "blurb": "Clears poison and closes a bleeding wound.",
+      "kind": "consumable",
+      "consumable": { "effect": "clearPoison", "potency": 0 }
+    },
+    {
+      "id": "draught_quenching",
+      "name": "Quenching Draught",
+      "icon": "snowflake",
+      "rarity": "uncommon",
+      "blurb": "Quenches burning and clears the eyes after a dazzling emanation.",
+      "kind": "consumable",
+      "consumable": { "effect": "clearElemental", "potency": 0 }
+    },
+    {
+      "id": "antidote_broad",
+      "name": "Broad Antidote",
+      "icon": "allergens.fill",
+      "rarity": "rare",
+      "blurb": "Draws out one affliction, whatever shape it took.",
+      "kind": "consumable",
+      "consumable": { "effect": "clearAnyStatus", "potency": 0 }
+    },
+    {
+      "id": "stonebark_tonic",
+      "name": "Stonebark Tonic",
+      "icon": "shield.lefthalf.filled",
+      "rarity": "uncommon",
+      "blurb": "Turns aside the next affliction that would take hold.",
+      "kind": "consumable",
+      "consumable": { "effect": "preventStatus", "potency": 1 }
+    },
+    {
+      "id": "venom",
+      "name": "Venom",
+      "icon": "drop.fill",
+      "rarity": "uncommon",
+      "blurb": "Coats one weapon so its next strike leaves poison behind.",
+      "kind": "consumable",
+      "consumable": { "effect": "coatPoison", "potency": 0 }
+    },
+    {
+      "id": "firebrand",
+      "name": "Firebrand",
+      "icon": "flame.fill",
+      "rarity": "uncommon",
+      "blurb": "Coats one weapon so its next strike keeps burning.",
+      "kind": "consumable",
+      "consumable": { "effect": "coatBurn", "potency": 0 }
+    },
+    {
+      "id": "briar_oil",
+      "name": "Briar Oil",
+      "icon": "leaf.fill",
+      "rarity": "uncommon",
+      "blurb": "A placeholder preparation that makes the next strike leave a stubborn wound.",
+      "kind": "consumable",
+      "consumable": { "effect": "coatBleed", "potency": 0 }
+    },
+    {
+      "id": "flashsalt",
+      "name": "Flashsalt",
+      "icon": "sun.max.trianglebadge.exclamationmark.fill",
+      "rarity": "uncommon",
+      "blurb": "A placeholder preparation that makes the next strike dazzle its target.",
+      "kind": "consumable",
+      "consumable": { "effect": "coatDazzle", "potency": 0 }
+    },
+    {
+      "id": "solvent",
+      "name": "Solvent",
+      "icon": "testtube.2",
+      "rarity": "uncommon",
+      "blurb": "Reveals one unidentified curio while still in the field.",
+      "kind": "consumable",
+      "consumable": { "effect": "identifyCurio", "potency": 0 }
+    },
+    {
+      "id": "lure",
+      "name": "Lure",
+      "icon": "pawprint.fill",
+      "rarity": "uncommon",
+      "blurb": "Wakes the nearest roaming creature and draws it toward you.",
+      "kind": "consumable",
+      "consumable": { "effect": "lureCreature", "potency": 0 }
+    },
+    {
+      "id": "stillwater",
+      "name": "Stillwater",
+      "icon": "water.waves",
+      "rarity": "rare",
+      "blurb": "Coaxes a failing world into holding together a little longer.",
+      "kind": "consumable",
+      "consumable": { "effect": "restoreStability", "potency": 25 }
+    },
+    {
+      "id": "waystone",
+      "name": "Waystone",
+      "icon": "house.and.flag.fill",
+      "rarity": "mythic",
+      "blurb": "Forces a way home immediately, carrying the whole haul with you.",
+      "kind": "consumable",
+      "consumable": { "effect": "returnHome", "potency": 0 }
+    },
+    {
+      "id": "torch",
+      "name": "Torch",
+      "icon": "torch.fill",
+      "rarity": "common",
+      "blurb": "Pushes the dark back for the rest of this journey.",
+      "kind": "consumable",
+      "consumable": { "effect": "lightWorld", "potency": 2 }
+    },
+    {
+      "id": "farsight_draught",
+      "name": "Farsight Draught",
+      "icon": "eye.circle.fill",
+      "rarity": "rare",
+      "blurb": "Reveals the nearest site and a little of the country around it.",
+      "kind": "consumable",
+      "consumable": { "effect": "farsight", "potency": 2 }
     },
     {
       "id": "cache_key",
@@ -35,6 +220,14 @@
       "icon": "key",
       "rarity": "rare",
       "blurb": "Fits a lock in a world that is not this one.",
+      "kind": "key"
+    },
+    {
+      "id": "anchor_frame",
+      "name": "Anchor Frame",
+      "icon": "square.on.square.intersection.dashed",
+      "rarity": "mythic",
+      "blurb": "A carried binding strong enough to fasten one world back into the Atlas.",
       "kind": "key"
     },
     {
@@ -651,10 +844,10 @@
     },
     {
       "id": "rimed_edge",
-      "name": "Rimed Edge",
-      "icon": "snowflake",
+      "name": "Barbed Edge",
+      "icon": "leaf.fill",
       "rarity": "rare",
-      "blurb": "The frost on it never melts and never runs out. You have stopped trying to work out why.",
+      "blurb": "Its backward thorns stay in the wound. Nothing needs to be spread on them first.",
       "kind": "gear",
       "gear": {
         "slot": "weapon",
@@ -662,7 +855,7 @@
         "damage": "rend",
         "reach": "close",
         "breaks": "innateStatus",
-        "statusKind": "freeze"
+        "statusKind": "bleed"
       }
     },
     {
