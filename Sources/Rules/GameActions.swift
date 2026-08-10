@@ -225,7 +225,8 @@ extension GameStore {
             // from the seed, never from the run's live RNG, so in-run rolls resume cleanly.
             let tuning = DebugTuningProfile.active
             var world = Worldgen.generate(book: book, seed: seed, library: state.reality.library,
-                                          tuning: tuning)
+                                          tuning: tuning,
+                                          isFreshFirstExpedition: state.worlds.runIndex == 0)
             // Edren reads the field before the party reaches it: sites are known destinations, not
             // surprises hidden behind fog. Their contents still require travel and a full search.
             if state.base.station(Stations.reliquary).isUnlocked {
@@ -329,6 +330,7 @@ extension GameStore {
                 foundPagesAtStart: Set(state.reality.library.foundPages),
                 foundWritingsAtStart: Set(state.reality.library.foundWritings.map(\.id)),
                 foundTravellersAtStart: state.reality.library.foundTravellers,
+                generationDiagnostics: world.diagnostics,
                 tuning: tuning
             )
             state.worlds.activeRun = departingRun

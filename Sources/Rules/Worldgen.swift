@@ -20,10 +20,11 @@ enum Worldgen {
     }
 
     static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState(),
-                         tuning: DebugTuningProfile = .defaults)
+                         tuning: DebugTuningProfile = .defaults,
+                         isFreshFirstExpedition: Bool = false)
         -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite],
             pages: [DiaryPageID], writings: [FoundWritingRecord], travellers: [TravellerID], cast: [Species], flora: [Flora],
-            start: GridPoint) {
+            start: GridPoint, diagnostics: WorldGenerationDiagnostics) {
         // **Size is written, not fixed** (session 13 §5). The book carries the Scale it was
         // written at, so the same book always makes the same size of world.
         let width = book.scale.gridSide
@@ -107,7 +108,8 @@ enum Worldgen {
         } else {
             noteCount = 1
         }
-        if pageRNG.chance(tuning.additionalPageChance) {
+        let secondWritingRollSucceeded = pageRNG.chance(tuning.additionalPageChance)
+        if secondWritingRollSucceeded {
             if pages.isEmpty, let first = diaryCandidates.first {
                 pages.append(first)
             } else {
@@ -185,14 +187,21 @@ enum Worldgen {
 
         // 4. Wild drops — single pickups you get just by walking over them. Raw essence arrives
         //    this way (Aimee's stated design), so it's a reason to wander off your path.
+        let rawEssenceEligibleTiles = map.allPoints.count {
+            !occupied.contains($0) && map[$0].content == .empty && map[$0].isPassable
+        }
         let wildCount = scaled(featureRNG.int(in: Tuning.World.wildDropCountRange),
                                by: tuning.rawEssenceFrequencyMultiplier)
+        var rawEssenceDropsPlaced = 0
+        var rawEssenceObtainable = 0
         for _ in 0..<wildCount {
             guard let point = randomFreePoint(in: map, avoiding: occupied, rng: &featureRNG) else { continue }
-            map[point].content = .wildDrop(resource: Resources.essenceRaw,
-                                           amount: scaled(featureRNG.int(in: Tuning.World.wildDropAmountRange),
-                                                          by: tuning.rawEssenceYieldMultiplier))
+            let amount = scaled(featureRNG.int(in: Tuning.World.wildDropAmountRange),
+                                by: tuning.rawEssenceYieldMultiplier)
+            map[point].content = .wildDrop(resource: Resources.essenceRaw, amount: amount)
             occupied.insert(point)
+            rawEssenceDropsPlaced += 1
+            rawEssenceObtainable += amount
         }
 
         // 5. A locked cache, sometimes. It can only be opened with a key found in a *different*
@@ -261,9 +270,13 @@ enum Worldgen {
         // They used to be a list on the run that nothing ever placed, and arriving marked them
         // found in the save — so the payoff for writing somebody's world was a database write
         // (Aimee, 6 Aug). Now you have to walk to them, and talk to them.
+        let travellerCandidates = ContentCatalog.shared.travellersInAuthoredOrder
+            .map(\.id)
+            .filter { !library.foundTravellers.contains($0) }
         let travellers = LibraryRules.travellersPresent(in: readings)
             .map(\.id)
             .filter { !library.foundTravellers.contains($0) }
+        var placedTravellers: [TravellerID] = []
         var travellerRNG = SeededRNG(seed: seed).derived(0x7A4E1)
         for traveller in travellers {
             // **Beside something, where there is something to be beside** (Q39.4, answered).
@@ -286,6 +299,7 @@ enum Worldgen {
             guard let point else { continue }
             map[point].content = .traveller(traveller)
             occupied.insert(point)
+            placedTravellers.append(traveller)
         }
 
         // 10. Enemies, drawn from the world's own cast. It's daytime when you arrive, so it's the
@@ -308,6 +322,8 @@ enum Worldgen {
             stabilityScore: BookRules.stabilityScore(of: book),
             dangerTiles: danger.hazardTiles,
             sites: sites.count) * max(0, tuning.apexChanceMultiplier))
+        var apexDecisionRNG = SeededRNG(seed: seed).derived(0xA9E)
+        let apexRollSucceeded = apexDecisionRNG.chance(apexChance)
         if let apex = ApexRules.sample(for: readings, seed: seed, chance: apexChance),
            let point = randomFreePoint(in: map, avoiding: occupied,
                                        minimumDistanceFrom: entry,
@@ -335,7 +351,83 @@ enum Worldgen {
         WorldRules.reveal(around: entry, in: &map,
                           radius: WorldRules.visionRadius(for: book,
                                                           base: tuning.baseVisionRadius))
-        return (map, enemies, sites, placedPages, foundWritings, travellers, cast, flora, entry)
+        let envelopeApplied = isFreshFirstExpedition
+            && tuning.openingEncounterEnvelope != .natural
+        let relocated = envelopeApplied
+            ? applyOpeningEnvelope(tuning.openingEncounterEnvelope, to: &enemies, in: map,
+                                   sites: sites, occupied: &occupied, seed: seed)
+            : 0
+
+        let nodeDiagnostics = map.tiles.reduce(into: [ResourceID: Int]()) { result, tile in
+            if case .node(let node) = tile.content { result[node.resource, default: 0] += 1 }
+        }
+        let decay = BookRules.decayPerTurn(stabilityScore: BookRules.stabilityScore(of: book))
+            / max(0.01, tuning.stabilityDurationMultiplier)
+        let turnBudget = decay > 0
+            ? Int(ceil(Tuning.World.startingStability / decay))
+            : Tuning.World.indefiniteTurns
+        var diagnostics = WorldGenerationDiagnostics()
+        diagnostics.selectedDiaryPages = pages
+        diagnostics.selectedOtherWritingCount = noteCount
+        diagnostics.placedDiaryPages = placedPages
+        diagnostics.placedOtherWritings = foundWritings.map(\.id)
+        diagnostics.secondWritingRollSucceeded = secondWritingRollSucceeded
+        diagnostics.rawEssenceEligibleTiles = rawEssenceEligibleTiles
+        diagnostics.rawEssencePlacementAttempts = wildCount
+        diagnostics.rawEssenceDropsPlaced = rawEssenceDropsPlaced
+        diagnostics.rawEssenceObtainable = rawEssenceObtainable
+        diagnostics.ordinaryResourceNodes = nodeDiagnostics
+        diagnostics.creatureSpeciesCount = cast.count
+        diagnostics.creatureInstancesPlaced = enemies.count { !$0.isSessile && !$0.isApex }
+        diagnostics.floraSpeciesCount = flora.count
+        diagnostics.floraInstancesPlaced = map.tiles.count { $0.flora != nil }
+        diagnostics.activeFloraPlaced = enemies.count(where: \.isSessile)
+        diagnostics.apexChance = apexChance
+        diagnostics.apexRollSucceeded = apexRollSucceeded
+        diagnostics.apexPlaced = enemies.contains(where: \.isApex)
+        diagnostics.initialTurnBudget = turnBudget
+        diagnostics.projectedCollapseTurn = turnBudget
+        diagnostics.travellerCandidates = travellerCandidates
+        diagnostics.travellerSignatureMatches = travellers
+        diagnostics.travellersPlaced = placedTravellers
+        diagnostics.openingEnvelopeRequested = tuning.openingEncounterEnvelope
+        diagnostics.openingEnvelopeApplied = envelopeApplied
+        diagnostics.openingEnemiesRelocated = relocated
+        return (map, enemies, sites, placedPages, foundWritings, travellers, cast, flora, entry,
+                diagnostics)
+    }
+
+    private static func applyOpeningEnvelope(
+        _ envelope: DebugTuningProfile.OpeningEncounterEnvelope,
+        to enemies: inout [WorldEnemy], in map: WorldMap, sites: [PlacedSite],
+        occupied: inout Set<GridPoint>, seed: UInt64
+    ) -> Int {
+        let allowed = envelope == .gentle ? 1 : 0
+        let guardianPositions = Set(sites.map(\.position))
+        let nearby = enemies.indices.filter { index in
+            let enemy = enemies[index]
+            return map[enemy.position].isRevealed && !enemy.isSessile && !enemy.isApex
+                && !guardianPositions.contains(enemy.position)
+        }
+        guard nearby.count > allowed else { return 0 }
+        var rng = SeededRNG(seed: seed).derived(0xE17E10)
+        var moved = 0
+        for index in nearby.dropFirst(allowed) {
+            let old = enemies[index].position
+            occupied.remove(old)
+            let candidates = map.allPoints.filter { point in
+                !map[point].isRevealed && map[point].isPassable && map[point].content == .empty
+                    && !occupied.contains(point)
+            }
+            guard let destination = rng.pick(candidates) else {
+                occupied.insert(old)
+                continue
+            }
+            enemies[index].position = destination
+            occupied.insert(destination)
+            moved += 1
+        }
+        return moved
     }
 
     private static func writingPoint(in map: WorldMap, from entry: GridPoint,

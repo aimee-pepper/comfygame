@@ -158,6 +158,93 @@ final class WorldTests: XCTestCase {
         }
     }
 
+    func testGenerationDiagnosticsAreDeterministicAndSurviveMutableMapChanges() throws {
+        var tuning = DebugTuningProfile.defaults
+        tuning.additionalPageChance = 1
+        let composition = book(["terrain": "plains", "biome": "verdant"])
+        let first = Worldgen.generate(book: composition, seed: 20_260_809, tuning: tuning)
+        let again = Worldgen.generate(book: composition, seed: 20_260_809, tuning: tuning)
+
+        XCTAssertEqual(first.diagnostics, again.diagnostics)
+        XCTAssertEqual(first.diagnostics.placedDiaryPages, first.pages)
+        XCTAssertEqual(first.diagnostics.placedOtherWritings, first.writings.map(\.id))
+        XCTAssertEqual(first.diagnostics.rawEssenceDropsPlaced,
+                       first.map.tiles.count {
+                           if case .wildDrop(let resource, _) = $0.content {
+                               return resource == Resources.essenceRaw
+                           }
+                           return false
+                       })
+
+        var run = WorldRun(runIndex: 1, book: composition, mapSeed: 20_260_809,
+                           rng: SeededRNG(seed: 20_260_809), map: first.map,
+                           playerPosition: first.start,
+                           generationDiagnostics: first.diagnostics, tuning: tuning)
+        if let page = run.map.allPoints.first(where: {
+            if case .diaryPage = run.map[$0].content { return true }
+            return false
+        }) {
+            run.map[page].content = .empty
+        }
+        XCTAssertEqual(run.generationDiagnostics.placedDiaryPages,
+                       first.diagnostics.placedDiaryPages,
+                       "Initial placement is a snapshot, not a scan of collectible tiles")
+
+        let data = try SaveCodec.makeEncoder().encode(run)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(WorldRun.self, from: data)
+            .generationDiagnostics, first.diagnostics)
+    }
+
+    func testOpeningEnvelopeRelocatesRatherThanDeletesOnlyOnFreshFirstExpedition() throws {
+        let composition = book(["terrain": "plains", "biome": "teeming_life"])
+        var clear = DebugTuningProfile.defaults
+        clear.creatureDensityMultiplier = 3
+        clear.baseVisionRadius = 6
+        clear.openingEncounterEnvelope = .clearApproach
+
+        let seed = try XCTUnwrap((UInt64(1)...500).first { candidate in
+            let world = Worldgen.generate(book: composition, seed: candidate, tuning: clear,
+                                          isFreshFirstExpedition: false)
+            return world.enemies.count { enemy in
+                world.map[enemy.position].isRevealed && !enemy.isSessile && !enemy.isApex
+                    && !world.sites.map(\.position).contains(enemy.position)
+            } >= 2
+        })
+        let natural = Worldgen.generate(book: composition, seed: seed, tuning: clear,
+                                        isFreshFirstExpedition: false)
+        let protectedPositions = Set(natural.sites.map(\.position))
+        let protectedEnemies = natural.enemies.filter {
+            $0.isSessile || $0.isApex || protectedPositions.contains($0.position)
+        }
+
+        let cleared = Worldgen.generate(book: composition, seed: seed, tuning: clear,
+                                        isFreshFirstExpedition: true)
+        XCTAssertEqual(cleared.enemies.count, natural.enemies.count)
+        XCTAssertEqual(cleared.enemies.filter { $0.isSessile || $0.isApex
+            || protectedPositions.contains($0.position) }, protectedEnemies)
+        XCTAssertFalse(cleared.enemies.contains {
+            cleared.map[$0.position].isRevealed && !$0.isSessile && !$0.isApex
+                && !protectedPositions.contains($0.position)
+        })
+        XCTAssertTrue(cleared.diagnostics.openingEnvelopeApplied)
+        XCTAssertGreaterThan(cleared.diagnostics.openingEnemiesRelocated, 0)
+
+        let ignored = Worldgen.generate(book: composition, seed: seed, tuning: clear,
+                                        isFreshFirstExpedition: false)
+        XCTAssertEqual(ignored.enemies, natural.enemies)
+        XCTAssertFalse(ignored.diagnostics.openingEnvelopeApplied)
+
+        var gentle = clear
+        gentle.openingEncounterEnvelope = .gentle
+        let softened = Worldgen.generate(book: composition, seed: seed, tuning: gentle,
+                                         isFreshFirstExpedition: true)
+        XCTAssertLessThanOrEqual(softened.enemies.count {
+            softened.map[$0.position].isRevealed && !$0.isSessile && !$0.isApex
+                && !protectedPositions.contains($0.position)
+        }, 1)
+        XCTAssertEqual(softened.enemies.count, natural.enemies.count)
+    }
+
     // MARK: Fog and movement
 
     func testFogRevealsAroundThePlayerAndStaysRevealed() {

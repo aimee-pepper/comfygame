@@ -6,7 +6,7 @@ what's blocked on a decision, and where the whole thing is going.
 **Where it sits in the docs:** `BACKLOG.md` is the milestone plan and is authoritative for *what v0
 is*. `the-queue.md` is the working list of specced-and-unbuilt. This is the overview above both.
 
-**Numbers as of today:** 807 tests at the current full-suite checkpoint; current content has all 28
+**Numbers as of today:** 809 tests at the current full-suite checkpoint; current content has all 28
 currently designed recruitable travellers, 233 validated diary pages, 62 focuses and 9 sites.
 
 ---

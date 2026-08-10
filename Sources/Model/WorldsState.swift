@@ -290,6 +290,76 @@ struct WorldClock: Codable, Equatable, Sendable {
     }
 }
 
+/// Facts captured while a world is made. These are observations, not inputs: diagnostics must
+/// never reconstruct a generation decision from mutable tiles or by consuming the world's RNG.
+struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
+    var writingWasGuaranteed: Bool = true
+    var selectedDiaryPages: [DiaryPageID] = []
+    var selectedOtherWritingCount: Int = 0
+    var placedDiaryPages: [DiaryPageID] = []
+    var placedOtherWritings: [FoundWritingID] = []
+    var secondWritingRollSucceeded: Bool = false
+
+    var rawEssenceEligibleTiles: Int = 0
+    var rawEssencePlacementAttempts: Int = 0
+    var rawEssenceDropsPlaced: Int = 0
+    var rawEssenceObtainable: Int = 0
+    var ordinaryResourceNodes: [ResourceID: Int] = [:]
+
+    var creatureSpeciesCount: Int = 0
+    var creatureInstancesPlaced: Int = 0
+    var floraSpeciesCount: Int = 0
+    var floraInstancesPlaced: Int = 0
+    var activeFloraPlaced: Int = 0
+    var apexChance: Double = 0
+    var apexRollSucceeded: Bool = false
+    var apexPlaced: Bool = false
+
+    var initialTurnBudget: Int = 0
+    var projectedCollapseTurn: Int = 0
+    var travellerCandidates: [TravellerID] = []
+    var travellerSignatureMatches: [TravellerID] = []
+    var travellersPlaced: [TravellerID] = []
+
+    var openingEnvelopeRequested: DebugTuningProfile.OpeningEncounterEnvelope = .natural
+    var openingEnvelopeApplied: Bool = false
+    var openingEnemiesRelocated: Int = 0
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        writingWasGuaranteed = try c.decodeIfPresent(Bool.self, forKey: .writingWasGuaranteed) ?? true
+        selectedDiaryPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .selectedDiaryPages) ?? []
+        selectedOtherWritingCount = try c.decodeIfPresent(Int.self, forKey: .selectedOtherWritingCount) ?? 0
+        placedDiaryPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .placedDiaryPages) ?? []
+        placedOtherWritings = try c.decodeIfPresent([FoundWritingID].self, forKey: .placedOtherWritings) ?? []
+        secondWritingRollSucceeded = try c.decodeIfPresent(Bool.self, forKey: .secondWritingRollSucceeded) ?? false
+        rawEssenceEligibleTiles = try c.decodeIfPresent(Int.self, forKey: .rawEssenceEligibleTiles) ?? 0
+        rawEssencePlacementAttempts = try c.decodeIfPresent(Int.self, forKey: .rawEssencePlacementAttempts) ?? 0
+        rawEssenceDropsPlaced = try c.decodeIfPresent(Int.self, forKey: .rawEssenceDropsPlaced) ?? 0
+        rawEssenceObtainable = try c.decodeIfPresent(Int.self, forKey: .rawEssenceObtainable) ?? 0
+        ordinaryResourceNodes = try c.decodeIfPresent([ResourceID: Int].self, forKey: .ordinaryResourceNodes) ?? [:]
+        creatureSpeciesCount = try c.decodeIfPresent(Int.self, forKey: .creatureSpeciesCount) ?? 0
+        creatureInstancesPlaced = try c.decodeIfPresent(Int.self, forKey: .creatureInstancesPlaced) ?? 0
+        floraSpeciesCount = try c.decodeIfPresent(Int.self, forKey: .floraSpeciesCount) ?? 0
+        floraInstancesPlaced = try c.decodeIfPresent(Int.self, forKey: .floraInstancesPlaced) ?? 0
+        activeFloraPlaced = try c.decodeIfPresent(Int.self, forKey: .activeFloraPlaced) ?? 0
+        apexChance = try c.decodeIfPresent(Double.self, forKey: .apexChance) ?? 0
+        apexRollSucceeded = try c.decodeIfPresent(Bool.self, forKey: .apexRollSucceeded) ?? false
+        apexPlaced = try c.decodeIfPresent(Bool.self, forKey: .apexPlaced) ?? false
+        initialTurnBudget = try c.decodeIfPresent(Int.self, forKey: .initialTurnBudget) ?? 0
+        projectedCollapseTurn = try c.decodeIfPresent(Int.self, forKey: .projectedCollapseTurn) ?? 0
+        travellerCandidates = try c.decodeIfPresent([TravellerID].self, forKey: .travellerCandidates) ?? []
+        travellerSignatureMatches = try c.decodeIfPresent([TravellerID].self, forKey: .travellerSignatureMatches) ?? []
+        travellersPlaced = try c.decodeIfPresent([TravellerID].self, forKey: .travellersPlaced) ?? []
+        openingEnvelopeRequested = try c.decodeIfPresent(DebugTuningProfile.OpeningEncounterEnvelope.self,
+                                                          forKey: .openingEnvelopeRequested) ?? .natural
+        openingEnvelopeApplied = try c.decodeIfPresent(Bool.self, forKey: .openingEnvelopeApplied) ?? false
+        openingEnemiesRelocated = try c.decodeIfPresent(Int.self, forKey: .openingEnemiesRelocated) ?? 0
+    }
+}
+
 /// One instanced world run.
 struct WorldRun: Codable, Equatable, Sendable {
     var runIndex: Int
@@ -304,6 +374,7 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Development-only creation profile snapshotted into the run. Defaults in release and for
     /// old saves; keeping it here is what makes changing Settings unable to rewrite a live world.
     var tuning: DebugTuningProfile
+    var generationDiagnostics: WorldGenerationDiagnostics
     /// The resolved Cycle pressure made operational. Stored with the run so phase scheduling is
     /// deterministic across saves and anchored revisits, while old runs can preserve their phase
     /// at the migration boundary.
@@ -464,12 +535,14 @@ struct WorldRun: Codable, Equatable, Sendable {
          foundPagesAtStart: Set<DiaryPageID> = [],
          foundWritingsAtStart: Set<FoundWritingID> = [],
          foundTravellersAtStart: Set<TravellerID> = [],
+         generationDiagnostics: WorldGenerationDiagnostics = WorldGenerationDiagnostics(),
          tuning: DebugTuningProfile = .defaults) {
         self.runIndex = runIndex
         self.book = book
         self.mapSeed = mapSeed
         self.rng = rng
         self.tuning = tuning
+        self.generationDiagnostics = generationDiagnostics
         self.clock = WorldClock(book: book, seed: mapSeed)
         self.map = map
         self.playerPosition = playerPosition
@@ -539,6 +612,9 @@ struct WorldRun: Codable, Equatable, Sendable {
         mapSeed = try container.decode(UInt64.self, forKey: .mapSeed)
         rng = try container.decode(SeededRNG.self, forKey: .rng)
         tuning = try container.decodeIfPresent(DebugTuningProfile.self, forKey: .tuning) ?? .defaults
+        generationDiagnostics = try container.decodeIfPresent(WorldGenerationDiagnostics.self,
+                                                                forKey: .generationDiagnostics)
+            ?? WorldGenerationDiagnostics()
         map = try container.decode(WorldMap.self, forKey: .map)
         playerPosition = try container.decode(GridPoint.self, forKey: .playerPosition)
         enemies = try container.decodeIfPresent([WorldEnemy].self, forKey: .enemies) ?? []

@@ -158,6 +158,29 @@ private struct BalancingView: View {
             }
 
             Section {
+                Picker("Opening encounter envelope",
+                       selection: $settings.debugTuning.openingEncounterEnvelope) {
+                    ForEach(DebugTuningProfile.OpeningEncounterEnvelope.allCases, id: \.self) {
+                        Text($0.displayName).tag($0)
+                    }
+                }
+                Text("Only the first expedition of a fresh campaign. Gentle keeps at most one ordinary mobile enemy in the revealed entry area; Clear approach keeps none. Enemies are relocated, never deleted.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Reset Test Setup") {
+                    settings.debugTuning.openingEncounterEnvelope = .natural
+                }
+                .font(.caption)
+            } header: {
+                Text("Test Setup")
+            } footer: {
+                if settings.debugTuning.openingEncounterEnvelope != .natural {
+                    Label("TEST SETUP ACTIVE", systemImage: "wrench.and.screwdriver.fill")
+                        .foregroundStyle(.orange)
+                }
+            }
+
+            Section {
                 tuningSlider("Stability duration", value: $settings.debugTuning.stabilityDurationMultiplier,
                              range: 0.5...2)
                 percentageSlider("Collapse recovery",

@@ -72,6 +72,20 @@ final class AppSettings: ObservableObject {
 /// Balancing values are deliberately separate from `GameState`: they describe the development
 /// environment that creates the next run, not anything the player earned or discovered.
 struct DebugTuningProfile: Codable, Equatable, Sendable {
+    enum OpeningEncounterEnvelope: String, Codable, CaseIterable, Sendable {
+        case natural
+        case gentle
+        case clearApproach
+
+        var displayName: String {
+            switch self {
+            case .natural: "Natural"
+            case .gentle: "Gentle"
+            case .clearApproach: "Clear approach"
+            }
+        }
+    }
+
     static let storageKey = "debug.tuning.profile.v1"
     static let defaults = DebugTuningProfile()
 
@@ -89,6 +103,7 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
     var slowGroundExtraTurns = 1
     var activeFloraFrequencyMultiplier = 1.0
     var floraHazardSeverityMultiplier = 1.0
+    var openingEncounterEnvelope: OpeningEncounterEnvelope = .natural
 
     var isDefault: Bool { self == .defaults }
 
@@ -133,6 +148,8 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
             forKey: .activeFloraFrequencyMultiplier) ?? 1
         floraHazardSeverityMultiplier = try c.decodeIfPresent(Double.self,
             forKey: .floraHazardSeverityMultiplier) ?? 1
+        openingEncounterEnvelope = try c.decodeIfPresent(OpeningEncounterEnvelope.self,
+            forKey: .openingEncounterEnvelope) ?? .natural
     }
 }
 

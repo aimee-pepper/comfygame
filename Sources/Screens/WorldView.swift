@@ -439,8 +439,6 @@ private struct WorldDiagnosticsView: View {
             }
         }
     }
-    private var pageCount: Int { run.map.tiles.count { if case .diaryPage = $0.content { true } else { false } } }
-
     var body: some View {
         NavigationStack {
             List {
@@ -449,34 +447,43 @@ private struct WorldDiagnosticsView: View {
                     LabeledRow(icon: "clock", label: "Turn", value: "\(run.turnsTaken)")
                 }
                 Section("Writing") {
-                    LabeledRow(icon: "book.pages", label: "Diary pages remaining", value: "\(pageCount)")
-                    LabeledRow(icon: "note.text", label: "Other-writing records generated", value: "\(run.foundWritings.count)")
+                    let report = run.generationDiagnostics
+                    LabeledRow(icon: "checkmark.seal", label: "Guaranteed", value: report.writingWasGuaranteed ? "yes" : "no")
+                    LabeledRow(icon: "book.pages", label: "Diary selected / placed",
+                               value: "\(report.selectedDiaryPages.count) / \(report.placedDiaryPages.count)")
+                    LabeledRow(icon: "note.text", label: "Other selected / placed",
+                               value: "\(report.selectedOtherWritingCount) / \(report.placedOtherWritings.count)")
+                    LabeledRow(icon: "dice", label: "Second-writing roll",
+                               value: report.secondWritingRollSucceeded ? "succeeded" : "missed")
                     LabeledRow(icon: "percent", label: "Diary mix snapshot",
                                value: run.tuning.diaryWritingShare.formatted(.percent.precision(.fractionLength(0))))
                     LabeledRow(icon: "hourglass", label: "Patience floor", value: "\(run.tuning.diaryPatienceWorlds) worlds")
                 }
                 Section("Population") {
-                    LabeledRow(icon: "hare", label: "Creature species", value: "\(run.cast.count)")
-                    LabeledRow(icon: "pawprint", label: "Creature instances", value: "\(run.enemies.count)")
-                    LabeledRow(icon: "crown", label: "Apex result", value: run.enemies.contains(where: \.isApex) ? "placed" : "none")
-                    LabeledRow(icon: "leaf", label: "Flora records", value: "\(run.flora.count)")
-                    LabeledRow(icon: "burst", label: "Active flora", value: "\(run.enemies.count(where: \.isSessile))")
+                    let report = run.generationDiagnostics
+                    LabeledRow(icon: "hare", label: "Creature species", value: "\(report.creatureSpeciesCount)")
+                    LabeledRow(icon: "pawprint", label: "Creature instances placed", value: "\(report.creatureInstancesPlaced)")
+                    LabeledRow(icon: "crown", label: "Apex roll / result",
+                               value: "\(report.apexChance.formatted(.percent.precision(.fractionLength(1)))) · \(report.apexRollSucceeded ? "hit" : "miss") · \(report.apexPlaced ? "placed" : "none")")
+                    LabeledRow(icon: "leaf", label: "Flora species / instances",
+                               value: "\(report.floraSpeciesCount) / \(report.floraInstancesPlaced)")
+                    LabeledRow(icon: "burst", label: "Active flora placed", value: "\(report.activeFloraPlaced)")
                 }
                 Section("World duration") {
                     LabeledRow(icon: "gauge", label: "Stability score", value: "\(run.effectiveStabilityScore)")
                     LabeledRow(icon: "timer", label: "Turns remaining",
                                value: "\(max(0, Int(ceil(run.stability / max(0.01, run.decayPerTurn)))))")
+                    LabeledRow(icon: "flag.checkered", label: "Initial budget / projected collapse",
+                               value: "\(run.generationDiagnostics.initialTurnBudget) / turn \(run.generationDiagnostics.projectedCollapseTurn)")
                     LabeledRow(icon: "shippingbox", label: "Collapse recovery",
                                value: run.tuning.collapseRecoveryFraction.formatted(.percent.precision(.fractionLength(0))))
                 }
                 Section("Placed resources") {
-                    let rawDrops = run.map.tiles.compactMap { tile -> Int? in
-                        if case .wildDrop(let resource, let amount) = tile.content,
-                           resource == Resources.essenceRaw { return amount }
-                        return nil
-                    }
-                    LabeledRow(icon: "drop.fill", label: "Raw Essence wild drops",
-                               value: "\(rawDrops.count) · \(rawDrops.reduce(0, +)) obtainable")
+                    let report = run.generationDiagnostics
+                    LabeledRow(icon: "drop.fill", label: "Raw Essence eligible / attempted / placed",
+                               value: "\(report.rawEssenceEligibleTiles) / \(report.rawEssencePlacementAttempts) / \(report.rawEssenceDropsPlaced)")
+                    LabeledRow(icon: "drop", label: "Raw Essence obtainable",
+                               value: "\(report.rawEssenceObtainable)")
                     if nodes.isEmpty { Text("None") }
                     ForEach(nodes.keys.sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { id in
                         LabeledRow(icon: ContentCatalog.shared.resource(id)?.icon ?? "cube",
@@ -485,16 +492,39 @@ private struct WorldDiagnosticsView: View {
                     }
                 }
                 Section("Traveller placement") {
-                    if run.travellersHere.isEmpty { Text("No travellers placed") }
-                    ForEach(run.travellersHere, id: \.self) { id in
+                    let report = run.generationDiagnostics
+                    LabeledRow(icon: "person.3", label: "Candidates / matches / placed",
+                               value: "\(report.travellerCandidates.count) / \(report.travellerSignatureMatches.count) / \(report.travellersPlaced.count)")
+                    if report.travellersPlaced.isEmpty { Text("No travellers placed") }
+                    ForEach(report.travellersPlaced, id: \.self) { id in
                         Text(ContentCatalog.shared.traveller(id)?.name ?? id.rawValue)
                     }
+                }
+                Section("Test Setup") {
+                    let report = run.generationDiagnostics
+                    LabeledRow(icon: "wrench.and.screwdriver", label: "Opening envelope requested",
+                               value: report.openingEnvelopeRequested.displayName)
+                    LabeledRow(icon: "arrow.triangle.swap", label: "Opening envelope result",
+                               value: report.openingEnvelopeRequested == .natural ? "natural — no change"
+                                   : report.openingEnvelopeApplied
+                                       ? "applied · \(report.openingEnemiesRelocated) relocated"
+                                       : "ignored — not a fresh first expedition")
+                }
+                Section("Tuning snapshot") {
+                    Text(tuningSnapshot)
+                        .font(.caption.monospaced())
+                        .textSelection(.enabled)
                 }
             }
             .navigationTitle("World diagnostics")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         }
+    }
+
+    private var tuningSnapshot: String {
+        let t = run.tuning
+        return "rawFrequency=\(t.rawEssenceFrequencyMultiplier) rawYield=\(t.rawEssenceYieldMultiplier) nodeDensity=\(t.resourceNodeDensityMultiplier) creatureDensity=\(t.creatureDensityMultiplier) diaryShare=\(t.diaryWritingShare) secondWriting=\(t.additionalPageChance) patience=\(t.diaryPatienceWorlds) stabilityDuration=\(t.stabilityDurationMultiplier) collapseRecovery=\(t.collapseRecoveryFraction) apex=\(t.apexChanceMultiplier) vision=\(t.baseVisionRadius) slowExtra=\(t.slowGroundExtraTurns) activeFlora=\(t.activeFloraFrequencyMultiplier) floraSeverity=\(t.floraHazardSeverityMultiplier) opening=\(t.openingEncounterEnvelope.rawValue)"
     }
 }
 #endif
