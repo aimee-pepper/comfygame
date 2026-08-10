@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		01649DA229D4F9B920409CF5 /* CreatureTraits.swift in Sources */ = {isa = PBXBuildFile; fileRef = F308F3AB5ABAC31BC6DE4938 /* CreatureTraits.swift */; };
+		00A11A11A11A11A11A11A111 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00B22B22B22B22B22B22B222 /* LaunchScreen.storyboard */; };
 		01A65B5074EBFC458F077A59 /* VocabularyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */; };
 		01E64B915C4AC1BE0A72A935 /* ResearchViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */; };
 		0290A7D4A5E8A5E8516E171E /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606F9667A67D771D03320DDA /* PersistenceTests.swift */; };
@@ -189,6 +190,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		00B22B22B22B22B22B22B222 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0212875D2B95EA338E16F0B2 /* WorldDescriptionPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldDescriptionPanel.swift; sourceTree = "<group>"; };
 		03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingViews.swift; sourceTree = "<group>"; };
 		0486776A4EED6E508F843FB3 /* resources.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = resources.json; sourceTree = "<group>"; };
@@ -572,6 +574,7 @@
 		AD5AD96F34050F6073DCC407 /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				00B22B22B22B22B22B22B222 /* LaunchScreen.storyboard */,
 				FBE911A8A2C4D05D38EF6192 /* Signing.xcconfig */,
 			);
 			path = Support;
@@ -742,6 +745,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00A11A11A11A11A11A11A111 /* LaunchScreen.storyboard in Resources */,
 				583140A5C38A586267218BC1 /* combat_trees.json in Resources */,
 				5B91181B627494D599038230 /* constellation.json in Resources */,
 				4FD1E53B0D4C2E67BB48FEE9 /* contradictions.json in Resources */,

@@ -18,6 +18,19 @@ import OSLog
 ///  - Writes go through one serial queue, so they land in the order they were made.
 @MainActor
 final class GameStore: ObservableObject {
+    struct PreparedLaunch: Sendable {
+        var state: GameState
+        var loadOutcome: String
+        var saveFileByteCount: Int?
+        var timings: LaunchTimings
+    }
+
+    struct LaunchTimings: Equatable, Sendable {
+        var loadMilliseconds: Double
+        var reconciliationMilliseconds: Double
+        var persistenceMilliseconds: Double
+        var totalMilliseconds: Double
+    }
     @Published private(set) var state: GameState
     @Published private(set) var diagnostics: SaveDiagnostics
 
@@ -35,35 +48,83 @@ final class GameStore: ObservableObject {
 
     /// Loads synchronously at launch: the app must never render a frame of state it might have
     /// to replace a moment later. The file is a few KB.
-    init(io: SaveFileIO) {
+    convenience init(io: SaveFileIO) {
+        do {
+            self.init(io: io, prepared: try Self.prepareLaunch(io: io))
+        } catch {
+            let state = GameState.newGame()
+            self.init(io: io, prepared: PreparedLaunch(
+                state: state, loadOutcome: "launch failed: \(error.localizedDescription)",
+                saveFileByteCount: io.saveFileByteCount,
+                timings: .init(loadMilliseconds: 0, reconciliationMilliseconds: 0,
+                               persistenceMilliseconds: 0, totalMilliseconds: 0)
+            ))
+            diagnostics.lastError = error.localizedDescription
+        }
+    }
+
+    init(io: SaveFileIO, prepared: PreparedLaunch) {
         self.io = io
-        let outcome = io.load()
-        self.state = outcome.state ?? GameState.newGame()
+        self.state = prepared.state
         self.diagnostics = SaveDiagnostics(
-            loadOutcome: outcome.description,
-            savedMutationCount: outcome.state?.meta.mutationCount ?? 0,
+            loadOutcome: prepared.loadOutcome,
+            savedMutationCount: prepared.state.meta.mutationCount,
             saveURL: io.saveURL
         )
-        self.diagnostics.saveFileByteCount = io.saveFileByteCount
+        self.diagnostics.saveFileByteCount = prepared.saveFileByteCount
+    }
 
-        // A launch is itself a state change: record it and write immediately, so that even a
-        // launch-then-instant-kill leaves a coherent file.
-        //
-        // Also the moment to reconcile the save with the content it was written against. The book
-        // *draft* used to be pruned here — it referred to slots, and the slot taxonomy is gone
-        // (`fossil-audit.md` §5), so there is nothing left to prune: a save written before the page
-        // simply drops the field, which is what tolerant decoding is for.
-        mutate("launch", flush: true) { state in
-            state.meta.launchCount += 1
-            // **And everybody you've found gets a seat at the fire**, whether or not the version of
-            // the game that found them knew how to give them one. See `seatEveryoneFound`.
-            state.base.seatEveryoneFound(in: state.reality.library)
-            state.base.learnEveryStarterWord()
+    /// All disk, decoding, catalogue reconciliation and the launch commitment can run before the
+    /// main actor owns a store. The first SwiftUI frame therefore never waits behind file I/O.
+    nonisolated static func prepareLaunch(io: SaveFileIO) throws -> PreparedLaunch {
+        let totalStart = DispatchTime.now().uptimeNanoseconds
+        let loadStart = totalStart
+        let outcome = io.load()
+        var state = outcome.state ?? GameState.newGame()
+        let loadedAt = DispatchTime.now().uptimeNanoseconds
+
+        state.meta.launchCount += 1
+        state.base.seatEveryoneFound(in: state.reality.library)
+        state.base.learnEveryStarterWord()
+        state.meta.mutationCount += 1
+        state.meta.lastAction = "launch"
+        state.meta.lastSavedAt = Date()
+
+        if state.worlds.activeRun == nil {
+            let floor = EconomyRules.minimumBindCost(in: state)
+            if EconomyRules.spendableEssence(in: state) < floor {
+                state.base.essence += max(0, floor - EconomyRules.spendableEssence(in: state))
+                state.meta.mutationCount += 1
+                state.meta.lastAction = "the spring provides"
+                state.meta.lastSavedAt = Date()
+            }
         }
+        let reconciledAt = DispatchTime.now().uptimeNanoseconds
 
-        // Recover a save that's already stranded — someone who spent their last essence before
-        // this guard existed shouldn't have to start over.
-        ensureDepartureIsPossible()
+        do {
+            let committedData = try SaveCodec.encode(state)
+            try io.write(committedData)
+            // Publish the same normalized representation a future process will decode.
+            // Several tolerant save fields intentionally omit default dictionary entries.
+            state = try SaveCodec.decode(committedData)
+        }
+        catch {
+            Logger.persistence.error("Launch commitment failed: \(String(describing: error))")
+            throw error
+        }
+        let persistedAt = DispatchTime.now().uptimeNanoseconds
+        func milliseconds(_ start: UInt64, _ end: UInt64) -> Double {
+            Double(end - start) / 1_000_000
+        }
+        return PreparedLaunch(
+            state: state,
+            loadOutcome: outcome.description,
+            saveFileByteCount: io.saveFileByteCount,
+            timings: .init(loadMilliseconds: milliseconds(loadStart, loadedAt),
+                           reconciliationMilliseconds: milliseconds(loadedAt, reconciledAt),
+                           persistenceMilliseconds: milliseconds(reconciledAt, persistedAt),
+                           totalMilliseconds: milliseconds(totalStart, persistedAt))
+        )
     }
 
     static func live() -> GameStore { GameStore(io: .documents) }

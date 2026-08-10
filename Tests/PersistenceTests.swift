@@ -164,6 +164,153 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(loaded.reality.motes, 0, "A missing layer falls back to its new-game value")
     }
 
+    func testPreparedLaunchCommitsReconciliationBeforePublishingState() throws {
+        var saved = GameState.newGame()
+        saved.meta.launchCount = 4
+        saved.meta.mutationCount = 9
+        saved.base.essence = 0
+        try io.write(SaveCodec.encode(saved))
+
+        let prepared = try GameStore.prepareLaunch(io: io)
+        let persisted = try XCTUnwrap(io.load().state)
+
+        XCTAssertEqual(prepared.state.meta.launchCount, 5)
+        XCTAssertEqual(prepared.state.meta.mutationCount, 11,
+                       "Launch and the anti-stranding Spring are two honest commitments")
+        XCTAssertEqual(persisted, prepared.state,
+                       "A published store can never outrun its launch commitment on disk")
+        XCTAssertGreaterThanOrEqual(prepared.timings.loadMilliseconds, 0)
+        XCTAssertGreaterThanOrEqual(prepared.timings.reconciliationMilliseconds, 0)
+        XCTAssertGreaterThanOrEqual(prepared.timings.persistenceMilliseconds, 0)
+        XCTAssertGreaterThanOrEqual(prepared.timings.totalMilliseconds,
+                                    prepared.timings.loadMilliseconds)
+    }
+
+    @MainActor
+    func testLaunchCoordinatorPublishesOnlyPreparedStateAndWarmReadyDoesNotFlash() async throws {
+        let prepared = try GameStore.prepareLaunch(io: io)
+        let coordinator = AppLaunchCoordinator(prepare: { prepared })
+        XCTAssertNil(coordinator.store)
+        coordinator.start()
+        try await waitUntil { coordinator.store != nil }
+        XCTAssertEqual(coordinator.store?.state, prepared.state)
+
+        let warmStore = try XCTUnwrap(coordinator.store)
+        let warm = AppLaunchCoordinator(readyStore: warmStore, prepare: { prepared })
+        warm.start()
+        XCTAssertTrue(warm.store === warmStore,
+                      "An already-ready warm scene must not swap through the loader")
+    }
+
+    @MainActor
+    func testLaunchCoordinatorShowsFailureAndTimeoutWithRetryPath() async throws {
+        struct TestFailure: LocalizedError {
+            var errorDescription: String? { "A deliberate launch failure." }
+        }
+        let failure = AppLaunchCoordinator(prepare: { throw TestFailure() })
+        failure.start()
+        try await waitUntil {
+            if case .failed = failure.phase { return true }
+            return false
+        }
+        guard case .failed(let failureState) = failure.phase else { return XCTFail("Expected failure") }
+        XCTAssertEqual(failureState.message, "The Atlas could not be opened.")
+        XCTAssertEqual(failureState.details, "A deliberate launch failure.")
+        XCTAssertTrue(failureState.canRetry)
+
+        let timeoutIO = try XCTUnwrap(io)
+        let timeout = AppLaunchCoordinator(timeout: .milliseconds(20), prepare: {
+            try await Task.sleep(for: .milliseconds(80))
+            return try GameStore.prepareLaunch(io: timeoutIO)
+        })
+        timeout.start()
+        try await waitUntil {
+            if case .failed = timeout.phase { return true }
+            return false
+        }
+        guard case .failed(let timeoutState) = timeout.phase else { return XCTFail("Expected timeout") }
+        XCTAssertEqual(timeoutState.message, "The Atlas is taking longer than expected.")
+        XCTAssertFalse(timeoutState.canRetry)
+        timeout.retry()
+        try await waitUntil { timeout.store != nil }
+        XCTAssertNotNil(timeout.store, "A timed-out preparation finishes safely instead of racing a replacement writer")
+    }
+
+    @MainActor
+    func testLaunchTimeoutSerializesRetryWriters() async throws {
+        actor Probe {
+            var calls = 0
+            var active = 0
+            var maximumActive = 0
+            func begin() -> Int {
+                calls += 1
+                active += 1
+                maximumActive = max(maximumActive, active)
+                return calls
+            }
+            func end() { active -= 1 }
+            func snapshot() -> (Int, Int) { (calls, maximumActive) }
+        }
+        struct FirstFailure: LocalizedError { var errorDescription: String? { "first writer failed" } }
+        let probe = Probe()
+        let prepared = try GameStore.prepareLaunch(io: io)
+        let coordinator = AppLaunchCoordinator(timeout: .milliseconds(10), prepare: {
+            let call = await probe.begin()
+            try? await Task.sleep(for: .milliseconds(50))
+            await probe.end()
+            if call == 1 { throw FirstFailure() }
+            return prepared
+        })
+        coordinator.start()
+        try await waitUntil {
+            if case .failed(let state) = coordinator.phase { return !state.canRetry }
+            return false
+        }
+        coordinator.retry()
+        let timedOutSnapshot = await probe.snapshot()
+        XCTAssertEqual(timedOutSnapshot.0, 1, "Retry remains disabled while the timed-out writer owns the save path")
+        try await waitUntil {
+            if case .failed(let state) = coordinator.phase { return state.canRetry }
+            return false
+        }
+        coordinator.retry()
+        try await waitUntil { coordinator.store != nil }
+        let snapshot = await probe.snapshot()
+        XCTAssertEqual(snapshot.0, 2)
+        XCTAssertEqual(snapshot.1, 1, "Launch writers must never overlap")
+    }
+
+    func testFirstFrameClockIncludesElapsedLaunchWork() async throws {
+        LaunchClock.begin()
+        let before = LaunchClock.elapsedMilliseconds()
+        try await Task.sleep(for: .milliseconds(25))
+        let after = LaunchClock.elapsedMilliseconds()
+        XCTAssertGreaterThanOrEqual(after - before, 20,
+                                    "The eager launch epoch must include work before the first frame")
+    }
+
+    func testStaticLaunchMarkUsesTheAcceptedPairedPageGeometry() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let storyboard = try String(contentsOf: projectRoot.appendingPathComponent("Support/LaunchScreen.storyboard"),
+                                    encoding: .utf8)
+        let acceptedRects = [
+            "x=\"0\" y=\"4\" width=\"36\" height=\"54\"",
+            "x=\"38\" y=\"4\" width=\"36\" height=\"54\"",
+            "x=\"4\" y=\"8\" width=\"32\" height=\"46\"",
+            "x=\"38\" y=\"8\" width=\"32\" height=\"46\"",
+            "x=\"8\" y=\"12\" width=\"28\" height=\"38\"",
+            "x=\"38\" y=\"12\" width=\"28\" height=\"38\"",
+            "x=\"35\" y=\"0\" width=\"4\" height=\"58\"",
+            "x=\"0\" y=\"54\" width=\"32\" height=\"4\"",
+            "x=\"42\" y=\"54\" width=\"32\" height=\"4\"",
+            "x=\"8\" y=\"46\" width=\"6\" height=\"4\"",
+            "x=\"60\" y=\"50\" width=\"6\" height=\"4\""
+        ]
+        for rect in acceptedRects {
+            XCTAssertTrue(storyboard.contains(rect), "Static launch mark drifted from v0.2 rectangle \(rect)")
+        }
+    }
+
     // MARK: - GameStore
 
     @MainActor
@@ -253,5 +400,15 @@ final class PersistenceTests: XCTestCase {
             try await Task.sleep(for: .milliseconds(10))
         }
         XCTFail("Disk never caught up with memory")
+    }
+
+    @MainActor
+    private func waitUntil(timeout: Duration = .seconds(1), _ predicate: () -> Bool) async throws {
+        let deadline = ContinuousClock.now + timeout
+        while ContinuousClock.now < deadline {
+            if predicate() { return }
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        XCTFail("Timed out waiting for launch state")
     }
 }
