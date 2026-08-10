@@ -134,10 +134,16 @@ private struct BalancingView: View {
             }
 
             Section("Resources") {
+                Picker("Raw essence profile", selection: $settings.debugTuning.rawEssenceProfile) {
+                    ForEach(DebugTuningProfile.RawEssenceProfile.allCases, id: \.self) {
+                        Text($0.displayName).tag($0)
+                    }
+                }
                 tuningSlider("Raw essence frequency", value: $settings.debugTuning.rawEssenceFrequencyMultiplier)
                 tuningSlider("Raw essence yield", value: $settings.debugTuning.rawEssenceYieldMultiplier)
                 tuningSlider("World-resource node density", value: $settings.debugTuning.resourceNodeDensityMultiplier)
                 resetSection("Resources") {
+                    settings.debugTuning.rawEssenceProfile = .recommended
                     settings.debugTuning.rawEssenceFrequencyMultiplier = 1
                     settings.debugTuning.rawEssenceYieldMultiplier = 1
                     settings.debugTuning.resourceNodeDensityMultiplier = 1

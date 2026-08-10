@@ -344,6 +344,52 @@ final class WorldTests: XCTestCase {
             .generationDiagnostics, first.diagnostics)
     }
 
+    func testRawEssenceRecommendedProfileIsTheDefaultAndLegacyRemainsComparable() throws {
+        XCTAssertEqual(DebugTuningProfile.defaults.rawEssenceProfile, .recommended)
+        XCTAssertEqual(DebugTuningProfile.RawEssenceProfile.recommended.dropRange, 5...7)
+        XCTAssertEqual(DebugTuningProfile.RawEssenceProfile.recommended.amountRange, 2...3)
+        XCTAssertEqual(DebugTuningProfile.RawEssenceProfile.legacy.dropRange, 2...4)
+        XCTAssertEqual(DebugTuningProfile.RawEssenceProfile.legacy.amountRange, 1...2)
+
+        let composition = book(["terrain": "plains"])
+        for seed in UInt64(1)...20 {
+            let recommended = Worldgen.generate(book: composition, seed: seed,
+                                                tuning: .defaults).diagnostics
+            XCTAssertTrue((5...7).contains(recommended.rawEssenceDropsPlaced))
+            XCTAssertGreaterThanOrEqual(recommended.rawEssenceObtainable,
+                                        recommended.rawEssenceDropsPlaced * 2)
+            XCTAssertLessThanOrEqual(recommended.rawEssenceObtainable,
+                                     recommended.rawEssenceDropsPlaced * 3)
+
+            var legacyTuning = DebugTuningProfile.defaults
+            legacyTuning.rawEssenceProfile = .legacy
+            let legacy = Worldgen.generate(book: composition, seed: seed,
+                                           tuning: legacyTuning).diagnostics
+            XCTAssertTrue((2...4).contains(legacy.rawEssenceDropsPlaced))
+            XCTAssertGreaterThanOrEqual(legacy.rawEssenceObtainable, legacy.rawEssenceDropsPlaced)
+            XCTAssertLessThanOrEqual(legacy.rawEssenceObtainable, legacy.rawEssenceDropsPlaced * 2)
+        }
+    }
+
+    func testRawEssenceProfileAndIndependentMultipliersAreSnapshottedDeterministically() {
+        let composition = book(["terrain": "plains"])
+        var tuning = DebugTuningProfile.defaults
+        tuning.rawEssenceProfile = .lean
+        tuning.rawEssenceFrequencyMultiplier = 0.5
+        tuning.rawEssenceYieldMultiplier = 2
+        let first = Worldgen.generate(book: composition, seed: 81_919, tuning: tuning)
+        let again = Worldgen.generate(book: composition, seed: 81_919, tuning: tuning)
+        XCTAssertEqual(first.diagnostics, again.diagnostics)
+        XCTAssertTrue((2...3).contains(first.diagnostics.rawEssenceDropsPlaced))
+        XCTAssertGreaterThanOrEqual(first.diagnostics.rawEssenceObtainable,
+                                    first.diagnostics.rawEssenceDropsPlaced * 4)
+        let run = WorldRun(runIndex: 1, book: composition, mapSeed: 81_919,
+                           rng: SeededRNG(seed: 81_919), map: first.map,
+                           playerPosition: first.start, generationDiagnostics: first.diagnostics,
+                           tuning: tuning)
+        XCTAssertEqual(run.tuning, tuning)
+    }
+
     func testOpeningEnvelopeRelocatesRatherThanDeletesOnlyOnFreshFirstExpedition() throws {
         let composition = book(["terrain": "plains", "biome": "teeming_life"])
         var clear = DebugTuningProfile.defaults

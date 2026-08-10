@@ -74,7 +74,11 @@ extension GameStore {
 
         mutate("the spring provides", flush: true) { state in
             let shortfall = floor - EconomyRules.spendableEssence(in: state)
-            state.base.essence += max(0, shortfall)
+            let subsidy = max(0, shortfall)
+            state.base.essence += subsidy
+            let runway = EconomyRules.spendableEssence(in: state)
+            state.worlds.lastExit?.essenceEconomy.antiLockSubsidy += subsidy
+            state.worlds.lastExit?.essenceEconomy.netRunway = runway
         }
     }
 

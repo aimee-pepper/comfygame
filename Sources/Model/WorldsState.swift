@@ -97,6 +97,14 @@ struct AnchoredRealm: Codable, Equatable, Identifiable, Sendable {
 }
 
 struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
+    struct EssenceEconomy: Codable, Equatable, Sendable {
+        var rawCollected: Int = 0
+        var refinedEquivalent: Int = 0
+        var bindCostPaid: Int = 0
+        var springYield: Int = 0
+        var antiLockSubsidy: Int = 0
+        var netRunway: Int = 0
+    }
     enum Kind: String, Codable, Equatable, Sendable {
         case portal, waystone, defeat, collapse, abandon
 
@@ -122,6 +130,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     var lostItems: [RunExitGain] = []
     var progress: [RunProgressGain] = []
     var pages: [DiaryPageID] = []
+    var essenceEconomy = EssenceEconomy()
 
     var id: Int { runIndex }
 
@@ -129,7 +138,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
          resources: [RunExitGain] = [], items: [RunExitGain] = [],
          lostResources: [RunExitGain] = [], lostItems: [RunExitGain] = [],
          progress: [RunProgressGain] = [],
-         pages: [DiaryPageID] = []) {
+         pages: [DiaryPageID] = [], essenceEconomy: EssenceEconomy = EssenceEconomy()) {
         self.runIndex = runIndex
         self.kind = kind
         self.reason = reason
@@ -141,6 +150,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         self.lostItems = lostItems
         self.progress = progress
         self.pages = pages
+        self.essenceEconomy = essenceEconomy
     }
 
     init(from decoder: Decoder) throws {
@@ -157,6 +167,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         lostItems = try c.decodeIfPresent([RunExitGain].self, forKey: .lostItems) ?? []
         progress = try c.decodeIfPresent([RunProgressGain].self, forKey: .progress) ?? []
         pages = try c.decodeIfPresent([DiaryPageID].self, forKey: .pages) ?? []
+        essenceEconomy = try c.decodeIfPresent(EssenceEconomy.self, forKey: .essenceEconomy) ?? EssenceEconomy()
     }
 }
 

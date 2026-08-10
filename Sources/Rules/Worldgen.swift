@@ -190,13 +190,13 @@ enum Worldgen {
         let rawEssenceEligibleTiles = map.allPoints.count {
             !occupied.contains($0) && map[$0].content == .empty && map[$0].isPassable
         }
-        let wildCount = scaled(featureRNG.int(in: Tuning.World.wildDropCountRange),
+        let wildCount = scaled(featureRNG.int(in: tuning.rawEssenceProfile.dropRange),
                                by: tuning.rawEssenceFrequencyMultiplier)
         var rawEssenceDropsPlaced = 0
         var rawEssenceObtainable = 0
         for _ in 0..<wildCount {
             guard let point = randomFreePoint(in: map, avoiding: occupied, rng: &featureRNG) else { continue }
-            let amount = scaled(featureRNG.int(in: Tuning.World.wildDropAmountRange),
+            let amount = scaled(featureRNG.int(in: tuning.rawEssenceProfile.amountRange),
                                 by: tuning.rawEssenceYieldMultiplier)
             map[point].content = .wildDrop(resource: Resources.essenceRaw, amount: amount)
             occupied.insert(point)

@@ -72,6 +72,19 @@ final class AppSettings: ObservableObject {
 /// Balancing values are deliberately separate from `GameState`: they describe the development
 /// environment that creates the next run, not anything the player earned or discovered.
 struct DebugTuningProfile: Codable, Equatable, Sendable {
+    enum RawEssenceProfile: String, Codable, CaseIterable, Sendable {
+        case legacy, lean, recommended, generous
+        var displayName: String { rawValue.capitalized }
+        var dropRange: ClosedRange<Int> {
+            switch self {
+            case .legacy: 2...4
+            case .lean: 4...6
+            case .recommended: 5...7
+            case .generous: 6...8
+            }
+        }
+        var amountRange: ClosedRange<Int> { self == .legacy ? 1...2 : 2...3 }
+    }
     enum EncounterScalingProfile: String, Codable, CaseIterable, Sendable {
         case current, reserved, recommended, pressing
         var displayName: String {
@@ -110,6 +123,7 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
 
     var rawEssenceFrequencyMultiplier = 1.0
     var rawEssenceYieldMultiplier = 1.0
+    var rawEssenceProfile: RawEssenceProfile = .recommended
     var resourceNodeDensityMultiplier = 1.0
     var creatureDensityMultiplier = 1.0
     var additionalPageChance = Tuning.Library.additionalPageChance
@@ -144,6 +158,8 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
                                                                forKey: .rawEssenceFrequencyMultiplier) ?? 1
         rawEssenceYieldMultiplier = try c.decodeIfPresent(Double.self,
                                                            forKey: .rawEssenceYieldMultiplier) ?? 1
+        rawEssenceProfile = try c.decodeIfPresent(RawEssenceProfile.self,
+                                                   forKey: .rawEssenceProfile) ?? .recommended
         resourceNodeDensityMultiplier = try c.decodeIfPresent(Double.self,
                                                                forKey: .resourceNodeDensityMultiplier) ?? 1
         creatureDensityMultiplier = try c.decodeIfPresent(Double.self,

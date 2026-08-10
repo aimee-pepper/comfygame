@@ -129,6 +129,22 @@ private struct RunExitSummaryView: View {
                     recapSection("Resources", gains: summary.resources)
                     recapSection("Loot", gains: summary.items)
 
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Essence runway").font(.headline)
+                        LabeledContent("Raw Essence collected", value: "\(summary.essenceEconomy.rawCollected)")
+                        LabeledContent("Refined equivalent", value: "\(summary.essenceEconomy.refinedEquivalent)")
+                        LabeledContent("Bind cost paid", value: "\(summary.essenceEconomy.bindCostPaid)")
+                        LabeledContent("Spring yield", value: "+\(summary.essenceEconomy.springYield)")
+                        if summary.essenceEconomy.antiLockSubsidy > 0 {
+                            LabeledContent("Spring shortfall aid", value: "+\(summary.essenceEconomy.antiLockSubsidy)")
+                        }
+                        LabeledContent("Spendable runway", value: "\(summary.essenceEconomy.netRunway)")
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(14)
+                    .background(Color(.secondarySystemGroupedBackground),
+                                in: RoundedRectangle(cornerRadius: 14))
+
                     sectionHeading("Lost")
                     recapSection("Resources", gains: summary.lostResources)
                     recapSection("Loot", gains: summary.lostItems)

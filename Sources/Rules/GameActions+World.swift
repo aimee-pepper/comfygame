@@ -409,6 +409,7 @@ extension GameStore {
                 state.worlds.anchoredRealms[index].world = run.anchoredSnapshot
             }
             if kind == .portal { state.reality.lifetime.runsBankedViaPortal += 1 }
+            let springYield = GameStore.essenceSpringYield(for: state)
             GameStore.creditEssenceSpring(&state)
             state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex,
                                                    kind: kind,
@@ -420,7 +421,12 @@ extension GameStore {
                                                    lostResources: banked.lostResources,
                                                    lostItems: banked.lostItems,
                                                    progress: GameStore.progressGained(in: run, state: state),
-                                                   pages: GameStore.pagesFound(in: run, state: state))
+                                                   pages: GameStore.pagesFound(in: run, state: state),
+                                                   essenceEconomy: .init(rawCollected: banked.rawEssence,
+                                                       refinedEquivalent: EconomyRules.refine(rawUnits: banked.rawEssence),
+                                                       bindCostPaid: run.book.essencePaid,
+                                                       springYield: springYield,
+                                                       netRunway: EconomyRules.spendableEssence(in: state)))
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
             state.worlds.activeRun = nil
@@ -441,6 +447,7 @@ extension GameStore {
                 state.worlds.anchoredRealms[index].world = run.anchoredSnapshot
             }
             if kind == .collapse { state.reality.lifetime.runsLostToCollapse += 1 }
+            let springYield = GameStore.essenceSpringYield(for: state)
             GameStore.creditEssenceSpring(&state)
             state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex,
                                                    kind: kind,
@@ -452,7 +459,12 @@ extension GameStore {
                                                    lostResources: banked.lostResources,
                                                    lostItems: banked.lostItems,
                                                    progress: GameStore.progressGained(in: run, state: state),
-                                                   pages: GameStore.pagesFound(in: run, state: state))
+                                                   pages: GameStore.pagesFound(in: run, state: state),
+                                                   essenceEconomy: .init(rawCollected: banked.rawEssence,
+                                                       refinedEquivalent: EconomyRules.refine(rawUnits: banked.rawEssence),
+                                                       bindCostPaid: run.book.essencePaid,
+                                                       springYield: springYield,
+                                                       netRunway: EconomyRules.spendableEssence(in: state)))
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
             state.worlds.activeRun = nil
@@ -579,6 +591,7 @@ extension GameStore {
         var lostItems: [RunExitGain]
         var unidentifiedItemIDs: [ItemID]
         var returnedRawEssence: Bool
+        var rawEssence: Int = 0
     }
 
     @discardableResult
@@ -644,7 +657,8 @@ extension GameStore {
         return BankedHaul(resources: resourceGains, items: itemGains,
                           lostResources: lostResourceGains, lostItems: lostItemGains,
                           unidentifiedItemIDs: retainedRisk.stacks.filter { !$0.identified }.map(\.catalogID),
-                          returnedRawEssence: keptResources[Resources.essenceRaw] > 0)
+                          returnedRawEssence: keptResources[Resources.essenceRaw] > 0,
+                          rawEssence: keptResources[Resources.essenceRaw])
     }
 
     @discardableResult
