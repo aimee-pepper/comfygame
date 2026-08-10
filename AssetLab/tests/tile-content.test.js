@@ -9,5 +9,6 @@ for(const commands of visible){const bounds=commandBounds(commands);assert.ok(bo
 assert.notEqual(hash(tileContentCommands({type:"portal",portalDirection:"entry",revealed:true})),hash(tileContentCommands({type:"portal",portalDirection:"exit",revealed:true})),"entry and exit portals must differ");
 for(const type of tileContentTypes)assert.deepEqual(tileContentCommands({type,revealed:false}),[],"fog must reveal no content");
 for(const type of tileContentTypes)assert.deepEqual(minimapContentCommands({type,revealed:true,discovered:false}),[],"undiscovered content must not leak to minimap");
-const promised=["portal","site","diaryPage","foundWriting","traveller"],quiet=tileContentTypes.filter(type=>!promised.includes(type));for(const type of promised)assert.ok(minimapContentCommands({type,revealed:true,discovered:true}).length>0);for(const type of quiet)assert.deepEqual(minimapContentCommands({type,revealed:true,discovered:true}),[]);
+for(const type of tileContentTypes)assert.deepEqual(minimapContentCommands({type,revealed:false,discovered:true}),[],"discovery flag alone must not bypass fog");
+const mappedFamilies=["portal","site","diaryPage","foundWriting","traveller"],quiet=tileContentTypes.filter(type=>!mappedFamilies.includes(type));for(const type of mappedFamilies)assert.ok(minimapContentCommands({type,revealed:true,discovered:true}).length>0);for(const type of quiet)assert.deepEqual(minimapContentCommands({type,revealed:true,discovered:true}),[]);
 console.log("Asset Lab tile-content tests passed.");

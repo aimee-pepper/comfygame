@@ -130,7 +130,8 @@ variation, but are not generated from unconstrained parts.
 
 - Flora pixels remain stable; placement supplies variation.
 - Terrain derives from resolved tile facts, adjacency, and reveal state.
-- Fog contains literally nothing.
+- Fog contains one invariant concealment fill and literally nothing informative or
+  descriptor-dependent.
 - Minimap communicates terrain/growth class, not individual plants.
 - Validate integrated color and grayscale phone-size sheets before broadening.
 
@@ -493,3 +494,204 @@ Superseded by the current anchoring system. Do not use tether visual language.
   reality reset merely to make the card more dramatic.
 - Review candidate: `AssetLab/artifacts/splash-lifecycle-proof-v0.1.png`. The full AssetLab suite
   passes; splash fixtures are not golden pending visual/contract review.
+
+### Splash lifecycle v0.2 correction
+
+- Split `transition` from `continuity`: entry/portal/Waystone/defeat/collapse are transitions, while
+  anchored is an independent continuity dimension. The proof demonstrates an anchored portal exit;
+  collapsed plus anchored continuity is rejected as contradictory.
+- Defeat now uses an abstract upward extraction/loss-of-agency mark and no prone or canonical body.
+  Waystone is a tiny carried edge instrument, not an upright doorway or persistent map site.
+- Abandon is removed from the promotable transition set. A reserved card is available only through
+  explicit `allowNoncanonical` proof opt-in and is labelled noncanonical in both color and grayscale.
+- The anchored mark is a stable bookmark/book-edge tab outside the world scene: no tether, shore or
+  altered realm geometry. Automated prefix comparisons prove identical world geometry for every
+  intact transition and both continuity modes; only actual collapse changes it.
+- Removed proof-world defaults and permissive fallbacks from the public request. World and disclosure
+  DTOs accept exact fields and enumerated values; site disclosure accepts only the six current site
+  profiles, and apex identity is not part of the renderer input at all.
+- Corrected review artifact: `AssetLab/artifacts/splash-lifecycle-proof-v0.2.png`. Full tests pass and
+  resource golden regression remains 0/196; splash awaits final review before fixture promotion.
+
+### Splash lifecycle v0.3 golden closure
+
+- Corrected the final continuity rule: collapse and anchored continuity may coexist because collapse
+  ends the run while the anchored realm snapshot persists. The combined request is now an explicit
+  passing fixture rather than a contradiction.
+- A disclosed site no longer produces a generic box. The compositor delegates the validated current
+  site ID to the accepted authored site renderer; Signal Cairn and Salt Pan are pixel-distinct in an
+  automated identity test. Apex remains a separate location-only disclosure mark.
+- Top-level request fields and the noncanonical opt-in are strict. Abandon remains absent from the
+  promotable transition array, regression fixtures and any proposed player lifecycle vocabulary.
+- Final artifact: `AssetLab/artifacts/splash-lifecycle-proof-v0.3.png`. Seven golden fixtures cover
+  the five settled transitions, independent anchored continuity and the gated disclosed-entry
+  variant. Full suite passes; regression is 0/203.
+
+## Native top-down map slice handoff v1
+
+- Immediate integration contract: `docs/top-down-map-asset-integration-current.md`. Generated
+  conformance pack: `AssetLab/integration/map-slice-v1/manifest.json`; schema:
+  `AssetLab/schemas/map-slice-manifest.schema.json`.
+- The pack contains 198 individual 16×16 sRGB RGBA PNG conformance fixtures: all 12 ground raw
+  values, 16 adjacency masks for each edge-bearing family, elevation 1–3 and crumbled evidence for
+  every ground, four overhead flora examples, accepted content examples, route/crack and literal
+  transparent fog. Every output says `role: conformanceFixture` and has separate compressed-file
+  and decoded-RGBA SHA-256 hashes. These are not an exhaustive runtime atlas.
+- Exact native order follows Design: terrain → flora → crack/warning → content → route/action →
+  party/selection. Visibility is not a drawable eraser: unrevealed tiles short-circuit before any
+  ordinary tile layer. The former always-visible portal/writing/apex minimap promise is superseded:
+  all POIs are now game-owned fog/discovery-gated by default, with only explicit invested knowledge
+  effects permitted to reveal them early (`minimap-disclosure-current.md`).
+- Added the closed Swift flora adapter `swiftFloraToDescriptor`: `Tile.flora` resolves an exact
+  `WorldRun.flora` ID; logical identity and uint32 species seed derive from persisted UInt64 values;
+  every trait field, unit, clamp, normalization, enum spelling and legacy behavior is documented.
+  Two Swift-shaped fixtures carry expected rectangle and decoded-pixel hashes.
+- **Engineering-owned decision still required and explicitly blocked from substitution:** native
+  code must define/freeze/test the `terrainSeedUInt32` derivation from persisted `mapSeed`, tile
+  coordinate and immutable pipeline versions. AssetLab requires the already-derived uint32; proof
+  seed `404` is marked runtime-unsafe and cannot be used as fallback.
+- **Uncovered for this slice:** an accepted straight-top-down party/character sprite. Mara was
+  removed from the pack because the current Character Lab world figure reads upright. Engineering
+  should retain the existing party overlay until a top-down character milestone is reviewed.
+- That initial export hash is retained as history; the current hash is recorded under the v1.1
+  closure below.
+  Full AssetLab suite passes and golden regression remains 0/203.
+
+### Top-down map handoff v1.1 closure
+
+- Terrain placement identity is now named `terrainSeedUInt32` throughout the renderer and exporter.
+  The old `speciesSeed` spelling is accepted only as a deprecated proof-page alias and is deleted by
+  normalization, preventing native code from confusing flora identity with terrain placement.
+- World-grade adapter v1 and its three exact reading/grade vectors are frozen in the immutable
+  pipeline tuple. All 12 grounds now have four disclosure-neutral feature-template families; a
+  forbidden-semantic test rejects names implying cracks, roots, reeds, tracks, embers, dunes, shelves,
+  cold or other unowned facts.
+- The manifest schema is recursively closed and validated with AJV in strict mode. Negative mutations
+  inside pipeline versions, flora mapping, nested Swift flora vectors, world-grade vectors and output
+  metadata all fail. The earlier hand-written partial validator is removed.
+- Current pack: 198 conformance PNGs; manifest hash
+  `f776ae97f252f462570014ca81d06df40e5a6de82aaa06c53671310e1912c28d`.
+  Pipeline tuple: contract 1, terrain 1, flora 1, tile-content 1, world-grade
+  `world-grade-1.0.0`, grammar `map-slice-1.1.0`, compositor `rect-compositor-0.2.0`, profile
+  `top-down-map-16px-1.0.0`. Engineering accepted this as the integration-ready conformance handoff.
+- Bounded wording correction: fog is one invariant compositor fill `#17171a`, with no informative
+  pixels; the transparent output is only a conformance sentinel. Cardinal adjacency bits are set
+  only for in-bounds neighbors whose exact `GroundType` raw value equals the center. Renderer pixels
+  and the frozen tuple did not change; the former `05e23c…07a46` hash is superseded.
+
+### Uniform minimap disclosure closure
+
+- The machine contract now states that every POI family is game-owned and requires legitimate
+  reveal/discovery state. Portal, writing and apex have no type exceptions; the entrance portal is
+  visible because its starting tile is revealed.
+- AssetLab may render future bounded knowledge only when the game explicitly supplies it. It never
+  infers discovery from POI type, world descriptors or asset identity. Literal fog remains an early
+  ordinary-tile composition short-circuit and is separate from the minimap overlay decision.
+- The closed schema rejects unknown minimap exception fields, tile-content tests cover both hidden
+  and undiscovered inputs, and the regenerated manifest contains no `always-visible` promise.
+- Full AssetLab tests pass; regression is 0/203.
+
+## App Launch proof v0.1
+
+- Added a separate static App Launch Lab at `AssetLab/launch.html`; it is not a world lifecycle
+  splash. It uses a phone-safe 390×844 page/Atlas frame in light and dark, with `Bookbinder` and the
+  restrained `Opening the Atlas…` copy.
+- The same tokens and composition are intended for the constrained iOS LaunchScreen surface and the
+  first in-app loading frame, avoiding a cold-start visual jump. There is no authored Binder face,
+  world/site/apex content, animation dependency or fake progress bar.
+- Layout tokens are in `AssetLab/src/launch-kit.js`; proof artifact is
+  `AssetLab/artifacts/app-launch-proof-v0.1.png`. Browser navigation/export has no console errors and
+  the full AssetLab suite passes. Visual review is pending before promotion.
+
+### App Launch proof v0.2 correction
+
+- Replaced the ambiguous central I/sword-like mark with paired page masses, mirrored outer edges, a
+  narrow spine and restrained asymmetric torn notches. Launch copy and lifecycle meaning are
+  unchanged.
+- Added assertions that the complete framed composition respects `safeTop`/`safeBottom` and that
+  light and dark use identical geometry.
+- Lossless proof: `AssetLab/artifacts/app-launch-proof-v0.2.png`. It contains light/dark color and
+  literal grayscale evidence rendered at native 390×844 and nearest-neighbour 2×. Browser console
+  is clean. Design accepted v0.2 for visual golden promotion; v0.1 is retired as current evidence.
+- Light and dark launch command rasters are now protected by the golden regression catalogue. Full
+  AssetLab tests pass; regression is 0/205.
+
+## Straight-top-down map characters v0.1 — in progress
+
+- **Placeholder decision:** preserve the accepted 16×16 compact-upright `world` renderer as
+  historical/proof-only and add an explicit `mapTopDown` profile. Only `mapTopDown` may become the
+  integration-facing explorable-map character camera; this avoids silently changing v0.4 evidence.
+- The first renderer recomposes descriptor-owned build, hair, garment, carry, asymmetry and personal
+  palette as a foreshortened overhead human footprint. It has a closed north/east/south/west facing
+  axis; environment grade changes color but never geometry. Calling and stats remain absent.
+- First automated boundary covers Mara, Halloway, Isolde, Tovin, Wren and Ashe as pairwise-distinct
+  overhead silhouettes, deterministic generated people 41–44, all four facings, bounds and unknown
+  profile/facing rejection. Full suite passes; regression remains 0/205.
+- **Not promoted:** a native color/grayscale collision sheet still must prove these figures beside
+  route, drop, resource node, overhead flora, hostile flora and generic traveller, with current and
+  selection overlays remaining independently owned. Binder remains explicitly noncanonical.
+
+### Integrated mapTopDown v0.1 review fixture
+
+- Exported `AssetLab/artifacts/map-top-down-character-proof-v0.1.png`: a lossless sheet derived from
+  native 16px tiles and scaled nearest-neighbour 2× in color and literal grayscale.
+- It exercises Mara in N/E/S/W; six silhouette-diverse named people; generated seeds 41–43; a
+  separate noncanonical Binder; real world-graded terrain; route; disclosed writing, drop, flora,
+  site, portal and unjoined traveller; and separate current/selected/actionable overlays. It contains
+  no hidden markers and no gear/POI-like equipment glyphs.
+- Exact bounds are asserted for every first-proof named identity in every facing. Browser console is
+  clean; full tests pass and regression remains 0/205. The fixture is review-only pending direct
+  Design disposition and is not in the native map pack.
+
+### Integrated mapTopDown v0.2 focused correction
+
+- Design accepted v0.1's camera/disclosure direction but found its renderer still rotated an upright
+  paper doll, including a skin face plane. Promotion remained blocked.
+- v0.2 replaces that source geometry with true overhead occlusion: a stepped crown/headwear mass
+  overlaps the neck and upper back; torso, limbs and boot tips are foreshortened; hood/brim no longer
+  create hollow face boxes. Mara and mantle-heavy Tovin have four shape-distinct facings.
+- `mapTopDownContract` explicitly marks the compact-upright `world` profile legacy/proof-only,
+  `mapTopDown` as the sole integration-facing map profile, face plane false, ownership overlays
+  game-owned, and bounds 16px.
+- Revised artifact: `AssetLab/artifacts/map-top-down-character-proof-v0.2.png`. It retains the native
+  2× color/grayscale collision evidence and adds a labelled literal-grayscale 8× inspection strip
+  from the same 16px sprites for Mara and Tovin N/E/S/W, six named people, three generated seeds and
+  noncanonical Binder. The native grayscale fixture combines selected + current overlays.
+- Full tests pass; regression remains 0/205. v0.2 is still review-only pending direct Design
+  disposition and is not exported to the native map pack.
+
+### mapTopDown v0.3 golden promotion
+
+- v0.3 replaces hood rings and paired mantle voids with a contiguous stepped crown and directional
+  shoulder/back cap. Tovin and the narrower noncanonical Binder remain human and distinct in all
+  four facings, and do not collide with portal, site or unknown-creature grammar in grayscale.
+- Root Game Design accepted `AssetLab/artifacts/map-top-down-character-proof-v0.3.png` as the
+  superseding visual authority. v0.1/v0.2 are retired as current evidence.
+- Golden regression protects only reviewed scope: Mara and Tovin N/E/S/W; Halloway, Isolde, Wren
+  and Ashe north; generated seeds 41–43 north; and Binder N/E/S/W. Regression is 0/224.
+
+## Character-map adapter v1 — separate native handoff
+
+- This is deliberately separate from frozen map-slice v1.1. Schema:
+  `AssetLab/schemas/character-map-request.schema.json`; adapter:
+  `AssetLab/src/character-map-contract.js`; tests:
+  `AssetLab/tests/character-map-contract.test.js`.
+- Immutable tuple: contract `1`, adapter `character-map-adapter-1.0.0`, descriptor
+  `character-descriptor-1.0.0`, renderer `map-top-down-renderer-1.0.0`, world grade
+  `world-grade-1.0.0`, profile `map-character-16px-1.0.0`.
+- Closed request owns one identity kind, exact N/E/S/W facing, `mapTopDown`, and the signed world-grade
+  offsets. Calling, stats, party color, selection/action overlays, gear and POI state are rejected or
+  remain outside the character renderer.
+- Named `TravellerID` maps to the 28 authored descriptors. Generated people require an explicit
+  persisted `visualSeedUInt32`; missing seeds diagnose rather than reroll.
+- **Current native blockers, never substituted:** Binder and Quill have no accepted persisted
+  appearance model. Both return structured `missing-persisted-appearance` diagnostics and must keep
+  the existing native fallback until game-owned identity exists. The noncanonical Binder proof
+  template is not an adapter fallback.
+- Exact world-grade input now changes personal colors without changing geometry. Rectangle/request
+  hashes use the documented AssetLab 32-bit fixture hash; any packaged native conformance manifest
+  must add canonical JSON and decoded-pixel SHA-256 separately.
+- The public adapter now enforces the same recursive closure itself rather than trusting callers to
+  run AJV first. Unknown top-level, identity and world-grade fields return structured `unknown-field`
+  diagnostics with exact paths; direct tests cover `selected`, `identity.calling` and
+  `worldGrade.temperature`. Full suite passes; regression remains 0/224.

@@ -1,0 +1,10 @@
+import {renderCommands} from "./generator.js";
+import {launchCommands,launchLayoutTokens} from "./launch-kit.js";
+
+const canvas=document.getElementById("launch-proof"),x=canvas.getContext("2d");
+x.imageSmoothingEnabled=false;x.fillStyle="#111";x.fillRect(0,0,canvas.width,canvas.height);
+const text=(value,px,py,color,size)=>{x.fillStyle=color;x.font=`${size}px Georgia,serif`;x.textAlign="center";x.fillText(value,px,py);};
+const phone=(theme,grayscale=false)=>{const scratch=document.createElement("canvas");scratch.width=390;scratch.height=844;const c=scratch.getContext("2d");renderCommands(c,390,844,launchCommands(theme));c.fillStyle=theme==="dark"?"#eee8dc":"#211d19";c.textAlign="center";c.font="28px Georgia,serif";c.fillText("Bookbinder",195,launchLayoutTokens.titleBaseline);c.fillStyle=theme==="dark"?"#aaa092":"#665f56";c.font="16px Georgia,serif";c.fillText("Opening the Atlas…",195,launchLayoutTokens.loadingBaseline);if(grayscale){const pixels=c.getImageData(0,0,390,844);for(let i=0;i<pixels.data.length;i+=4){const value=Math.round(.2126*pixels.data[i]+.7152*pixels.data[i+1]+.0722*pixels.data[i+2]);pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=value;}c.putImageData(pixels,0,0);}return scratch;};
+for(const [row,grayscale] of [false,true].entries())for(const [column,theme] of ["light","dark"].entries()){const px=20+column*800,py=44+row*1724;x.drawImage(phone(theme,grayscale),px,py,780,1688);text(`${theme.toUpperCase()} · ${grayscale?"GRAYSCALE · ":"COLOR · "}NATIVE 390×844 → NEAREST 2×`,px+390,py-14,"#d8bd82",20);}
+text("STATIC LAUNCH SURFACE · SAME FRAME/COPY FOR IN-APP LOADING · NO PROGRESS CLAIM",820,3500,"#d8bd82",20);
+document.getElementById("save-launch-proof").addEventListener("click",()=>canvas.toBlob(async blob=>{const response=await fetch("/__artifact?name=app-launch-proof-v0.2.png",{method:"POST",headers:{"Content-Type":"image/png"},body:blob}),result=await response.json();document.getElementById("launch-status").textContent=`Saved ${result.path}`;},"image/png"));

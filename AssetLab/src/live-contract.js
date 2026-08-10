@@ -15,3 +15,12 @@ export function floraLiveContract(raw){
   const descriptor=normalizeFlora(raw),t=descriptor.traits,[cyan,magenta,yellow]=allocation([t.cyan,t.magenta,t.yellow]),[opacity,shine,schiller]=allocation([t.opacity,t.shine,t.schiller]),[woodyMix,fibrousMix,fleshyMix]=allocation([t.woody,t.fibrous,t.fleshy],1);
   return {gameIdentity:{stature:t.stature,tissue:{woody:t.tissueAmount*woodyMix,fibrous:t.tissueAmount*fibrousMix,fleshy:t.tissueAmount*fleshyMix,mix:{woody:woodyMix,fibrous:fibrousMix,fleshy:fleshyMix}},defence:t.defence,defenceType:t.defenceType,habit:t.habit,coloration:{cyan,magenta,yellow,depth:t.colorDepth,patterning:t.patterning},finish:{opacity,shine,schiller},metabolism:t.metabolism},renderHints:{schemaVersion:1},adapterDiagnostics:[]};
 }
+
+const percent=value=>Math.max(0,Math.min(100,Math.round(Number(value)||0)));
+const uint64=value=>{try{const n=BigInt(typeof value==="object"&&value!==null?value.rawValue:value);return n>=0n&&n<=0xffffffffffffffffn?n:null;}catch{return null;}};
+export function swiftFloraToDescriptor(raw){
+  if(!raw||typeof raw!=="object")throw new Error("invalid-live-flora");const id=uint64(raw.id),worldSeed=uint64(raw.worldSeed);if(id===null)throw new Error("invalid-live-flora-id");if(worldSeed===null)throw new Error("invalid-live-flora-world-seed");const t=raw.traits;if(!t||typeof t!=="object")throw new Error("invalid-live-flora-traits");
+  const tissue=t.tissue??{},color=t.coloration??{},finish=t.finish??{},woody=percent(tissue.woody),fibrous=percent(tissue.fibrous),fleshy=percent(tissue.fleshy),tissueAmount=percent(Number(tissue.woody||0)+Number(tissue.fibrous||0)+Number(tissue.fleshy||0));
+  const descriptor={schemaVersion:1,kind:"flora",logicalID:`flora-${id}`,speciesSeed:Number((worldSeed^id)&0xffffffffn),traits:{stature:percent(t.stature),tissueAmount,woody,fibrous,fleshy,defence:percent(t.defence),defenceType:t.defenceType,habit:t.habit,cyan:percent(color.cyan),magenta:percent(color.magenta),yellow:percent(color.yellow),colorDepth:percent(color.depth),patterning:percent(color.patterning),opacity:percent(finish.opacity),shine:percent(finish.shine),schiller:percent(finish.schiller),metabolism:t.metabolism}};
+  const enums={defenceType:["physical","chemical","active"],habit:["spreading","clustered","solitary"],metabolism:["photosynthetic","fungal","chemosynthetic"]};for(const [key,values] of Object.entries(enums))if(!values.includes(descriptor.traits[key]))throw new Error(`invalid-live-flora-enum:${key}`);return normalizeFlora(descriptor);
+}

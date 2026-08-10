@@ -1,0 +1,15 @@
+{
+  "$schema":"http://json-schema.org/draft-07/schema#","$id":"bookbinder.character-map-request.v1","type":"object","additionalProperties":false,
+  "required":["pipelineVersions","profile","facing","worldGrade","identity"],
+  "properties":{
+    "pipelineVersions":{"type":"object","additionalProperties":false,"required":["contractVersion","characterMapAdapterVersion","characterDescriptorVersion","mapTopDownRendererVersion","worldGradeAdapterVersion","renderProfileVersion"],"properties":{"contractVersion":{"const":1},"characterMapAdapterVersion":{"const":"character-map-adapter-1.0.0"},"characterDescriptorVersion":{"const":"character-descriptor-1.0.0"},"mapTopDownRendererVersion":{"const":"map-top-down-renderer-1.0.0"},"worldGradeAdapterVersion":{"const":"world-grade-1.0.0"},"renderProfileVersion":{"const":"map-character-16px-1.0.0"}}},
+    "profile":{"const":"mapTopDown"},"facing":{"enum":["north","east","south","west"]},
+    "worldGrade":{"type":"object","additionalProperties":false,"required":["red","green","blue","value"],"properties":{"red":{"type":"integer","minimum":-32,"maximum":32},"green":{"type":"integer","minimum":-32,"maximum":32},"blue":{"type":"integer","minimum":-32,"maximum":32},"value":{"type":"integer","minimum":-20,"maximum":20}}},
+    "identity":{"oneOf":[
+      {"type":"object","additionalProperties":false,"required":["identityKind","travellerID"],"properties":{"identityKind":{"const":"namedTraveller"},"travellerID":{"enum":["mara","edren","halloway","isolde","sela","tovin","bryn","orsa","vance","talin","nessa","corrin","dagg","rook","lys","bracken","fen","wren","kestrel","maud","marrick","sabine","grimmond","oda","auber","ashe","perren","nine"]}}},
+      {"type":"object","additionalProperties":false,"required":["identityKind","visualSeedUInt32"],"properties":{"identityKind":{"const":"generatedPerson"},"visualSeedUInt32":{"type":"integer","minimum":0,"maximum":4294967295}}},
+      {"type":"object","additionalProperties":false,"required":["identityKind"],"properties":{"identityKind":{"const":"binder"}}},
+      {"type":"object","additionalProperties":false,"required":["identityKind"],"properties":{"identityKind":{"const":"quill"}}}
+    ]}
+  }
+}

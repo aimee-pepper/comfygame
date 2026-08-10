@@ -160,3 +160,7 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
 .ui-large-text .turn-banner strong,.ui-large-text .combatant { font-size: 16px; }
 .ui-large-text .turn-banner small,.ui-large-text .vitals,.ui-large-text .condition { font-size: 12px; }
 @media (max-width: 1250px) { .ui-workspace { grid-template-columns: 1fr; } }
+.tool-nav { position: sticky; z-index: 20; top: 0; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 18px; background: #11100f; border-bottom: 1px solid var(--line); }
+.tool-nav a { padding: 6px 8px; color: var(--muted); border: 1px solid transparent; border-radius: 4px; font-size: 10px; text-decoration: none; white-space: nowrap; }
+.tool-nav a:hover,.tool-nav a:focus-visible { color: var(--ink); border-color: var(--line); outline: none; }
+.tool-nav a[aria-current="page"] { color: #171614; background: var(--accent); }

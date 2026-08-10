@@ -35,7 +35,7 @@ boundary.
 | Tile content | empty, node, wild drop, hazard, entry/exit portal, locked cache, site, diary page, found writing, traveller | route, portal, generic site, party | Add semantic overlay catalogue and minimap collision sheet; entry and exit portals must differ |
 | Resource nodes | 23 resources; organic nodes inherit flora, mineral nodes inherit world substrate; remaining/exhausted states | none | Generate node families from resolved resource facts; icons may remain authored, world nodes cannot all be one cube |
 | World mutation | revealed/fog, elevation 0–3, cracking, crumbled/gone, night/day sight, stability hazard bands | fog, elevation, crack | Add crumbled/gone and lighting/state composition; fog must not leak content |
-| Minimap | terrain/growth, party, portal, writing, apex promise, discovered navigation facts | terrain/growth, route, party, portal, site | Add diary/found-writing/apex and disclosure-timed site/resource rules; collision fixtures |
+| Minimap | terrain/growth, party and legitimately discovered navigation facts; all POIs default hidden under fog | terrain/growth, route, party, portal, site | Enforce game-owned revealed/discovered timing for portal, writing, apex, site, resource/item, traveller and encounters; collision fixtures |
 | Combat stage | 5v3/2v1, ranks/reach, selection/legal/cannot/protected, statuses and accessibility | accepted static golden + UI proof | Static boundary strong; still needs real character sprites, defeated/passed-out poses and later animation |
 | Splashes | framed/page-like entry; exit variants for portal, collapse, defeat, abandon and anchored continuity | none | **Critical new compositor:** disclosure-safe world identity layers and lifecycle-specific exit compositions |
 | Portraits/bestiary | bestiary species/specimens; later named traveller portraits | no portrait profile | Add creature bestiary profile and later named-cast portrait profile; generated companions need bounded portrait grammar |
@@ -61,8 +61,8 @@ plant.
 
 The map can contain resource nodes, wild drops, hazards, entry and exit portals, locked caches,
 sites, diary pages, found writing and travellers. Enemy state additionally distinguishes asleep vs
-awake, mobile vs sessile flora, and apex. The minimap promises portals, writing and apex locations
-under specific disclosure rules.
+awake, mobile vs sessile flora, and apex. The old always-visible minimap promise for portals, writing
+and apex locations is retired; every POI now follows game-owned reveal/discovery state by default.
 
 ### Authored-but-procedurally-placed content
 
@@ -160,6 +160,68 @@ After the completed ground and region-preset sheets:
 The descriptor adapter and multi-species map may be developed together, but adapter fixtures must be
 green before the composed sheet becomes a golden. Animation remains after these static identity,
 state and collision matrices.
+
+## Dynamic-depth re-audit — 9 Aug 2026
+
+This pass corrects the earlier audit's central omission: semantic coverage is not sufficient dynamic
+coverage. Every generated family is now evaluated across authored identity, shared world adaptation,
+species/item identity, placement/specimen variation, lifecycle/state, camera/profile, disclosure,
+accessibility and persisted determinism.
+
+### Settled three-axis terrain model
+
+1. **Ground identity/state** owns passability, adjacency, elevation, crumbling and cracking. Palette
+   or decorative templates may never invent these facts.
+2. **World grade** applies one coherent bounded RGB/value atmosphere to related terrain families from
+   actual resolved world data. It suggests material atmosphere and never encodes exact pressure
+   values, hidden mechanics or written rune identity.
+3. **Placement feature template** selects a stable same-affordance detail silhouette from persisted
+   world + coordinate + pipeline version. It may add compatible grain, pebbles, clumps, ripples,
+   frost or ash, but never a resource, hazard, route, elevation, crack or site promise.
+
+AssetLab now provides four named feature templates for each of the 12 ground families and bounded
+world grading that changes colors without changing geometry. The conformance pack contains neutral,
+warm and cool grade evidence and all feature variants. The exact live world-readings→grade mapping
+is deliberately flagged as unresolved rather than using proof defaults.
+
+### Current depth ledger
+
+| Family | Dynamic depth status | Remaining gap / risk |
+|---|---|---|
+| Terrain | **Corrected foundation:** 12 identities, state/adjacency, 4 templates each, coherent grade input | Freeze native world-grade mapping and persisted template-index derivation; integrated phone/grayscale collision review still required |
+| Flora | Strong species anatomy/habit/state/profile depth; live Swift adapter exists | Environmental grade is not yet a separate bounded input; harvested poses exist only where rules persist them; patch topology must remain placement-owned |
+| Creatures | Strong species/specimen anatomy and world/fight profiles | Missing world-coherent environmental grading, sleeping/detected/crypsis/apex-state matrix, bestiary profile and animation; current presets are evidence, not full ecological capacity proof |
+| Generated companions | Bounded structural generator exists for people | No durable live generated-person identity/seed in the game contract yet; portrait and top-down character profiles remain absent |
+| Named characters | Authored 28-person identity, gear, grade and prone coverage | Current world sprites are compact upright figures, not accepted straight-top-down map sprites; warm/cold grading is only a coarse proof, not world-data adaptation |
+| Village stations | Authored functional silhouettes, tier/damage matrices | Only small warm/cold/ash palette choices; missing coherent base-substrate/material accumulation, staffing accents, construction breadth and side-view environmental adaptation |
+| Sites | Authored site silhouettes and physical state grammar | World adaptation is coarse palette-only; searched/exhausted transformation breadth is not proven per every site; guard occupant and passability must remain rule-owned |
+| Resources | 23-family acquisition/source/profile/state coverage | Mineral template variety within each physical profile is shallow; world material grading is coarse; flora-linked nodes must inherit the actual graded species; no item/inventory icon depth audit yet |
+| Tile content | Ten semantic families plus collision evidence | Most are one canonical colored sprite. They need bounded same-meaning variants and shared world adaptation where appropriate, without weakening disclosure or traveller/drop distinctions |
+| Portals/writing/cache | Semantically distinct and disclosure-tested | Still largely canonical single shapes; portal material/world variation, writing substrate variants and cache wear states are shallow |
+| Minimap | Correct symbolic/disclosure boundary | Intentionally should **not** inherit decorative world variation. Validate hidden/revealed/discovered timing for every POI family after native art integration |
+| Combat stage/UI | Static semantic grammar is golden | Dynamic visual depth intentionally deferred: animation, real world-graded actors, status motion and multiple backdrops remain uncovered |
+| Splashes | Lifecycle compositor and disclosure boundary are golden | World scene palette currently uses four authored terrain categories, not the complete resolved world grade/material vocabulary; no animation by design |
+| Bestiary/portraits | Not implemented | Critical later profile gap for generated creatures, specimens, companions and named cast |
+| Equipment/items | Blade/spear/bow and armour preservation proofs only | Missing full eight-slot visual mapping, crafted material/provenance adaptation, drop/inventory/world correspondence and authored unique-item catalogue |
+
+### Highest-priority shallow/collapsed outputs
+
+1. Tile content, portals, caches and writing are still mostly one canonical colored glyph each.
+2. Flora and creature identity are deep, but neither yet accepts the same resolved world-grade DTO as
+   terrain; uncoordinated grading would make a world look assembled rather than native.
+3. Named/generated people lack a settled straight-top-down map profile.
+4. Stations/sites/resources have authored identity but only coarse palette adaptation and insufficient
+   same-state material/template breadth.
+5. Splash scenes use a reduced authored terrain palette rather than the eventual full world material
+   descriptor.
+6. Bestiary, portrait, equipment/item and animation families remain materially uncovered.
+
+### Export defect found and corrected
+
+The conformance PNG encoder previously parsed hex colors only while flora commands use CSS HSL/alpha.
+Browser canvases were correct, but exported flora PNG pixels could be incorrect. The exporter now
+parses both formats and keeps separate compressed-file and decoded-RGBA hashes. This is covered by the
+full export test; earlier generated map packs must not be treated as current evidence.
 # Progress update — 9 Aug 2026
 
 The first remediation gate is implemented inside AssetLab: manifest v3 separates the authoring descriptor, exact game identity, visual-only render hints, structured adapter diagnostics, and pipeline versions, with an explicit creature/flora identity kind. Creature emanation now has exact light/heat/caustic allocation rather than a lossy dominant-kind authoring control; v3 descriptor migration is covered and emits an assumption warning. Creature topology is confined to render hints, optional defence maps to `null`, and flora tissue resultant values are derived explicitly. Unit and golden-regression suites pass with 0/36 accepted pixel changes. Final enum/unit spelling remains an engineering confirmation before integration; AssetLab has not modified or integrated with game code.

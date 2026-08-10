@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bookbinder World Lab</title><link rel="stylesheet" href="styles.css"></head>
-<body>
+<body><nav class="tool-nav" aria-label="AssetLab tools"><a href="index.html">Creatures</a><a href="world.html">World &amp; Flora</a><a href="places.html">Places</a><a href="characters.html">Characters</a><a href="full-cast.html">Full Cast</a><a href="resources.html">Resources</a><a href="combat.html">Combat</a><a href="combat-ui.html">Combat UI</a><a href="launch.html">App Launch</a><a href="splashes.html">Splashes</a><a href="regression.html">Golden Review</a></nav>
   <header><div><p class="eyebrow">Bookbinder · isolated authoring tool</p><h1>World Lab</h1><p class="subtitle">One transitioned terrain family and one stable flora species.</p></div><div class="header-actions"><a class="nav-link" href="index.html">Creature Lab</a><a class="nav-link" href="places.html">Place Lab</a><a class="nav-link" href="regression.html">Golden Review</a><a class="nav-link" href="combat.html">Combat Proof</a><button id="reroll-world" class="primary">Reroll world</button><button id="reset-flora">Reset flora</button></div></header>
   <main>
     <aside class="panel controls-panel">
@@ -27,7 +27,7 @@
         <div class="checker transition-stage"><canvas id="transitions" width="64" height="64"></canvas></div>
       </div>
       <div class="panel environment-panel">
-        <div class="panel-heading"><div><p class="eyebrow">Live ground catalogue</p><h2>All 12 terrain facts</h2></div><span>stone · soil · sand · ice · ash · shallow/deep water · rubble · mud · tall/short growth · chasm</span></div>
+        <div class="panel-heading"><div><p class="eyebrow">Live ground catalogue</p><h2>All 12 terrain facts</h2></div><div class="header-actions"><label>World grade <select id="world-grade"><option value="neutral">Neutral</option><option value="cool">Cool mineral</option><option value="warm">Warm earthen</option><option value="strange">Strange violet</option></select></label><label>Templates <select id="terrain-variety"><option value="1">1 per ground</option><option value="2">2 per ground</option><option value="4" selected>4 per ground</option></select></label></div></div>
         <div class="checker terrain-catalogue-stage"><canvas id="terrain-catalogue" width="64" height="48"></canvas></div>
       </div>
       <div class="panel environment-panel">
