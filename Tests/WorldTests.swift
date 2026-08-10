@@ -246,24 +246,28 @@ final class WorldTests: XCTestCase {
     }
 
     func testPhoneSafeAreaConstrainsMapByHeightWithoutChangingViewport() {
-        let tutorialPhone = WorldMapLayout.maximumSide(containerWidth: 368, viewportHeight: 156,
-                                                        minimumScrollableSide: 128)
-        XCTAssertEqual(tutorialPhone, 140, accuracy: 0.001,
-                       "The 368×800 tutorial layout keeps its last row above fixed controls")
+        let phone = WorldMapLayout.maximumSide(containerWidth: 368, viewportHeight: 260,
+                                                viewportTiles: 11, displayScale: 3)
+        XCTAssertLessThanOrEqual(phone, 244)
+        XCTAssertEqual((phone * 3).truncatingRemainder(dividingBy: 11), 0, accuracy: 0.001,
+                       "The bottom border lands after a complete device-pixel cell")
+
+        let underlyingWithTutorial = WorldMapLayout.maximumSide(containerWidth: 368,
+                                                                 viewportHeight: 260,
+                                                                 viewportTiles: 11,
+                                                                 displayScale: 3)
+        XCTAssertEqual(phone, underlyingWithTutorial,
+                       "Tutorial presentation is an overlay and cannot alter map/control geometry")
 
         let ordinary = WorldMapLayout.maximumSide(containerWidth: 368, viewportHeight: 500,
-                                                   minimumScrollableSide: 128)
-        XCTAssertEqual(ordinary, 344, accuracy: 0.001,
-                       "An ordinary phone keeps the useful full-width square when it fits")
+                                                   viewportTiles: 11, displayScale: 3)
+        XCTAssertLessThanOrEqual(ordinary, 344)
+        XCTAssertGreaterThan(ordinary, 330)
 
-        let dynamicType = WorldMapLayout.maximumSide(containerWidth: 320, viewportHeight: 100,
-                                                      minimumScrollableSide: 128)
-        XCTAssertEqual(dynamicType, 128, accuracy: 0.001,
-                       "A genuinely constrained layout scrolls a useful square instead of clipping")
-
-        let roomy = WorldMapLayout.maximumSide(containerWidth: 1_024, viewportHeight: 1_100,
-                                                minimumScrollableSide: 128)
-        XCTAssertEqual(roomy, 1_000, accuracy: 0.001)
+        let cramped = WorldMapLayout.maximumSide(containerWidth: 320, viewportHeight: 100,
+                                                  viewportTiles: 11, displayScale: 3)
+        XCTAssertLessThanOrEqual(cramped, 84)
+        XCTAssertEqual((cramped * 3).truncatingRemainder(dividingBy: 11), 0, accuracy: 0.001)
     }
 
     // MARK: Fog and movement

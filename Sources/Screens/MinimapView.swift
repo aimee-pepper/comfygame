@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The whole world at a glance, under the movement arrows.
+/// The whole world at a glance, beside the movement arrows and above the portal/action column.
 ///
 /// Three states, and the third is the one that earns it (decisions-session-13 §4): **explored**,
 /// **unexplored**, and **nothing there**. Knowing an area is empty is as useful as knowing it's

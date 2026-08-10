@@ -8,6 +8,7 @@ import SwiftUI
 /// zone, which the brief offers for exactly this reason. Every button is ≥44pt.
 struct WorldView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.displayScale) private var displayScale
     /// Everything that crossed the threshold and can be consulted or used outside combat.
     @State private var isShowingFieldKit = false
     @State private var isConfirmingAtlasSeam = false
@@ -17,7 +18,6 @@ struct WorldView: View {
 #if DEBUG
     @State private var isShowingDiagnostics = false
 #endif
-    @State private var mapViewportHeight: CGFloat = 0
 
     private var run: WorldRun? { store.state.worlds.activeRun }
 
@@ -27,33 +27,34 @@ struct WorldView: View {
                 if let run {
                     StabilityHeader(run: run)
                     PartyHealthStrip(run: run, state: store.state)
-                    ScrollView {
-                        VStack(spacing: 12) {
-                            LootDecisionCard()
-                            MapGrid(
-                                run: run,
-                                maximumSide: WorldMapLayout.maximumSide(
-                                    containerWidth: geometry.size.width,
-                                    viewportHeight: mapViewportHeight > 0
-                                        ? mapViewportHeight : geometry.size.height,
-                                    minimumScrollableSide: 128
-                                )
-                            ) { point in
-                                tapped(point, in: run)
+                    GeometryReader { viewport in
+                        ScrollView {
+                            VStack(spacing: 12) {
+                                LootDecisionCard()
+                                MapGrid(
+                                    run: run,
+                                    maximumSide: WorldMapLayout.maximumSide(
+                                        containerWidth: viewport.size.width,
+                                        viewportHeight: viewport.size.height,
+                                        viewportTiles: min(Tuning.World.viewportTiles,
+                                                           min(run.map.width, run.map.height)),
+                                        displayScale: displayScale
+                                    )
+                                ) { point in
+                                    tapped(point, in: run)
+                                }
+                                eventLog
+                                satchel(run)
                             }
-                            eventLog
-                            satchel(run)
+                            .padding(.horizontal, 12)
+                            .padding(.top, 8)
+                            .padding(.bottom, 12)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.top, 8)
-                        .padding(.bottom, 12)
                     }
-                    .measureWorldMapViewport()
                     controls(run)
                 }
             }
         }
-        .onPreferenceChange(WorldMapViewportHeightKey.self) { mapViewportHeight = $0 }
         .background(Color(.systemGroupedBackground))
 #if DEBUG
         .toolbar {
@@ -89,7 +90,7 @@ struct WorldView: View {
         } message: {
             Text("The frame will be consumed and this realm will remain in the Anchorage. No additional essence is charged.")
         }
-        .safeAreaInset(edge: .bottom) {
+        .overlay(alignment: .bottom) {
             if let id = tutorialLesson, let lesson = TutorialRules.definition(id), !tutorialSuppressed {
                 TutorialCard(lesson: lesson,
                              gotIt: { dismissedTutorials.insert(id); tutorialLesson = nil },
@@ -99,7 +100,8 @@ struct WorldView: View {
                                  tutorialLesson = nil
                              })
                     .padding(.horizontal, 12)
-                    .padding(.bottom, 4)
+                    .padding(.bottom, 12)
+                    .transition(.opacity)
             }
         }
         .onAppear { presentNextWorldLesson() }
@@ -298,15 +300,17 @@ struct WorldView: View {
 
     private func controls(_ run: WorldRun) -> some View {
         HStack(alignment: .bottom, spacing: 14) {
-            VStack(spacing: 8) {
-                DirectionPad { direction in
-                    store.step(to: GridPoint(x: run.playerPosition.x + direction.dx,
-                                             y: run.playerPosition.y + direction.dy))
-                }
-                MinimapView(run: run)
+            DirectionPad { direction in
+                store.step(to: GridPoint(x: run.playerPosition.x + direction.dx,
+                                         y: run.playerPosition.y + direction.dy))
             }
 
             VStack(spacing: 8) {
+                // The map belongs beside the movement tool, using the space above the portal/action
+                // column. Putting it under the arrows needlessly made the fixed controls taller and
+                // was a regression from the settled phone layout.
+                MinimapView(run: run)
+                    .frame(maxWidth: .infinity, alignment: .center)
                 if store.canSurvey {
                     ActionButton("Survey", icon: "scope",
                                  detail: "\(run.carriedInstruments.count) instruments · 1 turn",
@@ -661,38 +665,17 @@ private struct StabilityHeader: View {
 // MARK: - Grid
 
 enum WorldMapLayout {
-    /// Keeps the entire square map visible above the fixed navigation tools on compact portrait
-    /// screens. Width alone used to choose the square, so moving the minimap below the D-pad made
-    /// the last map row fall below the scroll viewport on a phone. Art still composes at 16px and
-    /// uses nearest-neighbour sampling; this changes only its presented point size.
+    /// Fits a complete square inside the region left by the fixed controls, then aligns every cell
+    /// to whole device pixels. A scroll viewport may contain narration below the map, but it never
+    /// acts as a crop window through a fractional final row.
     static func maximumSide(containerWidth: CGFloat, viewportHeight: CGFloat,
-                            minimumScrollableSide: CGFloat) -> CGFloat {
+                            viewportTiles: Int, displayScale: CGFloat) -> CGFloat {
         let widthBound = max(0, containerWidth - 24)
-        // The measured ScrollView frame already reflects safe areas, the fixed controls, and a
-        // tutorial card's safe-area inset. Subtracting any of those again would double-charge it.
         let heightBound = max(0, viewportHeight - 16)
-        if heightBound >= minimumScrollableSide {
-            return min(widthBound, heightBound)
-        }
-        // A genuinely cramped/Dynamic-Type layout scrolls a still-useful square instead of clipping
-        // it at the fixed controls. Ordinary portrait sizes never take this branch.
-        return min(widthBound, minimumScrollableSide)
-    }
-}
-
-private struct WorldMapViewportHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat { 0 }
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
-}
-
-private extension View {
-    func measureWorldMapViewport() -> some View {
-        background {
-            GeometryReader { geometry in
-                Color.clear.preference(key: WorldMapViewportHeightKey.self,
-                                       value: geometry.size.height)
-            }
-        }
+        let tiles = CGFloat(max(1, viewportTiles))
+        let scale = max(1, displayScale)
+        let cellPixels = floor(min(widthBound, heightBound) * scale / tiles)
+        return max(tiles, cellPixels) * tiles / scale
     }
 }
 
