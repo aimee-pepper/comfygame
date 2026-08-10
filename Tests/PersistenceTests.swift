@@ -188,18 +188,28 @@ final class PersistenceTests: XCTestCase {
 
     @MainActor
     func testLaunchCoordinatorPublishesOnlyPreparedStateAndWarmReadyDoesNotFlash() async throws {
+        final class Announcements: @unchecked Sendable {
+            var values: [String] = []
+        }
+        let announcements = Announcements()
         let prepared = try GameStore.prepareLaunch(io: io)
-        let coordinator = AppLaunchCoordinator(prepare: { prepared })
+        let coordinator = AppLaunchCoordinator(announce: { announcements.values.append($0) },
+                                               prepare: { prepared })
         XCTAssertNil(coordinator.store)
         coordinator.start()
         try await waitUntil { coordinator.store != nil }
         XCTAssertEqual(coordinator.store?.state, prepared.state)
+        XCTAssertEqual(announcements.values, ["The Atlas is open."])
 
         let warmStore = try XCTUnwrap(coordinator.store)
-        let warm = AppLaunchCoordinator(readyStore: warmStore, prepare: { prepared })
+        let warm = AppLaunchCoordinator(readyStore: warmStore,
+                                        announce: { announcements.values.append($0) },
+                                        prepare: { prepared })
         warm.start()
         XCTAssertTrue(warm.store === warmStore,
                       "An already-ready warm scene must not swap through the loader")
+        XCTAssertEqual(announcements.values, ["The Atlas is open."],
+                       "An immediately warm-ready scene must not announce a redundant transition")
     }
 
     @MainActor

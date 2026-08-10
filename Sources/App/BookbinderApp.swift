@@ -51,6 +51,7 @@ final class AppLaunchCoordinator: ObservableObject {
     private var task: Task<Void, Never>?
     private var timeoutTask: Task<Void, Never>?
     private let prepare: @Sendable () async throws -> GameStore.PreparedLaunch
+    private let announce: @MainActor @Sendable (String) -> Void
     private let timeout: Duration
     private var attempt = UUID()
     private var didLogFirstFrame = false
@@ -62,6 +63,9 @@ final class AppLaunchCoordinator: ObservableObject {
 
     init(readyStore: GameStore? = nil,
          timeout: Duration = .seconds(12),
+         announce: @escaping @MainActor @Sendable (String) -> Void = {
+             UIAccessibility.post(notification: .announcement, argument: $0)
+         },
          prepare: @escaping @Sendable () async throws -> GameStore.PreparedLaunch = {
 #if DEBUG
              if ProcessInfo.processInfo.arguments.contains("--debug-launch-delay") {
@@ -74,6 +78,7 @@ final class AppLaunchCoordinator: ObservableObject {
          }) {
         self.phase = readyStore.map(Phase.ready) ?? .idle
         self.timeout = timeout
+        self.announce = announce
         self.prepare = prepare
     }
 
@@ -92,6 +97,7 @@ final class AppLaunchCoordinator: ObservableObject {
                 details: "Launch preparation exceeded \(timeout). The current save operation is being allowed to finish safely before retry is available.",
                 canRetry: false
             ))
+            self.announce("The Atlas is taking longer than expected. Finishing safely.")
         }
         task = Task {
             do {
@@ -101,6 +107,7 @@ final class AppLaunchCoordinator: ObservableObject {
                 let store = GameStore(io: .documents, prepared: prepared)
                 phase = .ready(store)
                 task = nil
+                announce("The Atlas is open.")
 #if DEBUG
                 let firstFrame = self.firstFrameMilliseconds ?? -1
                 let evidence = "launch ready firstFrame=\(firstFrame.formatted(.number.precision(.fractionLength(1))))ms total=\(prepared.timings.totalMilliseconds.formatted(.number.precision(.fractionLength(1))))ms load=\(prepared.timings.loadMilliseconds.formatted(.number.precision(.fractionLength(1))))ms reconcile=\(prepared.timings.reconciliationMilliseconds.formatted(.number.precision(.fractionLength(1))))ms persist=\(prepared.timings.persistenceMilliseconds.formatted(.number.precision(.fractionLength(1))))ms"
@@ -118,6 +125,7 @@ final class AppLaunchCoordinator: ObservableObject {
                     details: error.localizedDescription,
                     canRetry: true
                 ))
+                announce("The Atlas could not be opened. Try again or copy diagnostics.")
             }
         }
     }
