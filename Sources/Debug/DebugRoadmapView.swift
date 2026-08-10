@@ -50,7 +50,8 @@ struct DebugRoadmapView: View {
             }
 
             Section("Current build") {
-                LabeledContent("Installed / HEAD", value: board.installedBuild)
+                LabeledContent("Installed checkpoint", value: board.installedCheckpoint)
+                LabeledContent("Essence baseline", value: board.essenceBaseline)
                 LabeledContent("Current test", value: "Essence continuation")
                 Text("Use Recommended Raw Essence with 1× multipliers. Record bind cost, collected raw, refined equivalent, Spring yield, ending Essence, and any anti-lock help.")
                     .font(.callout)
@@ -113,10 +114,11 @@ private struct RoadmapItemRow: View {
 
 enum DebugRoadmap {
     enum Status {
-        case readyToTest, next, queued, pending, paused
+        case complete, readyToTest, next, queued, pending, paused
 
         var label: String {
             switch self {
+            case .complete: "Complete"
             case .readyToTest: "Test now"
             case .next: "Next"
             case .queued: "Queued"
@@ -127,6 +129,7 @@ enum DebugRoadmap {
 
         var icon: String {
             switch self {
+            case .complete: "checkmark.circle.fill"
             case .readyToTest: "play.circle.fill"
             case .next: "arrow.right.circle.fill"
             case .queued: "clock"
@@ -137,6 +140,7 @@ enum DebugRoadmap {
 
         var tint: Color {
             switch self {
+            case .complete: .green
             case .readyToTest: .green
             case .next: .blue
             case .queued: .secondary
@@ -156,22 +160,24 @@ enum DebugRoadmap {
     }
 
     struct Board {
-        let installedBuild: String
+        let installedCheckpoint: String
+        let essenceBaseline: String
         let items: [Item]
         let paused: [String]
     }
 
     static let current = Board(
-        installedBuild: "a816113",
+        installedCheckpoint: "A · awareness + roadmap complete",
+        essenceBaseline: "a816113",
         items: [
             Item(id: "essence", priority: "B0", title: "Essence continuation",
                  status: .readyToTest,
                  detail: "Recommended 5–7 drops × 2–3 raw is installed. Measure it; do not retune from memory.",
                  gate: "Three ordinary returns now, building toward ten; another ordinary authored bind remains affordable."),
             Item(id: "awareness", priority: "A", title: "Awareness housekeeping",
-                 status: .next,
-                 detail: "837 tests are green locally. This check-in only installs, commits and pushes that exact slice.",
-                 gate: "Installed build identity, phone smoke test, commit and push; no added scope."),
+                 status: .complete,
+                 detail: "Complete in 5731aa9: 837 tests passed; combined checkpoint installed and launched on iPhone.",
+                 gate: "Passed. Preserve scope; field play observations return through ordinary bug triage."),
             Item(id: "outcome", priority: "C", title: "Atomic expedition outcome",
                  status: .queued,
                  detail: "One monotonic receipt makes return-driven stock and production idempotent across relaunch and anchored revisits.",

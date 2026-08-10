@@ -160,8 +160,8 @@ does not spend implementation attention on them.
 
 | Priority | Checkpoint | State | Next proof / decision |
 |---|---|---|---|
-| A | Awareness housekeeping | **First check-in; no new scope** | Commit/push/install exact already-green slice |
-| B0 / B | Essence continuation | **First Aimee playtest** | Three Recommended-profile returns; continue toward ten |
+| A | Awareness housekeeping | **Complete — `5731aa9`, installed in `d12a8e8`** | 837/837 relevant product tests; phone launch passed |
+| B0 / B | Essence continuation | **Current Aimee playtest** | Three Recommended-profile returns; continue toward ten |
 | C | ExpeditionOutcomeID / atomic return | **Authorize only after B evidence** | Ordinary/collapse/anchored idempotence and relaunch |
 | D | Sell-first Trading Post engine | **Queued** | Sell/cancel/reload, anti-loop and one stock refresh |
 | E | Vance order 1 / 10e Trading Post | **Queued separately after D** | Fresh-campaign find/build/sell and old-save migration |
@@ -181,7 +181,7 @@ Add one short entry after each device checkpoint:
 | Date | Build | Test | Result | Next action |
 |---|---|---|---|---|
 | 10 Aug 2026 | `a816113` baseline | Roadmap established; Essence profile awaits focused run | Pending Aimee | Start B0 play; Engineering scopes B1a |
-| 10 Aug 2026 | local DEBUG roadmap candidate | Settings → Debug Tools → Roadmap/Balancing/Text Atlas | Simulator build and all three tabs pass; launch regression tests 3/3 | Await Aimee's first checkpoint selection; install only with an Engineering checkpoint |
+| 10 Aug 2026 | `5731aa9` + `d12a8e8` | Awareness housekeeping plus Settings → Debug Tools tabs | 837/837 relevant product tests; signed iPhone build installed/launched 15:19 PT | Aimee runs B: three Recommended Essence expeditions |
 
 ## Cross-lead notes
 
