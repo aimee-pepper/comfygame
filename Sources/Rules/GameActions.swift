@@ -224,15 +224,9 @@ extension GameStore {
             // Generated here, once, and saved with the run. Worldgen draws from streams derived
             // from the seed, never from the run's live RNG, so in-run rolls resume cleanly.
             let tuning = DebugTuningProfile.active
-            var world = Worldgen.generate(book: book, seed: seed, library: state.reality.library,
+            let world = Worldgen.generate(book: book, seed: seed, library: state.reality.library,
                                           tuning: tuning,
                                           isFreshFirstExpedition: state.worlds.runIndex == 0)
-            // Edren reads the field before the party reaches it: sites are known destinations, not
-            // surprises hidden behind fog. Their contents still require travel and a full search.
-            if state.base.station(Stations.reliquary).isUnlocked {
-                ReliquaryRules.revealSites(on: &world.map, sites: world.sites)
-            }
-
             // Entering unseals this world: from here on its rolled values may be described.
             state.reality.visitedWorldSeeds.insert(seed)
             // **Whose signature this world matches — not who you have met.**

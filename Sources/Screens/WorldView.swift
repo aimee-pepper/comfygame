@@ -688,6 +688,9 @@ private struct MapGrid: View {
     let run: WorldRun
     let maximumSide: CGFloat
     let onTap: (GridPoint) -> Void
+#if DEBUG
+    @AppStorage("debug.simpleMapRenderer") private var useSimpleRenderer = false
+#endif
 
     /// How many tiles across the window is. Small maps show whole; big ones scroll under you.
     private var viewport: Int { min(Tuning.World.viewportTiles, min(run.map.width, run.map.height)) }
@@ -705,16 +708,19 @@ private struct MapGrid: View {
     var body: some View {
         GeometryReader { proxy in
             let side = proxy.size.width / CGFloat(viewport)
+            let grade = WorldGrade.from(BookRules.readings(for: run.book, seed: run.mapSeed))
             VStack(spacing: 0) {
                 ForEach(origin.y..<(origin.y + viewport), id: \.self) { y in
                     HStack(spacing: 0) {
                         ForEach(origin.x..<(origin.x + viewport), id: \.self) { x in
                             let point = GridPoint(x: x, y: y)
                             TileView(tile: run.map[point],
+                                     artRequest: artRequest(at: point, grade: grade),
                                      enemy: enemy(at: point),
                                      site: site(at: point),
                                      isPlayer: point == run.playerPosition,
-                                     side: side)
+                                     side: side,
+                                     useSimpleRenderer: simpleRenderer)
                                 .onTapGesture { onTap(point) }
                         }
                     }
@@ -725,6 +731,31 @@ private struct MapGrid: View {
         .frame(maxWidth: .infinity)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
     }
+
+    private var simpleRenderer: Bool {
+#if DEBUG
+        useSimpleRenderer
+#else
+        false
+#endif
+    }
+
+    private func artRequest(at point: GridPoint, grade: WorldGrade) -> MapTileArtRequest {
+        let tile = run.map[point]
+        var adjacency = 0
+        for (bit, neighbour) in [(1, GridPoint(x: point.x, y: point.y-1)),
+                                 (2, GridPoint(x: point.x+1, y: point.y)),
+                                 (4, GridPoint(x: point.x, y: point.y+1)),
+                                 (8, GridPoint(x: point.x-1, y: point.y))] {
+            if run.map.contains(neighbour), run.map[neighbour].ground == tile.ground { adjacency |= bit }
+        }
+        let flora = tile.flora.flatMap { id in run.flora.first { $0.id == id } }
+        return MapTileArtRequest(tile: tile, point: point, mapSeed: run.mapSeed,
+                                 adjacency: adjacency,
+                                 grade: grade,
+                                 flora: flora)
+    }
+
 
     /// Cryptic creatures don't show until they're on you — see `WorldRules.isVisible`.
     private func enemy(at point: GridPoint) -> WorldEnemy? {
@@ -738,18 +769,30 @@ private struct MapGrid: View {
 
 private struct TileView: View {
     let tile: Tile
+    let artRequest: MapTileArtRequest
     let enemy: WorldEnemy?
     /// Resolved by the caller: the tile only stores an instance id, and the grid is the one place
     /// that has the run to look it up in.
     let site: SiteDef?
     let isPlayer: Bool
     let side: CGFloat
+    let useSimpleRenderer: Bool
 
     var body: some View {
         ZStack {
-            Rectangle()
-                .fill(background)
-                .overlay(Rectangle().stroke(Palette.mapGrid, lineWidth: 0.5))
+            if useSimpleRenderer {
+                Rectangle().fill(background)
+            } else {
+                MapTileArt(request: artRequest)
+            }
+            Rectangle().stroke(Palette.mapGrid.opacity(0.45), lineWidth: 0.5)
+            if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
+                CrackShape()
+                    .stroke(Color.orange.opacity(0.95), style: StrokeStyle(lineWidth: max(1, side * 0.07),
+                                                                          lineCap: .round,
+                                                                          lineJoin: .round))
+                    .padding(side * 0.12)
+            }
             // The player gets a filled disc behind them: at 27pt a bare glyph disappears into the
             // grid, and "where am I" has to be answerable at a glance.
             if isPlayer {
@@ -761,13 +804,6 @@ private struct TileView: View {
                 Image(systemName: symbol)
                     .font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
                     .foregroundStyle(tint)
-            }
-            if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
-                CrackShape()
-                    .stroke(Color.orange.opacity(0.95), style: StrokeStyle(lineWidth: max(1, side * 0.07),
-                                                                          lineCap: .round,
-                                                                          lineJoin: .round))
-                    .padding(side * 0.12)
             }
         }
         .frame(width: side, height: side)

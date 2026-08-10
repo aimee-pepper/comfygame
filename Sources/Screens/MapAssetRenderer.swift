@@ -1,0 +1,446 @@
+import SwiftUI
+import UIKit
+
+/// Native, deterministic adapter for AssetLab map-slice 1.1.
+/// The game supplies facts; this layer only turns them into 16px rectangle commands.
+enum MapAssetContract {
+    static let manifestSHA256 = "f776ae97f252f462570014ca81d06df40e5a6de82aaa06c53671310e1912c28d"
+    static let seedVersion = "bookbinder-terrain-seed-v1"
+    static let tuple = "1|1|1|1|world-grade-1.0.0|map-slice-1.1.0|rect-compositor-0.2.0|top-down-map-16px-1.0.0"
+
+    static func terrainSeed(mapSeed: UInt64, point: GridPoint) -> UInt32 {
+        let input = "\(seedVersion)|\(mapSeed)|\(point.x)|\(point.y)|\(tuple)"
+        return input.utf8.reduce(UInt32(0x811c9dc5)) { hash, byte in
+            (hash ^ UInt32(byte)) &* 0x01000193
+        }
+    }
+}
+
+struct WorldGrade: Equatable, Sendable {
+    var red: Int
+    var green: Int
+    var blue: Int
+    var value: Int
+
+    static func from(_ readings: PressureReadings) -> WorldGrade {
+        func center(_ x: Double) -> Double { min(1, max(-1, (x - 50) / 50)) }
+        func midpoint(_ id: PressureTargetID) -> Double {
+            let r = readings[id]
+            return (r.peak + r.floor) / 2
+        }
+        func away(_ x: Double, _ range: ClosedRange<Int>) -> Int {
+            let bounded = min(Double(range.upperBound), max(Double(range.lowerBound), x))
+            return Int(bounded.rounded(.toNearestOrAwayFromZero))
+        }
+        let warmth = center(midpoint("thermal"))
+        let wetness = center(readings["hydrology"].availableMagnitude)
+        let life = center(readings["vitality"].peak)
+        let light = center(midpoint("illumination"))
+        let mineral = center(readings["substrate"].peak)
+        return WorldGrade(red: away(24 * warmth + 8 * mineral, -32...32),
+                          green: away(22 * life + 8 * wetness, -32...32),
+                          blue: away(20 * wetness - 8 * warmth, -32...32),
+                          value: away(16 * light + 4 * mineral, -20...20))
+    }
+}
+
+struct MapTileArtRequest {
+    let tile: Tile
+    let point: GridPoint
+    let mapSeed: UInt64
+    let adjacency: Int
+    let grade: WorldGrade
+    let flora: Flora?
+    let explicitSeed: UInt32?
+    let explicitFeatureVariant: Int?
+
+    init(tile: Tile, point: GridPoint, mapSeed: UInt64, adjacency: Int, grade: WorldGrade,
+         flora: Flora?, explicitSeed: UInt32? = nil) {
+        self.tile = tile; self.point = point; self.mapSeed = mapSeed; self.adjacency = adjacency
+        self.grade = grade; self.flora = flora; self.explicitSeed = explicitSeed
+        self.explicitFeatureVariant = nil
+    }
+
+    init(tile: Tile, point: GridPoint, mapSeed: UInt64, adjacency: Int, grade: WorldGrade,
+         flora: Flora?, explicitSeed: UInt32, explicitFeatureVariant: Int) {
+        self.tile=tile; self.point=point; self.mapSeed=mapSeed; self.adjacency=adjacency
+        self.grade=grade; self.flora=flora; self.explicitSeed=explicitSeed
+        self.explicitFeatureVariant=explicitFeatureVariant
+    }
+
+    var seed: UInt32 { explicitSeed ?? MapAssetContract.terrainSeed(mapSeed: mapSeed, point: point) }
+    var featureVariant: Int { explicitFeatureVariant ?? Int(seed & 3) }
+}
+
+@MainActor enum MapAssetTestSupport {
+    static func terrainPixels(ground: GroundType, adjacency: Int = 15, featureVariant: Int = 0,
+                              grade: WorldGrade = WorldGrade(red: 0, green: 0, blue: 0, value: 0),
+                              elevation: Int = 0, crumbled: Bool = false,
+                              seed: UInt32 = 404) -> [UInt8] {
+        let tile = Tile(ground: ground, elevation: elevation, isRevealed: true, isCrumbled: crumbled)
+        let request = MapTileArtRequest(tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
+                                        adjacency: adjacency, grade: grade, flora: nil,
+                                        explicitSeed: seed, explicitFeatureVariant: featureVariant)
+        return MapPixelRaster.rawPixels(commands: TerrainPixelGrammar.commands(for: request))
+    }
+
+    static func floraPixels(_ flora: Flora) -> [UInt8] {
+        MapPixelRaster.rawPixels(commands: FloraPixelGrammar.commands(for: FloraRenderDescriptor(flora)))
+    }
+
+    static func floraCacheKey(_ flora: Flora) -> String {
+        MapPixelRaster.stableFloraKey(FloraRenderDescriptor(flora))
+    }
+}
+
+struct MapTileArt: View {
+    let request: MapTileArtRequest
+
+    var body: some View {
+        Group {
+            if let image = MapPixelRaster.image(for: request) {
+                Image(uiImage: image)
+                    .resizable()
+                    .interpolation(.none)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+}
+
+struct PixelCommand: Equatable {
+    var x: Int
+    var y: Int
+    var width: Int
+    var height: Int
+    var color: RGBA
+}
+
+private enum TerrainPixelGrammar {
+    static func commands(for request: MapTileArtRequest) -> [PixelCommand] {
+        let tile = request.tile
+        let palette = palette(for: tile.ground).map { $0.graded(request.grade) }
+        if tile.isCrumbled {
+            return [rect(0, 0, 16, 16, 0x09090c), rect(0, 0, 4, 2, palette[0]),
+                    rect(12, 14, 4, 2, palette[2])]
+        }
+        var random = Mulberry32(seed: request.seed ^ UInt32(request.adjacency) ^ UInt32(request.featureVariant &* 0x9e37))
+        var result = [rect(0, 0, 16, 16, palette[1])]
+        for _ in 0..<14 {
+            let width = [.water, .deepWater, .ice].contains(tile.ground) ? 2 : 1
+            result.append(rect(Int(random.next() * 16), Int(random.next() * 16), width, 1,
+                               random.next() > 0.5 ? palette[0] : palette[2]))
+        }
+        texture(tile.ground, palette, into: &result)
+        feature(tile.ground, request.featureVariant, palette, into: &result)
+        if [.water, .deepWater, .ice, .chasm].contains(tile.ground) {
+            let edge = edgeColour(tile.ground).graded(request.grade)
+            if request.adjacency & 1 == 0 { result.append(rect(0, 0, 16, 2, edge)) }
+            if request.adjacency & 2 == 0 { result.append(rect(14, 0, 2, 16, edge)) }
+            if request.adjacency & 4 == 0 { result.append(rect(0, 14, 16, 2, edge)) }
+            if request.adjacency & 8 == 0 { result.append(rect(0, 0, 2, 16, edge)) }
+        }
+        if tile.elevation > 0 {
+            let band = 1 + tile.elevation
+            result += [rect(0, 16 - band, 16, band, 0x21170f), rect(0, 15 - band, 16, 1, 0xb28a56)]
+            for x in stride(from: 1, to: 16, by: 4) { result.append(rect(x, 16 - band, 2, 1, 0x6b4b2d)) }
+        }
+        return fit(result, width: 16, height: 16, padding: 0)
+    }
+
+    private static func palette(for ground: GroundType) -> [RGB] {
+        switch ground {
+        case .stone: [0x34383b, 0x5b6264, 0x879092]
+        case .soil: [0x493827, 0x684b31, 0x88633e]
+        case .sand: [0x80683d, 0xb99a58, 0xdbc37c]
+        case .ice: [0x7895a6, 0xabc7d2, 0xe3f1ef]
+        case .ash: [0x29292b, 0x49474a, 0x777276]
+        case .water: [0x17384d, 0x245c73, 0x3b8190]
+        case .deepWater: [0x091e31, 0x12344e, 0x245571]
+        case .rubble: [0x3c3732, 0x625951, 0x91877d]
+        case .mud: [0x2d2118, 0x4f3926, 0x765536]
+        case .growth: [0x19361f, 0x31552f, 0x5f7b45]
+        case .chasm: [0x05060a, 0x0d1018, 0x292c3c]
+        case .groundcover: [0x3c542d, 0x657b3d, 0x92a85c]
+        }
+    }
+
+    private static func edgeColour(_ ground: GroundType) -> RGB {
+        switch ground { case .water: 0x8fc4cc; case .deepWater: 0x2e6681; case .ice: 0xd9eef2; default: 0x55566a }
+    }
+
+    private static func texture(_ ground: GroundType, _ p: [RGB], into c: inout [PixelCommand]) {
+        switch ground {
+        case .stone: c += line(1, 5, 6, 7, p[0]) + line(10, 1, 8, 5, p[2])
+        case .sand: c += line(1, 5, 7, 4, p[2]) + line(9, 11, 15, 10, p[0])
+        case .ice: c += line(3, 13, 8, 4, p[2]) + line(8, 4, 12, 2, p[2])
+        case .ash: for x in stride(from: 1, to: 16, by: 4) { c.append(rect(x, 12 - x % 5, 2, 1, p[0])) }
+        case .rubble: for (x, y) in [(1,2),(9,1),(5,9),(12,11)] { c += [rect(x,y,3,2,p[2]), rect(x+1,y+2,2,1,p[0])] }
+        case .mud: c += [rect(2,4,5,2,p[0]),rect(9,10,5,2,p[0]),rect(4,5,2,1,p[2]),rect(11,11,2,1,p[2])]
+        case .growth: for x in stride(from: 1, to: 16, by: 3) { c += line(x,15,x+(x%2 == 1 ? 2 : -1),4+x%4,p[2]) }
+        case .groundcover: for x in stride(from: 1, to: 16, by: 3) { c += [rect(x,9+x%3,2,2,p[2]),rect(x+1,12,1,3,p[0])] }
+        case .chasm: c += [rect(3,3,10,10,p[0]),rect(6,1,4,14,0x020205)]
+        default: break
+        }
+    }
+
+    private static func feature(_ ground: GroundType, _ variant: Int, _ p: [RGB], into c: inout [PixelCommand]) {
+        guard variant > 0 else { return }
+        let patterns: [[(Int,Int,Int,Int)]] = switch ground {
+        case .stone: [[(2,3,5,1),(9,10,5,1)],[(2,2,1,5),(8,1,1,7),(13,8,1,6)],[(3,3,3,2),(10,9,2,3)]]
+        case .soil: [[(2,3,2,1),(11,8,2,1)],[(3,1,1,8),(10,6,1,9)],[(1,4,13,1),(2,10,12,1)]]
+        case .sand: [[(1,4,6,1),(8,10,7,1)],[(3,3,9,2),(6,9,8,2)],[(2,2,2,1),(11,5,2,1),(6,12,2,1)]]
+        case .ice: [[(2,2,1,5),(3,6,5,1)],[(3,4,3,2),(10,9,2,2)],[(1,3,12,1),(4,9,11,1)]]
+        case .ash: [[(1,5,7,2),(9,10,6,2)],[(3,3,2,2),(11,8,2,2)],[(2,2,12,2),(5,9,9,2)]]
+        case .water: [[(1,4,7,1),(8,11,7,1)],[(3,3,3,1),(10,8,3,1)],[(2,2,1,5),(13,9,1,5)]]
+        case .deepWater: [[(0,5,12,1),(5,11,11,1)],[(4,4,7,4)],[(2,3,4,1),(10,10,4,1)]]
+        case .rubble: [[(2,2,4,3),(10,9,4,3)],[(1,4,6,4),(9,2,5,5)],[(3,3,2,1),(7,8,3,2),(12,12,2,1)]]
+        case .mud: [[(2,3,6,3),(9,10,5,3)],[(3,3,2,4),(10,8,2,5)],[(1,5,14,1),(3,11,11,1)]]
+        case .growth: [[(2,2,1,11),(7,4,1,10),(12,1,1,12)],[(2,4,4,3),(9,9,5,3)],[(1,3,13,2),(3,9,12,2)]]
+        case .chasm: [[(1,2,5,2),(10,11,5,2)],[(2,1,2,6),(12,8,2,7)],[(1,4,14,1),(4,11,11,1)]]
+        case .groundcover: [[(2,3,3,2),(10,8,3,2)],[(3,4,1,1),(8,7,1,1),(12,3,1,1)],[(1,5,14,2),(4,11,10,2)]]
+        }
+        for (x,y,w,h) in patterns[variant-1] { c.append(rect(x, y, w, h, variant == 2 ? p[2] : p[0])) }
+    }
+
+}
+
+fileprivate struct FloraRenderDescriptor: Codable, Equatable {
+    let logicalID: String
+    let speciesSeed: UInt32
+    let stature, tissueAmount, woody, fibrous, fleshy, defence: Int
+    let defenceType: DefenceType
+    let habit: Habit
+    let cyan, magenta, yellow, colorDepth, patterning, opacity, shine, schiller: Int
+    let metabolism: Metabolism
+
+    init(_ flora: Flora) {
+        func percent(_ value: Double) -> Int {
+            min(100, max(0, Int(value.rounded(.toNearestOrAwayFromZero))))
+        }
+        func allocation(_ values: [Int]) -> [Int] {
+            let total = values.reduce(0, +)
+            let divisor = max(1, total)
+            let first = Int((Double(values[0]) / Double(divisor) * 100).rounded(.toNearestOrAwayFromZero))
+            let second = Int((Double(values[1]) / Double(divisor) * 100).rounded(.toNearestOrAwayFromZero))
+            return [first, second, 100 - first - second]
+        }
+        let t = flora.traits
+        let tissue = allocation([percent(t.tissue.woody), percent(t.tissue.fibrous), percent(t.tissue.fleshy)])
+        let colour = allocation([percent(t.coloration.cyan), percent(t.coloration.magenta), percent(t.coloration.yellow)])
+        logicalID = "flora-\(flora.id.rawValue)"
+        speciesSeed = UInt32(truncatingIfNeeded: flora.worldSeed ^ flora.id.rawValue)
+        stature = percent(t.stature)
+        tissueAmount = percent(t.tissue.woody + t.tissue.fibrous + t.tissue.fleshy)
+        woody = tissue[0]; fibrous = tissue[1]; fleshy = tissue[2]
+        defence = percent(t.defence); defenceType = t.defenceType; habit = t.habit
+        cyan = colour[0]; magenta = colour[1]; yellow = colour[2]
+        colorDepth = percent(t.coloration.depth); patterning = percent(t.coloration.patterning)
+        opacity = percent(t.finish.opacity); shine = percent(t.finish.shine); schiller = percent(t.finish.schiller)
+        metabolism = t.metabolism
+    }
+}
+
+private enum FloraPixelGrammar {
+    static func commands(for t: FloraRenderDescriptor) -> [PixelCommand] {
+        var random = Mulberry32(seed: t.speciesSeed ^ 0x7102)
+        let total = max(1, t.cyan + t.magenta + t.yellow)
+        let hue = ((Double(t.cyan) / Double(total)) * 185 + (Double(t.magenta) / Double(total)) * 322
+                   + (Double(t.yellow) / Double(total)) * 74).truncatingRemainder(dividingBy: 360)
+        let saturation = 28 + Double(t.colorDepth) * 0.48
+        let alpha = 28 + Double(t.opacity) * 0.72
+        let outline = hsl(hue, 32, 10, 100)
+        let shadow = hsl(hue + 12, saturation, 25, alpha)
+        let body = hsl(hue, saturation, 43, alpha)
+        let light = hsl(hue + Double(t.schiller) * 0.7, min(100, saturation + 12),
+                        min(86, 58 + Double(t.shine) * 0.22), min(100, alpha + 10))
+        let warning = hsl(t.defenceType == .chemical ? 52 : t.defenceType == .active ? 338 : 24, 78, 58, 100)
+        let radius = 2 + Int((Double(t.stature + t.tissueAmount) / 45).rounded())
+        let centres = t.habit == .spreading ? [(5,6),(9,5),(7,10),(11,9)] : t.habit == .clustered ? [(6,6),(10,7),(7,10)] : [(8,8)]
+        var result: [PixelCommand] = []
+        for (index, centre) in centres.enumerated() {
+            let size = max(2, radius - index % 2), x = centre.0 - size / 2, y = centre.1 - size / 2
+            result += [rect(x-1,y,size+2,size,outline),rect(x,y-1,size,size+2,shadow),rect(x,y,size,size,body)]
+            if t.woody >= t.fibrous && t.woody >= t.fleshy {
+                result.append(rect(centre.0,centre.1,2,2,outline))
+                for (dx,dy) in [(-2,0),(2,0),(0,-2),(0,2)] { result.append(rect(centre.0+dx,centre.1+dy,2,2,body)) }
+            }
+            if t.fibrous > t.woody && t.fibrous >= t.fleshy {
+                for (dx,dy) in [(-3,0),(3,0),(0,-3),(0,3),(-2,-2),(2,2)] {
+                    result += line(centre.0, centre.1, centre.0+dx, centre.1+dy, light)
+                }
+            }
+            if t.fleshy > t.woody && t.fleshy > t.fibrous { for (dx,dy) in [(-2,-1),(1,-2),(2,1),(-1,2)] { result.append(rect(centre.0+dx,centre.1+dy,2,2,light)) } }
+            if t.metabolism == .fungal { result.append(rect(centre.0-1,centre.1-1,3,2,light)) }
+            if t.metabolism == .chemosynthetic { result.append(rect(centre.0+(index%2),centre.1-(index%2),1,1,light)) }
+        }
+        if t.patterning > 30 {
+            for _ in 0..<Int((Double(t.patterning)/22).rounded()) {
+                result.append(rect(4+Int(random.next()*8),4+Int(random.next()*8),1,1,light))
+            }
+        }
+        if t.defence > 55, t.defenceType == .physical { for (x,y) in [(3,8),(8,3),(13,8),(8,13)] { result.append(rect(x,y,1,2,warning)) } }
+        return fit(result, width: 16, height: 16, padding: 1)
+    }
+
+    private static func hsl(_ hue: Double, _ saturation: Double, _ lightness: Double, _ alpha: Double) -> RGBA {
+        RGBA.hsl(hue: hue.rounded(), saturation: saturation.rounded(), lightness: lightness.rounded(), alpha: alpha.rounded())
+    }
+}
+
+private struct Mulberry32 {
+    var state: UInt32
+    init(seed: UInt32) { state = seed == 0 ? 0x6d2b79f5 : seed }
+    mutating func next() -> Double {
+        state &+= 0x6d2b79f5
+        var t = state
+        t = (t ^ (t >> 15)) &* (t | 1)
+        t ^= t &+ ((t ^ (t >> 7)) &* (t | 61))
+        return Double((t ^ (t >> 14))) / 4_294_967_296
+    }
+}
+
+struct RGBA: Equatable {
+    var red: UInt8
+    var green: UInt8
+    var blue: UInt8
+    var alpha: UInt8
+
+    init(_ rgb: RGB, alpha: UInt8 = 255) {
+        red = UInt8(rgb.red); green = UInt8(rgb.green); blue = UInt8(rgb.blue); self.alpha = alpha
+    }
+
+    static func hsl(hue: Double, saturation: Double, lightness: Double, alpha: Double) -> RGBA {
+        let h = ((hue.truncatingRemainder(dividingBy: 360)) + 360).truncatingRemainder(dividingBy: 360) / 360
+        let s = min(1, max(0, saturation / 100)), l = min(1, max(0, lightness / 100))
+        func channel(_ n: Double) -> Double {
+            let k = (n + h * 12).truncatingRemainder(dividingBy: 12)
+            let a = s * min(l, 1-l)
+            return l - a * max(-1, min(k-3, min(9-k, 1)))
+        }
+        return RGBA(red: UInt8((channel(0)*255).rounded()),
+                    green: UInt8((channel(8)*255).rounded()),
+                    blue: UInt8((channel(4)*255).rounded()),
+                    alpha: UInt8((min(100,max(0,alpha))/100*255).rounded()))
+    }
+
+    init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8) {
+        self.red = red; self.green = green; self.blue = blue; self.alpha = alpha
+    }
+}
+
+@MainActor private enum MapPixelRaster {
+    static let cache = NSCache<NSString, UIImage>()
+
+    static func image(for request: MapTileArtRequest) -> UIImage? {
+        let descriptor = request.flora.map(FloraRenderDescriptor.init)
+        let floraKey = descriptor.map(stableFloraKey) ?? "none"
+        let key = "\(MapAssetContract.tuple)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.elevation)-\(request.grade.red),\(request.grade.green),\(request.grade.blue),\(request.grade.value)-\(floraKey)" as NSString
+        if let cached = cache.object(forKey: key) { return cached }
+        let commands: [PixelCommand]
+        if request.tile.isRevealed {
+            commands = TerrainPixelGrammar.commands(for: request)
+                + (request.tile.isCrumbled ? [] : descriptor.map(FloraPixelGrammar.commands) ?? [])
+        } else {
+            commands = [rect(0, 0, 16, 16, 0x17171a)]
+        }
+        guard let image = raster(commands: commands) else { return nil }
+        cache.setObject(image, forKey: key)
+        return image
+    }
+
+    fileprivate static func stableFloraKey(_ flora: FloraRenderDescriptor) -> String {
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
+        let data = (try? encoder.encode(flora)) ?? Data()
+        let hash = data.reduce(UInt32(0x811c9dc5)) { ($0 ^ UInt32($1)) &* 0x01000193 }
+        return "\(flora.logicalID)-\(flora.speciesSeed)-\(hash)"
+    }
+
+    static func raster(commands: [PixelCommand]) -> UIImage? {
+        var bytes = [UInt8](repeating: 0, count: 16 * 16 * 4)
+        for command in commands {
+            let x0 = max(0, command.x), y0 = max(0, command.y)
+            let x1 = min(16, command.x + command.width), y1 = min(16, command.y + command.height)
+            guard x0 < x1, y0 < y1 else { continue }
+            for y in y0..<y1 { for x in x0..<x1 { blend(command.color, into: &bytes, at: (y*16+x)*4) } }
+        }
+        let data = Data(bytes)
+        guard let provider = CGDataProvider(data: data as CFData),
+              let cg = CGImage(width: 16, height: 16, bitsPerComponent: 8, bitsPerPixel: 32,
+                               bytesPerRow: 64, space: CGColorSpaceCreateDeviceRGB(),
+                               bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+                               provider: provider, decode: nil, shouldInterpolate: false,
+                               intent: .defaultIntent) else { return nil }
+        return UIImage(cgImage: cg, scale: 1, orientation: .up)
+    }
+
+    /// AssetLab's conformance hash buffer stores the last rectangle's straight RGBA bytes.
+    /// This is deliberately separate from on-screen source-over composition.
+    static func rawPixels(commands: [PixelCommand]) -> [UInt8] {
+        var bytes = [UInt8](repeating: 0, count: 16 * 16 * 4)
+        for command in commands {
+            for y in max(0,command.y)..<min(16,command.y+command.height) {
+                for x in max(0,command.x)..<min(16,command.x+command.width) {
+                    let i=(y*16+x)*4
+                    bytes[i]=command.color.red; bytes[i+1]=command.color.green
+                    bytes[i+2]=command.color.blue; bytes[i+3]=command.color.alpha
+                }
+            }
+        }
+        return bytes
+    }
+
+    private static func blend(_ source: RGBA, into bytes: inout [UInt8], at i: Int) {
+        let sa = Int(source.alpha), inverse = 255-sa, da = Int(bytes[i+3])
+        bytes[i] = UInt8(min(255, (Int(source.red)*sa + Int(bytes[i])*inverse + 127) / 255))
+        bytes[i+1] = UInt8(min(255, (Int(source.green)*sa + Int(bytes[i+1])*inverse + 127) / 255))
+        bytes[i+2] = UInt8(min(255, (Int(source.blue)*sa + Int(bytes[i+2])*inverse + 127) / 255))
+        bytes[i+3] = UInt8(min(255, sa + (da*inverse + 127)/255))
+    }
+}
+
+struct RGB: ExpressibleByIntegerLiteral, Equatable {
+    var red: Int; var green: Int; var blue: Int
+    init(integerLiteral value: Int) { self.init(value) }
+    init(_ value: Int) { red = value >> 16 & 255; green = value >> 8 & 255; blue = value & 255 }
+    func graded(_ grade: WorldGrade) -> RGB {
+        var result = self
+        result.red = min(255, max(0, red + grade.red + grade.value))
+        result.green = min(255, max(0, green + grade.green + grade.value))
+        result.blue = min(255, max(0, blue + grade.blue + grade.value))
+        return result
+    }
+}
+
+private func rect(_ x: Int, _ y: Int, _ width: Int, _ height: Int, _ rgb: Int) -> PixelCommand { rect(x,y,width,height,RGB(rgb)) }
+private func rect(_ x: Int, _ y: Int, _ width: Int, _ height: Int, _ rgb: RGB) -> PixelCommand { rect(x,y,width,height,RGBA(rgb)) }
+private func rect(_ x: Int, _ y: Int, _ width: Int, _ height: Int, _ color: RGBA) -> PixelCommand {
+    PixelCommand(x: x, y: y, width: max(1,width), height: max(1,height), color: color)
+}
+
+private func line(_ x0: Int, _ y0: Int, _ x1: Int, _ y1: Int, _ rgb: Int) -> [PixelCommand] { line(x0,y0,x1,y1,RGB(rgb)) }
+private func line(_ startX: Int, _ startY: Int, _ endX: Int, _ endY: Int, _ rgb: RGB) -> [PixelCommand] {
+    line(startX, startY, endX, endY, RGBA(rgb))
+}
+private func line(_ startX: Int, _ startY: Int, _ endX: Int, _ endY: Int, _ color: RGBA) -> [PixelCommand] {
+    var x = startX, y = startY, result: [PixelCommand] = []
+    let dx = abs(endX-x), sx = x < endX ? 1 : -1, dy = -abs(endY-y), sy = y < endY ? 1 : -1
+    var error = dx + dy
+    while true {
+        result.append(rect(x,y,1,1,color)); if x == endX && y == endY { break }
+        let twice = 2 * error
+        if twice >= dy { error += dy; x += sx }; if twice <= dx { error += dx; y += sy }
+    }
+    return result
+}
+
+private func fit(_ commands: [PixelCommand], width: Int, height: Int, padding: Int) -> [PixelCommand] {
+    guard let minX = commands.map(\.x).min(), let minY = commands.map(\.y).min(),
+          let maxX = commands.map({ $0.x + $0.width }).max(), let maxY = commands.map({ $0.y + $0.height }).max() else { return commands }
+    if maxX-minX > width-padding*2 || maxY-minY > height-padding*2 {
+        return commands.map { var c=$0; c.x=max(padding,min(width-padding-c.width,c.x)); c.y=max(padding,min(height-padding-c.height,c.y)); return c }
+    }
+    let dx = minX < padding ? padding-minX : maxX > width-padding ? width-padding-maxX : 0
+    let dy = minY < padding ? padding-minY : maxY > height-padding ? height-padding-maxY : 0
+    return commands.map { var c=$0; c.x += dx; c.y += dy; return c }
+}

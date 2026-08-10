@@ -31,22 +31,11 @@ struct MinimapView: View {
                              width: side * 2, height: side * 2)
             context.fill(Path(ellipseIn: you), with: .color(.accentColor))
 
-            // These are navigation promises, not discoveries: the minimap always tells you where
-            // the way home, the writing, and the world's singular apex are.
+            // POIs are exploration knowledge. Rendering never grants discovery through fog.
             for point in run.map.allPoints {
-                switch run.map[point].content {
-                case .portal:
-                    draw("portal", at: point, side: side, inset: inset, context: &context)
-                case .diaryPage:
-                    draw("page", at: point, side: side, inset: inset, context: &context)
-                case .foundWriting:
-                    draw("page", at: point, side: side, inset: inset, context: &context)
-                default:
-                    break
+                if let marker = MinimapDisclosure.marker(at: point, in: run) {
+                    draw(marker.rawValue, at: point, side: side, inset: inset, context: &context)
                 }
-            }
-            for enemy in run.enemies where enemy.isApex {
-                draw("apex", at: enemy.position, side: side, inset: inset, context: &context)
             }
         } symbols: {
             Image(systemName: "arrow.down.left.circle.fill")
@@ -61,6 +50,12 @@ struct MinimapView: View {
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(.orange)
                 .tag("apex")
+            Image(systemName: "building.columns.fill").font(.system(size: 9, weight: .bold)).foregroundStyle(.brown).tag("site")
+            Image(systemName: "cube.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.teal).tag("resource")
+            Image(systemName: "person.fill").font(.system(size: 9, weight: .bold)).foregroundStyle(.green).tag("traveller")
+            Image(systemName: "pawprint.fill").font(.system(size: 9, weight: .bold)).foregroundStyle(.red).tag("encounter")
+            Image(systemName: "lock.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.purple).tag("cache")
+            Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.orange).tag("hazard")
         }
         .frame(width: 112, height: 112)
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
@@ -100,5 +95,29 @@ struct MinimapView: View {
         case .portal: return .blue.opacity(0.8)
         default: return Palette.mapFloor.opacity(0.95)                  // explored, something here
         }
+    }
+}
+
+enum MinimapDisclosure {
+    enum Marker: String, CaseIterable { case portal, page, apex, site, resource, traveller, encounter, cache, hazard }
+
+    static func marker(for tile: Tile, enemy: WorldEnemy?) -> Marker? {
+        guard tile.isRevealed else { return nil }
+        if let enemy { return enemy.isApex ? .apex : .encounter }
+        return switch tile.content {
+        case .empty: nil
+        case .portal: .portal
+        case .diaryPage, .foundWriting: .page
+        case .site: .site
+        case .node, .wildDrop: .resource
+        case .traveller: .traveller
+        case .lockedCache: .cache
+        case .hazard: .hazard
+        }
+    }
+
+    static func marker(at point: GridPoint, in run: WorldRun) -> Marker? {
+        let visibleEnemy = run.enemies.first { $0.position == point && WorldRules.isVisible($0, in: run) }
+        return marker(for: run.map[point], enemy: visibleEnemy)
     }
 }

@@ -21,6 +21,7 @@
 		0A77177F80047BBE6CD74591 /* skills.json in Resources */ = {isa = PBXBuildFile; fileRef = 2C4E5B7DC86948834FDAFFF9 /* skills.json */; };
 		0D0B63ACE19B51E89D5321F8 /* TravellerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C03E6819177D7EABE894A3 /* TravellerModels.swift */; };
 		10EA98516A8B4CB4C9379D71 /* MinimapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D238962CB9F8B60B212D9473 /* MinimapView.swift */; };
+		10EA98526A8B4CB4C9379D72 /* MapAssetRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D238962DB9F8B60B212D9474 /* MapAssetRenderer.swift */; };
 		10FAF7D28B2984AD85FBEB44 /* LivingAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE7FAE39BDF3B01C8F7B497 /* LivingAnalysisView.swift */; };
 		11BD659A05151A43A4F78554 /* WorldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6430D823936296B085FA9EBA /* WorldTests.swift */; };
 		12DA6127DA1CEF02D5108CE9 /* SiteRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A56C2CA4EF6B5366F86828 /* SiteRules.swift */; };
@@ -331,6 +332,7 @@
 		D08A668BC1215643DD63B178 /* TravellerMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravellerMeetingView.swift; sourceTree = "<group>"; };
 		D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCatalog.swift; sourceTree = "<group>"; };
 		D238962CB9F8B60B212D9473 /* MinimapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimapView.swift; sourceTree = "<group>"; };
+		D238962DB9F8B60B212D9474 /* MapAssetRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapAssetRenderer.swift; sourceTree = "<group>"; };
 		D2AAB75EDFEC0064219E57D4 /* PageRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageRules.swift; sourceTree = "<group>"; };
 		D3EB5122AA82F1610E51A10F /* DescriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionTests.swift; sourceTree = "<group>"; };
 		D56058E017000066A61CD5F0 /* NamingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamingTests.swift; sourceTree = "<group>"; };
@@ -461,6 +463,7 @@
 				9BE7FAE39BDF3B01C8F7B497 /* LivingAnalysisView.swift */,
 				CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */,
 				D238962CB9F8B60B212D9473 /* MinimapView.swift */,
+				D238962DB9F8B60B212D9474 /* MapAssetRenderer.swift */,
 				39D5618B6B6F36DB62CD836B /* PageGridView.swift */,
 				3B6F502E8B3B230294A2874A /* PartyRosterView.swift */,
 				36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */,
@@ -836,6 +839,7 @@
 				3C489CD6B833D6CBC9F6DD43 /* Materials.swift in Sources */,
 				A30BFB516414E49CB79270EF /* Migrations.swift in Sources */,
 				10EA98516A8B4CB4C9379D71 /* MinimapView.swift in Sources */,
+				10EA98526A8B4CB4C9379D72 /* MapAssetRenderer.swift in Sources */,
 				4419D5E216F811B6E590C273 /* Naming.swift in Sources */,
 				B3127BCE033E785E4B3EA912 /* Page.swift in Sources */,
 				A7B958AF227E4AD7A6E2E900 /* PageGridView.swift in Sources */,

@@ -1,4 +1,5 @@
 import XCTest
+import CryptoKit
 @testable import Bookbinder
 
 /// Worldgen determinism, movement, decay, and the rules that end a run.
@@ -26,6 +27,154 @@ final class WorldTests: XCTestCase {
         let composition = book(["terrain": "plains"])
         XCTAssertNotEqual(Worldgen.generate(book: composition, seed: 1).map,
                           Worldgen.generate(book: composition, seed: 2).map)
+    }
+
+    func testNativeMapTerrainSeedUsesFrozenPayloadAndFNV1a() {
+        XCTAssertEqual(MapAssetContract.terrainSeed(mapSeed: 0, point: GridPoint(x: 0, y: 0)), 1_940_317_494)
+        XCTAssertEqual(MapAssetContract.terrainSeed(mapSeed: 0, point: GridPoint(x: 0, y: 0)) & 3, 2)
+        XCTAssertEqual(MapAssetContract.terrainSeed(mapSeed: .max, point: GridPoint(x: 10, y: 10)), 3_919_347_185)
+        XCTAssertEqual(MapAssetContract.terrainSeed(mapSeed: .max, point: GridPoint(x: 10, y: 10)) & 3, 1)
+    }
+
+    func testNativeMapWorldGradeMatchesCrossLanguageVectors() {
+        func readings(thermal: Double, water: Double, life: Double, light: Double, mineral: Double) -> PressureReadings {
+            func reading(_ id: PressureTargetID, _ value: Double) -> PressureReading {
+                PressureReading(target: id, peak: value, demand: value, floor: value,
+                                opposedMagnitude: 0, aspects: [:], forms: [:], tags: [])
+            }
+            return PressureReadings(readings: [
+                "thermal": reading("thermal", thermal), "hydrology": reading("hydrology", water),
+                "vitality": reading("vitality", life), "illumination": reading("illumination", light),
+                "substrate": reading("substrate", mineral)
+            ])
+        }
+        XCTAssertEqual(WorldGrade.from(readings(thermal: 50, water: 50, life: 50, light: 50, mineral: 50)),
+                       WorldGrade(red: 0, green: 0, blue: 0, value: 0))
+        XCTAssertEqual(WorldGrade.from(readings(thermal: 90, water: 20, life: 25, light: 80, mineral: 75)),
+                       WorldGrade(red: 23, green: -16, blue: -18, value: 12))
+        XCTAssertEqual(WorldGrade.from(readings(thermal: 10, water: 90, life: 85, light: 20, mineral: 30)),
+                       WorldGrade(red: -22, green: 22, blue: 22, value: -11))
+    }
+
+    func testNativeMapPinsCorrectedCanonicalManifest() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let data = try Data(contentsOf: root.appendingPathComponent("AssetLab/integration/map-slice-v1/manifest.json"))
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertEqual(json["canonicalManifestSha256"] as? String, MapAssetContract.manifestSHA256)
+    }
+
+    @MainActor
+    func testNativeFloraAdapterMatchesPublishedLiveVectorsAndKeysNormalizedTraits() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let data = try Data(contentsOf: root.appendingPathComponent("AssetLab/integration/map-slice-v1/manifest.json"))
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let contract = try XCTUnwrap(json["liveInputContract"] as? [String: Any])
+        let vectors = try XCTUnwrap(contract["floraFixtureVectors"] as? [[String: Any]])
+
+        func flora(from vector: [String: Any]) throws -> Flora {
+            let swift = try XCTUnwrap(vector["swift"] as? [String: Any])
+            let idObject = try XCTUnwrap(swift["id"] as? [String: Any])
+            let id = UInt64(try XCTUnwrap(idObject["rawValue"] as? String))!
+            let seed = UInt64(try XCTUnwrap(swift["worldSeed"] as? String))!
+            let source = try XCTUnwrap(swift["traits"] as? [String: Any])
+            let tissue = try XCTUnwrap(source["tissue"] as? [String: Any])
+            let colour = try XCTUnwrap(source["coloration"] as? [String: Any])
+            let finish = try XCTUnwrap(source["finish"] as? [String: Any])
+            var traits = FloraTraits()
+            traits.stature = try XCTUnwrap(source["stature"] as? Double)
+            traits.tissue.woody = try XCTUnwrap(tissue["woody"] as? Double)
+            traits.tissue.fibrous = try XCTUnwrap(tissue["fibrous"] as? Double)
+            traits.tissue.fleshy = try XCTUnwrap(tissue["fleshy"] as? Double)
+            traits.defence = try XCTUnwrap(source["defence"] as? Double)
+            traits.defenceType = try XCTUnwrap(DefenceType(rawValue: try XCTUnwrap(source["defenceType"] as? String)))
+            traits.habit = try XCTUnwrap(Habit(rawValue: try XCTUnwrap(source["habit"] as? String)))
+            traits.coloration.cyan = try XCTUnwrap(colour["cyan"] as? Double)
+            traits.coloration.magenta = try XCTUnwrap(colour["magenta"] as? Double)
+            traits.coloration.yellow = try XCTUnwrap(colour["yellow"] as? Double)
+            traits.coloration.depth = try XCTUnwrap(colour["depth"] as? Double)
+            traits.coloration.patterning = try XCTUnwrap(colour["patterning"] as? Double)
+            traits.finish.opacity = try XCTUnwrap(finish["opacity"] as? Double)
+            traits.finish.shine = try XCTUnwrap(finish["shine"] as? Double)
+            traits.finish.schiller = try XCTUnwrap(finish["schiller"] as? Double)
+            traits.metabolism = try XCTUnwrap(Metabolism(rawValue: try XCTUnwrap(source["metabolism"] as? String)))
+            return Flora(id: InstanceID(rawValue: id), traits: traits, worldSeed: seed)
+        }
+
+        XCTAssertEqual(vectors.count, 2)
+        for vector in vectors {
+            let flora = try flora(from: vector)
+            let pixels = MapAssetTestSupport.floraPixels(flora)
+            let actual = SHA256.hash(data: Data(pixels)).map { String(format: "%02x", $0) }.joined()
+            XCTAssertEqual(actual, vector["pixelSha256"] as? String)
+        }
+
+        let original = try flora(from: vectors[0])
+        var changedTraits = original.traits
+        changedTraits.coloration.cyan += 10
+        let changed = Flora(id: original.id, traits: changedTraits, worldSeed: original.worldSeed)
+        XCTAssertNotEqual(MapAssetTestSupport.floraCacheKey(original), MapAssetTestSupport.floraCacheKey(changed))
+        XCTAssertNotEqual(MapAssetTestSupport.floraPixels(original), MapAssetTestSupport.floraPixels(changed))
+    }
+
+    @MainActor
+    func testNativeTerrainRasterMatchesEveryAssetLabConformanceFixture() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let data = try Data(contentsOf: root.appendingPathComponent("AssetLab/integration/map-slice-v1/manifest.json"))
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let outputs = try XCTUnwrap(json["outputs"] as? [[String: Any]])
+        var checked = 0
+        for output in outputs where (output["kind"] as? String)?.hasPrefix("terrain") == true {
+            let ground = try XCTUnwrap(GroundType(rawValue: try XCTUnwrap(output["ground"] as? String)))
+            let adjacency = output["adjacency"] as? Int ?? 15
+            let feature = output["featureVariant"] as? Int ?? 0
+            let elevation = output["elevation"] as? Int ?? 0
+            let crumbled = output["crumbled"] as? Bool ?? false
+            let gradeJSON = output["worldGrade"] as? [String: Int] ?? [:]
+            let grade = WorldGrade(red: gradeJSON["red"] ?? 0, green: gradeJSON["green"] ?? 0,
+                                   blue: gradeJSON["blue"] ?? 0, value: gradeJSON["value"] ?? 0)
+            let pixels = MapAssetTestSupport.terrainPixels(ground: ground, adjacency: adjacency,
+                                                           featureVariant: feature, grade: grade,
+                                                           elevation: elevation, crumbled: crumbled)
+            let actual = SHA256.hash(data: Data(pixels)).map { String(format: "%02x", $0) }.joined()
+            XCTAssertEqual(actual, output["pixelSha256"] as? String, output["id"] as? String ?? ground.rawValue)
+            checked += 1
+        }
+        XCTAssertGreaterThanOrEqual(checked, 180)
+    }
+
+    func testEveryMinimapPOIFamilyIsFogGated() {
+        let cases: [(TileContent, MinimapDisclosure.Marker)] = [
+            (.portal(isEntry: true), .portal), (.diaryPage("page"), .page),
+            (.foundWriting("note"), .page), (.site(InstanceID(rawValue: 1)), .site),
+            (.node(ResourceNode(resource: "ore", remainingHarvests: 1, yieldPerHarvest: 1)), .resource),
+            (.wildDrop(resource: "essence_raw", amount: 1), .resource), (.traveller("mara"), .traveller),
+            (.lockedCache, .cache), (.hazard, .hazard)
+        ]
+        for (content, expected) in cases {
+            XCTAssertNil(MinimapDisclosure.marker(for: Tile(content: content, isRevealed: false), enemy: nil))
+            XCTAssertEqual(MinimapDisclosure.marker(for: Tile(content: content, isRevealed: true), enemy: nil), expected)
+        }
+        let ordinary = WorldEnemy(id: InstanceID(rawValue: 2), position: GridPoint(x: 0, y: 0))
+        let apex = WorldEnemy(id: InstanceID(rawValue: 3), position: GridPoint(x: 0, y: 0), isApex: true)
+        XCTAssertNil(MinimapDisclosure.marker(for: Tile(isRevealed: false), enemy: ordinary))
+        XCTAssertNil(MinimapDisclosure.marker(for: Tile(isRevealed: false), enemy: apex))
+        XCTAssertEqual(MinimapDisclosure.marker(for: Tile(isRevealed: true), enemy: ordinary), .encounter)
+        XCTAssertEqual(MinimapDisclosure.marker(for: Tile(isRevealed: true), enemy: apex), .apex)
+    }
+
+    @MainActor func testMinimapDoesNotLeakSleepingCrypsisOnRevealedTerrain() {
+        let store = GameStore(io: .temporary(name: "minimap-crypsis-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        var run = store.state.worlds.activeRun!
+        var traits = CreatureTraits()
+        traits.defence = .crypsis
+        let point = GridPoint(x: run.playerPosition.x + 4, y: run.playerPosition.y)
+        run.map[point].isRevealed = true
+        run.enemies = [WorldEnemy(id: InstanceID(rawValue: 77), traits: traits, position: point)]
+        XCTAssertNil(MinimapDisclosure.marker(at: point, in: run))
+        run.enemies[0].isAwake = true
+        XCTAssertEqual(MinimapDisclosure.marker(at: point, in: run), .encounter)
     }
 
     /// Acceptance criterion: two books with different symbols must produce visibly different worlds.

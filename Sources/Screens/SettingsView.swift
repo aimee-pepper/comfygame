@@ -102,6 +102,7 @@ struct SettingsView: View {
 #if DEBUG
 private struct BalancingView: View {
     @EnvironmentObject private var settings: AppSettings
+    @AppStorage("debug.simpleMapRenderer") private var useSimpleMapRenderer = false
 
     var body: some View {
         Form {
@@ -210,6 +211,13 @@ private struct BalancingView: View {
                     settings.debugTuning.baseVisionRadius = Tuning.World.baseVisionRadius
                     settings.debugTuning.slowGroundExtraTurns = 1
                 }
+            }
+
+            Section("Rendering") {
+                Toggle("Use simple map renderer", isOn: $useSimpleMapRenderer)
+                Text("DEBUG fallback for comparing the native 16px terrain/flora renderer with the previous flat map. It does not change world rules or save data.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section("Flora") {
