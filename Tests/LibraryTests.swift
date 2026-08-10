@@ -123,6 +123,39 @@ final class LibraryTests: XCTestCase {
 
     // MARK: Pages
 
+    func testLibraryPresentationGivesEveryDiaryPageOnePeopleHome() throws {
+        let location = try XCTUnwrap(ContentCatalog.shared.diaryPages.first { $0.kind == .locationClue })
+        let other = try XCTUnwrap(ContentCatalog.shared.diaryPages.first { $0.kind != .locationClue })
+        var library = LibraryState()
+        library.foundPages = [location.id, other.id]
+
+        let presented = LibraryPresentation.people(in: library)
+            .flatMap { LibraryPresentation.pages(by: $0.id, in: library) }
+
+        XCTAssertEqual(Set(presented.map(\.id)), Set(library.foundPages))
+        XCTAssertEqual(presented.count, library.foundPages.count,
+                       "a diary page appeared in more than one collection")
+    }
+
+    func testRecoveredPageMakesItsAuthorVisibleWithoutRevealingTheRestOfTheCast() throws {
+        let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.last)
+        var library = LibraryState()
+        library.foundPages = [page.id]
+
+        XCTAssertEqual(LibraryPresentation.people(in: library).map(\.id), [page.diary])
+    }
+
+    func testWorldNoteTilesOnlyExposeRecoveredFamilies() {
+        var library = LibraryState()
+        library.foundWritings = [
+            .init(id: "field", family: .fieldNote, prose: "Observed.", position: .init(x: 0, y: 0)),
+            .init(id: "route", family: .routeMark, prose: "East.", position: .init(x: 1, y: 0))
+        ]
+
+        XCTAssertEqual(LibraryPresentation.recoveredNoteFamilies(in: library),
+                       [.fieldNote, .routeMark])
+    }
+
     func testTravellerProgressionUsesExplicitAuthoredOrder() {
         XCTAssertEqual(ContentCatalog.shared.travellersInAuthoredOrder.map(\.id),
                        ["mara", "edren", "halloway", "isolde", "sela",

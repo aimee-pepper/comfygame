@@ -79,7 +79,9 @@ struct LibraryState: Codable, Equatable, Sendable {
 }
 
 struct FoundWritingRecord: Codable, Equatable, Identifiable, Sendable {
-    enum Family: String, Codable, Sendable { case fieldNote, routeMark, siteFragment, workingScrap }
+    enum Family: String, Codable, CaseIterable, Sendable {
+        case fieldNote, routeMark, siteFragment, workingScrap
+    }
     var id: FoundWritingID
     var family: Family
     var prose: String
