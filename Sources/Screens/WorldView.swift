@@ -517,6 +517,33 @@ private struct WorldDiagnosticsView: View {
                         Text(ContentCatalog.shared.traveller(id)?.name ?? id.rawValue)
                     }
                 }
+                if let preview = run.activeEncounter?.scalingPreview {
+                    Section("Encounter scaling") {
+                        LabeledRow(icon: "person.3", label: "Party levels / upper median",
+                                   value: "\(preview.partyLevels.map(String.init).joined(separator: ", ")) / \(preview.upperMedian)")
+                        LabeledRow(icon: "pawprint", label: "Visible foe IDs",
+                                   value: preview.foeIDs.map { String($0.rawValue) }.joined(separator: ", "))
+                        LabeledRow(icon: "circle.grid.cross", label: "Grouping radius / reasons",
+                                   value: "\(preview.groupingRadius) · " + preview.inclusionReasons.keys.sorted().compactMap { foeID in
+                                       preview.inclusionReasons[foeID].map { reason in "\(foeID): \(reason)" }
+                                   }.joined(separator: "; "))
+                        LabeledRow(icon: "chart.bar", label: "Stability / greed level-equivalents",
+                                   value: "\(preview.stabilityLevelContribution.formatted(.number.precision(.fractionLength(2)))) / \(preview.greedLevelContribution.formatted(.number.precision(.fractionLength(2))))")
+                        LabeledRow(icon: "scalemass", label: "Budget / visible / adjustment",
+                                   value: "\(preview.ordinaryBudget.formatted(.number.precision(.fractionLength(2)))) / \(preview.visibleFoeCount) / +\(preview.totalOrdinaryLevelAdjustment)")
+                        LabeledRow(icon: "dice", label: "Remainder roll / step",
+                                   value: "\(preview.remainderRoll) / +\(preview.remainderUpgrade)")
+                        LabeledRow(icon: "crown", label: "Apex floor · HP · offence · actions",
+                                   value: "L\(preview.apexLevelFloor) · \(preview.apexHPMultiplier.formatted(.number.precision(.fractionLength(2))))× · \(preview.apexOffenceMultiplier.formatted(.number.precision(.fractionLength(2))))× · \(preview.apexActionSlots)")
+                        ForEach(preview.finalFoes, id: \.id) { foe in
+                            LabeledRow(icon: foe.isApex ? "crown.fill" : "pawprint.fill",
+                                       label: "Foe \(foe.id.rawValue) final",
+                                       value: "L\(foe.level) · HP \(foe.maxHP) · ATK \(foe.attack) · ARM \(foe.armour)")
+                        }
+                        Text("Projected opening damage and neutral rounds-to-defeat: pending simulation model.")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
                 Section("Test Setup") {
                     let report = run.generationDiagnostics
                     LabeledRow(icon: "wrench.and.screwdriver", label: "Opening envelope requested",
@@ -541,7 +568,7 @@ private struct WorldDiagnosticsView: View {
 
     private var tuningSnapshot: String {
         let t = run.tuning
-        return "rawFrequency=\(t.rawEssenceFrequencyMultiplier) rawYield=\(t.rawEssenceYieldMultiplier) nodeDensity=\(t.resourceNodeDensityMultiplier) creatureDensity=\(t.creatureDensityMultiplier) diaryShare=\(t.diaryWritingShare) secondWriting=\(t.additionalPageChance) patience=\(t.diaryPatienceWorlds) stabilityDuration=\(t.stabilityDurationMultiplier) collapseRecovery=\(t.collapseRecoveryFraction) apex=\(t.apexChanceMultiplier) vision=\(t.baseVisionRadius) slowExtra=\(t.slowGroundExtraTurns) activeFlora=\(t.activeFloraFrequencyMultiplier) floraSeverity=\(t.floraHazardSeverityMultiplier) opening=\(t.openingEncounterEnvelope.rawValue)"
+        return "rawFrequency=\(t.rawEssenceFrequencyMultiplier) rawYield=\(t.rawEssenceYieldMultiplier) nodeDensity=\(t.resourceNodeDensityMultiplier) creatureDensity=\(t.creatureDensityMultiplier) diaryShare=\(t.diaryWritingShare) secondWriting=\(t.additionalPageChance) patience=\(t.diaryPatienceWorlds) stabilityDuration=\(t.stabilityDurationMultiplier) collapseRecovery=\(t.collapseRecoveryFraction) apex=\(t.apexChanceMultiplier) encounterScaling=\(t.encounterScalingProfile.rawValue) vision=\(t.baseVisionRadius) slowExtra=\(t.slowGroundExtraTurns) activeFlora=\(t.activeFloraFrequencyMultiplier) floraSeverity=\(t.floraHazardSeverityMultiplier) opening=\(t.openingEncounterEnvelope.rawValue)"
     }
 }
 #endif

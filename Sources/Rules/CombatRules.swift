@@ -20,6 +20,7 @@ enum CombatRules {
     ///   order** — this is where a party of five becomes real, and it used to be a hardcoded two.
     static func makeEncounter(id: InstanceID, foes: [FoeState], party: [Combatant] = [.binder, .companion(0)],
                               names: [Int: String] = [:],
+                              apexActionSlots: [InstanceID: Int] = [:],
                               initiallyUnrecordedSpecies: Set<String> = [],
                               rng: inout SeededRNG) -> EncounterState {
         var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = party.map { member in
@@ -41,14 +42,33 @@ enum CombatRules {
             }
             .map(\.0.actor)
 
+        var slots = order.map { EncounterState.TurnSlot(actor: $0) }
+        for (foeID, count) in apexActionSlots.sorted(by: { $0.key.rawValue < $1.key.rawValue }) where count > 1 {
+            guard var previous = slots.firstIndex(where: { $0.actor == .foe(foeID) }) else { continue }
+            for ordinal in 2...min(3, count) {
+                // Place each lighter action after another actor whenever the remaining initiative
+                // order permits it. Re-resolve from the last insertion: using the original primary
+                // index for every insertion can accidentally bunch slots 2 and 3 together.
+                let intervening = slots.indices.first { $0 > previous && slots[$0].actor != .foe(foeID) }
+                let index = intervening.map { $0 + 1 } ?? slots.endIndex
+                slots.insert(.init(actor: .foe(foeID), kind: .apexFollowUp(ordinal),
+                                   strengthMultiplier: 0.60, suppressesAfflictions: true), at: index)
+                previous = index
+            }
+        }
+        var opening = [foes.count == 1 ? "A \(foes[0].stats.displayName) notices you."
+                                       : "They close in around you."]
+        if let relentless = apexActionSlots.values.max(), relentless > 1 {
+            opening.append("Relentless — \(relentless) actions; follow-ups lighter.")
+        }
         return EncounterState(
             id: id,
             foes: foes,
             partyNames: names,
             order: order,
+            turnSlots: slots,
             initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
-            log: [foes.count == 1 ? "A \(foes[0].stats.displayName) notices you."
-                                  : "They close in around you."]
+            log: opening
         )
     }
 
@@ -1037,7 +1057,7 @@ enum CombatRules {
         // **A turn owed is taken before the order moves on** — that's what Quicken buys, and it
         // has to be spent here rather than by shuffling `order`, which is stored precisely so a
         // death mid-round can't shift whose turn it is.
-        let acting = encounter.order.isEmpty ? Combatant.binder : encounter.order[encounter.turnIndex % encounter.order.count]
+        let acting = encounter.current
         if let owed = encounter.extraTurns[acting], owed > 0 {
             encounter.extraTurns[acting] = owed - 1
             encounter.note("Again, before it can answer.")
@@ -1047,11 +1067,12 @@ enum CombatRules {
         }
 
         var roundTurned = false
-        for step in 1...max(1, encounter.order.count) {
-            let next = (encounter.turnIndex + step) % encounter.order.count
+        let scheduleCount = max(1, encounter.turnSlots.isEmpty ? encounter.order.count : encounter.turnSlots.count)
+        for step in 1...scheduleCount {
+            let next = (encounter.turnIndex + step) % scheduleCount
             if next <= encounter.turnIndex { startNewRound(&encounter); roundTurned = true }
             encounter.turnIndex = next
-            let who = encounter.order[next]
+            let who = encounter.turnSlots.isEmpty ? encounter.order[next] : encounter.turnSlots[next].actor
             guard isAlive(who, in: withEncounter(encounter, on: run)) else { continue }
             // …and a turn borrowed is a turn skipped. Overbear and Quicken both pay here.
             if let owing = encounter.skippedTurns[who], owing > 0 {
@@ -1076,6 +1097,7 @@ enum CombatRules {
 
     private static func startNewRound(_ encounter: inout EncounterState) {
         encounter.roundNumber += 1
+        encounter.apexTargetsThisRound.removeAll()
         encounter.binderSkillCooldown = max(0, encounter.binderSkillCooldown - 1)
         encounter.companionSkillCooldown = max(0, encounter.companionSkillCooldown - 1)
         // Every skill's own timer, and every effect with a clock on it. Rounds, never seconds.
@@ -1185,7 +1207,7 @@ enum CombatRules {
 
             switch actor {
             case .foe:
-                performFoeTurn(actor, in: &state)
+                performFoeTurn(actor, slot: encounter.currentTurnSlot, in: &state)
             case .companion, .binder:
                 performAutomatedTurn(actor, in: &state)
             }
@@ -1198,7 +1220,8 @@ enum CombatRules {
     /// **How it hits you is what it is** (creature-system-spec §7): pierce goes through armour,
     /// crush lands heavier, rend leaves a wound that keeps costing you, and something that carries
     /// its own heat or venom isn't stopped by armour at all.
-    private static func performFoeTurn(_ actor: Combatant, in state: inout GameState) {
+    private static func performFoeTurn(_ actor: Combatant, slot: EncounterState.TurnSlot,
+                                       in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
               let foeID = actor.foeID, let foe = encounter.foes.first(where: { $0.id == foeID })
         else { return }
@@ -1216,7 +1239,8 @@ enum CombatRules {
         // **Draw Off.** Something you've taunted comes for you and doesn't get a choice — the only
         // way in the game to take a hit meant for somebody else.
         let taunted = (encounter.taunts[foeID] ?? 0) > 0 && isAlive(.binder, in: run)
-        guard let primary = taunted ? .binder : run.rng.pick(reachable) else {
+        let unused = reachable.filter { !(encounter.apexTargetsThisRound[foeID] ?? []).contains($0) }
+        guard let primary = taunted ? .binder : run.rng.pick(unused.isEmpty ? reachable : unused) else {
             run.activeEncounter = encounter
             state.worlds.activeRun = run
             checkOutcome(in: &state)
@@ -1224,13 +1248,23 @@ enum CombatRules {
         }
 
         // Delivery decides how many of you it reaches, and at what cost to each blow.
-        let (targets, share): ([Combatant], Double) = switch foe.stats.delivery {
-        case .single: ([primary], 1)
-        case .multi: (standing, Tuning.Encounter.multiDeliveryShare)
-        case .area: (standing, Tuning.Encounter.areaDeliveryShare)
+        let isFollowUp: Bool = if case .apexFollowUp = slot.kind { true } else { false }
+        let delivery: ([Combatant], Double)
+        if isFollowUp {
+            delivery = ([primary], slot.strengthMultiplier)
+        } else {
+            delivery = switch foe.stats.delivery {
+            case .single: ([primary], 1)
+            case .multi: (standing, Tuning.Encounter.multiDeliveryShare)
+            case .area: (standing, Tuning.Encounter.areaDeliveryShare)
+            }
         }
+        let (targets, share) = delivery
 
         for originalTarget in targets {
+            if foe.isApex, !(encounter.apexTargetsThisRound[foeID] ?? []).contains(originalTarget) {
+                encounter.apexTargetsThisRound[foeID, default: []].append(originalTarget)
+            }
             var target = originalTarget
             var grounded = false
             if foe.stats.element != nil, !encounter.snuffed.contains(foeID),
@@ -1298,7 +1332,7 @@ enum CombatRules {
             encounter.note("\(foe.stats.displayName.capitalisedSentence) \(verb) \(whom) for \(amount).")
 
             // Rend's wound outlives the blow.
-            if foe.stats.damageKind == .rend {
+            if foe.stats.damageKind == .rend, !slot.suppressesAfflictions {
                 if !consumeStatusGuard(on: target, encounter: &encounter) {
                     switch target {
                     case .binder: encounter.binderBleedRounds = Tuning.Encounter.bleedRounds
@@ -1311,7 +1345,7 @@ enum CombatRules {
 
             // **And so does what it gives off** (Q42). Emanation was generated, named in the
             // description, and did nothing beyond one armour-ignoring hit. Snuff puts a stop to it.
-            if let element = foe.stats.element, !encounter.snuffed.contains(foeID) {
+            if let element = foe.stats.element, !encounter.snuffed.contains(foeID), !slot.suppressesAfflictions {
                 let status = StatusKind.from(element)
                 let landed = afflict(target, with: status,
                                      damage: Tuning.Encounter.statusDamage[status.rawValue] ?? 0,

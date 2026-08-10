@@ -87,6 +87,172 @@ final class CombatTests: XCTestCase {
 
     // MARK: Structure
 
+    func testEncounterScalingUsesFullPartyUpperMedian() throws {
+        let store = GameStore(io: .temporary(name: "scaling-party-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        store.mutate("stage uneven active party") { state in
+            state.base.binderCharacter.level = 2
+            while state.base.roster.count < 3 { state.base.roster.append(CompanionState()) }
+            state.base.roster[0].character.level = 4
+            state.base.roster[1].character.level = 6
+            state.base.roster[2].character.level = 20
+            state.base.activeParty = [0, 1, 2]
+            guard var run = state.worlds.activeRun else { return }
+            let enemy = WorldEnemy(id: InstanceID(rawValue: 991), creatureID: "paper_moth",
+                                   position: run.playerPosition, isAwake: true)
+            run.enemies = [enemy]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy, in: &state)
+        }
+        let run = try XCTUnwrap(store.activeRun)
+        let expected = CharacterRules.foeLevel(partyLevel: 6, stability: run.stability,
+                                                greed: Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book))))
+        XCTAssertEqual(try XCTUnwrap(store.activeEncounter?.foes.first).level, expected)
+        XCTAssertEqual(EncounterScalingRules.partyLevels(in: store.state), [2, 4, 6, 20])
+        XCTAssertEqual(EncounterScalingRules.upperMedian([2, 4, 6, 20]), 6)
+    }
+
+    func testEncounterScalingCandidateMatrixIsDeterministicMonotonicAndVisible() {
+        let one = [WorldEnemy(id: InstanceID(rawValue: 44), creatureID: "paper_moth",
+                              position: GridPoint(x: 1, y: 1), isAwake: true)]
+        let three = (44...46).map { WorldEnemy(id: InstanceID(rawValue: UInt64($0)), creatureID: "paper_moth",
+                                               position: GridPoint(x: $0 - 43, y: 1), isAwake: true) }
+        for profile in [EncounterScalingRules.Profile.reserved, .recommended, .pressing] {
+            for band in [1, 8, 16] {
+                var previousBudget = 0.0
+                var previousHP = 0.0
+                for count in [1, 2, 3, 5] {
+                    let levels = Array(repeating: band, count: count)
+                    let preview = EncounterScalingRules.preview(profile: profile, partyLevels: levels,
+                        visibleFoes: one, mapSeed: 7_777, triggerID: one[0].id, worldLevel: band)
+                    XCTAssertGreaterThanOrEqual(preview.ordinaryBudget, previousBudget)
+                    XCTAssertGreaterThanOrEqual(preview.apexHPMultiplier, previousHP)
+                    XCTAssertLessThanOrEqual(preview.visibleFoeCount, Tuning.Encounter.maxFoes)
+                    XCTAssertEqual(preview.foeIDs, [one[0].id], "Scaling invented an off-map combatant")
+                    XCTAssertEqual(preview, EncounterScalingRules.preview(profile: profile, partyLevels: levels,
+                        visibleFoes: one, mapSeed: 7_777, triggerID: one[0].id, worldLevel: band))
+                    previousBudget = preview.ordinaryBudget
+                    previousHP = preview.apexHPMultiplier
+                }
+            }
+            let capped = EncounterScalingRules.preview(profile: profile,
+                partyLevels: [8, 8, 8, 8, 8], visibleFoes: three,
+                mapSeed: 7_777, triggerID: three[0].id, worldLevel: 8)
+            XCTAssertEqual(capped.foeIDs.count, 3)
+            XCTAssertEqual(capped.missingFoeConversion, 0)
+        }
+        XCTAssertEqual(EncounterScalingRules.upperMedian([2, 4, 6, 8, 20]), 6)
+    }
+
+    func testSelectedEncounterProfileFreezesWithoutInventingFoesAndSurvivesSave() throws {
+        let store = GameStore(io: .temporary(name: "scaling-freeze-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        store.mutate("stage recommended comparison") { state in
+            while state.base.roster.count < 4 { state.base.roster.append(CompanionState()) }
+            state.base.binderCharacter.level = 8
+            for index in 0..<4 { state.base.roster[index].character.level = 8 }
+            state.base.activeParty = [0, 1, 2, 3]
+            guard var run = state.worlds.activeRun else { return }
+            run.tuning.encounterScalingProfile = .recommended
+            let enemy = WorldEnemy(id: InstanceID(rawValue: 771), creatureID: "ink_hound",
+                                   position: run.playerPosition, isAwake: true)
+            run.enemies = [enemy]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy, in: &state)
+        }
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        let preview = try XCTUnwrap(encounter.scalingPreview)
+        XCTAssertEqual(encounter.foes.map(\.id), [InstanceID(rawValue: 771)])
+        XCTAssertEqual(preview.partyLevels, [8, 8, 8, 8, 8])
+        XCTAssertEqual(preview.missingFoeConversion, 2)
+        XCTAssertEqual(preview.apexActionSlots, 3)
+
+        let data = try JSONEncoder().encode(store.state)
+        let resumed = try JSONDecoder().decode(GameState.self, from: data)
+        XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.scalingPreview, preview)
+        XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.foes.map(\.id), encounter.foes.map(\.id))
+        XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.turnSlots, encounter.turnSlots)
+    }
+
+    func testApexTurnSchedulePersistsLighterAfflictionFreeFollowUps() throws {
+        var rng = SeededRNG(seed: 4_242)
+        let apexID = InstanceID(rawValue: 90)
+        let ordinaryID = InstanceID(rawValue: 91)
+        var apexStats = CombatStats(displayName: "Apex", icon: "crown", maxHP: 100, attack: 12)
+        apexStats.delivery = .area
+        apexStats.element = .heat
+        apexStats.initiative = 100
+        let foes = [
+            FoeState(id: apexID, stats: apexStats, currentHP: apexStats.maxHP, isApex: true),
+            FoeState(id: ordinaryID,
+                     stats: CombatStats(displayName: "Ordinary", icon: "pawprint", maxHP: 10, attack: 3),
+                     currentHP: 10)
+        ]
+        let encounter = CombatRules.makeEncounter(
+            id: InstanceID(rawValue: 1), foes: foes,
+            party: [.binder, .companion(0), .companion(1), .companion(2), .companion(3)],
+            apexActionSlots: [apexID: 3], rng: &rng)
+
+        let apexSlots = encounter.turnSlots.filter { $0.actor == .foe(apexID) }
+        XCTAssertEqual(apexSlots.count, 3)
+        XCTAssertEqual(apexSlots[0], .init(actor: .foe(apexID)))
+        for (ordinal, slot) in apexSlots.dropFirst().enumerated() {
+            XCTAssertEqual(slot.kind, .apexFollowUp(ordinal + 2))
+            XCTAssertEqual(slot.strengthMultiplier, 0.60, accuracy: 0.0001)
+            XCTAssertTrue(slot.suppressesAfflictions)
+        }
+        XCTAssertTrue(encounter.log.contains("Relentless — 3 actions; follow-ups lighter."))
+        let indices = encounter.turnSlots.indices.filter { encounter.turnSlots[$0].actor == .foe(apexID) }
+        XCTAssertTrue(zip(indices, indices.dropFirst()).allSatisfy { $1 - $0 > 1 },
+                      "Apex follow-ups should be distributed through the round when other actors exist")
+
+        let resumed = try JSONDecoder().decode(EncounterState.self,
+                                                from: JSONEncoder().encode(encounter))
+        XCTAssertEqual(resumed.turnSlots, encounter.turnSlots)
+    }
+
+    func testMixedApexAndOrdinaryScalingKeepsAdjustmentsOnTheirOwnFoes() throws {
+        let store = GameStore(io: .temporary(name: "scaling-mixed-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        store.mutate("stage mixed encounter") { state in
+            while state.base.roster.count < 4 { state.base.roster.append(CompanionState()) }
+            state.base.binderCharacter.level = 8
+            for index in 0..<4 { state.base.roster[index].character.level = 8 }
+            state.base.activeParty = [0, 1, 2, 3]
+            guard var run = state.worlds.activeRun else { return }
+            run.tuning.encounterScalingProfile = .recommended
+            var apexTraits = CreatureTraits()
+            apexTraits.armament.pierce = 65
+            apexTraits.armament.crush = 45
+            apexTraits.armament.rend = 55
+            var ordinaryTraits = CreatureTraits()
+            ordinaryTraits.armament.pierce = 20
+            ordinaryTraits.armament.crush = 20
+            ordinaryTraits.armament.rend = 20
+            let apex = WorldEnemy(id: InstanceID(rawValue: 801), traits: apexTraits,
+                                  position: run.playerPosition, isAwake: true, isApex: true)
+            let ordinary = WorldEnemy(id: InstanceID(rawValue: 802), traits: ordinaryTraits,
+                                      position: run.playerPosition, isAwake: true)
+            run.enemies = [apex, ordinary]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: apex, in: &state)
+        }
+
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        let preview = try XCTUnwrap(encounter.scalingPreview)
+        let apex = try XCTUnwrap(encounter.foes.first(where: \.isApex))
+        let ordinary = try XCTUnwrap(encounter.foes.first(where: { !$0.isApex }))
+        XCTAssertEqual(apex.level, preview.apexLevelFloor)
+        XCTAssertNotEqual(ordinary.level, preview.apexLevelFloor)
+        XCTAssertEqual(encounter.turnSlots.filter { $0.actor == .foe(apex.id) }.count,
+                       preview.apexActionSlots)
+        XCTAssertEqual(encounter.turnSlots.filter { $0.actor == .foe(ordinary.id) }.count, 1)
+        XCTAssertEqual(Set(preview.finalFoes.map(\.id)), Set(encounter.foes.map(\.id)))
+    }
+
     func testFoesCarryTheirOwnResolvedStats() throws {
         let store = inFight(["ink_hound"])
         let foe = try XCTUnwrap(foes(store).first)

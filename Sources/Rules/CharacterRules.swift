@@ -173,3 +173,118 @@ enum CharacterRules {
         return Int((Double(value) * pow(Tuning.Character.foeStatPerLevel, Double(level - 1))).rounded())
     }
 }
+
+/// Pure, deterministic encounter-scaling simulation. Candidate coefficients remain DEBUG choices;
+/// the full-party reference is correctness and is used even when comparison scaling is off.
+enum EncounterScalingRules {
+    struct Profile: Equatable, Sendable {
+        let equivalentsPerExtraMember: Double
+        let missingFoeLevelCap: Int
+        let remainderThreshold: Double?
+        let apexLevelOffset: Int
+        let apexHPPerMember: Double
+        let apexHPCap: Double
+        let apexOffencePerMember: Double
+        let apexOffenceCap: Double
+        let apexSlots: [Int]
+
+        static let reserved = Profile(equivalentsPerExtraMember: 0.35, missingFoeLevelCap: 1,
+                                      remainderThreshold: nil, apexLevelOffset: 1,
+                                      apexHPPerMember: 0.25, apexHPCap: 2,
+                                      apexOffencePerMember: 0.06, apexOffenceCap: 1.25,
+                                      apexSlots: [1, 1, 2, 2, 2])
+        static let recommended = Profile(equivalentsPerExtraMember: 0.5, missingFoeLevelCap: 2,
+                                         remainderThreshold: nil, apexLevelOffset: 2,
+                                         apexHPPerMember: 0.35, apexHPCap: 2.4,
+                                         apexOffencePerMember: 0.10, apexOffenceCap: 1.4,
+                                         apexSlots: [1, 1, 2, 2, 3])
+        static let pressing = Profile(equivalentsPerExtraMember: 0.65, missingFoeLevelCap: 2,
+                                      remainderThreshold: 0.35, apexLevelOffset: 3,
+                                      apexHPPerMember: 0.45, apexHPCap: 2.8,
+                                      apexOffencePerMember: 0.12, apexOffenceCap: 1.5,
+                                      apexSlots: [1, 1, 2, 2, 3])
+    }
+
+    struct Preview: Codable, Equatable, Sendable {
+        struct FinalFoe: Codable, Equatable, Sendable {
+            let id: InstanceID
+            let level: Int
+            let maxHP: Int
+            let attack: Int
+            let armour: Int
+            let isApex: Bool
+        }
+        let partyLevels: [Int]
+        let upperMedian: Int
+        let partyCount: Int
+        let visibleFoeCount: Int
+        let foeIDs: [InstanceID]
+        let groupingRadius: Int
+        let inclusionReasons: [String: String]
+        let stabilityLevelContribution: Double
+        let greedLevelContribution: Double
+        let ordinaryBudget: Double
+        let missingFoeConversion: Int
+        let remainder: Double
+        let remainderRoll: UInt32
+        let remainderUpgrade: Int
+        let apexLevelFloor: Int
+        let apexHPMultiplier: Double
+        let apexOffenceMultiplier: Double
+        let apexActionSlots: Int
+        var finalFoes: [FinalFoe] = []
+
+        var totalOrdinaryLevelAdjustment: Int { missingFoeConversion + remainderUpgrade }
+    }
+
+    static func partyLevels(in state: GameState) -> [Int] {
+        [state.base.binderCharacter.level] + state.base.activeParty.compactMap {
+            state.base.roster.indices.contains($0) ? state.base.roster[$0].character.level : nil
+        }
+    }
+
+    static func upperMedian(_ levels: [Int]) -> Int {
+        let ordered = levels.sorted()
+        return ordered.isEmpty ? 1 : ordered[ordered.count / 2]
+    }
+
+    static func preview(profile: Profile, partyLevels: [Int], visibleFoes: [WorldEnemy],
+                        mapSeed: UInt64, triggerID: InstanceID, worldLevel: Int,
+                        stability: Double = Tuning.World.startingStability, greed: Double = 0,
+                        groupingRadius: Int = 1) -> Preview {
+        let count = max(1, min(Tuning.Party.maximumSize, partyLevels.count))
+        let levels = Array(partyLevels.prefix(count))
+        let median = upperMedian(levels)
+        let budget = 1 + profile.equivalentsPerExtraMember * Double(count - 1)
+        let desiredWhole = min(Tuning.Encounter.maxFoes, max(1, Int(floor(budget))))
+        let missing = min(profile.missingFoeLevelCap, max(0, desiredWhole - visibleFoes.count))
+        let remainder = budget - floor(budget)
+        let roll = stableRemainder(mapSeed: mapSeed, triggerID: triggerID)
+        let fires: Bool
+        if let threshold = profile.remainderThreshold { fires = remainder >= threshold }
+        else { fires = remainder > 0 && Double(roll) / Double(UInt32.max) < remainder }
+        let extra = max(0, count - 1)
+        return Preview(partyLevels: levels, upperMedian: median, partyCount: count,
+                       visibleFoeCount: visibleFoes.count, foeIDs: visibleFoes.map(\.id),
+                       groupingRadius: groupingRadius,
+                       inclusionReasons: Dictionary(uniqueKeysWithValues: visibleFoes.enumerated().map {
+                           (String($0.element.id.rawValue), $0.offset == 0 ? "triggering map entity" : "awake within radius \(groupingRadius)")
+                       }),
+                       stabilityLevelContribution: (Tuning.World.startingStability - stability)
+                           / Tuning.Character.stabilityPerFoeLevel,
+                       greedLevelContribution: greed / Tuning.Character.greedPerFoeLevel,
+                       ordinaryBudget: budget, missingFoeConversion: missing, remainder: remainder,
+                       remainderRoll: roll, remainderUpgrade: fires ? 1 : 0,
+                       apexLevelFloor: max(worldLevel, median + profile.apexLevelOffset),
+                       apexHPMultiplier: min(profile.apexHPCap, 1 + profile.apexHPPerMember * Double(extra)),
+                       apexOffenceMultiplier: min(profile.apexOffenceCap, 1 + profile.apexOffencePerMember * Double(extra)),
+                       apexActionSlots: profile.apexSlots[count - 1])
+    }
+
+    private static func stableRemainder(mapSeed: UInt64, triggerID: InstanceID) -> UInt32 {
+        let payload = "bookbinder-encounter-scaling-v1|\(mapSeed)|\(triggerID.rawValue)"
+        var hash: UInt32 = 2_166_136_261
+        for byte in payload.utf8 { hash = (hash ^ UInt32(byte)) &* 16_777_619 }
+        return hash
+    }
+}

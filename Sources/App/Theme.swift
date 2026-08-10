@@ -72,6 +72,25 @@ final class AppSettings: ObservableObject {
 /// Balancing values are deliberately separate from `GameState`: they describe the development
 /// environment that creates the next run, not anything the player earned or discovered.
 struct DebugTuningProfile: Codable, Equatable, Sendable {
+    enum EncounterScalingProfile: String, Codable, CaseIterable, Sendable {
+        case current, reserved, recommended, pressing
+        var displayName: String {
+            switch self {
+            case .current: "Current live balance"
+            case .reserved: "A · Reserved"
+            case .recommended: "B · Recommended start"
+            case .pressing: "C · Pressing"
+            }
+        }
+        var rules: EncounterScalingRules.Profile? {
+            switch self {
+            case .current: nil
+            case .reserved: .reserved
+            case .recommended: .recommended
+            case .pressing: .pressing
+            }
+        }
+    }
     enum OpeningEncounterEnvelope: String, Codable, CaseIterable, Sendable {
         case natural
         case gentle
@@ -104,6 +123,7 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
     var activeFloraFrequencyMultiplier = 1.0
     var floraHazardSeverityMultiplier = 1.0
     var openingEncounterEnvelope: OpeningEncounterEnvelope = .natural
+    var encounterScalingProfile: EncounterScalingProfile = .current
 
     var isDefault: Bool { self == .defaults }
 
@@ -150,6 +170,8 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
             forKey: .floraHazardSeverityMultiplier) ?? 1
         openingEncounterEnvelope = try c.decodeIfPresent(OpeningEncounterEnvelope.self,
             forKey: .openingEncounterEnvelope) ?? .natural
+        encounterScalingProfile = try c.decodeIfPresent(EncounterScalingProfile.self,
+            forKey: .encounterScalingProfile) ?? .current
     }
 }
 

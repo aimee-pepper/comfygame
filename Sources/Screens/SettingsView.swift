@@ -172,9 +172,17 @@ private struct BalancingView: View {
                 tuningSlider("Creature density", value: $settings.debugTuning.creatureDensityMultiplier)
                 tuningSlider("Apex chance", value: $settings.debugTuning.apexChanceMultiplier,
                              range: 0...3)
+                Picker("Encounter scaling comparison", selection: $settings.debugTuning.encounterScalingProfile) {
+                    ForEach(DebugTuningProfile.EncounterScalingProfile.allCases, id: \.self) {
+                        Text($0.displayName).tag($0)
+                    }
+                }
+                Text("DEBUG comparison only. Current keeps live coefficients; A/B/C freeze their result when combat opens.")
+                    .font(.caption).foregroundStyle(.secondary)
                 resetSection("Creatures") {
                     settings.debugTuning.creatureDensityMultiplier = 1
                     settings.debugTuning.apexChanceMultiplier = 1
+                    settings.debugTuning.encounterScalingProfile = .current
                 }
             }
 

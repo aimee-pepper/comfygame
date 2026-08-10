@@ -263,6 +263,13 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
 /// A fight in progress. Saved in full — being mid-encounter is the hardest resume case in the game,
 /// and the one the acceptance criteria call out by name.
 struct EncounterState: Codable, Equatable, Sendable {
+    struct TurnSlot: Codable, Equatable, Sendable {
+        enum Kind: Codable, Equatable, Sendable { case primary, apexFollowUp(Int) }
+        var actor: Combatant
+        var kind: Kind = .primary
+        var strengthMultiplier: Double = 1
+        var suppressesAfflictions = false
+    }
     var id: InstanceID
     var foes: [FoeState]
     /// **What everyone in the party is called**, resolved when the fight starts and kept.
@@ -271,10 +278,16 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// can change underneath it. It also means the log doesn't need the roster passed into every
     /// function that writes a line, which is what made a party of five awkward to name.
     var partyNames: [Int: String] = [:]
+    /// Frozen DEBUG comparison inputs/results. Existing encounters decode without it.
+    var scalingPreview: EncounterScalingRules.Preview?
 
     /// Resolved from initiative at the start of the fight, and **stored** rather than recomputed so
     /// that a foe dying mid-round can't shift whose turn it is.
     var order: [Combatant]
+    /// Exact resolved round schedule. `order` remains as a tolerant compatibility mirror.
+    var turnSlots: [TurnSlot] = []
+    /// Targets already chosen by each apex this round, for distinct-target follow-up preference.
+    var apexTargetsThisRound: [InstanceID: [Combatant]] = [:]
     var turnIndex: Int = 0
     var roundNumber: Int = 1
 
@@ -353,7 +366,14 @@ struct EncounterState: Codable, Equatable, Sendable {
 
     var livingFoes: [FoeState] { foes.filter(\.isAlive) }
     var isResolved: Bool { foes.allSatisfy { !$0.isAlive } }
-    var current: Combatant { order.isEmpty ? .binder : order[turnIndex % order.count] }
+    var current: Combatant {
+        if !turnSlots.isEmpty { return turnSlots[turnIndex % turnSlots.count].actor }
+        return order.isEmpty ? .binder : order[turnIndex % order.count]
+    }
+    var currentTurnSlot: TurnSlot {
+        if !turnSlots.isEmpty { return turnSlots[turnIndex % turnSlots.count] }
+        return TurnSlot(actor: current)
+    }
 
     mutating func note(_ line: String) {
         log.append(line)
@@ -361,11 +381,13 @@ struct EncounterState: Codable, Equatable, Sendable {
     }
 
     init(id: InstanceID, foes: [FoeState], partyNames: [Int: String] = [:],
-         order: [Combatant], initiallyUnrecordedSpecies: Set<String> = [], log: [String] = []) {
+         order: [Combatant], turnSlots: [TurnSlot] = [],
+         initiallyUnrecordedSpecies: Set<String> = [], log: [String] = []) {
         self.id = id
         self.foes = foes
         self.partyNames = partyNames
         self.order = order
+        self.turnSlots = turnSlots.isEmpty ? order.map { TurnSlot(actor: $0) } : turnSlots
         self.initiallyUnrecordedSpecies = initiallyUnrecordedSpecies
         self.log = log
     }
@@ -382,7 +404,12 @@ struct EncounterState: Codable, Equatable, Sendable {
         id = try c.decode(InstanceID.self, forKey: .id)
         foes = try c.decodeIfPresent([FoeState].self, forKey: .foes) ?? []
         partyNames = try c.decodeIfPresent([Int: String].self, forKey: .partyNames) ?? [:]
+        scalingPreview = try c.decodeIfPresent(EncounterScalingRules.Preview.self, forKey: .scalingPreview)
         order = try c.decodeIfPresent([Combatant].self, forKey: .order) ?? [.binder, .companion(0)]
+        turnSlots = try c.decodeIfPresent([TurnSlot].self, forKey: .turnSlots)
+            ?? order.map { TurnSlot(actor: $0) }
+        apexTargetsThisRound = try c.decodeIfPresent([InstanceID: [Combatant]].self,
+                                                      forKey: .apexTargetsThisRound) ?? [:]
         turnIndex = try c.decodeIfPresent(Int.self, forKey: .turnIndex) ?? 0
         roundNumber = try c.decodeIfPresent(Int.self, forKey: .roundNumber) ?? 1
         binderSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .binderSkillCooldown) ?? 0

@@ -949,10 +949,19 @@ enum WorldRules {
         // **What this world raises its animals to** (session 17 §3). Slowly with the party, and
         // further in worlds that are unstable or greedy — so the risk you priced into those two
         // when you wrote the book comes back as difficulty, not only as more things on the ground.
-        let level = CharacterRules.foeLevel(
-            partyLevel: max(state.base.binderCharacter.level, state.base.companion.character.level),
+        let partyLevels = EncounterScalingRules.partyLevels(in: state)
+        let partyReference = EncounterScalingRules.upperMedian(partyLevels)
+        let worldLevel = CharacterRules.foeLevel(
+            partyLevel: partyReference,
             stability: run.stability,
             greed: Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book))))
+        var scalingPreview = run.tuning.encounterScalingProfile.rules.map {
+            EncounterScalingRules.preview(profile: $0, partyLevels: partyLevels, visibleFoes: group,
+                                          mapSeed: run.mapSeed, triggerID: enemy.id, worldLevel: worldLevel,
+                                          stability: run.stability,
+                                          greed: Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book))))
+        }
+        let ordinaryLevel = worldLevel + (scalingPreview?.totalOrdinaryLevelAdjustment ?? 0)
 
         var foes: [FoeState] = []
         var initiallyUnrecordedSpecies: Set<String> = []
@@ -976,10 +985,15 @@ enum WorldRules {
             // Levelling touches the *derived* numbers, never the traits — so a levelled animal is
             // recognisably the same animal, wearing the same covering, swinging the same corner of
             // the triangle. It is simply more of it.
+            let level = member.isApex ? (scalingPreview?.apexLevelFloor ?? worldLevel) : ordinaryLevel
             var levelled = stats
             levelled.maxHP = CharacterRules.scaled(stats.maxHP, toLevel: level)
             levelled.attack = CharacterRules.scaled(stats.attack, toLevel: level)
             levelled.armour = CharacterRules.scaled(stats.armour, toLevel: level)
+            if member.isApex, let scalingPreview {
+                levelled.maxHP = max(1, Int((Double(levelled.maxHP) * scalingPreview.apexHPMultiplier).rounded()))
+                levelled.attack = max(1, Int((Double(levelled.attack) * scalingPreview.apexOffenceMultiplier).rounded()))
+            }
 
             foes.append(FoeState(id: member.id,
                                  creatureID: member.creatureID,
@@ -1008,6 +1022,10 @@ enum WorldRules {
             }
         }
         guard !foes.isEmpty else { return }
+        scalingPreview?.finalFoes = foes.map {
+            .init(id: $0.id, level: $0.level, maxHP: $0.stats.maxHP, attack: $0.stats.attack,
+                  armour: $0.stats.armour, isApex: $0.isApex)
+        }
 
         // **Everybody who came gets a place in the order.** This is the line that makes a party of
         // five a party of five rather than a list on the Firepit screen.
@@ -1018,8 +1036,14 @@ enum WorldRules {
                                                             guard state.base.roster.indices.contains($1) else { return }
                                                             $0[$1] = state.base.roster[$1].name
                                                         },
+                                                        apexActionSlots: scalingPreview.map { preview in
+                                                            foes.filter(\.isApex).reduce(into: [:]) {
+                                                                $0[$1.id] = preview.apexActionSlots
+                                                            }
+                                                        } ?? [:],
                                                         initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
                                                         rng: &run.rng)
+        run.activeEncounter?.scalingPreview = scalingPreview
         state.worlds.activeRun = run
 
         // **Somebody has to move first, and it may not be you.** Automatic turns used to be kicked
