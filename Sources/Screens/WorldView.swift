@@ -828,7 +828,6 @@ private struct TileView: View {
             } else {
                 MapTileArt(request: artRequest)
             }
-            Rectangle().stroke(Palette.mapGrid.opacity(0.45), lineWidth: 0.5)
             if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
                 CrackShape()
                     .stroke(Color.orange.opacity(0.95), style: StrokeStyle(lineWidth: max(1, side * 0.07),
