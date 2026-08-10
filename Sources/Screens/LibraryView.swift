@@ -120,22 +120,7 @@ struct LibraryView: View {
         StationCard(title: "Pages — \(library.foundPages.count)", icon: "doc.text") {
             ForEach(library.foundPages, id: \.rawValue) { id in
                 if let page = ContentCatalog.shared.diaryPage(id) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack {
-                            Text(ContentCatalog.shared.traveller(page.diary)?.name ?? page.diary.rawValue)
-                                .font(.caption.weight(.medium))
-                            Spacer()
-                            Text(page.kind.displayName)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                        Text("“\(page.prose)”")
-                            .font(.caption.italic())
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 2)
+                    DiaryPageProseCard(page: page)
                 }
             }
         }
@@ -156,5 +141,26 @@ struct LibraryView: View {
                 .padding(.vertical, 2)
             }
         }
+    }
+}
+
+struct DiaryPageProseCard: View {
+    let page: DiaryPageDef
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                Text(ContentCatalog.shared.traveller(page.diary)?.name ?? page.diary.rawValue)
+                    .font(.caption.weight(.medium))
+                Spacer()
+                Text(page.kind.displayName).font(.caption2).foregroundStyle(.secondary)
+            }
+            Text(AuthoredTextRendering.attributed("“\(page.prose)”"))
+                .font(.caption.italic())
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 2)
     }
 }

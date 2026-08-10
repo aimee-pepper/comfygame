@@ -43,6 +43,72 @@ final class ContentTests: XCTestCase {
         XCTAssertNotEqual(before.ask, after.ask)
     }
 
+#if DEBUG
+    func testAuthoredTextAtlasAccountsForLiveAndReviewMeetingCorpora() {
+        let inventory = AuthoredTextAtlas.inventory()
+        XCTAssertEqual(inventory.count, 28)
+        XCTAssertEqual(inventory.flatMap(\.units).filter { $0.kind == .diary }.count, 233)
+        XCTAssertEqual(inventory.filter { $0.traveller.meeting != nil }.count, 7)
+        XCTAssertEqual(inventory.filter { $0.traveller.meeting == nil }.count, 21)
+        XCTAssertEqual(DraftMeetingCorpus.meetings.count, 22,
+                       DraftMeetingCorpus.decodingError ?? "21 missing meetings plus Auber revision")
+        XCTAssertEqual(DraftMeetingCorpus.meetings.flatMap(\.exchanges).count, 66)
+        XCTAssertEqual(inventory.filter { $0.traveller.meeting == nil && $0.draftMeetingAvailable }.count, 21)
+        XCTAssertEqual(Set(inventory.flatMap(\.units).map(\.id)).count, inventory.flatMap(\.units).count)
+        XCTAssertEqual(inventory.first { $0.id == "auber" }?.meetingState, "Live · revision draft")
+        XCTAssertEqual(DraftMeetingCorpus.meeting(for: "bryn")?.exchanges.first?.id, "bryn.held_route")
+        let emphasized = AuthoredTextRendering.attributed("What happens *after*?")
+        XCTAssertEqual(String(emphasized.characters), "What happens after?",
+                       "Review drafts must use the same Markdown-aware rendering path as live meetings")
+    }
+
+    @MainActor func testAuthoredTextReviewBecomesStaleAndRoundTripsUnicode() throws {
+        let suite = "atlas-review-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = AuthoredTextReviewStore(defaults: defaults)
+        let original = AuthoredTextAtlas.Unit(id: "meeting.isolde.opening", traveller: "isolde",
+                                               kind: .meeting, label: "Opening",
+                                               text: "A board — and a hand.", detail: nil)
+        store.review(original, as: .needsRevision, note: "Keep the em dash — and café.")
+        XCTAssertEqual(store.status(for: original), .needsRevision)
+        XCTAssertFalse(store.isStale(original))
+        let changed = AuthoredTextAtlas.Unit(id: original.id, traveller: original.traveller,
+                                              kind: original.kind, label: original.label,
+                                              text: original.text + " Changed.", detail: nil)
+        XCTAssertTrue(store.isStale(changed))
+        XCTAssertEqual(store.status(for: changed), .unreviewed)
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        let decoded = try decoder.decode(AuthoredTextReviewStore.File.self,
+                                         from: Data(store.jsonReport().utf8))
+        XCTAssertEqual(decoded.entries[original.id]?.note, "Keep the em dash — and café.")
+    }
+
+    @MainActor func testAuthoredTextReviewImportMergesNewerMatchingTextAndSurfacesConflict() throws {
+        let suite = "atlas-import-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = AuthoredTextReviewStore(defaults: defaults)
+        let unit = AuthoredTextAtlas.Unit(id: "meeting.nessa.exchange.nessa.time.ask", traveller: "nessa",
+                                          kind: .meeting, label: "Question", text: "What happens *after*?", detail: nil)
+        store.review(unit, as: .good, note: "local")
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
+        var imported = try decoder.decode(AuthoredTextReviewStore.File.self, from: Data(store.jsonReport().utf8))
+        imported.entries[unit.id]?.status = .needsRevision
+        imported.entries[unit.id]?.note = "newer café"
+        imported.entries[unit.id]?.reviewedAt = Date().addingTimeInterval(60)
+        try store.importReport(encoder.encode(imported))
+        XCTAssertEqual(store.status(for: unit), .needsRevision)
+        XCTAssertEqual(store.note(for: unit), "newer café")
+
+        imported.entries[unit.id]?.reviewedTextHash = "different-copy"
+        try store.importReport(encoder.encode(imported))
+        XCTAssertEqual(store.conflicts.map(\.id), [unit.id])
+        XCTAssertEqual(store.note(for: unit), "newer café", "A conflict must not silently replace local work")
+    }
+#endif
+
     func testStarterCollectionMatchesTheBrief() {
         // The brief names eleven (Q2). "Ore" is a twelfth, added on Aimee's instruction that the
         // bounty slot needs a neutral middle rung — see questions-for-design Q15.

@@ -91,6 +91,8 @@
 		7334C8A4D81258A4C7FA0885 /* SeededRNG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7294A9FAF1EE19D44BD7C56D /* SeededRNG.swift */; };
 		7345ED98F77854AE5C6FFB34 /* EconomyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6782235BDB0189FF9A0FFE41 /* EconomyTests.swift */; };
 		758EC3D9F7314C4018C089B9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */; };
+		A71A5001A71A5001A71A5001 /* AuthoredTextAtlasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71A5002A71A5002A71A5002 /* AuthoredTextAtlasView.swift */; };
+		A71A5003A71A5003A71A5003 /* DraftMeetingCorpus.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71A5004A71A5004A71A5004 /* DraftMeetingCorpus.generated.swift */; };
 		76925351AE69BDEB01BA072D /* ArmouryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C0E5CEA72598582B970714 /* ArmouryTests.swift */; };
 		776E19C048AB14D539E2ABC3 /* BookProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B022088C9636578892397C50 /* BookProjection.swift */; };
 		7C72DAD4C55C0D916064E912 /* ContradictionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43DADDF1091E89318A12B0D /* ContradictionTests.swift */; };
@@ -279,6 +281,8 @@
 		8B8A444C3FE08E6935849BA8 /* InstrumentCraftingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentCraftingTests.swift; sourceTree = "<group>"; };
 		8DB361F4E36998C9A7F31A44 /* WorldRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldRules.swift; sourceTree = "<group>"; };
 		8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A71A5002A71A5002A71A5002 /* AuthoredTextAtlasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthoredTextAtlasView.swift; sourceTree = "<group>"; };
+		A71A5004A71A5004A71A5004 /* DraftMeetingCorpus.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftMeetingCorpus.generated.swift; sourceTree = "<group>"; };
 		9142092437E5652D87187DF8 /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
 		92B2180E4666F5000817D3EC /* ContradictionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionRules.swift; sourceTree = "<group>"; };
 		92E6DEE432F7A225C5C28D6E /* DescriptionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionRules.swift; sourceTree = "<group>"; };
@@ -443,6 +447,7 @@
 				CCE50821478C20EB43E2E3C4 /* ResearchModels.swift */,
 				A4DA32364644741F03829592 /* SiteModels.swift */,
 				69C03E6819177D7EABE894A3 /* TravellerModels.swift */,
+				A71A5004A71A5004A71A5004 /* DraftMeetingCorpus.generated.swift */,
 			);
 			path = Content;
 			sourceTree = "<group>";
@@ -472,6 +477,7 @@
 				D5930D2370BEDE3BBE896275 /* RuleBuilderView.swift */,
 				14E466EEC3518F71FDD38EE9 /* RuneGlyph.swift */,
 				8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */,
+				A71A5002A71A5002A71A5002 /* AuthoredTextAtlasView.swift */,
 				03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */,
 				2C9C43310A7E6D0342B11251 /* StationViews.swift */,
 				D08A668BC1215643DD63B178 /* TravellerMeetingView.swift */,
@@ -860,6 +866,8 @@
 				FAEB06BFBE5764791F188FF3 /* SaveFileIO.swift in Sources */,
 				7334C8A4D81258A4C7FA0885 /* SeededRNG.swift in Sources */,
 				758EC3D9F7314C4018C089B9 /* SettingsView.swift in Sources */,
+				A71A5001A71A5001A71A5001 /* AuthoredTextAtlasView.swift in Sources */,
+				A71A5003A71A5003A71A5003 /* DraftMeetingCorpus.generated.swift in Sources */,
 				DB65DB08F102D87DE2D51956 /* Sigil.swift in Sources */,
 				40CDA99CD7F4DFF60EC0EBBB /* SiteModels.swift in Sources */,
 				12DA6127DA1CEF02D5108CE9 /* SiteRules.swift in Sources */,

@@ -54,6 +54,26 @@ struct SettingsView: View {
 
 #if DEBUG
                 NavigationLink {
+                    AuthoredTextAtlasView()
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "text.book.closed.fill").frame(width: 24)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Authored-Text Atlas")
+                            Text("Review all traveller meetings and diary pages")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+                    }
+                    .frame(minHeight: 44)
+                    .padding(14)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.authored-text-atlas")
+
+                NavigationLink {
                     BalancingView()
                 } label: {
                     HStack(spacing: 12) {

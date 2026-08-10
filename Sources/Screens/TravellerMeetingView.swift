@@ -1,5 +1,14 @@
 import SwiftUI
 
+enum AuthoredTextRendering {
+    static func attributed(_ source: String) -> AttributedString {
+        (try? AttributedString(
+            markdown: source,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        )) ?? AttributedString(source)
+    }
+}
+
 /// Meeting somebody in a world you wrote for them.
 ///
 /// **This is the payoff of the entire search loop**, and until today it didn't exist: arriving in a
@@ -92,7 +101,7 @@ struct TravellerMeetingView: View {
 
     /// Their words. Given the page's own indent so a conversation reads as one.
     private func said(_ text: String) -> some View {
-        Text(text)
+        Text(AuthoredTextRendering.attributed(text))
             .font(.callout)
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
@@ -102,7 +111,7 @@ struct TravellerMeetingView: View {
     }
 
     private func youSaid(_ text: String) -> some View {
-        Text(text)
+        Text(AuthoredTextRendering.attributed(text))
             .font(.callout.italic())
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -171,4 +180,20 @@ struct TravellerMeetingConversation: Equatable {
 
     mutating func accept() { guard terminal == nil else { return }; terminal = .accepted }
     mutating func decline() { guard terminal == nil else { return }; terminal = .declined }
+}
+
+struct AuthoredDialogueLine: View {
+    let text: String
+    var isPlayer = false
+
+    var body: some View {
+        Text(AuthoredTextRendering.attributed(text))
+            .font(isPlayer ? .callout.italic() : .callout)
+            .foregroundStyle(isPlayer ? .secondary : .primary)
+            .frame(maxWidth: .infinity, alignment: isPlayer ? .trailing : .leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(isPlayer ? 0 : 12)
+            .background(isPlayer ? Color.clear : Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: 12))
+    }
 }
