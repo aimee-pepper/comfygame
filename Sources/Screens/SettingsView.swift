@@ -54,13 +54,13 @@ struct SettingsView: View {
 
 #if DEBUG
                 NavigationLink {
-                    AuthoredTextAtlasView()
+                    DebugToolsView()
                 } label: {
                     HStack(spacing: 12) {
-                        Image(systemName: "text.book.closed.fill").frame(width: 24)
+                        Image(systemName: "wrench.and.screwdriver.fill").frame(width: 24)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Authored-Text Atlas")
-                            Text("Review all traveller meetings and diary pages")
+                            Text("Debug Tools")
+                            Text("Roadmap, balancing and authored-text review")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
@@ -71,31 +71,7 @@ struct SettingsView: View {
                     .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
                 }
                 .buttonStyle(.plain)
-                .accessibilityIdentifier("settings.authored-text-atlas")
-
-                NavigationLink {
-                    BalancingView()
-                } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "slider.horizontal.3")
-                            .frame(width: 24)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Balancing")
-                            Text(settings.debugTuning.isDefault ? "Defaults" : "Custom tuning active")
-                                .font(.caption)
-                                .foregroundStyle(settings.debugTuning.isDefault ? Color.secondary : Color.orange)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.tertiary)
-                    }
-                    .frame(minHeight: 44)
-                    .padding(14)
-                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("settings.balancing")
+                .accessibilityIdentifier("settings.debug-tools")
 #endif
 
                 Label {
@@ -120,7 +96,7 @@ struct SettingsView: View {
 }
 
 #if DEBUG
-private struct BalancingView: View {
+struct BalancingView: View {
     @EnvironmentObject private var settings: AppSettings
     @AppStorage("debug.simpleMapRenderer") private var useSimpleMapRenderer = false
 

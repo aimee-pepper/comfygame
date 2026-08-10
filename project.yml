@@ -24,6 +24,8 @@ targets:
       Release: Support/Signing.xcconfig
     sources:
       - path: Sources
+      - path: Support/LaunchScreen.storyboard
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aimeepepper.bookbinder
@@ -45,8 +47,7 @@ targets:
       path: Support/Info.plist
       properties:
         CFBundleDisplayName: Bookbinder
-        UILaunchScreen:
-          UIColorName: ""
+        UILaunchStoryboardName: LaunchScreen
         UIApplicationSupportsIndirectInputEvents: true
         # Portrait only — pillar 3. Do not add landscape without a design decision.
         UISupportedInterfaceOrientations:
