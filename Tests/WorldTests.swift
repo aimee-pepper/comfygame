@@ -491,7 +491,22 @@ final class WorldTests: XCTestCase {
         let after = state.worlds.activeRun!
 
         XCTAssertEqual(after.turnsTaken, before.turnsTaken + 1)
-        XCTAssertEqual(after.stability, before.stability - BookRules.decayPerTurn(for: before.book), accuracy: 0.0001)
+        XCTAssertEqual(after.stability, before.stability - before.decayPerTurn, accuracy: 0.0001)
+    }
+
+    func testResolvedStabilitySurvivesRelaunchAndMigratesOldRunsDeterministically() throws {
+        let run = try XCTUnwrap(startedRun(book([:]), seed: 91).worlds.activeRun)
+        let encoded = try JSONEncoder().encode(run)
+        let resumed = try JSONDecoder().decode(WorldRun.self, from: encoded)
+        XCTAssertEqual(resumed.resolvedStabilityScore, run.resolvedStabilityScore)
+        XCTAssertEqual(resumed.decayPerTurn, run.decayPerTurn)
+
+        var legacy = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        legacy.removeValue(forKey: "resolvedStabilityScore")
+        let migrated = try JSONDecoder().decode(
+            WorldRun.self, from: JSONSerialization.data(withJSONObject: legacy))
+        XCTAssertEqual(migrated.resolvedStabilityScore,
+                       BookRules.resolvedStabilityScore(of: run.book, seed: run.mapSeed))
     }
 
     func testTallGrowthAndMudEachCostTwoTurns() {

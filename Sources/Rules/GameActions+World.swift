@@ -422,6 +422,8 @@ extension GameStore {
                                                    lostItems: banked.lostItems,
                                                    progress: GameStore.progressGained(in: run, state: state),
                                                    pages: GameStore.pagesFound(in: run, state: state),
+                                                   writings: GameStore.writingsFound(in: run, state: state),
+                                                   recruitedTravellers: GameStore.travellersRecruited(in: run, state: state),
                                                    essenceEconomy: .init(rawCollected: banked.rawEssence,
                                                        refinedEquivalent: EconomyRules.refine(rawUnits: banked.rawEssence),
                                                        bindCostPaid: run.book.essencePaid,
@@ -460,6 +462,8 @@ extension GameStore {
                                                    lostItems: banked.lostItems,
                                                    progress: GameStore.progressGained(in: run, state: state),
                                                    pages: GameStore.pagesFound(in: run, state: state),
+                                                   writings: GameStore.writingsFound(in: run, state: state),
+                                                   recruitedTravellers: GameStore.travellersRecruited(in: run, state: state),
                                                    essenceEconomy: .init(rawCollected: banked.rawEssence,
                                                        refinedEquivalent: EconomyRules.refine(rawUnits: banked.rawEssence),
                                                        bindCostPaid: run.book.essencePaid,
@@ -680,5 +684,34 @@ extension GameStore {
 
     nonisolated static func pagesFound(in run: WorldRun, state: GameState) -> [DiaryPageID] {
         state.reality.library.foundPages.filter { !run.foundPagesAtStart.contains($0) }
+    }
+
+    nonisolated static func writingsFound(
+        in run: WorldRun, state: GameState
+    ) -> [RunExitSummary.RecoveredWriting] {
+        state.reality.library.foundWritings
+            .filter { !run.foundWritingsAtStart.contains($0.id) }
+            .map { writing in
+                let kind: RunExitSummary.RecoveredWriting.Kind = switch writing.family {
+                case .fieldNote: .fieldNote
+                case .routeMark: .routeMark
+                case .siteFragment: .siteFragment
+                case .workingScrap: .workingScrap
+                }
+                let title: String = switch writing.family {
+                case .fieldNote: "Field note"
+                case .routeMark: "Route mark"
+                case .siteFragment: "Site fragment"
+                case .workingScrap: "Working scrap"
+                }
+                return .init(id: writing.id.rawValue, kind: kind, title: title,
+                             prose: writing.prose)
+            }
+    }
+
+    nonisolated static func travellersRecruited(in run: WorldRun, state: GameState) -> [TravellerID] {
+        state.reality.library.foundTravellers
+            .subtracting(run.foundTravellersAtStart)
+            .sorted { $0.rawValue < $1.rawValue }
     }
 }

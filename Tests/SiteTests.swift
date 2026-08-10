@@ -195,7 +195,8 @@ final class SiteTests: XCTestCase {
         store.bindAndDepart()
         let run = try XCTUnwrap(store.state.worlds.activeRun)
 
-        XCTAssertEqual(run.effectiveStabilityScore, BookRules.stabilityScore(of: run.book),
+        XCTAssertEqual(run.effectiveStabilityScore,
+                       BookRules.resolvedStabilityScore(of: run.book, seed: run.mapSeed),
                        "a site moved the headline — Q19 says the book's own words move it and "
                        + "nothing else, until the preview is allowed to show what a world contains")
     }

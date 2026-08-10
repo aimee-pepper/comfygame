@@ -201,6 +201,20 @@ enum BookRules {
                                              contradictionPenalty: contradictionPenalty(of: book)))
     }
 
+    /// The stability of the world that was actually bound, including everything the page left to
+    /// chance. The authored-only score above is still useful while composing; it is not the truth
+    /// of a resolved world.
+    static func resolvedStabilityScore(of book: BoundBook, seed: UInt64) -> Int {
+        let written = sigils(for: book)
+        let filled = written + PressureRules.rollUnwritten(after: written, seed: seed)
+        let readings = PressureRules.resolve(filled)
+        let contradictions = ContradictionRules.fired(in: filled, readings: readings)
+        return stabilityScore(delta: stabilityDelta(
+            of: book,
+            sigils: filled,
+            contradictionPenalty: ContradictionRules.totalPenalty(for: contradictions)))
+    }
+
     /// **Everything that moves the headline, in one place.**
     ///
     /// Three callers needed this sum — the bind, the preview, and the preview's rolled band — and

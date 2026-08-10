@@ -49,6 +49,7 @@ enum Worldgen {
         // in it now come from the eight targets rather than from flat per-symbol tables.
         let sigils = BookRules.sigils(for: book)
         let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+        let resolvedStabilityScore = BookRules.resolvedStabilityScore(of: book, seed: seed)
         // The same world with nothing rolled into it. Chasms read this as a floor, and the exit rule
         // reads it alone — see `TerrainRules.isRiven(asWritten:)`.
         let asWritten = PressureRules.resolve(sigils)
@@ -319,7 +320,7 @@ enum Worldgen {
         var apexRNG = SeededRNG(seed: seed).derived(0xA9E00)
         let apexChance = min(1, ApexRules.chance(
             greed: BookRules.greedDelta(for: sigils),
-            stabilityScore: BookRules.stabilityScore(of: book),
+            stabilityScore: resolvedStabilityScore,
             dangerTiles: danger.hazardTiles,
             sites: sites.count) * max(0, tuning.apexChanceMultiplier))
         var apexDecisionRNG = SeededRNG(seed: seed).derived(0xA9E)
@@ -361,7 +362,7 @@ enum Worldgen {
         let nodeDiagnostics = map.tiles.reduce(into: [ResourceID: Int]()) { result, tile in
             if case .node(let node) = tile.content { result[node.resource, default: 0] += 1 }
         }
-        let decay = BookRules.decayPerTurn(stabilityScore: BookRules.stabilityScore(of: book))
+        let decay = BookRules.decayPerTurn(stabilityScore: resolvedStabilityScore)
             / max(0.01, tuning.stabilityDurationMultiplier)
         let turnBudget = decay > 0
             ? Int(ceil(Tuning.World.startingStability / decay))

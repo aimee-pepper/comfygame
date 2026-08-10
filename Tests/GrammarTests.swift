@@ -304,8 +304,8 @@ final class GrammarTests: XCTestCase {
     }
 
     /// **The trap.** Adjacency alone joins nothing, so a page can be full of sigils and describe
-    /// nothing — and the world comes out entirely random, at full stability, exactly as though you
-    /// had written nothing at all. The preview has to be able to say so.
+    /// nothing — and the world comes out entirely random, including its resolved stability,
+    /// exactly as though you had written nothing at all. The preview has to be able to say so.
     func testAPageOfUnjoinedSigilsIsReportedAsSayingNothing() throws {
         let page = try adjacentButUnjoined()
         let projection = BookProjection.project(page: page, seed: 1)

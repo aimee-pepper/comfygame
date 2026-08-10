@@ -97,6 +97,15 @@ struct AnchoredRealm: Codable, Equatable, Identifiable, Sendable {
 }
 
 struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
+    struct RecoveredWriting: Codable, Equatable, Identifiable, Sendable {
+        enum Kind: String, Codable, Sendable {
+            case diaryPage, fieldNote, routeMark, siteFragment, workingScrap
+        }
+        var id: String
+        var kind: Kind
+        var title: String
+        var prose: String
+    }
     struct EssenceEconomy: Codable, Equatable, Sendable {
         var rawCollected: Int = 0
         var refinedEquivalent: Int = 0
@@ -130,6 +139,8 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     var lostItems: [RunExitGain] = []
     var progress: [RunProgressGain] = []
     var pages: [DiaryPageID] = []
+    var writings: [RecoveredWriting] = []
+    var recruitedTravellers: [TravellerID] = []
     var essenceEconomy = EssenceEconomy()
 
     var id: Int { runIndex }
@@ -138,7 +149,9 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
          resources: [RunExitGain] = [], items: [RunExitGain] = [],
          lostResources: [RunExitGain] = [], lostItems: [RunExitGain] = [],
          progress: [RunProgressGain] = [],
-         pages: [DiaryPageID] = [], essenceEconomy: EssenceEconomy = EssenceEconomy()) {
+         pages: [DiaryPageID] = [], writings: [RecoveredWriting] = [],
+         recruitedTravellers: [TravellerID] = [],
+         essenceEconomy: EssenceEconomy = EssenceEconomy()) {
         self.runIndex = runIndex
         self.kind = kind
         self.reason = reason
@@ -150,6 +163,8 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         self.lostItems = lostItems
         self.progress = progress
         self.pages = pages
+        self.writings = writings
+        self.recruitedTravellers = recruitedTravellers
         self.essenceEconomy = essenceEconomy
     }
 
@@ -167,6 +182,9 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         lostItems = try c.decodeIfPresent([RunExitGain].self, forKey: .lostItems) ?? []
         progress = try c.decodeIfPresent([RunProgressGain].self, forKey: .progress) ?? []
         pages = try c.decodeIfPresent([DiaryPageID].self, forKey: .pages) ?? []
+        writings = try c.decodeIfPresent([RecoveredWriting].self, forKey: .writings) ?? []
+        recruitedTravellers = try c.decodeIfPresent([TravellerID].self,
+                                                     forKey: .recruitedTravellers) ?? []
         essenceEconomy = try c.decodeIfPresent(EssenceEconomy.self, forKey: .essenceEconomy) ?? EssenceEconomy()
     }
 }
@@ -421,6 +439,10 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// 0–100, always visible. Decays per *player turn* only — never wall-clock (pillar 2).
     var stability: Double = Tuning.World.startingStability
 
+    /// Frozen when the world is bound. This includes seeded rolls for every subject the page left
+    /// unwritten, so relaunches and anchored revisits cannot reinterpret the same world.
+    var resolvedStabilityScore: Int
+
     /// The Stability headline this world runs at.
     ///
     /// **Sites deliberately do not move this yet.** `docs/sites-system.md` §5 proposes charging
@@ -432,7 +454,7 @@ struct WorldRun: Codable, Equatable, Sendable {
     ///
     /// `SiteRules.stabilityDelta` is built and tested and ready to be added here the moment the
     /// preview is allowed to show it. See questions-for-design Q19.
-    var effectiveStabilityScore: Int { BookRules.stabilityScore(of: book) }
+    var effectiveStabilityScore: Int { resolvedStabilityScore }
 
 
     var decayPerTurn: Double {
@@ -546,6 +568,7 @@ struct WorldRun: Codable, Equatable, Sendable {
          foundPagesAtStart: Set<DiaryPageID> = [],
          foundWritingsAtStart: Set<FoundWritingID> = [],
          foundTravellersAtStart: Set<TravellerID> = [],
+         resolvedStabilityScore: Int? = nil,
          generationDiagnostics: WorldGenerationDiagnostics = WorldGenerationDiagnostics(),
          tuning: DebugTuningProfile = .defaults) {
         self.runIndex = runIndex
@@ -573,6 +596,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.foundPagesAtStart = foundPagesAtStart
         self.foundWritingsAtStart = foundWritingsAtStart
         self.foundTravellersAtStart = foundTravellersAtStart
+        self.resolvedStabilityScore = resolvedStabilityScore
+            ?? BookRules.resolvedStabilityScore(of: book, seed: mapSeed)
     }
 
     /// The species a given enemy belongs to, where the run still has it.
@@ -638,6 +663,9 @@ struct WorldRun: Codable, Equatable, Sendable {
         floraPoisonTurns = try container.decodeIfPresent(Int.self, forKey: .floraPoisonTurns) ?? 0
         stability = try container.decodeIfPresent(Double.self, forKey: .stability)
             ?? Tuning.World.startingStability
+        resolvedStabilityScore = try container.decodeIfPresent(Int.self,
+                                                                forKey: .resolvedStabilityScore)
+            ?? BookRules.resolvedStabilityScore(of: book, seed: mapSeed)
         turnsTaken = try container.decodeIfPresent(Int.self, forKey: .turnsTaken) ?? 0
         clock = try container.decodeIfPresent(WorldClock.self, forKey: .clock)
             ?? WorldClock.migratingLegacy(book: book, seed: mapSeed, turnsTaken: turnsTaken)

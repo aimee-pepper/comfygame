@@ -150,7 +150,8 @@ private struct RunExitSummaryView: View {
                     recapSection("Loot", gains: summary.lostItems)
 
                     sectionHeading("Kept for good")
-                    pagesSection
+                    writingSection
+                    travellersSection
 
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Party progress").font(.headline)
@@ -220,10 +221,10 @@ private struct RunExitSummaryView: View {
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
     }
 
-    private var pagesSection: some View {
+    private var writingSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Pages found").font(.headline)
-            if summary.pages.isEmpty {
+            Text("Writing recovered").font(.headline)
+            if summary.pages.isEmpty && summary.writings.isEmpty {
                 Text("None this trip.").foregroundStyle(.secondary)
             } else {
                 ForEach(summary.pages, id: \.self) { id in
@@ -240,6 +241,37 @@ private struct RunExitSummaryView: View {
                             }
                         }
                         Spacer(minLength: 0)
+                    }
+                }
+                ForEach(summary.writings) { writing in
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "doc.text.fill").foregroundStyle(.indigo).frame(width: 22)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(writing.title)
+                            Text(writing.prose).font(.caption).foregroundStyle(.secondary)
+                                .lineLimit(3)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private var travellersSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("People who came home").font(.headline)
+            if summary.recruitedTravellers.isEmpty {
+                Text("None this trip.").foregroundStyle(.secondary)
+            } else {
+                ForEach(summary.recruitedTravellers, id: \.self) { id in
+                    HStack {
+                        Image(systemName: "person.crop.circle.badge.checkmark")
+                            .foregroundStyle(.tint).frame(width: 22)
+                        Text(ContentCatalog.shared.traveller(id)?.name ?? id.rawValue)
                     }
                 }
             }

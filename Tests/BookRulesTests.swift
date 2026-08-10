@@ -3,6 +3,21 @@ import XCTest
 
 /// The legibility pillar, tested: what the Writing Desk promises is what the bind delivers.
 final class BookRulesTests: XCTestCase {
+    func testEmptyPageResolvesToDeterministicButVariedStability() {
+        let book = BookRules.resolveBook(page: Page())
+        let seeds = (0..<256).map(UInt64.init)
+        let scores = seeds.map { BookRules.resolvedStabilityScore(of: book, seed: $0) }
+
+        XCTAssertEqual(BookRules.resolvedStabilityScore(of: book, seed: 42),
+                       BookRules.resolvedStabilityScore(of: book, seed: 42))
+        XCTAssertGreaterThan(Set(scores).count, 3,
+                             "silence still resolves to one hidden stability preset")
+        XCTAssertTrue(scores.contains { $0 < 76 },
+                      "empty pages never reached a meaningfully unstable band")
+        XCTAssertTrue(scores.contains { $0 >= 76 },
+                      "chance lost the possibility of a forgiving world")
+    }
+
     func testRawEssenceNeverConsumesCurrentOrLegacyHarvestNodeWeight() {
         let readings = PressureRules.resolve([])
         XCTAssertFalse(BookRules.yieldTable(from: readings).contains { $0.value == Resources.essenceRaw })

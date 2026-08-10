@@ -827,6 +827,44 @@ final class LibraryTests: XCTestCase {
                       "collapse removed permanent page knowledge")
     }
 
+    func testRunRecapIncludesOtherWritingAndNewlyRecruitedPeople() throws {
+        let store = GameStore(io: .temporary(name: "recap-kept-\(UUID().uuidString)"))
+        store.mutate("fund") { $0.base.essence = 500 }
+        XCTAssertTrue(store.bindAndDepart())
+        let writing = FoundWritingRecord(id: "recap-field-note", family: .fieldNote,
+                                         prose: "The warm stones hold water.",
+                                         position: GridPoint(x: 0, y: 0))
+        store.mutate("recover permanent discoveries") { state in
+            state.reality.library.foundWritings.append(writing)
+            state.reality.library.foundTravellers.insert("halloway")
+        }
+
+        store.endRunWithPartialHaul(reason: "test")
+
+        XCTAssertEqual(store.state.worlds.lastExit?.writings.map(\.id), ["recap-field-note"])
+        XCTAssertEqual(store.state.worlds.lastExit?.writings.first?.prose,
+                       "The warm stones hold water.")
+        XCTAssertEqual(store.state.worlds.lastExit?.recruitedTravellers, ["halloway"])
+    }
+
+    func testPortalRecapIncludesPermanentDiscoveriesToo() throws {
+        let store = GameStore(io: .temporary(name: "recap-portal-kept-\(UUID().uuidString)"))
+        store.mutate("fund") { $0.base.essence = 500 }
+        XCTAssertTrue(store.bindAndDepart())
+        store.mutate("recover permanent discoveries") { state in
+            state.reality.library.foundWritings.append(.init(
+                id: "recap-route-mark", family: .routeMark, prose: "Three stones east.",
+                position: GridPoint(x: 0, y: 0)))
+            state.reality.library.foundTravellers.insert("mara")
+        }
+
+        XCTAssertTrue(store.canPortalHere)
+        store.portalHome()
+
+        XCTAssertEqual(store.state.worlds.lastExit?.writings.map(\.id), ["recap-route-mark"])
+        XCTAssertEqual(store.state.worlds.lastExit?.recruitedTravellers, ["mara"])
+    }
+
     /// Five is the expedition party including the Binder, not the number of people who may live at Home.
     func testTheActivePartyHoldsFiveWhileTheRosterKeepsGrowing() {
         let store = GameStore(io: .temporary(name: "five-\(UUID().uuidString)"))
