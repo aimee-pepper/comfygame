@@ -1,5 +1,10 @@
 # The Cast
 
+> **Historical roster reference.** Current identity, ownership and diary decisions live in
+> `cast-roster.md`, `roster-coherence-audit-current.md` and the traveller documents routed from
+> `current-design-index.md`. Keep this file for history; conflicting rows are not implementation
+> authority.
+
 **The problem:** *"half the game is supposed to be seeking these people out"* — and there are **six travellers**, two of whom unlock anything, against **thirteen specced buildings** and **twelve specced classes**. The maximum signature is four conditions when a late-game page holds twelve.
 
 ---
@@ -44,7 +49,7 @@ A 6×6 page is 36 cells. A condition is a cluster — subject + focus + modifier
 
 **Fighter companions give 1, 3 and 4 without a building** — a branch of combat technique rather than a trade.
 
-## 4. Proposed roster — ~28 named travellers
+## 4. Proposed core roster — expandable beyond the high twenties
 
 **Names, voices and diaries are Aimee's.** This is the structure and the count.
 
@@ -60,14 +65,17 @@ A 6×6 page is 36 cells. A condition is a cluster — subject + focus + modifier
 | **Exchange** + Recycler | Trader | — | mid | 3 |
 | **Tannery** — satchel and storehouse capacity | Tanner | — | mid | 4 |
 | **Apothecary** — consumables, inks, coatings | Apothecary | — | mid | 4 |
-| **Armoury** | Armorer | — | mid | 5 |
-| **Bowyer** | Bowyer | — | mid | 5 |
+| **Armoury** — higher-tier armour | Armorer | **Bracken** | mid | 5 |
+| **Bowyer** — all non-magical ranged weapons | Bowyer | **Fen** | mid | 5 |
+| **Weaponsmith** — higher-tier non-magical melee weapons | Weaponsmith | — | mid–late | 5–6 |
+| **Channelworks** — all magical weapon families | Channelwright | **Oda** | late | 7–8 |
 | **Menagerie** — animals, taming | Menagerist | — | late | 7 |
+| **Ranged-magic workshop** *(name pending)* | Spellwright *(working)* | **Oda** | late | 7–8 |
 | Deep works — mineral yields, hard substrate | Delver | — | late | 7 |
 | **Distillery** — advanced essence | Distiller | — | late | 8 |
 | Anchoring works — tethers, anchors | Wright | **Tovin** ✅ *(needs a building)* | late | **4 → raise** |
 
-### Fighter companions — 9, no building; class, skills, branch, diary rune
+### Dedicated fighter companions — currently 8, no building; class, skills, branch, diary rune
 
 *Each answers a different kind of foe, so recruiting one changes **how you fight** rather than what you own.*
 
@@ -79,11 +87,10 @@ A 6×6 page is 36 cells. A condition is a cluster — subject + focus + modifier
 | **Spear** — far reach, strikes first | The opening exchange | mid | 4 |
 | **Skirmisher** — evasion, extra actions | Swarms | mid | 5 |
 | **Hunter** — tracks, better butchery | The bestiary and the material chain | mid | 5 |
-| **Beast-handler** — fights alongside an animal | Pairs with the Menagerie | late | 6 |
 | **Emanant** — carries an element | Elemental and warded foes | late | 8 |
 | **Sela** — wanderer | *(reassign: Forager or Hunter)* | mid | **3** |
 
-### The strange ones — 5
+### The strange ones — currently 4
 
 *Answering a challenge from `companions-classes-spec-v2.md` §8: if every companion is a tradesperson, where are the people who weren't?*
 
@@ -94,7 +101,7 @@ A 6×6 page is 36 cells. A condition is a cluster — subject + focus + modifier
 | A **turned cultist** (session 9) — their diary records the turn happening | late | 9 |
 | Someone who **doesn't remember who they were** | late | 9 |
 | Someone who was **nobody in particular** before, and is now the only person who can do a thing | late | 10 |
-| Two more, Aimee's | endgame | 10–12 |
+| Two more, Aimee's | endgame | 10 |
 
 ## 5. Phase and difficulty, together
 
@@ -104,9 +111,9 @@ A 6×6 page is 36 cells. A condition is a cluster — subject + focus + modifier
 | **Start of mid** | charcoal | **2** | **one non-starting focus** — Isolde, and the cap is absolute |
 | **Mid** | pencil | **3–5** | named focuses, a compound or two |
 | **Late** | fountain pen | **6–9** | precise focuses, compounds, rare modifiers |
-| **Endgame** | refined + compounds | **10–12** | the last capabilities |
+| **Endgame** | refined + compounds | **9–10** | the last capabilities |
 
-**The rule: a signature must fit the page the player would plausibly have when they reach that person** — and must be writable with vocabulary obtainable by then.
+**The rule: a signature must fit the page the player would plausibly have when they reach that person** — and must be writable with vocabulary obtainable by then. **Ten conditions is the absolute traveller-signature cap.**
 
 ## 6. Re-checking the six against the new starting vocabulary
 
@@ -135,7 +142,7 @@ Because pity targets **the next rune for the next companion** (Aimee's correctio
 
 ## 9. The open questions, worked through
 
-### 9.1 The roster — 28, with roles assigned
+### 9.1 The core roster, with roles assigned; count is not capped
 
 **Names, voices and diaries remain Aimee's.** Everything else is proposed below and in §4.
 
@@ -157,7 +164,8 @@ Because pity targets **the next rune for the next companion** (Aimee's correctio
 | **Trader** | **Amber** | Preserved things, and what they're worth |
 | **Tanner** | **Chitin** | Armoured life; what you can make from it |
 | **Apothecary** | **Thorn** | Defended flora — the useful poison |
-| **Menagerist** | **Silk** | Something spins here |
+| **Menagerist/Beast-handler** | **Coral** | Living structure and animal worlds |
+| **Spellwright / ranged-magic weaponsmith** | **TBD** | Must follow from the final magical weapon system |
 | **Delver** | **Mercury** | Strange metal, deep down |
 | **Distiller** | **Brine** | Water you can't drink, and what's in it |
 | **Wright** *(if separate from Tovin)* | **Orrery** | A clockwork still running |
@@ -171,9 +179,9 @@ Because pity targets **the next rune for the next companion** (Aimee's correctio
 | Who | Building | What its branch does |
 |---|---|---|
 | **Mara** | **The Survey Post** | Vision radius · map revealed on entry · minimap depth · **eventually field instruments** — she's a surveyor, and measuring is her trade |
-| **Edren** | **The Library** *(exists, unattached)* | Reading pages · hint-page depth · faster rune study · cross-referencing |
-| **Sela** | **The Forager's Shed** | Organic yields · flora identification on sight · carrying capacity |
-| **Tovin** | **The Anchorage** | Tethers · anchors · **the sustain economy** · assigning companions to worlds |
+| **Edren** | **The Reliquary** | Site discovery · old ruins · artefacts and earlier habitation |
+| **Sela** | **The Wayfarer's Table** | Routes · provisions · organic yields · flora identification · capacity |
+| **Tovin** | **The Anchorage** | Three anchoring routes · sustain and dormancy · world assignments |
 
 **Mara getting the Survey Post matters more than it looks:** `clause-audit.md` F2 found the analysis progression has all five tiers implemented and **no way to raise one.** Field instruments are the missing acquisition path, and a surveyor is who makes them. **That closes a whole unreachable progression axis.**
 

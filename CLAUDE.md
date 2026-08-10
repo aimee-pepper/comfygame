@@ -16,6 +16,7 @@ You are the implementation engineer for a turn-based iOS game designed by Aimee 
 - When you hit a design ambiguity, append a question to `docs/questions-for-design.md` (create it if absent) with enough context to answer from the file alone, pick the most conservative interpretation, tag it, and continue. Never block waiting.
 - Data-driven content: symbols, gambit pieces, creatures, items, and base stations are data (JSON or Swift structs in a `Content/` module), not hardcoded logic — the design calls for these catalogs to grow a lot (see research-pass-3 catalogs).
 - After each milestone, verify the acceptance criteria in the brief's build-order section, especially the force-quit resume test.
+- After fixing a bug or completing a batch of updates, run the relevant tests and simulator smoke check, then build, install, and launch the latest Debug build on **Aimee's Phone** through Xcode. If the phone is disconnected, locked, untrusted, or unavailable, report device delivery as pending rather than treating it as complete.
 
 ## Tech constraints (from brief)
 Swift + SwiftUI, iOS 17+, portrait only, no backend, single Codable game-state JSON in Documents with atomic debounced writes, GameplayKit seeded RNG. No SpriteKit in v0.

@@ -1,4 +1,4 @@
-# State of the Build — 7 Aug 2026
+# State of the Build — 9 Aug 2026
 
 **Who this is for:** Aimee, and the designer Claude. A single place to see what exists, what's next,
 what's blocked on a decision, and where the whole thing is going.
@@ -6,7 +6,8 @@ what's blocked on a decision, and where the whole thing is going.
 **Where it sits in the docs:** `BACKLOG.md` is the milestone plan and is authoritative for *what v0
 is*. `the-queue.md` is the working list of specced-and-unbuilt. This is the overview above both.
 
-**Numbers as of today:** 639 tests · 94 Swift files, ~25,000 lines · 16 content files.
+**Numbers as of today:** 807 tests at the current full-suite checkpoint; current content has all 28
+currently designed recruitable travellers, 233 validated diary pages, 62 focuses and 9 sites.
 
 ---
 
@@ -18,26 +19,27 @@ is*. `the-queue.md` is the working list of specced-and-unbuilt. This is the over
 and end-to-end: you write on a page, it resolves into eight pressures, the pressures generate
 terrain, plants, animals, sites, resources and people, you walk around in it, fight things derived
 from the same numbers, and carry the results home to a base that grows. What's missing is *volume* —
-6 travellers against ~28, 1 consumable against 19, 0 crafting recipes — plus a handful of progression
-hooks and one whole system (anchoring) that the long-term design hangs off.
+25 recruitable travellers against an expandable high-twenties+ cast, with later packets entering as
+their dependencies validate — plus authored meeting/station content and a handful of progression
+hooks. Anchoring's three-route core loop is now built.
 
 ## What's built, by system
 
 | System | State | Notes |
 |---|---|---|
 | **Persistence** | ✅ Complete | Three layers kept separate; atomic debounced save after every action; force-quit mid-encounter resumes exactly. **Still wants one on-device force-quit pass** |
-| **The writing system** | ✅ Complete | 6×6 page, polyomino footprints, three hands, target-first grammar with clusters and connectors, order-invariant. 45 focuses, 8 subjects, 17 qualifiers |
+| **The writing system** | ✅ Complete | 6×6 page, polyomino footprints, three hands, target-first grammar with clusters and connectors, order-invariant. 62 focuses, 8 subjects, 17 qualifiers |
 | **The pressure model** | ✅ Complete | 8 subjects, dual-valued light and heat, diminishing returns, opposed magnitude tracked gross, cross-target constraints, the energy budget |
 | **Worldgen** | ✅ Complete | Seeded; terrain, water, chasms, reachability guarantees, sites, resource nodes, day/night |
 | **Creatures** | ✅ Complete | Budget-allocated traits, per-world cast, per-spawn jitter, derived identity and names, combat and loot both derived. No drop tables anywhere |
 | **Flora** | ✅ Complete | Trait model, the metabolism axis, growth writing the ground, harvest by tissue, hostile plants |
 | **Combat** | ✅ Complete | Party of five, ranks, damage triangle, statuses, gambits, 24 skills, three trees × three branches × eight nodes |
-| **The search loop** | ✅ Mechanism, ⚠️ content | Signatures, diary pages, the Library, meeting scenes, recruitment, the Firepit. **6 travellers of ~28** |
-| **The base** | ✅ Mechanism, ⚠️ content | 12 stations, found-then-built specialists, 73 research nodes across 8 branches |
-| **Analysis** | ✅ Complete | 8 field instruments at Mara's Survey Post, 4 page-lens tiers at Isolde's, gated on what you've measured |
-| **Apexes** | ✅ Mostly | The creature, the restraint rules, the greed draw, 8 wild weapons. 5 of 8 weapon rules wired |
-| **Crafting** | ❌ Not started | 0 recipes. The material economy that feeds it is done |
-| **Anchoring** | ❌ Not started | **The biggest hole.** Blocked on Q-A |
+| **The search loop** | ✅ Mechanism, ⚠️ content | Signatures, diary pages, the Library, meeting scenes, recruitment, the Firepit. **25 recruitable travellers and 195 validated pages** |
+| **The base** | ✅ Mechanism, ⚠️ content | Data-driven stations and found-then-built specialists, including Distillery and Channelworks; 73 research nodes across 8 branches |
+| **Analysis** | ⚠️ Partial, design resolved | Acquisition and tier 2 exist; session 18 specifies the missing field loop, grades and tier 3–5 outputs (`instrument-system-audit.md`) |
+| **Apexes** | ✅ Core loop | Eight weapon rules, cache lottery, bestiary sightings and consent rules work; authored hunting affinities remain (`apex-system-audit.md`) |
+| **Crafting** | ⚠️ Partial | Apothecary and instrument crafting plus all 21 designed physical families/profiles across Blacksmith/Tannery/Bowyer/Armoury/Weaponsmith exist; later station systems remain |
+| **Anchoring** | ✅ Core loop | All three routes converge on durable realms; revisit, explicit sustain settlement, dormancy/reactivation and assignments work |
 
 ## The last five days, in one line each
 
@@ -56,9 +58,20 @@ hooks and one whole system (anchoring) that the long-term design hangs off.
 
 ## The immediate queue, in order
 
-### 1. The traveller roster — **blocked on Aimee**
+### 1. Anchoring — **core loop built**
 
-**6 of ~28**, and four of the six unlock nothing. This is the single highest-value thing left,
+All three routes now work. Born-anchored worlds show the exact premium; Atlas Seams appear
+deterministically in 25% of worlds and offer the cheaper confirmed route; Anchor Frames consume six
+distinct property-matched samples plus 60 essence and are consumed only on valid placement. Realms
+survive as save-compatible Atlas records, revisit without regeneration, and enter an explicit
+player-choice essence settlement on return. Unpaid realms become dormant, never deleted, and can be
+reactivated. Companion assignment uses visible authored Worldwork aptitude plus level growth.
+
+### 2. The traveller roster — **25 implemented; expansion queued**
+
+**25 recruitable travellers of an expandable high-twenties+ cast**. Bryn, Orsa, Vance, Talin,
+Nessa, Corrin, Dagg, Rook, Lys, Bracken, Fen, Wren, Kestrel, Maud, Marrick, Sabine, Grimmond, Oda and Auber now have authored signatures and dependency-safe diary slices; their stations
+and authored meeting prose remain later integration work. This is the single highest-value thing left,
 because **the cast is what the search loop is for**. Every mechanism is built: signatures, diary
 pages, the Library, meeting scenes, recruitment, found-then-built buildings, starting leans.
 
@@ -69,97 +82,103 @@ pages, the Library, meeting scenes, recruitment, found-then-built buildings, sta
 | A condition signature | Claude Code can derive one to a target rarity |
 | **A name and a calling** | **Aimee / designer** |
 | **A voice — the meeting scene** | **Aimee / designer** |
-| **2–4 diary passages** that point at their conditions | **Aimee / designer** |
+| Usually **5–10 diary pages**, longer for late signatures; mix location, knowledge, sites, people and character material | **Aimee / designer** |
 | A building, or none | Designer — and see the trades list below |
 | A starting lean | Claude Code |
 
-**Also needs answering: Q47.** Should a blank book find anybody at all? Right now somebody is present
-in roughly half of all blank books, and six characters take ~19 runs to collect without ever reading
-a diary. Three levers in `questions-for-design.md`; my lean is that people should stand only in
-worlds somebody *wrote for them*.
+**Traveller placement is resolved.** Signatures are physical truth: a genuinely matching blank or
+accidental book may find somebody, and diary pages guide rather than gate. The incompatible
+Traveller's Token remains held for Aimee's review; see `travellers-token-audit-current.md`.
 
-### 2. Consumables and the Apothecary
+### 3. Consumables and the Apothecary
 
-**1 exists, 19 are specced** in `crafting-spec.md` PART FOUR. Includes the **Waystone**, the escape
-item — a real gameplay hole, since a run that goes wrong currently has no answer but walking.
+**17 now exist with property-based recipes**: healing, all four cures, four one-hit weapon coatings,
+all four world-facing items, Solvent and Lure. The **Waystone** immediately returns the full haul
+from anywhere in one atomic save; Torch, Stillwater, Farsight and Lure affect the active world, and
+Solvent identifies a carried curio in the field. Combat presents an item and recipient chooser
+rather than silently using the first carried stack. Traveller's Token remains held on Q47.
 
-**Needs first:** Nessa (a traveller who doesn't exist) and the Apothecary building. So this is
-partly blocked behind item 1.
+The station, screen, recipe discovery and crafting rules are implemented and exercisable through the
+debug harness. Nessa's identity, signature and seven currently dependency-safe pages are live;
+production access still needs her authored meeting/station integration.
 
-### 3. Crafting recipes
+### 4. Crafting recipes
 
-**0 exist**, ~60 proposed. The material economy underneath is finished — properties, grades,
-qualifiers inherited from the animal or plant they came off. Recipes ask for *properties*, never
-item names, so one recipe covers many outputs; the open question is how many recipes that actually
-needs.
+Instrument upgrades and the Apothecary recipes exist. The physical gear catalogue is now designed
+as **21 property-driven recipe families** across the Blacksmith, Armoury, Bowyer and Weaponsmith,
+rather than the older rough target of ~60 named recipes. The material economy underneath is
+finished — properties, grades and qualifiers inherited from the animal or plant they came off.
+Recipes ask for *properties*, never item names, so every family can produce many provenance-rich
+objects. The shared crafted-instance schema and lossless migration are now built: stored and worn
+gear retain one durable identity and frozen combat profile; old tier + upgrade power maps once into
+construction tier plus visible legacy credit; wild growth stays separate; and reforging is a
+three-rank within-tier track worth 0.2 rating per rank. Legacy stacked gear expands into unique
+instances without loss. Halloway's eight foundational and Corrin's three flexible property-driven
+families now share a live deterministic preview/craft engine and construction UI. Players can
+replace every automatically chosen sample with an exact qualifying stock instance before committing.
+Fen's Bowyer now adds the three far-reach physical families: Longbow is immediately useful at the
+built station, tier 1 adds Sling and Throwing Set, and tier 2 alone permits Tier 4. Specialist stock
+below the Tier-3 headline remains honestly craftable behind a distinct confirmation. Shared station staffing now uses
+max(purchased, keeper-earned) tiers and a station-local owner-at-Home discount; preview,
+affordability and atomic debit use the same rounded paid cost. The Tannery now grants foundational
+Wear with construction (and migrates already-built saves), then offers paid Tier-2 fitting, Carry and
+Keep roots; the latter two gate only advanced capacity. Bracken's Armoury rebuilds stored or worn
+protection in place as Rigid, Balanced or Insulated while preserving identity, wearer, slot,
+authored display provenance and cumulative honest receipts. Legacy credit has a separate guard,
+ordinary reforge work remains visible, and stale/unaffordable commits are atomic. Keeper-earned
+tiers now also render as supplied research rungs and count toward branch progress without inventing
+a paid completion. Maud's Weaponsmith completes the physical catalogue with fitted point, edge,
+maul and diary-pattern polearm construction. Polearms freeze the player's chosen physical
+consequence at mid reach; all recipes show ordinary Might/Finesse advice without adding wearer or
+fit state, and use the same exact-sample, discount, confirmation and stale-commit contract.
 
-### 4. Anchoring
-
-**The only thing that makes a world permanent**, and the hinge the whole long-term design turns on.
-Blocked on **Q-A**, which has been open since the brief. See Part Four.
 
 ## Smaller unblocked things, roughly by value
 
 | | Where | Size |
 |---|---|---|
-| **Living worlds** — creatures act on each other during a run | `living-worlds-spec.md` | Medium |
-| **Building staffing** — posted staff give a discount; in the party, their XP levels the building | `building-staffing.md` | Medium |
-| **Compound assembly** + its gate | session 10 §4 | Medium |
-| **The Exchange / Recycler** — Vance's, gear back into materials | `merchant-recycler-spec.md` | Medium |
-| **Identification becomes knowledge** — N of a kind identified = known forever | | Medium |
-| **Movement cost from terrain** — crossing growth costs the same as stone | | Small |
-| **Void as a cap** rather than a subtraction | | Small |
-| **Count reaching the description** — three suns should say so | | Small |
-| **Light/Shadow palette sections**, and the same for Thermal and Vitality | | Small |
-| **The vocabulary rename** — `pressure_sources.json` → `focuses.json` | | Small, mechanical |
-| **A tutorial** | Nobody's written it | **Large, and overdue** |
+| **Living worlds** — bounded visible predation | `predation-living-worlds-current.md` | Medium; design-ready |
+| **Building staffing** | `building-staffing-current.md` | Medium; design-ready |
+| **Compound assembly** + its gate | `compound-assembly-station-trees-current.md` | Medium; design-ready |
+| **The Exchange / Recycler** | `exchange-recycler-current.md` | Medium; design-ready |
+| **Identification becomes knowledge** | `curio-identification-knowledge-current.md` | Medium; design-ready |
+| **Movement cost from terrain** | built | Tall growth and mud cost one extra turn |
+| **Void as a cap** | `void-cap-current.md` | Small; design-ready |
+| **Count reaching the description** | `count-description-current.md` | Small; design-ready |
+| **Palette sections + vocabulary migration** | `writing-palette-vocabulary-migration-current.md` | Small; migration-ready |
+| **Tutorial implementation** | `tutorial-discoverability-current.md` | **Slices 1–4 built; combat/recruit and later-system hooks remain** |
 
-**On the tutorial:** the writing system now has four vocabularies, connection, clusters, rotation,
-qualifier ladders and a spatial packing constraint. It is not discoverable cold. This isn't scheduled
-and probably should be.
+**On the tutorial:** the writing system is not discoverable cold. The current design now teaches it
+through interruption-safe contextual lessons across the first two bindings, then just-in-time system
+hooks. Writing Desk and first-world essentials should begin before the full content catalogue lands.
+
+Writing Desk and first-world essentials now use versioned durable lesson records, one nonblocking
+context card at a time, Got it/Not now behavior, encounter/loot suppression, and Settings → Field
+Notes replay. Blank binding remains valid, both tap travel and the D-pad teach movement, actions
+teach from the current tile, and every real expedition outcome files Return. Pre-tutorial saves
+infer already-earned notes only when the tutorial field is absent, avoiding launch takeover while
+preserving exact round trips for current saves.
 
 ---
 
-# PART THREE — What's waiting on a decision
+# PART THREE — What is genuinely waiting on review
 
-**Nine open questions, and three of them are load-bearing.** Everything here is in
-`questions-for-design.md` unless marked otherwise.
+Anchoring's three routes, traveller placement, separate flora/creature budgets, site Stability,
+combat-tree depth and animal combat structure are resolved. Historical alternatives remain in the
+archive; they are not active questions.
 
-## The three that matter most
+The current running review list is `engineering-questions-for-aimee.md`. The material holds are:
 
-### Q-A — When does anchoring happen? *(in `open-questions.md`, open since the brief)*
-
-Three candidate designs: anchor at bind, anchor in-world at a discovered site, or anchor
-retroactively from base. The doc suggests a hybrid — a cheap in-world **tether** that pauses decay,
-with the expensive permanent anchor performed from base. **Tension in the moment, commitment at
-leisure.**
-
-**Why it's urgent now:** everything anchoring needs is built. Worlds keep their cast, their flora and
-their looted state; the Library remembers every world you wrote. It is one decision away.
-
-### Q47 — Traveller pacing
-
-Should a blank book find anybody? Should placement require the clue in hand? **This sets the pace of
-the entire game**, because the cast is the progression.
-
-### Q48 — Should flora and creatures share one world-wide life budget?
-
-Currently two budgets, both scaled by Vitality. **One shared budget would be more ecologically honest
-and much more constraining** — a world of enormous animals would have to be a world of thin plants.
-I think it's the better design. It also retunes every existing creature number, so it isn't
-something to do quietly.
-
-## The rest
-
-| | Question | Cost of getting it wrong |
+| Area | Current position | Why it remains open |
 |---|---|---|
-| **Q44** | The authored `stabilityDelta` values are 3–4× the emergent ones and were tuned for the old formula — retire them? | A greedy book is charged twice |
-| **Q49** | Three apex weapon rules need decisions before wiring; and should the strongest apexes require worlds you deliberately *write* toward? | Three items are inert |
-| **Q19** | Do sites move the Stability headline? Built, tested, deliberately switched off | Guarded by a test now, so it can't drift |
-| **Q37** | The full list of crafting trades — Tannery and Apothecary specced and unbuilt | Blocks consumables |
-| **Q-B/C** | Sustain economy for anchored worlds; the Reality reset | Both downstream of Q-A |
-| **Branch depth / point income** | 8 nodes and 1/level are proposals — they set the level cap at 25 | Rebalance, not rework |
-| **Small ones** | Whether animals use the combat trees · Kindling's name · Adamant carrying both endgame *and* anchoring · whether Glass is a resource or quartz serves · the Long Instruction's price now it applies to five people | |
+| **Great Work / Reality reset / Tam** | Deliberate hold; preserve realm history but invent no score or ending trigger | These require one dedicated emotional/endgame pass |
+| **Talin armour threshold grammar** | Design-ready; implementation pending | Absolute armour marks 1/3/5; HP percentages are not reused. See `gambit-stat-thresholds-current.md` |
+| **Traveller's Token** | Design lead recommends cutting it | It contradicts truthful signature placement; awaiting Aimee's review |
+| **Waystone material** | Rift-glass recommended over Adamant | Final repeatable demand and Glass vocabulary need review together |
+| **First anchoring balance** | Reversible live values | Needs multi-realm campaign play |
+| **Kestrel first-record timing** | Encounter-start snapshot placeholder | A deeper bestiary may later distinguish sighting from completed study |
+| **Opening safety and tutorial density** | Honest generation; nonblocking contextual lessons | Needs fresh-save observation, not more paper design |
+| **Realm production cadence** | Four surplus work per unit, six-unit tray | Needs short- and long-session play |
 
 ---
 
@@ -173,7 +192,7 @@ Four loops, nested:
 2. **Spend what you brought** on being able to bring more. *Built.*
 3. **Find people**, who unlock buildings, which unlock what you can make and learn. *Mechanism
    built, cast missing.*
-4. **Keep a world.** Anchoring turns a disposable run into a permanent place. *Not built.*
+4. **Keep a world.** Anchoring turns a disposable run into a permanent place. *Core loop built.*
 
 Loop 4 is the one that turns this from a good roguelike loop into the game the brief describes, and
 it is the one thing entirely blocked on a decision.
@@ -185,75 +204,117 @@ carrying more. Three axes carry that:
 
 | Axis | What it is | State |
 |---|---|---|
-| **Vocabulary** | What you can say. 45 focuses of ~85 specced | ✅ Working, ⚠️ half-authored. Learned from research, sites and caches |
+| **Vocabulary** | What you can say. 62 live focuses; exact 23-entry path to 85 | ✅ Working, ⚠️ expanding. See `focus-expansion-85-current.md` |
 | **Page space** | What you can fit. The page **never grows** — better hands say the same things in less room | ✅ Complete |
-| **Analysis** | What you can *read*. 8 field instruments + 4 lens tiers | ✅ Complete as of today |
+| **Analysis** | What you can *read*. 8 field instruments + later lens tiers | ✅ Field loop and tier behavior built; values remain playtest tuning |
 
-**All three are now real.** Analysis was the one with no door into it for weeks; it has one now, and
-the gate on it — *the lens only shows what you've been out and measured* — is the best single rule in
-the game's progression.
+**All three have an acquisition door and a current progression rule.** The analysis gate—*the lens
+only shows what you have measured in the field*—remains the key distinction between owning an
+instrument and understanding a world.
 
 ## A proposed order for what's left
 
-**Phase 1 — Fill the cast** *(blocked on Aimee)*
-The roster from 6 toward ~28, in batches. Each traveller is a signature, a voice, diary pages and
-usually a building. Answer Q47 first, because it decides how many worlds a player writes per person
-found.
+**Phase 1 — Finish the current cast rollout**
+All twenty-eight currently designed travellers are live through Nine. Perren's authored opposed
+route has a fixed survivability fixture; Nine's complete packet includes every now-valid relationship.
+Tam remains the one deliberate endgame hold. Continue deferred relationship pages and downstream
+systems rather than reopening roster structure.
 
 **Phase 2 — The making half**
-The Apothecary and Tannery, consumables, then crafting recipes. Everything underneath is done: the
-material economy, properties, grades, the Blacksmith's reforging. This is where the resources you
-haul finally become things you chose to make.
+The Apothecary engine and Distillery/Channelworks first slice exist or are in active integration.
 
-**Phase 3 — Anchoring** *(blocked on Q-A)*
-The tether, the anchor, the sustain economy, and what a permanent world does that a disposable one
-can't. Anchored worlds keep their cast and their flora already.
+Expedition partial-haul resolution now protects the exact quantities packed before departure:
+unused starting supplies always return, consumed supplies do not duplicate, and only newly acquired
+haul is exposed to the temporary saved-RNG retention roll. Legacy mid-expedition saves reconstruct
+that boundary conservatively.
 
-**Phase 4 — Living worlds, and depth**
-Creatures acting on each other, predation, per-building research trees, the Tavern and other
-people's travellers passing through.
+The writable qualifier grammar now rejects ambiguous new links before mutating the page: one
+subject, compatible focuses, one directly attached modifier per ladder, and multiple focuses only
+after Chaining. Old ambiguous pages remain loadable and receive a visible warning. Scale's written
+Minute/Small/Large/Vast offsets correctly straddle the unwritten ordinary value, and inert Hydrology
+Phase remains decodable but is absent from the writing palette.
+
+Found writing now has a separate save-tolerant model and Library collection. Every world reserves
+one reachable writing host before optional contents, uses the 70/30 diary/world-note starting mix,
+and can place a distinct second piece at the configured ten-percent rate. Exhausted diaries reweight
+to persisted field notes without advancing or resetting diary patience. Route marks, site fragments
+and working scraps remain the next content families.
+
+Expedition summaries persist portal, Waystone, defeat, collapse or future-abandon outcomes. Only a
+real collapse increments the collapse counter; partial returns now report recovered and lost
+resources/items separately, followed by pages and party progress under “Kept for good.”
+
+Tier-3 focus attribution now obeys the same field-calibration boundary at the Writing Desk and in
+World History. History retains structured effects so surveying a new subject can illuminate an old
+world later without leaking that secondary beforehand; legacy flattened records filter
+conservatively. Tier-4 prose also voices stabilising/destabilising meaning to accessibility tools.
+
+Cycle now drives the expedition clock. Resolved magnitude chooses stopped/64/40/28/20-turn bands,
+regularity produces bounded deterministic per-cycle jitter, and Stillness genuinely prevents phase
+events and roster swaps. The schedule survives save/load and anchored revisits; old mid-run saves
+retain their current phase at migration. Calibrated, deliberately written Cycle can name its band
+in the preview, and visited worlds retain clock analysis for History. The DEBUG harness reports the
+resolved band/pressures, held or advancing phase, and next two light transitions without mutating
+the run, alongside compact writing/life/apex counts.
+
+DEBUG expedition-feel controls now cover writing mix and patience, stability duration, collapse
+recovery, apex chance and base vision. Values are frozen into a run at binding where changing them
+mid-expedition would corrupt comparisons; old saves decode to authored defaults. Each section names
+its scope/default and can reset independently.
+Continue with the 21 physical families, Tannery and specialist shops on the completed instance and
+migration foundation. This is where the resources hauled from authored worlds become deliberate
+equipment.
+
+**Phase 3 — Anchoring depth**
+The core loop and authored aptitudes are built. Renewable production is design-ready around
+discovered source manifests and sustain-first Worldwork; later Atlas progression waits on its
+ending-facing threshold.
+
+**Phase 4 — Living worlds and social/deep breadth**
+Implement bounded predation, Tavern/generated visitors, animal trust/Menagerie, Deep Works and the
+expanded station/site catalogues from their current documents.
 
 **Phase 5 — Teach it**
-The tutorial, and a pass over discoverability. Realistically this should start earlier than fifth.
+Continue the tutorial/discoverability design with slices 3–6. The opening two slices are built and
+simulator-verified; finish the remaining framework before new systems compound its integration cost.
 
 **Ongoing, in parallel**
-Content volume — focuses toward 85, sites past 7, consumables, recipes — and the device-testing pass
+Content volume — the exact focus path to 85, sites from 9 toward 15, diary rollout and recipes — plus the device-testing pass
 on the numbers that can only be settled by playing: map size, day length, viewport, and the
 stability→turns curve.
 
 ## What would worry me if I were the designer
 
-1. **The cast is the bottleneck for everything.** Three of the four remaining phases route through
-   travellers, because buildings hang off people. Six people is not enough to test whether the search
-   loop is fun.
-2. **Nothing has been played end-to-end for long.** 639 tests prove the systems agree with
-   themselves; they don't prove a run is enjoyable. The numbers most likely to be wrong are the ones
-   only playing can settle.
-3. **Anchoring has been open since the brief** and the game is now built right up to its edge.
-4. **The tutorial debt is compounding.** Every good thing added to the writing system makes the cold
-   start harder.
+1. **The cast is no longer the content bottleneck, but integration follows it.** Twenty-five people
+   are live; their later stations and dependency-safe first uses now need to catch up.
+2. **Nothing has been played end-to-end for long.** Automated tests prove systems agree with
+   themselves; they do not prove a month-long campaign is enjoyable. The most important remaining
+   evidence is sustained device play.
+3. **Anchoring now needs play balance**, especially premiums, Seam frequency and sustain pressure.
+4. **Tutorial implementation continues in bounded slices.** First-return routing and semantic
+   two-world comparison now follow the opening lessons; combat/recruit and later-system hooks remain.
 5. **There is no failure state worth the name.** Running out of health ejects you home with half a
    haul. That may be exactly right for a comfy game — but it should be a decision, not a default
    nobody revisited.
 
 ---
 
-## Appendix — content census, 7 Aug 2026
+## Appendix — content census, 9 Aug 2026
 
 | | Built | Specced | |
 |---|---|---|---|
-| Focuses | **45** | ~85 | The vocabulary |
-| Subjects | 8 | 8 | Complete |
+| Focuses | **62** | **85** | Exact remaining scope in `focus-expansion-85-current.md` |
+| Subjects | 9 | 9 | Complete |
 | Qualifiers | 17 | ~25 | |
 | Resources | 23 | 23 | Complete |
-| Items | 56 | — | 52 gear · 2 curios · **1 consumable** · 1 key |
-| Skills | 24 | 24 | Complete |
+| Items | **78** | — | 52 gear · 17 consumables · 2 curios · 2 keys · 5 treasures |
+| Skills | 25 | 25 | Complete |
 | Combat tree nodes | 72 | 72 | Complete |
-| Research nodes | 73 | — | Across 8 branches |
-| Sites | 7 | — | Thin |
-| **Travellers** | **6** | **~28** | **The bottleneck** |
+| Research nodes | **72** | — | Current catalogue; station expansion adds authored decisions |
+| Sites | **9** | **15** | Six additional profiles are current |
+| **Travellers** | **28** | **28 active designs + Tam held** | Designed roster live through Nine; Tam deliberately held |
 | Contradictions | 9 | — | |
 | Description clauses | 50 | — | Every one reachable, by test |
-| Stations | 12 | — | |
-| Consumables | **1** | **19** | **The other gap** |
-| Crafting recipes | **0** | ~60 | |
+| Stations | **18** | More keeper stations queued | Lifecycle matrix is current |
+| Consumables | **17** | **17 + held Traveller's Token** | Current useful catalogue complete |
+| Physical gear recipe families | **21** | **21** | Halloway, Corrin, Bracken, Fen and Maud families are live; tuning remains playtest work |

@@ -1,5 +1,10 @@
 # The Sigil Vocabulary
 
+> **Current scope authority (9 Aug 2026):** The live catalogue contains 62 focuses. The reconciled
+> expansion is the exact 23-entry plan in `focus-expansion-85-current.md`. Older 39→95 counts,
+> proposed entries and open acquisition notes below remain historical provenance where they conflict
+> with that current plan.
+
 **Scope:** how runes are sorted, how they're obtained, and a rating for every one. Three companion documents cover **compounds**, **the cast**, and **Isolde** separately.
 
 **What this supersedes:** the "tiers" I invented in `rune-pacing-spec.md` §2.1 — a word used across two documents and never defined. There are no tiers. There is a curve.
@@ -153,7 +158,7 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | **Marsh** | hydr +22 · reli −8 · **vita +25** | 3 | — | P | mid wild · merchant |
 | **Glacier** | hydr +35 · **ther −30/f−35** · reli +25 | 4 | — | P | late wild · merchant |
 | **Geyser** | ther +20/f+15 · hydr +8 · subs +12 | 4 | d | P | late wild · research · merchant |
-| **Pond** *(new)* | small standing water | 2 | — | P | **diary — the wanderer's** |
+| **Pond** *(new)* | small standing water | 2 | — | P | **diary — Sela the wanderer** |
 
 ## Substrate
 
@@ -166,7 +171,7 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | **Sulfur** | subs +15 · vita −12 | 3 | d | P | mid wild · research · merchant |
 | **Crystal** | **illu +18/f+18** · subs +25 | 4 | **d** | P | **early-precise** wild · merchant — *see `isolde.md`; she depends on it preceding the pencil* |
 | **Gold** | subs +40 | 4 | **d** | P | late wild · merchant |
-| **Gold ore** *(new)* | precise, richer | 4 | **d** | P | **diary — the smith's** |
+| **Gold ore** *(new)* | precise, richer | 4 | **d** | P | **diary — Halloway the smith** |
 
 *Gold and Crystal leave the starting set. **They are where greed lives** — handing them over on turn one gives away the game's central tension before the player has met it.*
 
@@ -178,7 +183,7 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | **Sand** *(dune)* | reli −10 | 1 | — | N | start |
 | **Canopy** | illu −35 · reli +12 · **vita +35** | 3 | — | N | mid wild · merchant |
 | *also shape land:* River +20 · Glacier +25 · Volcano +30 · Marsh −8 · Sea −15 | | | | | |
-| **Canyon · Terrace · Scarp** *(unbuilt, Q30)* | | 3–4 | — | P | mid–late; **one is diary — the surveyor's** |
+| **Canyon · Terrace · Scarp** *(unbuilt, Q30)* | | 3–4 | — | P | mid–late; **Scarp is diary — Mara the surveyor** |
 
 *Relief is the thinnest subject. Three of the six words proposed in Q30 don't exist.*
 
@@ -214,10 +219,12 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 |---|---|---|---|---|
 | **Tide** | 2 | — | N | mid wild · research · merchant |
 | **Orrery** | 4 | s | P | late wild · research · merchant |
-| **Drift** | 4 | — | P | late wild · merchant |
+| **Drift** | 4 | — | P | **diary — Tovin the binder** |
 | **Stillness** | 5 | s | P | **late wild only** |
 
-*Currently **Moon** and **Comet** are the only things touching Cycle, incidentally. Aimee's cut from `cycle-sources-draft.md` is still outstanding — and Cycle is now clearly a late subject, which makes the cut less urgent but no less needed.*
+*Current authority:* Cycle has six direct focuses—Tide, Orrery, Drift, Stillness, Echo and Dream—
+plus Moon and Amber secondaries. The old candidate cut is superseded; see
+`cycle-system-current.md`. The remaining gap is the world-clock consumer, not vocabulary count.
 
 ---
 
@@ -271,7 +278,7 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 2. **The ~6 new precise focuses** — pond, gold ore, trees, and the relief and light words. Names are Aimee's.
 3. **Which diary teaches which**, covered in `the-cast.md`.
 4. **Which branches end in an exclusive rune.**
-5. **The Cycle cut** — `cycle-sources-draft.md`.
+5. ~~**The Cycle cut**~~ — resolved by the live six-focus set and `cycle-system-current.md`.
 6. **Crystal's exact position** in the precise band, since Isolde depends on it arriving before the pencil.
 7. **Whether a subject arrives with its first focus**, or unlocks separately.
 
@@ -311,8 +318,8 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | *built:* Rain · Sea · Lake · River · Mist · Marsh · Glacier · Geyser | | | | | |
 | **Spring** | 2 | — | N | start | Water arriving from the ground |
 | **Waterfall** | 3 | — | P | mid wild · merchant | Falling water; erodes |
-| **Pond** *(new)* | 2 | — | P | **diary — the wanderer's** | Small, still, standing |
-| **Brine** | 3 | d | P | mid wild · research | Salt water — *pairs with Salt for the undrinkable world* |
+| **Pond** *(new)* | 2 | — | P | **diary — Sela the wanderer** | Small, still, standing |
+| **Brine** | 3 | d | P | **diary — Auber the distiller** | Salt water — *pairs with Salt for the undrinkable world* |
 
 ## Substrate — 8 → 20
 
@@ -330,9 +337,9 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | **Copper** | 2 | d | N | early wild · research · merchant | Alloys, conductive work |
 | **Silver** | 3 | **d** | P | mid wild · merchant | Fine work; **instrument nibs** |
 | **Lead** | 2 | d | N | early wild · research · merchant | **Pencils** — dense, soft, cheap |
-| **Mercury** | 4 | **d** | P | late wild · merchant | *Aimee's own example.* Strange work; **chaining** |
+| **Mercury** | 4 | **d** | P | **diary — Grimmond the delver** | *Aimee's own example.* Strange work; **chaining** |
 | **Adamant** | 5 | **d** | P | **end of a research branch** | Endgame. Candidate anchoring material |
-| **Gold ore** *(new)* | 4 | **d** | P | **diary — the smith's** | |
+| **Gold ore** *(new)* | 4 | **d** | P | **diary — Halloway the smith** | |
 
 ## Relief — 3 → 9
 
@@ -345,7 +352,7 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | **Plain** | 1 | — | N | start | Nor its flat one |
 | **Canyon** | 3 | — | P | mid wild · merchant | Cut deep; encloses |
 | **Terrace** | 3 | — | P | mid wild · research | Stepped country |
-| **Scarp** | 4 | — | P | **diary — the surveyor's** | A face you can't climb |
+| **Scarp** | 4 | — | P | **diary — Mara the surveyor** | A face you can't climb |
 | **Dune** | 2 | — | N | early wild · merchant | Moving land |
 
 ## Vitality — 7 → 15
@@ -356,10 +363,10 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | **Grass** | 1 | — | N | **start** | The most ordinary living thing there is |
 | **Moss** | 2 | — | N | start | Low, damp, patient |
 | **Vine** | 2 | — | N | early wild · merchant | Climbing growth; cover |
-| **Thorn** | 3 | s | N | mid wild · research · merchant | **Defended flora** — the hazard half |
-| **Coral** | 4 | d | P | late wild · merchant | Living stone. Aquatic |
+| **Thorn** | 3 | s | N | **diary — Nessa the apothecary** | **Defended flora** — the hazard half |
+| **Coral** | 4 | d | P | **diary — Sabine the menagerist** | Living stone. Aquatic |
 | **Kelp** | 3 | — | P | mid wild · merchant | Underwater forest |
-| **Hive** | 3 | d | P | mid wild · research · merchant | Concentrated life; a site as much as a focus |
+| **Hive** | 3 | d | P | **diary — Orsa the keeper** | Concentrated life; a site as much as a focus |
 | **Trees** *(new)* | 2 | **d** | P | early–mid wild · merchant | Timber |
 
 ## Atmosphere — 5 → 8
@@ -367,23 +374,25 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | Focus | Std | Val | Spec | Route | What it is |
 |---|---|---|---|---|---|
 | *built:* Cloud · Wind · Ash · Thin Air · Miasma | | | | | |
-| **Stillness** | 2 | s | N | early wild · research · merchant | Air that does not move — *and the only thing that lowers motion* |
+| **Hush** | 2 | s | N | **diary — Isolde the calligrapher** | Air that does not move — *and the only thing that lowers motion* |
 | **Gale** | 3 | — | N | mid wild · merchant | *(Cut in the session-5 audit as redundant with Great Wind. **Reinstate only if** Intensity proves too coarse.)* |
 | **Weight** | 4 | s | P | late wild · research | Thick air — heat retention, and it feeds gigantism |
 
-## Cycle — 0 → 5
+## Cycle — historical 0 → 5 proposal
 
-**Cycle has no focuses of its own.** Moon and Comet touch it incidentally. Until this lands, an entire subject is unwritable at any point in the game.
+**Superseded:** Cycle now has six direct focuses and does not need the broad Time placeholder. See
+the current Cycle table above and `cycle-system-current.md`.
 
 | Focus | Std | Val | Spec | Route | What it is |
 |---|---|---|---|---|---|
 | **Time** *(broad)* | 3 | s | B | mid wild · research · merchant | The subject exists |
 | **Tide** | 2 | — | N | mid wild · research · merchant | The world moves to a pull |
 | **Orrery** | 4 | s | P | late wild · research · merchant | A clockwork, still running |
-| **Drift** | 4 | — | P | late wild · merchant | Time passes unevenly |
+| **Drift** | 4 | — | P | **diary — Tovin the binder** | Time passes unevenly |
 | **Stillness** *(Cycle sense)* | 5 | s | P | **late wild only** | Nothing turns. No day, no season |
 
-*From `cycle-sources-draft.md`; Aimee's cut still outstanding. **Note the collision:** *Stillness* wants to mean both "air that does not move" and "time that does not turn." One of them needs another word.*
+*Historical note:* this table predates the live six-focus set. Atmosphere's motion reducer is now
+**Hush**, so Cycle keeps **Stillness** without a naming collision.
 
 ## The Strange family — 0 → 11
 
@@ -391,16 +400,16 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 
 | Focus | Std | Val | Spec | Route | What it is |
 |---|---|---|---|---|---|
-| **Bone** | 3 | d | N | mid wild · merchant | Something died here at scale |
-| **Amber** | 4 | **d** | P | late wild · merchant | Preserved things |
+| **Bone** | 3 | d | N | **diary — Bracken the armorer** | Something died here at scale |
+| **Amber** | 4 | **d** | P | **diary — Vance the trader** | Preserved things |
 | **Tar** | 3 | d | N | mid wild · research · merchant | Slow, black, catching |
 | **Glass** | 3 | d | P | mid wild · research | Ground fused |
-| **Mirror** | 5 | s | P | late wild only | Surfaces that return light |
-| **Silk** | 3 | d | P | mid wild · merchant | Something spins here |
-| **Chitin** | 3 | d | N | mid wild · merchant | Armoured life at scale |
-| **Ruin** | 4 | s | P | late wild · **diary** | **The people who came before.** Sites, pages, the Atlas |
-| **Echo** | 5 | s | P | late wild only | The world repeats something |
-| **Dream** | 5 | s | P | **end of a research branch** | The strangest thing writable |
+| **Mirror** | 5 | s | P | **diary — Perren** | Surfaces that return light |
+| **Silk** | 3 | d | P | **diary — Fen the bowyer** | Something spins here |
+| **Chitin** | 3 | d | N | **diary — Corrin the tanner** | Armoured life at scale |
+| **Ruin** | 4 | s | P | **diary — Edren the archaeologist** | **The people who came before.** Sites, pages, the Atlas |
+| **Echo** | 5 | s | P | **diary — Lys the archivist** | The world repeats something |
+| **Dream** | 5 | s | P | **diary — Nine** | The strangest thing writable |
 
 ## Totals
 
@@ -413,7 +422,7 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | Relief | 3 | +6 | **9** |
 | Vitality | 7 | +8 | **15** |
 | Atmosphere | 5 | +3 | **8** |
-| Cycle | 0 | +5 | **5** |
+| Cycle | 0 | +5 | **5** *(historical proposal; live direct set is 6)* |
 | Strange | 0 | +10 | **10** |
 | **Broad** | 0 | +8 | **8** |
 | **Total focuses** | **39** | **+56** | **95** |
@@ -426,5 +435,6 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 
 - **Substrate 7 → 20** is the biggest change and the most needed. Greed lives there, every material comes from there, and it had seven words. **Lead and Silver and Quartz aren't decoration** — they're what pencils, pen nibs and lenses are *made of*, so the writing and analysis progressions finally have material costs that make sense.
 - **Relief 3 → 9** — a subject with no word for *mountain* or *plain*.
-- **Cycle 0 → 5** — a subject with nothing at all.
+- **Cycle 0 → 5** was the historical gap; the live six-focus set closes it. The remaining work is
+  making the resolved Cycle drive the world clock.
 - **The Strange family** gives the late game somewhere to go. Everything currently rare is rare because it's *valuable*; nothing is rare because it's *strange*.

@@ -1,7 +1,13 @@
 # For the designer — what's waiting on you
 
-**Kept current by the implementation engineer.** Everything here is blocked on, or improved by, a
-design call. Ordered by how much it unblocks.
+> **Historical routing notice — 9 Aug 2026:** This file is no longer an active question list. It
+> predates the current roster, combat-tree, Cycle, station, anchoring and vocabulary decisions and
+> contains many forks that are now resolved or superseded. Start with `current-design-index.md` and
+> use `design-review-queue.md` for live review items. The material below remains in place as decision
+> provenance only; it must not override a newer `*-current.md` document or session 18 decision.
+
+**Original purpose (historical):** Everything here was once blocked on, or improved by, a design
+call. Its ordering and “until then” statements describe the 7 Aug codebase, not current work.
 
 Format: **question → why it's blocking → what I've built in the meantime.** Nothing here is
 waiting on me; if you answer nothing, all of it still ships with the interpretation noted, and I'll

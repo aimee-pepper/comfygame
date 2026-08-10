@@ -1,4 +1,13 @@
-# Open Design Questions — Aimee decides; Claude Code must not resolve these
+# Historical open design questions — superseded routing
+
+**Authority notice (9 Aug 2026):** This file preserves an earlier question set and is not the live
+review queue. Several entries—especially anchoring timing and sustain—have since been resolved or
+given current implementation boundaries. Use `current-design-index.md` for system authority,
+`design-review-queue.md` for Aimee's active design reviews, and `engineering-questions-for-aimee.md`
+for reversible implementation questions. Do not implement an alternative from this file over a
+newer current document.
+
+The original questions follow unchanged for historical provenance.
 
 ## Q-A. WHEN does the anchor choice happen? (the big one)
 Aimee wants permanent anchoring of even high-instability worlds at great cost. Three candidate designs from the designer Claude (not decisions — pick/blend/reject):

@@ -119,7 +119,8 @@ Fourteen focuses touch it. Ranked by what they actually *do*:
 
 **A scarp is a cliff face formed by erosion or faulting.** Real word, genuinely obscure, and vocabulary the player writes with should be legible on sight.
 
-**[PROPOSAL] Mara's diary rune becomes *Bluff*** — same meaning, ordinary word. Or **Cliff**, which is plainer still.
+**Superseded 9 Aug 2026:** Mara uses diary-exclusive **Scarp**, the word already present in the
+vocabulary, rather than adding the near-synonym Bluff. See `traveller-identities-existing-six-current.md`.
 
 **Worth a general rule:** *if a focus's name needs explaining, it's the wrong name.* The vocabulary is meant to be readable, and half of reading it is knowing what the words mean.
 

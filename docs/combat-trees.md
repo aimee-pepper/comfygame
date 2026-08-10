@@ -16,7 +16,7 @@ A character isn't *given* a class — **a class is where they've spent.** A rogu
 |---|---|---|---|
 | **Offense** | **Force** | **Precision** | **Swiftness** |
 | **Defense** | **Fortitude** | **Evasion** | **Protection** |
-| **Craft** | **Venom** | **Shadow** | **Kindling** |
+| **Craft** | **Venom** | **Shadow** | **Emanation** *(ID `kindling`)* |
 
 **"Craft" rather than "magic"** — this world has no magic. It has the Art, alchemy, and emanation. Craft covers all three without implying spellcasting, and it's what the Apothecary and the Emanant actually do.
 
@@ -60,7 +60,7 @@ Skills: envenom · **Flense** · corrode
 *Answers:* fights you'd rather not have; opening a fight on your terms.
 Skills: conceal · ambush · **Snuff**
 
-**Kindling** — elemental attacks · burn, freeze, shock · resistances
+**Emanation** *(implementation ID `kindling`)* — heat, caustic and light · burn, poison and dazzle · resistances
 *Answers:* warded and elemental foes.
 Skills: elemental strikes · **Steady** · quench
 
@@ -135,7 +135,11 @@ So a fully-levelled companion has **three completed branches** — one from Offe
 
 **[PROPOSAL] Partial investment should be possible en route.** Nothing should force you to finish a branch before touching another; the cap is on *total points*, so spreading them means three unfinished branches rather than three finished ones. **The commitment is the interesting part** — and a player who spreads has made a real, slightly worse choice rather than an illegal one.
 
-## 8. Wild companions arrive already built (Aimee)
+## 8. Generated companions arrive already built (superseded detail)
+
+> Current authority: `generated-companion-arrival-builds-current.md`. “Wild companion” is retired
+> because it conflated generated people with tamed animals; the hidden-lean and open-respec wording
+> below is historical.
 
 Found at **the player's current level**, with their points **already spent** — otherwise a level-14 find who arrives at level 1 is worthless, and late-game recruiting would be pointless.
 
@@ -148,5 +152,5 @@ Found at **the player's current level**, with their points **already spent** —
 1. **Branch depth** — how many nodes each. **This decides the level cap**: max level = enough points for three complete branches.
 2. **Point income** per level, and whether respec exists.
 3. **Whether animals use these trees** or a simpler one.
-4. **Whether the branch names are right** — Kindling especially. *(Craft's third branch is elemental, and "kindling" leans fiery when it also covers freezing and shock.)*
-
+4. **Branch naming:** resolved to player-facing **Emanation** while the stable implementation ID
+   remains `kindling`.

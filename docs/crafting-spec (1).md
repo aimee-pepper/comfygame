@@ -47,6 +47,11 @@ Eleven at each of common / uncommon / rare / mythic. Weapons carry **damage type
 
 # PART TWO — Instruments
 
+**Implementation status, 8 Aug 2026:** acquisition content is built; the fieldwork behavior and
+later lens outputs remain. Session 18 resolves the completion design in
+`instrument-system-audit.md`: one-turn Survey, permanent observations, crude/good/fine precision,
+and distinct tier 3–5 outputs.
+
 **The most valuable thing in this document**, because it closes a progression axis that is fully implemented and completely unreachable: five analysis tiers, `analysisTier` written only by a debug harness.
 
 ## How analysis rises
@@ -136,13 +141,19 @@ Made at the **Scriptorium** *(Isolde's)*, because reading your own page is writi
 | **Pick** | Harvest hard substrate; faster nodes | iron · adamant · timber |
 | **Blade-tool** | Butchery yields | fang · obsidian |
 | **Lantern** | Vision in dark worlds | quartz · resin · ichor |
-| **Tether-iron** | Carry an anchor point | adamant · mercury |
+| **Anchor Frame** | Place an anchor on a valid world tile | 2 hard 65 · 2 dense 65 · 1 flexible 55 · 1 reactive 65 · 60 essence |
 
 ---
 
 # PART FOUR — Consumables
 
-**One exists.** This proposes **eighteen**, all made at the **Apothecary** *(Nessa's)* except where noted.
+**Implementation status (9 Aug):** seventeen are authored and implemented: all healing and cures,
+four one-hit coatings, all world-facing items, Solvent and Lure. Recipes infer from qualifying
+natural stock plus named reagents, remain learned after the suggesting stock is gone, and consume
+the weakest qualifying sample first. Traveller's Token remains held on Q47. The Apothecary engine
+and debug route exist; production access waits on Nessa's final authored diary prose.
+
+This proposes **eighteen**, all made at the **Apothecary** *(Nessa's)* except where noted.
 
 ## Healing — 3
 
@@ -159,9 +170,9 @@ Made at the **Scriptorium** *(Isolde's)*, because reading your own page is writi
 | Item | Clears | Wants |
 |---|---|---|
 | **Draught of Clearing** | bleed · poison | pulp · salt |
-| **Quenching Draught** | burn · freeze · shock | reagent · resin |
+| **Quenching Draught** | burn · dazzle | reagent · resin |
 | **Broad Antidote** | any one status | ichor · reagent · spore |
-| **Stonebark Tonic** | prevents the next status | timber · resin |
+| **Stonebark Tonic** | selected party member prevents exactly the next affliction, including bleed; then expires | timber · resin |
 
 ## Weapon coatings — 4
 
@@ -171,8 +182,23 @@ Made at the **Scriptorium** *(Isolde's)*, because reading your own page is writi
 |---|---|---|
 | **Venom** | poison | toxin · fibre |
 | **Firebrand** | burn | reagent · sulfur |
-| **Rimeoil** | freeze | reagent · salt |
-| **Stormsalt** | shock | reagent · mercury |
+| **Briar Oil** *(placeholder name; replaces Rimeoil)* | bleed | thorn · fibre |
+| **Flashsalt** *(placeholder name; replaces Stormsalt)* | dazzle | reagent · mercury |
+
+**Design-lead decision, 9 Aug 2026:** coatings do not add freeze or shock. The settled combat
+taxonomy has three `StatusKind` cases because each has an actual producer: burn, poison and dazzle.
+Bleed remains a separately implemented legacy affliction with real producers. The four coatings use
+those four existing outcomes rather than expanding the taxonomy to preserve old item names.
+
+Rimeoil and Stormsalt are superseded because their names promise freeze and shock. **Briar Oil** and
+**Flashsalt** are unblocker names and recipe directions, not final prose: keep their effects stable
+while names and exact ingredients remain available for playtest revision.
+
+Stonebark prevention is a one-use guard on the **selected party member**. The next attempted
+affliction—burn, poison, dazzle or bleed—is prevented and the guard expires immediately. It does not
+prevent damage from the triggering attack, block multiple simultaneous afflictions, or remain until
+the end of combat after firing. If it is never triggered, it expires when the current encounter ends;
+it is not a persistent pre-buff carried between combats.
 
 ## World-facing — 4
 
@@ -225,7 +251,9 @@ Made at the **Scriptorium** *(Isolde's)*, because reading your own page is writi
 
 **5. Nothing consumes `gold` except currency.** Every other metal has a craft use. **[PROPOSAL]** gold belongs in **keepsakes and instrument fittings** — ornamental, high-value, deliberately not structural. Which is true of gold.
 
-**6. Adamant is in five late recipes** and is the endgame material. Consistent with `sigil-vocabulary.md` putting it at the end of a research branch — **but if it's also the anchoring material, that's a lot of demand on one resource.** Worth checking before both land.
+**6. Adamant remains a late permanent-progression material, but it is not the anchoring material.**
+Anchor Frames use property-matched world resources instead. Repeatable Waystone demand remains a
+separate review item; see `adamant-demand-audit-current.md`.
 
 ---
 
@@ -233,16 +261,23 @@ Made at the **Scriptorium** *(Isolde's)*, because reading your own page is writi
 
 | Building | Makes | Whose |
 |---|---|---|
-| **Blacksmith** | Weapons · armour · tools · **reforging · salvage** | Halloway |
+| **Blacksmith** | Ordinary weapons · armour · tools · **reforging · salvage**; foundation for the two advanced equipment shops | Halloway |
 | **Apothecary** | Consumables · coatings · **inks** | Nessa |
 | **Tannery** | Soft armour · **satchel and storehouse capacity** · bindings | Corrin |
 | **Survey Post** | **Field instruments** | Mara |
 | **Scriptorium** | **The page lens** · pens · **compounds** | Isolde |
-| **Armoury** | Heavy armour · resistances | Bracken |
-| **Bowyer** | Reach weapons · the opening strike | Fen |
+| **Armoury** | **Higher-tier armour upgrades and recipes** · heavy armour · resistances | Bracken |
+| **Weaponsmith** | Higher-tier **non-magical melee weapon** upgrades, recipes and fitted trade-offs | **Maud** |
+| **Bowyer** | Higher-tier **non-magical ranged weapon** upgrades and recipes: bows, mechanical launchers and thrown families | **Fen** |
+| **The Channelworks** | **All magical weapon families**—contained or projected emanation implements at close, mid and far reach—and their upgrades | **Oda** |
 | **Exchange → Recycler** | **Breaks gear back into materials** | Vance |
 
 **Every crafting building belongs to someone**, which is session 12 working: *you don't research a smithy, you find a smith.*
+
+The Blacksmith is the ordinary equipment foundation. Advanced equipment then separates by what the
+player is making: the **Armoury** owns armour, the **Weaponsmith** owns physical melee weapons, the
+**Bowyer** owns physical ranged weapons, and **The Channelworks** owns magical weapons at every
+reach. These are specialisations, not replacements for basic forge work.
 
 ---
 
@@ -252,5 +287,6 @@ Made at the **Scriptorium** *(Isolde's)*, because reading your own page is writi
 2. **Does found gear stay?** 44 pieces exist. **[PROPOSAL] yes** — found gear tides you over before crafting, and sites should carry the best of it.
 3. **Glass** — new resource, or quartz serves.
 4. **Gold's craft use** — keepsakes and fittings, or none at all.
-5. **Adamant's load** — endgame material *and* anchoring material may be too much for one resource.
+5. **Waystone's Adamant** — review replacing its repeatable Adamant with Rift-glass; Anchor Frames no
+   longer use Adamant.
 6. **Flora blocks six resources.** Worth raising its priority — it's no longer just terrain.

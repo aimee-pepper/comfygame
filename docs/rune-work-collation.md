@@ -93,7 +93,10 @@
 
 **1. The rest of the Cycle list.** **Drift** is the obvious fourth and I agree. **Time** as the broad word is the other — a subject needs a coarse word before precise ones, and Cycle currently has three precise words and no way to say *"this world has a rhythm"* without specifying which.
 
-**2. Are Chasm and Silt the right words for poor ground?** **Yes.** *Chasm* is absence of ground; *Silt* is ground with nothing in it. Two genuinely different kinds of poor, and both are ordinary English — unlike **Scarp**, which I proposed and which needed explaining. *(Mara's rune is now **Bluff**.)*
+**2. Are Chasm and Silt the right words for poor ground?** **Yes.** *Chasm* is absence of ground;
+*Silt* is ground with nothing in it. Two genuinely different kinds of poor. **Later correction,
+9 Aug 2026:** Mara uses **Scarp**, already present in the vocabulary, rather than adding Bluff as a
+near-synonym; see `traveller-identities-existing-six-current.md`.
 
 **3. The thin subjects.** **Agreed, and §3 above is the list.** Atmosphere with one downward word is the worst of them.
 

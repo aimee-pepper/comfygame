@@ -1,8 +1,49 @@
 # The Flora System — growth, cover, harvest, hazard
 
-**Status:** Claude's design. Parallel in structure to `creature-system-spec.md` and using the same cast/jitter model from session 15. Numbers **[PLACEHOLDER]**.
+**Status:** **Core implemented and verified, 8 Aug 2026.** Parallel in structure to
+`creature-system-spec.md`. The implementation has a per-world flora cast; unlike creatures, it does
+not currently add per-tile specimen jitter. Numbers remain **[PLACEHOLDER]** pending playtesting.
 
-**Why it's next:** `growth` is a ground type with **nothing producing it**, and growth is what makes cover — and therefore ambush terrain, and therefore the whole openness axis — actually exist. Flora is also the base of the food web that Vitality's trophic depth assumes, and the loot source parallel to creatures.
+**Why it was needed:** `growth` was a ground type with nothing producing it. Flora now creates
+groundcover and sight-blocking growth, supplies the producer base of the food web, generates organic
+harvest nodes, and creates physical, chemical, and active hazards.
+
+## Implementation review — 8 Aug 2026
+
+The six-stage core in §8 is present. The targeted `FloraTests` suite passes **25/25**.
+
+| Spec responsibility | Current state |
+|---|---|
+| Trait model, metabolism, budget, derived identity and names | Implemented |
+| Flora cast deterministic per world | Implemented |
+| Habit-patterned groundcover and sight-blocking growth | Implemented as two legible ground types |
+| Organic resource nodes derived from nearby plants | Implemented for fibre, timber, pulp, toxin, spore and reagent |
+| Producer productivity gates the food web | Implemented |
+| Thorn, toxin and rooted active-defence hazards | Implemented |
+| Resin in the organic crafting economy | **Gap:** catalogued and required by recipes, but flora never yields it |
+| Growth slows movement | **Built:** tall growth costs one extra turn; pathing prices it and pauses before danger |
+| Per-instance flora jitter | **Gap or obsolete claim:** tiles reference the per-world species directly |
+
+The core system is therefore complete enough to leave the immediate sequence after these calls are
+resolved. Remaining work is integration and tuning, not a missing flora architecture.
+
+### Review decisions — settled by Aimee, 8 Aug 2026
+
+1. **Keep separate flora and creature budgets.** A shared zero-sum budget sounds ecological but is
+   not: abundant producers ordinarily support more consumer biomass rather than losing their own
+   traits to it. Producer productivity already gates trophic depth, which creates the causal link we
+   need without making large animals arbitrarily imply thin plants.
+2. **Do not add per-tile plant jitter.** Creature specimens are individually encountered, fought,
+   and recorded; individual grass tiles are not. Tile jitter would add save weight and invisible
+   complexity. Variation belongs in the world's small flora cast and its spatial patterning.
+3. **Make resin a secondary harvest from woody, defended flora rather than another dominant tissue.**
+   Resin is secretion/defence, not a fourth structural material. A woody plant should primarily
+   yield timber or fibre and sometimes resin as an additional product, with likelihood or quantity
+   rising with chemical defence/reactivity.
+4. **Let tall growth cost an extra world turn; keep groundcover at one.** This makes an overgrown
+   world mechanically maze-like as promised. The UI and pathfinder must quote the cost, and
+   auto-pathing should pause before entering costly growth when danger is nearby. Mud produced by
+   marsh conditions follows the same extra-turn rule.
 
 ---
 
@@ -23,7 +64,7 @@ Four jobs, and only the last overlaps with creatures:
 
 ### Metabolism — the axis that decides whether a world can live at all
 
-**[PROPOSAL]** This is new and it's the most important one, because it's what lifts the Vitality cap in worlds that have no light.
+This is the axis that lifts the Vitality cap in worlds that have no light.
 
 | Metabolism | Needs | Produces |
 |---|---|---|
@@ -31,7 +72,7 @@ Four jobs, and only the last overlaps with creatures:
 | **Fungal** | decay, moisture, darkness tolerance | Lets **dark worlds have life** |
 | **Chemosynthetic** | volatile Substrate | Lets **dark, dead, mineral worlds have life** |
 
-A world's flora draws its metabolism from what's actually available. A lightless world with volatile substrate grows chemosynthetic things and is *not* barren — which is the interesting case, and currently impossible.
+A world's flora draws its metabolism from what's actually available. A lightless world with volatile substrate grows chemosynthetic things and is *not* barren.
 
 ### Costly axes — spend budget
 
@@ -75,7 +116,7 @@ A world's flora draws its metabolism from what's actually available. A lightless
 </details>
 
 <details>
-<summary><b>4. Cast, budget, jitter — same model as creatures</b></summary>
+<summary><b>4. Cast and budget — parallel to creatures</b></summary>
 
 ```
 floraCastSize = 1 + floor(vitality / 30)     → 1 at barren, 4 at teeming   [PLACEHOLDER]
@@ -84,7 +125,9 @@ floraBudget   = base + vitalityScale × vitality
 
 Same rule as session 15: **Vitality changes how many species, not how strange they are.**
 
-Species are drawn by spending the budget across costly axes weighted by pressures. Free axes shaped, not spent. **Jitter** per instance: coloration ±10, stature ±10%.
+Species are drawn by spending the budget across costly axes weighted by pressures. Free axes are
+shaped, not spent. There is no per-tile specimen jitter; variation lives in the small flora cast
+and its spatial patterning.
 
 **Identity is derived**, same as creatures — authored regions (*bramble · canopy tree · succulent · mat · fungal bloom · reed · crust*) with **composed descriptive names for anything unmatched**.
 
@@ -97,7 +140,8 @@ Species are drawn by spending the budget across costly axes weighted by pressure
 
 - **Cover density** = f(vitality, mean stature). Decides what fraction of passable tiles become `growth`.
 - **Habit decides patterning:** *spreading* → large connected swathes · *clustered* → thickets with gaps · *solitary* → scattered single tiles.
-- **Stature decides whether `growth` blocks sight.** Groundcover shouldn't hide anything; canopy should. **[PROPOSAL]** low-stature flora writes `growth` that is passable and *doesn't* block sight; high-stature writes sight-blocking `growth`.
+- **Stature decides whether growth blocks sight.** Low-stature flora writes legible `groundcover`;
+  high-stature flora writes sight-blocking `growth`.
 
 **Ordering:** flora placement must run **with or after** terrain painting, since it converts passable ground to `growth` and needs to know what's passable.
 
@@ -130,7 +174,8 @@ Quantity from stature; grade from trait extremity — same rule as creature loot
 | **chemical** | Entering applies damage over turns |
 | **active** | It **engages you** — a combat encounter with a plant |
 
-**[PROPOSAL]** active defence should be rare and gated behind high defence *and* high vitality, because a world where the undergrowth attacks you is a memorable world and shouldn't be common.
+Active defence is rare and gated behind high defence and high vitality, because a world where the
+undergrowth attacks you is a memorable world and shouldn't be common.
 
 </details>
 
@@ -153,22 +198,26 @@ Consequences:
 <details>
 <summary><b>8. Build order</b></summary>
 
-1. **Flora trait model + budget sampling** (mirrors creature §1–4).
-2. **Flora → `growth` tiles**, with habit patterning and stature deciding sight-blocking. *Unblocks the cover that ambush terrain needs.*
-3. **Flora → resource nodes**, replacing generic node yields for organic materials.
-4. **Metabolism gating**, including the dark-world cases.
-5. **Trophic depth from producers**, feeding creature generation.
-6. **Hazardous flora**; active defence last.
+1. ✅ **Flora trait model + budget sampling** (mirrors creature §1–4).
+2. ✅ **Flora → growth tiles**, with habit patterning and stature deciding sight-blocking.
+3. ✅ **Flora → resource nodes**, replacing generic node yields for organic materials.
+4. ✅ **Metabolism gating**, including the dark-world cases.
+5. ✅ **Trophic depth from producers**, feeding creature generation.
+6. ✅ **Hazardous flora**, including active defence.
 
 </details>
 
 <details>
 <summary><b>9. What I'd want challenged</b></summary>
 
-1. **Metabolism as a distinct axis** — it's the newest idea here and it carries a lot (it's the whole reason dark worlds can live). Too clever?
-2. **Whether flora needs a cast at all**, or whether one dominant plant type per world is enough. Four species may be more bookkeeping than it's worth if flora is mostly terrain.
-3. **Active-defence plants** — good rare surprise, or does a plant that attacks you belong in the creature system with `build: sessile`?
-4. **Whether flora should have its own budget** or draw from the same pool as creatures (one world-wide life budget split between producers and consumers, which would be more ecologically honest and more constraining).
-5. **Low-stature `growth` not blocking sight** — two ground types would be clearer than one type with a hidden property.
+1. ✅ **Metabolism remains a distinct axis.** It produces writable dark-world ecologies and is
+   covered by reachability tests.
+2. ✅ **Flora has a small cast.** This produces meaningful harvest and terrain variation without a
+   large authored catalog.
+3. ✅ **Active-defence plants use both systems:** grown as flora, fought through creature combat,
+   rooted by the map.
+4. ✅ **Flora and creatures retain separate budgets** and influence one another through producer
+   productivity and trophic depth.
+5. ✅ **Two ground types shipped:** `groundcover` is visible through and `growth` blocks sight.
 
 </details>

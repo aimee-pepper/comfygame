@@ -1,5 +1,8 @@
 # Combat Trees — full spec
 
+> **Current economy:** `combat-progression-current.md` resolves the implemented depth, point income,
+> level cap and respec questions below. This file remains the node-content authority.
+
 **Supersedes `combat-trees.md`**, which had the structure but no nodes. This has every branch and every node.
 
 **Three trees. Three branches each. Eight nodes per branch. 72 nodes total.**
@@ -14,7 +17,7 @@ All numbers **[PLACEHOLDER]**. Skill names in **bold** are skills that already e
 |---|---|---|---|
 | **Offense** | **Force** | **Precision** | **Swiftness** |
 | **Defense** | **Fortitude** | **Evasion** | **Protection** |
-| **Craft** | **Venom** | **Shadow** | **Kindling** |
+| **Craft** | **Venom** | **Shadow** | **Emanation** *(ID `kindling`)* |
 
 **A class is where you spent.** Nobody is assigned one.
 
@@ -157,17 +160,17 @@ Each branch runs **passive → skill → passive → skill → passive → capst
 | 7 | Shadowed | The whole party is detected later |
 | 8 | **Unseen** ★ | Begin every encounter concealed |
 
-### Kindling — elemental, resistance
+### Emanation *(implementation ID `kindling`)* — projection, affliction and resistance
 *Answers warded and elemental foes.*
 
 | # | Node | Effect |
 |---|---|---|
 | 1 | Sparkhand | Attacks apply weak burn |
 | 2 | Insulation | Resist one element |
-| 3 | **Elemental Strike** ⚔️ | Strike with burn, freeze or shock |
+| 3 | **Emanation Strike** ⚔️ | Strike with heat, caustic or light emanation, applying burn, poison or dazzle |
 | 4 | Attunement | Your elemental damage scales |
 | 5 | **Snuff** ⚔️ | Remove a foe's emanation |
-| 6 | Quench | Cure elemental statuses on an ally |
+| 6 | Quench | Cure one emanation affliction on an ally |
 | 7 | Conduction | Elemental damage chains to a second foe |
 | 8 | **Emanant** ★ | You carry an emanation permanently |
 
@@ -189,13 +192,16 @@ Each branch runs **passive → skill → passive → skill → passive → capst
 
 **Twenty-seven in total**, each permanently distinct.
 
-## 6. Callings, leans, and wild companions
+## 6. Callings, leans, and generated companions
 
 **A calling gives a starting lean, never a limit.** Halloway the smith begins with a point or two in Force; nothing stops you making her a knife-fighter.
 
-**Wild companions arrive at the player's level with their points already spent** (Aimee) — otherwise a level-14 find who starts at 1 is worthless. **[PROPOSAL] spent coherently, following a hidden lean**, so you meet a *skirmisher*, not a bag of points.
+Generated people arrive at the Binder's level with a visible, coherent three-branch plan and their
+earned points already spent. They use the ordinary full Essence Spring respec. Exact persistence and
+arrival rules are current in `generated-companion-arrival-builds-current.md`.
 
-**[AIMEE] Respec** — leaning yes for wild companions, since otherwise they're a lottery on someone else's choices.
+“Wild companion” is retired here because it confused generated people with tamed animals. Animals
+do not use human trees; see `animal-companion-combat-current.md`.
 
 ## 7. What this gives the existing skills
 
@@ -218,13 +224,14 @@ Each branch runs **passive → skill → passive → skill → passive → capst
 
 **Sight and Read don't fit any of the nine**, and that's informative: they're **knowledge** skills in a game whose progression is literacy. **[PROPOSAL]** they belong to the **analysis** progression — instruments and tiers — rather than to combat, which also gives `clause-audit.md` F2 another hook to hang on.
 
-**Nodes needing new skills:** Shatter · Finish · First Strike · Brace · Sidestep · Interpose · Envenom · Conceal · Ambush · Elemental Strike — **ten new skills**, plus nine capstones.
+**Nodes needing new skills:** Shatter · Finish · First Strike · Brace · Sidestep · Interpose · Envenom · Conceal · Ambush · Emanation Strike — **ten new skills**, plus nine capstones.
 
-## 8. Open
+## 8. Historical open questions — current status
 
-1. **Branch depth** — 8 is a proposal. It sets max level at 25.
-2. **Point income** — 1 per level proposed.
-3. **Respec**, for wild companions and for everyone.
-4. **Do animals use these trees?** *(Leaning: a reduced set — Force, Fortitude, Swiftness only, since Craft and Protection imply intent.)*
-5. **Kindling's name** — it leans fiery when it also covers freezing and shock.
+1. **Branch depth:** current at 8; playtest timing.
+2. **Point income:** current at 1 per level, cap 25.
+3. **Respec:** implemented as paid full respec at the Spring.
+4. **Animals:** current placeholder uses no tree; see `animal-companion-combat-current.md`.
+5. **Branch naming resolved:** keep `kindling` as the implementation ID and display **Emanation** for
+   the branch covering heat, caustic and light.
 6. **Whether capstones are too strong.** Guardian and Killing Stroke especially — both are near-absolute, and near-absolute is what a capstone should be, but they want testing.

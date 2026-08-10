@@ -123,12 +123,38 @@
 - [x] **Flora** (`flora-system-spec.md`) — the trait model, metabolism, growth writing the ground,
       harvest by tissue, and defended flora. `growth` had nothing producing it; now plants do, and
       the metabolism axis lets a lightless volcanic world teem instead of being capped twice over.
-      Open, and logged as Q48: whether flora and creatures should share one world-wide life budget
+      Q48 answered in session 18: flora and creatures keep separate budgets and influence one
+      another through producer productivity and trophic depth
 - [ ] **Living worlds** (`living-worlds-spec.md`) — creatures act on each other during a run.
       `FoeState.bleedRounds` is already ticked and nothing sets it until this lands.
 - [ ] `WorldProfile` — the interface between readings and worldgen the spine specs. Terrain and
       spawns currently read readings directly, which works but won't compose as targets grow.
-- [ ] Movement cost from terrain — passability is in, but crossing growth costs the same as stone
+- [x] **Terrain movement cost (session 18)** — tall growth and mud each cost one additional world
+      turn; groundcover remains normal. Pathfinding must prefer cheaper routes where appropriate,
+      communicate route cost, and pause before costly terrain when danger is nearby. Marsh
+      conditions must paint a legible mud ground type where wet hydrology meets passable soil
+- [x] **World-screen minimap placement (session 18)** — `MinimapView` exists but is not embedded;
+      place it under the movement/navigation controls as session 13 originally specified
+- [ ] **Writing every world (session 18)** — **diary-page pacing is built:** while an eligible diary
+      page remains, place one with a 10% chance of a second; only one nominated diary page at a time
+      accrues the eight-world mismatched-placement patience fallback. Remaining: add non-diary
+      writing and the ~70/30 diary/other interleave so the ≥1-writing promise survives an exhausted
+      or temporarily ineligible diary pool
+- [x] **Complete the instrument behavior** (`instrument-system-audit.md`, session 18) — **field loop
+      built:** the Survey Post configures the next run's carried loadout; the mid-run Field Kit shows
+      those instruments beside out-of-combat consumables; one-turn Survey uses every carried instrument, records compact permanent per-subject
+      observations, and Desk/history share the calibrated-subject gate. Tier 3 now attributes each
+      focus's scaled primary and implicit secondary effects at the Desk and in later-readable world
+      records. Tier 4 now shows the numerical greed, contradiction, size and accepted-danger
+      stability terms, and contributor marking now comes from each focus's real marginal greed
+      arithmetic rather than authored sentence polarity; earned red/green prose underlining remains
+      at tier 4 and reads that derived result. Good/fine instruments now use property-based recipes,
+      spend the weakest qualifying material samples, and freeze their precision at departure.
+      Keep qualitative flora/life forecasting at early tiers. Tier-5 living distributions are built.
+- [ ] **Complete apex rewards** (`apex-system-audit.md`, session 18) — **core rewards built:**
+      Throughstroke; Living Hook encounter growth capped at +2; Warded Haft passive multiplicative
+      protection; Two-Natured strike wiring; apex bestiary badges/collection; and the 3% locked-cache
+      wild weapon bonus. Remaining later hunting layer: authored condition affinities
 - [ ] Retire `yieldModifiers` / `enemyTableModifiers` / `enemyTierDelta` now nothing generates from
       them; `primaryTarget` lives on the same object and must survive the surgery (code-audit-2 §3.2)
 - [ ] Retire `creatures.json` — nothing generates from it; it survives only as the fallback for a
@@ -143,13 +169,15 @@
 - [x] Cluster outline, so adjacent-and-joined reads unlike adjacent-and-separate
 - [x] Corrected invariant: translate or rotate the whole page and it says the same thing;
       breaking a connection changes what it says
-- [x] Qualifier ladders — Intensity, Scale, Count generic; Phase hydrology-only; "Bright" cut
-- [ ] Only Intensity reaches the resolver — Scale and Count are written and read back, but nothing
-      downstream consumes them yet
+- [x] Qualifier ladders — Intensity, Scale, Count generic; "Bright" cut. Hydrology Phase exists in
+      data but is inert and should be hidden pending DRQ-094
+- [x] Intensity, Scale and Count reach the resolver; Scale also drives extent/world size and Count
+      remains sublinear. Small's below-ordinary correction and link validation remain to implement
 - [ ] Open: does breaking a mid-chain link give two clusters or loose sigils?
 - [ ] Open: is the target sigil mandatory, or can an unambiguous source imply its target?
 - [ ] Open: can qualifiers modify the target rather than the source?
-- [ ] Re-audit the 51 qualifiers against §4
+- [x] Re-audit the qualifier catalogue — live scope is 17, not the obsolete 51; see
+      `docs/qualifier-grammar-audit-current.md`
 
 ## Session 13
 - [x] Variable world size, read off the Scale qualifier — no new mechanism needed
@@ -179,7 +207,10 @@
       (Aimee, 5–6 Aug). A station with `builtBy` in `stations.json` is found-then-built: meet the
       person out in a world, then raise the building at the base for its `buildCost`. Found and
       built are separate states. Halloway the smith and the Blacksmith are the first pair.
-- [ ] Open: the full list of crafting trades — Tannery and Apothecary specced, unbuilt (Q37)
+- [ ] The full list of crafting trades remains incomplete. Tannery is unbuilt; the Apothecary
+      engine, inferred/persistent property recipes, consumables and debug harness exist. Nessa's
+      identity, signature and dependency-safe pages are now authored/live, so production unlock is
+      an ordinary station-integration task rather than a design block.
 - [x] Ordinary gear from encounters — a won fight can drop something to wear, per tier fought
 
 ## Content volume — the systems were outrunning what they draw on (audit #8 §3)
@@ -383,7 +414,7 @@
 ## Analysis — the third progression axis (decisions-session-8)
 - [x] Analysis tiers stored in Reality; description always describes, attribution is gated
 - [x] Red/green underlining and named contradictions moved to tier 4, where they belong
-- [ ] Field instruments — per-target, crafted, grade affects precision
+- [x] Field instruments — per-target; good/fine upgrades are property-crafted and grade affects precision
 - [ ] The page lens — predicts from readings you've already taken; field work feeds it
 - [ ] Readings as permanent knowledge, stored like specimens (observation stored, meaning derived)
 - [ ] Tiers 2, 3 and 5 (readable targets, sigil attribution incl. secondaries, the living layer)

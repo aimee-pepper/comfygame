@@ -1,6 +1,10 @@
 # Questions for Design — from Claude Code
 
-> **STATUS:** **Q1–Q10 answered** in `decisions-log.md` §§ Session 2–3. Kept for the record; see `engineering-notes-session-2.md` and `-session-3.md` for what was built from them.
+> **STATUS: HISTORICAL INTAKE, NOT CURRENT AUTHORITY.** Kept in place so the questions and shipped
+> interpretations remain traceable. Route current work through `current-design-index.md`,
+> `design-review-queue.md` and the relevant `*-current.md` document. Newer dated decisions supersede
+> answers here; in particular Q35's rarity-based +1/+2/+3/+5 reforge ceiling is superseded by
+> `crafted-gear-migration-current.md` and Decision 91.
 
 Ambiguities hit while building. Each one has a **conservative interpretation already shipped**, so
 nothing is blocked; answering just tells me whether to keep or change it. Answers belong in
@@ -1256,7 +1260,7 @@ ready, not that it is coming, which is what keeps it a hazard you walk *into*.
 **Measured:** 12 of them across 150 generated worlds, so about one world in twelve holds one. The
 spec asked for rare and that's rare.
 
-### 3. §9.4 — should flora draw from the same budget as creatures? **No, for now.**
+### 3. §9.4 — should flora draw from the same budget as creatures? **ANSWERED: no.**
 
 They have separate budgets, both scaled by Vitality. One shared world-wide life budget split between
 producers and consumers would be more ecologically honest *and* more constraining — a world of
@@ -1264,8 +1268,8 @@ enormous animals would have to be a world of thin plants — and I think it's th
 didn't do it because it changes every existing creature-budget number at once, and rebalancing the
 whole animal cast is not a thing to do quietly inside a flora commit.
 
-**This is the one I'd like an answer on.** If you want it, it's a small change to
-`GrowingConditions.budget` and `WorldTendencies.budget` plus a retune.
+**Aimee, session 18:** keep the budgets separate. Flora and creatures influence one another through
+producer productivity and trophic depth rather than spending a single zero-sum trait budget.
 
 ### And one thing I changed that you should know about
 

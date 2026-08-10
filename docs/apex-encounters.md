@@ -1,5 +1,9 @@
 # Apex Encounters & Wild-Only Weapons
 
+**Implementation status, 8 Aug 2026:** the encounter generator, risk draw and consent rules are
+built. Five weapon rules work; three are inert, the locked-cache lottery is missing, and several
+open clauses require review. See `apex-system-audit.md`.
+
 > *"there need to be some rare weapon drops that only happen out in the wild. maybe there should be scary only-by-choice mob encounters out in the wild that they have a guaranteed drop from, but there's a tiny percent drop chance from normal mobs or locked caches?"*
 
 **Two routes to the same thing: hunt it deliberately, or get lucky.** Which respects both a player who wants the fight and one who doesn't.
@@ -54,7 +58,7 @@ Spawn weight rises with the things that already mean *this world is dangerous an
 | **Two-natured blade** | Carries **two damage types** at once | No material has two dominant armaments |
 | **Long fang** | **Far reach** on a close weapon | Reach comes from the haft; this one doesn't |
 | **Ranked spear** | Strikes **both ranks** in one blow | Nothing crafted reaches past the front |
-| **Rimed edge** | Applies a status **without a coating** | Coatings are consumed; this isn't |
+| **Barbed edge** *(placeholder; replaces Rimed edge)* | Applies legacy bleed **without a coating** | Coatings are consumed; this isn't |
 | **Living hook** | **Grade rises** as you use it | Grade is set by the material at forging |
 | **Quiet knife** | Attacking **doesn't break concealment** | Nothing else in Shadow allows it |
 | **Bloodletter** | Bleed that **doesn't expire** | Every status has a duration |

@@ -1,0 +1,153 @@
+# Running Design Review Queue
+
+**Owner:** Aimee + game-design lead  
+**Purpose:** Questions and placeholder decisions that should not block ordinary design or engineering
+work. Current design documents continue to state the active rule; this file records what Aimee may
+want to revisit.
+
+## How to read this file
+
+- **Review:** a meaningful choice still needs Aimee.
+- **Placeholder:** engineering/design may proceed with the stated rule, but it remains easy to revise.
+- **Playtest:** the design is current and should change only in response to observed feel or balance.
+- **Blocked:** do not invent downstream canon until the named prerequisite is settled.
+
+## Active
+
+| ID | State | Area | Current working decision | Revisit when |
+|---|---|---|---|---|
+| DRQ-001 | **Playtest** | Diary recovery | The eight-world recovery rule applies to one eligible diary page at a time; revisit its narrative destructiveness after playtesting page flow | Several long campaigns have exercised recovery |
+| DRQ-002 | **Placeholder** | Apothecary coatings | Four coatings map to poison, burn, bleed and dazzle. Working names are Venom, Firebrand, Briar Oil and Flashsalt; no freeze/shock statuses | Coatings are playable and names/ingredients can be felt in context |
+| DRQ-004 | **Blocked** | Tam | Keep Tam, but do not define their unique act or reserve Glass yet. Anchoring is settled enough; the remaining blockers are the Great Work's endgame operation, Reality reset and Glass/quartz | Those three prerequisites have decisions |
+| DRQ-005 | **Playtest** | Dagg | Diary teaches `Self: recovery complete`, firing on the first actionable turn after all skipped-turn debt is paid | Dagg/Overbear gambits can be exercised in real party combat |
+| DRQ-006 | **Playtest** | Ashe | Ground redirects one emanation event from another ally to Ashe, halves damage, and carries its affliction; working duration 2/cooldown 4 | Ashe and multi-target emanation threats are playable |
+| DRQ-013 | **Placeholder** | Apex weapon | Barbed Edge replaces Rimed Edge and applies legacy bleed without a coating; final name/art may change | Apex weapon playtest/art pass |
+| DRQ-016 | **Playtest** | Anchor capacity | The first anchored realm is sustain-free; later realms create a soft limit through escalating obligations, with no hard slot cap | Several campaigns maintain different-sized realm portfolios |
+| DRQ-017 | **Review** | Atlas progress | Track all anchored realms and their signatures, but do not yet decide what qualifies for Great Work progress or how many realms the Atlas requires | The Great Work receives its dedicated story pass |
+| DRQ-018 | **Review** | Reality reset | Keep reset rules outside anchoring v1; do not reset anchors, travellers or base progress until the reset's purpose and reward are settled together | A complete first campaign loop exists to evaluate |
+| DRQ-019 | **Placeholder** | Anchor balance | Atlas Seams appear in 25% of worlds and cost max(10 essence, 25% of born premium); Anchor Frames are paid entirely at craft; born-anchored remains most expensive | All three routes can be playtested together |
+| DRQ-026 | **Playtest** | Waystone recipe | Reversible placeholder replaces repeatable Adamant with Rift-glass while retaining the hardness-qualified world resource, Mote + 30 essence; this protects Adamant's permanent-progression role and makes interruption insurance less hoardable | Review after Rift-glass acquisition and repeated emergency-return use are both playable |
+| DRQ-024 | **Playtest** | Midgame signatures | Nessa, Corrin, Dagg, Rook and Lys have dependency-safe four-condition profiles in `traveller-signatures-mid-current.md` | Signature simulation and deliberate-book fixtures exist for unimplemented travellers |
+| DRQ-025 | **Playtest** | Five-condition signatures | Bracken, Fen, Wren, Kestrel and Maud use the profiles in `traveller-signatures-five-condition-current.md`; tune match rates without changing their contrasts | Five-condition deliberate-book fixtures and campaign hunts exist |
+| DRQ-027 | **Playtest** | Marrick signature | Use the six-condition banded profile in `traveller-signature-marrick-current.md`; preserve its group-routine identity while tuning thresholds | Six-condition deliberate-book fixture and hunt exist |
+| DRQ-028 | **Playtest** | Seven/eight signatures | Sabine, Grimmond and Oda use dependency-safe profiles in `traveller-signatures-seven-eight-current.md` | Refined-hand deliberate fixtures and late campaign hunts exist |
+| DRQ-029 | **Playtest** | Auber/Ashe signatures | Use the eight-condition process/emanation profiles in `traveller-signatures-auber-ashe-current.md` | Refined-hand deliberate fixtures and late hunts exist |
+| DRQ-030 | **Playtest** | Perren/Nine signatures | Use the nine-condition interpretive profiles in `traveller-signatures-perren-nine-current.md`; Perren's deliberate instability must remain survivable | Endgame deliberate fixtures and full hunts exist |
+| DRQ-031 | **Playtest** | Worldwork | Production is `1 + Worldwork + floor((level-1)/5)` with one visible authored 0–3 rating; do not add task-specific worker stats yet | Several realm portfolios use varied companions |
+| DRQ-032 | **Playtest** | Implemented-six diaries | Complete packet totals are Mara 6, Edren 7, Halloway 6, Isolde 7, Sela 7, Tovin 14; deferred relationship pages land with their target definitions | Full page flow and recovery rule can be exercised |
+| DRQ-033 | **Playtest** | Early–mid diaries | Bryn, Orsa, Vance and Talin have complete seven-page packets; fighter pages require a validated one-field gambit teaching schema | These four diaries can be found out of order in campaign play |
+| DRQ-034 | **Playtest** | Midgame diaries | Nessa/Corrin/Dagg/Rook have 8 pages and Lys 9 in `diary-packets-midgame-current.md`; deferred forward references land with target IDs | Midgame page flow, gambit teaching and relationship redundancy are playable |
+| DRQ-035 | **Playtest** | Five-condition diaries | Bracken/Fen have 8 pages and Wren/Kestrel/Maud 9 in `diary-packets-five-condition-current.md`; later relationship pages remain validation-gated | Specialist diary pacing and singular teaching rewards are playable |
+| DRQ-036 | **Playtest** | Marrick diary | Ten pages; `subject_ally_hp_below_any` is a condition and does not imply lowest-HP targeting | Gambit composition and diary arc are playable |
+| DRQ-037 | **Playtest** | Late specialist diaries | Sabine10, Grimmond11 and Oda12; strict deferred relationship targets and one singular reward each | Late diary pacing and teaching delivery are playable |
+| DRQ-038 | **Playtest** | Auber/Ashe diaries | Twelve pages each; Ashe's subject requires an active emanation producer, Ground remains starting kit, and the site lead uses DRQ-039 | Late hunts, teaching semantics and arcs are playable |
+| DRQ-039 | **Placeholder** | Ashe site | Use the reversible thermal old-ruin profile in `spent-emanation-housing-site-current.md`; no item or schematic reward | Site fixtures and Ashe's diary are playable |
+| DRQ-040 | **Playtest** | Perren hunt | Opposed-pressure signature must remain difficult but survivable; diary is deliberately order-independent | Perren fixture and stochastic book are playable |
+| DRQ-041 | **Playtest** | Nine diary | Thirteen-page present-continuity arc; Dream adds no recovered-biography or memory subsystem | Nine hunt and book are playable |
+| DRQ-042 | **Playtest** | Later diary focuses | Twelve directional profiles in `diary-focus-profiles-later-current.md`; signs/tags/contrasts are fixed, magnitudes tunable | Single-focus and compound fixtures are generated |
+| DRQ-043 | **Placeholder** | Diary rewards | Registry fixes 18 focus, 8 gambit, 1 pattern and 1 schematic owners; stable semantic IDs may map one-to-one to existing code IDs if recorded | Generic reward schema and fixtures are green |
+| DRQ-044 | **Review** | Traveller's Token | Recommend cutting it: valid signature matches already place travellers at 100%, while forcing a non-match would make diary clues dishonest | Aimee reviews the challenge or playtest exposes another visible expedition problem |
+| DRQ-045 | **Playtest** | Apex affinities | Eight additive condition profiles bias weapon selection; appearance remains on the risk/value draw and no result becomes guaranteed | Deliberate and neutral distribution fixtures are measured |
+| DRQ-046 | **Placeholder** | Animal combat | Animals use trait-derived fixed kits, normal levels and ordinary gambits; no skill tree, gear, bond meter or free sixth slot | Taming/Menagerie and mixed parties are playable |
+| DRQ-047 | **Playtest** | Combat progression | Eight nodes/branch, one point/level, cap 25 and paid Spring respec are current; authored leans are a small bonus above 24 standard points | Long mixed-XP campaigns reach capstones and respecs |
+| DRQ-048 | **Playtest** | Building staffing | Effective tier is max(purchased, keeper-earned), not sum; default milestones 8/16/24 and per-station home discounts are tunable | Several owners rotate among party/home/realm |
+| DRQ-049 | **Playtest** | Exchange / Recycler | Gold remains separate; stock is expedition-refreshed staples, selling is protected, and recycling distinguishes real crafted provenance from authored found-gear salvage | Vance's full station and gear crafting are playable together |
+| DRQ-050 | **Playtest** | Compound assembly | Scriptorium tier-1 capability formalizes a previously bound 2–5-atom statement; no repeat-world grind or recursive compounds | Personal runebook authoring is usable on phone |
+| DRQ-051 | **Playtest** | Station trees | Extend the existing station-owned branch architecture; nodes add decisions/families rather than tiny throughput bonuses | Several specialist stations have full branches |
+| DRQ-052 | **Playtest** | Random companions | Persistent generated people use one reachable want and additive world appearance capped at 20%; no diary or station | Opening campaigns and Tavern recurrence can be measured |
+| DRQ-053 | **Placeholder** | Tavern visitors | Three rotating seats refresh on expedition resolution; unmet people remain in a durable met pool and cannot expire | Orsa and several unresolved visitors are playable |
+| DRQ-054 | **Playtest** | Curio knowledge | Two resolved examples permanently identify a family in Reality; known duplicates reveal freely | A larger curio catalogue exercises repeat discovery |
+| DRQ-055 | **Playtest** | Use-to-identify | “Try it” appears only in a valid attributable context and applies the real effect; failed/contextless attempts cost nothing | Consumable and key curios can be tested in-world |
+| DRQ-056 | **Playtest** | Rune pity | One authored focus for the next known unrecruited traveller escalates 10/25/40/55/70/100% across resolved expeditions | Long campaigns measure dry streaks and pacing |
+| DRQ-057 | **Playtest** | Library literacy | Recovered passages say when current vocabulary cannot write them reliably, without naming a solution | Reachability fixtures and player interpretation tests exist |
+| DRQ-058 | **Playtest** | Palette grouping | Illumination uses Light/Shadow, Thermal Warming/Cooling and Vitality Growing/Consuming via explicit per-subject metadata | Full vocabulary is visible on phone with real art |
+| DRQ-059 | **Placeholder** | Vocabulary migration | Rename sources→focuses and old symbols→compounds without changing stable IDs or mechanics | Engineering schedules the mechanical migration with save fixtures |
+| DRQ-060 | **Playtest** | Predation | Trait-derived hunting runs only in active awareness; visible approach permits intervention and kills leave 50% carcasses | Dense food-web worlds are profiled on device |
+| DRQ-061 | **Placeholder** | Group motion | Herd/solitary preferences use only local spare movement and may be deferred if turn latency is visible | Predation is stable and performance measured |
+| DRQ-062 | **Playtest** | Count prose | Single/Pair/Few mean 1/2/3; Many/Countless retain qualitative names while representative math stays 4/5 | Full focus count-reading metadata and page fixtures exist |
+| DRQ-063 | **Playtest** | Void cap | Any un-negated Illumination Void suppresses whole celestial-light causes and their secondaries; non-celestial light remains | Contradiction, ecology and projection fixtures are playable |
+| DRQ-064 | **Playtest** | Gear recipes | Ship 21 property-driven physical families rather than mirroring every found item; specialist profiles own distinct tactical domains | Full crafting flow and material economy are playable |
+| DRQ-065 | **Placeholder** | Reforging | Reforge rank improves within construction tier (0.2 step, max 3) and never bypasses specialist tier-3/4 construction | Existing upgraded saves migrate and combat balance is measured |
+| DRQ-066 | **Playtest** | Crafted quality | Grade is 60% weakest input + 40% average; natural tier bands 0–39/40–64/65–84/85+, then station cap | Wide material samples and specialist stations are usable |
+| DRQ-067 | **Placeholder** | Realm harvest rate | Four surplus Worldwork points produce one unit; partial progress persists | Multiple anchored realms are staffed across several expeditions |
+| DRQ-068 | **Playtest** | Realm delivery capacity | Six completed units per realm; full trays pause safely | Production has run long enough to test both short and hour-long sessions |
+| DRQ-069 | **Review** | Realm-job depth | Keep one selected discovered renewable yield and one Worldwork aptitude unless play proves distinct jobs are needed | The first deterministic production loop is playable |
+| DRQ-070 | **Playtest** | Tutorial density | One non-blocking contextual card per screen, durable-fact completion and Field Notes replay | Several fresh and returning players complete two bindings |
+| DRQ-071 | **Review** | Opening safety | Do not weaken a hidden tutorial world; if needed, use an explicit debug-tunable opening encounter envelope | Fresh-save first-expedition failure/return has been tested |
+| DRQ-072 | **Playtest** | Second-binding exercise | Invite one player-chosen request and a World History comparison without prescribing Mara's solution | The comparison view and focus migration are live |
+| DRQ-073 | **Playtest** | Generated arrival builds | Generated people lock to Binder level at first meeting, arrive with a visible persisted three-branch plan and may fully respec | Tavern/world recruits appear across early and late campaigns |
+| DRQ-074 | **Playtest** | Animal trust | Attend reveals one deterministic condition; two-turn patient presence is the fallback and one reachable property offering is the only alternate first-slice family | Sabine/Menagerie and varied worlds are playable |
+| DRQ-075 | **Review** | Menagerie capacity | Ship without a hard animal cap; use grouping/search before considering a kennel limit | Long campaigns accumulate enough distinct animals to expose list pressure |
+| DRQ-076 | **Playtest** | Tannery boundary | Corrin owns three flexible tier-1/2 families and gates only advanced capacity; bindings remain a capability rather than inventory | Tannery, gear crafting and late capacity are playable together |
+| DRQ-077 | **Playtest** | Distillery cores | Blank crystal costs 40 essence + 2 Quartz; three attunements consume a qualifying provenanced sample and use 70% grade/30% property potency | Auber and one Channelworks housing are playable |
+| DRQ-078 | **Hold** | Infusion | Keep the approved concentrate-with-a-cost direction, but implement no universal Infuse action until one named crafted profile has a designed trade-off | Crafted-instance schema and a real consumer exist |
+| DRQ-079 | **Playtest** | Deep signs | At most one Buried seam in 20% of hard/relieved eligible worlds; sign is saved before Grimmond and never rerolled | Grimmond and anchored revisits are playable |
+| DRQ-080 | **Placeholder** | Deep support | Seams have 3–5 safe pulls; one brace may trade hard/flexible world resources + 10 essence for one extra pull while leaving support | Deep resources and crafting sinks can be measured together |
+| DRQ-081 | **Playtest** | Library depth | Library stays open from new game; Lys becomes keeper and adds authored search/cross-reference/study without solving signatures | Early pages and post-Lys corpus are playable in one campaign |
+| DRQ-082 | **Playtest** | Station build bundles | Use the reversible mid/late resource bundles in `station-integration-matrix-current.md`; every built station must be useful immediately | Full roster and deliberate resource acquisition are playable |
+| DRQ-083 | **Placeholder** | Oda arrival fixture | Oda carries one damaged Heat Conduit with an intact non-recoverable core so Channelworks is useful before Auber enables repeatable cores | Oda→Auber progression can be played end to end |
+| DRQ-084 | **Playtest** | Site breadth | Add Salt Pan, Wind-carved Gallery, Rootbound Sink, Obsidian Vent, Flooded Causeway and Signal Cairn after reachability/distribution fixtures | Site generation and generic writing hosts are measurable |
+| DRQ-085 | **Resolved boundary** | Site Stability | Site contents feed ordinary world value/greed; authored site deltas remain retired so sites and Tears are not charged twice | Keep a regression fixture as catalogue grows |
+| DRQ-086 | **Playtest** | Focus expansion | Add the exact 23-entry 62→85 scope in metadata-complete batches; signs/purposes stay fixed while magnitudes tune | Single-focus, contradiction and distribution fixtures exist per batch |
+| DRQ-087 | **Review** | Chill naming | Use Chill for direct dry cold; retire the misleading Frost proposal because frost implies water | Thermal copy/art pass or Aimee preference |
+| DRQ-088 | **Bug / settled boundary** | Carried-item safety | Partial failure loss applies only to net-new haul; every unused pre-departure item returns | Stack/provenance failure fixtures are green |
+| DRQ-089 | **Review** | Failure recovery agency | Compare deterministic random 50% acquired-item retention with player-chosen retained slots at the same budget | Both outcome summaries can be device-playtested |
+| DRQ-090 | **Playtest** | Failure fraction | Keep 50% acquired haul as current placeholder; loss summary must name recovered and lost objects | Greedy and ordinary runs fail across a longer campaign |
+| DRQ-091 | **Playtest** | Armour gambit marks | Talin uses absolute current-armour marks 1/3/5; HP percentage marks remain incompatible | Talin's teaching and varied natural armour are playable |
+| DRQ-092 | **Playtest** | Found-writing mix | Guarantee one discoverable writing; start 70/30 diary/other with 10% second and other pool led by contextual Field notes | Long campaigns with full, sparse and exhausted diary pools |
+| DRQ-093 | **Playtest** | Writing placement | Place guaranteed writing in the nearest third of reachable eligible tiles, excluding first two steps | Short/large/high-greed worlds are resolved on device |
+| DRQ-094 | **Review** | Hydrology Phase | Current Frozen/Solid/Liquid/Vaporous choices are inert and do not match standing/flowing/frozen/airborne simulation forms; hide them and recommend the exact simulation vocabulary | Aimee reviews the four replacement words and redirection semantics |
+| DRQ-095 | **Playtest** | Scale centre | Treat Minute/Small/unwritten/Large/Vast as offsets -2/-1/0/+1/+2 so Small is not mechanically ordinary | Qualifier fixtures and pre-bind projections run across all subjects |
+| DRQ-096 | **Playtest** | Cycle clock | Peak bands stop/64/40/28/20 turns; regularity adds deterministic bounded period jitter and never reverses time | Deliberate Tide/Orrery/Drift/Stillness worlds run across short and long expeditions |
+| DRQ-097 | **Hold** | Cycle amplitude depth | Keep current flora-storage consequence; do not invent global hazards until per-phase world readings have a real dynamic-state pass | Period/regularity clock is playable and dynamic ecology is scheduled |
+| DRQ-098 | **Review** | Separate Quirk layer | Retire the obsolete random Quirk catalogue and veto/reroll affordance; keep paired opportunity/consequence as a system-wide rule | Aimee reviews the boundary or play reveals a distinct unmet need |
+| DRQ-099 | **Review / Playtest** | Dim Sky fossils | Preserve great Cloud, vision -1 and derived ecology; verify then retire legacy creature weight and likely flat tier +1 rather than treating them as quirk identity | Generated-world comparison and save fixtures are available |
+| DRQ-100 | **Review** | Negation grammar | Keep six stable authored contradiction IDs dormant; do not add universal Negate until a focus-specific `without Target` branch is phone-readable and rejects invalid secondaries | Aimee reviews the authorship value or a dedicated writing-grammar proof exists |
+| DRQ-101 | **Bug / settled ecology boundary** | Green in the dark | Disable the Root-based assertion: Root does not promise photosynthesis, and fungal/chemosynthetic dark growth is valid | Re-enable only with an honest explicit photosynthetic assertion |
+| DRQ-102 | **Playtest** | Random assertion frequency | Unwritten results may form assertion contradictions, but blank-page incidence should remain <=15% provisionally | Diagnostics record a large deterministic seed sample and campaign feel |
+| DRQ-103 | **Bug / settled knowledge boundary** | Tier-3 calibration | Filter focus contribution/secondary attribution by calibrated affected subject on both Desk and History | Cross-surface disclosure fixtures are green |
+| DRQ-104 | **Playtest** | Analysis density | Keep prose and Stability always visible; collapse readback and advanced sections independently if full eight-subject pages become unwieldy on phone | Native-device late-tier pages can be reviewed |
+| DRQ-105 | **Bug / settled UI request** | Party Stats tab | Roster keeps brief Level/Health/Rank status but removes the five core-attribute strip; full values live in Stats | Device comparison across a five-person party |
+| DRQ-106 | **Bug / settled disclosure** | Minimap writing leak | Diary/other-writing and site markers require revealed/discovered state; portal and apex retain their explicit always-known rules | Hidden/revealed minimap fixtures pass |
+| DRQ-107 | **Bug / settled outcome semantics** | Failure taxonomy | Persist portal/waystone/defeat/collapse/future-abandon separately; do not count every partial return as collapse | History, recap and lifetime counters distinguish causes |
+| DRQ-108 | **Bug / completion boundary** | Finite reward loss | A truly one-copy narrative/progression object must commit, return protected or remain recoverable until banked | Exhausted-source partial-loss fixtures cannot create a missable campaign |
+| DRQ-109 | **Playtest** | Opening lesson density | Ship one anchored card per screen/context using the exact slices 1–2 order; never block blank-page or genuine first-world outcomes | Fresh and migrated saves complete two bindings on device |
+| DRQ-110 | **Placeholder** | Legacy gear migration | Preserve old effective smith power by promoting paid upgrades into construction tier up to 4 and retaining excess as non-growing legacy credit; future reforge ranks are 0–3 at 0.2 power each | Migration fixtures and old/new gear can be compared in combat and specialist rebuild UI |
+| DRQ-111 | **Playtest** | Physical construction cost | Charge 12/24/48/80 essence by actual output tier after station cap; specialists permit rather than guarantee high tier, and poor/wasted stock is confirmed visibly | One family from each physical station is craftable with varied-grade stock and Home discounts |
+| DRQ-112 | **Playtest** | Found-writing breadth | Route marks reveal 2–4 safe local terrain tiles, Site fragments add disclosure-safe site prose, and Working scraps teach one currently reachable ordinary recipe; ineligible weight becomes Field note | All families are forced/generated/collected across sparse and exhausted pools |
+| DRQ-113 | **Playtest** | Field-note mix | Within Field notes start terrain/light-growth-water-trace at 35/20/20/15/10, always falling back to a truthful local terrain fact | Long runs measure repetition and whether notes feel world-specific without leaking analysis |
+| DRQ-114 | **Playtest** | Exchange economy | Use authored 1/2/5/12 resource sell bands, 3× staple/uncommon buys, harsh 10 essence→1 gold / 8 gold→10 essence door, and persisted expedition-refreshed stock | Exchange/Recycler, crafting and several campaign shortages can be played together |
+| DRQ-115 | **Placeholder** | Recycler sample choice | Cumulative real construction receipt survives rebuild; recover max(1,floor(count×40/55/70%)) from 2+ inputs and let the player choose exact samples | Crafted/rebuilt/found gear recycling UI and anti-loop fixtures are playable |
+| DRQ-116 | **Placeholder** | Found-gear salvage | Authored profiles may return reclaimed world resources for visibly forged/mineral gear or reclaimed samples for organic gear; tier bands return 1/2/3 outputs and never assert original provenance | Recycler profiles can be compared against actual gear art and crafting recipes |
+| DRQ-117 | **Playtest** | First-return routing | Freeze exactly one result-driven destination per first return, prioritizing new writing, unidentified returned objects, needed raw essence, a new traveller, then another bind | Fresh saves return with varied mixed hauls and exit kinds |
+| DRQ-118 | **Playtest** | History comparison | Optional lesson asks for one semantic request change; comparison emphasizes authored differences while explicitly preserving uncontrolled chance and current analysis gates | Two-world comparisons are exercised with blank, one-change and multi-change pages |
+| DRQ-119 | **Playtest** | Combat/recruit teaching | Teach one acting/action card, visible Unbind retreat, post-manual gambits, and separate Firepit-versus-Party ownership without weakening combat or protecting a declined traveller | Fresh saves encounter varied formations and recruit with both available/full Firepits |
+| DRQ-120 | **Playtest** | Later tutorial hooks | Attach final hooks only to real decisions and permanent help: complete clues, build preview, carried instrument, curio routes, full satchel, real collapse, anchoring routes and Worldwork | Each owning system is playable and replayable on fresh/migrated saves |
+| DRQ-121 | **Resolved boundary** | Tannery first usefulness | Successful construction grants the foundational Wear root so all three tier-1 families are usable immediately; Tier 2, Carry and Keep remain progression | Keep a built-save migration and station-lifecycle fixture |
+| DRQ-122 | **Playtest** | Specialist station tiers | Armoury/Bowyer/Weaponsmith tier 0 includes one Tier-3 root; tier 1 broadens authored choices while staying capped at 3; tier 2 permits Tier 4 | All three specialist shops are built and upgraded with varied-grade stock |
+| DRQ-123 | **Placeholder** | Armoury profile offsets | Rigid contributes full physical power, Balanced −0.5 and Insulated −1.0 while all retain actual construction tier and selected-sample insulation | Tier-3/4 Armoury rebuilds face varied physical and heat threats |
+| DRQ-124 | **Playtest** | Weaponsmith fitting | Fitting remains visible recipe/reach/stat-lean advice with freely transferable output; Maud's diary pattern unlocks the chosen-kind mid-reach polearm, not a wearer-bound item subsystem | All four families are crafted for varied party builds |
+| DRQ-125 | **Resolved boundary** | Earned station rungs | Keeper-earned tier satisfies the corresponding station and branch gate without fabricating paid history or charging a redundant lower rung; only a genuinely higher purchased tier costs resources | Preserve cross-route fixtures as station trees expand |
+| DRQ-126 | **Bug / settled boundary** | Raw Essence acquisition | Raw Essence is a dedicated removable wild drop and is excluded from ordinary harvest-node tables/minimap; frequency and yield remain independently tunable | Node-exclusion, drop-placement and diagnostics fixtures are green |
+| DRQ-020 | **Playtest** | Diary focus values | Use the six directional profiles and placeholder magnitudes in `diary-focus-mechanical-profiles-current.md`; tune without erasing their distinctions | All six focuses generate observable worlds |
+| DRQ-021 | **Playtest** | Tovin signature | Use the eight sensory conditions in `traveller-identities-existing-six-current.md`; tune thresholds only, preserving reachability without Drift | Signature-match simulation and a full late-campaign hunt |
+| DRQ-022 | **Playtest** | Early–mid signatures | Bryn, Orsa, Vance and Talin have three-condition profiles in `traveller-signatures-early-mid-current.md`; validate deliberate reachability and accidental rates, especially Vance's Vitality dispersion | Signature simulator accepts unimplemented travellers |
+
+## Resolved elsewhere
+
+This queue does not duplicate the full decision archive. Settled calls live in
+`decisions-session-18.md` and the relevant current system/identity documents. When an active row is
+resolved, move it here with a short pointer rather than deleting its history.
+
+| ID | Resolved | Decision |
+|---|---|---|
+| DRQ-014 | 9 Aug 2026 | Implemented-six phases: Mara/Edren/Halloway `opening`, Isolde `startOfMid`, Sela `mid`, Tovin `late`. |
+| DRQ-015 | 9 Aug 2026 | Sela's station is **The Wayfarer's Table**: shared routes, provisions and field notes; Forager's Shed is superseded. |
+| DRQ-010 | 9 Aug 2026 | Arc retired. Oda teaches an emanation housing schematic; Channelworks families are defined in `channelworks-system-current.md`. |
+| DRQ-011 | 9 Aug 2026 | Maud teaches an exclusive fitting pattern through the Weaponsmith; no world focus or new fitting subsystem is added. |
+| DRQ-007 | 9 Aug 2026 | Mara uses diary-exclusive Scarp with a sheer Relief profile; Bluff is not added. |
+| DRQ-008 | 9 Aug 2026 | Isolde uses Hush, the strongest direct Atmosphere-motion reducer; Cycle alone keeps Stillness. |
+| DRQ-009 | 9 Aug 2026 | Anchoring is current and Tovin has an eight-condition, pre-Drift-reachable signature; exact thresholds move to playtest. |
+| DRQ-003 | 9 Aug 2026 | Stonebark blocks the next affliction in the current combat only; an untriggered guard expires when that encounter ends. |
+| DRQ-012 | 9 Aug 2026 | Keep implementation ID `kindling`; use player-facing **Emanation** for the Craft branch covering heat, caustic, light, projection and resistance. |
+| DRQ-023 | 9 Aug 2026 | Anchor Frame uses six property-matched world resources (2 hard 65, 2 dense 65, 1 flexible 55, 1 reactive 65) plus 60 essence; no Adamant. |

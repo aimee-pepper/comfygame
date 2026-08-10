@@ -1,5 +1,9 @@
 # Companions, Base, Anchoring & the Long Economy (v1 spec)
 
+> **Current authority note (9 Aug 2026):** Anchoring, sustain, dormancy and anchored-world
+> companion safety are superseded by `anchoring-system-current.md`. This document remains proposal
+> history for companion/base ideas that have not received a newer current-design document.
+
 **Status:** first full spec. **[PROPOSAL]** marks my calls — including on four questions previously flagged "Aimee decides" (Q-A anchoring, Q-B sustain, Q-C reality reset, Q-F permanent loss). Those are proposed here so the game is buildable end-to-end; override freely.
 
 ---

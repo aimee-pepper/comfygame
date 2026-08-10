@@ -72,7 +72,10 @@ building tier  =  what you have paid for  +  a slow function of its keeper's lev
 
 Full detail in `combat-trees.md` §7.
 
-### Wild companions arrive at your level (Aimee)
+### Generated companions arrive at your level (superseded detail)
+
+> Current authority: `generated-companion-arrival-builds-current.md`. Generated people have visible,
+> persisted plans and ordinary Spring respec; animals follow `animal-companion-combat-current.md`.
 
 > *"wild companions are found at the same level as the player character I think? which means their skill trees should be partially filled already."*
 

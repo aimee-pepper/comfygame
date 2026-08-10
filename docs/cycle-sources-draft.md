@@ -1,4 +1,8 @@
-# Cycle — a source list (draft for cutting)
+# Cycle — historical source-list draft (superseded)
+
+**Authority notice (9 Aug 2026):** The live catalogue already contains a reviewed six-focus Cycle
+set. Do not cut or implement candidates from this draft. Current vocabulary and the bounded clock
+mechanic are in `cycle-system-current.md`; this file remains as design history.
 
 **Why this exists.** Per-target exclusivity exposed a problem: **Cycle had no primary source of its own.** Period came from how celestials move, amplitude was derived from Illumination and Thermal swing, regularity came from Constancy qualifiers on *other* targets' sources. Under "one primary per target," Cycle's primary would have been the sun — already Illumination's primary.
 
