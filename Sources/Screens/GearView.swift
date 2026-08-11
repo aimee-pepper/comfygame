@@ -11,16 +11,9 @@ struct GearView: View {
     @Environment(\.dismiss) private var dismiss
     let slot: GearSlot
     let member: PartySlot
+    @State private var selectedOption: GameStore.WearableGearOption?
 
     private var worn: EquippedPiece? { store.worn(slot, by: member) }
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
-    private var columns: [GridItem] {
-        dynamicTypeSize.isAccessibilitySize
-            ? [GridItem(.flexible())]
-            : [GridItem(.adaptive(minimum: 150), spacing: 12)]
-    }
-
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -43,19 +36,16 @@ struct GearView: View {
                             .foregroundStyle(.secondary)
                             .frame(minHeight: 44)
                     }
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
-                        ForEach(options) { option in
-                            Button {
-                                if store.equip(option, on: member) { dismiss() }
-                            } label: {
-                                tile(piece: option.piece, definition: option.piece.definition,
-                                     delta: store.gearDelta(wearing: option.piece, for: member),
-                                     count: option.count, location: location(of: option),
-                                     enabled: option.canEquipAtHome)
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(!option.canEquipAtHome)
+                    SixAcrossItemGrid(data: options, id: \.id) { option in
+                        Button { selectedOption = option } label: {
+                            ItemIconTile(icon: option.piece.definition?.icon ?? "questionmark",
+                                         rarity: option.piece.definition?.rarity ?? .common,
+                                         quantity: option.count, identified: true,
+                                         location: gridLocation(of: option),
+                                         accessibilityName: option.piece.displayName,
+                                         isEnabled: option.canEquipAtHome)
                         }
+                        .buttonStyle(.plain)
                     }
 
                     if worn != nil {
@@ -75,6 +65,17 @@ struct GearView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
                 }
+            }
+            .sheet(item: $selectedOption) { option in
+                GearOptionDetailSheet(
+                    option: option, slot: slot, location: location(of: option),
+                    delta: store.gearDelta(wearing: option.piece, for: member),
+                    equip: {
+                        guard store.equip(option, on: member) else { return false }
+                        selectedOption = nil
+                        dismiss()
+                        return true
+                    })
             }
         }
     }
@@ -96,6 +97,15 @@ struct GearView: View {
         case .overflow: "Waiting to sort"
         case .worn(let owner): "Worn by \(store.name(of: owner))"
         case .carried: "Carried in world"
+        }
+    }
+
+    private func gridLocation(of option: GameStore.WearableGearOption) -> ItemGridLocation {
+        switch option.source {
+        case .stored: .stored
+        case .overflow: .waiting
+        case .worn: .worn
+        case .carried: .carried
         }
     }
 
@@ -148,6 +158,71 @@ struct GearView: View {
         guard let gear = definition.gear, let damage = gear.damage else { return nil }
         let reach = gear.reach == .close ? "" : " · \(gear.reach.rawValue) reach"
         return "\(damage.rawValue)\(reach)"
+    }
+}
+
+private struct GearOptionDetailSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let option: GameStore.WearableGearOption
+    let slot: GearSlot
+    let location: String
+    let delta: Int
+    let equip: () -> Bool
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack(spacing: 16) {
+                        ItemIconTile(icon: option.piece.definition?.icon ?? "questionmark",
+                                     rarity: option.piece.definition?.rarity ?? .common,
+                                     quantity: option.count, identified: true,
+                                     location: gridLocation,
+                                     accessibilityName: option.piece.displayName)
+                            .frame(width: 58, height: 58)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(option.piece.displayName).font(.headline)
+                            Text(location).font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                Section("Equipment") {
+                    LabeledContent("Location", value: location)
+                    LabeledContent("Quantity", value: "\(option.count)")
+                    LabeledContent("Power", value: String(format: "%.1f", option.piece.effectivePower))
+                    if let profile = option.piece.gearProfile {
+                        LabeledContent("Tier", value: "\(profile.constructionTier)")
+                        LabeledContent("Reforge", value: "\(profile.reforgeRank) of 3")
+                        if let provenance = profile.displayProvenance {
+                            LabeledContent("Provenance", value: provenance)
+                        }
+                    }
+                    ImprovementBadge(delta: delta, slot: slot)
+                }
+                Section {
+                    Button("Equip") { _ = equip() }
+                        .disabled(!option.canEquipAtHome)
+                    if !option.canEquipAtHome {
+                        Text("Carried gear can be changed after you return home.")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .navigationTitle(option.piece.displayName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
+            }
+        }
+    }
+
+    private var gridLocation: ItemGridLocation {
+        switch option.source {
+        case .stored: .stored
+        case .overflow: .waiting
+        case .worn: .worn
+        case .carried: .carried
+        }
     }
 }
 

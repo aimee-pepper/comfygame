@@ -33,6 +33,7 @@ extension ItemStack {
 /// still open.
 struct LootDecisionCard: View {
     @EnvironmentObject private var store: GameStore
+    @State private var selectedCarried: ItemStack?
 
     var body: some View {
         if let offered = store.pendingLoot.first {
@@ -42,7 +43,10 @@ struct LootDecisionCard: View {
                     .foregroundStyle(.orange)
 
                 HStack(spacing: 10) {
-                    Image(systemName: offered.icon).frame(width: 22).foregroundStyle(offered.rarity.tint)
+                    ItemIconTile(icon: offered.icon, rarity: offered.rarity,
+                                 quantity: offered.count, identified: offered.identified,
+                                 location: .offered, accessibilityName: offered.displayName)
+                        .frame(width: 52, height: 52)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(offered.displayName)
                             .font(.callout.weight(.medium))
@@ -58,21 +62,15 @@ struct LootDecisionCard: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                ForEach(store.state.worlds.activeRun?.satchelItems.stacks ?? []) { carried in
-                    Button {
-                        store.takeOffered(offered, dropping: carried)
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: "arrow.left.arrow.right").font(.caption).foregroundStyle(.secondary)
-                            Text("Drop \(carried.displayName)")
-                                .font(.callout)
-                                .foregroundStyle(carried.rarity.tint)
-                            Spacer(minLength: 0)
-                        }
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
+                let carriedItems = store.state.worlds.activeRun?.satchelItems.stacks ?? []
+                SixAcrossItemGrid(data: carriedItems, id: \.id) { carried in
+                    Button { selectedCarried = carried } label: {
+                        ItemIconTile(icon: carried.icon, rarity: carried.rarity,
+                                     quantity: carried.count, identified: carried.identified,
+                                     location: .carried,
+                                     accessibilityName: carried.displayName)
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.plain)
                 }
 
                 Button(role: .destructive) {
@@ -92,6 +90,60 @@ struct LootDecisionCard: View {
             .padding(14)
             .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.orange.opacity(0.5), lineWidth: 1.5))
+            .sheet(item: $selectedCarried) { carried in
+                LootSwapDetailSheet(carried: carried, offered: offered) {
+                    store.takeOffered(offered, dropping: carried)
+                    selectedCarried = nil
+                }
+            }
+        }
+    }
+}
+
+private struct LootSwapDetailSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let carried: ItemStack
+    let offered: ItemStack
+    let swap: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack(spacing: 16) {
+                        ItemIconTile(icon: carried.icon, rarity: carried.rarity,
+                                     quantity: carried.count, identified: carried.identified,
+                                     location: .carried,
+                                     accessibilityName: carried.displayName)
+                            .frame(width: 58, height: 58)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(carried.displayName).font(.headline).foregroundStyle(carried.rarity.tint)
+                            Text("Carried in world").font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                Section("Details") {
+                    LabeledContent("Quantity", value: "\(carried.count)")
+                    LabeledContent("Location", value: ItemGridLocation.carried.displayName)
+                    if !carried.detail.isEmpty { Text(carried.detail) }
+                    if let blurb = ContentCatalog.shared.item(carried.catalogID)?.blurb, !blurb.isEmpty {
+                        Text(blurb)
+                    }
+                }
+                Section {
+                    Button(role: .destructive) {
+                        swap()
+                        dismiss()
+                    } label: {
+                        Text("Drop this and take \(offered.displayName)")
+                    }
+                }
+            }
+            .navigationTitle(carried.identified ? carried.displayName : "Unknown item")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+            }
         }
     }
 }
