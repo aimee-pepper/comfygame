@@ -214,6 +214,26 @@ final class GearAndRulesTests: XCTestCase {
                        "still nudging about the thing already worn")
     }
 
+    func testUpgradeNudgeDoesNotAdvertiseGearWornBySomebodyElse() throws {
+        let store = GameStore(io: .temporary(name: "nudge-worn-\(UUID().uuidString)"))
+        let better = try XCTUnwrap(ContentCatalog.shared.item("blade_binders"))
+        store.mutate("test: add companion and better blade") { state in
+            var companion = CompanionState()
+            companion.name = "Mara"
+            state.base.roster.append(companion)
+            state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 41), catalogID: better.id))
+        }
+
+        XCTAssertTrue(store.hasUpgradeAvailable(for: .weapon, slot: .binder))
+        store.equip(ItemStack(id: InstanceID(rawValue: 41), catalogID: better.id), on: .member(0))
+
+        XCTAssertFalse(store.hasUpgradeAvailable(for: .weapon, slot: .binder),
+                       "somebody else's worn blade is not an available shelf upgrade")
+        XCTAssertTrue(store.wearableOptions(in: .weapon, excluding: .binder).contains {
+            $0.source == .worn(.member(0))
+        }, "the picker should still permit an explicit transfer")
+    }
+
     /// Equipment round-trips as a readable object, not the alternating array Swift defaults to for
     /// a dictionary whose key isn't a coding key.
     func testEquipmentRoundTripsThroughASaveAsAnObject() throws {

@@ -465,7 +465,15 @@ extension GameStore {
 
     func hasUpgradeAvailable(for gearSlot: GearSlot, slot: PartySlot) -> Bool {
         wearableOptions(in: gearSlot, excluding: slot)
-            .filter(\.canEquipAtHome)
+            // The nudge means an unused upgrade is waiting, not that another party member owns
+            // something stronger. Worn gear remains visible in the picker for an intentional
+            // transfer, but it must not make somebody else's equipment page look unfinished.
+            .filter {
+                switch $0.source {
+                case .stored, .overflow: true
+                case .worn, .carried: false
+                }
+            }
             .contains { gearDelta(wearing: $0.piece, for: slot) > 0 }
     }
 
