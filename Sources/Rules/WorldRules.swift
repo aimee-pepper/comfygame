@@ -24,11 +24,10 @@ enum WorldRules {
         })
         let approached = playerDestination.flatMap { destination in
             run.enemies.first(where: { enemy in
-                guard disclosed.contains(enemy.id) else { return false }
-                if enemy.position == destination { return true }
-                guard enemy.isApex || enemy.isSessile else { return false }
-                return destination.chebyshevDistance(to: enemy.position) <= 1
-                    && run.playerPosition.chebyshevDistance(to: enemy.position) > 1
+                guard enemy.position == destination else { return false }
+                // A disclosed stationary threat is a deliberate approach only on contact.
+                // Ordinary creatures retain mutual-contact/ambush classification.
+                return (enemy.isApex || enemy.isSessile) && disclosed.contains(enemy.id)
             })?.id
         }
         return PreContactSnapshot(disclosedEnemyIDs: disclosed, approachedEnemyID: approached)
@@ -169,6 +168,13 @@ enum WorldRules {
 
     static func isAdjacent(_ a: GridPoint, _ b: GridPoint) -> Bool {
         a.manhattanDistance(to: b) == 1
+    }
+
+    static func automaticTravelMustStop(before point: GridPoint, in run: WorldRun) -> Bool {
+        run.enemies.contains {
+            $0.position == point && ($0.isApex || $0.isSessile)
+                && run.map[$0.position].isRevealed && isVisible($0, in: run)
+        }
     }
 
     /// Lowest-turn path, returning the steps *after* the start. Empty if unreachable.
@@ -709,10 +715,7 @@ enum WorldRules {
         events.append(contentsOf: moveEnemies(in: &run, concealment: concealment))
         state.worlds.activeRun = run
 
-        let approachedStationaryThreat = preContact.approachedEnemyID.flatMap { id in
-            run.enemies.first { $0.id == id && ($0.isApex || $0.isSessile) }
-        }
-        if let bumped = enemyOnPlayer(in: run) ?? approachedStationaryThreat {
+        if let bumped = enemyOnPlayer(in: run) {
             beginEncounter(triggeredBy: bumped, preContact: preContact, in: &state)
             events.append(.encounterBegan)
         }
@@ -904,6 +907,10 @@ enum WorldRules {
         for index in run.enemies.indices {
             var enemy = run.enemies[index]
             let distance = enemy.position.chebyshevDistance(to: run.playerPosition)
+            let beganTurnUnaware: Bool = {
+                if case .unaware = enemy.awareness { return true }
+                return false
+            }()
 
             // **Openness sets ambush versus pursuit.** Across open ground you're seen coming;
             // in enclosed country you aren't, and neither is what's waiting.
@@ -943,7 +950,8 @@ enum WorldRules {
             // where it is; an apex holds its ground because it has no reason not to. Waking means
             // it is ready, not that it is coming — for both, the approach is the commitment
             // (`apex-encounters.md` §2), which is what keeps them hazards you walk *into*.
-            guard enemy.isAwake, distance > 0, !enemy.isSessile, !enemy.isApex else {
+            guard enemy.isAwake, !beganTurnUnaware, distance > 0,
+                  !enemy.isSessile, !enemy.isApex else {
                 run.enemies[index] = enemy
                 continue
             }

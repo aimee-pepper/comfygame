@@ -335,6 +335,11 @@ extension GameStore {
         mutate("travel") { state in
             for next in route {
                 if let current = state.worlds.activeRun,
+                   WorldRules.automaticTravelMustStop(before: next, in: current) {
+                    events.append(.blocked("Something dangerous occupies that tile. Step onto it deliberately."))
+                    break
+                }
+                if let current = state.worlds.activeRun,
                    current.map[next].ground.movementCost > 1,
                    current.enemies.contains(where: {
                        $0.position.manhattanDistance(to: next) <= 2

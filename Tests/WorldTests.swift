@@ -894,12 +894,16 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(state.worlds.activeRun?.enemies.first?.position, sleeper, "Inert until you come close")
         XCTAssertFalse(state.worlds.activeRun?.enemies.first?.isAwake ?? true)
 
-        // Move it inside the aggro radius and it starts closing.
+        // Detection and contact are separate: the discovery turn wakes it in place, then a later
+        // world turn lets the already-pursuing creature close the distance.
         state.worlds.activeRun?.enemies[0].position = GridPoint(x: 7, y: 9)
         _ = WorldRules.advanceTurn(in: &state)
-        let enemy = state.worlds.activeRun!.enemies[0]
-        XCTAssertTrue(enemy.isAwake)
-        XCTAssertLessThan(enemy.position.chebyshevDistance(to: GridPoint(x: 7, y: 7)), 2)
+        XCTAssertTrue(state.worlds.activeRun!.enemies[0].isAwake)
+        XCTAssertEqual(state.worlds.activeRun!.enemies[0].position, GridPoint(x: 7, y: 9))
+
+        _ = WorldRules.advanceTurn(in: &state)
+        XCTAssertLessThan(state.worlds.activeRun!.enemies[0].position
+            .chebyshevDistance(to: GridPoint(x: 7, y: 7)), 2)
     }
 
     func testQuietStepCreatesOnePersistedAlertTurnRatherThanAnInvisibleRoll() throws {
@@ -982,11 +986,11 @@ final class WorldTests: XCTestCase {
 
         let opening = try XCTUnwrap(state.worlds.activeRun?.activeEncounter?.opening)
         XCTAssertTrue(opening.preContactDisclosed)
-        XCTAssertEqual(opening.initial, .partyApproach)
-        XCTAssertEqual(opening.resolved, .partyApproach)
+        XCTAssertEqual(opening.initial, .mutualContact)
+        XCTAssertEqual(opening.resolved, .mutualContact)
     }
 
-    func testSteppingAdjacentToAStationaryApexIsADeliberateApproach() throws {
+    func testApexAdjacencyIsSafeAndOnlyOccupiedTileEntryStartsCombat() throws {
         var state = GameState.newGame()
         let start = GridPoint(x: 0, y: 0)
         let destination = GridPoint(x: 1, y: 0)
@@ -1004,7 +1008,57 @@ final class WorldTests: XCTestCase {
         _ = WorldRules.step(to: destination, in: &state)
 
         XCTAssertEqual(state.worlds.activeRun?.playerPosition, destination)
+        XCTAssertNil(state.worlds.activeRun?.activeEncounter)
+        XCTAssertTrue(WorldRules.automaticTravelMustStop(
+            before: apexPoint, in: try XCTUnwrap(state.worlds.activeRun)))
+
+        let beforeLook = try XCTUnwrap(state.worlds.activeRun)
+        _ = WorldRules.inspect(apexPoint, in: beforeLook)
+        XCTAssertEqual(state.worlds.activeRun, beforeLook, "Look must be byte-state neutral")
+        _ = WorldRules.advanceTurn(in: &state)
+        XCTAssertNil(state.worlds.activeRun?.activeEncounter,
+                     "waiting beside an apex must not manufacture contact")
+
+        _ = WorldRules.step(to: apexPoint, in: &state)
         XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.opening?.resolved, .partyApproach)
+    }
+
+    func testActiveFloraAdjacencyIsSafeAndOnlyOccupiedTileEntryStartsCombat() throws {
+        var state = GameState.newGame()
+        let start = GridPoint(x: 0, y: 0), beside = GridPoint(x: 1, y: 0)
+        let occupied = GridPoint(x: 2, y: 0)
+        let map = WorldMap(width: 3, height: 1,
+                           tiles: Array(repeating: Tile(isRevealed: true), count: 3), entry: start)
+        let flora = WorldEnemy(id: InstanceID(rawValue: 8107), creatureID: "paper_moth",
+                               position: occupied, isSessile: true)
+        state.worlds.activeRun = WorldRun(runIndex: 1, book: book(["terrain": "plains"]),
+                                          mapSeed: 8_107, rng: SeededRNG(seed: 8_107), map: map,
+                                          playerPosition: start, enemies: [flora])
+
+        _ = WorldRules.step(to: beside, in: &state)
+        XCTAssertNil(state.worlds.activeRun?.activeEncounter)
+        _ = WorldRules.advanceTurn(in: &state)
+        XCTAssertNil(state.worlds.activeRun?.activeEncounter)
+        _ = WorldRules.step(to: occupied, in: &state)
+        XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.opening?.resolved, .partyApproach)
+    }
+
+    func testEnteringOrdinaryAdjacencyWakesWithoutFabricatingContact() throws {
+        var state = GameState.newGame()
+        let start = GridPoint(x: 0, y: 0), beside = GridPoint(x: 1, y: 0)
+        let occupied = GridPoint(x: 2, y: 0)
+        let map = WorldMap(width: 3, height: 1,
+                           tiles: Array(repeating: Tile(isRevealed: true), count: 3), entry: start)
+        let enemy = WorldEnemy(id: InstanceID(rawValue: 8108), creatureID: "paper_moth",
+                               position: occupied)
+        state.worlds.activeRun = WorldRun(runIndex: 1, book: book(["terrain": "plains"]),
+                                          mapSeed: 8_108, rng: SeededRNG(seed: 8_108), map: map,
+                                          playerPosition: start, enemies: [enemy])
+
+        _ = WorldRules.step(to: beside, in: &state)
+        XCTAssertNil(state.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(state.worlds.activeRun?.enemies.first?.position, occupied)
+        XCTAssertTrue(state.worlds.activeRun?.enemies.first?.isAwake == true)
     }
 
     func testCreatureAmbushOpeningActionsRunBeforeOrdinaryInitiativeAndPersist() throws {

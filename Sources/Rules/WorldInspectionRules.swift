@@ -23,32 +23,36 @@ extension WorldRules {
             details.append(tile.isCrumbled ? "nothing remains to stand on" : "impassable")
         } else {
             let turns = movementCost(tile.ground, slowGroundExtraTurns: run.tuning.slowGroundExtraTurns)
-            details.append(turns == 1 ? "1 turn to enter" : "\(turns) turns to enter")
+            let total = turns == 1 ? "1 turn to enter" : "\(turns) turns to enter"
+            let extra = max(0, turns - 1)
+            details.append(extra == 0 ? total : "\(total) · \(extra) extra")
         }
         if tile.isCracking { details.append("cracks warn that it may crumble") }
 
         if let plant = run.plant(at: point) {
-            let name = run.floraNames[plant.id]?.name ?? plant.displayName
             let harm = FloraRules.harm(of: plant.traits,
                                        severity: run.tuning.floraHazardSeverityMultiplier)
             if plant.traits.isDefended {
-                switch plant.traits.defenceType {
-                case .physical: details.append("\(name) has barbs that will hurt the party")
-                case .chemical: details.append("\(name) is toxic and will linger")
-                case .active: details.append("\(name) reacts when approached")
-                }
+                details.append(floraEntryWarning(plant.traits.defenceType))
             } else {
-                if harm.isSomething { details.append("\(name) is known to be harmful") }
-                else { details.append(name) }
+                details.append(harm.isSomething ? "Entering may be harmful" : "Visible growth")
             }
         }
 
         if let enemy = run.enemies.first(where: { $0.position == point && isVisible($0, in: run) }) {
-            details.append("\(run.name(of: enemy)) is there")
+            if !enemy.isSessile { details.append("\(run.name(of: enemy)) is there") }
         } else if let content = visibleContent(tile.content, in: run) {
             details.append(content)
         }
         return TileInspection(heading: tile.ground.displayName.capitalized, details: details)
+    }
+
+    static func floraEntryWarning(_ defence: DefenceType) -> String {
+        switch defence {
+        case .physical: "Visible barbs. Entering will hurt the party"
+        case .chemical: "Entering carries a lingering hazard"
+        case .active: "Entering will start an encounter"
+        }
     }
 
     private static func visibleContent(_ content: TileContent, in run: WorldRun) -> String? {

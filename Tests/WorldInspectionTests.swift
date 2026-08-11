@@ -10,7 +10,20 @@ final class WorldInspectionTests: XCTestCase {
         let before = run
         let result = WorldRules.inspect(target, in: run)
         XCTAssertTrue(result.text.contains("\(WorldRules.movementCost(.mud, slowGroundExtraTurns: run.tuning.slowGroundExtraTurns)) turns to enter"))
+        XCTAssertTrue(result.text.contains("\(run.tuning.slowGroundExtraTurns) extra"))
         XCTAssertEqual(run, before)
+    }
+
+    func testLookUsesNeutralEntryConsequencesWithoutFloraTraitNumbers() {
+        XCTAssertEqual(WorldRules.floraEntryWarning(.active),
+                       "Entering will start an encounter")
+        XCTAssertEqual(WorldRules.floraEntryWarning(.physical),
+                       "Visible barbs. Entering will hurt the party")
+        XCTAssertEqual(WorldRules.floraEntryWarning(.chemical),
+                       "Entering carries a lingering hazard")
+        for warning in DefenceType.allCases.map(WorldRules.floraEntryWarning) {
+            XCTAssertFalse(warning.contains(where: \.isNumber))
+        }
     }
 
     func testLookNeverRevealsFogOrHiddenCrypsis() {
