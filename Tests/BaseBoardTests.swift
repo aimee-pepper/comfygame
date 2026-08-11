@@ -65,4 +65,11 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertEqual(BaseBoardRules.columnCount(isAccessibilitySize: false), 3)
         XCTAssertEqual(BaseBoardRules.columnCount(isAccessibilitySize: true), 2)
     }
+
+    func testPartyIsAUtilityAndNotADestinationTile() {
+        let destinations = BaseBoardRules.destinations(from: ContentCatalog.shared.stationsInOrder)
+        XCTAssertFalse(destinations.contains { $0.route == AppRoute.party.rawValue })
+        XCTAssertTrue(destinations.contains { $0.route == AppRoute.writingDesk.rawValue })
+        XCTAssertTrue(destinations.contains { $0.route == AppRoute.storehouse.rawValue })
+    }
 }

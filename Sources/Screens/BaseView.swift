@@ -1,6 +1,10 @@
 import SwiftUI
 
 enum BaseBoardRules {
+    static func destinations(from stations: [StationDef]) -> [StationDef] {
+        stations.filter { $0.route != AppRoute.party.rawValue }
+    }
+
     static func knownStations(_ stations: [StationDef], unlocked: Set<StationID>,
                               foundations: Set<StationID>) -> [StationDef] {
         stations.filter { unlocked.contains($0.id) || foundations.contains($0.id) }
@@ -35,13 +39,13 @@ struct BaseView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                purse
+            VStack(spacing: 12) {
+                contextRow
                 sectionPicker
                 stationBoard
             }
-            .padding(16)
-            .padding(.bottom, 24)
+            .padding(12)
+            .padding(.bottom, 12)
         }
         .background(Color(.systemGroupedBackground))
         .overlay(alignment: .top) {
@@ -50,7 +54,7 @@ struct BaseView: View {
                 .padding(.top, 8)
         }
         .navigationTitle("Base")
-        .navigationBarTitleDisplayMode(.large)
+        .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .bottom) {
             departure
                 .padding(.horizontal, 16)
@@ -65,32 +69,37 @@ struct BaseView: View {
             StationFoundationSheet(station: station)
                 .environmentObject(store)
         }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink(value: AppRoute.settings) {
-                    Image(systemName: "gearshape")
-                }
-                .accessibilityLabel("Settings")
-            }
-            #if DEBUG
-            ToolbarItem(placement: .topBarTrailing) {
-                // Development-only entry to the milestone-1 persistence harness.
-                NavigationLink(value: AppRoute.harness) {
-                    Image(systemName: "wrench.and.screwdriver")
-                }
-                .accessibilityLabel("Persistence harness")
-            }
-            #endif
-        }
     }
 
     // MARK: Purse
 
-    private var purse: some View {
+    private var contextRow: some View {
         HStack(spacing: 12) {
-            CurrencyChip(icon: "drop.fill", label: "Essence", value: "\(state.base.essence)", tint: .teal)
-            CurrencyChip(icon: "star.fill", label: "Motes", value: "\(state.reality.motes)", tint: .purple)
+            Text("Base")
+                .font(.title2.weight(.bold))
+                .accessibilityAddTraits(.isHeader)
+            Spacer(minLength: 4)
+            CompactCurrency(icon: "drop.fill", label: "Essence",
+                            value: state.base.essence, tint: .teal)
+            CompactCurrency(icon: "star.fill", label: "Motes",
+                            value: state.reality.motes, tint: .purple)
+            Menu {
+                NavigationLink(value: AppRoute.settings) {
+                    Label("Settings", systemImage: "gearshape")
+                }
+                #if DEBUG
+                NavigationLink(value: AppRoute.harness) {
+                    Label("Testing", systemImage: "wrench.and.screwdriver")
+                }
+                #endif
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.title3)
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel("Base utilities")
         }
+        .frame(minHeight: 44)
     }
 
     @ViewBuilder private var firstReturnRouteCard: some View {
@@ -182,8 +191,9 @@ struct BaseView: View {
         let unlocked = Set(ContentCatalog.shared.stationsInOrder.compactMap {
             state.base.station($0.id).isUnlocked ? $0.id : nil
         })
-        return BaseBoardRules.knownStations(ContentCatalog.shared.stationsInOrder,
-                                            unlocked: unlocked, foundations: foundations)
+        let known = BaseBoardRules.knownStations(ContentCatalog.shared.stationsInOrder,
+                                                 unlocked: unlocked, foundations: foundations)
+        return BaseBoardRules.destinations(from: known)
     }
 
     private var availableSections: [StationHomeSection] {
@@ -197,25 +207,38 @@ struct BaseView: View {
     // MARK: Departure
 
     private var departure: some View {
-        VStack(spacing: 8) {
-            NavigationLink(value: AppRoute.writingDesk) {
-                Label("Bind & Depart", systemImage: "arrow.up.forward.circle.fill")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 56) // primary action, thumb zone, well over 44pt
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(spacing: 8) { baseActionButtons }
+            } else {
+                HStack(spacing: 10) { baseActionButtons }
             }
-            .buttonStyle(.borderedProminent)
-            .simultaneousGesture(TapGesture().onEnded {
-                store.openedFirstReturnDestination(.writingDesk)
-            })
-
-            Text(departureHint)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity)
         }
-        .padding(.top, 4)
+        .padding(.top, 2)
+    }
+
+    @ViewBuilder private var baseActionButtons: some View {
+        NavigationLink(value: AppRoute.party) {
+            Label("Party", systemImage: "person.2.fill")
+                .font(.subheadline.weight(.semibold))
+                .frame(minWidth: dynamicTypeSize.isAccessibilitySize ? 0 : 96,
+                       maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : nil)
+                .frame(minHeight: 48)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityHint("Manage party members, gear and gambits")
+
+        NavigationLink(value: AppRoute.writingDesk) {
+            Label("Bind & Depart", systemImage: "arrow.up.forward.circle.fill")
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 48)
+        }
+        .buttonStyle(.borderedProminent)
+        .accessibilityHint(departureHint)
+        .simultaneousGesture(TapGesture().onEnded {
+            store.openedFirstReturnDestination(.writingDesk)
+        })
     }
 
     /// **Counted in marks and subjects**, because that is what a page is made of.
@@ -239,6 +262,24 @@ struct BaseView: View {
 }
 
 // MARK: - Pieces
+
+private struct CompactCurrency: View {
+    let icon: String
+    let label: String
+    let value: Int
+    let tint: Color
+
+    var body: some View {
+        Label {
+            Text(value, format: .number)
+                .font(.subheadline.weight(.semibold).monospacedDigit())
+        } icon: {
+            Image(systemName: icon).foregroundStyle(tint)
+        }
+        .labelStyle(.titleAndIcon)
+        .accessibilityLabel("\(value) \(label)")
+    }
+}
 
 private struct StationTile: View {
     let station: StationDef
