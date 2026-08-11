@@ -3,8 +3,8 @@
   "updated": "11 Aug 2026",
   "installedCheckpoint": "3549863 · independent campaign save slots",
   "essenceBaseline": "a816113",
-  "currentWork": "P0 save-slot phone acceptance, then next playability checkpoint",
-  "currentNote": "Independent UUID campaign envelopes, lossless legacy adoption, safe corrupt/future handling and in-app campaign switching are checkpointed. The next gate is physical-phone create/load/delete/export and relaunch verification.",
+  "currentWork": "P1 bug-report delivery + save-slot phone acceptance",
+  "currentNote": "Independent campaign saves are installed and ready for Aimee's phone acceptance. Engineering is now closing the bug-report delivery/outbox seam without consuming unfinished AssetLab work.",
   "items": [
     {
       "id": "essence",
@@ -122,7 +122,7 @@
       "id": "bug-reporter",
       "priority": "P1",
       "title": "In-game bug reporter",
-      "status": "readyToTest",
+      "status": "inProgress",
       "detail": "Local capture, durable visible queue, Unicode-safe single-file export and unique atomic staging are checkpointed. Direct relay is still absent.",
       "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete."
     },

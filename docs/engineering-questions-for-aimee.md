@@ -6,6 +6,22 @@ design decision; it remains here until Aimee or the game-design lead resolves it
 
 ## Open / temporarily implemented
 
+### EQ23 — Station ordering authority
+
+- **Audit finding:** `stations.json` repeats presentation `sortOrder` values for the Essence Spring
+  and Firepit; Trading Post, Blacksmith and Bestiary; Tannery and Scriptorium; and several later
+  specialist stations. Swift compares only that number, so ties inherit incidental JSON/decode
+  order rather than an explicit contract.
+- **Design-lead recommendation:** Preserve the current visible sequence for now, but replace the
+  overloaded number with an explicit unique `displayOrder`. If the repeated values were intended to
+  express progression bands, retain that as a separately named `campaignBand`; do not alphabetize
+  ties, because that would move the Blacksmith ahead of the deliberately first Trading Post.
+- **Question for review:** Are the repeated numbers meaningful progression groups, or only remnants
+  of stations being inserted over time?
+- **Temporary implementation:** None. Existing order remains untouched until the semantic choice is
+  confirmed; adding Noll/Recycler must not silently become another comparator tie.
+- **Status:** Open, nonblocking static-authority cleanup.
+
 ### EQ22 — Legacy gear power during specialist-shop migration
 
 - **Design-lead placeholder:** Convert `catalogue tier + old upgradeLevel` into construction tier up
@@ -176,15 +192,12 @@ design decision; it remains here until Aimee or the game-design lead resolves it
 
 ### EQ13 — Minimap writing disclosure
 
-- **Aimee's direct instruction:** The minimap should always display apex, portal and page icons.
-- **Later design-lead recommendation:** `playtest-ui-corrections-current.md` calls unrevealed page
-  icons a disclosure bug and asks that diary/other writing appear only after reveal.
-- **Temporary implementation:** Preserve Aimee's explicit always-visible page instruction, including
-  the new anonymous writing type. Portal and apex behavior is unchanged.
-- **Review:** Whether the newer fog-of-war recommendation intentionally supersedes the direct
-  always-visible-page decision.
-- **Impact:** Search guidance and how literal the guaranteed-writing promise feels in play.
-- **Status:** Open; it does not block found-writing persistence or collection.
+- **Historical instruction:** The minimap once displayed apex, portal and page icons through fog.
+- **Superseding Aimee decision, 9 Aug 2026:** all POIs require exploration/discovery by default;
+  explicit invested skills/station research/consumables may disclose bounded information early.
+- **Current implementation requirement:** remove type-based portal/page/apex exceptions and use
+  game-owned reveal/discovery state per `minimap-disclosure-current.md`.
+- **Status:** Resolved; retain this entry as decision history.
 
 ## Resolved
 
@@ -207,7 +220,8 @@ can distinguish an intentional migration from an accidental behavior change.
 
 ### EQ5 — Campaign phases for the implemented six
 
-- **Resolved 9 Aug 2026 by Game Design Lead:** 1 Mara `opening`, 2 Edren `opening`, 3 Halloway
+- **Superseded later 9 Aug 2026 by Aimee:** current order begins Vance 1, Noll 2, Halloway 3,
+  Mara 4, Edren 5; see `opening-economy-traveller-reorder-current.md`. Historical resolution was 1 Mara `opening`, 2 Edren `opening`, 3 Halloway
   `opening`, 4 Isolde `startOfMid`, 5 Sela `mid`; Tovin is global authored order **26**, `late`.
   The earlier “sixth of the implemented set” wording was relative, not a global order. `startOfMid`
   remains distinct because Isolde opens hand progression before Sela's expanded-page midgame hunt.

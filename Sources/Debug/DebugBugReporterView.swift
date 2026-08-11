@@ -205,19 +205,66 @@ private struct DebugBugReportSheet: View {
 }
 
 private struct DebugBugReportQueueView: View {
-    private var reports: [(report: DebugBugReport, directory: URL)] { DebugBugReportOutbox.live.reports() }
+    @State private var reports: [(report: DebugBugReport, directory: URL)] = []
+    @State private var deletionCandidate: DebugBugReport?
+
     var body: some View {
         List(reports, id: \.report.id) { entry in
             VStack(alignment: .leading, spacing: 6) {
                 Text(entry.report.whatHappened).lineLimit(3)
                 Text(entry.report.createdAt.formatted()).font(.caption).foregroundStyle(.secondary)
+                Label(transportLabel(entry.report.transportState),
+                      systemImage: transportIcon(entry.report.transportState))
+                    .font(.caption).foregroundStyle(.secondary)
                 ShareLink(item: DebugBugReportOutbox.live.exportURL(for: entry.report, in: entry.directory)) {
                     Label("Share saved report", systemImage: "square.and.arrow.up")
+                }
+                Button("Delete saved report", role: .destructive) {
+                    deletionCandidate = entry.report
                 }
             }.padding(.vertical, 4)
         }
         .navigationTitle("Bug queue")
         .overlay { if reports.isEmpty { ContentUnavailableView("No saved reports", systemImage: "ladybug") } }
+        .task {
+            _ = DebugBugReportOutbox.live.recoverInterruptedSends()
+            reload()
+        }
+        .alert("Delete this saved report?", isPresented: deletionIsPresented,
+               presenting: deletionCandidate) { report in
+            Button("Delete", role: .destructive) {
+                try? DebugBugReportOutbox.live.remove(report.id)
+                deletionCandidate = nil
+                reload()
+            }
+            Button("Cancel", role: .cancel) { deletionCandidate = nil }
+        } message: { _ in
+            Text("This removes the local report and its screenshot. It cannot be undone.")
+        }
+    }
+
+    private var deletionIsPresented: Binding<Bool> {
+        Binding(get: { deletionCandidate != nil }, set: { if !$0 { deletionCandidate = nil } })
+    }
+
+    private func reload() { reports = DebugBugReportOutbox.live.reports() }
+
+    private func transportLabel(_ state: DebugBugReport.TransportState) -> String {
+        switch state {
+        case .unsent: "Saved locally — not submitted"
+        case .sending: "Sending"
+        case .submitted: "Submitted"
+        case .needsAttention: "Needs retry or manual sharing"
+        }
+    }
+
+    private func transportIcon(_ state: DebugBugReport.TransportState) -> String {
+        switch state {
+        case .unsent: "tray"
+        case .sending: "arrow.up.circle"
+        case .submitted: "checkmark.circle"
+        case .needsAttention: "exclamationmark.triangle"
+        }
     }
 }
 #endif

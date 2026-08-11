@@ -32,6 +32,7 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
 }
 
 struct DebugBugReportReceipt: Codable, Equatable, Sendable {
+    static let supportedSchemaVersion = 1
     var schemaVersion: Int
     var remoteReference: String
     var receivedAt: Date
@@ -93,8 +94,92 @@ struct DebugBugReportOutbox: Sendable {
     }
 
     func exportURL(for id: UUID, in directory: URL) -> URL {
+        let destination = directory.appending(path: "\(id.uuidString).bookbinderbug")
+        // Export is derived from the canonical atomic report + optional screenshot. Removing any
+        // prior package first means an interrupted state update can leave either a current export
+        // or no export, never a stale package that contradicts the visible queue entry.
+        try? FileManager.default.removeItem(at: destination)
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        if let data = try? Data(contentsOf: directory.appending(path: "report.json")),
+           let report = try? decoder.decode(DebugBugReport.self, from: data) {
+            try? JSONEncoder().encode(DebugBugReportExport(
+                report: report, screenshot: screenshot(in: directory)))
+                .write(to: destination, options: .atomic)
+        }
+        return destination
+    }
+
+    func screenshot(in directory: URL) -> Data? {
+        try? Data(contentsOf: directory.appending(path: "screenshot.png"))
+    }
+
+    func update(_ report: DebugBugReport, in directory: URL) throws {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        encoder.dateEncodingStrategy = .iso8601
+        try? FileManager.default.removeItem(at: exportURLPath(for: report.id, in: directory))
+        try encoder.encode(report).write(to: directory.appending(path: "report.json"), options: .atomic)
+    }
+
+    /// A process can die after persisting `sending` but before receiving a receipt. Never imply
+    /// success on relaunch: make those entries explicitly retryable.
+    @discardableResult
+    func recoverInterruptedSends() -> Int {
+        var recovered = 0
+        for entry in reports() where entry.report.transportState == .sending {
+            var report = entry.report
+            report.transportState = .needsAttention
+            if (try? update(report, in: entry.directory)) != nil { recovered += 1 }
+        }
+        return recovered
+    }
+
+    func remove(_ id: UUID) throws {
+        guard let entry = reports().first(where: { $0.report.id == id }) else { return }
+        try FileManager.default.removeItem(at: entry.directory)
+    }
+
+    private func exportURLPath(for id: UUID, in directory: URL) -> URL {
         directory.appending(path: "\(id.uuidString).bookbinderbug")
     }
+}
+
+actor DebugBugReportSubmissionCoordinator {
+    enum SubmissionError: Error { case missingReport(UUID), invalidReceipt }
+    let outbox: DebugBugReportOutbox
+    let transport: any DebugBugReportTransport
+
+    init(outbox: DebugBugReportOutbox, transport: any DebugBugReportTransport) {
+        self.outbox = outbox
+        self.transport = transport
+    }
+
+    func submit(_ id: UUID) async throws -> DebugBugReportReceipt {
+        guard let entry = outbox.reports().first(where: { $0.report.id == id }) else {
+            throw SubmissionError.missingReport(id)
+        }
+        var report = entry.report
+        report.transportState = .sending
+        report.remoteReference = nil
+        try outbox.update(report, in: entry.directory)
+        do {
+            let receipt = try await transport.send(
+                report: report, screenshot: outbox.screenshot(in: entry.directory))
+            guard receipt.schemaVersion == DebugBugReportReceipt.supportedSchemaVersion,
+                  !receipt.remoteReference.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw SubmissionError.invalidReceipt
+            }
+            report.transportState = .submitted
+            report.remoteReference = receipt.remoteReference
+            try outbox.update(report, in: entry.directory)
+            return receipt
+        } catch {
+            report.transportState = .needsAttention
+            try? outbox.update(report, in: entry.directory)
+            throw error
+        }
+    }
+
 }
 
 private struct DebugBugReportExport: Codable {
