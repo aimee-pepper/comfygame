@@ -153,6 +153,35 @@ final class TravellerWorldPacingTests: XCTestCase {
             for: mara, actual: dark, withoutAuthoredPressure: dark).isEmpty)
     }
 
+    func testRemovedAuthoredTargetRerollsAndOnlyCountsWhenSameSeedFillFails() throws {
+        let mara = try traveller("mara")
+        let authored = [Sigil(id: InstanceID(rawValue: 1), source: "sun",
+                              target: "illumination", intensity: .overwhelming)]
+        var sameSeedStillMatches: UInt64?
+        var sameSeedFails: UInt64?
+
+        for seed in UInt64(1)...2_000
+            where sameSeedStillMatches == nil || sameSeedFails == nil {
+            let pair = Worldgen.travellerCausalityReadings(authoredSigils: authored, seed: seed)
+            guard mara.isFound(in: pair.actual) else { continue }
+            let causal = LibraryRules.causalConditionIndices(
+                for: mara, actual: pair.actual,
+                withoutAuthoredPressure: pair.withoutAuthoredPressure)
+            if mara.isFound(in: pair.withoutAuthoredPressure) {
+                sameSeedStillMatches = sameSeedStillMatches ?? seed
+                XCTAssertTrue(causal.isEmpty,
+                              "ordinary same-seed fill already satisfied Mara at seed \(seed)")
+            } else {
+                sameSeedFails = sameSeedFails ?? seed
+                XCTAssertEqual(causal, [0],
+                               "Mara depended on the authored illumination at seed \(seed)")
+            }
+        }
+
+        XCTAssertNotNil(sameSeedStillMatches, "fixture corpus needs a same-seed accidental match")
+        XCTAssertNotNil(sameSeedFails, "fixture corpus needs a genuinely authored match")
+    }
+
     func testPageBucketsAverageRatherThanRewardingPageCount() throws {
         let page = try XCTUnwrap(catalog.diaryPages.first)
         let readings = PressureRules.resolve([])

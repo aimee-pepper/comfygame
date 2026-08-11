@@ -49,9 +49,9 @@ enum Worldgen {
         // Everything below reads the world's *pressures*. What a world is made of and what lives
         // in it now come from the eight targets rather than from flat per-symbol tables.
         let sigils = BookRules.sigils(for: book)
-        let rolledUnwritten = PressureRules.rollUnwritten(after: sigils, seed: seed)
-        let readings = PressureRules.resolve(sigils + rolledUnwritten)
-        let withoutAuthoredPressure = PressureRules.resolve(rolledUnwritten)
+        let pressurePair = travellerCausalityReadings(authoredSigils: sigils, seed: seed)
+        let readings = pressurePair.actual
+        let withoutAuthoredPressure = pressurePair.withoutAuthoredPressure
         let resolvedStabilityScore = BookRules.resolvedStabilityScore(of: book, seed: seed)
         // The same world with nothing rolled into it. Chasms read this as a floor, and the exit rule
         // reads it alone — see `TerrainRules.isRiven(asWritten:)`.
@@ -452,6 +452,21 @@ enum Worldgen {
         diagnostics.openingEnemiesRelocated = relocated
         return (map, enemies, sites, placedPages, foundWritings, placedTravellers, cast, flora, entry,
                 diagnostics)
+    }
+
+    /// The actual world and the same seed with the player's pressure removed.
+    ///
+    /// Removing authored pressure makes those targets silent again, so they must participate in
+    /// the ordinary unwritten roll. Reusing only the actual world's already-rolled sigils would
+    /// leave the newly silent targets empty and falsely credit every authored target as causal.
+    static func travellerCausalityReadings(authoredSigils: [Sigil], seed: UInt64)
+        -> (actual: PressureReadings, withoutAuthoredPressure: PressureReadings) {
+        let actualRolled = PressureRules.rollUnwritten(after: authoredSigils, seed: seed)
+        let counterfactualRolled = PressureRules.rollUnwritten(after: [], seed: seed)
+        return (
+            PressureRules.resolve(authoredSigils + actualRolled),
+            PressureRules.resolve(counterfactualRolled)
+        )
     }
 
     private static func applyOpeningEnvelope(
