@@ -1,0 +1,13 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://bookbinder.local/schemas/lifted-terrain-request.schema.json",
+  "type":"object","additionalProperties":false,
+  "required":["pipelineVersions","ground","revealed","crumbled","cracking","elevation","adjacencyNESW","terrainSeedUInt32","featureVariant","worldGrade","southExposureLevels"],
+  "properties":{
+    "pipelineVersions":{"type":"object","additionalProperties":false,"required":["contractVersion","terrainAdapterVersion","terrainGrammarVersion","worldGradeAdapterVersion","renderProfileVersion"],"properties":{"contractVersion":{"const":1},"terrainAdapterVersion":{"const":"lifted-terrain-adapter-1.0.0"},"terrainGrammarVersion":{"const":"terrain-lifted-1.0.0"},"worldGradeAdapterVersion":{"const":"world-grade-1.0.0"},"renderProfileVersion":{"const":"terrain-16x19-bottom-anchored-1.0.0"}}},
+    "ground":{"enum":["stone","soil","sand","ice","ash","water","deepWater","rubble","mud","growth","chasm","groundcover"]},
+    "revealed":{"type":"boolean"},"crumbled":{"type":"boolean"},"cracking":{"type":"boolean"},
+    "elevation":{"type":"integer","minimum":0,"maximum":3},"adjacencyNESW":{"type":"integer","minimum":0,"maximum":15},"terrainSeedUInt32":{"type":"integer","minimum":0,"maximum":4294967295},"featureVariant":{"type":"integer","minimum":0,"maximum":3},"southExposureLevels":{"type":"integer","minimum":0,"maximum":3},
+    "worldGrade":{"type":"object","additionalProperties":false,"required":["red","green","blue","value"],"properties":{"red":{"type":"integer","minimum":-32,"maximum":32},"green":{"type":"integer","minimum":-32,"maximum":32},"blue":{"type":"integer","minimum":-32,"maximum":32},"value":{"type":"integer","minimum":-20,"maximum":20}}}
+  }
+}

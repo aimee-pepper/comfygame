@@ -1,0 +1,95 @@
+{
+  "manifestVersion": 1,
+  "identityKind": "liftedTerrainNativeConformancePack",
+  "status": "frozen-candidate-integration-boundary",
+  "pipelineVersions": {
+    "contractVersion": 1,
+    "terrainAdapterVersion": "lifted-terrain-adapter-1.0.0",
+    "terrainGrammarVersion": "terrain-lifted-1.0.0",
+    "worldGradeAdapterVersion": "world-grade-1.0.0",
+    "renderProfileVersion": "terrain-16x19-bottom-anchored-1.0.0"
+  },
+  "profile": {
+    "pixelWidth": 16,
+    "pixelHeight": 19,
+    "pivot": {
+      "x": 8,
+      "y": 18
+    },
+    "logicalHitFootprint": {
+      "width": 16,
+      "height": 16
+    },
+    "maxElevation": 3,
+    "riserPixelsPerLevel": 1
+  },
+  "compositor": {
+    "southExposureDerivation": "max(0, resolvedCenterElevation - resolvedSouthElevation)",
+    "rowOrder": "north-to-south",
+    "spriteOrigin": "x = column*16; y = row*16-3",
+    "surfaceOffsetY": "3-resolvedCenterElevation",
+    "shiftedLayers": [
+      "flora-decor",
+      "crack-warning",
+      "content",
+      "route-action-target",
+      "actor-selection"
+    ],
+    "unshiftedLayers": [
+      "floating-alert-badge"
+    ],
+    "concealedNeighborExposure": 0,
+    "mapBoundaryExposure": 0
+  },
+  "forcedZeroElevation": [
+    "unrevealed",
+    "crumbled",
+    "water",
+    "deepWater",
+    "chasm",
+    "ice",
+    "growth",
+    "groundcover"
+  ],
+  "outputs": [
+    {
+      "id": "lifted-terrain-vector-1",
+      "role": "nativeConformanceFixture",
+      "file": "lifted-terrain-vector-1.png",
+      "pixelWidth": 16,
+      "pixelHeight": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "logicalHitFootprint": {
+        "width": 16,
+        "height": 16
+      },
+      "fileSha256": "7d57e1331938f2ccd6477cd4b5e62f482de9f28d7cea73769c68c6dad82a3b3e",
+      "decodedRgbaSha256": "3307b2e1a0f27675161f2a6afe7406e5fc6f5221b3bfb0116e6fd39a16ddc534",
+      "canonicalRequestSha256": "83bc7018e851161e702c0fdb17039c849c5a26064c25a838c1a5113634fc39f6",
+      "rectangleSha256": "86ea9bb8a951e8d01a671a40cff63af0149a2eebe347630daea07e65be16eb14"
+    },
+    {
+      "id": "lifted-terrain-vector-2",
+      "role": "nativeConformanceFixture",
+      "file": "lifted-terrain-vector-2.png",
+      "pixelWidth": 16,
+      "pixelHeight": 19,
+      "pivot": {
+        "x": 8,
+        "y": 18
+      },
+      "logicalHitFootprint": {
+        "width": 16,
+        "height": 16
+      },
+      "fileSha256": "a98cbb9de813f1be6b4ea4c14bc5c6afc6ea8e89309d92c704f3c9f3e76d5698",
+      "decodedRgbaSha256": "ff921d6d36fe61a96bf350d4656620a9f30ebee58fb9e0d157d96acbeabf58e8",
+      "canonicalRequestSha256": "b30c372967343ce6bba7ac13056c88c79e3b58a5001740a2bb1cd8fca7dc98af",
+      "rectangleSha256": "2e8d93218d82f54377c4d0278525d4dc2e50edd9233734bd8742f843b7e463c3"
+    }
+  ],
+  "canonicalManifestSha256": "fdfe2744af523628dc7aacac3c5a901d2fbd499a02cdb205a76d21e9f3d3f399"
+}

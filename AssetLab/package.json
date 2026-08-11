@@ -4,9 +4,10 @@
   "type": "module",
   "scripts": {
     "serve": "node server.js",
-    "test": "node tests/generator.test.js && node tests/world-generator.test.js && node tests/live-contract.test.js && node tests/tile-content.test.js && node tests/resource-kit.test.js && node tests/place-kit.test.js && node tests/character-kit.test.js && node tests/character-map-contract.test.js && node tests/splash-kit.test.js && node tests/launch-kit.test.js && node tests/combat-generator.test.js && node tests/combat-ui-generator.test.js && node tests/map-slice-export.test.js && node tests/regression.test.js",
+    "test": "node tests/generator.test.js && node tests/world-generator.test.js && node tests/lifted-terrain-contract.test.js && node tests/live-contract.test.js && node tests/tile-content.test.js && node tests/resource-kit.test.js && node tests/place-kit.test.js && node tests/character-kit.test.js && node tests/character-map-contract.test.js && node tests/splash-kit.test.js && node tests/launch-kit.test.js && node tests/combat-generator.test.js && node tests/combat-ui-generator.test.js && node tests/map-slice-export.test.js && node tests/regression.test.js",
     "regression": "node scripts/regression-report.mjs",
-    "export:map-slice": "node scripts/export-map-slice.mjs"
+    "export:map-slice": "node scripts/export-map-slice.mjs",
+    "export:lifted-terrain": "node scripts/export-lifted-terrain.mjs"
   },
   "devDependencies": {
     "ajv": "^8.20.0"

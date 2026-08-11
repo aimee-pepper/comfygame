@@ -1,0 +1,14 @@
+{
+  "contract": "lifted-terrain-adapter-1.0.0",
+  "hashEncoding": "SHA-256 of UTF-8 recursive canonical JSON; pixelTokenSha256 hashes the 16x19 row-major color-token raster and is conformance-only until PNG export",
+  "vectors": [
+    {
+      "request": {"pipelineVersions":{"contractVersion":1,"terrainAdapterVersion":"lifted-terrain-adapter-1.0.0","terrainGrammarVersion":"terrain-lifted-1.0.0","worldGradeAdapterVersion":"world-grade-1.0.0","renderProfileVersion":"terrain-16x19-bottom-anchored-1.0.0"},"ground":"soil","revealed":true,"crumbled":false,"cracking":false,"elevation":2,"adjacencyNESW":15,"terrainSeedUInt32":82734192,"featureVariant":2,"worldGrade":{"red":14,"green":3,"blue":-12,"value":-4},"southExposureLevels":1},
+      "canonicalRequestSha256":"83bc7018e851161e702c0fdb17039c849c5a26064c25a838c1a5113634fc39f6","rectangleSha256":"86ea9bb8a951e8d01a671a40cff63af0149a2eebe347630daea07e65be16eb14","pixelTokenSha256":"0ba13167990addaccb655b3278efd79b713f9624d77797d506ac27f19159bf08"
+    },
+    {
+      "request": {"pipelineVersions":{"contractVersion":1,"terrainAdapterVersion":"lifted-terrain-adapter-1.0.0","terrainGrammarVersion":"terrain-lifted-1.0.0","worldGradeAdapterVersion":"world-grade-1.0.0","renderProfileVersion":"terrain-16x19-bottom-anchored-1.0.0"},"ground":"stone","revealed":true,"crumbled":false,"cracking":true,"elevation":3,"adjacencyNESW":6,"terrainSeedUInt32":305419896,"featureVariant":3,"worldGrade":{"red":-22,"green":22,"blue":22,"value":-11},"southExposureLevels":3},
+      "canonicalRequestSha256":"b30c372967343ce6bba7ac13056c88c79e3b58a5001740a2bb1cd8fca7dc98af","rectangleSha256":"2e8d93218d82f54377c4d0278525d4dc2e50edd9233734bd8742f843b7e463c3","pixelTokenSha256":"320a8b6c47522003a76074cbfa9d52d2d6b66fee00220425805022a27c1fbce1"
+    }
+  ]
+}

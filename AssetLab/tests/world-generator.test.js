@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { floraDefaults,floraPresets,normalizeFlora,floraCommands,terrainTemplateCatalogue,worldGradeFromReadings,normalizeTerrain,transitionedTerrainCommands,sampleWorld,sampleMultiSpeciesWorld,floraSpeciesSet,adjacencyFor,isPassableGround,crackOverlayCommands,groundTypes,groundRuleFacts } from "../src/world-generator.js";
+import { floraDefaults,floraPresets,normalizeFlora,floraCommands,terrainTemplateCatalogue,worldGradeFromReadings,normalizeTerrain,transitionedTerrainCommands,liftedTerrainProfile,liftedTerrainSprite,liftedSurfaceLayerCommands,sampleWorld,sampleMultiSpeciesWorld,floraSpeciesSet,adjacencyFor,isPassableGround,crackOverlayCommands,groundTypes,groundRuleFacts } from "../src/world-generator.js";
 import { commandBounds,hash } from "../src/generator.js";
 for(const [profile,size] of [["world",16],["detail",48]]){const commands=floraCommands(floraDefaults,profile);const b=commandBounds(commands);assert.ok(b.minX>=0&&b.minY>=0&&b.maxX<=size&&b.maxY<=size);assert.deepEqual(commands,floraCommands(floraDefaults,profile));}
 const active={...floraDefaults,traits:{...floraDefaults.traits,defenceType:"active",defence:90}};
@@ -18,6 +18,50 @@ assert.notEqual(hash(transitionedTerrainCommands({ground:"water",cracking:false}
 assert.notEqual(hash(transitionedTerrainCommands({ground:"water"})),hash(transitionedTerrainCommands({ground:"deepWater"})),"ordinary and deep water need distinct grammar");
 assert.equal(transitionedTerrainCommands({ground:"water",revealed:false}).length,1,"fog must contain literally nothing");
 assert.notEqual(hash(transitionedTerrainCommands({ground:"soil",elevation:0})),hash(transitionedTerrainCommands({ground:"soil",elevation:2})),"elevation needs redundant shape grammar");
+for(const ground of groundTypes){
+  const levels=[0,1,2,3].map(elevation=>transitionedTerrainCommands({ground,elevation,adjacency:15,terrainSeedUInt32:404}));
+  if(ground==="chasm"){
+    assert.equal(new Set(levels.map(hash)).size,1,"chasm is missing ground and must suppress elevation cues");
+    continue;
+  }
+  assert.equal(new Set(levels.map(hash)).size,4,`${ground} elevation levels must remain shape-distinct`);
+  const baseLength=levels[0].length;
+  for(let elevation=1;elevation<=3;elevation++){
+    const cues=levels[elevation].slice(baseLength);
+    assert.equal(cues.length,elevation*2,`${ground} elevation ${elevation} must add one paired contour cue per level`);
+    assert.equal(cues.every(command=>command.x>0&&command.y>0&&command.x+command.w<16&&command.y+command.h<16),true,`${ground} elevation cues must remain inset and never become a tile border`);
+    assert.doesNotMatch(JSON.stringify(cues),/#21170f|#b28a56|#6b4b2d/i,`${ground} elevation must derive color from its own terrain palette`);
+  }
+}
+for(const ground of ["stone","soil","sand","ash","rubble","mud"]){
+  for(let elevation=0;elevation<=3;elevation++){
+    const sprite=liftedTerrainSprite({ground,elevation,terrainSeedUInt32:404},{southExposureLevels:elevation});
+    assert.equal(sprite.width,16);assert.equal(sprite.height,19);assert.deepEqual(sprite.pivot,{x:8,y:18});
+    assert.equal(sprite.surfaceOffsetY,3-elevation);assert.equal(sprite.commands[0].y,3-elevation,"complete top plane must translate intact");
+    const wall=sprite.commands.slice(transitionedTerrainCommands({ground,elevation:0,terrainSeedUInt32:404}).length);
+    assert.equal(wall.every(command=>command.color!=="#21170f"&&command.color!=="#b28a56"&&command.color!=="#6b4b2d"),true,"lifted walls never use generic dirt/stake colors");
+  }
+}
+for(const elevation of [0,1,2,3])assert.equal(liftedTerrainSprite({ground:"chasm",elevation},{southExposureLevels:0}).elevation,0,"chasm cannot rise");
+for(const ground of ["water","deepWater","ice","growth","groundcover"])assert.equal(liftedTerrainSprite({ground,elevation:3},{southExposureLevels:0}).elevation,0,`${ground} needs explicit resolved substrate/shelf/basin facts before elevation`);
+const equalTerrace=liftedTerrainSprite({ground:"soil",elevation:2,terrainSeedUInt32:404},{southExposureLevels:0}),dropTerrace=liftedTerrainSprite({ground:"soil",elevation:2,terrainSeedUInt32:404},{southExposureLevels:2});
+assert.equal(equalTerrace.commands.length,transitionedTerrainCommands({ground:"soil",elevation:0,terrainSeedUInt32:404}).length,"equal heights must not create a wall seam");
+assert.ok(dropTerrace.commands.length>equalTerrace.commands.length,"only a positive southward height delta exposes a wall");
+const routeOverlay=[{op:"rect",x:1,y:6,w:14,h:4,color:"#e1c06f"}],liftedRoute=liftedSurfaceLayerCommands(routeOverlay,dropTerrace,"route-action-target");assert.equal(liftedRoute[0].y,routeOverlay[0].y+dropTerrace.surfaceOffsetY,"route/content/actor layers must move with the top plane");
+assert.deepEqual(liftedTerrainProfile,{profile:"terrain-lifted-1.0.0",width:16,height:19,pivot:{x:8,y:18},logicalFootprint:{width:16,height:16},maxElevation:3,riserPixelsPerLevel:1});
+for(const elevation of [1,2,3]){for(const state of [{revealed:false},{revealed:true,crumbled:true}]){const sprite=liftedTerrainSprite({ground:"soil",elevation,...state},{southExposureLevels:0});assert.equal(sprite.elevation,0);assert.equal(sprite.surfaceOffsetY,3);assert.equal(sprite.commands.some(command=>command.y>=19),false,"hidden/crumbled sprites stay inside the base footprint");}}
+assert.throws(()=>liftedTerrainSprite({ground:"soil",elevation:2}),/missing-south-exposure-levels/);
+assert.throws(()=>liftedTerrainSprite({ground:"soil",elevation:2},{}),/missing-south-exposure-levels/);
+assert.throws(()=>liftedTerrainSprite({ground:"soil",elevation:2},{southExposureLevels:0,extra:true}),/unknown-lifted-exposure-field/);
+assert.throws(()=>liftedTerrainSprite({ground:"soil",elevation:1},{southExposureLevels:2}),/inconsistent-south-exposure-levels/);
+assert.throws(()=>liftedTerrainSprite({ground:"soil",elevation:3,revealed:false},{southExposureLevels:1}),/inconsistent-south-exposure-levels/);
+assert.throws(()=>liftedTerrainSprite({ground:"soil",elevation:2},{southExposureLevels:-1}),/invalid-south-exposure-levels/);assert.throws(()=>liftedTerrainSprite({ground:"soil",elevation:2},{southExposureLevels:4}),/invalid-south-exposure-levels/);assert.throws(()=>liftedSurfaceLayerCommands(routeOverlay,dropTerrace,"floating-alert-badge"),/unsupported-lifted-layer/);
+for(const ground of groundTypes){
+  const joined=transitionedTerrainCommands({ground,adjacency:15,terrainSeedUInt32:404});
+  const isolated=transitionedTerrainCommands({ground,adjacency:0,terrainSeedUInt32:404});
+  const ownsEdges=["water","deepWater","ice","chasm"].includes(ground);
+  assert.equal(isolated.length-joined.length,ownsEdges?4:0,`${ground} adjacency must ${ownsEdges?"own four isolated":"not create any"} perimeter edges`);
+}
 assert.equal(groundTypes.length,12,"AssetLab must track every live GroundType");
 assert.equal(new Set(groundTypes.map((ground,index)=>hash(transitionedTerrainCommands({ground,speciesSeed:404+index})))).size,12,"every live ground needs distinct command grammar");
 assert.equal(isPassableGround("water"),true);assert.equal(isPassableGround("deepWater"),false);assert.equal(isPassableGround("chasm"),false);
