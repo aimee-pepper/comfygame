@@ -183,6 +183,47 @@ private struct LaunchSurface: View {
     var retry: (() -> Void)?
 
     var body: some View {
+        Group {
+            if let failure {
+                failureSurface(failure)
+            } else {
+                loadingSurface
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemBackground))
+        .accessibilityElement(children: failure == nil ? .combine : .contain)
+        .accessibilityLabel(failure == nil ? "Bookbinder. Opening the Atlas." : "Bookbinder. \(failure!.message)")
+    }
+
+    /// Matches LaunchScreen.storyboard's 248 x 340 safe-area-centered geometry exactly,
+    /// so UIKit handing off to SwiftUI does not move the accepted launch artwork.
+    private var loadingSurface: some View {
+        ZStack(alignment: .topLeading) {
+            Color(.secondarySystemBackground)
+
+            Rectangle().fill(.brown.opacity(0.75)).frame(width: 248, height: 2)
+            Rectangle().fill(.brown.opacity(0.75)).frame(width: 248, height: 2).offset(y: 338)
+            Rectangle().fill(.brown.opacity(0.75)).frame(width: 2, height: 340)
+            Rectangle().fill(.brown.opacity(0.75)).frame(width: 2, height: 340).offset(x: 246)
+
+            Rectangle().fill(.secondary).frame(width: 212, height: 2).offset(x: 18, y: 22)
+            BookbindingMark().offset(x: 87, y: 74).accessibilityHidden(true)
+            Text("Bookbinder")
+                .font(.custom("Georgia-Bold", fixedSize: 30))
+                .frame(width: 192, height: 37)
+                .offset(x: 28, y: 172)
+            Text("Opening the Atlas…")
+                .font(.system(size: 15))
+                .foregroundStyle(.secondary)
+                .frame(width: 192, height: 21)
+                .offset(x: 28, y: 225)
+            Rectangle().fill(.secondary).frame(width: 212, height: 2).offset(x: 18, y: 316)
+        }
+        .frame(width: 248, height: 340)
+    }
+
+    private func failureSurface(_ failure: AppLaunchCoordinator.Failure) -> some View {
         VStack(spacing: 18) {
             VStack(spacing: 18) {
                 Rectangle().fill(.secondary).frame(height: 2)
@@ -190,21 +231,17 @@ private struct LaunchSurface: View {
                 BookbindingMark()
                     .accessibilityHidden(true)
                 Text("Bookbinder").font(.system(size: 30, weight: .semibold, design: .serif))
-                if let failure {
-                    Text(failure.message).multilineTextAlignment(.center).foregroundStyle(.secondary)
-                    if failure.canRetry {
-                        Button("Try again") { retry?() }.buttonStyle(.borderedProminent)
-                    } else {
-                        Text("Finishing safely…").font(.caption).foregroundStyle(.secondary)
-                    }
-                    Button("Copy diagnostics") {
-                        UIPasteboard.general.string = failure.details
-                    }
-                    .buttonStyle(.borderless)
-                    .accessibilityHint("Copies technical launch details for support.")
+                Text(failure.message).multilineTextAlignment(.center).foregroundStyle(.secondary)
+                if failure.canRetry {
+                    Button("Try again") { retry?() }.buttonStyle(.borderedProminent)
                 } else {
-                    Text("Opening the Atlas…").foregroundStyle(.secondary)
+                    Text("Finishing safely…").font(.caption).foregroundStyle(.secondary)
                 }
+                Button("Copy diagnostics") {
+                    UIPasteboard.general.string = failure.details
+                }
+                .buttonStyle(.borderless)
+                .accessibilityHint("Copies technical launch details for support.")
                 Spacer(minLength: 0)
                 Rectangle().fill(.secondary).frame(height: 2)
             }
@@ -214,10 +251,6 @@ private struct LaunchSurface: View {
             .overlay(Rectangle().stroke(.brown.opacity(0.75), lineWidth: 2))
         }
         .padding(32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemBackground))
-        .accessibilityElement(children: failure == nil ? .combine : .contain)
-        .accessibilityLabel(failure == nil ? "Bookbinder. Opening the Atlas." : "Bookbinder. \(failure!.message)")
     }
 }
 

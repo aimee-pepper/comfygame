@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "aa0d3b1 · local bug reporter",
+  "installedCheckpoint": "de2b71b · collection and field playtest checkpoint",
   "essenceBaseline": "a816113",
-  "currentWork": "Recycler + field/launch UI",
-  "currentNote": "Trading Post, Vance, resource visuals, lifted terrain and the local bug reporter are already installed. Current candidates must preserve those checkpoints.",
+  "currentWork": "Phone verification + launch parity",
+  "currentNote": "Recycler rules, Look, compact collection UI, Library indexing and durable local bug-report export are checkpointed. Phone verification remains before these candidates are accepted.",
   "items": [
     {
       "id": "essence",
@@ -50,9 +50,9 @@
       "id": "recycler",
       "priority": "F",
       "title": "Independent Recycler engine",
-      "status": "pending",
-      "detail": "Recover exact construction receipts or explicit found-gear salvage with no invented provenance.",
-      "gate": "Recycle, reject, cancel and reload with exactly one recovery route."
+      "status": "readyToTest",
+      "detail": "Receipt-first and explicit authored-salvage rules are checkpointed with atomic stored/overflow handling; Noll and the player-facing station remain separate.",
+      "gate": "Rules suite passed; phone station flow waits for approved Noll integration."
     },
     {
       "id": "noll",
@@ -74,32 +74,32 @@
       "id": "spatial-ui",
       "priority": "P1",
       "title": "Spatial game hubs",
-      "status": "pending",
-      "detail": "Equipment/Base/Bestiary are installed. Library author-vs-subject accuracy and compact Party fit are current design candidates.",
+      "status": "readyToTest",
+      "detail": "Library author-vs-subject indexes, compact Party fit and six-across Storehouse resources are checkpointed.",
       "gate": "Full suite plus 368×800 and large-text inspection before the next phone install."
     },
     {
       "id": "field-controls",
       "priority": "P1",
       "title": "Look + fixed field controls",
-      "status": "pending",
-      "detail": "Inspect one adjacent tile without moving, spending a turn or leaking fog; keep Field Kit/resources above fixed navigation controls.",
+      "status": "readyToTest",
+      "detail": "Look inspects one adjacent tile through authoritative movement, harm and visibility rules without movement, turns or disclosure.",
       "gate": "Exact movement/hazard parity, zero mutation and compact-phone reachability."
     },
     {
       "id": "launch-handoff",
       "priority": "P1",
       "title": "Launch-screen handoff alignment",
-      "status": "pending",
-      "detail": "The static launch frame begins correctly, then the SwiftUI loading surface shifts when it takes over. Asset is comparing the two geometries.",
+      "status": "readyToTest",
+      "detail": "The SwiftUI loading surface now uses the storyboard's exact fixed 248×340 geometry and typography rather than reflowing.",
       "gate": "Static → in-app loading transition preserves the same mark, scale and alignment on the physical phone."
     },
     {
       "id": "item-popover",
       "priority": "P1",
       "title": "Anchored item details",
-      "status": "pending",
-      "detail": "Tapping a six-across item icon opens compact details at the source rather than navigating to a full screen.",
+      "status": "readyToTest",
+      "detail": "Trading Post, Storehouse, Gear and Loot grids use one anchored compact-detail presenter with accessibility sheet fallback.",
       "gate": "Popover remains on-screen at every edge, supports large text and preserves action state."
     },
     {
@@ -114,9 +114,9 @@
       "id": "bug-reporter",
       "priority": "P1",
       "title": "In-game bug reporter",
-      "status": "pending",
-      "detail": "Local capture/outbox is installed in aa0d3b1. Queue visibility and atomic package fixes are in progress; direct relay is still absent.",
-      "gate": "Offline/relaunch-safe local reports now; real idempotent queue receipt before calling direct submission complete."
+      "status": "readyToTest",
+      "detail": "Local capture, durable visible queue, Unicode-safe single-file export and unique atomic staging are checkpointed. Direct relay is still absent.",
+      "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete."
     }
   ],
   "paused": [
