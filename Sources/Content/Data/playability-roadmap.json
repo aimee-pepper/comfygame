@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "3549863 · independent campaign save slots",
+  "installedCheckpoint": "dbdb227 · save slots + secure bug-report context",
   "essenceBaseline": "a816113",
   "currentWork": "P1 bug-report delivery + save-slot phone acceptance",
-  "currentNote": "Independent campaign saves are installed and ready for Aimee's phone acceptance. Engineering is now closing the bug-report delivery/outbox seam without consuming unfinished AssetLab work.",
+  "currentNote": "Independent campaign saves and the hardened local bug-report outbox are installed for phone acceptance. The HTTPS relay adapter is complete; direct delivery remains pending an approved relay endpoint and Keychain credential.",
   "items": [
     {
       "id": "essence",
@@ -119,11 +119,19 @@
       "gate": "Opening 2:1 loop already works; unlock payback and precision cost remain healthy over ten returns."
     },
     {
+      "id": "world-color",
+      "priority": "P0",
+      "title": "Meaningful world color differentiation",
+      "status": "next",
+      "detail": "Repeated world palettes are materially reducing exploration readability. Asset is producing the isolated world-grade-2 proof; native renderer work waits for accepted proof and schema review.",
+      "gate": "Visual distance tracks meaningful authored and resolved input distance: similar worlds remain related, while opposed worlds separate proportionally. No promise of universal uniqueness or arbitrary neutral-world variety. Authority: docs/world-color-differentiation-current.md."
+    },
+    {
       "id": "bug-reporter",
       "priority": "P1",
       "title": "In-game bug reporter",
       "status": "inProgress",
-      "detail": "Local capture, durable visible queue, Unicode-safe single-file export and unique atomic staging are checkpointed. Direct relay is still absent.",
+      "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference and an idempotent HTTPS relay adapter are checkpointed. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
       "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete."
     },
     {
