@@ -29,13 +29,16 @@ size.
 
 ## Interface grammar
 
-- Use compact square or nearly-square icon tiles for destinations, categories, people, item families
-  and discovered species.
+- Use compact square or nearly-square icon tiles for destinations, categories, people and discovered
+  species. Physical items and loot use a denser **six-icons-across** collection grid.
 - Use tabs/segmented categories when one destination contains several peer modes.
 - Use full-width rows only when scanning and comparing text or numbers is the actual task.
 - Open a focused detail screen after tile selection; do not place the entire database on the hub.
-- Preserve 44pt targets, labels in addition to icon/color, large-text reflow and VoiceOver order.
-- Phone portrait is authoritative. Grids normally use two columns; allow one column at large text.
+- Preserve 44pt targets, accessible labels in addition to icon/color, large-text detail reflow and
+  VoiceOver order. Item names need not be printed beneath every icon when the cell has a full
+  accessibility label and opens named details.
+- Phone portrait is authoritative. Destination/person/species grids normally use two columns;
+  physical item and loot grids use six icons across.
 
 ## Screen triage
 
@@ -44,10 +47,10 @@ size.
 | Base | 2-column station/building tile hub; persistent Depart action | A place should be spatially remembered, not read as a directory |
 | Library | Tabs: People / World notes / History; people and note families as tiles | Fixes duplicate/inaccurate pages and gives the collection structure |
 | Party overview | Character portrait tiles; retain per-character swipe pager and Gear/Training/Stats/Gambits tabs | Existing detail structure is good; overview is still a card list |
-| Storehouse/equipment | Slot/category tabs plus item icon grid; visible location badges for Stored/Worn/Overflow/Carried | Inventory ownership must be visible before comparison rows |
+| Storehouse/equipment | Slot/category tabs plus six-across item icon grid; compact Stored/Worn/Overflow/Carried markers; tap for named comparison/action detail | Inventory should read as objects, not a reformatted prose list |
 | Bestiary | Species tiles; focused specimen detail | Discovery collection benefits from silhouettes and spatial recognition |
 | Workshop/station research | Branch icon grid leading to the existing node tree | Branches are destinations, not prose rows |
-| Stations with recipes | Category tabs + recipe/item grids; comparison/confirmation may remain rows | Selection should be visual; transaction details still need exact text |
+| Stations with recipes | Category tabs + six-across output/item icons; comparison/confirmation may remain rows or sheets | Selection should be visual; transaction details still need exact text |
 | World history | Keep chronological list, add compact filters/tabs | Timeline comparison genuinely benefits from ordered rows |
 | Settings, Debug queues, bug reports | Keep lists/forms | These are utilities rather than game-world spaces |
 | Combat gambit rules | Keep ordered rule list inside its character tab | Priority order is the mechanic |

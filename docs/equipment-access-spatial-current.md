@@ -8,9 +8,10 @@ At Home, choosing equipment shows every compatible physical item the player owns
 never imply that an item vanished merely because it is in overflow or worn by somebody who is not
 in the active party.
 
-Each tile names its location: **Stored**, **Waiting to sort**, **Worn by _name_**, or **Carried in
-world**. Expedition-carried equipment is visible but read-only from Home; moving it would bypass
-the expedition return and collapse rules.
+Each icon carries a compact location marker for **Stored**, **Waiting to sort**, **Worn**, or
+**Carried in world**; tapping it names the exact wearer/location in the detail sheet.
+Expedition-carried equipment is visible but read-only from Home; moving it would bypass the
+expedition return and collapse rules.
 
 ## Identity and movement
 
@@ -27,10 +28,18 @@ the expedition return and collapse rules.
 
 ## Interface grammar
 
-Equipment is a visual selection task, not an inventory ledger. The picker uses a two-column
-adaptive tile grid at ordinary phone text sizes and one column at accessibility sizes. Tiles retain
-the important comparison information: icon, rarity/name, tier or combat property, direct damage or
-protection delta, quantity, and ownership location.
+Equipment is a visual selection task, not an inventory ledger. At ordinary phone sizes the picker
+uses **six square item icons per row**. The grid does not print an item name, blurb, stat sentence or
+location sentence under every icon. A tap opens the focused detail/selection sheet containing name,
+provenance, tier and combat properties, direct damage/protection delta, quantity, exact ownership
+location and the available action.
+
+Each grid cell remains at least 44×44 points. Item identity comes from dedicated pictorial art rather
+than unrelated SF Symbols. Quantity, unknown identity, rarity and location use compact redundant
+badges/frame shapes; colour is supplementary. VoiceOver supplies the full item name, quantity,
+location and action even though those words are not visually repeated in the grid. At accessibility
+text sizes the detail sheet reflows, but the icon collection remains a compact collection rather
+than becoming six prose cards.
 
 ## Verification gates
 
@@ -40,4 +49,3 @@ protection delta, quantity, and ownership location.
 - Inactive roster wearers are included.
 - Stale worn references and invalid targets are atomic no-ops.
 - Carried gear remains in the active expedition.
-
