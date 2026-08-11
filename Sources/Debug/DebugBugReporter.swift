@@ -272,6 +272,36 @@ struct DebugBugReportOutbox: Sendable {
     }
 }
 
+/// Keeps local save/dismiss semantics structurally separate from the only action allowed to call a
+/// transport. UI labels can therefore be truthful without depending on convention in a button
+/// closure.
+struct DebugBugReportWorkflow: Sendable {
+    let outbox: DebugBugReportOutbox
+    private let submission: DebugBugReportSubmissionCoordinator?
+
+    init(outbox: DebugBugReportOutbox, transport: (any DebugBugReportTransport)? = nil) {
+        self.outbox = outbox
+        self.submission = transport.map {
+            DebugBugReportSubmissionCoordinator(outbox: outbox, transport: $0)
+        }
+    }
+
+    func saveOnThisPhone(_ report: DebugBugReport, screenshot: Data?) throws -> URL {
+        try outbox.save(report, screenshot: screenshot)
+    }
+
+    func done() {
+        // Dismissal only. Intentionally no submission or state transition.
+    }
+
+    func submitToTriage(_ id: UUID) async throws -> DebugBugReportReceipt {
+        guard let submission else {
+            throw DebugBugReportSubmissionCoordinator.SubmissionError.missingReport(id)
+        }
+        return try await submission.submit(id)
+    }
+}
+
 actor DebugBugReportSubmissionCoordinator {
     enum SubmissionError: Error { case missingReport(UUID), invalidReceipt }
     let outbox: DebugBugReportOutbox

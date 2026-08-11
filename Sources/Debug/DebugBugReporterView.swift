@@ -222,7 +222,7 @@ private struct DebugBugReportSheet: View {
                 }
                 if let savedPackage {
                     Section {
-                        Label("Saved on this phone — not yet shared", systemImage: "checkmark.circle.fill")
+                        Label("Saved on this phone — not submitted", systemImage: "checkmark.circle.fill")
                             .foregroundStyle(.green)
                         ShareLink(item: exportedFile(in: savedPackage)) { Label("Share report package", systemImage: "square.and.arrow.up") }
                     }
@@ -238,8 +238,13 @@ private struct DebugBugReportSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(savedPackage == nil ? "Save" : "Done") {
-                        if savedPackage == nil { save() } else { dismiss() }
+                    Button(savedPackage == nil ? "Save on this phone" : "Done") {
+                        if savedPackage == nil {
+                            save()
+                        } else {
+                            DebugBugReportWorkflow(outbox: .live).done()
+                            dismiss()
+                        }
                     }.disabled(savedPackage == nil && whatHappened.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
@@ -268,8 +273,10 @@ private struct DebugBugReportSheet: View {
         report.semanticActionTrail = draft.context.semanticActionTrail
         report.roadmapCheckpoint = DebugRoadmap.current.installedCheckpoint
         do {
-            savedPackage = try DebugBugReportOutbox.live.save(report, screenshot: screenshot?.png)
-            UIAccessibility.post(notification: .announcement, argument: "Saved on this phone — not yet shared")
+            savedPackage = try DebugBugReportWorkflow(outbox: .live)
+                .saveOnThisPhone(report, screenshot: screenshot?.png)
+            UIAccessibility.post(notification: .announcement,
+                                 argument: "Saved on this phone — not submitted")
         } catch {
             self.error = "Could not save this report: \(error.localizedDescription)"
             UIAccessibility.post(notification: .announcement, argument: "Bug report could not be saved")
@@ -296,7 +303,7 @@ private struct DebugBugReportQueueView: View {
                       systemImage: transportIcon(entry.report.transportState))
                     .font(.caption).foregroundStyle(.secondary)
                 ShareLink(item: DebugBugReportOutbox.live.exportURL(for: entry.report, in: entry.directory)) {
-                    Label("Share saved report", systemImage: "square.and.arrow.up")
+                    Label("Share saved report…", systemImage: "square.and.arrow.up")
                 }
                 .buttonStyle(.borderless)
                 if let configuration = DebugBugReportRelayConfiguration.live(),

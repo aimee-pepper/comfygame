@@ -160,6 +160,22 @@ final class DebugBugReporterTests: XCTestCase {
         XCTAssertEqual(outbox.reports().first?.report.remoteReference, "triage-42")
     }
 
+    func testSaveOnPhoneAndDoneNeverCallTransport() async throws {
+        let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let outbox = DebugBugReportOutbox(root: root)
+        let transport = RecordingBugTransport()
+        let workflow = DebugBugReportWorkflow(outbox: outbox, transport: transport)
+        let report = fixtureReport()
+
+        _ = try workflow.saveOnThisPhone(report, screenshot: nil)
+        workflow.done()
+
+        XCTAssertEqual(outbox.reports().first?.report.transportState, .unsent)
+        let transportCalls = await transport.callCount()
+        XCTAssertEqual(transportCalls, 0)
+    }
+
     func testSubmissionFailureRemainsDurableAndRetryable() async throws {
         let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
@@ -279,6 +295,16 @@ private struct StubBugTransport: DebugBugReportTransport {
         case .failure(let error): throw error
         }
     }
+}
+
+private actor RecordingBugTransport: DebugBugReportTransport {
+    private var calls = 0
+    func send(report: DebugBugReport, screenshot: Data?) async throws -> DebugBugReportReceipt {
+        calls += 1
+        return DebugBugReportReceipt(schemaVersion: 1, remoteReference: "unexpected",
+                                     receivedAt: Date())
+    }
+    func callCount() -> Int { calls }
 }
 
 private actor RequestRecorder {
