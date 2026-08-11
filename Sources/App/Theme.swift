@@ -89,7 +89,7 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
         case current, reserved, recommended, pressing
         var displayName: String {
             switch self {
-            case .current: "Current live balance"
+            case .current: "Legacy · level only"
             case .reserved: "A · Reserved"
             case .recommended: "B · Recommended start"
             case .pressing: "C · Pressing"

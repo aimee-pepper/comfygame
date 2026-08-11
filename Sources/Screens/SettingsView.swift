@@ -159,7 +159,7 @@ struct BalancingView: View {
                         Text($0.displayName).tag($0)
                     }
                 }
-                Text("DEBUG comparison only. Current keeps live coefficients; A/B/C freeze their result when combat opens.")
+                Text("DEBUG comparison only. Legacy uses party level but not party-size pressure. A/B/C add ordinary budget and apex durability, offence and actions; each result freezes when combat opens.")
                     .font(.caption).foregroundStyle(.secondary)
                 resetSection("Creatures") {
                     settings.debugTuning.creatureDensityMultiplier = 1
