@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "0cec007 · Blacksmith maker workflow",
+  "installedCheckpoint": "8471c75 · one-star Constellation",
   "essenceBaseline": "a816113",
   "currentWork": "P1 bug-report delivery + save-slot phone acceptance",
   "currentNote": "Independent campaign saves and the hardened local bug-report outbox are installed for phone acceptance. Reports now include exact route, safe campaign/encounter context, active tuning and a bounded semantic action trail. Direct delivery remains pending an approved relay endpoint and Keychain credential.",
@@ -93,6 +93,14 @@
       "status": "readyToTest",
       "detail": "Blacksmith Make/Reforge/Learn now proves the shared shell: three-across rules-owned families, six-across exact worn/stored/waiting targets, requirement sockets, anchored stock detail and atomic stale rejection.",
       "gate": "Aimee verifies the Blacksmith flow on phone; Tannery/Bowyer/Armoury/Weaponsmith reuse the shell without copying thresholds or flattening their distinct verbs."
+    },
+    {
+      "id": "constellation-first-slice",
+      "priority": "P1",
+      "title": "Truthful one-star Constellation",
+      "status": "readyToTest",
+      "detail": "The single live Long Instruction is now one centred stateful star with anchored detail, campaign-scoped effect copy and atomic no-op rejection for insufficient or duplicate purchase attempts.",
+      "gate": "Phone proof preserves wallet, star state, exact 0/1 rank and Mote cost without implying a reset, prestige loop or unavailable constellation graph."
     },
     {
       "id": "field-controls",
