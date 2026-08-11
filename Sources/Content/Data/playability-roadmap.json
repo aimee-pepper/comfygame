@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "bd2b5d2 · Immutable world-color bind receipts",
+  "installedCheckpoint": "2c3f3d4 · Compact world controls and dark lifted-tile backdrop",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 field-control placement correction",
-  "currentNote": "The compact world screen is restoring D-pad left and minimap right with exactly Interact and Look beneath it. The scrolling satchel/event content must end above that fixed pane, and transparent lifted-tile pixels must reveal the dark game field rather than white system background. World-color remains installed and ready for phone comparison.",
+  "currentWork": "P1 generated-native item identity seam",
+  "currentNote": "Field controls are corrected in 2c3f3d4: D-pad left, minimap right, exactly Interact and Look beneath it, scrolling content above, and lifted-tile transparency over the dark game field. Engineering is now isolating a generated visual-pack consumer so Asset can publish item pixels without editing gameplay/screens.",
   "items": [
     {
       "id": "essence",
@@ -122,7 +122,7 @@
       "id": "field-controls",
       "priority": "P1",
       "title": "Look + fixed field controls",
-      "status": "inProgress",
+      "status": "readyToTest",
       "detail": "D-pad stays left; minimap stays right; Interact and Look are the only two buttons beneath it. Look retains zero-turn adjacent inspection and Interact owns the current tile action without adding vertical control rows.",
       "gate": "368×800 shows the complete satchel/event row above the fixed pane, both action buttons below the minimap, exact movement/hazard parity, zero Look mutation and no white lifted-tile seams."
     },
@@ -194,8 +194,8 @@
       "id": "item-character-identities",
       "priority": "P1",
       "title": "Recognizable item and character tiles",
-      "status": "pending",
-      "detail": "Six-across layout is correct, but duplicated SF Symbols still collapse equipment families and generic people glyphs weaken Party/Library identity. Asset has accepted a first 30-item mapping; native consumption remains.",
+      "status": "inProgress",
+      "detail": "Six-across layout is correct, but duplicated SF Symbols still collapse equipment families. Engineering is freezing the generic generated command/raster/ItemID seam while Asset prepares a closed catalogue-items-v1 manifest and generated registry; current fallback remains until that pack is integration-ready.",
       "gate": "Stable authored identity survives Storehouse, loot, equipment, Trading Post and Recycler; named-character identity survives map, Party and Library; rarity, stats and array order never invent identity."
     }
   ],
