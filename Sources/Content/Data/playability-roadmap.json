@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "cfe236c · Deliberate stationary-threat contact",
+  "installedCheckpoint": "71ffca2 · Combat-v2 generated authority",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 combat-tree-v2 generated authority freshness",
-  "currentNote": "World contact is green in cfe236c: apexes and active flora are safe at adjacency and engage only on direct occupied-tile entry. Before v2 promotion, Engineering is repairing the schema-2 authority generator and exact Effect-copy mirror; tutorials remain excluded.",
+  "currentWork": "P1 combat-tree-v2 shared consumer foundations",
+  "currentNote": "Schema-2 topology, all 72 exact Effect strings and canonical 20-technique/52-passive ownership are generated and freshness-gated in 71ffca2. Combat-v2 remains inactive while Engineering implements and scenario-tests the shared consumer primitives; tutorials remain excluded.",
   "items": [
     {
       "id": "essence",
@@ -203,7 +203,7 @@
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
       "status": "inProgress",
-      "detail": "Promote the accepted three true graphs through stable node ownership, lossless save migration, all shared consumer primitives and the native phone graph. Keep unresolved baseline ownership and Withdraw naming choices separable from topology and passive consumers.",
+      "detail": "Checkpoint 71ffca2 generates the accepted three true graphs, exact Effect copy and canonical technique ownership from schema-2 authority, with every normal Xcode build failing stale mirrors. Next: implement and scenario-test shared consumer primitives, then lossless ownership migration and the native phone graph. Keep unresolved baseline ownership and Withdraw naming choices separable.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {
@@ -229,6 +229,30 @@
       "status": "queued",
       "detail": "Channelworks construction already grants Oda's authored Heat Conduit, but the station screen makes the separate player-core conversion look like the same pending restoration. Add/adopt one durable restoration receipt, confirm the restored fixture, and label the repeatable action Build another conduit.",
       "gate": "Fresh and unlocked-legacy saves, a moved/equipped/sold first fixture, repeated relaunch, and repeatable Heat-core conversion prove exactly one authored entitlement and truthful Oda-to-Auber progression. Authority: channelworks-system-current.md and DRQ-083."
+    },
+    {
+      "id": "traveller-world-pacing",
+      "priority": "P1",
+      "title": "Prevent first-world traveller crowds",
+      "status": "queued",
+      "detail": "Fresh world one placed Mara and early-mid Bryn together because worldgen ignores sequencing metadata and places every matching signature. Place at most one new traveller; opening people may match blindly, later people use max(3, order-blindDiscoveryWindow) with DEBUG Recommended 3, and an exact recovered location clue may accelerate its person.",
+      "gate": "The reported Mara+Bryn fixture, Sela-before-Bryn frontier, DEBUG windows 1/3/6, clue-backed priority, name-only knowledge, simultaneous matches, anchored revisits and seeded campaigns prove at most one new traveller per world without turning pages into permanent gates. Authority: traveller-world-pacing-current.md."
+    },
+    {
+      "id": "library-collection-accuracy",
+      "priority": "P1",
+      "title": "Trustworthy Library page indexing",
+      "status": "readyToTest",
+      "detail": "Implemented at 7a798a6/de2b71b: Diaries groups pages written by an author; People groups clues about a person over the same stable recovered IDs; counts name their basis and unknown legacy IDs remain visible as Older records.",
+      "gate": "On the current phone build, a cross-author page appears through both correct routes without double-counting, recruitment invents no pages, and the four compact tabs/page details remain readable at ordinary and large text. Authority: library-collection-accuracy-current.md."
+    },
+    {
+      "id": "authored-text-first-review",
+      "priority": "P1",
+      "title": "Review Isolde dialogue and Sabine clues",
+      "status": "queued",
+      "detail": "The transcript-order interaction bug is implemented separately, while exact observation-first replacements for Isolde's three opaque optional replies and Sabine's complete seven-location sequence await Aimee's side-by-side Atlas selections. Do not promote unreviewed prose automatically.",
+      "gate": "Aimee selects Original, Candidate, Needs another pass or Hold for each stable unit; arbitrary Isolde tap order preserves independent replies; Sabine's approved sequence retains exact condition/clue indices; regenerated Atlas hashes and phone/Large Text copy pass. Authority: dialogue-review-first-batch-current.md."
     }
   ],
   "paused": [
