@@ -13,9 +13,14 @@ struct EncounterView: View {
     /// The skill list, open. Twelve of them won't fit on a key.
     @State private var isChoosingSkill = false
     @State private var isChoosingItem = false
+    @State private var isConfirmingWithdraw = false
 
     private var run: WorldRun? { store.state.worlds.activeRun }
     private var encounter: EncounterState? { store.activeEncounter }
+    private var withdrawalCost: Int {
+        guard let actor = store.actingCombatant else { return Int(Tuning.Encounter.fleeStabilityCost) }
+        return Int(CombatRules.withdrawalStabilityCost(for: actor, in: store.state))
+    }
 
     private enum TargetingMode: Equatable { case attack, damageSkill, item(InstanceID) }
 
@@ -42,6 +47,19 @@ struct EncounterView: View {
             }
         }
         .background(Color(.systemGroupedBackground))
+        .confirmationDialog("Withdraw from this fight?", isPresented: $isConfirmingWithdraw,
+                            titleVisibility: .visible) {
+            Button(withdrawalCost == 0 ? "Withdraw without losing Stability"
+                                      : "Withdraw for \(withdrawalCost) Stability",
+                   role: .destructive) {
+                store.takeCombatAction(.flee)
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text(withdrawalCost == 0
+                 ? "The party leaves this encounter and remains in the world. Vanish prevents this Stability loss."
+                 : "The party leaves this encounter, remains in the world, and loses \(withdrawalCost) Stability.")
+        }
     }
 
     // MARK: Header
@@ -187,9 +205,13 @@ struct EncounterView: View {
                         stopTargeting()
                         isChoosingItem = true
                     }
-                    ActionKey("Flee", icon: "figure.run",
-                              detail: "−\(Int(Tuning.Encounter.fleeStabilityCost)) stability",
-                              isDestructive: true) { stopTargeting(); store.takeCombatAction(.flee) }
+                    ActionKey("Withdraw", icon: "figure.run",
+                              detail: withdrawalCost == 0 ? "no stability lost"
+                                                          : "−\(withdrawalCost) stability",
+                              isDestructive: true) {
+                        stopTargeting()
+                        isConfirmingWithdraw = true
+                    }
                 }
             } else {
                 Text("…")
@@ -326,7 +348,7 @@ struct EncounterView: View {
     private func outcomeText(_ outcome: EncounterOutcome) -> String {
         switch outcome {
         case .victory: "Nothing left standing."
-        case .fled: "You break away."
+        case .fled: "The party withdrew."
         case .defeated: "You can't go on."
         }
     }

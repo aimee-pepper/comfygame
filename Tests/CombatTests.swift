@@ -373,15 +373,76 @@ final class CombatTests: XCTestCase {
         XCTAssertFalse(run.enemies.isEmpty, "Fleeing doesn't kill anything")
     }
 
+    func testVanishMakesExactlyOneWithdrawPerExpeditionFree() throws {
+        let store = inFight()
+        let before = try XCTUnwrap(store.activeRun).stability
+        XCTAssertEqual(CombatRules.withdrawalStabilityCost(for: .binder, in: store.state), 0)
+
+        store.mutate("test: first Vanish withdraw") {
+            CombatRules.perform(.flee, by: .binder, in: &$0)
+        }
+        XCTAssertEqual(try XCTUnwrap(store.activeRun).stability, before, accuracy: 0.001)
+        XCTAssertEqual(store.activeRun?.vanishWithdrawSpent, true)
+        XCTAssertEqual(CombatRules.withdrawalStabilityCost(for: .binder, in: store.state),
+                       Tuning.Encounter.fleeStabilityCost)
+
+        store.mutate("test: another encounter in same expedition") { state in
+            state.worlds.activeRun?.activeEncounter?.outcome = nil
+            CombatRules.perform(.flee, by: .binder, in: &state)
+        }
+        XCTAssertEqual(try XCTUnwrap(store.activeRun).stability,
+                       before - Tuning.Encounter.fleeStabilityCost, accuracy: 0.001)
+    }
+
+    func testVanishWithdrawReceiptRoundTripsAndLegacyRunDefaultsUnused() throws {
+        let store = inFight()
+        store.mutate("test: spend Vanish") { CombatRules.perform(.flee, by: .binder, in: &$0) }
+        let spent = try XCTUnwrap(store.activeRun)
+        XCTAssertTrue(try JSONDecoder().decode(WorldRun.self,
+                                               from: JSONEncoder().encode(spent)).vanishWithdrawSpent)
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(spent))
+            as? [String: Any])
+        object.removeValue(forKey: "vanishWithdrawSpent")
+        let legacy = try JSONSerialization.data(withJSONObject: object)
+        XCTAssertFalse(try JSONDecoder().decode(WorldRun.self, from: legacy).vanishWithdrawSpent)
+    }
+
+    func testLegacyRoutDecodeIsInertAndDoesNotSpendTurn() throws {
+        let store = inFight()
+        giveTheTurnTo(.binder, in: store)
+        let before = try XCTUnwrap(store.activeEncounter)
+
+        store.mutate("test: decoded legacy Rout") {
+            CombatRules.perform(.skill("rout"), by: .binder, in: &$0)
+        }
+
+        let after = try XCTUnwrap(store.activeEncounter)
+        XCTAssertEqual(after.turnIndex, before.turnIndex)
+        XCTAssertEqual(after.roundNumber, before.roundNumber)
+        XCTAssertEqual(after.outcome, before.outcome)
+        XCTAssertEqual(after.cooldowns, before.cooldowns)
+    }
+
     func testSkillGoesOnCooldownAndComesBack() throws {
         let store = inFight(["ink_hound"])
         XCTAssertTrue(store.isSkillReady)
-        let skill = try XCTUnwrap(store.currentSkill)
+        let skill = try XCTUnwrap(store.readySkills.first { $0.kind == .damage })
+        let sight = try XCTUnwrap(CombatRules.skills(for: .binder, in: store.state)
+            .first { $0.id == "sight" })
+        let foe = try XCTUnwrap(foes(store).first)
+        giveTheTurnTo(.binder, in: store)
 
-        store.takeCombatAction(.damageSkill(foe: try XCTUnwrap(foes(store).first).id))
+        store.mutate("test: exact skill cooldown") {
+            CombatRules.perform(.damageSkill(foe: foe.id), by: .binder, in: &$0)
+        }
         let encounter = try XCTUnwrap(store.activeEncounter)
         XCTAssertGreaterThan(encounter.binderSkillCooldown, 0)
-        XCTAssertFalse(store.isSkillReady, "A skill just used is not ready again")
+        XCTAssertGreaterThan(CombatRules.cooldown(of: skill, for: .binder, in: encounter), 0,
+                             "the exact skill just used is ready again")
+        XCTAssertFalse(CombatRules.isReady(skill, for: .binder, in: encounter))
+        XCTAssertTrue(CombatRules.isReady(sight, for: .binder, in: encounter),
+                      "cooling Unbind incorrectly hid the Binder's independently ready Sight")
         XCTAssertLessThanOrEqual(encounter.binderSkillCooldown, skill.cooldownRounds)
     }
 
@@ -1575,16 +1636,21 @@ final class CombatTests: XCTestCase {
     @MainActor
     func testEachOfThemActsOnTheirOwnRulesAndIsNamed() throws {
         let store = try storeWithAFullParty()
+        let expectedNames = Set(store.state.base.activeParty.map { store.state.base.roster[$0].name })
+        var seenNames = Set<String>()
         var guardCount = 0
-        while store.activeEncounter?.outcome == nil, guardCount < 40 {
+        while store.activeEncounter?.outcome == nil, seenNames != expectedNames, guardCount < 40 {
             guardCount += 1
             guard let foe = store.activeEncounter?.livingFoes.first else { break }
             store.takeCombatAction(.attack(foe: foe.id))
+            let log = store.activeEncounter?.log ?? []
+            seenNames.formUnion(expectedNames.filter { name in
+                log.contains { $0.contains(name) }
+            })
         }
         let log = store.activeEncounter?.log.joined(separator: "\n") ?? ""
-        for index in store.state.base.activeParty {
-            let name = store.state.base.roster[index].name
-            XCTAssertTrue(log.contains(name), "\(name) came along and never did anything:\n\(log)")
+        for name in expectedNames {
+            XCTAssertTrue(seenNames.contains(name), "\(name) came along and never did anything:\n\(log)")
         }
     }
 

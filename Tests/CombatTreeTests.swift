@@ -145,15 +145,16 @@ final class CombatTreeTests: XCTestCase {
         }
     }
 
-    /// **Sight and Read are deliberately not in the trees** (Aimee, 7 Aug): they're knowledge rather
-    /// than fighting, and belong to an instrument. They must still be *usable*, though — a skill
-    /// that leaves the trees and has nowhere else to live is a skill nobody can ever use again.
-    func testSightAndReadLeftTheTreesWithoutBecomingUnreachable() {
+    /// Sight and Read remain outside the graph and belong temporarily to distinct identities.
+    func testSightAndReadLeftTheTreesForIdentityOwnership() {
         let taught = Set(branches.flatMap { $0.nodes.compactMap(\.grantsSkill) })
         XCTAssertFalse(taught.contains("sight"), "Sight is a lens, not a branch")
         XCTAssertFalse(taught.contains("read"), "Read is a lens, not a branch")
-        XCTAssertTrue(Tuning.TreeSkills.baseline.contains("sight"))
-        XCTAssertTrue(Tuning.TreeSkills.baseline.contains("read"))
+        let state = GameState.newGame()
+        XCTAssertTrue(CombatActionOwnershipRules.availableSkillIDs(for: .binder, in: state)
+            .contains("sight"))
+        XCTAssertTrue(CombatActionOwnershipRules.availableSkillIDs(for: .companion(0), in: state)
+            .contains("read"))
     }
 
     // MARK: It reaches the fight
@@ -233,9 +234,9 @@ final class CombatTreeTests: XCTestCase {
                        CombatTreeRules.totalPoints(atLevel: Tuning.Character.maximumLevel),
                        "the points came back")
         XCTAssertEqual(store.state.base.essence, purse - cost)
-        XCTAssertTrue(CombatRules.skills(for: .binder, in: store.state).allSatisfy {
-            Tuning.TreeSkills.baseline.contains($0.id.rawValue)
-        }, "unlearned the branch and kept the skills")
+        XCTAssertEqual(Set(CombatRules.skills(for: .binder, in: store.state).map(\.id)),
+                       CombatActionOwnershipRules.binderInnate,
+                       "respec kept only the Binder's identity techniques")
     }
 
     /// Nothing to take back, and nothing to pay for it with, are both refusals rather than crashes.

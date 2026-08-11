@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "f9be251 · Honest local bug-report save",
+  "installedCheckpoint": "f178936 · Combat damage authority",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 combat-tree-v2 shared consumer foundations",
-  "currentNote": "Checkpoint a86c2d3 adds the dormant actor-derived-stat foundation without partially activating v2. Engineering continues the shared consumer primitives and scenario coverage; tutorials remain excluded.",
+  "currentWork": "P1 combat technique ownership and Withdraw migration",
+  "currentNote": "Installed checkpoint f178936 centralizes live combat damage arithmetic. The current checkpoint removes universal technique ownership, assigns identity techniques, retires Rout, and makes Vanish apply to one confirmed Withdraw per expedition; tutorials remain excluded.",
   "items": [
     {
       "id": "essence",
@@ -48,11 +48,11 @@
     },
     {
       "id": "recycler",
-      "priority": "F",
-      "title": "Independent Recycler engine",
-      "status": "readyToTest",
-      "detail": "Receipt-first and explicit authored-salvage rules are checkpointed with atomic stored/overflow handling; Noll and the player-facing station remain separate.",
-      "gate": "Rules suite passed; phone station flow waits for approved Noll integration."
+      "priority": "P1",
+      "title": "Noll and the player-facing Recycler",
+      "status": "queued",
+      "detail": "The receipt-first Recycler rules/state are green, but no live Noll, station catalogue row, Home route or player-facing recovery verb exists. Decision182 already approves reversible Noll promotion; exact prose and Field Separation Kit remain separate review work.",
+      "gate": "Use opening-economy-trio-promotion-audit-current.md: 29-live catalogue, Noll band0/order2/signature, 15-Essence build, dormant old-state migration, atomic Recycler phone route, no Field Kit, corrected Sela/Halloway exchange IDs and complete sell→recycle→make→bind runway proof."
     },
     {
       "id": "anchorage-settlement",
@@ -203,7 +203,7 @@
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
       "status": "inProgress",
-      "detail": "Checkpoint 71ffca2 generates the accepted true graphs and canonical grants; a86c2d3 adds dormant stable-ID derived stats. The current checkpoint extracts matchup, rank, armour-ignore and minimum-damage arithmetic into one preview/exact rule and makes the live legacy strike path consume it without changing RNG or outcomes. Decision185 settles reversible playtest naming and starting ownership for the later palette migration.",
+      "detail": "Checkpoints 71ffca2 and a86c2d3 establish generated true-graph authority and dormant stable-ID derived stats; installed f178936 makes the live strike path consume one shared damage rule. The current Decision185 slice replaces universal technique grants with Binder Unbind/Sight, Quill Mend/Read, Ashe Ground, exact graph ownership, inert decode-only Rout, and one confirmed Vanish-powered Withdraw per expedition.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {
@@ -275,8 +275,8 @@
       "priority": "P1",
       "title": "One trustworthy expedition return receipt",
       "status": "queued",
-      "detail": "Full and partial exits still repeat the complete RunExitSummary field list even after the missing-page/traveller recap fix. Consolidate every outcome through one rules-owned frozen receipt so future XP, writing, recruitment and economy additions cannot drift by exit path.",
-      "gate": "One seeded all-category run through portal, Waystone, collapse, defeat and abandon proves parity for every non-loss-dependent category, exact retained/lost differences, atomic consumption/banking, relaunch idempotence and one constructor completeness seam. Authority: expedition-return-receipt-current.md."
+      "detail": "Full and partial exits still repeat the complete RunExitSummary field list after the missing-page/traveller fix, while loot lines discard stable/exact identity into name/SF-icon/count rows. Consolidate every outcome through one rules-owned frozen typed receipt so categories, item identity and accepted graphics cannot drift.",
+      "gate": "One seeded all-category run through portal, Waystone, collapse, defeat and abandon proves parity, exact retained/lost typed resource/stackable/unique lines, profile/provenance/identified round-trip, duplicate-label safety, atomic banking, relaunch, old receipt decode, six-across anchored detail and one constructor seam. Authority: expedition-return-receipt-current.md and Decision192."
     },
     {
       "id": "penmanship-native",
@@ -291,8 +291,32 @@
       "priority": "P1",
       "title": "Stack-independent failure retention",
       "status": "queued",
-      "detail": "Live discrete failure retention is neither random nor stack-neutral: it never consumes its RNG and floors each stack independently, so differently binned one-off finds can all be lost at the same fraction that preserves stacked copies. Correct one total-unit budget before separately deciding whether the suggested survivors are player-editable.",
-      "gate": "At 25/50/75%, merged/split and different-catalogue representations produce the same total budget; stable candidate identity/provenance survives; outcome-ID suggestion is deterministic; protected starting property and bulk resources remain outside; no agency UI is implied. Authority: failure-recovery-agency-recommendation.md DRQ-089 arithmetic split."
+      "detail": "Failure retention floors both discrete stacks and bulk resource kinds independently, so catalogue/bin variety changes the numerical penalty. Correct separate total-unit budgets: exact discrete candidates and automatic largest-remainder bulk apportionment; player-editable discrete recovery remains a later review.",
+      "gate": "At 25/50/75%, merged/split discrete stacks and one-kind/many-kind bulk resources produce their exact total budgets; stable item identity survives; bulk ties and automatic item suggestions are outcome-ID deterministic; starting property remains protected; Raw Essence/Motes and relaunch receipts are exact; no agency UI is implied. Authority: failure-recovery-agency-recommendation.md, DRQ-089/179 and Decision193."
+    },
+    {
+      "id": "compound-hostility-authority",
+      "priority": "P1",
+      "title": "Replace hidden compound tier fossils coherently",
+      "status": "queued",
+      "detail": "Six ordinary compounds still add flat live enemy tiers even though pressure readings now own world composition, ecology and population. Compare the complete six-compound removal as one balance migration; do not silently remove only Dim Sky/Gilded Veins or touch typed Danger bargains.",
+      "gate": "Same-seed on/off fixtures cover all six compounds, pressure-equivalent controls, party sizes 1/3/5, early/established levels, ordinary/teeming/large worlds, encounter previews, apex invariance, XP/resources and tolerant old books. Retune only the systemic authority that explains any measured gap. Authority: compound-hostility-fossil-audit-current.md and Decision190."
+    },
+    {
+      "id": "combat-affliction-authority",
+      "priority": "P1",
+      "title": "Give every affliction one exact owner",
+      "status": "queued",
+      "detail": "Burn, Poison and Dazzle use one collection while Bleed occupies four legacy paths; the shared companion counter currently makes one wound damage every living companion. Consolidate exact-combatant definitions and fix Broad Antidote's arbitrary first-status removal alongside combat-v2 consumers.",
+      "gate": "Burn/Poison/Dazzle/Bleed only; exact ally ownership, independent severity/duration, refresh/coexistence, Stonebark one-shot, typed cures, selected Broad Antidote, Bleed-excluding Quench, presentation and tolerant mid-encounter migration pass. Authority: combat-affliction-authority-current.md, DRQ-177 and Decision191."
+    },
+    {
+      "id": "legacy-token-quirk-cleanup",
+      "priority": "P2",
+      "title": "Remove retired Token and Quirk promises",
+      "status": "queued",
+      "detail": "Decision189 cuts Traveller's Token and the separately rolled Quirk/veto/reroll layer. Scent Mask remains independently justified; paired opportunity/consequence remains systemic. Clean only remaining current/runtime promises while preserving legacy decode aliases and archived rationale.",
+      "gate": "Release/current-copy and route scans expose no Traveller's Token recipe, Quirk slot/deck or reroll affordance; 17 consumables remain complete; legacy compound/item IDs decode without becoming writable; Dim Sky/Gilded Veins and Danger runes retain their real pressure consumers."
     }
   ],
   "paused": [

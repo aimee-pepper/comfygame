@@ -15,11 +15,10 @@ extension GameStore {
     }
 
     var isSkillReady: Bool {
-        guard let encounter = activeEncounter, let actor = actingCombatant else { return false }
-        return CombatRules.isSkillReady(for: actor, in: encounter)
+        !readySkills.isEmpty
     }
 
-    var currentSkill: SkillDef? { actingCombatant.flatMap { CombatRules.skill(for: $0) } }
+    var currentSkill: SkillDef? { actorSkills.first }
 
     /// **Everything whoever's acting could do**, and which of those are up this turn.
     var actorSkills: [SkillDef] {

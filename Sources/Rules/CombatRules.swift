@@ -289,19 +289,11 @@ enum CombatRules {
     /// fossil of a party that was exactly two people with fixed lists. Skills come from branches
     /// now, so a smith who spent in Shadow can Conceal and a soldier who didn't, can't.
     ///
-    /// **Two are deliberately untreed.** Unbind and Mend are the baseline everybody has. Sight and
-    /// Read are knowledge rather than fighting and Aimee ruled them *object* skills — they belong to
-    /// an instrument once instruments exist, and until then they stay baseline rather than
-    /// unreachable, which would be worse.
+    /// Identity techniques remain separate from graph ownership: Binder carries Unbind/Sight,
+    /// Quill carries Mend/Read, and Ashe carries Ground. `SkillDef.owner` and Rout are legacy input.
     static func skills(for actor: Combatant, in state: GameState) -> [SkillDef] {
-        guard actor.isParty else { return [] }
-        let learned = CombatTreeRules.loadout(for: state.base.character(actor.member)).skills
-        return ContentCatalog.shared.skills.filter {
-            Tuning.TreeSkills.baseline.contains($0.id.rawValue) || learned.contains($0.id)
-                || ($0.id.rawValue == "ground" && actor.rosterIndex.flatMap {
-                    state.base.roster.indices.contains($0) ? state.base.roster[$0].traveller : nil
-                } == TravellerID(rawValue: "ashe"))
-        }
+        let owned = CombatActionOwnershipRules.availableSkillIDs(for: actor, in: state)
+        return ContentCatalog.shared.skills.filter { owned.contains($0.id) }
     }
 
     /// The first skill of a kind this member could use *right now*. Nil if they haven't got one or
@@ -366,6 +358,16 @@ enum CombatRules {
             }
         }
         return true
+    }
+
+    /// Exact consequence shown before the ordinary retreat commits.
+    static func withdrawalStabilityCost(for actor: Combatant, in state: GameState) -> Double {
+        canVanishWithdraw(actor, in: state) ? 0 : Tuning.Encounter.fleeStabilityCost
+    }
+
+    private static func canVanishWithdraw(_ actor: Combatant, in state: GameState) -> Bool {
+        guard let run = state.worlds.activeRun else { return false }
+        return loadout(of: actor, in: state).freeFlee && !run.vanishWithdrawSpent
     }
 
     /// **Every skill's effect.**
@@ -647,26 +649,6 @@ enum CombatRules {
         (encounter.statuses[actor] ?? []).contains { $0.kind == kind }
     }
 
-    static func skill(for actor: Combatant) -> SkillDef? {
-        switch actor {
-        case .binder: ContentCatalog.shared.skill(ownedBy: .binder)
-        case .companion: ContentCatalog.shared.skill(ownedBy: .companion)
-        case .foe: nil
-        }
-    }
-
-    static func skillCooldown(for actor: Combatant, in encounter: EncounterState) -> Int {
-        switch actor {
-        case .binder: encounter.binderSkillCooldown
-        case .companion: encounter.companionSkillCooldown
-        case .foe: 0
-        }
-    }
-
-    static func isSkillReady(for actor: Combatant, in encounter: EncounterState) -> Bool {
-        skill(for: actor) != nil && skillCooldown(for: actor, in: encounter) == 0
-    }
-
     /// **What somebody can take**, which is Fortitude on top of the base (session 17 §1).
     ///
     /// **This is also where the party is put right.** A run begins at these values and health is
@@ -715,12 +697,15 @@ enum CombatRules {
     static func perform(_ action: CombatAction, by actor: Combatant, in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter, encounter.outcome == nil
         else { return }
-        if case .skill(let id, _, _) = action,
-           let skill = ContentCatalog.shared.skill(id), skill.kind == .ambush,
-           !isReady(skill, for: actor, in: encounter) {
-            // A stale opening-action tap is not a completed action. Reject it without moving the
-            // schedule or consuming a cooldown/receipt.
-            return
+        if case .skill(let id, _, _) = action {
+            guard let skill = ContentCatalog.shared.skill(id),
+                  skills(for: actor, in: state).contains(skill),
+                  isReady(skill, for: actor, in: encounter)
+            else {
+                // Saved palette selections and old Rout actions remain decodable, but an action
+                // the actor no longer owns cannot spend a turn during one-way migration.
+                return
+            }
         }
 
         switch action {
@@ -768,12 +753,15 @@ enum CombatRules {
             useItem(stackID, on: ally, run: &run, encounter: &encounter)
 
         case .flee:
-            // Always succeeds — it costs the run, not a dice roll.
-            // **Vanish.** Leaving costs the world nothing if you were never really there.
-            if !loadout(of: actor, in: state).freeFlee {
+            // Always succeeds — it costs the run, not a dice roll. Vanish pays for one Withdraw
+            // per expedition; the receipt prevents a later encounter in the same world reusing it.
+            if canVanishWithdraw(actor, in: state) {
+                run.vanishWithdrawSpent = true
+                encounter.note("The party withdraws without disturbing the world.")
+            } else {
                 run.stability = max(0, run.stability - Tuning.Encounter.fleeStabilityCost)
+                encounter.note("The party withdraws. The world notices.")
             }
-            encounter.note("You break away. The world notices.")
             encounter.outcome = .fled
         }
 

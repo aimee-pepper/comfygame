@@ -314,11 +314,6 @@ enum Tuning {
         static let finishThreshold: Double = 0.35
         /// Rounds a coating lasts beyond the skill's own.
         static let envenomExtraRounds: Int = 2
-        /// **What everybody can do without spending a point.** Unbind and Mend are the floor; Sight
-        /// and Read are here only until instruments exist to carry them (Aimee: they're object
-        /// skills). Leaving them out entirely would make them unreachable, which is worse than
-        /// leaving them free.
-        static let baseline: Set<String> = ["unbind", "mend", "sight", "read"]
     }
 
     enum Danger {

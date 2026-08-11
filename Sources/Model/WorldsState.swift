@@ -680,6 +680,8 @@ struct WorldRun: Codable, Equatable, Sendable {
     var previousPosition: GridPoint?
     /// Turns before a bump can start another fight. Stops a flee from being undone immediately.
     var encounterGraceTurns: Int = 0
+    /// Vanish makes exactly one confirmed Withdraw free during this expedition.
+    var vanishWithdrawSpent: Bool = false
 
     /// The turn the meter reached zero, or nil while the world is still holding.
     ///
@@ -841,6 +843,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         offeredItems = try container.decodeIfPresent([ItemStack].self, forKey: .offeredItems) ?? []
         previousPosition = try container.decodeIfPresent(GridPoint.self, forKey: .previousPosition)
         encounterGraceTurns = try container.decodeIfPresent(Int.self, forKey: .encounterGraceTurns) ?? 0
+        vanishWithdrawSpent = try container.decodeIfPresent(Bool.self, forKey: .vanishWithdrawSpent) ?? false
         collapsedOnTurn = try container.decodeIfPresent(Int.self, forKey: .collapsedOnTurn)
         binderHP = try container.decodeIfPresent(Int.self, forKey: .binderHP) ?? Tuning.Encounter.binderMaxHP
         partyProgressAtStart = try container.decodeIfPresent([RunProgressStart].self,
@@ -896,6 +899,7 @@ extension WorldRun {
         snapshot.carriedInstruments = []
         snapshot.carriedInstrumentPrecisions = [:]
         snapshot.activeEncounter = nil
+        snapshot.vanishWithdrawSpent = false
         snapshot.offeredItems = []
         snapshot.partyProgressAtStart = []
         snapshot.experienceBreakdown = RunExperienceBreakdown()
