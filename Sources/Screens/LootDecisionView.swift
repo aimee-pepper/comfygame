@@ -64,13 +64,17 @@ struct LootDecisionCard: View {
 
                 let carriedItems = store.state.worlds.activeRun?.satchelItems.stacks ?? []
                 SixAcrossItemGrid(data: carriedItems, id: \.id) { carried in
-                    Button { selectedCarried = carried } label: {
+                    AnchoredItemDetailButton(item: carried, selection: $selectedCarried) {
                         ItemIconTile(icon: carried.icon, rarity: carried.rarity,
                                      quantity: carried.count, identified: carried.identified,
                                      location: .carried,
                                      accessibilityName: carried.displayName)
+                    } detail: { selected in
+                        LootSwapDetailSheet(carried: selected, offered: offered) {
+                            store.takeOffered(offered, dropping: selected)
+                            selectedCarried = nil
+                        }
                     }
-                    .buttonStyle(.plain)
                 }
 
                 Button(role: .destructive) {
@@ -91,12 +95,6 @@ struct LootDecisionCard: View {
             .padding(.vertical, 14)
             .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.orange.opacity(0.5), lineWidth: 1.5))
-            .sheet(item: $selectedCarried) { carried in
-                LootSwapDetailSheet(carried: carried, offered: offered) {
-                    store.takeOffered(offered, dropping: carried)
-                    selectedCarried = nil
-                }
-            }
         }
     }
 }

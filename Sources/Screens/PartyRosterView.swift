@@ -17,12 +17,7 @@ struct PartyRosterView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
-                StationCard(title: "Satchel", icon: "bag") {
-                    LabeledRow(icon: "square.grid.2x2", label: "Carried into a world",
-                               value: "\(store.state.base.satchelCapacity) slots")
-                    LabeledRow(icon: "house", label: "Stored at home",
-                               value: "\(store.state.base.inventory.slots) slots")
-                }
+                satchelSummary
 
                 LazyVGrid(columns: columns, spacing: 12) {
                     ForEach(store.partySlots) { slot in
@@ -44,59 +39,66 @@ struct PartyRosterView: View {
     private var columns: [GridItem] {
         dynamicTypeSize.isAccessibilitySize
             ? [GridItem(.flexible())]
-            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+            : Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
+    }
+
+    private var satchelSummary: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "bag")
+                .foregroundStyle(.tint)
+                .frame(width: 32, height: 32)
+                .background(Color.accentColor.opacity(0.14), in: RoundedRectangle(cornerRadius: 8))
+            Text("Satchel").font(.callout.weight(.semibold))
+            Spacer(minLength: 4)
+            Text("\(store.state.base.satchelCapacity) carried · \(store.state.base.inventory.slots) stored")
+                .font(.caption).foregroundStyle(.secondary)
+                .lineLimit(1).minimumScaleFactor(0.8)
+        }
+        .padding(.horizontal, 12).padding(.vertical, 8)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .combine)
     }
 
     /// Thumbnail and brief stats. Enough to choose who to open, and nothing more.
     private func card(_ slot: PartySlot) -> some View {
         let character = store.character(of: slot)
         let isComing = store.state.base.partyMembers.contains(slot)
-        return VStack(alignment: .leading, spacing: 10) {
+        let upgrade = GearSlot.allCases.contains { store.hasUpgradeAvailable(for: $0, slot: slot) }
+        return VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .top) {
                 Image(systemName: icon(slot))
-                    .font(.title)
+                    .font(.title2)
                     .foregroundStyle(.tint)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 34, height: 34)
                 Spacer()
                 if isComing {
-                    Text("with you")
-                        .font(.caption2.weight(.medium)).foregroundStyle(.green)
-                        .padding(.horizontal, 7).padding(.vertical, 3)
-                        .background(Color.green.opacity(0.14), in: Capsule())
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.caption).foregroundStyle(.green)
+                        .accessibilityLabel("With you")
                 }
             }
-            Text(store.name(of: slot)).font(.headline)
-            HStack(spacing: 12) {
-                statChip("Level", "\(character.level)")
-                statChip("Health", "\(health(slot))")
-            }
+            Text(store.name(of: slot)).font(.callout.weight(.semibold)).lineLimit(1)
+            Text("Lv \(character.level) · HP \(health(slot))")
+                .font(.caption.monospacedDigit()).foregroundStyle(.secondary).lineLimit(1)
             Text("Rank · \(character.rank.displayName)")
-                .font(.caption)
+                .font(.caption2)
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
 
             // A nudge if something better is sitting unworn, so you know which card to open.
-            if GearSlot.allCases.contains(where: { store.hasUpgradeAvailable(for: $0, slot: slot) }) {
-                Text("Something better is on the shelf.")
-                    .font(.caption2).foregroundStyle(.green)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            if upgrade {
+                Label("Upgrade", systemImage: "sparkles")
+                    .font(.caption2.weight(.medium)).foregroundStyle(.green).lineLimit(1)
             }
             Spacer(minLength: 0)
-            Image(systemName: "chevron.right")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-                .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, minHeight: 190, alignment: .topLeading)
+        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: dynamicTypeSize.isAccessibilitySize ? 150 : 124,
+               alignment: .topLeading)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
         .contentShape(RoundedRectangle(cornerRadius: 14))
-    }
-
-    private func statChip(_ label: String, _ value: String) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text(value).font(.callout.monospacedDigit().weight(.medium))
-            Text(label).font(.caption2).foregroundStyle(.secondary)
-        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(store.name(of: slot)). Level \(character.level). Health \(health(slot)). Rank \(character.rank.displayName).\(isComing ? " With you." : "")\(upgrade ? " Upgrade available." : "")")
     }
 
     private func icon(_ slot: PartySlot) -> String {

@@ -23,15 +23,16 @@ struct TradingPostView: View {
                     EmptyNote(emptyMessage)
                 } else {
                     SixAcrossItemGrid(data: listings, id: \.id) { listing in
-                        Button { opened = listing } label: {
+                        AnchoredItemDetailButton(item: listing, selection: $opened) {
                             ItemIconTile(icon: listing.icon,
                                          rarity: listing.rarity,
                                          quantity: listing.displayQuantity,
                                          identified: true,
                                          location: listing.location,
                                          accessibilityName: listing.name)
+                        } detail: { selected in
+                            TradingPostListingSheet(listing: selected).environmentObject(store)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
 
@@ -47,9 +48,6 @@ struct TradingPostView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Trading Post")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(item: $opened) { listing in
-            TradingPostListingSheet(listing: listing).environmentObject(store)
-        }
     }
 
     private var wallet: some View {

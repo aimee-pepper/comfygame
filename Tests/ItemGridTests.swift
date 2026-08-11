@@ -24,4 +24,26 @@ final class ItemGridTests: XCTestCase {
             + ItemGridMetrics.spacing * CGFloat(ItemGridMetrics.columns - 1)
         XCTAssertEqual(reconstructed, contentWidth, accuracy: 0.001)
     }
+
+    func testItemDetailUsesAnchoredPopoverUntilAccessibilitySizes() {
+        XCTAssertFalse(ItemDetailPresentationPolicy.usesSheet(dynamicTypeSize: .large))
+        XCTAssertFalse(ItemDetailPresentationPolicy.usesSheet(dynamicTypeSize: .xxxLarge))
+        XCTAssertTrue(ItemDetailPresentationPolicy.usesSheet(dynamicTypeSize: .accessibility1))
+        XCTAssertTrue(ItemDetailPresentationPolicy.usesSheet(dynamicTypeSize: .accessibility5))
+    }
+
+    func testItemDetailPrefersBodyAwayFromNearestVerticalEdge() {
+        let height: CGFloat = 800
+        XCTAssertEqual(ItemDetailPresentationPolicy.preferredArrowEdge(sourceMidY: 100,
+                                                                        screenHeight: height), .top)
+        XCTAssertEqual(ItemDetailPresentationPolicy.preferredArrowEdge(sourceMidY: 700,
+                                                                        screenHeight: height), .bottom)
+    }
+
+    func testItemGridReflowsAtAccessibilitySizes() {
+        XCTAssertEqual(ItemGridMetrics.columnCount(dynamicTypeSize: .large), 6)
+        XCTAssertEqual(ItemGridMetrics.columnCount(dynamicTypeSize: .xxxLarge), 6)
+        XCTAssertEqual(ItemGridMetrics.columnCount(dynamicTypeSize: .accessibility1), 3)
+        XCTAssertEqual(ItemGridMetrics.columnCount(dynamicTypeSize: .accessibility5), 3)
+    }
 }

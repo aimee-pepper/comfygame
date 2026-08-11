@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "updated": "11 Aug 2026",
+  "installedCheckpoint": "aa0d3b1 · local bug reporter",
+  "essenceBaseline": "a816113",
+  "currentWork": "Recycler + field/launch UI",
+  "currentNote": "Trading Post, Vance, resource visuals, lifted terrain and the local bug reporter are already installed. Current candidates must preserve those checkpoints.",
+  "items": [
+    {
+      "id": "essence",
+      "priority": "B0",
+      "title": "Essence continuation",
+      "status": "readyToTest",
+      "detail": "Recommended 5–7 drops × 2–3 raw is installed. Measure it; do not retune from memory.",
+      "gate": "Three ordinary returns now, building toward ten; another ordinary authored bind remains affordable."
+    },
+    {
+      "id": "awareness",
+      "priority": "A",
+      "title": "Awareness housekeeping",
+      "status": "complete",
+      "detail": "Complete in 5731aa9: 837 tests passed; combined checkpoint installed and launched on iPhone.",
+      "gate": "Passed. Preserve scope; field play observations return through ordinary bug triage."
+    },
+    {
+      "id": "outcome",
+      "priority": "C",
+      "title": "Atomic expedition outcome",
+      "status": "complete",
+      "detail": "Complete in c34e5a9. One monotonic receipt makes return-driven consumers idempotent across relaunch and anchored revisits.",
+      "gate": "Passed; preserve the receipt contract as Recycler and later production consume outcomes."
+    },
+    {
+      "id": "trading-post",
+      "priority": "D",
+      "title": "Sell-first Trading Post",
+      "status": "complete",
+      "detail": "Installed merchant stock, gold, safe selling and idempotent stock refresh. Internal and player-facing naming agree on Trading Post.",
+      "gate": "Preserve sell/cancel/reload, locks and anti-loop behavior during later economy UI work."
+    },
+    {
+      "id": "vance",
+      "priority": "E",
+      "title": "Vance first + 10e Trading Post",
+      "status": "complete",
+      "detail": "Vance is the first intended find and sole Trading Post owner; the 10-Essence construction path is installed.",
+      "gate": "Preserve fresh/old-save reachability and opening Essence runway."
+    },
+    {
+      "id": "recycler",
+      "priority": "F",
+      "title": "Independent Recycler engine",
+      "status": "pending",
+      "detail": "Recover exact construction receipts or explicit found-gear salvage with no invented provenance.",
+      "gate": "Recycle, reject, cancel and reload with exactly one recovery route."
+    },
+    {
+      "id": "noll",
+      "priority": "G",
+      "title": "Noll second + Halloway third",
+      "status": "queued",
+      "detail": "After Aimee approves Noll's identity/live copy, migrate to Vance → Noll → Halloway without granting Noll to old saves.",
+      "gate": "Fresh campaign reaches circulate → recover → retain/make without recreating the Essence blocker."
+    },
+    {
+      "id": "terrain",
+      "priority": "P1",
+      "title": "Terrain border correction",
+      "status": "complete",
+      "detail": "Lifted-terrain conformance and resource v0.6 are installed through b709e7c.",
+      "gate": "Reopen only for a contradictory physical-phone screenshot and exact location."
+    },
+    {
+      "id": "spatial-ui",
+      "priority": "P1",
+      "title": "Spatial game hubs",
+      "status": "pending",
+      "detail": "Equipment/Base/Bestiary are installed. Library author-vs-subject accuracy and compact Party fit are current design candidates.",
+      "gate": "Full suite plus 368×800 and large-text inspection before the next phone install."
+    },
+    {
+      "id": "field-controls",
+      "priority": "P1",
+      "title": "Look + fixed field controls",
+      "status": "pending",
+      "detail": "Inspect one adjacent tile without moving, spending a turn or leaking fog; keep Field Kit/resources above fixed navigation controls.",
+      "gate": "Exact movement/hazard parity, zero mutation and compact-phone reachability."
+    },
+    {
+      "id": "launch-handoff",
+      "priority": "P1",
+      "title": "Launch-screen handoff alignment",
+      "status": "pending",
+      "detail": "The static launch frame begins correctly, then the SwiftUI loading surface shifts when it takes over. Asset is comparing the two geometries.",
+      "gate": "Static → in-app loading transition preserves the same mark, scale and alignment on the physical phone."
+    },
+    {
+      "id": "item-popover",
+      "priority": "P1",
+      "title": "Anchored item details",
+      "status": "pending",
+      "detail": "Tapping a six-across item icon opens compact details at the source rather than navigating to a full screen.",
+      "gate": "Popover remains on-screen at every edge, supports large text and preserves action state."
+    },
+    {
+      "id": "refining",
+      "priority": "P1",
+      "title": "Spring refining skills",
+      "status": "queued",
+      "detail": "After baseline telemetry: batch control, a reversible 2→3 rate unlock, and outcome-safe auto-refining.",
+      "gate": "Opening 2:1 loop already works; unlock payback and precision cost remain healthy over ten returns."
+    },
+    {
+      "id": "bug-reporter",
+      "priority": "P1",
+      "title": "In-game bug reporter",
+      "status": "pending",
+      "detail": "Local capture/outbox is installed in aa0d3b1. Queue visibility and atomic package fixes are in progress; direct relay is still absent.",
+      "gate": "Offline/relaunch-safe local reports now; real idempotent queue receipt before calling direct submission complete."
+    }
+  ],
+  "paused": [
+    "Broad asset and catalogue expansion",
+    "Tutorial content for outside testers",
+    "New stations and companion systems",
+    "Great Work, Reality reset and Tam",
+    "Animation and non-blocking polish"
+  ]
+}

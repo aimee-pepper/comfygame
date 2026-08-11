@@ -13,6 +13,8 @@ struct WorldView: View {
     @State private var isShowingFieldKit = false
     @State private var isConfirmingAtlasSeam = false
     @State private var isConfirmingAnchorFrame = false
+    @State private var isLookArmed = false
+    @State private var inspection: InspectionPresentation?
     @State private var tutorialLesson: TutorialLessonID?
     @State private var dismissedTutorials: Set<TutorialLessonID> = []
 #if DEBUG
@@ -90,6 +92,10 @@ struct WorldView: View {
         } message: {
             Text("The frame will be consumed and this realm will remain in the Anchorage. No additional essence is charged.")
         }
+        .alert(item: $inspection) { result in
+            Alert(title: Text(result.value.heading), message: Text(result.value.details.joined(separator: " · ")),
+                  dismissButton: .default(Text("Done")))
+        }
         .overlay(alignment: .bottom) {
             if let id = tutorialLesson, let lesson = TutorialRules.definition(id), !tutorialSuppressed {
                 TutorialCard(lesson: lesson,
@@ -124,6 +130,7 @@ struct WorldView: View {
 
     /// Tap an adjacent tile to step; tap anywhere else to walk there turn by turn.
     private func tapped(_ point: GridPoint, in run: WorldRun) {
+        isLookArmed = false
         if WorldRules.isAdjacent(run.playerPosition, point) {
             store.step(to: point)
         } else {
@@ -301,9 +308,30 @@ struct WorldView: View {
 
     private func controls(_ run: WorldRun) -> some View {
         HStack(alignment: .bottom, spacing: 14) {
-            DirectionPad { direction in
-                store.step(to: GridPoint(x: run.playerPosition.x + direction.dx,
-                                         y: run.playerPosition.y + direction.dy))
+            VStack(spacing: 8) {
+                Button {
+                    isLookArmed.toggle()
+                } label: {
+                    Label(isLookArmed ? "Cancel Look" : "Look", systemImage: isLookArmed ? "eye.fill" : "eye")
+                        .frame(minWidth: 132, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .overlay {
+                    if isLookArmed { RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2) }
+                }
+                .accessibilityHint(isLookArmed ? "Look mode armed. Choose one direction." : "Inspect one adjacent tile without moving or spending a turn.")
+                .accessibilityIdentifier("world.look")
+
+                DirectionPad(isLooking: isLookArmed) { direction in
+                    let point = GridPoint(x: run.playerPosition.x + direction.dx,
+                                          y: run.playerPosition.y + direction.dy)
+                    if isLookArmed {
+                        inspection = InspectionPresentation(value: WorldRules.inspect(point, in: run))
+                        isLookArmed = false
+                    } else {
+                        store.step(to: point)
+                    }
+                }
             }
 
             VStack(spacing: 8) {
@@ -988,6 +1016,7 @@ private enum Direction: CaseIterable {
 /// The one-handed movement control. Optional in the brief; here it's the primary one, because a
 /// 14×14 grid of 27pt tiles can't be.
 private struct DirectionPad: View {
+    var isLooking = false
     let onStep: (Direction) -> Void
 
     var body: some View {
@@ -1009,8 +1038,19 @@ private struct DirectionPad: View {
                 .frame(width: 46, height: 46) // ≥44pt
         }
         .buttonStyle(.bordered)
-        .accessibilityLabel(String(describing: direction))
+        .accessibilityLabel("\(isLooking ? "Look" : "Move") \(direction.accessibilityName)")
     }
+}
+
+private extension Direction {
+    var accessibilityName: String {
+        switch self { case .up: "north"; case .right: "east"; case .down: "south"; case .left: "west" }
+    }
+}
+
+private struct InspectionPresentation: Identifiable {
+    let id = UUID()
+    let value: WorldRules.TileInspection
 }
 
 private struct ActionButton: View {

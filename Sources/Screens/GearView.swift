@@ -37,15 +37,24 @@ struct GearView: View {
                             .frame(minHeight: 44)
                     }
                     SixAcrossItemGrid(data: options, id: \.id) { option in
-                        Button { selectedOption = option } label: {
+                        AnchoredItemDetailButton(item: option, selection: $selectedOption) {
                             ItemIconTile(icon: option.piece.definition?.icon ?? "questionmark",
                                          rarity: option.piece.definition?.rarity ?? .common,
                                          quantity: option.count, identified: true,
                                          location: gridLocation(of: option),
                                          accessibilityName: option.piece.displayName,
                                          isEnabled: option.canEquipAtHome)
+                        } detail: { selected in
+                            GearOptionDetailSheet(
+                                option: selected, slot: slot, location: location(of: selected),
+                                delta: store.gearDelta(wearing: selected.piece, for: member),
+                                equip: {
+                                    guard store.equip(selected, on: member) else { return false }
+                                    selectedOption = nil
+                                    dismiss()
+                                    return true
+                                })
                         }
-                        .buttonStyle(.plain)
                     }
 
                     if worn != nil {
@@ -65,17 +74,6 @@ struct GearView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
                 }
-            }
-            .sheet(item: $selectedOption) { option in
-                GearOptionDetailSheet(
-                    option: option, slot: slot, location: location(of: option),
-                    delta: store.gearDelta(wearing: option.piece, for: member),
-                    equip: {
-                        guard store.equip(option, on: member) else { return false }
-                        selectedOption = nil
-                        dismiss()
-                        return true
-                    })
             }
         }
     }

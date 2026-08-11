@@ -24,15 +24,18 @@ struct DebugBugReporterOverlay: View {
                 .foregroundStyle(.red)
                 .accessibilityLabel("Report Bug")
                 .accessibilityHint("Captures the current game screen, then opens a bug report form")
-                .position(x: clamped(savedX * proxy.size.width, 28, proxy.size.width - 28),
-                          y: clamped(savedY * proxy.size.height, 28, proxy.size.height - 28))
+                .position(x: clamped(CGFloat(savedX) * proxy.size.width,
+                                     proxy.safeAreaInsets.leading + 28,
+                                     proxy.size.width - proxy.safeAreaInsets.trailing - 28),
+                          y: clamped(CGFloat(savedY) * proxy.size.height,
+                                     proxy.safeAreaInsets.top + 28,
+                                     proxy.size.height - proxy.safeAreaInsets.bottom - 28))
                 .highPriorityGesture(DragGesture().onChanged { value in
-                    savedX = clamped(value.location.x / max(1, proxy.size.width), 0.08, 0.92)
-                    savedY = clamped(value.location.y / max(1, proxy.size.height), 0.08, 0.92)
+                    savedX = Double(clamped(value.location.x / max(1, proxy.size.width), 0.08, 0.92))
+                    savedY = Double(clamped(value.location.y / max(1, proxy.size.height), 0.08, 0.92))
                 })
             }
         }
-        .ignoresSafeArea(.keyboard)
         .sheet(item: $draft) { draft in
             DebugBugReportSheet(draft: draft)
         }
@@ -60,7 +63,7 @@ struct DebugBugReporterOverlay: View {
             outcomeID: store.state.worlds.lastExit?.outcomeID?.rawValue)
     }
 
-    private func clamped(_ value: Double, _ lower: Double, _ upper: Double) -> Double {
+    private func clamped(_ value: CGFloat, _ lower: CGFloat, _ upper: CGFloat) -> CGFloat {
         min(max(value, lower), upper)
     }
 }
@@ -130,23 +133,30 @@ private struct DebugBugReportSheet: View {
                 }
                 Section("What happened?") {
                     TextEditor(text: $whatHappened).frame(minHeight: 110)
+                        .accessibilityLabel("What happened?")
                         .accessibilityIdentifier("bug-report.what-happened")
                 }
                 Section("What did you expect? (optional)") {
                     TextEditor(text: $expected).frame(minHeight: 72)
+                        .accessibilityLabel("What did you expect? Optional")
                 }
                 Section("Captured context") {
-                    LabeledContent("Screen", value: draft.context.screen)
+                    LabeledContent("Mode", value: draft.context.screen)
                     LabeledContent("Save schema", value: "\(draft.context.saveSchemaVersion)")
                     if let run = draft.context.runIndex { LabeledContent("Expedition", value: "\(run)") }
-                    Text("Build, screen, save schema, expedition identifiers, world position, Stability and recent saved action. No account data or save contents.")
+                    Text("Build, game mode, save schema, expedition identifiers, world position, Stability and most recent saved action. No account data or save contents.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 if let savedPackage {
                     Section {
                         Label("Saved on this phone — not yet shared", systemImage: "checkmark.circle.fill")
                             .foregroundStyle(.green)
-                        ShareLink(item: savedPackage) { Label("Share report package", systemImage: "square.and.arrow.up") }
+                        ShareLink(item: exportedFile(in: savedPackage)) { Label("Share report package", systemImage: "square.and.arrow.up") }
+                    }
+                }
+                if !DebugBugReportOutbox.live.reports().isEmpty {
+                    Section("Saved reports") {
+                        NavigationLink("Open bug queue") { DebugBugReportQueueView() }
                     }
                 }
                 if let error { Text(error).foregroundStyle(.red) }
@@ -178,8 +188,34 @@ private struct DebugBugReportSheet: View {
             runIndex: draft.context.runIndex, mapSeed: draft.context.mapSeed,
             playerX: draft.context.playerX, playerY: draft.context.playerY,
             stability: draft.context.stability, outcomeID: draft.context.outcomeID)
-        do { savedPackage = try DebugBugReportOutbox.live.save(report, screenshot: screenshot?.png) }
-        catch { self.error = "Could not save this report: \(error.localizedDescription)" }
+        do {
+            savedPackage = try DebugBugReportOutbox.live.save(report, screenshot: screenshot?.png)
+            UIAccessibility.post(notification: .announcement, argument: "Saved on this phone — not yet shared")
+        } catch {
+            self.error = "Could not save this report: \(error.localizedDescription)"
+            UIAccessibility.post(notification: .announcement, argument: "Bug report could not be saved")
+        }
+    }
+
+    private func exportedFile(in directory: URL) -> URL {
+        DebugBugReportOutbox.live.exportURL(for: draft.id, in: directory)
+    }
+}
+
+private struct DebugBugReportQueueView: View {
+    private var reports: [(report: DebugBugReport, directory: URL)] { DebugBugReportOutbox.live.reports() }
+    var body: some View {
+        List(reports, id: \.report.id) { entry in
+            VStack(alignment: .leading, spacing: 6) {
+                Text(entry.report.whatHappened).lineLimit(3)
+                Text(entry.report.createdAt.formatted()).font(.caption).foregroundStyle(.secondary)
+                ShareLink(item: DebugBugReportOutbox.live.exportURL(for: entry.report, in: entry.directory)) {
+                    Label("Share saved report", systemImage: "square.and.arrow.up")
+                }
+            }.padding(.vertical, 4)
+        }
+        .navigationTitle("Bug queue")
+        .overlay { if reports.isEmpty { ContentUnavailableView("No saved reports", systemImage: "ladybug") } }
     }
 }
 #endif

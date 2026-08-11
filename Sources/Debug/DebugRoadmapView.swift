@@ -52,8 +52,8 @@ struct DebugRoadmapView: View {
             Section("Current build") {
                 LabeledContent("Installed checkpoint", value: board.installedCheckpoint)
                 LabeledContent("Essence baseline", value: board.essenceBaseline)
-                LabeledContent("Current test", value: "Essence continuation")
-                Text("Use Recommended Raw Essence with 1× multipliers. Record bind cost, collected raw, refined equivalent, Spring yield, ending Essence, and any anti-lock help.")
+                LabeledContent("Current work", value: board.currentWork)
+                Text(board.currentNote)
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -76,7 +76,7 @@ struct DebugRoadmapView: View {
                     .font(.caption.monospaced())
                     .textSelection(.enabled)
             } footer: {
-                Text("Read-only DEBUG mirror · updated 10 Aug 2026. Change the Markdown authority and this mirror together at each check-in.")
+                Text("Live DEBUG view · updated \(board.updated) from bundled playability-roadmap.json. The app contains no separate hand-maintained status list.")
             }
         }
         .accessibilityIdentifier("debug-roadmap")
@@ -113,7 +113,7 @@ private struct RoadmapItemRow: View {
 }
 
 enum DebugRoadmap {
-    enum Status {
+    enum Status: String, Codable, Equatable {
         case complete, readyToTest, next, queued, pending, paused
 
         var label: String {
@@ -150,7 +150,7 @@ enum DebugRoadmap {
         }
     }
 
-    struct Item: Identifiable {
+    struct Item: Identifiable, Codable {
         let id: String
         let priority: String
         let title: String
@@ -159,69 +159,23 @@ enum DebugRoadmap {
         let gate: String
     }
 
-    struct Board {
+    struct Board: Codable {
+        let schemaVersion: Int
+        let updated: String
         let installedCheckpoint: String
         let essenceBaseline: String
+        let currentWork: String
+        let currentNote: String
         let items: [Item]
         let paused: [String]
     }
 
-    static let current = Board(
-        installedCheckpoint: "A · awareness + roadmap complete",
-        essenceBaseline: "a816113",
-        items: [
-            Item(id: "essence", priority: "B0", title: "Essence continuation",
-                 status: .readyToTest,
-                 detail: "Recommended 5–7 drops × 2–3 raw is installed. Measure it; do not retune from memory.",
-                 gate: "Three ordinary returns now, building toward ten; another ordinary authored bind remains affordable."),
-            Item(id: "awareness", priority: "A", title: "Awareness housekeeping",
-                 status: .complete,
-                 detail: "Complete in 5731aa9: 837 tests passed; combined checkpoint installed and launched on iPhone.",
-                 gate: "Passed. Preserve scope; field play observations return through ordinary bug triage."),
-            Item(id: "outcome", priority: "C", title: "Atomic expedition outcome",
-                 status: .queued,
-                 detail: "One monotonic receipt makes return-driven stock and production idempotent across relaunch and anchored revisits.",
-                 gate: "Authorize only after the three-expedition Essence evidence; returns tick once and combat/recap do not."),
-            Item(id: "trading-post", priority: "D", title: "Sell-first Trading Post",
-                 status: .queued,
-                 detail: "Land gold, authored transfer metadata, safe selling and one idempotent stock refresh before traveller integration.",
-                 gate: "Sell, cancel and reload without loss, duplication, anti-loop failure or lock bypass."),
-            Item(id: "vance", priority: "E", title: "Vance first + 10e Trading Post",
-                 status: .queued,
-                 detail: "Make Vance the first intended find and sole Trading Post owner without rewriting unreviewed prose.",
-                 gate: "Fresh and old-save find/build/sell/runway proof on phone."),
-            Item(id: "recycler", priority: "F", title: "Independent Recycler engine",
-                 status: .queued,
-                 detail: "Recover exact construction receipts or explicit found-gear salvage with no invented provenance.",
-                 gate: "Recycle, reject, cancel and reload with exactly one recovery route."),
-            Item(id: "noll", priority: "G", title: "Noll second + Halloway third",
-                 status: .queued,
-                 detail: "After Aimee approves Noll's identity/live copy, migrate to Vance → Noll → Halloway without granting Noll to old saves.",
-                 gate: "Fresh campaign reaches circulate → recover → retain/make without recreating the Essence blocker."),
-            Item(id: "terrain", priority: "P1", title: "Terrain border correction",
-                 status: .pending,
-                 detail: "Remove universal grid/dirt ledge; keep only meaningful adjacency edges and inset elevation contours.",
-                 gate: "Native phone proof with complete map, mixed heights, route, content, water and chasm."),
-            Item(id: "spatial-ui", priority: "P1", title: "Spatial game hubs",
-                 status: .pending,
-                 detail: "Library, equipment, Base, Party and Bestiary corrections are green and pushed. Phone install is held while Aimee is in an expedition.",
-                 gate: "Install at check-in; verify all owned equipment appears and tile hubs remain readable on phone."),
-            Item(id: "refining", priority: "P1", title: "Spring refining skills",
-                 status: .queued,
-                 detail: "After baseline telemetry: batch control, a reversible 2→3 rate unlock, and outcome-safe auto-refining.",
-                 gate: "Opening 2:1 loop already works; unlock payback and precision cost remain healthy over ten returns."),
-            Item(id: "bug-reporter", priority: "P1", title: "In-game bug reporter",
-                 status: .queued,
-                 detail: "After blockers: floating DEBUG capture, text form, build/context bundle and durable untriaged outbox.",
-                 gate: "Screenshot/report survives relaunch and reaches one agreed queue exactly once.")
-        ],
-        paused: [
-            "Broad asset and catalogue expansion",
-            "Tutorial content for outside testers",
-            "New stations and companion systems",
-            "Great Work, Reality reset and Tam",
-            "Animation and non-blocking polish"
-        ]
-    )
+    static let current: Board = {
+        guard let url = Bundle.main.url(forResource: "playability-roadmap", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let board = try? JSONDecoder().decode(Board.self, from: data)
+        else { preconditionFailure("Missing or invalid playability-roadmap.json") }
+        return board
+    }()
 }
 #endif

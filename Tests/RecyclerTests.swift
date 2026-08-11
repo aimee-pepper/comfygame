@@ -1,0 +1,224 @@
+import XCTest
+@testable import Bookbinder
+
+final class RecyclerTests: XCTestCase {
+    private func sample(_ kind: MaterialKind = .hide, grade: Double,
+                        source: String) -> MaterialSample {
+        MaterialSample(kind: kind,
+                       properties: MaterialProperties(hardness: grade / 2,
+                                                      density: grade / 3,
+                                                      insulation: grade,
+                                                      flexibility: grade - 1,
+                                                      lustre: 7, reactivity: 9),
+                       grade: grade, source: source, qualifier: "kept")
+    }
+
+    private func gear(_ catalogID: ItemID = "blade_chipped", id: UInt64 = 700,
+                      tier: Int = 1, receipt: [MaterialSample] = []) -> ItemStack {
+        var result = ItemStack(id: InstanceID(rawValue: id), catalogID: catalogID)
+        result.gearProfile?.constructionTier = tier
+        result.gearProfile?.consumedSamples = receipt
+        return result
+    }
+
+    private func base(containing stack: ItemStack, overflow: Bool = false) -> BaseState {
+        var result = BaseState.newGame()
+        result.inventory.stacks = []
+        result.spillover = []
+        if overflow { result.spillover = [stack] } else { result.inventory.stacks = [stack] }
+        return result
+    }
+
+    func testOldBaseSaveAndPartialRecyclerStateDecodeTolerantly() throws {
+        let old = try SaveCodec.makeDecoder().decode(BaseState.self,
+                                                      from: Data("{\"essence\":37}".utf8))
+        XCTAssertEqual(old.recycler, RecyclerState())
+
+        let partial = try SaveCodec.makeDecoder().decode(
+            RecyclerState.self, from: Data("{\"inventoryRevision\":8}".utf8))
+        XCTAssertEqual(partial.schemaVersion, RecyclerState.schemaVersion)
+        XCTAssertEqual(partial.inventoryRevision, 8)
+
+        var base = BaseState.newGame()
+        base.recycler.inventoryRevision = 19
+        let restored = try SaveCodec.makeDecoder().decode(
+            BaseState.self, from: SaveCodec.makeEncoder().encode(base))
+        XCTAssertEqual(restored.recycler.inventoryRevision, 19)
+    }
+
+    func testEveryOrdinaryCatalogGearHasExplicitSalvageOrReceiptRoute() {
+        XCTAssertEqual(RecyclerRules.unprofiledOrdinaryGearIDs(), [])
+    }
+
+    func testServiceTierEfficienciesAndCapacitiesAreExact() {
+        XCTAssertEqual(RecyclerRules.efficiency(serviceTier: 1), 0.40)
+        XCTAssertEqual(RecyclerRules.efficiency(serviceTier: 2), 0.55)
+        XCTAssertEqual(RecyclerRules.efficiency(serviceTier: 3), 0.70)
+        XCTAssertEqual(RecyclerRules.recoveryCapacity(receiptCount: 1, serviceTier: 3), 0)
+        XCTAssertEqual(RecyclerRules.recoveryCapacity(receiptCount: 2, serviceTier: 1), 1)
+        XCTAssertEqual(RecyclerRules.recoveryCapacity(receiptCount: 5, serviceTier: 1), 2)
+        XCTAssertEqual(RecyclerRules.recoveryCapacity(receiptCount: 5, serviceTier: 2), 2)
+        XCTAssertEqual(RecyclerRules.recoveryCapacity(receiptCount: 5, serviceTier: 3), 3)
+    }
+
+    func testReceiptDefaultSelectsHighestGradesStablyAndPreservesExactSamples() throws {
+        let receipt = [sample(.hide, grade: 50, source: "first"),
+                       sample(.plate, grade: 80, source: "best-first"),
+                       sample(.plate, grade: 80, source: "best-second"),
+                       sample(.ichor, grade: 20, source: "last")]
+        let stack = gear(receipt: receipt)
+        let preview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                          serviceTier: 2,
+                                                          in: base(containing: stack)))
+        XCTAssertEqual(preview.route, .constructionReceipt)
+        XCTAssertEqual(preview.recoveryCapacity, 2)
+        XCTAssertEqual(preview.selectedReceiptIndices, [1, 2])
+        XCTAssertEqual(preview.returnedSamples, [receipt[1], receipt[2]])
+        XCTAssertTrue(preview.returnedResources.isEmpty)
+    }
+
+    func testReceiptSelectionRejectsDuplicatesOutOfRangeAndOverCapacity() {
+        let receipt = (0..<5).map { sample(grade: Double($0 * 10), source: "s\($0)") }
+        let stack = gear(receipt: receipt)
+        let base = base(containing: stack)
+        XCTAssertNil(RecyclerRules.preview(location: .stored, stackID: stack.id, serviceTier: 1,
+                                            selectedReceiptIndices: [0, 0], in: base))
+        XCTAssertNil(RecyclerRules.preview(location: .stored, stackID: stack.id, serviceTier: 1,
+                                            selectedReceiptIndices: [99], in: base))
+        XCTAssertNil(RecyclerRules.preview(location: .stored, stackID: stack.id, serviceTier: 1,
+                                            selectedReceiptIndices: [0, 1, 2], in: base))
+    }
+
+    func testConstructionReceiptWinsOverAuthoredFoundSalvageAndIgnoresReforgeRank() throws {
+        let receipt = [sample(.plate, grade: 61, source: "ore-a"),
+                       sample(.fibre, grade: 62, source: "fibre-b")]
+        var stack = gear("blade_chipped", receipt: receipt)
+        stack.gearProfile?.reforgeRank = 3
+        let preview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                          serviceTier: 1,
+                                                          in: base(containing: stack)))
+        XCTAssertEqual(preview.route, .constructionReceipt)
+        XCTAssertEqual(preview.returnedSamples.count, 1)
+        XCTAssertTrue(preview.returnedResources.isEmpty)
+    }
+
+    func testFoundSalvageUsesAuthoredTierSequenceWithoutInventingReceipt() throws {
+        for (tier, expectedOre, expectedTimber) in [(1, 1, 0), (3, 1, 1), (4, 2, 1)] {
+            let stack = gear("blade_chipped", id: UInt64(700 + tier), tier: tier)
+            let preview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                              serviceTier: 1,
+                                                              in: base(containing: stack)))
+            XCTAssertEqual(preview.route, .authoredSalvage(profileID: "forged_edge_v1"))
+            XCTAssertEqual(preview.returnedResources["ore"], expectedOre)
+            XCTAssertEqual(preview.returnedResources["timber"], expectedTimber)
+            XCTAssertEqual(preview.returnedSamples, [])
+        }
+    }
+
+    func testOrganicFoundSalvageProducesBoundedHonestReclaimedHide() throws {
+        let stack = gear("guard_padded", tier: 4)
+        let preview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                          serviceTier: 1,
+                                                          in: base(containing: stack)))
+        let hide = try XCTUnwrap(preview.returnedSamples.first)
+        XCTAssertEqual(hide.kind, .hide)
+        XCTAssertEqual(hide.source, "Recycler reclamation")
+        XCTAssertEqual(hide.qualifier, "reclaimed")
+        XCTAssertEqual(hide.grade, 80)
+        XCTAssertEqual(hide.rarity, .rare)
+        XCTAssertEqual(preview.returnedResources["fiber"], 2)
+    }
+
+    func testProtectedUnknownUniqueLegacyAndUnprofiledGearAreRejected() {
+        var favorite = gear(); favorite.isFavorite = true
+        var locked = gear(); locked.isLocked = true
+        var unknown = gear(); unknown.identified = false
+        var legacy = gear(); legacy.gearProfile?.legacyPowerCredit = 1
+        for stack in [favorite, locked, unknown, legacy] {
+            XCTAssertNil(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                serviceTier: 1, in: base(containing: stack)))
+        }
+        let apex = gear("two_natured_blade")
+        XCTAssertNil(RecyclerRules.preview(location: .stored, stackID: apex.id,
+                                            serviceTier: 1, in: base(containing: apex)))
+    }
+
+    func testStoredReceiptCommitRemovesExactGearReturnsSampleAndNeverPaysCurrency() throws {
+        let receipt = [sample(.plate, grade: 41, source: "one"),
+                       sample(.fibre, grade: 71, source: "two")]
+        let stack = gear(receipt: receipt)
+        var base = base(containing: stack)
+        base.goldCoins = 9
+        base.essence = 17
+        let preview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                          serviceTier: 1, in: base))
+        XCTAssertEqual(RecyclerRules.commit(preview, in: &base), .committed)
+        XCTAssertFalse(base.inventory.stacks.contains { $0.id == stack.id })
+        XCTAssertEqual(base.inventory.stacks.flatMap(\.materials), [receipt[1]])
+        XCTAssertEqual(base.goldCoins, 9)
+        XCTAssertEqual(base.essence, 17)
+        XCTAssertEqual(base.recycler.inventoryRevision, 1)
+    }
+
+    func testOverflowCommitUsesExactIdentityAndFullStorehouseSpillsRecoveredMaterialSafely() throws {
+        let receipt = [sample(.plate, grade: 30, source: "one"),
+                       sample(.fibre, grade: 60, source: "two")]
+        let stack = gear(id: 901, receipt: receipt)
+        var base = base(containing: stack, overflow: true)
+        base.inventory = Inventory(slots: 1, stacks: [ItemStack(id: InstanceID(rawValue: 12),
+                                                               catalogID: "salve_lesser")])
+        let preview = try XCTUnwrap(RecyclerRules.preview(location: .overflow, stackID: stack.id,
+                                                          serviceTier: 1, in: base))
+        XCTAssertEqual(RecyclerRules.commit(preview, in: &base), .committed)
+        XCTAssertFalse(base.spillover.contains { $0.id == stack.id })
+        XCTAssertEqual(base.spillover.count, 1)
+        XCTAssertEqual(base.spillover[0].materials, [receipt[1]])
+    }
+
+    func testMixedKindReceiptReturnsThroughSeparateMaterialBins() throws {
+        let receipt = [sample(.plate, grade: 90, source: "plate"),
+                       sample(.fibre, grade: 80, source: "fibre"),
+                       sample(.hide, grade: 30, source: "hide"),
+                       sample(.ichor, grade: 20, source: "ichor")]
+        let stack = gear(receipt: receipt)
+        var base = base(containing: stack)
+        let preview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                          serviceTier: 2, in: base))
+        XCTAssertEqual(RecyclerRules.commit(preview, in: &base), .committed)
+        XCTAssertEqual(Set(base.inventory.stacks.compactMap { $0.material?.kind }),
+                       Set([.plate, .fibre]))
+        XCTAssertTrue(base.inventory.stacks.allSatisfy { stack in
+            Set(stack.materials.map(\.kind)).count <= 1
+        })
+    }
+
+    func testStaleRevisionAndChangedSnapshotAreAtomicNoOps() throws {
+        let stack = gear(tier: 4)
+        var staleBase = base(containing: stack)
+        let stalePreview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                               serviceTier: 1, in: staleBase))
+        staleBase.recycler.inventoryRevision = 1
+        let staleBefore = staleBase
+        XCTAssertEqual(RecyclerRules.commit(stalePreview, in: &staleBase), .stale)
+        XCTAssertEqual(staleBase, staleBefore)
+
+        var changedBase = base(containing: stack)
+        let changedPreview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                                 serviceTier: 1, in: changedBase))
+        changedBase.inventory.stacks[0].isLocked = true
+        let changedBefore = changedBase
+        XCTAssertEqual(RecyclerRules.commit(changedPreview, in: &changedBase), .invalid)
+        XCTAssertEqual(changedBase, changedBefore)
+    }
+
+    func testExceptionalOneSampleReceiptReturnsNothingWithoutFabricatingSalvage() throws {
+        let stack = gear(receipt: [sample(.plate, grade: 91, source: "only")])
+        let preview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
+                                                          serviceTier: 3,
+                                                          in: base(containing: stack)))
+        XCTAssertEqual(preview.route, .constructionReceipt)
+        XCTAssertEqual(preview.recoveryCapacity, 0)
+        XCTAssertEqual(preview.returnedSamples, [])
+        XCTAssertTrue(preview.returnedResources.isEmpty)
+    }
+}

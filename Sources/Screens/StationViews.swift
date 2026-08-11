@@ -279,17 +279,15 @@ private struct SpilloverCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             SixAcrossItemGrid(data: store.spillover, id: \.id) { stack in
-                Button { opened = stack } label: {
+                AnchoredItemDetailButton(item: stack, selection: $opened) {
                     ItemIconTile(icon: stack.icon, rarity: stack.rarity,
                                  quantity: stack.count, identified: stack.identified,
                                  location: .waiting,
                                  accessibilityName: stack.displayName)
+                } detail: { spilled in
+                    SpilloverDetailSheet(spilled: spilled).environmentObject(store)
                 }
-                .buttonStyle(.plain)
             }
-        }
-        .sheet(item: $opened) { spilled in
-            SpilloverDetailSheet(spilled: spilled).environmentObject(store)
         }
     }
 }
@@ -354,6 +352,7 @@ private struct SwapSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     let spilled: ItemStack
+    @State private var opened: ItemStack?
 
     var body: some View {
         NavigationStack {
@@ -370,16 +369,18 @@ private struct SwapSheet: View {
                     }
                     Text("Choose what returns to the waiting pile").font(.headline)
                     SixAcrossItemGrid(data: store.state.base.inventory.stacks, id: \.id) { stored in
-                        Button {
-                            store.swapSpilled(spilled, for: stored)
-                            dismiss()
-                        } label: {
+                        AnchoredItemDetailButton(item: stored, selection: $opened) {
                             ItemIconTile(icon: stored.icon, rarity: stored.rarity,
                                          quantity: stored.count, identified: stored.identified,
                                          location: .stored,
                                          accessibilityName: stored.displayName)
+                        } detail: { selected in
+                            SwapStoredDetail(stored: selected, spilled: spilled) {
+                                store.swapSpilled(spilled, for: selected)
+                                opened = nil
+                                dismiss()
+                            }
                         }
-                        .buttonStyle(.plain)
                     }
                     Text("Whatever you replace goes back to the waiting pile. Nothing is thrown away here.")
                         .font(.caption).foregroundStyle(.secondary)
@@ -397,11 +398,47 @@ private struct SwapSheet: View {
     }
 }
 
+private struct SwapStoredDetail: View {
+    @Environment(\.dismiss) private var dismiss
+    let stored: ItemStack
+    let spilled: ItemStack
+    let confirm: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack(spacing: 16) {
+                        ItemIconTile(icon: stored.icon, rarity: stored.rarity,
+                                     quantity: stored.count, identified: stored.identified,
+                                     location: .stored, accessibilityName: stored.displayName)
+                            .frame(width: 58, height: 58)
+                        Text(stored.displayName).font(.headline).foregroundStyle(stored.rarity.tint)
+                    }
+                }
+                Section("Details") {
+                    LabeledContent("Quantity", value: "\(stored.count)")
+                    LabeledContent("Location", value: ItemGridLocation.stored.displayName)
+                    if !stored.detail.isEmpty { Text(stored.detail) }
+                }
+                Section {
+                    Button("Move this to waiting and store \(spilled.displayName)") { confirm() }
+                } footer: {
+                    Text("Nothing is discarded. This piece returns to the waiting pile.")
+                }
+            }
+            .navigationTitle(stored.identified ? stored.displayName : "Unknown item")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        }
+    }
+}
+
 /// Storehouse — inventory and identification. Identify flow is milestone 5.
 struct StorehouseView: View {
     @EnvironmentObject private var store: GameStore
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var opened: ItemStack?
+    @State private var openedResource: StorehouseResourceEntry?
     @State private var tab: StorehouseTab = .items
 
     private var base: BaseState { store.state.base }
@@ -425,12 +462,12 @@ struct StorehouseView: View {
                     if base.resources.isEmpty {
                         EmptyNote("Nothing hauled home yet.")
                     } else {
-                        LazyVGrid(columns: columns, spacing: 12) {
-                            ForEach(base.resources.nonZero, id: \.id) { entry in
-                                let resource = ContentCatalog.shared.resource(entry.id)
-                                stockTile(icon: resource?.icon ?? "cube",
-                                          name: resource?.name ?? entry.id.rawValue,
-                                          amount: entry.amount)
+                        SixAcrossItemGrid(data: resourceEntries, id: \.id) { entry in
+                            AnchoredItemDetailButton(item: entry, selection: $openedResource) {
+                                ResourceIconTile(icon: entry.icon, quantity: entry.amount,
+                                                 accessibilityName: entry.name)
+                            } detail: { selected in
+                                StorehouseResourceDetail(entry: selected)
                             }
                         }
                         if base.resources[Resources.essenceRaw] > 0 {
@@ -451,13 +488,14 @@ struct StorehouseView: View {
                         EmptyNote("Eight slots, all empty. Items come from worlds.")
                     } else {
                         SixAcrossItemGrid(data: base.inventory.stacks, id: \.id) { stack in
-                            Button { opened = stack } label: {
+                            AnchoredItemDetailButton(item: stack, selection: $opened) {
                                 ItemIconTile(icon: stack.icon, rarity: stack.rarity,
                                              quantity: stack.count, identified: stack.identified,
                                              location: .stored,
                                              accessibilityName: stack.displayName)
+                            } detail: { selected in
+                                StorehouseItemSheet(stack: selected).environmentObject(store)
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                     if !store.unidentifiedStacks.isEmpty { IdentifyCard() }
@@ -472,30 +510,58 @@ struct StorehouseView: View {
             .padding(16)
         }
         .background(Color(.systemGroupedBackground))
-        .sheet(item: $opened) { stack in
-            StorehouseItemSheet(stack: stack).environmentObject(store)
-        }
         .navigationTitle("Storehouse")
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var columns: [GridItem] {
-        dynamicTypeSize.isAccessibilitySize
-            ? [GridItem(.flexible())]
-            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
-    }
-
-    private func stockTile(icon: String, name: String, amount: Int) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: icon).font(.title2).foregroundStyle(.tint)
-            Text(name).font(.callout.weight(.medium))
-            Text("\(amount)").font(.title3.monospacedDigit().weight(.semibold))
+    private var resourceEntries: [StorehouseResourceEntry] {
+        base.resources.nonZero.map { entry in
+            let definition = ContentCatalog.shared.resource(entry.id)
+            return StorehouseResourceEntry(id: entry.id,
+                                           name: definition?.name ?? entry.id.rawValue,
+                                           icon: definition?.icon ?? "cube",
+                                           amount: entry.amount)
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, minHeight: 110, alignment: .topLeading)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
     }
+}
 
+private struct StorehouseResourceEntry: Identifiable {
+    let id: ResourceID
+    let name: String
+    let icon: String
+    let amount: Int
+}
+
+private struct StorehouseResourceDetail: View {
+    @Environment(\.dismiss) private var dismiss
+    let entry: StorehouseResourceEntry
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack(spacing: 16) {
+                        ResourceIconTile(icon: entry.icon, quantity: entry.amount,
+                                         accessibilityName: entry.name)
+                            .frame(width: 58, height: 58)
+                        Text(entry.name).font(.headline)
+                    }
+                }
+                Section("Details") {
+                    LabeledContent("Quantity", value: "\(entry.amount)")
+                    LabeledContent("Location", value: "Storehouse")
+                    if entry.id == Resources.essenceRaw {
+                        Text("Refine raw essence at the Workshop before writing with it.")
+                    }
+                }
+            }
+            .navigationTitle(entry.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
+            }
+        }
+    }
 }
 
 private struct StorehouseItemSheet: View {

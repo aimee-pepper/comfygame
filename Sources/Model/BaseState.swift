@@ -18,6 +18,7 @@ struct BaseState: Codable, Equatable, Sendable {
     var goldCoins: Int = 0
     /// Persisted stock snapshot. Empty until the first post-migration expedition outcome.
     var tradingPost: TradingPostState = TradingPostState()
+    var recycler: RecyclerState = RecyclerState()
 
     /// Owned catalog entries. Definitions are data; the save stores only which ones are owned.
     var ownedSymbols: Set<SymbolID> = []
@@ -306,7 +307,8 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Explicit because `companion` is no longer stored — it's a window onto the roster — and the
     /// decoder still has to be able to read it out of a save written before the roster existed.
     private enum CodingKeys: String, CodingKey {
-        case essence, resources, inventory, spillover, goldCoins, tradingPost, ownedSymbols, ownedGambitComponents
+        case essence, resources, inventory, spillover, goldCoins, tradingPost, recycler
+        case ownedSymbols, ownedGambitComponents
         case completedResearch, knownConsumableRecipes, stations, page, ownedHands, hasChainingUnlock, instrumentLoadout
         case hasConfiguredInstrumentLoadout
         case ownedSources
@@ -323,6 +325,7 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(spillover, forKey: .spillover)
         try c.encode(goldCoins, forKey: .goldCoins)
         try c.encode(tradingPost, forKey: .tradingPost)
+        try c.encode(recycler, forKey: .recycler)
         try c.encode(ownedSymbols, forKey: .ownedSymbols)
         try c.encode(ownedSources, forKey: .ownedSources)
         try c.encode(ownedGambitComponents, forKey: .ownedGambitComponents)
@@ -395,6 +398,8 @@ struct BaseState: Codable, Equatable, Sendable {
         goldCoins = max(0, try container.decodeIfPresent(Int.self, forKey: .goldCoins) ?? 0)
         tradingPost = try container.decodeIfPresent(TradingPostState.self, forKey: .tradingPost)
             ?? TradingPostState()
+        recycler = try container.decodeIfPresent(RecyclerState.self, forKey: .recycler)
+            ?? RecyclerState()
 
         migrateEquippedGearProfiles()
 
@@ -490,6 +495,7 @@ enum Stations {
     static let library: StationID = "library"
     static let blacksmith: StationID = "blacksmith"
     static let tradingPost: StationID = "trading_post"
+    static let recycler: StationID = "recycler"
     static let tannery: StationID = "tannery"
     static let bowyer: StationID = "bowyer"
     static let armoury: StationID = "armoury"

@@ -54,7 +54,7 @@ struct DebugBugReportOutbox: Sendable {
         try fm.createDirectory(at: root, withIntermediateDirectories: true)
         let destination = root.appending(path: report.id.uuidString, directoryHint: .isDirectory)
         guard !fm.fileExists(atPath: destination.path) else { throw SaveError.duplicateID }
-        let staging = root.appending(path: ".(report.id.uuidString).staging", directoryHint: .isDirectory)
+        let staging = root.appending(path: ".\(report.id.uuidString).staging", directoryHint: .isDirectory)
         try? fm.removeItem(at: staging)
         do {
             try fm.createDirectory(at: staging, withIntermediateDirectories: true)
@@ -65,6 +65,8 @@ struct DebugBugReportOutbox: Sendable {
             if report.includesScreenshot, let screenshot {
                 try screenshot.write(to: staging.appending(path: "screenshot.png"), options: .atomic)
             }
+            try JSONEncoder().encode(DebugBugReportExport(report: report, screenshot: screenshot))
+                .write(to: staging.appending(path: "\(report.id.uuidString).bookbinderbug"), options: .atomic)
             try fm.moveItem(at: staging, to: destination)
             return destination
         } catch {
@@ -72,5 +74,30 @@ struct DebugBugReportOutbox: Sendable {
             throw error
         }
     }
+
+    func reports() -> [(report: DebugBugReport, directory: URL)] {
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        let directories = (try? FileManager.default.contentsOfDirectory(
+            at: root, includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles])) ?? []
+        return directories.compactMap { directory in
+            guard let data = try? Data(contentsOf: directory.appending(path: "report.json")),
+                  let report = try? decoder.decode(DebugBugReport.self, from: data) else { return nil }
+            return (report, directory)
+        }.sorted { $0.report.createdAt > $1.report.createdAt }
+    }
+
+    func exportURL(for report: DebugBugReport, in directory: URL) -> URL {
+        exportURL(for: report.id, in: directory)
+    }
+
+    func exportURL(for id: UUID, in directory: URL) -> URL {
+        directory.appending(path: "\(id.uuidString).bookbinderbug")
+    }
+}
+
+private struct DebugBugReportExport: Codable {
+    var report: DebugBugReport
+    var screenshot: Data?
 }
 #endif

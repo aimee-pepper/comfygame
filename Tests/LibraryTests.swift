@@ -123,18 +123,18 @@ final class LibraryTests: XCTestCase {
 
     // MARK: Pages
 
-    func testLibraryPresentationGivesEveryDiaryPageOnePeopleHome() throws {
+    func testLibraryPresentationGivesEveryDiaryPageOneDiaryHome() throws {
         let location = try XCTUnwrap(ContentCatalog.shared.diaryPages.first { $0.kind == .locationClue })
         let other = try XCTUnwrap(ContentCatalog.shared.diaryPages.first { $0.kind != .locationClue })
         var library = LibraryState()
         library.foundPages = [location.id, other.id]
 
-        let presented = LibraryPresentation.people(in: library)
+        let presented = LibraryPresentation.diaries(in: library)
             .flatMap { LibraryPresentation.pages(by: $0.id, in: library) }
 
         XCTAssertEqual(Set(presented.map(\.id)), Set(library.foundPages))
         XCTAssertEqual(presented.count, library.foundPages.count,
-                       "a diary page appeared in more than one collection")
+                       "a diary page appeared in more than one authored diary")
     }
 
     func testRecoveredPageMakesItsAuthorVisibleWithoutRevealingTheRestOfTheCast() throws {
@@ -142,7 +142,44 @@ final class LibraryTests: XCTestCase {
         var library = LibraryState()
         library.foundPages = [page.id]
 
-        XCTAssertEqual(LibraryPresentation.people(in: library).map(\.id), [page.diary])
+        XCTAssertEqual(LibraryPresentation.diaries(in: library).map(\.id), [page.diary])
+    }
+
+    func testCrossDiaryPageIsIndexedByAuthorAndSubjectWithoutDuplicatingRecovery() throws {
+        let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.first {
+            guard let about = $0.about else { return false }
+            return about != $0.diary
+        })
+        var library = LibraryState()
+        library.foundPages = [page.id]
+
+        XCTAssertEqual(LibraryPresentation.pages(by: page.diary, in: library).map(\.id), [page.id])
+        XCTAssertEqual(LibraryPresentation.pages(about: try XCTUnwrap(page.about), in: library).map(\.id),
+                       [page.id])
+        XCTAssertEqual(library.foundPages.count, 1)
+    }
+
+    func testDiaryAndPeopleCountsUseDifferentAxes() throws {
+        let authoredElsewhere = try XCTUnwrap(ContentCatalog.shared.diaryPages.first {
+            $0.about != nil && $0.about != $0.diary
+        })
+        let authorOnly = try XCTUnwrap(ContentCatalog.shared.diaryPages.first {
+            $0.diary == authoredElsewhere.diary && $0.about != authoredElsewhere.about
+        })
+        var library = LibraryState()
+        library.foundPages = [authoredElsewhere.id, authorOnly.id]
+
+        XCTAssertEqual(LibraryPresentation.pages(by: authoredElsewhere.diary, in: library).count, 2)
+        XCTAssertEqual(LibraryPresentation.pages(about: try XCTUnwrap(authoredElsewhere.about),
+                                                  in: library).map(\.id), [authoredElsewhere.id])
+    }
+
+    func testUnknownRecoveredPageRemainsVisibleAsAnOlderRecord() {
+        var library = LibraryState()
+        library.foundPages = ["retired_page_from_older_catalogue"]
+
+        XCTAssertEqual(LibraryPresentation.olderRecordIDs(in: library), library.foundPages)
+        XCTAssertTrue(LibraryPresentation.diaries(in: library).isEmpty)
     }
 
     func testWorldNoteTilesOnlyExposeRecoveredFamilies() {
