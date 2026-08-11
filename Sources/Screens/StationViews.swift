@@ -405,21 +405,14 @@ struct StorehouseView: View {
                     if base.inventory.stacks.isEmpty {
                         EmptyNote("Eight slots, all empty. Items come from worlds.")
                     } else {
-                        LazyVGrid(columns: columns, spacing: 12) {
-                            ForEach(base.inventory.stacks) { stack in
-                                // Rarity reads as the colour of the name (design brief's colour-coded
-                                // ladder), so a Mythic is obvious at a glance in a long list.
-                                //
-                                // **A material bin opens.** All the hides share one slot, and what's
-                                // actually in it — the grades, the animals they came off — is the thing
-                                // worth having; a row saying "12 hides" would have hidden it.
-                                if stack.materials.count > 1 {
-                                    Button { opened = stack } label: { itemTile(stack) }
-                                        .buttonStyle(.plain)
-                                } else {
-                                    itemTile(stack)
-                                }
+                        SixAcrossItemGrid(data: base.inventory.stacks, id: \.id) { stack in
+                            Button { opened = stack } label: {
+                                ItemIconTile(icon: stack.icon, rarity: stack.rarity,
+                                             quantity: stack.count, identified: stack.identified,
+                                             location: .stored,
+                                             accessibilityName: stack.displayName)
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                     if !store.unidentifiedStacks.isEmpty { IdentifyCard() }
@@ -434,8 +427,8 @@ struct StorehouseView: View {
             .padding(16)
         }
         .background(Color(.systemGroupedBackground))
-        .sheet(item: $opened) { bin in
-            MaterialBinSheet(bin: bin).environmentObject(store)
+        .sheet(item: $opened) { stack in
+            StorehouseItemSheet(stack: stack).environmentObject(store)
         }
         .navigationTitle("Storehouse")
         .navigationBarTitleDisplayMode(.inline)
@@ -458,22 +451,54 @@ struct StorehouseView: View {
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
     }
 
-    private func itemTile(_ stack: ItemStack) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: stack.icon).font(.title2).foregroundStyle(stack.rarity.tint)
-                Spacer()
-                if stack.materials.count > 1 {
-                    Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
+}
+
+private struct StorehouseItemSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    let stack: ItemStack
+
+    var body: some View {
+        if !stack.materials.isEmpty {
+            MaterialBinSheet(bin: stack).environmentObject(store)
+        } else {
+            NavigationStack {
+                List {
+                    Section {
+                        HStack(spacing: 16) {
+                            ItemIconTile(icon: stack.icon, rarity: stack.rarity,
+                                         quantity: stack.count, identified: stack.identified,
+                                         location: .stored, accessibilityName: stack.displayName)
+                                .frame(width: 58, height: 58)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(stack.displayName).font(.headline).foregroundStyle(stack.rarity.tint)
+                                Text(stack.rarity.displayName).font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    Section("Details") {
+                        LabeledContent("Quantity", value: "\(stack.count)")
+                        LabeledContent("Location", value: ItemGridLocation.stored.displayName)
+                        if !stack.detail.isEmpty { Text(stack.detail) }
+                        if let profile = stack.gearProfile {
+                            LabeledContent("Tier", value: "\(profile.constructionTier)")
+                            LabeledContent("Reforge", value: "\(profile.reforgeRank) of 3")
+                            if let provenance = profile.displayProvenance {
+                                LabeledContent("Provenance", value: provenance)
+                            }
+                        } else if let blurb = ContentCatalog.shared.item(stack.catalogID)?.blurb,
+                                  !blurb.isEmpty {
+                            Text(blurb)
+                        }
+                    }
+                }
+                .navigationTitle(stack.identified ? stack.displayName : "Unknown item")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
                 }
             }
-            Text(stack.displayName).font(.callout.weight(.medium)).foregroundStyle(stack.rarity.tint)
-            if !stack.detail.isEmpty { Text(stack.detail).font(.caption2).foregroundStyle(.secondary) }
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
-        .contentShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 
