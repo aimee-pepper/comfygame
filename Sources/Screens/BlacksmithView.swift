@@ -1,46 +1,53 @@
 import SwiftUI
 
-/// The Blacksmith: where the piece you already carry gets better.
-///
-/// The screen has one job, and it's a question the player arrives with: *what should I put my
-/// materials into?* So it lists everything reforgeable — worn and stored, both party members — and
-/// each row says the price and whether you can pay it, without you having to open anything.
+enum BlacksmithTab: String, CaseIterable, Sendable {
+    case make = "Make"
+    case reforge = "Reforge"
+    case learn = "Learn"
+}
+
+enum MakerStationPresentationRules {
+    static func recipeColumns(isAccessibilitySize: Bool) -> Int {
+        isAccessibilitySize ? 2 : 3
+    }
+
+    static func readinessLabel(_ readiness: PhysicalGearCraftingRules.Readiness) -> String {
+        switch readiness {
+        case .ready(let preview): "Ready · Tier \(preview.outputTier)"
+        case .stationLocked: "Unavailable"
+        case .researchLocked: "Learn first"
+        case .tierLocked(let need): "Tier \(need)"
+        case .needsSamples: "Needs stock"
+        case .needsEssence: "Needs Essence"
+        }
+    }
+}
+
+/// The Blacksmith proves the shared maker-station grammar: families, exact retained pieces and
+/// authored learning stay separate, while every price and eligibility answer still comes from the
+/// existing rules previews.
 struct BlacksmithView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var tab: BlacksmithTab = .make
     @State private var chosen: ReforgeTarget?
     @State private var chosenRecipe: PhysicalGearCraftingRules.Recipe?
+    @State private var showingIdentity = false
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                HStack(spacing: 12) {
-                    CurrencyChip(icon: "drop.fill", label: "Essence",
-                                 value: "\(store.state.base.essence)", tint: .teal)
-                    CurrencyChip(icon: "shippingbox", label: "Stock",
-                                 value: "\(store.materialSampleCount)")
+            VStack(alignment: .leading, spacing: 14) {
+                header
+                Picker("Blacksmith work", selection: $tab) {
+                    ForEach(BlacksmithTab.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                 }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("blacksmith-tabs")
 
-                StationCard(title: "At the anvil", icon: "hammer.fill") {
-                    Text("Reforging asks for stock with the right quality in it, never for a named thing. A monstrous plate does a blade as much good as ore does — what matters is how hard it is.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-
-                StationCard(title: "Construct", icon: "hammer.circle") {
-                    ForEach(PhysicalGearCraftingRules.recipes) { recipe in
-                        ConstructionRow(recipe: recipe) { chosenRecipe = recipe }
-                    }
-                }
-
-                if store.reforgeable.isEmpty {
-                    StationCard(title: "Nothing to work on", icon: "questionmark") {
-                        EmptyNote("Bring back something to wear, and something hard to work it with.")
-                    }
-                } else {
-                    StationCard(title: "Gear", icon: "shield.lefthalf.filled") {
-                        ForEach(store.reforgeable) { target in
-                            ReforgeRow(target: target) { chosen = target }
-                        }
-                    }
+                switch tab {
+                case .make: makeGrid
+                case .reforge: reforgeGrid
+                case .learn: ResearchTree(station: Stations.blacksmith)
                 }
             }
             .padding(16)
@@ -48,11 +55,134 @@ struct BlacksmithView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Blacksmith")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(item: $chosen) { target in
-            ReforgeSheet(target: target).environmentObject(store)
-        }
         .sheet(item: $chosenRecipe) { recipe in
             ConstructionSheet(recipe: recipe).environmentObject(store)
+        }
+    }
+
+    private var header: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: "hammer.fill")
+                    .font(.title2)
+                    .frame(width: 36, height: 36)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Blacksmith").font(.headline)
+                    Text("Tier \(blacksmithTier)")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button { showingIdentity = true } label: {
+                    Image(systemName: "info.circle").frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("About the Blacksmith")
+                .popover(isPresented: $showingIdentity) {
+                    Text("Halloway constructs rigid physical gear and reforges an exact retained piece without crossing its construction tier.")
+                        .font(.callout).padding(16).frame(idealWidth: 280)
+                        .presentationCompactAdaptation(.popover)
+                }
+            }
+            HStack(spacing: 10) {
+                CurrencyChip(icon: "drop.fill", label: "Essence",
+                             value: "\(store.state.base.essence)", tint: .teal)
+                CurrencyChip(icon: "shippingbox", label: "Stock",
+                             value: "\(store.materialSampleCount)")
+            }
+        }
+    }
+
+    private var makeGrid: some View {
+        LazyVGrid(columns: recipeColumns, spacing: 10) {
+            ForEach(PhysicalGearCraftingRules.recipes) { recipe in
+                MakerRecipeTile(recipe: recipe,
+                                readiness: store.physicalGearReadiness(recipe)) {
+                    chosenRecipe = recipe
+                }
+            }
+        }
+        .accessibilityIdentifier("blacksmith-make-grid")
+    }
+
+    @ViewBuilder private var reforgeGrid: some View {
+        if store.reforgeable.isEmpty {
+            ContentUnavailableView("Nothing to reforge", systemImage: "hammer",
+                                   description: Text("Bring Home a physical piece and qualifying stock."))
+        } else {
+            SixAcrossItemGrid(data: store.reforgeable, id: \.id) { target in
+                AnchoredItemDetailButton(item: target, selection: $chosen) {
+                    ItemIconTile(icon: target.icon, rarity: target.rarity,
+                                 quantity: target.count, identified: true,
+                                 location: target.gridLocation,
+                                 accessibilityName: target.displayName,
+                                 isEnabled: SmithRules.requirement(
+                                    for: target.catalogID, at: target.upgradeLevel) != nil)
+                } detail: { target in
+                    ReforgeSheet(target: target).environmentObject(store)
+                }
+            }
+            .accessibilityIdentifier("blacksmith-reforge-grid")
+        }
+    }
+
+    private var recipeColumns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 10),
+              count: MakerStationPresentationRules.recipeColumns(
+                isAccessibilitySize: dynamicTypeSize.isAccessibilitySize))
+    }
+
+    private var blacksmithTier: Int {
+        guard let station = ContentCatalog.shared.station(Stations.blacksmith) else {
+            return store.state.base.station(Stations.blacksmith).tier
+        }
+        return StationStaffingRules.effectiveTier(for: station, in: store.state)
+    }
+}
+
+private struct MakerRecipeTile: View {
+    let recipe: PhysicalGearCraftingRules.Recipe
+    let readiness: PhysicalGearCraftingRules.Readiness
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 7) {
+                Image(systemName: ContentCatalog.shared.item(recipe.catalogFallback)?.icon ?? "hammer")
+                    .font(.title2).frame(width: 34, height: 30).foregroundStyle(.tint)
+                Text(recipe.displayName)
+                    .font(.subheadline.weight(.semibold)).lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                Text(MakerStationPresentationRules.readinessLabel(readiness))
+                    .font(.caption2.weight(.semibold))
+                    .padding(.horizontal, 6).padding(.vertical, 3)
+                    .background(readinessTint.opacity(0.14), in: Capsule())
+                    .foregroundStyle(readinessTint)
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, minHeight: 112, maxHeight: 120, alignment: .topLeading)
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 13))
+            .contentShape(RoundedRectangle(cornerRadius: 13))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(recipe.displayName), \(MakerStationPresentationRules.readinessLabel(readiness))")
+    }
+
+    private var readinessTint: Color {
+        if case .ready = readiness { return .green }
+        switch readiness {
+        case .needsSamples, .needsEssence: return .orange
+        default: return .secondary
+        }
+    }
+}
+
+private extension ReforgeTarget {
+    var gridLocation: ItemGridLocation {
+        switch self {
+        case .stored: .stored
+        case .overflow: .waiting
+        case .worn: .worn
         }
     }
 }
@@ -436,14 +566,16 @@ private struct ConstructionSheet: View {
     @State private var confirmingBelowHeadline = false
     @State private var confirmingWastedGrade = false
     @State private var commitFailure: String?
+    @State private var activeRequirementID: String?
+    @State private var openedCandidate: PhysicalGearCraftingRules.CandidateAssessment?
 
     private var selections: [PhysicalGearCraftingRules.Selection]? {
-        guard let defaults = PhysicalGearCraftingRules.defaultSelections(for: recipe, in: store.state)
-        else { return nil }
-        return recipe.requirements.compactMap { requirement in
+        let defaults = PhysicalGearCraftingRules.defaultSelections(for: recipe, in: store.state) ?? []
+        let resolved = recipe.requirements.compactMap { requirement in
             selected[requirement.id]
                 ?? defaults.first { $0.requirementID == requirement.id }
         }
+        return resolved.count == recipe.requirements.count ? resolved : nil
     }
 
     private var preview: PhysicalGearCraftingRules.Preview? {
@@ -482,40 +614,8 @@ private struct ConstructionSheet: View {
                                 .font(.caption).foregroundStyle(.orange)
                         }
                     }
-                    Section {
-                        ForEach(recipe.requirements) { requirement in
-                            if let selection = preview.selections.first(where: {
-                                $0.requirementID == requirement.id
-                            }) {
-                                NavigationLink {
-                                    SamplePicker(requirement: requirement,
-                                                 otherSelections: preview.selections.filter {
-                                                     $0.requirementID != requirement.id
-                                                 },
-                                                 selection: Binding(
-                                                    get: { selected[requirement.id] ?? selection },
-                                                    set: { selected[requirement.id] = $0 }
-                                                 ))
-                                } label: {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(requirement.displayName).font(.caption).foregroundStyle(.secondary)
-                                        Label(selection.sample.displayName,
-                                              systemImage: selection.sample.kind.icon)
-                                            .font(.callout)
-                                        if !selection.sample.source.isEmpty {
-                                            Text(selection.sample.source)
-                                                .font(.caption2).foregroundStyle(.secondary)
-                                        }
-                                    }
-                                    .padding(.vertical, 3)
-                                }
-                            }
-                        }
-                    } header: {
-                        Text("Selected stock")
-                    } footer: {
-                        Text("The weakest qualifying stock is selected first. Open any part to replace it deliberately.")
-                    }
+                    requirementSockets(preview.selections)
+                    candidateTray
                     Section {
                         Button("Construct · \(preview.essence) essence") {
                             if preview.wastesGradeAboveCap {
@@ -544,11 +644,16 @@ private struct ConstructionSheet: View {
                     Section {
                         EmptyNote("You do not yet have a distinct qualifying sample for every part of this piece.")
                     }
+                    requirementSockets([])
+                    candidateTray
                 }
             }
             .navigationTitle(recipe.displayName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+            .onAppear {
+                if activeRequirementID == nil { activeRequirementID = recipe.requirements.first?.id }
+            }
             .alert("Construct below the specialist headline?", isPresented: $confirmingBelowHeadline) {
                 Button("Cancel", role: .cancel) {}
                 Button("Construct") {
@@ -578,6 +683,130 @@ private struct ConstructionSheet: View {
 
     private var stationName: String {
         ContentCatalog.shared.station(recipe.station)?.name ?? "station"
+    }
+
+    @ViewBuilder
+    private func requirementSockets(_ previewSelections: [PhysicalGearCraftingRules.Selection]) -> some View {
+        Section("Requirements") {
+            ForEach(recipe.requirements) { requirement in
+                let current = selected[requirement.id]
+                    ?? previewSelections.first { $0.requirementID == requirement.id }
+                Button { activeRequirementID = requirement.id } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: current?.sample.kind.icon ?? "circle.dashed")
+                            .frame(width: 24)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(requirement.displayName).font(.callout.weight(.medium))
+                            Text(requirement.summary).font(.caption2).foregroundStyle(.secondary)
+                            if let current {
+                                Text(current.sample.displayName)
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                        Spacer()
+                        if activeRequirementID == requirement.id {
+                            Image(systemName: "checkmark.circle.fill").foregroundStyle(.tint)
+                        }
+                    }
+                    .frame(minHeight: 44).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(activeRequirementID == requirement.id ? .isSelected : [])
+            }
+            Button("Reset suggestion") {
+                selected.removeAll()
+                activeRequirementID = recipe.requirements.first?.id
+            }
+            .font(.caption)
+        }
+    }
+
+    @ViewBuilder private var candidateTray: some View {
+        if let requirement = activeRequirement {
+            let assessments = activeAssessments
+            let eligible = assessments.filter(\.isEligible)
+            let rejected = assessments.filter { !$0.isEligible }
+            Section {
+                if eligible.isEmpty {
+                    EmptyNote("No stored sample currently satisfies this socket.")
+                } else {
+                    SixAcrossItemGrid(data: eligible, id: \.id) { assessment in
+                        AnchoredItemDetailButton(item: assessment, selection: $openedCandidate) {
+                            ItemIconTile(icon: assessment.selection.sample.kind.icon,
+                                         rarity: assessment.selection.sample.rarity,
+                                         quantity: 1, identified: true, location: .stored,
+                                         accessibilityName: assessment.selection.sample.displayName,
+                                         isSelected: selected[requirement.id]?.stockKey
+                                            == assessment.selection.stockKey)
+                        } detail: { assessment in
+                            CandidateStockDetail(requirement: requirement, assessment: assessment) {
+                                selected[requirement.id] = assessment.selection
+                                openedCandidate = nil
+                            }
+                        }
+                    }
+                }
+                if !rejected.isEmpty {
+                    DisclosureGroup("Why \(rejected.count) other samples do not fit") {
+                        ForEach(rejected.prefix(8)) { assessment in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(assessment.selection.sample.displayName).font(.caption.weight(.medium))
+                                Text(assessment.rejectionReason ?? "Unavailable")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .font(.caption)
+                }
+            } header: {
+                Text("Stock · \(requirement.displayName)")
+            } footer: {
+                Text("Each icon is one exact stored sample. Opening it changes nothing until you choose Use.")
+            }
+        }
+    }
+
+    private var activeRequirement: PhysicalGearCraftingRules.SampleRequirement? {
+        recipe.requirements.first { $0.id == activeRequirementID } ?? recipe.requirements.first
+    }
+
+    private var activeAssessments: [PhysicalGearCraftingRules.CandidateAssessment] {
+        guard let requirement = activeRequirement else { return [] }
+        let current = Array(selected.values) + (selections ?? [])
+        let occupied = Set(current.filter { $0.requirementID != requirement.id }.map(\.stockKey))
+        return PhysicalGearCraftingRules.assessments(for: requirement, in: store.state)
+            .filter { !occupied.contains($0.selection.stockKey) }
+    }
+}
+
+private struct CandidateStockDetail: View {
+    let requirement: PhysicalGearCraftingRules.SampleRequirement
+    let assessment: PhysicalGearCraftingRules.CandidateAssessment
+    let use: () -> Void
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Label(assessment.selection.sample.displayName,
+                      systemImage: assessment.selection.sample.kind.icon)
+                    .font(.headline)
+                if !assessment.selection.sample.source.isEmpty {
+                    LabeledContent("Provenance", value: assessment.selection.sample.source)
+                }
+                LabeledContent("Grade", value: String(format: "%.1f", assessment.selection.sample.grade))
+                Text(requirement.summary).font(.caption).foregroundStyle(.secondary)
+                if let reason = assessment.rejectionReason {
+                    Label(reason, systemImage: "xmark.circle")
+                        .font(.caption).foregroundStyle(.orange)
+                } else {
+                    Button("Use for \(requirement.displayName)", action: use)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .buttonStyle(.borderedProminent)
+                }
+            }
+            .padding(16)
+        }
+        .frame(minWidth: 260)
     }
 }
 
@@ -742,6 +971,7 @@ private struct ReforgeSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     let target: ReforgeTarget
+    @State private var commitFailure: String?
 
     var body: some View {
         NavigationStack {
@@ -810,14 +1040,19 @@ private struct ReforgeSheet: View {
 
                     Section {
                         Button {
-                            store.reforge(target)
-                            dismiss()
+                            if store.reforge(target) { dismiss() }
+                            else {
+                                commitFailure = "The piece, stock, or cost changed. Review the refreshed result."
+                            }
                         } label: {
                             Text("Reforge")
                                 .frame(maxWidth: .infinity, minHeight: 44)
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(!store.readiness(of: target).isReady)
+                        if let commitFailure {
+                            Text(commitFailure).font(.caption).foregroundStyle(.orange)
+                        }
                     }
                 }
             }

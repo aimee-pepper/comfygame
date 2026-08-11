@@ -779,6 +779,9 @@ extension GameStore {
         targets += state.base.inventory.stacks
             .filter { ContentCatalog.shared.item($0.catalogID)?.gear != nil }
             .map { ReforgeTarget.stored($0) }
+        targets += state.base.spillover
+            .filter { ContentCatalog.shared.item($0.catalogID)?.gear != nil }
+            .map { ReforgeTarget.overflow($0) }
         return targets.sorted { $0.effectiveTier > $1.effectiveTier }
     }
 
@@ -787,15 +790,20 @@ extension GameStore {
     }
 
     /// Spend stock and essence to push a piece one tier further.
-    func reforge(_ target: ReforgeTarget) {
+    @discardableResult
+    func reforge(_ target: ReforgeTarget) -> Bool {
+        var succeeded = false
         mutate("reforge \(target.catalogID.rawValue)", flush: true) { state in
             switch target {
             case .stored(let stack):
-                SmithRules.reforge(stored: stack, in: &state)
+                succeeded = SmithRules.reforge(stored: stack, in: &state) != nil
+            case .overflow(let stack):
+                succeeded = SmithRules.reforge(overflow: stack, in: &state) != nil
             case .worn(let slot, let member, _):
-                SmithRules.reforge(worn: slot, on: member, in: &state)
+                succeeded = SmithRules.reforge(worn: slot, on: member, in: &state)
             }
         }
+        return succeeded
     }
 
 }

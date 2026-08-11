@@ -146,6 +146,7 @@
 		AA467E2DFFB389EFACA3B124 /* sites.json in Resources */ = {isa = PBXBuildFile; fileRef = 77957A7595BE1E25AC8CF406 /* sites.json */; };
 		AAFAB01A37942E4A425FE909 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CBCB8652F20B361959F9B5C /* LibraryView.swift */; };
 		AC3C0F06CB2BD3D9A9917BA1 /* PageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7811775C7058B692E07EB1 /* PageTests.swift */; };
+		AC7D7F7C063E577D75003D57 /* MakerStationPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E87D371EF13A3599ED4B41 /* MakerStationPresentationTests.swift */; };
 		AC84C9DF64921B883263CEA5 /* PressureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F1E5BF56652C658BFF5484 /* PressureTests.swift */; };
 		AD06A15C582B042710CEED9F /* GameStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86093A93DD9720F92E4148D5 /* GameStore.swift */; };
 		AEBED915A9156084389B1BD6 /* LifeRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4002533174316FAE3274D6 /* LifeRules.swift */; };
@@ -265,6 +266,7 @@
 		3F7B97CCB3D7660ADA8ED9E5 /* MapAssetRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapAssetRenderer.swift; sourceTree = "<group>"; };
 		40DDEB42C7E2856E98352341 /* GameActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameActions.swift; sourceTree = "<group>"; };
 		41571D49472E12EE120FF5A8 /* CreatureIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatureIdentity.swift; sourceTree = "<group>"; };
+		42E87D371EF13A3599ED4B41 /* MakerStationPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakerStationPresentationTests.swift; sourceTree = "<group>"; };
 		433D570D177BA9841C75DCF9 /* Bookbinder.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Bookbinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4353B80B12FAA212BCCEEA39 /* DebugBugReporterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugBugReporterView.swift; sourceTree = "<group>"; };
 		4461FC8AD054E8E6E494602B /* EconomyRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EconomyRules.swift; sourceTree = "<group>"; };
@@ -712,6 +714,7 @@
 				EB15ACCA73C26252DA8A2E39 /* ItemGridTests.swift */,
 				80DFFB14B396FE04A7C03E01 /* LibraryTests.swift */,
 				7A7229E243E5EB4700C03C4A /* LifeTests.swift */,
+				42E87D371EF13A3599ED4B41 /* MakerStationPresentationTests.swift */,
 				E14C42A31CF4E0C858F212BF /* MaterialTests.swift */,
 				D56058E017000066A61CD5F0 /* NamingTests.swift */,
 				8DED817BCBD65429BDCD60C9 /* OpeningEconomyContentTests.swift */,
@@ -1035,6 +1038,7 @@
 				9E45FEACB28E637C10F680BC /* ItemGridTests.swift in Sources */,
 				DEB5615945275C75236426AD /* LibraryTests.swift in Sources */,
 				A94D38590FAA36B2D274214B /* LifeTests.swift in Sources */,
+				AC7D7F7C063E577D75003D57 /* MakerStationPresentationTests.swift in Sources */,
 				BCB44A183A64B987C97BC1EA /* MaterialTests.swift in Sources */,
 				9F43622A2E66874204BCCDC7 /* NamingTests.swift in Sources */,
 				54E8A6FB039D4B6F7FF4AA92 /* OpeningEconomyContentTests.swift in Sources */,

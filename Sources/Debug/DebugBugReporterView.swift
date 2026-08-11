@@ -4,9 +4,14 @@ import UIKit
 
 enum DebugBugReporterPlacementPolicy {
     static func verticalRange(height: CGFloat, safeTop: CGFloat, safeBottom: CGFloat,
-                              isBase: Bool) -> ClosedRange<CGFloat> {
+                              isBase: Bool, reservesTopChrome: Bool = false) -> ClosedRange<CGFloat> {
         let safeMinimum = safeTop + 28
         let safeMaximum = height - safeBottom - 28
+        if !isBase, reservesTopChrome {
+            let lower = min(safeMaximum, max(safeMinimum, height * 0.48))
+            let upper = max(lower, min(safeMaximum, height * 0.78))
+            return lower...upper
+        }
         guard isBase else { return safeMinimum...safeMaximum }
         let lower = min(safeMaximum, max(safeMinimum, height * 0.65))
         let upper = max(lower, min(safeMaximum, height * 0.78))
@@ -97,7 +102,9 @@ struct DebugBugReporterOverlay: View {
         // Base reserves its upper band for purse + district tabs and its lower band for Depart.
         DebugBugReporterPlacementPolicy.verticalRange(
             height: proxy.size.height, safeTop: proxy.safeAreaInsets.top,
-            safeBottom: proxy.safeAreaInsets.bottom, isBase: route == .base
+            safeBottom: proxy.safeAreaInsets.bottom, isBase: route == .base,
+            reservesTopChrome: route != .world && route != .encounter
+                && route != .settings && route != .harness
         )
     }
 

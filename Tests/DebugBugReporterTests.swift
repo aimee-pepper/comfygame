@@ -8,11 +8,16 @@ final class DebugBugReporterTests: XCTestCase {
             height: 800, safeTop: 59, safeBottom: 34, isBase: true)
         let ordinary = DebugBugReporterPlacementPolicy.verticalRange(
             height: 800, safeTop: 59, safeBottom: 34, isBase: false)
+        let station = DebugBugReporterPlacementPolicy.verticalRange(
+            height: 800, safeTop: 59, safeBottom: 34, isBase: false,
+            reservesTopChrome: true)
 
         XCTAssertEqual(base.lowerBound, 520, accuracy: 0.01)
         XCTAssertEqual(base.upperBound, 624, accuracy: 0.01)
         XCTAssertEqual(ordinary.lowerBound, 87, accuracy: 0.01)
         XCTAssertEqual(ordinary.upperBound, 738, accuracy: 0.01)
+        XCTAssertEqual(station.lowerBound, 384, accuracy: 0.01)
+        XCTAssertEqual(station.upperBound, 624, accuracy: 0.01)
     }
 
     func testOutboxAtomicallyPersistsUnicodeReportAndScreenshot() throws {

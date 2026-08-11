@@ -47,6 +47,13 @@ enum PhysicalGearCraftingRules {
         var stockKey: String { "\(binID.rawValue):\(sampleIndex)" }
     }
 
+    struct CandidateAssessment: Identifiable, Equatable, Sendable {
+        var id: String { selection.id }
+        var selection: Selection
+        var rejectionReason: String?
+        var isEligible: Bool { rejectionReason == nil }
+    }
+
     struct Preview: Equatable, Sendable {
         var recipe: Recipe
         var selections: [Selection]
@@ -353,11 +360,44 @@ enum PhysicalGearCraftingRules {
     }
 
     static func qualifies(_ sample: MaterialSample, for requirement: SampleRequirement) -> Bool {
-        if let kinds = requirement.allowedKinds, !kinds.contains(sample.kind) { return false }
-        guard requirement.floors.allSatisfy({ sample.properties[$0.property] >= $0.minimum })
-        else { return false }
-        return requirement.alternativeFloors.isEmpty
-            || requirement.alternativeFloors.contains { sample.properties[$0.property] >= $0.minimum }
+        rejectionReason(for: sample, requirement: requirement) == nil
+    }
+
+    static func rejectionReason(for sample: MaterialSample,
+                                requirement: SampleRequirement) -> String? {
+        if let kinds = requirement.allowedKinds, !kinds.contains(sample.kind) {
+            let allowed = kinds.map(\.displayName).sorted().joined(separator: ", ")
+            return "Needs \(allowed)."
+        }
+        let missing = requirement.floors.filter {
+            sample.properties[$0.property] < $0.minimum
+        }
+        if let floor = missing.first {
+            return "\(floor.property.displayName) \(Int(sample.properties[floor.property])) of \(Int(floor.minimum)) required."
+        }
+        if !requirement.alternativeFloors.isEmpty,
+           !requirement.alternativeFloors.contains(where: {
+               sample.properties[$0.property] >= $0.minimum
+           }) {
+            return requirement.alternativeFloors.map {
+                "\($0.property.displayName) \(Int($0.minimum))+"
+            }.joined(separator: " or ") + " required."
+        }
+        return nil
+    }
+
+    static func assessments(for requirement: SampleRequirement,
+                            in state: GameState) -> [CandidateAssessment] {
+        state.base.inventory.stacks.flatMap { bin in
+            bin.materials.enumerated().map { index, sample in
+                let selection = Selection(requirementID: requirement.id, binID: bin.id,
+                                          sampleIndex: index, sample: sample)
+                return CandidateAssessment(
+                    selection: selection,
+                    rejectionReason: rejectionReason(for: sample, requirement: requirement)
+                )
+            }
+        }
     }
 
     static func candidates(for requirement: SampleRequirement, in state: GameState) -> [Selection] {

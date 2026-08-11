@@ -188,6 +188,26 @@ enum SmithRules {
         return taken
     }
 
+    /// Reforge an exact piece waiting beyond Storehouse capacity. The operation stages the whole
+    /// state so a stale target or failed payment cannot partially remove the waiting stack.
+    @discardableResult
+    static func reforge(overflow stack: ItemStack, in state: inout GameState) -> ItemStack? {
+        var staged = state
+        let rank = stack.gearProfile?.reforgeRank ?? stack.upgradeLevel
+        guard case .ready = readiness(for: stack.catalogID, at: rank, in: staged),
+              let requirement = requirement(for: stack.catalogID, at: rank),
+              let index = staged.base.spillover.firstIndex(where: { $0.id == stack.id }),
+              var taken = staged.base.spillover[index].removing(1)
+        else { return nil }
+        if staged.base.spillover[index].isEmpty { staged.base.spillover.remove(at: index) }
+        guard pay(requirement, in: &staged) else { return nil }
+        taken.gearProfile?.reforgeRank += 1
+        taken.upgradeLevel = taken.gearProfile?.reforgeRank ?? (taken.upgradeLevel + 1)
+        staged.base.store(taken)
+        state = staged
+        return taken
+    }
+
     /// Reforge something somebody is wearing.
     ///
     /// **Without taking it off**, which matters more than it sounds: the piece you most want
@@ -227,11 +247,13 @@ enum SmithRules {
 /// between you and the only thing the building does.
 enum ReforgeTarget: Identifiable, Equatable, Sendable {
     case stored(ItemStack)
+    case overflow(ItemStack)
     case worn(slot: GearSlot, member: PartyMember, piece: EquippedPiece)
 
     var id: String {
         switch self {
         case .stored(let stack): "stored-\(stack.id.rawValue)"
+        case .overflow(let stack): "overflow-\(stack.id.rawValue)"
         case .worn(let slot, let member, _): "worn-\(member.id)-\(slot.rawValue)"
         }
     }
@@ -239,6 +261,7 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
     var catalogID: ItemID {
         switch self {
         case .stored(let stack): stack.catalogID
+        case .overflow(let stack): stack.catalogID
         case .worn(_, _, let piece): piece.catalogID
         }
     }
@@ -246,6 +269,7 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
     var upgradeLevel: Int {
         switch self {
         case .stored(let stack): stack.gearProfile?.reforgeRank ?? stack.upgradeLevel
+        case .overflow(let stack): stack.gearProfile?.reforgeRank ?? stack.upgradeLevel
         case .worn(_, _, let piece): piece.gearProfile?.reforgeRank ?? piece.upgradeLevel
         }
     }
@@ -254,6 +278,7 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
     var effectivePower: Double {
         switch self {
         case .stored(let stack): stack.effectivePower
+        case .overflow(let stack): stack.effectivePower
         case .worn(_, _, let piece): piece.effectivePower
         }
     }
@@ -261,6 +286,7 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
     var constructionTier: Int {
         switch self {
         case .stored(let stack): stack.constructionTier
+        case .overflow(let stack): stack.constructionTier
         case .worn(_, _, let piece): piece.constructionTier
         }
     }
@@ -277,6 +303,7 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
     var count: Int {
         switch self {
         case .stored(let stack): stack.count
+        case .overflow(let stack): stack.count
         case .worn: 1
         }
     }
@@ -285,9 +312,11 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
     var wearer: String? {
         switch self {
         case .stored: nil
+        case .overflow: "Waiting to sort"
         case .worn(let slot, let member, _): "\(member.displayName) · \(slot.displayName)"
         }
     }
+
 }
 
 /// The six properties, as something you can name and ask for — recipes read one by name (§5), and
