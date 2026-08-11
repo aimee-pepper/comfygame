@@ -70,7 +70,7 @@ struct PartyRosterView: View {
                 statChip("Level", "\(character.level)")
                 statChip("Health", "\(health(slot))")
             }
-            Text(character.rank.displayName)
+            Text("Rank · \(character.rank.displayName)")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
