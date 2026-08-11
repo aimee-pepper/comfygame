@@ -137,6 +137,7 @@
 		A0E08F8449F633B86AA0FF7A /* DistilleryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2735185C6352AE1A8F71DD42 /* DistilleryRules.swift */; };
 		A300CEAFF2FFDDD22DD00C9A /* GameActions+TradingPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD181474BAFE15E98980FD8 /* GameActions+TradingPost.swift */; };
 		A30BFB516414E49CB79270EF /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9142092437E5652D87187DF8 /* Migrations.swift */; };
+		A4BA22D701A51C7C584E8EAC /* ConstellationPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5699AE7D8C7D5B25E6FA1072 /* ConstellationPresentationTests.swift */; };
 		A4BBB435916ACBCC3039F0B4 /* TradingPostTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE496768808007B40188081 /* TradingPostTests.swift */; };
 		A6C910C0BD0B249F3AE3B0AE /* QualifierModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFEB95F304073E45D3BB22FB /* QualifierModels.swift */; };
 		A7B958AF227E4AD7A6E2E900 /* PageGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D5618B6B6F36DB62CD836B /* PageGridView.swift */; };
@@ -278,6 +279,7 @@
 		51B3BDF8FB0EE8418DD8EC80 /* ConsumableCraftingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsumableCraftingRules.swift; sourceTree = "<group>"; };
 		53634CFCB3CD23CDD115C001 /* ChasmTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChasmTests.swift; sourceTree = "<group>"; };
 		541026CEC51423252ED5FAFD /* WorldConstraints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldConstraints.swift; sourceTree = "<group>"; };
+		5699AE7D8C7D5B25E6FA1072 /* ConstellationPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstellationPresentationTests.swift; sourceTree = "<group>"; };
 		56CE9E9A2ED4242F8C480AEF /* ResearchTreeLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchTreeLayout.swift; sourceTree = "<group>"; };
 		58CFC1BCB5228A5CA88FB517 /* ResourceVisualTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceVisualTests.swift; sourceTree = "<group>"; };
 		59F1E2A3A08364F9452A684F /* stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = stations.json; sourceTree = "<group>"; };
@@ -694,6 +696,7 @@
 				53634CFCB3CD23CDD115C001 /* ChasmTests.swift */,
 				F395689728B586E0D0A7CD61 /* CombatTests.swift */,
 				E50FD84F29FE6729623D70EB /* CombatTreeTests.swift */,
+				5699AE7D8C7D5B25E6FA1072 /* ConstellationPresentationTests.swift */,
 				BDD17B2922EA6A0230E9DC64 /* ConsumableCraftingTests.swift */,
 				7691C0625AD4AACD2BA46A20 /* ContentTests.swift */,
 				F43DADDF1091E89318A12B0D /* ContradictionTests.swift */,
@@ -1018,6 +1021,7 @@
 				F6AE3DF4E00E397B950A1CBC /* ChasmTests.swift in Sources */,
 				EB5A7F017737E52E163C9A5C /* CombatTests.swift in Sources */,
 				9CB21084FFC26A6CCB93F47E /* CombatTreeTests.swift in Sources */,
+				A4BA22D701A51C7C584E8EAC /* ConstellationPresentationTests.swift in Sources */,
 				28A3F307CF0659FDF0163BA9 /* ConsumableCraftingTests.swift in Sources */,
 				867F278950814C3D859CEAFD /* ContentTests.swift in Sources */,
 				7C72DAD4C55C0D916064E912 /* ContradictionTests.swift in Sources */,

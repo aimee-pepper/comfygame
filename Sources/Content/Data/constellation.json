@@ -5,7 +5,7 @@
       "id": "extra_gambit_slot",
       "name": "The Long Instruction",
       "icon": "list.number",
-      "blurb": "+1 gambit slot for everybody, forever.",
+      "blurb": "Adds one Gambit rule slot to every current and future person in this campaign.",
       "maxRank": 1,
       "moteCostPerRank": [
         3

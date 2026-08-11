@@ -205,16 +205,22 @@ extension GameStore {
         return state.reality.motes >= cost
     }
 
-    /// Constellation nodes are the Reality layer's only spend — permanent, and the one thing a
-    /// future base reset won't take back.
+    /// Constellation nodes are the Reality layer's only spend. The effect belongs to the campaign's
+    /// Reality state rather than one building or one current party member.
     @discardableResult
     func buy(_ node: ConstellationNodeDef) -> Bool {
-        guard let cost = moteCost(of: node), state.reality.motes >= cost else { return false }
+        guard let quotedCost = moteCost(of: node), state.reality.motes >= quotedCost else {
+            return false
+        }
+        var bought = false
         mutate("constellation: \(node.id.rawValue)", flush: true) { state in
+            guard let cost = EconomyRules.moteCost(of: node, in: state),
+                  state.reality.motes >= cost else { return }
             state.reality.motes -= cost
             state.reality.constellation[node.id, default: 0] += 1
+            bought = true
         }
-        return true
+        return bought
     }
 
     // MARK: - Locked caches

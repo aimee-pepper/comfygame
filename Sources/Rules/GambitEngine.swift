@@ -54,7 +54,7 @@ enum GambitEngine {
     ///
     ///  - the **base** is what anybody can hold
     ///  - **research** is what your base has learned, and is lost in a reset
-    ///  - the **Constellation** is permanent and survives everything
+    ///  - the **Constellation** applies at the campaign Reality layer
     ///  - **Wit** is who *this person* is — a sharper companion holds a longer hand (session 17 §1)
     ///
     /// The Wit term is why this takes an actor at all. `CharacterRules.gambitSlots` was written for

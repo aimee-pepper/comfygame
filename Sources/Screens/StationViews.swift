@@ -852,33 +852,87 @@ private struct InstrumentUpgradeRow: View {
 /// Constellation — the Reality layer's only screen. Buying nodes is milestone 5.
 struct ConstellationView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var selectedNode: ConstellationNodeDef?
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                CurrencyChip(icon: "star.fill", label: "Motes", value: "\(store.state.reality.motes)", tint: .purple)
+        VStack(spacing: 24) {
+            CurrencyChip(icon: "star.fill", label: "Motes",
+                         value: "\(store.state.reality.motes)", tint: .purple)
+                .accessibilitySortPriority(3)
 
+            Spacer(minLength: 24)
+            HStack(spacing: 28) {
                 ForEach(ContentCatalog.shared.constellationNodes) { node in
-                    ConstellationNodeCard(node: node)
+                    AnchoredItemDetailButton(item: node, selection: $selectedNode) {
+                        ConstellationStar(node: node)
+                    } detail: { node in
+                        ConstellationNodeDetail(node: node).environmentObject(store)
+                    }
                 }
-
-                Label {
-                    Text("These survive everything, including a future reset. Nothing else you buy does.")
-                } icon: {
-                    Image(systemName: "infinity")
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
             }
-            .padding(16)
+            .frame(maxWidth: .infinity)
+            .accessibilitySortPriority(2)
+            Spacer(minLength: 24)
+
+            Text("The Constellation changes Reality itself, rather than one building or one person.")
+                .font(.callout).foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+                .accessibilitySortPriority(1)
+            Spacer()
         }
+        .padding(16)
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Constellation")
         .navigationBarTitleDisplayMode(.inline)
     }
+}
+
+private struct ConstellationStar: View {
+    @EnvironmentObject private var store: GameStore
+    let node: ConstellationNodeDef
+
+    var body: some View {
+        VStack(spacing: 10) {
+            ZStack {
+                Circle().fill(fill)
+                Circle().strokeBorder(.purple, style: stroke)
+                Image(systemName: starIcon)
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundStyle(foreground)
+            }
+            .frame(width: 64, height: 64)
+            Text(node.name).font(.subheadline.weight(.semibold)).multilineTextAlignment(.center)
+            Text(state.label).font(.caption2).foregroundStyle(.secondary)
+        }
+        .frame(minWidth: 150, minHeight: 112)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(node.name), \(state.label), rank \(rank) of \(node.maxRank)")
+        .accessibilityHint("Shows effect, cost and purchase action")
+    }
+
+    private var rank: Int { store.state.reality.rank(of: node.id) }
+    private var state: ConstellationNodePresentationState {
+        ConstellationNodePresentationState.resolve(
+            rank: rank, maxRank: node.maxRank, cost: store.moteCost(of: node),
+            motes: store.state.reality.motes)
+    }
+    private var fill: Color {
+        switch state {
+        case .affordable: .purple.opacity(0.18)
+        case .shortfall: Color(.secondarySystemGroupedBackground)
+        case .bought: .purple
+        }
+    }
+    private var stroke: StrokeStyle {
+        switch state {
+        case .shortfall: StrokeStyle(lineWidth: 2, dash: [5, 4])
+        case .affordable, .bought: StrokeStyle(lineWidth: 2)
+        }
+    }
+    private var starIcon: String { state == .bought ? "checkmark.star.fill" : "star.fill" }
+    private var foreground: Color { state == .bought ? .white : .purple }
 }
 
 /// Essence Spring — the trickle credited on each return from a run.
