@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "c8fde3d · Side-by-side Interact and Look control strip",
+  "installedCheckpoint": "cfe236c · Deliberate stationary-threat contact",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 world encounter contact matrix",
-  "currentNote": "Generated item-pack validation and stable ItemID wiring are checkpointed in 0911e2c, awaiting Aimee-authored immutable art. Engineering is correcting contact rules so apexes and active flora are safe when adjacent and engage only on deliberate same-tile entry.",
+  "currentWork": "P1 combat-tree-v2 generated authority freshness",
+  "currentNote": "World contact is green in cfe236c: apexes and active flora are safe at adjacency and engage only on direct occupied-tile entry. Before v2 promotion, Engineering is repairing the schema-2 authority generator and exact Effect-copy mirror; tutorials remain excluded.",
   "items": [
     {
       "id": "essence",
@@ -179,8 +179,8 @@
       "priority": "P1",
       "title": "Static/manual authority audit",
       "status": "queued",
-      "detail": "Audit game data, UI, debug tools, supporting docs and team process for duplicated or manually synchronized facts that should derive from one active source of truth.",
-      "gate": "Inventory every duplicate authority; classify deliberate authored constants versus accidental mirrors; migrate safe cases with validation and archive history without turning settled design into generated content."
+      "detail": "Fourth audit pass is current in static-manual-authority-audit-current.md. P0 before combat v2: repair the currently stale native graph generator/output. Then derive roadmap schema 2 and atlas review union; move Trading Post/Recycler classifications and baseline combat ownership into their owning catalogues at those checkpoints.",
+      "gate": "Combat and meeting generators pass normal freshness checks; roadmap summaries/build identity derive; review union includes draft-only identities without release promotion; catalogue classifications fail closed; history remains dated and authored judgment is never generated."
     },
     {
       "id": "encounter-scaling",
@@ -202,7 +202,7 @@
       "id": "combat-tree-v2",
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
-      "status": "queued",
+      "status": "inProgress",
       "detail": "Promote the accepted three true graphs through stable node ownership, lossless save migration, all shared consumer primitives and the native phone graph. Keep unresolved baseline ownership and Withdraw naming choices separable from topology and passive consumers.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
@@ -210,9 +210,25 @@
       "id": "world-contact",
       "priority": "P1",
       "title": "Deliberate world encounter contact",
-      "status": "inProgress",
-      "detail": "Correct apex and active-flora contact so adjacency remains safe and only deliberate same-tile entry begins combat; long auto-path stops adjacent before that final commitment.",
+      "status": "readyToTest",
+      "detail": "Checkpoint cfe236c keeps apex and active-flora adjacency safe, stops long travel before the hazardous final step, begins party-approach combat only on direct entry, and gives neutral truthful Look warnings.",
       "gate": "Adjacent Look, wait and Interact never start apex/flora combat; direct entry does; ordinary roaming creatures still wake nearby but encounter only on contact. Authority: world-encounter-contact-current.md."
+    },
+    {
+      "id": "apothecary-reachability",
+      "priority": "P1",
+      "title": "Make Nessa's Apothecary reachable",
+      "status": "queued",
+      "detail": "The live locked Apothecary uniquely lacks both builtBy and buildCost, and its stock-inference-only screen can open empty. Add Nessa's persistent build path, teach Lesser Salve without granting an item, retain partial-stock inference, and apply the settled sustainable preparation costs without changing writing-ink ownership.",
+      "gate": "Fresh, already-recruited-Nessa and already-built saves prove exactly one atomic Make → build → visible Lesser Salve route; partial inference persists; ordinary recipes cost 0 Essence, Stillwater 6, and Waystone 12 plus one mote; all locked stations validate an explicit lifecycle. Authority: station-first-use-reachability-audit-current.md."
+    },
+    {
+      "id": "channelworks-restoration-receipt",
+      "priority": "P2",
+      "title": "Separate Oda's restored conduit from repeatable construction",
+      "status": "queued",
+      "detail": "Channelworks construction already grants Oda's authored Heat Conduit, but the station screen makes the separate player-core conversion look like the same pending restoration. Add/adopt one durable restoration receipt, confirm the restored fixture, and label the repeatable action Build another conduit.",
+      "gate": "Fresh and unlocked-legacy saves, a moved/equipped/sold first fixture, repeated relaunch, and repeatable Heat-core conversion prove exactly one authored entitlement and truthful Oda-to-Auber progression. Authority: channelworks-system-current.md and DRQ-083."
     }
   ],
   "paused": [
