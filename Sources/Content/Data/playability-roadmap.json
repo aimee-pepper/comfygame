@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "be82418 · reporter context + placement/save corrections",
+  "installedCheckpoint": "b3bc410 · Base destination board + progression shelves",
   "essenceBaseline": "a816113",
   "currentWork": "P1 bug-report delivery + save-slot phone acceptance",
   "currentNote": "Independent campaign saves and the hardened local bug-report outbox are installed for phone acceptance. Reports now include exact route, safe campaign/encounter context, active tuning and a bounded semantic action trail. Direct delivery remains pending an approved relay endpoint and Keychain credential.",
@@ -59,7 +59,7 @@
       "priority": "P0",
       "title": "Start, load and delete saves",
       "status": "readyToTest",
-      "detail": "Checkpointed through be82418: post-loading Continue/New/Load chooser, independent autosaves, lossless legacy adoption, safe details/delete/export, Settings return without relaunch and active-slot-first Continue semantics.",
+      "detail": "Checkpointed through b3bc410: post-loading Continue/New/Load chooser, independent autosaves, lossless legacy adoption, safe details/delete/export, Settings return without relaunch, active-slot-first Continue semantics and progression-driven campaign shelves.",
       "gate": "Existing single save migrates losslessly; new games never overwrite another slot; Continue chooses the persisted active valid slot then falls back to the most recently played valid slot; delete requires explicit confirmation and cannot strand the app; corrupted or incompatible slots fail visibly without harming healthy saves."
     },
     {
@@ -83,7 +83,7 @@
       "priority": "P1",
       "title": "Spatial game hubs",
       "status": "readyToTest",
-      "detail": "Library author-vs-subject indexes, compact Party fit and six-across Storehouse resources are checkpointed.",
+      "detail": "Library author-vs-subject indexes, compact Party fit, six-across Storehouse resources and the four-section Base destination board are checkpointed.",
       "gate": "Full suite plus 368×800 and large-text inspection before the next phone install."
     },
     {
