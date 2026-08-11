@@ -335,6 +335,7 @@ final class ContentTests: XCTestCase {
             contradictions: catalog.contradictions,
             descriptionClauses: catalog.descriptionClauses,
             combatTrees: catalog.combatTrees,
+            combatGraph: catalog.combatGraph,
             runeShapes: catalog.runeShapes,
             qualifiers: catalog.qualifiers,
             travellers: catalog.travellers,

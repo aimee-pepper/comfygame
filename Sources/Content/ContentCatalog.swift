@@ -22,6 +22,9 @@ struct ContentCatalog: Sendable {
     let contradictions: [ContradictionDef]
     let descriptionClauses: [DescriptionClauseDef]
     let combatTrees: [CombatTreeDef]
+    /// Generated from the machine-readable v2 authority plus the existing authored node content.
+    /// Kept alongside the live v1 trees until the lossless ownership/consumer migration is green.
+    let combatGraph: CombatGraphCatalogue
     let runeShapes: [RuneShapeDef]
     let qualifiers: [QualifierDef]
     let travellers: [TravellerDef]
@@ -172,6 +175,7 @@ struct ContentCatalog: Sendable {
             contradictions: try loadFile("contradictions", key: "contradictions", bundle: bundle),
             descriptionClauses: try loadFile("descriptions", key: "clauses", bundle: bundle),
             combatTrees: try loadFile("combat_trees", key: "trees", bundle: bundle),
+            combatGraph: try loadObject("combat_tree_v2", bundle: bundle),
             runeShapes: try loadFile("rune_shapes", key: "shapes", bundle: bundle),
             qualifiers: try loadFile("qualifiers", key: "qualifiers", bundle: bundle),
             travellers: try loadFile("travellers", key: "travellers", bundle: bundle),
@@ -195,6 +199,17 @@ struct ContentCatalog: Sendable {
             return try JSONDecoder().decode([T].self, from: entriesData)
         } catch let error as ContentError {
             throw error
+        } catch {
+            throw ContentError.decodeFailed(name, underlying: error)
+        }
+    }
+
+    private static func loadObject<T: Decodable>(_ name: String, bundle: Bundle) throws -> T {
+        guard let url = bundle.url(forResource: name, withExtension: "json") else {
+            throw ContentError.missingFile(name)
+        }
+        do {
+            return try JSONDecoder().decode(T.self, from: Data(contentsOf: url))
         } catch {
             throw ContentError.decodeFailed(name, underlying: error)
         }
@@ -231,6 +246,7 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(qualifiers.map(\.id.rawValue), label: "qualifier")
         try requireUniqueIDs(travellers.map(\.id.rawValue), label: "traveller")
         try requireUniqueIDs(diaryPages.map(\.id.rawValue), label: "diary page")
+        try validateCombatGraph()
 
         for traveller in travellers {
             guard let meeting = traveller.meeting else { continue }
@@ -620,6 +636,98 @@ struct ContentCatalog: Sendable {
                 break
             }
         }
+    }
+
+
+    private func validateCombatGraph() throws {
+        guard combatGraph.schemaVersion == 1, combatGraph.graphVersion == 2 else {
+            throw ContentError.danglingReference(
+                "unsupported combat graph schema \(combatGraph.schemaVersion)/\(combatGraph.graphVersion)")
+        }
+        guard combatGraph.trees.count == 3,
+              combatGraph.disciplines.count == 9,
+              combatGraph.nodes.count == 72 else {
+            throw ContentError.danglingReference(
+                "combat graph must contain 3 trees, 9 disciplines and 72 nodes")
+        }
+        try requireUniqueIDs(combatGraph.nodes.map(\.id.rawValue), label: "combat node")
+        let nodeIDs = Set(combatGraph.nodes.map(\.id))
+        let skillIDs = Set(skills.map(\.id))
+        let legacyBranches = Dictionary(uniqueKeysWithValues: combatBranches.map { ($0.id, $0) })
+
+        for tree in combatGraph.trees {
+            guard tree.disciplines.count == 3,
+                  tree.disciplines.allSatisfy({ $0.nodes.count == 8 }) else {
+                throw ContentError.danglingReference(
+                    "combat tree '\(tree.id)' must contain three eight-node disciplines")
+            }
+            let disciplineIDs = Set(tree.disciplines.map(\.id))
+            let disciplineIndex = Dictionary(uniqueKeysWithValues:
+                tree.disciplines.enumerated().map { ($0.element.id, $0.offset) })
+            for discipline in tree.disciplines {
+                guard let former = legacyBranches[discipline.legacyBranchID] else {
+                    throw ContentError.danglingReference(
+                        "combat discipline '\(discipline.id)' maps unknown legacy branch '\(discipline.legacyBranchID)'")
+                }
+                for node in discipline.nodes {
+                    guard node.id.rawValue.hasPrefix("combat.\(tree.id.rawValue).\(discipline.id.rawValue)."),
+                          node.formerIndex >= 1, node.formerIndex <= former.nodes.count,
+                          node.depth >= 1, node.depth <= 5 else {
+                        throw ContentError.danglingReference("combat node '\(node.id)' has invalid placement")
+                    }
+                    let formerNode = former.nodes[node.formerIndex - 1]
+                    guard node.name == formerNode.name, node.legacyEffect == formerNode.effect,
+                          node.legacyTechniqueID == formerNode.grantsSkill else {
+                        throw ContentError.danglingReference(
+                            "generated combat node '\(node.id)' is stale against authored node content")
+                    }
+                    if let skill = node.legacyTechniqueID, !skillIDs.contains(skill) {
+                        throw ContentError.danglingReference(
+                            "combat node '\(node.id)' grants unknown technique '\(skill)'")
+                    }
+                    for parent in node.ordinaryParentAlternatives where !nodeIDs.contains(parent) {
+                        throw ContentError.danglingReference(
+                            "combat node '\(node.id)' names unknown parent '\(parent)'")
+                    }
+                    for parent in node.hybridAlternativeParents {
+                        guard let parentTree = combatGraph.tree(containing: parent), parentTree.id == tree.id,
+                              let parentDiscipline = combatGraph.discipline(containing: parent),
+                              disciplineIDs.contains(parentDiscipline.id), parentDiscipline.id != discipline.id,
+                              let lhs = disciplineIndex[discipline.id],
+                              let rhs = disciplineIndex[parentDiscipline.id], abs(lhs - rhs) == 1 else {
+                            throw ContentError.danglingReference(
+                                "combat node '\(node.id)' has invalid hybrid parent '\(parent)'")
+                        }
+                    }
+                    for parentID in node.ordinaryParentAlternatives {
+                        guard let parent = combatGraph.node(parentID), parent.depth <= node.depth else {
+                            throw ContentError.danglingReference(
+                                "combat node '\(node.id)' has a non-forward parent '\(parentID)'")
+                        }
+                    }
+                }
+            }
+            guard !combatGraphHasCycle(in: tree) else {
+                throw ContentError.danglingReference("combat tree '\(tree.id)' contains a prerequisite cycle")
+            }
+        }
+    }
+
+    private func combatGraphHasCycle(in tree: CombatGraphTreeDef) -> Bool {
+        let nodes = tree.disciplines.flatMap(\.nodes)
+        let parents = Dictionary(uniqueKeysWithValues: nodes.map { ($0.id, $0.ordinaryParentAlternatives) })
+        var visiting: Set<CombatNodeID> = []
+        var visited: Set<CombatNodeID> = []
+        func visit(_ id: CombatNodeID) -> Bool {
+            if visiting.contains(id) { return true }
+            if visited.contains(id) { return false }
+            visiting.insert(id)
+            for parent in parents[id, default: []] where visit(parent) { return true }
+            visiting.remove(id)
+            visited.insert(id)
+            return false
+        }
+        return nodes.contains { visit($0.id) }
     }
 
     private func requireUniqueIDs(_ ids: [String], label: String) throws {

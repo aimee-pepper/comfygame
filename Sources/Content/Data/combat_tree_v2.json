@@ -1,0 +1,1501 @@
+{
+  "_note": "GENERATED topology plus explicitly labelled legacy migration payloads; v2 semantics remain owned by docs/combat-node-viability-current.md.",
+  "schemaVersion": 1,
+  "graphVersion": 2,
+  "capstoneGate": {
+    "minimumPriorNodesInTree": 7,
+    "minimumNodesInCapstoneDisciplineIncludingCapstone": 5,
+    "requiredOwnedRolesInCapstoneDiscipline": [
+      "root",
+      "oneFundamental",
+      "oneDevelopment",
+      "oneMastery"
+    ],
+    "priorNodesMustFormOneConnectedPrerequisiteSubgraph": true,
+    "connectivityTreatsOwnedEdgesAsUndirected": true
+  },
+  "trees": [
+    {
+      "id": "offense",
+      "name": "Offense",
+      "icon": "flame.fill",
+      "blurb": "What you do to them.",
+      "disciplines": [
+        {
+          "id": "force",
+          "legacyBranchID": "force",
+          "name": "Force",
+          "icon": "hammer.fill",
+          "blurb": "Crush, stagger, weight. Answers armoured foes; costs initiative.",
+          "nodes": [
+            {
+              "id": "combat.offense.force.heavy_hand",
+              "slug": "heavy_hand",
+              "legacyBranchID": "force",
+              "formerIndex": 1,
+              "role": "root",
+              "depth": 1,
+              "name": "Heavy Hand",
+              "blurb": "You hit like something heavier than you are.",
+              "legacyEffect": {
+                "kind": "damageOfKind",
+                "damageKind": "crush",
+                "amount": 2
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.force.follow_through",
+              "slug": "follow_through",
+              "legacyBranchID": "force",
+              "formerIndex": 2,
+              "role": "fundamentalA",
+              "depth": 2,
+              "name": "Follow Through",
+              "blurb": "Armour is something to go through, not around.",
+              "legacyEffect": {
+                "kind": "damageVersusArmour",
+                "above": 8,
+                "amount": 3
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.force.heavy_hand"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.force.overbear",
+              "slug": "overbear",
+              "legacyBranchID": "force",
+              "formerIndex": 3,
+              "role": "fundamentalB",
+              "depth": 2,
+              "name": "Overbear",
+              "blurb": "Everything behind the swing, and you pay for it next turn.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "overbear",
+              "sameDisciplineParents": [
+                "combat.offense.force.heavy_hand"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.force.bracing_stance",
+              "slug": "bracing_stance",
+              "legacyBranchID": "force",
+              "formerIndex": 4,
+              "role": "developmentA",
+              "depth": 3,
+              "name": "Bracing Stance",
+              "blurb": "You did not move, and it shows.",
+              "legacyEffect": {
+                "kind": "damageIfHeldRank",
+                "amount": 3
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.force.follow_through"
+              ],
+              "hybridAlternativeParents": [
+                "combat.offense.precision.pry"
+              ]
+            },
+            {
+              "id": "combat.offense.force.stagger",
+              "slug": "stagger",
+              "legacyBranchID": "force",
+              "formerIndex": 5,
+              "role": "developmentB",
+              "depth": 3,
+              "name": "Stagger",
+              "blurb": "Enough weight and they lose their footing.",
+              "legacyEffect": {
+                "kind": "staggerChance",
+                "chance": 0.3
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.force.overbear"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.force.shatter",
+              "slug": "shatter",
+              "legacyBranchID": "force",
+              "formerIndex": 6,
+              "role": "masteryA",
+              "depth": 4,
+              "name": "Shatter",
+              "blurb": "What it was wearing is not what it is wearing now.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "shatter",
+              "sameDisciplineParents": [
+                "combat.offense.force.bracing_stance"
+              ],
+              "hybridAlternativeParents": [
+                "combat.offense.precision.exploit"
+              ]
+            },
+            {
+              "id": "combat.offense.force.momentum",
+              "slug": "momentum",
+              "legacyBranchID": "force",
+              "formerIndex": 7,
+              "role": "masteryB",
+              "depth": 4,
+              "name": "Momentum",
+              "blurb": "Slow, and worse for it.",
+              "legacyEffect": {
+                "kind": "damagePerMissingInitiative",
+                "amount": 0.4
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.force.stagger"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.force.breaking_blow",
+              "slug": "breaking_blow",
+              "legacyBranchID": "force",
+              "formerIndex": 8,
+              "role": "capstone",
+              "depth": 5,
+              "name": "Breaking Blow",
+              "blurb": "Through the armour and off their feet.",
+              "legacyEffect": {
+                "kind": "capstoneBreakingBlow"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.force.shatter",
+                "combat.offense.force.momentum"
+              ],
+              "hybridAlternativeParents": []
+            }
+          ]
+        },
+        {
+          "id": "precision",
+          "legacyBranchID": "precision",
+          "name": "Precision",
+          "icon": "scope",
+          "blurb": "Pierce, gaps, finishing. Answers plated foes; costs raw damage.",
+          "nodes": [
+            {
+              "id": "combat.offense.precision.keen_eye",
+              "slug": "keen_eye",
+              "legacyBranchID": "precision",
+              "formerIndex": 1,
+              "role": "root",
+              "depth": 1,
+              "name": "Keen Eye",
+              "blurb": "You can see where it isn't covered.",
+              "legacyEffect": {
+                "kind": "damageOfKind",
+                "damageKind": "pierce",
+                "amount": 2
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.precision.weak_point",
+              "slug": "weak_point",
+              "legacyBranchID": "precision",
+              "formerIndex": 2,
+              "role": "fundamentalA",
+              "depth": 2,
+              "name": "Weak Point",
+              "blurb": "The thicker it is, the more it has to hide.",
+              "legacyEffect": {
+                "kind": "damageVersusCovering",
+                "above": 50,
+                "amount": 3
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.precision.keen_eye"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.precision.pry",
+              "slug": "pry",
+              "legacyBranchID": "precision",
+              "formerIndex": 3,
+              "role": "fundamentalB",
+              "depth": 2,
+              "name": "Pry",
+              "blurb": "Under the armour entirely.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "pry",
+              "sameDisciplineParents": [
+                "combat.offense.precision.keen_eye"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.precision.steady_hand",
+              "slug": "steady_hand",
+              "legacyBranchID": "precision",
+              "formerIndex": 4,
+              "role": "developmentA",
+              "depth": 3,
+              "name": "Steady Hand",
+              "blurb": "You do not waste the opening.",
+              "legacyEffect": {
+                "kind": "critChance",
+                "chance": 0.12
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.precision.weak_point"
+              ],
+              "hybridAlternativeParents": [
+                "combat.offense.force.overbear"
+              ]
+            },
+            {
+              "id": "combat.offense.precision.exploit",
+              "slug": "exploit",
+              "legacyBranchID": "precision",
+              "formerIndex": 5,
+              "role": "developmentB",
+              "depth": 3,
+              "name": "Exploit",
+              "blurb": "Something already wrong with it is something to work with.",
+              "legacyEffect": {
+                "kind": "damageVersusAfflicted",
+                "amount": 4
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.precision.pry"
+              ],
+              "hybridAlternativeParents": [
+                "combat.offense.swiftness.quicken"
+              ]
+            },
+            {
+              "id": "combat.offense.precision.finish",
+              "slug": "finish",
+              "legacyBranchID": "precision",
+              "formerIndex": 6,
+              "role": "masteryA",
+              "depth": 4,
+              "name": "Finish",
+              "blurb": "It was nearly over.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "finish",
+              "sameDisciplineParents": [
+                "combat.offense.precision.steady_hand"
+              ],
+              "hybridAlternativeParents": [
+                "combat.offense.force.stagger",
+                "combat.offense.swiftness.flurry"
+              ]
+            },
+            {
+              "id": "combat.offense.precision.anatomy",
+              "slug": "anatomy",
+              "legacyBranchID": "precision",
+              "formerIndex": 7,
+              "role": "masteryB",
+              "depth": 4,
+              "name": "Anatomy",
+              "blurb": "You know where everything is, and what it is worth.",
+              "legacyEffect": {
+                "kind": "butcheryYield",
+                "amount": 0.35
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.precision.exploit"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.precision.killing_stroke",
+              "slug": "killing_stroke",
+              "legacyBranchID": "precision",
+              "formerIndex": 8,
+              "role": "capstone",
+              "depth": 5,
+              "name": "Killing Stroke",
+              "blurb": "Below a certain point, there is no fight left in it.",
+              "legacyEffect": {
+                "kind": "capstoneKillingStroke",
+                "threshold": 0.15
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.precision.finish",
+                "combat.offense.precision.anatomy"
+              ],
+              "hybridAlternativeParents": []
+            }
+          ]
+        },
+        {
+          "id": "swiftness",
+          "legacyBranchID": "swiftness",
+          "name": "Swiftness",
+          "icon": "hare.fill",
+          "blurb": "Initiative, extra actions, several targets. Answers swarms.",
+          "nodes": [
+            {
+              "id": "combat.offense.swiftness.quick_step",
+              "slug": "quick_step",
+              "legacyBranchID": "swiftness",
+              "formerIndex": 1,
+              "role": "root",
+              "depth": 1,
+              "name": "Quick Step",
+              "blurb": "First, more often than not.",
+              "legacyEffect": {
+                "kind": "initiative",
+                "amount": 4
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.swiftness.light_touch",
+              "slug": "light_touch",
+              "legacyBranchID": "swiftness",
+              "formerIndex": 2,
+              "role": "fundamentalA",
+              "depth": 2,
+              "name": "Light Touch",
+              "blurb": "Heavy gear stops slowing you down so much.",
+              "legacyEffect": {
+                "kind": "gearInitiativeRelief",
+                "amount": 0.5
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.swiftness.quick_step"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.swiftness.quicken",
+              "slug": "quicken",
+              "legacyBranchID": "swiftness",
+              "formerIndex": 3,
+              "role": "fundamentalB",
+              "depth": 2,
+              "name": "Quicken",
+              "blurb": "Twice now, nothing after.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "quicken",
+              "sameDisciplineParents": [
+                "combat.offense.swiftness.quick_step"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.swiftness.second_wind",
+              "slug": "second_wind",
+              "legacyBranchID": "swiftness",
+              "formerIndex": 4,
+              "role": "developmentA",
+              "depth": 3,
+              "name": "Second Wind",
+              "blurb": "A kill puts something back.",
+              "legacyEffect": {
+                "kind": "healOnKill",
+                "amount": 3
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.swiftness.light_touch"
+              ],
+              "hybridAlternativeParents": [
+                "combat.offense.precision.pry"
+              ]
+            },
+            {
+              "id": "combat.offense.swiftness.flurry",
+              "slug": "flurry",
+              "legacyBranchID": "swiftness",
+              "formerIndex": 5,
+              "role": "developmentB",
+              "depth": 3,
+              "name": "Flurry",
+              "blurb": "The swing carries into the next one.",
+              "legacyEffect": {
+                "kind": "splashDamage",
+                "fraction": 0.4
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.swiftness.quicken"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.swiftness.first_strike",
+              "slug": "first_strike",
+              "legacyBranchID": "swiftness",
+              "formerIndex": 6,
+              "role": "masteryA",
+              "depth": 4,
+              "name": "First Strike",
+              "blurb": "Before it has decided anything.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "first_strike",
+              "sameDisciplineParents": [
+                "combat.offense.swiftness.second_wind"
+              ],
+              "hybridAlternativeParents": [
+                "combat.offense.precision.exploit"
+              ]
+            },
+            {
+              "id": "combat.offense.swiftness.cascade",
+              "slug": "cascade",
+              "legacyBranchID": "swiftness",
+              "formerIndex": 7,
+              "role": "masteryB",
+              "depth": 4,
+              "name": "Cascade",
+              "blurb": "Each one makes the next quicker.",
+              "legacyEffect": {
+                "kind": "initiativeOnKill",
+                "amount": 3
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.swiftness.flurry"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.offense.swiftness.blur",
+              "slug": "blur",
+              "legacyBranchID": "swiftness",
+              "formerIndex": 8,
+              "role": "capstone",
+              "depth": 5,
+              "name": "Blur",
+              "blurb": "Two whole turns, once, when it matters.",
+              "legacyEffect": {
+                "kind": "capstoneBlur"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.offense.swiftness.first_strike",
+                "combat.offense.swiftness.cascade"
+              ],
+              "hybridAlternativeParents": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "defense",
+      "name": "Defense",
+      "icon": "shield.fill",
+      "blurb": "What they cannot do to you.",
+      "disciplines": [
+        {
+          "id": "fortitude",
+          "legacyBranchID": "fortitude",
+          "name": "Fortitude",
+          "icon": "figure.stand",
+          "blurb": "Health, armour, resistance. Answers attrition; costs speed.",
+          "nodes": [
+            {
+              "id": "combat.defense.fortitude.thick_hide",
+              "slug": "thick_hide",
+              "legacyBranchID": "fortitude",
+              "formerIndex": 1,
+              "role": "root",
+              "depth": 1,
+              "name": "Thick Hide",
+              "blurb": "There is more of you to get through.",
+              "legacyEffect": {
+                "kind": "maxHP",
+                "amount": 6
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.fortitude.iron_skin",
+              "slug": "iron_skin",
+              "legacyBranchID": "fortitude",
+              "formerIndex": 2,
+              "role": "fundamentalA",
+              "depth": 2,
+              "name": "Iron Skin",
+              "blurb": "Less of what lands, lands.",
+              "legacyEffect": {
+                "kind": "armour",
+                "amount": 2
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.fortitude.thick_hide"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.fortitude.brace",
+              "slug": "brace",
+              "legacyBranchID": "fortitude",
+              "formerIndex": 3,
+              "role": "fundamentalB",
+              "depth": 2,
+              "name": "Brace",
+              "blurb": "You take the next one properly.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "brace",
+              "sameDisciplineParents": [
+                "combat.defense.fortitude.thick_hide"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.fortitude.constitution",
+              "slug": "constitution",
+              "legacyBranchID": "fortitude",
+              "formerIndex": 4,
+              "role": "developmentA",
+              "depth": 3,
+              "name": "Constitution",
+              "blurb": "Whatever is in the wound does not stay long.",
+              "legacyEffect": {
+                "kind": "statusResistance",
+                "amount": 0.5
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.fortitude.iron_skin"
+              ],
+              "hybridAlternativeParents": [
+                "combat.defense.protection.draw_off"
+              ]
+            },
+            {
+              "id": "combat.defense.fortitude.endurance",
+              "slug": "endurance",
+              "legacyBranchID": "fortitude",
+              "formerIndex": 5,
+              "role": "developmentB",
+              "depth": 3,
+              "name": "Endurance",
+              "blurb": "Hurt, and harder to hurt further.",
+              "legacyEffect": {
+                "kind": "damageReductionWhenHurt",
+                "amount": 0.25
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.fortitude.brace"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.fortitude.ward",
+              "slug": "ward",
+              "legacyBranchID": "fortitude",
+              "formerIndex": 6,
+              "role": "masteryA",
+              "depth": 4,
+              "name": "Ward",
+              "blurb": "Set against one thing, and set well.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "ward",
+              "sameDisciplineParents": [
+                "combat.defense.fortitude.constitution"
+              ],
+              "hybridAlternativeParents": [
+                "combat.defense.protection.shieldwall"
+              ]
+            },
+            {
+              "id": "combat.defense.fortitude.unyielding",
+              "slug": "unyielding",
+              "legacyBranchID": "fortitude",
+              "formerIndex": 7,
+              "role": "masteryB",
+              "depth": 4,
+              "name": "Unyielding",
+              "blurb": "Once, you simply do not fall.",
+              "legacyEffect": {
+                "kind": "surviveOnce"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.fortitude.endurance"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.fortitude.immovable",
+              "slug": "immovable",
+              "legacyBranchID": "fortitude",
+              "formerIndex": 8,
+              "role": "capstone",
+              "depth": 5,
+              "name": "Immovable",
+              "blurb": "Armour is armour, whatever it is against.",
+              "legacyEffect": {
+                "kind": "capstoneImmovable"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.fortitude.ward",
+                "combat.defense.fortitude.unyielding"
+              ],
+              "hybridAlternativeParents": []
+            }
+          ]
+        },
+        {
+          "id": "protection",
+          "legacyBranchID": "protection",
+          "name": "Protection",
+          "icon": "shield.lefthalf.filled",
+          "blurb": "Guarding, drawing, sharing. Answers a fragile back rank.",
+          "nodes": [
+            {
+              "id": "combat.defense.protection.bulwark",
+              "slug": "bulwark",
+              "legacyBranchID": "protection",
+              "formerIndex": 1,
+              "role": "root",
+              "depth": 1,
+              "name": "Bulwark",
+              "blurb": "Standing near you is worth something.",
+              "legacyEffect": {
+                "kind": "allyArmour",
+                "amount": 2
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.protection.watchful",
+              "slug": "watchful",
+              "legacyBranchID": "protection",
+              "formerIndex": 2,
+              "role": "fundamentalA",
+              "depth": 2,
+              "name": "Watchful",
+              "blurb": "You see them before they move.",
+              "legacyEffect": {
+                "kind": "partyAmbushResistance",
+                "amount": 0.4
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.protection.bulwark"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.protection.draw_off",
+              "slug": "draw_off",
+              "legacyBranchID": "protection",
+              "formerIndex": 3,
+              "role": "fundamentalB",
+              "depth": 2,
+              "name": "Draw Off",
+              "blurb": "It comes for you instead.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "draw_off",
+              "sameDisciplineParents": [
+                "combat.defense.protection.bulwark"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.protection.cover",
+              "slug": "cover",
+              "legacyBranchID": "protection",
+              "formerIndex": 4,
+              "role": "developmentA",
+              "depth": 3,
+              "name": "Cover",
+              "blurb": "Some of what was meant for them lands on you.",
+              "legacyEffect": {
+                "kind": "shareBackRankDamage",
+                "fraction": 0.3
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.protection.watchful"
+              ],
+              "hybridAlternativeParents": [
+                "combat.defense.fortitude.brace",
+                "combat.defense.evasion.sidestep"
+              ]
+            },
+            {
+              "id": "combat.defense.protection.shieldwall",
+              "slug": "shieldwall",
+              "legacyBranchID": "protection",
+              "formerIndex": 5,
+              "role": "developmentB",
+              "depth": 3,
+              "name": "Shieldwall",
+              "blurb": "While you're standing, the line holds.",
+              "legacyEffect": {
+                "kind": "frontRankArmour",
+                "amount": 2
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.protection.draw_off"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.protection.interpose",
+              "slug": "interpose",
+              "legacyBranchID": "protection",
+              "formerIndex": 6,
+              "role": "masteryA",
+              "depth": 4,
+              "name": "Interpose",
+              "blurb": "Not them.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "interpose",
+              "sameDisciplineParents": [
+                "combat.defense.protection.cover"
+              ],
+              "hybridAlternativeParents": [
+                "combat.defense.fortitude.endurance",
+                "combat.defense.evasion.feint"
+              ]
+            },
+            {
+              "id": "combat.defense.protection.rally",
+              "slug": "rally",
+              "legacyBranchID": "protection",
+              "formerIndex": 7,
+              "role": "masteryB",
+              "depth": 4,
+              "name": "Rally",
+              "blurb": "A kill of yours puts something back into everyone.",
+              "legacyEffect": {
+                "kind": "partyHealOnKill",
+                "amount": 2
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.protection.shieldwall"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.protection.guardian",
+              "slug": "guardian",
+              "legacyBranchID": "protection",
+              "formerIndex": 8,
+              "role": "capstone",
+              "depth": 5,
+              "name": "Guardian",
+              "blurb": "Nothing reaches past you at all.",
+              "legacyEffect": {
+                "kind": "capstoneGuardian"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.protection.interpose",
+                "combat.defense.protection.rally"
+              ],
+              "hybridAlternativeParents": []
+            }
+          ]
+        },
+        {
+          "id": "evasion",
+          "legacyBranchID": "evasion",
+          "name": "Evasion",
+          "icon": "figure.run",
+          "blurb": "Dodging, initiative, moving. Answers single heavy hitters.",
+          "nodes": [
+            {
+              "id": "combat.defense.evasion.footwork",
+              "slug": "footwork",
+              "legacyBranchID": "evasion",
+              "formerIndex": 1,
+              "role": "root",
+              "depth": 1,
+              "name": "Footwork",
+              "blurb": "Not where the blow is.",
+              "legacyEffect": {
+                "kind": "evasion",
+                "amount": 0.06
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.evasion.light_frame",
+              "slug": "light_frame",
+              "legacyBranchID": "evasion",
+              "formerIndex": 2,
+              "role": "fundamentalA",
+              "depth": 2,
+              "name": "Light Frame",
+              "blurb": "Nothing on you that you don't need.",
+              "legacyEffect": {
+                "kind": "initiative",
+                "amount": 3
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.evasion.footwork"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.evasion.sidestep",
+              "slug": "sidestep",
+              "legacyBranchID": "evasion",
+              "formerIndex": 3,
+              "role": "fundamentalB",
+              "depth": 2,
+              "name": "Sidestep",
+              "blurb": "That one misses.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "sidestep",
+              "sameDisciplineParents": [
+                "combat.defense.evasion.footwork"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.evasion.slippery",
+              "slug": "slippery",
+              "legacyBranchID": "evasion",
+              "formerIndex": 4,
+              "role": "developmentA",
+              "depth": 3,
+              "name": "Slippery",
+              "blurb": "The things that wait for you wait badly.",
+              "legacyEffect": {
+                "kind": "ambushResistance",
+                "amount": 0.5
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.evasion.light_frame"
+              ],
+              "hybridAlternativeParents": [
+                "combat.defense.protection.draw_off"
+              ]
+            },
+            {
+              "id": "combat.defense.evasion.fall_back",
+              "slug": "fall_back",
+              "legacyBranchID": "evasion",
+              "formerIndex": 5,
+              "role": "developmentB",
+              "depth": 3,
+              "name": "Fall Back",
+              "blurb": "Somewhere else, and still your turn.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "fall_back",
+              "sameDisciplineParents": [
+                "combat.defense.evasion.sidestep"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.evasion.feint",
+              "slug": "feint",
+              "legacyBranchID": "evasion",
+              "formerIndex": 6,
+              "role": "masteryA",
+              "depth": 4,
+              "name": "Feint",
+              "blurb": "Swinging leaves you harder to hit, not easier.",
+              "legacyEffect": {
+                "kind": "evasionAfterAttacking",
+                "amount": 0.1
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.evasion.slippery"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.defense.evasion.untouchable",
+              "slug": "untouchable",
+              "legacyBranchID": "evasion",
+              "formerIndex": 7,
+              "role": "masteryB",
+              "depth": 4,
+              "name": "Untouchable",
+              "blurb": "The longer they miss, the more they miss.",
+              "legacyEffect": {
+                "kind": "evasionPerCleanRound",
+                "amount": 0.05
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.evasion.fall_back"
+              ],
+              "hybridAlternativeParents": [
+                "combat.defense.protection.shieldwall"
+              ]
+            },
+            {
+              "id": "combat.defense.evasion.ghost",
+              "slug": "ghost",
+              "legacyBranchID": "evasion",
+              "formerIndex": 8,
+              "role": "capstone",
+              "depth": 5,
+              "name": "Ghost",
+              "blurb": "The first thing that comes for you finds nothing.",
+              "legacyEffect": {
+                "kind": "capstoneGhost"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.defense.evasion.feint",
+                "combat.defense.evasion.untouchable"
+              ],
+              "hybridAlternativeParents": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "craft",
+      "name": "Craft",
+      "icon": "flask.fill",
+      "blurb": "Not magic — this world has none. Alchemy, concealment and emanation.",
+      "disciplines": [
+        {
+          "id": "venom",
+          "legacyBranchID": "venom",
+          "name": "Venom",
+          "icon": "drop.triangle.fill",
+          "blurb": "Toxins, wounds that keep opening, coatings. Answers high-HP foes.",
+          "nodes": [
+            {
+              "id": "combat.craft.venom.tainted_edge",
+              "slug": "tainted_edge",
+              "legacyBranchID": "venom",
+              "formerIndex": 1,
+              "role": "root",
+              "depth": 1,
+              "name": "Tainted Edge",
+              "blurb": "There is always something on the blade.",
+              "legacyEffect": {
+                "kind": "poisonOnHit",
+                "amount": 1
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.venom.apothecary_s_hand",
+              "slug": "apothecary_s_hand",
+              "legacyBranchID": "venom",
+              "formerIndex": 2,
+              "role": "fundamentalA",
+              "depth": 2,
+              "name": "Apothecary's Hand",
+              "blurb": "The same draught goes further with you holding it.",
+              "legacyEffect": {
+                "kind": "consumablePotency",
+                "amount": 0.5
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.venom.tainted_edge"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.venom.envenom",
+              "slug": "envenom",
+              "legacyBranchID": "venom",
+              "formerIndex": 3,
+              "role": "fundamentalB",
+              "depth": 2,
+              "name": "Envenom",
+              "blurb": "Properly coated, for a while.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "envenom",
+              "sameDisciplineParents": [
+                "combat.craft.venom.tainted_edge"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.venom.virulence",
+              "slug": "virulence",
+              "legacyBranchID": "venom",
+              "formerIndex": 4,
+              "role": "developmentA",
+              "depth": 3,
+              "name": "Virulence",
+              "blurb": "It does not wear off when they'd like.",
+              "legacyEffect": {
+                "kind": "statusDuration",
+                "amount": 2
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.venom.apothecary_s_hand"
+              ],
+              "hybridAlternativeParents": [
+                "combat.craft.emanation.emanation_strike"
+              ]
+            },
+            {
+              "id": "combat.craft.venom.flense",
+              "slug": "flense",
+              "legacyBranchID": "venom",
+              "formerIndex": 5,
+              "role": "developmentB",
+              "depth": 3,
+              "name": "Flense",
+              "blurb": "A wound that keeps opening.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "flense",
+              "sameDisciplineParents": [
+                "combat.craft.venom.envenom"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.venom.corrode",
+              "slug": "corrode",
+              "legacyBranchID": "venom",
+              "formerIndex": 6,
+              "role": "masteryA",
+              "depth": 4,
+              "name": "Corrode",
+              "blurb": "What you put on them eats what they're wearing.",
+              "legacyEffect": {
+                "kind": "poisonReducesArmour",
+                "amount": 1
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.venom.virulence"
+              ],
+              "hybridAlternativeParents": [
+                "combat.craft.emanation.snuff"
+              ]
+            },
+            {
+              "id": "combat.craft.venom.distiller",
+              "slug": "distiller",
+              "legacyBranchID": "venom",
+              "formerIndex": 7,
+              "role": "masteryB",
+              "depth": 4,
+              "name": "Distiller",
+              "blurb": "You waste less making it.",
+              "legacyEffect": {
+                "kind": "coatingCostRelief",
+                "amount": 0.4
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.venom.flense"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.venom.blight",
+              "slug": "blight",
+              "legacyBranchID": "venom",
+              "formerIndex": 8,
+              "role": "capstone",
+              "depth": 5,
+              "name": "Blight",
+              "blurb": "It spreads.",
+              "legacyEffect": {
+                "kind": "capstoneBlight"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.venom.corrode",
+                "combat.craft.venom.distiller"
+              ],
+              "hybridAlternativeParents": []
+            }
+          ]
+        },
+        {
+          "id": "emanation",
+          "legacyBranchID": "kindling",
+          "name": "Emanation",
+          "icon": "bolt.fill",
+          "blurb": "Heat, caustic and light emanations—and holding them off. Answers warded and emanating foes.",
+          "nodes": [
+            {
+              "id": "combat.craft.emanation.sparkhand",
+              "slug": "sparkhand",
+              "legacyBranchID": "kindling",
+              "formerIndex": 1,
+              "role": "root",
+              "depth": 1,
+              "name": "Sparkhand",
+              "blurb": "Something catches where you touch.",
+              "legacyEffect": {
+                "kind": "burnOnHit",
+                "amount": 1
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.emanation.insulation",
+              "slug": "insulation",
+              "legacyBranchID": "kindling",
+              "formerIndex": 2,
+              "role": "fundamentalA",
+              "depth": 2,
+              "name": "Insulation",
+              "blurb": "One of the three stops mattering so much.",
+              "legacyEffect": {
+                "kind": "elementResistance",
+                "amount": 0.35
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.emanation.sparkhand"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.emanation.emanation_strike",
+              "slug": "emanation_strike",
+              "legacyBranchID": "kindling",
+              "formerIndex": 3,
+              "role": "fundamentalB",
+              "depth": 2,
+              "name": "Emanation Strike",
+              "blurb": "Strike through a ward with a searing emanation.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "elemental_strike",
+              "sameDisciplineParents": [
+                "combat.craft.emanation.sparkhand"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.emanation.attunement",
+              "slug": "attunement",
+              "legacyBranchID": "kindling",
+              "formerIndex": 4,
+              "role": "developmentA",
+              "depth": 3,
+              "name": "Attunement",
+              "blurb": "What you carry burns hotter.",
+              "legacyEffect": {
+                "kind": "elementalDamage",
+                "amount": 3
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.emanation.insulation"
+              ],
+              "hybridAlternativeParents": [
+                "combat.craft.venom.envenom",
+                "combat.craft.shadow.conceal"
+              ]
+            },
+            {
+              "id": "combat.craft.emanation.snuff",
+              "slug": "snuff",
+              "legacyBranchID": "kindling",
+              "formerIndex": 5,
+              "role": "developmentB",
+              "depth": 3,
+              "name": "Snuff",
+              "blurb": "Whatever it was giving off, it isn't now.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "snuff",
+              "sameDisciplineParents": [
+                "combat.craft.emanation.emanation_strike"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.emanation.quench",
+              "slug": "quench",
+              "legacyBranchID": "kindling",
+              "formerIndex": 6,
+              "role": "masteryA",
+              "depth": 4,
+              "name": "Quench",
+              "blurb": "You take it back out of them.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "steady",
+              "sameDisciplineParents": [
+                "combat.craft.emanation.attunement"
+              ],
+              "hybridAlternativeParents": [
+                "combat.craft.venom.corrode",
+                "combat.craft.shadow.ambush"
+              ]
+            },
+            {
+              "id": "combat.craft.emanation.conduction",
+              "slug": "conduction",
+              "legacyBranchID": "kindling",
+              "formerIndex": 7,
+              "role": "masteryB",
+              "depth": 4,
+              "name": "Conduction",
+              "blurb": "It carries to the next one.",
+              "legacyEffect": {
+                "kind": "elementalChain",
+                "fraction": 0.5
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.emanation.snuff"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.emanation.emanant",
+              "slug": "emanant",
+              "legacyBranchID": "kindling",
+              "formerIndex": 8,
+              "role": "capstone",
+              "depth": 5,
+              "name": "Emanant",
+              "blurb": "You give something off now. Permanently.",
+              "legacyEffect": {
+                "kind": "capstoneEmanant"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.emanation.quench",
+                "combat.craft.emanation.conduction"
+              ],
+              "hybridAlternativeParents": []
+            }
+          ]
+        },
+        {
+          "id": "shadow",
+          "legacyBranchID": "shadow",
+          "name": "Shadow",
+          "icon": "moon.fill",
+          "blurb": "Concealment, ambush, not being there. Answers fights you'd rather not have.",
+          "nodes": [
+            {
+              "id": "combat.craft.shadow.quiet_step",
+              "slug": "quiet_step",
+              "legacyBranchID": "shadow",
+              "formerIndex": 1,
+              "role": "root",
+              "depth": 1,
+              "name": "Quiet Step",
+              "blurb": "Fewer things notice you at all.",
+              "legacyEffect": {
+                "kind": "encounterChance",
+                "amount": -0.25
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.shadow.low_profile",
+              "slug": "low_profile",
+              "legacyBranchID": "shadow",
+              "formerIndex": 2,
+              "role": "fundamentalA",
+              "depth": 2,
+              "name": "Low Profile",
+              "blurb": "They see you late.",
+              "legacyEffect": {
+                "kind": "sightedAtRange",
+                "amount": -1
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.shadow.quiet_step"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.shadow.conceal",
+              "slug": "conceal",
+              "legacyBranchID": "shadow",
+              "formerIndex": 3,
+              "role": "fundamentalB",
+              "depth": 2,
+              "name": "Conceal",
+              "blurb": "Not there, for a moment.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "conceal",
+              "sameDisciplineParents": [
+                "combat.craft.shadow.quiet_step"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.shadow.opportunist",
+              "slug": "opportunist",
+              "legacyBranchID": "shadow",
+              "formerIndex": 4,
+              "role": "developmentA",
+              "depth": 3,
+              "name": "Opportunist",
+              "blurb": "Coming out of nowhere is worth extra.",
+              "legacyEffect": {
+                "kind": "damageFromConcealment",
+                "amount": 5
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.shadow.low_profile"
+              ],
+              "hybridAlternativeParents": [
+                "combat.craft.emanation.emanation_strike"
+              ]
+            },
+            {
+              "id": "combat.craft.shadow.ambush",
+              "slug": "ambush",
+              "legacyBranchID": "shadow",
+              "formerIndex": 5,
+              "role": "developmentB",
+              "depth": 3,
+              "name": "Ambush",
+              "blurb": "The fight starts with your turn.",
+              "legacyEffect": {
+                "kind": "skill"
+              },
+              "legacyTechniqueID": "ambush",
+              "sameDisciplineParents": [
+                "combat.craft.shadow.conceal"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.shadow.vanish",
+              "slug": "vanish",
+              "legacyBranchID": "shadow",
+              "formerIndex": 6,
+              "role": "masteryA",
+              "depth": 4,
+              "name": "Vanish",
+              "blurb": "You leave, and the world doesn't charge you for it.",
+              "legacyEffect": {
+                "kind": "freeFlee"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.shadow.opportunist"
+              ],
+              "hybridAlternativeParents": [
+                "combat.craft.emanation.snuff"
+              ]
+            },
+            {
+              "id": "combat.craft.shadow.shadowed",
+              "slug": "shadowed",
+              "legacyBranchID": "shadow",
+              "formerIndex": 7,
+              "role": "masteryB",
+              "depth": 4,
+              "name": "Shadowed",
+              "blurb": "All of you are harder to notice.",
+              "legacyEffect": {
+                "kind": "partySightedAtRange",
+                "amount": -1
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.shadow.ambush"
+              ],
+              "hybridAlternativeParents": []
+            },
+            {
+              "id": "combat.craft.shadow.unseen",
+              "slug": "unseen",
+              "legacyBranchID": "shadow",
+              "formerIndex": 8,
+              "role": "capstone",
+              "depth": 5,
+              "name": "Unseen",
+              "blurb": "Every fight begins with them looking for you.",
+              "legacyEffect": {
+                "kind": "capstoneUnseen"
+              },
+              "legacyTechniqueID": null,
+              "sameDisciplineParents": [
+                "combat.craft.shadow.vanish",
+                "combat.craft.shadow.shadowed"
+              ],
+              "hybridAlternativeParents": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

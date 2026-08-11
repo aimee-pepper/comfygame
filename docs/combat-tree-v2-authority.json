@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "graphVersion": 2,
+  "status": "current-design-authority",
+  "stableIDFormat": "combat.{tree}.{discipline}.{node_slug}",
+  "legacyDisciplineIDMigration": {
+    "kindling": "emanation"
+  },
+  "rolesByFormerIndex": [
+    "root",
+    "fundamentalA",
+    "fundamentalB",
+    "developmentA",
+    "developmentB",
+    "masteryA",
+    "masteryB",
+    "capstone"
+  ],
+  "depthsByFormerIndex": [1, 2, 2, 3, 3, 4, 4, 5],
+  "sameDisciplineParentByRole": {
+    "root": null,
+    "fundamentalA": "root",
+    "fundamentalB": "root",
+    "developmentA": "fundamentalA",
+    "developmentB": "fundamentalB",
+    "masteryA": "developmentA",
+    "masteryB": "developmentB",
+    "capstone": ["masteryA", "masteryB"]
+  },
+  "capstoneGate": {
+    "minimumPriorNodesInTree": 7,
+    "minimumNodesInCapstoneDisciplineIncludingCapstone": 5,
+    "requiredOwnedRolesInCapstoneDiscipline": [
+      "root",
+      "oneFundamental",
+      "oneDevelopment",
+      "oneMastery"
+    ],
+    "priorNodesMustFormOneConnectedPrerequisiteSubgraph": true,
+    "connectivityTreatsOwnedEdgesAsUndirected": true
+  },
+  "trees": [
+    {
+      "id": "offense",
+      "disciplines": [
+        {
+          "id": "force",
+          "nodes": ["heavy_hand", "follow_through", "overbear", "bracing_stance", "stagger", "shatter", "momentum", "breaking_blow"]
+        },
+        {
+          "id": "precision",
+          "nodes": ["keen_eye", "weak_point", "pry", "steady_hand", "exploit", "finish", "anatomy", "killing_stroke"]
+        },
+        {
+          "id": "swiftness",
+          "nodes": ["quick_step", "light_touch", "quicken", "second_wind", "flurry", "first_strike", "cascade", "blur"]
+        }
+      ],
+      "hybridAlternativeParents": {
+        "combat.offense.force.bracing_stance": ["combat.offense.precision.pry"],
+        "combat.offense.precision.steady_hand": ["combat.offense.force.overbear"],
+        "combat.offense.swiftness.second_wind": ["combat.offense.precision.pry"],
+        "combat.offense.precision.exploit": ["combat.offense.swiftness.quicken"],
+        "combat.offense.force.shatter": ["combat.offense.precision.exploit"],
+        "combat.offense.precision.finish": ["combat.offense.force.stagger", "combat.offense.swiftness.flurry"],
+        "combat.offense.swiftness.first_strike": ["combat.offense.precision.exploit"]
+      }
+    },
+    {
+      "id": "defense",
+      "disciplines": [
+        {
+          "id": "fortitude",
+          "nodes": ["thick_hide", "iron_skin", "brace", "constitution", "endurance", "ward", "unyielding", "immovable"]
+        },
+        {
+          "id": "protection",
+          "nodes": ["bulwark", "watchful", "draw_off", "cover", "shieldwall", "interpose", "rally", "guardian"]
+        },
+        {
+          "id": "evasion",
+          "nodes": ["footwork", "light_frame", "sidestep", "slippery", "fall_back", "feint", "untouchable", "ghost"]
+        }
+      ],
+      "hybridAlternativeParents": {
+        "combat.defense.protection.cover": ["combat.defense.fortitude.brace", "combat.defense.evasion.sidestep"],
+        "combat.defense.fortitude.constitution": ["combat.defense.protection.draw_off"],
+        "combat.defense.evasion.slippery": ["combat.defense.protection.draw_off"],
+        "combat.defense.fortitude.ward": ["combat.defense.protection.shieldwall"],
+        "combat.defense.protection.interpose": ["combat.defense.fortitude.endurance", "combat.defense.evasion.feint"],
+        "combat.defense.evasion.untouchable": ["combat.defense.protection.shieldwall"]
+      }
+    },
+    {
+      "id": "craft",
+      "disciplines": [
+        {
+          "id": "venom",
+          "nodes": ["tainted_edge", "apothecary_s_hand", "envenom", "virulence", "flense", "corrode", "distiller", "blight"]
+        },
+        {
+          "id": "emanation",
+          "nodes": ["sparkhand", "insulation", "emanation_strike", "attunement", "snuff", "quench", "conduction", "emanant"]
+        },
+        {
+          "id": "shadow",
+          "nodes": ["quiet_step", "low_profile", "conceal", "opportunist", "ambush", "vanish", "shadowed", "unseen"]
+        }
+      ],
+      "hybridAlternativeParents": {
+        "combat.craft.emanation.attunement": ["combat.craft.venom.envenom", "combat.craft.shadow.conceal"],
+        "combat.craft.venom.virulence": ["combat.craft.emanation.emanation_strike"],
+        "combat.craft.shadow.opportunist": ["combat.craft.emanation.emanation_strike"],
+        "combat.craft.venom.corrode": ["combat.craft.emanation.snuff"],
+        "combat.craft.emanation.quench": ["combat.craft.venom.corrode", "combat.craft.shadow.ambush"],
+        "combat.craft.shadow.vanish": ["combat.craft.emanation.snuff"]
+      }
+    }
+  ],
+  "techniqueIdentity": "explicit-per-node-not-derived-from-role",
+  "sourceNodeContent": "Sources/Content/Data/combat_trees.json",
+  "semanticContract": "docs/combat-node-viability-current.md",
+  "presentationAndMigrationContract": "docs/combat-tree-true-graph-current.md"
+}
