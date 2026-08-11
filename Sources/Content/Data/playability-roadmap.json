@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "8471c75 · one-star Constellation",
+  "installedCheckpoint": "2af9300 · explicit Anchorage settlement",
   "essenceBaseline": "a816113",
   "currentWork": "P1 bug-report delivery + save-slot phone acceptance",
   "currentNote": "Independent campaign saves and the hardened local bug-report outbox are installed for phone acceptance. Reports now include exact route, safe campaign/encounter context, active tuning and a bounded semantic action trail. Direct delivery remains pending an approved relay endpoint and Keychain credential.",
@@ -53,6 +53,14 @@
       "status": "readyToTest",
       "detail": "Receipt-first and explicit authored-salvage rules are checkpointed with atomic stored/overflow handling; Noll and the player-facing station remain separate.",
       "gate": "Rules suite passed; phone station flow waits for approved Noll integration."
+    },
+    {
+      "id": "anchorage-settlement",
+      "priority": "P1",
+      "title": "Safe Anchorage settlement",
+      "status": "readyToTest",
+      "detail": "Every due realm now requires an explicit Sustain or Let rest choice. The sticky summary shows payment, remaining Essence, authored-bind runway and rest count; incomplete or unaffordable matrices are rejected before mutation.",
+      "gate": "On phone, no-touch Confirm remains disabled; a mixed decision pays only sustained realms, rests only named realms and keeps every realm recoverable."
     },
     {
       "id": "save-slots",
