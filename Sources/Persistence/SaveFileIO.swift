@@ -30,6 +30,11 @@ protocol GamePersistenceIO: Sendable {
     func write(_ data: Data) throws
     func load() -> SaveLoadOutcome
     func deleteEverything()
+    var diagnosticCampaignReference: String? { get }
+}
+
+extension GamePersistenceIO {
+    var diagnosticCampaignReference: String? { nil }
 }
 
 // Preserve concise call sites after GameStore began accepting any persistence adapter.

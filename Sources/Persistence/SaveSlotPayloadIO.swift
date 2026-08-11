@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 final class SaveSlotWriterLease: @unchecked Sendable {
     private let lock = NSLock()
@@ -31,6 +32,11 @@ struct SaveSlotPayloadIO: GamePersistenceIO {
     let saveURL: URL
     let slotID: SaveSlotID
     let lease: SaveSlotWriterLease
+
+    var diagnosticCampaignReference: String? {
+        let digest = SHA256.hash(data: Data(slotID.description.utf8))
+        return digest.prefix(6).map { String(format: "%02x", $0) }.joined()
+    }
 
     var saveFileByteCount: Int? {
         try? FileManager.default.attributesOfItem(atPath: saveURL.path(percentEncoded: false))[.size] as? Int

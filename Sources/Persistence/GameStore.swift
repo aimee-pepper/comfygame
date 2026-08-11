@@ -47,6 +47,8 @@ final class GameStore: ObservableObject {
     private let writeQueue = DispatchQueue(label: "com.aimeepepper.bookbinder.save", qos: .userInitiated)
     private var debounceTask: Task<Void, Never>?
 
+    var diagnosticCampaignReference: String? { io.diagnosticCampaignReference }
+
     // MARK: - Construction
 
     /// Loads synchronously at launch: the app must never render a frame of state it might have

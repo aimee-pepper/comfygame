@@ -478,4 +478,31 @@ final class SaveSlotTests: XCTestCase {
             XCTAssertEqual(error as? SaveSlotPayloadError, .retiredWriter)
         }
     }
+
+    func testDiagnosticCampaignReferenceIsStableDistinctAndDoesNotExposeSlotID() async throws {
+        let firstID = SaveSlotID()
+        let secondID = SaveSlotID()
+        let first = SaveSlotPayloadIO(
+            saveURL: directory().appending(path: "first.slot.json"),
+            slotID: firstID,
+            lease: SaveSlotWriterLease()
+        )
+        let same = SaveSlotPayloadIO(
+            saveURL: directory().appending(path: "same.slot.json"),
+            slotID: firstID,
+            lease: SaveSlotWriterLease()
+        )
+        let second = SaveSlotPayloadIO(
+            saveURL: directory().appending(path: "second.slot.json"),
+            slotID: secondID,
+            lease: SaveSlotWriterLease()
+        )
+
+        let firstReference = try XCTUnwrap(first.diagnosticCampaignReference)
+        XCTAssertEqual(firstReference, same.diagnosticCampaignReference)
+        XCTAssertNotEqual(firstReference, second.diagnosticCampaignReference)
+        XCTAssertEqual(firstReference.count, 12)
+        XCTAssertFalse(firstID.description.lowercased().contains(firstReference))
+        XCTAssertFalse(firstReference.contains(firstID.description.lowercased()))
+    }
 }

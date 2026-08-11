@@ -20,6 +20,8 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
     var roadmapCheckpoint: String? = nil
     var screen: String
     var route: String? = nil
+    var campaignReference: String? = nil
+    var encounterID: UInt64? = nil
     var saveSchemaVersion: Int
     var mutationCount: Int
     var lastAction: String
