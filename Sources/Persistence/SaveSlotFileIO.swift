@@ -146,6 +146,9 @@ actor SaveSlotFileIO {
     }
 
     func continueSlot() -> SaveSlotLoaded? {
+        if let activeID = readActiveSelection(), let active = try? load(activeID) {
+            return active
+        }
         for descriptor in inspect() where descriptor.isValid {
             if let loaded = try? load(descriptor.id) { return loaded }
         }
