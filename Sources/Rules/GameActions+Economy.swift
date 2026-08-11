@@ -300,10 +300,60 @@ extension GameStore {
 
     // MARK: - Gear
 
-    /// What's in the Storehouse that could be worn in a given slot.
+    struct WearableGearOption: Identifiable, Equatable {
+        enum Source: Equatable {
+            case stored(InstanceID)
+            case overflow(InstanceID)
+            case worn(PartySlot)
+            case carried(InstanceID)
+        }
+
+        let piece: EquippedPiece
+        let source: Source
+        let count: Int
+
+        var id: String {
+            switch source {
+            case .stored(let id): "stored-\(id.rawValue)"
+            case .overflow(let id): "overflow-\(id.rawValue)"
+            case .worn(let owner): "worn-\(owner.id)-\(piece.gearProfile?.stableInstanceID.rawValue ?? 0)"
+            case .carried(let id): "carried-\(id.rawValue)"
+            }
+        }
+
+        var canEquipAtHome: Bool {
+            if case .carried = source { return false }
+            return true
+        }
+    }
+
+    /// Every compatible piece the player owns, wherever it currently is. Physical instance data
+    /// is authoritative: a catalogue rebalance must not change an existing blade into another slot.
+    func wearableOptions(in slot: GearSlot, excluding wearer: PartySlot? = nil) -> [WearableGearOption] {
+        let stored = state.base.inventory.stacks.compactMap { stack -> WearableGearOption? in
+            guard (stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot) == slot else { return nil }
+            return WearableGearOption(piece: EquippedPiece(stack), source: .stored(stack.id), count: stack.count)
+        }
+        let overflow = state.base.spillover.compactMap { stack -> WearableGearOption? in
+            guard (stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot) == slot else { return nil }
+            return WearableGearOption(piece: EquippedPiece(stack), source: .overflow(stack.id), count: stack.count)
+        }
+        let owners: [PartySlot] = [.binder] + state.base.roster.indices.map(PartySlot.member)
+        let worn = owners.compactMap { owner -> WearableGearOption? in
+            guard owner != wearer, let piece = self.worn(slot, by: owner), piece.frozenSlot == slot else { return nil }
+            return WearableGearOption(piece: piece, source: .worn(owner), count: 1)
+        }
+        let carried = (state.worlds.activeRun?.satchelItems.stacks ?? []).compactMap { stack -> WearableGearOption? in
+            guard (stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot) == slot else { return nil }
+            return WearableGearOption(piece: EquippedPiece(stack), source: .carried(stack.id), count: stack.count)
+        }
+        return stored + overflow + worn + carried
+    }
+
+    /// Compatibility boundary for older callers that specifically mean the Storehouse shelf.
     func wearable(in slot: GearSlot) -> [ItemStack] {
         state.base.inventory.stacks.filter {
-            ContentCatalog.shared.item($0.catalogID)?.gear?.slot == slot
+            ($0.gearProfile?.slot ?? ContentCatalog.shared.item($0.catalogID)?.gear?.slot) == slot
         }
     }
 
@@ -401,22 +451,28 @@ extension GameStore {
 
     /// What wearing this would change, for whoever you're looking at.
     func gearDelta(wearing stack: ItemStack, for slot: PartySlot) -> Int {
-        guard let gear = ContentCatalog.shared.item(stack.catalogID)?.gear else { return 0 }
-        let wornPower = worn(gear.slot, by: slot)?.effectivePower ?? 0
-        let step = gear.slot == .weapon
+        gearDelta(wearing: EquippedPiece(stack), for: slot)
+    }
+
+    func gearDelta(wearing piece: EquippedPiece, for slot: PartySlot) -> Int {
+        guard let gearSlot = piece.frozenSlot else { return 0 }
+        let wornPower = worn(gearSlot, by: slot)?.effectivePower ?? 0
+        let step = gearSlot == .weapon
             ? Tuning.Encounter.attackPerWeaponTier
             : Tuning.Encounter.defencePerArmorTier
-        return Int(((stack.effectivePower - wornPower) * Double(step)).rounded())
+        return Int(((piece.effectivePower - wornPower) * Double(step)).rounded())
     }
 
     func hasUpgradeAvailable(for gearSlot: GearSlot, slot: PartySlot) -> Bool {
-        wearable(in: gearSlot).contains { gearDelta(wearing: $0, for: slot) > 0 }
+        wearableOptions(in: gearSlot, excluding: slot)
+            .filter(\.canEquipAtHome)
+            .contains { gearDelta(wearing: $0.piece, for: slot) > 0 }
     }
 
     /// Put something on somebody. Takes the piece out of the bin, puts back what it replaces —
     /// the same rule as before, now aimed at anybody in the party.
     func equip(_ stack: ItemStack, on slot: PartySlot) {
-        guard let gearSlot = ContentCatalog.shared.item(stack.catalogID)?.gear?.slot else { return }
+        guard let gearSlot = stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot else { return }
         mutate("equip \(stack.catalogID.rawValue)", flush: true) { state in
             guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }),
                   let taken = state.base.inventory.stacks[index].removing(1)
@@ -429,6 +485,86 @@ extension GameStore {
                 state.base.store(previous.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
             }
         }
+    }
+
+    /// Equip from an explicit ownership location. Stale sources are a complete no-op, and a piece
+    /// worn by somebody else moves directly rather than briefly pretending to fit on a full shelf.
+    @discardableResult
+    func equip(_ option: WearableGearOption, on target: PartySlot) -> Bool {
+        guard option.canEquipAtHome, let gearSlot = option.piece.frozenSlot,
+              Self.isValid(target, in: state)
+        else { return false }
+
+        // Resolve and validate the exact physical source before opening the mutation. In
+        // particular, an old "Worn by Quill" tile must not move whatever Quill put on afterward.
+        switch option.source {
+        case .stored(let id):
+            guard let stack = state.base.inventory.stacks.first(where: { $0.id == id }),
+                  Self.samePhysicalPiece(stack, option.piece),
+                  (stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot) == gearSlot
+            else { return false }
+        case .overflow(let id):
+            guard let stack = state.base.spillover.first(where: { $0.id == id }),
+                  Self.samePhysicalPiece(stack, option.piece),
+                  (stack.gearProfile?.slot ?? ContentCatalog.shared.item(stack.catalogID)?.gear?.slot) == gearSlot
+            else { return false }
+        case .worn(let source):
+            guard source != target, Self.isValid(source, in: state),
+                  worn(gearSlot, by: source) == option.piece
+            else { return false }
+        case .carried:
+            return false
+        }
+
+        mutate("equip owned \(option.piece.catalogID.rawValue)", flush: true) { state in
+            switch option.source {
+            case .stored(let id):
+                guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == id }),
+                      (state.base.inventory.stacks[index].gearProfile?.slot
+                       ?? ContentCatalog.shared.item(state.base.inventory.stacks[index].catalogID)?.gear?.slot) == gearSlot,
+                      let taken = state.base.inventory.stacks[index].removing(1)
+                else { return }
+                if state.base.inventory.stacks[index].isEmpty { state.base.inventory.stacks.remove(at: index) }
+                if let previous = Self.swapIn(EquippedPiece(taken), gearSlot, target, in: &state) {
+                    state.base.store(previous.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
+                }
+            case .overflow(let id):
+                guard let index = state.base.spillover.firstIndex(where: { $0.id == id }),
+                      (state.base.spillover[index].gearProfile?.slot
+                       ?? ContentCatalog.shared.item(state.base.spillover[index].catalogID)?.gear?.slot) == gearSlot,
+                      let taken = state.base.spillover[index].removing(1)
+                else { return }
+                if state.base.spillover[index].isEmpty { state.base.spillover.remove(at: index) }
+                if let previous = Self.swapIn(EquippedPiece(taken), gearSlot, target, in: &state) {
+                    state.base.store(previous.asStack(id: InstanceID(rawValue: state.base.nextItemID())))
+                }
+            case .worn(let source):
+                guard source != target,
+                      let moving = Self.swapIn(nil, gearSlot, source, in: &state),
+                      moving.frozenSlot == gearSlot
+                else { return }
+                let previous = Self.swapIn(moving, gearSlot, target, in: &state)
+                _ = Self.swapIn(previous, gearSlot, source, in: &state)
+            case .carried:
+                return
+            }
+        }
+        return true
+    }
+
+    private static func isValid(_ slot: PartySlot, in state: GameState) -> Bool {
+        switch slot {
+        case .binder: true
+        case .member(let index): state.base.roster.indices.contains(index)
+        }
+    }
+
+    private static func samePhysicalPiece(_ stack: ItemStack, _ piece: EquippedPiece) -> Bool {
+        guard stack.catalogID == piece.catalogID else { return false }
+        if let expected = piece.gearProfile?.stableInstanceID {
+            return stack.gearProfile?.stableInstanceID == expected
+        }
+        return stack.upgradeLevel == piece.upgradeLevel && stack.wildGrowth == piece.wildGrowth
     }
 
     func unequip(_ gearSlot: GearSlot, from slot: PartySlot) {

@@ -13,57 +13,61 @@ struct GearView: View {
     let member: PartySlot
 
     private var worn: EquippedPiece? { store.worn(slot, by: member) }
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var columns: [GridItem] {
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.adaptive(minimum: 150), spacing: 12)]
+    }
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    Text("Worn now").font(.headline)
                     if let worn, let definition = worn.definition {
-                        row(stack: nil, definition: definition, name: worn.displayName,
-                            delta: nil, count: 1)
+                        tile(piece: worn, definition: definition, delta: nil, count: 1,
+                             location: "Worn", enabled: true)
                     } else {
                         Text("Nothing worn.")
                             .font(.callout)
                             .foregroundStyle(.secondary)
                             .frame(minHeight: 44)
                     }
-                } header: {
-                    Text("Worn")
-                }
-
-                Section {
+                    Text("Your \(slot.displayName.lowercased())").font(.headline)
                     let options = candidates
                     if options.isEmpty {
-                        Text("Nothing else to wear. Sites hold the better pieces — ruins especially.")
+                        Text("You don't own another \(slot.displayName.lowercased()) yet. Sites hold better pieces — ruins especially.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .frame(minHeight: 44)
                     }
-                    ForEach(options, id: \.stack.id) { option in
-                        Button {
-                            store.equip(option.stack, on: member)
-                            dismiss()
-                        } label: {
-                            row(stack: option.stack, definition: option.definition,
-                                name: option.stack.displayName,
-                                delta: store.gearDelta(wearing: option.stack, for: member),
-                                count: option.stack.count)
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
+                        ForEach(options) { option in
+                            Button {
+                                if store.equip(option, on: member) { dismiss() }
+                            } label: {
+                                tile(piece: option.piece, definition: option.piece.definition,
+                                     delta: store.gearDelta(wearing: option.piece, for: member),
+                                     count: option.count, location: location(of: option),
+                                     enabled: option.canEquipAtHome)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!option.canEquipAtHome)
                         }
-                        .buttonStyle(.plain)
                     }
-                } header: {
-                    Text("In the storehouse")
-                }
 
-                if worn != nil {
-                    Section {
+                    if worn != nil {
                         Button("Take it off", role: .destructive) {
                             store.unequip(slot, from: member)
                             dismiss()
                         }
                         .frame(minHeight: 44)
+                        .buttonStyle(.bordered)
                     }
                 }
+                .padding()
             }
             .navigationTitle(slot.displayName)
             .navigationBarTitleDisplayMode(.inline)
@@ -81,46 +85,61 @@ struct GearView: View {
     /// reforged one is its own row — which is exactly what makes "give the best to me and the
     /// second best to Quill" a choice you can make (Aimee, 6 Aug). Nothing is filtered out for
     /// being worn by somebody else: if you have four, you can wear four.
-    private var candidates: [(stack: ItemStack, definition: ItemDef)] {
-        store.wearable(in: slot)
-            .compactMap { stack in
-                ContentCatalog.shared.item(stack.catalogID).map { (stack, $0) }
-            }
-            .sorted { $0.stack.effectiveTier > $1.stack.effectiveTier }
+    private var candidates: [GameStore.WearableGearOption] {
+        store.wearableOptions(in: slot, excluding: member)
+            .sorted { $0.piece.effectivePower > $1.piece.effectivePower }
     }
 
-    private func row(stack: ItemStack?, definition: ItemDef, name: String,
-                     delta: Int?, count: Int) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: definition.icon)
-                .foregroundStyle(definition.rarity.tint)
-                .frame(width: 24)
-            VStack(alignment: .leading, spacing: 1) {
+    private func location(of option: GameStore.WearableGearOption) -> String {
+        switch option.source {
+        case .stored: "Stored"
+        case .overflow: "Waiting to sort"
+        case .worn(let owner): "Worn by \(store.name(of: owner))"
+        case .carried: "Carried in world"
+        }
+    }
+
+    private func tile(piece: EquippedPiece, definition: ItemDef?, delta: Int?, count: Int,
+                      location: String, enabled: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                Image(systemName: definition?.icon ?? "questionmark")
+                    .font(.title2)
+                    .foregroundStyle(definition?.rarity.tint ?? .secondary)
+                Spacer()
+                Text(location)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(enabled ? Color.secondary : Color.orange)
+            }
+            VStack(alignment: .leading, spacing: 3) {
                 // Rarity reads as the colour of the name — the ladder from the design brief.
                 HStack(spacing: 6) {
-                    Text(name)
+                    Text(piece.displayName)
                         .font(.callout.weight(.medium))
-                        .foregroundStyle(definition.rarity.tint)
+                        .foregroundStyle(definition?.rarity.tint ?? .primary)
                     // How many of this exact piece you hold, so "the best one to me, the next to
                     // Quill" is a decision you can see rather than guess at.
                     if count > 1 {
                         Text("×\(count)").font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
                     }
                 }
-                Text(damageLine(definition) ?? definition.blurb)
+                Text(definition.flatMap(damageLine) ?? definition?.blurb ?? "Unknown equipment")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
-            Spacer(minLength: 6)
             if let delta {
                 ImprovementBadge(delta: delta, slot: slot)
             } else {
                 Text("worn").font(.caption2).foregroundStyle(.secondary)
             }
         }
-        .frame(minHeight: 44)
-        .contentShape(Rectangle())
+        .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
+        .padding(12)
+        .background(.secondary.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(.secondary.opacity(0.18)))
+        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .opacity(enabled ? 1 : 0.72)
     }
 
     /// A weapon's corner and reach, because that's the matchup read — a blurb won't tell you

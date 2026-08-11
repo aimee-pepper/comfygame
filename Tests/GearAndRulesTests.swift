@@ -412,4 +412,84 @@ final class GearAndRulesTests: XCTestCase {
         store.setComing(1, false)
         XCTAssertEqual(store.partySlots, [.binder, .member(0)])
     }
+
+    func testEquipmentPickerUsesFrozenSlotAndIncludesOverflow() throws {
+        let store = GameStore(io: .temporary(name: "owned-gear-\(UUID().uuidString)"))
+        var frozen = ItemStack(id: InstanceID(rawValue: 901), catalogID: "blade_keen")
+        frozen.gearProfile?.slot = .armor // Simulates an authored/migrated instance surviving a catalogue change.
+        store.mutate("test: overflow frozen piece") { $0.base.spillover = [frozen] }
+
+        XCTAssertFalse(store.wearableOptions(in: .weapon).contains { $0.piece.gearProfile?.stableInstanceID == frozen.gearProfile?.stableInstanceID })
+        let option = try XCTUnwrap(store.wearableOptions(in: .armor).first)
+        XCTAssertEqual(option.source, .overflow(frozen.id))
+
+        store.equip(option, on: .binder)
+        XCTAssertEqual(store.worn(.armor, by: .binder)?.gearProfile?.stableInstanceID,
+                       frozen.gearProfile?.stableInstanceID)
+        XCTAssertTrue(store.state.base.spillover.isEmpty)
+    }
+
+    func testPickerCanSwapExactPiecesBetweenPeopleWithoutLosingEither() throws {
+        let store = GameStore(io: .temporary(name: "swap-gear-\(UUID().uuidString)"))
+        var first = ItemStack(id: InstanceID(rawValue: 911), catalogID: "blade_keen")
+        var second = ItemStack(id: InstanceID(rawValue: 912), catalogID: "blade_chipped")
+        first.gearProfile?.reforgeRank = 2
+        second.wildGrowth = 1
+        store.mutate("test: dress both") { state in
+            state.base.binderEquipped[.weapon] = EquippedPiece(first)
+            state.base.roster[0].equipped[.weapon] = EquippedPiece(second)
+        }
+
+        let offered = try XCTUnwrap(store.wearableOptions(in: .weapon, excluding: .binder)
+            .first { $0.source == .worn(.member(0)) })
+        store.equip(offered, on: .binder)
+
+        XCTAssertEqual(store.worn(.weapon, by: .binder)?.gearProfile?.stableInstanceID,
+                       second.gearProfile?.stableInstanceID)
+        XCTAssertEqual(store.worn(.weapon, by: .member(0))?.gearProfile?.stableInstanceID,
+                       first.gearProfile?.stableInstanceID)
+        XCTAssertEqual(store.worn(.weapon, by: .member(0))?.gearProfile?.reforgeRank, 2)
+        XCTAssertEqual(store.worn(.weapon, by: .binder)?.wildGrowth, 1)
+    }
+
+    func testCarriedGearIsVisibleButCannotTeleportHome() throws {
+        let store = GameStore(io: .temporary(name: "carried-gear-\(UUID().uuidString)"))
+        let carried = ItemStack(id: InstanceID(rawValue: 921), catalogID: "guard_padded")
+        store.mutate("test: fund") { $0.base.essence = 500 }
+        store.write("plains")
+        store.bindAndDepart()
+        store.mutate("test: active haul") { state in
+            _ = state.worlds.activeRun?.satchelItems.add(carried)
+        }
+        let option = try XCTUnwrap(store.wearableOptions(in: .armor).first { $0.source == .carried(carried.id) })
+        XCTAssertFalse(option.canEquipAtHome)
+        store.equip(option, on: .binder)
+        XCTAssertNil(store.worn(.armor, by: .binder))
+        XCTAssertTrue(store.state.worlds.activeRun?.satchelItems.stacks.contains { $0.id == carried.id } == true)
+    }
+
+    func testAStaleWornTileCannotMoveItsReplacement() throws {
+        let store = GameStore(io: .temporary(name: "stale-worn-\(UUID().uuidString)"))
+        let first = ItemStack(id: InstanceID(rawValue: 931), catalogID: "blade_keen")
+        let replacement = ItemStack(id: InstanceID(rawValue: 932), catalogID: "blade_chipped")
+        store.mutate("test: first worn") { $0.base.roster[0].equipped[.weapon] = EquippedPiece(first) }
+        let stale = try XCTUnwrap(store.wearableOptions(in: .weapon, excluding: .binder)
+            .first { $0.source == .worn(.member(0)) })
+        store.mutate("test: replaced elsewhere") { $0.base.roster[0].equipped[.weapon] = EquippedPiece(replacement) }
+
+        XCTAssertFalse(store.equip(stale, on: .binder))
+        XCTAssertNil(store.worn(.weapon, by: .binder))
+        XCTAssertEqual(store.worn(.weapon, by: .member(0))?.gearProfile?.stableInstanceID,
+                       replacement.gearProfile?.stableInstanceID)
+    }
+
+    func testInvalidTargetDoesNotRemoveTheSource() throws {
+        let store = GameStore(io: .temporary(name: "invalid-target-\(UUID().uuidString)"))
+        let piece = ItemStack(id: InstanceID(rawValue: 941), catalogID: "blade_keen")
+        store.mutate("test: stored") { _ = $0.base.inventory.add(piece) }
+        let option = try XCTUnwrap(store.wearableOptions(in: .weapon).first)
+
+        XCTAssertFalse(store.equip(option, on: .member(999)))
+        XCTAssertTrue(store.state.base.inventory.stacks.contains { $0.id == piece.id })
+    }
 }
