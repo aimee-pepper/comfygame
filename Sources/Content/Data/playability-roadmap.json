@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "56535c5 · exclusive person placement",
+  "installedCheckpoint": "6c649ee · persisted encounter openings + real launch progress",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 bug-report delivery + save-slot phone acceptance",
-  "currentNote": "Independent campaign saves and the hardened local bug-report outbox are installed for phone acceptance. Reports now include exact route, safe campaign/encounter context, active tuning and a bounded semantic action trail. Direct delivery remains pending an approved relay endpoint and Keychain credential.",
+  "currentWork": "P0 world-grade-2 native boundary + P1 bug-report delivery",
+  "currentNote": "Persisted encounter openings and a real phase-driven launch bar are installed for phone acceptance. Next, Engineering reviews the accepted keyed world-grade-2 descriptor/conformance boundary in an isolated asset lane; direct bug-report delivery still waits for an approved relay endpoint and Keychain credential.",
   "items": [
     {
       "id": "essence",
@@ -131,8 +131,16 @@
       "priority": "P1",
       "title": "Launch-screen handoff alignment",
       "status": "readyToTest",
-      "detail": "The SwiftUI loading surface now uses the storyboard's exact fixed 248×340 geometry and typography rather than reflowing.",
-      "gate": "Static → in-app loading transition preserves the same mark, scale and alignment on the physical phone."
+      "detail": "The SwiftUI loading surface uses the storyboard's exact fixed 248×340 geometry and typography. A shared 192×4 track now advances only through real read, reconcile, commit and ready milestones.",
+      "gate": "Static → in-app loading preserves the same mark, scale, alignment and empty progress track; the fill advances monotonically through real work and warm-ready scenes do not flash it."
+    },
+    {
+      "id": "encounter-opening",
+      "priority": "P1",
+      "title": "Persisted encounter opening authority",
+      "status": "readyToTest",
+      "detail": "Approach, mutual contact, creature ambush and explicit scripted policy now freeze before action from disclosed state. Slippery, Watchful, Unseen and Ambush share that saved fact; foe-only opening actions preserve ordinary initiative.",
+      "gate": "Phone encounters preserve visible approach versus genuine ambush, Watchful suppresses without reclassifying, concealed actors redirect only while another target exists, and relaunch never rerolls the opening."
     },
     {
       "id": "item-popover",
