@@ -1,5 +1,6 @@
 #if DEBUG
 import Foundation
+import Security
 
 struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
     static let schemaVersion = 1
@@ -102,6 +103,66 @@ struct DebugBugReportHTTPTransport: DebugBugReportTransport {
         append("--\(boundary)--\r\n")
         return body
     }
+}
+
+struct DebugBugReportRelayConfiguration: Sendable {
+    static let endpointInfoKey = "DebugBugReportRelayURL"
+    static let credentialEnvironmentKey = "BOOKBINDER_BUG_RELAY_CREDENTIAL"
+    var endpoint: URL
+    var credential: String
+
+    static func live(bundle: Bundle = .main,
+                     environment: [String: String] = ProcessInfo.processInfo.environment) -> Self? {
+        if let injected = environment[credentialEnvironmentKey], !injected.isEmpty {
+            try? DebugBugReportCredentialStore.save(injected)
+        }
+        guard let rawURL = bundle.object(forInfoDictionaryKey: endpointInfoKey) as? String,
+              let endpoint = URL(string: rawURL), endpoint.scheme == "https",
+              let credential = DebugBugReportCredentialStore.load(), !credential.isEmpty else {
+            return nil
+        }
+        return Self(endpoint: endpoint, credential: credential)
+    }
+}
+
+enum DebugBugReportCredentialStore {
+    private static let service = "com.aimeepepper.bookbinder.debug-bug-relay"
+    private static let account = "installation"
+
+    static func save(_ credential: String) throws {
+        let value = Data(credential.utf8)
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account
+        ]
+        let attributes: [String: Any] = [kSecValueData as String: value]
+        let status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+        if status == errSecItemNotFound {
+            var addition = query
+            addition[kSecValueData as String] = value
+            let added = SecItemAdd(addition as CFDictionary, nil)
+            guard added == errSecSuccess else { throw CredentialError.status(added) }
+        } else if status != errSecSuccess {
+            throw CredentialError.status(status)
+        }
+    }
+
+    static func load() -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var item: CFTypeRef?
+        guard SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess,
+              let data = item as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    enum CredentialError: Error { case status(OSStatus) }
 }
 
 struct DebugBugReportOutbox: Sendable {

@@ -207,6 +207,8 @@ private struct DebugBugReportSheet: View {
 private struct DebugBugReportQueueView: View {
     @State private var reports: [(report: DebugBugReport, directory: URL)] = []
     @State private var deletionCandidate: DebugBugReport?
+    @State private var submitting: Set<UUID> = []
+    @State private var submissionError: String?
 
     var body: some View {
         List(reports, id: \.report.id) { entry in
@@ -219,6 +221,13 @@ private struct DebugBugReportQueueView: View {
                 ShareLink(item: DebugBugReportOutbox.live.exportURL(for: entry.report, in: entry.directory)) {
                     Label("Share saved report", systemImage: "square.and.arrow.up")
                 }
+                if let configuration = DebugBugReportRelayConfiguration.live(),
+                   entry.report.transportState != .submitted {
+                    Button(entry.report.transportState == .needsAttention ? "Retry submission" : "Submit to triage") {
+                        submit(entry.report.id, configuration: configuration)
+                    }
+                    .disabled(submitting.contains(entry.report.id))
+                }
                 Button("Delete saved report", role: .destructive) {
                     deletionCandidate = entry.report
                 }
@@ -226,6 +235,12 @@ private struct DebugBugReportQueueView: View {
         }
         .navigationTitle("Bug queue")
         .overlay { if reports.isEmpty { ContentUnavailableView("No saved reports", systemImage: "ladybug") } }
+        .safeAreaInset(edge: .bottom) {
+            if let submissionError {
+                Text(submissionError).font(.caption).foregroundStyle(.red)
+                    .padding(8).background(.regularMaterial, in: Capsule())
+            }
+        }
         .task {
             _ = DebugBugReportOutbox.live.recoverInterruptedSends()
             reload()
@@ -248,6 +263,29 @@ private struct DebugBugReportQueueView: View {
     }
 
     private func reload() { reports = DebugBugReportOutbox.live.reports() }
+
+    private func submit(_ id: UUID, configuration: DebugBugReportRelayConfiguration) {
+        submitting.insert(id)
+        submissionError = nil
+        Task {
+            do {
+                _ = try await DebugBugReportSubmissionCoordinator(
+                    outbox: .live,
+                    transport: DebugBugReportHTTPTransport(
+                        endpoint: configuration.endpoint,
+                        credential: configuration.credential)
+                ).submit(id)
+                UIAccessibility.post(notification: .announcement,
+                                     argument: "Bug report submitted to triage")
+            } catch {
+                submissionError = "Submission failed. The report remains saved for retry or sharing."
+                UIAccessibility.post(notification: .announcement,
+                                     argument: "Submission failed. Report remains saved.")
+            }
+            submitting.remove(id)
+            reload()
+        }
+    }
 
     private func transportLabel(_ state: DebugBugReport.TransportState) -> String {
         switch state {

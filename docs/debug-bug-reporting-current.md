@@ -1,7 +1,7 @@
 # DEBUG bug reporting — current design
 
-**Status:** DEBUG capture, form, durable visible local queue and immutable export installed through
-`4d8da72`; direct transport destination/receipt remains unresolved
+**Status:** DEBUG capture, durable queue/export and receipt-gated HTTPS adapter are implemented;
+the real relay destination and installation credential remain unconfigured
 **Priority:** delivery/outbox state is the active post-save checkpoint. A real relay still requires
 an approved external host; local reporting remains usable meanwhile
 **Updated:** 11 Aug 2026
@@ -119,11 +119,13 @@ has been approved/configured, so the UI correctly says **Saved on this phone —
 The installed slice meets the immediate capture/local-loss boundary. It does **not** yet satisfy the
 complete reporter contract, and the next checkpoint should remain narrow:
 
-1. **Real receipt:** no live transport is configured; Share is manual recovery, not direct submission.
+1. **Real receipt:** the multipart/idempotency/2xx/receipt adapter and retry state are implemented,
+   but no live relay is configured; Share remains the available manual path.
 2. **Closed — durable queue/export:** Aimee can browse saved packages and share one immutable,
    Unicode-safe `.bookbinderbug` export; report-specific atomic staging prevents overlapping saves.
-3. **Transport transitions:** without a configured relay the local saver cannot durably advance
-   `sending → submitted/needsAttention` against a receipt.
+3. **Closed — transport transitions:** configured builds durably advance
+   `sending → submitted/needsAttention`; interrupted sends recover to retryable state and only a
+   supported nonempty receipt marks Submitted.
 4. **Context completeness:** native capture records the roadmap checkpoint, app build, broad screen,
    save schema, run/seed/position, Stability, outcome, mutation count and one last action. It still
    lacks the promised precise route, campaign/slot hash, active tuning, encounter ID and bounded
