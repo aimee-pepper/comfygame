@@ -64,8 +64,7 @@ struct RuleBuilderView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Add") {
-                        if let preview { store.addGambit(preview, for: owner) }
-                        dismiss()
+                        if let preview, store.addGambit(preview, for: owner) { dismiss() }
                     }
                     .disabled(preview == nil)
                 }

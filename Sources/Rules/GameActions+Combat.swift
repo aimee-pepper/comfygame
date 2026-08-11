@@ -177,9 +177,6 @@ extension GameStore {
         mutate("remove rule", withGambits(owner) { $0.remove(atOffsets: offsets) })
     }
 
-    /// Write a new rule from components you own. Refused if any part isn't yours — the grammar is
-    /// gated by what you've learned, which is the whole point of it being a grammar.
-    @discardableResult
     /// Change one segment of a rule in place. The whole point of the editor is that you never
     /// leave the list to do this.
     func setGambitPart(_ ruleID: InstanceID, kind: GambitComponentDef.Kind,
@@ -217,6 +214,9 @@ extension GameStore {
                                     subject: subject.id, action: action.id), for: owner)
     }
 
+    /// Write a new rule from components you own. Refused if any part isn't yours — the grammar is
+    /// gated by what you've learned, which is the whole point of it being a grammar.
+    @discardableResult
     func addGambit(_ rule: GambitRule, for owner: Combatant = .companion(0)) -> Bool {
         guard canEditGambits, rule.isWritable(with: state.base.ownedGambitComponents) else { return false }
         mutate("write a rule", flush: true, withGambits(owner) { list in

@@ -1599,7 +1599,7 @@ enum CombatRules {
               let outcome = encounter.outcome
         else { return [] }
 
-        var events: [WorldRules.Event] = []
+        let events: [WorldRules.Event] = []
 
         switch outcome {
         case .victory:

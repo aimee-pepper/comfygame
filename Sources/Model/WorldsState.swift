@@ -708,7 +708,7 @@ struct WorldRun: Codable, Equatable, Sendable {
                                                                 forKey: .foundTravellersAtStart) ?? []
         // A run saved when only one person could come brings that one person's health with it.
         if let perMember = try? container.decodeIfPresent([Int: Int].self, forKey: .companionHP) {
-            companionHP = perMember ?? [:]
+            companionHP = perMember
         } else if let single = try? container.decode(Int.self, forKey: .companionHP) {
             companionHP = [0: single]
         } else {
