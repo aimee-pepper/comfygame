@@ -190,6 +190,7 @@ final class WorldTests: XCTestCase {
         var traits = CreatureTraits()
         traits.defence = .crypsis
         let point = GridPoint(x: run.playerPosition.x + 4, y: run.playerPosition.y)
+        run.map[point].content = .empty
         run.map[point].isRevealed = true
         run.enemies = [WorldEnemy(id: InstanceID(rawValue: 77), traits: traits, position: point)]
         XCTAssertNil(MinimapDisclosure.marker(at: point, in: run))

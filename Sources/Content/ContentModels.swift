@@ -598,12 +598,23 @@ struct SkillDef: Codable, Equatable, Identifiable, Sendable {
 
 /// A base station. The Base screen is a data-driven list of these, not hardcoded buttons —
 /// v1+ adds blacksmith, tavern, distillery, and they should be a JSON edit.
+enum StationHomeSection: String, Codable, CaseIterable, Sendable {
+    case home, make, study, realms
+
+    var rank: Int { Self.allCases.firstIndex(of: self) ?? .max }
+    var title: String { rawValue.capitalized }
+}
+
 struct StationDef: Codable, Equatable, Identifiable, Sendable {
     var id: StationID
     var name: String
     var icon: String
     var blurb: String
     var sortOrder: Int
+    /// Authored Base-board ownership. Optional only so old content bundles can decode through the
+    /// closed stable-ID compatibility map; current catalogue validation requires both fields.
+    var homeSection: StationHomeSection?
+    var sectionOrder: Int?
     var unlockedAtStart: Bool
     var startingTier: Int
     var maxTier: Int
@@ -628,6 +639,7 @@ struct StationDef: Codable, Equatable, Identifiable, Sendable {
     var homeDiscountCap: Double
 
     init(id: StationID, name: String, icon: String, blurb: String, sortOrder: Int,
+         homeSection: StationHomeSection? = nil, sectionOrder: Int? = nil,
          unlockedAtStart: Bool, startingTier: Int, maxTier: Int, route: String,
          builtBy: TravellerID? = nil, buildCost: UpgradeCost? = nil, buildBlurb: String? = nil,
          keeperLevelForTier: [Int] = [8, 16, 24], homeDiscountBase: Double = 0.10,
@@ -637,6 +649,8 @@ struct StationDef: Codable, Equatable, Identifiable, Sendable {
         self.icon = icon
         self.blurb = blurb
         self.sortOrder = sortOrder
+        self.homeSection = homeSection
+        self.sectionOrder = sectionOrder
         self.unlockedAtStart = unlockedAtStart
         self.startingTier = startingTier
         self.maxTier = maxTier
@@ -659,6 +673,8 @@ struct StationDef: Codable, Equatable, Identifiable, Sendable {
         icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "square"
         blurb = try c.decodeIfPresent(String.self, forKey: .blurb) ?? ""
         sortOrder = try c.decodeIfPresent(Int.self, forKey: .sortOrder) ?? 0
+        homeSection = try c.decodeIfPresent(StationHomeSection.self, forKey: .homeSection)
+        sectionOrder = try c.decodeIfPresent(Int.self, forKey: .sectionOrder)
         unlockedAtStart = try c.decodeIfPresent(Bool.self, forKey: .unlockedAtStart) ?? false
         startingTier = try c.decodeIfPresent(Int.self, forKey: .startingTier) ?? 0
         maxTier = try c.decodeIfPresent(Int.self, forKey: .maxTier) ?? 0
@@ -672,6 +688,29 @@ struct StationDef: Codable, Equatable, Identifiable, Sendable {
                                                             forKey: .homeDiscountPerKeeperLevel) ?? 0.005
         homeDiscountCap = try c.decodeIfPresent(Double.self, forKey: .homeDiscountCap) ?? 0.20
     }
+
+    var resolvedBoardPlacement: (section: StationHomeSection, order: Int) {
+        if let homeSection, let sectionOrder { return (homeSection, sectionOrder) }
+        return Self.boardPlacement(for: id) ?? (.home, Int.max)
+    }
+
+    static func boardPlacement(for id: StationID) -> (section: StationHomeSection, order: Int)? {
+        guard let placement = legacyBoardPlacement[id] else { return nil }
+        return placement
+    }
+
+    private static let legacyBoardPlacement: [StationID: (section: StationHomeSection, order: Int)] = [
+        "writing_desk": (.home, 0), "storehouse": (.home, 1), "party": (.home, 2),
+        "firepit": (.home, 3), "essence_spring": (.home, 4), "workshop": (.home, 5),
+        "trading_post": (.make, 0), "recycler": (.make, 1), "blacksmith": (.make, 2),
+        "apothecary": (.make, 3), "tannery": (.make, 4), "bowyer": (.make, 5),
+        "armoury": (.make, 6), "weaponsmith": (.make, 7), "distillery": (.make, 8),
+        "channelworks": (.make, 9),
+        "library": (.study, 0), "constellation": (.study, 1), "bestiary": (.study, 2),
+        "survey_post": (.study, 3), "reliquary": (.study, 4), "scriptorium": (.study, 5),
+        "wayfarers_table": (.realms, 0), "menagerie": (.realms, 1),
+        "deep_works": (.realms, 2), "anchorage": (.realms, 3)
+    ]
 }
 
 /// A Reality-layer Constellation node.

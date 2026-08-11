@@ -19,6 +19,7 @@
 		04A394B9CE1582C902CDEFB2 /* CombatTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B213D165D2239B2A934DB263 /* CombatTreeView.swift */; };
 		0573EFC73887107DB190A9DF /* StationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9C43310A7E6D0342B11251 /* StationViews.swift */; };
 		08E2FFDDC62269B7658BCC99 /* DebugRoadmapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A46FDFBE2EBCE6663BE00A40 /* DebugRoadmapTests.swift */; };
+		08F1B44EE071624D86A2CBD6 /* BaseBoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */; };
 		09C34648DD52FD6A92404726 /* InstrumentCraftingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8A444C3FE08E6935849BA8 /* InstrumentCraftingTests.swift */; };
 		0A77177F80047BBE6CD74591 /* skills.json in Resources */ = {isa = PBXBuildFile; fileRef = 2C4E5B7DC86948834FDAFFF9 /* skills.json */; };
 		0D0B63ACE19B51E89D5321F8 /* TravellerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C03E6819177D7EABE894A3 /* TravellerModels.swift */; };
@@ -280,6 +281,7 @@
 		59F1E2A3A08364F9452A684F /* stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = stations.json; sourceTree = "<group>"; };
 		5AB1CD7D6C91CDD187B2410F /* CharacterRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterRules.swift; sourceTree = "<group>"; };
 		5B11474BCFC5AFD1111E98E7 /* ExpeditionOutcomeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpeditionOutcomeTests.swift; sourceTree = "<group>"; };
+		5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseBoardTests.swift; sourceTree = "<group>"; };
 		5D960FCB6727D86D57A82BF4 /* travellers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = travellers.json; sourceTree = "<group>"; };
 		5DEBC912C792450657FADE4C /* SaveSlotFileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSlotFileIO.swift; sourceTree = "<group>"; };
 		5F756C7CBAE86A8565FB12DD /* Inventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inventory.swift; sourceTree = "<group>"; };
@@ -683,6 +685,7 @@
 				01DD7C9C85D04883D2042EFF /* Fixtures */,
 				CA9D12FE35D80EBAAD321DB4 /* ApexTests.swift */,
 				29C0E5CEA72598582B970714 /* ArmouryTests.swift */,
+				5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */,
 				74D9F704438225E8CFD8268D /* BestiaryTests.swift */,
 				7582647B2841DB69559E3968 /* BookRulesTests.swift */,
 				B6B3681EEDB3DB65AE754495 /* CampaignStartPresentationTests.swift */,
@@ -1005,6 +1008,7 @@
 			files = (
 				3A849B10B8A116F089F9D49C /* ApexTests.swift in Sources */,
 				76925351AE69BDEB01BA072D /* ArmouryTests.swift in Sources */,
+				08F1B44EE071624D86A2CBD6 /* BaseBoardTests.swift in Sources */,
 				52A3E7BA47AED80B02C9FFDA /* BestiaryTests.swift in Sources */,
 				030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */,
 				7FAF1BB2BE9134A54D8E970C /* CampaignStartPresentationTests.swift in Sources */,

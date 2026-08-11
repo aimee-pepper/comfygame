@@ -3,6 +3,18 @@ import XCTest
 @testable import Bookbinder
 
 final class DebugBugReporterTests: XCTestCase {
+    func testBaseReporterPlacementAvoidsPurseTabsAndDepartureBands() {
+        let base = DebugBugReporterPlacementPolicy.verticalRange(
+            height: 800, safeTop: 59, safeBottom: 34, isBase: true)
+        let ordinary = DebugBugReporterPlacementPolicy.verticalRange(
+            height: 800, safeTop: 59, safeBottom: 34, isBase: false)
+
+        XCTAssertEqual(base.lowerBound, 520, accuracy: 0.01)
+        XCTAssertEqual(base.upperBound, 624, accuracy: 0.01)
+        XCTAssertEqual(ordinary.lowerBound, 87, accuracy: 0.01)
+        XCTAssertEqual(ordinary.upperBound, 738, accuracy: 0.01)
+    }
+
     func testOutboxAtomicallyPersistsUnicodeReportAndScreenshot() throws {
         let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

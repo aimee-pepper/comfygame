@@ -117,7 +117,19 @@ struct ContentCatalog: Sendable {
     var starterSourceIDs: [PressureSourceID] {
         pressureSources.filter { $0.acquisition == .starter }.map(\.id)
     }
-    var stationsInOrder: [StationDef] { stations.sorted { $0.sortOrder < $1.sortOrder } }
+    var stationsInOrder: [StationDef] {
+        Self.boardOrderedStations(stations)
+    }
+
+    static func boardOrderedStations(_ stations: [StationDef]) -> [StationDef] {
+        stations.sorted {
+            let lhs = $0.resolvedBoardPlacement
+            let rhs = $1.resolvedBoardPlacement
+            if lhs.section.rank != rhs.section.rank { return lhs.section.rank < rhs.section.rank }
+            if lhs.order != rhs.order { return lhs.order < rhs.order }
+            return $0.id.rawValue < $1.id.rawValue
+        }
+    }
 
     /// Description groups that aren't named after a pressure target. Empty for now — every group
     /// is a target — but the panel is expected to grow clauses about a world's *character*
@@ -202,6 +214,15 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(researchNodes.map(\.id.rawValue), label: "research node")
         try requireUniqueIDs(gambitComponents.map(\.id.rawValue), label: "gambit component")
         try requireUniqueIDs(stations.map(\.id.rawValue), label: "station")
+        for station in stations where station.homeSection == nil || station.sectionOrder == nil {
+            throw ContentError.danglingReference(
+                "station '\(station.id)' relies on legacy Base-board placement")
+        }
+        let stationBoardPositions = stations.compactMap { station -> String? in
+            guard let section = station.homeSection, let order = station.sectionOrder else { return nil }
+            return "\(section.rawValue):\(order)"
+        }
+        try requireUniqueIDs(stationBoardPositions, label: "station board position")
         try requireUniqueIDs(constellationNodes.map(\.id.rawValue), label: "constellation node")
         try requireUniqueIDs(sites.map(\.id.rawValue), label: "site")
         try requireUniqueIDs(contradictions.map(\.id.rawValue), label: "contradiction")

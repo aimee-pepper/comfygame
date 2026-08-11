@@ -2,6 +2,18 @@
 import SwiftUI
 import UIKit
 
+enum DebugBugReporterPlacementPolicy {
+    static func verticalRange(height: CGFloat, safeTop: CGFloat, safeBottom: CGFloat,
+                              isBase: Bool) -> ClosedRange<CGFloat> {
+        let safeMinimum = safeTop + 28
+        let safeMaximum = height - safeBottom - 28
+        guard isBase else { return safeMinimum...safeMaximum }
+        let lower = min(safeMaximum, max(safeMinimum, height * 0.65))
+        let upper = max(lower, min(safeMaximum, height * 0.78))
+        return lower...upper
+    }
+}
+
 struct DebugBugReporterOverlay: View {
     @ObservedObject var store: GameStore
     var route: AppRoute = .base
@@ -29,8 +41,7 @@ struct DebugBugReporterOverlay: View {
                                      proxy.safeAreaInsets.leading + 28,
                                      proxy.size.width - proxy.safeAreaInsets.trailing - 28),
                           y: clamped(CGFloat(savedY) * proxy.size.height,
-                                     proxy.safeAreaInsets.top + 28,
-                                     proxy.size.height - proxy.safeAreaInsets.bottom - 28))
+                                     minimumY(in: proxy), maximumY(in: proxy)))
                 .highPriorityGesture(DragGesture().onChanged { value in
                     savedX = Double(clamped(value.location.x / max(1, proxy.size.width), 0.08, 0.92))
                     savedY = Double(clamped(value.location.y / max(1, proxy.size.height), 0.08, 0.92))
@@ -72,6 +83,22 @@ struct DebugBugReporterOverlay: View {
 
     private func clamped(_ value: CGFloat, _ lower: CGFloat, _ upper: CGFloat) -> CGFloat {
         min(max(value, lower), upper)
+    }
+
+    private func minimumY(in proxy: GeometryProxy) -> CGFloat {
+        verticalRange(in: proxy).lowerBound
+    }
+
+    private func maximumY(in proxy: GeometryProxy) -> CGFloat {
+        verticalRange(in: proxy).upperBound
+    }
+
+    private func verticalRange(in proxy: GeometryProxy) -> ClosedRange<CGFloat> {
+        // Base reserves its upper band for purse + district tabs and its lower band for Depart.
+        DebugBugReporterPlacementPolicy.verticalRange(
+            height: proxy.size.height, safeTop: proxy.safeAreaInsets.top,
+            safeBottom: proxy.safeAreaInsets.bottom, isBase: route == .base
+        )
     }
 
     private static func debugTuningSnapshot() -> String? {

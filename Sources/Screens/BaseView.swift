@@ -1,5 +1,24 @@
 import SwiftUI
 
+enum BaseBoardRules {
+    static func knownStations(_ stations: [StationDef], unlocked: Set<StationID>,
+                              foundations: Set<StationID>) -> [StationDef] {
+        stations.filter { unlocked.contains($0.id) || foundations.contains($0.id) }
+    }
+
+    static func availableSections(for stations: [StationDef]) -> [StationHomeSection] {
+        StationHomeSection.allCases.filter { section in
+            section == .home || stations.contains { $0.resolvedBoardPlacement.section == section }
+        }
+    }
+
+    static func stations(in section: StationHomeSection, from stations: [StationDef]) -> [StationDef] {
+        stations.filter { $0.resolvedBoardPlacement.section == section }
+    }
+
+    static func columnCount(isAccessibilitySize: Bool) -> Int { isAccessibilitySize ? 2 : 3 }
+}
+
 /// The hub. Routes to station subscreens and out into a world.
 ///
 /// The station list is **rendered from `ContentCatalog.stations`**, not hardcoded — v1+ adds a
@@ -9,6 +28,8 @@ struct BaseView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var routeCardHidden = false
+    @State private var selectedSection: StationHomeSection = .home
+    @State private var foundationStation: StationDef?
 
     private var state: GameState { store.state }
 
@@ -16,14 +37,18 @@ struct BaseView: View {
         ScrollView {
             VStack(spacing: 16) {
                 purse
-                firstReturnRouteCard
-                stations
-                buildingSites
+                sectionPicker
+                stationBoard
             }
             .padding(16)
             .padding(.bottom, 24)
         }
         .background(Color(.systemGroupedBackground))
+        .overlay(alignment: .top) {
+            firstReturnRouteCard
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+        }
         .navigationTitle("Base")
         .navigationBarTitleDisplayMode(.large)
         .safeAreaInset(edge: .bottom) {
@@ -33,6 +58,13 @@ struct BaseView: View {
                 .background(.bar)
         }
         .onAppear { routeCardHidden = false }
+        .onChange(of: availableSections) { _, sections in
+            if !sections.contains(selectedSection) { selectedSection = .home }
+        }
+        .sheet(item: $foundationStation) { station in
+            StationFoundationSheet(station: station)
+                .environmentObject(store)
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink(value: AppRoute.settings) {
@@ -40,6 +72,7 @@ struct BaseView: View {
                 }
                 .accessibilityLabel("Settings")
             }
+            #if DEBUG
             ToolbarItem(placement: .topBarTrailing) {
                 // Development-only entry to the milestone-1 persistence harness.
                 NavigationLink(value: AppRoute.harness) {
@@ -47,6 +80,7 @@ struct BaseView: View {
                 }
                 .accessibilityLabel("Persistence harness")
             }
+            #endif
         }
     }
 
@@ -79,6 +113,9 @@ struct BaseView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .simultaneousGesture(TapGesture().onEnded {
+                        if let station = ContentCatalog.shared.stations.first(where: { $0.route == route.rawValue }) {
+                            selectedSection = station.resolvedBoardPlacement.section
+                        }
                         store.openedFirstReturnDestination(route)
                     })
                 }
@@ -101,46 +138,60 @@ struct BaseView: View {
 
     // MARK: Stations
 
-    private var stations: some View {
-        LazyVGrid(columns: stationColumns, spacing: 12) {
-            ForEach(unlockedStations) { station in
-                let route = AppRoute(rawValue: station.route) ?? .base
-                NavigationLink(value: route) {
-                    StationTile(station: station, tier: state.base.station(station.id).tier)
-                }
-                .buttonStyle(.plain)
-                .simultaneousGesture(TapGesture().onEnded {
-                    store.openedFirstReturnDestination(route)
-                })
+    private var sectionPicker: some View {
+        Picker("Base district", selection: $selectedSection) {
+            ForEach(availableSections, id: \.self) { section in
+                Text(section.title).tag(section)
             }
         }
+        .pickerStyle(.segmented)
+        .accessibilityIdentifier("base-section-picker")
+    }
+
+    private var stationBoard: some View {
+        LazyVGrid(columns: stationColumns, spacing: 12) {
+            ForEach(stations(in: selectedSection)) { station in
+                if state.base.station(station.id).isUnlocked {
+                    let route = AppRoute(rawValue: station.route) ?? .base
+                    NavigationLink(value: route) {
+                        StationTile(station: station, tier: state.base.station(station.id).tier,
+                                    isFoundation: false)
+                    }
+                    .buttonStyle(.plain)
+                    .simultaneousGesture(TapGesture().onEnded {
+                        store.openedFirstReturnDestination(route)
+                    })
+                } else {
+                    Button { foundationStation = station } label: {
+                        StationTile(station: station, tier: 0, isFoundation: true)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .accessibilityIdentifier("base-station-board-\(selectedSection.rawValue)")
     }
 
     private var stationColumns: [GridItem] {
-        dynamicTypeSize.isAccessibilitySize
-            ? [GridItem(.flexible())]
-            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+        let count = BaseBoardRules.columnCount(isAccessibilitySize: dynamicTypeSize.isAccessibilitySize)
+        return Array(repeating: GridItem(.flexible(), spacing: 10), count: count)
     }
 
-    // MARK: Building sites
-
-    /// **What you could raise, now that you've met somebody who'd run it** (Aimee, 6 Aug).
-    ///
-    /// Sits under the stations rather than in a shop, because that's what it is: a patch of ground
-    /// with a person standing on it waiting for you to find the iron.
-    @ViewBuilder
-    private var buildingSites: some View {
-        if !store.buildableStations.isEmpty {
-            VStack(spacing: 10) {
-                ForEach(store.buildableStations) { station in
-                    BuildingSiteCard(station: station)
-                }
-            }
-        }
+    private var knownStations: [StationDef] {
+        let foundations = Set(store.buildableStations.map(\.id))
+        let unlocked = Set(ContentCatalog.shared.stationsInOrder.compactMap {
+            state.base.station($0.id).isUnlocked ? $0.id : nil
+        })
+        return BaseBoardRules.knownStations(ContentCatalog.shared.stationsInOrder,
+                                            unlocked: unlocked, foundations: foundations)
     }
 
-    private var unlockedStations: [StationDef] {
-        ContentCatalog.shared.stationsInOrder.filter { state.base.station($0.id).isUnlocked }
+    private var availableSections: [StationHomeSection] {
+        BaseBoardRules.availableSections(for: knownStations)
+    }
+
+    private func stations(in section: StationHomeSection) -> [StationDef] {
+        BaseBoardRules.stations(in: section, from: knownStations)
     }
 
     // MARK: Departure
@@ -192,24 +243,26 @@ struct BaseView: View {
 private struct StationTile: View {
     let station: StationDef
     let tier: Int
+    let isFoundation: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 7) {
             Image(systemName: station.icon)
-                .font(.title)
-                .frame(width: 40, height: 40)
-                .foregroundStyle(.tint)
+                .font(.title2)
+                .frame(width: 34, height: 30)
+                .foregroundStyle(isFoundation ? Color.secondary : Color.accentColor)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(station.name).font(.headline)
-                Text(station.blurb)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Text(station.name)
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(2)
             Spacer(minLength: 0)
             HStack {
-                if tier > 0 {
+                if isFoundation {
+                    Text("Build")
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Color(.tertiarySystemFill), in: Capsule())
+                } else if tier > 0 {
                     Text("Tier \(tier)")
                         .font(.caption2.weight(.semibold))
                         .padding(.horizontal, 6)
@@ -217,15 +270,24 @@ private struct StationTile: View {
                         .background(Color(.tertiarySystemFill), in: Capsule())
                 }
                 Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
+                if isFoundation {
+                    Image(systemName: "hammer")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
             }
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, minHeight: 156, alignment: .topLeading)
+        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: 108, maxHeight: 116, alignment: .topLeading)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(isFoundation ? Color.secondary.opacity(0.55) : Color.clear,
+                        style: StrokeStyle(lineWidth: 1.5, dash: isFoundation ? [5, 3] : []))
+        }
         .contentShape(RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(station.resolvedBoardPlacement.section.title), \(station.name), \(isFoundation ? "foundation, Build" : (tier > 0 ? "built, Tier \(tier), Open" : "built, Open"))")
     }
 }
 
@@ -233,12 +295,15 @@ private struct StationTile: View {
 ///
 /// The card carries the *person's* line rather than a shop blurb, because meeting them is what
 /// unlocked it — "Halloway will raise a forge here, if you can find the stone and the iron for it."
-private struct BuildingSiteCard: View {
+private struct StationFoundationSheet: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
     let station: StationDef
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        NavigationStack {
+            Form {
+                Section {
             HStack(spacing: 12) {
                 Image(systemName: station.icon)
                     .font(.title3)
@@ -252,7 +317,7 @@ private struct BuildingSiteCard: View {
                     }
                 }
                 Spacer(minLength: 0)
-                Text("not built")
+                Text("Foundation")
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 7).padding(.vertical, 3)
@@ -265,14 +330,16 @@ private struct BuildingSiteCard: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             if let cost = station.buildCost {
-                Text(describe(cost))
+                LabeledContent("Build cost", value: describe(cost))
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
             }
 
             let missing = store.shortfall(for: station)
             if missing.isEmpty {
-                Button { store.build(station) } label: {
+                Button {
+                    if store.build(station) { dismiss() }
+                } label: {
                     Label("Build it", systemImage: "hammer")
                         .frame(maxWidth: .infinity, minHeight: 44)
                 }
@@ -286,9 +353,16 @@ private struct BuildingSiteCard: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .frame(minHeight: 44)
             }
+                }
+            }
+            .navigationTitle(station.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                }
+            }
         }
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
     }
 
     private func describe(_ cost: UpgradeCost) -> String {
