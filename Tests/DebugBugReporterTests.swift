@@ -62,10 +62,23 @@ final class DebugBugReporterTests: XCTestCase {
         let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
         var object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoder.encode(report)) as? [String: Any])
         object.removeValue(forKey: "roadmapCheckpoint")
+        object.removeValue(forKey: "debugTuningSnapshot")
         let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
         let decoded = try decoder.decode(DebugBugReport.self,
                                          from: JSONSerialization.data(withJSONObject: object))
         XCTAssertNil(decoded.roadmapCheckpoint)
+        XCTAssertNil(decoded.debugTuningSnapshot)
+    }
+
+    func testReportPreservesReproducibleDebugTuningSnapshot() throws {
+        var report = fixtureReport()
+        report.debugTuningSnapshot = "{\"encounterScalingProfile\":\"recommended\",\"rawEssenceProfile\":\"recommended\"}"
+        let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+
+        let decoded = try decoder.decode(DebugBugReport.self, from: encoder.encode(report))
+
+        XCTAssertEqual(decoded.debugTuningSnapshot, report.debugTuningSnapshot)
     }
 
     func testDistinctReportsUseIndependentAtomicStagingDirectories() async throws {

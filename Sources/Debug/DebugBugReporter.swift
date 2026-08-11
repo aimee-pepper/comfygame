@@ -22,6 +22,7 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
     var route: String? = nil
     var campaignReference: String? = nil
     var encounterID: UInt64? = nil
+    var debugTuningSnapshot: String? = nil
     var saveSchemaVersion: Int
     var mutationCount: Int
     var lastAction: String

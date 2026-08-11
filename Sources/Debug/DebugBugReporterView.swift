@@ -59,6 +59,7 @@ struct DebugBugReporterOverlay: View {
                 : (run == nil ? route.rawValue : AppRoute.world.rawValue),
             campaignReference: store.diagnosticCampaignReference,
             encounterID: store.activeEncounter?.id.rawValue,
+            debugTuningSnapshot: Self.debugTuningSnapshot(),
             saveSchemaVersion: store.state.schemaVersion,
             mutationCount: store.state.meta.mutationCount,
             lastAction: store.state.meta.lastAction,
@@ -71,6 +72,13 @@ struct DebugBugReporterOverlay: View {
     private func clamped(_ value: CGFloat, _ lower: CGFloat, _ upper: CGFloat) -> CGFloat {
         min(max(value, lower), upper)
     }
+
+    private static func debugTuningSnapshot() -> String? {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        guard let data = try? encoder.encode(DebugTuningProfile.active) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
 }
 
 private struct DebugBugReportContext {
@@ -78,6 +86,7 @@ private struct DebugBugReportContext {
     var route: String?
     var campaignReference: String?
     var encounterID: UInt64?
+    var debugTuningSnapshot: String?
     var saveSchemaVersion: Int
     var mutationCount: Int
     var lastAction: String
@@ -158,6 +167,11 @@ private struct DebugBugReportSheet: View {
                     if let encounter = draft.context.encounterID {
                         LabeledContent("Encounter", value: "\(encounter)")
                     }
+                    if let tuning = draft.context.debugTuningSnapshot {
+                        LabeledContent("DEBUG tuning") {
+                            Text(tuning).font(.caption.monospaced()).textSelection(.enabled)
+                        }
+                    }
                     LabeledContent("Save schema", value: "\(draft.context.saveSchemaVersion)")
                     if let run = draft.context.runIndex { LabeledContent("Expedition", value: "\(run)") }
                     Text("Build, game mode, save schema, expedition identifiers, world position, Stability and most recent saved action. No account data or save contents.")
@@ -207,6 +221,7 @@ private struct DebugBugReportSheet: View {
         report.route = draft.context.route
         report.campaignReference = draft.context.campaignReference
         report.encounterID = draft.context.encounterID
+        report.debugTuningSnapshot = draft.context.debugTuningSnapshot
         report.roadmapCheckpoint = DebugRoadmap.current.installedCheckpoint
         do {
             savedPackage = try DebugBugReportOutbox.live.save(report, screenshot: screenshot?.png)
