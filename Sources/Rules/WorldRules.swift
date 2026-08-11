@@ -240,19 +240,22 @@ enum WorldRules {
             events.append(.foundCache)
         case .diaryPage(let page):
             // Reading is the whole interaction: one page, one unlock, and it's yours permanently.
-            events.append(contentsOf: readPage(page, in: &state))
+            let readingEvents = readPage(page, in: &state)
+            events.append(contentsOf: readingEvents)
             // **Finding pays** (session 17 §2). `.page` and `.species` were defined and never
             // awarded, so two of the three stated sources of discovery experience paid nothing.
-            awardDiscovery(.page, in: &state)
-            run = state.worlds.activeRun ?? run
+            // A tolerant old/anchored world can still contain a page already known in Reality.
+            // Clearing that stale tile is harmless; paying its discovery XP again is not.
+            if readingEvents.contains(where: { if case .readPage = $0 { true } else { false } }) {
+                awardDiscovery(.page, run: &run, in: &state)
+            }
             run.map[destination].content = .empty
         case .foundWriting(let id):
             if let writing = run.foundWritings.first(where: { $0.id == id }),
                !state.reality.library.foundWritings.contains(where: { $0.id == id }) {
                 state.reality.library.foundWritings.append(writing)
                 events.append(.readFoundWriting(id, writing.prose))
-                awardDiscovery(.page, in: &state)
-                run = state.worlds.activeRun ?? run
+                awardDiscovery(.page, run: &run, in: &state)
             }
             run.map[destination].content = .empty
         case .site(let instance):
@@ -260,7 +263,7 @@ enum WorldRules {
                 events.append(.foundSite(site.siteID))
                 let isNew = state.reality.discovery.sites[site.siteID] == nil
                 state.reality.discovery.recordSite(site.siteID, runIndex: run.runIndex)
-                if isNew { awardDiscovery(.site, in: &state) }
+                if isNew { awardDiscovery(.site, run: &run, in: &state) }
             }
         case .traveller(let id):
             // **Standing on them opens the scene, and nothing else happens yet.** Being found is
@@ -311,10 +314,12 @@ enum WorldRules {
 
     /// **Finding pays as well as fighting** (session 17 §2). A game whose progression is literacy
     /// shouldn't reward only killing.
-    static func awardDiscovery(_ kind: CharacterRules.Discovery, in state: inout GameState) {
+    static func awardDiscovery(_ kind: CharacterRules.Discovery, run: inout WorldRun,
+                               in state: inout GameState) {
         for member in state.base.partyMembers {
             state.base.withCharacter(member) { CharacterRules.award(kind.experience, to: &$0) }
         }
+        run.experienceBreakdown.record(kind)
     }
 
     /// **Talking somebody into coming home with you.**
@@ -339,10 +344,10 @@ enum WorldRules {
 
         run.map[run.playerPosition].content = .empty
         run.travellersHere.removeAll { $0 == id }
+        awardDiscovery(.traveller, run: &run, in: &state)
         state.worlds.activeRun = run
         state.reality.library.foundTravellers.insert(id)
         state.reality.library.knownTravellers.insert(id)
-        awardDiscovery(.traveller, in: &state)
 
         // **And she joins you.** This used to be the whole of recruitment: two writes to the
         // Library and nothing else. No roster, no gear, no presence — so Aimee recruited somebody,
@@ -1060,7 +1065,7 @@ enum WorldRules {
             let isNewSpecies = state.reality.discovery.species[member.identityKey] == nil
             if isNewSpecies { initiallyUnrecordedSpecies.insert(member.identityKey) }
             state.reality.discovery.recordSpecies(member.identityKey, runIndex: run.runIndex)
-            if isNewSpecies { awardDiscovery(.species, in: &state) }
+            if isNewSpecies { awardDiscovery(.species, run: &run, in: &state) }
             if let traits = member.traits {
                 state.reality.discovery.recordSpecimen(traits, of: member.identityKey, runIndex: run.runIndex)
             }

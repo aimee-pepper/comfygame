@@ -158,6 +158,16 @@ private struct RunExitSummaryView: View {
                         if summary.progress.isEmpty {
                             Text("No progress recorded for this run.").foregroundStyle(.secondary)
                         } else {
+                            if !experienceSources.isEmpty {
+                                Text("Each active party member earned")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                                ViewThatFits(in: .horizontal) {
+                                    HStack(spacing: 12) { experienceSourceLabels }
+                                    VStack(alignment: .leading, spacing: 4) { experienceSourceLabels }
+                                }
+                                Divider()
+                            }
                             ForEach(summary.progress) { gain in
                                 HStack {
                                     Image(systemName: gain.member == .binder ? "person.fill" : "person.2.fill")
@@ -198,6 +208,22 @@ private struct RunExitSummaryView: View {
         Text(title)
             .font(.title3.bold())
             .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var experienceSources: [(name: String, amount: Int)] {
+        let xp = summary.experienceBreakdown
+        return [("Combat", xp.combat), ("New species", xp.species), ("New sites", xp.sites),
+                ("Writing", xp.pages), ("New travellers", xp.travellers)]
+            .filter { $0.amount > 0 }
+    }
+
+    @ViewBuilder private var experienceSourceLabels: some View {
+        ForEach(experienceSources.indices, id: \.self) { index in
+            let source = experienceSources[index]
+            Text("\(source.name) +\(source.amount)")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
     }
 
     private func recapSection(_ title: String, gains: [RunExitGain]) -> some View {

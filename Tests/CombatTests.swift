@@ -1311,6 +1311,25 @@ final class CombatTests: XCTestCase {
                        "the Binder is down and the fight carried on")
     }
 
+    func testVictoryExperienceIsAttributedToCombatWithoutBeingDivided() throws {
+        let store = inFight(["paper_moth"])
+        let foe = try XCTUnwrap(store.activeEncounter?.foes.first)
+        let partyLevel = store.state.base.partyMembers.map { store.state.base.character($0).level }.max() ?? 1
+        let expected = CharacterRules.experience(forDefeating: foe, partyLevel: partyLevel)
+        let binderBefore = store.state.base.binderCharacter.experience
+        let companionBefore = store.state.base.companion.character.experience
+
+        store.mutate("test: foe falls") { state in
+            state.worlds.activeRun?.activeEncounter?.foes[0].currentHP = 0
+            CombatRules.checkOutcome(in: &state)
+        }
+
+        XCTAssertEqual(store.state.base.binderCharacter.experience - binderBefore, expected)
+        XCTAssertEqual(store.state.base.companion.character.experience - companionBefore, expected,
+                       "the full award remains equal for every active party member")
+        XCTAssertEqual(store.activeRun?.experienceBreakdown.combat, expected)
+    }
+
     /// …and a companion at zero has **passed out**, not died. They take no more turns and are on
     /// their feet at the base — health is run-scoped, so coming home is the revival.
     func testACompanionPassesOutRatherThanDying() throws {

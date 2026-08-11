@@ -1399,7 +1399,7 @@ enum CombatRules {
             encounter.outcome = .victory
             encounter.note("Nothing left standing.")
             awardSpoils(run: &run, encounter: &encounter, state: &state)
-            awardExperience(for: encounter.foes, encounter: &encounter, state: &state)
+            awardExperience(for: encounter.foes, run: &run, encounter: &encounter, state: &state)
             let grown = growLivingHooks(in: &state)
             encounter.spoils.append(contentsOf: grown)
         } else if run.binderHP <= 0 {
@@ -1439,7 +1439,8 @@ enum CombatRules {
     ///
     /// Both of them get it. A companion who levelled only when you did wouldn't be a character,
     /// and one who levelled separately would drift out of the party.
-    private static func awardExperience(for foes: [FoeState], encounter: inout EncounterState,
+    private static func awardExperience(for foes: [FoeState], run: inout WorldRun,
+                                        encounter: inout EncounterState,
                                         state: inout GameState) {
         let partyLevel = state.base.partyMembers.map { state.base.character($0).level }.max() ?? 1
         let earned = foes.reduce(0) {
@@ -1461,6 +1462,7 @@ enum CombatRules {
                 gained.append("\(name) level \(state.base.character(member).level).")
             }
         }
+        run.experienceBreakdown.combat += earned
         encounter.note("\(earned) experience.")
         for line in gained { encounter.note(line) }
     }

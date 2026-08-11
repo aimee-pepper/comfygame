@@ -632,6 +632,60 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(state.worlds.activeRun?.map[target].content, .empty, "A wild drop is taken, not left")
     }
 
+    func testDiaryPageExperienceIsPaidOnlyForANewlyReadPage() throws {
+        let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.first)
+
+        func stateWithPage(alreadyKnown: Bool) -> (GameState, GridPoint) {
+            var state = startedRun(book(["terrain": "plains"]), seed: 2_026_081_011)
+            var run = state.worlds.activeRun!
+            run.enemies = []
+            let target = run.map.neighbours(of: run.playerPosition)
+                .first { WorldRules.canEnter($0, in: run.map) }!
+            run.map[target].content = .diaryPage(page.id)
+            state.worlds.activeRun = run
+            if alreadyKnown { state.reality.library.foundPages.append(page.id) }
+            return (state, target)
+        }
+
+        var (fresh, freshTarget) = stateWithPage(alreadyKnown: false)
+        let freshXP = fresh.base.binderCharacter.experience
+        _ = WorldRules.step(to: freshTarget, in: &fresh)
+        XCTAssertEqual(fresh.base.binderCharacter.experience - freshXP,
+                       Tuning.Character.experienceForPage)
+        XCTAssertEqual(fresh.worlds.activeRun?.experienceBreakdown.pages,
+                       Tuning.Character.experienceForPage)
+
+        var (known, knownTarget) = stateWithPage(alreadyKnown: true)
+        let knownXP = known.base.binderCharacter.experience
+        _ = WorldRules.step(to: knownTarget, in: &known)
+        XCTAssertEqual(known.base.binderCharacter.experience, knownXP,
+                       "a stale duplicate page tile must not pay discovery XP again")
+        XCTAssertEqual(known.worlds.activeRun?.experienceBreakdown.pages, 0)
+        XCTAssertEqual(known.worlds.activeRun?.map[knownTarget].content, .empty)
+    }
+
+    func testExperienceBreakdownIsTolerantAndFrozenIntoARecap() throws {
+        var run = try XCTUnwrap(startedRun(book([:]), seed: 741).worlds.activeRun)
+        run.experienceBreakdown = RunExperienceBreakdown(combat: 36, species: 14,
+                                                         sites: 20, pages: 25, travellers: 0)
+        let encodedRun = try SaveCodec.makeEncoder().encode(run)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(WorldRun.self, from: encodedRun)
+            .experienceBreakdown.total, 95)
+
+        var legacy = try XCTUnwrap(JSONSerialization.jsonObject(with: encodedRun) as? [String: Any])
+        legacy.removeValue(forKey: "experienceBreakdown")
+        let legacyData = try JSONSerialization.data(withJSONObject: legacy)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(WorldRun.self, from: legacyData)
+            .experienceBreakdown, RunExperienceBreakdown())
+
+        let summary = RunExitSummary(runIndex: 1, kind: .portal, reason: "Home", turnsTaken: 4,
+                                     haulKeptFraction: 1,
+                                     experienceBreakdown: run.experienceBreakdown)
+        let resumed = try SaveCodec.makeDecoder().decode(
+            RunExitSummary.self, from: SaveCodec.makeEncoder().encode(summary))
+        XCTAssertEqual(resumed.experienceBreakdown, run.experienceBreakdown)
+    }
+
     // MARK: The world turning against you
 
     func testHazardsOnlyAppearOnceStabilityFalls() {

@@ -96,6 +96,27 @@ struct AnchoredRealm: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
+/// Equal per-member experience earned during one expedition, retained by source so the recap can
+/// explain a total instead of presenting an opaque number such as "+100".
+struct RunExperienceBreakdown: Codable, Equatable, Sendable {
+    var combat: Int = 0
+    var species: Int = 0
+    var sites: Int = 0
+    var pages: Int = 0
+    var travellers: Int = 0
+
+    var total: Int { combat + species + sites + pages + travellers }
+
+    mutating func record(_ discovery: CharacterRules.Discovery) {
+        switch discovery {
+        case .species: species += discovery.experience
+        case .site: sites += discovery.experience
+        case .page: pages += discovery.experience
+        case .traveller: travellers += discovery.experience
+        }
+    }
+}
+
 struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     struct RecoveredWriting: Codable, Equatable, Identifiable, Sendable {
         enum Kind: String, Codable, Sendable {
@@ -142,6 +163,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     var writings: [RecoveredWriting] = []
     var recruitedTravellers: [TravellerID] = []
     var essenceEconomy = EssenceEconomy()
+    var experienceBreakdown = RunExperienceBreakdown()
 
     var id: Int { runIndex }
 
@@ -151,6 +173,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
          progress: [RunProgressGain] = [],
          pages: [DiaryPageID] = [], writings: [RecoveredWriting] = [],
          recruitedTravellers: [TravellerID] = [],
+         experienceBreakdown: RunExperienceBreakdown = RunExperienceBreakdown(),
          essenceEconomy: EssenceEconomy = EssenceEconomy()) {
         self.runIndex = runIndex
         self.kind = kind
@@ -166,6 +189,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         self.writings = writings
         self.recruitedTravellers = recruitedTravellers
         self.essenceEconomy = essenceEconomy
+        self.experienceBreakdown = experienceBreakdown
     }
 
     init(from decoder: Decoder) throws {
@@ -186,6 +210,9 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         recruitedTravellers = try c.decodeIfPresent([TravellerID].self,
                                                      forKey: .recruitedTravellers) ?? []
         essenceEconomy = try c.decodeIfPresent(EssenceEconomy.self, forKey: .essenceEconomy) ?? EssenceEconomy()
+        experienceBreakdown = try c.decodeIfPresent(RunExperienceBreakdown.self,
+                                                     forKey: .experienceBreakdown)
+            ?? RunExperienceBreakdown()
     }
 }
 
@@ -547,6 +574,8 @@ struct WorldRun: Codable, Equatable, Sendable {
     var companionHP: [Int: Int] = [:]
     /// Progress when the party crossed the threshold, for the return-home recap.
     var partyProgressAtStart: [RunProgressStart] = []
+    /// Equal per-member awards earned since that threshold, retained by source for an honest recap.
+    var experienceBreakdown = RunExperienceBreakdown()
     /// Items deliberately brought from home, excluded from the "loot obtained" recap.
     var carriedItemCountsAtStart: [ItemID: Int] = [:]
     /// Pages already known on departure, so the recap can name only discoveries from this trip.
@@ -686,6 +715,9 @@ struct WorldRun: Codable, Equatable, Sendable {
         binderHP = try container.decodeIfPresent(Int.self, forKey: .binderHP) ?? Tuning.Encounter.binderMaxHP
         partyProgressAtStart = try container.decodeIfPresent([RunProgressStart].self,
                                                               forKey: .partyProgressAtStart) ?? []
+        experienceBreakdown = try container.decodeIfPresent(RunExperienceBreakdown.self,
+                                                              forKey: .experienceBreakdown)
+            ?? RunExperienceBreakdown()
         carriedItemCountsAtStart = try container.decodeIfPresent([ItemID: Int].self,
                                                                   forKey: .carriedItemCountsAtStart) ?? [:]
         // Saves already in a world predate per-stack protection. Reconstruct conservatively from
@@ -736,6 +768,7 @@ extension WorldRun {
         snapshot.activeEncounter = nil
         snapshot.offeredItems = []
         snapshot.partyProgressAtStart = []
+        snapshot.experienceBreakdown = RunExperienceBreakdown()
         snapshot.carriedItemCountsAtStart = [:]
         snapshot.foundPagesAtStart = []
         return snapshot
