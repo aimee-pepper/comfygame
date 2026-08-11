@@ -11,6 +11,12 @@ final class ItemGridTests: XCTestCase {
         }
     }
 
+    func testSixAcrossGridFitsInsideCompactLootCard() {
+        // 320pt phone, 12pt world margin each side, 8pt card inset each side.
+        let compactLootWidth: CGFloat = 320 - 24 - 16
+        XCTAssertGreaterThanOrEqual(ItemGridMetrics.cellSide(for: compactLootWidth), 44)
+    }
+
     func testSixAcrossGridUsesExactlyItsAvailableWidth() {
         let contentWidth: CGFloat = 336
         let side = ItemGridMetrics.cellSide(for: contentWidth)

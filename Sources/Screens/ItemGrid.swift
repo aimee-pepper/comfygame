@@ -2,7 +2,7 @@ import SwiftUI
 
 enum ItemGridMetrics {
     static let columns = 6
-    static let spacing: CGFloat = 4
+    static let spacing: CGFloat = 2
     static let minimumCellSide: CGFloat = 44
 
     static func cellSide(for contentWidth: CGFloat) -> CGFloat {

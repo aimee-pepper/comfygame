@@ -87,7 +87,8 @@ struct LootDecisionCard: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(14)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 14)
             .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.orange.opacity(0.5), lineWidth: 1.5))
             .sheet(item: $selectedCarried) { carried in
