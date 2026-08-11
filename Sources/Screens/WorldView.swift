@@ -1,5 +1,26 @@
 import SwiftUI
 
+enum WorldControlsLayout {
+    static let actionCount = 2
+    static let actionRows = 1
+    static let actionHeight: CGFloat = 48
+}
+
+/// A closed two-slot strip prevents action growth from silently adding fixed rows and obscuring
+/// the scrollable event/satchel content above the controls.
+private struct WorldActionRow<Interact: View, Look: View>: View {
+    @ViewBuilder let interact: () -> Interact
+    @ViewBuilder let look: () -> Look
+
+    var body: some View {
+        HStack(spacing: 6) {
+            interact().frame(maxWidth: .infinity)
+            look().frame(maxWidth: .infinity)
+        }
+        .frame(height: WorldControlsLayout.actionHeight)
+    }
+}
+
 /// The world: stability at the top, the grid in the middle, your hands at the bottom.
 ///
 /// Ergonomics note. A 14×14 grid can't give every tile a 44pt target on a 402pt-wide phone — that
@@ -320,37 +341,47 @@ struct WorldView: View {
             }
             .frame(maxWidth: .infinity)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 // The map belongs beside the movement tool, using the space above the portal/action
                 // column. Putting it under the arrows needlessly made the fixed controls taller and
                 // was a regression from the settled phone layout.
                 MinimapView(run: run)
                     .frame(maxWidth: .infinity, alignment: .center)
-                ActionButton("Interact", icon: "hand.tap.fill",
-                             detail: interactionDetail(in: run),
-                             isProminent: canInteract,
-                             isEnabled: canInteract) {
-                    performInteraction()
-                }
-                .accessibilityIdentifier("world.interact")
-
-                Button {
-                    isLookArmed.toggle()
-                } label: {
-                    Label(isLookArmed ? "Cancel Look" : "Look",
-                          systemImage: isLookArmed ? "eye.fill" : "eye")
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.bordered)
-                .overlay {
-                    if isLookArmed {
-                        RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2)
+                // One invariant action row. Adding a world action must never create another fixed
+                // control row and steal the event/satchel viewport above it.
+                WorldActionRow {
+                    ActionButton("Interact", icon: "hand.tap.fill",
+                                 isProminent: canInteract,
+                                 isEnabled: canInteract) {
+                        performInteraction()
                     }
+                    .accessibilityValue(interactionDetail(in: run))
+                    .accessibilityIdentifier("world.interact")
+
+                } look: {
+                    Button {
+                        isLookArmed.toggle()
+                    } label: {
+                        Label(isLookArmed ? "Cancel" : "Look",
+                              systemImage: isLookArmed ? "eye.fill" : "eye")
+                            .font(.callout.weight(.medium))
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                    }
+                    .buttonStyle(.bordered)
+                    .overlay {
+                        if isLookArmed {
+                            RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2)
+                        }
+                    }
+                    .accessibilityLabel(isLookArmed ? "Cancel Look" : "Look")
+                    .accessibilityHint(isLookArmed
+                        ? "Look mode armed. Choose one direction."
+                        : "Inspect one adjacent tile without moving or spending a turn.")
+                    .accessibilityIdentifier("world.look")
                 }
-                .accessibilityHint(isLookArmed
-                    ? "Look mode armed. Choose one direction."
-                    : "Inspect one adjacent tile without moving or spending a turn.")
-                .accessibilityIdentifier("world.look")
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("world.action-row")
             }
             .frame(maxWidth: .infinity)
         }

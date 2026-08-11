@@ -488,6 +488,13 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual((cramped * 3).truncatingRemainder(dividingBy: 11), 0, accuracy: 0.001)
     }
 
+    func testWorldControlsHaveExactlyTwoActionsInOneFixedRow() {
+        XCTAssertEqual(WorldControlsLayout.actionCount, 2)
+        XCTAssertEqual(WorldControlsLayout.actionRows, 1,
+                       "Interact and Look must remain side by side, never stacked")
+        XCTAssertEqual(WorldControlsLayout.actionHeight, 48)
+    }
+
     // MARK: Fog and movement
 
     func testFogRevealsAroundThePlayerAndStaysRevealed() {
