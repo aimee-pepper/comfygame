@@ -170,6 +170,7 @@ does not spend implementation attention on them.
 | P1 | Halloway third / opening trio loop | **Queued after offloading** | Circulate → recover → retain/make playthrough |
 | P1 | Awareness foundation | **Green locally; install/checkpoint pending** | Exact phone build, commit and push |
 | P1 | Terrain border/elevation correction | **Asset contract ready; native integration pending** | Adjacent-height phone strip and full map |
+| P1 | Library/equipment/Base/Party/Bestiary spatial correction | **Green and pushed; phone install held during active play** | Install together after Aimee's current expedition; verify equipment ownership and hub readability |
 | P1 after blockers | In-game DEBUG bug reporter | **Designed / transport check-in pending** | Capture, submit, relaunch persistence and triage ingestion |
 | P1 after telemetry | Spring refining branch | **Designed; values need B0 evidence** | Batch control, 3:1 future conversion, outcome-safe auto-refine |
 | Paused | Breadth and outside-player polish | **Paused** | Reconsider only after B0/B1 pass |
@@ -182,12 +183,13 @@ Add one short entry after each device checkpoint:
 |---|---|---|---|---|
 | 10 Aug 2026 | `a816113` baseline | Roadmap established; Essence profile awaits focused run | Pending Aimee | Start B0 play; Engineering scopes B1a |
 | 10 Aug 2026 | `5731aa9` + `d12a8e8` | Awareness housekeeping plus Settings → Debug Tools tabs | 837/837 relevant product tests; signed iPhone build installed/launched 15:19 PT | Aimee runs B: three Recommended Essence expeditions |
+| 10 Aug 2026 | `0e10856` → `698ffde` | Complete equipment ownership plus Library/Base/Party/Bestiary spatial shells | Full product regression green; equipment 29/29 plus full-Storehouse identity fixture; simulator phone-size QA green; deliberately not installed during active play | Install/review at 20:24 check-in, after Aimee exits the current expedition |
 
 ## Cross-lead notes
 
-- **Engineering:** HEAD/origin and Aimee's installed build are `a816113`. A green awareness slice is
-  local but uncommitted/uninstalled and owns `WorldMap.swift`, `WorldRules.swift`, `WorldView.swift`,
-  `WorldTests.swift` and `ConsumableCraftingTests.swift`; Roadmap work must not touch them. Engineering
+- **Engineering:** HEAD/origin includes the green spatial checkpoints through `698ffde`; Aimee's
+  phone remains on the earlier playtest build so an active expedition is not interrupted. Awareness
+  housekeeping is committed and installed. Engineering
   recommends outcome receipt → Trading Post engine → Vance integration → Recycler engine → Noll plus
   Halloway order migration → physical end-to-end loop, with device evidence at each checkpoint.
 - **Asset Design:** Raw Essence and Blacksmith already have sufficient identities. Trading Post and
