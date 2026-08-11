@@ -1460,7 +1460,15 @@ final class WorldTests: XCTestCase {
             state.worlds.pendingAnchorSettlement = true
         }
 
-        XCTAssertTrue(store.settleAnchoredRealms(paying: [2]))
+        XCTAssertFalse(store.settleAnchoredRealms(decisions: [:]),
+                       "an untouched settlement must never rest every realm")
+        XCTAssertEqual(store.state.base.essence, 40)
+        XCTAssertFalse(store.state.worlds.anchoredRealms[2].isDormant)
+
+        XCTAssertTrue(store.settleAnchoredRealms(decisions: [
+            2: .sustain,
+            3: .letRest,
+        ]))
         XCTAssertEqual(store.state.base.essence, 30)
         XCTAssertFalse(store.state.worlds.anchoredRealms[1].isDormant)
         XCTAssertTrue(store.state.worlds.anchoredRealms[2].isDormant)

@@ -47,13 +47,20 @@ struct RootView: View {
 
 private struct AnchorSettlementView: View {
     @EnvironmentObject private var store: GameStore
-    @State private var paying: Set<Int> = []
+    @State private var decisions: [Int: GameStore.AnchorSettlementDecision] = [:]
 
     private var realms: [AnchoredRealm] {
         store.state.worlds.anchoredRealms.filter { !$0.isDormant && $0.projectedShortfall > 0 }
     }
     private var total: Int {
-        realms.filter { paying.contains($0.id) }.reduce(0) { $0 + $1.projectedShortfall }
+        realms.filter { decisions[$0.id] == .sustain }.reduce(0) { $0 + $1.projectedShortfall }
+    }
+    private var remaining: Int { store.state.base.essence - total }
+    private var bindCost: Int { EconomyRules.minimumBindCost(in: store.state) }
+    private var bindRunway: Int { max(0, remaining) / max(1, bindCost) }
+    private var restCount: Int { decisions.values.filter { $0 == .letRest }.count }
+    private var allDecided: Bool {
+        Set(decisions.keys) == Set(realms.map(\.id))
     }
 
     var body: some View {
@@ -61,41 +68,71 @@ private struct AnchorSettlementView: View {
             List {
                 Section {
                     ForEach(realms) { realm in
-                        Button {
-                            if paying.contains(realm.id) { paying.remove(realm.id) }
-                            else { paying.insert(realm.id) }
-                        } label: {
-                            HStack {
-                                Image(systemName: paying.contains(realm.id) ? "checkmark.circle.fill" : "circle")
-                                VStack(alignment: .leading) {
-                                    Text(realm.name)
-                                    Text("Production \(realm.productionContribution) · obligation \(realm.sustainObligation)")
-                                        .font(.caption).foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                Text("\(realm.projectedShortfall)").monospacedDigit()
+                        VStack(alignment: .leading, spacing: 10) {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(realm.name).font(.headline)
+                                Text("Production \(realm.productionContribution) · obligation \(realm.sustainObligation)")
+                                    .font(.caption).foregroundStyle(.secondary)
                             }
+                            Picker("Decision for \(realm.name)", selection: Binding(
+                                get: { decisions[realm.id] },
+                                set: { decisions[realm.id] = $0 }
+                            )) {
+                                Text("Choose…").tag(nil as GameStore.AnchorSettlementDecision?)
+                                Text("Sustain · \(realm.projectedShortfall) Essence")
+                                    .tag(GameStore.AnchorSettlementDecision.sustain as GameStore.AnchorSettlementDecision?)
+                                Text("Let rest")
+                                    .tag(GameStore.AnchorSettlementDecision.letRest as GameStore.AnchorSettlementDecision?)
+                            }
+                            .pickerStyle(.menu)
                         }
-                        .buttonStyle(.plain)
                     }
                 } header: {
-                    Text("Choose realms to sustain")
+                    Text("Decide each realm")
                 } footer: {
-                    Text("Any unchecked realm becomes dormant, never deleted. Assigned companions return safely.")
-                }
-
-                Section {
-                    LabeledContent("Available essence", value: "\(store.state.base.essence)")
-                    LabeledContent("Selected payment", value: "\(total)")
-                    Button("Confirm settlement") {
-                        store.settleAnchoredRealms(paying: paying)
-                    }
-                    .disabled(total > store.state.base.essence)
+                    Text("Let rest makes a realm dormant, never deleted. Its assigned companions return safely.")
                 }
             }
             .navigationTitle("Anchorage settlement")
             .interactiveDismissDisabled()
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 8) {
+                    HStack {
+                        summary("Available", store.state.base.essence)
+                        summary("Payment", total)
+                        summary("Remaining", remaining)
+                    }
+                    HStack {
+                        Text("Authored-bind runway: \(bindRunway)")
+                        Spacer()
+                        Text("Resting: \(restCount)")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    if remaining < 0 {
+                        Text("You need \(-remaining) more Essence for these choices.")
+                            .font(.caption.bold())
+                            .foregroundStyle(.red)
+                    }
+                    Button("Confirm settlement") {
+                        _ = store.settleAnchoredRealms(decisions: decisions)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .frame(maxWidth: .infinity)
+                    .disabled(!allDecided || remaining < 0)
+                }
+                .padding()
+                .background(.bar)
+            }
         }
+    }
+
+    private func summary(_ label: String, _ value: Int) -> some View {
+        VStack(spacing: 2) {
+            Text("\(value)").font(.headline).monospacedDigit()
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 

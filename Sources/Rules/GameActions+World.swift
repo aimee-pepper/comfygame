@@ -508,10 +508,22 @@ extension GameStore {
             ? outcomeID : nil
     }
 
-    func settleAnchoredRealms(paying ids: Set<Int>) -> Bool {
+    enum AnchorSettlementDecision: String, CaseIterable, Sendable {
+        case sustain
+        case letRest
+    }
+
+    func settleAnchoredRealms(decisions: [Int: AnchorSettlementDecision]) -> Bool {
         guard state.worlds.pendingAnchorSettlement else { return false }
-        let due = state.worlds.anchoredRealms
-            .filter { ids.contains($0.id) && !$0.isDormant }
+        let dueRealms = state.worlds.anchoredRealms
+            .filter { !$0.isDormant && $0.projectedShortfall > 0 }
+        let dueIDs = Set(dueRealms.map(\.id))
+        guard Set(decisions.keys) == dueIDs else { return false }
+        let payingIDs = Set(decisions.compactMap { id, decision in
+            decision == .sustain ? id : nil
+        })
+        let due = dueRealms
+            .filter { payingIDs.contains($0.id) }
             .reduce(0) { $0 + $1.projectedShortfall }
         guard due <= state.base.essence else { return false }
         mutate("settle anchored realms", flush: true) { state in
@@ -519,7 +531,7 @@ extension GameStore {
             for index in state.worlds.anchoredRealms.indices {
                 guard state.worlds.anchoredRealms[index].projectedShortfall > 0,
                       !state.worlds.anchoredRealms[index].isDormant else { continue }
-                if !ids.contains(state.worlds.anchoredRealms[index].id) {
+                if !payingIDs.contains(state.worlds.anchoredRealms[index].id) {
                     state.worlds.anchoredRealms[index].isDormant = true
                     state.worlds.anchoredRealms[index].assignedCompanions = []
                 }
