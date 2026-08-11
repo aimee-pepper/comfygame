@@ -209,6 +209,9 @@ enum ItemGridLocation: String, Sendable {
 
 struct ItemIconTile: View {
     let icon: String
+    /// Stable catalogue identity passed independently of name, rarity, slot and ordering.
+    /// The generated visual adapter may consume it; nil/non-covered IDs retain the visible fallback.
+    var catalogueID: ItemID? = nil
     let rarity: Rarity
     let quantity: Int
     let identified: Bool
@@ -225,9 +228,13 @@ struct ItemIconTile: View {
                 .strokeBorder(rarity.tint.opacity(isSelected ? 1 : 0.72),
                               style: StrokeStyle(lineWidth: isSelected ? 3 : 1.5,
                                                  dash: rarityDash))
-            Image(systemName: identified ? icon : "questionmark")
-                .font(.system(size: 21, weight: .semibold))
-                .foregroundStyle(identified ? rarity.tint : Color.secondary)
+            CatalogueItemPixelIdentity(
+                itemID: catalogueID,
+                identified: identified,
+                fallbackSystemIcon: icon,
+                fallbackColor: identified ? rarity.tint : Color.secondary
+            )
+            .frame(width: 32, height: 32)
 
             VStack {
                 HStack {

@@ -51,7 +51,8 @@ struct TradingPostView: View {
                              quantity: listing.displayQuantity,
                              accessibilityName: listing.name)
         } else {
-            ItemIconTile(icon: listing.icon, rarity: listing.rarity,
+            ItemIconTile(icon: listing.icon, catalogueID: listing.catalogueItemID,
+                         rarity: listing.rarity,
                          quantity: listing.displayQuantity, identified: true,
                          location: listing.location, accessibilityName: listing.name)
         }
@@ -102,7 +103,8 @@ struct TradingPostView: View {
                                           unitQuantity: 1, unitPrice: line.unitPrice, location: .offered,
                                           revision: base.tradingPost.inventoryRevision,
                                           stack: nil,
-                                          action: .unavailable)
+                                          action: .unavailable,
+                                          authoredCatalogueItemID: id)
             case .material(let sample):
                 return TradingPostListing(id: "stock-\(line.id)", name: sample.displayName,
                                           icon: "hexagon.fill", rarity: sample.rarity,
@@ -203,7 +205,9 @@ private struct TradingPostListingSheet: View {
                                                  quantity: listing.displayQuantity,
                                                  accessibilityName: listing.name)
                             } else {
-                                ItemIconTile(icon: listing.icon, rarity: listing.rarity,
+                                ItemIconTile(icon: listing.icon,
+                                             catalogueID: listing.catalogueItemID,
+                                             rarity: listing.rarity,
                                              quantity: listing.displayQuantity, identified: true,
                                              location: listing.location, accessibilityName: listing.name)
                             }
@@ -352,6 +356,9 @@ private struct TradingPostListing: Identifiable {
     let revision: UInt64
     let stack: ItemStack?
     let action: Action
+    var authoredCatalogueItemID: ItemID? = nil
+
+    var catalogueItemID: ItemID? { authoredCatalogueItemID ?? stack?.catalogID }
 }
 
 private extension TradingPostTradeBand {

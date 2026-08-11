@@ -111,7 +111,8 @@ struct BlacksmithView: View {
         } else {
             SixAcrossItemGrid(data: store.reforgeable, id: \.id) { target in
                 AnchoredItemDetailButton(item: target, selection: $chosen) {
-                    ItemIconTile(icon: target.icon, rarity: target.rarity,
+                    ItemIconTile(icon: target.icon, catalogueID: target.catalogID,
+                                 rarity: target.rarity,
                                  quantity: target.count, identified: true,
                                  location: target.gridLocation,
                                  accessibilityName: target.displayName,

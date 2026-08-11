@@ -43,7 +43,8 @@ struct LootDecisionCard: View {
                     .foregroundStyle(.orange)
 
                 HStack(spacing: 10) {
-                    ItemIconTile(icon: offered.icon, rarity: offered.rarity,
+                    ItemIconTile(icon: offered.icon, catalogueID: offered.catalogID,
+                                 rarity: offered.rarity,
                                  quantity: offered.count, identified: offered.identified,
                                  location: .offered, accessibilityName: offered.displayName)
                         .frame(width: 52, height: 52)
@@ -65,7 +66,8 @@ struct LootDecisionCard: View {
                 let carriedItems = store.state.worlds.activeRun?.satchelItems.stacks ?? []
                 SixAcrossItemGrid(data: carriedItems, id: \.id) { carried in
                     AnchoredItemDetailButton(item: carried, selection: $selectedCarried) {
-                        ItemIconTile(icon: carried.icon, rarity: carried.rarity,
+                        ItemIconTile(icon: carried.icon, catalogueID: carried.catalogID,
+                                     rarity: carried.rarity,
                                      quantity: carried.count, identified: carried.identified,
                                      location: .carried,
                                      accessibilityName: carried.displayName)
@@ -110,7 +112,8 @@ private struct LootSwapDetailSheet: View {
             List {
                 Section {
                     HStack(spacing: 16) {
-                        ItemIconTile(icon: carried.icon, rarity: carried.rarity,
+                        ItemIconTile(icon: carried.icon, catalogueID: carried.catalogID,
+                                     rarity: carried.rarity,
                                      quantity: carried.count, identified: carried.identified,
                                      location: .carried,
                                      accessibilityName: carried.displayName)

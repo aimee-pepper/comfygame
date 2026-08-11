@@ -39,6 +39,7 @@ struct GearView: View {
                     SixAcrossItemGrid(data: options, id: \.id) { option in
                         AnchoredItemDetailButton(item: option, selection: $selectedOption) {
                             ItemIconTile(icon: option.piece.definition?.icon ?? "questionmark",
+                                         catalogueID: option.piece.catalogID,
                                          rarity: option.piece.definition?.rarity ?? .common,
                                          quantity: option.count, identified: true,
                                          location: gridLocation(of: option),
@@ -173,6 +174,7 @@ private struct GearOptionDetailSheet: View {
                 Section {
                     HStack(spacing: 16) {
                         ItemIconTile(icon: option.piece.definition?.icon ?? "questionmark",
+                                     catalogueID: option.piece.catalogID,
                                      rarity: option.piece.definition?.rarity ?? .common,
                                      quantity: option.count, identified: true,
                                      location: gridLocation,

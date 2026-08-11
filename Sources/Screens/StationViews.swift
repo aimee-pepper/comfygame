@@ -299,7 +299,8 @@ private struct SpilloverCard: View {
 
             SixAcrossItemGrid(data: store.spillover, id: \.id) { stack in
                 AnchoredItemDetailButton(item: stack, selection: $opened) {
-                    ItemIconTile(icon: stack.icon, rarity: stack.rarity,
+                    ItemIconTile(icon: stack.icon, catalogueID: stack.catalogID,
+                                 rarity: stack.rarity,
                                  quantity: stack.count, identified: stack.identified,
                                  location: .waiting,
                                  accessibilityName: stack.displayName)
@@ -322,7 +323,8 @@ private struct SpilloverDetailSheet: View {
             List {
                 Section {
                     HStack(spacing: 16) {
-                        ItemIconTile(icon: spilled.icon, rarity: spilled.rarity,
+                        ItemIconTile(icon: spilled.icon, catalogueID: spilled.catalogID,
+                                     rarity: spilled.rarity,
                                      quantity: spilled.count, identified: spilled.identified,
                                      location: .waiting,
                                      accessibilityName: spilled.displayName)
@@ -379,7 +381,8 @@ private struct SwapSheet: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Making room for").font(.headline)
                     HStack(spacing: 12) {
-                        ItemIconTile(icon: spilled.icon, rarity: spilled.rarity,
+                        ItemIconTile(icon: spilled.icon, catalogueID: spilled.catalogID,
+                                     rarity: spilled.rarity,
                                      quantity: spilled.count, identified: spilled.identified,
                                      location: .waiting,
                                      accessibilityName: spilled.displayName)
@@ -389,7 +392,8 @@ private struct SwapSheet: View {
                     Text("Choose what returns to the waiting pile").font(.headline)
                     SixAcrossItemGrid(data: store.state.base.inventory.stacks, id: \.id) { stored in
                         AnchoredItemDetailButton(item: stored, selection: $opened) {
-                            ItemIconTile(icon: stored.icon, rarity: stored.rarity,
+                            ItemIconTile(icon: stored.icon, catalogueID: stored.catalogID,
+                                         rarity: stored.rarity,
                                          quantity: stored.count, identified: stored.identified,
                                          location: .stored,
                                          accessibilityName: stored.displayName)
@@ -428,7 +432,8 @@ private struct SwapStoredDetail: View {
             List {
                 Section {
                     HStack(spacing: 16) {
-                        ItemIconTile(icon: stored.icon, rarity: stored.rarity,
+                        ItemIconTile(icon: stored.icon, catalogueID: stored.catalogID,
+                                     rarity: stored.rarity,
                                      quantity: stored.count, identified: stored.identified,
                                      location: .stored, accessibilityName: stored.displayName)
                             .frame(width: 58, height: 58)
@@ -508,7 +513,8 @@ struct StorehouseView: View {
                     } else {
                         SixAcrossItemGrid(data: base.inventory.stacks, id: \.id) { stack in
                             AnchoredItemDetailButton(item: stack, selection: $opened) {
-                                ItemIconTile(icon: stack.icon, rarity: stack.rarity,
+                                ItemIconTile(icon: stack.icon, catalogueID: stack.catalogID,
+                                             rarity: stack.rarity,
                                              quantity: stack.count, identified: stack.identified,
                                              location: .stored,
                                              accessibilityName: stack.displayName)
@@ -596,7 +602,8 @@ private struct StorehouseItemSheet: View {
                 List {
                     Section {
                         HStack(spacing: 16) {
-                            ItemIconTile(icon: stack.icon, rarity: stack.rarity,
+                            ItemIconTile(icon: stack.icon, catalogueID: stack.catalogID,
+                                         rarity: stack.rarity,
                                          quantity: stack.count, identified: stack.identified,
                                          location: .stored, accessibilityName: stack.displayName)
                                 .frame(width: 58, height: 58)
