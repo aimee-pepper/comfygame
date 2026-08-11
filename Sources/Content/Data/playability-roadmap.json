@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "6c649ee · persisted encounter openings + real launch progress",
+  "installedCheckpoint": "0b23c3a · bug-report share isolation + world-grade-2 handoff gate",
   "essenceBaseline": "a816113",
   "currentWork": "P0 world-grade-2 production handoff + P1 bug-report delivery",
-  "currentNote": "Persisted encounter openings and a real phase-driven launch bar are installed for phone acceptance. World-grade-2 v0.2 is accepted calibration evidence, but its own report remains integrationReady:false; Asset must publish the frozen schema, production tuple, immutable manifest and native conformance vectors before Engineering ports it in the isolated visual lane. Direct bug-report delivery still waits for an approved relay endpoint and Keychain credential.",
+  "currentNote": "The durable bug queue now survives relaunch and opens the real share sheet without triggering Delete; the 368×800 Simulator acceptance path is green and the phone build is next. World-grade-2 v0.2 remains calibration evidence with integrationReady:false, so Asset must publish the frozen schema, production tuple, immutable manifest and native conformance vectors before Engineering ports it in the isolated visual lane. Direct delivery still waits for an approved relay endpoint and Keychain credential.",
   "items": [
     {
       "id": "essence",
