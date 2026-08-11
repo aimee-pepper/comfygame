@@ -58,9 +58,12 @@ final class WorldTests: XCTestCase {
 
     func testNativeMapPinsCorrectedCanonicalManifest() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-        let data = try Data(contentsOf: root.appendingPathComponent("AssetLab/integration/map-slice-v1/manifest.json"))
+        let data = try Data(contentsOf: root.appendingPathComponent("AssetLab/integration/lifted-terrain-v1/manifest.json"))
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         XCTAssertEqual(json["canonicalManifestSha256"] as? String, MapAssetContract.manifestSHA256)
+        let profile = try XCTUnwrap(json["profile"] as? [String: Any])
+        XCTAssertEqual(profile["pixelWidth"] as? Int, MapAssetContract.spriteWidth)
+        XCTAssertEqual(profile["pixelHeight"] as? Int, MapAssetContract.spriteHeight)
     }
 
     @MainActor
@@ -117,29 +120,46 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
-    func testNativeTerrainRasterMatchesEveryAssetLabConformanceFixture() throws {
+    func testNativeLiftedTerrainRasterMatchesFrozenAssetLabConformanceFixtures() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-        let data = try Data(contentsOf: root.appendingPathComponent("AssetLab/integration/map-slice-v1/manifest.json"))
+        let data = try Data(contentsOf: root.appendingPathComponent("AssetLab/integration/lifted-terrain-v1/manifest.json"))
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         let outputs = try XCTUnwrap(json["outputs"] as? [[String: Any]])
-        var checked = 0
-        for output in outputs where (output["kind"] as? String)?.hasPrefix("terrain") == true {
-            let ground = try XCTUnwrap(GroundType(rawValue: try XCTUnwrap(output["ground"] as? String)))
-            let adjacency = output["adjacency"] as? Int ?? 15
-            let feature = output["featureVariant"] as? Int ?? 0
-            let elevation = output["elevation"] as? Int ?? 0
-            let crumbled = output["crumbled"] as? Bool ?? false
-            let gradeJSON = output["worldGrade"] as? [String: Int] ?? [:]
-            let grade = WorldGrade(red: gradeJSON["red"] ?? 0, green: gradeJSON["green"] ?? 0,
-                                   blue: gradeJSON["blue"] ?? 0, value: gradeJSON["value"] ?? 0)
-            let pixels = MapAssetTestSupport.terrainPixels(ground: ground, adjacency: adjacency,
-                                                           featureVariant: feature, grade: grade,
-                                                           elevation: elevation, crumbled: crumbled)
+        let vectors: [(GroundType, Int, UInt32, Int, WorldGrade, Int, Int, Bool)] = [
+            (.soil, 15, 82_734_192, 2, WorldGrade(red: 14, green: 3, blue: -12, value: -4), 2, 1, false),
+            (.stone, 6, 305_419_896, 3, WorldGrade(red: -22, green: 22, blue: 22, value: -11), 3, 3, true)
+        ]
+        XCTAssertEqual(outputs.count, vectors.count)
+        for (output, vector) in zip(outputs, vectors) {
+            let pixels = MapAssetTestSupport.terrainPixels(ground: vector.0, adjacency: vector.1,
+                                                           featureVariant: vector.3, grade: vector.4,
+                                                           elevation: vector.5, cracking: vector.7,
+                                                           southExposureLevels: vector.6, seed: vector.2)
             let actual = SHA256.hash(data: Data(pixels)).map { String(format: "%02x", $0) }.joined()
-            XCTAssertEqual(actual, output["pixelSha256"] as? String, output["id"] as? String ?? ground.rawValue)
-            checked += 1
+            XCTAssertEqual(actual, output["decodedRgbaSha256"] as? String,
+                           output["id"] as? String ?? vector.0.rawValue)
         }
-        XCTAssertGreaterThanOrEqual(checked, 180)
+    }
+
+    @MainActor
+    func testLiftedTerrainForcesZeroAndNeverBuildsWallsAgainstFogOrBoundary() {
+        for ground in [GroundType.water, .deepWater, .chasm, .ice, .growth, .groundcover] {
+            var tile = Tile(ground: ground, elevation: 3, isRevealed: true)
+            XCTAssertEqual(MapAssetContract.resolvedElevation(for: tile), 0)
+            tile.isRevealed = false
+            XCTAssertEqual(MapAssetContract.resolvedElevation(for: tile), 0)
+        }
+        var raised = Tile(ground: .soil, elevation: 3, isRevealed: true)
+        XCTAssertEqual(MapAssetContract.resolvedElevation(for: raised), 3)
+        raised.isCrumbled = true
+        XCTAssertEqual(MapAssetContract.resolvedElevation(for: raised), 0)
+
+        let raisedSurface = Tile(ground: .soil, elevation: 3, isRevealed: true)
+        XCTAssertEqual(MapAssetContract.southExposure(center: raisedSurface, south: nil), 0)
+        XCTAssertEqual(MapAssetContract.southExposure(
+            center: raisedSurface, south: Tile(ground: .soil, elevation: 0, isRevealed: false)), 0)
+        XCTAssertEqual(MapAssetContract.southExposure(
+            center: raisedSurface, south: Tile(ground: .soil, elevation: 1, isRevealed: true)), 2)
     }
 
     func testEveryMinimapPOIFamilyIsFogGated() {

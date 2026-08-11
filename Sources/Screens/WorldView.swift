@@ -767,6 +767,7 @@ private struct MapGrid: View {
                                 .onTapGesture { onTap(point) }
                         }
                     }
+                    .zIndex(Double(y))
                 }
             }
         }
@@ -793,8 +794,13 @@ private struct MapGrid: View {
             if run.map.contains(neighbour), run.map[neighbour].ground == tile.ground { adjacency |= bit }
         }
         let flora = tile.flora.flatMap { id in run.flora.first { $0.id == id } }
+        let south = GridPoint(x: point.x, y: point.y + 1)
+        // Concealed neighbours and the map boundary never fabricate a visible side wall.
+        let southExposure = MapAssetContract.southExposure(
+            center: tile, south: run.map.contains(south) ? run.map[south] : nil)
         return MapTileArtRequest(tile: tile, point: point, mapSeed: run.mapSeed,
                                  adjacency: adjacency,
+                                 southExposureLevels: southExposure,
                                  grade: grade,
                                  flora: flora)
     }
@@ -822,43 +828,61 @@ private struct TileView: View {
     let useSimpleRenderer: Bool
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             if useSimpleRenderer {
                 Rectangle().fill(background)
+                if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
+                    SimpleCrackShape()
+                        .stroke(Color.orange.opacity(0.95),
+                                style: StrokeStyle(lineWidth: max(1, side * 0.07),
+                                                   lineCap: .round, lineJoin: .round))
+                        .padding(side * 0.12)
+                }
             } else {
                 MapTileArt(request: artRequest)
+                    .frame(width: side,
+                           height: side * CGFloat(MapAssetContract.spriteHeight)
+                               / CGFloat(MapAssetContract.logicalSide))
+                    .offset(y: -side * CGFloat(MapAssetContract.maximumElevation)
+                            / CGFloat(MapAssetContract.logicalSide))
             }
-            if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
-                CrackShape()
-                    .stroke(Color.orange.opacity(0.95), style: StrokeStyle(lineWidth: max(1, side * 0.07),
-                                                                          lineCap: .round,
-                                                                          lineJoin: .round))
-                    .padding(side * 0.12)
+            ZStack {
+                // The player gets a filled disc behind them: at 27pt a bare glyph disappears into
+                // the grid, and "where am I" has to be answerable at a glance.
+                if isPlayer {
+                    Circle()
+                        .fill(Color.accentColor)
+                        .padding(side * 0.14)
+                }
+                if let enemy, case .alert = enemy.awareness {
+                    Circle()
+                        .stroke(Color.orange, style: StrokeStyle(lineWidth: max(2, side * 0.08), dash: [3, 2]))
+                        .padding(side * 0.08)
+                }
+                if let symbol {
+                    Image(systemName: symbol)
+                        .font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
+                        .foregroundStyle(tint)
+                }
             }
-            // The player gets a filled disc behind them: at 27pt a bare glyph disappears into the
-            // grid, and "where am I" has to be answerable at a glance.
-            if isPlayer {
-                Circle()
-                    .fill(Color.accentColor)
-                    .padding(side * 0.14)
-            }
+            .frame(width: side, height: side)
+            .offset(y: surfaceLift)
+
+            // Alert punctuation is a floating UI badge, not something painted on the ground.
             if let enemy, case .alert = enemy.awareness {
-                Circle()
-                    .stroke(Color.orange, style: StrokeStyle(lineWidth: max(2, side * 0.08), dash: [3, 2]))
-                    .padding(side * 0.08)
                 Image(systemName: "exclamationmark")
                     .font(.system(size: side * 0.28, weight: .black))
                     .foregroundStyle(.orange)
                     .offset(x: side * 0.30, y: -side * 0.30)
             }
-            if let symbol {
-                Image(systemName: symbol)
-                    .font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
-                    .foregroundStyle(tint)
-            }
         }
         .frame(width: side, height: side)
         .contentShape(Rectangle())
+    }
+
+    private var surfaceLift: CGFloat {
+        guard !useSimpleRenderer else { return 0 }
+        return -side * CGFloat(artRequest.resolvedElevation) / CGFloat(MapAssetContract.logicalSide)
     }
 
     private var symbol: String? {
@@ -928,8 +952,8 @@ private struct TileView: View {
     }
 }
 
-/// A deliberately simple fissure that stays readable at tiny map-tile sizes.
-private struct CrackShape: Shape {
+/// DEBUG fallback only. The native renderer uses the frozen 16px crack command grammar.
+private struct SimpleCrackShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
         path.move(to: CGPoint(x: rect.midX * 0.9, y: rect.minY))

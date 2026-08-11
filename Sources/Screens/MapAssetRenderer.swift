@@ -1,15 +1,35 @@
 import SwiftUI
 import UIKit
 
-/// Native, deterministic adapter for AssetLab map-slice 1.1.
-/// The game supplies facts; this layer only turns them into 16px rectangle commands.
+/// Native, deterministic adapter for AssetLab's frozen lifted-terrain conformance pack.
+/// The game supplies facts; this layer turns them into bottom-anchored 16×19 pixel sprites while
+/// the map retains its logical 16×16 footprint.
 enum MapAssetContract {
-    static let manifestSHA256 = "f776ae97f252f462570014ca81d06df40e5a6de82aaa06c53671310e1912c28d"
+    static let manifestSHA256 = "fdfe2744af523628dc7aacac3c5a901d2fbd499a02cdb205a76d21e9f3d3f399"
     static let seedVersion = "bookbinder-terrain-seed-v1"
-    static let tuple = "1|1|1|1|world-grade-1.0.0|map-slice-1.1.0|rect-compositor-0.2.0|top-down-map-16px-1.0.0"
+    /// Placement variation was frozen with map-slice v1.1. The lifted compositor changes pixels,
+    /// not the persisted world's neutral feature choice.
+    static let seedTuple = "1|1|1|1|world-grade-1.0.0|map-slice-1.1.0|rect-compositor-0.2.0|top-down-map-16px-1.0.0"
+    static let rendererTuple = "1|lifted-terrain-adapter-1.0.0|terrain-lifted-1.0.0|world-grade-1.0.0|terrain-16x19-bottom-anchored-1.0.0"
+    static let spriteWidth = 16
+    static let spriteHeight = 19
+    static let logicalSide = 16
+    static let maximumElevation = 3
+
+    static func resolvedElevation(for tile: Tile) -> Int {
+        guard tile.isRevealed, !tile.isCrumbled,
+              ![.water, .deepWater, .chasm, .ice, .growth, .groundcover].contains(tile.ground)
+        else { return 0 }
+        return min(maximumElevation, max(0, tile.elevation))
+    }
+
+    static func southExposure(center: Tile, south: Tile?) -> Int {
+        guard let south, south.isRevealed else { return 0 }
+        return max(0, resolvedElevation(for: center) - resolvedElevation(for: south))
+    }
 
     static func terrainSeed(mapSeed: UInt64, point: GridPoint) -> UInt32 {
-        let input = "\(seedVersion)|\(mapSeed)|\(point.x)|\(point.y)|\(tuple)"
+        let input = "\(seedVersion)|\(mapSeed)|\(point.x)|\(point.y)|\(seedTuple)"
         return input.utf8.reduce(UInt32(0x811c9dc5)) { hash, byte in
             (hash ^ UInt32(byte)) &* 0x01000193
         }
@@ -49,39 +69,52 @@ struct MapTileArtRequest {
     let point: GridPoint
     let mapSeed: UInt64
     let adjacency: Int
+    let southExposureLevels: Int
     let grade: WorldGrade
     let flora: Flora?
     let explicitSeed: UInt32?
     let explicitFeatureVariant: Int?
 
-    init(tile: Tile, point: GridPoint, mapSeed: UInt64, adjacency: Int, grade: WorldGrade,
+    init(tile: Tile, point: GridPoint, mapSeed: UInt64, adjacency: Int,
+         southExposureLevels: Int = 0, grade: WorldGrade,
          flora: Flora?, explicitSeed: UInt32? = nil) {
         self.tile = tile; self.point = point; self.mapSeed = mapSeed; self.adjacency = adjacency
+        self.southExposureLevels = southExposureLevels
         self.grade = grade; self.flora = flora; self.explicitSeed = explicitSeed
         self.explicitFeatureVariant = nil
     }
 
-    init(tile: Tile, point: GridPoint, mapSeed: UInt64, adjacency: Int, grade: WorldGrade,
+    init(tile: Tile, point: GridPoint, mapSeed: UInt64, adjacency: Int,
+         southExposureLevels: Int = 0, grade: WorldGrade,
          flora: Flora?, explicitSeed: UInt32, explicitFeatureVariant: Int) {
         self.tile=tile; self.point=point; self.mapSeed=mapSeed; self.adjacency=adjacency
+        self.southExposureLevels=southExposureLevels
         self.grade=grade; self.flora=flora; self.explicitSeed=explicitSeed
         self.explicitFeatureVariant=explicitFeatureVariant
     }
 
     var seed: UInt32 { explicitSeed ?? MapAssetContract.terrainSeed(mapSeed: mapSeed, point: point) }
     var featureVariant: Int { explicitFeatureVariant ?? Int(seed & 3) }
+    var resolvedElevation: Int { MapAssetContract.resolvedElevation(for: tile) }
+    var surfaceOffsetY: Int { MapAssetContract.maximumElevation - resolvedElevation }
 }
 
 @MainActor enum MapAssetTestSupport {
     static func terrainPixels(ground: GroundType, adjacency: Int = 15, featureVariant: Int = 0,
                               grade: WorldGrade = WorldGrade(red: 0, green: 0, blue: 0, value: 0),
                               elevation: Int = 0, crumbled: Bool = false,
+                              cracking: Bool = false, revealed: Bool = true,
+                              southExposureLevels: Int = 0,
                               seed: UInt32 = 404) -> [UInt8] {
-        let tile = Tile(ground: ground, elevation: elevation, isRevealed: true, isCrumbled: crumbled)
+        var tile = Tile(ground: ground, elevation: elevation, isRevealed: revealed, isCrumbled: crumbled)
+        tile.isCracking = cracking
         let request = MapTileArtRequest(tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
-                                        adjacency: adjacency, grade: grade, flora: nil,
+                                        adjacency: adjacency, southExposureLevels: southExposureLevels,
+                                        grade: grade, flora: nil,
                                         explicitSeed: seed, explicitFeatureVariant: featureVariant)
-        return MapPixelRaster.rawPixels(commands: TerrainPixelGrammar.commands(for: request))
+        return MapPixelRaster.rawPixels(commands: TerrainPixelGrammar.commands(for: request),
+                                        width: MapAssetContract.spriteWidth,
+                                        height: MapAssetContract.spriteHeight)
     }
 
     static func floraPixels(_ flora: Flora) -> [UInt8] {
@@ -120,9 +153,12 @@ private enum TerrainPixelGrammar {
     static func commands(for request: MapTileArtRequest) -> [PixelCommand] {
         let tile = request.tile
         let palette = palette(for: tile.ground).map { $0.graded(request.grade) }
+        if !tile.isRevealed {
+            return [rect(0, MapAssetContract.maximumElevation, 16, 16, 0x17171a)]
+        }
         if tile.isCrumbled {
-            return [rect(0, 0, 16, 16, 0x09090c), rect(0, 0, 4, 2, palette[0]),
-                    rect(12, 14, 4, 2, palette[2])]
+            return [rect(0, 3, 16, 16, 0x09090c), rect(0, 3, 4, 2, palette[0]),
+                    rect(12, 17, 4, 2, palette[2])]
         }
         var random = Mulberry32(seed: request.seed ^ UInt32(request.adjacency) ^ UInt32(request.featureVariant &* 0x9e37))
         var result = [rect(0, 0, 16, 16, palette[1])]
@@ -140,12 +176,24 @@ private enum TerrainPixelGrammar {
             if request.adjacency & 4 == 0 { result.append(rect(0, 14, 16, 2, edge)) }
             if request.adjacency & 8 == 0 { result.append(rect(0, 0, 2, 16, edge)) }
         }
-        if tile.elevation > 0 {
-            let band = 1 + tile.elevation
-            result += [rect(0, 16 - band, 16, band, 0x21170f), rect(0, 15 - band, 16, 1, 0xb28a56)]
-            for x in stride(from: 1, to: 16, by: 4) { result.append(rect(x, 16 - band, 2, 1, 0x6b4b2d)) }
+        if tile.isCracking {
+            result += line(7, 1, 9, 7, 0x171116) + line(9, 7, 5, 14, 0x171116)
+                + line(8, 1, 10, 7, 0xf0a84e) + line(10, 7, 6, 14, 0xf0a84e)
         }
-        return fit(result, width: 16, height: 16, padding: 0)
+        let elevation = MapAssetContract.resolvedElevation(for: tile)
+        let offset = MapAssetContract.maximumElevation - elevation
+        result = fit(result, width: 16, height: 16, padding: 0).map {
+            PixelCommand(x: $0.x, y: $0.y + offset, width: $0.width, height: $0.height,
+                         color: $0.color)
+        }
+        let exposure = min(elevation, max(0, request.southExposureLevels))
+        if exposure > 0 {
+            let wallY = offset + 16
+            result.append(rect(0, wallY, 16, exposure, palette[0]))
+            result.append(rect(0, wallY, 16, 1, palette[1]))
+            if exposure == 3 { result.append(rect(0, wallY + 2, 16, 1, palette[0])) }
+        }
+        return result
     }
 
     private static func palette(for ground: GroundType) -> [RGB] {
@@ -335,16 +383,17 @@ struct RGBA: Equatable {
     static func image(for request: MapTileArtRequest) -> UIImage? {
         let descriptor = request.flora.map(FloraRenderDescriptor.init)
         let floraKey = descriptor.map(stableFloraKey) ?? "none"
-        let key = "\(MapAssetContract.tuple)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.elevation)-\(request.grade.red),\(request.grade.green),\(request.grade.blue),\(request.grade.value)-\(floraKey)" as NSString
+        let key = "\(MapAssetContract.rendererTuple)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.southExposureLevels)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(request.grade.red),\(request.grade.green),\(request.grade.blue),\(request.grade.value)-\(floraKey)" as NSString
         if let cached = cache.object(forKey: key) { return cached }
-        let commands: [PixelCommand]
-        if request.tile.isRevealed {
-            commands = TerrainPixelGrammar.commands(for: request)
-                + (request.tile.isCrumbled ? [] : descriptor.map(FloraPixelGrammar.commands) ?? [])
-        } else {
-            commands = [rect(0, 0, 16, 16, 0x17171a)]
+        var commands = TerrainPixelGrammar.commands(for: request)
+        if request.tile.isRevealed, !request.tile.isCrumbled, let descriptor {
+            commands += FloraPixelGrammar.commands(for: descriptor).map {
+                PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
+                             width: $0.width, height: $0.height, color: $0.color)
+            }
         }
-        guard let image = raster(commands: commands) else { return nil }
+        guard let image = raster(commands: commands, width: MapAssetContract.spriteWidth,
+                                 height: MapAssetContract.spriteHeight) else { return nil }
         cache.setObject(image, forKey: key)
         return image
     }
@@ -356,18 +405,19 @@ struct RGBA: Equatable {
         return "\(flora.logicalID)-\(flora.speciesSeed)-\(hash)"
     }
 
-    static func raster(commands: [PixelCommand]) -> UIImage? {
-        var bytes = [UInt8](repeating: 0, count: 16 * 16 * 4)
+    static func raster(commands: [PixelCommand], width: Int, height: Int) -> UIImage? {
+        var bytes = [UInt8](repeating: 0, count: width * height * 4)
         for command in commands {
             let x0 = max(0, command.x), y0 = max(0, command.y)
-            let x1 = min(16, command.x + command.width), y1 = min(16, command.y + command.height)
+            let x1 = min(width, command.x + command.width)
+            let y1 = min(height, command.y + command.height)
             guard x0 < x1, y0 < y1 else { continue }
-            for y in y0..<y1 { for x in x0..<x1 { blend(command.color, into: &bytes, at: (y*16+x)*4) } }
+            for y in y0..<y1 { for x in x0..<x1 { blend(command.color, into: &bytes, at: (y*width+x)*4) } }
         }
         let data = Data(bytes)
         guard let provider = CGDataProvider(data: data as CFData),
-              let cg = CGImage(width: 16, height: 16, bitsPerComponent: 8, bitsPerPixel: 32,
-                               bytesPerRow: 64, space: CGColorSpaceCreateDeviceRGB(),
+              let cg = CGImage(width: width, height: height, bitsPerComponent: 8, bitsPerPixel: 32,
+                               bytesPerRow: width * 4, space: CGColorSpaceCreateDeviceRGB(),
                                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
                                provider: provider, decode: nil, shouldInterpolate: false,
                                intent: .defaultIntent) else { return nil }
@@ -376,12 +426,12 @@ struct RGBA: Equatable {
 
     /// AssetLab's conformance hash buffer stores the last rectangle's straight RGBA bytes.
     /// This is deliberately separate from on-screen source-over composition.
-    static func rawPixels(commands: [PixelCommand]) -> [UInt8] {
-        var bytes = [UInt8](repeating: 0, count: 16 * 16 * 4)
+    static func rawPixels(commands: [PixelCommand], width: Int = 16, height: Int = 16) -> [UInt8] {
+        var bytes = [UInt8](repeating: 0, count: width * height * 4)
         for command in commands {
-            for y in max(0,command.y)..<min(16,command.y+command.height) {
-                for x in max(0,command.x)..<min(16,command.x+command.width) {
-                    let i=(y*16+x)*4
+            for y in max(0,command.y)..<min(height,command.y+command.height) {
+                for x in max(0,command.x)..<min(width,command.x+command.width) {
+                    let i=(y*width+x)*4
                     bytes[i]=command.color.red; bytes[i+1]=command.color.green
                     bytes[i+2]=command.color.blue; bytes[i+3]=command.color.alpha
                 }
