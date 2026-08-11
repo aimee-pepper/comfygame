@@ -404,14 +404,18 @@ extension GameStore {
                 _ = run.satchelItems.stacks[index].removing(1)
                 if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
             }
+            let outcomeID = state.worlds.mintOutcomeID()
             let banked = GameStore.bankHaul(of: run, into: &state, fraction: 1.0)
             if let index = state.worlds.anchoredRealms.firstIndex(where: { $0.runIndex == run.runIndex }) {
                 state.worlds.anchoredRealms[index].world = run.anchoredSnapshot
             }
             if kind == .portal { state.reality.lifetime.runsBankedViaPortal += 1 }
             let springYield = GameStore.essenceSpringYield(for: state)
-            GameStore.creditEssenceSpring(&state)
-            state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex,
+            if state.worlds.lastSpringOutcomeID != outcomeID {
+                GameStore.creditEssenceSpring(&state)
+                state.worlds.lastSpringOutcomeID = outcomeID
+            }
+            state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex, outcomeID: outcomeID,
                                                    kind: kind,
                                                    reason: reason,
                                                    turnsTaken: run.turnsTaken,
@@ -432,9 +436,9 @@ extension GameStore {
                                                        netRunway: EconomyRules.spendableEssence(in: state)))
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
-            Self.refreshTradingPost(after: run, in: &state)
+            Self.refreshTradingPost(after: run, outcomeID: outcomeID, in: &state)
             state.worlds.activeRun = nil
-            Self.prepareAnchorSettlement(in: &state)
+            Self.prepareAnchorSettlement(for: outcomeID, in: &state)
         }
         recentEvents = []
         ensureDepartureIsPossible()
@@ -445,6 +449,7 @@ extension GameStore {
         guard activeRun != nil else { return }
         mutate("run ended: \(reason)", flush: true) { state in
             guard var run = state.worlds.activeRun else { return }
+            let outcomeID = state.worlds.mintOutcomeID()
             let fraction = min(1, max(0, run.tuning.collapseRecoveryFraction))
             let banked = GameStore.bankHaul(of: run, into: &state, fraction: fraction, rng: &run.rng)
             if let index = state.worlds.anchoredRealms.firstIndex(where: { $0.runIndex == run.runIndex }) {
@@ -452,8 +457,11 @@ extension GameStore {
             }
             if kind == .collapse { state.reality.lifetime.runsLostToCollapse += 1 }
             let springYield = GameStore.essenceSpringYield(for: state)
-            GameStore.creditEssenceSpring(&state)
-            state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex,
+            if state.worlds.lastSpringOutcomeID != outcomeID {
+                GameStore.creditEssenceSpring(&state)
+                state.worlds.lastSpringOutcomeID = outcomeID
+            }
+            state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex, outcomeID: outcomeID,
                                                    kind: kind,
                                                    reason: reason,
                                                    turnsTaken: run.turnsTaken,
@@ -474,9 +482,9 @@ extension GameStore {
                                                        netRunway: EconomyRules.spendableEssence(in: state)))
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
-            Self.refreshTradingPost(after: run, in: &state)
+            Self.refreshTradingPost(after: run, outcomeID: outcomeID, in: &state)
             state.worlds.activeRun = nil
-            Self.prepareAnchorSettlement(in: &state)
+            Self.prepareAnchorSettlement(for: outcomeID, in: &state)
         }
         recentEvents = []
         ensureDepartureIsPossible()
@@ -490,11 +498,14 @@ extension GameStore {
         count * Tuning.Anchoring.sustainPerAdditionalRealm
     }
 
-    nonisolated static func prepareAnchorSettlement(in state: inout GameState) {
+    nonisolated static func prepareAnchorSettlement(for outcomeID: ExpeditionOutcomeID,
+                                                    in state: inout GameState) {
         recalculateAnchorProduction(in: &state)
         state.worlds.pendingAnchorSettlement = state.worlds.anchoredRealms.contains {
             !$0.isDormant && $0.projectedShortfall > 0
         }
+        state.worlds.pendingAnchorSettlementOutcomeID = state.worlds.pendingAnchorSettlement
+            ? outcomeID : nil
     }
 
     func settleAnchoredRealms(paying ids: Set<Int>) -> Bool {
@@ -515,6 +526,7 @@ extension GameStore {
             }
             Self.recalculateAnchorProduction(in: &state)
             state.worlds.pendingAnchorSettlement = false
+            state.worlds.pendingAnchorSettlementOutcomeID = nil
         }
         return true
     }

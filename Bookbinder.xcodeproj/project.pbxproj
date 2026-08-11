@@ -114,6 +114,7 @@
 		8E1AFCB6CD0FBDD0EA84B800 /* ArmouryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAAE51E0323DDA3AA3015D22 /* ArmouryRules.swift */; };
 		8F6B0EF541120D379B1FD06B /* BestiaryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A588AFCFC47B584CE07F3B4E /* BestiaryRules.swift */; };
 		91761E73D4647CB7D2741D93 /* FloraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87254230F32E20320932D7 /* FloraTests.swift */; };
+		94095A78E4E8679458940F25 /* ExpeditionOutcomeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11474BCFC5AFD1111E98E7 /* ExpeditionOutcomeTests.swift */; };
 		94381815D9D6D36F24168B83 /* symbols.json in Resources */ = {isa = PBXBuildFile; fileRef = A4270CCCF203CAA8859A086B /* symbols.json */; };
 		95D1663E471A6098FA803AA9 /* ApexRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E261DE325914CF72D32BD5 /* ApexRules.swift */; };
 		983452CD1EE2126ECB5B1973 /* HarnessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638830B7B5223E3065252FC /* HarnessView.swift */; };
@@ -255,6 +256,7 @@
 		56CE9E9A2ED4242F8C480AEF /* ResearchTreeLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchTreeLayout.swift; sourceTree = "<group>"; };
 		59F1E2A3A08364F9452A684F /* stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = stations.json; sourceTree = "<group>"; };
 		5AB1CD7D6C91CDD187B2410F /* CharacterRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterRules.swift; sourceTree = "<group>"; };
+		5B11474BCFC5AFD1111E98E7 /* ExpeditionOutcomeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpeditionOutcomeTests.swift; sourceTree = "<group>"; };
 		5D960FCB6727D86D57A82BF4 /* travellers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = travellers.json; sourceTree = "<group>"; };
 		5F756C7CBAE86A8565FB12DD /* Inventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inventory.swift; sourceTree = "<group>"; };
 		5FD331CEC89F930A1F99C13B /* creatures.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = creatures.json; sourceTree = "<group>"; };
@@ -649,6 +651,7 @@
 				C51FE4FBAB98280181089C56 /* DeterminismTests.swift */,
 				6782235BDB0189FF9A0FFE41 /* EconomyTests.swift */,
 				961E1AC7BEB7E7C4C243CAD1 /* ExclusivityTests.swift */,
+				5B11474BCFC5AFD1111E98E7 /* ExpeditionOutcomeTests.swift */,
 				DB87254230F32E20320932D7 /* FloraTests.swift */,
 				C09AD15A5BFBBBD300176004 /* GearAndRulesTests.swift */,
 				6A76948555AB0C3BF0F480FF /* GearMigrationTests.swift */,
@@ -950,6 +953,7 @@
 				EDF26461D4FD581D2BCFBB0A /* DeterminismTests.swift in Sources */,
 				7345ED98F77854AE5C6FFB34 /* EconomyTests.swift in Sources */,
 				804C3EA48958EDEA3E234F95 /* ExclusivityTests.swift in Sources */,
+				94095A78E4E8679458940F25 /* ExpeditionOutcomeTests.swift in Sources */,
 				91761E73D4647CB7D2741D93 /* FloraTests.swift in Sources */,
 				4F7559D592DAED143B8AEF88 /* GearAndRulesTests.swift in Sources */,
 				EE5BFC9FE59245B9FD396EDB /* GearMigrationTests.swift in Sources */,

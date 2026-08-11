@@ -48,6 +48,16 @@ struct GameState: Codable, Equatable, Sendable {
         base = try container.decodeIfPresent(BaseState.self, forKey: .base) ?? .newGame()
         var seeds = SeedSequence.newGame()
         worlds = try container.decodeIfPresent(WorldsState.self, forKey: .worlds) ?? .newGame(seeds: &seeds)
+        // Trading Post shipped briefly before the campaign-wide receipt source. Seed the new
+        // sequence from every durable consumer so the first post-migration return cannot reuse
+        // an already-processed identifier and silently skip a refresh.
+        worlds.outcomeSequence = [
+            worlds.outcomeSequence,
+            worlds.lastExit?.outcomeID?.rawValue ?? 0,
+            worlds.pendingAnchorSettlementOutcomeID?.rawValue ?? 0,
+            worlds.lastSpringOutcomeID?.rawValue ?? 0,
+            base.tradingPost.expeditionOutcomeID?.rawValue ?? 0
+        ].max() ?? 0
         if let savedTutorial = try container.decodeIfPresent(TutorialState.self, forKey: .tutorial) {
             tutorial = savedTutorial
         } else {

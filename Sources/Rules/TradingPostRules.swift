@@ -77,7 +77,7 @@ enum TradingPostRules {
     /// Generates at most once for one durable expedition outcome. The caller supplies a stable
     /// campaign seed; this stream is isolated from worldgen and combat RNG.
     @discardableResult
-    static func refresh(after outcomeID: UInt64, campaignSeed: UInt64,
+    static func refresh(after outcomeID: ExpeditionOutcomeID, campaignSeed: UInt64,
                         in base: inout BaseState, catalog: ContentCatalog = .shared) -> Bool {
         guard base.tradingPost.expeditionOutcomeID != outcomeID else { return false }
         var post = base.tradingPost

@@ -1,5 +1,15 @@
 import Foundation
 
+/// One campaign-local receipt for an expedition-to-Base transition. Unlike `runIndex`, this
+/// advances for every visit to an anchored realm as well as every newly bound world.
+struct ExpeditionOutcomeID: RawRepresentable, Codable, Equatable, Hashable, Comparable, Sendable,
+                            ExpressibleByIntegerLiteral {
+    var rawValue: UInt64
+    init(rawValue: UInt64) { self.rawValue = rawValue }
+    init(integerLiteral value: UInt64) { rawValue = value }
+    static func < (lhs: Self, rhs: Self) -> Bool { lhs.rawValue < rhs.rawValue }
+}
+
 /// Layer 3 — Authored Worlds. Instanced expeditions plus realms rebound into the Atlas.
 struct WorldsState: Codable, Equatable, Sendable {
     /// The run in progress, or `nil` when the player is at base. Saving this whole struct is what
@@ -7,6 +17,8 @@ struct WorldsState: Codable, Equatable, Sendable {
     var activeRun: WorldRun?
     /// Monotonic run counter. Stamps discovery records — a turn/run count, never a date.
     var runIndex: Int = 0
+    /// Monotonic receipt source for completed expeditions. Never derived from a world's identity.
+    var outcomeSequence: UInt64 = 0
     /// Deterministic source of world seeds; lives in the save so relaunching cannot re-roll a
     /// seed the player already saw in a pre-bind preview.
     var seeds: SeedSequence
@@ -16,6 +28,9 @@ struct WorldsState: Codable, Equatable, Sendable {
     var anchoredRealms: [AnchoredRealm] = []
     /// A return-time player decision. Never resolved by a clock or hidden automatic spending.
     var pendingAnchorSettlement: Bool = false
+    var pendingAnchorSettlementOutcomeID: ExpeditionOutcomeID?
+    /// Spring income is an automatic outcome consumer and must never replay after relaunch.
+    var lastSpringOutcomeID: ExpeditionOutcomeID?
 
     static func newGame(seeds: inout SeedSequence) -> WorldsState {
         WorldsState(activeRun: nil, runIndex: 0, seeds: seeds, lastExit: nil,
@@ -25,23 +40,39 @@ struct WorldsState: Codable, Equatable, Sendable {
     var isInRun: Bool { activeRun != nil }
 
     init(activeRun: WorldRun?, runIndex: Int, seeds: SeedSequence, lastExit: RunExitSummary? = nil,
-         anchoredRealms: [AnchoredRealm] = [], pendingAnchorSettlement: Bool = false) {
+         anchoredRealms: [AnchoredRealm] = [], pendingAnchorSettlement: Bool = false,
+         outcomeSequence: UInt64 = 0,
+         pendingAnchorSettlementOutcomeID: ExpeditionOutcomeID? = nil,
+         lastSpringOutcomeID: ExpeditionOutcomeID? = nil) {
         self.activeRun = activeRun
         self.runIndex = runIndex
+        self.outcomeSequence = outcomeSequence
         self.seeds = seeds
         self.lastExit = lastExit
         self.anchoredRealms = anchoredRealms
         self.pendingAnchorSettlement = pendingAnchorSettlement
+        self.pendingAnchorSettlementOutcomeID = pendingAnchorSettlementOutcomeID
+        self.lastSpringOutcomeID = lastSpringOutcomeID
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         activeRun = try container.decodeIfPresent(WorldRun.self, forKey: .activeRun)
         runIndex = try container.decodeIfPresent(Int.self, forKey: .runIndex) ?? 0
+        outcomeSequence = try container.decodeIfPresent(UInt64.self, forKey: .outcomeSequence) ?? 0
         seeds = try container.decodeIfPresent(SeedSequence.self, forKey: .seeds) ?? SeedSequence.newGame()
         lastExit = try container.decodeIfPresent(RunExitSummary.self, forKey: .lastExit)
         anchoredRealms = try container.decodeIfPresent([AnchoredRealm].self, forKey: .anchoredRealms) ?? []
         pendingAnchorSettlement = try container.decodeIfPresent(Bool.self, forKey: .pendingAnchorSettlement) ?? false
+        pendingAnchorSettlementOutcomeID = try container.decodeIfPresent(
+            ExpeditionOutcomeID.self, forKey: .pendingAnchorSettlementOutcomeID)
+        lastSpringOutcomeID = try container.decodeIfPresent(ExpeditionOutcomeID.self,
+                                                             forKey: .lastSpringOutcomeID)
+    }
+
+    mutating func mintOutcomeID() -> ExpeditionOutcomeID {
+        outcomeSequence &+= 1
+        return ExpeditionOutcomeID(rawValue: outcomeSequence)
     }
 }
 
@@ -150,6 +181,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     }
 
     var runIndex: Int
+    var outcomeID: ExpeditionOutcomeID?
     var kind: Kind
     var reason: String
     var turnsTaken: Int
@@ -165,9 +197,10 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     var essenceEconomy = EssenceEconomy()
     var experienceBreakdown = RunExperienceBreakdown()
 
-    var id: Int { runIndex }
+    var id: String { outcomeID.map { "outcome-\($0.rawValue)" } ?? "legacy-run-\(runIndex)" }
 
-    init(runIndex: Int, kind: Kind, reason: String, turnsTaken: Int, haulKeptFraction: Double,
+    init(runIndex: Int, outcomeID: ExpeditionOutcomeID? = nil,
+         kind: Kind, reason: String, turnsTaken: Int, haulKeptFraction: Double,
          resources: [RunExitGain] = [], items: [RunExitGain] = [],
          lostResources: [RunExitGain] = [], lostItems: [RunExitGain] = [],
          progress: [RunProgressGain] = [],
@@ -176,6 +209,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
          experienceBreakdown: RunExperienceBreakdown = RunExperienceBreakdown(),
          essenceEconomy: EssenceEconomy = EssenceEconomy()) {
         self.runIndex = runIndex
+        self.outcomeID = outcomeID
         self.kind = kind
         self.reason = reason
         self.turnsTaken = turnsTaken
@@ -195,6 +229,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         runIndex = try c.decode(Int.self, forKey: .runIndex)
+        outcomeID = try c.decodeIfPresent(ExpeditionOutcomeID.self, forKey: .outcomeID)
         let fraction = try c.decode(Double.self, forKey: .haulKeptFraction)
         kind = try c.decodeIfPresent(Kind.self, forKey: .kind) ?? (fraction >= 1 ? .portal : .collapse)
         reason = try c.decode(String.self, forKey: .reason)

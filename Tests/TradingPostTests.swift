@@ -90,10 +90,10 @@ final class TradingPostTests: XCTestCase {
                                map: nextGenerated.map, playerPosition: nextGenerated.start)
         var state = GameState.newGame()
 
-        GameStore.refreshTradingPost(after: run, in: &state)
+        GameStore.refreshTradingPost(after: run, outcomeID: 1, in: &state)
         XCTAssertEqual(state.base.tradingPost.refreshSequence, 1)
         XCTAssertEqual(state.base.tradingPost.expeditionOutcomeID, 1)
-        GameStore.refreshTradingPost(after: nextRun, in: &state)
+        GameStore.refreshTradingPost(after: nextRun, outcomeID: 2, in: &state)
         XCTAssertEqual(state.base.tradingPost.refreshSequence, 2)
         XCTAssertEqual(state.base.tradingPost.expeditionOutcomeID, 2)
     }

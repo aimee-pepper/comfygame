@@ -1,12 +1,11 @@
 import Foundation
 
 extension GameStore {
-    /// The Trading Post owns its own persisted refresh sequence until the campaign-wide
-    /// ExpeditionOutcomeID migration lands. Calling this inside the one atomic return mutation
-    /// means each resolved expedition advances stock exactly once, including anchored revisits.
-    nonisolated static func refreshTradingPost(after run: WorldRun, in state: inout GameState) {
-        let receipt = state.base.tradingPost.refreshSequence &+ 1
-        TradingPostRules.refresh(after: receipt, campaignSeed: run.mapSeed, in: &state.base)
+    /// Consumes the campaign-wide receipt inside the atomic return mutation, so each resolved
+    /// expedition advances stock exactly once, including anchored revisits.
+    nonisolated static func refreshTradingPost(after run: WorldRun, outcomeID: ExpeditionOutcomeID,
+                                               in state: inout GameState) {
+        TradingPostRules.refresh(after: outcomeID, campaignSeed: run.mapSeed, in: &state.base)
     }
 
     @discardableResult

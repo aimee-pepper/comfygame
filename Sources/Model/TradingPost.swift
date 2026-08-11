@@ -7,7 +7,7 @@ struct TradingPostState: Codable, Equatable, Sendable {
 
     var stockSchemaVersion: Int = Self.schemaVersion
     var refreshSequence: UInt64 = 0
-    var expeditionOutcomeID: UInt64?
+    var expeditionOutcomeID: ExpeditionOutcomeID?
     var campaignSeed: UInt64?
     var stock: [TradingPostStockLine] = []
     var essenceBundlesRemaining: Int = 0
@@ -26,7 +26,7 @@ struct TradingPostState: Codable, Equatable, Sendable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         stockSchemaVersion = try c.decodeIfPresent(Int.self, forKey: .stockSchemaVersion) ?? Self.schemaVersion
         refreshSequence = try c.decodeIfPresent(UInt64.self, forKey: .refreshSequence) ?? 0
-        expeditionOutcomeID = try c.decodeIfPresent(UInt64.self, forKey: .expeditionOutcomeID)
+        expeditionOutcomeID = try c.decodeIfPresent(ExpeditionOutcomeID.self, forKey: .expeditionOutcomeID)
         campaignSeed = try c.decodeIfPresent(UInt64.self, forKey: .campaignSeed)
         stock = try c.decodeIfPresent([TradingPostStockLine].self, forKey: .stock) ?? []
         essenceBundlesRemaining = max(0, try c.decodeIfPresent(Int.self,
