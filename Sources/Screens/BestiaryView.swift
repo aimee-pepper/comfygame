@@ -11,6 +11,7 @@ import SwiftUI
 /// keeps a late find meaningful once your own distribution has drifted (*largest as they come*).
 struct BestiaryView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var opened: BestiaryRules.Entry?
 
     private var entries: [BestiaryRules.Entry] {
@@ -25,9 +26,14 @@ struct BestiaryView: View {
                         EmptyNote("Everything you meet out there is written up here — what it was, and how the one you met compared.")
                     }
                 } else {
-                    StationCard(title: "Kinds met — \(entries.count)", icon: "pawprint.fill") {
+                    HStack {
+                        Label("Kinds met", systemImage: "pawprint.fill").font(.headline)
+                        Spacer()
+                        Text("\(entries.count)").font(.headline.monospacedDigit()).foregroundStyle(.secondary)
+                    }
+                    LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(entries) { entry in
-                            Button { opened = entry } label: { row(entry) }
+                            Button { opened = entry } label: { tile(entry) }
                                 .buttonStyle(.plain)
                         }
                     }
@@ -43,11 +49,18 @@ struct BestiaryView: View {
         }
     }
 
-    private func row(_ entry: BestiaryRules.Entry) -> some View {
-        HStack(spacing: 10) {
+    private var columns: [GridItem] {
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+    }
+
+    private func tile(_ entry: BestiaryRules.Entry) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
             Image(systemName: entry.icon)
+                .font(.title)
                 .foregroundStyle(.tint)
-                .frame(width: 24)
+                .frame(width: 40, height: 40)
             VStack(alignment: .leading, spacing: 1) {
                 Text(entry.name.capitalisedSentence).font(.callout.weight(.medium))
                 if entry.isApexSpecies {
@@ -59,11 +72,15 @@ struct BestiaryView: View {
                      : "met \(entry.timesEncountered) times · \(entry.specimens.count) kept")
                     .font(.caption2).foregroundStyle(.secondary)
             }
-            Spacer(minLength: 6)
-            Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .font(.caption2).foregroundStyle(.tertiary)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .frame(minHeight: 44)
-        .contentShape(Rectangle())
+        .padding(14)
+        .frame(maxWidth: .infinity, minHeight: 160, alignment: .topLeading)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .contentShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 

@@ -11,6 +11,7 @@ import SwiftUI
 /// and two rule lists, and the party is heading for five.
 struct PartyRosterView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var opened: PartySlot?
 
     var body: some View {
@@ -23,9 +24,11 @@ struct PartyRosterView: View {
                                value: "\(store.state.base.inventory.slots) slots")
                 }
 
-                ForEach(store.partySlots) { slot in
-                    Button { opened = slot } label: { card(slot) }
-                        .buttonStyle(.plain)
+                LazyVGrid(columns: columns, spacing: 12) {
+                    ForEach(store.partySlots) { slot in
+                        Button { opened = slot } label: { card(slot) }
+                            .buttonStyle(.plain)
+                    }
                 }
             }
             .padding(16)
@@ -38,25 +41,38 @@ struct PartyRosterView: View {
         }
     }
 
+    private var columns: [GridItem] {
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+    }
+
     /// Thumbnail and brief stats. Enough to choose who to open, and nothing more.
     private func card(_ slot: PartySlot) -> some View {
         let character = store.character(of: slot)
         let isComing = store.state.base.partyMembers.contains(slot)
-        return StationCard(title: store.name(of: slot), icon: icon(slot)) {
-            HStack(spacing: 14) {
-                statChip("Level", "\(character.level)")
-                statChip("Health", "\(health(slot))")
-                statChip("Rank", character.rank.displayName)
-                Spacer(minLength: 0)
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                Image(systemName: icon(slot))
+                    .font(.title)
+                    .foregroundStyle(.tint)
+                    .frame(width: 40, height: 40)
+                Spacer()
                 if isComing {
                     Text("with you")
                         .font(.caption2.weight(.medium)).foregroundStyle(.green)
                         .padding(.horizontal, 7).padding(.vertical, 3)
                         .background(Color.green.opacity(0.14), in: Capsule())
                 }
-                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
             }
-            .frame(minHeight: 30)
+            Text(store.name(of: slot)).font(.headline)
+            HStack(spacing: 12) {
+                statChip("Level", "\(character.level)")
+                statChip("Health", "\(health(slot))")
+            }
+            Text(character.rank.displayName)
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
             // A nudge if something better is sitting unworn, so you know which card to open.
             if GearSlot.allCases.contains(where: { store.hasUpgradeAvailable(for: $0, slot: slot) }) {
@@ -64,7 +80,16 @@ struct PartyRosterView: View {
                     .font(.caption2).foregroundStyle(.green)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
+        .padding(14)
+        .frame(maxWidth: .infinity, minHeight: 190, alignment: .topLeading)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .contentShape(RoundedRectangle(cornerRadius: 14))
     }
 
     private func statChip(_ label: String, _ value: String) -> some View {
