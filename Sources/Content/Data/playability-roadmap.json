@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "5e97ef4 · Binder-anchored encounter scaling",
+  "installedCheckpoint": "bd2b5d2 · Immutable world-color bind receipts",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 encounter scaling phone comparison + P0 world-grade-2 handoff correction",
-  "currentNote": "Binder-anchored additive party pressure is installed and ready for Aimee's two- and five-person ordinary/apex comparison. The durable bug queue and real Share fallback are checkpointed; direct delivery still waits for an approved relay endpoint and Keychain credential. World-grade-2 remains held while Asset corrects per-species flora relationships and explicit all-12-ground ownership in the immutable native handoff.",
+  "currentWork": "P0 world-grade-2 phone color + grayscale acceptance",
+  "currentNote": "Checkpoint bd2b5d2 freezes deterministic bind-time color receipts, persists the same receipt in the active world and History, and renders it through the accepted native compositor without changing fog, resources or geometry. Legacy bound worlds remain world-grade-1. Physical-phone color and literal grayscale still gate promotion.",
   "items": [
     {
       "id": "essence",
@@ -162,9 +162,9 @@
       "id": "world-color",
       "priority": "P0",
       "title": "Meaningful world color differentiation",
-      "status": "inProgress",
-      "detail": "Repeated world palettes are materially reducing exploration readability. The keyed v0.2 calibration is accepted, but it is not a native handoff: Asset must freeze the production descriptor/schema/version tuple and publish immutable command/RGBA vectors before Engineering integration.",
-      "gate": "Asset handoff declares integrationReady:true and pins schema + manifest hashes, canonical descriptor encoding, resolver/palette/renderer versions, command/RGBA/geometry vectors and legacy-v1 migration. Then native visual distance must track meaningful authored and resolved input distance: similar worlds remain related, while opposed worlds separate proportionally, with no universal uniqueness or arbitrary neutral-world variety. Authority: docs/world-color-differentiation-current.md."
+      "status": "readyToTest",
+      "detail": "Checkpoint bd2b5d2 integrates the accepted pack, frozen game-owned bind adapter, canonical receipt self-hash, immutable run/History persistence and exact native renderer/cache selection. No raw Illumination/Vitality or temperature/wetness tint is used.",
+      "gate": "New binds freeze the exact accepted descriptor while legacy bound/anchored worlds remain world-grade-1; save/load/redraw/cache/fog/geometry tests pass; native color and literal grayscale show proportionate differentiation while similar worlds may remain related. Authority: docs/world-color-differentiation-current.md and docs/world-grade-2-native-handoff-current.md."
     },
     {
       "id": "bug-reporter",
