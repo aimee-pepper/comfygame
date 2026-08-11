@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "2af9300 · explicit Anchorage settlement",
+  "installedCheckpoint": "56535c5 · exclusive person placement",
   "essenceBaseline": "a816113",
   "currentWork": "P1 bug-report delivery + save-slot phone acceptance",
   "currentNote": "Independent campaign saves and the hardened local bug-report outbox are installed for phone acceptance. Reports now include exact route, safe campaign/encounter context, active tuning and a bounded semantic action trail. Direct delivery remains pending an approved relay endpoint and Keychain credential.",
@@ -61,6 +61,14 @@
       "status": "readyToTest",
       "detail": "Every due realm now requires an explicit Sustain or Let rest choice. The sticky summary shows payment, remaining Essence, authored-bind runway and rest count; incomplete or unaffordable matrices are rejected before mutation.",
       "gate": "On phone, no-touch Confirm remains disabled; a mixed decision pays only sustained realms, rests only named realms and keeps every realm recoverable."
+    },
+    {
+      "id": "person-placement",
+      "priority": "P1",
+      "title": "Exclusive person placement",
+      "status": "readyToTest",
+      "detail": "Firepit transfers now distinguish Home, active Party and realm postings; taking a worker previews and atomically applies production/shortfall changes, returning sends them Home, and contradictory legacy projections reconcile deterministically.",
+      "gate": "Phone flow cannot leave one person travelling and producing remotely; keeper benefits pause visibly; Binder-only parties survive relaunch. Stable-ID migration remains one later cross-system boundary."
     },
     {
       "id": "save-slots",
