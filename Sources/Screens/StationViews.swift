@@ -11,8 +11,10 @@ struct DistilleryView: View {
                 StationCard(title: "Crystallise", icon: "diamond.fill") {
                     Text("A stable blank. Quartz is the lattice; essence remains the thing being held.")
                         .font(.caption).foregroundStyle(.secondary)
-                    LabeledRow(icon: "drop.fill", label: "Essence", value: "40")
-                    LabeledRow(icon: "diamond", label: "Quartz", value: "2")
+                    LabeledRow(icon: "drop.fill", label: "Essence",
+                               value: "\(DistilleryRules.blankEssence)")
+                    LabeledRow(icon: "diamond", label: "Quartz",
+                               value: "\(DistilleryRules.blankQuartz)")
                     Button("Crystallise essence") { store.crystalliseEssence() }
                         .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
                         .disabled(!DistilleryRules.canCrystallise(in: store.state))
@@ -45,8 +47,12 @@ struct DistilleryView: View {
                 }
                 if attunement == .caustic {
                     Picker("Catalyst", selection: $causticCatalyst) {
-                        Text("2 Toxin").tag(Resources.toxin)
-                        Text("1 Ichor").tag(Resources.ichor)
+                        ForEach(DistilleryRules.requirement(for: attunement).catalysts,
+                                id: \.resource) { option in
+                            let name = ContentCatalog.shared.resource(option.resource)?.name
+                                ?? option.resource.rawValue.capitalisedSentence
+                            Text("\(option.amount) \(name)").tag(option.resource)
+                        }
                     }.pickerStyle(.segmented)
                 }
                 if let chosen {
@@ -65,11 +71,22 @@ struct DistilleryView: View {
     }
 
     private func requirement(_ value: CoreAttunement) -> String {
-        switch value {
-        case .heat: "15 essence · 2 Sulfur · reactive 60+, insulating 25+ sample"
-        case .caustic: "15 essence · 2 Toxin or 1 Ichor · reactive reagent/toxin/ichor sample"
-        case .light: "15 essence · 2 Silver · lustrous 60+, hard 30+ sample"
+        let rule = DistilleryRules.requirement(for: value)
+        let catalyst = rule.catalysts.map { option in
+            let name = ContentCatalog.shared.resource(option.resource)?.name
+                ?? option.resource.rawValue.capitalisedSentence
+            return "\(option.amount) \(name)"
+        }.joined(separator: " or ")
+        var sample: [String] = []
+        if let kinds = rule.allowedKinds {
+            sample.append(kinds.sorted { $0.rawValue < $1.rawValue }
+                .map(\.displayName).joined(separator: "/"))
         }
+        if let minimum = rule.minimumReactivity { sample.append("reactive \(Int(minimum))+") }
+        if let minimum = rule.minimumInsulation { sample.append("insulating \(Int(minimum))+") }
+        if let minimum = rule.minimumLustre { sample.append("lustrous \(Int(minimum))+") }
+        if let minimum = rule.minimumHardness { sample.append("hard \(Int(minimum))+") }
+        return (["\(rule.essence) essence", catalyst] + sample).joined(separator: " · ") + " sample"
     }
     private func coreIcon(_ value: CoreAttunement) -> String {
         switch value { case .heat: "flame.circle.fill"; case .caustic: "drop.triangle.fill"; case .light: "sun.max.circle.fill" }

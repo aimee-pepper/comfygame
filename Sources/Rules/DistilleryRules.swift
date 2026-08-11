@@ -7,6 +7,45 @@ enum DistilleryRules {
     static let blankQuartz = 2
     static let attuneEssence = 15
 
+    struct AttunementRequirement: Sendable {
+        let essence: Int
+        let catalysts: [(resource: ResourceID, amount: Int)]
+        let allowedKinds: Set<MaterialKind>?
+        let minimumReactivity: Double?
+        let minimumInsulation: Double?
+        let minimumLustre: Double?
+        let minimumHardness: Double?
+
+        func accepts(_ sample: MaterialSample) -> Bool {
+            if let allowedKinds, !allowedKinds.contains(sample.kind) { return false }
+            if let minimumReactivity, sample.properties.reactivity < minimumReactivity { return false }
+            if let minimumInsulation, sample.properties.insulation < minimumInsulation { return false }
+            if let minimumLustre, sample.properties.lustre < minimumLustre { return false }
+            if let minimumHardness, sample.properties.hardness < minimumHardness { return false }
+            return true
+        }
+    }
+
+    static func requirement(for attunement: CoreAttunement) -> AttunementRequirement {
+        switch attunement {
+        case .heat:
+            AttunementRequirement(essence: attuneEssence,
+                catalysts: [(Resources.sulfur, 2)], allowedKinds: nil,
+                minimumReactivity: 60, minimumInsulation: 25,
+                minimumLustre: nil, minimumHardness: nil)
+        case .caustic:
+            AttunementRequirement(essence: attuneEssence,
+                catalysts: [(Resources.toxin, 2), (Resources.ichor, 1)],
+                allowedKinds: [.reagent, .toxin, .ichor], minimumReactivity: 60,
+                minimumInsulation: nil, minimumLustre: nil, minimumHardness: nil)
+        case .light:
+            AttunementRequirement(essence: attuneEssence,
+                catalysts: [(Resources.silver, 2)], allowedKinds: nil,
+                minimumReactivity: nil, minimumInsulation: nil,
+                minimumLustre: 60, minimumHardness: 30)
+        }
+    }
+
     struct Candidate: Equatable, Identifiable, Sendable {
         var binID: InstanceID
         var sampleIndex: Int
@@ -16,18 +55,17 @@ enum DistilleryRules {
     }
 
     static func candidates(for attunement: CoreAttunement, in state: GameState) -> [Candidate] {
-        state.base.inventory.stacks.flatMap { bin in
+        let requirement = requirement(for: attunement)
+        return state.base.inventory.stacks.flatMap { bin in
             bin.materials.enumerated().compactMap { index, sample in
+                guard requirement.accepts(sample) else { return nil }
                 let relevant: Double
                 switch attunement {
                 case .heat:
-                    guard sample.properties.reactivity >= 60, sample.properties.insulation >= 25 else { return nil }
                     relevant = sample.properties.reactivity
                 case .caustic:
-                    guard [.reagent, .toxin, .ichor].contains(sample.kind), sample.properties.reactivity >= 60 else { return nil }
                     relevant = sample.properties.reactivity
                 case .light:
-                    guard sample.properties.lustre >= 60, sample.properties.hardness >= 30 else { return nil }
                     relevant = sample.properties.lustre
                 }
                 return Candidate(binID: bin.id, sampleIndex: index, sample: sample,
@@ -37,11 +75,7 @@ enum DistilleryRules {
     }
 
     static func catalystOptions(for attunement: CoreAttunement) -> [(ResourceID, Int)] {
-        switch attunement {
-        case .heat: [(Resources.sulfur, 2)]
-        case .caustic: [(Resources.toxin, 2), (Resources.ichor, 1)]
-        case .light: [(Resources.silver, 2)]
-        }
+        requirement(for: attunement).catalysts.map { ($0.resource, $0.amount) }
     }
 
     static func potency(for candidate: Candidate) -> Int {
@@ -69,14 +103,16 @@ enum DistilleryRules {
 
     static func canAttune(_ attunement: CoreAttunement, candidate: Candidate,
                           catalyst: ResourceID, in state: GameState) -> Bool {
+        let requirement = requirement(for: attunement)
         guard state.base.station(Stations.distillery).isUnlocked,
-              state.base.essence >= attuneEssence,
+              state.base.essence >= requirement.essence,
               candidates(for: attunement, in: state).contains(candidate),
-              let required = catalystOptions(for: attunement).first(where: { $0.0 == catalyst }),
-              state.base.resources[catalyst] >= required.1,
+              let required = requirement.catalysts.first(where: { $0.resource == catalyst }),
+              state.base.resources[catalyst] >= required.amount,
               state.base.inventory.stacks.contains(where: { $0.catalogID == Items.essenceCrystal && $0.count > 0 })
         else { return false }
-        let core = provenance(for: attunement, candidate: candidate, catalyst: required)
+        let core = provenance(for: attunement, candidate: candidate,
+                              catalyst: (required.resource, required.amount))
         return canStore(output(catalogID: item(for: attunement), core: core), in: state,
                         replacingOneBlank: true, consuming: candidate)
     }
@@ -84,13 +120,15 @@ enum DistilleryRules {
     @discardableResult
     static func attune(_ attunement: CoreAttunement, candidate: Candidate,
                        catalyst: ResourceID, in state: inout GameState) -> Bool {
+        let requirement = requirement(for: attunement)
         guard canAttune(attunement, candidate: candidate, catalyst: catalyst, in: state),
-              let required = catalystOptions(for: attunement).first(where: { $0.0 == catalyst }) else { return false }
-        let core = provenance(for: attunement, candidate: candidate, catalyst: required)
+              let required = requirement.catalysts.first(where: { $0.resource == catalyst }) else { return false }
+        let catalystReceipt = (required.resource, required.amount)
+        let core = provenance(for: attunement, candidate: candidate, catalyst: catalystReceipt)
         guard removeOne(catalogID: Items.essenceCrystal, from: &state.base.inventory),
               remove(candidate: candidate, from: &state.base.inventory) else { return false }
-        state.base.essence -= attuneEssence
-        state.base.resources.spend(required.1, of: catalyst)
+        state.base.essence -= requirement.essence
+        state.base.resources.spend(required.amount, of: catalyst)
         return state.base.inventory.add(output(catalogID: item(for: attunement), core: core, in: state))
     }
 

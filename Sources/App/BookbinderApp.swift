@@ -4,7 +4,7 @@ import UIKit
 
 @main
 struct BookbinderApp: App {
-    @StateObject private var launch = AppLaunchCoordinator()
+    @StateObject private var campaign: CampaignAppCoordinator
     @StateObject private var settings = AppSettings()
     @Environment(\.scenePhase) private var scenePhase
 
@@ -17,15 +17,16 @@ struct BookbinderApp: App {
             let visualStore = GameStore(io: .temporary(name: "visual-world"))
             visualStore.resetEverything()
             _ = visualStore.bindAndDepart()
-            _launch = StateObject(wrappedValue: AppLaunchCoordinator(readyStore: visualStore))
+            _campaign = StateObject(wrappedValue: CampaignAppCoordinator(readyStore: visualStore))
             return
         }
 #endif
+        _campaign = StateObject(wrappedValue: CampaignAppCoordinator())
     }
 
     var body: some Scene {
         WindowGroup {
-            LaunchRootView(coordinator: launch)
+            CampaignAppRootView(coordinator: campaign)
                 .environmentObject(settings)
                 // nil follows the phone; light/dark override it.
                 .preferredColorScheme(settings.theme.colorScheme)
@@ -33,7 +34,7 @@ struct BookbinderApp: App {
         .onChange(of: scenePhase) { _, phase in
             // Leaving .active is the last reliable moment before iOS may suspend or kill us.
             // Write synchronously here rather than trusting the debounce to land.
-            if phase != .active { launch.store?.flushNow() }
+            if phase != .active { campaign.store?.flushNow() }
         }
     }
 }
@@ -178,7 +179,7 @@ private struct LaunchRootView: View {
     }
 }
 
-private struct LaunchSurface: View {
+struct LaunchSurface: View {
     var failure: AppLaunchCoordinator.Failure?
     var retry: (() -> Void)?
 

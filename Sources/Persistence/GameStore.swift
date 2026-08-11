@@ -18,6 +18,9 @@ import OSLog
 ///  - Writes go through one serial queue, so they land in the order they were made.
 @MainActor
 final class GameStore: ObservableObject {
+    enum PreparationError: Error, Equatable {
+        case unrecoverableSave(String)
+    }
     struct PreparedLaunch: Sendable {
         var state: GameState
         var loadOutcome: String
@@ -40,7 +43,7 @@ final class GameStore: ObservableObject {
     /// you got there. Losing this to a force-quit costs nothing.
     @Published var recentEvents: [WorldRules.Event] = []
 
-    private let io: SaveFileIO
+    private let io: any GamePersistenceIO
     private let writeQueue = DispatchQueue(label: "com.aimeepepper.bookbinder.save", qos: .userInitiated)
     private var debounceTask: Task<Void, Never>?
 
@@ -48,7 +51,7 @@ final class GameStore: ObservableObject {
 
     /// Loads synchronously at launch: the app must never render a frame of state it might have
     /// to replace a moment later. The file is a few KB.
-    convenience init(io: SaveFileIO) {
+    convenience init(io: any GamePersistenceIO) {
         do {
             self.init(io: io, prepared: try Self.prepareLaunch(io: io))
         } catch {
@@ -63,7 +66,7 @@ final class GameStore: ObservableObject {
         }
     }
 
-    init(io: SaveFileIO, prepared: PreparedLaunch) {
+    init(io: any GamePersistenceIO, prepared: PreparedLaunch) {
         self.io = io
         self.state = prepared.state
         self.diagnostics = SaveDiagnostics(
@@ -76,11 +79,19 @@ final class GameStore: ObservableObject {
 
     /// All disk, decoding, catalogue reconciliation and the launch commitment can run before the
     /// main actor owns a store. The first SwiftUI frame therefore never waits behind file I/O.
-    nonisolated static func prepareLaunch(io: SaveFileIO) throws -> PreparedLaunch {
+    nonisolated static func prepareLaunch(io: any GamePersistenceIO) throws -> PreparedLaunch {
         let totalStart = DispatchTime.now().uptimeNanoseconds
         let loadStart = totalStart
         let outcome = io.load()
-        var state = outcome.state ?? GameState.newGame()
+        var state: GameState
+        switch outcome {
+        case .newGame:
+            state = GameState.newGame()
+        case .loaded(let loaded), .recoveredFromBackup(let loaded, _):
+            state = loaded
+        case .unrecoverable(let reason):
+            throw PreparationError.unrecoverableSave(reason)
+        }
         let loadedAt = DispatchTime.now().uptimeNanoseconds
 
         state.meta.launchCount += 1

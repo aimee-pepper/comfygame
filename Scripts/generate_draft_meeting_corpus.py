@@ -85,7 +85,7 @@ enum DraftMeetingCorpus {
 output = ROOT / "Sources" / "Content" / "DraftMeetingCorpus.generated.swift"
 if "--check" in sys.argv:
     if not output.exists() or output.read_text() != source:
-        print(f"{output.relative_to(ROOT)} is stale; regenerate with Scripts/generate_draft_meeting_corpus.py", file=sys.stderr)
+        print(f"{output.relative_to(ROOT)} is stale; regenerate with Scripts/generate_draft_meeting_corpus.py --write", file=sys.stderr)
         raise SystemExit(1)
 elif "--write" in sys.argv:
     output.write_text(source)

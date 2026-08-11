@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "4d8da72 · canonical resource collection art",
+  "installedCheckpoint": "a2feb67 · all 23 canonical resource identities",
   "essenceBaseline": "a816113",
-  "currentWork": "Recycler route + item identity QA",
-  "currentNote": "The phone now includes launch parity, canonical v0.6 resource art, Look, compact collection UI, corrected Library indexing and durable local bug-report export. Recycler rules are complete; the player-facing route is next without treating provisional Noll copy as canon.",
+  "currentWork": "P0 save slots + campaign chooser",
+  "currentNote": "Save-slot focused persistence tests are green: legacy adoption, corrupt/future isolation, exact export, stale-writer rejection and immediate Continue after switching. Full product regression, native A→B→A flow, Release/device build and corrected campaign-card evidence remain before install.",
   "items": [
     {
       "id": "essence",
@@ -53,6 +53,14 @@
       "status": "readyToTest",
       "detail": "Receipt-first and explicit authored-salvage rules are checkpointed with atomic stored/overflow handling; Noll and the player-facing station remain separate.",
       "gate": "Rules suite passed; phone station flow waits for approved Noll integration."
+    },
+    {
+      "id": "save-slots",
+      "priority": "P0 next",
+      "title": "Start, load and delete saves",
+      "status": "inProgress",
+      "detail": "After Engineering's active checkpoint, replace implicit single-save launch with a start screen offering Continue, New Game and a save list with safe load/delete controls. Each campaign keeps independent autosave state.",
+      "gate": "Existing single save migrates losslessly; new games never overwrite another slot; Continue chooses the most recently played valid slot; delete requires explicit confirmation and cannot strand the app; corrupted or incompatible slots fail visibly without harming healthy saves."
     },
     {
       "id": "noll",
@@ -125,6 +133,22 @@
       "status": "queued",
       "detail": "Audit game data, UI, debug tools, supporting docs and team process for duplicated or manually synchronized facts that should derive from one active source of truth.",
       "gate": "Inventory every duplicate authority; classify deliberate authored constants versus accidental mirrors; migrate safe cases with validation and archive history without turning settled design into generated content."
+    },
+    {
+      "id": "encounter-scaling",
+      "priority": "P1",
+      "title": "Party and apex difficulty",
+      "status": "queued",
+      "detail": "Full-party upper-median correctness and A/B/C profiles exist, but new and decoded tuning still default to Legacy level-only behavior. Test Recommended before promoting a real default.",
+      "gate": "Aimee plays ordinary and apex encounters with a developed five-person party under Recommended; then default/decode migration changes explicitly, with readable foe-count, apex durability and action-tempo evidence."
+    },
+    {
+      "id": "item-character-identities",
+      "priority": "P1",
+      "title": "Recognizable item and character tiles",
+      "status": "pending",
+      "detail": "Six-across layout is correct, but duplicated SF Symbols still collapse equipment families and generic people glyphs weaken Party/Library identity. Asset has accepted a first 30-item mapping; native consumption remains.",
+      "gate": "Stable authored identity survives Storehouse, loot, equipment, Trading Post and Recycler; named-character identity survives map, Party and Library; rarity, stats and array order never invent identity."
     }
   ],
   "paused": [

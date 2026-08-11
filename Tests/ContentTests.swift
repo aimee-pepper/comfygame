@@ -46,14 +46,21 @@ final class ContentTests: XCTestCase {
 #if DEBUG
     func testAuthoredTextAtlasAccountsForLiveAndReviewMeetingCorpora() {
         let inventory = AuthoredTextAtlas.inventory()
-        XCTAssertEqual(inventory.count, 28)
-        XCTAssertEqual(inventory.flatMap(\.units).filter { $0.kind == .diary }.count, 233)
-        XCTAssertEqual(inventory.filter { $0.traveller.meeting != nil }.count, 7)
-        XCTAssertEqual(inventory.filter { $0.traveller.meeting == nil }.count, 21)
-        XCTAssertEqual(DraftMeetingCorpus.meetings.count, 22,
-                       DraftMeetingCorpus.decodingError ?? "21 missing meetings plus Auber revision")
-        XCTAssertEqual(DraftMeetingCorpus.meetings.flatMap(\.exchanges).count, 66)
-        XCTAssertEqual(inventory.filter { $0.traveller.meeting == nil && $0.draftMeetingAvailable }.count, 21)
+        let catalogue = ContentCatalog.shared
+        let catalogueIDs = Set(catalogue.travellers.map(\.id))
+        let missingMeetingIDs = Set(catalogue.travellers.filter { $0.meeting == nil }.map(\.id))
+        let draftIDs = Set(DraftMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
+
+        XCTAssertEqual(Set(inventory.map(\.id)), catalogueIDs)
+        XCTAssertEqual(inventory.flatMap(\.units).filter { $0.kind == .diary }.count,
+                       catalogue.diaryPages.count)
+        XCTAssertEqual(Set(inventory.filter { $0.traveller.meeting == nil }.map(\.id)),
+                       missingMeetingIDs)
+        XCTAssertEqual(draftIDs, missingMeetingIDs.union(["auber"]),
+                       DraftMeetingCorpus.decodingError ?? "missing live meetings plus Auber revision")
+        XCTAssertTrue(DraftMeetingCorpus.meetings.allSatisfy { $0.exchanges.count == 3 })
+        XCTAssertEqual(Set(inventory.filter { $0.traveller.meeting == nil && $0.draftMeetingAvailable }
+            .map(\.id)), missingMeetingIDs)
         XCTAssertEqual(Set(inventory.flatMap(\.units).map(\.id)).count, inventory.flatMap(\.units).count)
         XCTAssertEqual(inventory.first { $0.id == "auber" }?.meetingState, "Live · revision draft")
         XCTAssertEqual(DraftMeetingCorpus.meeting(for: "bryn")?.exchanges.first?.id, "bryn.held_route")

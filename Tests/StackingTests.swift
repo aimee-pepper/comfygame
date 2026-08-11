@@ -1,6 +1,46 @@
 import XCTest
 @testable import Bookbinder
 
+final class DistilleryRequirementAuthorityTests: XCTestCase {
+    func testCatalystOptionsAreDerivedFromTheAttunementRequirement() {
+        for attunement in CoreAttunement.allCases {
+            let expected = DistilleryRules.requirement(for: attunement).catalysts
+            XCTAssertEqual(DistilleryRules.catalystOptions(for: attunement).map(\.0),
+                           expected.map(\.resource))
+            XCTAssertEqual(DistilleryRules.catalystOptions(for: attunement).map(\.1),
+                           expected.map(\.amount))
+        }
+    }
+
+    func testHeatCandidateThresholdUsesTheSharedRequirement() {
+        let requirement = DistilleryRules.requirement(for: .heat)
+        let accepted = MaterialSample(kind: .bone,
+            properties: MaterialProperties(insulation: 25, reactivity: 60),
+            grade: 50, source: "test")
+        let tooCold = MaterialSample(kind: .bone,
+            properties: MaterialProperties(insulation: 24, reactivity: 60),
+            grade: 50, source: "test")
+        XCTAssertTrue(requirement.accepts(accepted))
+        XCTAssertFalse(requirement.accepts(tooCold))
+    }
+
+    func testCausticKindAndLightPropertyThresholdsUseSharedRequirements() {
+        let reactiveReagent = MaterialSample(kind: .reagent,
+            properties: MaterialProperties(reactivity: 60), grade: 50, source: "test")
+        let reactiveBone = MaterialSample(kind: .bone,
+            properties: MaterialProperties(reactivity: 60), grade: 50, source: "test")
+        XCTAssertTrue(DistilleryRules.requirement(for: .caustic).accepts(reactiveReagent))
+        XCTAssertFalse(DistilleryRules.requirement(for: .caustic).accepts(reactiveBone))
+
+        let luminous = MaterialSample(kind: .quill,
+            properties: MaterialProperties(hardness: 30, lustre: 60), grade: 50, source: "test")
+        let tooSoft = MaterialSample(kind: .quill,
+            properties: MaterialProperties(hardness: 29, lustre: 60), grade: 50, source: "test")
+        XCTAssertTrue(DistilleryRules.requirement(for: .light).accepts(luminous))
+        XCTAssertFalse(DistilleryRules.requirement(for: .light).accepts(tooSoft))
+    }
+}
+
 /// Items stack, and materials bin by kind (decisions-session-16 §1).
 final class StackingTests: XCTestCase {
 

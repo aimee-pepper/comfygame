@@ -2,7 +2,7 @@
 
 **Status:** current cross-lead priority authority  
 **Owner:** Aimee; Game Design coordinates Engineering and Asset Design  
-**Updated:** 10 Aug 2026  
+**Updated:** 11 Aug 2026
 **Supersedes for scheduling:** feature-breadth ordering in `the-queue.md` and `state-of-the-build.md`
 where they conflict. Those files remain useful inventories and history.
 
@@ -13,7 +13,14 @@ real campaign loop repeatedly, find defects, and make balance judgments. Outside
 broad catalogue completeness, visual breadth and polished late-game content do not outrank a blocker
 she encounters in ordinary play.
 
-We work in **small check-in checkpoints**, not an unattended continuous queue:
+We normally work in **small check-in checkpoints**. Aimee explicitly authorized a temporary
+continuous-work exception on 10 Aug 2026 for the current game-blocking chain:
+`ExpeditionOutcomeID` → Trading Post → Vance integration. During that exception, leads continue
+through routine reversible decisions and report meaningful milestones without waiting for approval;
+new irreversible fiction, economy changes outside the settled bounds, and scope expansion still come
+back to Aimee.
+
+Each checkpoint still follows the same evidence discipline:
 
 1. agree on one player-visible outcome;
 2. Engineering produces a green simulator build and installs that exact checkpoint on Aimee's phone;
@@ -123,11 +130,12 @@ make**, and that provisional 10/15-Essence stations do not recreate the Essence 
 These are visible correctness fixes, but they do not outrank B0/B1 unless they prevent Aimee from
 reading or navigating the test world.
 
-### P1 — repeatable playtest observability
+### P0 after Trading Post/resource visuals — repeatable playtest observability
 
 - DEBUG Roadmap tab mirrors this file's checkpoint status and next test;
 - existing Balancing and Authored-Text Atlas remain development-only tools;
-- after B0/B1 pass, add the DEBUG bug reporter specified in `debug-bug-reporting-current.md`: one
+- immediately after the Trading Post/Vance checkpoint and resource-visual update, add the DEBUG bug
+  reporter specified in `debug-bug-reporting-current.md`: one
   persistent floating button, screenshot + build/context capture, player text, durable untriaged
   outbox and explicit transport state; Aimee never has to assign priority;
 - add deterministic grant/fixture actions only as a named test requires them; do not turn the debug
@@ -158,22 +166,15 @@ does not spend implementation attention on them.
 
 ## Current board
 
-| Priority | Checkpoint | State | Next proof / decision |
-|---|---|---|---|
-| A | Awareness housekeeping | **Complete — `5731aa9`, installed in `d12a8e8`** | 837/837 relevant product tests; phone launch passed |
-| B0 / B | Essence continuation | **Current Aimee playtest** | Three Recommended-profile returns; continue toward ten |
-| C | ExpeditionOutcomeID / atomic return | **Authorize only after B evidence** | Ordinary/collapse/anchored idempotence and relaunch |
-| D | Sell-first Trading Post engine | **Queued** | Sell/cancel/reload, anti-loop and one stock refresh |
-| E | Vance order 1 / 10e Trading Post | **Queued separately after D** | Fresh-campaign find/build/sell and old-save migration |
-| F | Independent Recycler engine | **Queued separately after E** | Recycle/reject/cancel/reload with one recovery route |
-| G | Noll order 2 + Halloway order 3 | **Needs Aimee identity/live-copy approval** | Find/build/order migration; no free Noll |
-| P1 | Halloway third / opening trio loop | **Queued after offloading** | Circulate → recover → retain/make playthrough |
-| P1 | Awareness foundation | **Green locally; install/checkpoint pending** | Exact phone build, commit and push |
-| P1 | Terrain border/elevation correction | **Asset contract ready; native integration pending** | Adjacent-height phone strip and full map |
-| P1 | Library/equipment/Base/Party/Bestiary spatial correction | **Green and pushed; phone install held during active play** | Install together after Aimee's current expedition; verify equipment ownership and hub readability |
-| P1 after blockers | In-game DEBUG bug reporter | **Designed / transport check-in pending** | Capture, submit, relaunch persistence and triage ingestion |
-| P1 after telemetry | Spring refining branch | **Designed; values need B0 evidence** | Batch control, 3:1 future conversion, outcome-safe auto-refine |
-| Paused | Breadth and outside-player polish | **Paused** | Reconsider only after B0/B1 pass |
+The operational status source of truth is
+`Sources/Content/Data/playability-roadmap.json`. The DEBUG Roadmap tab decodes that bundled file
+directly; it has no separate hard-coded Swift board. This Markdown remains authoritative for goals,
+scope, sequencing rationale and acceptance rules, while the JSON owns the actively changing state,
+current work, checkpoint IDs and concise gates. Do not recreate a second status table here.
+
+Every JSON item ID is stable across status changes so tests, bug reports and review notes can refer
+to the same checkpoint. A missing or invalid bundled board is a DEBUG build failure rather than an
+empty/stale screen.
 
 ## Check-in record
 
@@ -184,22 +185,26 @@ Add one short entry after each device checkpoint:
 | 10 Aug 2026 | `a816113` baseline | Roadmap established; Essence profile awaits focused run | Pending Aimee | Start B0 play; Engineering scopes B1a |
 | 10 Aug 2026 | `5731aa9` + `d12a8e8` | Awareness housekeeping plus Settings → Debug Tools tabs | 837/837 relevant product tests; signed iPhone build installed/launched 15:19 PT | Aimee runs B: three Recommended Essence expeditions |
 | 10 Aug 2026 | `0e10856` → `698ffde` | Complete equipment ownership plus Library/Base/Party/Bestiary spatial shells | Full product regression green; equipment 29/29 plus full-Storehouse identity fixture; simulator phone-size QA green; deliberately not installed during active play | Install/review at 20:24 check-in, after Aimee exits the current expedition |
+| 10 Aug 2026 | `a77c9dd` | Six-across item grids, XP source breakdown/duplicate-page guard, and corrected lifted terrain | 859/859 tests; signed device build succeeded, installed and launched on Aimee's iPhone at 20:54 PT | Continuous OutcomeID → Trading Post → Vance implementation; Aimee verifies the installed UI/terrain/XP fixes |
+| 10 Aug 2026 | `b709e7c` + `aa0d3b1` | Resource v0.6, lifted-terrain conformance, and DEBUG local bug reporter | 892/892 tests; Release build passed; both commits installed/launched on Aimee's phone | Playtest resource/sidewall evidence; finish real bug-report delivery without mislabelling local saves |
+| 11 Aug 2026 | `de2b71b` | Recycler engine, adjacent-tile Look, durable reporter queue/export, six-across Storehouse resources, anchored item details, compact Party and corrected Library indexing | 916/916 tests; Release device build passed; install held briefly for the launch-handoff parity correction | Update the bundled roadmap status in the install checkpoint; then phone-test the combined slice |
 
 ## Cross-lead notes
 
-- **Engineering:** HEAD/origin includes the green spatial checkpoints through `698ffde`; Aimee's
-  phone remains on the earlier playtest build so an active expedition is not interrupted. Awareness
-  housekeeping is committed and installed. Engineering
-  recommends outcome receipt → Trading Post engine → Vance integration → Recycler engine → Noll plus
-  Halloway order migration → physical end-to-end loop, with device evidence at each checkpoint.
-- **Asset Design:** Raw Essence and Blacksmith already have sufficient identities. Trading Post and
-  Recycler are absent from the authored-place catalogue. The only blocker-facing asset scope is a
-  compact economy grammar—Keep/Sell/Recycle/Cannot act/Preview/Confirm/Result—and distinct Trading Post/
-  Recycler silhouettes. Terrain and creature breadth pause.
+- **Engineering:** HEAD/origin and Aimee's phone include the local reporter checkpoint `aa0d3b1`.
+  On 11 Aug Engineering owns the independent Recycler checkpoint plus the contained Look/field-layout
+  and anchored item-detail work. It must not reopen accepted Trading Post/Vance/resource/terrain work
+  without contradictory play evidence. Device evidence remains required at each installable checkpoint.
+- **Asset Design:** Resource v0.6 and the native terrain contract are accepted. On 11 Aug Asset owns
+  the compact five-identity economy bridge and subsequent Recycler transaction-state proof. Player-
+  facing language must retain Aimee's settled **world resources** terminology rather than inventing a
+  separate generic “material sample” category. Prices, yields, eligibility and provenance rules stay
+  outside the icon layer.
 
-## Agreed first check-in
+## Historical first check-in sequence
 
-Engineering will not begin a new feature checkpoint until Aimee selects it. Cross-lead recommendation:
+This sequence governed the earlier playability reset and is retained as rationale. It is superseded
+for current scheduling by Aimee's continuous-work authorization above:
 
 1. **A — housekeeping only:** install, commit and push the already-green awareness slice; no added
    mechanics or redesign.

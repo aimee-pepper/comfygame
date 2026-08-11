@@ -1,6 +1,47 @@
 import Foundation
 import OSLog
 
+enum SaveLoadOutcome {
+    case newGame
+    case loaded(GameState)
+    case recoveredFromBackup(GameState, reason: String)
+    case unrecoverable(reason: String)
+
+    var state: GameState? {
+        switch self {
+        case .loaded(let state), .recoveredFromBackup(let state, _): state
+        case .newGame, .unrecoverable: nil
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .newGame: "new game (no save file)"
+        case .loaded: "loaded"
+        case .recoveredFromBackup(_, let reason): "recovered from backup (\(reason))"
+        case .unrecoverable(let reason): "unrecoverable (\(reason))"
+        }
+    }
+}
+
+protocol GamePersistenceIO: Sendable {
+    var saveURL: URL { get }
+    var saveFileByteCount: Int? { get }
+    func write(_ data: Data) throws
+    func load() -> SaveLoadOutcome
+    func deleteEverything()
+}
+
+// Preserve concise call sites after GameStore began accepting any persistence adapter.
+// Constraining the protocol extension to SaveFileIO keeps `.documents` and `.temporary(...)`
+// unambiguous while slot-backed stores continue to inject their own adapter explicitly.
+extension GamePersistenceIO where Self == SaveFileIO {
+    static var documents: SaveFileIO { SaveFileIO.documents }
+    static func temporary(name: String = UUID().uuidString) -> SaveFileIO {
+        SaveFileIO.temporary(name: name)
+    }
+}
+
 /// Reads and writes the single save file.
 ///
 /// Brief: one `Codable` game-state JSON in Documents, atomic writes, no SwiftData/CoreData in v0.
@@ -8,7 +49,7 @@ import OSLog
 /// writes to a sibling temp file and renames, so the save is never half-written, and the previous
 /// good save is kept alongside as a backup for the case where a save is unreadable for any other
 /// reason (schema mistake, disk trouble).
-struct SaveFileIO: Sendable {
+struct SaveFileIO: GamePersistenceIO {
     let directory: URL
     let fileName: String
 
@@ -59,30 +100,7 @@ struct SaveFileIO: Sendable {
 
     // MARK: - Loading
 
-    enum LoadOutcome {
-        case newGame
-        case loaded(GameState)
-        /// Main file was unreadable; the previous good save was used instead.
-        case recoveredFromBackup(GameState, reason: String)
-        /// Nothing readable. The unreadable files are quarantined, not deleted.
-        case unrecoverable(reason: String)
-
-        var state: GameState? {
-            switch self {
-            case .loaded(let state), .recoveredFromBackup(let state, _): state
-            case .newGame, .unrecoverable: nil
-            }
-        }
-
-        var description: String {
-            switch self {
-            case .newGame: "new game (no save file)"
-            case .loaded: "loaded"
-            case .recoveredFromBackup(_, let reason): "recovered from backup (\(reason))"
-            case .unrecoverable(let reason): "unrecoverable, quarantined (\(reason))"
-            }
-        }
-    }
+    typealias LoadOutcome = SaveLoadOutcome
 
     func load() -> LoadOutcome {
         guard saveFileExists else { return .newGame }

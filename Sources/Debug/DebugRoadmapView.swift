@@ -42,7 +42,7 @@ struct DebugRoadmapView: View {
         List {
             Section {
                 Label("Aimee is the sole tester for this phase.", systemImage: "person.fill")
-                Text("Essence continuity and early item offloading block feature breadth. We check in after each installed phone checkpoint.")
+                Text("Playable-loop blockers stay ahead of feature breadth. We check in after each installed phone checkpoint.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             } header: {
@@ -114,12 +114,13 @@ private struct RoadmapItemRow: View {
 
 enum DebugRoadmap {
     enum Status: String, Codable, Equatable {
-        case complete, readyToTest, next, queued, pending, paused
+        case complete, readyToTest, inProgress, next, queued, pending, paused
 
         var label: String {
             switch self {
             case .complete: "Complete"
             case .readyToTest: "Test now"
+            case .inProgress: "In progress"
             case .next: "Next"
             case .queued: "Queued"
             case .pending: "Pending"
@@ -131,6 +132,7 @@ enum DebugRoadmap {
             switch self {
             case .complete: "checkmark.circle.fill"
             case .readyToTest: "play.circle.fill"
+            case .inProgress: "hammer.circle.fill"
             case .next: "arrow.right.circle.fill"
             case .queued: "clock"
             case .pending: "wrench.and.screwdriver"
@@ -142,6 +144,7 @@ enum DebugRoadmap {
             switch self {
             case .complete: .green
             case .readyToTest: .green
+            case .inProgress: .blue
             case .next: .blue
             case .queued: .secondary
             case .pending: .orange

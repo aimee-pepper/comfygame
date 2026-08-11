@@ -12,8 +12,19 @@ import Foundation
 /// `MigrationTests` that loads a fixture of the old shape.
 enum Migrations {
 
+    struct FutureSchemaError: Error, Equatable, CustomStringConvertible {
+        let found: Int
+        let supported: Int
+        var description: String {
+            "save schema \(found) requires a newer Bookbinder build (this build supports \(supported))"
+        }
+    }
+
     static func migrateIfNeeded(_ data: Data) throws -> Data {
         let version = probeSchemaVersion(data) ?? Tuning.saveSchemaVersion
+        guard version <= Tuning.saveSchemaVersion else {
+            throw FutureSchemaError(found: version, supported: Tuning.saveSchemaVersion)
+        }
         guard version < Tuning.saveSchemaVersion else { return data }
 
         var working = data

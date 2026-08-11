@@ -11,6 +11,8 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertFalse(board.items.isEmpty)
         XCTAssertEqual(Set(board.items.map(\.id)).count, board.items.count,
                        "roadmap item IDs must remain stable and unique")
+        XCTAssertEqual(board.items.filter { $0.status == .inProgress }.count, 1,
+                       "the operational board must identify exactly one active checkpoint")
     }
 
     func testCompletedBlockersCannotRegressToQueuedInTheCurrentBoard() throws {

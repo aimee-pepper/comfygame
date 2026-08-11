@@ -400,6 +400,15 @@ final class PersistenceTests: XCTestCase {
         XCTAssertNil(store.state.worlds.activeRun)
     }
 
+    func testFutureSchemaIsRejectedBeforeTolerantDecodeCanRewriteIt() throws {
+        let future = Tuning.saveSchemaVersion + 1
+        let data = Data("{\"schemaVersion\":\(future),\"base\":{\"essence\":999}}".utf8)
+        XCTAssertThrowsError(try SaveCodec.decode(data)) { error in
+            XCTAssertEqual(error as? Migrations.FutureSchemaError,
+                           .init(found: future, supported: Tuning.saveSchemaVersion))
+        }
+    }
+
     // MARK: - Helpers
 
     @MainActor

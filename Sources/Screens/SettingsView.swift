@@ -4,6 +4,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var store: GameStore
+    @EnvironmentObject private var campaigns: CampaignAppCoordinator
 
     var body: some View {
         ScrollView {
@@ -51,6 +52,27 @@ struct SettingsView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.field-notes")
+
+                Button {
+                    campaigns.returnToCampaigns()
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "books.vertical").frame(width: 24)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Save games")
+                            Text("Return to the campaign chooser")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.backward")
+                            .font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+                    }
+                    .frame(minHeight: 44)
+                    .padding(14)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.save-games")
 
 #if DEBUG
                 NavigationLink {
