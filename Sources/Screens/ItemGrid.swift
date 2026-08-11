@@ -40,6 +40,7 @@ struct SixAcrossItemGrid<Data: RandomAccessCollection, ID: Hashable, Cell: View>
 /// A resource uses the same six-across spatial grammar as items, while keeping its identity and
 /// quantity legible without adding a prose label beneath every tile.
 struct ResourceIconTile: View {
+    let resourceID: ResourceID
     let icon: String
     let quantity: Int
     let accessibilityName: String
@@ -50,9 +51,8 @@ struct ResourceIconTile: View {
                 .fill(Color(.secondarySystemGroupedBackground))
             RoundedRectangle(cornerRadius: 9)
                 .strokeBorder(Color.accentColor.opacity(0.65), lineWidth: 1.5)
-            Image(systemName: icon)
-                .font(.system(size: 21, weight: .semibold))
-                .foregroundStyle(.tint)
+            ResourcePixelIdentity(id: resourceID, fallbackSystemIcon: icon)
+                .frame(width: 32, height: 32)
             VStack {
                 HStack {
                     Spacer()
@@ -131,6 +131,8 @@ where Item.ID: Equatable {
                     .popover(isPresented: isPresented, attachmentAnchor: .rect(.bounds),
                              arrowEdge: preferredArrowEdge) {
                         detail(item)
+                            .frame(idealWidth: 320, maxWidth: 340,
+                                   idealHeight: 360, maxHeight: 420)
                             .presentationCompactAdaptation(.popover)
                             .presentationBackgroundInteraction(.enabled)
                     }
@@ -149,6 +151,16 @@ where Item.ID: Equatable {
     private var sourceButton: some View {
         Button { selection = item } label: { label() }
             .buttonStyle(.plain)
+            .overlay {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(Color.primary, lineWidth: 3)
+                        .padding(1)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
+            .accessibilityAddTraits(isSelected ? .isSelected : [])
             .accessibilityFocused($sourceIsFocused)
             .background {
                 GeometryReader { proxy in

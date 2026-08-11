@@ -141,6 +141,7 @@ private struct DebugBugReportSheet: View {
                         .accessibilityLabel("What did you expect? Optional")
                 }
                 Section("Captured context") {
+                    LabeledContent("Roadmap checkpoint", value: DebugRoadmap.current.installedCheckpoint)
                     LabeledContent("Mode", value: draft.context.screen)
                     LabeledContent("Save schema", value: "\(draft.context.saveSchemaVersion)")
                     if let run = draft.context.runIndex { LabeledContent("Expedition", value: "\(run)") }
@@ -176,7 +177,7 @@ private struct DebugBugReportSheet: View {
     private func save() {
         let info = Bundle.main.infoDictionary ?? [:]
         let screenshot = includeScreenshot ? draft.screenshot : nil
-        let report = DebugBugReport(
+        var report = DebugBugReport(
             id: draft.id, createdAt: Date(), whatHappened: whatHappened,
             expected: expected, includesScreenshot: screenshot != nil,
             screenshotWidth: screenshot?.width, screenshotHeight: screenshot?.height,
@@ -188,6 +189,7 @@ private struct DebugBugReportSheet: View {
             runIndex: draft.context.runIndex, mapSeed: draft.context.mapSeed,
             playerX: draft.context.playerX, playerY: draft.context.playerY,
             stability: draft.context.stability, outcomeID: draft.context.outcomeID)
+        report.roadmapCheckpoint = DebugRoadmap.current.installedCheckpoint
         do {
             savedPackage = try DebugBugReportOutbox.live.save(report, screenshot: screenshot?.png)
             UIAccessibility.post(notification: .announcement, argument: "Saved on this phone — not yet shared")

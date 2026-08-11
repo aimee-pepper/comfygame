@@ -16,6 +16,7 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
     var screenshotScale: Double?
     var appVersion: String
     var build: String
+    var roadmapCheckpoint: String? = nil
     var screen: String
     var saveSchemaVersion: Int
     var mutationCount: Int

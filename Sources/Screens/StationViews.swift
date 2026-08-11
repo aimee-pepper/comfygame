@@ -464,7 +464,7 @@ struct StorehouseView: View {
                     } else {
                         SixAcrossItemGrid(data: resourceEntries, id: \.id) { entry in
                             AnchoredItemDetailButton(item: entry, selection: $openedResource) {
-                                ResourceIconTile(icon: entry.icon, quantity: entry.amount,
+                                ResourceIconTile(resourceID: entry.id, icon: entry.icon, quantity: entry.amount,
                                                  accessibilityName: entry.name)
                             } detail: { selected in
                                 StorehouseResourceDetail(entry: selected)
@@ -541,7 +541,7 @@ private struct StorehouseResourceDetail: View {
             List {
                 Section {
                     HStack(spacing: 16) {
-                        ResourceIconTile(icon: entry.icon, quantity: entry.amount,
+                        ResourceIconTile(resourceID: entry.id, icon: entry.icon, quantity: entry.amount,
                                          accessibilityName: entry.name)
                             .frame(width: 58, height: 58)
                         Text(entry.name).font(.headline)

@@ -141,6 +141,26 @@ struct MapTileArtRequest {
     }
 }
 
+/// The accepted Resource v0.6 identity without map substrate or animated sheen.
+/// Inventory and merchant grids use this same raster grammar as world nodes.
+struct ResourcePixelIdentity: View {
+    let id: ResourceID
+    let fallbackSystemIcon: String
+
+    var body: some View {
+        if let image = MapPixelRaster.resourceIdentityImage(for: id) {
+            Image(uiImage: image)
+                .resizable()
+                .interpolation(.none)
+                .antialiased(false)
+                .accessibilityHidden(true)
+        } else {
+            Image(systemName: fallbackSystemIcon)
+                .accessibilityHidden(true)
+        }
+    }
+}
+
 struct MapTileArt: View {
     let request: MapTileArtRequest
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -496,6 +516,17 @@ struct RGBA: Equatable {
 
 @MainActor private enum MapPixelRaster {
     static let cache = NSCache<NSString, UIImage>()
+
+    static func resourceIdentityImage(for id: ResourceID) -> UIImage? {
+        let key = "resource-static-v0.6-\(id.rawValue)" as NSString
+        if let cached = cache.object(forKey: key) { return cached }
+        let commands = ResourcePixelGrammar.bodyCommands(for: id)
+        guard !commands.isEmpty, let image = raster(commands: commands, width: 16, height: 16) else {
+            return nil
+        }
+        cache.setObject(image, forKey: key)
+        return image
+    }
 
     static func image(for request: MapTileArtRequest, tick: Int = 0, reduceMotion: Bool = false) -> UIImage? {
         let descriptor = request.flora.map(FloraRenderDescriptor.init)

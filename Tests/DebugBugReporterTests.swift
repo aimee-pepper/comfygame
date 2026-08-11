@@ -42,6 +42,16 @@ final class DebugBugReporterTests: XCTestCase {
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil).filter { !$0.lastPathComponent.hasPrefix(".") }.count, 1)
     }
 
+    func testReportCapturesTheActivelyBundledRoadmapCheckpoint() {
+        var report = DebugBugReport(id: UUID(), createdAt: Date(), whatHappened: "x", expected: "",
+            includesScreenshot: false, screenshotWidth: nil, screenshotHeight: nil, screenshotScale: nil,
+            appVersion: "1", build: "1", screen: "base", saveSchemaVersion: 1,
+            mutationCount: 0, lastAction: "new",
+            runIndex: nil, mapSeed: nil, playerX: nil, playerY: nil, stability: nil, outcomeID: nil)
+        report.roadmapCheckpoint = DebugRoadmap.current.installedCheckpoint
+        XCTAssertEqual(report.roadmapCheckpoint, DebugRoadmap.current.installedCheckpoint)
+    }
+
     func testDistinctReportsUseIndependentAtomicStagingDirectories() async throws {
         let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

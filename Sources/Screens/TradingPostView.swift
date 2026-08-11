@@ -24,12 +24,7 @@ struct TradingPostView: View {
                 } else {
                     SixAcrossItemGrid(data: listings, id: \.id) { listing in
                         AnchoredItemDetailButton(item: listing, selection: $opened) {
-                            ItemIconTile(icon: listing.icon,
-                                         rarity: listing.rarity,
-                                         quantity: listing.displayQuantity,
-                                         identified: true,
-                                         location: listing.location,
-                                         accessibilityName: listing.name)
+                            listingTile(listing)
                         } detail: { selected in
                             TradingPostListingSheet(listing: selected).environmentObject(store)
                         }
@@ -48,6 +43,18 @@ struct TradingPostView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Trading Post")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder private func listingTile(_ listing: TradingPostListing) -> some View {
+        if let resourceID = listing.action.resourceID {
+            ResourceIconTile(resourceID: resourceID, icon: listing.icon,
+                             quantity: listing.displayQuantity,
+                             accessibilityName: listing.name)
+        } else {
+            ItemIconTile(icon: listing.icon, rarity: listing.rarity,
+                         quantity: listing.displayQuantity, identified: true,
+                         location: listing.location, accessibilityName: listing.name)
+        }
     }
 
     private var wallet: some View {
@@ -190,10 +197,18 @@ private struct TradingPostListingSheet: View {
             List {
                 Section {
                     HStack(spacing: 16) {
-                        ItemIconTile(icon: listing.icon, rarity: listing.rarity,
-                                     quantity: listing.displayQuantity, identified: true,
-                                     location: listing.location, accessibilityName: listing.name)
-                            .frame(width: 58, height: 58)
+                        Group {
+                            if let resourceID = listing.action.resourceID {
+                                ResourceIconTile(resourceID: resourceID, icon: listing.icon,
+                                                 quantity: listing.displayQuantity,
+                                                 accessibilityName: listing.name)
+                            } else {
+                                ItemIconTile(icon: listing.icon, rarity: listing.rarity,
+                                             quantity: listing.displayQuantity, identified: true,
+                                             location: listing.location, accessibilityName: listing.name)
+                            }
+                        }
+                        .frame(width: 58, height: 58)
                         VStack(alignment: .leading, spacing: 4) {
                             Text(listing.name).font(.headline).foregroundStyle(listing.rarity.tint)
                             Text(listing.action.isPurchase ? "For sale" : "From your stores")
@@ -312,6 +327,16 @@ private struct TradingPostListing: Identifiable {
         var isAvailable: Bool {
             if case .unavailable = self { return false }
             return true
+        }
+
+        var resourceID: ResourceID? {
+            switch self {
+            case .buyStock(_, let kind):
+                if case .resource(let id) = kind { return id }
+                return nil
+            case .sellResource(let id): return id
+            default: return nil
+            }
         }
     }
 
