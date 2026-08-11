@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "2c3f3d4 · Compact world controls and dark lifted-tile backdrop",
+  "installedCheckpoint": "c8fde3d · Side-by-side Interact and Look control strip",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 generated-native item identity seam",
-  "currentNote": "Field controls are corrected in 2c3f3d4: D-pad left, minimap right, exactly Interact and Look beneath it, scrolling content above, and lifted-tile transparency over the dark game field. Engineering is now isolating a generated visual-pack consumer so Asset can publish item pixels without editing gameplay/screens.",
+  "currentWork": "P1 world encounter contact matrix",
+  "currentNote": "Generated item-pack validation and stable ItemID wiring are checkpointed in 0911e2c, awaiting Aimee-authored immutable art. Engineering is correcting contact rules so apexes and active flora are safe when adjacent and engage only on deliberate same-tile entry.",
   "items": [
     {
       "id": "essence",
@@ -194,9 +194,25 @@
       "id": "item-character-identities",
       "priority": "P1",
       "title": "Recognizable item and character tiles",
-      "status": "inProgress",
-      "detail": "Six-across layout is correct, but duplicated SF Symbols still collapse equipment families. Engineering is freezing the generic generated command/raster/ItemID seam while Asset prepares a closed catalogue-items-v1 manifest and generated registry; current fallback remains until that pack is integration-ready.",
+      "status": "queued",
+      "detail": "Checkpoint 0911e2c freezes strict generated command/raster validation and carries stable ItemID through Storehouse, loot, equipment, Blacksmith and Trading Post. Existing fallbacks remain until Aimee provides the immutable catalogue-items-v1 art/registry.",
       "gate": "Stable authored identity survives Storehouse, loot, equipment, Trading Post and Recycler; named-character identity survives map, Party and Library; rarity, stats and array order never invent identity."
+    },
+    {
+      "id": "combat-tree-v2",
+      "priority": "P1",
+      "title": "True combat trees and complete node consumers",
+      "status": "queued",
+      "detail": "Promote the accepted three true graphs through stable node ownership, lossless save migration, all shared consumer primitives and the native phone graph. Keep unresolved baseline ownership and Withdraw naming choices separable from topology and passive consumers.",
+      "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
+    },
+    {
+      "id": "world-contact",
+      "priority": "P1",
+      "title": "Deliberate world encounter contact",
+      "status": "inProgress",
+      "detail": "Correct apex and active-flora contact so adjacency remains safe and only deliberate same-tile entry begins combat; long auto-path stops adjacent before that final commitment.",
+      "gate": "Adjacent Look, wait and Interact never start apex/flora combat; direct entry does; ordinary roaming creatures still wake nearby but encounter only on contact. Authority: world-encounter-contact-current.md."
     }
   ],
   "paused": [
