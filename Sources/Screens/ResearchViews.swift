@@ -7,7 +7,7 @@ import SwiftUI
 /// better at; its nodes are the steps, and locked ones stay visible because seeing what you can't
 /// have yet is most of what makes a tree feel like a tree.
 ///
-/// The list of branches is a list; each one **opens onto its own screen**. Expanding four trees
+/// The branch hub is a compact tile grid; each subject **opens onto its own screen**. Expanding trees
 /// inside a scrolling card gave every one of them a fifth of the screen to draw itself in, and the
 /// trees were laid out sideways to cope — so reading a branch meant scrolling horizontally.
 /// The branches taught at one building.
@@ -19,17 +19,24 @@ import SwiftUI
 struct ResearchTree: View {
     /// Nil for the Workshop, which teaches everything nobody else does.
     var station: StationID?
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        VStack(spacing: 10) {
+        LazyVGrid(columns: columns, spacing: 12) {
             ForEach(ContentCatalog.shared.branchesInOrder.filter { $0.station == station }) { branch in
-                ResearchBranchRow(branch: branch)
+                ResearchBranchTile(branch: branch)
             }
         }
     }
+
+    private var columns: [GridItem] {
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+    }
 }
 
-private struct ResearchBranchRow: View {
+private struct ResearchBranchTile: View {
     @EnvironmentObject private var store: GameStore
     let branch: ResearchBranchDef
 
@@ -40,8 +47,8 @@ private struct ResearchBranchRow: View {
         NavigationLink {
             ResearchBranchScreen(branch: branch).environmentObject(store)
         } label: {
-            HStack(spacing: 10) {
-                Image(systemName: branch.icon).font(.title3).frame(width: 26).foregroundStyle(.tint)
+            VStack(alignment: .leading, spacing: 8) {
+                Image(systemName: branch.icon).font(.title).frame(width: 40, height: 40).foregroundStyle(.tint)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(branch.name).font(.headline).foregroundStyle(.primary)
                     Text(branch.blurb)
@@ -50,22 +57,25 @@ private struct ResearchBranchRow: View {
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                Spacer(minLength: 8)
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("\(progress.done)/\(progress.total)")
-                        .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
-                    // What's ready to buy right now, so a branch worth opening says so from here.
-                    if available > 0 {
-                        Text("\(available) ready")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(Color.accentColor)
+                Spacer(minLength: 0)
+                HStack(alignment: .bottom) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(progress.done)/\(progress.total)")
+                            .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                        // What's ready to buy right now, so a branch worth opening says so from here.
+                        if available > 0 {
+                            Text("\(available) ready")
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(Color.accentColor)
+                        }
                     }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
                 }
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
             }
-            .frame(minHeight: 44)
             .padding(14)
+            .frame(maxWidth: .infinity, minHeight: 168, alignment: .topLeading)
             .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
