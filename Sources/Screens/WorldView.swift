@@ -798,7 +798,7 @@ private struct MapGrid: View {
         // Concealed neighbours and the map boundary never fabricate a visible side wall.
         let southExposure = MapAssetContract.southExposure(
             center: tile, south: run.map.contains(south) ? run.map[south] : nil)
-        return MapTileArtRequest(tile: tile, point: point, mapSeed: run.mapSeed,
+        return MapTileArtRequest(tile: tile, point: point, mapSeed: run.mapSeed, runIndex: run.runIndex,
                                  adjacency: adjacency,
                                  southExposureLevels: southExposure,
                                  grade: grade,
@@ -891,8 +891,8 @@ private struct TileView: View {
         if let enemy { return enemy.icon }
         switch tile.content {
         case .empty: return nil
-        case .node(let node): return ContentCatalog.shared.resource(node.resource)?.icon ?? "cube"
-        case .wildDrop: return "sparkle"
+        case .node(let node): return useSimpleRenderer ? (ContentCatalog.shared.resource(node.resource)?.icon ?? "cube") : nil
+        case .wildDrop: return useSimpleRenderer ? "sparkle" : nil
         case .hazard: return "exclamationmark.triangle.fill"
         case .portal(let isEntry): return isEntry ? "arrow.down.left.circle" : "circle.circle"
         case .lockedCache: return "lock.fill"

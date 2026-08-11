@@ -68,6 +68,7 @@ struct MapTileArtRequest {
     let tile: Tile
     let point: GridPoint
     let mapSeed: UInt64
+    let runIndex: Int
     let adjacency: Int
     let southExposureLevels: Int
     let grade: WorldGrade
@@ -75,19 +76,19 @@ struct MapTileArtRequest {
     let explicitSeed: UInt32?
     let explicitFeatureVariant: Int?
 
-    init(tile: Tile, point: GridPoint, mapSeed: UInt64, adjacency: Int,
+    init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0, adjacency: Int,
          southExposureLevels: Int = 0, grade: WorldGrade,
          flora: Flora?, explicitSeed: UInt32? = nil) {
-        self.tile = tile; self.point = point; self.mapSeed = mapSeed; self.adjacency = adjacency
+        self.tile = tile; self.point = point; self.mapSeed = mapSeed; self.runIndex = runIndex; self.adjacency = adjacency
         self.southExposureLevels = southExposureLevels
         self.grade = grade; self.flora = flora; self.explicitSeed = explicitSeed
         self.explicitFeatureVariant = nil
     }
 
-    init(tile: Tile, point: GridPoint, mapSeed: UInt64, adjacency: Int,
+    init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0, adjacency: Int,
          southExposureLevels: Int = 0, grade: WorldGrade,
          flora: Flora?, explicitSeed: UInt32, explicitFeatureVariant: Int) {
-        self.tile=tile; self.point=point; self.mapSeed=mapSeed; self.adjacency=adjacency
+        self.tile=tile; self.point=point; self.mapSeed=mapSeed; self.runIndex=runIndex; self.adjacency=adjacency
         self.southExposureLevels=southExposureLevels
         self.grade=grade; self.flora=flora; self.explicitSeed=explicitSeed
         self.explicitFeatureVariant=explicitFeatureVariant
@@ -124,20 +125,50 @@ struct MapTileArtRequest {
     static func floraCacheKey(_ flora: Flora) -> String {
         MapPixelRaster.stableFloraKey(FloraRenderDescriptor(flora))
     }
+
+    static func resourcePixels(_ id: ResourceID, frame: Int? = nil) -> [UInt8] {
+        let body = ResourcePixelGrammar.bodyCommands(for: id)
+        let sheen = frame.map { ResourcePixelGrammar.sheenCommands(body: body, frame: $0) } ?? []
+        return MapPixelRaster.rawPixels(commands: body + sheen)
+    }
+
+    static func resourceSheenPhase(mapSeed: UInt64, runIndex: Int, point: GridPoint) -> UInt32 {
+        ResourcePixelGrammar.phase(mapSeed: mapSeed, runIndex: runIndex, point: point)
+    }
+
+    static func resourceSheenFrame(phase: UInt32, tick: Int) -> Int? {
+        ResourcePixelGrammar.frame(phase: phase, tick: tick)
+    }
 }
 
 struct MapTileArt: View {
     let request: MapTileArtRequest
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        Group {
-            if let image = MapPixelRaster.image(for: request) {
-                Image(uiImage: image)
-                    .resizable()
-                    .interpolation(.none)
+        if request.resourceID == nil {
+            image(tick: 0)
+        } else {
+            TimelineView(.periodic(from: .now, by: 0.36)) { context in
+                image(tick: Int(context.date.timeIntervalSinceReferenceDate / 0.36))
             }
         }
-        .accessibilityHidden(true)
+    }
+
+    @ViewBuilder private func image(tick: Int) -> some View {
+        if let image = MapPixelRaster.image(for: request, tick: tick, reduceMotion: reduceMotion) {
+            Image(uiImage: image).resizable().interpolation(.none).accessibilityHidden(true)
+        }
+    }
+}
+
+private extension MapTileArtRequest {
+    var resourceID: ResourceID? {
+        switch tile.content {
+        case .node(let node) where node.remainingHarvests > 0: node.resource
+        case .wildDrop(let resource, let amount) where amount > 0: resource
+        default: nil
+        }
     }
 }
 
@@ -251,6 +282,92 @@ private enum TerrainPixelGrammar {
         for (x,y,w,h) in patterns[variant-1] { c.append(rect(x, y, w, h, variant == 2 ? p[2] : p[0])) }
     }
 
+}
+
+/// Exact native port of AssetLab Resource v0.6's static identity bodies and sheen v1.1.
+/// Material accents are intentionally not world-graded: terrain owns atmosphere; these pixels own
+/// the promise that copper still looks like copper and gold still looks like gold.
+private enum ResourcePixelGrammar {
+    private enum Tone: Hashable { case dark, body, light, accent }
+    private struct Part { let x,y,w,h: Int; let tone: Tone }
+    private static let stone: [Tone: RGB] = [.dark: 0x36383b, .body: 0x686d70, .light: 0xaeb3b1]
+    private static let flora: [Tone: RGB] = [.dark: 0x263c28, .body: 0x53704c, .light: 0x92a963]
+    private static let unstable: [Tone: RGB] = [.dark: 0x25222d, .body: 0x514b60, .light: 0x8d819e]
+    private static let floraIDs: Set<ResourceID> = ["fiber","timber","pulp","toxin","spore","reagent"]
+    private static let accents: [ResourceID: RGB] = [
+        "rubble":0x8b8175,"clay":0xb87350,"ore":0x9b5b3c,"copper":0xb86f4b,
+        "silver":0xd8d9d4,"gold":0xe1ad43,"quartz":0xd9cae3,"obsidian":0x352c43,
+        "salt":0xeee8db,"sulfur":0xdbcf43,"mercury":0xcbd4d5,"adamant":0x63aaa5,
+        "resin":0xd39442,"ichor":0x87506f,"rift_glass":0x82c2c7,"essence_raw":0x8c82ca
+    ]
+
+    static func bodyCommands(for id: ResourceID) -> [PixelCommand] {
+        if id == "mote" { return [] }
+        if id == "essence_raw" {
+            return [rect(5,8,6,4,0x171614), rect(6,6,4,5,0x83b86b), rect(9,5,2,2,0xf4ead7)]
+        }
+        let palette = id == "rift_glass" ? unstable : (floraIDs.contains(id) ? flora : stone)
+        let accent = accents[id] ?? palette[.light]!
+        return parts(for: id).map { part in
+            let colour = part.tone == .accent ? accent : palette[part.tone]!
+            return rect(part.x, part.y, part.w, part.h, colour)
+        }
+    }
+
+    static func phase(mapSeed: UInt64, runIndex: Int, point: GridPoint) -> UInt32 {
+        let payload = "resource-sheen-1.1.0|\(mapSeed)|\(runIndex)|\(point.x)|\(point.y)"
+        return payload.utf8.reduce(UInt32(0x811c9dc5)) { ($0 ^ UInt32($1)) &* 0x01000193 }
+    }
+
+    static func frame(phase: UInt32, tick: Int) -> Int? {
+        let cycle = (Int(phase % 8) + tick % 8) % 8
+        return cycle >= 2 && cycle < 6 ? cycle - 2 : nil
+    }
+
+    static func sheenCommands(body: [PixelCommand], frame: Int) -> [PixelCommand] {
+        guard !body.isEmpty, (0..<4).contains(frame) else { return [] }
+        var occupied = Set<GridPoint>()
+        for command in body {
+            for y in command.y..<(command.y + command.height) where (0..<16).contains(y) {
+                for x in command.x..<(command.x + command.width) where (0..<16).contains(x) {
+                    occupied.insert(GridPoint(x: x, y: y))
+                }
+            }
+        }
+        let pixels = occupied.sorted { $0.y == $1.y ? $0.x < $1.x : $0.y < $1.y }
+        guard !pixels.isEmpty else { return [] }
+        let sweep = pixels.filter { ($0.x + $0.y - frame * 3 + 32) % 7 == 0 }.prefix(4)
+        let selected = sweep.isEmpty ? [pixels[(frame * 5) % pixels.count]] : Array(sweep)
+        return selected.map { rect($0.x, $0.y, 1, 1, 0xfff4cf) }
+    }
+
+    private static func p(_ x:Int,_ y:Int,_ w:Int,_ h:Int,_ tone:Tone)->Part { Part(x:x,y:y,w:w,h:h,tone:tone) }
+    private static func parts(for id: ResourceID) -> [Part] {
+        switch id.rawValue {
+        case "rubble": [p(1,10,5,4,.dark),p(5,7,5,7,.body),p(10,9,5,5,.dark),p(3,6,3,3,.light),p(10,5,3,4,.accent)]
+        case "clay": [p(2,10,12,4,.dark),p(3,8,10,4,.accent),p(5,6,7,3,.body),p(7,5,4,2,.light)]
+        case "ore": [p(2,8,4,6,.dark),p(5,5,7,9,.body),p(11,7,3,7,.dark),p(4,6,3,2,.accent),p(8,8,3,3,.accent),p(10,5,2,2,.light)]
+        case "copper": [p(3,3,3,11,.accent),p(6,5,5,3,.accent),p(9,3,3,4,.body),p(6,10,6,3,.accent),p(11,9,3,5,.light),p(2,12,5,2,.dark)]
+        case "silver": [p(2,5,3,3,.light),p(4,7,8,2,.accent),p(9,4,2,4,.light),p(11,7,3,5,.accent),p(6,9,2,5,.light),p(3,12,4,2,.body)]
+        case "gold": [p(2,10,5,4,.accent),p(7,8,4,5,.light),p(11,11,4,3,.accent),p(5,5,4,3,.accent),p(9,5,3,2,.light)]
+        case "quartz": [p(3,9,4,5,.body),p(6,3,4,11,.accent),p(10,7,4,7,.body),p(7,2,2,3,.light),p(11,6,2,3,.light)]
+        case "obsidian": [p(2,10,4,4,.dark),p(5,5,3,9,.accent),p(8,2,3,12,.dark),p(11,7,3,7,.accent),p(8,3,1,7,.light)]
+        case "salt": [p(2,9,5,5,.accent),p(6,4,5,5,.light),p(10,9,4,5,.body),p(3,10,2,2,.light),p(7,5,2,2,.body),p(11,10,2,2,.light)]
+        case "sulfur": [p(2,11,12,3,.body),p(3,7,4,4,.accent),p(7,5,4,6,.light),p(11,8,3,3,.accent),p(8,3,2,3,.accent)]
+        case "mercury": [p(1,10,14,4,.dark),p(2,9,11,4,.accent),p(5,7,7,4,.accent),p(10,6,3,3,.light),p(3,11,3,2,.body),p(13,8,2,2,.light)]
+        case "adamant": [p(4,3,8,2,.accent),p(2,5,12,7,.body),p(4,12,8,2,.dark),p(4,6,2,5,.accent),p(10,6,2,5,.accent),p(6,5,4,2,.light),p(6,10,4,2,.dark)]
+        case "fiber": [p(3,3,2,11,.light),p(6,2,2,12,.body),p(9,3,2,11,.light),p(12,4,2,10,.body),p(2,8,13,2,.accent)]
+        case "timber": [p(1,6,12,7,.dark),p(2,7,11,5,.body),p(12,7,3,5,.accent),p(13,8,1,3,.light),p(4,8,2,2,.accent),p(7,8,2,2,.dark)]
+        case "pulp": [p(2,10,12,3,.body),p(3,7,11,3,.light),p(4,4,9,3,.accent),p(11,3,3,2,.light),p(2,12,3,2,.dark)]
+        case "resin": [p(7,2,3,3,.light),p(6,4,5,6,.accent),p(4,9,9,4,.body),p(6,12,5,2,.dark),p(8,5,1,3,.light)]
+        case "toxin": [p(5,5,7,7,.body),p(7,3,3,3,.accent),p(3,7,3,3,.dark),p(11,7,3,3,.dark),p(7,8,3,3,.light),p(8,12,2,2,.accent)]
+        case "spore": [p(2,10,4,4,.body),p(6,5,3,3,.light),p(11,9,4,4,.accent),p(9,3,2,2,.body),p(5,12,2,2,.light),p(12,5,2,2,.light)]
+        case "reagent": [p(3,11,11,3,.dark),p(7,4,2,8,.body),p(3,6,5,3,.light),p(8,7,5,3,.accent),p(10,3,3,4,.light),p(5,10,3,3,.accent)]
+        case "ichor": [p(1,11,14,3,.dark),p(3,8,9,4,.accent),p(10,6,3,4,.body),p(5,5,2,4,.accent),p(11,4,2,3,.light)]
+        case "rift_glass": [p(2,6,4,8,.accent),p(4,3,3,9,.light),p(10,3,4,11,.accent),p(8,10,3,4,.dark),p(11,4,1,6,.light)]
+        default: []
+        }
+    }
 }
 
 fileprivate struct FloraRenderDescriptor: Codable, Equatable {
@@ -380,16 +497,33 @@ struct RGBA: Equatable {
 @MainActor private enum MapPixelRaster {
     static let cache = NSCache<NSString, UIImage>()
 
-    static func image(for request: MapTileArtRequest) -> UIImage? {
+    static func image(for request: MapTileArtRequest, tick: Int = 0, reduceMotion: Bool = false) -> UIImage? {
         let descriptor = request.flora.map(FloraRenderDescriptor.init)
         let floraKey = descriptor.map(stableFloraKey) ?? "none"
-        let key = "\(MapAssetContract.rendererTuple)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.southExposureLevels)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(request.grade.red),\(request.grade.green),\(request.grade.blue),\(request.grade.value)-\(floraKey)" as NSString
+        let phase = request.resourceID.map { _ in
+            ResourcePixelGrammar.phase(mapSeed: request.mapSeed, runIndex: request.runIndex, point: request.point)
+        }
+        let sheenFrame = reduceMotion ? phase.map { _ in 0 } : phase.flatMap { ResourcePixelGrammar.frame(phase: $0, tick: tick) }
+        let resourceKey = request.resourceID.map { "\($0.rawValue)-\(sheenFrame.map(String.init) ?? "rest")" } ?? "none"
+        let key = "\(MapAssetContract.rendererTuple)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.southExposureLevels)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(request.grade.red),\(request.grade.green),\(request.grade.blue),\(request.grade.value)-\(floraKey)-\(resourceKey)" as NSString
         if let cached = cache.object(forKey: key) { return cached }
         var commands = TerrainPixelGrammar.commands(for: request)
         if request.tile.isRevealed, !request.tile.isCrumbled, let descriptor {
             commands += FloraPixelGrammar.commands(for: descriptor).map {
                 PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
                              width: $0.width, height: $0.height, color: $0.color)
+            }
+        }
+        if request.tile.isRevealed, !request.tile.isCrumbled, let resource = request.resourceID {
+            let body = ResourcePixelGrammar.bodyCommands(for: resource)
+            let shifted = body.map { PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
+                                                   width: $0.width, height: $0.height, color: $0.color) }
+            commands += shifted
+            if let sheenFrame {
+                commands += ResourcePixelGrammar.sheenCommands(body: body, frame: sheenFrame).map {
+                    PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
+                                 width: $0.width, height: $0.height, color: $0.color)
+                }
             }
         }
         guard let image = raster(commands: commands, width: MapAssetContract.spriteWidth,
