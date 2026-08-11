@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "dbdb227 · save slots + secure bug-report context",
+  "installedCheckpoint": "be82418 · reporter context + placement/save corrections",
   "essenceBaseline": "a816113",
   "currentWork": "P1 bug-report delivery + save-slot phone acceptance",
-  "currentNote": "Independent campaign saves and the hardened local bug-report outbox are installed for phone acceptance. The HTTPS relay adapter is complete; direct delivery remains pending an approved relay endpoint and Keychain credential.",
+  "currentNote": "Independent campaign saves and the hardened local bug-report outbox are installed for phone acceptance. Reports now include exact route, safe campaign/encounter context, active tuning and a bounded semantic action trail. Direct delivery remains pending an approved relay endpoint and Keychain credential.",
   "items": [
     {
       "id": "essence",
@@ -59,8 +59,8 @@
       "priority": "P0",
       "title": "Start, load and delete saves",
       "status": "readyToTest",
-      "detail": "Checkpointed in 3549863: post-loading Continue/New/Load chooser, independent autosaves, lossless legacy adoption, safe details/delete/export and Settings return without relaunch.",
-      "gate": "Existing single save migrates losslessly; new games never overwrite another slot; Continue chooses the most recently played valid slot; delete requires explicit confirmation and cannot strand the app; corrupted or incompatible slots fail visibly without harming healthy saves."
+      "detail": "Checkpointed through be82418: post-loading Continue/New/Load chooser, independent autosaves, lossless legacy adoption, safe details/delete/export, Settings return without relaunch and active-slot-first Continue semantics.",
+      "gate": "Existing single save migrates losslessly; new games never overwrite another slot; Continue chooses the persisted active valid slot then falls back to the most recently played valid slot; delete requires explicit confirmation and cannot strand the app; corrupted or incompatible slots fail visibly without harming healthy saves."
     },
     {
       "id": "noll",
@@ -131,7 +131,7 @@
       "priority": "P1",
       "title": "In-game bug reporter",
       "status": "inProgress",
-      "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference and an idempotent HTTPS relay adapter are checkpointed. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
+      "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference, active DEBUG tuning, a bounded 20-action semantic trail and an idempotent HTTPS relay adapter are checkpointed. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
       "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete."
     },
     {
@@ -147,8 +147,8 @@
       "priority": "P1",
       "title": "Party and apex difficulty",
       "status": "queued",
-      "detail": "Full-party upper-median correctness and A/B/C profiles exist, but new and decoded tuning still default to Legacy level-only behavior. Test Recommended before promoting a real default.",
-      "gate": "Aimee plays ordinary and apex encounters with a developed five-person party under Recommended; then default/decode migration changes explicitly, with readable foe-count, apex durability and action-tempo evidence."
+      "detail": "Legacy still lacks party-size pressure and its hidden +level substitute is rejected. The queued candidate path-groups awake reachable real foes, converts whole shortfall to saved 55% affliction-free follow-ups plus bounded HP, and retains Profile B apex tempo without stacking both systems.",
+      "gate": "Grouping/HP/schedule/migration fixtures pass; then Aimee plays two- and five-person ordinary and apex fights. Recommended becomes the next-bound default only through explicit versioned migration, with active fights unchanged."
     },
     {
       "id": "item-character-identities",
