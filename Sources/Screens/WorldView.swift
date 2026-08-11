@@ -563,20 +563,61 @@ private struct WorldDiagnosticsView: View {
                 }
                 if let preview = run.activeEncounter?.scalingPreview {
                     Section("Encounter scaling") {
-                        LabeledRow(icon: "person.3", label: "Party levels / upper median",
-                                   value: "\(preview.partyLevels.map(String.init).joined(separator: ", ")) / \(preview.upperMedian)")
+                        LabeledRow(icon: "number", label: "Scaling rules",
+                                   value: preview.scalingRulesVersion ?? "historical-upper-median")
+                        if let ledger = preview.partyPowerLedger {
+                            LabeledRow(icon: "person.3", label: "Anchor / party power",
+                                       value: "L\(ledger.anchorLevel) · \(ledger.uncappedBudget.formatted(.number.precision(.fractionLength(3)))) → \(ledger.cappedBudget.formatted(.number.precision(.fractionLength(3))))")
+                            ForEach(Array(ledger.contributions.enumerated()), id: \.offset) { _, entry in
+                                LabeledRow(icon: entry.identity == "binder" ? "person.fill" : "person",
+                                           label: entry.identity,
+                                           value: "L\(entry.level) · ratio \(entry.rawLevelRatio.formatted(.number.precision(.fractionLength(3)))) · +\(entry.contribution.formatted(.number.precision(.fractionLength(3))))")
+                            }
+                        } else {
+                            LabeledRow(icon: "person.3", label: "Historical party levels / upper median",
+                                       value: "\(preview.partyLevels.map(String.init).joined(separator: ", ")) / \(preview.upperMedian)")
+                        }
                         LabeledRow(icon: "pawprint", label: "Visible foe IDs",
                                    value: preview.foeIDs.map { String($0.rawValue) }.joined(separator: ", "))
                         LabeledRow(icon: "circle.grid.cross", label: "Grouping radius / reasons",
                                    value: "\(preview.groupingRadius) · " + preview.inclusionReasons.keys.sorted().compactMap { foeID in
                                        preview.inclusionReasons[foeID].map { reason in "\(foeID): \(reason)" }
                                    }.joined(separator: "; "))
+                        if let excluded = preview.exclusionReasons, !excluded.isEmpty {
+                            LabeledRow(icon: "nosign", label: "Excluded map foes",
+                                       value: excluded.keys.sorted().compactMap { foeID in
+                                           excluded[foeID].map { "\(foeID): \($0)" }
+                                       }.joined(separator: "; "))
+                        }
                         LabeledRow(icon: "chart.bar", label: "Stability / greed level-equivalents",
                                    value: "\(preview.stabilityLevelContribution.formatted(.number.precision(.fractionLength(2)))) / \(preview.greedLevelContribution.formatted(.number.precision(.fractionLength(2))))")
-                        LabeledRow(icon: "scalemass", label: "Budget / visible / adjustment",
-                                   value: "\(preview.ordinaryBudget.formatted(.number.precision(.fractionLength(2)))) / \(preview.visibleFoeCount) / +\(preview.totalOrdinaryLevelAdjustment)")
-                        LabeledRow(icon: "dice", label: "Remainder roll / step",
-                                   value: "\(preview.remainderRoll) / +\(preview.remainderUpgrade)")
+                        if preview.scalingRulesVersion == EncounterScalingRules.additivePartyPowerRulesVersion {
+                            LabeledRow(icon: "scalemass", label: "Real foes / shortfall",
+                                       value: "\(preview.realFoeCount ?? preview.visibleFoeCount) / \((preview.shortfall ?? 0).formatted(.number.precision(.fractionLength(3))))")
+                            LabeledRow(icon: "arrow.turn.down.right", label: "Pressure slots / HP fraction",
+                                       value: "\(preview.wholePressureSlots ?? 0) / \((preview.totalHPAdditionFraction ?? 0).formatted(.percent.precision(.fractionLength(1))))")
+                            let allocations = preview.hpAllocationByFoeID ?? [:]
+                            LabeledRow(icon: "heart", label: "HP allocation",
+                                       value: allocations.isEmpty ? "none" : allocations.keys.sorted().map {
+                                           "\($0): +\(allocations[$0, default: 0])"
+                                       }.joined(separator: "; "))
+                            let slots = run.activeEncounter?.turnSlots.compactMap { slot -> String? in
+                                switch slot.kind {
+                                case .ordinaryPressureFollowUp(let ordinal):
+                                    return "\(slot.actor): lighter \(ordinal) @ \(slot.strengthMultiplier.formatted(.percent))"
+                                case .apexFollowUp(let ordinal):
+                                    return "\(slot.actor): apex \(ordinal) @ \(slot.strengthMultiplier.formatted(.percent))"
+                                case .primary: return nil
+                                }
+                            } ?? []
+                            LabeledRow(icon: "list.number", label: "Saved follow-up slots",
+                                       value: slots.isEmpty ? "none" : slots.joined(separator: "; "))
+                        } else {
+                            LabeledRow(icon: "scalemass", label: "Historical budget / visible / adjustment",
+                                       value: "\(preview.ordinaryBudget.formatted(.number.precision(.fractionLength(2)))) / \(preview.visibleFoeCount) / +\(preview.totalOrdinaryLevelAdjustment)")
+                            LabeledRow(icon: "dice", label: "Historical remainder roll / step",
+                                       value: "\(preview.remainderRoll) / +\(preview.remainderUpgrade)")
+                        }
                         LabeledRow(icon: "crown", label: "Apex floor · HP · offence · actions",
                                    value: "L\(preview.apexLevelFloor) · \(preview.apexHPMultiplier.formatted(.number.precision(.fractionLength(2))))× · \(preview.apexOffenceMultiplier.formatted(.number.precision(.fractionLength(2))))× · \(preview.apexActionSlots)")
                         ForEach(preview.finalFoes, id: \.id) { foe in

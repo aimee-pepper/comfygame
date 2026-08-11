@@ -119,7 +119,14 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
     }
 
     static let storageKey = "debug.tuning.profile.v1"
+    static let currentEncounterScalingProfileSchemaVersion = 2
     static let defaults = DebugTuningProfile()
+    static var legacyFrozenRunDefaults: DebugTuningProfile {
+        var value = DebugTuningProfile()
+        value.encounterScalingProfileSchemaVersion = 1
+        value.encounterScalingProfile = .current
+        return value
+    }
 
     var rawEssenceFrequencyMultiplier = 1.0
     var rawEssenceYieldMultiplier = 1.0
@@ -137,7 +144,10 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
     var activeFloraFrequencyMultiplier = 1.0
     var floraHazardSeverityMultiplier = 1.0
     var openingEncounterEnvelope: OpeningEncounterEnvelope = .natural
-    var encounterScalingProfile: EncounterScalingProfile = .current
+    /// Version 2 promotes Recommended for newly bound runs. WorldRun stores its own frozen tuning,
+    /// so this preference migration never rewrites an existing expedition or encounter.
+    var encounterScalingProfileSchemaVersion = Self.currentEncounterScalingProfileSchemaVersion
+    var encounterScalingProfile: EncounterScalingProfile = .recommended
 
     var isDefault: Bool { self == .defaults }
 
@@ -145,8 +155,20 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
 
     static func load(from defaults: UserDefaults) -> DebugTuningProfile {
         guard let data = defaults.data(forKey: storageKey),
-              let profile = try? JSONDecoder().decode(DebugTuningProfile.self, from: data)
+              var profile = try? JSONDecoder().decode(DebugTuningProfile.self, from: data)
         else { return .defaults }
+        // Preference-only migration. Codable is also used inside frozen WorldRun snapshots, where
+        // changing Legacy under an active expedition would be a correctness bug.
+        if profile.encounterScalingProfileSchemaVersion
+            < currentEncounterScalingProfileSchemaVersion {
+            if profile.encounterScalingProfile == .current {
+                profile.encounterScalingProfile = .recommended
+            }
+            profile.encounterScalingProfileSchemaVersion = currentEncounterScalingProfileSchemaVersion
+            if let migrated = try? JSONEncoder().encode(profile) {
+                defaults.set(migrated, forKey: storageKey)
+            }
+        }
         return profile
     }
 
@@ -186,6 +208,9 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
             forKey: .floraHazardSeverityMultiplier) ?? 1
         openingEncounterEnvelope = try c.decodeIfPresent(OpeningEncounterEnvelope.self,
             forKey: .openingEncounterEnvelope) ?? .natural
+        let savedProfileVersion = try c.decodeIfPresent(Int.self,
+            forKey: .encounterScalingProfileSchemaVersion) ?? 1
+        encounterScalingProfileSchemaVersion = savedProfileVersion
         encounterScalingProfile = try c.decodeIfPresent(EncounterScalingProfile.self,
             forKey: .encounterScalingProfile) ?? .current
     }

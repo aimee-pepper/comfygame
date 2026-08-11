@@ -70,6 +70,9 @@ final class CombatTests: XCTestCase {
         }
         store.mutate("stage a fight") { state in
             guard var run = state.worlds.activeRun else { return }
+            // Most combat fixtures test the underlying creature/skill rule, not the Recommended
+            // comparison layer. Keep those baselines byte-stable; dedicated scaling fixtures opt in.
+            run.tuning.encounterScalingProfile = .current
             let enemies = creatures.enumerated().map { index, id in
                 WorldEnemy(id: InstanceID(rawValue: UInt64(index + 1)), creatureID: id,
                            position: run.playerPosition, isAwake: true)
@@ -87,7 +90,7 @@ final class CombatTests: XCTestCase {
 
     // MARK: Structure
 
-    func testEncounterScalingUsesFullPartyUpperMedian() throws {
+    func testRecommendedEncounterScalingAnchorsFoeLevelToBinder() throws {
         let store = GameStore(io: .temporary(name: "scaling-party-\(UUID().uuidString)"))
         store.write("plains")
         store.bindAndDepart()
@@ -106,11 +109,12 @@ final class CombatTests: XCTestCase {
             WorldRules.beginEncounter(triggeredBy: enemy, in: &state)
         }
         let run = try XCTUnwrap(store.activeRun)
-        let expected = CharacterRules.foeLevel(partyLevel: 6, stability: run.stability,
+        let expected = CharacterRules.foeLevel(partyLevel: 2, stability: run.stability,
                                                 greed: Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book))))
         XCTAssertEqual(try XCTUnwrap(store.activeEncounter?.foes.first).level, expected)
         XCTAssertEqual(EncounterScalingRules.partyLevels(in: store.state), [2, 4, 6, 20])
-        XCTAssertEqual(EncounterScalingRules.upperMedian([2, 4, 6, 20]), 6)
+        XCTAssertEqual(store.activeEncounter?.scalingPreview?.anchorLevel, 2)
+        XCTAssertEqual(store.activeEncounter?.scalingPreview?.totalOrdinaryLevelAdjustment, 0)
     }
 
     func testEncounterScalingCandidateMatrixIsDeterministicMonotonicAndVisible() {
@@ -166,7 +170,8 @@ final class CombatTests: XCTestCase {
         let preview = try XCTUnwrap(encounter.scalingPreview)
         XCTAssertEqual(encounter.foes.map(\.id), [InstanceID(rawValue: 771)])
         XCTAssertEqual(preview.partyLevels, [8, 8, 8, 8, 8])
-        XCTAssertEqual(preview.missingFoeConversion, 2)
+        XCTAssertEqual(preview.wholePressureSlots, 2)
+        XCTAssertEqual(preview.missingFoeConversion, 0)
         XCTAssertEqual(preview.apexActionSlots, 3)
 
         let data = try JSONEncoder().encode(store.state)
@@ -245,8 +250,23 @@ final class CombatTests: XCTestCase {
         let preview = try XCTUnwrap(encounter.scalingPreview)
         let apex = try XCTUnwrap(encounter.foes.first(where: \.isApex))
         let ordinary = try XCTUnwrap(encounter.foes.first(where: { !$0.isApex }))
+        let run = try XCTUnwrap(store.activeRun)
+        let expectedOrdinaryLevel = CharacterRules.foeLevel(
+            partyLevel: store.state.base.binderCharacter.level,
+            stability: run.stability,
+            greed: Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book))))
+        var expectedOrdinaryStats = CombatStats.derived(
+            from: try XCTUnwrap(ordinary.traits), name: ordinary.stats.displayName,
+            icon: ordinary.stats.icon)
+        expectedOrdinaryStats.maxHP = CharacterRules.scaled(expectedOrdinaryStats.maxHP,
+                                                             toLevel: expectedOrdinaryLevel)
         XCTAssertEqual(apex.level, preview.apexLevelFloor)
-        XCTAssertNotEqual(ordinary.level, preview.apexLevelFloor)
+        XCTAssertEqual(ordinary.level, expectedOrdinaryLevel)
+        XCTAssertEqual(ordinary.stats.maxHP, expectedOrdinaryStats.maxHP,
+                       "Mixed ordinary bodies receive neither apex nor ordinary pressure durability")
+        XCTAssertEqual(preview.wholePressureSlots, 0)
+        XCTAssertEqual(preview.totalHPAdditionFraction, 0)
+        XCTAssertEqual(preview.hpAllocationByFoeID, [:])
         XCTAssertEqual(encounter.turnSlots.filter { $0.actor == .foe(apex.id) }.count,
                        preview.apexActionSlots)
         XCTAssertEqual(encounter.turnSlots.filter { $0.actor == .foe(ordinary.id) }.count, 1)

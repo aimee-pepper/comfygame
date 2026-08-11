@@ -3,8 +3,8 @@
   "updated": "11 Aug 2026",
   "installedCheckpoint": "0b23c3a · bug-report share isolation + world-grade-2 handoff gate",
   "essenceBaseline": "a816113",
-  "currentWork": "P0 world-grade-2 production handoff + P1 bug-report delivery",
-  "currentNote": "The durable bug queue now survives relaunch and opens the real share sheet without triggering Delete; the 368×800 Simulator acceptance path is green and the phone build is next. World-grade-2 v0.2 remains calibration evidence with integrationReady:false, so Asset must publish the frozen schema, production tuple, immutable manifest and native conformance vectors before Engineering ports it in the isolated visual lane. Direct delivery still waits for an approved relay endpoint and Keychain credential.",
+  "currentWork": "P1 encounter scaling phone comparison + P0 world-grade-2 handoff correction",
+  "currentNote": "Binder-anchored additive party pressure is integrated and passing its focused suite; the next green build will install it for Aimee's two- and five-person ordinary/apex comparison. The durable bug queue and real Share fallback are checkpointed; direct delivery still waits for an approved relay endpoint and Keychain credential. World-grade-2 remains held while Asset corrects per-species flora relationships and explicit all-12-ground ownership in the immutable native handoff.",
   "items": [
     {
       "id": "essence",
@@ -170,7 +170,7 @@
       "id": "bug-reporter",
       "priority": "P1",
       "title": "In-game bug reporter",
-      "status": "inProgress",
+      "status": "readyToTest",
       "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference, active DEBUG tuning, a bounded 20-action semantic trail and an idempotent HTTPS relay adapter are checkpointed. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
       "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete."
     },
@@ -186,9 +186,9 @@
       "id": "encounter-scaling",
       "priority": "P1",
       "title": "Party and apex difficulty",
-      "status": "queued",
-      "detail": "Legacy still lacks party-size pressure and its hidden +level substitute is rejected. The queued candidate path-groups awake reachable real foes, converts whole shortfall to saved 55% affliction-free follow-ups plus bounded HP, and retains Profile B apex tempo without stacking both systems.",
-      "gate": "Grouping/HP/schedule/migration fixtures pass; then Aimee plays two- and five-person ordinary and apex fights. Recommended becomes the next-bound default only through explicit versioned migration, with active fights unchanged."
+      "status": "inProgress",
+      "detail": "Binder-anchored additive power, path-honest visible grouping, proportional encounter HP, saved 55% affliction-free follow-ups and apex-only scaling are integrated. Legacy and frozen v1 runs retain their historical grouping and rules.",
+      "gate": "Focused and full suites pass; install the checkpoint, then Aimee plays two- and five-person ordinary and apex fights using the phone test card. Reject burst one-shots or HP walls before marking the Recommended profile complete."
     },
     {
       "id": "item-character-identities",

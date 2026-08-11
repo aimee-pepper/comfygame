@@ -177,6 +177,85 @@ enum CharacterRules {
 /// Pure, deterministic encounter-scaling simulation. Candidate coefficients remain DEBUG choices;
 /// the full-party reference is correctness and is used even when comparison scaling is off.
 enum EncounterScalingRules {
+    static let additivePartyPowerRulesVersion = "additive-party-power-v1"
+
+    struct PartyMemberInput: Equatable, Sendable {
+        var identity: String
+        var level: Int
+    }
+
+    struct Contribution: Codable, Equatable, Sendable {
+        var identity: String
+        var level: Int
+        var rawLevelRatio: Double
+        var contribution: Double
+    }
+
+    struct PartyPowerLedger: Codable, Equatable, Sendable {
+        var scalingRulesVersion: String
+        var anchorLevel: Int
+        /// Binder first, followed by companions in stable identity order.
+        var contributions: [Contribution]
+        var uncappedBudget: Double
+        var cappedBudget: Double
+    }
+
+    /// Binder-anchored additive party pressure. The Binder's 1.0 entry is explicit in telemetry;
+    /// companions cannot subtract power, and order cannot affect the sum.
+    static func partyPower(anchorLevel: Int,
+                           companions: [PartyMemberInput]) -> PartyPowerLedger {
+        let anchor = max(1, anchorLevel)
+        let binder = Contribution(identity: "binder", level: anchor,
+                                  rawLevelRatio: 1, contribution: 1)
+        let stableCompanions = companions.sorted {
+            if $0.identity != $1.identity { return $0.identity < $1.identity }
+            return $0.level < $1.level
+        }.prefix(max(0, Tuning.Party.maximumSize - 1))
+        let companionEntries = stableCompanions.map { member in
+            let level = max(1, member.level)
+            let ratio = pow(Tuning.Character.foeStatPerLevel, Double(level - anchor))
+            return Contribution(identity: member.identity, level: level,
+                                rawLevelRatio: ratio,
+                                contribution: min(1.5, max(0.25, 0.5 * ratio)))
+        }
+        let all = [binder] + companionEntries
+        let uncapped = all.reduce(0) { $0 + $1.contribution }
+        return PartyPowerLedger(scalingRulesVersion: additivePartyPowerRulesVersion,
+                                anchorLevel: anchor, contributions: all,
+                                uncappedBudget: uncapped, cappedBudget: min(3, uncapped))
+    }
+
+    struct AdditivePressure: Codable, Equatable, Sendable {
+        var realFoeCount: Int
+        var shortfall: Double
+        var wholePressureSlots: Int
+        var fractionalShortfall: Double
+        var totalHPAdditionFraction: Double
+    }
+
+    static func additivePressure(partyPowerBudget: Double,
+                                 realFoeCount: Int) -> AdditivePressure {
+        let count = max(0, realFoeCount)
+        let shortfall = max(0, partyPowerBudget - Double(count))
+        let whole = Int(floor(shortfall))
+        let fraction = shortfall - Double(whole)
+        return AdditivePressure(realFoeCount: count, shortfall: shortfall,
+                                wholePressureSlots: whole,
+                                fractionalShortfall: fraction,
+                                totalHPAdditionFraction: 0.15 * Double(whole) + 0.30 * fraction)
+    }
+
+    static func additiveApexValues(ledger: PartyPowerLedger, worldLevel: Int,
+                                   partyCount: Int) -> (levelFloor: Int, hp: Double,
+                                                        offence: Double, slots: Int) {
+        let extra = max(0, ledger.cappedBudget - 1)
+        let count = min(Tuning.Party.maximumSize, max(1, partyCount))
+        let slots = count <= 2 ? 1 : (count <= 4 ? 2 : 3)
+        return (max(worldLevel, ledger.anchorLevel + 2),
+                min(2.4, 1 + 0.70 * extra),
+                min(1.4, 1 + 0.20 * extra), slots)
+    }
+
     struct Profile: Equatable, Sendable {
         let equivalentsPerExtraMember: Double
         let missingFoeLevelCap: Int
@@ -234,6 +313,22 @@ enum EncounterScalingRules {
         let apexActionSlots: Int
         var finalFoes: [FinalFoe] = []
 
+        /// Additive v1 fields are optional so historical upper-median previews remain evidence
+        /// rather than making a mid-encounter save unreadable.
+        var scalingRulesVersion: String? = nil
+        var partyPowerLedger: PartyPowerLedger? = nil
+        var anchorLevel: Int? = nil
+        var uncappedPartyPowerBudget: Double? = nil
+        var cappedPartyPowerBudget: Double? = nil
+        var realFoeCount: Int? = nil
+        var shortfall: Double? = nil
+        var wholePressureSlots: Int? = nil
+        var fractionalShortfall: Double? = nil
+        var totalHPAdditionFraction: Double? = nil
+        var hpAllocationByFoeID: [String: Int]? = nil
+        var exclusionReasons: [String: String]? = nil
+
+        /// Historical decode/display only. Additive Recommended never applies this adjustment.
         var totalOrdinaryLevelAdjustment: Int { missingFoeConversion + remainderUpgrade }
     }
 
@@ -243,9 +338,69 @@ enum EncounterScalingRules {
         }
     }
 
+    static func companionInputs(in state: GameState) -> [PartyMemberInput] {
+        state.base.activeParty.compactMap { index in
+            guard state.base.roster.indices.contains(index) else { return nil }
+            let companion = state.base.roster[index]
+            let identity: String
+            if let traveller = companion.traveller {
+                identity = "traveller:\(traveller.rawValue)"
+            } else if companion.name.trimmingCharacters(in: .whitespacesAndNewlines)
+                .localizedCaseInsensitiveCompare("Quill") == .orderedSame {
+                identity = "quill"
+            } else {
+                // Generated-person IDs are not live yet. This reorder-stable legacy identity is
+                // evidence only until that migration lands; it deliberately never uses roster order.
+                let name = companion.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                let calling = companion.calling.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                identity = "legacy-person:\(name)|\(calling)"
+            }
+            return PartyMemberInput(identity: identity, level: companion.character.level)
+        }
+    }
+
     static func upperMedian(_ levels: [Int]) -> Int {
         let ordered = levels.sorted()
         return ordered.isEmpty ? 1 : ordered[ordered.count / 2]
+    }
+
+    static func additivePreview(anchorLevel: Int, companions: [PartyMemberInput],
+                                visibleFoes: [WorldEnemy], worldLevel: Int,
+                                stability: Double = Tuning.World.startingStability,
+                                greed: Double = 0, groupingRadius: Int,
+                                inclusionReasons: [String: String],
+                                exclusionReasons: [String: String]) -> Preview {
+        let ledger = partyPower(anchorLevel: anchorLevel, companions: companions)
+        let pressure = additivePressure(partyPowerBudget: ledger.cappedBudget,
+                                        realFoeCount: visibleFoes.count)
+        let count = min(Tuning.Party.maximumSize, 1 + companions.count)
+        let levels = [max(1, anchorLevel)] + companions.prefix(max(0, count - 1)).map { max(1, $0.level) }
+        let apex = additiveApexValues(ledger: ledger, worldLevel: worldLevel,
+                                      partyCount: count)
+        var result = Preview(
+            partyLevels: levels, upperMedian: upperMedian(levels), partyCount: count,
+            visibleFoeCount: visibleFoes.count, foeIDs: visibleFoes.map(\.id),
+            groupingRadius: groupingRadius, inclusionReasons: inclusionReasons,
+            stabilityLevelContribution: (Tuning.World.startingStability - stability)
+                / Tuning.Character.stabilityPerFoeLevel,
+            greedLevelContribution: greed / Tuning.Character.greedPerFoeLevel,
+            ordinaryBudget: ledger.cappedBudget, missingFoeConversion: 0,
+            remainder: 0, remainderRoll: 0, remainderUpgrade: 0,
+            apexLevelFloor: apex.levelFloor, apexHPMultiplier: apex.hp,
+            apexOffenceMultiplier: apex.offence, apexActionSlots: apex.slots)
+        result.scalingRulesVersion = additivePartyPowerRulesVersion
+        result.partyPowerLedger = ledger
+        result.anchorLevel = ledger.anchorLevel
+        result.uncappedPartyPowerBudget = ledger.uncappedBudget
+        result.cappedPartyPowerBudget = ledger.cappedBudget
+        result.realFoeCount = pressure.realFoeCount
+        result.shortfall = pressure.shortfall
+        result.wholePressureSlots = pressure.wholePressureSlots
+        result.fractionalShortfall = pressure.fractionalShortfall
+        result.totalHPAdditionFraction = pressure.totalHPAdditionFraction
+        result.hpAllocationByFoeID = [:]
+        result.exclusionReasons = exclusionReasons
+        return result
     }
 
     static func preview(profile: Profile, partyLevels: [Int], visibleFoes: [WorldEnemy],

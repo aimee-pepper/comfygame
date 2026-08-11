@@ -21,6 +21,7 @@ enum CombatRules {
     static func makeEncounter(id: InstanceID, foes: [FoeState], party: [Combatant] = [.binder, .companion(0)],
                               names: [Int: String] = [:],
                               apexActionSlots: [InstanceID: Int] = [:],
+                              ordinaryPressureSlots: Int = 0,
                               initiallyUnrecordedSpecies: Set<String> = [],
                               rng: inout SeededRNG) -> EncounterState {
         var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = party.map { member in
@@ -56,10 +57,26 @@ enum CombatRules {
                 previous = index
             }
         }
+        let ordinaryFoeOrder = order.compactMap(\.foeID).filter { foeID in
+            foes.contains { $0.id == foeID && !$0.isApex }
+        }
+        if !ordinaryFoeOrder.isEmpty, ordinaryPressureSlots > 0 {
+            for ordinal in 1...ordinaryPressureSlots {
+                let foeID = ordinaryFoeOrder[(ordinal - 1) % ordinaryFoeOrder.count]
+                let previous = slots.lastIndex(where: { $0.actor == .foe(foeID) }) ?? 0
+                let intervening = slots.indices.first { $0 > previous && slots[$0].actor != .foe(foeID) }
+                let index = intervening.map { $0 + 1 } ?? slots.endIndex
+                slots.insert(.init(actor: .foe(foeID), kind: .ordinaryPressureFollowUp(ordinal),
+                                   strengthMultiplier: 0.55, suppressesAfflictions: true), at: index)
+            }
+        }
         var opening = [foes.count == 1 ? "A \(foes[0].stats.displayName) notices you."
                                        : "They close in around you."]
         if let relentless = apexActionSlots.values.max(), relentless > 1 {
             opening.append("Relentless — \(relentless) actions; follow-ups lighter.")
+        }
+        if ordinaryPressureSlots > 0 {
+            opening.append("Pressed — \(ordinaryPressureSlots) lighter follow-up\(ordinaryPressureSlots == 1 ? "" : "s").")
         }
         return EncounterState(
             id: id,
@@ -1289,9 +1306,15 @@ enum CombatRules {
             checkOutcome(in: &state)
             return
         }
+        if case .ordinaryPressureFollowUp(let ordinal) = slot.kind {
+            encounter.note("Lighter follow-up \(ordinal) — \(foe.stats.displayName.capitalisedSentence).")
+        }
 
         // Delivery decides how many of you it reaches, and at what cost to each blow.
-        let isFollowUp: Bool = if case .apexFollowUp = slot.kind { true } else { false }
+        let isFollowUp: Bool = switch slot.kind {
+        case .primary: false
+        case .apexFollowUp, .ordinaryPressureFollowUp: true
+        }
         let delivery: ([Combatant], Double)
         if isFollowUp {
             delivery = ([primary], slot.strengthMultiplier)
@@ -1305,7 +1328,11 @@ enum CombatRules {
         let (targets, share) = delivery
 
         for originalTarget in targets {
-            if foe.isApex, !(encounter.apexTargetsThisRound[foeID] ?? []).contains(originalTarget) {
+            let hasLighterFollowUp = encounter.turnSlots.contains {
+                $0.actor == .foe(foeID) && $0.kind != .primary
+            }
+            if (foe.isApex || hasLighterFollowUp),
+               !(encounter.apexTargetsThisRound[foeID] ?? []).contains(originalTarget) {
                 encounter.apexTargetsThisRound[foeID, default: []].append(originalTarget)
             }
             var target = originalTarget

@@ -321,7 +321,12 @@ struct EncounterState: Codable, Equatable, Sendable {
     }
 
     struct TurnSlot: Codable, Equatable, Sendable {
-        enum Kind: Codable, Equatable, Sendable { case primary, apexFollowUp(Int) }
+        enum Kind: Codable, Equatable, Sendable {
+            case primary
+            case apexFollowUp(Int)
+            /// Saved 55% single-target, affliction-free pressure action for an ordinary foe.
+            case ordinaryPressureFollowUp(Int)
+        }
         var actor: Combatant
         var kind: Kind = .primary
         var strengthMultiplier: Double = 1

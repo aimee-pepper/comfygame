@@ -24,6 +24,7 @@
 		09C34648DD52FD6A92404726 /* InstrumentCraftingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8A444C3FE08E6935849BA8 /* InstrumentCraftingTests.swift */; };
 		0A77177F80047BBE6CD74591 /* skills.json in Resources */ = {isa = PBXBuildFile; fileRef = 2C4E5B7DC86948834FDAFFF9 /* skills.json */; };
 		0D0B63ACE19B51E89D5321F8 /* TravellerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C03E6819177D7EABE894A3 /* TravellerModels.swift */; };
+		0E22746AD9ACDD1884457BBE /* EncounterScalingIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF7AC3F95D1AA5C4D0E9AD5 /* EncounterScalingIntegrationTests.swift */; };
 		0FD9747174A22CF0CD20A419 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C37F84A94ADC380C1F4B4C85 /* LaunchScreen.storyboard */; };
 		10EA98516A8B4CB4C9379D71 /* MinimapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D238962CB9F8B60B212D9473 /* MinimapView.swift */; };
 		10FAF7D28B2984AD85FBEB44 /* LivingAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE7FAE39BDF3B01C8F7B497 /* LivingAnalysisView.swift */; };
@@ -195,6 +196,7 @@
 		E16183802737C05EFA98488A /* SaveSlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B07ACB016173BA0637D5B85C /* SaveSlotTests.swift */; };
 		E412FF242D7E09BD9DBB75E8 /* gambit_components.json in Resources */ = {isa = PBXBuildFile; fileRef = 6AE18B24DF2998D5D65F61D0 /* gambit_components.json */; };
 		E47AA63C2C51E3EB55BB3F8D /* SaveSlotFileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DEBC912C792450657FADE4C /* SaveSlotFileIO.swift */; };
+		E586A7027F2951AF6D4AC315 /* EncounterScalingRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503DB4EF098EB90B1924A344 /* EncounterScalingRulesTests.swift */; };
 		E5F159A8D0BC893F517CBE6A /* SaveSlotPayloadIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1852EC9D09586AD995187C27 /* SaveSlotPayloadIO.swift */; };
 		E62CC0DEF814DD53743731F9 /* TradingPostFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818724CCF5EB78A3DCEC46E4 /* TradingPostFlowTests.swift */; };
 		E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */; };
@@ -279,6 +281,7 @@
 		4924ECCC22AE9125898B039F /* CombatTreeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTreeModels.swift; sourceTree = "<group>"; };
 		4FEC07E6110ABED3DA33EA3B /* ApothecaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApothecaryView.swift; sourceTree = "<group>"; };
 		4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldsState.swift; sourceTree = "<group>"; };
+		503DB4EF098EB90B1924A344 /* EncounterScalingRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncounterScalingRulesTests.swift; sourceTree = "<group>"; };
 		504332712854230587940F0A /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		51B3BDF8FB0EE8418DD8EC80 /* ConsumableCraftingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsumableCraftingRules.swift; sourceTree = "<group>"; };
 		53634CFCB3CD23CDD115C001 /* ChasmTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChasmTests.swift; sourceTree = "<group>"; };
@@ -379,6 +382,7 @@
 		B8E261DE325914CF72D32BD5 /* ApexRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApexRules.swift; sourceTree = "<group>"; };
 		B9CABEB714204FCBDE32F8E4 /* BlacksmithView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlacksmithView.swift; sourceTree = "<group>"; };
 		BBC296DF1CBC1B62D9002252 /* combat_tree_v2.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = combat_tree_v2.json; sourceTree = "<group>"; };
+		BBF7AC3F95D1AA5C4D0E9AD5 /* EncounterScalingIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncounterScalingIntegrationTests.swift; sourceTree = "<group>"; };
 		BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyTests.swift; sourceTree = "<group>"; };
 		BDD17B2922EA6A0230E9DC64 /* ConsumableCraftingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsumableCraftingTests.swift; sourceTree = "<group>"; };
 		BDFAE95092D158944E000B02 /* GrammarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarTests.swift; sourceTree = "<group>"; };
@@ -718,6 +722,8 @@
 				D3EB5122AA82F1610E51A10F /* DescriptionTests.swift */,
 				C51FE4FBAB98280181089C56 /* DeterminismTests.swift */,
 				6782235BDB0189FF9A0FFE41 /* EconomyTests.swift */,
+				BBF7AC3F95D1AA5C4D0E9AD5 /* EncounterScalingIntegrationTests.swift */,
+				503DB4EF098EB90B1924A344 /* EncounterScalingRulesTests.swift */,
 				961E1AC7BEB7E7C4C243CAD1 /* ExclusivityTests.swift */,
 				5B11474BCFC5AFD1111E98E7 /* ExpeditionOutcomeTests.swift */,
 				DB87254230F32E20320932D7 /* FloraTests.swift */,
@@ -1047,6 +1053,8 @@
 				6D8D7D57D683FAA42DFD1B9F /* DescriptionTests.swift in Sources */,
 				EDF26461D4FD581D2BCFBB0A /* DeterminismTests.swift in Sources */,
 				7345ED98F77854AE5C6FFB34 /* EconomyTests.swift in Sources */,
+				0E22746AD9ACDD1884457BBE /* EncounterScalingIntegrationTests.swift in Sources */,
+				E586A7027F2951AF6D4AC315 /* EncounterScalingRulesTests.swift in Sources */,
 				804C3EA48958EDEA3E234F95 /* ExclusivityTests.swift in Sources */,
 				94095A78E4E8679458940F25 /* ExpeditionOutcomeTests.swift in Sources */,
 				91761E73D4647CB7D2741D93 /* FloraTests.swift in Sources */,

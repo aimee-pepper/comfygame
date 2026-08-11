@@ -1019,6 +1019,137 @@ enum WorldRules {
         run.enemies.first { $0.position == run.playerPosition }
     }
 
+    struct EncounterGroupSelection: Equatable {
+        let foes: [WorldEnemy]
+        let radius: Int
+        let inclusionReasons: [String: String]
+        let exclusionReasons: [String: String]
+    }
+
+    /// Resolves the exact persisted map bodies allowed to enter a fight. The trigger is always
+    /// first; every companion body must already be awake, genuinely visible, and connected by a
+    /// passable orthogonal path. Array order never decides who joins.
+    static func encounterGroup(triggeredBy trigger: WorldEnemy, in run: WorldRun,
+                               partyCount: Int, adaptiveRadius: Bool = true)
+        -> EncounterGroupSelection {
+        if !adaptiveRadius {
+            var foes = [trigger]
+            var inclusion = [String(trigger.id.rawValue): "triggering map entity"]
+            var exclusion: [String: String] = [:]
+            for candidate in run.enemies where candidate.id != trigger.id {
+                let key = String(candidate.id.rawValue)
+                guard candidate.isAwake else {
+                    exclusion[key] = "asleep"
+                    continue
+                }
+                guard candidate.position.chebyshevDistance(to: trigger.position) <= 1 else {
+                    exclusion[key] = "outside historical radius 1"
+                    continue
+                }
+                guard foes.count < Tuning.Encounter.maxFoes else {
+                    exclusion[key] = "eligible after three-foe cap"
+                    continue
+                }
+                foes.append(candidate)
+                inclusion[key] = "historical awake adjacency"
+            }
+            return EncounterGroupSelection(foes: foes, radius: 1,
+                                           inclusionReasons: inclusion,
+                                           exclusionReasons: exclusion)
+        }
+        let clampedCount = max(1, min(Tuning.Party.maximumSize, partyCount))
+        let radius = [1, 1, 2, 2, 3][clampedCount - 1]
+        let distances = passableDistances(from: trigger.position, in: run.map, limit: radius)
+        var included: [(enemy: WorldEnemy, distance: Int)] = [(trigger, 0)]
+        var inclusion = [String(trigger.id.rawValue): "triggering map entity"]
+        var exclusion: [String: String] = [:]
+
+        for candidate in run.enemies where candidate.id != trigger.id {
+            let key = String(candidate.id.rawValue)
+            guard candidate.isAwake else {
+                exclusion[key] = "asleep"
+                continue
+            }
+            guard run.map.contains(candidate.position), run.map[candidate.position].isRevealed,
+                  isVisible(candidate, in: run) else {
+                exclusion[key] = "not legitimately visible"
+                continue
+            }
+            guard let distance = distances[candidate.position], distance <= radius else {
+                exclusion[key] = "outside passable radius \(radius)"
+                continue
+            }
+            included.append((candidate, distance))
+        }
+
+        included = [included[0]] + included.dropFirst().sorted {
+            ($0.distance, $0.enemy.id.rawValue) < ($1.distance, $1.enemy.id.rawValue)
+        }
+        if included.count > Tuning.Encounter.maxFoes {
+            for excluded in included.dropFirst(Tuning.Encounter.maxFoes) {
+                exclusion[String(excluded.enemy.id.rawValue)] = "eligible after three-foe cap"
+            }
+            included = Array(included.prefix(Tuning.Encounter.maxFoes))
+        }
+        for entry in included.dropFirst() {
+            inclusion[String(entry.enemy.id.rawValue)] = "awake, visible, passable distance \(entry.distance)"
+        }
+        return EncounterGroupSelection(foes: included.map(\.enemy), radius: radius,
+                                       inclusionReasons: inclusion,
+                                       exclusionReasons: exclusion)
+    }
+
+    private static func passableDistances(from start: GridPoint, in map: WorldMap,
+                                          limit: Int) -> [GridPoint: Int] {
+        guard map.contains(start) else { return [:] }
+        var distances = [start: 0]
+        var queue = [start]
+        var cursor = 0
+        while cursor < queue.count {
+            let point = queue[cursor]
+            cursor += 1
+            let distance = distances[point, default: 0]
+            guard distance < limit else { continue }
+            for next in map.neighbours(of: point)
+            where map[next].isPassable && distances[next] == nil {
+                distances[next] = distance + 1
+                queue.append(next)
+            }
+        }
+        return distances
+    }
+
+    /// Stable largest-remainder allocation of one encounter-wide durability addition. The total
+    /// is rounded once; array order cannot move a hit point between otherwise identical foes.
+    static func pressureHPAllocation(for foes: [FoeState], additionFraction: Double)
+        -> [InstanceID: Int] {
+        guard additionFraction > 0 else { return [:] }
+        let total = foes.reduce(0) { $0 + max(0, $1.stats.maxHP) }
+        guard total > 0 else { return [:] }
+        let intended = max(0, Int((Double(total) * additionFraction).rounded()))
+        struct Share {
+            let id: InstanceID
+            let floor: Int
+            let remainder: Double
+        }
+        let shares = foes.map { foe -> Share in
+            let exact = Double(intended) * Double(max(0, foe.stats.maxHP)) / Double(total)
+            let floorValue = Int(floor(exact))
+            return Share(id: foe.id, floor: floorValue, remainder: exact - Double(floorValue))
+        }
+        var result = Dictionary(uniqueKeysWithValues: shares.map { ($0.id, $0.floor) })
+        var left = intended - shares.reduce(0) { $0 + $1.floor }
+        for share in shares.sorted(by: {
+            $0.remainder == $1.remainder
+                ? $0.id.rawValue < $1.id.rawValue
+                : $0.remainder > $1.remainder
+        }) where left > 0 {
+            result[share.id, default: 0] += 1
+            left -= 1
+        }
+        return result.filter { $0.value > 0 }
+    }
+
     /// Opens an encounter with the bumped enemy plus anything awake standing next to it, up to the
     /// party's limit. Milestone 4 replaces the combat itself, not this trigger.
     static func beginEncounter(triggeredBy enemy: WorldEnemy,
@@ -1029,26 +1160,45 @@ enum WorldRules {
         // Just fled? You get a moment before anything else can catch you.
         guard run.encounterGraceTurns == 0 else { return }
 
-        var group = [enemy]
-        for other in run.enemies where other.id != enemy.id && other.isAwake {
-            guard group.count < Tuning.Encounter.maxFoes else { break }
-            if other.position.chebyshevDistance(to: enemy.position) <= 1 { group.append(other) }
-        }
+        let partyLevels = EncounterScalingRules.partyLevels(in: state)
+        let usesAdditiveScaling = run.tuning.encounterScalingProfile == .recommended
+            && run.tuning.encounterScalingProfileSchemaVersion
+                >= DebugTuningProfile.currentEncounterScalingProfileSchemaVersion
+        let grouping = encounterGroup(triggeredBy: enemy, in: run,
+                                      partyCount: partyLevels.count,
+                                      adaptiveRadius: usesAdditiveScaling)
+        let group = grouping.foes
 
         // **What this world raises its animals to** (session 17 §3). Slowly with the party, and
         // further in worlds that are unstable or greedy — so the risk you priced into those two
         // when you wrote the book comes back as difficulty, not only as more things on the ground.
-        let partyLevels = EncounterScalingRules.partyLevels(in: state)
-        let partyReference = EncounterScalingRules.upperMedian(partyLevels)
+        // Recommended anchors species/world level to the Binder. Companion differences enter once
+        // through the additive power ledger; they never secretly raise or lower every foe level.
+        // Historical comparison profiles retain their old median reference for decode/playback.
+        let partyReference = usesAdditiveScaling
+            ? state.base.binderCharacter.level
+            : EncounterScalingRules.upperMedian(partyLevels)
         let worldLevel = CharacterRules.foeLevel(
             partyLevel: partyReference,
             stability: run.stability,
             greed: Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book))))
-        var scalingPreview = run.tuning.encounterScalingProfile.rules.map {
-            EncounterScalingRules.preview(profile: $0, partyLevels: partyLevels, visibleFoes: group,
-                                          mapSeed: run.mapSeed, triggerID: enemy.id, worldLevel: worldLevel,
-                                          stability: run.stability,
-                                          greed: Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book))))
+        let greed = Double(BookRules.greedDelta(for: BookRules.sigils(for: run.book)))
+        var scalingPreview: EncounterScalingRules.Preview?
+        if usesAdditiveScaling {
+            scalingPreview = EncounterScalingRules.additivePreview(
+                anchorLevel: state.base.binderCharacter.level,
+                companions: EncounterScalingRules.companionInputs(in: state),
+                visibleFoes: group, worldLevel: worldLevel, stability: run.stability, greed: greed,
+                groupingRadius: grouping.radius, inclusionReasons: grouping.inclusionReasons,
+                exclusionReasons: grouping.exclusionReasons)
+        } else {
+            scalingPreview = run.tuning.encounterScalingProfile.rules.map {
+                EncounterScalingRules.preview(profile: $0, partyLevels: partyLevels,
+                                              visibleFoes: group, mapSeed: run.mapSeed,
+                                              triggerID: enemy.id, worldLevel: worldLevel,
+                                              stability: run.stability, greed: greed,
+                                              groupingRadius: grouping.radius)
+            }
         }
         let ordinaryLevel = worldLevel + (scalingPreview?.totalOrdinaryLevelAdjustment ?? 0)
 
@@ -1111,6 +1261,31 @@ enum WorldRules {
             }
         }
         guard !foes.isEmpty else { return }
+        let containsApex = foes.contains(where: \.isApex)
+        let ordinaryPressureSlots: Int
+        if !containsApex, let fraction = scalingPreview?.totalHPAdditionFraction,
+           scalingPreview?.scalingRulesVersion == EncounterScalingRules.additivePartyPowerRulesVersion {
+            let allocation = pressureHPAllocation(for: foes, additionFraction: fraction)
+            for index in foes.indices {
+                let added = allocation[foes[index].id, default: 0]
+                foes[index].stats.maxHP += added
+                foes[index].currentHP += added
+            }
+            scalingPreview?.hpAllocationByFoeID = Dictionary(uniqueKeysWithValues:
+                allocation.map { (String($0.key.rawValue), $0.value) })
+            ordinaryPressureSlots = scalingPreview?.wholePressureSlots ?? 0
+        } else {
+            // Apex scaling and ordinary pressure are mutually exclusive. A mixed encounter keeps
+            // every ordinary body at world-resolved stats with one ordinary action.
+            if containsApex {
+                scalingPreview?.shortfall = 0
+                scalingPreview?.wholePressureSlots = 0
+                scalingPreview?.fractionalShortfall = 0
+                scalingPreview?.totalHPAdditionFraction = 0
+            }
+            scalingPreview?.hpAllocationByFoeID = [:]
+            ordinaryPressureSlots = 0
+        }
         scalingPreview?.finalFoes = foes.map {
             .init(id: $0.id, level: $0.level, maxHP: $0.stats.maxHP, attack: $0.stats.attack,
                   armour: $0.stats.armour, isApex: $0.isApex)
@@ -1160,6 +1335,7 @@ enum WorldRules {
                                                                 $0[$1.id] = preview.apexActionSlots
                                                             }
                                                         } ?? [:],
+                                                        ordinaryPressureSlots: ordinaryPressureSlots,
                                                         initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
                                                         rng: &run.rng)
         run.activeEncounter?.scalingPreview = scalingPreview

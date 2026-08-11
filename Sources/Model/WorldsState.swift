@@ -711,7 +711,10 @@ struct WorldRun: Codable, Equatable, Sendable {
         book = try container.decode(BoundBook.self, forKey: .book)
         mapSeed = try container.decode(UInt64.self, forKey: .mapSeed)
         rng = try container.decode(SeededRNG.self, forKey: .rng)
-        tuning = try container.decodeIfPresent(DebugTuningProfile.self, forKey: .tuning) ?? .defaults
+        // A run bound before tuning snapshots existed is already a historical Legacy run. The
+        // newly promoted preference default applies only at the next bind, never during decode.
+        tuning = try container.decodeIfPresent(DebugTuningProfile.self, forKey: .tuning)
+            ?? .legacyFrozenRunDefaults
         generationDiagnostics = try container.decodeIfPresent(WorldGenerationDiagnostics.self,
                                                                 forKey: .generationDiagnostics)
             ?? WorldGenerationDiagnostics()

@@ -181,12 +181,12 @@ struct BalancingView: View {
                         Text($0.displayName).tag($0)
                     }
                 }
-                Text("DEBUG comparison only. Legacy uses party level but not party-size pressure. A/B/C add ordinary budget and apex durability, offence and actions; each result freezes when combat opens.")
+                Text("Recommended anchors level to the Binder, adds only visible reachable foes, and freezes additive party pressure plus apex tempo when combat opens. Legacy, Reserved and Pressing remain historical DEBUG comparisons.")
                     .font(.caption).foregroundStyle(.secondary)
                 resetSection("Creatures") {
                     settings.debugTuning.creatureDensityMultiplier = 1
                     settings.debugTuning.apexChanceMultiplier = 1
-                    settings.debugTuning.encounterScalingProfile = .current
+                    settings.debugTuning.encounterScalingProfile = .recommended
                 }
             }
 
