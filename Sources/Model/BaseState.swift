@@ -99,16 +99,6 @@ struct BaseState: Codable, Equatable, Sendable {
     /// How many more can come. The Binder is one of the five.
     var canTakeAnother: Bool { activeParty.count < Tuning.Party.maximumSize - 1 }
 
-    mutating func setComing(_ index: Int, _ coming: Bool) {
-        guard roster.indices.contains(index) else { return }
-        if coming {
-            guard !activeParty.contains(index), canTakeAnother else { return }
-            activeParty.append(index)
-        } else {
-            activeParty.removeAll { $0 == index }
-        }
-    }
-
     /// Who's fighting beside you, as one value. Kept as a property so the hundred places that read
     /// `base.companion` don't all have to learn about the roster at once.
     var companion: CompanionState {
@@ -383,10 +373,13 @@ struct BaseState: Codable, Equatable, Sendable {
             ?? [try container.decodeIfPresent(CompanionState.self, forKey: .companion) ?? CompanionState()]
         if roster.isEmpty { roster = [CompanionState()] }
         // A save from when only one person could come brings that one person with it.
-        activeParty = try container.decodeIfPresent([Int].self, forKey: .activeParty)
-            ?? [try container.decodeIfPresent(Int.self, forKey: .activeCompanion) ?? 0]
-        activeParty = activeParty.filter { $0 >= 0 }
-        if activeParty.isEmpty { activeParty = [0] }
+        if let savedParty = try container.decodeIfPresent([Int].self, forKey: .activeParty) {
+            // Empty is a deliberate Binder-only party. Only a genuinely absent legacy field
+            // inherits the old single active companion.
+            activeParty = savedParty.filter { $0 >= 0 }
+        } else {
+            activeParty = [try container.decodeIfPresent(Int.self, forKey: .activeCompanion) ?? 0]
+        }
         binderEquipped = try container.decodeIfPresent([GearSlot: EquippedPiece].self, forKey: .binderEquipped) ?? [:]
         hasAutomateSelfUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasAutomateSelfUnlock) ?? false
         satchelTier = try container.decodeIfPresent(Int.self, forKey: .satchelTier) ?? 0

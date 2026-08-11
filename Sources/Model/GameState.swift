@@ -68,6 +68,11 @@ struct GameState: Codable, Equatable, Sendable {
             reconciled.reconcile(with: self)
             tutorial = reconciled
         }
+        if RosterPlacementRules.reconcileLegacyProjections(in: &self) {
+#if DEBUG
+            print("[placement migration] repaired contradictory legacy party/realm assignments")
+#endif
+        }
     }
 
     init(schemaVersion: Int, meta: SaveMeta, reality: RealityState, base: BaseState, worlds: WorldsState,

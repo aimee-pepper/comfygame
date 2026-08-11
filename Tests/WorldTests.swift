@@ -1501,4 +1501,92 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(store.state.worlds.anchoredRealms[0].productionContribution, 0)
         XCTAssertEqual(store.state.worlds.anchoredRealms[1].assignedCompanions, [0])
     }
+
+    @MainActor
+    func testTakingRealmWorkerIsAtomicAndReturningSendsThemHome() throws {
+        let blank = book([:])
+        let generated = Worldgen.generate(book: blank, seed: 13)
+        let run = WorldRun(runIndex: 1, book: blank, mapSeed: 13, rng: SeededRNG(seed: 13),
+                           map: generated.map, playerPosition: generated.start)
+        let store = GameStore(io: .temporary(name: "realm-party-transfer-\(UUID().uuidString)"))
+        store.mutate("prepare worker") { state in
+            var worker = CompanionState()
+            worker.name = "Worker"
+            worker.worldwork = 2
+            state.base.roster = [CompanionState(), worker]
+            state.base.activeParty = [0]
+            state.worlds.anchoredRealms = [
+                AnchoredRealm(runIndex: 1, name: "Moss Archive", route: .bornAnchored,
+                              sustainObligation: 10, assignedCompanions: [1], world: run),
+            ]
+            GameStore.recalculateAnchorProduction(in: &state)
+        }
+
+        let preview = try XCTUnwrap(store.partyTransferPreview(for: 1))
+        XCTAssertEqual(preview.source, .anchoredRealm(id: 1, name: "Moss Archive"))
+        XCTAssertEqual(preview.realmProductionBefore, 3)
+        XCTAssertEqual(preview.realmProductionAfter, 0)
+        XCTAssertEqual(preview.realmShortfallBefore, 7)
+        XCTAssertEqual(preview.realmShortfallAfter, 10)
+
+        XCTAssertFalse(store.setComing(1, true, expected: .home), "stale source must not transfer")
+        XCTAssertEqual(store.state.worlds.anchoredRealms[0].assignedCompanions, [1])
+        XCTAssertTrue(store.setComing(1, true, expected: preview.source))
+        XCTAssertEqual(store.state.base.activeParty, [0, 1])
+        XCTAssertTrue(store.state.worlds.anchoredRealms[0].assignedCompanions.isEmpty)
+        XCTAssertEqual(store.state.worlds.anchoredRealms[0].productionContribution, 0)
+
+        XCTAssertTrue(store.setComing(1, false, expected: .activeParty))
+        XCTAssertEqual(store.placement(of: 1), .home)
+        XCTAssertFalse(store.state.base.activeParty.contains(1))
+        XCTAssertTrue(store.state.worlds.anchoredRealms[0].assignedCompanions.isEmpty,
+                      "returning Home must not restore the old realm posting")
+    }
+
+    @MainActor
+    func testTakingHomeKeeperPreviewsAndSuspendsStationBenefit() throws {
+        let store = GameStore(io: .temporary(name: "keeper-party-transfer-\(UUID().uuidString)"))
+        store.mutate("prepare keeper") { state in
+            var keeper = CompanionState()
+            keeper.name = "Halloway"
+            keeper.traveller = "halloway"
+            state.base.roster = [CompanionState(), keeper]
+            state.base.activeParty = [0]
+            state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)
+        }
+        let blacksmith = try XCTUnwrap(ContentCatalog.shared.stations.first { $0.id == Stations.blacksmith })
+        XCTAssertTrue(StationStaffingRules.keeperIsHome(for: blacksmith, in: store.state))
+
+        let preview = try XCTUnwrap(store.partyTransferPreview(for: 1))
+        XCTAssertEqual(preview.source, .home)
+        XCTAssertEqual(preview.stationNames, ["Blacksmith"])
+        XCTAssertTrue(store.setComing(1, true, expected: .home))
+        XCTAssertFalse(StationStaffingRules.keeperIsHome(for: blacksmith, in: store.state))
+    }
+
+    func testLegacyContradictoryPersonPlacementsReconcileDeterministically() throws {
+        let blank = book([:])
+        let generated = Worldgen.generate(book: blank, seed: 14)
+        let run = WorldRun(runIndex: 1, book: blank, mapSeed: 14, rng: SeededRNG(seed: 14),
+                           map: generated.map, playerPosition: generated.start)
+        var state = GameState.newGame()
+        state.base.roster = [CompanionState(), CompanionState(), CompanionState()]
+        state.base.activeParty = [1, 1, 99]
+        state.worlds.anchoredRealms = [
+            AnchoredRealm(runIndex: 2, name: "Later", route: .naturalPoint,
+                          assignedCompanions: [0, 1, 2, 2], world: run),
+            AnchoredRealm(runIndex: 1, name: "Earlier", route: .bornAnchored,
+                          assignedCompanions: [0, 2], world: run),
+            AnchoredRealm(runIndex: 3, name: "Dormant", route: .craftedFrame, isDormant: true,
+                          assignedCompanions: [0], world: run),
+        ]
+
+        let decoded = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(state))
+        XCTAssertEqual(decoded.base.activeParty, [1], "party wins and duplicates/invalid IDs are removed")
+        XCTAssertTrue(decoded.worlds.anchoredRealms[0].assignedCompanions.isEmpty)
+        XCTAssertEqual(decoded.worlds.anchoredRealms[1].assignedCompanions, [0, 2],
+                       "lowest stable realm ID wins a contradictory posting")
+        XCTAssertTrue(decoded.worlds.anchoredRealms[2].assignedCompanions.isEmpty)
+        XCTAssertEqual(decoded.worlds.anchoredRealms[1].productionContribution, 4)
+    }
 }

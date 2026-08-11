@@ -956,7 +956,7 @@ final class LibraryTests: XCTestCase {
             while state.base.roster.count < Tuning.Party.maximumSize + 3 {
                 state.base.roster.append(CompanionState())
             }
-            for index in 1..<state.base.roster.count { state.base.setComing(index, true) }
+            state.base.activeParty = Array(0..<(Tuning.Party.maximumSize - 1))
         }
         XCTAssertEqual(store.state.base.partyMembers.count, Tuning.Party.maximumSize)
         XCTAssertFalse(store.state.base.canTakeAnother)

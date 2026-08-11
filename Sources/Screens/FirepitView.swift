@@ -14,14 +14,21 @@ import SwiftUI
 /// the firepit holds *your* people, the tavern brings you other people's.
 struct FirepitView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var pendingTransfer: PartyTransferPreview?
 
     private var roster: [CompanionState] { store.state.base.roster }
     private var coming: [(index: Int, member: CompanionState)] {
         roster.enumerated().filter { store.isComing($0.offset) }.map { ($0.offset, $0.element) }
     }
-    /// Everybody who isn't currently walking out with you — the point of the screen.
-    private var waiting: [(index: Int, member: CompanionState)] {
-        roster.enumerated().filter { !store.isComing($0.offset) }.map { ($0.offset, $0.element) }
+    private var home: [(index: Int, member: CompanionState)] {
+        roster.enumerated().filter { store.placement(of: $0.offset) == .home }
+            .map { ($0.offset, $0.element) }
+    }
+    private var posted: [(index: Int, member: CompanionState)] {
+        roster.enumerated().filter {
+            if case .anchoredRealm = store.placement(of: $0.offset) { return true }
+            return false
+        }.map { ($0.offset, $0.element) }
     }
     /// You count as one of the five, so four is as many as can come with you.
     private var seatsLeft: Int {
@@ -45,11 +52,19 @@ struct FirepitView: View {
                     }
                 }
 
-                StationCard(title: "Around the fire — \(waiting.count)", icon: "flame.fill") {
-                    if waiting.isEmpty {
+                StationCard(title: "Around the fire — \(home.count)", icon: "flame.fill") {
+                    if home.isEmpty {
                         EmptyNote("Nobody else, yet. People are out in the worlds: read a diary, write the world it describes, and walk up to whoever is standing in it.")
                     } else {
-                        ForEach(waiting, id: \.index) { entry in
+                        ForEach(home, id: \.index) { entry in
+                            row(entry.member, index: entry.index)
+                        }
+                    }
+                }
+
+                if !posted.isEmpty {
+                    StationCard(title: "Posted in realms — \(posted.count)", icon: "map.fill") {
+                        ForEach(posted, id: \.index) { entry in
                             row(entry.member, index: entry.index)
                         }
                     }
@@ -66,6 +81,16 @@ struct FirepitView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Firepit")
         .navigationBarTitleDisplayMode(.inline)
+        .alert(item: $pendingTransfer) { preview in
+            Alert(
+                title: Text("Take \(preview.name) with you?"),
+                message: Text(transferMessage(preview)),
+                primaryButton: .default(Text("Take with you")) {
+                    _ = store.setComing(preview.index, true, expected: preview.source)
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 
     /// One person, in one line. Their sheet is on the Party screen; this is just who they are and
@@ -84,16 +109,40 @@ struct FirepitView: View {
             }
             Spacer(minLength: 6)
             if store.isComing(index) {
-                Button("Leave them") { store.setComing(index, false) }
+                Button("Send Home") { _ = store.setComing(index, false, expected: .activeParty) }
                     .font(.caption2.weight(.medium))
                     .buttonStyle(.bordered)
             } else {
-                Button("Take them") { store.setComing(index, true) }
+                Button("Take them") { pendingTransfer = store.partyTransferPreview(for: index) }
                     .font(.caption2.weight(.medium))
                     .buttonStyle(.borderedProminent)
                     .disabled(seatsLeft == 0)
             }
         }
         .frame(minHeight: 44)
+    }
+
+    private func transferMessage(_ preview: PartyTransferPreview) -> String {
+        var lines: [String] = []
+        switch preview.source {
+        case .home:
+            if !preview.stationNames.isEmpty {
+                lines.append("Home benefits pause at \(preview.stationNames.joined(separator: ", ")).")
+            } else {
+                lines.append("They will leave Home and join the active party.")
+            }
+        case .activeParty:
+            lines.append("They are already in the active party.")
+        case .anchoredRealm(_, let name):
+            if let before = preview.realmProductionBefore, let after = preview.realmProductionAfter,
+               let shortfallBefore = preview.realmShortfallBefore,
+               let shortfallAfter = preview.realmShortfallAfter {
+                lines.append("\(name) production: \(before) → \(after).")
+                lines.append("Sustain shortfall: \(shortfallBefore) → \(shortfallAfter) Essence.")
+            }
+            lines.append("Their realm posting ends when you confirm.")
+        }
+        lines.append("Returning them later sends them Home; it will not restore an old posting.")
+        return lines.joined(separator: "\n")
     }
 }

@@ -40,9 +40,10 @@ final class PersistenceTests: XCTestCase {
         let generated = Worldgen.generate(book: book, seed: 73)
         let run = WorldRun(runIndex: 7, book: book, mapSeed: 73, rng: SeededRNG(seed: 73),
                            map: generated.map, playerPosition: generated.start)
+        state.base.activeParty = []
         state.worlds.anchoredRealms = [
             AnchoredRealm(runIndex: 7, name: "The Quiet Reach", route: .craftedFrame,
-                          sustainObligation: 3, productionContribution: 1,
+                          sustainObligation: 3, productionContribution: 2,
                           assignedCompanions: [0], world: run)
         ]
 
@@ -50,7 +51,7 @@ final class PersistenceTests: XCTestCase {
         let reloaded = try XCTUnwrap(io.load().state)
 
         XCTAssertEqual(reloaded.worlds.anchoredRealms, state.worlds.anchoredRealms)
-        XCTAssertEqual(reloaded.worlds.anchoredRealms.first?.projectedShortfall, 2)
+        XCTAssertEqual(reloaded.worlds.anchoredRealms.first?.projectedShortfall, 1)
     }
 
     func testSaveFromBeforeAnchoringLoadsWithAnEmptyAtlas() throws {

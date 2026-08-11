@@ -583,15 +583,7 @@ extension GameStore {
     }
 
     nonisolated static func recalculateAnchorProduction(in state: inout GameState) {
-        for index in state.worlds.anchoredRealms.indices {
-            state.worlds.anchoredRealms[index].productionContribution =
-                state.worlds.anchoredRealms[index].assignedCompanions.reduce(0) { total, companion in
-                    guard state.base.roster.indices.contains(companion) else { return total }
-                    let worker = state.base.roster[companion]
-                    return total + Tuning.Anchoring.worldworkBaseContribution + worker.worldwork
-                        + max(0, worker.character.level - 1) / Tuning.Anchoring.levelsPerWorldworkBonus
-                }
-        }
+        RosterPlacementRules.recalculateRealmProduction(in: &state)
     }
 
     // MARK: - Turn bookkeeping

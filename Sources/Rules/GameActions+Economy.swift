@@ -1,5 +1,92 @@
 import Foundation
 
+enum RosterPlacement: Equatable, Sendable {
+    case home
+    case activeParty
+    case anchoredRealm(id: Int, name: String)
+}
+
+struct PartyTransferPreview: Identifiable, Equatable, Sendable {
+    let index: Int
+    let name: String
+    let source: RosterPlacement
+    let stationNames: [String]
+    let realmProductionBefore: Int?
+    let realmProductionAfter: Int?
+    let realmShortfallBefore: Int?
+    let realmShortfallAfter: Int?
+
+    var id: Int { index }
+}
+
+enum RosterPlacementRules {
+    static func placement(of index: Int, in state: GameState) -> RosterPlacement {
+        if state.base.activeParty.contains(index) { return .activeParty }
+        if let realm = state.worlds.anchoredRealms.first(where: {
+            !$0.isDormant && $0.assignedCompanions.contains(index)
+        }) {
+            return .anchoredRealm(id: realm.id, name: realm.name)
+        }
+        return .home
+    }
+
+    static func contribution(of index: Int, in state: GameState) -> Int {
+        guard state.base.roster.indices.contains(index) else { return 0 }
+        let person = state.base.roster[index]
+        return Tuning.Anchoring.worldworkBaseContribution + person.worldwork
+            + max(0, person.character.level - 1) / Tuning.Anchoring.levelsPerWorldworkBonus
+    }
+
+    static func recalculateRealmProduction(in state: inout GameState) {
+        for index in state.worlds.anchoredRealms.indices {
+            state.worlds.anchoredRealms[index].productionContribution = state.worlds
+                .anchoredRealms[index].assignedCompanions.reduce(0) { total, companion in
+                    total + contribution(of: companion, in: state)
+                }
+        }
+    }
+
+    /// Repairs the old independent index arrays once at decode. Party wins; otherwise the earliest
+    /// active realm keeps the worker. Invalid, dormant and duplicate references return Home.
+    static func reconcileLegacyProjections(in state: inout GameState) -> Bool {
+        var changed = false
+        var seenParty = Set<Int>()
+        let party = state.base.activeParty.filter { index in
+            let valid = state.base.roster.indices.contains(index)
+                && seenParty.insert(index).inserted
+                && seenParty.count <= Tuning.Party.maximumSize - 1
+            if !valid { changed = true }
+            return valid
+        }
+        if party != state.base.activeParty {
+            state.base.activeParty = party
+            changed = true
+        }
+
+        var claimed = Set(party)
+        for realmIndex in state.worlds.anchoredRealms.indices.sorted(by: {
+            state.worlds.anchoredRealms[$0].id < state.worlds.anchoredRealms[$1].id
+        }) {
+            let realm = state.worlds.anchoredRealms[realmIndex]
+            var local = Set<Int>()
+            let repaired = realm.assignedCompanions.filter { companion in
+                let keep = !realm.isDormant
+                    && state.base.roster.indices.contains(companion)
+                    && !claimed.contains(companion)
+                    && local.insert(companion).inserted
+                if keep { claimed.insert(companion) }
+                else { changed = true }
+                return keep
+            }
+            if repaired != realm.assignedCompanions {
+                state.worlds.anchoredRealms[realmIndex].assignedCompanions = repaired
+            }
+        }
+        recalculateRealmProduction(in: &state)
+        return changed
+    }
+}
+
 /// Spending actions: the Workshop, the Storehouse, the Constellation, and opening a cache.
 extension GameStore {
     @discardableResult func crystalliseEssence() -> Bool {
@@ -616,13 +703,67 @@ extension GameStore {
 
     // MARK: - The party
 
-    /// **Who comes with you.** Toggled per person at the fire, up to a party of five including you.
-    func setComing(_ index: Int, _ coming: Bool) {
-        guard state.base.roster.indices.contains(index) else { return }
-        let name = state.base.roster[index].name
-        mutate(coming ? "take \(name)" : "leave \(name)", flush: true) {
-            $0.base.setComing(index, coming)
+    func placement(of index: Int) -> RosterPlacement {
+        RosterPlacementRules.placement(of: index, in: state)
+    }
+
+    func partyTransferPreview(for index: Int) -> PartyTransferPreview? {
+        guard state.base.roster.indices.contains(index) else { return nil }
+        let source = placement(of: index)
+        let person = state.base.roster[index]
+        let stations = ContentCatalog.shared.stationsInOrder.filter {
+            $0.builtBy == person.traveller && state.base.station($0.id).isUnlocked
+        }.map(\.name)
+        var before: Int?
+        var after: Int?
+        var shortfallBefore: Int?
+        var shortfallAfter: Int?
+        if case .anchoredRealm(let id, _) = source,
+           let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }) {
+            before = realm.productionContribution
+            after = max(0, realm.productionContribution - RosterPlacementRules.contribution(of: index, in: state))
+            shortfallBefore = realm.projectedShortfall
+            shortfallAfter = max(0, realm.sustainObligation - (after ?? 0))
         }
+        return PartyTransferPreview(index: index, name: person.name, source: source,
+                                    stationNames: stations, realmProductionBefore: before,
+                                    realmProductionAfter: after, realmShortfallBefore: shortfallBefore,
+                                    realmShortfallAfter: shortfallAfter)
+    }
+
+    /// **Who comes with you.** One atomic transfer: taking removes every realm posting; returning
+    /// always means Home. Expected placement rejects a stale confirmation instead of moving the
+    /// wrong projection.
+    @discardableResult
+    func setComing(_ index: Int, _ coming: Bool, expected: RosterPlacement? = nil) -> Bool {
+        guard state.base.roster.indices.contains(index),
+              expected == nil || placement(of: index) == expected else { return false }
+        if coming {
+            guard !state.base.activeParty.contains(index), state.base.canTakeAnother else { return false }
+        } else {
+            guard state.base.activeParty.contains(index) else { return false }
+        }
+        let name = state.base.roster[index].name
+        var committed = false
+        mutate(coming ? "take \(name)" : "leave \(name)", flush: true) {
+            guard expected == nil || RosterPlacementRules.placement(of: index, in: $0) == expected else { return }
+            if coming {
+                guard !$0.base.activeParty.contains(index), $0.base.canTakeAnother else { return }
+                for realmIndex in $0.worlds.anchoredRealms.indices {
+                    $0.worlds.anchoredRealms[realmIndex].assignedCompanions.removeAll { $0 == index }
+                }
+                $0.base.activeParty.append(index)
+            } else {
+                guard $0.base.activeParty.contains(index) else { return }
+                $0.base.activeParty.removeAll { $0 == index }
+                for realmIndex in $0.worlds.anchoredRealms.indices {
+                    $0.worlds.anchoredRealms[realmIndex].assignedCompanions.removeAll { $0 == index }
+                }
+            }
+            RosterPlacementRules.recalculateRealmProduction(in: &$0)
+            committed = true
+        }
+        return committed
     }
 
     func isComing(_ index: Int) -> Bool { state.base.activeParty.contains(index) }
