@@ -167,6 +167,7 @@
 		C709E6D127F96D2420ADBC5C /* creatures.json in Resources */ = {isa = PBXBuildFile; fileRef = 5FD331CEC89F930A1F99C13B /* creatures.json */; };
 		C70E08A04DE0584580A4800F /* WeaponsmithTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EF2B3DBADEF32F2DE2B00DE /* WeaponsmithTests.swift */; };
 		C7B3F65E25299A2524857544 /* SmithRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFF9A08573788622472DB26 /* SmithRules.swift */; };
+		C8382F92496ECFAF3B4E12F9 /* WorldGrade2V1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E799C3EE2B9C4ADA352571 /* WorldGrade2V1.swift */; };
 		C8B16AD5D3CDC5B67BE7E320 /* qualifiers.json in Resources */ = {isa = PBXBuildFile; fileRef = 283E3D55623002C01AF8AF98 /* qualifiers.json */; };
 		C9ED9DB51CD49A2457B00B7D /* ButcheryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1FD369C1CCCC28B0A42FC7 /* ButcheryRules.swift */; };
 		CA284D5488986FFA0719A4A6 /* WorldInspectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CCC9B79C252DA82D33A758A /* WorldInspectionTests.swift */; };
@@ -179,6 +180,7 @@
 		D469496DC882C482CB83E721 /* WorldMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B20DAF90C2684826A3C3F21 /* WorldMap.swift */; };
 		D4C22A64280B145820AEF8E8 /* TradingPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1382E660444BCF946A8778 /* TradingPost.swift */; };
 		D4DE88F2BA8D93E6307B66A6 /* GameActions+World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE0FA07FD91558E2F953944 /* GameActions+World.swift */; };
+		D5541EFE4BA1931DBF238650 /* WorldGrade2V1ConformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0833EC11FA5260A70D341655 /* WorldGrade2V1ConformanceTests.swift */; };
 		D5F20DBC8665036E83421DF9 /* CampaignAppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FFD007E856531EEC9D5703 /* CampaignAppCoordinator.swift */; };
 		D70BCC3356D30C3EC0FFA587 /* StackingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F880A764AED5BABB194953 /* StackingTests.swift */; };
 		D80F4645CCFCE0956CFBB33B /* ReachableContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87D049B2DF2A90A21B3729E /* ReachableContentTests.swift */; };
@@ -236,6 +238,7 @@
 		0486776A4EED6E508F843FB3 /* resources.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = resources.json; sourceTree = "<group>"; };
 		04E110F7C0AF0739241A8F94 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		061FE2BB0FA59B8824641746 /* save-pre-sites-2026-08-04.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "save-pre-sites-2026-08-04.json"; sourceTree = "<group>"; };
+		0833EC11FA5260A70D341655 /* WorldGrade2V1ConformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldGrade2V1ConformanceTests.swift; sourceTree = "<group>"; };
 		0BD3736ADDC83B6481EFAC9A /* Combat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Combat.swift; sourceTree = "<group>"; };
 		0DA805AE9804EFB6621B7166 /* TutorialTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialTests.swift; sourceTree = "<group>"; };
 		0EF2B3DBADEF32F2DE2B00DE /* WeaponsmithTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaponsmithTests.swift; sourceTree = "<group>"; };
@@ -277,6 +280,7 @@
 		433D570D177BA9841C75DCF9 /* Bookbinder.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Bookbinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4353B80B12FAA212BCCEEA39 /* DebugBugReporterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugBugReporterView.swift; sourceTree = "<group>"; };
 		4461FC8AD054E8E6E494602B /* EconomyRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EconomyRules.swift; sourceTree = "<group>"; };
+		45E799C3EE2B9C4ADA352571 /* WorldGrade2V1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldGrade2V1.swift; sourceTree = "<group>"; };
 		475999A2E43B7E5F16A3E724 /* DebugBugReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugBugReporter.swift; sourceTree = "<group>"; };
 		4924ECCC22AE9125898B039F /* CombatTreeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTreeModels.swift; sourceTree = "<group>"; };
 		4FEC07E6110ABED3DA33EA3B /* ApothecaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApothecaryView.swift; sourceTree = "<group>"; };
@@ -693,6 +697,7 @@
 				4DD13C27AAD6A718AC4C8188 /* Persistence */,
 				21AAB30585002EFE1DBBC7F6 /* Rules */,
 				3D392DB4F9B9CD74CF43A670 /* Screens */,
+				E45320FE6F032D7A7F042557 /* VisualRuntime */,
 				644939D61FCF530C40392FCC /* Tuning.swift */,
 			);
 			path = Sources;
@@ -761,11 +766,20 @@
 				0DA805AE9804EFB6621B7166 /* TutorialTests.swift */,
 				BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */,
 				0EF2B3DBADEF32F2DE2B00DE /* WeaponsmithTests.swift */,
+				0833EC11FA5260A70D341655 /* WorldGrade2V1ConformanceTests.swift */,
 				2CCC9B79C252DA82D33A758A /* WorldInspectionTests.swift */,
 				9A91FFF6BF680BAFC6742249 /* WorldScaleAndNightTests.swift */,
 				6430D823936296B085FA9EBA /* WorldTests.swift */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		E45320FE6F032D7A7F042557 /* VisualRuntime */ = {
+			isa = PBXGroup;
+			children = (
+				45E799C3EE2B9C4ADA352571 /* WorldGrade2V1.swift */,
+			);
+			path = VisualRuntime;
 			sourceTree = "<group>";
 		};
 		EF3B2790522C361A5A9CEF04 /* Debug */ = {
@@ -1018,6 +1032,7 @@
 				F6BFEA449969C175D779E930 /* TutorialState.swift in Sources */,
 				2651CFD69611A045AB93B2C7 /* WorldConstraints.swift in Sources */,
 				88FF4649E14551AB79BE82CB /* WorldDescriptionPanel.swift in Sources */,
+				C8382F92496ECFAF3B4E12F9 /* WorldGrade2V1.swift in Sources */,
 				9F5DC7673BF8A93B1EF8ED6B /* WorldHistoryView.swift in Sources */,
 				F51758D1870B39749890B1A7 /* WorldInspectionRules.swift in Sources */,
 				D469496DC882C482CB83E721 /* WorldMap.swift in Sources */,
@@ -1092,6 +1107,7 @@
 				45B359C084C6F5A35C69529A /* TutorialTests.swift in Sources */,
 				01A65B5074EBFC458F077A59 /* VocabularyTests.swift in Sources */,
 				C70E08A04DE0584580A4800F /* WeaponsmithTests.swift in Sources */,
+				D5541EFE4BA1931DBF238650 /* WorldGrade2V1ConformanceTests.swift in Sources */,
 				CA284D5488986FFA0719A4A6 /* WorldInspectionTests.swift in Sources */,
 				66727C83C77239282A12ADBC /* WorldScaleAndNightTests.swift in Sources */,
 				11BD659A05151A43A4F78554 /* WorldTests.swift in Sources */,
