@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "b3bc410 · Base destination board + progression shelves",
+  "installedCheckpoint": "0cec007 · Blacksmith maker workflow",
   "essenceBaseline": "a816113",
   "currentWork": "P1 bug-report delivery + save-slot phone acceptance",
   "currentNote": "Independent campaign saves and the hardened local bug-report outbox are installed for phone acceptance. Reports now include exact route, safe campaign/encounter context, active tuning and a bounded semantic action trail. Direct delivery remains pending an approved relay endpoint and Keychain credential.",
@@ -85,6 +85,14 @@
       "status": "readyToTest",
       "detail": "Library author-vs-subject indexes, compact Party fit, six-across Storehouse resources and the four-section Base destination board are checkpointed.",
       "gate": "Full suite plus 368×800 and large-text inspection before the next phone install."
+    },
+    {
+      "id": "maker-stations",
+      "priority": "P1",
+      "title": "Maker-station workflows",
+      "status": "readyToTest",
+      "detail": "Blacksmith Make/Reforge/Learn now proves the shared shell: three-across rules-owned families, six-across exact worn/stored/waiting targets, requirement sockets, anchored stock detail and atomic stale rejection.",
+      "gate": "Aimee verifies the Blacksmith flow on phone; Tannery/Bowyer/Armoury/Weaponsmith reuse the shell without copying thresholds or flattening their distinct verbs."
     },
     {
       "id": "field-controls",
