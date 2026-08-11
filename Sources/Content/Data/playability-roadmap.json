@@ -3,8 +3,8 @@
   "updated": "11 Aug 2026",
   "installedCheckpoint": "bd2b5d2 · Immutable world-color bind receipts",
   "essenceBaseline": "a816113",
-  "currentWork": "P0 world-grade-2 phone color + grayscale acceptance",
-  "currentNote": "Checkpoint bd2b5d2 freezes deterministic bind-time color receipts, persists the same receipt in the active world and History, and renders it through the accepted native compositor without changing fog, resources or geometry. Legacy bound worlds remain world-grade-1. Physical-phone color and literal grayscale still gate promotion.",
+  "currentWork": "P1 field-control placement correction",
+  "currentNote": "The compact world screen is restoring D-pad left and minimap right with exactly Interact and Look beneath it. The scrolling satchel/event content must end above that fixed pane, and transparent lifted-tile pixels must reveal the dark game field rather than white system background. World-color remains installed and ready for phone comparison.",
   "items": [
     {
       "id": "essence",
@@ -122,9 +122,9 @@
       "id": "field-controls",
       "priority": "P1",
       "title": "Look + fixed field controls",
-      "status": "readyToTest",
-      "detail": "Look inspects one adjacent tile through authoritative movement, harm and visibility rules without movement, turns or disclosure.",
-      "gate": "Exact movement/hazard parity, zero mutation and compact-phone reachability."
+      "status": "inProgress",
+      "detail": "D-pad stays left; minimap stays right; Interact and Look are the only two buttons beneath it. Look retains zero-turn adjacent inspection and Interact owns the current tile action without adding vertical control rows.",
+      "gate": "368×800 shows the complete satchel/event row above the fixed pane, both action buttons below the minimap, exact movement/hazard parity, zero Look mutation and no white lifted-tile seams."
     },
     {
       "id": "launch-handoff",

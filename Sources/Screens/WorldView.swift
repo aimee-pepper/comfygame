@@ -308,31 +308,17 @@ struct WorldView: View {
 
     private func controls(_ run: WorldRun) -> some View {
         HStack(alignment: .bottom, spacing: 14) {
-            VStack(spacing: 8) {
-                Button {
-                    isLookArmed.toggle()
-                } label: {
-                    Label(isLookArmed ? "Cancel Look" : "Look", systemImage: isLookArmed ? "eye.fill" : "eye")
-                        .frame(minWidth: 132, minHeight: 44)
-                }
-                .buttonStyle(.bordered)
-                .overlay {
-                    if isLookArmed { RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2) }
-                }
-                .accessibilityHint(isLookArmed ? "Look mode armed. Choose one direction." : "Inspect one adjacent tile without moving or spending a turn.")
-                .accessibilityIdentifier("world.look")
-
-                DirectionPad(isLooking: isLookArmed) { direction in
-                    let point = GridPoint(x: run.playerPosition.x + direction.dx,
-                                          y: run.playerPosition.y + direction.dy)
-                    if isLookArmed {
-                        inspection = InspectionPresentation(value: WorldRules.inspect(point, in: run))
-                        isLookArmed = false
-                    } else {
-                        store.step(to: point)
-                    }
+            DirectionPad(isLooking: isLookArmed) { direction in
+                let point = GridPoint(x: run.playerPosition.x + direction.dx,
+                                      y: run.playerPosition.y + direction.dy)
+                if isLookArmed {
+                    inspection = InspectionPresentation(value: WorldRules.inspect(point, in: run))
+                    isLookArmed = false
+                } else {
+                    store.step(to: point)
                 }
             }
+            .frame(maxWidth: .infinity)
 
             VStack(spacing: 8) {
                 // The map belongs beside the movement tool, using the space above the portal/action
@@ -340,83 +326,31 @@ struct WorldView: View {
                 // was a regression from the settled phone layout.
                 MinimapView(run: run)
                     .frame(maxWidth: .infinity, alignment: .center)
-                if store.canSurvey {
-                    ActionButton("Survey", icon: "scope",
-                                 detail: "\(run.carriedInstruments.count) instruments · 1 turn",
-                                 isProminent: false) {
-                        completeInteraction()
-                        store.survey()
-                    }
-                    .accessibilityIdentifier("world.survey")
+                ActionButton("Interact", icon: "hand.tap.fill",
+                             detail: interactionDetail(in: run),
+                             isProminent: canInteract,
+                             isEnabled: canInteract) {
+                    performInteraction()
                 }
-                if let node = store.harvestableHere {
-                    ActionButton("Harvest \(ContentCatalog.shared.resource(node.resource)?.name ?? "")",
-                                 icon: "cube.fill",
-                                 detail: "\(node.remainingHarvests) left",
-                                 isProminent: true) {
-                        completeInteraction()
-                        store.harvest()
-                    }
+                .accessibilityIdentifier("world.interact")
+
+                Button {
+                    isLookArmed.toggle()
+                } label: {
+                    Label(isLookArmed ? "Cancel Look" : "Look",
+                          systemImage: isLookArmed ? "eye.fill" : "eye")
+                        .frame(maxWidth: .infinity, minHeight: 44)
                 }
-                if let site = store.searchableHere, let definition = site.definition {
-                    ActionButton("Search the \(definition.name.lowercased())",
-                                 icon: definition.icon,
-                                 detail: site.searchTurnsRemaining == definition.contents.searchTurns
-                                     ? "\(definition.contents.searchTurns) turns"
-                                     : "\(site.searchTurnsRemaining) turns left",
-                                 isProminent: true) {
-                        completeInteraction()
-                        store.searchSite()
+                .buttonStyle(.bordered)
+                .overlay {
+                    if isLookArmed {
+                        RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2)
                     }
                 }
-                if let anchor = store.naturalAnchorHere, anchor.definition != nil {
-                    ActionButton("Use the Atlas Seam", icon: "point.3.connected.trianglepath.dotted",
-                                 detail: store.canUseNaturalAnchor
-                                     ? "\(store.naturalAnchorCost) essence"
-                                     : "needs the Anchorage and \(store.naturalAnchorCost) essence",
-                                 isProminent: true,
-                                 isEnabled: store.canUseNaturalAnchor) {
-                        completeInteraction()
-                        isConfirmingAtlasSeam = true
-                    }
-                }
-                if store.carriedAnchorFrame != nil {
-                    ActionButton("Place Anchor Frame", icon: "square.on.square.intersection.dashed",
-                                 detail: store.canPlaceAnchorFrame
-                                     ? "anchor this world here"
-                                     : "needs clear, ordinary ground",
-                                 isProminent: store.canPlaceAnchorFrame,
-                                 isEnabled: store.canPlaceAnchorFrame) {
-                        completeInteraction()
-                        isConfirmingAnchorFrame = true
-                    }
-                }
-                if store.canPortalHere {
-                    ActionButton("Portal home", icon: "arrow.down.left.circle.fill",
-                                 detail: "keep everything", isProminent: true) {
-                        store.completeTutorial(.worldReturn, fact: "first_expedition_outcome")
-                        store.portalHome()
-                    }
-                }
-                if store.isOnLockedCache {
-                    let hasKey = store.carriedCacheKey != nil
-                    ActionButton(hasKey ? "Open the cache" : "Locked cache",
-                                 icon: hasKey ? "key.fill" : "lock.fill",
-                                 detail: hasKey ? "spends your key" : "needs a key found elsewhere",
-                                 isProminent: hasKey,
-                                 isEnabled: hasKey) {
-                        completeInteraction()
-                        store.openCacheHere()
-                    }
-                }
-                if store.harvestableHere == nil && store.searchableHere == nil && store.naturalAnchorHere == nil
-                    && !store.canPortalHere && !store.isOnLockedCache {
-                    Text(hint(for: run))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .frame(minHeight: 44)
-                }
+                .accessibilityHint(isLookArmed
+                    ? "Look mode armed. Choose one direction."
+                    : "Inspect one adjacent tile without moving or spending a turn.")
+                .accessibilityIdentifier("world.look")
             }
             .frame(maxWidth: .infinity)
         }
@@ -424,6 +358,52 @@ struct WorldView: View {
         .padding(.top, 10)
         .padding(.bottom, 6)
         .background(.bar)
+    }
+
+    private var canInteract: Bool {
+        store.harvestableHere != nil || store.searchableHere != nil || store.canPortalHere
+            || (store.isOnLockedCache && store.carriedCacheKey != nil)
+            || store.canUseNaturalAnchor || store.canPlaceAnchorFrame || store.canSurvey
+    }
+
+    private func interactionDetail(in run: WorldRun) -> String {
+        if let node = store.harvestableHere {
+            return "Harvest \(ContentCatalog.shared.resource(node.resource)?.name ?? "resource") · \(node.remainingHarvests) left"
+        }
+        if let site = store.searchableHere, let definition = site.definition {
+            return "Search \(definition.name) · \(site.searchTurnsRemaining) turns left"
+        }
+        if store.canPortalHere { return "Portal home · keep everything" }
+        if store.isOnLockedCache {
+            return store.carriedCacheKey == nil ? "Locked cache · needs a key" : "Open cache · spends your key"
+        }
+        if store.canUseNaturalAnchor { return "Use Atlas Seam · \(store.naturalAnchorCost) essence" }
+        if store.canPlaceAnchorFrame { return "Place Anchor Frame here" }
+        if store.canSurvey { return "Survey · \(run.carriedInstruments.count) instruments · 1 turn" }
+        if store.naturalAnchorHere != nil {
+            return "Atlas Seam · needs Anchorage and \(store.naturalAnchorCost) essence"
+        }
+        if store.carriedAnchorFrame != nil { return "Anchor Frame · needs clear ordinary ground" }
+        return hint(for: run)
+    }
+
+    private func performInteraction() {
+        if store.harvestableHere != nil {
+            completeInteraction(); store.harvest()
+        } else if store.searchableHere != nil {
+            completeInteraction(); store.searchSite()
+        } else if store.canPortalHere {
+            store.completeTutorial(.worldReturn, fact: "first_expedition_outcome")
+            store.portalHome()
+        } else if store.isOnLockedCache, store.carriedCacheKey != nil {
+            completeInteraction(); store.openCacheHere()
+        } else if store.canUseNaturalAnchor {
+            completeInteraction(); isConfirmingAtlasSeam = true
+        } else if store.canPlaceAnchorFrame {
+            completeInteraction(); isConfirmingAnchorFrame = true
+        } else if store.canSurvey {
+            completeInteraction(); store.survey()
+        }
     }
 
     private func hint(for run: WorldRun) -> String {
@@ -777,6 +757,10 @@ private struct StabilityHeader: View {
 // MARK: - Grid
 
 enum WorldMapLayout {
+    /// Transparent pixels in a lifted 16×19 sprite reveal this game-owned field, never the
+    /// system/card background. It is the same non-informative dark used by accepted fog art.
+    static let backdropRGB: [UInt8] = [23, 23, 26]
+
     /// Fits a complete square inside the region left by the fixed controls, then aligns every cell
     /// to whole device pixels. A scroll viewport may contain narration below the map, but it never
     /// acts as a crop window through a fractional final row.
@@ -842,7 +826,12 @@ private struct MapGrid: View {
         }
         .frame(width: maximumSide, height: maximumSide)
         .frame(maxWidth: .infinity)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+        .background(
+            Color(red: Double(WorldMapLayout.backdropRGB[0]) / 255,
+                  green: Double(WorldMapLayout.backdropRGB[1]) / 255,
+                  blue: Double(WorldMapLayout.backdropRGB[2]) / 255),
+            in: RoundedRectangle(cornerRadius: 10)
+        )
     }
 
     private var simpleRenderer: Bool {

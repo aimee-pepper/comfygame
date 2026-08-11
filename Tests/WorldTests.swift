@@ -462,6 +462,8 @@ final class WorldTests: XCTestCase {
     }
 
     func testPhoneSafeAreaConstrainsMapByHeightWithoutChangingViewport() {
+        XCTAssertEqual(WorldMapLayout.backdropRGB, [23, 23, 26],
+                       "transparent lifted-sprite pixels reveal fog, never a white card seam")
         let phone = WorldMapLayout.maximumSide(containerWidth: 368, viewportHeight: 260,
                                                 viewportTiles: 11, displayScale: 3)
         XCTAssertLessThanOrEqual(phone, 244)
