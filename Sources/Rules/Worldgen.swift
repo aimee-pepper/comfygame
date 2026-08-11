@@ -394,7 +394,7 @@ enum Worldgen {
         diagnostics.openingEnvelopeRequested = tuning.openingEncounterEnvelope
         diagnostics.openingEnvelopeApplied = envelopeApplied
         diagnostics.openingEnemiesRelocated = relocated
-        return (map, enemies, sites, placedPages, foundWritings, travellers, cast, flora, entry,
+        return (map, enemies, sites, placedPages, foundWritings, placedTravellers, cast, flora, entry,
                 diagnostics)
     }
 

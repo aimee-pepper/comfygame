@@ -75,6 +75,20 @@ final class LibraryTests: XCTestCase {
         XCTFail("no world in forty held anybody")
     }
 
+    func testWorldTravellerReceiptsExactlyMatchPlacedTravellerTiles() {
+        let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
+        for seed in UInt64(1)...100 {
+            let world = Worldgen.generate(book: book, seed: seed)
+            let tileTravellers = Set(world.map.allPoints.compactMap { point -> TravellerID? in
+                guard case .traveller(let id) = world.map[point].content else { return nil }
+                return id
+            })
+
+            XCTAssertEqual(Set(world.travellers), tileTravellers, "seed \(seed) returned an unplaced traveller")
+            XCTAssertEqual(world.diagnostics.travellersPlaced, world.travellers)
+        }
+    }
+
     /// **Walking up to them and agreeing is what finds them**, and that's what raises their
     /// building — the whole point of the search loop, and the thing that didn't exist.
     func testRecruitingIsWhatFindsThemAndUnlocksTheirBuilding() {
