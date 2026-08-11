@@ -7,6 +7,7 @@ import SwiftUI
 /// never a new button welded into this file.
 struct BaseView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var routeCardHidden = false
 
     private var state: GameState { store.state }
@@ -18,7 +19,6 @@ struct BaseView: View {
                 firstReturnRouteCard
                 stations
                 buildingSites
-                departure
             }
             .padding(16)
             .padding(.bottom, 24)
@@ -26,6 +26,12 @@ struct BaseView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Base")
         .navigationBarTitleDisplayMode(.large)
+        .safeAreaInset(edge: .bottom) {
+            departure
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(.bar)
+        }
         .onAppear { routeCardHidden = false }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -96,11 +102,11 @@ struct BaseView: View {
     // MARK: Stations
 
     private var stations: some View {
-        VStack(spacing: 10) {
+        LazyVGrid(columns: stationColumns, spacing: 12) {
             ForEach(unlockedStations) { station in
                 let route = AppRoute(rawValue: station.route) ?? .base
                 NavigationLink(value: route) {
-                    StationRow(station: station, tier: state.base.station(station.id).tier)
+                    StationTile(station: station, tier: state.base.station(station.id).tier)
                 }
                 .buttonStyle(.plain)
                 .simultaneousGesture(TapGesture().onEnded {
@@ -108,6 +114,12 @@ struct BaseView: View {
                 })
             }
         }
+    }
+
+    private var stationColumns: [GridItem] {
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
     }
 
     // MARK: Building sites
@@ -177,42 +189,43 @@ struct BaseView: View {
 
 // MARK: - Pieces
 
-private struct StationRow: View {
+private struct StationTile: View {
     let station: StationDef
     let tier: Int
 
     var body: some View {
-        HStack(spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             Image(systemName: station.icon)
-                .font(.title2)
-                .frame(width: 34)
+                .font(.title)
+                .frame(width: 40, height: 40)
                 .foregroundStyle(.tint)
 
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text(station.name).font(.headline)
-                    if tier > 0 {
-                        Text("tier \(tier)")
-                            .font(.caption2.weight(.semibold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color(.tertiarySystemFill), in: Capsule())
-                    }
-                }
+                Text(station.name).font(.headline)
                 Text(station.blurb)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-
-            Spacer(minLength: 8)
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.tertiary)
+            Spacer(minLength: 0)
+            HStack {
+                if tier > 0 {
+                    Text("Tier \(tier)")
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color(.tertiarySystemFill), in: Capsule())
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
         }
         .padding(14)
-        .frame(minHeight: 60)
+        .frame(maxWidth: .infinity, minHeight: 156, alignment: .topLeading)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .contentShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 

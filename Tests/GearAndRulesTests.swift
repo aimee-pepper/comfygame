@@ -492,4 +492,29 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertFalse(store.equip(option, on: .member(999)))
         XCTAssertTrue(store.state.base.inventory.stacks.contains { $0.id == piece.id })
     }
+
+    func testOverflowEquipKeepsReplacedExactPieceWhenStorehouseIsFull() throws {
+        let store = GameStore(io: .temporary(name: "full-overflow-\(UUID().uuidString)"))
+        var previous = ItemStack(id: InstanceID(rawValue: 951), catalogID: "guard_vault")
+        previous.gearProfile?.reforgeRank = 3
+        let incoming = ItemStack(id: InstanceID(rawValue: 952), catalogID: "guard_padded")
+        store.mutate("test: full store and overflow") { state in
+            state.base.binderEquipped[.armor] = EquippedPiece(previous)
+            state.base.inventory = Inventory(slots: 1, stacks: [
+                ItemStack(id: InstanceID(rawValue: 953), catalogID: "curio_glass_eye")
+            ])
+            state.base.spillover = [incoming]
+        }
+        let option = try XCTUnwrap(store.wearableOptions(in: .armor, excluding: .binder)
+            .first { $0.source == .overflow(incoming.id) })
+
+        XCTAssertTrue(store.equip(option, on: .binder))
+        XCTAssertEqual(store.worn(.armor, by: .binder)?.gearProfile?.stableInstanceID,
+                       incoming.gearProfile?.stableInstanceID)
+        let returned = try XCTUnwrap(store.state.base.spillover.first {
+            $0.gearProfile?.stableInstanceID == previous.gearProfile?.stableInstanceID
+        })
+        XCTAssertEqual(returned.gearProfile, previous.gearProfile)
+        XCTAssertEqual(returned.gearProfile?.reforgeRank, 3)
+    }
 }
