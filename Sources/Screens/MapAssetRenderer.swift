@@ -132,6 +132,10 @@ struct MapTileArtRequest {
         return MapPixelRaster.rawPixels(commands: body + sheen)
     }
 
+    static func inventoryResourcePixels(_ id: ResourceID) -> [UInt8] {
+        MapPixelRaster.rawPixels(commands: ResourcePixelGrammar.inventoryCommands(for: id))
+    }
+
     static func resourceSheenPhase(mapSeed: UInt64, runIndex: Int, point: GridPoint) -> UInt32 {
         ResourcePixelGrammar.phase(mapSeed: mapSeed, runIndex: runIndex, point: point)
     }
@@ -334,6 +338,17 @@ private enum ResourcePixelGrammar {
         }
     }
 
+    static func inventoryCommands(for id: ResourceID) -> [PixelCommand] {
+        switch id.rawValue {
+        case "essence_raw":
+            return [rect(6,2,4,5,0xeee5d5), rect(4,6,8,8,0x8c82ca), rect(7,4,2,3,0xc6bff0)]
+        case "mote":
+            return [rect(3,3,10,10,0xd5a84f), rect(5,5,6,6,0x171614), rect(7,2,2,12,0xeee5d5)]
+        default:
+            return bodyCommands(for: id)
+        }
+    }
+
     static func phase(mapSeed: UInt64, runIndex: Int, point: GridPoint) -> UInt32 {
         let payload = "resource-sheen-1.1.0|\(mapSeed)|\(runIndex)|\(point.x)|\(point.y)"
         return payload.utf8.reduce(UInt32(0x811c9dc5)) { ($0 ^ UInt32($1)) &* 0x01000193 }
@@ -520,7 +535,7 @@ struct RGBA: Equatable {
     static func resourceIdentityImage(for id: ResourceID) -> UIImage? {
         let key = "resource-static-v0.6-\(id.rawValue)" as NSString
         if let cached = cache.object(forKey: key) { return cached }
-        let commands = ResourcePixelGrammar.bodyCommands(for: id)
+        let commands = ResourcePixelGrammar.inventoryCommands(for: id)
         guard !commands.isEmpty, let image = raster(commands: commands, width: 16, height: 16) else {
             return nil
         }

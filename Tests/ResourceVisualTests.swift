@@ -49,4 +49,14 @@ final class ResourceVisualTests: XCTestCase {
         let hashes = ids.map { sha(MapAssetTestSupport.resourcePixels($0)) }
         XCTAssertEqual(Set(hashes).count, ids.count)
     }
+
+    func testEveryResourceHasAnInventoryIdentityIncludingMote() {
+        let ids = ContentCatalog.shared.resources.map(\.id)
+        XCTAssertEqual(ids.count, 23)
+        let pixels = ids.map { MapAssetTestSupport.inventoryResourcePixels($0) }
+        XCTAssertTrue(pixels.allSatisfy { !$0.allSatisfy { $0 == 0 } })
+        XCTAssertEqual(Set(pixels.map(sha)).count, ids.count)
+        XCTAssertTrue(MapAssetTestSupport.resourcePixels("mote").allSatisfy { $0 == 0 },
+                      "Mote remains inventory-only")
+    }
 }
