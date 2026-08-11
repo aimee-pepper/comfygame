@@ -54,6 +54,41 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertEqual(CampaignStartLayoutPolicy.compactCardMinimumWidth, 156)
     }
 
+    func testCampaignShelfAddsBooksAsDurableProgressGrowsAndCapsAtCardWidth() {
+        let early = GameState.newGame()
+        var progressed = early
+        progressed.reality.library.foundTravellers = Set(
+            ContentCatalog.shared.travellers.prefix(6).map(\.id)
+        )
+        progressed.reality.library.foundPages = Array(
+            ContentCatalog.shared.diaryPages.prefix(36).map(\.id)
+        )
+        progressed.base.completedResearch = Set(
+            ContentCatalog.shared.researchNodes.prefix(12).map(\.id)
+        )
+
+        XCTAssertGreaterThan(CampaignShelfProgress.bookCount(for: progressed),
+                             CampaignShelfProgress.bookCount(for: early))
+        XCTAssertEqual(CampaignShelfProgress.bookCount(for: progressed),
+                       CampaignShelfProgress.maximumBooks)
+    }
+
+    func testSlotSummaryUsesPersistedShelfCountAndInvalidSlotInventsNone() {
+        var state = GameState.newGame()
+        state.reality.library.foundPages = Array(ContentCatalog.shared.diaryPages.prefix(12).map(\.id))
+        let id = SaveSlotID()
+        let metadata = SaveSlotMetadata.make(id: id, name: "Growing shelf", state: state,
+                                             createdAt: .distantPast, lastPlayedAt: .distantFuture)
+        let valid = CampaignSlotSummary(descriptor: SaveSlotDescriptor(
+            id: id, metadata: metadata, validity: .valid))
+        let corrupt = CampaignSlotSummary(descriptor: SaveSlotDescriptor(
+            id: SaveSlotID(), metadata: nil, validity: .corrupt(reason: "Unreadable")))
+
+        XCTAssertEqual(valid.progressBookCount, metadata.progressBookCount)
+        XCTAssertGreaterThan(valid.progressBookCount, 0)
+        XCTAssertEqual(corrupt.progressBookCount, 0)
+    }
+
     func testPersistenceDescriptorMapsFutureAndCorruptSlotsWithoutHidingThem() {
         let futureID = SaveSlotID()
         let future = CampaignSlotSummary(descriptor: SaveSlotDescriptor(

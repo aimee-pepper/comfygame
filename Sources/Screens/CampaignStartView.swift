@@ -34,6 +34,7 @@ struct CampaignSlotSummary: Identifiable, Equatable, Sendable {
     let binderLevel: Int
     let location: String
     let progression: String
+    let progressBookCount: Int
     let health: CampaignSlotHealth
     let debugVersion: String?
     let hasKnownMetadata: Bool
@@ -64,6 +65,11 @@ struct CampaignSlotSummary: Identifiable, Equatable, Sendable {
         binderLevel = metadata?.binderLevel ?? 0
         location = metadata?.location ?? "Unavailable"
         progression = metadata?.progression ?? "Campaign metadata could not be read"
+        progressBookCount = metadata.map {
+            min(CampaignShelfProgress.maximumBooks,
+                max(CampaignShelfProgress.minimumBooks,
+                    $0.progressBookCount ?? CampaignShelfProgress.minimumBooks + max(0, $0.binderLevel - 1) / 2))
+        } ?? 0
         hasKnownMetadata = metadata != nil
         switch descriptor.validity {
         case .valid:
@@ -83,11 +89,13 @@ struct CampaignSlotSummary: Identifiable, Equatable, Sendable {
     }
 
     init(id: UUID, name: String, lastPlayed: Date, binderLevel: Int, location: String,
-         progression: String, health: CampaignSlotHealth, debugVersion: String?,
+         progression: String, progressBookCount: Int = CampaignShelfProgress.minimumBooks,
+         health: CampaignSlotHealth, debugVersion: String?,
          hasKnownMetadata: Bool = true) {
         self.id = id; self.name = name; self.lastPlayed = lastPlayed
         self.binderLevel = binderLevel; self.location = location
-        self.progression = progression; self.health = health; self.debugVersion = debugVersion
+        self.progression = progression; self.progressBookCount = progressBookCount
+        self.health = health; self.debugVersion = debugVersion
         self.hasKnownMetadata = hasKnownMetadata
     }
 }
@@ -263,7 +271,7 @@ private struct CampaignSlotCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            CampaignBookplateMotif(id: slot.id)
+            CampaignBookplateMotif(id: slot.id, bookCount: slot.progressBookCount)
                 .frame(height: 42)
                 .accessibilityHidden(true)
 
@@ -330,7 +338,7 @@ private struct CampaignSlotDetail: View {
         NavigationStack {
             List {
                 Section {
-                    CampaignBookplateMotif(id: slot.id)
+                    CampaignBookplateMotif(id: slot.id, bookCount: slot.progressBookCount)
                         .frame(height: 58)
                         .accessibilityHidden(true)
                     Text(slot.name).font(.title2.bold())
@@ -373,10 +381,13 @@ private struct CampaignSlotDetail: View {
 
 private struct CampaignBookplateMotif: View {
     let id: UUID
+    let bookCount: Int
 
     private var marks: [Bool] {
         withUnsafeBytes(of: id.uuid) { bytes in
-            (0..<8).map { index in (bytes[index] & 1) == 1 }
+            (0..<max(0, bookCount)).map { index in
+                (bytes[index % bytes.count] & UInt8(1 << (index % 4))) != 0
+            }
         }
     }
 
