@@ -4,7 +4,7 @@
   "installedCheckpoint": "f9be251 · Honest local bug-report save",
   "essenceBaseline": "a816113",
   "currentWork": "P1 combat-tree-v2 shared consumer foundations",
-  "currentNote": "Schema-2 topology, all 72 exact Effect strings and canonical 20-technique/52-passive ownership are generated and freshness-gated in 71ffca2. Combat-v2 remains inactive while Engineering implements and scenario-tests the shared consumer primitives; tutorials remain excluded.",
+  "currentNote": "Checkpoint a86c2d3 adds the dormant actor-derived-stat foundation without partially activating v2. Engineering continues the shared consumer primitives and scenario coverage; tutorials remain excluded.",
   "items": [
     {
       "id": "essence",
@@ -83,8 +83,8 @@
       "priority": "G",
       "title": "Noll second + Halloway third",
       "status": "queued",
-      "detail": "After Aimee approves Noll's identity/live copy, migrate to Vance → Noll → Halloway without granting Noll to old saves.",
-      "gate": "Fresh campaign reaches circulate → recover → retain/make without recreating the Essence blocker."
+      "detail": "Promote reversible playtest Noll as order 2/story-arrival band 0 and sole Recycler owner. Use current stable-ID meeting/diary units as DEBUG-Atlas-labelled Provisional copy, do not grant the held Field Separation Kit, and do not grant Noll to old saves.",
+      "gate": "Fresh-save signature/one-person selection, provisional-copy census, meeting/recruitment, 15e Recycler construction, sell-versus-recycle runway and old-save dormant-state migration are green without a free Noll or Field Separation Kit."
     },
     {
       "id": "terrain",
@@ -203,7 +203,7 @@
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
       "status": "inProgress",
-      "detail": "Checkpoint 71ffca2 generates the accepted three true graphs, exact Effect copy and canonical technique ownership from schema-2 authority, with every normal Xcode build failing stale mirrors. Next: implement and scenario-test shared consumer primitives, then lossless ownership migration and the native phone graph. Keep unresolved baseline ownership and Withdraw naming choices separable.",
+      "detail": "Checkpoint 71ffca2 generates the accepted three true graphs, exact Effect copy and canonical technique ownership from schema-2 authority. Checkpoint a86c2d3 adds a dormant, stable-ID actor-derived-stat foundation; production remains on legacy combat until all shared consumers can switch atomically. Next: complete scenario-tested consumer primitives, then lossless ownership migration and the native phone graph.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {
@@ -242,9 +242,17 @@
       "id": "traveller-world-pacing",
       "priority": "P1",
       "title": "Prevent first-world traveller crowds",
-      "status": "queued",
-      "detail": "Fresh world one placed Mara and early-mid Bryn together because worldgen ignores sequencing metadata and places every signature match. Settled: at most one new traveller and no blind late match. Recommended under review: Let the world decide follows Vance → Noll → Halloway as a next-live-person blind gate, while explicit Seek may target any person with a recovered location clue; later blind discovery uses max(3, order-blindDiscoveryWindow), Recommended 3.",
-      "gate": "After Aimee settles Seek semantics, the Mara+Bryn fixture, successful/failed selected targets, multiple known matches, Let the world decide, blind opening priority, DEBUG 1/3/6, anchored revisits and bind-receipt relaunch all pass. Authority: traveller-world-pacing-current.md."
+      "status": "readyToTest",
+      "detail": "Implemented in a86c2d3: each new world selects at most one full-signature match through blind frontier, immutable arrival band, causal evidence and stable tie-breaks. One frozen confidence roll uses saved near-miss protection; failure substitutes nobody. Diary discovery is normalized by subject/diary bucket so long books do not dominate by page count. Fresh-save phone acceptance remains.",
+      "gate": "Mara+Bryn/no-clue, cross/same-band full matches, clue counts, causal counterfactuals, opening order, DEBUG weights/window and seed/shuffle/relaunch prove one stable candidate; then arrival confidence proves 25/62.5/100% at zero/half/all authored, +25 saved near misses, guaranteed third match and no substitute on failure. Authority: traveller-world-pacing-current.md, roster-progression-current.md and traveller-arrival-confidence-review-current.md."
+    },
+    {
+      "id": "traveller-clue-distribution",
+      "priority": "P2",
+      "title": "Keep long diaries from dominating clue drops",
+      "status": "readyToTest",
+      "detail": "Implemented in a86c2d3: ordinary diary discovery selects an average-weighted location-subject or diary-author bucket before selecting the exact page. Context preference, writing rate and the due one-page patience override are preserved; seeded phone/campaign distribution remains to test.",
+      "gate": "Controlled one-page/ten-page buckets have equal aggregate weight; contextual preference still matters; exact patience nominee, writing floor, stable seed/shuffle/relaunch and seeded campaign distribution pass. Authority: traveller-clue-distribution-current.md."
     },
     {
       "id": "library-collection-accuracy",
