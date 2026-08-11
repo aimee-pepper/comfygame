@@ -3,8 +3,8 @@
   "updated": "11 Aug 2026",
   "installedCheckpoint": "6c649ee · persisted encounter openings + real launch progress",
   "essenceBaseline": "a816113",
-  "currentWork": "P0 world-grade-2 native boundary + P1 bug-report delivery",
-  "currentNote": "Persisted encounter openings and a real phase-driven launch bar are installed for phone acceptance. Next, Engineering reviews the accepted keyed world-grade-2 descriptor/conformance boundary in an isolated asset lane; direct bug-report delivery still waits for an approved relay endpoint and Keychain credential.",
+  "currentWork": "P0 world-grade-2 production handoff + P1 bug-report delivery",
+  "currentNote": "Persisted encounter openings and a real phase-driven launch bar are installed for phone acceptance. World-grade-2 v0.2 is accepted calibration evidence, but its own report remains integrationReady:false; Asset must publish the frozen schema, production tuple, immutable manifest and native conformance vectors before Engineering ports it in the isolated visual lane. Direct bug-report delivery still waits for an approved relay endpoint and Keychain credential.",
   "items": [
     {
       "id": "essence",
@@ -163,8 +163,8 @@
       "priority": "P0",
       "title": "Meaningful world color differentiation",
       "status": "next",
-      "detail": "Repeated world palettes are materially reducing exploration readability. Asset is producing the isolated world-grade-2 proof; native renderer work waits for accepted proof and schema review.",
-      "gate": "Visual distance tracks meaningful authored and resolved input distance: similar worlds remain related, while opposed worlds separate proportionally. No promise of universal uniqueness or arbitrary neutral-world variety. Authority: docs/world-color-differentiation-current.md."
+      "detail": "Repeated world palettes are materially reducing exploration readability. The keyed v0.2 calibration is accepted, but it is not a native handoff: Asset must freeze the production descriptor/schema/version tuple and publish immutable command/RGBA vectors before Engineering integration.",
+      "gate": "Asset handoff declares integrationReady:true and pins schema + manifest hashes, canonical descriptor encoding, resolver/palette/renderer versions, command/RGBA/geometry vectors and legacy-v1 migration. Then native visual distance must track meaningful authored and resolved input distance: similar worlds remain related, while opposed worlds separate proportionally, with no universal uniqueness or arbitrary neutral-world variety. Authority: docs/world-color-differentiation-current.md."
     },
     {
       "id": "bug-reporter",

@@ -298,16 +298,19 @@ private struct DebugBugReportQueueView: View {
                 ShareLink(item: DebugBugReportOutbox.live.exportURL(for: entry.report, in: entry.directory)) {
                     Label("Share saved report", systemImage: "square.and.arrow.up")
                 }
+                .buttonStyle(.borderless)
                 if let configuration = DebugBugReportRelayConfiguration.live(),
                    entry.report.transportState != .submitted {
                     Button(entry.report.transportState == .needsAttention ? "Retry submission" : "Submit to triage") {
                         submit(entry.report.id, configuration: configuration)
                     }
+                    .buttonStyle(.borderless)
                     .disabled(submitting.contains(entry.report.id))
                 }
                 Button("Delete saved report", role: .destructive) {
                     deletionCandidate = entry.report
                 }
+                .buttonStyle(.borderless)
             }.padding(.vertical, 4)
         }
         .navigationTitle("Bug queue")
