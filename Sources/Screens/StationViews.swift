@@ -269,7 +269,7 @@ private extension AnchorRoute {
 /// as opposed to the satchel decision, which belongs in the world while the walls are closing in.
 private struct SpilloverCard: View {
     @EnvironmentObject private var store: GameStore
-    @State private var swapping: ItemStack?
+    @State private var opened: ItemStack?
 
     var body: some View {
         StationCard(title: "Waiting to be sorted — \(store.spillover.count)", icon: "tray.full") {
@@ -278,31 +278,72 @@ private struct SpilloverCard: View {
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            ForEach(store.spillover) { stack in
-                VStack(alignment: .leading, spacing: 8) {
-                    LabeledRow(icon: stack.icon,
-                               label: stack.displayName,
-                               value: stack.detail,
-                               tint: stack.rarity.tint)
-                    HStack(spacing: 8) {
-                        if store.state.base.inventory.isFull {
-                            Button("Make room") { swapping = stack }
-                                .buttonStyle(.borderedProminent)
-                                .frame(minHeight: 44)
-                        } else {
-                            Button("Store it") { store.storeSpilled(stack) }
-                                .buttonStyle(.borderedProminent)
-                                .frame(minHeight: 44)
-                        }
-                        Button("Throw away", role: .destructive) { store.discardSpilled(stack) }
-                            .frame(minHeight: 44)
-                    }
+            SixAcrossItemGrid(data: store.spillover, id: \.id) { stack in
+                Button { opened = stack } label: {
+                    ItemIconTile(icon: stack.icon, rarity: stack.rarity,
+                                 quantity: stack.count, identified: stack.identified,
+                                 location: .waiting,
+                                 accessibilityName: stack.displayName)
                 }
-                .padding(.vertical, 4)
+                .buttonStyle(.plain)
             }
         }
-        .sheet(item: $swapping) { spilled in
-            SwapSheet(spilled: spilled)
+        .sheet(item: $opened) { spilled in
+            SpilloverDetailSheet(spilled: spilled).environmentObject(store)
+        }
+    }
+}
+
+private struct SpilloverDetailSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var isMakingRoom = false
+    let spilled: ItemStack
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack(spacing: 16) {
+                        ItemIconTile(icon: spilled.icon, rarity: spilled.rarity,
+                                     quantity: spilled.count, identified: spilled.identified,
+                                     location: .waiting,
+                                     accessibilityName: spilled.displayName)
+                            .frame(width: 58, height: 58)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(spilled.displayName).font(.headline).foregroundStyle(spilled.rarity.tint)
+                            Text("Waiting to sort").font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                Section("Details") {
+                    LabeledContent("Quantity", value: "\(spilled.count)")
+                    LabeledContent("Location", value: ItemGridLocation.waiting.displayName)
+                    if !spilled.detail.isEmpty { Text(spilled.detail) }
+                }
+                Section {
+                    if store.state.base.inventory.isFull {
+                        Button("Make room") { isMakingRoom = true }
+                    } else {
+                        Button("Store it") {
+                            store.storeSpilled(spilled)
+                            dismiss()
+                        }
+                    }
+                    Button("Throw away", role: .destructive) {
+                        store.discardSpilled(spilled)
+                        dismiss()
+                    }
+                }
+            }
+            .navigationTitle(spilled.identified ? spilled.displayName : "Unknown item")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
+            }
+            .sheet(isPresented: $isMakingRoom) {
+                SwapSheet(spilled: spilled).environmentObject(store)
+            }
         }
     }
 }
@@ -316,30 +357,34 @@ private struct SwapSheet: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    LabeledRow(icon: spilled.icon, label: spilled.displayName,
-                               value: "", tint: spilled.rarity.tint)
-                } header: {
-                    Text("Making room for")
-                }
-                Section {
-                    ForEach(store.state.base.inventory.stacks) { stored in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Making room for").font(.headline)
+                    HStack(spacing: 12) {
+                        ItemIconTile(icon: spilled.icon, rarity: spilled.rarity,
+                                     quantity: spilled.count, identified: spilled.identified,
+                                     location: .waiting,
+                                     accessibilityName: spilled.displayName)
+                            .frame(width: 52, height: 52)
+                        Text(spilled.displayName).font(.callout.weight(.medium))
+                    }
+                    Text("Choose what returns to the waiting pile").font(.headline)
+                    SixAcrossItemGrid(data: store.state.base.inventory.stacks, id: \.id) { stored in
                         Button {
                             store.swapSpilled(spilled, for: stored)
                             dismiss()
                         } label: {
-                            LabeledRow(icon: stored.icon, label: stored.displayName,
-                                       value: stored.detail,
-                                       tint: stored.rarity.tint)
+                            ItemIconTile(icon: stored.icon, rarity: stored.rarity,
+                                         quantity: stored.count, identified: stored.identified,
+                                         location: .stored,
+                                         accessibilityName: stored.displayName)
                         }
-                        .frame(minHeight: 44)
+                        .buttonStyle(.plain)
                     }
-                } header: {
-                    Text("Replaces")
-                } footer: {
                     Text("Whatever you replace goes back to the waiting pile. Nothing is thrown away here.")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
+                .padding(16)
             }
             .navigationTitle("Make room")
             .navigationBarTitleDisplayMode(.inline)
