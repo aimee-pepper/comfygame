@@ -36,6 +36,9 @@ struct RootView: View {
         )) {
             AnchorSettlementView().environmentObject(store)
         }
+#if DEBUG
+        .overlay { DebugBugReporterOverlay(store: store) }
+#endif
     }
 }
 
