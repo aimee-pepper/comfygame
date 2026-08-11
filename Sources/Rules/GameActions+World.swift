@@ -432,6 +432,7 @@ extension GameStore {
                                                        netRunway: EconomyRules.spendableEssence(in: state)))
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
+            Self.refreshTradingPost(after: run, in: &state)
             state.worlds.activeRun = nil
             Self.prepareAnchorSettlement(in: &state)
         }
@@ -473,6 +474,7 @@ extension GameStore {
                                                        netRunway: EconomyRules.spendableEssence(in: state)))
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
+            Self.refreshTradingPost(after: run, in: &state)
             state.worlds.activeRun = nil
             Self.prepareAnchorSettlement(in: &state)
         }

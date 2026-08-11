@@ -79,6 +79,23 @@
       "route": "library"
     },
     {
+      "id": "trading_post",
+      "name": "Trading Post",
+      "icon": "arrow.left.arrow.right",
+      "blurb": "Sell identified holdings and buy from Vance's rotating ordinary stock.",
+      "sortOrder": 7,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 0,
+      "route": "tradingPost",
+      "builtBy": "vance",
+      "buildCost": {
+        "essence": 10,
+        "resources": {}
+      },
+      "buildBlurb": "Vance can set out a ledger and a table here for anything your household should not keep."
+    },
+    {
       "id": "blacksmith",
       "name": "Blacksmith",
       "icon": "hammer.fill",

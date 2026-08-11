@@ -75,6 +75,7 @@
 		52A3E7BA47AED80B02C9FFDA /* BestiaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D9F704438225E8CFD8268D /* BestiaryTests.swift */; };
 		52C1E5841A22ED23AA8245DF /* Tuning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644939D61FCF530C40392FCC /* Tuning.swift */; };
 		54180CF9C6CE41FEA6C57B60 /* ContradictionRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92B2180E4666F5000817D3EC /* ContradictionRules.swift */; };
+		54E8A6FB039D4B6F7FF4AA92 /* OpeningEconomyContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DED817BCBD65429BDCD60C9 /* OpeningEconomyContentTests.swift */; };
 		56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8946B89F914D32DABAC53D5A /* Worldgen.swift */; };
 		583140A5C38A586267218BC1 /* combat_trees.json in Resources */ = {isa = PBXBuildFile; fileRef = FD2CA32A5090B2067ABD22C0 /* combat_trees.json */; };
 		5B91181B627494D599038230 /* constellation.json in Resources */ = {isa = PBXBuildFile; fileRef = DD0C594698AE7E6D06191449 /* constellation.json */; };
@@ -82,6 +83,7 @@
 		5BAABA4D069D949BB71CA216 /* WorldRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB361F4E36998C9A7F31A44 /* WorldRules.swift */; };
 		5C566924739958DDBD8FBFF9 /* StationStaffingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A994CD6D435E84CB0C58E988 /* StationStaffingTests.swift */; };
 		5DEF7F6C69BC916C96535B2D /* TerrainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E8A2DF6BF1E7AB1B5B574C /* TerrainTests.swift */; };
+		5FE46B0BE1FA690A55635C78 /* TradingPostRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CD14CCF42EC2DE49E1F617 /* TradingPostRules.swift */; };
 		601014E078036FCE48CDAF06 /* BaseState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B664EB59C95581C3098E542B /* BaseState.swift */; };
 		635C2692AD380102590270C3 /* WorldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9311ACC91B2E555993A3297 /* WorldView.swift */; };
 		66727C83C77239282A12ADBC /* WorldScaleAndNightTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A91FFF6BF680BAFC6742249 /* WorldScaleAndNightTests.swift */; };
@@ -121,7 +123,9 @@
 		9F43622A2E66874204BCCDC7 /* NamingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56058E017000066A61CD5F0 /* NamingTests.swift */; };
 		9F5DC7673BF8A93B1EF8ED6B /* WorldHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51F4BCA8A3D72D7B108E2E1 /* WorldHistoryView.swift */; };
 		A0E08F8449F633B86AA0FF7A /* DistilleryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2735185C6352AE1A8F71DD42 /* DistilleryRules.swift */; };
+		A300CEAFF2FFDDD22DD00C9A /* GameActions+TradingPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD181474BAFE15E98980FD8 /* GameActions+TradingPost.swift */; };
 		A30BFB516414E49CB79270EF /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9142092437E5652D87187DF8 /* Migrations.swift */; };
+		A4BBB435916ACBCC3039F0B4 /* TradingPostTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE496768808007B40188081 /* TradingPostTests.swift */; };
 		A6C910C0BD0B249F3AE3B0AE /* QualifierModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFEB95F304073E45D3BB22FB /* QualifierModels.swift */; };
 		A7B958AF227E4AD7A6E2E900 /* PageGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D5618B6B6F36DB62CD836B /* PageGridView.swift */; };
 		A81656D157A597344E823340 /* GrammarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFAE95092D158944E000B02 /* GrammarTests.swift */; };
@@ -151,6 +155,7 @@
 		CF22F5AA092E017612B1124E /* LootDecisionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD5B65B248A4645C422FEA0D /* LootDecisionView.swift */; };
 		CFFD06DFE407E96C28AB6464 /* travellers.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D960FCB6727D86D57A82BF4 /* travellers.json */; };
 		D469496DC882C482CB83E721 /* WorldMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B20DAF90C2684826A3C3F21 /* WorldMap.swift */; };
+		D4C22A64280B145820AEF8E8 /* TradingPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1382E660444BCF946A8778 /* TradingPost.swift */; };
 		D4DE88F2BA8D93E6307B66A6 /* GameActions+World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE0FA07FD91558E2F953944 /* GameActions+World.swift */; };
 		D70BCC3356D30C3EC0FFA587 /* StackingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F880A764AED5BABB194953 /* StackingTests.swift */; };
 		D80F4645CCFCE0956CFBB33B /* ReachableContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87D049B2DF2A90A21B3729E /* ReachableContentTests.swift */; };
@@ -162,9 +167,11 @@
 		DEB5615945275C75236426AD /* LibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DFFB14B396FE04A7C03E01 /* LibraryTests.swift */; };
 		DFD7015BF47869ECBCD4BD4B /* ConsumableCraftingRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B3BDF8FB0EE8418DD8EC80 /* ConsumableCraftingRules.swift */; };
 		E03430D101A162FC1F36A8B1 /* ContradictionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2227C9E0E4E333249CF7FEFA /* ContradictionModels.swift */; };
+		E091E0BFAB7D2EE5A6146890 /* TradingPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE9C21A64B585FBF480A8268 /* TradingPostView.swift */; };
 		E0B21F8C88F40A6B7F9E8212 /* GambitEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F978ADFABDF1296849D8F5AB /* GambitEngine.swift */; };
 		E0C67C543BF911F3F58A0C80 /* CombatTreeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4924ECCC22AE9125898B039F /* CombatTreeModels.swift */; };
 		E412FF242D7E09BD9DBB75E8 /* gambit_components.json in Resources */ = {isa = PBXBuildFile; fileRef = 6AE18B24DF2998D5D65F61D0 /* gambit_components.json */; };
+		E62CC0DEF814DD53743731F9 /* TradingPostFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818724CCF5EB78A3DCEC46E4 /* TradingPostFlowTests.swift */; };
 		E7C947F1BFF84DDAE9B61761 /* PreviewPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */; };
 		E90526D391BEDFC1166DCE96 /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19DC1448710810CD318671E /* Identifiers.swift */; };
 		EAB84410DBECDF38B16E452B /* GearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B71324BA8EC6B7B6732500 /* GearView.swift */; };
@@ -207,11 +214,13 @@
 		0F66F95CC3FEA4D5E13AE410 /* DescriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionModels.swift; sourceTree = "<group>"; };
 		14E466EEC3518F71FDD38EE9 /* RuneGlyph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneGlyph.swift; sourceTree = "<group>"; };
 		1824E6BFD5550AACCB6416A5 /* DangerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DangerTests.swift; sourceTree = "<group>"; };
+		1A1382E660444BCF946A8778 /* TradingPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingPost.swift; sourceTree = "<group>"; };
 		1AE0FA07FD91558E2F953944 /* GameActions+World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+World.swift"; sourceTree = "<group>"; };
 		1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchViews.swift; sourceTree = "<group>"; };
 		1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GambitEditorView.swift; sourceTree = "<group>"; };
 		1F045A414F1C1CF9A9A916BB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		1FD618ABD859C8D8097F3DC0 /* TerrainRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerrainRules.swift; sourceTree = "<group>"; };
+		1FE496768808007B40188081 /* TradingPostTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingPostTests.swift; sourceTree = "<group>"; };
 		2227C9E0E4E333249CF7FEFA /* ContradictionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionModels.swift; sourceTree = "<group>"; };
 		224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+Economy.swift"; sourceTree = "<group>"; };
 		248394713D4F19F950F25B92 /* HarnessActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HarnessActions.swift; sourceTree = "<group>"; };
@@ -276,6 +285,7 @@
 		7B20DAF90C2684826A3C3F21 /* WorldMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldMap.swift; sourceTree = "<group>"; };
 		80B20E4E8E0EE351CA9E333B /* DraftMeetingCorpus.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftMeetingCorpus.generated.swift; sourceTree = "<group>"; };
 		80DFFB14B396FE04A7C03E01 /* LibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryTests.swift; sourceTree = "<group>"; };
+		818724CCF5EB78A3DCEC46E4 /* TradingPostFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingPostFlowTests.swift; sourceTree = "<group>"; };
 		83F481D57E05D77B109D44FC /* SaveToleranceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveToleranceTests.swift; sourceTree = "<group>"; };
 		8581D80804C54BB6F112E428 /* DebugRoadmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRoadmapView.swift; sourceTree = "<group>"; };
 		86093A93DD9720F92E4148D5 /* GameStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStore.swift; sourceTree = "<group>"; };
@@ -286,7 +296,9 @@
 		8ADC03C0E941B354BFE2EF65 /* Discovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discovery.swift; sourceTree = "<group>"; };
 		8B8A444C3FE08E6935849BA8 /* InstrumentCraftingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentCraftingTests.swift; sourceTree = "<group>"; };
 		8DB361F4E36998C9A7F31A44 /* WorldRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldRules.swift; sourceTree = "<group>"; };
+		8DED817BCBD65429BDCD60C9 /* OpeningEconomyContentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpeningEconomyContentTests.swift; sourceTree = "<group>"; };
 		8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		8FD181474BAFE15E98980FD8 /* GameActions+TradingPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+TradingPost.swift"; sourceTree = "<group>"; };
 		9142092437E5652D87187DF8 /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
 		92B2180E4666F5000817D3EC /* ContradictionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionRules.swift; sourceTree = "<group>"; };
 		92E6DEE432F7A225C5C28D6E /* DescriptionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionRules.swift; sourceTree = "<group>"; };
@@ -313,6 +325,7 @@
 		B022088C9636578892397C50 /* BookProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookProjection.swift; sourceTree = "<group>"; };
 		B213D165D2239B2A934DB263 /* CombatTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTreeView.swift; sourceTree = "<group>"; };
 		B23878A2219B30C376009246 /* PressuresDriveGenerationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressuresDriveGenerationTests.swift; sourceTree = "<group>"; };
+		B4CD14CCF42EC2DE49E1F617 /* TradingPostRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingPostRules.swift; sourceTree = "<group>"; };
 		B4E29CCF27C6C3CDFCED5311 /* FloraTraits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloraTraits.swift; sourceTree = "<group>"; };
 		B543B94C8E89980FDE029D9C /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
 		B664EB59C95581C3098E542B /* BaseState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseState.swift; sourceTree = "<group>"; };
@@ -374,6 +387,7 @@
 		FBE911A8A2C4D05D38EF6192 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		FC12BB34DF703B3AFF600656 /* FloraIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloraIdentity.swift; sourceTree = "<group>"; };
 		FD2CA32A5090B2067ABD22C0 /* combat_trees.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = combat_trees.json; sourceTree = "<group>"; };
+		FE9C21A64B585FBF480A8268 /* TradingPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingPostView.swift; sourceTree = "<group>"; };
 		FF7811775C7058B692E07EB1 /* PageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -408,6 +422,7 @@
 				40DDEB42C7E2856E98352341 /* GameActions.swift */,
 				3464FCF84292D7835460EDEE /* GameActions+Combat.swift */,
 				224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */,
+				8FD181474BAFE15E98980FD8 /* GameActions+TradingPost.swift */,
 				1AE0FA07FD91558E2F953944 /* GameActions+World.swift */,
 				637E2762C9738BB22D883D75 /* InstrumentCraftingRules.swift */,
 				F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */,
@@ -420,6 +435,7 @@
 				BDFF9A08573788622472DB26 /* SmithRules.swift */,
 				AF13E2576281E76FA92CD685 /* StationStaffingRules.swift */,
 				1FD618ABD859C8D8097F3DC0 /* TerrainRules.swift */,
+				B4CD14CCF42EC2DE49E1F617 /* TradingPostRules.swift */,
 				DB0490C36229CF9D49D6695F /* TutorialRules.swift */,
 				541026CEC51423252ED5FAFD /* WorldConstraints.swift */,
 				8946B89F914D32DABAC53D5A /* Worldgen.swift */,
@@ -487,6 +503,7 @@
 				8FC5961B006C6E0FA2B8EDBC /* SettingsView.swift */,
 				03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */,
 				2C9C43310A7E6D0342B11251 /* StationViews.swift */,
+				FE9C21A64B585FBF480A8268 /* TradingPostView.swift */,
 				D08A668BC1215643DD63B178 /* TravellerMeetingView.swift */,
 				F04D876D78710D8DC1CAB2BE /* TutorialCard.swift */,
 				0212875D2B95EA338E16F0B2 /* WorldDescriptionPanel.swift */,
@@ -546,6 +563,7 @@
 				B543B94C8E89980FDE029D9C /* Page.swift */,
 				CAAA1B171F7C380229C20CC5 /* RealityState.swift */,
 				3358F9F069CEED67DA33294D /* Sigil.swift */,
+				1A1382E660444BCF946A8778 /* TradingPost.swift */,
 				C90EDFFDB627C51117ADED0E /* TutorialState.swift */,
 				7B20DAF90C2684826A3C3F21 /* WorldMap.swift */,
 				4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */,
@@ -642,6 +660,7 @@
 				7A7229E243E5EB4700C03C4A /* LifeTests.swift */,
 				E14C42A31CF4E0C858F212BF /* MaterialTests.swift */,
 				D56058E017000066A61CD5F0 /* NamingTests.swift */,
+				8DED817BCBD65429BDCD60C9 /* OpeningEconomyContentTests.swift */,
 				FF7811775C7058B692E07EB1 /* PageTests.swift */,
 				606F9667A67D771D03320DDA /* PersistenceTests.swift */,
 				A01228DC87E3A479A661D525 /* PhysicalGearCraftingTests.swift */,
@@ -656,6 +675,8 @@
 				75F880A764AED5BABB194953 /* StackingTests.swift */,
 				A994CD6D435E84CB0C58E988 /* StationStaffingTests.swift */,
 				F7E8A2DF6BF1E7AB1B5B574C /* TerrainTests.swift */,
+				818724CCF5EB78A3DCEC46E4 /* TradingPostFlowTests.swift */,
+				1FE496768808007B40188081 /* TradingPostTests.swift */,
 				0DA805AE9804EFB6621B7166 /* TutorialTests.swift */,
 				BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */,
 				0EF2B3DBADEF32F2DE2B00DE /* WeaponsmithTests.swift */,
@@ -837,6 +858,7 @@
 				E0B21F8C88F40A6B7F9E8212 /* GambitEngine.swift in Sources */,
 				893B4E338D412AE9D298E4A4 /* GameActions+Combat.swift in Sources */,
 				19C9DFC5BC904175AC32B894 /* GameActions+Economy.swift in Sources */,
+				A300CEAFF2FFDDD22DD00C9A /* GameActions+TradingPost.swift in Sources */,
 				D4DE88F2BA8D93E6307B66A6 /* GameActions+World.swift in Sources */,
 				3939EA44678C9E3D7CE7FF86 /* GameActions.swift in Sources */,
 				BFB3CF53CC01D5CED466B0C9 /* GameState.swift in Sources */,
@@ -888,6 +910,9 @@
 				0573EFC73887107DB190A9DF /* StationViews.swift in Sources */,
 				6C90C6B086284BE1533023D2 /* TerrainRules.swift in Sources */,
 				A901EE2297DFB40E48663457 /* Theme.swift in Sources */,
+				D4C22A64280B145820AEF8E8 /* TradingPost.swift in Sources */,
+				5FE46B0BE1FA690A55635C78 /* TradingPostRules.swift in Sources */,
+				E091E0BFAB7D2EE5A6146890 /* TradingPostView.swift in Sources */,
 				2133F8A2A985268991F782B5 /* TravellerMeetingView.swift in Sources */,
 				0D0B63ACE19B51E89D5321F8 /* TravellerModels.swift in Sources */,
 				52C1E5841A22ED23AA8245DF /* Tuning.swift in Sources */,
@@ -936,6 +961,7 @@
 				A94D38590FAA36B2D274214B /* LifeTests.swift in Sources */,
 				BCB44A183A64B987C97BC1EA /* MaterialTests.swift in Sources */,
 				9F43622A2E66874204BCCDC7 /* NamingTests.swift in Sources */,
+				54E8A6FB039D4B6F7FF4AA92 /* OpeningEconomyContentTests.swift in Sources */,
 				AC3C0F06CB2BD3D9A9917BA1 /* PageTests.swift in Sources */,
 				0290A7D4A5E8A5E8516E171E /* PersistenceTests.swift in Sources */,
 				39EB7F728697D5247C1E39F2 /* PhysicalGearCraftingTests.swift in Sources */,
@@ -950,6 +976,8 @@
 				D70BCC3356D30C3EC0FFA587 /* StackingTests.swift in Sources */,
 				5C566924739958DDBD8FBFF9 /* StationStaffingTests.swift in Sources */,
 				5DEF7F6C69BC916C96535B2D /* TerrainTests.swift in Sources */,
+				E62CC0DEF814DD53743731F9 /* TradingPostFlowTests.swift in Sources */,
+				A4BBB435916ACBCC3039F0B4 /* TradingPostTests.swift in Sources */,
 				45B359C084C6F5A35C69529A /* TutorialTests.swift in Sources */,
 				01A65B5074EBFC458F077A59 /* VocabularyTests.swift in Sources */,
 				C70E08A04DE0584580A4800F /* WeaponsmithTests.swift in Sources */,

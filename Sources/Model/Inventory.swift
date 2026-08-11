@@ -130,6 +130,9 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     var catalogID: ItemID
     var count: Int = 1
     var identified: Bool = true
+    /// Player-authored sale safeguards. Missing fields on old saves are deliberately false.
+    var isFavorite: Bool = false
+    var isLocked: Bool = false
     /// **How far this piece has been reforged** at the Blacksmith. Gear only.
     ///
     /// Per instance, not per catalogue entry — the point of upgrading over replacing is that *this*
@@ -179,7 +182,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     /// loads: it held one sample and a count, and becomes a bin holding that many of it.
     private enum StoredKeys: String, CodingKey {
         case id, catalogID, count, identified, materials, material, upgradeLevel, wildGrowth
-        case distilledCore, protectedReturnCount, gearProfile
+        case distilledCore, protectedReturnCount, gearProfile, isFavorite, isLocked
     }
 
     /// Tolerant decoding, per the policy in `Migrations.swift`.
@@ -189,6 +192,8 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         catalogID = try c.decode(ItemID.self, forKey: .catalogID)
         count = try c.decodeIfPresent(Int.self, forKey: .count) ?? 1
         identified = try c.decodeIfPresent(Bool.self, forKey: .identified) ?? true
+        isFavorite = try c.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
+        isLocked = try c.decodeIfPresent(Bool.self, forKey: .isLocked) ?? false
         upgradeLevel = try c.decodeIfPresent(Int.self, forKey: .upgradeLevel) ?? 0
         wildGrowth = try c.decodeIfPresent(Int.self, forKey: .wildGrowth) ?? 0
         gearProfile = try c.decodeIfPresent(GearInstanceProfile.self, forKey: .gearProfile)
@@ -216,7 +221,8 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
     enum BinKey: Hashable, Sendable {
         case material(MaterialKind)
         case distilledCore(ItemID, DistilledCore)
-        case item(ItemID, identified: Bool, upgradeLevel: Int, wildGrowth: Int)
+        case item(ItemID, identified: Bool, upgradeLevel: Int, wildGrowth: Int,
+                  isFavorite: Bool, isLocked: Bool)
         case gear(InstanceID)
     }
 
@@ -227,7 +233,7 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         // Upgrade level is part of what a piece *is*: a blade you've reforged twice is not
         // interchangeable with one fresh off the ground.
         return .item(catalogID, identified: identified, upgradeLevel: upgradeLevel,
-                     wildGrowth: wildGrowth)
+                     wildGrowth: wildGrowth, isFavorite: isFavorite, isLocked: isLocked)
     }
 
     /// The best example in the bin — what makes "12 hides · finest superb" possible.
@@ -255,6 +261,8 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
             result.wildGrowth = wildGrowth
             result.gearProfile = gearProfile
             result.protectedReturnCount = protectedTaken
+            result.isFavorite = isFavorite
+            result.isLocked = isLocked
             return result
         }
         let ordered = materials.sorted { $0.grade < $1.grade }
@@ -443,14 +451,20 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
     var upgradeLevel: Int = 0
     var wildGrowth: Int = 0
     var gearProfile: GearInstanceProfile?
+    var isFavorite: Bool = false
+    var isLocked: Bool = false
 
-    private enum StoredKeys: String, CodingKey { case catalogID, upgradeLevel, wildGrowth, gearProfile }
+    private enum StoredKeys: String, CodingKey {
+        case catalogID, upgradeLevel, wildGrowth, gearProfile, isFavorite, isLocked
+    }
 
     init(stringLiteral value: String) {
         self.catalogID = ItemID(rawValue: value)
         self.upgradeLevel = 0
         self.wildGrowth = 0
         self.gearProfile = nil
+        self.isFavorite = false
+        self.isLocked = false
     }
 
     init(catalogID: ItemID, upgradeLevel: Int = 0, wildGrowth: Int = 0) {
@@ -458,6 +472,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         self.upgradeLevel = upgradeLevel
         self.wildGrowth = wildGrowth
         self.gearProfile = nil
+        self.isFavorite = false
+        self.isLocked = false
     }
 
     init(_ stack: ItemStack) {
@@ -465,6 +481,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         self.upgradeLevel = stack.upgradeLevel
         self.wildGrowth = stack.wildGrowth
         self.gearProfile = stack.gearProfile
+        self.isFavorite = stack.isFavorite
+        self.isLocked = stack.isLocked
     }
 
     /// **Writes itself as a bare id when there's nothing else to say.**
@@ -473,7 +491,7 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
     /// stays hand-editable and legible — which is worth keeping. Only a reforged piece needs the
     /// object form, and only then does it stop being readable by an older build.
     func encode(to encoder: Encoder) throws {
-        guard upgradeLevel != 0 || wildGrowth != 0 || gearProfile != nil else {
+        guard upgradeLevel != 0 || wildGrowth != 0 || gearProfile != nil || isFavorite || isLocked else {
             var single = encoder.singleValueContainer()
             try single.encode(catalogID)
             return
@@ -483,6 +501,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         try c.encode(upgradeLevel, forKey: .upgradeLevel)
         try c.encode(wildGrowth, forKey: .wildGrowth)
         try c.encodeIfPresent(gearProfile, forKey: .gearProfile)
+        try c.encode(isFavorite, forKey: .isFavorite)
+        try c.encode(isLocked, forKey: .isLocked)
     }
 
     /// Accepts the **bare item id** this used to be, so a save from before pieces could be
@@ -493,6 +513,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
             upgradeLevel = 0
             wildGrowth = 0
             gearProfile = nil
+            isFavorite = false
+            isLocked = false
             return
         }
         let c = try decoder.container(keyedBy: StoredKeys.self)
@@ -500,6 +522,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
         upgradeLevel = try c.decodeIfPresent(Int.self, forKey: .upgradeLevel) ?? 0
         wildGrowth = try c.decodeIfPresent(Int.self, forKey: .wildGrowth) ?? 0
         gearProfile = try c.decodeIfPresent(GearInstanceProfile.self, forKey: .gearProfile)
+        isFavorite = try c.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
+        isLocked = try c.decodeIfPresent(Bool.self, forKey: .isLocked) ?? false
         if gearProfile == nil, let definition = ContentCatalog.shared.item(catalogID), definition.gear != nil {
             // BaseState assigns a collision-free stable id after every equipped slot is decoded.
             gearProfile = GearInstanceProfile(stableInstanceID: InstanceID(rawValue: 0),
@@ -543,6 +567,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
             if kept.stableInstanceID.rawValue == 0 { kept.stableInstanceID = stableID }
             return kept
         }
+        stack.isFavorite = isFavorite
+        stack.isLocked = isLocked
         return stack
     }
 }

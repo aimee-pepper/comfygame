@@ -158,8 +158,8 @@ final class LibraryTests: XCTestCase {
 
     func testTravellerProgressionUsesExplicitAuthoredOrder() {
         XCTAssertEqual(ContentCatalog.shared.travellersInAuthoredOrder.map(\.id),
-                       ["mara", "edren", "halloway", "isolde", "sela",
-                        "bryn", "orsa", "vance", "talin", "nessa", "corrin", "dagg", "rook",
+                       ["vance", "halloway", "mara", "edren", "isolde", "sela",
+                        "bryn", "orsa", "talin", "nessa", "corrin", "dagg", "rook",
                         "lys", "bracken", "fen", "wren", "kestrel", "maud", "marrick", "sabine", "grimmond", "oda", "auber", "ashe", "tovin", "perren", "nine"])
         XCTAssertTrue(ContentCatalog.shared.travellersInAuthoredOrder.allSatisfy {
             $0.authoredOrder != nil && $0.campaignPhase != nil

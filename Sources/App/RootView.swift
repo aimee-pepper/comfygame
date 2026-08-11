@@ -321,6 +321,7 @@ extension RootView {
         case .library: LibraryView()
         case .bestiary: BestiaryView()
         case .blacksmith: BlacksmithView()
+        case .tradingPost: TradingPostView()
         case .tannery: TanneryView()
         case .bowyer: BowyerView()
         case .armoury: ArmouryView()
