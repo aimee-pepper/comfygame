@@ -17,6 +17,7 @@ enum Worldgen {
         static let features: UInt64 = 0x4CAC
         static let sites: UInt64 = 0x5175
         static let pages: UInt64 = 0x9A6E
+        static let travellerArrival: UInt64 = 0x7A4E2
     }
 
     static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState(),
@@ -48,7 +49,9 @@ enum Worldgen {
         // Everything below reads the world's *pressures*. What a world is made of and what lives
         // in it now come from the eight targets rather than from flat per-symbol tables.
         let sigils = BookRules.sigils(for: book)
-        let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+        let rolledUnwritten = PressureRules.rollUnwritten(after: sigils, seed: seed)
+        let readings = PressureRules.resolve(sigils + rolledUnwritten)
+        let withoutAuthoredPressure = PressureRules.resolve(rolledUnwritten)
         let resolvedStabilityScore = BookRules.resolvedStabilityScore(of: book, seed: seed)
         // The same world with nothing rolled into it. Chasms read this as a floor, and the exit rule
         // reads it alone — see `TerrainRules.isRiven(asWritten:)`.
@@ -274,12 +277,57 @@ enum Worldgen {
         let travellerCandidates = ContentCatalog.shared.travellersInAuthoredOrder
             .map(\.id)
             .filter { !library.foundTravellers.contains($0) }
-        let travellers = LibraryRules.travellersPresent(in: readings)
-            .map(\.id)
-            .filter { !library.foundTravellers.contains($0) }
+        let matchingTravellerDefs = LibraryRules.travellersPresent(in: readings)
+            .filter { !library.foundTravellers.contains($0.id) }
+        let travellers = matchingTravellerDefs.map(\.id)
+        let causalConditionIndices = Dictionary(uniqueKeysWithValues: matchingTravellerDefs.map { traveller in
+            (traveller.id, LibraryRules.causalConditionIndices(
+                for: traveller, actual: readings,
+                withoutAuthoredPressure: withoutAuthoredPressure))
+        })
+        let travellerSelection = LibraryRules.selectTravellerForNewWorld(
+            from: matchingTravellerDefs, library: library,
+            blindDiscoveryWindow: tuning.blindDiscoveryWindow,
+            causalConditionIndices: causalConditionIndices,
+            clueWeight: tuning.travellerClueEvidenceWeight,
+            authoredWeight: tuning.travellerAuthoredEvidenceWeight)
         var placedTravellers: [TravellerID] = []
+        var travellerExclusions = travellerSelection.exclusions
         var travellerRNG = SeededRNG(seed: seed).derived(0x7A4E1)
-        for traveller in travellers {
+        var arrivalRNG = SeededRNG(seed: seed).derived(Salt.travellerArrival)
+        var travellerArrival = TravellerArrivalReceipt()
+        if let traveller = travellerSelection.selected,
+           let definition = matchingTravellerDefs.first(where: { $0.id == traveller }) {
+            let evidence = travellerSelection.evidence[traveller]
+                ?? .init(recoveredClues: 0, causallyAuthoredConditions: 0,
+                         causallyAuthoredKnownConditions: 0, evidenceScore: 0)
+            let priorNearMisses = library.travellerArrivalNearMisses[traveller] ?? 0
+            let chance = LibraryRules.travellerArrivalChance(
+                causallyAuthoredConditions: evidence.causallyAuthoredConditions,
+                totalConditions: definition.signature.count,
+                priorNearMisses: priorNearMisses,
+                floor: tuning.travellerArrivalChanceFloor,
+                nearMissIncrement: tuning.travellerArrivalNearMissIncrement)
+            let roll = arrivalRNG.double(in: 0...1)
+            travellerArrival = TravellerArrivalReceipt(
+                selectedTraveller: traveller,
+                storyArrivalBand: definition.storyArrivalBand,
+                authoredOrder: definition.authoredOrder,
+                totalConditions: definition.signature.count,
+                recoveredLocationClues: evidence.recoveredClues,
+                causallyAuthoredConditions: evidence.causallyAuthoredConditions,
+                causallyAuthoredKnownConditions: evidence.causallyAuthoredKnownConditions,
+                accidentalSatisfiedConditions: max(0, definition.signature.count
+                    - evidence.causallyAuthoredConditions),
+                evidenceScore: evidence.evidenceScore,
+                priorNearMisses: priorNearMisses,
+                arrivalChance: chance,
+                arrivalRoll: roll,
+                outcome: roll < chance || chance >= 1 ? .placementFailed : .confidenceFailed)
+            if travellerArrival.outcome == .confidenceFailed {
+                travellerExclusions.append(.init(traveller: traveller, reason: .arrivalRollFailed))
+            }
+            if travellerArrival.outcome != .confidenceFailed {
             // **Beside something, where there is something to be beside** (Q39.4, answered).
             //
             // A smith found next to a landmark is much better than a smith on a random tile — but
@@ -297,10 +345,15 @@ enum Worldgen {
                                    minimumDistanceFrom: entry,
                                    distance: Tuning.World.travellerMinimumDistance,
                                    rng: &travellerRNG)
-            guard let point else { continue }
-            map[point].content = .traveller(traveller)
-            occupied.insert(point)
-            placedTravellers.append(traveller)
+            if let point {
+                map[point].content = .traveller(traveller)
+                occupied.insert(point)
+                placedTravellers.append(traveller)
+                travellerArrival.outcome = .placed
+            } else {
+                travellerExclusions.append(.init(traveller: traveller, reason: .noPlacementTile))
+            }
+            }
         }
 
         // 10. Enemies, drawn from the world's own cast. It's daytime when you arrive, so it's the
@@ -390,7 +443,10 @@ enum Worldgen {
         diagnostics.projectedCollapseTurn = turnBudget
         diagnostics.travellerCandidates = travellerCandidates
         diagnostics.travellerSignatureMatches = travellers
+        diagnostics.travellerEligibleMatches = travellerSelection.eligible
+        diagnostics.travellerExclusions = travellerExclusions
         diagnostics.travellersPlaced = placedTravellers
+        diagnostics.travellerArrival = travellerArrival
         diagnostics.openingEnvelopeRequested = tuning.openingEncounterEnvelope
         diagnostics.openingEnvelopeApplied = envelopeApplied
         diagnostics.openingEnemiesRelocated = relocated

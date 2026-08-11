@@ -15,7 +15,137 @@ enum LibraryRules {
         ContentCatalog.shared.travellersInAuthoredOrder.filter { $0.isFound(in: readings) }
     }
 
+    struct TravellerSelection: Equatable {
+        var eligible: [TravellerID]
+        var selected: TravellerID?
+        var exclusions: [TravellerGenerationExclusion]
+        var evidence: [TravellerID: TravellerEvidence]
+    }
+
+    struct TravellerEvidence: Equatable {
+        var recoveredClues: Int
+        var causallyAuthoredConditions: Int
+        var causallyAuthoredKnownConditions: Int
+        var evidenceScore: Double
+    }
+
+    static func causalConditionIndices(for traveller: TravellerDef,
+                                       actual: PressureReadings,
+                                       withoutAuthoredPressure: PressureReadings) -> Set<Int> {
+        Set(traveller.signature.indices.filter {
+            traveller.signature[$0].condition.holds(in: actual)
+                && !traveller.signature[$0].condition.holds(in: withoutAuthoredPressure)
+        })
+    }
+
+    /// Freezes the single traveller this newly bound world may contain. Location knowledge may
+    /// deliberately reach ahead; name/relationship knowledge never does because only exact
+    /// recovered location clues enter `knownClueIndices`.
+    static func selectTravellerForNewWorld(
+        from signatureMatches: [TravellerDef],
+        library: LibraryState,
+        blindDiscoveryWindow: Int,
+        causalConditionIndices: [TravellerID: Set<Int>] = [:],
+        clueWeight: Double = 1,
+        authoredWeight: Double = 2
+    ) -> TravellerSelection {
+        let window = min(6, max(1, blindDiscoveryWindow))
+        let recruitedCount = library.foundTravellers.count
+        let matches = signatureMatches.filter { !library.foundTravellers.contains($0.id) }
+        let knownIndices = Dictionary(uniqueKeysWithValues: matches.map {
+            ($0.id, library.knownClueIndices(for: $0.id)
+                .intersection(Set($0.signature.indices)))
+        })
+        let eligibleDefs = matches.filter { traveller in
+            if !(knownIndices[traveller.id] ?? []).isEmpty { return true }
+            if traveller.campaignPhase == .opening { return true }
+            let order = traveller.authoredOrder ?? Int.max
+            return recruitedCount >= max(3, order - window)
+        }
+        let evidence = Dictionary(uniqueKeysWithValues: eligibleDefs.map { traveller in
+            let known = knownIndices[traveller.id] ?? []
+            let causal = causalConditionIndices[traveller.id] ?? []
+            let knownCausal = known.intersection(causal).count
+            return (traveller.id, TravellerEvidence(
+                recoveredClues: known.count,
+                causallyAuthoredConditions: causal.count,
+                causallyAuthoredKnownConditions: knownCausal,
+                evidenceScore: Double(known.count) * max(0, clueWeight)
+                    + Double(knownCausal) * max(0, authoredWeight)))
+        })
+        let earliestBand = eligibleDefs.compactMap(\.storyArrivalBand).min()
+        let sameBand = eligibleDefs.filter { $0.storyArrivalBand == earliestBand }
+        let ranked = sameBand.sorted { lhs, rhs in
+            let lhsEvidence = evidence[lhs.id]?.evidenceScore ?? 0
+            let rhsEvidence = evidence[rhs.id]?.evidenceScore ?? 0
+            if lhsEvidence != rhsEvidence { return lhsEvidence > rhsEvidence }
+            let lhsOrder = lhs.authoredOrder ?? Int.max
+            let rhsOrder = rhs.authoredOrder ?? Int.max
+            if lhsOrder != rhsOrder { return lhsOrder < rhsOrder }
+            return lhs.id.rawValue < rhs.id.rawValue
+        }
+        let selected = ranked.first?.id
+        let eligibleIDs = eligibleDefs.sorted {
+            let lhsOrder = $0.authoredOrder ?? Int.max
+            let rhsOrder = $1.authoredOrder ?? Int.max
+            return lhsOrder == rhsOrder ? $0.id.rawValue < $1.id.rawValue : lhsOrder < rhsOrder
+        }.map(\.id)
+        let eligibleSet = Set(eligibleIDs)
+        let exclusions = matches.compactMap { traveller -> TravellerGenerationExclusion? in
+            guard traveller.id != selected else { return nil }
+            let reason: TravellerGenerationExclusion.Reason
+            if !eligibleSet.contains(traveller.id) {
+                reason = .phaseLocked
+            } else if traveller.storyArrivalBand != earliestBand {
+                reason = .laterStoryBand
+            } else {
+                reason = .lowerSameBandEvidence
+            }
+            return TravellerGenerationExclusion(traveller: traveller.id, reason: reason)
+        }
+        return TravellerSelection(eligible: eligibleIDs, selected: selected,
+                                  exclusions: exclusions, evidence: evidence)
+    }
+
+    static func travellerArrivalChance(causallyAuthoredConditions: Int,
+                                       totalConditions: Int,
+                                       priorNearMisses: Int,
+                                       floor: Double = 0.25,
+                                       nearMissIncrement: Double = 0.25) -> Double {
+        guard totalConditions > 0 else { return 0 }
+        let causal = min(totalConditions, max(0, causallyAuthoredConditions))
+        if causal == totalConditions || priorNearMisses >= 2 { return 1 }
+        let boundedFloor = min(1, max(0, floor))
+        let fraction = Double(causal) / Double(totalConditions)
+        let base = boundedFloor + (1 - boundedFloor) * fraction
+        return min(1, base + Double(max(0, priorNearMisses)) * max(0, nearMissIncrement))
+    }
+
     // MARK: Finding pages
+
+    struct PageSelectionBucket: Equatable {
+        var key: String
+        var pageIDs: [DiaryPageID]
+        var weight: Double
+    }
+
+    static func pageSelectionBuckets(_ pages: [DiaryPageDef],
+                                     readings: PressureReadings) -> [PageSelectionBucket] {
+        let grouped = Dictionary(grouping: pages) { page -> String in
+            if page.kind == .locationClue, let about = page.about {
+                return "location:\(about.rawValue)"
+            }
+            return "diary:\(page.diary.rawValue)"
+        }
+        return grouped.keys.sorted().compactMap { key in
+            guard let bucketPages = grouped[key], !bucketPages.isEmpty else { return nil }
+            let total = bucketPages.reduce(0.0) { $0 + contextualPageWeight($1, in: readings) }
+            return PageSelectionBucket(
+                key: key,
+                pageIDs: bucketPages.map(\.id).sorted { $0.rawValue < $1.rawValue },
+                weight: total / Double(bucketPages.count))
+        }
+    }
 
     /// Which pages could surface in a given world.
     ///
@@ -57,17 +187,32 @@ enum LibraryRules {
         }
         for _ in 0..<count {
             guard chosen.count < count, !pool.isEmpty else { break }
-            // Weighted toward pages whose author would have been here — a soft lean, not a filter.
-            let weights = pool.map { page -> (value: DiaryPageDef, weight: Double) in
-                let athome = !page.prefersConditions.isEmpty
-                    && page.prefersConditions.allSatisfy { $0.holds(in: readings) }
-                return (page, athome ? Tuning.Library.atHomeWeight : 1)
+            // Location clues compete as one bucket per person; every other page competes as one
+            // bucket per diary. Averaging contextual page weights prevents a ten-page diary from
+            // receiving ten times the aggregate chance of a one-page diary.
+            let grouped = Dictionary(grouping: pool) { page -> String in
+                page.kind == .locationClue && page.about != nil
+                    ? "location:\(page.about!.rawValue)" : "diary:\(page.diary.rawValue)"
             }
-            guard let picked = rng.pickWeighted(weights) else { break }
+            let buckets = pageSelectionBuckets(pool, readings: readings).map {
+                (value: $0.key, weight: $0.weight)
+            }
+            guard let bucket = rng.pickWeighted(buckets), let bucketPages = grouped[bucket] else { break }
+            let pageWeights = bucketPages.sorted { $0.id.rawValue < $1.id.rawValue }.map {
+                (value: $0, weight: contextualPageWeight($0, in: readings))
+            }
+            guard let picked = rng.pickWeighted(pageWeights) else { break }
             chosen.append(picked.id)
             pool.removeAll { $0.id == picked.id }
         }
         return chosen
+    }
+
+    private static func contextualPageWeight(_ page: DiaryPageDef,
+                                             in readings: PressureReadings) -> Double {
+        let atHome = !page.prefersConditions.isEmpty
+            && page.prefersConditions.allSatisfy { $0.holds(in: readings) }
+        return atHome ? Tuning.Library.atHomeWeight : 1
     }
 
     /// Advance exactly one mismatched-placement clock after generating a world.

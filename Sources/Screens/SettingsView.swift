@@ -162,6 +162,23 @@ struct BalancingView: View {
                                range: 0...20,
                                suffix: " worlds",
                                defaultValue: Tuning.Library.patienceInWorlds)
+                integerStepper("Blind traveller window",
+                               value: $settings.debugTuning.blindDiscoveryWindow,
+                               range: 1...6,
+                               suffix: " places",
+                               defaultValue: 3)
+                tuningSlider("Recovered-clue evidence weight",
+                             value: $settings.debugTuning.travellerClueEvidenceWeight,
+                             range: 0...4, defaultValue: 1)
+                tuningSlider("Causally authored evidence weight",
+                             value: $settings.debugTuning.travellerAuthoredEvidenceWeight,
+                             range: 0...4, defaultValue: 2)
+                percentageSlider("Traveller arrival floor",
+                                 value: $settings.debugTuning.travellerArrivalChanceFloor,
+                                 range: 0...1, defaultValue: 0.25)
+                percentageSlider("Traveller near-miss protection",
+                                 value: $settings.debugTuning.travellerArrivalNearMissIncrement,
+                                 range: 0...1, defaultValue: 0.25)
                 Text("Every world still guarantees one writing. This only controls the chance of another.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -169,6 +186,11 @@ struct BalancingView: View {
                     settings.debugTuning.additionalPageChance = Tuning.Library.additionalPageChance
                     settings.debugTuning.diaryWritingShare = Tuning.Library.diaryWritingShare
                     settings.debugTuning.diaryPatienceWorlds = Tuning.Library.patienceInWorlds
+                    settings.debugTuning.blindDiscoveryWindow = 3
+                    settings.debugTuning.travellerClueEvidenceWeight = 1
+                    settings.debugTuning.travellerAuthoredEvidenceWeight = 2
+                    settings.debugTuning.travellerArrivalChanceFloor = 0.25
+                    settings.debugTuning.travellerArrivalNearMissIncrement = 0.25
                 }
             }
 

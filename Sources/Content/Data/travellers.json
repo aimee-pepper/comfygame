@@ -8,6 +8,7 @@
       "calling": "a surveyor",
       "icon": "figure.stand",
       "authoredOrder": 4,
+      "storyArrivalBand": 1,
       "campaignPhase": "opening",
       "blurb": "Measured things for a living. Still does, out of habit.",
       "signature": [
@@ -59,6 +60,7 @@
       "calling": "an archaeologist",
       "icon": "figure.stand",
       "authoredOrder": 5,
+      "storyArrivalBand": 1,
       "campaignPhase": "opening",
       "blurb": "Was digging when it happened. Has not stopped.",
       "signature": [
@@ -119,6 +121,7 @@
       "calling": "a wanderer",
       "icon": "figure.stand",
       "authoredOrder": 7,
+      "storyArrivalBand": 2,
       "campaignPhase": "mid",
       "blurb": "Was always leaving. This time it took.",
       "signature": [
@@ -187,6 +190,7 @@
       "calling": "a binder",
       "icon": "figure.stand",
       "authoredOrder": 27,
+      "storyArrivalBand": 6,
       "campaignPhase": "late",
       "blurb": "Wrote worlds before you did. Knows what that costs.",
       "signature": [
@@ -299,6 +303,7 @@
       "calling": "a smith",
       "icon": "hammer.fill",
       "authoredOrder": 3,
+      "storyArrivalBand": 0,
       "campaignPhase": "opening",
       "blurb": "Kept the fire in. Says a forge is only a fire someone stayed with.",
       "signature": [
@@ -358,6 +363,7 @@
       "calling": "a calligrapher",
       "icon": "pencil.and.outline",
       "authoredOrder": 6,
+      "storyArrivalBand": 2,
       "campaignPhase": "startOfMid",
       "blurb": "Taught the Art before there was anything left to write about. Still teaching, to nobody.",
       "signature": [
@@ -413,7 +419,7 @@
     },
     {
       "id": "bryn", "name": "Bryn", "calling": "a warden", "icon": "figure.stand",
-      "authoredOrder": 8, "campaignPhase": "early-mid",
+      "authoredOrder": 8, "storyArrivalBand": 2, "campaignPhase": "early-mid",
       "blurb": "Steps between danger and the person it chose. Knows being grateful is not the same as having agreed to owe her.",
       "signature": [
         { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "maximum": 40 }, "passage": "The land closes around every path. An approach can be watched here, provided somebody agrees to be the one watching it." },
@@ -425,7 +431,7 @@
     },
     {
       "id": "orsa", "name": "Orsa", "calling": "a keeper", "icon": "figure.stand",
-      "authoredOrder": 9, "campaignPhase": "early-mid",
+      "authoredOrder": 9, "storyArrivalBand": 2, "campaignPhase": "early-mid",
       "blurb": "Makes a room where strangers can stay without pretending they already trust one another.",
       "signature": [
         { "condition": { "target": "vitality", "measure": "peak", "minimum": 62 }, "passage": "Every cleared place is used again by morning. Nothing here mistakes vacancy for abandonment." },
@@ -437,7 +443,7 @@
     },
     {
       "id": "vance", "name": "Vance", "calling": "a trader and appraiser", "icon": "figure.stand",
-      "authoredOrder": 1, "campaignPhase": "opening",
+      "authoredOrder": 1, "storyArrivalBand": 0, "campaignPhase": "opening",
       "blurb": "Remembers who carried a thing before he remembers what it costs. Insists that this makes him a better trader, not a sentimental one.",
       "signature": [
         { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 68 }, "passage": "A load can cross the horizon here without the land inventing a toll." }
@@ -447,7 +453,7 @@
     },
     {
       "id": "talin", "name": "Talin", "calling": "a blade fighter", "icon": "figure.stand",
-      "authoredOrder": 10, "campaignPhase": "mid",
+      "authoredOrder": 10, "storyArrivalBand": 3, "campaignPhase": "mid",
       "blurb": "Makes decisions quickly and judges them slowly. Knows hesitation is still a choice somebody pays for.",
       "signature": [
         { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 40 }, "passage": "The ground breaks into plates with edges clean enough to show where force will glance away." },
@@ -459,7 +465,7 @@
     },
     {
       "id": "nessa", "name": "Nessa", "calling": "an apothecary", "icon": "figure.stand",
-      "authoredOrder": 11, "campaignPhase": "mid",
+      "authoredOrder": 11, "storyArrivalBand": 3, "campaignPhase": "mid",
       "blurb": "Refuses to call anything a cure until she knows for whom, how much, and when.",
       "signature": [
         { "condition": { "target": "atmosphere", "measure": "tag", "key": "toxic", "minimum": 1 }, "passage": "The first breath leaves a taste behind. Harm is already a dose by the time you notice taking it." },
@@ -472,7 +478,7 @@
     },
     {
       "id": "corrin", "name": "Corrin", "calling": "a tanner", "icon": "figure.stand",
-      "authoredOrder": 12, "campaignPhase": "mid",
+      "authoredOrder": 12, "storyArrivalBand": 3, "campaignPhase": "mid",
       "blurb": "Makes hard-wearing things for the parts of a body that refuse to stay still. Never calls material obedient when she means it has been forced.",
       "signature": [
         { "condition": { "target": "vitality", "measure": "produced", "minimum": 40 }, "passage": "Fresh growth sits beside old cut edges. Replacement does not excuse taking, but it changes what taking means." },
@@ -485,7 +491,7 @@
     },
     {
       "id": "dagg", "name": "Dagg", "calling": "a hammer fighter", "icon": "figure.stand",
-      "authoredOrder": 13, "campaignPhase": "mid",
+      "authoredOrder": 13, "storyArrivalBand": 3, "campaignPhase": "mid",
       "blurb": "Refuses to hurry a blow merely because somebody is frightened by the pause before it.",
       "signature": [
         { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 50 }, "passage": "The ground answers a misplaced step instead of forgiving it. Good. An honest consequence can be prepared for." },
@@ -498,7 +504,7 @@
     },
     {
       "id": "rook", "name": "Rook", "calling": "a spear fighter and keeper of contested approaches", "icon": "figure.stand",
-      "authoredOrder": 14, "campaignPhase": "mid",
+      "authoredOrder": 14, "storyArrivalBand": 3, "campaignPhase": "mid",
       "blurb": "Believes a boundary should be visible from both sides. Stands far enough back that approaching it remains a choice.",
       "signature": [
         { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 78 }, "passage": "An approach begins at the horizon. Nothing nearby can pretend it started later." },
@@ -511,7 +517,7 @@
     },
     {
       "id": "lys", "name": "Lys", "calling": "an archivist", "icon": "figure.stand",
-      "authoredOrder": 15, "campaignPhase": "mid",
+      "authoredOrder": 15, "storyArrivalBand": 3, "campaignPhase": "mid",
       "blurb": "Keeps contradictory accounts beside each other. Says agreement is useful, but absence is evidence.",
       "signature": [
         { "condition": { "target": "relief", "measure": "tag", "key": "ruined", "minimum": 1 }, "passage": "The ground has been shaped, broken and shaped again. Calling one layer original would only hide the editor." },
@@ -524,7 +530,7 @@
     },
     {
       "id": "bracken", "name": "Bracken", "calling": "an armorer", "icon": "figure.stand",
-      "authoredOrder": 16, "campaignPhase": "mid",
+      "authoredOrder": 16, "storyArrivalBand": 4, "campaignPhase": "mid",
       "blurb": "Reads a dent from the inside. Says armour records the blow more honestly than the person who took it.",
       "signature": [
         { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 60 }, "passage": "A tool skates before it bites. Hardness protects the surface by sending the effort back through the hand." },
@@ -538,7 +544,7 @@
     },
     {
       "id": "fen", "name": "Fen", "calling": "a bowyer and maker of physical ranged weapons", "icon": "figure.stand",
-      "authoredOrder": 17, "campaignPhase": "mid",
+      "authoredOrder": 17, "storyArrivalBand": 4, "campaignPhase": "mid",
       "blurb": "Makes the shot long before anything is released. The rest is string remembering what it was told.",
       "signature": [
         { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 80 }, "passage": "The shot can spend itself on distance instead of striking the first obstruction. That makes every small error patient." },
@@ -552,7 +558,7 @@
     },
     {
       "id": "wren", "name": "Wren", "calling": "a skirmisher who manages crowded threats through tempo and exits", "icon": "figure.stand",
-      "authoredOrder": 18, "campaignPhase": "mid-late",
+      "authoredOrder": 18, "storyArrivalBand": 4, "campaignPhase": "mid-late",
       "blurb": "Finds the exit before he needs it. Calls speed a debt owed to the moment after.",
       "signature": [
         { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 72 }, "passage": "There is another line before the first closes. Keep seeing it after you decide which one to take." },
@@ -567,7 +573,7 @@
     {
       "id": "kestrel", "name": "Kestrel", "calling": "a hunter and field naturalist", "icon": "figure.stand",
       "pronouns": { "subject": "she", "object": "her", "possessive": "her", "reflexive": "herself" },
-      "authoredOrder": 19, "campaignPhase": "mid-late",
+      "authoredOrder": 19, "storyArrivalBand": 4, "campaignPhase": "mid-late",
       "blurb": "Learns what an animal does when nobody is pursuing it. Decides what to kill only after that.",
       "signature": [
         { "condition": { "target": "vitality", "measure": "produced", "minimum": 40 }, "passage": "Fresh growth beneath older feeding marks proves the account begins before the animal I came to find." },
@@ -581,7 +587,7 @@
     },
     {
       "id": "maud", "name": "Maud", "calling": "a weaponsmith", "icon": "figure.stand",
-      "authoredOrder": 20, "campaignPhase": "mid-late",
+      "authoredOrder": 20, "storyArrivalBand": 4, "campaignPhase": "mid-late",
       "blurb": "Fits a weapon to the hand, the shoulder, and how close its bearer is willing to stand. Distrusts anything praised without naming who must use it.",
       "signature": [
         { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 40 }, "passage": "One part of the ground holds an edge. Useful, if the edge belongs to the motion asked of it." },
@@ -595,7 +601,7 @@
     },
     {
       "id": "marrick", "name": "Marrick", "calling": "a formation leader and keeper of shared routines", "icon": "figure.stand",
-      "authoredOrder": 21, "campaignPhase": "late",
+      "authoredOrder": 21, "storyArrivalBand": 5, "campaignPhase": "late",
       "blurb": "Builds routines people can still remember while frightened. Counts who the plan forgot before he counts whether it worked.",
       "signature": [
         { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 50 }, "passage": "Several sets of feet receive the same answer from the ground. A shared instruction can begin here without becoming shared judgement." },
@@ -610,7 +616,7 @@
     },
     {
       "id": "sabine", "name": "Sabine", "calling": "a menagerist and beast-handler", "icon": "figure.stand",
-      "authoredOrder": 22, "campaignPhase": "late",
+      "authoredOrder": 22, "storyArrivalBand": 5, "campaignPhase": "late",
       "blurb": "Kept animals for people who thought keeping meant owning. Learned most of her trade from being corrected.",
       "signature": [
         { "condition": { "target": "vitality", "measure": "produced", "minimum": 45 }, "passage": "New growth follows feeding quickly enough to change the place without pretending nothing was taken." },
@@ -626,7 +632,7 @@
     },
     {
       "id": "grimmond", "name": "Grimmond", "calling": "a delver who reads load, depth and the voids extraction leaves behind", "icon": "figure.stand",
-      "authoredOrder": 23, "campaignPhase": "late",
+      "authoredOrder": 23, "storyArrivalBand": 5, "campaignPhase": "late",
       "blurb": "Maps what holds the ceiling after the valuable part is gone. Says an empty space is still made of consequences.",
       "signature": [
         { "condition": { "target": "illumination", "measure": "peak", "maximum": 25 }, "passage": "Even the brightest interval leaves the lowest face unreadable. Value does not make a place consent to inspection." },
@@ -642,7 +648,7 @@
     },
     {
       "id": "oda", "name": "Oda", "calling": "a channelwright who makes contained and projected emanation weapons", "icon": "figure.stand",
-      "authoredOrder": 24, "campaignPhase": "late",
+      "authoredOrder": 24, "storyArrivalBand": 5, "campaignPhase": "late",
       "blurb": "Gave dangerous force a handle, an edge, and somewhere to stop. Never calls that the same as making it safe.",
       "signature": [
         { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 30 }, "passage": "One material keeps its shape when force arrives. A housing begins with what refuses to travel." },
@@ -659,7 +665,7 @@
     },
     {
       "id": "auber", "name": "Auber", "calling": "a distiller", "icon": "figure.stand",
-      "authoredOrder": 25, "campaignPhase": "late", "worldwork": 2,
+      "authoredOrder": 25, "storyArrivalBand": 5, "campaignPhase": "late", "worldwork": 2,
       "blurb": "Separates a thing from what carried it. Never calls what remains nothing.",
       "signature": [
         { "condition": { "target": "hydrology", "measure": "aspect", "key": "salinity", "minimum": 45 }, "passage": "What dries here remains in the next water. Separation changes the carrier that follows." },
@@ -687,7 +693,7 @@
     },
     {
       "id": "ashe", "name": "Ashe", "calling": "an embodied emanation specialist", "icon": "figure.stand",
-      "authoredOrder": 26, "campaignPhase": "late", "worldwork": 1,
+      "authoredOrder": 26, "storyArrivalBand": 6, "campaignPhase": "late", "worldwork": 1,
       "blurb": "Names what force costs a body, then chooses which burden to receive.",
       "signature": [
         { "condition": { "target": "thermal", "measure": "tag", "key": "geothermal", "minimum": 1 }, "passage": "Heat rises through my feet before the sky changes. The body notices direction even when the instrument reports only amount." },
@@ -704,7 +710,7 @@
     },
     {
       "id": "perren", "name": "Perren", "calling": "a former Sundering interpreter", "icon": "figure.stand",
-      "authoredOrder": 28, "campaignPhase": "late", "worldwork": 1,
+      "authoredOrder": 28, "storyArrivalBand": 6, "campaignPhase": "late", "worldwork": 1,
       "blurb": "Keeps the questions a lesson tried to make feel already answered.",
       "signature": [
         { "condition": { "target": "illumination", "measure": "opposed", "minimum": 20 }, "passage": "Light is made and smothered together. They taught that conflict reveals the truer source. It may only reveal who selected the frame." },
@@ -722,7 +728,7 @@
     },
     {
       "id": "nine", "name": "Nine", "calling": "a keeper of chosen continuities", "icon": "figure.stand",
-      "authoredOrder": 29, "campaignPhase": "late", "worldwork": 1,
+      "authoredOrder": 29, "storyArrivalBand": 7, "campaignPhase": "late", "worldwork": 1,
       "blurb": "Keeps promises in forms that do not require remembering why they were made.",
       "signature": [
         { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "maximum": 35 }, "passage": "No interval arrives when the last one taught me to expect it. I can record surprise without treating it as failure." },

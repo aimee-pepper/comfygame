@@ -29,6 +29,8 @@ struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
     /// Stable campaign sequencing. JSON array order is an authoring convenience, never progression.
     var authoredOrder: Int?
     var campaignPhase: CampaignPhase?
+    /// Hidden immutable story cluster used only after a complete signature match.
+    var storyArrivalBand: Int?
     /// Visible fit for maintaining an anchored realm, 0–3. Everyone may still do the work.
     var worldwork: Int = 1
     /// Where they are. **Every condition must hold** for the world to be the one they're in.
@@ -94,6 +96,7 @@ struct TravellerDef: Codable, Equatable, Identifiable, Sendable {
         icon = try c.decodeIfPresent(String.self, forKey: .icon) ?? "figure.stand"
         authoredOrder = try c.decodeIfPresent(Int.self, forKey: .authoredOrder)
         campaignPhase = try c.decodeIfPresent(CampaignPhase.self, forKey: .campaignPhase)
+        storyArrivalBand = try c.decodeIfPresent(Int.self, forKey: .storyArrivalBand)
         worldwork = min(3, max(0, try c.decodeIfPresent(Int.self, forKey: .worldwork) ?? 1))
         signature = try c.decodeIfPresent([SignatureClue].self, forKey: .signature) ?? []
         leansToward = try c.decodeIfPresent([DiaryPageDef.Kind].self, forKey: .leansToward) ?? []

@@ -136,6 +136,13 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
     var additionalPageChance = Tuning.Library.additionalPageChance
     var diaryWritingShare = Tuning.Library.diaryWritingShare
     var diaryPatienceWorlds = Tuning.Library.patienceInWorlds
+    /// How many authored-order positions beyond the recruited frontier may appear blindly.
+    /// Applied only when the next world is generated; the one-traveller cap is structural.
+    var blindDiscoveryWindow = 3
+    var travellerClueEvidenceWeight = 1.0
+    var travellerAuthoredEvidenceWeight = 2.0
+    var travellerArrivalChanceFloor = 0.25
+    var travellerArrivalNearMissIncrement = 0.25
     var stabilityDurationMultiplier = 1.0
     var collapseRecoveryFraction = Tuning.World.collapseHaulKeptFraction
     var apexChanceMultiplier = 1.0
@@ -192,6 +199,16 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
             ?? Tuning.Library.diaryWritingShare
         diaryPatienceWorlds = try c.decodeIfPresent(Int.self, forKey: .diaryPatienceWorlds)
             ?? Tuning.Library.patienceInWorlds
+        blindDiscoveryWindow = min(6, max(1, try c.decodeIfPresent(Int.self,
+            forKey: .blindDiscoveryWindow) ?? 3))
+        travellerClueEvidenceWeight = max(0, try c.decodeIfPresent(Double.self,
+            forKey: .travellerClueEvidenceWeight) ?? 1)
+        travellerAuthoredEvidenceWeight = max(0, try c.decodeIfPresent(Double.self,
+            forKey: .travellerAuthoredEvidenceWeight) ?? 2)
+        travellerArrivalChanceFloor = min(1, max(0, try c.decodeIfPresent(Double.self,
+            forKey: .travellerArrivalChanceFloor) ?? 0.25))
+        travellerArrivalNearMissIncrement = min(1, max(0, try c.decodeIfPresent(Double.self,
+            forKey: .travellerArrivalNearMissIncrement) ?? 0.25))
         stabilityDurationMultiplier = try c.decodeIfPresent(Double.self,
                                                               forKey: .stabilityDurationMultiplier) ?? 1
         collapseRecoveryFraction = try c.decodeIfPresent(Double.self,

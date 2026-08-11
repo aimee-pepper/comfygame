@@ -261,6 +261,7 @@ extension GameStore {
             // the one consumed here. World generation and visual resolution use isolated streams.
             precondition(state.worlds.seeds.nextSeed() == seed,
                          "Bind seed changed inside one synchronous commitment")
+            state.reality.library.applyTravellerArrival(world.diagnostics.travellerArrival)
             // Entering unseals this world: from here on its rolled values may be described.
             state.reality.visitedWorldSeeds.insert(seed)
             // **Whose signature this world matches — not who you have met.**

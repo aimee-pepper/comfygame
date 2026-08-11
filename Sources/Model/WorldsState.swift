@@ -410,7 +410,10 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
     var projectedCollapseTurn: Int = 0
     var travellerCandidates: [TravellerID] = []
     var travellerSignatureMatches: [TravellerID] = []
+    var travellerEligibleMatches: [TravellerID] = []
+    var travellerExclusions: [TravellerGenerationExclusion] = []
     var travellersPlaced: [TravellerID] = []
+    var travellerArrival: TravellerArrivalReceipt = TravellerArrivalReceipt()
 
     var openingEnvelopeRequested: DebugTuningProfile.OpeningEncounterEnvelope = .natural
     var openingEnvelopeApplied: Bool = false
@@ -443,11 +446,92 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
         projectedCollapseTurn = try c.decodeIfPresent(Int.self, forKey: .projectedCollapseTurn) ?? 0
         travellerCandidates = try c.decodeIfPresent([TravellerID].self, forKey: .travellerCandidates) ?? []
         travellerSignatureMatches = try c.decodeIfPresent([TravellerID].self, forKey: .travellerSignatureMatches) ?? []
+        travellerEligibleMatches = try c.decodeIfPresent([TravellerID].self,
+            forKey: .travellerEligibleMatches) ?? travellerSignatureMatches
+        travellerExclusions = try c.decodeIfPresent([TravellerGenerationExclusion].self,
+            forKey: .travellerExclusions) ?? []
         travellersPlaced = try c.decodeIfPresent([TravellerID].self, forKey: .travellersPlaced) ?? []
+        travellerArrival = try c.decodeIfPresent(TravellerArrivalReceipt.self,
+            forKey: .travellerArrival) ?? TravellerArrivalReceipt()
         openingEnvelopeRequested = try c.decodeIfPresent(DebugTuningProfile.OpeningEncounterEnvelope.self,
                                                           forKey: .openingEnvelopeRequested) ?? .natural
         openingEnvelopeApplied = try c.decodeIfPresent(Bool.self, forKey: .openingEnvelopeApplied) ?? false
         openingEnemiesRelocated = try c.decodeIfPresent(Int.self, forKey: .openingEnemiesRelocated) ?? 0
+    }
+}
+
+struct TravellerGenerationExclusion: Codable, Equatable, Sendable {
+    enum Reason: String, Codable, Sendable {
+        case phaseLocked, lowerPriorityThanClueBacked, laterAuthoredMatch, noPlacementTile
+        case laterStoryBand, lowerSameBandEvidence, arrivalRollFailed
+    }
+    var traveller: TravellerID
+    var reason: Reason
+}
+
+/// Immutable bind-time evidence. DEBUG and bug reports read this receipt; they never reconstruct a
+/// hidden selection or consume RNG after the world exists.
+struct TravellerArrivalReceipt: Codable, Equatable, Sendable {
+    enum Outcome: String, Codable, Sendable {
+        case noEligibleMatch, confidenceFailed, placementFailed, placed
+    }
+
+    var selectedTraveller: TravellerID?
+    var storyArrivalBand: Int?
+    var authoredOrder: Int?
+    var totalConditions: Int = 0
+    var recoveredLocationClues: Int = 0
+    var causallyAuthoredConditions: Int = 0
+    var causallyAuthoredKnownConditions: Int = 0
+    var accidentalSatisfiedConditions: Int = 0
+    var evidenceScore: Double = 0
+    var priorNearMisses: Int = 0
+    var arrivalChance: Double = 0
+    var arrivalRoll: Double?
+    var outcome: Outcome = .noEligibleMatch
+
+    init() {}
+
+    init(selectedTraveller: TravellerID?, storyArrivalBand: Int?, authoredOrder: Int?,
+         totalConditions: Int, recoveredLocationClues: Int, causallyAuthoredConditions: Int,
+         causallyAuthoredKnownConditions: Int, accidentalSatisfiedConditions: Int,
+         evidenceScore: Double, priorNearMisses: Int, arrivalChance: Double,
+         arrivalRoll: Double?, outcome: Outcome) {
+        self.selectedTraveller = selectedTraveller
+        self.storyArrivalBand = storyArrivalBand
+        self.authoredOrder = authoredOrder
+        self.totalConditions = totalConditions
+        self.recoveredLocationClues = recoveredLocationClues
+        self.causallyAuthoredConditions = causallyAuthoredConditions
+        self.causallyAuthoredKnownConditions = causallyAuthoredKnownConditions
+        self.accidentalSatisfiedConditions = accidentalSatisfiedConditions
+        self.evidenceScore = evidenceScore
+        self.priorNearMisses = priorNearMisses
+        self.arrivalChance = arrivalChance
+        self.arrivalRoll = arrivalRoll
+        self.outcome = outcome
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        selectedTraveller = try c.decodeIfPresent(TravellerID.self, forKey: .selectedTraveller)
+        storyArrivalBand = try c.decodeIfPresent(Int.self, forKey: .storyArrivalBand)
+        authoredOrder = try c.decodeIfPresent(Int.self, forKey: .authoredOrder)
+        totalConditions = max(0, try c.decodeIfPresent(Int.self, forKey: .totalConditions) ?? 0)
+        recoveredLocationClues = max(0, try c.decodeIfPresent(Int.self,
+            forKey: .recoveredLocationClues) ?? 0)
+        causallyAuthoredConditions = max(0, try c.decodeIfPresent(Int.self,
+            forKey: .causallyAuthoredConditions) ?? 0)
+        causallyAuthoredKnownConditions = max(0, try c.decodeIfPresent(Int.self,
+            forKey: .causallyAuthoredKnownConditions) ?? 0)
+        accidentalSatisfiedConditions = max(0, try c.decodeIfPresent(Int.self,
+            forKey: .accidentalSatisfiedConditions) ?? 0)
+        evidenceScore = try c.decodeIfPresent(Double.self, forKey: .evidenceScore) ?? 0
+        priorNearMisses = max(0, try c.decodeIfPresent(Int.self, forKey: .priorNearMisses) ?? 0)
+        arrivalChance = min(1, max(0, try c.decodeIfPresent(Double.self,
+            forKey: .arrivalChance) ?? 0))
+        arrivalRoll = try c.decodeIfPresent(Double.self, forKey: .arrivalRoll)
+        outcome = try c.decodeIfPresent(Outcome.self, forKey: .outcome) ?? .noEligibleMatch
     }
 }
 

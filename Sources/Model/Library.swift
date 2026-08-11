@@ -15,6 +15,8 @@ struct LibraryState: Codable, Equatable, Sendable {
     var knownTravellers: Set<TravellerID> = []
     /// Singular authored workshop patterns learned from diary pages.
     var knownPatterns: Set<String> = []
+    /// Saved protection against repeated selected full-signature arrival failures.
+    var travellerArrivalNearMisses: [TravellerID: Int] = [:]
     /// How many worlds have been generated since each page became eligible to appear.
     ///
     /// Pages prefer worlds relevant to their author, but nothing may be permanently unreachable
@@ -46,12 +48,26 @@ struct LibraryState: Codable, Equatable, Sendable {
         foundTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .foundTravellers) ?? []
         knownTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .knownTravellers) ?? []
         knownPatterns = try c.decodeIfPresent(Set<String>.self, forKey: .knownPatterns) ?? []
+        travellerArrivalNearMisses = (try c.decodeIfPresent([TravellerID: Int].self,
+            forKey: .travellerArrivalNearMisses) ?? [:]).mapValues { max(0, $0) }
         pagesWaiting = try c.decodeIfPresent([DiaryPageID: Int].self, forKey: .pagesWaiting) ?? [:]
         patiencePage = try c.decodeIfPresent(DiaryPageID.self, forKey: .patiencePage)
         visitedWorlds = try c.decodeIfPresent([VisitedWorld].self, forKey: .visitedWorlds) ?? []
     }
 
     func hasFound(_ page: DiaryPageID) -> Bool { foundPages.contains(page) }
+
+    mutating func applyTravellerArrival(_ receipt: TravellerArrivalReceipt) {
+        guard let id = receipt.selectedTraveller else { return }
+        switch receipt.outcome {
+        case .confidenceFailed:
+            travellerArrivalNearMisses[id, default: 0] += 1
+        case .placed:
+            travellerArrivalNearMisses[id] = nil
+        case .noEligibleMatch, .placementFailed:
+            break
+        }
+    }
 
     /// Adds a world to the history, dropping the oldest **unkept** ones past the cap.
     ///

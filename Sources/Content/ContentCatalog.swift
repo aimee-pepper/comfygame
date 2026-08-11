@@ -554,6 +554,10 @@ struct ContentCatalog: Sendable {
                 throw ContentError.danglingReference(
                     "traveller '\(traveller.id)' has no campaignPhase")
             }
+            guard let band = traveller.storyArrivalBand, band >= 0 else {
+                throw ContentError.danglingReference(
+                    "traveller '\(traveller.id)' has no valid storyArrivalBand")
+            }
             guard !traveller.signature.isEmpty else {
                 throw ContentError.danglingReference("traveller '\(traveller.id)' is nowhere at all")
             }

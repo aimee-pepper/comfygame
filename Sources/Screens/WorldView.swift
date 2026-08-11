@@ -565,8 +565,20 @@ private struct WorldDiagnosticsView: View {
                 }
                 Section("Traveller placement") {
                     let report = run.generationDiagnostics
-                    LabeledRow(icon: "person.3", label: "Candidates / matches / placed",
-                               value: "\(report.travellerCandidates.count) / \(report.travellerSignatureMatches.count) / \(report.travellersPlaced.count)")
+                    LabeledRow(icon: "person.3", label: "Candidates / matches / eligible / placed",
+                               value: "\(report.travellerCandidates.count) / \(report.travellerSignatureMatches.count) / \(report.travellerEligibleMatches.count) / \(report.travellersPlaced.count)")
+                    let arrival = report.travellerArrival
+                    if let selected = arrival.selectedTraveller {
+                        LabeledRow(icon: "person.crop.circle.badge.questionmark",
+                                   label: "Selected / band / order",
+                                   value: "\(selected.rawValue) / \(arrival.storyArrivalBand.map(String.init) ?? "—") / \(arrival.authoredOrder.map(String.init) ?? "—")")
+                        LabeledRow(icon: "text.book.closed", label: "Clues / causal known / causal all / accidental",
+                                   value: "\(arrival.recoveredLocationClues) / \(arrival.causallyAuthoredKnownConditions) / \(arrival.causallyAuthoredConditions) / \(arrival.accidentalSatisfiedConditions)")
+                        LabeledRow(icon: "dice", label: "Evidence / prior misses / chance / roll",
+                                   value: "\(arrival.evidenceScore.formatted(.number.precision(.fractionLength(2)))) / \(arrival.priorNearMisses) / \(arrival.arrivalChance.formatted(.percent.precision(.fractionLength(1)))) / \(arrival.arrivalRoll?.formatted(.number.precision(.fractionLength(4))) ?? "—")")
+                    }
+                    LabeledRow(icon: "checkmark.seal", label: "Arrival outcome",
+                               value: arrival.outcome.rawValue)
                     if report.travellersPlaced.isEmpty { Text("No travellers placed") }
                     ForEach(report.travellersPlaced, id: \.self) { id in
                         Text(ContentCatalog.shared.traveller(id)?.name ?? id.rawValue)
@@ -664,7 +676,7 @@ private struct WorldDiagnosticsView: View {
 
     private var tuningSnapshot: String {
         let t = run.tuning
-        return "rawProfile=\(t.rawEssenceProfile.rawValue) rawFrequency=\(t.rawEssenceFrequencyMultiplier) rawYield=\(t.rawEssenceYieldMultiplier) nodeDensity=\(t.resourceNodeDensityMultiplier) creatureDensity=\(t.creatureDensityMultiplier) diaryShare=\(t.diaryWritingShare) secondWriting=\(t.additionalPageChance) patience=\(t.diaryPatienceWorlds) stabilityDuration=\(t.stabilityDurationMultiplier) collapseRecovery=\(t.collapseRecoveryFraction) apex=\(t.apexChanceMultiplier) encounterScaling=\(t.encounterScalingProfile.rawValue) vision=\(t.baseVisionRadius) slowExtra=\(t.slowGroundExtraTurns) activeFlora=\(t.activeFloraFrequencyMultiplier) floraSeverity=\(t.floraHazardSeverityMultiplier) opening=\(t.openingEncounterEnvelope.rawValue)"
+        return "rawProfile=\(t.rawEssenceProfile.rawValue) rawFrequency=\(t.rawEssenceFrequencyMultiplier) rawYield=\(t.rawEssenceYieldMultiplier) nodeDensity=\(t.resourceNodeDensityMultiplier) creatureDensity=\(t.creatureDensityMultiplier) diaryShare=\(t.diaryWritingShare) secondWriting=\(t.additionalPageChance) patience=\(t.diaryPatienceWorlds) travellerWindow=\(t.blindDiscoveryWindow) travellerClueWeight=\(t.travellerClueEvidenceWeight) travellerAuthoredWeight=\(t.travellerAuthoredEvidenceWeight) travellerArrivalFloor=\(t.travellerArrivalChanceFloor) travellerNearMissIncrement=\(t.travellerArrivalNearMissIncrement) stabilityDuration=\(t.stabilityDurationMultiplier) collapseRecovery=\(t.collapseRecoveryFraction) apex=\(t.apexChanceMultiplier) encounterScaling=\(t.encounterScalingProfile.rawValue) vision=\(t.baseVisionRadius) slowExtra=\(t.slowGroundExtraTurns) activeFlora=\(t.activeFloraFrequencyMultiplier) floraSeverity=\(t.floraHazardSeverityMultiplier) opening=\(t.openingEncounterEnvelope.rawValue)"
     }
 }
 #endif
