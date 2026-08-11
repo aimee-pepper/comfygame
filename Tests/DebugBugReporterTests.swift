@@ -52,6 +52,22 @@ final class DebugBugReporterTests: XCTestCase {
         XCTAssertEqual(report.roadmapCheckpoint, DebugRoadmap.current.installedCheckpoint)
     }
 
+    func testOlderSavedReportWithoutRoadmapCheckpointStillDecodes() throws {
+        let report = DebugBugReport(id: UUID(), createdAt: Date(timeIntervalSince1970: 1),
+            whatHappened: "older report", expected: "", includesScreenshot: false,
+            screenshotWidth: nil, screenshotHeight: nil, screenshotScale: nil,
+            appVersion: "1", build: "1", screen: "base", saveSchemaVersion: 1,
+            mutationCount: 0, lastAction: "new", runIndex: nil, mapSeed: nil,
+            playerX: nil, playerY: nil, stability: nil, outcomeID: nil)
+        let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoder.encode(report)) as? [String: Any])
+        object.removeValue(forKey: "roadmapCheckpoint")
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        let decoded = try decoder.decode(DebugBugReport.self,
+                                         from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertNil(decoded.roadmapCheckpoint)
+    }
+
     func testDistinctReportsUseIndependentAtomicStagingDirectories() async throws {
         let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

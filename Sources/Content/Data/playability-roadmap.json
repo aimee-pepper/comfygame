@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "de2b71b · collection and field playtest checkpoint",
+  "installedCheckpoint": "4d8da72 · canonical resource collection art",
   "essenceBaseline": "a816113",
-  "currentWork": "Phone verification + launch parity",
-  "currentNote": "Recycler rules, Look, compact collection UI, Library indexing and durable local bug-report export are checkpointed. Phone verification remains before these candidates are accepted.",
+  "currentWork": "Recycler route + item identity QA",
+  "currentNote": "The phone now includes launch parity, canonical v0.6 resource art, Look, compact collection UI, corrected Library indexing and durable local bug-report export. Recycler rules are complete; the player-facing route is next without treating provisional Noll copy as canon.",
   "items": [
     {
       "id": "essence",
@@ -117,6 +117,14 @@
       "status": "readyToTest",
       "detail": "Local capture, durable visible queue, Unicode-safe single-file export and unique atomic staging are checkpointed. Direct relay is still absent.",
       "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete."
+    },
+    {
+      "id": "dynamic-authority-audit",
+      "priority": "P1",
+      "title": "Static/manual authority audit",
+      "status": "queued",
+      "detail": "Audit game data, UI, debug tools, supporting docs and team process for duplicated or manually synchronized facts that should derive from one active source of truth.",
+      "gate": "Inventory every duplicate authority; classify deliberate authored constants versus accidental mirrors; migrate safe cases with validation and archive history without turning settled design into generated content."
     }
   ],
   "paused": [
