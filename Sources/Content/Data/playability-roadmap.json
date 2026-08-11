@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "71ffca2 · Combat-v2 generated authority",
+  "installedCheckpoint": "f9be251 · Honest local bug-report save",
   "essenceBaseline": "a816113",
   "currentWork": "P1 combat-tree-v2 shared consumer foundations",
   "currentNote": "Schema-2 topology, all 72 exact Effect strings and canonical 20-technique/52-passive ownership are generated and freshness-gated in 71ffca2. Combat-v2 remains inactive while Engineering implements and scenario-tests the shared consumer primitives; tutorials remain excluded.",
@@ -171,7 +171,7 @@
       "priority": "P1",
       "title": "In-game bug reporter",
       "status": "readyToTest",
-      "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference, active DEBUG tuning, a bounded 20-action semantic trail and an idempotent HTTPS relay adapter are checkpointed. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
+      "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference, active DEBUG tuning, a bounded 20-action semantic trail and an idempotent HTTPS relay adapter are checkpointed. f9be251 labels local Save/Done honestly and proves they make zero transport calls. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
       "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete."
     },
     {
@@ -223,6 +223,14 @@
       "gate": "Fresh, already-recruited-Nessa and already-built saves prove exactly one atomic Make → build → visible Lesser Salve route; partial inference persists; ordinary recipes cost 0 Essence, Stillwater 6, and Waystone 12 plus one mote; all locked stations validate an explicit lifecycle. Authority: station-first-use-reachability-audit-current.md."
     },
     {
+      "id": "scent-mask",
+      "priority": "P1",
+      "title": "Prepared animal-avoidance route",
+      "status": "queued",
+      "detail": "Complete the requested non-skill encounter-avoidance route after Apothecary reachability: Nessa tier-0 Scent Mask consumes one Reagent plus one exact grade-25+ animal world resource, costs 0 Essence, and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation.",
+      "gate": "Exact-instance preview/commit, all animal/flora material boundaries, chemo/mixed/direct-contact sensory matrix, Quiet Step composition, relaunch, protected Field Kit return and 368×800 presentation pass. Authority: scent-mask-first-slice-current.md and Decision155."
+    },
+    {
       "id": "channelworks-restoration-receipt",
       "priority": "P2",
       "title": "Separate Oda's restored conduit from repeatable construction",
@@ -235,8 +243,8 @@
       "priority": "P1",
       "title": "Prevent first-world traveller crowds",
       "status": "queued",
-      "detail": "Fresh world one placed Mara and early-mid Bryn together because worldgen ignores sequencing metadata and places every matching signature. Place at most one new traveller; opening people may match blindly, later people use max(3, order-blindDiscoveryWindow) with DEBUG Recommended 3, and an exact recovered location clue may accelerate its person.",
-      "gate": "The reported Mara+Bryn fixture, Sela-before-Bryn frontier, DEBUG windows 1/3/6, clue-backed priority, name-only knowledge, simultaneous matches, anchored revisits and seeded campaigns prove at most one new traveller per world without turning pages into permanent gates. Authority: traveller-world-pacing-current.md."
+      "detail": "Fresh world one placed Mara and early-mid Bryn together because worldgen ignores sequencing metadata and places every signature match. Settled: at most one new traveller and no blind late match. Recommended under review: Let the world decide follows Vance → Noll → Halloway as a next-live-person blind gate, while explicit Seek may target any person with a recovered location clue; later blind discovery uses max(3, order-blindDiscoveryWindow), Recommended 3.",
+      "gate": "After Aimee settles Seek semantics, the Mara+Bryn fixture, successful/failed selected targets, multiple known matches, Let the world decide, blind opening priority, DEBUG 1/3/6, anchored revisits and bind-receipt relaunch all pass. Authority: traveller-world-pacing-current.md."
     },
     {
       "id": "library-collection-accuracy",
