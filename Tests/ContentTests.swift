@@ -51,14 +51,26 @@ final class ContentTests: XCTestCase {
         let missingMeetingIDs = Set(catalogue.travellers.filter { $0.meeting == nil }.map(\.id))
         let draftIDs = Set(DraftMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
 
+        XCTAssertEqual(catalogue.travellers.count, 28,
+                       "Noll remains review-only and must not enter the live catalogue before approval")
+        XCTAssertEqual(catalogue.diaryPages.count, 233)
+        XCTAssertEqual(catalogue.travellers.filter { $0.meeting != nil }.count, 7)
+        XCTAssertEqual(missingMeetingIDs.count, 21)
+        XCTAssertEqual(DraftMeetingCorpus.meetings.count, 23,
+                       "21 live missing meetings, Noll's review-only draft, and Auber's revision")
+        XCTAssertEqual(draftIDs.union(catalogueIDs).count, 29,
+                       "the review atlas covers 28 live travellers plus designed Noll")
         XCTAssertEqual(Set(inventory.map(\.id)), catalogueIDs)
         XCTAssertEqual(inventory.flatMap(\.units).filter { $0.kind == .diary }.count,
                        catalogue.diaryPages.count)
         XCTAssertEqual(Set(inventory.filter { $0.traveller.meeting == nil }.map(\.id)),
                        missingMeetingIDs)
-        XCTAssertEqual(draftIDs, missingMeetingIDs.union(["auber"]),
-                       DraftMeetingCorpus.decodingError ?? "missing live meetings plus Auber revision")
+        XCTAssertEqual(draftIDs, missingMeetingIDs.union(["auber", "noll"]),
+                       DraftMeetingCorpus.decodingError
+                           ?? "missing live meetings plus Noll and Auber review drafts")
         XCTAssertTrue(DraftMeetingCorpus.meetings.allSatisfy { $0.exchanges.count == 3 })
+        XCTAssertTrue(DraftMeetingCorpus.meetings.allSatisfy { $0.offerSpeaker == .player },
+                      "a review offer was generated in the traveller's speaking role")
         XCTAssertEqual(Set(inventory.filter { $0.traveller.meeting == nil && $0.draftMeetingAvailable }
             .map(\.id)), missingMeetingIDs)
         XCTAssertEqual(Set(inventory.flatMap(\.units).map(\.id)).count, inventory.flatMap(\.units).count)

@@ -7,6 +7,32 @@ import Foundation
 /// hazards, crumbling and enemy movement all hang off `advanceTurn`, and `advanceTurn` is only ever
 /// called from a player action (pillar 2).
 enum WorldRules {
+    struct PreContactSnapshot: Equatable, Sendable {
+        var disclosedEnemyIDs: Set<InstanceID>
+        var approachedEnemyID: InstanceID?
+
+        func disclosed(_ enemy: WorldEnemy) -> Bool {
+            disclosedEnemyIDs.contains(enemy.id)
+        }
+    }
+
+    static func preContactSnapshot(in run: WorldRun,
+                                   playerDestination: GridPoint? = nil) -> PreContactSnapshot {
+        let disclosed = Set(run.enemies.compactMap { enemy -> InstanceID? in
+            guard run.map[enemy.position].isRevealed, isVisible(enemy, in: run) else { return nil }
+            return enemy.id
+        })
+        let approached = playerDestination.flatMap { destination in
+            run.enemies.first(where: { enemy in
+                guard disclosed.contains(enemy.id) else { return false }
+                if enemy.position == destination { return true }
+                guard enemy.isApex || enemy.isSessile else { return false }
+                return destination.chebyshevDistance(to: enemy.position) <= 1
+                    && run.playerPosition.chebyshevDistance(to: enemy.position) > 1
+            })?.id
+        }
+        return PreContactSnapshot(disclosedEnemyIDs: disclosed, approachedEnemyID: approached)
+    }
 
     /// Things that happened during a turn, for the UI to narrate and for travel to interrupt on.
     enum Event: Equatable {
@@ -209,6 +235,7 @@ enum WorldRules {
         guard canEnter(destination, in: run.map) else {
             return [.blocked("Crumbled away — nothing to stand on.")]
         }
+        let preContact = preContactSnapshot(in: run, playerDestination: destination)
 
         let movementCost = movementCost(run.map[destination].ground,
                                         slowGroundExtraTurns: run.tuning.slowGroundExtraTurns)
@@ -275,7 +302,7 @@ enum WorldRules {
 
         state.worlds.activeRun = run
         for _ in 0..<movementCost {
-            let turn = advanceTurn(in: &state)
+            let turn = advanceTurn(in: &state, preContact: preContact)
             events.append(contentsOf: turn)
             if turn.contains(where: { event in
                 if case .floorGaveWay = event { return true }
@@ -622,9 +649,13 @@ enum WorldRules {
     }
 
     /// Everything the *world* does after the player acts. The only place a turn is consumed.
-    static func advanceTurn(in state: inout GameState) -> [Event] {
+    static func advanceTurn(in state: inout GameState,
+                            preContact suppliedSnapshot: PreContactSnapshot? = nil) -> [Event] {
         guard var run = state.worlds.activeRun else { return [] }
         var events: [Event] = []
+        // Non-movement actions can capture this at the turn boundary. A step supplies the snapshot
+        // from before reveal/movement changed what the player was actually shown.
+        let preContact = suppliedSnapshot ?? preContactSnapshot(in: run)
 
         let bandBefore = run.stabilityBand
         let wasNight = run.isNight
@@ -678,8 +709,11 @@ enum WorldRules {
         events.append(contentsOf: moveEnemies(in: &run, concealment: concealment))
         state.worlds.activeRun = run
 
-        if let bumped = enemyOnPlayer(in: run) {
-            beginEncounter(triggeredBy: bumped, in: &state)
+        let approachedStationaryThreat = preContact.approachedEnemyID.flatMap { id in
+            run.enemies.first { $0.id == id && ($0.isApex || $0.isSessile) }
+        }
+        if let bumped = enemyOnPlayer(in: run) ?? approachedStationaryThreat {
+            beginEncounter(triggeredBy: bumped, preContact: preContact, in: &state)
             events.append(.encounterBegan)
         }
 
@@ -987,7 +1021,10 @@ enum WorldRules {
 
     /// Opens an encounter with the bumped enemy plus anything awake standing next to it, up to the
     /// party's limit. Milestone 4 replaces the combat itself, not this trigger.
-    static func beginEncounter(triggeredBy enemy: WorldEnemy, in state: inout GameState) {
+    static func beginEncounter(triggeredBy enemy: WorldEnemy,
+                               preContact suppliedSnapshot: PreContactSnapshot? = nil,
+                               runsAutomaticTurns: Bool = true,
+                               in state: inout GameState) {
         guard var run = state.worlds.activeRun, run.activeEncounter == nil else { return }
         // Just fled? You get a moment before anything else can catch you.
         guard run.encounterGraceTurns == 0 else { return }
@@ -1081,9 +1118,39 @@ enum WorldRules {
 
         // **Everybody who came gets a place in the order.** This is the line that makes a party of
         // five a party of five rather than a list on the Firepit screen.
+        let preContact = suppliedSnapshot ?? preContactSnapshot(in: run)
+        let initialOpening: EncounterState.Opening
+        if preContact.approachedEnemyID == enemy.id {
+            initialOpening = .partyApproach
+        } else if enemy.isApex || enemy.isSessile {
+            // These threats hold their ground. Contact with them is always a deliberate approach,
+            // never an ambush inferred from a post-contact awareness value.
+            initialOpening = .partyApproach
+        } else if preContact.disclosed(enemy) {
+            initialOpening = .mutualContact
+        } else {
+            initialOpening = .creatureAmbush
+        }
+
+        let party = CombatRules.party(of: state)
+        let slipperyProbability = party.map { CombatRules.loadout(of: $0, in: state).ambushResistance }
+            .max().map { min(1, max(0, $0)) } ?? 0
+        let watchful = party.contains {
+            CombatRules.loadout(of: $0, in: state).partyAmbushResistance > 0
+        }
+        var slipperyRoll: Double?
+        var slipperyPrevented = false
+        if initialOpening == .creatureAmbush, slipperyProbability > 0 {
+            let roll = run.rng.double(in: 0...1)
+            slipperyRoll = roll
+            slipperyPrevented = roll < slipperyProbability
+        }
+        let resolvedOpening: EncounterState.Opening = slipperyPrevented ? .mutualContact : initialOpening
+        let watchfulSuppressed = resolvedOpening == .creatureAmbush && watchful
+
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
                                                         foes: foes,
-                                                        party: CombatRules.party(of: state),
+                                                        party: party,
                                                         names: state.base.activeParty.reduce(into: [Int: String]()) {
                                                             guard state.base.roster.indices.contains($1) else { return }
                                                             $0[$1] = state.base.roster[$1].name
@@ -1096,6 +1163,39 @@ enum WorldRules {
                                                         initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
                                                         rng: &run.rng)
         run.activeEncounter?.scalingPreview = scalingPreview
+        if var encounter = run.activeEncounter {
+            let pending: [InstanceID]
+            if resolvedOpening == .creatureAmbush, !watchfulSuppressed {
+                pending = encounter.order.compactMap(\.foeID).filter { foeID in
+                    encounter.foes.contains { $0.id == foeID && $0.isAlive }
+                }
+            } else {
+                pending = []
+            }
+            encounter.opening = .init(preContactDisclosed: preContact.disclosed(enemy),
+                                      initial: initialOpening,
+                                      slipperyProbability: slipperyProbability > 0 ? slipperyProbability : nil,
+                                      slipperyRoll: slipperyRoll,
+                                      slipperyPrevented: slipperyPrevented,
+                                      watchfulSuppressedOpening: watchfulSuppressed,
+                                      resolved: resolvedOpening,
+                                      pendingFoeActions: pending)
+            // Unseen begins after classification. It cannot change an ambush into a safer opening,
+            // but its owner is concealed for the first ordinary round.
+            for actor in party where CombatRules.loadout(of: actor, in: state).beginsConcealed {
+                encounter.concealed[actor] = max(1, encounter.concealed[actor] ?? 0)
+            }
+            switch resolvedOpening {
+            case .creatureAmbush:
+                encounter.note(watchfulSuppressed
+                               ? "Watchful: you keep the opening to ordinary order."
+                               : "They strike from cover before the ordinary order begins.")
+            case .mutualContact where slipperyPrevented:
+                encounter.note("Slippery: the sudden attack becomes mutual contact.")
+            default: break
+            }
+            run.activeEncounter = encounter
+        }
         state.worlds.activeRun = run
 
         // **Somebody has to move first, and it may not be you.** Automatic turns used to be kicked
@@ -1103,7 +1203,7 @@ enum WorldRules {
         // With turn order coming off initiative, a fight that opens on a creature's turn would
         // otherwise sit there waiting on nobody: the player's buttons do nothing, because it isn't
         // their turn, and nothing else is running.
-        CombatRules.runAutomaticTurns(in: &state)
+        if runsAutomaticTurns { CombatRules.runAutomaticTurns(in: &state) }
     }
 
 }

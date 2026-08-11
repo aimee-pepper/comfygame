@@ -930,6 +930,314 @@ final class WorldTests: XCTestCase {
         XCTAssertTrue(resumed.quietStepHesitationUsed)
     }
 
+    func testEncounterOpeningFreezesApproachMutualContactAndAmbushFromPreActionDisclosure() throws {
+        func opening(disclosed: Bool, approached: Bool, apex: Bool = false) throws -> EncounterState.OpeningResolution {
+            var state = startedRun(book(["terrain": "plains"]), seed: apex ? 8_103 : 8_101)
+            var run = try XCTUnwrap(state.worlds.activeRun)
+            let enemy = WorldEnemy(id: InstanceID(rawValue: apex ? 8103 : 8101),
+                                   creatureID: "paper_moth", position: run.playerPosition,
+                                   isApex: apex)
+            run.enemies = [enemy]
+            state.worlds.activeRun = run
+            let snapshot = WorldRules.PreContactSnapshot(
+                disclosedEnemyIDs: disclosed ? [enemy.id] : [],
+                approachedEnemyID: approached ? enemy.id : nil
+            )
+            WorldRules.beginEncounter(triggeredBy: enemy, preContact: snapshot,
+                                      runsAutomaticTurns: false, in: &state)
+            return try XCTUnwrap(state.worlds.activeRun?.activeEncounter?.opening)
+        }
+
+        XCTAssertEqual(try opening(disclosed: true, approached: true).resolved, .partyApproach)
+        XCTAssertEqual(try opening(disclosed: true, approached: false).resolved, .mutualContact)
+        let ambush = try opening(disclosed: false, approached: false)
+        XCTAssertEqual(ambush.initial, .creatureAmbush)
+        XCTAssertEqual(ambush.resolved, .creatureAmbush)
+        XCTAssertFalse(ambush.pendingFoeActions.isEmpty)
+        XCTAssertEqual(try opening(disclosed: false, approached: false, apex: true).resolved,
+                       .partyApproach, "an apex never gains an ordinary creature ambush")
+    }
+
+    func testRealStepUsesThePresentationBeforeMovementAndReveal() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 8_105)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let destination = try XCTUnwrap(run.map.neighbours(of: run.playerPosition)
+            .first { WorldRules.canEnter($0, in: run.map) })
+        run.map[destination].isRevealed = true
+        let enemy = WorldEnemy(id: InstanceID(rawValue: 8105), creatureID: "paper_moth",
+                               position: destination)
+        run.enemies = [enemy]
+        state.worlds.activeRun = run
+
+        _ = WorldRules.step(to: destination, in: &state)
+
+        let opening = try XCTUnwrap(state.worlds.activeRun?.activeEncounter?.opening)
+        XCTAssertTrue(opening.preContactDisclosed)
+        XCTAssertEqual(opening.initial, .partyApproach)
+        XCTAssertEqual(opening.resolved, .partyApproach)
+    }
+
+    func testSteppingAdjacentToAStationaryApexIsADeliberateApproach() throws {
+        var state = GameState.newGame()
+        let start = GridPoint(x: 0, y: 0)
+        let destination = GridPoint(x: 1, y: 0)
+        let apexPoint = GridPoint(x: 2, y: 0)
+        let map = WorldMap(width: 3, height: 1,
+                           tiles: [Tile(isRevealed: true), Tile(isRevealed: true),
+                                   Tile(isRevealed: true)], entry: start)
+        let composition = book(["terrain": "plains"])
+        let apex = WorldEnemy(id: InstanceID(rawValue: 8106), creatureID: "paper_moth",
+                              position: apexPoint, isApex: true)
+        state.worlds.activeRun = WorldRun(runIndex: 1, book: composition, mapSeed: 8_106,
+                                          rng: SeededRNG(seed: 8_106), map: map,
+                                          playerPosition: start, enemies: [apex])
+
+        _ = WorldRules.step(to: destination, in: &state)
+
+        XCTAssertEqual(state.worlds.activeRun?.playerPosition, destination)
+        XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.opening?.resolved, .partyApproach)
+    }
+
+    func testCreatureAmbushOpeningActionsRunBeforeOrdinaryInitiativeAndPersist() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 8_111)
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let enemy = WorldEnemy(id: InstanceID(rawValue: 8111), creatureID: "paper_moth",
+                               position: run.playerPosition)
+        let second = WorldEnemy(id: InstanceID(rawValue: 8112), creatureID: "paper_moth",
+                                position: run.playerPosition, isAwake: true)
+        run.enemies = [enemy, second]
+        state.worlds.activeRun = run
+        WorldRules.beginEncounter(triggeredBy: enemy,
+                                  preContact: .init(disclosedEnemyIDs: [], approachedEnemyID: nil),
+                                  runsAutomaticTurns: false, in: &state)
+        let frozen = try XCTUnwrap(state.worlds.activeRun?.activeEncounter)
+        let relativeFoeOrder = frozen.order.compactMap(\.foeID)
+        XCTAssertEqual(frozen.opening?.pendingFoeActions, relativeFoeOrder)
+        XCTAssertEqual(relativeFoeOrder.count, 2)
+
+        let resumed = try SaveCodec.makeDecoder().decode(
+            EncounterState.self, from: SaveCodec.makeEncoder().encode(frozen))
+        XCTAssertEqual(resumed.opening, frozen.opening)
+
+        let logCount = frozen.log.count
+        let ordinaryTurnIndex = frozen.turnIndex
+        CombatRules.runAutomaticTurns(in: &state)
+        let after = try XCTUnwrap(state.worlds.activeRun?.activeEncounter)
+        XCTAssertTrue(after.opening?.pendingFoeActions.isEmpty == true)
+        XCTAssertGreaterThanOrEqual(after.log.count, logCount + 2,
+                                    "each living foe did not resolve one opening action")
+        XCTAssertEqual(after.turnIndex, ordinaryTurnIndex,
+                       "an opening action incorrectly consumed the foe's ordinary initiative slot")
+    }
+
+    func testWatchfulSuppressesActionsWithoutReclassifyingAmbush() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 8_121)
+        state.base.binderCharacter.branchDepth["protection"] = 2
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        let enemy = WorldEnemy(id: InstanceID(rawValue: 8121), creatureID: "paper_moth",
+                               position: run.playerPosition)
+        run.enemies = [enemy]
+        state.worlds.activeRun = run
+        WorldRules.beginEncounter(triggeredBy: enemy,
+                                  preContact: .init(disclosedEnemyIDs: [], approachedEnemyID: nil),
+                                  runsAutomaticTurns: false, in: &state)
+
+        let opening = try XCTUnwrap(state.worlds.activeRun?.activeEncounter?.opening)
+        XCTAssertEqual(opening.resolved, .creatureAmbush)
+        XCTAssertTrue(opening.watchfulSuppressedOpening)
+        XCTAssertTrue(opening.pendingFoeActions.isEmpty)
+    }
+
+    func testSlipperyRollIsSavedAndUnseenAndAmbushReadTheFrozenOpening() throws {
+        var preventedState: GameState?
+        for seed in UInt64(8_130)...8_194 {
+            var state = startedRun(book(["terrain": "plains"]), seed: seed)
+            state.base.binderCharacter.branchDepth["evasion"] = 4
+            var run = try XCTUnwrap(state.worlds.activeRun)
+            let enemy = WorldEnemy(id: InstanceID(rawValue: seed), creatureID: "paper_moth",
+                                   position: run.playerPosition)
+            run.enemies = [enemy]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy,
+                                      preContact: .init(disclosedEnemyIDs: [], approachedEnemyID: nil),
+                                      runsAutomaticTurns: false, in: &state)
+            if state.worlds.activeRun?.activeEncounter?.opening?.slipperyPrevented == true {
+                preventedState = state
+                break
+            }
+        }
+        let slippery = try XCTUnwrap(preventedState)
+        let slipperyOpening = try XCTUnwrap(slippery.worlds.activeRun?.activeEncounter?.opening)
+        XCTAssertEqual(slipperyOpening.initial, .creatureAmbush)
+        XCTAssertEqual(slipperyOpening.resolved, .mutualContact)
+        XCTAssertNotNil(slipperyOpening.slipperyRoll)
+        XCTAssertTrue(slipperyOpening.pendingFoeActions.isEmpty)
+
+        var unseen = startedRun(book(["terrain": "plains"]), seed: 8_195)
+        unseen.base.binderCharacter.branchDepth["shadow"] = 8
+        var run = try XCTUnwrap(unseen.worlds.activeRun)
+        let enemy = WorldEnemy(id: InstanceID(rawValue: 8195), creatureID: "paper_moth",
+                               position: run.playerPosition)
+        run.enemies = [enemy]
+        unseen.worlds.activeRun = run
+        WorldRules.beginEncounter(triggeredBy: enemy,
+                                  preContact: .init(disclosedEnemyIDs: [], approachedEnemyID: nil),
+                                  runsAutomaticTurns: false, in: &unseen)
+        let encounter = try XCTUnwrap(unseen.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(encounter.opening?.resolved, .creatureAmbush)
+        XCTAssertEqual(encounter.concealed[.binder], 1)
+        let ambushSkill = try XCTUnwrap(ContentCatalog.shared.skill("ambush"))
+        XCTAssertFalse(CombatRules.isReady(ambushSkill, for: .binder, in: encounter))
+
+        var approach = unseen
+        approach.worlds.activeRun?.activeEncounter = nil
+        WorldRules.beginEncounter(triggeredBy: enemy,
+                                  preContact: .init(disclosedEnemyIDs: [enemy.id],
+                                                    approachedEnemyID: enemy.id),
+                                  runsAutomaticTurns: false, in: &approach)
+        let approached = try XCTUnwrap(approach.worlds.activeRun?.activeEncounter)
+        XCTAssertTrue(CombatRules.isReady(ambushSkill, for: .binder, in: approached))
+        var legacyEncounter = approached
+        legacyEncounter.opening = nil
+        legacyEncounter.roundNumber = 5
+        XCTAssertFalse(CombatRules.isReady(ambushSkill, for: .binder, in: legacyEncounter),
+                       "a legacy mid-fight save gained a new free opening attack")
+        var scriptedAllows = approached
+        scriptedAllows.opening?.resolved = .scripted(scriptID: "test.opening", overridesWatchful: true,
+                                                      allowsPartyOpeningAttack: true)
+        XCTAssertTrue(CombatRules.isReady(ambushSkill, for: .binder, in: scriptedAllows))
+        var scriptedForbids = approached
+        scriptedForbids.opening?.resolved = .scripted(scriptID: "test.opening", overridesWatchful: false,
+                                                      allowsPartyOpeningAttack: false)
+        XCTAssertFalse(CombatRules.isReady(ambushSkill, for: .binder, in: scriptedForbids),
+                       "scripted Ambush policy was inferred from Watchful policy")
+        let turnIndex = approached.turnIndex
+        CombatRules.perform(.skill(ambushSkill.id, foe: enemy.id), by: .binder, in: &approach)
+        let afterAmbush = try XCTUnwrap(approach.worlds.activeRun?.activeEncounter)
+        XCTAssertTrue(afterAmbush.openingAttackConsumed.contains(.binder))
+        XCTAssertFalse(afterAmbush.completedFirstActions.contains(.binder))
+        XCTAssertEqual(afterAmbush.turnIndex, turnIndex, "Ambush consumed the actor's ordinary turn")
+        let frozenAfterUse = afterAmbush
+        CombatRules.perform(.skill(ambushSkill.id, foe: enemy.id), by: .binder, in: &approach)
+        XCTAssertEqual(approach.worlds.activeRun?.activeEncounter, frozenAfterUse,
+                       "a repeated or stale Ambush tap mutated the encounter")
+
+        var quickenFirst = unseen
+        quickenFirst.base.binderCharacter.branchDepth["swiftness"] = 3
+        quickenFirst.base.binderCharacter.branchDepth["shadow"] = 5
+        quickenFirst.worlds.activeRun?.activeEncounter = nil
+        WorldRules.beginEncounter(triggeredBy: enemy,
+                                  preContact: .init(disclosedEnemyIDs: [enemy.id],
+                                                    approachedEnemyID: enemy.id),
+                                  runsAutomaticTurns: false, in: &quickenFirst)
+        CombatRules.perform(.skill("quicken"), by: .binder, in: &quickenFirst)
+        let afterQuicken = try XCTUnwrap(quickenFirst.worlds.activeRun?.activeEncounter)
+        XCTAssertTrue(afterQuicken.completedFirstActions.contains(.binder))
+        XCTAssertFalse(CombatRules.isReady(ambushSkill, for: .binder, in: afterQuicken),
+                       "Quicken left Ambush available on its borrowed action")
+
+        var partial = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: JSONEncoder().encode(approached)) as? [String: Any])
+        var openingObject = try XCTUnwrap(partial["opening"] as? [String: Any])
+        openingObject.removeValue(forKey: "pendingFoeActions")
+        openingObject.removeValue(forKey: "slipperyPrevented")
+        openingObject.removeValue(forKey: "watchfulSuppressedOpening")
+        partial["opening"] = openingObject
+        let tolerant = try JSONDecoder().decode(
+            EncounterState.self, from: JSONSerialization.data(withJSONObject: partial))
+        XCTAssertEqual(tolerant.opening?.pendingFoeActions, [])
+        XCTAssertEqual(tolerant.opening?.slipperyPrevented, false)
+        XCTAssertEqual(tolerant.opening?.watchfulSuppressedOpening, false)
+    }
+
+    func testUnseenExcludesOnlyItsOwnerFromOpeningTargetsThroughFirstOrdinaryRound() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 8_201)
+        state.base.binderCharacter.branchDepth["shadow"] = 8
+        var companion = CompanionState()
+        companion.name = "Quill"
+        state.base.roster = [companion]
+        state.base.activeParty = [0]
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.companionHP[0] = companion.maxHP
+        let enemy = WorldEnemy(id: InstanceID(rawValue: 8201), creatureID: "paper_moth",
+                               position: run.playerPosition)
+        run.enemies = [enemy]
+        state.worlds.activeRun = run
+        WorldRules.beginEncounter(triggeredBy: enemy,
+                                  preContact: .init(disclosedEnemyIDs: [], approachedEnemyID: nil),
+                                  runsAutomaticTurns: false, in: &state)
+
+        let binderHP = try XCTUnwrap(state.worlds.activeRun?.binderHP)
+        CombatRules.runAutomaticTurns(in: &state)
+        let afterOpening = try XCTUnwrap(state.worlds.activeRun?.activeEncounter)
+        XCTAssertEqual(state.worlds.activeRun?.binderHP, binderHP,
+                       "Unseen's owner was a legal foe-opening target")
+        XCTAssertTrue(afterOpening.log.suffix(2).contains { $0.contains("Quill") },
+                      "the visible companion was not used as the legal opening target")
+        XCTAssertEqual(afterOpening.concealed[.binder], 1)
+
+        var safety = 0
+        while state.worlds.activeRun?.activeEncounter?.roundNumber == 1, safety < 8 {
+            CombatRules.advanceTurn(in: &state)
+            safety += 1
+        }
+        XCTAssertNil(state.worlds.activeRun?.activeEncounter?.concealed[.binder],
+                     "Unseen lasted beyond the end of the first ordinary round")
+
+        var allUnseen = startedRun(book(["terrain": "plains"]), seed: 8_202)
+        allUnseen.base.binderCharacter.branchDepth["shadow"] = 8
+        var hiddenCompanion = CompanionState()
+        hiddenCompanion.name = "Quill"
+        hiddenCompanion.character.branchDepth["shadow"] = 8
+        allUnseen.base.roster = [hiddenCompanion]
+        allUnseen.base.activeParty = [0]
+        var allHiddenRun = try XCTUnwrap(allUnseen.worlds.activeRun)
+        allHiddenRun.companionHP[0] = hiddenCompanion.maxHP
+        let secondEnemy = WorldEnemy(id: InstanceID(rawValue: 8202), creatureID: "paper_moth",
+                                     position: allHiddenRun.playerPosition)
+        allHiddenRun.enemies = [secondEnemy]
+        allUnseen.worlds.activeRun = allHiddenRun
+        WorldRules.beginEncounter(triggeredBy: secondEnemy,
+                                  preContact: .init(disclosedEnemyIDs: [], approachedEnemyID: nil),
+                                  runsAutomaticTurns: false, in: &allUnseen)
+        let beforeAllHidden = try XCTUnwrap(allUnseen.worlds.activeRun?.activeEncounter?.log.count)
+        CombatRules.runAutomaticTurns(in: &allUnseen)
+        let afterAllHidden = try XCTUnwrap(allUnseen.worlds.activeRun?.activeEncounter)
+        XCTAssertTrue(afterAllHidden.opening?.pendingFoeActions.isEmpty == true)
+        XCTAssertGreaterThan(afterAllHidden.log.count, beforeAllHidden,
+                             "an all-concealed party incorrectly erased every legal target")
+    }
+
+    func testUnseenExcludesItsOwnerFromMultiAndAreaOpeningDelivery() throws {
+        for (offset, delivery) in [Delivery.multi, .area].enumerated() {
+            var state = startedRun(book(["terrain": "plains"]), seed: 8_210 + UInt64(offset))
+            state.base.binderCharacter.branchDepth["shadow"] = 8
+            var companion = CompanionState()
+            companion.name = "Quill"
+            state.base.roster = [companion]
+            state.base.activeParty = [0]
+            var run = try XCTUnwrap(state.worlds.activeRun)
+            run.companionHP[0] = companion.maxHP
+            let enemy = WorldEnemy(id: InstanceID(rawValue: 8210 + UInt64(offset)),
+                                   creatureID: "paper_moth", position: run.playerPosition)
+            run.enemies = [enemy]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy,
+                                      preContact: .init(disclosedEnemyIDs: [], approachedEnemyID: nil),
+                                      runsAutomaticTurns: false, in: &state)
+            state.worlds.activeRun?.activeEncounter?.foes[0].stats.delivery = delivery
+            state.worlds.activeRun?.activeEncounter?.foes[0].stats.attack = 20
+            let binderHP = try XCTUnwrap(state.worlds.activeRun?.binderHP)
+            let companionHP = try XCTUnwrap(state.worlds.activeRun?.companionHP[0])
+
+            CombatRules.runAutomaticTurns(in: &state)
+
+            XCTAssertEqual(state.worlds.activeRun?.binderHP, binderHP,
+                           "\(delivery) bypassed opening target legality")
+            XCTAssertLessThan(try XCTUnwrap(state.worlds.activeRun?.companionHP[0]), companionHP)
+        }
+    }
+
     func testOldEnemyAwakeFlagMigratesToSingleAwarenessAuthority() throws {
         let awake = WorldEnemy(id: InstanceID(rawValue: 71), creatureID: "paper_moth",
                                position: GridPoint(x: 1, y: 1), isAwake: true)

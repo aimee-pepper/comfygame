@@ -187,6 +187,28 @@ final class PersistenceTests: XCTestCase {
                                     prepared.timings.loadMilliseconds)
     }
 
+    func testPreparedLaunchReportsRealOrderedWorkPhases() throws {
+        final class Recorder: @unchecked Sendable {
+            private let lock = NSLock()
+            private var storage: [GameStore.PreparationStep] = []
+            func append(_ step: GameStore.PreparationStep) {
+                lock.lock(); defer { lock.unlock() }
+                storage.append(step)
+            }
+            var values: [GameStore.PreparationStep] {
+                lock.lock(); defer { lock.unlock() }
+                return storage
+            }
+        }
+        let recorder = Recorder()
+
+        _ = try GameStore.prepareLaunch(io: io, progress: recorder.append)
+
+        XCTAssertEqual(recorder.values,
+                       [.loadingSave, .reconcilingCatalogue, .committingSave, .complete])
+        XCTAssertEqual(recorder.values.map(\.completedFraction), [0, 1.0 / 3.0, 2.0 / 3.0, 1])
+    }
+
     @MainActor
     func testLaunchCoordinatorPublishesOnlyPreparedStateAndWarmReadyDoesNotFlash() async throws {
         final class Announcements: @unchecked Sendable {
@@ -195,7 +217,7 @@ final class PersistenceTests: XCTestCase {
         let announcements = Announcements()
         let prepared = try GameStore.prepareLaunch(io: io)
         let coordinator = AppLaunchCoordinator(announce: { announcements.values.append($0) },
-                                               prepare: { prepared })
+                                               prepare: { _ in prepared })
         XCTAssertNil(coordinator.store)
         coordinator.start()
         try await waitUntil { coordinator.store != nil }
@@ -205,7 +227,7 @@ final class PersistenceTests: XCTestCase {
         let warmStore = try XCTUnwrap(coordinator.store)
         let warm = AppLaunchCoordinator(readyStore: warmStore,
                                         announce: { announcements.values.append($0) },
-                                        prepare: { prepared })
+                                        prepare: { _ in prepared })
         warm.start()
         XCTAssertTrue(warm.store === warmStore,
                       "An already-ready warm scene must not swap through the loader")
@@ -218,7 +240,7 @@ final class PersistenceTests: XCTestCase {
         struct TestFailure: LocalizedError {
             var errorDescription: String? { "A deliberate launch failure." }
         }
-        let failure = AppLaunchCoordinator(prepare: { throw TestFailure() })
+        let failure = AppLaunchCoordinator(prepare: { _ in throw TestFailure() })
         failure.start()
         try await waitUntil {
             if case .failed = failure.phase { return true }
@@ -230,7 +252,7 @@ final class PersistenceTests: XCTestCase {
         XCTAssertTrue(failureState.canRetry)
 
         let timeoutIO = try XCTUnwrap(io)
-        let timeout = AppLaunchCoordinator(timeout: .milliseconds(20), prepare: {
+        let timeout = AppLaunchCoordinator(timeout: .milliseconds(20), prepare: { _ in
             try await Task.sleep(for: .milliseconds(80))
             return try GameStore.prepareLaunch(io: timeoutIO)
         })
@@ -265,7 +287,7 @@ final class PersistenceTests: XCTestCase {
         struct FirstFailure: LocalizedError { var errorDescription: String? { "first writer failed" } }
         let probe = Probe()
         let prepared = try GameStore.prepareLaunch(io: io)
-        let coordinator = AppLaunchCoordinator(timeout: .milliseconds(10), prepare: {
+        let coordinator = AppLaunchCoordinator(timeout: .milliseconds(10), prepare: { _ in
             let call = await probe.begin()
             try? await Task.sleep(for: .milliseconds(50))
             await probe.end()
@@ -320,6 +342,9 @@ final class PersistenceTests: XCTestCase {
         for rect in acceptedRects {
             XCTAssertTrue(storyboard.contains(rect), "Static launch mark drifted from v0.2 rectangle \(rect)")
         }
+        XCTAssertTrue(storyboard.contains("id=\"launch-progress-track\""))
+        XCTAssertTrue(storyboard.contains("x=\"28\" y=\"270\" width=\"192\" height=\"4\""),
+                      "the static handoff no longer reserves the exact in-app progress-bar frame")
     }
 
     // MARK: - GameStore

@@ -94,7 +94,7 @@ formation rule. Random chances use the saved encounter RNG. Derived previews use
 | Ambush | Available only before the actor's first completed encounter action when the party was not ambushed. It is one zero-turn free direct attack, consumes the shared opening-attack opportunity and cannot combine with another free opening attack. It is not a reusable five-round damage button. |
 | Vanish | Once per expedition, Unbind from combat without Stability loss. The player confirms the same disclosed retreat consequences; a run receipt prevents relaunch reuse. |
 | Shadowed | Existing party world rule reduces detection radius by two tiles, superseding rather than stacking with Low Profile. |
-| Unseen | This actor begins ordinary encounters concealed for one round. Scripted/apex revelation may explicitly override it and must say so. |
+| Unseen | After opening classification, this actor begins ordinary encounters concealed through the end of the first ordinary round. The concealment already governs target legality during any preceding foe-only ambush actions, but it does not cancel or reclassify the ambush. Scripted/apex revelation may explicitly override it and must say so. |
 | Sparkhand | A landed direct weapon hit applies weak burn (1 damage, 2 rounds) if no stronger burn is present. |
 | Insulation | On learning, choose Heat, Caustic or Light. The actor takes 35% less matching emanation damage; choice changes only through respec and is accessible text, not color. |
 | Emanation Strike | Player chooses Heat/Caustic/Light; learning this technique makes all three available without separate gear or research. The strike applies burn/poison/dazzle respectively. Gambits use the actor's saved preference, which manual use may change visibly. It never hardcodes burn while promising three choices. **Identity correction:** use stable skill ID `emanation_strike`; migrate the legacy internal ID `elemental_strike` one way rather than retaining a second name. |
@@ -119,8 +119,10 @@ pre-contact world state, not reconstructed after the creature has been removed f
 - **creatureAmbush** — a non-apex mobile creature was not disclosed before the action that caused
   contact and reached the party from cover. Its living foes take one opening action each, in their
   stored relative order, before ordinary initiative begins.
-- **scripted(scriptID, overridesWatchful)** — an authored opening. It must name its exception in the
-  encounter introduction; it never masquerades as an ordinary ambush.
+- **scripted(scriptID, overridesWatchful, allowsPartyOpeningAttack)** — an authored opening. Both
+  exception policies are explicit saved facts; neither is inferred from the script name or from the
+  other policy. It must name any exception in the encounter introduction and never masquerades as an
+  ordinary ambush.
 
 “Disclosed” uses the exact pre-action map presentation rule, including fog and crypsis. Merely having
 an `unaware` creature in the data is not enough to ambush the party, and merely having a `pursuing`
@@ -131,8 +133,13 @@ success it converts the opening to `mutualContact`; it does not reroll encounter
 Watchful leaves the encounter classified as `creatureAmbush` but suppresses its foe-only opening
 actions, then begins the stored ordinary order. This makes its narrative and DEBUG telemetry distinct
 from Slippery. Ambush checks the frozen opening and is unavailable only for `creatureAmbush` or a
-scripted opening that explicitly forbids it. Unseen applies after opening classification, so it cannot
-retroactively prevent an ambush; it conceals the owner for the first ordinary round.
+scripted opening whose saved `allowsPartyOpeningAttack` is false. Unseen applies after opening
+classification, so it cannot
+retroactively prevent an ambush; its concealment is active for target selection during foe-only
+opening actions and remains through the end of the first ordinary round. Concealment cannot erase the
+enemy's entire target set: if every otherwise legal conscious party member is concealed, those
+members remain targetable and ordinary rank/reach rules decide among them. This is the same
+“while another legal target exists” boundary as Conceal, not an all-party invulnerability exploit.
 
 The opening value and any Slippery roll/result are saved in the encounter. Relaunch cannot reroll or
 reclassify contact. DEBUG comparison exposes pre-contact disclosure, initial opening, contributing

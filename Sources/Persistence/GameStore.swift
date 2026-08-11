@@ -34,6 +34,30 @@ final class GameStore: ObservableObject {
         var persistenceMilliseconds: Double
         var totalMilliseconds: Double
     }
+    enum PreparationStep: Int, CaseIterable, Equatable, Sendable {
+        case loadingSave
+        case reconcilingCatalogue
+        case committingSave
+        case complete
+
+        var completedFraction: Double {
+            switch self {
+            case .loadingSave: 0
+            case .reconcilingCatalogue: 1.0 / 3.0
+            case .committingSave: 2.0 / 3.0
+            case .complete: 1
+            }
+        }
+
+        var accessibilityDescription: String {
+            switch self {
+            case .loadingSave: "Reading campaign"
+            case .reconcilingCatalogue: "Checking the Atlas"
+            case .committingSave: "Securing campaign"
+            case .complete: "Ready"
+            }
+        }
+    }
     @Published private(set) var state: GameState
     @Published private(set) var diagnostics: SaveDiagnostics
 
@@ -81,9 +105,13 @@ final class GameStore: ObservableObject {
 
     /// All disk, decoding, catalogue reconciliation and the launch commitment can run before the
     /// main actor owns a store. The first SwiftUI frame therefore never waits behind file I/O.
-    nonisolated static func prepareLaunch(io: any GamePersistenceIO) throws -> PreparedLaunch {
+    nonisolated static func prepareLaunch(
+        io: any GamePersistenceIO,
+        progress: @Sendable (PreparationStep) -> Void = { _ in }
+    ) throws -> PreparedLaunch {
         let totalStart = DispatchTime.now().uptimeNanoseconds
         let loadStart = totalStart
+        progress(.loadingSave)
         let outcome = io.load()
         var state: GameState
         switch outcome {
@@ -95,6 +123,7 @@ final class GameStore: ObservableObject {
             throw PreparationError.unrecoverableSave(reason)
         }
         let loadedAt = DispatchTime.now().uptimeNanoseconds
+        progress(.reconcilingCatalogue)
 
         state.meta.launchCount += 1
         state.base.seatEveryoneFound(in: state.reality.library)
@@ -113,6 +142,7 @@ final class GameStore: ObservableObject {
             }
         }
         let reconciledAt = DispatchTime.now().uptimeNanoseconds
+        progress(.committingSave)
 
         do {
             let committedData = try SaveCodec.encode(state)
@@ -126,6 +156,7 @@ final class GameStore: ObservableObject {
             throw error
         }
         let persistedAt = DispatchTime.now().uptimeNanoseconds
+        progress(.complete)
         func milliseconds(_ start: UInt64, _ end: UInt64) -> Double {
             Double(end - start) / 1_000_000
         }

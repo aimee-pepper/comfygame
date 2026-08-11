@@ -23,8 +23,8 @@ leave now,” he says. “That is not yet an answer to what happens next.”
 | `wren.threat_pattern` | “Will the creatures fight each other?” | “Briefly. Then the one that yields will close this gap.” He moves two pebbles together. “Chaos is only useful while you still account for where it settles.” |
 | `wren.tempo_debt` | “Can you reach them in time?” | “Yes, if I spend the next moment now.” He rolls his shoulders. “Speed creates no time. It decides who inherits the missing part.” |
 
-**Offer:** “Your party will meet crowds that make the current arrangement unsafe. I can keep exits
-open—and teach them to count the recovery after a burst as honestly as the burst itself.”
+**Offer:** “Come with me. My party meets crowds that make the current arrangement unsafe. Help us
+keep exits open and count the recovery after a burst as honestly as the burst itself.”
 
 **Accepted:** Wren scatters the three threat pebbles with one sweep and moves toward the closing gap.
 “Good. We take their exit first. Mine will still be mine if I planned this correctly.”
@@ -47,8 +47,8 @@ not yet the animal.”
 | `kestrel.take_or_leave` | “Are you going to kill it?” | “I have not decided.” She does not make the uncertainty ceremonial. “Knowing where a shot would land answers how. It does not answer whether.” |
 | `kestrel.trace_limit` | “What did you cross out?” | “I wrote that it travelled alone.” She points to a second, older track. “The trace proved separation. I supplied loneliness because it made a cleaner story.” |
 
-**Offer:** “Come with me. I can teach your party to recognize an animal before reducing it to threat
-or material—and to waste less when taking one is the decision they actually make.”
+**Offer:** “Come with me. Teach my party to recognize an animal before reducing it to threat or
+material—and to waste less when taking one is the decision we actually make.”
 
 **Accepted:** Kestrel waits until the animal chooses another route before standing. “Good. We leave
 by the path that does not turn this conversation into another pursuit.”
@@ -93,8 +93,8 @@ was how we avoided counting who could not stand inside it.”
 | `marrick.repeated_routine` | “Why repeat a formation?” | “So it remains usable when fear makes explanation expensive.” He walks the fallback route without looking down. “Repetition can distribute judgement. It can also harden one person's blind spot into everybody's habit.” |
 | `marrick.success_count` | “But it protected five people.” | “Yes.” Marrick does not diminish that. “A failure outside the count does not erase the protection. The protection does not erase whom the count excluded.” |
 
-**Offer:** “Your party needs routines that still work when nobody has attention left to spare. I can
-build them—if we begin every plan with the person who cannot use it.”
+**Offer:** “Come with me. My party needs routines that still work when nobody has attention left to
+spare. Build them with us, beginning with the person who cannot use them.”
 
 **Accepted:** Marrick scuffs all six markers and asks you to take the least convenient position.
 “Good. A shared routine starts when someone besides its designer can correct it.”
@@ -117,14 +117,14 @@ boots.”
 | `sabine.ownership` | “Do they belong to you?” | “Their water, injuries and the consequences of my enclosures are my responsibility.” She coils the unused lead. “Their bodies and decisions are not my property because the responsibility is inconvenient.” |
 | `sabine.survival_route` | “Did they show you how to survive here?” | “They showed me water and a path through the low ground. They also stole food, drew a predator and left during the worst night.” Sabine smiles once. “Coexistence is not a service animals provide.” |
 
-**Offer:** “There is a base. Help me make room where animals can stay, work beside people and still
-communicate refusal. I will inspect the place before promising it on anyone else's behalf.”
+**Offer:** “There is a base. Come inspect it, and help me make room where animals can stay, work
+beside people and still communicate refusal. You needn't promise it on anyone else's behalf.”
 
 **Accepted:** Sabine shoulders the unused lead. “I am agreeing to look. If the place is wrong, the
 first useful thing I do there may be saying so.”
 
 **Declined:** “Do not follow the clearest tracks when you leave.” She replaces the crossed twig.
-“Whatever made those wanted to be found. You do not yet know by whom.”
+“They may be freshest, or made by the heaviest animal. Neither tells you it will tolerate company.”
 
 ## Grimmond
 
@@ -141,7 +141,7 @@ mapping what must hold the ceiling after it leaves.”
 | `grimmond.unclaimed_depth` | “Has anyone worked this place before?” | “No marks I can prove are work.” He tests a wet fissure. “Untouched is a claim about people. Pressure, water and living routes do not wait for a person to begin having consequences.” |
 | `grimmond.needed_material` | “What if people need what is in the seam?” | “Then need belongs in the calculation with collapse, not outside it as an excuse or an abstraction.” He adjusts the brace. “Refusing safely while somebody else bears the scarcity is also a choice with a site.” |
 
-**Offer:** “At home I can open Deep Works that count removal, altered load and what remains
+**Offer:** “Come home with me. Open Deep Works that count removal, altered load and what remains
 supported—not merely how much valuable material returns.”
 
 **Accepted:** Grimmond adds your name beside the proposed empty shape. “Then the record begins before
@@ -164,6 +164,14 @@ unchanged place, and I have already asked this one a question.”
   thresholds, hidden sites or recipes.
 - **Proposed identity fields:** Maud's documented pronouns remain proposed; preserve semantic IDs and
   mark hashes stale if review changes the identity field or copy.
+
+### Design-lead revision log — 11 Aug 2026
+
+- Wren, Kestrel, Marrick, Sabine and Grimmond's older offers spoke as the traveller on a player-
+  dialogue button. They now read as player invitations. Maud's existing offer already did.
+- Sabine's older declined line inferred that clear tracks meant an animal “wanted to be found,” an
+  anthropomorphic leap contradicted by her own practice. The current line gives two physical reasons
+  for track clarity and correctly says neither establishes consent.
 
 ## Atlas disposition fields
 

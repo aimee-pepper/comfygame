@@ -263,6 +263,63 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
 /// A fight in progress. Saved in full — being mid-encounter is the hardest resume case in the game,
 /// and the one the acceptance criteria call out by name.
 struct EncounterState: Codable, Equatable, Sendable {
+    /// The saved fact of how contact began. Combat consumers read this instead of reconstructing
+    /// an opening from post-contact enemy awareness or map visibility.
+    enum Opening: Codable, Equatable, Sendable {
+        case partyApproach
+        case mutualContact
+        case creatureAmbush
+        case scripted(scriptID: String, overridesWatchful: Bool,
+                      allowsPartyOpeningAttack: Bool)
+    }
+
+    struct OpeningResolution: Codable, Equatable, Sendable {
+        /// Whether the triggering creature was actually present in the pre-action map presentation.
+        var preContactDisclosed: Bool
+        /// What contact was before any learned protection acted.
+        var initial: Opening
+        /// Slippery is one saved comparison, not an encounter-occurrence reroll.
+        var slipperyProbability: Double?
+        var slipperyRoll: Double?
+        var slipperyPrevented: Bool
+        /// Watchful preserves the ambush classification but removes its forced foe actions.
+        var watchfulSuppressedOpening: Bool
+        var resolved: Opening
+        /// Stored relative foe order still owed before ordinary initiative begins.
+        var pendingFoeActions: [InstanceID]
+
+        init(preContactDisclosed: Bool, initial: Opening,
+             slipperyProbability: Double?, slipperyRoll: Double?, slipperyPrevented: Bool,
+             watchfulSuppressedOpening: Bool, resolved: Opening,
+             pendingFoeActions: [InstanceID]) {
+            self.preContactDisclosed = preContactDisclosed
+            self.initial = initial
+            self.slipperyProbability = slipperyProbability
+            self.slipperyRoll = slipperyRoll
+            self.slipperyPrevented = slipperyPrevented
+            self.watchfulSuppressedOpening = watchfulSuppressedOpening
+            self.resolved = resolved
+            self.pendingFoeActions = pendingFoeActions
+        }
+
+        /// Additive opening evidence must not quarantine a mid-fight save. Unknown enum cases are
+        /// handled by EncounterState as an absent/legacy opening, which conservatively forbids
+        /// opening-only player actions.
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            preContactDisclosed = try c.decodeIfPresent(Bool.self, forKey: .preContactDisclosed) ?? false
+            initial = try c.decodeIfPresent(Opening.self, forKey: .initial) ?? .mutualContact
+            slipperyProbability = try c.decodeIfPresent(Double.self, forKey: .slipperyProbability)
+            slipperyRoll = try c.decodeIfPresent(Double.self, forKey: .slipperyRoll)
+            slipperyPrevented = try c.decodeIfPresent(Bool.self, forKey: .slipperyPrevented) ?? false
+            watchfulSuppressedOpening = try c.decodeIfPresent(Bool.self,
+                                                               forKey: .watchfulSuppressedOpening) ?? false
+            resolved = try c.decodeIfPresent(Opening.self, forKey: .resolved) ?? initial
+            pendingFoeActions = try c.decodeIfPresent([InstanceID].self,
+                                                       forKey: .pendingFoeActions) ?? []
+        }
+    }
+
     struct TurnSlot: Codable, Equatable, Sendable {
         enum Kind: Codable, Equatable, Sendable { case primary, apexFollowUp(Int) }
         var actor: Combatant
@@ -280,6 +337,12 @@ struct EncounterState: Codable, Equatable, Sendable {
     var partyNames: [Int: String] = [:]
     /// Frozen DEBUG comparison inputs/results. Existing encounters decode without it.
     var scalingPreview: EncounterScalingRules.Preview?
+    var opening: OpeningResolution?
+    /// Ordinary actions completed by each actor. Opening foe actions and zero-turn opening attacks
+    /// do not enter this set.
+    var completedFirstActions: Set<Combatant> = []
+    /// One saved receipt per actor for free opening attacks such as Ambush.
+    var openingAttackConsumed: Set<Combatant> = []
 
     /// Resolved from initiative at the start of the fight, and **stored** rather than recomputed so
     /// that a foe dying mid-round can't shift whose turn it is.
@@ -405,6 +468,11 @@ struct EncounterState: Codable, Equatable, Sendable {
         foes = try c.decodeIfPresent([FoeState].self, forKey: .foes) ?? []
         partyNames = try c.decodeIfPresent([Int: String].self, forKey: .partyNames) ?? [:]
         scalingPreview = try c.decodeIfPresent(EncounterScalingRules.Preview.self, forKey: .scalingPreview)
+        opening = try? c.decodeIfPresent(OpeningResolution.self, forKey: .opening)
+        completedFirstActions = try c.decodeIfPresent(Set<Combatant>.self,
+                                                       forKey: .completedFirstActions) ?? []
+        openingAttackConsumed = try c.decodeIfPresent(Set<Combatant>.self,
+                                                       forKey: .openingAttackConsumed) ?? []
         order = try c.decodeIfPresent([Combatant].self, forKey: .order) ?? [.binder, .companion(0)]
         turnSlots = try c.decodeIfPresent([TurnSlot].self, forKey: .turnSlots)
             ?? order.map { TurnSlot(actor: $0) }

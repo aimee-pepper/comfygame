@@ -57,13 +57,15 @@ The creature, restraint rules, greed draw, all eight weapon rules, locked-cache 
 explicit bestiary sightings work. Authored condition affinities remain the later layer that turns
 specific apex hunting into a world-writing goal. See `apex-system-audit.md`.
 
-### 4. The traveller roster — **twenty-five recruitable; expansion in progress**
+### 4. The traveller roster — **28 live/recruitable; 29 designed**
 
-The implemented six have corrected meetings and identities. Bryn through Lys now also have authored
+The live catalogue contains 28 recruitable travellers. Seven have live meeting objects; the other
+twenty-one retain the generic recruitment fallback while their authored meetings remain review-only.
+Bryn through Lys also have authored
 signatures, global order/phase and dependency-safe diary packets. Bryn, Dagg and Rook's exclusive
 gambit teachings work end to end; diary-exclusive focus acquisition can no longer be pre-empted by
 random caches. Dangling relationship pages and Talin's configurable armour component remain deferred.
-All twenty-five have explicit authored order and campaign phase,
+All 28 live travellers have explicit authored order and campaign phase,
 one honest location page per condition, and their approved focus teachings. Mara's Survey Post,
 Edren's Reliquary, Halloway's forge, Isolde's Scriptorium, Sela's Wayfarer's Table and Tovin's
 Anchorage are represented. Tovin uses the current eight-condition late signature.
@@ -82,7 +84,9 @@ advanced melee recipe, so the page grants a real usable pattern rather than an i
 The Home roster is no longer incorrectly capped at five; five is active combat party size including
 the Binder.
 
-Perren and Nine complete the currently designed 28-traveller rollout. Perren has a fixed authored
+Perren and Nine complete the live 28-traveller rollout. Noll is the designed 29th traveller and
+second opening-economy identity, but remains deliberately absent from the live catalogue pending
+Aimee's identity/copy approval; their DEBUG meeting draft is not recruitment content. Perren has a fixed authored
 opposed-world fixture proving all nine conditions and at least ten playable turns. Nine's full packet
 is live; her reversible Thermal range placeholder was tightened to ≤12 after distribution testing.
 Tam remains deliberately held by the Great Work boundary.
@@ -96,31 +100,34 @@ Tam remains deliberately held by the Great Work boundary.
 | | Where | Note |
 |---|---|---|
 | **Debug balancing expansion** | `debug-balancing-surface-current.md` | Batch 2 controls are built and snapshotted, including the explicit fresh-first-expedition Natural/Gentle/Clear approach envelope; generation diagnostics now persist writing selection/placement, Raw Essence, populations, apex, duration, traveller and full-profile facts. Deterministic forcing/export remain before long-campaign breadth |
-| **Party/minimap corrections** | `playtest-ui-corrections-current.md` | Core-stat strip removed and minimap moved below D-pad; page visibility remains Aimee's direct always-visible rule (EQ13), while undiscovered site/world-note leakage remains the boundary |
+| **Traveller meeting corpus** | `traveller-meeting-interaction-current.md`, `traveller-meeting-corpus-plan-current.md` | Ordered/terminal behavior and DEBUG atlas are built (`9cc0f10`); the generated review corpus covers 22 draft-only meetings (the 21 live identities without meetings plus designed Noll, 66 exchanges) and Auber's separate 3-exchange revision. None promotes without explicit review |
+| **Party/minimap corrections** | `playtest-ui-corrections-current.md` | Core-stat strip removed; minimap sits beside D-pad above Portal home; every POI is now fog/discovery-gated by default per `minimap-disclosure-current.md` |
 | ~~**Crafting recipes**~~ | `gear-crafting-families-current.md` | **Built:** all 21 physical families/profiles, durable migration, exact selected-sample receipts, specialist tiers/confirmations, keeper-at-Home discounts and stale atomic commits |
 | ~~**Bowyer**~~ | `gear-crafting-families-current.md` | **Built:** Fen lifecycle/build bundle, immediate Longbow, tier-1 Sling/Throwing Set, tier-2 Tier-4 cap, exact samples, far-reach triangle and honest below-headline confirmation |
 | ~~**Armoury rebuild**~~ | `armoury-rebuild-implementation-current.md` | **Built:** stored/worn in-place rebuild, Rigid/Balanced/Insulated tier matrix, exact sample provenance/receipts, fractional protection offsets, legacy guard, atomic stale/affordability handling and keeper-supplied research presentation |
 | ~~**Weaponsmith**~~ | `weaponsmith-implementation-current.md` | **Built:** exact Maud lifecycle/rungs, fitted point/edge/maul, persistent diary-pattern polearm with chosen physical kind, visible lean advice, no wearer-fit subsystem, exact receipts and atomic commits |
 | ~~**Tannery**~~ | `tannery-system-current.md` | **Built:** exact lifecycle/bundle, free foundational Wear with old-save inference, paid Tier-2 fitting, paid Carry/Keep capabilities, advanced-capacity gates, exact samples and Corrin's three families |
 | ~~**Distillery first slice**~~ | `distillery-system-current.md` | **Built:** safe blank crystallisation, three attunements, potency/provenance, stacking/save behavior and first repeatable Heat Conduit consumer. Retuning and Infuse remain held by design |
-| **Deep Works** | `deep-works-system-current.md` | Design-ready one-site first slice on existing maps; inert signs precede Grimmond and finite pulls persist |
-| **Site catalogue** | `site-system-catalogue-current.md` | Six design-ready profiles; writing-host separation and no site Stability double-charge precede breadth |
+| **Deep Works** | `deep-works-system-current.md` | Implementation-audited one-site first slice: dedicated saved sign/profile state, isolated bind RNG, finite pulls and atomic brace selection; thresholds/frequency remain DRQ-129 playtest values |
+| **Channelworks** | `channelworks-system-current.md` | Implementation-audited first slice: receipt-bearing emanation profile, shared combat path, atomic construction/retuning and three reversible housing curves under DRQ-130 |
+| **Site catalogue** | `site-system-catalogue-current.md` | Implementation-audited six-profile expansion; stale Raw Essence yields, inert Stability data, typed placement predicates and independent writing hosting precede breadth under DRQ-131 |
 | **Consumables** | `crafting-spec (1).md` PART FOUR | **17 authored and craftable:** healing, cures, Stonebark, four coatings, all world items, Solvent and Lure. Traveller's Token remains held; Nessa is authored, so Apothecary production access now needs station integration rather than more design prose |
 | **Building staffing** | `building-staffing-current.md` | ✅ Shared max(purchased, keeper-earned) tier and correct-owner-at-Home discount rules are built with assignment/rounding fixtures; extend paid-action consumers as each station surface lands |
 | **Station catalogue expansion** | `station-integration-matrix-current.md` | Design-ready lifecycle/cost/dependency matrix for every current keeper station |
 | **Compound assembly** | `compound-assembly-station-trees-current.md` | Design-ready; needs personal compound schema, runebook/popup and Scriptorium gate |
 | **Per-building research trees** | `compound-assembly-station-trees-current.md` | Core station ownership/gating architecture exists; expand it as specialist stations land |
-| **The Exchange / Recycler** | `exchange-recycler-current.md` | Design-ready with exact economy/provenance in `exchange-recycler-economy-current.md`; implement gold wallet, safe selling and salvage |
-| **The Tavern** | `tavern-random-companions-current.md` | Design-ready; Firepit upgrade, durable met pool and expedition-refreshed visitors |
+| **The Trading Post / Recycler** | `trading-post-recycler-current.md` | Implementation-audited: distinct goldCoins wallet, persisted outcome-refreshed stock, explicit transfer/salvage metadata, safe selling and one-route Recycler provenance; tune under DRQ-114 |
+| **The Tavern** | `tavern-random-companions-current.md` | Implementation-audited: Firepit upgrade, stable generated-person identity, durable met pool, persisted outcome-refreshed visitors and atomic wants |
 | **Predation** | `predation-living-worlds-current.md` | Design-ready bounded behavior; group-motion texture may follow performance testing |
 | **Anchoring depth** | `anchoring-system-current.md`, `anchored-realm-production-current.md` | Core loop and authored Worldwork aptitudes built; renewable production is design-ready |
-| **Tutorial / discoverability** | `tutorial-discoverability-current.md` | Slices 1–4 are built: opening, deterministic first-return routing, and analysis-gated semantic World History comparison; slices 5–6 remain |
+| **Tutorial / discoverability — DEAD LAST** | `tutorial-discoverability-current.md` | Slices 1–4 are built. Slices 5–6 remain intentionally last behind every current playability, correctness, visual, progression and content-system priority; never pull them forward as filler work |
 | **Tutorial slices 1–2** | `tutorial-opening-slices-current.md` | ✅ Versioned state/migration, one-card Desk/world essentials, suppression, Field Notes replay, and outcome completion built; fresh-save playfeel still belongs in ongoing observation |
 | **Debug Batch 2** | `debug-balancing-surface-current.md` | Complete first slice: all expedition-feel controls are live and per-run snapshotted; opening envelope deterministically relocates only ordinary mobile entry enemies on a fresh first expedition; the DEBUG report reads saved generation facts rather than mutable tiles or rerun RNG. Broader deterministic forcing/export remains a separate Test Setup batch. |
 | ~~**Expedition loss boundary**~~ | `expedition-outcomes-current.md` | **Built:** pre-departure property is protected, only net-new haul enters partial loss, exit kinds persist separately, and recap shows Recovered/Lost/Kept-for-good; random-vs-chosen recovery remains review-only |
 | **Random companions** | `tavern-random-companions-current.md` | Design-ready; persistent generated identity, reachable want, no diary/station |
-| **Generated companion arrival builds** | `generated-companion-arrival-builds-current.md` | Design-ready persistent three-branch plans; replaces ambiguous “wild companion” wording |
-| **Animal taming / Menagerie** | `animal-taming-menagerie-current.md` | Design-ready deterministic Attend→one want→accept loop; no capture odds or breeding |
+| **Combat trees** | `combat-tree-true-graph-current.md`, `combat-node-viability-current.md` | **Immediate enabling priority:** replace live ladders and rejected Asset v0.2 with the true 3-root/6/6/6/3 fan-and-fork graph; Asset proof and Engineering schema use this authority |
+| **Generated companion arrival builds** | `generated-companion-arrival-builds-current.md` | Existing branch-step arrival data needs the true-graph migration to explicit stable-node route plans; XP/stats/free-point budget and repair semantics remain current |
+| **Animal taming / Menagerie** | `animal-taming-menagerie-current.md` | Implementation-audited deterministic Attend→one trust condition→accept loop with awareness integration, exact sample offering and atomic stable-animal transition; no capture odds or breeding |
 | **Library / Lys depth** | `library-lys-progression-current.md` | Design-ready keeper exception: basic Library remains opening; Lys adds search, cross-reference and study |
 
 ### The writing system
@@ -172,12 +179,16 @@ clues remain guides rather than gates. The incompatible Traveller's Token is und
 **Q48:** flora and creatures keep separate budgets and influence one another through productivity and
 trophic depth.
 
-**Q49:** all eight weapon rules, the 3% cache bonus, explicit apex sightings, immediate map reveal and
-later condition-favoured hunting are decided in `apex-system-audit.md`.
+**Q49:** all eight weapon rules, the 3% cache bonus, explicit apex sightings and later
+condition-favoured hunting are decided in `apex-system-audit.md`. Its earlier immediate-map-reveal
+rule is superseded by the settled explore-first boundary in `minimap-disclosure-current.md`: an apex
+marker appears only after legitimate discovery or an explicit invested disclosure effect.
 
-**Emanation branch:** player-facing **Emanation**, stable implementation ID `kindling`.
+**Emanation discipline:** player-facing/new graph ID **Emanation** / `emanation`; legacy `kindling`
+maps one-way at graph migration and remains decode-only.
 
-**Combat progression:** eight nodes per branch, one point per level, level cap 25 and paid Spring
+**Combat progression:** eight-point capstone routes through the true graph, one point per level,
+level cap 25 and paid Spring
 respec are implemented/current. Calling leans are bonus points above the 24 level-earned budget; see
 `combat-progression-current.md`.
 

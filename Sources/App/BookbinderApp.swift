@@ -49,9 +49,10 @@ final class AppLaunchCoordinator: ObservableObject {
 
     enum Phase { case idle, loading, ready(GameStore), failed(Failure) }
     @Published private(set) var phase: Phase
+    @Published private(set) var preparationStep: GameStore.PreparationStep = .loadingSave
     private var task: Task<Void, Never>?
     private var timeoutTask: Task<Void, Never>?
-    private let prepare: @Sendable () async throws -> GameStore.PreparedLaunch
+    private let prepare: @Sendable (@escaping @Sendable (GameStore.PreparationStep) -> Void) async throws -> GameStore.PreparedLaunch
     private let announce: @MainActor @Sendable (String) -> Void
     private let timeout: Duration
     private var attempt = UUID()
@@ -67,14 +68,14 @@ final class AppLaunchCoordinator: ObservableObject {
          announce: @escaping @MainActor @Sendable (String) -> Void = {
              UIAccessibility.post(notification: .announcement, argument: $0)
          },
-         prepare: @escaping @Sendable () async throws -> GameStore.PreparedLaunch = {
+         prepare: @escaping @Sendable (@escaping @Sendable (GameStore.PreparationStep) -> Void) async throws -> GameStore.PreparedLaunch = { progress in
 #if DEBUG
              if ProcessInfo.processInfo.arguments.contains("--debug-launch-delay") {
                  try await Task.sleep(for: .seconds(8))
              }
 #endif
              return try await Task.detached(priority: .userInitiated) {
-                 try GameStore.prepareLaunch(io: .documents)
+                 try GameStore.prepareLaunch(io: .documents, progress: progress)
              }.value
          }) {
         self.phase = readyStore.map(Phase.ready) ?? .idle
@@ -85,6 +86,7 @@ final class AppLaunchCoordinator: ObservableObject {
 
     func start() {
         guard case .idle = phase else { return }
+        preparationStep = .loadingSave
         phase = .loading
         let thisAttempt = UUID()
         attempt = thisAttempt
@@ -102,7 +104,12 @@ final class AppLaunchCoordinator: ObservableObject {
         }
         task = Task {
             do {
-                let prepared = try await self.prepare()
+                let prepared = try await self.prepare { [weak self] step in
+                    Task { @MainActor in
+                        guard let self, self.attempt == thisAttempt else { return }
+                        self.preparationStep = step
+                    }
+                }
                 guard self.attempt == thisAttempt else { return }
                 self.timeoutTask?.cancel()
                 let store = GameStore(io: .documents, prepared: prepared)
@@ -167,7 +174,7 @@ private struct LaunchRootView: View {
         Group {
             switch coordinator.phase {
             case .idle, .loading:
-                LaunchSurface()
+                LaunchSurface(preparationStep: coordinator.preparationStep)
                     .task { coordinator.start() }
                     .onAppear { coordinator.noteFirstMeaningfulFrame() }
             case .ready(let store):
@@ -180,6 +187,7 @@ private struct LaunchRootView: View {
 }
 
 struct LaunchSurface: View {
+    var preparationStep: GameStore.PreparationStep = .loadingSave
     var failure: AppLaunchCoordinator.Failure?
     var retry: (() -> Void)?
 
@@ -194,7 +202,9 @@ struct LaunchSurface: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))
         .accessibilityElement(children: failure == nil ? .combine : .contain)
-        .accessibilityLabel(failure == nil ? "Bookbinder. Opening the Atlas." : "Bookbinder. \(failure!.message)")
+        .accessibilityLabel(failure == nil
+                            ? "Bookbinder. Opening the Atlas. \(preparationStep.accessibilityDescription)."
+                            : "Bookbinder. \(failure!.message)")
     }
 
     /// Matches LaunchScreen.storyboard's 248 x 340 safe-area-centered geometry exactly,
@@ -219,6 +229,13 @@ struct LaunchSurface: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 192, height: 21)
                 .offset(x: 28, y: 225)
+            ProgressView(value: preparationStep.completedFraction)
+                .progressViewStyle(.linear)
+                .tint(.brown)
+                .frame(width: 192, height: 4)
+                .offset(x: 28, y: 270)
+                .accessibilityLabel("Opening progress")
+                .accessibilityValue(preparationStep.accessibilityDescription)
             Rectangle().fill(.secondary).frame(width: 212, height: 2).offset(x: 18, y: 316)
         }
         .frame(width: 248, height: 340)

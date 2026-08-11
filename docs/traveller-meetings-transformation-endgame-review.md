@@ -25,8 +25,8 @@ below holds several colours the water no longer carries. “Everyone watches wha
 | `auber.essence` | “Can you make essence here?” | “Essence is already here.” He turns the vessel so the residue catches the light. “The question is what form you are willing to pay to keep it in, and where the rest of that payment goes.” |
 | `auber.residue` | “Why save the residue?” | “Because throwing something away only changes who encounters it next.” Auber labels the cloudy vessel before touching the clear one. “Often that person is merely farther from the shelf.” |
 
-**Offer:** “There is a refinery at the base. Let me build the work it cannot do: crystallisation,
-attunement and separation that keep the carrier and remainder in the same record.”
+**Offer:** “There is a refinery at the base. Come home with me and build the work it cannot do:
+crystallisation, attunement and separation that keep carrier and remainder in the same record.”
 
 **Accepted:** “First show me where the refinery's waste goes.” Auber gathers the cloudy vessel. “If
 the answer is nowhere, we will begin by following it.”
@@ -49,8 +49,8 @@ the clearing, not about the conduit.”
 | `oda.distance` | “Why test it from so far away?” | “Distance keeps the first failure away from my body.” She checks the ground behind the target. “It also makes consequences look smaller. Safety changes responsibility; it does not remove it.” |
 | `oda.weapon_history` | “Did you make weapons before the Sundering?” | “Yes. They were tools, and they were weapons. Either word can become a hiding place if spoken alone.” Oda marks the failed seam. “A handle makes intention convenient. It does not make outcomes obedient.” |
 
-**Offer:** “I have the one intact core this housing cannot safely carry again. Give me walls behind
-the targets and I can build Channelworks that make containment, reach and stopping visible.”
+**Offer:** “Come home with me, and bring that intact core. I'll give you walls behind the targets;
+build Channelworks that make containment, reach and stopping visible.”
 
 **Accepted:** Oda asks what the walls are made from, then keeps asking until the answer includes what
 lies behind them. She takes the intact inner assembly and leaves the spectacular broken shell.
@@ -72,9 +72,8 @@ come closer,” they say. “That is permission for this moment, from that direc
 | `ashe.endurance` | “Does it hurt?” | “Sometimes. Sometimes it is only present. Sometimes it becomes dangerous before it hurts.” They meet your eyes. “Other people prefer one dramatic answer because it tells them when they are allowed to start listening.” |
 | `ashe.helping_others` | “Can you protect someone from it?” | “Often.” The heat above their hands tightens, then settles. “Capacity is real. So is the question each time. Enduring a force does not appoint my body as public equipment.” |
 
-**Offer:** “Your party will meet emanations before its instruments or eyes can name them. I can help
-recognize, receive and ground that pressure when I choose the cost—not when endurance is mistaken for
-consent.”
+**Offer:** “Come with me. My party will meet emanations before our instruments or eyes can name them.
+Help us recognize, receive and ground that pressure when you choose the cost.”
 
 **Accepted:** Ashe removes one warning strip and leaves the others. “Then we walk out through the
 opening I made. Do not collect the stones; boundaries are useful to whoever arrives next.”
@@ -97,8 +96,8 @@ about which relationship the repetition is allowed to prove.”
 | `perren.sundering_lesson` | “What did the rite teach?” | “That difference was the wound and correspondence the cure.” He turns one mirrored piece over. “We built choices whose alternatives were missing, then called the chosen answer revelation.” |
 | `perren.trust` | “Do you believe any shared account now?” | “Sometimes.” The admission costs more than suspicion. “Distrusting every frame lets me remain its only interpreter. That can reproduce the control I claim to have escaped.” |
 
-**Offer:** “You are writing worlds with inherited words. I can help keep the absent alternatives and
-reversed images visible—but I will not become a device that certifies which account is true.”
+**Offer:** “Come with me. I am writing worlds with inherited words. Help me keep absent alternatives
+and reversed images visible; I won't ask you to certify which account is true.”
 
 **Accepted:** Perren mixes the two arrangements into one labelled cloth rather than choosing between
 them. “Then keep the questions with the fragments. An answer stored alone becomes instruction very
@@ -122,8 +121,8 @@ Then she turns the cup over and adds the change to the note. “The arrangement 
 | `nine.changed_promise` | “Why turn the cup over?” | “The old note says it marked water safe to drink. The water changed.” She writes beside rather than over the earlier line. “A promise that survives memory must also survive honest revision.” |
 | `nine.missing_origin` | “Would knowing who you were make this easier?” | “Some things.” Nine considers the question without flinching. “It would not make that person more entitled to my next choice than the person checking the cup now.” |
 
-**Offer:** “Your journeys depend on marks, returns and promises carried across change. I can help keep
-those continuities deliberately—without asking an unknown origin to overrule the present.”
+**Offer:** “Come with me. My journeys depend on marks, returns and promises carried across change.
+Help me keep those continuities without letting an unknown origin overrule your present.”
 
 **Accepted:** Nine gives you the blue thread and makes a new note naming that transfer. “Tomorrow I
 will know you did not steal it. More importantly, tomorrow I may decide the agreement still fits.”
@@ -148,6 +147,13 @@ will know you did not steal it. More importantly, tomorrow I may decide the agre
   their old hashes stale instead of pretending the expanded copy was previously reviewed.
 - **Proposed identity fields:** Auber and Oda retain currently proposed pronouns; exact-copy hashes and
   review state must update if identity review changes them.
+
+### Design-lead revision log — 11 Aug 2026
+
+- All five older offers were authored as if the traveller spoke the player-facing recruitment
+  button. They now read as player invitations and preserve the same practice/system promises.
+- Ashe's offer no longer places the consent condition in the player's mouth as “when I choose the
+  cost”; it explicitly leaves that choice with Ashe.
 
 ## Atlas disposition fields
 

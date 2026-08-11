@@ -50,6 +50,10 @@ for source in SOURCES:
             "source": source,
             "opening": clean(opening_match.group(1)),
             "exchanges": exchanges,
+            # Offer is the player's authored prompt. Accepted/declined are the traveller's
+            # response. Keep the speaker semantic explicit so presentation cannot regress by
+            # rendering every terminal line as though the traveller said it.
+            "offerSpeaker": "player",
             "offer": field(body, "Offer"),
             "accepted": field(body, "Accepted"),
             "declined": field(body, "Declined"),
@@ -63,11 +67,13 @@ import Foundation
 
 enum DraftMeetingCorpus {
     struct Meeting: Codable, Equatable {
+        enum Speaker: String, Codable { case player, traveller }
         struct Exchange: Codable, Equatable { let id: String; let ask: String; let reply: String }
         let travellerID: String
         let source: String
         let opening: String
         let exchanges: [Exchange]
+        let offerSpeaker: Speaker
         let offer: String
         let accepted: String
         let declined: String

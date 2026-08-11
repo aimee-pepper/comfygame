@@ -302,7 +302,9 @@ enum CombatRules {
     /// it's still cooling.
     static func ready(_ kind: SkillDef.Kind, for actor: Combatant,
                       in encounter: EncounterState, state: GameState) -> SkillDef? {
-        skills(for: actor, in: state).first { $0.kind == kind && cooldown(of: $0, for: actor, in: encounter) == 0 }
+        skills(for: actor, in: state).first {
+            $0.kind == kind && isReady($0, for: actor, in: encounter)
+        }
     }
 
     /// What a gambit means by "use a skill" now that there are twelve.
@@ -345,7 +347,19 @@ enum CombatRules {
     }
 
     static func isReady(_ skill: SkillDef, for actor: Combatant, in encounter: EncounterState) -> Bool {
-        cooldown(of: skill, for: actor, in: encounter) == 0
+        guard cooldown(of: skill, for: actor, in: encounter) == 0 else { return false }
+        if skill.kind == .ambush {
+            guard !encounter.completedFirstActions.contains(actor),
+                  !encounter.openingAttackConsumed.contains(actor)
+            else { return false }
+            switch encounter.opening?.resolved {
+            case .creatureAmbush: return false
+            case .scripted(_, _, let allowsPartyOpeningAttack): return allowsPartyOpeningAttack
+            case .partyApproach, .mutualContact: return true
+            case nil: return false
+            }
+        }
+        return true
     }
 
     /// **Every skill's effect.**
@@ -515,16 +529,20 @@ enum CombatRules {
                    run: &run, encounter: &encounter, verb: skill.name,
                    standingBack: standingBack, reachOfActor: reach)
 
-        case .preempt, .ambush:
-            // **First Strike / Ambush.** A turn you didn't have. Ambush also lands a blow with it.
+        case .preempt:
+            // Legacy First Strike behavior remains until the direct-hit/action-receipt slice.
             encounter.extraTurns[actor, default: 0] += 1
-            if skill.kind == .ambush, let foe {
-                strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
-                       run: &run, encounter: &encounter, verb: skill.name,
-                       standingBack: standingBack, reachOfActor: reach)
-            } else {
-                encounter.note("\(skill.name): you move before they do.")
-            }
+            encounter.note("\(skill.name): you move before they do.")
+
+        case .ambush:
+            // A conditional zero-turn direct attack. The extra-turn debt keeps the ordinary
+            // schedule on this actor after `perform` hands on; the receipt survives relaunch.
+            guard let foe, !encounter.openingAttackConsumed.contains(actor) else { return }
+            encounter.openingAttackConsumed.insert(actor)
+            encounter.extraTurns[actor, default: 0] += 1
+            strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
+                   run: &run, encounter: &encounter, verb: skill.name,
+                   standingBack: standingBack, reachOfActor: reach)
 
         case .brace:
             encounter.braced[actor] = skill.rounds
@@ -691,6 +709,13 @@ enum CombatRules {
     static func perform(_ action: CombatAction, by actor: Combatant, in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter, encounter.outcome == nil
         else { return }
+        if case .skill(let id, _, _) = action,
+           let skill = ContentCatalog.shared.skill(id), skill.kind == .ambush,
+           !isReady(skill, for: actor, in: encounter) {
+            // A stale opening-action tap is not a completed action. Reject it without moving the
+            // schedule or consuming a cooldown/receipt.
+            return
+        }
 
         switch action {
         case .attack(let foeID):
@@ -753,7 +778,12 @@ enum CombatRules {
 
         run.activeEncounter = encounter
         state.worlds.activeRun = run
-        if encounter.outcome == nil { advanceTurn(in: &state) }
+        let wasZeroTurnOpeningAttack: Bool = if case .skill(let id, _, _) = action {
+            ContentCatalog.shared.skill(id)?.kind == .ambush
+        } else { false }
+        if encounter.outcome == nil {
+            advanceTurn(in: &state, completedAction: !wasZeroTurnOpeningAttack)
+        }
         checkOutcome(in: &state)
     }
 
@@ -1051,13 +1081,14 @@ enum CombatRules {
     // MARK: Turn order
 
     /// Moves to the next living combatant, ticking the round over when the rotation wraps.
-    static func advanceTurn(in state: inout GameState) {
+    static func advanceTurn(in state: inout GameState, completedAction: Bool = true) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
 
         // **A turn owed is taken before the order moves on** — that's what Quicken buys, and it
         // has to be spent here rather than by shuffling `order`, which is stored precisely so a
         // death mid-round can't shift whose turn it is.
         let acting = encounter.current
+        if completedAction { encounter.completedFirstActions.insert(acting) }
         if let owed = encounter.extraTurns[acting], owed > 0 {
             encounter.extraTurns[acting] = owed - 1
             encounter.note("Again, before it can answer.")
@@ -1065,7 +1096,6 @@ enum CombatRules {
             state.worlds.activeRun = run
             return
         }
-
         var roundTurned = false
         let scheduleCount = max(1, encounter.turnSlots.isEmpty ? encounter.order.count : encounter.turnSlots.count)
         for step in 1...scheduleCount {
@@ -1182,6 +1212,7 @@ enum CombatRules {
     /// Whether the current actor is waiting on the player rather than acting for itself.
     static func needsPlayerInput(_ state: GameState) -> Bool {
         guard let encounter = state.worlds.activeRun?.activeEncounter, encounter.outcome == nil else { return false }
+        if encounter.opening?.pendingFoeActions.isEmpty == false { return false }
         switch encounter.current {
         case .binder:
             // Manual until you've bought the right to automate yourself, and still manual if you
@@ -1202,7 +1233,14 @@ enum CombatRules {
               state.worlds.activeRun?.activeEncounter?.outcome == nil,
               guardCount < Tuning.Encounter.maxAutomaticTurnsPerInput {
             guardCount += 1
-            guard let encounter = state.worlds.activeRun?.activeEncounter else { return }
+            guard var encounter = state.worlds.activeRun?.activeEncounter else { return }
+            if let foeID = encounter.opening?.pendingFoeActions.first {
+                encounter.opening?.pendingFoeActions.removeFirst()
+                state.worlds.activeRun?.activeEncounter = encounter
+                performFoeTurn(.foe(foeID), slot: .init(actor: .foe(foeID)),
+                               advancesOrdinarySchedule: false, in: &state)
+                continue
+            }
             let actor = encounter.current
 
             switch actor {
@@ -1221,20 +1259,25 @@ enum CombatRules {
     /// crush lands heavier, rend leaves a wound that keeps costing you, and something that carries
     /// its own heat or venom isn't stopped by armour at all.
     private static func performFoeTurn(_ actor: Combatant, slot: EncounterState.TurnSlot,
+                                       advancesOrdinarySchedule: Bool = true,
                                        in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
               let foeID = actor.foeID, let foe = encounter.foes.first(where: { $0.id == foeID })
         else { return }
 
         let standing: [Combatant] = party(of: state).filter { isAlive($0, in: run) }
+        let visibleTargets = standing.filter { (encounter.concealed[$0] ?? 0) <= 0 }
+        // Concealment redirects attention while another legal target exists; an entirely concealed
+        // party does not make the encounter unable to act.
+        let targetable = visibleTargets.isEmpty ? standing : visibleTargets
 
         // **The front rank takes the melee** (session 17 §4). Targeting was uniform, so standing at
         // the back was pure upside — less damage, no more risk of being chosen — which is half a
         // rank system. Something with far reach ignores the line entirely, which is what reach is
         // *for*, and if everybody is at the back there's nobody to hide behind.
-        let front = standing.filter { rank(of: $0, in: state) == .front }
+        let front = targetable.filter { rank(of: $0, in: state) == .front }
         let reachesPast = foe.stats.strikesFirst || foe.stats.element != nil
-        let reachable = (reachesPast || front.isEmpty) ? standing : front
+        let reachable = (reachesPast || front.isEmpty) ? targetable : front
 
         // **Draw Off.** Something you've taunted comes for you and doesn't get a choice — the only
         // way in the game to take a hit meant for somebody else.
@@ -1255,8 +1298,8 @@ enum CombatRules {
         } else {
             delivery = switch foe.stats.delivery {
             case .single: ([primary], 1)
-            case .multi: (standing, Tuning.Encounter.multiDeliveryShare)
-            case .area: (standing, Tuning.Encounter.areaDeliveryShare)
+            case .multi: (targetable, Tuning.Encounter.multiDeliveryShare)
+            case .area: (targetable, Tuning.Encounter.areaDeliveryShare)
             }
         }
         let (targets, share) = delivery
@@ -1361,7 +1404,7 @@ enum CombatRules {
 
         run.activeEncounter = encounter
         state.worlds.activeRun = run
-        advanceTurn(in: &state)
+        if advancesOrdinarySchedule { advanceTurn(in: &state) }
         checkOutcome(in: &state)
     }
 

@@ -46,8 +46,8 @@ one corner where she asks before entering. “Try the stool,” she says. “Not
 | `orsa.disclosed_risk` | “Why mark that corner?” | “Because I told the last guest what frightened me, and they agreed not to surprise me there.” Orsa smooths the cloth flat. “Confidence is not permission. It is information someone trusted you to carry carefully.” |
 | `orsa.strangers` | “Do you trust everyone who stays here?” | “No. They do not have to perform friendship to earn dry ground.” She glances around the separate spaces. “Enough agreement for one night can still be honest agreement.” |
 
-**Offer:** “The Firepit at home could become a place like this—shared food, clear exits, no demand
-that strangers pretend to be family. Will you make room for me to try?”
+**Offer:** “Come home with me. Help me make the Firepit a place like this—shared food, clear exits,
+and no demand that strangers pretend to be family.”
 
 **Accepted:** “Good. We begin with the chairs.” Orsa lifts the lamp. “People confess all sorts of
 things when furniture leaves them nowhere comfortable to look.”
@@ -69,14 +69,35 @@ been filed away, but not deeply enough. Beside it lies a neat price card with th
 | `vance.missing_mark` | “Why was that mark removed?” | “That is the expensive question.” His thumb rests over the scar. “If I omit it, the kettle moves today. If I name it, the person buying can decide whether usefulness is the only history they are willing to inherit.” |
 | `vance.price` | “So what is it worth?” | “To someone cold, more than I should charge. To someone carrying three kettles, less than the repair cost.” He leaves the card blank. “A price compares offers. It does not settle need.” |
 
-**Offer:** “You will bring home more useful things than one household can keep. Give me a place to
-move them honestly—and to recover what remains useful when an object is finished.”
+**Offer:** “Come home with me. I bring back more useful things than one household can keep. Run a
+counter where I can sell what we no longer need and find changing stock with its history intact.”
 
 **Accepted:** Vance writes a price, then adds the missing ownership mark beneath it. “There. Now both
 of us have something awkward to explain.”
 
 **Declined:** “Keep the kettle in mind.” He turns the blank card face down. “A thing can wait for the
 right exchange without becoming worthless.”
+
+## Noll
+
+**Opening**
+
+Noll has a cracked frame across one knee. Its removed fastenings lie in a neat line, but one damaged
+corner remains deliberately joined. They press that corner once, listen, and leave it intact.
+
+| Stable ID | Ask | Reply |
+|---|---|---|
+| `noll.join_left` | “Why leave that corner together?” | “Because the join is evidence.” They press it once and stop. “Separated pieces tell you what may be used. A joined failure tells you what the maker expected to hold.” |
+| `noll.repair` | “Could the frame be repaired?” | “Yes. That is not the same as saying it should be.” They indicate the bowed edge. “Repair preserves a whole. Salvage preserves uses. Sentiment becomes waste when it refuses to name which one it wants.” |
+| `noll.vance` | “You know Vance?” | “He can price the story attached to a thing. I can tell him which part of the story will survive his buyer.” A brief look up. “He dislikes that distinction most when it saves him money.” |
+
+**Offer:** “Come back with me. We have things that need a second honest use.”
+
+**Accepted:** “Then do not call it rescue when we take something apart.” Noll folds the joined
+corner into cloth and gathers the reusable pieces separately. “Give each result its own name.”
+
+**Declined:** “Go carefully.” They return to the failed join. “Whole ground can hide worse breaks
+than this.”
 
 ## Talin
 
@@ -92,8 +113,8 @@ and vanishes when the plates settle. “Not yet,” she says, though you have no
 | `talin.certainty` | “How will you know it is the right moment?” | “I will not.” Her grip remains loose. “I will know when the useful moment is leaving. Certainty and timeliness are different luxuries.” |
 | `talin.outcome` | “And if the strike works?” | “Then it worked.” Talin watches the next breath. “Success does not travel backward and improve the reasons I had before I chose.” |
 
-**Offer:** “You are going to meet things that give you one useful moment and several convincing
-distractions. I can teach your party to act while the first is still true.”
+**Offer:** “Come with me. My party meets things that give us one useful moment and several convincing
+distractions. Teach us to act while the first is still true.”
 
 **Accepted:** The seam opens. Talin lowers the blade instead of striking. “Good. This one no longer
 needs to become proof.” She backs away with you.
@@ -115,8 +136,8 @@ includes a pawprint, a quantity and a time. The other bears a hand, half the qua
 | `nessa.cure_or_poison` | “Is it medicine or poison?” | “For whom? How much? Before or after what?” Nessa holds up the shorter label she removed. “Those are not evasions. They are the parts the old name concealed.” |
 | `nessa.result` | “Did either one work?” | “One body improved and wanted the treatment stopped. The other worsened and asked me to continue.” She sets the vials apart. “A measured result matters. It does not answer on their behalf.” |
 
-**Offer:** “Bring me the bodies, routes and moments along with your ingredients. I can make remedies,
-coatings and tools that say what they are for instead of pretending to be universally safe.”
+**Offer:** “Come home with me. I'll bring you ingredients and tell you whose body, which route and
+what moment they are meant for. Make us remedies, coatings and tools that say what they are for.”
 
 **Accepted:** “Then we begin with labels before bottles.” Nessa hands you the scraped-off names.
 “Keep these. Confidence should leave evidence when it was wrong.”
@@ -127,21 +148,37 @@ also competent fieldwork.”
 ## Batch review checks
 
 - **Voice separation:** Bryn is plain and relational; Orsa practical and socially exact; Vance
-  conversational but unwilling to reduce worth to price; Talin spare and disciplined; Nessa precise
-  without hiding behind technical language.
+  conversational but unwilling to reduce worth to price; Noll exact and materially severe; Talin
+  spare and disciplined; Nessa precise without hiding behind technical language.
 - **Physical readability:** every opening establishes a visible action before presenting the
   traveller's argument.
 - **Independent exchanges:** no reply assumes another question was asked, and no terminal choice
   requires exhausting questions.
 - **Current-fiction alignment:** Orsa upgrades the Firepit rather than promising a separate generic
-  inn; Vance implies Exchange/Recycler; Nessa implies the existing preparation catalogue; Bryn and
+  inn; Vance implies Trading Post/appraisal only (older Recycler implications are stale and require
+  revision); Nessa implies the existing preparation catalogue; Bryn and
   Talin promise combat practice rather than stations.
 - **No disclosure leak:** meetings do not reveal unearned diary focuses, exact gambit IDs, signature
   conditions or hidden world-analysis facts.
 
+### Design-lead revision log — 11 Aug 2026
+
+- Vance's older offer said he would “recover what remains useful when an object is finished,” which
+  assigned the Recycler to him after Trading Post and Recycler ownership were separated. The current
+  offer names buying, rotating stock and honest provenance only; Noll retains recovery/unmaking.
+- Nessa's older “Bring me the bodies” construction was grammatically defensible but too easy to read
+  as asking for corpses. The current sentence keeps her body/route/time principle while naming
+  ingredients first and making intended recipients explicit.
+- Orsa, Vance, Talin and Nessa's older offers were written in the traveller's voice even though the
+  live prominent button is player dialogue. Current offers are player-spoken invitations; accepted
+  and declined lines remain the traveller's response. Bryn's offer already used the player's voice.
+- Noll joins the canonical early-economy batch as the twenty-second missing meeting after the roster
+  expanded from 28 to 29. `traveller-identity-noll-recycler-current.md` retains the original first
+  draft for design history but points review/generation to this canonical copy.
+
 ## Atlas disposition fields
 
-When the DEBUG atlas lands, create rows for the five meeting objects and fifteen exchanges with
+The DEBUG atlas creates rows for the six meeting objects and eighteen exchanges with
 review state `Draft / needs Aimee review`, this document as provenance, and a hash of the exact
 opening/questions/offer/terminal copy. Review state remains external to content JSON and campaign
 saves.
