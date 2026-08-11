@@ -81,6 +81,17 @@ final class DebugBugReporterTests: XCTestCase {
         XCTAssertEqual(decoded.debugTuningSnapshot, report.debugTuningSnapshot)
     }
 
+    func testReportPreservesBoundedSemanticActionTrail() throws {
+        var report = fixtureReport()
+        report.semanticActionTrail = ["move north", "look east", "collect quartz"]
+        let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+
+        let decoded = try decoder.decode(DebugBugReport.self, from: encoder.encode(report))
+
+        XCTAssertEqual(decoded.semanticActionTrail, report.semanticActionTrail)
+    }
+
     func testDistinctReportsUseIndependentAtomicStagingDirectories() async throws {
         let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

@@ -26,6 +26,7 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
     var saveSchemaVersion: Int
     var mutationCount: Int
     var lastAction: String
+    var semanticActionTrail: [String]? = nil
     var runIndex: Int?
     var mapSeed: UInt64?
     var playerX: Int?

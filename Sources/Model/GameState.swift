@@ -88,14 +88,18 @@ struct SaveMeta: Codable, Equatable, Sendable {
     var mutationCount: Int = 0
     /// Label of the most recent mutation — makes a resumed save self-describing.
     var lastAction: String = "new game"
+    /// Diagnostics-only bounded semantic history. Game rules must never read this.
+    var semanticActionTrail: [String] = []
     /// Diagnostics only. No game rule may read this (pillar 2: no wall-clock gameplay).
     var lastSavedAt: Date? = nil
     /// Number of app launches that loaded this save. Useful in the kill-test.
     var launchCount: Int = 0
 
-    init(mutationCount: Int = 0, lastAction: String = "new game", lastSavedAt: Date? = nil, launchCount: Int = 0) {
+    init(mutationCount: Int = 0, lastAction: String = "new game",
+         semanticActionTrail: [String] = [], lastSavedAt: Date? = nil, launchCount: Int = 0) {
         self.mutationCount = mutationCount
         self.lastAction = lastAction
+        self.semanticActionTrail = Array(semanticActionTrail.suffix(Self.actionTrailLimit))
         self.lastSavedAt = lastSavedAt
         self.launchCount = launchCount
     }
@@ -104,7 +108,19 @@ struct SaveMeta: Codable, Equatable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         mutationCount = try container.decodeIfPresent(Int.self, forKey: .mutationCount) ?? 0
         lastAction = try container.decodeIfPresent(String.self, forKey: .lastAction) ?? "unknown"
+        semanticActionTrail = Array((try container.decodeIfPresent([String].self, forKey: .semanticActionTrail)
+                                     ?? [lastAction]).suffix(Self.actionTrailLimit))
         lastSavedAt = try container.decodeIfPresent(Date.self, forKey: .lastSavedAt)
         launchCount = try container.decodeIfPresent(Int.self, forKey: .launchCount) ?? 0
+    }
+
+    static let actionTrailLimit = 20
+
+    mutating func recordSemanticAction(_ action: String) {
+        lastAction = action
+        semanticActionTrail.append(action)
+        if semanticActionTrail.count > Self.actionTrailLimit {
+            semanticActionTrail.removeFirst(semanticActionTrail.count - Self.actionTrailLimit)
+        }
     }
 }

@@ -126,10 +126,10 @@ complete reporter contract, and the next checkpoint should remain narrow:
 3. **Closed — transport transitions:** configured builds durably advance
    `sending → submitted/needsAttention`; interrupted sends recover to retryable state and only a
    supported nonempty receipt marks Submitted.
-4. **Context completeness:** native capture records the roadmap checkpoint, app build, broad screen,
-   save schema, run/seed/position, Stability, outcome, mutation count and one last action. It still
-   lacks the promised precise route, campaign/slot hash, active tuning, encounter ID and bounded
-   semantic action trail.
+4. **Closed — safe context:** native capture records the roadmap checkpoint, app build, exact route,
+   privacy-safe campaign reference, save schema, run/seed/position, Stability, outcome and encounter
+   IDs, mutation count, active DEBUG tuning and the last 20 semantic mutations. Legacy saves infer
+   only their known last action; the trail never records raw touches or save contents.
 
 Do not expand this completion pass into general telemetry, save attachment or a full issue-tracker
 client. Close the real receipt, honest outbox/retry and promised safe context; downstream triage stays

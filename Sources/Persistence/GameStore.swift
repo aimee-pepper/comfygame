@@ -100,7 +100,7 @@ final class GameStore: ObservableObject {
         state.base.seatEveryoneFound(in: state.reality.library)
         state.base.learnEveryStarterWord()
         state.meta.mutationCount += 1
-        state.meta.lastAction = "launch"
+        state.meta.recordSemanticAction("launch")
         state.meta.lastSavedAt = Date()
 
         if state.worlds.activeRun == nil {
@@ -108,7 +108,7 @@ final class GameStore: ObservableObject {
             if EconomyRules.spendableEssence(in: state) < floor {
                 state.base.essence += max(0, floor - EconomyRules.spendableEssence(in: state))
                 state.meta.mutationCount += 1
-                state.meta.lastAction = "the spring provides"
+                state.meta.recordSemanticAction("the spring provides")
                 state.meta.lastSavedAt = Date()
             }
         }
@@ -154,7 +154,7 @@ final class GameStore: ObservableObject {
     func mutate(_ label: String, flush: Bool = false, _ body: (inout GameState) -> Void) {
         body(&state)
         state.meta.mutationCount += 1
-        state.meta.lastAction = label
+        state.meta.recordSemanticAction(label)
         state.meta.lastSavedAt = Date() // diagnostics only — no gameplay rule may read this
 
         if flush {

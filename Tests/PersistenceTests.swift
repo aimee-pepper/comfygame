@@ -331,6 +331,7 @@ final class PersistenceTests: XCTestCase {
         store.mutate("test mutation") { $0.reality.motes += 3 }
         XCTAssertEqual(store.state.meta.mutationCount, startingCount + 1)
         XCTAssertEqual(store.state.meta.lastAction, "test mutation")
+        XCTAssertEqual(store.state.meta.semanticActionTrail.last, "test mutation")
 
         try await waitForDiskToCatchUp(store)
         let onDisk = try XCTUnwrap(io.load().state)
@@ -360,6 +361,17 @@ final class PersistenceTests: XCTestCase {
         try await waitForDiskToCatchUp(store)
         XCTAssertEqual(try XCTUnwrap(io.load().state).reality.motes, 20)
         XCTAssertLessThan(store.diagnostics.writeCount - writesBefore, 20, "Writes should coalesce")
+        XCTAssertEqual(store.state.meta.semanticActionTrail.count, SaveMeta.actionTrailLimit)
+        XCTAssertEqual(store.state.meta.semanticActionTrail.first, "tap 1")
+        XCTAssertEqual(store.state.meta.semanticActionTrail.last, "tap 20")
+    }
+
+    func testLegacySaveMetaInfersOneSemanticActionWithoutInventingHistory() throws {
+        let data = Data(#"{"mutationCount":4,"lastAction":"returned","launchCount":2}"#.utf8)
+        let decoded = try JSONDecoder().decode(SaveMeta.self, from: data)
+
+        XCTAssertEqual(decoded.semanticActionTrail, ["returned"])
+        XCTAssertEqual(decoded.lastAction, "returned")
     }
 
     /// Relaunching must not disturb anything except the launch counter.

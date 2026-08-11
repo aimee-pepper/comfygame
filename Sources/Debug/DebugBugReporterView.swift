@@ -63,6 +63,7 @@ struct DebugBugReporterOverlay: View {
             saveSchemaVersion: store.state.schemaVersion,
             mutationCount: store.state.meta.mutationCount,
             lastAction: store.state.meta.lastAction,
+            semanticActionTrail: store.state.meta.semanticActionTrail,
             runIndex: run?.runIndex, mapSeed: run?.mapSeed,
             playerX: run?.playerPosition.x, playerY: run?.playerPosition.y,
             stability: run?.effectiveStabilityScore,
@@ -90,6 +91,7 @@ private struct DebugBugReportContext {
     var saveSchemaVersion: Int
     var mutationCount: Int
     var lastAction: String
+    var semanticActionTrail: [String]
     var runIndex: Int?
     var mapSeed: UInt64?
     var playerX: Int?
@@ -172,6 +174,13 @@ private struct DebugBugReportSheet: View {
                             Text(tuning).font(.caption.monospaced()).textSelection(.enabled)
                         }
                     }
+                    if !draft.context.semanticActionTrail.isEmpty {
+                        LabeledContent("Recent actions") {
+                            Text(draft.context.semanticActionTrail.joined(separator: " → "))
+                                .font(.caption.monospaced())
+                                .textSelection(.enabled)
+                        }
+                    }
                     LabeledContent("Save schema", value: "\(draft.context.saveSchemaVersion)")
                     if let run = draft.context.runIndex { LabeledContent("Expedition", value: "\(run)") }
                     Text("Build, game mode, save schema, expedition identifiers, world position, Stability and most recent saved action. No account data or save contents.")
@@ -222,6 +231,7 @@ private struct DebugBugReportSheet: View {
         report.campaignReference = draft.context.campaignReference
         report.encounterID = draft.context.encounterID
         report.debugTuningSnapshot = draft.context.debugTuningSnapshot
+        report.semanticActionTrail = draft.context.semanticActionTrail
         report.roadmapCheckpoint = DebugRoadmap.current.installedCheckpoint
         do {
             savedPackage = try DebugBugReportOutbox.live.save(report, screenshot: screenshot?.png)
