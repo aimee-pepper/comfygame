@@ -172,6 +172,48 @@ final class DebugBugReporterTests: XCTestCase {
         XCTAssertEqual(object["screenshot"] as? String, Data([3]).base64EncodedString())
     }
 
+    func testHTTPTransportUsesMultipartIdempotencyAndRequiresTwoXX() async throws {
+        let report = fixtureReport()
+        let recorder = RequestRecorder()
+        let receipt = DebugBugReportReceipt(schemaVersion: 1, remoteReference: "queue-9",
+                                            receivedAt: Date(timeIntervalSince1970: 1))
+        let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
+        let responseData = try encoder.encode(receipt)
+        let endpoint = try XCTUnwrap(URL(string: "https://bugs.example.test/v1/reports"))
+        let transport = DebugBugReportHTTPTransport(
+            endpoint: endpoint, credential: "installation-secret") { request in
+                await recorder.record(request)
+                return (responseData, HTTPURLResponse(
+                    url: endpoint, statusCode: 201, httpVersion: nil, headerFields: nil)!)
+            }
+
+        let returned = try await transport.send(report: report, screenshot: Data([0x89, 0x50]))
+        XCTAssertEqual(returned, receipt)
+        let recorded = await recorder.captured()
+        let request = try XCTUnwrap(recorded)
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Idempotency-Key"),
+                       report.id.uuidString.lowercased())
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"),
+                       "Bearer installation-secret")
+        let body = try XCTUnwrap(request.httpBody)
+        let text = String(decoding: body, as: UTF8.self)
+        XCTAssertTrue(text.contains("name=\"report\""))
+        XCTAssertTrue(text.contains("name=\"screenshot\""))
+        XCTAssertNotNil(body.range(of: Data([0x89, 0x50])))
+    }
+
+    func testHTTPTransportRejectsNonTwoXXWithoutReceipt() async throws {
+        let endpoint = try XCTUnwrap(URL(string: "https://bugs.example.test/v1/reports"))
+        let transport = DebugBugReportHTTPTransport(endpoint: endpoint, credential: "secret") { _ in
+            (Data(), HTTPURLResponse(url: endpoint, statusCode: 503,
+                                     httpVersion: nil, headerFields: nil)!)
+        }
+        do { _ = try await transport.send(report: fixtureReport(), screenshot: nil); XCTFail("Expected rejection") }
+        catch { XCTAssertEqual(error as? DebugBugReportHTTPTransport.TransportError,
+                               .rejected(statusCode: 503)) }
+    }
+
     private func fixtureReport() -> DebugBugReport {
         DebugBugReport(
             id: UUID(), createdAt: Date(), whatHappened: "Unicode 🐞 café", expected: "Worked",
@@ -196,5 +238,11 @@ private struct StubBugTransport: DebugBugReportTransport {
         case .failure(let error): throw error
         }
     }
+}
+
+private actor RequestRecorder {
+    var request: URLRequest?
+    func record(_ request: URLRequest) { self.request = request }
+    func captured() -> URLRequest? { request }
 }
 #endif

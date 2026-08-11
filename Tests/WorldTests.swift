@@ -1401,6 +1401,18 @@ final class WorldTests: XCTestCase {
     }
 
     @MainActor
+    func testAnchorFrameVisibleRequirementsDeriveFromRecipeNeeds() {
+        XCTAssertEqual(AnchorFrameRules.groupedNeeds, [
+            .init(property: .hardness, minimum: 65, count: 2),
+            .init(property: .density, minimum: 65, count: 2),
+            .init(property: .flexibility, minimum: 55, count: 1),
+            .init(property: .reactivity, minimum: 65, count: 1),
+        ])
+        XCTAssertEqual(AnchorFrameRules.groupedNeeds.reduce(0) { $0 + $1.count },
+                       AnchorFrameRules.needs.count)
+    }
+
+    @MainActor
     func testAnchorFrameRecipeUsesSixDistinctWeakestQualifyingSamples() throws {
         func sample(hardness: Double = 0, density: Double = 0,
                     flexibility: Double = 0, reactivity: Double = 0) -> MaterialSample {

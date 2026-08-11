@@ -354,12 +354,31 @@ enum AnchorFrameRules {
         var minimum: Double
     }
 
+    struct GroupedNeed: Identifiable, Equatable, Sendable {
+        var property: MaterialProperty
+        var minimum: Double
+        var count: Int
+        var id: String { "\(property.rawValue):\(minimum)" }
+    }
+
     static let essenceCost = 60
     static let needs: [Need] = [
         Need(property: .hardness, minimum: 65), Need(property: .hardness, minimum: 65),
         Need(property: .density, minimum: 65), Need(property: .density, minimum: 65),
         Need(property: .flexibility, minimum: 55), Need(property: .reactivity, minimum: 65),
     ]
+
+    static var groupedNeeds: [GroupedNeed] {
+        needs.reduce(into: []) { groups, need in
+            if let index = groups.firstIndex(where: {
+                $0.property == need.property && $0.minimum == need.minimum
+            }) {
+                groups[index].count += 1
+            } else {
+                groups.append(GroupedNeed(property: need.property, minimum: need.minimum, count: 1))
+            }
+        }
+    }
 
     static func selectedSamples(in state: GameState) -> [SmithRules.Candidate]? {
         let slots = needs.enumerated().sorted { lhs, rhs in

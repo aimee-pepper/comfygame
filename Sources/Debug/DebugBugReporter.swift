@@ -42,6 +42,68 @@ protocol DebugBugReportTransport: Sendable {
     func send(report: DebugBugReport, screenshot: Data?) async throws -> DebugBugReportReceipt
 }
 
+struct DebugBugReportHTTPTransport: DebugBugReportTransport {
+    enum TransportError: Error, Equatable {
+        case invalidResponse
+        case rejected(statusCode: Int)
+        case invalidReceipt
+    }
+
+    typealias Performer = @Sendable (URLRequest) async throws -> (Data, HTTPURLResponse)
+    let endpoint: URL
+    let credential: String
+    let perform: Performer
+
+    init(endpoint: URL, credential: String,
+         perform: @escaping Performer = { request in
+             let (data, response) = try await URLSession.shared.data(for: request)
+             guard let http = response as? HTTPURLResponse else { throw TransportError.invalidResponse }
+             return (data, http)
+         }) {
+        self.endpoint = endpoint
+        self.credential = credential
+        self.perform = perform
+    }
+
+    func send(report: DebugBugReport, screenshot: Data?) async throws -> DebugBugReportReceipt {
+        let boundary = "bookbinder-\(report.id.uuidString.lowercased())"
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(credential)", forHTTPHeaderField: "Authorization")
+        request.setValue(report.id.uuidString.lowercased(), forHTTPHeaderField: "Idempotency-Key")
+        request.httpBody = try Self.multipart(report: report, screenshot: screenshot, boundary: boundary)
+        let (data, response) = try await perform(request)
+        guard (200..<300).contains(response.statusCode) else {
+            throw TransportError.rejected(statusCode: response.statusCode)
+        }
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        guard let receipt = try? decoder.decode(DebugBugReportReceipt.self, from: data) else {
+            throw TransportError.invalidReceipt
+        }
+        return receipt
+    }
+
+    static func multipart(report: DebugBugReport, screenshot: Data?, boundary: String) throws -> Data {
+        let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
+        let reportData = try encoder.encode(report)
+        var body = Data()
+        func append(_ string: String) { body.append(Data(string.utf8)) }
+        append("--\(boundary)\r\n")
+        append("Content-Disposition: form-data; name=\"report\"; filename=\"report.json\"\r\n")
+        append("Content-Type: application/json; charset=utf-8\r\n\r\n")
+        body.append(reportData); append("\r\n")
+        if let screenshot {
+            append("--\(boundary)\r\n")
+            append("Content-Disposition: form-data; name=\"screenshot\"; filename=\"screenshot.png\"\r\n")
+            append("Content-Type: image/png\r\n\r\n")
+            body.append(screenshot); append("\r\n")
+        }
+        append("--\(boundary)--\r\n")
+        return body
+    }
+}
+
 struct DebugBugReportOutbox: Sendable {
     enum SaveError: Error { case duplicateID }
     let root: URL

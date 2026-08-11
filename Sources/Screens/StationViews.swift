@@ -164,11 +164,13 @@ struct AnchorageView: View {
                 StationCard(title: "Anchor Frame", icon: "square.on.square.intersection.dashed") {
                     Text("A carried binding for a world with no usable Atlas Seam. Six different pieces of world-made stock are consumed.")
                         .font(.caption).foregroundStyle(.secondary)
-                    LabeledRow(icon: "diamond", label: "Hardness 65+", value: "2 distinct")
-                    LabeledRow(icon: "circle.fill", label: "Density 65+", value: "2 distinct")
-                    LabeledRow(icon: "wave.3.right", label: "Flexibility 55+", value: "1")
-                    LabeledRow(icon: "bolt", label: "Reactivity 65+", value: "1")
-                    LabeledRow(icon: "drop.fill", label: "Essence", value: "60")
+                    ForEach(AnchorFrameRules.groupedNeeds) { need in
+                        LabeledRow(icon: need.property.icon,
+                                   label: "\(need.property.stockWord.capitalisedSentence) \(Int(need.minimum))+",
+                                   value: need.count == 1 ? "1" : "\(need.count) distinct")
+                    }
+                    LabeledRow(icon: "drop.fill", label: "Essence",
+                               value: "\(AnchorFrameRules.essenceCost)")
                     let missing = AnchorFrameRules.shortfall(in: store.state)
                     if !missing.isEmpty {
                         Text("Still needed: \(missing.joined(separator: " · "))")
