@@ -7,6 +7,7 @@ import SwiftUI
 /// place — the save decides where you are, not a navigation stack we'd have to restore.
 struct RootView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var debugBaseRoute: AppRoute = .base
 
     var body: some View {
         Group {
@@ -19,6 +20,8 @@ struct RootView: View {
                     BaseView()
                         .navigationDestination(for: AppRoute.self) { route in
                             destination(for: route)
+                                .onAppear { debugBaseRoute = route }
+                                .onDisappear { debugBaseRoute = .base }
                         }
                 }
             }
@@ -37,7 +40,7 @@ struct RootView: View {
             AnchorSettlementView().environmentObject(store)
         }
 #if DEBUG
-        .overlay { DebugBugReporterOverlay(store: store) }
+        .overlay { DebugBugReporterOverlay(store: store, route: debugBaseRoute) }
 #endif
     }
 }

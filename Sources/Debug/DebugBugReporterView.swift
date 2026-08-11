@@ -4,6 +4,7 @@ import UIKit
 
 struct DebugBugReporterOverlay: View {
     @ObservedObject var store: GameStore
+    var route: AppRoute = .base
     @AppStorage("debug.reporter.x") private var savedX = 0.92
     @AppStorage("debug.reporter.y") private var savedY = 0.18
     @State private var isCapturing = false
@@ -54,6 +55,8 @@ struct DebugBugReporterOverlay: View {
         let run = store.state.worlds.activeRun
         return DebugBugReportContext(
             screen: store.activeEncounter != nil ? "encounter" : (run == nil ? "base" : "world"),
+            route: store.activeEncounter != nil ? AppRoute.encounter.rawValue
+                : (run == nil ? route.rawValue : AppRoute.world.rawValue),
             saveSchemaVersion: store.state.schemaVersion,
             mutationCount: store.state.meta.mutationCount,
             lastAction: store.state.meta.lastAction,
@@ -70,6 +73,7 @@ struct DebugBugReporterOverlay: View {
 
 private struct DebugBugReportContext {
     var screen: String
+    var route: String?
     var saveSchemaVersion: Int
     var mutationCount: Int
     var lastAction: String
@@ -143,6 +147,7 @@ private struct DebugBugReportSheet: View {
                 Section("Captured context") {
                     LabeledContent("Roadmap checkpoint", value: DebugRoadmap.current.installedCheckpoint)
                     LabeledContent("Mode", value: draft.context.screen)
+                    if let route = draft.context.route { LabeledContent("Screen", value: route) }
                     LabeledContent("Save schema", value: "\(draft.context.saveSchemaVersion)")
                     if let run = draft.context.runIndex { LabeledContent("Expedition", value: "\(run)") }
                     Text("Build, game mode, save schema, expedition identifiers, world position, Stability and most recent saved action. No account data or save contents.")
@@ -189,6 +194,7 @@ private struct DebugBugReportSheet: View {
             runIndex: draft.context.runIndex, mapSeed: draft.context.mapSeed,
             playerX: draft.context.playerX, playerY: draft.context.playerY,
             stability: draft.context.stability, outcomeID: draft.context.outcomeID)
+        report.route = draft.context.route
         report.roadmapCheckpoint = DebugRoadmap.current.installedCheckpoint
         do {
             savedPackage = try DebugBugReportOutbox.live.save(report, screenshot: screenshot?.png)
