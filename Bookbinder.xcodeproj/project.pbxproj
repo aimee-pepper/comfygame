@@ -18,6 +18,7 @@
 		0463A21CD6D0C85974C64C81 /* RealityState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAAA1B171F7C380229C20CC5 /* RealityState.swift */; };
 		04A394B9CE1582C902CDEFB2 /* CombatTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B213D165D2239B2A934DB263 /* CombatTreeView.swift */; };
 		0573EFC73887107DB190A9DF /* StationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C9C43310A7E6D0342B11251 /* StationViews.swift */; };
+		05DF99DAF5FEA8B2CF112BFB /* WorldGrade2BindAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 259420EF978A3386DCA63D6C /* WorldGrade2BindAdapterTests.swift */; };
 		06C400B11A69ED49007381F4 /* CombatGraphTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0ED58C8EAA439ABE4A10DE /* CombatGraphTests.swift */; };
 		08E2FFDDC62269B7658BCC99 /* DebugRoadmapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A46FDFBE2EBCE6663BE00A40 /* DebugRoadmapTests.swift */; };
 		08F1B44EE071624D86A2CBD6 /* BaseBoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */; };
@@ -88,6 +89,7 @@
 		56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8946B89F914D32DABAC53D5A /* Worldgen.swift */; };
 		583140A5C38A586267218BC1 /* combat_trees.json in Resources */ = {isa = PBXBuildFile; fileRef = FD2CA32A5090B2067ABD22C0 /* combat_trees.json */; };
 		5A3C249D84DE9D8C0576B2EA /* ResourceVisualTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58CFC1BCB5228A5CA88FB517 /* ResourceVisualTests.swift */; };
+		5AF9EB4D43D0B5F0C0C21EE2 /* WorldGrade2MapIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBBCA040726518A6C0907256 /* WorldGrade2MapIntegrationTests.swift */; };
 		5B91181B627494D599038230 /* constellation.json in Resources */ = {isa = PBXBuildFile; fileRef = DD0C594698AE7E6D06191449 /* constellation.json */; };
 		5BA053D5F38A0AE4F9E782C3 /* SiteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1BB569F0B672F268545701C /* SiteTests.swift */; };
 		5BAABA4D069D949BB71CA216 /* WorldRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB361F4E36998C9A7F31A44 /* WorldRules.swift */; };
@@ -124,6 +126,7 @@
 		88FF4649E14551AB79BE82CB /* WorldDescriptionPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0212875D2B95EA338E16F0B2 /* WorldDescriptionPanel.swift */; };
 		890774F4FCDF3A9DAE6BEFDD /* BookbinderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76338986776C016E4422759E /* BookbinderApp.swift */; };
 		893B4E338D412AE9D298E4A4 /* GameActions+Combat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3464FCF84292D7835460EDEE /* GameActions+Combat.swift */; };
+		8AF1BD697B2A2C3A907251CD /* WorldGrade2BindAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7EF8A95B3D944FE1BAE6DA /* WorldGrade2BindAdapter.swift */; };
 		8C88D2C21DA68452155D8172 /* rune_shapes.json in Resources */ = {isa = PBXBuildFile; fileRef = 68BD0EED52655859C21A0136 /* rune_shapes.json */; };
 		8D526864C54EBC0CB6BDC575 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F045A414F1C1CF9A9A916BB /* RootView.swift */; };
 		8E1AFCB6CD0FBDD0EA84B800 /* ArmouryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAAE51E0323DDA3AA3015D22 /* ArmouryRules.swift */; };
@@ -216,6 +219,7 @@
 		F6AE3DF4E00E397B950A1CBC /* ChasmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53634CFCB3CD23CDD115C001 /* ChasmTests.swift */; };
 		F6BFEA449969C175D779E930 /* TutorialState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C90EDFFDB627C51117ADED0E /* TutorialState.swift */; };
 		F6E366378F5921F9B9EFF410 /* SmithTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6C54531684DE111C33038A /* SmithTests.swift */; };
+		F7A590456D85D35640519E0C /* WorldVisualReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249A4AAED67D3F96D5B91988 /* WorldVisualReceipt.swift */; };
 		F9A1322571DBD99F4BF908CB /* ContentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B08032B70636FB2D70EFD6 /* ContentModels.swift */; };
 		F9A397FEF26E5A194578909E /* PageRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2AAB75EDFEC0064219E57D4 /* PageRules.swift */; };
 		FAEB06BFBE5764791F188FF3 /* SaveFileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7F491C849679A2428073CA /* SaveFileIO.swift */; };
@@ -256,6 +260,8 @@
 		2227C9E0E4E333249CF7FEFA /* ContradictionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionModels.swift; sourceTree = "<group>"; };
 		224E1E95022E7547C70C35C2 /* GameActions+Economy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+Economy.swift"; sourceTree = "<group>"; };
 		248394713D4F19F950F25B92 /* HarnessActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HarnessActions.swift; sourceTree = "<group>"; };
+		249A4AAED67D3F96D5B91988 /* WorldVisualReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldVisualReceipt.swift; sourceTree = "<group>"; };
+		259420EF978A3386DCA63D6C /* WorldGrade2BindAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldGrade2BindAdapterTests.swift; sourceTree = "<group>"; };
 		26FE0502F98B3DB6A7BF0C87 /* pressure_targets.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pressure_targets.json; sourceTree = "<group>"; };
 		2735185C6352AE1A8F71DD42 /* DistilleryRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistilleryRules.swift; sourceTree = "<group>"; };
 		283E3D55623002C01AF8AF98 /* qualifiers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = qualifiers.json; sourceTree = "<group>"; };
@@ -419,6 +425,7 @@
 		D5C0097382514786457FDE48 /* AuthoredTextAtlasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthoredTextAtlasView.swift; sourceTree = "<group>"; };
 		D9311ACC91B2E555993A3297 /* WorldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldView.swift; sourceTree = "<group>"; };
 		DB0490C36229CF9D49D6695F /* TutorialRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialRules.swift; sourceTree = "<group>"; };
+		DB7EF8A95B3D944FE1BAE6DA /* WorldGrade2BindAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldGrade2BindAdapter.swift; sourceTree = "<group>"; };
 		DB87254230F32E20320932D7 /* FloraTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloraTests.swift; sourceTree = "<group>"; };
 		DD0C594698AE7E6D06191449 /* constellation.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = constellation.json; sourceTree = "<group>"; };
 		DD1FD369C1CCCC28B0A42FC7 /* ButcheryRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButcheryRules.swift; sourceTree = "<group>"; };
@@ -432,6 +439,7 @@
 		E6801BC62F5B1EF81C4253C6 /* CombatGraphRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatGraphRules.swift; sourceTree = "<group>"; };
 		E87D049B2DF2A90A21B3729E /* ReachableContentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachableContentTests.swift; sourceTree = "<group>"; };
 		EB15ACCA73C26252DA8A2E39 /* ItemGridTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemGridTests.swift; sourceTree = "<group>"; };
+		EBBCA040726518A6C0907256 /* WorldGrade2MapIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldGrade2MapIntegrationTests.swift; sourceTree = "<group>"; };
 		EFEB95F304073E45D3BB22FB /* QualifierModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualifierModels.swift; sourceTree = "<group>"; };
 		F04D876D78710D8DC1CAB2BE /* TutorialCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialCard.swift; sourceTree = "<group>"; };
 		F1A0D044C45D04A1D2195A0F /* LibraryRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryRules.swift; sourceTree = "<group>"; };
@@ -501,6 +509,7 @@
 				DB0490C36229CF9D49D6695F /* TutorialRules.swift */,
 				541026CEC51423252ED5FAFD /* WorldConstraints.swift */,
 				8946B89F914D32DABAC53D5A /* Worldgen.swift */,
+				DB7EF8A95B3D944FE1BAE6DA /* WorldGrade2BindAdapter.swift */,
 				9A5E11DF83FB060B8C22D36A /* WorldInspectionRules.swift */,
 				8DB361F4E36998C9A7F31A44 /* WorldRules.swift */,
 			);
@@ -637,6 +646,7 @@
 				C90EDFFDB627C51117ADED0E /* TutorialState.swift */,
 				7B20DAF90C2684826A3C3F21 /* WorldMap.swift */,
 				4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */,
+				249A4AAED67D3F96D5B91988 /* WorldVisualReceipt.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -766,6 +776,8 @@
 				0DA805AE9804EFB6621B7166 /* TutorialTests.swift */,
 				BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */,
 				0EF2B3DBADEF32F2DE2B00DE /* WeaponsmithTests.swift */,
+				259420EF978A3386DCA63D6C /* WorldGrade2BindAdapterTests.swift */,
+				EBBCA040726518A6C0907256 /* WorldGrade2MapIntegrationTests.swift */,
 				0833EC11FA5260A70D341655 /* WorldGrade2V1ConformanceTests.swift */,
 				2CCC9B79C252DA82D33A758A /* WorldInspectionTests.swift */,
 				9A91FFF6BF680BAFC6742249 /* WorldScaleAndNightTests.swift */,
@@ -1032,12 +1044,14 @@
 				F6BFEA449969C175D779E930 /* TutorialState.swift in Sources */,
 				2651CFD69611A045AB93B2C7 /* WorldConstraints.swift in Sources */,
 				88FF4649E14551AB79BE82CB /* WorldDescriptionPanel.swift in Sources */,
+				8AF1BD697B2A2C3A907251CD /* WorldGrade2BindAdapter.swift in Sources */,
 				C8382F92496ECFAF3B4E12F9 /* WorldGrade2V1.swift in Sources */,
 				9F5DC7673BF8A93B1EF8ED6B /* WorldHistoryView.swift in Sources */,
 				F51758D1870B39749890B1A7 /* WorldInspectionRules.swift in Sources */,
 				D469496DC882C482CB83E721 /* WorldMap.swift in Sources */,
 				5BAABA4D069D949BB71CA216 /* WorldRules.swift in Sources */,
 				635C2692AD380102590270C3 /* WorldView.swift in Sources */,
+				F7A590456D85D35640519E0C /* WorldVisualReceipt.swift in Sources */,
 				56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */,
 				3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */,
 				3E24E2D2D2BEAD60ADE93D0A /* WritingDeskView.swift in Sources */,
@@ -1107,6 +1121,8 @@
 				45B359C084C6F5A35C69529A /* TutorialTests.swift in Sources */,
 				01A65B5074EBFC458F077A59 /* VocabularyTests.swift in Sources */,
 				C70E08A04DE0584580A4800F /* WeaponsmithTests.swift in Sources */,
+				05DF99DAF5FEA8B2CF112BFB /* WorldGrade2BindAdapterTests.swift in Sources */,
+				5AF9EB4D43D0B5F0C0C21EE2 /* WorldGrade2MapIntegrationTests.swift in Sources */,
 				D5541EFE4BA1931DBF238650 /* WorldGrade2V1ConformanceTests.swift in Sources */,
 				CA284D5488986FFA0719A4A6 /* WorldInspectionTests.swift in Sources */,
 				66727C83C77239282A12ADBC /* WorldScaleAndNightTests.swift in Sources */,

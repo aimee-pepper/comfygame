@@ -105,7 +105,15 @@ final class SaveToleranceTests: XCTestCase {
         ]
 
         XCTAssertGreaterThan(checked, 8, "the walk isn't finding the save's collections")
-        let added = Set(failures).subtracting(known)
+        // The visual receipt is one optional, atomic authority. Its absence is the legacy default
+        // (covered by WorldGrade2MapIntegrationTests), but once the key is present every nested
+        // request/descriptor/hash field is deliberately required: accepting a partial receipt
+        // would silently recolour an already-bound world. Treat that envelope like `map`, not like
+        // a bag of independently additive save fields.
+        let atomicReceiptPrefix = "worlds.activeRun.worldVisualReceipt."
+        let added = Set(failures).subtracting(known).filter {
+            !$0.hasPrefix(atomicReceiptPrefix)
+        }
         XCTAssertTrue(added.isEmpty, """
             new load-bearing fields. Whichever struct owns one needs a tolerant decoder \
             (`decodeIfPresent` + default) before the next field lands next to it, or the first save \

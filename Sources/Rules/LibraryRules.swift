@@ -108,7 +108,8 @@ enum LibraryRules {
     /// against you** — the unwritten targets the world decided for itself. That's the half a player
     /// can't see at the time and most wants to read later.
     static func record(book: BoundBook, page: Page, seed: UInt64, runIndex: Int,
-                       travellers: [TravellerID]) -> VisitedWorld {
+                       travellers: [TravellerID],
+                       worldVisualReceipt: WorldVisualReceipt? = nil) -> VisitedWorld {
         let sigils = BookRules.sigils(for: book)
         let written = Set(sigils.map(\.target))
         let readings = BookRules.readings(for: book, seed: seed)
@@ -152,7 +153,8 @@ enum LibraryRules {
                     }
                 }
             },
-            semanticRequests: TutorialRules.semanticRequests(on: page)
+            semanticRequests: TutorialRules.semanticRequests(on: page),
+            worldVisualReceipt: worldVisualReceipt
         )
         record.livingAnalysis = LivingAnalysisRules.analyze(readings)
         let clock = WorldClock(book: book, seed: seed)

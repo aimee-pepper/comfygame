@@ -871,7 +871,8 @@ private struct MapGrid: View {
                                  adjacency: adjacency,
                                  southExposureLevels: southExposure,
                                  grade: grade,
-                                 flora: flora)
+                                 flora: flora,
+                                 worldGrade2Descriptor: run.worldVisualReceipt?.descriptor)
     }
 
 

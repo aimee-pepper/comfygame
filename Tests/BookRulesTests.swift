@@ -320,6 +320,43 @@ final class BookRulesTests: XCTestCase {
     }
 
     @MainActor
+    func testBindingPersistsOneVisualReceiptInRunAndHistory() throws {
+        let store = GameStore(io: .temporary(name: "visual-bind-\(UUID().uuidString)"))
+        store.write("caverns")
+        store.write("frostbound")
+
+        XCTAssertTrue(store.bindAndDepart())
+
+        let run = try XCTUnwrap(store.state.worlds.activeRun)
+        let history = try XCTUnwrap(store.state.reality.library.visitedWorlds.last)
+        let receipt = try XCTUnwrap(run.worldVisualReceipt)
+        XCTAssertEqual(history.worldVisualReceipt, receipt,
+                       "History and the active world must retain the same immutable visual fact")
+        let restored = try JSONDecoder().decode(
+            GameState.self, from: JSONEncoder().encode(store.state))
+        XCTAssertEqual(restored.worlds.activeRun?.worldVisualReceipt, receipt)
+        XCTAssertEqual(restored.reality.library.visitedWorlds.last?.worldVisualReceipt, receipt)
+    }
+
+    @MainActor
+    func testVisualReceiptFailureLeavesTheEntireCampaignUnchanged() throws {
+        let store = GameStore(io: .temporary(name: "visual-bind-fail-\(UUID().uuidString)"))
+        store.write("caverns")
+        store.write("frostbound")
+        let before = store.state
+
+        let didBind = store.bindAndDepart { _, _, _ in
+            throw WorldGrade2BindAdapter.Error.missingOpenColorAuthority(.material)
+        }
+
+        XCTAssertFalse(didBind)
+        XCTAssertEqual(store.state, before,
+                       "A failed visual receipt must spend no Essence, seed, page, or history fact")
+        XCTAssertNil(store.state.worlds.activeRun)
+        XCTAssertNotNil(store.bindError)
+    }
+
+    @MainActor
     func testBornAnchoredBindingPaysThePreviewedPremiumAndKeepsTheRealm() throws {
         let store = GameStore(io: .temporary(name: "anchor-bind-\(UUID().uuidString)"))
         store.mutate("prepare anchorage") { state in

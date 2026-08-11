@@ -1,14 +1,20 @@
 # World-grade-2 native handoff gate
 
-Status: **Engineering boundary review complete; waiting for an immutable Asset production pack.**
+Status: **Corrected Asset pack Design-accepted and native conformance checkpoint green; game-owned
+bind adapter frozen in `world-grade-2-bind-adapter-current.md` for implementation.**
 
-The keyed `world-grade-2` v0.2 proof is accepted calibration evidence. It is not yet a native
-contract: its machine-readable report says `integrationReady: false`, its version remains
-`world-grade-2-candidate-0.2.0`, and no closed schema or conformance manifest exists. Engineering
-must not turn that exploratory implementation into persisted save authority by copying its current
-JavaScript constants into Swift.
+The exploratory keyed `world-grade-2` v0.2 proof has been superseded for integration by the immutable
+`AssetLab/integration/world-grade-2-v1/` pack. Design accepted the corrected pack after it added
+per-species frozen Flora colors and explicit ownership for all twelve ground families. Its canonical
+manifest SHA-256 is `e601d2f77a15d545fd2d893dbb2e41891518cba2900c3f6d66890d56294824c1`.
 
-## Required Asset handoff
+Engineering pinned and ported the request → descriptor → recolor contract at `57d8850`. The focused
+9-test conformance suite and the 1,031-test product suite pass. This does **not** authorize inventing
+the remaining game-fact → request adapter. Those derivations are now frozen in
+`world-grade-2-bind-adapter-current.md`; Engineering must persist its immutable receipt at successful
+bind rather than re-derive it during rendering.
+
+## Frozen Asset handoff
 
 Publish one immutable `AssetLab/integration/world-grade-2-v1/` pack containing:
 
@@ -27,7 +33,7 @@ Publish one immutable `AssetLab/integration/world-grade-2-v1/` pack containing:
 The production pack consumes **resolved** game-owned visual facts. Named proof swatches are gamut
 labels, not the player-facing CMY+Depth authorship model and not persisted `Sigil.color` values.
 
-## Native ownership after the pack freezes
+## Native ownership after the pack freeze
 
 Asset owns the immutable pack and generated command registries. Engineering owns:
 
@@ -49,11 +55,14 @@ neighbors remain related; opposed inputs separate proportionally within comparab
 thresholds may produce justified steps or plateaus. Runtime never novelty-optimizes and neutral/Ash
 worlds receive no arbitrary differentiation.
 
-## Integration order
+## Integration order and current disposition
 
-1. Asset freezes and hashes the production pack in its isolated worktree.
-2. Engineering pins that exact manifest in a separate native worktree.
-3. Swift matches every descriptor, command, RGBA and geometry vector.
-4. Product tests prove v1 compatibility, v2 persistence, anchored revisit, deterministic redraw,
+1. **Complete:** Asset froze and hashed the corrected production pack.
+2. **Complete:** Engineering pinned the exact manifest and ported the pure contract.
+3. **Complete for published representative vectors:** Swift matches descriptor, recolor, fog and
+   geometry evidence; broader product integration remains below.
+4. **Active:** freeze and implement the game-owned bind adapter without interpreting raw
+   Illumination/Vitality or inventing temperature/wetness color.
+5. Product tests prove v1 compatibility, v2 persistence, anchored revisit, deterministic redraw,
    cache invalidation and fog/disclosure invariance.
-5. Aimee compares lossless phone color and literal-grayscale captures before promotion.
+6. Aimee compares lossless phone color and literal-grayscale captures before promotion.

@@ -214,19 +214,53 @@ extension GameStore {
     /// world, and it's the last thing that should ever be lost to a kill.
     @discardableResult
     func bindAndDepart(bornAnchored: Bool = false) -> Bool {
+        bindAndDepart(bornAnchored: bornAnchored,
+                      openColorResolver: { scope, sigil, seed in
+            try WorldGrade2BindAdapter.openColor(scope: scope,
+                                                 selectedSigilID: sigil.id,
+                                                 mapSeed: seed)
+        })
+    }
+
+    /// Injectable only so the atomic-failure contract can be proved without corrupting a real
+    /// adapter or save. Production always uses the frozen resolver above.
+    @discardableResult
+    func bindAndDepart(
+        bornAnchored: Bool = false,
+        openColorResolver: WorldGrade2BindAdapter.OpenColorResolver
+    ) -> Bool {
+        bindError = nil
         guard canBindAndDepart(bornAnchored: bornAnchored) else { return false }
         let anchorPremium = bornAnchored ? bornAnchoredPremium : 0
 
-        mutate("bind book & depart", flush: true) { state in
-            let seed = state.worlds.seeds.nextSeed()
-            let book = BookRules.resolveBook(page: state.base.page)
+        // Build the complete world and its immutable visual authority before the commitment
+        // mutation. A bad future adapter/schema can therefore spend no Essence, consume no seed,
+        // change no page/history fact and create no half-world.
+        let seed = state.worlds.seeds.peekNextSeed()
+        let book = BookRules.resolveBook(page: state.base.page)
+        let tuning = DebugTuningProfile.active
+        let world = Worldgen.generate(book: book, seed: seed, library: state.reality.library,
+                                      tuning: tuning,
+                                      isFreshFirstExpedition: state.worlds.runIndex == 0)
+        let visualReceipt: WorldVisualReceipt
+        do {
+            visualReceipt = try WorldGrade2BindAdapter.makeReceipt(
+                book: book, mapSeed: seed, map: world.map, flora: world.flora,
+                openColorResolver: openColorResolver)
+        } catch {
+#if DEBUG
+            bindError = "This world could not be prepared. Your page and Essence were not changed. Visual receipt: \(error)"
+#else
+            bindError = "This world could not be prepared. Your page and Essence were not changed."
+#endif
+            return false
+        }
 
-            // Generated here, once, and saved with the run. Worldgen draws from streams derived
-            // from the seed, never from the run's live RNG, so in-run rolls resume cleanly.
-            let tuning = DebugTuningProfile.active
-            let world = Worldgen.generate(book: book, seed: seed, library: state.reality.library,
-                                          tuning: tuning,
-                                          isFreshFirstExpedition: state.worlds.runIndex == 0)
+        mutate("bind book & depart", flush: true) { state in
+            // The actor is synchronous from preview through commit, so the peeked seed is exactly
+            // the one consumed here. World generation and visual resolution use isolated streams.
+            precondition(state.worlds.seeds.nextSeed() == seed,
+                         "Bind seed changed inside one synchronous commitment")
             // Entering unseals this world: from here on its rolled values may be described.
             state.reality.visitedWorldSeeds.insert(seed)
             // **Whose signature this world matches — not who you have met.**
@@ -246,7 +280,8 @@ extension GameStore {
             // 6 Aug). Nothing here is explained now — that would break "explanation is earned".
             let historyRecord = LibraryRules.record(book: book, page: state.base.page, seed: seed,
                                                     runIndex: state.worlds.runIndex + 1,
-                                                    travellers: world.travellers)
+                                                    travellers: world.travellers,
+                                                    worldVisualReceipt: visualReceipt)
             state.reality.library.record(world: historyRecord)
             TutorialRules.reconcileComparisonPair(in: &state)
             TutorialRules.pairNewWorld(historyRecord, in: &state)
@@ -325,7 +360,8 @@ extension GameStore {
                 foundWritingsAtStart: Set(state.reality.library.foundWritings.map(\.id)),
                 foundTravellersAtStart: state.reality.library.foundTravellers,
                 generationDiagnostics: world.diagnostics,
-                tuning: tuning
+                tuning: tuning,
+                worldVisualReceipt: visualReceipt
             )
             state.worlds.activeRun = departingRun
             state.tutorial.complete(.writingPageRequest, fact: "first_bind")

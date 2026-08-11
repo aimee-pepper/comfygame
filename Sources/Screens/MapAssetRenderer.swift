@@ -42,6 +42,8 @@ struct WorldGrade: Equatable, Sendable {
     var blue: Int
     var value: Int
 
+    static let neutral = WorldGrade(red: 0, green: 0, blue: 0, value: 0)
+
     static func from(_ readings: PressureReadings) -> WorldGrade {
         func center(_ x: Double) -> Double { min(1, max(-1, (x - 50) / 50)) }
         func midpoint(_ id: PressureTargetID) -> Double {
@@ -73,24 +75,29 @@ struct MapTileArtRequest {
     let southExposureLevels: Int
     let grade: WorldGrade
     let flora: Flora?
+    let worldGrade2Descriptor: WorldGrade2V1.Descriptor?
     let explicitSeed: UInt32?
     let explicitFeatureVariant: Int?
 
     init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0, adjacency: Int,
          southExposureLevels: Int = 0, grade: WorldGrade,
-         flora: Flora?, explicitSeed: UInt32? = nil) {
+         flora: Flora?, worldGrade2Descriptor: WorldGrade2V1.Descriptor? = nil,
+         explicitSeed: UInt32? = nil) {
         self.tile = tile; self.point = point; self.mapSeed = mapSeed; self.runIndex = runIndex; self.adjacency = adjacency
         self.southExposureLevels = southExposureLevels
-        self.grade = grade; self.flora = flora; self.explicitSeed = explicitSeed
+        self.grade = grade; self.flora = flora
+        self.worldGrade2Descriptor = worldGrade2Descriptor; self.explicitSeed = explicitSeed
         self.explicitFeatureVariant = nil
     }
 
     init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0, adjacency: Int,
          southExposureLevels: Int = 0, grade: WorldGrade,
-         flora: Flora?, explicitSeed: UInt32, explicitFeatureVariant: Int) {
+         flora: Flora?, worldGrade2Descriptor: WorldGrade2V1.Descriptor? = nil,
+         explicitSeed: UInt32, explicitFeatureVariant: Int) {
         self.tile=tile; self.point=point; self.mapSeed=mapSeed; self.runIndex=runIndex; self.adjacency=adjacency
         self.southExposureLevels=southExposureLevels
-        self.grade=grade; self.flora=flora; self.explicitSeed=explicitSeed
+        self.grade=grade; self.flora=flora; self.worldGrade2Descriptor=worldGrade2Descriptor
+        self.explicitSeed=explicitSeed
         self.explicitFeatureVariant=explicitFeatureVariant
     }
 
@@ -124,6 +131,54 @@ struct MapTileArtRequest {
 
     static func floraCacheKey(_ flora: Flora) -> String {
         MapPixelRaster.stableFloraKey(FloraRenderDescriptor(flora))
+    }
+
+    static func descriptorCacheIdentity(_ descriptor: WorldGrade2V1.Descriptor) throws -> String {
+        try WorldGrade2V1.validatedCacheIdentity(descriptor)
+    }
+
+    static func gradedTerrainPixels(ground: GroundType, descriptor: WorldGrade2V1.Descriptor,
+                                    adjacency: Int = 15, featureVariant: Int = 0,
+                                    revealed: Bool = true) throws -> [UInt8] {
+        let tile = Tile(ground: ground, isRevealed: revealed)
+        let request = MapTileArtRequest(tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
+                                        adjacency: adjacency, grade: .neutral, flora: nil,
+                                        worldGrade2Descriptor: descriptor, explicitSeed: 404,
+                                        explicitFeatureVariant: featureVariant)
+        return MapPixelRaster.rawPixels(commands: try MapPixelRaster.terrainCommands(for: request),
+                                        width: MapAssetContract.spriteWidth,
+                                        height: MapAssetContract.spriteHeight)
+    }
+
+    static func gradedFloraPixels(_ flora: Flora,
+                                  descriptor: WorldGrade2V1.Descriptor) throws -> [UInt8] {
+        try MapPixelRaster.rawPixels(commands: MapPixelRaster.floraCommands(
+            FloraRenderDescriptor(flora), descriptor: descriptor))
+    }
+
+    /// Returns the composed tile and the resource-only overlay in the same lifted coordinates.
+    /// Tests use the overlay's nontransparent pixels to prove world grading never recolors a
+    /// resource identity while still exercising the real terrain-first composition order.
+    static func gradedResourceComposition(_ id: ResourceID,
+                                          descriptor: WorldGrade2V1.Descriptor) throws
+        -> (composed: [UInt8], resourceOverlay: [UInt8]) {
+        var tile = Tile(ground: .stone, isRevealed: true)
+        tile.content = .wildDrop(resource: id, amount: 1)
+        let request = MapTileArtRequest(tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
+                                        adjacency: 15, grade: .neutral, flora: nil,
+                                        worldGrade2Descriptor: descriptor, explicitSeed: 404,
+                                        explicitFeatureVariant: 0)
+        let resource = ResourcePixelGrammar.bodyCommands(for: id).map {
+            PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
+                         width: $0.width, height: $0.height, color: $0.color)
+        }
+        let terrain = try MapPixelRaster.terrainCommands(for: request)
+        return (MapPixelRaster.rawPixels(commands: terrain + resource,
+                                         width: MapAssetContract.spriteWidth,
+                                         height: MapAssetContract.spriteHeight),
+                MapPixelRaster.rawPixels(commands: resource,
+                                         width: MapAssetContract.spriteWidth,
+                                         height: MapAssetContract.spriteHeight))
     }
 
     static func resourcePixels(_ id: ResourceID, frame: Int? = nil) -> [UInt8] {
@@ -207,7 +262,8 @@ struct PixelCommand: Equatable {
 private enum TerrainPixelGrammar {
     static func commands(for request: MapTileArtRequest) -> [PixelCommand] {
         let tile = request.tile
-        let palette = palette(for: tile.ground).map { $0.graded(request.grade) }
+        let grade = request.worldGrade2Descriptor == nil ? request.grade : .neutral
+        let palette = palette(for: tile.ground).map { $0.graded(grade) }
         if !tile.isRevealed {
             return [rect(0, MapAssetContract.maximumElevation, 16, 16, 0x17171a)]
         }
@@ -225,7 +281,7 @@ private enum TerrainPixelGrammar {
         texture(tile.ground, palette, into: &result)
         feature(tile.ground, request.featureVariant, palette, into: &result)
         if [.water, .deepWater, .ice, .chasm].contains(tile.ground) {
-            let edge = edgeColour(tile.ground).graded(request.grade)
+            let edge = edgeColour(tile.ground).graded(grade)
             if request.adjacency & 1 == 0 { result.append(rect(0, 0, 16, 2, edge)) }
             if request.adjacency & 2 == 0 { result.append(rect(14, 0, 2, 16, edge)) }
             if request.adjacency & 4 == 0 { result.append(rect(0, 14, 16, 2, edge)) }
@@ -527,6 +583,20 @@ struct RGBA: Equatable {
     init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8) {
         self.red = red; self.green = green; self.blue = blue; self.alpha = alpha
     }
+
+    fileprivate init(hex: String) throws {
+        guard hex.range(of: "^#[0-9a-fA-F]{6}$", options: .regularExpression) != nil else {
+            throw WorldGrade2V1.ContractError.invalidHexColor
+        }
+        red = UInt8(hex.dropFirst(1).prefix(2), radix: 16)!
+        green = UInt8(hex.dropFirst(3).prefix(2), radix: 16)!
+        blue = UInt8(hex.dropFirst(5).prefix(2), radix: 16)!
+        alpha = 255
+    }
+
+    fileprivate var hex: String {
+        String(format: "#%02x%02x%02x", red, green, blue)
+    }
 }
 
 @MainActor private enum MapPixelRaster {
@@ -546,16 +616,24 @@ struct RGBA: Equatable {
     static func image(for request: MapTileArtRequest, tick: Int = 0, reduceMotion: Bool = false) -> UIImage? {
         let descriptor = request.flora.map(FloraRenderDescriptor.init)
         let floraKey = descriptor.map(stableFloraKey) ?? "none"
+        let grade2Key = request.worldGrade2Descriptor.flatMap {
+            try? WorldGrade2V1.validatedCacheIdentity($0)
+        } ?? "legacy-v1"
+        let gradeKey = request.worldGrade2Descriptor == nil
+            ? "\(request.grade.red),\(request.grade.green),\(request.grade.blue),\(request.grade.value)"
+            : "v2"
         let phase = request.resourceID.map { _ in
             ResourcePixelGrammar.phase(mapSeed: request.mapSeed, runIndex: request.runIndex, point: request.point)
         }
         let sheenFrame = reduceMotion ? phase.map { _ in 0 } : phase.flatMap { ResourcePixelGrammar.frame(phase: $0, tick: tick) }
         let resourceKey = request.resourceID.map { "\($0.rawValue)-\(sheenFrame.map(String.init) ?? "rest")" } ?? "none"
-        let key = "\(MapAssetContract.rendererTuple)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.southExposureLevels)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(request.grade.red),\(request.grade.green),\(request.grade.blue),\(request.grade.value)-\(floraKey)-\(resourceKey)" as NSString
+        let key = "\(MapAssetContract.rendererTuple)-\(grade2Key)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.southExposureLevels)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(gradeKey)-\(floraKey)-\(resourceKey)" as NSString
         if let cached = cache.object(forKey: key) { return cached }
-        var commands = TerrainPixelGrammar.commands(for: request)
+        guard var commands = try? terrainCommands(for: request) else { return nil }
         if request.tile.isRevealed, !request.tile.isCrumbled, let descriptor {
-            commands += FloraPixelGrammar.commands(for: descriptor).map {
+            guard let floraCommands = try? floraCommands(
+                descriptor, descriptor: request.worldGrade2Descriptor) else { return nil }
+            commands += floraCommands.map {
                 PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
                              width: $0.width, height: $0.height, color: $0.color)
             }
@@ -576,6 +654,49 @@ struct RGBA: Equatable {
                                  height: MapAssetContract.spriteHeight) else { return nil }
         cache.setObject(image, forKey: key)
         return image
+    }
+
+    fileprivate static func terrainCommands(for request: MapTileArtRequest) throws -> [PixelCommand] {
+        let commands = TerrainPixelGrammar.commands(for: request)
+        guard request.tile.isRevealed, let descriptor = request.worldGrade2Descriptor else {
+            return commands
+        }
+        try WorldGrade2V1.validateDescriptor(descriptor)
+        return try recolor(commands, descriptor: descriptor, scope: .material,
+                           groundType: request.tile.ground.rawValue)
+    }
+
+    fileprivate static func floraCommands(_ flora: FloraRenderDescriptor,
+                                           descriptor: WorldGrade2V1.Descriptor?) throws -> [PixelCommand] {
+        let commands = FloraPixelGrammar.commands(for: flora)
+        guard let descriptor else { return commands }
+        try WorldGrade2V1.validateDescriptor(descriptor)
+        guard descriptor.flora.cast.contains(where: { $0.speciesID == flora.logicalID }) else {
+            throw WorldGrade2V1.ContractError.unknownFloraSpeciesColor
+        }
+        return try recolor(commands, descriptor: descriptor, scope: .flora,
+                           speciesID: flora.logicalID)
+    }
+
+    private static func recolor(_ commands: [PixelCommand],
+                                descriptor: WorldGrade2V1.Descriptor,
+                                scope: WorldGrade2V1.ColorScope,
+                                groundType: String? = nil,
+                                speciesID: String? = nil) throws -> [PixelCommand] {
+        let portable = commands.map {
+            WorldGrade2V1.RectangleCommand(op: "rect", x: $0.x, y: $0.y,
+                                           w: $0.width, h: $0.height,
+                                           color: $0.color.hex)
+        }
+        let graded = try WorldGrade2V1.recolor(portable, descriptor: descriptor, scope: scope,
+                                               groundType: groundType, speciesID: speciesID)
+        return try zip(graded, commands).map { pair in
+            let (graded, original) = pair
+            var color = try RGBA(hex: graded.color)
+            color.alpha = original.color.alpha
+            return PixelCommand(x: graded.x, y: graded.y, width: graded.w, height: graded.h,
+                                color: color)
+        }
     }
 
     fileprivate static func stableFloraKey(_ flora: FloraRenderDescriptor) -> String {

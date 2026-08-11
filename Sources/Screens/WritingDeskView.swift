@@ -392,6 +392,14 @@ struct WritingDeskView: View {
             .buttonStyle(.borderedProminent)
             .disabled(!store.canBindAndDepart(bornAnchored: bornAnchored))
 
+            if let error = store.bindError {
+                Text(error)
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .multilineTextAlignment(.center)
+                    .accessibilityIdentifier("writing.bind-error")
+            }
+
             Text(bindFootnote)
                 .font(.caption)
                 .foregroundStyle(store.canBindAndDepart(bornAnchored: bornAnchored) ? Color.secondary : Color.orange)

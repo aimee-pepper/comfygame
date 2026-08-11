@@ -251,6 +251,7 @@ enum WorldGrade2V1 {
         case unknownFloraSpeciesColor
         case invalidHexColor
         case invalidFogRequest
+        case invalidDescriptor
     }
 
     private struct PaletteTransform { var hue: Double; var saturation: Double; var value: Double }
@@ -344,6 +345,32 @@ enum WorldGrade2V1 {
         return try resolve(JSONDecoder().decode(Request.self, from: data))
     }
 
+    /// Validates a persisted renderer receipt without deriving or repairing any of its facts.
+    /// Legacy worlds omit the receipt; a present receipt is either exactly current and self-
+    /// authenticating, or is rejected before rendering.
+    static func validateDescriptor(_ descriptor: Descriptor) throws {
+        let request = Request(
+            versions: descriptor.versions,
+            material: descriptor.material,
+            atmosphere: descriptor.atmosphere,
+            flora: FloraRequest(coveragePercent: descriptor.flora.coveragePercent,
+                                paletteRichness: descriptor.flora.paletteRichness,
+                                cast: descriptor.flora.cast),
+            resolvedColors: RequestColors(material: descriptor.resolvedColors.material,
+                                          atmosphere: descriptor.resolvedColors.atmosphere,
+                                          emitter: descriptor.resolvedColors.emitter,
+                                          floraTendency: nil))
+        let canonical = try resolve(request)
+        guard canonical == descriptor else { throw ContractError.invalidDescriptor }
+    }
+
+    static func validatedCacheIdentity(_ descriptor: Descriptor) throws -> String {
+        try validateDescriptor(descriptor)
+        let v = descriptor.versions
+        return "\(v.contractVersion)|\(v.resolverVersion)|\(v.paletteCatalogueVersion)|"
+            + "\(v.rendererVersion)|\(v.lightLayerVersion)|\(descriptor.canonicalDescriptorSHA256)"
+    }
+
     static func canonicalSHA256<T: Encodable>(_ value: T) throws -> String {
         let object = try JSONSerialization.jsonObject(with: JSONEncoder().encode(value))
         return sha256(Data(try canonicalJSON(object).utf8))
@@ -423,6 +450,20 @@ enum WorldGrade2V1 {
     static func fogRGBA(revealed: Bool, width: Int, height: Int) throws -> [UInt8]? {
         guard width >= 1, height >= 1 else { throw ContractError.invalidFogRequest }
         return revealed ? nil : Array(repeating: 0, count: width * height * 4)
+    }
+
+    /// The one pinned HSL → sRGB conversion used by both the accepted renderer and the game-owned
+    /// bind adapter. Keeping it here prevents open colors and persisted Flora colors from acquiring
+    /// a subtly different rounding path from runtime recoloring.
+    static func resolvedSRGB(hue: Double, saturationPercent: Double,
+                             lightnessPercent: Double) throws -> [Int] {
+        guard hue.isFinite, saturationPercent.isFinite, lightnessPercent.isFinite,
+              (0...100).contains(saturationPercent), (0...100).contains(lightnessPercent)
+        else { throw ContractError.invalidColor("hsl") }
+        let rgb = hslToRGB(HSL(h: positiveModulo(hue, 360),
+                               s: saturationPercent / 100,
+                               l: lightnessPercent / 100))
+        return rgb.map { Int($0.rounded()) }
     }
 
     private static func descriptorColor(_ scope: ColorScope,

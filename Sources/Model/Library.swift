@@ -151,6 +151,9 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
     /// Resolved after arrival, retained independently of the simulation object so History can
     /// explain the world's clock as the player's Cycle instrument becomes readable.
     var clockAnalysis: ClockAnalysis?
+    /// Frozen visual authority captured with the world. Legacy History records omit it and remain
+    /// on world-grade 1; History never re-resolves current catalogue facts into a newer receipt.
+    var worldVisualReceipt: WorldVisualReceipt?
     /// Who was standing in it, whether or not you reached them.
     var travellersPresent: [TravellerID]
     /// **Kept on purpose.** The list is curated rather than infinite (Aimee, 6 Aug) — a kept world
@@ -186,7 +189,8 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
          written: [String], inertModifiers: [String], readings: [String: ReadingSnapshot],
          travellersPresent: [TravellerID], isKept: Bool = false,
          focusAttributions: [String] = [], focusEffects: [RecordedFocusEffect] = [],
-         semanticRequests: [String]? = nil) {
+         semanticRequests: [String]? = nil,
+         worldVisualReceipt: WorldVisualReceipt? = nil) {
         self.id = id
         self.seed = seed
         self.runIndex = runIndex
@@ -201,12 +205,14 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         self.focusEffects = focusEffects
         self.livingAnalysis = nil
         self.clockAnalysis = nil
+        self.worldVisualReceipt = worldVisualReceipt
     }
 
     /// Includes the retired `inertRungs`, so a history written before the rename still reads.
     private enum CodingKeys: String, CodingKey {
         case id, seed, runIndex, descriptionSentence, written, semanticRequests, inertModifiers, readings
         case travellersPresent, isKept, focusAttributions, focusEffects, livingAnalysis, clockAnalysis
+        case worldVisualReceipt
         case inertRungs
     }
 
@@ -224,6 +230,7 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         try c.encode(focusEffects, forKey: .focusEffects)
         try c.encodeIfPresent(livingAnalysis, forKey: .livingAnalysis)
         try c.encodeIfPresent(clockAnalysis, forKey: .clockAnalysis)
+        try c.encodeIfPresent(worldVisualReceipt, forKey: .worldVisualReceipt)
         try c.encode(travellersPresent, forKey: .travellersPresent)
         try c.encode(isKept, forKey: .isKept)
     }
@@ -244,6 +251,8 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         focusEffects = try c.decodeIfPresent([RecordedFocusEffect].self, forKey: .focusEffects) ?? []
         livingAnalysis = try c.decodeIfPresent(LivingAnalysis.self, forKey: .livingAnalysis)
         clockAnalysis = try c.decodeIfPresent(ClockAnalysis.self, forKey: .clockAnalysis)
+        worldVisualReceipt = try c.decodeIfPresent(WorldVisualReceipt.self,
+                                                    forKey: .worldVisualReceipt)
         travellersPresent = try c.decodeIfPresent([TravellerID].self, forKey: .travellersPresent) ?? []
         isKept = try c.decodeIfPresent(Bool.self, forKey: .isKept) ?? false
     }

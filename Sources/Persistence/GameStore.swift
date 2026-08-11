@@ -66,6 +66,9 @@ final class GameStore: ObservableObject {
     /// Deliberately *not* in the save: a resumed run should show you where you are, not replay how
     /// you got there. Losing this to a force-quit costs nothing.
     @Published var recentEvents: [WorldRules.Event] = []
+    /// Recoverable player-facing failure from the bind preview/receipt commitment boundary.
+    /// It is deliberately outside the save: a failed bind changes no campaign fact.
+    @Published var bindError: String?
 
     private let io: any GamePersistenceIO
     private let writeQueue = DispatchQueue(label: "com.aimeepepper.bookbinder.save", qos: .userInitiated)

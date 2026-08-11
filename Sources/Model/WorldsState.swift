@@ -465,6 +465,9 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Development-only creation profile snapshotted into the run. Defaults in release and for
     /// old saves; keeping it here is what makes changing Settings unable to rewrite a live world.
     var tuning: DebugTuningProfile
+    /// Optional frozen visual receipt for the accepted world-grade-2 renderer. Worlds bound
+    /// before that contract omit it and retain the v1 appearance; it is never inferred on load.
+    var worldVisualReceipt: WorldVisualReceipt?
     var generationDiagnostics: WorldGenerationDiagnostics
     /// The resolved Cycle pressure made operational. Stored with the run so phase scheduling is
     /// deterministic across saves and anchored revisits, while old runs can preserve their phase
@@ -634,12 +637,14 @@ struct WorldRun: Codable, Equatable, Sendable {
          foundTravellersAtStart: Set<TravellerID> = [],
          resolvedStabilityScore: Int? = nil,
          generationDiagnostics: WorldGenerationDiagnostics = WorldGenerationDiagnostics(),
-         tuning: DebugTuningProfile = .defaults) {
+         tuning: DebugTuningProfile = .defaults,
+         worldVisualReceipt: WorldVisualReceipt? = nil) {
         self.runIndex = runIndex
         self.book = book
         self.mapSeed = mapSeed
         self.rng = rng
         self.tuning = tuning
+        self.worldVisualReceipt = worldVisualReceipt
         self.generationDiagnostics = generationDiagnostics
         self.clock = WorldClock(book: book, seed: mapSeed)
         self.map = map
@@ -715,6 +720,9 @@ struct WorldRun: Codable, Equatable, Sendable {
         // newly promoted preference default applies only at the next bind, never during decode.
         tuning = try container.decodeIfPresent(DebugTuningProfile.self, forKey: .tuning)
             ?? .legacyFrozenRunDefaults
+        worldVisualReceipt = try container.decodeIfPresent(WorldVisualReceipt.self,
+                                                            forKey: .worldVisualReceipt)
+        try worldVisualReceipt?.validate()
         generationDiagnostics = try container.decodeIfPresent(WorldGenerationDiagnostics.self,
                                                                 forKey: .generationDiagnostics)
             ?? WorldGenerationDiagnostics()
