@@ -355,22 +355,38 @@ private struct SwapSheet: View {
 /// Storehouse — inventory and identification. Identify flow is milestone 5.
 struct StorehouseView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var opened: ItemStack?
+    @State private var tab: StorehouseTab = .items
 
     private var base: BaseState { store.state.base }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                StationCard(title: "Stockpiles", icon: "shippingbox") {
+                Picker("Storehouse section", selection: $tab) {
+                    ForEach(StorehouseTab.allCases) { section in
+                        Text(section == .waiting && !store.spillover.isEmpty
+                             ? "Waiting \(store.spillover.count)"
+                             : section.title)
+                            .tag(section)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(minHeight: 44)
+
+                switch tab {
+                case .stockpiles:
                     if base.resources.isEmpty {
                         EmptyNote("Nothing hauled home yet.")
                     } else {
-                        ForEach(base.resources.nonZero, id: \.id) { entry in
-                            let resource = ContentCatalog.shared.resource(entry.id)
-                            LabeledRow(icon: resource?.icon ?? "cube",
-                                       label: resource?.name ?? entry.id.rawValue,
-                                       value: "\(entry.amount)")
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(base.resources.nonZero, id: \.id) { entry in
+                                let resource = ContentCatalog.shared.resource(entry.id)
+                                stockTile(icon: resource?.icon ?? "cube",
+                                          name: resource?.name ?? entry.id.rawValue,
+                                          amount: entry.amount)
+                            }
                         }
                         if base.resources[Resources.essenceRaw] > 0 {
                             // Raw essence looks like currency and isn't. Say so here rather than
@@ -379,48 +395,40 @@ struct StorehouseView: View {
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }
-                }
-
-                StationCard(title: "Inventory — \(base.inventory.stacks.count) of \(base.inventory.slots)", icon: "archivebox") {
+                case .items:
+                    HStack {
+                        Label("Items", systemImage: "archivebox").font(.headline)
+                        Spacer()
+                        Text("\(base.inventory.stacks.count) of \(base.inventory.slots)")
+                            .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    }
                     if base.inventory.stacks.isEmpty {
                         EmptyNote("Eight slots, all empty. Items come from worlds.")
                     } else {
-                        ForEach(base.inventory.stacks) { stack in
-                            // Rarity reads as the colour of the name (design brief's colour-coded
-                            // ladder), so a Mythic is obvious at a glance in a long list.
-                            //
-                            // **A material bin opens.** All the hides share one slot, and what's
-                            // actually in it — the grades, the animals they came off — is the thing
-                            // worth having; a row saying "12 hides" would have hidden it.
-                            if stack.materials.count > 1 {
-                                Button { opened = stack } label: {
-                                    HStack(spacing: 0) {
-                                        LabeledRow(icon: stack.icon, label: stack.displayName,
-                                                   value: stack.detail, tint: stack.rarity.tint)
-                                        Image(systemName: "chevron.right")
-                                            .font(.caption2.weight(.semibold))
-                                            .foregroundStyle(.tertiary)
-                                    }
-                                    .frame(minHeight: 44)
-                                    .contentShape(Rectangle())
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(base.inventory.stacks) { stack in
+                                // Rarity reads as the colour of the name (design brief's colour-coded
+                                // ladder), so a Mythic is obvious at a glance in a long list.
+                                //
+                                // **A material bin opens.** All the hides share one slot, and what's
+                                // actually in it — the grades, the animals they came off — is the thing
+                                // worth having; a row saying "12 hides" would have hidden it.
+                                if stack.materials.count > 1 {
+                                    Button { opened = stack } label: { itemTile(stack) }
+                                        .buttonStyle(.plain)
+                                } else {
+                                    itemTile(stack)
                                 }
-                                .buttonStyle(.plain)
-                            } else {
-                                LabeledRow(icon: stack.icon,
-                                           label: stack.displayName,
-                                           value: stack.detail,
-                                           tint: stack.rarity.tint)
                             }
                         }
                     }
-                }
-
-                if !store.spillover.isEmpty {
-                    SpilloverCard()
-                }
-
-                if !store.unidentifiedStacks.isEmpty {
-                    IdentifyCard()
+                    if !store.unidentifiedStacks.isEmpty { IdentifyCard() }
+                case .waiting:
+                    if store.spillover.isEmpty {
+                        EmptyNote("Nothing is waiting to be sorted.")
+                    } else {
+                        SpilloverCard()
+                    }
                 }
             }
             .padding(16)
@@ -431,6 +439,49 @@ struct StorehouseView: View {
         }
         .navigationTitle("Storehouse")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var columns: [GridItem] {
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+    }
+
+    private func stockTile(icon: String, name: String, amount: Int) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: icon).font(.title2).foregroundStyle(.tint)
+            Text(name).font(.callout.weight(.medium))
+            Text("\(amount)").font(.title3.monospacedDigit().weight(.semibold))
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 110, alignment: .topLeading)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func itemTile(_ stack: ItemStack) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: stack.icon).font(.title2).foregroundStyle(stack.rarity.tint)
+                Spacer()
+                if stack.materials.count > 1 {
+                    Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
+                }
+            }
+            Text(stack.displayName).font(.callout.weight(.medium)).foregroundStyle(stack.rarity.tint)
+            if !stack.detail.isEmpty { Text(stack.detail).font(.caption2).foregroundStyle(.secondary) }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .contentShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private enum StorehouseTab: String, CaseIterable, Identifiable {
+    case items, stockpiles, waiting
+    var id: String { rawValue }
+    var title: String {
+        switch self { case .items: "Items"; case .stockpiles: "Resources"; case .waiting: "Waiting" }
     }
 }
 
