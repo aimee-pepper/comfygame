@@ -184,22 +184,11 @@ enum CombatRules {
     /// because nothing has two dominant armaments (`apex-encounters.md` §4).
     static func effectiveness(of kind: DamageKind, against covering: Covering,
                               breaking rule: WildRule?) -> Double {
-        guard rule == .twoNatured else { return effectiveness(of: kind, against: covering) }
-        return DamageKind.allCases
-            .map { effectiveness(of: $0, against: covering) }
-            .max() ?? effectiveness(of: kind, against: covering)
+        CombatDamageRules.effectiveness(of: kind, against: covering, breaking: rule)
     }
 
     static func effectiveness(of kind: DamageKind, against covering: Covering) -> Double {
-        let hard = covering.armourValue / Tuning.Pressure.scaleMaximum
-        let padded = covering.insulation / Tuning.Pressure.scaleMaximum
-        let t = Tuning.Encounter.self
-
-        let multiplier: Double = switch kind {
-        case .pierce, .crush: 1 + hard * t.matchupBonus - padded * t.matchupPenalty
-        case .rend: 1 + padded * t.matchupBonus - hard * t.matchupPenalty
-        }
-        return max(t.minimumMatchup, multiplier)
+        CombatDamageRules.effectiveness(of: kind, against: covering)
     }
 
     static func companionAttack(_ index: Int, in state: GameState) -> Int {
@@ -852,18 +841,19 @@ enum CombatRules {
 
         // **The matchup.** What you're swinging against what it's wearing, then armour on what's
         // left — and a piercing weapon goes through a share of that armour rather than all of it.
-        let matchup = kind.map {
-            effectiveness(of: $0, against: foe.traits?.covering ?? Covering(), breaking: breaking)
-        } ?? 1
-        var swing = Double(roll(around: damage, run: &run)) * matchup
-        // **From the back you can barely reach it** — unless what you're holding is long. That's
-        // what makes reach worth having on a weapon rather than only on a creature.
-        if standingBack, reachOfActor != .far { swing *= 1 - Tuning.Encounter.backRankMeleePenalty }
-        let raw = Int(swing.rounded())
-        // **Pry goes under it entirely**, which is the one thing armour has no answer to.
-        let ignored = ignoresArmour ? 1.0 : (kind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0)
-        let armour = Int((Double(foe.stats.armour) * (1 - ignored)).rounded())
-        let amount = max(Tuning.Encounter.minimumDamage, raw - armour)
+        let rolledPower = roll(around: damage, run: &run)
+        let resolved = CombatDamageRules.resolve(
+            rolledPower: rolledPower,
+            in: .init(damageKind: kind,
+                      covering: foe.traits?.covering ?? Covering(),
+                      wildRule: breaking,
+                      standingBack: standingBack,
+                      reach: reachOfActor,
+                      armour: foe.stats.armour,
+                      ignoresArmour: ignoresArmour)
+        )
+        let raw = resolved.rawDamage
+        let amount = resolved.finalDamage
         encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
 
         let soaked = raw - amount

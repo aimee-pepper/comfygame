@@ -155,8 +155,8 @@
       "priority": "P1",
       "title": "Spring refining skills",
       "status": "queued",
-      "detail": "After baseline telemetry: batch control, a reversible 2→3 rate unlock, and outcome-safe auto-refining.",
-      "gate": "Opening 2:1 loop already works; unlock payback and precision cost remain healthy over ten returns."
+      "detail": "Decision186 supplies a reversible playtest profile: move refinement to the Essence Spring; free exact selected/all at 2:1; Second pass at 50 lifetime Raw refined + 80 Essence/10 Quartz raises future conversion to 3:1; Continuous settling later auto-refines only newly retained Raw once per outcome; Deepen remains a parallel dividend branch.",
+      "gate": "Fresh/legacy saves preserve balances and Deepen completion; Workshop has no refinery claim; committed practice is exact and idempotent; 2:1/3:1 previews share rules; auto-refining handles retained outcomes once; phone/Large Text Spring graph fits without routine scrolling. Authority: essence-spring-review-batch-current.md and Decision186."
     },
     {
       "id": "world-color",
@@ -203,7 +203,7 @@
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
       "status": "inProgress",
-      "detail": "Checkpoint 71ffca2 generates the accepted three true graphs, exact Effect copy and canonical technique ownership from schema-2 authority. Checkpoint a86c2d3 adds a dormant, stable-ID actor-derived-stat foundation; production remains on legacy combat until all shared consumers can switch atomically. Next: complete scenario-tested consumer primitives, then lossless ownership migration and the native phone graph.",
+      "detail": "Checkpoint 71ffca2 generates the accepted true graphs and canonical grants; a86c2d3 adds dormant stable-ID derived stats. The current checkpoint extracts matchup, rank, armour-ignore and minimum-damage arithmetic into one preview/exact rule and makes the live legacy strike path consume it without changing RNG or outcomes. Decision185 settles reversible playtest naming and starting ownership for the later palette migration.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {
@@ -243,7 +243,7 @@
       "priority": "P1",
       "title": "Prevent first-world traveller crowds",
       "status": "readyToTest",
-      "detail": "Implemented in a86c2d3: each new world selects at most one full-signature match through blind frontier, immutable arrival band, causal evidence and stable tie-breaks. One frozen confidence roll uses saved near-miss protection; failure substitutes nobody. Diary discovery is normalized by subject/diary bucket so long books do not dominate by page count. Fresh-save phone acceptance remains.",
+      "detail": "Installed from corrected checkpoint 634da20: each new world selects at most one full-signature match through blind frontier, immutable arrival band, causal evidence and stable tie-breaks. The authored-pressure counterfactual rerolls every newly silent target with the same world seed. One frozen confidence roll uses saved near-miss protection; failure substitutes nobody. Fresh-save phone acceptance remains.",
       "gate": "Mara+Bryn/no-clue, cross/same-band full matches, clue counts, causal counterfactuals, opening order, DEBUG weights/window and seed/shuffle/relaunch prove one stable candidate; then arrival confidence proves 25/62.5/100% at zero/half/all authored, +25 saved near misses, guaranteed third match and no substitute on failure. Authority: traveller-world-pacing-current.md, roster-progression-current.md and traveller-arrival-confidence-review-current.md."
     },
     {
@@ -251,7 +251,7 @@
       "priority": "P2",
       "title": "Keep long diaries from dominating clue drops",
       "status": "readyToTest",
-      "detail": "Implemented in a86c2d3: ordinary diary discovery selects an average-weighted location-subject or diary-author bucket before selecting the exact page. Context preference, writing rate and the due one-page patience override are preserved; seeded phone/campaign distribution remains to test.",
+      "detail": "Installed from corrected checkpoint 634da20: ordinary diary discovery selects an average-weighted location-subject or diary-author bucket before selecting the exact page. Context preference, writing rate and the due one-page patience override are preserved; seeded phone/campaign distribution remains to test.",
       "gate": "Controlled one-page/ten-page buckets have equal aggregate weight; contextual preference still matters; exact patience nominee, writing floor, stable seed/shuffle/relaunch and seeded campaign distribution pass. Authority: traveller-clue-distribution-current.md."
     },
     {
@@ -269,6 +269,30 @@
       "status": "queued",
       "detail": "The transcript-order interaction bug is implemented separately, while exact observation-first replacements for Isolde's three opaque optional replies and Sabine's complete seven-location sequence await Aimee's side-by-side Atlas selections. Do not promote unreviewed prose automatically.",
       "gate": "Aimee selects Original, Candidate, Needs another pass or Hold for each stable unit; arbitrary Isolde tap order preserves independent replies; Sabine's approved sequence retains exact condition/clue indices; regenerated Atlas hashes and phone/Large Text copy pass. Authority: dialogue-review-first-batch-current.md."
+    },
+    {
+      "id": "return-receipt-authority",
+      "priority": "P1",
+      "title": "One trustworthy expedition return receipt",
+      "status": "queued",
+      "detail": "Full and partial exits still repeat the complete RunExitSummary field list even after the missing-page/traveller recap fix. Consolidate every outcome through one rules-owned frozen receipt so future XP, writing, recruitment and economy additions cannot drift by exit path.",
+      "gate": "One seeded all-category run through portal, Waystone, collapse, defeat and abandon proves parity for every non-loss-dependent category, exact retained/lost differences, atomic consumption/banking, relaunch idempotence and one constructor completeness seam. Authority: expedition-return-receipt-current.md."
+    },
+    {
+      "id": "penmanship-native",
+      "priority": "P1",
+      "title": "Brush, ink and Fountain pen progression",
+      "status": "queued",
+      "detail": "Migrate Pencil to Brush and implement the settled Penmanship fan/fork with Brush-gated sibling Ink Mixing, Compound Assembly and Chaining, then ruling frame and Fountain pen. Decision187 supplies a reversible coherent 40–220 Essence comparison profile rather than preserving the 150-Essence first-hand bottleneck.",
+      "gate": "Legacy IDs/capabilities migrate losslessly; sibling routes stay independent; exact recipes and Low writing runway preview share rules-owned costs; ten ordinary returns measure worlds-to-purchase without anti-lock dependence; phone graph fits without list regression. Authority: penmanship-native-migration-current.md, penmanship-economy-runway-review-current.md and Decision187."
+    },
+    {
+      "id": "failure-retention-correctness",
+      "priority": "P1",
+      "title": "Stack-independent failure retention",
+      "status": "queued",
+      "detail": "Live discrete failure retention is neither random nor stack-neutral: it never consumes its RNG and floors each stack independently, so differently binned one-off finds can all be lost at the same fraction that preserves stacked copies. Correct one total-unit budget before separately deciding whether the suggested survivors are player-editable.",
+      "gate": "At 25/50/75%, merged/split and different-catalogue representations produce the same total budget; stable candidate identity/provenance survives; outcome-ID suggestion is deterministic; protected starting property and bulk resources remain outside; no agency UI is implied. Authority: failure-recovery-agency-recommendation.md DRQ-089 arithmetic split."
     }
   ],
   "paused": [

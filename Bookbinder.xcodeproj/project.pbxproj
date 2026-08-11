@@ -14,6 +14,7 @@
 		01E64B915C4AC1BE0A72A935 /* ResearchViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0CB601F15811CBB11B5B39 /* ResearchViews.swift */; };
 		0290A7D4A5E8A5E8516E171E /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606F9667A67D771D03320DDA /* PersistenceTests.swift */; };
 		030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7582647B2841DB69559E3968 /* BookRulesTests.swift */; };
+		032B8A18E9C67A5EA6DA3375 /* CombatDamageRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3CEC3D11B926B391742E90C /* CombatDamageRulesTests.swift */; };
 		03705DB034E250EE8C9A5A0B /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867ADA7C98334AD5152A4937 /* AppRoute.swift */; };
 		0463A21CD6D0C85974C64C81 /* RealityState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAAA1B171F7C380229C20CC5 /* RealityState.swift */; };
 		04A394B9CE1582C902CDEFB2 /* CombatTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B213D165D2239B2A934DB263 /* CombatTreeView.swift */; };
@@ -165,6 +166,7 @@
 		AD06A15C582B042710CEED9F /* GameStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86093A93DD9720F92E4148D5 /* GameStore.swift */; };
 		AEBED915A9156084389B1BD6 /* LifeRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4002533174316FAE3274D6 /* LifeRules.swift */; };
 		AEBEF81AB87C48DD9D3C7AA1 /* playability-roadmap.json in Resources */ = {isa = PBXBuildFile; fileRef = AE024D65F580FDE6AE922F0E /* playability-roadmap.json */; };
+		AF40F83C822A636A79DABF02 /* CombatDamageRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13670D6FD1A95328A0EF06A3 /* CombatDamageRules.swift */; };
 		B3127BCE033E785E4B3EA912 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543B94C8E89980FDE029D9C /* Page.swift */; };
 		B359756CD03EA20040D41934 /* CatalogueItemVisualAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3454F785ADFD7CFC19BFCF5 /* CatalogueItemVisualAdapterTests.swift */; };
 		B4A71AFB4A613C6430C0F185 /* StationStaffingRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF13E2576281E76FA92CD685 /* StationStaffingRules.swift */; };
@@ -258,6 +260,7 @@
 		0DA805AE9804EFB6621B7166 /* TutorialTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialTests.swift; sourceTree = "<group>"; };
 		0EF2B3DBADEF32F2DE2B00DE /* WeaponsmithTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeaponsmithTests.swift; sourceTree = "<group>"; };
 		0F66F95CC3FEA4D5E13AE410 /* DescriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionModels.swift; sourceTree = "<group>"; };
+		13670D6FD1A95328A0EF06A3 /* CombatDamageRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatDamageRules.swift; sourceTree = "<group>"; };
 		14E466EEC3518F71FDD38EE9 /* RuneGlyph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneGlyph.swift; sourceTree = "<group>"; };
 		1824E6BFD5550AACCB6416A5 /* DangerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DangerTests.swift; sourceTree = "<group>"; };
 		1852EC9D09586AD995187C27 /* SaveSlotPayloadIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSlotPayloadIO.swift; sourceTree = "<group>"; };
@@ -453,6 +456,7 @@
 		E19DC1448710810CD318671E /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
 		E1BB569F0B672F268545701C /* SiteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteTests.swift; sourceTree = "<group>"; };
 		E3454F785ADFD7CFC19BFCF5 /* CatalogueItemVisualAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogueItemVisualAdapterTests.swift; sourceTree = "<group>"; };
+		E3CEC3D11B926B391742E90C /* CombatDamageRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatDamageRulesTests.swift; sourceTree = "<group>"; };
 		E3EDB1BAC65E07DA7319F3C6 /* PhysicalGearCraftingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicalGearCraftingRules.swift; sourceTree = "<group>"; };
 		E50FD84F29FE6729623D70EB /* CombatTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatTreeTests.swift; sourceTree = "<group>"; };
 		E5F6F843AB65D2D26E6F5A56 /* FirepitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirepitView.swift; sourceTree = "<group>"; };
@@ -500,6 +504,7 @@
 				C3CC1BB415696E2B7417C43D /* BookRules.swift */,
 				DD1FD369C1CCCC28B0A42FC7 /* ButcheryRules.swift */,
 				5AB1CD7D6C91CDD187B2410F /* CharacterRules.swift */,
+				13670D6FD1A95328A0EF06A3 /* CombatDamageRules.swift */,
 				2EC7108D31E9422C701DCEDD /* CombatDerivedStats.swift */,
 				E6801BC62F5B1EF81C4253C6 /* CombatGraphRules.swift */,
 				99D023496EC834EA78E9BE63 /* CombatRules.swift */,
@@ -759,6 +764,7 @@
 				B6B3681EEDB3DB65AE754495 /* CampaignStartPresentationTests.swift */,
 				E3454F785ADFD7CFC19BFCF5 /* CatalogueItemVisualAdapterTests.swift */,
 				53634CFCB3CD23CDD115C001 /* ChasmTests.swift */,
+				E3CEC3D11B926B391742E90C /* CombatDamageRulesTests.swift */,
 				A186B96AD87CB57DEDF8F4D7 /* CombatDerivedStatsFoundationTests.swift */,
 				AE0ED58C8EAA439ABE4A10DE /* CombatGraphTests.swift */,
 				F395689728B586E0D0A7CD61 /* CombatTests.swift */,
@@ -1016,6 +1022,7 @@
 				EBC7C77E4438C75730F0DCCA /* Character.swift in Sources */,
 				3C4C4E838448237D91492B61 /* CharacterRules.swift in Sources */,
 				3062AB49BB5A3BBCC3A396BD /* Combat.swift in Sources */,
+				AF40F83C822A636A79DABF02 /* CombatDamageRules.swift in Sources */,
 				2118F34B3C42A6DF2E2B15AE /* CombatDerivedStats.swift in Sources */,
 				277FD4073B21D49D8ACBB905 /* CombatGraphModels.swift in Sources */,
 				85E86B9A5614E6F585425104 /* CombatGraphRules.swift in Sources */,
@@ -1147,6 +1154,7 @@
 				7FAF1BB2BE9134A54D8E970C /* CampaignStartPresentationTests.swift in Sources */,
 				B359756CD03EA20040D41934 /* CatalogueItemVisualAdapterTests.swift in Sources */,
 				F6AE3DF4E00E397B950A1CBC /* ChasmTests.swift in Sources */,
+				032B8A18E9C67A5EA6DA3375 /* CombatDamageRulesTests.swift in Sources */,
 				9325056626B6BA2E7E6AA3B1 /* CombatDerivedStatsFoundationTests.swift in Sources */,
 				06C400B11A69ED49007381F4 /* CombatGraphTests.swift in Sources */,
 				EB5A7F017737E52E163C9A5C /* CombatTests.swift in Sources */,
