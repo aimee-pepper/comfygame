@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "0b23c3a · bug-report share isolation + world-grade-2 handoff gate",
+  "installedCheckpoint": "5e97ef4 · Binder-anchored encounter scaling",
   "essenceBaseline": "a816113",
   "currentWork": "P1 encounter scaling phone comparison + P0 world-grade-2 handoff correction",
-  "currentNote": "Binder-anchored additive party pressure is integrated and passing its focused suite; the next green build will install it for Aimee's two- and five-person ordinary/apex comparison. The durable bug queue and real Share fallback are checkpointed; direct delivery still waits for an approved relay endpoint and Keychain credential. World-grade-2 remains held while Asset corrects per-species flora relationships and explicit all-12-ground ownership in the immutable native handoff.",
+  "currentNote": "Binder-anchored additive party pressure is installed and ready for Aimee's two- and five-person ordinary/apex comparison. The durable bug queue and real Share fallback are checkpointed; direct delivery still waits for an approved relay endpoint and Keychain credential. World-grade-2 remains held while Asset corrects per-species flora relationships and explicit all-12-ground ownership in the immutable native handoff.",
   "items": [
     {
       "id": "essence",
@@ -162,7 +162,7 @@
       "id": "world-color",
       "priority": "P0",
       "title": "Meaningful world color differentiation",
-      "status": "next",
+      "status": "inProgress",
       "detail": "Repeated world palettes are materially reducing exploration readability. The keyed v0.2 calibration is accepted, but it is not a native handoff: Asset must freeze the production descriptor/schema/version tuple and publish immutable command/RGBA vectors before Engineering integration.",
       "gate": "Asset handoff declares integrationReady:true and pins schema + manifest hashes, canonical descriptor encoding, resolver/palette/renderer versions, command/RGBA/geometry vectors and legacy-v1 migration. Then native visual distance must track meaningful authored and resolved input distance: similar worlds remain related, while opposed worlds separate proportionally, with no universal uniqueness or arbitrary neutral-world variety. Authority: docs/world-color-differentiation-current.md."
     },
@@ -186,7 +186,7 @@
       "id": "encounter-scaling",
       "priority": "P1",
       "title": "Party and apex difficulty",
-      "status": "inProgress",
+      "status": "readyToTest",
       "detail": "Binder-anchored additive power, path-honest visible grouping, proportional encounter HP, saved 55% affliction-free follow-ups and apex-only scaling are integrated. Legacy and frozen v1 runs retain their historical grouping and rules.",
       "gate": "Focused and full suites pass; install the checkpoint, then Aimee plays two- and five-person ordinary and apex fights using the phone test card. Reject burst one-shots or HP walls before marking the Recommended profile complete."
     },
