@@ -5,7 +5,7 @@ final class CombatGraphTests: XCTestCase {
     private var graph: CombatGraphCatalogue { ContentCatalog.shared.combatGraph }
 
     func testGeneratedAuthorityHasExactClosedShapeAndStableIdentity() {
-        XCTAssertEqual(graph.schemaVersion, 1)
+        XCTAssertEqual(graph.schemaVersion, 2)
         XCTAssertEqual(graph.graphVersion, 2)
         XCTAssertEqual(graph.trees.count, 3)
         XCTAssertEqual(graph.disciplines.count, 9)
@@ -16,6 +16,21 @@ final class CombatGraphTests: XCTestCase {
             $0.id.rawValue == "combat.\(graph.tree(containing: $0.id)!.id.rawValue)."
                 + "\(graph.discipline(containing: $0.id)!.id.rawValue).\($0.slug)"
         })
+    }
+
+    func testSchemaTwoOwnsExactTechniqueAndEffectCoverage() {
+        XCTAssertEqual(graph.nodes.filter { $0.techniqueID != nil }.count, 20)
+        XCTAssertEqual(graph.nodes.filter { $0.techniqueID == nil }.count, 52)
+        XCTAssertTrue(graph.nodes.allSatisfy { !$0.effectCopy.isEmpty })
+        XCTAssertEqual(graph.node(id("offense", "swiftness", "blur"))?.techniqueID, "blur")
+        XCTAssertEqual(graph.node(id("craft", "emanation", "emanation_strike"))?.techniqueID,
+                       "emanation_strike")
+        XCTAssertEqual(graph.node(id("craft", "emanation", "quench"))?.techniqueID, "quench")
+        XCTAssertNil(graph.node(id("offense", "force", "heavy_hand"))?.techniqueID)
+        XCTAssertEqual(graph.authoritySHA256,
+                       "235abe8b86e4f39dec920c8dd47063be3adc4b2a8189e5adcefdc83ca1378d0f")
+        XCTAssertEqual(graph.effectCopySHA256,
+                       "175ea991e0ff476696b8616eac3c3cc459fe0e0cd85b4837dfdf7406c709b094")
     }
 
     func testEveryLegacyDepthMapsToExactFormerPrefixesWithoutLosingPoints() {

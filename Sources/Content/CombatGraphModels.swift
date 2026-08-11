@@ -34,6 +34,10 @@ struct CombatGraphNodeDef: Codable, Equatable, Identifiable, Sendable {
     /// Decode/migration parity only. Known stale legacy meanings must not become v2 authority.
     var legacyEffect: CombatNodeEffect
     var legacyTechniqueID: SkillID?
+    /// Canonical v2 action grant. Nil is an explicit passive/no-action declaration.
+    var techniqueID: SkillID?
+    /// Exact player-facing Effect copy generated from Design authority.
+    var effectCopy: String
     var sameDisciplineParents: [CombatNodeID]
     var hybridAlternativeParents: [CombatNodeID]
 
@@ -70,6 +74,9 @@ struct CombatCapstoneGate: Codable, Equatable, Sendable {
 struct CombatGraphCatalogue: Codable, Equatable, Sendable {
     var schemaVersion: Int
     var graphVersion: Int
+    var authoritySHA256: String
+    var effectCopySHA256: String
+    var effectCopySourceMarkdownSHA256: String
     var capstoneGate: CombatCapstoneGate
     var trees: [CombatGraphTreeDef]
 

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "graphVersion": 2,
   "status": "current-design-authority",
   "stableIDFormat": "combat.{tree}.{discipline}.{node_slug}",
@@ -118,6 +118,29 @@
     }
   ],
   "techniqueIdentity": "explicit-per-node-not-derived-from-role",
+  "effectCopyArtifact": "docs/combat-tree-v2-effect-copy.generated.json",
+  "techniqueIDByNode": {
+    "combat.offense.force.overbear": "overbear",
+    "combat.offense.force.shatter": "shatter",
+    "combat.offense.precision.pry": "pry",
+    "combat.offense.precision.finish": "finish",
+    "combat.offense.swiftness.quicken": "quicken",
+    "combat.offense.swiftness.first_strike": "first_strike",
+    "combat.offense.swiftness.blur": "blur",
+    "combat.defense.fortitude.brace": "brace",
+    "combat.defense.fortitude.ward": "ward",
+    "combat.defense.protection.draw_off": "draw_off",
+    "combat.defense.protection.interpose": "interpose",
+    "combat.defense.evasion.sidestep": "sidestep",
+    "combat.defense.evasion.fall_back": "fall_back",
+    "combat.craft.venom.envenom": "envenom",
+    "combat.craft.venom.flense": "flense",
+    "combat.craft.emanation.emanation_strike": "emanation_strike",
+    "combat.craft.emanation.snuff": "snuff",
+    "combat.craft.emanation.quench": "quench",
+    "combat.craft.shadow.conceal": "conceal",
+    "combat.craft.shadow.ambush": "ambush"
+  },
   "sourceNodeContent": "Sources/Content/Data/combat_trees.json",
   "semanticContract": "docs/combat-node-viability-current.md",
   "presentationAndMigrationContract": "docs/combat-tree-true-graph-current.md"

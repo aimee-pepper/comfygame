@@ -26,6 +26,18 @@ targets:
       - path: Sources
       - path: Support/LaunchScreen.storyboard
         buildPhase: resources
+    preBuildScripts:
+      - name: Verify generated combat-v2 authority
+        basedOnDependencyAnalysis: false
+        script: |
+          python3 "$SRCROOT/Scripts/generate_combat_tree_v2.py" --check
+        inputFiles:
+          - $(SRCROOT)/Scripts/generate_combat_tree_v2.py
+          - $(SRCROOT)/docs/combat-tree-v2-authority.json
+          - $(SRCROOT)/docs/combat-tree-v2-effect-copy.generated.json
+          - $(SRCROOT)/docs/combat-tree-node-copy-current.md
+          - $(SRCROOT)/Sources/Content/Data/combat_trees.json
+          - $(SRCROOT)/Sources/Content/Data/combat_tree_v2.json
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aimeepepper.bookbinder

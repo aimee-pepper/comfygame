@@ -9,6 +9,7 @@ generated join prevents either side from becoming a second hand-maintained comba
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -18,6 +19,10 @@ AUTHORITY = ROOT / "docs/combat-tree-v2-authority.json"
 LEGACY_CONTENT = ROOT / "Sources/Content/Data/combat_trees.json"
 OUTPUT = ROOT / "Sources/Content/Data/combat_tree_v2.json"
 
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
 def load(path: Path) -> dict:
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
@@ -25,6 +30,20 @@ def load(path: Path) -> dict:
 
 def generate() -> dict:
     authority = load(AUTHORITY)
+    if authority.get("schemaVersion") != 2:
+        raise ValueError("combat-tree-v2 authority must use schemaVersion 2")
+    effect_copy_path = ROOT / authority["effectCopyArtifact"]
+    effect_copy_artifact = load(effect_copy_path)
+    if effect_copy_artifact.get("combatAuthority") != str(AUTHORITY.relative_to(ROOT)):
+        raise ValueError("effect-copy artifact names the wrong combat authority")
+    authority_hash = sha256(AUTHORITY)
+    if effect_copy_artifact.get("combatAuthoritySHA256") != authority_hash:
+        raise ValueError("effect-copy artifact is stale against combat authority")
+    effect_source_path = ROOT / effect_copy_artifact["sourceMarkdown"]
+    if effect_copy_artifact.get("sourceMarkdownSHA256") != sha256(effect_source_path):
+        raise ValueError("effect-copy artifact is stale against its source Markdown")
+    effect_copy = effect_copy_artifact["effectCopyByNode"]
+    technique_ids = authority["techniqueIDByNode"]
     legacy = load(LEGACY_CONTENT)
     trees_by_id = {tree["id"]: tree for tree in legacy["trees"]}
     legacy_branch_ids = {
@@ -90,6 +109,8 @@ def generate() -> dict:
                     "blurb": legacy_node["blurb"],
                     "legacyEffect": legacy_node["effect"],
                     "legacyTechniqueID": legacy_node.get("grantsSkill"),
+                    "techniqueID": technique_ids.get(stable_id),
+                    "effectCopy": effect_copy.get(stable_id),
                     "sameDisciplineParents": same_parents,
                     "hybridAlternativeParents": authored_tree["hybridAlternativeParents"].get(stable_id, []),
                 })
@@ -111,10 +132,21 @@ def generate() -> dict:
 
     if len(seen_ids) != 72:
         raise ValueError(f"expected 72 stable combat nodes, got {len(seen_ids)}")
+    if set(effect_copy) != seen_ids:
+        raise ValueError("effect-copy artifact must cover exactly all 72 combat nodes")
+    if not all(isinstance(value, str) and value.strip() for value in effect_copy.values()):
+        raise ValueError("every combat node must have nonempty Effect copy")
+    if not set(technique_ids).issubset(seen_ids):
+        raise ValueError("techniqueIDByNode names an unknown combat node")
+    if len(technique_ids) != 20 or len(seen_ids - set(technique_ids)) != 52:
+        raise ValueError("combat techniques must resolve to exactly 20 grants and 52 nulls")
     return {
-        "_note": "GENERATED topology plus explicitly labelled legacy migration payloads; v2 semantics remain owned by docs/combat-node-viability-current.md.",
+        "_note": "GENERATED schema-2 topology, canonical technique IDs and exact Effect copy. Legacy fields are decode/migration payload only.",
         "schemaVersion": authority["schemaVersion"],
         "graphVersion": authority["graphVersion"],
+        "authoritySHA256": authority_hash,
+        "effectCopySHA256": sha256(effect_copy_path),
+        "effectCopySourceMarkdownSHA256": effect_copy_artifact["sourceMarkdownSHA256"],
         "capstoneGate": authority["capstoneGate"],
         "trees": generated_trees,
     }

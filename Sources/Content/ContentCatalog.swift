@@ -640,7 +640,7 @@ struct ContentCatalog: Sendable {
 
 
     private func validateCombatGraph() throws {
-        guard combatGraph.schemaVersion == 1, combatGraph.graphVersion == 2 else {
+        guard combatGraph.schemaVersion == 2, combatGraph.graphVersion == 2 else {
             throw ContentError.danglingReference(
                 "unsupported combat graph schema \(combatGraph.schemaVersion)/\(combatGraph.graphVersion)")
         }
@@ -653,6 +653,19 @@ struct ContentCatalog: Sendable {
         try requireUniqueIDs(combatGraph.nodes.map(\.id.rawValue), label: "combat node")
         let nodeIDs = Set(combatGraph.nodes.map(\.id))
         let skillIDs = Set(skills.map(\.id))
+        // These schema-2 identities intentionally replace decode-only legacy actions. Their
+        // typed consumers land with combat-v2 activation; the graph must not keep serializing the
+        // misleading legacy IDs merely because the old action catalogue still contains them.
+        let pendingV2SkillIDs: Set<SkillID> = ["blur", "emanation_strike", "quench"]
+        guard combatGraph.authoritySHA256.count == 64,
+              combatGraph.effectCopySHA256.count == 64,
+              combatGraph.effectCopySourceMarkdownSHA256.count == 64 else {
+            throw ContentError.danglingReference("combat graph source hashes are missing or malformed")
+        }
+        guard combatGraph.nodes.filter({ $0.techniqueID != nil }).count == 20,
+              combatGraph.nodes.filter({ $0.techniqueID == nil }).count == 52 else {
+            throw ContentError.danglingReference("combat graph must contain 20 techniques and 52 passive nodes")
+        }
         let legacyBranches = Dictionary(uniqueKeysWithValues: combatBranches.map { ($0.id, $0) })
 
         for tree in combatGraph.trees {
@@ -684,6 +697,15 @@ struct ContentCatalog: Sendable {
                     if let skill = node.legacyTechniqueID, !skillIDs.contains(skill) {
                         throw ContentError.danglingReference(
                             "combat node '\(node.id)' grants unknown technique '\(skill)'")
+                    }
+                    if let skill = node.techniqueID,
+                       !skillIDs.contains(skill), !pendingV2SkillIDs.contains(skill) {
+                        throw ContentError.danglingReference(
+                            "combat node '\(node.id)' grants unknown v2 technique '\(skill)'")
+                    }
+                    guard !node.effectCopy.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                        throw ContentError.danglingReference(
+                            "combat node '\(node.id)' has no canonical Effect copy")
                     }
                     for parent in node.ordinaryParentAlternatives where !nodeIDs.contains(parent) {
                         throw ContentError.danglingReference(
