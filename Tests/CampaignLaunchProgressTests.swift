@@ -12,7 +12,7 @@ final class CampaignLaunchProgressTests: XCTestCase {
 
     func testInitialInspectionPublishesHonestProgressBeforeChooser() async throws {
         let directory = temporaryDirectory("initial")
-        let coordinator = CampaignAppCoordinator(directory: directory)
+        let coordinator = CampaignAppCoordinator(directory: directory, minimumInitialDisplay: .zero)
         var observed: [CampaignAppCoordinator.LoadingPhase] = []
         let observation = coordinator.$loadingPhase.sink { observed.append($0) }
 
@@ -29,7 +29,7 @@ final class CampaignLaunchProgressTests: XCTestCase {
         let directory = temporaryDirectory("opening")
         let slot = try await SaveSlotFileIO(directory: directory).create(name: "Progress")
         let prepared = fixturePrepared()
-        let coordinator = CampaignAppCoordinator(directory: directory, prepare: { _, progress in
+        let coordinator = CampaignAppCoordinator(directory: directory, minimumInitialDisplay: .zero, prepare: { _, progress in
             progress(.loadingSave)
             progress(.reconcilingCatalogue)
             progress(.committingSave)
@@ -58,7 +58,7 @@ final class CampaignLaunchProgressTests: XCTestCase {
         let directory = temporaryDirectory("stale")
         let slot = try await SaveSlotFileIO(directory: directory).create(name: "Stale")
         let prepared = fixturePrepared()
-        let coordinator = CampaignAppCoordinator(directory: directory, prepare: { _, progress in
+        let coordinator = CampaignAppCoordinator(directory: directory, minimumInitialDisplay: .zero, prepare: { _, progress in
             progress(.loadingSave)
             progress(.complete)
             progress(.reconcilingCatalogue) // deliberately out of order
@@ -87,7 +87,7 @@ final class CampaignLaunchProgressTests: XCTestCase {
         let slot = try await SaveSlotFileIO(directory: directory).create(name: "Retry")
         let attempts = AttemptCounter()
         let prepared = fixturePrepared()
-        let coordinator = CampaignAppCoordinator(directory: directory, prepare: { _, progress in
+        let coordinator = CampaignAppCoordinator(directory: directory, minimumInitialDisplay: .zero, prepare: { _, progress in
             let attempt = await attempts.next()
             progress(.loadingSave)
             if attempt == 1 { throw ExpectedFailure() }
@@ -127,6 +127,24 @@ final class CampaignLaunchProgressTests: XCTestCase {
                       "The production campaign root must timestamp its actual first frame")
         XCTAssertTrue(source.contains("campaign phase="),
                       "Every published production phase must carry elapsed-time evidence")
+    }
+
+    func testInitialSplashRemainsPerceptibleAfterFastInspection() async throws {
+        let directory = temporaryDirectory("minimum-display")
+        let clock = ContinuousClock()
+        let started = clock.now
+        let coordinator = CampaignAppCoordinator(
+            directory: directory,
+            minimumInitialDisplay: .milliseconds(120)
+        )
+
+        coordinator.start()
+        try await Task.sleep(for: .milliseconds(60))
+        if case .choosing = coordinator.phase {
+            XCTFail("Fast inspection must not make the branded launch surface flicker away")
+        }
+        try await waitUntil { if case .choosing = coordinator.phase { true } else { false } }
+        XCTAssertGreaterThanOrEqual(started.duration(to: clock.now), .milliseconds(110))
     }
 
     func testLaunchProgressUsesAReservedFixedRegionInsteadOfSystemIntrinsicLayout() throws {

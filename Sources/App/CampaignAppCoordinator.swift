@@ -53,6 +53,7 @@ final class CampaignAppCoordinator: ObservableObject {
     private var task: Task<Void, Never>?
     private var generation = UUID()
     private var didLogFirstFrame = false
+    private let minimumInitialDisplay: Duration
     private let prepare: @Sendable (
         any GamePersistenceIO,
         @escaping @Sendable (GameStore.PreparationStep) -> Void
@@ -66,6 +67,7 @@ final class CampaignAppCoordinator: ObservableObject {
     init(directory: URL = FileManager.default.urls(for: .documentDirectory,
                                                     in: .userDomainMask)[0],
          readyStore: GameStore? = nil,
+         minimumInitialDisplay: Duration = .seconds(1),
          prepare: @escaping @Sendable (
              any GamePersistenceIO,
              @escaping @Sendable (GameStore.PreparationStep) -> Void
@@ -76,6 +78,7 @@ final class CampaignAppCoordinator: ObservableObject {
          }) {
         slots = SaveSlotFileIO(directory: directory)
         phase = readyStore.map(Phase.playing) ?? .idle
+        self.minimumInitialDisplay = minimumInitialDisplay
         self.prepare = prepare
     }
 
@@ -88,6 +91,8 @@ final class CampaignAppCoordinator: ObservableObject {
         task = Task { [weak self] in
             guard let self else { return }
             do {
+                let clock = ContinuousClock()
+                let earliestChooser = clock.now.advanced(by: minimumInitialDisplay)
                 let startedAt = DispatchTime.now().uptimeNanoseconds
                 _ = try await slots.adoptLegacyIfNeeded()
                 let adoptedAt = DispatchTime.now().uptimeNanoseconds
@@ -95,6 +100,9 @@ final class CampaignAppCoordinator: ObservableObject {
                 publish(.inspectingCampaigns, for: token)
                 let descriptors = await slots.inspect()
                 let inspectedAt = DispatchTime.now().uptimeNanoseconds
+                let remaining = clock.now.duration(to: earliestChooser)
+                if remaining > .zero { try await Task.sleep(for: remaining) }
+                guard generation == token else { return }
                 phase = .choosing(descriptors)
 #if DEBUG
                 let adoption = Double(adoptedAt - startedAt) / 1_000_000

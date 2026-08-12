@@ -201,3 +201,12 @@ Focused/full XCTest execution and exact cold-launch/save-open visual evidence re
 failed Simulator/CoreDevice services, then on a clean committed install. Acceptance still requires
 proving that the branded storyboard hands directly to the branded SwiftUI surface with no uncovered
 frame.
+
+### Perceptible initial handoff — 11 Aug
+
+Build 232 removed the long uncovered black wait on Aimee's phone, but the initial branded surface
+became only a momentary flicker because an already-normalized campaign shelf inspected almost
+instantly. The production root now keeps only the **initial app-launch** surface visible for at least
+one second from coordinator start. Real adoption/inspection still runs immediately and continues to
+drive the honest progress state; the minimum does not delay selected-save opening, warm-ready scenes,
+retry semantics or any save write. This is presentation dwell, not simulated work or a fake timer.
