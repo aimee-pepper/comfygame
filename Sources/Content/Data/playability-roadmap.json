@@ -179,7 +179,7 @@
       "priority": "P2",
       "title": "Static/manual authority audit",
       "status": "queued",
-      "detail": "Fourth audit pass is current in static-manual-authority-audit-current.md. P0 before combat v2: repair the currently stale native graph generator/output. Then derive roadmap schema 2 and atlas review union; move Trading Post/Recycler classifications and baseline combat ownership into their owning catalogues at those checkpoints.",
+      "detail": "Fourth audit pass is current in static-manual-authority-audit-current.md. Combat schema-2 generation, Effect-copy linkage and normal freshness checks are now green; remaining work is roadmap schema 2, atlas review union, and moving Trading Post/Recycler classifications into catalogue authority at their checkpoints.",
       "gate": "Combat and meeting generators pass normal freshness checks; roadmap summaries/build identity derive; review union includes draft-only identities without release promotion; catalogue classifications fail closed; history remains dated and authored judgment is never generated."
     },
     {
@@ -202,8 +202,8 @@
       "id": "combat-tree-v2",
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
-      "status": "queued",
-      "detail": "Generated true-graph authority and the shared damage rule are live. Explicit DEBUG ownership now freezes Heavy Hand/Keen Eye into shared preview+commit damage and Quick Step/Light Frame into every participating actor's authoritative saved initiative/order receipt. Settings previews party totals; compact encounter detail explains final RNG/contact-priority order without reflowing combat. The other 68 nodes, release ownership migration, full graph UI and remaining dormant derived-stat fields remain unfinished.",
+      "status": "inProgress",
+      "detail": "Active authorized outcome: finish the real 24-node fan-and-fork combat trees already settled by Game Design and handed off by Asset. First build and phone-prove the reusable native graph through the DEBUG route explorer while preserving the functioning legacy production purchase route. Then remain on this outcome while every stable-ID node gains a real scenario-tested consumer behind the isolated v2 path. Durable ordinary ownership, atomic legal purchase and lossless migration promote with the functional graph only after no purchasable node is inert. Accessibility-size variants, tutorials and unrelated audits cannot displace it.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {

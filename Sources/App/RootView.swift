@@ -8,6 +8,7 @@ import SwiftUI
 struct RootView: View {
     @EnvironmentObject private var store: GameStore
     @State private var debugBaseRoute: AppRoute = .base
+    @State private var debugBugReporterSuppressed = false
 
     var body: some View {
         Group {
@@ -40,10 +41,26 @@ struct RootView: View {
             AnchorSettlementView().environmentObject(store)
         }
 #if DEBUG
-        .overlay { DebugBugReporterOverlay(store: store, route: debugBaseRoute) }
+        .onPreferenceChange(DebugBugReporterSuppressedPreferenceKey.self) {
+            debugBugReporterSuppressed = $0
+        }
+        .overlay {
+            if !debugBugReporterSuppressed {
+                DebugBugReporterOverlay(store: store, route: debugBaseRoute)
+            }
+        }
 #endif
     }
 }
+
+#if DEBUG
+struct DebugBugReporterSuppressedPreferenceKey: PreferenceKey {
+    static let defaultValue = false
+    static func reduce(value: inout Bool, nextValue: () -> Bool) {
+        value = value || nextValue()
+    }
+}
+#endif
 
 private struct AnchorSettlementView: View {
     @EnvironmentObject private var store: GameStore

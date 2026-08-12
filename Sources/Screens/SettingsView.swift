@@ -214,6 +214,9 @@ struct BalancingView: View {
             }
 
             Section("Combat v2 comparison harness") {
+                NavigationLink("Open native true-graph route explorer") {
+                    CombatGraphRouteExplorer()
+                }
                 Toggle("Use frozen v2 combat inputs", isOn: $settings.debugTuning.debugCombatV2BinderAttackEnabled)
                 debugCombatNodeToggle("Heavy Hand · Crush +2",
                                       id: CombatDerivedStatsRules.Node.heavyHand)
