@@ -263,6 +263,24 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
 /// A fight in progress. Saved in full — being mid-encounter is the hardest resume case in the game,
 /// and the one the acceptance criteria call out by name.
 struct EncounterState: Codable, Equatable, Sendable {
+    struct DebugV2InitiativeReceipt: Codable, Equatable, Sendable {
+        struct Component: Codable, Equatable, Sendable {
+            var nodeID: CombatNodeID
+            var amount: Int
+        }
+        struct Entry: Codable, Equatable, Sendable {
+            var actor: Combatant
+            var baseline: Int
+            var components: [Component]
+            var total: Int
+            var strikesFirst: Bool
+            var finalPosition: Int?
+        }
+        var entries: [Entry]
+
+        func entry(for actor: Combatant) -> Entry? { entries.first { $0.actor == actor } }
+    }
+
     struct DebugV2BinderAttackReceipt: Codable, Equatable, Sendable {
         static let schemaVersion = 1
         var version = schemaVersion
@@ -360,6 +378,8 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// Binder-only DEBUG harness receipt. It is frozen at encounter entry and never inferred from
     /// legacy branch depth. Release encounters and old saves have no receipt.
     var debugV2BinderAttack: DebugV2BinderAttackReceipt?
+    /// Exact DEBUG initiative inputs and the final tie-broken position frozen at contact.
+    var debugV2Initiative: DebugV2InitiativeReceipt?
     var opening: OpeningResolution?
     /// Ordinary actions completed by each actor. Opening foe actions and zero-turn opening attacks
     /// do not enter this set.
@@ -470,6 +490,7 @@ struct EncounterState: Codable, Equatable, Sendable {
          order: [Combatant], turnSlots: [TurnSlot] = [],
          initiallyUnrecordedSpecies: Set<String> = [],
          debugV2BinderAttack: DebugV2BinderAttackReceipt? = nil,
+         debugV2Initiative: DebugV2InitiativeReceipt? = nil,
          log: [String] = []) {
         self.id = id
         self.foes = foes
@@ -478,6 +499,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.turnSlots = turnSlots.isEmpty ? order.map { TurnSlot(actor: $0) } : turnSlots
         self.initiallyUnrecordedSpecies = initiallyUnrecordedSpecies
         self.debugV2BinderAttack = debugV2BinderAttack
+        self.debugV2Initiative = debugV2Initiative
         self.log = log
     }
 
@@ -496,6 +518,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         scalingPreview = try c.decodeIfPresent(EncounterScalingRules.Preview.self, forKey: .scalingPreview)
         debugV2BinderAttack = try c.decodeIfPresent(DebugV2BinderAttackReceipt.self,
                                                      forKey: .debugV2BinderAttack)
+        debugV2Initiative = try c.decodeIfPresent(DebugV2InitiativeReceipt.self,
+                                                   forKey: .debugV2Initiative)
         opening = try? c.decodeIfPresent(OpeningResolution.self, forKey: .opening)
         completedFirstActions = try c.decodeIfPresent(Set<Combatant>.self,
                                                        forKey: .completedFirstActions) ?? []

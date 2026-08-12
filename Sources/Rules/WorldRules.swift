@@ -1335,6 +1335,11 @@ enum WorldRules {
             enabled: run.tuning.debugCombatV2BinderAttackEnabled,
             selectedNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
             ordinaryWeaponKind: CombatRules.damageKind(for: .binder, in: state))
+        let debugInitiativeReceipt = CombatDerivedStatsRules.debugInitiativeReceipt(
+            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
+            party: party, foes: foes,
+            binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
+            companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs)
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
                                                         foes: foes,
                                                         party: party,
@@ -1350,6 +1355,7 @@ enum WorldRules {
                                                         ordinaryPressureSlots: ordinaryPressureSlots,
                                                         initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
                                                         debugV2BinderAttack: debugAttackReceipt,
+                                                        debugV2Initiative: debugInitiativeReceipt,
                                                         rng: &run.rng)
         run.activeEncounter?.scalingPreview = scalingPreview
         if var encounter = run.activeEncounter {

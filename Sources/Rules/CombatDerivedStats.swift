@@ -112,6 +112,41 @@ enum CombatDerivedStatsRules {
             pierceBonus: preMatchupAttackBonus(ownedNodeIDs: supported, weaponDamageKind: .pierce))
     }
 
+    /// Pure DEBUG-route initiative snapshot. Only actors actually entering the encounter receive
+    /// entries, so an absent/unconscious party member cannot lend an aura to somebody else.
+    static func debugInitiativeReceipt(enabled: Bool, party: [Combatant], foes: [FoeState],
+                                       binderNodeIDs: Set<CombatNodeID>,
+                                       companionNodeIDs: [Int: Set<CombatNodeID>])
+        -> EncounterState.DebugV2InitiativeReceipt? {
+        guard enabled else { return nil }
+        let supported: Set<CombatNodeID> = [Node.quickStep, Node.lightFrame]
+        var entries = party.map { actor -> EncounterState.DebugV2InitiativeReceipt.Entry in
+            let owned: Set<CombatNodeID>
+            switch actor {
+            case .binder: owned = binderNodeIDs.intersection(supported)
+            case .companion(let index):
+                owned = (companionNodeIDs[index] ?? []).intersection(supported)
+            case .foe: owned = []
+            }
+            var components: [EncounterState.DebugV2InitiativeReceipt.Component] = []
+            if owned.contains(Node.quickStep) { components.append(.init(nodeID: Node.quickStep, amount: 4)) }
+            if owned.contains(Node.lightFrame) { components.append(.init(nodeID: Node.lightFrame, amount: 3)) }
+            components.sort { $0.nodeID.rawValue < $1.nodeID.rawValue }
+            let baseline = actor == .binder ? Tuning.Encounter.binderInitiative
+                                            : Tuning.Encounter.companionInitiative
+            return .init(actor: actor, baseline: baseline, components: components,
+                         total: baseline + components.reduce(0) { $0 + $1.amount },
+                         strikesFirst: false, finalPosition: nil)
+        }
+        entries += foes.map { foe in
+            let slow = foe.stats.damageKind == .crush ? Tuning.Encounter.crushInitiativePenalty : 0
+            let baseline = foe.stats.initiative - slow
+            return .init(actor: .foe(foe.id), baseline: baseline, components: [], total: baseline,
+                         strikesFirst: foe.stats.strikesFirst, finalPosition: nil)
+        }
+        return .init(entries: entries)
+    }
+
     static func derive(_ input: Input) -> Output {
         let owned = input.ownedNodeIDs
         var provenance: [String: Set<CombatNodeID>] = [:]

@@ -24,14 +24,20 @@ enum CombatRules {
                               ordinaryPressureSlots: Int = 0,
                               initiallyUnrecordedSpecies: Set<String> = [],
                               debugV2BinderAttack: EncounterState.DebugV2BinderAttackReceipt? = nil,
+                              debugV2Initiative: EncounterState.DebugV2InitiativeReceipt? = nil,
                               rng: inout SeededRNG) -> EncounterState {
         var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = party.map { member in
-            (member, member == .binder ? Tuning.Encounter.binderInitiative
-                                       : Tuning.Encounter.companionInitiative, false)
+            let frozen = debugV2Initiative?.entry(for: member)
+            return (member, frozen?.total ?? (member == .binder ? Tuning.Encounter.binderInitiative
+                                                                : Tuning.Encounter.companionInitiative),
+                    frozen?.strikesFirst ?? false)
         }
         for foe in foes {
             let slow = foe.stats.damageKind == .crush ? Tuning.Encounter.crushInitiativePenalty : 0
-            ranked.append((.foe(foe.id), foe.stats.initiative - slow, foe.stats.strikesFirst))
+            let actor = Combatant.foe(foe.id)
+            let frozen = debugV2Initiative?.entry(for: actor)
+            ranked.append((actor, frozen?.total ?? foe.stats.initiative - slow,
+                            frozen?.strikesFirst ?? foe.stats.strikesFirst))
         }
         // Ties broken off the run's own stream rather than by declaration order, so two identical
         // animals don't always act in the order they happened to be placed.
@@ -79,6 +85,14 @@ enum CombatRules {
         if ordinaryPressureSlots > 0 {
             opening.append("Pressed — \(ordinaryPressureSlots) lighter follow-up\(ordinaryPressureSlots == 1 ? "" : "s").")
         }
+        var finalizedInitiative = debugV2Initiative
+        if var receipt = finalizedInitiative {
+            for index in receipt.entries.indices {
+                receipt.entries[index].finalPosition = order.firstIndex(
+                    of: receipt.entries[index].actor).map { $0 + 1 }
+            }
+            finalizedInitiative = receipt
+        }
         return EncounterState(
             id: id,
             foes: foes,
@@ -87,6 +101,7 @@ enum CombatRules {
             turnSlots: slots,
             initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
             debugV2BinderAttack: debugV2BinderAttack,
+            debugV2Initiative: finalizedInitiative,
             log: opening
         )
     }

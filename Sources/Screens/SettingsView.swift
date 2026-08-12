@@ -120,6 +120,7 @@ struct SettingsView: View {
 #if DEBUG
 struct BalancingView: View {
     @EnvironmentObject private var settings: AppSettings
+    @EnvironmentObject private var store: GameStore
     @AppStorage("debug.simpleMapRenderer") private var useSimpleMapRenderer = false
 
     var body: some View {
@@ -212,13 +213,34 @@ struct BalancingView: View {
                 }
             }
 
-            Section("Combat v2 attack harness") {
-                Toggle("Use frozen v2 Binder attack", isOn: $settings.debugTuning.debugCombatV2BinderAttackEnabled)
+            Section("Combat v2 comparison harness") {
+                Toggle("Use frozen v2 combat inputs", isOn: $settings.debugTuning.debugCombatV2BinderAttackEnabled)
                 debugCombatNodeToggle("Heavy Hand · Crush +2",
                                       id: CombatDerivedStatsRules.Node.heavyHand)
                 debugCombatNodeToggle("Keen Eye · Pierce +2",
                                       id: CombatDerivedStatsRules.Node.keenEye)
-                Text("Binder-only comparison harness. Exact node IDs freeze when combat opens; changing these switches cannot alter an active encounter.")
+                debugCombatNodeToggle("Quick Step · initiative +4",
+                                      id: CombatDerivedStatsRules.Node.quickStep)
+                debugCombatNodeToggle("Light Frame · initiative +3",
+                                      id: CombatDerivedStatsRules.Node.lightFrame)
+                ForEach(store.state.base.activeParty, id: \.self) { index in
+                    if store.state.base.roster.indices.contains(index) {
+                        let name = store.state.base.roster[index].name
+                        Text("\(name) initiative ownership").font(.subheadline.weight(.semibold))
+                        debugCompanionNodeToggle("Quick Step · +4", index: index,
+                                                 id: CombatDerivedStatsRules.Node.quickStep)
+                        debugCompanionNodeToggle("Light Frame · +3", index: index,
+                                                 id: CombatDerivedStatsRules.Node.lightFrame)
+                    }
+                }
+                if settings.debugTuning.debugCombatV2BinderAttackEnabled,
+                   let preview = debugInitiativePreview {
+                    ForEach(preview.entries, id: \.actor) { entry in
+                        Text("\(debugActorName(entry.actor)) · \(entry.baseline)\(debugComponents(entry.components)) = \(entry.total)\(debugTieNote(entry, in: preview))")
+                            .font(.caption.monospacedDigit())
+                    }
+                }
+                Text("Explicit DEBUG ownership only. Party totals preview before contact; equal totals remain unresolved until the encounter's saved RNG breaks the tie. Exact inputs and final order freeze when combat opens.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -318,6 +340,44 @@ struct BalancingView: View {
                 if enabled { settings.debugTuning.debugCombatV2BinderNodeIDs.insert(id) }
                 else { settings.debugTuning.debugCombatV2BinderNodeIDs.remove(id) }
             }))
+    }
+
+    private func debugCompanionNodeToggle(_ title: String, index: Int,
+                                          id: CombatNodeID) -> some View {
+        Toggle(title, isOn: Binding(
+            get: { settings.debugTuning.debugCombatV2CompanionNodeIDs[index]?.contains(id) == true },
+            set: { enabled in
+                var nodes = settings.debugTuning.debugCombatV2CompanionNodeIDs[index] ?? []
+                if enabled { nodes.insert(id) } else { nodes.remove(id) }
+                if nodes.isEmpty { settings.debugTuning.debugCombatV2CompanionNodeIDs.removeValue(forKey: index) }
+                else { settings.debugTuning.debugCombatV2CompanionNodeIDs[index] = nodes }
+            }))
+    }
+
+    private var debugInitiativePreview: EncounterState.DebugV2InitiativeReceipt? {
+        CombatDerivedStatsRules.debugInitiativeReceipt(
+            enabled: settings.debugTuning.debugCombatV2BinderAttackEnabled,
+            party: CombatRules.party(of: store.state), foes: [],
+            binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
+            companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs)
+    }
+
+    private func debugActorName(_ actor: Combatant) -> String {
+        switch actor {
+        case .binder: "Binder"
+        case .companion(let index):
+            store.state.base.roster.indices.contains(index) ? store.state.base.roster[index].name : "Companion \(index)"
+        case .foe: "Foe"
+        }
+    }
+
+    private func debugComponents(_ components: [EncounterState.DebugV2InitiativeReceipt.Component]) -> String {
+        components.map { " + \($0.amount) [\($0.nodeID.rawValue)]" }.joined()
+    }
+
+    private func debugTieNote(_ entry: EncounterState.DebugV2InitiativeReceipt.Entry,
+                              in receipt: EncounterState.DebugV2InitiativeReceipt) -> String {
+        receipt.entries.filter { $0.total == entry.total }.count > 1 ? " · equal total: order unresolved" : ""
     }
 
     private func tuningSlider(_ title: String, value: Binding<Double>,

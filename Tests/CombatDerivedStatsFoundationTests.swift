@@ -62,6 +62,28 @@ final class CombatDerivedStatsFoundationTests: XCTestCase {
                        "Light Touch must preserve positive equipment initiative")
     }
 
+    func testDebugInitiativeReceiptKeepsPersonalStableCombatantOwnership() throws {
+        let quick = Rules.Node.quickStep
+        let frame = Rules.Node.lightFrame
+        let receipt = try XCTUnwrap(Rules.debugInitiativeReceipt(
+            enabled: true,
+            party: [.binder, .companion(2), .companion(7), .companion(9), .companion(11)],
+            foes: [], binderNodeIDs: [quick],
+            companionNodeIDs: [2: [frame], 5: [quick], 7: [quick, frame], 9: [quick]]))
+
+        XCTAssertEqual(receipt.entry(for: .binder)?.baseline, 42)
+        XCTAssertEqual(receipt.entry(for: .binder)?.total, 46, "Quick Step alone is personal +4")
+        XCTAssertEqual(receipt.entry(for: .companion(2))?.total, 43)
+        XCTAssertEqual(receipt.entry(for: .companion(7))?.total, 47, "same-owner +4/+3 sums to +7")
+        XCTAssertEqual(receipt.entry(for: .companion(9))?.total, 44,
+                       "Quick Step alone must work on its exact companion owner")
+        XCTAssertEqual(receipt.entry(for: .companion(11))?.total, 40,
+                       "other owners do not create a party aura")
+        XCTAssertNil(receipt.entry(for: .companion(5)),
+                     "an owner outside this encounter contributes nothing")
+        XCTAssertEqual(receipt.entry(for: .companion(2))?.components.map(\.nodeID), [frame])
+    }
+
     func testPersonalDurabilityAndEvasionAreExplicit() {
         let thick = node("defense.fortitude.thick_hide")
         let iron = node("defense.fortitude.iron_skin")

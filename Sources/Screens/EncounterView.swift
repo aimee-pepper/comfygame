@@ -14,6 +14,7 @@ struct EncounterView: View {
     @State private var isChoosingSkill = false
     @State private var isChoosingItem = false
     @State private var isConfirmingWithdraw = false
+    @State private var isShowingDebugV2Order = false
 
     private var run: WorldRun? { store.state.worlds.activeRun }
     private var encounter: EncounterState? { store.activeEncounter }
@@ -60,6 +61,34 @@ struct EncounterView: View {
                  ? "The party leaves this encounter and remains in the world. Vanish prevents this Stability loss."
                  : "The party leaves this encounter, remains in the world, and loses \(withdrawalCost) Stability.")
         }
+#if DEBUG
+        .sheet(isPresented: $isShowingDebugV2Order) {
+            if let encounter, let receipt = encounter.debugV2Initiative {
+                NavigationStack {
+                    List(receipt.entries.sorted { ($0.finalPosition ?? .max) < ($1.finalPosition ?? .max) },
+                         id: \.actor) { entry in
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("\(entry.finalPosition ?? 0). \(CombatRules.actorName(entry.actor, encounter: encounter))")
+                                .font(.headline)
+                            Text("Baseline \(entry.baseline) · total \(entry.total)")
+                                .font(.subheadline.monospacedDigit())
+                            ForEach(entry.components, id: \.nodeID) { component in
+                                Text("+\(component.amount) · \(debugInitiativeNodeName(component.nodeID)) [\(component.nodeID.rawValue)]")
+                                    .font(.caption.monospacedDigit())
+                            }
+                            if entry.strikesFirst {
+                                Text("Contact priority places this actor before ordinary initiative totals.")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .navigationTitle("V2 final order")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar { Button("Done") { isShowingDebugV2Order = false } }
+                }
+            }
+        }
+#endif
     }
 
     // MARK: Header
@@ -69,6 +98,17 @@ struct EncounterView: View {
             Text("Round \(encounter.roundNumber)")
                 .font(.headline.monospacedDigit())
             Spacer()
+#if DEBUG
+            if let receipt = encounter.debugV2Initiative {
+                Button("V2 order · \(receipt.entries.count) actors") {
+                    isShowingDebugV2Order = true
+                }
+                    .font(.caption.weight(.semibold))
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .accessibilityIdentifier("encounter.debug-v2-initiative-order")
+            }
+#endif
             Text(turnText(encounter))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -77,6 +117,16 @@ struct EncounterView: View {
         .padding(.vertical, 10)
         .background(.bar)
     }
+
+#if DEBUG
+    private func debugInitiativeNodeName(_ id: CombatNodeID) -> String {
+        switch id {
+        case CombatDerivedStatsRules.Node.quickStep: "Quick Step"
+        case CombatDerivedStatsRules.Node.lightFrame: "Light Frame"
+        default: id.rawValue
+        }
+    }
+#endif
 
     private func turnText(_ encounter: EncounterState) -> String {
         if encounter.outcome != nil { return "" }

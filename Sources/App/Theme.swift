@@ -159,6 +159,9 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
     /// Exact stable node IDs for the Binder-only combat-v2 comparison harness. These are frozen
     /// into an encounter; changing this preference never mutates a fight already in progress.
     var debugCombatV2BinderNodeIDs: Set<CombatNodeID> = []
+    /// Explicit companion ownership for the DEBUG combat-v2 initiative comparison. Keys are the
+    /// current roster indices used by Combatant; release ownership does not read this harness.
+    var debugCombatV2CompanionNodeIDs: [Int: Set<CombatNodeID>] = [:]
 
     var isDefault: Bool { self == .defaults }
 
@@ -238,6 +241,8 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
             forKey: .debugCombatV2BinderNodeIDs) ?? []
         debugCombatV2BinderAttackEnabled = try c.decodeIfPresent(Bool.self,
             forKey: .debugCombatV2BinderAttackEnabled) ?? false
+        debugCombatV2CompanionNodeIDs = try c.decodeIfPresent([Int: Set<CombatNodeID>].self,
+            forKey: .debugCombatV2CompanionNodeIDs) ?? [:]
     }
 }
 

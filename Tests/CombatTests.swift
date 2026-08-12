@@ -1732,6 +1732,109 @@ final class CombatTests: XCTestCase {
                        empty)
     }
 
+    func testFrozenDebugInitiativeDrivesOrderAndExplainsContactPriority() throws {
+        let quick = CombatDerivedStatsRules.Node.quickStep
+        let frame = CombatDerivedStatsRules.Node.lightFrame
+        var stats = CombatStats(displayName: "Ordinary", icon: "circle",
+                                maxHP: 20, attack: 2, armour: 0,
+                                damageKind: .pierce, initiative: 45)
+        stats.strikesFirst = false
+        let ordinaryFoe = FoeState(id: InstanceID(rawValue: 90), stats: stats, currentHP: 20)
+        stats.initiative = 1
+        stats.strikesFirst = true
+        let priorityFoe = FoeState(id: InstanceID(rawValue: 91), stats: stats, currentHP: 20)
+        let draft = try XCTUnwrap(CombatDerivedStatsRules.debugInitiativeReceipt(
+            enabled: true, party: [.binder, .companion(2), .companion(7)],
+            foes: [ordinaryFoe, priorityFoe], binderNodeIDs: [quick],
+            companionNodeIDs: [2: [frame], 7: [quick]]))
+        var rng = SeededRNG(seed: 700)
+        let encounter = CombatRules.makeEncounter(
+            id: InstanceID(rawValue: 3), foes: [ordinaryFoe, priorityFoe],
+            party: [.binder, .companion(2), .companion(7)],
+            debugV2Initiative: draft, rng: &rng)
+
+        XCTAssertEqual(encounter.order.first, .foe(priorityFoe.id),
+                       "strikesFirst remains separate from the numeric initiative total")
+        XCTAssertLessThan(try XCTUnwrap(encounter.order.firstIndex(of: .binder)),
+                          try XCTUnwrap(encounter.order.firstIndex(of: .foe(ordinaryFoe.id))),
+                          "Quick Step must cross the ordinary foe's initiative")
+        let saved = try XCTUnwrap(encounter.debugV2Initiative)
+        XCTAssertEqual(saved.entry(for: .binder)?.total, 46)
+        XCTAssertEqual(saved.entry(for: .companion(2))?.total, 43)
+        XCTAssertEqual(saved.entry(for: .companion(7))?.total, 44)
+        XCTAssertEqual(saved.entry(for: .foe(priorityFoe.id))?.strikesFirst, true)
+        XCTAssertEqual(saved.entries.compactMap(\.finalPosition).sorted(), Array(1...5))
+        XCTAssertEqual(try JSONDecoder().decode(EncounterState.self,
+                                                from: JSONEncoder().encode(encounter)).debugV2Initiative,
+                       saved)
+    }
+
+    func testDebugInitiativeDisabledAndEnabledEmptyPreserveLegacyOrder() throws {
+        let foe = FoeState(id: InstanceID(rawValue: 92),
+                           stats: CombatStats(displayName: "Tie", icon: "circle",
+                                              maxHP: 10, attack: 1, armour: 0, initiative: 42),
+                           currentHP: 10)
+        var legacyRNG = SeededRNG(seed: 808)
+        var emptyRNG = SeededRNG(seed: 808)
+        let legacy = CombatRules.makeEncounter(id: InstanceID(rawValue: 1), foes: [foe], party: [.binder, .companion(4)],
+                                               rng: &legacyRNG)
+        let emptyDraft = try XCTUnwrap(CombatDerivedStatsRules.debugInitiativeReceipt(
+            enabled: true, party: [.binder, .companion(4)], foes: [foe],
+            binderNodeIDs: [], companionNodeIDs: [:]))
+        let empty = CombatRules.makeEncounter(id: InstanceID(rawValue: 2), foes: [foe], party: [.binder, .companion(4)],
+                                              debugV2Initiative: emptyDraft, rng: &emptyRNG)
+        XCTAssertEqual(empty.order, legacy.order)
+        XCTAssertNil(legacy.debugV2Initiative)
+        XCTAssertNotNil(empty.debugV2Initiative)
+    }
+
+    func testWorldRulesFreezesDebugInitiativeFromRunTuningAtContact() throws {
+        let io = SaveFileIO.temporary(name: "v2-initiative-entry-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart())
+        store.mutate("configure exact v2 initiative ownership") { state in
+            guard var run = state.worlds.activeRun, let enemy = run.enemies.first else { return }
+            run.tuning.debugCombatV2BinderAttackEnabled = true
+            run.tuning.debugCombatV2BinderNodeIDs = [CombatDerivedStatsRules.Node.quickStep]
+            run.tuning.debugCombatV2CompanionNodeIDs = [0: [CombatDerivedStatsRules.Node.lightFrame]]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
+        }
+        let frozen = try XCTUnwrap(store.activeEncounter?.debugV2Initiative)
+        XCTAssertEqual(frozen.entry(for: .binder)?.total, 46)
+        if CombatRules.party(of: store.state).contains(.companion(0)) {
+            XCTAssertEqual(frozen.entry(for: .companion(0))?.total, 43)
+        }
+
+        store.mutate("change harness after contact") { state in
+            state.worlds.activeRun?.tuning.debugCombatV2BinderNodeIDs = []
+            state.worlds.activeRun?.tuning.debugCombatV2CompanionNodeIDs = [:]
+        }
+        XCTAssertEqual(store.activeEncounter?.debugV2Initiative, frozen)
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.activeEncounter?.debugV2Initiative, frozen)
+        XCTAssertEqual(relaunched.activeEncounter?.order, store.activeEncounter?.order)
+    }
+
+    func testDebugInitiativeDetailsPresentWithoutGrowingEncounterHeaderByActorCount() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent("Sources/Screens/EncounterView.swift"),
+                                encoding: .utf8)
+        let headerStart = try XCTUnwrap(source.range(of: "private func header(_ encounter:"))
+        let headerEnd = try XCTUnwrap(source.range(of: "private func turnText", range: headerStart.upperBound..<source.endIndex))
+        let header = String(source[headerStart.lowerBound..<headerEnd.lowerBound])
+
+        XCTAssertTrue(header.contains("Button(\"V2 order · \\(receipt.entries.count) actors\")"))
+        XCTAssertFalse(header.contains("ForEach"))
+        XCTAssertFalse(header.contains("receipt.entries.sorted"),
+                       "receipt rows belong in presented detail, never the gameplay header")
+        XCTAssertTrue(source.contains(".sheet(isPresented: $isShowingDebugV2Order)"))
+        XCTAssertTrue(source.contains("Contact priority places this actor before ordinary initiative totals."))
+    }
+
     func testFrozenDebugV2ReceiptUsesOnlyTheMatchingExactNode() throws {
         let heavy = CombatDerivedStatsRules.Node.heavyHand
         let keen = CombatDerivedStatsRules.Node.keenEye
