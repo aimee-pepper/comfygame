@@ -105,10 +105,13 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
     /// raised by having gone out and measured things — so the two instrument families feed each
     /// other rather than sitting side by side.
     var needsInstruments: Int = 0
+    /// Committed Raw Essence conversions required before this node can be bought.
+    var needsLifetimeRawRefined: Int = 0
 
     init(id: ResearchNodeID, branch: ResearchBranchID, name: String, icon: String, blurb: String,
          cost: UpgradeCost, requires: [ResearchNodeID] = [], grants: [ResearchGrant] = [],
-         needsStationTier: Int = 0, needsInstruments: Int = 0) {
+         needsStationTier: Int = 0, needsInstruments: Int = 0,
+         needsLifetimeRawRefined: Int = 0) {
         self.id = id
         self.branch = branch
         self.name = name
@@ -119,6 +122,7 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
         self.grants = grants
         self.needsStationTier = needsStationTier
         self.needsInstruments = needsInstruments
+        self.needsLifetimeRawRefined = needsLifetimeRawRefined
     }
 
     /// Tolerant, per the policy in `Migrations.swift`.
@@ -134,6 +138,8 @@ struct ResearchNodeDef: Codable, Equatable, Identifiable, Sendable {
         grants = try c.decodeIfPresent([ResearchGrant].self, forKey: .grants) ?? []
         needsStationTier = try c.decodeIfPresent(Int.self, forKey: .needsStationTier) ?? 0
         needsInstruments = try c.decodeIfPresent(Int.self, forKey: .needsInstruments) ?? 0
+        needsLifetimeRawRefined = try c.decodeIfPresent(Int.self,
+                                                        forKey: .needsLifetimeRawRefined) ?? 0
     }
 }
 

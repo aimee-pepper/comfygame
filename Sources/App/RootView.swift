@@ -175,7 +175,14 @@ private struct RunExitSummaryView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Essence runway").font(.headline)
                         LabeledContent("Raw Essence collected", value: "\(summary.essenceEconomy.rawCollected)")
-                        LabeledContent("Refined equivalent", value: "\(summary.essenceEconomy.refinedEquivalent)")
+                        if summary.essenceEconomy.refinedEquivalent > 0 {
+                            LabeledContent("Value at current rate",
+                                           value: "\(summary.essenceEconomy.refinedEquivalent) Essence")
+                        }
+                        if summary.essenceEconomy.rawAutoRefined > 0 {
+                            LabeledContent("Continuous settling",
+                                           value: "\(summary.essenceEconomy.rawAutoRefined) Raw → \(summary.essenceEconomy.automaticallyRefinedEssence) Essence")
+                        }
                         LabeledContent("Bind cost paid", value: "\(summary.essenceEconomy.bindCostPaid)")
                         LabeledContent("Spring yield", value: "+\(summary.essenceEconomy.springYield)")
                         if summary.essenceEconomy.antiLockSubsidy > 0 {

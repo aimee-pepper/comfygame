@@ -84,7 +84,7 @@ enum TutorialRules {
                             reason: .unidentifiedObject, writingID: item.rawValue)
         } else if banked.returnedRawEssence
                     && state.base.essence < EconomyRules.minimumBindCost(in: state) {
-            context = .init(runIndex: run.runIndex, route: .workshop,
+            context = .init(runIndex: run.runIndex, route: .essenceSpring,
                             reason: .rawEssence, writingID: nil)
         } else if let traveller = newTravellers.sorted(by: { $0.rawValue < $1.rawValue }).first {
             context = .init(runIndex: run.runIndex, route: .firepit,
@@ -101,7 +101,8 @@ enum TutorialRules {
         switch route {
         case .library: .library
         case .storehouse: .storehouse
-        case .workshop: .workshop
+        case .workshop: .essenceSpring
+        case .essenceSpring: .essenceSpring
         case .firepit: .firepit
         case .writingDesk: .writingDesk
         }
@@ -113,7 +114,8 @@ enum TutorialRules {
             return libraryCopy(context, in: state)
                 ?? "You brought back writing. The Library keeps its words beside everything else you have learned. The selected record is not present in this migrated save."
         case .storehouse: return "Something returned without a known name. The Storehouse is where an object can be identified without guessing at its use."
-        case .workshop: return "Raw essence cannot bind a page. Refine what returned at the Workshop."
+        case .workshop: return "Raw essence cannot bind a page. Refine what returned at the Essence Spring."
+        case .essenceSpring: return "Raw essence cannot bind a page. Refine what returned at the Essence Spring."
         case .firepit: return "Someone new is at the Base. The Firepit is where you choose who travels; Party holds their stats, gear, rank and gambits."
         case .writingDesk: return "This journey is now part of World History. Bind again when you want another comparison."
         }

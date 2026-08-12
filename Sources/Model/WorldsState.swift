@@ -161,10 +161,44 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     struct EssenceEconomy: Codable, Equatable, Sendable {
         var rawCollected: Int = 0
         var refinedEquivalent: Int = 0
+        var rawAutoRefined: Int = 0
+        var automaticallyRefinedEssence: Int = 0
         var bindCostPaid: Int = 0
         var springYield: Int = 0
         var antiLockSubsidy: Int = 0
         var netRunway: Int = 0
+
+        init(rawCollected: Int = 0, refinedEquivalent: Int = 0,
+             rawAutoRefined: Int = 0, automaticallyRefinedEssence: Int = 0,
+             bindCostPaid: Int = 0, springYield: Int = 0,
+             antiLockSubsidy: Int = 0, netRunway: Int = 0) {
+            self.rawCollected = rawCollected
+            self.refinedEquivalent = refinedEquivalent
+            self.rawAutoRefined = rawAutoRefined
+            self.automaticallyRefinedEssence = automaticallyRefinedEssence
+            self.bindCostPaid = bindCostPaid
+            self.springYield = springYield
+            self.antiLockSubsidy = antiLockSubsidy
+            self.netRunway = netRunway
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case rawCollected, refinedEquivalent, rawAutoRefined, automaticallyRefinedEssence
+            case bindCostPaid, springYield, antiLockSubsidy, netRunway
+        }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            rawCollected = try c.decodeIfPresent(Int.self, forKey: .rawCollected) ?? 0
+            refinedEquivalent = try c.decodeIfPresent(Int.self, forKey: .refinedEquivalent) ?? 0
+            rawAutoRefined = try c.decodeIfPresent(Int.self, forKey: .rawAutoRefined) ?? 0
+            automaticallyRefinedEssence = try c.decodeIfPresent(Int.self,
+                                                                 forKey: .automaticallyRefinedEssence) ?? 0
+            bindCostPaid = try c.decodeIfPresent(Int.self, forKey: .bindCostPaid) ?? 0
+            springYield = try c.decodeIfPresent(Int.self, forKey: .springYield) ?? 0
+            antiLockSubsidy = try c.decodeIfPresent(Int.self, forKey: .antiLockSubsidy) ?? 0
+            netRunway = try c.decodeIfPresent(Int.self, forKey: .netRunway) ?? 0
+        }
     }
     enum Kind: String, Codable, Equatable, Sendable {
         case portal, waystone, defeat, collapse, abandon

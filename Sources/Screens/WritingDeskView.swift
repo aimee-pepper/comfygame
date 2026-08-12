@@ -418,7 +418,7 @@ struct WritingDeskView: View {
         if !store.canBindAndDepart(bornAnchored: bornAnchored) {
             if store.needsToRefine {
                 let raw = state.base.resources[Resources.essenceRaw]
-                return "You have \(state.base.essence) essence and \(raw) raw. Refine it at the Workshop — raw essence can't be written with."
+                return "You have \(state.base.essence) essence and \(raw) raw. Refine it at the Essence Spring — raw essence can't be written with."
             }
             return "You have \(state.base.essence) essence; this binding costs \(totalCost). Erase a mark or bind it without anchoring."
         }

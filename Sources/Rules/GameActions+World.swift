@@ -415,6 +415,9 @@ extension GameStore {
                 state.worlds.anchoredRealms[index].world = run.anchoredSnapshot
             }
             if kind == .portal { state.reality.lifetime.runsBankedViaPortal += 1 }
+            let automatic = EconomyRules.commitContinuousSettling(rawUnits: banked.rawEssence,
+                                                                   outcomeID: outcomeID,
+                                                                   in: &state)
             let springYield = GameStore.essenceSpringYield(for: state)
             if state.worlds.lastSpringOutcomeID != outcomeID {
                 GameStore.creditEssenceSpring(&state)
@@ -435,7 +438,12 @@ extension GameStore {
                                                    recruitedTravellers: GameStore.travellersRecruited(in: run, state: state),
                                                    experienceBreakdown: run.experienceBreakdown,
                                                    essenceEconomy: .init(rawCollected: banked.rawEssence,
-                                                       refinedEquivalent: EconomyRules.refine(rawUnits: banked.rawEssence),
+                                                       refinedEquivalent: EconomyRules.refine(
+                                                        rawUnits: max(0, banked.rawEssence
+                                                                      - (automatic?.rawSpent ?? 0)),
+                                                                                              in: state),
+                                                       rawAutoRefined: automatic?.rawSpent ?? 0,
+                                                       automaticallyRefinedEssence: automatic?.essenceGained ?? 0,
                                                        bindCostPaid: run.book.essencePaid,
                                                        springYield: springYield,
                                                        netRunway: EconomyRules.spendableEssence(in: state)))
@@ -461,6 +469,9 @@ extension GameStore {
                 state.worlds.anchoredRealms[index].world = run.anchoredSnapshot
             }
             if kind == .collapse { state.reality.lifetime.runsLostToCollapse += 1 }
+            let automatic = EconomyRules.commitContinuousSettling(rawUnits: banked.rawEssence,
+                                                                   outcomeID: outcomeID,
+                                                                   in: &state)
             let springYield = GameStore.essenceSpringYield(for: state)
             if state.worlds.lastSpringOutcomeID != outcomeID {
                 GameStore.creditEssenceSpring(&state)
@@ -481,7 +492,12 @@ extension GameStore {
                                                    recruitedTravellers: GameStore.travellersRecruited(in: run, state: state),
                                                    experienceBreakdown: run.experienceBreakdown,
                                                    essenceEconomy: .init(rawCollected: banked.rawEssence,
-                                                       refinedEquivalent: EconomyRules.refine(rawUnits: banked.rawEssence),
+                                                       refinedEquivalent: EconomyRules.refine(
+                                                        rawUnits: max(0, banked.rawEssence
+                                                                      - (automatic?.rawSpent ?? 0)),
+                                                                                              in: state),
+                                                       rawAutoRefined: automatic?.rawSpent ?? 0,
+                                                       automaticallyRefinedEssence: automatic?.essenceGained ?? 0,
                                                        bindCostPaid: run.book.essencePaid,
                                                        springYield: springYield,
                                                        netRunway: EconomyRules.spendableEssence(in: state)))

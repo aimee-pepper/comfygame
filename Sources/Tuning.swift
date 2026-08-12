@@ -922,9 +922,10 @@ enum Tuning {
         static let bornAnchoredBasePremium: Int = 100 // PLACEHOLDER
         static let bornAnchoredBookCostMultiplier: Int = 2 // PLACEHOLDER
         static let identifyCostEssence: Int = 5      // PLACEHOLDER
-        /// Raw essence refines into this much essence at the Workshop. The join between what
-        /// worlds give you and what the base runs on.
+        /// Opening conversion at the Essence Spring. Second pass raises the active rate without
+        /// rewriting old transactions.
         static let essencePerRawEssence: Int = 2    // PLACEHOLDER
+        static let secondPassEssencePerRawEssence: Int = 3 // PLACEHOLDER
 
         // Locked caches — guaranteed Rare+ (design brief).
         static let cacheMoteRange: ClosedRange<Int> = 1...2 // PLACEHOLDER

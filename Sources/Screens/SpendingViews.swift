@@ -6,29 +6,45 @@ import SwiftUI
 /// Raw essence → essence. The join between what worlds give you and what the base runs on.
 struct RefineryCard: View {
     @EnvironmentObject private var store: GameStore
+    @State private var selectedRaw = 1
 
     private var raw: Int { store.state.base.resources[Resources.essenceRaw] }
+    private var selected: Int { min(max(1, selectedRaw), max(1, raw)) }
+    private var rate: Int { EconomyRules.refinementRate(in: store.state) }
 
     var body: some View {
         StationCard(title: "Refinery", icon: "flask") {
             LabeledRow(icon: "drop", label: "Raw essence held", value: "\(raw)")
-            LabeledRow(icon: "arrow.right", label: "Refines into",
-                       value: "\(EconomyRules.refine(rawUnits: raw)) essence")
+            LabeledRow(icon: "arrow.right", label: "Active rate", value: "1 Raw → \(rate) Essence")
+
+            Stepper(value: $selectedRaw, in: 1...max(1, raw)) {
+                LabeledContent("Selected", value: raw == 0 ? "—" : "\(selected) Raw → \(selected * rate) Essence")
+            }
+            .frame(minHeight: 44)
+            .disabled(raw == 0)
 
             Button {
-                store.refineAllEssence()
+                if store.refineEssence(rawUnits: selected) {
+                    selectedRaw = min(selectedRaw, max(1, raw))
+                }
             } label: {
-                Label(raw > 0 ? "Refine all" : "Nothing to refine", systemImage: "flame")
+                Label(raw > 0 ? "Refine selected" : "Nothing to refine", systemImage: "flame")
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 44)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.borderedProminent)
             .disabled(raw == 0)
 
-            Text("Worlds give you raw essence. The base runs on refined. This is where one becomes the other.")
+            Button("Refine all · \(raw * rate) Essence") { store.refineAllEssence() }
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .buttonStyle(.bordered)
+                .disabled(raw == 0)
+
+            Text("The preview is exact. Only a confirmed conversion increases refining practice.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
+        .onChange(of: raw) { _, value in selectedRaw = min(selectedRaw, max(1, value)) }
     }
 }
 

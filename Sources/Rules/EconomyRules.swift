@@ -10,10 +10,59 @@ enum EconomyRules {
 
     // MARK: Refining
 
-    /// Raw essence is what worlds give you; essence is what the base runs on. The Workshop is where
-    /// one becomes the other (design brief), and it's the join between harvesting and spending.
+    struct RefinementReceipt: Equatable, Sendable {
+        var rawSpent: Int
+        var essenceGained: Int
+        var rate: Int
+    }
+
+    static let secondPassNode: ResearchNodeID = "essence_second_pass"
+    static let continuousSettlingNode: ResearchNodeID = "essence_continuous_settling"
+    static var secondPassPracticeRequired: Int {
+        ContentCatalog.shared.researchNode(secondPassNode)?.needsLifetimeRawRefined ?? 50
+    }
+
+    /// Legacy/opening projection retained for callers without campaign state.
     static func refine(rawUnits: Int) -> Int {
         max(0, rawUnits) * Tuning.Economy.essencePerRawEssence
+    }
+
+    static func refinementRate(in state: GameState) -> Int {
+        state.base.completedResearch.contains(secondPassNode)
+            ? Tuning.Economy.secondPassEssencePerRawEssence
+            : Tuning.Economy.essencePerRawEssence
+    }
+
+    static func refine(rawUnits: Int, in state: GameState) -> Int {
+        max(0, rawUnits) * refinementRate(in: state)
+    }
+
+    /// One rules-owned transaction used by manual and outcome-driven conversion.
+    @discardableResult
+    static func commitRefinement(rawUnits: Int, in state: inout GameState) -> RefinementReceipt? {
+        let available = state.base.resources[Resources.essenceRaw]
+        guard rawUnits > 0, rawUnits <= available else { return nil }
+        let amount = rawUnits
+        let rate = refinementRate(in: state)
+        let gained = amount * rate
+        state.base.resources.spend(amount, of: Resources.essenceRaw)
+        state.base.essence += gained
+        state.base.lifetimeRawEssenceRefined += amount
+        return RefinementReceipt(rawSpent: amount, essenceGained: gained, rate: rate)
+    }
+
+    /// Processes only the Raw retained by this outcome; older stored Raw is never swept in.
+    @discardableResult
+    static func commitContinuousSettling(rawUnits: Int, outcomeID: ExpeditionOutcomeID,
+                                         in state: inout GameState) -> RefinementReceipt? {
+        guard state.base.completedResearch.contains(continuousSettlingNode),
+              state.base.autoRefineReturnedRawEssence,
+              state.base.station(Stations.essenceSpring).tier >= 1,
+              state.base.lastAutoRefinedOutcomeID != outcomeID else { return nil }
+        guard rawUnits >= 0, rawUnits <= state.base.resources[Resources.essenceRaw] else { return nil }
+        state.base.lastAutoRefinedOutcomeID = outcomeID
+        guard rawUnits > 0 else { return nil }
+        return commitRefinement(rawUnits: rawUnits, in: &state)
     }
 
     /// **The cheapest book that can possibly be written: an empty page.**
@@ -32,7 +81,7 @@ enum EconomyRules {
 
     /// Everything the player could turn into essence right now without leaving the base.
     static func spendableEssence(in state: GameState) -> Int {
-        state.base.essence + refine(rawUnits: state.base.resources[Resources.essenceRaw])
+        state.base.essence + refine(rawUnits: state.base.resources[Resources.essenceRaw], in: state)
     }
 
     // MARK: Research
@@ -45,6 +94,7 @@ enum EconomyRules {
             && node.requires.allSatisfy { prerequisiteSatisfied($0, in: state) }
             && buildingAllows(node, in: state) == nil
             && kitAllows(node, in: state) == nil
+            && practiceAllows(node, in: state) == nil
     }
 
     /// **Whether you have measured enough to be worth predicting with** (`crafting-spec.md` PART TWO).
@@ -57,6 +107,11 @@ enum EconomyRules {
         guard node.needsInstruments > measured else { return nil }
         let short = node.needsInstruments - measured
         return "\(short) more field reading\(short == 1 ? "" : "s") to grind it against"
+    }
+
+    static func practiceAllows(_ node: ResearchNodeDef, in state: GameState) -> String? {
+        let missing = max(0, node.needsLifetimeRawRefined - state.base.lifetimeRawEssenceRefined)
+        return missing == 0 ? nil : "refine \(missing) more Raw Essence first"
     }
 
     /// **Whether the building that teaches this is built, and built far enough** (Q40).
@@ -114,6 +169,7 @@ enum EconomyRules {
             .compactMap { ContentCatalog.shared.researchNode($0)?.name }
         if let blocked = buildingAllows(node, in: state) { missing.append(blocked) }
         if let unmeasured = kitAllows(node, in: state) { missing.append(unmeasured) }
+        if let practice = practiceAllows(node, in: state) { missing.append(practice) }
         return missing
     }
 

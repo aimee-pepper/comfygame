@@ -140,6 +140,7 @@ struct BaseView: View {
         case .library: "Library"
         case .storehouse: "Storehouse"
         case .workshop: "Workshop"
+        case .essenceSpring: "Essence Spring"
         case .firepit: "Firepit"
         case .writingDesk: "Writing Desk"
         }

@@ -312,6 +312,10 @@ struct ContentCatalog: Sendable {
         let symbolIDs = Set(symbols.map(\.id))
 
         for node in researchNodes {
+            guard node.needsLifetimeRawRefined >= 0 else {
+                throw ContentError.danglingReference(
+                    "research node '\(node.id)' has negative refining practice")
+            }
             guard branchIDs.contains(node.branch) else {
                 throw ContentError.danglingReference("research node '\(node.id)' is in unknown branch '\(node.branch)'")
             }

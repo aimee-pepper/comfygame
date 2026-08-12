@@ -122,24 +122,30 @@ extension GameStore {
     }
 
 
-    // MARK: - Workshop
+    // MARK: - Essence Spring
 
     /// Raw essence → essence. The join between what worlds give you and what the base spends.
     @discardableResult
     func refineEssence(rawUnits: Int) -> Bool {
-        let available = state.base.resources[Resources.essenceRaw]
-        let amount = min(max(0, rawUnits), available)
-        guard amount > 0 else { return false }
-
-        mutate("refine \(amount) raw essence", flush: true) { state in
-            state.base.resources.spend(amount, of: Resources.essenceRaw)
-            state.base.essence += EconomyRules.refine(rawUnits: amount)
+        guard rawUnits > 0,
+              rawUnits <= state.base.resources[Resources.essenceRaw] else { return false }
+        var receipt: EconomyRules.RefinementReceipt?
+        mutate("refine raw essence", flush: true) { state in
+            receipt = EconomyRules.commitRefinement(rawUnits: rawUnits, in: &state)
         }
-        return true
+        return receipt != nil
     }
 
     func refineAllEssence() {
         refineEssence(rawUnits: state.base.resources[Resources.essenceRaw])
+    }
+
+    func setAutoRefineReturnedRawEssence(_ enabled: Bool) {
+        guard state.base.completedResearch.contains(EconomyRules.continuousSettlingNode),
+              state.base.station(Stations.essenceSpring).tier >= 1 else { return }
+        mutate("set continuous settling", flush: true) {
+            $0.base.autoRefineReturnedRawEssence = enabled
+        }
     }
 
     /// **The base never strands you.**

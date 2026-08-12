@@ -3,8 +3,8 @@
   "updated": "11 Aug 2026",
   "installedCheckpoint": "ce9b1af · Combat technique ownership and Withdraw",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 Noll and player-facing Recycler phone acceptance",
-  "currentNote": "Installed checkpoint ce9b1af assigns combat techniques by identity and makes Vanish apply to one confirmed Withdraw. Noll and the player-facing Recycler are implemented and green; signed phone installation is held while the fresh-save traveller test is active.",
+  "currentWork": "P1 Noll/Recycler device acceptance waiting · Spring source ready",
+  "currentNote": "WIP limit: one Engineering slice, one phone acceptance checkpoint and at most one directly enabling Asset consumer. Essence Spring refining is source-green and awaits its ordered phone gate; the app remains untouched during Aimee's fresh-save test. Next is Noll/Recycler aaf6280 device acceptance using the Phase 1 phone card, followed by resource/terrain/UI and bug-delivery acceptance. Source-green and readyToTest remain unfinished; no additional Engineering implementation slice starts behind this acceptance queue.",
   "items": [
     {
       "id": "essence",
@@ -50,7 +50,7 @@
       "id": "recycler",
       "priority": "P1",
       "title": "Noll and the player-facing Recycler",
-      "status": "readyToTest",
+      "status": "inProgress",
       "detail": "Implemented and green: Noll is the 29th live traveller; the 15-Essence Recycler has a distinct Make route and atomic receipt-first recovery screen; station runway preview and corrected Sela/Halloway review IDs are included. Field Separation Kit remains held. Signed phone installation is waiting for Aimee's active fresh-save traveller test to finish.",
       "gate": "Use opening-economy-trio-promotion-audit-current.md: 29-live catalogue, Noll band0/order2/signature, 15-Essence build, dormant old-state migration, atomic Recycler phone route, no Field Kit, corrected Sela/Halloway exchange IDs and complete sell→recycle→make→bind runway proof."
     },
@@ -82,8 +82,8 @@
       "id": "noll",
       "priority": "G",
       "title": "Noll second + Halloway third",
-      "status": "queued",
-      "detail": "Promote reversible playtest Noll as order 2/story-arrival band 0 and sole Recycler owner. Use current stable-ID meeting/diary units as DEBUG-Atlas-labelled Provisional copy, do not grant the held Field Separation Kit, and do not grant Noll to old saves.",
+      "status": "complete",
+      "detail": "Complete in aaf6280: Noll is live at order 2/story-arrival band 0 as sole Recycler owner with provisional copy; Halloway remains order 3. The Field Separation Kit remains absent and old saves receive no free Noll.",
       "gate": "Fresh-save signature/one-person selection, provisional-copy census, meeting/recruitment, 15e Recycler construction, sell-versus-recycle runway and old-save dormant-state migration are green without a free Noll or Field Separation Kit."
     },
     {
@@ -154,9 +154,9 @@
       "id": "refining",
       "priority": "P1",
       "title": "Spring refining skills",
-      "status": "queued",
-      "detail": "Decision186 supplies a reversible playtest profile: move refinement to the Essence Spring; free exact selected/all at 2:1; Second pass at 50 lifetime Raw refined + 80 Essence/10 Quartz raises future conversion to 3:1; Continuous settling later auto-refines only newly retained Raw once per outcome; Deepen remains a parallel dividend branch.",
-      "gate": "Fresh/legacy saves preserve balances and Deepen completion; Workshop has no refinery claim; committed practice is exact and idempotent; 2:1/3:1 previews share rules; auto-refining handles retained outcomes once; phone/Large Text Spring graph fits without routine scrolling. Authority: essence-spring-review-batch-current.md and Decision186."
+      "status": "readyToTest",
+      "detail": "Source-green reversible profile: the Essence Spring solely owns exact selected/all conversion at 1 Raw → 2 Essence; Second pass requires 50 lifetime committed Raw plus 80 Essence/10 Quartz and changes future conversion to 1 Raw → 3 Essence; Continuous settling auto-refines only newly retained Raw once per outcome; Deepen remains a parallel dividend branch.",
+      "gate": "Fresh/legacy saves preserve balances and Deepen completion; Workshop has no refinery claim; committed practice is exact and idempotent; 1 Raw → 2/3 Essence previews share rules; auto-refining handles retained outcomes once; phone/Large Text Spring graph fits without routine scrolling. Authority: essence-spring-review-batch-current.md and Decision186."
     },
     {
       "id": "world-color",
@@ -168,7 +168,7 @@
     },
     {
       "id": "bug-reporter",
-      "priority": "P1",
+      "priority": "P0",
       "title": "In-game bug reporter",
       "status": "readyToTest",
       "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference, active DEBUG tuning, a bounded 20-action semantic trail and an idempotent HTTPS relay adapter are checkpointed. f9be251 labels local Save/Done honestly and proves they make zero transport calls. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
@@ -176,7 +176,7 @@
     },
     {
       "id": "dynamic-authority-audit",
-      "priority": "P1",
+      "priority": "P2",
       "title": "Static/manual authority audit",
       "status": "queued",
       "detail": "Fourth audit pass is current in static-manual-authority-audit-current.md. P0 before combat v2: repair the currently stale native graph generator/output. Then derive roadmap schema 2 and atlas review union; move Trading Post/Recycler classifications and baseline combat ownership into their owning catalogues at those checkpoints.",
@@ -184,7 +184,7 @@
     },
     {
       "id": "encounter-scaling",
-      "priority": "P1",
+      "priority": "P0",
       "title": "Party and apex difficulty",
       "status": "readyToTest",
       "detail": "Binder-anchored additive power, path-honest visible grouping, proportional encounter HP, saved 55% affliction-free follow-ups and apex-only scaling are integrated. Legacy and frozen v1 runs retain their historical grouping and rules.",
@@ -202,7 +202,7 @@
       "id": "combat-tree-v2",
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
-      "status": "inProgress",
+      "status": "queued",
       "detail": "Checkpoints 71ffca2 and a86c2d3 establish generated true-graph authority and dormant stable-ID derived stats; installed f178936 makes the live strike path consume one shared damage rule. The current Decision185 slice replaces universal technique grants with Binder Unbind/Sight, Quill Mend/Read, Ashe Ground, exact graph ownership, inert decode-only Rout, and one confirmed Vanish-powered Withdraw per expedition.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
@@ -224,7 +224,7 @@
     },
     {
       "id": "scent-mask",
-      "priority": "P1",
+      "priority": "P2",
       "title": "Prepared animal-avoidance route",
       "status": "queued",
       "detail": "Complete the requested non-skill encounter-avoidance route after Apothecary reachability: Nessa tier-0 Scent Mask consumes one Reagent plus one exact grade-25+ animal world resource, costs 0 Essence, and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation.",
@@ -280,7 +280,7 @@
     },
     {
       "id": "penmanship-native",
-      "priority": "P1",
+      "priority": "P2",
       "title": "Brush, ink and Fountain pen progression",
       "status": "queued",
       "detail": "Migrate Pencil to Brush and implement the settled Penmanship fan/fork with Brush-gated sibling Ink Mixing, Compound Assembly and Chaining, then ruling frame and Fountain pen. Decision187 supplies a reversible coherent 40–220 Essence comparison profile rather than preserving the 150-Essence first-hand bottleneck.",
@@ -312,7 +312,7 @@
     },
     {
       "id": "legacy-token-quirk-cleanup",
-      "priority": "P2",
+      "priority": "P3",
       "title": "Remove retired Token and Quirk promises",
       "status": "queued",
       "detail": "Decision189 cuts Traveller's Token and the separately rolled Quirk/veto/reroll layer. Scent Mask remains independently justified; paired opportunity/consequence remains systemic. Clean only remaining current/runtime promises while preserving legacy decode aliases and archived rationale.",
@@ -322,7 +322,9 @@
   "paused": [
     "Broad asset and catalogue expansion",
     "Tutorial content for outside testers",
-    "New stations and companion systems",
+    "New late-game stations and specialist breadth until existing systems pass completion gates",
+    "Generated people, Tavern visitors, Menagerie, animal combat, predation and group motion",
+    "Anchored-realm production and anchor-route retuning",
     "Great Work, Reality reset and Tam",
     "Animation and non-blocking polish"
   ]

@@ -25,7 +25,8 @@ enum StationRunwayRules {
     }
 
     static func preview(for station: StationDef, in state: GameState) -> Preview {
-        let rawEquivalent = EconomyRules.refine(rawUnits: state.base.resources[Resources.essenceRaw])
+        let rawEquivalent = EconomyRules.refine(rawUnits: state.base.resources[Resources.essenceRaw],
+                                                 in: state)
         let now = state.base.essence + rawEquivalent
         let cost = max(0, station.buildCost?.essence ?? 0)
         let after = max(0, now - cost)

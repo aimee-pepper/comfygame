@@ -19,6 +19,11 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Persisted stock snapshot. Empty until the first post-migration expedition outcome.
     var tradingPost: TradingPostState = TradingPostState()
     var recycler: RecyclerState = RecyclerState()
+    /// Exact committed practice. Legacy saves start at zero; holdings are not historical proof.
+    var lifetimeRawEssenceRefined: Int = 0
+    var autoRefineReturnedRawEssence: Bool = false
+    /// Makes Continuous settling idempotent across relaunch and repeated outcome consumers.
+    var lastAutoRefinedOutcomeID: ExpeditionOutcomeID?
 
     /// Owned catalog entries. Definitions are data; the save stores only which ones are owned.
     var ownedSymbols: Set<SymbolID> = []
@@ -298,6 +303,7 @@ struct BaseState: Codable, Equatable, Sendable {
     /// decoder still has to be able to read it out of a save written before the roster existed.
     private enum CodingKeys: String, CodingKey {
         case essence, resources, inventory, spillover, goldCoins, tradingPost, recycler
+        case lifetimeRawEssenceRefined, autoRefineReturnedRawEssence, lastAutoRefinedOutcomeID
         case ownedSymbols, ownedGambitComponents
         case completedResearch, knownConsumableRecipes, stations, page, ownedHands, hasChainingUnlock, instrumentLoadout
         case hasConfiguredInstrumentLoadout
@@ -316,6 +322,9 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(goldCoins, forKey: .goldCoins)
         try c.encode(tradingPost, forKey: .tradingPost)
         try c.encode(recycler, forKey: .recycler)
+        try c.encode(lifetimeRawEssenceRefined, forKey: .lifetimeRawEssenceRefined)
+        try c.encode(autoRefineReturnedRawEssence, forKey: .autoRefineReturnedRawEssence)
+        try c.encodeIfPresent(lastAutoRefinedOutcomeID, forKey: .lastAutoRefinedOutcomeID)
         try c.encode(ownedSymbols, forKey: .ownedSymbols)
         try c.encode(ownedSources, forKey: .ownedSources)
         try c.encode(ownedGambitComponents, forKey: .ownedGambitComponents)
@@ -349,6 +358,12 @@ struct BaseState: Codable, Equatable, Sendable {
                                                               forKey: .ownedGambitComponents)
             ?? Set(GambitStarter.components)
         completedResearch = try container.decodeIfPresent(Set<ResearchNodeID>.self, forKey: .completedResearch) ?? []
+        lifetimeRawEssenceRefined = try container.decodeIfPresent(Int.self,
+                                                                   forKey: .lifetimeRawEssenceRefined) ?? 0
+        autoRefineReturnedRawEssence = try container.decodeIfPresent(Bool.self,
+                                                                      forKey: .autoRefineReturnedRawEssence) ?? false
+        lastAutoRefinedOutcomeID = try container.decodeIfPresent(ExpeditionOutcomeID.self,
+                                                                  forKey: .lastAutoRefinedOutcomeID)
         knownConsumableRecipes = try container.decodeIfPresent(Set<ItemID>.self,
                                                                 forKey: .knownConsumableRecipes) ?? []
         instrumentLoadout = try container.decodeIfPresent(Set<PressureTargetID>.self,

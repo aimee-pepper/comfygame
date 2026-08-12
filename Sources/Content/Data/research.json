@@ -23,6 +23,15 @@
       "order": 2
     },
     {
+      "id": "spring",
+      "name": "The Spring",
+      "icon": "drop.circle",
+      "blurb": "Refine what comes home, deepen its return, and eventually settle new Raw automatically.",
+      "order": 7,
+      "station": "essence_spring",
+      "freeRungs": 0
+    },
+    {
       "id": "lexicon",
       "name": "The Lexicon",
       "icon": "character.book.closed",
@@ -635,7 +644,7 @@
     },
     {
       "id": "deepen_spring",
-      "branch": "hold",
+      "branch": "spring",
       "name": "Deepen the spring",
       "icon": "drop.circle",
       "blurb": "More essence waiting each time you come home.",
@@ -646,13 +655,56 @@
           "fiber": 8
         }
       },
-      "requires": [
-        "shelving_one"
-      ],
+      "requires": [],
       "grants": [
         {
           "kind": "effect",
           "effect": "essenceSpringTier"
+        }
+      ]
+    },
+    {
+      "id": "essence_second_pass",
+      "branch": "spring",
+      "name": "Second pass",
+      "icon": "arrow.triangle.2.circlepath",
+      "blurb": "Practice the ordinary conversion until each Raw Essence yields three instead of two.",
+      "cost": {
+        "essence": 80,
+        "resources": {
+          "quartz": 10
+        }
+      },
+      "requires": [],
+      "needsLifetimeRawRefined": 50,
+      "grants": [
+        {
+          "kind": "capability",
+          "id": "essence_second_pass"
+        }
+      ]
+    },
+    {
+      "id": "essence_continuous_settling",
+      "branch": "spring",
+      "name": "Continuous settling",
+      "icon": "drop.degreesign",
+      "blurb": "Automatically refine only the Raw retained by each new expedition outcome.",
+      "cost": {
+        "essence": 120,
+        "resources": {
+          "quartz": 12,
+          "pulp": 8
+        }
+      },
+      "requires": [
+        "essence_second_pass"
+      ],
+      "needsStationTier": 1,
+      "grants": [
+        {
+          "kind": "capability",
+          "id": "essence_continuous_settling"
         }
       ]
     },

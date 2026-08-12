@@ -497,7 +497,7 @@ struct StorehouseView: View {
                         if base.resources[Resources.essenceRaw] > 0 {
                             // Raw essence looks like currency and isn't. Say so here rather than
                             // letting someone stare at a full storehouse and an unaffordable book.
-                            Text("Raw essence can't be written with — refine it at the Workshop first.")
+                            Text("Raw essence can't be written with — refine it at the Essence Spring first.")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }
@@ -576,7 +576,7 @@ private struct StorehouseResourceDetail: View {
                     LabeledContent("Quantity", value: "\(entry.amount)")
                     LabeledContent("Location", value: "Storehouse")
                     if entry.id == Resources.essenceRaw {
-                        Text("Refine raw essence at the Workshop before writing with it.")
+                        Text("Refine raw essence at the Essence Spring before writing with it.")
                     }
                 }
             }
@@ -659,8 +659,6 @@ struct WorkshopView: View {
                     CurrencyChip(icon: "cube", label: "Ore", value: "\(store.state.base.resources[Resources.ore])")
                     CurrencyChip(icon: "scribble", label: "Fiber", value: "\(store.state.base.resources[Resources.fiber])")
                 }
-
-                RefineryCard()
 
                 ResearchTree()
 
@@ -945,63 +943,99 @@ private struct ConstellationStar: View {
 /// Essence Spring — the trickle credited on each return from a run.
 struct EssenceSpringView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var tab: EssenceSpringTab = .refine
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                StationCard(title: "The Spring", icon: "drop.circle") {
-                    LabeledRow(icon: "arrow.down.circle", label: "Yield per return home",
-                               value: "\(store.essenceSpringYield) essence")
-                    LabeledRow(icon: "chart.bar", label: "Tier",
-                               value: "\(store.state.base.station(Stations.essenceSpring).tier)")
+                HStack(spacing: 12) {
+                    CurrencyChip(icon: "drop.fill", label: "Essence",
+                                 value: "\(store.state.base.essence)", tint: .teal)
+                    CurrencyChip(icon: "arrow.down.circle", label: "Return",
+                                 value: "+\(store.essenceSpringYield)")
+                    CurrencyChip(icon: "chart.bar", label: "Tier",
+                                 value: "\(store.state.base.station(Stations.essenceSpring).tier)")
                 }
 
-                Label {
-                    Text("The Spring fills when you come home — never while the app is closed. Nothing in this game moves without you.")
-                } icon: {
-                    Image(systemName: "moon.zzz")
+                Picker("Spring section", selection: $tab) {
+                    ForEach(EssenceSpringTab.allCases) { item in Text(item.title).tag(item) }
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                .pickerStyle(.segmented)
+                .frame(minHeight: 44)
 
-                // **Changing your mind, for a price** (Aimee, 7 Aug: *"people should be able to be
-                // respec'd at the spring in town"*). Everybody at the fire, not just who's coming —
-                // the point of rethinking somebody is often that you're about to take them.
-                StationCard(title: "Unlearning", icon: "arrow.uturn.backward.circle") {
-                    Text("The Spring takes back what somebody learned, and they can spend it again. It costs, so it isn't a free retry.")
-                        .font(.caption2).foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    ForEach([PartyMember.binder] + store.state.base.roster.indices.map(PartyMember.member)) { member in
-                        let cost = store.respecCost(for: member)
-                        HStack(spacing: 8) {
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(store.name(of: member)).font(.callout)
-                                Text(cost == 0
-                                     ? "nothing spent yet"
-                                     : "\(CombatTreeRules.spentPoints(store.character(of: member))) points learned")
-                                    .font(.caption2).foregroundStyle(.secondary)
-                            }
-                            Spacer(minLength: 6)
-                            Button(cost == 0 ? "—" : "\(cost) essence") { store.respec(member) }
-                                .font(.caption2.weight(.medium))
-                                .buttonStyle(.bordered)
-                                .disabled(!store.canRespec(member))
-                        }
-                        .frame(minHeight: 44)
-                    }
+                switch tab {
+                case .refine:
+                    RefineryCard()
+                    refiningPractice
+                case .study:
+                    ResearchTree(station: Stations.essenceSpring)
+                case .unlearn:
+                    unlearning
                 }
-
-                ComingLater("The tier 2 upgrade is bought at the Workshop in milestone 5.")
             }
             .padding(16)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Essence Spring")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var refiningPractice: some View {
+        StationCard(title: "Refining practice", icon: "arrow.triangle.2.circlepath") {
+            let practiced = store.state.base.lifetimeRawEssenceRefined
+            LabeledRow(icon: "drop", label: "Lifetime Raw refined", value: "\(practiced)")
+            LabeledRow(icon: "arrow.right", label: "Current conversion",
+                       value: "1 Raw → \(EconomyRules.refinementRate(in: store.state)) Essence")
+            if !store.state.base.completedResearch.contains(EconomyRules.secondPassNode) {
+                let remaining = max(0, EconomyRules.secondPassPracticeRequired - practiced)
+                Text(remaining == 0 ? "Second pass practice complete."
+                     : "Refine \(remaining) more Raw Essence to qualify for Second pass.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            if store.state.base.completedResearch.contains(EconomyRules.continuousSettlingNode) {
+                Toggle("Auto-refine newly returned Raw", isOn: Binding(
+                    get: { store.state.base.autoRefineReturnedRawEssence },
+                    set: { store.setAutoRefineReturnedRawEssence($0) }
+                ))
+                .frame(minHeight: 44)
+            }
+        }
+    }
+
+    private var unlearning: some View {
+        StationCard(title: "Unlearning", icon: "arrow.uturn.backward.circle") {
+            Text("Reclaim somebody's spent points for an Essence cost.")
+                .font(.caption2).foregroundStyle(.secondary)
+            ForEach([PartyMember.binder] + store.state.base.roster.indices.map(PartyMember.member)) { member in
+                let cost = store.respecCost(for: member)
+                HStack(spacing: 8) {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(store.name(of: member)).font(.callout)
+                        Text(cost == 0 ? "nothing spent yet"
+                             : "\(CombatTreeRules.spentPoints(store.character(of: member))) points learned")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 6)
+                    Button(cost == 0 ? "—" : "\(cost) essence") { store.respec(member) }
+                        .font(.caption2.weight(.medium))
+                        .buttonStyle(.bordered)
+                        .disabled(!store.canRespec(member))
+                }
+                .frame(minHeight: 44)
+            }
+        }
+    }
+}
+
+enum EssenceSpringTab: String, CaseIterable, Identifiable, Sendable {
+    case refine, study, unlearn
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .refine: "Refine"
+        case .study: "Study"
+        case .unlearn: "Unlearn"
+        }
     }
 }
 

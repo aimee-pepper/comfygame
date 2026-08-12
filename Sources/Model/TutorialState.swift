@@ -110,7 +110,9 @@ struct TutorialComparisonPair: Codable, Equatable, Sendable {
 }
 
 struct FirstReturnTutorialContext: Codable, Equatable, Sendable {
-    enum Route: String, Codable, Sendable { case library, storehouse, workshop, firepit, writingDesk }
+    enum Route: String, Codable, Sendable {
+        case library, storehouse, workshop, essenceSpring, firepit, writingDesk
+    }
     enum Reason: String, Codable, Sendable {
         case diaryPage, fieldNote, routeMark, siteFragment, workingScrap
         case unidentifiedObject, rawEssence, traveller, ordinaryReturn

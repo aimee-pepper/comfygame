@@ -111,7 +111,7 @@ final class TutorialTests: XCTestCase {
         let rawBanked = GameStore.BankedHaul(resources: [], items: [], lostResources: [], lostItems: [],
                                              unidentifiedItemIDs: [], returnedRawEssence: true)
         TutorialRules.freezeFirstReturnContext(run: makeRun(), banked: rawBanked, in: &raw)
-        XCTAssertEqual(raw.tutorial.firstReturnContext?.route, .workshop)
+        XCTAssertEqual(raw.tutorial.firstReturnContext?.route, .essenceSpring)
 
         var traveller = GameState.newGame()
         traveller.reality.library.foundTravellers.insert("mara")
