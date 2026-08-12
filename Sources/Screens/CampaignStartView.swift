@@ -126,6 +126,10 @@ enum CampaignStartLayoutPolicy {
     /// plus their 12-point gutter fit without manufacturing horizontal scrolling.
     static let compactCardMinimumWidth: CGFloat = 156
 
+    static func primaryActionLabelHeight(dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+        dynamicTypeSize.isAccessibilitySize ? 88 : 52
+    }
+
     static func usesSingleColumn(dynamicTypeSize: DynamicTypeSize) -> Bool {
         dynamicTypeSize.isAccessibilitySize
     }
@@ -199,34 +203,31 @@ struct CampaignStartView: View {
     }
 
     private var primaryActions: some View {
-        VStack(spacing: 10) {
-            if let slot = presentation.continueSlot {
-                Button {
-                    onContinue(slot.id)
-                } label: {
-                    CampaignStartActionLabel(title: "Continue", subtitle: slot.name,
-                                             icon: "book.pages.fill")
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .accessibilityHint("Opens the most recently played available campaign")
-            }
-
-            if presentation.isEmpty {
-                newGameButton.buttonStyle(.borderedProminent)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(spacing: 10) { primaryActionButtons }
             } else {
-                newGameButton.buttonStyle(.bordered)
+                HStack(spacing: 10) { primaryActionButtons }
             }
         }
     }
 
-    private var newGameButton: some View {
-        Button(action: onNewGame) {
-            CampaignStartActionLabel(title: "New Game",
-                                     subtitle: "Create a separate campaign",
-                                     icon: "plus.rectangle.on.folder")
-        }
-        .controlSize(.large)
+    @ViewBuilder private var primaryActionButtons: some View {
+            if let slot = presentation.continueSlot {
+                CampaignStartPrimaryAction(title: "Continue", subtitle: slot.name,
+                                           icon: "book.pages.fill", emphasized: true,
+                                           identifier: "campaign.primary.continue") {
+                    onContinue(slot.id)
+                }
+                .accessibilityHint("Opens the most recently played available campaign")
+            }
+
+            CampaignStartPrimaryAction(title: "New Game",
+                                       subtitle: "Create a separate campaign",
+                                       icon: "plus.rectangle.on.folder",
+                                       emphasized: presentation.isEmpty,
+                                       identifier: "campaign.primary.new",
+                                       action: onNewGame)
     }
 
     private var slotColumns: [GridItem] {
@@ -245,21 +246,53 @@ struct CampaignStartView: View {
     }
 }
 
-private struct CampaignStartActionLabel: View {
+struct CampaignStartPrimaryAction: View {
     let title: String
     let subtitle: String
     let icon: String
+    let emphasized: Bool
+    let identifier: String
+    let action: () -> Void
+
+    var body: some View {
+        Group {
+            if emphasized { button.buttonStyle(.borderedProminent) }
+            else { button.buttonStyle(.bordered) }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var button: some View {
+        Button(action: action) {
+            CampaignStartActionLabel(title: title, subtitle: subtitle, icon: icon)
+        }
+        .accessibilityIdentifier(identifier)
+    }
+}
+
+struct CampaignStartActionLabel: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: icon).font(.title3)
+            Image(systemName: icon).font(.body.weight(.semibold))
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.headline)
-                Text(subtitle).font(.caption)
+                Text(title).font(.callout.weight(.semibold))
+                Text(subtitle).font(.caption).lineLimit(2)
             }
             Spacer()
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity,
+               minHeight: CampaignStartLayoutPolicy.primaryActionLabelHeight(
+                   dynamicTypeSize: dynamicTypeSize
+               ),
+               maxHeight: CampaignStartLayoutPolicy.primaryActionLabelHeight(
+                   dynamicTypeSize: dynamicTypeSize
+               ),
+               alignment: .leading)
         .contentShape(Rectangle())
     }
 }

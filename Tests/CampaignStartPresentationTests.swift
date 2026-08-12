@@ -1,3 +1,5 @@
+import SwiftUI
+import UIKit
 import XCTest
 @testable import Bookbinder
 
@@ -52,6 +54,69 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: .accessibility1))
         XCTAssertTrue(CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: .accessibility5))
         XCTAssertEqual(CampaignStartLayoutPolicy.compactCardMinimumWidth, 156)
+    }
+
+    @MainActor
+    func testPrimaryCampaignActionsRenderAtEqualSizeNormallyAndAtAccessibilityText() {
+        for dynamicTypeSize in [DynamicTypeSize.large, .accessibility3] {
+            let continueSize = renderedActionLabelSize(
+                title: "Continue", subtitle: "A campaign with a longer name",
+                icon: "book.pages.fill",
+                dynamicTypeSize: dynamicTypeSize
+            )
+            let createSize = renderedActionLabelSize(
+                title: "New Game", subtitle: "Create a separate campaign",
+                icon: "plus.rectangle.on.folder",
+                dynamicTypeSize: dynamicTypeSize
+            )
+
+            XCTAssertEqual(continueSize.width, createSize.width, accuracy: 0.5)
+            XCTAssertEqual(continueSize.height, createSize.height, accuracy: 0.5)
+            XCTAssertEqual(continueSize.height,
+                           CampaignStartLayoutPolicy.primaryActionLabelHeight(
+                               dynamicTypeSize: dynamicTypeSize
+                           ), accuracy: 0.5)
+        }
+    }
+
+    @MainActor
+    func testStyledPrimaryCampaignButtonsHaveEqualRenderedBounds() throws {
+        for dynamicTypeSize in [DynamicTypeSize.large, .accessibility3] {
+            let continueSize = renderedPrimaryActionSize(
+                title: "Continue", subtitle: "The deliberately long winter campaign",
+                icon: "book.pages.fill", emphasized: true, dynamicTypeSize: dynamicTypeSize)
+            let newSize = renderedPrimaryActionSize(
+                title: "New Game", subtitle: "Create a separate campaign",
+                icon: "plus.rectangle.on.folder", emphasized: false,
+                dynamicTypeSize: dynamicTypeSize)
+            XCTAssertEqual(continueSize.width, newSize.width, accuracy: 0.5)
+            XCTAssertEqual(continueSize.height, newSize.height, accuracy: 0.5)
+        }
+    }
+
+    @MainActor
+    private func renderedActionLabelSize(title: String, subtitle: String, icon: String,
+                                         dynamicTypeSize: DynamicTypeSize) -> CGSize {
+        let controller = UIHostingController(rootView:
+            CampaignStartActionLabel(title: title, subtitle: subtitle,
+                                     icon: icon)
+                .environment(\.dynamicTypeSize, dynamicTypeSize)
+                .frame(width: 164)
+        )
+        return controller.sizeThatFits(in: CGSize(width: 164, height: 200))
+    }
+
+    @MainActor
+    private func renderedPrimaryActionSize(title: String, subtitle: String, icon: String,
+                                           emphasized: Bool,
+                                           dynamicTypeSize: DynamicTypeSize) -> CGSize {
+        let controller = UIHostingController(rootView:
+            CampaignStartPrimaryAction(title: title, subtitle: subtitle, icon: icon,
+                                       emphasized: emphasized, identifier: "fixture", action: {})
+                .environment(\.dynamicTypeSize, dynamicTypeSize)
+                .frame(width: dynamicTypeSize.isAccessibilitySize ? 361 : 164)
+        )
+        return controller.sizeThatFits(in: CGSize(width: 361, height: 200))
     }
 
     func testCampaignShelfAddsBooksAsDurableProgressGrowsAndCapsAtCardWidth() {
