@@ -1,7 +1,9 @@
 # App Launch and Loading — Current
 
-**Status:** implementation-ready launch-quality boundary; visual proof may refine art without
-changing behavior. Prompted by physical-device playtest reporting a prolonged black screen.
+**Status:** **failed physical-device acceptance on 11 Aug**. The production coordinator and progress
+track exist in source, but Aimee's newly installed phone build still presents a long black wait and
+no perceptible loading bar. Prior direct-store and source-only acceptances are historical, not proof
+of the current installed experience.
 
 ## Goal
 
@@ -21,6 +23,11 @@ Visual direction: the Bookbinder name within the established page/book-edge/Atla
 plus restrained **Opening the Atlas…** copy on the in-app state. No canonical Binder face, random
 world, undiscovered site, apex, progress fiction or animated flourish is required. It must not imply
 that a new world is generated on every app launch.
+
+**Canonical visual reference:** `AssetLab/artifacts/app-launch-proof-v0.2.png`, SHA-256
+`360f02713f0bba9e84ddcf4ba37c35a22594738dbfd6f6732fa2b9da84b1e4d9`. It owns the fixed internal
+248×340 composition and v0.2 mark. Native placement remains safe-area centering; AssetLab's fixture
+absolute `frameY` is not a phone-placement constant.
 
 ## Engineering requirements
 
@@ -44,8 +51,8 @@ that a new world is generated on every app launch.
 1. Cold launch never presents an unexplained black frame between the OS launch surface and app UI.
 2. Before/after timing evidence identifies the actual bottleneck and shows first meaningful frame;
    optimization and visual coverage are reported separately.
-3. Static and in-app surfaces align at representative compact/large portrait safe areas, light/dark
-   appearance and grayscale.
+3. Static and in-app surfaces align on Aimee's ordinary phone in its current appearance. Broader
+   appearance/device/accessibility matrices wait until the application-wide UI direction is stable.
 4. Empty/new, ordinary existing, large campaign and tolerant legacy saves all reach the correct
    destination; malformed/failing initialization reaches Retry rather than hanging.
 5. No world generation, hidden identity or save-dependent art is required to render the loader.
@@ -104,3 +111,93 @@ preparation path: reading the campaign, reconciling the catalogue, committing th
 and ready. It is phase completion rather than a time estimate, exposes the current phase to
 VoiceOver, and introduces no invented percentage or background work. Warm-ready scenes still skip
 the loader entirely; timeout and failure retain the existing serialized recovery behavior.
+
+### Campaign-slot production-path correction — 11 Aug
+
+The paragraph above described `AppLaunchCoordinator`, but production now enters through
+`CampaignAppCoordinator` and `CampaignAppRootView`. That root rendered `LaunchSurface()` at its
+default zero progress and called preparation without forwarding progress. The visual bar therefore
+existed but was not functional in the app Aimee actually launched. The earlier “accepted” result is
+historical evidence for the direct-store path, not proof of the later save-slot integration.
+
+Current correction requirements are:
+
+- one monotonic, generation-guarded production phase across legacy adoption, campaign inspection,
+  writer acquisition, save load, reconciliation, necessary commit and ready;
+- real progress descriptions forwarded to the visible bar and VoiceOver, never a timer;
+- zero launch writes for an already normalized campaign, while genuine reconciliation commits once;
+- DEBUG timings separated into shelf adoption/inspection and campaign load/reconcile/persist;
+- stale callbacks, retry and slot switching cannot regress or cross-wire visible progress; and
+- physical-device timing/transition evidence from the exact save-slot build before this defect is
+  called accepted again.
+
+The source patch later reached the installed line, but Aimee's 11 Aug physical retest still saw a
+long black wait and no loading bar. Therefore neither the presence of `LaunchSurface` in source nor
+coordinator tests close the defect. Diagnosis must identify whether the missing interval occurs in
+the OS storyboard handoff, before SwiftUI's first frame, during campaign-shelf inspection or while
+opening the selected campaign. The exact installed commit and phase timings accompany the next
+acceptance evidence. A loading screen remains a truthful progress surface, not a substitute for
+removing avoidable delay.
+
+### Fixed first-frame composition — 11 Aug
+
+The system launch frame, zero-progress SwiftUI frame and every advancing-progress frame use the same
+248×340 composition with the same permanently reserved track. Progress changes only the fill width
+inside that track; it may never insert a system control whose intrinsic size remeasures or recentres
+the artwork. A centered first frame followed by a shifted title/mark when progress appears is a
+launch regression even when the bar itself is functional. Current acceptance compares the artwork,
+title, subtitle, track and frame coordinates at zero and nonzero progress on Aimee's ordinary phone,
+then verifies the system→SwiftUI handoff on that exact installed build. Large Text and the wider
+layout matrix are deferred with the broader UI redesign.
+
+### Physical regression reopened — 11 Aug
+
+Aimee installed the current build and again observed a long black **main-app startup** interval with
+no visible loading bar. After she selects a save, that separate loader does function and advance, but
+its splash composition is askew rather than aligned with the intended/static frame. This explicitly
+reopens `launch-handoff` ahead of the next Combat Tree v2 consumer once the already-green graph
+checkpoint is isolated. Preserve the working selected-save progress semantics; correct the uncovered
+process-launch interval and the shared surface geometry rather than rebuilding the state machine.
+
+The next checkpoint must prove, on the exact installed build:
+
+1. what commit and bundle was actually launched;
+2. timestamped OS static surface, first SwiftUI frame, shelf-ready and selected-campaign-ready events;
+3. no black or unowned interval between process launch and the branded surface;
+4. the working selected-save determinate progress remains honest and clearly perceptible;
+5. static, initial SwiftUI and selected-save frames use the same aligned composition; and
+6. the slowest measured phase has been reduced where safe, or truthfully remains covered and named.
+
+Current diagnosis also found that installed bundle version `1` does not embed a Git/build identity,
+so a manually installed phone build cannot be reconstructed honestly from the bundle afterward.
+The next install records its clean source commit at install time and uses an explicit bumped bundle
+version to invalidate this acceptance boundary. A generated signed-provenance experiment repeatedly
+blocked the build and was cut before process infrastructure displaced the player-visible repair; it
+returns with the later roadmap/build-metadata authority work. This observation does not by itself
+prove that caching caused the black interval.
+
+Read-only compiled-product inspection then proved `UILaunchStoryboardName=LaunchScreen` and the
+compiled storyboard nibs are present. Fresh-bundle Simulator evidence renders that storyboard, then
+one black transition frame, then the SwiftUI surface/chooser. Available captures place both static
+and SwiftUI page frames on the safe-area midpoint, so the earlier full-frame-versus-safe-area-offset
+hypothesis is rejected; do not patch a guessed vertical offset. Unique build identity/cache
+invalidation is necessary for trustworthy phone evidence and may clear an obsolete launch snapshot,
+but the observed fresh-bundle black transition remains a defect until eliminated or proven to be a
+capture artifact.
+
+### Instrumented acceptance checkpoint — 11 Aug
+
+The next Debug build advances the sole XcodeGen-owned numeric bundle version beyond the obsolete
+`1`. Its clean Git commit and build number are recorded externally with the install. Production
+campaign loading logs the first SwiftUI launch-surface frame, every monotonic campaign phase, shelf
+adoption/inspection, and selected-save load/reconcile/persist timings. The fixed canonical 248×340
+composition and working selected-save progress semantics are unchanged. Generated signed provenance
+is deliberately deferred to the later dynamic-authority audit.
+
+This checkpoint does **not** close the fresh-bundle black transition. Source and compiled-product
+evidence did not identify a supported host/window change that would keep UIKit's storyboard visible
+after the OS relinquishes it, and a dark `systemBackground` would merely rename the same black gap.
+Focused/full XCTest execution and exact cold-launch/save-open visual evidence remain blocked on the
+failed Simulator/CoreDevice services, then on a clean committed install. Acceptance still requires
+proving that the branded storyboard hands directly to the branded SwiftUI surface with no uncovered
+frame.

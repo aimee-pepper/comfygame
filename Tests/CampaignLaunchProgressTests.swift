@@ -123,6 +123,10 @@ final class CampaignLaunchProgressTests: XCTestCase {
             .appending(path: "Sources/App/BookbinderApp.swift"), encoding: .utf8)
         XCTAssertTrue(launchSurface.contains(".accessibilityValue(progressDescription)"),
                       "VoiceOver must name the live campaign-loading phase")
+        XCTAssertTrue(source.contains("coordinator.noteFirstMeaningfulFrame()"),
+                      "The production campaign root must timestamp its actual first frame")
+        XCTAssertTrue(source.contains("campaign phase="),
+                      "Every published production phase must carry elapsed-time evidence")
     }
 
     func testLaunchProgressUsesAReservedFixedRegionInsteadOfSystemIntrinsicLayout() throws {

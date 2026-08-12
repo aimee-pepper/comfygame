@@ -52,6 +52,7 @@ final class CampaignAppCoordinator: ObservableObject {
     private let slots: SaveSlotFileIO
     private var task: Task<Void, Never>?
     private var generation = UUID()
+    private var didLogFirstFrame = false
     private let prepare: @Sendable (
         any GamePersistenceIO,
         @escaping @Sendable (GameStore.PreparationStep) -> Void
@@ -82,6 +83,7 @@ final class CampaignAppCoordinator: ObservableObject {
         guard case .idle = phase, task == nil else { return }
         loadingPhase = .adoptingLegacy
         phase = .loading
+        logPhase(.adoptingLegacy)
         let token = UUID(); generation = token
         task = Task { [weak self] in
             guard let self else { return }
@@ -98,7 +100,7 @@ final class CampaignAppCoordinator: ObservableObject {
                 let adoption = Double(adoptedAt - startedAt) / 1_000_000
                 let inspection = Double(inspectedAt - adoptedAt) / 1_000_000
                 Logger.launch.notice(
-                    "campaign shelf ready adopt=\(adoption, format: .fixed(precision: 1))ms inspect=\(inspection, format: .fixed(precision: 1))ms total=\(adoption + inspection, format: .fixed(precision: 1))ms slots=\(descriptors.count)"
+                    "campaign shelf ready elapsed=\(LaunchClock.elapsedMilliseconds(), format: .fixed(precision: 1))ms adopt=\(adoption, format: .fixed(precision: 1))ms inspect=\(inspection, format: .fixed(precision: 1))ms total=\(adoption + inspection, format: .fixed(precision: 1))ms slots=\(descriptors.count)"
                 )
 #endif
             } catch {
@@ -183,6 +185,8 @@ final class CampaignAppCoordinator: ObservableObject {
         guard case .choosing = phase, task == nil else { return }
         loadingPhase = .selectingCampaign
         phase = .opening
+        logPhase(.selectingCampaign)
+        let openingStartedAt = DispatchTime.now().uptimeNanoseconds
         let token = UUID(); generation = token
         task = Task { [weak self] in
             guard let self else { return }
@@ -222,7 +226,7 @@ final class CampaignAppCoordinator: ObservableObject {
                 phase = .playing(GameStore(io: io, prepared: prepared))
 #if DEBUG
                 Logger.launch.notice(
-                    "campaign open total=\(prepared.timings.totalMilliseconds, format: .fixed(precision: 1))ms load=\(prepared.timings.loadMilliseconds, format: .fixed(precision: 1))ms reconcile=\(prepared.timings.reconciliationMilliseconds, format: .fixed(precision: 1))ms persist=\(prepared.timings.persistenceMilliseconds, format: .fixed(precision: 1))ms"
+                    "campaign open elapsed=\(LaunchClock.elapsedMilliseconds(), format: .fixed(precision: 1))ms operation=\(Self.milliseconds(since: openingStartedAt), format: .fixed(precision: 1))ms prepare=\(prepared.timings.totalMilliseconds, format: .fixed(precision: 1))ms load=\(prepared.timings.loadMilliseconds, format: .fixed(precision: 1))ms reconcile=\(prepared.timings.reconciliationMilliseconds, format: .fixed(precision: 1))ms persist=\(prepared.timings.persistenceMilliseconds, format: .fixed(precision: 1))ms"
                 )
 #endif
             } catch {
@@ -240,6 +244,32 @@ final class CampaignAppCoordinator: ObservableObject {
         // a late callback move the visible bar backwards or overwrite a newer operation.
         guard next.completedFraction >= loadingPhase.completedFraction else { return }
         loadingPhase = next
+        logPhase(next)
+    }
+
+    func noteFirstMeaningfulFrame() {
+        guard !didLogFirstFrame else { return }
+        didLogFirstFrame = true
+#if DEBUG
+        DispatchQueue.main.async {
+            Logger.launch.notice(
+                "campaign first meaningful frame=\(LaunchClock.elapsedMilliseconds(), format: .fixed(precision: 1))ms"
+            )
+        }
+#endif
+    }
+
+    private func logPhase(_ phase: LoadingPhase) {
+#if DEBUG
+        Logger.launch.notice(
+            "campaign phase=\(phase.accessibilityDescription, privacy: .public) fraction=\(phase.completedFraction, format: .fixed(precision: 2)) elapsed=\(LaunchClock.elapsedMilliseconds(), format: .fixed(precision: 1))ms"
+        )
+#endif
+    }
+
+    nonisolated private static func milliseconds(since start: UInt64) -> Double {
+        let now = DispatchTime.now().uptimeNanoseconds
+        return Double(now >= start ? now - start : 0) / 1_000_000
     }
 }
 
@@ -258,6 +288,7 @@ struct CampaignAppRootView: View {
                 LaunchSurface(progressFraction: coordinator.loadingPhase.completedFraction,
                               progressDescription: coordinator.loadingPhase.accessibilityDescription)
                     .task { coordinator.start() }
+                    .onAppear { coordinator.noteFirstMeaningfulFrame() }
             case .choosing(let descriptors):
                 CampaignStartView(
                     presentation: CampaignStartPresentation(

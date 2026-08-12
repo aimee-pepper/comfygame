@@ -42,7 +42,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aimeepepper.bookbinder
         PRODUCT_NAME: Bookbinder
-        CURRENT_PROJECT_VERSION: 1
+        CURRENT_PROJECT_VERSION: 232
         MARKETING_VERSION: "0.1"
         TARGETED_DEVICE_FAMILY: "1" # iPhone only — portrait, one-handed (pillar 3)
         CODE_SIGN_STYLE: Automatic
@@ -59,6 +59,7 @@ targets:
       path: Support/Info.plist
       properties:
         CFBundleDisplayName: Bookbinder
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchStoryboardName: LaunchScreen
         UIApplicationSupportsIndirectInputEvents: true
         # Portrait only — pillar 3. Do not add landscape without a design decision.

@@ -3,8 +3,8 @@
   "updated": "11 Aug 2026",
   "installedCheckpoint": "ce9b1af · Combat technique ownership and Withdraw",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 Noll/Recycler device acceptance waiting · production launch source ready",
-  "currentNote": "WIP limit: one Engineering slice, one phone acceptance checkpoint and at most one directly enabling Asset consumer. Noll/Recycler aaf6280 remains the next isolated phone install when Aimee releases the current run. Essence Spring and the corrected production campaign-slot loading path are source-green but unfinished until their ordered phone gates; no additional Engineering implementation slice starts behind this acceptance queue.",
+  "currentWork": "P0 physical launch regression diagnosis · combat-tree v2 Stage A checkpointed",
+  "currentNote": "Aimee's installed phone build has a long black main-app startup with no loader; selected-save progress works but the shared splash is askew. Engineering is measuring the exact installed launch path and aligning static/SwiftUI geometry without rewriting working save progress. Combat Tree v2 Stage A is complete in 9326494/b912d55 and resumes after this ordinary-play blocker.",
   "items": [
     {
       "id": "essence",
@@ -50,7 +50,7 @@
       "id": "recycler",
       "priority": "P1",
       "title": "Noll and the player-facing Recycler",
-      "status": "inProgress",
+      "status": "readyToTest",
       "detail": "Implemented and green: Noll is the 29th live traveller; the 15-Essence Recycler has a distinct Make route and atomic receipt-first recovery screen; station runway preview and corrected Sela/Halloway review IDs are included. Field Separation Kit remains held. Signed phone installation is waiting for Aimee's active fresh-save traveller test to finish.",
       "gate": "Use opening-economy-trio-promotion-audit-current.md: 29-live catalogue, Noll band0/order2/signature, 15-Essence build, dormant old-state migration, atomic Recycler phone route, no Field Kit, corrected Sela/Halloway exchange IDs and complete sell→recycle→make→bind runway proof."
     },
@@ -130,9 +130,9 @@
       "id": "launch-handoff",
       "priority": "P1",
       "title": "Launch-screen handoff alignment",
-      "status": "readyToTest",
-      "detail": "Source-green on the live CampaignAppCoordinator path: the storyboard-matched 248×340 surface now publishes real legacy adoption, shelf inspection, selected-slot acquisition, read, reconcile, conditional commit and ready progress. Normalized campaigns perform zero launch writes; actual reconciliation commits once.",
-      "gate": "Phone evidence must capture static → campaign inspection → selected-campaign handoff at one viewport, VoiceOver phase names and exact adoption/inspection/load/reconcile/persist timings. Fill is monotonic within each operation, stale callbacks cannot regress it, and warm-ready scenes do not flash it."
+      "status": "inProgress",
+      "detail": "Physical acceptance failed on 11 Aug: main-app launch remains black through a long uncovered wait. The selected-save loader advances honestly but its splash is askew. Preserve working save progress; diagnose the pre-first-frame gap and align storyboard/SwiftUI safe-area geometry on the exact installed build.",
+      "gate": "Ordinary-phone evidence records exact installed commit plus OS static, first SwiftUI, shelf-ready and selected-save-ready timestamps; no black/unowned interval remains; selected-save progress still advances; static, initial and save-loading compositions align; and the slowest phase is safely reduced or truthfully covered."
     },
     {
       "id": "encounter-opening",
@@ -202,8 +202,8 @@
       "id": "combat-tree-v2",
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
-      "status": "inProgress",
-      "detail": "Active authorized outcome: finish the real 24-node fan-and-fork combat trees already settled by Game Design and handed off by Asset. First build and phone-prove the reusable native graph through the DEBUG route explorer while preserving the functioning legacy production purchase route. Then remain on this outcome while every stable-ID node gains a real scenario-tested consumer behind the isolated v2 path. Durable ordinary ownership, atomic legal purchase and lossless migration promote with the functional graph only after no purchasable node is inert. Accessibility-size variants, tutorials and unrelated audits cannot displace it.",
+      "status": "queued",
+      "detail": "Stage A is checkpointed in 9326494 with durable evidence in b912d55: the reusable native graph, exact connectors/effect detail, 8/17/25 legal local route state and ordinary-phone DEBUG proof are green while legacy production purchase remains playable. Resume immediately after the active launch blocker with the first genuinely missing stable-ID consumer; ordinary ownership/purchase/migration promote only after no node is inert.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {
@@ -321,6 +321,7 @@
   ],
   "paused": [
     "Broad asset and catalogue expansion",
+    "Accessibility-size variants and rare-layout hardening until existing mechanics and ordinary phone UI are coherent, unless Aimee explicitly promotes one",
     "Tutorial content for outside testers",
     "New late-game stations and specialist breadth until existing systems pass completion gates",
     "Generated people, Tavern visitors, Menagerie, animal combat, predation and group motion",
