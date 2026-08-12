@@ -391,6 +391,47 @@ final class BookRulesTests: XCTestCase {
         XCTAssertFalse(store.canBindAndDepart)
         XCTAssertFalse(store.bindAndDepart())
         XCTAssertNil(store.state.worlds.activeRun)
+        XCTAssertEqual(store.bindError,
+                       "This binding needs 10 Essence; you currently have 0.")
+    }
+
+    @MainActor
+    func testBindingRefusalUsesCurrentStateAfterAnEarlierReadyRender() {
+        let store = GameStore(io: .temporary(name: "stale-bind-\(UUID().uuidString)"))
+        XCTAssertEqual(store.bindAvailability(bornAnchored: false), .ready(totalCost: 10))
+
+        store.mutate("simulate state changing after render") { state in
+            state.base.essence = 0
+        }
+
+        XCTAssertFalse(store.bindAndDepart())
+        XCTAssertNil(store.state.worlds.activeRun)
+        XCTAssertEqual(store.state.worlds.runIndex, 0)
+        XCTAssertEqual(store.bindError,
+                       "This binding needs 10 Essence; you currently have 0.")
+    }
+
+    @MainActor
+    func testBornAnchoredRefusalNamesTheCurrentMissingRequirement() {
+        let store = GameStore(io: .temporary(name: "anchor-refusal-\(UUID().uuidString)"))
+
+        XCTAssertEqual(store.bindAvailability(bornAnchored: true), .anchorageLocked)
+        XCTAssertFalse(store.bindAndDepart(bornAnchored: true))
+        XCTAssertEqual(store.bindError,
+                       "Born anchored requires the Anchorage. Turn it off or build the Anchorage first.")
+    }
+
+    @MainActor
+    func testBindingRefusalNamesAnExistingExpeditionWithoutMutation() {
+        let store = GameStore(io: .temporary(name: "active-run-refusal-\(UUID().uuidString)"))
+        XCTAssertTrue(store.bindAndDepart(), "A blank page is an eligible bind")
+        let before = store.state
+
+        XCTAssertEqual(store.bindAvailability(bornAnchored: false), .activeExpedition)
+        XCTAssertFalse(store.bindAndDepart())
+        XCTAssertEqual(store.state, before)
+        XCTAssertEqual(store.bindError,
+                       "You are already in an expedition. Return Home before binding another world.")
     }
 
     /// A half-written page is state like any other: it survives a kill.

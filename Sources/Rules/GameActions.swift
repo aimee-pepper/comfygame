@@ -8,6 +8,31 @@ enum ReliquaryRules {
     }
 }
 
+enum BindAvailability: Equatable {
+    case ready(totalCost: Int)
+    case activeExpedition
+    case anchorageLocked
+    case insufficientEssence(available: Int, required: Int)
+
+    var isReady: Bool {
+        if case .ready = self { return true }
+        return false
+    }
+
+    var refusalMessage: String? {
+        switch self {
+        case .ready:
+            nil
+        case .activeExpedition:
+            "You are already in an expedition. Return Home before binding another world."
+        case .anchorageLocked:
+            "Born anchored requires the Anchorage. Turn it off or build the Anchorage first."
+        case let .insufficientEssence(available, required):
+            "This binding needs \(required) Essence; you currently have \(available)."
+        }
+    }
+}
+
 /// Real player actions — the ones the shipping UI calls. Anything still faked lives in
 /// `Sources/Debug/` and says so.
 ///
@@ -188,7 +213,7 @@ extension GameStore {
     /// The price is exact before committing — a slot left to chance costs a flat rate whatever
     /// rolls into it — so there's no worst case to hold back for.
     var canBindAndDepart: Bool {
-        state.worlds.activeRun == nil && state.base.essence >= bookProjection.cost
+        bindAvailability(bornAnchored: false).isReady
     }
 
     var bornAnchoredPremium: Int {
@@ -201,11 +226,19 @@ extension GameStore {
     }
 
     func canBindAndDepart(bornAnchored: Bool) -> Bool {
-        let anchorageReady = state.base.station(Stations.anchorage).isUnlocked
+        bindAvailability(bornAnchored: bornAnchored).isReady
+    }
+
+    func bindAvailability(bornAnchored: Bool) -> BindAvailability {
         let total = bookProjection.cost + (bornAnchored ? bornAnchoredPremium : 0)
-        return state.worlds.activeRun == nil
-            && (!bornAnchored || anchorageReady)
-            && state.base.essence >= total
+        if state.worlds.activeRun != nil { return .activeExpedition }
+        if bornAnchored && !state.base.station(Stations.anchorage).isUnlocked {
+            return .anchorageLocked
+        }
+        if state.base.essence < total {
+            return .insufficientEssence(available: state.base.essence, required: total)
+        }
+        return .ready(totalCost: total)
     }
 
     /// Binds the current draft and departs into the world it describes.
@@ -230,7 +263,11 @@ extension GameStore {
         openColorResolver: WorldGrade2BindAdapter.OpenColorResolver
     ) -> Bool {
         bindError = nil
-        guard canBindAndDepart(bornAnchored: bornAnchored) else { return false }
+        let availability = bindAvailability(bornAnchored: bornAnchored)
+        guard availability.isReady else {
+            bindError = availability.refusalMessage
+            return false
+        }
         let anchorPremium = bornAnchored ? bornAnchoredPremium : 0
 
         // Build the complete world and its immutable visual authority before the commitment
