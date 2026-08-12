@@ -1331,6 +1331,10 @@ enum WorldRules {
         let resolvedOpening: EncounterState.Opening = slipperyPrevented ? .mutualContact : initialOpening
         let watchfulSuppressed = resolvedOpening == .creatureAmbush && watchful
 
+        let debugAttackReceipt = CombatDerivedStatsRules.debugBinderAttackReceipt(
+            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
+            selectedNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
+            ordinaryWeaponKind: CombatRules.damageKind(for: .binder, in: state))
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
                                                         foes: foes,
                                                         party: party,
@@ -1345,6 +1349,7 @@ enum WorldRules {
                                                         } ?? [:],
                                                         ordinaryPressureSlots: ordinaryPressureSlots,
                                                         initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
+                                                        debugV2BinderAttack: debugAttackReceipt,
                                                         rng: &run.rng)
         run.activeEncounter?.scalingPreview = scalingPreview
         if var encounter = run.activeEncounter {

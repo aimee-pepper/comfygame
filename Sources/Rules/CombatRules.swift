@@ -23,6 +23,7 @@ enum CombatRules {
                               apexActionSlots: [InstanceID: Int] = [:],
                               ordinaryPressureSlots: Int = 0,
                               initiallyUnrecordedSpecies: Set<String> = [],
+                              debugV2BinderAttack: EncounterState.DebugV2BinderAttackReceipt? = nil,
                               rng: inout SeededRNG) -> EncounterState {
         var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = party.map { member in
             (member, member == .binder ? Tuning.Encounter.binderInitiative
@@ -85,6 +86,7 @@ enum CombatRules {
             order: order,
             turnSlots: slots,
             initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
+            debugV2BinderAttack: debugV2BinderAttack,
             log: opening
         )
     }
@@ -370,6 +372,14 @@ enum CombatRules {
         return loadout(of: actor, in: state).freeFlee && !run.vanishWithdrawSpent
     }
 
+    /// Frozen v2 bonus for the two explicitly typed weapon techniques in this first slice.
+    /// Unbind and other legacy `.damage` skills are intentionally not weapon hits.
+    private static func debugV2WeaponTechniqueBonus(for actor: Combatant, kind: DamageKind,
+                                                     encounter: EncounterState) -> Int {
+        guard actor == .binder, let receipt = encounter.debugV2BinderAttack else { return 0 }
+        return receipt.preMatchupBonus(for: kind).total
+    }
+
     /// **Every skill's effect.**
     ///
     /// The design rule the whole set is built on (`resources-skills-spec.md` §2): *every skill
@@ -405,14 +415,18 @@ enum CombatRules {
             // **Pry.** Goes under the plate entirely, and hits for very little. The answer to a
             // bulwark whose armour is eating four fifths of every honest swing.
             guard let foe else { return }
-            strike(foe.id, damage: power, by: actor, kind: .pierce,
+            strike(foe.id, damage: power + debugV2WeaponTechniqueBonus(for: actor, kind: .pierce,
+                                                                       encounter: encounter),
+                   by: actor, kind: .pierce,
                    run: &run, encounter: &encounter, verb: skill.name, ignoresArmour: true,
                    standingBack: standingBack, reachOfActor: reach)
 
         case .overbear:
             // **Overbear.** All your weight behind it, and you're out of position afterwards.
             guard let foe else { return }
-            strike(foe.id, damage: power, by: actor, kind: .crush,
+            strike(foe.id, damage: power + debugV2WeaponTechniqueBonus(for: actor, kind: .crush,
+                                                                       encounter: encounter),
+                   by: actor, kind: .crush,
                    run: &run, encounter: &encounter, verb: skill.name,
                    standingBack: standingBack, reachOfActor: reach)
             encounter.skippedTurns[actor, default: 0] += 1
@@ -783,11 +797,30 @@ enum CombatRules {
 
     private static func baseAttack(of actor: Combatant, in state: GameState) -> Int {
         switch actor {
-        case .binder: binderAttack(in: state)
-        case .companion(let index): companionAttack(index, in: state)
+        case .binder:
+            let frozen = state.worlds.activeRun?.activeEncounter?.debugV2BinderAttack
+            return binderAttack(in: state)
+                + (frozen?.preMatchupBonus(for: frozen?.ordinaryWeaponKind).total ?? 0)
+        case .companion(let index): return companionAttack(index, in: state)
         case .foe(let id):
-            state.worlds.activeRun?.activeEncounter?.foes.first { $0.id == id }?.stats.attack ?? 1
+            return state.worlds.activeRun?.activeEncounter?.foes.first { $0.id == id }?.stats.attack ?? 1
         }
+    }
+
+    static func debugV2DirectAttackPreview(foe: FoeState, in state: GameState,
+                                           standingBack: Bool = false) -> CombatDamageRules.Preview? {
+        guard let receipt = state.worlds.activeRun?.activeEncounter?.debugV2BinderAttack else { return nil }
+        let power = binderAttack(in: state)
+            + receipt.preMatchupBonus(for: receipt.ordinaryWeaponKind).total
+        let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
+        let range = max(Tuning.Encounter.minimumDamage, power - spread)...max(Tuning.Encounter.minimumDamage,
+                                                                               power + spread)
+        return CombatDamageRules.preview(rolledPower: range,
+            in: .init(damageKind: receipt.ordinaryWeaponKind,
+                      covering: foe.traits?.covering ?? Covering(),
+                      wildRule: wildRule(for: .binder, in: state),
+                      standingBack: standingBack,
+                      reach: reach(for: .binder, in: state), armour: foe.stats.armour))
     }
 
     private static func strike(_ foeID: InstanceID,

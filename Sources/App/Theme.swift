@@ -155,6 +155,10 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
     /// so this preference migration never rewrites an existing expedition or encounter.
     var encounterScalingProfileSchemaVersion = Self.currentEncounterScalingProfileSchemaVersion
     var encounterScalingProfile: EncounterScalingProfile = .recommended
+    var debugCombatV2BinderAttackEnabled = false
+    /// Exact stable node IDs for the Binder-only combat-v2 comparison harness. These are frozen
+    /// into an encounter; changing this preference never mutates a fight already in progress.
+    var debugCombatV2BinderNodeIDs: Set<CombatNodeID> = []
 
     var isDefault: Bool { self == .defaults }
 
@@ -230,6 +234,10 @@ struct DebugTuningProfile: Codable, Equatable, Sendable {
         encounterScalingProfileSchemaVersion = savedProfileVersion
         encounterScalingProfile = try c.decodeIfPresent(EncounterScalingProfile.self,
             forKey: .encounterScalingProfile) ?? .current
+        debugCombatV2BinderNodeIDs = try c.decodeIfPresent(Set<CombatNodeID>.self,
+            forKey: .debugCombatV2BinderNodeIDs) ?? []
+        debugCombatV2BinderAttackEnabled = try c.decodeIfPresent(Bool.self,
+            forKey: .debugCombatV2BinderAttackEnabled) ?? false
     }
 }
 

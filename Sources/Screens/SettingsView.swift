@@ -212,6 +212,17 @@ struct BalancingView: View {
                 }
             }
 
+            Section("Combat v2 attack harness") {
+                Toggle("Use frozen v2 Binder attack", isOn: $settings.debugTuning.debugCombatV2BinderAttackEnabled)
+                debugCombatNodeToggle("Heavy Hand · Crush +2",
+                                      id: CombatDerivedStatsRules.Node.heavyHand)
+                debugCombatNodeToggle("Keen Eye · Pierce +2",
+                                      id: CombatDerivedStatsRules.Node.keenEye)
+                Text("Binder-only comparison harness. Exact node IDs freeze when combat opens; changing these switches cannot alter an active encounter.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section {
                 Picker("Opening encounter envelope",
                        selection: $settings.debugTuning.openingEncounterEnvelope) {
@@ -298,6 +309,15 @@ struct BalancingView: View {
         }
         .navigationTitle("Balancing")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func debugCombatNodeToggle(_ title: String, id: CombatNodeID) -> some View {
+        Toggle(title, isOn: Binding(
+            get: { settings.debugTuning.debugCombatV2BinderNodeIDs.contains(id) },
+            set: { enabled in
+                if enabled { settings.debugTuning.debugCombatV2BinderNodeIDs.insert(id) }
+                else { settings.debugTuning.debugCombatV2BinderNodeIDs.remove(id) }
+            }))
     }
 
     private func tuningSlider(_ title: String, value: Binding<Double>,

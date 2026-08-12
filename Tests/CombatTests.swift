@@ -1716,4 +1716,158 @@ final class CombatTests: XCTestCase {
         }
         return store
     }
+
+    func testDebugV2EnabledEmptyReceiptIsDistinctFromLegacyAndFreezesAcrossRelaunch() throws {
+        var rng = SeededRNG(seed: 44)
+        let empty = EncounterState.DebugV2BinderAttackReceipt(
+            ordinaryWeaponKind: .crush, crushBonus: .init(components: []),
+            pierceBonus: .init(components: []))
+        let v2 = CombatRules.makeEncounter(id: InstanceID(rawValue: 1), foes: [], party: [.binder],
+                                           debugV2BinderAttack: empty, rng: &rng)
+        let legacy = CombatRules.makeEncounter(id: InstanceID(rawValue: 2), foes: [], party: [.binder], rng: &rng)
+        XCTAssertEqual(v2.debugV2BinderAttack?.preMatchupBonus(for: .crush).total, 0)
+        XCTAssertNil(legacy.debugV2BinderAttack)
+        XCTAssertEqual(try JSONDecoder().decode(EncounterState.self,
+                                                from: JSONEncoder().encode(v2)).debugV2BinderAttack,
+                       empty)
+    }
+
+    func testFrozenDebugV2ReceiptUsesOnlyTheMatchingExactNode() throws {
+        let heavy = CombatDerivedStatsRules.Node.heavyHand
+        let keen = CombatDerivedStatsRules.Node.keenEye
+        let crush = CombatDerivedStatsRules.preMatchupAttackBonus(
+            ownedNodeIDs: [heavy, keen], weaponDamageKind: .crush)
+        XCTAssertEqual(crush.total, 2)
+        XCTAssertEqual(crush.components.map(\.nodeID), [heavy])
+        XCTAssertEqual(CombatDerivedStatsRules.preMatchupAttackBonus(
+            ownedNodeIDs: [heavy], weaponDamageKind: .pierce).total, 0)
+        XCTAssertEqual(CombatDerivedStatsRules.preMatchupAttackBonus(
+            ownedNodeIDs: [keen], weaponDamageKind: .pierce).total, 2)
+
+        var rng = SeededRNG(seed: 9)
+        let encounter = CombatRules.makeEncounter(
+            id: InstanceID(rawValue: 1), foes: [], party: [.binder],
+            debugV2BinderAttack: .init(ordinaryWeaponKind: .crush, crushBonus: crush,
+                                       pierceBonus: CombatDerivedStatsRules.preMatchupAttackBonus(
+                                        ownedNodeIDs: [heavy, keen], weaponDamageKind: .pierce)), rng: &rng)
+        var changedPreference = DebugTuningProfile()
+        changedPreference.debugCombatV2BinderAttackEnabled = true
+        changedPreference.debugCombatV2BinderNodeIDs = [keen]
+        XCTAssertEqual(encounter.debugV2BinderAttack?.preMatchupBonus(for: .crush), crush,
+                       "post-entry DEBUG changes cannot mutate the frozen encounter receipt")
+    }
+
+    func testFrozenV2AttackMatrixUsesPreviewAndCommittedPathExactlyOnce() throws {
+        let cases: [(weapon: ItemID, kind: DamageKind, nodes: Set<CombatNodeID>, bonus: Int)] = [
+            ("field_maul", .crush, [CombatDerivedStatsRules.Node.heavyHand], 2),
+            ("blade_keen", .pierce, [CombatDerivedStatsRules.Node.keenEye], 2),
+            ("blade_keen", .pierce, [CombatDerivedStatsRules.Node.heavyHand], 0),
+            ("field_maul", .crush, [], 0)
+        ]
+        for (offset, fixture) in cases.enumerated() {
+            let store = GameStore(io: .temporary(name: "v2-hit-\(UUID().uuidString)"))
+            store.write("plains")
+            store.bindAndDepart()
+            let foeID = InstanceID(rawValue: UInt64(501 + offset))
+            var traits = CreatureTraits()
+            traits.covering = Covering(hardness: 0, length: 0, coverage: 0)
+            var stats = CombatStats.derived(from: traits, name: "Target", icon: "circle")
+            stats.maxHP = 500; stats.armour = 0; stats.evasion = 0
+            store.mutate("stage fixed v2 hit") { state in
+                state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: fixture.weapon)
+                guard var run = state.worlds.activeRun else { return }
+                var orderRNG = SeededRNG(seed: 1)
+                run.activeEncounter = CombatRules.makeEncounter(
+                    id: InstanceID(rawValue: 2),
+                    foes: [FoeState(id: foeID, traits: traits, stats: stats, currentHP: stats.maxHP)],
+                    party: [.binder],
+                    debugV2BinderAttack: .init(
+                        ordinaryWeaponKind: fixture.kind,
+                        crushBonus: CombatDerivedStatsRules.preMatchupAttackBonus(
+                            ownedNodeIDs: fixture.nodes, weaponDamageKind: .crush),
+                        pierceBonus: CombatDerivedStatsRules.preMatchupAttackBonus(
+                            ownedNodeIDs: fixture.nodes, weaponDamageKind: .pierce)),
+                    rng: &orderRNG)
+                state.worlds.activeRun = run
+            }
+            let receipt = try XCTUnwrap(store.activeEncounter?.debugV2BinderAttack)
+            XCTAssertEqual(receipt.preMatchupBonus(for: fixture.kind).total, fixture.bonus)
+            let preview = try XCTUnwrap(CombatRules.debugV2DirectAttackPreview(
+                foe: try XCTUnwrap(store.activeEncounter?.foes.first), in: store.state))
+            let basePower = CombatRules.binderAttack(in: store.state) + fixture.bonus
+            let spread = max(1, Int((Double(basePower) * Tuning.Encounter.damageVariance).rounded()))
+            var fixedRNG = try XCTUnwrap(store.state.worlds.activeRun).rng
+            let fixedRoll = max(Tuning.Encounter.minimumDamage,
+                                basePower + fixedRNG.int(in: -spread...spread))
+            let expected = CombatDamageRules.resolve(
+                rolledPower: fixedRoll,
+                in: .init(damageKind: fixture.kind, covering: traits.covering, armour: 0))
+            let before = try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP)
+            store.mutate("commit fixed attack") {
+                CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0)
+            }
+            let committed = before - (try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP))
+            XCTAssertTrue((preview.lower.finalDamage...preview.upper.finalDamage).contains(committed))
+            XCTAssertEqual(committed, expected.finalDamage,
+                           "fixed-roll preview and commit diverged for \(fixture.kind)")
+        }
+    }
+
+    func testFrozenHeavyHandAndKeenEyeReachOnlyTheirExplicitWeaponTechniques() throws {
+        let fixtures: [(skill: SkillID, weapon: ItemID, kind: DamageKind,
+                        node: CombatNodeID, isWeaponTechnique: Bool)] = [
+            ("overbear", "blade_keen", .crush, CombatDerivedStatsRules.Node.heavyHand, true),
+            ("pry", "field_maul", .pierce, CombatDerivedStatsRules.Node.keenEye, true),
+            ("unbind", "field_maul", .crush, CombatDerivedStatsRules.Node.heavyHand, false)
+        ]
+        for fixture in fixtures {
+            for nodes: Set<CombatNodeID> in [[fixture.node], []] {
+                let store = GameStore(io: .temporary(name: "v2-technique-\(UUID().uuidString)"))
+                store.mutate("learn techniques") { Self.learnEverything(&$0) }
+                store.write("plains"); store.bindAndDepart()
+                let foeID = InstanceID(rawValue: 701)
+                var traits = CreatureTraits()
+                traits.covering = Covering(hardness: 0, length: 0, coverage: 0)
+                var stats = CombatStats.derived(from: traits, name: "Target", icon: "circle")
+                stats.maxHP = 500; stats.armour = 0; stats.evasion = 0
+                store.mutate("stage weapon technique") { state in
+                    Self.learnEverything(&state)
+                    state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: fixture.weapon)
+                    guard var run = state.worlds.activeRun else { return }
+                    var orderRNG = SeededRNG(seed: 2)
+                    let ordinaryKind: DamageKind = fixture.weapon == "field_maul" ? .crush : .pierce
+                    run.activeEncounter = CombatRules.makeEncounter(
+                        id: InstanceID(rawValue: 3),
+                        foes: [FoeState(id: foeID, traits: traits, stats: stats, currentHP: stats.maxHP)],
+                        party: [.binder],
+                        debugV2BinderAttack: .init(
+                            ordinaryWeaponKind: ordinaryKind,
+                            crushBonus: CombatDerivedStatsRules.preMatchupAttackBonus(
+                                ownedNodeIDs: nodes, weaponDamageKind: .crush),
+                            pierceBonus: CombatDerivedStatsRules.preMatchupAttackBonus(
+                                ownedNodeIDs: nodes, weaponDamageKind: .pierce)), rng: &orderRNG)
+                    state.worlds.activeRun = run
+                }
+                let skill = try XCTUnwrap(ContentCatalog.shared.skill(fixture.skill))
+                let ordinaryPower = CharacterRules.skillPower(skill.power,
+                                                               store.state.base.binderCharacter.stats)
+                let bonus = nodes.isEmpty || !fixture.isWeaponTechnique ? 0 : 2
+                let power = ordinaryPower + bonus
+                let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
+                var fixedRNG = try XCTUnwrap(store.state.worlds.activeRun).rng
+                let fixedRoll = max(Tuning.Encounter.minimumDamage,
+                                    power + fixedRNG.int(in: -spread...spread))
+                let expected = CombatDamageRules.resolve(
+                    rolledPower: fixedRoll,
+                    in: .init(damageKind: fixture.kind, covering: traits.covering,
+                              armour: 0, ignoresArmour: fixture.skill == "pry"))
+                let before = try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP)
+                store.mutate("commit weapon technique") {
+                    CombatRules.perform(.skill(fixture.skill, foe: foeID), by: .binder, in: &$0)
+                }
+                XCTAssertEqual(before - (try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP)),
+                               expected.finalDamage)
+            }
+        }
+    }
 }

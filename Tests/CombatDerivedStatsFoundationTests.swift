@@ -39,10 +39,10 @@ final class CombatDerivedStatsFoundationTests: XCTestCase {
     func testPhysicalRootsApplyOnlyToMatchingDamageKinds() {
         let heavy = node("offense.force.heavy_hand")
         let keen = node("offense.precision.keen_eye")
-        XCTAssertEqual(Rules.derive(input(nodes: [heavy], kind: .crush)).matchingPhysicalDamageBonus, 2)
-        XCTAssertEqual(Rules.derive(input(nodes: [heavy], kind: .rend)).matchingPhysicalDamageBonus, 0)
-        XCTAssertEqual(Rules.derive(input(nodes: [keen], kind: .pierce)).matchingPhysicalDamageBonus, 2)
-        XCTAssertEqual(Rules.derive(input(nodes: [keen], kind: .crush)).matchingPhysicalDamageBonus, 0)
+        XCTAssertEqual(Rules.derive(input(nodes: [heavy], kind: .crush)).preMatchupAttackBonus.total, 2)
+        XCTAssertEqual(Rules.derive(input(nodes: [heavy], kind: .rend)).preMatchupAttackBonus.total, 0)
+        XCTAssertEqual(Rules.derive(input(nodes: [keen], kind: .pierce)).preMatchupAttackBonus.total, 2)
+        XCTAssertEqual(Rules.derive(input(nodes: [keen], kind: .crush)).preMatchupAttackBonus.total, 0)
     }
 
     func testInitiativeReliefRoundsTowardZeroAndMomentumUsesRelievedPenalty() {
@@ -55,9 +55,9 @@ final class CombatDerivedStatsFoundationTests: XCTestCase {
         XCTAssertEqual(result.unencumberedInitiative, 15)
         XCTAssertEqual(result.effectiveGearInitiativePenalty, 4)
         XCTAssertEqual(result.initiative, 11)
-        XCTAssertEqual(result.momentumDamageBonus, 1)
+        XCTAssertEqual(result.preMatchupAttackBonus.total, 1)
 
-        XCTAssertEqual(Rules.derive(input(nodes: [momentum], gearInitiative: -30)).momentumDamageBonus, 4)
+        XCTAssertEqual(Rules.derive(input(nodes: [momentum], gearInitiative: -30)).preMatchupAttackBonus.total, 4)
         XCTAssertEqual(Rules.derive(input(nodes: [lightTouch], gearInitiative: 3)).initiative, 11,
                        "Light Touch must preserve positive equipment initiative")
     }
@@ -114,5 +114,23 @@ final class CombatDerivedStatsFoundationTests: XCTestCase {
                                    node("defense.fortitude.thick_hide")],
                            gearInitiative: -2)
         XCTAssertEqual(Rules.derive(frozen), Rules.derive(frozen))
+    }
+
+    func testProductionDebugReceiptFactoryDistinguishesDisabledEmptyAndExactNodes() throws {
+        XCTAssertNil(Rules.debugBinderAttackReceipt(enabled: false,
+                                                     selectedNodeIDs: [node("offense.force.heavy_hand")],
+                                                     ordinaryWeaponKind: .crush))
+        let empty = try XCTUnwrap(Rules.debugBinderAttackReceipt(
+            enabled: true, selectedNodeIDs: [], ordinaryWeaponKind: .crush))
+        XCTAssertEqual(empty.preMatchupBonus(for: .crush).total, 0)
+        let exact = try XCTUnwrap(Rules.debugBinderAttackReceipt(
+            enabled: true,
+            selectedNodeIDs: [node("offense.force.heavy_hand"), node("offense.precision.keen_eye")],
+            ordinaryWeaponKind: .rend))
+        XCTAssertEqual(exact.preMatchupBonus(for: .crush).components.map(\.nodeID),
+                       [node("offense.force.heavy_hand")])
+        XCTAssertEqual(exact.preMatchupBonus(for: .pierce).components.map(\.nodeID),
+                       [node("offense.precision.keen_eye")])
+        XCTAssertEqual(exact.preMatchupBonus(for: .rend).total, 0)
     }
 }

@@ -263,6 +263,21 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
 /// A fight in progress. Saved in full — being mid-encounter is the hardest resume case in the game,
 /// and the one the acceptance criteria call out by name.
 struct EncounterState: Codable, Equatable, Sendable {
+    struct DebugV2BinderAttackReceipt: Codable, Equatable, Sendable {
+        static let schemaVersion = 1
+        var version = schemaVersion
+        var ordinaryWeaponKind: DamageKind?
+        var crushBonus: CombatDerivedStatsRules.PreMatchupAttackBonus
+        var pierceBonus: CombatDerivedStatsRules.PreMatchupAttackBonus
+
+        func preMatchupBonus(for kind: DamageKind?) -> CombatDerivedStatsRules.PreMatchupAttackBonus {
+            switch kind {
+            case .crush: crushBonus
+            case .pierce: pierceBonus
+            case .rend, nil: .init(components: [])
+            }
+        }
+    }
     /// The saved fact of how contact began. Combat consumers read this instead of reconstructing
     /// an opening from post-contact enemy awareness or map visibility.
     enum Opening: Codable, Equatable, Sendable {
@@ -342,6 +357,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     var partyNames: [Int: String] = [:]
     /// Frozen DEBUG comparison inputs/results. Existing encounters decode without it.
     var scalingPreview: EncounterScalingRules.Preview?
+    /// Binder-only DEBUG harness receipt. It is frozen at encounter entry and never inferred from
+    /// legacy branch depth. Release encounters and old saves have no receipt.
+    var debugV2BinderAttack: DebugV2BinderAttackReceipt?
     var opening: OpeningResolution?
     /// Ordinary actions completed by each actor. Opening foe actions and zero-turn opening attacks
     /// do not enter this set.
@@ -450,13 +468,16 @@ struct EncounterState: Codable, Equatable, Sendable {
 
     init(id: InstanceID, foes: [FoeState], partyNames: [Int: String] = [:],
          order: [Combatant], turnSlots: [TurnSlot] = [],
-         initiallyUnrecordedSpecies: Set<String> = [], log: [String] = []) {
+         initiallyUnrecordedSpecies: Set<String> = [],
+         debugV2BinderAttack: DebugV2BinderAttackReceipt? = nil,
+         log: [String] = []) {
         self.id = id
         self.foes = foes
         self.partyNames = partyNames
         self.order = order
         self.turnSlots = turnSlots.isEmpty ? order.map { TurnSlot(actor: $0) } : turnSlots
         self.initiallyUnrecordedSpecies = initiallyUnrecordedSpecies
+        self.debugV2BinderAttack = debugV2BinderAttack
         self.log = log
     }
 
@@ -473,6 +494,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         foes = try c.decodeIfPresent([FoeState].self, forKey: .foes) ?? []
         partyNames = try c.decodeIfPresent([Int: String].self, forKey: .partyNames) ?? [:]
         scalingPreview = try c.decodeIfPresent(EncounterScalingRules.Preview.self, forKey: .scalingPreview)
+        debugV2BinderAttack = try c.decodeIfPresent(DebugV2BinderAttackReceipt.self,
+                                                     forKey: .debugV2BinderAttack)
         opening = try? c.decodeIfPresent(OpeningResolution.self, forKey: .opening)
         completedFirstActions = try c.decodeIfPresent(Set<Combatant>.self,
                                                        forKey: .completedFirstActions) ?? []

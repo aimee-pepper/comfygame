@@ -5,6 +5,18 @@ import Foundation
 /// Nothing in production combat calls this yet. Preview, encounter creation and committed combat
 /// must be moved to this path together; activating only one consumer would create split arithmetic.
 enum CombatDerivedStatsRules {
+    struct AttackBonusComponent: Codable, Equatable, Sendable {
+        var nodeID: CombatNodeID
+        var amount: Int
+    }
+
+    /// Additions made before matchup, rank and armour. This is deliberately not called `attack`:
+    /// weapon/base power remains owned by combat, and callers add this total exactly once.
+    struct PreMatchupAttackBonus: Codable, Equatable, Sendable {
+        var components: [AttackBonusComponent]
+        var total: Int { components.reduce(0) { $0 + $1.amount } }
+    }
+
     /// Compatibility adapter only. It does not persist ownership and does not activate v2.
     static func legacyOwnedNodes(for character: CharacterState,
                                  catalogue: CombatGraphCatalogue) -> Set<CombatNodeID> {
@@ -39,9 +51,7 @@ enum CombatDerivedStatsRules {
     }
 
     struct Output: Equatable, Sendable {
-        var attack: Int
-        var matchingPhysicalDamageBonus: Int
-        var momentumDamageBonus: Int
+        var preMatchupAttackBonus: PreMatchupAttackBonus
         var maximumHP: Int
         var initiative: Int
         var unencumberedInitiative: Int
@@ -56,7 +66,7 @@ enum CombatDerivedStatsRules {
         var contributorsByField: [String: [CombatNodeID]]
     }
 
-    private enum Node {
+    enum Node {
         static let heavyHand: CombatNodeID = "combat.offense.force.heavy_hand"
         static let momentum: CombatNodeID = "combat.offense.force.momentum"
         static let keenEye: CombatNodeID = "combat.offense.precision.keen_eye"
@@ -73,19 +83,40 @@ enum CombatDerivedStatsRules {
         static let attunement: CombatNodeID = "combat.craft.emanation.attunement"
     }
 
+    static func preMatchupAttackBonus(ownedNodeIDs: Set<CombatNodeID>,
+                                      weaponDamageKind: DamageKind?,
+                                      momentum: Int = 0) -> PreMatchupAttackBonus {
+        var components: [AttackBonusComponent] = []
+        if ownedNodeIDs.contains(Node.heavyHand), weaponDamageKind == .crush {
+            components.append(.init(nodeID: Node.heavyHand, amount: 2))
+        }
+        if ownedNodeIDs.contains(Node.keenEye), weaponDamageKind == .pierce {
+            components.append(.init(nodeID: Node.keenEye, amount: 2))
+        }
+        if momentum > 0, ownedNodeIDs.contains(Node.momentum) {
+            components.append(.init(nodeID: Node.momentum, amount: momentum))
+        }
+        return .init(components: components.sorted { $0.nodeID.rawValue < $1.nodeID.rawValue })
+    }
+
+    /// Sole DEBUG-route factory used at real encounter entry. Unsupported IDs are ignored; an
+    /// enabled empty selection deliberately returns a zero-component v2 receipt rather than nil.
+    static func debugBinderAttackReceipt(enabled: Bool, selectedNodeIDs: Set<CombatNodeID>,
+                                         ordinaryWeaponKind: DamageKind?)
+        -> EncounterState.DebugV2BinderAttackReceipt? {
+        guard enabled else { return nil }
+        let supported = selectedNodeIDs.intersection([Node.heavyHand, Node.keenEye])
+        return .init(
+            ordinaryWeaponKind: ordinaryWeaponKind,
+            crushBonus: preMatchupAttackBonus(ownedNodeIDs: supported, weaponDamageKind: .crush),
+            pierceBonus: preMatchupAttackBonus(ownedNodeIDs: supported, weaponDamageKind: .pierce))
+    }
+
     static func derive(_ input: Input) -> Output {
         let owned = input.ownedNodeIDs
         var provenance: [String: Set<CombatNodeID>] = [:]
         func note(_ field: String, _ node: CombatNodeID) {
             provenance[field, default: []].insert(node)
-        }
-
-        var physical = 0
-        if owned.contains(Node.heavyHand), input.weaponDamageKind == .crush {
-            physical += 2; note("attack", Node.heavyHand)
-        }
-        if owned.contains(Node.keenEye), input.weaponDamageKind == .pierce {
-            physical += 2; note("attack", Node.keenEye)
         }
 
         var initiativeNodes = 0
@@ -103,6 +134,10 @@ enum CombatDerivedStatsRules {
             momentum = min(4, Int(floor(Double(penalty) * 0.4)))
             if momentum > 0 { note("attack", Node.momentum) }
         }
+        let attackBonus = preMatchupAttackBonus(ownedNodeIDs: owned,
+                                                weaponDamageKind: input.weaponDamageKind,
+                                                momentum: momentum)
+        for component in attackBonus.components { note("preMatchupAttackBonus", component.nodeID) }
 
         var hp = input.baseMaximumHP
         if owned.contains(Node.thickHide) { hp += 6; note("maximumHP", Node.thickHide) }
@@ -142,9 +177,7 @@ enum CombatDerivedStatsRules {
         if universalArmour { note("armourScope", Node.immovable) }
 
         return Output(
-            attack: input.baseAttack + physical + momentum,
-            matchingPhysicalDamageBonus: physical,
-            momentumDamageBonus: momentum,
+            preMatchupAttackBonus: attackBonus,
             maximumHP: hp,
             initiative: unencumbered + gearModifier,
             unencumberedInitiative: unencumbered,

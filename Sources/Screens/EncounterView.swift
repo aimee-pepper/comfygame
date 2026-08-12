@@ -124,10 +124,18 @@ struct EncounterView: View {
 
             VStack(spacing: 8) {
                 ForEach(encounter.foes) { foe in
-                    FoeCard(foe: foe,
-                            isActing: encounter.current == .foe(foe.id) && encounter.outcome == nil,
-                            isTargetable: targetingAction != nil && foe.isAlive)
-                        .onTapGesture { tapFoe(foe) }
+                    VStack(spacing: 3) {
+                        FoeCard(foe: foe,
+                                isActing: encounter.current == .foe(foe.id) && encounter.outcome == nil,
+                                isTargetable: targetingAction != nil && foe.isAlive)
+                            .onTapGesture { tapFoe(foe) }
+#if DEBUG
+                        if encounter.current == .binder, encounter.outcome == nil, foe.isAlive,
+                           encounter.debugV2BinderAttack != nil {
+                            debugV2TargetPreview(foe, encounter: encounter)
+                        }
+#endif
+                    }
                 }
             }
             .frame(maxWidth: .infinity)
@@ -225,6 +233,32 @@ struct EncounterView: View {
         .padding(.bottom, 6)
         .background(.bar)
     }
+
+#if DEBUG
+    @ViewBuilder
+    private func debugV2TargetPreview(_ foe: FoeState, encounter: EncounterState) -> some View {
+        if encounter.revealed.contains(foe.id),
+           let preview = CombatRules.debugV2DirectAttackPreview(foe: foe, in: store.state),
+           let receipt = encounter.debugV2BinderAttack {
+            let contributors = receipt.preMatchupBonus(for: receipt.ordinaryWeaponKind).components.map { component in
+                let name: String = switch component.nodeID {
+                case CombatDerivedStatsRules.Node.heavyHand: "Heavy Hand"
+                case CombatDerivedStatsRules.Node.keenEye: "Keen Eye"
+                default: component.nodeID.rawValue
+                }
+                return "\(name) [\(component.nodeID.rawValue)] +\(component.amount)"
+            }.joined(separator: " · ")
+            Text("V2 \(preview.lower.finalDamage)–\(preview.upper.finalDamage) · \(contributors.isEmpty ? "no node bonus" : contributors)")
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        } else {
+            Text("V2 damage preview needs Sight")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+    }
+#endif
 
     /// How many are actually usable this turn — the number you'd want before opening the list.
     private func skillDetail(_ encounter: EncounterState) -> String? {
