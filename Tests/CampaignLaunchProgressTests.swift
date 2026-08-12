@@ -125,6 +125,22 @@ final class CampaignLaunchProgressTests: XCTestCase {
                       "VoiceOver must name the live campaign-loading phase")
     }
 
+    func testLaunchProgressUsesAReservedFixedRegionInsteadOfSystemIntrinsicLayout() throws {
+        let source = try String(contentsOf: projectRoot
+            .appending(path: "Sources/App/BookbinderApp.swift"), encoding: .utf8)
+        let loadingSurface = try XCTUnwrap(source.range(of: "private var loadingSurface"))
+        let failureSurface = try XCTUnwrap(source.range(of: "private func failureSurface"))
+        let section = String(source[loadingSurface.lowerBound..<failureSurface.lowerBound])
+
+        XCTAssertTrue(section.contains("LaunchProgressTrack(fraction: progressFraction)"))
+        XCTAssertTrue(section.contains(".frame(width: 192, height: 4)"),
+                      "The live progress region must match the launch storyboard from frame one")
+        XCTAssertFalse(section.contains("ProgressView("),
+                       "System progress styling must not introduce different intrinsic geometry")
+        XCTAssertTrue(source.contains("geometry.size.width * min(1, max(0, fraction))"),
+                      "Progress may change only the fill width inside the reserved region")
+    }
+
     private func fixturePrepared() -> GameStore.PreparedLaunch {
         .init(state: .newGame(), loadOutcome: "fixture", saveFileByteCount: nil,
               timings: .init(loadMilliseconds: 1, reconciliationMilliseconds: 2,

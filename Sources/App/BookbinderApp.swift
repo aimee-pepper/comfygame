@@ -246,9 +246,7 @@ struct LaunchSurface: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 192, height: 21)
                 .offset(x: 28, y: 225)
-            ProgressView(value: progressFraction)
-                .progressViewStyle(.linear)
-                .tint(.brown)
+            LaunchProgressTrack(fraction: progressFraction)
                 .frame(width: 192, height: 4)
                 .offset(x: 28, y: 270)
                 .accessibilityLabel("Opening progress")
@@ -286,6 +284,24 @@ struct LaunchSurface: View {
             .overlay(Rectangle().stroke(.brown.opacity(0.75), lineWidth: 2))
         }
         .padding(32)
+    }
+}
+
+/// A fixed counterpart to the progress region reserved in LaunchScreen.storyboard.
+/// Only the brown fill changes width; the track's geometry exists from the first frame.
+private struct LaunchProgressTrack: View {
+    let fraction: Double
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Rectangle().fill(Color(.tertiarySystemFill))
+                Rectangle()
+                    .fill(.brown)
+                    .frame(width: geometry.size.width * min(1, max(0, fraction)))
+            }
+        }
+        .accessibilityHidden(true)
     }
 }
 
