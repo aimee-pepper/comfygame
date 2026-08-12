@@ -68,6 +68,7 @@
 		3F566ECFBA89D9C89BF6CD76 /* BestiaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2AEBC30A9B7C63053F8A0F /* BestiaryView.swift */; };
 		3F6C7DB75723783F90E7E5F8 /* WorldsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF0BDCB9C9FD9D726EB1BA9 /* WorldsState.swift */; };
 		3F7F3C4563DF82F7C46AD147 /* DebugBugReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475999A2E43B7E5F16A3E724 /* DebugBugReporter.swift */; };
+		3F8AF2F1560817D135E46BC8 /* CampaignLaunchProgressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB1B5ADB9BA9F47B33028E2 /* CampaignLaunchProgressTests.swift */; };
 		3FD60BA9683F245EBFA14D61 /* SpendingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */; };
 		3FEC7A80C9D18085728D1574 /* RecyclerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E01A9F65815D1E04ADB910A /* RecyclerView.swift */; };
 		40CDA99CD7F4DFF60EC0EBBB /* SiteModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DA32364644741F03829592 /* SiteModels.swift */; };
@@ -299,6 +300,7 @@
 		2EADA515B59EC9ABA10B19F9 /* LivingAnalysisRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivingAnalysisRules.swift; sourceTree = "<group>"; };
 		2EC7108D31E9422C701DCEDD /* CombatDerivedStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatDerivedStats.swift; sourceTree = "<group>"; };
 		3358F9F069CEED67DA33294D /* Sigil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sigil.swift; sourceTree = "<group>"; };
+		2FB1B5ADB9BA9F47B33028E2 /* CampaignLaunchProgressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampaignLaunchProgressTests.swift; sourceTree = "<group>"; };
 		3464FCF84292D7835460EDEE /* GameActions+Combat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameActions+Combat.swift"; sourceTree = "<group>"; };
 		346EEEC616B8EBFE291C4A79 /* BaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseView.swift; sourceTree = "<group>"; };
 		36DEAE589721D10BEDE5AEC8 /* PreviewPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPanel.swift; sourceTree = "<group>"; };
@@ -783,6 +785,7 @@
 				7582647B2841DB69559E3968 /* BookRulesTests.swift */,
 				B6B3681EEDB3DB65AE754495 /* CampaignStartPresentationTests.swift */,
 				E3454F785ADFD7CFC19BFCF5 /* CatalogueItemVisualAdapterTests.swift */,
+				2FB1B5ADB9BA9F47B33028E2 /* CampaignLaunchProgressTests.swift */,
 				53634CFCB3CD23CDD115C001 /* ChasmTests.swift */,
 				A63931749B9E0FF4D2097ABD /* CombatActionOwnershipTests.swift */,
 				E3CEC3D11B926B391742E90C /* CombatDamageRulesTests.swift */,
@@ -1182,6 +1185,7 @@
 				7FAF1BB2BE9134A54D8E970C /* CampaignStartPresentationTests.swift in Sources */,
 				B359756CD03EA20040D41934 /* CatalogueItemVisualAdapterTests.swift in Sources */,
 				F6AE3DF4E00E397B950A1CBC /* ChasmTests.swift in Sources */,
+				3F8AF2F1560817D135E46BC8 /* CampaignLaunchProgressTests.swift in Sources */,
 				4D28095C1853704D7BE6B892 /* CombatActionOwnershipTests.swift in Sources */,
 				032B8A18E9C67A5EA6DA3375 /* CombatDamageRulesTests.swift in Sources */,
 				9325056626B6BA2E7E6AA3B1 /* CombatDerivedStatsFoundationTests.swift in Sources */,

@@ -187,9 +187,26 @@ private struct LaunchRootView: View {
 }
 
 struct LaunchSurface: View {
-    var preparationStep: GameStore.PreparationStep = .loadingSave
+    var progressFraction: Double
+    var progressDescription: String
     var failure: AppLaunchCoordinator.Failure?
     var retry: (() -> Void)?
+
+    init(preparationStep: GameStore.PreparationStep = .loadingSave,
+         failure: AppLaunchCoordinator.Failure? = nil,
+         retry: (() -> Void)? = nil) {
+        progressFraction = preparationStep.completedFraction
+        progressDescription = preparationStep.accessibilityDescription
+        self.failure = failure
+        self.retry = retry
+    }
+
+    init(progressFraction: Double, progressDescription: String) {
+        self.progressFraction = min(1, max(0, progressFraction))
+        self.progressDescription = progressDescription
+        failure = nil
+        retry = nil
+    }
 
     var body: some View {
         Group {
@@ -203,7 +220,7 @@ struct LaunchSurface: View {
         .background(Color(.systemBackground))
         .accessibilityElement(children: failure == nil ? .combine : .contain)
         .accessibilityLabel(failure == nil
-                            ? "Bookbinder. Opening the Atlas. \(preparationStep.accessibilityDescription)."
+                            ? "Bookbinder. Opening the Atlas. \(progressDescription)."
                             : "Bookbinder. \(failure!.message)")
     }
 
@@ -229,13 +246,13 @@ struct LaunchSurface: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 192, height: 21)
                 .offset(x: 28, y: 225)
-            ProgressView(value: preparationStep.completedFraction)
+            ProgressView(value: progressFraction)
                 .progressViewStyle(.linear)
                 .tint(.brown)
                 .frame(width: 192, height: 4)
                 .offset(x: 28, y: 270)
                 .accessibilityLabel("Opening progress")
-                .accessibilityValue(preparationStep.accessibilityDescription)
+                .accessibilityValue(progressDescription)
             Rectangle().fill(.secondary).frame(width: 212, height: 2).offset(x: 18, y: 316)
         }
         .frame(width: 248, height: 340)

@@ -3,8 +3,8 @@
   "updated": "11 Aug 2026",
   "installedCheckpoint": "ce9b1af · Combat technique ownership and Withdraw",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 Noll/Recycler device acceptance waiting · Spring source ready",
-  "currentNote": "WIP limit: one Engineering slice, one phone acceptance checkpoint and at most one directly enabling Asset consumer. Essence Spring refining is source-green and awaits its ordered phone gate; the app remains untouched during Aimee's fresh-save test. Next is Noll/Recycler aaf6280 device acceptance using the Phase 1 phone card, followed by resource/terrain/UI and bug-delivery acceptance. Source-green and readyToTest remain unfinished; no additional Engineering implementation slice starts behind this acceptance queue.",
+  "currentWork": "P1 Noll/Recycler device acceptance waiting · production launch source ready",
+  "currentNote": "WIP limit: one Engineering slice, one phone acceptance checkpoint and at most one directly enabling Asset consumer. Noll/Recycler aaf6280 remains the next isolated phone install when Aimee releases the current run. Essence Spring and the corrected production campaign-slot loading path are source-green but unfinished until their ordered phone gates; no additional Engineering implementation slice starts behind this acceptance queue.",
   "items": [
     {
       "id": "essence",
@@ -131,8 +131,8 @@
       "priority": "P1",
       "title": "Launch-screen handoff alignment",
       "status": "readyToTest",
-      "detail": "The SwiftUI loading surface uses the storyboard's exact fixed 248×340 geometry and typography. A shared 192×4 track now advances only through real read, reconcile, commit and ready milestones.",
-      "gate": "Static → in-app loading preserves the same mark, scale, alignment and empty progress track; the fill advances monotonically through real work and warm-ready scenes do not flash it."
+      "detail": "Source-green on the live CampaignAppCoordinator path: the storyboard-matched 248×340 surface now publishes real legacy adoption, shelf inspection, selected-slot acquisition, read, reconcile, conditional commit and ready progress. Normalized campaigns perform zero launch writes; actual reconciliation commits once.",
+      "gate": "Phone evidence must capture static → campaign inspection → selected-campaign handoff at one viewport, VoiceOver phase names and exact adoption/inspection/load/reconcile/persist timings. Fill is monotonic within each operation, stale callbacks cannot regress it, and warm-ready scenes do not flash it."
     },
     {
       "id": "encounter-opening",

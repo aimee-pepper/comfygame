@@ -128,37 +128,40 @@ final class GameStore: ObservableObject {
         let loadedAt = DispatchTime.now().uptimeNanoseconds
         progress(.reconcilingCatalogue)
 
-        state.meta.launchCount += 1
+        let loadedState = state
         state.base.seatEveryoneFound(in: state.reality.library)
         state.base.learnEveryStarterWord()
-        state.meta.mutationCount += 1
-        state.meta.recordSemanticAction("launch")
-        state.meta.lastSavedAt = Date()
 
         if state.worlds.activeRun == nil {
             let floor = EconomyRules.minimumBindCost(in: state)
             if EconomyRules.spendableEssence(in: state) < floor {
                 state.base.essence += max(0, floor - EconomyRules.spendableEssence(in: state))
-                state.meta.mutationCount += 1
-                state.meta.recordSemanticAction("the spring provides")
-                state.meta.lastSavedAt = Date()
             }
         }
         let reconciledAt = DispatchTime.now().uptimeNanoseconds
-        progress(.committingSave)
+        var persistedAt = reconciledAt
 
-        do {
-            let committedData = try SaveCodec.encode(state)
-            try io.write(committedData)
-            // Publish the same normalized representation a future process will decode.
-            // Several tolerant save fields intentionally omit default dictionary entries.
-            state = try SaveCodec.decode(committedData)
+        // A normal launch is read-only. Previously diagnostics-only launch bookkeeping forced an
+        // envelope encode, atomic write, and second full decode every time the app opened. Commit
+        // only when tolerant decode/reconciliation actually changed campaign facts.
+        if state != loadedState {
+            state.meta.mutationCount += 1
+            state.meta.recordSemanticAction("launch reconciliation")
+            state.meta.lastSavedAt = Date()
+            progress(.committingSave)
+            do {
+                let committedData = try SaveCodec.encode(state)
+                try io.write(committedData)
+                // Publish the same normalized representation a future process will decode.
+                // Several tolerant save fields intentionally omit default dictionary entries.
+                state = try SaveCodec.decode(committedData)
+            }
+            catch {
+                Logger.persistence.error("Launch commitment failed: \(String(describing: error))")
+                throw error
+            }
+            persistedAt = DispatchTime.now().uptimeNanoseconds
         }
-        catch {
-            Logger.persistence.error("Launch commitment failed: \(String(describing: error))")
-            throw error
-        }
-        let persistedAt = DispatchTime.now().uptimeNanoseconds
         progress(.complete)
         func milliseconds(_ start: UInt64, _ end: UInt64) -> Double {
             Double(end - start) / 1_000_000

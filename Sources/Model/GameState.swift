@@ -97,7 +97,8 @@ struct SaveMeta: Codable, Equatable, Sendable {
     var semanticActionTrail: [String] = []
     /// Diagnostics only. No game rule may read this (pillar 2: no wall-clock gameplay).
     var lastSavedAt: Date? = nil
-    /// Number of app launches that loaded this save. Useful in the kill-test.
+    /// Legacy diagnostics-only field. Retained for tolerant decode; new launches use measured
+    /// coordinator timings and do not rewrite a campaign merely to increment this value.
     var launchCount: Int = 0
 
     init(mutationCount: Int = 0, lastAction: String = "new game",

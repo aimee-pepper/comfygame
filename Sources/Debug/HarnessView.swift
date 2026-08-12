@@ -41,7 +41,6 @@ struct HarnessView: View {
             Row("outcome at launch", store.diagnostics.loadOutcome)
             Row("mutations in memory", "\(state.meta.mutationCount)")
             Row("mutations on disk", "\(store.diagnostics.savedMutationCount)")
-            Row("launches", "\(state.meta.launchCount)")
             Row("last action", state.meta.lastAction)
             Row("writes this session", "\(store.diagnostics.writeCount)")
             Row("file size", store.diagnostics.saveFileByteCount.map { "\($0) bytes" } ?? "—")

@@ -4,6 +4,24 @@ import XCTest
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
 
+    private final class CountingIO: GamePersistenceIO, @unchecked Sendable {
+        let wrapped: SaveFileIO
+        private let lock = NSLock()
+        private var writeStorage = 0
+
+        init(_ wrapped: SaveFileIO) { self.wrapped = wrapped }
+        var saveURL: URL { wrapped.saveURL }
+        var saveFileByteCount: Int? { wrapped.saveFileByteCount }
+        var diagnosticCampaignReference: String? { wrapped.diagnosticCampaignReference }
+        var writes: Int { lock.withLock { writeStorage } }
+        func load() -> SaveLoadOutcome { wrapped.load() }
+        func write(_ data: Data) throws {
+            lock.withLock { writeStorage += 1 }
+            try wrapped.write(data)
+        }
+        func deleteEverything() { wrapped.deleteEverything() }
+    }
+
     private var io: SaveFileIO!
 
     override func setUp() {
@@ -175,9 +193,10 @@ final class PersistenceTests: XCTestCase {
         let prepared = try GameStore.prepareLaunch(io: io)
         let persisted = try XCTUnwrap(io.load().state)
 
-        XCTAssertEqual(prepared.state.meta.launchCount, 5)
-        XCTAssertEqual(prepared.state.meta.mutationCount, 11,
-                       "Launch and the anti-stranding Spring are two honest commitments")
+        XCTAssertEqual(prepared.state.meta.launchCount, 4,
+                       "Diagnostics-only launch counting must not force a save rewrite")
+        XCTAssertEqual(prepared.state.meta.mutationCount, 10,
+                       "All actual launch reconciliation commits as one mutation")
         XCTAssertEqual(persisted, prepared.state,
                        "A published store can never outrun its launch commitment on disk")
         XCTAssertGreaterThanOrEqual(prepared.timings.loadMilliseconds, 0)
@@ -201,12 +220,37 @@ final class PersistenceTests: XCTestCase {
             }
         }
         let recorder = Recorder()
+        var state = GameState.newGame()
+        state.base.essence = 0
+        try io.write(SaveCodec.encode(state))
 
         _ = try GameStore.prepareLaunch(io: io, progress: recorder.append)
 
         XCTAssertEqual(recorder.values,
                        [.loadingSave, .reconcilingCatalogue, .committingSave, .complete])
         XCTAssertEqual(recorder.values.map(\.completedFraction), [0, 1.0 / 3.0, 2.0 / 3.0, 1])
+    }
+
+    func testHealthyLaunchPerformsZeroWritesWhileRealReconciliationPersistsOnce() throws {
+        try io.write(SaveCodec.encode(GameState.newGame()))
+        _ = try GameStore.prepareLaunch(io: io)
+        let normalized = try XCTUnwrap(io.load().state)
+        let healthyIO = CountingIO(io)
+        let healthy = try GameStore.prepareLaunch(io: healthyIO)
+        XCTAssertEqual(healthyIO.writes, 0,
+                       "A healthy launch must not rewrite and decode the same campaign")
+        XCTAssertEqual(healthy.state, normalized)
+
+        var stranded = normalized
+        stranded.base.essence = 0
+        try io.write(SaveCodec.encode(stranded))
+        let reconciliationIO = CountingIO(io)
+        let reconciled = try GameStore.prepareLaunch(io: reconciliationIO)
+        XCTAssertEqual(reconciliationIO.writes, 1,
+                       "Real launch reconciliation must commit atomically exactly once")
+        XCTAssertGreaterThanOrEqual(EconomyRules.spendableEssence(in: reconciled.state),
+                                    EconomyRules.minimumBindCost(in: reconciled.state))
+        XCTAssertEqual(io.load().state, reconciled.state)
     }
 
     @MainActor
@@ -400,7 +444,7 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(decoded.lastAction, "returned")
     }
 
-    /// Relaunching must not disturb anything except the launch counter.
+    /// A healthy relaunch is read-only: it must not disturb campaign state just to count itself.
     @MainActor
     func testRelaunchResumesExactly() async throws {
         let first = GameStore(io: io)
@@ -415,7 +459,12 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(second.state.base, before.base)
         XCTAssertEqual(second.state.reality, before.reality)
         XCTAssertEqual(second.state.worlds, before.worlds)
-        XCTAssertEqual(second.state.meta.launchCount, before.meta.launchCount + 1)
+        XCTAssertEqual(second.state.base, before.base)
+        XCTAssertEqual(second.state.reality, before.reality)
+        XCTAssertEqual(second.state.worlds, before.worlds)
+        XCTAssertEqual(second.state.meta.mutationCount, before.meta.mutationCount)
+        XCTAssertEqual(second.state.meta.launchCount, before.meta.launchCount)
+        XCTAssertEqual(second.state.meta.lastAction, before.meta.lastAction)
     }
 
     /// The three-layer split has to be real, not aspirational.
