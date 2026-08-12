@@ -299,6 +299,7 @@ enum LibraryRules {
                 }
             },
             semanticRequests: TutorialRules.semanticRequests(on: page),
+            bindEssencePaid: book.essencePaid,
             worldVisualReceipt: worldVisualReceipt
         )
         record.livingAnalysis = LivingAnalysisRules.analyze(readings)

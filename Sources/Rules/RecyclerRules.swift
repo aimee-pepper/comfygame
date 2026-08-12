@@ -1,6 +1,28 @@
 import Foundation
 
 enum RecyclerRules {
+    enum Ineligibility: String, CaseIterable, Hashable, Sendable {
+        case stacked, unidentified, favorite, locked, equipped, notGear, unique, apex
+        case narrative, channelworks, legacyCredit, noRecoveryProfile
+
+        var explanation: String {
+            switch self {
+            case .stacked: "Separate this stack before dismantling one piece."
+            case .unidentified: "Identify it before deciding what should be recovered."
+            case .favorite: "Favorite pieces are protected. Remove Favorite first."
+            case .locked: "Locked pieces are protected. Unlock it first."
+            case .equipped: "Worn gear must be taken off before dismantling."
+            case .notGear: "The Recycler accepts eligible gear, not ordinary holdings."
+            case .unique: "Singular authored gear cannot be dismantled."
+            case .apex: "Apex gear keeps its rule and cannot be dismantled."
+            case .narrative: "Narrative objects remain intact."
+            case .channelworks: "Channelworks objects use their own receipt and cannot be dismantled here."
+            case .legacyCredit: "Legacy masterwork credit is protected from irreversible loss."
+            case .noRecoveryProfile: "No honest recovery profile or construction receipt exists for this piece."
+            }
+        }
+    }
+
     enum SalvageOutput: Equatable, Sendable {
         case resource(ResourceID)
         case reclaimedHide
@@ -82,10 +104,8 @@ enum RecyclerRules {
                         in base: BaseState) -> RecyclerPreview? {
         let tier = min(3, max(1, serviceTier))
         guard let stack = stack(stackID, at: location, in: base),
-              stack.count == 1, stack.identified, !stack.isFavorite, !stack.isLocked,
-              let definition = ContentCatalog.shared.item(stack.catalogID), definition.gear != nil,
-              definition.gear?.breaks == nil, stack.gearProfile?.authoredUniqueRuleID == nil,
-              (stack.gearProfile?.legacyPowerCredit ?? 0) == 0 else { return nil }
+              ineligibility(of: stack) == nil,
+              let definition = ContentCatalog.shared.item(stack.catalogID), definition.gear != nil else { return nil }
 
         let receipt = stack.gearProfile?.consumedSamples ?? []
         if !receipt.isEmpty {
@@ -122,6 +142,25 @@ enum RecyclerRules {
                                selectedReceiptIndices: [], recoveryCapacity: 0,
                                returnedSamples: samples, returnedResources: resources)
     }
+
+    static func ineligibility(of stack: ItemStack) -> Ineligibility? {
+        if stack.count != 1 { return .stacked }
+        if !stack.identified { return .unidentified }
+        if stack.isFavorite { return .favorite }
+        if stack.isLocked { return .locked }
+        if stack.catalogID == Items.conduitFixture { return .channelworks }
+        guard let definition = ContentCatalog.shared.item(stack.catalogID), definition.gear != nil
+        else { return .notGear }
+        if definition.gear?.breaks != nil { return .apex }
+        if let unique = stack.gearProfile?.authoredUniqueRuleID {
+            return unique.contains("narrative") ? .narrative : .unique
+        }
+        if (stack.gearProfile?.legacyPowerCredit ?? 0) > 0 { return .legacyCredit }
+        if !(stack.gearProfile?.consumedSamples.isEmpty ?? true) { return nil }
+        return salvageProfiles[stack.catalogID] == nil ? .noRecoveryProfile : nil
+    }
+
+    static func ineligibility(ofEquipped piece: EquippedPiece) -> Ineligibility { .equipped }
 
     static func commit(_ preview: RecyclerPreview, in base: inout BaseState) -> RecyclerCommitResult {
         guard preview.revision == base.recycler.inventoryRevision else { return .stale }

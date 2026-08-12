@@ -51,18 +51,18 @@ final class ContentTests: XCTestCase {
         let missingMeetingIDs = Set(catalogue.travellers.filter { $0.meeting == nil }.map(\.id))
         let draftIDs = Set(DraftMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
 
-        XCTAssertEqual(catalogue.travellers.count, 28,
-                       "Noll remains review-only and must not enter the live catalogue before approval")
-        XCTAssertEqual(catalogue.diaryPages.count, 233)
-        XCTAssertEqual(catalogue.travellers.filter { $0.meeting != nil }.count, 7)
+        XCTAssertEqual(catalogue.travellers.count, 29)
+        XCTAssertEqual(catalogue.diaryPages.count, 238,
+                       "Noll has five findable pages; the held Field Separation Kit page is DEBUG-only")
+        XCTAssertEqual(catalogue.travellers.filter { $0.meeting != nil }.count, 8)
         XCTAssertEqual(missingMeetingIDs.count, 21)
         XCTAssertEqual(DraftMeetingCorpus.meetings.count, 23,
                        "21 live missing meetings, Noll's review-only draft, and Auber's revision")
-        XCTAssertEqual(draftIDs.union(catalogueIDs).count, 29,
-                       "the review atlas covers 28 live travellers plus designed Noll")
+        XCTAssertEqual(draftIDs.union(catalogueIDs).count, 29)
         XCTAssertEqual(Set(inventory.map(\.id)), catalogueIDs)
         XCTAssertEqual(inventory.flatMap(\.units).filter { $0.kind == .diary }.count,
-                       catalogue.diaryPages.count)
+                       catalogue.diaryPages.count + 1,
+                       "the held Field Separation Kit page is reviewable but not findable")
         XCTAssertEqual(Set(inventory.filter { $0.traveller.meeting == nil }.map(\.id)),
                        missingMeetingIDs)
         XCTAssertEqual(draftIDs, missingMeetingIDs.union(["auber", "noll"]),
@@ -75,6 +75,10 @@ final class ContentTests: XCTestCase {
             .map(\.id)), missingMeetingIDs)
         XCTAssertEqual(Set(inventory.flatMap(\.units).map(\.id)).count, inventory.flatMap(\.units).count)
         XCTAssertEqual(inventory.first { $0.id == "auber" }?.meetingState, "Live · revision draft")
+        XCTAssertEqual(inventory.first { $0.id == "noll" }?.meetingState, "Live · revision draft")
+        XCTAssertTrue(inventory.first { $0.id == "noll" }?.units.allSatisfy {
+            ($0.detail ?? "").contains("Provisional") || $0.id.hasPrefix("meeting.noll")
+        } == true)
         XCTAssertEqual(DraftMeetingCorpus.meeting(for: "bryn")?.exchanges.first?.id, "bryn.held_route")
         let emphasized = AuthoredTextRendering.attributed("What happens *after*?")
         XCTAssertEqual(String(emphasized.characters), "What happens after?",
@@ -125,6 +129,31 @@ final class ContentTests: XCTestCase {
         try store.importReport(encoder.encode(imported))
         XCTAssertEqual(store.conflicts.map(\.id), [unit.id])
         XCTAssertEqual(store.note(for: unit), "newer café", "A conflict must not silently replace local work")
+    }
+
+    @MainActor func testCorrectedMeetingReviewAliasesRequireExactTextHash() throws {
+        let unit = try XCTUnwrap(AuthoredTextAtlas.inventory().first { $0.id == "sela" }?.units.first {
+            $0.id == "meeting.sela.exchange.sela.destination.ask"
+        })
+        let oldID = "meeting.sela.exchange.halloway.destination.ask"
+        let suite = "atlas-alias-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
+        let entry = AuthoredTextReviewStore.Entry(status: .good, note: "preserve",
+                                                   reviewedTextHash: unit.textHash, reviewedAt: Date())
+        defaults.set(try encoder.encode(AuthoredTextReviewStore.File(entries: [oldID: entry])),
+                     forKey: "debug.authoredTextReview.v1")
+        let migrated = AuthoredTextReviewStore(defaults: defaults)
+        XCTAssertEqual(migrated.status(for: unit), .good)
+        XCTAssertTrue(migrated.migrationWarnings.isEmpty)
+
+        defaults.set(try encoder.encode(AuthoredTextReviewStore.File(entries: [oldID:
+            .init(status: .needsRevision, note: nil, reviewedTextHash: "changed", reviewedAt: Date())])),
+                     forKey: "debug.authoredTextReview.v1")
+        let mismatched = AuthoredTextReviewStore(defaults: defaults)
+        XCTAssertEqual(mismatched.status(for: unit), .unreviewed)
+        XCTAssertEqual(mismatched.migrationWarnings.count, 1)
     }
 #endif
 

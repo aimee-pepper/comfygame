@@ -146,6 +146,9 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
     var written: [String]
     /// Normalized target chains used for semantic comparison. Old records fall back to `written`.
     var semanticRequests: [String]
+    /// Exact Essence paid when this authored world was bound. Legacy History records omit it;
+    /// runway estimates must exclude those records rather than repricing old writing with today's rules.
+    var bindEssencePaid: Int?
     /// **A modifier written where it changed nothing.** The thing you most want to find later.
     ///
     /// Called `inertRungs` until 6 Aug — *rung* was a spec coinage nobody had ever defined for the
@@ -206,6 +209,7 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
          travellersPresent: [TravellerID], isKept: Bool = false,
          focusAttributions: [String] = [], focusEffects: [RecordedFocusEffect] = [],
          semanticRequests: [String]? = nil,
+         bindEssencePaid: Int? = nil,
          worldVisualReceipt: WorldVisualReceipt? = nil) {
         self.id = id
         self.seed = seed
@@ -213,6 +217,7 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         self.descriptionSentence = descriptionSentence
         self.written = written
         self.semanticRequests = semanticRequests ?? written
+        self.bindEssencePaid = bindEssencePaid
         self.inertModifiers = inertModifiers
         self.readings = readings
         self.travellersPresent = travellersPresent
@@ -226,7 +231,7 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
 
     /// Includes the retired `inertRungs`, so a history written before the rename still reads.
     private enum CodingKeys: String, CodingKey {
-        case id, seed, runIndex, descriptionSentence, written, semanticRequests, inertModifiers, readings
+        case id, seed, runIndex, descriptionSentence, written, semanticRequests, bindEssencePaid, inertModifiers, readings
         case travellersPresent, isKept, focusAttributions, focusEffects, livingAnalysis, clockAnalysis
         case worldVisualReceipt
         case inertRungs
@@ -240,6 +245,7 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         try c.encode(descriptionSentence, forKey: .descriptionSentence)
         try c.encode(written, forKey: .written)
         try c.encode(semanticRequests, forKey: .semanticRequests)
+        try c.encodeIfPresent(bindEssencePaid, forKey: .bindEssencePaid)
         try c.encode(inertModifiers, forKey: .inertModifiers)
         try c.encode(readings, forKey: .readings)
         try c.encode(focusAttributions, forKey: .focusAttributions)
@@ -260,6 +266,7 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         descriptionSentence = try c.decodeIfPresent(String.self, forKey: .descriptionSentence) ?? ""
         written = try c.decodeIfPresent([String].self, forKey: .written) ?? []
         semanticRequests = try c.decodeIfPresent([String].self, forKey: .semanticRequests) ?? written
+        bindEssencePaid = try c.decodeIfPresent(Int.self, forKey: .bindEssencePaid).map { max(0, $0) }
         inertModifiers = try c.decodeIfPresent([String].self, forKey: .inertModifiers)
             ?? c.decodeIfPresent([String].self, forKey: .inertRungs) ?? []
         readings = try c.decodeIfPresent([String: ReadingSnapshot].self, forKey: .readings) ?? [:]

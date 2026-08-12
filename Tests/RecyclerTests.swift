@@ -141,6 +141,26 @@ final class RecyclerTests: XCTestCase {
         let apex = gear("two_natured_blade")
         XCTAssertNil(RecyclerRules.preview(location: .stored, stackID: apex.id,
                                             serviceTier: 1, in: base(containing: apex)))
+        XCTAssertEqual(RecyclerRules.ineligibility(of: favorite), .favorite)
+        XCTAssertEqual(RecyclerRules.ineligibility(of: locked), .locked)
+        XCTAssertEqual(RecyclerRules.ineligibility(of: unknown), .unidentified)
+        XCTAssertEqual(RecyclerRules.ineligibility(of: legacy), .legacyCredit)
+        XCTAssertEqual(RecyclerRules.ineligibility(of: apex), .apex)
+        XCTAssertEqual(RecyclerRules.ineligibility(ofEquipped: EquippedPiece(apex)), .equipped)
+        XCTAssertTrue(RecyclerRules.Ineligibility.allCases.allSatisfy { !$0.explanation.isEmpty })
+    }
+
+    func testUniqueNarrativeChannelworksAndMissingReceiptExplainTheirRejection() {
+        var unique = gear(); unique.gearProfile?.authoredUniqueRuleID = "singular_work"
+        var narrative = gear(); narrative.gearProfile?.authoredUniqueRuleID = "narrative_key"
+        let conduit = ItemStack(id: InstanceID(rawValue: 99), catalogID: Items.conduitFixture)
+        var unprofiled = gear("blade_chipped")
+        unprofiled.catalogID = "unmapped_test_gear"
+
+        XCTAssertEqual(RecyclerRules.ineligibility(of: unique), .unique)
+        XCTAssertEqual(RecyclerRules.ineligibility(of: narrative), .narrative)
+        XCTAssertEqual(RecyclerRules.ineligibility(of: conduit), .channelworks)
+        XCTAssertEqual(RecyclerRules.ineligibility(of: unprofiled), .notGear)
     }
 
     func testStoredReceiptCommitRemovesExactGearReturnsSampleAndNeverPaysCurrency() throws {

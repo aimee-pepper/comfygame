@@ -117,7 +117,7 @@ final class TravellerWorldPacingTests: XCTestCase {
     }
 
     func testAllLiveTravellersHaveExactNonnegativeStoryBands() {
-        XCTAssertEqual(catalog.travellers.count, 28)
+        XCTAssertEqual(catalog.travellers.count, 29)
         XCTAssertTrue(catalog.travellers.allSatisfy { ($0.storyArrivalBand ?? -1) >= 0 })
         XCTAssertEqual(catalog.traveller("vance")?.storyArrivalBand, 0)
         XCTAssertEqual(catalog.traveller("mara")?.storyArrivalBand, 1)

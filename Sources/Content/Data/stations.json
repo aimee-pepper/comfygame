@@ -112,6 +112,25 @@
       "buildBlurb": "Vance can set out a ledger and a table here for anything your household should not keep."
     },
     {
+      "id": "recycler",
+      "name": "Recycler",
+      "icon": "arrow.3.trianglepath",
+      "blurb": "Take eligible gear apart without inventing where its useful material came from.",
+      "sortOrder": 8,
+      "homeSection": "make",
+      "sectionOrder": 1,
+      "unlockedAtStart": false,
+      "startingTier": 0,
+      "maxTier": 2,
+      "route": "recycler",
+      "builtBy": "noll",
+      "buildCost": {
+        "essence": 15,
+        "resources": {}
+      },
+      "buildBlurb": "Noll can fit a sorting bench here, leaving failed joins intact until their evidence has been recorded."
+    },
+    {
       "id": "blacksmith",
       "name": "Blacksmith",
       "icon": "hammer.fill",

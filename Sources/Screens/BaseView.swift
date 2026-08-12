@@ -374,6 +374,34 @@ private struct StationFoundationSheet: View {
                 LabeledContent("Build cost", value: describe(cost))
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
+
+                let runway = StationRunwayRules.preview(for: station, in: store.state)
+                VStack(alignment: .leading, spacing: 5) {
+                    LabeledContent("Spendable Essence now", value: "\(runway.spendableNow)")
+                    LabeledContent("After construction", value: "\(runway.spendableAfter)")
+                    if runway.refinableRawEssence > 0 {
+                        Text("Includes \(runway.refinableRawEssence) Essence currently refinable from Raw Essence.")
+                    }
+                    if let median = runway.recentMedianBindCost,
+                       let remaining = runway.authoredBindsRemaining {
+                        LabeledContent("Recent authored bind", value: median.formatted(.number.precision(.fractionLength(0...1))))
+                        LabeledContent("Writing runway", value: "\(remaining.formatted(.number.precision(.fractionLength(1)))) binds")
+                    } else {
+                        Text("Writing runway appears after an authored world has been bound and recorded.")
+                    }
+                    switch runway.warning {
+                    case .low:
+                        Label("Low writing runway", systemImage: "exclamationmark.triangle")
+                            .foregroundStyle(.orange)
+                    case .belowOne:
+                        Label("This leaves less Essence than your recent authored bind cost.", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                    case nil:
+                        EmptyView()
+                    }
+                }
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
             }
 
             let missing = store.shortfall(for: station)

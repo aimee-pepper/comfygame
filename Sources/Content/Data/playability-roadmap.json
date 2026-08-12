@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "11 Aug 2026",
-  "installedCheckpoint": "f178936 · Combat damage authority",
+  "installedCheckpoint": "ce9b1af · Combat technique ownership and Withdraw",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 combat technique ownership and Withdraw migration",
-  "currentNote": "Installed checkpoint f178936 centralizes live combat damage arithmetic. The current checkpoint removes universal technique ownership, assigns identity techniques, retires Rout, and makes Vanish apply to one confirmed Withdraw per expedition; tutorials remain excluded.",
+  "currentWork": "P1 Noll and player-facing Recycler phone acceptance",
+  "currentNote": "Installed checkpoint ce9b1af assigns combat techniques by identity and makes Vanish apply to one confirmed Withdraw. Noll and the player-facing Recycler are implemented and green; signed phone installation is held while the fresh-save traveller test is active.",
   "items": [
     {
       "id": "essence",
@@ -50,8 +50,8 @@
       "id": "recycler",
       "priority": "P1",
       "title": "Noll and the player-facing Recycler",
-      "status": "queued",
-      "detail": "The receipt-first Recycler rules/state are green, but no live Noll, station catalogue row, Home route or player-facing recovery verb exists. Decision182 already approves reversible Noll promotion; exact prose and Field Separation Kit remain separate review work.",
+      "status": "readyToTest",
+      "detail": "Implemented and green: Noll is the 29th live traveller; the 15-Essence Recycler has a distinct Make route and atomic receipt-first recovery screen; station runway preview and corrected Sela/Halloway review IDs are included. Field Separation Kit remains held. Signed phone installation is waiting for Aimee's active fresh-save traveller test to finish.",
       "gate": "Use opening-economy-trio-promotion-audit-current.md: 29-live catalogue, Noll band0/order2/signature, 15-Essence build, dormant old-state migration, atomic Recycler phone route, no Field Kit, corrected Sela/Halloway exchange IDs and complete sell→recycle→make→bind runway proof."
     },
     {
@@ -219,8 +219,8 @@
       "priority": "P1",
       "title": "Make Nessa's Apothecary reachable",
       "status": "queued",
-      "detail": "The live locked Apothecary uniquely lacks both builtBy and buildCost, and its stock-inference-only screen can open empty. Add Nessa's persistent build path, teach Lesser Salve without granting an item, retain partial-stock inference, and apply the settled sustainable preparation costs without changing writing-ink ownership.",
-      "gate": "Fresh, already-recruited-Nessa and already-built saves prove exactly one atomic Make → build → visible Lesser Salve route; partial inference persists; ordinary recipes cost 0 Essence, Stillwater 6, and Waystone 12 plus one mote; all locked stations validate an explicit lifecycle. Authority: station-first-use-reachability-audit-current.md."
+      "detail": "The live locked Apothecary uniquely lacks both builtBy and buildCost, and its stock-inference-only screen can open empty. Add Nessa's persistent build path, teach Lesser Salve without granting an item, retain partial-stock inference, and apply the settled sustainable preparation costs. The same checkpoint corrects Venom's invalid `fibre` resource ID and gives Briar Oil its distinct Fiber + Resin identity without changing writing-ink ownership.",
+      "gate": "Fresh, already-recruited-Nessa and already-built saves prove exactly one atomic Make → build → visible Lesser Salve route; partial inference persists; ordinary recipes including all four coatings cost 0 Essence, Stillwater 6, and Waystone 12 plus one mote; every recipe resource ID resolves exactly; Venom/Briar recipes and four typed one-hit effects match apothecary-coating-identity-current.md; all locked stations validate an explicit lifecycle."
     },
     {
       "id": "scent-mask",
@@ -307,8 +307,8 @@
       "priority": "P1",
       "title": "Give every affliction one exact owner",
       "status": "queued",
-      "detail": "Burn, Poison and Dazzle use one collection while Bleed occupies four legacy paths; the shared companion counter currently makes one wound damage every living companion. Consolidate exact-combatant definitions and fix Broad Antidote's arbitrary first-status removal alongside combat-v2 consumers.",
-      "gate": "Burn/Poison/Dazzle/Bleed only; exact ally ownership, independent severity/duration, refresh/coexistence, Stonebark one-shot, typed cures, selected Broad Antidote, Bleed-excluding Quench, presentation and tolerant mid-encounter migration pass. Authority: combat-affliction-authority-current.md, DRQ-177 and Decision191."
+      "detail": "Burn, Poison and Dazzle use one collection while Bleed occupies four legacy paths; the shared companion counter currently makes one wound damage every living companion. Barbed Edge also writes a second legacy Bleed beside ordinary Rend and double-ticks accidentally. Consolidate exact-combatant definitions, one max-refresh Barbed 3×3 Bleed, and selected Broad Antidote alongside combat-v2 consumers.",
+      "gate": "Burn/Poison/Dazzle/Bleed only; exact ally ownership, independent severity/duration, refresh/coexistence, Barbed single 3×3 instance and dual-legacy adoption, Bloodletter endless distinction, Briar ineligibility, Stonebark one-shot, typed cures, selected Broad Antidote, Bleed-excluding Quench, presentation and tolerant mid-encounter migration pass. Authority: combat-affliction-authority-current.md, barbed-edge-apex-identity-current.md, DRQ-013/177 and Decisions191/200."
     },
     {
       "id": "legacy-token-quirk-cleanup",

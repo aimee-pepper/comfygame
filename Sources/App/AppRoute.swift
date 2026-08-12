@@ -17,6 +17,7 @@ enum AppRoute: String, Codable, Hashable, CaseIterable, Sendable {
     case bestiary
     case blacksmith
     case tradingPost
+    case recycler
     case tannery
     case bowyer
     case armoury

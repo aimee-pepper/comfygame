@@ -851,7 +851,8 @@ extension GameStore {
     func build(_ station: StationDef) -> Bool {
         guard buildableStations.contains(where: { $0.id == station.id }), canAfford(station)
         else { return false }
-        mutate("build \(station.id.rawValue)", flush: true) { state in
+        let runway = StationRunwayRules.preview(for: station, in: state)
+        mutate("build \(station.id.rawValue) [\(runway.telemetryLabel)]", flush: true) { state in
             if let cost = station.buildCost { EconomyRules.pay(cost, in: &state) }
             state.base.stations[station.id] = StationState(isUnlocked: true,
                                                            tier: station.startingTier)

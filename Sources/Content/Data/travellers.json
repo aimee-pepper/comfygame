@@ -159,17 +159,17 @@
         "opening": "She's already walking when she sees you, and she doesn't stop, just changes direction slightly so the two of you converge. \"Oh, good. Company. Keep up.\"",
         "questions": [
           {
-            "id": "halloway.destination",
+            "id": "sela.destination",
             "ask": "Where are you going?",
             "reply": "\"On.\" A beat. \"I know how that sounds. But I was going on before, as well, and at least now nobody's asking me when I'll settle.\""
           },
           {
-            "id": "halloway.tired",
+            "id": "sela.tired",
             "ask": "Aren't you tired?",
             "reply": "\"Constantly.\" She grins. \"That was true at home too. The difference is that here it's the walking doing it, and I like the walking.\""
           },
           {
-            "id": "halloway.wayfinding",
+            "id": "sela.wayfinding",
             "ask": "How do you find your way?",
             "reply": "\"I don't. Finding your way means there's somewhere you're meant to end up.\" She scans the horizon out of pure habit. \"I've made my peace with that. Mostly.\""
           }
@@ -333,17 +333,17 @@
         "opening": "There's a fire going, banked low and tended, in a place with nothing to burn. She's sitting beside it with her hands out. \"Don't crowd it. It's shy.\"",
         "questions": [
           {
-            "id": "sela.kept_fire",
+            "id": "halloway.kept_fire",
             "ask": "You've kept a fire going out here?",
             "reply": "\"Nine years of it.\" She feeds it something you don't get a look at. \"A forge isn't a building, whatever anybody tells you. A forge is a fire somebody stayed with.\""
           },
           {
-            "id": "sela.making",
+            "id": "halloway.making",
             "ask": "What do you make?",
             "reply": "\"Nothing, now. Nothing to make it out of and nobody to make it for.\" She says it evenly, which is worse than bitterly. \"I keep my hand in. I heat things and let them cool and heat them again.\""
           },
           {
-            "id": "sela.needs",
+            "id": "halloway.needs",
             "ask": "What would you need?",
             "reply": "\"Stone and iron and somewhere out of the wind.\" She finally looks up. \"And someone bringing me things worth working. That's the one I've missed.\""
           }
@@ -450,6 +450,28 @@
       ],
       "leansToward": ["worldWorthWriting", "whereabouts"],
       "lean": { "precision": 1, "kindling": 1 }
+    },
+    {
+      "id": "noll", "name": "Noll", "calling": "a Salvager", "icon": "figure.stand",
+      "authoredOrder": 2, "storyArrivalBand": 0, "campaignPhase": "opening",
+      "blurb": "Knows where an object will part before touching it. Keeps a ledger of the pieces that should not have been separated.",
+      "signature": [
+        { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 35 }, "passage": "Broken pieces keep their edges here. A join can be found again after the whole has failed." },
+        { "condition": { "target": "substrate", "measure": "aspect", "key": "dispersion", "maximum": 40 }, "passage": "Useful matter keeps to seams instead of disappearing evenly into the ground." }
+      ],
+      "leansToward": ["locationClue", "whereabouts"],
+      "meeting": {
+        "opening": "Noll has a cracked frame across one knee. Its removed fastenings lie in a neat line, but one damaged corner remains deliberately joined. They press that corner once, listen, and leave it intact.",
+        "questions": [
+          { "id": "noll.join_left", "ask": "Why leave that corner together?", "reply": "“Because the join is evidence.” They press it once and stop. “Separated pieces tell you what may be used. A joined failure tells you what the maker expected to hold.”" },
+          { "id": "noll.repair", "ask": "Could the frame be repaired?", "reply": "“I could straighten it, bind the corner and sell you the same failure with better posture.” They lift the bowed edge. “Or I can have three sound lengths and four fastenings before supper. Which result do you need?”" },
+          { "id": "noll.vance", "ask": "You know Vance?", "reply": "“He can price the story attached to a thing. I can tell him which part of the story will survive his buyer.” A brief look up. “He dislikes that distinction most when it saves him money.”" }
+        ],
+        "offer": "Come back with me. We have things that need a second honest use.",
+        "accepted": "“Then do not call it rescue when we take something apart.” Noll folds the joined corner into cloth and gathers the reusable pieces separately. “Give each result its own name.”",
+        "declined": "“Go carefully.” They return to the failed join. “Whole ground can hide worse breaks than this.”"
+      },
+      "lean": { "precision": 1, "protection": 1 }
     },
     {
       "id": "talin", "name": "Talin", "calling": "a blade fighter", "icon": "figure.stand",
@@ -1116,6 +1138,12 @@
     { "id": "vance_word_orsa", "diary": "vance", "kind": "whereabouts", "prose": "Orsa never charged for the fire. She did expect anyone using it to notice who else was cold. Some debts become clearer when nobody names them.", "about": "orsa", "prefersConditions": [] },
     { "id": "vance_world_repaired_handle", "diary": "vance", "kind": "worldWorthWriting", "prose": "Write somewhere one material is common and another is scarce. Then look at what has been repaired. Need leaves better records than abundance.", "prefersConditions": [] },
     { "id": "vance_site_binders_workshop", "diary": "vance", "kind": "ruin", "prose": "The tools in the old binder's room came from six hands. I know because every handle was changed for the next one. Ownership is rarely the longest fact about an object.", "site": "binders_workshop", "prefersConditions": [] },
+
+    { "id": "noll_where_0", "diary": "noll", "kind": "locationClue", "prose": "Broken pieces keep their edges here. A join can be found again after the whole has failed.", "about": "noll", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "noll_where_1", "diary": "noll", "kind": "locationClue", "prose": "Useful matter keeps to seams instead of disappearing evenly into the ground.", "about": "noll", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "noll_word_vance", "diary": "noll", "kind": "whereabouts", "prose": "Vance asks what an object will fetch. I ask which parts would have to lie for that price to be true. We usually arrive at the same table by different doors.", "about": "vance", "prefersConditions": [] },
+    { "id": "noll_word_halloway", "diary": "noll", "kind": "whereabouts", "prose": "Halloway can keep a whole thing alive past my estimate. When she says it can be mended, wait. When she says it cannot, wait once more; the admission cost her something.", "about": "halloway", "prefersConditions": [] },
+    { "id": "noll_world_join", "diary": "noll", "kind": "worldWorthWriting", "prose": "Write a place where hard matter keeps to a few clear seams. Scattered plenty makes careless salvagers. A boundary makes each removal answerable.", "prefersConditions": [] },
 
     { "id": "talin_where_0", "diary": "talin", "kind": "locationClue", "prose": "The ground breaks into plates with edges clean enough to show where force will glance away.", "about": "talin", "clueIndex": 0, "prefersConditions": [] },
     { "id": "talin_where_1", "diary": "talin", "kind": "locationClue", "prose": "Nothing here hides an approach. That does not make deciding when to meet it easier.", "about": "talin", "clueIndex": 1, "prefersConditions": [] },

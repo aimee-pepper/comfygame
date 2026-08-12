@@ -36,7 +36,7 @@ final class BaseBoardTests: XCTestCase {
     func testBoardOrderingDoesNotDependOnJSONArrayOrder() {
         let expected: [StationID] = [
             "writing_desk", "storehouse", "party", "firepit", "essence_spring", "workshop",
-            "trading_post", "blacksmith", "apothecary", "tannery", "bowyer", "armoury",
+            "trading_post", "recycler", "blacksmith", "apothecary", "tannery", "bowyer", "armoury",
             "weaponsmith", "distillery", "channelworks",
             "library", "constellation", "bestiary", "survey_post", "reliquary", "scriptorium",
             "wayfarers_table", "anchorage"

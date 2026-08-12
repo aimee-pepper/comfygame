@@ -39,13 +39,13 @@ final class OpeningEconomyContentTests: XCTestCase {
         XCTAssertEqual(pages.first { $0.id == "vance_where_2" }?.kind, .worldWorthWriting)
     }
 
-    func testOpeningOrderLeavesReservedSecondSlotForRecyclerKeeper() throws {
+    func testOpeningOrderIncludesLiveRecyclerKeeperInSecondSlot() throws {
         let order = Dictionary(uniqueKeysWithValues: ContentCatalog.shared.travellers.compactMap {
             traveller in traveller.authoredOrder.map { (traveller.id, $0) }
         })
 
         XCTAssertEqual(order["vance"], 1)
-        XCTAssertFalse(order.values.contains(2), "order 2 is reserved for the not-yet-live Recycler keeper")
+        XCTAssertEqual(order["noll"], 2)
         XCTAssertEqual(order["halloway"], 3)
         XCTAssertEqual(order["mara"], 4)
         XCTAssertEqual(order["edren"], 5)

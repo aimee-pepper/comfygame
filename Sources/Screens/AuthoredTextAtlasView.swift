@@ -51,7 +51,7 @@ enum AuthoredTextAtlas {
     /// Review-only meeting prose stays in Design's markdown until Aimee approves it. The atlas
     /// nevertheless accounts for that material rather than calling these travellers simply absent.
     static let draftMeetingIDs: Set<TravellerID> = [
-        "bryn", "orsa", "vance", "talin", "nessa",
+        "bryn", "orsa", "vance", "noll", "talin", "nessa",
         "corrin", "dagg", "rook", "lys", "bracken", "fen",
         "wren", "kestrel", "maud", "marrick", "sabine", "grimmond",
         "oda", "ashe", "perren", "nine"
@@ -67,23 +67,24 @@ enum AuthoredTextAtlas {
                 let draft = DraftMeetingCorpus.meeting(for: traveller.id)
                 if let meeting = traveller.meeting {
                     let prefix = draft == nil ? "meeting.\(traveller.id.rawValue)" : "live.meeting.\(traveller.id.rawValue)"
+                    let liveDetail = traveller.id == "noll" ? "Provisional · needs Aimee review" : nil
                     units.append(Unit(id: "\(prefix).opening", traveller: traveller.id,
-                                      kind: .meeting, label: "Opening", text: meeting.opening, detail: nil))
+                                      kind: .meeting, label: "Opening", text: meeting.opening, detail: liveDetail))
                     for exchange in meeting.questions {
                         units.append(Unit(id: "\(prefix).exchange.\(exchange.id).ask", traveller: traveller.id,
                                           kind: .meeting, label: "You may ask", text: exchange.ask,
-                                          detail: exchange.id))
+                                          detail: liveDetail.map { "\(exchange.id) · \($0)" } ?? exchange.id))
                         units.append(Unit(id: "\(prefix).exchange.\(exchange.id).reply", traveller: traveller.id,
                                           kind: .meeting, label: "Reply", text: exchange.reply,
-                                          detail: exchange.id))
+                                          detail: liveDetail.map { "\(exchange.id) · \($0)" } ?? exchange.id))
                     }
                     units += [
                         Unit(id: "\(prefix).offer", traveller: traveller.id, kind: .meeting,
-                             label: "Offer", text: meeting.offer, detail: nil),
+                             label: "Offer", text: meeting.offer, detail: liveDetail),
                         Unit(id: "\(prefix).accepted", traveller: traveller.id, kind: .meeting,
-                             label: "Accepted", text: meeting.accepted, detail: nil),
+                             label: "Accepted", text: meeting.accepted, detail: liveDetail),
                         Unit(id: "\(prefix).declined", traveller: traveller.id, kind: .meeting,
-                             label: "Declined", text: meeting.declined, detail: nil)
+                             label: "Declined", text: meeting.declined, detail: liveDetail)
                     ]
                 }
                 if let draft {
@@ -118,9 +119,16 @@ enum AuthoredTextAtlas {
                     if let pattern = page.teachesPattern { metadata.append("pattern \(pattern)") }
                     if let research = page.researchNode { metadata.append("research \(research.rawValue)") }
                     if let site = page.site { metadata.append("site \(site.rawValue)") }
+                    if traveller.id == "noll" { metadata.append("Provisional · needs Aimee review") }
                     units.append(Unit(id: "page.\(page.id.rawValue).prose", traveller: traveller.id,
                                       kind: .diary, label: "Page \(index + 1) · \(page.kind.displayName)",
                                       text: page.prose, detail: metadata.joined(separator: " · ")))
+                }
+                if traveller.id == "noll" {
+                    units.append(Unit(id: "held.page.noll_field_separation_kit.prose", traveller: traveller.id,
+                                      kind: .diary, label: "Held page · Pattern",
+                                      text: "A travelling kit should open one object and then be spent. If the tool survives every separation, the thing being consumed is somewhere you have chosen not to record.",
+                                      detail: "Provisional · DEBUG review only · not findable · no live Field Separation Kit reward"))
                 }
                 return TravellerEntry(traveller: traveller, units: units,
                                       draftMeetingAvailable: draft != nil)
@@ -146,6 +154,7 @@ final class AuthoredTextReviewStore: ObservableObject {
 
     @Published private(set) var file: File
     @Published private(set) var conflicts: [Conflict] = []
+    @Published private(set) var migrationWarnings: [String] = []
     private let defaults: UserDefaults
     private let key = "debug.authoredTextReview.v1"
 
@@ -155,6 +164,7 @@ final class AuthoredTextReviewStore: ObservableObject {
         if let data = defaults.data(forKey: key), let decoded = try? decoder.decode(File.self, from: data) {
             file = decoded
         } else { file = File() }
+        migrateCorrectedMeetingAliases()
     }
 
     func status(for unit: AuthoredTextAtlas.Unit) -> Status {
@@ -207,6 +217,37 @@ final class AuthoredTextReviewStore: ObservableObject {
         }
         conflicts = newConflicts.sorted { $0.id < $1.id }
         persist()
+    }
+
+    /// Sela and Halloway's prose was always attached to the right traveller, but six exchange IDs
+    /// carried the other person's prefix. Move DEBUG review decisions only when their exact prose
+    /// hash proves identity; an edited/mismatched record stays under its old key and is reported.
+    private func migrateCorrectedMeetingAliases() {
+        let aliases = [
+            ("sela", "halloway.destination", "sela.destination"),
+            ("sela", "halloway.tired", "sela.tired"),
+            ("sela", "halloway.wayfinding", "sela.wayfinding"),
+            ("halloway", "sela.kept_fire", "halloway.kept_fire"),
+            ("halloway", "sela.making", "halloway.making"),
+            ("halloway", "sela.needs", "halloway.needs")
+        ]
+        let units = Dictionary(uniqueKeysWithValues: AuthoredTextAtlas.inventory().flatMap(\.units).map { ($0.id, $0) })
+        var changed = false
+        for (traveller, oldExchange, newExchange) in aliases {
+            for suffix in ["ask", "reply"] {
+                let oldID = "meeting.\(traveller).exchange.\(oldExchange).\(suffix)"
+                let newID = "meeting.\(traveller).exchange.\(newExchange).\(suffix)"
+                guard let old = file.entries[oldID], let unit = units[newID] else { continue }
+                guard old.reviewedTextHash == unit.textHash else {
+                    migrationWarnings.append("Review alias not applied: \(oldID) → \(newID) (text changed)")
+                    continue
+                }
+                if file.entries[newID] == nil { file.entries[newID] = old }
+                file.entries.removeValue(forKey: oldID)
+                changed = true
+            }
+        }
+        if changed { persist() }
     }
 
     func markdownReport(inventory: [AuthoredTextAtlas.TravellerEntry]) -> String {
@@ -291,6 +332,13 @@ struct AuthoredTextAtlasView: View {
                         ForEach(reviews.conflicts) { conflict in
                             Text("\(conflict.id): local review retained; imported review targets different text.")
                                 .font(.caption).foregroundStyle(.orange)
+                        }
+                    }
+                }
+                if !reviews.migrationWarnings.isEmpty {
+                    DisclosureGroup("Review migration warnings · \(reviews.migrationWarnings.count)") {
+                        ForEach(reviews.migrationWarnings, id: \.self) { warning in
+                            Text(warning).font(.caption.monospaced()).foregroundStyle(.orange)
                         }
                     }
                 }
