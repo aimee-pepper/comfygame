@@ -23,6 +23,10 @@ struct PageGridView: View {
     /// and a scroll view is greedy — left to negotiate, it squeezed the grid to two-thirds of the
     /// width available and the page came out small and off-centre.
     let side: CGFloat
+    /// Incremented by the owning screen whenever an off-page interaction or navigation transition
+    /// occurs. It is a signal, not persisted state, so the same tap can continue to its ordinary
+    /// destination after dismissing the modal page tool.
+    let dismissalToken: Int
 
     /// The written mark being dragged, and how far. Kept apart from `ghost` so a written rune and
     /// an unwritten one can never be in flight at once.
@@ -43,16 +47,29 @@ struct PageGridView: View {
 
     private var dragging: InstanceID? { drag?.id }
     /// Connecting or disconnecting. Entered from a sigil's menu, left by tapping bare page.
-    @State private var mode: PageMode = .off
+    @State private var interaction = PageInteractionSession()
     /// The sigil the mode is anchored on — what the next tap joins to or unjoins from.
-    @State private var anchor: InstanceID?
     /// The mark you're holding, whose actions are showing in the footer.
     ///
     /// Plain `@State` rather than a gesture state: the row has to stay up while you reach for a
     /// button, which is the opposite of a gesture's lifetime. Cleared by choosing something,
     /// cancelling, or touching bare page.
-    @State private var held: InstanceID?
-    @State private var connectionError: String?
+    private var mode: PageMode {
+        get { interaction.mode }
+        nonmutating set { interaction.mode = newValue }
+    }
+    private var anchor: InstanceID? {
+        get { interaction.anchor }
+        nonmutating set { interaction.anchor = newValue }
+    }
+    private var held: InstanceID? {
+        get { interaction.held }
+        nonmutating set { interaction.held = newValue }
+    }
+    private var connectionError: String? {
+        get { interaction.connectionError }
+        nonmutating set { interaction.connectionError = newValue }
+    }
 
 
     private var page: Page { store.state.base.page }
@@ -101,6 +118,13 @@ struct PageGridView: View {
         .frame(width: pageSize.width, alignment: .leading)
         .padding(8)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        .onChange(of: dismissalToken) { _, _ in interaction.cancel() }
+        .onChange(of: pageInteractionIdentity) { _, _ in interaction.cancel() }
+        .onDisappear { interaction.cancel() }
+    }
+
+    private var pageInteractionIdentity: PageInteractionIdentity {
+        PageInteractionIdentity(width: page.width, height: page.height, runeIDs: page.runes.map(\.id))
     }
 
     // MARK: Chrome
@@ -172,7 +196,7 @@ struct PageGridView: View {
                 Image(systemName: mode.icon).font(.caption2)
                 Text(hint).font(.caption2)
                 Spacer()
-                Button("Done") { mode = .off; anchor = nil; connectionError = nil }
+                Button("Done") { interaction.cancel() }
                     .font(.caption2)
                     .frame(minWidth: 44, minHeight: 44)
             }
@@ -240,7 +264,7 @@ struct PageGridView: View {
         // Hit-testable only while a mode is running, so a tap on bare page can end it — and can't
         // interfere with anything the rest of the time.
         .allowsHitTesting(mode != .off || held != nil)
-        .onTapGesture { mode = .off; anchor = nil; held = nil; connectionError = nil }
+        .onTapGesture { interaction.cancel() }
     }
 
     // MARK: Written runes
@@ -658,5 +682,25 @@ enum PageMode: Equatable {
         case .connecting: .accentColor
         case .disconnecting: .orange
         }
+    }
+}
+
+struct PageInteractionIdentity: Equatable {
+    let width: Int
+    let height: Int
+    let runeIDs: [InstanceID]
+}
+
+struct PageInteractionSession: Equatable {
+    var mode: PageMode = .off
+    var anchor: InstanceID?
+    var held: InstanceID?
+    var connectionError: String?
+
+    mutating func cancel() {
+        mode = .off
+        anchor = nil
+        held = nil
+        connectionError = nil
     }
 }

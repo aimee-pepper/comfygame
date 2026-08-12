@@ -19,6 +19,7 @@ struct WritingDeskView: View {
     @State private var pane: Pane = .write
     @State private var bornAnchored = false
     @State private var tutorialLesson: TutorialLessonID?
+    @State private var pageInteractionDismissalToken = 0
 
     @State private var bin: Bin = .compounds
 
@@ -90,7 +91,11 @@ struct WritingDeskView: View {
                 .frame(width: 220)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Clear") { store.clearPage(); ghost = nil }
+                Button("Clear") {
+                    dismissPageInteraction()
+                    store.clearPage()
+                    ghost = nil
+                }
                     .disabled(state.base.page.runes.isEmpty)
             }
         }
@@ -102,6 +107,7 @@ struct WritingDeskView: View {
             }
         }
         .onAppear { presentWritingRequestIfNeeded() }
+        .onDisappear { dismissPageInteraction() }
         .onChange(of: ghost?.glyph) { _, glyph in
             guard glyph != nil else { return }
             present(.writingPageSpace)
@@ -110,11 +116,13 @@ struct WritingDeskView: View {
             if count > 0 { store.completeTutorial(.writingPageSpace, fact: "mark_placed") }
         }
         .onChange(of: pane) { _, pane in
+            dismissPageInteraction()
             guard pane == .world else { return }
             present(.writingPreview)
             store.completeTutorial(.writingPreview, fact: "world_pane_opened")
             store.openedComparisonPreview()
         }
+        .onChange(of: bin) { _, _ in dismissPageInteraction() }
     }
 
     // MARK: Pane 1 — writing
@@ -129,13 +137,21 @@ struct WritingDeskView: View {
             let side = floor(min(byWidth, byHeight))
 
             VStack(spacing: 6) {
-                PageGridView(ghost: $ghost, side: side)
+                PageGridView(ghost: $ghost, side: side,
+                             dismissalToken: pageInteractionDismissalToken)
                 ScrollView { binContents }
+                    .contentShape(Rectangle())
+                    .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
                 binTabs
+                    .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 2)
         }
+    }
+
+    private func dismissPageInteraction() {
+        pageInteractionDismissalToken &+= 1
     }
 
     private var binTabs: some View {

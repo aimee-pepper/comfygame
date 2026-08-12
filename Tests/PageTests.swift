@@ -8,6 +8,35 @@ import XCTest
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
 
+    func testCancellingPageToolClearsEveryTransientFieldWithoutChangingThePage() {
+        let link = MarkLink(InstanceID(rawValue: 1), InstanceID(rawValue: 2))
+        let page = Page(links: [link])
+        var session = PageInteractionSession(mode: .connecting,
+                                             anchor: InstanceID(rawValue: 1),
+                                             held: InstanceID(rawValue: 2),
+                                             connectionError: "Not adjacent")
+
+        session.cancel()
+
+        XCTAssertEqual(session.mode, .off)
+        XCTAssertNil(session.anchor)
+        XCTAssertNil(session.held)
+        XCTAssertNil(session.connectionError)
+        XCTAssertEqual(page.links, [link], "dismissing a tool must not undo completed links")
+    }
+
+    func testPageIdentityTracksPageReplacementButNotLinkEdits() {
+        let ids = [InstanceID(rawValue: 3), InstanceID(rawValue: 7)]
+        let original = PageInteractionIdentity(width: 6, height: 6, runeIDs: ids)
+        let linkOnlyEdit = PageInteractionIdentity(width: 6, height: 6, runeIDs: ids)
+        let replacement = PageInteractionIdentity(width: 6, height: 6,
+                                                  runeIDs: [InstanceID(rawValue: 9)])
+
+        XCTAssertEqual(original, linkOnlyEdit,
+                       "completed Connect/Disconnect edits must not cancel their own mode")
+        XCTAssertNotEqual(original, replacement)
+    }
+
     // MARK: The page is a budget, not a syntax
 
     /// **Superseded in part** (decisions-session-14 §3). Absolute position still carries no
