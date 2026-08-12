@@ -179,6 +179,7 @@
 		B56D55D213A6CAE51A0EAF4A /* GeneratedCatalogueItemVisualRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A58B0D4893EF0AA2412B28 /* GeneratedCatalogueItemVisualRegistry.swift */; };
 		B711CA1EAFFCEBB62204C170 /* PhysicalGearCraftingRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3EDB1BAC65E07DA7319F3C6 /* PhysicalGearCraftingRules.swift */; };
 		B85571B991A8E79441EA5237 /* PixelCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7863FB4074F0CAF26EFEF01E /* PixelCommand.swift */; };
+		BC3FF1FD01FBED0889EEF383 /* TutorialOverlayLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C349BCC0BF69992DE71C7582 /* TutorialOverlayLayoutTests.swift */; };
 		BCB44A183A64B987C97BC1EA /* MaterialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E14C42A31CF4E0C858F212BF /* MaterialTests.swift */; };
 		BE5D3BC36C9F1D8030CFEE81 /* CombatRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99D023496EC834EA78E9BE63 /* CombatRules.swift */; };
 		BFB3CF53CC01D5CED466B0C9 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E110F7C0AF0739241A8F94 /* GameState.swift */; };
@@ -440,6 +441,7 @@
 		BE933E91275B1FF990B69BAA /* EncounterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncounterView.swift; sourceTree = "<group>"; };
 		C09AD15A5BFBBBD300176004 /* GearAndRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GearAndRulesTests.swift; sourceTree = "<group>"; };
 		C110827C995BC018EA20B47F /* SpilloverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpilloverTests.swift; sourceTree = "<group>"; };
+		C349BCC0BF69992DE71C7582 /* TutorialOverlayLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialOverlayLayoutTests.swift; sourceTree = "<group>"; };
 		C37F84A94ADC380C1F4B4C85 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C3CC1BB415696E2B7417C43D /* BookRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookRules.swift; sourceTree = "<group>"; };
 		C51FE4FBAB98280181089C56 /* DeterminismTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeterminismTests.swift; sourceTree = "<group>"; };
@@ -844,6 +846,7 @@
 				818724CCF5EB78A3DCEC46E4 /* TradingPostFlowTests.swift */,
 				1FE496768808007B40188081 /* TradingPostTests.swift */,
 				AC5758ECEC1BAA08D7EF63F2 /* TravellerWorldPacingTests.swift */,
+				C349BCC0BF69992DE71C7582 /* TutorialOverlayLayoutTests.swift */,
 				0DA805AE9804EFB6621B7166 /* TutorialTests.swift */,
 				BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */,
 				0EF2B3DBADEF32F2DE2B00DE /* WeaponsmithTests.swift */,
@@ -1243,6 +1246,7 @@
 				E62CC0DEF814DD53743731F9 /* TradingPostFlowTests.swift in Sources */,
 				A4BBB435916ACBCC3039F0B4 /* TradingPostTests.swift in Sources */,
 				2C398C0FAAD42106E4E5799B /* TravellerWorldPacingTests.swift in Sources */,
+				BC3FF1FD01FBED0889EEF383 /* TutorialOverlayLayoutTests.swift in Sources */,
 				45B359C084C6F5A35C69529A /* TutorialTests.swift in Sources */,
 				01A65B5074EBFC458F077A59 /* VocabularyTests.swift in Sources */,
 				C70E08A04DE0584580A4800F /* WeaponsmithTests.swift in Sources */,

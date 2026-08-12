@@ -1,5 +1,52 @@
 import SwiftUI
 
+/// Tutorial help is transient chrome, never page content. `overlay` receives the primary view's
+/// resolved size and cannot feed the card's size back into that proposal, so showing a lesson does
+/// not resize maps, pages, grids, scroll content, or fixed controls.
+extension View {
+    func tutorialHoverOverlay<Overlay: View>(alignment: Alignment = .bottom,
+                                             @ViewBuilder overlay: () -> Overlay) -> some View {
+        self.overlay(alignment: alignment) {
+            TutorialHoverOverlayContainer(alignment: alignment, content: overlay())
+        }
+    }
+}
+
+enum TutorialHoverOverlayMetrics {
+    static func maximumCardHeight(containerHeight: CGFloat, safeAreaTop: CGFloat,
+                                  safeAreaBottom: CGFloat) -> CGFloat {
+        max(44, containerHeight - safeAreaTop - safeAreaBottom - 16)
+    }
+}
+
+private struct TutorialHoverOverlayContainer<Content: View>: View {
+    let alignment: Alignment
+    let content: Content
+
+    var body: some View {
+        GeometryReader { proxy in
+            let maximumHeight = TutorialHoverOverlayMetrics.maximumCardHeight(
+                containerHeight: proxy.size.height,
+                safeAreaTop: proxy.safeAreaInsets.top,
+                safeAreaBottom: proxy.safeAreaInsets.bottom
+            )
+            ZStack(alignment: alignment) {
+                Color.clear.allowsHitTesting(false)
+                ScrollView {
+                    content
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .frame(maxWidth: .infinity, maxHeight: maximumHeight, alignment: alignment)
+                .padding(.horizontal, 12)
+                .padding(.top, proxy.safeAreaInsets.top + 8)
+                .padding(.bottom, proxy.safeAreaInsets.bottom + 8)
+            }
+        }
+    }
+}
+
 struct TutorialCard: View {
     let lesson: TutorialLessonDefinition
     let gotIt: () -> Void
@@ -8,14 +55,18 @@ struct TutorialCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(lesson.title).font(.headline)
+                .accessibilityIdentifier("tutorial.title")
             Text(lesson.body).font(.subheadline)
             Text(lesson.anchorLabel)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.tint)
             HStack {
                 Button("Not now", action: notNow)
+                    .accessibilityIdentifier("tutorial.not-now")
                 Spacer()
-                Button("Got it", action: gotIt).buttonStyle(.borderedProminent)
+                Button("Got it", action: gotIt)
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityIdentifier("tutorial.got-it")
             }
         }
         .padding(14)

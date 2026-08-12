@@ -94,13 +94,11 @@ struct WritingDeskView: View {
                     .disabled(state.base.page.runes.isEmpty)
             }
         }
-        .safeAreaInset(edge: .bottom) {
+        .tutorialHoverOverlay {
             if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
                 TutorialCard(lesson: lesson,
                              gotIt: { tutorialLesson = nil },
                              notNow: { store.deferTutorial(id); tutorialLesson = nil })
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 4)
             }
         }
         .onAppear { presentWritingRequestIfNeeded() }

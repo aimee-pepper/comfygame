@@ -138,6 +138,7 @@ private struct AnchorSettlementView: View {
 
 private struct RunExitSummaryView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var tutorialHidden = false
     let summary: RunExitSummary
     let dismiss: () -> Void
 
@@ -161,12 +162,6 @@ private struct RunExitSummaryView: View {
                     }
                     .font(.callout)
                     .foregroundStyle(.secondary)
-
-                    if store.state.tutorial.firstReturnContext?.runIndex == summary.runIndex {
-                        Text("Resources and objects crossed into the Base. Writing, discoveries and people are remembered in Reality even when part of a haul was lost.")
-                            .font(.callout)
-                            .multilineTextAlignment(.center)
-                    }
 
                     sectionHeading("Recovered")
                     recapSection("Resources", gains: summary.resources)
@@ -252,6 +247,18 @@ private struct RunExitSummaryView: View {
         }
         .presentationDetents([.large])
         .interactiveDismissDisabled()
+        .tutorialHoverOverlay(alignment: .top) {
+            if !tutorialHidden,
+               store.state.tutorial.firstReturnContext?.runIndex == summary.runIndex,
+               let lesson = TutorialRules.definition(.returnPersistenceBoundary) {
+                TutorialCard(lesson: lesson,
+                             gotIt: { tutorialHidden = true },
+                             notNow: {
+                                 store.deferTutorial(.returnPersistenceBoundary)
+                                 tutorialHidden = true
+                             })
+            }
+        }
     }
 
     private func sectionHeading(_ title: String) -> some View {

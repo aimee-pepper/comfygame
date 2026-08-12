@@ -96,6 +96,7 @@ struct LibraryView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var tab: LibraryTab = .diaries
+    @State private var firstReturnPrompt: FirstReturnTutorialContext?
 
     private var library: LibraryState { store.state.reality.library }
     private var columns: [GridItem] {
@@ -115,7 +116,6 @@ struct LibraryView: View {
 
             ScrollView {
                 VStack(spacing: 16) {
-                    firstReturnWritingCard
                     switch tab {
                     case .diaries: diariesGrid
                     case .people: peopleGrid
@@ -131,6 +131,10 @@ struct LibraryView: View {
         .navigationTitle("The Library")
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("library.\(tab.id.lowercased())")
+        .tutorialHoverOverlay(alignment: .top) {
+            firstReturnWritingOverlay
+        }
+        .onAppear { prepareFirstReturnWritingPrompt() }
     }
 
     @ViewBuilder private var diariesGrid: some View {
@@ -170,22 +174,47 @@ struct LibraryView: View {
         }
     }
 
-    @ViewBuilder private var firstReturnWritingCard: some View {
-        if let context = store.state.tutorial.firstReturnContext,
-           context.route == .library,
-           store.state.tutorial[.libraryFirstWriting].status != .completed {
+    @ViewBuilder private var firstReturnWritingOverlay: some View {
+        if let context = firstReturnPrompt {
             if let copy = TutorialRules.libraryCopy(context, in: store.state) {
-                StationCard(title: "What this writing carries", icon: "doc.text.magnifyingglass") {
+                tutorialNotice(title: "What this writing carries", icon: "doc.text.magnifyingglass") {
                     Text(copy).font(.callout)
                 }
-                .onAppear { store.displayedFirstReturnWriting() }
             } else {
-                StationCard(title: "Recovered writing", icon: "doc.questionmark") {
+                tutorialNotice(title: "Recovered writing", icon: "doc.questionmark") {
                     Text("The record selected by an older return is not present in this save. The Library will not guess what kind of writing it was.")
                         .font(.callout).foregroundStyle(.secondary)
                 }
             }
         }
+    }
+
+    private func prepareFirstReturnWritingPrompt() {
+        guard firstReturnPrompt == nil,
+              let context = store.state.tutorial.firstReturnContext,
+              context.route == .library,
+              store.state.tutorial[.libraryFirstWriting].status != .completed else { return }
+        firstReturnPrompt = context
+        // Completion records that the exact recovered text was displayed. Keeping a local copy
+        // lets the hovering card remain readable until dismissed without re-entering scroll layout.
+        store.displayedFirstReturnWriting()
+    }
+
+    private func tutorialNotice<Content: View>(title: String, icon: String,
+                                                @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(title, systemImage: icon).font(.headline)
+            content()
+            HStack {
+                Spacer()
+                Button("Got it") { firstReturnPrompt = nil }
+                    .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding(14)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(.tint.opacity(0.35)))
+        .shadow(radius: 8, y: 3)
     }
 
     @ViewBuilder private var peopleGrid: some View {
