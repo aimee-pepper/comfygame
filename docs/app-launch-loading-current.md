@@ -210,3 +210,12 @@ instantly. The production root now keeps only the **initial app-launch** surface
 one second from coordinator start. Real adoption/inspection still runs immediately and continues to
 drive the honest progress state; the minimum does not delay selected-save opening, warm-ready scenes,
 retry semantics or any save write. This is presentation dwell, not simulated work or a fake timer.
+
+### Safe-area alignment correction — 11 Aug
+
+Physical build-233 comparison confirmed that the no-progress storyboard is correctly aligned while
+the advancing SwiftUI loader shifts the whole otherwise-identical composition. The storyboard
+explicitly centers its 248×340 page on `launch-safe`; SwiftUI previously relied on the root's implicit
+max-frame center. `LaunchSurface` now places the unchanged page at the live safe-area rectangle's
+explicit center. No internal mark/title/subtitle/track/rule coordinate, progress phase or save
+behavior changes.

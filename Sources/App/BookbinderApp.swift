@@ -209,15 +209,23 @@ struct LaunchSurface: View {
     }
 
     var body: some View {
-        Group {
-            if let failure {
-                failureSurface(failure)
-            } else {
-                loadingSurface
+        GeometryReader { geometry in
+            let center = LaunchSurfacePlacement.safeAreaCenter(
+                containerSize: geometry.size,
+                insets: geometry.safeAreaInsets
+            )
+            ZStack(alignment: .topLeading) {
+                Color(.systemBackground).ignoresSafeArea()
+                Group {
+                    if let failure {
+                        failureSurface(failure)
+                    } else {
+                        loadingSurface
+                    }
+                }
+                .position(center)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemBackground))
         .accessibilityElement(children: failure == nil ? .combine : .contain)
         .accessibilityLabel(failure == nil
                             ? "Bookbinder. Opening the Atlas. \(progressDescription)."
@@ -284,6 +292,15 @@ struct LaunchSurface: View {
             .overlay(Rectangle().stroke(.brown.opacity(0.75), lineWidth: 2))
         }
         .padding(32)
+    }
+}
+
+enum LaunchSurfacePlacement {
+    static func safeAreaCenter(containerSize: CGSize, insets: EdgeInsets) -> CGPoint {
+        CGPoint(
+            x: insets.leading + (containerSize.width - insets.leading - insets.trailing) / 2,
+            y: insets.top + (containerSize.height - insets.top - insets.bottom) / 2
+        )
     }
 }
 

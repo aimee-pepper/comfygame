@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import XCTest
+import SwiftUI
 @testable import Bookbinder
 
 @MainActor
@@ -161,6 +162,18 @@ final class CampaignLaunchProgressTests: XCTestCase {
                        "System progress styling must not introduce different intrinsic geometry")
         XCTAssertTrue(source.contains("geometry.size.width * min(1, max(0, fraction))"),
                       "Progress may change only the fill width inside the reserved region")
+    }
+
+    func testSwiftUILoaderUsesTheStoryboardSafeAreaCenter() {
+        let phone = CGSize(width: 393, height: 852)
+        let insets = EdgeInsets(top: 59, leading: 0, bottom: 34, trailing: 0)
+
+        let center = LaunchSurfacePlacement.safeAreaCenter(containerSize: phone, insets: insets)
+
+        XCTAssertEqual(center.x, 196.5, accuracy: 0.001)
+        XCTAssertEqual(center.y, 438.5, accuracy: 0.001)
+        XCTAssertNotEqual(center.y, phone.height / 2,
+                          "The SwiftUI loader must use the same safe-area center as the storyboard")
     }
 
     private func fixturePrepared() -> GameStore.PreparedLaunch {
