@@ -1,6 +1,20 @@
 import SwiftUI
 
 enum LibraryPresentation {
+    static func placementLabel(for traveller: TravellerDef, in state: GameState) -> String {
+        guard state.reality.library.foundTravellers.contains(traveller.id) else {
+            return traveller.calling.capitalized
+        }
+        guard let index = state.base.roster.firstIndex(where: { $0.traveller == traveller.id }) else {
+            return "Recruited"
+        }
+        switch RosterPlacementRules.placement(of: index, in: state) {
+        case .home: return "At Home"
+        case .activeParty: return "With you"
+        case .anchoredRealm(_, let name): return "At \(name)"
+        }
+    }
+
     static func diaries(in library: LibraryState) -> [TravellerDef] {
         let recoveredAuthors = Set(library.foundPages.compactMap {
             ContentCatalog.shared.diaryPage($0)?.diary
@@ -242,7 +256,7 @@ struct LibraryView: View {
         let hint = LibraryRules.hintPage(for: traveller, library: library)
         return LibraryTile(icon: traveller.icon, travellerID: traveller.id,
                            title: traveller.name,
-                           subtitle: hint.isFound ? "At Home" : traveller.calling.capitalized,
+                           subtitle: LibraryPresentation.placementLabel(for: traveller, in: store.state),
                            count: clues.isEmpty ? nil : "\(clues.count) clue\(clues.count == 1 ? "" : "s") about them",
                            accent: hint.isFound ? .green : .accentColor,
                            wide: dynamicTypeSize.isAccessibilitySize)
@@ -376,7 +390,9 @@ private struct LibraryTravellerView: View {
         ScrollView {
             VStack(spacing: 14) {
                 StationCard(title: traveller.name, icon: traveller.icon) {
-                    Text(hint.isFound ? "At Home · \(traveller.blurb)" : traveller.calling.capitalized)
+                    Text(hint.isFound
+                         ? "\(LibraryPresentation.placementLabel(for: traveller, in: store.state)) · \(traveller.blurb)"
+                         : traveller.calling.capitalized)
                         .font(.callout).foregroundStyle(.secondary)
                 }
 

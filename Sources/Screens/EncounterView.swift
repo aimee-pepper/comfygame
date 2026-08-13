@@ -638,6 +638,9 @@ private struct SkillSheet: View {
                 Section {
                     ForEach(store.actorSkills) { skill in
                         let cooling = store.cooldown(of: skill)
+                        let potency = store.actingCombatant
+                            .flatMap { CombatRules.stats(of: $0, in: store.state) }
+                            .map { CharacterRules.skillPower(skill.power, $0) } ?? skill.power
                         Button {
                             onUse(skill)
                             dismiss()
@@ -656,13 +659,13 @@ private struct SkillSheet: View {
                                 }
                                 Spacer(minLength: 6)
                                 if cooling > 0 {
-                                    Text("\(cooling)")
+                                    Text("Cooldown \(cooling)")
                                         .font(.caption.monospacedDigit())
                                         .foregroundStyle(.secondary)
                                         .padding(.horizontal, 8).padding(.vertical, 3)
                                         .background(Color(.tertiarySystemFill), in: Capsule())
-                                } else if skill.power > 0 {
-                                    Text("\(skill.power)")
+                                } else if potency > 0 {
+                                    Text("Power \(potency)")
                                         .font(.caption.monospacedDigit())
                                         .foregroundStyle(.secondary)
                                 }
@@ -675,7 +678,7 @@ private struct SkillSheet: View {
                         .opacity(cooling > 0 ? 0.5 : 1)
                     }
                 } footer: {
-                    Text("A number on the right is what it costs you in rounds before you can use it again.")
+                    Text("Ready skills show their actor-adjusted power. Cooling skills show rounds remaining.")
                 }
             }
             .navigationTitle("Skills")

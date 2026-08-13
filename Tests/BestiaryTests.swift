@@ -73,6 +73,33 @@ final class BestiaryTests: XCTestCase {
         }
     }
 
+    func testGeneratedReferencePercentileIsAlwaysBounded() {
+        for measure in BestiaryRules.Measure.allCases {
+            var extreme = CreatureTraits()
+            extreme.size = 10_000
+            extreme.covering = Covering(hardness: 10_000, length: 10_000, coverage: 10_000)
+            extreme.armament.pierce = 10_000
+            extreme.armament.crush = 10_000
+            extreme.armament.rend = 10_000
+            extreme.ornament = 10_000
+            extreme.boneDensity = 10_000
+            XCTAssertTrue((0...1).contains(BestiaryRules.globalPercentile(of: extreme, by: measure)))
+        }
+    }
+
+    func testFeaturedRecordIsLatestRatherThanAnInvisibleAppetiteRanking() throws {
+        var discovery = DiscoveryLog()
+        discovery.recordSpecies("thing", runIndex: 1)
+        let hungry = traits(size: 100)
+        let latest = traits(size: 10)
+        discovery.recordSpecimen(hungry, of: "thing", runIndex: 1)
+        discovery.recordSpecimen(latest, of: "thing", runIndex: 2)
+
+        let entry = try XCTUnwrap(BestiaryRules.entries(in: discovery).first)
+        XCTAssertEqual(entry.latest?.runIndex, 2)
+        XCTAssertEqual(entry.latest?.traits.size, 10)
+    }
+
     // MARK: Honesty about small samples
 
     /// A percentile over two animals is not the same claim as one over forty, and printing them

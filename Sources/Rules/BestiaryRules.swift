@@ -94,7 +94,7 @@ enum BestiaryRules {
             let mid = (low + high) / 2
             if population[mid] < value { low = mid + 1 } else { high = mid }
         }
-        return Double(low) / Double(population.count - 1)
+        return min(1, max(0, Double(low) / Double(population.count - 1)))
     }
 
     /// Where it sits against the ones **you** have met of its kind.
@@ -125,8 +125,10 @@ enum BestiaryRules {
         var apexSightings: Int
         var isApexSpecies: Bool { apexSightings > 0 }
 
-        /// The one worth talking about: your best by any measure.
-        var finest: SpecimenRecord? { specimens.max { $0.traits.appetite < $1.traits.appetite } }
+        /// A factual, stable featured record. There is no single cross-trait "best" measure.
+        var latest: SpecimenRecord? { specimens.last }
+        /// Decode/source compatibility for older UI revisions; do not present this as a superlative.
+        var finest: SpecimenRecord? { latest }
     }
 
     /// Everything you've met, best-known first.

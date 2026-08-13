@@ -80,7 +80,7 @@ struct PartyRosterView: View {
                 }
             }
             Text(store.name(of: slot)).font(.callout.weight(.semibold)).lineLimit(1)
-            Text("Lv \(character.level) · HP \(health(slot))")
+            Text("Lv \(character.level) · Max HP \(health(slot))")
                 .font(.caption.monospacedDigit()).foregroundStyle(.secondary).lineLimit(1)
             Text("Rank · \(character.rank.displayName)")
                 .font(.caption2)
@@ -100,7 +100,7 @@ struct PartyRosterView: View {
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
         .contentShape(RoundedRectangle(cornerRadius: 14))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(store.name(of: slot)). Level \(character.level). Health \(health(slot)). Rank \(character.rank.displayName).\(isComing ? " With you." : "")\(upgrade ? " Upgrade available." : "")")
+        .accessibilityLabel("\(store.name(of: slot)). Level \(character.level). Maximum health \(health(slot)). Rank \(character.rank.displayName).\(isComing ? " With you." : "")\(upgrade ? " Upgrade available." : "")")
     }
 
     private func icon(_ slot: PartySlot) -> String {

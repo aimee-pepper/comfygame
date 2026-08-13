@@ -894,6 +894,21 @@ final class LibraryTests: XCTestCase {
                       "a collapse took somebody out of the party")
     }
 
+    func testLibraryPersonStatusUsesCurrentPlacementNotRecruitmentAlone() throws {
+        var state = GameState.newGame()
+        var mara = CompanionState()
+        mara.name = "Mara"
+        mara.traveller = "mara"
+        state.base.roster.append(mara)
+        let index = state.base.roster.count - 1
+        state.reality.library.foundTravellers.insert("mara")
+        let definition = try XCTUnwrap(ContentCatalog.shared.traveller("mara"))
+
+        XCTAssertEqual(LibraryPresentation.placementLabel(for: definition, in: state), "At Home")
+        state.base.activeParty.append(index)
+        XCTAssertEqual(LibraryPresentation.placementLabel(for: definition, in: state), "With you")
+    }
+
     func testRunRecapListsOnlyPagesFoundThisTrip() throws {
         let store = GameStore(io: .temporary(name: "recap-pages-\(UUID().uuidString)"))
         let pages = ContentCatalog.shared.diaryPages
