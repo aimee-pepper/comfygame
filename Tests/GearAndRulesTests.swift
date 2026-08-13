@@ -5,6 +5,20 @@ import XCTest
 @MainActor
 final class GearAndRulesTests: XCTestCase {
 
+    func testFirepitPlacementPresentationDistinguishesHomePartyAndPostedRealm() {
+        let home = FirepitPlacementPresentation(.home)
+        XCTAssertEqual(home.icon, "house.circle")
+        XCTAssertEqual(home.label, "At Home")
+
+        let party = FirepitPlacementPresentation(.activeParty)
+        XCTAssertEqual(party.icon, "figure.walk.circle.fill")
+        XCTAssertEqual(party.label, "Coming with you")
+
+        let posted = FirepitPlacementPresentation(.anchoredRealm(id: 7, name: "Ash Reach"))
+        XCTAssertEqual(posted.icon, "map.circle.fill")
+        XCTAssertEqual(posted.label, "Posted at Ash Reach")
+    }
+
     func testFirepitReturnReportsStalePlacementInsteadOfSilentlyDoingNothing() {
         let store = GameStore(io: .temporary(name: "firepit-return-\(UUID().uuidString)"))
         store.mutate("prepare active companion") { state in

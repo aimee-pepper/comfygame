@@ -1,5 +1,24 @@
 import SwiftUI
 
+struct FirepitPlacementPresentation: Equatable {
+    let icon: String
+    let label: String
+
+    init(_ placement: RosterPlacement) {
+        switch placement {
+        case .activeParty:
+            icon = "figure.walk.circle.fill"
+            label = "Coming with you"
+        case .home:
+            icon = "house.circle"
+            label = "At Home"
+        case .anchoredRealm(_, let name):
+            icon = "map.circle.fill"
+            label = "Posted at \(name)"
+        }
+    }
+}
+
 /// Where the people you've brought home are, and who you can take with you.
 ///
 /// **It is not a second Party screen.** The Party screen is where somebody's gear, rules and stats
@@ -121,7 +140,8 @@ struct FirepitView: View {
 
     /// Location and departure choice only; detailed character management remains on Party.
     private func memberTile(_ member: CompanionState, index: Int) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let placement = FirepitPlacementPresentation(store.placement(of: index))
+        return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top) {
                 NamedCharacterPixelIdentity(
                     travellerID: member.traveller,
@@ -130,9 +150,8 @@ struct FirepitView: View {
                 )
                 .frame(width: 36, height: 36)
                 Spacer()
-                Image(systemName: store.isComing(index) ? "figure.walk.circle.fill" : "house.circle")
+                Image(systemName: placement.icon)
                     .foregroundStyle(.secondary)
-                    .accessibilityLabel(store.isComing(index) ? "Coming with you" : "At Home")
             }
             Text(member.name)
                 .font(.callout.weight(.semibold))
@@ -143,6 +162,10 @@ struct FirepitView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
+            Label(placement.label, systemImage: placement.icon)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
             Spacer(minLength: 0)
             if store.isComing(index) {
                 Button("Send Home") {
