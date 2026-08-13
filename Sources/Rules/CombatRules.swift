@@ -1309,6 +1309,15 @@ enum CombatRules {
     private static let killingStrokeNodeID = CombatNodeID(
         rawValue: "combat.offense.precision.killing_stroke"
     )
+    private static let secondWindNodeID = CombatNodeID(
+        rawValue: "combat.offense.swiftness.second_wind"
+    )
+    private static let rallyNodeID = CombatNodeID(
+        rawValue: "combat.defense.protection.rally"
+    )
+    private static let cascadeNodeID = CombatNodeID(
+        rawValue: "combat.offense.swiftness.cascade"
+    )
 
     /// The one authority shared by preview and commit. `primaryDamage` is the final positive HP
     /// loss from the eligible direct hit, after critical, armour and the global minimum.
@@ -1349,6 +1358,126 @@ enum CombatRules {
                                                            foe: foe, in: state) else { return nil }
         return killingStrokePreview(actor: actor, damage: preview.damage, foe: foe,
                                     encounter: encounter)
+    }
+
+    @discardableResult
+    static func applyFoeDamage(foeID: InstanceID, amount: Int, sourceActor: Combatant?,
+                               provenance: EncounterState.FoeDamageProvenance,
+                               sourceNodeID: CombatNodeID? = nil,
+                               run: inout WorldRun,
+                               encounter: inout EncounterState) -> EncounterState.DefeatTransition? {
+        guard amount > 0,
+              let index = encounter.foes.firstIndex(where: { $0.id == foeID }),
+              encounter.foes[index].isAlive else { return nil }
+        let before = encounter.foes[index].currentHP
+        encounter.foes[index].currentHP = max(0, before - amount)
+        guard before > 0, encounter.foes[index].currentHP == 0 else { return nil }
+        guard provenance != .environment, sourceActor?.isParty == true else { return nil }
+        let transition = EncounterState.DefeatTransition(
+            receipt: encounter.nextDefeatTransitionReceipt, foeID: foeID,
+            sourceActor: sourceActor, provenance: provenance, damage: amount,
+            sourceNodeID: sourceNodeID)
+        encounter.nextDefeatTransitionReceipt &+= 1
+        encounter.defeatTransitions.append(transition)
+        if encounter.defeatTransitions.count > 24 {
+            encounter.defeatTransitions.removeFirst(encounter.defeatTransitions.count - 24)
+        }
+        resolveDefeatConsequences(transition, run: &run, encounter: &encounter)
+        return transition
+    }
+
+    private static func resolveDefeatConsequences(_ transition: EncounterState.DefeatTransition,
+                                                   run: inout WorldRun,
+                                                   encounter: inout EncounterState) {
+        guard let owner = transition.sourceActor, owner.isParty,
+              let owned = encounter.debugV2OwnedNodeIDs?[owner] else { return }
+        let ownerIsConscious = isAlive(owner, in: run)
+        if owned.contains(secondWindNodeID), ownerIsConscious {
+            heal(owner, by: 3, run: &run, encounter: &encounter,
+                 source: "Second Wind", healer: owner)
+        }
+        if owned.contains(rallyNodeID), ownerIsConscious {
+            var seen = Set<Combatant>()
+            let party = encounter.turnSlots.map(\.actor).filter { $0.isParty && seen.insert($0).inserted }
+            for ally in party where ally != owner && isAlive(ally, in: run) {
+                heal(ally, by: 2, run: &run, encounter: &encounter,
+                     source: "Rally", healer: owner)
+            }
+        }
+        if owned.contains(cascadeNodeID) {
+            applyCascade(to: owner, encounter: &encounter)
+        }
+    }
+
+    private static func applyCascade(to owner: Combatant, encounter: inout EncounterState) {
+        let old = min(3, max(0, encounter.cascadeStacks[owner] ?? 0))
+        guard old < 3 else { return }
+        encounter.cascadeStacks[owner] = old + 1
+        if let entryIndex = encounter.debugV2Initiative?.entries.firstIndex(where: { $0.actor == owner }) {
+            var entry = encounter.debugV2Initiative!.entries[entryIndex]
+            if let component = entry.components.firstIndex(where: { $0.nodeID == cascadeNodeID }) {
+                entry.components[component].amount = (old + 1) * 3
+            } else {
+                entry.components.append(.init(nodeID: cascadeNodeID, amount: 3))
+                entry.components.sort { $0.nodeID.rawValue < $1.nodeID.rawValue }
+            }
+            entry.total = entry.baseline + entry.components.reduce(0) { $0 + $1.amount }
+            encounter.debugV2Initiative!.entries[entryIndex] = entry
+        }
+
+        guard let ownerIndex = encounter.turnSlots.indices.first(where: {
+            $0 > encounter.turnIndex && encounter.turnSlots[$0].actor == owner
+                && encounter.turnSlots[$0].kind == .primary
+        }), let ownerTotal = encounter.debugV2Initiative?.entry(for: owner)?.total else {
+            encounter.note("Cascade · \(old + 1) of 3.")
+            return
+        }
+        let destination = encounter.turnSlots.indices.first(where: { index in
+            guard index > encounter.turnIndex, index < ownerIndex,
+                  encounter.turnSlots[index].kind == .primary,
+                  let total = encounter.debugV2Initiative?.entry(
+                    for: encounter.turnSlots[index].actor)?.total else { return false }
+            return ownerTotal > total
+        })
+        if let destination {
+            let slot = encounter.turnSlots.remove(at: ownerIndex)
+            encounter.turnSlots.insert(slot, at: destination)
+            encounter.order = encounter.turnSlots.map(\.actor).reduce(into: []) { result, actor in
+                if !result.contains(actor) { result.append(actor) }
+            }
+            if let indices = encounter.debugV2Initiative?.entries.indices {
+                for index in indices {
+                    let actor = encounter.debugV2Initiative!.entries[index].actor
+                    encounter.debugV2Initiative!.entries[index].finalPosition = encounter.order.firstIndex(of: actor)
+                        .map { $0 + 1 }
+                }
+            }
+            encounter.note("Cascade · \(old + 1) of 3 · you move earlier.")
+        } else {
+            encounter.note("Cascade · \(old + 1) of 3.")
+        }
+    }
+
+    /// Cascade changes only the relative order of primary actor slots. Follow-up slots keep their
+    /// authored positions and payloads, so gaining tempo can never gather an apex/pressure burst.
+    private static func applyCascadeOrderForNewRound(_ encounter: inout EncounterState) {
+        guard let receipt = encounter.debugV2Initiative else { return }
+        let primaryIndices = encounter.turnSlots.indices.filter {
+            encounter.turnSlots[$0].kind == .primary
+        }
+        let sortedActors = primaryIndices.map { encounter.turnSlots[$0].actor }.sorted { lhs, rhs in
+            let left = receipt.entry(for: lhs)
+            let right = receipt.entry(for: rhs)
+            if left?.strikesFirst != right?.strikesFirst { return left?.strikesFirst == true }
+            if left?.total != right?.total { return (left?.total ?? Int.min) > (right?.total ?? Int.min) }
+            return lhs.storageKey < rhs.storageKey
+        }
+        for (index, actor) in zip(primaryIndices, sortedActors) {
+            encounter.turnSlots[index].actor = actor
+        }
+        encounter.order = encounter.turnSlots.map(\.actor).reduce(into: []) { result, actor in
+            if !result.contains(actor) { result.append(actor) }
+        }
     }
 
     static func breakingBlowEffect(actor: Combatant, kind: DamageKind?,
@@ -1588,7 +1717,8 @@ enum CombatRules {
         )
         let raw = resolved.rawDamage
         let amount = resolved.finalDamage
-        encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
+        _ = applyFoeDamage(foeID: foeID, amount: amount, sourceActor: actor,
+                           provenance: .direct, run: &run, encounter: &encounter)
         if critical { encounter.note("Critical — Steady Hand.") }
         switch killingStrokeOutcome(actor: actor, primaryDamage: amount, foe: foe,
                                     allowsDirectHit: allowsConditionalDirectHit,
@@ -1596,10 +1726,15 @@ enum CombatRules {
         case .none:
             break
         case .defeat:
-            encounter.foes[index].currentHP = 0
+            _ = applyFoeDamage(foeID: foeID, amount: encounter.foes[index].currentHP,
+                               sourceActor: actor, provenance: .killingStroke,
+                               sourceNodeID: killingStrokeNodeID,
+                               run: &run, encounter: &encounter)
             encounter.note("Killing Stroke — the fight goes out of \(name).")
         case .apexDamage(let additional):
-            encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - additional)
+            _ = applyFoeDamage(foeID: foeID, amount: additional, sourceActor: actor,
+                               provenance: .killingStroke, sourceNodeID: killingStrokeNodeID,
+                               run: &run, encounter: &encounter)
             encounter.note("Killing Stroke — \(name) takes \(additional) more.")
         }
         if !encounter.foes[index].isAlive { encounter.pendingStaggers[foeID] = nil }
@@ -1637,7 +1772,9 @@ enum CombatRules {
            let second = encounter.foes.indices.first(where: { $0 != index && encounter.foes[$0].isAlive }) {
             let carried = max(Tuning.Encounter.minimumDamage, amount / 2)
             let secondName = encounter.foes[second].stats.displayName
-            encounter.foes[second].currentHP = max(0, encounter.foes[second].currentHP - carried)
+            _ = applyFoeDamage(foeID: encounter.foes[second].id, amount: carried,
+                               sourceActor: actor, provenance: .carried,
+                               run: &run, encounter: &encounter)
             encounter.note("The point keeps going into \(secondName) for \(carried).")
             if !encounter.foes[second].isAlive {
                 encounter.note("\(secondName.capitalisedSentence) goes down.")
@@ -1742,9 +1879,8 @@ enum CombatRules {
         case .companion(let index):
             run.companionHP[index] = max(0, health(of: target, in: run).current - amount)
         case .foe(let id):
-            if let index = encounter.foes.firstIndex(where: { $0.id == id }) {
-                encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
-            }
+            _ = applyFoeDamage(foeID: id, amount: amount, sourceActor: nil,
+                               provenance: .environment, run: &run, encounter: &encounter)
         }
     }
 
@@ -1924,6 +2060,7 @@ enum CombatRules {
             encounter.untouchableStates = states
         }
         encounter.roundNumber += 1
+        applyCascadeOrderForNewRound(&encounter)
         applyPendingStaggers(for: encounter.roundNumber, run: run, encounter: &encounter)
         encounter.apexTargetsThisRound.removeAll()
         encounter.binderSkillCooldown = max(0, encounter.binderSkillCooldown - 1)
@@ -2056,7 +2193,14 @@ enum CombatRules {
         }) {
             guard isAlive(affliction.target, in: withEncounter(encounter, on: run)) else { continue }
             if affliction.damage > 0 {
-                hurt(affliction.target, by: affliction.damage, run: &run, encounter: &encounter)
+                if case .foe(let foeID) = affliction.target {
+                    _ = applyFoeDamage(foeID: foeID, amount: affliction.damage,
+                                       sourceActor: affliction.source,
+                                       provenance: .affliction,
+                                       run: &run, encounter: &encounter)
+                } else {
+                    hurt(affliction.target, by: affliction.damage, run: &run, encounter: &encounter)
+                }
                 encounter.note("\(actorName(affliction.target, encounter: encounter)) "
                                + "\(affliction.kind.legacyVerb) — \(affliction.damage).")
             }

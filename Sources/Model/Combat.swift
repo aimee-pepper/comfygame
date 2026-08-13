@@ -371,6 +371,17 @@ struct EncounterState: Codable, Equatable, Sendable {
         var applyingRound: Int?
         var merged: Bool
     }
+    enum FoeDamageProvenance: String, Codable, Equatable, Sendable {
+        case direct, killingStroke, carried, affliction, environment
+    }
+    struct DefeatTransition: Codable, Equatable, Sendable {
+        var receipt: UInt64
+        var foeID: InstanceID
+        var sourceActor: Combatant?
+        var provenance: FoeDamageProvenance
+        var damage: Int
+        var sourceNodeID: CombatNodeID?
+    }
     /// The saved fact of how contact began. Combat consumers read this instead of reconstructing
     /// an opening from post-contact enemy awareness or map visibility.
     enum Opening: Codable, Equatable, Sendable {
@@ -497,6 +508,12 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// Ambush and any later explicitly classified opening strike use a separate one-shot window.
     /// It never borrows from or consumes the actor's first scheduled personal turn.
     var breakingBlowOpeningSpent: Set<Combatant>?
+    /// Bounded, persisted first-zero evidence. Consequences drain synchronously; retaining the
+    /// transition makes relaunch/debug reporting truthful without making it replayable.
+    var defeatTransitions: [DefeatTransition] = []
+    var nextDefeatTransitionReceipt: UInt64 = 1
+    /// Saved encounter-only Cascade gains per exact actor, capped at three.
+    var cascadeStacks: [Combatant: Int] = [:]
 
     /// Rounds until each side's skill comes back. Counted in *rounds*, never seconds.
     ///
@@ -682,6 +699,13 @@ struct EncounterState: Codable, Equatable, Sendable {
         breakingBlowOpeningSpent = try c.decodeIfPresent(Set<Combatant>.self,
                                                           forKey: .breakingBlowOpeningSpent)
             ?? (debugV2OwnedNodeIDs == nil ? nil : [])
+        defeatTransitions = try c.decodeIfPresent([DefeatTransition].self,
+                                                   forKey: .defeatTransitions) ?? []
+        nextDefeatTransitionReceipt = try c.decodeIfPresent(UInt64.self,
+                                                             forKey: .nextDefeatTransitionReceipt)
+            ?? ((defeatTransitions.map(\.receipt).max() ?? 0) + 1)
+        cascadeStacks = try c.decodeIfPresent([Combatant: Int].self,
+                                               forKey: .cascadeStacks) ?? [:]
         binderSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .binderSkillCooldown) ?? 0
         companionSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .companionSkillCooldown) ?? 0
         cooldowns = try c.decodeIfPresent([String: Int].self, forKey: .cooldowns) ?? [:]

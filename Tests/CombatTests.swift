@@ -4440,4 +4440,157 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(reloaded.debugV2OwnedNodeIDs?[.binder], [node],
                        "relaunch or a later DEBUG toggle must not rewrite frozen ownership")
     }
+
+    func testDefeatTransitionRewardsExactSourceOnceAndRejectsUnknownSources() throws {
+        let store = inFight(["paper_moth", "paper_moth"])
+        let secondWind: CombatNodeID = "combat.offense.swiftness.second_wind"
+        let rally: CombatNodeID = "combat.defense.protection.rally"
+        store.mutate("stage defeat rewards") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  encounter.foes.count == 2 else { return }
+            let first = encounter.foes[0].id, second = encounter.foes[1].id
+            encounter.turnSlots = [.init(actor: .binder), .init(actor: .companion(0)),
+                                   .init(actor: .companion(1)), .init(actor: .foe(first)),
+                                   .init(actor: .foe(second))]
+            encounter.debugV2OwnedNodeIDs = [.binder: [secondWind, rally]]
+            run.healthCaps = [
+                .init(member: .binder, ordinaryMaximum: 20,
+                      components: [.init(nodeID: CombatDerivedStatsRules.Node.thickHide, amount: 6)]),
+                .init(member: .member(0), ordinaryMaximum: 20, components: []),
+                .init(member: .member(1), ordinaryMaximum: 20, components: [])
+            ]
+            run.binderHP = 24; run.companionHP = [0: 17, 1: 0]
+            encounter.foes[0].currentHP = 2; encounter.foes[1].currentHP = 1
+            XCTAssertNotNil(CombatRules.applyFoeDamage(
+                foeID: first, amount: 2, sourceActor: .binder, provenance: .direct,
+                run: &run, encounter: &encounter))
+            XCTAssertEqual(run.binderHP, 26)
+            XCTAssertEqual(run.companionHP[0], 19)
+            XCTAssertEqual(run.companionHP[1], 0)
+            XCTAssertNil(CombatRules.applyFoeDamage(
+                foeID: first, amount: 20, sourceActor: .binder, provenance: .carried,
+                run: &run, encounter: &encounter))
+            XCTAssertNil(CombatRules.applyFoeDamage(
+                foeID: second, amount: 1, sourceActor: nil, provenance: .environment,
+                run: &run, encounter: &encounter))
+            XCTAssertEqual(encounter.foes[1].currentHP, 0)
+            encounter.foes[1].currentHP = 1
+            XCTAssertNil(CombatRules.applyFoeDamage(
+                foeID: second, amount: 1, sourceActor: .foe(first), provenance: .direct,
+                run: &run, encounter: &encounter))
+            XCTAssertEqual(encounter.defeatTransitions.count, 1)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let transition = try XCTUnwrap(store.activeEncounter?.defeatTransitions.first)
+        XCTAssertEqual(transition.sourceActor, .binder)
+        XCTAssertEqual(transition.provenance, .direct)
+        let encoded = try JSONEncoder().encode(try XCTUnwrap(store.activeEncounter))
+        let reloaded = try JSONDecoder().decode(EncounterState.self, from: encoded)
+        XCTAssertEqual(reloaded.defeatTransitions, store.activeEncounter?.defeatTransitions)
+        XCTAssertEqual(reloaded.nextDefeatTransitionReceipt, 2)
+    }
+
+    func testCascadePreservesFollowupSlotsAndPersistsItsFrozenStack() throws {
+        let store = inFight(["paper_moth", "paper_moth"])
+        let cascade: CombatNodeID = "combat.offense.swiftness.cascade"
+        store.mutate("stage cascade") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  encounter.foes.count == 2 else { return }
+            let a = encounter.foes[0].id, b = encounter.foes[1].id
+            encounter.turnSlots = [
+                .init(actor: .binder), .init(actor: .foe(a)),
+                .init(actor: .foe(b), kind: .ordinaryPressureFollowUp(1),
+                      strengthMultiplier: 0.55, suppressesAfflictions: true),
+                .init(actor: .companion(0)),
+                .init(actor: .foe(a), kind: .ordinaryPressureFollowUp(2),
+                      strengthMultiplier: 0.55, suppressesAfflictions: true)
+            ]
+            encounter.turnIndex = 0
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [cascade]]
+            encounter.debugV2Initiative = .init(entries: [
+                .init(actor: .binder, baseline: 42, components: [], total: 42,
+                      strikesFirst: false, finalPosition: 1),
+                .init(actor: .companion(0), baseline: 40, components: [], total: 40,
+                      strikesFirst: false, finalPosition: 4),
+                .init(actor: .foe(a), baseline: 41, components: [], total: 41,
+                      strikesFirst: false, finalPosition: 2),
+                .init(actor: .foe(b), baseline: 39, components: [], total: 39,
+                      strikesFirst: false, finalPosition: 3)
+            ])
+            encounter.foes[1].currentHP = 1
+            _ = CombatRules.applyFoeDamage(foeID: b, amount: 1,
+                sourceActor: .companion(0), provenance: .direct,
+                run: &run, encounter: &encounter)
+            XCTAssertEqual(encounter.cascadeStacks[.companion(0)], 1)
+            XCTAssertEqual(encounter.turnSlots.map(\.actor),
+                           [.binder, .companion(0), .foe(a), .foe(b), .foe(a)],
+                           "the unacted owner crosses the first lower-total primary immediately")
+            CombatRules.startNewRound(&encounter, run: run)
+            XCTAssertEqual(encounter.turnSlots.map(\.kind),
+                           [.primary, .primary, .primary, .ordinaryPressureFollowUp(1),
+                            .ordinaryPressureFollowUp(2)])
+            XCTAssertEqual(encounter.turnSlots[3].actor, .foe(b))
+            XCTAssertEqual(encounter.turnSlots[4].actor, .foe(a))
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let encoded = try JSONEncoder().encode(try XCTUnwrap(store.activeEncounter))
+        let reloaded = try JSONDecoder().decode(EncounterState.self, from: encoded)
+        XCTAssertEqual(reloaded.cascadeStacks[.companion(0)], 1)
+    }
+
+    func testAfflictionDefeatKeepsExactTickSourceForSecondWind() throws {
+        let store = inFight(["paper_moth"])
+        let secondWind: CombatNodeID = "combat.offense.swiftness.second_wind"
+        store.mutate("stage attributed tick") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  let foeID = encounter.foes.first?.id else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [secondWind]]
+            encounter.foes[0].currentHP = 2; run.binderHP = 10
+            _ = CombatRules.applyAffliction(.burn, to: .foe(foeID), source: .binder,
+                                            provenance: .coating, damage: 2, ticks: 1,
+                                            targetIsStanding: true, encounter: &encounter)
+            CombatRules.tickAfflictions(run: &run, encounter: &encounter)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let transition = try XCTUnwrap(store.activeEncounter?.defeatTransitions.last)
+        XCTAssertEqual(transition.sourceActor, .binder)
+        XCTAssertEqual(transition.provenance, .affliction)
+        XCTAssertEqual(store.activeRun?.binderHP, 13)
+    }
+
+    func testThroughstrokeCarriedDefeatUsesTheOriginalActorAndEnabledEmptyHasNoReward() throws {
+        let secondWind: CombatNodeID = "combat.offense.swiftness.second_wind"
+        func staged(owns: Bool) throws -> GameStore {
+            let store = inFight(["paper_moth", "paper_moth"])
+            store.mutate("stage ranked spear carried defeat") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+                state.base.binderEquipped[.weapon] = "ranked_spear"
+                encounter.debugV2OwnedNodeIDs = [.binder: owns ? [secondWind] : []]
+                encounter.order = [.binder] + encounter.foes.map { .foe($0.id) }
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.foes[0].currentHP = 99
+                encounter.foes[1].currentHP = 1
+                run.binderHP = 10
+                run.activeEncounter = encounter; state.worlds.activeRun = run
+            }
+            return store
+        }
+        let owned = try staged(owns: true)
+        let target = try XCTUnwrap(owned.activeEncounter?.foes.first?.id)
+        owned.takeCombatAction(.attack(foe: target))
+        let carried = try XCTUnwrap(owned.activeEncounter?.defeatTransitions.first {
+            $0.provenance == .carried
+        })
+        XCTAssertEqual(carried.sourceActor, .binder)
+        XCTAssertEqual(owned.activeEncounter?.log.filter { $0.contains("Second Wind") }.count, 1)
+
+        let empty = try staged(owns: false)
+        let emptyTarget = try XCTUnwrap(empty.activeEncounter?.foes.first?.id)
+        empty.takeCombatAction(.attack(foe: emptyTarget))
+        XCTAssertEqual(empty.activeEncounter?.log.filter { $0.contains("Second Wind") }.count, 0)
+        XCTAssertEqual(empty.activeEncounter?.defeatTransitions.filter {
+            $0.provenance == .carried
+        }.count, 1, "enabled-empty preserves gameplay and receipt attribution without rewards")
+    }
 }
