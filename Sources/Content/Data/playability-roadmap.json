@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "updated": "12 Aug 2026",
-  "installedCheckpoint": "29581b2 · signed World UI, Bestiary, and presentation-authority build installed without launching",
+  "updated": "13 Aug 2026",
+  "installedCheckpoint": "0eac8a0 · signed Debug build 234 / version 0.1 installed at 14:32 without launch (bundled claim; not device introspection)",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 verification · World UI closed; combat-v2 Feint/Untouchable next",
-  "currentNote": "World exploration layout, floating reporter, Bestiary truth, and presentation-authority corrections are installed in the clean 29581b2 phone build; focused verification is 62/62 and the full suite is 1,250/1,250 green. Engineering's truthful combat-number checkpoint is complete in 0e9c325 with 118/118 focused Combat tests. Feint plus Untouchable is the active dependency-safe combat boundary on the live Sidestep/Ghost/Footwork resolver. No Attunement work begins before a real Channelworks combat attack exists.",
+  "currentWork": "P1 combat-v2 · Breaking Blow exact consumer",
+  "currentNote": "HEAD/origin and the latest signed phone install are 0eac8a0; the in-app value is explicitly only a bundled claim. Combat v2 has 23 real scenario consumers through Flense 6bb37ca, while Breaking Blow is the sole active Engineering rules boundary. Recent source-complete economy, return, failure and affliction checkpoints remain phone acceptance work rather than completed playtest evidence. No Attunement work begins before a real Channelworks combat attack exists.",
   "items": [
     {
       "id": "essence",
@@ -42,8 +42,8 @@
       "id": "trading-post-stock-breadth",
       "priority": "P1",
       "title": "Complete the merchant shelves",
-      "status": "queued",
-      "detail": "The sell-first slice is complete, but refreshes still offer only resources and occasional Essence while saved item/material lines remain unpurchasable. After launch acceptance, fresh encounter evidence and the already-started Thick Hide consumer, add common samples, known basic consumables and one ordinary tier-1 equipment offer; constrain it to a weapon only while the campaign owns none.",
+      "status": "readyToTest",
+      "detail": "Source-complete in 9ab833d: persisted refreshes freeze mixed resource, known consumable, exact material-sample and ordinary tier-1 equipment stock; the no-owned-weapon rule limits the first gear offer to a weapon, while weapon-owning campaigns may receive any ordinary tier-1 slot.",
       "gate": "Decision258/DRQ-181: frozen stable purchase identity, exact sample preservation, knowledge eligibility, persisted no-weapon/weapon-owned refresh, capacity-safe Waiting, stale/unaffordable no-op and unique/apex/narrative exclusion all pass; phone buys mixed stock without reroll or duplication."
     },
     {
@@ -187,7 +187,7 @@
       "priority": "P2",
       "title": "Static/manual authority audit",
       "status": "queued",
-      "detail": "Fourth audit pass is current in static-manual-authority-audit-current.md. Combat schema-2 generation, Effect-copy linkage and normal freshness checks are now green; remaining work is roadmap schema 2, atlas review union, and moving Trading Post/Recycler classifications into catalogue authority at their checkpoints.",
+      "detail": "The 13 Aug whole-game conformance ledger is current in design-implementation-conformance-audit-current.md; static/manual duplication remains detailed in static-manual-authority-audit-current.md. Combat schema-2 generation, Effect-copy linkage and normal freshness checks are green. Remaining systemic work is roadmap schema 2/build provenance, atlas review union, catalogue-owned Trading Post/Recycler classifications and a generated current-document drift report.",
       "gate": "Combat and meeting generators pass normal freshness checks; roadmap summaries/build identity derive; review union includes draft-only identities without release promotion; catalogue classifications fail closed; history remains dated and authored judgment is never generated."
     },
     {
@@ -211,7 +211,7 @@
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
       "status": "inProgress",
-      "detail": "Stage A is checkpointed in 9326494/b912d55; Heavy Hand, Keen Eye, Quick Step and Light Frame are committed, b7b320c adds Thick Hide, df5a963 adds shared Iron Skin/Bulwark/Shieldwall armour, d33c027 activates Stagger, c4d62a5 activates Footwork plus exact one-use Ghost while repairing Sidestep, f944cff activates typed Insulation, and dbb1443 activates exact-owner Immovable armour scope. Thirteen nodes now have real DEBUG-path scenario consumers; 0e9c325 also makes live combat potency/cooldown copy rules-derived and truthful. Feint plus Untouchable is the next dependency-safe consumer boundary on the existing evasion resolver. Attunement waits on real Channelworks combat and Light Touch/Momentum waits on its wider gear-tempo receipt. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
+      "detail": "Twenty-three nodes now have real scenario consumers through 6bb37ca: the prior derived-stat/armour/evasion/affliction slices plus Feint, Untouchable, Follow Through, Bracing Stance, Weak Point, Exploit, Pry, Finish, Steady Hand and Flense. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Attunement waits on a real Channelworks combat attack, and Light Touch/Momentum wait on the wider gear-tempo receipt. Production promotion still requires every shared consumer plus no inert or contradictory node.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {
@@ -226,8 +226,8 @@
       "id": "apothecary-reachability",
       "priority": "P1",
       "title": "Make Nessa's Apothecary reachable",
-      "status": "queued",
-      "detail": "The live locked Apothecary uniquely lacks both builtBy and buildCost, and its stock-inference-only screen can open empty. Add Nessa's persistent build path, teach Lesser Salve without granting an item, retain partial-stock inference, and apply the settled sustainable preparation costs. The same checkpoint corrects Venom's invalid `fibre` resource ID and gives Briar Oil its distinct Fiber + Resin identity without changing writing-ink ownership.",
+      "status": "readyToTest",
+      "detail": "Source-complete in 13f0c13: Nessa owns a persistent 85-Essence Apothecary build path; construction teaches Lesser Salve without granting an item; partial-stock inference remains; recipe IDs, sustainable Essence costs and the distinct Venom/Briar recipes are corrected.",
       "gate": "Fresh, already-recruited-Nessa and already-built saves prove exactly one atomic Make → build → visible Lesser Salve route; partial inference persists; ordinary recipes including all four coatings cost 0 Essence, Stillwater 6, and Waystone 12 plus one mote; every recipe resource ID resolves exactly; Venom/Briar recipes and four typed one-hit effects match apothecary-coating-identity-current.md; all locked stations validate an explicit lifecycle."
     },
     {
@@ -282,8 +282,8 @@
       "id": "return-receipt-authority",
       "priority": "P1",
       "title": "One trustworthy expedition return receipt",
-      "status": "queued",
-      "detail": "Full and partial exits still repeat the complete RunExitSummary field list after the missing-page/traveller fix, while loot lines discard stable/exact identity into name/SF-icon/count rows. Consolidate every outcome through one rules-owned frozen typed receipt so categories, item identity and accepted graphics cannot drift.",
+      "status": "readyToTest",
+      "detail": "Source-complete in 07c9aee: every exit uses one rules-owned typed receipt constructor; resource, stackable, unique gear and each material sample freeze stable identity; compatibility rows derive from typed lines; anti-lock subsidy and final runway are frozen atomically.",
       "gate": "One seeded all-category run through portal, Waystone, collapse, defeat and abandon proves parity, exact retained/lost typed resource/stackable/unique lines, profile/provenance/identified round-trip, duplicate-label safety, atomic banking, relaunch, old receipt decode, six-across anchored detail and one constructor seam. Authority: expedition-return-receipt-current.md and Decision192."
     },
     {
@@ -298,8 +298,8 @@
       "id": "failure-retention-correctness",
       "priority": "P1",
       "title": "Stack-independent failure retention",
-      "status": "queued",
-      "detail": "Failure retention floors both discrete stacks and bulk resource kinds independently, so catalogue/bin variety changes the numerical penalty. Correct separate total-unit budgets: exact discrete candidates and automatic largest-remainder bulk apportionment; player-editable discrete recovery remains a later review.",
+      "status": "readyToTest",
+      "detail": "Source-complete in f9ec86c: protected starting property is separated first; exposed discrete and resource property use outcome-wide budgets; exact item/material identity survives deterministic selection; resources use stable largest-remainder apportionment. Player-editable recovery remains a later Homework decision.",
       "gate": "At 25/50/75%, merged/split discrete stacks and one-kind/many-kind bulk resources produce their exact total budgets; stable item identity survives; bulk ties and automatic item suggestions are outcome-ID deterministic; starting property remains protected; Raw Essence/Motes and relaunch receipts are exact; no agency UI is implied. Authority: failure-recovery-agency-recommendation.md, DRQ-089/179 and Decision193."
     },
     {
@@ -314,8 +314,8 @@
       "id": "combat-affliction-authority",
       "priority": "P1",
       "title": "Give every affliction one exact owner",
-      "status": "queued",
-      "detail": "Burn, Poison and Dazzle use one collection while Bleed occupies four legacy paths; the shared companion counter currently makes one wound damage every living companion. Barbed Edge also writes a second legacy Bleed beside ordinary Rend and double-ticks accidentally. Consolidate exact-combatant definitions, one max-refresh Barbed 3×3 Bleed, and selected Broad Antidote alongside combat-v2 consumers.",
+      "status": "readyToTest",
+      "detail": "Source-complete in 16fab7a: Burn, Poison, Dazzle and Bleed share one exact-combatant typed collection; cures and Quench use authored membership; Stonebark consumes only for a meaningful standing application; coatings and Barbed/Bloodletter provenance are canonical; legacy paths adopt once without parallel ticking.",
       "gate": "Burn/Poison/Dazzle/Bleed only; exact ally ownership, independent severity/duration, refresh/coexistence, Barbed single 3×3 instance and dual-legacy adoption, Bloodletter endless distinction, Briar ineligibility, Stonebark one-shot, typed cures, selected Broad Antidote, Bleed-excluding Quench, presentation and tolerant mid-encounter migration pass. Authority: combat-affliction-authority-current.md, barbed-edge-apex-identity-current.md, DRQ-013/177 and Decisions191/200."
     },
     {
