@@ -6,6 +6,22 @@ enum RosterPlacement: Equatable, Sendable {
     case anchoredRealm(id: Int, name: String)
 }
 
+struct SpilloverStoreQuote: Equatable, Sendable { let spilled: ItemStack }
+struct SpilloverSwapQuote: Equatable, Sendable {
+    let spilled: ItemStack
+    let stored: ItemStack
+}
+
+enum SpilloverStoreEvaluation: Equatable, Sendable {
+    case allowed(SpilloverStoreQuote)
+    case refused(String)
+}
+
+enum SpilloverSwapEvaluation: Equatable, Sendable {
+    case allowed(SpilloverSwapQuote)
+    case refused(String)
+}
+
 struct PartyTransferPreview: Identifiable, Equatable, Sendable {
     let index: Int
     let name: String
@@ -360,15 +376,35 @@ extension GameStore {
     /// Move a spilled stack into the Storehouse proper. Refused rather than silently swapped when
     /// there's still no room — the player has to make space first.
     @discardableResult
-    func storeSpilled(_ stack: ItemStack) -> Bool {
-        guard !state.base.inventory.isFull,
-              state.base.spillover.contains(where: { $0.id == stack.id })
-        else { return false }
-        mutate("store spilled item", flush: true) { state in
-            guard state.base.inventory.add(stack) else { return }
-            state.base.spillover.removeAll { $0.id == stack.id }
+    func storeSpilledQuote(_ stack: ItemStack) -> SpilloverStoreEvaluation {
+        guard state.base.spillover.contains(stack) else {
+            return .refused("That waiting stack has changed.")
         }
-        return true
+        var simulated = state.base.inventory
+        guard simulated.add(stack) else { return .refused("The Storehouse is full.") }
+        return .allowed(.init(spilled: stack))
+    }
+
+    @discardableResult
+    func storeSpilled(_ quote: SpilloverStoreQuote) -> CurrentStateCommitResult {
+        guard case .allowed(let fresh) = storeSpilledQuote(quote.spilled), fresh == quote else {
+            return .refused("The waiting pile or Storehouse changed. Review it and try again.")
+        }
+        var committed = false
+        mutate("store spilled item", flush: true) { state in
+            guard state.base.spillover.contains(quote.spilled),
+                  state.base.inventory.add(quote.spilled) else { return }
+            state.base.spillover.removeAll { $0.id == quote.spilled.id }
+            committed = true
+        }
+        return committed ? .committed
+            : .refused("The waiting pile or Storehouse changed. Review it and try again.")
+    }
+
+    @discardableResult
+    func storeSpilled(_ stack: ItemStack) -> Bool {
+        guard case .allowed(let quote) = storeSpilledQuote(stack) else { return false }
+        return storeSpilled(quote) == .committed
     }
 
     /// Throw a spilled stack away. Deliberate, explicit, and the *only* way loot leaves the game
@@ -381,20 +417,49 @@ extension GameStore {
 
     /// Swap a spilled stack for one already stored, when the Storehouse is full and the player
     /// would rather keep the new thing.
-    func swapSpilled(_ spilled: ItemStack, for stored: ItemStack) {
+    func swapSpilledQuote(_ spilled: ItemStack, for stored: ItemStack) -> SpilloverSwapEvaluation {
+        guard state.base.spillover.contains(spilled) else {
+            return .refused("That waiting stack has changed.")
+        }
+        guard state.base.inventory.stacks.contains(stored) else {
+            return .refused("That stored stack has changed.")
+        }
+        var simulated = state.base.inventory
+        simulated.remove(stored.id)
+        guard simulated.add(spilled) else {
+            return .refused("The waiting stack cannot fit after that move.")
+        }
+        return .allowed(.init(spilled: spilled, stored: stored))
+    }
+
+    @discardableResult
+    func swapSpilled(_ quote: SpilloverSwapQuote) -> CurrentStateCommitResult {
+        guard case .allowed(let fresh) = swapSpilledQuote(quote.spilled, for: quote.stored),
+              fresh == quote else {
+            return .refused("The waiting pile or Storehouse changed. Review it and try again.")
+        }
+        var committed = false
         mutate("swap spilled item", flush: true) { state in
-            guard state.base.spillover.contains(where: { $0.id == spilled.id }),
-                  state.base.inventory.stacks.contains(where: { $0.id == stored.id })
+            guard state.base.spillover.contains(quote.spilled),
+                  state.base.inventory.stacks.contains(quote.stored)
             else { return }
-            state.base.inventory.remove(stored.id)
-            guard state.base.inventory.add(spilled) else {
+            state.base.inventory.remove(quote.stored.id)
+            guard state.base.inventory.add(quote.spilled) else {
                 // Couldn't place it after all — put the old one back rather than losing both.
-                state.base.inventory.add(stored)
+                state.base.inventory.add(quote.stored)
                 return
             }
-            state.base.spillover.removeAll { $0.id == spilled.id }
-            state.base.spillover.append(stored)
+            state.base.spillover.removeAll { $0.id == quote.spilled.id }
+            state.base.spillover.append(quote.stored)
+            committed = true
         }
+        return committed ? .committed
+            : .refused("The waiting pile or Storehouse changed. Review it and try again.")
+    }
+
+    func swapSpilled(_ spilled: ItemStack, for stored: ItemStack) {
+        guard case .allowed(let quote) = swapSpilledQuote(spilled, for: stored) else { return }
+        _ = swapSpilled(quote)
     }
 
     // MARK: - Gear
@@ -770,6 +835,19 @@ extension GameStore {
             committed = true
         }
         return committed
+    }
+
+    /// Commits the exact transfer facts the confirmation displayed. If station staffing, realm
+    /// production, placement, or capacity changed while the alert was open, nothing moves.
+    @discardableResult
+    func setComing(_ quote: PartyTransferPreview) -> CurrentStateCommitResult {
+        guard partyTransferPreview(for: quote.index) == quote else {
+            return .refused("Party or realm staffing changed. Review the current impact and try again.")
+        }
+        guard state.base.canTakeAnother else { return .refused("The active party is full.") }
+        return setComing(quote.index, true, expected: quote.source)
+            ? .committed
+            : .refused("Party or realm staffing changed. Review the current impact and try again.")
     }
 
     func isComing(_ index: Int) -> Bool { state.base.activeParty.contains(index) }

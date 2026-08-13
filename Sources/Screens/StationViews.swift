@@ -316,43 +316,62 @@ private struct SpilloverDetailSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     @State private var isMakingRoom = false
+    @State private var refusal: String?
     let spilled: ItemStack
+
+    private var currentSpilled: ItemStack? {
+        store.spillover.first { $0.id == spilled.id }
+    }
+    private var displaySpilled: ItemStack { currentSpilled ?? spilled }
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
                     HStack(spacing: 16) {
-                        ItemIconTile(icon: spilled.icon, catalogueID: spilled.catalogID,
-                                     rarity: spilled.rarity,
-                                     quantity: spilled.count, identified: spilled.identified,
+                        ItemIconTile(icon: displaySpilled.icon, catalogueID: displaySpilled.catalogID,
+                                     rarity: displaySpilled.rarity,
+                                     quantity: displaySpilled.count, identified: displaySpilled.identified,
                                      location: .waiting,
-                                     accessibilityName: spilled.displayName)
+                                     accessibilityName: displaySpilled.displayName)
                             .frame(width: 58, height: 58)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(spilled.displayName).font(.headline).foregroundStyle(spilled.rarity.tint)
-                            Text("Waiting to sort").font(.caption).foregroundStyle(.secondary)
+                            Text(displaySpilled.displayName).font(.headline).foregroundStyle(displaySpilled.rarity.tint)
+                            Text(currentSpilled == nil ? "No longer waiting" : "Waiting to sort")
+                                .font(.caption).foregroundStyle(currentSpilled == nil ? .red : .secondary)
                         }
                     }
                 }
                 Section("Details") {
-                    LabeledContent("Quantity", value: "\(spilled.count)")
-                    LabeledContent("Location", value: ItemGridLocation.waiting.displayName)
-                    if !spilled.detail.isEmpty { Text(spilled.detail) }
+                    LabeledContent("Quantity", value: "\(displaySpilled.count)")
+                    LabeledContent("Location", value: currentSpilled == nil
+                                   ? "No longer waiting" : ItemGridLocation.waiting.displayName)
+                    if !displaySpilled.detail.isEmpty { Text(displaySpilled.detail) }
                 }
                 Section {
                     if store.state.base.inventory.isFull {
                         Button("Make room") { isMakingRoom = true }
                     } else {
                         Button("Store it") {
-                            store.storeSpilled(spilled)
-                            dismiss()
+                            guard let currentSpilled,
+                                  case .allowed(let quote) = store.storeSpilledQuote(currentSpilled)
+                            else {
+                                refusal = "The waiting pile or Storehouse changed. Review it and try again."
+                                return
+                            }
+                            switch store.storeSpilled(quote) {
+                            case .committed: dismiss()
+                            case .refused(let message): refusal = message
+                            }
                         }
                     }
                     Button("Throw away", role: .destructive) {
                         store.discardSpilled(spilled)
                         dismiss()
                     }
+                }
+                if let refusal {
+                    Section { Text(refusal).foregroundStyle(.red) }
                 }
             }
             .navigationTitle(spilled.identified ? spilled.displayName : "Unknown item")
@@ -399,7 +418,13 @@ private struct SwapSheet: View {
                                          accessibilityName: stored.displayName)
                         } detail: { selected in
                             SwapStoredDetail(stored: selected, spilled: spilled) {
-                                store.swapSpilled(spilled, for: selected)
+                                guard case .allowed(let quote) = store.swapSpilledQuote(
+                                    spilled, for: selected
+                                ) else {
+                                    return .refused("The waiting pile or Storehouse changed. Review it and try again.")
+                                }
+                                return store.swapSpilled(quote)
+                            } onCommitted: {
                                 opened = nil
                                 dismiss()
                             }
@@ -422,33 +447,52 @@ private struct SwapSheet: View {
 }
 
 private struct SwapStoredDetail: View {
+    @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     let stored: ItemStack
     let spilled: ItemStack
-    let confirm: () -> Void
+    let confirm: () -> CurrentStateCommitResult
+    let onCommitted: () -> Void
+    @State private var refusal: String?
+
+    private var currentStored: ItemStack? {
+        store.state.base.inventory.stacks.first { $0.id == stored.id }
+    }
+    private var displayStored: ItemStack { currentStored ?? stored }
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
                     HStack(spacing: 16) {
-                        ItemIconTile(icon: stored.icon, catalogueID: stored.catalogID,
-                                     rarity: stored.rarity,
-                                     quantity: stored.count, identified: stored.identified,
-                                     location: .stored, accessibilityName: stored.displayName)
+                        ItemIconTile(icon: displayStored.icon, catalogueID: displayStored.catalogID,
+                                     rarity: displayStored.rarity,
+                                     quantity: displayStored.count, identified: displayStored.identified,
+                                     location: .stored, accessibilityName: displayStored.displayName)
                             .frame(width: 58, height: 58)
-                        Text(stored.displayName).font(.headline).foregroundStyle(stored.rarity.tint)
+                        Text(displayStored.displayName).font(.headline).foregroundStyle(displayStored.rarity.tint)
                     }
                 }
                 Section("Details") {
-                    LabeledContent("Quantity", value: "\(stored.count)")
-                    LabeledContent("Location", value: ItemGridLocation.stored.displayName)
-                    if !stored.detail.isEmpty { Text(stored.detail) }
+                    LabeledContent("Quantity", value: "\(displayStored.count)")
+                    LabeledContent("Location", value: currentStored == nil
+                                   ? "No longer stored" : ItemGridLocation.stored.displayName)
+                    if !displayStored.detail.isEmpty { Text(displayStored.detail) }
                 }
                 Section {
-                    Button("Move this to waiting and store \(spilled.displayName)") { confirm() }
+                    Button("Move this to waiting and store \(spilled.displayName)") {
+                        switch confirm() {
+                        case .committed:
+                            onCommitted()
+                            dismiss()
+                        case .refused(let message): refusal = message
+                        }
+                    }
                 } footer: {
                     Text("Nothing is discarded. This piece returns to the waiting pile.")
+                }
+                if let refusal {
+                    Section { Text(refusal).foregroundStyle(.red) }
                 }
             }
             .navigationTitle(stored.identified ? stored.displayName : "Unknown item")

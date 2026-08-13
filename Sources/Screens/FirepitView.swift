@@ -16,6 +16,7 @@ struct FirepitView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var pendingTransfer: PartyTransferPreview?
+    @State private var transferRefusal: String?
 
     private var roster: [CompanionState] { store.state.base.roster }
     private var coming: [(index: Int, member: CompanionState)] {
@@ -75,10 +76,24 @@ struct FirepitView: View {
                 title: Text("Take \(preview.name) with you?"),
                 message: Text(transferMessage(preview)),
                 primaryButton: .default(Text("Take with you")) {
-                    _ = store.setComing(preview.index, true, expected: preview.source)
+                    if case .refused(let message) = store.setComing(preview) {
+                        transferRefusal = message
+                    }
                 },
                 secondaryButton: .cancel()
             )
+        }
+        .overlay(alignment: .bottom) {
+            if let transferRefusal {
+                HStack(spacing: 10) {
+                    Text(transferRefusal).font(.callout).frame(maxWidth: .infinity, alignment: .leading)
+                    Button("Dismiss") { self.transferRefusal = nil }
+                }
+                .padding(14)
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                .padding(16)
+                .accessibilityElement(children: .contain)
+            }
         }
     }
 

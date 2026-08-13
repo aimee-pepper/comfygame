@@ -78,6 +78,45 @@ final class SpilloverTests: XCTestCase {
                        "the displaced item must go back to the pile, not be destroyed")
     }
 
+    func testStaleStoreQuoteRefusesWithoutMovingTheUpdatedStack() throws {
+        let store = makeStore()
+        let spilled = stack("spilled")
+        store.mutate("prepare waiting stack") { state in
+            state.base.inventory = Inventory(slots: 2)
+            state.base.spillover = [spilled]
+        }
+        guard case .allowed(let quote) = store.storeSpilledQuote(spilled) else {
+            return XCTFail("Valid waiting stack did not quote")
+        }
+        store.mutate("change waiting quantity") { $0.base.spillover[0].count = 2 }
+
+        guard case .refused = store.storeSpilled(quote) else {
+            return XCTFail("Stale store quote committed")
+        }
+        XCTAssertTrue(store.state.base.inventory.stacks.isEmpty)
+        XCTAssertEqual(store.spillover.first?.count, 2)
+    }
+
+    func testStaleSwapQuoteRefusesWithoutLosingEitherSide() throws {
+        let store = makeStore()
+        let spilled = stack("spilled")
+        let stored = stack("stored")
+        store.mutate("prepare quoted swap") { state in
+            state.base.inventory = Inventory(slots: 1, stacks: [stored])
+            state.base.spillover = [spilled]
+        }
+        guard case .allowed(let quote) = store.swapSpilledQuote(spilled, for: stored) else {
+            return XCTFail("Valid swap did not quote")
+        }
+        store.mutate("change stored quantity") { $0.base.inventory.stacks[0].count = 2 }
+
+        guard case .refused = store.swapSpilled(quote) else {
+            return XCTFail("Stale swap quote committed")
+        }
+        XCTAssertEqual(store.spillover.map(\.id), [spilled.id])
+        XCTAssertEqual(store.state.base.inventory.stacks.first?.count, 2)
+    }
+
     func testDiscardingIsTheOnlyWayLootLeaves() {
         let store = makeStore()
         let spilled = stack("spilled")

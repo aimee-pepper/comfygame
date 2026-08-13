@@ -343,11 +343,39 @@ final class EconomyTests: XCTestCase {
 
         let offered = try XCTUnwrap(store.pendingLoot.first)
         let carried = try XCTUnwrap(store.state.worlds.activeRun?.satchelItems.stacks.first)
-        store.takeOffered(offered, dropping: carried)
+        guard case .allowed(let quote) = store.lootSwapQuote(offered: offered, dropping: carried) else {
+            return XCTFail("A valid exact swap did not quote")
+        }
+        XCTAssertEqual(store.takeOffered(quote), .committed)
 
         let run = try XCTUnwrap(store.state.worlds.activeRun)
         XCTAssertTrue(run.offeredItems.isEmpty)
         XCTAssertEqual(run.satchelItems.stacks.map(\.id), [offered.id], "You swapped, not stacked")
+    }
+
+    func testStaleLootSwapQuoteRefusesWithoutDeletingEitherItem() throws {
+        let store = richStore()
+        store.write("plains")
+        store.bindAndDepart()
+        let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
+        let carried = ItemStack(id: InstanceID(rawValue: 11), catalogID: curio.id)
+        let offered = ItemStack(id: InstanceID(rawValue: 12), catalogID: curio.id)
+        store.mutate("prepare quoted swap") { state in
+            state.worlds.activeRun?.satchelItems = Inventory(slots: 1, stacks: [carried])
+            state.worlds.activeRun?.offeredItems = [offered]
+        }
+        guard case .allowed(let quote) = store.lootSwapQuote(offered: offered, dropping: carried) else {
+            return XCTFail("The initial swap did not quote")
+        }
+        store.mutate("change carried stack behind sheet") { state in
+            state.worlds.activeRun?.satchelItems.stacks[0].count = 2
+        }
+
+        guard case .refused = store.takeOffered(quote) else {
+            return XCTFail("A stale exact quote committed")
+        }
+        XCTAssertEqual(store.pendingLoot, [offered])
+        XCTAssertEqual(store.state.worlds.activeRun?.satchelItems.stacks.first?.count, 2)
     }
 
     func testLootCanBeLeftBehind() throws {

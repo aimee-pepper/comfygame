@@ -73,9 +73,13 @@ struct LootDecisionCard: View {
                                      accessibilityName: carried.displayName)
                     } detail: { selected in
                         LootSwapDetailSheet(carried: selected, offered: offered) {
-                            store.takeOffered(offered, dropping: selected)
-                            selectedCarried = nil
-                        }
+                            guard case .allowed(let quote) = store.lootSwapQuote(
+                                offered: offered, dropping: selected
+                            ) else {
+                                return .refused("The satchel changed. Review the current items and try again.")
+                            }
+                            return store.takeOffered(quote)
+                        } onCommitted: { selectedCarried = nil }
                     }
                 }
 
@@ -105,7 +109,9 @@ private struct LootSwapDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     let carried: ItemStack
     let offered: ItemStack
-    let swap: () -> Void
+    let swap: () -> CurrentStateCommitResult
+    let onCommitted: () -> Void
+    @State private var refusal: String?
 
     var body: some View {
         NavigationStack {
@@ -134,11 +140,19 @@ private struct LootSwapDetailSheet: View {
                 }
                 Section {
                     Button(role: .destructive) {
-                        swap()
-                        dismiss()
+                        switch swap() {
+                        case .committed:
+                            onCommitted()
+                            dismiss()
+                        case .refused(let message):
+                            refusal = message
+                        }
                     } label: {
                         Text("Drop this and take \(offered.displayName)")
                     }
+                }
+                if let refusal {
+                    Section { Text(refusal).foregroundStyle(.red) }
                 }
             }
             .navigationTitle(carried.identified ? carried.displayName : "Unknown item")

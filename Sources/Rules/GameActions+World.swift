@@ -1,5 +1,20 @@
 import Foundation
 
+enum CurrentStateCommitResult: Equatable, Sendable {
+    case committed
+    case refused(String)
+}
+
+struct LootSwapQuote: Equatable, Sendable {
+    let offered: ItemStack
+    let carried: ItemStack
+}
+
+enum LootSwapEvaluation: Equatable, Sendable {
+    case allowed(LootSwapQuote)
+    case refused(String)
+}
+
 /// Player actions inside a world. Each one is a turn, and each one is saved.
 extension GameStore {
     /// Re-enter a permanent realm without regenerating it. Layout, depleted sites and named life
@@ -161,14 +176,50 @@ extension GameStore {
     /// Take the offered item, dropping something you're carrying to make room. The satchel is
     /// smaller than home storage precisely so this choice exists; making it for the player would
     /// be the thing that empties the design out.
-    func takeOffered(_ offered: ItemStack, dropping carried: ItemStack) {
-        mutate("swap loot", flush: true) { state in
-            guard var run = state.worlds.activeRun else { return }
-            run.satchelItems.remove(carried.id)
-            _ = run.satchelItems.add(offered)
-            run.offeredItems.removeAll { $0.id == offered.id }
-            state.worlds.activeRun = run
+    func lootSwapQuote(offered: ItemStack, dropping carried: ItemStack) -> LootSwapEvaluation {
+        guard let run = state.worlds.activeRun else { return .refused("There is no active expedition.") }
+        guard run.offeredItems.contains(offered) else {
+            return .refused("That offered item is no longer waiting.")
         }
+        guard run.satchelItems.stacks.contains(carried) else {
+            return .refused("That carried stack has changed.")
+        }
+        var simulated = run.satchelItems
+        simulated.remove(carried.id)
+        guard simulated.add(offered) else {
+            return .refused("The offered item no longer fits after that swap.")
+        }
+        return .allowed(LootSwapQuote(offered: offered, carried: carried))
+    }
+
+    @discardableResult
+    func takeOffered(_ quote: LootSwapQuote) -> CurrentStateCommitResult {
+        guard case .allowed(let fresh) = lootSwapQuote(offered: quote.offered,
+                                                       dropping: quote.carried),
+              fresh == quote else {
+            return .refused("The satchel changed. Review the current items and try again.")
+        }
+        var committed = false
+        mutate("swap loot", flush: true) { state in
+            guard var run = state.worlds.activeRun,
+                  run.offeredItems.contains(quote.offered),
+                  run.satchelItems.stacks.contains(quote.carried) else { return }
+            var updated = run.satchelItems
+            updated.remove(quote.carried.id)
+            guard updated.add(quote.offered) else { return }
+            run.satchelItems = updated
+            run.offeredItems.removeAll { $0.id == quote.offered.id }
+            state.worlds.activeRun = run
+            committed = true
+        }
+        return committed ? .committed
+            : .refused("The satchel changed. Review the current items and try again.")
+    }
+
+    @available(*, deprecated, message: "Use a rules-owned LootSwapQuote and inspect the result")
+    func takeOffered(_ offered: ItemStack, dropping carried: ItemStack) {
+        guard case .allowed(let quote) = lootSwapQuote(offered: offered, dropping: carried) else { return }
+        _ = takeOffered(quote)
     }
 
     func leaveOffered(_ offered: ItemStack) {
