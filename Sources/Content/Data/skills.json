@@ -1,4 +1,5 @@
 {
+  "_authority": { "schemaVersion": 1, "defaultDisposition": "settled", "numericValues": "playtestTuning", "playerFacingCopy": "provisionalCopy" },
   "_note": "PLACEHOLDER numbers. THE DESIGN RULE (resources-skills-spec.md \u00a72): every skill answers a specific kind of creature. If it is good against everything it is just a bigger attack. 'answers' names the problem it solves and is printed in the skill list, so the rule is visible to the player rather than only to us. Limiter is a round-counted COOLDOWN per skill and nothing else \u2014 no mana pool, deliberately: a second resource to track in every fight is the wrong overhead for this game, so stronger skills carry longer cooldowns instead. 'owner' ties a skill to a party member; when the party expands past two this moves onto the character. Fall Back swaps ranks without spending the turn \u2014 it was the one skill held back until ranks existed, and they do now.",
   "skills": [
     {

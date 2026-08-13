@@ -1,4 +1,5 @@
 {
+  "_authority": { "schemaVersion": 1, "defaultDisposition": "settled", "numericValues": "playtestTuning", "playerFacingCopy": "provisionalCopy" },
   "_note": "World-description clauses (contradiction-danger-spec §6, decisions-session-6 Q18). The panel says what a world is LIKE, in prose — never a condition list, never a sigil value. This is the surface the player matches a Library hint page against, so the wording is gameplay, not flavour text. One clause per group wins, highest priority first; priority 1 with no conditions is the group's fallback. 'polarity' drives the red/green underline. PLACEHOLDER: polarity is authored here, and should become derived once instability is derived (decisions-session-6 Q19, option 4).",
   "clauses": [
     {

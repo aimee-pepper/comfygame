@@ -146,6 +146,7 @@ struct ContentCatalog: Sendable {
         case decodeFailed(String, underlying: Error)
         case danglingReference(String)
         case duplicateID(String)
+        case undisclosedProvisionalContent(String)
 
         var description: String {
             switch self {
@@ -153,12 +154,60 @@ struct ContentCatalog: Sendable {
             case .decodeFailed(let name, let underlying): "Failed to decode \(name).json — \(underlying)"
             case .danglingReference(let detail): "Dangling content reference — \(detail)"
             case .duplicateID(let detail): "Duplicate content id — \(detail)"
+            case .undisclosedProvisionalContent(let detail):
+                "Undisclosed provisional content — \(detail)"
             }
         }
     }
 
+    /// Machine-readable promotion boundary for catalogues whose historical note still calls some
+    /// content placeholder. Every field is classified deterministically: named player-facing copy
+    /// keys use `playerFacingCopy`, every numeric leaf uses `numericValues`, and all remaining
+    /// identity/schema/mechanics fields use `defaultDisposition`.
+    struct AuthorityMetadata: Decodable, Equatable, Sendable {
+        enum Disposition: String, Decodable, Sendable {
+            case settled, playtestTuning, provisionalCopy, legacyDecodeOnly
+        }
+
+        let schemaVersion: Int
+        let defaultDisposition: Disposition
+        let numericValues: Disposition
+        let playerFacingCopy: Disposition
+
+        private static let playerFacingCopyKeys: Set<String> = [
+            "name", "title", "label", "blurb", "prose", "passage", "description",
+            "descriptionSentence", "headline", "prompt", "question", "reply", "summary"
+        ]
+
+        func disposition(forFieldNamed key: String, value: Any) -> Disposition {
+            if Self.playerFacingCopyKeys.contains(key) { return playerFacingCopy }
+            if let number = value as? NSNumber,
+               CFGetTypeID(number) != CFBooleanGetTypeID() { return numericValues }
+            return defaultDisposition
+        }
+
+        func validate(file: String) throws {
+            guard schemaVersion == 1,
+                  defaultDisposition == .settled,
+                  numericValues == .playtestTuning,
+                  playerFacingCopy == .provisionalCopy else {
+                throw ContentError.undisclosedProvisionalContent(
+                    "\(file).json must classify mechanics, numeric tuning, and player-facing copy"
+                )
+            }
+        }
+    }
+
+    static let provisionalAuthorityFileNames: [String] = [
+        "combat_trees", "constellation", "contradictions", "creatures", "descriptions",
+        "gambit_components", "items", "pressure_sources", "pressure_targets",
+        "research", "resources", "rune_shapes", "sites", "skills", "stations", "symbols",
+        "travellers"
+    ]
+
     static func load(bundle: Bundle = .contentBundle) throws -> ContentCatalog {
-        ContentCatalog(
+        try validateBundledAuthorityMetadata(bundle: bundle)
+        return ContentCatalog(
             symbols: try loadFile("symbols", key: "symbols", bundle: bundle),
             creatures: try loadFile("creatures", key: "creatures", bundle: bundle),
             resources: try loadFile("resources", key: "resources", bundle: bundle),
@@ -183,6 +232,40 @@ struct ContentCatalog: Sendable {
         )
     }
 
+    static func validateBundledAuthorityMetadata(bundle: Bundle = .contentBundle) throws {
+        for name in provisionalAuthorityFileNames {
+            guard let url = bundle.url(forResource: name, withExtension: "json") else {
+                throw ContentError.missingFile(name)
+            }
+            do {
+                let object = try JSONSerialization.jsonObject(with: Data(contentsOf: url))
+                guard let root = object as? [String: Any] else {
+                    throw ContentError.decodeFailed(name, underlying: ContentError.missingFile("root"))
+                }
+                try validateAuthorityIfProvisional(root, file: name)
+            } catch let error as ContentError {
+                throw error
+            } catch {
+                throw ContentError.decodeFailed(name, underlying: error)
+            }
+        }
+
+    }
+
+    private static func validateAuthorityIfProvisional(_ root: [String: Any],
+                                                        file name: String) throws {
+        guard let note = root["_note"] as? String,
+              note.localizedCaseInsensitiveContains("placeholder") else { return }
+        guard let raw = root["_authority"] else {
+            throw ContentError.undisclosedProvisionalContent(
+                "\(name).json needs an _authority field-disposition declaration"
+            )
+        }
+        let data = try JSONSerialization.data(withJSONObject: raw)
+        let metadata = try JSONDecoder().decode(AuthorityMetadata.self, from: data)
+        try metadata.validate(file: name)
+    }
+
     /// Each file is `{ "_note": "...", "<key>": [ ... ] }` — the note carries the PLACEHOLDER
     /// warning inside the data, since JSON has no comments.
     private static func loadFile<T: Decodable>(_ name: String, key: String, bundle: Bundle) throws -> [T] {
@@ -195,6 +278,7 @@ struct ContentCatalog: Sendable {
                   let rawEntries = object[key] else {
                 throw ContentError.decodeFailed(name, underlying: ContentError.missingFile(key))
             }
+            try validateAuthorityIfProvisional(object, file: name)
             let entriesData = try JSONSerialization.data(withJSONObject: rawEntries)
             return try JSONDecoder().decode([T].self, from: entriesData)
         } catch let error as ContentError {

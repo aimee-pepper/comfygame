@@ -1,4 +1,5 @@
 {
+  "_authority": { "schemaVersion": 1, "defaultDisposition": "settled", "numericValues": "playtestTuning", "playerFacingCopy": "provisionalCopy" },
   "_note": "Travellers and their scattered diaries (decisions-session-7). A traveller is AT A CONDITION SIGNATURE, never N worlds away \u2014 difficulty is how hard the signature is to write, so search scales off the writing system. Pages are a GUIDE, NEVER A GATE: write the right world by luck and you find the person without ever reading one. Signature passages are PROSE the player matches against a world description \u2014 never a condition, never a value. All PLACEHOLDER.",
   "travellers": [
     {

@@ -5,6 +5,28 @@ import XCTest
 /// Adding a symbol/creature/station to JSON and getting an ID wrong should fail here, loudly,
 /// rather than silently spawning nothing in a world.
 final class ContentTests: XCTestCase {
+    func testEveryPlaceholderCatalogueHasFieldDispositionMetadata() throws {
+        try ContentCatalog.validateBundledAuthorityMetadata()
+        XCTAssertEqual(ContentCatalog.provisionalAuthorityFileNames.count, 17)
+
+        let metadata = ContentCatalog.AuthorityMetadata(
+            schemaVersion: 1,
+            defaultDisposition: .settled,
+            numericValues: .playtestTuning,
+            playerFacingCopy: .provisionalCopy
+        )
+        XCTAssertEqual(metadata.disposition(forFieldNamed: "id", value: "venom"), .settled)
+        XCTAssertEqual(metadata.disposition(forFieldNamed: "potency", value: 2), .playtestTuning)
+        XCTAssertEqual(metadata.disposition(forFieldNamed: "enabled", value: true), .settled)
+        XCTAssertEqual(metadata.disposition(forFieldNamed: "blurb", value: "copy"), .provisionalCopy)
+    }
+
+    func testLiveCatalogueCopyDoesNotLeakPlaceholderLanguageToPlayers() {
+        XCTAssertFalse(ContentCatalog.shared.items.contains {
+            $0.name.localizedCaseInsensitiveContains("placeholder") ||
+            $0.blurb.localizedCaseInsensitiveContains("placeholder")
+        })
+    }
 
     func testCatalogLoadsAndValidates() throws {
         let catalog = try ContentCatalog.load()
@@ -50,6 +72,8 @@ final class ContentTests: XCTestCase {
         let catalogueIDs = Set(catalogue.travellers.map(\.id))
         let missingMeetingIDs = Set(catalogue.travellers.filter { $0.meeting == nil }.map(\.id))
         let draftIDs = Set(DraftMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
+        XCTAssertEqual(AuthoredTextAtlas.draftMeetingIDs, draftIDs,
+                       "Atlas draft availability must derive from the generated corpus")
 
         XCTAssertEqual(catalogue.travellers.count, 29)
         XCTAssertEqual(catalogue.diaryPages.count, 238,
@@ -57,7 +81,7 @@ final class ContentTests: XCTestCase {
         XCTAssertEqual(catalogue.travellers.filter { $0.meeting != nil }.count, 8)
         XCTAssertEqual(missingMeetingIDs.count, 21)
         XCTAssertEqual(DraftMeetingCorpus.meetings.count, 23,
-                       "21 live missing meetings, Noll's review-only draft, and Auber's revision")
+                       "21 live missing meetings, Noll's replacement candidate, and Auber's revision")
         XCTAssertEqual(draftIDs.union(catalogueIDs).count, 29)
         XCTAssertEqual(Set(inventory.map(\.id)), catalogueIDs)
         XCTAssertEqual(inventory.flatMap(\.units).filter { $0.kind == .diary }.count,

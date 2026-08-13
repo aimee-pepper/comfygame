@@ -1,4 +1,5 @@
 {
+  "_authority": { "schemaVersion": 1, "defaultDisposition": "settled", "numericValues": "playtestTuning", "playerFacingCopy": "provisionalCopy" },
   "_note": "PLACEHOLDER. A rule is ASSEMBLED from these, never bought whole: subject + (property comparator threshold) + action. So research reads 'you learned to reason about Self' or 'you learned to notice 30%', and every new component multiplies with everything you already know rather than adding one more canned line. Mirrors the writing system: literacy, not inventory. Components are granted by research nodes (research.json) or found in the wild.",
   "components": [
     {

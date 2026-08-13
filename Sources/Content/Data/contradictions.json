@@ -1,4 +1,5 @@
 {
+  "_authority": { "schemaVersion": 1, "defaultDisposition": "settled", "numericValues": "playtestTuning", "playerFacingCopy": "provisionalCopy" },
   "_note": "The contradiction catalogue (contradiction-danger-spec §1-2). Contradiction is NEVER computed from opposed magnitudes — it fires only from these named entries. That is the whole safety mechanism: a sunny snowy world is real worldbuilding, not a contradiction, and nothing here fires on it. Every entry is authored, testable, and nameable in the preview. All values PLACEHOLDER.",
   "contradictions": [
     {

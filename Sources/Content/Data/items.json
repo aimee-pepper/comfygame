@@ -1,4 +1,5 @@
 {
+  "_authority": { "schemaVersion": 1, "defaultDisposition": "settled", "numericValues": "playtestTuning", "playerFacingCopy": "provisionalCopy" },
   "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). GEAR: a standard assortment across eight slots (Aimee, 6 Aug), each running common -> uncommon -> rare -> mythic, and every piece upgradeable at the Blacksmith. Weapons cover all three corners of the damage triangle at every quality, so the matchup against a creature's covering is always answerable with something you could plausibly be carrying. PLACEHOLDER names, blurbs and tiers. INSULATION AND REACTIVITY on gear are Q36's addition (audit #9): the other four material properties each decide what the Blacksmith asks for, and these two decided nothing, so a warm pelt and a volatile ichor were worth nothing to wear. Insulation on anything protective turns aside a heat emanation; reactivity on a weapon leaves something in the wound. Authored here because found gear is a catalogue entry — crafting doesn't exist yet, and when it does these become the crafted piece's own material properties. PLACEHOLDER values. 7 Aug: EIGHT WILD-ONLY WEAPONS (apex-encounters.md §4). Each breaks exactly one rule a crafted piece cannot break, and each is deliberately MID-TIER: you are buying the rule, not the numbers, so a two-natured blade at tier 3 is a real trade against a superb crafted one. They drop guaranteed from an apex and vanishingly rarely from anything else. ALL TIERS PLACEHOLDER.",
   "items": [
     {
@@ -147,7 +148,7 @@
       "name": "Briar Oil",
       "icon": "leaf.fill",
       "rarity": "uncommon",
-      "blurb": "A placeholder preparation that makes the next strike leave a stubborn wound.",
+      "blurb": "Coats one weapon so its next strike leaves a stubborn wound.",
       "kind": "consumable",
       "consumable": { "effect": "coatBleed", "potency": 0 }
     },
@@ -156,7 +157,7 @@
       "name": "Flashsalt",
       "icon": "sun.max.trianglebadge.exclamationmark.fill",
       "rarity": "uncommon",
-      "blurb": "A placeholder preparation that makes the next strike dazzle its target.",
+      "blurb": "Coats one weapon so its next strike dazzles its target.",
       "kind": "consumable",
       "consumable": { "effect": "coatDazzle", "potency": 0 }
     },
