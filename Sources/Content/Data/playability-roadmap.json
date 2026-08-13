@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "12 Aug 2026",
-  "installedCheckpoint": "1aab7c3 · signed clean build installed · on-device developer trust required",
+  "installedCheckpoint": "4ed15ab · signed Homework build installed · on-device developer trust required",
   "essenceBaseline": "a816113",
-  "currentWork": "P0 DEBUG Homework checkpoint · isolated and build-clean",
-  "currentNote": "Signed clean checkpoint 1aab7c3 is installed on Aimee's phone; automatic launch is blocked only by on-device developer-profile trust, so launch alignment still awaits physical acceptance. The 17-question/62-review-item Homework catalogue, answer history and Thick Hide DEBUG preview are isolated and build-clean for the next checkpoint. Combat-v2 Thick Hide is committed at b7b320c with a frozen expedition-health receipt; its next dependency-safe consumer is the shared Iron Skin/Bulwark/Shieldwall armour receipt, which must replace rather than duplicate legacy armour contributions.",
+  "currentWork": "P1 combat-v2 · Stagger next-round order receipt",
+  "currentNote": "Signed checkpoint 4ed15ab is installed on Aimee's phone with Settings → Homework, 17 questions, answer history and Thick Hide DEBUG preview; automatic launch is blocked only by on-device developer-profile trust. Commit 76d6f16 adds small Base station-builder cameos but is not in that phone build. The next Design-only catalogue revision is validated at 19 questions/66 exact review items and awaits an ordinary checkpoint. Combat-v2 shared armour is committed at df5a963 with 95/95 focused and 1,201/1,201 full tests; Stagger is the next contained visible consumer under DRQ-193.",
   "items": [
     {
       "id": "essence",
@@ -138,8 +138,8 @@
       "id": "launch-handoff",
       "priority": "P1",
       "title": "Launch-screen handoff alignment",
-      "status": "inProgress",
-      "detail": "Build 233 removed the black wait and added a one-second initial branded dwell, but Aimee confirmed the advancing loader remained misaligned relative to the correctly aligned static launch screen. Commit 29abf52/build 234 now gives the SwiftUI loader the same safe-area centering authority while preserving internal artwork/progress geometry; focused 8/8 and clean full 1,164/1,164 are green, signed build succeeded and origin/main is pushed. The phone remains on build 233; install plus physical static-to-progress alignment acceptance is the only remaining gate.",
+      "status": "readyToTest",
+      "detail": "Commit 29abf52/build 234 aligns the advancing SwiftUI loader to the static launch screen's safe-area center while preserving truthful progress. The later signed 4ed15ab Homework build is installed; physical launch acceptance remains blocked only by trusting the development profile on-device.",
       "gate": "Ordinary-phone evidence records exact installed commit plus OS static, first SwiftUI, shelf-ready and selected-save-ready timestamps; no black/unowned interval remains; selected-save progress still advances; static, initial and save-loading compositions align; and the slowest phase is safely reduced or truthfully covered."
     },
     {
@@ -210,8 +210,8 @@
       "id": "combat-tree-v2",
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
-      "status": "queued",
-      "detail": "Stage A is checkpointed in 9326494/b912d55; Heavy Hand, Keen Eye, Quick Step and Light Frame are committed, and b7b320c adds Thick Hide's frozen expedition-health receipt with 90/90 focused Combat/Thick Hide tests. The next dependency-safe passive consumer is the shared Iron Skin/Bulwark/Shieldwall armour receipt. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
+      "status": "inProgress",
+      "detail": "Stage A is checkpointed in 9326494/b912d55; Heavy Hand, Keen Eye, Quick Step and Light Frame are committed, b7b320c adds Thick Hide, and df5a963 adds frozen shared Iron Skin/Bulwark/Shieldwall armour with one preview/commit calculation and dynamic saved formation. Eight nodes now have real DEBUG-path scenario consumers. Stagger is the next contained visible consumer under DRQ-193; Light Touch/Momentum still waits on its wider gear-tempo receipt. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {
