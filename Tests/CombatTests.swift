@@ -3941,4 +3941,61 @@ final class CombatTests: XCTestCase {
             XCTAssertTrue((preview.lower.finalDamage...preview.upper.finalDamage).contains(committed))
         }
     }
+
+    func testPryAndFinishUseSharedExactTechniquePreviewAndCommit() throws {
+        let cases: [(skill: SkillID, hp: Int, expectedBranch: Int, ignoresArmour: Bool)] = [
+            ("pry", 100, 7, true),
+            ("finish", 35, 14, false),
+            ("finish", 36, 4, false)
+        ]
+        for fixture in cases {
+            let store = GameStore(io: .temporary(name: "targeted-technique-\(UUID().uuidString)"))
+            store.mutate("learn targeted techniques") { Self.learnEverything(&$0) }
+            store.write("plains"); store.bindAndDepart()
+            let foeID = InstanceID(rawValue: 8_501)
+            var traits = CreatureTraits()
+            traits.covering = Covering(hardness: 90, length: 0, coverage: 90)
+            var stats = CombatStats.derived(from: traits, name: "Plated target", icon: "circle")
+            stats.maxHP = 100; stats.armour = 12; stats.evasion = 0
+            store.mutate("stage targeted technique") { state in
+                Self.learnEverything(&state)
+                state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "field_maul")
+                guard var run = state.worlds.activeRun else { return }
+                var orderRNG = SeededRNG(seed: 91)
+                var encounter = CombatRules.makeEncounter(
+                    id: InstanceID(rawValue: 8_500),
+                    foes: [.init(id: foeID, traits: traits, stats: stats, currentHP: fixture.hp)],
+                    party: [.binder],
+                    debugV2BinderAttack: .init(
+                        ordinaryWeaponKind: .crush,
+                        crushBonus: .init(components: []),
+                        pierceBonus: CombatDerivedStatsRules.preMatchupAttackBonus(
+                            ownedNodeIDs: [CombatDerivedStatsRules.Node.keenEye], weaponDamageKind: .pierce)),
+                    debugV2OwnedNodeIDs: [.binder: [CombatDerivedStatsRules.Node.followThrough]],
+                    partyRanks: [.binder: .front], rng: &orderRNG)
+                encounter.order = [.binder, .foe(foeID)]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+            }
+            let foe = try XCTUnwrap(store.activeEncounter?.foes.first)
+            let preview = try XCTUnwrap(CombatRules.debugV2DirectTechniquePreview(
+                skillID: fixture.skill, actor: .binder, foe: foe, in: store.state))
+            XCTAssertEqual(preview.branchPower, fixture.expectedBranch)
+            XCTAssertEqual(preview.kind, .pierce)
+            XCTAssertEqual(preview.ignoresArmour, fixture.ignoresArmour)
+            if fixture.ignoresArmour {
+                XCTAssertEqual(preview.damage.lower.effectiveArmour, 0)
+            } else {
+                XCTAssertGreaterThan(preview.damage.lower.effectiveArmour, 0)
+            }
+            let before = foe.currentHP
+            store.mutate("commit targeted technique") {
+                CombatRules.perform(.skill(fixture.skill, foe: foeID), by: .binder, in: &$0)
+            }
+            let committed = before - (try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP))
+            XCTAssertTrue((preview.damage.lower.finalDamage...preview.damage.upper.finalDamage).contains(committed))
+        }
+    }
 }

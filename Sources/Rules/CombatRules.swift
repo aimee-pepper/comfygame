@@ -617,11 +617,15 @@ enum CombatRules {
             // **Pry.** Goes under the plate entirely, and hits for very little. The answer to a
             // bulwark whose armour is eating four fifths of every honest swing.
             guard let foe else { return nil }
-            strike(foe.id, damage: power + debugV2WeaponTechniqueBonus(for: actor, kind: .pierce,
-                                                                       encounter: encounter),
-                   by: actor, kind: .pierce,
+            guard let profile = targetedWeaponTechniqueProfile(skill, actor: actor, foe: foe,
+                                                                encounter: encounter, state: state) else { return nil }
+            strike(foe.id, damage: profile.power, by: actor, kind: profile.kind,
                    run: &run, encounter: &encounter, verb: skill.name, ignoresArmour: true,
-                   standingBack: standingBack, reachOfActor: reach)
+                   standingBack: standingBack, reachOfActor: reach,
+                   coating: coating(of: actor, in: state),
+                   breaking: wildRule(for: actor, in: state),
+                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
+                   allowsConditionalDirectHit: true)
 
         case .overbear:
             // **Overbear.** All your weight behind it, and you're out of position afterwards.
@@ -743,11 +747,15 @@ enum CombatRules {
             // **Finish.** Large, and only against something already nearly gone — so it rewards
             // having done the work rather than replacing it.
             guard let foe else { return nil }
-            let share = Double(foe.currentHP) / Double(max(1, foe.stats.maxHP))
-            let scaled = share <= Tuning.TreeSkills.finishThreshold ? power : power / 3
-            strike(foe.id, damage: scaled, by: actor, kind: skill.damage ?? weaponKind,
+            guard let profile = targetedWeaponTechniqueProfile(skill, actor: actor, foe: foe,
+                                                                encounter: encounter, state: state) else { return nil }
+            strike(foe.id, damage: profile.power, by: actor, kind: profile.kind,
                    run: &run, encounter: &encounter, verb: skill.name,
-                   standingBack: standingBack, reachOfActor: reach)
+                   standingBack: standingBack, reachOfActor: reach,
+                   coating: coating(of: actor, in: state),
+                   breaking: wildRule(for: actor, in: state),
+                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
+                   allowsConditionalDirectHit: true)
 
         case .preempt:
             // Legacy First Strike behavior remains until the direct-hit/action-receipt slice.
@@ -1277,6 +1285,62 @@ enum CombatRules {
                             actorHeldRank: currentRank != nil && currentRank == previousRanks[actor],
                             targetHasAffliction: !afflictions(on: .foe(foe.id), in: encounter).isEmpty)
         )
+    }
+
+    struct DirectTechniquePreview: Equatable, Sendable {
+        var skillID: SkillID
+        var kind: DamageKind
+        var branchPower: Int
+        var preMatchupPower: Int
+        var ignoresArmour: Bool
+        var damage: CombatDamageRules.Preview
+    }
+
+    private static func targetedWeaponTechniqueProfile(
+        _ skill: SkillDef, actor: Combatant, foe: FoeState,
+        encounter: EncounterState, state: GameState
+    ) -> (power: Int, branchPower: Int, kind: DamageKind, ignoresArmour: Bool)? {
+        let kind: DamageKind
+        let branchPower: Int
+        switch skill.kind {
+        case .armourIgnoring:
+            kind = .pierce
+            branchPower = skill.power
+        case .execute:
+            kind = skill.damage ?? .pierce
+            let authored = skill.power
+            branchPower = foe.currentHP * 100 <= max(1, foe.stats.maxHP) * 35 ? authored : authored / 3
+        default:
+            return nil
+        }
+        let root = debugV2WeaponTechniqueBonus(for: actor, kind: kind, encounter: encounter)
+        return (branchPower + root, branchPower, kind, skill.kind == .armourIgnoring)
+    }
+
+    static func debugV2DirectTechniquePreview(skillID: SkillID, actor: Combatant,
+                                               foe: FoeState, in state: GameState) -> DirectTechniquePreview? {
+        guard let encounter = state.worlds.activeRun?.activeEncounter,
+              let skill = ContentCatalog.shared.skill(skillID),
+              skills(for: actor, in: state).contains(skill),
+              let profile = targetedWeaponTechniqueProfile(skill, actor: actor, foe: foe,
+                                                            encounter: encounter, state: state)
+        else { return nil }
+        let conditional = conditionalDirectHitComponents(actor: actor, foe: foe,
+                                                         encounter: encounter).reduce(0) { $0 + $1.amount }
+        let power = profile.power + conditional
+        let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
+        let range = max(Tuning.Encounter.minimumDamage, power - spread)...max(Tuning.Encounter.minimumDamage,
+                                                                               power + spread)
+        return .init(skillID: skillID, kind: profile.kind, branchPower: profile.branchPower,
+                     preMatchupPower: power, ignoresArmour: profile.ignoresArmour,
+                     damage: CombatDamageRules.preview(
+                        rolledPower: range,
+                        in: .init(damageKind: profile.kind,
+                                  covering: foe.traits?.covering ?? Covering(),
+                                  wildRule: wildRule(for: actor, in: state),
+                                  standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
+                                  reach: reach(for: actor, in: state), armour: foe.stats.armour,
+                                  ignoresArmour: profile.ignoresArmour)))
     }
 
     static func debugV2DirectAttackPreview(foe: FoeState, in state: GameState,
