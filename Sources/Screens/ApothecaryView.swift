@@ -4,6 +4,7 @@ struct ApothecaryView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var selectedRecipeID: ItemID?
+    @State private var preparationFailure: String?
 
     private var known: [ConsumableCraftingRules.Recipe] {
         ConsumableCraftingRules.recipes.filter {
@@ -82,6 +83,14 @@ struct ApothecaryView: View {
                 selectedRecipeID = ids.first
             }
         }
+        .alert("Preparation not made", isPresented: Binding(
+            get: { preparationFailure != nil },
+            set: { if !$0 { preparationFailure = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(preparationFailure ?? "The preparation could not be made.")
+        }
     }
 
     private var contextRow: some View {
@@ -108,7 +117,11 @@ struct ApothecaryView: View {
                 messageTint: missing.isEmpty ? .secondary : .orange
             ) {
                 Button {
-                    store.craftConsumable(recipe)
+                    if store.craftConsumable(recipe) {
+                        preparationFailure = nil
+                    } else {
+                        preparationFailure = "The required stock changed. Review the exact recipe and try again."
+                    }
                 } label: {
                     Label("Prepare \(name)", systemImage: "cross.vial.fill")
                         .frame(maxWidth: .infinity, minHeight: 44)

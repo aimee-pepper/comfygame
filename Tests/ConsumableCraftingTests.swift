@@ -15,6 +15,9 @@ final class ConsumableCraftingTests: XCTestCase {
         XCTAssertTrue(source.contains("store.craftConsumable(recipe)"))
         XCTAssertEqual(source.components(separatedBy: "store.craftConsumable(recipe)").count - 1, 1,
                        "the persistent action bar should own the sole preparation mutation")
+        XCTAssertTrue(source.contains("if store.craftConsumable(recipe)"))
+        XCTAssertTrue(source.contains("Preparation not made"))
+        XCTAssertTrue(source.contains("The required stock changed."))
     }
 
     func testEveryApothecaryRecipeProducesAnAuthoredConsumableEffect() {
