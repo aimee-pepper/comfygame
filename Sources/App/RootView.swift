@@ -264,7 +264,11 @@ private struct RunExitSummaryView: View {
         }
         .presentationDetents([.large])
         .interactiveDismissDisabled()
-        .tutorialHoverOverlay(alignment: .top) {
+        .tutorialHoverOverlay(
+            isPresented: !tutorialHidden
+                && store.state.tutorial.firstReturnContext?.runIndex == summary.runIndex,
+            alignment: .top
+        ) {
             if !tutorialHidden,
                store.state.tutorial.firstReturnContext?.runIndex == summary.runIndex,
                let lesson = TutorialRules.definition(.returnPersistenceBoundary) {

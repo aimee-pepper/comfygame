@@ -99,7 +99,7 @@ struct WritingDeskView: View {
                     .disabled(state.base.page.runes.isEmpty)
             }
         }
-        .tutorialHoverOverlay {
+        .tutorialHoverOverlay(isPresented: tutorialLesson != nil) {
             if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
                 TutorialCard(lesson: lesson,
                              gotIt: { tutorialLesson = nil },

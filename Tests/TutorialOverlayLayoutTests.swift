@@ -22,7 +22,7 @@ final class TutorialOverlayLayoutTests: XCTestCase {
         let scrollBody = source[scrollStart.lowerBound..<scrollEnd.lowerBound]
         XCTAssertFalse(scrollBody.contains("firstReturnWriting"),
                        "The Library tutorial must never become a scroll child")
-        XCTAssertTrue(source.contains(".tutorialHoverOverlay(alignment: .top)"))
+        XCTAssertTrue(source.contains(".tutorialHoverOverlay(isPresented: firstReturnPrompt != nil, alignment: .top)"))
         XCTAssertTrue(source.contains("firstReturnWritingOverlay"))
     }
 
@@ -33,7 +33,7 @@ final class TutorialOverlayLayoutTests: XCTestCase {
 
         let root = try read("Sources/App/RootView.swift")
         XCTAssertTrue(root.contains("TutorialRules.definition(.returnPersistenceBoundary)"))
-        XCTAssertTrue(root.contains(".tutorialHoverOverlay(alignment: .top)"))
+        XCTAssertTrue(root.contains(".tutorialHoverOverlay("))
 
         let base = try read("Sources/Screens/BaseView.swift")
         XCTAssertTrue(base.contains(".overlay(alignment: .top)"))
@@ -48,7 +48,7 @@ final class TutorialOverlayLayoutTests: XCTestCase {
                                               anchorLabel: "Page grid")
         let root = Color.blue
             .frame(width: 390, height: 800)
-            .tutorialHoverOverlay {
+            .tutorialHoverOverlay(isPresented: true) {
                 TutorialCard(lesson: lesson, gotIt: {}, notNow: {})
             }
             .environment(\.dynamicTypeSize, .accessibility3)
@@ -78,6 +78,26 @@ final class TutorialOverlayLayoutTests: XCTestCase {
         XCTAssertTrue(source.contains(".scrollBounceBehavior(.basedOnSize)"))
     }
 
+    func testDismissedPromptLeavesNoInvisibleScrollViewAboveGameplay() {
+        let lesson = TutorialLessonDefinition(id: .writingPageRequest, group: .writing,
+                                              title: "Hidden", body: "Hidden",
+                                              anchorLabel: "Hidden")
+        let root = Color.blue
+            .frame(width: 390, height: 800)
+            .tutorialHoverOverlay(isPresented: false) {
+                TutorialCard(lesson: lesson, gotIt: {}, notNow: {})
+            }
+        let host = UIHostingController(rootView: root)
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 800))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        defer { window.isHidden = true }
+        host.view.layoutIfNeeded()
+
+        XCTAssertTrue(descendants(of: host.view).compactMap { $0 as? UIScrollView }.isEmpty,
+                      "A dismissed tutorial must leave no invisible scroll view intercepting taps")
+    }
+
     private func measuredSize(promptVisible: Bool, typeSize: DynamicTypeSize) -> CGSize {
         let lesson = TutorialLessonDefinition(id: .writingPageRequest, group: .writing,
                                               title: "A deliberately long prompt title",
@@ -86,7 +106,7 @@ final class TutorialOverlayLayoutTests: XCTestCase {
         let root = VStack(spacing: 0) {
             Color.blue.frame(width: 320, height: 420)
         }
-        .tutorialHoverOverlay {
+        .tutorialHoverOverlay(isPresented: promptVisible) {
             if promptVisible { TutorialCard(lesson: lesson, gotIt: {}, notNow: {}) }
         }
         .environment(\.dynamicTypeSize, typeSize)

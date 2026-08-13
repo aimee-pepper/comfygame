@@ -145,7 +145,7 @@ struct LibraryView: View {
         .navigationTitle("The Library")
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("library.\(tab.id.lowercased())")
-        .tutorialHoverOverlay(alignment: .top) {
+        .tutorialHoverOverlay(isPresented: firstReturnPrompt != nil, alignment: .top) {
             firstReturnWritingOverlay
         }
         .onAppear { prepareFirstReturnWritingPrompt() }

@@ -4,10 +4,13 @@ import SwiftUI
 /// resolved size and cannot feed the card's size back into that proposal, so showing a lesson does
 /// not resize maps, pages, grids, scroll content, or fixed controls.
 extension View {
-    func tutorialHoverOverlay<Overlay: View>(alignment: Alignment = .bottom,
+    func tutorialHoverOverlay<Overlay: View>(isPresented: Bool,
+                                             alignment: Alignment = .bottom,
                                              @ViewBuilder overlay: () -> Overlay) -> some View {
         self.overlay(alignment: alignment) {
-            TutorialHoverOverlayContainer(alignment: alignment, content: overlay())
+            if isPresented {
+                TutorialHoverOverlayContainer(alignment: alignment, content: overlay())
+            }
         }
     }
 }
@@ -32,12 +35,22 @@ private struct TutorialHoverOverlayContainer<Content: View>: View {
             )
             ZStack(alignment: alignment) {
                 Color.clear.allowsHitTesting(false)
-                ScrollView {
+                ViewThatFits(in: .vertical) {
+                    // Keep an ordinary prompt's hit region to the card itself. A permanently
+                    // full-height ScrollView used to sit invisibly above the whole screen and
+                    // swallow controls outside the card — including Bind & Depart.
                     content
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity)
+
+                    // Only oversized accessibility content becomes internally scrollable.
+                    ScrollView {
+                        content
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
                 }
-                .scrollBounceBehavior(.basedOnSize)
                 .frame(maxWidth: .infinity, maxHeight: maximumHeight, alignment: alignment)
                 .padding(.horizontal, 12)
                 .padding(.top, proxy.safeAreaInsets.top + 8)
