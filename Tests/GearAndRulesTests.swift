@@ -5,6 +5,47 @@ import XCTest
 @MainActor
 final class GearAndRulesTests: XCTestCase {
 
+    func testFirepitReturnReportsStalePlacementInsteadOfSilentlyDoingNothing() {
+        let store = GameStore(io: .temporary(name: "firepit-return-\(UUID().uuidString)"))
+        store.mutate("prepare active companion") { state in
+            state.base.roster = [CompanionState()]
+            state.base.activeParty = [0]
+        }
+
+        XCTAssertEqual(store.setComingHome(0), .committed)
+        guard case .refused(let message) = store.setComingHome(0) else {
+            return XCTFail("A stale return was reported as committed")
+        }
+        XCTAssertTrue(message.contains("placement changed"))
+        XCTAssertEqual(store.placement(of: 0), .home)
+    }
+
+    func testFirepitConfirmationDismissesOnlyAfterCommittedQuote() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/FirepitView.swift"),
+                                encoding: .utf8)
+        let detailStart = try XCTUnwrap(source.range(of: "private struct PartyTransferConfirmationSheet"))
+        let detail = source[detailStart.lowerBound...]
+
+        XCTAssertTrue(source.contains(".sheet(item: $pendingTransfer)"))
+        XCTAssertTrue(detail.contains("case .committed: dismiss()"))
+        XCTAssertTrue(detail.contains("case .refused(let message): refusal = message"))
+        XCTAssertFalse(source.contains("_ = store.setComing(index, false"))
+    }
+
+    func testPartyStorageSummaryNamesCapacitiesRatherThanClaimingItemCounts() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/PartyRosterView.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains("satchelCapacity) capacity"))
+        XCTAssertTrue(source.contains("inventory.slots) Storehouse bins"))
+        XCTAssertFalse(source.contains("satchelCapacity) carried"))
+        XCTAssertFalse(source.contains("inventory.slots) stored"))
+    }
+
     // MARK: Gear comes from the world, not from study
 
     func testNoResearchNodeModifiesAPartyMember() {

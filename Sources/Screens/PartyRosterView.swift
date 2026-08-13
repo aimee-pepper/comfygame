@@ -50,7 +50,7 @@ struct PartyRosterView: View {
                 .background(Color.accentColor.opacity(0.14), in: RoundedRectangle(cornerRadius: 8))
             Text("Satchel").font(.callout.weight(.semibold))
             Spacer(minLength: 4)
-            Text("\(store.state.base.satchelCapacity) carried · \(store.state.base.inventory.slots) stored")
+            Text("\(store.state.base.satchelCapacity) capacity · \(store.state.base.inventory.slots) Storehouse bins")
                 .font(.caption).foregroundStyle(.secondary)
                 .lineLimit(1).minimumScaleFactor(0.8)
         }
