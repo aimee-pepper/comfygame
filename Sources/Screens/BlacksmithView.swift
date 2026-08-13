@@ -323,7 +323,10 @@ struct ArmouryView: View {
         .navigationTitle("Armoury")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $chosenTarget) { target in
-            ArmouryTargetSheet(target: target).environmentObject(store)
+            ArmouryTargetSheet(target: target)
+                .environmentObject(store)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
     }
 

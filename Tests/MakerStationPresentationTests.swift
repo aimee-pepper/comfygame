@@ -38,6 +38,8 @@ final class MakerStationPresentationTests: XCTestCase {
         XCTAssertTrue(armoury.contains("location: targetLocation(target)"))
         XCTAssertTrue(armoury.contains("case .stored: .stored"))
         XCTAssertTrue(armoury.contains("case .worn: .worn"))
+        XCTAssertTrue(armoury.contains(".presentationDetents([.medium, .large])"))
+        XCTAssertTrue(armoury.contains(".presentationDragIndicator(.visible)"))
         XCTAssertFalse(armoury.contains("Image(systemName: \"chevron.right\")"))
     }
     func testPlayerFacingReforgeLabelsUseRulesOwnedMaximum() throws {
