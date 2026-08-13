@@ -50,6 +50,10 @@ struct FirepitView: View {
                 if seatsLeft > 0 {
                     Text(seatsLeft == 1 ? "Room for one more." : "Room for \(seatsLeft) more.")
                         .font(.caption).foregroundStyle(.secondary)
+                } else if !home.isEmpty {
+                    Text("Party full · send someone Home before taking another traveller.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 communitySection("At Home", icon: "flame.fill", entries: home,

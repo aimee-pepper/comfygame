@@ -46,6 +46,16 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertFalse(source.contains("A tavern would bring other people's travellers through"))
     }
 
+    func testFirepitExplainsWhyTakeThemIsDisabledAtPartyCapacity() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/FirepitView.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains("Party full · send someone Home before taking another traveller."))
+        XCTAssertTrue(source.contains(".disabled(seatsLeft == 0)"))
+    }
+
     func testPartyStorageSummaryNamesCapacitiesRatherThanClaimingItemCounts() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
