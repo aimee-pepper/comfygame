@@ -34,6 +34,18 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertFalse(source.contains("_ = store.setComing(index, false"))
     }
 
+    func testFirepitShowsCurrentCommunityWithoutAnUnavailableFutureTavernCard() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/FirepitView.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains("Coming with you"))
+        XCTAssertTrue(source.contains("At Home"))
+        XCTAssertTrue(source.contains("The fire is full — five is as many as you can keep."))
+        XCTAssertFalse(source.contains("A tavern would bring other people's travellers through"))
+    }
+
     func testPartyStorageSummaryNamesCapacitiesRatherThanClaimingItemCounts() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

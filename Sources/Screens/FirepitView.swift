@@ -63,8 +63,6 @@ struct FirepitView: View {
                 if !store.state.base.canRecruit {
                     ComingLater("The fire is full — five is as many as you can keep.")
                 }
-
-                ComingLater("A tavern would bring other people's travellers through, to be asked for directions. Somebody has to keep it, and you haven't met them yet.")
             }
             .padding(16)
         }
