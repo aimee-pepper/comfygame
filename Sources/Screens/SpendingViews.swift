@@ -155,6 +155,7 @@ enum ConstellationNodePresentationState: Equatable, Sendable {
 struct ConstellationNodeDetail: View {
     @EnvironmentObject private var store: GameStore
     let node: ConstellationNodeDef
+    @State private var confirmingPurchase = false
 
     var body: some View {
         let rank = store.state.reality.rank(of: node.id)
@@ -183,13 +184,25 @@ struct ConstellationNodeDetail: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if cost != nil {
                 PersistentActionBar(message: state.label, messageTint: state.tint) {
-                    Button("Fix in place") { _ = store.buy(node) }
+                    Button("Fix in place") { confirmingPurchase = true }
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .buttonStyle(.borderedProminent)
                         .tint(.purple)
                         .disabled(!store.canBuy(node))
                 }
             }
+        }
+        .confirmationDialog(
+            "Fix \(node.name) in place?",
+            isPresented: $confirmingPurchase,
+            titleVisibility: .visible
+        ) {
+            if let cost {
+                Button("Spend \(cost) Motes") { _ = store.buy(node) }
+            }
+            Button("Not yet", role: .cancel) {}
+        } message: {
+            Text("This permanently changes Reality for the current campaign.")
         }
         .frame(minWidth: 270)
     }

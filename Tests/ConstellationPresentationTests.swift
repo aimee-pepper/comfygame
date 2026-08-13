@@ -33,6 +33,10 @@ final class ConstellationPresentationTests: XCTestCase {
         XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0)"))
         XCTAssertTrue(source.contains("PersistentActionBar(message: state.label, messageTint: state.tint)"))
         XCTAssertTrue(source.contains("Button(\"Fix in place\")"))
+        XCTAssertTrue(source.contains("Fix \\(node.name) in place?"))
+        XCTAssertTrue(source.contains("Button(\"Spend \\(cost) Motes\")"))
+        XCTAssertTrue(source.contains("This permanently changes Reality for the current campaign."))
+        XCTAssertFalse(source.contains("Button(\"Fix in place\") { _ = store.buy(node) }"))
     }
 
     func testInsufficientAndDuplicatePurchasesAreAtomic() throws {
