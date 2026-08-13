@@ -353,9 +353,18 @@ private struct StationFoundationSheet: View {
                     .frame(width: 30)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(station.name).font(.headline)
-                    if let person = station.builtBy.flatMap({ ContentCatalog.shared.traveller($0) }) {
-                        Text("\(person.name), \(person.calling)")
-                            .font(.caption).foregroundStyle(.secondary)
+                    if let travellerID = station.builtBy,
+                       let person = ContentCatalog.shared.traveller(travellerID) {
+                        HStack(spacing: 6) {
+                            NamedCharacterPixelIdentity(
+                                travellerID: travellerID,
+                                fallbackSystemIcon: person.icon,
+                                fallbackColor: .secondary
+                            )
+                            .frame(width: 22, height: 22)
+                            Text("\(person.name), \(person.calling)")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
                     }
                 }
                 Spacer(minLength: 0)

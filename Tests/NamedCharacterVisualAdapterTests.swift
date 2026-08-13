@@ -167,6 +167,23 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
         )
     }
 
+    func testBaseFoundationUsesExactBuilderIdentityAndPreservesStationPresentation() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let base = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                              encoding: .utf8)
+
+        XCTAssertTrue(base.contains("let travellerID = station.builtBy"),
+                      "Foundation builder identity must remain the exact stable TravellerID")
+        XCTAssertTrue(base.contains("NamedCharacterPixelIdentity("))
+        XCTAssertTrue(base.contains("travellerID: travellerID"))
+        XCTAssertTrue(base.contains("fallbackSystemIcon: person.icon"),
+                      "Unknown, missing, or invalid cameo assets retain the traveller's SF fallback")
+        XCTAssertTrue(base.contains("Image(systemName: station.icon)"),
+                      "Adding builder identity must not replace the station's own identity")
+        XCTAssertTrue(base.contains("Text(\"\\(person.name), \\(person.calling)\")"))
+    }
+
     func testBuiltBundleResourceBasenameRemainsHashValidated() throws {
         let source = try String(contentsOf: URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
