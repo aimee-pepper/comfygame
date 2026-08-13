@@ -5,6 +5,39 @@ import XCTest
 /// Adding a symbol/creature/station to JSON and getting an ID wrong should fail here, loudly,
 /// rather than silently spawning nothing in a world.
 final class ContentTests: XCTestCase {
+    func testBundledPlayerFacingCatalogueCopyContainsNoPlaceholderMarkers() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let dataDirectory = projectRoot.appending(path: "Sources/Content/Data")
+        let files = try FileManager.default.contentsOfDirectory(
+            at: dataDirectory,
+            includingPropertiesForKeys: nil
+        ).filter { $0.pathExtension == "json" }
+
+        for file in files {
+            let object = try JSONSerialization.jsonObject(with: Data(contentsOf: file))
+            assertPlayerFacingCopyHasNoPlaceholderMarker(object, path: file.lastPathComponent)
+        }
+    }
+
+    private func assertPlayerFacingCopyHasNoPlaceholderMarker(_ value: Any, path: String) {
+        if let dictionary = value as? [String: Any] {
+            for (key, child) in dictionary {
+                let childPath = "\(path).\(key)"
+                if ["name", "blurb", "description", "title", "subtitle"].contains(key),
+                   let text = child as? String {
+                    XCTAssertFalse(text.localizedCaseInsensitiveContains("placeholder"),
+                                   "Player-facing copy at \(childPath) exposes placeholder status")
+                }
+                assertPlayerFacingCopyHasNoPlaceholderMarker(child, path: childPath)
+            }
+        } else if let array = value as? [Any] {
+            for (index, child) in array.enumerated() {
+                assertPlayerFacingCopyHasNoPlaceholderMarker(child, path: "\(path)[\(index)]")
+            }
+        }
+    }
     func testEveryPlaceholderCatalogueHasFieldDispositionMetadata() throws {
         try ContentCatalog.validateBundledAuthorityMetadata()
         XCTAssertEqual(ContentCatalog.provisionalAuthorityFileNames.count, 17)

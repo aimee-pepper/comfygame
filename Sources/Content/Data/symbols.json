@@ -329,7 +329,7 @@
     {
       "id": "verdigris_bloom",
       "name": "Verdigris Bloom",
-      "blurb": "Copper-green growth over everything. PLACEHOLDER research symbol.",
+      "blurb": "Copper-green growth spreads across living ground and metal-rich seams.",
       "icon": "camera.macro",
       "acquisition": "research",
       "essenceCost": 5,
@@ -363,7 +363,7 @@
     {
       "id": "mote_vein",
       "name": "Mote Vein",
-      "blurb": "Something permanent, buried where it should not be. PLACEHOLDER research symbol.",
+      "blurb": "Motes gather in buried veins alongside raw Essence.",
       "icon": "star.circle",
       "acquisition": "research",
       "essenceCost": 9,
