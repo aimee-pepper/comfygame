@@ -26,7 +26,7 @@ Classifications:
 
 ## Remediation status — 13 August 2026
 
-The priority remediation is implemented in eight isolated checkpoints:
+The priority remediation is implemented in ten isolated checkpoints:
 
 - `4cc1006` — measured shelf units plus indeterminate save preparation; both fabricated percentage
   scales removed.
@@ -41,6 +41,10 @@ The priority remediation is implemented in eight isolated checkpoints:
 - `3316b18` — audit evidence and permanent acceptance gates recorded with the implementation.
 - `4bf4562` — the live SwiftUI loader reads the actual UIKit window safe-area layout frame, keeping
   the fixed 248×340 composition on the same outer-placement authority as the launch storyboard.
+- `c36dca7` — runtime/export diagnostics distinguish bundled roadmap claims from observed build
+  provenance, with tolerant explicitly-legacy decode for the former field name.
+- `4bebb89` — the live bookbinding mark uses the storyboard's top-leading 74×58 coordinate origin;
+  the former default-centered SwiftUI frame shifted the mark even when the page itself was aligned.
 
 Verification on an existing iPhone 17 Pro Simulator (iOS 26.2): 116/116 focused remediation tests,
 10/10 focused launch tests, and 1,237/1,237 complete-suite tests passed with zero failures or skips.
@@ -50,6 +54,14 @@ window), centered on the UIKit safe area. The clean signed build was installed o
 iPhone; physical visual acceptance remains explicitly open until Aimee confirms that exact installed
 build rather than an earlier inferred-frame build. The permanent acceptance rules at the end of this
 document are executable gates where the relevant surface has a testable authority seam.
+
+For `4bebb89`, the launch geometry gate is 12/12 and an unsigned iPhone device build completed
+successfully. The exact clean checkpoint also built and signed successfully as build 234 and was
+installed on Aimee's physical iPhone. CoreSimulatorService failed before a new rendered transition
+capture/full-suite rerun; that infrastructure failure does not substitute for visual acceptance and
+does not block continued engineering work. The preceding exact full-suite baseline remains
+1,238/1,238 because this follow-up changes only SwiftUI frame alignment plus its source/authority
+fixture.
 
 The subsequent diagnostic-provenance completion removes the remaining misleading runtime/export
 names `installedCheckpoint` and `roadmapCheckpoint`: current reports encode
