@@ -1295,6 +1295,62 @@ enum CombatRules {
         var automaticStaggerAvailable: Bool
     }
 
+    enum KillingStrokeOutcome: Equatable, Sendable {
+        case none
+        case defeat
+        case apexDamage(Int)
+    }
+
+    struct KillingStrokePreview: Equatable, Sendable {
+        var lower: KillingStrokeOutcome
+        var upper: KillingStrokeOutcome
+    }
+
+    private static let killingStrokeNodeID = CombatNodeID(
+        rawValue: "combat.offense.precision.killing_stroke"
+    )
+
+    /// The one authority shared by preview and commit. `primaryDamage` is the final positive HP
+    /// loss from the eligible direct hit, after critical, armour and the global minimum.
+    static func killingStrokeOutcome(actor: Combatant, primaryDamage: Int, foe: FoeState,
+                                     allowsDirectHit: Bool,
+                                     encounter: EncounterState) -> KillingStrokeOutcome {
+        guard allowsDirectHit, primaryDamage > 0, foe.isAlive,
+              encounter.debugV2OwnedNodeIDs?[actor]?.contains(killingStrokeNodeID) == true else {
+            return .none
+        }
+        let remaining = max(0, foe.currentHP - primaryDamage)
+        guard remaining > 0,
+              remaining * 100 <= max(1, foe.stats.maxHP) * 15 else { return .none }
+        return foe.isApex ? .apexDamage(4) : .defeat
+    }
+
+    static func killingStrokePreview(actor: Combatant, damage: CombatDamageRules.Preview,
+                                     foe: FoeState,
+                                     encounter: EncounterState) -> KillingStrokePreview {
+        .init(lower: killingStrokeOutcome(actor: actor, primaryDamage: damage.lower.finalDamage,
+                                          foe: foe, allowsDirectHit: true, encounter: encounter),
+              upper: killingStrokeOutcome(actor: actor, primaryDamage: damage.upper.finalDamage,
+                                          foe: foe, allowsDirectHit: true, encounter: encounter))
+    }
+
+    static func debugV2KillingStrokeAttackPreview(foe: FoeState,
+                                                   in state: GameState) -> KillingStrokePreview? {
+        guard let encounter = state.worlds.activeRun?.activeEncounter,
+              let damage = debugV2DirectAttackPreview(foe: foe, in: state) else { return nil }
+        return killingStrokePreview(actor: .binder, damage: damage, foe: foe, encounter: encounter)
+    }
+
+    static func debugV2KillingStrokeTechniquePreview(skillID: SkillID, actor: Combatant,
+                                                      foe: FoeState,
+                                                      in state: GameState) -> KillingStrokePreview? {
+        guard let encounter = state.worlds.activeRun?.activeEncounter,
+              let preview = debugV2DirectTechniquePreview(skillID: skillID, actor: actor,
+                                                           foe: foe, in: state) else { return nil }
+        return killingStrokePreview(actor: actor, damage: preview.damage, foe: foe,
+                                    encounter: encounter)
+    }
+
     static func breakingBlowEffect(actor: Combatant, kind: DamageKind?,
                                    allowsDirectWeapon: Bool = true,
                                    window: DirectAttackWindow = .scheduled,
@@ -1534,6 +1590,18 @@ enum CombatRules {
         let amount = resolved.finalDamage
         encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
         if critical { encounter.note("Critical — Steady Hand.") }
+        switch killingStrokeOutcome(actor: actor, primaryDamage: amount, foe: foe,
+                                    allowsDirectHit: allowsConditionalDirectHit,
+                                    encounter: encounter) {
+        case .none:
+            break
+        case .defeat:
+            encounter.foes[index].currentHP = 0
+            encounter.note("Killing Stroke — the fight goes out of \(name).")
+        case .apexDamage(let additional):
+            encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - additional)
+            encounter.note("Killing Stroke — \(name) takes \(additional) more.")
+        }
         if !encounter.foes[index].isAlive { encounter.pendingStaggers[foeID] = nil }
 
         let soaked = raw - amount

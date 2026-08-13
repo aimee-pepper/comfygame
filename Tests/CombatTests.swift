@@ -4286,4 +4286,158 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(store.activeEncounter?.pendingStaggers[foeID]?.sourceNodeIDs,
                        [CombatDerivedStatsRules.Node.breakingBlow])
     }
+
+    func testKillingStrokeUsesExactIntegerThresholdAndPreviewBranches() throws {
+        let node = CombatNodeID(rawValue: "combat.offense.precision.killing_stroke")
+        let foeID = InstanceID(rawValue: 8_831)
+        var stats = CombatStats.derived(from: CreatureTraits(), name: "Threshold", icon: "circle")
+        stats.maxHP = 100
+        let encounter = EncounterState(
+            id: InstanceID(rawValue: 8_830), foes: [], order: [.binder],
+            debugV2OwnedNodeIDs: [.binder: [node]])
+
+        func foe(hp: Int, apex: Bool = false) -> FoeState {
+            .init(id: foeID, traits: CreatureTraits(), stats: stats, currentHP: hp, isApex: apex)
+        }
+
+        XCTAssertEqual(CombatRules.killingStrokeOutcome(
+            actor: .binder, primaryDamage: 1, foe: foe(hp: 16),
+            allowsDirectHit: true, encounter: encounter), .defeat)
+        XCTAssertEqual(CombatRules.killingStrokeOutcome(
+            actor: .binder, primaryDamage: 1, foe: foe(hp: 17),
+            allowsDirectHit: true, encounter: encounter), .none)
+        XCTAssertEqual(CombatRules.killingStrokeOutcome(
+            actor: .binder, primaryDamage: 15, foe: foe(hp: 15),
+            allowsDirectHit: true, encounter: encounter), .none,
+            "a primary lethal hit must not create a second defeat event")
+        XCTAssertEqual(CombatRules.killingStrokeOutcome(
+            actor: .binder, primaryDamage: 1, foe: foe(hp: 16, apex: true),
+            allowsDirectHit: true, encounter: encounter), .apexDamage(4))
+        XCTAssertEqual(CombatRules.killingStrokeOutcome(
+            actor: .binder, primaryDamage: 14, foe: foe(hp: 16, apex: true),
+            allowsDirectHit: true, encounter: encounter), .apexDamage(4),
+            "the apex consequence remains an authored four-damage event even when it overkills")
+        XCTAssertEqual(CombatRules.killingStrokeOutcome(
+            actor: .binder, primaryDamage: 1, foe: foe(hp: 16),
+            allowsDirectHit: false, encounter: encounter), .none,
+            "carried, status and emanation events are not eligible direct hits")
+        XCTAssertEqual(CombatRules.killingStrokeOutcome(
+            actor: .companion(0), primaryDamage: 1, foe: foe(hp: 16),
+            allowsDirectHit: true, encounter: encounter), .none,
+            "Killing Stroke leaked from its exact owner")
+        let legacy = EncounterState(id: InstanceID(rawValue: 8_832), foes: [], order: [.binder])
+        XCTAssertEqual(CombatRules.killingStrokeOutcome(
+            actor: .binder, primaryDamage: 1, foe: foe(hp: 16),
+            allowsDirectHit: true, encounter: legacy), .none,
+            "legacy encounters must not infer canonical ownership")
+
+        let damage = CombatDamageRules.preview(rolledPower: 4...6, in: .init(damageKind: .pierce))
+        XCTAssertEqual(CombatRules.killingStrokePreview(
+            actor: .binder, damage: damage, foe: foe(hp: 20), encounter: encounter),
+            .init(lower: .none, upper: .defeat),
+            "a preview crossing the threshold must show both branches rather than promise one")
+    }
+
+    func testKillingStrokePryCommitsNonApexDefeatAndApexFourThroughFrozenOwnership() throws {
+        let node = CombatNodeID(rawValue: "combat.offense.precision.killing_stroke")
+        let skill = try XCTUnwrap(ContentCatalog.shared.skill("pry"))
+
+        func staged(apex: Bool, owns: Bool, suffix: String) throws -> GameStore {
+            let store = GameStore(io: .temporary(name: "killing-stroke-\(suffix)-\(UUID().uuidString)"))
+            store.mutate("learn Pry") { Self.learnEverything(&$0) }
+            store.write("plains"); store.bindAndDepart()
+            let foeID = InstanceID(rawValue: apex ? 8_842 : 8_841)
+            var traits = CreatureTraits()
+            var stats = CombatStats.derived(from: traits, name: apex ? "Apex" : "Ordinary", icon: "circle")
+            stats.maxHP = 100; stats.armour = 0; stats.evasion = 0
+            var expectedRNG = SeededRNG(seed: 152)
+            let spread = max(1, Int((Double(skill.power) * Tuning.Encounter.damageVariance).rounded()))
+            let rolled = max(Tuning.Encounter.minimumDamage,
+                             skill.power + expectedRNG.int(in: -spread...spread))
+            let primary = CombatDamageRules.resolve(
+                rolledPower: rolled,
+                in: .init(damageKind: .pierce, covering: traits.covering, ignoresArmour: true)
+            ).finalDamage
+            let currentHP = primary + 4
+            store.mutate("stage exact Killing Stroke owner") { state in
+                state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "bone_awl")
+                guard var run = state.worlds.activeRun else { return }
+                var orderRNG = SeededRNG(seed: 151)
+                var encounter = CombatRules.makeEncounter(
+                    id: InstanceID(rawValue: apex ? 8_852 : 8_851),
+                    foes: [.init(id: foeID, traits: traits, stats: stats,
+                                  currentHP: currentHP, isApex: apex)],
+                    party: [.binder],
+                    debugV2BinderAttack: .init(ordinaryWeaponKind: .pierce,
+                                               crushBonus: .init(components: []),
+                                               pierceBonus: .init(components: [])),
+                    debugV2OwnedNodeIDs: [.binder: owns ? [node] : []],
+                    partyRanks: [.binder: .front], rng: &orderRNG)
+                encounter.order = [.binder, .foe(foeID)]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                run.rng = SeededRNG(seed: 152)
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+            }
+            return store
+        }
+
+        let ordinary = try staged(apex: false, owns: true, suffix: "ordinary")
+        let ordinaryID = try XCTUnwrap(ordinary.activeEncounter?.foes.first?.id)
+        ordinary.mutate("commit ordinary execute") {
+            CombatRules.perform(.skill("pry", foe: ordinaryID), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(ordinary.activeEncounter?.foes.first?.currentHP, 0)
+        XCTAssertTrue(ordinary.activeEncounter?.log.contains {
+            $0 == "Killing Stroke — the fight goes out of Ordinary."
+        } == true)
+        XCTAssertEqual(ordinary.activeEncounter?.log.filter { $0 == "Ordinary goes down." }.count, 1)
+
+        let apex = try staged(apex: true, owns: true, suffix: "apex")
+        let apexID = try XCTUnwrap(apex.activeEncounter?.foes.first?.id)
+        apex.mutate("commit apex consequence") {
+            CombatRules.perform(.skill("pry", foe: apexID), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(apex.activeEncounter?.foes.first?.currentHP, 0)
+        XCTAssertEqual(apex.activeEncounter?.log.filter { $0.contains("Killing Stroke") }.count, 1)
+        XCTAssertTrue(apex.activeEncounter?.log.contains { $0 == "Killing Stroke — Apex takes 4 more." } == true)
+        XCTAssertEqual(apex.activeEncounter?.log.filter { $0 == "Apex goes down." }.count, 1)
+
+        let empty = try staged(apex: false, owns: false, suffix: "empty")
+        let emptyID = try XCTUnwrap(empty.activeEncounter?.foes.first?.id)
+        empty.mutate("commit enabled-empty counterfactual") {
+            CombatRules.perform(.skill("pry", foe: emptyID), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(empty.activeEncounter?.foes.first?.currentHP, 4)
+        XCTAssertFalse(empty.activeEncounter?.log.contains { $0.contains("Killing Stroke") } == true)
+
+        let attack = try staged(apex: false, owns: true, suffix: "ordinary-attack")
+        let attackID = try XCTUnwrap(attack.activeEncounter?.foes.first?.id)
+        let initialFoe = try XCTUnwrap(attack.activeEncounter?.foes.first)
+        let attackPreview = try XCTUnwrap(CombatRules.debugV2DirectAttackPreview(
+            foe: initialFoe, in: attack.state))
+        attack.mutate("put ordinary Attack safely across the threshold") {
+            $0.worlds.activeRun?.activeEncounter?.foes[0].currentHP = attackPreview.upper.finalDamage + 1
+        }
+        let stagedFoe = try XCTUnwrap(attack.activeEncounter?.foes.first)
+        XCTAssertEqual(try XCTUnwrap(CombatRules.debugV2KillingStrokeAttackPreview(
+            foe: stagedFoe, in: attack.state)).lower, .defeat)
+        attack.mutate("commit ordinary Killing Stroke") {
+            CombatRules.perform(.attack(foe: attackID), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(attack.activeEncounter?.foes.first?.currentHP, 0)
+        XCTAssertEqual(attack.activeEncounter?.log.filter { $0.contains("Killing Stroke") }.count, 1)
+
+        let techniquePreviewFoe = try XCTUnwrap(empty.activeEncounter?.foes.first)
+        XCTAssertEqual(try XCTUnwrap(CombatRules.debugV2KillingStrokeTechniquePreview(
+            skillID: "pry", actor: .binder, foe: techniquePreviewFoe, in: empty.state)),
+                       .init(lower: .none, upper: .none),
+                       "enabled-empty technique preview promised an unowned consequence")
+
+        let saved = try JSONEncoder().encode(try XCTUnwrap(ordinary.activeEncounter))
+        let reloaded = try JSONDecoder().decode(EncounterState.self, from: saved)
+        XCTAssertEqual(reloaded.debugV2OwnedNodeIDs?[.binder], [node],
+                       "relaunch or a later DEBUG toggle must not rewrite frozen ownership")
+    }
 }
