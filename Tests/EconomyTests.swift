@@ -331,6 +331,9 @@ final class EconomyTests: XCTestCase {
 
         XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom)"))
         XCTAssertTrue(source.contains("Drop this and take \\(offered.displayName)"))
+        XCTAssertTrue(source.contains("swapSummary(carried, role: \"Drop\", location: .carried)"))
+        XCTAssertTrue(source.contains("swapSummary(offered, role: \"Take\", location: .offered)"))
+        XCTAssertTrue(source.contains("Image(systemName: \"arrow.right\")"))
         XCTAssertTrue(source.contains(".frame(maxWidth: .infinity, minHeight: 44)"))
         XCTAssertTrue(source.contains("case .refused(let message):\n                        refusal = message"))
     }

@@ -117,17 +117,13 @@ private struct LootSwapDetailSheet: View {
         NavigationStack {
             List {
                 Section {
-                    HStack(spacing: 16) {
-                        ItemIconTile(icon: carried.icon, catalogueID: carried.catalogID,
-                                     rarity: carried.rarity,
-                                     quantity: carried.count, identified: carried.identified,
-                                     location: .carried,
-                                     accessibilityName: carried.displayName)
-                            .frame(width: 58, height: 58)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(carried.displayName).font(.headline).foregroundStyle(carried.rarity.tint)
-                            Text("Carried in world").font(.caption).foregroundStyle(.secondary)
-                        }
+                    HStack(alignment: .top, spacing: 10) {
+                        swapSummary(carried, role: "Drop", location: .carried)
+                        Image(systemName: "arrow.right")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 18, height: 52)
+                        swapSummary(offered, role: "Take", location: .offered)
                     }
                 }
                 Section("Details") {
@@ -166,5 +162,28 @@ private struct LootSwapDetailSheet: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             }
         }
+    }
+
+    private func swapSummary(_ stack: ItemStack,
+                             role: String,
+                             location: ItemGridLocation) -> some View {
+        HStack(spacing: 8) {
+            ItemIconTile(icon: stack.icon, catalogueID: stack.catalogID,
+                         rarity: stack.rarity,
+                         quantity: stack.count, identified: stack.identified,
+                         location: location,
+                         accessibilityName: stack.displayName)
+                .frame(width: 52, height: 52)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(role)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(role == "Drop" ? Color.red : Color.green)
+                Text(stack.displayName)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(stack.rarity.tint)
+                    .lineLimit(2)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
