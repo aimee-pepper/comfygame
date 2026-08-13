@@ -1,7 +1,7 @@
 # Design → implementation conformance audit — current
 
-**Snapshot:** 13 Aug 2026, source HEAD `0eac8a0` plus the explicitly listed uncommitted UI
-boundaries.  
+**Snapshot:** 13 Aug 2026. Rules/content baseline audited at `0eac8a0`; the subsequent isolated
+ordinary-phone remedy-action checkpoint `d63a387` does not change the classifications below.  
 **Purpose:** answer one question honestly: *does the game currently implement settled design?*  
 **Scheduling authority:** `Sources/Content/Data/playability-roadmap.json`; this document diagnoses
 coverage and must not become a second queue.
