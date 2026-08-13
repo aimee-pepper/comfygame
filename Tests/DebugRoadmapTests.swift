@@ -28,7 +28,7 @@ final class DesignHomeworkTests: XCTestCase {
     func testBundledQuestionsAndChoicesHaveStableUniqueIDs() {
         let catalogue = DesignHomeworkCatalogue.current
         XCTAssertEqual(catalogue.schemaVersion, 1)
-        XCTAssertEqual(catalogue.questions.count, 17)
+        XCTAssertEqual(catalogue.questions.count, 19)
         XCTAssertEqual(Set(catalogue.questions.map(\.id)).count, catalogue.questions.count)
         for question in catalogue.questions {
             XCTAssertFalse(question.choices.isEmpty)

@@ -570,6 +570,35 @@
         { "id": "level-one-catchup", "title": "Level 1 with catch-up", "detail": "Preserve a full growth arc but grant strongly accelerated XP; late recruits may still need to sit out initially." },
         { "id": "keep-level-one", "title": "Keep level 1", "detail": "Accept that late named travellers begin far behind and require ordinary equal-share XP to advance." }
       ]
+    },
+    {
+      "id": "named-character-stat-growth",
+      "title": "How should named characters grow distinct stats?",
+      "context": "Every named traveller currently starts with the same all-equal stats. Level-up raises the two currently highest stats, but an equal starting line has no authored tie identity, so distinct callings can converge on the same Might/Finesse build. This is separate from combat-tree lean and from the level a traveller joins at.",
+      "recommendation": "Give each named person an authored primary and secondary growth stat, let the Binder choose a pair at new game, and freeze a generated pair for generated companions. Add one point to each per level. This keeps growth legible and identity-specific without asking the player to assign points across a large roster.",
+      "choices": [
+        { "id": "authored-fixed-pair", "title": "Authored stat pair", "detail": "Each named person grows two authored stats; Binder chooses and generated companions freeze a generated pair." },
+        { "id": "authored-weighted-rotation", "title": "Weighted rotation", "detail": "Give each character a five-stat order or weighting and rotate two increases per level; more varied, but harder to read." },
+        { "id": "player-assigns-points", "title": "Assign every point", "detail": "Let the player choose both stat increases at every level; strongest control, with substantial roster upkeep." },
+        { "id": "keep-highest-two", "title": "Keep highest two", "detail": "Retain current growth and add only a deterministic tie-breaking rule." }
+      ]
+    },
+    {
+      "id": "remaining-meeting-voice-revision",
+      "title": "Approve Bracken, Maud, and Perren's revised replies?",
+      "context": "These four meeting replies have strong physical scenes but currently end by explaining their theme in generalized language. The candidates keep the settled meaning and let damaged lining, a grip test, and rearranged fragments carry it. Sabine and Orsa were audited and intentionally left unchanged.",
+      "recommendation": "Approve the exact four-line batch. Preserve every unlisted meeting line and all stable exchange IDs.",
+      "reviewItems": [
+        { "id": "bracken.intact_outside", "label": "Bracken · intact outside", "candidate": "“It stopped the point.” Bracken turns the lining over. The hidden buckle has pressed its own shape through every layer beneath it. “Then this struck the wearer instead. Put it back untouched and it will do both again.”" },
+        { "id": "maud.not_weapon_yet", "label": "Maud · not a weapon yet", "candidate": "“Not yet. Pick a reach.” Maud balances the bar on her mark. “Now show me how you mean to recover it after a miss. Until then it is a length of iron and several unmade promises.”" },
+        { "id": "maud.advanced_compromise", "label": "Maud · advanced compromise", "candidate": "“I can tell you exactly what it gives up.” She shifts the balance toward your upper hand. “This grip buys speed with your shoulder. Rare metal only makes the bargain more expensive.”" },
+        { "id": "perren.two_arrangements", "label": "Perren · two arrangements", "candidate": "“Neither is innocent.” Perren moves one outer fragment from the first pattern into the second. “Here it guards the person in the middle. Here it points everyone else at them. The fragment cannot tell us which use its makers meant to survive.”" }
+      ],
+      "choices": [
+        { "id": "approve-exact-set", "title": "Approve exact set", "detail": "Promote all four replies exactly as shown." },
+        { "id": "revise-set", "title": "Needs another pass", "detail": "Keep the object-led direction but name any stable units to revise below." },
+        { "id": "hold", "title": "Hold this batch", "detail": "Make no live Bracken, Maud or Perren prose change yet." }
+      ]
     }
   ]
 }

@@ -1,6 +1,7 @@
 # Design Homework — Current Contract
 
-**Status:** Implemented source slice; awaiting phone installation and interaction check
+**Status:** Initial 17-question slice installed in `4ed15ab`; launch trust and phone interaction check
+remain. Next 19-question/66-review-item catalogue revision is source-validated but not installed.
 **Decision date:** 12 August 2026
 **Content authority:** `Sources/Content/Data/design-homework.json`
 
@@ -67,6 +68,10 @@ A later authenticated relay may add direct submission, but the UI must not call 
     (`corrin-fen-meeting-voice-revision`).
 17. Named-traveller arrival level and permanent catch-up gap
     (`named-traveller-arrival-level`).
+18. Named-character stat-growth identity and roster-upkeep trade-off
+    (`named-character-stat-growth`).
+19. Bracken/Maud/Perren's four-line remaining abstract-reply correction
+    (`remaining-meeting-voice-revision`).
 
 The catalogue deliberately mixes held mechanical choices with exact authored-copy reviews. Each can
 be answered asynchronously without blocking unrelated implementation; a question's own authority
