@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "12 Aug 2026",
-  "installedCheckpoint": "dbb1443 · signed Immovable build installed without launching",
+  "installedCheckpoint": "29581b2 · signed World UI, Bestiary, and presentation-authority build installed without launching",
   "essenceBaseline": "a816113",
   "currentWork": "P1 verification · World UI closed; combat-v2 Feint/Untouchable next",
-  "currentNote": "World exploration layout and floating reporter corrections are committed in a600a0f; exact focused verification across World UI, reporter, named-character consumers and the separate Bestiary authority checkpoint 4637f99 is 132/132 green, with full-suite verification in progress. Engineering's truthful combat-number checkpoint is complete in 0e9c325 with 118/118 focused Combat tests. After reconciliation, Feint plus Untouchable is the next dependency-safe combat boundary on the live Sidestep/Ghost/Footwork resolver. No Attunement work begins before a real Channelworks combat attack exists.",
+  "currentNote": "World exploration layout, floating reporter, Bestiary truth, and presentation-authority corrections are installed in the clean 29581b2 phone build; focused verification is 62/62 and the full suite is 1,250/1,250 green. Engineering's truthful combat-number checkpoint is complete in 0e9c325 with 118/118 focused Combat tests. Feint plus Untouchable is the active dependency-safe combat boundary on the live Sidestep/Ghost/Footwork resolver. No Attunement work begins before a real Channelworks combat attack exists.",
   "items": [
     {
       "id": "essence",
