@@ -23,28 +23,45 @@ struct RefineryCard: View {
             .frame(minHeight: 44)
             .disabled(raw == 0)
 
-            Button {
-                if store.refineEssence(rawUnits: selected) {
-                    selectedRaw = min(selectedRaw, max(1, raw))
+            HStack(spacing: 10) {
+                Button {
+                    if store.refineEssence(rawUnits: selected) {
+                        selectedRaw = min(selectedRaw, max(1, raw))
+                    }
+                } label: {
+                    RefineryActionLabel(
+                        title: raw > 0 ? "Refine selected" : "Nothing to refine",
+                        result: raw > 0 ? "\(selected * rate) Essence" : "—"
+                    )
                 }
-            } label: {
-                Label(raw > 0 ? "Refine selected" : "Nothing to refine", systemImage: "flame")
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 44)
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(raw == 0)
+                .buttonStyle(.borderedProminent)
+                .disabled(raw == 0)
 
-            Button("Refine all · \(raw * rate) Essence") { store.refineAllEssence() }
-                .frame(maxWidth: .infinity, minHeight: 44)
+                Button { store.refineAllEssence() } label: {
+                    RefineryActionLabel(title: "Refine all", result: "\(raw * rate) Essence")
+                }
                 .buttonStyle(.bordered)
                 .disabled(raw == 0)
+            }
 
             Text("The preview is exact. Only a confirmed conversion increases refining practice.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .onChange(of: raw) { _, value in selectedRaw = min(selectedRaw, max(1, value)) }
+    }
+}
+
+private struct RefineryActionLabel: View {
+    let title: String
+    let result: String
+
+    var body: some View {
+        VStack(spacing: 1) {
+            Text(title).font(.callout.weight(.semibold)).lineLimit(1)
+            Text(result).font(.caption2).monospacedDigit().opacity(0.82)
+        }
+        .frame(maxWidth: .infinity, minHeight: 44)
     }
 }
 
