@@ -9,15 +9,21 @@ struct DistilleryView: View {
         ScrollView {
             VStack(spacing: 16) {
                 StationCard(title: "Crystallise", icon: "diamond.fill") {
+                    let readiness = DistilleryRules.crystallisationReadiness(in: store.state)
                     Text("A stable blank. Quartz is the lattice; essence remains the thing being held.")
                         .font(.caption).foregroundStyle(.secondary)
                     LabeledRow(icon: "drop.fill", label: "Essence",
                                value: "\(DistilleryRules.blankEssence)")
                     LabeledRow(icon: "diamond", label: "Quartz",
                                value: "\(DistilleryRules.blankQuartz)")
+                    Label(crystallisationReadinessText(readiness),
+                          systemImage: readiness == .ready
+                              ? "checkmark.circle.fill" : "exclamationmark.circle")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(readiness == .ready ? Color.green : Color.orange)
                     Button("Crystallise essence") { store.crystalliseEssence() }
                         .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
-                        .disabled(!DistilleryRules.canCrystallise(in: store.state))
+                        .disabled(readiness != .ready)
                 }
                 ForEach(CoreAttunement.allCases, id: \.self) { attunement in
                     attunementCard(attunement)
@@ -27,6 +33,18 @@ struct DistilleryView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Distillery")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func crystallisationReadinessText(
+        _ readiness: DistilleryRules.CrystallisationReadiness
+    ) -> String {
+        switch readiness {
+        case .ready: "Ready to crystallise"
+        case .stationLocked: "Distillery unavailable"
+        case .needsEssence(let have, let need): "Needs \(need) Essence · \(have) held"
+        case .needsQuartz(let have, let need): "Needs \(need) Quartz · \(have) held"
+        case .needsRoom: "Needs room in the Storehouse"
+        }
     }
 
     @ViewBuilder private func attunementCard(_ attunement: CoreAttunement) -> some View {

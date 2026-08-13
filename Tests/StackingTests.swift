@@ -73,6 +73,24 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
         XCTAssertTrue(DistilleryRules.canAttune(.heat, candidate: candidate,
                                                 catalyst: Resources.sulfur, in: state))
     }
+
+    func testCrystallisationReadinessNamesTheExactMissingInput() {
+        var state = GameState.newGame()
+        XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state), .stationLocked)
+
+        state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
+        XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state),
+                       .needsEssence(have: state.base.essence,
+                                     need: DistilleryRules.blankEssence))
+
+        state.base.essence = DistilleryRules.blankEssence
+        XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state),
+                       .needsQuartz(have: 0, need: DistilleryRules.blankQuartz))
+
+        state.base.resources.add(DistilleryRules.blankQuartz, of: Resources.quartz)
+        XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state), .ready)
+        XCTAssertTrue(DistilleryRules.canCrystallise(in: state))
+    }
 }
 
 /// Items stack, and materials bin by kind (decisions-session-16 §1).

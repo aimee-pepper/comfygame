@@ -65,6 +65,14 @@ enum DistilleryRules {
         case needsRoom
     }
 
+    enum CrystallisationReadiness: Equatable, Sendable {
+        case ready
+        case stationLocked
+        case needsEssence(have: Int, need: Int)
+        case needsQuartz(have: Int, need: Int)
+        case needsRoom
+    }
+
     static func candidates(for attunement: CoreAttunement, in state: GameState) -> [Candidate] {
         let requirement = requirement(for: attunement)
         return state.base.inventory.stacks.flatMap { bin in
@@ -94,12 +102,24 @@ enum DistilleryRules {
     }
 
     static func canCrystallise(in state: GameState) -> Bool {
-        guard state.base.station(Stations.distillery).isUnlocked,
-              state.base.essence >= blankEssence,
-              state.base.resources[Resources.quartz] >= blankQuartz else { return false }
-        return canStore(output(catalogID: Items.essenceCrystal,
-                               core: DistilledCore(attunement: nil, potency: 0,
-                                                   catalystCount: 0)), in: state)
+        crystallisationReadiness(in: state) == .ready
+    }
+
+    static func crystallisationReadiness(in state: GameState) -> CrystallisationReadiness {
+        guard state.base.station(Stations.distillery).isUnlocked else { return .stationLocked }
+        guard state.base.essence >= blankEssence else {
+            return .needsEssence(have: state.base.essence, need: blankEssence)
+        }
+        let quartz = state.base.resources[Resources.quartz]
+        guard quartz >= blankQuartz else {
+            return .needsQuartz(have: quartz, need: blankQuartz)
+        }
+        guard canStore(output(catalogID: Items.essenceCrystal,
+                              core: DistilledCore(attunement: nil, potency: 0,
+                                                  catalystCount: 0)), in: state) else {
+            return .needsRoom
+        }
+        return .ready
     }
 
     @discardableResult
