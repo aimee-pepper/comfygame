@@ -771,14 +771,6 @@ struct WorkshopView: View {
                 }
 
                 ResearchTree()
-
-                // **The Workshop is where you get better at writing, and nothing else** (Q40).
-                // Anything a person teaches went with that person's building.
-                ForEach(ContentCatalog.shared.branchesInOrder.filter { $0.station != nil }) { branch in
-                    if let id = branch.station, let elsewhere = ContentCatalog.shared.station(id) {
-                        ComingLater("\(branch.name) is taught at \(elsewhere.name), not here.")
-                    }
-                }
             }
             .padding(16)
         }

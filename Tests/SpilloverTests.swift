@@ -5,6 +5,22 @@ import XCTest
 /// sorts it, at home, with full information.
 @MainActor
 final class SpilloverTests: XCTestCase {
+
+    func testWorkshopShowsItsResearchWithoutAWallOfOtherStationPlaceholders() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+            encoding: .utf8
+        )
+        let start = try XCTUnwrap(source.range(of: "struct WorkshopView"))
+        let end = try XCTUnwrap(source.range(of: "struct ScriptoriumView", range: start.upperBound..<source.endIndex))
+        let workshop = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(workshop.contains("ResearchTree()"))
+        XCTAssertFalse(workshop.contains("ComingLater"))
+        XCTAssertFalse(workshop.contains("branchesInOrder.filter { $0.station != nil }"))
+    }
     func testStorehouseSortingActionsRemainOutsideScrollableDetails() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
