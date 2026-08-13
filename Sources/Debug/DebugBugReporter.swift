@@ -33,8 +33,101 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
     var playerY: Int?
     var stability: Int?
     var outcomeID: UInt64?
+    /// Exact saved encounter evidence. Absent outside combat and in reports written before v1.
+    var encounterScalingEvidence: DebugEncounterScalingEvidence? = nil
     var transportState: TransportState = .unsent
     var remoteReference: String?
+}
+
+struct DebugEncounterScalingEvidence: Codable, Equatable, Sendable {
+    static let schemaVersion = 1
+
+    struct PartyMember: Codable, Equatable, Sendable {
+        var actor: Combatant
+        var stableIdentity: String
+        var displayName: String
+        var level: Int
+        var rank: Rank
+        var currentHP: Int
+        var rawLevelRatio: Double?
+        var powerContribution: Double?
+    }
+
+    struct FoeHealth: Codable, Equatable, Sendable {
+        var id: InstanceID
+        var currentHP: Int
+    }
+
+    var schemaVersion = Self.schemaVersion
+    var scalingPreview: EncounterScalingRules.Preview
+    var party: [PartyMember]
+    var foes: [FoeHealth]
+    var opening: EncounterState.OpeningResolution?
+    var roundNumber: Int
+    var turnIndex: Int
+    var currentTurnSlot: EncounterState.TurnSlot
+    var turnSlots: [EncounterState.TurnSlot]
+
+    static func capture(from state: GameState) -> Self? {
+        guard let run = state.worlds.activeRun,
+              let encounter = run.activeEncounter,
+              let preview = encounter.scalingPreview else { return nil }
+
+        let contributions = Dictionary(uniqueKeysWithValues:
+            (preview.partyPowerLedger?.contributions ?? []).map { ($0.identity, $0) })
+        var seen: Set<Combatant> = []
+        let partyActors = encounter.order.filter { $0.isParty && seen.insert($0).inserted }
+        let party = partyActors.compactMap { actor -> PartyMember? in
+            let identity: String
+            let name: String
+            let level: Int
+            let currentHP: Int
+            switch actor {
+            case .binder:
+                identity = "binder"
+                name = "Binder"
+                level = state.base.binderCharacter.level
+                currentHP = run.binderHP
+            case .companion(let index):
+                guard state.base.roster.indices.contains(index) else { return nil }
+                let companion = state.base.roster[index]
+                identity = stableIdentity(for: companion)
+                name = encounter.partyNames[index] ?? companion.name
+                level = companion.character.level
+                currentHP = run.companionHP[index]
+                    ?? CombatRules.maximumHealth(of: actor, in: state)
+            case .foe:
+                return nil
+            }
+            let contribution = contributions[identity]
+            return PartyMember(actor: actor, stableIdentity: identity, displayName: name,
+                               level: level, rank: CombatRules.rank(of: actor, in: state),
+                               currentHP: currentHP,
+                               rawLevelRatio: contribution?.rawLevelRatio,
+                               powerContribution: contribution?.contribution)
+        }.sorted { $0.stableIdentity < $1.stableIdentity }
+
+        return Self(
+            scalingPreview: preview,
+            party: party,
+            foes: encounter.foes.map { FoeHealth(id: $0.id, currentHP: $0.currentHP) }
+                .sorted { $0.id.rawValue < $1.id.rawValue },
+            opening: encounter.opening,
+            roundNumber: encounter.roundNumber,
+            turnIndex: encounter.turnIndex,
+            currentTurnSlot: encounter.currentTurnSlot,
+            turnSlots: encounter.turnSlots
+        )
+    }
+
+    private static func stableIdentity(for companion: CompanionState) -> String {
+        if let traveller = companion.traveller { return "traveller:\(traveller.rawValue)" }
+        if companion.name.trimmingCharacters(in: .whitespacesAndNewlines)
+            .localizedCaseInsensitiveCompare("Quill") == .orderedSame { return "quill" }
+        let name = companion.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let calling = companion.calling.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return "legacy-person:\(name)|\(calling)"
+    }
 }
 
 struct DebugBugReportReceipt: Codable, Equatable, Sendable {

@@ -1208,6 +1208,10 @@ enum WorldRules {
                                               groupingRadius: grouping.radius)
             }
         }
+        scalingPreview?.worldLevel = worldLevel
+        scalingPreview?.triggerFoeID = enemy.id
+        scalingPreview?.scalingProfile = run.tuning.encounterScalingProfile.rawValue
+        scalingPreview?.scalingProfileSchemaVersion = run.tuning.encounterScalingProfileSchemaVersion
         let ordinaryLevel = worldLevel + (scalingPreview?.totalOrdinaryLevelAdjustment ?? 0)
 
         var foes: [FoeState] = []

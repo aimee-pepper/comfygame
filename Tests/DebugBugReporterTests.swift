@@ -80,11 +80,51 @@ final class DebugBugReporterTests: XCTestCase {
         var object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoder.encode(report)) as? [String: Any])
         object.removeValue(forKey: "roadmapCheckpoint")
         object.removeValue(forKey: "debugTuningSnapshot")
+        object.removeValue(forKey: "encounterScalingEvidence")
         let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
         let decoded = try decoder.decode(DebugBugReport.self,
                                          from: JSONSerialization.data(withJSONObject: object))
         XCTAssertNil(decoded.roadmapCheckpoint)
         XCTAssertNil(decoded.debugTuningSnapshot)
+        XCTAssertNil(decoded.encounterScalingEvidence)
+    }
+
+    @MainActor
+    func testReportCopiesFrozenScalingReceiptAndCurrentEncounterStateWithoutMutation() throws {
+        let store = GameStore(io: .temporary(name: "bug-scaling-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        store.mutate("stage scaling evidence") { state in
+            state.base.binderCharacter.level = 4
+            guard var run = state.worlds.activeRun else { return }
+            run.tuning.encounterScalingProfile = .recommended
+            run.tuning.encounterScalingProfileSchemaVersion = 2
+            let enemy = WorldEnemy(id: InstanceID(rawValue: 4_401), creatureID: "paper_moth",
+                                   position: run.playerPosition, isAwake: true)
+            run.enemies = [enemy]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
+        }
+        let before = store.state
+        let evidence = try XCTUnwrap(DebugEncounterScalingEvidence.capture(from: store.state))
+
+        XCTAssertEqual(store.state, before, "Capturing DEBUG evidence must be read-only")
+        XCTAssertEqual(evidence.scalingPreview, store.activeEncounter?.scalingPreview)
+        XCTAssertEqual(evidence.scalingPreview.triggerFoeID, InstanceID(rawValue: 4_401))
+        XCTAssertEqual(evidence.scalingPreview.scalingProfile, "recommended")
+        XCTAssertEqual(evidence.scalingPreview.scalingProfileSchemaVersion, 2)
+        XCTAssertNotNil(evidence.scalingPreview.worldLevel)
+        XCTAssertEqual(evidence.party.first { $0.actor == .binder }?.level, 4)
+        XCTAssertEqual(evidence.party.first { $0.actor == .binder }?.powerContribution, 1)
+        XCTAssertEqual(evidence.foes.first?.currentHP, store.activeEncounter?.foes.first?.currentHP)
+        XCTAssertEqual(evidence.turnSlots, store.activeEncounter?.turnSlots)
+        XCTAssertEqual(evidence.currentTurnSlot, store.activeEncounter?.currentTurnSlot)
+
+        var report = fixtureReport()
+        report.encounterScalingEvidence = evidence
+        let decoded = try JSONDecoder().decode(DebugBugReport.self,
+                                                from: JSONEncoder().encode(report))
+        XCTAssertEqual(decoded.encounterScalingEvidence, evidence)
     }
 
     func testReportPreservesReproducibleDebugTuningSnapshot() throws {

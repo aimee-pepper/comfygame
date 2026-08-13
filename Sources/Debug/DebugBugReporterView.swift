@@ -75,6 +75,7 @@ struct DebugBugReporterOverlay: View {
                 : (run == nil ? route.rawValue : AppRoute.world.rawValue),
             campaignReference: store.diagnosticCampaignReference,
             encounterID: store.activeEncounter?.id.rawValue,
+            encounterScalingEvidence: DebugEncounterScalingEvidence.capture(from: store.state),
             debugTuningSnapshot: Self.debugTuningSnapshot(),
             saveSchemaVersion: store.state.schemaVersion,
             mutationCount: store.state.meta.mutationCount,
@@ -121,6 +122,7 @@ private struct DebugBugReportContext {
     var route: String?
     var campaignReference: String?
     var encounterID: UInt64?
+    var encounterScalingEvidence: DebugEncounterScalingEvidence?
     var debugTuningSnapshot: String?
     var saveSchemaVersion: Int
     var mutationCount: Int
@@ -203,6 +205,10 @@ private struct DebugBugReportSheet: View {
                     if let encounter = draft.context.encounterID {
                         LabeledContent("Encounter", value: "\(encounter)")
                     }
+                    if let evidence = draft.context.encounterScalingEvidence {
+                        LabeledContent("Scaling receipt",
+                                       value: "\(evidence.party.count) party · \(evidence.foes.count) foes · round \(evidence.roundNumber)")
+                    }
                     if let tuning = draft.context.debugTuningSnapshot {
                         LabeledContent("DEBUG tuning") {
                             Text(tuning).font(.caption.monospaced()).textSelection(.enabled)
@@ -269,6 +275,7 @@ private struct DebugBugReportSheet: View {
         report.route = draft.context.route
         report.campaignReference = draft.context.campaignReference
         report.encounterID = draft.context.encounterID
+        report.encounterScalingEvidence = draft.context.encounterScalingEvidence
         report.debugTuningSnapshot = draft.context.debugTuningSnapshot
         report.semanticActionTrail = draft.context.semanticActionTrail
         report.roadmapCheckpoint = DebugRoadmap.current.installedCheckpoint

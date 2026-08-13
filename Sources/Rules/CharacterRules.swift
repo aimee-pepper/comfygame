@@ -327,6 +327,11 @@ enum EncounterScalingRules {
         var totalHPAdditionFraction: Double? = nil
         var hpAllocationByFoeID: [String: Int]? = nil
         var exclusionReasons: [String: String]? = nil
+        /// Exact creation inputs frozen by WorldRules. Older encounters omit these fields.
+        var worldLevel: Int? = nil
+        var triggerFoeID: InstanceID? = nil
+        var scalingProfile: String? = nil
+        var scalingProfileSchemaVersion: Int? = nil
 
         /// Historical decode/display only. Additive Recommended never applies this adjustment.
         var totalOrdinaryLevelAdjustment: Int { missingFoeConversion + remainderUpgrade }
