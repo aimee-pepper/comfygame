@@ -877,6 +877,18 @@ extension GameStore {
             : .refused("Party or realm staffing changed. Review the current impact and try again.")
     }
 
+    /// Returns one player-facing result for the reverse transfer instead of making callers infer
+    /// success from a discarded Boolean. Placement is checked both before and inside mutation.
+    @discardableResult
+    func setComingHome(_ index: Int) -> CurrentStateCommitResult {
+        guard state.base.roster.indices.contains(index), placement(of: index) == .activeParty else {
+            return .refused("Party placement changed. Review the current roster and try again.")
+        }
+        return setComing(index, false, expected: .activeParty)
+            ? .committed
+            : .refused("Party placement changed. Review the current roster and try again.")
+    }
+
     func isComing(_ index: Int) -> Bool { state.base.activeParty.contains(index) }
 
     /// What unlearning everything would cost this person, and whether you can afford it.
