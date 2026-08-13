@@ -34,6 +34,7 @@ extension ItemStack {
 struct LootDecisionCard: View {
     @EnvironmentObject private var store: GameStore
     @State private var selectedCarried: ItemStack?
+    @State private var confirmingLeave = false
 
     var body: some View {
         if let offered = store.pendingLoot.first {
@@ -84,12 +85,24 @@ struct LootDecisionCard: View {
                 }
 
                 Button(role: .destructive) {
-                    store.leaveOffered(offered)
+                    confirmingLeave = true
                 } label: {
                     Label("Leave it behind", systemImage: "xmark")
                         .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
+                .confirmationDialog(
+                    "Leave \(offered.displayName) behind?",
+                    isPresented: $confirmingLeave,
+                    titleVisibility: .visible
+                ) {
+                    Button("Leave \(offered.displayName)", role: .destructive) {
+                        store.leaveOffered(offered)
+                    }
+                    Button("Keep deciding", role: .cancel) {}
+                } message: {
+                    Text("You cannot recover it after leaving this decision.")
+                }
 
                 if store.pendingLoot.count > 1 {
                     Text("\(store.pendingLoot.count - 1) more waiting.")

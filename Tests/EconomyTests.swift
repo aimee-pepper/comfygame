@@ -4,6 +4,20 @@ import XCTest
 /// Spending: refining, upgrades, identification, the key→cache payoff, and Constellation nodes.
 @MainActor
 final class EconomyTests: XCTestCase {
+    func testLootDecisionConfirmsTheExactItemBeforeLeavingItBehind() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/LootDecisionView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("Leave \\(offered.displayName) behind?"))
+        XCTAssertTrue(source.contains("You cannot recover it after leaving this decision."))
+        XCTAssertTrue(source.contains("Button(\"Leave \\(offered.displayName)\", role: .destructive)"))
+        XCTAssertFalse(source.contains("Button(role: .destructive) {\n                    store.leaveOffered(offered)"))
+    }
+
 
     /// The simplest legal rule, for tests that just need the Binder to do *something*.
     private static let attackAnything = GambitRule(id: InstanceID(rawValue: 99),
