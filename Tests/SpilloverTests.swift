@@ -6,6 +6,33 @@ import XCTest
 @MainActor
 final class SpilloverTests: XCTestCase {
 
+    func testLiveStationScreensDoNotAdvertiseUnavailableFutureProducts() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+            encoding: .utf8
+        )
+
+        let distilleryStart = try XCTUnwrap(source.range(of: "struct DistilleryView"))
+        let channelworksStart = try XCTUnwrap(source.range(
+            of: "struct ChannelworksView",
+            range: distilleryStart.upperBound..<source.endIndex
+        ))
+        let reliquaryStart = try XCTUnwrap(source.range(
+            of: "struct ReliquaryView",
+            range: channelworksStart.upperBound..<source.endIndex
+        ))
+        let distillery = String(source[distilleryStart.lowerBound..<channelworksStart.lowerBound])
+        let channelworks = String(source[channelworksStart.lowerBound..<reliquaryStart.lowerBound])
+
+        XCTAssertTrue(distillery.contains("Crystallise essence"))
+        XCTAssertTrue(distillery.contains("attunementCard(attunement)"))
+        XCTAssertFalse(distillery.contains("ComingLater"))
+        XCTAssertTrue(channelworks.contains("Construct Heat Conduit fixture"))
+        XCTAssertFalse(channelworks.contains("ComingLater"))
+    }
+
     func testWorkshopShowsItsResearchWithoutAWallOfOtherStationPlaceholders() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

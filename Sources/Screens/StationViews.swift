@@ -22,7 +22,6 @@ struct DistilleryView: View {
                 ForEach(CoreAttunement.allCases, id: \.self) { attunement in
                     attunementCard(attunement)
                 }
-                ComingLater("Infusion is deliberately held until a named crafted profile has a designed trade-off.")
             }.padding(16)
         }
         .background(Color(.systemGroupedBackground))
@@ -107,7 +106,6 @@ struct ChannelworksView: View {
                         .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
                         .disabled(!store.state.base.inventory.stacks.contains { $0.catalogID == Items.heatCore })
                 }
-                ComingLater("Contact and Projection housings follow after this first Conduit construction path is proven.")
             }.padding(16)
         }.background(Color(.systemGroupedBackground))
             .navigationTitle("The Channelworks").navigationBarTitleDisplayMode(.inline)
