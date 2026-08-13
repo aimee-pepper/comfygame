@@ -87,16 +87,39 @@ final class BestiaryTests: XCTestCase {
 
     func testGeneratedReferencePercentileIsAlwaysBounded() {
         for measure in BestiaryRules.Measure.allCases {
-            var extreme = CreatureTraits()
-            extreme.size = 10_000
-            extreme.covering = Covering(hardness: 10_000, length: 10_000, coverage: 10_000)
-            extreme.armament.pierce = 10_000
-            extreme.armament.crush = 10_000
-            extreme.armament.rend = 10_000
-            extreme.ornament = 10_000
-            extreme.boneDensity = 10_000
-            XCTAssertTrue((0...1).contains(BestiaryRules.globalPercentile(of: extreme, by: measure)))
+            var aboveReference = CreatureTraits()
+            aboveReference.size = 10_000
+            aboveReference.covering = Covering(hardness: 10_000, length: 10_000, coverage: 10_000)
+            aboveReference.armament.pierce = 10_000
+            aboveReference.armament.crush = 10_000
+            aboveReference.armament.rend = 10_000
+            aboveReference.ornament = 10_000
+            aboveReference.boneDensity = 10_000
+
+            var belowReference = CreatureTraits()
+            belowReference.size = -10_000
+            // Covering armour is hardness × coverage, so two negative synthetic inputs multiply
+            // into a huge positive value. Zero is the actual lower-bound representation.
+            belowReference.covering = Covering(hardness: 0, length: 0, coverage: 0)
+            belowReference.armament.pierce = -10_000
+            belowReference.armament.crush = -10_000
+            belowReference.armament.rend = -10_000
+            belowReference.ornament = -10_000
+            belowReference.boneDensity = -10_000
+
+            XCTAssertEqual(BestiaryRules.globalPercentile(of: aboveReference, by: measure), 1)
+            XCTAssertEqual(BestiaryRules.globalPercentile(of: belowReference, by: measure), 0)
         }
+    }
+
+    func testRulesDoNotDescribeGeneratedOrRecordedDataAsNatureOrKeptSpecimens() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Rules/BestiaryRules.swift"),
+                                encoding: .utf8)
+        XCTAssertFalse(source.localizedCaseInsensitiveContains("what nature produces"))
+        XCTAssertFalse(source.localizedCaseInsensitiveContains("specimens you've kept"))
+        XCTAssertFalse(source.contains("var finest:"))
     }
 
     func testFeaturedRecordIsLatestRatherThanAnInvisibleAppetiteRanking() throws {

@@ -8,7 +8,7 @@ import Foundation
 /// save nobody could read.
 ///
 /// **The two halves do different jobs, which is why the spec asked for both.** Personal carries the
-/// early game: *the finest pelt you've recovered* means something when you've seen four. Global is
+/// early game: *the largest of four you've encountered* means something when you've seen four. Global is
 /// what keeps a late find objectively meaningful once you've seen hundreds and your own
 /// distribution has drifted up — without it, "rare" quietly stops meaning anything the longer you
 /// play, which is precisely the failure two percentiles exist to prevent.
@@ -54,7 +54,7 @@ enum BestiaryRules {
 
     // MARK: The global distribution
 
-    /// **What nature produces**, sampled from the generator itself rather than authored.
+    /// A deterministic reference sample produced by the current creature generator.
     ///
     /// Deliberately not a hand-written table: the creature system derives everything from world
     /// readings, so the only honest reference is what the readings actually make. Sampling it means
@@ -79,7 +79,7 @@ enum BestiaryRules {
         return samples.mapValues { $0.sorted() }
     }
 
-    /// Where this animal sits against **everything the worlds can grow**, 0–1.
+    /// Where this animal sits in the current build's deterministic generated reference sample, 0–1.
     ///
     /// Across all species rather than within its own kind, on purpose: the global claim is *"this is
     /// a big animal"*, not *"this is a big one of these"* — the second question is what the personal
@@ -113,7 +113,7 @@ enum BestiaryRules {
 
     // MARK: What the bestiary shows
 
-    /// One kind of animal you've met, with the specimens you've kept of it.
+    /// One kind of animal you've met, with the individual encounter records captured for it.
     struct Entry: Identifiable, Sendable {
         var id: String { identityKey }
         var identityKey: String
@@ -125,10 +125,8 @@ enum BestiaryRules {
         var apexSightings: Int
         var isApexSpecies: Bool { apexSightings > 0 }
 
-        /// A factual, stable featured record. There is no single cross-trait "best" measure.
+        /// A factual, stable featured record. There is no inferred cross-trait "best" measure.
         var latest: SpecimenRecord? { specimens.last }
-        /// Decode/source compatibility for older UI revisions; do not present this as a superlative.
-        var finest: SpecimenRecord? { latest }
     }
 
     /// Everything you've met, best-known first.
