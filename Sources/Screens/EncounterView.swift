@@ -637,10 +637,13 @@ private struct SkillSheet: View {
             List {
                 Section {
                     ForEach(store.actorSkills) { skill in
-                        let cooling = store.cooldown(of: skill)
-                        let potency = store.actingCombatant
-                            .flatMap { CombatRules.stats(of: $0, in: store.state) }
-                            .map { CharacterRules.skillPower(skill.power, $0) } ?? skill.power
+                        let presentation = store.actingCombatant.flatMap { actor in
+                            store.activeEncounter.map {
+                                CombatSkillRowPresentation.make(skill: skill, actor: actor,
+                                                                encounter: $0, state: store.state)
+                            }
+                        }
+                        let cooling = presentation?.remainingCooldown ?? store.cooldown(of: skill)
                         Button {
                             onUse(skill)
                             dismiss()
@@ -658,16 +661,17 @@ private struct SkillSheet: View {
                                         .fixedSize(horizontal: false, vertical: true)
                                 }
                                 Spacer(minLength: 6)
-                                if cooling > 0 {
-                                    Text("Cooldown \(cooling)")
-                                        .font(.caption.monospacedDigit())
-                                        .foregroundStyle(.secondary)
-                                        .padding(.horizontal, 8).padding(.vertical, 3)
-                                        .background(Color(.tertiarySystemFill), in: Capsule())
-                                } else if potency > 0 {
-                                    Text("Power \(potency)")
-                                        .font(.caption.monospacedDigit())
-                                        .foregroundStyle(.secondary)
+                                if let presentation {
+                                    VStack(alignment: .trailing, spacing: 2) {
+                                        if let potency = presentation.potency {
+                                            Text("Potency \(potency)")
+                                        }
+                                        Text(presentation.cooldownText)
+                                    }
+                                    .font(.caption2.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.trailing)
+                                    .fixedSize(horizontal: true, vertical: false)
                                 }
                             }
                             .frame(minHeight: 44)
@@ -676,9 +680,10 @@ private struct SkillSheet: View {
                         .buttonStyle(.plain)
                         .disabled(cooling > 0)
                         .opacity(cooling > 0 ? 0.5 : 1)
+                        .accessibilityValue(presentation?.accessibilityValue ?? "")
                     }
                 } footer: {
-                    Text("Ready skills show their actor-adjusted power. Cooling skills show rounds remaining.")
+                    Text(CombatSkillRowPresentation.footerText)
                 }
             }
             .navigationTitle("Skills")
@@ -688,6 +693,40 @@ private struct SkillSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+    }
+}
+
+/// Truth boundary for the skill row. The displayed potency and minted cooldown use the same
+/// actor-stat derivations as `CombatRules.use`; the remaining cooldown is the encounter's saved
+/// per-actor, per-skill receipt.
+struct CombatSkillRowPresentation: Equatable, Sendable {
+    static let footerText = "Potency and cooldown reflect the acting character. “Ready in” is the saved cooldown remaining now."
+
+    var potency: Int?
+    var cooldownDuration: Int
+    var remainingCooldown: Int
+
+    var cooldownText: String {
+        remainingCooldown > 0
+            ? "Ready in \(remainingCooldown) round\(remainingCooldown == 1 ? "" : "s")"
+            : "Ready · \(cooldownDuration)-round cooldown"
+    }
+
+    var accessibilityValue: String {
+        (potency.map { "Potency \($0). " } ?? "") + cooldownText
+    }
+
+    static func make(skill: SkillDef, actor: Combatant, encounter: EncounterState,
+                     state: GameState) -> CombatSkillRowPresentation {
+        let stats = CombatRules.stats(of: actor, in: state)
+        return CombatSkillRowPresentation(
+            potency: skill.power > 0
+                ? (stats.map { CharacterRules.skillPower(skill.power, $0) } ?? skill.power)
+                : nil,
+            cooldownDuration: stats.map { CharacterRules.cooldown(skill.cooldownRounds, $0) }
+                ?? skill.cooldownRounds,
+            remainingCooldown: CombatRules.cooldown(of: skill, for: actor, in: encounter)
+        )
     }
 }
 

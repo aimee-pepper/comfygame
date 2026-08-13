@@ -446,6 +446,51 @@ final class CombatTests: XCTestCase {
         XCTAssertLessThanOrEqual(encounter.binderSkillCooldown, skill.cooldownRounds)
     }
 
+    func testSkillRowUsesTheSameActorAdjustedPowerAndCooldownAsCommit() throws {
+        let skill = try XCTUnwrap(ContentCatalog.shared.skill("unbind"))
+        var ordinaryState = GameState.newGame()
+        var sharpState = ordinaryState
+        sharpState.base.binderCharacter.stats.wit = Tuning.Character.startingStat
+            + Tuning.Character.witPerCooldownRound * 2
+        let encounter = EncounterState(id: InstanceID(rawValue: 43_001), foes: [], order: [.binder])
+
+        let ordinary = CombatSkillRowPresentation.make(skill: skill, actor: .binder,
+                                                       encounter: encounter, state: ordinaryState)
+        let sharp = CombatSkillRowPresentation.make(skill: skill, actor: .binder,
+                                                    encounter: encounter, state: sharpState)
+
+        XCTAssertEqual(ordinary.potency,
+                       CharacterRules.skillPower(skill.power, ordinaryState.base.binderCharacter.stats))
+        XCTAssertEqual(sharp.potency,
+                       CharacterRules.skillPower(skill.power, sharpState.base.binderCharacter.stats))
+        XCTAssertEqual(ordinary.cooldownDuration,
+                       CharacterRules.cooldown(skill.cooldownRounds,
+                                               ordinaryState.base.binderCharacter.stats))
+        XCTAssertEqual(sharp.cooldownDuration,
+                       CharacterRules.cooldown(skill.cooldownRounds,
+                                               sharpState.base.binderCharacter.stats))
+        XCTAssertGreaterThan(sharp.potency ?? 0, ordinary.potency ?? 0)
+        XCTAssertLessThan(sharp.cooldownDuration, ordinary.cooldownDuration)
+        XCTAssertEqual(sharp.cooldownText, "Ready · \(sharp.cooldownDuration)-round cooldown")
+    }
+
+    func testSkillRowDistinguishesSavedRemainingCooldownFromMintedDurationAndLabelsBoth() throws {
+        let skill = try XCTUnwrap(ContentCatalog.shared.skill("unbind"))
+        let state = GameState.newGame()
+        var encounter = EncounterState(id: InstanceID(rawValue: 43_002), foes: [], order: [.binder])
+        encounter.cooldowns[CombatRules.cooldownKey(skill, for: .binder)] = 1
+
+        let row = CombatSkillRowPresentation.make(skill: skill, actor: .binder,
+                                                  encounter: encounter, state: state)
+
+        XCTAssertEqual(row.remainingCooldown, 1)
+        XCTAssertEqual(row.cooldownText, "Ready in 1 round")
+        XCTAssertTrue(row.accessibilityValue.contains("Potency \(try XCTUnwrap(row.potency))"))
+        XCTAssertTrue(row.accessibilityValue.contains("Ready in 1 round"))
+        XCTAssertTrue(CombatSkillRowPresentation.footerText.contains("Potency and cooldown"))
+        XCTAssertFalse(CombatSkillRowPresentation.footerText.contains("A number on the right"))
+    }
+
     // MARK: The pillar
 
     /// Being mid-fight is the hardest resume case in the game. It has to be exact.
