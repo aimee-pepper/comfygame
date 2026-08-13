@@ -378,26 +378,51 @@ private struct ArmouryTargetSheet: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section("Rebuild as") {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Rebuild as")
+                        .font(.headline)
+                    LazyVGrid(columns: profileColumns, spacing: 10) {
                     ForEach(ArmouryRules.profiles) { profile in
                         let available = ArmouryRules.isAvailable(profile, for: target, in: store.state)
                         Button { if available { chosenProfile = profile } } label: {
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(profile.name).foregroundStyle(.primary)
-                                    Text(profileSummary(profile)).font(.caption2).foregroundStyle(.secondary)
+                                VStack(spacing: 8) {
+                                    Image(systemName: profileIcon(profile))
+                                        .font(.title2)
+                                        .frame(height: 28)
+                                    Text(profile.name)
+                                        .font(.caption.weight(.semibold))
+                                        .multilineTextAlignment(.center)
+                                        .foregroundStyle(.primary)
+                                    Text(available ? profileSummary(profile)
+                                                   : "Needs Tier \(profile.minimumEffectiveTier)")
+                                        .font(.caption2)
+                                        .multilineTextAlignment(.center)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(2)
                                 }
-                                Spacer()
-                                Text(available ? "" : "Tier \(profile.minimumEffectiveTier)")
-                                    .font(.caption2).foregroundStyle(.secondary)
-                                Image(systemName: available ? "chevron.right" : "lock")
-                                    .font(.caption2).foregroundStyle(.tertiary)
-                            }.frame(minHeight: 44)
-                        }.buttonStyle(.plain).disabled(!available)
+                                .frame(maxWidth: .infinity, minHeight: 112)
+                                .padding(8)
+                                .background(Color(.secondarySystemGroupedBackground),
+                                            in: RoundedRectangle(cornerRadius: 12))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(available ? Color.accentColor.opacity(0.55)
+                                                                : Color.secondary.opacity(0.25))
+                                }
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!available)
                     }
+                    }
+                    Text("Choose a construction profile. Exact stock and the final comparison follow without leaving this rebuild.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
+                .padding(16)
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle(target.displayName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
@@ -410,6 +435,18 @@ private struct ArmouryTargetSheet: View {
     private func profileSummary(_ profile: ArmouryRules.Profile) -> String {
         let physical = profile.physicalOffset == 0 ? "full physical" : "\(profile.physicalOffset) physical"
         return "\(profile.requirements.count) selected samples · \(physical)"
+    }
+
+    private var profileColumns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
+    }
+
+    private func profileIcon(_ profile: ArmouryRules.Profile) -> String {
+        switch profile.id {
+        case ArmouryRules.rigid.id: "shield.fill"
+        case ArmouryRules.insulated.id: "square.3.layers.3d"
+        default: "circle.grid.cross"
+        }
     }
 }
 
@@ -845,37 +882,36 @@ private struct SamplePicker: View {
     let requirement: PhysicalGearCraftingRules.SampleRequirement
     let otherSelections: [PhysicalGearCraftingRules.Selection]
     @Binding var selection: PhysicalGearCraftingRules.Selection
+    @State private var openedCandidate: PhysicalGearCraftingRules.Selection?
 
     var body: some View {
-        List {
-            Section {
-                ForEach(available) { candidate in
-                    Button {
-                        selection = candidate
-                        dismiss()
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: candidate.sample.kind.icon)
-                                .frame(width: 22).foregroundStyle(candidate.sample.rarity.tint)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(candidate.sample.displayName).foregroundStyle(.primary)
-                                Text(detail(candidate.sample))
-                                    .font(.caption2).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            if candidate.stockKey == selection.stockKey {
-                                Image(systemName: "checkmark").foregroundStyle(.teal)
-                            }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(requirement.summary)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                SixAcrossItemGrid(data: available, id: \.id) { candidate in
+                    AnchoredItemDetailButton(item: candidate, selection: $openedCandidate) {
+                        ItemIconTile(icon: candidate.sample.kind.icon,
+                                     rarity: candidate.sample.rarity,
+                                     quantity: 1, identified: true, location: .stored,
+                                     accessibilityName: candidate.sample.displayName,
+                                     isSelected: candidate.stockKey == selection.stockKey)
+                    } detail: { candidate in
+                        ArmourySampleDetail(requirement: requirement, candidate: candidate) {
+                            selection = candidate
+                            openedCandidate = nil
+                            dismiss()
                         }
-                        .frame(minHeight: 44)
                     }
                 }
-            } header: {
-                Text(requirement.summary)
-            } footer: {
                 Text("Samples already selected for another part are unavailable.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
+            .padding(16)
         }
+        .background(Color(.systemGroupedBackground))
         .navigationTitle(requirement.displayName)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -886,11 +922,33 @@ private struct SamplePicker: View {
             .filter { !occupied.contains($0.stockKey) }
     }
 
-    private func detail(_ sample: MaterialSample) -> String {
-        let values = requirement.floors.map {
-            "\($0.property.displayName) \(Int(sample.properties[$0.property]))"
+}
+
+private struct ArmourySampleDetail: View {
+    let requirement: PhysicalGearCraftingRules.SampleRequirement
+    let candidate: PhysicalGearCraftingRules.Selection
+    let use: () -> Void
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Label(candidate.sample.displayName, systemImage: candidate.sample.kind.icon)
+                    .font(.headline)
+                if !candidate.sample.source.isEmpty {
+                    LabeledContent("Provenance", value: candidate.sample.source)
+                }
+                LabeledContent("Grade", value: String(format: "%.1f", candidate.sample.grade))
+                ForEach(requirement.floors, id: \.property) { floor in
+                    LabeledContent(floor.property.displayName,
+                                   value: "\(Int(candidate.sample.properties[floor.property])) · needs \(Int(floor.minimum))+")
+                }
+                Button("Use for \(requirement.displayName)", action: use)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .buttonStyle(.borderedProminent)
+            }
+            .padding(16)
         }
-        return ([sample.source] + values).filter { !$0.isEmpty }.joined(separator: " · ")
+        .frame(minWidth: 260)
     }
 }
 

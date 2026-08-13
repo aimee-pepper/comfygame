@@ -2,6 +2,25 @@ import XCTest
 @testable import Bookbinder
 
 final class MakerStationPresentationTests: XCTestCase {
+    func testArmouryUsesCompactProfileAndExactSampleGrids() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/BlacksmithView.swift"),
+            encoding: .utf8
+        )
+        let armoury = try XCTUnwrap(source.range(of: "private struct ArmouryTargetSheet"))
+        let picker = try XCTUnwrap(source.range(of: "private struct SamplePicker"))
+        let armourySource = String(source[armoury.lowerBound..<picker.lowerBound])
+        let pickerSource = String(source[picker.lowerBound...])
+
+        XCTAssertTrue(armourySource.contains("LazyVGrid(columns: profileColumns"))
+        XCTAssertTrue(armourySource.contains("count: 3"))
+        XCTAssertFalse(armourySource.contains("Section(\"Rebuild as\")"))
+        XCTAssertTrue(pickerSource.contains("SixAcrossItemGrid(data: available"))
+        XCTAssertTrue(pickerSource.contains("AnchoredItemDetailButton"))
+        XCTAssertTrue(pickerSource.contains("ArmourySampleDetail"))
+    }
     func testPlayerFacingReforgeLabelsUseRulesOwnedMaximum() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
