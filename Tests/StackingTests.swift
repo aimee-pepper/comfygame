@@ -79,9 +79,9 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
         XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state), .stationLocked)
 
         state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
+        state.base.essence = 0
         XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state),
-                       .needsEssence(have: state.base.essence,
-                                     need: DistilleryRules.blankEssence))
+                       .needsEssence(have: 0, need: DistilleryRules.blankEssence))
 
         state.base.essence = DistilleryRules.blankEssence
         XCTAssertEqual(DistilleryRules.crystallisationReadiness(in: state),

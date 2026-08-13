@@ -126,6 +126,8 @@ final class EncounterScalingIntegrationTests: XCTestCase {
             stats.delivery = .area
             stats.element = .heat
             let enemy = FoeState(id: InstanceID(rawValue: 91), stats: stats, currentHP: 20)
+            run.binderHP = Tuning.Encounter.binderMaxHP
+            run.companionHP[0] = Tuning.Encounter.companionMaxHP
             run.activeEncounter = EncounterState(
                 id: InstanceID(rawValue: 7), foes: [enemy], partyNames: [0: "Mara"],
                 order: [.foe(InstanceID(rawValue: 91)), .binder],
