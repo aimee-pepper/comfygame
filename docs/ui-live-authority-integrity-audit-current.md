@@ -26,7 +26,7 @@ Classifications:
 
 ## Remediation status — 13 August 2026
 
-The priority remediation is implemented in six isolated checkpoints:
+The priority remediation is implemented in eight isolated checkpoints:
 
 - `4cc1006` — measured shelf units plus indeterminate save preparation; both fabricated percentage
   scales removed.
@@ -38,11 +38,18 @@ The priority remediation is implemented in six isolated checkpoints:
   literal placeholder item copy is removed.
 - `b922dca` — Bestiary release wording and Storehouse/resource/material details resolve current
   authority instead of frozen presentation snapshots.
+- `3316b18` — audit evidence and permanent acceptance gates recorded with the implementation.
+- `4bf4562` — the live SwiftUI loader reads the actual UIKit window safe-area layout frame, keeping
+  the fixed 248×340 composition on the same outer-placement authority as the launch storyboard.
 
-Verification on an existing iPhone 17 Pro Simulator (iOS 26.2): 116/116 focused remediation tests
-and 1,236/1,236 complete-suite tests passed with zero failures or skips. The permanent acceptance
-rules at the end of this document are now executable gates where the relevant surface has a testable
-authority seam.
+Verification on an existing iPhone 17 Pro Simulator (iOS 26.2): 116/116 focused remediation tests,
+10/10 focused launch tests, and 1,237/1,237 complete-suite tests passed with zero failures or skips.
+Frame-by-frame ordinary-viewport proof for `4bf4562` measured the launch storyboard and moving-bar
+SwiftUI surface at the same page bounds (approximately x 77…325 pt, y 281…621 pt in a 402×874 pt
+window), centered on the UIKit safe area. The clean signed build was installed on Aimee's physical
+iPhone; physical visual acceptance remains explicitly open until Aimee confirms that exact installed
+build rather than an earlier inferred-frame build. The permanent acceptance rules at the end of this
+document are executable gates where the relevant surface has a testable authority seam.
 
 Confirmed defects:
 
