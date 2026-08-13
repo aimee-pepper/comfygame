@@ -315,7 +315,17 @@
       "unlockedAtStart": false,
       "startingTier": 0,
       "maxTier": 1,
-      "route": "apothecary"
+      "route": "apothecary",
+      "builtBy": "nessa",
+      "buildCost": {
+        "essence": 85,
+        "resources": {
+          "clay": 16,
+          "quartz": 6,
+          "reagent": 12
+        }
+      },
+      "buildBlurb": "Nessa needs a clean room, vessels that can take heat, and shelves for what the worlds grew. Raising it makes Lesser Salve available immediately."
     },
     {
       "id": "reliquary",

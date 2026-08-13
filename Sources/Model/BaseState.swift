@@ -379,6 +379,11 @@ struct BaseState: Codable, Equatable, Sendable {
         if stations[Stations.weaponsmith]?.isUnlocked == true {
             completedResearch.insert("weaponsmith_point_root")
         }
+        // A paid Apothecary must never reopen empty. This reconciles saves from before its
+        // first-use guarantee without granting stock or changing the station's tier.
+        if stations[Stations.apothecary]?.isUnlocked == true {
+            knownConsumableRecipes.insert("salve_lesser")
+        }
         page = try container.decodeIfPresent(Page.self, forKey: .page) ?? Page()
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
         hasChainingUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) ?? false

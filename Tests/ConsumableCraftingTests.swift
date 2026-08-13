@@ -80,7 +80,7 @@ final class ConsumableCraftingTests: XCTestCase {
         XCTAssertEqual(recipe.material?.count, 1)
         XCTAssertEqual(recipe.resources, ["rift_glass": 1])
         XCTAssertEqual(recipe.motes, 1)
-        XCTAssertEqual(recipe.essence, 30)
+        XCTAssertEqual(recipe.essence, 12)
     }
 
     func testSolventIdentifiesOneCurioInTheFieldAndCostsOneTurn() throws {
@@ -156,12 +156,162 @@ final class ConsumableCraftingTests: XCTestCase {
         XCTAssertNotNil(onlyHidden.worlds.activeRun?.satchelItems.stacks.first)
     }
 
+    func testApothecaryHasNessaLifecycleAndExactBuildCost() throws {
+        let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.apothecary))
+        XCTAssertFalse(station.unlockedAtStart)
+        XCTAssertEqual(station.builtBy, "nessa")
+        XCTAssertEqual(station.buildCost?.essence, 85)
+        XCTAssertEqual(station.buildCost?.resources,
+                       ["clay": 16, "quartz": 6, "reagent": 12])
+    }
+
+    func testNessaRecruitmentExposesExactlyOneSiteWithoutBuildingIt() throws {
+        let store = apothecaryStore()
+        let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.apothecary))
+        XCTAssertFalse(store.buildableStations.contains { $0.id == Stations.apothecary })
+        XCTAssertFalse(store.build(station))
+
+        store.mutate("find Nessa") { $0.reality.library.foundTravellers.insert("nessa") }
+
+        XCTAssertEqual(store.buildableStations.filter { $0.id == Stations.apothecary }.count, 1)
+        XCTAssertFalse(store.state.base.station(Stations.apothecary).isUnlocked)
+    }
+
+    func testBuildAtomicallyPaysUnlocksAndTeachesOnlyLesserSalve() throws {
+        let store = apothecaryStore()
+        let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.apothecary))
+        let cost = try XCTUnwrap(station.buildCost)
+        store.mutate("fund Apothecary") { state in
+            state.reality.library.foundTravellers.insert("nessa")
+            state.base.essence = cost.essence
+            for (id, amount) in cost.resources { state.base.resources.add(amount, of: id) }
+        }
+        let inventoryBefore = store.state.base.inventory
+        let spilloverBefore = store.state.base.spillover
+
+        XCTAssertTrue(store.build(station))
+        XCTAssertTrue(store.state.base.station(Stations.apothecary).isUnlocked)
+        XCTAssertEqual(store.state.base.station(Stations.apothecary).tier, 0)
+        XCTAssertEqual(store.state.base.knownConsumableRecipes, ["salve_lesser"])
+        XCTAssertEqual(store.state.base.essence, 0)
+        for id in cost.resources.keys { XCTAssertEqual(store.state.base.resources[id], 0) }
+        XCTAssertEqual(store.state.base.inventory, inventoryBefore)
+        XCTAssertEqual(store.state.base.spillover, spilloverBefore)
+        XCTAssertFalse(store.build(station), "a repeated build charged or duplicated the station")
+        XCTAssertEqual(store.state.base.knownConsumableRecipes, ["salve_lesser"])
+    }
+
+    func testShortApothecaryFundsChangeNothing() throws {
+        let store = apothecaryStore()
+        let station = try XCTUnwrap(ContentCatalog.shared.station(Stations.apothecary))
+        store.mutate("find Nessa") { $0.reality.library.foundTravellers.insert("nessa") }
+        let before = store.state
+
+        XCTAssertFalse(store.build(station))
+        XCTAssertEqual(store.state, before)
+    }
+
+    func testStaleSameIDApothecaryQuoteIsRejectedWithoutMutation() throws {
+        let store = apothecaryStore()
+        let canonical = try XCTUnwrap(ContentCatalog.shared.station(Stations.apothecary))
+        let cost = try XCTUnwrap(canonical.buildCost)
+        store.mutate("fund Apothecary") { state in
+            state.reality.library.foundTravellers.insert("nessa")
+            state.base.essence = cost.essence
+            for (id, amount) in cost.resources { state.base.resources.add(amount, of: id) }
+        }
+        let funded = store.state
+
+        var missingCost = canonical
+        missingCost.buildCost = nil
+        XCTAssertFalse(store.canAfford(missingCost))
+        XCTAssertFalse(store.build(missingCost))
+        XCTAssertEqual(store.state, funded)
+
+        var lowerCost = canonical
+        lowerCost.buildCost = UpgradeCost(essence: 1)
+        XCTAssertFalse(store.canAfford(lowerCost))
+        XCTAssertFalse(store.build(lowerCost))
+        XCTAssertEqual(store.state, funded)
+    }
+
+    func testLegacyUnlockedApothecaryLearnsLesserSalveExactlyOnceOnDecode() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.apothecary] = StationState(isUnlocked: true, tier: 0)
+        XCTAssertTrue(state.base.knownConsumableRecipes.isEmpty)
+
+        let restored = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(state))
+        let restoredAgain = try JSONDecoder().decode(GameState.self,
+                                                     from: JSONEncoder().encode(restored))
+
+        XCTAssertEqual(restored.base.knownConsumableRecipes, ["salve_lesser"])
+        XCTAssertEqual(restoredAgain.base.knownConsumableRecipes, ["salve_lesser"])
+        XCTAssertTrue(restored.base.inventory.stacks.isEmpty)
+        XCTAssertTrue(restored.base.spillover.isEmpty)
+        XCTAssertEqual(restored.base.station(Stations.apothecary).tier, 0)
+    }
+
+    func testEveryRecipeUsesLiveCatalogueResourceIDsAndSettledEssenceCosts() {
+        let expectedSpecialCosts: [ItemID: Int] = ["stillwater": 6, "waystone": 12]
+        for recipe in ConsumableCraftingRules.recipes {
+            XCTAssertNotNil(ContentCatalog.shared.item(recipe.output), recipe.output.rawValue)
+            for id in recipe.resources.keys {
+                XCTAssertNotNil(ContentCatalog.shared.resource(id),
+                                "\(recipe.output.rawValue) uses unknown resource \(id.rawValue)")
+            }
+            XCTAssertEqual(recipe.essence, expectedSpecialCosts[recipe.output] ?? 0,
+                           recipe.output.rawValue)
+        }
+        XCTAssertEqual(ConsumableCraftingRules.recipe("waystone")?.motes, 1)
+    }
+
+    func testCoatingsUseSettledExactRecipes() throws {
+        let venom = try XCTUnwrap(ConsumableCraftingRules.recipe("venom"))
+        let firebrand = try XCTUnwrap(ConsumableCraftingRules.recipe("firebrand"))
+        let briarOil = try XCTUnwrap(ConsumableCraftingRules.recipe("briar_oil"))
+        let flashsalt = try XCTUnwrap(ConsumableCraftingRules.recipe("flashsalt"))
+
+        XCTAssertEqual(venom.resources, ["toxin": 1, "fiber": 1])
+        XCTAssertEqual(firebrand.resources, ["reagent": 1, "sulfur": 1])
+        XCTAssertEqual(briarOil.resources, ["fiber": 1, "resin": 1])
+        XCTAssertEqual(flashsalt.resources, ["reagent": 1, "mercury": 1])
+        XCTAssertEqual([venom, firebrand, briarOil, flashsalt].map(\.essence), [0, 0, 0, 0])
+    }
+
+    func testPartialSuggestiveStockInfersAndPersistsAnotherRecipe() throws {
+        let store = apothecaryStore()
+        store.mutate("built Apothecary with suggestive stock") { state in
+            state.base.stations[Stations.apothecary] = StationState(isUnlocked: true, tier: 0)
+            var properties = MaterialProperties()
+            properties.lustre = 61
+            state.base.inventory.stacks = [ItemStack(
+                id: InstanceID(rawValue: 700), catalogID: Items.material,
+                materials: [MaterialSample(kind: .reagent, properties: properties,
+                                           grade: 61, source: "test")])]
+            state.base.resources.add(1, of: "mercury")
+        }
+
+        store.discoverConsumableRecipes()
+
+        XCTAssertTrue(store.state.base.knownConsumableRecipes.contains("stillwater"))
+        XCTAssertFalse(ConsumableCraftingRules.shortfall(
+            try XCTUnwrap(ConsumableCraftingRules.recipe("stillwater")), in: store.state
+        ).isEmpty)
+        let restored = try JSONDecoder().decode(GameState.self,
+                                                from: JSONEncoder().encode(store.state))
+        XCTAssertTrue(restored.base.knownConsumableRecipes.contains("stillwater"))
+    }
+
     private func stockedState(for recipe: ItemID) -> GameState {
         var state = GameState.newGame()
         state.base.essence = 500
         state.base.inventory.slots = 20
         state.base.knownConsumableRecipes.insert(recipe)
         return state
+    }
+
+    private func apothecaryStore() -> GameStore {
+        GameStore(io: .temporary(name: "apothecary-reachability-\(UUID().uuidString)"))
     }
 
     private func sample(_ property: MaterialProperty, _ value: Double) -> MaterialSample {

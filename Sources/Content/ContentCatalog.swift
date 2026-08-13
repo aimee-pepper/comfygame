@@ -366,6 +366,45 @@ struct ContentCatalog: Sendable {
         let creatureIDs = Set(creatures.map(\.id))
         let itemIDs = Set(items.map(\.id))
 
+        // Every locked live station must name a reachable keeper and an authored, payable cost.
+        // Otherwise it can have a route and screen while remaining impossible to build in play.
+        let stationOwnerIDs = Set(travellers.map(\.id))
+        for station in stations where !station.unlockedAtStart {
+            guard let owner = station.builtBy, stationOwnerIDs.contains(owner) else {
+                throw ContentError.danglingReference(
+                    "locked station '\(station.id)' has no live keeper")
+            }
+            guard let cost = station.buildCost else {
+                throw ContentError.danglingReference(
+                    "locked station '\(station.id)' has no build cost")
+            }
+            guard cost.essence >= 0, cost.resources.values.allSatisfy({ $0 >= 0 }) else {
+                throw ContentError.danglingReference(
+                    "locked station '\(station.id)' has a negative build cost")
+            }
+            guard cost.essence > 0 || cost.resources.values.contains(where: { $0 > 0 }) else {
+                throw ContentError.danglingReference(
+                    "locked station '\(station.id)' has an empty build cost")
+            }
+            for id in cost.resources.keys where !resourceIDs.contains(id) {
+                throw ContentError.danglingReference(
+                    "station '\(station.id)' costs unknown resource '\(id)'")
+            }
+        }
+
+        // Apothecary recipes are native rules rather than JSON, so validate their stable IDs at
+        // the same catalogue boundary instead of allowing a misspelling to become unobtainable.
+        for recipe in ConsumableCraftingRules.recipes {
+            guard itemIDs.contains(recipe.output) else {
+                throw ContentError.danglingReference(
+                    "apothecary recipe produces unknown item '\(recipe.output)'")
+            }
+            for id in recipe.resources.keys where !resourceIDs.contains(id) {
+                throw ContentError.danglingReference(
+                    "apothecary recipe '\(recipe.output)' uses unknown resource '\(id)'")
+            }
+        }
+
         // A source that points at a target nobody defined would silently contribute nothing.
         let targetIDs = Set(pressureTargets.map(\.id))
         for source in pressureSources {

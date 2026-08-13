@@ -969,34 +969,46 @@ extension GameStore {
     /// Buildings whose person is still out there. Not shown as sites — you don't know they're
     /// possible yet — but the Library lists who you're missing.
     func canAfford(_ station: StationDef) -> Bool {
-        guard let cost = station.buildCost else { return true }
+        guard let canonical = ContentCatalog.shared.station(station.id),
+              canonical == station else { return false }
+        guard let cost = canonical.buildCost else { return true }
         return EconomyRules.canAfford(cost, in: state)
     }
 
     func shortfall(for station: StationDef) -> [String] {
-        guard let cost = station.buildCost else { return [] }
+        guard let canonical = ContentCatalog.shared.station(station.id),
+              canonical == station else { return ["Building plans changed"] }
+        guard let cost = canonical.buildCost else { return [] }
         return EconomyRules.shortfall(cost, in: state)
     }
 
     /// Raise the building. One-way, and cheap to describe: it costs what it says and then it's there.
     @discardableResult
     func build(_ station: StationDef) -> Bool {
-        guard buildableStations.contains(where: { $0.id == station.id }), canAfford(station)
+        guard let canonical = ContentCatalog.shared.station(station.id),
+              canonical == station,
+              buildableStations.contains(where: { $0.id == canonical.id }),
+              canAfford(canonical)
         else { return false }
-        let runway = StationRunwayRules.preview(for: station, in: state)
-        mutate("build \(station.id.rawValue) [\(runway.telemetryLabel)]", flush: true) { state in
-            if let cost = station.buildCost { EconomyRules.pay(cost, in: &state) }
-            state.base.stations[station.id] = StationState(isUnlocked: true,
-                                                           tier: station.startingTier)
-            if station.id == Stations.tannery {
+        let runway = StationRunwayRules.preview(for: canonical, in: state)
+        mutate("build \(canonical.id.rawValue) [\(runway.telemetryLabel)]", flush: true) { state in
+            if let cost = canonical.buildCost { EconomyRules.pay(cost, in: &state) }
+            state.base.stations[canonical.id] = StationState(isUnlocked: true,
+                                                             tier: canonical.startingTier)
+            if canonical.id == Stations.apothecary {
+                // The paid room opens with one honest first preparation, not an empty discovery
+                // screen. Learning is permanent, idempotent, and grants no prepared item.
+                state.base.knownConsumableRecipes.insert("salve_lesser")
+            }
+            if canonical.id == Stations.tannery {
                 // A completed building must have an immediate verb. Wear is Corrin's free root;
                 // the later fit, Carry and Keep capabilities remain authored research choices.
                 state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearRoot)
             }
-            if station.id == Stations.weaponsmith {
+            if canonical.id == Stations.weaponsmith {
                 state.base.completedResearch.insert(PhysicalGearCraftingRules.weaponsmithPointRoot)
             }
-            if station.id == Stations.channelworks {
+            if canonical.id == Stations.channelworks {
                 let restored = DistilledCore(attunement: .heat, potency: 40,
                                              sampleKind: "authored fixture",
                                              sampleSource: "Oda's damaged conduit",
