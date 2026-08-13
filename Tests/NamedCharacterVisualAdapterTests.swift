@@ -137,6 +137,36 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
                       "Character pixels must not alter the saved-world receipt meaning")
     }
 
+    func testEncounterTurnTextUsesExactNonQuillRosterName() {
+        XCTAssertEqual(
+            EncounterTurnText.format(
+                current: .companion(1), encounterFinished: false,
+                companionOverride: false, rosterNames: ["Mara", "Noll"]),
+            "Noll is acting"
+        )
+        XCTAssertEqual(
+            EncounterTurnText.format(
+                current: .companion(1), encounterFinished: false,
+                companionOverride: true, rosterNames: ["Mara", "Noll"]),
+            "you're directing Noll"
+        )
+    }
+
+    func testEncounterTurnTextUsesGenericFallbackForInvalidRosterIndex() {
+        XCTAssertEqual(
+            EncounterTurnText.format(
+                current: .companion(9), encounterFinished: false,
+                companionOverride: false, rosterNames: ["Mara"]),
+            "Companion is acting"
+        )
+        XCTAssertEqual(
+            EncounterTurnText.format(
+                current: .companion(-1), encounterFinished: false,
+                companionOverride: true, rosterNames: ["Mara"]),
+            "you're directing Companion"
+        )
+    }
+
     func testBuiltBundleResourceBasenameRemainsHashValidated() throws {
         let source = try String(contentsOf: URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

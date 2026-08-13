@@ -129,12 +129,12 @@ struct EncounterView: View {
 #endif
 
     private func turnText(_ encounter: EncounterState) -> String {
-        if encounter.outcome != nil { return "" }
-        switch encounter.current {
-        case .binder: return "your move"
-        case .companion: return encounter.isCompanionOverridden ? "you're directing Quill" : "Quill is acting"
-        case .foe: return "…"
-        }
+        EncounterTurnText.format(
+            current: encounter.current,
+            encounterFinished: encounter.outcome != nil,
+            companionOverride: encounter.isCompanionOverridden,
+            rosterNames: store.state.base.roster.map(\.name)
+        )
     }
 
     // MARK: Combatants
@@ -436,6 +436,26 @@ struct EncounterView: View {
         case .victory: "Nothing left standing."
         case .fled: "The party withdrew."
         case .defeated: "You can't go on."
+        }
+    }
+}
+
+enum EncounterTurnText {
+    static func format(
+        current: Combatant,
+        encounterFinished: Bool,
+        companionOverride: Bool,
+        rosterNames: [String]
+    ) -> String {
+        guard !encounterFinished else { return "" }
+        switch current {
+        case .binder:
+            return "your move"
+        case .companion(let index):
+            let name = rosterNames.indices.contains(index) ? rosterNames[index] : "Companion"
+            return companionOverride ? "you're directing \(name)" : "\(name) is acting"
+        case .foe:
+            return "…"
         }
     }
 }
