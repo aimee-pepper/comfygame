@@ -228,7 +228,8 @@ final class PersistenceTests: XCTestCase {
 
         XCTAssertEqual(recorder.values,
                        [.loadingSave, .reconcilingCatalogue, .committingSave, .complete])
-        XCTAssertEqual(recorder.values.map(\.completedFraction), [0, 1.0 / 3.0, 2.0 / 3.0, 1])
+        XCTAssertEqual(recorder.values.map(\.accessibilityDescription),
+                       ["Reading campaign", "Checking the Atlas", "Securing campaign", "Ready"])
     }
 
     func testHealthyLaunchPerformsZeroWritesWhileRealReconciliationPersistsOnce() throws {

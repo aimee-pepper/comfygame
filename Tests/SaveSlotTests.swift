@@ -2,6 +2,31 @@ import XCTest
 @testable import Bookbinder
 
 final class SaveSlotTests: XCTestCase {
+    func testInspectionReportsExactCompletedAndTotalFileUnits() async throws {
+        let directory = directory()
+        let io = SaveSlotFileIO(directory: directory)
+        _ = try await io.create(name: "One")
+        _ = try await io.create(name: "Two")
+        final class Recorder: @unchecked Sendable {
+            private let lock = NSLock()
+            private var values: [(Int, Int)] = []
+            func append(_ completed: Int, _ total: Int) {
+                lock.lock(); defer { lock.unlock() }
+                values.append((completed, total))
+            }
+            var snapshot: [(Int, Int)] {
+                lock.lock(); defer { lock.unlock() }
+                return values
+            }
+        }
+        let recorder = Recorder()
+
+        let inspected = await io.inspect(progress: recorder.append)
+
+        XCTAssertEqual(inspected.count, 2)
+        XCTAssertEqual(recorder.snapshot.map(\.0), [0, 1, 2])
+        XCTAssertEqual(recorder.snapshot.map(\.1), [2, 2, 2])
+    }
     private func directory() -> URL {
         FileManager.default.temporaryDirectory
             .appending(path: "bookbinder-slot-tests/\(UUID().uuidString)", directoryHint: .isDirectory)

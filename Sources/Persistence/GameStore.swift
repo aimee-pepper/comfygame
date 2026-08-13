@@ -40,15 +40,6 @@ final class GameStore: ObservableObject {
         case committingSave
         case complete
 
-        var completedFraction: Double {
-            switch self {
-            case .loadingSave: 0
-            case .reconcilingCatalogue: 1.0 / 3.0
-            case .committingSave: 2.0 / 3.0
-            case .complete: 1
-            }
-        }
-
         var accessibilityDescription: String {
             switch self {
             case .loadingSave: "Reading campaign"

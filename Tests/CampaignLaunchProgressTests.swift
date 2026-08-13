@@ -22,8 +22,11 @@ final class CampaignLaunchProgressTests: XCTestCase {
         _ = observation
 
         XCTAssertTrue(observed.contains(.adoptingLegacy))
-        XCTAssertTrue(observed.contains(.inspectingCampaigns))
-        XCTAssertEqual(coordinator.loadingPhase.accessibilityDescription, "Reading campaign shelf")
+        XCTAssertTrue(observed.contains { phase in
+            if case .inspectingCampaigns = phase { true } else { false }
+        })
+        XCTAssertEqual(coordinator.loadingPhase, .ready)
+        XCTAssertEqual(coordinator.loadingPhase.progress, .complete)
     }
 
     func testOpeningPublishesEveryOrderedPreparationStepAndLiveDescriptions() async throws {
@@ -47,11 +50,11 @@ final class CampaignLaunchProgressTests: XCTestCase {
         _ = observation
 
         XCTAssertEqual(consecutiveUnique(observed), [
-            .inspectingCampaigns, .selectingCampaign, .acquiringWriter,
+            .ready, .selectingCampaign, .acquiringWriter,
             .preparing(.loadingSave), .preparing(.reconcilingCatalogue),
             .preparing(.committingSave), .preparing(.complete)
         ])
-        XCTAssertEqual(coordinator.loadingPhase.completedFraction, 1)
+        XCTAssertEqual(coordinator.loadingPhase.progress, .complete)
         XCTAssertEqual(coordinator.loadingPhase.accessibilityDescription, "Ready")
     }
 
@@ -78,8 +81,9 @@ final class CampaignLaunchProgressTests: XCTestCase {
         coordinator.returnToCampaigns()
         try await waitUntil { if case .choosing = coordinator.phase { true } else { false } }
         try await Task.sleep(for: .milliseconds(70))
-        XCTAssertEqual(coordinator.loadingPhase, .inspectingCampaigns,
-                       "A callback from an older generation must not overwrite the chooser")
+        guard case .inspectingCampaigns = coordinator.loadingPhase else {
+            return XCTFail("A callback from an older generation overwrote shelf inspection")
+        }
     }
 
     func testOpeningFailureCanRetryWithoutPublishingTheFailedAttempt() async throws {
@@ -118,7 +122,7 @@ final class CampaignLaunchProgressTests: XCTestCase {
 
         let source = try String(contentsOf: projectRoot
             .appending(path: "Sources/App/CampaignAppCoordinator.swift"), encoding: .utf8)
-        XCTAssertTrue(source.contains("progressFraction: coordinator.loadingPhase.completedFraction"))
+        XCTAssertTrue(source.contains("progress: coordinator.loadingPhase.progress"))
         XCTAssertTrue(source.contains("progressDescription: coordinator.loadingPhase.accessibilityDescription"))
         let launchSurface = try String(contentsOf: projectRoot
             .appending(path: "Sources/App/BookbinderApp.swift"), encoding: .utf8)
@@ -126,6 +130,8 @@ final class CampaignLaunchProgressTests: XCTestCase {
                       "VoiceOver must name the live campaign-loading phase")
         XCTAssertTrue(source.contains("coordinator.noteFirstMeaningfulFrame()"),
                       "The production campaign root must timestamp its actual first frame")
+        XCTAssertTrue(source.contains("DispatchQueue.main.async { coordinator.start() }"),
+                      "Campaign inspection must begin after the branded first-frame transaction")
         XCTAssertTrue(source.contains("campaign phase="),
                       "Every published production phase must carry elapsed-time evidence")
     }
@@ -155,13 +161,23 @@ final class CampaignLaunchProgressTests: XCTestCase {
         let failureSurface = try XCTUnwrap(source.range(of: "private func failureSurface"))
         let section = String(source[loadingSurface.lowerBound..<failureSurface.lowerBound])
 
-        XCTAssertTrue(section.contains("LaunchProgressTrack(fraction: progressFraction)"))
+        XCTAssertTrue(section.contains("LaunchProgressTrack(progress: progress)"))
         XCTAssertTrue(section.contains(".frame(width: 192, height: 4)"),
                       "The live progress region must match the launch storyboard from frame one")
         XCTAssertFalse(section.contains("ProgressView("),
                        "System progress styling must not introduce different intrinsic geometry")
-        XCTAssertTrue(source.contains("geometry.size.width * min(1, max(0, fraction))"),
-                      "Progress may change only the fill width inside the reserved region")
+        XCTAssertTrue(source.contains("Double(completed) / Double(total)"),
+                      "Determinate progress must derive from completed and total work units")
+        XCTAssertTrue(source.contains("repeatForever"),
+                      "Work without a measurable denominator must show activity, not a percentage")
+    }
+
+    func testProgressStateUsesMeasuredUnitsAndNeverInventsAPercentage() {
+        XCTAssertNil(LaunchProgressState.activity.measuredFraction)
+        XCTAssertEqual(LaunchProgressState.measured(completed: 1, total: 4).measuredFraction, 0.25)
+        XCTAssertEqual(LaunchProgressState.measured(completed: 3, total: 4).measuredFraction, 0.75)
+        XCTAssertEqual(LaunchProgressState.complete.measuredFraction, 1)
+        XCTAssertNil(LaunchProgressState.measured(completed: 0, total: 0).measuredFraction)
     }
 
     func testSwiftUILoaderUsesTheStoryboardSafeAreaCenter() {

@@ -26,8 +26,16 @@ actor SaveSlotFileIO {
     }
 
     /// Read-only inspection. It never quarantines, rewrites, adopts or deletes anything.
-    func inspect() -> [SaveSlotDescriptor] {
-        slotFileURLs().map(descriptor(at:)).sorted { lhs, rhs in
+    func inspect(progress: @Sendable (Int, Int) -> Void = { _, _ in }) -> [SaveSlotDescriptor] {
+        let urls = slotFileURLs()
+        progress(0, urls.count)
+        var descriptors: [SaveSlotDescriptor] = []
+        descriptors.reserveCapacity(urls.count)
+        for (index, url) in urls.enumerated() {
+            descriptors.append(descriptor(at: url))
+            progress(index + 1, urls.count)
+        }
+        return descriptors.sorted { lhs, rhs in
             switch (lhs.metadata?.lastPlayedAt, rhs.metadata?.lastPlayedAt) {
             case let (a?, b?) where a != b: return a > b
             default: return lhs.id.description < rhs.id.description

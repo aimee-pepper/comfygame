@@ -8,30 +8,45 @@ import SwiftUI
 final class CampaignAppCoordinator: ObservableObject {
     enum LoadingPhase: Equatable, Sendable {
         case adoptingLegacy
-        case inspectingCampaigns
+        case inspectingCampaigns(completed: Int, total: Int)
         case selectingCampaign
         case acquiringWriter
         case preparing(GameStore.PreparationStep)
+        case ready
 
-        var completedFraction: Double {
+        var progress: LaunchProgressState {
             switch self {
-            case .adoptingLegacy, .selectingCampaign: 0
-            case .inspectingCampaigns: 0.65
-            case .acquiringWriter: 0.15
-            case .preparing(.loadingSave): 0.25
-            case .preparing(.reconcilingCatalogue): 0.5
-            case .preparing(.committingSave): 0.75
-            case .preparing(.complete): 1
+            case .inspectingCampaigns(let completed, let total) where total > 0:
+                .measured(completed: completed, total: total)
+            case .ready, .preparing(.complete):
+                .complete
+            default:
+                .activity
+            }
+        }
+
+        /// Orders callbacks within one operation without pretending that unlike operations are
+        /// equal-sized pieces of a percentage.
+        var sequence: Int {
+            switch self {
+            case .adoptingLegacy: 0
+            case .inspectingCampaigns: 1
+            case .selectingCampaign: 0
+            case .acquiringWriter: 1
+            case .preparing(let step): 2 + step.rawValue
+            case .ready: 6
             }
         }
 
         var accessibilityDescription: String {
             switch self {
             case .adoptingLegacy: "Checking existing campaigns"
-            case .inspectingCampaigns: "Reading campaign shelf"
+            case .inspectingCampaigns(let completed, let total):
+                total > 0 ? "Reading campaign \(min(completed + 1, total)) of \(total)" : "Reading campaign shelf"
             case .selectingCampaign: "Opening selected campaign"
             case .acquiringWriter: "Securing selected campaign"
             case .preparing(let step): step.accessibilityDescription
+            case .ready: "Ready"
             }
         }
     }
@@ -97,9 +112,21 @@ final class CampaignAppCoordinator: ObservableObject {
                 _ = try await slots.adoptLegacyIfNeeded()
                 let adoptedAt = DispatchTime.now().uptimeNanoseconds
                 guard generation == token else { return }
-                publish(.inspectingCampaigns, for: token)
-                let descriptors = await slots.inspect()
+                publish(.inspectingCampaigns(completed: 0, total: 0), for: token)
+                let (updates, continuation) = AsyncStream<(Int, Int)>.makeStream()
+                let progressTask = Task { [weak self] in
+                    for await (completed, total) in updates {
+                        self?.publish(.inspectingCampaigns(completed: completed, total: total),
+                                      for: token)
+                    }
+                }
+                let descriptors = await slots.inspect { completed, total in
+                    continuation.yield((completed, total))
+                }
+                continuation.finish()
+                await progressTask.value
                 let inspectedAt = DispatchTime.now().uptimeNanoseconds
+                publish(.ready, for: token)
                 let remaining = clock.now.duration(to: earliestChooser)
                 if remaining > .zero { try await Task.sleep(for: remaining) }
                 guard generation == token else { return }
@@ -172,7 +199,7 @@ final class CampaignAppCoordinator: ObservableObject {
         guard case .playing(let store) = phase, task == nil else { return }
         store.flushNow()
         let finalState = store.state
-        loadingPhase = .inspectingCampaigns
+        loadingPhase = .inspectingCampaigns(completed: 0, total: 0)
         phase = .loading
         let token = UUID(); generation = token
         task = Task { [weak self] in
@@ -250,7 +277,7 @@ final class CampaignAppCoordinator: ObservableObject {
         guard generation == token else { return }
         // Detached persistence callbacks can arrive after the completion continuation. Never let
         // a late callback move the visible bar backwards or overwrite a newer operation.
-        guard next.completedFraction >= loadingPhase.completedFraction else { return }
+        guard next.sequence >= loadingPhase.sequence else { return }
         loadingPhase = next
         logPhase(next)
     }
@@ -270,7 +297,7 @@ final class CampaignAppCoordinator: ObservableObject {
     private func logPhase(_ phase: LoadingPhase) {
 #if DEBUG
         Logger.launch.notice(
-            "campaign phase=\(phase.accessibilityDescription, privacy: .public) fraction=\(phase.completedFraction, format: .fixed(precision: 2)) elapsed=\(LaunchClock.elapsedMilliseconds(), format: .fixed(precision: 1))ms"
+            "campaign phase=\(phase.accessibilityDescription, privacy: .public) progress=\(String(describing: phase.progress), privacy: .public) elapsed=\(LaunchClock.elapsedMilliseconds(), format: .fixed(precision: 1))ms"
         )
 #endif
     }
@@ -293,10 +320,14 @@ struct CampaignAppRootView: View {
         Group {
             switch coordinator.phase {
             case .idle, .loading, .opening:
-                LaunchSurface(progressFraction: coordinator.loadingPhase.completedFraction,
+                LaunchSurface(progress: coordinator.loadingPhase.progress,
                               progressDescription: coordinator.loadingPhase.accessibilityDescription)
-                    .task { coordinator.start() }
-                    .onAppear { coordinator.noteFirstMeaningfulFrame() }
+                    .onAppear {
+                        coordinator.noteFirstMeaningfulFrame()
+                        // Commit the branded SwiftUI surface before campaign file work begins.
+                        // `start()` is idempotent, so repeated appearances remain safe.
+                        DispatchQueue.main.async { coordinator.start() }
+                    }
             case .choosing(let descriptors):
                 CampaignStartView(
                     presentation: CampaignStartPresentation(

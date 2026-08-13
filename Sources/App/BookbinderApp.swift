@@ -187,7 +187,7 @@ private struct LaunchRootView: View {
 }
 
 struct LaunchSurface: View {
-    var progressFraction: Double
+    var progress: LaunchProgressState
     var progressDescription: String
     var failure: AppLaunchCoordinator.Failure?
     var retry: (() -> Void)?
@@ -195,14 +195,14 @@ struct LaunchSurface: View {
     init(preparationStep: GameStore.PreparationStep = .loadingSave,
          failure: AppLaunchCoordinator.Failure? = nil,
          retry: (() -> Void)? = nil) {
-        progressFraction = preparationStep.completedFraction
+        progress = preparationStep == .complete ? .complete : .activity
         progressDescription = preparationStep.accessibilityDescription
         self.failure = failure
         self.retry = retry
     }
 
-    init(progressFraction: Double, progressDescription: String) {
-        self.progressFraction = min(1, max(0, progressFraction))
+    init(progress: LaunchProgressState, progressDescription: String) {
+        self.progress = progress
         self.progressDescription = progressDescription
         failure = nil
         retry = nil
@@ -254,7 +254,7 @@ struct LaunchSurface: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 192, height: 21)
                 .offset(x: 28, y: 225)
-            LaunchProgressTrack(fraction: progressFraction)
+            LaunchProgressTrack(progress: progress)
                 .frame(width: 192, height: 4)
                 .offset(x: 28, y: 270)
                 .accessibilityLabel("Opening progress")
@@ -306,19 +306,54 @@ enum LaunchSurfacePlacement {
 
 /// A fixed counterpart to the progress region reserved in LaunchScreen.storyboard.
 /// Only the brown fill changes width; the track's geometry exists from the first frame.
+enum LaunchProgressState: Equatable, Sendable {
+    case activity
+    case measured(completed: Int, total: Int)
+    case complete
+
+    var measuredFraction: Double? {
+        switch self {
+        case .activity: nil
+        case .measured(let completed, let total):
+            total > 0 ? min(1, max(0, Double(completed) / Double(total))) : nil
+        case .complete: 1
+        }
+    }
+}
+
 private struct LaunchProgressTrack: View {
-    let fraction: Double
+    let progress: LaunchProgressState
+    @State private var activityOffset = -0.35
 
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 Rectangle().fill(Color(.tertiarySystemFill))
-                Rectangle()
-                    .fill(.brown)
-                    .frame(width: geometry.size.width * min(1, max(0, fraction)))
+                if let fraction = progress.measuredFraction {
+                    Rectangle()
+                        .fill(.brown)
+                        .frame(width: geometry.size.width * fraction)
+                } else {
+                    Rectangle()
+                        .fill(.brown)
+                        .frame(width: geometry.size.width * 0.35)
+                        .offset(x: geometry.size.width * activityOffset)
+                        .onAppear { animateActivity() }
+                }
             }
+            .clipped()
+        }
+        .onChange(of: progress) { _, next in
+            if next.measuredFraction == nil { animateActivity() }
         }
         .accessibilityHidden(true)
+    }
+
+    private func animateActivity() {
+        activityOffset = -0.35
+        withAnimation(.linear(duration: 0.9).repeatForever(autoreverses: false)) {
+            activityOffset = 1
+        }
     }
 }
 
