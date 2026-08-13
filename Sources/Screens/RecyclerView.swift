@@ -12,7 +12,7 @@ struct RecyclerView: View {
                     .foregroundStyle(.secondary)
 
                 if previews.isEmpty {
-                    EmptyNote("No eligible ordinary gear is stored or waiting. Favorites, locked pieces, unique work and unrecorded provenance stay protected.")
+                    recyclerEmptyState
                 } else {
                     SixAcrossItemGrid(data: previews, id: \.stackID) { preview in
                         Button { selected = preview } label: {
@@ -53,6 +53,30 @@ struct RecyclerView: View {
     }
 
     private var previews: [RecyclerPreview] { store.recyclerPreviews() }
+
+    private var recyclerEmptyState: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("No gear to dismantle", systemImage: "shippingbox")
+                .font(.headline)
+
+            Text("Store or recover an eligible ordinary piece, then return here to preview what Noll can salvage.")
+                .font(.callout)
+
+            Divider()
+
+            Label("Favorites, locked pieces, unique work and gear without recorded provenance stay protected.",
+                  systemImage: "lock.shield")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color.secondary.opacity(0.18), lineWidth: 1)
+        }
+    }
 
     private var ineligibilityCounts: [(reason: RecyclerRules.Ineligibility, count: Int)] {
         var counts: [RecyclerRules.Ineligibility: Int] = [:]

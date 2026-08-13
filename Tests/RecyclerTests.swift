@@ -11,6 +11,9 @@ final class RecyclerTests: XCTestCase {
         )
 
         XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0) { dismantleActionBar }"))
+        XCTAssertTrue(source.contains("private var recyclerEmptyState: some View"))
+        XCTAssertTrue(source.contains("No gear to dismantle"))
+        XCTAssertTrue(source.contains("gear without recorded provenance stay protected"))
         XCTAssertTrue(source.contains("Text(\"Dismantle this piece\").frame(maxWidth: .infinity)"))
         XCTAssertFalse(source.contains("Section {\n                    Button(\"Dismantle this piece\""))
     }
