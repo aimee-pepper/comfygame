@@ -1355,6 +1355,13 @@ enum WorldRules {
             party: party, in: state,
             binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
             companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs)
+        let debugResistanceReceipt = CombatDerivedStatsRules.debugResistanceReceipt(
+            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
+            party: party,
+            binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
+            binderChoices: run.tuning.debugCombatV2BinderChoices,
+            companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs,
+            companionChoices: run.tuning.debugCombatV2CompanionChoices)
         let ghostEvasionAvailable = Set(party.filter { actor in
             if run.tuning.debugCombatV2BinderAttackEnabled {
                 switch actor {
@@ -1399,6 +1406,7 @@ enum WorldRules {
                                                         debugV2Initiative: debugInitiativeReceipt,
                                                         debugV2Armour: debugArmourReceipt,
                                                         debugV2Evasion: debugEvasionReceipt,
+                                                        debugV2Resistance: debugResistanceReceipt,
                                                         ghostEvasionAvailable: ghostEvasionAvailable,
                                                         debugV2OwnedNodeIDs: debugOwnedNodeIDs,
                                                         partyRanks: partyRanks,

@@ -2792,4 +2792,180 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.debugV2Evasion,
                        frozen.debugV2Evasion)
     }
+
+    func testInsulationReceiptFreezesExactTypedOwnerWithoutAuraOrHeatDefault() throws {
+        let party: [Combatant] = [.binder, .companion(0), .companion(1), .companion(2), .companion(3)]
+        let insulation = CombatDerivedStatsRules.Node.insulation
+        let receipt = try XCTUnwrap(CombatDerivedStatsRules.debugResistanceReceipt(
+            enabled: true, party: party,
+            binderNodeIDs: [insulation],
+            binderChoices: [insulation: .init(rawValue: EmanationKind.caustic.rawValue)],
+            companionNodeIDs: [0: [insulation], 1: [insulation], 2: [insulation]],
+            companionChoices: [
+                0: [insulation: .init(rawValue: EmanationKind.heat.rawValue)],
+                1: [insulation: .init(rawValue: EmanationKind.light.rawValue)],
+                2: [insulation: .init(rawValue: "unknown")]
+            ]))
+        XCTAssertEqual(receipt.entry(for: .binder)?.insulationChoice, .caustic)
+        XCTAssertEqual(receipt.entry(for: .companion(0))?.insulationChoice, .heat)
+        XCTAssertEqual(receipt.entry(for: .companion(1))?.insulationChoice, .light)
+        XCTAssertNil(receipt.entry(for: .companion(2))?.insulationChoice,
+                     "unknown choices must not silently become Heat")
+        XCTAssertNil(receipt.entry(for: .companion(3))?.insulationChoice,
+                     "another owner's choice is never an aura")
+        XCTAssertNil(CombatDerivedStatsRules.debugResistanceReceipt(
+            enabled: false, party: party, binderNodeIDs: [insulation], binderChoices: [:],
+            companionNodeIDs: [:], companionChoices: [:]))
+    }
+
+    func testInsulationPureDamageMatchesOnlyChosenEmanationAndRoundsContinuousMultipliersOnce() {
+        for choice in EmanationKind.allCases {
+            let receipt = EncounterState.DebugV2ResistanceReceipt(entries: [
+                .init(actor: .binder, insulationChoice: choice)
+            ])
+            let matching = CombatDerivedStatsRules.emanationDamage(
+                raw: 19, element: choice, receiver: .binder, receipt: receipt)
+            XCTAssertEqual(matching.combinedMultiplier, 0.65, accuracy: 0.000_001)
+            XCTAssertEqual(matching.finalDamage, 12)
+            XCTAssertEqual(matching.components.map(\.nodeID), [CombatDerivedStatsRules.Node.insulation])
+
+            let other = EmanationKind.allCases.first { $0 != choice }!
+            XCTAssertEqual(CombatDerivedStatsRules.emanationDamage(
+                raw: 19, element: other, receiver: .binder, receipt: receipt).finalDamage, 19)
+            XCTAssertEqual(CombatDerivedStatsRules.emanationDamage(
+                raw: 0, element: choice, receiver: .binder, receipt: receipt).finalDamage,
+                           Tuning.Encounter.minimumDamage)
+            XCTAssertEqual(CombatDerivedStatsRules.emanationDamage(
+                raw: 1, element: choice, receiver: .binder, receipt: receipt).finalDamage,
+                           Tuning.Encounter.minimumDamage)
+        }
+        let heat = EncounterState.DebugV2ResistanceReceipt(entries: [
+            .init(actor: .binder, insulationChoice: .heat)
+        ])
+        let composed = CombatDerivedStatsRules.emanationDamage(
+            raw: 23, element: .heat, receiver: .binder, receipt: heat,
+            wornInsulationMultiplier: 0.8, wardMultiplier: 0.6)
+        XCTAssertEqual(composed.combinedMultiplier, 0.8 * 0.6 * 0.65, accuracy: 0.000_001)
+        XCTAssertEqual(composed.roundedDamage, Int(floor(23 * 0.8 * 0.6 * 0.65)))
+        XCTAssertEqual(composed.components.map(\.source), [.wornInsulation, .ward, .insulation])
+
+        let enabledEmpty = EncounterState.DebugV2ResistanceReceipt(entries: [
+            .init(actor: .binder, insulationChoice: nil)
+        ])
+        let fractionalLegacy = 24.0 * 0.8 * 0.6
+        let emptyResult = CombatDerivedStatsRules.emanationDamage(
+            raw: 24, element: .heat, receiver: .binder, receipt: enabledEmpty,
+            wornInsulationMultiplier: 0.8, wardMultiplier: 0.6)
+        XCTAssertEqual(emptyResult.finalDamage, Int(fractionalLegacy.rounded()),
+                       "enabled-empty must preserve legacy rounding")
+        XCTAssertNotEqual(Int(fractionalLegacy.rounded()), Int(floor(fractionalLegacy)),
+                          "fixture must distinguish round from floor")
+        XCTAssertEqual(composed.roundedDamage, Int(floor(23 * 0.8 * 0.6 * 0.65)),
+                       "matching Insulation uses the new single floor point")
+    }
+
+    func testRealEmanationRouteUsesFrozenInsulationAndStillCarriesAffliction() throws {
+        func staged(choice: EmanationKind?) -> GameStore {
+            let store = inFight()
+            store.mutate("stage Insulation route") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                      !encounter.foes.isEmpty else { return }
+                run.rng = SeededRNG(seed: 73)
+                run.binderHP = 30
+                run.companionHP[0] = 0
+                encounter.foes[0].stats.delivery = .single
+                encounter.foes[0].stats.element = .caustic
+                encounter.foes[0].stats.damageKind = .crush
+                encounter.foes[0].stats.attack = 12
+                encounter.order = [.foe(encounter.foes[0].id), .binder]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.debugV2Resistance = .init(entries: [
+                    .init(actor: .binder, insulationChoice: choice)
+                ])
+                encounter.debugV2Evasion = .init(entries: [
+                    .init(actor: .binder, characterEvasion: 0, components: [])
+                ])
+                encounter.ghostEvasionAvailable = []
+                encounter.statuses[.binder] = []
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                CombatRules.runAutomaticTurns(in: &state)
+            }
+            return store
+        }
+        let matching = staged(choice: .caustic)
+        let nonmatching = staged(choice: .light)
+        XCTAssertGreaterThan(matching.activeRun?.binderHP ?? 0, nonmatching.activeRun?.binderHP ?? 0)
+        XCTAssertTrue(matching.activeEncounter?.statuses[.binder]?.contains(where: {
+            $0.kind == .poison
+        }) == true, "damage resistance must not erase the landed affliction payload")
+        XCTAssertEqual(matching.activeEncounter?.statuses[.binder],
+                       nonmatching.activeEncounter?.statuses[.binder])
+    }
+
+    func testPhysicalDirectRouteNeverReadsFrozenInsulationChoice() throws {
+        func staged(choice: EmanationKind?) -> GameStore {
+            let store = inFight()
+            store.mutate("stage physical Insulation counterfactual") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                      !encounter.foes.isEmpty else { return }
+                run.rng = SeededRNG(seed: 91)
+                run.binderHP = 30
+                run.companionHP[0] = 0
+                encounter.foes[0].stats.delivery = .single
+                encounter.foes[0].stats.element = nil
+                encounter.foes[0].stats.damageKind = .crush
+                encounter.foes[0].stats.attack = 12
+                encounter.order = [.foe(encounter.foes[0].id), .binder]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.debugV2Resistance = .init(entries: [
+                    .init(actor: .binder, insulationChoice: choice)
+                ])
+                encounter.debugV2Evasion = .init(entries: [
+                    .init(actor: .binder, characterEvasion: 0, components: [])
+                ])
+                encounter.ghostEvasionAvailable = []
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                CombatRules.runAutomaticTurns(in: &state)
+            }
+            return store
+        }
+        let owned = staged(choice: .heat)
+        let enabledEmpty = staged(choice: nil)
+        XCTAssertEqual(owned.activeRun?.binderHP, enabledEmpty.activeRun?.binderHP)
+        XCTAssertEqual(owned.activeEncounter?.log, enabledEmpty.activeEncounter?.log)
+        XCTAssertEqual(owned.activeRun?.rng, enabledEmpty.activeRun?.rng)
+    }
+
+    func testWorldContactFreezesTypedInsulationAcrossHarnessMutationAndRelaunch() throws {
+        let store = GameStore(io: .temporary(name: "insulation-contact-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        store.mutate("stage typed Insulation contact") { state in
+            guard var run = state.worlds.activeRun else { return }
+            let node = CombatDerivedStatsRules.Node.insulation
+            run.tuning.debugCombatV2BinderAttackEnabled = true
+            run.tuning.debugCombatV2BinderNodeIDs.insert(node)
+            run.tuning.debugCombatV2BinderChoices[node] = .init(rawValue: EmanationKind.light.rawValue)
+            let enemy = WorldEnemy(id: .init(rawValue: 98_002), creatureID: "paper_moth",
+                                   position: run.playerPosition, isAwake: true)
+            run.enemies = [enemy]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
+        }
+        let frozen = try XCTUnwrap(store.activeEncounter?.debugV2Resistance)
+        XCTAssertEqual(frozen.entry(for: .binder)?.insulationChoice, .light)
+        store.mutate("change Insulation after contact") { state in
+            let node = CombatDerivedStatsRules.Node.insulation
+            state.worlds.activeRun?.tuning.debugCombatV2BinderNodeIDs.remove(node)
+            state.worlds.activeRun?.tuning.debugCombatV2BinderChoices[node] =
+                .init(rawValue: EmanationKind.heat.rawValue)
+        }
+        XCTAssertEqual(store.activeEncounter?.debugV2Resistance, frozen)
+        let resumed = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(store.state))
+        XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.debugV2Resistance, frozen)
+    }
 }

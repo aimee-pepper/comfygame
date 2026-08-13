@@ -519,6 +519,12 @@ struct BalancingView: View {
                                       id: CombatDerivedStatsRules.Node.footwork)
                 debugCombatNodeToggle("Ghost · first direct attack misses once",
                                       id: CombatDerivedStatsRules.Node.ghost)
+                Picker("Binder Insulation", selection: debugBinderInsulationChoice) {
+                    Text("Not owned").tag(EmanationKind?.none)
+                    ForEach(EmanationKind.allCases, id: \.self) { kind in
+                        Text(kind.rawValue.capitalized).tag(Optional(kind))
+                    }
+                }
                 ForEach(store.state.base.activeParty, id: \.self) { index in
                     if store.state.base.roster.indices.contains(index) {
                         let name = store.state.base.roster[index].name
@@ -541,6 +547,12 @@ struct BalancingView: View {
                                                  id: CombatDerivedStatsRules.Node.footwork)
                         debugCompanionNodeToggle("Ghost · one guaranteed miss", index: index,
                                                  id: CombatDerivedStatsRules.Node.ghost)
+                        Picker("\(name) Insulation", selection: debugCompanionInsulationChoice(index)) {
+                            Text("Not owned").tag(EmanationKind?.none)
+                            ForEach(EmanationKind.allCases, id: \.self) { kind in
+                                Text(kind.rawValue.capitalized).tag(Optional(kind))
+                            }
+                        }
                     }
                 }
                 if settings.debugTuning.debugCombatV2BinderAttackEnabled,
@@ -564,6 +576,12 @@ struct BalancingView: View {
                         }
                         Text("\(debugActorName(entry.actor)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "") = \(Int(entry.total * 100))% · Ghost \(ghostOwned ? "ready" : "not owned")")
                             .font(.caption.monospacedDigit())
+                    }
+                    Text("Next encounter Insulation")
+                        .font(.subheadline.weight(.semibold))
+                    ForEach(debugResistancePreview?.entries ?? [], id: \.actor) { entry in
+                        Text("\(debugActorName(entry.actor)) · \(entry.insulationChoice.map { "35% less \($0.rawValue.capitalized) emanation damage" } ?? "not owned or no valid choice")")
+                            .font(.caption)
                     }
                     Text("Next expedition health caps")
                         .font(.subheadline.weight(.semibold))
@@ -709,6 +727,56 @@ struct BalancingView: View {
             }))
     }
 
+    private var debugBinderInsulationChoice: Binding<EmanationKind?> {
+        Binding(
+            get: {
+                guard settings.debugTuning.debugCombatV2BinderNodeIDs
+                    .contains(CombatDerivedStatsRules.Node.insulation),
+                      let choice = settings.debugTuning.debugCombatV2BinderChoices[
+                        CombatDerivedStatsRules.Node.insulation]
+                else { return nil }
+                return EmanationKind(rawValue: choice.rawValue)
+            },
+            set: { choice in
+                if let choice {
+                    settings.debugTuning.debugCombatV2BinderNodeIDs
+                        .insert(CombatDerivedStatsRules.Node.insulation)
+                    settings.debugTuning.debugCombatV2BinderChoices[
+                        CombatDerivedStatsRules.Node.insulation] = .init(rawValue: choice.rawValue)
+                } else {
+                    settings.debugTuning.debugCombatV2BinderNodeIDs
+                        .remove(CombatDerivedStatsRules.Node.insulation)
+                    settings.debugTuning.debugCombatV2BinderChoices[
+                        CombatDerivedStatsRules.Node.insulation] = nil
+                }
+            })
+    }
+
+    private func debugCompanionInsulationChoice(_ index: Int) -> Binding<EmanationKind?> {
+        Binding(
+            get: {
+                guard settings.debugTuning.debugCombatV2CompanionNodeIDs[index]?
+                    .contains(CombatDerivedStatsRules.Node.insulation) == true,
+                      let choice = settings.debugTuning.debugCombatV2CompanionChoices[index]?[
+                        CombatDerivedStatsRules.Node.insulation]
+                else { return nil }
+                return EmanationKind(rawValue: choice.rawValue)
+            },
+            set: { choice in
+                var nodes = settings.debugTuning.debugCombatV2CompanionNodeIDs[index] ?? []
+                var choices = settings.debugTuning.debugCombatV2CompanionChoices[index] ?? [:]
+                if let choice {
+                    nodes.insert(CombatDerivedStatsRules.Node.insulation)
+                    choices[CombatDerivedStatsRules.Node.insulation] = .init(rawValue: choice.rawValue)
+                } else {
+                    nodes.remove(CombatDerivedStatsRules.Node.insulation)
+                    choices[CombatDerivedStatsRules.Node.insulation] = nil
+                }
+                settings.debugTuning.debugCombatV2CompanionNodeIDs[index] = nodes.isEmpty ? nil : nodes
+                settings.debugTuning.debugCombatV2CompanionChoices[index] = choices.isEmpty ? nil : choices
+            })
+    }
+
     private var debugInitiativePreview: EncounterState.DebugV2InitiativeReceipt? {
         CombatDerivedStatsRules.debugInitiativeReceipt(
             enabled: settings.debugTuning.debugCombatV2BinderAttackEnabled,
@@ -727,6 +795,16 @@ struct BalancingView: View {
             party: CombatRules.party(of: store.state), in: store.state,
             binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
             companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs)
+    }
+
+    private var debugResistancePreview: EncounterState.DebugV2ResistanceReceipt? {
+        CombatDerivedStatsRules.debugResistanceReceipt(
+            enabled: settings.debugTuning.debugCombatV2BinderAttackEnabled,
+            party: CombatRules.party(of: store.state),
+            binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
+            binderChoices: settings.debugTuning.debugCombatV2BinderChoices,
+            companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs,
+            companionChoices: settings.debugTuning.debugCombatV2CompanionChoices)
     }
 
     private var debugArmourReceipt: EncounterState.DebugV2ArmourReceipt? {

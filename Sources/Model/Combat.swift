@@ -322,6 +322,15 @@ struct EncounterState: Codable, Equatable, Sendable {
         var entries: [Entry]
         func entry(for actor: Combatant) -> Entry? { entries.first { $0.actor == actor } }
     }
+    struct DebugV2ResistanceReceipt: Codable, Equatable, Sendable {
+        struct Entry: Codable, Equatable, Sendable {
+            var actor: Combatant
+            /// Nil is an explicit enabled-v2 counterfactual, including missing/unknown choices.
+            var insulationChoice: EmanationKind?
+        }
+        var entries: [Entry]
+        func entry(for actor: Combatant) -> Entry? { entries.first { $0.actor == actor } }
+    }
     struct EvasionAttempt: Codable, Equatable, Sendable {
         enum Resolution: String, Codable, Equatable, Sendable {
             case sidestep, ghost, probabilityHit, probabilityMiss
@@ -439,6 +448,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     var debugV2Armour: DebugV2ArmourReceipt?
     /// Frozen personal evasion plus exact Footwork ownership for the DEBUG-v2 route.
     var debugV2Evasion: DebugV2EvasionReceipt?
+    /// Frozen typed Insulation ownership. Nil is legacy; an enabled empty/counterfactual route has
+    /// entries whose choices are nil and never silently defaults to Heat.
+    var debugV2Resistance: DebugV2ResistanceReceipt?
     /// Explicit frozen ownership for consumers that do not yet have a dedicated derived receipt.
     /// Nil is legacy; an empty dictionary is an enabled-v2 comparison with no owned nodes.
     var debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]?
@@ -565,6 +577,7 @@ struct EncounterState: Codable, Equatable, Sendable {
          debugV2Initiative: DebugV2InitiativeReceipt? = nil,
          debugV2Armour: DebugV2ArmourReceipt? = nil,
          debugV2Evasion: DebugV2EvasionReceipt? = nil,
+         debugV2Resistance: DebugV2ResistanceReceipt? = nil,
          ghostEvasionAvailable: Set<Combatant>? = nil,
          debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = nil,
          partyRanks: [Combatant: Rank] = [:],
@@ -579,6 +592,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2Initiative = debugV2Initiative
         self.debugV2Armour = debugV2Armour
         self.debugV2Evasion = debugV2Evasion
+        self.debugV2Resistance = debugV2Resistance
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
         self.partyRanks = partyRanks
@@ -606,6 +620,8 @@ struct EncounterState: Codable, Equatable, Sendable {
                                               forKey: .debugV2Armour)
         debugV2Evasion = try c.decodeIfPresent(DebugV2EvasionReceipt.self,
                                                forKey: .debugV2Evasion)
+        debugV2Resistance = try c.decodeIfPresent(DebugV2ResistanceReceipt.self,
+                                                  forKey: .debugV2Resistance)
         debugV2OwnedNodeIDs = try c.decodeIfPresent([Combatant: Set<CombatNodeID>].self,
                                                      forKey: .debugV2OwnedNodeIDs)
         partyRanks = try c.decodeIfPresent([Combatant: Rank].self, forKey: .partyRanks) ?? [:]

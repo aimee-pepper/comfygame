@@ -27,6 +27,7 @@ enum CombatRules {
                               debugV2Initiative: EncounterState.DebugV2InitiativeReceipt? = nil,
                               debugV2Armour: EncounterState.DebugV2ArmourReceipt? = nil,
                               debugV2Evasion: EncounterState.DebugV2EvasionReceipt? = nil,
+                              debugV2Resistance: EncounterState.DebugV2ResistanceReceipt? = nil,
                               ghostEvasionAvailable: Set<Combatant>? = nil,
                               debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = nil,
                               partyRanks: [Combatant: Rank] = [:],
@@ -109,6 +110,7 @@ enum CombatRules {
             debugV2Initiative: finalizedInitiative,
             debugV2Armour: debugV2Armour,
             debugV2Evasion: debugV2Evasion,
+            debugV2Resistance: debugV2Resistance,
             ghostEvasionAvailable: ghostEvasionAvailable,
             debugV2OwnedNodeIDs: debugV2OwnedNodeIDs,
             partyRanks: partyRanks,
@@ -1686,32 +1688,38 @@ enum CombatRules {
             if grounded { raw *= 0.5 }
             if foe.stats.damageKind == .crush { raw *= 1 + Tuning.Encounter.crushDamageBonus }
 
-            // **What you're wearing turns aside heat**, whatever it was made of (Q36).
-            if foe.stats.element == .heat {
-                raw *= 1 - min(Tuning.Encounter.maximumInsulation,
-                               insulation(of: target, in: state) * Tuning.Encounter.insulationPerPoint)
-            }
-
             // **Ward.** Turns aside one harm, so you have to know what's coming — which is what
             // Sight is for. Guessing wrong costs you the round you spent setting it.
             let incoming: Harm = (encounter.snuffed.contains(foeID) ? nil : foe.stats.element)
                 .map(Harm.emanation) ?? .blow(foe.stats.damageKind)
-            if encounter.wards[target]?.harm == incoming {
-                raw *= 1 - Tuning.Encounter.wardReduction
-            }
+            let wardMultiplier = encounter.wards[target]?.harm == incoming
+                ? 1 - Tuning.Encounter.wardReduction : 1
             // The Haft is a modest continuous ward against one authored blow type. Applied after
             // the skill ward so the two stack multiplicatively rather than replacing each other.
-            if case .blow(let kind) = incoming {
-                raw *= wardedHaftMultiplier(against: kind, for: target, in: state)
-            }
 
             let amount: Int
             // **Snuff** puts out whatever it was giving off, and with it the damage nothing you
             // wear could stop.
-            if foe.stats.element != nil, !encounter.snuffed.contains(foeID) {
-                // Nothing you're wearing stops caustic, heat or light.
-                amount = max(Tuning.Encounter.minimumDamage, Int(raw.rounded()))
+            if let element = foe.stats.element, !encounter.snuffed.contains(foeID) {
+                let wornMultiplier = element == .heat
+                    ? 1 - min(Tuning.Encounter.maximumInsulation,
+                              insulation(of: target, in: state) * Tuning.Encounter.insulationPerPoint)
+                    : 1
+                if let receipt = encounter.debugV2Resistance {
+                    amount = CombatDerivedStatsRules.emanationDamage(
+                        raw: raw, element: element, receiver: target, receipt: receipt,
+                        wornInsulationMultiplier: wornMultiplier,
+                        wardMultiplier: wardMultiplier).finalDamage
+                } else {
+                    // Preserve the frozen legacy arithmetic for encounters without a v2 receipt.
+                    amount = max(Tuning.Encounter.minimumDamage,
+                                 Int((raw * wornMultiplier * wardMultiplier).rounded()))
+                }
             } else {
+                raw *= wardMultiplier
+                if case .blow(let kind) = incoming {
+                    raw *= wardedHaftMultiplier(against: kind, for: target, in: state)
+                }
                 let ignored = foe.stats.damageKind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0
                 amount = damageTaken(Int(raw.rounded()), by: target, in: state, run: run,
                                      encounter: encounter, armourIgnored: ignored)

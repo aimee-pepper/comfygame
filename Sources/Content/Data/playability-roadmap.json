@@ -3,8 +3,8 @@
   "updated": "12 Aug 2026",
   "installedCheckpoint": "4ed15ab · signed Homework build installed · on-device developer trust required",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 combat-v2 · Footwork and Ghost final-target miss receipt",
-  "currentNote": "Signed checkpoint 4ed15ab is installed on Aimee's phone with Settings → Homework, 17 questions, answer history and Thick Hide DEBUG preview; automatic launch is blocked only by on-device developer-profile trust. Combat-v2 Stagger is committed at d33c027 after 102/102 focused and 1,208/1,208 full tests. The active contained slice is the shared final-target miss resolver: frozen personal evasion plus Footwork, consumed Sidestep and one saved Ghost before one capped RNG. Area and multi-target harm must not borrow personal evasion.",
+  "currentWork": "P1 combat-v2 · typed Insulation receipt",
+  "currentNote": "Signed checkpoint 4ed15ab is installed on Aimee's phone with Settings → Homework; automatic launch remains blocked only by on-device developer-profile trust. Combat-v2 Stagger is committed at d33c027. Footwork and Ghost are committed at c4d62a5 after 108/108 focused and 1,214/1,214 full tests; that shared final-target resolver also repairs consumed Sidestep, one-use Ghost, miss payload suppression and area/multi exclusion. The next contained slice is exact-owner Heat/Caustic/Light Insulation with one frozen matching-harm multiplier; it must not protect physical or carried affliction damage.",
   "items": [
     {
       "id": "essence",
@@ -211,7 +211,7 @@
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
       "status": "inProgress",
-      "detail": "Stage A is checkpointed in 9326494/b912d55; Heavy Hand, Keen Eye, Quick Step and Light Frame are committed, b7b320c adds Thick Hide, df5a963 adds frozen shared Iron Skin/Bulwark/Shieldwall armour, and d33c027 activates Stagger. Nine nodes now have real DEBUG-path scenario consumers. Footwork plus the coupled one-use Ghost/Sidestep final-target miss pipeline is active; Light Touch/Momentum still waits on its wider gear-tempo receipt. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
+      "detail": "Stage A is checkpointed in 9326494/b912d55; Heavy Hand, Keen Eye, Quick Step and Light Frame are committed, b7b320c adds Thick Hide, df5a963 adds shared Iron Skin/Bulwark/Shieldwall armour, d33c027 activates Stagger, and c4d62a5 activates Footwork plus exact one-use Ghost while repairing Sidestep's real final-target path. Eleven nodes now have real DEBUG-path scenario consumers. Typed Insulation is the active contained consumer; Light Touch/Momentum still waits on its wider gear-tempo receipt. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {

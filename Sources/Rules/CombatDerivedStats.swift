@@ -53,6 +53,23 @@ enum CombatDerivedStatsRules {
         var finalDamage: Int
     }
 
+    struct ResistanceComponent: Codable, Equatable, Sendable {
+        enum Source: String, Codable, Equatable, Sendable { case wornInsulation, ward, insulation }
+        var source: Source
+        var nodeID: CombatNodeID?
+        var multiplier: Double
+    }
+
+    struct EmanationDamageResult: Codable, Equatable, Sendable {
+        var receiver: Combatant
+        var element: EmanationKind
+        var raw: Double
+        var components: [ResistanceComponent]
+        var combinedMultiplier: Double
+        var roundedDamage: Int
+        var finalDamage: Int
+    }
+
     struct Input: Equatable, Sendable {
         var actorIdentity: String
         var stats: CharacterStats
@@ -193,6 +210,67 @@ enum CombatDerivedStatsRules {
                          components: components)
         }
         return .init(entries: entries)
+    }
+
+    static func debugResistanceReceipt(
+        enabled: Bool, party: [Combatant],
+        binderNodeIDs: Set<CombatNodeID>,
+        binderChoices: [CombatNodeID: StableChoiceID],
+        companionNodeIDs: [Int: Set<CombatNodeID>],
+        companionChoices: [Int: [CombatNodeID: StableChoiceID]]
+    ) -> EncounterState.DebugV2ResistanceReceipt? {
+        guard enabled else { return nil }
+        let entries = party.map { actor -> EncounterState.DebugV2ResistanceReceipt.Entry in
+            let owned: Set<CombatNodeID>
+            let choices: [CombatNodeID: StableChoiceID]
+            switch actor {
+            case .binder:
+                owned = binderNodeIDs
+                choices = binderChoices
+            case .companion(let index):
+                owned = companionNodeIDs[index] ?? []
+                choices = companionChoices[index] ?? [:]
+            case .foe:
+                owned = []
+                choices = [:]
+            }
+            let choice = owned.contains(Node.insulation)
+                ? choices[Node.insulation].flatMap { EmanationKind(rawValue: $0.rawValue) }
+                : nil
+            return .init(actor: actor, insulationChoice: choice)
+        }
+        return .init(entries: entries)
+    }
+
+    /// One rounding point for continuous emanation multipliers. Afflictions never call this path.
+    static func emanationDamage(
+        raw: Double, element: EmanationKind, receiver: Combatant,
+        receipt: EncounterState.DebugV2ResistanceReceipt,
+        wornInsulationMultiplier: Double = 1,
+        wardMultiplier: Double = 1,
+        minimumDamage: Int = Tuning.Encounter.minimumDamage
+    ) -> EmanationDamageResult {
+        var components: [ResistanceComponent] = []
+        if wornInsulationMultiplier < 1 {
+            components.append(.init(source: .wornInsulation, nodeID: nil,
+                                    multiplier: max(0, wornInsulationMultiplier)))
+        }
+        if wardMultiplier < 1 {
+            components.append(.init(source: .ward, nodeID: nil,
+                                    multiplier: max(0, wardMultiplier)))
+        }
+        let matchingInsulation = receipt.entry(for: receiver)?.insulationChoice == element
+        if matchingInsulation {
+            components.append(.init(source: .insulation, nodeID: Node.insulation, multiplier: 0.65))
+        }
+        let combined = components.reduce(1.0) { $0 * $1.multiplier }
+        let reduced = max(0, raw) * combined
+        // An enabled-empty v2 harness must be byte/outcome-equivalent to legacy. The new
+        // floor-once contract begins only when matching Insulation is a real contributor.
+        let rounded = matchingInsulation ? Int(floor(reduced)) : Int(reduced.rounded())
+        return .init(receiver: receiver, element: element, raw: raw, components: components,
+                     combinedMultiplier: combined, roundedDamage: rounded,
+                     finalDamage: max(minimumDamage, rounded))
     }
 
     static func incomingDamage(raw: Int, receiver: Combatant,
