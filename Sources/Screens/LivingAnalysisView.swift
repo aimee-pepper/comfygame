@@ -6,8 +6,11 @@ struct LivingAnalysisView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
+            Text("Generated estimate · \(LivingAnalysisRules.sampleCount) deterministic samples")
+                .font(.caption)
+                .foregroundStyle(.secondary)
             group("Creature traits", icon: "pawprint.fill", lines: analysis.creatureTraits)
-            group("Likely ecological roles", icon: "point.3.connected.trianglepath.dotted",
+            group("Sampled ecological roles", icon: "point.3.connected.trianglepath.dotted",
                   lines: analysis.ecologicalRoles)
             group("Flora traits", icon: "leaf.fill", lines: analysis.floraTraits)
         }

@@ -69,6 +69,7 @@ final class SmithTests: XCTestCase {
         let mythic = SmithRules.maximumLevel(for: ContentCatalog.shared.item("the_long_grievance")!)
         XCTAssertEqual(common, 3)
         XCTAssertEqual(mythic, 3)
+        XCTAssertEqual(common, SmithRules.maximumReforgeLevel)
         XCTAssertNil(SmithRules.requirement(for: "blade_chipped", at: common),
                      "a finished piece was still offering another reforging")
     }

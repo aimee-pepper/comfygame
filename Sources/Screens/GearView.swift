@@ -192,7 +192,7 @@ private struct GearOptionDetailSheet: View {
                     LabeledContent("Power", value: String(format: "%.1f", option.piece.effectivePower))
                     if let profile = option.piece.gearProfile {
                         LabeledContent("Tier", value: "\(profile.constructionTier)")
-                        LabeledContent("Reforge", value: "\(profile.reforgeRank) of 3")
+                        LabeledContent("Reforge", value: "\(profile.reforgeRank) of \(SmithRules.maximumReforgeLevel)")
                         if let provenance = profile.displayProvenance {
                             LabeledContent("Provenance", value: provenance)
                         }

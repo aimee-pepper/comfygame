@@ -394,10 +394,11 @@ private struct StationFoundationSheet: View {
                     }
                     if let median = runway.recentMedianBindCost,
                        let remaining = runway.authoredBindsRemaining {
-                        LabeledContent("Recent authored bind", value: median.formatted(.number.precision(.fractionLength(0...1))))
-                        LabeledContent("Writing runway", value: "\(remaining.formatted(.number.precision(.fractionLength(1)))) binds")
+                        LabeledContent("Recent median authored bind", value: median.formatted(.number.precision(.fractionLength(0...1))))
+                        LabeledContent("Estimated runway at that median",
+                                       value: "≈ \(remaining.formatted(.number.precision(.fractionLength(1)))) binds")
                     } else {
-                        Text("Writing runway appears after an authored world has been bound and recorded.")
+                        Text("A runway estimate appears after an authored world has been bound and recorded.")
                     }
                     switch runway.warning {
                     case .low:

@@ -242,7 +242,8 @@ final class InstrumentTests: XCTestCase {
         XCTAssertFalse(first.creatureTraits.isEmpty)
         XCTAssertFalse(first.ecologicalRoles.isEmpty)
         XCTAssertFalse(first.floraTraits.isEmpty)
-        XCTAssertTrue(first.ecologicalRoles.allSatisfy { $0.contains("% likely") })
+        XCTAssertTrue(first.ecologicalRoles.allSatisfy { $0.contains("% in sample") })
+        XCTAssertTrue(first.creatureTraits.allSatisfy { $0.contains("sampled middle range") })
     }
 
     func testVisitedWorldCapturesLivingAnalysisForLaterTierFiveReading() {

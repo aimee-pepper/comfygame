@@ -11,7 +11,7 @@ struct LivingAnalysis: Codable, Equatable, Sendable {
 }
 
 enum LivingAnalysisRules {
-    private static let sampleCount = 96
+    static let sampleCount = 96
 
     static func analyze(_ readings: PressureReadings) -> LivingAnalysis {
         var creatureRNG = SeededRNG(seed: 0x1A11_515).derived(0xC0FFEE)
@@ -28,7 +28,7 @@ enum LivingAnalysisRules {
         let roles = roleCounts
             .map { (role: $0.key, count: $0.value) }
             .sorted { $0.count == $1.count ? $0.role < $1.role : $0.count > $1.count }
-            .map { "\($0.role.capitalisedSentence): \(percent($0.count)) likely" }
+            .map { "\($0.role.capitalisedSentence): ≈\(percent($0.count)) in sample" }
 
         var floraRNG = SeededRNG(seed: 0xF10A_515).derived(0xC0FFEE)
         let conditions = GrowingConditions(readings: readings)
@@ -41,7 +41,7 @@ enum LivingAnalysisRules {
         var floraLines = ranges(flora.map(\.stature), named: "Stature")
             + ranges(flora.map(\.defence), named: "Defence")
         floraLines += metabolism.map { kind, count in
-            "\(kind.displayName.capitalisedSentence): \(percent(count)) likely"
+            "\(kind.displayName.capitalisedSentence): ≈\(percent(count)) in sample"
         }.sorted()
 
         return LivingAnalysis(
@@ -58,7 +58,7 @@ enum LivingAnalysisRules {
         let ordered = values.sorted()
         let low = ordered[ordered.count / 4]
         let high = ordered[(ordered.count * 3) / 4]
-        return ["\(name): usually \(Int(low.rounded()))–\(Int(high.rounded()))"]
+        return ["\(name): sampled middle range \(Int(low.rounded()))–\(Int(high.rounded()))"]
     }
 
     private static func percent(_ count: Int) -> String {

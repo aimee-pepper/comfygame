@@ -196,7 +196,7 @@ private struct DebugBugReportSheet: View {
                         .accessibilityLabel("What did you expect? Optional")
                 }
                 Section("Captured context") {
-                    LabeledContent("Roadmap checkpoint", value: DebugRoadmap.current.installedCheckpoint)
+                    LabeledContent("Bundled roadmap claim", value: DebugRoadmap.current.installedCheckpoint)
                     LabeledContent("Mode", value: draft.context.screen)
                     if let route = draft.context.route { LabeledContent("Screen", value: route) }
                     if let campaign = draft.context.campaignReference {

@@ -241,7 +241,7 @@ private struct TradingPostListingSheet: View {
                         if let profile = stack.gearProfile {
                             LabeledContent("Power", value: profile.effectivePower.formatted(.number.precision(.fractionLength(0...1))))
                             LabeledContent("Construction tier", value: "\(profile.constructionTier)")
-                            LabeledContent("Reforge", value: "\(profile.reforgeRank) of 3")
+                            LabeledContent("Reforge", value: "\(profile.reforgeRank) of \(SmithRules.maximumReforgeLevel)")
                             if let provenance = profile.displayProvenance {
                                 LabeledContent("Provenance", value: provenance)
                             }

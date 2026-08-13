@@ -663,7 +663,7 @@ private struct StorehouseItemSheet: View {
                         if !stack.detail.isEmpty { Text(stack.detail) }
                         if let profile = stack.gearProfile {
                             LabeledContent("Tier", value: "\(profile.constructionTier)")
-                            LabeledContent("Reforge", value: "\(profile.reforgeRank) of 3")
+                            LabeledContent("Reforge", value: "\(profile.reforgeRank) of \(SmithRules.maximumReforgeLevel)")
                             if let provenance = profile.displayProvenance {
                                 LabeledContent("Provenance", value: provenance)
                             }

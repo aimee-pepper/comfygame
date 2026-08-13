@@ -21,6 +21,20 @@ final class DebugRoadmapTests: XCTestCase {
             XCTAssertEqual(try XCTUnwrap(byID[id]).status, .complete, "\(id) is already installed")
         }
     }
+
+    func testBundledRoadmapIsDisclosedAsAClaimRatherThanInstalledEvidence() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let roadmap = try String(contentsOf: root.appending(path: "Sources/Debug/DebugRoadmapView.swift"),
+                                 encoding: .utf8)
+        let reporter = try String(contentsOf: root.appending(path: "Sources/Debug/DebugBugReporterView.swift"),
+                                  encoding: .utf8)
+        XCTAssertTrue(roadmap.contains("Bundled planning snapshot"))
+        XCTAssertTrue(roadmap.contains("not a measurement of the installed commit"))
+        XCTAssertFalse(roadmap.contains("Live DEBUG view"))
+        XCTAssertTrue(reporter.contains("Bundled roadmap claim"))
+        XCTAssertFalse(reporter.contains("LabeledContent(\"Roadmap checkpoint\""))
+    }
 }
 
 @MainActor

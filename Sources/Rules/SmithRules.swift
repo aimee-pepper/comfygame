@@ -12,6 +12,9 @@ import Foundation
 /// Nothing here rolls dice: what a reforge costs and what it gives are both stated before you agree
 /// to it, so a force-quit halfway through the decision loses nothing.
 enum SmithRules {
+    /// Single presentation and validation authority for the within-tier reforge ceiling.
+    static var maximumReforgeLevel: Int { Tuning.Smith.maximumReforgeRank }
+
 
     // MARK: What the smith asks for
 
@@ -48,7 +51,7 @@ enum SmithRules {
     /// specialist hierarchy; reforging can improve a piece but can never promote it across that
     /// boundary.
     static func maximumLevel(for definition: ItemDef) -> Int {
-        Tuning.Smith.maximumReforgeRank
+        maximumReforgeLevel
     }
 
     /// What the next step up costs. Nil when the piece is finished, or isn't gear at all.

@@ -49,8 +49,8 @@ struct DebugRoadmapView: View {
                 Text("Playability first")
             }
 
-            Section("Current build") {
-                LabeledContent("Installed checkpoint", value: board.installedCheckpoint)
+            Section("Bundled planning snapshot") {
+                LabeledContent("Checkpoint claimed by this bundle", value: board.installedCheckpoint)
                 LabeledContent("Essence baseline", value: board.essenceBaseline)
                 LabeledContent("Current work", value: board.currentWork)
                 Text(board.currentNote)
@@ -76,7 +76,7 @@ struct DebugRoadmapView: View {
                     .font(.caption.monospaced())
                     .textSelection(.enabled)
             } footer: {
-                Text("Live DEBUG view · updated \(board.updated) from bundled playability-roadmap.json. The app contains no separate hand-maintained status list.")
+                Text("Bundled planning snapshot · updated \(board.updated). This is authored roadmap data, not a measurement of the installed commit, build, tests, or device state.")
             }
         }
         .accessibilityIdentifier("debug-roadmap")
