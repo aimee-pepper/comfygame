@@ -26,6 +26,8 @@ enum CombatRules {
                               debugV2BinderAttack: EncounterState.DebugV2BinderAttackReceipt? = nil,
                               debugV2Initiative: EncounterState.DebugV2InitiativeReceipt? = nil,
                               debugV2Armour: EncounterState.DebugV2ArmourReceipt? = nil,
+                              debugV2Evasion: EncounterState.DebugV2EvasionReceipt? = nil,
+                              ghostEvasionAvailable: Set<Combatant>? = nil,
                               debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = nil,
                               partyRanks: [Combatant: Rank] = [:],
                               rng: inout SeededRNG) -> EncounterState {
@@ -106,6 +108,8 @@ enum CombatRules {
             debugV2BinderAttack: debugV2BinderAttack,
             debugV2Initiative: finalizedInitiative,
             debugV2Armour: debugV2Armour,
+            debugV2Evasion: debugV2Evasion,
+            ghostEvasionAvailable: ghostEvasionAvailable,
             debugV2OwnedNodeIDs: debugV2OwnedNodeIDs,
             partyRanks: partyRanks,
             log: opening
@@ -266,20 +270,56 @@ enum CombatRules {
         return .poison
     }
 
-    /// Whether a blow simply misses somebody. **Finesse, on the party's side of the fight** — the
-    /// mirror of a creature's evasion, which has existed since creatures were generated.
-    static func evades(_ actor: Combatant, in state: GameState, run: inout WorldRun,
-                       encounter: EncounterState? = nil) -> Bool {
-        // **Sidestep and Ghost are certainties, not chances.** A skill that says "that one misses"
-        // has to mean it, or it is a slightly better Footwork.
-        if let encounter {
-            if (encounter.dodging[actor] ?? 0) > 0 { return true }
-            let ghost = loadout(of: actor, in: state).firstAttackAlwaysMisses
-            if ghost, encounter.roundNumber == 1 { return true }
+    /// The one final-target miss resolver for otherwise legal single-target direct foe attacks.
+    /// Guaranteed receipts consume before probability and therefore consume no RNG.
+    static func resolvePartyMiss(_ actor: Combatant, in state: GameState, run: inout WorldRun,
+                                 encounter: inout EncounterState) -> Bool {
+        if encounter.ghostEvasionAvailable == nil {
+            // One-time adoption for tolerant mid-fight saves. A modern empty set is deliberately
+            // distinct and must never remint a consumed Ghost on relaunch.
+            encounter.ghostEvasionAvailable = Set(encounter.order.filter { candidate in
+                guard candidate.foeID == nil else { return false }
+                return loadout(of: candidate, in: state).firstAttackAlwaysMisses
+            })
         }
-        guard let stats = stats(of: actor, in: state) else { return false }
-        let fromTree = loadout(of: actor, in: state).evasion
-        return run.rng.chance(min(0.85, CharacterRules.evasion(stats) + fromTree))
+        let frozen = encounter.debugV2Evasion?.entry(for: actor)
+        let character: Double
+        let components: [EncounterState.DebugV2EvasionReceipt.Component]
+        if encounter.debugV2Evasion != nil {
+            // An incomplete/corrupt v2 receipt fails closed instead of mixing in mutable Base data.
+            character = frozen?.characterEvasion ?? 0
+            components = frozen?.components ?? []
+        } else {
+            character = stats(of: actor, in: state).map(CharacterRules.evasion) ?? 0
+            let legacy = loadout(of: actor, in: state).evasion
+            components = legacy > 0
+                ? [.init(nodeID: CombatDerivedStatsRules.Node.footwork, amount: legacy)] : []
+        }
+        let chance = min(0.85, max(0, character + components.reduce(0) { $0 + $1.amount }))
+        func record(_ resolution: EncounterState.EvasionAttempt.Resolution,
+                    roll: Double?, missed: Bool) {
+            encounter.evasionAttempts.append(.init(actor: actor, characterEvasion: character,
+                                                    components: components, finalChance: chance,
+                                                    roll: roll, resolution: resolution,
+                                                    missed: missed))
+            if encounter.evasionAttempts.count > 24 {
+                encounter.evasionAttempts.removeFirst(encounter.evasionAttempts.count - 24)
+            }
+        }
+        if (encounter.dodging[actor] ?? 0) > 0 {
+            encounter.dodging.removeValue(forKey: actor)
+            record(.sidestep, roll: nil, missed: true)
+            return true
+        }
+        if encounter.ghostEvasionAvailable?.contains(actor) == true {
+            encounter.ghostEvasionAvailable?.remove(actor)
+            record(.ghost, roll: nil, missed: true)
+            return true
+        }
+        let roll = run.rng.double(in: 0...1)
+        let missed = roll < chance
+        record(missed ? .probabilityMiss : .probabilityHit, roll: roll, missed: missed)
+        return missed
     }
 
     static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
@@ -1345,7 +1385,7 @@ enum CombatRules {
         return copy
     }
 
-    private static func startNewRound(_ encounter: inout EncounterState, run: WorldRun) {
+    static func startNewRound(_ encounter: inout EncounterState, run: WorldRun) {
         encounter.roundNumber += 1
         applyPendingStaggers(for: encounter.roundNumber, run: run, encounter: &encounter)
         encounter.apexTargetsThisRound.removeAll()
@@ -1362,7 +1402,7 @@ enum CombatRules {
         }
         // The five the trees leave on somebody. **A clock that never ticks is a permanent effect**,
         // which is what Brace and Conceal would silently have become.
-        tick(&encounter.braced); tick(&encounter.dodging); tick(&encounter.concealed)
+        tick(&encounter.braced); tick(&encounter.concealed)
         tick(&encounter.interposing); tick(&encounter.grounding); tick(&encounter.envenomed)
     }
 
@@ -1636,7 +1676,9 @@ enum CombatRules {
             }
             // **Not where the blow landed** (session 17 §1). Finesse on the party's side, the
             // mirror of the evasion creatures have had since they were generated.
-            if evades(target, in: state, run: &run) {
+            let isSingleTargetDirect = isFollowUp || foe.stats.delivery == .single
+            if isSingleTargetDirect,
+               resolvePartyMiss(target, in: state, run: &run, encounter: &encounter) {
                 encounter.note("\(foe.stats.displayName.capitalisedSentence) finds nothing where \(actorName(target, encounter: encounter).lowercased()) was.")
                 continue
             }

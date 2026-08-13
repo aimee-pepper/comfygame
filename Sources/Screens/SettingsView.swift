@@ -515,6 +515,10 @@ struct BalancingView: View {
                                       id: CombatDerivedStatsRules.Node.shieldwall)
                 debugCombatNodeToggle("Stagger · landed Crush has 30% next-round delay",
                                       id: CombatDerivedStatsRules.Node.stagger)
+                debugCombatNodeToggle("Footwork · personal miss chance +6 points",
+                                      id: CombatDerivedStatsRules.Node.footwork)
+                debugCombatNodeToggle("Ghost · first direct attack misses once",
+                                      id: CombatDerivedStatsRules.Node.ghost)
                 ForEach(store.state.base.activeParty, id: \.self) { index in
                     if store.state.base.roster.indices.contains(index) {
                         let name = store.state.base.roster[index].name
@@ -533,6 +537,10 @@ struct BalancingView: View {
                                                  id: CombatDerivedStatsRules.Node.shieldwall)
                         debugCompanionNodeToggle("Stagger · Crush delay", index: index,
                                                  id: CombatDerivedStatsRules.Node.stagger)
+                        debugCompanionNodeToggle("Footwork · miss chance +6", index: index,
+                                                 id: CombatDerivedStatsRules.Node.footwork)
+                        debugCompanionNodeToggle("Ghost · one guaranteed miss", index: index,
+                                                 id: CombatDerivedStatsRules.Node.ghost)
                     }
                 }
                 if settings.debugTuning.debugCombatV2BinderAttackEnabled,
@@ -543,6 +551,20 @@ struct BalancingView: View {
                     }
                 }
                 if settings.debugTuning.debugCombatV2BinderAttackEnabled {
+                    Text("Next encounter personal evasion")
+                        .font(.subheadline.weight(.semibold))
+                    ForEach(debugEvasionPreview?.entries ?? [], id: \.actor) { entry in
+                        let footwork = entry.components.first {
+                            $0.nodeID == CombatDerivedStatsRules.Node.footwork
+                        }?.amount ?? 0
+                        let ghostOwned: Bool = switch entry.actor {
+                        case .binder: settings.debugTuning.debugCombatV2BinderNodeIDs.contains(CombatDerivedStatsRules.Node.ghost)
+                        case .companion(let index): (settings.debugTuning.debugCombatV2CompanionNodeIDs[index] ?? []).contains(CombatDerivedStatsRules.Node.ghost)
+                        case .foe: false
+                        }
+                        Text("\(debugActorName(entry.actor)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "") = \(Int(entry.total * 100))% · Ghost \(ghostOwned ? "ready" : "not owned")")
+                            .font(.caption.monospacedDigit())
+                    }
                     Text("Next expedition health caps")
                         .font(.subheadline.weight(.semibold))
                     ForEach(debugHealthCapPreview, id: \.member) { entry in
@@ -697,6 +719,14 @@ struct BalancingView: View {
 
     private var debugHealthCapPreview: [RunHealthCapEntry] {
         CombatRules.expeditionHealthCaps(in: store.state, tuning: settings.debugTuning)
+    }
+
+    private var debugEvasionPreview: EncounterState.DebugV2EvasionReceipt? {
+        CombatDerivedStatsRules.debugEvasionReceipt(
+            enabled: settings.debugTuning.debugCombatV2BinderAttackEnabled,
+            party: CombatRules.party(of: store.state), in: store.state,
+            binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
+            companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs)
     }
 
     private var debugArmourReceipt: EncounterState.DebugV2ArmourReceipt? {

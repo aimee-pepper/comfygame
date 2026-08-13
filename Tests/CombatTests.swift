@@ -1083,6 +1083,8 @@ final class CombatTests: XCTestCase {
             let store = inFightWith([crusher])
             store.mutate("test: stand and take it") { state in
                 guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+                // Ward is the variable under test; the all-nodes fixture also owns Ghost.
+                encounter.ghostEvasionAvailable = []
                 if let against { encounter.wards[.binder] = WardState(against: .blow(against), rounds: 3) }
                 // Force the foe to act next, at the Binder.
                 let foe = encounter.foes[0].id
@@ -1341,6 +1343,9 @@ final class CombatTests: XCTestCase {
         let asheBefore = try XCTUnwrap(try XCTUnwrap(store.activeRun).companionHP[0])
         giveTheTurnTo(.companion(0), in: store)
         store.mutate("test: ground") {
+            // This fixture isolates Ground; `learnEverything` also owns Ghost, whose now-correct
+            // one-use receipt would otherwise consume the redirected direct attack first.
+            $0.worlds.activeRun?.activeEncounter?.ghostEvasionAvailable = []
             CombatRules.perform(.skill("ground"), by: .companion(0), in: &$0)
             CombatRules.runAutomaticTurns(in: &$0)
         }
@@ -2583,5 +2588,208 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(encounter.turnSlots.map(\.kind).map(String.init(describing:)).sorted(),
                        before.map(\.kind).map(String.init(describing:)).sorted(),
                        "saved payload kinds remain present without duplicate scheduling")
+    }
+
+    func testFootworkReceiptIsExactOwnerFrozenAndClampedWithoutAura() throws {
+        var state = GameState.newGame()
+        while state.base.roster.count < 4 { state.base.roster.append(CompanionState()) }
+        state.base.activeParty = [0, 1, 2, 3]
+        state.base.binderCharacter.stats.finesse = 100
+        let party = CombatRules.party(of: state)
+        let receipt = try XCTUnwrap(CombatDerivedStatsRules.debugEvasionReceipt(
+            enabled: true, party: party, in: state,
+            binderNodeIDs: [CombatDerivedStatsRules.Node.footwork],
+            companionNodeIDs: [2: [CombatDerivedStatsRules.Node.footwork]]))
+        XCTAssertEqual(receipt.entries.count, 5)
+        XCTAssertEqual(receipt.entry(for: .binder)?.components.map(\.nodeID),
+                       [CombatDerivedStatsRules.Node.footwork])
+        XCTAssertEqual(receipt.entry(for: .companion(2))?.components.map(\.nodeID),
+                       [CombatDerivedStatsRules.Node.footwork])
+        XCTAssertTrue([0, 1, 3].allSatisfy {
+            receipt.entry(for: .companion($0))?.components.isEmpty == true
+        }, "Footwork is personal and cannot become a five-person aura")
+        let frozenTotal = try XCTUnwrap(receipt.entry(for: .binder)?.total)
+        XCTAssertEqual(frozenTotal, min(0.85,
+            try XCTUnwrap(receipt.entry(for: .binder)?.characterEvasion) + 0.06))
+        let clamped = EncounterState.DebugV2EvasionReceipt.Entry(
+            actor: .binder, characterEvasion: 0.82,
+            components: [.init(nodeID: CombatDerivedStatsRules.Node.footwork, amount: 0.06)])
+        XCTAssertEqual(clamped.total, 0.85)
+
+        state.base.binderCharacter.stats.finesse = 0
+        let frozen = try XCTUnwrap(receipt.entry(for: .binder))
+        XCTAssertEqual(frozen.total, frozenTotal, "post-contact Base edits cannot rewrite the receipt")
+        XCTAssertNil(CombatDerivedStatsRules.debugEvasionReceipt(
+            enabled: false, party: party, in: state,
+            binderNodeIDs: [CombatDerivedStatsRules.Node.footwork], companionNodeIDs: [:]))
+    }
+
+    func testSidestepThenGhostThenProbabilityConsumeInExactOrder() throws {
+        let state = GameState.newGame()
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 1, rng: SeededRNG(seed: 12), map: map,
+                           playerPosition: .init(x: 0, y: 0), binderHP: 20)
+        var encounter = EncounterState(id: .init(rawValue: 1), foes: [], order: [.binder],
+            debugV2Evasion: .init(entries: [.init(actor: .binder, characterEvasion: 0,
+                components: [.init(nodeID: CombatDerivedStatsRules.Node.footwork, amount: 0.06)])]),
+            ghostEvasionAvailable: [.binder])
+        encounter.dodging[.binder] = 1
+        encounter.dodging[.companion(0)] = 1
+        let before = run.rng.drawCount
+        XCTAssertTrue(CombatRules.resolvePartyMiss(.binder, in: state, run: &run, encounter: &encounter))
+        XCTAssertNil(encounter.dodging[.binder])
+        XCTAssertEqual(encounter.evasionAttempts.last?.resolution, .sidestep)
+        XCTAssertEqual(run.rng.drawCount, before)
+
+        CombatRules.startNewRound(&encounter, run: run)
+        XCTAssertEqual(encounter.dodging[.binder], nil,
+                       "Sidestep was consumed by the attack, not expired by the round")
+        XCTAssertEqual(encounter.dodging[.companion(0)], 1,
+                       "an unused Sidestep persists across round transitions")
+        XCTAssertTrue(CombatRules.resolvePartyMiss(.binder, in: state, run: &run, encounter: &encounter))
+        XCTAssertEqual(encounter.evasionAttempts.last?.resolution, .ghost)
+        XCTAssertEqual(encounter.ghostEvasionAvailable, [])
+        XCTAssertEqual(run.rng.drawCount, before)
+
+        _ = CombatRules.resolvePartyMiss(.binder, in: state, run: &run, encounter: &encounter)
+        XCTAssertNotNil(encounter.evasionAttempts.last?.roll)
+        XCTAssertEqual(run.rng.drawCount, before + 1)
+    }
+
+    func testLegacyGhostAdoptsOnceAndSpentReceiptDoesNotRemintAfterReload() throws {
+        var state = GameState.newGame()
+        Self.learnEverything(&state)
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: .init(x: 0, y: 0))
+        map[.init(x: 0, y: 0)].content = .portal(isEntry: true)
+        var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0), mapSeed: 1,
+                           rng: SeededRNG(seed: 3), map: map, playerPosition: .init(x: 0, y: 0), binderHP: 20)
+        var legacy = EncounterState(id: .init(rawValue: 2), foes: [], order: [.binder])
+        XCTAssertNil(legacy.ghostEvasionAvailable)
+        XCTAssertTrue(CombatRules.resolvePartyMiss(.binder, in: state, run: &run, encounter: &legacy))
+        XCTAssertEqual(legacy.evasionAttempts.last?.resolution, .ghost)
+        XCTAssertEqual(legacy.ghostEvasionAvailable, [])
+        var resumed = try JSONDecoder().decode(EncounterState.self,
+                                                from: JSONEncoder().encode(legacy))
+        XCTAssertEqual(resumed.ghostEvasionAvailable, [])
+        _ = CombatRules.resolvePartyMiss(.binder, in: state, run: &run, encounter: &resumed)
+        XCTAssertNotEqual(resumed.evasionAttempts.last?.resolution, .ghost,
+                          "modern spent-empty must never rederive Ghost from legacy ownership")
+    }
+
+    func testAreaAndMultiFoeAttacksDoNotConsumePersonalEvasionReceiptsOrRoll() throws {
+        for delivery in [Delivery.area, .multi] {
+            let store = inFight()
+            store.mutate("stage \(delivery) exclusion") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                      !encounter.foes.isEmpty else { return }
+                encounter.foes[0].stats.delivery = delivery
+                encounter.foes[0].stats.evasion = 0
+                encounter.foes[0].stats.attack = 2
+                encounter.order = [.foe(encounter.foes[0].id), .binder]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.debugV2Evasion = .init(entries: [.init(actor: .binder,
+                    characterEvasion: 0.79,
+                    components: [.init(nodeID: CombatDerivedStatsRules.Node.footwork, amount: 0.06)])])
+                encounter.ghostEvasionAvailable = [.binder]
+                encounter.dodging[.binder] = 1
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                CombatRules.runAutomaticTurns(in: &state)
+            }
+            let encounter = try XCTUnwrap(store.activeEncounter)
+            XCTAssertTrue(encounter.evasionAttempts.isEmpty, "\(delivery) must bypass personal evasion")
+            XCTAssertEqual(encounter.dodging[.binder], 1)
+            XCTAssertEqual(encounter.ghostEvasionAvailable, [.binder])
+        }
+    }
+
+    func testRealSingleTargetFoeRouteUsesFootworkForMissAndHitAndMissSuppressesPayload() throws {
+        func staged(seed: UInt64) -> GameStore {
+            let store = inFight()
+            store.mutate("stage direct Footwork route") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                      !encounter.foes.isEmpty else { return }
+                run.rng = SeededRNG(seed: seed)
+                run.binderHP = 20
+                run.companionHP[0] = 0
+                encounter.foes[0].stats.delivery = .single
+                encounter.foes[0].stats.element = .heat
+                encounter.foes[0].stats.attack = 6
+                encounter.order = [.foe(encounter.foes[0].id), .binder]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.debugV2Evasion = .init(entries: [.init(actor: .binder,
+                    characterEvasion: 0.50,
+                    components: [.init(nodeID: CombatDerivedStatsRules.Node.footwork, amount: 0.06)])])
+                encounter.ghostEvasionAvailable = []
+                encounter.dodging.removeAll()
+                encounter.statuses[.binder] = []
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                CombatRules.runAutomaticTurns(in: &state)
+            }
+            return store
+        }
+        func seed(where predicate: (Double) -> Bool) -> UInt64 {
+            var seed: UInt64 = 1
+            while true {
+                var probe = SeededRNG(seed: seed)
+                _ = probe.int(in: 0...0) // exact production target selection
+                if predicate(probe.double(in: 0...1)) { return seed }
+                seed += 1
+            }
+        }
+        let miss = staged(seed: seed { $0 < 0.56 })
+        XCTAssertEqual(miss.activeEncounter?.evasionAttempts.last?.resolution, .probabilityMiss)
+        XCTAssertEqual(miss.activeRun?.binderHP, 20)
+        XCTAssertTrue(miss.activeEncounter?.statuses[.binder]?.isEmpty != false,
+                      "a missed direct hit cannot land its Heat affliction")
+
+        let hit = staged(seed: seed { $0 >= 0.56 })
+        XCTAssertEqual(hit.activeEncounter?.evasionAttempts.last?.resolution, .probabilityHit)
+        XCTAssertLessThan(hit.activeRun?.binderHP ?? 20, 20)
+    }
+
+    func testWorldContactFreezesExactGhostAndEvasionReceiptsAcrossToggleAndReload() throws {
+        let store = GameStore(io: .temporary(name: "footwork-contact-\(UUID().uuidString)"))
+        store.write("plains")
+        store.bindAndDepart()
+        store.mutate("stage exact v2 evasion contact") { state in
+            while state.base.roster.count < 2 { state.base.roster.append(CompanionState()) }
+            state.base.activeParty = [0, 1]
+            guard var run = state.worlds.activeRun else { return }
+            run.tuning.debugCombatV2BinderAttackEnabled = true
+            run.tuning.debugCombatV2BinderNodeIDs = [CombatDerivedStatsRules.Node.footwork,
+                                                     CombatDerivedStatsRules.Node.ghost]
+            run.tuning.debugCombatV2CompanionNodeIDs = [1: [CombatDerivedStatsRules.Node.ghost]]
+            let enemy = WorldEnemy(id: .init(rawValue: 98_001), creatureID: "paper_moth",
+                                   position: run.playerPosition, isAwake: true)
+            run.enemies = [enemy]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
+        }
+        let frozen = try XCTUnwrap(store.activeEncounter)
+        XCTAssertEqual(frozen.ghostEvasionAvailable, [.binder, .companion(1)])
+        XCTAssertEqual(frozen.debugV2Evasion?.entry(for: .binder)?.components.map(\.nodeID),
+                       [CombatDerivedStatsRules.Node.footwork])
+        XCTAssertTrue(frozen.debugV2Evasion?.entry(for: .companion(0))?.components.isEmpty == true)
+        XCTAssertTrue(frozen.debugV2Evasion?.entry(for: .companion(1))?.components.isEmpty == true)
+
+        store.mutate("change DEBUG ownership after contact") { state in
+            state.worlds.activeRun?.tuning.debugCombatV2BinderNodeIDs = []
+            state.worlds.activeRun?.tuning.debugCombatV2CompanionNodeIDs = [:]
+        }
+        XCTAssertEqual(store.activeEncounter?.ghostEvasionAvailable, frozen.ghostEvasionAvailable)
+        XCTAssertEqual(store.activeEncounter?.debugV2Evasion, frozen.debugV2Evasion)
+        let resumed = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(store.state))
+        XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.ghostEvasionAvailable,
+                       frozen.ghostEvasionAvailable)
+        XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.debugV2Evasion,
+                       frozen.debugV2Evasion)
     }
 }

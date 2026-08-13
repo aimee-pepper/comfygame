@@ -65,20 +65,40 @@ struct EncounterView: View {
         .sheet(isPresented: $isShowingDebugV2Order) {
             if let encounter, let receipt = encounter.debugV2Initiative {
                 NavigationStack {
-                    List(receipt.entries.sorted { ($0.finalPosition ?? .max) < ($1.finalPosition ?? .max) },
-                         id: \.actor) { entry in
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("\(entry.finalPosition ?? 0). \(CombatRules.actorName(entry.actor, encounter: encounter))")
-                                .font(.headline)
-                            Text("Baseline \(entry.baseline) · total \(entry.total)")
-                                .font(.subheadline.monospacedDigit())
-                            ForEach(entry.components, id: \.nodeID) { component in
-                                Text("+\(component.amount) · \(debugInitiativeNodeName(component.nodeID)) [\(component.nodeID.rawValue)]")
-                                    .font(.caption.monospacedDigit())
+                    List {
+                        Section("Final order") {
+                            ForEach(receipt.entries.sorted { ($0.finalPosition ?? .max) < ($1.finalPosition ?? .max) },
+                                    id: \.actor) { entry in
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Text("\(entry.finalPosition ?? 0). \(CombatRules.actorName(entry.actor, encounter: encounter))")
+                                        .font(.headline)
+                                    Text("Baseline \(entry.baseline) · total \(entry.total)")
+                                        .font(.subheadline.monospacedDigit())
+                                    ForEach(entry.components, id: \.nodeID) { component in
+                                        Text("+\(component.amount) · \(debugInitiativeNodeName(component.nodeID)) [\(component.nodeID.rawValue)]")
+                                            .font(.caption.monospacedDigit())
+                                    }
+                                    if entry.strikesFirst {
+                                        Text("Contact priority places this actor before ordinary initiative totals.")
+                                            .font(.caption).foregroundStyle(.secondary)
+                                    }
+                                }
                             }
-                            if entry.strikesFirst {
-                                Text("Contact priority places this actor before ordinary initiative totals.")
-                                    .font(.caption).foregroundStyle(.secondary)
+                        }
+                        if let evasion = encounter.debugV2Evasion {
+                            Section("Final-target miss inputs") {
+                                ForEach(evasion.entries, id: \.actor) { entry in
+                                    let footwork = entry.components.first {
+                                        $0.nodeID == CombatDerivedStatsRules.Node.footwork
+                                    }?.amount ?? 0
+                                    Text("\(CombatRules.actorName(entry.actor, encounter: encounter)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "") = \(Int(entry.total * 100))%")
+                                        .font(.caption.monospacedDigit())
+                                }
+                                ForEach(Array(encounter.evasionAttempts.suffix(8).enumerated()), id: \.offset) { _, attempt in
+                                    Text("\(CombatRules.actorName(attempt.actor, encounter: encounter)) · \(attempt.resolution.rawValue) · \(Int(attempt.finalChance * 100))%\(attempt.roll.map { " · roll \(String(format: "%.3f", $0))" } ?? " · no RNG")")
+                                        .font(.caption2.monospacedDigit())
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }

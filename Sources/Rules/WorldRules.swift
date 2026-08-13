@@ -1350,6 +1350,24 @@ enum WorldRules {
             party: party, in: state,
             binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
             companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs)
+        let debugEvasionReceipt = CombatDerivedStatsRules.debugEvasionReceipt(
+            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
+            party: party, in: state,
+            binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
+            companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs)
+        let ghostEvasionAvailable = Set(party.filter { actor in
+            if run.tuning.debugCombatV2BinderAttackEnabled {
+                switch actor {
+                case .binder:
+                    return run.tuning.debugCombatV2BinderNodeIDs.contains(CombatDerivedStatsRules.Node.ghost)
+                case .companion(let index):
+                    return (run.tuning.debugCombatV2CompanionNodeIDs[index] ?? [])
+                        .contains(CombatDerivedStatsRules.Node.ghost)
+                case .foe: return false
+                }
+            }
+            return CombatRules.loadout(of: actor, in: state).firstAttackAlwaysMisses
+        })
         let partyRanks = Dictionary(uniqueKeysWithValues: party.map {
             ($0, CombatRules.rank(of: $0, in: state))
         })
@@ -1380,6 +1398,8 @@ enum WorldRules {
                                                         debugV2BinderAttack: debugAttackReceipt,
                                                         debugV2Initiative: debugInitiativeReceipt,
                                                         debugV2Armour: debugArmourReceipt,
+                                                        debugV2Evasion: debugEvasionReceipt,
+                                                        ghostEvasionAvailable: ghostEvasionAvailable,
                                                         debugV2OwnedNodeIDs: debugOwnedNodeIDs,
                                                         partyRanks: partyRanks,
                                                         rng: &run.rng)

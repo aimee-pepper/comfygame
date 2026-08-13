@@ -100,6 +100,7 @@ enum CombatDerivedStatsRules {
         static let bulwark: CombatNodeID = "combat.defense.protection.bulwark"
         static let shieldwall: CombatNodeID = "combat.defense.protection.shieldwall"
         static let footwork: CombatNodeID = "combat.defense.evasion.footwork"
+        static let ghost: CombatNodeID = "combat.defense.evasion.ghost"
         static let lightFrame: CombatNodeID = "combat.defense.evasion.light_frame"
         static let insulation: CombatNodeID = "combat.craft.emanation.insulation"
         static let attunement: CombatNodeID = "combat.craft.emanation.attunement"
@@ -168,6 +169,28 @@ enum CombatDerivedStatsRules {
             let baseline = foe.stats.initiative - slow
             return .init(actor: .foe(foe.id), baseline: baseline, components: [], total: baseline,
                          strikesFirst: foe.stats.strikesFirst, finalPosition: nil)
+        }
+        return .init(entries: entries)
+    }
+
+    /// Frozen at contact so neither Base-stat edits nor DEBUG ownership changes can rewrite an
+    /// active encounter's personal miss chance.
+    static func debugEvasionReceipt(enabled: Bool, party: [Combatant], in state: GameState,
+                                    binderNodeIDs: Set<CombatNodeID>,
+                                    companionNodeIDs: [Int: Set<CombatNodeID>])
+        -> EncounterState.DebugV2EvasionReceipt? {
+        guard enabled else { return nil }
+        let entries = party.compactMap { actor -> EncounterState.DebugV2EvasionReceipt.Entry? in
+            guard let stats = CombatRules.stats(of: actor, in: state) else { return nil }
+            let owned: Set<CombatNodeID> = switch actor {
+            case .binder: binderNodeIDs
+            case .companion(let index): companionNodeIDs[index] ?? []
+            case .foe: []
+            }
+            let components: [EncounterState.DebugV2EvasionReceipt.Component] =
+                owned.contains(Node.footwork) ? [.init(nodeID: Node.footwork, amount: 0.06)] : []
+            return .init(actor: actor, characterEvasion: CharacterRules.evasion(stats),
+                         components: components)
         }
         return .init(entries: entries)
     }

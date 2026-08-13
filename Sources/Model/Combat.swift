@@ -308,6 +308,32 @@ struct EncounterState: Codable, Equatable, Sendable {
 
         func entry(for actor: Combatant) -> Entry? { entries.first { $0.actor == actor } }
     }
+    struct DebugV2EvasionReceipt: Codable, Equatable, Sendable {
+        struct Component: Codable, Equatable, Sendable {
+            var nodeID: CombatNodeID
+            var amount: Double
+        }
+        struct Entry: Codable, Equatable, Sendable {
+            var actor: Combatant
+            var characterEvasion: Double
+            var components: [Component]
+            var total: Double { min(0.85, characterEvasion + components.reduce(0) { $0 + $1.amount }) }
+        }
+        var entries: [Entry]
+        func entry(for actor: Combatant) -> Entry? { entries.first { $0.actor == actor } }
+    }
+    struct EvasionAttempt: Codable, Equatable, Sendable {
+        enum Resolution: String, Codable, Equatable, Sendable {
+            case sidestep, ghost, probabilityHit, probabilityMiss
+        }
+        var actor: Combatant
+        var characterEvasion: Double
+        var components: [DebugV2EvasionReceipt.Component]
+        var finalChance: Double
+        var roll: Double?
+        var resolution: Resolution
+        var missed: Bool
+    }
     struct PendingStagger: Codable, Equatable, Sendable {
         var foeID: InstanceID
         var applyingRound: Int
@@ -411,6 +437,8 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// Frozen equipment, sturdiness and explicit DEBUG-v2 ownership. Formation rank and
     /// consciousness remain encounter-owned dynamic facts.
     var debugV2Armour: DebugV2ArmourReceipt?
+    /// Frozen personal evasion plus exact Footwork ownership for the DEBUG-v2 route.
+    var debugV2Evasion: DebugV2EvasionReceipt?
     /// Explicit frozen ownership for consumers that do not yet have a dedicated derived receipt.
     /// Nil is legacy; an empty dictionary is an enabled-v2 comparison with no owned nodes.
     var debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]?
@@ -479,6 +507,11 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// front of the back rank, and a coated weapon poisons what it touches.
     var braced: [Combatant: Int] = [:]
     var dodging: [Combatant: Int] = [:]
+    /// One saved Ghost receipt per exact owner. `nil` means a legacy/unadopted encounter; an empty
+    /// set is modern and spent, so relaunch cannot mint the guarantee again.
+    var ghostEvasionAvailable: Set<Combatant>?
+    /// Bounded DEBUG/bug-report evidence from the authoritative final-target miss resolver.
+    var evasionAttempts: [EvasionAttempt] = []
     var concealed: [Combatant: Int] = [:]
     var interposing: [Combatant: Int] = [:]
     /// Ashe's consented interception of one active emanation event aimed at somebody else.
@@ -531,6 +564,8 @@ struct EncounterState: Codable, Equatable, Sendable {
          debugV2BinderAttack: DebugV2BinderAttackReceipt? = nil,
          debugV2Initiative: DebugV2InitiativeReceipt? = nil,
          debugV2Armour: DebugV2ArmourReceipt? = nil,
+         debugV2Evasion: DebugV2EvasionReceipt? = nil,
+         ghostEvasionAvailable: Set<Combatant>? = nil,
          debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = nil,
          partyRanks: [Combatant: Rank] = [:],
          log: [String] = []) {
@@ -543,6 +578,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2BinderAttack = debugV2BinderAttack
         self.debugV2Initiative = debugV2Initiative
         self.debugV2Armour = debugV2Armour
+        self.debugV2Evasion = debugV2Evasion
+        self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
         self.partyRanks = partyRanks
         self.log = log
@@ -567,6 +604,8 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                    forKey: .debugV2Initiative)
         debugV2Armour = try c.decodeIfPresent(DebugV2ArmourReceipt.self,
                                               forKey: .debugV2Armour)
+        debugV2Evasion = try c.decodeIfPresent(DebugV2EvasionReceipt.self,
+                                               forKey: .debugV2Evasion)
         debugV2OwnedNodeIDs = try c.decodeIfPresent([Combatant: Set<CombatNodeID>].self,
                                                      forKey: .debugV2OwnedNodeIDs)
         partyRanks = try c.decodeIfPresent([Combatant: Rank].self, forKey: .partyRanks) ?? [:]
@@ -591,6 +630,10 @@ struct EncounterState: Codable, Equatable, Sendable {
         cooldowns = try c.decodeIfPresent([String: Int].self, forKey: .cooldowns) ?? [:]
         braced = try c.decodeIfPresent([Combatant: Int].self, forKey: .braced) ?? [:]
         dodging = try c.decodeIfPresent([Combatant: Int].self, forKey: .dodging) ?? [:]
+        ghostEvasionAvailable = try c.decodeIfPresent(Set<Combatant>.self,
+                                                       forKey: .ghostEvasionAvailable)
+        evasionAttempts = try c.decodeIfPresent([EvasionAttempt].self,
+                                                 forKey: .evasionAttempts) ?? []
         concealed = try c.decodeIfPresent([Combatant: Int].self, forKey: .concealed) ?? [:]
         interposing = try c.decodeIfPresent([Combatant: Int].self, forKey: .interposing) ?? [:]
         grounding = try c.decodeIfPresent([Combatant: Int].self, forKey: .grounding) ?? [:]
