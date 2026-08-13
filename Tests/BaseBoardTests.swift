@@ -72,4 +72,17 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertTrue(destinations.contains { $0.route == AppRoute.writingDesk.rawValue })
         XCTAssertTrue(destinations.contains { $0.route == AppRoute.storehouse.rawValue })
     }
+
+    func testFoundationSheetReportsAStaleConstructionFailure() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("if store.build(station)"))
+        XCTAssertTrue(source.contains("Station not built"))
+        XCTAssertTrue(source.contains("The builder, materials, Essence, or available space changed."))
+    }
 }

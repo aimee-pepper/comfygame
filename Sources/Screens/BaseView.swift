@@ -340,6 +340,7 @@ private struct StationTile: View {
 private struct StationFoundationSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
+    @State private var buildFailure: String?
     let station: StationDef
 
     var body: some View {
@@ -418,7 +419,12 @@ private struct StationFoundationSheet: View {
             let missing = store.shortfall(for: station)
             if missing.isEmpty {
                 Button {
-                    if store.build(station) { dismiss() }
+                    if store.build(station) {
+                        buildFailure = nil
+                        dismiss()
+                    } else {
+                        buildFailure = "The builder, materials, Essence, or available space changed. Review the foundation requirements and try again."
+                    }
                 } label: {
                     Label("Build it", systemImage: "hammer")
                         .frame(maxWidth: .infinity, minHeight: 44)
@@ -441,6 +447,14 @@ private struct StationFoundationSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
                 }
+            }
+            .alert("Station not built", isPresented: Binding(
+                get: { buildFailure != nil },
+                set: { if !$0 { buildFailure = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(buildFailure ?? "The station could not be built.")
             }
         }
     }
