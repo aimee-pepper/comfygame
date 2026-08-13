@@ -1345,6 +1345,14 @@ enum WorldRules {
             party: party, foes: foes,
             binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
             companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs)
+        let debugArmourReceipt = CombatRules.debugArmourReceipt(
+            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
+            party: party, in: state,
+            binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
+            companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs)
+        let partyRanks = Dictionary(uniqueKeysWithValues: party.map {
+            ($0, CombatRules.rank(of: $0, in: state))
+        })
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
                                                         foes: foes,
                                                         party: party,
@@ -1361,6 +1369,8 @@ enum WorldRules {
                                                         initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
                                                         debugV2BinderAttack: debugAttackReceipt,
                                                         debugV2Initiative: debugInitiativeReceipt,
+                                                        debugV2Armour: debugArmourReceipt,
+                                                        partyRanks: partyRanks,
                                                         rng: &run.rng)
         run.activeEncounter?.scalingPreview = scalingPreview
         if var encounter = run.activeEncounter {

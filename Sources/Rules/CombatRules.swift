@@ -25,6 +25,8 @@ enum CombatRules {
                               initiallyUnrecordedSpecies: Set<String> = [],
                               debugV2BinderAttack: EncounterState.DebugV2BinderAttackReceipt? = nil,
                               debugV2Initiative: EncounterState.DebugV2InitiativeReceipt? = nil,
+                              debugV2Armour: EncounterState.DebugV2ArmourReceipt? = nil,
+                              partyRanks: [Combatant: Rank] = [:],
                               rng: inout SeededRNG) -> EncounterState {
         var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = party.map { member in
             let frozen = debugV2Initiative?.entry(for: member)
@@ -102,6 +104,8 @@ enum CombatRules {
             initiallyUnrecordedSpecies: initiallyUnrecordedSpecies,
             debugV2BinderAttack: debugV2BinderAttack,
             debugV2Initiative: finalizedInitiative,
+            debugV2Armour: debugV2Armour,
+            partyRanks: partyRanks,
             log: opening
         )
     }
@@ -140,6 +144,14 @@ enum CombatRules {
         }
     }
 
+    static func rank(of actor: Combatant, in encounter: EncounterState,
+                     fallback state: GameState) -> Rank {
+        if let saved = encounter.partyRanks[actor] { return saved }
+        if let frozen = encounter.debugV2Armour?.entry(for: actor)?.entryRank { return frozen }
+        if encounter.debugV2Armour != nil { return .front }
+        return rank(of: actor, in: state)
+    }
+
     static func binderAttack(in state: GameState) -> Int {
         let power = equipped(.weapon, for: .binder, in: state)?.effectivePower ?? 0
         let total = Double(Tuning.Encounter.binderAttack
@@ -167,8 +179,12 @@ enum CombatRules {
                          in state: GameState, run: WorldRun) -> Bool {
         let standing = party(of: state).filter { isAlive($0, in: run) }
         guard standing.contains(target) else { return false }
-        if rank(of: target, in: state) == .front { return true }
-        if standing.allSatisfy({ rank(of: $0, in: state) == .back }) { return true }
+        let encounter = run.activeEncounter
+        func currentRank(_ actor: Combatant) -> Rank {
+            encounter.map { rank(of: actor, in: $0, fallback: state) } ?? rank(of: actor, in: state)
+        }
+        if currentRank(target) == .front { return true }
+        if standing.allSatisfy({ currentRank($0) == .back }) { return true }
         if foe.stats.delivery != .single { return true }
         return foe.stats.strikesFirst || foe.stats.element != nil
     }
@@ -266,6 +282,12 @@ enum CombatRules {
 
     static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
                             armourIgnored: Double = 0) -> Int {
+        legacyDamageTaken(raw, by: actor, in: state, rank: rank(of: actor, in: state),
+                          armourIgnored: armourIgnored)
+    }
+
+    private static func legacyDamageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
+                                          rank: Rank, armourIgnored: Double) -> Int {
         // **Iron Skin, and Immovable.** The capstone is the one thing in the game that makes armour
         // work against a piercing blow, which is what "armour is armour, whatever it is against"
         // has to mean if it is worth eight points.
@@ -290,8 +312,62 @@ enum CombatRules {
         // **Standing at the back is worth something**, and only against something in reach
         // (session 17 §4).
         var incoming = Double(raw)
-        if rank(of: actor, in: state) == .back { incoming *= 1 - Tuning.Encounter.backRankProtection }
+        if rank == .back { incoming *= 1 - Tuning.Encounter.backRankProtection }
         return max(Tuning.Encounter.minimumDamage, Int(incoming.rounded()) - effective)
+    }
+
+    static func debugArmourReceipt(enabled: Bool, party: [Combatant], in state: GameState,
+                                   binderNodeIDs: Set<CombatNodeID>,
+                                   companionNodeIDs: [Int: Set<CombatNodeID>])
+        -> EncounterState.DebugV2ArmourReceipt? {
+        guard enabled else { return nil }
+        let supported: Set<CombatNodeID> = [CombatDerivedStatsRules.Node.ironSkin,
+                                            CombatDerivedStatsRules.Node.bulwark,
+                                            CombatDerivedStatsRules.Node.shieldwall]
+        let entries = party.map { actor -> EncounterState.DebugV2ArmourReceipt.Entry in
+            let power = GearSlot.allCases.filter(\.isProtective).reduce(0.0) { total, slot in
+                guard let piece = equipped(slot, for: actor, in: state) else { return total }
+                return total + (piece.gearProfile?.protectivePower ?? piece.effectivePower)
+            }
+            let sturdiness = stats(of: actor, in: state).map(CharacterRules.armourMultiplier) ?? 1
+            let selected: Set<CombatNodeID>
+            switch actor {
+            case .binder: selected = binderNodeIDs
+            case .companion(let index): selected = companionNodeIDs[index] ?? []
+            case .foe: selected = []
+            }
+            return .init(actor: actor, equipmentProtectivePower: power,
+                         sturdiness: sturdiness, ownedNodeIDs: selected.intersection(supported),
+                         entryRank: rank(of: actor, in: state))
+        }
+        return .init(entries: entries)
+    }
+
+    static func v2IncomingDamage(_ raw: Int, by actor: Combatant, in state: GameState,
+                                 run: WorldRun, encounter: EncounterState,
+                                 armourIgnored: Double = 0)
+        -> CombatDerivedStatsRules.IncomingDamageResult? {
+        guard let receipt = encounter.debugV2Armour else { return nil }
+        let participants = receipt.entries.map(\.actor)
+        var ranks: [Combatant: Rank] = [:]
+        for actor in participants where ranks[actor] == nil {
+            ranks[actor] = rank(of: actor, in: encounter, fallback: state)
+        }
+        let conscious = Set(participants.filter { isAlive($0, in: run) })
+        return CombatDerivedStatsRules.incomingDamage(raw: raw, receiver: actor,
+                                                       receipt: receipt, ranks: ranks,
+                                                       conscious: conscious,
+                                                       armourIgnored: armourIgnored)
+    }
+
+    static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
+                            run: WorldRun, encounter: EncounterState,
+                            armourIgnored: Double = 0) -> Int {
+        v2IncomingDamage(raw, by: actor, in: state, run: run, encounter: encounter,
+                         armourIgnored: armourIgnored)?.finalDamage
+            ?? legacyDamageTaken(raw, by: actor, in: state,
+                                 rank: rank(of: actor, in: encounter, fallback: state),
+                                 armourIgnored: armourIgnored)
     }
 
     // MARK: Skills
@@ -531,11 +607,7 @@ enum CombatRules {
             // anything else (`resources-skills-spec.md` §2). Swapping where you stand *without*
             // spending the turn is the whole point — otherwise you'd just take the hit.
             let swapped: Rank = rankNow == .front ? .back : .front
-            switch actor {
-            case .binder: state.base.binderCharacter.rank = swapped
-            case .companion(let index): state.base.withCharacter(.member(index)) { $0.rank = swapped }
-            case .foe: break
-            }
+            if actor.isParty { encounter.partyRanks[actor] = swapped }
             encounter.extraTurns[actor, default: 0] += 1
             encounter.note(swapped == .back ? "You give ground." : "You step up.")
 
@@ -832,7 +904,7 @@ enum CombatRules {
         case .attack(let foeID):
             strike(foeID, damage: baseAttack(of: actor, in: state), by: actor,
                    kind: damageKind(for: actor, in: state), run: &run, encounter: &encounter,
-                   standingBack: rank(of: actor, in: state) == .back,
+                   standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
                    reachOfActor: reach(for: actor, in: state),
                    coating: coating(of: actor, in: state),
                    breaking: wildRule(for: actor, in: state),
@@ -844,7 +916,7 @@ enum CombatRules {
                 use(skill, by: actor, on: foeID, ally: allyID, run: &run, encounter: &encounter,
                     weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
-                    standingBack: rank(of: actor, in: state) == .back,
+                    standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
                     reach: reach(for: actor, in: state), state: &state)
             }
 
@@ -856,7 +928,7 @@ enum CombatRules {
                 use(skill, by: actor, on: foeID, ally: nil, run: &run, encounter: &encounter,
                     weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
-                    standingBack: rank(of: actor, in: state) == .back,
+                    standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
                     reach: reach(for: actor, in: state), state: &state)
             }
 
@@ -865,7 +937,7 @@ enum CombatRules {
                 use(skill, by: actor, on: nil, ally: ally, run: &run, encounter: &encounter,
                     weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
-                    standingBack: rank(of: actor, in: state) == .back,
+                    standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
                     reach: reach(for: actor, in: state), state: &state)
             }
 
@@ -1410,7 +1482,7 @@ enum CombatRules {
         // the back was pure upside — less damage, no more risk of being chosen — which is half a
         // rank system. Something with far reach ignores the line entirely, which is what reach is
         // *for*, and if everybody is at the back there's nobody to hide behind.
-        let front = targetable.filter { rank(of: $0, in: state) == .front }
+        let front = targetable.filter { rank(of: $0, in: encounter, fallback: state) == .front }
         let reachesPast = foe.stats.strikesFirst || foe.stats.element != nil
         let reachable = (reachesPast || front.isEmpty) ? targetable : front
 
@@ -1503,7 +1575,8 @@ enum CombatRules {
                 amount = max(Tuning.Encounter.minimumDamage, Int(raw.rounded()))
             } else {
                 let ignored = foe.stats.damageKind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0
-                amount = damageTaken(Int(raw.rounded()), by: target, in: state, armourIgnored: ignored)
+                amount = damageTaken(Int(raw.rounded()), by: target, in: state, run: run,
+                                     encounter: encounter, armourIgnored: ignored)
             }
             let wasStanding = isAlive(target, in: run)
             hurt(target, by: amount, run: &run, encounter: &encounter)

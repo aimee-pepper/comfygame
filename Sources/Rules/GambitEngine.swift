@@ -105,7 +105,7 @@ enum GambitEngine {
 
         case "ally.backRank":
             return party(in: run, state: state)
-                .filter { CombatRules.rank(of: $0, in: state) == .back }
+                .filter { CombatRules.rank(of: $0, in: encounter, fallback: state) == .back }
                 .filter { matches(rule, combatant: $0, run: run) }
                 .min { healthFraction($0, in: run) < healthFraction($1, in: run) }
                 .map { .ally($0) }

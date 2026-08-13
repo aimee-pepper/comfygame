@@ -507,6 +507,12 @@ struct BalancingView: View {
                                       id: CombatDerivedStatsRules.Node.lightFrame)
                 debugCombatNodeToggle("Thick Hide · next-expedition maximum HP +6",
                                       id: CombatDerivedStatsRules.Node.thickHide)
+                debugCombatNodeToggle("Iron Skin · personal armour +2",
+                                      id: CombatDerivedStatsRules.Node.ironSkin)
+                debugCombatNodeToggle("Bulwark · self +1, same-rank allies +2",
+                                      id: CombatDerivedStatsRules.Node.bulwark)
+                debugCombatNodeToggle("Shieldwall · conscious front line +2",
+                                      id: CombatDerivedStatsRules.Node.shieldwall)
                 ForEach(store.state.base.activeParty, id: \.self) { index in
                     if store.state.base.roster.indices.contains(index) {
                         let name = store.state.base.roster[index].name
@@ -517,6 +523,12 @@ struct BalancingView: View {
                                                  id: CombatDerivedStatsRules.Node.lightFrame)
                         debugCompanionNodeToggle("Thick Hide · maximum HP +6", index: index,
                                                  id: CombatDerivedStatsRules.Node.thickHide)
+                        debugCompanionNodeToggle("Iron Skin · personal armour +2", index: index,
+                                                 id: CombatDerivedStatsRules.Node.ironSkin)
+                        debugCompanionNodeToggle("Bulwark · self +1, same-rank allies +2", index: index,
+                                                 id: CombatDerivedStatsRules.Node.bulwark)
+                        debugCompanionNodeToggle("Shieldwall · conscious front line +2", index: index,
+                                                 id: CombatDerivedStatsRules.Node.shieldwall)
                     }
                 }
                 if settings.debugTuning.debugCombatV2BinderAttackEnabled,
@@ -537,7 +549,27 @@ struct BalancingView: View {
                             .font(.caption.monospacedDigit())
                     }
                 }
+                if settings.debugTuning.debugCombatV2BinderAttackEnabled,
+                   let receipt = debugArmourReceipt {
+                    Text("Next encounter armour · current formation")
+                        .font(.subheadline.weight(.semibold))
+                    ForEach(receipt.entries, id: \.actor) { entry in
+                        let breakdown = CombatDerivedStatsRules.incomingDamage(
+                            raw: 0,
+                            receiver: entry.actor,
+                            receipt: receipt,
+                            ranks: debugArmourRanks,
+                            conscious: Set(receipt.entries.map(\.actor)),
+                            armourIgnored: 0
+                        ).breakdown
+                        Text(debugArmourLine(entry.actor, breakdown: breakdown))
+                            .font(.caption.monospacedDigit())
+                    }
+                }
                 Text("Explicit DEBUG ownership only. Party totals preview before contact; equal totals remain unresolved until the encounter's saved RNG breaks the tie. Exact inputs and final order freeze when combat opens.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text("Armour formation bonuses are resolved from the saved encounter rank and current consciousness. They intentionally have no single pre-contact total.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -661,6 +693,35 @@ struct BalancingView: View {
 
     private var debugHealthCapPreview: [RunHealthCapEntry] {
         CombatRules.expeditionHealthCaps(in: store.state, tuning: settings.debugTuning)
+    }
+
+    private var debugArmourReceipt: EncounterState.DebugV2ArmourReceipt? {
+        CombatRules.debugArmourReceipt(
+            enabled: settings.debugTuning.debugCombatV2BinderAttackEnabled,
+            party: store.state.base.partyMembers.map(\.combatant),
+            in: store.state,
+            binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
+            companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs
+        )
+    }
+
+    private var debugArmourRanks: [Combatant: Rank] {
+        Dictionary(uniqueKeysWithValues: store.state.base.partyMembers.map {
+            ($0.combatant, CombatRules.rank(of: $0.combatant, in: store.state))
+        })
+    }
+
+    private func debugArmourLine(
+        _ actor: Combatant,
+        breakdown: CombatDerivedStatsRules.ArmourBreakdown
+    ) -> String {
+        let equipment = String(format: "%.1f", breakdown.equipment)
+        let components = breakdown.components.map {
+            let source = $0.source == actor ? "self" : debugActorName($0.source)
+            return "\($0.nodeID.rawValue.split(separator: ".").last?.replacingOccurrences(of: "_", with: " ").capitalisedSentence ?? $0.nodeID.rawValue) \(source) +\(Int($0.amount))"
+        }
+        let suffix = components.isEmpty ? "no v2 formation bonus" : components.joined(separator: ", ")
+        return "\(debugActorName(actor)) · equipment×sturdiness \(equipment) · \(suffix) · total \(String(format: "%.1f", breakdown.totalBeforeIgnore))"
     }
 
     private func debugActorName(_ actor: Combatant) -> String {

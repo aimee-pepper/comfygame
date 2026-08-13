@@ -296,6 +296,18 @@ struct EncounterState: Codable, Equatable, Sendable {
             }
         }
     }
+    struct DebugV2ArmourReceipt: Codable, Equatable, Sendable {
+        struct Entry: Codable, Equatable, Sendable {
+            var actor: Combatant
+            var equipmentProtectivePower: Double
+            var sturdiness: Double
+            var ownedNodeIDs: Set<CombatNodeID>
+            var entryRank: Rank
+        }
+        var entries: [Entry]
+
+        func entry(for actor: Combatant) -> Entry? { entries.first { $0.actor == actor } }
+    }
     /// The saved fact of how contact began. Combat consumers read this instead of reconstructing
     /// an opening from post-contact enemy awareness or map visibility.
     enum Opening: Codable, Equatable, Sendable {
@@ -380,6 +392,12 @@ struct EncounterState: Codable, Equatable, Sendable {
     var debugV2BinderAttack: DebugV2BinderAttackReceipt?
     /// Exact DEBUG initiative inputs and the final tie-broken position frozen at contact.
     var debugV2Initiative: DebugV2InitiativeReceipt?
+    /// Frozen equipment, sturdiness and explicit DEBUG-v2 ownership. Formation rank and
+    /// consciousness remain encounter-owned dynamic facts.
+    var debugV2Armour: DebugV2ArmourReceipt?
+    /// Current formation rank belongs to this encounter. Fall Back mutates this saved receipt,
+    /// never the mutable Base loadout under an already-open fight.
+    var partyRanks: [Combatant: Rank] = [:]
     var opening: OpeningResolution?
     /// Ordinary actions completed by each actor. Opening foe actions and zero-turn opening attacks
     /// do not enter this set.
@@ -491,6 +509,8 @@ struct EncounterState: Codable, Equatable, Sendable {
          initiallyUnrecordedSpecies: Set<String> = [],
          debugV2BinderAttack: DebugV2BinderAttackReceipt? = nil,
          debugV2Initiative: DebugV2InitiativeReceipt? = nil,
+         debugV2Armour: DebugV2ArmourReceipt? = nil,
+         partyRanks: [Combatant: Rank] = [:],
          log: [String] = []) {
         self.id = id
         self.foes = foes
@@ -500,6 +520,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.initiallyUnrecordedSpecies = initiallyUnrecordedSpecies
         self.debugV2BinderAttack = debugV2BinderAttack
         self.debugV2Initiative = debugV2Initiative
+        self.debugV2Armour = debugV2Armour
+        self.partyRanks = partyRanks
         self.log = log
     }
 
@@ -520,6 +542,9 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                      forKey: .debugV2BinderAttack)
         debugV2Initiative = try c.decodeIfPresent(DebugV2InitiativeReceipt.self,
                                                    forKey: .debugV2Initiative)
+        debugV2Armour = try c.decodeIfPresent(DebugV2ArmourReceipt.self,
+                                              forKey: .debugV2Armour)
+        partyRanks = try c.decodeIfPresent([Combatant: Rank].self, forKey: .partyRanks) ?? [:]
         opening = try? c.decodeIfPresent(OpeningResolution.self, forKey: .opening)
         completedFirstActions = try c.decodeIfPresent(Set<Combatant>.self,
                                                        forKey: .completedFirstActions) ?? []

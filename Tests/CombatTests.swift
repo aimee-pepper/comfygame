@@ -549,25 +549,29 @@ final class CombatTests: XCTestCase {
     func testBackRankSubjectTargetsOnlyAnAllyInTheBackRank() throws {
         let store = inFight(["paper_moth"], gambits: [Self.healBackRank])
         store.mutate("put only the binder in back") { state in
-            state.base.binderCharacter.rank = .back
-            state.base.companion.character.rank = .front
+            state.worlds.activeRun?.activeEncounter?.partyRanks[.binder] = .back
+            state.worlds.activeRun?.activeEncounter?.partyRanks[.companion(0)] = .front
         }
 
         XCTAssertEqual(GambitEngine.decide(in: store.state)?.action, .healSkill(ally: .binder))
 
-        store.mutate("move the binder forward") { $0.base.binderCharacter.rank = .front }
+        store.mutate("move the binder forward") {
+            $0.worlds.activeRun?.activeEncounter?.partyRanks[.binder] = .front
+        }
         XCTAssertNil(GambitEngine.decide(in: store.state))
     }
 
     func testCannotReachSubjectReadsTheCurrentRanksAndFoeAction() throws {
         let store = inFight(["paper_moth"], gambits: [Self.attackOutOfReach])
         store.mutate("hold behind a front line") { state in
-            state.base.binderCharacter.rank = .front
-            state.base.companion.character.rank = .back
+            state.worlds.activeRun?.activeEncounter?.partyRanks[.binder] = .front
+            state.worlds.activeRun?.activeEncounter?.partyRanks[.companion(0)] = .back
         }
         XCTAssertEqual(GambitEngine.decide(in: store.state)?.rule, Self.attackOutOfReach)
 
-        store.mutate("leave nobody in front") { $0.base.binderCharacter.rank = .back }
+        store.mutate("leave nobody in front") {
+            $0.worlds.activeRun?.activeEncounter?.partyRanks[.binder] = .back
+        }
         XCTAssertNil(GambitEngine.decide(in: store.state),
                      "a foe can close when the whole standing party is in back")
     }
@@ -1463,7 +1467,9 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(store.state.base.binderCharacter.rank, .front)
 
         store.mutate("test: give ground") { CombatRules.perform(.skill("fall_back"), by: .binder, in: &$0) }
-        XCTAssertEqual(store.state.base.binderCharacter.rank, .back)
+        XCTAssertEqual(store.activeEncounter?.partyRanks[.binder], .back)
+        XCTAssertEqual(store.state.base.binderCharacter.rank, .front,
+                       "encounter movement must not rewrite the departing formation")
         // **And it's still your move.** The owed turn is spent the instant the order tries to move
         // on, which is what "without spending the turn" means from the player's side.
         XCTAssertEqual(store.activeEncounter?.current, .binder,
@@ -2155,5 +2161,163 @@ final class CombatTests: XCTestCase {
                                expected.finalDamage)
             }
         }
+    }
+
+    func testFrozenV2ArmourCombinesPersonalAndStrongestOnceFormationBonuses() throws {
+        let iron = CombatDerivedStatsRules.Node.ironSkin
+        let bulwark = CombatDerivedStatsRules.Node.bulwark
+        let shieldwall = CombatDerivedStatsRules.Node.shieldwall
+        let receipt = EncounterState.DebugV2ArmourReceipt(entries: [
+            .init(actor: .binder, equipmentProtectivePower: 3, sturdiness: 1.5,
+                  ownedNodeIDs: [iron, bulwark], entryRank: .front),
+            .init(actor: .companion(0), equipmentProtectivePower: 0, sturdiness: 1,
+                  ownedNodeIDs: [bulwark, shieldwall], entryRank: .front),
+            .init(actor: .companion(1), equipmentProtectivePower: 0, sturdiness: 1,
+                  ownedNodeIDs: [bulwark, shieldwall], entryRank: .front),
+            .init(actor: .companion(2), equipmentProtectivePower: 0, sturdiness: 1,
+                  ownedNodeIDs: [bulwark], entryRank: .back),
+            .init(actor: .companion(3), equipmentProtectivePower: 0, sturdiness: 1,
+                  ownedNodeIDs: [], entryRank: .back)
+        ])
+        let allConscious: Set<Combatant> = [.binder, .companion(0), .companion(1),
+                                            .companion(2), .companion(3)]
+        let ranks: [Combatant: Rank] = [.binder: .front, .companion(0): .front,
+                                        .companion(1): .front, .companion(2): .back,
+                                        .companion(3): .back]
+        let result = CombatDerivedStatsRules.incomingDamage(
+            raw: 30, receiver: .binder, receipt: receipt, ranks: ranks,
+            conscious: allConscious, armourIgnored: 0)
+
+        XCTAssertEqual(result.breakdown.equipment, 3 * 1.5 * Double(Tuning.Encounter.defencePerArmorTier))
+        XCTAssertEqual(result.breakdown.components.filter { $0.nodeID == iron }.map(\.amount), [2])
+        XCTAssertEqual(result.breakdown.components.filter { $0.nodeID == bulwark }.map(\.amount), [1, 2],
+                       "personal Bulwark and one strongest ally aura coexist")
+        XCTAssertEqual(result.breakdown.components.filter { $0.nodeID == shieldwall }.map(\.amount), [2],
+                       "duplicate Shieldwalls must apply strongest-once")
+
+        var movedRanks = ranks
+        movedRanks[.binder] = .back
+        let moved = CombatDerivedStatsRules.incomingDamage(
+            raw: 30, receiver: .binder, receipt: receipt, ranks: movedRanks,
+            conscious: allConscious, armourIgnored: 0)
+        XCTAssertFalse(moved.breakdown.components.contains { $0.nodeID == shieldwall })
+        XCTAssertEqual(moved.breakdown.components.filter { $0.nodeID == bulwark }.map(\.amount), [1, 2],
+                       "current-rank back Bulwark may come from the conscious back ally")
+
+        let passedOut = CombatDerivedStatsRules.incomingDamage(
+            raw: 30, receiver: .binder, receipt: receipt, ranks: ranks,
+            conscious: [.binder, .companion(2), .companion(3)], armourIgnored: 0)
+        XCTAssertFalse(passedOut.breakdown.components.contains { $0.nodeID == shieldwall })
+        XCTAssertEqual(passedOut.breakdown.components.filter { $0.nodeID == bulwark }.map(\.amount), [1],
+                       "passed-out aura owners stop contributing")
+
+        let ignored = CombatDerivedStatsRules.incomingDamage(
+            raw: 30, receiver: .binder, receipt: receipt, ranks: ranks,
+            conscious: allConscious, armourIgnored: 1)
+        XCTAssertEqual(ignored.breakdown.effectiveArmour, 0)
+        XCTAssertEqual(ignored.finalDamage, 30)
+    }
+
+    func testV2ArmourMissingEntryAndRankFailClosedWithoutLiveLegacyFallback() throws {
+        var state = GameState.newGame()
+        state.base.binderCharacter.branchDepth["defense_fortitude"] = 3
+        let missingReceiver = EncounterState.DebugV2ArmourReceipt(entries: [
+            .init(actor: .companion(0), equipmentProtectivePower: 99, sturdiness: 2,
+                  ownedNodeIDs: [CombatDerivedStatsRules.Node.bulwark], entryRank: .back)
+        ])
+        var rng = SeededRNG(seed: 44)
+        let encounter = CombatRules.makeEncounter(
+            id: InstanceID(rawValue: 44), foes: [], party: [.binder],
+            debugV2Armour: missingReceiver, partyRanks: [:], rng: &rng)
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 44, rng: SeededRNG(seed: 44), map: map,
+                           playerPosition: GridPoint(x: 0, y: 0), binderHP: 20)
+        let result = try XCTUnwrap(CombatRules.v2IncomingDamage(
+            12, by: .binder, in: state, run: run, encounter: encounter))
+        XCTAssertEqual(result.rank, .front)
+        XCTAssertEqual(result.breakdown.totalBeforeIgnore, 0)
+        XCTAssertEqual(result.finalDamage, 12,
+                       "corrupt v2 receipt must not mix in mutable legacy tree or gear")
+
+        let frozenRank = EncounterState.DebugV2ArmourReceipt(entries: [
+            .init(actor: .binder, equipmentProtectivePower: 0, sturdiness: 1,
+                  ownedNodeIDs: [], entryRank: .back)
+        ])
+        let fallback = CombatDerivedStatsRules.incomingDamage(
+            raw: 12, receiver: .binder, receipt: frozenRank, ranks: [:],
+            conscious: [.binder], armourIgnored: 0)
+        XCTAssertEqual(fallback.rank, .back, "missing saved rank adopts the frozen entry rank")
+    }
+
+    func testDebugV2ArmourDisabledAndEnabledEmptyPreserveLegacyDamage() throws {
+        let state = GameState.newGame()
+        let empty = try XCTUnwrap(CombatRules.debugArmourReceipt(
+            enabled: true, party: [.binder], in: state,
+            binderNodeIDs: [], companionNodeIDs: [:]))
+        var rng = SeededRNG(seed: 45)
+        let encounter = CombatRules.makeEncounter(
+            id: InstanceID(rawValue: 45), foes: [], party: [.binder],
+            debugV2Armour: empty, partyRanks: [.binder: .front], rng: &rng)
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 45, rng: SeededRNG(seed: 45), map: map,
+                           playerPosition: GridPoint(x: 0, y: 0), binderHP: 20)
+        XCTAssertEqual(CombatRules.damageTaken(17, by: .binder, in: state,
+                                               run: run, encounter: encounter),
+                       CombatRules.damageTaken(17, by: .binder, in: state))
+        XCTAssertNotNil(encounter.debugV2Armour,
+                        "enabled with zero nodes remains a real frozen v2 comparison route")
+    }
+
+    func testWorldContactFreezesV2ArmourAndSharedPreviewCommitAcrossRelaunch() throws {
+        let io = SaveFileIO.temporary(name: "v2-armour-entry-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart())
+        store.mutate("freeze exact armour receipt") { state in
+            guard var run = state.worlds.activeRun, let enemy = run.enemies.first else { return }
+            run.tuning.debugCombatV2BinderAttackEnabled = true
+            run.tuning.debugCombatV2BinderNodeIDs = [CombatDerivedStatsRules.Node.ironSkin,
+                                                      CombatDerivedStatsRules.Node.bulwark]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
+        }
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        let receipt = try XCTUnwrap(encounter.debugV2Armour)
+        XCTAssertNotNil(receipt.entry(for: .binder))
+        XCTAssertEqual(encounter.partyRanks[.binder], receipt.entry(for: .binder)?.entryRank)
+        let before = try XCTUnwrap(CombatRules.v2IncomingDamage(
+            25, by: .binder, in: store.state, run: try XCTUnwrap(store.activeRun),
+            encounter: encounter))
+        XCTAssertEqual(CombatRules.damageTaken(
+            25, by: .binder, in: store.state, run: try XCTUnwrap(store.activeRun),
+            encounter: encounter), before.finalDamage,
+                       "preview and committed incoming-damage route must share one calculation")
+
+        store.mutate("change mutable base after contact") { state in
+            state.base.binderCharacter.stats.fortitude = 99
+            state.base.binderCharacter.branchDepth["fortitude"] = 8
+            state.base.binderEquipped[.armor] = EquippedPiece(catalogID: "guard_vault")
+            state.base.binderCharacter.rank = state.base.binderCharacter.rank == .front ? .back : .front
+            state.worlds.activeRun?.tuning.debugCombatV2BinderNodeIDs = []
+        }
+        let after = try XCTUnwrap(CombatRules.v2IncomingDamage(
+            25, by: .binder, in: store.state, run: try XCTUnwrap(store.activeRun),
+            encounter: try XCTUnwrap(store.activeEncounter)))
+        XCTAssertEqual(after, before)
+
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.activeEncounter?.debugV2Armour, receipt)
+        let reloaded = try XCTUnwrap(CombatRules.v2IncomingDamage(
+            25, by: .binder, in: relaunched.state, run: try XCTUnwrap(relaunched.activeRun),
+            encounter: try XCTUnwrap(relaunched.activeEncounter)))
+        XCTAssertEqual(reloaded, before)
     }
 }

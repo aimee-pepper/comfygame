@@ -31,6 +31,28 @@ enum CombatDerivedStatsRules {
         var ownedNodeIDs: Set<CombatNodeID>
     }
 
+    struct ArmourComponent: Codable, Equatable, Sendable {
+        var nodeID: CombatNodeID
+        var source: Combatant
+        var amount: Double
+    }
+
+    struct ArmourBreakdown: Codable, Equatable, Sendable {
+        var receiver: Combatant
+        var equipment: Double
+        var components: [ArmourComponent]
+        var totalBeforeIgnore: Double
+        var armourIgnored: Double
+        var effectiveArmour: Int
+    }
+
+    struct IncomingDamageResult: Codable, Equatable, Sendable {
+        var raw: Int
+        var rank: Rank
+        var breakdown: ArmourBreakdown
+        var finalDamage: Int
+    }
+
     struct Input: Equatable, Sendable {
         var actorIdentity: String
         var stats: CharacterStats
@@ -145,6 +167,59 @@ enum CombatDerivedStatsRules {
                          strikesFirst: foe.stats.strikesFirst, finalPosition: nil)
         }
         return .init(entries: entries)
+    }
+
+    static func incomingDamage(raw: Int, receiver: Combatant,
+                               receipt: EncounterState.DebugV2ArmourReceipt,
+                               ranks: [Combatant: Rank], conscious: Set<Combatant>,
+                               armourIgnored: Double) -> IncomingDamageResult {
+        let receiverEntry = receipt.entry(for: receiver) ?? .init(
+            actor: receiver, equipmentProtectivePower: 0, sturdiness: 1,
+            ownedNodeIDs: [], entryRank: .front)
+        func rank(of entry: EncounterState.DebugV2ArmourReceipt.Entry) -> Rank {
+            ranks[entry.actor] ?? entry.entryRank
+        }
+        let receiverRank = rank(of: receiverEntry)
+        var components: [ArmourComponent] = []
+        func add(_ node: CombatNodeID, source: Combatant, amount: Double) {
+            components.append(.init(nodeID: node, source: source, amount: amount))
+        }
+        if receiverEntry.ownedNodeIDs.contains(Node.ironSkin) {
+            add(Node.ironSkin, source: receiver, amount: 2)
+        }
+        if conscious.contains(receiver), receiverEntry.ownedNodeIDs.contains(Node.bulwark) {
+            add(Node.bulwark, source: receiver, amount: 1)
+        }
+        if let ally = receipt.entries
+            .filter({ $0.actor != receiver && conscious.contains($0.actor)
+                && rank(of: $0) == receiverRank && $0.ownedNodeIDs.contains(Node.bulwark) })
+            .sorted(by: { $0.actor.storageKey < $1.actor.storageKey }).first {
+            add(Node.bulwark, source: ally.actor, amount: 2)
+        }
+        if receiverRank == .front,
+           let owner = receipt.entries
+            .filter({ conscious.contains($0.actor) && rank(of: $0) == .front
+                && $0.ownedNodeIDs.contains(Node.shieldwall) })
+            .sorted(by: { $0.actor.storageKey < $1.actor.storageKey }).first {
+            add(Node.shieldwall, source: owner.actor, amount: 2)
+        }
+        components.sort {
+            if $0.nodeID != $1.nodeID { return $0.nodeID.rawValue < $1.nodeID.rawValue }
+            return $0.source.storageKey < $1.source.storageKey
+        }
+        let equipment = receiverEntry.equipmentProtectivePower
+            * Double(Tuning.Encounter.defencePerArmorTier) * receiverEntry.sturdiness
+        let total = equipment + components.reduce(0) { $0 + $1.amount }
+        let ignored = min(1, max(0, armourIgnored))
+        let effective = Int((total * (1 - ignored)).rounded())
+        var incoming = Double(raw)
+        if receiverRank == .back { incoming *= 1 - Tuning.Encounter.backRankProtection }
+        let final = max(Tuning.Encounter.minimumDamage, Int(incoming.rounded()) - effective)
+        return .init(raw: raw, rank: receiverRank,
+                     breakdown: .init(receiver: receiver, equipment: equipment,
+                                      components: components, totalBeforeIgnore: total,
+                                      armourIgnored: ignored, effectiveArmour: effective),
+                     finalDamage: final)
     }
 
     static func derive(_ input: Input) -> Output {
