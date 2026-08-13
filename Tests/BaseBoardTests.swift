@@ -85,4 +85,21 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertTrue(source.contains("Station not built"))
         XCTAssertTrue(source.contains("The builder, materials, Essence, or available space changed."))
     }
+
+    func testFoundationBuildActionStaysOutsideScrollableRequirements() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+            encoding: .utf8
+        )
+        let sheetStart = try XCTUnwrap(source.range(of: "private struct StationFoundationSheet"))
+        let sheetEnd = try XCTUnwrap(source.range(of: "struct CurrencyChip"))
+        let sheet = String(source[sheetStart.lowerBound..<sheetEnd.lowerBound])
+
+        XCTAssertTrue(sheet.contains(".safeAreaInset(edge: .bottom, spacing: 0) { foundationActionBar }"))
+        XCTAssertTrue(sheet.contains("PersistentActionBar("))
+        XCTAssertTrue(sheet.contains("Label(\"Build it\", systemImage: \"hammer\")"))
+        XCTAssertTrue(sheet.contains(".disabled(!missing.isEmpty)"))
+    }
 }

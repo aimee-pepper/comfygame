@@ -416,31 +416,9 @@ private struct StationFoundationSheet: View {
                 .foregroundStyle(.secondary)
             }
 
-            let missing = store.shortfall(for: station)
-            if missing.isEmpty {
-                Button {
-                    if store.build(station) {
-                        buildFailure = nil
-                        dismiss()
-                    } else {
-                        buildFailure = "The builder, materials, Essence, or available space changed. Review the foundation requirements and try again."
-                    }
-                } label: {
-                    Label("Build it", systemImage: "hammer")
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.borderedProminent)
-            } else {
-                // Says what's short rather than greying out a button and leaving you to work it
-                // out — the same promise the research tree makes.
-                Text("Still need \(missing.joined(separator: ", ")).")
-                    .font(.caption)
-                    .foregroundStyle(.orange)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(minHeight: 44)
-            }
                 }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) { foundationActionBar }
             .navigationTitle(station.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -456,6 +434,31 @@ private struct StationFoundationSheet: View {
             } message: {
                 Text(buildFailure ?? "The station could not be built.")
             }
+        }
+    }
+
+    private var foundationActionBar: some View {
+        let missing = store.shortfall(for: station)
+        return PersistentActionBar(
+            message: missing.isEmpty
+                ? "Builder, materials, Essence, and space are checked again before construction."
+                : "Still need \(missing.joined(separator: ", ")).",
+            messageTint: missing.isEmpty ? .secondary : .orange
+        ) {
+            Button {
+                if store.build(station) {
+                    buildFailure = nil
+                    dismiss()
+                } else {
+                    buildFailure = "The builder, materials, Essence, or available space changed. Review the foundation requirements and try again."
+                }
+            } label: {
+                Label("Build it", systemImage: "hammer")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(!missing.isEmpty)
         }
     }
 
