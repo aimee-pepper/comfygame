@@ -1073,16 +1073,17 @@
       ]
     },
     {
-      "id": "pen_pencil",
+      "id": "pen_brush",
       "branch": "penmanship",
-      "name": "A pencil",
-      "icon": "pencil",
-      "blurb": "Lead and a sleeve of wood. Half the room, and Isolde will not stop calling it a beginning.",
+      "name": "A brush",
+      "icon": "paintbrush.pointed",
+      "blurb": "A copper ferrule holds fibre bristles to a timber handle. Half the room, and Isolde will not stop calling it a beginning.",
       "cost": {
-        "essence": 150,
+        "essence": 45,
         "resources": {
-          "copper": 8,
-          "timber": 10
+          "copper": 2,
+          "fiber": 6,
+          "timber": 4
         }
       },
       "requires": [],
@@ -1100,14 +1101,14 @@
       "icon": "tablecells",
       "blurb": "Isolde's first condition, and she was right about it. Raises the Scriptorium.",
       "cost": {
-        "essence": 120,
+        "essence": 70,
         "resources": {
-          "clay": 12,
-          "timber": 16
+          "clay": 6,
+          "timber": 8
         }
       },
       "requires": [
-        "pen_pencil"
+        "pen_brush"
       ],
       "grants": [
         {
@@ -1117,25 +1118,53 @@
       ]
     },
     {
+      "id": "pen_ink_mixing",
+      "branch": "penmanship",
+      "name": "Ink Mixing",
+      "icon": "drop.triangle",
+      "blurb": "Prepare deliberate liquid inks without changing the hand that lays them down.",
+      "cost": {
+        "essence": 40,
+        "resources": { "copper": 2, "quartz": 2, "resin": 4 }
+      },
+      "requires": ["pen_brush"],
+      "grants": [{ "kind": "capability", "id": "inkMixing" }],
+      "needsStationTier": 1
+    },
+    {
+      "id": "pen_compounds",
+      "branch": "penmanship",
+      "name": "Compound Assembly",
+      "icon": "point.3.connected.trianglepath.dotted",
+      "blurb": "Assemble learned marks without confusing their meaning with their shape.",
+      "cost": {
+        "essence": 55,
+        "resources": { "pulp": 4, "resin": 4, "quartz": 2 }
+      },
+      "requires": ["pen_brush"],
+      "grants": [{ "kind": "capability", "id": "compoundAssembly" }],
+      "needsStationTier": 1
+    },
+    {
       "id": "pen_chaining",
       "branch": "penmanship",
       "name": "Chaining",
       "icon": "link",
       "blurb": "Joining one statement to another, so a world can have two kinds of land in it.",
       "cost": {
-        "essence": 350,
+        "essence": 90,
         "resources": {
-          "mercury": 4,
-          "mote": 2
+          "mercury": 2,
+          "mote": 1
         }
       },
       "requires": [
-        "pen_pencil"
+        "pen_brush"
       ],
       "grants": [
         {
-          "kind": "effect",
-          "effect": "chaining"
+          "kind": "capability",
+          "id": "chaining"
         }
       ],
       "needsStationTier": 1
@@ -1147,10 +1176,10 @@
       "icon": "rectangle.split.3x3",
       "blurb": "Lines true enough to write a hair's width between them. Raises the Scriptorium again.",
       "cost": {
-        "essence": 260,
+        "essence": 140,
         "resources": {
-          "quartz": 8,
-          "silver": 6
+          "quartz": 6,
+          "silver": 4
         }
       },
       "requires": [
@@ -1171,11 +1200,11 @@
       "icon": "pencil.tip",
       "blurb": "A nib ground to nothing and a barrel that holds its ink. Everything, in a quarter of the room.",
       "cost": {
-        "essence": 500,
+        "essence": 220,
         "resources": {
-          "quartz": 6,
-          "resin": 12,
-          "silver": 10
+          "quartz": 4,
+          "resin": 8,
+          "silver": 6
         }
       },
       "requires": [

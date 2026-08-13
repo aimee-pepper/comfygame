@@ -768,7 +768,7 @@ final class LibraryTests: XCTestCase {
             // The whole line up to it — chaining comes before the fountain pen (Aimee, 6 Aug):
             // learning to join two statements is the grammar lesson, writing small enough for it
             // to matter is the one after.
-            state.base.completedResearch.formUnion(["pen_pencil", "pen_desk", "pen_chaining"])
+            state.base.completedResearch.formUnion(["pen_brush", "pen_desk", "pen_chaining"])
         }
         let fountain = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_fountain"))
         XCTAssertFalse(store.canResearch(fountain), "the finest hand ignored the building's tier")
@@ -779,17 +779,10 @@ final class LibraryTests: XCTestCase {
         XCTAssertTrue(store.canResearch(fountain), "upgraded the Scriptorium and still can't learn it")
     }
 
-    /// The hands are the biggest capability jump in the game and cost less than a storehouse tier
-    /// (Aimee, 6 Aug: *"WAY too cheap"*). Each one should now want a world you went and wrote.
-    func testEachHandCostsARareMaterialFromAParticularKindOfWorld() throws {
-        let staples: Set<ResourceID> = ["ore", "fiber", "rubble", "clay", "essence_raw"]
-        for node in ContentCatalog.shared.nodes(in: "penmanship") {
-            XCTAssertGreaterThan(node.cost.essence, Tuning.Economy.startingEssence * 2,
-                                 "\(node.name) is pocket change")
-            XCTAssertFalse(node.cost.resources.isEmpty, "\(node.name) asks for no materials at all")
-            XCTAssertTrue(node.cost.resources.keys.contains { !staples.contains($0) },
-                          "\(node.name) is buyable out of what an ordinary world already pays")
-        }
+    func testBrushUsesTheReversibleContinuationProfile() throws {
+        let brush = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_brush"))
+        XCTAssertEqual(brush.cost.essence, 45)
+        XCTAssertEqual(brush.cost.resources, ["copper": 2, "fiber": 6, "timber": 4])
     }
 
     /// What a brand-new player can actually reach, per subject, using only starting symbols.

@@ -11,8 +11,8 @@ enum Hand: String, Codable, CaseIterable, Sendable, Comparable {
 
     var displayName: String {
         switch self {
-        case .crude: "Charcoal"
-        case .plain: "Pencil"
+        case .crude: "Rough charcoal"
+        case .plain: "Brush"
         case .refined: "Fountain pen"
         }
     }

@@ -43,15 +43,28 @@ struct LibraryState: Codable, Equatable, Sendable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        foundPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .foundPages) ?? []
+        let aliases: [DiaryPageID: DiaryPageID] = [
+            "halloway_lead_pencil": "halloway_brush_ferrule",
+            "isolde_lead_pencil": "isolde_brush_hand"
+        ]
+        let decodedPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .foundPages) ?? []
+        foundPages = decodedPages.reduce(into: []) { result, page in
+            let canonical = aliases[page] ?? page
+            if !result.contains(canonical) { result.append(canonical) }
+        }
         foundWritings = try c.decodeIfPresent([FoundWritingRecord].self, forKey: .foundWritings) ?? []
         foundTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .foundTravellers) ?? []
         knownTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .knownTravellers) ?? []
         knownPatterns = try c.decodeIfPresent(Set<String>.self, forKey: .knownPatterns) ?? []
         travellerArrivalNearMisses = (try c.decodeIfPresent([TravellerID: Int].self,
             forKey: .travellerArrivalNearMisses) ?? [:]).mapValues { max(0, $0) }
-        pagesWaiting = try c.decodeIfPresent([DiaryPageID: Int].self, forKey: .pagesWaiting) ?? [:]
-        patiencePage = try c.decodeIfPresent(DiaryPageID.self, forKey: .patiencePage)
+        let decodedWaiting = try c.decodeIfPresent([DiaryPageID: Int].self, forKey: .pagesWaiting) ?? [:]
+        pagesWaiting = decodedWaiting.reduce(into: [:]) { result, entry in
+            let canonical = aliases[entry.key] ?? entry.key
+            result[canonical] = max(result[canonical] ?? 0, entry.value)
+        }
+        let decodedPatience = try c.decodeIfPresent(DiaryPageID.self, forKey: .patiencePage)
+        patiencePage = decodedPatience.map { aliases[$0] ?? $0 }
         visitedWorlds = try c.decodeIfPresent([VisitedWorld].self, forKey: .visitedWorlds) ?? []
     }
 

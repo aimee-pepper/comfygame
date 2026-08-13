@@ -73,7 +73,13 @@ struct BaseState: Codable, Equatable, Sendable {
     ///
     /// A single unlock for now (session 11 §3); per-target chaining runes stay possible later if
     /// one blunt switch proves too coarse.
-    var hasChainingUnlock: Bool = false
+    var hasChainingUnlock: Bool {
+        get { completedResearch.contains("pen_chaining") }
+        set {
+            if newValue { completedResearch.insert("pen_chaining") }
+            else { completedResearch.remove("pen_chaining") }
+        }
+    }
 
     /// The finest hand available. Marks are written in it by default.
     var bestHand: Hand { ownedHands.max() ?? .crude }
@@ -338,7 +344,6 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(stations, forKey: .stations)
         try c.encode(page, forKey: .page)
         try c.encode(ownedHands, forKey: .ownedHands)
-        try c.encode(hasChainingUnlock, forKey: .hasChainingUnlock)
         try c.encode(roster, forKey: .roster)
         try c.encode(activeParty, forKey: .activeParty)
         try c.encode(binderEquipped, forKey: .binderEquipped)
@@ -363,6 +368,9 @@ struct BaseState: Codable, Equatable, Sendable {
                                                               forKey: .ownedGambitComponents)
             ?? Set(GambitStarter.components)
         completedResearch = try container.decodeIfPresent(Set<ResearchNodeID>.self, forKey: .completedResearch) ?? []
+        if completedResearch.remove("pen_pencil") != nil {
+            completedResearch.insert("pen_brush")
+        }
         lifetimeRawEssenceRefined = try container.decodeIfPresent(Int.self,
                                                                    forKey: .lifetimeRawEssenceRefined) ?? 0
         autoRefineReturnedRawEssence = try container.decodeIfPresent(Bool.self,
@@ -393,7 +401,9 @@ struct BaseState: Codable, Equatable, Sendable {
         }
         page = try container.decodeIfPresent(Page.self, forKey: .page) ?? Page()
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
-        hasChainingUnlock = try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) ?? false
+        if try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) == true {
+            completedResearch.insert("pen_chaining")
+        }
         // A save written before the roster existed holds exactly one companion; she becomes the
         // roster, and keeps everything she had.
         roster = try container.decodeIfPresent([CompanionState].self, forKey: .roster)

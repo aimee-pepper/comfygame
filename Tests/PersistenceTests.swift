@@ -4,6 +4,33 @@ import XCTest
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
 
+    func testLegacyPencilAndChainingDecodeToCanonicalResearchAndReencodeCanonically() throws {
+        let data = Data(#"{"completedResearch":["pen_pencil","pen_desk"],"hasChainingUnlock":true}"#.utf8)
+        let decoded = try JSONDecoder().decode(BaseState.self, from: data)
+        XCTAssertEqual(decoded.completedResearch.intersection(["pen_brush", "pen_desk", "pen_chaining"]),
+                       ["pen_brush", "pen_desk", "pen_chaining"])
+        XCTAssertFalse(decoded.completedResearch.contains("pen_pencil"))
+        XCTAssertTrue(decoded.hasChainingUnlock)
+
+        let encoded = String(decoding: try JSONEncoder().encode(decoded), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("pen_pencil"))
+        XCTAssertFalse(encoded.contains("hasChainingUnlock"))
+        XCTAssertTrue(encoded.contains("pen_chaining"))
+        let roundTrip = try JSONDecoder().decode(BaseState.self, from: Data(encoded.utf8))
+        XCTAssertEqual(roundTrip.completedResearch, decoded.completedResearch)
+    }
+
+    func testLegacyBrushDiaryProgressAliasesEveryPersistedKeyWithoutDuplicates() throws {
+        let data = Data(#"{"foundPages":["halloway_lead_pencil","halloway_brush_ferrule","isolde_lead_pencil"],"pagesWaiting":{"halloway_lead_pencil":2,"halloway_brush_ferrule":5},"patiencePage":"isolde_lead_pencil"}"#.utf8)
+        let decoded = try JSONDecoder().decode(LibraryState.self, from: data)
+        XCTAssertEqual(decoded.foundPages, ["halloway_brush_ferrule", "isolde_brush_hand"])
+        XCTAssertEqual(decoded.pagesWaiting["halloway_brush_ferrule"], 5)
+        XCTAssertEqual(decoded.patiencePage, "isolde_brush_hand")
+
+        let encoded = String(decoding: try JSONEncoder().encode(decoded), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("lead_pencil"))
+    }
+
     private final class CountingIO: GamePersistenceIO, @unchecked Sendable {
         let wrapped: SaveFileIO
         private let lock = NSLock()

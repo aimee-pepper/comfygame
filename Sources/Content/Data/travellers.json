@@ -1088,14 +1088,14 @@
       "prefersConditions": []
     },
     {
-      "id": "halloway_lead_pencil", "diary": "halloway", "kind": "researchLead",
-      "prose": "A nib does not need to be precious. It needs to wear at the same rate on both sides. Bring Isolde metal that can keep that promise.",
-      "researchNode": "pen_pencil", "prefersConditions": []
+      "id": "halloway_brush_ferrule", "diary": "halloway", "kind": "researchLead",
+      "prose": "A ferrule does not need to be precious. It needs to hold an even bundle without crushing it. Bring Isolde metal that can keep that promise.",
+      "researchNode": "pen_brush", "prefersConditions": []
     },
     {
-      "id": "isolde_lead_pencil", "diary": "isolde", "kind": "researchLead",
-      "prose": "Charcoal teaches confidence because it cannot hide a correction. A pencil teaches revision. Do not call the second lesson refinement until you have learned both.",
-      "researchNode": "pen_pencil", "prefersConditions": []
+      "id": "isolde_brush_hand", "diary": "isolde", "kind": "researchLead",
+      "prose": "Rough charcoal teaches confidence because it cannot hide a correction. A brush teaches revision. Do not call the second lesson refinement until you have learned both.",
+      "researchNode": "pen_brush", "prefersConditions": []
     },
     {
       "id": "isolde_word_tovin", "diary": "isolde", "kind": "whereabouts",

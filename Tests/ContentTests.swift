@@ -5,6 +5,37 @@ import XCTest
 /// Adding a symbol/creature/station to JSON and getting an ID wrong should fail here, loudly,
 /// rather than silently spawning nothing in a world.
 final class ContentTests: XCTestCase {
+    func testPenmanshipIsBrushRootedWithThreeIndependentTierOnePractices() throws {
+        let catalog = ContentCatalog.shared
+        let brush = try XCTUnwrap(catalog.researchNode("pen_brush"))
+        XCTAssertTrue(brush.requires.isEmpty)
+        XCTAssertNil(catalog.researchNode("pen_pencil"))
+
+        let siblings = ["pen_ink_mixing", "pen_compounds", "pen_chaining"]
+            .compactMap(catalog.researchNode)
+        XCTAssertEqual(siblings.count, 3)
+        for node in siblings {
+            XCTAssertEqual(node.requires, ["pen_brush"])
+            XCTAssertEqual(node.needsStationTier, 1)
+        }
+        XCTAssertEqual(Set(siblings.flatMap(\.requires)), ["pen_brush"])
+
+        let fountain = try XCTUnwrap(catalog.researchNode("pen_fountain"))
+        XCTAssertEqual(fountain.requires, ["pen_chaining"])
+        XCTAssertEqual(fountain.needsStationTier, 2)
+    }
+
+    func testCurrentResearchAndDiaryCopyContainsNoPlayerFacingPencil() {
+        for node in ContentCatalog.shared.researchNodes {
+            XCTAssertFalse("\(node.name) \(node.blurb)".localizedCaseInsensitiveContains("pencil"),
+                           "legacy tool copy remains on \(node.id)")
+        }
+        for page in ContentCatalog.shared.diaryPages {
+            XCTAssertFalse(page.prose.localizedCaseInsensitiveContains("pencil"),
+                           "legacy tool copy remains on \(page.id)")
+        }
+    }
+
     func testSettingsDestinationsShareOneNavigationCardGrammar() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
