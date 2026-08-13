@@ -303,7 +303,7 @@ struct ArmouryView: View {
                                 catalogueID: target.catalogID,
                                 rarity: targetRarity(target),
                                 quantity: 1,
-                                identified: true,
+                                identified: targetIsIdentified(target),
                                 location: targetLocation(target),
                                 accessibilityName: target.displayName
                             )
@@ -345,6 +345,13 @@ struct ArmouryView: View {
         switch target {
         case .stored: .stored
         case .worn: .worn
+        }
+    }
+
+    private func targetIsIdentified(_ target: ArmouryRules.Target) -> Bool {
+        switch target {
+        case .stored(let stack): stack.identified
+        case .worn: true
         }
     }
 }

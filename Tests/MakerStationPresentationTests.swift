@@ -35,9 +35,11 @@ final class MakerStationPresentationTests: XCTestCase {
 
         XCTAssertTrue(armoury.contains("SixAcrossItemGrid(data: targets, id: \\.id)"))
         XCTAssertTrue(armoury.contains("catalogueID: target.catalogID"))
+        XCTAssertTrue(armoury.contains("identified: targetIsIdentified(target)"))
         XCTAssertTrue(armoury.contains("location: targetLocation(target)"))
         XCTAssertTrue(armoury.contains("case .stored: .stored"))
         XCTAssertTrue(armoury.contains("case .worn: .worn"))
+        XCTAssertTrue(armoury.contains("case .stored(let stack): stack.identified"))
         XCTAssertTrue(armoury.contains(".presentationDetents([.medium, .large])"))
         XCTAssertTrue(armoury.contains(".presentationDragIndicator(.visible)"))
         XCTAssertFalse(armoury.contains("Image(systemName: \"chevron.right\")"))
