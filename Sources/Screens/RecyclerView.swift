@@ -48,7 +48,10 @@ struct RecyclerView: View {
         .navigationTitle("Recycler")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selected) { preview in
-            RecyclerPreviewSheet(preview: preview).environmentObject(store)
+            RecyclerPreviewSheet(preview: preview)
+                .environmentObject(store)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
     }
 
