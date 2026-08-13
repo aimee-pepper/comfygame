@@ -24,6 +24,26 @@ Classifications:
 
 ## Executive result
 
+## Remediation status — 13 August 2026
+
+The priority remediation is implemented in six isolated checkpoints:
+
+- `4cc1006` — measured shelf units plus indeterminate save preparation; both fabricated percentage
+  scales removed.
+- `967713d` — truthful combat-skill, Bestiary, Library-placement, and maximum-health semantics.
+- `4dc340d` — rules-owned stale quotes and atomic refusal-visible loot, spillover, and party transfer.
+- `09a3a39` — bundled planning claims and generated/estimated values explicitly disclosed; reforge
+  maximum derives from rules authority.
+- `649626f` — 17 tracked provisional catalogues carry machine-validated field dispositions and
+  literal placeholder item copy is removed.
+- `b922dca` — Bestiary release wording and Storehouse/resource/material details resolve current
+  authority instead of frozen presentation snapshots.
+
+Verification on an existing iPhone 17 Pro Simulator (iOS 26.2): 116/116 focused remediation tests
+and 1,236/1,236 complete-suite tests passed with zero failures or skips. The permanent acceptance
+rules at the end of this document are now executable gates where the relevant surface has a testable
+authority seam.
+
 Confirmed defects:
 
 - 2 P0 fabricated determinate progress authorities for the same launch work.
