@@ -493,7 +493,7 @@ private struct VisitedWorldSheet: View {
                     } header: {
                         Text("Living analysis")
                     } footer: {
-                        Text("Likely distributions, derived from the same trait budgets that grew this world's species.")
+                        Text("Reference distribution from \(LivingAnalysisRules.sampleCount) deterministic generated samples using the same trait budgets that grew this world's species.")
                     }
                 }
 

@@ -10,6 +10,16 @@ import XCTest
 /// bought with.**
 @MainActor
 final class InstrumentTests: XCTestCase {
+    func testWorldHistoryLabelsLivingAnalysisAsDeterministicReferenceEvidence() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/WorldHistoryView.swift"), encoding: .utf8)
+
+        XCTAssertTrue(source.contains("Reference distribution from \\(LivingAnalysisRules.sampleCount) deterministic generated samples"))
+        XCTAssertFalse(source.contains("Likely distributions"))
+    }
+
 
     func testWorldHistoryRecordActionsRemainOutsideLongAnalysisContent() throws {
         let root = URL(fileURLWithPath: #filePath)
