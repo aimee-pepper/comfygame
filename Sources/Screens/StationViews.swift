@@ -94,6 +94,11 @@ struct DistilleryView: View {
 
 struct ChannelworksView: View {
     @EnvironmentObject private var store: GameStore
+
+    private var hasHeatCore: Bool {
+        store.state.base.inventory.stacks.contains { $0.catalogID == Items.heatCore }
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -102,9 +107,15 @@ struct ChannelworksView: View {
                         .font(.caption).foregroundStyle(.secondary)
                     Text("Oda consumes one Heat core and transfers its attunement, potency and origin receipt into a contained fixture.")
                         .font(.caption).foregroundStyle(.secondary)
+
+                    Label(hasHeatCore ? "Heat core ready" : "Requires one Heat core",
+                          systemImage: hasHeatCore ? "checkmark.circle.fill" : "exclamationmark.circle")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(hasHeatCore ? Color.green : Color.orange)
+
                     Button("Construct Heat Conduit fixture") { store.constructConduitFixture() }
                         .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
-                        .disabled(!store.state.base.inventory.stacks.contains { $0.catalogID == Items.heatCore })
+                        .disabled(!hasHeatCore)
                 }
             }.padding(16)
         }.background(Color(.systemGroupedBackground))

@@ -30,6 +30,9 @@ final class SpilloverTests: XCTestCase {
         XCTAssertTrue(distillery.contains("attunementCard(attunement)"))
         XCTAssertFalse(distillery.contains("ComingLater"))
         XCTAssertTrue(channelworks.contains("Construct Heat Conduit fixture"))
+        XCTAssertTrue(channelworks.contains("Requires one Heat core"))
+        XCTAssertTrue(channelworks.contains("Heat core ready"))
+        XCTAssertTrue(channelworks.contains(".disabled(!hasHeatCore)"))
         XCTAssertFalse(channelworks.contains("ComingLater"))
     }
 
