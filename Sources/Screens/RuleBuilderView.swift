@@ -16,6 +16,7 @@ struct RuleBuilderView: View {
     @State private var threshold: GambitComponentID?
     @State private var action: GambitComponentID?
     @State private var wantsCondition = false
+    @State private var addFailure: String?
 
     var body: some View {
         NavigationStack {
@@ -64,12 +65,26 @@ struct RuleBuilderView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Add") {
-                        if let preview, store.addGambit(preview, for: owner) { dismiss() }
+                        guard let preview else { return }
+                        if store.addGambit(preview, for: owner) {
+                            addFailure = nil
+                            dismiss()
+                        } else {
+                            addFailure = "Rule writing or one of the selected parts is no longer available. Review the sentence and try again."
+                        }
                     }
                     .disabled(preview == nil)
                 }
             }
             .onAppear(perform: seedDefaults)
+            .alert("Rule not added", isPresented: Binding(
+                get: { addFailure != nil },
+                set: { if !$0 { addFailure = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(addFailure ?? "The rule could not be added.")
+            }
         }
     }
 

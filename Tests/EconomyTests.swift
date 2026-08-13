@@ -348,6 +348,20 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(source.components(separatedBy: "Label(\"Write a rule\"").count - 1, 1)
     }
 
+    func testRuleBuilderReportsAStaleWriteFailure() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/RuleBuilderView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("if store.addGambit(preview, for: owner)"))
+        XCTAssertTrue(source.contains("Rule not added"))
+        XCTAssertTrue(source.contains("Rule writing or one of the selected parts is no longer available."))
+        XCTAssertTrue(source.contains("addFailure = nil\n                            dismiss()"))
+    }
+
     func testGambitSwipeDeletionConfirmsStableRuleIdentityBeforeMutation() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
