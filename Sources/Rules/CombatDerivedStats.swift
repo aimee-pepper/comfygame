@@ -160,6 +160,20 @@ enum CombatDerivedStatsRules {
         static let virulence: CombatNodeID = "combat.craft.venom.virulence"
         static let corrode: CombatNodeID = "combat.craft.venom.corrode"
         static let blight: CombatNodeID = "combat.craft.venom.blight"
+        static let constitution: CombatNodeID = "combat.defense.fortitude.constitution"
+        static let endurance: CombatNodeID = "combat.defense.fortitude.endurance"
+        static let unyielding: CombatNodeID = "combat.defense.fortitude.unyielding"
+    }
+
+    static func constitutionTicks(authored: Int, endless: Bool, ownsNode: Bool) -> Int {
+        guard ownsNode, !endless else { return authored }
+        return max(1, (max(0, authored) + 1) / 2)
+    }
+
+    static func enduranceDamage(_ value: Int, currentHP: Int, maximumHP: Int,
+                                eventMinimum: Int, ownsNode: Bool) -> Int {
+        guard ownsNode, currentHP > 0, currentHP * 2 <= max(1, maximumHP) else { return value }
+        return max(eventMinimum, Int((Double(value) * 0.75).rounded(.down)))
     }
 
     struct DirectHitSnapshot: Equatable, Sendable {

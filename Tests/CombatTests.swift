@@ -4950,4 +4950,91 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(erodedLoss, plainLoss + 2)
         XCTAssertEqual(eroded.activeEncounter?.foes.first?.stats.armour, 6)
     }
+
+    func testConstitutionRunsAfterVirulenceBeforeRefreshForAllAfflictions() throws {
+        for kind in AfflictionID.allCases {
+            var encounter = try XCTUnwrap(inFight().activeEncounter)
+            let target: Combatant = .companion(0)
+            encounter.debugV2OwnedNodeIDs = [
+                .binder: [CombatDerivedStatsRules.Node.virulence],
+                target: [CombatDerivedStatsRules.Node.constitution]
+            ]
+            _ = CombatRules.applyAffliction(kind, to: target, source: .binder,
+                provenance: .direct, damage: 2, ticks: 3, targetIsStanding: true,
+                encounter: &encounter)
+            XCTAssertEqual(encounter.afflictions?.first?.ticksRemaining, 3,
+                           "Virulence 3+2 then Constitution ceil-half")
+            _ = CombatRules.applyAffliction(kind, to: target, source: .binder,
+                provenance: .direct, damage: 1, ticks: 1, targetIsStanding: true,
+                encounter: &encounter)
+            XCTAssertEqual(encounter.afflictions?.first?.ticksRemaining, 3,
+                           "shorter prospective duration is a canonical no-op")
+        }
+        XCTAssertEqual(CombatDerivedStatsRules.constitutionTicks(authored: 1, endless: false,
+                                                                  ownsNode: true), 1)
+        XCTAssertEqual(CombatDerivedStatsRules.constitutionTicks(authored: 7, endless: false,
+                                                                  ownsNode: true), 4)
+        XCTAssertEqual(CombatDerivedStatsRules.constitutionTicks(authored: 7, endless: true,
+                                                                  ownsNode: true), 7)
+    }
+
+    func testEnduranceThresholdCrossingAndMinimumArePureAndFrozenMaximumAware() {
+        let node = true
+        XCTAssertEqual(CombatDerivedStatsRules.enduranceDamage(
+            8, currentHP: 11, maximumHP: 20, eventMinimum: 1, ownsNode: node), 8)
+        XCTAssertEqual(CombatDerivedStatsRules.enduranceDamage(
+            8, currentHP: 10, maximumHP: 20, eventMinimum: 1, ownsNode: node), 6)
+        XCTAssertEqual(CombatDerivedStatsRules.enduranceDamage(
+            1, currentHP: 1, maximumHP: 26, eventMinimum: 1, ownsNode: node), 1)
+        XCTAssertEqual(CombatDerivedStatsRules.enduranceDamage(
+            8, currentHP: 5, maximumHP: 26, eventMinimum: 1, ownsNode: false), 8)
+    }
+
+    func testUnyieldingAndEnduranceApplyOnCanonicalAfflictionTicksPersistAndDoNotRecharge() throws {
+        let store = inFight()
+        store.mutate("stage lethal status against exact survival owner") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.endurance,
+                                                       CombatDerivedStatsRules.Node.unyielding]]
+            encounter.unyieldingSpent = []
+            run.binderHP = 4
+            _ = CombatRules.applyAffliction(.burn, to: .binder, source: .foe(encounter.foes[0].id),
+                provenance: .direct, damage: 8, ticks: 2, targetIsStanding: true,
+                encounter: &encounter)
+            CombatRules.tickAfflictions(run: &run, encounter: &encounter)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        XCTAssertEqual(store.state.worlds.activeRun?.binderHP, 1)
+        XCTAssertEqual(store.activeEncounter?.unyieldingSpent, [.binder])
+        XCTAssertTrue(store.activeEncounter?.log.contains { $0.contains("Endurance") } == true)
+        XCTAssertTrue(store.activeEncounter?.log.contains { $0.contains("Unyielding") } == true)
+
+        let encoded = try JSONEncoder().encode(try XCTUnwrap(store.activeEncounter))
+        var encounter = try JSONDecoder().decode(EncounterState.self, from: encoded)
+        var run = try XCTUnwrap(store.state.worlds.activeRun)
+        run.binderHP = 5 // healing does not restore the spent receipt
+        CombatRules.tickAfflictions(run: &run, encounter: &encounter)
+        XCTAssertEqual(run.binderHP, 0)
+        XCTAssertEqual(encounter.unyieldingSpent, [.binder])
+    }
+
+    func testSurvivalNodesAreExactOwnerAndEnabledEmptyParity() throws {
+        var encounter = try XCTUnwrap(inFight().activeEncounter)
+        encounter.debugV2OwnedNodeIDs = [.binder: [], .companion(0): []]
+        encounter.unyieldingSpent = []
+        let target: Combatant = .companion(0)
+        _ = CombatRules.applyAffliction(.poison, to: target, source: .binder,
+            provenance: .direct, damage: 2, ticks: 5, targetIsStanding: true,
+            encounter: &encounter)
+        XCTAssertEqual(encounter.afflictions?.first?.ticksRemaining, 5)
+        XCTAssertEqual(encounter.unyieldingSpent, [])
+
+        var exact = try XCTUnwrap(inFight().activeEncounter)
+        exact.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.constitution],
+                                     .companion(0): []]
+        _ = CombatRules.applyAffliction(.poison, to: target, source: .binder,
+            provenance: .direct, damage: 2, ticks: 5, targetIsStanding: true,
+            encounter: &exact)
+        XCTAssertEqual(exact.afflictions?.first?.ticksRemaining, 5, "no party aura")
+    }
 }

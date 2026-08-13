@@ -902,7 +902,10 @@ enum CombatRules {
             + (eligibleVirulence && !endless ? 2 : 0)
         // Constitution's later consumer transforms this prospective value here, before refresh.
         // Keeping the named boundary prevents Virulence being retroactively added to an old row.
-        let proposedTicks = authoredTicks
+        let proposedTicks = CombatDerivedStatsRules.constitutionTicks(
+            authored: authoredTicks, endless: endless,
+            ownsNode: owns(CombatDerivedStatsRules.Node.constitution,
+                           actor: target, encounter: encounter))
         let index = encounter.afflictions?.firstIndex { $0.target == target && $0.kind == kind }
         let old = index.flatMap { encounter.afflictions?[$0] }
         let changes = old == nil
@@ -2044,13 +2047,32 @@ enum CombatRules {
                              by amount: Int,
                              run: inout WorldRun,
                              encounter: inout EncounterState) {
+        let before = health(of: target, in: run)
+        let ownsEndurance = owns(CombatDerivedStatsRules.Node.endurance,
+                                 actor: target, encounter: encounter)
+        let reduced = CombatDerivedStatsRules.enduranceDamage(
+            amount, currentHP: before.current, maximumHP: before.max,
+            eventMinimum: Tuning.Encounter.minimumDamage, ownsNode: ownsEndurance)
+        let ownsUnyielding = owns(CombatDerivedStatsRules.Node.unyielding,
+                                  actor: target, encounter: encounter)
+        let canSpendUnyielding = target.isParty && before.current > 0
+            && before.current - reduced <= 0 && ownsUnyielding
+            && encounter.unyieldingSpent?.contains(target) == false
+        let finalHP = canSpendUnyielding ? 1 : max(0, before.current - reduced)
         switch target {
-        case .binder: run.binderHP = max(0, run.binderHP - amount)
+        case .binder: run.binderHP = finalHP
         case .companion(let index):
-            run.companionHP[index] = max(0, health(of: target, in: run).current - amount)
+            run.companionHP[index] = finalHP
         case .foe(let id):
-            _ = applyFoeDamage(foeID: id, amount: amount, sourceActor: nil,
+            _ = applyFoeDamage(foeID: id, amount: reduced, sourceActor: nil,
                                provenance: .environment, run: &run, encounter: &encounter)
+        }
+        if ownsEndurance, reduced < amount {
+            encounter.note("Endurance reduces the harm from \(amount) to \(reduced).")
+        }
+        if canSpendUnyielding {
+            encounter.unyieldingSpent?.insert(target)
+            encounter.note("Unyielding leaves \(actorName(target, encounter: encounter).lowercased()) at 1 health.")
         }
     }
 

@@ -572,6 +572,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     var foeArmourErosion: [InstanceID: Int] = [:]
     /// At most one Corrode contribution from one exact source to one target in one global round.
     var corrodeReceipts: Set<CorrodeReceipt> = []
+    /// One lethal-event survival receipt per exact modern-v2 owner. Nil marks a legacy encounter;
+    /// an empty set is modern and unspent, so relaunch/healing cannot remint a spent charge.
+    var unyieldingSpent: Set<Combatant>?
     /// One prepared refusal of the next affliction. Kept as a count-shaped value so a future
     /// upgrade can grant more than one without changing the save shape; Stonebark currently sets 1.
     var statusGuards: [Combatant: Int] = [:]
@@ -665,6 +668,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2Resistance = debugV2Resistance
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
+        self.unyieldingSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.breakingBlowScheduledSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.breakingBlowOpeningSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.partyRanks = partyRanks
@@ -766,6 +770,8 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                   forKey: .foeArmourErosion) ?? [:]
         corrodeReceipts = try c.decodeIfPresent(Set<CorrodeReceipt>.self,
                                                  forKey: .corrodeReceipts) ?? []
+        unyieldingSpent = try c.decodeIfPresent(Set<Combatant>.self, forKey: .unyieldingSpent)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [])
         statusGuards = try c.decodeIfPresent([Combatant: Int].self, forKey: .statusGuards) ?? [:]
         preparedCoatings = try c.decodeIfPresent([Combatant: PreparedCoating].self,
                                                  forKey: .preparedCoatings) ?? [:]
