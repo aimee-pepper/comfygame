@@ -123,8 +123,20 @@ struct TravellerMeetingView: View {
     /// **Yes or not yet.** Declining isn't punished and isn't final while the world holds — but the
     /// world is coming apart, so "I'll come back" is a bet rather than a plan.
     private var decision: some View {
-        VStack(spacing: 8) {
+        PersistentActionBar(
+            message: decisionMessage,
+            messageTint: blockedReason == nil ? .secondary : .red
+        ) {
             if conversation.terminal == nil {
+                HStack(spacing: 10) {
+                    Button("Not now") {
+                        blockedReason = nil
+                        withAnimation { conversation.decline() }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                    .frame(maxWidth: .infinity)
+
                 Button {
                     store.recruit(traveller.id)
                     if store.state.reality.library.foundTravellers.contains(traveller.id) {
@@ -136,37 +148,32 @@ struct TravellerMeetingView: View {
                         }.first ?? "They cannot come with you yet."
                     }
                 } label: {
-                    Text(meeting?.offer ?? "Come back with me.")
-                        .font(.headline)
+                    Text("Invite them")
                         .frame(maxWidth: .infinity)
-                        .frame(minHeight: 52)
                 }
                 .buttonStyle(.borderedProminent)
-
-                Button("Leave them") {
-                    blockedReason = nil
-                    withAnimation { conversation.decline() }
+                .controlSize(.large)
+                .frame(maxWidth: .infinity)
                 }
-                    .font(.callout)
-                    .frame(minHeight: 44)
             } else {
-                Button(conversation.terminal == .declined ? "Leave" : "Continue") { dismiss() }
-                    .buttonStyle(.borderedProminent)
-                    .frame(minHeight: 52)
-            }
-
-            if let blockedReason {
-                Text(blockedReason)
-                    .font(.caption2)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+                Button(conversation.terminal == .declined ? "Leave" : "Continue") {
+                    dismiss()
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .frame(maxWidth: .infinity)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 10)
-        .padding(.bottom, 12)
-        .background(.bar)
+    }
+
+    private var decisionMessage: String {
+        if let blockedReason { return blockedReason }
+        if conversation.terminal == nil {
+            return meeting?.offer ?? "Come back with me."
+        }
+        return conversation.terminal == .declined
+            ? "You can still leave before the world closes."
+            : "They are ready to return with you."
     }
 }
 

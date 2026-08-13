@@ -4,6 +4,20 @@ import XCTest
 final class TravellerWorldPacingTests: XCTestCase {
     private let catalog = ContentCatalog.shared
 
+    func testMeetingKeepsAuthoredOfferOutOfOversizedActionLabel() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/TravellerMeetingView.swift"),
+            encoding: .utf8
+        )
+        XCTAssertTrue(source.contains("PersistentActionBar("))
+        XCTAssertTrue(source.contains("Text(\"Invite them\")"))
+        XCTAssertTrue(source.contains("Button(\"Not now\")"))
+        XCTAssertTrue(source.contains("return meeting?.offer ?? \"Come back with me.\""))
+    }
+
     func testFreshMaraAndBrynMatchPlacesMaraOnly() throws {
         let mara = try traveller("mara")
         let bryn = try traveller("bryn")
