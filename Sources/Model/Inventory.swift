@@ -330,7 +330,8 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         let catalogBase = identified ? item.name : (item.unidentifiedName ?? "Something odd")
         let base = gearProfile?.displayProvenance ?? catalogBase
         if let profile = gearProfile {
-            let suffix = profile.reforgeRank > 0 ? " · Reforged \(profile.reforgeRank)/3" : ""
+            let suffix = profile.reforgeRank > 0
+                ? " · Reforged \(profile.reforgeRank)/\(Tuning.Smith.maximumReforgeRank)" : ""
             return "\(base) · Tier \(profile.constructionTier)\(suffix)"
         }
         let bonus = upgradeLevel + wildGrowth
@@ -548,7 +549,8 @@ struct EquippedPiece: Codable, Equatable, Sendable, ExpressibleByStringLiteral {
     var displayName: String {
         let base = gearProfile?.displayProvenance ?? definition?.name ?? catalogID.rawValue
         if let profile = gearProfile {
-            let suffix = profile.reforgeRank > 0 ? " · Reforged \(profile.reforgeRank)/3" : ""
+            let suffix = profile.reforgeRank > 0
+                ? " · Reforged \(profile.reforgeRank)/\(Tuning.Smith.maximumReforgeRank)" : ""
             return "\(base) · Tier \(profile.constructionTier)\(suffix)"
         }
         let bonus = upgradeLevel + wildGrowth

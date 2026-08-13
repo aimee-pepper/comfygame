@@ -2,6 +2,29 @@ import XCTest
 @testable import Bookbinder
 
 final class MakerStationPresentationTests: XCTestCase {
+    func testPlayerFacingReforgeLabelsUseRulesOwnedMaximum() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let paths = [
+            "Sources/Screens/GearView.swift",
+            "Sources/Screens/TradingPostView.swift",
+            "Sources/Screens/StationViews.swift",
+            "Sources/Rules/SmithRules.swift",
+            "Sources/Model/Inventory.swift"
+        ]
+        let sources = try paths.map {
+            try String(contentsOf: root.appending(path: $0), encoding: .utf8)
+        }
+
+        XCTAssertFalse(sources.contains { $0.contains("Reforged \\(upgradeLevel)/3") })
+        XCTAssertFalse(sources.contains { $0.contains("Reforged \\(profile.reforgeRank)/3") })
+        XCTAssertTrue(sources[0].contains("SmithRules.maximumReforgeLevel"))
+        XCTAssertTrue(sources[1].contains("SmithRules.maximumReforgeLevel"))
+        XCTAssertTrue(sources[2].contains("SmithRules.maximumReforgeLevel"))
+        XCTAssertTrue(sources[3].contains("SmithRules.maximumReforgeLevel"))
+        XCTAssertTrue(sources[4].contains("Tuning.Smith.maximumReforgeRank"))
+    }
+
     func testBlacksmithRecipeGridReflowsBeforeTextShrinks() {
         XCTAssertEqual(MakerStationPresentationRules.recipeColumns(isAccessibilitySize: false), 3)
         XCTAssertEqual(MakerStationPresentationRules.recipeColumns(isAccessibilitySize: true), 2)

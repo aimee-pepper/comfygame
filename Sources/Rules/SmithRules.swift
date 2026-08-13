@@ -298,7 +298,8 @@ enum ReforgeTarget: Identifiable, Equatable, Sendable {
 
     var displayName: String {
         let base = definition?.name ?? catalogID.rawValue
-        let suffix = upgradeLevel > 0 ? " · Reforged \(upgradeLevel)/3" : ""
+        let suffix = upgradeLevel > 0
+            ? " · Reforged \(upgradeLevel)/\(SmithRules.maximumReforgeLevel)" : ""
         return "\(base) · Tier \(constructionTier)\(suffix)"
     }
 

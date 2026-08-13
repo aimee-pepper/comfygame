@@ -215,7 +215,19 @@ final class SmithTests: XCTestCase {
         let resumed = GameStore(io: io)
         XCTAssertEqual(resumed.worn(.weapon, by: PartyMember.binder)?.upgradeLevel, 1)
         XCTAssertEqual(resumed.worn(.weapon, by: PartyMember.binder)?.displayName,
-                       "Keen Blade · Tier 2 · Reforged 1/3")
+                       "Keen Blade · Tier 2 · Reforged 1/\(SmithRules.maximumReforgeLevel)")
+    }
+
+    func testPlayerFacingReforgeNamesUseRulesOwnedMaximum() throws {
+        var stack = ItemStack(id: InstanceID(rawValue: 219), catalogID: "blade_keen")
+        stack.gearProfile?.reforgeRank = 1
+        let expected = "Reforged 1/\(SmithRules.maximumReforgeLevel)"
+
+        XCTAssertTrue(stack.displayName.contains(expected))
+        XCTAssertTrue(ReforgeTarget.stored(stack).displayName.contains(expected))
+        XCTAssertFalse(stack.displayName.contains("Reforged 1/3")
+                       && SmithRules.maximumReforgeLevel != 3,
+                       "Presentation must follow tuning rather than a frozen denominator")
     }
 
     /// Once loaded, even an untouched equipped piece writes its durable instance profile. Bare IDs
