@@ -100,6 +100,9 @@ final class MakerStationPresentationTests: XCTestCase {
         XCTAssertTrue(source.contains("Text(\"Construct · \\(preview.essence) essence\").frame(maxWidth: .infinity)"))
         XCTAssertTrue(source.contains("reforgeActionBar"))
         XCTAssertTrue(source.contains("Text(\"Reforge\").frame(maxWidth: .infinity)"))
+        XCTAssertTrue(source.contains("reforgeActionFootnote(readiness)"))
+        XCTAssertTrue(source.contains("Needs \\(missing) more qualifying stock"))
+        XCTAssertTrue(source.contains("Needs \\(max(0, need - have)) more essence."))
         XCTAssertTrue(source.contains("if let preview { rebuildActionBar(preview) }"))
         XCTAssertTrue(source.contains("Text(\"Rebuild · \\(preview.essence) essence\").frame(maxWidth: .infinity)"))
     }

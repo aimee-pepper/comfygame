@@ -1187,9 +1187,10 @@ private struct ReforgeSheet: View {
     }
 
     private var reforgeActionBar: some View {
-        PersistentActionBar(
-            message: commitFailure ?? "The piece, stock, and cost are checked again before reforging.",
-            messageTint: commitFailure == nil ? .secondary : .orange
+        let readiness = store.readiness(of: target)
+        return PersistentActionBar(
+            message: reforgeActionFootnote(readiness),
+            messageTint: commitFailure == nil && readiness.isReady ? .secondary : .orange
         ) {
             Button {
                 if store.reforge(target) { dismiss() }
@@ -1199,7 +1200,22 @@ private struct ReforgeSheet: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
-            .disabled(!store.readiness(of: target).isReady)
+            .disabled(!readiness.isReady)
+        }
+    }
+
+    private func reforgeActionFootnote(_ readiness: SmithRules.Readiness) -> String {
+        if let commitFailure { return commitFailure }
+        switch readiness {
+        case .ready:
+            return "The piece, stock, and cost are checked again before reforging."
+        case .finished:
+            return "This piece is already fully reforged."
+        case .needsMaterials(let have, let need):
+            let missing = max(0, need - have)
+            return "Needs \(missing) more qualifying stock \(missing == 1 ? "sample" : "samples")."
+        case .needsEssence(let have, let need):
+            return "Needs \(max(0, need - have)) more essence."
         }
     }
 
