@@ -212,6 +212,22 @@ final class CampaignLaunchProgressTests: XCTestCase {
                        "the live page and storyboard must share one global centre")
     }
 
+    func testLiveBookMarkUsesStoryboardTopLeadingCoordinateSpace() throws {
+        let source = try String(contentsOf: projectRoot
+            .appending(path: "Sources/App/BookbinderApp.swift"), encoding: .utf8)
+        let storyboard = try String(contentsOf: projectRoot
+            .appending(path: "Support/LaunchScreen.storyboard"), encoding: .utf8)
+        let markStart = try XCTUnwrap(source.range(of: "private struct BookbindingMark"))
+        let loggerStart = try XCTUnwrap(source.range(of: "extension Logger", range: markStart.upperBound..<source.endIndex))
+        let mark = String(source[markStart.lowerBound..<loggerStart.lowerBound])
+
+        XCTAssertTrue(storyboard.contains("<rect key=\"frame\" x=\"87\" y=\"74\" width=\"74\" height=\"58\"/>"))
+        XCTAssertTrue(mark.contains(".frame(width: 74, height: 58, alignment: .topLeading)"),
+                      "absolute storyboard piece offsets require a top-leading 74×58 origin")
+        XCTAssertTrue(mark.contains("piece(0, 4, 36, 54"))
+        XCTAssertTrue(mark.contains("piece(60, 50, 6, 4"))
+    }
+
     private func fixturePrepared() -> GameStore.PreparedLaunch {
         .init(state: .newGame(), loadOutcome: "fixture", saveFileByteCount: nil,
               timings: .init(loadMilliseconds: 1, reconciliationMilliseconds: 2,

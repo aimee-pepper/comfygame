@@ -343,3 +343,17 @@ stopgaps.
 - A test name may not claim honesty, parity, or exactness unless it asserts the authority relation,
   not only output shape/order/text.
 - Release content cannot inherit a broad placeholder note without a field-level disposition.
+
+## Launch composition parity follow-up
+
+The remaining static-to-live alignment defect was inside the bookbinding mark, not the outer page.
+`LaunchScreen.storyboard` places every mark piece in a 74×58 top-leading coordinate space. The
+SwiftUI `BookbindingMark` used the same numeric offsets but framed its intrinsically 36-point-wide
+`ZStack` with the default centered alignment, shifting the entire live mark to the right when the
+progress surface appeared. The live mark now uses an explicit top-leading 74×58 frame so the static
+and progress states share the same coordinate origin as well as the same page geometry.
+
+Focused evidence: `CampaignLaunchProgressTests` asserts the storyboard mark frame, live frame
+alignment, and endpoint coordinates; the launch/persistence geometry gate passes 12/12. Rendered
+transition and physical-device acceptance remain evidence gates and are not inferred from source
+geometry when Simulator/device services are unavailable.

@@ -399,7 +399,10 @@ private struct BookbindingMark: View {
             piece(8, 46, 6, 4, ink)
             piece(60, 50, 6, 4, ink)
         }
-        .frame(width: 74, height: 58)
+        // These offsets are the exact LaunchScreen.storyboard coordinates. Without an explicit
+        // top-leading frame alignment SwiftUI centers the ZStack's 36-point intrinsic width in
+        // this 74-point frame, shifting the whole mark right even though the page itself is centered.
+        .frame(width: 74, height: 58, alignment: .topLeading)
     }
 
     private var edge: Color { color(colorScheme == .dark ? 0xD8BD82 : 0x8A693A) }
