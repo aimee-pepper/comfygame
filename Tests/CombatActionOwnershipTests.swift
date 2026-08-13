@@ -2,6 +2,22 @@ import XCTest
 @testable import Bookbinder
 
 final class CombatActionOwnershipTests: XCTestCase {
+    func testCarriedRemedyTargetActionRemainsOutsideScrollableInventory() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/EncounterView.swift"), encoding: .utf8)
+        let sheet = try XCTUnwrap(source.range(of: "private struct CombatItemSheet: View"))
+        let pending = try XCTUnwrap(source.range(of: "private struct PendingSelection", range: sheet.lowerBound..<source.endIndex))
+        let view = String(source[sheet.lowerBound..<pending.lowerBound])
+
+        XCTAssertTrue(view.contains(".safeAreaInset(edge: .bottom, spacing: 0) { selectedRemedyActionBar }"))
+        XCTAssertTrue(view.contains("PersistentActionBar(message: itemEffect(item))"))
+        XCTAssertTrue(view.contains("Label(\"Use on…\", systemImage: \"person.crop.circle.badge.checkmark\")"))
+        XCTAssertTrue(view.contains("ForEach(livingParty, id: \\.self)"))
+        XCTAssertTrue(view.contains("Button(name(of: ally)) { beginUse(stack, on: ally) }"))
+    }
+
     func testStartingIdentityTechniquesDoNotFollowGenericCompanionStatus() {
         var state = GameState.newGame()
         var ordinary = CompanionState()

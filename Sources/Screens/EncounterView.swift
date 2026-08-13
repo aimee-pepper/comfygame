@@ -793,17 +793,6 @@ private struct CombatItemSheet: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
 
-                            Text("Use on")
-                                .font(.subheadline.weight(.semibold))
-                            LazyVGrid(columns: recipientColumns, spacing: 8) {
-                                ForEach(livingParty, id: \.self) { ally in
-                                    Button(name(of: ally)) {
-                                        beginUse(stack, on: ally)
-                                    }
-                                    .buttonStyle(.bordered)
-                                    .frame(maxWidth: .infinity, minHeight: 44)
-                                }
-                            }
                         }
                         .padding(12)
                         .background(Color(.secondarySystemGroupedBackground),
@@ -816,6 +805,7 @@ private struct CombatItemSheet: View {
                 }
                 .padding(16)
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) { selectedRemedyActionBar }
             .navigationTitle("Carried remedies")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -847,8 +837,28 @@ private struct CombatItemSheet: View {
         .presentationDetents([.medium, .large])
     }
 
-    private var recipientColumns: [GridItem] {
-        [GridItem(.flexible(), spacing: 8), GridItem(.flexible())]
+    @ViewBuilder private var selectedRemedyActionBar: some View {
+        if let stack = selectedStack,
+           let item = ContentCatalog.shared.item(stack.catalogID) {
+            PersistentActionBar(message: itemEffect(item)) {
+                HStack(spacing: 10) {
+                    Text(stack.count > 1 ? "\(item.name) ×\(stack.count)" : item.name)
+                        .font(.callout.weight(.semibold))
+                        .lineLimit(1)
+                    Spacer(minLength: 4)
+                    Menu {
+                        ForEach(livingParty, id: \.self) { ally in
+                            Button(name(of: ally)) { beginUse(stack, on: ally) }
+                        }
+                    } label: {
+                        Label("Use on…", systemImage: "person.crop.circle.badge.checkmark")
+                            .frame(minHeight: 44)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(livingParty.isEmpty)
+                }
+            }
+        }
     }
 
     private struct PendingSelection {
