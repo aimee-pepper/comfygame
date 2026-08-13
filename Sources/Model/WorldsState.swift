@@ -149,6 +149,102 @@ struct RunExperienceBreakdown: Codable, Equatable, Sendable {
 }
 
 struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
+    /// Frozen, typed receipt authority. The older name/icon/count arrays remain compatibility
+    /// projections for existing presentation; they are never used to reconstruct identity.
+    enum ReceiptLine: Codable, Equatable, Identifiable, Sendable {
+        struct Resource: Codable, Equatable, Sendable {
+            var lineID: String
+            var id: ResourceID
+            var quantity: Int
+            var fallbackName: String
+            var fallbackIcon: String
+        }
+
+        struct Item: Codable, Equatable, Sendable {
+            var lineID: String
+            var instanceID: InstanceID
+            var snapshot: ItemStack
+            var quantity: Int
+            var fallbackName: String
+            var fallbackIcon: String
+        }
+
+        struct Material: Codable, Equatable, Sendable {
+            var lineID: String
+            var sourceStackID: InstanceID
+            var catalogID: ItemID
+            var sample: MaterialSample
+            var identified: Bool
+            var fallbackName: String
+            var fallbackIcon: String
+        }
+
+        struct Legacy: Codable, Equatable, Sendable {
+            var stableID: String
+            var fallbackName: String
+            var fallbackIcon: String
+            var quantity: Int
+        }
+
+        case resource(Resource)
+        case stackableItem(Item)
+        case uniqueItem(Item)
+        case materialSample(Material)
+        case legacy(Legacy)
+
+        var id: String {
+            switch self {
+            case .resource(let line): "resource-\(line.lineID)"
+            case .stackableItem(let line): "stack-\(line.lineID)"
+            case .uniqueItem(let line): "instance-\(line.lineID)"
+            case .materialSample(let line): "material-\(line.lineID)"
+            case .legacy(let line): "legacy-\(line.stableID)"
+            }
+        }
+
+        var compatibilityGain: RunExitGain {
+            switch self {
+            case .resource(let line):
+                RunExitGain(name: line.fallbackName, icon: line.fallbackIcon, count: line.quantity)
+            case .stackableItem(let line), .uniqueItem(let line):
+                RunExitGain(name: line.fallbackName, icon: line.fallbackIcon, count: line.quantity)
+            case .materialSample(let line):
+                RunExitGain(name: line.fallbackName, icon: line.fallbackIcon, count: 1)
+            case .legacy(let line):
+                RunExitGain(name: line.fallbackName, icon: line.fallbackIcon, count: line.quantity)
+            }
+        }
+
+        static func compatibilityResources(from lines: [Self]) -> [RunExitGain] {
+            lines.compactMap { line in
+                switch line {
+                case .resource: line.compatibilityGain
+                case .legacy(let legacy) where legacy.stableID.contains("resource-"):
+                    line.compatibilityGain
+                case .stackableItem, .uniqueItem, .materialSample, .legacy: nil
+                }
+            }
+        }
+
+        static func compatibilityItems(from lines: [Self]) -> [RunExitGain] {
+            lines.compactMap { line in
+                switch line {
+                case .stackableItem, .uniqueItem, .materialSample: line.compatibilityGain
+                case .legacy(let legacy) where !legacy.stableID.contains("resource-"):
+                    line.compatibilityGain
+                case .resource, .legacy: nil
+                }
+            }
+        }
+
+        static func legacyLines(from gains: [RunExitGain], category: String) -> [Self] {
+            gains.enumerated().map { index, gain in
+                .legacy(.init(stableID: "\(category)-\(index)", fallbackName: gain.name,
+                              fallbackIcon: gain.icon, quantity: gain.count))
+            }
+        }
+    }
+
     struct RecoveredWriting: Codable, Equatable, Identifiable, Sendable {
         enum Kind: String, Codable, Sendable {
             case diaryPage, fieldNote, routeMark, siteFragment, workingScrap
@@ -220,10 +316,12 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     var reason: String
     var turnsTaken: Int
     var haulKeptFraction: Double
-    var resources: [RunExitGain] = []
-    var items: [RunExitGain] = []
-    var lostResources: [RunExitGain] = []
-    var lostItems: [RunExitGain] = []
+    private(set) var resources: [RunExitGain] = []
+    private(set) var items: [RunExitGain] = []
+    private(set) var lostResources: [RunExitGain] = []
+    private(set) var lostItems: [RunExitGain] = []
+    private(set) var recoveredLines: [ReceiptLine] = []
+    private(set) var lostLines: [ReceiptLine] = []
     var progress: [RunProgressGain] = []
     var pages: [DiaryPageID] = []
     var writings: [RecoveredWriting] = []
@@ -237,6 +335,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
          kind: Kind, reason: String, turnsTaken: Int, haulKeptFraction: Double,
          resources: [RunExitGain] = [], items: [RunExitGain] = [],
          lostResources: [RunExitGain] = [], lostItems: [RunExitGain] = [],
+         recoveredLines: [ReceiptLine]? = nil, lostLines: [ReceiptLine]? = nil,
          progress: [RunProgressGain] = [],
          pages: [DiaryPageID] = [], writings: [RecoveredWriting] = [],
          recruitedTravellers: [TravellerID] = [],
@@ -248,10 +347,26 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         self.reason = reason
         self.turnsTaken = turnsTaken
         self.haulKeptFraction = haulKeptFraction
-        self.resources = resources
-        self.items = items
-        self.lostResources = lostResources
-        self.lostItems = lostItems
+        self.recoveredLines = recoveredLines
+            ?? (ReceiptLine.legacyLines(from: resources, category: "recovered-resource")
+                + ReceiptLine.legacyLines(from: items, category: "recovered-item"))
+        self.lostLines = lostLines
+            ?? (ReceiptLine.legacyLines(from: lostResources, category: "lost-resource")
+                + ReceiptLine.legacyLines(from: lostItems, category: "lost-item"))
+        if recoveredLines != nil {
+            self.resources = ReceiptLine.compatibilityResources(from: self.recoveredLines)
+            self.items = ReceiptLine.compatibilityItems(from: self.recoveredLines)
+        } else {
+            self.resources = resources
+            self.items = items
+        }
+        if lostLines != nil {
+            self.lostResources = ReceiptLine.compatibilityResources(from: self.lostLines)
+            self.lostItems = ReceiptLine.compatibilityItems(from: self.lostLines)
+        } else {
+            self.lostResources = lostResources
+            self.lostItems = lostItems
+        }
         self.progress = progress
         self.pages = pages
         self.writings = writings
@@ -269,10 +384,30 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         reason = try c.decode(String.self, forKey: .reason)
         turnsTaken = try c.decode(Int.self, forKey: .turnsTaken)
         haulKeptFraction = fraction
-        resources = try c.decodeIfPresent([RunExitGain].self, forKey: .resources) ?? []
-        items = try c.decodeIfPresent([RunExitGain].self, forKey: .items) ?? []
-        lostResources = try c.decodeIfPresent([RunExitGain].self, forKey: .lostResources) ?? []
-        lostItems = try c.decodeIfPresent([RunExitGain].self, forKey: .lostItems) ?? []
+        let decodedResources = try c.decodeIfPresent([RunExitGain].self, forKey: .resources) ?? []
+        let decodedItems = try c.decodeIfPresent([RunExitGain].self, forKey: .items) ?? []
+        let decodedLostResources = try c.decodeIfPresent([RunExitGain].self, forKey: .lostResources) ?? []
+        let decodedLostItems = try c.decodeIfPresent([RunExitGain].self, forKey: .lostItems) ?? []
+        if let typed = try c.decodeIfPresent([ReceiptLine].self, forKey: .recoveredLines) {
+            recoveredLines = typed
+            resources = ReceiptLine.compatibilityResources(from: typed)
+            items = ReceiptLine.compatibilityItems(from: typed)
+        } else {
+            resources = decodedResources
+            items = decodedItems
+            recoveredLines = ReceiptLine.legacyLines(from: resources, category: "recovered-resource")
+                + ReceiptLine.legacyLines(from: items, category: "recovered-item")
+        }
+        if let typed = try c.decodeIfPresent([ReceiptLine].self, forKey: .lostLines) {
+            lostLines = typed
+            lostResources = ReceiptLine.compatibilityResources(from: typed)
+            lostItems = ReceiptLine.compatibilityItems(from: typed)
+        } else {
+            lostResources = decodedLostResources
+            lostItems = decodedLostItems
+            lostLines = ReceiptLine.legacyLines(from: lostResources, category: "lost-resource")
+                + ReceiptLine.legacyLines(from: lostItems, category: "lost-item")
+        }
         progress = try c.decodeIfPresent([RunProgressGain].self, forKey: .progress) ?? []
         pages = try c.decodeIfPresent([DiaryPageID].self, forKey: .pages) ?? []
         writings = try c.decodeIfPresent([RecoveredWriting].self, forKey: .writings) ?? []

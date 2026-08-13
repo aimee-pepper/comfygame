@@ -464,7 +464,8 @@ extension GameStore {
                 if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
             }
             let outcomeID = state.worlds.mintOutcomeID()
-            let banked = GameStore.bankHaul(of: run, into: &state, fraction: 1.0)
+            let banked = GameStore.bankHaul(of: run, outcomeID: outcomeID,
+                                            into: &state, fraction: 1.0)
             if let index = state.worlds.anchoredRealms.firstIndex(where: { $0.runIndex == run.runIndex }) {
                 state.worlds.anchoredRealms[index].world = run.anchoredSnapshot
             }
@@ -477,38 +478,19 @@ extension GameStore {
                 GameStore.creditEssenceSpring(&state)
                 state.worlds.lastSpringOutcomeID = outcomeID
             }
-            state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex, outcomeID: outcomeID,
-                                                   kind: kind,
-                                                   reason: reason,
-                                                   turnsTaken: run.turnsTaken,
-                                                   haulKeptFraction: 1,
-                                                   resources: banked.resources,
-                                                   items: banked.items,
-                                                   lostResources: banked.lostResources,
-                                                   lostItems: banked.lostItems,
-                                                   progress: GameStore.progressGained(in: run, state: state),
-                                                   pages: GameStore.pagesFound(in: run, state: state),
-                                                   writings: GameStore.writingsFound(in: run, state: state),
-                                                   recruitedTravellers: GameStore.travellersRecruited(in: run, state: state),
-                                                   experienceBreakdown: run.experienceBreakdown,
-                                                   essenceEconomy: .init(rawCollected: banked.rawEssence,
-                                                       refinedEquivalent: EconomyRules.refine(
-                                                        rawUnits: max(0, banked.rawEssence
-                                                                      - (automatic?.rawSpent ?? 0)),
-                                                                                              in: state),
-                                                       rawAutoRefined: automatic?.rawSpent ?? 0,
-                                                       automaticallyRefinedEssence: automatic?.essenceGained ?? 0,
-                                                       bindCostPaid: run.book.essencePaid,
-                                                       springYield: springYield,
-                                                       netRunway: EconomyRules.spendableEssence(in: state)))
+            state.worlds.activeRun = nil
+            let subsidy = GameStore.applyDepartureSubsidy(in: &state)
+            state.worlds.lastExit = GameStore.makeReturnReceipt(
+                run: run, outcomeID: outcomeID, kind: kind, reason: reason, fraction: 1,
+                banked: banked, autoRefinedRaw: automatic?.rawSpent ?? 0,
+                autoRefinedEssence: automatic?.essenceGained ?? 0,
+                springYield: springYield, antiLockSubsidy: subsidy, state: state)
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
             Self.refreshTradingPost(after: run, outcomeID: outcomeID, in: &state)
-            state.worlds.activeRun = nil
             Self.prepareAnchorSettlement(for: outcomeID, in: &state)
         }
         recentEvents = []
-        ensureDepartureIsPossible()
     }
 
     /// Caught by the collapse (or carried out unconscious): keep a fraction, chosen at random.
@@ -518,7 +500,8 @@ extension GameStore {
             guard var run = state.worlds.activeRun else { return }
             let outcomeID = state.worlds.mintOutcomeID()
             let fraction = min(1, max(0, run.tuning.collapseRecoveryFraction))
-            let banked = GameStore.bankHaul(of: run, into: &state, fraction: fraction, rng: &run.rng)
+            let banked = GameStore.bankHaul(of: run, outcomeID: outcomeID,
+                                            into: &state, fraction: fraction, rng: &run.rng)
             if let index = state.worlds.anchoredRealms.firstIndex(where: { $0.runIndex == run.runIndex }) {
                 state.worlds.anchoredRealms[index].world = run.anchoredSnapshot
             }
@@ -531,38 +514,19 @@ extension GameStore {
                 GameStore.creditEssenceSpring(&state)
                 state.worlds.lastSpringOutcomeID = outcomeID
             }
-            state.worlds.lastExit = RunExitSummary(runIndex: run.runIndex, outcomeID: outcomeID,
-                                                   kind: kind,
-                                                   reason: reason,
-                                                   turnsTaken: run.turnsTaken,
-                                                   haulKeptFraction: fraction,
-                                                   resources: banked.resources,
-                                                   items: banked.items,
-                                                   lostResources: banked.lostResources,
-                                                   lostItems: banked.lostItems,
-                                                   progress: GameStore.progressGained(in: run, state: state),
-                                                   pages: GameStore.pagesFound(in: run, state: state),
-                                                   writings: GameStore.writingsFound(in: run, state: state),
-                                                   recruitedTravellers: GameStore.travellersRecruited(in: run, state: state),
-                                                   experienceBreakdown: run.experienceBreakdown,
-                                                   essenceEconomy: .init(rawCollected: banked.rawEssence,
-                                                       refinedEquivalent: EconomyRules.refine(
-                                                        rawUnits: max(0, banked.rawEssence
-                                                                      - (automatic?.rawSpent ?? 0)),
-                                                                                              in: state),
-                                                       rawAutoRefined: automatic?.rawSpent ?? 0,
-                                                       automaticallyRefinedEssence: automatic?.essenceGained ?? 0,
-                                                       bindCostPaid: run.book.essencePaid,
-                                                       springYield: springYield,
-                                                       netRunway: EconomyRules.spendableEssence(in: state)))
+            state.worlds.activeRun = nil
+            let subsidy = GameStore.applyDepartureSubsidy(in: &state)
+            state.worlds.lastExit = GameStore.makeReturnReceipt(
+                run: run, outcomeID: outcomeID, kind: kind, reason: reason, fraction: fraction,
+                banked: banked, autoRefinedRaw: automatic?.rawSpent ?? 0,
+                autoRefinedEssence: automatic?.essenceGained ?? 0,
+                springYield: springYield, antiLockSubsidy: subsidy, state: state)
             TutorialRules.freezeFirstReturnContext(run: run, banked: banked, in: &state)
             TutorialRules.recordExpeditionOutcome(in: &state)
             Self.refreshTradingPost(after: run, outcomeID: outcomeID, in: &state)
-            state.worlds.activeRun = nil
             Self.prepareAnchorSettlement(for: outcomeID, in: &state)
         }
         recentEvents = []
-        ensureDepartureIsPossible()
     }
 
     func dismissRunExitSummary() {
@@ -688,13 +652,66 @@ extension GameStore {
         var items: [RunExitGain]
         var lostResources: [RunExitGain]
         var lostItems: [RunExitGain]
+        var recoveredLines: [RunExitSummary.ReceiptLine] = []
+        var lostLines: [RunExitSummary.ReceiptLine] = []
         var unidentifiedItemIDs: [ItemID]
         var returnedRawEssence: Bool
         var rawEssence: Int = 0
     }
 
+    nonisolated static func makeReturnReceipt(
+        run: WorldRun, outcomeID: ExpeditionOutcomeID, kind: RunExitSummary.Kind,
+        reason: String, fraction: Double, banked: BankedHaul,
+        autoRefinedRaw: Int, autoRefinedEssence: Int, springYield: Int,
+        antiLockSubsidy: Int = 0, state: GameState
+    ) -> RunExitSummary {
+        RunExitSummary(
+            runIndex: run.runIndex, outcomeID: outcomeID, kind: kind, reason: reason,
+            turnsTaken: run.turnsTaken, haulKeptFraction: fraction,
+            resources: banked.resources, items: banked.items,
+            lostResources: banked.lostResources, lostItems: banked.lostItems,
+            recoveredLines: banked.recoveredLines, lostLines: banked.lostLines,
+            progress: progressGained(in: run, state: state),
+            pages: pagesFound(in: run, state: state),
+            writings: writingsFound(in: run, state: state),
+            recruitedTravellers: travellersRecruited(in: run, state: state),
+            experienceBreakdown: run.experienceBreakdown,
+            essenceEconomy: .init(
+                rawCollected: banked.rawEssence,
+                refinedEquivalent: EconomyRules.refine(
+                    rawUnits: max(0, banked.rawEssence - autoRefinedRaw), in: state),
+                rawAutoRefined: autoRefinedRaw,
+                automaticallyRefinedEssence: autoRefinedEssence,
+                bindCostPaid: run.book.essencePaid, springYield: springYield,
+                antiLockSubsidy: antiLockSubsidy,
+                netRunway: EconomyRules.spendableEssence(in: state)))
+    }
+
+    nonisolated private static func receiptLines(
+        for stack: ItemStack, outcomeID: ExpeditionOutcomeID, side: String
+    ) -> [RunExitSummary.ReceiptLine] {
+        if !stack.materials.isEmpty {
+            return stack.materials.enumerated().map { index, sample in
+                .materialSample(.init(
+                    lineID: "\(outcomeID.rawValue)-\(side)-\(stack.id.rawValue)-\(index)",
+                    sourceStackID: stack.id,
+                    catalogID: stack.catalogID, sample: sample, identified: stack.identified,
+                    fallbackName: stack.displayName, fallbackIcon: stack.icon))
+            }
+        }
+        let frozen = RunExitSummary.ReceiptLine.Item(
+            lineID: "\(outcomeID.rawValue)-\(side)-\(stack.id.rawValue)",
+            instanceID: stack.id, snapshot: stack, quantity: stack.count,
+            fallbackName: stack.displayName, fallbackIcon: stack.icon)
+        let isUnique = stack.gearProfile != nil || stack.distilledCore != nil
+            || stack.upgradeLevel != 0 || stack.wildGrowth != 0
+            || stack.isFavorite || stack.isLocked
+        return [isUnique ? .uniqueItem(frozen) : .stackableItem(frozen)]
+    }
+
     @discardableResult
     nonisolated static func bankHaul(of run: WorldRun,
+                                     outcomeID: ExpeditionOutcomeID,
                                      into state: inout GameState,
                                      fraction: Double,
                                      rng: inout SeededRNG) -> BankedHaul {
@@ -710,6 +727,22 @@ extension GameStore {
             let definition = ContentCatalog.shared.resource(id)
             return RunExitGain(name: definition?.name ?? id.rawValue,
                                icon: definition?.icon ?? "cube", count: lost)
+        }
+        let recoveredResourceLines = keptResources.nonZero.map { id, amount in
+            let definition = ContentCatalog.shared.resource(id)
+            return RunExitSummary.ReceiptLine.resource(.init(
+                lineID: "\(outcomeID.rawValue)-recovered-\(id.rawValue)",
+                id: id, quantity: amount, fallbackName: definition?.name ?? id.rawValue,
+                fallbackIcon: definition?.icon ?? "cube"))
+        }
+        let lostResourceLines = run.satchel.nonZero.compactMap { id, amount -> RunExitSummary.ReceiptLine? in
+            let lost = amount - keptResources[id]
+            guard lost > 0 else { return nil }
+            let definition = ContentCatalog.shared.resource(id)
+            return .resource(.init(lineID: "\(outcomeID.rawValue)-lost-\(id.rawValue)",
+                                   id: id, quantity: lost,
+                                   fallbackName: definition?.name ?? id.rawValue,
+                                   fallbackIcon: definition?.icon ?? "cube"))
         }
         for (id, amount) in keptResources.nonZero {
             if ContentCatalog.shared.resource(id)?.isRealityCurrency == true {
@@ -729,23 +762,27 @@ extension GameStore {
             : exposed.randomlyKeeping(fraction: fraction, rng: &rng)
         var kept = guaranteed
         for stack in retainedRisk.stacks { _ = kept.add(stack) }
-        let itemGains = retainedRisk.stacks.compactMap { stack -> RunExitGain? in
+        let itemGains = kept.stacks.compactMap { stack -> RunExitGain? in
             guard stack.count > 0 else { return nil }
             return RunExitGain(name: stack.displayName,
                                icon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "shippingbox",
                                count: stack.count)
         }
-        let retainedCounts = retainedRisk.stacks.reduce(into: [ItemID: Int]()) {
-            $0[$1.catalogID, default: 0] += $1.count
+        let lostStacks = exposed.stacks.compactMap { exposedStack -> ItemStack? in
+            let keptCount = retainedRisk.stacks.first { $0.binKey == exposedStack.binKey }?.count ?? 0
+            let lostCount = exposedStack.count - keptCount
+            guard lostCount > 0 else { return nil }
+            var copy = exposedStack
+            return copy.removing(lostCount)
         }
-        let exposedCounts = exposed.stacks.reduce(into: [ItemID: Int]()) {
-            $0[$1.catalogID, default: 0] += $1.count
+        let lostItemGains = lostStacks.map {
+            RunExitGain(name: $0.displayName, icon: $0.icon, count: $0.count)
         }
-        let lostItemGains = exposedCounts.compactMap { id, amount -> RunExitGain? in
-            let lost = amount - (retainedCounts[id] ?? 0)
-            guard lost > 0 else { return nil }
-            return RunExitGain(name: ContentCatalog.shared.item(id)?.name ?? id.rawValue,
-                               icon: ContentCatalog.shared.item(id)?.icon ?? "shippingbox", count: lost)
+        let recoveredItemLines = kept.stacks.filter { $0.count > 0 }.flatMap {
+            receiptLines(for: $0, outcomeID: outcomeID, side: "recovered")
+        }
+        let lostItemLines = lostStacks.filter { $0.count > 0 }.flatMap {
+            receiptLines(for: $0, outcomeID: outcomeID, side: "lost")
         }
         for var stack in kept.stacks {
             stack.protectedReturnCount = 0
@@ -755,16 +792,27 @@ extension GameStore {
         }
         return BankedHaul(resources: resourceGains, items: itemGains,
                           lostResources: lostResourceGains, lostItems: lostItemGains,
+                          recoveredLines: recoveredResourceLines + recoveredItemLines,
+                          lostLines: lostResourceLines + lostItemLines,
                           unidentifiedItemIDs: retainedRisk.stacks.filter { !$0.identified }.map(\.catalogID),
                           returnedRawEssence: keptResources[Resources.essenceRaw] > 0,
                           rawEssence: keptResources[Resources.essenceRaw])
     }
 
     @discardableResult
-    nonisolated static func bankHaul(of run: WorldRun, into state: inout GameState,
-                                     fraction: Double) -> BankedHaul {
+    nonisolated static func bankHaul(of run: WorldRun, outcomeID: ExpeditionOutcomeID = 0,
+                                     into state: inout GameState, fraction: Double) -> BankedHaul {
         var unused = run.rng
-        return bankHaul(of: run, into: &state, fraction: fraction, rng: &unused)
+        return bankHaul(of: run, outcomeID: outcomeID, into: &state,
+                        fraction: fraction, rng: &unused)
+    }
+
+    /// Compatibility seam for rule fixtures that exercise banking without minting an expedition
+    /// outcome. Production return paths always pass the real minted OutcomeID above.
+    @discardableResult
+    nonisolated static func bankHaul(of run: WorldRun, into state: inout GameState,
+                                     fraction: Double, rng: inout SeededRNG) -> BankedHaul {
+        bankHaul(of: run, outcomeID: 0, into: &state, fraction: fraction, rng: &rng)
     }
 
     nonisolated static func progressGained(in run: WorldRun, state: GameState) -> [RunProgressGain] {

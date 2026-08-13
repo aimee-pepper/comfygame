@@ -186,15 +186,24 @@ extension GameStore {
         guard state.worlds.activeRun == nil else { return }
         let floor = EconomyRules.minimumBindCost(in: state)
         guard EconomyRules.spendableEssence(in: state) < floor else { return }
-
         mutate("the spring provides", flush: true) { state in
-            let shortfall = floor - EconomyRules.spendableEssence(in: state)
-            let subsidy = max(0, shortfall)
-            state.base.essence += subsidy
+            let subsidy = GameStore.applyDepartureSubsidy(in: &state)
             let runway = EconomyRules.spendableEssence(in: state)
             state.worlds.lastExit?.essenceEconomy.antiLockSubsidy += subsidy
             state.worlds.lastExit?.essenceEconomy.netRunway = runway
         }
+    }
+
+    /// Applies the anti-lock floor inside whichever transaction owns the transition home.
+    /// Returning from an expedition calls this before freezing its receipt, so subsidy and final
+    /// runway cannot be separated by a process interruption.
+    @discardableResult
+    nonisolated static func applyDepartureSubsidy(in state: inout GameState) -> Int {
+        guard state.worlds.activeRun == nil else { return 0 }
+        let floor = EconomyRules.minimumBindCost(in: state)
+        let subsidy = max(0, floor - EconomyRules.spendableEssence(in: state))
+        state.base.essence += subsidy
+        return subsidy
     }
 
     /// True when the only thing standing between the player and a world is a trip to the Refinery.
