@@ -13,39 +13,67 @@ import SwiftUI
 /// already written.
 struct WorldHistoryView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var opened: VisitedWorld?
-    @State private var comparing = false
+    @State private var comparison: WorldComparisonPair?
+    @State private var compareMode = false
+    @State private var selected: [InstanceID] = []
+    @State private var query = ""
+    @State private var filter: WorldHistoryFilter = .all
+    @State private var newestFirst = true
+
+    private var allWorlds: [VisitedWorld] {
+        store.state.reality.library.visitedWorlds
+    }
 
     private var worlds: [VisitedWorld] {
-        store.state.reality.library.visitedWorlds.reversed()
+        let all = allWorlds.filter { world in
+            let filterMatch = switch filter {
+            case .all: true
+            case .kept: world.isKept
+            case .chanceLed: world.semanticRequests.isEmpty
+            }
+            let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+            let searchMatch = trimmed.isEmpty
+                || "world \(world.runIndex)".localizedCaseInsensitiveContains(trimmed)
+                || world.travellersPresent.compactMap(ContentCatalog.shared.traveller)
+                    .contains { $0.name.localizedCaseInsensitiveContains(trimmed) }
+            return filterMatch && searchMatch
+        }
+        return all.sorted { newestFirst ? $0.runIndex > $1.runIndex : $0.runIndex < $1.runIndex }
+    }
+
+    private var columns: [GridItem] {
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible())]
     }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                if worlds.isEmpty {
-                    StationCard(title: "Nowhere yet", icon: "clock.arrow.circlepath") {
-                        EmptyNote("Every world you bind is recorded here — what you wrote, and what it turned out to be.")
-                    }
+            VStack(alignment: .leading, spacing: 14) {
+                if allWorlds.isEmpty {
+                    ContentUnavailableView("No recorded worlds", systemImage: "clock.arrow.circlepath",
+                                           description: Text("Every world you bind is recorded here."))
+                        .frame(maxWidth: .infinity, minHeight: 280)
                 } else {
-                    StationCard(title: "What it becomes", icon: "eye") {
-                        Text(readingNote)
-                            .font(.caption).foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    if comparisonWorlds != nil {
-                        Button {
-                            comparing = true
-                            store.openedWorldComparison()
-                        } label: {
-                            Label(comparisonTitle, systemImage: "rectangle.split.2x1")
-                                .frame(maxWidth: .infinity, minHeight: 44)
+                    browseControls
+                    Text(readingNote)
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if worlds.isEmpty {
+                        ContentUnavailableView.search(text: query)
+                            .frame(maxWidth: .infinity, minHeight: 220)
+                    } else {
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(worlds) { world in
+                                WorldCoverTile(world: world,
+                                               selectionOrder: selected.firstIndex(of: world.id).map { $0 + 1 },
+                                               compareMode: compareMode,
+                                               open: { activate(world) },
+                                               toggleKept: { store.keepWorld(world.id, kept: !world.isKept) })
+                            }
                         }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    ForEach(worlds) { world in
-                        Button { opened = world } label: { row(world) }
-                            .buttonStyle(.plain)
                     }
                 }
             }
@@ -54,27 +82,110 @@ struct WorldHistoryView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Worlds you've written")
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $query, prompt: "World number or known traveller")
+        .safeAreaInset(edge: .bottom) {
+            if compareMode { comparisonFooter }
+        }
         .sheet(item: $opened) { world in
             VisitedWorldSheet(world: world).environmentObject(store)
         }
-        .sheet(isPresented: $comparing) {
-            if let pair = comparisonWorlds {
-                WorldComparisonSheet(origin: pair.0, partner: pair.1).environmentObject(store)
+        .sheet(item: $comparison) { pair in
+            WorldComparisonSheet(origin: pair.earlier, partner: pair.later).environmentObject(store)
+        }
+        .onAppear {
+            guard selected.isEmpty, let pair = tutorialComparisonWorlds else { return }
+            selected = [pair.0.id, pair.1.id]
+        }
+        .onChange(of: worlds.map(\.id)) { _, visibleIDs in
+            selected.removeAll { !visibleIDs.contains($0) }
+        }
+    }
+
+    private var browseControls: some View {
+        VStack(spacing: 10) {
+            Picker("World filter", selection: $filter) {
+                ForEach(WorldHistoryFilter.allCases) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            HStack {
+                Button {
+                    newestFirst.toggle()
+                } label: {
+                    Label(newestFirst ? "Newest" : "Oldest",
+                          systemImage: newestFirst ? "arrow.down" : "arrow.up")
+                        .frame(minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                Spacer()
+                if compareMode {
+                    Button {
+                        compareMode = false
+                        selected.removeAll()
+                    } label: {
+                        Label("Done comparing", systemImage: "rectangle.split.2x1")
+                            .frame(minHeight: 44)
+                    }
+                    .buttonStyle(.borderedProminent)
+                } else {
+                    Button {
+                        compareMode = true
+                    } label: {
+                        Label("Compare", systemImage: "rectangle.split.2x1")
+                            .frame(minHeight: 44)
+                    }
+                    .buttonStyle(.bordered)
+                }
             }
         }
     }
 
-    private var comparisonWorlds: (VisitedWorld, VisitedWorld)? {
+    private var comparisonFooter: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(selected.count) of 2 selected").font(.headline)
+                Text(selectedWorldNames).font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button("Compare") { openComparison() }
+                .buttonStyle(.borderedProminent)
+                .frame(minHeight: 44)
+                .disabled(selected.count != 2)
+        }
+        .padding(.horizontal, 16).padding(.vertical, 10)
+        .background(.bar)
+    }
+
+    private var selectedWorldNames: String {
+        selected.compactMap { id in
+            store.state.reality.library.visitedWorlds.first { $0.id == id }.map { "World \($0.runIndex)" }
+        }.joined(separator: " + ")
+    }
+
+    private func activate(_ world: VisitedWorld) {
+        guard compareMode else { opened = world; return }
+        if let index = selected.firstIndex(of: world.id) {
+            selected.remove(at: index)
+        } else if selected.count < 2 {
+            selected.append(world.id)
+        }
+    }
+
+    private func openComparison() {
+        guard selected.count == 2 else { return }
+        let records = selected.compactMap { id in
+            store.state.reality.library.visitedWorlds.first { $0.id == id }
+        }.sorted { $0.runIndex < $1.runIndex }
+        guard records.count == 2 else { selected.removeAll(); return }
+        comparison = WorldComparisonPair(earlier: records[0], later: records[1])
+        store.openedWorldComparison()
+    }
+
+    private var tutorialComparisonWorlds: (VisitedWorld, VisitedWorld)? {
         guard let pair = store.state.tutorial.comparisonPair,
               let first = store.state.reality.library.visitedWorlds.first(where: { $0.id == pair.originID }),
               let second = store.state.reality.library.visitedWorlds.first(where: { $0.id == pair.partnerID })
         else { return nil }
         return (first, second)
-    }
-
-    private var comparisonTitle: String {
-        store.state.tutorial.comparisonPair?.isOneChangeExercise == true
-            ? "Read the two records together" : "Compare these pages"
     }
 
     /// Says what this screen can currently tell you, so the instruments have a visible reason to
@@ -90,37 +201,101 @@ struct WorldHistoryView: View {
         }
     }
 
-    private func row(_ world: VisitedWorld) -> some View {
-        StationCard(title: "World \(world.runIndex)",
-                    icon: world.isKept ? "bookmark.fill" : "globe") {
-            Text(world.descriptionSentence)
-                .font(.callout)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
+}
 
-            ForEach(Array(world.written.enumerated()), id: \.offset) { _, line in
-                Text(line)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
+private enum WorldHistoryFilter: String, CaseIterable, Identifiable {
+    case all, kept, chanceLed
+    var id: String { rawValue }
+    var title: String { switch self { case .all: "All"; case .kept: "Kept"; case .chanceLed: "Chance-led" } }
+}
 
-            HStack(spacing: 8) {
-                // **Who was standing in it** — the thing you were looking for, whether or not you
-                // reached them. This is what makes the history a search tool and not a scrapbook.
-                ForEach(world.travellersPresent, id: \.self) { id in
-                    if let person = ContentCatalog.shared.traveller(id) {
-                        Label(person.name, systemImage: "figure.wave")
-                            .font(.caption2)
-                            .foregroundStyle(.green)
+private struct WorldComparisonPair: Identifiable {
+    let earlier: VisitedWorld
+    let later: VisitedWorld
+    var id: String { "\(earlier.id)-\(later.id)" }
+}
+
+private struct WorldCoverTile: View {
+    let world: VisitedWorld
+    let selectionOrder: Int?
+    let compareMode: Bool
+    let open: () -> Void
+    let toggleKept: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Button(action: open) {
+                VStack(alignment: .leading, spacing: 9) {
+                    HStack {
+                        FrozenWorldCoverMark(world: world)
+                        Spacer()
+                    }
+                    Text("World \(world.runIndex)").font(.headline)
+                    HStack(spacing: 5) {
+                        if world.semanticRequests.isEmpty {
+                            Label("Chance-led", systemImage: "circle.dotted")
+                        } else {
+                            ForEach(Array(world.semanticRequests.prefix(2).enumerated()), id: \.offset) { _, request in
+                                Text(request.components(separatedBy: " ← ").first ?? request)
+                                    .lineLimit(1)
+                            }
+                            if world.semanticRequests.count > 2 { Text("+\(world.semanticRequests.count - 2)") }
+                        }
+                    }
+                    .font(.caption2.weight(.semibold)).foregroundStyle(.secondary)
+                    if !world.travellersPresent.isEmpty {
+                        Label("Traveller recorded", systemImage: "figure.wave")
+                            .font(.caption2).foregroundStyle(.green)
                     }
                 }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
+                .frame(maxWidth: .infinity, minHeight: 150, alignment: .topLeading)
+                .padding(12)
+                .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(selectionOrder == nil ? Color.clear : Color.accentColor, lineWidth: 3)
+                }
             }
-            .frame(minHeight: 24)
+            .buttonStyle(.plain)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityHint(compareMode ? "Selects this record for comparison" : "Opens world record")
+
+            if let selectionOrder {
+                Text("\(selectionOrder)")
+                    .font(.caption.bold()).foregroundStyle(.white)
+                    .frame(width: 26, height: 26).background(Color.accentColor, in: Circle())
+                    .padding(8).accessibilityHidden(true)
+            } else if !compareMode {
+                Button(action: toggleKept) {
+                    Image(systemName: world.isKept ? "bookmark.fill" : "bookmark")
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel(world.isKept ? "Stop keeping World \(world.runIndex)" : "Keep World \(world.runIndex)")
+            }
         }
+    }
+
+    private var accessibilityLabel: String {
+        var values = ["World \(world.runIndex)", world.isKept ? "Kept" : "Ordinary"]
+        values.append(world.semanticRequests.isEmpty ? "Chance-led" : "\(world.semanticRequests.count) authored requests")
+        if let selectionOrder { values.append("Selected \(selectionOrder) of 2") }
+        return values.joined(separator: ", ")
+    }
+}
+
+/// Disclosure-neutral placeholder until the persisted world visual receipt has a dedicated,
+/// versioned History-cover presentation adapter. It intentionally does not reinterpret that
+/// receipt through the current renderer.
+private struct FrozenWorldCoverMark: View {
+    let world: VisitedWorld
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 8).fill(Color(.tertiarySystemFill))
+            Image(systemName: world.semanticRequests.isEmpty ? "circle.dotted" : "globe")
+                .foregroundStyle(.secondary)
+        }
+        .frame(width: 48, height: 48)
+        .accessibilityHidden(true)
     }
 }
 
@@ -163,7 +338,7 @@ struct WorldComparisonSheet: View {
             Text(world.descriptionSentence).font(.caption)
             Divider()
             Text("What you wrote").font(.caption.weight(.semibold))
-            ForEach(changes(for: world, against: other, isLater: isLater), id: \.line) { change in
+            ForEach(changes(for: world, against: other, isLater: isLater), id: \.key) { change in
                 Label(change.line, systemImage: change.icon)
                     .font(.caption)
                     .foregroundStyle(change.kind == "Unchanged" ? .secondary : .primary)
@@ -185,24 +360,25 @@ struct WorldComparisonSheet: View {
     }
 
     static func labelledChanges(for world: VisitedWorld, against other: VisitedWorld,
-                                isLater: Bool) -> [(line: String, kind: String, icon: String)] {
+                                isLater: Bool) -> [(key: String, line: String, kind: String, icon: String)] {
         func keyed(_ lines: [String]) -> [String: String] {
             Dictionary(lines.map { ($0.components(separatedBy: " ← ").first ?? $0, $0) },
                        uniquingKeysWith: { _, new in new })
         }
         let mine = keyed(world.semanticRequests), theirs = keyed(other.semanticRequests)
-        return mine.keys.sorted().map { key in
-            let line = mine[key]!
-            if theirs[key] == line { return (line, "Unchanged", "equal.circle") }
-            if theirs[key] == nil {
-                return isLater ? (line, "Added", "plus.circle") : (line, "Removed", "minus.circle")
-            }
-            return (line, "Replaced", "arrow.triangle.2.circlepath")
+        let earlier = isLater ? theirs : mine
+        let later = isLater ? mine : theirs
+        return Set(earlier.keys).union(later.keys).sorted().map { key in
+            let line = mine[key] ?? "Not written"
+            if earlier[key] == later[key] { return (key, line, "Unchanged", "equal.circle") }
+            if earlier[key] == nil { return (key, line, "Added", "plus.circle") }
+            if later[key] == nil { return (key, line, "Removed", "minus.circle") }
+            return (key, line, "Changed", "arrow.triangle.2.circlepath")
         }
     }
 
     private func changes(for world: VisitedWorld, against other: VisitedWorld,
-                         isLater: Bool) -> [(line: String, kind: String, icon: String)] {
+                         isLater: Bool) -> [(key: String, line: String, kind: String, icon: String)] {
         Self.labelledChanges(for: world, against: other, isLater: isLater)
     }
 
@@ -324,10 +500,20 @@ private struct VisitedWorldSheet: View {
                     Section {
                         ForEach(world.travellersPresent, id: \.self) { id in
                             if let person = ContentCatalog.shared.traveller(id) {
-                                LabeledRow(icon: "figure.wave", label: person.name,
-                                           value: store.state.reality.library.foundTravellers.contains(id)
-                                               ? "with you" : "still there",
-                                           tint: .green)
+                                HStack(spacing: 10) {
+                                    NamedCharacterPixelIdentity(
+                                        travellerID: id,
+                                        fallbackSystemIcon: "figure.wave",
+                                        fallbackColor: .green
+                                    )
+                                    .frame(width: 28, height: 28)
+                                    Text(person.name)
+                                    Spacer(minLength: 8)
+                                    Text(store.state.reality.library.foundTravellers.contains(id)
+                                         ? "with you" : "still there")
+                                        .foregroundStyle(.secondary)
+                                }
+                                .frame(minHeight: 44)
                             }
                         }
                     } header: {

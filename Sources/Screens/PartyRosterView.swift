@@ -66,9 +66,11 @@ struct PartyRosterView: View {
         let upgrade = GearSlot.allCases.contains { store.hasUpgradeAvailable(for: $0, slot: slot) }
         return VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .top) {
-                Image(systemName: icon(slot))
-                    .font(.title2)
-                    .foregroundStyle(.tint)
+                NamedCharacterPixelIdentity(
+                    travellerID: travellerID(slot),
+                    fallbackSystemIcon: icon(slot),
+                    fallbackColor: .accentColor
+                )
                     .frame(width: 34, height: 34)
                 Spacer()
                 if isComing {
@@ -107,6 +109,14 @@ struct PartyRosterView: View {
         case .member(let index): store.state.base.roster.indices.contains(index)
             ? store.state.base.roster[index].icon : "person.fill"
         }
+    }
+
+    /// Binder and Quill/generated companions intentionally return nil and keep their SF fallback.
+    /// A recruited named traveller resolves only through the stable ID already stored on roster.
+    private func travellerID(_ slot: PartySlot) -> TravellerID? {
+        guard case .member(let index) = slot,
+              store.state.base.roster.indices.contains(index) else { return nil }
+        return store.state.base.roster[index].traveller
     }
 
     private func health(_ slot: PartySlot) -> Int {

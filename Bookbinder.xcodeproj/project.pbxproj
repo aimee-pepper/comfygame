@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A10000000000000000000001 /* NamedCharacterVisualAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */; };
+		A10000000000000000000002 /* NamedCharacterPlaceholderPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */; };
+		A10000000000000000000003 /* NamedCharacterPixelIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */; };
+		A10000000000000000000004 /* NamedCharacterPlaceholderPackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000004 /* NamedCharacterPlaceholderPackTests.swift */; };
+		A10000000000000000000005 /* NamedCharacterVisualAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* NamedCharacterVisualAdapterTests.swift */; };
+		A10000000000000000000006 /* named-character-placeholders-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* named-character-placeholders-v1.json */; };
+		A20000000000000000000001 /* CatalogueConsumablesPlaceholderV1Registry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* CatalogueConsumablesPlaceholderV1Registry.swift */; };
+		A20000000000000000000002 /* CatalogueConsumablesPlaceholderV1RegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000002 /* CatalogueConsumablesPlaceholderV1RegistryTests.swift */; };
 		00FC87BBE099BE4FBE96CA63 /* DraftMeetingCorpus.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80B20E4E8E0EE351CA9E333B /* DraftMeetingCorpus.generated.swift */; };
 		01649DA229D4F9B920409CF5 /* CreatureTraits.swift in Sources */ = {isa = PBXBuildFile; fileRef = F308F3AB5ABAC31BC6DE4938 /* CreatureTraits.swift */; };
 		01A65B5074EBFC458F077A59 /* VocabularyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD8610CC37F5AB36E0846FCD /* VocabularyTests.swift */; };
@@ -263,6 +271,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterVisualAdapter.swift; sourceTree = "<group>"; };
+		B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPlaceholderPack.swift; sourceTree = "<group>"; };
+		B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPixelIdentity.swift; sourceTree = "<group>"; };
+		B10000000000000000000004 /* NamedCharacterPlaceholderPackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPlaceholderPackTests.swift; sourceTree = "<group>"; };
+		B10000000000000000000005 /* NamedCharacterVisualAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterVisualAdapterTests.swift; sourceTree = "<group>"; };
+		B10000000000000000000006 /* named-character-placeholders-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "named-character-placeholders-v1.json"; path = "AssetLab/integration/named-character-placeholders-v1/manifest.json"; sourceTree = SOURCE_ROOT; };
+		B20000000000000000000001 /* CatalogueConsumablesPlaceholderV1Registry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogueConsumablesPlaceholderV1Registry.swift; sourceTree = "<group>"; };
+		B20000000000000000000002 /* CatalogueConsumablesPlaceholderV1RegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogueConsumablesPlaceholderV1RegistryTests.swift; sourceTree = "<group>"; };
 		0212875D2B95EA338E16F0B2 /* WorldDescriptionPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldDescriptionPanel.swift; sourceTree = "<group>"; };
 		03BEF52A08A939AAFB2CF800 /* SpendingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingViews.swift; sourceTree = "<group>"; };
 		03DE9B08C1ED73C404EE2AF9 /* CombatGraphRouteExplorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatGraphRouteExplorer.swift; sourceTree = "<group>"; };
@@ -608,6 +624,7 @@
 		3D392DB4F9B9CD74CF43A670 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */,
 				4FEC07E6110ABED3DA33EA3B /* ApothecaryView.swift */,
 				D5C0097382514786457FDE48 /* AuthoredTextAtlasView.swift */,
 				346EEEC616B8EBFE291C4A79 /* BaseView.swift */,
@@ -762,6 +779,7 @@
 			children = (
 				193E41B61927927E78865C30 /* CatalogueItemVisualAdapter.swift */,
 				27A58B0D4893EF0AA2412B28 /* GeneratedCatalogueItemVisualRegistry.swift */,
+				B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */,
 			);
 			path = VisualAdapters;
 			sourceTree = "<group>";
@@ -831,6 +849,9 @@
 				42E87D371EF13A3599ED4B41 /* MakerStationPresentationTests.swift */,
 				E14C42A31CF4E0C858F212BF /* MaterialTests.swift */,
 				D56058E017000066A61CD5F0 /* NamingTests.swift */,
+				B20000000000000000000002 /* CatalogueConsumablesPlaceholderV1RegistryTests.swift */,
+				B10000000000000000000004 /* NamedCharacterPlaceholderPackTests.swift */,
+				B10000000000000000000005 /* NamedCharacterVisualAdapterTests.swift */,
 				8C75616CB8F2F405724D0AEF /* NativeVisualPackTests.swift */,
 				A75C6362A89F917EE2B2113D /* NollRecyclerPromotionTests.swift */,
 				8DED817BCBD65429BDCD60C9 /* OpeningEconomyContentTests.swift */,
@@ -872,6 +893,9 @@
 		E45320FE6F032D7A7F042557 /* VisualRuntime */ = {
 			isa = PBXGroup;
 			children = (
+				B10000000000000000000006 /* named-character-placeholders-v1.json */,
+				B20000000000000000000001 /* CatalogueConsumablesPlaceholderV1Registry.swift */,
+				B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */,
 				3B52219A7EE3D04B75EED3BE /* NativeVisualPack.swift */,
 				7863FB4074F0CAF26EFEF01E /* PixelCommand.swift */,
 				F3329464831CD9BBDA9B45C9 /* PixelRaster.swift */,
@@ -981,6 +1005,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000000000000000000006 /* named-character-placeholders-v1.json in Resources */,
 				0FD9747174A22CF0CD20A419 /* LaunchScreen.storyboard in Resources */,
 				236C64B1C3B3B83BAD510425 /* combat_tree_v2.json in Resources */,
 				583140A5C38A586267218BC1 /* combat_trees.json in Resources */,
@@ -1124,6 +1149,10 @@
 				A30BFB516414E49CB79270EF /* Migrations.swift in Sources */,
 				10EA98516A8B4CB4C9379D71 /* MinimapView.swift in Sources */,
 				4419D5E216F811B6E590C273 /* Naming.swift in Sources */,
+				A10000000000000000000003 /* NamedCharacterPixelIdentity.swift in Sources */,
+				A20000000000000000000001 /* CatalogueConsumablesPlaceholderV1Registry.swift in Sources */,
+				A10000000000000000000002 /* NamedCharacterPlaceholderPack.swift in Sources */,
+				A10000000000000000000001 /* NamedCharacterVisualAdapter.swift in Sources */,
 				29B3C3CAADACAFAFCD2D213B /* NativeVisualPack.swift in Sources */,
 				B3127BCE033E785E4B3EA912 /* Page.swift in Sources */,
 				A7B958AF227E4AD7A6E2E900 /* PageGridView.swift in Sources */,
@@ -1234,6 +1263,9 @@
 				AC7D7F7C063E577D75003D57 /* MakerStationPresentationTests.swift in Sources */,
 				BCB44A183A64B987C97BC1EA /* MaterialTests.swift in Sources */,
 				9F43622A2E66874204BCCDC7 /* NamingTests.swift in Sources */,
+				A20000000000000000000002 /* CatalogueConsumablesPlaceholderV1RegistryTests.swift in Sources */,
+				A10000000000000000000004 /* NamedCharacterPlaceholderPackTests.swift in Sources */,
+				A10000000000000000000005 /* NamedCharacterVisualAdapterTests.swift in Sources */,
 				E6107723C514EDCB13CD6C2B /* NativeVisualPackTests.swift in Sources */,
 				CA885FA438BFA001D5494194 /* NollRecyclerPromotionTests.swift in Sources */,
 				54E8A6FB039D4B6F7FF4AA92 /* OpeningEconomyContentTests.swift in Sources */,

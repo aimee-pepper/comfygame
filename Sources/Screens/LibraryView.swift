@@ -150,7 +150,8 @@ struct LibraryView: View {
                     NavigationLink {
                         LibraryDiaryView(traveller: traveller, pages: pages)
                     } label: {
-                        LibraryTile(icon: traveller.icon, title: traveller.name,
+                        LibraryTile(icon: traveller.icon, travellerID: traveller.id,
+                                    title: traveller.name,
                                     subtitle: "Written by \(traveller.name)",
                                     count: "\(pages.count) page\(pages.count == 1 ? "" : "s") written",
                                     accent: .brown,
@@ -239,7 +240,8 @@ struct LibraryView: View {
     private func personTile(_ traveller: TravellerDef) -> some View {
         let clues = LibraryPresentation.pages(about: traveller.id, in: library)
         let hint = LibraryRules.hintPage(for: traveller, library: library)
-        return LibraryTile(icon: traveller.icon, title: traveller.name,
+        return LibraryTile(icon: traveller.icon, travellerID: traveller.id,
+                           title: traveller.name,
                            subtitle: hint.isFound ? "At Home" : traveller.calling.capitalized,
                            count: clues.isEmpty ? nil : "\(clues.count) clue\(clues.count == 1 ? "" : "s") about them",
                            accent: hint.isFound ? .green : .accentColor,
@@ -316,6 +318,7 @@ struct LibraryView: View {
 
 private struct LibraryTile: View {
     let icon: String
+    var travellerID: TravellerID? = nil
     let title: String
     let subtitle: String
     let count: String?
@@ -324,9 +327,11 @@ private struct LibraryTile: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 30, weight: .medium))
-                .foregroundStyle(accent)
+            NamedCharacterPixelIdentity(
+                travellerID: travellerID,
+                fallbackSystemIcon: icon,
+                fallbackColor: accent
+            )
                 .frame(width: 48, height: 48)
                 .background(accent.opacity(0.14), in: RoundedRectangle(cornerRadius: 12))
             Spacer(minLength: 0)

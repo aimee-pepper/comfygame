@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ApothecaryView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var selectedRecipeID: ItemID?
 
     private var known: [ConsumableCraftingRules.Recipe] {
         ConsumableCraftingRules.recipes.filter {
@@ -9,24 +11,57 @@ struct ApothecaryView: View {
         }
     }
 
+    private var selectedRecipe: ConsumableCraftingRules.Recipe? {
+        known.first { $0.output == selectedRecipeID }
+    }
+
+    private var columns: [GridItem] {
+        let count = dynamicTypeSize.isAccessibilitySize ? 1 : 3
+        return Array(repeating: GridItem(.flexible(), spacing: 10), count: count)
+    }
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                HStack(spacing: 12) {
-                    CurrencyChip(icon: "drop.fill", label: "Essence",
-                                 value: "\(store.state.base.essence)", tint: .teal)
-                    CurrencyChip(icon: "star.fill", label: "Motes",
-                                 value: "\(store.state.reality.motes)", tint: .purple)
-                }
+            VStack(alignment: .leading, spacing: 14) {
+                contextRow
 
-                StationCard(title: "Preparations", icon: "cross.vial.fill") {
-                    Text("A recipe becomes legible when you bring Nessa stock that suggests it. Once understood, it stays understood. Natural samples substitute by property; named reagents keep their particular chemical jobs.")
-                        .font(.caption).foregroundStyle(.secondary)
-                    if known.isEmpty {
-                        Text("Nothing on the shelves suggests a preparation yet.")
-                            .font(.caption).foregroundStyle(.tertiary)
+                if known.isEmpty {
+                    ContentUnavailableView(
+                        "Nothing understood yet",
+                        systemImage: "cross.vial",
+                        description: Text("Bring Nessa stock whose properties suggest a preparation. Once understood, a recipe stays understood.")
+                    )
+                    .frame(maxWidth: .infinity, minHeight: 280)
+                } else {
+                    Text("Preparations")
+                        .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
+
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(known) { recipe in
+                            Button {
+                                selectedRecipeID = recipe.output
+                            } label: {
+                                ConsumableRecipeTile(
+                                    recipe: recipe,
+                                    selected: selectedRecipeID == recipe.output
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+
+                    if let selectedRecipe {
+                        ConsumableRecipeDetail(recipe: selectedRecipe)
+                            .id(selectedRecipe.output)
                     } else {
-                        ForEach(known) { recipe in ConsumableRecipeRow(recipe: recipe) }
+                        Text("Choose a preparation to see its exact stock and prepare it.")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(14)
+                            .background(Color(.secondarySystemGroupedBackground),
+                                        in: RoundedRectangle(cornerRadius: 14))
                     }
                 }
             }
@@ -35,11 +70,78 @@ struct ApothecaryView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Apothecary")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { store.discoverConsumableRecipes() }
+        .onAppear {
+            store.discoverConsumableRecipes()
+            if selectedRecipeID == nil { selectedRecipeID = known.first?.output }
+        }
+        .onChange(of: known.map(\.output)) { _, ids in
+            if let selectedRecipeID, !ids.contains(selectedRecipeID) {
+                self.selectedRecipeID = ids.first
+            } else if selectedRecipeID == nil {
+                selectedRecipeID = ids.first
+            }
+        }
+    }
+
+    private var contextRow: some View {
+        HStack(spacing: 14) {
+            Label("\(store.state.base.essence)", systemImage: "drop.fill")
+                .foregroundStyle(.teal)
+            Label("\(store.state.reality.motes)", systemImage: "star.fill")
+                .foregroundStyle(.purple)
+            Spacer()
+            Text("\(known.count) known")
+                .foregroundStyle(.secondary)
+        }
+        .font(.subheadline.weight(.semibold).monospacedDigit())
+        .frame(minHeight: 44)
+        .accessibilityElement(children: .combine)
     }
 }
 
-private struct ConsumableRecipeRow: View {
+private struct ConsumableRecipeTile: View {
+    @EnvironmentObject private var store: GameStore
+    let recipe: ConsumableCraftingRules.Recipe
+    let selected: Bool
+
+    private var item: ItemDef? { ContentCatalog.shared.item(recipe.output) }
+    private var ready: Bool { ConsumableCraftingRules.shortfall(recipe, in: store.state).isEmpty }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            CatalogueItemPixelIdentity(
+                itemID: recipe.output,
+                identified: true,
+                fallbackSystemIcon: item?.icon ?? "cross.vial",
+                fallbackColor: item?.rarity.tint ?? .secondary
+            )
+                .frame(width: 34, height: 34)
+            Spacer(minLength: 0)
+            Text(item?.name ?? recipe.output.rawValue)
+                .font(.caption.weight(.semibold))
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+            Label(ready ? "Ready" : "Needs stock",
+                  systemImage: ready ? "checkmark.circle.fill" : "circle.dashed")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(ready ? Color.green : Color.secondary)
+        }
+        .frame(maxWidth: .infinity, minHeight: 112, alignment: .leading)
+        .padding(10)
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(selected ? Color.accentColor : Color.clear, lineWidth: 3)
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(selected ? .isSelected : [])
+        .accessibilityHint("Shows recipe requirements and preparation action")
+    }
+}
+
+private struct ConsumableRecipeDetail: View {
     @EnvironmentObject private var store: GameStore
     let recipe: ConsumableCraftingRules.Recipe
 
@@ -47,23 +149,47 @@ private struct ConsumableRecipeRow: View {
     private var missing: [String] { ConsumableCraftingRules.shortfall(recipe, in: store.state) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack {
-                Label(item?.name ?? recipe.output.rawValue, systemImage: item?.icon ?? "cross.vial")
-                    .font(.callout.weight(.medium))
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 10) {
+                CatalogueItemPixelIdentity(
+                    itemID: recipe.output,
+                    identified: true,
+                    fallbackSystemIcon: item?.icon ?? "cross.vial",
+                    fallbackColor: item?.rarity.tint ?? .secondary
+                )
+                .frame(width: 32, height: 32)
+                Text(item?.name ?? recipe.output.rawValue)
+                    .font(.headline)
                 Spacer()
-                Button("Prepare") { store.craftConsumable(recipe) }
-                    .buttonStyle(.borderedProminent).controlSize(.small)
-                    .disabled(!missing.isEmpty)
-                    .accessibilityIdentifier("apothecary.craft.\(recipe.output.rawValue)")
+                Text(missing.isEmpty ? "Ready" : "Missing stock")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(missing.isEmpty ? Color.green : Color.secondary)
             }
-            Text(requirements).font(.caption2).foregroundStyle(.secondary)
+
+            Text(requirements)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+
             if !missing.isEmpty {
-                Text("Needs: " + missing.joined(separator: " · "))
-                    .font(.caption2).foregroundStyle(.tertiary)
+                Label(missing.joined(separator: " · "), systemImage: "exclamationmark.circle")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
+
+            Button {
+                store.craftConsumable(recipe)
+            } label: {
+                Label("Prepare", systemImage: "cross.vial.fill")
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(!missing.isEmpty)
+            .accessibilityIdentifier("apothecary.craft.\(recipe.output.rawValue)")
         }
-        .padding(.vertical, 4)
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .contain)
     }
 
     private var requirements: String {

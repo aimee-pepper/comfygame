@@ -87,10 +87,12 @@ struct TravellerMeetingView: View {
 
     private var who: some View {
         HStack(spacing: 12) {
-            Image(systemName: traveller.icon)
-                .font(.title2)
-                .foregroundStyle(.green)
-                .frame(width: 34)
+            NamedCharacterPixelIdentity(
+                travellerID: traveller.id,
+                fallbackSystemIcon: traveller.icon,
+                fallbackColor: .green
+            )
+            .frame(width: 34, height: 34)
             VStack(alignment: .leading, spacing: 2) {
                 Text(traveller.name).font(.headline)
                 Text(traveller.calling).font(.caption).foregroundStyle(.secondary)

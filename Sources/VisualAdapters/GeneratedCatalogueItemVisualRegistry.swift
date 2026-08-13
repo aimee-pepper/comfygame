@@ -7,15 +7,13 @@ import Foundation
 enum GeneratedCatalogueItemVisualRegistry {}
 
 protocol CatalogueItemVisualRegistryProvider {
-    static var registry: any NativeVisualRuntime.Registry { get }
+    static var registry: any NativeVisualRuntime.Registry & Sendable { get }
 }
 
 extension CatalogueItemVisualAdapter {
     static func live() -> Self {
-        guard let provider = GeneratedCatalogueItemVisualRegistry.self
-            as? any CatalogueItemVisualRegistryProvider.Type,
-              let pack = try? NativeVisualRuntime.Pack(
-                registry: provider.registry,
+        guard let pack = try? NativeVisualRuntime.Pack(
+                registry: GeneratedCatalogueItemVisualRegistry.registry,
                 requiredCatalogueIDs: Set(ContentCatalog.shared.items.map(\.id.rawValue))) else {
             return .init(pack: nil)
         }

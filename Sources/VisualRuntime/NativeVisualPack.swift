@@ -11,7 +11,9 @@ extension NativeVisualRuntime {
         var asset: GeneratedPixelAsset
     }
 
-    protocol Registry {
+    /// Immutable generated-pack input. Registries are value descriptions that may be cached and
+    /// read from any actor; conformers must therefore expose only `Sendable` state.
+    protocol Registry: Sendable {
         var manifestSHA256: String { get }
         var pipelineVersion: String { get }
         var canvasWidth: UInt8 { get }

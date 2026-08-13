@@ -145,6 +145,7 @@ struct EncounterView: View {
                 PartyCard(actor: .binder,
                           name: "You",
                           icon: "figure.stand",
+                          travellerID: nil,
                           health: CombatRules.health(of: .binder, in: run),
                           isActing: encounter.current == .binder && encounter.outcome == nil,
                           badge: nil)
@@ -156,6 +157,7 @@ struct EncounterView: View {
                         PartyCard(actor: .companion(index),
                                   name: store.state.base.roster[index].name,
                                   icon: store.state.base.roster[index].icon,
+                                  travellerID: store.state.base.roster[index].traveller,
                                   health: CombatRules.health(of: .companion(index), in: run),
                                   isActing: encounter.current == .companion(index) && encounter.outcome == nil,
                                   badge: encounter.isCompanionOverridden ? "manual" : "auto")
@@ -444,6 +446,7 @@ private struct PartyCard: View {
     let actor: Combatant
     let name: String
     let icon: String
+    let travellerID: TravellerID?
     let health: (current: Int, max: Int)
     let isActing: Bool
     let badge: String?
@@ -451,7 +454,12 @@ private struct PartyCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
-                Image(systemName: icon)
+                NamedCharacterPixelIdentity(
+                    travellerID: travellerID,
+                    fallbackSystemIcon: icon,
+                    fallbackColor: .primary
+                )
+                .frame(width: 24, height: 24)
                 Text(name).font(.subheadline.weight(.semibold)).lineLimit(1)
                 Spacer(minLength: 0)
                 if let badge {
@@ -674,7 +682,17 @@ private struct CombatItemSheet: View {
                                 }
                             }
                         } header: {
-                            Text(stack.count > 1 ? "\(item.name) ×\(stack.count)" : item.name)
+                            HStack(spacing: 8) {
+                                CatalogueItemPixelIdentity(
+                                    itemID: stack.catalogID,
+                                    identified: stack.identified,
+                                    fallbackSystemIcon: item.icon,
+                                    fallbackColor: item.rarity.tint
+                                )
+                                .frame(width: 28, height: 28)
+                                Text(stack.count > 1 ? "\(item.name) ×\(stack.count)" : item.name)
+                            }
+                            .accessibilityElement(children: .combine)
                         } footer: {
                             Text(itemEffect(item))
                         }

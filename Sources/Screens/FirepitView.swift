@@ -14,6 +14,7 @@ import SwiftUI
 /// the firepit holds *your* people, the tavern brings you other people's.
 struct FirepitView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var pendingTransfer: PartyTransferPreview?
 
     private var roster: [CompanionState] { store.state.base.roster }
@@ -34,40 +35,28 @@ struct FirepitView: View {
     private var seatsLeft: Int {
         max(0, Tuning.Party.maximumSize - 1 - store.state.base.activeParty.count)
     }
+    private var columns: [GridItem] {
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible(), spacing: 10), GridItem(.flexible())]
+    }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 12) {
-                StationCard(title: "Who's coming — you and \(coming.count)", icon: "figure.walk") {
-                    if coming.isEmpty {
-                        EmptyNote("Nobody but you.")
-                    } else {
-                        ForEach(coming, id: \.index) { entry in
-                            row(entry.member, index: entry.index)
-                        }
-                    }
-                    if seatsLeft > 0 {
-                        Text(seatsLeft == 1 ? "Room for one more." : "Room for \(seatsLeft) more.")
-                            .font(.caption2).foregroundStyle(.secondary)
-                    }
+            VStack(alignment: .leading, spacing: 18) {
+                communitySection("Coming with you", icon: "figure.walk", entries: coming,
+                                 empty: "Nobody but you.")
+                if seatsLeft > 0 {
+                    Text(seatsLeft == 1 ? "Room for one more." : "Room for \(seatsLeft) more.")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
 
-                StationCard(title: "Around the fire — \(home.count)", icon: "flame.fill") {
-                    if home.isEmpty {
-                        EmptyNote("Nobody else, yet. People are out in the worlds: read a diary, write the world it describes, and walk up to whoever is standing in it.")
-                    } else {
-                        ForEach(home, id: \.index) { entry in
-                            row(entry.member, index: entry.index)
-                        }
-                    }
-                }
+                communitySection("At Home", icon: "flame.fill", entries: home,
+                                 empty: "Nobody else, yet. Recovered writing can lead you to people in other worlds.")
 
                 if !posted.isEmpty {
-                    StationCard(title: "Posted in realms — \(posted.count)", icon: "map.fill") {
-                        ForEach(posted, id: \.index) { entry in
-                            row(entry.member, index: entry.index)
-                        }
-                    }
+                    communitySection("Posted in realms", icon: "map.fill", entries: posted,
+                                     empty: "Nobody is posted away from Home.")
                 }
 
                 if !store.state.base.canRecruit {
@@ -93,33 +82,76 @@ struct FirepitView: View {
         }
     }
 
-    /// One person, in one line. Their sheet is on the Party screen; this is just who they are and
-    /// whether they're coming.
-    private func row(_ member: CompanionState, index: Int) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: member.icon)
-                .foregroundStyle(.orange)
-                .frame(width: 24)
-            VStack(alignment: .leading, spacing: 1) {
-                Text(member.name).font(.callout.weight(.medium))
-                Text(member.calling.isEmpty
-                     ? "Level \(member.character.level)"
-                     : "\(member.calling.capitalisedSentence) · level \(member.character.level)")
-                    .font(.caption2).foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 6)
-            if store.isComing(index) {
-                Button("Send Home") { _ = store.setComing(index, false, expected: .activeParty) }
-                    .font(.caption2.weight(.medium))
-                    .buttonStyle(.bordered)
+    @ViewBuilder
+    private func communitySection(_ title: String, icon: String,
+                                  entries: [(index: Int, member: CompanionState)],
+                                  empty: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("\(title) · \(entries.count)", systemImage: icon)
+                .font(.headline)
+                .accessibilityAddTraits(.isHeader)
+            if entries.isEmpty {
+                Text(empty)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(14)
+                    .background(Color(.secondarySystemGroupedBackground),
+                                in: RoundedRectangle(cornerRadius: 14))
             } else {
-                Button("Take them") { pendingTransfer = store.partyTransferPreview(for: index) }
-                    .font(.caption2.weight(.medium))
-                    .buttonStyle(.borderedProminent)
-                    .disabled(seatsLeft == 0)
+                LazyVGrid(columns: columns, spacing: 10) {
+                    ForEach(entries, id: \.index) { entry in
+                        memberTile(entry.member, index: entry.index)
+                    }
+                }
             }
         }
-        .frame(minHeight: 44)
+    }
+
+    /// Location and departure choice only; detailed character management remains on Party.
+    private func memberTile(_ member: CompanionState, index: Int) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                NamedCharacterPixelIdentity(
+                    travellerID: member.traveller,
+                    fallbackSystemIcon: member.icon,
+                    fallbackColor: .orange
+                )
+                .frame(width: 36, height: 36)
+                Spacer()
+                Image(systemName: store.isComing(index) ? "figure.walk.circle.fill" : "house.circle")
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+            }
+            Text(member.name)
+                .font(.callout.weight(.semibold))
+                .lineLimit(1)
+            Text(member.calling.isEmpty
+                 ? "Level \(member.character.level)"
+                 : "\(member.calling.capitalisedSentence) · level \(member.character.level)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+            Spacer(minLength: 0)
+            if store.isComing(index) {
+                Button("Send Home") { _ = store.setComing(index, false, expected: .activeParty) }
+                    .font(.caption.weight(.semibold))
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            } else {
+                Button("Take them") { pendingTransfer = store.partyTransferPreview(for: index) }
+                    .font(.caption.weight(.semibold))
+                    .buttonStyle(.borderedProminent)
+                    .disabled(seatsLeft == 0)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: dynamicTypeSize.isAccessibilitySize ? 164 : 176,
+               alignment: .topLeading)
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .contain)
     }
 
     private func transferMessage(_ preview: PartyTransferPreview) -> String {

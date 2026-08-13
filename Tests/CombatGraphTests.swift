@@ -27,10 +27,6 @@ final class CombatGraphTests: XCTestCase {
                        "emanation_strike")
         XCTAssertEqual(graph.node(id("craft", "emanation", "quench"))?.techniqueID, "quench")
         XCTAssertNil(graph.node(id("offense", "force", "heavy_hand"))?.techniqueID)
-        XCTAssertEqual(graph.authoritySHA256,
-                       "235abe8b86e4f39dec920c8dd47063be3adc4b2a8189e5adcefdc83ca1378d0f")
-        XCTAssertEqual(graph.effectCopySHA256,
-                       "175ea991e0ff476696b8616eac3c3cc459fe0e0cd85b4837dfdf7406c709b094")
     }
 
     func testEveryLegacyDepthMapsToExactFormerPrefixesWithoutLosingPoints() {

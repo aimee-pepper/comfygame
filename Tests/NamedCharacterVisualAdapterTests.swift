@@ -1,0 +1,149 @@
+import Foundation
+import XCTest
+@testable import Bookbinder
+
+final class NamedCharacterVisualAdapterTests: XCTestCase {
+    private func manifestData() throws -> Data {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        return try Data(contentsOf: root
+            .appendingPathComponent("AssetLab/integration/named-character-placeholders-v1/manifest.json"))
+    }
+
+    func testExactStableIdentityResolvesCameoAndEveryMapFacing() throws {
+        let adapter = try NamedCharacterVisualAdapter.validated(manifestData: manifestData())
+
+        for travellerID in NativeVisualRuntime.NamedCharacterPlaceholderPack
+            .supportedTravellerIDs {
+            let cameo = try XCTUnwrap(adapter.cameoAsset(for: travellerID))
+            XCTAssertEqual(cameo.width, 16)
+            XCTAssertEqual(cameo.height, 16)
+            for facing in NativeVisualRuntime.MapFacing.allCases {
+                let map = try XCTUnwrap(adapter.mapSpriteAsset(
+                    for: travellerID, facing: facing))
+                XCTAssertEqual(map.width, 16)
+                XCTAssertEqual(map.height, 16)
+            }
+        }
+    }
+
+    func testIdentityAndProfileLookupFailClosedWithoutSubstitution() throws {
+        let adapter = try NamedCharacterVisualAdapter.validated(manifestData: manifestData())
+        XCTAssertNil(adapter.cameoAsset(for: "generated-person-1"))
+        XCTAssertNil(adapter.mapSpriteAsset(for: "generated-person-1", facing: .north))
+        XCTAssertNil(adapter.cameoAsset(for: "unknown"))
+
+        let mara: TravellerID = "mara"
+        XCTAssertNotEqual(adapter.cameoAsset(for: mara),
+                          adapter.mapSpriteAsset(for: mara, facing: .north))
+        XCTAssertNotEqual(adapter.mapSpriteAsset(for: mara, facing: .north),
+                          adapter.mapSpriteAsset(for: mara, facing: .south))
+    }
+
+    func testNollIsPackCoverageOnlyAndFallbackConfigurationReturnsNil() throws {
+        let adapter = try NamedCharacterVisualAdapter.validated(manifestData: manifestData())
+        XCTAssertNotNil(adapter.cameoAsset(for: "noll"),
+                        "The immutable pack covers Noll without changing catalogue state")
+
+        let fallback: any NamedCharacterVisualProviding = NamedCharacterVisualAdapter.fallbackOnly
+        XCTAssertNil(fallback.cameoAsset(for: "noll"))
+        XCTAssertNil(fallback.mapSpriteAsset(for: "mara", facing: .west))
+    }
+
+    func testPartyAndLibraryPassOnlyStableTravellerIdentityToCompactCameo() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let party = try String(contentsOf: root.appending(path: "Sources/Screens/PartyRosterView.swift"),
+                               encoding: .utf8)
+        let library = try String(contentsOf: root.appending(path: "Sources/Screens/LibraryView.swift"),
+                                 encoding: .utf8)
+        let identity = try String(contentsOf: root.appending(path: "Sources/Screens/NamedCharacterPixelIdentity.swift"),
+                                  encoding: .utf8)
+
+        XCTAssertTrue(party.contains("NamedCharacterPixelIdentity("))
+        XCTAssertTrue(party.contains("store.state.base.roster[index].traveller"),
+                      "Party identity must come from the persisted named-traveller link")
+        XCTAssertTrue(library.contains("travellerID: traveller.id"),
+                      "Library People and diary authors must use stable catalogue identity")
+        XCTAssertTrue(identity.contains("NamedCharacterVisualAdapter.live()"))
+        XCTAssertTrue(identity.contains("Image(systemName: fallbackSystemIcon)"),
+                      "Missing/generated identities must retain the visible SF fallback")
+        XCTAssertFalse(identity.contains("calling"))
+    }
+
+    func testEncounterCompanionsUsePersistedNamedIdentityAndPreserveFallbacks() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let encounter = try String(contentsOf: root.appending(path: "Sources/Screens/EncounterView.swift"),
+                                   encoding: .utf8)
+
+        XCTAssertTrue(encounter.contains("NamedCharacterPixelIdentity("))
+        XCTAssertTrue(encounter.contains("travellerID: store.state.base.roster[index].traveller"),
+                      "Encounter identity must use the exact persisted named-traveller link")
+        XCTAssertTrue(encounter.contains("travellerID: nil"),
+                      "Binder must remain outside the named-traveller placeholder pack")
+        XCTAssertTrue(encounter.contains("fallbackSystemIcon: icon"),
+                      "Quill, generated, unknown, and unavailable identities retain their SF fallback")
+        XCTAssertFalse(encounter.contains("travellerID: store.state.base.roster[index].calling"))
+    }
+
+    func testTravellerMeetingUsesExactMeetingIdentityAndPreservesFallback() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let meeting = try String(contentsOf: root.appending(path: "Sources/Screens/TravellerMeetingView.swift"),
+                                 encoding: .utf8)
+
+        XCTAssertTrue(meeting.contains("NamedCharacterPixelIdentity("))
+        XCTAssertTrue(meeting.contains("travellerID: traveller.id"),
+                      "Meeting identity must resolve from the exact encountered TravellerDef")
+        XCTAssertTrue(meeting.contains("fallbackSystemIcon: traveller.icon"),
+                      "Validation, missing-asset, and lookup failures retain the authored SF fallback")
+        XCTAssertTrue(meeting.contains("Text(traveller.name)"),
+                      "The visible authored identity must remain unchanged")
+        XCTAssertFalse(meeting.contains("travellerID: traveller.calling"))
+    }
+
+    func testFirepitUsesPersistedCompanionIdentityAndPreservesFallback() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let firepit = try String(contentsOf: root.appending(path: "Sources/Screens/FirepitView.swift"),
+                                 encoding: .utf8)
+
+        XCTAssertTrue(firepit.contains("NamedCharacterPixelIdentity("))
+        XCTAssertTrue(firepit.contains("travellerID: member.traveller"),
+                      "Firepit identity must use the persisted roster member's TravellerID")
+        XCTAssertTrue(firepit.contains("fallbackSystemIcon: member.icon"),
+                      "Quill, generated, unknown, and unavailable identities retain their SF fallback")
+        XCTAssertTrue(firepit.contains("Text(member.name)"),
+                      "Existing visible companion names must remain unchanged")
+        XCTAssertFalse(firepit.contains("travellerID: member.calling"))
+    }
+
+    func testWorldHistoryUsesRecordedTravellerIdentityAndPreservesReceiptCopy() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let history = try String(contentsOf: root.appending(path: "Sources/Screens/WorldHistoryView.swift"),
+                                 encoding: .utf8)
+
+        XCTAssertTrue(history.contains("ForEach(world.travellersPresent, id: \\.self) { id in"),
+                      "History must retain the stable recorded TravellerID at presentation time")
+        XCTAssertTrue(history.contains("NamedCharacterPixelIdentity("))
+        XCTAssertTrue(history.contains("travellerID: id"))
+        XCTAssertTrue(history.contains("fallbackSystemIcon: \"figure.wave\""),
+                      "Unknown, missing, and invalid assets retain the existing receipt fallback")
+        XCTAssertTrue(history.contains("Text(person.name)"))
+        XCTAssertTrue(history.contains("? \"with you\" : \"still there\""),
+                      "Character pixels must not alter the saved-world receipt meaning")
+    }
+
+    func testBuiltBundleResourceBasenameRemainsHashValidated() throws {
+        let source = try String(contentsOf: URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appending(path: "Sources/VisualAdapters/NamedCharacterVisualAdapter.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("[\"named-character-placeholders-v1\", \"manifest\"]"))
+        XCTAssertTrue(source.contains("validated(manifestData: data)"),
+                      "Neither bundle resource name may bypass immutable pack validation")
+    }
+}

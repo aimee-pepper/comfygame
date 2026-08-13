@@ -1244,16 +1244,40 @@ private struct FieldKitSheet: View {
                                 store.useItemInWorld(stack, on: .binder)
                                 dismiss()
                             } label: {
-                                LabeledRow(icon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "sparkles",
-                                           label: "Use now",
-                                           value: fieldEffectDetail(stack.catalogID))
+                                HStack(spacing: 10) {
+                                    CatalogueItemPixelIdentity(
+                                        itemID: stack.catalogID,
+                                        identified: stack.identified,
+                                        fallbackSystemIcon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "sparkles",
+                                        fallbackColor: ContentCatalog.shared.item(stack.catalogID)?.rarity.tint ?? .secondary
+                                    )
+                                    .frame(width: 32, height: 32)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Use now")
+                                        Text(fieldEffectDetail(stack.catalogID))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                }
                                 .frame(minHeight: 44)
                                 .contentShape(Rectangle())
+                                .accessibilityElement(children: .combine)
                             }
                             .buttonStyle(.plain)
                         }
                     } header: {
-                        Text("\(stack.displayName)\(stack.count > 1 ? " ×\(stack.count)" : "")")
+                        HStack(spacing: 8) {
+                            CatalogueItemPixelIdentity(
+                                itemID: stack.catalogID,
+                                identified: stack.identified,
+                                fallbackSystemIcon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "sparkles",
+                                fallbackColor: ContentCatalog.shared.item(stack.catalogID)?.rarity.tint ?? .secondary
+                            )
+                            .frame(width: 28, height: 28)
+                            Text("\(stack.displayName)\(stack.count > 1 ? " ×\(stack.count)" : "")")
+                        }
+                        .accessibilityElement(children: .combine)
                     }
                 }
             }
