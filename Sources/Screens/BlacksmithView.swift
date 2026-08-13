@@ -296,23 +296,29 @@ struct ArmouryView: View {
                 StationCard(title: "Protective pieces", icon: "shield") {
                     Toggle("Show legacy masterworks", isOn: $showLegacy)
                     let targets = ArmouryRules.targets(in: store.state, includeLegacy: showLegacy)
-                    SixAcrossItemGrid(data: targets, id: \.id) { target in
-                        Button { chosenTarget = target } label: {
-                            ItemIconTile(
-                                icon: targetDefinition(target)?.icon ?? "shield",
-                                catalogueID: target.catalogID,
-                                rarity: targetRarity(target),
-                                quantity: 1,
-                                identified: targetIsIdentified(target),
-                                location: targetLocation(target),
-                                accessibilityName: target.displayName
-                            )
+                    if targets.isEmpty {
+                        EmptyNote(showLegacy
+                                  ? "No eligible protective pieces are stored or worn."
+                                  : "No eligible ordinary protective pieces. Show legacy masterworks to include them.")
+                    } else {
+                        SixAcrossItemGrid(data: targets, id: \.id) { target in
+                            Button { chosenTarget = target } label: {
+                                ItemIconTile(
+                                    icon: targetDefinition(target)?.icon ?? "shield",
+                                    catalogueID: target.catalogID,
+                                    rarity: targetRarity(target),
+                                    quantity: 1,
+                                    identified: targetIsIdentified(target),
+                                    location: targetLocation(target),
+                                    accessibilityName: target.displayName
+                                )
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
+                        Text("Tap a stored or worn piece to choose its rebuild profile.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    Text("Tap a stored or worn piece to choose its rebuild profile.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
                 StationCard(title: "Bracken's work", icon: "point.3.connected.trianglepath.dotted") {
                     ResearchTree(station: Stations.armoury)

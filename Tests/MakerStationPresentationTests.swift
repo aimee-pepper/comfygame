@@ -42,6 +42,9 @@ final class MakerStationPresentationTests: XCTestCase {
         XCTAssertTrue(armoury.contains("case .stored(let stack): stack.identified"))
         XCTAssertTrue(armoury.contains(".presentationDetents([.medium, .large])"))
         XCTAssertTrue(armoury.contains(".presentationDragIndicator(.visible)"))
+        XCTAssertTrue(armoury.contains("if targets.isEmpty"))
+        XCTAssertTrue(armoury.contains("No eligible protective pieces are stored or worn."))
+        XCTAssertTrue(armoury.contains("No eligible ordinary protective pieces. Show legacy masterworks to include them."))
         XCTAssertFalse(armoury.contains("Image(systemName: \"chevron.right\")"))
     }
     func testPlayerFacingReforgeLabelsUseRulesOwnedMaximum() throws {
