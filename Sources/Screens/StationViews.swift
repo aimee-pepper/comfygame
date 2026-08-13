@@ -227,13 +227,20 @@ struct AnchorageView: View {
                                             fallbackColor: .secondary
                                         )
                                         .frame(width: 24, height: 24)
-                                        Text(worker.name)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(worker.name)
+                                                .font(.callout.weight(.medium))
+                                            Text("Worldwork \(worker.worldwork) · +\(contribution)")
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                        }
                                         Spacer()
-                                        Text("Worldwork \(worker.worldwork) · +\(contribution)")
-                                            .foregroundStyle(.secondary)
                                         Button("Return") { store.unassignCompanion(index, fromAnchoredRealm: realm.id) }
+                                            .font(.caption.weight(.semibold))
+                                            .buttonStyle(.bordered)
+                                            .frame(minHeight: 44)
                                     }
-                                    .font(.caption)
+                                    .frame(minHeight: 44)
                                 }
                             }
                             if !realm.isDormant && !store.state.base.roster.isEmpty {

@@ -51,6 +51,28 @@ final class SpilloverTests: XCTestCase {
         XCTAssertFalse(workshop.contains("ComingLater"))
         XCTAssertFalse(workshop.contains("branchesInOrder.filter { $0.station != nil }"))
     }
+
+    func testAnchorageWorkerRowsKeepIdentityFactsClearOfTheReturnAction() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+            encoding: .utf8
+        )
+        let start = try XCTUnwrap(source.range(of: "struct AnchorageView"))
+        let end = try XCTUnwrap(source.range(
+            of: "private extension AnchorRoute",
+            range: start.upperBound..<source.endIndex
+        ))
+        let anchorage = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(anchorage.contains("VStack(alignment: .leading, spacing: 2)"))
+        XCTAssertTrue(anchorage.contains("Worldwork \\(worker.worldwork) · +\\(contribution)"))
+        XCTAssertTrue(anchorage.contains("Button(\"Return\")"))
+        XCTAssertTrue(anchorage.contains(".buttonStyle(.bordered)"))
+        XCTAssertTrue(anchorage.contains(".frame(minHeight: 44)"))
+    }
+
     func testStorehouseSortingActionsRemainOutsideScrollableDetails() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
