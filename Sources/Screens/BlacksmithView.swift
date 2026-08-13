@@ -148,8 +148,13 @@ private struct MakerRecipeTile: View {
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 7) {
-                Image(systemName: ContentCatalog.shared.item(recipe.catalogFallback)?.icon ?? "hammer")
-                    .font(.title2).frame(width: 34, height: 30).foregroundStyle(.tint)
+                CatalogueItemPixelIdentity(
+                    itemID: recipe.catalogFallback,
+                    identified: true,
+                    fallbackSystemIcon: ContentCatalog.shared.item(recipe.catalogFallback)?.icon ?? "hammer",
+                    fallbackColor: .accentColor
+                )
+                .frame(width: 34, height: 30)
                 Text(recipe.displayName)
                     .font(.subheadline.weight(.semibold)).lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
@@ -196,8 +201,13 @@ private struct ConstructionRow: View {
     var body: some View {
         Button(action: tap) {
             HStack(spacing: 10) {
-                Image(systemName: ContentCatalog.shared.item(recipe.catalogFallback)?.icon ?? "hammer")
-                    .frame(width: 22).foregroundStyle(.teal)
+                CatalogueItemPixelIdentity(
+                    itemID: recipe.catalogFallback,
+                    identified: true,
+                    fallbackSystemIcon: ContentCatalog.shared.item(recipe.catalogFallback)?.icon ?? "hammer",
+                    fallbackColor: .teal
+                )
+                .frame(width: 32, height: 32)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(recipe.displayName).font(.callout.weight(.medium))
                     Text(summary).font(.caption2).foregroundStyle(.secondary)

@@ -78,6 +78,23 @@ final class MakerStationPresentationTests: XCTestCase {
         XCTAssertTrue(source.contains("Text(\"Rebuild · \\(preview.essence) essence\").frame(maxWidth: .infinity)"))
     }
 
+    func testBlacksmithRecipesUseTheirExactSharedCatalogueIdentity() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/BlacksmithView.swift"),
+            encoding: .utf8
+        )
+
+        let recipeTile = try XCTUnwrap(source.range(of: "private struct MakerRecipeTile"))
+        let armouryTarget = try XCTUnwrap(source.range(of: "private struct ArmouryTargetSheet"))
+        let recipeSurfaces = String(source[recipeTile.lowerBound..<armouryTarget.lowerBound])
+
+        XCTAssertEqual(recipeSurfaces.components(separatedBy: "CatalogueItemPixelIdentity(").count - 1, 2)
+        XCTAssertEqual(recipeSurfaces.components(separatedBy: "itemID: recipe.catalogFallback").count - 1, 2)
+        XCTAssertEqual(recipeSurfaces.components(separatedBy: "identified: true").count - 1, 2)
+    }
+
     func testLandingReadinessCopyComesFromRulesPreview() throws {
         var state = GameState.newGame()
         state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)
