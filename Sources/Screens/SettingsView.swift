@@ -64,8 +64,9 @@ struct SettingsView: View {
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Image(systemName: "chevron.backward")
-                            .font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.secondary)
                     }
                     .frame(minHeight: 44)
                     .padding(14)
@@ -127,7 +128,6 @@ struct SettingsView: View {
                 .padding(12)
                 .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
 
-                ComingLater("Text size, haptics and a colour-blind-safe palette belong here too — milestone 6 is the ergonomics pass.")
             }
             .padding(16)
         }
