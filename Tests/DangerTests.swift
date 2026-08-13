@@ -9,6 +9,58 @@ import XCTest
 /// things.
 final class DangerTests: XCTestCase {
 
+    func testCompoundHostilityDebugComparisonCoversAllSixFossilsSameSeed() {
+        let fossils: [(SymbolID, Int)] = [
+            ("ashen", 1), ("rich_ore", 1), ("teeming_life", 1), ("dim_sky", 1),
+            ("gilded_veins", 1), ("mote_vein", 2)
+        ]
+        for (symbol, expectedDelta) in fossils {
+            let book = BoundBook(written: [symbol], essencePaid: 0)
+            let readings = PressureRules.resolve(BookRules.sigils(for: book))
+            var legacyRNG = SeededRNG(seed: 0xC0A0)
+            var systemicRNG = legacyRNG
+            let legacy = Worldgen.enemyCount(for: book, readings: readings,
+                                               rng: &legacyRNG,
+                                               legacyOrdinaryTierDeltas: true)
+            let systemic = Worldgen.enemyCount(for: book, readings: readings,
+                                                 rng: &systemicRNG,
+                                                 legacyOrdinaryTierDeltas: false)
+            XCTAssertEqual(BookRules.enemyTier(of: book, legacyOrdinaryTierDeltas: true)
+                           - BookRules.enemyTier(of: book, legacyOrdinaryTierDeltas: false),
+                           expectedDelta, symbol.rawValue)
+            XCTAssertGreaterThanOrEqual(legacy, systemic, symbol.rawValue)
+            XCTAssertEqual(legacyRNG, systemicRNG,
+                           "the comparison must consume identical RNG for \(symbol.rawValue)")
+        }
+    }
+
+    func testCompoundHostilityOffPreservesDangerAndPressureEquivalentPopulation() {
+        let compound = BoundBook(written: ["teeming_life"], essencePaid: 0)
+        let expanded = BoundBook(written: [], essencePaid: 0)
+        let compoundReadings = PressureRules.resolve(BookRules.sigils(for: compound))
+        let equivalentReadings = compoundReadings
+        for partySize in [1, 3, 5] {
+            for level in [1, 8] {
+                var left = SeededRNG(seed: UInt64(800 + partySize * 10 + level))
+                var right = left
+                let compoundCount = Worldgen.enemyCount(
+                    for: compound, readings: compoundReadings,
+                    multiplier: 1, rng: &left, legacyOrdinaryTierDeltas: false)
+                let equivalentCount = Worldgen.enemyCount(
+                    for: expanded, readings: equivalentReadings,
+                    multiplier: 1, rng: &right, legacyOrdinaryTierDeltas: false)
+                XCTAssertEqual(compoundCount, equivalentCount)
+                XCTAssertGreaterThan(compoundCount, 1, "Teeming Life must remain crowded")
+            }
+        }
+
+        let danger = BoundBook(written: ["rich_ore", "predation"], essencePaid: 0)
+        XCTAssertEqual(BookRules.enemyTier(of: danger, legacyOrdinaryTierDeltas: false),
+                       max(1, Tuning.World.baseEnemyTier
+                           + BookRules.dangerProfile(for: danger).tierDelta),
+                       "typed Danger hostility must survive ordinary-delta comparison-off")
+    }
+
     // MARK: The axis
 
     func testADangerRuneBuysStability() {
