@@ -40,18 +40,13 @@ enum AuthoredTextAtlas {
     struct TravellerEntry: Identifiable {
         let traveller: TravellerDef
         let units: [Unit]
-        let draftMeetingAvailable: Bool
         var id: TravellerID { traveller.id }
-        var meetingState: String {
-            if traveller.meeting != nil { return draftMeetingAvailable ? "Live · revision draft" : "Live" }
-            return draftMeetingAvailable ? "Draft · needs review" : "Missing"
-        }
+        var meetingState: String { traveller.meeting == nil ? "Missing" : "Live" }
     }
 
-    /// Review-only meeting prose stays in Design's markdown until Aimee approves it. The atlas
-    /// nevertheless accounts for that material rather than calling these travellers simply absent.
-    static var draftMeetingIDs: Set<TravellerID> {
-        Set(DraftMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
+    /// The generated source and release catalogue share these exact authored meeting IDs.
+    static var generatedMeetingIDs: Set<TravellerID> {
+        Set(AuthoredMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
     }
 
     static func inventory(catalogue: ContentCatalog = .shared) -> [TravellerEntry] {
@@ -61,50 +56,25 @@ enum AuthoredTextAtlas {
             }
             .map { traveller in
                 var units: [Unit] = []
-                let draft = DraftMeetingCorpus.meeting(for: traveller.id)
                 if let meeting = traveller.meeting {
-                    let prefix = draft == nil ? "meeting.\(traveller.id.rawValue)" : "live.meeting.\(traveller.id.rawValue)"
-                    let liveDetail = traveller.id == "noll" ? "Provisional · needs Aimee review" : nil
+                    let prefix = "meeting.\(traveller.id.rawValue)"
                     units.append(Unit(id: "\(prefix).opening", traveller: traveller.id,
-                                      kind: .meeting, label: "Opening", text: meeting.opening, detail: liveDetail))
+                                      kind: .meeting, label: "Opening", text: meeting.opening, detail: nil))
                     for exchange in meeting.questions {
                         units.append(Unit(id: "\(prefix).exchange.\(exchange.id).ask", traveller: traveller.id,
                                           kind: .meeting, label: "You may ask", text: exchange.ask,
-                                          detail: liveDetail.map { "\(exchange.id) · \($0)" } ?? exchange.id))
+                                          detail: exchange.id))
                         units.append(Unit(id: "\(prefix).exchange.\(exchange.id).reply", traveller: traveller.id,
                                           kind: .meeting, label: "Reply", text: exchange.reply,
-                                          detail: liveDetail.map { "\(exchange.id) · \($0)" } ?? exchange.id))
+                                          detail: exchange.id))
                     }
                     units += [
                         Unit(id: "\(prefix).offer", traveller: traveller.id, kind: .meeting,
-                             label: "Offer", text: meeting.offer, detail: liveDetail),
+                             label: "Offer", text: meeting.offer, detail: nil),
                         Unit(id: "\(prefix).accepted", traveller: traveller.id, kind: .meeting,
-                             label: "Accepted", text: meeting.accepted, detail: liveDetail),
+                             label: "Accepted", text: meeting.accepted, detail: nil),
                         Unit(id: "\(prefix).declined", traveller: traveller.id, kind: .meeting,
-                             label: "Declined", text: meeting.declined, detail: liveDetail)
-                    ]
-                }
-                if let draft {
-                    let prefix = "meeting.\(traveller.id.rawValue)"
-                    let provenance = "Draft · needs Aimee review · \(draft.source)"
-                    units.append(Unit(id: "\(prefix).opening", traveller: traveller.id,
-                                      kind: .meeting, label: "Draft opening", text: draft.opening,
-                                      detail: provenance))
-                    for exchange in draft.exchanges {
-                        units.append(Unit(id: "\(prefix).exchange.\(exchange.id).ask", traveller: traveller.id,
-                                          kind: .meeting, label: "Draft question", text: exchange.ask,
-                                          detail: "\(exchange.id) · \(provenance)"))
-                        units.append(Unit(id: "\(prefix).exchange.\(exchange.id).reply", traveller: traveller.id,
-                                          kind: .meeting, label: "Draft reply", text: exchange.reply,
-                                          detail: "\(exchange.id) · \(provenance)"))
-                    }
-                    units += [
-                        Unit(id: "\(prefix).offer", traveller: traveller.id, kind: .meeting,
-                             label: "Draft offer", text: draft.offer, detail: provenance),
-                        Unit(id: "\(prefix).accepted", traveller: traveller.id, kind: .meeting,
-                             label: "Draft accepted", text: draft.accepted, detail: provenance),
-                        Unit(id: "\(prefix).declined", traveller: traveller.id, kind: .meeting,
-                             label: "Draft declined", text: draft.declined, detail: provenance)
+                             label: "Declined", text: meeting.declined, detail: nil)
                     ]
                 }
                 for (index, page) in catalogue.diary(of: traveller.id).enumerated() {
@@ -127,8 +97,7 @@ enum AuthoredTextAtlas {
                                       text: "A travelling kit should open one object and then be spent. If the tool survives every separation, the thing being consumed is somewhere you have chosen not to record.",
                                       detail: "Provisional · DEBUG review only · not findable · no live Field Separation Kit reward"))
                 }
-                return TravellerEntry(traveller: traveller, units: units,
-                                      draftMeetingAvailable: draft != nil)
+                return TravellerEntry(traveller: traveller, units: units)
             }
     }
 }
@@ -364,7 +333,7 @@ struct AuthoredTextAtlasView: View {
             switch reviewFilter {
             case .all: break
             case .missing:
-                guard entry.traveller.meeting == nil && !entry.draftMeetingAvailable else { return nil }
+                guard entry.traveller.meeting == nil else { return nil }
             case .stale: units = units.filter(reviews.isStale)
             case .unreviewed: units = units.filter { reviews.status(for: $0) == .unreviewed && !reviews.isStale($0) }
             case .good: units = units.filter { reviews.status(for: $0) == .good }
@@ -381,8 +350,7 @@ struct AuthoredTextAtlasView: View {
                     guard !units.isEmpty else { return nil }
                 }
             }
-            return AuthoredTextAtlas.TravellerEntry(traveller: entry.traveller, units: units,
-                                                    draftMeetingAvailable: entry.draftMeetingAvailable)
+            return AuthoredTextAtlas.TravellerEntry(traveller: entry.traveller, units: units)
         }
     }
 
@@ -407,22 +375,14 @@ private struct AuthoredTextTravellerView: View {
                 Text("\(entry.traveller.calling) · \(entry.traveller.campaignPhase?.rawValue ?? "unphased") · authored order \(entry.traveller.authoredOrder.map(String.init) ?? "—")")
                     .font(.subheadline).foregroundStyle(.secondary)
                 if entry.traveller.meeting == nil {
-                    ContentUnavailableView(entry.draftMeetingAvailable ? "Meeting draft awaits review" : "Meeting missing",
-                                           systemImage: entry.draftMeetingAvailable ? "pencil.and.list.clipboard" : "person.crop.circle.badge.questionmark",
-                                           description: Text(entry.draftMeetingAvailable
-                                                             ? "Review-only prose remains outside shipped content until Aimee approves it."
-                                                             : "No meeting object or reviewed draft exists yet."))
+                    ContentUnavailableView("Meeting missing",
+                                           systemImage: "person.crop.circle.badge.questionmark",
+                                           description: Text("No live meeting object exists."))
                 }
                 if let live = entry.traveller.meeting {
                     AtlasMeetingPreview(title: "Live meeting preview", opening: live.opening,
                                         exchanges: live.questions.map { .init(id: $0.id, ask: $0.ask, reply: $0.reply) },
                                         offer: live.offer, accepted: live.accepted, declined: live.declined)
-                }
-                if let draft = DraftMeetingCorpus.meeting(for: entry.id) {
-                    AtlasMeetingPreview(title: entry.traveller.meeting == nil ? "Draft meeting preview" : "Revision draft preview",
-                                        opening: draft.opening,
-                                        exchanges: draft.exchanges.map { .init(id: $0.id, ask: $0.ask, reply: $0.reply) },
-                                        offer: draft.offer, accepted: draft.accepted, declined: draft.declined)
                 }
                     ForEach(entry.units) { unit in ReviewUnitCard(unit: unit, reviews: reviews).id(unit.id) }
                 }.padding(16)

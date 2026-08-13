@@ -111,48 +111,86 @@ final class ContentTests: XCTestCase {
         XCTAssertNotEqual(before.ask, after.ask)
     }
 
+    func testReleaseCataloguePromotesOneMeetingForEveryTraveller() throws {
+        let catalogue = try ContentCatalog.load()
+        XCTAssertEqual(catalogue.travellers.count, 29)
+        XCTAssertTrue(catalogue.travellers.allSatisfy { $0.meeting != nil })
+        XCTAssertTrue(catalogue.travellers.allSatisfy { traveller in
+            guard let meeting = traveller.meeting else { return false }
+            return meeting.questions.count == 3
+                && meeting.questions.allSatisfy { $0.id.hasPrefix("\(traveller.id.rawValue).") }
+        })
+    }
+
 #if DEBUG
-    func testAuthoredTextAtlasAccountsForLiveAndReviewMeetingCorpora() {
+    func testAuthoredTextAtlasReviewsTheSameLiveMeetingCorpus() throws {
         let inventory = AuthoredTextAtlas.inventory()
         let catalogue = ContentCatalog.shared
         let catalogueIDs = Set(catalogue.travellers.map(\.id))
-        let missingMeetingIDs = Set(catalogue.travellers.filter { $0.meeting == nil }.map(\.id))
-        let draftIDs = Set(DraftMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
-        XCTAssertEqual(AuthoredTextAtlas.draftMeetingIDs, draftIDs,
-                       "Atlas draft availability must derive from the generated corpus")
+        let generatedIDs = Set(AuthoredMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
+        XCTAssertEqual(AuthoredTextAtlas.generatedMeetingIDs, generatedIDs)
 
         XCTAssertEqual(catalogue.travellers.count, 29)
         XCTAssertEqual(catalogue.diaryPages.count, 238,
                        "Noll has five findable pages; the held Field Separation Kit page is DEBUG-only")
-        XCTAssertEqual(catalogue.travellers.filter { $0.meeting != nil }.count, 8)
-        XCTAssertEqual(missingMeetingIDs.count, 21)
-        XCTAssertEqual(DraftMeetingCorpus.meetings.count, 23,
-                       "21 live missing meetings, Noll's replacement candidate, and Auber's revision")
-        XCTAssertEqual(draftIDs.union(catalogueIDs).count, 29)
+        XCTAssertEqual(catalogue.travellers.filter { $0.meeting != nil }.count, 29)
+        XCTAssertEqual(AuthoredMeetingCorpus.meetings.count, 23,
+                       "21 formerly missing meetings plus Noll and Auber replacements")
+        XCTAssertNil(AuthoredMeetingCorpus.decodingError)
+        XCTAssertEqual(generatedIDs.subtracting(catalogueIDs), [])
         XCTAssertEqual(Set(inventory.map(\.id)), catalogueIDs)
         XCTAssertEqual(inventory.flatMap(\.units).filter { $0.kind == .diary }.count,
                        catalogue.diaryPages.count + 1,
                        "the held Field Separation Kit page is reviewable but not findable")
-        XCTAssertEqual(Set(inventory.filter { $0.traveller.meeting == nil }.map(\.id)),
-                       missingMeetingIDs)
-        XCTAssertEqual(draftIDs, missingMeetingIDs.union(["auber", "noll"]),
-                       DraftMeetingCorpus.decodingError
-                           ?? "missing live meetings plus Noll and Auber review drafts")
-        XCTAssertTrue(DraftMeetingCorpus.meetings.allSatisfy { $0.exchanges.count == 3 })
-        XCTAssertTrue(DraftMeetingCorpus.meetings.allSatisfy { $0.offerSpeaker == .player },
-                      "a review offer was generated in the traveller's speaking role")
-        XCTAssertEqual(Set(inventory.filter { $0.traveller.meeting == nil && $0.draftMeetingAvailable }
-            .map(\.id)), missingMeetingIDs)
         XCTAssertEqual(Set(inventory.flatMap(\.units).map(\.id)).count, inventory.flatMap(\.units).count)
-        XCTAssertEqual(inventory.first { $0.id == "auber" }?.meetingState, "Live · revision draft")
-        XCTAssertEqual(inventory.first { $0.id == "noll" }?.meetingState, "Live · revision draft")
-        XCTAssertTrue(inventory.first { $0.id == "noll" }?.units.allSatisfy {
-            ($0.detail ?? "").contains("Provisional") || $0.id.hasPrefix("meeting.noll")
-        } == true)
-        XCTAssertEqual(DraftMeetingCorpus.meeting(for: "bryn")?.exchanges.first?.id, "bryn.held_route")
+        XCTAssertTrue(inventory.allSatisfy { $0.meetingState == "Live" })
+        XCTAssertTrue(AuthoredMeetingCorpus.meetings.allSatisfy { $0.exchanges.count == 3 })
+        XCTAssertTrue(AuthoredMeetingCorpus.meetings.allSatisfy { $0.offerSpeaker == .player })
+
+        for authored in AuthoredMeetingCorpus.meetings {
+            let live = try XCTUnwrap(catalogue.traveller(TravellerID(rawValue: authored.travellerID))?.meeting)
+            XCTAssertEqual(live.opening, authored.opening)
+            XCTAssertEqual(live.questions.map(\.id), authored.exchanges.map(\.id))
+            XCTAssertEqual(live.questions.map(\.ask), authored.exchanges.map(\.ask))
+            XCTAssertEqual(live.questions.map(\.reply), authored.exchanges.map(\.reply))
+            XCTAssertEqual(live.offer, authored.offer)
+            XCTAssertEqual(live.accepted, authored.accepted)
+            XCTAssertEqual(live.declined, authored.declined)
+        }
+        XCTAssertEqual(AuthoredMeetingCorpus.meeting(for: "bryn")?.exchanges.first?.id, "bryn.held_route")
         let emphasized = AuthoredTextRendering.attributed("What happens *after*?")
         XCTAssertEqual(String(emphasized.characters), "What happens after?",
-                       "Review drafts must use the same Markdown-aware rendering path as live meetings")
+                       "Live authored meetings must use the same Markdown-aware rendering path")
+    }
+
+    func testDecision279ExactIsoldeRepliesAndSabineClueIdentity() throws {
+        let isolde = try XCTUnwrap(ContentCatalog.shared.traveller("isolde")?.meeting)
+        XCTAssertEqual(isolde.questions.map(\.id),
+                       ["isolde.blank_board", "isolde.teacher", "isolde.charcoal_hand"])
+        XCTAssertEqual(isolde.questions.map(\.reply), [
+            "\u{201c}The board is for resistance, not ink.\u{201d} She draws the line again, slower. \u{201c}If the hand cannot keep its course here, giving it charcoal only records the mistake.\u{201d}",
+            "\u{201c}For forty years. Mostly to people who wanted to write faster.\u{201d} A short laugh. \u{201c}They had to learn smaller first. Smaller takes longer.\u{201d}",
+            "She looks at you for the first time. \u{201c}Then every mark has had to carry too much.\u{201d} She sets the board down. \u{201c}Show me your hands.\u{201d}"
+        ])
+
+        let clues = ContentCatalog.shared.diary(of: "sabine")
+            .filter { $0.kind == .locationClue }
+            .sorted { ($0.clueIndex ?? .max) < ($1.clueIndex ?? .max) }
+        XCTAssertEqual(clues.map { $0.id.rawValue }, (0...6).map { "sabine_where_\($0)" })
+        XCTAssertEqual(clues.map(\.clueIndex), Array(0...6).map(Optional.some))
+        XCTAssertEqual(clues.map(\.about), Array(repeating: TravellerID(rawValue: "sabine"), count: 7).map(Optional.some))
+        XCTAssertEqual(clues.map(\.prose), [
+            "Bite the new shoots down at dusk and they stand above the old cut by morning. This place can answer feeding without pretending nothing was taken.",
+            "Every shelter is occupied, and fresh tracks stop at the entrances before turning away. More creatures live here than one keeper could gather.",
+            "Small grazers crowd the new growth. Larger tracks circle them, and scavengers follow what the hunt leaves behind. Feed one creature here and three others change their route.",
+            "The same hollows are pressed flat each night while nearby ground goes untouched. Return often enough and absence becomes part of the pattern.",
+            "Hoofprints, paws and dragging tails reach the water by different banks. No creature has to pass another's shelter to drink.",
+            "There is open ground enough to approach and cover near enough to refuse. I could work here without making nearness the only safe choice.",
+            "The same calls begin at the same interval, and the same paths fill soon after. They can learn when I return; that does not mean they must come."
+        ])
+        let sabine = try XCTUnwrap(ContentCatalog.shared.traveller("sabine"))
+        XCTAssertEqual(sabine.signature.map(\.passage), clues.map(\.prose),
+                       "Location disclosure and recovered diary clues must tell one exact story")
     }
 
     @MainActor func testAuthoredTextReviewBecomesStaleAndRoundTripsUnicode() throws {

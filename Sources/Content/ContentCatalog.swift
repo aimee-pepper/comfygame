@@ -227,9 +227,47 @@ struct ContentCatalog: Sendable {
             combatGraph: try loadObject("combat_tree_v2", bundle: bundle),
             runeShapes: try loadFile("rune_shapes", key: "shapes", bundle: bundle),
             qualifiers: try loadFile("qualifiers", key: "qualifiers", bundle: bundle),
-            travellers: try loadFile("travellers", key: "travellers", bundle: bundle),
+            travellers: try loadPromotedTravellers(bundle: bundle),
             diaryPages: try loadFile("travellers", key: "pages", bundle: bundle)
         )
+    }
+
+    /// Decision 279 promotes Design's generated authored meetings into the live catalogue. Keeping
+    /// the prose in one generated corpus means release play and the DEBUG Atlas review the exact
+    /// same text instead of maintaining a hand-copied JSON shadow.
+    private static func loadPromotedTravellers(bundle: Bundle) throws -> [TravellerDef] {
+        var travellers: [TravellerDef] = try loadFile("travellers", key: "travellers", bundle: bundle)
+        guard AuthoredMeetingCorpus.decodingError == nil else {
+            throw ContentError.decodeFailed(
+                "authored meeting corpus",
+                underlying: ContentError.danglingReference(AuthoredMeetingCorpus.decodingError ?? "unknown error")
+            )
+        }
+        let authored = AuthoredMeetingCorpus.meetings
+        let authoredIDs = authored.map(\.travellerID)
+        guard authored.count == 23, Set(authoredIDs).count == authored.count else {
+            throw ContentError.duplicateID("authored meeting corpus must contain 23 unique traveller IDs")
+        }
+        let replaceableLiveIDs: Set<TravellerID> = ["noll", "auber"]
+        for source in authored {
+            let id = TravellerID(rawValue: source.travellerID)
+            guard let index = travellers.firstIndex(where: { $0.id == id }) else {
+                throw ContentError.danglingReference("authored meeting traveller \(source.travellerID)")
+            }
+            if travellers[index].meeting != nil, !replaceableLiveIDs.contains(id) {
+                throw ContentError.duplicateID("authored meeting unexpectedly replaces live \(source.travellerID)")
+            }
+            travellers[index].meeting = TravellerMeeting(
+                opening: source.opening,
+                questions: source.exchanges.map {
+                    TravellerMeeting.Exchange(id: $0.id, ask: $0.ask, reply: $0.reply)
+                },
+                offer: source.offer,
+                accepted: source.accepted,
+                declined: source.declined
+            )
+        }
+        return travellers
     }
 
     static func validateBundledAuthorityMetadata(bundle: Bundle = .contentBundle) throws {

@@ -395,17 +395,17 @@
           {
             "id": "isolde.blank_board",
             "ask": "There's nothing on that board.",
-            "reply": "\"There is on my side of it.\" She finishes the line anyway. \"The hand goes first, you know. Before the eyes, before anything. If I stop, that's it \u2014 I don't get it back.\""
+            "reply": "“The board is for resistance, not ink.” She draws the line again, slower. “If the hand cannot keep its course here, giving it charcoal only records the mistake.”"
           },
           {
             "id": "isolde.teacher",
             "ask": "You taught this?",
-            "reply": "\"Forty years. Mostly to people who wanted to write faster.\" A short laugh. \"You cannot write faster. You can only write *smaller*, which is a different thing entirely and takes twice as long to learn.\""
+            "reply": "“For forty years. Mostly to people who wanted to write faster.” A short laugh. “They had to learn smaller first. Smaller takes longer.”"
           },
           {
             "id": "isolde.charcoal_hand",
             "ask": "I've been writing in charcoal.",
-            "reply": "She looks at you for the first time. \"Charcoal.\" A long pause. \"Then you've been saying about two things at once and calling it a world.\" She sets the board down. \"Show me your hands.\""
+            "reply": "She looks at you for the first time. “Then every mark has had to carry too much.” She sets the board down. “Show me your hands.”"
           }
         ],
         "offer": "Come and teach me. I'll find the lead and the silver.",
@@ -642,13 +642,13 @@
       "authoredOrder": 22, "storyArrivalBand": 5, "campaignPhase": "late",
       "blurb": "Kept animals for people who thought keeping meant owning. Learned most of her trade from being corrected.",
       "signature": [
-        { "condition": { "target": "vitality", "measure": "produced", "minimum": 45 }, "passage": "New growth follows feeding quickly enough to change the place without pretending nothing was taken." },
-        { "condition": { "target": "vitality", "measure": "peak", "minimum": 70 }, "passage": "More creatures arrive than one shelter can hold. Care begins by noticing who chooses not to enter." },
-        { "condition": { "target": "vitality", "measure": "aspect", "key": "trophicDepth", "minimum": 55 }, "passage": "Every appetite rests inside another. Feeding one body alters a relationship, not merely a bowl." },
-        { "condition": { "target": "vitality", "measure": "aspect", "key": "dispersion", "maximum": 38 }, "passage": "Life returns to recurring places. Routine can become recognisable here, including the routine of staying away." },
-        { "condition": { "target": "hydrology", "measure": "available", "minimum": 60 }, "passage": "Water can be reached by more than one path. Repeated care should not turn the only route into a leash." },
-        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 45, "maximum": 70 }, "passage": "There is room to approach while boundaries remain available. Trust needs both." },
-        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The interval returns precisely. Recognition is possible; obedience is not therefore owed." }
+        { "condition": { "target": "vitality", "measure": "produced", "minimum": 45 }, "passage": "Bite the new shoots down at dusk and they stand above the old cut by morning. This place can answer feeding without pretending nothing was taken." },
+        { "condition": { "target": "vitality", "measure": "peak", "minimum": 70 }, "passage": "Every shelter is occupied, and fresh tracks stop at the entrances before turning away. More creatures live here than one keeper could gather." },
+        { "condition": { "target": "vitality", "measure": "aspect", "key": "trophicDepth", "minimum": 55 }, "passage": "Small grazers crowd the new growth. Larger tracks circle them, and scavengers follow what the hunt leaves behind. Feed one creature here and three others change their route." },
+        { "condition": { "target": "vitality", "measure": "aspect", "key": "dispersion", "maximum": 38 }, "passage": "The same hollows are pressed flat each night while nearby ground goes untouched. Return often enough and absence becomes part of the pattern." },
+        { "condition": { "target": "hydrology", "measure": "available", "minimum": 60 }, "passage": "Hoofprints, paws and dragging tails reach the water by different banks. No creature has to pass another's shelter to drink." },
+        { "condition": { "target": "relief", "measure": "aspect", "key": "openness", "minimum": 45, "maximum": 70 }, "passage": "There is open ground enough to approach and cover near enough to refuse. I could work here without making nearness the only safe choice." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "regularity", "minimum": 85 }, "passage": "The same calls begin at the same interval, and the same paths fill soon after. They can learn when I return; that does not mean they must come." }
       ],
       "leansToward": ["locationClue", "focus"],
       "lean": { "protection": 1, "precision": 1, "evasion": 1 }
@@ -1250,13 +1250,13 @@
     { "id": "marrick_word_rook", "diary": "marrick", "kind": "whereabouts", "prose": "Rook makes a boundary legible to the person approaching it. I made mine legible only from inside. That was not a small drafting error.", "about": "rook", "prefersConditions": [] },
     { "id": "marrick_account_missing_position", "diary": "marrick", "kind": "account", "prose": "The formation held. Every assigned position returned. Only afterward did the report name the porters who could not take a position and were therefore counted as supplies.", "prefersConditions": [] }
     ,
-    { "id": "sabine_where_0", "diary": "sabine", "kind": "locationClue", "prose": "New growth follows feeding quickly enough to change the place without pretending nothing was taken.", "about": "sabine", "clueIndex": 0, "prefersConditions": [] },
-    { "id": "sabine_where_1", "diary": "sabine", "kind": "locationClue", "prose": "More creatures arrive than one shelter can hold. Care begins by noticing who chooses not to enter.", "about": "sabine", "clueIndex": 1, "prefersConditions": [] },
-    { "id": "sabine_where_2", "diary": "sabine", "kind": "locationClue", "prose": "Every appetite rests inside another. Feeding one body alters a relationship, not merely a bowl.", "about": "sabine", "clueIndex": 2, "prefersConditions": [] },
-    { "id": "sabine_where_3", "diary": "sabine", "kind": "locationClue", "prose": "Life returns to recurring places. Routine can become recognisable here, including the routine of staying away.", "about": "sabine", "clueIndex": 3, "prefersConditions": [] },
-    { "id": "sabine_where_4", "diary": "sabine", "kind": "locationClue", "prose": "Water can be reached by more than one path. Repeated care should not turn the only route into a leash.", "about": "sabine", "clueIndex": 4, "prefersConditions": [] },
-    { "id": "sabine_where_5", "diary": "sabine", "kind": "locationClue", "prose": "There is room to approach while boundaries remain available. Trust needs both.", "about": "sabine", "clueIndex": 5, "prefersConditions": [] },
-    { "id": "sabine_where_6", "diary": "sabine", "kind": "locationClue", "prose": "The interval returns precisely. Recognition is possible; obedience is not therefore owed.", "about": "sabine", "clueIndex": 6, "prefersConditions": [] },
+    { "id": "sabine_where_0", "diary": "sabine", "kind": "locationClue", "prose": "Bite the new shoots down at dusk and they stand above the old cut by morning. This place can answer feeding without pretending nothing was taken.", "about": "sabine", "clueIndex": 0, "prefersConditions": [] },
+    { "id": "sabine_where_1", "diary": "sabine", "kind": "locationClue", "prose": "Every shelter is occupied, and fresh tracks stop at the entrances before turning away. More creatures live here than one keeper could gather.", "about": "sabine", "clueIndex": 1, "prefersConditions": [] },
+    { "id": "sabine_where_2", "diary": "sabine", "kind": "locationClue", "prose": "Small grazers crowd the new growth. Larger tracks circle them, and scavengers follow what the hunt leaves behind. Feed one creature here and three others change their route.", "about": "sabine", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "sabine_where_3", "diary": "sabine", "kind": "locationClue", "prose": "The same hollows are pressed flat each night while nearby ground goes untouched. Return often enough and absence becomes part of the pattern.", "about": "sabine", "clueIndex": 3, "prefersConditions": [] },
+    { "id": "sabine_where_4", "diary": "sabine", "kind": "locationClue", "prose": "Hoofprints, paws and dragging tails reach the water by different banks. No creature has to pass another's shelter to drink.", "about": "sabine", "clueIndex": 4, "prefersConditions": [] },
+    { "id": "sabine_where_5", "diary": "sabine", "kind": "locationClue", "prose": "There is open ground enough to approach and cover near enough to refuse. I could work here without making nearness the only safe choice.", "about": "sabine", "clueIndex": 5, "prefersConditions": [] },
+    { "id": "sabine_where_6", "diary": "sabine", "kind": "locationClue", "prose": "The same calls begin at the same interval, and the same paths fill soon after. They can learn when I return; that does not mean they must come.", "about": "sabine", "clueIndex": 6, "prefersConditions": [] },
     { "id": "sabine_coral", "diary": "sabine", "kind": "focus", "prose": "Coral is a structure made by lives that remain lives while building it. Colony is not another word for command.", "teachesFocus": "coral", "prefersConditions": [] },
     { "id": "sabine_word_kestrel", "diary": "sabine", "kind": "whereabouts", "prose": "Kestrel reads what animals leave when no observer shaped the encounter. I read what changes after they learn I will return.", "about": "kestrel", "prefersConditions": [] },
     { "id": "sabine_word_marrick", "diary": "sabine", "kind": "whereabouts", "prose": "Marrick makes routine carry people through fear. Ask him whether a creature that cannot refuse a position has joined the formation.", "about": "marrick", "prefersConditions": [] }

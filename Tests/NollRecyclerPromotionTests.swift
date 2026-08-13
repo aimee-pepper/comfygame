@@ -24,7 +24,8 @@ final class NollRecyclerPromotionTests: XCTestCase {
     func testNollMeetingAndCorrectedLiveExchangeIDsUseOwnerPrefixes() throws {
         let noll = try XCTUnwrap(ContentCatalog.shared.traveller("noll"))
         XCTAssertEqual(noll.meeting?.questions.map(\.id), ["noll.join_left", "noll.repair", "noll.vance"])
-        XCTAssertTrue(noll.meeting?.questions.first { $0.id == "noll.repair" }?.reply.contains("better posture") == true)
+        XCTAssertEqual(noll.meeting?.questions.first { $0.id == "noll.repair" }?.reply,
+                       "\u{201c}Yes. That is not the same as saying it should be.\u{201d} They indicate the bowed edge. \u{201c}Repair preserves a whole. Salvage preserves uses. Sentiment becomes waste when it refuses to name which one it wants.\u{201d}")
 
         for id: TravellerID in ["sela", "halloway", "noll"] {
             let meeting = try XCTUnwrap(ContentCatalog.shared.traveller(id)?.meeting)
