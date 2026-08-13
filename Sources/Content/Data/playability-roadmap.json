@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "updated": "11 Aug 2026",
-  "installedCheckpoint": "ce9b1af · Combat technique ownership and Withdraw",
+  "updated": "12 Aug 2026",
+  "installedCheckpoint": "42d60dc · build 233 · perceptible initial launch dwell",
   "essenceBaseline": "a816113",
-  "currentWork": "P0 physical launch regression diagnosis · combat-tree v2 Stage A checkpointed",
-  "currentNote": "Aimee's installed phone build has a long black main-app startup with no loader; selected-save progress works but the shared splash is askew. Engineering is measuring the exact installed launch path and aligning static/SwiftUI geometry without rewriting working save progress. Combat Tree v2 Stage A is complete in 9326494/b912d55 and resumes after this ordinary-play blocker.",
+  "currentWork": "P1 launch acceptance · build 234 ready · phone release required",
+  "currentNote": "Build 233/42d60dc is installed and removed the black startup wait while preserving a perceptible one-second initial splash, but its selected-save progress composition remains misaligned. Commit 29abf52/build 234 gives the advancing SwiftUI loader the same safe-area center as the correct static launch screen; focused 8/8, clean full 1,164/1,164 and signed build are green. Physical static-to-progress alignment acceptance is waiting for Aimee to release the phone. Next: capture the frozen encounter-scaling payload in bug reports for fresh balance evidence, then resume combat-tree-v2 with Thick Hide.",
   "items": [
     {
       "id": "essence",
@@ -37,6 +37,14 @@
       "status": "complete",
       "detail": "Installed merchant stock, gold, safe selling and idempotent stock refresh. Internal and player-facing naming agree on Trading Post.",
       "gate": "Preserve sell/cancel/reload, locks and anti-loop behavior during later economy UI work."
+    },
+    {
+      "id": "trading-post-stock-breadth",
+      "priority": "P1",
+      "title": "Complete the merchant shelves",
+      "status": "queued",
+      "detail": "The sell-first slice is complete, but refreshes still offer only resources and occasional Essence while saved item/material lines remain unpurchasable. After launch acceptance, fresh encounter evidence and the already-started Thick Hide consumer, add common samples, known basic consumables and one ordinary tier-1 equipment offer; constrain it to a weapon only while the campaign owns none.",
+      "gate": "Decision258/DRQ-181: frozen stable purchase identity, exact sample preservation, knowledge eligibility, persisted no-weapon/weapon-owned refresh, capacity-safe Waiting, stale/unaffordable no-op and unique/apex/narrative exclusion all pass; phone buys mixed stock without reroll or duplication."
     },
     {
       "id": "vance",
@@ -131,7 +139,7 @@
       "priority": "P1",
       "title": "Launch-screen handoff alignment",
       "status": "inProgress",
-      "detail": "Physical acceptance failed on 11 Aug: main-app launch remains black through a long uncovered wait. The selected-save loader advances honestly but its splash is askew. Preserve working save progress; diagnose the pre-first-frame gap and align storyboard/SwiftUI safe-area geometry on the exact installed build.",
+      "detail": "Build 233 removed the black wait and added a one-second initial branded dwell, but Aimee confirmed the advancing loader remained misaligned relative to the correctly aligned static launch screen. Commit 29abf52/build 234 now gives the SwiftUI loader the same safe-area centering authority while preserving internal artwork/progress geometry; focused 8/8 and clean full 1,164/1,164 are green, signed build succeeded and origin/main is pushed. The phone remains on build 233; install plus physical static-to-progress alignment acceptance is the only remaining gate.",
       "gate": "Ordinary-phone evidence records exact installed commit plus OS static, first SwiftUI, shelf-ready and selected-save-ready timestamps; no black/unowned interval remains; selected-save progress still advances; static, initial and save-loading compositions align; and the slowest phase is safely reduced or truthfully covered."
     },
     {
@@ -187,8 +195,8 @@
       "priority": "P0",
       "title": "Party and apex difficulty",
       "status": "readyToTest",
-      "detail": "Binder-anchored additive power, path-honest visible grouping, proportional encounter HP, saved 55% affliction-free follow-ups and apex-only scaling are integrated. Legacy and frozen v1 runs retain their historical grouping and rules.",
-      "gate": "Focused and full suites pass; install the checkpoint, then Aimee plays two- and five-person ordinary and apex fights using the phone test card. Reject burst one-shots or HP walls before marking the Recommended profile complete."
+      "detail": "Binder-anchored additive power, path-honest visible grouping, proportional encounter HP, saved 55% affliction-free follow-ups and apex-only scaling are integrated but not balance-accepted. Aimee's first new-save encounter killed the party in a possibly Teeming world; more samples are in progress before retuning.",
+      "gate": "After the active launch repair, compare level-1 Binder+Quill normal versus Teeming ordinary contacts with exact scaling receipts. Normal opening fights should usually last 2–4 rounds and spend about 5–20% aggregate HP, not routinely defeat the party. If failure repeats, isolate baseline stats, abundance/world level, grouping or species matchup before tuning. Then complete two-/five-person ordinary and apex phone bands."
     },
     {
       "id": "item-character-identities",
@@ -203,7 +211,7 @@
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
       "status": "queued",
-      "detail": "Stage A is checkpointed in 9326494 with durable evidence in b912d55: the reusable native graph, exact connectors/effect detail, 8/17/25 legal local route state and ordinary-phone DEBUG proof are green while legacy production purchase remains playable. Resume immediately after the active launch blocker with the first genuinely missing stable-ID consumer; ordinary ownership/purchase/migration promote only after no node is inert.",
+      "detail": "Stage A is checkpointed in 9326494/b912d55; schema-2 authority plus four consumers are complete. Resume after launch/fresh-balance evidence with Thick Hide. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {
