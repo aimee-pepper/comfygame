@@ -21,6 +21,25 @@ final class MakerStationPresentationTests: XCTestCase {
         XCTAssertTrue(pickerSource.contains("AnchoredItemDetailButton"))
         XCTAssertTrue(pickerSource.contains("ArmourySampleDetail"))
     }
+
+    func testArmouryProtectivePiecesUseTheSharedPhysicalItemTray() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/BlacksmithView.swift"),
+            encoding: .utf8
+        )
+        let armouryStart = try XCTUnwrap(source.range(of: "struct ArmouryView"))
+        let armouryEnd = try XCTUnwrap(source.range(of: "struct WeaponsmithView"))
+        let armoury = String(source[armouryStart.lowerBound..<armouryEnd.lowerBound])
+
+        XCTAssertTrue(armoury.contains("SixAcrossItemGrid(data: targets, id: \\.id)"))
+        XCTAssertTrue(armoury.contains("catalogueID: target.catalogID"))
+        XCTAssertTrue(armoury.contains("location: targetLocation(target)"))
+        XCTAssertTrue(armoury.contains("case .stored: .stored"))
+        XCTAssertTrue(armoury.contains("case .worn: .worn"))
+        XCTAssertFalse(armoury.contains("Image(systemName: \"chevron.right\")"))
+    }
     func testPlayerFacingReforgeLabelsUseRulesOwnedMaximum() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

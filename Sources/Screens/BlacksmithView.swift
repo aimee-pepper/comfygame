@@ -295,22 +295,24 @@ struct ArmouryView: View {
                 }
                 StationCard(title: "Protective pieces", icon: "shield") {
                     Toggle("Show legacy masterworks", isOn: $showLegacy)
-                    ForEach(ArmouryRules.targets(in: store.state, includeLegacy: showLegacy)) { target in
+                    let targets = ArmouryRules.targets(in: store.state, includeLegacy: showLegacy)
+                    SixAcrossItemGrid(data: targets, id: \.id) { target in
                         Button { chosenTarget = target } label: {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(target.displayName).foregroundStyle(.primary)
-                                    Text(target.slot?.rawValue.capitalisedSentence ?? "Unknown slot")
-                                        .font(.caption2).foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                if target.isLegacyMasterwork {
-                                    Text("Legacy").font(.caption2).foregroundStyle(.orange)
-                                }
-                                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
-                            }.frame(minHeight: 44)
-                        }.buttonStyle(.plain)
+                            ItemIconTile(
+                                icon: targetDefinition(target)?.icon ?? "shield",
+                                catalogueID: target.catalogID,
+                                rarity: targetRarity(target),
+                                quantity: 1,
+                                identified: true,
+                                location: targetLocation(target),
+                                accessibilityName: target.displayName
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
+                    Text("Tap a stored or worn piece to choose its rebuild profile.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 StationCard(title: "Bracken's work", icon: "point.3.connected.trianglepath.dotted") {
                     ResearchTree(station: Stations.armoury)
@@ -322,6 +324,24 @@ struct ArmouryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $chosenTarget) { target in
             ArmouryTargetSheet(target: target).environmentObject(store)
+        }
+    }
+
+    private func targetDefinition(_ target: ArmouryRules.Target) -> ItemDef? {
+        ContentCatalog.shared.item(target.catalogID)
+    }
+
+    private func targetRarity(_ target: ArmouryRules.Target) -> Rarity {
+        switch target {
+        case .stored(let stack): stack.rarity
+        case .worn: targetDefinition(target)?.rarity ?? .common
+        }
+    }
+
+    private func targetLocation(_ target: ArmouryRules.Target) -> ItemGridLocation {
+        switch target {
+        case .stored: .stored
+        case .worn: .worn
         }
     }
 }
