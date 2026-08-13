@@ -223,7 +223,7 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
         let stations = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
                                   encoding: .utf8)
 
-        let start = try XCTUnwrap(stations.range(of: "private var unlearning: some View"))
+        let start = try XCTUnwrap(stations.range(of: "struct EssenceSpringView: View"))
         let end = try XCTUnwrap(stations.range(of: "enum EssenceSpringTab", range: start.upperBound..<stations.endIndex))
         let unlearning = String(stations[start.lowerBound..<end.lowerBound])
         XCTAssertTrue(unlearning.contains("let person = store.state.base.roster[index]"))

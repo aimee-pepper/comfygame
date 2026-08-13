@@ -79,10 +79,10 @@ final class CatalogueConsumablesPlaceholderV1RegistryTests: XCTestCase {
         XCTAssertTrue(apothecary.contains("CatalogueItemPixelIdentity("))
         XCTAssertTrue(apothecary.contains("itemID: recipe.output"),
                       "Apothecary recipes must resolve by exact output catalogue identity")
-        XCTAssertTrue(encounter.contains("itemID: stack.catalogID"),
-                      "Combat remedies must preserve the carried stack catalogue identity")
+        XCTAssertTrue(encounter.contains("catalogueID: stack.catalogID"),
+                      "Combat remedy tiles must preserve the carried stack catalogue identity")
         XCTAssertTrue(encounter.contains("identified: stack.identified"),
-                      "Encounter presentation must preserve disclosure state")
+                      "Combat remedy tiles must preserve disclosure state")
 
         let fieldKitStart = try XCTUnwrap(world.range(of: "private struct FieldKitSheet"))
         let fieldKit = world[fieldKitStart.lowerBound...]
