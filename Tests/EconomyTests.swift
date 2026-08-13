@@ -320,6 +320,20 @@ final class EconomyTests: XCTestCase {
 
     // MARK: The satchel decision
 
+    func testGambitWriteActionPrecedesThePotentiallyLongPriorityList() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/GambitEditorView.swift"),
+            encoding: .utf8
+        )
+
+        let action = try XCTUnwrap(source.range(of: "Label(\"Write a rule\""))
+        let priorityList = try XCTUnwrap(source.range(of: "List {"))
+        XCTAssertLessThan(action.lowerBound, priorityList.lowerBound)
+        XCTAssertEqual(source.components(separatedBy: "Label(\"Write a rule\"").count - 1, 1)
+    }
+
     func testLootSwapKeepsTheExactDecisionActionOutsideScrollableItemFacts() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

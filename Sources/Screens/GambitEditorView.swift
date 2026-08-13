@@ -43,6 +43,14 @@ struct GambitEditorView: View {
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
 
+            Button { store.addBlankGambit(for: owner) } label: {
+                Label("Write a rule", systemImage: "plus.circle")
+                    .font(.caption)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .disabled(!store.canEditGambits)
+
             if gambits.isEmpty {
                 EmptyNote(owner == .binder
                           ? "No rules written — you'll keep acting for yourself."
@@ -71,14 +79,6 @@ struct GambitEditorView: View {
                 .scrollDisabled(true)
                 .disabled(!store.canEditGambits)
             }
-
-            Button { store.addBlankGambit(for: owner) } label: {
-                Label("Write a rule", systemImage: "plus.circle")
-                    .font(.caption)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-            }
-            .buttonStyle(.bordered)
-            .disabled(!store.canEditGambits)
 
             if gambits.count > slots {
                 Text("Rules past slot \(slots) are written but idle.")
