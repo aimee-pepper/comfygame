@@ -28,6 +28,11 @@ enum SpilloverSwapEvaluation: Equatable, Sendable {
     case refused(String)
 }
 
+enum IdentificationCommitResult: Equatable, Sendable {
+    case committed(ItemDef)
+    case refused(String)
+}
+
 struct PartyTransferPreview: Identifiable, Equatable, Sendable {
     let index: Int
     let name: String
@@ -300,24 +305,40 @@ extension GameStore {
 
     /// Find out what a curio actually is. The small version of the per-component identification
     /// the writing system will want later.
-    @discardableResult
-    func identify(_ stack: ItemStack) -> ItemDef? {
-        guard canAffordIdentify, let revealed = EconomyRules.identification(of: stack) else { return nil }
+    func identify(_ stack: ItemStack) -> IdentificationCommitResult {
+        var result: IdentificationCommitResult = .refused(
+            "The unidentified item changed. Review the Storehouse and try again."
+        )
         mutate("identify \(stack.catalogID.rawValue)", flush: true) { state in
-            state.base.essence -= Tuning.Economy.identifyCostEssence
-            guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }) else { return }
+            guard state.base.essence >= Tuning.Economy.identifyCostEssence else {
+                result = .refused("Not enough Essence to identify this item.")
+                return
+            }
+            guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }),
+                  state.base.inventory.stacks[index] == stack,
+                  !state.base.inventory.stacks[index].identified,
+                  let revealed = EconomyRules.identification(of: state.base.inventory.stacks[index])
+            else { return }
+
+            var candidate = state
             // **One at a time.** Unidentified curios of the same kind share a bin, and you paid to
             // learn about *one* of them — splitting it out is what keeps the price honest, and the
             // rest stay a mystery worth another five essence.
-            guard var identified = state.base.inventory.stacks[index].removing(1) else { return }
+            guard var identified = candidate.base.inventory.stacks[index].removing(1) else { return }
             identified.catalogID = revealed.id
             identified.identified = true
-            if state.base.inventory.stacks[index].isEmpty {
-                state.base.inventory.stacks.remove(at: index)
+            if candidate.base.inventory.stacks[index].isEmpty {
+                candidate.base.inventory.stacks.remove(at: index)
             }
-            _ = state.base.inventory.add(identified)
+            guard candidate.base.inventory.add(identified) else {
+                result = .refused("The Storehouse needs room for the identified item.")
+                return
+            }
+            candidate.base.essence -= Tuning.Economy.identifyCostEssence
+            state = candidate
+            result = .committed(revealed)
         }
-        return revealed
+        return result
     }
 
     // MARK: - Constellation

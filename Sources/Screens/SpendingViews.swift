@@ -83,7 +83,7 @@ private struct RefineryActionLabel: View {
 /// find out what a thing you were already carrying actually is.
 struct IdentifyCard: View {
     @EnvironmentObject private var store: GameStore
-    @State private var revealed: ItemDef?
+    @State private var identificationNotice: IdentificationNotice?
 
     var body: some View {
         StationCard(title: "Unidentified", icon: "questionmark.diamond") {
@@ -103,7 +103,12 @@ struct IdentifyCard: View {
                     }
                     Spacer(minLength: 8)
                     Button {
-                        revealed = store.identify(stack)
+                        switch store.identify(stack) {
+                        case .committed(let revealed):
+                            identificationNotice = .revealed(revealed)
+                        case .refused(let message):
+                            identificationNotice = .refused(message)
+                        }
                     } label: {
                         Label {
                             Text("Identify · \(Tuning.Economy.identifyCostEssence)")
@@ -127,19 +132,40 @@ struct IdentifyCard: View {
                 .font(.caption)
                 .foregroundStyle(store.canAffordIdentify ? Color.secondary : Color.orange)
         }
-        .alert("It's a \(revealed?.name ?? "") — \(revealed?.rarity.displayName ?? "")",
-               isPresented: .constant(revealed != nil)) {
-            Button("Oh") { revealed = nil }
-        } message: {
-            Text(revealedMessage)
+        .alert(item: $identificationNotice) { notice in
+            switch notice {
+            case .revealed(let item):
+                Alert(
+                    title: Text("It's a \(item.name) — \(item.rarity.displayName)"),
+                    message: Text(revealedMessage(item)),
+                    dismissButton: .default(Text("Oh"))
+                )
+            case .refused(let message):
+                Alert(
+                    title: Text("Item not identified"),
+                    message: Text(message),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
         }
     }
 
-    private var revealedMessage: String {
-        guard let revealed else { return "" }
+    private func revealedMessage(_ revealed: ItemDef) -> String {
         return revealed.kind == .key
             ? "\(revealed.blurb)\n\nCarry it. Somewhere out there is a lock it fits."
             : revealed.blurb
+    }
+}
+
+private enum IdentificationNotice: Identifiable {
+    case revealed(ItemDef)
+    case refused(String)
+
+    var id: String {
+        switch self {
+        case .revealed(let item): "revealed-\(item.id.rawValue)"
+        case .refused(let message): "refused-\(message)"
+        }
     }
 }
 

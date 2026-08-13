@@ -43,6 +43,9 @@ final class EssenceSpringRefiningTests: XCTestCase {
         XCTAssertTrue(source.contains("fallbackSystemIcon: stack.icon"))
         XCTAssertTrue(source.contains("Text(\"Identify · \\(Tuning.Economy.identifyCostEssence)\")"))
         XCTAssertTrue(source.contains("Image(systemName: \"drop.fill\")"))
+        XCTAssertTrue(source.contains("case .committed(let revealed)"))
+        XCTAssertTrue(source.contains("case .refused(let message)"))
+        XCTAssertTrue(source.contains("Item not identified"))
     }
 
     func testBaselineSelectedRefinementIsExactAndBuildsPractice() {

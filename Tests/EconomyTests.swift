@@ -231,7 +231,11 @@ final class EconomyTests: XCTestCase {
         store.mutate("found something") { $0.base.inventory.add(stack) }
 
         let essenceBefore = store.state.base.essence
-        let revealed = try XCTUnwrap(store.identify(stack))
+        let revealed: ItemDef
+        switch store.identify(stack) {
+        case .committed(let item): revealed = item
+        case .refused(let message): return XCTFail(message)
+        }
 
         XCTAssertEqual(store.state.base.essence, essenceBefore - Tuning.Economy.identifyCostEssence)
         XCTAssertEqual(revealed.id, curio.identifiesInto)
@@ -248,8 +252,44 @@ final class EconomyTests: XCTestCase {
             state.base.essence = 0
         }
 
-        XCTAssertNil(store.identify(stack))
+        XCTAssertEqual(store.identify(stack), .refused("Not enough Essence to identify this item."))
         XCTAssertEqual(store.unidentifiedStacks.count, 1)
+    }
+
+    func testIdentifyingAStaleStackSnapshotIsRefusedWithoutTheFee() throws {
+        let store = richStore()
+        let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
+        let quoted = ItemStack(id: InstanceID(rawValue: 11), catalogID: curio.id,
+                               count: 1, identified: false)
+        store.mutate("found more of the same curio") { state in
+            state.base.inventory.add(quoted)
+            state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 12), catalogID: curio.id,
+                                               count: 1, identified: false))
+        }
+        let before = store.state
+
+        XCTAssertEqual(
+            store.identify(quoted),
+            .refused("The unidentified item changed. Review the Storehouse and try again.")
+        )
+        XCTAssertEqual(store.state, before)
+    }
+
+    func testIdentifyingNeedsRoomForASplitStackBeforeCharging() throws {
+        let store = richStore()
+        let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
+        let stack = ItemStack(id: InstanceID(rawValue: 13), catalogID: curio.id,
+                              count: 2, identified: false)
+        store.mutate("full unidentified bin") { state in
+            state.base.inventory = Inventory(slots: 1, stacks: [stack])
+        }
+        let before = store.state
+
+        XCTAssertEqual(
+            store.identify(stack),
+            .refused("The Storehouse needs room for the identified item.")
+        )
+        XCTAssertEqual(store.state, before)
     }
 
     // MARK: The delayed payoff
@@ -265,7 +305,11 @@ final class EconomyTests: XCTestCase {
         })
         let stack = ItemStack(id: InstanceID(rawValue: 7), catalogID: knot.id, count: 1, identified: false)
         store.mutate("hauled home from world A") { $0.base.inventory.add(stack) }
-        let key = try XCTUnwrap(store.identify(stack))
+        let key: ItemDef
+        switch store.identify(stack) {
+        case .committed(let item): key = item
+        case .refused(let message): return XCTFail(message)
+        }
         XCTAssertEqual(key.kind, .key)
 
         // World B: stand on a cache.
