@@ -94,8 +94,7 @@ struct DebugEncounterScalingEvidence: Codable, Equatable, Sendable {
                 identity = stableIdentity(for: companion)
                 name = encounter.partyNames[index] ?? companion.name
                 level = companion.character.level
-                currentHP = run.companionHP[index]
-                    ?? CombatRules.maximumHealth(of: actor, in: state)
+                currentHP = CombatRules.health(of: actor, in: run).current
             case .foe:
                 return nil
             }

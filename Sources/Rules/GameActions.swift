@@ -353,6 +353,12 @@ extension GameStore {
             for index in packedItems.stacks.indices {
                 packedItems.stacks[index].protectedReturnCount = packedItems.stacks[index].count
             }
+            let healthCaps = CombatRules.expeditionHealthCaps(in: state, tuning: tuning)
+            let binderMaximum = healthCaps.first { $0.member == .binder }?.maximum
+                ?? Tuning.Encounter.binderMaxHP
+            let companionMaximums = healthCaps.reduce(into: [Int: Int]()) { result, entry in
+                if case .member(let index) = entry.member { result[index] = entry.maximum }
+            }
             let departingRun = WorldRun(
                 runIndex: state.worlds.runIndex,
                 book: book,
@@ -373,10 +379,9 @@ extension GameStore {
                 // **Everybody comes home mended.** Health is run-scoped, so opening a run at full
                 // is what "the party heals on returning home" means (Aimee, 6 Aug) — and it reads
                 // the Fortitude they've earned rather than a constant.
-                binderHP: CombatRules.maximumHealth(of: .binder, in: state),
-                companionHP: state.base.activeParty.reduce(into: [Int: Int]()) { hp, index in
-                    hp[index] = CombatRules.maximumHealth(of: .companion(index), in: state)
-                },
+                binderHP: binderMaximum,
+                companionHP: companionMaximums,
+                healthCaps: healthCaps,
                 // The satchel is its own, smaller capacity — separate from home storage, and
                 // separately upgradeable (decisions-log session 2).
                 satchelItems: packedItems,

@@ -1732,6 +1732,189 @@ final class CombatTests: XCTestCase {
                        empty)
     }
 
+    func testThickHideExpeditionCapsArePersonalAcrossFivePartyMembers() throws {
+        var state = GameState.newGame()
+        while state.base.roster.count < 4 { state.base.roster.append(CompanionState()) }
+        state.base.activeParty = [0, 1, 2, 3]
+        var tuning = DebugTuningProfile.defaults
+        tuning.debugCombatV2BinderAttackEnabled = true
+        tuning.debugCombatV2BinderNodeIDs = [CombatDerivedStatsRules.Node.thickHide]
+        tuning.debugCombatV2CompanionNodeIDs = [2: [CombatDerivedStatsRules.Node.thickHide]]
+
+        let caps = CombatRules.expeditionHealthCaps(in: state, tuning: tuning)
+        XCTAssertEqual(caps.count, 5)
+        for member in state.base.partyMembers {
+            let cap = try XCTUnwrap(caps.first { $0.member == member })
+            let expectedComponent = member == .binder || member == .member(2) ? 6 : 0
+            XCTAssertEqual(cap.maximum, cap.ordinaryMaximum + expectedComponent, member.id)
+            XCTAssertEqual(cap.components.map(\.nodeID), expectedComponent == 0
+                           ? [] : [CombatDerivedStatsRules.Node.thickHide], member.id)
+        }
+    }
+
+    func testDepartureFreezesThickHideAndLaterPreferenceChangesCannotRewriteRun() throws {
+        let defaults = UserDefaults.standard
+        let prior = defaults.data(forKey: DebugTuningProfile.storageKey)
+        defer {
+            if let prior { defaults.set(prior, forKey: DebugTuningProfile.storageKey) }
+            else { defaults.removeObject(forKey: DebugTuningProfile.storageKey) }
+        }
+        var tuning = DebugTuningProfile.defaults
+        tuning.debugCombatV2BinderAttackEnabled = true
+        tuning.debugCombatV2BinderNodeIDs = [CombatDerivedStatsRules.Node.thickHide]
+        defaults.set(try JSONEncoder().encode(tuning), forKey: DebugTuningProfile.storageKey)
+
+        let io = SaveFileIO.temporary(name: "thick-hide-departure-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart())
+        let frozen = try XCTUnwrap(store.activeRun?.healthCap(for: .binder))
+        XCTAssertEqual(frozen.maximum, frozen.ordinaryMaximum + 6)
+        XCTAssertEqual(store.activeRun?.binderHP, frozen.maximum)
+
+        tuning.debugCombatV2BinderNodeIDs = []
+        defaults.set(try JSONEncoder().encode(tuning), forKey: DebugTuningProfile.storageKey)
+        XCTAssertEqual(store.activeRun?.healthCap(for: .binder), frozen)
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.activeRun?.healthCap(for: .binder), frozen)
+        XCTAssertEqual(relaunched.activeRun?.binderHP, frozen.maximum)
+    }
+
+    func testFrozenHealthCapDrivesWorldAndCombatHealing() throws {
+        let store = inFight(["paper_moth"])
+        let worldSalve = ItemStack(id: InstanceID(rawValue: 88_001), catalogID: "salve_lesser")
+        store.mutate("freeze test health cap") { state in
+            guard var run = state.worlds.activeRun else { return }
+            run.healthCaps = [RunHealthCapEntry(member: .binder, ordinaryMaximum: 20,
+                                                components: [.init(
+                                                    nodeID: CombatDerivedStatsRules.Node.thickHide,
+                                                    amount: 6)])]
+            run.binderHP = 25
+            _ = run.satchelItems.add(worldSalve)
+            run.activeEncounter = nil
+            state.worlds.activeRun = run
+            _ = WorldRules.useItem(worldSalve.id, on: .binder, in: &state)
+        }
+        XCTAssertEqual(store.activeRun?.binderHP, 26)
+        XCTAssertEqual(CombatRules.health(of: .binder, in: try XCTUnwrap(store.activeRun)).max, 26)
+
+        let combatSalve = ItemStack(id: InstanceID(rawValue: 88_002), catalogID: "salve_lesser")
+        store.mutate("stage combat healing against same receipt") { state in
+            guard var run = state.worlds.activeRun else { return }
+            var rng = run.rng
+            run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: 88_003),
+                                                             foes: [], party: [.binder], rng: &rng)
+            run.activeEncounter?.order = [.binder]
+            run.activeEncounter?.turnIndex = 0
+            run.binderHP = 25
+            _ = run.satchelItems.add(combatSalve)
+            state.worlds.activeRun = run
+            CombatRules.perform(.useItem(stack: combatSalve.id, ally: .binder),
+                                by: .binder, in: &state)
+        }
+        XCTAssertEqual(store.activeRun?.binderHP, 26)
+    }
+
+    func testLegacyRunHealthAdoptionPreservesSavedCurrentWithoutV2Provenance() throws {
+        var state = GameState.newGame()
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        state.worlds.activeRun = WorldRun(runIndex: 1,
+                                          book: BoundBook(written: [], essencePaid: 0),
+                                          mapSeed: 9, rng: SeededRNG(seed: 9), map: map,
+                                          playerPosition: GridPoint(x: 0, y: 0), binderHP: 99)
+        XCTAssertTrue(CombatRules.reconcileExpeditionHealth(in: &state))
+        let cap = try XCTUnwrap(state.worlds.activeRun?.healthCap(for: .binder))
+        XCTAssertEqual(cap.maximum, 99)
+        XCTAssertEqual(cap.components, [])
+        XCTAssertEqual(state.worlds.activeRun?.binderHP, 99)
+        XCTAssertFalse(CombatRules.reconcileExpeditionHealth(in: &state),
+                       "adoption must be idempotent")
+    }
+
+    func testAdoptionKeepsAlreadyFrozenV2ThickHideProvenanceWithoutHealing() throws {
+        var state = GameState.newGame()
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        var tuning = DebugTuningProfile.defaults
+        tuning.debugCombatV2BinderAttackEnabled = true
+        tuning.debugCombatV2BinderNodeIDs = [CombatDerivedStatsRules.Node.thickHide]
+        var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 11, rng: SeededRNG(seed: 11), map: map,
+                           playerPosition: GridPoint(x: 0, y: 0), binderHP: 7,
+                           tuning: tuning)
+        run.healthCaps = nil
+        state.worlds.activeRun = run
+
+        XCTAssertTrue(CombatRules.reconcileExpeditionHealth(in: &state))
+        let adopted = try XCTUnwrap(state.worlds.activeRun?.healthCap(for: .binder))
+        XCTAssertEqual(adopted.components, [.init(
+            nodeID: CombatDerivedStatsRules.Node.thickHide, amount: 6)])
+        XCTAssertEqual(state.worlds.activeRun?.binderHP, 7, "adoption must not heal")
+        XCTAssertGreaterThanOrEqual(adopted.maximum, 7)
+    }
+
+    func testSavedHealthReceiptNormalizesDuplicateComponentsAndClampsOverCapOnce() throws {
+        var state = GameState.newGame()
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        let cap = RunHealthCapEntry(member: .binder, ordinaryMaximum: 20, components: [
+            .init(nodeID: CombatDerivedStatsRules.Node.thickHide, amount: 6),
+            .init(nodeID: CombatDerivedStatsRules.Node.thickHide, amount: 6)
+        ])
+        XCTAssertEqual(cap.maximum, 26)
+        XCTAssertEqual(cap.components.count, 1)
+        state.worlds.activeRun = WorldRun(runIndex: 1,
+                                          book: BoundBook(written: [], essencePaid: 0),
+                                          mapSeed: 10, rng: SeededRNG(seed: 10), map: map,
+                                          playerPosition: GridPoint(x: 0, y: 0), binderHP: 40,
+                                          healthCaps: [cap])
+        XCTAssertTrue(CombatRules.reconcileExpeditionHealth(in: &state))
+        XCTAssertEqual(state.worlds.activeRun?.binderHP, 26)
+        XCTAssertFalse(CombatRules.reconcileExpeditionHealth(in: &state))
+    }
+
+    func testThickHideComposesLevelAndLegacyCompatibilityExactlyOnce() throws {
+        var state = GameState.newGame()
+        state.base.binderCharacter.level = 8
+        state.base.binderCharacter.branchDepth["defense_fortitude"] = 1
+        let characterOnly = CharacterRules.maximumHealth(state.base.binderCharacter,
+                                                          base: Tuning.Encounter.binderMaxHP)
+        var v2 = DebugTuningProfile.defaults
+        v2.debugCombatV2BinderAttackEnabled = true
+        v2.debugCombatV2BinderNodeIDs = [CombatDerivedStatsRules.Node.thickHide]
+        let v2Cap = try XCTUnwrap(CombatRules.expeditionHealthCaps(in: state, tuning: v2)
+            .first { $0.member == .binder })
+        XCTAssertEqual(v2Cap.ordinaryMaximum, characterOnly)
+        XCTAssertEqual(v2Cap.maximum, characterOnly + 6,
+                       "legacy maxHP and canonical Thick Hide must not both be added")
+
+        let legacyCap = try XCTUnwrap(CombatRules.expeditionHealthCaps(
+            in: state, tuning: .legacyFrozenRunDefaults).first { $0.member == .binder })
+        XCTAssertEqual(legacyCap.maximum, CombatRules.maximumHealth(of: .binder, in: state))
+        XCTAssertTrue(legacyCap.components.isEmpty)
+    }
+
+    func testFrozenCapOwnsGambitFractionAndPassedOutState() throws {
+        let store = inFight(["paper_moth"], gambits: [Self.healHurtAlly])
+        store.mutate("freeze twenty-six health") { state in
+            state.worlds.activeRun?.healthCaps = [RunHealthCapEntry(
+                member: .binder, ordinaryMaximum: 20,
+                components: [.init(nodeID: CombatDerivedStatsRules.Node.thickHide, amount: 6)])]
+            state.worlds.activeRun?.binderHP = 13
+        }
+        XCTAssertNil(GambitEngine.decide(in: store.state), "13 / 26 is not below half")
+        store.mutate("drop below frozen half") { $0.worlds.activeRun?.binderHP = 12 }
+        XCTAssertEqual(GambitEngine.decide(in: store.state)?.rule, Self.healHurtAlly)
+        store.mutate("pass out") { $0.worlds.activeRun?.binderHP = 0 }
+        XCTAssertTrue(CombatRules.hasPassedOut(.binder, in: try XCTUnwrap(store.activeRun)))
+    }
+
     func testFrozenDebugInitiativeDrivesOrderAndExplainsContactPriority() throws {
         let quick = CombatDerivedStatsRules.Node.quickStep
         let frame = CombatDerivedStatsRules.Node.lightFrame

@@ -688,12 +688,12 @@ private struct PartyHealthStrip: View {
     var body: some View {
         HStack(spacing: 14) {
             health("You", icon: "person.fill", current: run.binderHP,
-                   maximum: CombatRules.maximumHealth(of: .binder, in: state))
+                   maximum: CombatRules.health(of: .binder, in: run).max)
             ForEach(state.base.activeParty, id: \.self) { index in
                 let member = state.base.roster[index]
                 health(member.name, icon: member.icon,
-                       current: run.companionHP[index] ?? CombatRules.maximumHealth(of: .companion(index), in: state),
-                       maximum: CombatRules.maximumHealth(of: .companion(index), in: state))
+                       current: CombatRules.health(of: .companion(index), in: run).current,
+                       maximum: CombatRules.health(of: .companion(index), in: run).max)
             }
         }
         .padding(.horizontal, 16)

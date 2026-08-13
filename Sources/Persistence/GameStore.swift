@@ -131,6 +131,7 @@ final class GameStore: ObservableObject {
         let loadedState = state
         state.base.seatEveryoneFound(in: state.reality.library)
         state.base.learnEveryStarterWord()
+        _ = CombatRules.reconcileExpeditionHealth(in: &state)
 
         if state.worlds.activeRun == nil {
             let floor = EconomyRules.minimumBindCost(in: state)

@@ -569,6 +569,35 @@ struct TravellerArrivalReceipt: Codable, Equatable, Sendable {
     }
 }
 
+struct RunHealthCapEntry: Codable, Equatable, Sendable {
+    struct Component: Codable, Equatable, Sendable {
+        var nodeID: CombatNodeID
+        var amount: Int
+    }
+
+    var member: PartyMember
+    var ordinaryMaximum: Int
+    var components: [Component]
+    var maximum: Int
+
+    init(member: PartyMember, ordinaryMaximum: Int, components: [Component]) {
+        self.member = member
+        self.ordinaryMaximum = max(1, ordinaryMaximum)
+        var byNode: [CombatNodeID: Component] = [:]
+        for component in components {
+            if let current = byNode[component.nodeID] {
+                // A duplicated source cannot stack. Choose deterministically so array order never
+                // changes the adopted cap, then encode one canonical component per stable node.
+                byNode[component.nodeID] = component.amount < current.amount ? component : current
+            } else {
+                byNode[component.nodeID] = component
+            }
+        }
+        self.components = byNode.values.sorted { $0.nodeID.rawValue < $1.nodeID.rawValue }
+        self.maximum = max(1, self.ordinaryMaximum + self.components.reduce(0) { $0 + $1.amount })
+    }
+}
+
 /// One instanced world run.
 struct WorldRun: Codable, Equatable, Sendable {
     var runIndex: Int
@@ -730,6 +759,9 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// exactly one place to keep a companion's health, so a second one had nowhere to be hurt.
     /// Anybody absent from the dictionary is at full — joining mid-run shouldn't arrive wounded.
     var companionHP: [Int: Int] = [:]
+    /// Frozen expedition maximums. `nil` means a legacy run awaiting post-decode adoption; an
+    /// empty/nonmatching receipt never licenses a lookup against mutable Base progression.
+    var healthCaps: [RunHealthCapEntry]?
     /// Progress when the party crossed the threshold, for the return-home recap.
     var partyProgressAtStart: [RunProgressStart] = []
     /// Equal per-member awards earned since that threshold, retained by source for an honest recap.
@@ -747,6 +779,7 @@ struct WorldRun: Codable, Equatable, Sendable {
          foundWritings: [FoundWritingRecord] = [],
          binderHP: Int = Tuning.Encounter.binderMaxHP,
          companionHP: [Int: Int] = [:],
+         healthCaps: [RunHealthCapEntry]? = nil,
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots),
          carriedInstruments: Set<PressureTargetID> = [],
          carriedInstrumentPrecisions: [PressureTargetID: RealityState.InstrumentPrecision] = [:],
@@ -777,6 +810,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.foundWritings = foundWritings
         self.binderHP = binderHP
         self.companionHP = companionHP
+        self.healthCaps = healthCaps.map(Self.normalizedHealthCaps)
         self.satchelItems = satchelItems
         self.carriedInstruments = carriedInstruments
         self.carriedInstrumentPrecisions = carriedInstrumentPrecisions
@@ -880,6 +914,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         vanishWithdrawSpent = try container.decodeIfPresent(Bool.self, forKey: .vanishWithdrawSpent) ?? false
         collapsedOnTurn = try container.decodeIfPresent(Int.self, forKey: .collapsedOnTurn)
         binderHP = try container.decodeIfPresent(Int.self, forKey: .binderHP) ?? Tuning.Encounter.binderMaxHP
+        healthCaps = try container.decodeIfPresent([RunHealthCapEntry].self, forKey: .healthCaps)
+            .map(Self.normalizedHealthCaps)
         partyProgressAtStart = try container.decodeIfPresent([RunProgressStart].self,
                                                               forKey: .partyProgressAtStart) ?? []
         experienceBreakdown = try container.decodeIfPresent(RunExperienceBreakdown.self,
@@ -913,6 +949,28 @@ struct WorldRun: Codable, Equatable, Sendable {
         } else {
             companionHP = [:]
         }
+    }
+
+    private static func normalizedHealthCaps(_ entries: [RunHealthCapEntry]) -> [RunHealthCapEntry] {
+        var byMember: [PartyMember: RunHealthCapEntry] = [:]
+        for entry in entries {
+            let normalized = RunHealthCapEntry(member: entry.member,
+                                               ordinaryMaximum: entry.ordinaryMaximum,
+                                               components: entry.components)
+            if let current = byMember[entry.member] {
+                // Corrupt duplicate receipts normalize without depending on encoded array order.
+                let currentKey = "\(current.maximum):\(current.components.map(\.nodeID.rawValue).joined(separator: ","))"
+                let newKey = "\(normalized.maximum):\(normalized.components.map(\.nodeID.rawValue).joined(separator: ","))"
+                if newKey < currentKey { byMember[entry.member] = normalized }
+            } else {
+                byMember[entry.member] = normalized
+            }
+        }
+        return byMember.values.sorted { $0.member.id < $1.member.id }
+    }
+
+    func healthCap(for member: PartyMember) -> RunHealthCapEntry? {
+        healthCaps?.first { $0.member == member }
     }
 
     /// Stability band drives the world's escalating behaviour. Thresholds are tunable.

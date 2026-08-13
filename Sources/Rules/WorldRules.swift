@@ -412,9 +412,10 @@ enum WorldRules {
             let healed = effect.potency
             switch member {
             case .binder:
-                run.binderHP = min(CombatRules.maximumHealth(of: .binder, in: state), run.binderHP + healed)
+                let ceiling = CombatRules.health(of: .binder, in: run).max
+                run.binderHP = min(ceiling, run.binderHP + healed)
             case .member(let index):
-                let ceiling = CombatRules.maximumHealth(of: .companion(index), in: state)
+                let ceiling = CombatRules.health(of: .companion(index), in: run).max
                 run.companionHP[index] = min(ceiling, (run.companionHP[index] ?? ceiling) + healed)
             }
         case .restoreStability:

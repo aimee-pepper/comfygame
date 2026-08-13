@@ -16,9 +16,12 @@ extension GameStore {
             var run = realm.world
             run.activeEncounter = nil
             run.offeredItems = []
-            run.binderHP = CombatRules.maximumHealth(of: .binder, in: state)
-            run.companionHP = state.base.activeParty.reduce(into: [:]) { hp, index in
-                hp[index] = CombatRules.maximumHealth(of: .companion(index), in: state)
+            let healthCaps = CombatRules.expeditionHealthCaps(in: state, tuning: DebugTuningProfile.active)
+            run.healthCaps = healthCaps
+            run.binderHP = healthCaps.first { $0.member == .binder }?.maximum
+                ?? Tuning.Encounter.binderMaxHP
+            run.companionHP = healthCaps.reduce(into: [:]) { hp, entry in
+                if case .member(let index) = entry.member { hp[index] = entry.maximum }
             }
 
             var packedItems = Inventory(slots: state.base.satchelCapacity)

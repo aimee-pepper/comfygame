@@ -700,13 +700,104 @@ enum CombatRules {
         }
     }
 
+    static func expeditionHealthCaps(in state: GameState,
+                                     tuning: DebugTuningProfile) -> [RunHealthCapEntry] {
+        state.base.partyMembers.map { member in
+            let actor = member.combatant
+            let explicitV2 = tuning.debugCombatV2BinderAttackEnabled
+            let ordinary: Int
+            switch actor {
+            case .binder:
+                ordinary = CharacterRules.maximumHealth(state.base.binderCharacter,
+                                                         base: Tuning.Encounter.binderMaxHP)
+                    + (explicitV2 ? 0 : loadout(of: actor, in: state).maxHP)
+            case .companion(let index):
+                ordinary = CharacterRules.maximumHealth(
+                    state.base.character(.member(index)),
+                    base: state.base.roster.indices.contains(index)
+                        ? state.base.roster[index].maxHP : Tuning.Encounter.companionMaxHP)
+                    + (explicitV2 ? 0 : loadout(of: actor, in: state).maxHP)
+            case .foe:
+                ordinary = 1
+            }
+            let selected: Set<CombatNodeID>
+            switch member {
+            case .binder: selected = tuning.debugCombatV2BinderNodeIDs
+            case .member(let index): selected = tuning.debugCombatV2CompanionNodeIDs[index] ?? []
+            }
+            let components: [RunHealthCapEntry.Component] = explicitV2
+                && selected.contains(CombatDerivedStatsRules.Node.thickHide)
+                ? [.init(nodeID: CombatDerivedStatsRules.Node.thickHide, amount: 6)] : []
+            return RunHealthCapEntry(member: member, ordinaryMaximum: ordinary,
+                                     components: components)
+        }
+    }
+
+    @discardableResult
+    static func reconcileExpeditionHealth(in state: inout GameState) -> Bool {
+        guard var run = state.worlds.activeRun else { return false }
+        var changed = false
+        if run.healthCaps == nil {
+            let proposed = Dictionary(uniqueKeysWithValues:
+                expeditionHealthCaps(in: state, tuning: run.tuning).map { ($0.member, $0) })
+            run.healthCaps = state.base.partyMembers.map { member -> RunHealthCapEntry in
+                let current: Int
+                switch member {
+                case .binder: current = run.binderHP
+                case .member(let index): current = run.companionHP[index] ?? 0
+                }
+                let draft = proposed[member] ?? RunHealthCapEntry(
+                    member: member,
+                    ordinaryMaximum: maximumHealth(of: member.combatant, in: state),
+                    components: [])
+                let componentTotal = draft.components.reduce(0) { $0 + $1.amount }
+                // Preserve an already-saved current value. A historical Legacy run has no
+                // component; a run whose frozen DEBUG-v2 tuning explicitly owned Thick Hide keeps
+                // that provenance without receiving HP during adoption.
+                let ordinary = max(draft.ordinaryMaximum, current - componentTotal)
+                return RunHealthCapEntry(member: member, ordinaryMaximum: ordinary,
+                                         components: draft.components)
+            }
+            changed = true
+        }
+        if let binderCap = run.healthCap(for: .binder), run.binderHP > binderCap.maximum {
+            run.binderHP = binderCap.maximum
+            changed = true
+        }
+        for (index, current) in run.companionHP {
+            guard let cap = run.healthCap(for: .member(index)), current > cap.maximum else { continue }
+            run.companionHP[index] = cap.maximum
+            changed = true
+        }
+        guard changed else { return false }
+        state.worlds.activeRun = run
+        return true
+    }
+
     static func health(of actor: Combatant, in run: WorldRun) -> (current: Int, max: Int) {
+        if run.healthCaps != nil, actor.isParty {
+            let member: PartyMember
+            switch actor {
+            case .binder: member = .binder
+            case .companion(let index): member = .member(index)
+            case .foe: preconditionFailure("foes do not have expedition health caps")
+            }
+            guard let cap = run.healthCap(for: member) else { return (0, 1) }
+            switch actor {
+            case .binder: return (min(run.binderHP, cap.maximum), cap.maximum)
+            case .companion(let index):
+                return (min(run.companionHP[index] ?? cap.maximum, cap.maximum), cap.maximum)
+            case .foe: break
+            }
+        }
         switch actor {
-        case .binder: (run.binderHP, Tuning.Encounter.binderMaxHP)
+        case .binder: return (run.binderHP, Tuning.Encounter.binderMaxHP)
         case .companion(let index):
-            (run.companionHP[index] ?? Tuning.Encounter.companionMaxHP, Tuning.Encounter.companionMaxHP)
+            return (run.companionHP[index] ?? Tuning.Encounter.companionMaxHP,
+                    Tuning.Encounter.companionMaxHP)
         case .foe(let id):
-            run.activeEncounter?.foes.first { $0.id == id }.map { ($0.currentHP, $0.maxHP) } ?? (0, 1)
+            return run.activeEncounter?.foes.first { $0.id == id }
+                .map { ($0.currentHP, $0.maxHP) } ?? (0, 1)
         }
     }
 
@@ -1003,7 +1094,7 @@ enum CombatRules {
         switch target {
         case .binder: run.binderHP = max(0, run.binderHP - amount)
         case .companion(let index):
-            run.companionHP[index] = max(0, (run.companionHP[index] ?? Tuning.Encounter.companionMaxHP) - amount)
+            run.companionHP[index] = max(0, health(of: target, in: run).current - amount)
         case .foe(let id):
             if let index = encounter.foes.firstIndex(where: { $0.id == id }) {
                 encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
@@ -1017,11 +1108,12 @@ enum CombatRules {
                              encounter: inout EncounterState,
                              source: String,
                              healer: Combatant) {
+        let ceiling = health(of: ally, in: run).max
         switch ally {
-        case .binder: run.binderHP = min(Tuning.Encounter.binderMaxHP, run.binderHP + amount)
+        case .binder: run.binderHP = min(ceiling, run.binderHP + amount)
         case .companion(let index):
-            run.companionHP[index] = min(Tuning.Encounter.companionMaxHP,
-                                         (run.companionHP[index] ?? Tuning.Encounter.companionMaxHP) + amount)
+            run.companionHP[index] = min(ceiling,
+                                         (run.companionHP[index] ?? ceiling) + amount)
         case .foe: return
         }
         encounter.note("\(actorName(healer, encounter: encounter)) — \(source) — restores \(amount) to \(actorName(ally, encounter: encounter)).")
