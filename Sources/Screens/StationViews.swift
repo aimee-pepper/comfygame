@@ -225,7 +225,11 @@ struct AnchorageView: View {
                             .font(.caption).foregroundStyle(.secondary)
                     }
                     Button {
-                        store.craftAnchorFrame()
+                        if store.craftAnchorFrame() {
+                            actionFailure = nil
+                        } else {
+                            actionFailure = "The stock, Essence, or Storehouse space changed. Review the Anchor Frame requirements and try again."
+                        }
                     } label: {
                         Label("Craft Anchor Frame", systemImage: "hammer.fill")
                             .frame(maxWidth: .infinity).frame(minHeight: 44)
