@@ -24,6 +24,9 @@ final class EssenceSpringRefiningTests: XCTestCase {
         XCTAssertTrue(source.contains("title: raw > 0 ? \"Refine selected\""))
         XCTAssertTrue(source.contains("RefineryActionLabel(title: \"Refine all\""))
         XCTAssertTrue(source.contains("Text(result).font(.caption2).monospacedDigit().opacity(0.82)"))
+        XCTAssertTrue(source.contains("if store.refineEssence(rawUnits: selected)"))
+        XCTAssertTrue(source.contains("Essence not refined"))
+        XCTAssertTrue(source.contains("The available Raw Essence changed."))
     }
 
     func testUnidentifiedCuriosUseTheSharedDisclosureNeutralItemIdentity() throws {

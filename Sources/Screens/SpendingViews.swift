@@ -7,6 +7,7 @@ import SwiftUI
 struct RefineryCard: View {
     @EnvironmentObject private var store: GameStore
     @State private var selectedRaw = 1
+    @State private var refinementFailure: String?
 
     private var raw: Int { store.state.base.resources[Resources.essenceRaw] }
     private var selected: Int { min(max(1, selectedRaw), max(1, raw)) }
@@ -26,7 +27,10 @@ struct RefineryCard: View {
             HStack(spacing: 10) {
                 Button {
                     if store.refineEssence(rawUnits: selected) {
+                        refinementFailure = nil
                         selectedRaw = min(selectedRaw, max(1, raw))
+                    } else {
+                        refinementFailure = "The available Raw Essence changed. Review the selected amount and try again."
                     }
                 } label: {
                     RefineryActionLabel(
@@ -49,6 +53,14 @@ struct RefineryCard: View {
                 .foregroundStyle(.secondary)
         }
         .onChange(of: raw) { _, value in selectedRaw = min(selectedRaw, max(1, value)) }
+        .alert("Essence not refined", isPresented: Binding(
+            get: { refinementFailure != nil },
+            set: { if !$0 { refinementFailure = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(refinementFailure ?? "The selected Raw Essence could not be refined.")
+        }
     }
 }
 
