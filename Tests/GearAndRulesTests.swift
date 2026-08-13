@@ -67,6 +67,7 @@ final class GearAndRulesTests: XCTestCase {
                                 encoding: .utf8)
 
         XCTAssertTrue(source.contains("Party full · send someone Home before taking another traveller."))
+        XCTAssertTrue(source.contains("else if !home.isEmpty || !posted.isEmpty"))
         XCTAssertTrue(source.contains(".disabled(seatsLeft == 0)"))
     }
 

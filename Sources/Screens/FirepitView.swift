@@ -69,7 +69,7 @@ struct FirepitView: View {
                 if seatsLeft > 0 {
                     Text(seatsLeft == 1 ? "Room for one more." : "Room for \(seatsLeft) more.")
                         .font(.caption).foregroundStyle(.secondary)
-                } else if !home.isEmpty {
+                } else if !home.isEmpty || !posted.isEmpty {
                     Text("Party full · send someone Home before taking another traveller.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
