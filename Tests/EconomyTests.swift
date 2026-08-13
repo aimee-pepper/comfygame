@@ -334,6 +334,26 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(source.components(separatedBy: "Label(\"Write a rule\"").count - 1, 1)
     }
 
+    func testGambitSwipeDeletionConfirmsStableRuleIdentityBeforeMutation() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/GambitEditorView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("pendingDeletionID = rule.id"))
+        XCTAssertTrue(source.contains("firstIndex(where: { $0.id == pendingDeletionID })"))
+        XCTAssertTrue(source.contains("Button(\"Cancel\", role: .cancel)"))
+        XCTAssertTrue(source.contains("Button(\"Delete rule\", role: .destructive)"))
+        XCTAssertTrue(source.contains("pendingDeletion?.rule.displayText"))
+        XCTAssertEqual(source.components(separatedBy: "store.removeGambit(at:").count - 1, 1,
+                       "a rule should be removed only by the confirmed stable-ID path")
+        XCTAssertTrue(source.contains("Button(\"Any — no condition\")"))
+        XCTAssertFalse(source.contains("Button(\"Any — no condition\", role: .destructive)"),
+                       "a valid optional-condition choice should not be styled as destructive")
+    }
+
     func testLootSwapKeepsTheExactDecisionActionOutsideScrollableItemFacts() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

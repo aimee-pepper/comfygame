@@ -17,6 +17,7 @@ import SwiftUI
 struct GambitEditorView: View {
     @EnvironmentObject private var store: GameStore
     let owner: Combatant
+    @State private var pendingDeletionID: InstanceID?
 
     private var gambits: [GambitRule] { store.gambits(for: owner) }
     /// **This person's list, this person's length.** Wit governs how long a rule list somebody can
@@ -61,7 +62,7 @@ struct GambitEditorView: View {
                         GambitRow(index: index, rule: rule, isInSlot: index < slots, owner: owner)
                             .swipeActions(edge: .trailing) {
                                 Button("Delete", role: .destructive) {
-                                    store.removeGambit(at: IndexSet(integer: index), for: owner)
+                                    pendingDeletionID = rule.id
                                 }
                             }
                             .listRowInsets(EdgeInsets(top: 2, leading: 0, bottom: 2, trailing: 0))
@@ -89,6 +90,36 @@ struct GambitEditorView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        .alert(deletionTitle, isPresented: Binding(
+            get: { pendingDeletionID != nil },
+            set: { if !$0 { pendingDeletionID = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { pendingDeletionID = nil }
+            Button("Delete rule", role: .destructive) { confirmDeletion() }
+        } message: {
+            Text(deletionMessage)
+        }
+    }
+
+    private var pendingDeletion: (index: Int, rule: GambitRule)? {
+        guard let pendingDeletionID,
+              let index = gambits.firstIndex(where: { $0.id == pendingDeletionID }) else { return nil }
+        return (index, gambits[index])
+    }
+
+    private var deletionTitle: String {
+        guard let pendingDeletion else { return "Delete rule?" }
+        return "Delete rule \(pendingDeletion.index + 1)?"
+    }
+
+    private var deletionMessage: String {
+        pendingDeletion?.rule.displayText ?? "This rule is no longer present."
+    }
+
+    private func confirmDeletion() {
+        guard let pendingDeletion else { pendingDeletionID = nil; return }
+        pendingDeletionID = nil
+        store.removeGambit(at: IndexSet(integer: pendingDeletion.index), for: owner)
     }
 }
 
@@ -150,7 +181,7 @@ private struct GambitRow: View {
             }
             if !required {
                 Divider()
-                Button("Any — no condition", role: .destructive) {
+                Button("Any — no condition") {
                     store.setGambitPart(rule.id, kind: kind, to: nil, for: owner)
                 }
             }
