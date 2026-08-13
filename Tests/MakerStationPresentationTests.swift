@@ -160,6 +160,24 @@ final class MakerStationPresentationTests: XCTestCase {
         XCTAssertEqual(state, before)
     }
 
+    func testEssenceSpringNamesAndConfirmsUnlearningBeforeMutation() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/StationViews.swift"), encoding: .utf8)
+        let spring = try XCTUnwrap(source.range(of: "struct EssenceSpringView: View"))
+        let tabs = try XCTUnwrap(source.range(of: "enum EssenceSpringTab", range: spring.lowerBound..<source.endIndex))
+        let view = String(source[spring.lowerBound..<tabs.lowerBound])
+
+        XCTAssertTrue(view.contains("Button(cost == 0 ? \"Nothing to unlearn\" : \"Unlearn · \\(cost)\")"))
+        XCTAssertTrue(view.contains("pendingUnlearning = member"))
+        XCTAssertTrue(view.contains("Button(\"Cancel\", role: .cancel)"))
+        XCTAssertTrue(view.contains("Button(\"Unlearn\", role: .destructive)"))
+        XCTAssertTrue(view.contains("This returns \\(points) learned points and costs \\(cost) essence."))
+        XCTAssertEqual(view.components(separatedBy: "store.respec(member)").count - 1, 1,
+                       "unlearning should mutate only from the confirmed destructive action")
+    }
+
     private func sample(_ kind: MaterialKind, hardness: Double = 0,
                         flexibility: Double = 0, source: String) -> MaterialSample {
         MaterialSample(kind: kind,

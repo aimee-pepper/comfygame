@@ -1044,6 +1044,7 @@ private struct ConstellationStar: View {
 struct EssenceSpringView: View {
     @EnvironmentObject private var store: GameStore
     @State private var tab: EssenceSpringTab = .refine
+    @State private var pendingUnlearning: PartyMember?
 
     var body: some View {
         ScrollView {
@@ -1078,6 +1079,31 @@ struct EssenceSpringView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Essence Spring")
         .navigationBarTitleDisplayMode(.inline)
+        .alert(unlearningTitle, isPresented: Binding(
+            get: { pendingUnlearning != nil },
+            set: { if !$0 { pendingUnlearning = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { pendingUnlearning = nil }
+            Button("Unlearn", role: .destructive) {
+                guard let member = pendingUnlearning else { return }
+                pendingUnlearning = nil
+                store.respec(member)
+            }
+        } message: {
+            Text(unlearningMessage)
+        }
+    }
+
+    private var unlearningTitle: String {
+        guard let member = pendingUnlearning else { return "Unlearn techniques?" }
+        return "Unlearn \(store.name(of: member))'s techniques?"
+    }
+
+    private var unlearningMessage: String {
+        guard let member = pendingUnlearning else { return "" }
+        let points = CombatTreeRules.spentPoints(store.character(of: member))
+        let cost = store.respecCost(for: member)
+        return "This returns \(points) learned points and costs \(cost) essence."
     }
 
     private var refiningPractice: some View {
@@ -1131,7 +1157,9 @@ struct EssenceSpringView: View {
                             .font(.caption2).foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 6)
-                    Button(cost == 0 ? "—" : "\(cost) essence") { store.respec(member) }
+                    Button(cost == 0 ? "Nothing to unlearn" : "Unlearn · \(cost)") {
+                        pendingUnlearning = member
+                    }
                         .font(.caption2.weight(.medium))
                         .buttonStyle(.bordered)
                         .disabled(!store.canRespec(member))
