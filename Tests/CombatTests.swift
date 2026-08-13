@@ -2109,7 +2109,9 @@ final class CombatTests: XCTestCase {
 
         XCTAssertTrue(sheet.contains("SixAcrossItemGrid(data: store.usableItems"))
         XCTAssertTrue(sheet.contains("selectedStackID = stack.id"))
-        XCTAssertTrue(sheet.contains("LazyVGrid(columns: recipientColumns"))
+        XCTAssertTrue(sheet.contains(".safeAreaInset(edge: .bottom, spacing: 0) { selectedRemedyActionBar }"))
+        XCTAssertTrue(sheet.contains("PersistentActionBar(message: itemEffect(item))"))
+        XCTAssertTrue(sheet.contains("Label(\"Use on…\", systemImage: \"person.crop.circle.badge.checkmark\")"))
         XCTAssertTrue(sheet.contains("beginUse(stack, on: ally)"))
         XCTAssertFalse(sheet.contains("ForEach(store.usableItems) { stack in\n                    if let item"),
                        "remedies must not duplicate a full recipient list beneath every item")
@@ -4126,5 +4128,162 @@ final class CombatTests: XCTestCase {
                                                 from: JSONEncoder().encode(try XCTUnwrap(store.activeEncounter)))
         XCTAssertEqual(reloaded.afflictions?.first?.applicationReceipt, bleed.applicationReceipt)
         XCTAssertEqual(reloaded.debugV2OwnedNodeIDs?[.binder], [CombatDerivedStatsRules.Node.flense])
+    }
+
+    func testBreakingBlowExactOwnerIgnoresArmourAndAutoStaggersOnlyFirstCrushInWindow() throws {
+        let store = GameStore(io: .temporary(name: "breaking-blow-\(UUID().uuidString)"))
+        store.mutate("learn combat techniques") { Self.learnEverything(&$0) }
+        store.write("plains"); store.bindAndDepart()
+        let foeID = InstanceID(rawValue: 8_801)
+        var stats = CombatStats.derived(from: CreatureTraits(), name: "Armoured target", icon: "circle")
+        stats.maxHP = 200; stats.armour = 12; stats.evasion = 0
+        store.mutate("stage exact Breaking Blow owner") { state in
+            state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "field_maul")
+            guard var run = state.worlds.activeRun else { return }
+            var orderRNG = SeededRNG(seed: 121)
+            var encounter = CombatRules.makeEncounter(
+                id: InstanceID(rawValue: 8_800),
+                foes: [.init(id: foeID, traits: CreatureTraits(), stats: stats, currentHP: 200)],
+                party: [.binder],
+                debugV2BinderAttack: .init(ordinaryWeaponKind: .crush,
+                                           crushBonus: .init(components: []),
+                                           pierceBonus: .init(components: [])),
+                debugV2OwnedNodeIDs: [.binder: [CombatDerivedStatsRules.Node.breakingBlow]],
+                partyRanks: [.binder: .front], rng: &orderRNG)
+            encounter.order = [.binder, .foe(foeID)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            encounter.extraTurns[.binder] = 1
+            run.rng = SeededRNG(seed: 122)
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+
+        let foe = try XCTUnwrap(store.activeEncounter?.foes.first)
+        let preview = try XCTUnwrap(CombatRules.debugV2DirectAttackPreview(foe: foe, in: store.state))
+        XCTAssertEqual(preview.lower.effectiveArmour, 0)
+        XCTAssertTrue(CombatRules.breakingBlowEffect(actor: .binder, kind: .crush,
+                                                     encounter: try XCTUnwrap(store.activeEncounter))
+            .automaticStaggerAvailable)
+        let before = foe.currentHP
+        store.mutate("first landed Crush") {
+            CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0)
+        }
+        let firstDamage = before - (try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP))
+        XCTAssertTrue((preview.lower.finalDamage...preview.upper.finalDamage).contains(firstDamage))
+        XCTAssertEqual(store.activeEncounter?.staggerAttempts.filter(\.automatic).count, 1)
+        XCTAssertEqual(store.activeEncounter?.pendingStaggers[foeID]?.sourceNodeIDs,
+                       [CombatDerivedStatsRules.Node.breakingBlow])
+        XCTAssertEqual(store.activeEncounter?.breakingBlowScheduledSpent, [.binder])
+
+        store.mutate("second Crush in same expanded window") {
+            CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(store.activeEncounter?.staggerAttempts.filter(\.automatic).count, 1,
+                       "a later action credit minted another automatic Stagger")
+        XCTAssertTrue(CombatRules.breakingBlowEffect(actor: .binder, kind: .crush,
+                                                     encounter: try XCTUnwrap(store.activeEncounter))
+            .ignoresArmour)
+        store.mutate("complete foe slot and reach a fresh Binder turn") {
+            CombatRules.advanceTurn(in: &$0)
+        }
+        XCTAssertEqual(store.activeEncounter?.current, .binder)
+        XCTAssertEqual(store.activeEncounter?.breakingBlowScheduledSpent, [],
+                       "a fresh scheduled personal turn did not mint a new window")
+    }
+
+    func testBreakingBlowMissAndWrongKindDoNotSpendAndRelaunchPreservesSeparateWindows() throws {
+        let store = GameStore(io: .temporary(name: "breaking-blow-window-\(UUID().uuidString)"))
+        store.mutate("learn combat techniques") { Self.learnEverything(&$0) }
+        store.write("plains"); store.bindAndDepart()
+        let foeID = InstanceID(rawValue: 8_811)
+        var stats = CombatStats.derived(from: CreatureTraits(), name: "Elusive target", icon: "circle")
+        stats.maxHP = 200; stats.armour = 10; stats.evasion = 1
+        store.mutate("stage miss then hit") { state in
+            state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "field_maul")
+            guard var run = state.worlds.activeRun else { return }
+            var orderRNG = SeededRNG(seed: 131)
+            var encounter = CombatRules.makeEncounter(
+                id: InstanceID(rawValue: 8_810),
+                foes: [.init(id: foeID, traits: CreatureTraits(), stats: stats, currentHP: 200)],
+                party: [.binder], debugV2OwnedNodeIDs: [
+                    .binder: [CombatDerivedStatsRules.Node.breakingBlow]],
+                partyRanks: [.binder: .front], rng: &orderRNG)
+            encounter.order = [.binder, .foe(foeID)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            encounter.extraTurns[.binder] = 1
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        store.mutate("miss") { CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0) }
+        XCTAssertEqual(store.activeEncounter?.breakingBlowScheduledSpent, [])
+        XCTAssertTrue(store.activeEncounter?.staggerAttempts.isEmpty == true)
+        store.mutate("make next Crush land") {
+            $0.worlds.activeRun?.activeEncounter?.foes[0].stats.evasion = 0
+            CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(store.activeEncounter?.breakingBlowScheduledSpent, [.binder])
+
+        var saved = try XCTUnwrap(store.activeEncounter)
+        saved.breakingBlowOpeningSpent = []
+        let reloaded = try JSONDecoder().decode(EncounterState.self,
+                                                from: JSONEncoder().encode(saved))
+        XCTAssertEqual(reloaded.breakingBlowScheduledSpent, [.binder])
+        XCTAssertEqual(reloaded.breakingBlowOpeningSpent, [])
+        XCTAssertFalse(CombatRules.breakingBlowEffect(actor: .binder, kind: .pierce,
+                                                      encounter: reloaded).ignoresArmour)
+        XCTAssertFalse(CombatRules.breakingBlowEffect(actor: .binder, kind: .crush,
+                                                      allowsDirectWeapon: false,
+                                                      encounter: reloaded).ignoresArmour,
+                       "a nonweapon action such as Unbind inherited Breaking Blow")
+        XCTAssertTrue(CombatRules.breakingBlowEffect(actor: .binder, kind: .crush,
+                                                     window: .opening, encounter: reloaded)
+            .automaticStaggerAvailable)
+        XCTAssertFalse(CombatRules.breakingBlowEffect(actor: .companion(0), kind: .crush,
+                                                      encounter: reloaded).ignoresArmour,
+                       "Breaking Blow leaked to a non-owner")
+    }
+
+    func testBreakingBlowUsesDeclaredOverbearCrushAcrossNonCrushEquipment() throws {
+        let store = GameStore(io: .temporary(name: "breaking-blow-overbear-\(UUID().uuidString)"))
+        store.mutate("learn Overbear") { Self.learnEverything(&$0) }
+        store.write("plains"); store.bindAndDepart()
+        let foeID = InstanceID(rawValue: 8_821)
+        var stats = CombatStats.derived(from: CreatureTraits(), name: "Plate", icon: "circle")
+        stats.maxHP = 200; stats.armour = 15; stats.evasion = 0
+        store.mutate("stage cross-equipped Overbear") { state in
+            state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "bone_awl")
+            guard var run = state.worlds.activeRun else { return }
+            var orderRNG = SeededRNG(seed: 141)
+            var encounter = CombatRules.makeEncounter(
+                id: InstanceID(rawValue: 8_820),
+                foes: [.init(id: foeID, traits: CreatureTraits(), stats: stats, currentHP: 200)],
+                party: [.binder], debugV2OwnedNodeIDs: [
+                    .binder: [CombatDerivedStatsRules.Node.breakingBlow]],
+                partyRanks: [.binder: .front], rng: &orderRNG)
+            encounter.order = [.binder, .foe(foeID)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.rng = SeededRNG(seed: 142)
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let skill = try XCTUnwrap(ContentCatalog.shared.skill("overbear"))
+        let before = try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP)
+        var expectedRNG = try XCTUnwrap(store.state.worlds.activeRun).rng
+        let spread = max(1, Int((Double(skill.power) * Tuning.Encounter.damageVariance).rounded()))
+        let rolled = max(Tuning.Encounter.minimumDamage,
+                         skill.power + expectedRNG.int(in: -spread...spread))
+        let expected = CombatDamageRules.resolve(
+            rolledPower: rolled, in: .init(damageKind: .crush, armour: stats.armour,
+                                           ignoresArmour: true))
+        store.mutate("commit Overbear") {
+            CombatRules.perform(.skill("overbear", foe: foeID), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(before - (try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP)),
+                       expected.finalDamage)
+        XCTAssertEqual(store.activeEncounter?.pendingStaggers[foeID]?.sourceNodeIDs,
+                       [CombatDerivedStatsRules.Node.breakingBlow])
     }
 }

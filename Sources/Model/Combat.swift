@@ -490,6 +490,13 @@ struct EncounterState: Codable, Equatable, Sendable {
     var roundNumber: Int = 1
     var pendingStaggers: [InstanceID: PendingStagger] = [:]
     var staggerAttempts: [StaggerAttempt] = []
+    /// Exact actors whose automatic Breaking Blow Stagger has been spent in the current scheduled
+    /// personal-turn window. Nil is a legacy encounter; modern enabled-v2 encounters persist even
+    /// an empty set so relaunch never invents a second use.
+    var breakingBlowScheduledSpent: Set<Combatant>?
+    /// Ambush and any later explicitly classified opening strike use a separate one-shot window.
+    /// It never borrows from or consumes the actor's first scheduled personal turn.
+    var breakingBlowOpeningSpent: Set<Combatant>?
 
     /// Rounds until each side's skill comes back. Counted in *rounds*, never seconds.
     ///
@@ -617,6 +624,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2Resistance = debugV2Resistance
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
+        self.breakingBlowScheduledSpent = debugV2OwnedNodeIDs == nil ? nil : []
+        self.breakingBlowOpeningSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.partyRanks = partyRanks
         self.rankAtPreviousCompletedAction = debugV2OwnedNodeIDs == nil ? nil : partyRanks
         self.afflictions = []
@@ -667,6 +676,12 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                 forKey: .pendingStaggers) ?? [:]
         staggerAttempts = try c.decodeIfPresent([StaggerAttempt].self,
                                                 forKey: .staggerAttempts) ?? []
+        breakingBlowScheduledSpent = try c.decodeIfPresent(Set<Combatant>.self,
+                                                            forKey: .breakingBlowScheduledSpent)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [])
+        breakingBlowOpeningSpent = try c.decodeIfPresent(Set<Combatant>.self,
+                                                          forKey: .breakingBlowOpeningSpent)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [])
         binderSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .binderSkillCooldown) ?? 0
         companionSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .companionSkillCooldown) ?? 0
         cooldowns = try c.decodeIfPresent([String: Int].self, forKey: .cooldowns) ?? [:]

@@ -771,7 +771,8 @@ enum CombatRules {
             encounter.extraTurns[actor, default: 0] += 1
             strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
                    run: &run, encounter: &encounter, verb: skill.name,
-                   standingBack: standingBack, reachOfActor: reach, allowsStagger: true)
+                   standingBack: standingBack, reachOfActor: reach, allowsStagger: true,
+                   allowsConditionalDirectHit: true, directAttackWindow: .opening)
 
         case .brace:
             encounter.braced[actor] = skill.rounds
@@ -1284,6 +1285,30 @@ enum CombatRules {
         case committed(cost: CombatActionCost, completedDirectAttack: Bool)
     }
 
+    enum DirectAttackWindow {
+        case scheduled
+        case opening
+    }
+
+    struct BreakingBlowEffect: Equatable, Sendable {
+        var ignoresArmour: Bool
+        var automaticStaggerAvailable: Bool
+    }
+
+    static func breakingBlowEffect(actor: Combatant, kind: DamageKind?,
+                                   allowsDirectWeapon: Bool = true,
+                                   window: DirectAttackWindow = .scheduled,
+                                   encounter: EncounterState) -> BreakingBlowEffect {
+        let owns = allowsDirectWeapon && kind == .crush
+            && encounter.debugV2OwnedNodeIDs?[actor]?.contains(
+                CombatDerivedStatsRules.Node.breakingBlow) == true
+        let spent = switch window {
+        case .scheduled: encounter.breakingBlowScheduledSpent?.contains(actor) == true
+        case .opening: encounter.breakingBlowOpeningSpent?.contains(actor) == true
+        }
+        return .init(ignoresArmour: owns, automaticStaggerAvailable: owns && !spent)
+    }
+
     /// One authority for turn cost. Extra-turn implementation details must not decide whether a
     /// temporary receipt survives an action.
     private static func combatActionCost(_ action: CombatAction) -> CombatActionCost {
@@ -1366,16 +1391,19 @@ enum CombatRules {
         let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
         let range = max(Tuning.Encounter.minimumDamage, power - spread)...max(Tuning.Encounter.minimumDamage,
                                                                                power + spread)
+        let breakingBlow = breakingBlowEffect(actor: actor, kind: profile.kind,
+                                              encounter: encounter)
         let context = CombatDamageRules.Context(damageKind: profile.kind,
             covering: foe.traits?.covering ?? Covering(),
             wildRule: wildRule(for: actor, in: state),
             standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
             reach: reach(for: actor, in: state), armour: foe.stats.armour,
-            ignoresArmour: profile.ignoresArmour)
+            ignoresArmour: profile.ignoresArmour || breakingBlow.ignoresArmour)
         let ownsSteadyHand = encounter.debugV2OwnedNodeIDs?[actor]?.contains(
             CombatDerivedStatsRules.Node.steadyHand) == true
         return .init(skillID: skillID, kind: profile.kind, branchPower: profile.branchPower,
-                     preMatchupPower: power, ignoresArmour: profile.ignoresArmour,
+                     preMatchupPower: power,
+                     ignoresArmour: profile.ignoresArmour || breakingBlow.ignoresArmour,
                      damage: CombatDamageRules.preview(rolledPower: range, in: context),
                      criticalDamage: ownsSteadyHand ? CombatDamageRules.preview(
                         rolledPower: range,
@@ -1396,11 +1424,17 @@ enum CombatRules {
               let encounter = state.worlds.activeRun?.activeEncounter else { return nil }
         guard encounter.debugV2OwnedNodeIDs?[.binder]?.contains(CombatDerivedStatsRules.Node.steadyHand) == true
         else { return .init(ordinary: ordinary, critical: nil) }
+        let breakingBlow = breakingBlowEffect(
+            actor: .binder,
+            kind: encounter.debugV2BinderAttack?.ordinaryWeaponKind,
+            encounter: encounter
+        )
         let context = CombatDamageRules.Context(
             damageKind: encounter.debugV2BinderAttack?.ordinaryWeaponKind,
             covering: foe.traits?.covering ?? Covering(),
             wildRule: wildRule(for: .binder, in: state), standingBack: standingBack,
-            reach: reach(for: .binder, in: state), armour: foe.stats.armour, isCritical: true)
+            reach: reach(for: .binder, in: state), armour: foe.stats.armour,
+            ignoresArmour: breakingBlow.ignoresArmour, isCritical: true)
         return .init(ordinary: ordinary,
                      critical: CombatDamageRules.preview(
                         rolledPower: ordinary.lower.rolledPower...ordinary.upper.rolledPower, in: context))
@@ -1422,12 +1456,15 @@ enum CombatRules {
         let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
         let range = max(Tuning.Encounter.minimumDamage, power - spread)...max(Tuning.Encounter.minimumDamage,
                                                                                power + spread)
+        let breakingBlow = breakingBlowEffect(actor: .binder, kind: receipt.ordinaryWeaponKind,
+                                              encounter: encounter)
         return CombatDamageRules.preview(rolledPower: range,
             in: .init(damageKind: receipt.ordinaryWeaponKind,
                       covering: foe.traits?.covering ?? Covering(),
                       wildRule: wildRule(for: .binder, in: state),
                       standingBack: standingBack,
-                      reach: reach(for: .binder, in: state), armour: foe.stats.armour))
+                      reach: reach(for: .binder, in: state), armour: foe.stats.armour,
+                      ignoresArmour: breakingBlow.ignoresArmour))
     }
 
     @discardableResult
@@ -1448,7 +1485,8 @@ enum CombatRules {
                                breaking: WildRule? = nil,
                                innateStatus: String? = nil,
                                allowsStagger: Bool = false,
-                               allowsConditionalDirectHit: Bool = false) -> Bool {
+                               allowsConditionalDirectHit: Bool = false,
+                               directAttackWindow: DirectAttackWindow = .scheduled) -> Bool {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
         else { return false }
 
@@ -1479,6 +1517,9 @@ enum CombatRules {
         let ownsSteadyHand = allowsConditionalDirectHit
             && encounter.debugV2OwnedNodeIDs?[actor]?.contains(CombatDerivedStatsRules.Node.steadyHand) == true
         let critical = ownsSteadyHand && steadyHandCritical(roll: run.rng.double(in: 0...1), ownsNode: true)
+        let breakingBlow = breakingBlowEffect(actor: actor, kind: kind,
+                                              allowsDirectWeapon: allowsConditionalDirectHit,
+                                              window: directAttackWindow, encounter: encounter)
         let resolved = CombatDamageRules.resolve(
             rolledPower: rolledPower,
             in: .init(damageKind: kind,
@@ -1487,7 +1528,7 @@ enum CombatRules {
                       standingBack: standingBack,
                       reach: reachOfActor,
                       armour: foe.stats.armour,
-                      ignoresArmour: ignoresArmour, isCritical: critical)
+                      ignoresArmour: ignoresArmour || breakingBlow.ignoresArmour, isCritical: critical)
         )
         let raw = resolved.rawDamage
         let amount = resolved.finalDamage
@@ -1502,7 +1543,22 @@ enum CombatRules {
             ?? "\(who) \(hits) \(name) for \(amount)."
         encounter.note(soaked > 1 ? note + " Its \(armourWord(for: foe)) takes the rest." : note)
 
-        if allowsStagger, kind == .crush, encounter.foes[index].isAlive {
+        var didAutomaticBreakingBlowStagger = false
+        if breakingBlow.automaticStaggerAvailable {
+                switch directAttackWindow {
+                case .scheduled: encounter.breakingBlowScheduledSpent?.insert(actor)
+                case .opening: encounter.breakingBlowOpeningSpent?.insert(actor)
+                }
+                if encounter.foes[index].isAlive {
+                    attemptStagger(foeID: foeID, actor: actor, automatic: true,
+                                   run: &run, encounter: &encounter,
+                                   sourceNodeID: CombatDerivedStatsRules.Node.breakingBlow)
+                    didAutomaticBreakingBlowStagger = true
+                }
+        }
+
+        if allowsStagger, kind == .crush, encounter.foes[index].isAlive,
+           !didAutomaticBreakingBlowStagger {
             attemptStagger(foeID: foeID, actor: actor, automatic: false,
                            run: &run, encounter: &encounter)
         }
@@ -1768,6 +1824,9 @@ enum CombatRules {
                 encounter.note("\(actorName(who, encounter: encounter)) is still recovering.")
                 continue
             }
+            // A newly reached scheduled personal turn mints one Breaking Blow opportunity. Extra
+            // action credits return above without clearing this receipt and therefore share it.
+            encounter.breakingBlowScheduledSpent?.remove(who)
             break
         }
 
@@ -1820,8 +1879,8 @@ enum CombatRules {
         automatic || roll < 0.30
     }
 
-    /// Future Breaking Blow may call this with `automatic`; this checkpoint activates only the
-    /// explicit Stagger node and never infers Breaking Blow ownership or personal-turn receipts.
+    /// Stagger and Breaking Blow share one typed producer. Breaking Blow supplies the automatic
+    /// result only after its exact-owner personal-window receipt authorizes a landed Crush hit.
     static func attemptStagger(foeID: InstanceID, actor: Combatant, automatic: Bool,
                                run: inout WorldRun,
                                encounter: inout EncounterState,
