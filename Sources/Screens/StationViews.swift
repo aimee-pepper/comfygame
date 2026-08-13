@@ -4,6 +4,7 @@ struct DistilleryView: View {
     @EnvironmentObject private var store: GameStore
     @State private var selected: [CoreAttunement: String] = [:]
     @State private var causticCatalyst: ResourceID = Resources.toxin
+    @State private var actionFailure: String?
 
     var body: some View {
         ScrollView {
@@ -21,7 +22,13 @@ struct DistilleryView: View {
                               ? "checkmark.circle.fill" : "exclamationmark.circle")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(readiness == .ready ? Color.green : Color.orange)
-                    Button("Crystallise essence") { store.crystalliseEssence() }
+                    Button("Crystallise essence") {
+                        if store.crystalliseEssence() {
+                            actionFailure = nil
+                        } else {
+                            actionFailure = "The Essence, Quartz, or Storehouse space changed. Review the crystallisation requirements and try again."
+                        }
+                    }
                         .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
                         .disabled(readiness != .ready)
                 }
@@ -33,6 +40,14 @@ struct DistilleryView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Distillery")
         .navigationBarTitleDisplayMode(.inline)
+        .alert("Distillery action not completed", isPresented: Binding(
+            get: { actionFailure != nil },
+            set: { if !$0 { actionFailure = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(actionFailure ?? "The Distillery action could not be completed.")
+        }
     }
 
     private func crystallisationReadinessText(
@@ -85,7 +100,11 @@ struct DistilleryView: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(readiness == .ready ? Color.green : Color.orange)
                     Button("Attune \(attunement.displayName) core") {
-                        store.attuneCore(attunement, candidate: chosen, catalyst: catalyst)
+                        if store.attuneCore(attunement, candidate: chosen, catalyst: catalyst) {
+                            actionFailure = nil
+                        } else {
+                            actionFailure = "The selected sample, catalyst, blank crystal, Essence, or Storehouse space changed. Review this core's requirements and try again."
+                        }
                     }.buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
                         .disabled(readiness != .ready)
                 }

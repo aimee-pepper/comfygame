@@ -139,6 +139,17 @@ final class SpilloverTests: XCTestCase {
         XCTAssertFalse(source.contains("Button(\"Improve\") { store.improveInstrument(target.id) }"))
     }
 
+    func testDistilleryReportsStaleCrystallisationAndAttunementFailures() throws {
+        let source = try String(contentsOfFile: "Sources/Screens/StationViews.swift", encoding: .utf8)
+
+        XCTAssertTrue(source.contains("if store.crystalliseEssence()"))
+        XCTAssertTrue(source.contains("if store.attuneCore(attunement, candidate: chosen, catalyst: catalyst)"))
+        XCTAssertTrue(source.contains("Distillery action not completed"))
+        XCTAssertTrue(source.contains("The Essence, Quartz, or Storehouse space changed."))
+        XCTAssertTrue(source.contains("The selected sample, catalyst, blank crystal, Essence, or Storehouse space changed."))
+        XCTAssertFalse(source.contains("Button(\"Crystallise essence\") { store.crystalliseEssence() }"))
+    }
+
 
     func testBankingAFullStorehouseSpillsRatherThanDrops() {
         let store = makeStore()
