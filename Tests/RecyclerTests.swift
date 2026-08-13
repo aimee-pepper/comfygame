@@ -14,6 +14,9 @@ final class RecyclerTests: XCTestCase {
         XCTAssertTrue(source.contains("private var recyclerEmptyState: some View"))
         XCTAssertTrue(source.contains("No gear to dismantle"))
         XCTAssertTrue(source.contains("gear without recorded provenance stay protected"))
+        XCTAssertTrue(source.contains("ItemIconTile(icon: preview.snapshot.icon"))
+        XCTAssertTrue(source.contains("SixAcrossItemGrid(data: preview.returnedResources.nonZero"))
+        XCTAssertTrue(source.contains("ResourceIconTile(resourceID: entry.id"))
         XCTAssertTrue(source.contains("Text(\"Dismantle this piece\").frame(maxWidth: .infinity)"))
         XCTAssertFalse(source.contains("Section {\n                    Button(\"Dismantle this piece\""))
     }

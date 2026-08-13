@@ -101,14 +101,34 @@ private struct RecyclerPreviewSheet: View {
         NavigationStack {
             List {
                 Section {
-                    LabeledContent("Piece", value: preview.snapshot.displayName)
-                    LabeledContent("Location", value: preview.location == .stored ? "Stored" : "Waiting")
-                    LabeledContent("Recovery route", value: routeName)
+                    HStack(spacing: 12) {
+                        ItemIconTile(icon: preview.snapshot.icon,
+                                     catalogueID: preview.snapshot.catalogID,
+                                     rarity: preview.snapshot.rarity,
+                                     quantity: 1,
+                                     identified: preview.snapshot.identified,
+                                     location: preview.location == .stored ? .stored : .waiting,
+                                     accessibilityName: preview.snapshot.displayName)
+                            .frame(width: 52, height: 52)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(preview.snapshot.displayName).font(.headline)
+                            Text(preview.location == .stored ? "Stored" : "Waiting")
+                                .font(.caption).foregroundStyle(.secondary)
+                            Text(routeName).font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 0)
+                    }
                 }
                 Section("Recovered") {
-                    ForEach(preview.returnedResources.nonZero, id: \.id) { entry in
-                        LabeledContent(ContentCatalog.shared.resource(entry.id)?.name ?? entry.id.rawValue,
-                                       value: "\(entry.amount)")
+                    if !preview.returnedResources.nonZero.isEmpty {
+                        SixAcrossItemGrid(data: preview.returnedResources.nonZero, id: \.id) { entry in
+                            let definition = ContentCatalog.shared.resource(entry.id)
+                            ResourceIconTile(resourceID: entry.id,
+                                             icon: definition?.icon ?? "shippingbox",
+                                             quantity: entry.amount,
+                                             accessibilityName: definition?.name ?? entry.id.rawValue)
+                        }
+                        .padding(.vertical, 4)
                     }
                     ForEach(Array(preview.returnedSamples.enumerated()), id: \.offset) { _, sample in
                         LabeledContent(sample.displayName, value: sample.grade.formatted(.number.precision(.fractionLength(0))))
