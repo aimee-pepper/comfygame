@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "updated": "12 Aug 2026",
-  "installedCheckpoint": "42d60dc · build 233 · perceptible initial launch dwell",
+  "installedCheckpoint": "1aab7c3 · signed clean build installed · on-device developer trust required",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 launch acceptance · build 234 ready · phone release required",
-  "currentNote": "Build 233/42d60dc is installed and removed the black startup wait while preserving a perceptible one-second initial splash, but its selected-save progress composition remains misaligned. Commit 29abf52/build 234 gives the advancing SwiftUI loader the same safe-area center as the correct static launch screen; focused 8/8, clean full 1,164/1,164 and signed build are green. Physical static-to-progress alignment acceptance is waiting for Aimee to release the phone. Next: capture the frozen encounter-scaling payload in bug reports for fresh balance evidence, then resume combat-tree-v2 with Thick Hide.",
+  "currentWork": "P0 DEBUG Homework checkpoint · isolated and build-clean",
+  "currentNote": "Signed clean checkpoint 1aab7c3 is installed on Aimee's phone; automatic launch is blocked only by on-device developer-profile trust, so launch alignment still awaits physical acceptance. The 17-question/62-review-item Homework catalogue, answer history and Thick Hide DEBUG preview are isolated and build-clean for the next checkpoint. Combat-v2 Thick Hide is committed at b7b320c with a frozen expedition-health receipt; its next dependency-safe consumer is the shared Iron Skin/Bulwark/Shieldwall armour receipt, which must replace rather than duplicate legacy armour contributions.",
   "items": [
     {
       "id": "essence",
@@ -211,7 +211,7 @@
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
       "status": "queued",
-      "detail": "Stage A is checkpointed in 9326494/b912d55; schema-2 authority plus four consumers are complete. Resume after launch/fresh-balance evidence with Thick Hide. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
+      "detail": "Stage A is checkpointed in 9326494/b912d55; Heavy Hand, Keen Eye, Quick Step and Light Frame are committed, and b7b320c adds Thick Hide's frozen expedition-health receipt with 90/90 focused Combat/Thick Hide tests. The next dependency-safe passive consumer is the shared Iron Skin/Bulwark/Shieldwall armour receipt. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {

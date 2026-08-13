@@ -76,6 +76,26 @@ struct SettingsView: View {
 
 #if DEBUG
                 NavigationLink {
+                    DesignHomeworkView()
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "checklist.checked").frame(width: 24)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Homework")
+                            Text("Design questions waiting for your decision")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+                    }
+                    .frame(minHeight: 44)
+                    .padding(14)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.homework")
+
+                NavigationLink {
                     DebugToolsView()
                 } label: {
                     HStack(spacing: 12) {
@@ -116,6 +136,265 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+#if DEBUG
+struct DesignHomeworkChoice: Codable, Identifiable, Equatable {
+    let id: String
+    let title: String
+    let detail: String
+}
+
+struct DesignHomeworkQuestion: Codable, Identifiable, Equatable {
+    struct ReviewItem: Codable, Identifiable, Equatable {
+        let id: String
+        let label: String
+        let candidate: String
+    }
+
+    let id: String
+    let title: String
+    let context: String
+    let recommendation: String
+    let reviewItems: [ReviewItem]?
+    let choices: [DesignHomeworkChoice]
+}
+
+struct DesignHomeworkCatalogue: Codable {
+    let schemaVersion: Int
+    let updated: String
+    let questions: [DesignHomeworkQuestion]
+
+    static let current: Self = {
+        guard let url = Bundle.main.url(forResource: "design-homework", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let catalogue = try? JSONDecoder().decode(Self.self, from: data)
+        else { preconditionFailure("Missing or invalid design-homework.json") }
+        return catalogue
+    }()
+}
+
+struct DesignHomeworkAnswer: Codable, Equatable {
+    let questionID: String
+    var choiceID: String?
+    var customText: String
+    var savedAt: Date
+    var catalogueUpdated: String?
+    var questionTitle: String?
+    var choiceTitle: String?
+}
+
+struct DesignHomeworkExport: Codable {
+    let schemaVersion: Int
+    let catalogueUpdated: String
+    var answers: [DesignHomeworkAnswer]
+}
+
+@MainActor
+final class DesignHomeworkStore: ObservableObject {
+    @Published private(set) var answers: [String: DesignHomeworkAnswer] = [:]
+    let catalogue = DesignHomeworkCatalogue.current
+
+    private let fileURL: URL
+
+    init(fileURL: URL? = nil) {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        self.fileURL = fileURL ?? documents.appendingPathComponent("DesignHomeworkAnswers.json")
+        if let data = try? Data(contentsOf: self.fileURL),
+           let export = try? JSONDecoder().decode(DesignHomeworkExport.self, from: data) {
+            answers = Dictionary(uniqueKeysWithValues: export.answers.map { ($0.questionID, $0) })
+        }
+    }
+
+    func answer(for questionID: String) -> DesignHomeworkAnswer? { answers[questionID] }
+
+    func save(questionID: String, choiceID: String?, customText: String) throws {
+        let trimmed = customText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard choiceID != nil || !trimmed.isEmpty else { return }
+        let question = catalogue.questions.first { $0.id == questionID }
+        answers[questionID] = DesignHomeworkAnswer(
+            questionID: questionID,
+            choiceID: choiceID,
+            customText: trimmed,
+            savedAt: Date(),
+            catalogueUpdated: catalogue.updated,
+            questionTitle: question?.title,
+            choiceTitle: question?.choices.first { $0.id == choiceID }?.title
+        )
+        try persist()
+    }
+
+    var exportURL: URL? {
+        guard !answers.isEmpty else { return nil }
+        try? persist()
+        return fileURL
+    }
+
+    private func persist() throws {
+        let payload = DesignHomeworkExport(
+            schemaVersion: catalogue.schemaVersion,
+            catalogueUpdated: catalogue.updated,
+            answers: answers.values.sorted { $0.questionID < $1.questionID }
+        )
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        try encoder.encode(payload).write(to: fileURL, options: .atomic)
+    }
+}
+
+private struct DesignHomeworkView: View {
+    @StateObject private var store = DesignHomeworkStore()
+
+    var body: some View {
+        List {
+            Section {
+                Text("Each card is one decision. Answers stay on this device until you share the answer package or Engineering retrieves it from the connected development phone.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Questions") {
+                ForEach(store.catalogue.questions) { question in
+                    NavigationLink {
+                        DesignHomeworkQuestionView(question: question, store: store)
+                    } label: {
+                        Label {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(question.title)
+                                Text(store.answer(for: question.id) == nil ? "Needs an answer" : "Saved")
+                                    .font(.caption)
+                                    .foregroundStyle(store.answer(for: question.id) == nil ? .orange : .green)
+                            }
+                        } icon: {
+                            Image(systemName: store.answer(for: question.id) == nil ? "questionmark.circle" : "checkmark.circle.fill")
+                        }
+                    }
+                }
+            }
+
+            if let url = store.exportURL {
+                Section("Review with the team") {
+                    ShareLink(item: url) {
+                        Label("Export saved answers", systemImage: "square.and.arrow.up")
+                    }
+                }
+            }
+        }
+        .navigationTitle("Homework")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct DesignHomeworkQuestionView: View {
+    let question: DesignHomeworkQuestion
+    @ObservedObject var store: DesignHomeworkStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedChoiceID: String?
+    @State private var customText = ""
+    @State private var saveError: String?
+    private let retiredChoiceTitle: String?
+
+    init(question: DesignHomeworkQuestion, store: DesignHomeworkStore) {
+        self.question = question
+        self.store = store
+        let existing = store.answer(for: question.id)
+        let currentChoiceIDs = Set(question.choices.map(\.id))
+        let currentChoiceID = existing?.choiceID.flatMap { currentChoiceIDs.contains($0) ? $0 : nil }
+        _selectedChoiceID = State(initialValue: currentChoiceID)
+        _customText = State(initialValue: existing?.customText ?? "")
+        retiredChoiceTitle = existing?.choiceID != nil && currentChoiceID == nil
+            ? (existing?.choiceTitle ?? "A previous option")
+            : nil
+    }
+
+    var body: some View {
+        Form {
+            Section {
+                Text(question.context)
+                VStack(alignment: .leading, spacing: 5) {
+                    Label("Design recommendation", systemImage: "sparkles")
+                        .font(.headline)
+                    Text(question.recommendation)
+                }
+                .padding(.vertical, 4)
+            }
+
+            if let reviewItems = question.reviewItems, !reviewItems.isEmpty {
+                Section("Exact proposed copy") {
+                    ForEach(reviewItems) { item in
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(item.label).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                            Text(item.candidate)
+                        }
+                        .padding(.vertical, 3)
+                    }
+                }
+            }
+
+            Section("Choose one") {
+                if let retiredChoiceTitle {
+                    Label("Previously saved: \(retiredChoiceTitle). That option has since been revised; choose again to update it.", systemImage: "clock.arrow.circlepath")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                ForEach(question.choices) { choice in
+                    Button {
+                        selectedChoiceID = choice.id
+                    } label: {
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: selectedChoiceID == choice.id ? "largecircle.fill.circle" : "circle")
+                                .foregroundStyle(.tint)
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(choice.title).foregroundStyle(.primary)
+                                Text(choice.detail).font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            Section("Something else") {
+                Button {
+                    selectedChoiceID = nil
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: selectedChoiceID == nil ? "largecircle.fill.circle" : "circle")
+                            .foregroundStyle(.tint)
+                        Text("None of these — write my answer")
+                            .foregroundStyle(.primary)
+                    }
+                }
+                .buttonStyle(.plain)
+                TextEditor(text: $customText)
+                    .frame(minHeight: 110)
+                Text("Use this if none of the choices fit. You can also use it to qualify a selected answer.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
+            if let saveError {
+                Section { Text(saveError).foregroundStyle(.red) }
+            }
+        }
+        .navigationTitle(question.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .safeAreaInset(edge: .bottom) {
+            Button("Save answer") {
+                do {
+                    try store.save(questionID: question.id, choiceID: selectedChoiceID, customText: customText)
+                    dismiss()
+                } catch {
+                    saveError = "Could not save this answer: \(error.localizedDescription)"
+                }
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(selectedChoiceID == nil && customText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(.bar)
+        }
+    }
+}
+#endif
 
 #if DEBUG
 struct BalancingView: View {
@@ -226,20 +505,35 @@ struct BalancingView: View {
                                       id: CombatDerivedStatsRules.Node.quickStep)
                 debugCombatNodeToggle("Light Frame · initiative +3",
                                       id: CombatDerivedStatsRules.Node.lightFrame)
+                debugCombatNodeToggle("Thick Hide · next-expedition maximum HP +6",
+                                      id: CombatDerivedStatsRules.Node.thickHide)
                 ForEach(store.state.base.activeParty, id: \.self) { index in
                     if store.state.base.roster.indices.contains(index) {
                         let name = store.state.base.roster[index].name
-                        Text("\(name) initiative ownership").font(.subheadline.weight(.semibold))
+                        Text("\(name) v2 ownership").font(.subheadline.weight(.semibold))
                         debugCompanionNodeToggle("Quick Step · +4", index: index,
                                                  id: CombatDerivedStatsRules.Node.quickStep)
                         debugCompanionNodeToggle("Light Frame · +3", index: index,
                                                  id: CombatDerivedStatsRules.Node.lightFrame)
+                        debugCompanionNodeToggle("Thick Hide · maximum HP +6", index: index,
+                                                 id: CombatDerivedStatsRules.Node.thickHide)
                     }
                 }
                 if settings.debugTuning.debugCombatV2BinderAttackEnabled,
                    let preview = debugInitiativePreview {
                     ForEach(preview.entries, id: \.actor) { entry in
                         Text("\(debugActorName(entry.actor)) · \(entry.baseline)\(debugComponents(entry.components)) = \(entry.total)\(debugTieNote(entry, in: preview))")
+                            .font(.caption.monospacedDigit())
+                    }
+                }
+                if settings.debugTuning.debugCombatV2BinderAttackEnabled {
+                    Text("Next expedition health caps")
+                        .font(.subheadline.weight(.semibold))
+                    ForEach(debugHealthCapPreview, id: \.member) { entry in
+                        let thickHide = entry.components.first {
+                            $0.nodeID == CombatDerivedStatsRules.Node.thickHide
+                        }?.amount ?? 0
+                        Text("\(debugActorName(entry.member.combatant)) · ordinary \(entry.ordinaryMaximum) → frozen \(entry.maximum) · \(thickHide == 0 ? "Thick Hide not owned" : "Thick Hide +\(thickHide)")")
                             .font(.caption.monospacedDigit())
                     }
                 }
@@ -363,6 +657,10 @@ struct BalancingView: View {
             party: CombatRules.party(of: store.state), foes: [],
             binderNodeIDs: settings.debugTuning.debugCombatV2BinderNodeIDs,
             companionNodeIDs: settings.debugTuning.debugCombatV2CompanionNodeIDs)
+    }
+
+    private var debugHealthCapPreview: [RunHealthCapEntry] {
+        CombatRules.expeditionHealthCaps(in: store.state, tuning: settings.debugTuning)
     }
 
     private func debugActorName(_ actor: Combatant) -> String {
