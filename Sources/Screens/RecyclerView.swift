@@ -140,9 +140,6 @@ private struct RecyclerPreviewSheet: View {
                         Text("No recoverable output.").foregroundStyle(.secondary)
                     }
                 }
-                if let failure {
-                    Section { Text(message(for: failure)).foregroundStyle(.red) }
-                }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) { dismantleActionBar }
             .navigationTitle("Recovery preview")
@@ -153,7 +150,9 @@ private struct RecyclerPreviewSheet: View {
 
     private var dismantleActionBar: some View {
         PersistentActionBar(
-            message: "The selected piece is consumed only by a successful atomic recovery."
+            message: failure.map(message(for:))
+                ?? "The selected piece is consumed only by a successful atomic recovery.",
+            messageTint: failure == nil ? .secondary : .red
         ) {
             Button(role: .destructive) {
                 let result = store.recycle(preview)
@@ -164,6 +163,7 @@ private struct RecyclerPreviewSheet: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .tint(.red)
+            .disabled(failure != nil)
         }
     }
 
