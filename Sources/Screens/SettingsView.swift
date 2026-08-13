@@ -35,20 +35,11 @@ struct SettingsView: View {
                 NavigationLink {
                     FieldNotesView().environmentObject(store)
                 } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "text.book.closed").frame(width: 24)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Field Notes")
-                            Text("How writing and expeditions work")
-                                .font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
-                    }
-                    .frame(minHeight: 44)
-                    .padding(14)
-                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+                    SettingsDestinationRow(
+                        icon: "text.book.closed",
+                        title: "Field Notes",
+                        subtitle: "How writing and expeditions work"
+                    )
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.field-notes")
@@ -56,21 +47,11 @@ struct SettingsView: View {
                 Button {
                     campaigns.returnToCampaigns()
                 } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "books.vertical").frame(width: 24)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Save games")
-                            Text("Return to the campaign chooser")
-                                .font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                            .font(.callout.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(minHeight: 44)
-                    .padding(14)
-                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+                    SettingsDestinationRow(
+                        icon: "books.vertical",
+                        title: "Save games",
+                        subtitle: "Return to the campaign chooser"
+                    )
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.save-games")
@@ -79,19 +60,11 @@ struct SettingsView: View {
                 NavigationLink {
                     DesignHomeworkView()
                 } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "checklist.checked").frame(width: 24)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Homework")
-                            Text("Design questions waiting for your decision")
-                                .font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
-                    }
-                    .frame(minHeight: 44)
-                    .padding(14)
-                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+                    SettingsDestinationRow(
+                        icon: "checklist.checked",
+                        title: "Homework",
+                        subtitle: "Design questions waiting for your decision"
+                    )
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.homework")
@@ -99,19 +72,11 @@ struct SettingsView: View {
                 NavigationLink {
                     DebugToolsView()
                 } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "wrench.and.screwdriver.fill").frame(width: 24)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Debug Tools")
-                            Text("Roadmap, balancing and authored-text review")
-                                .font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
-                    }
-                    .frame(minHeight: 44)
-                    .padding(14)
-                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+                    SettingsDestinationRow(
+                        icon: "wrench.and.screwdriver.fill",
+                        title: "Debug Tools",
+                        subtitle: "Roadmap, balancing and authored-text review"
+                    )
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.debug-tools")
@@ -134,6 +99,35 @@ struct SettingsView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct SettingsDestinationRow: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .frame(width: 24)
+                .foregroundStyle(.tint)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).foregroundStyle(.primary)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 8)
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .frame(minHeight: 44)
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .contentShape(Rectangle())
     }
 }
 

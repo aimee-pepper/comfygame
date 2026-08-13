@@ -5,6 +5,19 @@ import XCTest
 /// Adding a symbol/creature/station to JSON and getting an ID wrong should fail here, loudly,
 /// rather than silently spawning nothing in a world.
 final class ContentTests: XCTestCase {
+    func testSettingsDestinationsShareOneNavigationCardGrammar() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/SettingsView.swift"), encoding: .utf8)
+
+        XCTAssertTrue(source.contains("private struct SettingsDestinationRow: View"))
+        XCTAssertEqual(source.components(separatedBy: "SettingsDestinationRow(").count - 1, 4)
+        XCTAssertTrue(source.contains("Image(systemName: \"chevron.right\")"))
+        XCTAssertFalse(source.contains("rectangle.portrait.and.arrow.right"))
+        XCTAssertTrue(source.contains(".frame(minHeight: 44)"))
+    }
+
     func testBundledPlayerFacingCatalogueCopyContainsNoPlaceholderMarkers() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
