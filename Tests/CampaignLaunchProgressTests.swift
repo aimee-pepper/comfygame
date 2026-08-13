@@ -150,6 +150,8 @@ final class CampaignLaunchProgressTests: XCTestCase {
         if case .choosing = coordinator.phase {
             XCTFail("Fast inspection must not make the branded launch surface flicker away")
         }
+        XCTAssertEqual(coordinator.loadingPhase, .ready,
+                       "The minimum hold must show completion, not stale inspection progress")
         try await waitUntil { if case .choosing = coordinator.phase { true } else { false } }
         XCTAssertGreaterThanOrEqual(started.duration(to: clock.now), .milliseconds(110))
     }
@@ -178,6 +180,12 @@ final class CampaignLaunchProgressTests: XCTestCase {
         XCTAssertEqual(LaunchProgressState.measured(completed: 3, total: 4).measuredFraction, 0.75)
         XCTAssertEqual(LaunchProgressState.complete.measuredFraction, 1)
         XCTAssertNil(LaunchProgressState.measured(completed: 0, total: 0).measuredFraction)
+        XCTAssertEqual(CampaignAppCoordinator.LoadingPhase
+            .inspectingCampaigns(completed: 0, total: 4).accessibilityDescription,
+                       "Reading 0 of 4 campaigns")
+        XCTAssertEqual(CampaignAppCoordinator.LoadingPhase
+            .inspectingCampaigns(completed: 3, total: 4).accessibilityDescription,
+                       "Read 3 of 4 campaigns")
     }
 
     func testSwiftUILoaderUsesTheStoryboardSafeAreaCenter() {

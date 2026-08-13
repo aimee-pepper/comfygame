@@ -233,24 +233,43 @@ final class PersistenceTests: XCTestCase {
     }
 
     func testHealthyLaunchPerformsZeroWritesWhileRealReconciliationPersistsOnce() throws {
+        final class StepRecorder: @unchecked Sendable {
+            private let lock = NSLock()
+            private var storage: [GameStore.PreparationStep] = []
+            func append(_ value: GameStore.PreparationStep) {
+                lock.lock(); defer { lock.unlock() }
+                storage.append(value)
+            }
+            var values: [GameStore.PreparationStep] {
+                lock.lock(); defer { lock.unlock() }
+                return storage
+            }
+        }
         try io.write(SaveCodec.encode(GameState.newGame()))
         _ = try GameStore.prepareLaunch(io: io)
         let normalized = try XCTUnwrap(io.load().state)
         let healthyIO = CountingIO(io)
-        let healthy = try GameStore.prepareLaunch(io: healthyIO)
+        let healthySteps = StepRecorder()
+        let healthy = try GameStore.prepareLaunch(io: healthyIO, progress: healthySteps.append)
         XCTAssertEqual(healthyIO.writes, 0,
                        "A healthy launch must not rewrite and decode the same campaign")
         XCTAssertEqual(healthy.state, normalized)
+        XCTAssertEqual(healthySteps.values, [.loadingSave, .reconcilingCatalogue, .complete],
+                       "A read-only launch must not claim that it is securing a changed save")
 
         var stranded = normalized
         stranded.base.essence = 0
         try io.write(SaveCodec.encode(stranded))
         let reconciliationIO = CountingIO(io)
-        let reconciled = try GameStore.prepareLaunch(io: reconciliationIO)
+        let reconciliationSteps = StepRecorder()
+        let reconciled = try GameStore.prepareLaunch(io: reconciliationIO,
+                                                     progress: reconciliationSteps.append)
         XCTAssertEqual(reconciliationIO.writes, 1,
                        "Real launch reconciliation must commit atomically exactly once")
         XCTAssertGreaterThanOrEqual(EconomyRules.spendableEssence(in: reconciled.state),
                                     EconomyRules.minimumBindCost(in: reconciled.state))
+        XCTAssertEqual(reconciliationSteps.values,
+                       [.loadingSave, .reconcilingCatalogue, .committingSave, .complete])
         XCTAssertEqual(io.load().state, reconciled.state)
     }
 

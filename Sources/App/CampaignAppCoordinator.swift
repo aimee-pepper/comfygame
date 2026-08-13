@@ -42,7 +42,9 @@ final class CampaignAppCoordinator: ObservableObject {
             switch self {
             case .adoptingLegacy: "Checking existing campaigns"
             case .inspectingCampaigns(let completed, let total):
-                total > 0 ? "Reading campaign \(min(completed + 1, total)) of \(total)" : "Reading campaign shelf"
+                if total <= 0 { "Reading campaign shelf" }
+                else if completed <= 0 { "Reading 0 of \(total) campaigns" }
+                else { "Read \(min(completed, total)) of \(total) campaigns" }
             case .selectingCampaign: "Opening selected campaign"
             case .acquiringWriter: "Securing selected campaign"
             case .preparing(let step): step.accessibilityDescription
