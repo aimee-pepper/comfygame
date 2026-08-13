@@ -399,6 +399,7 @@ private struct VisitedWorldSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     let world: VisitedWorld
+    @State private var confirmingErase = false
 
     private var tier: Int { store.state.reality.analysisTier }
 
@@ -528,6 +529,15 @@ private struct VisitedWorldSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
             }
+            .alert("Erase World \(world.runIndex)?", isPresented: $confirmingErase) {
+                Button("Cancel", role: .cancel) {}
+                Button("Erase World \(world.runIndex)", role: .destructive) {
+                    store.forgetWorld(world.id)
+                    dismiss()
+                }
+            } message: {
+                Text("This removes this world from History. It cannot be undone; other world records will not change.")
+            }
         }
     }
 
@@ -545,8 +555,7 @@ private struct VisitedWorldSheet: View {
                 .buttonStyle(.bordered)
 
                 Button(role: .destructive) {
-                    store.forgetWorld(world.id)
-                    dismiss()
+                    confirmingErase = true
                 } label: {
                     Label("Erase", systemImage: "trash")
                         .frame(maxWidth: .infinity, minHeight: 44)

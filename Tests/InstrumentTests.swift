@@ -25,6 +25,10 @@ final class InstrumentTests: XCTestCase {
         XCTAssertTrue(detail.contains("Label(world.isKept ? \"Stop keeping\" : \"Keep\""))
         XCTAssertTrue(detail.contains("Button(role: .destructive)"))
         XCTAssertTrue(detail.contains("Label(\"Erase\", systemImage: \"trash\")"))
+        XCTAssertTrue(detail.contains(".alert(\"Erase World \\(world.runIndex)?\""))
+        XCTAssertTrue(detail.contains("Button(\"Cancel\", role: .cancel)"))
+        XCTAssertTrue(detail.contains("Button(\"Erase World \\(world.runIndex)\", role: .destructive)"))
+        XCTAssertEqual(detail.components(separatedBy: "store.forgetWorld(world.id)").count - 1, 1)
     }
 
     // MARK: The content
