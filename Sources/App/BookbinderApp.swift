@@ -210,14 +210,8 @@ struct LaunchSurface: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let containerFrame = geometry.frame(in: .global)
-            let safeAreaFrameInScreen = LaunchSurfacePlacement.currentSafeAreaFrameInScreen ??
-                LaunchSurfacePlacement.inferredSafeAreaFrame(
-                    containerFrame: containerFrame, insets: geometry.safeAreaInsets
-                )
-            let safeAreaFrame = LaunchSurfacePlacement.localFrame(
-                containerFrame: containerFrame,
-                safeAreaFrameInScreen: safeAreaFrameInScreen
+            let safeAreaFrame = LaunchSurfacePlacement.localSafeAreaFrame(
+                size: geometry.size, insets: geometry.safeAreaInsets
             )
             ZStack(alignment: .topLeading) {
                 Color(.systemBackground).ignoresSafeArea()
@@ -232,7 +226,7 @@ struct LaunchSurface: View {
             }
             .onAppear {
                 Logger.launch.notice(
-                    "loader container=\(String(describing: containerFrame), privacy: .public) safeScreen=\(String(describing: safeAreaFrameInScreen), privacy: .public) safeLocal=\(String(describing: safeAreaFrame), privacy: .public)"
+                    "loader size=\(String(describing: geometry.size), privacy: .public) insets=\(String(describing: geometry.safeAreaInsets), privacy: .public) safeLocal=\(String(describing: safeAreaFrame), privacy: .public)"
                 )
             }
         }
@@ -306,26 +300,14 @@ struct LaunchSurface: View {
 }
 
 enum LaunchSurfacePlacement {
-    /// The storyboard is constrained to `UIWindow.safeAreaLayoutGuide`. Read that same UIKit frame
-    /// rather than inferring it from SwiftUI's proposal, whose origin/size semantics vary depending
-    /// on which root container proposed the GeometryReader.
-    @MainActor static var currentSafeAreaFrameInScreen: CGRect? {
-        let windows = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-        guard let window = windows.first(where: \.isKeyWindow) ?? windows.first else { return nil }
-        return window.convert(window.safeAreaLayoutGuide.layoutFrame, to: nil)
-    }
-
-    static func localFrame(containerFrame: CGRect, safeAreaFrameInScreen: CGRect) -> CGRect {
-        safeAreaFrameInScreen.offsetBy(dx: -containerFrame.minX, dy: -containerFrame.minY)
-    }
-
-    static func inferredSafeAreaFrame(containerFrame: CGRect, insets: EdgeInsets) -> CGRect {
-        CGRect(x: containerFrame.minX + insets.leading,
-               y: containerFrame.minY + insets.top,
-               width: max(0, containerFrame.width - insets.leading - insets.trailing),
-               height: max(0, containerFrame.height - insets.top - insets.bottom))
+    /// Keep the launch artwork in the coordinate system SwiftUI is laying out right now. Looking
+    /// up a separate UIWindow frame during first-frame handoff can briefly return a different safe
+    /// area and visibly move the otherwise identical storyboard composition.
+    static func localSafeAreaFrame(size: CGSize, insets: EdgeInsets) -> CGRect {
+        CGRect(x: insets.leading,
+               y: insets.top,
+               width: max(0, size.width - insets.leading - insets.trailing),
+               height: max(0, size.height - insets.top - insets.bottom))
     }
 }
 
@@ -348,7 +330,6 @@ enum LaunchProgressState: Equatable, Sendable {
 
 private struct LaunchProgressTrack: View {
     let progress: LaunchProgressState
-    @State private var activityOffset = -0.35
 
     var body: some View {
         GeometryReader { geometry in
@@ -358,27 +339,11 @@ private struct LaunchProgressTrack: View {
                     Rectangle()
                         .fill(.brown)
                         .frame(width: geometry.size.width * fraction)
-                } else {
-                    Rectangle()
-                        .fill(.brown)
-                        .frame(width: geometry.size.width * 0.35)
-                        .offset(x: geometry.size.width * activityOffset)
-                        .onAppear { animateActivity() }
                 }
             }
             .clipped()
         }
-        .onChange(of: progress) { _, next in
-            if next.measuredFraction == nil { animateActivity() }
-        }
         .accessibilityHidden(true)
-    }
-
-    private func animateActivity() {
-        activityOffset = -0.35
-        withAnimation(.linear(duration: 0.9).repeatForever(autoreverses: false)) {
-            activityOffset = 1
-        }
     }
 }
 

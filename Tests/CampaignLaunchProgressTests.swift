@@ -170,8 +170,10 @@ final class CampaignLaunchProgressTests: XCTestCase {
                        "System progress styling must not introduce different intrinsic geometry")
         XCTAssertTrue(source.contains("Double(completed) / Double(total)"),
                       "Determinate progress must derive from completed and total work units")
-        XCTAssertTrue(source.contains("repeatForever"),
-                      "Work without a measurable denominator must show activity, not a percentage")
+        XCTAssertFalse(source.contains("activityOffset"),
+                       "Unmeasured work must not resemble a fabricated partial percentage")
+        XCTAssertFalse(source.contains("geometry.size.width * 0.35"),
+                       "Only measured completed/total work may control fill width")
     }
 
     func testProgressStateUsesMeasuredUnitsAndNeverInventsAPercentage() {
@@ -189,35 +191,27 @@ final class CampaignLaunchProgressTests: XCTestCase {
     }
 
     func testSwiftUILoaderUsesTheStoryboardSafeAreaCenter() {
-        let fullFrame = CGRect(x: 0, y: 0, width: 393, height: 852)
         let insets = EdgeInsets(top: 59, leading: 0, bottom: 34, trailing: 0)
 
-        let safeFrame = LaunchSurfacePlacement.inferredSafeAreaFrame(
-            containerFrame: fullFrame, insets: insets
-        )
-        let local = LaunchSurfacePlacement.localFrame(
-            containerFrame: fullFrame, safeAreaFrameInScreen: safeFrame
+        let local = LaunchSurfacePlacement.localSafeAreaFrame(
+            size: CGSize(width: 393, height: 852), insets: insets
         )
 
         XCTAssertEqual(local.midX, 196.5, accuracy: 0.001)
         XCTAssertEqual(local.midY, 438.5, accuracy: 0.001)
-        XCTAssertNotEqual(local.midY, fullFrame.height / 2,
+        XCTAssertNotEqual(local.midY, 852 / 2,
                           "The SwiftUI loader must use the same safe-area center as the storyboard")
     }
 
     func testAlreadyInsetSwiftUIProposalDoesNotApplySafeAreaTwice() {
-        let proposedSafeFrame = CGRect(x: 0, y: 59, width: 393, height: 759)
-
-        let storyboardSafeFrame = CGRect(x: 0, y: 59, width: 393, height: 759)
-        let local = LaunchSurfacePlacement.localFrame(
-            containerFrame: proposedSafeFrame,
-            safeAreaFrameInScreen: storyboardSafeFrame
+        let local = LaunchSurfacePlacement.localSafeAreaFrame(
+            size: CGSize(width: 393, height: 759), insets: EdgeInsets()
         )
 
         XCTAssertEqual(local.midX, 196.5, accuracy: 0.001)
         XCTAssertEqual(local.midY, 379.5, accuracy: 0.001)
-        XCTAssertEqual(proposedSafeFrame.minY + local.midY, 438.5, accuracy: 0.001,
-                       "the live page and storyboard must share one global centre")
+        XCTAssertEqual(59 + local.midY, 438.5, accuracy: 0.001,
+                       "an already-inset proposal must not apply the safe area twice")
     }
 
     func testLiveBookMarkUsesStoryboardTopLeadingCoordinateSpace() throws {
