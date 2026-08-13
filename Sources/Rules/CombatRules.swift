@@ -859,7 +859,24 @@ enum CombatRules {
     // MARK: Harm that outlives the blow
 
     enum AfflictionApplicationOutcome: Equatable {
-        case prevented, noChange, added(AfflictionInstance), strengthened(AfflictionInstance)
+        case prevented, noChange, added(AfflictionInstance)
+        case damageStrengthened(AfflictionInstance)
+        case durationStrengthened(AfflictionInstance)
+        case bothStrengthened(AfflictionInstance)
+
+        var appliedInstance: AfflictionInstance? {
+            switch self {
+            case .added(let row), .damageStrengthened(let row),
+                 .durationStrengthened(let row), .bothStrengthened(let row): row
+            case .prevented, .noChange: nil
+            }
+        }
+    }
+
+    private static func owns(_ node: CombatNodeID, actor: Combatant?,
+                             encounter: EncounterState) -> Bool {
+        guard let actor else { return false }
+        return encounter.debugV2OwnedNodeIDs?[actor]?.contains(node) == true
     }
 
     /// One-time adoption boundary. Nil is the only legacy marker; modern empty stays empty.
@@ -879,7 +896,13 @@ enum CombatRules {
         guard targetIsStanding else { return .noChange }
         let definition = AfflictionDefinition.definition(kind)
         let proposedDamage = definition.allowsSeverityOverride ? max(0, damage) : definition.defaultDamage
-        let proposedTicks = definition.allowsDurationOverride ? max(0, ticks) : definition.defaultTicks
+        let eligibleVirulence = [.direct, .coating].contains(provenance)
+            && owns(CombatDerivedStatsRules.Node.virulence, actor: source, encounter: encounter)
+        let authoredTicks = (definition.allowsDurationOverride ? max(0, ticks) : definition.defaultTicks)
+            + (eligibleVirulence && !endless ? 2 : 0)
+        // Constitution's later consumer transforms this prospective value here, before refresh.
+        // Keeping the named boundary prevents Virulence being retroactively added to an old row.
+        let proposedTicks = authoredTicks
         let index = encounter.afflictions?.firstIndex { $0.target == target && $0.kind == kind }
         let old = index.flatMap { encounter.afflictions?[$0] }
         let changes = old == nil
@@ -908,7 +931,47 @@ enum CombatRules {
         merged.provenances.formUnion(contributingProvenances ?? [provenance])
         if let index { encounter.afflictions?[index] = merged }
         else { encounter.afflictions?.append(merged) }
-        return old == nil ? .added(merged) : .strengthened(merged)
+        let outcome: AfflictionApplicationOutcome
+        if let old {
+            let damageChanged = merged.damage > old.damage || (merged.endless && !old.endless)
+            let durationChanged = merged.ticksRemaining > old.ticksRemaining
+            outcome = switch (damageChanged, durationChanged) {
+            case (true, true): .bothStrengthened(merged)
+            case (true, false): .damageStrengthened(merged)
+            case (false, true): .durationStrengthened(merged)
+            case (false, false): .noChange
+            }
+        } else {
+            outcome = .added(merged)
+        }
+
+        // Blight copies the prospective authored Poison, never the older merged row. Copied
+        // provenance makes this recursive call ineligible for both Virulence and another Blight.
+        if kind == .poison, [.direct, .coating].contains(provenance),
+           owns(CombatDerivedStatsRules.Node.blight, actor: source, encounter: encounter),
+           outcome.appliedInstance != nil,
+           case .foe(let primaryID) = target, let source {
+            let secondary = encounter.foes
+                .filter { $0.id != primaryID && $0.isAlive && encounter.revealed.contains($0.id) }
+                .sorted { $0.id.rawValue < $1.id.rawValue }
+                .first
+            if let secondary {
+                _ = applyAffliction(.poison, to: .foe(secondary.id), source: source,
+                                    provenance: .copied,
+                                    damage: max(1, (proposedDamage + 1) / 2),
+                                    ticks: max(1, (authoredTicks + 1) / 2),
+                                    targetIsStanding: true, encounter: &encounter)
+            }
+        }
+        return outcome
+    }
+
+    static func foeArmourBreakdown(_ foe: FoeState, encounter: EncounterState,
+                                   ignoredFraction: Double = 0)
+        -> CombatDerivedStatsRules.FoeArmourBreakdown {
+        CombatDerivedStatsRules.foeArmour(base: foe.stats.armour,
+            erosion: encounter.foeArmourErosion[foe.id] ?? 0,
+            ignoredFraction: ignoredFraction)
     }
 
     private static func consumeStatusGuard(on target: Combatant,
@@ -1544,7 +1607,7 @@ enum CombatRules {
         let currentRank = encounter.partyRanks[actor]
         return CombatDerivedStatsRules.conditionalDirectHitComponents(
             ownedNodeIDs: ownership[actor] ?? [],
-            snapshot: .init(targetArmour: foe.stats.armour,
+            snapshot: .init(targetArmour: foeArmourBreakdown(foe, encounter: encounter).beforeIgnore,
                             coveringDensity: foe.traits?.covering.coverage,
                             actorHeldRank: currentRank != nil && currentRank == previousRanks[actor],
                             targetHasAffliction: !afflictions(on: .foe(foe.id), in: encounter).isEmpty)
@@ -1602,7 +1665,8 @@ enum CombatRules {
             covering: foe.traits?.covering ?? Covering(),
             wildRule: wildRule(for: actor, in: state),
             standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
-            reach: reach(for: actor, in: state), armour: foe.stats.armour,
+            reach: reach(for: actor, in: state),
+            armour: foeArmourBreakdown(foe, encounter: encounter).beforeIgnore,
             ignoresArmour: profile.ignoresArmour || breakingBlow.ignoresArmour)
         let ownsSteadyHand = encounter.debugV2OwnedNodeIDs?[actor]?.contains(
             CombatDerivedStatsRules.Node.steadyHand) == true
@@ -1638,7 +1702,8 @@ enum CombatRules {
             damageKind: encounter.debugV2BinderAttack?.ordinaryWeaponKind,
             covering: foe.traits?.covering ?? Covering(),
             wildRule: wildRule(for: .binder, in: state), standingBack: standingBack,
-            reach: reach(for: .binder, in: state), armour: foe.stats.armour,
+            reach: reach(for: .binder, in: state),
+            armour: foeArmourBreakdown(foe, encounter: encounter).beforeIgnore,
             ignoresArmour: breakingBlow.ignoresArmour, isCritical: true)
         return .init(ordinary: ordinary,
                      critical: CombatDamageRules.preview(
@@ -1668,7 +1733,8 @@ enum CombatRules {
                       covering: foe.traits?.covering ?? Covering(),
                       wildRule: wildRule(for: .binder, in: state),
                       standingBack: standingBack,
-                      reach: reach(for: .binder, in: state), armour: foe.stats.armour,
+                      reach: reach(for: .binder, in: state),
+                      armour: foeArmourBreakdown(foe, encounter: encounter).beforeIgnore,
                       ignoresArmour: breakingBlow.ignoresArmour))
     }
 
@@ -1721,7 +1787,8 @@ enum CombatRules {
                 targetIsStanding: encounter.foes[secondaryIndex].isAlive,
                 encounter: &encounter)
             switch outcome {
-            case .added(let instance), .strengthened(let instance):
+            case .added(let instance), .damageStrengthened(let instance),
+                 .durationStrengthened(let instance), .bothStrengthened(let instance):
                 copiedReceipt = instance.applicationReceipt
             case .prevented, .noChange:
                 break
@@ -1807,7 +1874,7 @@ enum CombatRules {
                       wildRule: breaking,
                       standingBack: standingBack,
                       reach: reachOfActor,
-                      armour: foe.stats.armour,
+                      armour: foeArmourBreakdown(foe, encounter: encounter).beforeIgnore,
                       ignoresArmour: ignoresArmour || breakingBlow.ignoresArmour, isCritical: critical)
         )
         let raw = resolved.rawDamage
@@ -2285,6 +2352,9 @@ enum CombatRules {
     /// three-tick payload always means three future boundaries and relaunch preserves the count.
     static func tickAfflictions(run: inout WorldRun, encounter: inout EncounterState) {
         adoptLegacyAfflictions(in: &encounter)
+        encounter.corrodeReceipts = encounter.corrodeReceipts.filter {
+            $0.round >= encounter.roundNumber - 1
+        }
         let snapshot = encounter.afflictions ?? []
         var remaining: [AfflictionInstance] = []
         for var affliction in snapshot.sorted(by: {
@@ -2308,6 +2378,19 @@ enum CombatRules {
                                + "\(affliction.kind.legacyVerb) — \(affliction.damage).")
             }
             guard isAlive(affliction.target, in: withEncounter(encounter, on: run)) else { continue }
+            if affliction.kind == .poison, case .foe(let targetID) = affliction.target,
+               owns(CombatDerivedStatsRules.Node.corrode,
+                    actor: affliction.source, encounter: encounter),
+               let source = affliction.source {
+                let receipt = EncounterState.CorrodeReceipt(source: source, target: targetID,
+                                                             round: encounter.roundNumber)
+                if encounter.corrodeReceipts.insert(receipt).inserted,
+                   let foe = encounter.foes.first(where: { $0.id == targetID }) {
+                    let current = encounter.foeArmourErosion[targetID] ?? 0
+                    encounter.foeArmourErosion[targetID] = min(max(0, foe.stats.armour), current + 1)
+                    encounter.note("Corrode wears \(foe.stats.displayName)'s armour down by 1.")
+                }
+            }
             if affliction.endless {
                 remaining.append(affliction)
             } else if affliction.ticksRemaining > 1 {

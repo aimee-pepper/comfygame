@@ -4714,4 +4714,240 @@ final class CombatTests: XCTestCase {
         empty.takeCombatAction(.attack(foe: emptyTarget))
         XCTAssertTrue(empty.activeEncounter?.carriedDamageEvents.isEmpty == true)
     }
+
+    func testVirulenceExtendsOnlyExactOwnerDirectAndCoatingApplicationsBeforeRefresh() throws {
+        let owner: Combatant = .binder
+        for kind in AfflictionID.allCases {
+            var encounter = try XCTUnwrap(inFight().activeEncounter)
+            encounter.debugV2OwnedNodeIDs = [owner: [CombatDerivedStatsRules.Node.virulence]]
+            let target: Combatant = .foe(try XCTUnwrap(encounter.foes.first?.id))
+            let outcome = CombatRules.applyAffliction(kind, to: target, source: owner,
+                provenance: .direct, damage: 2, ticks: 3, targetIsStanding: true,
+                encounter: &encounter)
+            guard case .added(let row) = outcome else { return XCTFail("expected added \(kind)") }
+            XCTAssertEqual(row.ticksRemaining, 5)
+
+            for excluded in [AfflictionProvenance.copied, .retaliation, .environment,
+                             .migratedUnknown] {
+                var excludedEncounter = try XCTUnwrap(inFight().activeEncounter)
+                excludedEncounter.debugV2OwnedNodeIDs = [owner: [CombatDerivedStatsRules.Node.virulence]]
+                let excludedTarget: Combatant = .foe(try XCTUnwrap(excludedEncounter.foes.first?.id))
+                _ = CombatRules.applyAffliction(kind, to: excludedTarget, source: owner,
+                    provenance: excluded, damage: 2, ticks: 3, targetIsStanding: true,
+                    encounter: &excludedEncounter)
+                XCTAssertEqual(excludedEncounter.afflictions?.first?.ticksRemaining, 3,
+                               "\(excluded) cannot receive Virulence")
+            }
+        }
+
+        var encounter = try XCTUnwrap(inFight().activeEncounter)
+        encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.virulence]]
+        let target: Combatant = .foe(try XCTUnwrap(encounter.foes.first?.id))
+        _ = CombatRules.applyAffliction(.poison, to: target, source: .companion(0),
+            provenance: .direct, damage: 4, ticks: 7, targetIsStanding: true,
+            encounter: &encounter)
+        _ = CombatRules.applyAffliction(.poison, to: target, source: .binder,
+            provenance: .coating, damage: 3, ticks: 3, targetIsStanding: true,
+            encounter: &encounter)
+        let retained = try XCTUnwrap(encounter.afflictions?.first)
+        XCTAssertEqual(retained.ticksRemaining, 7)
+        XCTAssertEqual(retained.source, .companion(0), "weaker/equal refresh cannot steal tick credit")
+    }
+
+    func testBlightCopiesProspectivePoisonHalfRoundedUpInStableDisclosedOrderWithoutRecursion() throws {
+        var encounter = try XCTUnwrap(inFight(["paper_moth", "paper_moth", "paper_moth"]).activeEncounter)
+        encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.virulence,
+                                                   CombatDerivedStatsRules.Node.blight]]
+        let ids = encounter.foes.map(\.id)
+        encounter.revealed = Set(ids.dropFirst())
+        _ = CombatRules.applyAffliction(.poison, to: .foe(ids[0]), source: .binder,
+            provenance: .direct, damage: 5, ticks: 3, targetIsStanding: true,
+            encounter: &encounter)
+        let primary = try XCTUnwrap(encounter.afflictions?.first { $0.target == .foe(ids[0]) })
+        let copy = try XCTUnwrap(encounter.afflictions?.first { $0.provenance == .copied })
+        XCTAssertEqual(primary.ticksRemaining, 5)
+        XCTAssertEqual(copy.target, .foe(ids[1]))
+        XCTAssertEqual(copy.damage, 3)
+        XCTAssertEqual(copy.ticksRemaining, 3)
+        XCTAssertEqual(copy.source, .binder)
+        XCTAssertEqual(encounter.afflictions?.filter { $0.provenance == .copied }.count, 1)
+
+        // A no-op refresh and a Stonebark-prevented primary cannot produce another copy.
+        _ = CombatRules.applyAffliction(.poison, to: .foe(ids[0]), source: .binder,
+            provenance: .direct, damage: 1, ticks: 1, targetIsStanding: true,
+            encounter: &encounter)
+        XCTAssertEqual(encounter.afflictions?.filter { $0.provenance == .copied }.count, 1)
+        encounter.statusGuards[.foe(ids[1])] = 1
+        _ = CombatRules.applyAffliction(.poison, to: .foe(ids[0]), source: .binder,
+            provenance: .direct, damage: 1, ticks: 1, targetIsStanding: true,
+            encounter: &encounter)
+        XCTAssertEqual(encounter.statusGuards[.foe(ids[1])], 1,
+                       "a no-op primary cannot consume the secondary's Stonebark")
+        encounter.statusGuards[.foe(ids[2])] = 1
+        _ = CombatRules.applyAffliction(.poison, to: .foe(ids[2]), source: .binder,
+            provenance: .direct, damage: 9, ticks: 9, targetIsStanding: true,
+            encounter: &encounter)
+        XCTAssertNil(encounter.afflictions?.first { $0.target == .foe(ids[2]) })
+
+        var guarded = try XCTUnwrap(inFight(["paper_moth", "paper_moth"]).activeEncounter)
+        guarded.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.blight]]
+        let guardedIDs = guarded.foes.map(\.id)
+        guarded.revealed.insert(guardedIDs[1])
+        guarded.statusGuards[.foe(guardedIDs[1])] = 1
+        _ = CombatRules.applyAffliction(.poison, to: .foe(guardedIDs[0]), source: .binder,
+            provenance: .direct, damage: 5, ticks: 3, targetIsStanding: true,
+            encounter: &guarded)
+        XCTAssertNotNil(guarded.afflictions?.first { $0.target == .foe(guardedIDs[0]) })
+        XCTAssertNil(guarded.afflictions?.first { $0.target == .foe(guardedIDs[1]) })
+        XCTAssertNil(guarded.statusGuards[.foe(guardedIDs[1])],
+                     "the secondary independently spends its own Stonebark")
+    }
+
+    func testPreparedPoisonProductionRouteUsesVirulenceAndBlightAfterLandedHit() throws {
+        let store = inFight(["paper_moth", "paper_moth"])
+        store.mutate("stage exact venom owners and prepared coating") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.virulence,
+                                                       CombatDerivedStatsRules.Node.blight]]
+            encounter.preparedCoatings[.binder] = .poison
+            encounter.order = [.binder] + encounter.foes.map { .foe($0.id) }
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            encounter.foes[0].currentHP = 99
+            encounter.revealed.insert(encounter.foes[1].id)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let target = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("commit prepared Poison before automatic round ticks") {
+            CombatRules.perform(.attack(foe: target), by: .binder, in: &$0)
+        }
+        let rows = try XCTUnwrap(store.activeEncounter?.afflictions)
+        let primary = try XCTUnwrap(rows.first { $0.target == .foe(target) && $0.kind == .poison })
+        let copy = try XCTUnwrap(rows.first { $0.provenance == .copied })
+        XCTAssertEqual(primary.provenance, .coating)
+        XCTAssertEqual(primary.ticksRemaining,
+                       (Tuning.Encounter.statusRounds["poison"] ?? 3) + 2)
+        XCTAssertEqual(copy.ticksRemaining, max(1, (primary.ticksRemaining + 1) / 2))
+        XCTAssertEqual(copy.damage, max(1, (primary.damage + 1) / 2))
+        XCTAssertNil(store.activeEncounter?.preparedCoatings[.binder])
+    }
+
+    func testCorrodeTicksOncePerSourceTargetRoundAndPersistsErosionWithoutMutatingBaseArmour() throws {
+        let store = inFight()
+        store.mutate("stage source-owned Corrode poison") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  let foe = encounter.foes.first else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.corrode]]
+            encounter.foes[0].currentHP = 99
+            encounter.foes[0].stats.armour = 5
+            _ = CombatRules.applyAffliction(.poison, to: .foe(foe.id), source: .binder,
+                provenance: .direct, damage: 1, ticks: 3, targetIsStanding: true,
+                encounter: &encounter)
+            CombatRules.tickAfflictions(run: &run, encounter: &encounter)
+            // A duplicate boundary invocation in the same saved round cannot multiply erosion.
+            CombatRules.tickAfflictions(run: &run, encounter: &encounter)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        let foe = try XCTUnwrap(encounter.foes.first)
+        XCTAssertEqual(encounter.foeArmourErosion[foe.id], min(1, foe.stats.armour))
+        XCTAssertEqual(encounter.corrodeReceipts.count, 1)
+        XCTAssertEqual(foe.stats.armour, 5)
+        let breakdown = CombatRules.foeArmourBreakdown(foe, encounter: encounter)
+        XCTAssertEqual(breakdown.beforeIgnore, max(0, foe.stats.armour - (encounter.foeArmourErosion[foe.id] ?? 0)))
+
+        let reloaded = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(encounter))
+        XCTAssertEqual(reloaded.foeArmourErosion, encounter.foeArmourErosion)
+        XCTAssertEqual(reloaded.corrodeReceipts, encounter.corrodeReceipts)
+    }
+
+    func testCorrodeRequiresRetainedExactSourceAndAllowsTwoOwnersOnceEach() throws {
+        var run = try XCTUnwrap(inFight().state.worlds.activeRun)
+        var encounter = try XCTUnwrap(run.activeEncounter)
+        let foeID = try XCTUnwrap(encounter.foes.first?.id)
+        encounter.foes[0].currentHP = 99
+        encounter.foes[0].stats.armour = 5
+        encounter.debugV2OwnedNodeIDs = [
+            .binder: [CombatDerivedStatsRules.Node.corrode],
+            .companion(0): [CombatDerivedStatsRules.Node.corrode]
+        ]
+        _ = CombatRules.applyAffliction(.poison, to: .foe(foeID), source: .binder,
+            provenance: .direct, damage: 3, ticks: 3, targetIsStanding: true,
+            encounter: &encounter)
+        _ = CombatRules.applyAffliction(.poison, to: .foe(foeID), source: .companion(0),
+            provenance: .direct, damage: 3, ticks: 8, targetIsStanding: true,
+            encounter: &encounter)
+        CombatRules.tickAfflictions(run: &run, encounter: &encounter)
+        XCTAssertEqual(encounter.foeArmourErosion[foeID], min(1, encounter.foes[0].stats.armour),
+                       "equal damage/duration refresh must not steal source credit")
+
+        // A genuinely stronger source takes ownership. If a migrated/copy edge exposes a second
+        // boundary in the same round, that other exact owner may contribute once too.
+        _ = CombatRules.applyAffliction(.poison, to: .foe(foeID), source: .companion(0),
+            provenance: .direct, damage: 4, ticks: 8, targetIsStanding: true,
+            encounter: &encounter)
+        CombatRules.tickAfflictions(run: &run, encounter: &encounter)
+        XCTAssertEqual(encounter.corrodeReceipts.filter { $0.target == foeID }.count, 2)
+        XCTAssertEqual(Set(encounter.corrodeReceipts.map(\.round)), [encounter.roundNumber])
+        XCTAssertEqual(encounter.foeArmourErosion[foeID], min(2, encounter.foes[0].stats.armour))
+
+        var unknown = try XCTUnwrap(inFight().state.worlds.activeRun)
+        var unknownEncounter = try XCTUnwrap(unknown.activeEncounter)
+        let unknownID = try XCTUnwrap(unknownEncounter.foes.first?.id)
+        unknownEncounter.foes[0].currentHP = 99
+        unknownEncounter.foes[0].stats.armour = 5
+        unknownEncounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.corrode]]
+        _ = CombatRules.applyAffliction(.poison, to: .foe(unknownID), source: nil,
+            provenance: .migratedUnknown, damage: 2, ticks: 2, targetIsStanding: true,
+            encounter: &unknownEncounter)
+        CombatRules.tickAfflictions(run: &unknown, encounter: &unknownEncounter)
+        XCTAssertNil(unknownEncounter.foeArmourErosion[unknownID])
+        XCTAssertTrue(unknownEncounter.corrodeReceipts.isEmpty)
+    }
+
+    func testFoeArmourErosionFloorsBeforeIgnoreAndEnabledEmptyIsParity() {
+        let empty = CombatDerivedStatsRules.foeArmour(base: 7, erosion: 0, ignoredFraction: 0.5)
+        let legacy = CombatDerivedStatsRules.foeArmour(base: 7, erosion: 0, ignoredFraction: 0.5)
+        XCTAssertEqual(empty, legacy)
+        let eroded = CombatDerivedStatsRules.foeArmour(base: 7, erosion: 3, ignoredFraction: 0.5)
+        XCTAssertEqual(eroded.beforeIgnore, 4)
+        XCTAssertEqual(eroded.components, [.init(nodeID: CombatDerivedStatsRules.Node.corrode,
+                                                  amount: -3)])
+        XCTAssertEqual(eroded.effective, 2)
+        XCTAssertEqual(CombatDerivedStatsRules.foeArmour(base: 2, erosion: 99).effective, 0)
+    }
+
+    func testCorrodeErosionChangesRealLaterStrikeWithoutChangingFrozenFoeArmour() throws {
+        func staged(erosion: Int) throws -> GameStore {
+            let store = inFight()
+            store.mutate("stage real Corrode armour counterfactual") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+                state.base.binderCharacter.stats.might = 20
+                state.base.binderCharacter.stats.finesse = 20
+                run.rng = SeededRNG(seed: 0xC0770DE)
+                encounter.debugV2OwnedNodeIDs = [.binder: erosion > 0
+                    ? [CombatDerivedStatsRules.Node.corrode] : []]
+                encounter.order = [.binder] + encounter.foes.map { .foe($0.id) }
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.foes[0].currentHP = 99
+                encounter.foes[0].stats.armour = 6
+                encounter.foes[0].stats.evasion = 0
+                encounter.foeArmourErosion[encounter.foes[0].id] = erosion
+                run.activeEncounter = encounter; state.worlds.activeRun = run
+            }
+            return store
+        }
+        let plain = try staged(erosion: 0)
+        let eroded = try staged(erosion: 2)
+        let plainID = try XCTUnwrap(plain.activeEncounter?.foes.first?.id)
+        let erodedID = try XCTUnwrap(eroded.activeEncounter?.foes.first?.id)
+        plain.takeCombatAction(.attack(foe: plainID))
+        eroded.takeCombatAction(.attack(foe: erodedID))
+        let plainLoss = 99 - (plain.activeEncounter?.foes.first?.currentHP ?? 99)
+        let erodedLoss = 99 - (eroded.activeEncounter?.foes.first?.currentHP ?? 99)
+        XCTAssertEqual(erodedLoss, plainLoss + 2)
+        XCTAssertEqual(eroded.activeEncounter?.foes.first?.stats.armour, 6)
+    }
 }

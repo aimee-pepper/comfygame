@@ -53,6 +53,31 @@ enum CombatDerivedStatsRules {
         var finalDamage: Int
     }
 
+    struct FoeArmourComponent: Codable, Equatable, Sendable {
+        var nodeID: CombatNodeID
+        var amount: Int
+    }
+    struct FoeArmourBreakdown: Codable, Equatable, Sendable {
+        var base: Int
+        var components: [FoeArmourComponent]
+        var beforeIgnore: Int
+        var ignoredFraction: Double
+        var effective: Int
+    }
+
+    static func foeArmour(base: Int, erosion: Int,
+                          ignoredFraction: Double = 0) -> FoeArmourBreakdown {
+        let safeBase = max(0, base)
+        let appliedErosion = min(safeBase, max(0, erosion))
+        let beforeIgnore = safeBase - appliedErosion
+        let ignored = min(1, max(0, ignoredFraction))
+        let components = appliedErosion > 0
+            ? [FoeArmourComponent(nodeID: Node.corrode, amount: -appliedErosion)] : []
+        return .init(base: safeBase, components: components, beforeIgnore: beforeIgnore,
+                     ignoredFraction: ignored,
+                     effective: Int((Double(beforeIgnore) * (1 - ignored)).rounded()))
+    }
+
     struct ResistanceComponent: Codable, Equatable, Sendable {
         enum Source: String, Codable, Equatable, Sendable { case wornInsulation, ward, insulation }
         var source: Source
@@ -132,6 +157,9 @@ enum CombatDerivedStatsRules {
         static let exploit: CombatNodeID = "combat.offense.precision.exploit"
         static let steadyHand: CombatNodeID = "combat.offense.precision.steady_hand"
         static let flense: CombatNodeID = "combat.craft.venom.flense"
+        static let virulence: CombatNodeID = "combat.craft.venom.virulence"
+        static let corrode: CombatNodeID = "combat.craft.venom.corrode"
+        static let blight: CombatNodeID = "combat.craft.venom.blight"
     }
 
     struct DirectHitSnapshot: Equatable, Sendable {

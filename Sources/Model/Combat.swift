@@ -562,6 +562,16 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// adoption; an empty array is modern authoritative state and must never remint old mirrors.
     var afflictions: [AfflictionInstance]?
     var nextAfflictionReceipt: UInt64 = 1
+    struct CorrodeReceipt: Codable, Hashable, Sendable {
+        var source: Combatant
+        var target: InstanceID
+        var round: Int
+    }
+    /// Encounter-local armour loss caused by Corrode. This is a derived negative component, not a
+    /// mutation of a foe's frozen stats, and therefore disappears with the encounter.
+    var foeArmourErosion: [InstanceID: Int] = [:]
+    /// At most one Corrode contribution from one exact source to one target in one global round.
+    var corrodeReceipts: Set<CorrodeReceipt> = []
     /// One prepared refusal of the next affliction. Kept as a count-shaped value so a future
     /// upgrade can grant more than one without changing the save shape; Stonebark currently sets 1.
     var statusGuards: [Combatant: Int] = [:]
@@ -752,6 +762,10 @@ struct EncounterState: Codable, Equatable, Sendable {
         afflictions = try c.decodeIfPresent([AfflictionInstance].self, forKey: .afflictions)
         nextAfflictionReceipt = try c.decodeIfPresent(UInt64.self,
                                                        forKey: .nextAfflictionReceipt) ?? 1
+        foeArmourErosion = try c.decodeIfPresent([InstanceID: Int].self,
+                                                  forKey: .foeArmourErosion) ?? [:]
+        corrodeReceipts = try c.decodeIfPresent(Set<CorrodeReceipt>.self,
+                                                 forKey: .corrodeReceipts) ?? []
         statusGuards = try c.decodeIfPresent([Combatant: Int].self, forKey: .statusGuards) ?? [:]
         preparedCoatings = try c.decodeIfPresent([Combatant: PreparedCoating].self,
                                                  forKey: .preparedCoatings) ?? [:]
