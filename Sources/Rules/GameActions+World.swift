@@ -715,7 +715,8 @@ extension GameStore {
                                      into state: inout GameState,
                                      fraction: Double,
                                      rng: inout SeededRNG) -> BankedHaul {
-        let keptResources = run.satchel.scaled(by: fraction)
+        let keptResources = run.satchel.retainedForFailure(fraction: fraction,
+                                                           outcomeID: outcomeID)
         let resourceGains = keptResources.nonZero.map { id, amount in
             let definition = ContentCatalog.shared.resource(id)
             return RunExitGain(name: definition?.name ?? id.rawValue,
@@ -758,8 +759,9 @@ extension GameStore {
             if let safe = parts.protected { _ = guaranteed.add(safe) }
             if let risk = parts.atRisk { _ = exposed.add(risk) }
         }
-        let retainedRisk = fraction >= 1 ? exposed
-            : exposed.randomlyKeeping(fraction: fraction, rng: &rng)
+        let exposedPartition = exposed.partitionedForFailure(fraction: fraction,
+                                                             outcomeID: outcomeID)
+        let retainedRisk = exposedPartition.kept
         var kept = guaranteed
         for stack in retainedRisk.stacks { _ = kept.add(stack) }
         let itemGains = kept.stacks.compactMap { stack -> RunExitGain? in
@@ -768,13 +770,7 @@ extension GameStore {
                                icon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "shippingbox",
                                count: stack.count)
         }
-        let lostStacks = exposed.stacks.compactMap { exposedStack -> ItemStack? in
-            let keptCount = retainedRisk.stacks.first { $0.binKey == exposedStack.binKey }?.count ?? 0
-            let lostCount = exposedStack.count - keptCount
-            guard lostCount > 0 else { return nil }
-            var copy = exposedStack
-            return copy.removing(lostCount)
-        }
+        let lostStacks = exposedPartition.lost.stacks
         let lostItemGains = lostStacks.map {
             RunExitGain(name: $0.displayName, icon: $0.icon, count: $0.count)
         }

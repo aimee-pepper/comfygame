@@ -41,6 +41,46 @@ struct ResourcePool: Codable, Equatable, Sendable {
     func scaled(by fraction: Double) -> ResourcePool {
         ResourcePool(amounts.mapValues { Int((Double($0) * fraction).rounded(.down)) })
     }
+
+    /// Decision 207: one outcome-wide budget, apportioned without rewarding resource variety.
+    func retainedForFailure(fraction: Double, outcomeID: ExpeditionOutcomeID) -> ResourcePool {
+        let fraction = min(1, max(0, fraction))
+        guard fraction > 0, totalUnits > 0 else { return ResourcePool() }
+        let budget = min(totalUnits, Int(ceil(Double(totalUnits) * fraction)))
+        struct Share {
+            let id: ResourceID
+            let amount: Int
+            let base: Int
+            let remainder: Double
+            let tie: UInt64
+        }
+        let shares = nonZero.map { entry -> Share in
+            let exact = Double(entry.amount) * fraction
+            return Share(id: entry.id, amount: entry.amount, base: Int(floor(exact)),
+                         remainder: exact - floor(exact),
+                         tie: failureStableHash("\(outcomeID.rawValue):resource:\(entry.id.rawValue)"))
+        }
+        var result = ResourcePool(Dictionary(uniqueKeysWithValues: shares.map { ($0.id, $0.base) }))
+        var remaining = budget - shares.reduce(0) { $0 + $1.base }
+        for share in shares.sorted(by: {
+            if $0.remainder != $1.remainder { return $0.remainder > $1.remainder }
+            if $0.tie != $1.tie { return $0.tie < $1.tie }
+            return $0.id.rawValue < $1.id.rawValue
+        }) where remaining > 0 && result[share.id] < share.amount {
+            result.add(1, of: share.id)
+            remaining -= 1
+        }
+        return result
+    }
+}
+
+private func failureStableHash(_ text: String) -> UInt64 {
+    var hash: UInt64 = 0xcbf29ce484222325
+    for byte in text.utf8 {
+        hash ^= UInt64(byte)
+        hash = hash &* 0x100000001b3
+    }
+    return hash
 }
 
 /// Rarity ladder — colour-coded in the UI.
@@ -283,6 +323,9 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
         var risk: ItemStack?
         if safeCount > 0 {
             var copy = self
+            if !copy.materials.isEmpty {
+                copy.materials = Array(copy.materials.prefix(safeCount))
+            }
             copy.count = safeCount
             copy.protectedReturnCount = 0
             safe = copy
@@ -292,8 +335,6 @@ struct ItemStack: Codable, Equatable, Identifiable, Sendable {
             var copy = self
             copy.count = riskCount
             copy.protectedReturnCount = 0
-            // Packed items are ordinary slot items; material bins remain wholly at risk. This
-            // defensive slice keeps counts coherent if that policy expands later.
             if !copy.materials.isEmpty { copy.materials = Array(copy.materials.suffix(riskCount)) }
             risk = copy
         }
@@ -392,6 +433,10 @@ struct DistilledCore: Codable, Equatable, Hashable, Sendable {
 
 /// Slot-limited item storage. Slot count grows with Storehouse tiers.
 struct Inventory: Codable, Equatable, Sendable {
+    struct FailurePartition: Equatable, Sendable {
+        var kept: Inventory
+        var lost: Inventory
+    }
     var slots: Int
     var stacks: [ItemStack] = []
 
@@ -440,6 +485,75 @@ struct Inventory: Codable, Equatable, Sendable {
         }
         return Inventory(slots: slots, stacks: kept)
     }
+
+    /// Decision 207: select from one exposed-unit pool, never one budget per stack.
+    func partitionedForFailure(fraction: Double,
+                               outcomeID: ExpeditionOutcomeID) -> FailurePartition {
+        let fraction = min(1, max(0, fraction))
+        let total = stacks.reduce(0) { $0 + max(0, $1.count) }
+        let budget = fraction > 0 ? min(total, Int(ceil(Double(total) * fraction))) : 0
+        struct Unit {
+            let stack: ItemStack
+            let tie: UInt64
+            let fallback: String
+        }
+        var units: [Unit] = []
+        let canonicalSamples = stacks.flatMap { stack in
+            stack.materials.map {
+                (sample: $0, content: failureCanonicalMaterial($0), stack: stack)
+            }
+        }.sorted { $0.content < $1.content }
+        var duplicateOrdinals: [String: Int] = [:]
+        for entry in canonicalSamples {
+            let ordinal = duplicateOrdinals[entry.content, default: 0]
+            duplicateOrdinals[entry.content] = ordinal + 1
+            let unit = ItemStack(id: entry.stack.id, catalogID: entry.stack.catalogID,
+                                 identified: entry.stack.identified, materials: [entry.sample])
+            let key = "\(outcomeID.rawValue):material:\(entry.content):duplicate:\(ordinal)"
+            units.append(.init(stack: unit, tie: failureStableHash(key), fallback: key))
+        }
+        for stack in stacks where stack.materials.isEmpty {
+                for index in 0..<max(0, stack.count) {
+                    var unit = ItemStack(id: stack.id, catalogID: stack.catalogID,
+                                         count: 1, identified: stack.identified,
+                                         distilledCore: stack.distilledCore)
+                    unit.upgradeLevel = stack.upgradeLevel
+                    unit.wildGrowth = stack.wildGrowth
+                    unit.gearProfile = stack.gearProfile
+                    unit.isFavorite = stack.isFavorite
+                    unit.isLocked = stack.isLocked
+                    let key = "\(outcomeID.rawValue):item:\(stack.catalogID.rawValue):\(stack.id.rawValue):unit:\(index)"
+                    units.append(.init(stack: unit, tie: failureStableHash(key), fallback: key))
+                }
+        }
+        let ordered = units.sorted {
+            if $0.tie != $1.tie { return $0.tie < $1.tie }
+            return $0.fallback < $1.fallback
+        }
+        var kept = Inventory(slots: slots)
+        var lost = Inventory(slots: slots)
+        for (index, unit) in ordered.enumerated() {
+            _ = index < budget ? kept.add(unit.stack) : lost.add(unit.stack)
+        }
+        return .init(kept: kept, lost: lost)
+    }
+}
+
+private func failureCanonicalMaterial(_ sample: MaterialSample) -> String {
+    let properties = sample.properties
+    let qualifier = sample.qualifier ?? ""
+    return [
+        sample.kind.rawValue,
+        String(properties.hardness.bitPattern, radix: 16),
+        String(properties.density.bitPattern, radix: 16),
+        String(properties.insulation.bitPattern, radix: 16),
+        String(properties.flexibility.bitPattern, radix: 16),
+        String(properties.lustre.bitPattern, radix: 16),
+        String(properties.reactivity.bitPattern, radix: 16),
+        String(sample.grade.bitPattern, radix: 16),
+        "\(sample.source.utf8.count):\(sample.source)",
+        "\(qualifier.utf8.count):\(qualifier)"
+    ].joined(separator: "|")
 }
 
 /// A piece actually on somebody.

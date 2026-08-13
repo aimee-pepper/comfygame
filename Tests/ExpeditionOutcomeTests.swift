@@ -278,6 +278,161 @@ final class ExpeditionOutcomeTests: XCTestCase {
         XCTAssertTrue((recovered + lost).map(\.sample).contains(second))
     }
 
+    func testDecision207ResourceBudgetIsOutcomeWideAndLargestRemainderStable() {
+        for fraction in [0.25, 0.5, 0.75] {
+            let oneKind = ResourcePool([Resources.ore: 4])
+            let fragmented = ResourcePool([Resources.ore: 1, Resources.fiber: 1,
+                                           Resources.resin: 1, Resources.essenceRaw: 1])
+            let expected = Int(ceil(4 * fraction))
+            XCTAssertEqual(oneKind.retainedForFailure(fraction: fraction, outcomeID: 41).totalUnits,
+                           expected)
+            let first = fragmented.retainedForFailure(fraction: fraction, outcomeID: 41)
+            XCTAssertEqual(first.totalUnits, expected)
+            XCTAssertEqual(first, fragmented.retainedForFailure(fraction: fraction, outcomeID: 41))
+        }
+        XCTAssertEqual(ResourcePool([Resources.ore: 1])
+            .retainedForFailure(fraction: 0.5, outcomeID: 9).totalUnits, 1)
+        XCTAssertTrue(ResourcePool([Resources.ore: 9])
+            .retainedForFailure(fraction: 0, outcomeID: 9).isEmpty)
+    }
+
+    func testDecision207DiscreteBudgetIgnoresStackFragmentationAndProtectsPackedUnits() throws {
+        let merged = Inventory(slots: 8, stacks: [
+            ItemStack(id: InstanceID(rawValue: 800), catalogID: "salve", count: 4)
+        ])
+        let fragmented = Inventory(slots: 8, stacks: [
+            ItemStack(id: InstanceID(rawValue: 801), catalogID: "salve", count: 1),
+            ItemStack(id: InstanceID(rawValue: 802), catalogID: "draught_clearing", count: 1),
+            ItemStack(id: InstanceID(rawValue: 803), catalogID: "draught_quenching", count: 1),
+            ItemStack(id: InstanceID(rawValue: 804), catalogID: "antidote_broad", count: 1)
+        ])
+        for fraction in [0.25, 0.5, 0.75] {
+            let expected = Int(ceil(4 * fraction))
+            let mergedPartition = merged.partitionedForFailure(fraction: fraction, outcomeID: 51)
+            let fragmentedPartition = fragmented.partitionedForFailure(fraction: fraction, outcomeID: 51)
+            XCTAssertEqual(mergedPartition.kept.stacks.reduce(0) { $0 + $1.count }, expected)
+            XCTAssertEqual(fragmentedPartition.kept.stacks.reduce(0) { $0 + $1.count }, expected)
+
+            let reordered = Inventory(slots: 8, stacks: Array(fragmented.stacks.reversed()))
+                .partitionedForFailure(fraction: fraction, outcomeID: 51)
+            XCTAssertEqual(Set(fragmentedPartition.kept.stacks.map(\.id)),
+                           Set(reordered.kept.stacks.map(\.id)))
+
+            let roundTripped = try JSONDecoder().decode(
+                Inventory.self,
+                from: JSONEncoder().encode(fragmented)
+            ).partitionedForFailure(fraction: fraction, outcomeID: 51)
+            XCTAssertEqual(Set(fragmentedPartition.kept.stacks.map(\.id)),
+                           Set(roundTripped.kept.stacks.map(\.id)))
+        }
+
+        var carried = ItemStack(id: InstanceID(rawValue: 805), catalogID: "salve", count: 4)
+        carried.protectedReturnCount = 2
+        let store = fundedStore()
+        XCTAssertTrue(store.bindAndDepart())
+        var run = try XCTUnwrap(store.state.worlds.activeRun)
+        run.satchelItems = Inventory(slots: 8, stacks: [carried])
+        var state = GameState.newGame()
+        state.base.inventory.stacks = []
+        var rng = run.rng
+        let banked = GameStore.bankHaul(of: run, outcomeID: 52, into: &state,
+                                        fraction: 0, rng: &rng)
+        XCTAssertEqual(banked.items.reduce(0) { $0 + $1.count }, 2)
+        XCTAssertEqual(banked.lostItems.reduce(0) { $0 + $1.count }, 2)
+    }
+
+    func testDecision207PartitionPreservesExactGearAndMaterialUnitsWithoutDuplication() throws {
+        var gear = ItemStack(id: InstanceID(rawValue: 901), catalogID: "blade_keen")
+        gear.upgradeLevel = 2
+        let pale = MaterialSample(kind: .hide, properties: .init(insulation: 31),
+                                  grade: 42, source: "pale")
+        let shaggy = MaterialSample(kind: .hide, properties: .init(insulation: 67),
+                                    grade: 81, source: "shaggy")
+        let materials = ItemStack(id: InstanceID(rawValue: 902), catalogID: Items.material,
+                                  materials: [pale, shaggy])
+        let inventory = Inventory(slots: 8, stacks: [gear, materials])
+        let partition = inventory.partitionedForFailure(fraction: 0.5, outcomeID: 61)
+        let all = partition.kept.stacks + partition.lost.stacks
+        XCTAssertEqual(all.reduce(0) { $0 + $1.count }, 3)
+        XCTAssertEqual(all.flatMap { $0.materials }.sorted { $0.grade < $1.grade }, [pale, shaggy])
+        XCTAssertEqual(all.first { $0.catalogID == gear.catalogID }?.upgradeLevel, 2)
+        XCTAssertEqual(partition.kept.stacks.reduce(0) { $0 + $1.count }, 2)
+    }
+
+    func testDecision207ProtectedMaterialsAreComplementaryExactSamples() {
+        let samples = [
+            MaterialSample(kind: .hide, properties: .init(insulation: 11),
+                           grade: 10, source: "first"),
+            MaterialSample(kind: .hide, properties: .init(insulation: 22),
+                           grade: 20, source: "second"),
+            MaterialSample(kind: .hide, properties: .init(insulation: 33),
+                           grade: 30, source: "third")
+        ]
+        var stack = ItemStack(id: InstanceID(rawValue: 910), catalogID: Items.material,
+                              materials: samples)
+        stack.protectedReturnCount = 1
+
+        let parts = stack.partitionedForReturn()
+        XCTAssertEqual(parts.protected?.materials, Array(samples.prefix(1)))
+        XCTAssertEqual(parts.atRisk?.materials, Array(samples.suffix(2)))
+        XCTAssertEqual((parts.protected?.materials ?? []) + (parts.atRisk?.materials ?? []), samples)
+        XCTAssertEqual((parts.protected?.count ?? 0) + (parts.atRisk?.count ?? 0), samples.count)
+    }
+
+    func testDecision207MaterialSelectionIgnoresReorderSplitMergeAndFreezesTypedSides() throws {
+        let samples = [
+            MaterialSample(kind: .hide, properties: .init(hardness: 13, insulation: 19),
+                           grade: 21, source: "alpha", qualifier: "ashen"),
+            MaterialSample(kind: .hide, properties: .init(density: 29, flexibility: 31),
+                           grade: 37, source: "beta", qualifier: "shaggy"),
+            MaterialSample(kind: .hide, properties: .init(lustre: 41, reactivity: 43),
+                           grade: 47, source: "gamma", qualifier: "pale"),
+            MaterialSample(kind: .hide, properties: .init(insulation: 53),
+                           grade: 59, source: "delta")
+        ]
+        let merged = Inventory(slots: 8, stacks: [
+            ItemStack(id: InstanceID(rawValue: 920), catalogID: Items.material,
+                      materials: samples)
+        ])
+        let splitReordered = Inventory(slots: 8, stacks: [
+            ItemStack(id: InstanceID(rawValue: 922), catalogID: Items.material,
+                      materials: [samples[3], samples[1]]),
+            ItemStack(id: InstanceID(rawValue: 921), catalogID: Items.material,
+                      materials: [samples[2], samples[0]])
+        ])
+        let mergedPartition = merged.partitionedForFailure(fraction: 0.5, outcomeID: 71)
+        let splitPartition = splitReordered.partitionedForFailure(fraction: 0.5, outcomeID: 71)
+        let samplesBySource: (Inventory) -> [MaterialSample] = {
+            $0.stacks.flatMap { $0.materials }.sorted { $0.source < $1.source }
+        }
+        XCTAssertEqual(samplesBySource(mergedPartition.kept), samplesBySource(splitPartition.kept))
+        XCTAssertEqual(samplesBySource(mergedPartition.lost), samplesBySource(splitPartition.lost))
+
+        let store = fundedStore()
+        XCTAssertTrue(store.bindAndDepart())
+        var run = try XCTUnwrap(store.state.worlds.activeRun)
+        run.satchelItems = splitReordered
+        var state = GameState.newGame()
+        state.base.inventory.stacks = []
+        var rng = run.rng
+        let rngBefore = rng
+        let banked = GameStore.bankHaul(of: run, outcomeID: 71, into: &state,
+                                        fraction: 0.5, rng: &rng)
+        XCTAssertEqual(rng, rngBefore, "failure partition must not consume the live run RNG")
+        let recovered = banked.recoveredLines.compactMap { line -> MaterialSample? in
+            guard case .materialSample(let material) = line else { return nil }
+            return material.sample
+        }.sorted { $0.source < $1.source }
+        let lost = banked.lostLines.compactMap { line -> MaterialSample? in
+            guard case .materialSample(let material) = line else { return nil }
+            return material.sample
+        }.sorted { $0.source < $1.source }
+        XCTAssertEqual(recovered, samplesBySource(splitPartition.kept))
+        XCTAssertEqual(lost, samplesBySource(splitPartition.lost))
+        XCTAssertEqual((recovered + lost).sorted { $0.source < $1.source },
+                       samples.sorted { $0.source < $1.source })
+    }
+
     func testReturnReceiptFreezesAntiLockSubsidyAndFinalRunwayAtomically() throws {
         let store = GameStore(io: .temporary(name: "return-subsidy-\(UUID().uuidString)"))
         let required = EconomyRules.minimumBindCost(in: store.state)
