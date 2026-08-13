@@ -93,8 +93,13 @@ struct IdentifyCard: View {
                     Button {
                         revealed = store.identify(stack)
                     } label: {
-                        Text("\(Tuning.Economy.identifyCostEssence)")
-                            .font(.caption.weight(.semibold)).monospacedDigit()
+                        Label {
+                            Text("Identify · \(Tuning.Economy.identifyCostEssence)")
+                                .monospacedDigit()
+                        } icon: {
+                            Image(systemName: "drop.fill")
+                        }
+                            .font(.caption.weight(.semibold))
                             .frame(minHeight: 44)
                             .padding(.horizontal, 12)
                     }
