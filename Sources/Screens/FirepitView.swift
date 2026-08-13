@@ -71,17 +71,11 @@ struct FirepitView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Firepit")
         .navigationBarTitleDisplayMode(.inline)
-        .alert(item: $pendingTransfer) { preview in
-            Alert(
-                title: Text("Take \(preview.name) with you?"),
-                message: Text(transferMessage(preview)),
-                primaryButton: .default(Text("Take with you")) {
-                    if case .refused(let message) = store.setComing(preview) {
-                        transferRefusal = message
-                    }
-                },
-                secondaryButton: .cancel()
-            )
+        .sheet(item: $pendingTransfer) { preview in
+            PartyTransferConfirmationSheet(preview: preview,
+                                           message: transferMessage(preview)) {
+                store.setComing(preview)
+            }
         }
         .overlay(alignment: .bottom) {
             if let transferRefusal {
@@ -136,7 +130,7 @@ struct FirepitView: View {
                 Spacer()
                 Image(systemName: store.isComing(index) ? "figure.walk.circle.fill" : "house.circle")
                     .foregroundStyle(.secondary)
-                    .accessibilityHidden(true)
+                    .accessibilityLabel(store.isComing(index) ? "Coming with you" : "At Home")
             }
             Text(member.name)
                 .font(.callout.weight(.semibold))
@@ -149,7 +143,11 @@ struct FirepitView: View {
                 .lineLimit(2)
             Spacer(minLength: 0)
             if store.isComing(index) {
-                Button("Send Home") { _ = store.setComing(index, false, expected: .activeParty) }
+                Button("Send Home") {
+                    if case .refused(let message) = store.setComingHome(index) {
+                        transferRefusal = message
+                    }
+                }
                     .font(.caption.weight(.semibold))
                     .buttonStyle(.bordered)
                     .frame(maxWidth: .infinity, minHeight: 44)
@@ -191,5 +189,47 @@ struct FirepitView: View {
         }
         lines.append("Returning them later sends them Home; it will not restore an old posting.")
         return lines.joined(separator: "\n")
+    }
+}
+
+private struct PartyTransferConfirmationSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let preview: PartyTransferPreview
+    let message: String
+    let commit: () -> CurrentStateCommitResult
+    @State private var refusal: String?
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                Text(message)
+                    .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                if let refusal {
+                    Text(refusal)
+                        .font(.callout)
+                        .foregroundStyle(.red)
+                        .accessibilityIdentifier("firepit.transfer-refusal")
+                }
+                Spacer(minLength: 0)
+                Button("Take with you") {
+                    switch commit() {
+                    case .committed: dismiss()
+                    case .refused(let message): refusal = message
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .padding(16)
+            .navigationTitle("Take \(preview.name) with you?")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+        .presentationDetents([.medium])
     }
 }

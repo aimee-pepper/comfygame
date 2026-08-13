@@ -48,6 +48,7 @@ struct GearView: View {
                         } detail: { selected in
                             GearOptionDetailSheet(
                                 option: selected, slot: slot, location: location(of: selected),
+                                worn: worn,
                                 delta: store.gearDelta(wearing: selected.piece, for: member),
                                 equip: {
                                     guard store.equip(selected, on: member) else { return false }
@@ -165,55 +166,104 @@ private struct GearOptionDetailSheet: View {
     let option: GameStore.WearableGearOption
     let slot: GearSlot
     let location: String
+    let worn: EquippedPiece?
     let delta: Int
     let equip: () -> Bool
 
     var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    HStack(spacing: 16) {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Button("Done") { dismiss() }
+                    .buttonStyle(.bordered)
+                Text(option.piece.displayName)
+                    .font(.headline)
+                    .lineLimit(2)
+                Spacer(minLength: 0)
+            }
+            .padding(12)
+
+            Divider()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 12) {
                         ItemIconTile(icon: option.piece.definition?.icon ?? "questionmark",
                                      catalogueID: option.piece.catalogID,
                                      rarity: option.piece.definition?.rarity ?? .common,
                                      quantity: option.count, identified: true,
                                      location: gridLocation,
                                      accessibilityName: option.piece.displayName)
-                            .frame(width: 58, height: 58)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(option.piece.displayName).font(.headline)
-                            Text(location).font(.caption).foregroundStyle(.secondary)
+                            .frame(width: 52, height: 52)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(location)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Text("Power \(power(option.piece))")
+                                .font(.callout.monospacedDigit())
                         }
                     }
-                }
-                Section("Equipment") {
-                    LabeledContent("Location", value: location)
-                    LabeledContent("Quantity", value: "\(option.count)")
-                    LabeledContent("Power", value: String(format: "%.1f", option.piece.effectivePower))
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Compared with worn")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        comparisonRow("Worn now", worn?.displayName ?? "Nothing",
+                                      power: worn.map(power))
+                        comparisonRow("This piece", option.piece.displayName,
+                                      power: power(option.piece))
+                        ImprovementBadge(delta: delta, slot: slot)
+                    }
+                    .padding(12)
+                    .background(.secondary.opacity(0.10),
+                                in: RoundedRectangle(cornerRadius: 12))
+
                     if let profile = option.piece.gearProfile {
-                        LabeledContent("Tier", value: "\(profile.constructionTier)")
-                        LabeledContent("Reforge", value: "\(profile.reforgeRank) of \(SmithRules.maximumReforgeLevel)")
-                        if let provenance = profile.displayProvenance {
-                            LabeledContent("Provenance", value: provenance)
-                        }
+                        Text("Tier \(profile.constructionTier) · Reforge \(profile.reforgeRank)/\(SmithRules.maximumReforgeLevel)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    ImprovementBadge(delta: delta, slot: slot)
+                    if let provenance = option.piece.gearProfile?.displayProvenance {
+                        Text(provenance)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                Section {
-                    Button("Equip") { _ = equip() }
-                        .disabled(!option.canEquipAtHome)
-                    if !option.canEquipAtHome {
-                        Text("Carried gear can be changed after you return home.")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
+                .padding(12)
+            }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 4) {
+                Button("Equip") { _ = equip() }
+                    .buttonStyle(.borderedProminent)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .disabled(!option.canEquipAtHome)
+                if !option.canEquipAtHome {
+                    Text("Carried gear can be changed after you return home.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle(option.piece.displayName)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
+            .padding(12)
+        }
+        .frame(minWidth: 300, idealWidth: 320, maxWidth: 340,
+               minHeight: 280, idealHeight: 340, maxHeight: 420)
+    }
+
+    private func power(_ piece: EquippedPiece) -> String {
+        String(format: "%.1f", piece.effectivePower)
+    }
+
+    private func comparisonRow(_ label: String, _ name: String, power: String?) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(label).font(.caption)
+            Spacer(minLength: 8)
+            VStack(alignment: .trailing, spacing: 1) {
+                Text(name).font(.caption.weight(.medium)).lineLimit(1)
+                if let power { Text("Power \(power)").font(.caption2.monospacedDigit()) }
             }
         }
+        .accessibilityElement(children: .combine)
     }
 
     private var gridLocation: ItemGridLocation {

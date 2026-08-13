@@ -70,6 +70,10 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
         XCTAssertTrue(identity.contains("Image(systemName: fallbackSystemIcon)"),
                       "Missing/generated identities must retain the visible SF fallback")
         XCTAssertFalse(identity.contains("calling"))
+        XCTAssertTrue(party.contains("· Max HP \\(health(slot))"),
+                      "Party cards must label the derived maximum as Max HP")
+        XCTAssertFalse(party.contains("· HP \\(health(slot))"))
+        XCTAssertFalse(party.contains("· Health \\(health(slot))"))
     }
 
     func testEncounterCompanionsUsePersistedNamedIdentityAndPreserveFallbacks() throws {
@@ -118,6 +122,20 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
         XCTAssertTrue(firepit.contains("Text(member.name)"),
                       "Existing visible companion names must remain unchanged")
         XCTAssertFalse(firepit.contains("travellerID: member.calling"))
+    }
+
+    func testFirepitAnnouncesCurrentPlacementStatusInsteadOfHidingIt() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let firepit = try String(contentsOf: root.appending(path: "Sources/Screens/FirepitView.swift"),
+                                 encoding: .utf8)
+
+        XCTAssertTrue(firepit.contains(
+            ".accessibilityLabel(store.isComing(index) ? \"Coming with you\" : \"At Home\")"
+        ))
+        XCTAssertFalse(firepit.contains(
+            "store.isComing(index) ? \"figure.walk.circle.fill\" : \"house.circle\")\n                    .foregroundStyle(.secondary)\n                    .accessibilityHidden(true)"
+        ), "Placement state must not remain visual-only")
     }
 
     func testWorldHistoryUsesRecordedTravellerIdentityAndPreservesReceiptCopy() throws {
@@ -242,5 +260,30 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
         XCTAssertTrue(source.contains("[\"named-character-placeholders-v1\", \"manifest\"]"))
         XCTAssertTrue(source.contains("validated(manifestData: data)"),
                       "Neither bundle resource name may bypass immutable pack validation")
+    }
+
+    func testGearPopoverKeepsEquipVisibleAndComparesAgainstWornPiece() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let gear = try String(contentsOf: root.appending(path: "Sources/Screens/GearView.swift"),
+                              encoding: .utf8)
+        let detailStart = try XCTUnwrap(gear.range(of: "private struct GearOptionDetailSheet"))
+        let detail = String(gear[detailStart.lowerBound...])
+
+        XCTAssertTrue(gear.contains("worn: worn"),
+                      "The detail must receive the exact currently worn piece")
+        XCTAssertTrue(detail.contains("Text(\"Compared with worn\")"))
+        XCTAssertTrue(detail.contains("comparisonRow(\"Worn now\""))
+        XCTAssertTrue(detail.contains("comparisonRow(\"This piece\""))
+        XCTAssertTrue(detail.contains("ImprovementBadge(delta: delta, slot: slot)"))
+        XCTAssertTrue(detail.contains("Button(\"Equip\")"))
+        XCTAssertTrue(detail.contains(".frame(maxWidth: .infinity, minHeight: 44)"))
+
+        let scrollEnd = try XCTUnwrap(detail.range(of: "\n            Divider()\n\n            VStack(alignment: .leading, spacing: 4)"))
+        let equip = try XCTUnwrap(detail.range(of: "Button(\"Equip\")"))
+        XCTAssertLessThan(scrollEnd.lowerBound, equip.lowerBound,
+                          "Equip must live outside and below the metadata ScrollView")
+        XCTAssertFalse(detail.contains("List {"),
+                       "The compact anchored detail must not recreate a full-screen settings list")
     }
 }
