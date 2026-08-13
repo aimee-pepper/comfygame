@@ -54,6 +54,17 @@ enum DistilleryRules {
         var id: String { "\(binID.rawValue)-\(sampleIndex)" }
     }
 
+    enum AttunementReadiness: Equatable, Sendable {
+        case ready
+        case stationLocked
+        case needsEssence(have: Int, need: Int)
+        case sampleUnavailable
+        case unsupportedCatalyst
+        case needsCatalyst(resource: ResourceID, have: Int, need: Int)
+        case needsBlankCrystal
+        case needsRoom
+    }
+
     static func candidates(for attunement: CoreAttunement, in state: GameState) -> [Candidate] {
         let requirement = requirement(for: attunement)
         return state.base.inventory.stacks.flatMap { bin in
@@ -103,18 +114,34 @@ enum DistilleryRules {
 
     static func canAttune(_ attunement: CoreAttunement, candidate: Candidate,
                           catalyst: ResourceID, in state: GameState) -> Bool {
+        readiness(attunement, candidate: candidate, catalyst: catalyst, in: state) == .ready
+    }
+
+    static func readiness(_ attunement: CoreAttunement, candidate: Candidate,
+                          catalyst: ResourceID, in state: GameState) -> AttunementReadiness {
         let requirement = requirement(for: attunement)
-        guard state.base.station(Stations.distillery).isUnlocked,
-              state.base.essence >= requirement.essence,
-              candidates(for: attunement, in: state).contains(candidate),
-              let required = requirement.catalysts.first(where: { $0.resource == catalyst }),
-              state.base.resources[catalyst] >= required.amount,
-              state.base.inventory.stacks.contains(where: { $0.catalogID == Items.essenceCrystal && $0.count > 0 })
-        else { return false }
+        guard state.base.station(Stations.distillery).isUnlocked else { return .stationLocked }
+        guard state.base.essence >= requirement.essence else {
+            return .needsEssence(have: state.base.essence, need: requirement.essence)
+        }
+        guard candidates(for: attunement, in: state).contains(candidate) else {
+            return .sampleUnavailable
+        }
+        guard let required = requirement.catalysts.first(where: { $0.resource == catalyst }) else {
+            return .unsupportedCatalyst
+        }
+        let catalystHeld = state.base.resources[catalyst]
+        guard catalystHeld >= required.amount else {
+            return .needsCatalyst(resource: catalyst, have: catalystHeld, need: required.amount)
+        }
+        guard state.base.inventory.stacks.contains(where: {
+            $0.catalogID == Items.essenceCrystal && $0.count > 0
+        }) else { return .needsBlankCrystal }
         let core = provenance(for: attunement, candidate: candidate,
                               catalyst: (required.resource, required.amount))
-        return canStore(output(catalogID: item(for: attunement), core: core), in: state,
-                        replacingOneBlank: true, consuming: candidate)
+        guard canStore(output(catalogID: item(for: attunement), core: core), in: state,
+                       replacingOneBlank: true, consuming: candidate) else { return .needsRoom }
+        return .ready
     }
 
     @discardableResult

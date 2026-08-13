@@ -57,15 +57,35 @@ struct DistilleryView: View {
                 if let chosen {
                     let preview = DistilledCore(attunement: attunement,
                                                 potency: DistilleryRules.potency(for: chosen))
+                    let readiness = DistilleryRules.readiness(
+                        attunement, candidate: chosen, catalyst: catalyst, in: store.state
+                    )
                     LabeledRow(icon: "gauge.with.dots.needle.50percent", label: "Potency",
                                value: "\(preview.potency) · \(preview.potencyBand)")
+                    Label(readinessText(readiness), systemImage: readiness == .ready
+                          ? "checkmark.circle.fill" : "exclamationmark.circle")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(readiness == .ready ? Color.green : Color.orange)
                     Button("Attune \(attunement.displayName) core") {
                         store.attuneCore(attunement, candidate: chosen, catalyst: catalyst)
                     }.buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
-                        .disabled(!DistilleryRules.canAttune(attunement, candidate: chosen,
-                                                            catalyst: catalyst, in: store.state))
+                        .disabled(readiness != .ready)
                 }
             }
+        }
+    }
+
+    private func readinessText(_ readiness: DistilleryRules.AttunementReadiness) -> String {
+        switch readiness {
+        case .ready: "Ready to attune"
+        case .stationLocked: "Distillery unavailable"
+        case .needsEssence(let have, let need): "Needs \(need) Essence · \(have) held"
+        case .sampleUnavailable: "Selected sample is no longer available"
+        case .unsupportedCatalyst: "Selected catalyst is not valid for this core"
+        case .needsCatalyst(let resource, let have, let need):
+            "Needs \(need) \(ContentCatalog.shared.resource(resource)?.name ?? resource.rawValue) · \(have) held"
+        case .needsBlankCrystal: "Needs one blank Essence Crystal"
+        case .needsRoom: "Needs room in the Storehouse"
         }
     }
 

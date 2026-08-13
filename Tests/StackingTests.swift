@@ -39,6 +39,40 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
         XCTAssertTrue(DistilleryRules.requirement(for: .light).accepts(luminous))
         XCTAssertFalse(DistilleryRules.requirement(for: .light).accepts(tooSoft))
     }
+
+    func testAttunementReadinessNamesTheExactMissingInput() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
+        state.base.essence = 0
+        let sample = MaterialSample(kind: .reagent,
+            properties: MaterialProperties(insulation: 30, reactivity: 80),
+            grade: 70, source: "ashen bloom")
+        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.material,
+                                           material: sample))
+        let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
+
+        XCTAssertEqual(DistilleryRules.readiness(.heat, candidate: candidate,
+                                                  catalyst: Resources.sulfur, in: state),
+                       .needsEssence(have: 0, need: DistilleryRules.attuneEssence))
+
+        state.base.essence = DistilleryRules.attuneEssence
+        XCTAssertEqual(DistilleryRules.readiness(.heat, candidate: candidate,
+                                                  catalyst: Resources.sulfur, in: state),
+                       .needsCatalyst(resource: Resources.sulfur, have: 0, need: 2))
+
+        state.base.resources.add(2, of: Resources.sulfur)
+        XCTAssertEqual(DistilleryRules.readiness(.heat, candidate: candidate,
+                                                  catalyst: Resources.sulfur, in: state),
+                       .needsBlankCrystal)
+
+        state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2),
+                                           catalogID: Items.essenceCrystal,
+                                           distilledCore: DistilledCore(attunement: nil, potency: 0)))
+        XCTAssertEqual(DistilleryRules.readiness(.heat, candidate: candidate,
+                                                  catalyst: Resources.sulfur, in: state), .ready)
+        XCTAssertTrue(DistilleryRules.canAttune(.heat, candidate: candidate,
+                                                catalyst: Resources.sulfur, in: state))
+    }
 }
 
 /// Items stack, and materials bin by kind (decisions-session-16 §1).
