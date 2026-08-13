@@ -92,6 +92,27 @@ final class SpilloverTests: XCTestCase {
         XCTAssertTrue(anchorage.contains(".disabled(store.state.base.essence < cost)"))
     }
 
+    func testAnchorageReportsStaleAssignmentRevisitAndReactivationFailures() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+            encoding: .utf8
+        )
+        let start = try XCTUnwrap(source.range(of: "struct AnchorageView"))
+        let end = try XCTUnwrap(source.range(
+            of: "private extension AnchorRoute",
+            range: start.upperBound..<source.endIndex
+        ))
+        let anchorage = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(anchorage.contains("if store.assignCompanion(index, toAnchoredRealm: realm.id)"))
+        XCTAssertTrue(anchorage.contains("if store.revisitAnchoredRealm(realm.id)"))
+        XCTAssertTrue(anchorage.contains("if store.reactivateAnchoredRealm(realm.id)"))
+        XCTAssertTrue(anchorage.contains("Anchorage action not completed"))
+        XCTAssertFalse(anchorage.contains("Button(store.state.base.roster[index].name) {\n                                            store.assignCompanion"))
+    }
+
     func testStorehouseSortingActionsRemainOutsideScrollableDetails() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

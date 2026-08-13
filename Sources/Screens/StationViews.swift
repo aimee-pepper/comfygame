@@ -204,6 +204,7 @@ struct WayfarersTableView: View {
 
 struct AnchorageView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var actionFailure: String?
 
     var body: some View {
         ScrollView {
@@ -285,7 +286,11 @@ struct AnchorageView: View {
                                 Menu {
                                     ForEach(store.state.base.roster.indices, id: \.self) { index in
                                         Button(store.state.base.roster[index].name) {
-                                            store.assignCompanion(index, toAnchoredRealm: realm.id)
+                                            if store.assignCompanion(index, toAnchoredRealm: realm.id) {
+                                                actionFailure = nil
+                                            } else {
+                                                actionFailure = "That traveller or realm changed. Review the current assignments and try again."
+                                            }
                                         }
                                     }
                                 } label: {
@@ -296,7 +301,11 @@ struct AnchorageView: View {
                                     .font(.caption2).foregroundStyle(.secondary)
                             }
                             Button {
-                                store.revisitAnchoredRealm(realm.id)
+                                if store.revisitAnchoredRealm(realm.id) {
+                                    actionFailure = nil
+                                } else {
+                                    actionFailure = "The realm cannot be revisited now. Check that no expedition is active and the realm is not dormant."
+                                }
                             } label: {
                                 Label("Revisit realm", systemImage: "arrow.up.forward.circle.fill")
                                     .frame(maxWidth: .infinity)
@@ -309,7 +318,11 @@ struct AnchorageView: View {
                                                realm.projectedShortfall)
                                 let missingEssence = max(0, cost - store.state.base.essence)
                                 Button {
-                                    store.reactivateAnchoredRealm(realm.id)
+                                    if store.reactivateAnchoredRealm(realm.id) {
+                                        actionFailure = nil
+                                    } else {
+                                        actionFailure = "The realm state or available Essence changed. Review it and try again."
+                                    }
                                 } label: {
                                     Label("Reactivate · \(cost) essence", systemImage: "sunrise.fill")
                                         .frame(maxWidth: .infinity).frame(minHeight: 44)
@@ -331,6 +344,14 @@ struct AnchorageView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Anchorage")
         .navigationBarTitleDisplayMode(.inline)
+        .alert("Anchorage action not completed", isPresented: Binding(
+            get: { actionFailure != nil },
+            set: { if !$0 { actionFailure = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(actionFailure ?? "The Anchorage changed before the action completed.")
+        }
     }
 }
 
