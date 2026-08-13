@@ -2095,6 +2095,21 @@ final class CombatTests: XCTestCase {
         XCTAssertTrue(source.contains("Contact priority places this actor before ordinary initiative totals."))
     }
 
+    func testCarriedRemediesChooseOneCompactItemBeforeListingRecipients() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent("Sources/Screens/EncounterView.swift"),
+                                encoding: .utf8)
+        let sheetStart = try XCTUnwrap(source.range(of: "private struct CombatItemSheet"))
+        let sheet = String(source[sheetStart.lowerBound...])
+
+        XCTAssertTrue(sheet.contains("SixAcrossItemGrid(data: store.usableItems"))
+        XCTAssertTrue(sheet.contains("selectedStackID = stack.id"))
+        XCTAssertTrue(sheet.contains("LazyVGrid(columns: recipientColumns"))
+        XCTAssertTrue(sheet.contains("beginUse(stack, on: ally)"))
+        XCTAssertFalse(sheet.contains("ForEach(store.usableItems) { stack in\n                    if let item"),
+                       "remedies must not duplicate a full recipient list beneath every item")
+    }
+
     func testFrozenDebugV2ReceiptUsesOnlyTheMatchingExactNode() throws {
         let heavy = CombatDerivedStatsRules.Node.heavyHand
         let keen = CombatDerivedStatsRules.Node.keenEye

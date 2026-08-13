@@ -746,49 +746,75 @@ private struct CombatItemSheet: View {
     @Environment(\.dismiss) private var dismiss
     let onCommit: (CombatItemUseQuote) -> CombatItemUseCommitResult
     @State private var refusalMessage: String?
+    @State private var selectedStackID: InstanceID?
 
     private var livingParty: [Combatant] {
         guard let run = store.activeRun else { return [] }
         return CombatRules.party(of: store.state).filter { CombatRules.isAlive($0, in: run) }
     }
 
+    private var selectedStack: ItemStack? {
+        store.usableItems.first { $0.id == selectedStackID }
+    }
+
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(store.usableItems) { stack in
-                    if let item = ContentCatalog.shared.item(stack.catalogID) {
-                        Section {
-                            ForEach(livingParty, id: \.self) { ally in
-                                Button {
-                                    beginUse(stack, on: ally)
-                                } label: {
-                                    HStack {
-                                        Text("Use on \(name(of: ally))")
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .font(.caption)
-                                            .foregroundStyle(.tertiary)
-                                    }
-                                    .frame(minHeight: 36)
-                                }
-                            }
-                        } header: {
-                            HStack(spacing: 8) {
-                                CatalogueItemPixelIdentity(
-                                    itemID: stack.catalogID,
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("Choose a remedy")
+                        .font(.headline)
+
+                    SixAcrossItemGrid(data: store.usableItems, id: \.id) { stack in
+                        if let item = ContentCatalog.shared.item(stack.catalogID) {
+                            Button {
+                                selectedStackID = stack.id
+                            } label: {
+                                ItemIconTile(
+                                    icon: item.icon,
+                                    catalogueID: stack.catalogID,
+                                    rarity: item.rarity,
+                                    quantity: stack.count,
                                     identified: stack.identified,
-                                    fallbackSystemIcon: item.icon,
-                                    fallbackColor: item.rarity.tint
+                                    location: .carried,
+                                    accessibilityName: item.name,
+                                    isSelected: selectedStackID == stack.id
                                 )
-                                .frame(width: 28, height: 28)
-                                Text(stack.count > 1 ? "\(item.name) ×\(stack.count)" : item.name)
                             }
-                            .accessibilityElement(children: .combine)
-                        } footer: {
-                            Text(itemEffect(item))
+                            .buttonStyle(.plain)
                         }
                     }
+
+                    if let stack = selectedStack,
+                       let item = ContentCatalog.shared.item(stack.catalogID) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(stack.count > 1 ? "\(item.name) ×\(stack.count)" : item.name)
+                                .font(.headline)
+                            Text(itemEffect(item))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            Text("Use on")
+                                .font(.subheadline.weight(.semibold))
+                            LazyVGrid(columns: recipientColumns, spacing: 8) {
+                                ForEach(livingParty, id: \.self) { ally in
+                                    Button(name(of: ally)) {
+                                        beginUse(stack, on: ally)
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .frame(maxWidth: .infinity, minHeight: 44)
+                                }
+                            }
+                        }
+                        .padding(12)
+                        .background(Color(.secondarySystemGroupedBackground),
+                                    in: RoundedRectangle(cornerRadius: 12))
+                    } else {
+                        Text("Select a remedy to choose who uses it.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
+                .padding(16)
             }
             .navigationTitle("Carried remedies")
             .navigationBarTitleDisplayMode(.inline)
@@ -819,6 +845,10 @@ private struct CombatItemSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    private var recipientColumns: [GridItem] {
+        [GridItem(.flexible(), spacing: 8), GridItem(.flexible())]
     }
 
     private struct PendingSelection {
