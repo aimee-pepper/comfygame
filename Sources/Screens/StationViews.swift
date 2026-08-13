@@ -376,6 +376,7 @@ private struct SpilloverDetailSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     @State private var isMakingRoom = false
+    @State private var isConfirmingDiscard = false
     @State private var refusal: String?
     let spilled: ItemStack
 
@@ -418,6 +419,17 @@ private struct SpilloverDetailSheet: View {
             .sheet(isPresented: $isMakingRoom) {
                 SwapSheet(spilled: spilled).environmentObject(store)
             }
+            .confirmationDialog(
+                "Throw away \(displaySpilled.displayName)?",
+                isPresented: $isConfirmingDiscard,
+                titleVisibility: .visible
+            ) {
+                Button("Throw away \(displaySpilled.displayName)", role: .destructive,
+                       action: discard)
+                Button("Keep it waiting", role: .cancel) {}
+            } message: {
+                Text("This permanently removes the item from the waiting pile.")
+            }
         }
     }
 
@@ -425,7 +437,9 @@ private struct SpilloverDetailSheet: View {
         PersistentActionBar(message: refusal ?? "Nothing changes until one of these actions succeeds.",
                             messageTint: refusal == nil ? .secondary : .red) {
             HStack(spacing: 10) {
-                Button(role: .destructive, action: discard) {
+                Button(role: .destructive) {
+                    isConfirmingDiscard = true
+                } label: {
                     Text("Throw away").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)

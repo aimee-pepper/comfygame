@@ -96,6 +96,20 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
 /// Items stack, and materials bin by kind (decisions-session-16 §1).
 final class StackingTests: XCTestCase {
 
+    func testStorehouseWaitingItemRequiresExactDestructiveConfirmation() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("Throw away \\(displaySpilled.displayName)?"))
+        XCTAssertTrue(source.contains("This permanently removes the item from the waiting pile."))
+        XCTAssertTrue(source.contains("Button(\"Keep it waiting\", role: .cancel)"))
+        XCTAssertFalse(source.contains("Button(role: .destructive, action: discard)"))
+    }
+
     func testDistilledCoresStackOnlyWhenDisplayProvenanceMatches() {
         var inventory = Inventory(slots: 8)
         let first = DistilledCore(attunement: .heat, potency: 70, sampleKind: "reagent",
