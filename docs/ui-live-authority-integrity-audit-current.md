@@ -51,6 +51,12 @@ iPhone; physical visual acceptance remains explicitly open until Aimee confirms 
 build rather than an earlier inferred-frame build. The permanent acceptance rules at the end of this
 document are executable gates where the relevant surface has a testable authority seam.
 
+The subsequent diagnostic-provenance completion removes the remaining misleading runtime/export
+names `installedCheckpoint` and `roadmapCheckpoint`: current reports encode
+`bundledRoadmapClaim`, while the old key decodes only as an explicitly historical legacy claim.
+Focused reporter/roadmap evidence is 21/21 and the exact final complete suite is 1,238/1,238 with
+zero failures or skips.
+
 Confirmed defects:
 
 - 2 P0 fabricated determinate progress authorities for the same launch work.

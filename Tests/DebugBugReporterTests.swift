@@ -59,14 +59,20 @@ final class DebugBugReporterTests: XCTestCase {
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil).filter { !$0.lastPathComponent.hasPrefix(".") }.count, 1)
     }
 
-    func testReportCapturesTheActivelyBundledRoadmapCheckpoint() {
+    func testReportEncodesBundledRoadmapClaimWithoutInventingInstalledCheckpoint() throws {
         var report = DebugBugReport(id: UUID(), createdAt: Date(), whatHappened: "x", expected: "",
             includesScreenshot: false, screenshotWidth: nil, screenshotHeight: nil, screenshotScale: nil,
             appVersion: "1", build: "1", screen: "base", saveSchemaVersion: 1,
             mutationCount: 0, lastAction: "new",
             runIndex: nil, mapSeed: nil, playerX: nil, playerY: nil, stability: nil, outcomeID: nil)
-        report.roadmapCheckpoint = DebugRoadmap.current.installedCheckpoint
-        XCTAssertEqual(report.roadmapCheckpoint, DebugRoadmap.current.installedCheckpoint)
+        report.bundledRoadmapClaim = DebugRoadmap.current.bundledCheckpointClaim
+
+        let encoded = try JSONEncoder().encode(report)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        XCTAssertEqual(object["bundledRoadmapClaim"] as? String,
+                       DebugRoadmap.current.bundledCheckpointClaim)
+        XCTAssertNil(object["roadmapCheckpoint"],
+                     "new reports must not serialize a planning claim under installed provenance")
     }
 
     func testOlderSavedReportWithoutRoadmapCheckpointStillDecodes() throws {
@@ -78,15 +84,36 @@ final class DebugBugReporterTests: XCTestCase {
             playerX: nil, playerY: nil, stability: nil, outcomeID: nil)
         let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
         var object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoder.encode(report)) as? [String: Any])
+        object.removeValue(forKey: "bundledRoadmapClaim")
         object.removeValue(forKey: "roadmapCheckpoint")
         object.removeValue(forKey: "debugTuningSnapshot")
         object.removeValue(forKey: "encounterScalingEvidence")
         let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
         let decoded = try decoder.decode(DebugBugReport.self,
                                          from: JSONSerialization.data(withJSONObject: object))
-        XCTAssertNil(decoded.roadmapCheckpoint)
+        XCTAssertNil(decoded.bundledRoadmapClaim)
+        XCTAssertNil(decoded.legacyRoadmapCheckpointClaim)
         XCTAssertNil(decoded.debugTuningSnapshot)
         XCTAssertNil(decoded.encounterScalingEvidence)
+    }
+
+    func testLegacyRoadmapCheckpointDecodesOnlyAsHistoricalClaim() throws {
+        let report = DebugBugReport(id: UUID(), createdAt: Date(timeIntervalSince1970: 1),
+            whatHappened: "older report", expected: "", includesScreenshot: false,
+            screenshotWidth: nil, screenshotHeight: nil, screenshotScale: nil,
+            appVersion: "1", build: "1", screen: "base", saveSchemaVersion: 1,
+            mutationCount: 0, lastAction: "new", runIndex: nil, mapSeed: nil,
+            playerX: nil, playerY: nil, stability: nil, outcomeID: nil)
+        let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoder.encode(report)) as? [String: Any])
+        object["roadmapCheckpoint"] = "historical bundled claim"
+        object.removeValue(forKey: "bundledRoadmapClaim")
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        let decoded = try decoder.decode(DebugBugReport.self,
+                                         from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertEqual(decoded.legacyRoadmapCheckpointClaim, "historical bundled claim")
+        XCTAssertNil(decoded.bundledRoadmapClaim,
+                     "legacy naming must not be silently promoted to installed provenance")
     }
 
     @MainActor

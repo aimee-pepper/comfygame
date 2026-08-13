@@ -50,7 +50,7 @@ struct DebugRoadmapView: View {
             }
 
             Section("Bundled planning snapshot") {
-                LabeledContent("Checkpoint claimed by this bundle", value: board.installedCheckpoint)
+                LabeledContent("Checkpoint claimed by this bundle", value: board.bundledCheckpointClaim)
                 LabeledContent("Essence baseline", value: board.essenceBaseline)
                 LabeledContent("Current work", value: board.currentWork)
                 Text(board.currentNote)
@@ -165,12 +165,18 @@ enum DebugRoadmap {
     struct Board: Codable {
         let schemaVersion: Int
         let updated: String
-        let installedCheckpoint: String
+        let bundledCheckpointClaim: String
         let essenceBaseline: String
         let currentWork: String
         let currentNote: String
         let items: [Item]
         let paused: [String]
+
+        private enum CodingKeys: String, CodingKey {
+            case schemaVersion, updated
+            case bundledCheckpointClaim = "installedCheckpoint"
+            case essenceBaseline, currentWork, currentNote, items, paused
+        }
     }
 
     static let current: Board = {

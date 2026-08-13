@@ -196,7 +196,7 @@ private struct DebugBugReportSheet: View {
                         .accessibilityLabel("What did you expect? Optional")
                 }
                 Section("Captured context") {
-                    LabeledContent("Bundled roadmap claim", value: DebugRoadmap.current.installedCheckpoint)
+                    LabeledContent("Bundled roadmap claim", value: DebugRoadmap.current.bundledCheckpointClaim)
                     LabeledContent("Mode", value: draft.context.screen)
                     if let route = draft.context.route { LabeledContent("Screen", value: route) }
                     if let campaign = draft.context.campaignReference {
@@ -278,7 +278,7 @@ private struct DebugBugReportSheet: View {
         report.encounterScalingEvidence = draft.context.encounterScalingEvidence
         report.debugTuningSnapshot = draft.context.debugTuningSnapshot
         report.semanticActionTrail = draft.context.semanticActionTrail
-        report.roadmapCheckpoint = DebugRoadmap.current.installedCheckpoint
+        report.bundledRoadmapClaim = DebugRoadmap.current.bundledCheckpointClaim
         do {
             savedPackage = try DebugBugReportWorkflow(outbox: .live)
                 .saveOnThisPhone(report, screenshot: screenshot?.png)

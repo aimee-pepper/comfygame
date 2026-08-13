@@ -17,7 +17,11 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
     var screenshotScale: Double?
     var appVersion: String
     var build: String
-    var roadmapCheckpoint: String? = nil
+    /// The planning claim bundled with this build. This is not observed installed-commit provenance.
+    var bundledRoadmapClaim: String? = nil
+    /// Decode-only compatibility for reports written before the authority label was corrected.
+    /// New reports never populate or encode this key.
+    var legacyRoadmapCheckpointClaim: String? = nil
     var screen: String
     var route: String? = nil
     var campaignReference: String? = nil
@@ -37,6 +41,17 @@ struct DebugBugReport: Codable, Equatable, Identifiable, Sendable {
     var encounterScalingEvidence: DebugEncounterScalingEvidence? = nil
     var transportState: TransportState = .unsent
     var remoteReference: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case id, schemaVersion, createdAt, whatHappened, expected, includesScreenshot
+        case screenshotWidth, screenshotHeight, screenshotScale, appVersion, build
+        case bundledRoadmapClaim
+        case legacyRoadmapCheckpointClaim = "roadmapCheckpoint"
+        case screen, route, campaignReference, encounterID, debugTuningSnapshot
+        case saveSchemaVersion, mutationCount, lastAction, semanticActionTrail
+        case runIndex, mapSeed, playerX, playerY, stability, outcomeID
+        case encounterScalingEvidence, transportState, remoteReference
+    }
 }
 
 struct DebugEncounterScalingEvidence: Codable, Equatable, Sendable {
