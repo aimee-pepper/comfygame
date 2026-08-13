@@ -26,6 +26,20 @@ final class EssenceSpringRefiningTests: XCTestCase {
         XCTAssertTrue(source.contains("Text(result).font(.caption2).monospacedDigit().opacity(0.82)"))
     }
 
+    func testUnidentifiedCuriosUseTheSharedDisclosureNeutralItemIdentity() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/SpendingViews.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("CatalogueItemPixelIdentity("))
+        XCTAssertTrue(source.contains("itemID: stack.catalogID"))
+        XCTAssertTrue(source.contains("identified: stack.identified"))
+        XCTAssertTrue(source.contains("fallbackSystemIcon: stack.icon"))
+    }
+
     func testBaselineSelectedRefinementIsExactAndBuildsPractice() {
         let store = store()
         store.mutate("raw") { state in

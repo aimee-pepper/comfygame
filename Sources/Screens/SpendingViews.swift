@@ -78,7 +78,13 @@ struct IdentifyCard: View {
             ForEach(store.unidentifiedStacks) { stack in
                 let curio = ContentCatalog.shared.item(stack.catalogID)
                 HStack(spacing: 10) {
-                    Image(systemName: stack.icon).frame(width: 22).foregroundStyle(stack.rarity.tint)
+                    CatalogueItemPixelIdentity(
+                        itemID: stack.catalogID,
+                        identified: stack.identified,
+                        fallbackSystemIcon: stack.icon,
+                        fallbackColor: stack.rarity.tint
+                    )
+                    .frame(width: 32, height: 32)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(stack.displayName).font(.callout).foregroundStyle(stack.rarity.tint)
                         Text(curio?.blurb ?? "").font(.caption).foregroundStyle(.secondary)
