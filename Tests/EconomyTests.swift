@@ -378,6 +378,53 @@ final class EconomyTests: XCTestCase {
         XCTAssertEqual(store.state.worlds.activeRun?.satchelItems.stacks.first?.count, 2)
     }
 
+    func testLootSwapQuoteRefusesWhenRemovalWouldStillLeaveNoCapacity() throws {
+        let store = richStore()
+        store.write("plains")
+        store.bindAndDepart()
+        let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
+        let carried = ItemStack(id: InstanceID(rawValue: 21), catalogID: curio.id)
+        let offered = ItemStack(id: InstanceID(rawValue: 22), catalogID: curio.id)
+        store.mutate("prepare impossible zero-slot swap") { state in
+            state.worlds.activeRun?.satchelItems = Inventory(slots: 0, stacks: [carried])
+            state.worlds.activeRun?.offeredItems = [offered]
+        }
+
+        guard case .refused = store.lootSwapQuote(offered: offered, dropping: carried) else {
+            return XCTFail("A swap whose add would fail was quoted as allowed")
+        }
+        XCTAssertEqual(store.pendingLoot, [offered])
+        XCTAssertEqual(store.state.worlds.activeRun?.satchelItems.stacks, [carried])
+    }
+
+    func testCapacityMutationAfterLootQuoteRefusesWithNoLoss() throws {
+        let store = richStore()
+        store.write("plains")
+        store.bindAndDepart()
+        let curio = try XCTUnwrap(ContentCatalog.shared.items.first { $0.kind == .curio })
+        let carried = ItemStack(id: InstanceID(rawValue: 31), catalogID: curio.id)
+        let offered = ItemStack(id: InstanceID(rawValue: 32), catalogID: curio.id)
+        store.mutate("prepare capacity quote") { state in
+            state.worlds.activeRun?.satchelItems = Inventory(slots: 1, stacks: [carried])
+            state.worlds.activeRun?.offeredItems = [offered]
+        }
+        guard case .allowed(let quote) = store.lootSwapQuote(offered: offered, dropping: carried) else {
+            return XCTFail("The initial capacity-safe swap did not quote")
+        }
+        store.mutate("remove capacity behind open detail") { state in
+            state.worlds.activeRun?.satchelItems.slots = 0
+        }
+
+        guard case .refused = store.takeOffered(quote) else {
+            return XCTFail("A quote committed after its add capacity disappeared")
+        }
+        let run = try XCTUnwrap(store.state.worlds.activeRun)
+        XCTAssertEqual(run.offeredItems, [offered], "refusal must preserve offered loot")
+        XCTAssertEqual(run.satchelItems.stacks, [carried], "refusal must preserve carried loot")
+        XCTAssertEqual(run.offeredItems.count + run.satchelItems.stacks.count, 2,
+                       "a failed atomic swap must neither lose nor duplicate an item")
+    }
+
     func testLootCanBeLeftBehind() throws {
         let store = richStore()
         store.write("plains")

@@ -7,6 +7,7 @@ enum RosterPlacement: Equatable, Sendable {
 }
 
 struct SpilloverStoreQuote: Equatable, Sendable { let spilled: ItemStack }
+struct SpilloverDiscardQuote: Equatable, Sendable { let spilled: ItemStack }
 struct SpilloverSwapQuote: Equatable, Sendable {
     let spilled: ItemStack
     let stored: ItemStack
@@ -14,6 +15,11 @@ struct SpilloverSwapQuote: Equatable, Sendable {
 
 enum SpilloverStoreEvaluation: Equatable, Sendable {
     case allowed(SpilloverStoreQuote)
+    case refused(String)
+}
+
+enum SpilloverDiscardEvaluation: Equatable, Sendable {
+    case allowed(SpilloverDiscardQuote)
     case refused(String)
 }
 
@@ -409,10 +415,31 @@ extension GameStore {
 
     /// Throw a spilled stack away. Deliberate, explicit, and the *only* way loot leaves the game
     /// once it's been banked — nothing may discard on the player's behalf (Q10).
-    func discardSpilled(_ stack: ItemStack) {
-        mutate("discard spilled item", flush: true) { state in
-            state.base.spillover.removeAll { $0.id == stack.id }
+    func discardSpilledQuote(_ stack: ItemStack) -> SpilloverDiscardEvaluation {
+        guard state.base.spillover.contains(stack) else {
+            return .refused("That waiting stack has changed.")
         }
+        return .allowed(.init(spilled: stack))
+    }
+
+    @discardableResult
+    func discardSpilled(_ quote: SpilloverDiscardQuote) -> CurrentStateCommitResult {
+        guard case .allowed(let fresh) = discardSpilledQuote(quote.spilled), fresh == quote else {
+            return .refused("The waiting pile changed. Review it and try again.")
+        }
+        var committed = false
+        mutate("discard spilled item", flush: true) { state in
+            guard state.base.spillover.contains(quote.spilled) else { return }
+            state.base.spillover.removeAll { $0.id == quote.spilled.id }
+            committed = true
+        }
+        return committed ? .committed
+            : .refused("The waiting pile changed. Review it and try again.")
+    }
+
+    func discardSpilled(_ stack: ItemStack) {
+        guard case .allowed(let quote) = discardSpilledQuote(stack) else { return }
+        _ = discardSpilled(quote)
     }
 
     /// Swap a spilled stack for one already stored, when the Storehouse is full and the player

@@ -366,8 +366,16 @@ private struct SpilloverDetailSheet: View {
                         }
                     }
                     Button("Throw away", role: .destructive) {
-                        store.discardSpilled(spilled)
-                        dismiss()
+                        guard let currentSpilled,
+                              case .allowed(let quote) = store.discardSpilledQuote(currentSpilled)
+                        else {
+                            refusal = "The waiting pile changed. Review it and try again."
+                            return
+                        }
+                        switch store.discardSpilled(quote) {
+                        case .committed: dismiss()
+                        case .refused(let message): refusal = message
+                        }
                     }
                 }
                 if let refusal {
@@ -394,19 +402,32 @@ private struct SwapSheet: View {
     let spilled: ItemStack
     @State private var opened: ItemStack?
 
+    private var currentSpilled: ItemStack? {
+        store.spillover.first { $0.id == spilled.id }
+    }
+    private var displaySpilled: ItemStack { currentSpilled ?? spilled }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Making room for").font(.headline)
                     HStack(spacing: 12) {
-                        ItemIconTile(icon: spilled.icon, catalogueID: spilled.catalogID,
-                                     rarity: spilled.rarity,
-                                     quantity: spilled.count, identified: spilled.identified,
+                        ItemIconTile(icon: displaySpilled.icon, catalogueID: displaySpilled.catalogID,
+                                     rarity: displaySpilled.rarity,
+                                     quantity: displaySpilled.count, identified: displaySpilled.identified,
                                      location: .waiting,
-                                     accessibilityName: spilled.displayName)
+                                     accessibilityName: displaySpilled.displayName)
                             .frame(width: 52, height: 52)
-                        Text(spilled.displayName).font(.callout.weight(.medium))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(displaySpilled.displayName).font(.callout.weight(.medium))
+                            if currentSpilled == nil {
+                                Text("No longer waiting").font(.caption).foregroundStyle(.red)
+                            } else {
+                                Text("Quantity \(displaySpilled.count)")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
                     }
                     Text("Choose what returns to the waiting pile").font(.headline)
                     SixAcrossItemGrid(data: store.state.base.inventory.stacks, id: \.id) { stored in

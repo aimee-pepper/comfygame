@@ -126,6 +126,69 @@ final class SpilloverTests: XCTestCase {
         XCTAssertTrue(store.state.base.inventory.stacks.isEmpty)
     }
 
+    func testStaleDiscardQuoteCannotDeleteAChangedWaitingStack() throws {
+        let store = makeStore()
+        let spilled = stack("discard-stale")
+        store.mutate("prepare discard quote") { $0.base.spillover = [spilled] }
+        guard case .allowed(let quote) = store.discardSpilledQuote(spilled) else {
+            return XCTFail("Current waiting stack did not quote for discard")
+        }
+        store.mutate("change waiting stack behind discard confirmation") {
+            $0.base.spillover[0].count = 2
+        }
+
+        guard case .refused = store.discardSpilled(quote) else {
+            return XCTFail("A stale discard quote deleted the changed stack")
+        }
+        XCTAssertEqual(store.spillover.first?.count, 2)
+        XCTAssertEqual(store.spillover.count, 1)
+    }
+
+    func testCapacityMutationAfterStoreQuoteRefusesWithoutLossOrDuplication() throws {
+        let store = makeStore()
+        let spilled = stack("capacity-stale")
+        store.mutate("prepare capacity-safe store") {
+            $0.base.inventory = Inventory(slots: 1)
+            $0.base.spillover = [spilled]
+        }
+        guard case .allowed(let quote) = store.storeSpilledQuote(spilled) else {
+            return XCTFail("Capacity-safe store did not quote")
+        }
+        store.mutate("fill Storehouse behind store confirmation") {
+            $0.base.inventory.stacks = [self.stack("new-occupant")]
+        }
+
+        guard case .refused = store.storeSpilled(quote) else {
+            return XCTFail("Store committed after capacity disappeared")
+        }
+        XCTAssertEqual(store.spillover, [spilled])
+        XCTAssertEqual(store.state.base.inventory.stacks.count, 1)
+        XCTAssertEqual(store.spillover.count + store.state.base.inventory.stacks.count, 2)
+    }
+
+    func testCapacityMutationAfterSwapQuoteRefusesWithoutLossOrDuplication() throws {
+        let store = makeStore()
+        let spilled = stack("swap-capacity-stale")
+        let stored = stack("swap-stored")
+        store.mutate("prepare capacity-safe swap") {
+            $0.base.inventory = Inventory(slots: 1, stacks: [stored])
+            $0.base.spillover = [spilled]
+        }
+        guard case .allowed(let quote) = store.swapSpilledQuote(spilled, for: stored) else {
+            return XCTFail("Capacity-safe swap did not quote")
+        }
+        store.mutate("remove Storehouse capacity behind swap confirmation") {
+            $0.base.inventory.slots = 0
+        }
+
+        guard case .refused = store.swapSpilled(quote) else {
+            return XCTFail("Swap committed after capacity disappeared")
+        }
+        XCTAssertEqual(store.spillover, [spilled])
+        XCTAssertEqual(store.state.base.inventory.stacks, [stored])
+        XCTAssertEqual(store.spillover.count + store.state.base.inventory.stacks.count, 2)
+    }
+
     func testSpilloverSurvivesAForceQuit() {
         let io = SaveFileIO.temporary(name: "spillover-\(UUID().uuidString)")
         let spilled = stack("spilled")
