@@ -390,6 +390,11 @@ final class EconomyTests: XCTestCase {
         let priorityList = try XCTUnwrap(source.range(of: "List {"))
         XCTAssertLessThan(action.lowerBound, priorityList.lowerBound)
         XCTAssertEqual(source.components(separatedBy: "Label(\"Write a rule\"").count - 1, 1)
+        XCTAssertTrue(source.contains("if !store.canEditGambits"))
+        XCTAssertTrue(source.contains("Rules can be changed at Home between expeditions."))
+        XCTAssertTrue(source.contains("if store.addBlankGambit(for: owner)"))
+        XCTAssertTrue(source.contains("Rule not written"))
+        XCTAssertTrue(source.contains("No owned subject and action are available for a new rule."))
     }
 
     func testRuleBuilderReportsAStaleWriteFailure() throws {

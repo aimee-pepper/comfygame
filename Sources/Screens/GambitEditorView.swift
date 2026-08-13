@@ -18,6 +18,7 @@ struct GambitEditorView: View {
     @EnvironmentObject private var store: GameStore
     let owner: Combatant
     @State private var pendingDeletionID: InstanceID?
+    @State private var writeFailure: String?
 
     private var gambits: [GambitRule] { store.gambits(for: owner) }
     /// **This person's list, this person's length.** Wit governs how long a rule list somebody can
@@ -44,13 +45,25 @@ struct GambitEditorView: View {
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
 
-            Button { store.addBlankGambit(for: owner) } label: {
+            Button {
+                if store.addBlankGambit(for: owner) {
+                    writeFailure = nil
+                } else {
+                    writeFailure = "No owned subject and action are available for a new rule."
+                }
+            } label: {
                 Label("Write a rule", systemImage: "plus.circle")
                     .font(.caption)
                     .frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.bordered)
             .disabled(!store.canEditGambits)
+
+            if !store.canEditGambits {
+                Text("Rules can be changed at Home between expeditions.")
+                    .font(.caption2)
+                    .foregroundStyle(.orange)
+            }
 
             if gambits.isEmpty {
                 EmptyNote(owner == .binder
@@ -98,6 +111,14 @@ struct GambitEditorView: View {
             Button("Delete rule", role: .destructive) { confirmDeletion() }
         } message: {
             Text(deletionMessage)
+        }
+        .alert("Rule not written", isPresented: Binding(
+            get: { writeFailure != nil },
+            set: { if !$0 { writeFailure = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(writeFailure ?? "A new rule could not be written.")
         }
     }
 
