@@ -50,12 +50,9 @@ enum AuthoredTextAtlas {
 
     /// Review-only meeting prose stays in Design's markdown until Aimee approves it. The atlas
     /// nevertheless accounts for that material rather than calling these travellers simply absent.
-    static let draftMeetingIDs: Set<TravellerID> = [
-        "bryn", "orsa", "vance", "noll", "talin", "nessa",
-        "corrin", "dagg", "rook", "lys", "bracken", "fen",
-        "wren", "kestrel", "maud", "marrick", "sabine", "grimmond",
-        "oda", "ashe", "perren", "nine"
-    ]
+    static var draftMeetingIDs: Set<TravellerID> {
+        Set(DraftMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
+    }
 
     static func inventory(catalogue: ContentCatalog = .shared) -> [TravellerEntry] {
         catalogue.travellers

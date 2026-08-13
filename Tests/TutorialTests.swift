@@ -271,22 +271,26 @@ final class TutorialTests: XCTestCase {
         XCTAssertNil(reverted.tutorial.pendingComparisonOriginID)
     }
 
-    func testComparisonLabelsAddedRemovedReplacedAndUnchangedWithoutColour() {
+    func testComparisonLabelsAddedRemovedChangedAndUnchangedWithoutColour() {
         let earlier = history(id: 41, run: 1,
             requests: ["Illumination ← Sun", "Thermal ← Magma", "Relief ← Plain"])
         let later = history(id: 42, run: 2,
             requests: ["Illumination ← Moon", "Atmosphere ← Wind", "Relief ← Plain"])
         let earlyKinds = Dictionary(uniqueKeysWithValues:
             WorldComparisonSheet.labelledChanges(for: earlier, against: later, isLater: false)
-                .map { ($0.line, $0.kind) })
+                .map { ($0.key, $0.kind) })
         let laterKinds = Dictionary(uniqueKeysWithValues:
             WorldComparisonSheet.labelledChanges(for: later, against: earlier, isLater: true)
-                .map { ($0.line, $0.kind) })
-        XCTAssertEqual(earlyKinds["Thermal ← Magma"], "Removed")
-        XCTAssertEqual(laterKinds["Atmosphere ← Wind"], "Added")
-        XCTAssertEqual(earlyKinds["Illumination ← Sun"], "Replaced")
-        XCTAssertEqual(laterKinds["Illumination ← Moon"], "Replaced")
-        XCTAssertEqual(laterKinds["Relief ← Plain"], "Unchanged")
+                .map { ($0.key, $0.kind) })
+        XCTAssertEqual(earlyKinds["Thermal"], "Removed")
+        XCTAssertEqual(laterKinds["Atmosphere"], "Added")
+        XCTAssertEqual(earlyKinds["Illumination"], "Changed")
+        XCTAssertEqual(laterKinds["Illumination"], "Changed")
+        XCTAssertEqual(laterKinds["Relief"], "Unchanged")
+        let earlyLines = Dictionary(uniqueKeysWithValues:
+            WorldComparisonSheet.labelledChanges(for: earlier, against: later, isLater: false)
+                .map { ($0.key, $0.line) })
+        XCTAssertEqual(earlyLines["Atmosphere"], "Not written")
     }
 
     private func history(id: UInt64, run: Int, requests: [String]) -> VisitedWorld {

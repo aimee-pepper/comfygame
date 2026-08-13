@@ -390,10 +390,23 @@ private struct LibraryTravellerView: View {
         ScrollView {
             VStack(spacing: 14) {
                 StationCard(title: traveller.name, icon: traveller.icon) {
-                    Text(hint.isFound
-                         ? "\(LibraryPresentation.placementLabel(for: traveller, in: store.state)) · \(traveller.blurb)"
-                         : traveller.calling.capitalized)
-                        .font(.callout).foregroundStyle(.secondary)
+                    HStack(alignment: .top, spacing: 12) {
+                        NamedCharacterPixelIdentity(
+                            travellerID: traveller.id,
+                            fallbackSystemIcon: traveller.icon,
+                            fallbackColor: .secondary
+                        )
+                        .frame(width: 52, height: 52)
+                        .background(Color.secondary.opacity(0.12),
+                                    in: RoundedRectangle(cornerRadius: 12))
+
+                        Text(hint.isFound
+                             ? "\(LibraryPresentation.placementLabel(for: traveller, in: store.state)) · \(traveller.blurb)"
+                             : traveller.calling.capitalized)
+                            .font(.callout).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .accessibilityElement(children: .combine)
                 }
 
                 if !hint.passages.isEmpty {
