@@ -150,6 +150,15 @@ final class SpilloverTests: XCTestCase {
         XCTAssertFalse(source.contains("Button(\"Crystallise essence\") { store.crystalliseEssence() }"))
     }
 
+    func testChannelworksReportsAStaleFixtureConstructionFailure() throws {
+        let source = try String(contentsOfFile: "Sources/Screens/StationViews.swift", encoding: .utf8)
+
+        XCTAssertTrue(source.contains("if store.constructConduitFixture()"))
+        XCTAssertTrue(source.contains("Fixture not constructed"))
+        XCTAssertTrue(source.contains("The Heat core or Storehouse space changed."))
+        XCTAssertFalse(source.contains("Button(\"Construct Heat Conduit fixture\") { store.constructConduitFixture() }"))
+    }
+
 
     func testBankingAFullStorehouseSpillsRatherThanDrops() {
         let store = makeStore()

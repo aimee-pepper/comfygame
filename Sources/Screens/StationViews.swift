@@ -151,6 +151,7 @@ struct DistilleryView: View {
 
 struct ChannelworksView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var constructionFailure: String?
 
     private var hasHeatCore: Bool {
         store.state.base.inventory.stacks.contains { $0.catalogID == Items.heatCore }
@@ -170,13 +171,27 @@ struct ChannelworksView: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(hasHeatCore ? Color.green : Color.orange)
 
-                    Button("Construct Heat Conduit fixture") { store.constructConduitFixture() }
+                    Button("Construct Heat Conduit fixture") {
+                        if store.constructConduitFixture() {
+                            constructionFailure = nil
+                        } else {
+                            constructionFailure = "The Heat core or Storehouse space changed. Review the fixture requirements and try again."
+                        }
+                    }
                         .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
                         .disabled(!hasHeatCore)
                 }
             }.padding(16)
         }.background(Color(.systemGroupedBackground))
             .navigationTitle("The Channelworks").navigationBarTitleDisplayMode(.inline)
+            .alert("Fixture not constructed", isPresented: Binding(
+                get: { constructionFailure != nil },
+                set: { if !$0 { constructionFailure = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(constructionFailure ?? "The fixture could not be constructed.")
+            }
     }
 }
 
