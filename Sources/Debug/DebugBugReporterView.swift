@@ -3,6 +3,13 @@ import SwiftUI
 import UIKit
 
 enum DebugBugReporterPlacementPolicy {
+    static func horizontalRange(width: CGFloat, safeLeading: CGFloat,
+                                safeTrailing: CGFloat) -> ClosedRange<CGFloat> {
+        let lower = safeLeading + 28
+        let upper = max(lower, width - safeTrailing - 28)
+        return lower...upper
+    }
+
     static func verticalRange(height: CGFloat, safeTop: CGFloat, safeBottom: CGFloat,
                               isBase: Bool, reservesTopChrome: Bool = false) -> ClosedRange<CGFloat> {
         let safeMinimum = safeTop + 28
@@ -43,8 +50,8 @@ struct DebugBugReporterOverlay: View {
                 .accessibilityLabel("Report Bug")
                 .accessibilityHint("Captures the current game screen, then opens a bug report form")
                 .position(x: clamped(CGFloat(savedX) * proxy.size.width,
-                                     proxy.safeAreaInsets.leading + 28,
-                                     proxy.size.width - proxy.safeAreaInsets.trailing - 28),
+                                     horizontalRange(in: proxy).lowerBound,
+                                     horizontalRange(in: proxy).upperBound),
                           y: clamped(CGFloat(savedY) * proxy.size.height,
                                      minimumY(in: proxy), maximumY(in: proxy)))
                 .highPriorityGesture(DragGesture().onChanged { value in
@@ -53,6 +60,8 @@ struct DebugBugReporterOverlay: View {
                 })
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .zIndex(10_000)
         .sheet(item: $draft) { draft in
             DebugBugReportSheet(draft: draft)
         }
@@ -106,6 +115,14 @@ struct DebugBugReporterOverlay: View {
             safeBottom: proxy.safeAreaInsets.bottom, isBase: route == .base,
             reservesTopChrome: route != .world && route != .encounter
                 && route != .settings && route != .harness
+        )
+    }
+
+    private func horizontalRange(in proxy: GeometryProxy) -> ClosedRange<CGFloat> {
+        DebugBugReporterPlacementPolicy.horizontalRange(
+            width: proxy.size.width,
+            safeLeading: proxy.safeAreaInsets.leading,
+            safeTrailing: proxy.safeAreaInsets.trailing
         )
     }
 

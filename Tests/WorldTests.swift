@@ -488,11 +488,33 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual((cramped * 3).truncatingRemainder(dividingBy: 11), 0, accuracy: 0.001)
     }
 
-    func testWorldControlsHaveExactlyTwoActionsInOneFixedRow() {
+    func testWorldControlsHaveExactlyTwoActionsInOneFixedBottomInset() throws {
         XCTAssertEqual(WorldControlsLayout.actionCount, 2)
         XCTAssertEqual(WorldControlsLayout.actionRows, 1,
                        "Interact and Look must remain side by side, never stacked")
         XCTAssertEqual(WorldControlsLayout.actionHeight, 48)
+
+        let frames = WorldControlsLayout.actionFrames(containerWidth: 368)
+        XCTAssertEqual(frames.count, 2)
+        XCTAssertGreaterThanOrEqual(frames[0].width, 44)
+        XCTAssertGreaterThanOrEqual(frames[1].width, 44)
+        XCTAssertEqual(frames[0].height, 48)
+        XCTAssertEqual(frames[1].height, 48)
+        XCTAssertLessThanOrEqual(frames[0].maxX, frames[1].minX)
+        XCTAssertEqual(frames[1].maxX, 352, accuracy: 0.01)
+
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/WorldView.swift"),
+                                encoding: .utf8)
+        let inset = try XCTUnwrap(source.range(of: ".safeAreaInset(edge: .bottom, spacing: 0)"))
+        let tutorial = try XCTUnwrap(source.range(of: ".overlay(alignment: .bottom)",
+                                                  range: inset.upperBound..<source.endIndex))
+        let fixedHUD = String(source[inset.lowerBound..<tutorial.lowerBound])
+        XCTAssertTrue(fixedHUD.contains("satchel(run)"))
+        XCTAssertTrue(fixedHUD.contains("controls(run)"))
+        XCTAssertFalse(fixedHUD.contains("eventLog"),
+                       "Variable narration belongs to the scroll viewport, never the fixed HUD")
     }
 
     // MARK: Fog and movement

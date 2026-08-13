@@ -4,6 +4,18 @@ enum WorldControlsLayout {
     static let actionCount = 2
     static let actionRows = 1
     static let actionHeight: CGFloat = 48
+    static let horizontalPadding: CGFloat = 16
+    static let actionSpacing: CGFloat = 6
+
+    static func actionFrames(containerWidth: CGFloat) -> [CGRect] {
+        let usable = max(0, containerWidth - horizontalPadding * 2 - actionSpacing)
+        let width = usable / 2
+        return [
+            CGRect(x: horizontalPadding, y: 0, width: width, height: actionHeight),
+            CGRect(x: horizontalPadding + width + actionSpacing, y: 0,
+                   width: width, height: actionHeight),
+        ]
+    }
 }
 
 /// A closed two-slot strip prevents action growth from silently adding fixed rows and obscuring
@@ -45,37 +57,45 @@ struct WorldView: View {
     private var run: WorldRun? { store.state.worlds.activeRun }
 
     var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 0) {
-                if let run {
-                    StabilityHeader(run: run)
-                    PartyHealthStrip(run: run, state: store.state)
-                    GeometryReader { viewport in
-                        ScrollView {
-                            VStack(spacing: 12) {
-                                LootDecisionCard()
-                                MapGrid(
-                                    run: run,
-                                    maximumSide: WorldMapLayout.maximumSide(
-                                        containerWidth: viewport.size.width,
-                                        viewportHeight: viewport.size.height,
-                                        viewportTiles: min(Tuning.World.viewportTiles,
-                                                           min(run.map.width, run.map.height)),
-                                        displayScale: displayScale
-                                    )
-                                ) { point in
-                                    tapped(point, in: run)
-                                }
-                                eventLog
-                                satchel(run)
+        VStack(spacing: 0) {
+            if let run {
+                StabilityHeader(run: run)
+                PartyHealthStrip(run: run, state: store.state)
+                GeometryReader { viewport in
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            LootDecisionCard()
+                            MapGrid(
+                                run: run,
+                                maximumSide: WorldMapLayout.maximumSide(
+                                    containerWidth: viewport.size.width,
+                                    viewportHeight: viewport.size.height,
+                                    viewportTiles: min(Tuning.World.viewportTiles,
+                                                       min(run.map.width, run.map.height)),
+                                    displayScale: displayScale
+                                )
+                            ) { point in
+                                tapped(point, in: run)
                             }
-                            .padding(.horizontal, 12)
-                            .padding(.top, 8)
-                            .padding(.bottom, 12)
+                            eventLog
                         }
+                        .padding(.horizontal, 12)
+                        .padding(.top, 8)
+                        .padding(.bottom, 12)
                     }
+                }
+            }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if let run {
+                VStack(spacing: 0) {
+                    satchel(run)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
                     controls(run)
                 }
+                .background(.bar)
+                .zIndex(2)
             }
         }
         .background(Color(.systemGroupedBackground))
@@ -328,66 +348,68 @@ struct WorldView: View {
     // MARK: Controls — thumb zone
 
     private func controls(_ run: WorldRun) -> some View {
-        HStack(alignment: .bottom, spacing: 14) {
-            DirectionPad(isLooking: isLookArmed) { direction in
-                let point = GridPoint(x: run.playerPosition.x + direction.dx,
-                                      y: run.playerPosition.y + direction.dy)
-                if isLookArmed {
-                    inspection = InspectionPresentation(value: WorldRules.inspect(point, in: run))
-                    isLookArmed = false
-                } else {
-                    store.step(to: point)
+        VStack(spacing: 8) {
+            HStack(alignment: .center, spacing: 14) {
+                DirectionPad(isLooking: isLookArmed) { direction in
+                    let point = GridPoint(x: run.playerPosition.x + direction.dx,
+                                          y: run.playerPosition.y + direction.dy)
+                    if isLookArmed {
+                        inspection = InspectionPresentation(value: WorldRules.inspect(point, in: run))
+                        isLookArmed = false
+                    } else {
+                        store.step(to: point)
+                    }
                 }
-            }
-            .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity)
 
-            VStack(spacing: 6) {
-                // The map belongs beside the movement tool, using the space above the portal/action
-                // column. Putting it under the arrows needlessly made the fixed controls taller and
-                // was a regression from the settled phone layout.
+                // Navigation peers use the same square allocation. The minimap must not share its
+                // height with action buttons: doing so compressed a nominal square into the small
+                // remainder beneath the D-pad's intrinsic height.
                 MinimapView(run: run)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                // One invariant action row. Adding a world action must never create another fixed
-                // control row and steal the event/satchel viewport above it.
-                WorldActionRow {
-                    ActionButton("Interact", icon: "hand.tap.fill",
-                                 isProminent: canInteract,
-                                 isEnabled: canInteract) {
-                        performInteraction()
-                    }
-                    .accessibilityValue(interactionDetail(in: run))
-                    .accessibilityIdentifier("world.interact")
-
-                } look: {
-                    Button {
-                        isLookArmed.toggle()
-                    } label: {
-                        Label(isLookArmed ? "Cancel" : "Look",
-                              systemImage: isLookArmed ? "eye.fill" : "eye")
-                            .font(.callout.weight(.medium))
-                            .lineLimit(1)
-                            .frame(maxWidth: .infinity, minHeight: 48)
-                    }
-                    .buttonStyle(.bordered)
-                    .overlay {
-                        if isLookArmed {
-                            RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2)
-                        }
-                    }
-                    .accessibilityLabel(isLookArmed ? "Cancel Look" : "Look")
-                    .accessibilityHint(isLookArmed
-                        ? "Look mode armed. Choose one direction."
-                        : "Inspect one adjacent tile without moving or spending a turn.")
-                    .accessibilityIdentifier("world.look")
-                }
-                .accessibilityElement(children: .contain)
-                .accessibilityIdentifier("world.action-row")
+                    .frame(width: 132, height: 132)
+                    .fixedSize()
+                    .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
+
+            // The two actions own half of the phone each instead of half of the minimap column.
+            // This keeps their visible labels readable without scale-down or icon-only fallback.
+            WorldActionRow {
+                ActionButton("Interact", icon: "hand.tap.fill",
+                             isProminent: canInteract,
+                             isEnabled: canInteract) {
+                    performInteraction()
+                }
+                .accessibilityValue(interactionDetail(in: run))
+                .accessibilityIdentifier("world.interact")
+
+            } look: {
+                Button {
+                    isLookArmed.toggle()
+                } label: {
+                    Label(isLookArmed ? "Cancel Look" : "Look",
+                          systemImage: isLookArmed ? "eye.fill" : "eye")
+                        .font(.callout.weight(.medium))
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                }
+                .buttonStyle(.bordered)
+                .overlay {
+                    if isLookArmed {
+                        RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2)
+                    }
+                }
+                .accessibilityLabel(isLookArmed ? "Cancel Look" : "Look")
+                .accessibilityHint(isLookArmed
+                    ? "Look mode armed. Choose one direction."
+                    : "Inspect one adjacent tile without moving or spending a turn.")
+                .accessibilityIdentifier("world.look")
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("world.action-row")
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 10)
-        .padding(.bottom, 6)
+        .padding(.horizontal, WorldControlsLayout.horizontalPadding)
+        .padding(.top, 8)
+        .padding(.bottom, 4)
         .background(.bar)
     }
 
@@ -1150,10 +1172,10 @@ private struct ActionButton: View {
             HStack(spacing: 8) {
                 Image(systemName: icon)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(title).font(.callout.weight(.medium)).lineLimit(1).minimumScaleFactor(0.75)
+                    Text(title).font(.callout.weight(.medium)).lineLimit(1)
                     if let detail {
                         Text(detail).font(.caption2).foregroundStyle(.secondary)
-                            .lineLimit(1).minimumScaleFactor(0.75)
+                            .lineLimit(1)
                     }
                 }
                 Spacer(minLength: 0)
@@ -1161,7 +1183,9 @@ private struct ActionButton: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(minHeight: 48)
             .padding(.horizontal, 10)
+            .contentShape(Rectangle())
         }
+        .frame(maxWidth: .infinity, minHeight: WorldControlsLayout.actionHeight)
         .buttonStyle(.bordered)
         .tint(isProminent ? .accentColor : .secondary)
         .disabled(!isEnabled)

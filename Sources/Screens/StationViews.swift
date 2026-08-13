@@ -211,8 +211,14 @@ struct AnchorageView: View {
                                         + worker.worldwork
                                         + max(0, worker.character.level - 1)
                                             / Tuning.Anchoring.levelsPerWorldworkBonus
-                                    HStack {
-                                        Text(store.state.base.roster[index].name)
+                                    HStack(spacing: 8) {
+                                        NamedCharacterPixelIdentity(
+                                            travellerID: worker.traveller,
+                                            fallbackSystemIcon: worker.icon,
+                                            fallbackColor: .secondary
+                                        )
+                                        .frame(width: 24, height: 24)
+                                        Text(worker.name)
                                         Spacer()
                                         Text("Worldwork \(worker.worldwork) · +\(contribution)")
                                             .foregroundStyle(.secondary)
@@ -1084,6 +1090,21 @@ struct EssenceSpringView: View {
             ForEach([PartyMember.binder] + store.state.base.roster.indices.map(PartyMember.member)) { member in
                 let cost = store.respecCost(for: member)
                 HStack(spacing: 8) {
+                    if let index = member.rosterIndex,
+                       store.state.base.roster.indices.contains(index) {
+                        let person = store.state.base.roster[index]
+                        NamedCharacterPixelIdentity(
+                            travellerID: person.traveller,
+                            fallbackSystemIcon: person.icon,
+                            fallbackColor: .secondary
+                        )
+                        .frame(width: 24, height: 24)
+                    } else {
+                        Image(systemName: "figure.stand")
+                            .foregroundStyle(.secondary)
+                            .frame(width: 24, height: 24)
+                            .accessibilityHidden(true)
+                    }
                     VStack(alignment: .leading, spacing: 1) {
                         Text(store.name(of: member)).font(.callout)
                         Text(cost == 0 ? "nothing spent yet"

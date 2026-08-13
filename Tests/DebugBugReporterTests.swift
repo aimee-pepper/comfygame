@@ -18,6 +18,13 @@ final class DebugBugReporterTests: XCTestCase {
         XCTAssertEqual(ordinary.upperBound, 738, accuracy: 0.01)
         XCTAssertEqual(station.lowerBound, 384, accuracy: 0.01)
         XCTAssertEqual(station.upperBound, 624, accuracy: 0.01)
+
+        let horizontal = DebugBugReporterPlacementPolicy.horizontalRange(
+            width: 368, safeLeading: 0, safeTrailing: 0)
+        XCTAssertEqual(horizontal.lowerBound, 28, accuracy: 0.01)
+        XCTAssertEqual(horizontal.upperBound, 340, accuracy: 0.01)
+        XCTAssertGreaterThan(horizontal.upperBound - horizontal.lowerBound, 300,
+                             "The floating reporter must traverse the full ordinary-phone width")
     }
 
     func testOutboxAtomicallyPersistsUnicodeReportAndScreenshot() throws {

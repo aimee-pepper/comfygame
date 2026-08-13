@@ -184,6 +184,56 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
         XCTAssertTrue(base.contains("Text(\"\\(person.name), \\(person.calling)\")"))
     }
 
+    func testAnchorageWorkerUsesPersistedCompanionIdentityAndPreservesAssignmentCopy() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let stations = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+                                  encoding: .utf8)
+
+        XCTAssertTrue(stations.contains("travellerID: worker.traveller"),
+                      "Anchorage worker identity must come from the persisted roster member")
+        XCTAssertTrue(stations.contains("fallbackSystemIcon: worker.icon"))
+        XCTAssertTrue(stations.contains("Text(worker.name)"))
+        XCTAssertTrue(stations.contains("Worldwork \\(worker.worldwork) · +\\(contribution)"),
+                      "Character pixels must not alter assignment contribution copy")
+        XCTAssertTrue(stations.contains("store.unassignCompanion(index, fromAnchoredRealm: realm.id)"))
+    }
+
+    func testEssenceSpringUnlearningUsesExactRosterIdentityButKeepsBinderSeparate() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let stations = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+                                  encoding: .utf8)
+
+        let start = try XCTUnwrap(stations.range(of: "private var unlearning: some View"))
+        let end = try XCTUnwrap(stations.range(of: "enum EssenceSpringTab", range: start.upperBound..<stations.endIndex))
+        let unlearning = String(stations[start.lowerBound..<end.lowerBound])
+        XCTAssertTrue(unlearning.contains("let person = store.state.base.roster[index]"))
+        XCTAssertTrue(unlearning.contains("travellerID: person.traveller"))
+        XCTAssertTrue(unlearning.contains("fallbackSystemIcon: person.icon"))
+        XCTAssertTrue(unlearning.contains("Image(systemName: \"figure.stand\")"),
+                      "Binder must remain outside the named-traveller pack")
+        XCTAssertTrue(unlearning.contains("store.respec(member)"),
+                      "Identity presentation must not change Unlearning behavior")
+    }
+
+    func testLibraryPersonDetailUsesExactTravellerCameoWithFallback() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let library = try String(contentsOf: root.appending(path: "Sources/Screens/LibraryView.swift"),
+                                 encoding: .utf8)
+        let detailStart = try XCTUnwrap(library.range(of: "private struct LibraryTravellerView"))
+        let detail = library[detailStart.lowerBound...]
+
+        XCTAssertTrue(detail.contains("NamedCharacterPixelIdentity("))
+        XCTAssertTrue(detail.contains("travellerID: traveller.id"),
+                      "Person detail must resolve the accepted cameo by stable TravellerID")
+        XCTAssertTrue(detail.contains("fallbackSystemIcon: traveller.icon"),
+                      "Missing or invalid cameo assets must preserve the prior SF Symbol fallback")
+        XCTAssertTrue(detail.contains("LibraryPresentation.placementLabel"),
+                      "Identity wiring must preserve the existing discovery-state copy")
+    }
+
     func testBuiltBundleResourceBasenameRemainsHashValidated() throws {
         let source = try String(contentsOf: URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
