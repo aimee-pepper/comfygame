@@ -22,6 +22,19 @@ final class ConstellationPresentationTests: XCTestCase {
             rank: 1, maxRank: 1, cost: nil, motes: 0), .bought)
     }
 
+    func testPurchaseActionRemainsOutsideScrollableRealityDetails() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/SpendingViews.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0)"))
+        XCTAssertTrue(source.contains("PersistentActionBar(message: state.label, messageTint: state.tint)"))
+        XCTAssertTrue(source.contains("Button(\"Fix in place\")"))
+    }
+
     func testInsufficientAndDuplicatePurchasesAreAtomic() throws {
         let store = GameStore(io: .temporary(name: "constellation-atomic-\(UUID().uuidString)"))
         let node = try XCTUnwrap(ContentCatalog.shared.constellationNodes.first)

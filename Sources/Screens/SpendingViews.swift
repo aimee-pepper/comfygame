@@ -165,20 +165,26 @@ struct ConstellationNodeDetail: View {
                 if let cost {
                     LabeledContent("Cost", value: "\(cost) Motes")
                 }
-                Label(state.label, systemImage: state.icon)
-                    .font(.caption.weight(.semibold)).foregroundStyle(state.tint)
-                if cost != nil {
-                    Button("Fix in place") { _ = store.buy(node) }
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                        .buttonStyle(.borderedProminent)
-                        .tint(.purple)
-                        .disabled(!store.canBuy(node))
+                if cost == nil {
+                    Label(state.label, systemImage: state.icon)
+                        .font(.caption.weight(.semibold)).foregroundStyle(state.tint)
                 }
                 Divider()
                 Text("The Constellation changes Reality itself, rather than one building or one person.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             .padding(16)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if cost != nil {
+                PersistentActionBar(message: state.label, messageTint: state.tint) {
+                    Button("Fix in place") { _ = store.buy(node) }
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.purple)
+                        .disabled(!store.canBuy(node))
+                }
+            }
         }
         .frame(minWidth: 270)
     }
