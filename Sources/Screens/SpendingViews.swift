@@ -41,7 +41,14 @@ struct RefineryCard: View {
                 .buttonStyle(.borderedProminent)
                 .disabled(raw == 0)
 
-                Button { store.refineAllEssence() } label: {
+                Button {
+                    if store.refineEssence(rawUnits: raw) {
+                        refinementFailure = nil
+                        selectedRaw = 1
+                    } else {
+                        refinementFailure = "The available Raw Essence changed. Review the current amount and try again."
+                    }
+                } label: {
                     RefineryActionLabel(title: "Refine all", result: "\(raw * rate) Essence")
                 }
                 .buttonStyle(.bordered)
