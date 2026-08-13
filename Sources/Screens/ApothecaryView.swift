@@ -67,6 +67,7 @@ struct ApothecaryView: View {
             }
             .padding(16)
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) { preparationActionBar }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Apothecary")
         .navigationBarTitleDisplayMode(.inline)
@@ -96,6 +97,27 @@ struct ApothecaryView: View {
         .font(.subheadline.weight(.semibold).monospacedDigit())
         .frame(minHeight: 44)
         .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder private var preparationActionBar: some View {
+        if let recipe = selectedRecipe {
+            let missing = ConsumableCraftingRules.shortfall(recipe, in: store.state)
+            let name = ContentCatalog.shared.item(recipe.output)?.name ?? recipe.output.rawValue
+            PersistentActionBar(
+                message: missing.isEmpty ? "Exact stock is ready." : missing.joined(separator: " · "),
+                messageTint: missing.isEmpty ? .secondary : .orange
+            ) {
+                Button {
+                    store.craftConsumable(recipe)
+                } label: {
+                    Label("Prepare \(name)", systemImage: "cross.vial.fill")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!missing.isEmpty)
+                .accessibilityIdentifier("apothecary.craft.\(recipe.output.rawValue)")
+            }
+        }
     }
 }
 
@@ -176,15 +198,6 @@ private struct ConsumableRecipeDetail: View {
                     .foregroundStyle(.secondary)
             }
 
-            Button {
-                store.craftConsumable(recipe)
-            } label: {
-                Label("Prepare", systemImage: "cross.vial.fill")
-                    .frame(maxWidth: .infinity, minHeight: 44)
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(!missing.isEmpty)
-            .accessibilityIdentifier("apothecary.craft.\(recipe.output.rawValue)")
         }
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground),

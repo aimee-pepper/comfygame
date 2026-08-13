@@ -3,6 +3,20 @@ import XCTest
 
 @MainActor
 final class ConsumableCraftingTests: XCTestCase {
+    func testApothecaryPreparationActionStaysOutsideScrollableRecipeCatalogue() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/ApothecaryView.swift"), encoding: .utf8)
+
+        XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0) { preparationActionBar }"))
+        XCTAssertTrue(source.contains("PersistentActionBar("))
+        XCTAssertTrue(source.contains("Label(\"Prepare \\(name)\", systemImage: \"cross.vial.fill\")"))
+        XCTAssertTrue(source.contains("store.craftConsumable(recipe)"))
+        XCTAssertEqual(source.components(separatedBy: "store.craftConsumable(recipe)").count - 1, 1,
+                       "the persistent action bar should own the sole preparation mutation")
+    }
+
     func testEveryApothecaryRecipeProducesAnAuthoredConsumableEffect() {
         for recipe in ConsumableCraftingRules.recipes {
             let item = ContentCatalog.shared.item(recipe.output)
