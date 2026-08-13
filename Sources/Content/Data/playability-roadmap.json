@@ -179,7 +179,7 @@
       "priority": "P0",
       "title": "In-game bug reporter",
       "status": "readyToTest",
-      "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference, active DEBUG tuning, a bounded 20-action semantic trail and an idempotent HTTPS relay adapter are checkpointed. f9be251 labels local Save/Done honestly and proves they make zero transport calls. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
+      "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference, active DEBUG tuning, a bounded 20-action semantic trail and an idempotent HTTPS relay adapter are checkpointed. cae4b7a adds a tolerant, read-only frozen encounter-scaling evidence payload for balance reports. f9be251 labels local Save/Done honestly and proves they make zero transport calls. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
       "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete."
     },
     {
