@@ -38,9 +38,6 @@ struct EncounterView: View {
                     outcomeBar(outcome)
                 } else {
                     actionBar(run, encounter)
-                        .sheet(isPresented: $isChoosingSkill) {
-                            SkillSheet(onUse: use).environmentObject(store)
-                        }
                         .sheet(isPresented: $isChoosingItem) {
                             CombatItemSheet(onCommit: use).environmentObject(store)
                         }
@@ -278,15 +275,21 @@ struct EncounterView: View {
                 }
                 .frame(minHeight: 32)
             }
-            if store.actingCombatant != nil {
+            if isChoosingSkill, let actor = store.actingCombatant {
+                CombatTechniquePalette(
+                    skills: store.actorSkills,
+                    actor: actor,
+                    encounter: encounter,
+                    state: store.state,
+                    onUse: use,
+                    onClose: { isChoosingSkill = false }
+                )
+            } else if store.actingCombatant != nil {
                 HStack(spacing: 8) {
                     ActionKey("Attack", icon: "figure.fencing") { attackPressed() }
-                    // **Twelve skills don't fit on a key.** Opens the list, which is also where
-                    // each one says what it's *for* — the spec's rule that a skill names the
-                    // problem it solves is worth nothing if the UI doesn't print it.
-                    ActionKey("Skills", icon: "sparkles",
+                    ActionKey("Techniques", icon: "sparkles",
                               detail: skillDetail(encounter),
-                              isEnabled: store.hasAnyReadySkill) { isChoosingSkill = true }
+                              isEnabled: !store.actorSkills.isEmpty) { isChoosingSkill = true }
                 }
                 HStack(spacing: 8) {
                     ActionKey("Item", icon: "cross.vial",
@@ -631,77 +634,99 @@ private struct ActionKey: View {
 }
 
 
-/// The skill list.
-///
-/// **Every row says what it's for.** `resources-skills-spec.md` §2 rules that a skill which is good
-/// against everything is just a bigger attack — so each one names the kind of creature it answers,
-/// and the list prints that rather than making you infer it from a power number.
-private struct SkillSheet: View {
-    @EnvironmentObject private var store: GameStore
-    @Environment(\.dismiss) private var dismiss
+/// The compact in-place technique palette. It replaces only the ordinary action keys, leaving the
+/// encounter stage and current actor visible. A first tap owns selection/detail; the explicit Use
+/// action preserves the existing combat commit/target flow.
+private struct CombatTechniquePalette: View {
+    let skills: [SkillDef]
+    let actor: Combatant
+    let encounter: EncounterState
+    let state: GameState
     let onUse: (SkillDef) -> Void
+    let onClose: () -> Void
+    @State private var selectedSkillID: SkillID?
+
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 4)
+
+    private var selectedSkill: SkillDef? {
+        skills.first { $0.id == selectedSkillID }
+    }
 
     var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    ForEach(store.actorSkills) { skill in
-                        let presentation = store.actingCombatant.flatMap { actor in
-                            store.activeEncounter.map {
-                                CombatSkillRowPresentation.make(skill: skill, actor: actor,
-                                                                encounter: $0, state: store.state)
-                            }
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Techniques").font(.headline)
+                Spacer(minLength: 8)
+                Button("Close", action: onClose)
+                    .font(.footnote.weight(.semibold))
+                    .frame(minHeight: 44)
+            }
+
+            LazyVGrid(columns: columns, spacing: 6) {
+                ForEach(skills) { skill in
+                    let presentation = CombatSkillRowPresentation.make(
+                        skill: skill, actor: actor, encounter: encounter, state: state
+                    )
+                    let cooling = presentation.remainingCooldown > 0
+                    Button {
+                        selectedSkillID = skill.id
+                    } label: {
+                        VStack(spacing: 3) {
+                            Image(systemName: skill.icon)
+                                .font(.body)
+                            Text(skill.name)
+                                .font(.caption2.weight(.semibold))
+                                .lineLimit(2)
+                                .multilineTextAlignment(.center)
+                            Text(cooling ? "\(presentation.remainingCooldown) rounds" : "Ready")
+                                .font(.caption2.monospacedDigit())
+                                .foregroundStyle(.secondary)
                         }
-                        let cooling = presentation?.remainingCooldown ?? store.cooldown(of: skill)
-                        Button {
-                            onUse(skill)
-                            dismiss()
-                        } label: {
-                            HStack(spacing: 10) {
-                                Image(systemName: skill.icon)
-                                    .foregroundStyle(cooling > 0 ? Color.secondary : .accentColor)
-                                    .frame(width: 24)
-                                VStack(alignment: .leading, spacing: 1) {
-                                    Text(skill.name).font(.callout.weight(.medium))
-                                    // The problem it solves, which is the whole reason to have it.
-                                    Text(skill.answers.isEmpty ? skill.blurb : skill.answers)
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                }
-                                Spacer(minLength: 6)
-                                if let presentation {
-                                    VStack(alignment: .trailing, spacing: 2) {
-                                        if let potency = presentation.potency {
-                                            Text("Potency \(potency)")
-                                        }
-                                        Text(presentation.cooldownText)
-                                    }
-                                    .font(.caption2.monospacedDigit())
-                                    .foregroundStyle(.secondary)
-                                    .multilineTextAlignment(.trailing)
-                                    .fixedSize(horizontal: true, vertical: false)
-                                }
-                            }
-                            .frame(minHeight: 44)
-                            .contentShape(Rectangle())
+                        .frame(maxWidth: .infinity, minHeight: 64)
+                        .padding(.horizontal, 2)
+                        .background(Color(.secondarySystemGroupedBackground),
+                                    in: RoundedRectangle(cornerRadius: 10))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(selectedSkillID == skill.id ? Color.accentColor : .clear,
+                                        lineWidth: 2)
                         }
-                        .buttonStyle(.plain)
-                        .disabled(cooling > 0)
-                        .opacity(cooling > 0 ? 0.5 : 1)
-                        .accessibilityValue(presentation?.accessibilityValue ?? "")
                     }
-                } footer: {
-                    Text(CombatSkillRowPresentation.footerText)
+                    .buttonStyle(.plain)
+                    .opacity(cooling ? 0.55 : 1)
                 }
             }
-            .navigationTitle("Skills")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Back") { dismiss() } }
+
+            if let skill = selectedSkill {
+                let presentation = CombatSkillRowPresentation.make(
+                    skill: skill, actor: actor, encounter: encounter, state: state
+                )
+                HStack(alignment: .center, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(skill.name).font(.callout.weight(.semibold))
+                        Text(skill.answers.isEmpty ? skill.blurb : skill.answers)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                        Text(presentation.accessibilityValue)
+                            .font(.caption2.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 4)
+                    Button("Use") { onUse(skill) }
+                        .buttonStyle(.borderedProminent)
+                        .frame(minHeight: 44)
+                        .disabled(presentation.remainingCooldown > 0)
+                }
+                .padding(10)
+                .background(Color(.tertiarySystemGroupedBackground),
+                            in: RoundedRectangle(cornerRadius: 10))
+            } else {
+                Text("Select a technique to review its effect and readiness.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
-        .presentationDetents([.medium, .large])
     }
 }
 

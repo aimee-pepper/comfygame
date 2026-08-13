@@ -2,6 +2,26 @@ import XCTest
 @testable import Bookbinder
 
 final class CombatActionOwnershipTests: XCTestCase {
+    func testTechniqueChooserIsAnInPlaceFourAcrossPaletteRatherThanAFullScreenList() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/EncounterView.swift"), encoding: .utf8)
+        let palette = try XCTUnwrap(source.range(of: "private struct CombatTechniquePalette: View"))
+        let presentation = try XCTUnwrap(source.range(of: "struct CombatSkillRowPresentation", range: palette.lowerBound..<source.endIndex))
+        let view = String(source[palette.lowerBound..<presentation.lowerBound])
+
+        XCTAssertTrue(source.contains("if isChoosingSkill, let actor = store.actingCombatant"))
+        XCTAssertFalse(source.contains(".sheet(isPresented: $isChoosingSkill)"))
+        XCTAssertTrue(source.contains("isEnabled: !store.actorSkills.isEmpty"))
+        XCTAssertTrue(view.contains("count: 4"))
+        XCTAssertTrue(view.contains("LazyVGrid(columns: columns"))
+        XCTAssertTrue(view.contains("selectedSkillID = skill.id"))
+        XCTAssertTrue(view.contains("Button(\"Use\") { onUse(skill) }"))
+        XCTAssertTrue(view.contains(".disabled(presentation.remainingCooldown > 0)"))
+        XCTAssertFalse(view.contains("List {"))
+    }
+
     func testCarriedRemedyTargetActionRemainsOutsideScrollableInventory() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
