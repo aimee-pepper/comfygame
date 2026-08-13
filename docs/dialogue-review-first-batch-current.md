@@ -1,6 +1,6 @@
 # First authored-text review batch — Isolde and Sabine
 
-**Status:** exact Game Design recommendations for Aimee review; no live prose change authorized  
+**Status:** approved for live promotion and review through play; Atlas remains a revision tool
 **Priority:** first atlas content batch because both defects were observed directly in play  
 **Scope:** three Isolde optional replies and Sabine's seven location clues; interaction ordering is
 already fixed separately.

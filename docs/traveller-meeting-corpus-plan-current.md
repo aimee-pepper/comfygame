@@ -1,8 +1,8 @@
 # Traveller Meeting Corpus Plan — Current
 
-**Status:** comprehensive authoring direction for the 22 missing live meetings in the expanded
-29-person roster; exact dialogue is
-review-only until the DEBUG atlas supports Aimee's pass. Existing seven meeting objects remain live,
+**Status:** comprehensive authoring direction for 21 missing-live meetings plus Noll's replacement
+candidate in the live 29-person roster; coherent completed dialogue is live-by-default. The DEBUG
+atlas supports revision during and after play rather than gating promotion. Existing meeting objects remain live,
 with Isolde and Auber routed to revision by `authored-text-audit-current.md`.
 
 ## Shared meeting shape
@@ -38,7 +38,7 @@ responses. Atlas preview validates the transition aloud as **player offer → tr
 | 8 | Bryn | Holding a dangerous route open from the threat side while those behind her refuse that exit | Protection can be necessary and still return agency badly | Approved identity direction |
 | 9 | Orsa | Rearranging light, seats and exits in a shelter made peaceful through a confidence she disclosed | Welcome is consent and practical coexistence, not instant intimacy | Approved identity direction |
 | 1 | Vance | Reading repairs and ownership marks on an object whose useful price depends on omitted provenance | Circulation preserves usefulness but price can erase history and need | Existing draft requires order/Recycler-ownership revision review |
-| 2 | Noll *(working)* | Separating a failed object while deliberately leaving one joined section intact | Recovery preserves usefulness but unmaking can destroy the only legible whole | New identity/prose required |
+| 2 | Noll *(live provisional meeting; replacement under review)* | Separating a failed object while deliberately leaving one joined section intact | Recovery preserves usefulness but unmaking can destroy the only legible whole | Exact replacement prose required |
 | 10 | Talin | Waiting motionless for a plated creature or mechanism to expose a brief opening | Timely choice accepts uncertainty; a good outcome does not make the reasoning certain | New scene anchor |
 | 11 | Nessa | Relabelling two visually identical preparations after their carriers/bodies react differently | Substance is not effect without dose, body, route and time | New scene anchor |
 | 12 | Corrin | Reworking a strap or flexible guard at the exact place repeated contact has worn it | Durability can honour a source while clean finish can erase provenance | New scene anchor |
@@ -76,12 +76,12 @@ appears in the missing matrix.
    `traveller-meetings-specialists-review.md`; review relationship overlap while preserving the
    physically distinct practices.
 5. **Transformation/endgame:** Auber's revision candidate plus Oda, Ashe, Perren and Nine now have
-   complete review copy in `traveller-meetings-transformation-endgame-review.md`. These remain Draft
-   until their station/ending-facing fiction and exact prose are reviewed in the atlas.
+   complete review copy in `traveller-meetings-transformation-endgame-review.md`. Complete coherent
+   copy is promoted; only incomplete or contradictory units remain Draft.
 
-Each batch is drafted as a whole, reviewed in the atlas, then installed with old text/history
-preserved. Missing rows remain visibly Missing; scene anchors are not placeholder player-facing
-dialogue.
+Each batch is drafted as a coherent whole, then installed with old text/history preserved. Atlas
+review follows through play. Missing rows remain visibly Missing; scene anchors are not placeholder
+player-facing dialogue.
 
 ## Acceptance for a complete corpus
 

@@ -3521,3 +3521,18 @@ level-1 creature/unarmed baseline; Teeming-only grouped failure routes to densit
 agency; a single species outlier routes to that identity. Apex values remain structurally accepted
 but numerically unpromoted until two- and five-person phone bands exist. This is disciplined tuning,
 not acceptance of the present feel.
+
+## 279. Coherent authored content enters the game before review
+
+**Date:** 13 August 2026
+
+Completed coherent traveller meetings, dialogue replacements and clue sequences are promoted into
+live game content without waiting for Aimee to preapprove each unit in the DEBUG Atlas. Aimee reviews
+them through ordinary play and bug reports; the Atlas remains useful for targeted revision, hashes,
+notes and corpus navigation rather than acting as a release gate.
+
+This authorizes promotion of the 21 completed missing-live traveller meetings, Noll's replacement,
+Auber's revision, Isolde's three optional-reply replacements and Sabine's seven-location sequence.
+Stable IDs, authored order, condition indices, migrations and generator freshness remain mandatory.
+Only genuinely incomplete or internally contradictory copy remains draft-only. A play-found bad line
+is revised in place; it does not justify withholding unrelated completed content.

@@ -273,10 +273,10 @@
     {
       "id": "authored-text-first-review",
       "priority": "P1",
-      "title": "Review Isolde dialogue and Sabine clues",
+      "title": "Promote and play-review authored dialogue",
       "status": "queued",
-      "detail": "The transcript-order interaction bug is implemented separately, while exact observation-first replacements for Isolde's three opaque optional replies and Sabine's complete seven-location sequence await Aimee's side-by-side Atlas selections. Do not promote unreviewed prose automatically.",
-      "gate": "Aimee selects Original, Candidate, Needs another pass or Hold for each stable unit; arbitrary Isolde tap order preserves independent replies; Sabine's approved sequence retains exact condition/clue indices; regenerated Atlas hashes and phone/Large Text copy pass. Authority: dialogue-review-first-batch-current.md."
+      "detail": "Decision279 makes coherent authored content live by default and uses play as review. Promote the 21 completed missing-live meeting drafts, Noll's replacement candidate, Auber's revision, Isolde's three optional-reply replacements and Sabine's seven-location clue sequence without waiting for prior Atlas ratings. Incomplete or contradictory units remain draft-only.",
+      "gate": "All 29 travellers have coherent live meetings; stable exchange/page IDs, reply order, condition indices and old-save tolerance survive promotion; generated corpus freshness and catalogue-set validation pass; Atlas reviews the same live text; phone play can flag and revise individual units without blocking the rest. Authority: Decision279, traveller-meeting-corpus-plan-current.md and dialogue-review-first-batch-current.md."
     },
     {
       "id": "return-receipt-authority",
