@@ -36,6 +36,10 @@ final class ConstellationPresentationTests: XCTestCase {
         XCTAssertTrue(source.contains("Fix \\(node.name) in place?"))
         XCTAssertTrue(source.contains("Button(\"Spend \\(cost) Motes\")"))
         XCTAssertTrue(source.contains("This permanently changes Reality for the current campaign."))
+        XCTAssertTrue(source.contains("if store.buy(node)"))
+        XCTAssertTrue(source.contains("Constellation not changed"))
+        XCTAssertTrue(source.contains("Your Motes or this node's rank changed."))
+        XCTAssertFalse(source.contains("Button(\"Spend \\(cost) Motes\") { _ = store.buy(node) }"))
         XCTAssertFalse(source.contains("Button(\"Fix in place\") { _ = store.buy(node) }"))
     }
 

@@ -156,6 +156,7 @@ struct ConstellationNodeDetail: View {
     @EnvironmentObject private var store: GameStore
     let node: ConstellationNodeDef
     @State private var confirmingPurchase = false
+    @State private var purchaseFailure: String?
 
     var body: some View {
         let rank = store.state.reality.rank(of: node.id)
@@ -198,11 +199,25 @@ struct ConstellationNodeDetail: View {
             titleVisibility: .visible
         ) {
             if let cost {
-                Button("Spend \(cost) Motes") { _ = store.buy(node) }
+                Button("Spend \(cost) Motes") {
+                    if store.buy(node) {
+                        purchaseFailure = nil
+                    } else {
+                        purchaseFailure = "Your Motes or this node's rank changed. Review the current cost before trying again."
+                    }
+                }
             }
             Button("Not yet", role: .cancel) {}
         } message: {
             Text("This permanently changes Reality for the current campaign.")
+        }
+        .alert("Constellation not changed", isPresented: Binding(
+            get: { purchaseFailure != nil },
+            set: { if !$0 { purchaseFailure = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(purchaseFailure ?? "The permanent purchase could not be completed.")
         }
         .frame(minWidth: 270)
     }
