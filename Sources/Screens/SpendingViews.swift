@@ -228,9 +228,11 @@ struct ConstellationNodeDetail: View {
             .padding(16)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if cost != nil {
+            if let cost {
                 PersistentActionBar(message: state.label, messageTint: state.tint) {
-                    Button("Fix in place") { confirmingPurchase = true }
+                    Button("Fix in place · \(cost) \(cost == 1 ? "Mote" : "Motes")") {
+                        confirmingPurchase = true
+                    }
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .buttonStyle(.borderedProminent)
                         .tint(.purple)
