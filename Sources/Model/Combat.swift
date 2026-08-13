@@ -296,6 +296,10 @@ struct EncounterState: Codable, Equatable, Sendable {
             }
         }
     }
+    struct DirectHitComponent: Codable, Equatable, Sendable {
+        var nodeID: CombatNodeID
+        var amount: Int
+    }
     struct DebugV2ArmourReceipt: Codable, Equatable, Sendable {
         struct Entry: Codable, Equatable, Sendable {
             var actor: Combatant
@@ -462,6 +466,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// Explicit frozen ownership for consumers that do not yet have a dedicated derived receipt.
     /// Nil is legacy; an empty dictionary is an enabled-v2 comparison with no owned nodes.
     var debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]?
+    /// Saved rank at each actor's previous completed normal-cost action. Nil is legacy; an empty
+    /// modern receipt is deliberately distinct and never reconstructed from mutable Base state.
+    var rankAtPreviousCompletedAction: [Combatant: Rank]?
     /// Current formation rank belongs to this encounter. Fall Back mutates this saved receipt,
     /// never the mutable Base loadout under an already-open fight.
     var partyRanks: [Combatant: Rank] = [:]
@@ -611,6 +618,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
         self.partyRanks = partyRanks
+        self.rankAtPreviousCompletedAction = debugV2OwnedNodeIDs == nil ? nil : partyRanks
         self.afflictions = []
         self.log = log
     }
@@ -641,6 +649,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         debugV2OwnedNodeIDs = try c.decodeIfPresent([Combatant: Set<CombatNodeID>].self,
                                                      forKey: .debugV2OwnedNodeIDs)
         partyRanks = try c.decodeIfPresent([Combatant: Rank].self, forKey: .partyRanks) ?? [:]
+        rankAtPreviousCompletedAction = try c.decodeIfPresent([Combatant: Rank].self,
+                                                               forKey: .rankAtPreviousCompletedAction)
         opening = try? c.decodeIfPresent(OpeningResolution.self, forKey: .opening)
         completedFirstActions = try c.decodeIfPresent(Set<Combatant>.self,
                                                        forKey: .completedFirstActions) ?? []

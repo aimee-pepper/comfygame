@@ -630,7 +630,8 @@ enum CombatRules {
                                                                        encounter: encounter),
                    by: actor, kind: .crush,
                    run: &run, encounter: &encounter, verb: skill.name,
-                   standingBack: standingBack, reachOfActor: reach, allowsStagger: true)
+                   standingBack: standingBack, reachOfActor: reach, allowsStagger: true,
+                   allowsConditionalDirectHit: true)
             encounter.skippedTurns[actor, default: 0] += 1
             encounter.note("You're off balance.")
 
@@ -1127,7 +1128,7 @@ enum CombatRules {
                    coating: coating(of: actor, in: state),
                    breaking: wildRule(for: actor, in: state),
                    innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
-                   allowsStagger: true) {
+                   allowsStagger: true, allowsConditionalDirectHit: true) {
                 outcome = .committed(cost: actionCost, completedDirectAttack: true)
             }
 
@@ -1208,6 +1209,11 @@ enum CombatRules {
            encounter.feintActive != nil {
             encounter.feintActive?.insert(actor)
         }
+        if committedCost == .normal,
+           encounter.rankAtPreviousCompletedAction != nil,
+           let rank = encounter.partyRanks[actor] {
+            encounter.rankAtPreviousCompletedAction?[actor] = rank
+        }
 
         // The FF12 rule: an override covers that turn and then hands control back.
         if actor.rosterIndex != nil { encounter.isCompanionOverridden = false }
@@ -1259,11 +1265,29 @@ enum CombatRules {
         }
     }
 
+    private static func conditionalDirectHitComponents(actor: Combatant, foe: FoeState,
+                                                        encounter: EncounterState) -> [EncounterState.DirectHitComponent] {
+        guard let ownership = encounter.debugV2OwnedNodeIDs,
+              let previousRanks = encounter.rankAtPreviousCompletedAction else { return [] }
+        let currentRank = encounter.partyRanks[actor]
+        return CombatDerivedStatsRules.conditionalDirectHitComponents(
+            ownedNodeIDs: ownership[actor] ?? [],
+            snapshot: .init(targetArmour: foe.stats.armour,
+                            coveringDensity: foe.traits?.covering.coverage,
+                            actorHeldRank: currentRank != nil && currentRank == previousRanks[actor],
+                            targetHasAffliction: !afflictions(on: .foe(foe.id), in: encounter).isEmpty)
+        )
+    }
+
     static func debugV2DirectAttackPreview(foe: FoeState, in state: GameState,
                                            standingBack: Bool = false) -> CombatDamageRules.Preview? {
         guard let receipt = state.worlds.activeRun?.activeEncounter?.debugV2BinderAttack else { return nil }
+        guard let encounter = state.worlds.activeRun?.activeEncounter else { return nil }
+        let conditional = conditionalDirectHitComponents(actor: .binder, foe: foe,
+                                                         encounter: encounter).reduce(0) { $0 + $1.amount }
         let power = binderAttack(in: state)
             + receipt.preMatchupBonus(for: receipt.ordinaryWeaponKind).total
+            + conditional
         let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
         let range = max(Tuning.Encounter.minimumDamage, power - spread)...max(Tuning.Encounter.minimumDamage,
                                                                                power + spread)
@@ -1292,7 +1316,8 @@ enum CombatRules {
                                /// same reason `coating` is.
                                breaking: WildRule? = nil,
                                innateStatus: String? = nil,
-                               allowsStagger: Bool = false) -> Bool {
+                               allowsStagger: Bool = false,
+                               allowsConditionalDirectHit: Bool = false) -> Bool {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
         else { return false }
 
@@ -1316,7 +1341,10 @@ enum CombatRules {
 
         // **The matchup.** What you're swinging against what it's wearing, then armour on what's
         // left — and a piercing weapon goes through a share of that armour rather than all of it.
-        let rolledPower = roll(around: damage, run: &run)
+        let conditional = allowsConditionalDirectHit
+            ? conditionalDirectHitComponents(actor: actor, foe: foe, encounter: encounter)
+            : []
+        let rolledPower = roll(around: damage + conditional.reduce(0) { $0 + $1.amount }, run: &run)
         let resolved = CombatDamageRules.resolve(
             rolledPower: rolledPower,
             in: .init(damageKind: kind,

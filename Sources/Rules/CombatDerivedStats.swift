@@ -126,6 +126,36 @@ enum CombatDerivedStatsRules {
         static let stagger: CombatNodeID = "combat.offense.force.stagger"
         /// Producer identity only. Breaking Blow is not activated by the Stagger checkpoint.
         static let breakingBlow: CombatNodeID = "combat.offense.force.breaking_blow"
+        static let followThrough: CombatNodeID = "combat.offense.force.follow_through"
+        static let bracingStance: CombatNodeID = "combat.offense.force.bracing_stance"
+        static let weakPoint: CombatNodeID = "combat.offense.precision.weak_point"
+        static let exploit: CombatNodeID = "combat.offense.precision.exploit"
+    }
+
+    struct DirectHitSnapshot: Equatable, Sendable {
+        var targetArmour: Int
+        var coveringDensity: Double?
+        var actorHeldRank: Bool
+        var targetHasAffliction: Bool
+    }
+
+    static func conditionalDirectHitComponents(
+        ownedNodeIDs: Set<CombatNodeID>, snapshot: DirectHitSnapshot
+    ) -> [EncounterState.DirectHitComponent] {
+        var result: [EncounterState.DirectHitComponent] = []
+        if ownedNodeIDs.contains(Node.followThrough), snapshot.targetArmour >= 8 {
+            result.append(.init(nodeID: Node.followThrough, amount: 3))
+        }
+        if ownedNodeIDs.contains(Node.bracingStance), snapshot.actorHeldRank {
+            result.append(.init(nodeID: Node.bracingStance, amount: 3))
+        }
+        if ownedNodeIDs.contains(Node.weakPoint), (snapshot.coveringDensity ?? -Double.infinity) >= 50 {
+            result.append(.init(nodeID: Node.weakPoint, amount: 3))
+        }
+        if ownedNodeIDs.contains(Node.exploit), snapshot.targetHasAffliction {
+            result.append(.init(nodeID: Node.exploit, amount: 4))
+        }
+        return result.sorted { $0.nodeID.rawValue < $1.nodeID.rawValue }
     }
 
     static func preMatchupAttackBonus(ownedNodeIDs: Set<CombatNodeID>,

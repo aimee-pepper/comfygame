@@ -3838,4 +3838,107 @@ final class CombatTests: XCTestCase {
         XCTAssertTrue(source.contains("case .refused(let refusal): refusalMessage = refusal.message"))
         XCTAssertFalse(source.contains("onUse(stack, ally)\n                                    dismiss()"))
     }
+
+    func testConditionalDirectHitComponentsUseExactThresholdsAndSumOnce() {
+        let nodes: Set<CombatNodeID> = [
+            CombatDerivedStatsRules.Node.followThrough,
+            CombatDerivedStatsRules.Node.bracingStance,
+            CombatDerivedStatsRules.Node.weakPoint,
+            CombatDerivedStatsRules.Node.exploit
+        ]
+        let all = CombatDerivedStatsRules.conditionalDirectHitComponents(
+            ownedNodeIDs: nodes,
+            snapshot: .init(targetArmour: 8, coveringDensity: 50,
+                            actorHeldRank: true, targetHasAffliction: true))
+        XCTAssertEqual(all.reduce(0) { $0 + $1.amount }, 13)
+        XCTAssertEqual(Set(all.map(\.nodeID)), nodes)
+
+        let below = CombatDerivedStatsRules.conditionalDirectHitComponents(
+            ownedNodeIDs: nodes,
+            snapshot: .init(targetArmour: 7, coveringDensity: 49.999,
+                            actorHeldRank: false, targetHasAffliction: false))
+        XCTAssertTrue(below.isEmpty)
+        XCTAssertTrue(CombatDerivedStatsRules.conditionalDirectHitComponents(
+            ownedNodeIDs: [],
+            snapshot: .init(targetArmour: 99, coveringDensity: 100,
+                            actorHeldRank: true, targetHasAffliction: true)).isEmpty)
+    }
+
+    func testConditionalDirectHitReceiptPersistsFrozenRanksAndEnabledEmpty() throws {
+        var rng = SeededRNG(seed: 44)
+        var encounter = CombatRules.makeEncounter(
+            id: InstanceID(rawValue: 44), foes: [], party: [.binder],
+            debugV2OwnedNodeIDs: [.binder: [CombatDerivedStatsRules.Node.bracingStance]],
+            partyRanks: [.binder: .front], rng: &rng)
+        XCTAssertEqual(encounter.rankAtPreviousCompletedAction?[.binder], encounter.partyRanks[.binder])
+        encounter.partyRanks[.binder] = .back
+        let decoded = try JSONDecoder().decode(EncounterState.self,
+                                               from: JSONEncoder().encode(encounter))
+        XCTAssertEqual(decoded.rankAtPreviousCompletedAction?[.binder], .front)
+        XCTAssertEqual(decoded.partyRanks[.binder], .back)
+
+        var emptyRNG = SeededRNG(seed: 45)
+        let empty = CombatRules.makeEncounter(id: InstanceID(rawValue: 45), foes: [], party: [.binder],
+                                              debugV2OwnedNodeIDs: [:], rng: &emptyRNG)
+        XCTAssertNotNil(empty.rankAtPreviousCompletedAction)
+        XCTAssertEqual(empty.debugV2OwnedNodeIDs, [:])
+    }
+
+    func testConditionalDirectHitOrdinaryAttackPreviewAndCommitShareFrozenSnapshot() throws {
+        let allNodes: Set<CombatNodeID> = [
+            CombatDerivedStatsRules.Node.followThrough,
+            CombatDerivedStatsRules.Node.bracingStance,
+            CombatDerivedStatsRules.Node.weakPoint,
+            CombatDerivedStatsRules.Node.exploit
+        ]
+        for nodes in [allNodes, Set<CombatNodeID>()] {
+            let store = GameStore(io: .temporary(name: "conditional-hit-\(UUID().uuidString)"))
+            store.write("plains"); store.bindAndDepart()
+            let foeID = InstanceID(rawValue: 8_401)
+            var traits = CreatureTraits()
+            traits.covering = Covering(hardness: 60, length: 0, coverage: 50)
+            var stats = CombatStats.derived(from: traits, name: "Marked target", icon: "circle")
+            stats.maxHP = 500; stats.armour = 8; stats.evasion = 0
+            store.mutate("stage conditional direct hit") { state in
+                state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "field_maul")
+                guard var run = state.worlds.activeRun else { return }
+                var orderRNG = SeededRNG(seed: 88)
+                var encounter = CombatRules.makeEncounter(
+                    id: InstanceID(rawValue: 8_400),
+                    foes: [.init(id: foeID, traits: traits, stats: stats, currentHP: stats.maxHP)],
+                    party: [.binder],
+                    debugV2BinderAttack: .init(
+                        ordinaryWeaponKind: .crush,
+                        crushBonus: .init(components: []),
+                        pierceBonus: .init(components: [])),
+                    debugV2OwnedNodeIDs: [.binder: nodes],
+                    partyRanks: [.binder: .front], rng: &orderRNG)
+                encounter.order = [.binder, .foe(foeID)]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                _ = CombatRules.applyAffliction(.burn, to: .foe(foeID), source: .binder,
+                                                provenance: .direct, damage: 1, ticks: 2,
+                                                targetIsStanding: true, encounter: &encounter)
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+            }
+            let foe = try XCTUnwrap(store.activeEncounter?.foes.first)
+            let preview = try XCTUnwrap(CombatRules.debugV2DirectAttackPreview(foe: foe, in: store.state))
+            let conditional = nodes.isEmpty ? 0 : 13
+            let power = CombatRules.binderAttack(in: store.state) + conditional
+            let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
+            var fixedRNG = try XCTUnwrap(store.state.worlds.activeRun).rng
+            let roll = max(Tuning.Encounter.minimumDamage, power + fixedRNG.int(in: -spread...spread))
+            let expected = CombatDamageRules.resolve(
+                rolledPower: roll,
+                in: .init(damageKind: .crush, covering: traits.covering, armour: stats.armour))
+            let before = foe.currentHP
+            store.mutate("commit conditional direct hit") {
+                CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0)
+            }
+            let committed = before - (try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP))
+            XCTAssertEqual(committed, expected.finalDamage)
+            XCTAssertTrue((preview.lower.finalDamage...preview.upper.finalDamage).contains(committed))
+        }
+    }
 }
