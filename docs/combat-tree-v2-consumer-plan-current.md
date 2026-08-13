@@ -1412,6 +1412,36 @@ Constitution; Stonebark canonical order/no-op; existing stronger/weaker status m
 spend; actor/source provenance; purchase cancel/respec/repurchase/legacy Heat adoption; five-person
 no-aura; encounter freeze/relaunch; preview=commit; and disabled/empty-v2 parity.
 
+## Remaining implementation waves — 13 August
+
+Do not choose the next node by catalogue order. After the thirteen live scenario consumers, use
+these dependency-shaped waves:
+
+1. **Complete evasion state:** Feint + Untouchable on the live Sidestep/Ghost/Footwork resolver.
+2. **Canonical afflictions:** migrate exact-combatant Burn/Poison/Dazzle/Bleed before adding any new
+   producer or cure consumer. This is the shared prerequisite for Flense, Virulence/Corrode/Blight,
+   Quench, Envenom, Emanation Strike and the passive affliction roots.
+3. **Direct-hit components:** Follow Through, Bracing Stance, Weak Point and Exploit; then Pry,
+   Finish and Steady Hand. Flense joins only after wave 2. Breaking Blow and Killing Stroke follow
+   on the same landed-hit/saved-personal-turn receipts.
+4. **Non-recursive consequences:** Second Wind/Rally/Cascade, then Flurry/Conduction, then the
+   Virulence/Corrode/Blight affliction consequences. Do not implement a recursive attack call for
+   any carried or defeat event.
+5. **Mitigation, survival and targeting:** Brace/Ward/Snuff/Quench; Constitution/Endurance/
+   Unyielding; Guardian/Draw Off/Interpose/Cover. These consume the canonical incoming-harm,
+   affliction and final-target receipts rather than creating parallel clocks.
+6. **Personal-turn techniques:** Quicken/Blur/Overbear/First Strike, then Fall Back/Conceal/
+   Envenom/Emanation Strike. Finish Slippery/Watchful/Low Profile/Ambush/Unseen only after their
+   shared persisted opening authority remains intact through these action producers.
+7. **Economy and passive payloads:** Anatomy/Apothecary's Hand, then Tainted Edge/Sparkhand/Emanant.
+   Distiller uses Aimee's Homework answer; do not ship the mathematically inert discount.
+8. **Gear-tempo and external attack dependencies:** Light Touch/Momentum wait for exact frozen gear
+   initiative. Attunement waits for both Emanation Strike and a real Channelworks combat attack.
+
+Shatter is the only held technique and uses Homework `combat-shatter-effect`; Distiller uses
+`combat-distiller-effect`. Every other node in these waves has a complete semantic/acceptance
+contract in this document. A held node never blocks an independent earlier wave.
+
 ## Slice gates
 
 Each slice must prove:

@@ -3504,3 +3504,20 @@ Whether the player may replace that suggested item set is a separate design choi
 favourite-first automation and deliberately holding agency until the arithmetic/receipt is playable.
 No answer may change the fixed retention budget, bulk-resource automation or protection for knowledge,
 people and pre-departure property.
+
+## 278. The single fresh-save defeat does not authorize a global encounter nerf
+
+**Date:** 13 August 2026
+
+The only retained feel evidence is one uncontrolled fresh-save defeat in a possibly Teeming world,
+without a complete encounter receipt. Recommended scaling adds 15% HP and no follow-up to one real
+foe against fresh Binder + Quill; it adds no hidden pressure to an already-visible two-/three-foe
+group. Generated species, grouping, Greed/Stability level, opening and matchup can each explain a
+loss independently.
+
+Keep the current reversible coefficients until the exact Normal-versus-Teeming control in
+`encounter-scaling-playtest-current.md` is captured. Repeated isolated Normal failure routes to the
+level-1 creature/unarmed baseline; Teeming-only grouped failure routes to density/grouping/contact
+agency; a single species outlier routes to that identity. Apex values remain structurally accepted
+but numerically unpromoted until two- and five-person phone bands exist. This is disciplined tuning,
+not acceptance of the present feel.
