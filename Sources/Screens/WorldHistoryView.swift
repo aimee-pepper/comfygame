@@ -511,7 +511,8 @@ private struct VisitedWorldSheet: View {
                                     Text(person.name)
                                     Spacer(minLength: 8)
                                     Text(store.state.reality.library.foundTravellers.contains(id)
-                                         ? "with you" : "still there")
+                                         ? LibraryPresentation.placementLabel(for: person, in: store.state)
+                                         : "Still there")
                                         .foregroundStyle(.secondary)
                                 }
                                 .frame(minHeight: 44)

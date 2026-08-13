@@ -907,6 +907,15 @@ final class LibraryTests: XCTestCase {
         XCTAssertEqual(LibraryPresentation.placementLabel(for: definition, in: state), "At Home")
         state.base.activeParty.append(index)
         XCTAssertEqual(LibraryPresentation.placementLabel(for: definition, in: state), "With you")
+
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let historySource = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/WorldHistoryView.swift"), encoding: .utf8)
+        XCTAssertTrue(historySource.contains(
+            "LibraryPresentation.placementLabel(for: person, in: store.state)"
+        ))
+        XCTAssertFalse(historySource.contains("? \"with you\" : \"still there\""))
     }
 
     func testRunRecapListsOnlyPagesFoundThisTrip() throws {
