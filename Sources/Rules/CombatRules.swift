@@ -1091,6 +1091,14 @@ enum CombatRules {
 
         guard case .committed(let committedCost, let completedDirectAttack) = outcome else { return }
 
+        // Ambush is a separate opening opportunity, not the actor's first normal-cost action.
+        // Choosing anything else closes that opportunity even when the chosen setup action costs
+        // no ordinary turn (for example Quicken or Fall Back).
+        let completedAmbush: Bool = if case .skill(let id, _, _) = action {
+            ContentCatalog.shared.skill(id)?.kind == .ambush
+        } else { false }
+        if !completedAmbush { encounter.openingAttackConsumed.insert(actor) }
+
         // Feint lasts through the consequences of the next normal-cost action. Expire the receipt
         // that existed at action start, then let a direct action arm/refresh the next one.
         if committedCost == .normal, feintWasActive { encounter.feintActive?.remove(actor) }

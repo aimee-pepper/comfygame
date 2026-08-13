@@ -1217,7 +1217,10 @@ final class WorldTests: XCTestCase {
                                   runsAutomaticTurns: false, in: &quickenFirst)
         CombatRules.perform(.skill("quicken"), by: .binder, in: &quickenFirst)
         let afterQuicken = try XCTUnwrap(quickenFirst.worlds.activeRun?.activeEncounter)
-        XCTAssertTrue(afterQuicken.completedFirstActions.contains(.binder))
+        XCTAssertFalse(afterQuicken.completedFirstActions.contains(.binder),
+                       "Quicken was incorrectly recorded as a normal-cost first action")
+        XCTAssertTrue(afterQuicken.openingAttackConsumed.contains(.binder),
+                      "choosing Quicken did not close the separate Ambush opportunity")
         XCTAssertFalse(CombatRules.isReady(ambushSkill, for: .binder, in: afterQuicken),
                        "Quicken left Ambush available on its borrowed action")
 
