@@ -19,6 +19,49 @@ final class TradingPostTests: XCTestCase {
         XCTAssertEqual(restored.inventoryRevision, 0)
     }
 
+    func testLegacyResourceStockRowDecodesRoundTripsAndRemainsPurchasable() throws {
+        let modern = TradingPostStockLine(id: 9, kind: .resource("clay"),
+                                          remainingQuantity: 2, unitPrice: 3)
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(modern)) as? [String: Any])
+        object.removeValue(forKey: "frozenUnits")
+        let legacy = try SaveCodec.makeDecoder().decode(
+            TradingPostStockLine.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertEqual(legacy.frozenUnits, [])
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(
+            TradingPostStockLine.self, from: SaveCodec.makeEncoder().encode(legacy)), legacy)
+
+        var base = BaseState.newGame()
+        base.goldCoins = 6
+        base.tradingPost.stock = [legacy]
+        let preview = try XCTUnwrap(TradingPostRules.previewPurchase(lineID: 9, quantity: 2, in: base))
+        XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .committed)
+        XCTAssertEqual(base.resources["clay"], 2)
+        XCTAssertEqual(base.goldCoins, 0)
+    }
+
+    func testLegacyItemAndMaterialRowsDecodeButFailClosedWithoutFrozenIdentity() throws {
+        let sample = MaterialSample(kind: .hide, properties: .init(flexibility: 30),
+                                    grade: 28, source: "legacy supplier")
+        for modern in [
+            TradingPostStockLine(id: 10, kind: .item("salve_lesser"),
+                                 remainingQuantity: 1, unitPrice: 6),
+            TradingPostStockLine(id: 11, kind: .material(sample),
+                                 remainingQuantity: 1, unitPrice: 3)
+        ] {
+            var object = try XCTUnwrap(JSONSerialization.jsonObject(
+                with: SaveCodec.makeEncoder().encode(modern)) as? [String: Any])
+            object.removeValue(forKey: "frozenUnits")
+            let legacy = try SaveCodec.makeDecoder().decode(
+                TradingPostStockLine.self, from: JSONSerialization.data(withJSONObject: object))
+            XCTAssertEqual(legacy.frozenUnits, [])
+            var base = BaseState.newGame()
+            base.goldCoins = 100
+            base.tradingPost.stock = [legacy]
+            XCTAssertNil(TradingPostRules.previewPurchase(lineID: legacy.id, quantity: 1, in: base))
+        }
+    }
+
     func testEveryResourceHasAnExplicitTradeClassification() {
         XCTAssertEqual(TradingPostRules.unclassifiedResourceIDs(), [])
         XCTAssertEqual(TradingPostRules.tradeBand(for: "essence_raw"), .nontradeable)
@@ -78,6 +121,106 @@ final class TradingPostTests: XCTestCase {
         XCTAssertTrue(restored.tradingPost.stock.allSatisfy { line in
             line.remainingQuantity > 0 && line.unitPrice >= 3
         })
+    }
+
+    func testCompleteRefreshFreezesBoundedKnownShelvesAndOneTierOneWeapon() throws {
+        var first = BaseState.newGame()
+        first.knownConsumableRecipes = ["salve_lesser", "salve", "salve_greater"]
+        var second = first
+        XCTAssertTrue(TradingPostRules.refresh(after: 30, campaignSeed: 0xCAFE, in: &first))
+        XCTAssertTrue(TradingPostRules.refresh(after: 30, campaignSeed: 0xCAFE, in: &second))
+        XCTAssertEqual(first.tradingPost, second.tradingPost)
+
+        let materials = first.tradingPost.stock.filter {
+            if case .material = $0.kind { return true }; return false
+        }
+        let itemLines = first.tradingPost.stock.filter {
+            if case .item = $0.kind { return true }; return false
+        }
+        let equipment = itemLines.filter { line in
+            guard case .item(let id) = line.kind else { return false }
+            return ContentCatalog.shared.item(id)?.gear != nil
+        }
+        let consumables = itemLines.filter { line in
+            guard case .item(let id) = line.kind else { return false }
+            return ContentCatalog.shared.item(id)?.kind == .consumable
+        }
+        XCTAssertLessThanOrEqual(materials.count, 2)
+        XCTAssertLessThanOrEqual(consumables.count, 2)
+        XCTAssertEqual(equipment.count, 1)
+        XCTAssertEqual(ContentCatalog.shared.item(equipment[0].frozenUnits[0].catalogID)?.gear?.tier, 1)
+        XCTAssertEqual(ContentCatalog.shared.item(equipment[0].frozenUnits[0].catalogID)?.gear?.slot, .weapon)
+        XCTAssertEqual(equipment[0].remainingQuantity, 1)
+        XCTAssertEqual(equipment[0].unitPrice,
+                       try XCTUnwrap(TradingPostRules.saleUnitPrice(for: equipment[0].frozenUnits[0])) * 3)
+        XCTAssertTrue(consumables.allSatisfy { line in
+            guard case .item(let id) = line.kind,
+                  let rarity = ContentCatalog.shared.item(id)?.rarity else { return false }
+            return first.knownConsumableRecipes.contains(id)
+                && (rarity == .common || rarity == .uncommon)
+                && (1...2).contains(line.remainingQuantity)
+                && line.unitPrice == (rarity == .common ? 6 : 15)
+                && line.frozenUnits.count == line.remainingQuantity
+        })
+        XCTAssertTrue(materials.allSatisfy { line in
+            guard case .material(let sample) = line.kind else { return false }
+            return line.remainingQuantity == 1 && line.unitPrice == 3
+                && line.frozenUnits.first?.materials == [sample]
+                && sample.source == "Vance's supplier" && sample.qualifier == nil
+                && (25...39).contains(Int(sample.grade))
+        })
+
+        let restored = try SaveCodec.makeDecoder().decode(
+            BaseState.self, from: SaveCodec.makeEncoder().encode(first))
+        XCTAssertEqual(restored.tradingPost, first.tradingPost)
+    }
+
+    func testOwnedWeaponRefreshAllowsAnyOrdinaryTierOneSlotAndExcludesForbiddenGear() {
+        var sawNonWeapon = false
+        for seed in UInt64(1)...100 where !sawNonWeapon {
+            var base = BaseState.newGame()
+            base.inventory.stacks = [
+                ItemStack(id: InstanceID(rawValue: 400), catalogID: "blade_chipped")
+            ]
+            XCTAssertTrue(TradingPostRules.refresh(after: 1, campaignSeed: seed, in: &base))
+            let equipment = base.tradingPost.stock.first { line in
+                guard case .item(let id) = line.kind else { return false }
+                return ContentCatalog.shared.item(id)?.gear != nil
+            }
+            guard let equipment, case .item(let id) = equipment.kind,
+                  let gear = ContentCatalog.shared.item(id)?.gear else {
+                return XCTFail("every refresh requires one equipment line")
+            }
+            XCTAssertEqual(gear.tier, 1)
+            XCTAssertNil(gear.breaks)
+            XCTAssertTrue(TradingPostRules.isAuthoredTransferable(id))
+            sawNonWeapon = gear.slot != .weapon
+        }
+        XCTAssertTrue(sawNonWeapon, "weapon ownership must broaden the frozen refresh eligibility")
+    }
+
+    func testFrozenItemPurchaseUsesWaitingAndRejectsStaleSnapshotAtomically() throws {
+        var base = BaseState.newGame()
+        base.knownConsumableRecipes = ["salve_lesser"]
+        base.inventory.slots = 0
+        base.inventory.stacks = []
+        base.goldCoins = 10_000
+        XCTAssertTrue(TradingPostRules.refresh(after: 80, campaignSeed: 0xBAD5EED, in: &base))
+        let equipment = try XCTUnwrap(base.tradingPost.stock.first { line in
+            guard case .item(let id) = line.kind else { return false }
+            return ContentCatalog.shared.item(id)?.gear != nil
+        })
+        let frozen = try XCTUnwrap(equipment.frozenUnits.first)
+        let preview = try XCTUnwrap(TradingPostRules.previewPurchase(
+            lineID: equipment.id, quantity: 1, in: base))
+        let stale = preview
+        XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .committed)
+        XCTAssertEqual(base.spillover.last, frozen)
+        XCTAssertEqual(base.tradingPost.stock.first(where: { $0.id == equipment.id })?.remainingQuantity, 0)
+
+        let before = base
+        XCTAssertEqual(TradingPostRules.commit(stale, in: &base), .stale)
+        XCTAssertEqual(base, before)
     }
 
     func testResolvedRunWrapperAdvancesOnePersistedSnapshotPerSequentialCall() {

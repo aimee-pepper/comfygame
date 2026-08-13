@@ -47,6 +47,40 @@ struct TradingPostStockLine: Codable, Equatable, Identifiable, Sendable {
     var kind: Kind
     var remainingQuantity: Int
     var unitPrice: Int
+    /// Exact persisted objects supplied by this line, one entry per purchasable unit. Old resource
+    /// shelves decode empty; item/material shelves without this receipt remain safely unbuyable.
+    var frozenUnits: [ItemStack] = []
+
+    private enum CodingKeys: String, CodingKey {
+        case id, kind, remainingQuantity, unitPrice, frozenUnits
+    }
+
+    init(id: UInt64, kind: Kind, remainingQuantity: Int, unitPrice: Int,
+         frozenUnits: [ItemStack] = []) {
+        self.id = id
+        self.kind = kind
+        self.remainingQuantity = remainingQuantity
+        self.unitPrice = unitPrice
+        self.frozenUnits = frozenUnits
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UInt64.self, forKey: .id)
+        kind = try c.decode(Kind.self, forKey: .kind)
+        remainingQuantity = try c.decode(Int.self, forKey: .remainingQuantity)
+        unitPrice = try c.decode(Int.self, forKey: .unitPrice)
+        frozenUnits = try c.decodeIfPresent([ItemStack].self, forKey: .frozenUnits) ?? []
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(kind, forKey: .kind)
+        try c.encode(remainingQuantity, forKey: .remainingQuantity)
+        try c.encode(unitPrice, forKey: .unitPrice)
+        try c.encode(frozenUnits, forKey: .frozenUnits)
+    }
 }
 
 enum TradingPostTradeBand: String, Codable, CaseIterable, Sendable {
@@ -116,6 +150,7 @@ struct TradingPostPurchasePreview: Equatable, Sendable {
     var kind: Kind
     var quantity: Int
     var goldCost: Int
+    var frozenUnits: [ItemStack] = []
 }
 
 enum TradingPostCommitResult: Equatable, Sendable {

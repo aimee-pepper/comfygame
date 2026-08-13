@@ -111,12 +111,114 @@ enum TradingPostRules {
         for id in chosen(staples, count: rng.int(in: 3...5)) { append(id, quantity: rng.int(in: 3...8)) }
         for id in chosen(uncommon, count: rng.int(in: 0...2)) { append(id, quantity: rng.int(in: 1...3)) }
 
+        var nextItemID = base.nextItemID()
+        func mint(_ catalogID: ItemID, count: Int = 1,
+                  material: MaterialSample? = nil) -> [ItemStack] {
+            (0..<count).map { _ in
+                defer { nextItemID &+= 1 }
+                if let material {
+                    return ItemStack(id: InstanceID(rawValue: nextItemID), catalogID: Items.material,
+                                     materials: [material])
+                }
+                return ItemStack(id: InstanceID(rawValue: nextItemID), catalogID: catalogID)
+            }
+        }
+        func append(kind: TradingPostStockLine.Kind, quantity: Int, unitPrice: Int,
+                    units: [ItemStack]) {
+            lines.append(.init(id: post.nextStockLineID, kind: kind,
+                               remainingQuantity: quantity, unitPrice: unitPrice,
+                               frozenUnits: units))
+            post.nextStockLineID &+= 1
+        }
+
+        let physicalKinds: [MaterialKind] = [
+            .plate, .quill, .pelt, .down, .hide, .chitin, .fang, .tusk, .claw, .bone,
+            .timber, .fibre, .pulp
+        ]
+        for kind in chosenMaterialKinds(physicalKinds, count: rng.int(in: 0...2), rng: &rng) {
+            let pair = merchantPropertyPair(for: kind)
+            var properties = MaterialProperties()
+            properties[pair.0] = Double(rng.int(in: 30...39))
+            properties[pair.1] = Double(rng.int(in: 15...29))
+            for property in MaterialProperty.allCases where property != pair.0 && property != pair.1 {
+                properties[property] = Double(rng.int(in: 0...14))
+            }
+            let sample = MaterialSample(kind: kind, properties: properties,
+                                        grade: Double(rng.int(in: 25...39)),
+                                        source: "Vance's supplier")
+            append(kind: .material(sample), quantity: 1, unitPrice: 3,
+                   units: mint(Items.material, material: sample))
+        }
+
+        let knownConsumables = base.knownConsumableRecipes.compactMap { id -> ItemDef? in
+            guard let item = catalog.item(id), item.kind == .consumable,
+                  item.rarity == .common || item.rarity == .uncommon else { return nil }
+            return item
+        }.sorted { $0.id.rawValue < $1.id.rawValue }
+        for item in chosenItems(knownConsumables, count: rng.int(in: 0...2), rng: &rng) {
+            let quantity = rng.int(in: 1...2)
+            let units = mint(item.id, count: quantity)
+            let price = (saleUnitPrice(for: units[0], catalog: catalog) ?? 0) * 3
+            append(kind: .item(item.id), quantity: quantity, unitPrice: price,
+                   units: units)
+        }
+
+        let ownsWeapon = ownsCampaignWeapon(base)
+        let equipment = catalog.items.filter { item in
+            guard let gear = item.gear else { return false }
+            return gear.tier == 1 && gear.breaks == nil && transferableItemIDs.contains(item.id)
+                && (ownsWeapon || gear.slot == .weapon)
+        }.sorted { $0.id.rawValue < $1.id.rawValue }
+        if let item = chosenItems(equipment, count: 1, rng: &rng).first {
+            let units = mint(item.id)
+            let price = (saleUnitPrice(for: units[0], catalog: catalog) ?? 0) * 3
+            append(kind: .item(item.id), quantity: 1, unitPrice: price, units: units)
+        }
+
         post.stock = lines
         post.essenceBundlesRemaining = rng.chance(0.35) ? rng.int(in: 1...3) : 0
         post.expeditionOutcomeID = outcomeID
         post.inventoryRevision &+= 1
         base.tradingPost = post
         return true
+    }
+
+    private static func chosenItems<T>(_ source: [T], count: Int,
+                                       rng: inout SeededRNG) -> [T] {
+        var remaining = source
+        var result: [T] = []
+        for _ in 0..<min(count, remaining.count) {
+            result.append(remaining.remove(at: rng.int(in: 0...(remaining.count - 1))))
+        }
+        return result
+    }
+
+    private static func chosenMaterialKinds(_ source: [MaterialKind], count: Int,
+                                            rng: inout SeededRNG) -> [MaterialKind] {
+        chosenItems(source, count: count, rng: &rng)
+    }
+
+    private static func merchantPropertyPair(for kind: MaterialKind) -> (MaterialProperty, MaterialProperty) {
+        switch kind {
+        case .plate, .chitin, .bone, .tusk: (.hardness, .density)
+        case .fang, .claw: (.hardness, .reactivity)
+        case .quill: (.flexibility, .hardness)
+        case .pelt, .down: (.insulation, .flexibility)
+        case .hide: (.flexibility, .hardness)
+        case .timber: (.density, .hardness)
+        case .fibre: (.flexibility, .insulation)
+        case .pulp: (.flexibility, .reactivity)
+        case .ichor, .toxin, .reagent: (.reactivity, .density)
+        }
+    }
+
+    private static func ownsCampaignWeapon(_ base: BaseState) -> Bool {
+        let stored = base.inventory.stacks + base.spillover
+        if stored.contains(where: { ContentCatalog.shared.item($0.catalogID)?.gear?.slot == .weapon }) {
+            return true
+        }
+        if base.binderEquipped[.weapon] != nil { return true }
+        return base.roster.contains { $0.equipped[.weapon] != nil }
     }
 
     static func previewSale(resources requested: [ResourceID: Int],
@@ -211,10 +313,16 @@ enum TradingPostRules {
                                 in base: BaseState) -> TradingPostPurchasePreview? {
         guard quantity > 0, let line = base.tradingPost.stock.first(where: { $0.id == lineID }),
               line.remainingQuantity >= quantity else { return nil }
+        switch line.kind {
+        case .resource: break
+        case .item, .material:
+            guard line.frozenUnits.count >= quantity else { return nil }
+        }
         let cost = quantity * line.unitPrice
         guard base.goldCoins >= cost else { return nil }
         return .init(revision: base.tradingPost.inventoryRevision, kind: .stock(lineID: lineID, kind: line.kind),
-                     quantity: quantity, goldCost: cost)
+                     quantity: quantity, goldCost: cost,
+                     frozenUnits: Array(line.frozenUnits.prefix(quantity)))
     }
 
     static func previewEssencePurchase(bundles: Int, in base: BaseState) -> TradingPostPurchasePreview? {
@@ -234,11 +342,15 @@ enum TradingPostRules {
             guard let index = base.tradingPost.stock.firstIndex(where: { $0.id == lineID }),
                   base.tradingPost.stock[index].kind == kind,
                   base.tradingPost.stock[index].remainingQuantity >= preview.quantity,
-                  preview.goldCost == base.tradingPost.stock[index].unitPrice * preview.quantity
+                  preview.goldCost == base.tradingPost.stock[index].unitPrice * preview.quantity,
+                  preview.frozenUnits == Array(base.tradingPost.stock[index].frozenUnits.prefix(preview.quantity))
             else { return .invalid }
             switch kind {
             case .resource(let id): base.resources.add(preview.quantity, of: id)
-            case .item, .material: return .invalid // enabled when capacity-aware item purchasing lands
+            case .item, .material:
+                guard preview.frozenUnits.count == preview.quantity else { return .invalid }
+                for unit in preview.frozenUnits { base.store(unit) }
+                base.tradingPost.stock[index].frozenUnits.removeFirst(preview.quantity)
             }
             base.tradingPost.stock[index].remainingQuantity -= preview.quantity
         case .essence:

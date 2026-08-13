@@ -287,7 +287,8 @@ struct BaseState: Codable, Equatable, Sendable {
         let stored = inventory.stacks.map(\.id.rawValue) + spillover.map(\.id.rawValue)
         let worn = Array(binderEquipped.values).compactMap { $0.gearProfile?.stableInstanceID.rawValue }
             + roster.flatMap { $0.equipped.values.compactMap { $0.gearProfile?.stableInstanceID.rawValue } }
-        return ((stored + worn).max() ?? 0) + 1
+        let merchant = tradingPost.stock.flatMap(\.frozenUnits).map(\.id.rawValue)
+        return ((stored + worn + merchant).max() ?? 0) + 1
     }
 
     /// `Inventory.slots` is the stored capacity (the run satchel has its own), so it has to be
