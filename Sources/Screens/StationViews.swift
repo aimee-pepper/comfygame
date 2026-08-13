@@ -1068,7 +1068,7 @@ private struct InstrumentUpgradeRow: View {
                         }
                     }
                         .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
+                        .frame(minWidth: 72, minHeight: 44)
                         .disabled(!store.instrumentCraftingReadiness(for: target.id).isReady)
                         .accessibilityIdentifier("instrument.improve.\(target.id.rawValue)")
                 }

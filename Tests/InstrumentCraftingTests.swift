@@ -3,6 +3,22 @@ import XCTest
 
 @MainActor
 final class InstrumentCraftingTests: XCTestCase {
+    func testInstrumentUpgradeUsesAnOrdinaryPhoneTouchTarget() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+            encoding: .utf8
+        )
+        let action = try XCTUnwrap(source.range(of: "Button(\"Improve\")"))
+        let end = try XCTUnwrap(source.range(of: ".accessibilityIdentifier(\"instrument.improve.",
+                                               range: action.lowerBound..<source.endIndex))
+        let button = source[action.lowerBound..<end.upperBound]
+
+        XCTAssertTrue(button.contains(".frame(minWidth: 72, minHeight: 44)"))
+        XCTAssertFalse(button.contains(".controlSize(.small)"))
+    }
+
     func testRecipesAskForPropertiesRatherThanMaterialNames() {
         var state = GameState.newGame()
         state.reality.instruments.insert("illumination")
