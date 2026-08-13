@@ -103,6 +103,9 @@ enum CombatDerivedStatsRules {
         static let lightFrame: CombatNodeID = "combat.defense.evasion.light_frame"
         static let insulation: CombatNodeID = "combat.craft.emanation.insulation"
         static let attunement: CombatNodeID = "combat.craft.emanation.attunement"
+        static let stagger: CombatNodeID = "combat.offense.force.stagger"
+        /// Producer identity only. Breaking Blow is not activated by the Stagger checkpoint.
+        static let breakingBlow: CombatNodeID = "combat.offense.force.breaking_blow"
     }
 
     static func preMatchupAttackBonus(ownedNodeIDs: Set<CombatNodeID>,

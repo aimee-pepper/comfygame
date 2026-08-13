@@ -308,6 +308,22 @@ struct EncounterState: Codable, Equatable, Sendable {
 
         func entry(for actor: Combatant) -> Entry? { entries.first { $0.actor == actor } }
     }
+    struct PendingStagger: Codable, Equatable, Sendable {
+        var foeID: InstanceID
+        var applyingRound: Int
+        var sourceActors: Set<Combatant>
+        var sourceNodeIDs: Set<CombatNodeID>
+        var automatic: Bool
+    }
+    struct StaggerAttempt: Codable, Equatable, Sendable {
+        var actor: Combatant
+        var foeID: InstanceID
+        var roll: Double?
+        var succeeded: Bool
+        var automatic: Bool
+        var applyingRound: Int?
+        var merged: Bool
+    }
     /// The saved fact of how contact began. Combat consumers read this instead of reconstructing
     /// an opening from post-contact enemy awareness or map visibility.
     enum Opening: Codable, Equatable, Sendable {
@@ -395,6 +411,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// Frozen equipment, sturdiness and explicit DEBUG-v2 ownership. Formation rank and
     /// consciousness remain encounter-owned dynamic facts.
     var debugV2Armour: DebugV2ArmourReceipt?
+    /// Explicit frozen ownership for consumers that do not yet have a dedicated derived receipt.
+    /// Nil is legacy; an empty dictionary is an enabled-v2 comparison with no owned nodes.
+    var debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]?
     /// Current formation rank belongs to this encounter. Fall Back mutates this saved receipt,
     /// never the mutable Base loadout under an already-open fight.
     var partyRanks: [Combatant: Rank] = [:]
@@ -414,6 +433,8 @@ struct EncounterState: Codable, Equatable, Sendable {
     var apexTargetsThisRound: [InstanceID: [Combatant]] = [:]
     var turnIndex: Int = 0
     var roundNumber: Int = 1
+    var pendingStaggers: [InstanceID: PendingStagger] = [:]
+    var staggerAttempts: [StaggerAttempt] = []
 
     /// Rounds until each side's skill comes back. Counted in *rounds*, never seconds.
     ///
@@ -510,6 +531,7 @@ struct EncounterState: Codable, Equatable, Sendable {
          debugV2BinderAttack: DebugV2BinderAttackReceipt? = nil,
          debugV2Initiative: DebugV2InitiativeReceipt? = nil,
          debugV2Armour: DebugV2ArmourReceipt? = nil,
+         debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = nil,
          partyRanks: [Combatant: Rank] = [:],
          log: [String] = []) {
         self.id = id
@@ -521,6 +543,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2BinderAttack = debugV2BinderAttack
         self.debugV2Initiative = debugV2Initiative
         self.debugV2Armour = debugV2Armour
+        self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
         self.partyRanks = partyRanks
         self.log = log
     }
@@ -544,6 +567,8 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                    forKey: .debugV2Initiative)
         debugV2Armour = try c.decodeIfPresent(DebugV2ArmourReceipt.self,
                                               forKey: .debugV2Armour)
+        debugV2OwnedNodeIDs = try c.decodeIfPresent([Combatant: Set<CombatNodeID>].self,
+                                                     forKey: .debugV2OwnedNodeIDs)
         partyRanks = try c.decodeIfPresent([Combatant: Rank].self, forKey: .partyRanks) ?? [:]
         opening = try? c.decodeIfPresent(OpeningResolution.self, forKey: .opening)
         completedFirstActions = try c.decodeIfPresent(Set<Combatant>.self,
@@ -557,6 +582,10 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                       forKey: .apexTargetsThisRound) ?? [:]
         turnIndex = try c.decodeIfPresent(Int.self, forKey: .turnIndex) ?? 0
         roundNumber = try c.decodeIfPresent(Int.self, forKey: .roundNumber) ?? 1
+        pendingStaggers = try c.decodeIfPresent([InstanceID: PendingStagger].self,
+                                                forKey: .pendingStaggers) ?? [:]
+        staggerAttempts = try c.decodeIfPresent([StaggerAttempt].self,
+                                                forKey: .staggerAttempts) ?? []
         binderSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .binderSkillCooldown) ?? 0
         companionSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .companionSkillCooldown) ?? 0
         cooldowns = try c.decodeIfPresent([String: Int].self, forKey: .cooldowns) ?? [:]

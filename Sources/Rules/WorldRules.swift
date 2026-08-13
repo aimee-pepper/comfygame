@@ -1353,6 +1353,16 @@ enum WorldRules {
         let partyRanks = Dictionary(uniqueKeysWithValues: party.map {
             ($0, CombatRules.rank(of: $0, in: state))
         })
+        let debugOwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = run.tuning.debugCombatV2BinderAttackEnabled
+            ? Dictionary(uniqueKeysWithValues: party.map { actor in
+                switch actor {
+                case .binder: return (actor, run.tuning.debugCombatV2BinderNodeIDs)
+                case .companion(let index):
+                    return (actor, run.tuning.debugCombatV2CompanionNodeIDs[index] ?? [])
+                case .foe: return (actor, [])
+                }
+            })
+            : nil
         run.activeEncounter = CombatRules.makeEncounter(id: InstanceID(rawValue: run.rng.next()),
                                                         foes: foes,
                                                         party: party,
@@ -1370,6 +1380,7 @@ enum WorldRules {
                                                         debugV2BinderAttack: debugAttackReceipt,
                                                         debugV2Initiative: debugInitiativeReceipt,
                                                         debugV2Armour: debugArmourReceipt,
+                                                        debugV2OwnedNodeIDs: debugOwnedNodeIDs,
                                                         partyRanks: partyRanks,
                                                         rng: &run.rng)
         run.activeEncounter?.scalingPreview = scalingPreview

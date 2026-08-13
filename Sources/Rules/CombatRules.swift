@@ -26,6 +26,7 @@ enum CombatRules {
                               debugV2BinderAttack: EncounterState.DebugV2BinderAttackReceipt? = nil,
                               debugV2Initiative: EncounterState.DebugV2InitiativeReceipt? = nil,
                               debugV2Armour: EncounterState.DebugV2ArmourReceipt? = nil,
+                              debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = nil,
                               partyRanks: [Combatant: Rank] = [:],
                               rng: inout SeededRNG) -> EncounterState {
         var ranked: [(actor: Combatant, initiative: Int, first: Bool)] = party.map { member in
@@ -105,6 +106,7 @@ enum CombatRules {
             debugV2BinderAttack: debugV2BinderAttack,
             debugV2Initiative: finalizedInitiative,
             debugV2Armour: debugV2Armour,
+            debugV2OwnedNodeIDs: debugV2OwnedNodeIDs,
             partyRanks: partyRanks,
             log: opening
         )
@@ -519,7 +521,7 @@ enum CombatRules {
                                                                        encounter: encounter),
                    by: actor, kind: .crush,
                    run: &run, encounter: &encounter, verb: skill.name,
-                   standingBack: standingBack, reachOfActor: reach)
+                   standingBack: standingBack, reachOfActor: reach, allowsStagger: true)
             encounter.skippedTurns[actor, default: 0] += 1
             encounter.note("You're off balance.")
 
@@ -651,7 +653,7 @@ enum CombatRules {
             encounter.extraTurns[actor, default: 0] += 1
             strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
                    run: &run, encounter: &encounter, verb: skill.name,
-                   standingBack: standingBack, reachOfActor: reach)
+                   standingBack: standingBack, reachOfActor: reach, allowsStagger: true)
 
         case .brace:
             encounter.braced[actor] = skill.rounds
@@ -908,7 +910,8 @@ enum CombatRules {
                    reachOfActor: reach(for: actor, in: state),
                    coating: coating(of: actor, in: state),
                    breaking: wildRule(for: actor, in: state),
-                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind)
+                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
+                   allowsStagger: true)
 
         case .skill(let id, let foeID, let allyID):
             if let skill = ContentCatalog.shared.skill(id), skills(for: actor, in: state).contains(skill),
@@ -1016,7 +1019,8 @@ enum CombatRules {
                                /// in rather than looked up, because `strike` has no `state` — the
                                /// same reason `coating` is.
                                breaking: WildRule? = nil,
-                               innateStatus: String? = nil) {
+                               innateStatus: String? = nil,
+                               allowsStagger: Bool = false) {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
         else { return }
 
@@ -1054,6 +1058,7 @@ enum CombatRules {
         let raw = resolved.rawDamage
         let amount = resolved.finalDamage
         encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
+        if !encounter.foes[index].isAlive { encounter.pendingStaggers[foeID] = nil }
 
         let soaked = raw - amount
         // "You hits" — the log addresses the Binder in the second person, so the verb has to agree.
@@ -1061,6 +1066,11 @@ enum CombatRules {
         let note = verb.map { "\(who) — \($0) — \(hits) \(name) for \(amount)." }
             ?? "\(who) \(hits) \(name) for \(amount)."
         encounter.note(soaked > 1 ? note + " Its \(armourWord(for: foe)) takes the rest." : note)
+
+        if allowsStagger, kind == .crush, encounter.foes[index].isAlive {
+            attemptStagger(foeID: foeID, actor: actor, automatic: false,
+                           run: &run, encounter: &encounter)
+        }
 
         // **Throughstroke.** It carries the damage that actually landed through the selected foe,
         // rather than rolling a second attack or inventing enemy ranks for one weapon.
@@ -1307,7 +1317,10 @@ enum CombatRules {
         let scheduleCount = max(1, encounter.turnSlots.isEmpty ? encounter.order.count : encounter.turnSlots.count)
         for step in 1...scheduleCount {
             let next = (encounter.turnIndex + step) % scheduleCount
-            if next <= encounter.turnIndex { startNewRound(&encounter); roundTurned = true }
+            if next <= encounter.turnIndex {
+                startNewRound(&encounter, run: run)
+                roundTurned = true
+            }
             encounter.turnIndex = next
             let who = encounter.turnSlots.isEmpty ? encounter.order[next] : encounter.turnSlots[next].actor
             guard isAlive(who, in: withEncounter(encounter, on: run)) else { continue }
@@ -1332,8 +1345,9 @@ enum CombatRules {
         return copy
     }
 
-    private static func startNewRound(_ encounter: inout EncounterState) {
+    private static func startNewRound(_ encounter: inout EncounterState, run: WorldRun) {
         encounter.roundNumber += 1
+        applyPendingStaggers(for: encounter.roundNumber, run: run, encounter: &encounter)
         encounter.apexTargetsThisRound.removeAll()
         encounter.binderSkillCooldown = max(0, encounter.binderSkillCooldown - 1)
         encounter.companionSkillCooldown = max(0, encounter.companionSkillCooldown - 1)
@@ -1350,6 +1364,88 @@ enum CombatRules {
         // which is what Brace and Conceal would silently have become.
         tick(&encounter.braced); tick(&encounter.dodging); tick(&encounter.concealed)
         tick(&encounter.interposing); tick(&encounter.grounding); tick(&encounter.envenomed)
+    }
+
+    static func staggerSucceeds(roll: Double, automatic: Bool) -> Bool {
+        automatic || roll < 0.30
+    }
+
+    /// Future Breaking Blow may call this with `automatic`; this checkpoint activates only the
+    /// explicit Stagger node and never infers Breaking Blow ownership or personal-turn receipts.
+    static func attemptStagger(foeID: InstanceID, actor: Combatant, automatic: Bool,
+                               run: inout WorldRun,
+                               encounter: inout EncounterState,
+                               sourceNodeID: CombatNodeID = CombatDerivedStatsRules.Node.stagger) {
+        let ownsStagger = encounter.debugV2OwnedNodeIDs?[actor]?
+            .contains(CombatDerivedStatsRules.Node.stagger) == true
+        let validProducer = automatic
+            ? sourceNodeID == CombatDerivedStatsRules.Node.breakingBlow
+            : sourceNodeID == CombatDerivedStatsRules.Node.stagger && ownsStagger
+        guard validProducer,
+              let foe = encounter.foes.first(where: { $0.id == foeID && $0.isAlive })
+        else { return }
+        let roll: Double? = automatic ? nil : run.rng.double(in: 0...1)
+        let succeeded = automatic || staggerSucceeds(roll: roll ?? 0, automatic: automatic)
+        let applyingRound = encounter.roundNumber + 1
+        let merged = encounter.pendingStaggers[foeID] != nil
+        encounter.staggerAttempts.append(.init(actor: actor, foeID: foeID, roll: roll,
+                                                succeeded: succeeded, automatic: automatic,
+                                                applyingRound: succeeded ? applyingRound : nil,
+                                                merged: succeeded && merged))
+        if encounter.staggerAttempts.count > 24 {
+            encounter.staggerAttempts.removeFirst(encounter.staggerAttempts.count - 24)
+        }
+        guard succeeded else { return }
+        if var pending = encounter.pendingStaggers[foeID] {
+            pending.sourceActors.insert(actor)
+            pending.sourceNodeIDs.insert(sourceNodeID)
+            pending.automatic = pending.automatic || automatic
+            encounter.pendingStaggers[foeID] = pending
+        } else {
+            encounter.pendingStaggers[foeID] = .init(
+                foeID: foeID, applyingRound: applyingRound, sourceActors: [actor],
+                sourceNodeIDs: [sourceNodeID], automatic: automatic)
+            encounter.note("\(foe.stats.displayName) loses footing · later in round \(applyingRound).")
+        }
+    }
+
+    static func applyPendingStaggers(for round: Int, run: WorldRun,
+                                     encounter: inout EncounterState) {
+        let applicable = encounter.pendingStaggers.values.filter { $0.applyingRound == round }
+        let sorted = applicable.sorted { lhs, rhs in
+            let left = encounter.turnSlots.firstIndex { $0.actor == .foe(lhs.foeID) } ?? -1
+            let right = encounter.turnSlots.firstIndex { $0.actor == .foe(rhs.foeID) } ?? -1
+            if left != right { return left > right }
+            return lhs.foeID.rawValue < rhs.foeID.rawValue
+        }
+        for pending in sorted {
+            defer { encounter.pendingStaggers[pending.foeID] = nil }
+            guard encounter.foes.contains(where: { $0.id == pending.foeID && $0.isAlive }) else { continue }
+            let actor = Combatant.foe(pending.foeID)
+            let name = encounter.foes.first { $0.id == pending.foeID }?.stats.displayName ?? "The foe"
+            var moved = false
+            let ownedIndices = encounter.turnSlots.indices.filter {
+                encounter.turnSlots[$0].actor == actor
+            }.sorted(by: >)
+            for index in ownedIndices {
+                guard let next = encounter.turnSlots.indices.first(where: {
+                    $0 > index && encounter.turnSlots[$0].actor != actor
+                        && isAlive(encounter.turnSlots[$0].actor,
+                                          in: withEncounter(encounter, on: run))
+                }) else { continue }
+                let slot = encounter.turnSlots.remove(at: index)
+                encounter.turnSlots.insert(slot, at: next)
+                moved = true
+            }
+            guard moved else {
+                encounter.note("\(name) has no later opening.")
+                continue
+            }
+            encounter.order = encounter.turnSlots.map(\.actor).reduce(into: [Combatant]()) { result, candidate in
+                if !result.contains(candidate) { result.append(candidate) }
+            }
+            encounter.note("\(name) falls one place later.")
+        }
     }
 
     private static func tick(_ clock: inout [Combatant: Int]) {

@@ -2290,6 +2290,9 @@ final class CombatTests: XCTestCase {
         }
         let encounter = try XCTUnwrap(store.activeEncounter)
         let receipt = try XCTUnwrap(encounter.debugV2Armour)
+        XCTAssertEqual(encounter.debugV2OwnedNodeIDs?[.binder],
+                       [CombatDerivedStatsRules.Node.ironSkin,
+                        CombatDerivedStatsRules.Node.bulwark])
         XCTAssertNotNil(receipt.entry(for: .binder))
         XCTAssertEqual(encounter.partyRanks[.binder], receipt.entry(for: .binder)?.entryRank)
         let before = try XCTUnwrap(CombatRules.v2IncomingDamage(
@@ -2319,5 +2322,266 @@ final class CombatTests: XCTestCase {
             25, by: .binder, in: relaunched.state, run: try XCTUnwrap(relaunched.activeRun),
             encounter: try XCTUnwrap(relaunched.activeEncounter)))
         XCTAssertEqual(reloaded, before)
+    }
+
+    func testStaggerRollBoundaryAndAutomaticProducerSeam() throws {
+        XCTAssertTrue(CombatRules.staggerSucceeds(roll: 0.299_999, automatic: false))
+        XCTAssertFalse(CombatRules.staggerSucceeds(roll: 0.30, automatic: false))
+        XCTAssertTrue(CombatRules.staggerSucceeds(roll: 1, automatic: true))
+
+        let foeID = InstanceID(rawValue: 8_001)
+        let stats = CombatStats(displayName: "Stoneback", icon: "circle", maxHP: 20, attack: 2)
+        var encounter = EncounterState(
+            id: InstanceID(rawValue: 8_000),
+            foes: [.init(id: foeID, stats: stats, currentHP: 20)],
+            order: [.binder, .foe(foeID)],
+            debugV2OwnedNodeIDs: [.binder: []])
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 8, rng: SeededRNG(seed: 8), map: map,
+                           playerPosition: GridPoint(x: 0, y: 0), binderHP: 20)
+        CombatRules.attemptStagger(foeID: foeID, actor: .binder, automatic: true,
+                                   run: &run, encounter: &encounter,
+                                   sourceNodeID: CombatDerivedStatsRules.Node.breakingBlow)
+        XCTAssertEqual(encounter.pendingStaggers[foeID]?.applyingRound, 2)
+        XCTAssertEqual(encounter.pendingStaggers[foeID]?.sourceNodeIDs,
+                       [CombatDerivedStatsRules.Node.breakingBlow])
+        XCTAssertTrue(encounter.pendingStaggers[foeID]?.automatic == true)
+        XCTAssertEqual(run.rng.drawCount, 0, "an automatic future producer consumes no Stagger roll")
+
+        var noNode = encounter
+        noNode.pendingStaggers = [:]
+        noNode.debugV2OwnedNodeIDs = [.binder: []]
+        let before = run.rng
+        CombatRules.attemptStagger(foeID: foeID, actor: .binder, automatic: false,
+                                   run: &run, encounter: &noNode)
+        XCTAssertEqual(run.rng, before, "enabled-empty ownership consumes no Stagger RNG")
+        XCTAssertTrue(noNode.pendingStaggers.isEmpty)
+    }
+
+    func testStaggerMovesEveryFoeSlotOneLivingPositionWithoutGatheringBurst() throws {
+        let delayed = InstanceID(rawValue: 8_101)
+        let next = InstanceID(rawValue: 8_102)
+        let stats = CombatStats(displayName: "Ram", icon: "circle", maxHP: 20, attack: 2)
+        var encounter = EncounterState(
+            id: InstanceID(rawValue: 8_100),
+            foes: [.init(id: delayed, stats: stats, currentHP: 20),
+                   .init(id: next, stats: .init(displayName: "Moth", icon: "circle", maxHP: 20, attack: 2),
+                         currentHP: 20)],
+            order: [.binder, .foe(delayed), .companion(0), .foe(next)],
+            turnSlots: [
+                .init(actor: .binder),
+                .init(actor: .foe(delayed)),
+                .init(actor: .companion(0)),
+                .init(actor: .foe(delayed), kind: .apexFollowUp(2), strengthMultiplier: 0.6,
+                      suppressesAfflictions: true),
+                .init(actor: .foe(next))
+            ],
+            debugV2OwnedNodeIDs: [.binder: [CombatDerivedStatsRules.Node.stagger]])
+        encounter.pendingStaggers[delayed] = .init(
+            foeID: delayed, applyingRound: 2, sourceActors: [.binder],
+            sourceNodeIDs: [CombatDerivedStatsRules.Node.stagger], automatic: false)
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 9, rng: SeededRNG(seed: 9), map: map,
+                           playerPosition: GridPoint(x: 0, y: 0), binderHP: 20,
+                           companionHP: [0: 20])
+        CombatRules.applyPendingStaggers(for: 2, run: run, encounter: &encounter)
+        let actors = encounter.turnSlots.map(\.actor)
+        XCTAssertEqual(actors, [.binder, .companion(0), .foe(delayed), .foe(next), .foe(delayed)])
+        XCTAssertEqual(encounter.turnSlots.filter { $0.actor == .foe(delayed) }.count, 2,
+                       "primary and follow-up are preserved without being gathered into a burst")
+        XCTAssertEqual(encounter.turnSlots.last?.kind, .apexFollowUp(2))
+        XCTAssertEqual(encounter.turnSlots.last?.strengthMultiplier, 0.6)
+        XCTAssertTrue(encounter.turnSlots.last?.suppressesAfflictions == true)
+        XCTAssertNil(encounter.pendingStaggers[delayed])
+        XCTAssertEqual(encounter.log.filter { $0 == "Ram falls one place later." }.count, 1)
+    }
+
+    func testStaggerAlreadyLastConsumesWithTruthfulFeedback() {
+        let foeID = InstanceID(rawValue: 8_151)
+        let stats = CombatStats(displayName: "Last hound", icon: "circle", maxHP: 20, attack: 2)
+        var encounter = EncounterState(
+            id: InstanceID(rawValue: 8_150),
+            foes: [.init(id: foeID, stats: stats, currentHP: 20)],
+            order: [.binder, .foe(foeID)],
+            turnSlots: [.init(actor: .binder), .init(actor: .foe(foeID)),
+                        .init(actor: .foe(foeID), kind: .ordinaryPressureFollowUp(1),
+                              strengthMultiplier: 0.55, suppressesAfflictions: true)])
+        encounter.pendingStaggers[foeID] = .init(
+            foeID: foeID, applyingRound: 2, sourceActors: [.binder],
+            sourceNodeIDs: [CombatDerivedStatsRules.Node.stagger], automatic: false)
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 9, rng: SeededRNG(seed: 9), map: map,
+                           playerPosition: GridPoint(x: 0, y: 0), binderHP: 20)
+        CombatRules.applyPendingStaggers(for: 2, run: run, encounter: &encounter)
+        XCTAssertNil(encounter.pendingStaggers[foeID])
+        XCTAssertEqual(encounter.turnSlots.map(\.actor), [.binder, .foe(foeID), .foe(foeID)],
+                       "adjacent slots from the same foe do not count as a delayed opening")
+        XCTAssertTrue(encounter.log.contains("Last hound has no later opening."))
+    }
+
+    func testStaggerReceiptMergesWithoutPushingRoundAndSurvivesRelaunch() throws {
+        let foeID = InstanceID(rawValue: 8_201)
+        let stats = CombatStats(displayName: "Hound", icon: "circle", maxHP: 20, attack: 2)
+        var encounter = EncounterState(
+            id: InstanceID(rawValue: 8_200), foes: [.init(id: foeID, stats: stats, currentHP: 20)],
+            order: [.binder, .foe(foeID)],
+            debugV2OwnedNodeIDs: [.binder: [CombatDerivedStatsRules.Node.stagger],
+                                  .companion(0): [CombatDerivedStatsRules.Node.stagger]])
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 10, rng: SeededRNG(seed: 10), map: map,
+                           playerPosition: GridPoint(x: 0, y: 0), binderHP: 20)
+        CombatRules.attemptStagger(foeID: foeID, actor: .binder, automatic: true,
+                                   run: &run, encounter: &encounter,
+                                   sourceNodeID: CombatDerivedStatsRules.Node.breakingBlow)
+        CombatRules.attemptStagger(foeID: foeID, actor: .companion(0), automatic: true,
+                                   run: &run, encounter: &encounter,
+                                   sourceNodeID: CombatDerivedStatsRules.Node.breakingBlow)
+        let pending = try XCTUnwrap(encounter.pendingStaggers[foeID])
+        XCTAssertEqual(pending.applyingRound, 2)
+        XCTAssertEqual(pending.sourceActors, [.binder, .companion(0)])
+        XCTAssertEqual(encounter.log.filter { $0.contains("loses footing") }.count, 1)
+        let resumed = try JSONDecoder().decode(EncounterState.self,
+                                                from: JSONEncoder().encode(encounter))
+        XCTAssertEqual(resumed.pendingStaggers, encounter.pendingStaggers)
+        XCTAssertEqual(resumed.staggerAttempts, encounter.staggerAttempts)
+        XCTAssertEqual(resumed.debugV2OwnedNodeIDs, encounter.debugV2OwnedNodeIDs)
+    }
+
+    func testProductionAttackCreatesStaggerOnlyForSurvivingCrushHit() throws {
+        func staged(kind: DamageKind, hp: Int, seed: UInt64) -> (GameState, InstanceID) {
+            var state = GameState.newGame()
+            state.base.binderEquipped[.weapon] = EquippedPiece(
+                catalogID: kind == .crush ? "field_maul" : "blade_keen")
+            let foeID = InstanceID(rawValue: seed + 9_000)
+            var stats = CombatStats(displayName: "Target", icon: "circle", maxHP: max(1, hp), attack: 1)
+            stats.evasion = 0; stats.armour = 0
+            let encounter = EncounterState(
+                id: InstanceID(rawValue: seed),
+                foes: [.init(id: foeID, stats: stats, currentHP: hp)],
+                order: [.binder, .foe(foeID)],
+                debugV2OwnedNodeIDs: [.binder: [CombatDerivedStatsRules.Node.stagger]],
+                partyRanks: [.binder: .front])
+            var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                               entry: GridPoint(x: 0, y: 0))
+            map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+            var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                               mapSeed: seed, rng: SeededRNG(seed: seed), map: map,
+                               playerPosition: GridPoint(x: 0, y: 0), binderHP: 20)
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+            return (state, foeID)
+        }
+
+        var successSeed: UInt64 = 1
+        while true {
+            var probe = SeededRNG(seed: successSeed)
+            _ = probe.int(in: -2...2)
+            if probe.double(in: 0...1) < 0.30 { break }
+            successSeed += 1
+        }
+        var (crush, crushID) = staged(kind: .crush, hp: 500, seed: successSeed)
+        CombatRules.perform(.attack(foe: crushID), by: .binder, in: &crush)
+        let landed = try XCTUnwrap(crush.worlds.activeRun?.activeEncounter)
+        XCTAssertNotNil(landed.pendingStaggers[crushID])
+        XCTAssertEqual(crush.worlds.activeRun?.rng.drawCount, 2,
+                       "one damage roll plus exactly one eligible Stagger roll")
+
+        var (pierce, pierceID) = staged(kind: .pierce, hp: 500, seed: 77)
+        CombatRules.perform(.attack(foe: pierceID), by: .binder, in: &pierce)
+        XCTAssertNil(pierce.worlds.activeRun?.activeEncounter?.pendingStaggers[pierceID])
+        XCTAssertEqual(pierce.worlds.activeRun?.rng.drawCount, 1,
+                       "non-Crush landed hit consumes only its damage roll")
+
+        var (lethal, lethalID) = staged(kind: .crush, hp: 1, seed: 78)
+        CombatRules.perform(.attack(foe: lethalID), by: .binder, in: &lethal)
+        XCTAssertNil(lethal.worlds.activeRun?.activeEncounter?.pendingStaggers[lethalID])
+        XCTAssertTrue(lethal.worlds.activeRun?.activeEncounter?.staggerAttempts.isEmpty == true,
+                      "a defeating blow records no Stagger attempt before victory reward RNG")
+    }
+
+    func testRealZeroTurnAmbushSchedulesStaggerNextRoundWithoutMovingCursor() throws {
+        let store = inFight()
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        var seed: UInt64 = 1
+        while true {
+            var probe = SeededRNG(seed: seed)
+            _ = probe.int(in: -2...2)
+            if probe.double(in: 0...1) < 0.30 { break }
+            seed += 1
+        }
+        store.mutate("stage zero-turn Ambush Stagger") { state in
+            state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "field_maul")
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            run.rng = SeededRNG(seed: seed)
+            encounter.order = [.binder, .foe(foeID)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            encounter.roundNumber = 1
+            encounter.opening = .init(preContactDisclosed: true, initial: .partyApproach,
+                                      slipperyProbability: nil, slipperyRoll: nil,
+                                      slipperyPrevented: false, watchfulSuppressedOpening: false,
+                                      resolved: .partyApproach, pendingFoeActions: [])
+            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.stagger]]
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+            CombatRules.perform(.skill("ambush", foe: foeID),
+                                by: .binder, in: &state)
+        }
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        XCTAssertEqual(encounter.pendingStaggers[foeID]?.applyingRound, 2)
+        XCTAssertEqual(encounter.roundNumber, 1)
+        XCTAssertEqual(encounter.turnIndex, 0, "zero-turn Ambush retains the current ordinary slot")
+    }
+
+    func testMultiplePendingStaggersProcessDescendingWithoutDuplicateSlots() {
+        let a = InstanceID(rawValue: 9_201), b = InstanceID(rawValue: 9_202)
+        let stats = CombatStats(displayName: "Foe", icon: "circle", maxHP: 20, attack: 2)
+        var encounter = EncounterState(
+            id: InstanceID(rawValue: 9_200),
+            foes: [.init(id: a, stats: stats, currentHP: 20),
+                   .init(id: b, stats: stats, currentHP: 20)],
+            order: [.binder, .foe(a), .foe(b), .companion(0)],
+            turnSlots: [.init(actor: .binder), .init(actor: .foe(a)), .init(actor: .foe(b)),
+                        .init(actor: .companion(0)),
+                        .init(actor: .foe(a), kind: .ordinaryPressureFollowUp(1),
+                              strengthMultiplier: 0.55, suppressesAfflictions: true)])
+        for id in [a, b] {
+            encounter.pendingStaggers[id] = .init(
+                foeID: id, applyingRound: 2, sourceActors: [.binder],
+                sourceNodeIDs: [CombatDerivedStatsRules.Node.stagger], automatic: false)
+        }
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 0, y: 0)].content = .portal(isEntry: true)
+        let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                           mapSeed: 92, rng: SeededRNG(seed: 92), map: map,
+                           playerPosition: GridPoint(x: 0, y: 0), binderHP: 20,
+                           companionHP: [0: 20])
+        let before = encounter.turnSlots
+        CombatRules.applyPendingStaggers(for: 2, run: run, encounter: &encounter)
+        XCTAssertEqual(encounter.turnSlots.count, before.count)
+        XCTAssertEqual(encounter.turnSlots.map(\.actor),
+                       [.binder, .companion(0), .foe(a), .foe(b), .foe(a)],
+                       "pending foes process by descending primary position and each slot crosses at most one other actor")
+        XCTAssertEqual(encounter.turnSlots.last?.kind, .ordinaryPressureFollowUp(1))
+        XCTAssertEqual(encounter.turnSlots.last?.strengthMultiplier, 0.55)
+        XCTAssertEqual(encounter.turnSlots.last?.suppressesAfflictions, true,
+                       "the final A slot keeps its exact pressure-follow-up payload")
+        XCTAssertTrue(encounter.pendingStaggers.isEmpty)
+        XCTAssertEqual(encounter.turnSlots.map(\.kind).map(String.init(describing:)).sorted(),
+                       before.map(\.kind).map(String.init(describing:)).sorted(),
+                       "saved payload kinds remain present without duplicate scheduling")
     }
 }

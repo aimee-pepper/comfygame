@@ -513,6 +513,8 @@ struct BalancingView: View {
                                       id: CombatDerivedStatsRules.Node.bulwark)
                 debugCombatNodeToggle("Shieldwall · conscious front line +2",
                                       id: CombatDerivedStatsRules.Node.shieldwall)
+                debugCombatNodeToggle("Stagger · landed Crush has 30% next-round delay",
+                                      id: CombatDerivedStatsRules.Node.stagger)
                 ForEach(store.state.base.activeParty, id: \.self) { index in
                     if store.state.base.roster.indices.contains(index) {
                         let name = store.state.base.roster[index].name
@@ -529,6 +531,8 @@ struct BalancingView: View {
                                                  id: CombatDerivedStatsRules.Node.bulwark)
                         debugCompanionNodeToggle("Shieldwall · conscious front line +2", index: index,
                                                  id: CombatDerivedStatsRules.Node.shieldwall)
+                        debugCompanionNodeToggle("Stagger · Crush delay", index: index,
+                                                 id: CombatDerivedStatsRules.Node.stagger)
                     }
                 }
                 if settings.debugTuning.debugCombatV2BinderAttackEnabled,
