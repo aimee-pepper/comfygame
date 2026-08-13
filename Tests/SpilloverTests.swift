@@ -131,7 +131,7 @@ final class SpilloverTests: XCTestCase {
     }
 
     func testInstrumentImprovementReportsAStaleReadinessFailure() throws {
-        let source = try String(contentsOfFile: "Sources/Screens/StationViews.swift", encoding: .utf8)
+        let source = try stationViewsSource()
 
         XCTAssertTrue(source.contains("if store.improveInstrument(target.id)"))
         XCTAssertTrue(source.contains("Instrument not improved"))
@@ -140,7 +140,7 @@ final class SpilloverTests: XCTestCase {
     }
 
     func testDistilleryReportsStaleCrystallisationAndAttunementFailures() throws {
-        let source = try String(contentsOfFile: "Sources/Screens/StationViews.swift", encoding: .utf8)
+        let source = try stationViewsSource()
 
         XCTAssertTrue(source.contains("if store.crystalliseEssence()"))
         XCTAssertTrue(source.contains("if store.attuneCore(attunement, candidate: chosen, catalyst: catalyst)"))
@@ -151,12 +151,19 @@ final class SpilloverTests: XCTestCase {
     }
 
     func testChannelworksReportsAStaleFixtureConstructionFailure() throws {
-        let source = try String(contentsOfFile: "Sources/Screens/StationViews.swift", encoding: .utf8)
+        let source = try stationViewsSource()
 
         XCTAssertTrue(source.contains("if store.constructConduitFixture()"))
         XCTAssertTrue(source.contains("Fixture not constructed"))
         XCTAssertTrue(source.contains("The Heat core or Storehouse space changed."))
         XCTAssertFalse(source.contains("Button(\"Construct Heat Conduit fixture\") { store.constructConduitFixture() }"))
+    }
+
+    private func stationViewsSource() throws -> String {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        return try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+                          encoding: .utf8)
     }
 
 
