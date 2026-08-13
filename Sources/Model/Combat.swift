@@ -382,6 +382,17 @@ struct EncounterState: Codable, Equatable, Sendable {
         var damage: Int
         var sourceNodeID: CombatNodeID?
     }
+
+    struct CarriedDamageEvent: Codable, Equatable, Sendable {
+        var receipt: UInt64
+        var sourceActor: Combatant
+        var sourceNodeID: CombatNodeID
+        var primaryFoeID: InstanceID
+        var secondaryFoeID: InstanceID
+        var primaryActualLoss: Int
+        var damage: Int
+        var copiedAfflictionReceipt: UInt64?
+    }
     /// The saved fact of how contact began. Combat consumers read this instead of reconstructing
     /// an opening from post-contact enemy awareness or map visibility.
     enum Opening: Codable, Equatable, Sendable {
@@ -514,6 +525,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     var nextDefeatTransitionReceipt: UInt64 = 1
     /// Saved encounter-only Cascade gains per exact actor, capped at three.
     var cascadeStacks: [Combatant: Int] = [:]
+    /// Bounded terminal consequence evidence. These events never re-enter the direct-hit pipeline.
+    var carriedDamageEvents: [CarriedDamageEvent] = []
+    var nextCarriedDamageReceipt: UInt64 = 1
 
     /// Rounds until each side's skill comes back. Counted in *rounds*, never seconds.
     ///
@@ -706,6 +720,11 @@ struct EncounterState: Codable, Equatable, Sendable {
             ?? ((defeatTransitions.map(\.receipt).max() ?? 0) + 1)
         cascadeStacks = try c.decodeIfPresent([Combatant: Int].self,
                                                forKey: .cascadeStacks) ?? [:]
+        carriedDamageEvents = try c.decodeIfPresent([CarriedDamageEvent].self,
+                                                      forKey: .carriedDamageEvents) ?? []
+        nextCarriedDamageReceipt = try c.decodeIfPresent(UInt64.self,
+                                                          forKey: .nextCarriedDamageReceipt)
+            ?? ((carriedDamageEvents.map(\.receipt).max() ?? 0) + 1)
         binderSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .binderSkillCooldown) ?? 0
         companionSkillCooldown = try c.decodeIfPresent(Int.self, forKey: .companionSkillCooldown) ?? 0
         cooldowns = try c.decodeIfPresent([String: Int].self, forKey: .cooldowns) ?? [:]

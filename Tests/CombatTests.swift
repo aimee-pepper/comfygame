@@ -4593,4 +4593,125 @@ final class CombatTests: XCTestCase {
             $0.provenance == .carried
         }.count, 1, "enabled-empty preserves gameplay and receipt attribution without rewards")
     }
+
+    func testFlurryCarriesFortyPercentOfActualLossOnceWithoutDirectHitRecursion() throws {
+        XCTAssertEqual([0, 1, 2, 3, 5, 20].map {
+            CombatRules.carriedDamageAmount(actualLoss: $0, fraction: 0.4)
+        }, [0, 1, 1, 1, 2, 8])
+        XCTAssertEqual([0, 1, 2, 3, 5, 20].map {
+            CombatRules.carriedDamageAmount(actualLoss: $0, fraction: 0.5)
+        }, [0, 1, 1, 1, 2, 10])
+        let node: CombatNodeID = "combat.offense.swiftness.flurry"
+        let store = inFight(["paper_moth", "paper_moth"])
+        var secondaryBefore = 0
+        store.mutate("stage exact Flurry owner") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  encounter.foes.count == 2 else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [node]]
+            encounter.order = [.binder] + encounter.foes.map { .foe($0.id) }
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            encounter.foes[0].currentHP = 5
+            encounter.foes[1].currentHP = 1
+            secondaryBefore = 1
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let primary = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.takeCombatAction(.attack(foe: primary))
+        let event = try XCTUnwrap(store.activeEncounter?.carriedDamageEvents.last)
+        XCTAssertEqual(event.sourceNodeID, node)
+        XCTAssertEqual(event.sourceActor, .binder)
+        XCTAssertEqual(event.damage, max(1, Int(floor(Double(event.primaryActualLoss) * 0.4))))
+        let secondary = try XCTUnwrap(store.activeEncounter?.foes.first {
+            $0.id == event.secondaryFoeID
+        })
+        XCTAssertEqual(secondary.currentHP, max(0, secondaryBefore - event.damage))
+        XCTAssertEqual(store.activeEncounter?.defeatTransitions.filter {
+            $0.foeID == event.secondaryFoeID && $0.provenance == .carried
+        }.count, secondary.isAlive ? 0 : 1)
+        XCTAssertEqual(store.activeEncounter?.carriedDamageEvents.count, 1,
+                       "a carried event must not recursively produce another Flurry")
+    }
+
+    func testConductionCarriesHalfAndCopiesHalfDurationBurnOnlyToDisclosedFoe() throws {
+        let node: CombatNodeID = "combat.craft.emanation.conduction"
+        func staged(disclosed: Bool) throws -> GameStore {
+            let store = inFight(["paper_moth", "paper_moth"])
+            store.mutate("stage exact Conduction owner") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                      encounter.foes.count == 2 else { return }
+                state.base.binderCharacter.branchDepth["kindling"] = 3
+                encounter.debugV2OwnedNodeIDs = [.binder: [node]]
+                encounter.order = [.binder] + encounter.foes.map { .foe($0.id) }
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.foes[0].currentHP = 99
+                encounter.foes[1].currentHP = 30
+                if disclosed { encounter.revealed.insert(encounter.foes[1].id) }
+                run.activeEncounter = encounter; state.worlds.activeRun = run
+            }
+            return store
+        }
+        let visible = try staged(disclosed: true)
+        let primary = try XCTUnwrap(visible.activeEncounter?.foes.first?.id)
+        visible.mutate("commit Conduction before automatic round ticks") {
+            CombatRules.perform(.skill("elemental_strike", foe: primary), by: .binder, in: &$0)
+        }
+        let event = try XCTUnwrap(visible.activeEncounter?.carriedDamageEvents.last)
+        XCTAssertEqual(event.sourceNodeID, node)
+        XCTAssertEqual(event.damage, max(1, event.primaryActualLoss / 2))
+        let primaryBurn = try XCTUnwrap(visible.activeEncounter?.afflictions?.first {
+            $0.target == .foe(primary) && $0.kind == .burn
+        })
+        let copied = try XCTUnwrap(visible.activeEncounter?.afflictions?.first {
+            $0.target == .foe(event.secondaryFoeID) && $0.kind == .burn
+        })
+        XCTAssertEqual(copied.source, .binder)
+        XCTAssertEqual(copied.provenance, .copied)
+        XCTAssertEqual(copied.damage, primaryBurn.damage)
+        XCTAssertEqual(copied.ticksRemaining, max(1, (primaryBurn.ticksRemaining + 1) / 2))
+        XCTAssertEqual(event.copiedAfflictionReceipt, copied.applicationReceipt)
+
+        let hidden = try staged(disclosed: false)
+        let hiddenPrimary = try XCTUnwrap(hidden.activeEncounter?.foes.first?.id)
+        hidden.mutate("commit hidden Conduction counterfactual") {
+            CombatRules.perform(.skill("elemental_strike", foe: hiddenPrimary), by: .binder, in: &$0)
+        }
+        XCTAssertTrue(hidden.activeEncounter?.carriedDamageEvents.isEmpty == true)
+        XCTAssertEqual(hidden.activeEncounter?.afflictions?.filter { $0.provenance == .copied }.count, 0)
+    }
+
+    func testCarriedReceiptRelaunchAndEnabledEmptyParity() throws {
+        let node: CombatNodeID = "combat.offense.swiftness.flurry"
+        let store = inFight(["paper_moth", "paper_moth"])
+        store.mutate("stage Flurry receipt") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [node]]
+            encounter.order = [.binder] + encounter.foes.map { .foe($0.id) }
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            encounter.foes[0].currentHP = 99
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let target = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.takeCombatAction(.attack(foe: target))
+        let encoded = try JSONEncoder().encode(try XCTUnwrap(store.activeEncounter))
+        let reloaded = try JSONDecoder().decode(EncounterState.self, from: encoded)
+        XCTAssertEqual(reloaded.carriedDamageEvents, store.activeEncounter?.carriedDamageEvents)
+        XCTAssertEqual(reloaded.nextCarriedDamageReceipt, 2)
+
+        let empty = inFight(["paper_moth", "paper_moth"])
+        empty.mutate("stage enabled-empty") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: []]
+            encounter.order = [.binder] + encounter.foes.map { .foe($0.id) }
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            encounter.foes[0].currentHP = 99
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let emptyTarget = try XCTUnwrap(empty.activeEncounter?.foes.first?.id)
+        empty.takeCombatAction(.attack(foe: emptyTarget))
+        XCTAssertTrue(empty.activeEncounter?.carriedDamageEvents.isEmpty == true)
+    }
 }

@@ -801,13 +801,27 @@ enum CombatRules {
         case .elemental:
             // **Emanation Strike.** The answer to a warded foe: emanated harm delivered by a blade.
             guard let foe else { return nil }
-            strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
-                   run: &run, encounter: &encounter, verb: skill.name,
-                   standingBack: standingBack, reachOfActor: reach)
-            _ = applyAffliction(.burn, to: .foe(foe.id), source: actor,
-                                provenance: .direct, damage: max(1, power / 4),
-                                ticks: skill.rounds + 1,
-                                targetIsStanding: foe.isAlive, encounter: &encounter)
+            let result = strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
+                                run: &run, encounter: &encounter, verb: skill.name,
+                                standingBack: standingBack, reachOfActor: reach,
+                                defersCarriedDamage: true, isEmanation: true)
+            // Conduction copies the authored payload, not whatever survived the primary target's
+            // Stonebark/refresh rules. The secondary independently gets its own protection check.
+            let authoredPayload = AfflictionInstance(
+                kind: .burn, target: .foe(foe.id), source: actor, provenance: .direct,
+                damage: max(1, power / 4), ticksRemaining: skill.rounds + 1,
+                applicationReceipt: 0)
+            if let landed = result.landed {
+                _ = applyAffliction(.burn, to: .foe(foe.id), source: actor,
+                                    provenance: .direct, damage: authoredPayload.damage,
+                                    ticks: authoredPayload.ticksRemaining,
+                                    targetIsStanding: encounter.foes.first {
+                                        $0.id == foe.id
+                                    }?.isAlive == true,
+                                    encounter: &encounter)
+                resolveCarriedDamage(from: landed, primaryAffliction: authoredPayload,
+                                     run: &run, encounter: &encounter)
+            }
         }
 
         let cooling = stats.map { CharacterRules.cooldown(skill.cooldownRounds, $0) } ?? skill.cooldownRounds
@@ -1138,7 +1152,7 @@ enum CombatRules {
                    coating: coating(of: actor, in: state),
                    breaking: wildRule(for: actor, in: state),
                    innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
-                   allowsStagger: true, allowsConditionalDirectHit: true) {
+                   allowsStagger: true, allowsConditionalDirectHit: true).committed {
                 outcome = .committed(cost: actionCost, completedDirectAttack: true)
             }
 
@@ -1317,6 +1331,12 @@ enum CombatRules {
     )
     private static let cascadeNodeID = CombatNodeID(
         rawValue: "combat.offense.swiftness.cascade"
+    )
+    private static let flurryNodeID = CombatNodeID(
+        rawValue: "combat.offense.swiftness.flurry"
+    )
+    private static let conductionNodeID = CombatNodeID(
+        rawValue: "combat.craft.emanation.conduction"
     )
 
     /// The one authority shared by preview and commit. `primaryDamage` is the final positive HP
@@ -1652,6 +1672,79 @@ enum CombatRules {
                       ignoresArmour: breakingBlow.ignoresArmour))
     }
 
+    private struct LandedDirectHit {
+        var actor: Combatant
+        var primaryFoeID: InstanceID
+        var actualLoss: Int
+        var isEmanation: Bool
+    }
+
+    private struct StrikeResult {
+        var committed: Bool
+        var landed: LandedDirectHit?
+    }
+
+    private static func resolveCarriedDamage(from hit: LandedDirectHit,
+                                             primaryAffliction: AfflictionInstance?,
+                                             run: inout WorldRun,
+                                             encounter: inout EncounterState) {
+        guard hit.actualLoss > 0, let owned = encounter.debugV2OwnedNodeIDs?[hit.actor] else { return }
+        let usesConduction = hit.isEmanation && owned.contains(conductionNodeID)
+        let sourceNode = usesConduction ? conductionNodeID : flurryNodeID
+        guard usesConduction || owned.contains(flurryNodeID) else { return }
+
+        let secondaryIndex = encounter.foes.indices.first { index in
+            let candidate = encounter.foes[index]
+            guard candidate.id != hit.primaryFoeID, candidate.isAlive else { return false }
+            if usesConduction { return encounter.revealed.contains(candidate.id) }
+            // Current foe targeting has no per-foe formation rank: every other living participant
+            // is legal once the actor could make this same direct attack. Keep this query explicit
+            // so later typed foe ranks can narrow it without changing Flurry arithmetic.
+            return true
+        }
+        guard let secondaryIndex else { return }
+        let fraction = usesConduction ? 0.5 : 0.4
+        let damage = carriedDamageAmount(actualLoss: hit.actualLoss, fraction: fraction)
+        let secondaryID = encounter.foes[secondaryIndex].id
+        _ = applyFoeDamage(foeID: secondaryID, amount: damage, sourceActor: hit.actor,
+                           provenance: .carried, sourceNodeID: sourceNode,
+                           run: &run, encounter: &encounter)
+
+        var copiedReceipt: UInt64?
+        if usesConduction, let primaryAffliction,
+           [.burn, .poison, .dazzle].contains(primaryAffliction.kind) {
+            let copiedTicks = max(1, (primaryAffliction.ticksRemaining + 1) / 2)
+            let outcome = applyAffliction(
+                primaryAffliction.kind, to: .foe(secondaryID), source: hit.actor,
+                provenance: .copied, contributingProvenances: [.copied],
+                damage: primaryAffliction.damage, ticks: copiedTicks,
+                targetIsStanding: encounter.foes[secondaryIndex].isAlive,
+                encounter: &encounter)
+            switch outcome {
+            case .added(let instance), .strengthened(let instance):
+                copiedReceipt = instance.applicationReceipt
+            case .prevented, .noChange:
+                break
+            }
+        }
+        let event = EncounterState.CarriedDamageEvent(
+            receipt: encounter.nextCarriedDamageReceipt, sourceActor: hit.actor,
+            sourceNodeID: sourceNode, primaryFoeID: hit.primaryFoeID,
+            secondaryFoeID: secondaryID, primaryActualLoss: hit.actualLoss,
+            damage: damage, copiedAfflictionReceipt: copiedReceipt)
+        encounter.nextCarriedDamageReceipt &+= 1
+        encounter.carriedDamageEvents.append(event)
+        if encounter.carriedDamageEvents.count > 24 {
+            encounter.carriedDamageEvents.removeFirst(encounter.carriedDamageEvents.count - 24)
+        }
+        encounter.note("\(sourceNode == conductionNodeID ? "Conduction" : "Flurry") carries \(damage) into \(encounter.foes[secondaryIndex].stats.displayName).")
+    }
+
+    static func carriedDamageAmount(actualLoss: Int, fraction: Double) -> Int {
+        guard actualLoss > 0 else { return 0 }
+        return max(1, Int(floor(Double(actualLoss) * fraction)))
+    }
+
     @discardableResult
     private static func strike(_ foeID: InstanceID,
                                damage: Int,
@@ -1671,9 +1764,11 @@ enum CombatRules {
                                innateStatus: String? = nil,
                                allowsStagger: Bool = false,
                                allowsConditionalDirectHit: Bool = false,
-                               directAttackWindow: DirectAttackWindow = .scheduled) -> Bool {
+                               directAttackWindow: DirectAttackWindow = .scheduled,
+                               defersCarriedDamage: Bool = false,
+                               isEmanation: Bool = false) -> StrikeResult {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
-        else { return false }
+        else { return .init(committed: false, landed: nil) }
 
         let foe = encounter.foes[index]
         let name = foe.stats.displayName
@@ -1684,13 +1779,13 @@ enum CombatRules {
         let dazzled = has(.dazzle, actor, in: encounter) ? Tuning.Encounter.dazzleMissChance : 0
         if dazzled > 0, run.rng.chance(dazzled) {
             encounter.note("\(who) \(actor == .binder ? "swing" : "swings") at where \(name) was.")
-            return true
+            return .init(committed: true, landed: nil)
         }
 
         // **Sleek and small is hard to hit.** A miss is the price of chasing something built to run.
         if run.rng.chance(foe.stats.evasion) {
             encounter.note("\(who) \(actor == .binder ? "swing" : "swings") at \(name) and find\(actor == .binder ? "" : "s") nothing there.")
-            return true
+            return .init(committed: true, landed: nil)
         }
 
         // **The matchup.** What you're swinging against what it's wearing, then armour on what's
@@ -1717,8 +1812,12 @@ enum CombatRules {
         )
         let raw = resolved.rawDamage
         let amount = resolved.finalDamage
+        let hpBefore = encounter.foes[index].currentHP
         _ = applyFoeDamage(foeID: foeID, amount: amount, sourceActor: actor,
                            provenance: .direct, run: &run, encounter: &encounter)
+        let landedHit = LandedDirectHit(actor: actor, primaryFoeID: foeID,
+                                        actualLoss: hpBefore - encounter.foes[index].currentHP,
+                                        isEmanation: isEmanation)
         if critical { encounter.note("Critical — Steady Hand.") }
         switch killingStrokeOutcome(actor: actor, primaryDamage: amount, foe: foe,
                                     allowsDirectHit: allowsConditionalDirectHit,
@@ -1859,7 +1958,11 @@ enum CombatRules {
             }
         }
         if !encounter.foes[index].isAlive { encounter.note("\(name.capitalisedSentence) goes down.") }
-        return true
+        if !defersCarriedDamage {
+            resolveCarriedDamage(from: landedHit, primaryAffliction: nil,
+                                 run: &run, encounter: &encounter)
+        }
+        return .init(committed: true, landed: landedHit)
     }
 
     private static func armourWord(for foe: FoeState) -> String {
