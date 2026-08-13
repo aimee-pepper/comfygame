@@ -3,8 +3,8 @@
   "updated": "12 Aug 2026",
   "installedCheckpoint": "dbb1443 · signed Immovable build installed without launching",
   "essenceBaseline": "a816113",
-  "currentWork": "Paused for the night after P1 combat-v2 Immovable checkpoint",
-  "currentNote": "Signed checkpoint dbb1443 is installed on Aimee's phone without launching. Immovable is committed with 116/116 focused Combat tests and 1,222/1,222 full tests: exact-owner frozen armour applies to Pierce and direct Heat/Caustic/Light, does not borrow Back-rank raw-damage protection, and leaves Crush, Rend and affliction ticks unchanged. No next implementation slice has started; Attunement remains deferred until a real Channelworks combat attack exists.",
+  "currentWork": "P1 playability · World UI repair plus combat-v2 Feint/Untouchable handoff",
+  "currentNote": "Asset Lead owns the already-prioritized World exploration UI correction: long text must not occlude Field Kit/resources, the bug control must float above gameplay, and interaction controls must recover their intended layout/hit behavior. Engineering's truthful combat-number checkpoint is complete in 0e9c325 with 118/118 focused Combat tests; the next dependency-safe combat boundary is Feint plus Untouchable on the live Sidestep/Ghost/Footwork resolver. No Attunement work begins before a real Channelworks combat attack exists.",
   "items": [
     {
       "id": "essence",
@@ -211,7 +211,7 @@
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
       "status": "inProgress",
-      "detail": "Stage A is checkpointed in 9326494/b912d55; Heavy Hand, Keen Eye, Quick Step and Light Frame are committed, b7b320c adds Thick Hide, df5a963 adds shared Iron Skin/Bulwark/Shieldwall armour, d33c027 activates Stagger, c4d62a5 activates Footwork plus exact one-use Ghost while repairing Sidestep, f944cff activates typed Insulation, and dbb1443 activates exact-owner Immovable armour scope. Thirteen nodes now have real DEBUG-path scenario consumers. Work is paused after the Immovable checkpoint; Attunement waits on real Channelworks combat and Light Touch/Momentum waits on its wider gear-tempo receipt. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
+      "detail": "Stage A is checkpointed in 9326494/b912d55; Heavy Hand, Keen Eye, Quick Step and Light Frame are committed, b7b320c adds Thick Hide, df5a963 adds shared Iron Skin/Bulwark/Shieldwall armour, d33c027 activates Stagger, c4d62a5 activates Footwork plus exact one-use Ghost while repairing Sidestep, f944cff activates typed Insulation, and dbb1443 activates exact-owner Immovable armour scope. Thirteen nodes now have real DEBUG-path scenario consumers; 0e9c325 also makes live combat potency/cooldown copy rules-derived and truthful. Feint plus Untouchable is the next dependency-safe consumer boundary on the existing evasion resolver. Attunement waits on real Channelworks combat and Light Touch/Momentum waits on its wider gear-tempo receipt. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Production promotion still requires every shared consumer plus no inert or contradictory node.",
       "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
     },
     {

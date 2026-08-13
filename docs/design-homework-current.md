@@ -1,7 +1,7 @@
 # Design Homework — Current Contract
 
 **Status:** Initial 17-question slice installed in `4ed15ab`; launch trust and phone interaction check
-remain. Next 19-question/66-review-item catalogue revision is source-validated but not installed.
+remain. Next 20-question/66-review-item catalogue revision is source-validated but not installed.
 **Decision date:** 12 August 2026
 **Content authority:** `Sources/Content/Data/design-homework.json`
 
@@ -71,6 +71,7 @@ A later authenticated relay may add direct submission, but the UI must not call 
 18. Named-character stat-growth identity and roster-upkeep trade-off
     (`named-character-stat-growth`).
 19. Bracken/Maud/Perren's four-line remaining abstract-reply correction
+20. failed-expedition item-retention agency after stack-independent arithmetic correction
     (`remaining-meeting-voice-revision`).
 
 The catalogue deliberately mixes held mechanical choices with exact authored-copy reviews. Each can

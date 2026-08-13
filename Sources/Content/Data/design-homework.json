@@ -572,6 +572,18 @@
       ]
     },
     {
+      "id": "failure-recovery-agency",
+      "title": "Who chooses what survives a failed expedition?",
+      "context": "The current failure rule floors each inventory stack separately, so splitting the same haul across item types can make far more of it disappear. That arithmetic will be corrected regardless of this choice. The remaining design question is whether the game automatically chooses which exact items fit the corrected retention budget or lets you change a deterministic suggested set before confirming.",
+      "recommendation": "Let the player choose within the fixed budget. Show a deterministic suggested set first, then allow swaps without changing how many items survive. Bulk world resources remain automatically apportioned, while pages, knowledge, recruited people and pre-departure property keep their existing protection.",
+      "choices": [
+        { "id": "player-choice", "title": "Let me choose", "detail": "Show a suggested retained set, then let the player swap exact acquired items within the same fixed budget before confirming." },
+        { "id": "automatic", "title": "Choose automatically", "detail": "Use the corrected total-unit budget but select retained items deterministically from the expedition outcome, with no extra decision screen." },
+        { "id": "automatic-favourites", "title": "Protect favourites first", "detail": "Choose automatically but prioritize items the player marked as favourites; simpler at failure time, but attachment must be predicted before the expedition." },
+        { "id": "hold", "title": "Test arithmetic first", "detail": "Ship only the corrected automatic arithmetic, then revisit player choice after failure recaps are trustworthy." }
+      ]
+    },
+    {
       "id": "named-character-stat-growth",
       "title": "How should named characters grow distinct stats?",
       "context": "Every named traveller currently starts with the same all-equal stats. Level-up raises the two currently highest stats, but an equal starting line has no authored tie identity, so distinct callings can converge on the same Might/Finesse build. This is separate from combat-tree lean and from the level a traveller joins at.",

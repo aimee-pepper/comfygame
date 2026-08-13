@@ -3488,3 +3488,19 @@ Decision269's Ambush→round-1 example is also superseded. Live Ambush is chosen
 ordinary scheduled slot, despite costing zero turns, so that round is already in progress and its
 Stagger targets the following round. Only a genuinely pre-schedule future producer may affect the
 upcoming round 1 before its cursor begins.
+
+## 277. Failure-retention arithmetic is correctness; exact-item agency remains a player choice
+
+**Date:** 13 August 2026
+
+The outcome-wide retained-unit budgets and stable apportionment in
+`failure-recovery-agency-recommendation.md` are not optional generosity: they correct the live defect
+where splitting an identical total haul across more inventory/resource kinds causes more of it to
+disappear. Engineering may implement that arithmetic with deterministic automatic item selection
+before any new UI.
+
+Whether the player may replace that suggested item set is a separate design choice. Homework question
+`failure-recovery-agency` now compares player selection, deterministic automatic selection,
+favourite-first automation and deliberately holding agency until the arithmetic/receipt is playable.
+No answer may change the fixed retention budget, bulk-resource automation or protection for knowledge,
+people and pre-departure property.
