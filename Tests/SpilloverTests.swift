@@ -73,6 +73,25 @@ final class SpilloverTests: XCTestCase {
         XCTAssertTrue(anchorage.contains(".frame(minHeight: 44)"))
     }
 
+    func testDormantRealmNamesExactEssenceShortfallBesideDisabledReactivation() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+            encoding: .utf8
+        )
+        let start = try XCTUnwrap(source.range(of: "struct AnchorageView"))
+        let end = try XCTUnwrap(source.range(
+            of: "private extension AnchorRoute",
+            range: start.upperBound..<source.endIndex
+        ))
+        let anchorage = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(anchorage.contains("let missingEssence = max(0, cost - store.state.base.essence)"))
+        XCTAssertTrue(anchorage.contains("Needs \\(missingEssence) more Essence to reactivate."))
+        XCTAssertTrue(anchorage.contains(".disabled(store.state.base.essence < cost)"))
+    }
+
     func testStorehouseSortingActionsRemainOutsideScrollableDetails() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

@@ -307,6 +307,7 @@ struct AnchorageView: View {
                             if realm.isDormant {
                                 let cost = max(Tuning.Anchoring.minimumReactivationCost,
                                                realm.projectedShortfall)
+                                let missingEssence = max(0, cost - store.state.base.essence)
                                 Button {
                                     store.reactivateAnchoredRealm(realm.id)
                                 } label: {
@@ -315,6 +316,11 @@ struct AnchorageView: View {
                                 }
                                 .buttonStyle(.bordered)
                                 .disabled(store.state.base.essence < cost)
+                                if missingEssence > 0 {
+                                    Text("Needs \(missingEssence) more Essence to reactivate.")
+                                        .font(.caption)
+                                        .foregroundStyle(.orange)
+                                }
                             }
                         }
                     }
