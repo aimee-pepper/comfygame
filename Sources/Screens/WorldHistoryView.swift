@@ -521,29 +521,37 @@ private struct VisitedWorldSheet: View {
                     }
                 }
 
-                Section {
-                    Button {
-                        store.keepWorld(world.id, kept: !world.isKept)
-                        dismiss()
-                    } label: {
-                        Label(world.isKept ? "Stop keeping this" : "Keep this one",
-                              systemImage: world.isKept ? "bookmark.slash" : "bookmark")
-                            .frame(minHeight: 44)
-                    }
-                    Button(role: .destructive) {
-                        store.forgetWorld(world.id)
-                        dismiss()
-                    } label: {
-                        Label("Erase it", systemImage: "trash").frame(minHeight: 44)
-                    }
-                } footer: {
-                    Text("Kept worlds are never dropped when the history fills up.")
-                }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) { historyActionBar }
             .navigationTitle("World \(world.runIndex)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
+            }
+        }
+    }
+
+    private var historyActionBar: some View {
+        PersistentActionBar(message: "Kept worlds are never dropped when the history fills up.") {
+            HStack(spacing: 10) {
+                Button {
+                    store.keepWorld(world.id, kept: !world.isKept)
+                    dismiss()
+                } label: {
+                    Label(world.isKept ? "Stop keeping" : "Keep",
+                          systemImage: world.isKept ? "bookmark.slash" : "bookmark")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+
+                Button(role: .destructive) {
+                    store.forgetWorld(world.id)
+                    dismiss()
+                } label: {
+                    Label("Erase", systemImage: "trash")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
             }
         }
     }

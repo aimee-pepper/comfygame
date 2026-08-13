@@ -11,6 +11,22 @@ import XCTest
 @MainActor
 final class InstrumentTests: XCTestCase {
 
+    func testWorldHistoryRecordActionsRemainOutsideLongAnalysisContent() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/WorldHistoryView.swift"),
+            encoding: .utf8
+        )
+        let detailStart = try XCTUnwrap(source.range(of: "private struct VisitedWorldSheet"))
+        let detail = String(source[detailStart.lowerBound...])
+
+        XCTAssertTrue(detail.contains(".safeAreaInset(edge: .bottom, spacing: 0) { historyActionBar }"))
+        XCTAssertTrue(detail.contains("Label(world.isKept ? \"Stop keeping\" : \"Keep\""))
+        XCTAssertTrue(detail.contains("Button(role: .destructive)"))
+        XCTAssertTrue(detail.contains("Label(\"Erase\", systemImage: \"trash\")"))
+    }
+
     // MARK: The content
 
     /// One instrument per subject, and no subject left unreadable.
