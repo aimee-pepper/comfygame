@@ -575,6 +575,15 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// One lethal-event survival receipt per exact modern-v2 owner. Nil marks a legacy encounter;
     /// an empty set is modern and unspent, so relaunch/healing cannot remint a spent charge.
     var unyieldingSpent: Set<Combatant>?
+    struct BraceReceipt: Codable, Equatable, Sendable {
+        var owner: Combatant
+        var hostileActor: Combatant?
+        var round: Int?
+        var slotIndex: Int?
+        var triggered = false
+    }
+    /// Exact next-hostile-slot receipts. Nil is legacy; modern empty is authoritative/spent.
+    var braceReceipts: [Combatant: BraceReceipt]?
     /// One prepared refusal of the next affliction. Kept as a count-shaped value so a future
     /// upgrade can grant more than one without changing the save shape; Stonebark currently sets 1.
     var statusGuards: [Combatant: Int] = [:]
@@ -669,6 +678,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
         self.unyieldingSpent = debugV2OwnedNodeIDs == nil ? nil : []
+        self.braceReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.breakingBlowScheduledSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.breakingBlowOpeningSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.partyRanks = partyRanks
@@ -772,6 +782,9 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                  forKey: .corrodeReceipts) ?? []
         unyieldingSpent = try c.decodeIfPresent(Set<Combatant>.self, forKey: .unyieldingSpent)
             ?? (debugV2OwnedNodeIDs == nil ? nil : [])
+        braceReceipts = try c.decodeIfPresent([Combatant: BraceReceipt].self,
+                                               forKey: .braceReceipts)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [:])
         statusGuards = try c.decodeIfPresent([Combatant: Int].self, forKey: .statusGuards) ?? [:]
         preparedCoatings = try c.decodeIfPresent([Combatant: PreparedCoating].self,
                                                  forKey: .preparedCoatings) ?? [:]

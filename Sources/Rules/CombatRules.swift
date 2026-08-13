@@ -775,7 +775,13 @@ enum CombatRules {
                    allowsConditionalDirectHit: true, directAttackWindow: .opening)
 
         case .brace:
-            encounter.braced[actor] = skill.rounds
+            if encounter.debugV2OwnedNodeIDs != nil {
+                guard owns(CombatDerivedStatsRules.Node.brace, actor: actor,
+                           encounter: encounter) else { return nil }
+                encounter.braceReceipts?[actor] = .init(owner: actor)
+            } else {
+                encounter.braced[actor] = skill.rounds
+            }
             encounter.note("\(skill.name): you set yourself.")
 
         case .dodge:
@@ -2045,14 +2051,16 @@ enum CombatRules {
     /// Damage onto one of the party, wherever it comes from.
     private static func hurt(_ target: Combatant,
                              by amount: Int,
+                             braceApplies: Bool = false,
                              run: inout WorldRun,
                              encounter: inout EncounterState) {
         let before = health(of: target, in: run)
         let ownsEndurance = owns(CombatDerivedStatsRules.Node.endurance,
                                  actor: target, encounter: encounter)
-        let reduced = CombatDerivedStatsRules.enduranceDamage(
+        let reduced = CombatDerivedStatsRules.survivalDamage(
             amount, currentHP: before.current, maximumHP: before.max,
-            eventMinimum: Tuning.Encounter.minimumDamage, ownsNode: ownsEndurance)
+            eventMinimum: Tuning.Encounter.minimumDamage, ownsEndurance: ownsEndurance,
+            braceApplies: braceApplies)
         let ownsUnyielding = owns(CombatDerivedStatsRules.Node.unyielding,
                                   actor: target, encounter: encounter)
         let canSpendUnyielding = target.isParty && before.current > 0
@@ -2067,8 +2075,10 @@ enum CombatRules {
             _ = applyFoeDamage(foeID: id, amount: reduced, sourceActor: nil,
                                provenance: .environment, run: &run, encounter: &encounter)
         }
-        if ownsEndurance, reduced < amount {
-            encounter.note("Endurance reduces the harm from \(amount) to \(reduced).")
+        if reduced < amount {
+            let source = braceApplies && ownsEndurance ? "Brace and Endurance"
+                : (braceApplies ? "Brace" : "Endurance")
+            encounter.note("\(source) reduces the harm from \(amount) to \(reduced).")
         }
         if canSpendUnyielding {
             encounter.unyieldingSpent?.insert(target)
@@ -2605,7 +2615,23 @@ enum CombatRules {
                                      encounter: encounter, armourIgnored: ignored)
             }
             let wasStanding = isAlive(target, in: run)
-            hurt(target, by: amount, run: &run, encounter: &encounter)
+            var braceApplies = false
+            if isSingleTargetDirect || (!isFollowUp && [.multi, .area].contains(foe.stats.delivery)),
+               var receipt = encounter.braceReceipts?[target] {
+                if receipt.hostileActor == nil {
+                    receipt.hostileActor = actor
+                    receipt.round = encounter.roundNumber
+                    receipt.slotIndex = encounter.turnIndex
+                }
+                if receipt.hostileActor == actor, receipt.round == encounter.roundNumber,
+                   receipt.slotIndex == encounter.turnIndex {
+                    receipt.triggered = true
+                    encounter.braceReceipts?[target] = receipt
+                    braceApplies = true
+                }
+            }
+            hurt(target, by: amount, braceApplies: braceApplies,
+                 run: &run, encounter: &encounter)
             if wasStanding, !isAlive(target, in: run), target.rosterIndex != nil {
                 encounter.note("\(actorName(target, encounter: encounter)) goes down. They'll be all right at home.")
             }
@@ -2646,6 +2672,16 @@ enum CombatRules {
                                    ? "The after-image sits in your eyes."
                                    : "It's still \(status == .burn ? "burning" : "spreading").")
                 }
+            }
+        }
+
+        // Consume only after the whole hostile slot so every direct event from the same authored
+        // multi/area slot receives the one armed reduction. A miss or other target leaves it armed.
+        if encounter.braceReceipts != nil {
+            encounter.braceReceipts = encounter.braceReceipts?.filter { _, receipt in
+                !(receipt.triggered && receipt.hostileActor == actor
+                  && receipt.round == encounter.roundNumber
+                  && receipt.slotIndex == encounter.turnIndex)
             }
         }
 

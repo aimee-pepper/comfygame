@@ -3014,6 +3014,8 @@ final class CombatTests: XCTestCase {
             ])
             encounter.feintActive = []
             encounter.untouchableStates = [:]
+            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.brace]]
+            encounter.braceReceipts = [:]
             run.activeEncounter = encounter
             state.worlds.activeRun = run
 
@@ -4578,7 +4580,9 @@ final class CombatTests: XCTestCase {
         }
         let owned = try staged(owns: true)
         let target = try XCTUnwrap(owned.activeEncounter?.foes.first?.id)
-        owned.takeCombatAction(.attack(foe: target))
+        owned.mutate("commit Throughstroke before automatic turns") {
+            CombatRules.perform(.attack(foe: target), by: .binder, in: &$0)
+        }
         let carried = try XCTUnwrap(owned.activeEncounter?.defeatTransitions.first {
             $0.provenance == .carried
         })
@@ -4987,6 +4991,8 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(CombatDerivedStatsRules.enduranceDamage(
             1, currentHP: 1, maximumHP: 26, eventMinimum: 1, ownsNode: node), 1)
         XCTAssertEqual(CombatDerivedStatsRules.enduranceDamage(
+            0, currentHP: 1, maximumHP: 26, eventMinimum: 1, ownsNode: node), 0)
+        XCTAssertEqual(CombatDerivedStatsRules.enduranceDamage(
             8, currentHP: 5, maximumHP: 26, eventMinimum: 1, ownsNode: false), 8)
     }
 
@@ -5036,5 +5042,101 @@ final class CombatTests: XCTestCase {
             provenance: .direct, damage: 2, ticks: 5, targetIsStanding: true,
             encounter: &exact)
         XCTAssertEqual(exact.afflictions?.first?.ticksRemaining, 5, "no party aura")
+    }
+
+    func testBraceAndEnduranceComposeOnceWithMinimum() {
+        XCTAssertEqual(CombatDerivedStatsRules.survivalDamage(
+            20, currentHP: 5, maximumHP: 20, eventMinimum: 1,
+            ownsEndurance: true, braceApplies: true), 9)
+        XCTAssertEqual(CombatDerivedStatsRules.survivalDamage(
+            20, currentHP: 11, maximumHP: 20, eventMinimum: 1,
+            ownsEndurance: true, braceApplies: true), 13)
+        XCTAssertEqual(CombatDerivedStatsRules.survivalDamage(
+            1, currentHP: 1, maximumHP: 20, eventMinimum: 1,
+            ownsEndurance: true, braceApplies: true), 1)
+        XCTAssertEqual(CombatDerivedStatsRules.survivalDamage(
+            0, currentHP: 1, maximumHP: 20, eventMinimum: 1,
+            ownsEndurance: true, braceApplies: true), 0)
+    }
+
+    func testBraceExactOwnerArmsPersistsAndQualifyingFoeSlotConsumes() throws {
+        func staged(armed: Bool) -> GameStore {
+            let store = inFight()
+            store.mutate("stage exact Brace counterfactual") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+                encounter.debugV2OwnedNodeIDs = [.binder: armed
+                    ? [CombatDerivedStatsRules.Node.brace] : [], .companion(0): []]
+                encounter.braceReceipts = [:]
+                encounter.order = [.binder, .foe(encounter.foes[0].id), .companion(0)]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                run.activeEncounter = encounter; state.worlds.activeRun = run
+            }
+            if armed {
+                store.mutate("arm Brace without advancing") {
+                    CombatRules.perform(.skill("brace"), by: .binder, in: &$0)
+                }
+            }
+            return store
+        }
+        func runHostileSlot(_ store: GameStore) {
+            store.mutate("run the exact hostile slot") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+                encounter.turnIndex = 1
+                run.rng = SeededRNG(seed: 0xBACE)
+                run.companionHP[0] = 0
+                encounter.debugV2Evasion = .init(entries: [
+                    .init(actor: .binder, characterEvasion: 0, components: [])
+                ])
+                encounter.ghostEvasionAvailable = []
+                run.activeEncounter = encounter; state.worlds.activeRun = run
+                CombatRules.runAutomaticTurns(in: &state)
+            }
+        }
+        let store = staged(armed: true)
+        let armed = try XCTUnwrap(store.activeEncounter?.braceReceipts?[.binder])
+        XCTAssertFalse(armed.triggered)
+        let reloaded = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(try XCTUnwrap(store.activeEncounter)))
+        XCTAssertEqual(reloaded.braceReceipts?[.binder], armed)
+
+        let plain = staged(armed: false)
+        let before = try XCTUnwrap(store.activeRun?.binderHP)
+        runHostileSlot(store)
+        runHostileSlot(plain)
+        XCTAssertNil(store.activeEncounter?.braceReceipts?[.binder])
+        let bracedLoss = before - (store.activeRun?.binderHP ?? before)
+        let plainLoss = before - (plain.activeRun?.binderHP ?? before)
+        XCTAssertEqual(bracedLoss, CombatDerivedStatsRules.survivalDamage(
+            plainLoss, currentHP: before, maximumHP: store.activeRun?.healthCap(for: .binder)?.maximum
+                ?? Tuning.Encounter.binderMaxHP, eventMinimum: 1,
+            ownsEndurance: false, braceApplies: true))
+        XCTAssertLessThan(bracedLoss, plainLoss)
+    }
+
+    func testBraceRejectsNonOwnerAndLegacyDurationRemainsParityAdapter() throws {
+        let modern = inFight()
+        modern.mutate("stage enabled empty Brace") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: []]
+            encounter.braceReceipts = [:]
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        modern.mutate("try unowned Brace") {
+            CombatRules.perform(.skill("brace"), by: .binder, in: &$0)
+        }
+        XCTAssertTrue(modern.activeEncounter?.braceReceipts?.isEmpty == true)
+
+        let legacy = inFight()
+        legacy.mutate("stage legacy adapter") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = nil
+            encounter.braceReceipts = nil
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        legacy.mutate("use legacy Brace") {
+            CombatRules.perform(.skill("brace"), by: .binder, in: &$0)
+        }
+        XCTAssertGreaterThan(legacy.activeEncounter?.braced[.binder] ?? 0, 0)
     }
 }

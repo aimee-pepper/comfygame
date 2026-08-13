@@ -163,6 +163,7 @@ enum CombatDerivedStatsRules {
         static let constitution: CombatNodeID = "combat.defense.fortitude.constitution"
         static let endurance: CombatNodeID = "combat.defense.fortitude.endurance"
         static let unyielding: CombatNodeID = "combat.defense.fortitude.unyielding"
+        static let brace: CombatNodeID = "combat.defense.fortitude.brace"
     }
 
     static func constitutionTicks(authored: Int, endless: Bool, ownsNode: Bool) -> Int {
@@ -172,8 +173,22 @@ enum CombatDerivedStatsRules {
 
     static func enduranceDamage(_ value: Int, currentHP: Int, maximumHP: Int,
                                 eventMinimum: Int, ownsNode: Bool) -> Int {
-        guard ownsNode, currentHP > 0, currentHP * 2 <= max(1, maximumHP) else { return value }
+        guard value > 0, ownsNode, currentHP > 0,
+              currentHP * 2 <= max(1, maximumHP) else { return value }
         return max(eventMinimum, Int((Double(value) * 0.75).rounded(.down)))
+    }
+
+    static func survivalDamage(_ value: Int, currentHP: Int, maximumHP: Int,
+                               eventMinimum: Int, ownsEndurance: Bool,
+                               braceApplies: Bool) -> Int {
+        guard value > 0 else { return value }
+        let enduranceApplies = ownsEndurance && currentHP > 0
+            && currentHP * 2 <= max(1, maximumHP)
+        var multiplier = 1.0
+        if enduranceApplies { multiplier *= 0.75 }
+        if braceApplies { multiplier *= 0.65 }
+        guard multiplier < 1 else { return value }
+        return max(eventMinimum, Int((Double(value) * multiplier).rounded(.down)))
     }
 
     struct DirectHitSnapshot: Equatable, Sendable {
