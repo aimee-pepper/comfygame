@@ -3998,4 +3998,68 @@ final class CombatTests: XCTestCase {
             XCTAssertTrue((preview.damage.lower.finalDamage...preview.damage.upper.finalDamage).contains(committed))
         }
     }
+
+    func testSteadyHandThresholdAndPreviewBranchesDoNotAdvanceRNG() throws {
+        XCTAssertTrue(CombatRules.steadyHandCritical(roll: 0.119_999, ownsNode: true))
+        XCTAssertFalse(CombatRules.steadyHandCritical(roll: 0.12, ownsNode: true))
+        XCTAssertFalse(CombatRules.steadyHandCritical(roll: 0, ownsNode: false))
+
+        let store = GameStore(io: .temporary(name: "steady-hand-preview-\(UUID().uuidString)"))
+        store.mutate("learn Steady Hand") { Self.learnEverything(&$0) }
+        store.write("plains"); store.bindAndDepart()
+        let foeID = InstanceID(rawValue: 8_601)
+        var stats = CombatStats.derived(from: CreatureTraits(), name: "Target", icon: "circle")
+        stats.maxHP = 100; stats.armour = 5; stats.evasion = 0
+        store.mutate("stage Steady Hand preview") { state in
+            state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "field_maul")
+            guard var run = state.worlds.activeRun else { return }
+            var orderRNG = SeededRNG(seed: 101)
+            var encounter = CombatRules.makeEncounter(
+                id: InstanceID(rawValue: 8_600),
+                foes: [.init(id: foeID, traits: CreatureTraits(), stats: stats, currentHP: 100)],
+                party: [.binder],
+                debugV2BinderAttack: .init(ordinaryWeaponKind: .crush,
+                                           crushBonus: .init(components: []),
+                                           pierceBonus: .init(components: [])),
+                debugV2OwnedNodeIDs: [.binder: [CombatDerivedStatsRules.Node.steadyHand]],
+                partyRanks: [.binder: .front], rng: &orderRNG)
+            encounter.order = [.binder, .foe(foeID)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let rngBefore = try XCTUnwrap(store.state.worlds.activeRun).rng
+        let preview = try XCTUnwrap(CombatRules.debugV2DirectAttackCriticalPreview(
+            foe: try XCTUnwrap(store.activeEncounter?.foes.first), in: store.state))
+        XCTAssertNotNil(preview.critical)
+        XCTAssertEqual(try XCTUnwrap(store.state.worlds.activeRun).rng, rngBefore)
+        XCTAssertGreaterThanOrEqual(try XCTUnwrap(preview.critical).lower.rawDamage,
+                                    preview.ordinary.lower.rawDamage)
+
+        let power = CombatRules.binderAttack(in: store.state)
+        let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
+        var chosen = SeededRNG(seed: 1)
+        var expectedRoll = 0
+        for seed in 1...10_000 {
+            var candidate = SeededRNG(seed: UInt64(seed))
+            let rolled = max(Tuning.Encounter.minimumDamage,
+                             power + candidate.int(in: -spread...spread))
+            if candidate.double(in: 0...1) < 0.12 {
+                chosen = SeededRNG(seed: UInt64(seed)); expectedRoll = rolled; break
+            }
+        }
+        XCTAssertGreaterThan(expectedRoll, 0)
+        store.mutate("force saved Steady Hand success") { $0.worlds.activeRun?.rng = chosen }
+        let before = try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP)
+        let expected = CombatDamageRules.resolve(
+            rolledPower: expectedRoll,
+            in: .init(damageKind: .crush, armour: 5, isCritical: true))
+        store.mutate("commit Steady Hand attack") {
+            CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(before - (try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP)),
+                       expected.finalDamage)
+        XCTAssertTrue(try XCTUnwrap(store.activeEncounter).log.contains("Critical — Steady Hand."))
+    }
 }

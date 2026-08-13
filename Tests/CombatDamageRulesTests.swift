@@ -124,10 +124,26 @@ final class CombatDamageRulesTests: XCTestCase {
         return .init(rolledPower: rolledPower,
                      matchup: matchup,
                      rankMultiplier: rankMultiplier,
+                     isCritical: false,
                      rawDamage: raw,
                      armourIgnored: ignored,
                      effectiveArmour: effectiveArmour,
                      finalDamage: max(Tuning.Encounter.minimumDamage, raw - effectiveArmour))
+    }
+
+    func testSteadyHandCriticalRoundsOnceAfterMatchupAndBeforeArmour() {
+        let covering = Covering(hardness: 50, length: 0, coverage: 100)
+        let ordinary = CombatDamageRules.resolve(
+            rolledPower: 9,
+            in: .init(damageKind: .crush, covering: covering, armour: 4))
+        let critical = CombatDamageRules.resolve(
+            rolledPower: 9,
+            in: .init(damageKind: .crush, covering: covering, armour: 4, isCritical: true))
+        XCTAssertEqual(critical.rawDamage, Int((Double(ordinary.rawDamage) * 1.5).rounded()))
+        XCTAssertEqual(critical.effectiveArmour, ordinary.effectiveArmour)
+        XCTAssertEqual(critical.finalDamage, max(Tuning.Encounter.minimumDamage,
+                                                  critical.rawDamage - ordinary.effectiveArmour))
+        XCTAssertTrue(critical.isCritical)
     }
 
     private func legacyEffectiveness(of kind: DamageKind, against covering: Covering,

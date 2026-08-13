@@ -13,10 +13,12 @@ enum CombatDamageRules {
         var reach: Reach
         var armour: Int
         var ignoresArmour: Bool
+        var isCritical: Bool
 
         init(damageKind: DamageKind?, covering: Covering = Covering(),
              wildRule: WildRule? = nil, standingBack: Bool = false,
-             reach: Reach = .close, armour: Int = 0, ignoresArmour: Bool = false) {
+             reach: Reach = .close, armour: Int = 0, ignoresArmour: Bool = false,
+             isCritical: Bool = false) {
             self.damageKind = damageKind
             self.covering = covering
             self.wildRule = wildRule
@@ -24,6 +26,7 @@ enum CombatDamageRules {
             self.reach = reach
             self.armour = armour
             self.ignoresArmour = ignoresArmour
+            self.isCritical = isCritical
         }
     }
 
@@ -31,6 +34,7 @@ enum CombatDamageRules {
         let rolledPower: Int
         let matchup: Double
         let rankMultiplier: Double
+        let isCritical: Bool
         let rawDamage: Int
         let armourIgnored: Double
         let effectiveArmour: Int
@@ -49,7 +53,8 @@ enum CombatDamageRules {
         let rankMultiplier = context.standingBack && context.reach != .far
             ? 1 - Tuning.Encounter.backRankMeleePenalty
             : 1
-        let raw = Int((Double(rolledPower) * matchup * rankMultiplier).rounded())
+        let matched = Int((Double(rolledPower) * matchup * rankMultiplier).rounded())
+        let raw = context.isCritical ? Int((Double(matched) * 1.5).rounded()) : matched
         let ignored = context.ignoresArmour
             ? 1
             : (context.damageKind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0)
@@ -58,6 +63,7 @@ enum CombatDamageRules {
             rolledPower: rolledPower,
             matchup: matchup,
             rankMultiplier: rankMultiplier,
+            isCritical: context.isCritical,
             rawDamage: raw,
             armourIgnored: ignored,
             effectiveArmour: effectiveArmour,

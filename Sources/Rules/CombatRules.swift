@@ -1294,6 +1294,7 @@ enum CombatRules {
         var preMatchupPower: Int
         var ignoresArmour: Bool
         var damage: CombatDamageRules.Preview
+        var criticalDamage: CombatDamageRules.Preview?
     }
 
     private static func targetedWeaponTechniqueProfile(
@@ -1331,16 +1332,48 @@ enum CombatRules {
         let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
         let range = max(Tuning.Encounter.minimumDamage, power - spread)...max(Tuning.Encounter.minimumDamage,
                                                                                power + spread)
+        let context = CombatDamageRules.Context(damageKind: profile.kind,
+            covering: foe.traits?.covering ?? Covering(),
+            wildRule: wildRule(for: actor, in: state),
+            standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
+            reach: reach(for: actor, in: state), armour: foe.stats.armour,
+            ignoresArmour: profile.ignoresArmour)
+        let ownsSteadyHand = encounter.debugV2OwnedNodeIDs?[actor]?.contains(
+            CombatDerivedStatsRules.Node.steadyHand) == true
         return .init(skillID: skillID, kind: profile.kind, branchPower: profile.branchPower,
                      preMatchupPower: power, ignoresArmour: profile.ignoresArmour,
-                     damage: CombatDamageRules.preview(
+                     damage: CombatDamageRules.preview(rolledPower: range, in: context),
+                     criticalDamage: ownsSteadyHand ? CombatDamageRules.preview(
                         rolledPower: range,
-                        in: .init(damageKind: profile.kind,
-                                  covering: foe.traits?.covering ?? Covering(),
-                                  wildRule: wildRule(for: actor, in: state),
-                                  standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
-                                  reach: reach(for: actor, in: state), armour: foe.stats.armour,
-                                  ignoresArmour: profile.ignoresArmour)))
+                        in: .init(damageKind: context.damageKind, covering: context.covering,
+                                  wildRule: context.wildRule, standingBack: context.standingBack,
+                                  reach: context.reach, armour: context.armour,
+                                  ignoresArmour: context.ignoresArmour, isCritical: true)) : nil)
+    }
+
+    struct DirectAttackCriticalPreview: Equatable, Sendable {
+        var ordinary: CombatDamageRules.Preview
+        var critical: CombatDamageRules.Preview?
+    }
+
+    static func debugV2DirectAttackCriticalPreview(foe: FoeState, in state: GameState,
+                                                    standingBack: Bool = false) -> DirectAttackCriticalPreview? {
+        guard let ordinary = debugV2DirectAttackPreview(foe: foe, in: state, standingBack: standingBack),
+              let encounter = state.worlds.activeRun?.activeEncounter else { return nil }
+        guard encounter.debugV2OwnedNodeIDs?[.binder]?.contains(CombatDerivedStatsRules.Node.steadyHand) == true
+        else { return .init(ordinary: ordinary, critical: nil) }
+        let context = CombatDamageRules.Context(
+            damageKind: encounter.debugV2BinderAttack?.ordinaryWeaponKind,
+            covering: foe.traits?.covering ?? Covering(),
+            wildRule: wildRule(for: .binder, in: state), standingBack: standingBack,
+            reach: reach(for: .binder, in: state), armour: foe.stats.armour, isCritical: true)
+        return .init(ordinary: ordinary,
+                     critical: CombatDamageRules.preview(
+                        rolledPower: ordinary.lower.rolledPower...ordinary.upper.rolledPower, in: context))
+    }
+
+    static func steadyHandCritical(roll: Double, ownsNode: Bool) -> Bool {
+        ownsNode && roll < 0.12
     }
 
     static func debugV2DirectAttackPreview(foe: FoeState, in state: GameState,
@@ -1409,6 +1442,9 @@ enum CombatRules {
             ? conditionalDirectHitComponents(actor: actor, foe: foe, encounter: encounter)
             : []
         let rolledPower = roll(around: damage + conditional.reduce(0) { $0 + $1.amount }, run: &run)
+        let ownsSteadyHand = allowsConditionalDirectHit
+            && encounter.debugV2OwnedNodeIDs?[actor]?.contains(CombatDerivedStatsRules.Node.steadyHand) == true
+        let critical = ownsSteadyHand && steadyHandCritical(roll: run.rng.double(in: 0...1), ownsNode: true)
         let resolved = CombatDamageRules.resolve(
             rolledPower: rolledPower,
             in: .init(damageKind: kind,
@@ -1417,11 +1453,12 @@ enum CombatRules {
                       standingBack: standingBack,
                       reach: reachOfActor,
                       armour: foe.stats.armour,
-                      ignoresArmour: ignoresArmour)
+                      ignoresArmour: ignoresArmour, isCritical: critical)
         )
         let raw = resolved.rawDamage
         let amount = resolved.finalDamage
         encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - amount)
+        if critical { encounter.note("Critical — Steady Hand.") }
         if !encounter.foes[index].isAlive { encounter.pendingStaggers[foeID] = nil }
 
         let soaked = raw - amount
