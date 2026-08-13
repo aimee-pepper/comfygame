@@ -367,7 +367,8 @@ enum CombatRules {
         guard enabled else { return nil }
         let supported: Set<CombatNodeID> = [CombatDerivedStatsRules.Node.ironSkin,
                                             CombatDerivedStatsRules.Node.bulwark,
-                                            CombatDerivedStatsRules.Node.shieldwall]
+                                            CombatDerivedStatsRules.Node.shieldwall,
+                                            CombatDerivedStatsRules.Node.immovable]
         let entries = party.map { actor -> EncounterState.DebugV2ArmourReceipt.Entry in
             let power = GearSlot.allCases.filter(\.isProtective).reduce(0.0) { total, slot in
                 guard let piece = equipped(slot, for: actor, in: state) else { return total }
@@ -402,6 +403,21 @@ enum CombatRules {
                                                        receipt: receipt, ranks: ranks,
                                                        conscious: conscious,
                                                        armourIgnored: armourIgnored)
+    }
+
+    static func v2EmanationArmourDamage(_ raw: Int, by actor: Combatant, in state: GameState,
+                                        run: WorldRun, encounter: EncounterState)
+        -> CombatDerivedStatsRules.IncomingDamageResult? {
+        guard let receipt = encounter.debugV2Armour,
+              receipt.entry(for: actor)?.ownedNodeIDs.contains(
+                CombatDerivedStatsRules.Node.immovable) == true else { return nil }
+        let participants = receipt.entries.map(\.actor)
+        let ranks = Dictionary(uniqueKeysWithValues: participants.map {
+            ($0, rank(of: $0, in: encounter, fallback: state))
+        })
+        let conscious = Set(participants.filter { isAlive($0, in: run) })
+        return CombatDerivedStatsRules.emanationArmourDamage(
+            raw: raw, receiver: actor, receipt: receipt, ranks: ranks, conscious: conscious)
     }
 
     static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
@@ -1706,10 +1722,13 @@ enum CombatRules {
                               insulation(of: target, in: state) * Tuning.Encounter.insulationPerPoint)
                     : 1
                 if let receipt = encounter.debugV2Resistance {
-                    amount = CombatDerivedStatsRules.emanationDamage(
+                    let reduced = CombatDerivedStatsRules.emanationDamage(
                         raw: raw, element: element, receiver: target, receipt: receipt,
                         wornInsulationMultiplier: wornMultiplier,
-                        wardMultiplier: wardMultiplier).finalDamage
+                        wardMultiplier: wardMultiplier)
+                    amount = v2EmanationArmourDamage(
+                        reduced.roundedDamage, by: target, in: state, run: run,
+                        encounter: encounter)?.finalDamage ?? reduced.finalDamage
                 } else {
                     // Preserve the frozen legacy arithmetic for encounters without a v2 receipt.
                     amount = max(Tuning.Encounter.minimumDamage,
@@ -1720,7 +1739,10 @@ enum CombatRules {
                 if case .blow(let kind) = incoming {
                     raw *= wardedHaftMultiplier(against: kind, for: target, in: state)
                 }
-                let ignored = foe.stats.damageKind == .pierce ? Tuning.Encounter.pierceArmourIgnored : 0
+                let immovable = encounter.debugV2Armour?.entry(for: target)?
+                    .ownedNodeIDs.contains(CombatDerivedStatsRules.Node.immovable) == true
+                let ignored = foe.stats.damageKind == .pierce && !immovable
+                    ? Tuning.Encounter.pierceArmourIgnored : 0
                 amount = damageTaken(Int(raw.rounded()), by: target, in: state, run: run,
                                      encounter: encounter, armourIgnored: ignored)
             }

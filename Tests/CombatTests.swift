@@ -2329,6 +2329,96 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(reloaded, before)
     }
 
+    func testImmovableUsesFrozenExactOwnerArmourForPierceAndEmanationOnly() throws {
+        let immovable = CombatDerivedStatsRules.Node.immovable
+        let receipt = EncounterState.DebugV2ArmourReceipt(entries: [
+            .init(actor: .binder, equipmentProtectivePower: 4, sturdiness: 1,
+                  ownedNodeIDs: [immovable], entryRank: .back),
+            .init(actor: .companion(0), equipmentProtectivePower: 4, sturdiness: 1,
+                  ownedNodeIDs: [], entryRank: .back)
+        ])
+        let ranks: [Combatant: Rank] = [.binder: .back, .companion(0): .back]
+        let conscious: Set<Combatant> = [.binder, .companion(0)]
+
+        let binderPierce = CombatDerivedStatsRules.incomingDamage(
+            raw: 20, receiver: .binder, receipt: receipt, ranks: ranks,
+            conscious: conscious, armourIgnored: 0)
+        let companionPierce = CombatDerivedStatsRules.incomingDamage(
+            raw: 20, receiver: .companion(0), receipt: receipt, ranks: ranks,
+            conscious: conscious, armourIgnored: Tuning.Encounter.pierceArmourIgnored)
+        XCTAssertLessThan(binderPierce.finalDamage, companionPierce.finalDamage)
+
+        let emanation = CombatDerivedStatsRules.emanationArmourDamage(
+            raw: 20, receiver: .binder, receipt: receipt, ranks: ranks,
+            conscious: conscious)
+        XCTAssertEqual(emanation.raw, 20)
+        XCTAssertEqual(emanation.finalDamage,
+                       max(Tuning.Encounter.minimumDamage,
+                           20 - emanation.breakdown.effectiveArmour),
+                       "Immovable emanation uses armour but not physical back-rank protection")
+
+        let zeroArmour = EncounterState.DebugV2ArmourReceipt(entries: [
+            .init(actor: .binder, equipmentProtectivePower: 0, sturdiness: 1,
+                  ownedNodeIDs: [immovable], entryRank: .front)
+        ])
+        XCTAssertEqual(CombatDerivedStatsRules.emanationArmourDamage(
+            raw: 13, receiver: .binder, receipt: zeroArmour,
+            ranks: [.binder: .front], conscious: [.binder]).finalDamage, 13)
+        XCTAssertFalse(receipt.entry(for: .companion(0))!.ownedNodeIDs.contains(immovable),
+                       "Immovable is exact-owner, never an aura")
+    }
+
+    func testImmovableEmanationArmourKeepsFormationDynamicAndFreezesAcrossRelaunch() throws {
+        let io = SaveFileIO.temporary(name: "v2-immovable-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        store.mutate("test: everything learned") { Self.learnEverything(&$0) }
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart())
+        store.mutate("stage fight") { state in
+            guard var run = state.worlds.activeRun else { return }
+            var rng = SeededRNG(seed: 55)
+            run.activeEncounter = CombatRules.makeEncounter(
+                id: InstanceID(rawValue: 55), foes: [], party: [.binder, .companion(0)],
+                rng: &rng)
+            state.worlds.activeRun = run
+        }
+        store.mutate("freeze Immovable") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2Armour = .init(entries: [
+                .init(actor: .binder, equipmentProtectivePower: 2, sturdiness: 1,
+                      ownedNodeIDs: [CombatDerivedStatsRules.Node.immovable], entryRank: .front),
+                .init(actor: .companion(0), equipmentProtectivePower: 0, sturdiness: 1,
+                      ownedNodeIDs: [CombatDerivedStatsRules.Node.shieldwall], entryRank: .front)
+            ])
+            encounter.partyRanks = [.binder: .front, .companion(0): .front]
+            run.binderHP = 20
+            run.companionHP[0] = 20
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let before = try XCTUnwrap(CombatRules.v2EmanationArmourDamage(
+            20, by: .binder, in: store.state, run: try XCTUnwrap(store.activeRun),
+            encounter: try XCTUnwrap(store.activeEncounter)))
+        store.mutate("move formation and alter Base") { state in
+            state.worlds.activeRun?.activeEncounter?.partyRanks[.binder] = .back
+            state.base.binderCharacter.stats.fortitude = 99
+            state.worlds.activeRun?.tuning.debugCombatV2BinderNodeIDs = []
+        }
+        let moved = try XCTUnwrap(CombatRules.v2EmanationArmourDamage(
+            20, by: .binder, in: store.state, run: try XCTUnwrap(store.activeRun),
+            encounter: try XCTUnwrap(store.activeEncounter)))
+        XCTAssertFalse(moved.breakdown.components.contains {
+            $0.nodeID == CombatDerivedStatsRules.Node.shieldwall
+        })
+        XCTAssertEqual(moved.breakdown.equipment, before.breakdown.equipment)
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(try XCTUnwrap(CombatRules.v2EmanationArmourDamage(
+            20, by: .binder, in: relaunched.state, run: try XCTUnwrap(relaunched.activeRun),
+            encounter: try XCTUnwrap(relaunched.activeEncounter))), moved)
+    }
+
     func testStaggerRollBoundaryAndAutomaticProducerSeam() throws {
         XCTAssertTrue(CombatRules.staggerSucceeds(roll: 0.299_999, automatic: false))
         XCTAssertFalse(CombatRules.staggerSucceeds(roll: 0.30, automatic: false))
@@ -2816,6 +2906,66 @@ final class CombatTests: XCTestCase {
         XCTAssertNil(CombatDerivedStatsRules.debugResistanceReceipt(
             enabled: false, party: party, binderNodeIDs: [insulation], binderChoices: [:],
             companionNodeIDs: [:], companionChoices: [:]))
+    }
+
+    func testRealFoeCommitAppliesImmovableOnlyToPierceAndDirectEmanation() throws {
+        func staged(kind: DamageKind, element: EmanationKind?, immovable: Bool) -> GameStore {
+            let store = inFight()
+            store.mutate("stage Immovable commit counterfactual") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                      !encounter.foes.isEmpty else { return }
+                run.rng = SeededRNG(seed: 91)
+                run.binderHP = 40
+                run.companionHP[0] = 0
+                encounter.foes[0].stats.delivery = .single
+                encounter.foes[0].stats.damageKind = kind
+                encounter.foes[0].stats.element = element
+                encounter.foes[0].stats.attack = 18
+                encounter.order = [.foe(encounter.foes[0].id), .binder]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.partyRanks = [.binder: .front]
+                encounter.debugV2Armour = .init(entries: [
+                    .init(actor: .binder, equipmentProtectivePower: 5, sturdiness: 1,
+                          ownedNodeIDs: immovable ? [CombatDerivedStatsRules.Node.immovable] : [],
+                          entryRank: .front)
+                ])
+                encounter.debugV2Resistance = .init(entries: [
+                    .init(actor: .binder, insulationChoice: element)
+                ])
+                encounter.debugV2Evasion = .init(entries: [
+                    .init(actor: .binder, characterEvasion: 0, components: [])
+                ])
+                encounter.ghostEvasionAvailable = []
+                encounter.statuses[.binder] = []
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                CombatRules.runAutomaticTurns(in: &state)
+            }
+            return store
+        }
+
+        let pierceOwned = staged(kind: .pierce, element: nil, immovable: true)
+        let pierceEmpty = staged(kind: .pierce, element: nil, immovable: false)
+        XCTAssertGreaterThan(pierceOwned.activeRun?.binderHP ?? 0,
+                             pierceEmpty.activeRun?.binderHP ?? 0)
+
+        for kind in [DamageKind.crush, .rend] {
+            XCTAssertEqual(staged(kind: kind, element: nil, immovable: true).activeRun?.binderHP,
+                           staged(kind: kind, element: nil, immovable: false).activeRun?.binderHP,
+                           "Immovable must not alter \(kind) damage")
+        }
+
+        let emanationOwned = staged(kind: .crush, element: .caustic, immovable: true)
+        let emanationEmpty = staged(kind: .crush, element: .caustic, immovable: false)
+        XCTAssertGreaterThan(emanationOwned.activeRun?.binderHP ?? 0,
+                             emanationEmpty.activeRun?.binderHP ?? 0)
+        XCTAssertEqual(emanationOwned.activeEncounter?.statuses[.binder],
+                       emanationEmpty.activeEncounter?.statuses[.binder],
+                       "Immovable changes direct damage, never the emanation affliction payload")
+        XCTAssertTrue(emanationOwned.activeEncounter?.statuses[.binder]?.contains(where: {
+            $0.kind == .poison
+        }) == true)
     }
 
     func testInsulationPureDamageMatchesOnlyChosenEmanationAndRoundsContinuousMultipliersOnce() {

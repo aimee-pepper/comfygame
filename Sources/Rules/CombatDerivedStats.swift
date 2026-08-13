@@ -277,6 +277,28 @@ enum CombatDerivedStatsRules {
                                receipt: EncounterState.DebugV2ArmourReceipt,
                                ranks: [Combatant: Rank], conscious: Set<Combatant>,
                                armourIgnored: Double) -> IncomingDamageResult {
+        incomingDamage(raw: raw, receiver: receiver, receipt: receipt, ranks: ranks,
+                       conscious: conscious, armourIgnored: armourIgnored,
+                       appliesBackRankProtection: true)
+    }
+
+    /// Shared armour authority for direct emanation when Immovable expands armour's scope.
+    /// Formation still reads current encounter ranks, but emanation never gains the physical
+    /// back-rank raw-damage reduction.
+    static func emanationArmourDamage(raw: Int, receiver: Combatant,
+                                      receipt: EncounterState.DebugV2ArmourReceipt,
+                                      ranks: [Combatant: Rank], conscious: Set<Combatant>)
+        -> IncomingDamageResult {
+        incomingDamage(raw: raw, receiver: receiver, receipt: receipt, ranks: ranks,
+                       conscious: conscious, armourIgnored: 0,
+                       appliesBackRankProtection: false)
+    }
+
+    private static func incomingDamage(raw: Int, receiver: Combatant,
+                                       receipt: EncounterState.DebugV2ArmourReceipt,
+                                       ranks: [Combatant: Rank], conscious: Set<Combatant>,
+                                       armourIgnored: Double,
+                                       appliesBackRankProtection: Bool) -> IncomingDamageResult {
         let receiverEntry = receipt.entry(for: receiver) ?? .init(
             actor: receiver, equipmentProtectivePower: 0, sturdiness: 1,
             ownedNodeIDs: [], entryRank: .front)
@@ -317,7 +339,9 @@ enum CombatDerivedStatsRules {
         let ignored = min(1, max(0, armourIgnored))
         let effective = Int((total * (1 - ignored)).rounded())
         var incoming = Double(raw)
-        if receiverRank == .back { incoming *= 1 - Tuning.Encounter.backRankProtection }
+        if appliesBackRankProtection, receiverRank == .back {
+            incoming *= 1 - Tuning.Encounter.backRankProtection
+        }
         let final = max(Tuning.Encounter.minimumDamage, Int(incoming.rounded()) - effective)
         return .init(raw: raw, rank: receiverRank,
                      breakdown: .init(receiver: receiver, equipment: equipment,

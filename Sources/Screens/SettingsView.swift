@@ -513,6 +513,8 @@ struct BalancingView: View {
                                       id: CombatDerivedStatsRules.Node.bulwark)
                 debugCombatNodeToggle("Shieldwall · conscious front line +2",
                                       id: CombatDerivedStatsRules.Node.shieldwall)
+                debugCombatNodeToggle("Immovable · armour applies to Pierce and emanation",
+                                      id: CombatDerivedStatsRules.Node.immovable)
                 debugCombatNodeToggle("Stagger · landed Crush has 30% next-round delay",
                                       id: CombatDerivedStatsRules.Node.stagger)
                 debugCombatNodeToggle("Footwork · personal miss chance +6 points",
@@ -541,6 +543,9 @@ struct BalancingView: View {
                                                  id: CombatDerivedStatsRules.Node.bulwark)
                         debugCompanionNodeToggle("Shieldwall · conscious front line +2", index: index,
                                                  id: CombatDerivedStatsRules.Node.shieldwall)
+                        debugCompanionNodeToggle("Immovable · armour applies to Pierce and emanation",
+                                                 index: index,
+                                                 id: CombatDerivedStatsRules.Node.immovable)
                         debugCompanionNodeToggle("Stagger · Crush delay", index: index,
                                                  id: CombatDerivedStatsRules.Node.stagger)
                         debugCompanionNodeToggle("Footwork · miss chance +6", index: index,
@@ -608,6 +613,10 @@ struct BalancingView: View {
                         ).breakdown
                         Text(debugArmourLine(entry.actor, breakdown: breakdown))
                             .font(.caption.monospacedDigit())
+                        if entry.ownedNodeIDs.contains(CombatDerivedStatsRules.Node.immovable) {
+                            Text("Immovable · this armour also applies to Pierce and direct Heat, Caustic, and Light")
+                                .font(.caption)
+                        }
                     }
                 }
                 Text("Explicit DEBUG ownership only. Party totals preview before contact; equal totals remain unresolved until the encounter's saved RNG breaks the tie. Exact inputs and final order freeze when combat opens.")
