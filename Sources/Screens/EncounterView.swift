@@ -42,7 +42,7 @@ struct EncounterView: View {
                             SkillSheet(onUse: use).environmentObject(store)
                         }
                         .sheet(isPresented: $isChoosingItem) {
-                            CombatItemSheet(onUse: use).environmentObject(store)
+                            CombatItemSheet(onCommit: use).environmentObject(store)
                         }
                 }
             }
@@ -406,9 +406,8 @@ struct EncounterView: View {
         }
     }
 
-    private func use(_ stack: ItemStack, on ally: Combatant) {
-        isChoosingItem = false
-        store.takeCombatAction(.useItem(stack: stack.id, ally: ally))
+    private func use(_ quote: CombatItemUseQuote) -> CombatItemUseCommitResult {
+        store.commitCombatItemUse(quote)
     }
 
     /// Healing goes to whoever needs it most — the obvious intent, and one fewer tap. Across the
@@ -745,7 +744,8 @@ struct CombatSkillRowPresentation: Equatable, Sendable {
 private struct CombatItemSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
-    let onUse: (ItemStack, Combatant) -> Void
+    let onCommit: (CombatItemUseQuote) -> CombatItemUseCommitResult
+    @State private var refusalMessage: String?
 
     private var livingParty: [Combatant] {
         guard let run = store.activeRun else { return [] }
@@ -760,8 +760,7 @@ private struct CombatItemSheet: View {
                         Section {
                             ForEach(livingParty, id: \.self) { ally in
                                 Button {
-                                    onUse(stack, ally)
-                                    dismiss()
+                                    beginUse(stack, on: ally)
                                 } label: {
                                     HStack {
                                         Text("Use on \(name(of: ally))")
@@ -796,8 +795,64 @@ private struct CombatItemSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Back") { dismiss() } }
             }
+            .alert("Item not used", isPresented: Binding(
+                get: { refusalMessage != nil },
+                set: { if !$0 { refusalMessage = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(refusalMessage ?? "The current fight state no longer permits that action.")
+            }
+            .confirmationDialog("Choose an affliction", isPresented: Binding(
+                get: { pendingSelection != nil },
+                set: { if !$0 { pendingSelection = nil } }
+            ), titleVisibility: .visible) {
+                if let pendingSelection {
+                    ForEach(pendingSelection.afflictions, id: \.applicationReceipt) { affliction in
+                        Button(AfflictionDefinition.definition(affliction.kind).displayName) {
+                            commit(pendingSelection.stack, on: pendingSelection.ally,
+                                   selecting: affliction.applicationReceipt)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) { self.pendingSelection = nil }
+                }
+            }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    private struct PendingSelection {
+        let stack: ItemStack
+        let ally: Combatant
+        let afflictions: [AfflictionInstance]
+    }
+
+    @State private var pendingSelection: PendingSelection?
+
+    private func beginUse(_ stack: ItemStack, on ally: Combatant) {
+        switch store.combatItemUseEvaluation(stack: stack, on: ally) {
+        case .ready(let quote):
+            finish(onCommit(quote))
+        case .refused(.selectionRequired(let afflictions)):
+            pendingSelection = .init(stack: stack, ally: ally, afflictions: afflictions)
+        case .refused(let refusal):
+            refusalMessage = refusal.message
+        }
+    }
+
+    private func commit(_ stack: ItemStack, on ally: Combatant, selecting receipt: UInt64) {
+        pendingSelection = nil
+        switch store.combatItemUseEvaluation(stack: stack, on: ally, selecting: receipt) {
+        case .ready(let quote): finish(onCommit(quote))
+        case .refused(let refusal): refusalMessage = refusal.message
+        }
+    }
+
+    private func finish(_ result: CombatItemUseCommitResult) {
+        switch result {
+        case .committed: dismiss()
+        case .refused(let refusal): refusalMessage = refusal.message
+        }
     }
 
     private func name(of actor: Combatant) -> String {

@@ -640,7 +640,9 @@ enum CombatRules {
             guard let foe else { return nil }
             let purchase = (foe.traits?.covering.insulation ?? 0) / Tuning.Pressure.scaleMaximum
             let perRound = max(1, Int((Double(power) * purchase).rounded()))
-            encounter.foeBleeds[foe.id] = BleedState(damage: perRound, rounds: skill.rounds)
+            _ = applyAffliction(.bleed, to: .foe(foe.id), source: actor,
+                                provenance: .direct, damage: perRound, ticks: skill.rounds,
+                                targetIsStanding: foe.isAlive, encounter: &encounter)
             encounter.note(purchase < Tuning.Encounter.thinCovering
                            ? "\(skill.name): there's nothing here to open."
                            : "\(skill.name). \(foe.stats.displayName) is bleeding.")
@@ -693,19 +695,16 @@ enum CombatRules {
             encounter.note("\(skill.name).")
 
         case .cleanse:
-            // **Steady.** Closes whatever is still open — a wound, a burn, a poison, or the
-            // after-image of something that flared at you.
+            // Legacy `steady` is the decode route for Quench. It may remove one eligible
+            // Burn/Poison/Dazzle only when that choice is unambiguous; Bleed remains treatment.
             let target = ally ?? actor
-            switch target {
-            case .binder: encounter.binderBleedRounds = 0
-            case .companion: encounter.companionBleedRounds = 0
-            case .foe: break
+            adoptLegacyAfflictions(in: &encounter)
+            let eligible = afflictions(on: target, in: encounter).filter {
+                AfflictionDefinition.definition($0.kind).cures.contains(.quench)
             }
-            let carried = encounter.statuses[target] ?? []
-            encounter.statuses[target] = []
-            encounter.note(carried.isEmpty
-                           ? "\(skill.name): the bleeding stops."
-                           : "\(skill.name): the \(carried.map { $0.kind.rawValue }.joined(separator: " and ")) stops.")
+            guard eligible.count == 1, let chosen = eligible.first else { return nil }
+            encounter.afflictions?.removeAll { $0.applicationReceipt == chosen.applicationReceipt }
+            encounter.note("\(skill.name): the \(chosen.kind.rawValue) stops.")
 
         case .rout:
             // **Rout.** Leaving without the world noticing — the answer to a fight you shouldn't
@@ -794,8 +793,10 @@ enum CombatRules {
             strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
                    run: &run, encounter: &encounter, verb: skill.name,
                    standingBack: standingBack, reachOfActor: reach)
-            encounter.statuses[.foe(foe.id), default: []]
-                .append(StatusState(kind: .burn, damage: max(1, power / 4), rounds: skill.rounds + 1))
+            _ = applyAffliction(.burn, to: .foe(foe.id), source: actor,
+                                provenance: .direct, damage: max(1, power / 4),
+                                ticks: skill.rounds + 1,
+                                targetIsStanding: foe.isAlive, encounter: &encounter)
         }
 
         let cooling = stats.map { CharacterRules.cooldown(skill.cooldownRounds, $0) } ?? skill.cooldownRounds
@@ -832,21 +833,57 @@ enum CombatRules {
 
     // MARK: Harm that outlives the blow
 
-    /// Lays a status on somebody, replacing a weaker one of the same kind rather than stacking.
-    /// Stacking would make two emanating creatures arithmetic rather than a threat.
+    enum AfflictionApplicationOutcome: Equatable {
+        case prevented, noChange, added(AfflictionInstance), strengthened(AfflictionInstance)
+    }
+
+    /// One-time adoption boundary. Nil is the only legacy marker; modern empty stays empty.
+    static func adoptLegacyAfflictions(in encounter: inout EncounterState) {
+        encounter.adoptLegacyAfflictionsIfNeeded()
+    }
+
     @discardableResult
-    private static func afflict(_ target: Combatant, with kind: StatusKind, damage: Int,
-                                rounds: Int, encounter: inout EncounterState) -> Bool {
-        if consumeStatusGuard(on: target, encounter: &encounter) { return false }
-        var carried = encounter.statuses[target] ?? []
-        if let index = carried.firstIndex(where: { $0.kind == kind }) {
-            carried[index].damage = max(carried[index].damage, damage)
-            carried[index].rounds = max(carried[index].rounds, rounds)
-        } else {
-            carried.append(StatusState(kind: kind, damage: damage, rounds: rounds))
+    static func applyAffliction(_ kind: AfflictionID, to target: Combatant,
+                                source: Combatant?, provenance: AfflictionProvenance,
+                                contributingProvenances: Set<AfflictionProvenance>? = nil,
+                                damage: Int, ticks: Int, endless: Bool = false,
+                                targetIsStanding: Bool,
+                                bypassGuard: Bool = false,
+                                encounter: inout EncounterState) -> AfflictionApplicationOutcome {
+        adoptLegacyAfflictions(in: &encounter)
+        guard targetIsStanding else { return .noChange }
+        let definition = AfflictionDefinition.definition(kind)
+        let proposedDamage = definition.allowsSeverityOverride ? max(0, damage) : definition.defaultDamage
+        let proposedTicks = definition.allowsDurationOverride ? max(0, ticks) : definition.defaultTicks
+        let index = encounter.afflictions?.firstIndex { $0.target == target && $0.kind == kind }
+        let old = index.flatMap { encounter.afflictions?[$0] }
+        let changes = old == nil
+            || proposedDamage > (old?.damage ?? 0)
+            || endless && old?.endless != true
+            || (!endless && old?.endless != true && proposedTicks > (old?.ticksRemaining ?? 0))
+        guard changes else { return .noChange }
+        if !bypassGuard, definition.stonebarkEligible,
+           consumeStatusGuard(on: target, encounter: &encounter) {
+            return .prevented
         }
-        encounter.statuses[target] = carried
-        return true
+
+        let higherDamage = proposedDamage > (old?.damage ?? -1)
+        let receipt = encounter.nextAfflictionReceipt
+        encounter.nextAfflictionReceipt &+= 1
+        var merged = AfflictionInstance(
+            kind: kind, target: target,
+            source: higherDamage ? source : old?.source,
+            provenance: higherDamage ? provenance : (old?.provenance ?? provenance),
+            damage: max(old?.damage ?? 0, proposedDamage),
+            ticksRemaining: max(old?.ticksRemaining ?? 0, proposedTicks),
+            endless: old?.endless == true || endless,
+            applicationReceipt: receipt
+        )
+        merged.provenances.formUnion(old?.provenances ?? [])
+        merged.provenances.formUnion(contributingProvenances ?? [provenance])
+        if let index { encounter.afflictions?[index] = merged }
+        else { encounter.afflictions?.append(merged) }
+        return old == nil ? .added(merged) : .strengthened(merged)
     }
 
     private static func consumeStatusGuard(on target: Combatant,
@@ -859,7 +896,70 @@ enum CombatRules {
     }
 
     static func has(_ kind: StatusKind, _ actor: Combatant, in encounter: EncounterState) -> Bool {
-        (encounter.statuses[actor] ?? []).contains { $0.kind == kind }
+        encounter.afflictions?.contains { $0.target == actor && $0.kind == kind.afflictionID }
+            ?? (encounter.statuses[actor] ?? []).contains { $0.kind == kind }
+    }
+
+    static func afflictions(on target: Combatant,
+                            in encounter: EncounterState) -> [AfflictionInstance] {
+        var normalized = encounter
+        adoptLegacyAfflictions(in: &normalized)
+        return (normalized.afflictions ?? []).filter { $0.target == target }.sorted {
+            AfflictionDefinition.definition($0.kind).order
+                < AfflictionDefinition.definition($1.kind).order
+        }
+    }
+
+    static func eligibleAfflictions(for effect: ConsumableDef.Effect, on target: Combatant,
+                                    in encounter: EncounterState) -> [AfflictionInstance] {
+        let family: AfflictionCureFamily? = switch effect {
+        case .clearPoison: .clearing
+        case .clearElemental: .quenching
+        case .clearAnyStatus: .broad
+        default: nil
+        }
+        guard let family else { return [] }
+        return afflictions(on: target, in: encounter).filter {
+            AfflictionDefinition.definition($0.kind).cures.contains(family)
+        }
+    }
+
+    /// Rules-owned cure commit. Group cures remove their entire authored family; Broad removes the
+    /// sole eligible kind or the exact player-selected kind and rejects stale/ambiguous input.
+    @discardableResult
+    static func cureAfflictions(for effect: ConsumableDef.Effect, on target: Combatant,
+                                selectedReceipt: UInt64?,
+                                encounter: inout EncounterState) -> Bool {
+        adoptLegacyAfflictions(in: &encounter)
+        let eligible = eligibleAfflictions(for: effect, on: target, in: encounter)
+        guard !eligible.isEmpty else { return false }
+        if effect == .clearAnyStatus {
+            let chosen: AfflictionInstance?
+            if let selectedReceipt {
+                chosen = eligible.first { $0.applicationReceipt == selectedReceipt }
+            }
+            else { chosen = eligible.count == 1 ? eligible[0] : nil }
+            guard let chosen else { return false }
+            encounter.afflictions?.removeAll {
+                $0.target == target && $0.applicationReceipt == chosen.applicationReceipt
+            }
+        } else {
+            let kinds = Set(eligible.map(\.kind))
+            encounter.afflictions?.removeAll { $0.target == target && kinds.contains($0.kind) }
+        }
+        return true
+    }
+
+    @discardableResult
+    static func quenchAffliction(on target: Combatant, selectedReceipt: UInt64,
+                                 encounter: inout EncounterState) -> Bool {
+        adoptLegacyAfflictions(in: &encounter)
+        guard let chosen = afflictions(on: target, in: encounter).first(where: {
+            $0.applicationReceipt == selectedReceipt
+                && AfflictionDefinition.definition($0.kind).cures.contains(.quench)
+        }) else { return false }
+        encounter.afflictions?.removeAll { $0.applicationReceipt == chosen.applicationReceipt }
+        return true
     }
 
     /// **What somebody can take**, which is Fortitude on top of the base (session 17 §1).
@@ -1070,8 +1170,9 @@ enum CombatRules {
                 }
             }
 
-        case .useItem(let stackID, let ally):
-            if useItem(stackID, on: ally, run: &run, encounter: &encounter) {
+        case .useItem(let stackID, let ally, let afflictionReceipt):
+            if useItem(stackID, on: ally, afflictionReceipt: afflictionReceipt,
+                       run: &run, encounter: &encounter) {
                 outcome = .committed(cost: .normal, completedDirectAttack: false)
             }
 
@@ -1256,59 +1357,61 @@ enum CombatRules {
             }
         }
 
-        // **A volatile weapon leaves something in the wound** (Q36). What your blade was made of
-        // reaches the fight, which is what makes an ichor worth carrying home.
-        if let coating, encounter.foes[index].isAlive {
-            // Reactive material predates the general status collection and is intentionally a
-            // wound payload. Preserve that save/behavior contract; prepared Apothecary coatings
-            // below use their explicit poison/burn/bleed/dazzle mapping.
-            encounter.foeBleeds[foe.id] = BleedState(
-                damage: Tuning.Encounter.statusDamage[coating.rawValue] ?? 2,
-                rounds: Tuning.Encounter.statusRounds[coating.rawValue] ?? 3)
-            encounter.note("Whatever that blade is made of is in the wound now.")
-        }
-
-        // Apothecary coatings are prepared choices, not material properties. One successful
-        // weapon strike spends the treatment even when the blow itself finishes the foe.
-        if let prepared = encounter.preparedCoatings.removeValue(forKey: actor),
-           encounter.foes[index].isAlive {
-            switch prepared {
-            case .bleed:
-                encounter.foes[index].bleedRounds = max(encounter.foes[index].bleedRounds,
-                                                        Tuning.Encounter.bleedRounds)
-            case .poison, .burn, .dazzle:
-                let kind: StatusKind = switch prepared {
-                case .poison: .poison
-                case .burn: .burn
-                case .dazzle: .dazzle
-                case .bleed: .poison // unreachable; keeps the switch total
-                }
-                afflict(.foe(foe.id), with: kind,
-                        damage: Tuning.Encounter.statusDamage[kind.rawValue] ?? 0,
-                        rounds: Tuning.Encounter.statusRounds[kind.rawValue] ?? 2,
-                        encounter: &encounter)
+        // One successful weapon strike spends its prepared coating even if the damage defeats the
+        // target. If the target remains standing, merge every same-kind contributor before the one
+        // Stonebark/max-refresh transaction; different kinds use registry order.
+        let prepared = encounter.preparedCoatings.removeValue(forKey: actor)
+        if encounter.foes[index].isAlive {
+            typealias Payload = (kind: AfflictionID, damage: Int, ticks: Int,
+                                 endless: Bool, provenance: AfflictionProvenance)
+            var payloads: [Payload] = []
+            if let coating {
+                payloads.append((.bleed, Tuning.Encounter.statusDamage[coating.rawValue] ?? 2,
+                                 Tuning.Encounter.statusRounds[coating.rawValue] ?? 3,
+                                 false, .direct))
+                encounter.note("Whatever that blade is made of is in the wound now.")
             }
-            encounter.note("The \(prepared.rawValue) coating leaves the weapon in the wound.")
-        }
-
-        // Rending tears: the wound goes on costing it after the blow. This is what finally makes
-        // `bleedRounds` live on the foe's side of the fight rather than only on yours.
-        //
-        // **The Bloodletter's doesn't stop.** Every status in the game has a duration; this is the
-        // one thing in it that doesn't, which is the sentence it exists to say.
-        if kind == .rend, encounter.foes[index].isAlive {
-            encounter.foes[index].bleedRounds = breaking == .endlessBleed
-                ? Tuning.Encounter.endlessBleedRounds
-                : Tuning.Encounter.bleedRounds
-        }
-
-        // **Something in the wound, with nothing consumed to put it there.** Coatings are spent;
-        // the Barbed Edge simply is what it is. Its code ID remains `rimed_edge` for old saves.
-        if breaking == .innateStatus, encounter.foes[index].isAlive, let named = innateStatus {
-            encounter.foeBleeds[foe.id] = BleedState(
-                damage: Tuning.Encounter.statusDamage[named] ?? 2,
-                rounds: Tuning.Encounter.statusRounds[named] ?? 2)
-            encounter.note("The barbs stay in the wound.")
+            if let prepared {
+                let payload: Payload = switch prepared {
+                case .bleed:
+                    (.bleed, Tuning.Encounter.statusDamage["bleed"] ?? 2,
+                     Tuning.Encounter.bleedRounds, false, .coating)
+                case .poison:
+                    (.poison, Tuning.Encounter.statusDamage["poison"] ?? 2,
+                     Tuning.Encounter.statusRounds["poison"] ?? 3, false, .coating)
+                case .burn:
+                    (.burn, Tuning.Encounter.statusDamage["burn"] ?? 4,
+                     Tuning.Encounter.statusRounds["burn"] ?? 2, false, .coating)
+                case .dazzle:
+                    (.dazzle, 0, Tuning.Encounter.statusRounds["dazzle"] ?? 2,
+                     false, .coating)
+                }
+                payloads.append(payload)
+                encounter.note("The \(prepared.rawValue) coating leaves the weapon in the wound.")
+            }
+            if kind == .rend {
+                payloads.append((.bleed, Tuning.Encounter.bleedDamage,
+                                 Tuning.Encounter.bleedRounds,
+                                 breaking == .endlessBleed, .direct))
+            }
+            if breaking == .innateStatus, let named = innateStatus {
+                payloads.append((.bleed, Tuning.Encounter.statusDamage[named] ?? 3,
+                                 Tuning.Encounter.statusRounds[named] ?? 3,
+                                 false, .direct))
+                encounter.note("The barbs stay in the wound.")
+            }
+            for kind in AfflictionID.allCases {
+                let contributors = payloads.filter { $0.kind == kind }
+                guard !contributors.isEmpty else { continue }
+                let strongest = contributors.max { $0.damage < $1.damage }!
+                _ = applyAffliction(kind, to: .foe(foe.id), source: actor,
+                                    provenance: strongest.provenance,
+                                    contributingProvenances: Set(contributors.map(\.provenance)),
+                                    damage: contributors.map(\.damage).max() ?? 0,
+                                    ticks: contributors.map(\.ticks).max() ?? 0,
+                                    endless: contributors.contains(where: \.endless),
+                                    targetIsStanding: true, encounter: &encounter)
+            }
         }
 
         // **Attacking out of cover, and staying in it.** Nothing else in Shadow allows this.
@@ -1322,10 +1425,12 @@ enum CombatRules {
             hurt(actor, by: foe.stats.retaliation, run: &run, encounter: &encounter)
             encounter.note("\(name.capitalisedSentence) is not safe to touch — \(foe.stats.retaliation) back.")
             if foe.traits?.isToxic == true {
-                afflict(actor, with: .poison,
-                        damage: Tuning.Encounter.statusDamage["poison"] ?? 0,
-                        rounds: Tuning.Encounter.statusRounds["poison"] ?? 3,
-                        encounter: &encounter)
+                _ = applyAffliction(.poison, to: actor, source: .foe(foe.id),
+                                    provenance: .retaliation,
+                                    damage: Tuning.Encounter.statusDamage["poison"] ?? 0,
+                                    ticks: Tuning.Encounter.statusRounds["poison"] ?? 3,
+                                    targetIsStanding: isAlive(actor, in: run),
+                                    encounter: &encounter)
                 encounter.note("It's in you now.")
             }
         }
@@ -1376,6 +1481,7 @@ enum CombatRules {
     @discardableResult
     private static func useItem(_ stackID: InstanceID,
                                 on ally: Combatant,
+                                afflictionReceipt: UInt64?,
                                 run: inout WorldRun,
                                 encounter: inout EncounterState) -> Bool {
         guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID }),
@@ -1384,23 +1490,25 @@ enum CombatRules {
         else { return false }
 
         guard let effect = item.consumable else { return false }
+        adoptLegacyAfflictions(in: &encounter)
         switch effect.effect {
         case .heal:
             heal(ally, by: effect.potency, run: &run, encounter: &encounter,
                  source: item.name, healer: ally)
         case .clearPoison:
-            encounter.statuses[ally]?.removeAll { $0.kind == .poison }
-            clearBleed(on: ally, encounter: &encounter)
+            guard cureAfflictions(for: effect.effect, on: ally,
+                                  selectedReceipt: afflictionReceipt,
+                                  encounter: &encounter) else { return false }
             encounter.note("\(item.name) clears the wound and the poison.")
         case .clearElemental:
-            encounter.statuses[ally]?.removeAll { $0.kind == .burn || $0.kind == .dazzle }
+            guard cureAfflictions(for: effect.effect, on: ally,
+                                  selectedReceipt: afflictionReceipt,
+                                  encounter: &encounter) else { return false }
             encounter.note("\(item.name) quenches what was clinging to \(actorName(ally, encounter: encounter)).")
         case .clearAnyStatus:
-            if !(encounter.statuses[ally]?.isEmpty ?? true) {
-                encounter.statuses[ally]?.removeFirst()
-            } else {
-                clearBleed(on: ally, encounter: &encounter)
-            }
+            guard cureAfflictions(for: effect.effect, on: ally,
+                                  selectedReceipt: afflictionReceipt,
+                                  encounter: &encounter) else { return false }
             encounter.note("\(item.name) draws one affliction out.")
         case .preventStatus:
             encounter.statusGuards[ally] = max(1, effect.potency)
@@ -1425,14 +1533,6 @@ enum CombatRules {
             run.satchelItems.stacks.remove(at: index)
         }
         return true
-    }
-
-    private static func clearBleed(on ally: Combatant, encounter: inout EncounterState) {
-        switch ally {
-        case .binder: encounter.binderBleedRounds = 0
-        case .companion: encounter.companionBleedRounds = 0
-        case .foe: break
-        }
     }
 
     private static func setCooldown(_ rounds: Int, for actor: Combatant, in encounter: inout EncounterState) {
@@ -1645,58 +1745,40 @@ enum CombatRules {
     /// actually turns over, so a force-quit between rounds can't skip or double a tick.
     private static func bleed(in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
-        let damage = Tuning.Encounter.bleedDamage
-
-        // **Burns, poisons and dazzles**, ticked with everything else so a force-quit between
-        // rounds can't skip or double one.
-        for (who, carried) in encounter.statuses {
-            var remaining: [StatusState] = []
-            for status in carried {
-                if status.damage > 0, isAlive(who, in: withEncounter(encounter, on: run)) {
-                    hurt(who, by: status.damage, run: &run, encounter: &encounter)
-                    encounter.note("\(actorName(who, encounter: encounter)) \(status.kind.verb) — \(status.damage).")
-                }
-                if status.rounds > 1 {
-                    var next = status
-                    next.rounds -= 1
-                    remaining.append(next)
-                }
-            }
-            encounter.statuses[who] = remaining
-        }
-
-        // **Wounds you opened.** Flense's, which are per-foe and carry their own severity — a
-        // shaggy thing bleeds far worse than a plated one, which is the whole reading.
-        for (foeID, state) in encounter.foeBleeds {
-            guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }),
-                  encounter.foes[index].isAlive
-            else { encounter.foeBleeds[foeID] = nil; continue }
-            encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - state.damage)
-            encounter.note("\(encounter.foes[index].stats.displayName) bleeds for \(state.damage).")
-            if state.rounds <= 1 { encounter.foeBleeds[foeID] = nil }
-            else { encounter.foeBleeds[foeID]?.rounds = state.rounds - 1 }
-        }
-
-        if encounter.binderBleedRounds > 0 {
-            encounter.binderBleedRounds -= 1
-            run.binderHP = max(0, run.binderHP - damage)
-            encounter.note("You're still bleeding — \(damage).")
-        }
-        if encounter.companionBleedRounds > 0 {
-            encounter.companionBleedRounds -= 1
-            for index in run.companionHP.keys where (run.companionHP[index] ?? 0) > 0 {
-                run.companionHP[index] = max(0, (run.companionHP[index] ?? 0) - damage)
-            }
-        }
-        for index in encounter.foes.indices where encounter.foes[index].bleedRounds > 0
-            && encounter.foes[index].isAlive {
-            encounter.foes[index].bleedRounds -= 1
-            encounter.foes[index].currentHP = max(0, encounter.foes[index].currentHP - damage)
-            encounter.note("\(encounter.foes[index].stats.displayName.capitalisedSentence) is still bleeding — \(damage).")
-        }
+        tickAfflictions(run: &run, encounter: &encounter)
 
         run.activeEncounter = encounter
         state.worlds.activeRun = run
+    }
+
+    /// One persisted round-boundary consequence. Applications never call this directly, so a
+    /// three-tick payload always means three future boundaries and relaunch preserves the count.
+    static func tickAfflictions(run: inout WorldRun, encounter: inout EncounterState) {
+        adoptLegacyAfflictions(in: &encounter)
+        let snapshot = encounter.afflictions ?? []
+        var remaining: [AfflictionInstance] = []
+        for var affliction in snapshot.sorted(by: {
+            if $0.target.storageKey != $1.target.storageKey {
+                return $0.target.storageKey < $1.target.storageKey
+            }
+            return AfflictionDefinition.definition($0.kind).order
+                < AfflictionDefinition.definition($1.kind).order
+        }) {
+            guard isAlive(affliction.target, in: withEncounter(encounter, on: run)) else { continue }
+            if affliction.damage > 0 {
+                hurt(affliction.target, by: affliction.damage, run: &run, encounter: &encounter)
+                encounter.note("\(actorName(affliction.target, encounter: encounter)) "
+                               + "\(affliction.kind.legacyVerb) — \(affliction.damage).")
+            }
+            guard isAlive(affliction.target, in: withEncounter(encounter, on: run)) else { continue }
+            if affliction.endless {
+                remaining.append(affliction)
+            } else if affliction.ticksRemaining > 1 {
+                affliction.ticksRemaining -= 1
+                remaining.append(affliction)
+            }
+        }
+        encounter.afflictions = remaining
     }
 
     /// Whether the current actor is waiting on the player rather than acting for itself.
@@ -1896,12 +1978,13 @@ enum CombatRules {
 
             // Rend's wound outlives the blow.
             if foe.stats.damageKind == .rend, !slot.suppressesAfflictions {
-                if !consumeStatusGuard(on: target, encounter: &encounter) {
-                    switch target {
-                    case .binder: encounter.binderBleedRounds = Tuning.Encounter.bleedRounds
-                    case .companion: encounter.companionBleedRounds = Tuning.Encounter.bleedRounds
-                    case .foe: break
-                    }
+                let outcome = applyAffliction(.bleed, to: target, source: .foe(foeID),
+                                              provenance: .direct,
+                                              damage: Tuning.Encounter.bleedDamage,
+                                              ticks: Tuning.Encounter.bleedRounds,
+                                              targetIsStanding: isAlive(target, in: run),
+                                              encounter: &encounter)
+                if outcome != .prevented && outcome != .noChange {
                     encounter.note("The wound won't close.")
                 }
             }
@@ -1910,11 +1993,13 @@ enum CombatRules {
             // description, and did nothing beyond one armour-ignoring hit. Snuff puts a stop to it.
             if let element = foe.stats.element, !encounter.snuffed.contains(foeID), !slot.suppressesAfflictions {
                 let status = StatusKind.from(element)
-                let landed = afflict(target, with: status,
-                                     damage: Tuning.Encounter.statusDamage[status.rawValue] ?? 0,
-                                     rounds: Tuning.Encounter.statusRounds[status.rawValue] ?? 2,
-                                     encounter: &encounter)
-                if landed {
+                let outcome = applyAffliction(status.afflictionID, to: target,
+                                              source: .foe(foeID), provenance: .direct,
+                                              damage: Tuning.Encounter.statusDamage[status.rawValue] ?? 0,
+                                              ticks: Tuning.Encounter.statusRounds[status.rawValue] ?? 2,
+                                              targetIsStanding: isAlive(target, in: run),
+                                              encounter: &encounter)
+                if outcome != .prevented && outcome != .noChange {
                     encounter.note(status == .dazzle
                                    ? "The after-image sits in your eyes."
                                    : "It's still \(status == .burn ? "burning" : "spreading").")

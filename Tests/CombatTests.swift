@@ -853,7 +853,7 @@ final class CombatTests: XCTestCase {
             }
         }
         let encounter = try XCTUnwrap(store.activeEncounter)
-        XCTAssertTrue(encounter.binderBleedRounds > 0 || encounter.companionBleedRounds > 0
+        XCTAssertTrue(encounter.afflictions?.contains { $0.kind == .bleed && $0.target.isParty } == true
                       || encounter.log.contains { $0.contains("bleeding") || $0.contains("won\'t close") },
                       "nothing rent anybody in six rounds against a pure render")
     }
@@ -979,7 +979,9 @@ final class CombatTests: XCTestCase {
         let foe = try XCTUnwrap(foes(store).first)
         store.takeCombatAction(.attack(foe: foe.id))
 
-        XCTAssertTrue(foes(store).first?.bleedRounds ?? 0 > 0 || foes(store).first?.isAlive == false,
+        XCTAssertTrue(store.activeEncounter?.afflictions?.contains {
+            $0.kind == .bleed && $0.target == .foe(foe.id)
+        } == true || foes(store).first?.isAlive == false,
                       "a rending weapon left no wound")
     }
 
@@ -1094,7 +1096,9 @@ final class CombatTests: XCTestCase {
             let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
             giveTheTurnTo(.companion(0), in: store)
             store.mutate("test: use it") { CombatRules.perform(.skill("flense", foe: foeID), by: .companion(0), in: &$0) }
-            return store.activeEncounter?.foeBleeds[foeID]?.damage ?? 0
+            return store.activeEncounter?.afflictions?.first {
+                $0.target == .foe(foeID) && $0.kind == .bleed
+            }?.damage ?? 0
         }
 
         var shaggy = CreatureTraits()
@@ -1241,7 +1245,8 @@ final class CombatTests: XCTestCase {
 
         XCTAssertLessThan(store.activeRun?.binderHP ?? hpBefore, hpBefore, "Stonebark stopped attack damage")
         XCTAssertNil(store.activeEncounter?.statusGuards[.binder])
-        XCTAssertTrue((store.activeEncounter?.statuses[.binder] ?? []).isEmpty)
+        XCTAssertTrue(CombatRules.afflictions(on: .binder,
+                                              in: try XCTUnwrap(store.activeEncounter)).isEmpty)
     }
 
     func testEachPreparedCoatingMapsToItsExistingCombatEffectAndIsSpent() throws {
@@ -1271,10 +1276,14 @@ final class CombatTests: XCTestCase {
             }
             XCTAssertNil(store.activeEncounter?.preparedCoatings[.binder], "\(itemID) was not spent")
             if expected == .bleed {
-                XCTAssertGreaterThan(store.activeEncounter?.foes.first?.bleedRounds ?? 0, 0)
+                XCTAssertTrue(store.activeEncounter?.afflictions?.contains {
+                    $0.target == .foe(foeID) && $0.kind == .bleed
+                } == true)
             } else {
-                let kind: StatusKind = expected == .poison ? .poison : (expected == .burn ? .burn : .dazzle)
-                XCTAssertTrue((store.activeEncounter?.statuses[.foe(foeID)] ?? []).contains { $0.kind == kind })
+                let kind: AfflictionID = expected == .poison ? .poison : (expected == .burn ? .burn : .dazzle)
+                XCTAssertTrue(store.activeEncounter?.afflictions?.contains {
+                    $0.target == .foe(foeID) && $0.kind == kind
+                } == true)
             }
         }
     }
@@ -1301,13 +1310,13 @@ final class CombatTests: XCTestCase {
             // real entropy at new-game, so a single strike made this assert fail about one run in
             // five. It was flaky before flora and it is not flora's; it is a test that asserted a
             // consequence of hitting after an action that can miss.
-            var carried: [StatusState] = []
+            var carried: [AfflictionInstance] = []
             for _ in 0..<12 {
                 forceTheFoeToStrike(in: store)
-                carried = store.activeEncounter?.statuses.values.flatMap { $0 } ?? []
-                if carried.contains(where: { $0.kind == StatusKind.from(element) }) { break }
+                carried = store.activeEncounter?.afflictions ?? []
+                if carried.contains(where: { $0.kind == StatusKind.from(element).afflictionID }) { break }
             }
-            XCTAssertTrue(carried.contains { $0.kind == StatusKind.from(element) },
+            XCTAssertTrue(carried.contains { $0.kind == StatusKind.from(element).afflictionID },
                           "a \(element.rawValue) creature hit somebody and left no \(StatusKind.from(element).rawValue)")
         }
     }
@@ -1326,7 +1335,7 @@ final class CombatTests: XCTestCase {
         store.mutate("test: snuff it") { CombatRules.perform(.skill("snuff", foe: foeID), by: .companion(0), in: &$0) }
         forceTheFoeToStrike(in: store)
 
-        let carried = store.activeEncounter?.statuses.values.flatMap { $0 } ?? []
+        let carried = store.activeEncounter?.afflictions ?? []
         XCTAssertFalse(carried.contains { $0.kind == .burn },
                        "snuffed it and it still set somebody on fire")
     }
@@ -1335,12 +1344,16 @@ final class CombatTests: XCTestCase {
     func testSteadyClearsWhatIsStillWorking() throws {
         let store = inFightWith([armoured()])
         store.mutate("test: poisoned") { state in
-            state.worlds.activeRun?.activeEncounter?.statuses[.binder] =
-                [StatusState(kind: .poison, damage: 2, rounds: 4)]
+            guard var encounter = state.worlds.activeRun?.activeEncounter else { return }
+            _ = CombatRules.applyAffliction(.poison, to: .binder, source: nil,
+                                            provenance: .environment, damage: 2, ticks: 4,
+                                            targetIsStanding: true, encounter: &encounter)
+            state.worlds.activeRun?.activeEncounter = encounter
         }
         giveTheTurnTo(.companion(0), in: store)
         store.mutate("test: steady") { CombatRules.perform(.skill("steady", ally: .binder), by: .companion(0), in: &$0) }
-        XCTAssertTrue((store.activeEncounter?.statuses[.binder] ?? []).isEmpty,
+        XCTAssertTrue(CombatRules.afflictions(on: .binder,
+                                              in: try XCTUnwrap(store.activeEncounter)).isEmpty,
                       "Steady left the poison in")
     }
 
@@ -1399,7 +1412,9 @@ final class CombatTests: XCTestCase {
         XCTAssertLessThan(store.activeRun?.companionHP[0] ?? asheBefore, asheBefore,
                           "Ashe did not receive the redirected damage")
         XCTAssertNil(store.activeEncounter?.grounding[.companion(0)], "Ground caught more than one event")
-        XCTAssertTrue((store.activeEncounter?.statuses[.companion(0)] ?? []).contains { $0.kind == .burn },
+        XCTAssertTrue(store.activeEncounter?.afflictions?.contains {
+            $0.target == .companion(0) && $0.kind == .burn
+        } == true,
                       "the redirected affliction did not follow the event")
     }
 
@@ -1543,7 +1558,9 @@ final class CombatTests: XCTestCase {
         let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
         giveTheTurnTo(.binder, in: store)
         store.mutate("test: swing") { CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0) }
-        XCTAssertNotNil(store.activeEncounter?.foeBleeds[foeID],
+        XCTAssertTrue(store.activeEncounter?.afflictions?.contains {
+            $0.target == .foe(foeID) && $0.kind == .bleed
+        } == true,
                         "a volatile weapon left nothing behind")
     }
 
@@ -1557,13 +1574,17 @@ final class CombatTests: XCTestCase {
             $0.base.binderEquipped[.weapon] = EquippedPiece(catalogID: edge.id)
         }
         let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
-        for _ in 0..<12 where store.activeEncounter?.foeBleeds[foeID] == nil {
+        for _ in 0..<12 where store.activeEncounter?.afflictions?.contains(where: {
+            $0.target == .foe(foeID) && $0.kind == .bleed
+        }) != true {
             giveTheTurnTo(.binder, in: store)
             store.mutate("test: strike with barbed edge") {
                 CombatRules.perform(.attack(foe: foeID), by: .binder, in: &$0)
             }
         }
-        XCTAssertNotNil(store.activeEncounter?.foeBleeds[foeID])
+        XCTAssertTrue(store.activeEncounter?.afflictions?.contains {
+            $0.target == .foe(foeID) && $0.kind == .bleed
+        } == true)
         XCTAssertNil(store.activeEncounter?.preparedCoatings[.binder])
     }
 
@@ -2871,7 +2892,7 @@ final class CombatTests: XCTestCase {
                     components: [.init(nodeID: CombatDerivedStatsRules.Node.footwork, amount: 0.06)])])
                 encounter.ghostEvasionAvailable = []
                 encounter.dodging.removeAll()
-                encounter.statuses[.binder] = []
+                encounter.afflictions = []
                 run.activeEncounter = encounter
                 state.worlds.activeRun = run
                 CombatRules.runAutomaticTurns(in: &state)
@@ -2890,7 +2911,7 @@ final class CombatTests: XCTestCase {
         let miss = staged(seed: seed { $0 < 0.56 })
         XCTAssertEqual(miss.activeEncounter?.evasionAttempts.last?.resolution, .probabilityMiss)
         XCTAssertEqual(miss.activeRun?.binderHP, 20)
-        XCTAssertTrue(miss.activeEncounter?.statuses[.binder]?.isEmpty != false,
+        XCTAssertTrue(miss.activeEncounter?.afflictions?.contains { $0.target == .binder } != true,
                       "a missed direct hit cannot land its Heat affliction")
 
         let hit = staged(seed: seed { $0 >= 0.56 })
@@ -3220,7 +3241,9 @@ final class CombatTests: XCTestCase {
             CombatRules.perform(.damageSkill(foe: foe.id), by: .binder, in: &state)
             XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.feintActive, [],
                            "Flense is a committed normal-cost non-direct action")
-            XCTAssertNotNil(state.worlds.activeRun?.activeEncounter?.foeBleeds[foe.id])
+            XCTAssertTrue(state.worlds.activeRun?.activeEncounter?.afflictions?.contains {
+                $0.target == .foe(foe.id) && $0.kind == .bleed
+            } == true)
 
             state.worlds.activeRun?.activeEncounter?.feintActive = [.binder]
             state.worlds.activeRun?.activeEncounter?.cooldowns = [:]
@@ -3299,7 +3322,7 @@ final class CombatTests: XCTestCase {
                     .init(actor: .binder, characterEvasion: 0, components: [])
                 ])
                 encounter.ghostEvasionAvailable = []
-                encounter.statuses[.binder] = []
+                encounter.afflictions = []
                 run.activeEncounter = encounter
                 state.worlds.activeRun = run
                 CombatRules.runAutomaticTurns(in: &state)
@@ -3322,12 +3345,14 @@ final class CombatTests: XCTestCase {
         let emanationEmpty = staged(kind: .crush, element: .caustic, immovable: false)
         XCTAssertGreaterThan(emanationOwned.activeRun?.binderHP ?? 0,
                              emanationEmpty.activeRun?.binderHP ?? 0)
-        XCTAssertEqual(emanationOwned.activeEncounter?.statuses[.binder],
-                       emanationEmpty.activeEncounter?.statuses[.binder],
+        XCTAssertEqual(CombatRules.afflictions(on: .binder,
+                                               in: try XCTUnwrap(emanationOwned.activeEncounter)),
+                       CombatRules.afflictions(on: .binder,
+                                               in: try XCTUnwrap(emanationEmpty.activeEncounter)),
                        "Immovable changes direct damage, never the emanation affliction payload")
-        XCTAssertTrue(emanationOwned.activeEncounter?.statuses[.binder]?.contains(where: {
-            $0.kind == .poison
-        }) == true)
+        XCTAssertTrue(emanationOwned.activeEncounter?.afflictions?.contains {
+            $0.target == .binder && $0.kind == .poison
+        } == true)
     }
 
     func testInsulationPureDamageMatchesOnlyChosenEmanationAndRoundsContinuousMultipliersOnce() {
@@ -3399,7 +3424,7 @@ final class CombatTests: XCTestCase {
                     .init(actor: .binder, characterEvasion: 0, components: [])
                 ])
                 encounter.ghostEvasionAvailable = []
-                encounter.statuses[.binder] = []
+                encounter.afflictions = []
                 run.activeEncounter = encounter
                 state.worlds.activeRun = run
                 CombatRules.runAutomaticTurns(in: &state)
@@ -3409,11 +3434,13 @@ final class CombatTests: XCTestCase {
         let matching = staged(choice: .caustic)
         let nonmatching = staged(choice: .light)
         XCTAssertGreaterThan(matching.activeRun?.binderHP ?? 0, nonmatching.activeRun?.binderHP ?? 0)
-        XCTAssertTrue(matching.activeEncounter?.statuses[.binder]?.contains(where: {
-            $0.kind == .poison
-        }) == true, "damage resistance must not erase the landed affliction payload")
-        XCTAssertEqual(matching.activeEncounter?.statuses[.binder],
-                       nonmatching.activeEncounter?.statuses[.binder])
+        XCTAssertTrue(matching.activeEncounter?.afflictions?.contains {
+            $0.target == .binder && $0.kind == .poison
+        } == true, "damage resistance must not erase the landed affliction payload")
+        XCTAssertEqual(CombatRules.afflictions(on: .binder,
+                                               in: try XCTUnwrap(matching.activeEncounter)),
+                       CombatRules.afflictions(on: .binder,
+                                               in: try XCTUnwrap(nonmatching.activeEncounter)))
     }
 
     func testPhysicalDirectRouteNeverReadsFrozenInsulationChoice() throws {
@@ -3479,5 +3506,321 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(store.activeEncounter?.debugV2Resistance, frozen)
         let resumed = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(store.state))
         XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.debugV2Resistance, frozen)
+    }
+
+    func testCanonicalAfflictionRegistryIsExactlyTheFourAuthoredKinds() {
+        XCTAssertEqual(AfflictionDefinition.all.map(\.id), [.burn, .poison, .dazzle, .bleed])
+        XCTAssertEqual(Set(AfflictionDefinition.all.flatMap(\.cures)),
+                       [.clearing, .quenching, .broad, .quench])
+        XCTAssertTrue(AfflictionDefinition.all.allSatisfy(\.stonebarkEligible))
+        XCTAssertFalse(AfflictionDefinition.definition(.bleed).cures.contains(.quench))
+    }
+
+    func testCanonicalAfflictionMaxRefreshPreservesExactTargetAndTickSource() throws {
+        var encounter = EncounterState(id: .init(rawValue: 81), foes: [],
+                                       order: [.binder, .companion(0), .companion(1)])
+        XCTAssertEqual(
+            CombatRules.applyAffliction(.bleed, to: .companion(0), source: .binder,
+                                        provenance: .direct, damage: 2, ticks: 3,
+                                        targetIsStanding: true, encounter: &encounter),
+            .added(try XCTUnwrap(encounter.afflictions?.first))
+        )
+        let firstReceipt = try XCTUnwrap(encounter.afflictions?.first?.applicationReceipt)
+        _ = CombatRules.applyAffliction(.bleed, to: .companion(0), source: .companion(1),
+                                        provenance: .coating, damage: 2, ticks: 5,
+                                        targetIsStanding: true, encounter: &encounter)
+        var wound = try XCTUnwrap(encounter.afflictions?.first)
+        XCTAssertEqual(wound.source, .binder, "duration-only refresh stole tick ownership")
+        XCTAssertEqual(wound.ticksRemaining, 5)
+        XCTAssertNotEqual(wound.applicationReceipt, firstReceipt)
+
+        _ = CombatRules.applyAffliction(.bleed, to: .companion(0), source: .companion(1),
+                                        provenance: .coating, damage: 3, ticks: 2,
+                                        targetIsStanding: true, encounter: &encounter)
+        wound = try XCTUnwrap(encounter.afflictions?.first)
+        XCTAssertEqual(wound.source, .companion(1))
+        XCTAssertEqual(wound.provenance, .coating)
+        XCTAssertEqual(wound.damage, 3)
+        XCTAssertEqual(wound.ticksRemaining, 5)
+        XCTAssertTrue(CombatRules.afflictions(on: .companion(1), in: encounter).isEmpty,
+                      "an exact companion affliction became party-wide")
+    }
+
+    func testThreeTickAfflictionHasExactlyThreeFutureBoundariesAcrossRelaunch() throws {
+        let store = inFight()
+        var run = try XCTUnwrap(store.activeRun)
+        var encounter = try XCTUnwrap(run.activeEncounter)
+        run.binderHP = 20
+        encounter.afflictions = []
+        _ = CombatRules.applyAffliction(.bleed, to: .binder, source: .foe(.init(rawValue: 1)),
+                                        provenance: .direct, damage: 2, ticks: 3,
+                                        targetIsStanding: true, encounter: &encounter)
+        XCTAssertEqual(run.binderHP, 20, "application dealt an unauthorized immediate tick")
+
+        CombatRules.tickAfflictions(run: &run, encounter: &encounter)
+        XCTAssertEqual(run.binderHP, 18)
+        XCTAssertEqual(encounter.afflictions?.first?.ticksRemaining, 2)
+
+        let resumedRun = try JSONDecoder().decode(WorldRun.self, from: JSONEncoder().encode(run))
+        var resumedEncounter = try JSONDecoder().decode(EncounterState.self,
+                                                        from: JSONEncoder().encode(encounter))
+        var mutableRun = resumedRun
+        CombatRules.tickAfflictions(run: &mutableRun, encounter: &resumedEncounter)
+        XCTAssertEqual(mutableRun.binderHP, 16)
+        XCTAssertEqual(resumedEncounter.afflictions?.first?.ticksRemaining, 1)
+        CombatRules.tickAfflictions(run: &mutableRun, encounter: &resumedEncounter)
+        XCTAssertEqual(mutableRun.binderHP, 14)
+        XCTAssertTrue(resumedEncounter.afflictions?.isEmpty == true)
+        CombatRules.tickAfflictions(run: &mutableRun, encounter: &resumedEncounter)
+        XCTAssertEqual(mutableRun.binderHP, 14, "expired affliction ticked a fourth time")
+    }
+
+    func testStonebarkConsumesOnlyForMeaningfulStandingApplication() throws {
+        var encounter = EncounterState(id: .init(rawValue: 82), foes: [], order: [.binder])
+        _ = CombatRules.applyAffliction(.burn, to: .binder, source: .foe(.init(rawValue: 1)),
+                                        provenance: .direct, damage: 3, ticks: 3,
+                                        targetIsStanding: true, bypassGuard: true,
+                                        encounter: &encounter)
+        encounter.statusGuards[.binder] = 1
+        XCTAssertEqual(
+            CombatRules.applyAffliction(.burn, to: .binder, source: nil,
+                                        provenance: .environment, damage: 2, ticks: 2,
+                                        targetIsStanding: true, encounter: &encounter),
+            .noChange
+        )
+        XCTAssertEqual(encounter.statusGuards[.binder], 1)
+        XCTAssertEqual(
+            CombatRules.applyAffliction(.burn, to: .binder, source: nil,
+                                        provenance: .environment, damage: 4, ticks: 3,
+                                        targetIsStanding: true, encounter: &encounter),
+            .prevented
+        )
+        XCTAssertNil(encounter.statusGuards[.binder])
+        encounter.statusGuards[.binder] = 1
+        XCTAssertEqual(
+            CombatRules.applyAffliction(.poison, to: .binder, source: nil,
+                                        provenance: .environment, damage: 2, ticks: 3,
+                                        targetIsStanding: false, encounter: &encounter),
+            .noChange
+        )
+        XCTAssertEqual(encounter.statusGuards[.binder], 1)
+    }
+
+    func testLegacyAfflictionsAdoptOnceWithoutParallelActiveMirrors() throws {
+        var encounter = EncounterState(id: .init(rawValue: 83), foes: [],
+                                       order: [.binder, .companion(0)])
+        encounter.afflictions = nil
+        encounter.statuses[.binder] = [.init(kind: .poison, damage: 2, rounds: 4)]
+        encounter.binderBleedRounds = 3
+        encounter.companionBleedRounds = 2
+        encounter.foeBleeds[.init(rawValue: 9)] = .init(damage: 4, rounds: 2)
+        CombatRules.adoptLegacyAfflictions(in: &encounter)
+
+        XCTAssertEqual(CombatRules.afflictions(on: .binder, in: encounter).map(\.kind),
+                       [.poison, .bleed])
+        XCTAssertEqual(CombatRules.afflictions(on: .companion(0), in: encounter).map(\.kind),
+                       [.bleed])
+        XCTAssertEqual(CombatRules.afflictions(on: .foe(.init(rawValue: 9)), in: encounter).first?.damage, 4)
+        XCTAssertTrue(encounter.statuses.isEmpty)
+        XCTAssertTrue(encounter.foeBleeds.isEmpty)
+        XCTAssertEqual(encounter.binderBleedRounds, 0)
+        XCTAssertEqual(encounter.companionBleedRounds, 0)
+
+        let resumed = try JSONDecoder().decode(EncounterState.self,
+                                               from: JSONEncoder().encode(encounter))
+        XCTAssertNotNil(resumed.afflictions)
+        XCTAssertEqual(resumed.afflictions, encounter.afflictions)
+        XCTAssertTrue(resumed.statuses.isEmpty)
+        XCTAssertTrue(resumed.foeBleeds.isEmpty)
+    }
+
+    func testBroadCureRevalidatesExactReceiptAndNeverChoosesArrayFirst() throws {
+        var encounter = EncounterState(id: .init(rawValue: 84), foes: [], order: [.binder])
+        _ = CombatRules.applyAffliction(.burn, to: .binder, source: nil,
+                                        provenance: .environment, damage: 3, ticks: 2,
+                                        targetIsStanding: true, encounter: &encounter)
+        _ = CombatRules.applyAffliction(.poison, to: .binder, source: nil,
+                                        provenance: .environment, damage: 2, ticks: 3,
+                                        targetIsStanding: true, encounter: &encounter)
+        XCTAssertFalse(CombatRules.cureAfflictions(for: .clearAnyStatus, on: .binder,
+                                                   selectedReceipt: nil, encounter: &encounter))
+        XCTAssertEqual(CombatRules.afflictions(on: .binder, in: encounter).count, 2)
+        let poison = try XCTUnwrap(CombatRules.afflictions(on: .binder, in: encounter)
+            .first { $0.kind == .poison })
+        XCTAssertFalse(CombatRules.cureAfflictions(for: .clearAnyStatus, on: .companion(0),
+                                                   selectedReceipt: poison.applicationReceipt,
+                                                   encounter: &encounter))
+        XCTAssertTrue(CombatRules.cureAfflictions(for: .clearAnyStatus, on: .binder,
+                                                  selectedReceipt: poison.applicationReceipt,
+                                                  encounter: &encounter))
+        XCTAssertEqual(CombatRules.afflictions(on: .binder, in: encounter).map(\.kind), [.burn])
+        XCTAssertFalse(CombatRules.cureAfflictions(for: .clearAnyStatus, on: .binder,
+                                                   selectedReceipt: poison.applicationReceipt,
+                                                   encounter: &encounter), "stale receipt was accepted")
+    }
+
+    func testCureFamiliesAndQuenchUseExactAuthoredMembership() throws {
+        func loaded() -> EncounterState {
+            var encounter = EncounterState(id: .init(rawValue: 85), foes: [], order: [.binder])
+            for kind in AfflictionID.allCases {
+                _ = CombatRules.applyAffliction(kind, to: .binder, source: nil,
+                                                provenance: .environment,
+                                                damage: kind == .dazzle ? 0 : 2, ticks: 3,
+                                                targetIsStanding: true, encounter: &encounter)
+            }
+            return encounter
+        }
+        var clearing = loaded()
+        XCTAssertTrue(CombatRules.cureAfflictions(for: .clearPoison, on: .binder,
+                                                  selectedReceipt: nil, encounter: &clearing))
+        XCTAssertEqual(CombatRules.afflictions(on: .binder, in: clearing).map(\.kind),
+                       [.burn, .dazzle])
+        var quenching = loaded()
+        XCTAssertTrue(CombatRules.cureAfflictions(for: .clearElemental, on: .binder,
+                                                  selectedReceipt: nil, encounter: &quenching))
+        XCTAssertEqual(CombatRules.afflictions(on: .binder, in: quenching).map(\.kind),
+                       [.poison, .bleed])
+        var quench = loaded()
+        let poison = try XCTUnwrap(CombatRules.afflictions(on: .binder, in: quench)
+            .first { $0.kind == .poison })
+        let bleed = try XCTUnwrap(CombatRules.afflictions(on: .binder, in: quench)
+            .first { $0.kind == .bleed })
+        XCTAssertFalse(CombatRules.quenchAffliction(on: .binder,
+                                                    selectedReceipt: bleed.applicationReceipt,
+                                                    encounter: &quench))
+        XCTAssertTrue(CombatRules.quenchAffliction(on: .binder,
+                                                   selectedReceipt: poison.applicationReceipt,
+                                                   encounter: &quench))
+        XCTAssertTrue(CombatRules.afflictions(on: .binder, in: quench).contains { $0.kind == .bleed })
+    }
+
+    func testLethalCoatedHitSpendsCoatingWithoutAfflictionOrStonebark() throws {
+        let store = inFightWith([armoured()])
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage lethal coated hit") { state in
+            state.base.binderEquipped[.weapon] = "blade_keen"
+            guard var encounter = state.worlds.activeRun?.activeEncounter,
+                  let index = encounter.foes.firstIndex(where: { $0.id == foeID }) else { return }
+            encounter.foes[index].currentHP = 1
+            encounter.foes[index].stats.evasion = 0
+            encounter.preparedCoatings[.binder] = .poison
+            encounter.statusGuards[.foe(foeID)] = 1
+            encounter.order = [.binder, .foe(foeID)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            state.worlds.activeRun?.activeEncounter = encounter
+            CombatRules.perform(.attack(foe: foeID), by: .binder, in: &state)
+        }
+        XCTAssertNil(store.activeEncounter?.preparedCoatings[.binder])
+        XCTAssertFalse(store.activeEncounter?.foes.first(where: { $0.id == foeID })?.isAlive ?? true)
+        XCTAssertFalse(store.activeEncounter?.afflictions?.contains { $0.target == .foe(foeID) } == true)
+        XCTAssertEqual(store.activeEncounter?.statusGuards[.foe(foeID)], 1)
+    }
+
+    func testLegacyDecodeImmediatelyResavesWithCanonicalStateOnly() throws {
+        var legacy = EncounterState(id: .init(rawValue: 90), foes: [], order: [.binder])
+        legacy.afflictions = nil
+        legacy.statuses[.binder] = [.init(kind: .poison, damage: 2, rounds: 3)]
+        legacy.binderBleedRounds = 2
+        let decoded = try SaveCodec.makeDecoder().decode(
+            EncounterState.self, from: SaveCodec.makeEncoder().encode(legacy))
+        XCTAssertEqual(decoded.afflictions?.count, 2)
+        XCTAssertTrue(decoded.statuses.isEmpty)
+        XCTAssertEqual(decoded.binderBleedRounds, 0)
+        let reloaded = try SaveCodec.makeDecoder().decode(
+            EncounterState.self, from: SaveCodec.makeEncoder().encode(decoded))
+        XCTAssertEqual(reloaded.afflictions, decoded.afflictions)
+        XCTAssertTrue(reloaded.statuses.isEmpty)
+        XCTAssertEqual(reloaded.binderBleedRounds, 0)
+    }
+
+    func testCombatItemConsumerRequiresSelectionAndCommitsExactCurrentReceipt() throws {
+        let store = inFight()
+        let antidote = ItemStack(id: .init(rawValue: 91_001), catalogID: "antidote_broad", count: 2)
+        store.mutate("stage consumer cure") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.order = [.binder]
+            encounter.turnSlots = [.init(actor: .binder)]
+            encounter.turnIndex = 0
+            encounter.afflictions = []
+            _ = CombatRules.applyAffliction(.burn, to: .binder, source: nil,
+                                            provenance: .environment, damage: 3, ticks: 2,
+                                            targetIsStanding: true, encounter: &encounter)
+            _ = CombatRules.applyAffliction(.poison, to: .binder, source: nil,
+                                            provenance: .environment, damage: 2, ticks: 3,
+                                            targetIsStanding: true, encounter: &encounter)
+            _ = run.satchelItems.add(antidote)
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+
+        guard case .refused(.selectionRequired(let choices)) =
+                store.combatItemUseEvaluation(stack: antidote, on: .binder) else {
+            return XCTFail("Broad cure did not require an exact current selection")
+        }
+        let poison = try XCTUnwrap(choices.first { $0.kind == .poison })
+        guard case .ready(let quote) = store.combatItemUseEvaluation(
+            stack: antidote, on: .binder, selecting: poison.applicationReceipt
+        ) else { return XCTFail("Exact current selection was not quotable") }
+        XCTAssertEqual(store.commitCombatItemUse(quote), .committed)
+        XCTAssertEqual(store.activeRun?.satchelItems.stacks.first { $0.id == antidote.id }?.count, 1)
+        XCTAssertEqual(CombatRules.afflictions(on: .binder,
+                                               in: try XCTUnwrap(store.activeEncounter)).map(\.kind),
+                       [.burn])
+    }
+
+    func testCombatItemConsumerRejectsEveryStaleAuthorityWithoutLoss() throws {
+        let store = inFight()
+        let antidote = ItemStack(id: .init(rawValue: 91_002), catalogID: "antidote_broad", count: 2)
+        store.mutate("stage stale consumer cure") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.order = [.binder]
+            encounter.turnSlots = [.init(actor: .binder)]
+            encounter.turnIndex = 0
+            encounter.afflictions = []
+            _ = CombatRules.applyAffliction(.poison, to: .binder, source: nil,
+                                            provenance: .environment, damage: 2, ticks: 3,
+                                            targetIsStanding: true, encounter: &encounter)
+            _ = run.satchelItems.add(antidote)
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let receipt = try XCTUnwrap(store.activeEncounter?.afflictions?.first?.applicationReceipt)
+        guard case .ready(let quote) = store.combatItemUseEvaluation(
+            stack: antidote, on: .binder, selecting: receipt
+        ) else { return XCTFail("fixture did not quote") }
+
+        store.mutate("refresh affliction behind sheet") { state in
+            guard var encounter = state.worlds.activeRun?.activeEncounter else { return }
+            _ = CombatRules.applyAffliction(.poison, to: .binder, source: nil,
+                                            provenance: .environment, damage: 3, ticks: 4,
+                                            targetIsStanding: true, encounter: &encounter)
+            state.worlds.activeRun?.activeEncounter = encounter
+        }
+        let stateBefore = store.state
+        XCTAssertEqual(store.commitCombatItemUse(quote), .refused(.staleAffliction))
+        XCTAssertEqual(store.state, stateBefore, "stale receipt changed item, turn, or affliction")
+
+        var staleStack = antidote
+        staleStack.count = 1
+        XCTAssertEqual(store.combatItemUseEvaluation(stack: staleStack, on: .binder),
+                       .refused(.staleItem))
+        staleStack = antidote
+        staleStack.identified = false
+        XCTAssertEqual(store.combatItemUseEvaluation(stack: staleStack, on: .binder),
+                       .refused(.staleItem))
+
+        store.mutate("target falls behind sheet") { $0.worlds.activeRun?.binderHP = 0 }
+        XCTAssertEqual(store.combatItemUseEvaluation(stack: antidote, on: .binder),
+                       .refused(.invalidTarget))
+    }
+
+    func testCombatItemSheetDismissesOnlyAfterTypedCommit() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent("Sources/Screens/EncounterView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("case .committed: dismiss()"))
+        XCTAssertTrue(source.contains("case .refused(let refusal): refusalMessage = refusal.message"))
+        XCTAssertFalse(source.contains("onUse(stack, ally)\n                                    dismiss()"))
     }
 }

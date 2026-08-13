@@ -1,5 +1,42 @@
 import Foundation
 
+struct CombatItemUseQuote: Equatable, Sendable {
+    let stack: ItemStack
+    let actor: Combatant
+    let ally: Combatant
+    let afflictionReceipt: UInt64?
+}
+
+enum CombatItemUseRefusal: Equatable, Sendable {
+    case staleItem
+    case wrongTurn
+    case invalidTarget
+    case noEligibleAffliction
+    case selectionRequired([AfflictionInstance])
+    case staleAffliction
+
+    var message: String {
+        switch self {
+        case .staleItem: "That carried item is no longer available in that exact state."
+        case .wrongTurn: "The turn changed before the item was used."
+        case .invalidTarget: "That party member can no longer receive the item."
+        case .noEligibleAffliction: "There is no matching affliction to clear."
+        case .selectionRequired: "Choose which affliction to clear."
+        case .staleAffliction: "That affliction is no longer present. Choose from the current list."
+        }
+    }
+}
+
+enum CombatItemUseEvaluation: Equatable, Sendable {
+    case ready(CombatItemUseQuote)
+    case refused(CombatItemUseRefusal)
+}
+
+enum CombatItemUseCommitResult: Equatable, Sendable {
+    case committed
+    case refused(CombatItemUseRefusal)
+}
+
 /// Player actions inside an encounter.
 ///
 /// Every one flushes to disk: mid-encounter is the hardest resume case in the game, and the one the
@@ -46,6 +83,64 @@ extension GameStore {
             else { return false }
             return [.heal, .clearPoison, .clearElemental, .clearAnyStatus, .preventStatus,
                     .coatPoison, .coatBurn, .coatBleed, .coatDazzle].contains(effect)
+        }
+    }
+
+    func combatItemUseEvaluation(stack: ItemStack, on ally: Combatant,
+                                 selecting afflictionReceipt: UInt64? = nil,
+                                 expectedActor: Combatant? = nil) -> CombatItemUseEvaluation {
+        guard let actor = actingCombatant,
+              expectedActor == nil || expectedActor == actor,
+              let run = state.worlds.activeRun,
+              let encounter = run.activeEncounter
+        else { return .refused(.wrongTurn) }
+        guard run.satchelItems.stacks.first(where: { $0.id == stack.id }) == stack,
+              stack.identified,
+              let item = ContentCatalog.shared.item(stack.catalogID),
+              let effect = item.consumable
+        else { return .refused(.staleItem) }
+        guard ally.isParty,
+              CombatRules.party(of: state).contains(ally),
+              CombatRules.isAlive(ally, in: run)
+        else { return .refused(.invalidTarget) }
+
+        switch effect.effect {
+        case .clearPoison, .clearElemental, .clearAnyStatus:
+            let eligible = CombatRules.eligibleAfflictions(for: effect.effect, on: ally,
+                                                           in: encounter)
+            guard !eligible.isEmpty else { return .refused(.noEligibleAffliction) }
+            if effect.effect == .clearAnyStatus {
+                if let afflictionReceipt {
+                    guard eligible.contains(where: { $0.applicationReceipt == afflictionReceipt })
+                    else { return .refused(.staleAffliction) }
+                } else if eligible.count > 1 {
+                    return .refused(.selectionRequired(eligible))
+                }
+            }
+        default:
+            break
+        }
+        return .ready(.init(stack: stack, actor: actor, ally: ally,
+                            afflictionReceipt: afflictionReceipt))
+    }
+
+    func commitCombatItemUse(_ quote: CombatItemUseQuote) -> CombatItemUseCommitResult {
+        switch combatItemUseEvaluation(stack: quote.stack, on: quote.ally,
+                                       selecting: quote.afflictionReceipt,
+                                       expectedActor: quote.actor) {
+        case .ready:
+            let countBefore = state.worlds.activeRun?.satchelItems.stacks
+                .first(where: { $0.id == quote.stack.id })?.count
+            takeCombatAction(.useItem(stack: quote.stack.id, ally: quote.ally,
+                                      afflictionReceipt: quote.afflictionReceipt))
+            let countAfter = state.worlds.activeRun?.satchelItems.stacks
+                .first(where: { $0.id == quote.stack.id })?.count ?? 0
+            guard let countBefore, countAfter == countBefore - 1 else {
+                return .refused(quote.afflictionReceipt == nil ? .staleItem : .staleAffliction)
+            }
+            return .committed
+        case .refused(let refusal):
+            return .refused(refusal)
         }
     }
 

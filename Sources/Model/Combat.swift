@@ -173,7 +173,7 @@ enum CombatAction: Codable, Equatable, Sendable {
     /// Resolved against whatever the member actually carries.
     case damageSkill(foe: InstanceID)
     case healSkill(ally: Combatant)
-    case useItem(stack: InstanceID, ally: Combatant)
+    case useItem(stack: InstanceID, ally: Combatant, afflictionReceipt: UInt64? = nil)
     /// Always succeeds, and costs the run stability. The escape hatch, not a gamble.
     case flee
 }
@@ -513,6 +513,10 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// **Burns, poisons and dazzles**, per combatant. Emanation was a generated trait that reached
     /// the prose and never the fight; now it leaves something behind (Q42).
     var statuses: [Combatant: [StatusState]] = [:]
+    /// Canonical exact-combatant afflictions. `nil` is a legacy encounter awaiting one-time
+    /// adoption; an empty array is modern authoritative state and must never remint old mirrors.
+    var afflictions: [AfflictionInstance]?
+    var nextAfflictionReceipt: UInt64 = 1
     /// One prepared refusal of the next affliction. Kept as a count-shaped value so a future
     /// upgrade can grant more than one without changing the save shape; Stonebark currently sets 1.
     var statusGuards: [Combatant: Int] = [:]
@@ -607,6 +611,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
         self.partyRanks = partyRanks
+        self.afflictions = []
         self.log = log
     }
 
@@ -676,6 +681,9 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                            forKey: .initiallyUnrecordedSpecies) ?? []
         snuffed = try c.decodeIfPresent(Set<InstanceID>.self, forKey: .snuffed) ?? []
         statuses = try c.decodeIfPresent([Combatant: [StatusState]].self, forKey: .statuses) ?? [:]
+        afflictions = try c.decodeIfPresent([AfflictionInstance].self, forKey: .afflictions)
+        nextAfflictionReceipt = try c.decodeIfPresent(UInt64.self,
+                                                       forKey: .nextAfflictionReceipt) ?? 1
         statusGuards = try c.decodeIfPresent([Combatant: Int].self, forKey: .statusGuards) ?? [:]
         preparedCoatings = try c.decodeIfPresent([Combatant: PreparedCoating].self,
                                                  forKey: .preparedCoatings) ?? [:]
@@ -688,6 +696,63 @@ struct EncounterState: Codable, Equatable, Sendable {
         companionBleedRounds = try c.decodeIfPresent(Int.self, forKey: .companionBleedRounds) ?? 0
         log = try c.decodeIfPresent([String].self, forKey: .log) ?? []
         spoils = try c.decodeIfPresent([String].self, forKey: .spoils) ?? []
+        adoptLegacyAfflictionsIfNeeded()
+    }
+
+    mutating func adoptLegacyAfflictionsIfNeeded() {
+        guard afflictions == nil else { return }
+        afflictions = []
+        func adopt(_ kind: AfflictionID, target: Combatant, damage: Int, ticks: Int,
+                   endless: Bool = false) {
+            guard ticks > 0 || endless else { return }
+            let existing = afflictions?.firstIndex { $0.target == target && $0.kind == kind }
+            if let existing {
+                var merged = afflictions![existing]
+                merged.damage = max(merged.damage, damage)
+                merged.ticksRemaining = max(merged.ticksRemaining, ticks)
+                merged.endless = merged.endless || endless
+                afflictions![existing] = merged
+            } else {
+                afflictions?.append(.init(kind: kind, target: target, source: nil,
+                                         provenance: .migratedUnknown, damage: damage,
+                                         ticksRemaining: ticks, endless: endless,
+                                         applicationReceipt: nextAfflictionReceipt))
+                nextAfflictionReceipt &+= 1
+            }
+        }
+        for (target, carried) in statuses {
+            for status in carried {
+                adopt(status.kind.afflictionID, target: target, damage: status.damage,
+                      ticks: status.rounds)
+            }
+        }
+        for (foeID, wound) in foeBleeds {
+            adopt(.bleed, target: .foe(foeID), damage: wound.damage, ticks: wound.rounds)
+        }
+        for foe in foes where foe.bleedRounds > 0 {
+            adopt(.bleed, target: .foe(foe.id), damage: Tuning.Encounter.bleedDamage,
+                  ticks: foe.bleedRounds,
+                  endless: foe.bleedRounds >= Tuning.Encounter.endlessBleedRounds)
+        }
+        adopt(.bleed, target: .binder, damage: Tuning.Encounter.bleedDamage,
+              ticks: binderBleedRounds)
+        if companionBleedRounds > 0 {
+            let companions = Set(order.compactMap { actor -> Combatant? in
+                if case .companion = actor { return actor }
+                return nil
+            })
+            if companions.count == 1, let target = companions.first {
+                adopt(.bleed, target: target, damage: Tuning.Encounter.bleedDamage,
+                      ticks: companionBleedRounds)
+            } else {
+                note("A legacy shared companion wound could not be assigned safely and was cleared.")
+            }
+        }
+        statuses = [:]
+        foeBleeds = [:]
+        binderBleedRounds = 0
+        companionBleedRounds = 0
+        for index in foes.indices { foes[index].bleedRounds = 0 }
     }
 }
 
@@ -727,6 +792,132 @@ enum StatusKind: String, Codable, Hashable, CaseIterable, Sendable {
         case .poison: "is working through"
         case .dazzle: "can't see straight"
         }
+    }
+
+    var afflictionID: AfflictionID {
+        switch self {
+        case .burn: .burn
+        case .poison: .poison
+        case .dazzle: .dazzle
+        }
+    }
+}
+
+enum AfflictionID: String, Codable, Hashable, CaseIterable, Sendable {
+    case burn, poison, dazzle, bleed
+
+    var legacyVerb: String {
+        switch self {
+        case .burn: "burns"
+        case .poison: "is working through"
+        case .dazzle: "can't see straight"
+        case .bleed: "bleeds"
+        }
+    }
+}
+
+enum AfflictionFamily: String, Codable, Sendable {
+    case damageOverTime, accuracy
+}
+
+enum AfflictionCureFamily: String, Codable, Hashable, Sendable {
+    case clearing, quenching, broad, quench
+}
+
+struct AfflictionDefinition: Equatable, Sendable {
+    let id: AfflictionID
+    let displayName: String
+    let glyph: String
+    let family: AfflictionFamily
+    let defaultDamage: Int
+    let defaultTicks: Int
+    let cures: Set<AfflictionCureFamily>
+    let order: Int
+    let allowsSeverityOverride: Bool
+    let allowsDurationOverride: Bool
+    let stonebarkEligible: Bool
+
+    static let all: [AfflictionDefinition] = [
+        .init(id: .burn, displayName: "Burn", glyph: "flame.fill",
+              family: .damageOverTime,
+              defaultDamage: Tuning.Encounter.statusDamage["burn"] ?? 4,
+              defaultTicks: Tuning.Encounter.statusRounds["burn"] ?? 2,
+              cures: [.quenching, .broad, .quench], order: 0,
+              allowsSeverityOverride: true, allowsDurationOverride: true,
+              stonebarkEligible: true),
+        .init(id: .poison, displayName: "Poison", glyph: "drop.triangle.fill",
+              family: .damageOverTime,
+              defaultDamage: Tuning.Encounter.statusDamage["poison"] ?? 2,
+              defaultTicks: Tuning.Encounter.statusRounds["poison"] ?? 4,
+              cures: [.clearing, .broad, .quench], order: 1,
+              allowsSeverityOverride: true, allowsDurationOverride: true,
+              stonebarkEligible: true),
+        .init(id: .dazzle, displayName: "Dazzle", glyph: "sun.max.fill",
+              family: .accuracy,
+              defaultDamage: Tuning.Encounter.statusDamage["dazzle"] ?? 0,
+              defaultTicks: Tuning.Encounter.statusRounds["dazzle"] ?? 2,
+              cures: [.quenching, .broad, .quench], order: 2,
+              allowsSeverityOverride: false, allowsDurationOverride: true,
+              stonebarkEligible: true),
+        .init(id: .bleed, displayName: "Bleed", glyph: "drop.fill",
+              family: .damageOverTime, defaultDamage: Tuning.Encounter.bleedDamage,
+              defaultTicks: Tuning.Encounter.bleedRounds,
+              cures: [.clearing, .broad], order: 3,
+              allowsSeverityOverride: true, allowsDurationOverride: true,
+              stonebarkEligible: true)
+    ]
+
+    static func definition(_ id: AfflictionID) -> AfflictionDefinition {
+        all.first { $0.id == id }!
+    }
+}
+
+enum AfflictionProvenance: String, Codable, Hashable, Sendable {
+    case direct, coating, copied, retaliation, environment, migratedUnknown
+}
+
+struct AfflictionInstance: Codable, Equatable, Identifiable, Sendable {
+    var id: UInt64 { applicationReceipt }
+    var kind: AfflictionID
+    var target: Combatant
+    var source: Combatant?
+    /// Every same-kind contributor merged into this application. `provenance` below remains the
+    /// damage-owning component used for source credit; this set preserves the complete hit receipt.
+    var provenances: Set<AfflictionProvenance>
+    var provenance: AfflictionProvenance
+    var damage: Int
+    var ticksRemaining: Int
+    var endless: Bool = false
+    var applicationReceipt: UInt64
+
+    init(kind: AfflictionID, target: Combatant, source: Combatant?,
+         provenance: AfflictionProvenance, damage: Int, ticksRemaining: Int,
+         endless: Bool = false, applicationReceipt: UInt64) {
+        self.kind = kind
+        self.target = target
+        self.source = source
+        self.provenances = [provenance]
+        self.provenance = provenance
+        self.damage = damage
+        self.ticksRemaining = ticksRemaining
+        self.endless = endless
+        self.applicationReceipt = applicationReceipt
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        kind = try c.decode(AfflictionID.self, forKey: .kind)
+        target = try c.decode(Combatant.self, forKey: .target)
+        source = try c.decodeIfPresent(Combatant.self, forKey: .source)
+        provenance = try c.decodeIfPresent(AfflictionProvenance.self, forKey: .provenance)
+            ?? .migratedUnknown
+        provenances = try c.decodeIfPresent(Set<AfflictionProvenance>.self,
+                                             forKey: .provenances) ?? [provenance]
+        damage = try c.decodeIfPresent(Int.self, forKey: .damage) ?? 0
+        ticksRemaining = try c.decodeIfPresent(Int.self, forKey: .ticksRemaining) ?? 0
+        endless = try c.decodeIfPresent(Bool.self, forKey: .endless) ?? false
+        applicationReceipt = try c.decodeIfPresent(UInt64.self,
+                                                     forKey: .applicationReceipt) ?? 0
     }
 }
 
