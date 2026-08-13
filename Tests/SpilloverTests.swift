@@ -130,6 +130,15 @@ final class SpilloverTests: XCTestCase {
         XCTAssertTrue(source.contains("Button(action: commitSwap)"))
     }
 
+    func testInstrumentImprovementReportsAStaleReadinessFailure() throws {
+        let source = try String(contentsOfFile: "Sources/Screens/StationViews.swift", encoding: .utf8)
+
+        XCTAssertTrue(source.contains("if store.improveInstrument(target.id)"))
+        XCTAssertTrue(source.contains("Instrument not improved"))
+        XCTAssertTrue(source.contains("The qualifying stock or Essence changed."))
+        XCTAssertFalse(source.contains("Button(\"Improve\") { store.improveInstrument(target.id) }"))
+    }
+
 
     func testBankingAFullStorehouseSpillsRatherThanDrops() {
         let store = makeStore()

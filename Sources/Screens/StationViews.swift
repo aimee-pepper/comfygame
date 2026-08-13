@@ -1003,6 +1003,7 @@ struct SurveyPostView: View {
 
 private struct InstrumentUpgradeRow: View {
     @EnvironmentObject private var store: GameStore
+    @State private var upgradeFailure: String?
     let target: PressureTargetDef
 
     private var precision: RealityState.InstrumentPrecision {
@@ -1025,7 +1026,13 @@ private struct InstrumentUpgradeRow: View {
                     }
                     .font(.caption2).foregroundStyle(.secondary)
                     Spacer(minLength: 8)
-                    Button("Improve") { store.improveInstrument(target.id) }
+                    Button("Improve") {
+                        if store.improveInstrument(target.id) {
+                            upgradeFailure = nil
+                        } else {
+                            upgradeFailure = "The qualifying stock or Essence changed. Review this instrument's requirements and try again."
+                        }
+                    }
                         .buttonStyle(.borderedProminent)
                         .controlSize(.small)
                         .disabled(!store.instrumentCraftingReadiness(for: target.id).isReady)
@@ -1038,6 +1045,14 @@ private struct InstrumentUpgradeRow: View {
             }
         }
         .padding(.vertical, 4)
+        .alert("Instrument not improved", isPresented: Binding(
+            get: { upgradeFailure != nil },
+            set: { if !$0 { upgradeFailure = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(upgradeFailure ?? "The instrument could not be improved.")
+        }
     }
 
     private var instrumentName: String {
