@@ -69,7 +69,7 @@ struct BestiaryView: View {
                 }
                 Text(entry.timesEncountered == 1
                      ? "met once"
-                     : "met \(entry.timesEncountered) times · \(entry.specimens.count) kept")
+                     : "met \(entry.timesEncountered) times · \(entry.specimens.count) recorded")
                     .font(.caption2).foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
@@ -84,7 +84,7 @@ struct BestiaryView: View {
     }
 }
 
-/// One kind, and the individuals of it you've kept.
+/// One kind, and the individuals recorded when it was encountered.
 private struct EntrySheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
@@ -102,22 +102,22 @@ private struct EntrySheet: View {
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }
-                    if let finest = entry.finest {
-                        StationCard(title: "The best you've found", icon: "star.fill") {
-                            measures(of: finest)
+                    if let latest = entry.latest {
+                        StationCard(title: "Latest record", icon: "star.fill") {
+                            measures(of: latest)
                         }
                     }
 
-                    StationCard(title: "Specimens — \(entry.specimens.count)", icon: "list.bullet") {
+                    StationCard(title: "Encounter records — \(entry.specimens.count)", icon: "list.bullet") {
                         if entry.specimens.isEmpty {
-                            EmptyNote("You've seen this kind, but never kept one.")
+                            EmptyNote("You have met this kind, but no individual measurements were recorded.")
                         }
                         ForEach(Array(entry.specimens.enumerated().reversed()), id: \.offset) { item in
                             HStack {
                                 Text(CreatureIdentity.name(for: item.element.traits).capitalisedSentence)
                                     .font(.caption)
                                 Spacer(minLength: 6)
-                                Text("run \(item.element.runIndex)")
+                                Text("World \(item.element.runIndex)")
                                     .font(.caption2).foregroundStyle(.secondary)
                             }
                             .frame(minHeight: 32)
@@ -152,7 +152,7 @@ private struct EntrySheet: View {
                 }
                 HStack(spacing: 12) {
                     bar("of \(peers) seen", personal, enabled: peers > 1)
-                    bar("in nature", global, enabled: true)
+                    bar("in generated reference sample", global, enabled: true)
                 }
             }
             .frame(minHeight: 44)

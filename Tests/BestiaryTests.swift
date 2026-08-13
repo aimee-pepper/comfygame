@@ -5,6 +5,18 @@ import XCTest
 /// displayed nowhere — the bestiary had no screen at all, so every specimen, trait vector and
 /// derived identity went into the save unreadable.
 final class BestiaryTests: XCTestCase {
+    func testReleaseBestiaryDisclosesRecordedAndGeneratedAuthorities() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BestiaryView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("Latest record"))
+        XCTAssertTrue(source.contains("Encounter records"))
+        XCTAssertTrue(source.contains("generated reference sample"))
+        XCTAssertFalse(source.contains("The best you've found"))
+        XCTAssertFalse(source.contains("bar(\"in nature\""))
+        XCTAssertFalse(source.contains("specimens.count) kept"))
+    }
 
     private func traits(size: Double) -> CreatureTraits {
         var t = CreatureTraits()

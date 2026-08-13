@@ -535,7 +535,7 @@ struct StorehouseView: View {
                                 ResourceIconTile(resourceID: entry.id, icon: entry.icon, quantity: entry.amount,
                                                  accessibilityName: entry.name)
                             } detail: { selected in
-                                StorehouseResourceDetail(entry: selected)
+                                StorehouseResourceDetail(entry: selected).environmentObject(store)
                             }
                         }
                         if base.resources[Resources.essenceRaw] > 0 {
@@ -602,23 +602,26 @@ private struct StorehouseResourceEntry: Identifiable {
 }
 
 private struct StorehouseResourceDetail: View {
+    @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     let entry: StorehouseResourceEntry
+
+    private var currentAmount: Int { store.state.base.resources[entry.id] }
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
                     HStack(spacing: 16) {
-                        ResourceIconTile(resourceID: entry.id, icon: entry.icon, quantity: entry.amount,
+                        ResourceIconTile(resourceID: entry.id, icon: entry.icon, quantity: currentAmount,
                                          accessibilityName: entry.name)
                             .frame(width: 58, height: 58)
                         Text(entry.name).font(.headline)
                     }
                 }
                 Section("Details") {
-                    LabeledContent("Quantity", value: "\(entry.amount)")
-                    LabeledContent("Location", value: "Storehouse")
+                    LabeledContent("Quantity", value: "\(currentAmount)")
+                    LabeledContent("Location", value: currentAmount > 0 ? "Storehouse" : "No longer stored")
                     if entry.id == Resources.essenceRaw {
                         Text("Refine raw essence at the Essence Spring before writing with it.")
                     }
@@ -638,42 +641,49 @@ private struct StorehouseItemSheet: View {
     @Environment(\.dismiss) private var dismiss
     let stack: ItemStack
 
+    private var currentStack: ItemStack? {
+        store.state.base.inventory.stacks.first { $0.id == stack.id }
+    }
+
+    private var displayedStack: ItemStack { currentStack ?? stack }
+
     var body: some View {
-        if !stack.materials.isEmpty {
-            MaterialBinSheet(bin: stack).environmentObject(store)
+        if !displayedStack.materials.isEmpty {
+            MaterialBinSheet(bin: displayedStack).environmentObject(store)
         } else {
             NavigationStack {
                 List {
                     Section {
                         HStack(spacing: 16) {
-                            ItemIconTile(icon: stack.icon, catalogueID: stack.catalogID,
-                                         rarity: stack.rarity,
-                                         quantity: stack.count, identified: stack.identified,
-                                         location: .stored, accessibilityName: stack.displayName)
+                            ItemIconTile(icon: displayedStack.icon, catalogueID: displayedStack.catalogID,
+                                         rarity: displayedStack.rarity,
+                                         quantity: displayedStack.count, identified: displayedStack.identified,
+                                         location: .stored, accessibilityName: displayedStack.displayName)
                                 .frame(width: 58, height: 58)
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(stack.displayName).font(.headline).foregroundStyle(stack.rarity.tint)
-                                Text(stack.rarity.displayName).font(.caption).foregroundStyle(.secondary)
+                                Text(displayedStack.displayName).font(.headline).foregroundStyle(displayedStack.rarity.tint)
+                                Text(displayedStack.rarity.displayName).font(.caption).foregroundStyle(.secondary)
                             }
                         }
                     }
                     Section("Details") {
-                        LabeledContent("Quantity", value: "\(stack.count)")
-                        LabeledContent("Location", value: ItemGridLocation.stored.displayName)
-                        if !stack.detail.isEmpty { Text(stack.detail) }
-                        if let profile = stack.gearProfile {
+                        LabeledContent("Quantity", value: "\(displayedStack.count)")
+                        LabeledContent("Location", value: currentStack == nil
+                                       ? "No longer stored" : ItemGridLocation.stored.displayName)
+                        if !displayedStack.detail.isEmpty { Text(displayedStack.detail) }
+                        if let profile = displayedStack.gearProfile {
                             LabeledContent("Tier", value: "\(profile.constructionTier)")
                             LabeledContent("Reforge", value: "\(profile.reforgeRank) of \(SmithRules.maximumReforgeLevel)")
                             if let provenance = profile.displayProvenance {
                                 LabeledContent("Provenance", value: provenance)
                             }
-                        } else if let blurb = ContentCatalog.shared.item(stack.catalogID)?.blurb,
+                        } else if let blurb = ContentCatalog.shared.item(displayedStack.catalogID)?.blurb,
                                   !blurb.isEmpty {
                             Text(blurb)
                         }
                     }
                 }
-                .navigationTitle(stack.identified ? stack.displayName : "Unknown item")
+                .navigationTitle(displayedStack.identified ? displayedStack.displayName : "Unknown item")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
@@ -1159,6 +1169,12 @@ struct MaterialBinSheet: View {
     @Environment(\.dismiss) private var dismiss
     let bin: ItemStack
 
+    private var currentBin: ItemStack? {
+        store.state.base.inventory.stacks.first { $0.id == bin.id }
+    }
+
+    private var displayedBin: ItemStack { currentBin ?? bin }
+
     enum Order: String, CaseIterable, Identifiable {
         case grade = "Grade"
         case source = "Where from"
@@ -1203,10 +1219,12 @@ struct MaterialBinSheet: View {
                     .textCase(nil)
                     .padding(.bottom, 4)
                 } footer: {
-                    Text("All \(bin.count) share one slot. Every one keeps its own grade and the animal it came off.")
+                    Text(currentBin == nil
+                         ? "This material bin is no longer in the Storehouse."
+                         : "All \(displayedBin.count) share one slot. Every one keeps its own grade and the animal it came off.")
                 }
             }
-            .navigationTitle(bin.displayName)
+            .navigationTitle(displayedBin.displayName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
@@ -1215,10 +1233,11 @@ struct MaterialBinSheet: View {
     }
 
     private var sorted: [MaterialSample] {
-        switch order {
-        case .grade: bin.materials.sorted { $0.grade > $1.grade }
-        case .source: bin.materials.sorted { ($0.source, $0.grade) < ($1.source, $1.grade) }
-        case .order: bin.materials
+        let materials = currentBin?.materials ?? []
+        return switch order {
+        case .grade: materials.sorted { $0.grade > $1.grade }
+        case .source: materials.sorted { ($0.source, $0.grade) < ($1.source, $1.grade) }
+        case .order: materials
         }
     }
 }

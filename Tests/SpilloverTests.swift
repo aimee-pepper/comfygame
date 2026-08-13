@@ -138,6 +138,17 @@ final class SpilloverTests: XCTestCase {
                        "loot waiting to be sorted didn't survive a relaunch")
     }
 
+    func testStorehouseDetailSheetsResolveCurrentStateInsteadOfFrozenQuantities() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("private var currentAmount: Int"))
+        XCTAssertTrue(source.contains("private var currentStack: ItemStack?"))
+        XCTAssertTrue(source.contains("private var currentBin: ItemStack?"))
+        XCTAssertTrue(source.contains("No longer stored"))
+    }
+
     // MARK: Helpers
 
     private func makeStore() -> GameStore {
