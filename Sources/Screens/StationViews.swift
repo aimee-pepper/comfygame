@@ -161,9 +161,12 @@ struct ChannelworksView: View {
         ScrollView {
             VStack(spacing: 16) {
                 StationCard(title: "Conduit housing", icon: "point.3.connected.trianglepath.dotted") {
-                    Text("The first fixture is Oda's own damaged Heat Conduit, restored when this station is raised. Its core is intact and cannot be recovered.")
+                    Label("Oda's restored conduit", systemImage: "checkmark.seal.fill")
+                        .font(.subheadline.weight(.semibold)).foregroundStyle(.green)
+                    Text(store.odaRestoredConduitLocation.map { "The restored fixture is \($0)." }
+                         ?? "The restoration is complete. The original fixture is no longer in known Home storage.")
                         .font(.caption).foregroundStyle(.secondary)
-                    Text("Oda consumes one Heat core and transfers its attunement, potency and origin receipt into a contained fixture.")
+                    Text("Build another conduit by consuming one player-made Heat core and transferring its attunement, potency and origin receipt into a contained fixture.")
                         .font(.caption).foregroundStyle(.secondary)
 
                     Label(hasHeatCore ? "Heat core ready" : "Requires one Heat core",
@@ -171,7 +174,7 @@ struct ChannelworksView: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(hasHeatCore ? Color.green : Color.orange)
 
-                    Button("Construct Heat Conduit fixture") {
+                    Button("Build another conduit") {
                         if store.constructConduitFixture() {
                             constructionFailure = nil
                         } else {
@@ -180,6 +183,10 @@ struct ChannelworksView: View {
                     }
                         .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
                         .disabled(!hasHeatCore)
+                    if !hasHeatCore {
+                        Text("Auber's Distillery makes the Heat cores used for additional conduits.")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
                 }
             }.padding(16)
         }.background(Color(.systemGroupedBackground))

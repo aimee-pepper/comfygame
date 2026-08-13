@@ -188,9 +188,50 @@ final class StackingTests: XCTestCase {
         let fixtures = store.state.base.inventory.stacks.filter { $0.catalogID == Items.conduitFixture }
         XCTAssertEqual(fixtures.reduce(0) { $0 + $1.count }, 1)
         XCTAssertEqual(fixtures.first?.distilledCore?.recipeVersion, 0)
+        XCTAssertTrue(store.state.base.odaFixtureRestored)
         XCTAssertFalse(store.build(station))
         XCTAssertEqual(store.state.base.inventory.stacks.filter { $0.catalogID == Items.conduitFixture }
             .reduce(0) { $0 + $1.count }, 1)
+    }
+
+    func testUnlockedLegacyChannelworksAdoptsOrGrantsOneRestorationReceipt() throws {
+        var adopting = GameState.newGame()
+        adopting.base.stations[Stations.channelworks] = StationState(isUnlocked: true, tier: 0)
+        let authored = DistilledCore(attunement: .heat, potency: 40,
+            sampleKind: "authored fixture", sampleSource: "Oda's damaged conduit",
+            sampleQualifier: "intact, non-recoverable core", catalystID: nil, catalystCount: 0,
+            recipeVersion: 0, stationID: Stations.channelworks)
+        adopting.base.store(ItemStack(id: InstanceID(rawValue: 800),
+                                     catalogID: Items.conduitFixture, distilledCore: authored))
+
+        let adopted = try SaveCodec.decode(SaveCodec.encode(adopting))
+        XCTAssertTrue(adopted.base.odaFixtureRestored)
+        XCTAssertEqual(restorationCount(in: adopted), 1)
+        XCTAssertEqual(restorationCount(in: try SaveCodec.decode(SaveCodec.encode(adopted))), 1)
+
+        var granting = GameState.newGame()
+        granting.base.stations[Stations.channelworks] = StationState(isUnlocked: true, tier: 0)
+        let granted = try SaveCodec.decode(SaveCodec.encode(granting))
+        XCTAssertTrue(granted.base.odaFixtureRestored)
+        XCTAssertEqual(restorationCount(in: granted), 1)
+    }
+
+    func testRestorationReceiptPreventsReplacementAfterFixtureLeavesStorage() throws {
+        var state = GameState.newGame()
+        state.base.stations[Stations.channelworks] = StationState(isUnlocked: true, tier: 0)
+        state.base.odaFixtureRestored = true
+
+        let restored = try SaveCodec.decode(SaveCodec.encode(state))
+        XCTAssertTrue(restored.base.odaFixtureRestored)
+        XCTAssertEqual(restorationCount(in: restored), 0)
+    }
+
+    private func restorationCount(in state: GameState) -> Int {
+        (state.base.inventory.stacks + state.base.spillover).filter {
+            $0.catalogID == Items.conduitFixture
+                && $0.distilledCore?.recipeVersion == 0
+                && $0.distilledCore?.sampleSource == "Oda's damaged conduit"
+        }.reduce(0) { $0 + $1.count }
     }
 
     // MARK: The bug

@@ -145,6 +145,17 @@ extension GameStore {
         return made
     }
 
+    var odaRestoredConduitLocation: String? {
+        let isOdas = { (stack: ItemStack) in
+            stack.catalogID == Items.conduitFixture
+                && stack.distilledCore?.recipeVersion == 0
+                && stack.distilledCore?.sampleSource == "Oda's damaged conduit"
+        }
+        if state.base.inventory.stacks.contains(where: isOdas) { return "in the Storehouse" }
+        if state.base.spillover.contains(where: isOdas) { return "waiting at the Storehouse" }
+        return nil
+    }
+
     @discardableResult
     func craftAnchorFrame() -> Bool {
         guard AnchorFrameRules.canCraft(in: state) else { return false }
@@ -1058,6 +1069,7 @@ extension GameStore {
                 state.base.store(ItemStack(id: InstanceID(rawValue: state.base.nextItemID()),
                                            catalogID: Items.conduitFixture,
                                            distilledCore: restored))
+                state.base.odaFixtureRestored = true
             }
         }
         return true

@@ -29,7 +29,9 @@ final class SpilloverTests: XCTestCase {
         XCTAssertTrue(distillery.contains("Crystallise essence"))
         XCTAssertTrue(distillery.contains("attunementCard(attunement)"))
         XCTAssertFalse(distillery.contains("ComingLater"))
-        XCTAssertTrue(channelworks.contains("Construct Heat Conduit fixture"))
+        XCTAssertTrue(channelworks.contains("Oda's restored conduit"))
+        XCTAssertTrue(channelworks.contains("Build another conduit"))
+        XCTAssertTrue(channelworks.contains("Auber's Distillery"))
         XCTAssertTrue(channelworks.contains("Requires one Heat core"))
         XCTAssertTrue(channelworks.contains("Heat core ready"))
         XCTAssertTrue(channelworks.contains(".disabled(!hasHeatCore)"))
@@ -156,7 +158,7 @@ final class SpilloverTests: XCTestCase {
         XCTAssertTrue(source.contains("if store.constructConduitFixture()"))
         XCTAssertTrue(source.contains("Fixture not constructed"))
         XCTAssertTrue(source.contains("The Heat core or Storehouse space changed."))
-        XCTAssertFalse(source.contains("Button(\"Construct Heat Conduit fixture\") { store.constructConduitFixture() }"))
+        XCTAssertFalse(source.contains("Button(\"Build another conduit\") { store.constructConduitFixture() }"))
     }
 
     private func stationViewsSource() throws -> String {
