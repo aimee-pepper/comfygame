@@ -131,6 +131,7 @@ enum CombatDerivedStatsRules {
         static let weakPoint: CombatNodeID = "combat.offense.precision.weak_point"
         static let exploit: CombatNodeID = "combat.offense.precision.exploit"
         static let steadyHand: CombatNodeID = "combat.offense.precision.steady_hand"
+        static let flense: CombatNodeID = "combat.craft.venom.flense"
     }
 
     struct DirectHitSnapshot: Equatable, Sendable {

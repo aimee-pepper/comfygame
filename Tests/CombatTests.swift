@@ -1094,6 +1094,11 @@ final class CombatTests: XCTestCase {
         func bleedPerRound(_ traits: CreatureTraits) throws -> Int {
             let store = inFightWith([traits])
             let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
+            store.mutate("test: exact Flense owner") {
+                $0.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs?[.companion(0)] = [
+                    CombatDerivedStatsRules.Node.flense
+                ]
+            }
             giveTheTurnTo(.companion(0), in: store)
             store.mutate("test: use it") { CombatRules.perform(.skill("flense", foe: foeID), by: .companion(0), in: &$0) }
             return store.activeEncounter?.afflictions?.first {
@@ -4061,5 +4066,65 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(before - (try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP)),
                        expected.finalDamage)
         XCTAssertTrue(try XCTUnwrap(store.activeEncounter).log.contains("Critical — Steady Hand."))
+    }
+
+    func testFlenseUsesFrozenExactOwnerCanonicalBleedAndTruthfulPreview() throws {
+        let store = GameStore(io: .temporary(name: "flense-v2-\(UUID().uuidString)"))
+        store.mutate("learn Flense") { Self.learnEverything(&$0) }
+        store.write("plains"); store.bindAndDepart()
+        let foeID = InstanceID(rawValue: 8_701)
+        var traits = CreatureTraits()
+        traits.covering = Covering(hardness: 0, length: 80, coverage: 75)
+        var stats = CombatStats.derived(from: traits, name: "Shaggy target", icon: "circle")
+        stats.maxHP = 100; stats.evasion = 0
+        store.mutate("stage frozen Flense owner") { state in
+            state.base.binderCharacter.stats.wit = 99
+            guard var run = state.worlds.activeRun else { return }
+            var orderRNG = SeededRNG(seed: 111)
+            var encounter = CombatRules.makeEncounter(
+                id: InstanceID(rawValue: 8_700),
+                foes: [.init(id: foeID, traits: traits, stats: stats, currentHP: 100)],
+                party: [.binder, .companion(0)],
+                debugV2OwnedNodeIDs: [.binder: [CombatDerivedStatsRules.Node.flense],
+                                      .companion(0): []],
+                partyRanks: [.binder: .front, .companion(0): .front], rng: &orderRNG)
+            encounter.order = [.binder, .companion(0), .foe(foeID)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            encounter.preparedCoatings[.binder] = .poison
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let foe = try XCTUnwrap(store.activeEncounter?.foes.first)
+        let hidden = try XCTUnwrap(CombatRules.debugV2FlensePreview(actor: .binder, foe: foe,
+                                                                    in: store.state))
+        XCTAssertEqual(hidden.tickDamage, 1...9)
+        XCTAssertFalse(hidden.isExact)
+        XCTAssertNil(CombatRules.debugV2FlensePreview(actor: .companion(0), foe: foe, in: store.state),
+                     "Flense leaked as a legacy-role aura")
+        store.mutate("reveal covering") { $0.worlds.activeRun?.activeEncounter?.revealed.insert(foeID) }
+        let exact = try XCTUnwrap(CombatRules.debugV2FlensePreview(actor: .binder, foe: foe,
+                                                                   in: store.state))
+        XCTAssertEqual(exact.tickDamage.lowerBound, CombatRules.flenseTickDamage(covering: traits.covering))
+        XCTAssertEqual(exact.tickDamage.lowerBound, exact.tickDamage.upperBound)
+        let hpBefore = try XCTUnwrap(store.activeEncounter?.foes.first?.currentHP)
+        store.mutate("commit Flense") {
+            CombatRules.perform(.skill("flense", foe: foeID), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(store.activeEncounter?.foes.first?.currentHP, hpBefore,
+                       "Flense incorrectly dealt immediate direct damage")
+        XCTAssertEqual(store.activeEncounter?.preparedCoatings[.binder], .poison,
+                       "Flense consumed a weapon coating despite not being a weapon hit")
+        let bleed = try XCTUnwrap(store.activeEncounter?.afflictions?.first {
+            $0.target == .foe(foeID) && $0.kind == .bleed
+        })
+        XCTAssertEqual(bleed.damage, exact.tickDamage.lowerBound)
+        XCTAssertEqual(bleed.ticksRemaining, 3)
+        XCTAssertEqual(bleed.source, .binder)
+        XCTAssertEqual(bleed.provenance, .direct)
+        let reloaded = try JSONDecoder().decode(EncounterState.self,
+                                                from: JSONEncoder().encode(try XCTUnwrap(store.activeEncounter)))
+        XCTAssertEqual(reloaded.afflictions?.first?.applicationReceipt, bleed.applicationReceipt)
+        XCTAssertEqual(reloaded.debugV2OwnedNodeIDs?[.binder], [CombatDerivedStatsRules.Node.flense])
     }
 }

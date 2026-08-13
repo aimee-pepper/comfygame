@@ -644,7 +644,8 @@ enum CombatRules {
             // thing, a great deal on something shaggy. The mirror of the creature system's own rend.
             guard let foe else { return nil }
             let purchase = (foe.traits?.covering.insulation ?? 0) / Tuning.Pressure.scaleMaximum
-            let perRound = max(1, Int((Double(power) * purchase).rounded()))
+            let perRound = flenseTickDamage(power: skill.power,
+                                            covering: foe.traits?.covering ?? Covering())
             _ = applyAffliction(.bleed, to: .foe(foe.id), source: actor,
                                 provenance: .direct, damage: perRound, ticks: skill.rounds,
                                 targetIsStanding: foe.isAlive, encounter: &encounter)
@@ -1114,7 +1115,7 @@ enum CombatRules {
         normalizeV2EvasionState(&encounter)
         if case .skill(let id, _, _) = action {
             guard let skill = ContentCatalog.shared.skill(id),
-                  skills(for: actor, in: state).contains(skill),
+                  owns(skill, actor: actor, encounter: encounter, state: state),
                   isReady(skill, for: actor, in: encounter)
             else {
                 // Saved palette selections and old Rout actions remain decodable, but an action
@@ -1141,7 +1142,8 @@ enum CombatRules {
             }
 
         case .skill(let id, let foeID, let allyID):
-            if let skill = ContentCatalog.shared.skill(id), skills(for: actor, in: state).contains(skill),
+            if let skill = ContentCatalog.shared.skill(id), owns(skill, actor: actor, encounter: encounter,
+                                                                 state: state),
                isReady(skill, for: actor, in: encounter) {
                 if let direct = use(skill, by: actor, on: foeID, ally: allyID,
                     run: &run, encounter: &encounter,
@@ -1241,6 +1243,38 @@ enum CombatRules {
         case .damage, .armourIgnoring, .overbear, .execute, .ambush, .elemental: true
         default: false
         }
+    }
+
+    private static func owns(_ skill: SkillDef, actor: Combatant,
+                             encounter: EncounterState, state: GameState) -> Bool {
+        if skill.id == "flense", let frozen = encounter.debugV2OwnedNodeIDs {
+            return frozen[actor]?.contains(CombatDerivedStatsRules.Node.flense) == true
+        }
+        return skills(for: actor, in: state).contains(skill)
+    }
+
+    static func flenseTickDamage(power: Int = 9, covering: Covering) -> Int {
+        let purchase = covering.insulation / Tuning.Pressure.scaleMaximum
+        return max(1, Int((Double(power) * purchase).rounded()))
+    }
+
+    struct FlensePreview: Equatable, Sendable {
+        var tickDamage: ClosedRange<Int>
+        var ticks: Int
+        var isExact: Bool
+    }
+
+    static func debugV2FlensePreview(actor: Combatant, foe: FoeState,
+                                     in state: GameState) -> FlensePreview? {
+        guard let encounter = state.worlds.activeRun?.activeEncounter,
+              let skill = ContentCatalog.shared.skill("flense"),
+              owns(skill, actor: actor, encounter: encounter, state: state), foe.isAlive
+        else { return nil }
+        guard encounter.revealed.contains(foe.id) else {
+            return .init(tickDamage: 1...skill.power, ticks: skill.rounds, isExact: false)
+        }
+        let exact = flenseTickDamage(power: skill.power, covering: foe.traits?.covering ?? Covering())
+        return .init(tickDamage: exact...exact, ticks: skill.rounds, isExact: true)
     }
 
     private enum CombatActionCost { case zero, normal }
