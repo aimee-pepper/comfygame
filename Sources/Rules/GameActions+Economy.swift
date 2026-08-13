@@ -33,6 +33,11 @@ enum IdentificationCommitResult: Equatable, Sendable {
     case refused(String)
 }
 
+private enum IdentificationEvaluation {
+    case ready(GameState, ItemDef)
+    case refused(String)
+}
+
 struct PartyTransferPreview: Identifiable, Equatable, Sendable {
     let index: Int
     let name: String
@@ -306,37 +311,51 @@ extension GameStore {
     /// Find out what a curio actually is. The small version of the per-component identification
     /// the writing system will want later.
     func identify(_ stack: ItemStack) -> IdentificationCommitResult {
-        var result: IdentificationCommitResult = .refused(
-            "The unidentified item changed. Review the Storehouse and try again."
-        )
-        mutate("identify \(stack.catalogID.rawValue)", flush: true) { state in
-            guard state.base.essence >= Tuning.Economy.identifyCostEssence else {
-                result = .refused("Not enough Essence to identify this item.")
-                return
+        func candidate(from current: GameState) -> IdentificationEvaluation {
+            guard current.base.essence >= Tuning.Economy.identifyCostEssence else {
+                return .refused("Not enough Essence to identify this item.")
             }
-            guard let index = state.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }),
-                  state.base.inventory.stacks[index] == stack,
-                  !state.base.inventory.stacks[index].identified,
-                  let revealed = EconomyRules.identification(of: state.base.inventory.stacks[index])
-            else { return }
+            guard let index = current.base.inventory.stacks.firstIndex(where: { $0.id == stack.id }),
+                  current.base.inventory.stacks[index] == stack,
+                  !current.base.inventory.stacks[index].identified,
+                  let revealed = EconomyRules.identification(of: current.base.inventory.stacks[index])
+            else {
+                return .refused("The unidentified item changed. Review the Storehouse and try again.")
+            }
 
-            var candidate = state
-            // **One at a time.** Unidentified curios of the same kind share a bin, and you paid to
-            // learn about *one* of them — splitting it out is what keeps the price honest, and the
-            // rest stay a mystery worth another five essence.
-            guard var identified = candidate.base.inventory.stacks[index].removing(1) else { return }
+            var candidate = current
+            guard var identified = candidate.base.inventory.stacks[index].removing(1) else {
+                return .refused("The unidentified item changed. Review the Storehouse and try again.")
+            }
             identified.catalogID = revealed.id
             identified.identified = true
             if candidate.base.inventory.stacks[index].isEmpty {
                 candidate.base.inventory.stacks.remove(at: index)
             }
             guard candidate.base.inventory.add(identified) else {
-                result = .refused("The Storehouse needs room for the identified item.")
-                return
+                return .refused("The Storehouse needs room for the identified item.")
             }
             candidate.base.essence -= Tuning.Economy.identifyCostEssence
-            state = candidate
-            result = .committed(revealed)
+            return .ready(candidate, revealed)
+        }
+
+        // Refuse known-invalid attempts before entering `mutate`, whose bookkeeping is itself a
+        // persisted state change. The same candidate is rebuilt inside the transaction below.
+        guard case .ready = candidate(from: state) else {
+            if case .refused(let message) = candidate(from: state) { return .refused(message) }
+            fatalError("unreachable identification evaluation")
+        }
+        var result: IdentificationCommitResult = .refused(
+            "The unidentified item changed. Review the Storehouse and try again."
+        )
+        mutate("identify \(stack.catalogID.rawValue)", flush: true) { state in
+            switch candidate(from: state) {
+            case .ready(let committed, let revealed):
+                state = committed
+                result = .committed(revealed)
+            case .refused(let message):
+                result = .refused(message)
+            }
         }
         return result
     }
