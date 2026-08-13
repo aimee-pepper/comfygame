@@ -184,27 +184,31 @@ final class CampaignLaunchProgressTests: XCTestCase {
         let fullFrame = CGRect(x: 0, y: 0, width: 393, height: 852)
         let insets = EdgeInsets(top: 59, leading: 0, bottom: 34, trailing: 0)
 
-        let center = LaunchSurfacePlacement.localSafeAreaCenter(
+        let safeFrame = LaunchSurfacePlacement.inferredSafeAreaFrame(
             containerFrame: fullFrame, insets: insets
         )
+        let local = LaunchSurfacePlacement.localFrame(
+            containerFrame: fullFrame, safeAreaFrameInScreen: safeFrame
+        )
 
-        XCTAssertEqual(center.x, 196.5, accuracy: 0.001)
-        XCTAssertEqual(center.y, 438.5, accuracy: 0.001)
-        XCTAssertNotEqual(center.y, fullFrame.height / 2,
+        XCTAssertEqual(local.midX, 196.5, accuracy: 0.001)
+        XCTAssertEqual(local.midY, 438.5, accuracy: 0.001)
+        XCTAssertNotEqual(local.midY, fullFrame.height / 2,
                           "The SwiftUI loader must use the same safe-area center as the storyboard")
     }
 
     func testAlreadyInsetSwiftUIProposalDoesNotApplySafeAreaTwice() {
-        let insets = EdgeInsets(top: 59, leading: 0, bottom: 34, trailing: 0)
         let proposedSafeFrame = CGRect(x: 0, y: 59, width: 393, height: 759)
 
-        let local = LaunchSurfacePlacement.localSafeAreaCenter(
-            containerFrame: proposedSafeFrame, insets: insets
+        let storyboardSafeFrame = CGRect(x: 0, y: 59, width: 393, height: 759)
+        let local = LaunchSurfacePlacement.localFrame(
+            containerFrame: proposedSafeFrame,
+            safeAreaFrameInScreen: storyboardSafeFrame
         )
 
-        XCTAssertEqual(local.x, 196.5, accuracy: 0.001)
-        XCTAssertEqual(local.y, 379.5, accuracy: 0.001)
-        XCTAssertEqual(proposedSafeFrame.minY + local.y, 438.5, accuracy: 0.001,
+        XCTAssertEqual(local.midX, 196.5, accuracy: 0.001)
+        XCTAssertEqual(local.midY, 379.5, accuracy: 0.001)
+        XCTAssertEqual(proposedSafeFrame.minY + local.midY, 438.5, accuracy: 0.001,
                        "the live page and storyboard must share one global centre")
     }
 

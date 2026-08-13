@@ -210,10 +210,14 @@ struct LaunchSurface: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let frame = geometry.frame(in: .global)
-            let center = LaunchSurfacePlacement.localSafeAreaCenter(
-                containerFrame: frame,
-                insets: geometry.safeAreaInsets
+            let containerFrame = geometry.frame(in: .global)
+            let safeAreaFrameInScreen = LaunchSurfacePlacement.currentSafeAreaFrameInScreen ??
+                LaunchSurfacePlacement.inferredSafeAreaFrame(
+                    containerFrame: containerFrame, insets: geometry.safeAreaInsets
+                )
+            let safeAreaFrame = LaunchSurfacePlacement.localFrame(
+                containerFrame: containerFrame,
+                safeAreaFrameInScreen: safeAreaFrameInScreen
             )
             ZStack(alignment: .topLeading) {
                 Color(.systemBackground).ignoresSafeArea()
@@ -224,7 +228,12 @@ struct LaunchSurface: View {
                         loadingSurface
                     }
                 }
-                .position(center)
+                .position(x: safeAreaFrame.midX, y: safeAreaFrame.midY)
+            }
+            .onAppear {
+                Logger.launch.notice(
+                    "loader container=\(String(describing: containerFrame), privacy: .public) safeScreen=\(String(describing: safeAreaFrameInScreen), privacy: .public) safeLocal=\(String(describing: safeAreaFrame), privacy: .public)"
+                )
             }
         }
         .accessibilityElement(children: failure == nil ? .combine : .contain)
@@ -297,23 +306,26 @@ struct LaunchSurface: View {
 }
 
 enum LaunchSurfacePlacement {
-    /// Returns a point in the GeometryReader's local coordinates. SwiftUI may propose either the
-    /// full window or an already-safe-area-constrained frame; using only `geometry.size` loses that
-    /// distinction and can apply the top inset twice, shifting the live loader away from UIKit's
-    /// correctly centred storyboard.
-    static func localSafeAreaCenter(containerFrame frame: CGRect, insets: EdgeInsets) -> CGPoint {
-        let tolerance: CGFloat = 0.5
-        let isAlreadyHorizontallyInset = insets.leading > 0 &&
-            frame.minX >= insets.leading - tolerance
-        let isAlreadyVerticallyInset = insets.top > 0 &&
-            frame.minY >= insets.top - tolerance
+    /// The storyboard is constrained to `UIWindow.safeAreaLayoutGuide`. Read that same UIKit frame
+    /// rather than inferring it from SwiftUI's proposal, whose origin/size semantics vary depending
+    /// on which root container proposed the GeometryReader.
+    @MainActor static var currentSafeAreaFrameInScreen: CGRect? {
+        let windows = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+        guard let window = windows.first(where: \.isKeyWindow) ?? windows.first else { return nil }
+        return window.convert(window.safeAreaLayoutGuide.layoutFrame, to: nil)
+    }
 
-        let localMinX = isAlreadyHorizontallyInset ? 0 : insets.leading
-        let localMaxX = isAlreadyHorizontallyInset ? frame.width : frame.width - insets.trailing
-        let localMinY = isAlreadyVerticallyInset ? 0 : insets.top
-        let localMaxY = isAlreadyVerticallyInset ? frame.height : frame.height - insets.bottom
-        return CGPoint(x: (localMinX + localMaxX) / 2,
-                       y: (localMinY + localMaxY) / 2)
+    static func localFrame(containerFrame: CGRect, safeAreaFrameInScreen: CGRect) -> CGRect {
+        safeAreaFrameInScreen.offsetBy(dx: -containerFrame.minX, dy: -containerFrame.minY)
+    }
+
+    static func inferredSafeAreaFrame(containerFrame: CGRect, insets: EdgeInsets) -> CGRect {
+        CGRect(x: containerFrame.minX + insets.leading,
+               y: containerFrame.minY + insets.top,
+               width: max(0, containerFrame.width - insets.leading - insets.trailing),
+               height: max(0, containerFrame.height - insets.top - insets.bottom))
     }
 }
 
