@@ -181,15 +181,31 @@ final class CampaignLaunchProgressTests: XCTestCase {
     }
 
     func testSwiftUILoaderUsesTheStoryboardSafeAreaCenter() {
-        let phone = CGSize(width: 393, height: 852)
+        let fullFrame = CGRect(x: 0, y: 0, width: 393, height: 852)
         let insets = EdgeInsets(top: 59, leading: 0, bottom: 34, trailing: 0)
 
-        let center = LaunchSurfacePlacement.safeAreaCenter(containerSize: phone, insets: insets)
+        let center = LaunchSurfacePlacement.localSafeAreaCenter(
+            containerFrame: fullFrame, insets: insets
+        )
 
         XCTAssertEqual(center.x, 196.5, accuracy: 0.001)
         XCTAssertEqual(center.y, 438.5, accuracy: 0.001)
-        XCTAssertNotEqual(center.y, phone.height / 2,
+        XCTAssertNotEqual(center.y, fullFrame.height / 2,
                           "The SwiftUI loader must use the same safe-area center as the storyboard")
+    }
+
+    func testAlreadyInsetSwiftUIProposalDoesNotApplySafeAreaTwice() {
+        let insets = EdgeInsets(top: 59, leading: 0, bottom: 34, trailing: 0)
+        let proposedSafeFrame = CGRect(x: 0, y: 59, width: 393, height: 759)
+
+        let local = LaunchSurfacePlacement.localSafeAreaCenter(
+            containerFrame: proposedSafeFrame, insets: insets
+        )
+
+        XCTAssertEqual(local.x, 196.5, accuracy: 0.001)
+        XCTAssertEqual(local.y, 379.5, accuracy: 0.001)
+        XCTAssertEqual(proposedSafeFrame.minY + local.y, 438.5, accuracy: 0.001,
+                       "the live page and storyboard must share one global centre")
     }
 
     private func fixturePrepared() -> GameStore.PreparedLaunch {

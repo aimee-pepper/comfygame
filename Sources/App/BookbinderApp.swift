@@ -210,8 +210,9 @@ struct LaunchSurface: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let center = LaunchSurfacePlacement.safeAreaCenter(
-                containerSize: geometry.size,
+            let frame = geometry.frame(in: .global)
+            let center = LaunchSurfacePlacement.localSafeAreaCenter(
+                containerFrame: frame,
                 insets: geometry.safeAreaInsets
             )
             ZStack(alignment: .topLeading) {
@@ -296,11 +297,23 @@ struct LaunchSurface: View {
 }
 
 enum LaunchSurfacePlacement {
-    static func safeAreaCenter(containerSize: CGSize, insets: EdgeInsets) -> CGPoint {
-        CGPoint(
-            x: insets.leading + (containerSize.width - insets.leading - insets.trailing) / 2,
-            y: insets.top + (containerSize.height - insets.top - insets.bottom) / 2
-        )
+    /// Returns a point in the GeometryReader's local coordinates. SwiftUI may propose either the
+    /// full window or an already-safe-area-constrained frame; using only `geometry.size` loses that
+    /// distinction and can apply the top inset twice, shifting the live loader away from UIKit's
+    /// correctly centred storyboard.
+    static func localSafeAreaCenter(containerFrame frame: CGRect, insets: EdgeInsets) -> CGPoint {
+        let tolerance: CGFloat = 0.5
+        let isAlreadyHorizontallyInset = insets.leading > 0 &&
+            frame.minX >= insets.leading - tolerance
+        let isAlreadyVerticallyInset = insets.top > 0 &&
+            frame.minY >= insets.top - tolerance
+
+        let localMinX = isAlreadyHorizontallyInset ? 0 : insets.leading
+        let localMaxX = isAlreadyHorizontallyInset ? frame.width : frame.width - insets.trailing
+        let localMinY = isAlreadyVerticallyInset ? 0 : insets.top
+        let localMaxY = isAlreadyVerticallyInset ? frame.height : frame.height - insets.bottom
+        return CGPoint(x: (localMinX + localMaxX) / 2,
+                       y: (localMinY + localMaxY) / 2)
     }
 }
 
