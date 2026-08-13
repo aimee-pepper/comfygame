@@ -320,6 +320,21 @@ final class EconomyTests: XCTestCase {
 
     // MARK: The satchel decision
 
+    func testLootSwapKeepsTheExactDecisionActionOutsideScrollableItemFacts() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/LootDecisionView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom)"))
+        XCTAssertTrue(source.contains("Drop this and take \\(offered.displayName)"))
+        XCTAssertTrue(source.contains(".frame(maxWidth: .infinity, minHeight: 44)"))
+        XCTAssertTrue(source.contains("case .refused(let message):\n                        refusal = message"))
+    }
+
     /// A full satchel must hand the player a choice, not make one for them. Silently dropping the
     /// loot, or silently discarding what you were carrying, both empty out the reason the satchel is
     /// smaller than home storage in the first place.

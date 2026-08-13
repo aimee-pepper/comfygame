@@ -138,22 +138,27 @@ private struct LootSwapDetailSheet: View {
                         Text(blurb)
                     }
                 }
-                Section {
-                    Button(role: .destructive) {
-                        switch swap() {
-                        case .committed:
-                            onCommitted()
-                            dismiss()
-                        case .refused(let message):
-                            refusal = message
-                        }
-                    } label: {
-                        Text("Drop this and take \(offered.displayName)")
-                    }
-                }
                 if let refusal {
                     Section { Text(refusal).foregroundStyle(.red) }
                 }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button(role: .destructive) {
+                    switch swap() {
+                    case .committed:
+                        onCommitted()
+                        dismiss()
+                    case .refused(let message):
+                        refusal = message
+                    }
+                } label: {
+                    Text("Drop this and take \(offered.displayName)")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(.bar)
             }
             .navigationTitle(carried.identified ? carried.displayName : "Unknown item")
             .navigationBarTitleDisplayMode(.inline)
