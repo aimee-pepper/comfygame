@@ -472,25 +472,12 @@ private struct ArmouryRebuildSheet: View {
                             }
                         }
                     }
-                    Section {
-                        Button("Rebuild · \(preview.essence) essence") {
-                            if preview.destroysLegacyWork { confirmingLegacy = true }
-                            else if preview.isBelowSpecialistHeadline || preview.wastesGradeAboveCap {
-                                confirmingOrdinary = true
-                            } else { commit(preview, allowLegacy: false) }
-                        }.frame(maxWidth: .infinity, minHeight: 44).buttonStyle(.borderedProminent)
-                            .disabled(store.state.base.essence < preview.essence)
-                        if store.state.base.essence < preview.essence {
-                            Text("Needs \(preview.essence - store.state.base.essence) more essence.")
-                                .font(.caption).foregroundStyle(.orange)
-                        }
-                        if let commitFailure {
-                            Text(commitFailure).font(.caption).foregroundStyle(.orange)
-                        }
-                    }
                 } else {
                     Section { EmptyNote("You do not have four distinct qualifying samples for this profile.") }
                 }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if let preview { rebuildActionBar(preview) }
             }
             .navigationTitle(profile.name)
             .navigationBarTitleDisplayMode(.inline)
@@ -511,6 +498,35 @@ private struct ArmouryRebuildSheet: View {
                 }
             }
         }
+    }
+
+    private func rebuildActionBar(_ preview: ArmouryRules.Preview) -> some View {
+        PersistentActionBar(message: rebuildActionFootnote(preview),
+                            messageTint: rebuildActionHasFailure(preview) ? .orange : .secondary) {
+            Button {
+                if preview.destroysLegacyWork { confirmingLegacy = true }
+                else if preview.isBelowSpecialistHeadline || preview.wastesGradeAboveCap {
+                    confirmingOrdinary = true
+                } else { commit(preview, allowLegacy: false) }
+            } label: {
+                Text("Rebuild · \(preview.essence) essence").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(store.state.base.essence < preview.essence)
+        }
+    }
+
+    private func rebuildActionFootnote(_ preview: ArmouryRules.Preview) -> String {
+        if let commitFailure { return commitFailure }
+        if store.state.base.essence < preview.essence {
+            return "Needs \(preview.essence - store.state.base.essence) more essence."
+        }
+        return "The selected stock, tier, and cost are checked again before rebuilding."
+    }
+
+    private func rebuildActionHasFailure(_ preview: ArmouryRules.Preview) -> Bool {
+        commitFailure != nil || store.state.base.essence < preview.essence
     }
 
     private func commit(_ preview: ArmouryRules.Preview, allowLegacy: Bool) {
@@ -617,30 +633,6 @@ private struct ConstructionSheet: View {
                     }
                     requirementSockets(preview.selections)
                     candidateTray
-                    Section {
-                        Button("Construct · \(preview.essence) essence") {
-                            if preview.wastesGradeAboveCap {
-                                confirmingWastedGrade = true
-                            } else if recipe.specialistHeadlineTier != nil,
-                                      preview.isBelowSpecialistHeadline {
-                                confirmingBelowHeadline = true
-                            } else {
-                                commit(preview)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                        .buttonStyle(.borderedProminent)
-                        .disabled(store.state.base.essence < preview.essence)
-                        if store.state.base.essence < preview.essence {
-                            Text("Needs \(preview.essence - store.state.base.essence) more essence.")
-                                .font(.caption).foregroundStyle(.orange)
-                        }
-                        if let commitFailure {
-                            Text(commitFailure).font(.caption).foregroundStyle(.orange)
-                        }
-                    } footer: {
-                        Text("One persistent piece. The selected samples and their origins stay with it.")
-                    }
                 } else {
                     Section {
                         EmptyNote("You do not yet have a distinct qualifying sample for every part of this piece.")
@@ -648,6 +640,9 @@ private struct ConstructionSheet: View {
                     requirementSockets([])
                     candidateTray
                 }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if let preview { constructionActionBar(preview) }
             }
             .navigationTitle(recipe.displayName)
             .navigationBarTitleDisplayMode(.inline)
@@ -675,6 +670,39 @@ private struct ConstructionSheet: View {
                 }
             }
         }
+    }
+
+    private func constructionActionBar(_ preview: PhysicalGearCraftingRules.Preview) -> some View {
+        PersistentActionBar(message: constructionActionFootnote(preview),
+                            messageTint: constructionActionHasFailure(preview) ? .orange : .secondary) {
+            Button {
+                if preview.wastesGradeAboveCap {
+                    confirmingWastedGrade = true
+                } else if recipe.specialistHeadlineTier != nil,
+                          preview.isBelowSpecialistHeadline {
+                    confirmingBelowHeadline = true
+                } else {
+                    commit(preview)
+                }
+            } label: {
+                Text("Construct · \(preview.essence) essence").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(store.state.base.essence < preview.essence)
+        }
+    }
+
+    private func constructionActionFootnote(_ preview: PhysicalGearCraftingRules.Preview) -> String {
+        if let commitFailure { return commitFailure }
+        if store.state.base.essence < preview.essence {
+            return "Needs \(preview.essence - store.state.base.essence) more essence."
+        }
+        return "One persistent piece. Its selected samples and origins stay with it."
+    }
+
+    private func constructionActionHasFailure(_ preview: PhysicalGearCraftingRules.Preview) -> Bool {
+        commitFailure != nil || store.state.base.essence < preview.essence
     }
 
     private func commit(_ preview: PhysicalGearCraftingRules.Preview) {
@@ -1039,22 +1067,11 @@ private struct ReforgeSheet: View {
                         Text("The worst stock that clears the bar goes in first. Your best is left where it is.")
                     }
 
-                    Section {
-                        Button {
-                            if store.reforge(target) { dismiss() }
-                            else {
-                                commitFailure = "The piece, stock, or cost changed. Review the refreshed result."
-                            }
-                        } label: {
-                            Text("Reforge")
-                                .frame(maxWidth: .infinity, minHeight: 44)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(!store.readiness(of: target).isReady)
-                        if let commitFailure {
-                            Text(commitFailure).font(.caption).foregroundStyle(.orange)
-                        }
-                    }
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if SmithRules.requirement(for: target.catalogID, at: target.upgradeLevel) != nil {
+                    reforgeActionBar
                 }
             }
             .navigationTitle("The anvil")
@@ -1062,6 +1079,23 @@ private struct ReforgeSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             }
+        }
+    }
+
+    private var reforgeActionBar: some View {
+        PersistentActionBar(
+            message: commitFailure ?? "The piece, stock, and cost are checked again before reforging.",
+            messageTint: commitFailure == nil ? .secondary : .orange
+        ) {
+            Button {
+                if store.reforge(target) { dismiss() }
+                else { commitFailure = "The piece, stock, or cost changed. Review the refreshed result." }
+            } label: {
+                Text("Reforge").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(!store.readiness(of: target).isReady)
         }
     }
 

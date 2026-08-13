@@ -30,6 +30,35 @@ final class MakerStationPresentationTests: XCTestCase {
         XCTAssertEqual(MakerStationPresentationRules.recipeColumns(isAccessibilitySize: true), 2)
     }
 
+    func testTradingPostKeepsTradeActionOutsideScrollableDetails() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/TradingPostView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0) { tradeActionBar }"))
+        XCTAssertTrue(source.contains("Text(actionTitle).frame(maxWidth: .infinity)"))
+        XCTAssertFalse(source.contains("Section {\n                    Button(actionTitle)"))
+    }
+
+    func testBlacksmithKeepsConstructAndReforgeActionsOutsideScrollableDetails() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/BlacksmithView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("if let preview { constructionActionBar(preview) }"))
+        XCTAssertTrue(source.contains("Text(\"Construct · \\(preview.essence) essence\").frame(maxWidth: .infinity)"))
+        XCTAssertTrue(source.contains("reforgeActionBar"))
+        XCTAssertTrue(source.contains("Text(\"Reforge\").frame(maxWidth: .infinity)"))
+        XCTAssertTrue(source.contains("if let preview { rebuildActionBar(preview) }"))
+        XCTAssertTrue(source.contains("Text(\"Rebuild · \\(preview.essence) essence\").frame(maxWidth: .infinity)"))
+    }
+
     func testLandingReadinessCopyComesFromRulesPreview() throws {
         var state = GameState.newGame()
         state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)

@@ -96,19 +96,27 @@ private struct RecyclerPreviewSheet: View {
                 if let failure {
                     Section { Text(message(for: failure)).foregroundStyle(.red) }
                 }
-                Section {
-                    Button("Dismantle this piece", role: .destructive) {
-                        let result = store.recycle(preview)
-                        if result == .committed { dismiss() } else { failure = result }
-                    }
-                    .frame(minHeight: 44)
-                } footer: {
-                    Text("The selected piece is consumed only by a successful atomic recovery.")
-                }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) { dismantleActionBar }
             .navigationTitle("Recovery preview")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        }
+    }
+
+    private var dismantleActionBar: some View {
+        PersistentActionBar(
+            message: "The selected piece is consumed only by a successful atomic recovery."
+        ) {
+            Button(role: .destructive) {
+                let result = store.recycle(preview)
+                if result == .committed { dismiss() } else { failure = result }
+            } label: {
+                Text("Dismantle this piece").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .tint(.red)
         }
     }
 

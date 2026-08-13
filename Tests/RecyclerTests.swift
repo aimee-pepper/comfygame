@@ -2,6 +2,19 @@ import XCTest
 @testable import Bookbinder
 
 final class RecyclerTests: XCTestCase {
+    func testRecoveryPreviewKeepsDestructiveActionOutsideScrollableDetails() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/RecyclerView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0) { dismantleActionBar }"))
+        XCTAssertTrue(source.contains("Text(\"Dismantle this piece\").frame(maxWidth: .infinity)"))
+        XCTAssertFalse(source.contains("Section {\n                    Button(\"Dismantle this piece\""))
+    }
+
     private func sample(_ kind: MaterialKind = .hide, grade: Double,
                         source: String) -> MaterialSample {
         MaterialSample(kind: kind,

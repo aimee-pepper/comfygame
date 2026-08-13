@@ -290,3 +290,26 @@ enum Palette {
         UIColor(red: Double(red) / 255, green: Double(green) / 255, blue: Double(blue) / 255, alpha: alpha)
     }
 }
+
+/// A compact, persistent decision surface for ordinary-phone detail and transaction screens.
+/// Scrollable evidence stays above it; the action and its current truth remain in reach.
+struct PersistentActionBar<Actions: View>: View {
+    let message: String
+    var messageTint: Color = .secondary
+    @ViewBuilder let actions: () -> Actions
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            actions()
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(messageTint)
+                .lineLimit(2)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .background(.bar)
+        .overlay(alignment: .top) { Divider() }
+    }
+}

@@ -354,40 +354,8 @@ private struct SpilloverDetailSheet: View {
                                    ? "No longer waiting" : ItemGridLocation.waiting.displayName)
                     if !displaySpilled.detail.isEmpty { Text(displaySpilled.detail) }
                 }
-                Section {
-                    if store.state.base.inventory.isFull {
-                        Button("Make room") { isMakingRoom = true }
-                    } else {
-                        Button("Store it") {
-                            guard let currentSpilled,
-                                  case .allowed(let quote) = store.storeSpilledQuote(currentSpilled)
-                            else {
-                                refusal = "The waiting pile or Storehouse changed. Review it and try again."
-                                return
-                            }
-                            switch store.storeSpilled(quote) {
-                            case .committed: dismiss()
-                            case .refused(let message): refusal = message
-                            }
-                        }
-                    }
-                    Button("Throw away", role: .destructive) {
-                        guard let currentSpilled,
-                              case .allowed(let quote) = store.discardSpilledQuote(currentSpilled)
-                        else {
-                            refusal = "The waiting pile changed. Review it and try again."
-                            return
-                        }
-                        switch store.discardSpilled(quote) {
-                        case .committed: dismiss()
-                        case .refused(let message): refusal = message
-                        }
-                    }
-                }
-                if let refusal {
-                    Section { Text(refusal).foregroundStyle(.red) }
-                }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) { sortingActionBar }
             .navigationTitle(spilled.identified ? spilled.displayName : "Unknown item")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -396,6 +364,59 @@ private struct SpilloverDetailSheet: View {
             .sheet(isPresented: $isMakingRoom) {
                 SwapSheet(spilled: spilled).environmentObject(store)
             }
+        }
+    }
+
+    private var sortingActionBar: some View {
+        PersistentActionBar(message: refusal ?? "Nothing changes until one of these actions succeeds.",
+                            messageTint: refusal == nil ? .secondary : .red) {
+            HStack(spacing: 10) {
+                Button(role: .destructive, action: discard) {
+                    Text("Throw away").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.red)
+
+                if store.state.base.inventory.isFull {
+                    Button { isMakingRoom = true } label: {
+                        Text("Make room").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                } else {
+                    Button(action: storeCurrentItem) {
+                        Text("Store it").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+            .controlSize(.large)
+            .disabled(currentSpilled == nil)
+        }
+    }
+
+    private func storeCurrentItem() {
+        guard let currentSpilled,
+              case .allowed(let quote) = store.storeSpilledQuote(currentSpilled)
+        else {
+            refusal = "The waiting pile or Storehouse changed. Review it and try again."
+            return
+        }
+        switch store.storeSpilled(quote) {
+        case .committed: dismiss()
+        case .refused(let message): refusal = message
+        }
+    }
+
+    private func discard() {
+        guard let currentSpilled,
+              case .allowed(let quote) = store.discardSpilledQuote(currentSpilled)
+        else {
+            refusal = "The waiting pile changed. Review it and try again."
+            return
+        }
+        switch store.discardSpilled(quote) {
+        case .committed: dismiss()
+        case .refused(let message): refusal = message
         }
     }
 }
@@ -506,25 +527,33 @@ private struct SwapStoredDetail: View {
                                    ? "No longer stored" : ItemGridLocation.stored.displayName)
                     if !displayStored.detail.isEmpty { Text(displayStored.detail) }
                 }
-                Section {
-                    Button("Move this to waiting and store \(spilled.displayName)") {
-                        switch confirm() {
-                        case .committed:
-                            onCommitted()
-                            dismiss()
-                        case .refused(let message): refusal = message
-                        }
-                    }
-                } footer: {
-                    Text("Nothing is discarded. This piece returns to the waiting pile.")
-                }
-                if let refusal {
-                    Section { Text(refusal).foregroundStyle(.red) }
-                }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) { swapActionBar }
             .navigationTitle(stored.identified ? stored.displayName : "Unknown item")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        }
+    }
+
+    private var swapActionBar: some View {
+        PersistentActionBar(message: refusal ?? "Nothing is discarded. This piece returns to the waiting pile.",
+                            messageTint: refusal == nil ? .secondary : .red) {
+            Button(action: commitSwap) {
+                Text("Move this to waiting and store \(spilled.displayName)")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(currentStored == nil)
+        }
+    }
+
+    private func commitSwap() {
+        switch confirm() {
+        case .committed:
+            onCommitted()
+            dismiss()
+        case .refused(let message): refusal = message
         }
     }
 }

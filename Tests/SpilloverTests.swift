@@ -5,6 +5,20 @@ import XCTest
 /// sorts it, at home, with full information.
 @MainActor
 final class SpilloverTests: XCTestCase {
+    func testStorehouseSortingActionsRemainOutsideScrollableDetails() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0) { sortingActionBar }"))
+        XCTAssertTrue(source.contains(".safeAreaInset(edge: .bottom, spacing: 0) { swapActionBar }"))
+        XCTAssertTrue(source.contains("Text(\"Throw away\").frame(maxWidth: .infinity)"))
+        XCTAssertTrue(source.contains("Button(action: commitSwap)"))
+    }
+
 
     func testBankingAFullStorehouseSpillsRatherThanDrops() {
         let store = makeStore()

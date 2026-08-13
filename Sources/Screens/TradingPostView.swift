@@ -251,24 +251,38 @@ private struct TradingPostListingSheet: View {
                         }
                     }
                 }
-                Section {
-                    Button(actionTitle) { commit() }
-                        .disabled(!listing.action.isAvailable || cannotAfford)
-                        .frame(minHeight: 44)
-                } footer: {
-                    if !listing.action.isAvailable {
-                        Text("This stock is visible, but its capacity-safe purchase path is not available yet.")
-                    } else if cannotAfford {
-                        Text("You need \(totalPrice - store.state.base.goldCoins) more gold.")
-                    } else {
-                        Text("The exact stock and price will be checked again before anything changes.")
-                    }
-                }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) { tradeActionBar }
             .navigationTitle(listing.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         }
+    }
+
+    private var tradeActionBar: some View {
+        PersistentActionBar(message: actionFootnote,
+                            messageTint: actionFootnoteIsFailure ? .red : .secondary) {
+            Button { commit() } label: {
+                Text(actionTitle).frame(maxWidth: .infinity)
+            }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(!listing.action.isAvailable || cannotAfford)
+        }
+    }
+
+    private var actionFootnote: String {
+        if !listing.action.isAvailable {
+            return "This stock is visible, but its capacity-safe purchase path is not available yet."
+        }
+        if cannotAfford {
+            return "You need \(totalPrice - store.state.base.goldCoins) more gold."
+        }
+        return "Stock and price are checked again before anything changes."
+    }
+
+    private var actionFootnoteIsFailure: Bool {
+        !listing.action.isAvailable || cannotAfford
     }
 
     private var totalPrice: Int { quantity * listing.unitPrice }
