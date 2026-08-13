@@ -521,6 +521,10 @@ struct BalancingView: View {
                                       id: CombatDerivedStatsRules.Node.footwork)
                 debugCombatNodeToggle("Ghost · first direct attack misses once",
                                       id: CombatDerivedStatsRules.Node.ghost)
+                debugCombatNodeToggle("Feint · +10 evasion after direct attack",
+                                      id: CombatDerivedStatsRules.Node.feint)
+                debugCombatNodeToggle("Untouchable · targeted misses build +5 evasion",
+                                      id: CombatDerivedStatsRules.Node.untouchable)
                 Picker("Binder Insulation", selection: debugBinderInsulationChoice) {
                     Text("Not owned").tag(EmanationKind?.none)
                     ForEach(EmanationKind.allCases, id: \.self) { kind in
@@ -552,6 +556,10 @@ struct BalancingView: View {
                                                  id: CombatDerivedStatsRules.Node.footwork)
                         debugCompanionNodeToggle("Ghost · one guaranteed miss", index: index,
                                                  id: CombatDerivedStatsRules.Node.ghost)
+                        debugCompanionNodeToggle("Feint · +10 after direct attack", index: index,
+                                                 id: CombatDerivedStatsRules.Node.feint)
+                        debugCompanionNodeToggle("Untouchable · targeted misses build +5", index: index,
+                                                 id: CombatDerivedStatsRules.Node.untouchable)
                         Picker("\(name) Insulation", selection: debugCompanionInsulationChoice(index)) {
                             Text("Not owned").tag(EmanationKind?.none)
                             ForEach(EmanationKind.allCases, id: \.self) { kind in
@@ -579,7 +587,7 @@ struct BalancingView: View {
                         case .companion(let index): (settings.debugTuning.debugCombatV2CompanionNodeIDs[index] ?? []).contains(CombatDerivedStatsRules.Node.ghost)
                         case .foe: false
                         }
-                        Text("\(debugActorName(entry.actor)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "") = \(Int(entry.total * 100))% · Ghost \(ghostOwned ? "ready" : "not owned")")
+                        Text("\(debugActorName(entry.actor)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "") = \(Int(entry.total * 100))% · frozen ownership: Ghost \(ghostOwned ? "owned" : "not owned"), Feint \(entry.ownsFeint == true ? "owned" : "not owned"), Untouchable \(entry.ownsUntouchable == true ? "owned" : "not owned")")
                             .font(.caption.monospacedDigit())
                     }
                     Text("Next encounter Insulation")

@@ -117,6 +117,8 @@ enum CombatDerivedStatsRules {
         static let bulwark: CombatNodeID = "combat.defense.protection.bulwark"
         static let shieldwall: CombatNodeID = "combat.defense.protection.shieldwall"
         static let footwork: CombatNodeID = "combat.defense.evasion.footwork"
+        static let feint: CombatNodeID = "combat.defense.evasion.feint"
+        static let untouchable: CombatNodeID = "combat.defense.evasion.untouchable"
         static let ghost: CombatNodeID = "combat.defense.evasion.ghost"
         static let lightFrame: CombatNodeID = "combat.defense.evasion.light_frame"
         static let insulation: CombatNodeID = "combat.craft.emanation.insulation"
@@ -207,7 +209,9 @@ enum CombatDerivedStatsRules {
             let components: [EncounterState.DebugV2EvasionReceipt.Component] =
                 owned.contains(Node.footwork) ? [.init(nodeID: Node.footwork, amount: 0.06)] : []
             return .init(actor: actor, characterEvasion: CharacterRules.evasion(stats),
-                         components: components)
+                         components: components,
+                         ownsFeint: owned.contains(Node.feint),
+                         ownsUntouchable: owned.contains(Node.untouchable))
         }
         return .init(entries: entries)
     }

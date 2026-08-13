@@ -91,8 +91,18 @@ struct EncounterView: View {
                                     let footwork = entry.components.first {
                                         $0.nodeID == CombatDerivedStatsRules.Node.footwork
                                     }?.amount ?? 0
-                                    Text("\(CombatRules.actorName(entry.actor, encounter: encounter)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "") = \(Int(entry.total * 100))%")
-                                        .font(.caption.monospacedDigit())
+                                    let feint = encounter.feintActive?.contains(entry.actor) == true
+                                    let untouchable = encounter.untouchableStates?[entry.actor]
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("\(CombatRules.actorName(entry.actor, encounter: encounter)) · base \(Int(entry.characterEvasion * 100))%\(footwork > 0 ? " + Footwork 6%" : "")")
+                                        if entry.ownsFeint == true {
+                                            Text("Feint · \(feint ? "+10% active" : "inactive")")
+                                        }
+                                        if entry.ownsUntouchable == true {
+                                            Text("Untouchable · +\(untouchable?.percentagePoints ?? 0)% · targeted \(untouchable?.targetedDirectCount ?? 0) · landed \(untouchable?.landedDirectCount ?? 0)")
+                                        }
+                                    }
+                                    .font(.caption.monospacedDigit())
                                 }
                                 ForEach(Array(encounter.evasionAttempts.suffix(8).enumerated()), id: \.offset) { _, attempt in
                                     Text("\(CombatRules.actorName(attempt.actor, encounter: encounter)) · \(attempt.resolution.rawValue) · \(Int(attempt.finalChance * 100))%\(attempt.roll.map { " · roll \(String(format: "%.3f", $0))" } ?? " · no RNG")")

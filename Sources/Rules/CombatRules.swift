@@ -99,7 +99,7 @@ enum CombatRules {
             }
             finalizedInitiative = receipt
         }
-        return EncounterState(
+        var result = EncounterState(
             id: id,
             foes: foes,
             partyNames: names,
@@ -116,6 +116,13 @@ enum CombatRules {
             partyRanks: partyRanks,
             log: opening
         )
+        if let evasion = debugV2Evasion {
+            result.feintActive = []
+            result.untouchableStates = Dictionary(uniqueKeysWithValues: evasion.entries.compactMap {
+                $0.ownsUntouchable == true ? ($0.actor, .init()) : nil
+            })
+        }
+        return result
     }
 
     // MARK: Party numbers
@@ -276,6 +283,7 @@ enum CombatRules {
     /// Guaranteed receipts consume before probability and therefore consume no RNG.
     static func resolvePartyMiss(_ actor: Combatant, in state: GameState, run: inout WorldRun,
                                  encounter: inout EncounterState) -> Bool {
+        normalizeV2EvasionState(&encounter)
         if encounter.ghostEvasionAvailable == nil {
             // One-time adoption for tolerant mid-fight saves. A modern empty set is deliberately
             // distinct and must never remint a consumed Ghost on relaunch.
@@ -290,7 +298,16 @@ enum CombatRules {
         if encounter.debugV2Evasion != nil {
             // An incomplete/corrupt v2 receipt fails closed instead of mixing in mutable Base data.
             character = frozen?.characterEvasion ?? 0
-            components = frozen?.components ?? []
+            var active = frozen?.components ?? []
+            if frozen?.ownsFeint == true, encounter.feintActive?.contains(actor) == true {
+                active.append(.init(nodeID: CombatDerivedStatsRules.Node.feint, amount: 0.10))
+            }
+            if frozen?.ownsUntouchable == true,
+               let points = encounter.untouchableStates?[actor]?.percentagePoints, points > 0 {
+                active.append(.init(nodeID: CombatDerivedStatsRules.Node.untouchable,
+                                    amount: Double(points) / 100))
+            }
+            components = active
         } else {
             character = stats(of: actor, in: state).map(CharacterRules.evasion) ?? 0
             let legacy = loadout(of: actor, in: state).evasion
@@ -322,6 +339,38 @@ enum CombatRules {
         let missed = roll < chance
         record(missed ? .probabilityMiss : .probabilityHit, roll: roll, missed: missed)
         return missed
+    }
+
+    /// One-time adoption for the atomic Feint/Untouchable receipt revision. Receipts that predate
+    /// these ownership bits derive no owners; a modern explicit empty collection stays spent/empty.
+    private static func normalizeV2EvasionState(_ encounter: inout EncounterState) {
+        guard let receipt = encounter.debugV2Evasion else { return }
+        if encounter.feintActive == nil { encounter.feintActive = [] }
+        if encounter.untouchableStates == nil {
+            encounter.untouchableStates = Dictionary(uniqueKeysWithValues: receipt.entries.compactMap {
+                $0.ownsUntouchable == true ? ($0.actor, .init()) : nil
+            })
+        }
+    }
+
+    private static func recordUntouchableTarget(_ actor: Combatant, isForcedOpening: Bool,
+                                                 encounter: inout EncounterState) {
+        guard encounter.debugV2Evasion?.entry(for: actor)?.ownsUntouchable == true,
+              encounter.untouchableStates != nil else { return }
+        // Opening attacks can reset an existing stack when they land, but their misses are not an
+        // ordinary-round achievement and therefore never enter the growth counters.
+        guard !isForcedOpening else { return }
+        encounter.untouchableStates?[actor, default: .init()].targetedDirectCount += 1
+    }
+
+    private static func recordUntouchableLanding(_ actor: Combatant, isForcedOpening: Bool,
+                                                  encounter: inout EncounterState) {
+        guard encounter.debugV2Evasion?.entry(for: actor)?.ownsUntouchable == true,
+              encounter.untouchableStates != nil else { return }
+        if !isForcedOpening {
+            encounter.untouchableStates?[actor, default: .init()].landedDirectCount += 1
+        }
+        encounter.untouchableStates?[actor]?.percentagePoints = 0
     }
 
     static func damageTaken(_ raw: Int, by actor: Combatant, in state: GameState,
@@ -538,13 +587,15 @@ enum CombatRules {
     /// attack. So each of these reads something the creature system already computes — its
     /// covering, its armour, what it gives off — and is worth reaching for exactly when that
     /// reading is bad news.
+    @discardableResult
     private static func use(_ skill: SkillDef, by actor: Combatant,
                             on foeID: InstanceID?, ally: Combatant?,
                             run: inout WorldRun, encounter: inout EncounterState,
                             weaponKind: DamageKind?, stats: CharacterStats?,
                             standingBack: Bool, reach: Reach,
-                            state: inout GameState) {
+                            state: inout GameState) -> Bool? {
         let foe = foeID.flatMap { id in encounter.foes.first { $0.id == id && $0.isAlive } }
+        let committedDirectAttack = isDirectAttack(skill.kind) && foe != nil
         // **Wit is what a skill is worth in your hands** (session 17 §1) — potency here, and the
         // cooldown at the bottom of this function.
         let power = stats.map { CharacterRules.skillPower(skill.power, $0) } ?? skill.power
@@ -552,7 +603,7 @@ enum CombatRules {
 
         switch skill.kind {
         case .damage:
-            guard let foe else { return }
+            guard let foe else { return nil }
             strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
                    run: &run, encounter: &encounter, verb: skill.name,
                    standingBack: standingBack, reachOfActor: reach)
@@ -565,7 +616,7 @@ enum CombatRules {
         case .armourIgnoring:
             // **Pry.** Goes under the plate entirely, and hits for very little. The answer to a
             // bulwark whose armour is eating four fifths of every honest swing.
-            guard let foe else { return }
+            guard let foe else { return nil }
             strike(foe.id, damage: power + debugV2WeaponTechniqueBonus(for: actor, kind: .pierce,
                                                                        encounter: encounter),
                    by: actor, kind: .pierce,
@@ -574,7 +625,7 @@ enum CombatRules {
 
         case .overbear:
             // **Overbear.** All your weight behind it, and you're out of position afterwards.
-            guard let foe else { return }
+            guard let foe else { return nil }
             strike(foe.id, damage: power + debugV2WeaponTechniqueBonus(for: actor, kind: .crush,
                                                                        encounter: encounter),
                    by: actor, kind: .crush,
@@ -586,7 +637,7 @@ enum CombatRules {
         case .bleed:
             // **Flense.** Scales with how much covering there is to open — nothing on a plated
             // thing, a great deal on something shaggy. The mirror of the creature system's own rend.
-            guard let foe else { return }
+            guard let foe else { return nil }
             let purchase = (foe.traits?.covering.insulation ?? 0) / Tuning.Pressure.scaleMaximum
             let perRound = max(1, Int((Double(power) * purchase).rounded()))
             encounter.foeBleeds[foe.id] = BleedState(damage: perRound, rounds: skill.rounds)
@@ -597,7 +648,7 @@ enum CombatRules {
         case .reveal:
             // **Sight.** The covering word is what the whole damage triangle is read off, and
             // without this you only learn it by taking a bad trade first.
-            guard let foe else { return }
+            guard let foe else { return nil }
             encounter.revealed.insert(foe.id)
             remember(foe, in: &state.reality.discovery, runIndex: run.runIndex)
             let covering = foe.coveringWord ?? "nothing much"
@@ -624,14 +675,14 @@ enum CombatRules {
 
         case .taunt:
             // **Draw Off.** The only way to take a hit meant for somebody else.
-            guard let foe else { return }
+            guard let foe else { return nil }
             encounter.taunts[foe.id] = skill.rounds
             encounter.note("\(foe.stats.displayName) turns on you.")
 
         case .snuff:
             // **Snuff.** Puts out whatever it was giving off — which is what was doing damage every
             // round whether you touched it or not.
-            guard let foe else { return }
+            guard let foe else { return nil }
             encounter.snuffed.insert(foe.id)
             encounter.note("\(foe.stats.displayName) goes dark.")
 
@@ -674,7 +725,7 @@ enum CombatRules {
         case .read:
             // **Read.** A bestiary entry without a kill, which makes collecting a thing you can do
             // *instead* of killing rather than only by killing.
-            guard let foe else { return }
+            guard let foe else { return nil }
             encounter.revealed.insert(foe.id)
             remember(foe, in: &state.reality.discovery, runIndex: run.runIndex)
             encounter.note("You take \(foe.stats.displayName) in properly. You'll know it again.")
@@ -683,7 +734,7 @@ enum CombatRules {
 
         case .sunder:
             // **Shatter.** The one thing that changes what a foe *is* for the rest of the fight.
-            guard let foe, let index = encounter.foes.firstIndex(where: { $0.id == foe.id }) else { return }
+            guard let foe, let index = encounter.foes.firstIndex(where: { $0.id == foe.id }) else { return nil }
             let taken = min(encounter.foes[index].stats.armour, max(1, power))
             encounter.foes[index].stats.armour -= taken
             encounter.note("\(skill.name). \(foe.stats.displayName) is \(taken) less protected than it was.")
@@ -691,7 +742,7 @@ enum CombatRules {
         case .execute:
             // **Finish.** Large, and only against something already nearly gone — so it rewards
             // having done the work rather than replacing it.
-            guard let foe else { return }
+            guard let foe else { return nil }
             let share = Double(foe.currentHP) / Double(max(1, foe.stats.maxHP))
             let scaled = share <= Tuning.TreeSkills.finishThreshold ? power : power / 3
             strike(foe.id, damage: scaled, by: actor, kind: skill.damage ?? weaponKind,
@@ -706,7 +757,7 @@ enum CombatRules {
         case .ambush:
             // A conditional zero-turn direct attack. The extra-turn debt keeps the ordinary
             // schedule on this actor after `perform` hands on; the receipt survives relaunch.
-            guard let foe, !encounter.openingAttackConsumed.contains(actor) else { return }
+            guard let foe, !encounter.openingAttackConsumed.contains(actor) else { return nil }
             encounter.openingAttackConsumed.insert(actor)
             encounter.extraTurns[actor, default: 0] += 1
             strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
@@ -739,7 +790,7 @@ enum CombatRules {
 
         case .elemental:
             // **Emanation Strike.** The answer to a warded foe: emanated harm delivered by a blade.
-            guard let foe else { return }
+            guard let foe else { return nil }
             strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
                    run: &run, encounter: &encounter, verb: skill.name,
                    standingBack: standingBack, reachOfActor: reach)
@@ -750,6 +801,7 @@ enum CombatRules {
         let cooling = stats.map { CharacterRules.cooldown(skill.cooldownRounds, $0) } ?? skill.cooldownRounds
         encounter.cooldowns[cooldownKey(skill, for: actor)] = cooling
         setCooldown(cooling, for: actor, in: &encounter)
+        return committedDirectAttack
     }
 
     /// A bestiary entry without a kill — which is what makes Read a real alternative to killing
@@ -949,6 +1001,8 @@ enum CombatRules {
     static func perform(_ action: CombatAction, by actor: Combatant, in state: inout GameState) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter, encounter.outcome == nil
         else { return }
+        guard encounter.current == actor, isAlive(actor, in: run) else { return }
+        normalizeV2EvasionState(&encounter)
         if case .skill(let id, _, _) = action {
             guard let skill = ContentCatalog.shared.skill(id),
                   skills(for: actor, in: state).contains(skill),
@@ -960,25 +1014,34 @@ enum CombatRules {
             }
         }
 
+        let actionCost = combatActionCost(action)
+        let feintWasActive = encounter.feintActive?.contains(actor) == true
+        var outcome: CommittedActionOutcome = .rejected
+
         switch action {
         case .attack(let foeID):
-            strike(foeID, damage: baseAttack(of: actor, in: state), by: actor,
+            if strike(foeID, damage: baseAttack(of: actor, in: state), by: actor,
                    kind: damageKind(for: actor, in: state), run: &run, encounter: &encounter,
                    standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
                    reachOfActor: reach(for: actor, in: state),
                    coating: coating(of: actor, in: state),
                    breaking: wildRule(for: actor, in: state),
                    innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
-                   allowsStagger: true)
+                   allowsStagger: true) {
+                outcome = .committed(cost: actionCost, completedDirectAttack: true)
+            }
 
         case .skill(let id, let foeID, let allyID):
             if let skill = ContentCatalog.shared.skill(id), skills(for: actor, in: state).contains(skill),
                isReady(skill, for: actor, in: encounter) {
-                use(skill, by: actor, on: foeID, ally: allyID, run: &run, encounter: &encounter,
+                if let direct = use(skill, by: actor, on: foeID, ally: allyID,
+                    run: &run, encounter: &encounter,
                     weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
                     standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
-                    reach: reach(for: actor, in: state), state: &state)
+                    reach: reach(for: actor, in: state), state: &state) {
+                    outcome = .committed(cost: actionCost, completedDirectAttack: direct)
+                }
             }
 
         case .damageSkill(let foeID):
@@ -986,24 +1049,31 @@ enum CombatRules {
             if let skill = skills(for: actor, in: state).first(where: {
                 $0.power > 0 && $0.kind != .heal && isReady($0, for: actor, in: encounter)
             }) {
-                use(skill, by: actor, on: foeID, ally: nil, run: &run, encounter: &encounter,
+                if let direct = use(skill, by: actor, on: foeID, ally: nil,
+                    run: &run, encounter: &encounter,
                     weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
                     standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
-                    reach: reach(for: actor, in: state), state: &state)
+                    reach: reach(for: actor, in: state), state: &state) {
+                    outcome = .committed(cost: .normal, completedDirectAttack: direct)
+                }
             }
 
         case .healSkill(let ally):
             if let skill = ready(.heal, for: actor, in: encounter, state: state) {
-                use(skill, by: actor, on: nil, ally: ally, run: &run, encounter: &encounter,
+                if let direct = use(skill, by: actor, on: nil, ally: ally, run: &run, encounter: &encounter,
                     weaponKind: damageKind(for: actor, in: state),
                     stats: stats(of: actor, in: state),
                     standingBack: rank(of: actor, in: encounter, fallback: state) == .back,
-                    reach: reach(for: actor, in: state), state: &state)
+                    reach: reach(for: actor, in: state), state: &state) {
+                    outcome = .committed(cost: .normal, completedDirectAttack: direct)
+                }
             }
 
         case .useItem(let stackID, let ally):
-            useItem(stackID, on: ally, run: &run, encounter: &encounter)
+            if useItem(stackID, on: ally, run: &run, encounter: &encounter) {
+                outcome = .committed(cost: .normal, completedDirectAttack: false)
+            }
 
         case .flee:
             // Always succeeds — it costs the run, not a dice roll. Vanish pays for one Withdraw
@@ -1016,6 +1086,18 @@ enum CombatRules {
                 encounter.note("The party withdraws. The world notices.")
             }
             encounter.outcome = .fled
+            outcome = .committed(cost: .normal, completedDirectAttack: false)
+        }
+
+        guard case .committed(let committedCost, let completedDirectAttack) = outcome else { return }
+
+        // Feint lasts through the consequences of the next normal-cost action. Expire the receipt
+        // that existed at action start, then let a direct action arm/refresh the next one.
+        if committedCost == .normal, feintWasActive { encounter.feintActive?.remove(actor) }
+        if completedDirectAttack,
+           encounter.debugV2Evasion?.entry(for: actor)?.ownsFeint == true,
+           encounter.feintActive != nil {
+            encounter.feintActive?.insert(actor)
         }
 
         // The FF12 rule: an override covers that turn and then hands control back.
@@ -1025,13 +1107,35 @@ enum CombatRules {
 
         run.activeEncounter = encounter
         state.worlds.activeRun = run
-        let wasZeroTurnOpeningAttack: Bool = if case .skill(let id, _, _) = action {
-            ContentCatalog.shared.skill(id)?.kind == .ambush
-        } else { false }
         if encounter.outcome == nil {
-            advanceTurn(in: &state, completedAction: !wasZeroTurnOpeningAttack)
+            advanceTurn(in: &state, completedAction: committedCost == .normal)
         }
         checkOutcome(in: &state)
+    }
+
+    private static func isDirectAttack(_ kind: SkillDef.Kind) -> Bool {
+        switch kind {
+        case .damage, .armourIgnoring, .overbear, .execute, .ambush, .elemental: true
+        default: false
+        }
+    }
+
+    private enum CombatActionCost { case zero, normal }
+
+    private enum CommittedActionOutcome {
+        case rejected
+        case committed(cost: CombatActionCost, completedDirectAttack: Bool)
+    }
+
+    /// One authority for turn cost. Extra-turn implementation details must not decide whether a
+    /// temporary receipt survives an action.
+    private static func combatActionCost(_ action: CombatAction) -> CombatActionCost {
+        guard case .skill(let id, _, _) = action,
+              let kind = ContentCatalog.shared.skill(id)?.kind else { return .normal }
+        return switch kind {
+        case .ambush, .quicken, .reposition: .zero
+        default: .normal
+        }
     }
 
     private static func baseAttack(of actor: Combatant, in state: GameState) -> Int {
@@ -1062,6 +1166,7 @@ enum CombatRules {
                       reach: reach(for: .binder, in: state), armour: foe.stats.armour))
     }
 
+    @discardableResult
     private static func strike(_ foeID: InstanceID,
                                damage: Int,
                                by actor: Combatant,
@@ -1078,9 +1183,9 @@ enum CombatRules {
                                /// same reason `coating` is.
                                breaking: WildRule? = nil,
                                innateStatus: String? = nil,
-                               allowsStagger: Bool = false) {
+                               allowsStagger: Bool = false) -> Bool {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
-        else { return }
+        else { return false }
 
         let foe = encounter.foes[index]
         let name = foe.stats.displayName
@@ -1091,13 +1196,13 @@ enum CombatRules {
         let dazzled = has(.dazzle, actor, in: encounter) ? Tuning.Encounter.dazzleMissChance : 0
         if dazzled > 0, run.rng.chance(dazzled) {
             encounter.note("\(who) \(actor == .binder ? "swing" : "swings") at where \(name) was.")
-            return
+            return true
         }
 
         // **Sleek and small is hard to hit.** A miss is the price of chasing something built to run.
         if run.rng.chance(foe.stats.evasion) {
             encounter.note("\(who) \(actor == .binder ? "swing" : "swings") at \(name) and find\(actor == .binder ? "" : "s") nothing there.")
-            return
+            return true
         }
 
         // **The matchup.** What you're swinging against what it's wearing, then armour on what's
@@ -1217,6 +1322,7 @@ enum CombatRules {
             }
         }
         if !encounter.foes[index].isAlive { encounter.note("\(name.capitalisedSentence) goes down.") }
+        return true
     }
 
     private static func armourWord(for foe: FoeState) -> String {
@@ -1259,16 +1365,17 @@ enum CombatRules {
         encounter.note("\(actorName(healer, encounter: encounter)) — \(source) — restores \(amount) to \(actorName(ally, encounter: encounter)).")
     }
 
+    @discardableResult
     private static func useItem(_ stackID: InstanceID,
                                 on ally: Combatant,
                                 run: inout WorldRun,
-                                encounter: inout EncounterState) {
+                                encounter: inout EncounterState) -> Bool {
         guard let index = run.satchelItems.stacks.firstIndex(where: { $0.id == stackID }),
               let item = ContentCatalog.shared.item(run.satchelItems.stacks[index].catalogID),
               item.kind == .consumable
-        else { return }
+        else { return false }
 
-        guard let effect = item.consumable else { return }
+        guard let effect = item.consumable else { return false }
         switch effect.effect {
         case .heal:
             heal(ally, by: effect.potency, run: &run, encounter: &encounter,
@@ -1301,7 +1408,7 @@ enum CombatRules {
             encounter.preparedCoatings[ally] = coating
             encounter.note("\(item.name) is ready on \(actorName(ally, encounter: encounter))'s weapon.")
         case .restoreStability, .returnHome, .lightWorld, .farsight, .identifyCurio, .lureCreature:
-            return
+            return false
         }
         // Through the bin rather than by poking `count`, so a stack that also carries samples
         // can't have its count drift away from what's actually in it.
@@ -1309,6 +1416,7 @@ enum CombatRules {
         if run.satchelItems.stacks[index].isEmpty {
             run.satchelItems.stacks.remove(at: index)
         }
+        return true
     }
 
     private static func clearBleed(on ally: Combatant, encounter: inout EncounterState) {
@@ -1404,6 +1512,19 @@ enum CombatRules {
     }
 
     static func startNewRound(_ encounter: inout EncounterState, run: WorldRun) {
+        normalizeV2EvasionState(&encounter)
+        if var states = encounter.untouchableStates {
+            for actor in states.keys {
+                guard var state = states[actor] else { continue }
+                if state.targetedDirectCount > 0, state.landedDirectCount == 0 {
+                    state.percentagePoints = min(20, state.percentagePoints + 5)
+                }
+                state.targetedDirectCount = 0
+                state.landedDirectCount = 0
+                states[actor] = state
+            }
+            encounter.untouchableStates = states
+        }
         encounter.roundNumber += 1
         applyPendingStaggers(for: encounter.roundNumber, run: run, encounter: &encounter)
         encounter.apexTargetsThisRound.removeAll()
@@ -1695,10 +1816,15 @@ enum CombatRules {
             // **Not where the blow landed** (session 17 §1). Finesse on the party's side, the
             // mirror of the evasion creatures have had since they were generated.
             let isSingleTargetDirect = isFollowUp || foe.stats.delivery == .single
-            if isSingleTargetDirect,
-               resolvePartyMiss(target, in: state, run: &run, encounter: &encounter) {
-                encounter.note("\(foe.stats.displayName.capitalisedSentence) finds nothing where \(actorName(target, encounter: encounter).lowercased()) was.")
-                continue
+            if isSingleTargetDirect {
+                recordUntouchableTarget(target, isForcedOpening: !advancesOrdinarySchedule,
+                                        encounter: &encounter)
+                if resolvePartyMiss(target, in: state, run: &run, encounter: &encounter) {
+                    encounter.note("\(foe.stats.displayName.capitalisedSentence) finds nothing where \(actorName(target, encounter: encounter).lowercased()) was.")
+                    continue
+                }
+                recordUntouchableLanding(target, isForcedOpening: !advancesOrdinarySchedule,
+                                          encounter: &encounter)
             }
             var raw = Double(roll(around: foe.stats.attack, run: &run)) * share
             if grounded { raw *= 0.5 }

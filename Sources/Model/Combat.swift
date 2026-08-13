@@ -317,6 +317,9 @@ struct EncounterState: Codable, Equatable, Sendable {
             var actor: Combatant
             var characterEvasion: Double
             var components: [Component]
+            /// Optional for tolerant decoding of encounters frozen before these consumers existed.
+            var ownsFeint: Bool? = nil
+            var ownsUntouchable: Bool? = nil
             var total: Double { min(0.85, characterEvasion + components.reduce(0) { $0 + $1.amount }) }
         }
         var entries: [Entry]
@@ -342,6 +345,11 @@ struct EncounterState: Codable, Equatable, Sendable {
         var roll: Double?
         var resolution: Resolution
         var missed: Bool
+    }
+    struct UntouchableState: Codable, Equatable, Sendable {
+        var percentagePoints: Int = 0
+        var targetedDirectCount: Int = 0
+        var landedDirectCount: Int = 0
     }
     struct PendingStagger: Codable, Equatable, Sendable {
         var foeID: InstanceID
@@ -522,6 +530,9 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// One saved Ghost receipt per exact owner. `nil` means a legacy/unadopted encounter; an empty
     /// set is modern and spent, so relaunch cannot mint the guarantee again.
     var ghostEvasionAvailable: Set<Combatant>?
+    /// `nil` is legacy/unadopted. Modern empty state must stay empty across relaunch.
+    var feintActive: Set<Combatant>?
+    var untouchableStates: [Combatant: UntouchableState]?
     /// Bounded DEBUG/bug-report evidence from the authoritative final-target miss resolver.
     var evasionAttempts: [EvasionAttempt] = []
     var concealed: [Combatant: Int] = [:]
@@ -648,6 +659,9 @@ struct EncounterState: Codable, Equatable, Sendable {
         dodging = try c.decodeIfPresent([Combatant: Int].self, forKey: .dodging) ?? [:]
         ghostEvasionAvailable = try c.decodeIfPresent(Set<Combatant>.self,
                                                        forKey: .ghostEvasionAvailable)
+        feintActive = try c.decodeIfPresent(Set<Combatant>.self, forKey: .feintActive)
+        untouchableStates = try c.decodeIfPresent([Combatant: UntouchableState].self,
+                                                   forKey: .untouchableStates)
         evasionAttempts = try c.decodeIfPresent([EvasionAttempt].self,
                                                  forKey: .evasionAttempts) ?? []
         concealed = try c.decodeIfPresent([Combatant: Int].self, forKey: .concealed) ?? [:]

@@ -2119,7 +2119,7 @@ final class CombatTests: XCTestCase {
                 state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: fixture.weapon)
                 guard var run = state.worlds.activeRun else { return }
                 var orderRNG = SeededRNG(seed: 1)
-                run.activeEncounter = CombatRules.makeEncounter(
+                var encounter = CombatRules.makeEncounter(
                     id: InstanceID(rawValue: 2),
                     foes: [FoeState(id: foeID, traits: traits, stats: stats, currentHP: stats.maxHP)],
                     party: [.binder],
@@ -2130,6 +2130,10 @@ final class CombatTests: XCTestCase {
                         pierceBonus: CombatDerivedStatsRules.preMatchupAttackBonus(
                             ownedNodeIDs: fixture.nodes, weaponDamageKind: .pierce)),
                     rng: &orderRNG)
+                encounter.order = [.binder, .foe(foeID)]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                run.activeEncounter = encounter
                 state.worlds.activeRun = run
             }
             let receipt = try XCTUnwrap(store.activeEncounter?.debugV2BinderAttack)
@@ -2178,7 +2182,7 @@ final class CombatTests: XCTestCase {
                     guard var run = state.worlds.activeRun else { return }
                     var orderRNG = SeededRNG(seed: 2)
                     let ordinaryKind: DamageKind = fixture.weapon == "field_maul" ? .crush : .pierce
-                    run.activeEncounter = CombatRules.makeEncounter(
+                    var encounter = CombatRules.makeEncounter(
                         id: InstanceID(rawValue: 3),
                         foes: [FoeState(id: foeID, traits: traits, stats: stats, currentHP: stats.maxHP)],
                         party: [.binder],
@@ -2188,6 +2192,10 @@ final class CombatTests: XCTestCase {
                                 ownedNodeIDs: nodes, weaponDamageKind: .crush),
                             pierceBonus: CombatDerivedStatsRules.preMatchupAttackBonus(
                                 ownedNodeIDs: nodes, weaponDamageKind: .pierce)), rng: &orderRNG)
+                    encounter.order = [.binder, .foe(foeID)]
+                    encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                    encounter.turnIndex = 0
+                    run.activeEncounter = encounter
                     state.worlds.activeRun = run
                 }
                 let skill = try XCTUnwrap(ContentCatalog.shared.skill(fixture.skill))
@@ -2926,6 +2934,315 @@ final class CombatTests: XCTestCase {
                        frozen.ghostEvasionAvailable)
         XCTAssertEqual(resumed.worlds.activeRun?.activeEncounter?.debugV2Evasion,
                        frozen.debugV2Evasion)
+    }
+
+    func testFeintAndUntouchableOwnershipFreezeWithoutAura() throws {
+        var state = GameState.newGame()
+        while state.base.roster.count < 4 { state.base.roster.append(CompanionState()) }
+        state.base.activeParty = [0, 1, 2, 3]
+        let receipt = try XCTUnwrap(CombatDerivedStatsRules.debugEvasionReceipt(
+            enabled: true, party: CombatRules.party(of: state), in: state,
+            binderNodeIDs: [CombatDerivedStatsRules.Node.feint],
+            companionNodeIDs: [2: [CombatDerivedStatsRules.Node.untouchable]]))
+        XCTAssertEqual(receipt.entry(for: .binder)?.ownsFeint, true)
+        XCTAssertEqual(receipt.entry(for: .binder)?.ownsUntouchable, false)
+        XCTAssertEqual(receipt.entry(for: .companion(2))?.ownsUntouchable, true)
+        XCTAssertTrue([0, 1, 3].allSatisfy {
+            receipt.entry(for: .companion($0))?.ownsFeint == false
+                && receipt.entry(for: .companion($0))?.ownsUntouchable == false
+        })
+    }
+
+    func testFeintArmsAfterCommittedDirectMissRefreshesAndExpiresAfterNormalActionOnly() throws {
+        let store = inFight()
+        store.mutate("stage Feint action lifecycle") { state in
+            Self.learnEverything(&state)
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  let foe = encounter.foes.first else { return }
+            encounter.order = [.binder]
+            encounter.turnSlots = [.init(actor: .binder)]
+            encounter.turnIndex = 0
+            encounter.foes[0].stats.evasion = 1
+            encounter.foes[0].stats.maxHP = 500
+            encounter.foes[0].currentHP = 500
+            encounter.debugV2Evasion = .init(entries: [
+                .init(actor: .binder, characterEvasion: 0, components: [], ownsFeint: true,
+                      ownsUntouchable: false)
+            ])
+            encounter.feintActive = []
+            encounter.untouchableStates = [:]
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+
+            CombatRules.perform(.attack(foe: foe.id), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.feintActive, [.binder],
+                           "a committed direct miss still arms Feint")
+
+            // Quicken is zero-turn setup: it neither expires nor refreshes Feint.
+            CombatRules.perform(.skill("quicken"), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.feintActive, [.binder])
+
+            state.worlds.activeRun?.activeEncounter?.foes[0].stats.evasion = 0
+            CombatRules.perform(.attack(foe: foe.id), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.feintActive, [.binder],
+                           "a later direct action refreshes rather than stacks")
+
+            CombatRules.perform(.skill("brace"), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.feintActive, [],
+                           "the next normal-cost action expires Feint after its consequences")
+        }
+    }
+
+    func testUntouchableProductionRouteCountsOnlySingleDirectAndGrowsAtRoundBoundary() throws {
+        let store = inFight()
+        store.mutate("stage Untouchable direct miss") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  let foe = encounter.foes.first else { return }
+            run.rng = SeededRNG(seed: 41)
+            run.binderHP = 30
+            run.companionHP[0] = 0
+            encounter.order = [.foe(foe.id), .binder]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            encounter.foes[0].stats.delivery = .single
+            encounter.debugV2Evasion = .init(entries: [
+                .init(actor: .binder, characterEvasion: 1, components: [], ownsFeint: false,
+                      ownsUntouchable: true)
+            ])
+            encounter.ghostEvasionAvailable = []
+            encounter.dodging[.binder] = 1
+            encounter.feintActive = []
+            encounter.untouchableStates = [.binder: .init()]
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+            CombatRules.runAutomaticTurns(in: &state)
+
+            var after = state.worlds.activeRun!.activeEncounter!
+            XCTAssertEqual(after.untouchableStates?[.binder]?.targetedDirectCount, 1)
+            XCTAssertEqual(after.untouchableStates?[.binder]?.landedDirectCount, 0)
+            CombatRules.startNewRound(&after, run: state.worlds.activeRun!)
+            XCTAssertEqual(after.untouchableStates?[.binder]?.percentagePoints, 5)
+            XCTAssertEqual(after.untouchableStates?[.binder]?.targetedDirectCount, 0)
+            XCTAssertEqual(after.untouchableStates?[.binder]?.landedDirectCount, 0)
+        }
+    }
+
+    func testUntouchableLandedDirectResetsAndAreaNeverTouchesCounters() throws {
+        for delivery in [Delivery.single, .area, .multi] {
+            let store = inFight()
+            store.mutate("stage Untouchable \(delivery)") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                      let foe = encounter.foes.first else { return }
+                run.rng = SeededRNG(seed: 91)
+                run.binderHP = 30
+                run.companionHP[0] = 0
+                encounter.order = [.foe(foe.id), .binder]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.foes[0].stats.delivery = delivery
+                encounter.debugV2Evasion = .init(entries: [
+                    .init(actor: .binder, characterEvasion: 0, components: [], ownsFeint: false,
+                          ownsUntouchable: true)
+                ])
+                encounter.ghostEvasionAvailable = []
+                encounter.feintActive = []
+                encounter.untouchableStates = [.binder: .init(percentagePoints: 15)]
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                CombatRules.runAutomaticTurns(in: &state)
+            }
+            let saved = try XCTUnwrap(store.activeEncounter?.untouchableStates?[.binder])
+            if delivery == .single {
+                XCTAssertEqual(saved.targetedDirectCount, 1)
+                XCTAssertEqual(saved.landedDirectCount, 1)
+                XCTAssertEqual(saved.percentagePoints, 0)
+            } else {
+                XCTAssertEqual(saved, .init(percentagePoints: 15),
+                               "area/multi bypass both avoidance and Untouchable counters")
+            }
+        }
+    }
+
+    func testForcedOpeningCannotGrowUntouchableButLandedOpeningResetsIt() throws {
+        func staged(misses: Bool) throws -> EncounterState.UntouchableState {
+            let store = inFight()
+            store.mutate("stage forced opening Untouchable") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                      let foe = encounter.foes.first else { return }
+                run.rng = SeededRNG(seed: 71)
+                run.binderHP = 30
+                run.companionHP[0] = 0
+                encounter.order = [.binder, .foe(foe.id)]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+                encounter.turnIndex = 0
+                encounter.opening = .init(preContactDisclosed: false, initial: .creatureAmbush,
+                                          slipperyProbability: nil, slipperyRoll: nil,
+                                          slipperyPrevented: false, watchfulSuppressedOpening: false,
+                                          resolved: .creatureAmbush, pendingFoeActions: [foe.id])
+                encounter.foes[0].stats.delivery = .single
+                encounter.debugV2Evasion = .init(entries: [
+                    .init(actor: .binder, characterEvasion: misses ? 1 : 0, components: [],
+                          ownsFeint: false, ownsUntouchable: true)
+                ])
+                encounter.ghostEvasionAvailable = []
+                if misses { encounter.dodging[.binder] = 1 }
+                encounter.feintActive = []
+                encounter.untouchableStates = [.binder: .init(percentagePoints: 10)]
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                CombatRules.runAutomaticTurns(in: &state)
+                if var current = state.worlds.activeRun?.activeEncounter,
+                   let activeRun = state.worlds.activeRun {
+                    CombatRules.startNewRound(&current, run: activeRun)
+                    state.worlds.activeRun?.activeEncounter = current
+                }
+            }
+            return try XCTUnwrap(store.activeEncounter?.untouchableStates?[.binder])
+        }
+        XCTAssertEqual(try staged(misses: true).percentagePoints, 10,
+                       "forced-opening misses cannot award a pre-round step")
+        XCTAssertEqual(try staged(misses: false).percentagePoints, 0,
+                       "a landed forced-opening direct attack resets an existing stack")
+    }
+
+    func testFeintAndUntouchableModernStatePersistsWithoutRemintAfterReload() throws {
+        var encounter = EncounterState(id: .init(rawValue: 67), foes: [], order: [.binder],
+            debugV2Evasion: .init(entries: [
+                .init(actor: .binder, characterEvasion: 0.2, components: [], ownsFeint: true,
+                      ownsUntouchable: true)
+            ]))
+        encounter.feintActive = [.binder]
+        encounter.untouchableStates = [.binder: .init(percentagePoints: 20,
+                                                       targetedDirectCount: 2,
+                                                       landedDirectCount: 0)]
+        let resumed = try JSONDecoder().decode(EncounterState.self,
+                                                from: JSONEncoder().encode(encounter))
+        XCTAssertEqual(resumed.feintActive, [.binder])
+        XCTAssertEqual(resumed.untouchableStates, encounter.untouchableStates)
+
+        var rng = SeededRNG(seed: 68)
+        let enabledEmpty = CombatRules.makeEncounter(
+            id: .init(rawValue: 68), foes: [], party: [.binder],
+            debugV2Evasion: .init(entries: [
+                .init(actor: .binder, characterEvasion: 0.2, components: [], ownsFeint: false,
+                      ownsUntouchable: false)
+            ]), rng: &rng)
+        XCTAssertEqual(enabledEmpty.feintActive, [])
+        XCTAssertEqual(enabledEmpty.untouchableStates, [:],
+                       "enabled-empty freezes an explicit modern zero-state, distinct from legacy nil")
+    }
+
+    func testFinalTargetResolverConsumesFeintAndUntouchableExactlyOnceWithOneClamp() throws {
+        let state = GameState.newGame()
+        func resolve(owns: Bool, base: Double, points: Int) throws
+            -> EncounterState.EvasionAttempt {
+            var map = WorldMap(width: 1, height: 1, tiles: [Tile(isRevealed: true)],
+                               entry: .init(x: 0, y: 0))
+            map[.init(x: 0, y: 0)].content = .portal(isEntry: true)
+            var run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                               mapSeed: 991, rng: SeededRNG(seed: 991), map: map,
+                               playerPosition: .init(x: 0, y: 0), binderHP: 20)
+            var encounter = EncounterState(id: .init(rawValue: 991), foes: [], order: [.binder],
+                debugV2Evasion: .init(entries: [
+                    .init(actor: .binder, characterEvasion: base, components: [],
+                          ownsFeint: owns, ownsUntouchable: owns)
+                ]), ghostEvasionAvailable: [])
+            encounter.feintActive = [.binder]
+            encounter.untouchableStates = [.binder: .init(percentagePoints: points)]
+            _ = CombatRules.resolvePartyMiss(.binder, in: state, run: &run, encounter: &encounter)
+            return try XCTUnwrap(encounter.evasionAttempts.last)
+        }
+
+        let active = try resolve(owns: true, base: 0.50, points: 20)
+        XCTAssertEqual(active.components.map(\.nodeID), [CombatDerivedStatsRules.Node.feint,
+                                                         CombatDerivedStatsRules.Node.untouchable])
+        XCTAssertEqual(active.components.map(\.amount), [0.10, 0.20])
+        XCTAssertEqual(active.finalChance, 0.80, accuracy: 0.000_001,
+                       "the final-target resolver adds each live receipt exactly once")
+
+        let noOwnership = try resolve(owns: false, base: 0.50, points: 20)
+        XCTAssertTrue(noOwnership.components.isEmpty)
+        XCTAssertEqual(noOwnership.finalChance, 0.50, accuracy: 0.000_001,
+                       "enabled-empty ownership cannot consume persisted-looking dynamic state")
+        XCTAssertEqual(active.roll, noOwnership.roll, "the counterfactual uses the same one RNG draw")
+
+        let clamped = try resolve(owns: true, base: 0.70, points: 20)
+        XCTAssertEqual(clamped.finalChance, 0.85, accuracy: 0.000_001,
+                       "base + Feint + Untouchable is summed continuously and clamped once")
+    }
+
+    func testStaleDirectSelectionDoesNotArmExpireAdvanceOrMutate() throws {
+        let store = inFight()
+        store.mutate("stage stale Feint selection") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.order = [.binder]
+            encounter.turnSlots = [.init(actor: .binder)]
+            encounter.turnIndex = 0
+            encounter.debugV2Evasion = .init(entries: [
+                .init(actor: .binder, characterEvasion: 0, components: [], ownsFeint: true,
+                      ownsUntouchable: false)
+            ])
+            encounter.feintActive = [.binder]
+            encounter.untouchableStates = [:]
+            let stale = InstanceID(rawValue: UInt64.max)
+            let before = encounter
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+            CombatRules.perform(.attack(foe: stale), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter, before)
+        }
+    }
+
+    func testCommittedActionOutcomeSeparatesNormalNondirectFromRejectedActions() throws {
+        let store = inFight()
+        store.mutate("stage typed action outcomes") { state in
+            Self.learnEverything(&state)
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  let foe = encounter.foes.first else { return }
+            encounter.order = [.binder]
+            encounter.turnSlots = [.init(actor: .binder)]
+            encounter.turnIndex = 0
+            encounter.foes[0].currentHP = 500
+            encounter.foes[0].stats.maxHP = 500
+            encounter.debugV2Evasion = .init(entries: [
+                .init(actor: .binder, characterEvasion: 0, components: [], ownsFeint: true,
+                      ownsUntouchable: false)
+            ])
+            encounter.feintActive = [.binder]
+            encounter.untouchableStates = [:]
+            for skill in CombatRules.skills(for: .binder, in: state)
+                where skill.power > 0 && skill.id != "flense" {
+                encounter.cooldowns[CombatRules.cooldownKey(skill, for: .binder)] = 2
+            }
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+
+            CombatRules.perform(.damageSkill(foe: foe.id), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.feintActive, [],
+                           "Flense is a committed normal-cost non-direct action")
+            XCTAssertNotNil(state.worlds.activeRun?.activeEncounter?.foeBleeds[foe.id])
+
+            state.worlds.activeRun?.activeEncounter?.feintActive = [.binder]
+            state.worlds.activeRun?.activeEncounter?.cooldowns = [:]
+            state.worlds.activeRun?.activeEncounter?.binderSkillCooldown = 0
+            CombatRules.perform(.skill("first_strike"), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.feintActive, [],
+                           "First Strike is normal-cost, not zero-turn setup")
+
+            state.worlds.activeRun?.activeEncounter?.feintActive = [.binder]
+            let beforeItem = state.worlds.activeRun?.activeEncounter
+            CombatRules.perform(.useItem(stack: .init(rawValue: UInt64.max), ally: .binder),
+                                by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter, beforeItem,
+                           "a stale item is rejected without expiry or schedule mutation")
+
+            state.worlds.activeRun?.activeEncounter?.binderSkillCooldown = 2
+            state.worlds.activeRun?.activeEncounter?.cooldowns = [:]
+            let beforeHeal = state.worlds.activeRun?.activeEncounter
+            CombatRules.perform(.healSkill(ally: .binder), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter, beforeHeal,
+                           "no ready heal is rejected without expiry or schedule mutation")
+        }
     }
 
     func testInsulationReceiptFreezesExactTypedOwnerWithoutAuraOrHeatDefault() throws {
