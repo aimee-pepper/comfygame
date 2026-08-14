@@ -37,4 +37,18 @@ enum AppRoute: String, Codable, Hashable, CaseIterable, Sendable {
     case settings
     /// The milestone-1 persistence harness. Reachable from the Base screen while in development.
     case harness
+
+    /// Routes whose destinations are authored by `stations.json`. Non-station navigation remains
+    /// compiled-only and must not be mistaken for an orphaned catalogue destination.
+    var isStationRoute: Bool {
+        switch self {
+        case .writingDesk, .storehouse, .workshop, .party, .essenceSpring, .constellation,
+             .library, .bestiary, .blacksmith, .tradingPost, .recycler, .tannery, .bowyer,
+             .armoury, .weaponsmith, .scriptorium, .surveyPost, .apothecary, .reliquary,
+             .wayfarersTable, .anchorage, .distillery, .channelworks, .firepit:
+            true
+        case .base, .worldHistory, .world, .encounter, .settings, .harness:
+            false
+        }
+    }
 }

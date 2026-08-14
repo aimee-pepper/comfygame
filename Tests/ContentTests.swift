@@ -417,12 +417,15 @@ final class ContentTests: XCTestCase {
         XCTAssertTrue(outcomes.contains(.key), "One curio must identify into a key (the locked-cache payoff)")
     }
 
-    /// Every station in the data must route to a screen that exists.
+    /// Catalogue and compiled station destinations must remain a complete two-way bridge.
     func testStationRoutesResolveToRealScreens() {
-        for station in ContentCatalog.shared.stations {
-            XCTAssertNotNil(AppRoute(rawValue: station.route),
-                            "Station '\(station.id)' routes to unknown screen '\(station.route)'")
-        }
+        let authored = Set(ContentCatalog.shared.stations.map(\.route))
+        let compiled = Set(AppRoute.allCases.filter(\.isStationRoute).map(\.rawValue))
+        let missing = authored.subtracting(compiled).sorted()
+        let orphaned = compiled.subtracting(authored).sorted()
+
+        XCTAssertEqual(missing, [], "Station catalogue routes missing compiled screens: \(missing)")
+        XCTAssertEqual(orphaned, [], "Compiled station screens missing catalogue routes: \(orphaned)")
     }
 
     func testStationsCoverTheSixV0Screens() {
