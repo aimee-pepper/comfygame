@@ -125,7 +125,7 @@ struct CampaignStartPresentation: Equatable, Sendable {
 
 enum CampaignStartLayoutPolicy {
     static let ordinarySlotColumnCount = 2
-    static let ordinarySlotCardMinimumHeight: CGFloat = 120
+    static let ordinarySlotCardMinimumHeight: CGFloat = 84
 
     static func primaryActionLabelHeight(dynamicTypeSize: DynamicTypeSize) -> CGFloat {
         dynamicTypeSize.isAccessibilitySize ? 88 : 52
@@ -350,59 +350,56 @@ private struct CampaignSlotCard: View {
     }
 
     private var compactBody: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            CampaignBookplateMotif(id: slot.id, bookCount: slot.progressBookCount)
-                .frame(height: 20)
-                .accessibilityHidden(true)
+        Button(action: slot.health.canLoad ? onLoad : onDetails) {
+            VStack(alignment: .leading, spacing: 3) {
+                CampaignBookplateMotif(id: slot.id, bookCount: slot.progressBookCount)
+                    .frame(height: 20)
+                    .accessibilityHidden(true)
 
-            HStack(spacing: 4) {
-                Text(slot.name)
-                    .font(.subheadline.weight(.semibold))
+                HStack(spacing: 4) {
+                    Text(slot.name)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                    Spacer(minLength: 0)
+                    Image(systemName: slot.health.canLoad
+                          ? "checkmark.circle" : "exclamationmark.triangle")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(slot.health.canLoad ? Color.secondary : Color.orange)
+                        .accessibilityLabel(slot.health.label)
+                }
+
+                if slot.hasKnownMetadata {
+                    HStack(spacing: 5) {
+                        Label("Level \(slot.binderLevel)", systemImage: "figure.stand")
+                        Text("·")
+                        Text(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
-                Spacer(minLength: 0)
-                Image(systemName: slot.health.canLoad
-                      ? "checkmark.circle" : "exclamationmark.triangle")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(slot.health.canLoad ? Color.secondary : Color.orange)
-                    .accessibilityLabel(slot.health.label)
-            }
-
-            if slot.hasKnownMetadata {
-                HStack(spacing: 5) {
-                    Label("Level \(slot.binderLevel)", systemImage: "figure.stand")
-                    Text("·")
-                    Text(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))
+                    .minimumScaleFactor(0.82)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(
+                        "Level \(slot.binderLevel), last played \(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))"
+                    )
                 }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.82)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel(
-                    "Level \(slot.binderLevel), last played \(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))"
-                )
             }
-
-            HStack(spacing: 4) {
-                if slot.health.canLoad {
-                    Button("Load", action: onLoad)
-                        .buttonStyle(.borderedProminent)
-                        .frame(minHeight: 44)
-                        .accessibilityIdentifier("campaign.slot.\(slot.id.uuidString).load")
-                }
-                Spacer(minLength: 0)
-                Button("Details", action: onDetails)
-                    .buttonStyle(.bordered)
-                    .frame(minHeight: 44)
-                    .accessibilityIdentifier("campaign.slot.\(slot.id.uuidString).details")
-            }
-            .controlSize(.small)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 5)
+            .frame(maxWidth: .infinity,
+                   minHeight: CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight,
+                   alignment: .leading)
+            .contentShape(Rectangle())
         }
-        .padding(.horizontal, 7)
-        .padding(.vertical, 5)
-        .frame(maxWidth: .infinity,
-               minHeight: CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight,
-               alignment: .leading)
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("campaign.slot.\(slot.id.uuidString).\(slot.health.canLoad ? "load" : "details")")
+        .accessibilityHint(slot.health.canLoad
+                           ? "Double tap to load. Touch and hold for details."
+                           : "Opens recovery details.")
+        .accessibilityAction(named: "Details", onDetails)
+        .contextMenu {
+            Button("Details", systemImage: "info.circle", action: onDetails)
+        }
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
         .accessibilityElement(children: .contain)
     }

@@ -106,7 +106,7 @@ final class CampaignStartPresentationTests: XCTestCase {
             CGFloat(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8))
             * CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight
             + 30 // three ten-point row gutters
-        XCTAssertLessThanOrEqual(shelfHeight, 510,
+        XCTAssertLessThanOrEqual(shelfHeight, 370,
                                  "Eight slots must leave ordinary-phone room for title and actions.")
     }
 
@@ -126,7 +126,7 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertFalse(body.contains("ScrollView { campaignContents(compactSlots: true)"))
     }
 
-    func testCompactSlotKeepsIndependentLoadAndDetailsTargets() throws {
+    func testCompactSlotUsesTheWholeCardForLoadAndLongPressForDetails() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
@@ -135,10 +135,13 @@ final class CampaignStartPresentationTests: XCTestCase {
         let end = try XCTUnwrap(source.range(of: "private var expandedBody", range: start.upperBound..<source.endIndex))
         let compact = String(source[start.lowerBound..<end.lowerBound])
 
-        XCTAssertTrue(compact.contains("if slot.health.canLoad"))
-        XCTAssertTrue(compact.contains("Button(\"Load\", action: onLoad)"))
-        XCTAssertTrue(compact.contains("Button(\"Details\", action: onDetails)"))
-        XCTAssertGreaterThanOrEqual(compact.components(separatedBy: ".frame(minHeight: 44)").count - 1, 2)
+        XCTAssertTrue(compact.contains("Button(action: slot.health.canLoad ? onLoad : onDetails)"))
+        XCTAssertTrue(compact.contains(".contentShape(Rectangle())"))
+        XCTAssertTrue(compact.contains(".contextMenu"))
+        XCTAssertTrue(compact.contains("Button(\"Details\", systemImage: \"info.circle\", action: onDetails)"))
+        XCTAssertTrue(compact.contains(".accessibilityAction(named: \"Details\", onDetails)"))
+        XCTAssertFalse(compact.contains("Button(\"Load\""))
+        XCTAssertFalse(compact.contains(".buttonStyle(.borderedProminent)"))
     }
 
     func testCompactSlotRestoresProgressGraphicLevelAndLastPlayedWithoutLoosePadding() throws {
@@ -157,6 +160,7 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(compact.contains(".padding(.horizontal, 7)"))
         XCTAssertTrue(compact.contains(".padding(.vertical, 5)"))
         XCTAssertFalse(compact.contains(".padding(14)"))
+        XCTAssertFalse(compact.contains("HStack(spacing: 4) {\n                if slot.health.canLoad"))
     }
 
     @MainActor
