@@ -520,6 +520,11 @@ enum CombatRules {
             return hp.current > 0 && hp.current < hp.max
         }
         if hurt, let heal = ready(.heal, for: actor, in: encounter, state: state) { return heal }
+        if encounter.debugV2OwnedNodeIDs?[actor]?.contains(CombatDerivedStatsRules.Node.ward) == true,
+           let ward = ContentCatalog.shared.skill("ward"), isReady(ward, for: actor, in: encounter),
+           recommendedWardHarm(in: encounter) != nil {
+            return ward
+        }
         return skills(for: actor, in: state)
             .filter { $0.kind != .heal && $0.kind != .rout }
             .filter { cooldown(of: $0, for: actor, in: encounter) == 0 }
@@ -677,6 +682,9 @@ enum CombatRules {
             // **Ward.** Against one of six things, which is the point — you have to know what's
             // coming, and Sight is how you find out. A ward against "elemental" in general would be
             // the good-against-everything shape the whole skill set is built to avoid.
+            // Modern v2 Ward is a typed `CombatAction.ward`; an unquoted skill action must not
+            // infer a hidden harm. Legacy encounters retain their saved duration-shaped behavior.
+            guard encounter.wardReceipts == nil else { return nil }
             let against = skill.damage.map(Harm.blow) ?? mostCommonIncoming(in: encounter)
             encounter.wards[actor] = WardState(against: against, rounds: skill.rounds)
             encounter.note("\(skill.name): set against \(against.displayName).")
@@ -860,6 +868,30 @@ enum CombatRules {
         return .blow(DamageKind.allCases.max { a, b in
             kinds.count { $0 == a } < kinds.count { $0 == b }
         } ?? .pierce)
+    }
+
+    static func disclosedWardHarms(in encounter: EncounterState) -> Set<Harm> {
+        Set(encounter.livingFoes.compactMap { foe -> Harm? in
+            guard encounter.revealed.contains(foe.id) else { return nil }
+            return foe.stats.element.map(Harm.emanation) ?? .blow(foe.stats.damageKind)
+        })
+    }
+
+    static func recommendedWardHarm(in encounter: EncounterState) -> Harm? {
+        let harms = disclosedWardHarms(in: encounter)
+        guard !harms.isEmpty else { return nil }
+        let stable = DamageKind.allCases.map(Harm.blow) + EmanationKind.allCases.map(Harm.emanation)
+        return stable.max { lhs, rhs in
+            let left = encounter.livingFoes.count { foe in
+                encounter.revealed.contains(foe.id)
+                    && (foe.stats.element.map(Harm.emanation) ?? .blow(foe.stats.damageKind)) == lhs
+            }
+            let right = encounter.livingFoes.count { foe in
+                encounter.revealed.contains(foe.id)
+                    && (foe.stats.element.map(Harm.emanation) ?? .blow(foe.stats.damageKind)) == rhs
+            }
+            return left < right
+        }.flatMap { harms.contains($0) ? $0 : nil }
     }
 
     // MARK: Harm that outlives the blow
@@ -1210,6 +1242,13 @@ enum CombatRules {
                 return
             }
         }
+        if case .ward(let harm) = action {
+            guard encounter.debugV2OwnedNodeIDs?[actor]?.contains(CombatDerivedStatsRules.Node.ward) == true,
+                  let skill = ContentCatalog.shared.skill("ward"),
+                  isReady(skill, for: actor, in: encounter),
+                  disclosedWardHarms(in: encounter).contains(harm)
+            else { return }
+        }
 
         let actionCost = combatActionCost(action)
         let feintWasActive = encounter.feintActive?.contains(actor) == true
@@ -1241,6 +1280,17 @@ enum CombatRules {
                     outcome = .committed(cost: actionCost, completedDirectAttack: direct)
                 }
             }
+
+        case .ward(let harm):
+            guard let skill = ContentCatalog.shared.skill("ward"), encounter.wardReceipts != nil else { break }
+            encounter.wardReceipts?[actor] = .init(harm: harm, activationRound: encounter.roundNumber,
+                                                    expiresBeforeRound: encounter.roundNumber + 2)
+            let cooling = stats(of: actor, in: state)
+                .map { CharacterRules.cooldown(skill.cooldownRounds, $0) } ?? skill.cooldownRounds
+            encounter.cooldowns[cooldownKey(skill, for: actor)] = cooling
+            setCooldown(cooling, for: actor, in: &encounter)
+            encounter.note("Ward: set against \(harm.displayName) through round \(encounter.roundNumber + 1).")
+            outcome = .committed(cost: .normal, completedDirectAttack: false)
 
         case .damageSkill(let foeID):
             // The gambit vocabulary's "damage skill" — whichever damaging one is up.
@@ -2262,6 +2312,11 @@ enum CombatRules {
             encounter.untouchableStates = states
         }
         encounter.roundNumber += 1
+        if encounter.wardReceipts != nil {
+            encounter.wardReceipts = encounter.wardReceipts?.filter {
+                $0.value.expiresBeforeRound > encounter.roundNumber
+            }
+        }
         applyCascadeOrderForNewRound(&encounter)
         applyPendingStaggers(for: encounter.roundNumber, run: run, encounter: &encounter)
         encounter.apexTargetsThisRound.removeAll()
@@ -2576,8 +2631,16 @@ enum CombatRules {
             // Sight is for. Guessing wrong costs you the round you spent setting it.
             let incoming: Harm = (encounter.snuffed.contains(foeID) ? nil : foe.stats.element)
                 .map(Harm.emanation) ?? .blow(foe.stats.damageKind)
-            let wardMultiplier = encounter.wards[target]?.harm == incoming
-                ? 1 - Tuning.Encounter.wardReduction : 1
+            let wardMultiplier: Double
+            if let modern = encounter.wardReceipts {
+                let receipt = modern[target]
+                wardMultiplier = receipt?.harm == incoming
+                    && (receipt?.expiresBeforeRound ?? 0) > encounter.roundNumber
+                    ? 1 - Tuning.Encounter.wardReduction : 1
+            } else {
+                wardMultiplier = encounter.wards[target]?.harm == incoming
+                    ? 1 - Tuning.Encounter.wardReduction : 1
+            }
             // The Haft is a modest continuous ward against one authored blow type. Applied after
             // the skill ward so the two stack multiplicatively rather than replacing each other.
 

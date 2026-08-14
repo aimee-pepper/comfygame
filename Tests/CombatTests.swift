@@ -39,6 +39,8 @@ final class CombatTests: XCTestCase {
     static let attackEmanating = GambitRule(id: InstanceID(rawValue: 110),
                                             subject: "subject_foe_emanating",
                                             action: "act_attack")
+    static let useSkill = GambitRule(id: InstanceID(rawValue: 111),
+                                     subject: "subject_foe_any", action: "act_skill")
 
 
     /// **Skills come from the trees now**, so a test about *what a skill does* has to buy it first.
@@ -5138,5 +5140,97 @@ final class CombatTests: XCTestCase {
             CombatRules.perform(.skill("brace"), by: .binder, in: &$0)
         }
         XCTAssertGreaterThan(legacy.activeEncounter?.braced[.binder] ?? 0, 0)
+    }
+
+    func testModernWardRequiresExactOwnerAndDisclosedExplicitChoice() throws {
+        let store = inFight()
+        store.mutate("stage modern Ward") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.ward],
+                                               .companion(0): []]
+            encounter.wardReceipts = [:]
+            encounter.revealed.removeAll()
+            encounter.order = [.binder, .companion(0), .foe(encounter.foes[0].id)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let initialCooldown = store.activeEncounter?.binderSkillCooldown
+        store.takeCombatAction(.ward(.blow(.pierce)))
+        XCTAssertTrue(store.activeEncounter?.wardReceipts?.isEmpty == true)
+        XCTAssertEqual(store.activeEncounter?.binderSkillCooldown, initialCooldown)
+
+        store.mutate("disclose exact foe") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.revealed.insert(encounter.foes[0].id)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let disclosed = try XCTUnwrap(store.activeEncounter?.foes.first?.stats.damageKind)
+        store.takeCombatAction(.ward(.blow(disclosed)))
+        let receipt = try XCTUnwrap(store.activeEncounter?.wardReceipts?[.binder])
+        XCTAssertEqual(receipt.harm, .blow(disclosed))
+        XCTAssertEqual(receipt.activationRound, 1)
+        XCTAssertEqual(receipt.expiresBeforeRound, 3)
+        XCTAssertTrue(store.activeEncounter?.log.contains {
+            $0.contains(disclosed.rawValue) && $0.contains("round 2")
+        } == true)
+    }
+
+    func testModernWardReplacementRelaunchAndLegacySkillDoNotInfer() throws {
+        let store = inFight()
+        store.mutate("stage modern Ward replacement") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.ward]]
+            encounter.wardReceipts = [.binder: .init(harm: .blow(.crush), activationRound: 4,
+                                                       expiresBeforeRound: 6)]
+            encounter.roundNumber = 5
+            encounter.revealed = Set(encounter.foes.map(\.id))
+            encounter.order = [.binder, .foe(encounter.foes[0].id)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        store.mutate("legacy unquoted Ward must reject") {
+            CombatRules.perform(.skill("ward"), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(store.activeEncounter?.wardReceipts?[.binder]?.harm, .blow(.crush))
+
+        let harm = Harm.blow(try XCTUnwrap(store.activeEncounter?.foes.first?.stats.damageKind))
+        store.mutate("replace modern Ward") { CombatRules.perform(.ward(harm), by: .binder, in: &$0) }
+        let replaced = try XCTUnwrap(store.activeEncounter?.wardReceipts?[.binder])
+        XCTAssertEqual(replaced, .init(harm: harm, activationRound: 5, expiresBeforeRound: 7))
+        let reloaded = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(try XCTUnwrap(store.activeEncounter)))
+        XCTAssertEqual(reloaded.wardReceipts?[.binder], replaced)
+    }
+
+    func testWardGambitUsesOnlyDisclosedHarmAndLegacyReceiptRemainsLegacy() throws {
+        let store = inFight(gambits: [Self.useSkill])
+        store.mutate("stage Ward gambit query") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.ward]]
+            encounter.wardReceipts = [:]
+            encounter.revealed.removeAll()
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        XCTAssertNil(store.activeEncounter.flatMap(CombatRules.recommendedWardHarm))
+        store.mutate("disclose for Ward gambit") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.revealed = Set(encounter.foes.map(\.id))
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let expected = try XCTUnwrap(store.activeEncounter?.foes.first).stats.element
+            .map(Harm.emanation) ?? .blow(try XCTUnwrap(store.activeEncounter?.foes.first).stats.damageKind)
+        XCTAssertEqual(store.activeEncounter.flatMap(CombatRules.recommendedWardHarm), expected)
+        XCTAssertEqual(GambitEngine.decide(for: .companion(0), in: store.state)?.action,
+                       .ward(expected))
+
+        var legacy = try XCTUnwrap(store.activeEncounter)
+        legacy.debugV2OwnedNodeIDs = nil
+        legacy.wardReceipts = nil
+        legacy.wards[.binder] = .init(against: .blow(.rend), rounds: 2)
+        let decoded = try JSONDecoder().decode(EncounterState.self, from: JSONEncoder().encode(legacy))
+        XCTAssertNil(decoded.wardReceipts)
+        XCTAssertEqual(decoded.wards[.binder], legacy.wards[.binder])
     }
 }

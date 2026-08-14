@@ -169,6 +169,9 @@ enum CombatAction: Codable, Equatable, Sendable {
     /// **A named skill.** Twelve of them now, so which one is part of the action rather than
     /// something inferred from the single skill a member used to own.
     case skill(SkillID, foe: InstanceID? = nil, ally: Combatant? = nil)
+    /// Modern Ward always carries the exact disclosed harm selected at quote time. Keeping this
+    /// separate preserves the encoded shape of legacy `.skill("ward")` actions.
+    case ward(Harm)
     /// The two the gambit vocabulary still speaks in: "use your damage skill", "use your heal".
     /// Resolved against whatever the member actually carries.
     case damageSkill(foe: InstanceID)
@@ -488,6 +491,8 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// Explicit frozen ownership for consumers that do not yet have a dedicated derived receipt.
     /// Nil is legacy; an empty dictionary is an enabled-v2 comparison with no owned nodes.
     var debugV2OwnedNodeIDs: [Combatant: Set<CombatNodeID>]?
+    /// Nil is a frozen legacy encounter. A nonnil empty map is modern and must never infer a harm.
+    var wardReceipts: [Combatant: WardReceipt]?
     /// Saved rank at each actor's previous completed normal-cost action. Nil is legacy; an empty
     /// modern receipt is deliberately distinct and never reconstructed from mutable Base state.
     var rankAtPreviousCompletedAction: [Combatant: Rank]?
@@ -677,6 +682,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2Resistance = debugV2Resistance
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
+        self.wardReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.unyieldingSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.braceReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.breakingBlowScheduledSpent = debugV2OwnedNodeIDs == nil ? nil : []
@@ -712,6 +718,8 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                   forKey: .debugV2Resistance)
         debugV2OwnedNodeIDs = try c.decodeIfPresent([Combatant: Set<CombatNodeID>].self,
                                                      forKey: .debugV2OwnedNodeIDs)
+        wardReceipts = try c.decodeIfPresent([Combatant: WardReceipt].self, forKey: .wardReceipts)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [:])
         partyRanks = try c.decodeIfPresent([Combatant: Rank].self, forKey: .partyRanks) ?? [:]
         rankAtPreviousCompletedAction = try c.decodeIfPresent([Combatant: Rank].self,
                                                                forKey: .rankAtPreviousCompletedAction)
@@ -1112,6 +1120,13 @@ struct WardState: Codable, Equatable, Sendable {
     }
 
     private enum CodingKeys: String, CodingKey { case harm, rounds, against }
+}
+
+/// Modern Ward is bounded by global encounter rounds, not by the owner's personal turns.
+struct WardReceipt: Codable, Equatable, Sendable {
+    var harm: Harm
+    var activationRound: Int
+    var expiresBeforeRound: Int
 }
 
 enum EncounterOutcome: String, Codable, Equatable, Sendable {

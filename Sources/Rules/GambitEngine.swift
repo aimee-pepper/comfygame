@@ -225,6 +225,9 @@ enum GambitEngine {
             // otherwise put a skill into whatever you were aiming at.
             guard let skill = CombatRules.bestReadySkill(for: actor, in: encounter, state: state)
             else { return nil }
+            if skill.kind == .ward {
+                return CombatRules.recommendedWardHarm(in: encounter).map(CombatAction.ward)
+            }
             if skill.needsAlly {
                 if case .ally(let member) = target { return .skill(skill.id, ally: member) }
                 return .skill(skill.id, ally: actor)
