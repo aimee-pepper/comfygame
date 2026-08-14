@@ -1,7 +1,7 @@
 # Full-cast voice authority — current
 
-**Status:** personality and voice matrix settled; Vance/Noll opening production pass source-complete;
-remaining copy rewrite continues in campaign order without pre-empting playability implementation
+**Status:** personality and voice matrix settled; all five campaign-order meeting batches are
+production-authorized; diary voice revision remains later and does not pre-empt playability implementation
 **Date:** 14 August 2026
 **Roadmap position:** Band 6.8; this authority must not pre-empt opening playability work
 
@@ -122,6 +122,24 @@ The next six meetings are production-authorized with `Playable / unreviewed` Atl
 
 Stable exchange IDs, recruitment facts, mechanics and rewards remain unchanged. Sabine and Grimmond
 remain in the following campaign-order batch even though they share the specialists source file.
+
+## Final meeting batch disposition — Sabine through Nine
+
+The final seven authored-review meetings are production-authorized with `Playable / unreviewed`
+Atlas state. Tovin's already-live meeting remains a separate retained object.
+
+| Character | Voice correction |
+|---|---|
+| Sabine | Animated animal anecdotes, practical care and playful failed-negotiation humour replace consent treatises |
+| Grimmond | Dour load/support language and black humour replace abstract extraction ethics |
+| Oda | Specification-like fault reports and literal follow-ups replace philosophical weapon language |
+| Auber | Taste, smell, temperature and sly hospitality replace general moral aphorisms |
+| Ashe | Plain embodied answers and warm, direct boundaries replace doctrine-like reversals |
+| Perren | Retains deliberately lofty adversarial argument, but answers the selected question first |
+| Nine | Retains the sole 100% elliptical register by settled character design |
+
+Stable exchange IDs, recruitment facts, mechanics and rewards remain unchanged. This closes meeting
+voice production; diary voice remains a separate later campaign-order pass.
 
 ## Promotion gate
 

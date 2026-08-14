@@ -106,49 +106,47 @@ should not survive longer than the people it no longer serves.”
 
 **Opening**
 
-Sabine repairs a braided lead that is attached to nothing. Tracks circle her camp, but none crosses
-the low boundary she has marked with loose twigs. She notices your foot entering that space before
-she looks up. “You saw a line,” she says. “That already puts you ahead of several creatures with
-boots.”
+Sabine is repairing a braided lead while its owner watches from well outside arm's reach. Tracks
+circle her camp, stopping at a low boundary of loose twigs. She notices your boot crossing it and
+waves you back. “Sorry. The twigs are doing excellent work, but they are terrible at introductions.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `sabine.nearby_animals` | “Where are the animals?” | “Near enough to leave fresh tracks, far enough to choose the distance.” Sabine points to food left untouched beside one route. “Presence is easier to prove than permission to approach.” |
-| `sabine.ownership` | “Do they belong to you?” | “Their water, injuries and the consequences of my enclosures are my responsibility.” She coils the unused lead. “Their bodies and decisions are not my property because the responsibility is inconvenient.” |
-| `sabine.survival_route` | “Did they show you how to survive here?” | “They showed me water and a path through the low ground. They also stole food, drew a predator and left during the worst night.” Sabine smiles once. “Coexistence is not a service animals provide.” |
+| `sabine.nearby_animals` | “Where are the animals?” | “Watching us, mostly.” Sabine points out fresh prints beside an untouched bowl. “The small one wants the food. The large one wants to know why I want it to want the food. We are negotiating.” |
+| `sabine.ownership` | “Do they belong to you?” | “No. I keep the water clean, treat injuries when they let me, and take responsibility for every foolish fence I build.” She holds up the unattached lead. “This belongs to me. At present, nobody is impressed by it.” |
+| `sabine.survival_route` | “Did they show you how to survive here?” | “One showed me water. Another stole supper. A third led a predator directly past my bedroll.” Sabine grins. “Useful colleagues. Mixed references.” |
 
 **Offer:** “There is a base. Come inspect it, and help me make room where animals can stay, work
 beside people and still communicate refusal. You needn't promise it on anyone else's behalf.”
 
-**Accepted:** Sabine shoulders the unused lead. “I am agreeing to look. If the place is wrong, the
-first useful thing I do there may be saying so.”
+**Accepted:** Sabine shoulders the unused lead. “I'll inspect it. If I hate the place, you'll get a
+very thorough list. If I like it, you'll still get the list.”
 
-**Declined:** “Do not follow the clearest tracks when you leave.” She replaces the crossed twig.
-“They may be freshest, or made by the heaviest animal. Neither tells you it will tolerate company.”
+**Declined:** “Fair enough. And don't follow the clearest tracks out.” She replaces the crossed
+twig. “Those belong to the heavy one. It dislikes surprises and has dreadful manners.”
 
 ## Grimmond
 
 **Opening**
 
-Grimmond braces a dark seam before removing anything from it. He taps three points and waits long
-enough for the last answer to arrive through the floor. On his slate, the empty shape he might create
-is drawn more carefully than the material around it. “The valuable part is obvious,” he says. “I am
-mapping what must hold the ceiling after it leaves.”
+Grimmond braces a dark seam before touching his pick. He taps three points, waits, then adds another
+support. On his slate, the planned empty space is drawn more carefully than the ore. “Pretty seam,”
+he says. “It'll still crush you.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `grimmond.delayed_answer` | “What were you waiting to hear?” | “Load finding another route.” Grimmond marks a line beyond the seam. “The first sound tells me what I struck. The delayed one tells me what else I disturbed.” |
-| `grimmond.unclaimed_depth` | “Has anyone worked this place before?” | “No marks I can prove are work.” He tests a wet fissure. “Untouched is a claim about people. Pressure, water and living routes do not wait for a person to begin having consequences.” |
-| `grimmond.needed_material` | “What if people need what is in the seam?” | “Then need belongs in the calculation with collapse, not outside it as an excuse or an abstraction.” He adjusts the brace. “Refusing safely while somebody else bears the scarcity is also a choice with a site.” |
+| `grimmond.delayed_answer` | “What were you waiting to hear?” | “The weight shifting.” Grimmond marks a line beyond the seam. “First knock tells me what I hit. The echo tells me what I annoyed.” |
+| `grimmond.unclaimed_depth` | “Has anyone worked this place before?” | “No tool marks.” He presses a thumb to a wet fissure. “Water's been busy. So has the pressure. A place doesn't wait for a miner before it starts changing.” |
+| `grimmond.needed_material` | “What if people need what is in the seam?” | “Then we count the need, the supports, and the bodies under them.” He tightens the brace. “Need doesn't hold a roof up. Timber does.” |
 
 **Offer:** “Come home with me. Open Deep Works that count removal, altered load and what remains
 supported—not merely how much valuable material returns.”
 
-**Accepted:** Grimmond adds your name beside the proposed empty shape. “Then the record begins before
-the first pull. Afterward is when everybody becomes tempted to call it history.”
+**Accepted:** Grimmond adds your name beside the proposed empty shape. “Good. We measure before we
+dig. Measuring afterward is called an inquest.”
 
-**Declined:** “Leave the brace.” He listens once more. “Unremoved material is not the same as an
-unchanged place, and I have already asked this one a question.”
+**Declined:** “Leave the brace.” He listens once more. “I've already bothered the ceiling. No sense
+making it vindictive.”
 
 ## Batch review checks
 
@@ -172,6 +170,13 @@ unchanged place, and I have already asked this one a question.”
 - Sabine's older declined line inferred that clear tracks meant an animal “wanted to be found,” an
   anthropomorphic leap contradicted by her own practice. The current line gives two physical reasons
   for track clarity and correctly says neither establishes consent.
+
+### Design-lead voice pass — 14 Aug 2026
+
+- Sabine now sounds affectionate, animated and funny in ordinary conversation; her ethics remain
+  visible through specific care work rather than a sequence of consent aphorisms.
+- Grimmond now uses short load, brace, timber and roof language with black humour; the environmental
+  cost of extraction remains clear without making him deliver a thesis.
 
 ## Atlas disposition fields
 

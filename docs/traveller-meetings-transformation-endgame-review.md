@@ -1,62 +1,59 @@
 # Traveller Meetings — Transformation and Endgame Review Draft
 
-**Status:** authored review draft, not approved live copy. This final corpus batch contains one
-revision candidate for Auber's existing meeting and four missing meetings: Oda, Ashe, Perren and
-Nine. Engineering may expose it in the DEBUG authored-text atlas as `Draft / needs Aimee review`, but
-must not replace Auber's live text or populate missing catalogue rows without explicit review.
+**Status:** production-authorized final meeting batch. Auber's existing meeting is revised in place;
+Oda, Ashe, Perren and Nine fill their missing catalogue rows. All enter as `Playable / unreviewed`
+so playtest review can improve them without withholding coherent content from the game.
 
 Late-game concepts remain physical and observable here: separated fractions, a damaged housing,
 distance around an embodied force, arranged ritual remnants, and maintained present-tense markers.
 The meetings do not explain the Sundering, resolve Nine's biography or make recruitment an endgame
 knowledge test.
 
-## Auber — revision candidate
+## Auber
 
 **Opening**
 
-Auber has arranged shallow vessels beneath a mineral drip. He moves the nearly empty one instead of
-the full one, then marks where its last ring dried. A clear fraction has collected above; the residue
-below holds several colours the water no longer carries. “Everyone watches what arrives,” he says.
-“The cost is usually still attached to the vessel.”
+Auber has arranged shallow vessels beneath a mineral drip. He lifts the clear fraction, smells it,
+then tastes one drop from the handle of a spoon. “Too hot, slightly metallic, and almost useful.” He
+slides the cloudy residue toward you. “This is the interesting half. Nobody asks to taste this one.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `auber.fractions` | “What are you collecting?” | “Both fractions.” Auber points first to the clear liquid, then to the ring below it. “What leaves, and what remains when everyone stops looking. Naming only the wanted part does not make the process simpler.” |
-| `auber.essence` | “Can you make essence here?” | “Essence is already here.” He turns the vessel so the residue catches the light. “The question is what form you are willing to pay to keep it in, and where the rest of that payment goes.” |
-| `auber.residue` | “Why save the residue?” | “Because throwing something away only changes who encounters it next.” Auber labels the cloudy vessel before touching the clear one. “Often that person is merely farther from the shelf.” |
+| `auber.fractions` | “What are you collecting?” | “Clear liquid for immediate use; coloured sediment for a slower extraction.” Auber swirls each vessel. “The first is sharp and clean. The second smells appalling and contains more than it admits.” |
+| `auber.essence` | “Can you make essence here?” | “A little, badly.” He angles the vessel toward the light. “The heat wanders, the carrier is impure, and the finish tastes of stone. Give me proper glass and I can improve all three.” |
+| `auber.residue` | “Why save the residue?” | “Because it still contains useful material.” Auber labels the cloudy vessel. “Also because pouring it downhill would be rude to everyone downhill. Practicality and manners occasionally agree.” |
 
 **Offer:** “There is a refinery at the base. Come home with me and build the work it cannot do:
 crystallisation, attunement and separation that keep carrier and remainder in the same record.”
 
-**Accepted:** “First show me where the refinery's waste goes.” Auber gathers the cloudy vessel. “If
-the answer is nowhere, we will begin by following it.”
+**Accepted:** “First, show me the refinery and its drain.” Auber gathers both vessels. “Then tea. I
+need to know whether your water is merely hard or actively argumentative.”
 
-**Declined:** He gives you neither vessel. “Clarity is not the same as safety, and refusal is not the
-same as disposal. They can finish settling here.”
+**Declined:** “A pity.” He gives you neither vessel. “They need another hour to settle, and you have
+already supplied enough dust for one experiment.”
 
 ## Oda
 
 **Opening**
 
 A pale line crosses the clearing before you see Oda. The last of four stone markers splits; everything
-beyond it remains untouched. She lowers a damaged conduit, looks past the broken marker rather than
-at it, and says, “You entered from the one direction I had cleared. That is useful information about
-the clearing, not about the conduit.”
+beyond it remains untouched. She lowers a damaged conduit and checks a slate. “Approach corridor
+held. Marker four did not. Please stand exactly where you are while I determine which result matters.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `oda.carried_force` | “What was that?” | “Heat given a path, a stopping point and a housing I no longer trust.” Oda opens the cracked outer shell without touching its core. “The force was ordinary. Carrying it repeatedly was the engineered part.” |
-| `oda.distance` | “Why test it from so far away?” | “Distance keeps the first failure away from my body.” She checks the ground behind the target. “It also makes consequences look smaller. Safety changes responsibility; it does not remove it.” |
-| `oda.weapon_history` | “Did you make weapons before the Sundering?” | “Yes. They were tools, and they were weapons. Either word can become a hiding place if spoken alone.” Oda marks the failed seam. “A handle makes intention convenient. It does not make outcomes obedient.” |
+| `oda.carried_force` | “What was that?” | “A heat charge in a ceramic carrier with a cracked outer housing.” Oda opens the shell without touching its core. “The heat behaved to specification. The housing did not. I built the housing.” |
+| `oda.distance` | “Why test it from so far away?” | “At this distance, a primary rupture misses me by two strides.” She checks behind the target. “A secondary discharge reaches this marker. That is why you may not take another step.” |
+| `oda.weapon_history` | “Did you make weapons before the Sundering?” | “Yes. Contained heat, projected caustic charge, several failed light housings.” Oda marks the split seam. “Calling them tools did not alter their damage profile. Calling them weapons did not describe their other uses.” |
 
 **Offer:** “Come home with me, and bring that intact core. I'll give you walls behind the targets;
 build Channelworks that make containment, reach and stopping visible.”
 
-**Accepted:** Oda asks what the walls are made from, then keeps asking until the answer includes what
-lies behind them. She takes the intact inner assembly and leaves the spectacular broken shell.
+**Accepted:** Oda asks what the target wall is made from, how thick it is, and what stands behind it.
+“Insufficient answers. Acceptable starting data.” She packs the intact inner assembly.
 
-**Declined:** “Then do not take the conduit.” She grounds the core before closing it. “Damage is not
-an invitation to discover which boundary fails second.”
+**Declined:** “Understood. Do not take the conduit.” She grounds the core. “The outer housing has
+failed. The remaining boundaries have not volunteered for demonstration.”
 
 ## Ashe
 
@@ -68,18 +65,18 @@ come closer,” they say. “That is permission for this moment, from that direc
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `ashe.warning_distance` | “Are the markers protecting me or you?” | “Both, differently.” Ashe tests the air beyond one strip. “You need time to feel what the heat has not yet made visible. I need approach to remain something I can notice and answer.” |
-| `ashe.endurance` | “Does it hurt?” | “Sometimes. Sometimes it is only present. Sometimes it becomes dangerous before it hurts.” They meet your eyes. “Other people prefer one dramatic answer because it tells them when they are allowed to start listening.” |
-| `ashe.helping_others` | “Can you protect someone from it?” | “Often.” The heat above their hands tightens, then settles. “Capacity is real. So is the question each time. Enduring a force does not appoint my body as public equipment.” |
+| `ashe.warning_distance` | “Are the markers protecting me or you?” | “Both.” Ashe tests the air beyond one strip. “You get room to notice the heat. I get to see you coming. Neither of us has to guess.” |
+| `ashe.endurance` | “Does it hurt?” | “Today? A little. Yesterday, badly. Sometimes not at all.” They meet your eyes. “Please don't wait for me to perform agony before you believe the warning.” |
+| `ashe.helping_others` | “Can you protect someone from it?” | “Often, yes.” The heat above their hands tightens, then settles. “Ask me when it happens. I may say yes quickly. I may also be busy keeping myself alive.” |
 
 **Offer:** “Come with me. My party will meet emanations before our instruments or eyes can name them.
 Help us recognize, receive and ground that pressure when you choose the cost.”
 
-**Accepted:** Ashe removes one warning strip and leaves the others. “Then we walk out through the
-opening I made. Do not collect the stones; boundaries are useful to whoever arrives next.”
+**Accepted:** Ashe removes one warning strip and leaves the others. “Walk beside me through this
+gap. And leave the stones. The next person deserves the same warning you got.”
 
-**Declined:** “All right.” They adjust one marker displaced by your approach. “Refusal does not mean
-the warning was false, or that either of us must prove it.”
+**Declined:** “All right.” They straighten the marker displaced by your approach. “Step back through
+the gap, please. Then we're square.”
 
 ## Perren
 
@@ -157,7 +154,19 @@ will know you did not steal it. More importantly, tomorrow I may decide the agre
 
 ## Atlas disposition fields
 
-Create four missing meeting-object rows plus their twelve exchanges as `Draft / needs Aimee review`.
+Create four missing meeting-object rows plus their twelve exchanges as `Playable / unreviewed`.
 For Auber, retain the existing meeting/exchange row identities, attach this document as revision
-provenance and mark the prior exact-text hashes stale. Review metadata remains outside bundled
-content and campaign saves.
+provenance and mark the prior exact-text hashes stale. Coherent copy enters the game immediately;
+review metadata remains outside bundled content and campaign saves.
+
+### Design-lead voice pass — 14 Aug 2026
+
+- Auber now speaks through taste, smell, temperature and hospitable fussiness rather than universal
+  moral conclusions.
+- Oda now answers like a socially literal engineer: specification, failure boundary and measured
+  consequence precede interpretation.
+- Ashe answers bodily questions plainly and warmly, with boundaries stated as ordinary requests
+  rather than abstract doctrine.
+- Perren retains the cast's highest non-Nine rhetorical register because argument and framing are
+  his practice; his questions still receive direct answers first.
+- Nine remains the sole fully elliptical speaker by settled design.
