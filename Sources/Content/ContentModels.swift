@@ -387,6 +387,8 @@ struct ResourceDef: Codable, Equatable, Identifiable, Sendable {
     var requires: [PressureCondition] = []
     /// Conditions that each multiply its share.
     var favours: [PressureCondition] = []
+    /// Catalogue-owned Trading Post classification. Required content: omission fails catalogue load.
+    var tradeBand: TradingPostTradeBand
 
     /// How much of the ground is this, given what the world is made of.
     ///
@@ -424,6 +426,19 @@ struct ItemDef: Codable, Equatable, Identifiable, Sendable {
     /// What using this item does. Optional so every pre-consumable save and ordinary catalogue
     /// entry remains valid; the legacy Lesser Salve is authored explicitly in content.
     var consumable: ConsumableDef?
+    /// Catalogue-owned merchant disposition. Runtime never infers this from rarity or name.
+    var tradingPostDisposition: TradingPostDisposition
+    /// Catalogue-owned Recycler disposition and optional authored fallback profile.
+    var recyclerDisposition: RecyclerDisposition
+    var salvageProfileID: String?
+
+    enum TradingPostDisposition: String, Codable, Sendable {
+        case sellable, protected, notBought
+    }
+
+    enum RecyclerDisposition: String, Codable, Sendable {
+        case recyclable, protected, notGear
+    }
 
     enum Kind: String, Codable, Sendable {
         case consumable

@@ -62,19 +62,36 @@ final class TradingPostTests: XCTestCase {
         }
     }
 
-    func testEveryResourceHasAnExplicitTradeClassification() {
-        XCTAssertEqual(TradingPostRules.unclassifiedResourceIDs(), [])
+    func testEveryResourceHasAnExplicitTradeClassification() throws {
+        XCTAssertTrue(ContentCatalog.shared.resources.allSatisfy {
+            TradingPostRules.tradeBand(for: $0.id) == $0.tradeBand
+        })
         XCTAssertEqual(TradingPostRules.tradeBand(for: "essence_raw"), .nontradeable)
         XCTAssertEqual(TradingPostRules.tradeBand(for: "mote"), .nontradeable)
         XCTAssertEqual(TradingPostRules.tradeBand(for: "gold"), .precious)
+        XCTAssertNil(TradingPostRules.tradeBand(for: "missing_resource"))
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: JSONEncoder().encode(try XCTUnwrap(ContentCatalog.shared.resource("clay"))))
+            as? [String: Any])
+        object.removeValue(forKey: "tradeBand")
+        XCTAssertThrowsError(try JSONDecoder().decode(
+            ResourceDef.self, from: JSONSerialization.data(withJSONObject: object)))
     }
 
-    func testEveryCatalogItemHasExplicitTransferabilityClassification() {
-        XCTAssertEqual(TradingPostRules.unclassifiedItemIDs(), [])
+    func testEveryCatalogItemHasExplicitTransferabilityClassification() throws {
         XCTAssertTrue(TradingPostRules.isAuthoredTransferable("salve_lesser"))
         XCTAssertTrue(TradingPostRules.isAuthoredTransferable("blade_chipped"))
         XCTAssertFalse(TradingPostRules.isAuthoredTransferable("anchor_frame"))
         XCTAssertFalse(TradingPostRules.isAuthoredTransferable("two_natured_blade"))
+        XCTAssertFalse(TradingPostRules.isAuthoredTransferable("missing_item"))
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: JSONEncoder().encode(try XCTUnwrap(ContentCatalog.shared.item("salve_lesser"))))
+            as? [String: Any])
+        object.removeValue(forKey: "tradingPostDisposition")
+        XCTAssertThrowsError(try JSONDecoder().decode(
+            ItemDef.self, from: JSONSerialization.data(withJSONObject: object)))
     }
 
     func testOldItemFlagsDefaultFalseAndRoundTripThroughWornGear() throws {

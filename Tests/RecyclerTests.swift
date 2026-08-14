@@ -70,8 +70,20 @@ final class RecyclerTests: XCTestCase {
         XCTAssertEqual(restored.recycler.inventoryRevision, 19)
     }
 
-    func testEveryOrdinaryCatalogGearHasExplicitSalvageOrReceiptRoute() {
+    func testEveryOrdinaryCatalogGearHasExplicitSalvageOrReceiptRoute() throws {
         XCTAssertEqual(RecyclerRules.unprofiledOrdinaryGearIDs(), [])
+        XCTAssertEqual(RecyclerRules.invalidCatalogueItemIDs(), [])
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: JSONEncoder().encode(try XCTUnwrap(ContentCatalog.shared.item("blade_chipped"))))
+            as? [String: Any])
+        object.removeValue(forKey: "recyclerDisposition")
+        XCTAssertThrowsError(try JSONDecoder().decode(
+            ItemDef.self, from: JSONSerialization.data(withJSONObject: object)))
+
+        var unknownProfile = try XCTUnwrap(ContentCatalog.shared.item("blade_chipped"))
+        unknownProfile.salvageProfileID = "missing_profile"
+        XCTAssertFalse(RecyclerRules.hasValidCatalogueDisposition(unknownProfile))
     }
 
     func testServiceTierEfficienciesAndCapacitiesAreExact() {

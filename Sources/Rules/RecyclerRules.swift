@@ -50,31 +50,35 @@ enum RecyclerRules {
     private static let keepsake = SalvageProfile(
         id: "keepsake_v1", sequence: [.resource("pulp"), .resource("fiber"), .resource("quartz")])
 
-    /// Explicit item-level authorship. Runtime never guesses a recipe from the slot.
-    private static let salvageProfiles: [ItemID: SalvageProfile] = {
-        var result: [ItemID: SalvageProfile] = [:]
-        func assign(_ ids: [ItemID], _ profile: SalvageProfile) {
-            for id in ids { result[id] = profile }
-        }
-        assign(["blade_chipped", "blade_keen", "ripping_hook", "the_long_grievance",
-                "bone_awl", "raking_edge", "blade_binders", "hairsplitter",
-                "field_maul", "banded_mace", "anvilfall", "the_settled_argument"], forgedEdge)
-        assign(["long_pick", "warded_spear", "parting_needle", "the_kept_distance"], longHaft)
-        assign(["split_board", "banded_buckler", "tower_guard", "the_unarguable"], board)
-        assign(["ridged_helm", "visored_casque", "crown_of_quiet",
-                "guard_banded", "guard_vault", "the_standing_wall",
-                "studded_gloves", "gauntlets_of_hold", "the_sure_hands"], rigidProtection)
-        assign(["padded_cap", "guard_padded", "wrapped_hands"], paddedProtection)
-        assign(["worn_boots", "shod_boots", "longstriders", "the_unhurried"], boots)
-        assign(["bent_pick", "balanced_pick", "corebreaker", "the_willing_edge"], headedTool)
-        assign(["pressed_leaf", "cold_compass", "someones_ring", "the_first_page"], keepsake)
-        return result
-    }()
+    private static let profilesByID: [String: SalvageProfile] = Dictionary(uniqueKeysWithValues: [
+        forgedEdge, headedTool, longHaft, board, rigidProtection, paddedProtection, boots, keepsake
+    ].map { ($0.id, $0) })
+
+    private static func salvageProfile(for item: ItemDef) -> SalvageProfile? {
+        guard item.recyclerDisposition == .recyclable, let id = item.salvageProfileID else { return nil }
+        return profilesByID[id]
+    }
 
     static func unprofiledOrdinaryGearIDs(in catalog: ContentCatalog = .shared) -> [ItemID] {
         catalog.items.filter { item in
-            item.gear != nil && item.gear?.breaks == nil && salvageProfiles[item.id] == nil
+            item.gear != nil && item.gear?.breaks == nil && salvageProfile(for: item) == nil
         }.map(\.id).sorted { $0.rawValue < $1.rawValue }
+    }
+
+    static func invalidCatalogueItemIDs(in catalog: ContentCatalog = .shared) -> [ItemID] {
+        catalog.items.filter { !hasValidCatalogueDisposition($0) }
+            .map(\.id).sorted { $0.rawValue < $1.rawValue }
+    }
+
+    static func hasValidCatalogueDisposition(_ item: ItemDef) -> Bool {
+        switch item.recyclerDisposition {
+        case .recyclable:
+            return item.gear != nil && item.gear?.breaks == nil && salvageProfile(for: item) != nil
+        case .protected:
+            return item.salvageProfileID == nil
+        case .notGear:
+            return item.gear == nil && item.salvageProfileID == nil
+        }
     }
 
     static func efficiency(serviceTier: Int) -> Double {
@@ -122,7 +126,8 @@ enum RecyclerRules {
                                    returnedResources: ResourcePool())
         }
 
-        guard let profile = salvageProfiles[stack.catalogID] else { return nil }
+        guard let definition = ContentCatalog.shared.item(stack.catalogID),
+              let profile = salvageProfile(for: definition) else { return nil }
         let outputCount = switch stack.constructionTier {
         case ...2: 1
         case 3: 2
@@ -157,7 +162,7 @@ enum RecyclerRules {
         }
         if (stack.gearProfile?.legacyPowerCredit ?? 0) > 0 { return .legacyCredit }
         if !(stack.gearProfile?.consumedSamples.isEmpty ?? true) { return nil }
-        return salvageProfiles[stack.catalogID] == nil ? .noRecoveryProfile : nil
+        return salvageProfile(for: definition) == nil ? .noRecoveryProfile : nil
     }
 
     static func ineligibility(ofEquipped piece: EquippedPiece) -> Ineligibility { .equipped }

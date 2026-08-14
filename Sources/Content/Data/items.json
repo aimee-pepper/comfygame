@@ -1,5 +1,10 @@
 {
-  "_authority": { "schemaVersion": 1, "defaultDisposition": "settled", "numericValues": "playtestTuning", "playerFacingCopy": "provisionalCopy" },
+  "_authority": {
+    "schemaVersion": 1,
+    "defaultDisposition": "settled",
+    "numericValues": "playtestTuning",
+    "playerFacingCopy": "provisionalCopy"
+  },
   "_note": "PLACEHOLDER — the v0 itemization spine. Two curios drop unidentified and identify at the Storehouse: one into a consumable, one into a key. The key opens a locked cache in a DIFFERENT world than the one it dropped in (design-brief-v0, delayed-payoff seed). GEAR: a standard assortment across eight slots (Aimee, 6 Aug), each running common -> uncommon -> rare -> mythic, and every piece upgradeable at the Blacksmith. Weapons cover all three corners of the damage triangle at every quality, so the matchup against a creature's covering is always answerable with something you could plausibly be carrying. PLACEHOLDER names, blurbs and tiers. INSULATION AND REACTIVITY on gear are Q36's addition (audit #9): the other four material properties each decide what the Blacksmith asks for, and these two decided nothing, so a warm pelt and a volatile ichor were worth nothing to wear. Insulation on anything protective turns aside a heat emanation; reactivity on a weapon leaves something in the wound. Authored here because found gear is a catalogue entry — crafting doesn't exist yet, and when it does these become the crafted piece's own material properties. PLACEHOLDER values. 7 Aug: EIGHT WILD-ONLY WEAPONS (apex-encounters.md §4). Each breaks exactly one rule a crafted piece cannot break, and each is deliberately MID-TIER: you are buying the rule, not the numbers, so a two-natured blade at tier 3 is a real trade against a superb crafted one. They drop guaranteed from an apex and vanishingly rarely from anything else. ALL TIERS PLACEHOLDER.",
   "items": [
     {
@@ -8,7 +13,9 @@
       "icon": "diamond.fill",
       "rarity": "rare",
       "blurb": "Essence held in a stable quartz lattice. Auber records what made it possible.",
-      "kind": "treasure"
+      "kind": "treasure",
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "heat_core",
@@ -16,7 +23,9 @@
       "icon": "flame.circle.fill",
       "rarity": "rare",
       "blurb": "A provenanced concentration of heat, prepared for a Channelworks housing.",
-      "kind": "treasure"
+      "kind": "treasure",
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "caustic_core",
@@ -24,7 +33,9 @@
       "icon": "drop.triangle.fill",
       "rarity": "rare",
       "blurb": "A provenanced caustic concentration, prepared for a Channelworks housing.",
-      "kind": "treasure"
+      "kind": "treasure",
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "light_core",
@@ -32,7 +43,9 @@
       "icon": "sun.max.circle.fill",
       "rarity": "rare",
       "blurb": "A provenanced concentration of light, prepared for a Channelworks housing.",
-      "kind": "treasure"
+      "kind": "treasure",
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "conduit_fixture",
@@ -40,7 +53,9 @@
       "icon": "point.3.connected.trianglepath.dotted",
       "rarity": "rare",
       "blurb": "Oda's first contained Conduit housing, carrying the receipt of the core inside it.",
-      "kind": "treasure"
+      "kind": "treasure",
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected"
     },
     {
       "id": "curio_humming_shard",
@@ -50,7 +65,9 @@
       "blurb": "It hums when you are not listening.",
       "kind": "curio",
       "identifiesInto": "salve_lesser",
-      "unidentifiedName": "A humming shard…"
+      "unidentifiedName": "A humming shard…",
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "curio_bound_knot",
@@ -60,7 +77,9 @@
       "blurb": "Tied by someone who meant it to stay tied.",
       "kind": "curio",
       "identifiesInto": "cache_key",
-      "unidentifiedName": "A knot of something…"
+      "unidentifiedName": "A knot of something…",
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "salve_lesser",
@@ -69,7 +88,12 @@
       "rarity": "common",
       "blurb": "Restores a little health to one party member.",
       "kind": "consumable",
-      "consumable": { "effect": "heal", "potency": 10 }
+      "consumable": {
+        "effect": "heal",
+        "potency": 10
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "salve",
@@ -78,7 +102,12 @@
       "rarity": "uncommon",
       "blurb": "Restores a useful measure of health to one party member.",
       "kind": "consumable",
-      "consumable": { "effect": "heal", "potency": 24 }
+      "consumable": {
+        "effect": "heal",
+        "potency": 24
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "salve_greater",
@@ -87,7 +116,12 @@
       "rarity": "rare",
       "blurb": "Enough medicine to turn a grave injury into a survivable one.",
       "kind": "consumable",
-      "consumable": { "effect": "heal", "potency": 45 }
+      "consumable": {
+        "effect": "heal",
+        "potency": 45
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "draught_clearing",
@@ -96,7 +130,12 @@
       "rarity": "uncommon",
       "blurb": "Clears poison and closes a bleeding wound.",
       "kind": "consumable",
-      "consumable": { "effect": "clearPoison", "potency": 0 }
+      "consumable": {
+        "effect": "clearPoison",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "draught_quenching",
@@ -105,7 +144,12 @@
       "rarity": "uncommon",
       "blurb": "Quenches burning and clears the eyes after a dazzling emanation.",
       "kind": "consumable",
-      "consumable": { "effect": "clearElemental", "potency": 0 }
+      "consumable": {
+        "effect": "clearElemental",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "antidote_broad",
@@ -114,7 +158,12 @@
       "rarity": "rare",
       "blurb": "Draws out one affliction, whatever shape it took.",
       "kind": "consumable",
-      "consumable": { "effect": "clearAnyStatus", "potency": 0 }
+      "consumable": {
+        "effect": "clearAnyStatus",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "stonebark_tonic",
@@ -123,7 +172,12 @@
       "rarity": "uncommon",
       "blurb": "Turns aside the next affliction that would take hold.",
       "kind": "consumable",
-      "consumable": { "effect": "preventStatus", "potency": 1 }
+      "consumable": {
+        "effect": "preventStatus",
+        "potency": 1
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "venom",
@@ -132,7 +186,12 @@
       "rarity": "uncommon",
       "blurb": "Coats one weapon so its next strike leaves poison behind.",
       "kind": "consumable",
-      "consumable": { "effect": "coatPoison", "potency": 0 }
+      "consumable": {
+        "effect": "coatPoison",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "firebrand",
@@ -141,7 +200,12 @@
       "rarity": "uncommon",
       "blurb": "Coats one weapon so its next strike keeps burning.",
       "kind": "consumable",
-      "consumable": { "effect": "coatBurn", "potency": 0 }
+      "consumable": {
+        "effect": "coatBurn",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "briar_oil",
@@ -150,7 +214,12 @@
       "rarity": "uncommon",
       "blurb": "Coats one weapon so its next strike leaves a stubborn wound.",
       "kind": "consumable",
-      "consumable": { "effect": "coatBleed", "potency": 0 }
+      "consumable": {
+        "effect": "coatBleed",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "flashsalt",
@@ -159,7 +228,12 @@
       "rarity": "uncommon",
       "blurb": "Coats one weapon so its next strike dazzles its target.",
       "kind": "consumable",
-      "consumable": { "effect": "coatDazzle", "potency": 0 }
+      "consumable": {
+        "effect": "coatDazzle",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "solvent",
@@ -168,7 +242,12 @@
       "rarity": "uncommon",
       "blurb": "Reveals one unidentified curio while still in the field.",
       "kind": "consumable",
-      "consumable": { "effect": "identifyCurio", "potency": 0 }
+      "consumable": {
+        "effect": "identifyCurio",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "lure",
@@ -177,7 +256,12 @@
       "rarity": "uncommon",
       "blurb": "Wakes the nearest roaming creature and draws it toward you.",
       "kind": "consumable",
-      "consumable": { "effect": "lureCreature", "potency": 0 }
+      "consumable": {
+        "effect": "lureCreature",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "stillwater",
@@ -186,7 +270,12 @@
       "rarity": "rare",
       "blurb": "Coaxes a failing world into holding together a little longer.",
       "kind": "consumable",
-      "consumable": { "effect": "restoreStability", "potency": 25 }
+      "consumable": {
+        "effect": "restoreStability",
+        "potency": 25
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "waystone",
@@ -195,7 +284,12 @@
       "rarity": "mythic",
       "blurb": "Forces a way home immediately, carrying the whole haul with you.",
       "kind": "consumable",
-      "consumable": { "effect": "returnHome", "potency": 0 }
+      "consumable": {
+        "effect": "returnHome",
+        "potency": 0
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "torch",
@@ -204,7 +298,12 @@
       "rarity": "common",
       "blurb": "Pushes the dark back for the rest of this journey.",
       "kind": "consumable",
-      "consumable": { "effect": "lightWorld", "potency": 2 }
+      "consumable": {
+        "effect": "lightWorld",
+        "potency": 2
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "farsight_draught",
@@ -213,7 +312,12 @@
       "rarity": "rare",
       "blurb": "Reveals the nearest site and a little of the country around it.",
       "kind": "consumable",
-      "consumable": { "effect": "farsight", "potency": 2 }
+      "consumable": {
+        "effect": "farsight",
+        "potency": 2
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "cache_key",
@@ -221,7 +325,9 @@
       "icon": "key",
       "rarity": "rare",
       "blurb": "Fits a lock in a world that is not this one.",
-      "kind": "key"
+      "kind": "key",
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "anchor_frame",
@@ -229,7 +335,9 @@
       "icon": "square.on.square.intersection.dashed",
       "rarity": "mythic",
       "blurb": "A carried binding strong enough to fasten one world back into the Atlas.",
-      "kind": "key"
+      "kind": "key",
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "notGear"
     },
     {
       "id": "blade_chipped",
@@ -243,7 +351,10 @@
         "tier": 1,
         "damage": "rend",
         "reach": "close"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "blade_keen",
@@ -257,7 +368,10 @@
         "tier": 2,
         "damage": "pierce",
         "reach": "close"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "ripping_hook",
@@ -271,7 +385,10 @@
         "tier": 3,
         "damage": "rend",
         "reach": "close"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "the_long_grievance",
@@ -286,7 +403,10 @@
         "damage": "rend",
         "reach": "close",
         "reactivity": 70
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "bone_awl",
@@ -300,7 +420,10 @@
         "tier": 1,
         "damage": "pierce",
         "reach": "close"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "raking_edge",
@@ -314,7 +437,10 @@
         "tier": 2,
         "damage": "rend",
         "reach": "close"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "blade_binders",
@@ -328,7 +454,10 @@
         "tier": 3,
         "damage": "pierce",
         "reach": "mid"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "hairsplitter",
@@ -343,7 +472,10 @@
         "damage": "pierce",
         "reach": "close",
         "reactivity": 70
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "field_maul",
@@ -357,7 +489,10 @@
         "tier": 1,
         "damage": "crush",
         "reach": "close"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "banded_mace",
@@ -371,7 +506,10 @@
         "tier": 2,
         "damage": "crush",
         "reach": "close"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "anvilfall",
@@ -385,7 +523,10 @@
         "tier": 3,
         "damage": "crush",
         "reach": "close"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "the_settled_argument",
@@ -400,7 +541,10 @@
         "damage": "crush",
         "reach": "close",
         "reactivity": 70
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "forged_edge_v1"
     },
     {
       "id": "long_pick",
@@ -414,7 +558,10 @@
         "tier": 1,
         "damage": "pierce",
         "reach": "mid"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "long_haft_v1"
     },
     {
       "id": "warded_spear",
@@ -428,7 +575,10 @@
         "tier": 2,
         "damage": "pierce",
         "reach": "mid"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "long_haft_v1"
     },
     {
       "id": "parting_needle",
@@ -442,7 +592,10 @@
         "tier": 3,
         "damage": "pierce",
         "reach": "close"
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "long_haft_v1"
     },
     {
       "id": "the_kept_distance",
@@ -457,7 +610,10 @@
         "damage": "pierce",
         "reach": "mid",
         "reactivity": 70
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "long_haft_v1"
     },
     {
       "id": "split_board",
@@ -469,7 +625,10 @@
       "gear": {
         "slot": "offhand",
         "tier": 1
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "board_guard_v1"
     },
     {
       "id": "banded_buckler",
@@ -481,7 +640,10 @@
       "gear": {
         "slot": "offhand",
         "tier": 2
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "board_guard_v1"
     },
     {
       "id": "tower_guard",
@@ -493,7 +655,10 @@
       "gear": {
         "slot": "offhand",
         "tier": 3
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "board_guard_v1"
     },
     {
       "id": "the_unarguable",
@@ -505,7 +670,10 @@
       "gear": {
         "slot": "offhand",
         "tier": 4
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "board_guard_v1"
     },
     {
       "id": "padded_cap",
@@ -518,7 +686,10 @@
         "slot": "head",
         "tier": 1,
         "insulation": 65
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "padded_protection_v1"
     },
     {
       "id": "ridged_helm",
@@ -530,7 +701,10 @@
       "gear": {
         "slot": "head",
         "tier": 2
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "rigid_protection_v1"
     },
     {
       "id": "visored_casque",
@@ -542,7 +716,10 @@
       "gear": {
         "slot": "head",
         "tier": 3
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "rigid_protection_v1"
     },
     {
       "id": "crown_of_quiet",
@@ -554,7 +731,10 @@
       "gear": {
         "slot": "head",
         "tier": 4
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "rigid_protection_v1"
     },
     {
       "id": "guard_padded",
@@ -567,7 +747,10 @@
         "slot": "armor",
         "tier": 1,
         "insulation": 65
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "padded_protection_v1"
     },
     {
       "id": "guard_banded",
@@ -579,7 +762,10 @@
       "gear": {
         "slot": "armor",
         "tier": 2
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "rigid_protection_v1"
     },
     {
       "id": "guard_vault",
@@ -591,7 +777,10 @@
       "gear": {
         "slot": "armor",
         "tier": 3
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "rigid_protection_v1"
     },
     {
       "id": "the_standing_wall",
@@ -603,7 +792,10 @@
       "gear": {
         "slot": "armor",
         "tier": 4
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "rigid_protection_v1"
     },
     {
       "id": "wrapped_hands",
@@ -616,7 +808,10 @@
         "slot": "hands",
         "tier": 1,
         "insulation": 65
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "padded_protection_v1"
     },
     {
       "id": "studded_gloves",
@@ -628,7 +823,10 @@
       "gear": {
         "slot": "hands",
         "tier": 2
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "rigid_protection_v1"
     },
     {
       "id": "gauntlets_of_hold",
@@ -640,7 +838,10 @@
       "gear": {
         "slot": "hands",
         "tier": 3
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "rigid_protection_v1"
     },
     {
       "id": "the_sure_hands",
@@ -652,7 +853,10 @@
       "gear": {
         "slot": "hands",
         "tier": 4
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "rigid_protection_v1"
     },
     {
       "id": "worn_boots",
@@ -664,7 +868,10 @@
       "gear": {
         "slot": "feet",
         "tier": 1
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "boots_v1"
     },
     {
       "id": "shod_boots",
@@ -676,7 +883,10 @@
       "gear": {
         "slot": "feet",
         "tier": 2
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "boots_v1"
     },
     {
       "id": "longstriders",
@@ -688,7 +898,10 @@
       "gear": {
         "slot": "feet",
         "tier": 3
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "boots_v1"
     },
     {
       "id": "the_unhurried",
@@ -700,7 +913,10 @@
       "gear": {
         "slot": "feet",
         "tier": 4
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "boots_v1"
     },
     {
       "id": "bent_pick",
@@ -712,7 +928,10 @@
       "gear": {
         "slot": "tool",
         "tier": 1
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "headed_tool_v1"
     },
     {
       "id": "balanced_pick",
@@ -724,7 +943,10 @@
       "gear": {
         "slot": "tool",
         "tier": 2
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "headed_tool_v1"
     },
     {
       "id": "corebreaker",
@@ -736,7 +958,10 @@
       "gear": {
         "slot": "tool",
         "tier": 3
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "headed_tool_v1"
     },
     {
       "id": "the_willing_edge",
@@ -748,7 +973,10 @@
       "gear": {
         "slot": "tool",
         "tier": 4
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "headed_tool_v1"
     },
     {
       "id": "pressed_leaf",
@@ -760,7 +988,10 @@
       "gear": {
         "slot": "keepsake",
         "tier": 1
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "keepsake_v1"
     },
     {
       "id": "cold_compass",
@@ -772,7 +1003,10 @@
       "gear": {
         "slot": "keepsake",
         "tier": 2
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "keepsake_v1"
     },
     {
       "id": "someones_ring",
@@ -784,7 +1018,10 @@
       "gear": {
         "slot": "keepsake",
         "tier": 3
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "keepsake_v1"
     },
     {
       "id": "the_first_page",
@@ -796,7 +1033,10 @@
       "gear": {
         "slot": "keepsake",
         "tier": 4
-      }
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "recyclable",
+      "salvageProfileID": "keepsake_v1"
     },
     {
       "id": "two_natured_blade",
@@ -811,7 +1051,9 @@
         "damage": "pierce",
         "reach": "close",
         "breaks": "twoNatured"
-      }
+      },
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected"
     },
     {
       "id": "long_fang",
@@ -826,7 +1068,9 @@
         "damage": "pierce",
         "reach": "far",
         "breaks": "reachWithoutHaft"
-      }
+      },
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected"
     },
     {
       "id": "ranked_spear",
@@ -841,7 +1085,9 @@
         "damage": "pierce",
         "reach": "mid",
         "breaks": "bothRanks"
-      }
+      },
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected"
     },
     {
       "id": "rimed_edge",
@@ -857,7 +1103,9 @@
         "reach": "close",
         "breaks": "innateStatus",
         "statusKind": "bleed"
-      }
+      },
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected"
     },
     {
       "id": "living_hook",
@@ -872,7 +1120,9 @@
         "damage": "rend",
         "reach": "close",
         "breaks": "growingGrade"
-      }
+      },
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected"
     },
     {
       "id": "quiet_knife",
@@ -887,7 +1137,9 @@
         "damage": "pierce",
         "reach": "close",
         "breaks": "quietStrike"
-      }
+      },
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected"
     },
     {
       "id": "bloodletter",
@@ -902,7 +1154,9 @@
         "damage": "rend",
         "reach": "close",
         "breaks": "endlessBleed"
-      }
+      },
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected"
     },
     {
       "id": "warded_haft",
@@ -918,7 +1172,9 @@
         "reach": "mid",
         "breaks": "wardWhileHeld",
         "wardsAgainst": "crush"
-      }
+      },
+      "tradingPostDisposition": "protected",
+      "recyclerDisposition": "protected"
     }
   ]
 }

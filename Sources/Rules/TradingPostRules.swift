@@ -5,60 +5,19 @@ enum TradingPostRules {
     static let essencePurchaseQuantity = 10
     static let essencePurchasePrice = 8
 
-    private static let bands: [ResourceID: TradingPostTradeBand] = [
-        "rubble": .staple, "clay": .staple, "ore": .staple, "salt": .staple,
-        "fiber": .staple, "timber": .staple, "pulp": .staple, "resin": .staple,
-        "copper": .uncommon, "quartz": .uncommon, "obsidian": .uncommon,
-        "sulfur": .uncommon, "toxin": .uncommon, "spore": .uncommon, "reagent": .uncommon,
-        "silver": .rare, "mercury": .rare, "ichor": .rare, "rift_glass": .rare,
-        "gold": .precious, "adamant": .precious,
-        "essence_raw": .nontradeable, "mote": .nontradeable
-    ]
-
-    /// Versioned authored transferability table. Missing catalogue IDs are denied, never inferred
-    /// from rarity, order or display name. Apex-rule weapons and progression objects are explicit
-    /// members of the denied set below.
-    private static let transferableItemIDs: Set<ItemID> = [
-        "curio_humming_shard", "curio_bound_knot",
-        "salve_lesser", "salve", "salve_greater", "draught_clearing", "draught_quenching",
-        "antidote_broad", "stonebark_tonic", "venom", "firebrand", "briar_oil", "flashsalt",
-        "solvent", "lure", "stillwater", "waystone", "torch", "farsight_draught",
-        "blade_chipped", "blade_keen", "ripping_hook", "the_long_grievance",
-        "bone_awl", "raking_edge", "blade_binders", "hairsplitter",
-        "field_maul", "banded_mace", "anvilfall", "the_settled_argument",
-        "long_pick", "warded_spear", "parting_needle", "the_kept_distance",
-        "split_board", "banded_buckler", "tower_guard", "the_unarguable",
-        "padded_cap", "ridged_helm", "visored_casque", "crown_of_quiet",
-        "guard_padded", "guard_banded", "guard_vault", "the_standing_wall",
-        "wrapped_hands", "studded_gloves", "gauntlets_of_hold", "the_sure_hands",
-        "worn_boots", "shod_boots", "longstriders", "the_unhurried",
-        "bent_pick", "balanced_pick", "corebreaker", "the_willing_edge",
-        "pressed_leaf", "cold_compass", "someones_ring", "the_first_page"
-    ]
-    private static let nontransferableItemIDs: Set<ItemID> = [
-        "essence_crystal", "heat_core", "caustic_core", "light_core", "conduit_fixture",
-        "cache_key", "anchor_frame",
-        "two_natured_blade", "long_fang", "ranked_spear", "rimed_edge",
-        "living_hook", "quiet_knife", "bloodletter", "warded_haft"
-    ]
-
-    static func tradeBand(for resource: ResourceID) -> TradingPostTradeBand? { bands[resource] }
-
-    static func unclassifiedResourceIDs(in catalog: ContentCatalog = .shared) -> [ResourceID] {
-        catalog.resources.map(\.id).filter { bands[$0] == nil }.sorted { $0.rawValue < $1.rawValue }
+    static func tradeBand(for resource: ResourceID,
+                          in catalog: ContentCatalog = .shared) -> TradingPostTradeBand? {
+        catalog.resource(resource)?.tradeBand
     }
 
-    static func isAuthoredTransferable(_ item: ItemID) -> Bool { transferableItemIDs.contains(item) }
-
-    static func unclassifiedItemIDs(in catalog: ContentCatalog = .shared) -> [ItemID] {
-        catalog.items.map(\.id).filter {
-            !transferableItemIDs.contains($0) && !nontransferableItemIDs.contains($0)
-        }.sorted { $0.rawValue < $1.rawValue }
+    static func isAuthoredTransferable(_ item: ItemID,
+                                       in catalog: ContentCatalog = .shared) -> Bool {
+        catalog.item(item)?.tradingPostDisposition == .sellable
     }
 
     static func saleUnitPrice(for stack: ItemStack, catalog: ContentCatalog = .shared) -> Int? {
         guard stack.identified, !stack.isLocked, !stack.isFavorite,
-              transferableItemIDs.contains(stack.catalogID),
+              isAuthoredTransferable(stack.catalogID, in: catalog),
               let definition = catalog.item(stack.catalogID) else { return nil }
         if definition.gear != nil {
             guard definition.gear?.breaks == nil,
@@ -87,9 +46,13 @@ enum TradingPostRules {
             .derived(post.refreshSequence ^ 0x5452_4144_4550_4F53)
 
         let available = Set(catalog.resources.map(\.id))
-        let staples = bands.compactMap { $0.value == .staple && available.contains($0.key) ? $0.key : nil }
+        let staples = catalog.resources.compactMap {
+            $0.tradeBand == .staple && available.contains($0.id) ? $0.id : nil
+        }
             .sorted { $0.rawValue < $1.rawValue }
-        let uncommon = bands.compactMap { $0.value == .uncommon && available.contains($0.key) ? $0.key : nil }
+        let uncommon = catalog.resources.compactMap {
+            $0.tradeBand == .uncommon && available.contains($0.id) ? $0.id : nil
+        }
             .sorted { $0.rawValue < $1.rawValue }
 
         var lines: [TradingPostStockLine] = []
@@ -103,7 +66,7 @@ enum TradingPostRules {
             return result
         }
         func append(_ id: ResourceID, quantity: Int) {
-            guard let price = bands[id]?.buyPrice else { return }
+            guard let price = tradeBand(for: id, in: catalog)?.buyPrice else { return }
             lines.append(TradingPostStockLine(id: post.nextStockLineID, kind: .resource(id),
                                               remainingQuantity: quantity, unitPrice: price))
             post.nextStockLineID &+= 1
@@ -166,7 +129,8 @@ enum TradingPostRules {
         let ownsWeapon = ownsCampaignWeapon(base)
         let equipment = catalog.items.filter { item in
             guard let gear = item.gear else { return false }
-            return gear.tier == 1 && gear.breaks == nil && transferableItemIDs.contains(item.id)
+            return gear.tier == 1 && gear.breaks == nil
+                && item.tradingPostDisposition == .sellable
                 && (ownsWeapon || gear.slot == .weapon)
         }.sorted { $0.id.rawValue < $1.id.rawValue }
         if let item = chosenItems(equipment, count: 1, rng: &rng).first {
@@ -229,7 +193,7 @@ enum TradingPostRules {
         var total = essence / essenceSaleUnit
         for (id, quantity) in requested.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
             guard quantity > 0, base.resources[id] >= quantity,
-                  let price = bands[id]?.sellPrice else { return nil }
+                  let price = tradeBand(for: id)?.sellPrice else { return nil }
             lines.append(.init(id: id, quantity: quantity, unitPrice: price))
             total += quantity * price
         }

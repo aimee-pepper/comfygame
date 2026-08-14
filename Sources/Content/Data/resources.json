@@ -1,5 +1,10 @@
 {
-  "_authority": { "schemaVersion": 1, "defaultDisposition": "settled", "numericValues": "playtestTuning", "playerFacingCopy": "provisionalCopy" },
+  "_authority": {
+    "schemaVersion": 1,
+    "defaultDisposition": "settled",
+    "numericValues": "playtestTuning",
+    "playerFacingCopy": "provisionalCopy"
+  },
   "_note": "Resources are stackable and never consume an inventory slot. Motes are the Reality-layer currency and bank into RealityState, not BaseState. 'drivenBy' names the pressure target whose magnitude sets how much of this a world holds; 'requires' are conditions without which there is none at all; 'favours' each multiply its share. THE DESIGN RULE (resources-skills-spec §1): every resource should make you want to write a particular kind of world — if two come from the same conditions, one is redundant. Which is why the exotic ones are gated behind 'requires' rather than merely favoured: an ordinary world still pays ore and fibre, and mercury is something you go and write for. 'ore' keeps its id (it is a research cost and a save key) and is the workhorse metal the spec calls Iron; a separate iron would be the same thing twice. All PLACEHOLDER.",
   "resources": [
     {
@@ -27,7 +32,8 @@
           "measure": "peak",
           "minimum": 30
         }
-      ]
+      ],
+      "tradeBand": "staple"
     },
     {
       "id": "clay",
@@ -54,7 +60,8 @@
           "key": "hard",
           "maximum": 25
         }
-      ]
+      ],
+      "tradeBand": "staple"
     },
     {
       "id": "ore",
@@ -82,7 +89,8 @@
           "key": "ductile",
           "minimum": 25
         }
-      ]
+      ],
+      "tradeBand": "staple"
     },
     {
       "id": "copper",
@@ -110,7 +118,8 @@
           "measure": "peak",
           "minimum": 35
         }
-      ]
+      ],
+      "tradeBand": "uncommon"
     },
     {
       "id": "silver",
@@ -144,7 +153,8 @@
           "key": "dispersion",
           "maximum": 40
         }
-      ]
+      ],
+      "tradeBand": "rare"
     },
     {
       "id": "gold",
@@ -172,7 +182,8 @@
           "key": "valuable",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "precious"
     },
     {
       "id": "quartz",
@@ -205,7 +216,8 @@
           "measure": "peak",
           "minimum": 50
         }
-      ]
+      ],
+      "tradeBand": "uncommon"
     },
     {
       "id": "obsidian",
@@ -233,7 +245,8 @@
           "key": "geothermal",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "uncommon"
     },
     {
       "id": "salt",
@@ -267,7 +280,8 @@
           "measure": "available",
           "maximum": 25
         }
-      ]
+      ],
+      "tradeBand": "staple"
     },
     {
       "id": "sulfur",
@@ -295,7 +309,8 @@
           "key": "geothermal",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "uncommon"
     },
     {
       "id": "mercury",
@@ -329,7 +344,8 @@
           "key": "valuable",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "rare"
     },
     {
       "id": "adamant",
@@ -363,7 +379,8 @@
           "key": "valuable",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "precious"
     },
     {
       "id": "fiber",
@@ -390,7 +407,8 @@
           "measure": "available",
           "minimum": 25
         }
-      ]
+      ],
+      "tradeBand": "staple"
     },
     {
       "id": "timber",
@@ -417,7 +435,8 @@
           "measure": "available",
           "minimum": 30
         }
-      ]
+      ],
+      "tradeBand": "staple"
     },
     {
       "id": "pulp",
@@ -444,7 +463,8 @@
           "key": "trophicDepth",
           "minimum": 30
         }
-      ]
+      ],
+      "tradeBand": "staple"
     },
     {
       "id": "resin",
@@ -471,7 +491,8 @@
           "key": "dispersion",
           "maximum": 40
         }
-      ]
+      ],
+      "tradeBand": "staple"
     },
     {
       "id": "toxin",
@@ -499,7 +520,8 @@
           "key": "toxic",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "uncommon"
     },
     {
       "id": "spore",
@@ -527,7 +549,8 @@
           "key": "decaying",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "uncommon"
     },
     {
       "id": "reagent",
@@ -561,7 +584,8 @@
           "key": "toxic",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "uncommon"
     },
     {
       "id": "ichor",
@@ -583,7 +607,8 @@
           "key": "sourceless",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "rare"
     },
     {
       "id": "rift_glass",
@@ -617,7 +642,8 @@
           "key": "arrhythmic",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "rare"
     },
     {
       "id": "essence_raw",
@@ -639,7 +665,8 @@
           "key": "arrhythmic",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "nontradeable"
     },
     {
       "id": "mote",
@@ -667,7 +694,8 @@
           "key": "valuable",
           "minimum": 1
         }
-      ]
+      ],
+      "tradeBand": "nontradeable"
     }
   ]
 }
