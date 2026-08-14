@@ -5,7 +5,7 @@ import UIKit
 /// The game supplies facts; this layer turns them into bottom-anchored 16×19 pixel sprites while
 /// the map retains its logical 16×16 footprint.
 enum MapAssetContract {
-    static let manifestSHA256 = "fdfe2744af523628dc7aacac3c5a901d2fbd499a02cdb205a76d21e9f3d3f399"
+    static let manifestSHA256 = "dda2412e6c9253087b7dadc80d4626df637a820631f2d0a5cc26aaacccc63c7a"
     static let seedVersion = "bookbinder-terrain-seed-v1"
     /// Placement variation was frozen with map-slice v1.1. The lifted compositor changes pixels,
     /// not the persisted world's neutral feature choice.
@@ -321,7 +321,10 @@ private enum TerrainPixelGrammar {
         // Every terrain family is an autotiled area. Cardinal neighbours of the exact same ground
         // suppress this tile's corresponding perimeter; exposed sides and their overlapping corner
         // squares form the familiar 3×3 centre/edge/corner grammar already used by water.
-        let edge = edgeColour(tile.ground, palette: palette).graded(grade)
+        // The ordinary palette is already world-graded. Only the four authored special edge
+        // colours still need grading here; grading the fallback again made exposed stone/soil/etc.
+        // diverge from the accepted AssetLab raster whenever the world grade was non-neutral.
+        let edge = edgeColour(tile.ground, palette: palette, grade: grade)
         if request.adjacency & 1 == 0 { result.append(rect(0, 0, 16, 2, edge)) }
         if request.adjacency & 2 == 0 { result.append(rect(14, 0, 2, 16, edge)) }
         if request.adjacency & 4 == 0 { result.append(rect(0, 14, 16, 2, edge)) }
@@ -363,12 +366,12 @@ private enum TerrainPixelGrammar {
         }
     }
 
-    private static func edgeColour(_ ground: GroundType, palette: [RGB]) -> RGB {
+    private static func edgeColour(_ ground: GroundType, palette: [RGB], grade: WorldGrade) -> RGB {
         switch ground {
-        case .water: 0x8fc4cc
-        case .deepWater: 0x2e6681
-        case .ice: 0xd9eef2
-        case .chasm: 0x55566a
+        case .water: RGB(0x8fc4cc).graded(grade)
+        case .deepWater: RGB(0x2e6681).graded(grade)
+        case .ice: RGB(0xd9eef2).graded(grade)
+        case .chasm: RGB(0x55566a).graded(grade)
         default: palette[0]
         }
     }

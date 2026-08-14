@@ -631,7 +631,7 @@ final class WorldTests: XCTestCase {
         var tuning = DebugTuningProfile.defaults
         tuning.stabilityDurationMultiplier = 2
         tuning.collapseRecoveryFraction = 1
-        tuning.baseVisionRadius = 6
+        tuning.baseVisionRadius = Tuning.World.baseVisionRadius + 2
         tuning.slowGroundExtraTurns = 3
         tuning.activeFloraFrequencyMultiplier = 0
         tuning.floraHazardSeverityMultiplier = 2
@@ -2219,18 +2219,19 @@ final class WorldTests: XCTestCase {
         store.mutate("stock Anchorage") { state in
             state.base.stations[Stations.anchorage] = StationState(isUnlocked: true, tier: 0)
             state.base.essence = 100
-            state.base.inventory.stacks = [ItemStack(
-                id: InstanceID(rawValue: 800), catalogID: Items.material,
-                materials: [sample(hardness: 65), sample(hardness: 66),
-                            sample(density: 65), sample(density: 66),
-                            sample(flexibility: 55), sample(reactivity: 65),
-                            sample(hardness: 100, density: 100, flexibility: 100, reactivity: 100)])]
+            let samples = [sample(hardness: 65), sample(hardness: 66),
+                           sample(density: 65), sample(density: 66),
+                           sample(flexibility: 55), sample(reactivity: 65),
+                           sample(hardness: 100, density: 100, flexibility: 100, reactivity: 100)]
+            state.base.materialReserve = MaterialReserve(units: samples.enumerated().map { index, sample in
+                MaterialReserveUnit(id: .init(rawValue: "anchor-frame-\(index)"), sample: sample)
+            })
         }
 
         XCTAssertTrue(store.craftAnchorFrame())
         XCTAssertEqual(store.state.base.essence, 40)
-        XCTAssertEqual(store.state.base.inventory.stacks.first(where: { $0.catalogID == Items.material })?
-            .materials.map(\.grade), [100], "weakest qualifying stock should be consumed first")
+        XCTAssertEqual(store.state.base.materialReserve.units.map(\.sample.grade), [100],
+                       "weakest qualifying stock should be consumed first")
         XCTAssertEqual(store.state.base.inventory.stacks.first(where: { $0.catalogID == Items.anchorFrame })?.count, 1)
     }
 
