@@ -64,7 +64,8 @@ final class ExclusivityTests: XCTestCase {
     func testChainingIsReachableThroughResearch() {
         // A capability nothing grants is dead content.
         let grants = ContentCatalog.shared.researchNodes.flatMap(\.grants)
-        XCTAssertTrue(grants.contains { $0.effect == .chaining }, "no research node teaches chaining")
+        XCTAssertTrue(grants.contains { $0.kind == .capability && $0.id == "chaining" },
+                      "no research node teaches chaining")
         XCTAssertTrue(grants.contains { $0.effect == .finerHand }, "no research node grants a finer hand")
     }
 
@@ -76,6 +77,42 @@ final class ExclusivityTests: XCTestCase {
         store.mutate("test: a pencil") { $0.base.ownedHands.insert(.plain) }
         XCTAssertLessThan(store.footprint(of: symbol.id), before,
                           "a better instrument has to buy room, or it buys nothing")
+    }
+
+    func testUnimplementedPenmanshipCapabilitiesRejectWithoutChargingOrMutating() throws {
+        for id: ResearchNodeID in ["pen_ink_mixing", "pen_compounds"] {
+            let store = fundedScriptoriumStore()
+            let node = try XCTUnwrap(ContentCatalog.shared.researchNode(id))
+            let before = store.state
+
+            XCTAssertFalse(store.canResearch(node), id.rawValue)
+            XCTAssertEqual(store.missingPrerequisites(for: node), [
+                id == "pen_ink_mixing"
+                    ? "Ink Mixing is not ready to learn yet."
+                    : "Compound Assembly is not ready to learn yet."
+            ])
+            XCTAssertFalse(store.research(node), id.rawValue)
+            XCTAssertEqual(store.state, before, "\(id.rawValue) charged for an inert capability")
+            XCTAssertFalse(store.state.base.completedResearch.contains(id))
+        }
+    }
+
+    func testImplementedPenmanshipProgressionRemainsAvailable() throws {
+        let brushStore = fundedScriptoriumStore(completed: [])
+        let brush = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_brush"))
+        XCTAssertTrue(brushStore.canResearch(brush))
+
+        let chainingStore = fundedScriptoriumStore()
+        let chaining = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_chaining"))
+        XCTAssertNil(EconomyRules.implementationAllows(chaining))
+        XCTAssertTrue(chainingStore.canResearch(chaining))
+        XCTAssertTrue(chainingStore.research(chaining))
+        XCTAssertTrue(chainingStore.state.base.hasChainingUnlock)
+
+        let fountainStore = fundedScriptoriumStore(
+            completed: ["pen_brush", "pen_desk", "pen_chaining"], tier: 2)
+        let fountain = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_fountain"))
+        XCTAssertTrue(fountainStore.canResearch(fountain))
     }
 
     func testExclusivityIsEnforcedOnThePageNotJustInTheUI() {
@@ -95,6 +132,22 @@ final class ExclusivityTests: XCTestCase {
         store.mutate("test: know everything") { state in
             state.base.ownedSymbols = Set(ContentCatalog.shared.symbols.map(\.id))
             state.base.essence = 500
+        }
+        return store
+    }
+
+    private func fundedScriptoriumStore(
+        completed: Set<ResearchNodeID> = ["pen_brush", "pen_desk"],
+        tier: Int = 1
+    ) -> GameStore {
+        let store = GameStore(io: .temporary(name: "penmanship-capability-\(UUID().uuidString)"))
+        store.mutate("fund Penmanship") { state in
+            state.base.completedResearch = completed
+            state.base.stations[Stations.scriptorium] = StationState(isUnlocked: true, tier: tier)
+            state.base.essence = 100_000
+            for resource in ContentCatalog.shared.resources {
+                state.base.resources.add(9_999, of: resource.id)
+            }
         }
         return store
     }

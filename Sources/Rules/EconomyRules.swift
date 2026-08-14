@@ -92,9 +92,24 @@ enum EconomyRules {
         !isComplete(node, in: state)
             && !stationTierAlreadySupplied(by: node, in: state)
             && node.requires.allSatisfy { prerequisiteSatisfied($0, in: state) }
+            && implementationAllows(node) == nil
             && buildingAllows(node, in: state) == nil
             && kitAllows(node, in: state) == nil
             && practiceAllows(node, in: state) == nil
+    }
+
+    /// Capability nodes may be authored before their complete player-facing consumer exists, but
+    /// they must never take payment while their grant would be inert. Keep this deliberately exact:
+    /// Brush, Chaining, station tiers and the Fountain pen already have live consequences.
+    static func implementationAllows(_ node: ResearchNodeDef) -> String? {
+        switch node.id {
+        case "pen_ink_mixing":
+            "Ink Mixing is not ready to learn yet."
+        case "pen_compounds":
+            "Compound Assembly is not ready to learn yet."
+        default:
+            nil
+        }
     }
 
     /// **Whether you have measured enough to be worth predicting with** (`crafting-spec.md` PART TWO).
@@ -167,6 +182,7 @@ enum EconomyRules {
         var missing = node.requires
             .filter { !prerequisiteSatisfied($0, in: state) }
             .compactMap { ContentCatalog.shared.researchNode($0)?.name }
+        if let unimplemented = implementationAllows(node) { missing.append(unimplemented) }
         if let blocked = buildingAllows(node, in: state) { missing.append(blocked) }
         if let unmeasured = kitAllows(node, in: state) { missing.append(unmeasured) }
         if let practice = practiceAllows(node, in: state) { missing.append(practice) }
