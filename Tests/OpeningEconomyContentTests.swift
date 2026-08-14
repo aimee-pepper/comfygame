@@ -13,7 +13,7 @@ final class OpeningEconomyContentTests: XCTestCase {
         XCTAssertEqual(vance.signature[0].condition.key, "openness")
         XCTAssertEqual(vance.signature[0].condition.minimum, 68)
         XCTAssertEqual(vance.signature[0].passage,
-                       "A load can cross the horizon here without the land inventing a toll.")
+                       "The land is broad and open, with few barriers between one horizon and the next. A loaded cart could cross without the ground inventing a toll.")
     }
 
     func testTradingPostIsOwnedByVanceAndCheapToEstablish() throws {

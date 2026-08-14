@@ -411,18 +411,54 @@ final class LibraryTests: XCTestCase {
         }
     }
 
-    func testEveryLocationPageQuotesItsSignatureVerbatim() throws {
-        // The diary is the player's evidence, so its wording must not drift away from the
-        // condition passage ultimately shown on the hint page.
-        for traveller in ContentCatalog.shared.travellers {
-            for index in traveller.signature.indices {
-                let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.first {
-                    $0.kind == .locationClue && $0.about == traveller.id && $0.clueIndex == index
-                })
+    func testEveryCanonicalLocationPageQuotesItsSignatureAndRevisedCorpusIsComplete() throws {
+        // The canonical diary page is the player's evidence, so its wording must not drift away
+        // from the condition passage ultimately shown on the hint page. Tovin's recollection of
+        // Isolde is the sole deliberate cross-diary alternate for an already-covered condition.
+        let pages = ContentCatalog.shared.diaryPages.filter { $0.kind == .locationClue }
+        XCTAssertEqual(pages.count, 138)
+
+        let revisedIDs: Set<DiaryPageID> = [
+            "sela_where_2", "tovin_where_0", "tovin_where_1", "tovin_where_2",
+            "isolde_where_1", "tovin_about_isolde", "vance_where_0", "corrin_where_2",
+            "dagg_where_0", "dagg_where_3", "bracken_where_4", "wren_where_0",
+            "wren_where_1", "wren_where_3", "kestrel_where_3", "marrick_where_0",
+            "marrick_where_2", "grimmond_where_1", "grimmond_where_3", "oda_where_0",
+            "oda_where_1", "oda_where_2", "auber_where_0", "auber_where_2",
+            "auber_where_7", "ashe_where_1", "ashe_where_3", "perren_where_0",
+            "perren_where_3", "perren_where_4", "perren_where_6", "perren_where_7",
+            "perren_where_8", "nine_where_1", "nine_where_5", "nine_where_6"
+        ]
+        XCTAssertEqual(revisedIDs.count, 36)
+        XCTAssertEqual(Set(pages.filter { revisedIDs.contains($0.id) }.map(\.id)), revisedIDs)
+
+        let travellers = Dictionary(uniqueKeysWithValues:
+            ContentCatalog.shared.travellers.map { ($0.id, $0) })
+        var pagesByCondition: [String: [DiaryPageID]] = [:]
+        for page in pages {
+            let about = try XCTUnwrap(page.about, "\(page.id.rawValue) has no location subject")
+            let index = try XCTUnwrap(page.clueIndex, "\(page.id.rawValue) has no clue index")
+            let traveller = try XCTUnwrap(travellers[about], "\(page.id.rawValue) names no traveller")
+            XCTAssertTrue(traveller.signature.indices.contains(index))
+            let key = "\(about.rawValue):\(index)"
+            pagesByCondition[key, default: []].append(page.id)
+
+            let canonicalID = DiaryPageID(rawValue: "\(about.rawValue)_where_\(index)")
+            if page.id == canonicalID {
                 XCTAssertEqual(page.prose, traveller.signature[index].passage,
-                               "\(traveller.id.rawValue) clue \(index) tells two different stories")
+                               "\(about.rawValue) clue \(index) tells two different stories")
+            } else {
+                XCTAssertEqual(page.id, "tovin_about_isolde",
+                               "an unreviewed alternate page shares a signature condition")
+                XCTAssertEqual(about, "isolde")
+                XCTAssertEqual(index, 0)
             }
         }
+
+        let duplicateConditions = pagesByCondition.filter { $0.value.count > 1 }
+        XCTAssertEqual(duplicateConditions.count, 1)
+        XCTAssertEqual(Set(duplicateConditions["isolde:0"] ?? []),
+                       ["isolde_where_0", "tovin_about_isolde"])
     }
 
     func testEveryPageComesFromSomebodysDiary() {
