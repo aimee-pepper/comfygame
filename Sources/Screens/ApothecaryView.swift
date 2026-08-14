@@ -1,5 +1,20 @@
 import SwiftUI
 
+enum ConsumableRecipePresentation {
+    static let unknownName = "Unknown preparation"
+    static let unknownResourceName = "Unknown resource"
+
+    static func displayName(for output: ItemID,
+                            catalogue: ContentCatalog = .shared) -> String {
+        catalogue.item(output)?.name ?? unknownName
+    }
+
+    static func resourceName(for id: ResourceID,
+                             catalogue: ContentCatalog = .shared) -> String {
+        catalogue.resource(id)?.name ?? unknownResourceName
+    }
+}
+
 struct ApothecaryView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -111,7 +126,7 @@ struct ApothecaryView: View {
     @ViewBuilder private var preparationActionBar: some View {
         if let recipe = selectedRecipe {
             let missing = ConsumableCraftingRules.shortfall(recipe, in: store.state)
-            let name = ContentCatalog.shared.item(recipe.output)?.name ?? recipe.output.rawValue
+            let name = ConsumableRecipePresentation.displayName(for: recipe.output)
             PersistentActionBar(
                 message: missing.isEmpty ? "Exact stock is ready." : missing.joined(separator: " · "),
                 messageTint: missing.isEmpty ? .secondary : .orange
@@ -152,7 +167,7 @@ private struct ConsumableRecipeTile: View {
             )
                 .frame(width: 34, height: 34)
             Spacer(minLength: 0)
-            Text(item?.name ?? recipe.output.rawValue)
+            Text(ConsumableRecipePresentation.displayName(for: recipe.output))
                 .font(.caption.weight(.semibold))
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
@@ -193,7 +208,7 @@ private struct ConsumableRecipeDetail: View {
                     fallbackColor: item?.rarity.tint ?? .secondary
                 )
                 .frame(width: 32, height: 32)
-                Text(item?.name ?? recipe.output.rawValue)
+                Text(ConsumableRecipePresentation.displayName(for: recipe.output))
                     .font(.headline)
                 Spacer()
                 Text(missing.isEmpty ? "Ready" : "Missing stock")
@@ -224,7 +239,7 @@ private struct ConsumableRecipeDetail: View {
             parts.append("\(need.count) × \(need.property.stockWord) \(Int(need.minimum))+")
         }
         parts += recipe.resources.sorted { $0.key.rawValue < $1.key.rawValue }.map { id, amount in
-            "\(amount) \(ContentCatalog.shared.resource(id)?.name.lowercased() ?? id.rawValue)"
+            "\(amount) \(ConsumableRecipePresentation.resourceName(for: id).lowercased())"
         }
         if recipe.motes > 0 { parts.append("\(recipe.motes) mote") }
         parts.append("\(recipe.essence) essence")

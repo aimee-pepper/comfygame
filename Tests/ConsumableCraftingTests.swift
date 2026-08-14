@@ -28,6 +28,24 @@ final class ConsumableCraftingTests: XCTestCase {
         }
     }
 
+    func testApothecaryPresentationUsesAuthoredNamesAndNeverLeaksUnknownIDs() throws {
+        let recipe = try XCTUnwrap(ConsumableCraftingRules.recipes.first)
+        let item = try XCTUnwrap(ContentCatalog.shared.item(recipe.output))
+        XCTAssertEqual(ConsumableRecipePresentation.displayName(for: recipe.output), item.name)
+
+        let unknown: ItemID = "internal_missing_recipe_id"
+        XCTAssertEqual(ConsumableRecipePresentation.displayName(for: unknown),
+                       ConsumableRecipePresentation.unknownName)
+        XCTAssertFalse(ConsumableRecipePresentation.displayName(for: unknown)
+            .contains(unknown.rawValue))
+
+        let unknownResource: ResourceID = "internal_missing_resource_id"
+        XCTAssertEqual(ConsumableRecipePresentation.resourceName(for: unknownResource),
+                       ConsumableRecipePresentation.unknownResourceName)
+        XCTAssertFalse(ConsumableRecipePresentation.resourceName(for: unknownResource)
+            .contains(unknownResource.rawValue))
+    }
+
     func testRecipeUsesWeakestQualifyingNaturalStockAndNamedReagents() throws {
         var state = stockedState(for: "salve_lesser")
         let recipe = try XCTUnwrap(ConsumableCraftingRules.recipe("salve_lesser"))

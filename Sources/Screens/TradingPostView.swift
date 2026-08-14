@@ -1,5 +1,17 @@
 import SwiftUI
 
+enum TradingPostPresentation {
+    static func resourceName(_ id: ResourceID,
+                             catalogue: ContentCatalog = .shared) -> String {
+        catalogue.resource(id)?.name ?? "Unknown resource"
+    }
+
+    static func itemName(_ id: ItemID,
+                         catalogue: ContentCatalog = .shared) -> String {
+        catalogue.item(id)?.name ?? "Unknown item"
+    }
+}
+
 /// The first Trading Post slice deliberately speaks the same compact visual language as owned
 /// gear and loot: six identities across, with names, prices and actions behind a tap.
 struct TradingPostView: View {
@@ -87,7 +99,8 @@ struct TradingPostView: View {
             case .resource(let id):
                 let definition = ContentCatalog.shared.resource(id)
                 let band = TradingPostRules.tradeBand(for: id) ?? .staple
-                return TradingPostListing(id: "stock-\(line.id)", name: definition?.name ?? id.rawValue,
+                return TradingPostListing(id: "stock-\(line.id)",
+                                          name: TradingPostPresentation.resourceName(id),
                                           icon: definition?.icon ?? "cube.fill", rarity: band.rarity,
                                           displayQuantity: line.remainingQuantity, maximumQuantity: line.remainingQuantity,
                                           unitQuantity: 1, unitPrice: line.unitPrice, location: .offered,
@@ -96,14 +109,15 @@ struct TradingPostView: View {
                                           action: .buyStock(lineID: line.id, kind: line.kind))
             case .item(let id):
                 let definition = ContentCatalog.shared.item(id)
-                return TradingPostListing(id: "stock-\(line.id)", name: definition?.name ?? id.rawValue,
+                return TradingPostListing(id: "stock-\(line.id)",
+                                          name: TradingPostPresentation.itemName(id),
                                           icon: definition?.icon ?? "shippingbox.fill",
                                           rarity: definition?.rarity ?? .common,
                                           displayQuantity: line.remainingQuantity, maximumQuantity: line.remainingQuantity,
                                           unitQuantity: 1, unitPrice: line.unitPrice, location: .offered,
                                           revision: base.tradingPost.inventoryRevision,
                                           stack: nil,
-                                          action: .unavailable,
+                                          action: .unavailablePurchase,
                                           authoredCatalogueItemID: id)
             case .material(let sample):
                 return TradingPostListing(id: "stock-\(line.id)", name: sample.displayName,
@@ -112,7 +126,7 @@ struct TradingPostView: View {
                                           unitQuantity: 1, unitPrice: line.unitPrice, location: .offered,
                                           revision: base.tradingPost.inventoryRevision,
                                           stack: nil,
-                                          action: .unavailable)
+                                          action: .unavailablePurchase)
             }
         }
         if base.tradingPost.essenceBundlesRemaining > 0 {
@@ -140,7 +154,7 @@ struct TradingPostView: View {
                   let price = band.sellPrice else { return nil }
             let definition = ContentCatalog.shared.resource(entry.id)
             return TradingPostListing(id: "sell-\(entry.id.rawValue)",
-                                      name: definition?.name ?? entry.id.rawValue,
+                                      name: TradingPostPresentation.resourceName(entry.id),
                                       icon: definition?.icon ?? "cube.fill", rarity: band.rarity,
                                       displayQuantity: entry.amount, maximumQuantity: entry.amount,
                                       unitQuantity: 1, unitPrice: price, location: .stored,
@@ -273,7 +287,7 @@ private struct TradingPostListingSheet: View {
 
     private var actionFootnote: String {
         if !listing.action.isAvailable {
-            return "This stock is visible, but its capacity-safe purchase path is not available yet."
+            return "You can inspect this stock, but Vance cannot sell it yet."
         }
         if cannotAfford {
             return "You need \(totalPrice - store.state.base.goldCoins) more gold."
@@ -317,7 +331,7 @@ private struct TradingPostListingSheet: View {
                                                    quantity: quantity)],
                 essence: 0,
                 expectedRevision: listing.revision)
-        case .unavailable:
+        case .unavailablePurchase:
             result = .invalid
         }
         if result == .committed { dismiss() } else { failure = result }
@@ -337,13 +351,16 @@ private struct TradingPostListing: Identifiable {
         case sellResource(ResourceID)
         case sellEssence
         case sellItem(location: TradingPostItemLocation, stackID: InstanceID)
-        case unavailable
+        case unavailablePurchase
 
         var isPurchase: Bool {
-            switch self { case .buyStock, .buyEssence: true; default: false }
+            switch self {
+            case .buyStock, .buyEssence, .unavailablePurchase: true
+            default: false
+            }
         }
         var isAvailable: Bool {
-            if case .unavailable = self { return false }
+            if case .unavailablePurchase = self { return false }
             return true
         }
 

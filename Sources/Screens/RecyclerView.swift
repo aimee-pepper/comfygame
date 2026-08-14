@@ -1,5 +1,19 @@
 import SwiftUI
 
+enum RecyclerPresentation {
+    static func resourceName(_ id: ResourceID,
+                             catalogue: ContentCatalog = .shared) -> String {
+        catalogue.resource(id)?.name ?? "Unknown resource"
+    }
+
+    static func recoveredResourceSummary(_ entries: [(id: ResourceID, amount: Int)],
+                                         catalogue: ContentCatalog = .shared) -> String {
+        entries.map { entry in
+            "\(resourceName(entry.id, catalogue: catalogue)) ×\(entry.amount)"
+        }.joined(separator: " · ")
+    }
+}
+
 struct RecyclerView: View {
     @EnvironmentObject private var store: GameStore
     @State private var selected: RecyclerPreview?
@@ -124,12 +138,19 @@ private struct RecyclerPreviewSheet: View {
                 }
                 Section("Recovered") {
                     if !preview.returnedResources.nonZero.isEmpty {
+                        Text(RecyclerPresentation.recoveredResourceSummary(
+                            preview.returnedResources.nonZero
+                        ))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
                         SixAcrossItemGrid(data: preview.returnedResources.nonZero, id: \.id) { entry in
                             let definition = ContentCatalog.shared.resource(entry.id)
                             ResourceIconTile(resourceID: entry.id,
                                              icon: definition?.icon ?? "shippingbox",
                                              quantity: entry.amount,
-                                             accessibilityName: definition?.name ?? entry.id.rawValue)
+                                             accessibilityName: RecyclerPresentation.resourceName(entry.id))
                         }
                         .padding(.vertical, 4)
                     }
@@ -151,7 +172,7 @@ private struct RecyclerPreviewSheet: View {
     private var dismantleActionBar: some View {
         PersistentActionBar(
             message: failure.map(message(for:))
-                ?? "The selected piece is consumed only by a successful atomic recovery.",
+                ?? "The selected piece is consumed only after recovery succeeds.",
             messageTint: failure == nil ? .secondary : .red
         ) {
             Button(role: .destructive) {

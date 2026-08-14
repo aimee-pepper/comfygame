@@ -2,6 +2,35 @@ import XCTest
 @testable import Bookbinder
 
 final class TradingPostTests: XCTestCase {
+    func testTradingPostPresentationUsesAuthoredNamesAndHidesUnknownIDs() throws {
+        let clay = try XCTUnwrap(ContentCatalog.shared.resource("clay"))
+        let salve = try XCTUnwrap(ContentCatalog.shared.item("salve_lesser"))
+        XCTAssertEqual(TradingPostPresentation.resourceName(clay.id), clay.name)
+        XCTAssertEqual(TradingPostPresentation.itemName(salve.id), salve.name)
+
+        let unknownResource: ResourceID = "internal_missing_resource_id"
+        let unknownItem: ItemID = "internal_missing_item_id"
+        XCTAssertEqual(TradingPostPresentation.resourceName(unknownResource), "Unknown resource")
+        XCTAssertEqual(TradingPostPresentation.itemName(unknownItem), "Unknown item")
+        XCTAssertFalse(TradingPostPresentation.resourceName(unknownResource)
+            .contains(unknownResource.rawValue))
+        XCTAssertFalse(TradingPostPresentation.itemName(unknownItem)
+            .contains(unknownItem.rawValue))
+    }
+
+    func testUnavailableBuyStockKeepsPurchaseLanguage() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/TradingPostView.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains("case unavailablePurchase"))
+        XCTAssertTrue(source.contains("case .buyStock, .buyEssence, .unavailablePurchase: true"))
+        XCTAssertFalse(source.contains("case unavailable\n"))
+        XCTAssertTrue(source.contains("You can inspect this stock, but Vance cannot sell it yet."))
+        XCTAssertFalse(source.contains("capacity-safe purchase path"))
+    }
+
     func testOldBaseSaveDefaultsToEmptyTradingPostAndSeparateZeroGoldWallet() throws {
         let old = try SaveCodec.makeDecoder().decode(BaseState.self, from: Data("{\"essence\":37}".utf8))
 

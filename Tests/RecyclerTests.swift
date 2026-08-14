@@ -1,6 +1,23 @@
 import XCTest
 @testable import Bookbinder
 
+final class RecyclerPresentationTests: XCTestCase {
+    func testRecoveredResourceNamesUseCatalogueAndHideUnknownIDs() throws {
+        let clay = try XCTUnwrap(ContentCatalog.shared.resource("clay"))
+        XCTAssertEqual(RecyclerPresentation.resourceName(clay.id), clay.name)
+
+        let unknown: ResourceID = "internal_missing_resource_id"
+        XCTAssertEqual(RecyclerPresentation.resourceName(unknown), "Unknown resource")
+        XCTAssertFalse(RecyclerPresentation.resourceName(unknown).contains(unknown.rawValue))
+
+        let summary = RecyclerPresentation.recoveredResourceSummary([
+            (id: clay.id, amount: 2), (id: unknown, amount: 1)
+        ])
+        XCTAssertEqual(summary, "\(clay.name) ×2 · Unknown resource ×1")
+        XCTAssertFalse(summary.contains(unknown.rawValue))
+    }
+}
+
 final class RecyclerTests: XCTestCase {
     func testRecoveryPreviewKeepsDestructiveActionOutsideScrollableDetails() throws {
         let root = URL(fileURLWithPath: #filePath)
@@ -20,6 +37,8 @@ final class RecyclerTests: XCTestCase {
         XCTAssertTrue(source.contains("Text(\"Dismantle this piece\").frame(maxWidth: .infinity)"))
         XCTAssertTrue(source.contains("message: failure.map(message(for:))"))
         XCTAssertTrue(source.contains("messageTint: failure == nil ? .secondary : .red"))
+        XCTAssertTrue(source.contains("The selected piece is consumed only after recovery succeeds."))
+        XCTAssertFalse(source.contains("successful atomic recovery"))
         XCTAssertTrue(source.contains(".disabled(failure != nil)"))
         XCTAssertTrue(source.contains(".presentationDetents([.medium, .large])"))
         XCTAssertTrue(source.contains(".presentationDragIndicator(.visible)"))
