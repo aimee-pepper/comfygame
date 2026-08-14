@@ -1281,6 +1281,7 @@
     { "id": "oda_where_5", "diary": "oda", "kind": "locationClue", "prose": "Heat gathers at every join intended to hold it. The housing reports its design through the first place it hurts.", "about": "oda", "clueIndex": 5, "prefersConditions": [] },
     { "id": "oda_where_6", "diary": "oda", "kind": "locationClue", "prose": "Light persists between bright intervals. A carrier can continue after its dramatic moment has passed.", "about": "oda", "clueIndex": 6, "prefersConditions": [] },
     { "id": "oda_where_7", "diary": "oda", "kind": "locationClue", "prose": "The interval returns precisely enough to distinguish containment from a run of good luck.", "about": "oda", "clueIndex": 7, "prefersConditions": [] },
+    { "id": "oda_emanation_housing", "diary": "oda", "kind": "schematic", "prose": "A housing gives an emanation a route, a limit and a place to disclose failure. It does not make the force clean.", "teachesSchematic": "emanation_housing", "prefersConditions": [] },
     { "id": "oda_word_fen", "diary": "oda", "kind": "whereabouts", "prose": "Fen stores work in tension and sends it across distance. I store an effect in a housing. His string makes the carrier visible; mine must do the same.", "about": "fen", "prefersConditions": [] },
 
     { "id": "auber_where_0", "diary": "auber", "kind": "locationClue", "prose": "What dries here remains in the next water. Separation changes the carrier that follows.", "about": "auber", "clueIndex": 0, "prefersConditions": [] },

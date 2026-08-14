@@ -59,6 +59,7 @@ enum WorldRules {
         case learnedFocus(PressureSourceID)
         case learnedGambit(GambitComponentID)
         case learnedPattern(WorkshopPatternID)
+        case learnedSchematic(SchematicID)
         case gainedEssence(Int)
         case pickedUpItem(String)
         case satchelFull(String)
@@ -563,6 +564,12 @@ enum WorldRules {
                !state.reality.library.knownPatterns.contains(pattern) {
                 state.reality.library.knownPatterns.insert(pattern)
                 events.append(.learnedPattern(pattern))
+            }
+        case .schematic:
+            if let schematic = page.teachesSchematic,
+               !state.reality.library.knownSchematics.contains(schematic) {
+                state.reality.library.knownSchematics.insert(schematic)
+                events.append(.learnedSchematic(schematic))
             }
         case .researchLead, .ruin, .worldWorthWriting, .account, .turn:
             // Recorded in the Library; the systems that read it come later.

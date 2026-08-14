@@ -97,6 +97,12 @@ struct WorkshopPatternID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+/// A durable authored construction method learned from writing, not a station/build receipt.
+struct SchematicID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 /// One persisted piece of anonymous world writing, distinct from every traveller diary.
 struct FoundWritingID: StringIdentifier {
     var rawValue: String

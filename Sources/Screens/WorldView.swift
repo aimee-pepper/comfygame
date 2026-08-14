@@ -253,6 +253,8 @@ struct WorldView: View {
         case .learnedGambit(let component):
             "A gambit phrase you didn't have: \(ContentCatalog.shared.gambitComponent(component)?.name ?? "something new")."
         case .learnedPattern: "A workshop pattern you didn't have."
+        case .learnedSchematic(let schematic):
+            "A schematic you didn't have: \(SchematicRegistry.definition(schematic)?.name ?? schematic.rawValue)."
         case .gainedEssence(let amount): "\(amount) essence, banked."
         case .pickedUpItem(let what): "\(what) You can't tell what it is."
         case .satchelFull(let what): "No room in your satchel — \(what.lowercased()) is waiting on you."
@@ -284,7 +286,8 @@ struct WorldView: View {
     private func colour(for event: WorldRules.Event) -> Color {
         switch event {
         case .pickedUp, .harvested, .foundPortal, .pickedUpItem, .searchedSite, .siteOpened: .primary
-        case .foundSite, .learnedSymbol, .learnedFocus, .learnedGambit, .learnedPattern, .gainedEssence: .primary
+        case .foundSite, .learnedSymbol, .learnedFocus, .learnedGambit, .learnedPattern,
+             .learnedSchematic, .gainedEssence: .primary
         case .readPage, .foundTraveller, .metTraveller: .primary
         case .usedItem, .surveyed: .green
         case .enteredSlowGround: .orange

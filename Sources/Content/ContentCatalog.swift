@@ -341,6 +341,7 @@ struct ContentCatalog: Sendable {
 
     func validate() throws {
         try WorkshopPatternRegistry.validate(WorkshopPatternRegistry.definitions)
+        try SchematicRegistry.validate(SchematicRegistry.definitions)
         try requireUniqueIDs(symbols.map(\.id.rawValue), label: "symbol")
         try requireUniqueIDs(creatures.map(\.id.rawValue), label: "creature")
         try requireUniqueIDs(resources.map(\.id.rawValue), label: "resource")
@@ -769,6 +770,7 @@ struct ContentCatalog: Sendable {
                 page.teachesFocus != nil,
                 page.teachesGambit != nil,
                 page.teachesPattern != nil,
+                page.teachesSchematic != nil,
                 page.researchNode != nil,
                 page.site != nil,
             ].filter { $0 }.count
@@ -807,6 +809,11 @@ struct ContentCatalog: Sendable {
                 guard let id = page.teachesPattern,
                       WorkshopPatternRegistry.definition(id) != nil else {
                     throw ContentError.danglingReference("page '\(page.id)' teaches an unknown pattern")
+                }
+            case .schematic:
+                guard let id = page.teachesSchematic,
+                      SchematicRegistry.definition(id) != nil else {
+                    throw ContentError.danglingReference("page '\(page.id)' teaches an unknown schematic")
                 }
             case .researchLead:
                 guard let id = page.researchNode, nodeIDs.contains(id) else {

@@ -73,6 +73,11 @@ struct GameState: Codable, Equatable, Sendable {
             print("[placement migration] repaired contradictory legacy party/realm assignments")
 #endif
         }
+        // The schematic field postdates its authored page. Recover knowledge from the exact page
+        // receipt, never from station/item ownership, then canonical encoding persists it normally.
+        if reality.library.hasFound("oda_emanation_housing") {
+            reality.library.knownSchematics.insert("emanation_housing")
+        }
     }
 
     init(schemaVersion: Int, meta: SaveMeta, reality: RealityState, base: BaseState, worlds: WorldsState,

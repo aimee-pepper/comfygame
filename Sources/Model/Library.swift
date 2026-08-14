@@ -18,6 +18,8 @@ struct LibraryState: Codable, Equatable, Sendable {
     var knownTravellers: Set<TravellerID> = []
     /// Singular authored workshop patterns learned from diary pages.
     var knownPatterns: Set<WorkshopPatternID> = []
+    /// Authored construction methods learned from diary pages. Unknown legacy IDs are retained.
+    var knownSchematics: Set<SchematicID> = []
     /// Saved protection against repeated selected full-signature arrival failures.
     var travellerArrivalNearMisses: [TravellerID: Int] = [:]
     /// How many worlds have been generated since each page became eligible to appear.
@@ -89,6 +91,8 @@ struct LibraryState: Codable, Equatable, Sendable {
         // dangling rewards, but migration must never erase knowledge from an older build.
         knownPatterns = try c.decodeIfPresent(Set<WorkshopPatternID>.self,
                                               forKey: .knownPatterns) ?? []
+        knownSchematics = try c.decodeIfPresent(Set<SchematicID>.self,
+                                                forKey: .knownSchematics) ?? []
         travellerArrivalNearMisses = (try c.decodeIfPresent([TravellerID: Int].self,
             forKey: .travellerArrivalNearMisses) ?? [:]).mapValues { max(0, $0) }
         let decodedWaiting = try c.decodeIfPresent([DiaryPageID: Int].self, forKey: .pagesWaiting) ?? [:]

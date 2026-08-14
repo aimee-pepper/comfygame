@@ -200,6 +200,8 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
     var teachesGambit: GambitComponentID?
     /// A complete, singular authored workshop pattern. This is not research progress.
     var teachesPattern: WorkshopPatternID?
+    /// A durable authored construction method. Learning it grants knowledge, never its output.
+    var teachesSchematic: SchematicID?
     /// `researchLead`: partial progress toward a node, never the finished thing.
     var researchNode: ResearchNodeID?
     /// `ruin`: a site whose existence this page reveals.
@@ -230,6 +232,8 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
         case gambit
         /// A singular authored workshop pattern, taught outright.
         case pattern
+        /// A singular authored construction method, taught outright.
+        case schematic
         /// A head start on a research node — partial progress, not the finished thing.
         case researchLead
 
@@ -245,6 +249,7 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
             case .focus: "A focus"
             case .gambit: "A gambit phrase"
             case .pattern: "A workshop pattern"
+            case .schematic: "A schematic"
             case .researchLead: "A line of study"
             }
         }
@@ -276,6 +281,35 @@ enum WorkshopPatternRegistry {
             guard seen.insert(definition.id).inserted else {
                 throw ContentCatalog.ContentError.duplicateID(
                     "workshop pattern '\(definition.id.rawValue)'")
+            }
+        }
+    }
+}
+
+/// Central identity authority for construction knowledge learned from authored writing.
+enum SchematicRegistry {
+    struct Definition: Equatable, Sendable {
+        var id: SchematicID
+        var name: String
+    }
+
+    static let definitions: [Definition] = [
+        Definition(id: "emanation_housing", name: "Emanation housing")
+    ]
+
+    static func definition(_ id: SchematicID) -> Definition? {
+        definitions.first { $0.id == id }
+    }
+
+    static func validate(_ definitions: [Definition]) throws {
+        var seen: Set<SchematicID> = []
+        for definition in definitions {
+            guard !definition.id.rawValue.isEmpty, !definition.name.isEmpty else {
+                throw ContentCatalog.ContentError.danglingReference("unnamed schematic")
+            }
+            guard seen.insert(definition.id).inserted else {
+                throw ContentCatalog.ContentError.duplicateID(
+                    "schematic '\(definition.id.rawValue)'")
             }
         }
     }

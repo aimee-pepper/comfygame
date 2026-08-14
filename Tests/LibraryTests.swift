@@ -1202,4 +1202,92 @@ final class LibraryTests: XCTestCase {
         XCTAssertEqual(base.roster.count, travellers.count + 1, "Quill plus every named recruit")
         XCTAssertTrue(base.canRecruit)
     }
+
+    func testOdaSchematicRegistryRejectsDuplicatesRegardlessOfOrder() {
+        let canonical = SchematicRegistry.Definition(id: "emanation_housing", name: "Housing")
+        let duplicate = SchematicRegistry.Definition(id: "emanation_housing", name: "Duplicate")
+        let other = SchematicRegistry.Definition(id: "retired_schematic", name: "Retired")
+        XCTAssertThrowsError(try SchematicRegistry.validate([canonical, other, duplicate]))
+        XCTAssertThrowsError(try SchematicRegistry.validate([duplicate, canonical, other]))
+    }
+
+    func testOdaSchematicGrantsKnowledgeOnceAndNoOutput() throws {
+        var state = GameState.newGame()
+        let baseBefore = state.base
+        let worldsBefore = state.worlds
+        XCTAssertEqual(WorldRules.readPage("oda_emanation_housing", in: &state), [
+            .readPage("oda_emanation_housing"), .learnedSchematic("emanation_housing")
+        ])
+        XCTAssertEqual(state.reality.library.knownSchematics, ["emanation_housing"])
+        XCTAssertEqual(state.base, baseBefore)
+        XCTAssertEqual(state.worlds, worldsBefore)
+        XCTAssertEqual(WorldRules.readPage("oda_emanation_housing", in: &state), [])
+        let restored = try SaveCodec.decode(SaveCodec.encode(state))
+        XCTAssertEqual(restored.reality.library.knownSchematics, ["emanation_housing"])
+        XCTAssertEqual(restored.base, baseBefore)
+    }
+
+    func testOdaRecoveredLegacyPageReconcilesButStationOnlyDoesNot() throws {
+        var recovered = GameState.newGame()
+        recovered.reality.library.recordPage("oda_emanation_housing", worldRecordID: nil, siteID: nil)
+        let adopted = try SaveCodec.decode(try removingKnownSchematics(from: SaveCodec.encode(recovered)))
+        XCTAssertEqual(adopted.reality.library.knownSchematics, ["emanation_housing"])
+        var stationOnly = GameState.newGame()
+        stationOnly.base.stations[Stations.channelworks] = StationState(isUnlocked: true, tier: 1)
+        let notAdopted = try SaveCodec.decode(
+            try removingKnownSchematics(from: SaveCodec.encode(stationOnly)))
+        XCTAssertTrue(notAdopted.reality.library.knownSchematics.isEmpty)
+    }
+
+    func testOdaUnknownSchematicKnowledgeRoundTripsLosslessly() throws {
+        let data = Data(#"{"knownSchematics":["retired_schematic","emanation_housing"]}"#.utf8)
+        let decoded = try SaveCodec.makeDecoder().decode(LibraryState.self, from: data)
+        let restored = try SaveCodec.makeDecoder().decode(
+            LibraryState.self, from: SaveCodec.makeEncoder().encode(decoded))
+        XCTAssertTrue(restored.knownSchematics.contains("retired_schematic"))
+        XCTAssertEqual(restored.knownSchematics, decoded.knownSchematics)
+    }
+
+    func testOdaCatalogueUsesOneTypedValidatedSchematicReward() throws {
+        let catalog = try ContentCatalog.load()
+        let page = try XCTUnwrap(catalog.diaryPage("oda_emanation_housing"))
+        XCTAssertEqual(page.kind, .schematic)
+        XCTAssertEqual(page.teachesSchematic, "emanation_housing")
+        XCTAssertNil(page.teachesPattern)
+        XCTAssertNotNil(SchematicRegistry.definition(try XCTUnwrap(page.teachesSchematic)))
+        XCTAssertEqual(LibraryPresentation.rewardName(for: page), "Emanation housing")
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(
+            DiaryPageDef.self, from: SaveCodec.makeEncoder().encode(page)), page)
+
+        var pages = catalog.diaryPages
+        let index = try XCTUnwrap(pages.firstIndex { $0.id == page.id })
+        pages[index].teachesSchematic = "unknown_schematic"
+        XCTAssertThrowsError(try catalogueCopy(catalog, pages: pages).validate())
+        pages[index].teachesSchematic = "emanation_housing"
+        pages[index].teachesPattern = "maud_fitting_pattern"
+        XCTAssertThrowsError(try catalogueCopy(catalog, pages: pages).validate())
+    }
+
+    private func catalogueCopy(_ catalog: ContentCatalog, pages: [DiaryPageDef]) -> ContentCatalog {
+        ContentCatalog(symbols: catalog.symbols, creatures: catalog.creatures,
+            resources: catalog.resources, items: catalog.items, skills: catalog.skills,
+            pressureTargets: catalog.pressureTargets, pressureSources: catalog.pressureSources,
+            researchBranches: catalog.researchBranches, researchNodes: catalog.researchNodes,
+            gambitComponents: catalog.gambitComponents, stations: catalog.stations,
+            constellationNodes: catalog.constellationNodes, sites: catalog.sites,
+            contradictions: catalog.contradictions, descriptionClauses: catalog.descriptionClauses,
+            combatTrees: catalog.combatTrees, combatGraph: catalog.combatGraph,
+            runeShapes: catalog.runeShapes, qualifiers: catalog.qualifiers,
+            travellers: catalog.travellers, diaryPages: pages)
+    }
+
+    private func removingKnownSchematics(from data: Data) throws -> Data {
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+        var library = try XCTUnwrap(reality["library"] as? [String: Any])
+        library.removeValue(forKey: "knownSchematics")
+        reality["library"] = library
+        root["reality"] = reality
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
 }

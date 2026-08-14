@@ -56,6 +56,14 @@ enum LibraryPresentation {
     static func olderRecordIDs(in library: LibraryState) -> [DiaryPageID] {
         library.foundPages.filter { ContentCatalog.shared.diaryPage($0) == nil }
     }
+
+    static func rewardName(for page: DiaryPageDef) -> String? {
+        if let id = page.teachesSchematic { return SchematicRegistry.definition(id)?.name }
+        if let id = page.teachesPattern { return WorkshopPatternRegistry.definition(id)?.name }
+        if page.teaches != nil || page.teachesFocus != nil || page.teachesGambit != nil
+            || page.researchNode != nil { return page.kind.displayName }
+        return nil
+    }
 }
 
 extension FoundWritingRecord.Family {
@@ -91,6 +99,7 @@ private extension DiaryPageDef.Kind {
         case .focus: "scope"
         case .gambit: "point.3.connected.trianglepath.dotted"
         case .pattern: "wrench.and.screwdriver"
+        case .schematic: "scroll"
         case .researchLead: "lightbulb"
         }
     }
@@ -513,8 +522,7 @@ private struct DiaryPageTile: View {
     let page: DiaryPageDef
 
     private var hasReward: Bool {
-        page.teaches != nil || page.teachesFocus != nil || page.teachesGambit != nil
-            || page.teachesPattern != nil || page.researchNode != nil
+        LibraryPresentation.rewardName(for: page) != nil
     }
 
     private var fragment: String {
@@ -539,6 +547,9 @@ private struct DiaryPageTile: View {
             }
             Text(page.kind.displayName).font(.caption.weight(.semibold))
             Text(fragment).font(.caption).foregroundStyle(.secondary).lineLimit(3)
+            if let reward = LibraryPresentation.rewardName(for: page) {
+                Text(reward).font(.caption2.weight(.semibold)).foregroundStyle(.orange)
+            }
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, minHeight: 132, alignment: .leading)
@@ -605,6 +616,10 @@ struct DiaryPageProseCard: View {
             Text(AuthoredTextRendering.attributed("“\(page.prose)”"))
                 .font(.caption.italic()).foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+            if let reward = LibraryPresentation.rewardName(for: page) {
+                Label(reward, systemImage: "sparkles")
+                    .font(.caption.weight(.semibold)).foregroundStyle(.orange)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 4)
