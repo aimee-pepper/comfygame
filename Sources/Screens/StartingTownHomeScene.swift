@@ -140,9 +140,7 @@ struct StartingTownHomeScene: View {
             }
             .clipped()
         }
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.16)))
+        .clipped()
     }
 }
 

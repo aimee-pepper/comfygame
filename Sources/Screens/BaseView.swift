@@ -86,19 +86,17 @@ struct BaseView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            VStack(spacing: 12) {
-                contextRow
-                firstReturnRouteCard
-                sectionPicker
-                if selectedSection == .home {
-                    stationBoard(containerSize: geometry.size)
-                        .frame(maxHeight: .infinity)
-                } else {
-                    ScrollView { stationBoard(containerSize: geometry.size) }
+            VStack(spacing: 0) {
+                VStack(spacing: 12) {
+                    contextRow
+                    firstReturnRouteCard
+                    sectionPicker
                 }
+                .padding(.horizontal, 12)
+                .padding(.top, 12)
+                stationBoard(containerSize: geometry.size)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .padding(12)
-            .padding(.bottom, 12)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Base")
@@ -219,8 +217,6 @@ struct BaseView: View {
         let destinations = stations(in: selectedSection)
         let populatedPages = BaseBoardRules.townPages(destinations)
         let pages = populatedPages.isEmpty ? [[]] : populatedPages
-        let sceneHeight = min(440, max(320, containerSize.height * 0.58))
-
         return TabView {
             ForEach(Array(pages.enumerated()), id: \.offset) { _, page in
                 TownDistrictScene(
@@ -230,11 +226,10 @@ struct BaseView: View {
                     openFoundation: { foundationStation = $0 },
                     openedRoute: { store.openedFirstReturnDestination($0) }
                 )
-                .padding(.horizontal, 1)
             }
         }
         .tabViewStyle(.page(indexDisplayMode: pages.count > 1 ? .automatic : .never))
-        .frame(height: sceneHeight)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier("base-town-scene-\(selectedSection.rawValue)")
     }
 
@@ -415,9 +410,7 @@ private struct TownDistrictScene: View {
             .frame(width: geometry.size.width, height: geometry.size.height)
             .clipped()
         }
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.16)))
+        .clipped()
     }
 }
 

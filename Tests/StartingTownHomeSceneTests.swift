@@ -86,7 +86,7 @@ final class StartingTownHomeSceneTests: XCTestCase {
         }
     }
 
-    func testHomeSceneOwnsRemainingHeightOutsideTheScrollingDistrictGrid() throws {
+    func testEveryDistrictSceneOwnsTheSameRemainingViewportWithoutScrolling() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
@@ -94,10 +94,10 @@ final class StartingTownHomeSceneTests: XCTestCase {
         let bodyStart = try XCTUnwrap(source.range(of: "var body: some View"))
         let purse = try XCTUnwrap(source.range(of: "// MARK: Purse", range: bodyStart.upperBound..<source.endIndex))
         let body = String(source[bodyStart.lowerBound..<purse.lowerBound])
-        XCTAssertTrue(body.contains("if selectedSection == .home"))
-        XCTAssertTrue(body.contains("stationBoard(containerSize: geometry.size)\n                        .frame(maxHeight: .infinity)"))
-        XCTAssertTrue(body.contains("else {\n                    ScrollView { stationBoard(containerSize: geometry.size) }"))
-        XCTAssertFalse(body.contains("ScrollView {\n                VStack"))
+        XCTAssertTrue(body.contains("stationBoard(containerSize: geometry.size)\n                    .frame(maxWidth: .infinity, maxHeight: .infinity)"))
+        XCTAssertFalse(body.contains("if selectedSection == .home"))
+        XCTAssertFalse(body.contains("ScrollView"))
+        XCTAssertFalse(body.contains(".padding(12)"))
     }
 
     func testMalformedMetadataFailsClosed() throws {
@@ -126,6 +126,9 @@ final class StartingTownHomeSceneTests: XCTestCase {
         XCTAssertTrue(scene.contains("NavigationLink(value: route)"))
         XCTAssertTrue(scene.contains(".zIndex(1)"))
         XCTAssertTrue(scene.contains("openedRoute(route)"))
+        XCTAssertTrue(scene.contains(".clipped()"))
+        XCTAssertFalse(scene.contains("clipShape(RoundedRectangle"))
+        XCTAssertFalse(scene.contains("overlay(RoundedRectangle"))
     }
 
     private func loadedScene() throws -> StartingTownHomeRules.Scene {
