@@ -13,6 +13,54 @@ final class WorldTests: XCTestCase {
 
     // MARK: Worldgen
 
+    func testWildWorldPageSelectionIsDeterministicOrderIndependentAndPityGuaranteed() throws {
+        let context = WildWorldPageSelectionRules.Context(
+            resolvedExpeditions: 5, drought: 5, ownedCopies: [:],
+            worldContextTags: ["hydrology", "atmosphere"], suppressesRandomPage: false)
+        let first = try XCTUnwrap(WildWorldPageSelectionRules.select(seed: 991, context: context))
+        let second = try XCTUnwrap(WildWorldPageSelectionRules.select(
+            seed: 991, context: context,
+            definitions: Array(WorldPageCatalog.repeatableDefinitions.reversed())))
+        XCTAssertEqual(first, second)
+        XCTAssertNotEqual(first.instanceID.rawValue, 0)
+        XCTAssertEqual(first.definition.id, WorldPageCatalog.definition(first.definition.id)?.id)
+    }
+
+    func testWildWorldPageSelectionHonoursPacingCopyLimitAndSuppression() {
+        let base = WildWorldPageSelectionRules.Context(
+            resolvedExpeditions: 1, drought: 5, ownedCopies: [:], worldContextTags: [],
+            suppressesRandomPage: false)
+        let early = WildWorldPageSelectionRules.select(seed: 4, context: base)
+        XCTAssertNotNil(early)
+        XCTAssertEqual(early?.definition.minimumResolvedExpeditions, 1)
+
+        var capped = base
+        capped.ownedCopies = Dictionary(uniqueKeysWithValues:
+            WorldPageCatalog.repeatableDefinitions.map { ($0.id, 2) })
+        XCTAssertNil(WildWorldPageSelectionRules.select(seed: 4, context: capped))
+
+        var suppressed = base
+        suppressed.suppressesRandomPage = true
+        XCTAssertNil(WildWorldPageSelectionRules.select(seed: 4, context: suppressed))
+
+        var opening = base
+        opening.resolvedExpeditions = 0
+        XCTAssertNil(WildWorldPageSelectionRules.select(seed: 4, context: opening))
+    }
+
+    func testWildWorldPageContextWeightingDoesNotEliminateBaselineCandidates() {
+        let context = WildWorldPageSelectionRules.Context(
+            resolvedExpeditions: 5, drought: 5, ownedCopies: [:],
+            worldContextTags: ["hydrology"], suppressesRandomPage: false)
+        let selected = (0..<512).compactMap {
+            WildWorldPageSelectionRules.select(seed: UInt64($0), context: context)?.definition
+        }
+        XCTAssertEqual(selected.count, 512)
+        XCTAssertTrue(selected.contains { $0.contextTags.contains("hydrology") })
+        XCTAssertTrue(selected.contains { !$0.contextTags.contains("hydrology") },
+                      "3x context weighting must not make other repeatables unreachable")
+    }
+
     func testSameSeedRegeneratesTheSameWorld() {
         let composition = book(["terrain": "caverns", "biome": "ashen", "bounty": "rich_ore", "quirk": "gilded_veins"])
         let first = Worldgen.generate(book: composition, seed: 8_675_309)

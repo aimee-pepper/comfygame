@@ -1,5 +1,55 @@
 import Foundation
 
+enum WildWorldPageSelectionRules {
+    struct Context: Equatable, Sendable {
+        var resolvedExpeditions: Int
+        var drought: Int
+        var ownedCopies: [WorldPageDefinitionID: Int]
+        var worldContextTags: Set<String>
+        var suppressesRandomPage: Bool
+    }
+
+    struct Selection: Equatable, Sendable {
+        var definition: WorldPageDefinition
+        var generationSeed: UInt64
+        var instanceID: InstanceID
+    }
+
+    static let baseChance = 0.15
+    static let guaranteeDrought = 5
+    static let copyLimit = 2
+
+    static func select(seed: UInt64, context: Context,
+                       definitions: [WorldPageDefinition] = WorldPageCatalog.repeatableDefinitions)
+        -> Selection? {
+        guard !context.suppressesRandomPage, context.resolvedExpeditions >= 1 else { return nil }
+        var rng = SeededRNG(seed: seed).derived(0x5750_4147_45)
+        let eligible = definitions
+            .filter { definition in
+                definition.disposition.isRandom
+                    && definition.minimumResolvedExpeditions <= context.resolvedExpeditions
+                    && context.ownedCopies[definition.id, default: 0] < copyLimit
+            }
+            .sorted { $0.id.rawValue < $1.id.rawValue }
+        guard !eligible.isEmpty else { return nil }
+        let guaranteed = context.drought >= guaranteeDrought
+        guard guaranteed || rng.chance(baseChance) else { return nil }
+        let weighted = eligible.map { definition in
+            let contextMultiplier = definition.contextTags.contains {
+                context.worldContextTags.contains($0)
+            } ? 3.0 : 1.0
+            return (value: definition,
+                    weight: definition.baseWeightMultiplier * contextMultiplier)
+        }
+        guard let definition = rng.pickWeighted(weighted) else { return nil }
+        let generationSeed = rng.next()
+        var rawID = rng.next()
+        if rawID == 0 { rawID = 1 }
+        return Selection(definition: definition, generationSeed: generationSeed,
+                         instanceID: InstanceID(rawValue: rawID))
+    }
+}
+
 /// Turns (book, seed) into a tile grid.
 ///
 /// Every roll comes off a stream derived from the world's seed with a fixed salt per pass, so
