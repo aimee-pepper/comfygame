@@ -585,21 +585,19 @@ struct WorldTendencies: Equatable, Sendable {
         if atmosphere.peak > 60 { w[.size]! *= 1.2 }
         if atmosphere.aspect("motion") > 55 { free.appendageTypeWeights[.feathered]! += 0.9 }
 
-        // A world can only afford what it can feed.
-        budget = Tuning.Life.baseBudget + vitality.peak * Tuning.Life.budgetPerVitality
-        let productivity = vitality.peak / Tuning.Pressure.scaleMaximum
-        w[.ornament]! *= 0.3 + 1.7 * productivity
-
-        // Trophic depth is predation: deep webs push armament hard on some and to nothing on others,
-        // which is exactly the split the defence branch is for.
+        // Vitality peak owns abundance, never the total power of an individual animal. Cast size
+        // and placed population read it at their own boundaries; spending peak here used to make a
+        // Teeming page buy stronger and better-armoured species as well as more of them. Trophic
+        // depth remains a legitimate *allocation* signal, but it redistributes this fixed budget.
+        budget = Tuning.Life.baseBudget
         predation = vitality.aspect("trophicDepth")
         let depth = predation / Tuning.Pressure.scaleMaximum
         w[.armament]! *= 0.4 + 1.6 * depth
 
-        armourAffordance = 0.4 + mineral * 1.6 + productivity
+        armourAffordance = 0.4 + mineral * 1.6
         speedAffordance = 0.5 + (openness / Tuning.Pressure.scaleMaximum) * 1.5
         crypsisAffordance = 0.5 + (1 - openness / Tuning.Pressure.scaleMaximum) * 1.5
-        aposematismAffordance = 0.2 + productivity * 1.4
+        aposematismAffordance = 0.2
 
         free.clampToRanges()
         axisWeights = w

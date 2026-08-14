@@ -64,18 +64,50 @@ final class LifeTests: XCTestCase {
         let rich = world([:], vitality: 95)
 
         XCTAssertGreaterThan(LifeRules.castSize(for: rich), LifeRules.castSize(for: poor))
-        XCTAssertGreaterThan(WorldTendencies(readings: rich).budget,
-                             WorldTendencies(readings: poor).budget)
+        XCTAssertEqual(WorldTendencies(readings: rich), WorldTendencies(readings: poor),
+                       "Vitality changed an individual species tendency instead of only abundance")
 
-        // The *shape* of the draw must not change with wealth. Ornament is the one axis the spec
-        // ties to Vitality directly (costly signalling is only affordable when there's slack), and
-        // the weapon axes move with trophic depth, so the comparison is normalised over the rest.
-        let body: [CostlyAxis] = [.size, .coveringHardness, .coveringLength, .coveringCoverage, .boneDensity]
-        let shapePoor = normalisedWeights(poor, over: body), shapeRich = normalisedWeights(rich, over: body)
-        for axis in body {
-            XCTAssertEqual(shapePoor[axis] ?? 0, shapeRich[axis] ?? 0, accuracy: 0.001,
-                           "wealth changed what \(axis.rawValue) worlds tend to build, not just how much")
+        for seed in UInt64(1)...24 {
+            let poorCast = LifeRules.cast(for: poor, seed: seed)
+            let richCast = LifeRules.cast(for: rich, seed: seed)
+            XCTAssertEqual(Array(richCast.prefix(poorCast.count)), poorCast,
+                           "Vitality changed the gameplay species prefix for seed \(seed)")
         }
+    }
+
+    func testTrophicDepthRedistributesTheFixedBudgetRatherThanAddingPower() {
+        var shallow = world([:], vitality: 70)
+        var deep = shallow
+        shallow.readings["vitality"]?.aspects["trophicDepth"] = 0
+        deep.readings["vitality"]?.aspects["trophicDepth"] = 100
+
+        let shallowWorld = WorldTendencies(readings: shallow)
+        let deepWorld = WorldTendencies(readings: deep)
+        XCTAssertEqual(shallowWorld.budget, deepWorld.budget)
+        XCTAssertGreaterThan(deepWorld.axisWeights[.armament] ?? 0,
+                             shallowWorld.axisWeights[.armament] ?? 0)
+
+        var shallowArmament = 0.0, deepArmament = 0.0
+        var shallowOther = 0.0, deepOther = 0.0
+        for seed in UInt64(1)...120 {
+            let shallowTraits = LifeRules.cast(for: shallow, seed: seed).map(\.traits)
+            let deepTraits = LifeRules.cast(for: deep, seed: seed).map(\.traits)
+            for traits in shallowTraits {
+                shallowArmament += traits[.armament]
+                shallowOther += CostlyAxis.allCases.filter { $0 != .armament }
+                    .reduce(0) { $0 + traits[$1] }
+                XCTAssertLessThanOrEqual(traits.appetite, shallowWorld.budget + 0.001)
+            }
+            for traits in deepTraits {
+                deepArmament += traits[.armament]
+                deepOther += CostlyAxis.allCases.filter { $0 != .armament }
+                    .reduce(0) { $0 + traits[$1] }
+                XCTAssertLessThanOrEqual(traits.appetite, deepWorld.budget + 0.001)
+            }
+        }
+        XCTAssertGreaterThan(deepArmament, shallowArmament)
+        XCTAssertLessThan(deepOther, shallowOther,
+                          "trophic depth added weapons without taking investment elsewhere")
     }
 
     func testEveryWorldHoldsSomething() {
@@ -537,13 +569,6 @@ final class LifeTests: XCTestCase {
         var creatureID: CreatureID
         var position: GridPoint
         var isAwake: Bool
-    }
-
-    private func normalisedWeights(_ readings: PressureReadings,
-                                   over axes: [CostlyAxis]) -> [CostlyAxis: Double] {
-        let weights = WorldTendencies(readings: readings).axisWeights
-        let total = axes.reduce(0) { $0 + (weights[$1] ?? 0) }
-        return Dictionary(uniqueKeysWithValues: axes.map { ($0, total > 0 ? (weights[$0] ?? 0) / total : 0) })
     }
 
     /// A world built from sigils, then overridden on the axes a test wants to isolate — so a claim
