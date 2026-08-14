@@ -4,6 +4,29 @@ import XCTest
 /// Spending: refining, upgrades, identification, the key→cache payoff, and Constellation nodes.
 @MainActor
 final class EconomyTests: XCTestCase {
+    func testWritingPaletteUsesThreeReadableColumnsOnAnOrdinaryPhone() {
+        XCTAssertEqual(WritingDeskLayout.paletteChipMinimumWidth, 104)
+        XCTAssertEqual(WritingDeskLayout.paletteColumnCount(containerWidth: 344), 3)
+        XCTAssertEqual(WritingDeskLayout.paletteColumnCount(containerWidth: 320), 2)
+    }
+
+    func testGambitEditorUsesPlayerInstructionsInsteadOfSchemaPlaceholders() {
+        XCTAssertEqual(GambitEditorPresentation.placeholder(for: .subject), "Choose who")
+        XCTAssertEqual(GambitEditorPresentation.placeholder(for: .property), "Stat")
+        XCTAssertEqual(GambitEditorPresentation.placeholder(for: .comparator), "Test")
+        XCTAssertEqual(GambitEditorPresentation.placeholder(for: .threshold), "Value")
+        XCTAssertEqual(GambitEditorPresentation.placeholder(for: .action), "Action")
+    }
+
+    func testGambitEditorDistinguishesActiveSlotsFromWrittenIdleRules() {
+        XCTAssertEqual(GambitEditorPresentation.slotSummary(written: 1, slots: 2), "1/2 active")
+        XCTAssertEqual(GambitEditorPresentation.slotSummary(written: 2, slots: 2), "2/2 active")
+        XCTAssertEqual(GambitEditorPresentation.slotSummary(written: 3, slots: 2), "2 active · 3 written")
+        XCTAssertEqual(GambitEditorPresentation.addRuleLabel(written: 1, slots: 2), "Write a rule")
+        XCTAssertEqual(GambitEditorPresentation.addRuleLabel(written: 2, slots: 2), "Write an idle rule")
+        XCTAssertEqual(GambitEditorPresentation.addRuleLabel(written: 3, slots: 2), "Write an idle rule")
+    }
+
     func testIdentificationShortfallNamesTheExactMissingEssence() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
@@ -25,7 +48,8 @@ final class EconomyTests: XCTestCase {
 
         XCTAssertTrue(source.contains("var directionIcon = \"chevron.right\""))
         XCTAssertTrue(source.contains("subtitle: \"Return to the campaign chooser\","))
-        XCTAssertTrue(source.contains("directionIcon: \"chevron.backward\""))
+        XCTAssertTrue(source.contains("directionIcon: \"rectangle.portrait.and.arrow.right\""))
+        XCTAssertFalse(source.contains("directionIcon: \"chevron.backward\""))
         XCTAssertTrue(source.contains("Image(systemName: directionIcon)"))
     }
 
@@ -422,10 +446,10 @@ final class EconomyTests: XCTestCase {
             encoding: .utf8
         )
 
-        let action = try XCTUnwrap(source.range(of: "Label(\"Write a rule\""))
+        let action = try XCTUnwrap(source.range(of: "GambitEditorPresentation.addRuleLabel"))
         let priorityList = try XCTUnwrap(source.range(of: "List {"))
         XCTAssertLessThan(action.lowerBound, priorityList.lowerBound)
-        XCTAssertEqual(source.components(separatedBy: "Label(\"Write a rule\"").count - 1, 1)
+        XCTAssertEqual(source.components(separatedBy: "GambitEditorPresentation.addRuleLabel").count - 1, 1)
         XCTAssertTrue(source.contains("if !store.canEditGambits"))
         XCTAssertTrue(source.contains("Rules can be changed at Home between expeditions."))
         XCTAssertTrue(source.contains("if store.addBlankGambit(for: owner)"))

@@ -51,7 +51,7 @@ struct SettingsView: View {
                         icon: "books.vertical",
                         title: "Save games",
                         subtitle: "Return to the campaign chooser",
-                        directionIcon: "chevron.backward"
+                        directionIcon: "rectangle.portrait.and.arrow.right"
                     )
                 }
                 .buttonStyle(.plain)

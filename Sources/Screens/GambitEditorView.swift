@@ -1,5 +1,28 @@
 import SwiftUI
 
+enum GambitEditorPresentation {
+    static func slotSummary(written: Int, slots: Int) -> String {
+        if written <= slots {
+            return "\(written)/\(slots) active"
+        }
+        return "\(slots) active · \(written) written"
+    }
+
+    static func addRuleLabel(written: Int, slots: Int) -> String {
+        written >= slots ? "Write an idle rule" : "Write a rule"
+    }
+
+    static func placeholder(for kind: GambitComponentDef.Kind) -> String {
+        switch kind {
+        case .subject: "Choose who"
+        case .property: "Stat"
+        case .comparator: "Test"
+        case .threshold: "Value"
+        case .action: "Action"
+        }
+    }
+}
+
 /// The gambit list, in the shape FF12 got right.
 ///
 /// **The whole priority list is visible at once**, numbered, so you read your party's logic top to
@@ -33,17 +56,17 @@ struct GambitEditorView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Label("\(ownerName)", systemImage: "list.number")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
                 Spacer()
-                Text("\(min(gambits.count, slots))/\(slots) slots")
-                    .font(.caption2.monospacedDigit())
+                Text(GambitEditorPresentation.slotSummary(written: gambits.count, slots: slots))
+                    .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
             }
 
             Text("Checked top to bottom. The first rule that fits is the one that fires.")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
             Button {
                 if store.addBlankGambit(for: owner) {
@@ -52,7 +75,10 @@ struct GambitEditorView: View {
                     writeFailure = "No owned subject and action are available for a new rule."
                 }
             } label: {
-                Label("Write a rule", systemImage: "plus.circle")
+                Label(
+                    GambitEditorPresentation.addRuleLabel(written: gambits.count, slots: slots),
+                    systemImage: "plus.circle"
+                )
                     .font(.caption)
                     .frame(maxWidth: .infinity, minHeight: 44)
             }
@@ -209,7 +235,7 @@ private struct GambitRow: View {
                 }
             }
         } label: {
-            Text(name.map { "Armour mark \($0)" } ?? "·armour mark")
+            Text(name.map { "Armour mark \($0)" } ?? "Choose armour mark")
                 .font(.caption2.weight(name == nil ? .regular : .medium))
                 .foregroundStyle(name == nil ? Color.secondary : Color.primary)
                 .lineLimit(1)
@@ -240,7 +266,7 @@ private struct GambitRow: View {
                 }
             }
         } label: {
-            Text(name ?? "·\(kind.displayName.lowercased())")
+            Text(name ?? GambitEditorPresentation.placeholder(for: kind))
                 .font(.caption2.weight(name == nil ? .regular : .medium))
                 .foregroundStyle(name == nil ? Color.secondary : Color.primary)
                 .lineLimit(1)

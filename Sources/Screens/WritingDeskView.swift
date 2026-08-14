@@ -1,5 +1,15 @@
 import SwiftUI
 
+enum WritingDeskLayout {
+    /// Three readable palette identities across an ordinary 368pt phone. Four technically fit,
+    /// but authored names such as Frostbound and Archipelago collapse into ellipses.
+    static let paletteChipMinimumWidth: CGFloat = 104
+
+    static func paletteColumnCount(containerWidth: CGFloat, spacing: CGFloat = 6) -> Int {
+        max(1, Int((containerWidth + spacing) / (paletteChipMinimumWidth + spacing)))
+    }
+}
+
 /// Compose a book, see what it will cost you and what it will become, then commit.
 ///
 /// **Two panes.** *Write* is the page and the vocabulary — the page fixed at the top, never
@@ -139,10 +149,10 @@ struct WritingDeskView: View {
             VStack(spacing: 6) {
                 PageGridView(ghost: $ghost, side: side,
                              dismissalToken: pageInteractionDismissalToken)
-                ScrollView { binContents }
-                    .contentShape(Rectangle())
-                    .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
                 binTabs
+                    .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
+                ScrollView { binContents.padding(.bottom, 8) }
+                    .contentShape(Rectangle())
                     .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
             }
             .padding(.horizontal, 12)
@@ -165,11 +175,10 @@ struct WritingDeskView: View {
                         VStack(spacing: 2) {
                             Image(systemName: entry.icon).font(.footnote)
                             Text(entry.shortName)
-                                .font(.system(size: 9))
+                                .font(.caption2)
                                 .lineLimit(1)
-                                .minimumScaleFactor(0.8)
                         }
-                        .frame(width: 66, height: 40)
+                        .frame(width: 76, height: 44)
                         .background(bin == entry ? Color.accentColor.opacity(0.18) : Color.clear,
                                     in: RoundedRectangle(cornerRadius: 8))
                         .foregroundStyle(bin == entry ? Color.accentColor : Color.secondary)
@@ -180,7 +189,7 @@ struct WritingDeskView: View {
             }
             .padding(.horizontal, 4)
         }
-        .frame(height: 46)
+        .frame(height: 50)
         .mask(
             // Fades at both ends, so a cut-off tab reads as "keep going" rather than as a bug.
             LinearGradient(stops: [.init(color: .clear, location: 0),
@@ -258,7 +267,7 @@ struct WritingDeskView: View {
 
     private func sectionLabel(_ text: String) -> some View {
         Text(text.uppercased())
-            .font(.system(size: 9).weight(.semibold))
+            .font(.caption.weight(.semibold))
             .foregroundStyle(.tertiary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, 2)
@@ -302,7 +311,7 @@ struct WritingDeskView: View {
         // Small tiles, four or five to a row. These were list rows with two lines of prose each,
         // which meant six sigils filled the screen — for a vocabulary of forty-one sources that is
         // a scrolling chore rather than a palette. Still a 44pt-plus target.
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 74), spacing: 4)], spacing: 4) {
+        LazyVGrid(columns: chipColumns, spacing: 6) {
             ForEach(items) { item in
                 let fits = item.blockedBy == nil && store.canWrite(item.content)
                 Button {
@@ -310,17 +319,17 @@ struct WritingDeskView: View {
                                       origin: firstFreeOrigin(for: item.content))
                 } label: {
                     VStack(spacing: 1) {
-                        RuneGlyph(id: item.glyph).frame(width: 20, height: 20)
+                        RuneGlyph(id: item.glyph)
+                            .frame(width: 22, height: 22)
                         Text(item.name)
-                            .font(.system(size: 9).weight(.medium))
+                            .font(.caption.weight(.medium))
                             .lineLimit(1)
-                            .minimumScaleFactor(0.75)
                         // Two bare numbers: what it costs in space, and what it does to the meter.
                         // The words were repeated forty times down the screen to say what the
                         // numbers already say.
                         if let blocked = item.blockedBy, !blocked.isEmpty {
                             Text("taken")
-                                .font(.system(size: 8))
+                                .font(.caption2)
                                 .foregroundStyle(.secondary)
                         } else {
                             HStack(spacing: 4) {
@@ -331,11 +340,11 @@ struct WritingDeskView: View {
                                         .foregroundStyle(stability > 0 ? Color.green : Color.orange)
                                 }
                             }
-                            .font(.system(size: 8).monospacedDigit())
+                            .font(.caption2.monospacedDigit())
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    .frame(height: 52)
+                    .frame(minHeight: 58)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.bordered)
@@ -344,6 +353,10 @@ struct WritingDeskView: View {
                 .disabled(!fits)
             }
         }
+    }
+
+    private var chipColumns: [GridItem] {
+        [GridItem(.adaptive(minimum: WritingDeskLayout.paletteChipMinimumWidth), spacing: 6)]
     }
 
     private func firstFreeOrigin(for content: MarkContent) -> PageCell {
@@ -400,7 +413,7 @@ struct WritingDeskView: View {
                     Text(costLabel).monospacedDigit()
                 }
                 .font(.headline)
-                .frame(minHeight: 56)
+                .frame(minHeight: 50)
                 .padding(.horizontal, 4)
             }
             .buttonStyle(.borderedProminent)
