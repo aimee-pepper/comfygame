@@ -80,6 +80,7 @@ struct BaseView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var routeCardHidden = false
     @State private var selectedSection: StationHomeSection = .home
+    @State private var townPageBySection: [StationHomeSection: Int] = [:]
     @State private var foundationStation: StationDef?
 
     private var state: GameState { store.state }
@@ -94,7 +95,7 @@ struct BaseView: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.top, 12)
-                stationBoard(containerSize: geometry.size)
+                districtPager(containerSize: geometry.size)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
@@ -197,50 +198,79 @@ struct BaseView: View {
         .accessibilityIdentifier("base-section-picker")
     }
 
-    private func stationBoard(containerSize: CGSize) -> some View {
+    private func districtPager(containerSize: CGSize) -> some View {
+        TabView(selection: $selectedSection) {
+            ForEach(availableSections, id: \.self) { section in
+                districtBoard(section: section, containerSize: containerSize)
+                    .tag(section)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .accessibilityIdentifier("base-district-pager")
+    }
+
+    @ViewBuilder
+    private func districtBoard(section: StationHomeSection, containerSize: CGSize) -> some View {
         Group {
-            if selectedSection == .home,
+            if section == .home,
                let scene = StartingTownHomeResource.scene() {
                 StartingTownHomeScene(scene: scene,
                                       openedRoute: { store.openedFirstReturnDestination($0) })
-            } else if selectedSection != .home,
+            } else if section != .home,
                       TownVisualResource.image(named: "town-empty-v1") != nil {
-                townDistrictBoard(containerSize: containerSize)
+                townDistrictBoard(section: section, containerSize: containerSize)
             } else {
-                legacyStationGrid
+                legacyStationGrid(section: section)
             }
         }
-        .accessibilityIdentifier("base-station-board-\(selectedSection.rawValue)")
+        .accessibilityIdentifier("base-station-board-\(section.rawValue)")
     }
 
-    private func townDistrictBoard(containerSize: CGSize) -> some View {
-        let destinations = stations(in: selectedSection)
+    private func townDistrictBoard(section: StationHomeSection, containerSize: CGSize) -> some View {
+        let destinations = stations(in: section)
         let populatedPages = BaseBoardRules.townPages(destinations)
         let pages = populatedPages.isEmpty ? [[]] : populatedPages
-        return TabView {
-            ForEach(Array(pages.enumerated()), id: \.offset) { _, page in
-                TownDistrictScene(
-                    section: selectedSection,
-                    stations: page,
-                    stationState: { state.base.station($0) },
-                    openFoundation: { foundationStation = $0 },
-                    openedRoute: { store.openedFirstReturnDestination($0) }
-                )
+        let selectedPage = min(townPageBySection[section, default: 0], pages.count - 1)
+        return VStack(spacing: 0) {
+            TownDistrictScene(
+                section: section,
+                stations: pages[selectedPage],
+                stationState: { state.base.station($0) },
+                openFoundation: { foundationStation = $0 },
+                openedRoute: { store.openedFirstReturnDestination($0) }
+            )
+            if pages.count > 1 {
+                HStack(spacing: 12) {
+                    Button("Previous") {
+                        townPageBySection[section] = max(0, selectedPage - 1)
+                    }
+                    .disabled(selectedPage == 0)
+                    Spacer()
+                    Text("\(selectedPage + 1) of \(pages.count)")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Next") {
+                        townPageBySection[section] = min(pages.count - 1, selectedPage + 1)
+                    }
+                    .disabled(selectedPage == pages.count - 1)
+                }
+                .frame(minHeight: 44)
+                .padding(.horizontal, 12)
             }
         }
-        .tabViewStyle(.page(indexDisplayMode: pages.count > 1 ? .automatic : .never))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .accessibilityIdentifier("base-town-scene-\(selectedSection.rawValue)")
+        .accessibilityIdentifier("base-town-scene-\(section.rawValue)")
     }
 
-    private var legacyStationGrid: some View {
-        let destinations = stations(in: selectedSection)
+    private func legacyStationGrid(section: StationHomeSection) -> some View {
+        let destinations = stations(in: section)
         return Group {
             if destinations.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
                     Label("No known destinations", systemImage: "signpost.right")
                         .font(.headline)
-                    Text("No places are known in \(selectedSection.title) yet.")
+                    Text("No places are known in \(section.title) yet.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }

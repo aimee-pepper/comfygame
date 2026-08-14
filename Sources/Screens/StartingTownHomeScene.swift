@@ -56,7 +56,7 @@ enum StartingTownHomeRules {
     static func renderedImageRect(imageSize: CGSize, in containerSize: CGSize) -> CGRect {
         guard imageSize.width > 0, imageSize.height > 0,
               containerSize.width > 0, containerSize.height > 0 else { return .zero }
-        let scale = max(containerSize.width / imageSize.width,
+        let scale = min(containerSize.width / imageSize.width,
                         containerSize.height / imageSize.height)
         let size = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
         return CGRect(x: (containerSize.width - size.width) / 2,
@@ -114,8 +114,9 @@ struct StartingTownHomeScene: View {
                 Image(uiImage: scene.image)
                     .resizable()
                     .interpolation(.none)
-                    .scaledToFill()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .scaledToFit()
+                    .frame(width: imageRect.width, height: imageRect.height)
+                    .position(x: imageRect.midX, y: imageRect.midY)
                     .allowsHitTesting(false)
 
                 ForEach(scene.definition.hotspots) { hotspot in

@@ -10,7 +10,10 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertTrue(source.contains("NavigationLink(value: AppRoute.settings)"))
         XCTAssertTrue(source.contains(".accessibilityLabel(\"Settings and save games\")"))
         XCTAssertFalse(source.contains("Menu {\n                NavigationLink(value: AppRoute.settings)"))
-        XCTAssertTrue(source.contains("contextRow\n                firstReturnRouteCard\n                sectionPicker"))
+        let context = try XCTUnwrap(source.range(of: "contextRow"))
+        let route = try XCTUnwrap(source.range(of: "firstReturnRouteCard",
+                                               range: context.upperBound..<source.endIndex))
+        XCTAssertNotNil(source.range(of: "sectionPicker", range: route.upperBound..<source.endIndex))
         XCTAssertFalse(source.contains(".overlay(alignment: .top) {\n            firstReturnRouteCard"))
     }
 
@@ -82,7 +85,7 @@ final class BaseBoardTests: XCTestCase {
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
                                 encoding: .utf8)
         XCTAssertTrue(source.contains("No known destinations"))
-        XCTAssertTrue(source.contains("No places are known in \\(selectedSection.title) yet."))
+        XCTAssertTrue(source.contains("No places are known in \\(section.title) yet."))
     }
 
     func testBoardUsesThreeColumnsNormallyAndTwoForAccessibilityText() {
@@ -128,13 +131,40 @@ final class BaseBoardTests: XCTestCase {
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
                                 encoding: .utf8)
 
-        XCTAssertTrue(source.contains("selectedSection != .home"))
-        XCTAssertTrue(source.contains("townDistrictBoard(containerSize: containerSize)"))
+        XCTAssertTrue(source.contains("section != .home"))
+        XCTAssertTrue(source.contains("townDistrictBoard(section: section, containerSize: containerSize)"))
         XCTAssertTrue(source.contains("BaseBoardRules.townPages(destinations)"))
         XCTAssertTrue(source.contains("TownDistrictScene("))
-        XCTAssertTrue(source.contains("base-town-scene-\\(selectedSection.rawValue)"))
+        XCTAssertTrue(source.contains("base-town-scene-\\(section.rawValue)"))
         XCTAssertTrue(source.contains("populatedPages.isEmpty ? [[]] : populatedPages"),
                       "An empty district must retain its image-backed screen instead of disappearing")
+        XCTAssertFalse(source.contains("let sceneHeight"))
+        XCTAssertFalse(source.contains(".frame(height: sceneHeight)"))
+        XCTAssertFalse(source.contains("TownDistrictScene(\n                    section: selectedSection") &&
+                       source.contains(".padding(.horizontal, 1)"))
+
+        let start = try XCTUnwrap(source.range(of: "private struct TownDistrictScene"))
+        let end = try XCTUnwrap(source.range(of: "private struct TownStationPlot",
+                                             range: start.upperBound..<source.endIndex))
+        let scene = String(source[start.lowerBound..<end.lowerBound])
+        XCTAssertTrue(scene.contains(".clipped()"))
+        XCTAssertFalse(scene.contains("clipShape(RoundedRectangle"))
+        XCTAssertFalse(scene.contains("overlay(RoundedRectangle"))
+    }
+
+    func testDistrictPickerAndSwipePagerShareOneSelectionWithoutNestedSwipePaging() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("TabView(selection: $selectedSection)"))
+        XCTAssertTrue(source.contains(".tag(section)"))
+        XCTAssertTrue(source.contains("base-district-pager"))
+        XCTAssertTrue(source.contains("townPageBySection[section]"))
+        XCTAssertTrue(source.contains("Button(\"Previous\")"))
+        XCTAssertTrue(source.contains("Button(\"Next\")"))
+        XCTAssertEqual(source.components(separatedBy: "TabView").count - 1, 1,
+                       "Station pagination must not compete with district swipe paging")
     }
 
     func testTownBuildingArtIsExactIDOnlyAndUnknownStationsUseSemanticFallback() {
@@ -218,4 +248,5 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertTrue(sheet.contains("Label(\"Build it\", systemImage: \"hammer\")"))
         XCTAssertTrue(sheet.contains(".disabled(!missing.isEmpty)"))
     }
+
 }

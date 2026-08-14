@@ -56,12 +56,12 @@ final class StartingTownHomeSceneTests: XCTestCase {
         }
     }
 
-    func testAspectFillOwnsTheFullUsableViewportAndKeepsCoordinatesInImageSpace() {
+    func testAspectFitShowsTheFullAuthoredHomeAndKeepsCoordinatesInImageSpace() {
         let container = CGSize(width: 344, height: 500)
         let rect = StartingTownHomeRules.renderedImageRect(
             imageSize: CGSize(width: 1122, height: 1402), in: container)
-        XCTAssertEqual(rect.height, container.height, accuracy: 0.01)
-        XCTAssertGreaterThanOrEqual(rect.width, container.width)
+        XCTAssertEqual(rect.width, container.width, accuracy: 0.01)
+        XCTAssertLessThanOrEqual(rect.height, container.height)
         XCTAssertEqual(rect.midX, container.width / 2, accuracy: 0.01)
         XCTAssertEqual(rect.midY, container.height / 2, accuracy: 0.01)
     }
@@ -94,7 +94,7 @@ final class StartingTownHomeSceneTests: XCTestCase {
         let bodyStart = try XCTUnwrap(source.range(of: "var body: some View"))
         let purse = try XCTUnwrap(source.range(of: "// MARK: Purse", range: bodyStart.upperBound..<source.endIndex))
         let body = String(source[bodyStart.lowerBound..<purse.lowerBound])
-        XCTAssertTrue(body.contains("stationBoard(containerSize: geometry.size)\n                    .frame(maxWidth: .infinity, maxHeight: .infinity)"))
+        XCTAssertTrue(body.contains("districtPager(containerSize: geometry.size)\n                    .frame(maxWidth: .infinity, maxHeight: .infinity)"))
         XCTAssertFalse(body.contains("if selectedSection == .home"))
         XCTAssertFalse(body.contains("ScrollView"))
         XCTAssertFalse(body.contains(".padding(12)"))
@@ -121,7 +121,7 @@ final class StartingTownHomeSceneTests: XCTestCase {
         let scene = String(source[start.lowerBound..<end.lowerBound])
 
         XCTAssertTrue(scene.contains(".allowsHitTesting(false)"))
-        XCTAssertTrue(scene.contains(".scaledToFill()"))
+        XCTAssertTrue(scene.contains(".scaledToFit()"))
         XCTAssertTrue(scene.contains("StartingTownHomeRules.hotspotRect("))
         XCTAssertTrue(scene.contains("NavigationLink(value: route)"))
         XCTAssertTrue(scene.contains(".zIndex(1)"))
