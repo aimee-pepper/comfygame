@@ -69,6 +69,26 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertFalse(action.contains(".disabled("))
     }
 
+    func testOrdinaryPrimaryActionsUseTheWholeAvailableRow() throws {
+        XCTAssertEqual(
+            CampaignStartLayoutPolicy.ordinaryPrimaryActionColumnCount(hasContinue: false),
+            1,
+            "A fresh installation's only action must not be stranded in half a row."
+        )
+        XCTAssertEqual(
+            CampaignStartLayoutPolicy.ordinaryPrimaryActionColumnCount(hasContinue: true),
+            2,
+            "Continue and New Game should share two equal ordinary-phone columns."
+        )
+
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("LazyVGrid(columns: ordinaryPrimaryActionColumns"))
+        XCTAssertFalse(source.contains("HStack(spacing: 10) { primaryActionButtons }"))
+    }
+
     func testAccessibilityTextForcesSingleColumnCards() {
         XCTAssertFalse(CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: .xxxLarge))
         XCTAssertTrue(CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: .accessibility1))

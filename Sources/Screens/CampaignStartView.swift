@@ -135,6 +135,12 @@ enum CampaignStartLayoutPolicy {
     static func usesSingleColumn(dynamicTypeSize: DynamicTypeSize) -> Bool {
         dynamicTypeSize.isAccessibilitySize
     }
+
+    /// A fresh installation has only New Game, so it owns the whole action row. Once a campaign
+    /// can continue, the two equally weighted actions share that same row.
+    static func ordinaryPrimaryActionColumnCount(hasContinue: Bool) -> Int {
+        hasContinue ? 2 : 1
+    }
 }
 
 struct CampaignStartView: View {
@@ -209,9 +215,20 @@ struct CampaignStartView: View {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(spacing: 10) { primaryActionButtons }
             } else {
-                HStack(spacing: 10) { primaryActionButtons }
+                LazyVGrid(columns: ordinaryPrimaryActionColumns, spacing: 10) {
+                    primaryActionButtons
+                }
             }
         }
+    }
+
+    private var ordinaryPrimaryActionColumns: [GridItem] {
+        Array(
+            repeating: GridItem(.flexible(), spacing: 10),
+            count: CampaignStartLayoutPolicy.ordinaryPrimaryActionColumnCount(
+                hasContinue: presentation.continueSlot != nil
+            )
+        )
     }
 
     @ViewBuilder private var primaryActionButtons: some View {
