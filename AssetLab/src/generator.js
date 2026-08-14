@@ -1,11 +1,12 @@
 export const defaults = Object.freeze({
-  schemaVersion: 4,
+  schemaVersion: 5,
   kind: "creature",
   logicalID: "phase0-creature",
   speciesSeed: 1847,
   specimenSeed: 1,
   traits: {
-    topology: "quadruped",
+    bodyPlan: "quadruped",
+    cranialFeature: "none",
     size: 58,
     build: 48,
     boneDensity: 46,
@@ -45,7 +46,8 @@ export const defaults = Object.freeze({
 const range = (key, label, group, min = 0, max = 100, step = 1) => ({ key, label, group, min, max, step });
 const choice = (key, label, group, options) => ({ key, label, group, options });
 export const traitDefinitions = [
-  choice("topology", "Body topology", "Body", ["quadruped", "biped", "serpentine", "segmented", "radial", "piscine", "winged", "amorphous"]),
+  choice("bodyPlan", "Body plan", "Body", ["quadruped", "biped", "serpentine", "segmented", "radial", "piscine", "amorphous"]),
+  choice("cranialFeature", "Cranial feature", "Body", ["none", "longEars", "horns", "crest", "sensoryFan"]),
   range("size", "Size", "Body", 10, 100),
   range("build", "Build · sinuous → bulky", "Body"),
   range("boneDensity", "Bone density", "Body"),
@@ -81,13 +83,13 @@ export const traitDefinitions = [
 ];
 
 export const presets = Object.freeze({
-  "Dune long-ear": { topology:"quadruped",size:24,build:24,boneDensity:18,ornament:20,coveringHardness:8,coveringLength:44,coveringCoverage:58,appendageCount:4,appendageType:"limbed",pierce:28,crush:2,rend:8,reach:"close",delivery:"single",cyan:18,magenta:25,yellow:57,colorDepth:42,patterning:12,opacity:92,shine:6,schiller:2,vision:42,mechano:18,chemo:12,thermo:28,emanationStrength:0,emanationKind:"light",defence:"speed",toxic:false },
-  "Membrane sky serpent": { topology:"serpentine",size:46,build:16,boneDensity:14,ornament:38,coveringHardness:18,coveringLength:6,coveringCoverage:64,appendageCount:2,appendageType:"membrane",pierce:62,crush:2,rend:24,reach:"mid",delivery:"single",cyan:52,magenta:30,yellow:18,colorDepth:54,patterning:48,opacity:82,shine:12,schiller:6,vision:55,mechano:18,chemo:18,thermo:9,emanationStrength:0,emanationKind:"light",defence:"speed",toxic:false },
-  "Cold plated grazer": { topology:"quadruped",size:78,build:72,boneDensity:76,ornament:8,coveringHardness:88,coveringLength:62,coveringCoverage:92,appendageCount:4,appendageType:"limbed",pierce:12,crush:48,rend:4,reach:"close",delivery:"single",cyan:48,magenta:24,yellow:28,colorDepth:55,patterning:18,opacity:96,shine:12,schiller:2,vision:42,mechano:24,chemo:22,thermo:12,emanationStrength:0,emanationKind:"heat",defence:"armour",toxic:false },
-  "Lightless cave serpent": { topology:"serpentine",size:64,build:18,boneDensity:30,ornament:5,coveringHardness:20,coveringLength:8,coveringCoverage:42,appendageCount:0,appendageType:"none",pierce:72,crush:5,rend:38,reach:"mid",delivery:"single",cyan:42,magenta:30,yellow:28,colorDepth:14,patterning:44,opacity:72,shine:32,schiller:10,vision:4,mechano:56,chemo:30,thermo:10,emanationStrength:24,emanationKind:"light",defence:"crypsis",toxic:true },
-  "Sun-glass flier": { topology:"winged",size:38,build:30,boneDensity:16,ornament:86,coveringHardness:28,coveringLength:74,coveringCoverage:82,appendageCount:4,appendageType:"feathered",pierce:44,crush:2,rend:20,reach:"mid",delivery:"multi",cyan:18,magenta:48,yellow:72,colorDepth:82,patterning:66,opacity:76,shine:52,schiller:78,vision:82,mechano:8,chemo:6,thermo:4,emanationStrength:42,emanationKind:"light",defence:"speed",toxic:false },
-  "Mineral hive crawler": { topology:"segmented",size:52,build:58,boneDensity:84,ornament:20,coveringHardness:94,coveringLength:5,coveringCoverage:96,appendageCount:8,appendageType:"limbed",pierce:54,crush:42,rend:32,reach:"close",delivery:"multi",cyan:30,magenta:28,yellow:42,colorDepth:64,patterning:35,opacity:100,shine:46,schiller:12,vision:24,mechano:32,chemo:36,thermo:8,emanationStrength:0,emanationKind:"caustic",defence:"armour",toxic:false },
-  "Caustic bloom": { topology:"radial",size:70,build:62,boneDensity:12,ornament:68,coveringHardness:14,coveringLength:45,coveringCoverage:56,appendageCount:8,appendageType:"membrane",pierce:18,crush:4,rend:62,reach:"far",delivery:"area",cyan:66,magenta:12,yellow:22,colorDepth:74,patterning:72,opacity:58,shine:22,schiller:28,vision:8,mechano:18,chemo:64,thermo:10,emanationStrength:76,emanationKind:"caustic",defence:"aposematism",toxic:true }
+  "Dune long-ear": { bodyPlan:"quadruped",cranialFeature:"longEars",size:24,build:24,boneDensity:18,ornament:20,coveringHardness:8,coveringLength:44,coveringCoverage:58,appendageCount:4,appendageType:"limbed",pierce:28,crush:2,rend:8,reach:"close",delivery:"single",cyan:18,magenta:25,yellow:57,colorDepth:42,patterning:12,opacity:92,shine:6,schiller:2,vision:42,mechano:18,chemo:12,thermo:28,emanationStrength:0,emanationKind:"light",defence:"speed",toxic:false },
+  "Membrane sky serpent": { bodyPlan:"serpentine",cranialFeature:"crest",size:46,build:16,boneDensity:14,ornament:38,coveringHardness:18,coveringLength:6,coveringCoverage:64,appendageCount:2,appendageType:"membrane",pierce:62,crush:2,rend:24,reach:"mid",delivery:"single",cyan:52,magenta:30,yellow:18,colorDepth:54,patterning:48,opacity:82,shine:12,schiller:6,vision:55,mechano:18,chemo:18,thermo:9,emanationStrength:0,emanationKind:"light",defence:"speed",toxic:false },
+  "Cold plated grazer": { bodyPlan:"quadruped",cranialFeature:"horns",size:78,build:72,boneDensity:76,ornament:8,coveringHardness:88,coveringLength:62,coveringCoverage:92,appendageCount:4,appendageType:"limbed",pierce:12,crush:48,rend:4,reach:"close",delivery:"single",cyan:48,magenta:24,yellow:28,colorDepth:55,patterning:18,opacity:96,shine:12,schiller:2,vision:42,mechano:24,chemo:22,thermo:12,emanationStrength:0,emanationKind:"heat",defence:"armour",toxic:false },
+  "Lightless cave serpent": { bodyPlan:"serpentine",cranialFeature:"sensoryFan",size:64,build:18,boneDensity:30,ornament:5,coveringHardness:20,coveringLength:8,coveringCoverage:42,appendageCount:0,appendageType:"none",pierce:72,crush:5,rend:38,reach:"mid",delivery:"single",cyan:42,magenta:30,yellow:28,colorDepth:14,patterning:44,opacity:72,shine:32,schiller:10,vision:4,mechano:56,chemo:30,thermo:10,emanationStrength:24,emanationKind:"light",defence:"crypsis",toxic:true },
+  "Sun-glass flier": { bodyPlan:"biped",cranialFeature:"crest",size:38,build:30,boneDensity:16,ornament:86,coveringHardness:28,coveringLength:74,coveringCoverage:82,appendageCount:4,appendageType:"feathered",pierce:44,crush:2,rend:20,reach:"mid",delivery:"multi",cyan:18,magenta:48,yellow:72,colorDepth:82,patterning:66,opacity:76,shine:52,schiller:78,vision:82,mechano:8,chemo:6,thermo:4,emanationStrength:42,emanationKind:"light",defence:"speed",toxic:false },
+  "Mineral hive crawler": { bodyPlan:"segmented",cranialFeature:"none",size:52,build:58,boneDensity:84,ornament:20,coveringHardness:94,coveringLength:5,coveringCoverage:96,appendageCount:8,appendageType:"limbed",pierce:54,crush:42,rend:32,reach:"close",delivery:"multi",cyan:30,magenta:28,yellow:42,colorDepth:64,patterning:35,opacity:100,shine:46,schiller:12,vision:24,mechano:32,chemo:36,thermo:8,emanationStrength:0,emanationKind:"caustic",defence:"armour",toxic:false },
+  "Caustic bloom": { bodyPlan:"radial",cranialFeature:"none",size:70,build:62,boneDensity:12,ornament:68,coveringHardness:14,coveringLength:45,coveringCoverage:56,appendageCount:8,appendageType:"membrane",pierce:18,crush:4,rend:62,reach:"far",delivery:"area",cyan:66,magenta:12,yellow:22,colorDepth:74,patterning:72,opacity:58,shine:22,schiller:28,vision:8,mechano:18,chemo:64,thermo:10,emanationStrength:76,emanationKind:"caustic",defence:"aposematism",toxic:true }
 });
 
 export function cloneDescriptor(value = defaults) { return JSON.parse(JSON.stringify(value)); }
@@ -96,17 +98,21 @@ export function safeFilePart(value,fallback="asset") { const cleaned=String(valu
 export function normalizeDescriptor(input) {
   const d = cloneDescriptor(defaults);
   if (!input || typeof input !== "object") return d;
-  d.schemaVersion = 4;
+  d.schemaVersion = 5;
   d.kind = "creature";
   d.logicalID = typeof input.logicalID === "string" ? input.logicalID.slice(0, 80) : d.logicalID;
   // v2 used one `seed`. It becomes the species seed; specimen variation starts at 1.
   d.speciesSeed = clampInteger(input.speciesSeed ?? input.seed, 0, 0xffffffff, d.speciesSeed);
   d.specimenSeed = clampInteger(input.specimenSeed, 0, 0xffffffff, d.specimenSeed);
+  const legacyTopology = input.traits?.topology;
   for (const def of traitDefinitions) {
-    const value = input.traits?.[def.key];
+    let value = input.traits?.[def.key];
+    if (def.key === "bodyPlan" && value === undefined) value = legacyTopology === "winged" ? "biped" : legacyTopology;
+    if (def.key === "cranialFeature" && value === undefined && legacyLongEarProfile(input.traits ?? {})) value = "longEars";
     if (def.options) d.traits[def.key] = def.options.includes(value) ? value : d.traits[def.key];
     else d.traits[def.key] = clampInteger(value, def.min, def.max, d.traits[def.key]);
   }
+  if (legacyTopology === "winged" && input.traits?.appendageType === undefined) d.traits.appendageType = "membrane";
   if(input.traits && !["emanationLight","emanationHeat","emanationCaustic"].some(key=>Number.isFinite(Number(input.traits[key])))){
     const kind=["light","heat","caustic"].includes(input.traits.emanationKind)?input.traits.emanationKind:"light";
     Object.assign(d.traits,kind==="heat"?{emanationLight:15,emanationHeat:70,emanationCaustic:15}:kind==="caustic"?{emanationLight:15,emanationHeat:15,emanationCaustic:70}:{emanationLight:70,emanationHeat:15,emanationCaustic:15});
@@ -227,7 +233,7 @@ export function fitCommands(commands,width,height,padding=0){
 function worldCreature(d, p, random) {
   const c = [], t = d.traits, cx = 8, cy = 8;
   if (t.emanationStrength > 25) c.push(rect(3, 3, 10, 10, alpha(p.glow, 32 + t.emanationStrength * .35)));
-  switch (t.topology) {
+  switch (t.bodyPlan) {
   case "serpentine":
     c.push(...pixelLine(4, 11, 7, 6, 2, p.outline), ...pixelLine(7, 6, 12, 8, 2, p.body));
     c.push(rect(11, 7, 3, 3, p.outline), rect(12, 8, 1, 1, p.light)); break;
@@ -238,8 +244,6 @@ function worldCreature(d, p, random) {
     for (const [x, y] of [[2,7],[12,7],[7,2],[7,12],[3,3],[11,3],[3,11],[11,11]]) c.push(...pixelLine(cx, cy, x, y, 1, p.accent)); break;
   case "piscine":
     c.push(rect(4, 5, 8, 7, p.outline), rect(5, 6, 7, 5, p.body), ...pixelLine(4, 8, 1, 5, 1, p.accent), ...pixelLine(4, 8, 1, 11, 1, p.accent)); break;
-  case "winged":
-    c.push(rect(6, 5, 5, 7, p.outline), rect(7, 6, 3, 5, p.body), ...pixelLine(7, 7, 2, 3, 1, p.accent), ...pixelLine(10, 7, 14, 3, 1, p.accent)); break;
   case "amorphous":
     c.push(rect(4, 7, 9, 5, p.outline), rect(5, 5, 6, 7, p.body), rect(7, 4, 3, 2, p.light)); break;
   case "biped":
@@ -253,7 +257,7 @@ function worldCreature(d, p, random) {
 
 function decorateWorld(c, d, p, random) {
   const t = d.traits;
-  if (["quadruped", "segmented"].includes(t.topology) && t.appendageType === "limbed") {
+  if (["quadruped", "segmented"].includes(t.bodyPlan) && t.appendageType === "limbed") {
     const legs = Math.min(4, t.appendageCount);
     for (let i = 0; i < legs; i++) c.push(rect(4 + i * 2, 11, 1, 3, p.shadow));
   }
@@ -261,7 +265,7 @@ function decorateWorld(c, d, p, random) {
   if (t.coveringLength > 60) for (let x = 4; x <= 12; x += 2) c.push(rect(x, 4 + Math.round(random()), 1, 2, p.light));
   if (t.boneDensity > 58) c.push(rect(6, 9, 5, 1, p.light));
   if (t.ornament > 45) c.push(...pixelLine(7,5,6,2,1,p.accent),...pixelLine(9,5,10,2,1,p.accent));
-  if (longEarProfile(t)) c.push(rect(10,2,1,4,p.accent),rect(12,1,1,5,p.accent));
+  addWorldCranialFeature(c, t, p);
   addWorldAppendageType(c,t,p);
   addPattern(c, t, p, 5, 7, 6, 3, 1);
   const arm = dominantArmament(t);
@@ -279,16 +283,22 @@ function addWorldAppendageType(c,t,p) {
   if(t.appendageType==="membrane")c.push(rect(2,4,4,2,p.accent),rect(11,4,4,2,p.accent));
 }
 
+function addWorldCranialFeature(c,t,p) {
+  if(t.cranialFeature==="longEars")c.push(rect(10,2,1,4,p.accent),rect(12,1,1,5,p.accent));
+  if(t.cranialFeature==="horns")c.push(...pixelLine(10,5,10,2,1,p.accent),...pixelLine(12,5,14,2,1,p.accent));
+  if(t.cranialFeature==="crest")c.push(rect(11,2,1,4,p.accent),rect(12,1,1,5,p.accent),rect(13,3,1,3,p.accent));
+  if(t.cranialFeature==="sensoryFan")c.push(rect(9,2,5,1,p.accent),rect(10,3,4,1,p.accent));
+}
+
 function fightCreature(d, p, random) {
   const c = [], t = d.traits;
   if (t.emanationStrength > 15) c.push(rect(5, 5, 39, 38, alpha(p.glow, 20 + t.emanationStrength * .4)));
   const sizeScale = .78 + t.size / 210, bulk = .72 + t.build / 160;
-  switch (t.topology) {
+  switch (t.bodyPlan) {
   case "serpentine": drawSerpentine(c, t, p, sizeScale); break;
   case "segmented": drawSegmented(c, t, p, sizeScale); break;
   case "radial": drawRadial(c, t, p, sizeScale); break;
   case "piscine": drawPiscine(c, t, p, sizeScale); break;
-  case "winged": drawWinged(c, t, p, sizeScale); break;
   case "amorphous": drawAmorphous(c, t, p, sizeScale); break;
   case "biped": drawBiped(c, t, p, sizeScale, bulk); break;
   default: drawQuadruped(c, t, p, sizeScale, bulk);
@@ -329,20 +339,22 @@ function drawPiscine(c,t,p,s) {
   const w=Math.round(21*s),h=Math.round(12*s),x=20-Math.floor(w/2),y=26-Math.floor(h/2);c.push(rect(x,y,w,h,p.outline),rect(x+2,y+2,w-3,h-4,p.body));
   c.push(...pixelLine(x,y+h/2,x-7,y-5,2,p.accent),...pixelLine(x,y+h/2,x-7,y+h+5,2,p.accent));drawHead(c,t,p,x+w-2,y+2,s);
 }
-function drawWinged(c,t,p,s) {
-  const x=19,y=20,w=Math.round(12*s),h=Math.round(14*s);c.push(rect(x,y,w,h,p.outline),rect(x+2,y+2,w-4,h-3,p.body));
-  const wingColor=t.appendageType==="feathered"?p.light:p.accent;c.push(...pixelLine(x+2,y+5,4,8,3,wingColor),...pixelLine(x+w-2,y+5,43,8,3,wingColor));drawHead(c,t,p,x+w-1,y-2,s);
-}
 function drawAmorphous(c,t,p,s) {
   const w=Math.round(20*s),h=Math.round(14*s),x=22-Math.floor(w/2),y=34-h;c.push(rect(x-2,y+4,w+4,h-4,p.outline),rect(x,y,w,h,p.body),rect(x+4,y-3,w-9,5,p.light));
   for(let i=0;i<3;i++)c.push(rect(x+2+i*6,y+h-1,3,4+(i%2),p.shadow));
 }
 function drawHead(c,t,p,x,y,s) {
   const head=5+Math.round(t.size/30);c.push(rect(x,y,head+2,head+2,p.outline),rect(x+1,y+1,head,head,p.body));
-  if(longEarProfile(t))c.push(rect(x+1,y-7,2,7,p.accent),rect(x+head-1,y-8,2,8,p.accent));
+  addFightCranialFeature(c,t,p,x,y,head);
   addSense(c,t,p,x+head-1,y+2,2);drawArmament(c,t,p,x+head+1,y+head-1);
 }
-function longEarProfile(t){return t.topology==="quadruped"&&t.size<36&&t.build<38&&t.thermo>=24&&t.appendageType==="limbed";}
+function legacyLongEarProfile(t){return t.topology==="quadruped"&&t.size<36&&t.build<38&&t.thermo>=24&&t.appendageType==="limbed";}
+function addFightCranialFeature(c,t,p,x,y,head){
+  if(t.cranialFeature==="longEars")c.push(rect(x+1,y-7,2,7,p.accent),rect(x+head-1,y-8,2,8,p.accent));
+  if(t.cranialFeature==="horns")c.push(...pixelLine(x+1,y,x-1,y-6,2,p.accent),...pixelLine(x+head,y,x+head+3,y-6,2,p.accent));
+  if(t.cranialFeature==="crest")c.push(rect(x+1,y-5,2,5,p.accent),rect(x+4,y-7,2,7,p.accent),rect(x+7,y-4,2,4,p.accent));
+  if(t.cranialFeature==="sensoryFan")c.push(rect(x-2,y-5,head+6,2,p.accent),rect(x,y-3,head+2,2,p.accent));
+}
 function drawArmament(c,t,p,x,y) {
   const arm=dominantArmament(t), reach=t.reach==="far"?10:t.reach==="mid"?6:3;
   if(arm.value<18)return;
@@ -385,8 +397,7 @@ function alpha(color, alphaByte) { return color.replace(")", ` / ${Math.round(Ma
 export function compatibilityWarnings(raw) {
   const t=normalizeDescriptor(raw).traits,w=[];
   if(t.appendageType==="none"&&t.appendageCount>0)w.push("Appendage count is ignored while appendage type is none.");
-  if(t.topology==="piscine"&&!["finned","none"].includes(t.appendageType))w.push("Piscine bodies read most clearly with finned or no appendages.");
-  if(t.topology==="winged"&&!['feathered','membrane'].includes(t.appendageType))w.push("Winged bodies read most clearly with feathered or membrane appendages.");
+  if(t.bodyPlan==="piscine"&&!["finned","none"].includes(t.appendageType))w.push("Piscine bodies read most clearly with finned or no appendages.");
   if(t.opacity<25&&t.coveringHardness>70)w.push("Very transparent, very hard covering needs an authored material treatment.");
   if(t.emanationStrength===0)w.push("Emanation kind is dormant while strength is zero.");
   return w;
@@ -396,12 +407,13 @@ export function anatomySummary(raw) {
   const t=normalizeDescriptor(raw).traits,arm=dominantArmament(t),sense=[['vision',t.vision],['mechanical',t.mechano],['chemical',t.chemo],['thermal',t.thermo]].sort((a,b)=>b[1]-a[1])[0][0];
   const covering=t.coveringHardness>65?'plated':t.coveringLength>60?'long-covered':t.coveringCoverage<25?'bare':'soft-covered';
   const scale=t.size>72?'large':t.size<34?'small':'medium';
-  return `${scale} ${covering} ${t.topology}; ${t.appendageCount} ${t.appendageType} appendages; ${arm.kind} armament at ${t.reach} reach; ${sense}-led senses; ${t.defence} defence${t.toxic?'; toxic':''}${t.emanationStrength>0?`; ${t.emanationKind} emanation`:''}.`;
+  const head=t.cranialFeature==="none"?"":`; ${t.cranialFeature} cranial feature`;
+  return `${scale} ${covering} ${t.bodyPlan}${head}; ${t.appendageCount} ${t.appendageType} appendages; ${arm.kind} armament at ${t.reach} reach; ${sense}-led senses; ${t.defence} defence${t.toxic?'; toxic':''}${t.emanationStrength>0?`; ${t.emanationKind} emanation`:''}.`;
 }
 
 export function populationDescriptors(raw,count=24,mode="ecosystem") {
-  const base=normalizeDescriptor(raw), random=rng(base.speciesSeed^0x50f17), topologies=traitDefinitions.find(x=>x.key==="topology").options, appendages=traitDefinitions.find(x=>x.key==="appendageType").options;
-  return Array.from({length:count},(_,index)=>{const d=cloneDescriptor(base);d.specimenSeed=(base.specimenSeed+index*2654435761)>>>0;if(mode==="ecosystem"){d.speciesSeed=(base.speciesSeed+index*2246822519)>>>0;d.traits.topology=topologies[index%topologies.length];d.traits.appendageType=appendages[Math.floor(random()*appendages.length)];for(const key of ["size","build","coveringHardness","coveringLength","appendageCount","pierce","crush","rend","patterning","ornament"])d.traits[key]=Math.floor(random()*101);}return normalizeDescriptor(d);});
+  const base=normalizeDescriptor(raw), random=rng(base.speciesSeed^0x50f17), bodyPlans=traitDefinitions.find(x=>x.key==="bodyPlan").options, cranialFeatures=traitDefinitions.find(x=>x.key==="cranialFeature").options, appendages=traitDefinitions.find(x=>x.key==="appendageType").options;
+  return Array.from({length:count},(_,index)=>{const d=cloneDescriptor(base);d.specimenSeed=(base.specimenSeed+index*2654435761)>>>0;if(mode==="ecosystem"){d.speciesSeed=(base.speciesSeed+index*2246822519)>>>0;d.traits.bodyPlan=bodyPlans[index%bodyPlans.length];d.traits.cranialFeature=cranialFeatures[Math.floor(index/bodyPlans.length)%cranialFeatures.length];d.traits.appendageType=appendages[Math.floor(random()*appendages.length)];for(const key of ["size","build","coveringHardness","coveringLength","appendageCount","pierce","crush","rend","patterning","ornament"])d.traits[key]=Math.floor(random()*101);}return normalizeDescriptor(d);});
 }
 
 export function terrainCommands(kind,seed=1) {

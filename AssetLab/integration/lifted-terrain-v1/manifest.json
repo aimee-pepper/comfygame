@@ -85,11 +85,11 @@
         "width": 16,
         "height": 16
       },
-      "fileSha256": "a98cbb9de813f1be6b4ea4c14bc5c6afc6ea8e89309d92c704f3c9f3e76d5698",
-      "decodedRgbaSha256": "ff921d6d36fe61a96bf350d4656620a9f30ebee58fb9e0d157d96acbeabf58e8",
+      "fileSha256": "28500019a9ac1d918bc4a110d31284b6191f279d655afc62f1973683f4f61014",
+      "decodedRgbaSha256": "50172366cbb1b1dab3dd381da18842ed396f5a18d16b2b0d60cb4e41a0b29aaf",
       "canonicalRequestSha256": "b30c372967343ce6bba7ac13056c88c79e3b58a5001740a2bb1cd8fca7dc98af",
-      "rectangleSha256": "2e8d93218d82f54377c4d0278525d4dc2e50edd9233734bd8742f843b7e463c3"
+      "rectangleSha256": "3971455db0a0c975466a0725e7cfef0526956a80654ad8523c953ad24cef27e9"
     }
   ],
-  "canonicalManifestSha256": "fdfe2744af523628dc7aacac3c5a901d2fbd499a02cdb205a76d21e9f3d3f399"
+  "canonicalManifestSha256": "dda2412e6c9253087b7dadc80d4626df637a820631f2d0a5cc26aaacccc63c7a"
 }

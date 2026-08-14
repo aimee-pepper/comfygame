@@ -1,0 +1,26 @@
+import assert from "node:assert/strict";
+import {campaignVisualVersion,campaignFixtureSlots,campaignBookplateCommands,resolveCampaignCard,campaignPresentation,deleteConfirmation,campaignContractHash} from "../src/campaign-kit.js";
+
+assert.equal(campaignVisualVersion,"campaign-bookplate-1.0.0");
+const presentation=campaignPresentation(campaignFixtureSlots);
+assert.equal(presentation.cards.length,4);
+assert.equal(presentation.continueID,campaignFixtureSlots[0].id);
+assert.equal(presentation.cards.filter(card=>card.canLoad).length,2);
+assert.notDeepEqual(campaignBookplateCommands(campaignFixtureSlots[0].id),campaignBookplateCommands(campaignFixtureSlots[1].id),"UUID owns stable neutral bookplate geometry");
+assert.deepEqual(resolveCampaignCard({...campaignFixtureSlots[0],name:"Renamed"}).commands,resolveCampaignCard(campaignFixtureSlots[0]).commands,"renaming cannot reroll bookplate identity");
+const invalid=campaignPresentation(campaignFixtureSlots.slice(2));
+assert.equal(invalid.continueID,null);assert.equal(invalid.cards.length,2);
+assert.equal(invalid.cards[0].actionLabel,"Recovery details");
+assert.equal(invalid.cards[1].actionLabel,"Compatibility details");
+assert.match(invalid.cards[1].accessibilityLabel,/Not loadable.*Compatibility details/);
+assert.equal(campaignPresentation([]).continueID,null);
+const confirmation=deleteConfirmation(campaignFixtureSlots[0]);
+assert.equal(confirmation.title,"Delete “Mossbound”?");
+assert.doesNotMatch(confirmation.title,/11111111/,"UUID remains DEBUG technical detail only");
+assert.equal(confirmation.id,campaignFixtureSlots[0].id,"mutation still targets stable identity internally");
+assert.throws(()=>resolveCampaignCard({...campaignFixtureSlots[0],debugVersion:"15"}),/invalid-campaign-slot-shape/);
+assert.throws(()=>resolveCampaignCard({...campaignFixtureSlots[0],id:"not-an-id"}),/invalid-campaign-uuid/);
+assert.throws(()=>resolveCampaignCard({...campaignFixtureSlots[2],binderLevel:0}),/unknown-metadata-must-be-null/);
+assert.throws(()=>resolveCampaignCard({...campaignFixtureSlots[0],hasKnownMetadata:false}),/valid-campaign-requires-metadata/);
+assert.equal(campaignContractHash(),campaignContractHash());
+console.log("Asset Lab campaign-bookplate tests passed.");

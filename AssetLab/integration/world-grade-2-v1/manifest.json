@@ -1,0 +1,210 @@
+{
+  "manifestVersion": 1,
+  "identityKind": "worldGrade2NativeConformancePack",
+  "status": "frozen-production-integration-boundary",
+  "integrationReady": true,
+  "pipelineVersions": {
+    "contractVersion": 1,
+    "resolverVersion": "world-grade-2-resolver-1.0.0",
+    "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+    "rendererVersion": "world-grade-2-renderer-1.0.0",
+    "lightLayerVersion": "current-visibility-separate-1.0.0"
+  },
+  "canonicalSerialization": {
+    "encoding": "UTF-8 recursive canonical JSON",
+    "objectKeys": "lexicographic Unicode code-unit order",
+    "arrays": "retain order",
+    "whitespace": "none",
+    "numbers": "ECMAScript JSON.stringify finite numbers",
+    "digest": "SHA-256 lowercase hexadecimal",
+    "manifestSelfHashRule": "canonicalize manifest with canonicalManifestSHA256 omitted",
+    "descriptorSelfHashRule": "canonicalize descriptor with canonicalDescriptorSHA256 omitted",
+    "rawFileByteHash": "separate SHA-256 over formatted UTF-8 file bytes"
+  },
+  "catalogues": {
+    "materialPaletteFamilies": {
+      "warmMineral": {
+        "hue": 18,
+        "saturation": 1.28,
+        "value": 2
+      },
+      "coolMineral": {
+        "hue": -28,
+        "saturation": 1.18,
+        "value": -3
+      },
+      "warmEarth": {
+        "hue": 30,
+        "saturation": 1.22,
+        "value": 1
+      },
+      "coolEarth": {
+        "hue": -34,
+        "saturation": 1.2,
+        "value": -2
+      },
+      "paleNeutral": {
+        "hue": 8,
+        "saturation": 0.82,
+        "value": 8
+      },
+      "darkNeutral": {
+        "hue": 0,
+        "saturation": 0.9,
+        "value": -7
+      }
+    },
+    "atmospherePaletteFamilies": {
+      "clear": {
+        "hue": 0,
+        "saturation": 1,
+        "value": 0
+      },
+      "neutralSmoke": {
+        "hue": 8,
+        "saturation": 0.8,
+        "value": -10
+      },
+      "coolSmoke": {
+        "hue": -10,
+        "saturation": 0.86,
+        "value": -8
+      }
+    },
+    "materialIdentities": [
+      "granite",
+      "mixedMineral",
+      "mixedEarth"
+    ],
+    "atmosphereMedia": [
+      "none",
+      "smoke"
+    ],
+    "floraFormIDs": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "groundOwnership": {
+      "stone": "material+atmosphere",
+      "soil": "material+atmosphere",
+      "sand": "material+atmosphere",
+      "ash": "material+atmosphere",
+      "rubble": "material+atmosphere",
+      "mud": "material+atmosphere",
+      "chasm": "void+atmosphere",
+      "water": "hydrology+atmosphere",
+      "deepWater": "hydrology+atmosphere",
+      "ice": "hydrology+atmosphere",
+      "growth": "ecology+atmosphere",
+      "groundcover": "ecology+atmosphere"
+    }
+  },
+  "coverage": {
+    "material": "actual ground material + game-resolved recipe; authored Granite color applies only stone/rubble",
+    "atmosphere": "explicit persisted none/smoke medium, density and palette family",
+    "flora": "world floraTendency is game-resolver input only and is omitted from renderer descriptor; every persisted cast member owns a distinct frozen resolved color; Creature excluded",
+    "requestResolvedColorInputs": [
+      "material",
+      "atmosphere",
+      "emitter",
+      "floraTendency"
+    ],
+    "rendererResolvedColorScopes": [
+      "material",
+      "atmosphere",
+      "emitter",
+      "per-species flora cast color"
+    ],
+    "exercised": {
+      "materialIdentities": [
+        "granite",
+        "mixedMineral",
+        "mixedEarth"
+      ],
+      "materialPaletteFamilies": [
+        "paleNeutral",
+        "warmMineral",
+        "coolMineral",
+        "warmEarth"
+      ],
+      "atmospherePaletteFamilies": [
+        "clear",
+        "neutralSmoke",
+        "coolSmoke"
+      ],
+      "floraFormIDs": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "groundTypes": [
+        "stone",
+        "soil",
+        "sand",
+        "ash",
+        "rubble",
+        "mud",
+        "chasm",
+        "water",
+        "deepWater",
+        "ice",
+        "growth",
+        "groundcover"
+      ]
+    },
+    "unexercised": {
+      "materialPaletteFamilies": [
+        "coolEarth",
+        "darkNeutral"
+      ]
+    }
+  },
+  "similarityInvariant": "meaningful resolved input distance controls output distance; twins may match; near stays related; opposed separates proportionally; runtime never novelty-optimizes",
+  "fogInvariant": "unrevealed short-circuits before descriptor/color/Flora/content and produces descriptor-independent empty overlay",
+  "semanticValidation": [
+    "flora speciesID values must be unique within cast; JSON Schema cannot express this projection uniqueness",
+    "resolver validation is required after schema validation"
+  ],
+  "exclusions": [
+    "CMY+Depth authored ink recipe and mixing UI",
+    "named swatch vocabulary as persistence or gamut restriction",
+    "compound color semantics",
+    "multiple same-scope contributions before game resolution",
+    "Creature color",
+    "current visibility, darkness, Torch radius and smoke sight falloff",
+    "Illumination as inherent recolor input",
+    "raw Vitality as recolor input",
+    "characters, buildings, stations, weapons, inventory and item art"
+  ],
+  "files": {
+    "requestSchema": {
+      "file": "request.schema.json",
+      "sha256": "a5693b65d9a9abc6f63d3581f27d84968e8ecad9b613094fa6a3f7b4795f65ac"
+    },
+    "descriptorSchema": {
+      "file": "descriptor.schema.json",
+      "sha256": "a34f63e50aee7346ed304c1a666209e6ef706e252b557a23cd5cd4cbaeb565b3"
+    },
+    "conformanceVectors": {
+      "file": "conformance-vectors.json",
+      "sha256": "b10c92e4232e6fb01c75d3d6ba07b4fef2d883c0b6d735afd538c1001d7218f2"
+    }
+  },
+  "vectorCount": 10,
+  "vectorIDs": [
+    "identical-a",
+    "identical-b",
+    "near",
+    "mid",
+    "far",
+    "opposed-warm",
+    "opposed-cool",
+    "flora-scope",
+    "all-ground-ownership",
+    "smoke-scope"
+  ],
+  "canonicalManifestSHA256": "e601d2f77a15d545fd2d893dbb2e41891518cba2900c3f6d66890d56294824c1"
+}

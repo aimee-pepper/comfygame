@@ -1,0 +1,10 @@
+import {catalogueItemIDs} from "./item-kit.js";
+export const uncoveredCatalogueGroups=Object.freeze({
+treasure:Object.freeze(["essence_crystal","heat_core","caustic_core","light_core","conduit_fixture"]),
+key:Object.freeze(["cache_key","anchor_frame"]),
+standardProgression:Object.freeze(["blade_keen","ripping_hook","the_long_grievance","raking_edge","blade_binders","hairsplitter","banded_mace","anvilfall","the_settled_argument","warded_spear","parting_needle","the_kept_distance","banded_buckler","tower_guard","the_unarguable","ridged_helm","visored_casque","crown_of_quiet","guard_banded","guard_vault","the_standing_wall","studded_gloves","gauntlets_of_hold","the_sure_hands","shod_boots","longstriders","the_unhurried","balanced_pick","corebreaker","the_willing_edge","cold_compass","someones_ring","the_first_page"]),
+wildWeapon:Object.freeze(["two_natured_blade","long_fang","ranked_spear","rimed_edge","living_hook","quiet_knife","bloodletter","warded_haft"])});
+export const uncoveredCatalogueIDs=Object.freeze(Object.values(uncoveredCatalogueGroups).flat());
+export const nextCatalogueProofIDs=Object.freeze(["blade_keen","raking_edge","banded_mace","warded_spear","banded_buckler","ridged_helm","guard_banded","studded_gloves","shod_boots","balanced_pick","cold_compass"]);
+export const catalogueCoverageSummary=Object.freeze({liveExpected:78,accepted:catalogueItemIDs.length,uncovered:uncoveredCatalogueIDs.length,nextProof:nextCatalogueProofIDs.length});
+export const compactIdentityBoundary=Object.freeze({catalogue:"Known catalogItemID owns an authored core silhouette.",foundInstance:"Found instances preserve catalogue pixels; instance state remains external.",craftedInstance:"GearInstanceProfile.familyID owns a separately authored recipe-family silhouette; catalogue fallback is not visual authority.",resource:"ResourceID uses Resource v0.6 and never borrows catalogue identity.",worldMaterial:"Exact persisted MaterialSample value owns its known material cue; selection identity is context-owned.",unknown:"Unidentified curios share one disclosure-neutral unknown body."});

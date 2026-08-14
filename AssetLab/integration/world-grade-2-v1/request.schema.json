@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://comfygame.local/schemas/world-grade-2-v1-request.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["versions", "material", "atmosphere", "flora", "resolvedColors"],
+  "properties": {
+    "versions": { "$ref": "#/$defs/versions" },
+    "material": {
+      "type": "object", "additionalProperties": false, "required": ["identity", "paletteFamilyID", "transform"],
+      "properties": {
+        "identity": { "enum": ["granite", "mixedMineral", "mixedEarth"] },
+        "paletteFamilyID": { "enum": ["warmMineral", "coolMineral", "warmEarth", "coolEarth", "paleNeutral", "darkNeutral"] },
+        "transform": { "type": "object", "additionalProperties": false, "required": ["hue", "saturation", "value"], "properties": { "hue": { "type": "number", "minimum": -64, "maximum": 64 }, "saturation": { "type": "number", "minimum": 0.7, "maximum": 1.6 }, "value": { "type": "number", "minimum": -20, "maximum": 20 } } }
+      }
+    },
+    "atmosphere": {
+      "type": "object", "additionalProperties": false, "required": ["medium", "density", "paletteFamilyID"],
+      "properties": { "medium": { "enum": ["none", "smoke"] }, "density": { "type": "number", "minimum": 0, "maximum": 100 }, "paletteFamilyID": { "enum": ["clear", "neutralSmoke", "coolSmoke"] } },
+      "allOf": [
+        { "if": { "properties": { "medium": { "const": "none" } }, "required": ["medium"] }, "then": { "properties": { "density": { "const": 0 }, "paletteFamilyID": { "const": "clear" } } } },
+        { "if": { "properties": { "medium": { "const": "smoke" } }, "required": ["medium"] }, "then": { "properties": { "paletteFamilyID": { "enum": ["neutralSmoke", "coolSmoke"] } } } }
+      ]
+    },
+    "flora": {
+      "type": "object", "additionalProperties": false, "required": ["coveragePercent", "paletteRichness", "cast"],
+      "properties": {
+        "coveragePercent": { "type": "number", "minimum": 0, "maximum": 100 }, "paletteRichness": { "type": "number", "minimum": 0, "maximum": 100 },
+        "cast": { "type": "array", "maxItems": 4, "items": { "type": "object", "additionalProperties": false, "required": ["speciesID", "formID", "stature", "resolvedColor"], "properties": { "speciesID": { "type": "string", "pattern": "^[a-z][a-z0-9_-]{0,31}$" }, "formID": { "type": "integer", "minimum": 0, "maximum": 3 }, "stature": { "type": "number", "minimum": 0, "maximum": 100 }, "resolvedColor": { "$ref": "#/$defs/color" } } } }
+      },
+      "allOf": [
+        { "if": { "properties": { "coveragePercent": { "const": 0 } }, "required": ["coveragePercent"] }, "then": { "properties": { "cast": { "type": "array", "maxItems": 0 } } }, "else": { "properties": { "cast": { "type": "array", "minItems": 1 } } } }
+      ]
+    },
+    "resolvedColors": {
+      "type": "object", "additionalProperties": false, "required": ["material", "atmosphere", "emitter", "floraTendency"],
+      "properties": { "material": { "$ref": "#/$defs/nullableColor" }, "atmosphere": { "$ref": "#/$defs/nullableColor" }, "emitter": { "$ref": "#/$defs/nullableColor" }, "floraTendency": { "$ref": "#/$defs/nullableColor" } }
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "atmosphere": { "type": "object", "properties": { "medium": { "const": "none" } }, "required": ["medium"] } }, "required": ["atmosphere"] }, "then": { "properties": { "resolvedColors": { "type": "object", "properties": { "atmosphere": { "type": "null" } } } } } }
+  ],
+  "$defs": {
+    "versions": { "type": "object", "additionalProperties": false, "required": ["contractVersion", "resolverVersion", "paletteCatalogueVersion", "rendererVersion", "lightLayerVersion"], "properties": { "contractVersion": { "const": 1 }, "resolverVersion": { "const": "world-grade-2-resolver-1.0.0" }, "paletteCatalogueVersion": { "const": "world-grade-2-palette-1.0.0" }, "rendererVersion": { "const": "world-grade-2-renderer-1.0.0" }, "lightLayerVersion": { "const": "current-visibility-separate-1.0.0" } } },
+    "color": { "type": "object", "additionalProperties": false, "required": ["srgb", "resolutionVersion", "provenance"], "properties": { "srgb": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 0, "maximum": 255 }, { "type": "integer", "minimum": 0, "maximum": 255 }, { "type": "integer", "minimum": 0, "maximum": 255 }], "items": false, "minItems": 3, "maxItems": 3 }, "resolutionVersion": { "type": "string", "pattern": "^resolved-color-[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" }, "provenance": { "enum": ["authoredMix", "bindRandom"] } } },
+    "nullableColor": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/color" }] }
+  }
+}

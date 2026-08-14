@@ -1,0 +1,24 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import crypto from "node:crypto";
+import report from "../artifacts/combat-tree-functional-layout-proof-v0.4.json" with { type: "json" };
+import effectCopy from "../../docs/combat-tree-v2-effect-copy.generated.json" with { type: "json" };
+import { offensePresentationNodes as nodes, offenseTrueGraphByID as byID } from "../src/combat-tree-true-graph-kit.js";
+
+const sha = path => crypto.createHash("sha256").update(fs.readFileSync(path)).digest("hex");
+assert.equal(report.integrationReady, false);
+assert.equal(report.temporaryMarksOnly, true);
+assert.equal(nodes.length, 24);
+assert.deepEqual([1, 2, 3, 4, 5].map(depth => nodes.filter(node => node.depth === depth).length), [3, 6, 6, 6, 3]);
+assert.ok(nodes.every(node => effectCopy.effectCopyByNode[node.id]?.length > 0));
+assert.ok(nodes.filter(node => node.role === "capstone").every(node => node.alternativeParents.length === 2));
+assert.ok(nodes.some(node => node.alternativeParents.some(parent => byID[parent].laneID !== node.laneID)));
+assert.deepEqual(report.voiceOverOrder, ["tree and fixture context", "depth", "discipline and node name", "purchase state", "technique or capstone role", "exact effect", "alternative parents or capstone gate", "available action"]);
+assert.equal(report.accessibilityNodes.length, 24);
+assert.deepEqual(report.accessibilityNodes.map(node => node.id), nodes.map(node => node.id));
+assert.ok(report.accessibilityNodes.every(node => node.effect === effectCopy.effectCopyByNode[node.id]));
+assert.ok(report.accessibilityNodes.filter(node => node.role === "capstone").every(node => node.prerequisites.length === 2));
+assert.ok(new Set(report.accessibilityNodes.map(node => node.state)).isSupersetOf(new Set(["owned", "available", "blocked", "selected"])));
+assert.equal(report.pngSHA256, sha("artifacts/combat-tree-functional-layout-proof-v0.4.png"));
+assert.equal(report.largeTextPNGSHA256, sha("artifacts/combat-tree-functional-layout-proof-v0.4-large-text.png"));
+console.log("Asset Lab combat functional layout proof tests passed.");

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sprite Region Studio · Bookbinder Asset Lab</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="sprite-regions.css">
+</head>
+<body>
+  <nav class="tool-nav" aria-label="AssetLab tools"><a href="index.html">Creatures</a><a href="world.html">World &amp; Flora</a><a href="places.html">Places</a><a href="characters.html">Characters</a><a href="full-cast.html">Full Cast</a><a href="resources.html">Resources</a><a href="equipment.html">Items</a><a href="trading.html">Trading Post</a><a href="reporter.html">Bug Reporter</a><a href="noll.html">Noll Review</a><a href="bridge.html">Economy Bridge</a><a href="combat.html">Combat</a><a href="combat-ui.html">Combat UI</a><a href="campaigns.html">Campaigns</a><a href="launch.html">App Launch</a><a href="splashes.html">Splashes</a><a href="regression.html">Golden Review</a></nav>
+  <header class="region-header">
+    <div><p class="eyebrow">Bookbinder · body morph authoring</p><h1>Sprite Region Studio</h1><p class="subtitle">Draw vector regions, pin their joints, and inspect the pixel result.</p></div>
+    <div class="header-actions">
+      <button id="new-document">New</button><label class="file-button">Import JSON<input id="import-json" type="file" accept="application/json"></label>
+      <button id="export-json">Export JSON</button><button id="export-png" class="primary">Export PNG</button>
+    </div>
+  </header>
+
+  <main class="region-main">
+    <aside class="panel region-sidebar">
+      <section>
+        <p class="eyebrow">Document</p>
+        <div class="compact-fields">
+          <label>Width <input id="grid-width" type="number" min="8" max="256" value="48"></label>
+          <label>Height <input id="grid-height" type="number" min="8" max="256" value="64"></label>
+          <label>Zoom <select id="zoom"><option>8</option><option selected>10</option><option>12</option><option>16</option></select></label>
+        </div>
+        <div class="reference-fields">
+          <label class="file-button">Load reference PNG<input id="reference-image" type="file" accept="image/png,image/webp"></label>
+          <label>Opacity <input id="reference-opacity" type="range" min="0" max="100" value="55"></label>
+          <button id="clear-reference">Clear</button>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-title"><div><p class="eyebrow">Geometry</p><h2>Regions</h2></div><button id="add-region" title="Add region">＋</button></div>
+        <div id="region-list" class="entity-list"></div>
+        <div class="region-fields">
+          <label>Name <input id="region-name" type="text" maxlength="40"></label>
+          <label>Fill <input id="region-color" type="color"></label>
+          <button id="delete-region">Delete region</button>
+        </div>
+        <div class="boundary-fields">
+          <p class="control-help"><strong>Selected point’s outgoing line</strong></p>
+          <label>Boundary type <select id="boundary-type"><option value="outer">Outer edge</option><option value="seam">Shared color seam</option></select></label>
+          <label>Other zone <select id="boundary-neighbor"><option value="">None</option></select></label>
+          <p id="boundary-help" class="control-help">Select a point with Edit. Its line to the next point can be an outside edge or one shared by two zones.</p>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-title"><div><p class="eyebrow">Connections</p><h2>Joint anchors</h2></div></div>
+        <label class="wide-field">New anchor name <input id="anchor-name" type="text" value="waist-left" maxlength="40"></label>
+        <div id="anchor-list" class="entity-list anchor-list"></div>
+        <div class="row-actions"><button id="link-anchor">Link active region</button><button id="delete-anchor">Delete anchor</button></div>
+        <p class="control-help">An anchor may belong to multiple regions. Place it once, then activate another region and link it.</p>
+      </section>
+
+      <section>
+        <div class="section-title"><div><p class="eyebrow">Rig</p><h2>Skeleton</h2></div></div>
+        <label class="wide-field">New bone name <input id="bone-name" type="text" value="pelvis" maxlength="40"></label>
+        <div id="bone-list" class="entity-list anchor-list"></div>
+        <div class="rig-fields">
+          <label>Parent <select id="bone-parent"><option value="">None · root</option></select></label>
+          <label>Pose angle <output id="bone-angle-output">0°</output><input id="bone-angle" type="range" min="-180" max="180" value="0"></label>
+          <label>Point weight <output id="point-weight-output">0%</output><input id="point-weight" type="range" min="0" max="100" value="0"></label>
+        </div>
+        <div class="row-actions"><button id="bind-region">Bind region rigidly</button><button id="auto-weight-region">Auto-weight region</button><button id="delete-bone">Delete bone</button></div>
+        <p class="control-help">Select a vector point, select a bone, then set its weight. Weights are normalized during deformation. Auto-weight blends every point across nearby bones.</p>
+      </section>
+
+      <section>
+        <div class="section-title"><div><p class="eyebrow">Poses</p><h2>Pose library</h2></div><button id="add-pose" title="Add pose">＋</button></div>
+        <label class="wide-field">Active pose <select id="pose-select"></select></label>
+        <label class="wide-field">Pose name <input id="pose-name" type="text" maxlength="50"></label>
+        <div class="row-actions"><button id="duplicate-pose">Duplicate</button><button id="reset-pose">Reset angles</button></div>
+      </section>
+    </aside>
+
+    <section class="region-workspace">
+      <div class="panel toolbar" role="toolbar" aria-label="Drawing tools">
+        <button data-tool="pen" class="tool-active" aria-pressed="true">Pen <kbd>P</kbd></button>
+        <button data-tool="select" aria-pressed="false">Edit <kbd>V</kbd></button>
+        <button data-tool="anchor" aria-pressed="false">Anchor <kbd>A</kbd></button>
+        <button data-tool="bone" aria-pressed="false">Bone <kbd>B</kbd></button>
+        <span class="toolbar-divider"></span>
+        <button id="close-path">Close path</button><button id="undo">Undo</button>
+        <label><input id="show-grid" type="checkbox" checked> Grid</label><label><input id="show-vectors" type="checkbox" checked> Vectors</label>
+        <span id="status" class="status" aria-live="polite">Click to place points; drag while placing to create curves.</span>
+      </div>
+
+      <div class="editor-columns">
+        <section class="panel editor-panel">
+          <div class="panel-heading"><div><p class="eyebrow">Vector construction</p><h2>Region canvas</h2></div><span id="cursor-readout">x 0 · y 0</span></div>
+          <div id="editor-stage" class="editor-stage checker"><canvas id="editor-canvas" width="480" height="640"></canvas></div>
+          <p class="canvas-help"><strong>Pen:</strong> click points, drag for Bézier handles, click the first point or Close Path. <strong>Edit:</strong> drag points or handles. <strong>Anchor:</strong> click a joint location.</p>
+        </section>
+
+        <aside class="panel preview-panel region-preview-panel">
+          <div class="panel-heading"><div><p class="eyebrow">Raster result</p><h2>Pixel preview</h2></div><label>Scale <select id="preview-scale"><option>4</option><option selected>6</option><option>8</option><option>10</option></select></label></div>
+          <div id="preview-stage" class="pixel-preview checker"><canvas id="preview-canvas" width="48" height="64"></canvas></div>
+          <div class="preview-stats"><span id="region-count">0 regions</span><span id="anchor-count">0 anchors</span><span id="path-status">Open path</span></div>
+          <details><summary>Contract preview</summary><textarea id="json-preview" readonly spellcheck="false"></textarea></details>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="src/sprite-regions-app.js"></script>
+</body>
+</html>

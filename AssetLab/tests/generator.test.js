@@ -32,17 +32,27 @@ assert.ok(floraCommands(defaults).length > terrainCommands("soil", defaults.spec
 assert.deepEqual(paletteFor(defaults), paletteFor(cloneDescriptor(defaults)));
 
 const geometryHash = commands => hash(commands.map(({ color, ...geometry }) => geometry));
-const topology = traitDefinitions.find(definition => definition.key === "topology");
-const worldTopologies = new Set();
-const fightTopologies = new Set();
-for (const value of topology.options) {
+const bodyPlan = traitDefinitions.find(definition => definition.key === "bodyPlan");
+const cranialFeature = traitDefinitions.find(definition => definition.key === "cranialFeature");
+const worldBodyPlans = new Set();
+const fightBodyPlans = new Set();
+for (const value of bodyPlan.options) {
   const candidate = cloneDescriptor(defaults);
-  candidate.traits.topology = value;
-  worldTopologies.add(geometryHash(creatureCommands(candidate, "world")));
-  fightTopologies.add(geometryHash(creatureCommands(candidate, "fight")));
+  candidate.traits.bodyPlan = value;
+  worldBodyPlans.add(geometryHash(creatureCommands(candidate, "world")));
+  fightBodyPlans.add(geometryHash(creatureCommands(candidate, "fight")));
 }
-assert.equal(worldTopologies.size, topology.options.length, "every topology needs a distinct world silhouette");
-assert.equal(fightTopologies.size, topology.options.length, "every topology needs a distinct fight silhouette");
+assert.equal(worldBodyPlans.size, bodyPlan.options.length, "every body plan needs a distinct world silhouette");
+assert.equal(fightBodyPlans.size, bodyPlan.options.length, "every body plan needs a distinct fight silhouette");
+
+const cranialSilhouettes = new Set();
+for (const value of cranialFeature.options) {
+  const candidate = cloneDescriptor(defaults);
+  candidate.traits.cranialFeature = value;
+  cranialSilhouettes.add(geometryHash(creatureCommands(candidate, "fight")));
+}
+assert.equal(cranialSilhouettes.size, cranialFeature.options.length,
+  "every cranial feature needs a distinct fight silhouette");
 
 for (const trait of ["pierce", "crush", "rend", "coveringHardness", "coveringLength", "patterning", "ornament", "emanationStrength"]) {
   const low = cloneDescriptor(defaults), high = cloneDescriptor(defaults);
@@ -57,7 +67,8 @@ assert.ok(compatibilityWarnings(incompatible).some(warning => warning.includes("
 const population = populationDescriptors(defaults, 24);
 assert.equal(population.length, 24);
 assert.equal(new Set(population.map(candidate => candidate.specimenSeed)).size, 24);
-assert.equal(new Set(population.map(candidate => candidate.traits.topology)).size, topology.options.length);
+assert.equal(new Set(population.map(candidate => candidate.traits.bodyPlan)).size, bodyPlan.options.length);
+assert.ok(new Set(population.map(candidate => candidate.traits.cranialFeature)).size > 1);
 const specimens = populationDescriptors(defaults, 24, "species");
 assert.equal(new Set(specimens.map(candidate => candidate.speciesSeed)).size, 1);
 assert.equal(new Set(specimens.map(candidate => candidate.specimenSeed)).size, 24);
@@ -106,17 +117,25 @@ for (const [name, traits] of Object.entries(presets)) {
   assert.equal(candidate.logicalID, name);
   assert.ok(creatureCommands(candidate, "world").length > 0);
   assert.ok(creatureCommands(candidate, "fight").length > 0);
-  assert.ok(anatomySummary(candidate).includes(candidate.traits.topology));
+  assert.ok(anatomySummary(candidate).includes(candidate.traits.bodyPlan));
 }
 
 const longEar = normalizeDescriptor({ ...defaults, logicalID:"dune-long-ear", traits:presets["Dune long-ear"] });
 const wingedSerpent = normalizeDescriptor({ ...defaults, logicalID:"membrane-sky-serpent", traits:presets["Membrane sky serpent"] });
-assert.equal(longEar.traits.topology,"quadruped");
-assert.equal(wingedSerpent.traits.topology,"serpentine");
+assert.equal(longEar.traits.bodyPlan,"quadruped");
+assert.equal(longEar.traits.cranialFeature,"longEars");
+assert.equal(wingedSerpent.traits.bodyPlan,"serpentine");
+assert.equal(wingedSerpent.traits.cranialFeature,"crest");
 assert.equal(wingedSerpent.traits.appendageType,"membrane","wings must remain independent of axial topology");
 assert.notEqual(geometryHash(creatureCommands(longEar,"world")),geometryHash(creatureCommands(wingedSerpent,"world")));
 assert.notEqual(geometryHash(creatureCommands(longEar,"fight")),geometryHash(creatureCommands(wingedSerpent,"fight")));
 assert.ok(creatureCommands(longEar,"fight").some(command=>command.h>=7),"long-ear fixture needs a tall cranial silhouette");
 assert.ok(creatureCommands(wingedSerpent,"fight").some(command=>command.w>=8&&command.h===3),"winged serpent needs a membrane span");
+
+const migratedWinged = normalizeDescriptor({schemaVersion:4,traits:{topology:"winged",appendageType:"feathered"}});
+assert.equal(migratedWinged.schemaVersion,5);
+assert.equal(migratedWinged.traits.bodyPlan,"biped");
+assert.equal(migratedWinged.traits.appendageType,"feathered");
+assert.equal("topology" in migratedWinged.traits,false);
 
 console.log("Asset Lab generator tests passed.");

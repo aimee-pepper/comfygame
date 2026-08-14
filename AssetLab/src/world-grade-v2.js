@@ -1,0 +1,42 @@
+import {hash} from "./generator.js";
+
+export const worldGrade2CandidateVersion="world-grade-2-candidate-0.2.0";
+export const worldColorSwatches=Object.freeze({red:"#bd4050",orange:"#d66f35",yellow:"#d4b646",green:"#4f9d62",cyan:"#3f9ea1",blue:"#477fbd",violet:"#7856aa",magenta:"#b34f94",white:"#e5e1d6",black:"#24242a",grey:"#85858a",pale:"#c9c1b0"});
+export const colorScopeEligibility=Object.freeze({sun:"emitter",smoke:"atmosphere",granite:"material",bloom:"flora"});
+export const worldPaletteFamilies=Object.freeze({warmMineral:Object.freeze({hue:18,saturation:1.28,value:2}),coolMineral:Object.freeze({hue:-28,saturation:1.18,value:-3}),warmEarth:Object.freeze({hue:30,saturation:1.22,value:1}),coolEarth:Object.freeze({hue:-34,saturation:1.2,value:-2}),paleNeutral:Object.freeze({hue:8,saturation:.82,value:8}),darkNeutral:Object.freeze({hue:0,saturation:.9,value:-7})});
+export const worldAtmosphereFamilies=Object.freeze({clear:Object.freeze({hue:0,saturation:1,value:0}),neutralSmoke:Object.freeze({hue:8,saturation:.8,value:-10}),coolSmoke:Object.freeze({hue:-10,saturation:.86,value:-8})});
+const exact=(value,keys,label)=>{if(!value||typeof value!=="object"||Array.isArray(value)||JSON.stringify(Object.keys(value).sort())!==JSON.stringify([...keys].sort()))throw new Error(`invalid-${label}-fields`);};
+const finite=(n,label)=>{if(!Number.isFinite(n)||n<0||n>100)throw new Error(`invalid-${label}`);return n;};
+export function resolveWorldGrade2(request){
+  exact(request,["version","rendererInputs","authoredSigils"],"world-grade-2-request");
+  if(request.version!==worldGrade2CandidateVersion)throw new Error("world-grade-2-version-mismatch");
+  exact(request.rendererInputs,["materialIdentity","paletteFamilyID","materialTransform","atmosphere","flora"],"world-grade-2-renderer-inputs");
+  const input=request.rendererInputs;
+  if(!["granite","mixedMineral","mixedEarth"].includes(input.materialIdentity))throw new Error("unknown-material-identity");
+  if(!Object.hasOwn(worldPaletteFamilies,input.paletteFamilyID))throw new Error(`unknown-palette-family:${input.paletteFamilyID}`);
+  exact(input.materialTransform,["hue","saturation","value"],"world-grade-2-material-transform");
+  const {hue,saturation,value}=input.materialTransform;if(!Number.isFinite(hue)||hue < -64||hue>64||!Number.isFinite(saturation)||saturation<.7||saturation>1.6||!Number.isFinite(value)||value < -20||value>20)throw new Error("invalid-material-transform");
+  exact(input.atmosphere,["medium","density","paletteFamilyID"],"world-grade-2-atmosphere");
+  if(!["none","smoke"].includes(input.atmosphere.medium))throw new Error("unknown-atmosphere-medium");
+  if(input.atmosphere.medium==="none"&&input.atmosphere.paletteFamilyID!=="clear")throw new Error("clear-atmosphere-family-required");
+  if(input.atmosphere.medium==="smoke"&&!/Smoke$/.test(input.atmosphere.paletteFamilyID))throw new Error("smoke-atmosphere-family-required");
+  finite(input.atmosphere.density,"atmosphere-density");if(input.atmosphere.medium==="none"&&input.atmosphere.density!==0)throw new Error("clear-atmosphere-density-must-be-zero");
+  if(!Object.hasOwn(worldAtmosphereFamilies,input.atmosphere.paletteFamilyID))throw new Error("unknown-atmosphere-family");
+  exact(input.flora,["coveragePercent","paletteRichness","cast"],"world-grade-2-flora");
+  const coveragePercent=finite(input.flora.coveragePercent,"coverage"),paletteRichness=finite(input.flora.paletteRichness,"palette-richness");if(!Array.isArray(input.flora.cast)||input.flora.cast.length>4)throw new Error("invalid-flora-cast");
+  const cast=input.flora.cast.map(species=>{exact(species,["speciesID","formID","stature"],"world-grade-2-flora-species");if(typeof species.speciesID!=="string"||!/^[a-z][a-z0-9_-]{0,31}$/.test(species.speciesID)||!Number.isInteger(species.formID)||species.formID<0||species.formID>3)throw new Error("invalid-flora-species");return Object.freeze({speciesID:species.speciesID,formID:species.formID,stature:finite(species.stature,"flora-stature")});});if(new Set(cast.map(x=>x.speciesID)).size!==cast.length)throw new Error("duplicate-flora-species");if((cast.length===0)!==(coveragePercent===0))throw new Error("flora-cast-coverage-mismatch");
+  if(!Array.isArray(request.authoredSigils))throw new Error("invalid-world-grade-2-authored-sigils");const colors={material:[],atmosphere:[],emitter:[],flora:[]};
+  const sigilIDs=new Set();for(const sigil of request.authoredSigils){exact(sigil,["sigilIDUInt64Decimal","sourceID","colorID"],"world-grade-2-colored-sigil");if(typeof sigil.sigilIDUInt64Decimal!=="string"||!/^(0|[1-9][0-9]{0,19})$/.test(sigil.sigilIDUInt64Decimal)||BigInt(sigil.sigilIDUInt64Decimal)>18446744073709551615n)throw new Error("invalid-colored-sigil-id");if(sigilIDs.has(sigil.sigilIDUInt64Decimal))throw new Error("duplicate-colored-sigil-id");sigilIDs.add(sigil.sigilIDUInt64Decimal);if(!Object.hasOwn(colorScopeEligibility,sigil.sourceID))throw new Error(`color-ineligible-source:${sigil.sourceID}`);if(!Object.hasOwn(worldColorSwatches,sigil.colorID))throw new Error(`unknown-color-id:${sigil.colorID}`);const scope=colorScopeEligibility[sigil.sourceID];if(colors[scope].length)throw new Error(`multiple-color-contributions-not-supported:${scope}`);colors[scope].push(Object.freeze({...sigil}));}
+  const flora=Object.freeze({coveragePercent,paletteRichness,cast:Object.freeze(cast),richness:Number((.7+.6*paletteRichness/100).toFixed(3))}),scopedColors=Object.freeze(Object.fromEntries(Object.entries(colors).map(([scope,entries])=>[scope,Object.freeze(entries)])));
+  const result={version:worldGrade2CandidateVersion,materialIdentity:input.materialIdentity,paletteFamilyID:input.paletteFamilyID,atmosphereMedium:input.atmosphere.medium,atmosphereDensity:input.atmosphere.density,atmosphereFamily:input.atmosphere.paletteFamilyID,derived:Object.freeze({hue,saturation,value}),flora,scopedColors};
+  return Object.freeze({...result,recipeHash:hash(JSON.stringify(result))});
+}
+const clamp=(n,min=0,max=255)=>Math.max(min,Math.min(max,n));
+export const hexToRgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
+export const rgbToHex=rgb=>`#${rgb.map(n=>clamp(Math.round(n)).toString(16).padStart(2,"0")).join("")}`;
+function rgbToHsl([r,g,b]){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b),l=(max+min)/2,d=max-min;let h=0,s=0;if(d){s=d/(1-Math.abs(2*l-1));if(max===r)h=60*((g-b)/d%6);else if(max===g)h=60*((b-r)/d+2);else h=60*((r-g)/d+4);}return[(h+360)%360,s,l];}
+function hslToRgb([h,s,l]){const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2;let v;if(h<60)v=[c,x,0];else if(h<120)v=[x,c,0];else if(h<180)v=[0,c,x];else if(h<240)v=[0,x,c];else if(h<300)v=[x,0,c];else v=[c,0,x];return v.map(n=>(n+m)*255);}
+const mix=(a,b,t)=>a.map((n,i)=>n*(1-t)+b[i]*t),scopedColor=(recipe,scope)=>{const entry=recipe.scopedColors[scope][0];return entry?hexToRgb(worldColorSwatches[entry.colorID]):null;};
+export function worldGrade2Color(hex,recipe,{scope="material",includeEmitter=false,groundType=null}={}){const family=worldPaletteFamilies[recipe.paletteFamilyID],air=worldAtmosphereFamilies[recipe.atmosphereFamily],generalGrounds=["stone","soil","sand","ash","rubble","mud"],graniteGrounds=["stone","rubble"],m=scope==="material"&&generalGrounds.includes(groundType)?1:0,authoredMaterialEligible=recipe.materialIdentity==="granite"&&graniteGrounds.includes(groundType),hsl=rgbToHsl(hexToRgb(hex)),d=recipe.atmosphereDensity/100;hsl[0]=(hsl[0]+m*(recipe.derived.hue+family.hue)+air.hue*d+360)%360;hsl[1]=clamp(hsl[1]*(m?recipe.derived.saturation*family.saturation:1)*(1+(air.saturation-1)*d)*(scope==="flora"?recipe.flora.richness:1),0,.92);hsl[2]=clamp(hsl[2]+(m*(recipe.derived.value+family.value)+air.value*d)/100,.12,.9);let rgb=hslToRgb(hsl),color=scope==="material"&&!authoredMaterialEligible?null:scopedColor(recipe,scope);if(color)rgb=mix(rgb,color,scope==="flora"?.32:.38);color=scopedColor(recipe,"atmosphere");if(color&&recipe.atmosphereMedium!=="none")rgb=mix(rgb,color,.2*d);color=includeEmitter?scopedColor(recipe,"emitter"):null;if(color)rgb=mix(rgb,color,.13);return rgbToHex(rgb);}
+export function recolorWorldCommands(commands,recipe,options){return commands.map(command=>command.color.startsWith("#")?{...command,color:worldGrade2Color(command.color,recipe,options)}:{...command});}
+export const worldGrade2Geometry=commands=>commands.map(({op,x,y,w,h})=>({op,x,y,w,h}));

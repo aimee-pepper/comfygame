@@ -1,0 +1,7 @@
+import assert from "node:assert/strict";
+import {combatGraphProofVersion,offenseLanes,nodeID,prerequisites,prerequisiteText,proofState,nodeRole,selectedDetail} from "../src/combat-tree-graph-kit.js";
+assert.equal(combatGraphProofVersion,"combat-graph-proof-0.2.0");
+assert.equal(offenseLanes.length,3);assert.deepEqual(offenseLanes.map(x=>x.nodes.length),[8,8,8]);assert.equal(new Set(offenseLanes.flatMap(l=>l.nodes)).size,24);
+for(let lane=0;lane<3;lane++)for(let rank=1;rank<=8;rank++){const p=prerequisites(lane,rank);if(rank===1)assert.deepEqual(p,{kind:"root",nodes:[]});else if(rank===4||rank===6){assert.equal(p.kind,"any");assert.equal(p.nodes.length,lane===1?3:2);}else assert.deepEqual(p,{kind:"all",nodes:[nodeID(offenseLanes[lane].id,rank-1)]});assert.ok(["owned","available","blocked","selected"].includes(proofState(lane,rank)));assert.equal(nodeRole(rank).capstoneMinimumLaneSpend,rank===8?5:null);}
+assert.deepEqual(prerequisites(0,4),{kind:"any",nodes:[nodeID("force",3),nodeID("precision",3)]});assert.ok(!prerequisites(0,4).nodes.includes(nodeID("swiftness",3)));assert.match(prerequisiteText(1,4),/Overbear OR Pry OR Quicken/);assert.match(prerequisiteText(1,8),/five owned nodes in Precision/);assert.equal(proofState(1,6),"blocked");assert.match(selectedDetail().effect,/burn, poison, dazzle/);assert.match(selectedDetail().trigger,/Emanation without an affliction is insufficient/);
+console.log("Asset Lab combat graph proof tests passed.");

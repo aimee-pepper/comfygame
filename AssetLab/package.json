@@ -4,10 +4,23 @@
   "type": "module",
   "scripts": {
     "serve": "node server.js",
-    "test": "node tests/generator.test.js && node tests/world-generator.test.js && node tests/lifted-terrain-contract.test.js && node tests/live-contract.test.js && node tests/tile-content.test.js && node tests/resource-kit.test.js && node tests/place-kit.test.js && node tests/character-kit.test.js && node tests/character-map-contract.test.js && node tests/splash-kit.test.js && node tests/launch-kit.test.js && node tests/combat-generator.test.js && node tests/combat-ui-generator.test.js && node tests/map-slice-export.test.js && node tests/regression.test.js",
+    "test": "node scripts/export-combat-v2-effect-copy.mjs && node tests/web-shell.test.js && node tests/campaign-kit.test.js && node tests/catalogue-coverage.test.js && node tests/generator.test.js && node tests/identity-descriptor-schema.test.js && node tests/world-generator.test.js && node tests/world-grade-v2.test.js && node tests/world-grade-2-v1-pack.test.js && node tests/authored-color-vocabulary.test.js && node tests/authored-color-writing-kit.test.js && node tests/mixed-ink-kit.test.js && node tests/ink-vial-contract.test.js && node tests/combat-tree-graph-kit.test.js && node tests/combat-tree-true-graph-kit.test.js && node tests/combat-tree-v2-route-audit.test.js && node tests/combat-node-glyph-kit.test.js && node tests/research-graph-proof-kit.test.js && node tests/constellation-proof-kit.test.js && node tests/consumable-field-kit-proof.test.js && node tests/world-history-proof-kit.test.js && node tests/lifted-terrain-contract.test.js && node tests/live-contract.test.js && node tests/tile-content.test.js && node tests/resource-kit.test.js && node tests/item-kit.test.js && node tests/economy-identity-kit.test.js && node tests/trading-kit.test.js && node tests/bug-reporter-kit.test.js && node tests/place-kit.test.js && node tests/character-kit.test.js && node tests/character-map-contract.test.js && node tests/splash-kit.test.js && node tests/launch-kit.test.js && node tests/combat-generator.test.js && node tests/combat-ui-generator.test.js && node tests/map-slice-export.test.js && node tests/regression.test.js",
     "regression": "node scripts/regression-report.mjs",
     "export:map-slice": "node scripts/export-map-slice.mjs",
     "export:lifted-terrain": "node scripts/export-lifted-terrain.mjs"
+    ,"export:tier2-proof": "node scripts/export-tier2-proof.mjs",
+    "accept:tier2-items": "node scripts/accept-tier2-items.mjs"
+    ,"export:tier3-proof": "node scripts/export-tier3-proof.mjs"
+    ,"accept:tier3-items": "node scripts/accept-tier3-items.mjs"
+    ,"export:world-grade-v2": "node scripts/export-world-grade-v2-proof.mjs"
+    ,"export:authored-colors": "node scripts/export-authored-color-vocabulary-proof.mjs",
+    "generate:combat-copy": "node scripts/export-combat-v2-effect-copy.mjs --write",
+    "check:combat-copy": "node scripts/export-combat-v2-effect-copy.mjs",
+    "test:town-buildings": "node tests/town-building-generator.test.js",
+    "prompt:town-building": "node scripts/generate-town-building-prompts.mjs",
+    "accept:town-building": "node scripts/accept-town-building-layer.mjs",
+    "generate:town-registry": "node scripts/generate-town-building-registry.mjs",
+    "check:town-registry": "node scripts/generate-town-building-registry.mjs --check"
   },
   "devDependencies": {
     "ajv": "^8.20.0"

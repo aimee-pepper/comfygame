@@ -6,7 +6,7 @@
   "additionalProperties": false,
   "required": ["schemaVersion", "kind", "logicalID", "speciesSeed", "specimenSeed", "traits"],
   "properties": {
-    "schemaVersion": { "const": 4 },
+    "schemaVersion": { "const": 5 },
     "kind": { "const": "creature" },
     "logicalID": { "type": "string", "minLength": 1, "maxLength": 80 },
     "speciesSeed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
@@ -14,9 +14,10 @@
     "traits": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["topology", "size", "build", "boneDensity", "ornament", "coveringHardness", "coveringLength", "coveringCoverage", "appendageCount", "appendageType", "pierce", "crush", "rend", "reach", "delivery", "cyan", "magenta", "yellow", "colorDepth", "patterning", "opacity", "shine", "schiller", "vision", "mechano", "chemo", "thermo", "emanationStrength", "emanationKind", "emanationLight", "emanationHeat", "emanationCaustic", "defence", "toxic"],
+      "required": ["bodyPlan", "cranialFeature", "size", "build", "boneDensity", "ornament", "coveringHardness", "coveringLength", "coveringCoverage", "appendageCount", "appendageType", "pierce", "crush", "rend", "reach", "delivery", "cyan", "magenta", "yellow", "colorDepth", "patterning", "opacity", "shine", "schiller", "vision", "mechano", "chemo", "thermo", "emanationStrength", "emanationKind", "emanationLight", "emanationHeat", "emanationCaustic", "defence", "toxic"],
       "properties": {
-        "topology": { "enum": ["quadruped", "biped", "serpentine", "segmented", "radial", "piscine", "winged", "amorphous"] },
+        "bodyPlan": { "enum": ["quadruped", "biped", "serpentine", "segmented", "radial", "piscine", "amorphous"] },
+        "cranialFeature": { "enum": ["none", "longEars", "horns", "crest", "sensoryFan"] },
         "size": { "$ref": "#/$defs/percent" }, "build": { "$ref": "#/$defs/percent" }, "boneDensity": { "$ref": "#/$defs/percent" }, "ornament": { "$ref": "#/$defs/percent" },
         "coveringHardness": { "$ref": "#/$defs/percent" }, "coveringLength": { "$ref": "#/$defs/percent" }, "coveringCoverage": { "$ref": "#/$defs/percent" },
         "appendageCount": { "type": "integer", "minimum": 0, "maximum": 8 },

@@ -1,0 +1,3948 @@
+{
+  "packVersion": "world-grade-2-v1",
+  "canonicalEncoding": "recursive lexicographic-key JSON, no whitespace, UTF-8; arrays retain order; JSON number spelling follows ECMAScript JSON.stringify",
+  "digestAlgorithm": "SHA-256 lowercase hexadecimal",
+  "vectors": [
+    {
+      "id": "identical-a",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null,
+          "floraTendency": null
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "richness": 1,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null
+        },
+        "canonicalDescriptorSHA256": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "canonicalRequestSHA256": "51c8aff148d53a06874da1d336edd8f84c15f6e9f27f5e96225e2b7dbc265aa1",
+      "canonicalDescriptorSHA256": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 16,
+          "h": 16,
+          "color": "#6f7578"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 13,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 14,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 14,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 11,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 11,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 9,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 1,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 6,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 2,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 3,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 2,
+          "w": 1,
+          "h": 5,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 1,
+          "w": 1,
+          "h": 7,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 13,
+          "y": 8,
+          "w": 1,
+          "h": 6,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 5,
+          "w": 8,
+          "h": 7,
+          "color": "#367357"
+        },
+        {
+          "op": "rect",
+          "x": 22,
+          "y": 3,
+          "w": 4,
+          "h": 10,
+          "color": "#619a5c"
+        },
+        {
+          "op": "rect",
+          "x": 19,
+          "y": 7,
+          "w": 10,
+          "h": 3,
+          "color": "#83ac64"
+        },
+        {
+          "op": "rect",
+          "x": 27,
+          "y": 2,
+          "w": 4,
+          "h": 12,
+          "color": "#676e53"
+        }
+      ],
+      "rectangleCommandsSHA256": "4c455ca7bd2034c8ed8eab56235bcdb33927c865d798fd7cbc3ad808928f4e03",
+      "geometrySHA256": "225b2db5db487a06129cf7d2890dcab811d100edee4410fc87d1f2c86a6fb391",
+      "decodedRGBASHA256": "2490c85a9c8c3de448b16b71497b9ef71f5ec8c23b6a77658e1a615095204c90",
+      "pngFile": "identical-a.png",
+      "pngSHA256": "054076432bbb71ec610942fa75acd1fb4daf52f76e7cc39841356b2086bcbdf8",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    },
+    {
+      "id": "identical-b",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null,
+          "floraTendency": null
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "richness": 1,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null
+        },
+        "canonicalDescriptorSHA256": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09"
+      },
+      "canonicalRequestSHA256": "51c8aff148d53a06874da1d336edd8f84c15f6e9f27f5e96225e2b7dbc265aa1",
+      "canonicalDescriptorSHA256": "659e59c58822d20b5ddb7ed6303d15746d666444692bcc52ab21c37e200a5c09",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 16,
+          "h": 16,
+          "color": "#6f7578"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 13,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 14,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 14,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 11,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 11,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 9,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 1,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 6,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 2,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 3,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 2,
+          "w": 1,
+          "h": 5,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 1,
+          "w": 1,
+          "h": 7,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 13,
+          "y": 8,
+          "w": 1,
+          "h": 6,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 5,
+          "w": 8,
+          "h": 7,
+          "color": "#367357"
+        },
+        {
+          "op": "rect",
+          "x": 22,
+          "y": 3,
+          "w": 4,
+          "h": 10,
+          "color": "#619a5c"
+        },
+        {
+          "op": "rect",
+          "x": 19,
+          "y": 7,
+          "w": 10,
+          "h": 3,
+          "color": "#83ac64"
+        },
+        {
+          "op": "rect",
+          "x": 27,
+          "y": 2,
+          "w": 4,
+          "h": 12,
+          "color": "#676e53"
+        }
+      ],
+      "rectangleCommandsSHA256": "4c455ca7bd2034c8ed8eab56235bcdb33927c865d798fd7cbc3ad808928f4e03",
+      "geometrySHA256": "225b2db5db487a06129cf7d2890dcab811d100edee4410fc87d1f2c86a6fb391",
+      "decodedRGBASHA256": "2490c85a9c8c3de448b16b71497b9ef71f5ec8c23b6a77658e1a615095204c90",
+      "pngFile": "identical-b.png",
+      "pngSHA256": "054076432bbb71ec610942fa75acd1fb4daf52f76e7cc39841356b2086bcbdf8",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    },
+    {
+      "id": "near",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 3,
+            "saturation": 1.03,
+            "value": 1
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null,
+          "floraTendency": null
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 3,
+            "saturation": 1.03,
+            "value": 1
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "richness": 1,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null
+        },
+        "canonicalDescriptorSHA256": "b584a0a34c59de72ca1a9ad71d52dd90bb09c598371a88654e7f4d675a436da6"
+      },
+      "canonicalRequestSHA256": "51f9845ce2c108a0fe789b733e5a2ce5b9268c2d29676a4dce25a44e14ebe586",
+      "canonicalDescriptorSHA256": "b584a0a34c59de72ca1a9ad71d52dd90bb09c598371a88654e7f4d675a436da6",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 16,
+          "h": 16,
+          "color": "#72777b"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 13,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 14,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 14,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 11,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 11,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 9,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 1,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 6,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#4a4e53"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 2,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 3,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 2,
+          "w": 1,
+          "h": 5,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 1,
+          "w": 1,
+          "h": 7,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 13,
+          "y": 8,
+          "w": 1,
+          "h": 6,
+          "color": "#a0a4a7"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 5,
+          "w": 8,
+          "h": 7,
+          "color": "#367357"
+        },
+        {
+          "op": "rect",
+          "x": 22,
+          "y": 3,
+          "w": 4,
+          "h": 10,
+          "color": "#619a5c"
+        },
+        {
+          "op": "rect",
+          "x": 19,
+          "y": 7,
+          "w": 10,
+          "h": 3,
+          "color": "#83ac64"
+        },
+        {
+          "op": "rect",
+          "x": 27,
+          "y": 2,
+          "w": 4,
+          "h": 12,
+          "color": "#676e53"
+        }
+      ],
+      "rectangleCommandsSHA256": "af82817caf430e88ee62154309c921bd74d1ca9d1fba147d785484da5997c125",
+      "geometrySHA256": "225b2db5db487a06129cf7d2890dcab811d100edee4410fc87d1f2c86a6fb391",
+      "decodedRGBASHA256": "a0bac2ccb827c76bbea3cd5ccac5a86af02553f92730ec6646d60ce47c1731f5",
+      "pngFile": "near.png",
+      "pngSHA256": "63a3e0963ebf1fe07e1c0923c260d4f934f77fe04c6d179dca46f8af804820ac",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    },
+    {
+      "id": "mid",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 16,
+            "saturation": 1.16,
+            "value": 4
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null,
+          "floraTendency": null
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 16,
+            "saturation": 1.16,
+            "value": 4
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "richness": 1,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null
+        },
+        "canonicalDescriptorSHA256": "cbe5571d2e4f43d3ad4a85cde9b2ec3c2bb08b2d283cd4ef9d5b862f5d1fde9d"
+      },
+      "canonicalRequestSHA256": "cecefb33cc67be1536b191fd0c8bf13f91653c99eea2e30ae512c539160883a8",
+      "canonicalDescriptorSHA256": "cbe5571d2e4f43d3ad4a85cde9b2ec3c2bb08b2d283cd4ef9d5b862f5d1fde9d",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 16,
+          "h": 16,
+          "color": "#787d84"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 13,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 14,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 14,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 11,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 11,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 9,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 1,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 6,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#51535b"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 2,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 3,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 2,
+          "w": 1,
+          "h": 5,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 1,
+          "w": 1,
+          "h": 7,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 13,
+          "y": 8,
+          "w": 1,
+          "h": 6,
+          "color": "#a7aaaf"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 5,
+          "w": 8,
+          "h": 7,
+          "color": "#367357"
+        },
+        {
+          "op": "rect",
+          "x": 22,
+          "y": 3,
+          "w": 4,
+          "h": 10,
+          "color": "#619a5c"
+        },
+        {
+          "op": "rect",
+          "x": 19,
+          "y": 7,
+          "w": 10,
+          "h": 3,
+          "color": "#83ac64"
+        },
+        {
+          "op": "rect",
+          "x": 27,
+          "y": 2,
+          "w": 4,
+          "h": 12,
+          "color": "#676e53"
+        }
+      ],
+      "rectangleCommandsSHA256": "5ba0fe662d6557e90a69ec45dd1f634aae91ea7aa002061b8d8f4c8920a7ebff",
+      "geometrySHA256": "225b2db5db487a06129cf7d2890dcab811d100edee4410fc87d1f2c86a6fb391",
+      "decodedRGBASHA256": "2940f5865813d7eddef1e3fd597b52f52b43b793ef7b101a455cc6c1998be2e6",
+      "pngFile": "mid.png",
+      "pngSHA256": "c99b5d0861f578eed8ae798c148f9049adc4fe6ac056b84dfe37726758bdae52",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    },
+    {
+      "id": "far",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 34,
+            "saturation": 1.32,
+            "value": 7
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null,
+          "floraTendency": null
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 34,
+            "saturation": 1.32,
+            "value": 7
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "richness": 1,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null
+        },
+        "canonicalDescriptorSHA256": "6c0f031b2e636163be6cd3207c07ef4e6b84990d82af2bd566f384db94f36745"
+      },
+      "canonicalRequestSHA256": "1bbee093f73f29c5b183fbdc00a044647551c931d2c9f145457cf35801c125c5",
+      "canonicalDescriptorSHA256": "6c0f031b2e636163be6cd3207c07ef4e6b84990d82af2bd566f384db94f36745",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 16,
+          "h": 16,
+          "color": "#80818c"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 13,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 14,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 14,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 11,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 11,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 9,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 1,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 6,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#595764"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 2,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 3,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 2,
+          "w": 1,
+          "h": 5,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 1,
+          "w": 1,
+          "h": 7,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 13,
+          "y": 8,
+          "w": 1,
+          "h": 6,
+          "color": "#afb0b7"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 5,
+          "w": 8,
+          "h": 7,
+          "color": "#367357"
+        },
+        {
+          "op": "rect",
+          "x": 22,
+          "y": 3,
+          "w": 4,
+          "h": 10,
+          "color": "#619a5c"
+        },
+        {
+          "op": "rect",
+          "x": 19,
+          "y": 7,
+          "w": 10,
+          "h": 3,
+          "color": "#83ac64"
+        },
+        {
+          "op": "rect",
+          "x": 27,
+          "y": 2,
+          "w": 4,
+          "h": 12,
+          "color": "#676e53"
+        }
+      ],
+      "rectangleCommandsSHA256": "3c7312079094f122157f1f83cbc2e5beb4a526476ae966bc25a3b8fb4d872644",
+      "geometrySHA256": "225b2db5db487a06129cf7d2890dcab811d100edee4410fc87d1f2c86a6fb391",
+      "decodedRGBASHA256": "4609135c16b6f83e2402c5be069024b1f8b00bfa6ec32c0f2b07e97ca1f86d0e",
+      "pngFile": "far.png",
+      "pngSHA256": "5cf12a480394df06f87e9b2bdb18232285f806322718575392f099d3c36e6a5f",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    },
+    {
+      "id": "opposed-warm",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "granite",
+          "paletteFamilyID": "warmMineral",
+          "transform": {
+            "hue": 30,
+            "saturation": 1.3,
+            "value": 6
+          }
+        },
+        "atmosphere": {
+          "medium": "smoke",
+          "density": 45,
+          "paletteFamilyID": "neutralSmoke"
+        },
+        "flora": {
+          "coveragePercent": 78,
+          "paletteRichness": 82,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  176,
+                  92,
+                  140
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "authoredMix"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": {
+            "srgb": [
+              189,
+              64,
+              80
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "atmosphere": {
+            "srgb": [
+              214,
+              111,
+              53
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "emitter": {
+            "srgb": [
+              212,
+              182,
+              70
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "floraTendency": {
+            "srgb": [
+              179,
+              79,
+              148
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          }
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "granite",
+          "paletteFamilyID": "warmMineral",
+          "transform": {
+            "hue": 30,
+            "saturation": 1.3,
+            "value": 6
+          }
+        },
+        "atmosphere": {
+          "medium": "smoke",
+          "density": 45,
+          "paletteFamilyID": "neutralSmoke"
+        },
+        "flora": {
+          "coveragePercent": 78,
+          "paletteRichness": 82,
+          "richness": 1.192,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  176,
+                  92,
+                  140
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "authoredMix"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": {
+            "srgb": [
+              189,
+              64,
+              80
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "atmosphere": {
+            "srgb": [
+              214,
+              111,
+              53
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "emitter": {
+            "srgb": [
+              212,
+              182,
+              70
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          }
+        },
+        "canonicalDescriptorSHA256": "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a"
+      },
+      "canonicalRequestSHA256": "2c994473edec0e0d1f360a32c5f1a60db9a8e611958a02172b8d6a936cb5adb4",
+      "canonicalDescriptorSHA256": "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 16,
+          "h": 16,
+          "color": "#95635c"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 13,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 14,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 14,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 11,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 11,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 9,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 1,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 6,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#845048"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 2,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 3,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 2,
+          "w": 1,
+          "h": 5,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 1,
+          "w": 1,
+          "h": 7,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 13,
+          "y": 8,
+          "w": 1,
+          "h": 6,
+          "color": "#ab7972"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 5,
+          "w": 8,
+          "h": 7,
+          "color": "#6f6c5b"
+        },
+        {
+          "op": "rect",
+          "x": 22,
+          "y": 3,
+          "w": 4,
+          "h": 10,
+          "color": "#8c8e5c"
+        },
+        {
+          "op": "rect",
+          "x": 19,
+          "y": 7,
+          "w": 10,
+          "h": 3,
+          "color": "#a99f5f"
+        },
+        {
+          "op": "rect",
+          "x": 27,
+          "y": 2,
+          "w": 4,
+          "h": 12,
+          "color": "#946b57"
+        }
+      ],
+      "rectangleCommandsSHA256": "af2de3e1d5a9a6cf3c9b7116b11b7446162b085837f308514bd44872f79d96d9",
+      "geometrySHA256": "225b2db5db487a06129cf7d2890dcab811d100edee4410fc87d1f2c86a6fb391",
+      "decodedRGBASHA256": "943fad3b2473e5e0385829afc0e7a572dd3cfc8f3d70948ddc0f5351ea2194c0",
+      "pngFile": "opposed-warm.png",
+      "pngSHA256": "0c849b36d2748c607749b0b574c108f453976ad37cbfdf27d20577d99b130a80",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    },
+    {
+      "id": "opposed-cool",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "granite",
+          "paletteFamilyID": "coolMineral",
+          "transform": {
+            "hue": -30,
+            "saturation": 1.26,
+            "value": -5
+          }
+        },
+        "atmosphere": {
+          "medium": "smoke",
+          "density": 85,
+          "paletteFamilyID": "coolSmoke"
+        },
+        "flora": {
+          "coveragePercent": 78,
+          "paletteRichness": 82,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  74,
+                  150,
+                  101
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "authoredMix"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": {
+            "srgb": [
+              71,
+              127,
+              189
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "atmosphere": {
+            "srgb": [
+              63,
+              158,
+              161
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "emitter": {
+            "srgb": [
+              120,
+              86,
+              170
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "floraTendency": {
+            "srgb": [
+              79,
+              157,
+              98
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          }
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "granite",
+          "paletteFamilyID": "coolMineral",
+          "transform": {
+            "hue": -30,
+            "saturation": 1.26,
+            "value": -5
+          }
+        },
+        "atmosphere": {
+          "medium": "smoke",
+          "density": 85,
+          "paletteFamilyID": "coolSmoke"
+        },
+        "flora": {
+          "coveragePercent": 78,
+          "paletteRichness": 82,
+          "richness": 1.192,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  74,
+                  150,
+                  101
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "authoredMix"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": {
+            "srgb": [
+              71,
+              127,
+              189
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "atmosphere": {
+            "srgb": [
+              63,
+              158,
+              161
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          },
+          "emitter": {
+            "srgb": [
+              120,
+              86,
+              170
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "authoredMix"
+          }
+        },
+        "canonicalDescriptorSHA256": "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e"
+      },
+      "canonicalRequestSHA256": "1c56c1474f2fb0e9b28990572215f231988813b1476c83b20997f2db74fb3f7f",
+      "canonicalDescriptorSHA256": "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 16,
+          "h": 16,
+          "color": "#45617a"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 13,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 14,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 14,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 11,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 11,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 9,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 1,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 6,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#39546f"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 2,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 3,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 2,
+          "w": 1,
+          "h": 5,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 1,
+          "w": 1,
+          "h": 7,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 13,
+          "y": 8,
+          "w": 1,
+          "h": 6,
+          "color": "#58768d"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 5,
+          "w": 8,
+          "h": 7,
+          "color": "#3d7164"
+        },
+        {
+          "op": "rect",
+          "x": 22,
+          "y": 3,
+          "w": 4,
+          "h": 10,
+          "color": "#5e8f6c"
+        },
+        {
+          "op": "rect",
+          "x": 19,
+          "y": 7,
+          "w": 10,
+          "h": 3,
+          "color": "#7ba16c"
+        },
+        {
+          "op": "rect",
+          "x": 27,
+          "y": 2,
+          "w": 4,
+          "h": 12,
+          "color": "#5c6d66"
+        }
+      ],
+      "rectangleCommandsSHA256": "dc2d50b56377339b26d37e9aaa74fa36761e217e8e5bbf8158a725932911219b",
+      "geometrySHA256": "225b2db5db487a06129cf7d2890dcab811d100edee4410fc87d1f2c86a6fb391",
+      "decodedRGBASHA256": "202dcb0b23b6c2c27fd50dd39a82bb5f7660700469ce7052a5a5a38e7893aa70",
+      "pngFile": "opposed-cool.png",
+      "pngSHA256": "f8c9fdbb7b704069fc0d5aa55bdb5855038d86c3f5f5be0c546a731ceb1c10cb",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    },
+    {
+      "id": "flora-scope",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 88,
+          "paletteRichness": 90,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 24,
+              "resolvedColor": {
+                "srgb": [
+                  55,
+                  112,
+                  170
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68,
+              "resolvedColor": {
+                "srgb": [
+                  112,
+                  78,
+                  172
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            },
+            {
+              "speciesID": "flora-c",
+              "formID": 2,
+              "stature": 52,
+              "resolvedColor": {
+                "srgb": [
+                  67,
+                  151,
+                  111
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            },
+            {
+              "speciesID": "flora-d",
+              "formID": 3,
+              "stature": 81,
+              "resolvedColor": {
+                "srgb": [
+                  178,
+                  101,
+                  154
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null,
+          "floraTendency": {
+            "srgb": [
+              71,
+              127,
+              189
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "bindRandom"
+          }
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 88,
+          "paletteRichness": 90,
+          "richness": 1.24,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 24,
+              "resolvedColor": {
+                "srgb": [
+                  55,
+                  112,
+                  170
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68,
+              "resolvedColor": {
+                "srgb": [
+                  112,
+                  78,
+                  172
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            },
+            {
+              "speciesID": "flora-c",
+              "formID": 2,
+              "stature": 52,
+              "resolvedColor": {
+                "srgb": [
+                  67,
+                  151,
+                  111
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            },
+            {
+              "speciesID": "flora-d",
+              "formID": 3,
+              "stature": 81,
+              "resolvedColor": {
+                "srgb": [
+                  178,
+                  101,
+                  154
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null
+        },
+        "canonicalDescriptorSHA256": "39c1cd7f12b9b389ac86b40299ba2b92cc3f5e45acc4d624e069299c23b12bb2"
+      },
+      "canonicalRequestSHA256": "905d1d889a9200080aab514cc63314fba25832a68149db1f901e48d170801d39",
+      "canonicalDescriptorSHA256": "39c1cd7f12b9b389ac86b40299ba2b92cc3f5e45acc4d624e069299c23b12bb2",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 16,
+          "h": 16,
+          "color": "#6f7578"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 13,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 14,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 14,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 11,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 11,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 9,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 1,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 6,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#484b50"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 2,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 3,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 2,
+          "w": 1,
+          "h": 5,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 1,
+          "w": 1,
+          "h": 7,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 13,
+          "y": 8,
+          "w": 1,
+          "h": 6,
+          "color": "#9da2a5"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 5,
+          "w": 8,
+          "h": 7,
+          "color": "#2f7473"
+        },
+        {
+          "op": "rect",
+          "x": 22,
+          "y": 3,
+          "w": 4,
+          "h": 10,
+          "color": "#6e9272"
+        },
+        {
+          "op": "rect",
+          "x": 19,
+          "y": 7,
+          "w": 10,
+          "h": 3,
+          "color": "#87bc65"
+        },
+        {
+          "op": "rect",
+          "x": 27,
+          "y": 2,
+          "w": 4,
+          "h": 12,
+          "color": "#8f6766"
+        }
+      ],
+      "rectangleCommandsSHA256": "3d6a657be6bdb55b7e85da61be41e168efa2827a7baaab2b21d53dee4c00d470",
+      "geometrySHA256": "225b2db5db487a06129cf7d2890dcab811d100edee4410fc87d1f2c86a6fb391",
+      "decodedRGBASHA256": "0fd730f92cef620c4e98d30f13b2e0048167ac50c9bd73f9070a3657f745f482",
+      "pngFile": "flora-scope.png",
+      "pngSHA256": "2c575630b71e3335f4e47d8445a4003b12d8654663a7c77894c412126fa1038b",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    },
+    {
+      "id": "all-ground-ownership",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedEarth",
+          "paletteFamilyID": "warmEarth",
+          "transform": {
+            "hue": 12,
+            "saturation": 1.12,
+            "value": 3
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null,
+          "floraTendency": null
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedEarth",
+          "paletteFamilyID": "warmEarth",
+          "transform": {
+            "hue": 12,
+            "saturation": 1.12,
+            "value": 3
+          }
+        },
+        "atmosphere": {
+          "medium": "none",
+          "density": 0,
+          "paletteFamilyID": "clear"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "richness": 1,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": null,
+          "emitter": null
+        },
+        "canonicalDescriptorSHA256": "98578aa232fda6a26b1777f351a9d43a3ee89833dba803d1e22e8152db5daa5f"
+      },
+      "canonicalRequestSHA256": "0338666a87e31d198f0ce6ae42223f4863370526b5f2b3d234aebf97d62651f6",
+      "canonicalDescriptorSHA256": "98578aa232fda6a26b1777f351a9d43a3ee89833dba803d1e22e8152db5daa5f",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 5,
+          "h": 8,
+          "color": "#808471"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 0,
+          "w": 5,
+          "h": 8,
+          "color": "#7c8736"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 0,
+          "w": 5,
+          "h": 8,
+          "color": "#9fc069"
+        },
+        {
+          "op": "rect",
+          "x": 15,
+          "y": 0,
+          "w": 5,
+          "h": 8,
+          "color": "#727165"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 0,
+          "w": 5,
+          "h": 8,
+          "color": "#7d826b"
+        },
+        {
+          "op": "rect",
+          "x": 25,
+          "y": 0,
+          "w": 5,
+          "h": 8,
+          "color": "#5e673a"
+        },
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 8,
+          "w": 5,
+          "h": 8,
+          "color": "#292628"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 8,
+          "w": 5,
+          "h": 8,
+          "color": "#3d7890"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 8,
+          "w": 5,
+          "h": 8,
+          "color": "#284f70"
+        },
+        {
+          "op": "rect",
+          "x": 15,
+          "y": 8,
+          "w": 5,
+          "h": 8,
+          "color": "#94b8c4"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 8,
+          "w": 5,
+          "h": 8,
+          "color": "#487144"
+        },
+        {
+          "op": "rect",
+          "x": 25,
+          "y": 8,
+          "w": 5,
+          "h": 8,
+          "color": "#638354"
+        }
+      ],
+      "rectangleCommandsSHA256": "5c91d8336799b73b545a9b08044ecf58ae33a111c392b28cf89810e5692a1be1",
+      "geometrySHA256": "ba4e6b98dd7cd77b9e896c1b3fd1cb923d0736cd1a9ed6938b544601c4076aee",
+      "decodedRGBASHA256": "695fcaa247d223719efed054dcaa9f091cc928c549411c2ea78ea43b273a4eca",
+      "pngFile": "all-ground-ownership.png",
+      "pngSHA256": "c86ba60ceb3738d1294664a11e093ceeb82f575f23844b08bda736c1e6dac315",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    },
+    {
+      "id": "smoke-scope",
+      "request": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          }
+        },
+        "atmosphere": {
+          "medium": "smoke",
+          "density": 55,
+          "paletteFamilyID": "neutralSmoke"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": {
+            "srgb": [
+              120,
+              86,
+              170
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "bindRandom"
+          },
+          "emitter": null,
+          "floraTendency": null
+        }
+      },
+      "descriptor": {
+        "versions": {
+          "contractVersion": 1,
+          "resolverVersion": "world-grade-2-resolver-1.0.0",
+          "paletteCatalogueVersion": "world-grade-2-palette-1.0.0",
+          "rendererVersion": "world-grade-2-renderer-1.0.0",
+          "lightLayerVersion": "current-visibility-separate-1.0.0"
+        },
+        "material": {
+          "identity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "transform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          }
+        },
+        "atmosphere": {
+          "medium": "smoke",
+          "density": 55,
+          "paletteFamilyID": "neutralSmoke"
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "richness": 1,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35,
+              "resolvedColor": {
+                "srgb": [
+                  62,
+                  122,
+                  86
+                ],
+                "resolutionVersion": "resolved-color-1.0.0",
+                "provenance": "bindRandom"
+              }
+            }
+          ]
+        },
+        "resolvedColors": {
+          "material": null,
+          "atmosphere": {
+            "srgb": [
+              120,
+              86,
+              170
+            ],
+            "resolutionVersion": "resolved-color-1.0.0",
+            "provenance": "bindRandom"
+          },
+          "emitter": null
+        },
+        "canonicalDescriptorSHA256": "b7a587fab873d0587e2597739d13004dc3f90255d70eee544a0d72f7773141dd"
+      },
+      "canonicalRequestSHA256": "deb2fe757082eba58231ad68b5a3ce248443915e08dc6f6cecc5f26850f2b0a0",
+      "canonicalDescriptorSHA256": "b7a587fab873d0587e2597739d13004dc3f90255d70eee544a0d72f7773141dd",
+      "rectangleCommands": [
+        {
+          "op": "rect",
+          "x": 0,
+          "y": 0,
+          "w": 16,
+          "h": 16,
+          "color": "#656570"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 13,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 14,
+          "y": 10,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 14,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 15,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 7,
+          "y": 11,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 11,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 8,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 9,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 1,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 3,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 4,
+          "y": 6,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 5,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 6,
+          "y": 7,
+          "w": 1,
+          "h": 1,
+          "color": "#42404c"
+        },
+        {
+          "op": "rect",
+          "x": 10,
+          "y": 1,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 2,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 9,
+          "y": 3,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 4,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 5,
+          "w": 1,
+          "h": 1,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 2,
+          "y": 2,
+          "w": 1,
+          "h": 5,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 8,
+          "y": 1,
+          "w": 1,
+          "h": 7,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 13,
+          "y": 8,
+          "w": 1,
+          "h": 6,
+          "color": "#8d8d99"
+        },
+        {
+          "op": "rect",
+          "x": 20,
+          "y": 5,
+          "w": 8,
+          "h": 7,
+          "color": "#3a6259"
+        },
+        {
+          "op": "rect",
+          "x": 22,
+          "y": 3,
+          "w": 4,
+          "h": 10,
+          "color": "#5a875f"
+        },
+        {
+          "op": "rect",
+          "x": 19,
+          "y": 7,
+          "w": 10,
+          "h": 3,
+          "color": "#769a63"
+        },
+        {
+          "op": "rect",
+          "x": 27,
+          "y": 2,
+          "w": 4,
+          "h": 12,
+          "color": "#5d6457"
+        }
+      ],
+      "rectangleCommandsSHA256": "897c8a033de6f84277a272a5fc8cc4e42dc59e725ea710eedd72f9b1d4609d6b",
+      "geometrySHA256": "225b2db5db487a06129cf7d2890dcab811d100edee4410fc87d1f2c86a6fb391",
+      "decodedRGBASHA256": "b6588ac286ea7131452816d531f8c47dd6831093911925d25dc74bc977fe69e6",
+      "pngFile": "smoke-scope.png",
+      "pngSHA256": "8a50bb27cf8a782cef050b3c299731ffd63e7e6f7979166a8738c19ff148e9f0",
+      "pixelWidth": 32,
+      "pixelHeight": 16
+    }
+  ],
+  "similarity": [
+    {
+      "a": "identical-a",
+      "b": "identical-b",
+      "band": "identical",
+      "inputDistance": 0,
+      "outputDistance": 0
+    },
+    {
+      "a": "identical-a",
+      "b": "near",
+      "band": "near",
+      "inputDistance": 0.054,
+      "outputDistance": 2.313
+    },
+    {
+      "a": "identical-a",
+      "b": "mid",
+      "band": "mid",
+      "inputDistance": 0.44,
+      "outputDistance": 8.444
+    },
+    {
+      "a": "identical-a",
+      "b": "far",
+      "band": "far",
+      "inputDistance": 0.72,
+      "outputDistance": 14.442
+    },
+    {
+      "a": "opposed-warm",
+      "b": "opposed-cool",
+      "band": "opposed",
+      "inputDistance": "multi-layer; no total order",
+      "outputDistance": 54.363
+    }
+  ],
+  "fog": {
+    "rule": "frozen fog compositor short-circuits before descriptor and all content",
+    "requestA": "opposed-warm",
+    "requestB": "opposed-cool",
+    "width": 16,
+    "height": 16,
+    "rgbaByteLength": 1024,
+    "alphaSemantics": "all zero; undisclosed map content contributes no pixels",
+    "aDescriptorSHA256": "6ac8dd7b70564493296c8fb0ce7ee381db2bc47deceb1a12b08d50bfbc23dc4a",
+    "bDescriptorSHA256": "8055360658b09fe04395800c49bd595bf06312b1ee0e6bbe6cdafe82ba5b285e",
+    "decodedRGBASHA256A": "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+    "decodedRGBASHA256B": "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+    "invariant": true
+  },
+  "negativeCases": [
+    {
+      "id": "illumination-rejected",
+      "mutation": {
+        "illumination": 72
+      },
+      "expected": "schema additionalProperties false"
+    },
+    {
+      "id": "raw-vitality-rejected",
+      "mutation": {
+        "vitality": 88
+      },
+      "expected": "schema additionalProperties false"
+    },
+    {
+      "id": "authored-ink-rejected",
+      "mutation": {
+        "authoredInk": {
+          "cyan": 10,
+          "magenta": 20,
+          "yellow": 30,
+          "depth": 40
+        }
+      },
+      "expected": "schema additionalProperties false"
+    },
+    {
+      "id": "named-sigil-color-rejected",
+      "mutation": {
+        "authoredSigils": [
+          {
+            "sourceID": "sun",
+            "colorID": "yellow"
+          }
+        ]
+      },
+      "expected": "schema additionalProperties false"
+    },
+    {
+      "id": "global-final-flora-color-rejected",
+      "mutationPath": "resolvedColors.flora",
+      "expected": "schema additionalProperties false; floraTendency plus per-species resolvedColor only"
+    },
+    {
+      "id": "duplicate-flora-species-rejected",
+      "expected": "semantic resolver rejects duplicate speciesID projection"
+    },
+    {
+      "id": "flora-coverage-cast-mismatch-rejected",
+      "expected": "schema and resolver reject empty cast with positive coverage and nonempty cast with zero coverage"
+    },
+    {
+      "id": "atmosphere-medium-family-mismatch-rejected",
+      "expected": "schema and resolver enforce none/clear/zero or smoke/smoke-family"
+    },
+    {
+      "id": "multiple-same-scope-excluded",
+      "expected": "closed object contains one game-resolved contribution per technical scope"
+    },
+    {
+      "id": "current-visibility-excluded",
+      "mutation": {
+        "currentlyVisible": true
+      },
+      "expected": "schema additionalProperties false"
+    }
+  ]
+}

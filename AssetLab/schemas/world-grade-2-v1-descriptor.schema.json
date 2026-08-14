@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://comfygame.local/schemas/world-grade-2-v1-descriptor.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["versions", "material", "atmosphere", "flora", "resolvedColors", "canonicalDescriptorSHA256"],
+  "properties": {
+    "versions": { "$ref": "world-grade-2-v1-request.schema.json#/$defs/versions" },
+    "material": { "$ref": "world-grade-2-v1-request.schema.json#/properties/material" },
+    "atmosphere": { "$ref": "world-grade-2-v1-request.schema.json#/properties/atmosphere" },
+    "resolvedColors": {
+      "type": "object", "additionalProperties": false, "required": ["material", "atmosphere", "emitter"],
+      "properties": { "material": { "$ref": "world-grade-2-v1-request.schema.json#/$defs/nullableColor" }, "atmosphere": { "$ref": "world-grade-2-v1-request.schema.json#/$defs/nullableColor" }, "emitter": { "$ref": "world-grade-2-v1-request.schema.json#/$defs/nullableColor" } }
+    },
+    "canonicalDescriptorSHA256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "flora": {
+      "type": "object", "additionalProperties": false, "required": ["coveragePercent", "paletteRichness", "richness", "cast"],
+      "properties": {
+        "coveragePercent": { "type": "number", "minimum": 0, "maximum": 100 },
+        "paletteRichness": { "type": "number", "minimum": 0, "maximum": 100 },
+        "richness": { "type": "number", "minimum": 0.7, "maximum": 1.3 },
+        "cast": { "$ref": "world-grade-2-v1-request.schema.json#/properties/flora/properties/cast" }
+      }
+    }
+  }
+}

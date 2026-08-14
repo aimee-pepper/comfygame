@@ -125,7 +125,7 @@ function drawPopulation() {
   }
   byId("population-note").textContent=mode==="species"
     ? "One species, 24 specimen seeds. Mechanical anatomy stays fixed; only bounded cosmetic marks vary."
-    : "Twenty-four species spanning every topology. This tests the breadth of the ecosystem grammar.";
+    : "Twenty-four species spanning body plans, cranial features and appendages. This tests the breadth of the ecosystem grammar.";
 }
 
 function drawWarnings() {

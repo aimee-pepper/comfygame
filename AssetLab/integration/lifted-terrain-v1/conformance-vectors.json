@@ -8,7 +8,7 @@
     },
     {
       "request": {"pipelineVersions":{"contractVersion":1,"terrainAdapterVersion":"lifted-terrain-adapter-1.0.0","terrainGrammarVersion":"terrain-lifted-1.0.0","worldGradeAdapterVersion":"world-grade-1.0.0","renderProfileVersion":"terrain-16x19-bottom-anchored-1.0.0"},"ground":"stone","revealed":true,"crumbled":false,"cracking":true,"elevation":3,"adjacencyNESW":6,"terrainSeedUInt32":305419896,"featureVariant":3,"worldGrade":{"red":-22,"green":22,"blue":22,"value":-11},"southExposureLevels":3},
-      "canonicalRequestSha256":"b30c372967343ce6bba7ac13056c88c79e3b58a5001740a2bb1cd8fca7dc98af","rectangleSha256":"2e8d93218d82f54377c4d0278525d4dc2e50edd9233734bd8742f843b7e463c3","pixelTokenSha256":"320a8b6c47522003a76074cbfa9d52d2d6b66fee00220425805022a27c1fbce1"
+      "canonicalRequestSha256":"b30c372967343ce6bba7ac13056c88c79e3b58a5001740a2bb1cd8fca7dc98af","rectangleSha256":"3971455db0a0c975466a0725e7cfef0526956a80654ad8523c953ad24cef27e9","pixelTokenSha256":"d8d10f08db4d7aa08dc448c699d219646db32284b9258718511ec9cfe804002b"
     }
   ]
 }

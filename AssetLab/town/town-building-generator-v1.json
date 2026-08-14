@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "generatorVersion": "town-building-generator-1.0.0",
+  "integrationReady": true,
+  "backdrop": {
+    "path": "town-empty-v1.png",
+    "pixelWidth": 1408,
+    "pixelHeight": 3048,
+    "sha256": "d30caaf02f69ab4b63b23db443598033b7cc03f99b899bfa4fd9b291c3b31ac4"
+  },
+  "startingBackdrop": {
+    "path": "town-starting-v1.png",
+    "pixelWidth": 1408,
+    "pixelHeight": 3048,
+    "sha256": "287d28f294139a6ce9c37e10602c110c10202b5ebe24c7810088b9f53c0939c3",
+    "hotspots": ["workshop", "study", "party", "storehouse", "essenceSpring", "firepit"]
+  },
+  "pageCapacity": 4,
+  "plots": [
+    { "id": "upperLeft", "x": 0.24, "y": 0.49, "buildingWidth": 0.34 },
+    { "id": "upperRight", "x": 0.75, "y": 0.42, "buildingWidth": 0.34 },
+    { "id": "lowerLeft", "x": 0.25, "y": 0.72, "buildingWidth": 0.34 },
+    { "id": "lowerRight", "x": 0.75, "y": 0.70, "buildingWidth": 0.34 }
+  ],
+  "acceptedLayers": {
+    "workshop": { "file": "building-workshop-v1.png", "sha256": "c13375abd071a28b4f2b951aeaf9a47b3f651a283e43f91a8a46adb8bdfe5ff1" },
+    "storehouse": { "file": "building-storehouse-v1.png", "sha256": "3b7d34f0188a32d4164b39fb4bda35fc46aa960eb2e668bd59ca940cd4c96c9e" },
+    "library": { "file": "building-library-v1.png", "sha256": "d2c92a26a3f7c5a4a3ee93a6aa20307e61ab1f7492d3e686f235d03217701ff7" },
+    "constellation": { "file": "building-constellation-v1.png", "sha256": "96aa5622a513b23b0d0b26ca37aae62e26c8afb62c4e283ee2cdbad3ae493c38" },
+    "bestiary": { "file": "building-bestiary-v1.png", "sha256": "911c81b0c4f0f6a8cb351cf0cd6ef25978bb861e085424c92b41639b2859e852" },
+    "apothecary": { "file": "building-apothecary-v1.png", "sha256": "a096b18a2c9238e468cb53bd282b4060a091a934a0c5192b3304f338b8308ce8" },
+    "survey_post": { "file": "building-survey-post-v1.png", "sha256": "513c414a110865d93b4525d89aad992e925b5c6f5d0b4b823bb1f6bb0eccaa5b" },
+    "reliquary": { "file": "building-reliquary-v1.png", "sha256": "8a10d53e1565546fc0b939d6d7ec467644d7c6068be99b196adaf3daa7024b03" },
+    "scriptorium": { "file": "building-scriptorium-v1.png", "sha256": "973261ee001323fc3cd2110b67ed5df2116cd9a1a6cf6c6179b850e463bc57a8" },
+    "essence_spring": { "file": "building-essence-spring-v1.png", "sha256": "44cb6b9da03ad92fdfccebf66aef157dfeefbdfd21f1f09b0be356c4bcf3df04" }
+  },
+  "promptStyle": {
+    "perspective": "front-facing three-quarter pixel-art building, camera slightly elevated to match the town road",
+    "palette": "restrained mountain-town timber, stone and slate palette sampled conceptually from the reference scene",
+    "lighting": "soft daylight from upper left; compact dark contact shadow",
+    "background": "flat #ff00ff chroma key with no scenery, labels, border or UI",
+    "constraints": "one complete isolated building, readable silhouette, crisp nearest-neighbour pixel edges, no people, no road, no plot, no text"
+  }
+}
