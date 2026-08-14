@@ -13,7 +13,7 @@
       "id": "band-1",
       "title": "Band 1 · First world, fight and return",
       "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
-      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
+      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "field-note-generator", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
     },
     {
       "id": "band-2",
@@ -60,17 +60,57 @@
       "status": "readyToTest",
       "detail": "Source checkpoint 530a205 replaces inventory-order auto-pack and the rejected one-shot bag with a durable desired-count supply plan. Exact stock moves only inside successful Bind/Revisit; shortages remain visible without erasing the plan.",
       "gate": "Fresh campaigns begin with an explicit empty plan; legacy saves review a nonmoving typed suggestion; only identified consumables and Anchor Frames are eligible; capacity counts distinct families; malformed/over-cap saves fail visibly; preview and commit share one staged atomic quote; bind/revisit refusal loses nothing; relaunch and return retain desired quantities; six-across anchored UI uses plan language.",
-      "workstream": "engineering",
+      "workstream": "acceptance",
       "isPrimary": false
     },
     {
       "id": "starter-world-pages",
       "priority": "B1.4",
       "title": "Three consumable starting World Pages",
-      "status": "next",
-      "detail": "The three exact post-scaling sampled starter pages are implementation-ready in world-pages-authority.json and begin immediately after the already-dirty Field Kit departure transaction is closed. New campaigns receive optional physical read-only instances; pre-inscribed pricing preserves continuation and the exact selected instance is consumed only by successful atomic departure.",
+      "status": "readyToTest",
+      "detail": "Source checkpoint acb8a5f implements the three exact post-scaling starter pages from world-pages-authority.json: generated/hash-checked authority, physical stable instances, new-game grant and tightly gated pre-first-bind adoption, read-only Collected thumbnails, rules-owned 14/14/16 pricing, one campaign-seed advance, exact atomic consumption and immutable History provenance.",
       "gate": "Three exact instances survive relaunch, never consume on refusal/failure-before-commit, enter World History after binding, preserve continuation runway and produce survivable distinct opening worlds without hidden enemy nerfs.",
+      "workstream": "acceptance",
+      "isPrimary": false
+    },
+    {
+      "id": "collapse-hud-truth",
+      "priority": "B1.4a",
+      "title": "Truthful collapse-phase HUD",
+      "status": "next",
+      "detail": "The world HUD incorrectly labels Stability divided by decay as turns left, then prints zero while the map is still actively collapsing. Zero Stability begins collapse; it does not predict ejection.",
+      "gate": "Before zero, the estimate is labelled turns until collapse rather than turns left; nondecaying worlds read steady; at zero and afterward the HUD says collapse underway with no false remaining-turn count. The wording follows saved collapse state across relaunch and never predicts the player tile's stochastic failure turn.",
       "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "terrain-blocked-feedback",
+      "priority": "B1.4b",
+      "title": "Truthful blocked-movement feedback",
+      "status": "next",
+      "detail": "Blocked steps currently claim the ground crumbled even at the map boundary, deep water or an intact chasm. Resolve the refusal from the exact destination state without spending a turn.",
+      "gate": "Boundary, truly crumbled tile, deep water and chasm each produce distinct accurate player-facing text; other future impassable ground falls back to its visible ground name; every refusal preserves position, Stability, world clock and encounter state.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "field-note-generator",
+      "priority": "B1.5",
+      "title": "World-relevant field-note generator",
+      "status": "next",
+      "detail": "Replace the three generic rotating notes with the already-authored field-note grammar. Generation selects and freezes a truthful local terrain, light/air, growth, water or visible-trace fact from the writing host and its disclosed surroundings.",
+      "gate": "Every note stores stable template/fact identity, safe qualitative tokens and final prose; tokens recompute from saved local facts; slow/sight/impassable claims match live rules; no remote POI/resource/person/species/apex or analysis-only fact leaks; repeated notes in one world prefer distinct facts; save/load and anchored revisit preserve exact wording; blank worlds retain a truthful terrain fallback. Authority: field-note-grammar-current.md.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "world-visibility",
+      "priority": "B1.4c",
+      "title": "Illumination-driven current visibility",
+      "status": "inProgress",
+      "detail": "Asset Lead is implementing the directly assigned Band-1 visibility correction: current LOS is derived rather than saved, persistent reveal records only fully visible exploration, and Illumination plus Atmosphere control a full-visibility radius and a partially visible border without changing movement or gameplay RNG.",
+      "gate": "Default, low-light and true-black profiles produce distinct rules-owned radii; density and LOS/elevation/cover affect both full and border visibility; only fully visible tiles persist as explored or enter the minimap; fog and partial visibility never disclose hidden content; relaunch derives the same current view from saved world facts; ordinary phone proof remains readable without map-scale changes.",
+      "workstream": "asset",
       "isPrimary": false
     },
     {
@@ -347,10 +387,10 @@
       "id": "encounter-scaling",
       "priority": "B1.3",
       "title": "Party and apex difficulty",
-      "status": "inProgress",
-      "detail": "Binder-anchored additive power, path-honest visible grouping, proportional encounter HP, saved 55% affliction-free follow-ups and apex-only scaling are integrated but not balance-accepted. Aimee's first new-save encounter killed the party in a possibly Teeming world; more samples are in progress before retuning.",
-      "gate": "After the active launch repair, compare level-1 Binder+Quill normal versus Teeming ordinary contacts with exact scaling receipts. Normal opening fights should usually last 2–4 rounds and spend about 5–20% aggregate HP, not routinely defeat the party. If failure repeats, isolate baseline stats, abundance/world level, grouping or species matchup before tuning. Then complete two-/five-person ordinary and apex phone bands.",
-      "workstream": "engineering",
+      "status": "readyToTest",
+      "detail": "Source candidate is checkpointed through 910cc31. Vitality peak now controls cast abundance rather than individual creature power, authored trophic aspects redistribute one fixed creature budget, and multi-target delivery uses the accepted reversible 50% share. Controlled fresh Binder+Quill evidence: Normal 2–4 rounds/~2–20% HP and Teeming 2–4 rounds/~4–28%, all victories.",
+      "gate": "Install the signed checkpoint and compare at least one disclosed Normal and one disclosed Teeming level-1 Binder+Quill contact on an ordinary phone build, recording the frozen scaling receipt and whether decisions/telegraphing feel fair. Keep or revise the 50% share from play, then retain the later two-/five-person ordinary and apex matrix; automated evidence is not final balance acceptance.",
+      "workstream": "acceptance",
       "isPrimary": true
     },
     {
@@ -570,7 +610,7 @@
       "status": "readyToTest",
       "detail": "Decision279 makes coherent authored content live by default and uses play as review. Promote the 21 completed missing-live meeting drafts, Noll's replacement candidate, Auber's revision, Isolde's three optional-reply replacements and Sabine's seven-location clue sequence without waiting for prior Atlas ratings. Incomplete or contradictory units remain draft-only.",
       "gate": "All 29 travellers have coherent live meetings; stable exchange/page IDs, reply order, condition indices and old-save tolerance survive promotion; generated corpus freshness and catalogue-set validation pass; Atlas reviews the same live text; phone play can flag and revise individual units without blocking the rest. Authority: Decision279, traveller-meeting-corpus-plan-current.md and dialogue-review-first-batch-current.md.",
-      "workstream": "design",
+      "workstream": "acceptance",
       "isPrimary": true
     },
     {
