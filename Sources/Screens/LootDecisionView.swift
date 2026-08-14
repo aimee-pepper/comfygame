@@ -139,12 +139,11 @@ private struct LootSwapDetailSheet: View {
                         swapSummary(offered, role: "Take", location: .offered)
                     }
                 }
-                Section("Details") {
-                    LabeledContent("Quantity", value: "\(carried.count)")
-                    LabeledContent("Location", value: ItemGridLocation.carried.displayName)
-                    if !carried.detail.isEmpty { Text(carried.detail) }
-                    if let blurb = ContentCatalog.shared.item(carried.catalogID)?.blurb, !blurb.isEmpty {
-                        Text(blurb)
+                Section("Known facts") {
+                    HStack(alignment: .top, spacing: 12) {
+                        knownFacts(carried, role: "Drop", location: .carried)
+                        Divider()
+                        knownFacts(offered, role: "Take", location: .offered)
                     }
                 }
                 if let refusal {
@@ -195,6 +194,31 @@ private struct LootSwapDetailSheet: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(stack.rarity.tint)
                     .lineLimit(2)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func knownFacts(_ stack: ItemStack,
+                            role: String,
+                            location: ItemGridLocation) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(role)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(role == "Drop" ? Color.red : Color.green)
+            Text("\(location.displayName) · \(stack.count)")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+            if !stack.detail.isEmpty {
+                Text(stack.detail)
+                    .font(.caption)
+            }
+            if let blurb = ContentCatalog.shared.item(stack.catalogID)?.blurb,
+               !blurb.isEmpty {
+                Text(blurb)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
