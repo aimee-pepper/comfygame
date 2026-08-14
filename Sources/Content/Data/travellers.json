@@ -162,7 +162,7 @@
           {
             "id": "sela.destination",
             "ask": "Where are you going?",
-            "reply": "\"On.\" A beat. \"I know how that sounds. But I was going on before, as well, and at least now nobody's asking me when I'll settle.\""
+            "reply": "\"That ridge first. There should be water on the shaded side. After that, whichever route still has food and decent footing.\" She glances over. \"I travel without settling. I don't travel without a plan.\""
           },
           {
             "id": "sela.tired",
@@ -172,7 +172,7 @@
           {
             "id": "sela.wayfinding",
             "ask": "How do you find your way?",
-            "reply": "\"I don't. Finding your way means there's somewhere you're meant to end up.\" She scans the horizon out of pure habit. \"I've made my peace with that. Mostly.\""
+            "reply": "\"Slope, water, wind, tracks, and whether the plants look recently trampled.\" She scans the horizon. \"Then I choose a direction and keep enough food to admit I chose badly.\""
           }
         ],
         "offer": "Come with me. You can leave again whenever you like.",
@@ -408,7 +408,7 @@
             "reply": "She looks at you for the first time. “Then every mark has had to carry too much.” She sets the board down. “Show me your hands.”"
           }
         ],
-        "offer": "Come and teach me. I'll find the lead and the silver.",
+        "offer": "Come and teach me. I'll build you a Scriptorium and find what you need for a brush.",
         "accepted": "\"You'll want a room with light in it. And a table that doesn't rock \u2014 I'm going to be difficult about the table.\" She's already up. \"Charcoal. Honestly.\"",
         "declined": "\"Go on then.\" She picks the board back up. \"You'll be back when the page runs out. They always are.\""
       },
@@ -453,7 +453,7 @@
       "lean": { "precision": 1, "kindling": 1 }
     },
     {
-      "id": "noll", "name": "Noll", "calling": "a Salvager", "icon": "figure.stand",
+      "id": "noll", "name": "Noll", "calling": "a salvager", "icon": "figure.stand",
       "authoredOrder": 2, "storyArrivalBand": 0, "campaignPhase": "opening",
       "blurb": "Knows where an object will part before touching it. Keeps a ledger of the pieces that should not have been separated.",
       "signature": [
@@ -526,7 +526,7 @@
       "lean": { "force": 1, "fortitude": 1 }
     },
     {
-      "id": "rook", "name": "Rook", "calling": "a spear fighter and keeper of contested approaches", "icon": "figure.stand",
+      "id": "rook", "name": "Rook", "calling": "a spear fighter", "icon": "figure.stand",
       "authoredOrder": 14, "storyArrivalBand": 3, "campaignPhase": "mid",
       "blurb": "Believes a boundary should be visible from both sides. Stands far enough back that approaching it remains a choice.",
       "signature": [
@@ -566,7 +566,7 @@
       "lean": { "fortitude": 1, "protection": 1 }
     },
     {
-      "id": "fen", "name": "Fen", "calling": "a bowyer and maker of physical ranged weapons", "icon": "figure.stand",
+      "id": "fen", "name": "Fen", "calling": "a bowyer", "icon": "figure.stand",
       "authoredOrder": 17, "storyArrivalBand": 4, "campaignPhase": "mid",
       "blurb": "Makes the shot long before anything is released. The rest is string remembering what it was told.",
       "signature": [
@@ -580,7 +580,7 @@
       "lean": { "precision": 1, "swiftness": 1 }
     },
     {
-      "id": "wren", "name": "Wren", "calling": "a skirmisher who manages crowded threats through tempo and exits", "icon": "figure.stand",
+      "id": "wren", "name": "Wren", "calling": "a skirmisher", "icon": "figure.stand",
       "authoredOrder": 18, "storyArrivalBand": 4, "campaignPhase": "mid-late",
       "blurb": "Finds the exit before he needs it. Calls speed a debt owed to the moment after.",
       "signature": [
@@ -594,7 +594,7 @@
       "lean": { "evasion": 1, "swiftness": 1 }
     },
     {
-      "id": "kestrel", "name": "Kestrel", "calling": "a hunter and field naturalist", "icon": "figure.stand",
+      "id": "kestrel", "name": "Kestrel", "calling": "a field naturalist", "icon": "figure.stand",
       "pronouns": { "subject": "she", "object": "her", "possessive": "her", "reflexive": "herself" },
       "authoredOrder": 19, "storyArrivalBand": 4, "campaignPhase": "mid-late",
       "blurb": "Learns what an animal does when nobody is pursuing it. Decides what to kill only after that.",
@@ -623,7 +623,7 @@
       "lean": { "force": 1, "precision": 1, "fortitude": 1 }
     },
     {
-      "id": "marrick", "name": "Marrick", "calling": "a formation leader and keeper of shared routines", "icon": "figure.stand",
+      "id": "marrick", "name": "Marrick", "calling": "a formation leader", "icon": "figure.stand",
       "authoredOrder": 21, "storyArrivalBand": 5, "campaignPhase": "late",
       "blurb": "Builds routines people can still remember while frightened. Counts who the plan forgot before he counts whether it worked.",
       "signature": [
@@ -638,7 +638,7 @@
       "lean": { "protection": 1, "fortitude": 1 }
     },
     {
-      "id": "sabine", "name": "Sabine", "calling": "a menagerist and beast-handler", "icon": "figure.stand",
+      "id": "sabine", "name": "Sabine", "calling": "a menagerist", "icon": "figure.stand",
       "authoredOrder": 22, "storyArrivalBand": 5, "campaignPhase": "late",
       "blurb": "Kept animals for people who thought keeping meant owning. Learned most of her trade from being corrected.",
       "signature": [
@@ -654,7 +654,7 @@
       "lean": { "protection": 1, "precision": 1, "evasion": 1 }
     },
     {
-      "id": "grimmond", "name": "Grimmond", "calling": "a delver who reads load, depth and the voids extraction leaves behind", "icon": "figure.stand",
+      "id": "grimmond", "name": "Grimmond", "calling": "a deep miner", "icon": "figure.stand",
       "authoredOrder": 23, "storyArrivalBand": 5, "campaignPhase": "late",
       "blurb": "Maps what holds the ceiling after the valuable part is gone. Says an empty space is still made of consequences.",
       "signature": [
@@ -670,7 +670,7 @@
       "lean": { "force": 1, "fortitude": 1 }
     },
     {
-      "id": "oda", "name": "Oda", "calling": "a channelwright who makes contained and projected emanation weapons", "icon": "figure.stand",
+      "id": "oda", "name": "Oda", "calling": "a magic weaponsmith", "icon": "figure.stand",
       "authoredOrder": 24, "storyArrivalBand": 5, "campaignPhase": "late",
       "blurb": "Gave dangerous force a handle, an edge, and somewhere to stop. Never calls that the same as making it safe.",
       "signature": [
@@ -715,7 +715,7 @@
       }
     },
     {
-      "id": "ashe", "name": "Ashe", "calling": "an embodied emanation specialist", "icon": "figure.stand",
+      "id": "ashe", "name": "Ashe", "calling": "an emanation specialist", "icon": "figure.stand",
       "authoredOrder": 26, "storyArrivalBand": 6, "campaignPhase": "late", "worldwork": 1,
       "blurb": "Names what force costs a body, then chooses which burden to receive.",
       "signature": [
@@ -732,7 +732,7 @@
       "lean": { "fortitude": 1, "kindling": 1 }
     },
     {
-      "id": "perren", "name": "Perren", "calling": "a former Sundering interpreter", "icon": "figure.stand",
+      "id": "perren", "name": "Perren", "calling": "an interpreter", "icon": "figure.stand",
       "authoredOrder": 28, "storyArrivalBand": 6, "campaignPhase": "late", "worldwork": 1,
       "blurb": "Keeps the questions a lesson tried to make feel already answered.",
       "signature": [
@@ -750,7 +750,7 @@
       "lean": { "precision": 1, "shadow": 1 }
     },
     {
-      "id": "nine", "name": "Nine", "calling": "a keeper of chosen continuities", "icon": "figure.stand",
+      "id": "nine", "name": "Nine", "calling": "a continuity keeper", "icon": "figure.stand",
       "authoredOrder": 29, "storyArrivalBand": 7, "campaignPhase": "late", "worldwork": 1,
       "blurb": "Keeps promises in forms that do not require remembering why they were made.",
       "signature": [

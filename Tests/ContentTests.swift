@@ -255,6 +255,20 @@ final class ContentTests: XCTestCase {
         })
     }
 
+    func testTravellerCardCallingsStayShortRolesInsteadOfMiniBiographies() throws {
+        let travellers = try ContentCatalog.load().travellers
+        let offenders = travellers.compactMap { traveller -> String? in
+            let calling = traveller.calling
+            guard calling.count > 24
+                    || !(calling.hasPrefix("a ") || calling.hasPrefix("an "))
+                    || calling.localizedCaseInsensitiveContains(" who ")
+            else { return nil }
+            return "\(traveller.id.rawValue): \(calling)"
+        }
+        XCTAssertEqual(offenders, [],
+                       "Library cards need a short at-a-glance role; identity prose belongs in the blurb")
+    }
+
 #if DEBUG
     func testAuthoredTextAtlasReviewsTheSameLiveMeetingCorpus() throws {
         let inventory = AuthoredTextAtlas.inventory()
@@ -303,6 +317,14 @@ final class ContentTests: XCTestCase {
             "\u{201c}For forty years. Mostly to people who wanted to write faster.\u{201d} A short laugh. \u{201c}They had to learn smaller first. Smaller takes longer.\u{201d}",
             "She looks at you for the first time. \u{201c}Then every mark has had to carry too much.\u{201d} She sets the board down. \u{201c}Show me your hands.\u{201d}"
         ])
+        XCTAssertEqual(isolde.offer,
+                       "Come and teach me. I'll build you a Scriptorium and find what you need for a brush.")
+
+        let sela = try XCTUnwrap(ContentCatalog.shared.traveller("sela")?.meeting)
+        XCTAssertEqual(sela.questions.first { $0.id == "sela.destination" }?.reply,
+                       "\"That ridge first. There should be water on the shaded side. After that, whichever route still has food and decent footing.\" She glances over. \"I travel without settling. I don't travel without a plan.\"")
+        XCTAssertEqual(sela.questions.first { $0.id == "sela.wayfinding" }?.reply,
+                       "\"Slope, water, wind, tracks, and whether the plants look recently trampled.\" She scans the horizon. \"Then I choose a direction and keep enough food to admit I chose badly.\"")
 
         let clues = ContentCatalog.shared.diary(of: "sabine")
             .filter { $0.kind == .locationClue }
