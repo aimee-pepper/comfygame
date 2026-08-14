@@ -36,6 +36,12 @@ final class EncounterScalingIntegrationTests: XCTestCase {
                              normal.map(\.generatedPopulation).reduce(0, +),
                              "Teeming's density attribution must remain visible before grouping")
         XCTAssertTrue((normalAdjacent + teemingAdjacent).allSatisfy { $0.groupSize == 2 })
+        XCTAssertTrue(normal.allSatisfy {
+            $0.outcome == .victory && (2...4).contains($0.rounds) && $0.aggregateHPSpent <= 11
+        }, "fresh Normal openings left the settled 2–4 round / roughly 20% HP band")
+        XCTAssertTrue(teeming.allSatisfy {
+            $0.outcome == .victory && (2...4).contains($0.rounds)
+        }, "an isolated Teeming opening became an ordinary death trap")
 
         printDistribution("Normal", normal)
         printDistribution("Teeming", teeming)
@@ -44,6 +50,8 @@ final class EncounterScalingIntegrationTests: XCTestCase {
     }
 
     func testCorrectedNormalUpperHPMissesHaveFrozenSingleFactorCounterfactuals() throws {
+        XCTAssertEqual(Tuning.Encounter.multiDeliveryShare, 0.5,
+                       "the measured two-person opening correction drifted")
         for root in [UInt64(202), 303, 606] {
             let frozen = try frozenOpeningState(rootSeed: root)
             let encounter = try XCTUnwrap(frozen.worlds.activeRun?.activeEncounter)

@@ -831,7 +831,7 @@ enum Tuning {
         /// could never end. **[PLACEHOLDER]**
         static let endlessBleedRounds: Int = 99
         /// What each blow is worth when something reaches more than one of you at once.
-        static let multiDeliveryShare: Double = 0.7
+        static let multiDeliveryShare: Double = 0.5
         static let areaDeliveryShare: Double = 0.6
 
         static let baseInitiative: Double = 50
