@@ -183,6 +183,20 @@ final class BookRulesTests: XCTestCase {
                           "Dim Sky's stability is bought with sight")
     }
 
+    func testProjectionNamesTheFullVisibilityRadiusClearSight() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/PreviewPanel.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("StatCell(label: \"Clear sight\", value: sightText"))
+        XCTAssertFalse(source.contains("StatCell(label: \"Sight\", value: sightText"),
+                       "The full-radius value must not imply that the dim fringe is equally clear")
+    }
+
     // MARK: Stability is measured in steps
 
     /// Aimee's curve: stability isn't an abstract rate, it's how many moves you get. **The bands

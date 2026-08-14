@@ -175,7 +175,9 @@ struct PreviewPanel: View {
     private var statsRow: some View {
         HStack(alignment: .top, spacing: 0) {
             StatCell(label: "Map", value: "\(projection.mapWidth)×\(projection.mapHeight)", icon: "square.grid.3x3")
-            StatCell(label: "Sight", value: sightText, icon: "eye")
+            // This is the radius of fully readable tiles. Current visibility may also include a
+            // dim fringe, so calling the number merely “Sight” overstates what it measures.
+            StatCell(label: "Clear sight", value: sightText, icon: "eye")
             StatCell(label: "Danger", value: tierText, icon: "exclamationmark.triangle")
             StatCell(label: "Cost", value: costText, icon: "drop")
         }
