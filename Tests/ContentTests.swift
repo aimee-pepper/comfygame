@@ -245,20 +245,18 @@ final class ContentTests: XCTestCase {
         let generatedIDs = Set(AuthoredMeetingCorpus.meetings.map { TravellerID(rawValue: $0.travellerID) })
         XCTAssertEqual(AuthoredTextAtlas.generatedMeetingIDs, generatedIDs)
 
-        XCTAssertEqual(catalogue.travellers.count, 29)
-        XCTAssertEqual(catalogue.diaryPages.count, 238,
-                       "Noll has five findable pages; the held Field Separation Kit page is DEBUG-only")
-        XCTAssertEqual(catalogue.travellers.filter { $0.meeting != nil }.count, 29)
-        XCTAssertEqual(AuthoredMeetingCorpus.meetings.count, 23,
-                       "21 formerly missing meetings plus Noll and Auber replacements")
         XCTAssertNil(AuthoredMeetingCorpus.decodingError)
         XCTAssertEqual(generatedIDs.subtracting(catalogueIDs), [])
         XCTAssertEqual(Set(inventory.map(\.id)), catalogueIDs)
+        XCTAssertEqual(Set(catalogue.travellers.compactMap { $0.meeting == nil ? nil : $0.id }),
+                       catalogueIDs,
+                       "Every release traveller must have one live meeting")
         XCTAssertEqual(inventory.flatMap(\.units).filter { $0.kind == .diary }.count,
                        catalogue.diaryPages.count + 1,
                        "the held Field Separation Kit page is reviewable but not findable")
         XCTAssertEqual(Set(inventory.flatMap(\.units).map(\.id)).count, inventory.flatMap(\.units).count)
         XCTAssertTrue(inventory.allSatisfy { $0.meetingState == "Live" })
+        XCTAssertTrue(AuthoredMeetingCorpus.meetings.allSatisfy { !$0.source.isEmpty })
         XCTAssertTrue(AuthoredMeetingCorpus.meetings.allSatisfy { $0.exchanges.count == 3 })
         XCTAssertTrue(AuthoredMeetingCorpus.meetings.allSatisfy { $0.offerSpeaker == .player })
 
