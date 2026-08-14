@@ -233,6 +233,93 @@ enum LibraryRules {
 
     // MARK: The Library
 
+    static func catalogueEntries(in library: LibraryState, search: String = "",
+                                 filter: LibraryCatalogueFilter = .init(),
+                                 catalog: ContentCatalog = .shared) -> [LibraryCatalogueEntry] {
+        guard library.foundTravellers.contains("lys") else { return [] }
+        let needle = search.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        var result: [LibraryCatalogueEntry] = []
+        for recovery in library.recoveredPages.sorted(by: {
+            $0.discoverySequence < $1.discoverySequence
+        }) {
+            guard let page = catalog.diaryPage(recovery.pageID) else {
+                let entry = LibraryCatalogueEntry(recovery: recovery, page: nil,
+                                                  writerName: nil, subjectName: nil,
+                                                  teachingName: nil, references: [])
+                if needle.isEmpty && filter.kinds.isEmpty && filter.writers.isEmpty
+                    && filter.subjects.isEmpty && filter.teachingNames.isEmpty
+                    && filter.worldRecordIDs.isEmpty { result.append(entry) }
+                continue
+            }
+            let writer = catalog.traveller(page.diary)?.name
+            let subject = page.about.flatMap { catalog.traveller($0)?.name }
+            let teaching = teachingName(for: page, catalog: catalog)
+            guard filter.kinds.isEmpty || filter.kinds.contains(page.kind),
+                  filter.writers.isEmpty || filter.writers.contains(page.diary),
+                  filter.subjects.isEmpty || page.about.map(filter.subjects.contains) == true,
+                  filter.teachingNames.isEmpty || teaching.map(filter.teachingNames.contains) == true,
+                  filter.worldRecordIDs.isEmpty
+                    || recovery.foundInWorldRecordID.map(filter.worldRecordIDs.contains) == true
+            else { continue }
+
+            var visible = [page.kind.displayName, page.prose]
+            if let writer { visible.append(writer) }
+            if let subject { visible.append(subject) }
+            if let teaching { visible.append(teaching) }
+            if let worldID = recovery.foundInWorldRecordID,
+               let world = library.visitedWorlds.first(where: { $0.id == worldID }) {
+                visible.append("World \(world.runIndex)")
+            }
+            guard needle.isEmpty || visible.contains(where: {
+                $0.localizedCaseInsensitiveContains(needle)
+            }) else { continue }
+
+            result.append(LibraryCatalogueEntry(
+                recovery: recovery, page: page, writerName: writer, subjectName: subject,
+                teachingName: teaching, references: references(for: page, recovery: recovery,
+                                                               library: library, catalog: catalog)))
+        }
+        return result
+    }
+
+    static func references(for page: DiaryPageDef, recovery: RecoveredPageRecord,
+                           library: LibraryState,
+                           catalog: ContentCatalog = .shared) -> [LibraryPageReference] {
+        var result: [LibraryPageReference] = []
+        let writer = catalog.traveller(page.diary)?.name ?? "Unresolved person"
+        result.append(.init(kind: .diary, label: writer, target: .traveller(page.diary)))
+        if let about = page.about {
+            result.append(.init(kind: .subject,
+                                label: catalog.traveller(about)?.name ?? "Unresolved person",
+                                target: .traveller(about)))
+        }
+        if let site = page.site {
+            result.append(.init(kind: .place,
+                                label: catalog.site(site)?.name ?? "Unresolved place",
+                                target: .site(site)))
+        }
+        if let teaching = teachingName(for: page, catalog: catalog) {
+            result.append(.init(kind: .teaching, label: teaching, target: .teaching(teaching)))
+        }
+        if let world = recovery.foundInWorldRecordID {
+            let label = library.visitedWorlds.first(where: { $0.id == world })
+                .map { "World \($0.runIndex)" } ?? "Record no longer kept"
+            result.append(.init(kind: .recoveryWorld, label: label, target: .world(world)))
+        }
+        return result
+    }
+
+    private static func teachingName(for page: DiaryPageDef,
+                                     catalog: ContentCatalog) -> String? {
+        if let id = page.teaches { return catalog.symbol(id)?.name }
+        if let id = page.teachesFocus { return catalog.pressureSource(id)?.name }
+        if let id = page.teachesGambit { return catalog.gambitComponent(id)?.name }
+        if let id = page.teachesPattern { return id }
+        if let id = page.researchNode { return catalog.researchNode(id)?.name }
+        return nil
+    }
+
     /// What is known about where one traveller is.
     static func hintPage(for traveller: TravellerDef, library: LibraryState) -> HintPage {
         let known = library.knownClueIndices(for: traveller.id)

@@ -6,6 +6,57 @@ import XCTest
 @MainActor
 final class LibraryTests: XCTestCase {
 
+    func testLysCatalogueSearchesOnlyRecoveredVisibleContentInDiscoveryOrder() throws {
+        let pages = Array(ContentCatalog.shared.diaryPages.prefix(3))
+        XCTAssertEqual(pages.count, 3)
+        var library = LibraryState()
+        library.foundTravellers.insert("lys")
+        library.recordPage(pages[2].id, worldRecordID: nil, siteID: nil)
+        library.recordPage(pages[0].id, worldRecordID: nil, siteID: nil)
+
+        let all = LibraryRules.catalogueEntries(in: library)
+        XCTAssertEqual(all.map(\.recovery.pageID), [pages[2].id, pages[0].id])
+        XCTAssertEqual(LibraryRules.catalogueEntries(in: library, search: pages[0].prose)
+            .map(\.recovery.pageID), [pages[0].id])
+        XCTAssertTrue(LibraryRules.catalogueEntries(in: library, search: pages[1].prose).isEmpty,
+                      "catalogue leaked prose from an unrecovered page")
+    }
+
+    func testCatalogueRequiresLysAndUnknownIDsStayNeutralOlderRecords() {
+        var library = LibraryState()
+        library.recordPage("retired_unknown_page", worldRecordID: InstanceID(rawValue: 44), siteID: nil)
+        XCTAssertTrue(LibraryRules.catalogueEntries(in: library).isEmpty)
+
+        library.foundTravellers.insert("lys")
+        let entries = LibraryRules.catalogueEntries(in: library)
+        XCTAssertEqual(entries.count, 1)
+        XCTAssertTrue(entries[0].isOlderRecord)
+        XCTAssertTrue(entries[0].references.isEmpty)
+        XCTAssertTrue(LibraryRules.catalogueEntries(in: library,
+                                                     search: "retired_unknown_page").isEmpty,
+                      "internal unknown ID became searchable player copy")
+    }
+
+    func testCatalogueFiltersAndReferencesUseOnlyExplicitTypedFields() throws {
+        let page = try XCTUnwrap(ContentCatalog.shared.diaryPages.first { $0.about != nil })
+        var library = LibraryState()
+        library.foundTravellers.insert("lys")
+        let worldID = InstanceID(rawValue: 88)
+        library.recordPage(page.id, worldRecordID: worldID, siteID: nil)
+
+        let matching = LibraryRules.catalogueEntries(
+            in: library, filter: .init(kinds: [page.kind], writers: [page.diary],
+                                      subjects: page.about.map { [$0] } ?? [],
+                                      worldRecordIDs: [worldID]))
+        let entry = try XCTUnwrap(matching.first)
+        XCTAssertTrue(entry.references.contains { $0.kind == .diary })
+        XCTAssertTrue(entry.references.contains { $0.kind == .subject })
+        XCTAssertTrue(entry.references.contains {
+            $0.kind == .recoveryWorld && $0.label == "Record no longer kept"
+        })
+        XCTAssertFalse(entry.references.contains { $0.label.contains(page.id.rawValue) })
+    }
+
     func testRecoveredPageReceiptFreezesFirstWorldSiteAndOutcomeWithoutDuplication() {
         var library = LibraryState()
         let page: DiaryPageID = "mara_where_0"

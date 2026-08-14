@@ -173,6 +173,35 @@ struct RecoveredPageRecord: Codable, Equatable, Sendable {
     }
 }
 
+struct LibraryCatalogueFilter: Equatable, Sendable {
+    var kinds: Set<DiaryPageDef.Kind> = []
+    var writers: Set<TravellerID> = []
+    var subjects: Set<TravellerID> = []
+    var teachingNames: Set<String> = []
+    var worldRecordIDs: Set<InstanceID> = []
+}
+
+struct LibraryCatalogueEntry: Equatable, Sendable {
+    var recovery: RecoveredPageRecord
+    var page: DiaryPageDef?
+    var writerName: String?
+    var subjectName: String?
+    var teachingName: String?
+    var references: [LibraryPageReference]
+
+    var isOlderRecord: Bool { page == nil }
+}
+
+struct LibraryPageReference: Equatable, Sendable {
+    enum Kind: String, Sendable { case diary, subject, place, teaching, recoveryWorld }
+    enum Target: Equatable, Sendable {
+        case traveller(TravellerID), site(SiteID), teaching(String), world(InstanceID)
+    }
+    var kind: Kind
+    var label: String
+    var target: Target
+}
+
 struct FoundWritingRecord: Codable, Equatable, Identifiable, Sendable {
     enum Family: String, Codable, CaseIterable, Sendable {
         case fieldNote, routeMark, siteFragment, workingScrap
