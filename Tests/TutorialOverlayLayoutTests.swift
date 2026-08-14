@@ -98,6 +98,16 @@ final class TutorialOverlayLayoutTests: XCTestCase {
                       "A dismissed tutorial must leave no invisible scroll view intercepting taps")
     }
 
+    func testReturningFromAWorldClearsHomeNavigationWithoutBreakingAuditLaunch() {
+        let pushed: [AppRoute] = [.writingDesk]
+        XCTAssertEqual(RootNavigationRules.homePath(afterRunTransitionFrom: true, to: false,
+                                                     current: pushed), [])
+        XCTAssertEqual(RootNavigationRules.homePath(afterRunTransitionFrom: false, to: true,
+                                                     current: pushed), pushed)
+        XCTAssertEqual(RootNavigationRules.homePath(afterRunTransitionFrom: false, to: false,
+                                                     current: pushed), pushed)
+    }
+
     private func measuredSize(promptVisible: Bool, typeSize: DynamicTypeSize) -> CGSize {
         let lesson = TutorialLessonDefinition(id: .writingPageRequest, group: .writing,
                                               title: "A deliberately long prompt title",

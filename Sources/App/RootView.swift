@@ -1,5 +1,12 @@
 import SwiftUI
 
+enum RootNavigationRules {
+    static func homePath(afterRunTransitionFrom wasInRun: Bool, to isInRun: Bool,
+                         current: [AppRoute]) -> [AppRoute] {
+        wasInRun && !isInRun ? [] : current
+    }
+}
+
 /// Top-level routing.
 ///
 /// Being inside a world is a *state*, not a navigation destination: if a run is active, that's the
@@ -9,6 +16,22 @@ struct RootView: View {
     @EnvironmentObject private var store: GameStore
     @State private var debugBaseRoute: AppRoute = .base
     @State private var debugBugReporterSuppressed = false
+    @State private var debugAuditPath: [AppRoute] = {
+#if DEBUG
+        if let rawRoute = ProcessInfo.processInfo.environment["BOOKBINDER_AUDIT_ROUTE"],
+           let route = AppRoute(rawValue: rawRoute), route != .base {
+            return [route]
+        }
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let marker = arguments.firstIndex(of: "--debug-audit-route"),
+              arguments.indices.contains(marker + 1),
+              let route = AppRoute(rawValue: arguments[marker + 1]),
+              route != .base else { return [] }
+        return [route]
+#else
+        return []
+#endif
+    }()
 
     var body: some View {
         Group {
@@ -17,7 +40,7 @@ struct RootView: View {
             } else if store.state.worlds.isInRun {
                 WorldView()
             } else {
-                NavigationStack {
+                NavigationStack(path: $debugAuditPath) {
                     BaseView()
                         .navigationDestination(for: AppRoute.self) { route in
                             destination(for: route)
@@ -39,6 +62,14 @@ struct RootView: View {
             set: { _ in }
         )) {
             AnchorSettlementView().environmentObject(store)
+        }
+        .onChange(of: store.state.worlds.isInRun) { wasInRun, isInRun in
+            let updated = RootNavigationRules.homePath(afterRunTransitionFrom: wasInRun,
+                                                       to: isInRun,
+                                                       current: debugAuditPath)
+            guard updated != debugAuditPath else { return }
+            debugAuditPath = updated
+            if !isInRun { debugBaseRoute = .base }
         }
 #if DEBUG
         .onPreferenceChange(DebugBugReporterSuppressedPreferenceKey.self) {
