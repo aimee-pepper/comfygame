@@ -5,7 +5,9 @@ enum WorldDurationPresentation {
                        collapsedOnTurn: Int?) -> String {
         if collapsedOnTurn != nil || stability <= 0 { return "collapse underway" }
         guard decayPerTurn > 0 else { return "steady" }
-        return "~\(Int(ceil(stability / decayPerTurn))) turns until collapse"
+        let projectedTurns = ceil(stability / decayPerTurn)
+        guard projectedTurns < Double(Tuning.World.countdownCeiling) else { return "steady" }
+        return "~\(Int(projectedTurns)) turns until collapse"
     }
 
     static func diagnostic(stability: Double, decayPerTurn: Double,
@@ -14,8 +16,12 @@ enum WorldDurationPresentation {
             let phase = collapsedOnTurn.map { "underway · started turn \($0)" } ?? "underway"
             return ("Collapse status", phase)
         }
-        return ("Turns until collapse", decayPerTurn > 0
-                ? "\(Int(ceil(stability / decayPerTurn)))" : "steady")
+        guard decayPerTurn > 0 else { return ("Turns until collapse", "steady") }
+        let projectedTurns = ceil(stability / decayPerTurn)
+        guard projectedTurns < Double(Tuning.World.countdownCeiling) else {
+            return ("Turns until collapse", "steady")
+        }
+        return ("Turns until collapse", "\(Int(projectedTurns))")
     }
 }
 

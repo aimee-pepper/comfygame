@@ -30,6 +30,24 @@ final class InstrumentTests: XCTestCase {
             stability: 5, decayPerTurn: 2, collapsedOnTurn: nil)
         XCTAssertEqual(pending.label, "Turns until collapse")
         XCTAssertEqual(pending.value, "3")
+
+        let sentinel = Double(Tuning.World.countdownCeiling)
+        XCTAssertEqual(WorldDurationPresentation.status(
+            stability: sentinel, decayPerTurn: 1, collapsedOnTurn: nil), "steady")
+        let sentinelDiagnostic = WorldDurationPresentation.diagnostic(
+            stability: sentinel, decayPerTurn: 1, collapsedOnTurn: nil)
+        XCTAssertEqual(sentinelDiagnostic.label, "Turns until collapse")
+        XCTAssertEqual(sentinelDiagnostic.value, "steady")
+
+        let justBelowSentinel = Double(Tuning.World.countdownCeiling - 1)
+        XCTAssertEqual(WorldDurationPresentation.status(
+            stability: justBelowSentinel, decayPerTurn: 1, collapsedOnTurn: nil),
+            "~\(Tuning.World.countdownCeiling - 1) turns until collapse")
+        let justBelowDiagnostic = WorldDurationPresentation.diagnostic(
+            stability: justBelowSentinel, decayPerTurn: 1, collapsedOnTurn: nil)
+        XCTAssertEqual(justBelowDiagnostic.label, "Turns until collapse")
+        XCTAssertEqual(justBelowDiagnostic.value,
+                       "\(Tuning.World.countdownCeiling - 1)")
     }
     func testWorldHistoryCompareFooterGuidesIncompleteSelection() throws {
         let root = URL(fileURLWithPath: #filePath)
