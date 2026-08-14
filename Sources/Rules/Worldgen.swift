@@ -614,10 +614,8 @@ enum Worldgen {
     /// world, the emptier it read.
     static func enemyCount(for book: BoundBook, readings: PressureReadings,
                            multiplier: Double = 1, rng: inout SeededRNG,
-                           tiles: Int = Tuning.World.gridWidth * Tuning.World.gridHeight,
-                           legacyOrdinaryTierDeltas: Bool = true) -> Int {
-        let tier = BookRules.enemyTier(of: book,
-                                       legacyOrdinaryTierDeltas: legacyOrdinaryTierDeltas)
+                           tiles: Int = Tuning.World.gridWidth * Tuning.World.gridHeight) -> Int {
+        let tier = BookRules.enemyTier(of: book)
         let base = rng.int(in: Tuning.World.baseEnemyCountRange)
         let scaled = base + (tier - Tuning.World.baseEnemyTier) * Tuning.World.enemiesPerDangerTier
         // Swarm multiplies the count and drops the tier; Predation does the reverse. Applied after

@@ -292,18 +292,14 @@ enum BookRules {
         return Int((Tuning.World.startingStability / decayPerTurn).rounded())
     }
 
-    static func enemyTier(of book: BoundBook, legacyOrdinaryTierDeltas: Bool = true) -> Int {
-        enemyTier(symbolIDs: book.allSymbolIDs,
-                  legacyOrdinaryTierDeltas: legacyOrdinaryTierDeltas)
+    static func enemyTier(of book: BoundBook) -> Int {
+        enemyTier(symbolIDs: book.allSymbolIDs)
     }
 
-    static func enemyTier(symbolIDs: [SymbolID], legacyOrdinaryTierDeltas: Bool = true) -> Int {
-        let delta = legacyOrdinaryTierDeltas
-            ? symbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.enemyTierDelta ?? 0) }
-            : 0
-        // Danger runes carry their tier shift on the profile rather than on `enemyTierDelta`, so
-        // there's one place a rune's hostility is described.
-        return max(1, Tuning.World.baseEnemyTier + delta + dangerProfile(symbolIDs: symbolIDs).tierDelta)
+    static func enemyTier(symbolIDs: [SymbolID]) -> Int {
+        // Danger runes carry their tier shift on their typed profile, so there is one place a
+        // rune's hostility is described. Ordinary compounds affect population through pressures.
+        return max(1, Tuning.World.baseEnemyTier + dangerProfile(symbolIDs: symbolIDs).tierDelta)
     }
 
     // MARK: Spawn tables

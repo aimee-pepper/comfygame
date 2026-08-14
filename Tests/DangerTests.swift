@@ -9,37 +9,18 @@ import XCTest
 /// things.
 final class DangerTests: XCTestCase {
 
-    func testCompoundHostilityDebugComparisonCoversAllSixFossilsSameSeedAndMapSizes() {
-        let fossils: [(SymbolID, Int)] = [
-            ("ashen", 1), ("rich_ore", 1), ("teeming_life", 1), ("dim_sky", 1),
-            ("gilded_veins", 1), ("mote_vein", 2)
+    func testOrdinaryCompoundsHaveNoHiddenHostilityTier() {
+        let formerFossils: [SymbolID] = [
+            "ashen", "rich_ore", "teeming_life", "dim_sky", "gilded_veins", "mote_vein"
         ]
-        for (symbol, expectedDelta) in fossils {
+        for symbol in formerFossils {
             let book = BoundBook(written: [symbol], essencePaid: 0)
-            let readings = PressureRules.resolve(BookRules.sigils(for: book))
-            XCTAssertEqual(BookRules.enemyTier(of: book, legacyOrdinaryTierDeltas: true)
-                           - BookRules.enemyTier(of: book, legacyOrdinaryTierDeltas: false),
-                           expectedDelta, symbol.rawValue)
-
-            for tiles in [Tuning.World.gridWidth * Tuning.World.gridHeight,
-                          Tuning.World.gridWidth * Tuning.World.gridHeight * 4] {
-                var legacyRNG = SeededRNG(seed: 0xC0A0)
-                var systemicRNG = legacyRNG
-                let legacy = Worldgen.enemyCount(
-                    for: book, readings: readings, rng: &legacyRNG, tiles: tiles,
-                    legacyOrdinaryTierDeltas: true)
-                let systemic = Worldgen.enemyCount(
-                    for: book, readings: readings, rng: &systemicRNG, tiles: tiles,
-                    legacyOrdinaryTierDeltas: false)
-                XCTAssertGreaterThanOrEqual(legacy, systemic,
-                                            "\(symbol.rawValue), \(tiles) tiles")
-                XCTAssertEqual(legacyRNG, systemicRNG,
-                               "the comparison must consume identical RNG for \(symbol.rawValue)")
-            }
+            XCTAssertEqual(BookRules.enemyTier(of: book), Tuning.World.baseEnemyTier,
+                           symbol.rawValue)
         }
     }
 
-    func testCompoundHostilityOffUsesPressureForEquivalentAndHighVitalityPopulation() {
+    func testCompoundPopulationUsesOnlyResolvedPressureAtDefaultAndLargeMapSizes() {
         let compound = BoundBook(written: ["teeming_life"], essencePaid: 0)
         let expanded = BoundBook(written: [], essencePaid: 0)
         let compoundReadings = PressureRules.resolve(BookRules.sigils(for: compound))
@@ -50,35 +31,28 @@ final class DangerTests: XCTestCase {
             var right = left
             let compoundCount = Worldgen.enemyCount(
                 for: compound, readings: compoundReadings,
-                multiplier: 1, rng: &left, tiles: tiles, legacyOrdinaryTierDeltas: false)
+                multiplier: 1, rng: &left, tiles: tiles)
             let equivalentCount = Worldgen.enemyCount(
                 for: expanded, readings: equivalentReadings,
-                multiplier: 1, rng: &right, tiles: tiles, legacyOrdinaryTierDeltas: false)
+                multiplier: 1, rng: &right, tiles: tiles)
             XCTAssertEqual(compoundCount, equivalentCount)
             XCTAssertEqual(left, right)
             XCTAssertGreaterThan(compoundCount, 1, "Teeming Life must remain crowded")
         }
     }
 
-    func testCompoundHostilityToggleLeavesNoCompoundAndTypedDangerControlsAlone() {
+    func testNoCompoundAndTypedDangerControlsRemainDistinct() {
         let control = BoundBook(written: ["plains"], essencePaid: 0)
-        let readings = PressureRules.resolve(BookRules.sigils(for: control))
-        var legacyRNG = SeededRNG(seed: 0xC011)
-        var systemicRNG = legacyRNG
-        XCTAssertEqual(Worldgen.enemyCount(for: control, readings: readings, rng: &legacyRNG,
-                                            legacyOrdinaryTierDeltas: true),
-                       Worldgen.enemyCount(for: control, readings: readings, rng: &systemicRNG,
-                                            legacyOrdinaryTierDeltas: false))
-        XCTAssertEqual(legacyRNG, systemicRNG)
+        XCTAssertEqual(BookRules.enemyTier(of: control), Tuning.World.baseEnemyTier)
 
         let danger = BoundBook(written: ["rich_ore", "predation"], essencePaid: 0)
-        XCTAssertEqual(BookRules.enemyTier(of: danger, legacyOrdinaryTierDeltas: false),
+        XCTAssertEqual(BookRules.enemyTier(of: danger),
                        max(1, Tuning.World.baseEnemyTier
                            + BookRules.dangerProfile(for: danger).tierDelta),
-                       "typed Danger hostility must survive ordinary-delta comparison-off")
+                       "typed Danger remains the sole authored hostility tier")
     }
 
-    func testCompoundHostilityToggleCannotChangeReadingsGreedOrStability() {
+    func testOrdinaryCompoundTierEvaluationDoesNotChangeSystemicOutputs() {
         for symbol: SymbolID in ["ashen", "rich_ore", "teeming_life", "dim_sky",
                                   "gilded_veins", "mote_vein"] {
             let book = BoundBook(written: [symbol], essencePaid: 0)
@@ -88,8 +62,7 @@ final class DangerTests: XCTestCase {
                              stability: BookRules.stabilityScore(of: book),
                              danger: BookRules.dangerProfile(for: book))
 
-            _ = BookRules.enemyTier(of: book, legacyOrdinaryTierDeltas: true)
-            _ = BookRules.enemyTier(of: book, legacyOrdinaryTierDeltas: false)
+            _ = BookRules.enemyTier(of: book)
 
             XCTAssertEqual(PressureRules.resolve(sigils), invariant.readings, symbol.rawValue)
             XCTAssertEqual(BookRules.greedDelta(for: sigils), invariant.greed, symbol.rawValue)
@@ -98,16 +71,13 @@ final class DangerTests: XCTestCase {
         }
     }
 
-    func testLegacyBoundBookRoundTripPreservesCompoundHostilityComparison() throws {
+    func testLegacyBoundBookRoundTripPreservesSystemicHostilityInputs() throws {
         let legacy = BoundBook(symbols: ["land": "mote_vein"], randomlyFilled: [], essencePaid: 17)
         let restored = try SaveCodec.makeDecoder().decode(
             BoundBook.self, from: SaveCodec.makeEncoder().encode(legacy))
         XCTAssertEqual(restored, legacy)
         XCTAssertEqual(restored.allSymbolIDs, ["mote_vein"])
-        XCTAssertEqual(BookRules.enemyTier(of: restored, legacyOrdinaryTierDeltas: true),
-                       BookRules.enemyTier(of: legacy, legacyOrdinaryTierDeltas: true))
-        XCTAssertEqual(BookRules.enemyTier(of: restored, legacyOrdinaryTierDeltas: false),
-                       BookRules.enemyTier(of: legacy, legacyOrdinaryTierDeltas: false))
+        XCTAssertEqual(BookRules.enemyTier(of: restored), BookRules.enemyTier(of: legacy))
         XCTAssertEqual(BookRules.stabilityScore(of: restored), BookRules.stabilityScore(of: legacy))
     }
 

@@ -32,8 +32,6 @@ struct SymbolDef: Codable, Equatable, Identifiable, Sendable {
     var yieldModifiers: [ResourceID: Double]
     /// Additive weight changes to the enemy spawn table, keyed by creature.
     var enemyTableModifiers: [CreatureID: Double]
-    /// Shifts the encounter difficulty tier shown in the pre-bind preview.
-    var enemyTierDelta: Int
     /// Changes how far the player can see. The paired-tradeoff pattern from the decisions log:
     /// Dim Sky buys a longer-lived world with a ring of your sight.
     var visionDelta: Int
