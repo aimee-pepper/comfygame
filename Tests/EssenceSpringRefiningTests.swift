@@ -50,6 +50,16 @@ final class EssenceSpringRefiningTests: XCTestCase {
         XCTAssertTrue(source.contains("Item not identified"))
     }
 
+    func testStorehousePresentsIdentificationBeforeThePotentiallyLongItemTray() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+                                encoding: .utf8)
+        let identify = try XCTUnwrap(source.range(of: "if !store.unidentifiedStacks.isEmpty { IdentifyCard() }"))
+        let tray = try XCTUnwrap(source.range(of: "SixAcrossItemGrid(data: base.inventory.stacks"))
+        XCTAssertLessThan(identify.lowerBound, tray.lowerBound)
+    }
+
     func testBaselineSelectedRefinementIsExactAndBuildsPractice() {
         let store = store()
         store.mutate("raw") { state in

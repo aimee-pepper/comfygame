@@ -753,6 +753,7 @@ struct StorehouseView: View {
                     if base.inventory.stacks.isEmpty {
                         EmptyNote("Eight slots, all empty. Items come from worlds.")
                     } else {
+                        if !store.unidentifiedStacks.isEmpty { IdentifyCard() }
                         SixAcrossItemGrid(data: base.inventory.stacks, id: \.id) { stack in
                             AnchoredItemDetailButton(item: stack, selection: $opened) {
                                 ItemIconTile(icon: stack.icon, catalogueID: stack.catalogID,
@@ -765,7 +766,6 @@ struct StorehouseView: View {
                             }
                         }
                     }
-                    if !store.unidentifiedStacks.isEmpty { IdentifyCard() }
                 case .waiting:
                     if store.spillover.isEmpty {
                         EmptyNote("Nothing is waiting to be sorted.")
