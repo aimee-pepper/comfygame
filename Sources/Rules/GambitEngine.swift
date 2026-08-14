@@ -228,6 +228,12 @@ enum GambitEngine {
             if skill.kind == .ward {
                 return CombatRules.recommendedWardHarm(in: encounter).map(CombatAction.ward)
             }
+            if skill.id == "quench" {
+                let ally: Combatant = if case .ally(let selected) = target { selected } else { actor }
+                let eligible = CombatRules.quenchEligibleAfflictions(on: ally, in: encounter)
+                guard eligible.count == 1, let receipt = eligible.first?.applicationReceipt else { return nil }
+                return .quench(ally: ally, afflictionReceipt: receipt)
+            }
             if skill.needsAlly {
                 if case .ally(let member) = target { return .skill(skill.id, ally: member) }
                 return .skill(skill.id, ally: actor)

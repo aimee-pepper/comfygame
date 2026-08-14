@@ -494,8 +494,21 @@ enum CombatRules {
     /// Identity techniques remain separate from graph ownership: Binder carries Unbind/Sight,
     /// Quill carries Mend/Read, and Ashe carries Ground. `SkillDef.owner` and Rout are legacy input.
     static func skills(for actor: Combatant, in state: GameState) -> [SkillDef] {
-        let owned = CombatActionOwnershipRules.availableSkillIDs(for: actor, in: state)
+        var owned = CombatActionOwnershipRules.availableSkillIDs(for: actor, in: state)
+        if let modern = state.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs {
+            owned.remove("steady")
+            if modern[actor]?.contains(CombatDerivedStatsRules.Node.quench) == true {
+                owned.insert("quench")
+            }
+        }
         return ContentCatalog.shared.skills.filter { owned.contains($0.id) }
+    }
+
+    private static func modernQuenchSkill(for actor: Combatant,
+                                           encounter: EncounterState) -> SkillDef? {
+        guard encounter.debugV2OwnedNodeIDs?[actor]?.contains(
+            CombatDerivedStatsRules.Node.quench) == true else { return nil }
+        return ContentCatalog.shared.skill("quench")
     }
 
     /// The first skill of a kind this member could use *right now*. Nil if they haven't got one or
@@ -525,6 +538,13 @@ enum CombatRules {
            recommendedWardHarm(in: encounter) != nil {
             return ward
         }
+        if let quench = modernQuenchSkill(for: actor, encounter: encounter),
+           isReady(quench, for: actor, in: encounter),
+           party(of: state).contains(where: {
+               isAlive($0, in: run) && !quenchEligibleAfflictions(on: $0, in: encounter).isEmpty
+           }) {
+            return quench
+        }
         return skills(for: actor, in: state)
             .filter { $0.kind != .heal && $0.kind != .rout }
             .filter { cooldown(of: $0, for: actor, in: encounter) == 0 }
@@ -540,6 +560,8 @@ enum CombatRules {
     static func cooldown(of skill: SkillDef, for actor: Combatant,
                          in encounter: EncounterState) -> Int {
         if let counted = encounter.cooldowns[cooldownKey(skill, for: actor)] { return counted }
+        if skill.id == "quench",
+           let legacy = encounter.cooldowns["\(actor.storageKey)|steady"] { return legacy }
         // **Only** a save written before per-skill timers existed falls back to the single number,
         // and only while nothing has been used since. Reading the legacy field the moment any key
         // is missing would put every unused skill on the cooldown of the one you just spent.
@@ -722,6 +744,9 @@ enum CombatRules {
         case .cleanse:
             // Legacy `steady` is the decode route for Quench. It may remove one eligible
             // Burn/Poison/Dazzle only when that choice is unambiguous; Bleed remains treatment.
+            // Exact v2 Quench uses `CombatAction.quench`; never let the decode-only `steady`
+            // technique select a modern row or spend a modern turn implicitly.
+            guard encounter.debugV2OwnedNodeIDs == nil else { return nil }
             let target = ally ?? actor
             adoptLegacyAfflictions(in: &encounter)
             let eligible = afflictions(on: target, in: encounter).filter {
@@ -1102,6 +1127,13 @@ enum CombatRules {
         return true
     }
 
+    static func quenchEligibleAfflictions(on target: Combatant,
+                                           in encounter: EncounterState) -> [AfflictionInstance] {
+        afflictions(on: target, in: encounter).filter {
+            AfflictionDefinition.definition($0.kind).cures.contains(.quench)
+        }
+    }
+
     /// **What somebody can take**, which is Fortitude on top of the base (session 17 §1).
     ///
     /// **This is also where the party is put right.** A run begins at these values and health is
@@ -1260,6 +1292,14 @@ enum CombatRules {
                   disclosedWardHarms(in: encounter).contains(harm)
             else { return }
         }
+        if case .quench(let ally, let receipt) = action {
+            guard let skill = modernQuenchSkill(for: actor, encounter: encounter),
+                  isReady(skill, for: actor, in: encounter), ally.isParty,
+                  isAlive(ally, in: run),
+                  quenchEligibleAfflictions(on: ally, in: encounter).contains(where: {
+                      $0.applicationReceipt == receipt
+                  }) else { return }
+        }
 
         let actionCost = combatActionCost(action)
         let feintWasActive = encounter.feintActive?.contains(actor) == true
@@ -1301,6 +1341,20 @@ enum CombatRules {
             encounter.cooldowns[cooldownKey(skill, for: actor)] = cooling
             setCooldown(cooling, for: actor, in: &encounter)
             encounter.note("Ward: set against \(harm.displayName) through round \(encounter.roundNumber + 1).")
+            outcome = .committed(cost: .normal, completedDirectAttack: false)
+
+        case .quench(let ally, let receipt):
+            guard let skill = modernQuenchSkill(for: actor, encounter: encounter),
+                  quenchAffliction(on: ally, selectedReceipt: receipt, encounter: &encounter)
+            else { break }
+            let cooling = stats(of: actor, in: state)
+                .map { CharacterRules.cooldown(skill.cooldownRounds, $0) } ?? skill.cooldownRounds
+            let key = cooldownKey(skill, for: actor)
+            let legacyKey = "\(actor.storageKey)|steady"
+            encounter.cooldowns[key] = max(cooling, encounter.cooldowns[legacyKey] ?? 0)
+            encounter.cooldowns[legacyKey] = nil
+            setCooldown(cooling, for: actor, in: &encounter)
+            encounter.note("Quench: the selected affliction stops on \(actorName(ally, encounter: encounter)).")
             outcome = .committed(cost: .normal, completedDirectAttack: false)
 
         case .damageSkill(let foeID):

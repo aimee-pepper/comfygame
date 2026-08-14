@@ -172,6 +172,8 @@ enum CombatAction: Codable, Equatable, Sendable {
     /// Modern Ward always carries the exact disclosed harm selected at quote time. Keeping this
     /// separate preserves the encoded shape of legacy `.skill("ward")` actions.
     case ward(Harm)
+    /// Canonical Quench carries both the exact ally and the saved affliction application receipt.
+    case quench(ally: Combatant, afflictionReceipt: UInt64)
     /// The two the gambit vocabulary still speaks in: "use your damage skill", "use your heal".
     /// Resolved against whatever the member actually carries.
     case damageSkill(foe: InstanceID)

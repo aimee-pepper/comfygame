@@ -147,6 +147,18 @@
       "answers": "A wound that won't close on its own."
     },
     {
+      "id": "quench",
+      "name": "Quench",
+      "icon": "bandage.fill",
+      "blurb": "Remove one burn, poison or dazzle.",
+      "kind": "cleanse",
+      "power": 0,
+      "cooldownRounds": 2,
+      "owner": "companion",
+      "rounds": 1,
+      "answers": "One named burn, poison or dazzle. Bleeding needs other treatment."
+    },
+    {
       "id": "read",
       "name": "Read",
       "icon": "book.fill",

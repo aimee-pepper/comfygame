@@ -220,6 +220,7 @@ extension GameStore {
         case .attack: "attack"
         case .skill(let id, _, _): "skill \(id.rawValue)"
         case .ward(let harm): "ward \(harm.displayName)"
+        case .quench: "quench"
         case .damageSkill, .healSkill: "skill"
         case .useItem: "item"
         case .flee: "flee"

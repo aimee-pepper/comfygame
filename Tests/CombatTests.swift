@@ -5354,4 +5354,129 @@ final class CombatTests: XCTestCase {
             from: JSONEncoder().encode(encounter))
         XCTAssertFalse(CombatRules.isSnuffed(foeID, in: modern))
     }
+
+    func testModernQuenchRemovesOnlyExactSelectedEligibleReceipt() throws {
+        let store = inFight()
+        store.mutate("stage exact Quench choices") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.quench],
+                                               .binder: []]
+            encounter.afflictions = []
+            _ = CombatRules.applyAffliction(.burn, to: .binder, source: nil,
+                provenance: .environment, damage: 3, ticks: 3, targetIsStanding: true,
+                encounter: &encounter)
+            _ = CombatRules.applyAffliction(.poison, to: .binder, source: nil,
+                provenance: .environment, damage: 2, ticks: 4, targetIsStanding: true,
+                encounter: &encounter)
+            _ = CombatRules.applyAffliction(.bleed, to: .binder, source: nil,
+                provenance: .environment, damage: 2, ticks: 3, targetIsStanding: true,
+                encounter: &encounter)
+            encounter.order = [.companion(0), .binder, .foe(encounter.foes[0].id)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let poison = try XCTUnwrap(store.activeEncounter?.afflictions?.first { $0.kind == .poison })
+        store.takeCombatAction(.quench(ally: .binder, afflictionReceipt: poison.applicationReceipt))
+        let remaining = store.activeEncounter?.afflictions ?? []
+        XCTAssertFalse(remaining.contains { $0.applicationReceipt == poison.applicationReceipt })
+        XCTAssertTrue(remaining.contains { $0.kind == .burn })
+        XCTAssertTrue(remaining.contains { $0.kind == .bleed })
+        XCTAssertGreaterThan(store.activeEncounter?.companionSkillCooldown ?? 0, 0)
+    }
+
+    func testModernQuenchRejectsStaleBleedWrongTargetAndUnownedAtomically() throws {
+        let store = inFight()
+        store.mutate("stage rejected Quench") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.quench]]
+            encounter.afflictions = []
+            _ = CombatRules.applyAffliction(.bleed, to: .binder, source: nil,
+                provenance: .environment, damage: 2, ticks: 3, targetIsStanding: true,
+                encounter: &encounter)
+            encounter.order = [.companion(0), .binder, .foe(encounter.foes[0].id)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let bleed = try XCTUnwrap(store.activeEncounter?.afflictions?.first)
+        let before = store.activeEncounter
+        for receipt in [bleed.applicationReceipt, UInt64.max] {
+            store.takeCombatAction(.quench(ally: .binder, afflictionReceipt: receipt))
+            XCTAssertEqual(store.activeEncounter, before)
+        }
+        store.mutate("remove exact ownership") { state in
+            state.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs?[.companion(0)] = []
+        }
+        store.takeCombatAction(.quench(ally: .binder, afflictionReceipt: bleed.applicationReceipt))
+        XCTAssertEqual(store.activeEncounter?.afflictions, before?.afflictions)
+    }
+
+    func testQuenchGambitChoosesSoleExactRowButNotMultipleAndCooldownMigrates() throws {
+        let store = inFight(gambits: [Self.useSkill])
+        store.mutate("stage sole Quench gambit") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.quench]]
+            encounter.afflictions = []
+            _ = CombatRules.applyAffliction(.dazzle, to: .companion(0), source: nil,
+                provenance: .environment, damage: 0, ticks: 2, targetIsStanding: true,
+                encounter: &encounter)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let row = try XCTUnwrap(store.activeEncounter?.afflictions?.first)
+        XCTAssertEqual(GambitEngine.decide(for: .companion(0), in: store.state)?.action,
+                       .quench(ally: .companion(0), afflictionReceipt: row.applicationReceipt))
+        store.mutate("stage legacy Quench cooldown key") {
+            $0.worlds.activeRun?.activeEncounter?.cooldowns["companion-0|steady"] = 1
+        }
+        XCTAssertEqual(CombatRules.cooldown(of: try XCTUnwrap(ContentCatalog.shared.skill("quench")),
+                                             for: .companion(0),
+                                             in: try XCTUnwrap(store.activeEncounter)), 1)
+        store.mutate("add second Quench choice") { state in
+            guard var encounter = state.worlds.activeRun?.activeEncounter else { return }
+            _ = CombatRules.applyAffliction(.burn, to: .companion(0), source: nil,
+                provenance: .environment, damage: 3, ticks: 2, targetIsStanding: true,
+                encounter: &encounter)
+            encounter.cooldowns.removeAll()
+            state.worlds.activeRun?.activeEncounter = encounter
+        }
+        XCTAssertNil(GambitEngine.decide(for: .companion(0), in: store.state))
+    }
+
+    func testLegacySteadyRemainsLegacyOnlyAndModernUnquotedActionRejects() throws {
+        let modern = inFight()
+        modern.mutate("stage modern legacy-action rejection") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.quench]]
+            encounter.afflictions = []
+            _ = CombatRules.applyAffliction(.burn, to: .binder, source: nil,
+                provenance: .environment, damage: 3, ticks: 2, targetIsStanding: true,
+                encounter: &encounter)
+            encounter.order = [.companion(0), .binder, .foe(encounter.foes[0].id)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }; encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let before = modern.activeEncounter
+        XCTAssertFalse(CombatRules.skills(for: .companion(0), in: modern.state).contains { $0.id == "steady" })
+        XCTAssertTrue(CombatRules.skills(for: .companion(0), in: modern.state).contains { $0.id == "quench" })
+        modern.mutate("try decode-only Steady") {
+            CombatRules.perform(.skill("steady", ally: .binder), by: .companion(0), in: &$0)
+        }
+        XCTAssertEqual(modern.activeEncounter, before)
+
+        let legacy = inFight()
+        legacy.mutate("stage legacy Steady") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = nil
+            encounter.afflictions = []
+            _ = CombatRules.applyAffliction(.burn, to: .binder, source: nil,
+                provenance: .environment, damage: 3, ticks: 2, targetIsStanding: true,
+                encounter: &encounter)
+            encounter.order = [.companion(0), .binder, .foe(encounter.foes[0].id)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }; encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.perform(.skill("steady", ally: .binder), by: .companion(0), in: &state)
+        }
+        XCTAssertTrue((legacy.activeEncounter?.afflictions ?? []).isEmpty)
+    }
 }
