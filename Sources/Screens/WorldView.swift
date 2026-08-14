@@ -28,17 +28,19 @@ enum WorldDurationPresentation {
 enum WorldControlsLayout {
     static let actionCount = 2
     static let actionRows = 1
-    static let actionHeight: CGFloat = 48
+    static let actionHeight: CGFloat = 44
     static let horizontalPadding: CGFloat = 16
     static let actionSpacing: CGFloat = 6
     static let navigationSpacing: CGFloat = 14
 
     static func actionFrames(containerWidth: CGFloat) -> [CGRect] {
-        let usable = max(0, containerWidth - horizontalPadding * 2 - actionSpacing)
-        let width = usable / 2
+        let usable = max(0, containerWidth - horizontalPadding * 2 - navigationSpacing)
+        let navigationColumnWidth = usable / 2
+        let width = max(0, navigationColumnWidth - actionSpacing) / 2
+        let start = horizontalPadding + navigationColumnWidth + navigationSpacing
         return [
-            CGRect(x: horizontalPadding, y: 0, width: width, height: actionHeight),
-            CGRect(x: horizontalPadding + width + actionSpacing, y: 0,
+            CGRect(x: start, y: 0, width: width, height: actionHeight),
+            CGRect(x: start + width + actionSpacing, y: 0,
                    width: width, height: actionHeight),
         ]
     }
@@ -866,6 +868,7 @@ private struct PartyHealthStrip: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(name) health \(current) of \(maximum)")
     }
+
 }
 
 // MARK: - Header
@@ -1442,10 +1445,10 @@ private struct ActionButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 8) {
+            HStack(spacing: 4) {
                 Image(systemName: icon)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(title).font(.callout.weight(.medium)).lineLimit(1)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(title).font(.caption.weight(.semibold)).lineLimit(1)
                     if let detail {
                         Text(detail).font(.caption2).foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -1454,8 +1457,8 @@ private struct ActionButton: View {
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(minHeight: 48)
-            .padding(.horizontal, 10)
+            .frame(minHeight: WorldControlsLayout.actionHeight)
+            .padding(.horizontal, 6)
             .contentShape(Rectangle())
         }
         .frame(maxWidth: .infinity, minHeight: WorldControlsLayout.actionHeight)
@@ -1475,107 +1478,41 @@ private struct ActionButton: View {
 private struct FieldKitSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
+    @State private var section: FieldKitSection = .instruments
+    @State private var selectedSupply: ItemStack?
+
+    private enum FieldKitSection: String, CaseIterable, Identifiable {
+        case instruments = "Instruments"
+        case supplies = "Supplies"
+        var id: Self { self }
+    }
+
+    private var instruments: [PressureTargetDef] {
+        ContentCatalog.shared.pressureTargetsInOrder.filter {
+            store.activeRun?.carriedInstruments.contains($0.id) == true
+        }
+    }
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    let instruments = ContentCatalog.shared.pressureTargetsInOrder.filter {
-                        store.activeRun?.carriedInstruments.contains($0.id) == true
-                    }
-                    if instruments.isEmpty {
-                        Text("No instruments packed for this trip.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(instruments) { target in
-                            LabeledRow(icon: target.icon, label: target.name, value: "carried")
-                        }
-                    }
-                } header: {
-                    Text("Instruments")
-                } footer: {
-                    Text("Choose next trip's instruments at Mara's Survey Post.")
+            VStack(spacing: 0) {
+                Picker("Field Kit section", selection: $section) {
+                    ForEach(FieldKitSection.allCases) { Text($0.rawValue).tag($0) }
                 }
+                .pickerStyle(.segmented)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
 
-                if store.carriedConsumables.isEmpty {
-                    Section("Consumables") {
-                        Text("No usable items carried.").foregroundStyle(.secondary)
-                    }
-                }
-                ForEach(store.carriedConsumables) { stack in
-                    Section {
-                        if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .heal {
-                            ForEach(store.partyMembers) { member in
-                                Button {
-                                    store.useItemInWorld(stack, on: member)
-                                    dismiss()
-                                } label: {
-                                    LabeledRow(icon: "heart.fill",
-                                               label: store.name(of: member),
-                                               value: health(of: member))
-                                    .frame(minHeight: 44)
-                                    .contentShape(Rectangle())
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        } else if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .identifyCurio {
-                            if store.carriedUnidentifiedCurios.isEmpty {
-                                Text("No unidentified curios carried.")
-                                    .foregroundStyle(.secondary)
-                            } else {
-                                ForEach(store.carriedUnidentifiedCurios) { curio in
-                                    Button {
-                                        store.useSolventInWorld(stack, on: curio)
-                                        dismiss()
-                                    } label: {
-                                        LabeledRow(icon: curio.icon, label: curio.displayName,
-                                                   value: "identify")
-                                            .frame(minHeight: 44)
-                                            .contentShape(Rectangle())
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        } else {
-                            Button {
-                                store.useItemInWorld(stack, on: .binder)
-                                dismiss()
-                            } label: {
-                                HStack(spacing: 10) {
-                                    CatalogueItemPixelIdentity(
-                                        itemID: stack.catalogID,
-                                        identified: stack.identified,
-                                        fallbackSystemIcon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "sparkles",
-                                        fallbackColor: ContentCatalog.shared.item(stack.catalogID)?.rarity.tint ?? .secondary
-                                    )
-                                    .frame(width: 32, height: 32)
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Use now")
-                                        Text(fieldEffectDetail(stack.catalogID))
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    Spacer()
-                                }
-                                .frame(minHeight: 44)
-                                .contentShape(Rectangle())
-                                .accessibilityElement(children: .combine)
-                            }
-                            .buttonStyle(.plain)
+                Divider()
+
+                ScrollView {
+                    Group {
+                        switch section {
+                        case .instruments: instrumentTray
+                        case .supplies: supplyTray
                         }
-                    } header: {
-                        HStack(spacing: 8) {
-                            CatalogueItemPixelIdentity(
-                                itemID: stack.catalogID,
-                                identified: stack.identified,
-                                fallbackSystemIcon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "sparkles",
-                                fallbackColor: ContentCatalog.shared.item(stack.catalogID)?.rarity.tint ?? .secondary
-                            )
-                            .frame(width: 28, height: 28)
-                            Text("\(stack.displayName)\(stack.count > 1 ? " ×\(stack.count)" : "")")
-                        }
-                        .accessibilityElement(children: .combine)
                     }
+                    .padding(16)
                 }
             }
             .navigationTitle("Field Kit")
@@ -1587,6 +1524,141 @@ private struct FieldKitSheet: View {
         .presentationDetents([.medium, .large])
     }
 
+    @ViewBuilder private var instrumentTray: some View {
+        if instruments.isEmpty {
+            ContentUnavailableView("No instruments packed", systemImage: "gauge.with.dots.needle.33percent",
+                                   description: Text("Choose next trip's instruments at Mara's Survey Post."))
+                .frame(maxWidth: .infinity, minHeight: 180)
+        } else {
+            LazyVGrid(columns: instrumentColumns, spacing: 10) {
+                ForEach(instruments) { target in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Image(systemName: target.icon)
+                            .font(.title2)
+                            .foregroundStyle(.tint)
+                            .frame(width: 36, height: 36)
+                        Text(target.name)
+                            .font(.caption.weight(.semibold))
+                            .lineLimit(2)
+                        Text("Carried")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
+                    .padding(10)
+                    .background(.secondary.opacity(0.10), in: RoundedRectangle(cornerRadius: 12))
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(target.name), instrument, carried")
+                }
+            }
+            Text("Choose next trip's instruments at Mara's Survey Post.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 4)
+        }
+    }
+
+    @ViewBuilder private var supplyTray: some View {
+        if store.carriedConsumables.isEmpty {
+            ContentUnavailableView("No supplies carried", systemImage: "shippingbox",
+                                   description: Text("Prepare the next Field Kit at home."))
+                .frame(maxWidth: .infinity, minHeight: 180)
+        } else {
+            SixAcrossItemGrid(data: store.carriedConsumables, id: \.id) { stack in
+                AnchoredItemDetailButton(item: stack, selection: $selectedSupply) {
+                    ItemIconTile(
+                        icon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "sparkles",
+                        catalogueID: stack.catalogID,
+                        rarity: ContentCatalog.shared.item(stack.catalogID)?.rarity ?? .common,
+                        quantity: stack.count,
+                        identified: stack.identified,
+                        location: .carried,
+                        accessibilityName: stack.displayName
+                    )
+                } detail: { selected in
+                    supplyDetail(selected)
+                }
+            }
+            Text("Select a supply to inspect its effect and choose a target.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 6)
+        }
+    }
+
+    @ViewBuilder private func supplyDetail(_ stack: ItemStack) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                CatalogueItemPixelIdentity(
+                    itemID: stack.catalogID,
+                    identified: stack.identified,
+                    fallbackSystemIcon: ContentCatalog.shared.item(stack.catalogID)?.icon ?? "sparkles",
+                    fallbackColor: ContentCatalog.shared.item(stack.catalogID)?.rarity.tint ?? .secondary
+                )
+                .frame(width: 40, height: 40)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(stack.displayName).font(.headline)
+                    Text("Carried ×\(stack.count)").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+
+            Text(fieldEffectDetail(stack.catalogID))
+                .font(.callout)
+                .foregroundStyle(.secondary)
+
+            Divider()
+
+            if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .heal {
+                Text("Use on").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                ForEach(store.partyMembers) { member in
+                    Button {
+                        store.useItemInWorld(stack, on: member)
+                        dismiss()
+                    } label: {
+                        LabeledRow(icon: "heart.fill", label: store.name(of: member),
+                                   value: health(of: member))
+                            .frame(minHeight: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.bordered)
+                }
+            } else if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .identifyCurio {
+                if store.carriedUnidentifiedCurios.isEmpty {
+                    Text("No unidentified curios carried.").foregroundStyle(.secondary)
+                } else {
+                    Text("Identify").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                    ForEach(store.carriedUnidentifiedCurios) { curio in
+                        Button {
+                            store.useSolventInWorld(stack, on: curio)
+                            dismiss()
+                        } label: {
+                            LabeledRow(icon: curio.icon, label: curio.displayName, value: "identify")
+                                .frame(minHeight: 44)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+            } else {
+                Button("Use now") {
+                    store.useItemInWorld(stack, on: .binder)
+                    dismiss()
+                }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity, minHeight: 44)
+            }
+        }
+        .padding(14)
+        .frame(minWidth: 280, idealWidth: 320, maxWidth: 340, alignment: .topLeading)
+    }
+
+    private var instrumentColumns: [GridItem] {
+        [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10),
+         GridItem(.flexible())]
+    }
+
     private func health(of member: PartyMember) -> String {
         guard let run = store.state.worlds.activeRun else { return "" }
         let hp = CombatRules.health(of: member.combatant, in: run)
@@ -1595,12 +1667,13 @@ private struct FieldKitSheet: View {
 
     private func fieldEffectDetail(_ id: ItemID) -> String {
         switch ContentCatalog.shared.item(id)?.consumable?.effect {
-        case .restoreStability: "restore stability"
-        case .returnHome: "return with full haul"
-        case .lightWorld: "raise vision"
-        case .farsight: "reveal nearest site"
-        case .lureCreature: "draw nearest creature"
-        case .identifyCurio: "identify one curio"
+        case .heal: "Restore health to one party member."
+        case .restoreStability: "Restore Stability."
+        case .returnHome: "Return home with the full haul."
+        case .lightWorld: "Raise the party's vision."
+        case .farsight: "Reveal the nearest site."
+        case .lureCreature: "Draw the nearest creature closer."
+        case .identifyCurio: "Identify one carried curio."
         default: ""
         }
     }

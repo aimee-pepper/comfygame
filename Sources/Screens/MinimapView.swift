@@ -57,7 +57,7 @@ struct MinimapView: View {
             Image(systemName: "lock.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.purple).tag("cache")
             Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.orange).tag("hazard")
         }
-        .frame(width: 112, height: 112)
+        .aspectRatio(1, contentMode: .fit)
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
         .overlay {
             RoundedRectangle(cornerRadius: 8)

@@ -806,12 +806,12 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(softened.enemies.count, natural.enemies.count)
     }
 
-    func testPhoneSafeAreaConstrainsMapByHeightWithoutChangingViewport() {
+    func testMapIsWidthOwnedAndNeverShrinksForBottomChrome() {
         XCTAssertEqual(WorldMapLayout.backdropRGB, [23, 23, 26],
                        "transparent lifted-sprite pixels reveal fog, never a white card seam")
         let phone = WorldMapLayout.maximumSide(containerWidth: 368, viewportHeight: 260,
                                                 viewportTiles: 11, displayScale: 3)
-        XCTAssertLessThanOrEqual(phone, 244)
+        XCTAssertEqual(phone, 1100.0 / 3.0, accuracy: 0.001)
         XCTAssertEqual((phone * 3).truncatingRemainder(dividingBy: 11), 0, accuracy: 0.001,
                        "The bottom border lands after a complete device-pixel cell")
 
@@ -824,27 +824,42 @@ final class WorldTests: XCTestCase {
 
         let ordinary = WorldMapLayout.maximumSide(containerWidth: 368, viewportHeight: 500,
                                                    viewportTiles: 11, displayScale: 3)
-        XCTAssertLessThanOrEqual(ordinary, 344)
-        XCTAssertGreaterThan(ordinary, 330)
+        XCTAssertEqual(ordinary, phone, accuracy: 0.001,
+                       "Extra vertical room cannot change a width-owned map")
 
         let cramped = WorldMapLayout.maximumSide(containerWidth: 320, viewportHeight: 100,
                                                   viewportTiles: 11, displayScale: 3)
-        XCTAssertLessThanOrEqual(cramped, 84)
+        XCTAssertEqual(cramped, 319, accuracy: 0.001)
+        XCTAssertGreaterThan(cramped, 310,
+                             "Bottom panels may require scrolling but may never miniaturize the map")
         XCTAssertEqual((cramped * 3).truncatingRemainder(dividingBy: 11), 0, accuracy: 0.001)
+
+        XCTAssertEqual(WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 260,
+                                                   viewportColumns: 11, mapRows: 30), 7)
+        XCTAssertEqual(WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 500,
+                                                   viewportColumns: 11, mapRows: 30), 14)
+        XCTAssertEqual(WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 500,
+                                                   viewportColumns: 11, mapRows: 9), 9)
+        let rows = WorldMapLayout.viewportRows(mapWidth: phone, availableHeight: 500,
+                                               viewportColumns: 11, mapRows: 30)
+        XCTAssertLessThanOrEqual(phone / 11 * CGFloat(rows), 500,
+                               "Only complete rows that fit may be admitted to the viewport")
     }
 
-    func testWorldControlsHaveExactlyTwoActionsInOneFixedBottomInset() throws {
+    func testWorldControlsHaveExactlyTwoActionsInOneNonOverlappingBottomDock() throws {
         XCTAssertEqual(WorldControlsLayout.actionCount, 2)
         XCTAssertEqual(WorldControlsLayout.actionRows, 1,
                        "Interact and Look must remain side by side, never stacked")
-        XCTAssertEqual(WorldControlsLayout.actionHeight, 48)
+        XCTAssertEqual(WorldControlsLayout.actionHeight, 44)
 
         let frames = WorldControlsLayout.actionFrames(containerWidth: 368)
         XCTAssertEqual(frames.count, 2)
         XCTAssertGreaterThanOrEqual(frames[0].width, 44)
         XCTAssertGreaterThanOrEqual(frames[1].width, 44)
-        XCTAssertEqual(frames[0].height, 48)
-        XCTAssertEqual(frames[1].height, 48)
+        XCTAssertEqual(frames[0].height, 44)
+        XCTAssertEqual(frames[1].height, 44)
+        XCTAssertEqual(frames[0].minX, 191, accuracy: 0.01)
+        XCTAssertGreaterThan(frames[0].width, 70)
         XCTAssertLessThanOrEqual(frames[0].maxX, frames[1].minX)
         XCTAssertEqual(frames[1].maxX, 352, accuracy: 0.01)
 
@@ -852,14 +867,51 @@ final class WorldTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/WorldView.swift"),
                                 encoding: .utf8)
-        let inset = try XCTUnwrap(source.range(of: ".safeAreaInset(edge: .bottom, spacing: 0)"))
-        let tutorial = try XCTUnwrap(source.range(of: ".overlay(alignment: .bottom)",
-                                                  range: inset.upperBound..<source.endIndex))
-        let fixedHUD = String(source[inset.lowerBound..<tutorial.lowerBound])
-        XCTAssertTrue(fixedHUD.contains("satchel(run)"))
-        XCTAssertTrue(fixedHUD.contains("controls(run)"))
-        XCTAssertFalse(fixedHUD.contains("eventLog"),
-                       "Variable narration belongs to the scroll viewport, never the fixed HUD")
+        XCTAssertFalse(source.contains(".safeAreaInset(edge: .bottom"),
+                       "The bottom dock must reserve an ordinary sibling frame, never composite over the map")
+        let geometry = try XCTUnwrap(source.range(of: "GeometryReader { viewport in"))
+        let satchel = try XCTUnwrap(source.range(of: "satchel(run)",
+                                                 range: geometry.upperBound..<source.endIndex))
+        let controls = try XCTUnwrap(source.range(of: "controls(run)",
+                                                  range: satchel.upperBound..<source.endIndex))
+        XCTAssertLessThan(geometry.lowerBound, satchel.lowerBound)
+        XCTAssertLessThan(satchel.lowerBound, controls.lowerBound,
+                          "Map, Field Kit, and navigation are ordered siblings in one layout")
+        XCTAssertTrue(source.contains("MapGrid("))
+        XCTAssertFalse(source.contains("MapGrid(") && source.contains("eventLog.padding(8)"))
+        XCTAssertTrue(source.contains("eventLog\n                            .padding(.horizontal, 12)\n                            .padding(.bottom, 8)"),
+                      "Narration floats at the viewport boundary immediately above the bottom HUD")
+        XCTAssertTrue(source.contains("Color(.systemBackground).opacity(0.42)"))
+        XCTAssertTrue(source.contains(".allowsHitTesting(false)"))
+        XCTAssertTrue(source.contains("HStack(alignment: .center, spacing: WorldControlsLayout.navigationSpacing)"))
+        XCTAssertTrue(source.contains("VStack(spacing: 12)"),
+                      "The actions need deliberate separation from the minimap")
+        XCTAssertTrue(source.contains(".frame(width: 96, height: 96)"))
+        XCTAssertTrue(source.contains("Button(\"Interact\")"))
+        XCTAssertTrue(source.contains("Button(isLookArmed ? \"Cancel\" : \"Look\")"))
+        XCTAssertTrue(source.contains(".padding(.vertical, 8)"),
+                      "The control pair must be vertically centered inside symmetric padding")
+        XCTAssertTrue(source.contains(".overlay(alignment: .top) { Divider() }"))
+        XCTAssertTrue(source.contains(".clipShape(RoundedRectangle(cornerRadius: 10))"),
+                      "No map pixels may escape the viewport or render beneath the Field Kit border")
+    }
+
+    func testFieldKitIsACompactTwoTrayInventoryInsteadOfAFullWidthList() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/WorldView.swift"),
+                                encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "private struct FieldKitSheet"))
+        let fieldKit = String(source[start.lowerBound...])
+
+        XCTAssertTrue(fieldKit.contains("Picker(\"Field Kit section\""))
+        XCTAssertTrue(fieldKit.contains("case instruments = \"Instruments\""))
+        XCTAssertTrue(fieldKit.contains("case supplies = \"Supplies\""))
+        XCTAssertTrue(fieldKit.contains("SixAcrossItemGrid(data: store.carriedConsumables"))
+        XCTAssertTrue(fieldKit.contains("AnchoredItemDetailButton(item: stack"))
+        XCTAssertTrue(fieldKit.contains(".presentationDetents([.medium, .large])"))
+        XCTAssertFalse(fieldKit.contains("List {"),
+                       "Field Kit browsing is a compact tray; only selected-item detail may become prose")
     }
 
     // MARK: Fog and movement

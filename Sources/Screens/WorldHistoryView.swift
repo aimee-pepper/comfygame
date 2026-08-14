@@ -308,6 +308,8 @@ private struct FrozenWorldCoverMark: View {
 }
 
 struct WorldComparisonSheet: View {
+    static let noAuthoredRequestsText = "Nothing was written in this record."
+
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     let origin: VisitedWorld
@@ -341,16 +343,23 @@ struct WorldComparisonSheet: View {
 
     private func column(_ world: VisitedWorld, other: VisitedWorld, role: String,
                         isLater: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        let authoredChanges = changes(for: world, against: other, isLater: isLater)
+        return VStack(alignment: .leading, spacing: 10) {
             Text("\(role) · World \(world.runIndex)").font(.headline)
             Text(world.descriptionSentence).font(.caption)
             Divider()
             Text("What you wrote").font(.caption.weight(.semibold))
-            ForEach(changes(for: world, against: other, isLater: isLater), id: \.key) { change in
-                Label(change.line, systemImage: change.icon)
+            if authoredChanges.isEmpty {
+                Text(Self.noAuthoredRequestsText)
                     .font(.caption)
-                    .foregroundStyle(change.kind == "Unchanged" ? .secondary : .primary)
-                    .accessibilityLabel("\(change.kind): \(change.line)")
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(authoredChanges, id: \.key) { change in
+                    Label(change.line, systemImage: change.icon)
+                        .font(.caption)
+                        .foregroundStyle(change.kind == "Unchanged" ? .secondary : .primary)
+                        .accessibilityLabel("\(change.kind): \(change.line)")
+                }
             }
             if store.state.reality.analysisTier >= Tuning.Analysis.targetsTier {
                 Divider()
