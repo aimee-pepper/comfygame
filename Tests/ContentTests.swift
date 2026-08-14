@@ -5,6 +5,37 @@ import XCTest
 /// Adding a symbol/creature/station to JSON and getting an ID wrong should fail here, loudly,
 /// rather than silently spawning nothing in a world.
 final class ContentTests: XCTestCase {
+    func testEngineeringQuestionHeadingsHaveUniqueStableIDs() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: projectRoot.appending(
+            path: "docs/engineering-questions-for-aimee.md"
+        ), encoding: .utf8)
+        let questionHeadings = source.split(separator: "\n").filter { $0.hasPrefix("### EQ") }
+        let questionIDs = try questionHeadings.map { heading in
+            let parts = heading.dropFirst(4).components(separatedBy: " — ")
+            let questionID = try XCTUnwrap(
+                parts.count == 2 && !parts[1].isEmpty ? parts.first : nil,
+                "Malformed engineering-question heading: \(heading)"
+            )
+            XCTAssertTrue(
+                questionID.hasPrefix("EQ")
+                    && !questionID.dropFirst(2).isEmpty
+                    && questionID.dropFirst(2).allSatisfy(\.isNumber),
+                "Malformed engineering-question ID: \(questionID)"
+            )
+            return questionID
+        }
+
+        XCTAssertFalse(questionIDs.isEmpty, "No engineering-question headings were found")
+        XCTAssertEqual(
+            questionIDs.count,
+            Set(questionIDs).count,
+            "Engineering-question IDs must be unique: \(questionIDs)"
+        )
+    }
+
     func testPenmanshipIsBrushRootedWithThreeIndependentTierOnePractices() throws {
         let catalog = ContentCatalog.shared
         let brush = try XCTUnwrap(catalog.researchNode("pen_brush"))
