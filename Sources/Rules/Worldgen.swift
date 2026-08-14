@@ -7,6 +7,7 @@ enum WildWorldPageSelectionRules {
         var ownedCopies: [WorldPageDefinitionID: Int]
         var worldContextTags: Set<String>
         var suppressesRandomPage: Bool
+        var occupiedInstanceIDs: Set<InstanceID> = []
     }
 
     struct Selection: Equatable, Sendable {
@@ -54,7 +55,9 @@ enum WildWorldPageSelectionRules {
         guard let definition = rng.pickWeighted(weighted) else { return nil }
         let generationSeed = rng.next()
         var rawID = rng.next()
-        if rawID == 0 { rawID = 1 }
+        while rawID == 0 || context.occupiedInstanceIDs.contains(InstanceID(rawValue: rawID)) {
+            rawID = rng.next()
+        }
         return Selection(definition: definition, generationSeed: generationSeed,
                          instanceID: InstanceID(rawValue: rawID))
     }

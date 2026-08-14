@@ -33,6 +33,14 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(first, second)
         XCTAssertNotEqual(first.instanceID.rawValue, 0)
         XCTAssertEqual(first.definition.id, WorldPageCatalog.definition(first.definition.id)?.id)
+
+        var collision = context
+        collision.occupiedInstanceIDs = [first.instanceID]
+        let advanced = try XCTUnwrap(WildWorldPageSelectionRules.select(seed: 991,
+                                                                         context: collision))
+        XCTAssertNotEqual(advanced.instanceID, first.instanceID)
+        XCTAssertEqual(advanced.definition, first.definition,
+                       "identity collision handling must not reroll authored content")
     }
 
     func testWildWorldPageSelectionHonoursPacingCopyLimitAndSuppression() {

@@ -788,6 +788,10 @@ extension GameStore {
         let tuning = DebugTuningProfile.active
         let ownedPageCopies = Dictionary(grouping: state.base.collectedWorldPages,
                                          by: { $0.definition.id }).mapValues(\.count)
+        let occupiedPhysicalIDs = Set(
+            state.base.collectedWorldPages.map(\.id)
+                + state.base.inventory.stacks.map(\.id)
+                + state.base.spillover.map(\.id))
         let wildSelection = WildWorldPageSelectionRules.select(
             seed: generationSeed,
             context: .init(
@@ -796,7 +800,8 @@ extension GameStore {
                 ownedCopies: ownedPageCopies,
                 worldContextTags: WildWorldPageSelectionRules.contextTags(
                     for: book, seed: generationSeed),
-                suppressesRandomPage: false))
+                suppressesRandomPage: false,
+                occupiedInstanceIDs: occupiedPhysicalIDs))
         let world = Worldgen.generate(book: book, seed: generationSeed, library: state.reality.library,
                                       tuning: tuning,
                                       isFreshFirstExpedition: state.worlds.runIndex == 0,
