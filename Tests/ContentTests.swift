@@ -269,6 +269,23 @@ final class ContentTests: XCTestCase {
                        "Library cards need a short at-a-glance role; identity prose belongs in the blurb")
     }
 
+    func testEveryTravellerLocationClueExactlyMatchesItsSignaturePassage() throws {
+        let catalogue = try ContentCatalog.load()
+        for traveller in catalogue.travellers {
+            let clues = catalogue.diaryPages
+                .filter {
+                    $0.kind == .locationClue
+                        && $0.diary == traveller.id
+                        && $0.about == traveller.id
+                }
+                .sorted { ($0.clueIndex ?? .max) < ($1.clueIndex ?? .max) }
+            XCTAssertEqual(clues.map(\.clueIndex), traveller.signature.indices.map(Optional.some),
+                           "\(traveller.id.rawValue) needs one ordered self-clue per signature condition")
+            XCTAssertEqual(clues.map(\.prose), traveller.signature.map(\.passage),
+                           "\(traveller.id.rawValue) signature and recovered clue must tell one exact story")
+        }
+    }
+
 #if DEBUG
     func testAuthoredTextAtlasReviewsTheSameLiveMeetingCorpus() throws {
         let inventory = AuthoredTextAtlas.inventory()
@@ -333,7 +350,7 @@ final class ContentTests: XCTestCase {
         XCTAssertEqual(clues.map(\.clueIndex), Array(0...6).map(Optional.some))
         XCTAssertEqual(clues.map(\.about), Array(repeating: TravellerID(rawValue: "sabine"), count: 7).map(Optional.some))
         XCTAssertEqual(clues.map(\.prose), [
-            "Bite the new shoots down at dusk and they stand above the old cut by morning. This place can answer feeding without pretending nothing was taken.",
+            "New shoots bitten down at dusk grow above the old cut by morning. Plant matter is being produced quickly enough to support repeated feeding.",
             "Every shelter is occupied, and fresh tracks stop at the entrances before turning away. More creatures live here than one keeper could gather.",
             "Small grazers crowd the new growth. Larger tracks circle them, and scavengers follow what the hunt leaves behind. Feed one creature here and three others change their route.",
             "The same hollows are pressed flat each night while nearby ground goes untouched. Return often enough and absence becomes part of the pattern.",

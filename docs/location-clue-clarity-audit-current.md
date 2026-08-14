@@ -19,8 +19,10 @@ the page meant.
 ## Corpus disposition
 
 All **138** live `locationClue` pages were compared with the matching traveller signature condition.
-**102 pass** the contract without changes. **36 were revised in the production catalogue** because
-their operative fact was missing, ambiguous or buried beneath figurative language:
+The first pass promoted 36 corrections, but its `102 pass` claim was too permissive: it accepted
+several sentences whose meaning could be inferred only after translating a professional metaphor.
+The 14 Aug campaign-order re-audit adds **39 corrections**. Across both passes, **75 clues have now
+been revised in the production catalogue and 63 retain copy that passed the stricter second review.**
 
 `sela_where_2`, `tovin_where_0`, `tovin_where_1`, `tovin_where_2`, `isolde_where_1`,
 `tovin_about_isolde`, `vance_where_0`, `corrin_where_2`, `dagg_where_0`, `dagg_where_3`,
@@ -31,6 +33,19 @@ their operative fact was missing, ambiguous or buried beneath figurative languag
 `perren_where_6`, `perren_where_7`, `perren_where_8`, `nine_where_1`, `nine_where_5`,
 `nine_where_6`.
 
+Second-pass additions:
+
+`bryn_where_0`, `bryn_where_1`, `bryn_where_2`, `orsa_where_0`, `orsa_where_1`, `orsa_where_2`,
+`noll_where_0`, `noll_where_1`, `talin_where_0`, `nessa_where_0`, `nessa_where_1`,
+`nessa_where_3`, `corrin_where_0`, `corrin_where_1`, `corrin_where_3`, `dagg_where_1`,
+`dagg_where_2`, `rook_where_0`, `rook_where_2`, `lys_where_0`, `lys_where_1`, `lys_where_3`.
+
+`fen_where_0`, `fen_where_2`, `fen_where_3`, `fen_where_4`, `maud_where_0`, `maud_where_3`,
+`maud_where_4`, `marrick_where_3`, `marrick_where_4`.
+
+`bracken_where_3`, `maud_where_2`, `sabine_where_0`, `grimmond_where_5`, `oda_where_7`,
+`auber_where_4`, `ashe_where_7`, `nine_where_3`.
+
 The previous Oda line “The land contains each disturbance…” is specifically retired. Its live
 replacement describes close walls, narrow passages and nearby echoes before asking the player to
 infer a low-openness world-writing route.
@@ -40,4 +55,6 @@ infer a low-openness world-writing route.
 Catalogue decode and stable-ID coverage must remain green. A future authored-copy validator or
 review tool should present every location clue beside its hidden signature condition and require a
 human clarity disposition; prose style checks alone cannot prove that a sentence communicates the
-correct world fact.
+correct world fact. `ContentTests` now also enforces, for every traveller, that ordered self-clue
+pages exactly match the corresponding signature passages; this prevents the Library clue and
+traveller-arrival truth from silently diverging during future prose corrections.

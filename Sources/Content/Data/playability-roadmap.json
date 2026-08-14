@@ -13,7 +13,7 @@
       "id": "band-1",
       "title": "Band 1 · First world, fight and return",
       "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
-      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "world-resource-reserve", "field-note-generator", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
+      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "location-clue-plain-language", "world-resource-reserve", "field-note-generator", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
     },
     {
       "id": "band-2",
@@ -91,6 +91,16 @@
       "detail": "Blocked steps currently claim the ground crumbled even at the map boundary, deep water or an intact chasm. Resolve the refusal from the exact destination state without spending a turn.",
       "gate": "Boundary, truly crumbled tile, deep water and chasm each produce distinct accurate player-facing text; other future impassable ground falls back to its visible ground name; every refusal preserves position, Stability, world clock and encounter state.",
       "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "location-clue-plain-language",
+      "priority": "B1.4d",
+      "title": "Plain-language traveller location clues",
+      "status": "readyToTest",
+      "detail": "All 138 live location-clue pages have now received a stricter second review against their actual signature conditions. Seventy-five exact stable-ID clarity corrections lead with readily parseable observable world descriptions; the remaining 63 passed the stricter review. A global content gate enforces one ordered self-clue per signature condition with identical prose.",
+      "gate": "After one reading, a player can accurately paraphrase the relevant world property without seeing its internal target, threshold or required sigil. The clue still leaves the player to infer which known or unknown sigil could create that property. Every revised page retains its stable ID, owner and clue index, and replacement history remains documented.",
+      "workstream": "design",
       "isPrimary": false
     },
     {
