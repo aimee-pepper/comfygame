@@ -74,6 +74,8 @@ struct WorldView: View {
     @State private var isConfirmingAnchorFrame = false
     @State private var isLookArmed = false
     @State private var inspection: InspectionPresentation?
+    @State private var fieldPageMessage: String?
+    @State private var pendingWorldPageSwap: WildWorldPageFieldRules.Quote?
     @State private var tutorialLesson: TutorialLessonID?
     @State private var dismissedTutorials: Set<TutorialLessonID> = []
 #if DEBUG
@@ -175,6 +177,35 @@ struct WorldView: View {
         .alert(item: $inspection) { result in
             Alert(title: Text(result.value.heading), message: Text(result.value.details.joined(separator: " · ")),
                   dismissButton: .default(Text("Done")))
+        }
+        .alert("Loose page", isPresented: Binding(
+            get: { fieldPageMessage != nil }, set: { if !$0 { fieldPageMessage = nil } }
+        )) {
+            Button("Done") { fieldPageMessage = nil }
+        } message: {
+            Text(fieldPageMessage ?? "")
+        }
+        .confirmationDialog(
+            "Keep this page?",
+            isPresented: Binding(get: { pendingWorldPageSwap != nil },
+                                 set: { if !$0 { pendingWorldPageSwap = nil } }),
+            titleVisibility: .visible
+        ) {
+            if let run, let quote = pendingWorldPageSwap {
+                ForEach(run.satchelItems.stacks, id: \.id) { stack in
+                    Button("Leave \(stack.displayName) ×\(stack.count)") {
+                        completeWorldPageSwap(quote, discarding: .itemStack(stack.id))
+                    }
+                }
+                ForEach(run.carriedWorldPages, id: \.id) { page in
+                    Button("Leave \(page.inspected ? page.definition.title : "Unknown page")") {
+                        completeWorldPageSwap(quote, discarding: .worldPage(page.id))
+                    }
+                }
+            }
+            Button("Keep what I have", role: .cancel) { pendingWorldPageSwap = nil }
+        } message: {
+            Text("Your satchel is full. Choose the exact slot to leave behind, or keep what you have.")
         }
         .overlay(alignment: .bottom) {
             if let id = tutorialLesson, let lesson = TutorialRules.definition(id), !tutorialSuppressed {
@@ -464,11 +495,16 @@ struct WorldView: View {
         store.harvestableHere != nil || store.searchableHere != nil || store.canPortalHere
             || (store.isOnLockedCache && store.carriedCacheKey != nil)
             || store.canUseNaturalAnchor || store.canPlaceAnchorFrame || store.canSurvey
+            || store.offeredWorldPageHere != nil
     }
 
     private func interactionDetail(in run: WorldRun) -> String {
         if let node = store.harvestableHere {
             return "Harvest \(ContentCatalog.shared.resource(node.resource)?.name ?? "resource") · \(node.remainingHarvests) left"
+        }
+        if let page = store.offeredWorldPageHere {
+            return page.inspected ? "Take \(page.definition.title) · 1 satchel slot"
+                                  : "Inspect Loose page · no turn"
         }
         if let site = store.searchableHere, let definition = site.definition {
             return "Search \(definition.name) · \(site.searchTurnsRemaining) turns left"
@@ -488,7 +524,25 @@ struct WorldView: View {
     }
 
     private func performInteraction() {
-        if store.harvestableHere != nil {
+        if let page = store.offeredWorldPageHere,
+           let quote = store.offeredWorldPageQuote(page.id) {
+            if page.inspected {
+                switch store.takeOfferedWorldPage(quote) {
+                case .taken(let taken): fieldPageMessage = "Took \(taken.definition.title)."
+                case .satchelFull: pendingWorldPageSwap = quote
+                case .stale, .notHere, .duplicateIdentity:
+                    fieldPageMessage = "That page is no longer available here."
+                case .inspected, .swapped: break
+                }
+            } else {
+                switch store.inspectOfferedWorldPage(quote) {
+                case .inspected(let inspected): fieldPageMessage = inspected.definition.title
+                case .stale, .notHere, .duplicateIdentity:
+                    fieldPageMessage = "That page is no longer available here."
+                case .satchelFull, .taken, .swapped: break
+                }
+            }
+        } else if store.harvestableHere != nil {
             completeInteraction(); store.harvest()
         } else if store.searchableHere != nil {
             completeInteraction(); store.searchSite()
@@ -503,6 +557,19 @@ struct WorldView: View {
             completeInteraction(); isConfirmingAnchorFrame = true
         } else if store.canSurvey {
             completeInteraction(); store.survey()
+        }
+    }
+
+    private func completeWorldPageSwap(
+        _ quote: WildWorldPageFieldRules.Quote,
+        discarding occupant: WildWorldPageFieldRules.SlotOccupant
+    ) {
+        pendingWorldPageSwap = nil
+        switch store.swapOfferedWorldPage(quote, discarding: occupant) {
+        case .swapped(let page, _): fieldPageMessage = "Took \(page.definition.title)."
+        case .stale, .notHere, .duplicateIdentity, .satchelFull:
+            fieldPageMessage = "That choice is no longer current. Nothing was changed."
+        case .inspected, .taken: break
         }
     }
 
@@ -523,7 +590,7 @@ struct WorldView: View {
     private var hasActionHere: Bool {
         store.canSurvey || store.harvestableHere != nil || store.searchableHere != nil
             || store.naturalAnchorHere != nil || store.canPlaceAnchorFrame || store.canPortalHere
-            || store.isOnLockedCache
+            || store.isOnLockedCache || store.offeredWorldPageHere != nil
     }
 
     private func present(_ id: TutorialLessonID) {
@@ -945,6 +1012,10 @@ private struct MapGrid: View {
                                      fogBoundaryEdges: presentation.fogBoundaryEdges,
                                      enemy: enemy(at: point, visibility: currentVisibility),
                                      site: currentVisibility == .full ? site(at: point) : nil,
+                                     hasLooseWorldPage: currentVisibility == .full
+                                        && run.offeredWorldPages.contains {
+                                            $0.fieldProvenance?.position == point
+                                        },
                                      isPlayer: point == run.playerPosition,
                                      side: side,
                                      useSimpleRenderer: simpleRenderer)
@@ -1104,6 +1175,7 @@ private struct TileView: View {
     /// Resolved by the caller: the tile only stores an instance id, and the grid is the one place
     /// that has the run to look it up in.
     let site: SiteDef?
+    let hasLooseWorldPage: Bool
     let isPlayer: Bool
     let side: CGFloat
     let useSimpleRenderer: Bool
@@ -1212,6 +1284,7 @@ private struct TileView: View {
         if isPlayer { return "figure.stand" }
         guard visibility == .full, tile.isRevealed, !tile.isCrumbled else { return nil }
         if let enemy { return enemy.icon }
+        if hasLooseWorldPage { return "doc.text.fill" }
         switch tile.content {
         case .empty: return nil
         case .node(let node): return useSimpleRenderer ? (ContentCatalog.shared.resource(node.resource)?.icon ?? "cube") : nil
@@ -1230,6 +1303,7 @@ private struct TileView: View {
     private var tint: Color {
         if isPlayer { return Palette.mapFloor }
         if enemy != nil { return .red }
+        if hasLooseWorldPage { return .indigo }
         switch tile.content {
         case .hazard: return .orange
         case .portal: return .blue

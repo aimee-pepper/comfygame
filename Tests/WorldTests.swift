@@ -208,6 +208,36 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(run, duplicate)
     }
 
+    func testWildPageFullSatchelSwapRevalidatesExactOccupantWithoutLoss() throws {
+        let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))
+        let point = GridPoint(x: 1, y: 1)
+        let offered = WorldPageInstance(
+            id: InstanceID(rawValue: 890), definition: definition, inspected: true,
+            fieldProvenance: .init(originRunIndex: 3, originWorldSeed: 44,
+                                   generationSeed: 55, position: point))
+        var run = wildPageRun(seed: 44)
+        run.playerPosition = point
+        run.map[point].isRevealed = true
+        run.offeredWorldPages = [offered]
+        run.satchelItems.slots = 1
+        let stack = ItemStack(id: InstanceID(rawValue: 891), catalogID: "salve", count: 2)
+        _ = run.satchelItems.add(stack)
+        let quote = try XCTUnwrap(WildWorldPageFieldRules.quote(offered.id, in: run))
+
+        let staleBefore = run
+        XCTAssertEqual(WildWorldPageFieldRules.swap(
+            quote, discarding: .itemStack(InstanceID(rawValue: 999)), in: &run), .stale)
+        XCTAssertEqual(run, staleBefore)
+
+        XCTAssertEqual(WildWorldPageFieldRules.swap(
+            quote, discarding: .itemStack(stack.id), in: &run),
+            .swapped(offered, discarded: .itemStack(stack)))
+        XCTAssertEqual(run.carriedWorldPages, [offered])
+        XCTAssertTrue(run.offeredWorldPages.isEmpty)
+        XCTAssertTrue(run.satchelItems.stacks.isEmpty)
+        XCTAssertEqual(run.occupiedSatchelSlots, 1)
+    }
+
     @MainActor
     func testStoreInspectionTeachesOnlyAfterExactVisibleQuoteCommits() throws {
         let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_gilded_caverns"))

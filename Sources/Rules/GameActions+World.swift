@@ -218,6 +218,15 @@ extension GameStore {
 
     var activeRun: WorldRun? { state.worlds.activeRun }
 
+    var offeredWorldPageHere: WorldPageInstance? {
+        guard let run = activeRun else { return nil }
+        let matches = run.offeredWorldPages.filter {
+            $0.fieldProvenance?.position == run.playerPosition
+        }
+        guard matches.count == 1 else { return nil }
+        return matches[0]
+    }
+
     func offeredWorldPageQuote(_ instanceID: InstanceID) -> WildWorldPageFieldRules.Quote? {
         activeRun.flatMap { WildWorldPageFieldRules.quote(instanceID, in: $0) }
     }
@@ -244,6 +253,20 @@ extension GameStore {
             guard var run = state.worlds.activeRun else { return }
             result = WildWorldPageFieldRules.take(quote, in: &run)
             guard case .taken = result else { return }
+            state.worlds.activeRun = run
+        }
+        return result
+    }
+
+    @discardableResult
+    func swapOfferedWorldPage(_ quote: WildWorldPageFieldRules.Quote,
+                              discarding occupant: WildWorldPageFieldRules.SlotOccupant)
+        -> WildWorldPageFieldRules.Result {
+        var result: WildWorldPageFieldRules.Result = .stale
+        mutate("swap loose World Page", flush: true) { state in
+            guard var run = state.worlds.activeRun else { return }
+            result = WildWorldPageFieldRules.swap(quote, discarding: occupant, in: &run)
+            guard case .swapped = result else { return }
             state.worlds.activeRun = run
         }
         return result

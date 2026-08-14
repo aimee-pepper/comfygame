@@ -61,6 +61,22 @@ enum WildWorldPageSelectionRules {
 }
 
 enum WildWorldPageFieldRules {
+    enum DiscardedPayload: Equatable, Sendable {
+        case itemStack(ItemStack)
+        case worldPage(WorldPageInstance)
+    }
+
+    enum SlotOccupant: Equatable, Sendable, Identifiable {
+        case itemStack(InstanceID)
+        case worldPage(InstanceID)
+
+        var id: String {
+            switch self {
+            case .itemStack(let id): "item-\(id.rawValue)"
+            case .worldPage(let id): "page-\(id.rawValue)"
+            }
+        }
+    }
     struct Quote: Equatable, Sendable {
         var instance: WorldPageInstance
         var position: GridPoint
@@ -69,6 +85,7 @@ enum WildWorldPageFieldRules {
     enum Result: Equatable, Sendable {
         case inspected(WorldPageInstance)
         case taken(WorldPageInstance)
+        case swapped(WorldPageInstance, discarded: DiscardedPayload)
         case stale
         case notHere
         case satchelFull
@@ -114,6 +131,35 @@ enum WildWorldPageFieldRules {
         let instance = run.offeredWorldPages.remove(at: index)
         run.carriedWorldPages.append(instance)
         return .taken(instance)
+    }
+
+    static func swap(_ quote: Quote, discarding occupant: SlotOccupant,
+                     in run: inout WorldRun) -> Result {
+        guard let current = self.quote(quote.instance.id, in: run), current == quote,
+              run.freeSatchelSlots == 0,
+              !run.carriedWorldPages.contains(where: { $0.id == quote.instance.id }),
+              let offeredIndex = run.offeredWorldPages.firstIndex(where: {
+                  $0.id == quote.instance.id
+              })
+        else { return .stale }
+        let discarded: DiscardedPayload
+        switch occupant {
+        case .itemStack(let id):
+            let matches = run.satchelItems.stacks.indices.filter {
+                run.satchelItems.stacks[$0].id == id
+            }
+            guard matches.count == 1 else { return .stale }
+            discarded = .itemStack(run.satchelItems.stacks.remove(at: matches[0]))
+        case .worldPage(let id):
+            let matches = run.carriedWorldPages.indices.filter {
+                run.carriedWorldPages[$0].id == id
+            }
+            guard matches.count == 1 else { return .stale }
+            discarded = .worldPage(run.carriedWorldPages.remove(at: matches[0]))
+        }
+        let taken = run.offeredWorldPages.remove(at: offeredIndex)
+        run.carriedWorldPages.append(taken)
+        return .swapped(taken, discarded: discarded)
     }
 }
 
