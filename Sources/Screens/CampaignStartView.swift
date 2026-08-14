@@ -23,6 +23,14 @@ enum CampaignSlotHealth: Equatable, Sendable {
         case .corrupt(let message), .futureIncompatible(let message): message
         }
     }
+
+    var detailsActionLabel: String {
+        switch self {
+        case .valid: "More"
+        case .corrupt: "Recovery details"
+        case .futureIncompatible: "Compatibility details"
+        }
+    }
 }
 
 /// Lightweight catalogue metadata for the post-loading campaign chooser. The persistence layer
@@ -39,11 +47,9 @@ struct CampaignSlotSummary: Identifiable, Equatable, Sendable {
     let debugVersion: String?
     let hasKnownMetadata: Bool
 
-    var bookplateLabel: String {
-        let number: UInt16 = withUnsafeBytes(of: id.uuid) { bytes in
-            (UInt16(bytes[0]) << 8) | UInt16(bytes[1])
-        }
-        return "Bookplate \(String(format: "%04d", Int(number % 10_000)))"
+    var deletionDiscriminator: String {
+        guard hasKnownMetadata else { return health.label }
+        return "\(location) · \(lastPlayed.formatted(date: .abbreviated, time: .omitted))"
     }
 
     init(descriptor: SaveSlotDescriptor) {
@@ -52,13 +58,9 @@ struct CampaignSlotSummary: Identifiable, Equatable, Sendable {
         if let authoredName = metadata?.name {
             name = authoredName
         } else {
-            let number: UInt16 = withUnsafeBytes(of: id.uuid) { bytes in
-                (UInt16(bytes[0]) << 8) | UInt16(bytes[1])
-            }
-            let label = "Bookplate \(String(format: "%04d", Int(number % 10_000)))"
             switch descriptor.validity {
-            case .futureIncompatible: name = "Campaign · \(label)"
-            case .valid, .corrupt: name = "Damaged campaign · \(label)"
+            case .futureIncompatible: name = "Campaign from a newer version"
+            case .valid, .corrupt: name = "Campaign needing recovery"
             }
         }
         lastPlayed = metadata?.lastPlayedAt ?? .distantPast
@@ -117,7 +119,7 @@ struct CampaignStartPresentation: Equatable, Sendable {
     var isEmpty: Bool { slots.isEmpty }
 
     static func deletionTitle(for slot: CampaignSlotSummary) -> String {
-        "Delete “\(slot.name)” · \(slot.bookplateLabel)?"
+        "Delete “\(slot.name)” — \(slot.deletionDiscriminator)?"
     }
 }
 
@@ -182,11 +184,11 @@ struct CampaignStartView: View {
         .alert(deletionCandidate.map(CampaignStartPresentation.deletionTitle) ?? "Delete campaign?",
                isPresented: deletionIsPresented,
                presenting: deletionCandidate) { slot in
-            Button("Delete \(slot.name) · \(slot.bookplateLabel)", role: .destructive) {
+            Button("Cancel", role: .cancel) { deletionCandidate = nil }
+            Button("Delete “\(slot.name)”", role: .destructive) {
                 onDelete(slot.id)
                 deletionCandidate = nil
             }
-            Button("Cancel", role: .cancel) { deletionCandidate = nil }
         } message: { slot in
             Text("Only this campaign will be removed. Other campaigns will not be changed.")
         }
@@ -194,7 +196,7 @@ struct CampaignStartView: View {
 
     private var title: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Bookbinder").font(.largeTitle.bold())
+            Text("Campaigns").font(.largeTitle.bold())
             Text(presentation.isEmpty
                  ? "Begin a campaign. Each new game keeps its own progress."
                  : "Choose a campaign to continue.")
@@ -257,7 +259,16 @@ struct CampaignStartPrimaryAction: View {
     var body: some View {
         Group {
             if emphasized { button.buttonStyle(.borderedProminent) }
-            else { button.buttonStyle(.bordered) }
+            else {
+                button
+                    .buttonStyle(.bordered)
+                    .tint(.accentColor)
+                    .overlay {
+                        Capsule()
+                            .stroke(Color.accentColor.opacity(0.55), lineWidth: 1)
+                            .allowsHitTesting(false)
+                    }
+            }
         }
         .frame(maxWidth: .infinity)
     }
@@ -308,29 +319,17 @@ private struct CampaignSlotCard: View {
                 .frame(height: 42)
                 .accessibilityHidden(true)
 
-            HStack(alignment: .firstTextBaseline) {
-                Text(slot.name).font(.headline)
-                Spacer()
-                Label(slot.health.label,
-                      systemImage: slot.health.canLoad ? "checkmark.circle" : "exclamationmark.triangle")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(slot.health.canLoad ? Color.secondary : Color.orange)
-            }
+            Text(slot.name).font(.headline).lineLimit(2)
+            Label(slot.health.label,
+                  systemImage: slot.health.canLoad ? "checkmark.circle" : "exclamationmark.triangle")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(slot.health.canLoad ? Color.secondary : Color.orange)
 
             if slot.hasKnownMetadata {
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 12) { metadata }
                     VStack(alignment: .leading, spacing: 4) { metadata }
                 }
-            }
-
-            if let recoveryMessage = slot.health.recoveryMessage {
-                Text(recoveryMessage)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                Text("This campaign remains listed so it can be exported for recovery. Other campaigns are still safe to load.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
 
             HStack(spacing: 8) {
@@ -340,7 +339,7 @@ private struct CampaignSlotCard: View {
                         .frame(minHeight: 44)
                 }
                 Spacer(minLength: 4)
-                Button(slot.health.canLoad ? "More" : "Review", action: onDetails)
+                Button(slot.health.detailsActionLabel, action: onDetails)
                     .buttonStyle(.bordered)
                     .frame(minHeight: 44)
             }
@@ -375,12 +374,12 @@ private struct CampaignSlotDetail: View {
                         .frame(height: 58)
                         .accessibilityHidden(true)
                     Text(slot.name).font(.title2.bold())
-                    Text(slot.bookplateLabel)
-                        .font(.caption.monospaced()).foregroundStyle(.secondary)
                     if slot.hasKnownMetadata {
                         Label("Level \(slot.binderLevel)", systemImage: "figure.stand")
                         Label(slot.location, systemImage: "location")
                         Text(slot.progression)
+                        Text("Last played \(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))")
+                            .foregroundStyle(.secondary)
                     }
                     if let message = slot.health.recoveryMessage {
                         Label(message, systemImage: "exclamationmark.triangle")

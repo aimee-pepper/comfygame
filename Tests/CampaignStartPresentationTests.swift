@@ -38,8 +38,11 @@ final class CampaignStartPresentationTests: XCTestCase {
 
     func testDeleteConfirmationNamesExactCampaign() {
         let campaign = slot(name: "Aimee’s no-rune test", date: 10, health: .valid)
-        XCTAssertEqual(CampaignStartPresentation.deletionTitle(for: campaign),
-                       "Delete “Aimee’s no-rune test” · \(campaign.bookplateLabel)?")
+        let title = CampaignStartPresentation.deletionTitle(for: campaign)
+        XCTAssertTrue(title.contains("Aimee’s no-rune test"))
+        XCTAssertTrue(title.contains("Home"))
+        XCTAssertFalse(title.contains(campaign.id.uuidString))
+        XCTAssertFalse(title.contains("Bookplate"))
     }
 
     func testStableIDNotDisplayNameDistinguishesCampaigns() {
@@ -47,6 +50,23 @@ final class CampaignStartPresentationTests: XCTestCase {
         let second = slot(name: "Test", date: 20, health: .valid)
         XCTAssertNotEqual(first.id, second.id)
         XCTAssertEqual(CampaignStartPresentation(slots: [first, second]).slots.count, 2)
+    }
+
+    func testEnabledNewGameOwnsAnAccentOutlineInsteadOfLookingDisabled() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
+                                encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "struct CampaignStartPrimaryAction"))
+        let end = try XCTUnwrap(source.range(of: "struct CampaignStartActionLabel",
+                                             range: start.upperBound..<source.endIndex))
+        let action = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(action.contains("buttonStyle(.borderedProminent)"))
+        XCTAssertTrue(action.contains("buttonStyle(.bordered)"))
+        XCTAssertTrue(action.contains("Capsule()"))
+        XCTAssertTrue(action.contains("stroke(Color.accentColor.opacity(0.55)"))
+        XCTAssertFalse(action.contains(".disabled("))
     }
 
     func testAccessibilityTextForcesSingleColumnCards() {
@@ -167,11 +187,10 @@ final class CampaignStartPresentationTests: XCTestCase {
             id: corruptID, metadata: nil, validity: .corrupt(reason: "Unreadable envelope")))
         XCTAssertEqual(corrupt.id, corruptID.rawValue)
         XCTAssertEqual(corrupt.health.recoveryMessage, "Unreadable envelope")
-        XCTAssertTrue(corrupt.name.hasPrefix("Damaged campaign · Bookplate "))
+        XCTAssertEqual(corrupt.name, "Campaign needing recovery")
         XCTAssertFalse(corrupt.hasKnownMetadata)
         XCTAssertNil(corrupt.debugVersion)
-        XCTAssertTrue(future.name.hasPrefix("Campaign · Bookplate "))
-        XCTAssertFalse(future.name.contains("Damaged"))
+        XCTAssertEqual(future.name, "Campaign from a newer version")
     }
 
     private func slot(name: String, date: TimeInterval,
