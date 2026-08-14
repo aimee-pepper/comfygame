@@ -315,7 +315,9 @@ enum LibraryRules {
         if let id = page.teaches { return catalog.symbol(id)?.name }
         if let id = page.teachesFocus { return catalog.pressureSource(id)?.name }
         if let id = page.teachesGambit { return catalog.gambitComponent(id)?.name }
-        if let id = page.teachesPattern { return id }
+        if let id = page.taughtPatternID {
+            return WorkshopPatternRegistry.definition(id)?.name
+        }
         if let id = page.researchNode { return catalog.researchNode(id)?.name }
         return nil
     }

@@ -91,6 +91,12 @@ struct DiaryPageID: StringIdentifier {
     init(rawValue: String) { self.rawValue = rawValue }
 }
 
+/// A singular workshop method learned from authored writing, rather than research progress.
+struct WorkshopPatternID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
 /// One persisted piece of anonymous world writing, distinct from every traveller diary.
 struct FoundWritingID: StringIdentifier {
     var rawValue: String

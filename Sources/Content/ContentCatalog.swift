@@ -340,6 +340,7 @@ struct ContentCatalog: Sendable {
     // MARK: - Validation
 
     func validate() throws {
+        try WorkshopPatternRegistry.validate(WorkshopPatternRegistry.definitions)
         try requireUniqueIDs(symbols.map(\.id.rawValue), label: "symbol")
         try requireUniqueIDs(creatures.map(\.id.rawValue), label: "creature")
         try requireUniqueIDs(resources.map(\.id.rawValue), label: "resource")
@@ -790,7 +791,8 @@ struct ContentCatalog: Sendable {
                     throw ContentError.danglingReference("page '\(page.id)' teaches an unknown gambit phrase")
                 }
             case .pattern:
-                guard page.teachesPattern == "maud_fitting_pattern" else {
+                guard let id = page.taughtPatternID,
+                      WorkshopPatternRegistry.definition(id) != nil else {
                     throw ContentError.danglingReference("page '\(page.id)' teaches an unknown pattern")
                 }
             case .researchLead:

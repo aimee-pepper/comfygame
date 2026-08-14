@@ -200,6 +200,9 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
     var teachesGambit: GambitComponentID?
     /// A complete, singular authored workshop pattern. This is not research progress.
     var teachesPattern: String?
+    var taughtPatternID: WorkshopPatternID? {
+        teachesPattern.map(WorkshopPatternID.init(rawValue:))
+    }
     /// `researchLead`: partial progress toward a node, never the finished thing.
     var researchNode: ResearchNodeID?
     /// `ruin`: a site whose existence this page reveals.
@@ -246,6 +249,36 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
             case .gambit: "A gambit phrase"
             case .pattern: "A workshop pattern"
             case .researchLead: "A line of study"
+            }
+        }
+    }
+}
+
+/// Central identity authority for authored workshop patterns. A diary page names an ID; this
+/// registry decides whether that ID is a real, independently consumable workshop method.
+enum WorkshopPatternRegistry {
+    struct Definition: Equatable, Sendable {
+        var id: WorkshopPatternID
+        var name: String
+    }
+
+    static let definitions: [Definition] = [
+        Definition(id: "maud_fitting_pattern", name: "Maud's fitting pattern")
+    ]
+
+    static func definition(_ id: WorkshopPatternID) -> Definition? {
+        definitions.first { $0.id == id }
+    }
+
+    static func validate(_ definitions: [Definition]) throws {
+        var seen: Set<WorkshopPatternID> = []
+        for definition in definitions {
+            guard !definition.id.rawValue.isEmpty, !definition.name.isEmpty else {
+                throw ContentCatalog.ContentError.danglingReference("unnamed workshop pattern")
+            }
+            guard seen.insert(definition.id).inserted else {
+                throw ContentCatalog.ContentError.duplicateID(
+                    "workshop pattern '\(definition.id.rawValue)'")
             }
         }
     }

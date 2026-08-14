@@ -6,6 +6,54 @@ import XCTest
 @MainActor
 final class LibraryTests: XCTestCase {
 
+    func testWorkshopPatternRegistryRejectsDuplicateIDsRegardlessOfOrder() {
+        let maud = WorkshopPatternRegistry.Definition(
+            id: "maud_fitting_pattern", name: "Maud's fitting pattern")
+        let duplicate = WorkshopPatternRegistry.Definition(
+            id: "maud_fitting_pattern", name: "Renamed duplicate")
+        let other = WorkshopPatternRegistry.Definition(id: "other_pattern", name: "Other")
+
+        XCTAssertThrowsError(try WorkshopPatternRegistry.validate([maud, other, duplicate]))
+        XCTAssertThrowsError(try WorkshopPatternRegistry.validate([duplicate, maud, other]))
+    }
+
+    func testCatalogueRejectsUnknownWorkshopPattern() throws {
+        let catalog = try ContentCatalog.load()
+        var pages = catalog.diaryPages
+        let index = try XCTUnwrap(pages.firstIndex { $0.kind == .pattern })
+        pages[index].teachesPattern = "unknown_pattern"
+        let sabotaged = ContentCatalog(
+            symbols: catalog.symbols, creatures: catalog.creatures,
+            resources: catalog.resources, items: catalog.items, skills: catalog.skills,
+            pressureTargets: catalog.pressureTargets, pressureSources: catalog.pressureSources,
+            researchBranches: catalog.researchBranches, researchNodes: catalog.researchNodes,
+            gambitComponents: catalog.gambitComponents, stations: catalog.stations,
+            constellationNodes: catalog.constellationNodes, sites: catalog.sites,
+            contradictions: catalog.contradictions, descriptionClauses: catalog.descriptionClauses,
+            combatTrees: catalog.combatTrees, combatGraph: catalog.combatGraph,
+            runeShapes: catalog.runeShapes, qualifiers: catalog.qualifiers,
+            travellers: catalog.travellers, diaryPages: pages)
+
+        XCTAssertThrowsError(try sabotaged.validate())
+    }
+
+    func testMaudPatternAcquisitionIsIdempotentAndSurvivesSave() throws {
+        let page = try XCTUnwrap(ContentCatalog.shared.diaryPage("maud_fitting_pattern"))
+        XCTAssertEqual(page.taughtPatternID, "maud_fitting_pattern")
+        XCTAssertEqual(WorkshopPatternRegistry.definition(try XCTUnwrap(page.taughtPatternID))?.name,
+                       "Maud's fitting pattern")
+        var state = GameState.newGame()
+
+        let first = WorldRules.readPage(page.id, in: &state)
+        let second = WorldRules.readPage(page.id, in: &state)
+        XCTAssertEqual(first.filter { $0 == .learnedPattern("maud_fitting_pattern") }.count, 1)
+        XCTAssertTrue(second.isEmpty)
+        XCTAssertEqual(state.reality.library.knownPatterns, ["maud_fitting_pattern"])
+
+        let restored = try SaveCodec.decode(SaveCodec.encode(state))
+        XCTAssertEqual(restored.reality.library.knownPatterns, ["maud_fitting_pattern"])
+    }
+
     func testLysCatalogueSearchesOnlyRecoveredVisibleContentInDiscoveryOrder() throws {
         let pages = Array(ContentCatalog.shared.diaryPages.prefix(3))
         XCTAssertEqual(pages.count, 3)
