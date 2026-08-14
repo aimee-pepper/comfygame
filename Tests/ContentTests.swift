@@ -5,6 +5,36 @@ import XCTest
 /// Adding a symbol/creature/station to JSON and getting an ID wrong should fail here, loudly,
 /// rather than silently spawning nothing in a world.
 final class ContentTests: XCTestCase {
+    func testReleaseContentDoesNotPromiseRetiredTokenOrQuirkSystems() throws {
+        let catalogue = ContentCatalog.shared
+        XCTAssertEqual(catalogue.items.filter { $0.consumable != nil }.count, 17,
+                       "Decision189 retires Traveller's Token without shrinking the 17-item set")
+
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let sources = projectRoot.appending(path: "Sources")
+        let prohibitedPromises = [
+            "traveller's token", "travellers token", "quirk slot", "quirk deck",
+            "reroll quirk", "veto quirk"
+        ]
+        let files = FileManager.default.enumerator(
+            at: sources,
+            includingPropertiesForKeys: nil
+        )?.compactMap { $0 as? URL }.filter {
+            ["swift", "json"].contains($0.pathExtension)
+                && $0.lastPathComponent != "playability-roadmap.json"
+        } ?? []
+
+        for file in files {
+            let source = try String(contentsOf: file, encoding: .utf8).lowercased()
+            for promise in prohibitedPromises {
+                XCTAssertFalse(source.contains(promise),
+                               "Retired \(promise) promise remains in \(file.lastPathComponent)")
+            }
+        }
+    }
+
     func testGeneratedMeetingCorpusMatchesItsAuthoredSources() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

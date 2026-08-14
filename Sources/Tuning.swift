@@ -291,8 +291,8 @@ enum Tuning {
 
         // Sight
         /// Raised from 2 on the designer's flag (decisions session 5): at 2 you see ~24 of 196
-        /// tiles, which reads as groping rather than exploring, and leaves a vision-reducing quirk
-        /// nowhere to cut. At 3 a quirk can take a ring off and still leave you seeing.
+        /// tiles, which reads as groping rather than exploring, and leaves the real Dim Sky
+        /// pressure nowhere to cut. At 3 that pressure can take a ring off and still leave sight.
         static let baseVisionRadius: Int = 3         // PLACEHOLDER
         static let minimumVisionRadius: Int = 1      // even Dim Sky leaves you your own tile + 1
         /// Hazard tiles appear this often (in player turns) past the hazard threshold.

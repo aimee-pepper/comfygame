@@ -37,9 +37,9 @@ struct SymbolID: StringIdentifier {
 
 /// A slot in a book.
 ///
-/// Deliberately *not* an enum. The Terrain/Biome/Bounty/Quirk taxonomy is a placeholder and is
-/// being replaced by environmental-pressure sigils (decisions-log, session 2), so slot count and
-/// slot types are content, not code. Nothing anywhere may assume how many slots a book has.
+/// Deliberately *not* an enum. Old saves may still contain IDs from the retired slot taxonomy;
+/// environmental-pressure sigils are the live model, so slot count and slot types remain content,
+/// not code. Nothing anywhere may assume how many slots a book has.
 struct SlotID: StringIdentifier, Identifiable {
     var rawValue: String
     init(rawValue: String) { self.rawValue = rawValue }
