@@ -2370,6 +2370,30 @@ enum CombatRules {
         return front
     }
 
+    struct CoverAllocation: Equatable, Sendable {
+        var owner: Combatant
+        var targetDamage: Int
+        var coverDamage: Int
+    }
+
+    static func coverAllocation(finalDamage: Int, target: Combatant, wasInterposed: Bool,
+                                run: WorldRun, encounter: EncounterState,
+                                state: GameState) -> CoverAllocation? {
+        guard finalDamage > 0, !wasInterposed,
+              rank(of: target, in: encounter, fallback: state) == .back,
+              encounter.debugV2OwnedNodeIDs != nil else { return nil }
+        let owner = party(of: state).filter {
+            $0 != target && isAlive($0, in: run)
+                && rank(of: $0, in: encounter, fallback: state) == .front
+                && encounter.debugV2OwnedNodeIDs?[$0]?.contains(
+                    CombatDerivedStatsRules.Node.cover) == true
+        }.sorted { $0.storageKey < $1.storageKey }.first
+        guard let owner else { return nil }
+        let cover = Int((Double(finalDamage) * 0.30).rounded(.down))
+        guard cover > 0 else { return nil }
+        return .init(owner: owner, targetDamage: finalDamage - cover, coverDamage: cover)
+    }
+
     // MARK: Turn order
 
     /// Moves to the next living combatant, ticking the round over when the rotation wraps.
@@ -2751,6 +2775,7 @@ enum CombatRules {
                 encounter.apexTargetsThisRound[foeID, default: []].append(originalTarget)
             }
             var target = originalTarget
+            var wasInterposed = false
             var grounded = false
             if foe.stats.element != nil, !isSnuffed(foeID, in: encounter),
                let ashe = standing.first(where: { member in
@@ -2776,6 +2801,7 @@ enum CombatRules {
                 }
                 if let chosen = candidates.first {
                     target = chosen.owner
+                    wasInterposed = true
                     grounded = false
                     encounter.interposeReceipts?.removeAll {
                         $0.owner == chosen.owner && $0.activationSequence == chosen.activationSequence
@@ -2867,8 +2893,17 @@ enum CombatRules {
                     braceApplies = true
                 }
             }
-            hurt(target, by: amount, braceApplies: braceApplies,
-                 run: &run, encounter: &encounter)
+            if let allocation = coverAllocation(finalDamage: amount, target: target,
+                wasInterposed: wasInterposed, run: run, encounter: encounter, state: state) {
+                hurt(target, by: allocation.targetDamage, braceApplies: braceApplies,
+                     run: &run, encounter: &encounter)
+                hurt(allocation.owner, by: allocation.coverDamage,
+                     run: &run, encounter: &encounter)
+                encounter.note("\(actorName(allocation.owner, encounter: encounter)) covers \(allocation.coverDamage).")
+            } else {
+                hurt(target, by: amount, braceApplies: braceApplies,
+                     run: &run, encounter: &encounter)
+            }
             if wasStanding, !isAlive(target, in: run), target.rosterIndex != nil {
                 encounter.note("\(actorName(target, encounter: encounter)) goes down. They'll be all right at home.")
             }

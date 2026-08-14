@@ -5760,4 +5760,89 @@ final class CombatTests: XCTestCase {
         XCTAssertNil(legacy.drawOffReceipts)
         XCTAssertEqual(legacy.taunts[foeID], 2)
     }
+
+    func testCoverAllocatesFinalIntegerOneThroughTenWithRemainderOnTarget() throws {
+        let store = inFight()
+        store.mutate("stage Cover allocation") { state in
+            state.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs = [
+                .binder: [CombatDerivedStatsRules.Node.cover], .companion(0): []]
+            state.worlds.activeRun?.activeEncounter?.partyRanks = [
+                .binder: .front, .companion(0): .back]
+        }
+        let run = try XCTUnwrap(store.activeRun)
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        for total in 1...10 {
+            let allocation = CombatRules.coverAllocation(finalDamage: total,
+                target: .companion(0), wasInterposed: false, run: run,
+                encounter: encounter, state: store.state)
+            if total < 4 {
+                XCTAssertNil(allocation)
+            } else {
+                XCTAssertEqual(allocation?.owner, .binder)
+                XCTAssertEqual(allocation?.coverDamage, Int((Double(total) * 0.3).rounded(.down)))
+                XCTAssertEqual((allocation?.coverDamage ?? 0) + (allocation?.targetDamage ?? 0), total)
+            }
+        }
+    }
+
+    func testCoverRequiresExactConsciousFrontOwnerAndExcludesInterpose() throws {
+        let store = inFight()
+        store.mutate("stage exact Cover owner") { state in
+            state.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs = [
+                .binder: [CombatDerivedStatsRules.Node.cover], .companion(0): []]
+            state.worlds.activeRun?.activeEncounter?.partyRanks = [
+                .binder: .front, .companion(0): .back]
+        }
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        let run = try XCTUnwrap(store.activeRun)
+        XCTAssertNotNil(CombatRules.coverAllocation(finalDamage: 10, target: .companion(0),
+            wasInterposed: false, run: run, encounter: encounter, state: store.state))
+        XCTAssertNil(CombatRules.coverAllocation(finalDamage: 10, target: .companion(0),
+            wasInterposed: true, run: run, encounter: encounter, state: store.state))
+        var noOwner = encounter
+        noOwner.debugV2OwnedNodeIDs?[.binder] = []
+        XCTAssertNil(CombatRules.coverAllocation(finalDamage: 10, target: .companion(0),
+            wasInterposed: false, run: run, encounter: noOwner, state: store.state))
+        var passedOut = run; passedOut.binderHP = 0
+        XCTAssertNil(CombatRules.coverAllocation(finalDamage: 10, target: .companion(0),
+            wasInterposed: false, run: passedOut, encounter: encounter, state: store.state))
+    }
+
+    func testCoverProductionSplitsOneMitigatedHitWithoutChangingTotal() throws {
+        func staged(cover: Bool) -> GameStore {
+            let store = inFight()
+            let foeID = store.activeEncounter!.foes[0].id
+            store.mutate("stage production Cover") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+                encounter.debugV2OwnedNodeIDs = [
+                    .binder: cover ? [CombatDerivedStatsRules.Node.cover] : [],
+                    .companion(0): [CombatDerivedStatsRules.Node.drawOff]]
+                encounter.partyRanks = [.binder: .front, .companion(0): .back]
+                if let index = encounter.foes.firstIndex(where: { $0.id == foeID }) {
+                    encounter.foes[index].stats.element = .heat
+                }
+                encounter.drawOffReceipts = [foeID: .init(owner: .companion(0),
+                    activationRound: 1, expiresBeforeRound: 3)]
+                encounter.debugV2Evasion = .init(entries: CombatRules.party(of: state).map {
+                    .init(actor: $0, characterEvasion: 0, components: [])
+                })
+                encounter.ghostEvasionAvailable = []
+                encounter.order = [.foe(foeID), .binder, .companion(0)]
+                encounter.turnSlots = encounter.order.map { .init(actor: $0) }; encounter.turnIndex = 0
+                run.rng = SeededRNG(seed: 0xC0FE)
+                run.activeEncounter = encounter; state.worlds.activeRun = run
+            }
+            return store
+        }
+        let covered = staged(cover: true), plain = staged(cover: false)
+        let binderBefore = try XCTUnwrap(covered.activeRun?.binderHP)
+        let companionBefore = try XCTUnwrap(covered.activeRun?.companionHP[0])
+        covered.mutate("resolve covered hit") { CombatRules.runAutomaticTurns(in: &$0) }
+        plain.mutate("resolve plain hit") { CombatRules.runAutomaticTurns(in: &$0) }
+        let coverLoss = binderBefore - (covered.activeRun?.binderHP ?? binderBefore)
+        let targetLoss = companionBefore - (covered.activeRun?.companionHP[0] ?? companionBefore)
+        let plainLoss = companionBefore - (plain.activeRun?.companionHP[0] ?? companionBefore)
+        XCTAssertEqual(coverLoss + targetLoss, plainLoss)
+        XCTAssertGreaterThan(coverLoss, 0)
+    }
 }

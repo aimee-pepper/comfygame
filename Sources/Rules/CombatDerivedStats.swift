@@ -170,6 +170,7 @@ enum CombatDerivedStatsRules {
         static let interpose: CombatNodeID = "combat.defense.protection.interpose"
         static let guardian: CombatNodeID = "combat.defense.protection.guardian"
         static let drawOff: CombatNodeID = "combat.defense.protection.draw_off"
+        static let cover: CombatNodeID = "combat.defense.protection.cover"
     }
 
     static func constitutionTicks(authored: Int, endless: Bool, ownsNode: Bool) -> Int {
