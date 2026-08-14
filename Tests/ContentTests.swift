@@ -636,6 +636,37 @@ final class ContentTests: XCTestCase {
         }
     }
 
+    func testBundledGambitPiecesAndUpgradeAuthoritiesHaveStableUniqueIDs() throws {
+        func object(named name: String) throws -> [String: Any] {
+            let url = try XCTUnwrap(Bundle.contentBundle.url(forResource: name,
+                                                               withExtension: "json"))
+            return try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url))
+                as? [String: Any])
+        }
+
+        let gambits = try XCTUnwrap(try object(named: "gambit_pieces")["gambitPieces"]
+            as? [[String: Any]])
+        let gambitIDs = try gambits.map { try XCTUnwrap($0["id"] as? String) }
+        XCTAssertEqual(Set(gambitIDs).count, gambitIDs.count)
+        XCTAssertTrue(gambits.allSatisfy { $0["condition"] != nil && $0["action"] != nil })
+
+        let upgrades = try XCTUnwrap(try object(named: "upgrades")["upgrades"]
+            as? [[String: Any]])
+        let upgradeIDs = try upgrades.map { try XCTUnwrap($0["id"] as? String) }
+        XCTAssertEqual(Set(upgradeIDs).count, upgradeIDs.count)
+        for upgrade in upgrades {
+            let ranks = try XCTUnwrap(upgrade["ranks"] as? [[String: Any]])
+            XCTAssertFalse(ranks.isEmpty)
+            for rank in ranks {
+                let costs = rank["resources"] as? [String: Any] ?? [:]
+                for resourceID in costs.keys {
+                    XCTAssertNotNil(ContentCatalog.shared.resource(ResourceID(rawValue: resourceID)),
+                                    "upgrade names unknown resource \(resourceID)")
+                }
+            }
+        }
+    }
+
     func testValidationCatchesADanglingReference() throws {
         let catalog = try ContentCatalog.load()
         var broken = catalog.symbols
