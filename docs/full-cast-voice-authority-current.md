@@ -1,8 +1,7 @@
 # Full-cast voice authority — current
 
-**Status:** personality and voice matrix settled; all five campaign-order meeting batches are
-production-authorized; diary voice batches Vance–Sela, Bryn–Lys and Bracken–Marrick are
-source-complete; final diary revision stays behind playability implementation
+**Status:** full-cast meeting and diary voice production is source-complete; all coherent copy is
+production-authorized and remains subordinate to playability implementation
 **Date:** 14 August 2026
 **Roadmap position:** Band 6.8; this authority must not pre-empt opening playability work
 
@@ -181,6 +180,17 @@ formation procedures and revisions. Their 31 location clues remain unchanged.
 
 The batch changes prose only. Stable page identity and all teaching, relationship and condition
 metadata remain unchanged.
+
+## Final diary batch disposition — Sabine through Nine
+
+Twenty-four reflective pages now distinguish Tovin, Sabine, Grimmond, Oda, Auber, Ashe and Perren:
+Tovin is tentative and accountable; Sabine affectionate and animated; Grimmond dour and practical;
+Oda specification-like and literal; Auber sensuous and sly; Ashe embodied and direct; Perren
+deliberately rhetorical but responsive. Nine's existing reflective pages are retained as the sole
+100% elliptical register. All 65 final-batch location clues remain unchanged.
+
+This closes the full-cast diary voice pass. Stable page identity and every mechanical field remain
+unchanged; prior prose remains available in version history.
 
 ## Promotion gate
 

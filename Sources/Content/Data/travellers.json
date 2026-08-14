@@ -951,7 +951,7 @@
       "id": "tovin_drift",
       "diary": "tovin",
       "kind": "focus",
-      "prose": "An hour is not a length. It is an agreement. Out there, some worlds decline it.",
+      "prose": "Drift is the change between one measured interval and the next when the world does not keep our expected pace. Record both clocks. I learned this after trusting only one.",
       "teachesFocus": "drift",
       "prefersConditions": [
         {
@@ -965,7 +965,7 @@
       "id": "tovin_word_edren",
       "diary": "tovin",
       "kind": "whereabouts",
-      "prose": "Edren is somewhere cold and is, I expect, delighted about it.",
+      "prose": "Edren chose a cold world because the layers remain undisturbed. He will be delighted, underdressed, and unwilling to admit either fact.",
       "about": "edren",
       "prefersConditions": []
     },
@@ -1104,17 +1104,17 @@
     },
     {
       "id": "tovin_world_held_four", "diary": "tovin", "kind": "worldWorthWriting",
-      "prose": "The fourth world paid for its own binding, which is how I described it while I was taking the payment. It had blue mineral rain and nothing living beneath it. I still miss the sound.",
+      "prose": "The fourth world yielded enough Essence to fund the next binding. I called that self-sustaining while stripping it. Blue mineral rain fell on empty ground. I still miss the sound, which is not an excuse.",
       "prefersConditions": []
     },
     {
       "id": "tovin_world_left_open", "diary": "tovin", "kind": "worldWorthWriting",
-      "prose": "I once wrote a generous place and left it unbound because I was afraid greed would make the choice for me. Caution made the choice instead. Loss does not become wisdom because you can defend it.",
+      "prose": "I wrote a generous world and refused to bind it because I distrusted my motive. The page was lost unused. I can explain the caution clearly; that does not recover the world.",
       "prefersConditions": []
     },
     {
       "id": "tovin_site_atlas_seam", "diary": "tovin", "kind": "ruin",
-      "prose": "Some worlds have a place where the old binding still catches. You can feel the page pull taut around it. Do not mistake finding the seam for deciding what deserves to hang from it.",
+      "prose": "Some worlds contain a natural anchor where the old binding still catches. The page pulls taut near it. Mark the seam first; decide what to attach only after you know the return route.",
       "site": "natural_anchor", "prefersConditions": []
     },
     { "id": "bryn_where_0", "diary": "bryn", "kind": "locationClue", "prose": "Close walls and bends block long views along nearly every path. I could watch one approach at a time here.", "about": "bryn", "clueIndex": 0, "prefersConditions": [] },
@@ -1258,9 +1258,9 @@
     { "id": "sabine_where_4", "diary": "sabine", "kind": "locationClue", "prose": "Hoofprints, paws and dragging tails reach the water by different banks. No creature has to pass another's shelter to drink.", "about": "sabine", "clueIndex": 4, "prefersConditions": [] },
     { "id": "sabine_where_5", "diary": "sabine", "kind": "locationClue", "prose": "There is open ground enough to approach and cover near enough to refuse. I could work here without making nearness the only safe choice.", "about": "sabine", "clueIndex": 5, "prefersConditions": [] },
     { "id": "sabine_where_6", "diary": "sabine", "kind": "locationClue", "prose": "The same calls begin at the same interval, and the same paths fill soon after. They can learn when I return; that does not mean they must come.", "about": "sabine", "clueIndex": 6, "prefersConditions": [] },
-    { "id": "sabine_coral", "diary": "sabine", "kind": "focus", "prose": "Coral is a structure made by lives that remain lives while building it. Colony is not another word for command.", "teachesFocus": "coral", "prefersConditions": [] },
-    { "id": "sabine_word_kestrel", "diary": "sabine", "kind": "whereabouts", "prose": "Kestrel reads what animals leave when no observer shaped the encounter. I read what changes after they learn I will return.", "about": "kestrel", "prefersConditions": [] },
-    { "id": "sabine_word_marrick", "diary": "sabine", "kind": "whereabouts", "prose": "Marrick makes routine carry people through fear. Ask him whether a creature that cannot refuse a position has joined the formation.", "about": "marrick", "prefersConditions": [] }
+    { "id": "sabine_coral", "diary": "sabine", "kind": "focus", "prose": "Coral is a shared structure built by many tiny animals that remain very much alive and very bad at introductions. Observe the colony; do not pry off a souvenir.", "teachesFocus": "coral", "prefersConditions": [] },
+    { "id": "sabine_word_kestrel", "diary": "sabine", "kind": "whereabouts", "prose": "Kestrel reads tracks made before an animal noticed us. I watch what changes after it learns my routine. Between us, the animal is usually several observations ahead.", "about": "kestrel", "prefersConditions": [] },
+    { "id": "sabine_word_marrick", "diary": "sabine", "kind": "whereabouts", "prose": "Marrick builds routines that still work when people panic. I asked where an animal may stand if it refuses the assigned position. He has been revising the diagram ever since.", "about": "marrick", "prefersConditions": [] }
     ,
     { "id": "grimmond_where_0", "diary": "grimmond", "kind": "locationClue", "prose": "Even the brightest interval leaves the lowest face unreadable. Value does not make a place consent to inspection.", "about": "grimmond", "clueIndex": 0, "prefersConditions": [] },
     { "id": "grimmond_where_1", "diary": "grimmond", "kind": "locationClue", "prose": "Stone and packed earth make up nearly all of this place. The ledger may call the material between seams waste; the roof disagrees.", "about": "grimmond", "clueIndex": 1, "prefersConditions": [] },
@@ -1269,9 +1269,9 @@
     { "id": "grimmond_where_4", "diary": "grimmond", "kind": "locationClue", "prose": "Every route closes behind another wall. Extraction makes an opening and assigns its absence somewhere else.", "about": "grimmond", "clueIndex": 4, "prefersConditions": [] },
     { "id": "grimmond_where_5", "diary": "grimmond", "kind": "locationClue", "prose": "Deep drops, high faces and steep shafts divide the ground vertically. Every route carries weight above it and open space below.", "about": "grimmond", "clueIndex": 5, "prefersConditions": [] },
     { "id": "grimmond_where_6", "diary": "grimmond", "kind": "locationClue", "prose": "Breath thins before stone yields. A body is the first support the plan spends.", "about": "grimmond", "clueIndex": 6, "prefersConditions": [] },
-    { "id": "grimmond_mercury", "diary": "grimmond", "kind": "focus", "prose": "Mercury moves through the low place and joins what looked separate. Containment is part of finding it, not work performed afterward.", "teachesFocus": "mercury", "prefersConditions": [] },
-    { "id": "grimmond_word_edren", "diary": "grimmond", "kind": "whereabouts", "prose": "Edren reads layers as history. I read which layer carries the next. We disagree whenever removing a record is also how one reaches it.", "about": "edren", "prefersConditions": [] },
-    { "id": "grimmond_account_empty_support", "diary": "grimmond", "kind": "account", "prose": "The yield matched the estimate. The empty chamber did too. Only the report treated one result as product and the other as surprise.", "prefersConditions": [] }
+    { "id": "grimmond_mercury", "diary": "grimmond", "kind": "focus", "prose": "Mercury runs to the lowest gap and joins pools through cracks you missed. Build the tray before opening the seam. Chasing it afterward is expensive and poisonous.", "teachesFocus": "mercury", "prefersConditions": [] },
+    { "id": "grimmond_word_edren", "diary": "grimmond", "kind": "whereabouts", "prose": "Edren wants every layer left readable. I need to know which layer holds the roof. We mark the record, photograph the face, then argue about whether I may remove it.", "about": "edren", "prefersConditions": [] },
+    { "id": "grimmond_account_empty_support", "diary": "grimmond", "kind": "account", "prose": "Ore yield: as estimated. Empty chamber: as estimated. Supports requested: denied because the chamber was listed as a by-product. The roof has not read the ledger.", "prefersConditions": [] }
     ,
     { "id": "oda_where_0", "diary": "oda", "kind": "locationClue", "prose": "Much of the ground is hard enough to keep its shape under force. A housing begins with what refuses to travel.", "about": "oda", "clueIndex": 0, "prefersConditions": [] },
     { "id": "oda_where_1", "diary": "oda", "kind": "locationClue", "prose": "Other parts of the ground react to pressure by shifting, venting or changing shape. Calling that instability does not explain the route.", "about": "oda", "clueIndex": 1, "prefersConditions": [] },
@@ -1281,8 +1281,9 @@
     { "id": "oda_where_5", "diary": "oda", "kind": "locationClue", "prose": "Heat gathers at every join intended to hold it. The housing reports its design through the first place it hurts.", "about": "oda", "clueIndex": 5, "prefersConditions": [] },
     { "id": "oda_where_6", "diary": "oda", "kind": "locationClue", "prose": "Light persists between bright intervals. A carrier can continue after its dramatic moment has passed.", "about": "oda", "clueIndex": 6, "prefersConditions": [] },
     { "id": "oda_where_7", "diary": "oda", "kind": "locationClue", "prose": "Light, weather and other world changes return on a highly predictable schedule. Repeating a test under the same interval can distinguish containment from luck.", "about": "oda", "clueIndex": 7, "prefersConditions": [] },
-    { "id": "oda_emanation_housing", "diary": "oda", "kind": "schematic", "prose": "A housing gives an emanation a route, a limit and a place to disclose failure. It does not make the force clean.", "teachesSchematic": "emanation_housing", "prefersConditions": [] },
-    { "id": "oda_word_fen", "diary": "oda", "kind": "whereabouts", "prose": "Fen stores work in tension and sends it across distance. I store an effect in a housing. His string makes the carrier visible; mine must do the same.", "about": "fen", "prefersConditions": [] },
+    { "id": "oda_emanation_housing", "diary": "oda", "kind": "schematic", "prose": "Housing requirements: defined inlet, constrained route, rated stop and visible failure point. The force remains hazardous. The housing makes its path inspectable.", "teachesSchematic": "emanation_housing", "prefersConditions": [] },
+    { "id": "oda_word_fen", "diary": "oda", "kind": "whereabouts", "prose": "Fen stores work in a drawn string and releases it along a visible carrier. My carrier may be heat, light or caustic charge. It must be equally traceable, though Fen objects to my use of 'equally.'",
+      "about": "fen", "prefersConditions": [] },
 
     { "id": "auber_where_0", "diary": "auber", "kind": "locationClue", "prose": "Water leaves a white mineral crust when it dries, and the next water carries the same sharp taste. Separation changes the carrier that follows.", "about": "auber", "clueIndex": 0, "prefersConditions": [] },
     { "id": "auber_where_1", "diary": "auber", "kind": "locationClue", "prose": "Water gathers into distinct bodies. A mixture needs an edge before its layers can be compared.", "about": "auber", "clueIndex": 1, "prefersConditions": [] },
@@ -1292,10 +1293,10 @@
     { "id": "auber_where_5", "diary": "auber", "kind": "locationClue", "prose": "The workable matter keeps to narrow seams. Precision can spare the ground or simply make taking more efficient.", "about": "auber", "clueIndex": 5, "prefersConditions": [] },
     { "id": "auber_where_6", "diary": "auber", "kind": "locationClue", "prose": "Vapour keeps the farther edge uncertain. What leaves the vessel remains part of the process even when nobody collects it.", "about": "auber", "clueIndex": 6, "prefersConditions": [] },
     { "id": "auber_where_7", "diary": "auber", "kind": "locationClue", "prose": "Conditions change sharply from one interval to the next, enough to alter the mixture each time. Repetition is not purification by itself.", "about": "auber", "clueIndex": 7, "prefersConditions": [] },
-    { "id": "auber_brine", "diary": "auber", "kind": "focus", "prose": "Brine is a carrier made consequential by what it holds. Concentration reveals a property and magnifies every cost attached to it.", "teachesFocus": "brine", "prefersConditions": [] },
-    { "id": "auber_word_nessa", "diary": "auber", "kind": "whereabouts", "prose": "Nessa asks what an extract does to this body, now. I ask what had to be concentrated first. A safe dose needs both questions.", "about": "nessa", "prefersConditions": [] },
-    { "id": "auber_word_grimmond", "diary": "auber", "kind": "whereabouts", "prose": "Grimmond brings material out of a load-bearing place. My vessels remove one part from another. The residue is where both crafts confess.", "about": "grimmond", "prefersConditions": [] },
-    { "id": "auber_word_oda", "diary": "auber", "kind": "whereabouts", "prose": "Oda gives the concentrated effect a route and boundary. If my output makes her housing harder to read, purity has made the instrument worse.", "about": "oda", "prefersConditions": [] },
+    { "id": "auber_brine", "diary": "auber", "kind": "focus", "prose": "Brine is water carrying enough dissolved salt to taste sharp and leave crystals as it dries. Reduce it slowly. Scorched salt ruins the finish and the room smells dreadful.", "teachesFocus": "brine", "prefersConditions": [] },
+    { "id": "auber_word_nessa", "diary": "auber", "kind": "whereabouts", "prose": "Nessa asks what the extract does to a particular body at a particular dose. I tell her what was concentrated and what remains dissolved. Then she stops me tasting it, usually correctly.", "about": "nessa", "prefersConditions": [] },
+    { "id": "auber_word_grimmond", "diary": "auber", "kind": "whereabouts", "prose": "Grimmond brings me ore with stone, water and occasionally half a support brace attached. I separate the useful fraction. He insists I label the residue by weight. He is right and graceless.", "about": "grimmond", "prefersConditions": [] },
+    { "id": "auber_word_oda", "diary": "auber", "kind": "whereabouts", "prose": "Oda needs an output whose concentration and carrier are exact enough to contain. If my pure fraction hides its remaining vapour, she sends it back with annotations sharp enough to cut glass.", "about": "oda", "prefersConditions": [] },
 
     { "id": "ashe_where_0", "diary": "ashe", "kind": "locationClue", "prose": "Heat rises through my feet before the sky changes. The body notices direction even when the instrument reports only amount.", "about": "ashe", "clueIndex": 0, "prefersConditions": [] },
     { "id": "ashe_where_1", "diary": "ashe", "kind": "locationClue", "prose": "The world swings sharply between heat and cold. My joints notice the change before the scale finishes moving.", "about": "ashe", "clueIndex": 1, "prefersConditions": [] },
@@ -1305,10 +1306,10 @@
     { "id": "ashe_where_5", "diary": "ashe", "kind": "locationClue", "prose": "The air brings the effect from several directions. A body cannot face every source, but it can name what that costs.", "about": "ashe", "clueIndex": 5, "prefersConditions": [] },
     { "id": "ashe_where_6", "diary": "ashe", "kind": "locationClue", "prose": "Growth continues beneath conditions called hostile. Survival proves capacity, not comfort.", "about": "ashe", "clueIndex": 6, "prefersConditions": [] },
     { "id": "ashe_where_7", "diary": "ashe", "kind": "locationClue", "prose": "Heat, light, wind and other conditions swing between mild and extreme states. Even a predictable return to the extreme is a burden on the body.", "about": "ashe", "clueIndex": 7, "prefersConditions": [] },
-    { "id": "ashe_teach_foe_emanating", "diary": "ashe", "kind": "gambit", "prose": "An emanating foe is already expressing force beyond the strike you can see. Answer the active release, not the category someone assigned its body.", "teachesGambit": "subject_foe_emanating", "prefersConditions": [] },
-    { "id": "ashe_word_oda", "diary": "ashe", "kind": "whereabouts", "prose": "Oda begins with the housing and asks where failure travels. I begin with the person and ask who was allowed to call endurance containment.", "about": "oda", "prefersConditions": [] },
-    { "id": "ashe_account_praised_endurance", "diary": "ashe", "kind": "account", "prose": "They praised the warning after I absorbed what I had warned them about. Before that, the same words were called sensitivity.", "prefersConditions": [] },
-    { "id": "ashe_site_spent_housing", "diary": "ashe", "kind": "ruin", "prose": "The housing is empty, but the stone around it still carries the release. An instrument can finish its task before a place finishes receiving it.", "site": "spent_emanation_housing", "prefersConditions": [] }
+    { "id": "ashe_teach_foe_emanating", "diary": "ashe", "kind": "gambit", "prose": "If a foe is emanating, the release is already happening around the visible attack. Ground or interrupt that active force first. The body producing it is not the whole hazard.", "teachesGambit": "subject_foe_emanating", "prefersConditions": [] },
+    { "id": "ashe_word_oda", "diary": "ashe", "kind": "whereabouts", "prose": "Oda asks where a failed housing sends the force. I ask who is standing in that path and whether they agreed to be there. We need both answers before a test.", "about": "oda", "prefersConditions": [] },
+    { "id": "ashe_account_praised_endurance", "diary": "ashe", "kind": "account", "prose": "I warned them the release was building. They called me sensitive. After I absorbed it, they called me strong. I needed them to move the first time.", "prefersConditions": [] },
+    { "id": "ashe_site_spent_housing", "diary": "ashe", "kind": "ruin", "prose": "The housing is empty. The surrounding stone is still hot and my hands are tingling. The device finished releasing; this place has not finished receiving it.", "site": "spent_emanation_housing", "prefersConditions": [] }
     ,
     { "id": "perren_where_0", "diary": "perren", "kind": "locationClue", "prose": "Bright light and deep shadow are both strong here, often side by side. They taught that conflict reveals the truer source; it may only reveal who selected the frame.", "about": "perren", "clueIndex": 0, "prefersConditions": [] },
     { "id": "perren_where_1", "diary": "perren", "kind": "locationClue", "prose": "Heat and cold press into the same interval. A forced choice between them would make either answer feel discovered.", "about": "perren", "clueIndex": 1, "prefersConditions": [] },
@@ -1319,9 +1320,9 @@
     { "id": "perren_where_6", "diary": "perren", "kind": "locationClue", "prose": "Haze obscures distant ground long before nearby objects disappear. Distance removes context before it removes the object.", "about": "perren", "clueIndex": 6, "prefersConditions": [] },
     { "id": "perren_where_7", "diary": "perren", "kind": "locationClue", "prose": "The same interval returns at a regular, predictable time. Repetition can teach expectation and then present fulfilment as revelation.", "about": "perren", "clueIndex": 7, "prefersConditions": [] },
     { "id": "perren_where_8", "diary": "perren", "kind": "locationClue", "prose": "Retreating water leaves a bright white mineral line along every bank. It looks inevitable after it appears; the water remembers otherwise.", "about": "perren", "clueIndex": 8, "prefersConditions": [] },
-    { "id": "perren_mirror", "diary": "perren", "kind": "focus", "prose": "A mirror reverses while appearing exact and excludes everything outside its edge. Use it to test a frame, never to certify one.", "teachesFocus": "mirror", "prefersConditions": [] },
-    { "id": "perren_word_lys", "diary": "perren", "kind": "whereabouts", "prose": "Lys keeps contradictory accounts together without requiring one to disappear. I once called that failure to conclude. I had been trained to fear the space she preserves.", "about": "lys", "prefersConditions": [] },
-    { "id": "perren_turn_unframed", "diary": "perren", "kind": "turn", "prose": "I cannot mark the sentence where belief became departure. Perhaps there was none. I began keeping the questions the lesson told me were already answered.", "prefersConditions": [] }
+    { "id": "perren_mirror", "diary": "perren", "kind": "focus", "prose": "A mirror offers exactness after reversing the image and cutting away everything beyond its edge. Useful, therefore, as an accusation against the frame—not as its witness.", "teachesFocus": "mirror", "prefersConditions": [] },
+    { "id": "perren_word_lys", "diary": "perren", "kind": "whereabouts", "prose": "Lys preserves contradictory accounts without forcing one to disappear. I once named that cowardice. The doctrine had trained me to fear any archive in which its victory was not inevitable.", "about": "lys", "prefersConditions": [] },
+    { "id": "perren_turn_unframed", "diary": "perren", "kind": "turn", "prose": "There is no sentence I can underline and call the moment belief became departure. I merely stopped discarding the questions the lesson announced it had already answered.", "prefersConditions": [] }
     ,
     { "id": "nine_where_0", "diary": "nine", "kind": "locationClue", "prose": "No interval arrives when the last one taught me to expect it. I can record surprise without treating it as failure.", "about": "nine", "clueIndex": 0, "prefersConditions": [] },
     { "id": "nine_where_1", "diary": "nine", "kind": "locationClue", "prose": "The world changes dramatically from one interval to the next. Both accounts belong to the person who wrote them.", "about": "nine", "clueIndex": 1, "prefersConditions": [] },
