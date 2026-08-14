@@ -625,6 +625,10 @@ extension GameStore {
     func inspectWorldPage(_ instanceID: InstanceID) -> Bool {
         guard let instance = collectedWorldPage(instanceID) else { return false }
         mutate("inspect collected World Page") {
+            guard let current = Self.resolvedWorldPage(instanceID, in: $0), current == instance,
+                  let index = $0.base.collectedWorldPages.firstIndex(where: { $0.id == instanceID })
+            else { return }
+            $0.base.collectedWorldPages[index].inspected = true
             $0.reality.recordEncounter(on: instance.definition.page)
         }
         return true

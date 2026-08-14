@@ -418,6 +418,7 @@ struct WritingDeskView: View {
         } else {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
                 ForEach(state.base.collectedWorldPages) { instance in
+                    let concealsFieldPage = instance.fieldProvenance != nil && !instance.inspected
                     Button {
                         if store.inspectWorldPage(instance.id) {
                             selectedWorldPageID = instance.id
@@ -425,16 +426,27 @@ struct WritingDeskView: View {
                         }
                     } label: {
                         VStack(alignment: .leading, spacing: 7) {
-                            WorldPageReadOnlyThumbnail(page: instance.definition.page)
-                                .frame(maxWidth: .infinity)
-                                .aspectRatio(1, contentMode: .fit)
-                            Text(instance.definition.title)
+                            if concealsFieldPage {
+                                Image(systemName: "doc.fill")
+                                    .font(.system(size: 34))
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity)
+                                    .aspectRatio(1, contentMode: .fit)
+                                    .accessibilityHidden(true)
+                            } else {
+                                WorldPageReadOnlyThumbnail(page: instance.definition.page)
+                                    .frame(maxWidth: .infinity)
+                                    .aspectRatio(1, contentMode: .fit)
+                            }
+                            Text(concealsFieldPage ? "Unknown page" : instance.definition.title)
                                 .font(.headline)
                                 .foregroundStyle(.primary)
-                            Text(instance.definition.provenance)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
+                            if !concealsFieldPage {
+                                Text(instance.definition.provenance)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                            }
                             Text("Bind · \(instance.definition.worldPageCost) Essence")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(.tint)
@@ -449,7 +461,7 @@ struct WritingDeskView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("\(instance.definition.title), collected World Page, costs \(instance.definition.worldPageCost) Essence")
+                    .accessibilityLabel("\(concealsFieldPage ? "Unknown page" : instance.definition.title), collected World Page, costs \(instance.definition.worldPageCost) Essence")
                 }
             }
             .padding(12)

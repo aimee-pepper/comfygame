@@ -7,6 +7,33 @@ import XCTest
 /// sits never changes what it says — and **refinement is literacy, not power** — a better hand lets
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
+    func testWritingDeskConcealsUninspectedWildPageAuthorityUntilExactOpen() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("instance.fieldProvenance != nil && !instance.inspected"))
+        XCTAssertTrue(source.contains("concealsFieldPage ? \"Unknown page\" : instance.definition.title"))
+        XCTAssertTrue(source.contains("if !concealsFieldPage"))
+    }
+
+    @MainActor
+    func testHomeInspectionPersistsExactWildPageKnowledge() throws {
+        let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))
+        let instance = WorldPageInstance(
+            id: InstanceID(rawValue: 7_001), definition: definition,
+            fieldProvenance: .init(originRunIndex: 2, originWorldSeed: 3,
+                                   generationSeed: 4, position: GridPoint(x: 1, y: 1)))
+        let store = GameStore(io: .temporary(name: "inspect-wild-home-\(UUID().uuidString)"))
+        store.mutate("install wild page") { $0.base.collectedWorldPages.append(instance) }
+        XCTAssertTrue(store.inspectWorldPage(instance.id))
+        let current = try XCTUnwrap(store.state.base.collectedWorldPages.first {
+            $0.id == instance.id
+        })
+        XCTAssertTrue(current.inspected)
+        XCTAssertEqual(store.state.reality.encounteredLexemes,
+                       definition.page.encounteredLexemes)
+    }
     func testRepeatableWorldPagesMatchGeneratedAuthorityAndCarryFieldIdentity() throws {
         let definitions = WorldPageCatalog.repeatableDefinitions
         XCTAssertEqual(definitions.map(\.id), [
