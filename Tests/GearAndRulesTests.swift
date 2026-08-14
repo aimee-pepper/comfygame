@@ -46,6 +46,13 @@ final class GearAndRulesTests: XCTestCase {
                       "Only candidates equipped on another character get a dashed border")
     }
 
+    func testFirepitUsesTheWholeOrdinaryWidthForOneTraveller() {
+        XCTAssertEqual(FirepitLayoutRules.ordinaryColumnCount(entryCount: 0), 1)
+        XCTAssertEqual(FirepitLayoutRules.ordinaryColumnCount(entryCount: 1), 1)
+        XCTAssertEqual(FirepitLayoutRules.ordinaryColumnCount(entryCount: 2), 2)
+        XCTAssertEqual(FirepitLayoutRules.ordinaryColumnCount(entryCount: 5), 2)
+    }
+
 
     func testFirepitPlacementPresentationDistinguishesHomePartyAndPostedRealm() {
         let home = FirepitPlacementPresentation(.home)

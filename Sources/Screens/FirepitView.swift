@@ -19,6 +19,12 @@ struct FirepitPlacementPresentation: Equatable {
     }
 }
 
+enum FirepitLayoutRules {
+    static func ordinaryColumnCount(entryCount: Int) -> Int {
+        entryCount <= 1 ? 1 : 2
+    }
+}
+
 /// Where the people you've brought home are, and who you can take with you.
 ///
 /// **It is not a second Party screen.** The Party screen is where somebody's gear, rules and stats
@@ -55,10 +61,11 @@ struct FirepitView: View {
     private var seatsLeft: Int {
         max(0, Tuning.Party.maximumSize - 1 - store.state.base.activeParty.count)
     }
-    private var columns: [GridItem] {
-        dynamicTypeSize.isAccessibilitySize
-            ? [GridItem(.flexible())]
-            : [GridItem(.flexible(), spacing: 10), GridItem(.flexible())]
+    private func columns(entryCount: Int) -> [GridItem] {
+        let count = dynamicTypeSize.isAccessibilitySize
+            ? 1
+            : FirepitLayoutRules.ordinaryColumnCount(entryCount: entryCount)
+        return Array(repeating: GridItem(.flexible(), spacing: 10), count: count)
     }
 
     var body: some View {
@@ -128,14 +135,52 @@ struct FirepitView: View {
                     .padding(14)
                     .background(Color(.secondarySystemGroupedBackground),
                                 in: RoundedRectangle(cornerRadius: 14))
+            } else if let entry = entries.first, entries.count == 1 {
+                singleMemberRow(entry.member, index: entry.index)
             } else {
-                LazyVGrid(columns: columns, spacing: 10) {
+                LazyVGrid(columns: columns(entryCount: entries.count), spacing: 10) {
                     ForEach(entries, id: \.index) { entry in
                         memberTile(entry.member, index: entry.index)
                     }
                 }
             }
         }
+    }
+
+    private func singleMemberRow(_ member: CompanionState, index: Int) -> some View {
+        let placement = FirepitPlacementPresentation(store.placement(of: index))
+        return HStack(spacing: 12) {
+            NamedCharacterPixelIdentity(
+                travellerID: member.traveller,
+                fallbackSystemIcon: member.icon,
+                fallbackColor: .orange
+            )
+            .frame(width: 44, height: 44)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(member.name)
+                    .font(.callout.weight(.semibold))
+                    .lineLimit(1)
+                Text(member.calling.isEmpty
+                     ? "Level \(member.character.level)"
+                     : "\(member.calling.capitalisedSentence) · level \(member.character.level)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                Label(placement.label, systemImage: placement.icon)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 4)
+            transferButton(index: index)
+                .frame(minWidth: 96)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 76, alignment: .leading)
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 14))
     }
 
     /// Location and departure choice only; detailed character management remains on Party.
@@ -167,22 +212,8 @@ struct FirepitView: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             Spacer(minLength: 0)
-            if store.isComing(index) {
-                Button("Send Home") {
-                    if case .refused(let message) = store.setComingHome(index) {
-                        transferRefusal = message
-                    }
-                }
-                    .font(.caption.weight(.semibold))
-                    .buttonStyle(.bordered)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-            } else {
-                Button("Take them") { pendingTransfer = store.partyTransferPreview(for: index) }
-                    .font(.caption.weight(.semibold))
-                    .buttonStyle(.borderedProminent)
-                    .disabled(seatsLeft == 0)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-            }
+            transferButton(index: index)
+                .frame(maxWidth: .infinity)
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: dynamicTypeSize.isAccessibilitySize ? 164 : 176,
@@ -190,6 +221,26 @@ struct FirepitView: View {
         .background(Color(.secondarySystemGroupedBackground),
                     in: RoundedRectangle(cornerRadius: 14))
         .accessibilityElement(children: .contain)
+    }
+
+    @ViewBuilder
+    private func transferButton(index: Int) -> some View {
+        if store.isComing(index) {
+            Button("Send Home") {
+                if case .refused(let message) = store.setComingHome(index) {
+                    transferRefusal = message
+                }
+            }
+            .font(.caption.weight(.semibold))
+            .buttonStyle(.bordered)
+            .frame(minHeight: 44)
+        } else {
+            Button("Take them") { pendingTransfer = store.partyTransferPreview(for: index) }
+                .font(.caption.weight(.semibold))
+                .buttonStyle(.borderedProminent)
+                .disabled(seatsLeft == 0)
+                .frame(minHeight: 44)
+        }
     }
 
     private func transferMessage(_ preview: PartyTransferPreview) -> String {
