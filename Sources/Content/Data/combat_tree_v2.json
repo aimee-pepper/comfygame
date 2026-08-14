@@ -3,8 +3,8 @@
   "schemaVersion": 2,
   "graphVersion": 2,
   "authoritySHA256": "235abe8b86e4f39dec920c8dd47063be3adc4b2a8189e5adcefdc83ca1378d0f",
-  "effectCopySHA256": "175ea991e0ff476696b8616eac3c3cc459fe0e0cd85b4837dfdf7406c709b094",
-  "effectCopySourceMarkdownSHA256": "071e284536c00aa7389c72b92c6323db6ece54cf201974ffa9f5c5411b417ecc",
+  "effectCopySHA256": "220d5a0812ad63f51b39de8def8b75d03b7c851f98f813508d1f0a4ed2d91baf",
+  "effectCopySourceMarkdownSHA256": "d33ddf802b7620952a997575ede5dd3fffb252ddc6774a89076cf5a5d73cca53",
   "capstoneGate": {
     "minimumPriorNodesInTree": 7,
     "minimumNodesInCapstoneDisciplineIncludingCapstone": 5,
@@ -447,7 +447,7 @@
               },
               "legacyTechniqueID": "quicken",
               "techniqueID": "quicken",
-              "effectCopy": "Take one extra action now, then skip your next personal turn; cannot combine with Blur this turn.",
+              "effectCopy": "As zero-turn setup, take two ordinary actions now, then skip your next personal turn; cannot combine with Blur.",
               "sameDisciplineParents": [
                 "combat.offense.swiftness.quick_step"
               ],
@@ -511,7 +511,7 @@
               },
               "legacyTechniqueID": "first_strike",
               "techniqueID": "first_strike",
-              "effectCopy": "On your first completed action, attack for +4 raw damage without allowing retaliation.",
+              "effectCopy": "As your first normal-cost action, attack for +4 raw damage without allowing retaliation.",
               "sameDisciplineParents": [
                 "combat.offense.swiftness.second_wind"
               ],
@@ -632,7 +632,7 @@
               },
               "legacyTechniqueID": "brace",
               "techniqueID": "brace",
-              "effectCopy": "Reduce incoming damage through your next enemy-action window.",
+              "effectCopy": "Reduce direct damage by 35% through the next hostile action slot that damages you.",
               "sameDisciplineParents": [
                 "combat.defense.fortitude.thick_hide"
               ],
@@ -696,7 +696,7 @@
               },
               "legacyTechniqueID": "ward",
               "techniqueID": "ward",
-              "effectCopy": "Choose one disclosed harm kind; reduce matching harm until the Ward expires.",
+              "effectCopy": "Choose one disclosed harm kind; reduce matching direct harm by 60% this round and next round.",
               "sameDisciplineParents": [
                 "combat.defense.fortitude.constitution"
               ],
@@ -1008,7 +1008,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
-              "effectCopy": "Halve the chance that an ordinary encounter begins as an ambush; party copies do not stack.",
+              "effectCopy": "Gain a 50% chance to turn an ordinary creature ambush into mutual contact; party copies do not stack.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.light_frame"
               ],
@@ -1030,7 +1030,7 @@
               },
               "legacyTechniqueID": "fall_back",
               "techniqueID": "fall_back",
-              "effectCopy": "Change your rank without spending your action; this ends Bracing Stance.",
+              "effectCopy": "As zero-turn setup, change Front↔Back and keep your ordinary action; this ends Bracing Stance.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.sidestep"
               ],
@@ -1051,7 +1051,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
-              "effectCopy": "After your direct attack, gain +10 percentage-point evasion until your next completed action.",
+              "effectCopy": "After your direct attack, gain +10 percentage-point evasion through your next normal-cost action.",
               "sameDisciplineParents": [
                 "combat.defense.evasion.slippery"
               ],
@@ -1172,7 +1172,7 @@
               },
               "legacyTechniqueID": "envenom",
               "techniqueID": "envenom",
-              "effectCopy": "Temporarily coat your weapon with Poison for this encounter without using an inventory coating.",
+              "effectCopy": "Arm your next 3 landed physical-weapon hits with Poison 2×3; misses spend no charge.",
               "sameDisciplineParents": [
                 "combat.craft.venom.tainted_edge"
               ],
@@ -1215,7 +1215,7 @@
               },
               "legacyTechniqueID": "flense",
               "techniqueID": "flense",
-              "effectCopy": "Wound one foe; denser covering makes the hit stronger and the Bleed keeps opening.",
+              "effectCopy": "Apply 3 Bleed ticks at 9% of covering insulation, rounded to at least 1 damage per tick.",
               "sameDisciplineParents": [
                 "combat.craft.venom.envenom"
               ],
@@ -1349,7 +1349,7 @@
               },
               "legacyTechniqueID": "elemental_strike",
               "techniqueID": "emanation_strike",
-              "effectCopy": "Strike with chosen Heat, Caustic or Light, applying Burn, Poison or Dazzle respectively.",
+              "effectCopy": "Make a 9-power Heat, Caustic or Light attack, carrying Burn 4×2, Poison 2×4 or Dazzle 0×2.",
               "sameDisciplineParents": [
                 "combat.craft.emanation.sparkhand"
               ],
@@ -1393,7 +1393,7 @@
               },
               "legacyTechniqueID": "snuff",
               "techniqueID": "snuff",
-              "effectCopy": "Suppress one foe's active emanation for 2 rounds.",
+              "effectCopy": "Suppress one foe's active emanation through its next 2 complete hostile turns.",
               "sameDisciplineParents": [
                 "combat.craft.emanation.emanation_strike"
               ],
@@ -1527,7 +1527,7 @@
               },
               "legacyTechniqueID": "conceal",
               "techniqueID": "conceal",
-              "effectCopy": "Prevent direct targeting while another legal target exists for the effect's duration.",
+              "effectCopy": "Through next round, prevent direct targeting while another legal target exists; attacking or intervening reveals you.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.quiet_step"
               ],
@@ -1548,7 +1548,7 @@
               },
               "legacyTechniqueID": null,
               "techniqueID": null,
-              "effectCopy": "Your first direct hit while concealed or immediately after emerging deals +5 raw damage.",
+              "effectCopy": "Your first landed direct hit while concealed or in the action when you emerge deals +5 raw damage.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.low_profile"
               ],
@@ -1570,7 +1570,7 @@
               },
               "legacyTechniqueID": "ambush",
               "techniqueID": "ambush",
-              "effectCopy": "Before your first completed action when the party was not ambushed, make one free direct attack; only one free opening attack is allowed.",
+              "effectCopy": "In an eligible opening, make one shared free direct attack before your first normal-cost action.",
               "sameDisciplineParents": [
                 "combat.craft.shadow.conceal"
               ],

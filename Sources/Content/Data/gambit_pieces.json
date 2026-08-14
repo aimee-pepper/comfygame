@@ -1,0 +1,50 @@
+{
+  "_note": "PLACEHOLDER prices. Starter 3 + 2 purchasable, per design-brief-v0. Conditions/actions are loose specs; the engine that interprets them lands in milestone 4. The catalog is meant to grow toward FF12-scale granularity in staged unlocks (research-pass-3 part 2 — mirror the ORIGINAL PS2 staging, not Zodiac Age's all-at-once).",
+  "gambitPieces": [
+    {
+      "id": "foe_any_attack",
+      "name": "Foe: any → Attack",
+      "icon": "target",
+      "acquisition": "starter",
+      "essenceCost": 0,
+      "condition": { "kind": "foe.any" },
+      "action": { "kind": "attack" }
+    },
+    {
+      "id": "ally_hp_below_50_heal",
+      "name": "Ally HP < 50% → Heal",
+      "icon": "cross.case",
+      "acquisition": "starter",
+      "essenceCost": 0,
+      "condition": { "kind": "ally.hpBelow", "threshold": 0.5 },
+      "action": { "kind": "heal" }
+    },
+    {
+      "id": "foe_lowest_hp_attack",
+      "name": "Foe: lowest HP → Attack",
+      "icon": "arrow.down.right.circle",
+      "acquisition": "starter",
+      "essenceCost": 0,
+      "condition": { "kind": "foe.lowestHP" },
+      "action": { "kind": "attack" }
+    },
+    {
+      "id": "foe_hp_below_30_attack",
+      "name": "Foe HP < 30% → Attack",
+      "icon": "bolt.heart",
+      "acquisition": "research",
+      "essenceCost": 8,
+      "condition": { "kind": "foe.hpBelow", "threshold": 0.3 },
+      "action": { "kind": "attack" }
+    },
+    {
+      "id": "self_hp_below_30_flee",
+      "name": "Self HP < 30% → Flee",
+      "icon": "figure.run",
+      "acquisition": "research",
+      "essenceCost": 8,
+      "condition": { "kind": "self.hpBelow", "threshold": 0.3 },
+      "action": { "kind": "flee" }
+    }
+  ]
+}

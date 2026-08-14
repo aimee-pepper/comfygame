@@ -86,6 +86,7 @@
 		29B3C3CAADACAFAFCD2D213B /* NativeVisualPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B52219A7EE3D04B75EED3BE /* NativeVisualPack.swift */; };
 		2AAA4E398F09BD29BAD7816B /* stations.json in Resources */ = {isa = PBXBuildFile; fileRef = 59F1E2A3A08364F9452A684F /* stations.json */; };
 		2C0118338DCCD9231D0DE4D0 /* GambitEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EEBBF5F9C846FD07202D739 /* GambitEditorView.swift */; };
+		2EB9403AD8A6CC32F54FBFA1 /* upgrades.json in Resources */ = {isa = PBXBuildFile; fileRef = 84E44EC84F5C25D11A62DAC1 /* upgrades.json */; };
 		2C398C0FAAD42106E4E5799B /* TravellerWorldPacingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5758ECEC1BAA08D7EF63F2 /* TravellerWorldPacingTests.swift */; };
 		2F11A7C912A84D768B774A01 /* design-homework.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F11A7C912A84D768B774A02 /* design-homework.json */; };
 		3062AB49BB5A3BBCC3A396BD /* Combat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD3736ADDC83B6481EFAC9A /* Combat.swift */; };
@@ -176,6 +177,7 @@
 		8D526864C54EBC0CB6BDC575 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F045A414F1C1CF9A9A916BB /* RootView.swift */; };
 		8E1AFCB6CD0FBDD0EA84B800 /* ArmouryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAAE51E0323DDA3AA3015D22 /* ArmouryRules.swift */; };
 		8F6B0EF541120D379B1FD06B /* BestiaryRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A588AFCFC47B584CE07F3B4E /* BestiaryRules.swift */; };
+		8FFEAFA9BDCBAB82E11ACD27 /* gambit_pieces.json in Resources */ = {isa = PBXBuildFile; fileRef = 9576197010FD2BAC456588C6 /* gambit_pieces.json */; };
 		91761E73D4647CB7D2741D93 /* FloraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB87254230F32E20320932D7 /* FloraTests.swift */; };
 		9325056626B6BA2E7E6AA3B1 /* CombatDerivedStatsFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A186B96AD87CB57DEDF8F4D7 /* CombatDerivedStatsFoundationTests.swift */; };
 		94095A78E4E8679458940F25 /* ExpeditionOutcomeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B11474BCFC5AFD1111E98E7 /* ExpeditionOutcomeTests.swift */; };
@@ -443,6 +445,7 @@
 		818724CCF5EB78A3DCEC46E4 /* TradingPostFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingPostFlowTests.swift; sourceTree = "<group>"; };
 		82FFD007E856531EEC9D5703 /* CampaignAppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampaignAppCoordinator.swift; sourceTree = "<group>"; };
 		83F481D57E05D77B109D44FC /* SaveToleranceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveToleranceTests.swift; sourceTree = "<group>"; };
+		84E44EC84F5C25D11A62DAC1 /* upgrades.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = upgrades.json; sourceTree = "<group>"; };
 		2F11A7C912A84D768B774A02 /* design-homework.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "design-homework.json"; sourceTree = "<group>"; };
 		8581D80804C54BB6F112E428 /* DebugRoadmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRoadmapView.swift; sourceTree = "<group>"; };
 		86093A93DD9720F92E4148D5 /* GameStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStore.swift; sourceTree = "<group>"; };
@@ -462,6 +465,7 @@
 		9142092437E5652D87187DF8 /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
 		92B2180E4666F5000817D3EC /* ContradictionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContradictionRules.swift; sourceTree = "<group>"; };
 		92E6DEE432F7A225C5C28D6E /* DescriptionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionRules.swift; sourceTree = "<group>"; };
+		9576197010FD2BAC456588C6 /* gambit_pieces.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = gambit_pieces.json; sourceTree = "<group>"; };
 		961E1AC7BEB7E7C4C243CAD1 /* ExclusivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExclusivityTests.swift; sourceTree = "<group>"; };
 		99D023496EC834EA78E9BE63 /* CombatRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombatRules.swift; sourceTree = "<group>"; };
 		9A5E11DF83FB060B8C22D36A /* WorldInspectionRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldInspectionRules.swift; sourceTree = "<group>"; };
@@ -816,6 +820,7 @@
 				9F9F6F9740167F61E0AD0158 /* descriptions.json */,
 				2F11A7C912A84D768B774A02 /* design-homework.json */,
 				6AE18B24DF2998D5D65F61D0 /* gambit_components.json */,
+				9576197010FD2BAC456588C6 /* gambit_pieces.json */,
 				89776C411F7BC83CF86396E9 /* items.json */,
 				AE024D65F580FDE6AE922F0E /* playability-roadmap.json */,
 				A29A4F3CFC9073B8F80064F4 /* pressure_sources.json */,
@@ -829,6 +834,7 @@
 				59F1E2A3A08364F9452A684F /* stations.json */,
 				A4270CCCF203CAA8859A086B /* symbols.json */,
 				5D960FCB6727D86D57A82BF4 /* travellers.json */,
+				84E44EC84F5C25D11A62DAC1 /* upgrades.json */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -1115,6 +1121,7 @@
 				260B2ACBF0A66A2DBA4E1813 /* descriptions.json in Resources */,
 				2F11A7C912A84D768B774A01 /* design-homework.json in Resources */,
 				E412FF242D7E09BD9DBB75E8 /* gambit_components.json in Resources */,
+				8FFEAFA9BDCBAB82E11ACD27 /* gambit_pieces.json in Resources */,
 				DDBFEBACC92B746BC023CF6D /* items.json in Resources */,
 				AEBEF81AB87C48DD9D3C7AA1 /* playability-roadmap.json in Resources */,
 				1BDE5DBB7E79B5D05413B0FE /* pressure_sources.json in Resources */,
@@ -1128,6 +1135,7 @@
 				2AAA4E398F09BD29BAD7816B /* stations.json in Resources */,
 				94381815D9D6D36F24168B83 /* symbols.json in Resources */,
 				CFFD06DFE407E96C28AB6464 /* travellers.json in Resources */,
+				2EB9403AD8A6CC32F54FBFA1 /* upgrades.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

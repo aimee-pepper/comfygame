@@ -174,6 +174,8 @@ enum CombatAction: Codable, Equatable, Sendable {
     case ward(Harm)
     /// Canonical Quench carries both the exact ally and the saved affliction application receipt.
     case quench(ally: Combatant, afflictionReceipt: UInt64)
+    /// Blur has no legacy SkillDef row. Its stable combat-tree node is the complete action identity.
+    case blur
     /// The two the gambit vocabulary still speaks in: "use your damage skill", "use your heal".
     /// Resolved against whatever the member actually carries.
     case damageSkill(foe: InstanceID)
@@ -268,6 +270,16 @@ struct FoeState: Codable, Equatable, Identifiable, Sendable {
 /// A fight in progress. Saved in full — being mid-encounter is the hardest resume case in the game,
 /// and the one the acceptance criteria call out by name.
 struct EncounterState: Codable, Equatable, Sendable {
+    enum PersonalExpansionSource: String, Codable, Equatable, Sendable {
+        case quicken, blur, legacy
+    }
+
+    struct PersonalTurnReceipt: Codable, Equatable, Sendable {
+        var owner: Combatant
+        var setupAvailable = true
+        var normalCreditsRemaining = 1
+        var expansionSource: PersonalExpansionSource?
+    }
     struct DebugV2InitiativeReceipt: Codable, Equatable, Sendable {
         struct Component: Codable, Equatable, Sendable {
             var nodeID: CombatNodeID
@@ -605,8 +617,14 @@ struct EncounterState: Codable, Equatable, Sendable {
     var statusGuards: [Combatant: Int] = [:]
     /// Consumed by this combatant's next successful weapon strike, including a weapon skill.
     var preparedCoatings: [Combatant: PreparedCoating] = [:]
-    /// Extra turns owed, and turns owed back. Quicken buys the first with the second.
+    /// Decode-only compatibility source. Modern v2 encounters adopt these into personal turns.
     var extraTurns: [Combatant: Int] = [:]
+    /// Nil is legacy/unadopted. Modern state owns one currently scheduled personal block.
+    var personalTurn: PersonalTurnReceipt?
+    /// Blur is once per encounter for each exact owner. Modern empty is authoritative/unspent.
+    var blurSpent: Set<Combatant>?
+    /// The first normal-cost action is spent even when it misses.
+    var firstNormalActionCompleted: Set<Combatant>?
     /// **What the Craft and Defense branches leave on somebody**, in rounds remaining.
     ///
     /// One shape for five effects rather than five fields: bracing softens everything, dodging eats
@@ -707,6 +725,8 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.braceReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.breakingBlowScheduledSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.breakingBlowOpeningSpent = debugV2OwnedNodeIDs == nil ? nil : []
+        self.blurSpent = debugV2OwnedNodeIDs == nil ? nil : []
+        self.firstNormalActionCompleted = debugV2OwnedNodeIDs == nil ? nil : []
         self.partyRanks = partyRanks
         self.rankAtPreviousCompletedAction = debugV2OwnedNodeIDs == nil ? nil : partyRanks
         self.afflictions = []
@@ -829,6 +849,12 @@ struct EncounterState: Codable, Equatable, Sendable {
         preparedCoatings = try c.decodeIfPresent([Combatant: PreparedCoating].self,
                                                  forKey: .preparedCoatings) ?? [:]
         extraTurns = try c.decodeIfPresent([Combatant: Int].self, forKey: .extraTurns) ?? [:]
+        personalTurn = try c.decodeIfPresent(PersonalTurnReceipt.self, forKey: .personalTurn)
+        blurSpent = try c.decodeIfPresent(Set<Combatant>.self, forKey: .blurSpent)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [])
+        firstNormalActionCompleted = try c.decodeIfPresent(Set<Combatant>.self,
+                                                            forKey: .firstNormalActionCompleted)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [])
         skippedTurns = try c.decodeIfPresent([Combatant: Int].self, forKey: .skippedTurns) ?? [:]
         recoveryComplete = try c.decodeIfPresent(Set<Combatant>.self, forKey: .recoveryComplete) ?? []
         isCompanionOverridden = try c.decodeIfPresent(Bool.self, forKey: .isCompanionOverridden) ?? false

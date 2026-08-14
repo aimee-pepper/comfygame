@@ -59,10 +59,10 @@ values come from the same tuning source as the mechanic, not unrelated view cons
 |---|---|
 | Quick Step | Gain +4 initiative. |
 | Light Touch | Halve initiative penalties from equipped gear, rounding toward 0. |
-| Quicken | Take one extra action now, then skip your next personal turn; cannot combine with Blur this turn. |
+| Quicken | As zero-turn setup, take two ordinary actions now, then skip your next personal turn; cannot combine with Blur. |
 | Second Wind | When you defeat a foe, recover 3 HP if still conscious. |
 | Flurry | A landed direct attack carries 40% of damage dealt to one other legal foe; it cannot chain. |
-| First Strike | On your first completed action, attack for +4 raw damage without allowing retaliation. |
+| First Strike | As your first normal-cost action, attack for +4 raw damage without allowing retaliation. |
 | Cascade | Each foe you defeat grants +3 initiative for this encounter, up to three times. |
 | Blur | Once per encounter, take two ordinary actions without spending this action; cannot combine with Quicken this turn. |
 
@@ -74,10 +74,10 @@ values come from the same tuning source as the mechanic, not unrelated view cons
 |---|---|
 | Thick Hide | Gain +6 maximum and starting expedition HP. |
 | Iron Skin | Gain +2 armour after equipment and sturdiness. |
-| Brace | Reduce incoming damage through your next enemy-action window. |
+| Brace | Reduce direct damage by 35% through the next hostile action slot that damages you. |
 | Constitution | Burn, Poison, Dazzle and Bleed on you last half as many rounds, rounded up. |
 | Endurance | At half HP or less, reduce final incoming damage by 25%, without passing the global minimum. |
-| Ward | Choose one disclosed harm kind; reduce matching harm until the Ward expires. |
+| Ward | Choose one disclosed harm kind; reduce matching direct harm by 60% this round and next round. |
 | Unyielding | Once per encounter, harm that would pass you out leaves you at 1 HP. |
 | Immovable | Your armour also applies against Pierce, Heat, Caustic and Light damage. |
 
@@ -101,9 +101,9 @@ values come from the same tuning source as the mechanic, not unrelated view cons
 | Footwork | Foes are 6 percentage points more likely to miss you. |
 | Light Frame | Gain +3 initiative. |
 | Sidestep | The next otherwise legal attack against you misses; its affliction also fails. |
-| Slippery | Halve the chance that an ordinary encounter begins as an ambush; party copies do not stack. |
-| Fall Back | Change your rank without spending your action; this ends Bracing Stance. |
-| Feint | After your direct attack, gain +10 percentage-point evasion until your next completed action. |
+| Slippery | Gain a 50% chance to turn an ordinary creature ambush into mutual contact; party copies do not stack. |
+| Fall Back | As zero-turn setup, change Front↔Back and keep your ordinary action; this ends Bracing Stance. |
+| Feint | After your direct attack, gain +10 percentage-point evasion through your next normal-cost action. |
 | Untouchable | At round end, gain +5 percentage-point evasion if targeted but not hit, up to +20; a hit resets it. |
 | Ghost | The first otherwise legal attack against you each encounter misses. |
 
@@ -115,9 +115,9 @@ values come from the same tuning source as the mechanic, not unrelated view cons
 |---|---|
 | Tainted Edge | Landed direct weapon hits apply weak Poison: 1 damage for 2 rounds, unless stronger Poison is present. |
 | Apothecary's Hand | Beneficial items you use gain +50% magnitude or duration; harmful thrown items are unchanged. |
-| Envenom | Temporarily coat your weapon with Poison for this encounter without using an inventory coating. |
+| Envenom | Arm your next 3 landed physical-weapon hits with Poison 2×3; misses spend no charge. |
 | Virulence | Afflictions you directly apply last +2 rounds after resistance. |
-| Flense | Wound one foe; denser covering makes the hit stronger and the Bleed keeps opening. |
+| Flense | Apply 3 Bleed ticks at 9% of covering insulation, rounded to at least 1 damage per tick. |
 | Corrode | The first tick each round from Poison you applied reduces that foe's armour by 1. |
 | Distiller | Coatings prepared for you use 40% fewer positive world-resource ingredients, rounded up; Essence is unchanged. |
 | Blight | New or strengthened Poison you apply copies at half strength and duration to one other foe; it cannot spread again. |
@@ -128,9 +128,9 @@ values come from the same tuning source as the mechanic, not unrelated view cons
 |---|---|
 | Sparkhand | Landed direct weapon hits apply weak Burn: 1 damage for 2 rounds, unless stronger Burn is present. |
 | Insulation | Choose Heat, Caustic or Light when learned; take 35% less matching emanation damage. |
-| Emanation Strike | Strike with chosen Heat, Caustic or Light, applying Burn, Poison or Dazzle respectively. |
+| Emanation Strike | Make a 9-power Heat, Caustic or Light attack, carrying Burn 4×2, Poison 2×4 or Dazzle 0×2. |
 | Attunement | Emanation Strike and Channelworks attacks deal +3 raw damage. |
-| Snuff | Suppress one foe's active emanation for 2 rounds. |
+| Snuff | Suppress one foe's active emanation through its next 2 complete hostile turns. |
 | Quench | Choose one ally and remove one selected Burn, Poison or Dazzle; Bleed and unchosen conditions remain. |
 | Conduction | A direct emanation hit carries 50% damage and half-duration affliction to one other foe; it cannot chain. |
 | Emanant | Choose Heat, Caustic or Light when learned. Ordinary direct attacks carry its weak matching affliction; matching Sparkhand or Tainted Edge strengthens that application, while a nonmatching root remains separate. |
@@ -141,9 +141,9 @@ values come from the same tuning source as the mechanic, not unrelated view cons
 |---|---|
 | Quiet Step | Once per ordinary roaming creature, turn its first distant movement detection into one visible alert turn instead of immediate pursuit. |
 | Low Profile | Reduce the party's detection radius by 1 tile. This actor also gains +6 evasion during an ordinary creature ambush's foe-only opening actions. |
-| Conceal | Prevent direct targeting while another legal target exists for the effect's duration. |
-| Opportunist | Your first direct hit while concealed or immediately after emerging deals +5 raw damage. |
-| Ambush | Before your first completed action when the party was not ambushed, make one free direct attack; only one free opening attack is allowed. |
+| Conceal | Through next round, prevent direct targeting while another legal target exists; attacking or intervening reveals you. |
+| Opportunist | Your first landed direct hit while concealed or in the action when you emerge deals +5 raw damage. |
+| Ambush | In an eligible opening, make one shared free direct attack before your first normal-cost action. |
 | Vanish | Once per expedition, the confirmed ordinary combat retreat costs no Stability. |
 | Shadowed | Reduce the party's detection radius by 2 tiles, replacing Low Profile's field reduction but not its personal ambush-opening evasion. |
 | Unseen | Begin ordinary encounters concealed through the end of the first ordinary round; this does not cancel an ambush. |

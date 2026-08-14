@@ -69,6 +69,18 @@ extension GameStore {
 
     var hasAnyReadySkill: Bool { !readySkills.isEmpty }
 
+    /// Blur is a graph action without a legacy catalogue row.
+    var canBlur: Bool {
+        guard let actor = actingCombatant, let encounter = activeEncounter else { return false }
+        return encounter.debugV2OwnedNodeIDs?[actor]?.contains(
+            "combat.offense.swiftness.blur") == true
+            && encounter.personalTurn?.owner == actor
+            && encounter.personalTurn?.setupAvailable == true
+            && encounter.personalTurn?.normalCreditsRemaining == 1
+            && encounter.personalTurn?.expansionSource == nil
+            && encounter.blurSpent?.contains(actor) == false
+    }
+
     /// Rounds until a given skill is up again, for the list.
     func cooldown(of skill: SkillDef) -> Int {
         guard let encounter = activeEncounter, let actor = actingCombatant else { return 0 }
@@ -221,6 +233,7 @@ extension GameStore {
         case .skill(let id, _, _): "skill \(id.rawValue)"
         case .ward(let harm): "ward \(harm.displayName)"
         case .quench: "quench"
+        case .blur: "blur"
         case .damageSkill, .healSkill: "skill"
         case .useItem: "item"
         case .flee: "flee"

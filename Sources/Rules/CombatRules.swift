@@ -7,6 +7,23 @@ import Foundation
 /// comes off the run's saved RNG, so a force-quit mid-round resumes to the same fight rather than
 /// re-rolling in anyone's favour.
 enum CombatRules {
+    private static let quickenNode: CombatNodeID = "combat.offense.swiftness.quicken"
+    private static let blurNode: CombatNodeID = "combat.offense.swiftness.blur"
+    private static let overbearNode: CombatNodeID = "combat.offense.force.overbear"
+    private static let firstStrikeNode: CombatNodeID = "combat.offense.swiftness.first_strike"
+
+    static func firstStrikeRawBonus(actor: Combatant, encounter: EncounterState) -> Int {
+        encounter.debugV2OwnedNodeIDs?[actor]?.contains(firstStrikeNode) == true
+            && encounter.firstNormalActionCompleted?.contains(actor) == false ? 4 : 0
+    }
+
+    private static func usesPersonalTurnAuthority(_ encounter: EncounterState) -> Bool {
+        if encounter.personalTurn != nil { return true }
+        let nodes = [quickenNode, blurNode, overbearNode, firstStrikeNode]
+        return encounter.debugV2OwnedNodeIDs?.values.contains { owned in
+            nodes.contains(where: owned.contains)
+        } == true
+    }
 
     // MARK: Starting a fight
 
@@ -496,7 +513,8 @@ enum CombatRules {
     static func skills(for actor: Combatant, in state: GameState) -> [SkillDef] {
         var owned = CombatActionOwnershipRules.availableSkillIDs(for: actor, in: state)
         if let modern = state.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs {
-            owned.subtract(["steady", "snuff", "interpose", "draw_off"])
+            owned.subtract(["steady", "snuff", "interpose", "draw_off", "quicken",
+                            "overbear", "first_strike"])
             if modern[actor]?.contains(CombatDerivedStatsRules.Node.quench) == true {
                 owned.insert("quench")
             }
@@ -509,6 +527,9 @@ enum CombatRules {
             if modern[actor]?.contains(CombatDerivedStatsRules.Node.drawOff) == true {
                 owned.insert("draw_off")
             }
+            if modern[actor]?.contains(quickenNode) == true { owned.insert("quicken") }
+            if modern[actor]?.contains(overbearNode) == true { owned.insert("overbear") }
+            if modern[actor]?.contains(firstStrikeNode) == true { owned.insert("first_strike") }
         }
         return ContentCatalog.shared.skills.filter { owned.contains($0.id) }
     }
@@ -556,7 +577,7 @@ enum CombatRules {
         }
         return skills(for: actor, in: state)
             .filter { $0.kind != .heal && $0.kind != .rout }
-            .filter { cooldown(of: $0, for: actor, in: encounter) == 0 }
+            .filter { isReady($0, for: actor, in: encounter) }
             .max { $0.power < $1.power }
     }
 
@@ -584,6 +605,17 @@ enum CombatRules {
 
     static func isReady(_ skill: SkillDef, for actor: Combatant, in encounter: EncounterState) -> Bool {
         guard cooldown(of: skill, for: actor, in: encounter) == 0 else { return false }
+        if usesPersonalTurnAuthority(encounter) {
+            if skill.kind == .quicken {
+                guard encounter.personalTurn?.owner == actor,
+                      encounter.personalTurn?.setupAvailable == true,
+                      encounter.personalTurn?.normalCreditsRemaining == 1,
+                      encounter.personalTurn?.expansionSource == nil else { return false }
+            }
+            if skill.kind == .preempt {
+                guard encounter.firstNormalActionCompleted?.contains(actor) == false else { return false }
+            }
+        }
         if skill.kind == .ambush {
             guard !encounter.completedFirstActions.contains(actor),
                   !encounter.openingAttackConsumed.contains(actor)
@@ -756,10 +788,21 @@ enum CombatRules {
             encounter.note("\(foe.stats.displayName) goes dark.")
 
         case .quicken:
-            // **Quicken.** Borrowed against the round after. Worth it to finish something.
-            encounter.extraTurns[actor, default: 0] += 1
+            if !usesPersonalTurnAuthority(encounter) {
+                encounter.extraTurns[actor, default: 0] += 1
+                encounter.skippedTurns[actor, default: 0] += 1
+                encounter.note("\(skill.name).")
+                break
+            }
+            guard encounter.personalTurn?.owner == actor,
+                  encounter.personalTurn?.setupAvailable == true,
+                  encounter.personalTurn?.normalCreditsRemaining == 1,
+                  encounter.personalTurn?.expansionSource == nil else { return nil }
+            encounter.personalTurn?.setupAvailable = false
+            encounter.personalTurn?.normalCreditsRemaining = 2
+            encounter.personalTurn?.expansionSource = .quicken
             encounter.skippedTurns[actor, default: 0] += 1
-            encounter.note("\(skill.name).")
+            encounter.note("\(skill.name): two actions now, one turn owed.")
 
         case .cleanse:
             // Legacy `steady` is the decode route for Quench. It may remove one eligible
@@ -788,7 +831,11 @@ enum CombatRules {
             // spending the turn is the whole point — otherwise you'd just take the hit.
             let swapped: Rank = rankNow == .front ? .back : .front
             if actor.isParty { encounter.partyRanks[actor] = swapped }
-            encounter.extraTurns[actor, default: 0] += 1
+            if usesPersonalTurnAuthority(encounter) {
+                encounter.personalTurn?.setupAvailable = false
+            } else {
+                encounter.extraTurns[actor, default: 0] += 1
+            }
             encounter.note(swapped == .back ? "You give ground." : "You step up.")
 
         case .read:
@@ -823,16 +870,32 @@ enum CombatRules {
                    allowsConditionalDirectHit: true)
 
         case .preempt:
-            // Legacy First Strike behavior remains until the direct-hit/action-receipt slice.
-            encounter.extraTurns[actor, default: 0] += 1
-            encounter.note("\(skill.name): you move before they do.")
+            if !usesPersonalTurnAuthority(encounter) {
+                encounter.extraTurns[actor, default: 0] += 1
+                encounter.note("\(skill.name): you move before they do.")
+                break
+            }
+            guard let foe,
+                  encounter.firstNormalActionCompleted?.contains(actor) == false else { return nil }
+            let bonus = firstStrikeRawBonus(actor: actor, encounter: encounter)
+            guard bonus > 0 else { return nil }
+            strike(foe.id, damage: baseAttack(of: actor, in: state) + bonus, by: actor,
+                   kind: weaponKind, run: &run, encounter: &encounter, verb: skill.name,
+                   standingBack: standingBack, reachOfActor: reach,
+                   coating: coating(of: actor, in: state),
+                   breaking: wildRule(for: actor, in: state),
+                   innateStatus: equipped(.weapon, for: actor, in: state)?.gear?.statusKind,
+                   allowsStagger: true, allowsConditionalDirectHit: true,
+                   allowsRetaliation: false)
 
         case .ambush:
             // A conditional zero-turn direct attack. The extra-turn debt keeps the ordinary
             // schedule on this actor after `perform` hands on; the receipt survives relaunch.
             guard let foe, !encounter.openingAttackConsumed.contains(actor) else { return nil }
             encounter.openingAttackConsumed.insert(actor)
-            encounter.extraTurns[actor, default: 0] += 1
+            if !usesPersonalTurnAuthority(encounter) {
+                encounter.extraTurns[actor, default: 0] += 1
+            }
             strike(foe.id, damage: power, by: actor, kind: skill.damage ?? weaponKind,
                    run: &run, encounter: &encounter, verb: skill.name,
                    standingBack: standingBack, reachOfActor: reach, allowsStagger: true,
@@ -1304,6 +1367,7 @@ enum CombatRules {
         else { return }
         guard encounter.current == actor, isAlive(actor, in: run) else { return }
         normalizeV2EvasionState(&encounter)
+        normalizePersonalTurn(&encounter, actor: actor)
         if case .skill(let id, _, _) = action {
             guard let skill = ContentCatalog.shared.skill(id),
                   owns(skill, actor: actor, encounter: encounter, state: state),
@@ -1329,8 +1393,25 @@ enum CombatRules {
                       $0.applicationReceipt == receipt
                   }) else { return }
         }
+        if action == .blur {
+            guard encounter.debugV2OwnedNodeIDs?[actor]?.contains(blurNode) == true,
+                  encounter.personalTurn?.owner == actor,
+                  encounter.personalTurn?.setupAvailable == true,
+                  encounter.personalTurn?.normalCreditsRemaining == 1,
+                  encounter.personalTurn?.expansionSource == nil,
+                  encounter.blurSpent?.contains(actor) == false else { return }
+        }
 
         let actionCost = combatActionCost(action)
+        if usesPersonalTurnAuthority(encounter), encounter.personalTurn?.owner == actor {
+            if actionCost == .normal {
+                guard (encounter.personalTurn?.normalCreditsRemaining ?? 0) > 0 else { return }
+            } else if isPersonalSetup(action) {
+                guard encounter.personalTurn?.setupAvailable == true,
+                      encounter.personalTurn?.normalCreditsRemaining == 1,
+                      encounter.personalTurn?.expansionSource == nil else { return }
+            }
+        }
         let feintWasActive = encounter.feintActive?.contains(actor) == true
         var outcome: CommittedActionOutcome = .rejected
 
@@ -1385,6 +1466,14 @@ enum CombatRules {
             setCooldown(cooling, for: actor, in: &encounter)
             encounter.note("Quench: the selected affliction stops on \(actorName(ally, encounter: encounter)).")
             outcome = .committed(cost: .normal, completedDirectAttack: false)
+
+        case .blur:
+            encounter.personalTurn?.setupAvailable = false
+            encounter.personalTurn?.normalCreditsRemaining = 2
+            encounter.personalTurn?.expansionSource = .blur
+            encounter.blurSpent?.insert(actor)
+            encounter.note("Blur: two actions now.")
+            outcome = .committed(cost: .zero, completedDirectAttack: false)
 
         case .damageSkill(let foeID):
             // The gambit vocabulary's "damage skill" — whichever damaging one is up.
@@ -1455,6 +1544,7 @@ enum CombatRules {
            let rank = encounter.partyRanks[actor] {
             encounter.rankAtPreviousCompletedAction?[actor] = rank
         }
+        if committedCost == .normal { encounter.firstNormalActionCompleted?.insert(actor) }
 
         // The FF12 rule: an override covers that turn and then hands control back.
         if actor.rosterIndex != nil { encounter.isCompanionOverridden = false }
@@ -1749,12 +1839,30 @@ enum CombatRules {
     /// One authority for turn cost. Extra-turn implementation details must not decide whether a
     /// temporary receipt survives an action.
     private static func combatActionCost(_ action: CombatAction) -> CombatActionCost {
+        if action == .blur { return .zero }
         guard case .skill(let id, _, _) = action,
               let kind = ContentCatalog.shared.skill(id)?.kind else { return .normal }
         return switch kind {
         case .ambush, .quicken, .reposition: .zero
         default: .normal
         }
+    }
+
+    private static func isPersonalSetup(_ action: CombatAction) -> Bool {
+        if action == .blur { return true }
+        guard case .skill(let id, _, _) = action,
+              let kind = ContentCatalog.shared.skill(id)?.kind else { return false }
+        return kind == .quicken || kind == .reposition
+    }
+
+    private static func normalizePersonalTurn(_ encounter: inout EncounterState,
+                                              actor: Combatant) {
+        guard usesPersonalTurnAuthority(encounter) else { return }
+        guard encounter.personalTurn?.owner != actor else { return }
+        let legacyExtra = max(0, encounter.extraTurns.removeValue(forKey: actor) ?? 0)
+        encounter.personalTurn = .init(owner: actor, setupAvailable: true,
+                                       normalCreditsRemaining: 1 + legacyExtra,
+                                       expansionSource: legacyExtra > 0 ? .legacy : nil)
     }
 
     private static func baseAttack(of actor: Combatant, in state: GameState) -> Int {
@@ -1884,7 +1992,8 @@ enum CombatRules {
     }
 
     static func debugV2DirectAttackPreview(foe: FoeState, in state: GameState,
-                                           standingBack: Bool = false) -> CombatDamageRules.Preview? {
+                                           standingBack: Bool = false,
+                                           personalRawBonus: Int = 0) -> CombatDamageRules.Preview? {
         guard let receipt = state.worlds.activeRun?.activeEncounter?.debugV2BinderAttack else { return nil }
         guard let encounter = state.worlds.activeRun?.activeEncounter else { return nil }
         let conditional = conditionalDirectHitComponents(actor: .binder, foe: foe,
@@ -1892,6 +2001,7 @@ enum CombatRules {
         let power = binderAttack(in: state)
             + receipt.preMatchupBonus(for: receipt.ordinaryWeaponKind).total
             + conditional
+            + personalRawBonus
         let spread = max(1, Int((Double(power) * Tuning.Encounter.damageVariance).rounded()))
         let range = max(Tuning.Encounter.minimumDamage, power - spread)...max(Tuning.Encounter.minimumDamage,
                                                                                power + spread)
@@ -2002,7 +2112,8 @@ enum CombatRules {
                                allowsConditionalDirectHit: Bool = false,
                                directAttackWindow: DirectAttackWindow = .scheduled,
                                defersCarriedDamage: Bool = false,
-                               isEmanation: Bool = false) -> StrikeResult {
+                               isEmanation: Bool = false,
+                               allowsRetaliation: Bool = true) -> StrikeResult {
         guard let index = encounter.foes.firstIndex(where: { $0.id == foeID }), encounter.foes[index].isAlive
         else { return .init(committed: false, landed: nil) }
 
@@ -2180,7 +2291,7 @@ enum CombatRules {
 
         // **Warning colours are honest.** Hitting something that advertises costs you — and if it
         // was advertising *venom*, it costs you for a while (Q42).
-        if foe.stats.retaliation > 0, encounter.foes[index].isAlive {
+        if allowsRetaliation, foe.stats.retaliation > 0, encounter.foes[index].isAlive {
             hurt(actor, by: foe.stats.retaliation, run: &run, encounter: &encounter)
             encounter.note("\(name.capitalisedSentence) is not safe to touch — \(foe.stats.retaliation) back.")
             if foe.traits?.isToxic == true {
@@ -2400,14 +2511,26 @@ enum CombatRules {
     static func advanceTurn(in state: inout GameState, completedAction: Bool = true) {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
 
-        // **A turn owed is taken before the order moves on** — that's what Quicken buys, and it
-        // has to be spent here rather than by shuffling `order`, which is stored precisely so a
-        // death mid-round can't shift whose turn it is.
         let acting = encounter.current
         if completedAction { encounter.completedFirstActions.insert(acting) }
-        if let owed = encounter.extraTurns[acting], owed > 0 {
+        if usesPersonalTurnAuthority(encounter) {
+            normalizePersonalTurn(&encounter, actor: acting)
+            if !completedAction {
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                return
+            }
+            encounter.personalTurn?.normalCreditsRemaining -= 1
+            if (encounter.personalTurn?.normalCreditsRemaining ?? 0) > 0,
+               isAlive(acting, in: run), encounter.outcome == nil {
+                encounter.note("Again, before it can answer.")
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+                return
+            }
+            encounter.personalTurn = nil
+        } else if let owed = encounter.extraTurns[acting], owed > 0 {
             encounter.extraTurns[acting] = owed - 1
-            encounter.note("Again, before it can answer.")
             run.activeEncounter = encounter
             state.worlds.activeRun = run
             return
@@ -2429,6 +2552,9 @@ enum CombatRules {
                 if owing == 1 { encounter.recoveryComplete.insert(who) }
                 encounter.note("\(actorName(who, encounter: encounter)) is still recovering.")
                 continue
+            }
+            if usesPersonalTurnAuthority(encounter) {
+                encounter.personalTurn = .init(owner: who)
             }
             // A newly reached scheduled personal turn mints one Breaking Blow opportunity. Extra
             // action credits return above without clearing this receipt and therefore share it.

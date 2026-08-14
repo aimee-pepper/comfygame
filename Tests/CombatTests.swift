@@ -3016,7 +3016,8 @@ final class CombatTests: XCTestCase {
             ])
             encounter.feintActive = []
             encounter.untouchableStates = [:]
-            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.brace]]
+            encounter.debugV2OwnedNodeIDs = [.binder: [CombatDerivedStatsRules.Node.brace,
+                                                        "combat.offense.swiftness.quicken"]]
             encounter.braceReceipts = [:]
             run.activeEncounter = encounter
             state.worlds.activeRun = run
@@ -3274,9 +3275,9 @@ final class CombatTests: XCTestCase {
             state.worlds.activeRun?.activeEncounter?.feintActive = [.binder]
             state.worlds.activeRun?.activeEncounter?.cooldowns = [:]
             state.worlds.activeRun?.activeEncounter?.binderSkillCooldown = 0
-            CombatRules.perform(.skill("first_strike"), by: .binder, in: &state)
-            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.feintActive, [],
-                           "First Strike is normal-cost, not zero-turn setup")
+            CombatRules.perform(.skill("first_strike", foe: foe.id), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.feintActive, [.binder],
+                           "spent First Strike is rejected atomically after a prior normal action")
 
             state.worlds.activeRun?.activeEncounter?.feintActive = [.binder]
             let beforeItem = state.worlds.activeRun?.activeEncounter
@@ -4264,7 +4265,8 @@ final class CombatTests: XCTestCase {
                 id: InstanceID(rawValue: 8_820),
                 foes: [.init(id: foeID, traits: CreatureTraits(), stats: stats, currentHP: 200)],
                 party: [.binder], debugV2OwnedNodeIDs: [
-                    .binder: [CombatDerivedStatsRules.Node.breakingBlow]],
+                    .binder: [CombatDerivedStatsRules.Node.breakingBlow,
+                              "combat.offense.force.overbear"]],
                 partyRanks: [.binder: .front], rng: &orderRNG)
             encounter.order = [.binder, .foe(foeID)]
             encounter.turnSlots = encounter.order.map { .init(actor: $0) }
@@ -5844,5 +5846,156 @@ final class CombatTests: XCTestCase {
         let plainLoss = companionBefore - (plain.activeRun?.companionHP[0] ?? companionBefore)
         XCTAssertEqual(coverLoss + targetLoss, plainLoss)
         XCTAssertGreaterThan(coverLoss, 0)
+    }
+
+    func testQuickenCreatesExactlyTwoNormalCreditsThenOneSkippedBlock() throws {
+        let store = inFight()
+        let foe = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage modern Quicken") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [
+                "combat.offense.swiftness.quicken", "combat.offense.swiftness.blur"]]
+            encounter.order = [.binder]; encounter.turnSlots = [.init(actor: .binder)]; encounter.turnIndex = 0
+            encounter.personalTurn = .init(owner: .binder)
+            encounter.blurSpent = []; encounter.firstNormalActionCompleted = []
+            encounter.foes[0].currentHP = 500; encounter.foes[0].stats.maxHP = 500
+            encounter.foes[0].stats.evasion = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        store.mutate("quicken and spend two credits") { state in
+            CombatRules.perform(.skill("quicken"), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.personalTurn?.normalCreditsRemaining, 2)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.skippedTurns[.binder], 1)
+            if let quicken = ContentCatalog.shared.skill("quicken"),
+               let current = state.worlds.activeRun?.activeEncounter {
+                XCTAssertFalse(CombatRules.isReady(quicken, for: .binder, in: current))
+            }
+            let afterQuicken = state.worlds.activeRun?.activeEncounter
+            CombatRules.perform(.blur, by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter, afterQuicken,
+                           "expansions share one setup slot")
+            CombatRules.perform(.attack(foe: foe), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.personalTurn?.normalCreditsRemaining, 1)
+            CombatRules.perform(.attack(foe: foe), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.skippedTurns[.binder], 0)
+            XCTAssertTrue(state.worlds.activeRun?.activeEncounter?.recoveryComplete.contains(.binder) == true)
+        }
+    }
+
+    func testBlurIsOncePerEncounterAndPersistsBetweenCredits() throws {
+        let store = inFight()
+        let foe = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage modern Blur") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: ["combat.offense.swiftness.blur"]]
+            encounter.order = [.binder]; encounter.turnSlots = [.init(actor: .binder)]; encounter.turnIndex = 0
+            encounter.personalTurn = .init(owner: .binder); encounter.blurSpent = []
+            encounter.firstNormalActionCompleted = []
+            encounter.foes[0].currentHP = 500; encounter.foes[0].stats.maxHP = 500
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.perform(.blur, by: .binder, in: &state)
+        }
+        XCTAssertEqual(store.activeEncounter?.personalTurn?.expansionSource, .blur)
+        XCTAssertEqual(store.activeEncounter?.blurSpent, [.binder])
+        let data = try JSONEncoder().encode(try XCTUnwrap(store.activeEncounter))
+        let relaunched = try JSONDecoder().decode(EncounterState.self, from: data)
+        XCTAssertEqual(relaunched.personalTurn?.normalCreditsRemaining, 2)
+        XCTAssertEqual(relaunched.blurSpent, [.binder])
+        store.mutate("spend and reject second Blur") { state in
+            CombatRules.perform(.attack(foe: foe), by: .binder, in: &state)
+            let before = state.worlds.activeRun?.activeEncounter
+            CombatRules.perform(.blur, by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter, before)
+        }
+    }
+
+    func testOverbearDebtStacksForBothExpandedCredits() throws {
+        let store = inFight()
+        let foe = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage expansion techniques") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [
+                "combat.offense.swiftness.quicken", "combat.offense.force.overbear"]]
+            encounter.order = [.binder]; encounter.turnSlots = [.init(actor: .binder)]; encounter.turnIndex = 0
+            encounter.personalTurn = .init(owner: .binder); encounter.blurSpent = []
+            encounter.firstNormalActionCompleted = []
+            encounter.foes[0].currentHP = 500; encounter.foes[0].stats.maxHP = 500
+            encounter.foes[0].stats.evasion = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.perform(.skill("quicken"), by: .binder, in: &state)
+            CombatRules.perform(.skill("overbear", foe: foe), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.personalTurn?.normalCreditsRemaining, 1)
+            CombatRules.perform(.skill("overbear", foe: foe), by: .binder, in: &state)
+            XCTAssertEqual(state.worlds.activeRun?.activeEncounter?.skippedTurns[.binder], 2,
+                           "three debts were committed and the next scheduled block paid one")
+        }
+    }
+
+    func testFirstStrikeAddsFourOnceAndMissStillSpendsIt() throws {
+        func staged(firstStrike: Bool, evasion: Double = 0) -> GameStore {
+            let store = inFight()
+            store.mutate("stage First Strike") { state in
+                guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+                encounter.debugV2OwnedNodeIDs = [.binder: firstStrike
+                    ? ["combat.offense.swiftness.first_strike"] : []]
+                encounter.order = [.binder]; encounter.turnSlots = [.init(actor: .binder)]; encounter.turnIndex = 0
+                encounter.personalTurn = .init(owner: .binder); encounter.blurSpent = []
+                encounter.firstNormalActionCompleted = []
+                encounter.foes[0].currentHP = 500; encounter.foes[0].stats.maxHP = 500
+                encounter.foes[0].stats.evasion = evasion
+                run.rng = SeededRNG(seed: 0xF1757); run.activeEncounter = encounter
+                state.worlds.activeRun = run
+            }
+            return store
+        }
+        let strike = staged(firstStrike: true), plain = staged(firstStrike: false)
+        let foe = try XCTUnwrap(strike.activeEncounter?.foes.first?.id)
+        XCTAssertEqual(CombatRules.firstStrikeRawBonus(actor: .binder,
+            encounter: try XCTUnwrap(strike.activeEncounter)), 4)
+        XCTAssertEqual(CombatRules.firstStrikeRawBonus(actor: .binder,
+            encounter: try XCTUnwrap(plain.activeEncounter)), 0)
+        let ordinaryPreview = try XCTUnwrap(CombatRules.debugV2DirectAttackPreview(
+            foe: try XCTUnwrap(strike.activeEncounter?.foes.first), in: strike.state))
+        let firstPreview = try XCTUnwrap(CombatRules.debugV2DirectAttackPreview(
+            foe: try XCTUnwrap(strike.activeEncounter?.foes.first), in: strike.state,
+            personalRawBonus: CombatRules.firstStrikeRawBonus(
+                actor: .binder, encounter: try XCTUnwrap(strike.activeEncounter))))
+        XCTAssertGreaterThan(firstPreview.lower.rolledPower, ordinaryPreview.lower.rolledPower)
+        XCTAssertGreaterThan(firstPreview.upper.rolledPower, ordinaryPreview.upper.rolledPower)
+        XCTAssertEqual(firstPreview.lower.rolledPower + firstPreview.upper.rolledPower,
+                       ordinaryPreview.lower.rolledPower + ordinaryPreview.upper.rolledPower + 8,
+                       "the disclosed range remains centred on exactly +4 raw power")
+        strike.mutate("First Strike") { CombatRules.perform(.skill("first_strike", foe: foe), by: .binder, in: &$0) }
+        plain.mutate("ordinary attack") { CombatRules.perform(.attack(foe: foe), by: .binder, in: &$0) }
+        let strikeLoss = 500 - (strike.activeEncounter?.foes[0].currentHP ?? 500)
+        let plainLoss = 500 - (plain.activeEncounter?.foes[0].currentHP ?? 500)
+        XCTAssertGreaterThan(strikeLoss, plainLoss)
+        XCTAssertEqual(strike.activeEncounter?.firstNormalActionCompleted, [.binder])
+        XCTAssertFalse(CombatRules.isReady(try XCTUnwrap(ContentCatalog.shared.skill("first_strike")),
+                                           for: .binder,
+                                           in: try XCTUnwrap(strike.activeEncounter)))
+
+        let missed = staged(firstStrike: true, evasion: 1)
+        missed.mutate("miss First Strike") {
+            CombatRules.perform(.skill("first_strike", foe: foe), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(missed.activeEncounter?.firstNormalActionCompleted, [.binder])
+    }
+
+    func testLegacyExtraTurnsAdoptOnceIntoModernPersonalCredits() throws {
+        let store = inFight()
+        store.mutate("stage legacy credit adoption") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: ["combat.offense.swiftness.quicken"]]
+            encounter.personalTurn = nil; encounter.extraTurns[.binder] = 2
+            encounter.order = [.binder]
+            encounter.turnSlots = [.init(actor: .binder)]
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.advanceTurn(in: &state, completedAction: false)
+        }
+        XCTAssertEqual(store.activeEncounter?.personalTurn?.normalCreditsRemaining, 3)
+        XCTAssertEqual(store.activeEncounter?.personalTurn?.expansionSource, .legacy)
+        XCTAssertNil(store.activeEncounter?.extraTurns[.binder])
     }
 }
