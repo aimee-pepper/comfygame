@@ -128,8 +128,12 @@ final class ContentTests: XCTestCase {
 
         XCTAssertTrue(source.contains("private struct SettingsDestinationRow: View"))
         XCTAssertEqual(source.components(separatedBy: "SettingsDestinationRow(").count - 1, 4)
-        XCTAssertTrue(source.contains("Image(systemName: \"chevron.right\")"))
-        XCTAssertFalse(source.contains("rectangle.portrait.and.arrow.right"))
+        XCTAssertTrue(source.contains("Image(systemName: directionIcon)"),
+                      "the shared row must render its declared navigation direction")
+        XCTAssertEqual(source.components(separatedBy: "directionIcon: \"rectangle.portrait.and.arrow.right\"").count - 1, 1,
+                       "only Save games leaves Settings rather than navigating deeper")
+        XCTAssertTrue(source.contains("var directionIcon = \"chevron.right\""),
+                      "ordinary Settings destinations share the forward-navigation affordance")
         XCTAssertTrue(source.contains(".frame(minHeight: 44)"))
     }
 

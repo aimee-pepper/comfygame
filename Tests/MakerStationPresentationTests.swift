@@ -161,14 +161,14 @@ final class MakerStationPresentationTests: XCTestCase {
         var state = GameState.newGame()
         state.base.stations[Stations.blacksmith] = StationState(isUnlocked: true, tier: 0)
         state.base.essence = 100
-        let materials = ItemStack(
-            id: InstanceID(rawValue: 901), catalogID: Items.material,
-            identified: true,
-            materials: [
-                sample(.fang, hardness: 60, source: "point"),
-                sample(.fibre, flexibility: 60, source: "grip")
-            ])
-        XCTAssertTrue(state.base.inventory.add(materials))
+        state.base.materialReserve.add(.init(
+            id: .init(rawValue: "landing-point"),
+            sample: sample(.fang, hardness: 60, source: "point")
+        ))
+        state.base.materialReserve.add(.init(
+            id: .init(rawValue: "landing-grip"),
+            sample: sample(.fibre, flexibility: 60, source: "grip")
+        ))
 
         let readiness = PhysicalGearCraftingRules.readiness(
             PhysicalGearCraftingRules.pointedBlade, in: state)
@@ -198,9 +198,11 @@ final class MakerStationPresentationTests: XCTestCase {
         let stock = (0..<requirement.count).map { index in
             sample(.plate, hardness: requirement.minimum + 5, source: "stock \(index)")
         }
-        XCTAssertTrue(state.base.inventory.add(ItemStack(
-            id: InstanceID(rawValue: 903), catalogID: Items.material,
-            identified: true, materials: stock)))
+        for (index, sample) in stock.enumerated() {
+            state.base.materialReserve.add(.init(
+                id: .init(rawValue: "overflow-reforge-\(index)"), sample: sample
+            ))
+        }
         state.base.spillover = [gear]
 
         let result = try XCTUnwrap(SmithRules.reforge(overflow: gear, in: &state))
