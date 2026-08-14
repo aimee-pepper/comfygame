@@ -213,7 +213,7 @@ private struct RunExitSummaryView: View {
 
                     sectionHeading("Recovered")
                     recapSection("Resources", gains: summary.resources)
-                    recapSection("Loot", gains: summary.items)
+                    recapSection("Items", gains: summary.items)
 
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Essence runway").font(.headline)
@@ -240,7 +240,7 @@ private struct RunExitSummaryView: View {
 
                     sectionHeading("Lost")
                     recapSection("Resources", gains: summary.lostResources)
-                    recapSection("Loot", gains: summary.lostItems)
+                    recapSection("Items", gains: summary.lostItems)
 
                     sectionHeading("Kept for good")
                     writingSection
@@ -339,7 +339,7 @@ private struct RunExitSummaryView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title).font(.headline)
             if gains.isEmpty {
-                Text("None this trip.").foregroundStyle(.secondary)
+                Text("No \(title.lowercased()) this trip.").foregroundStyle(.secondary)
             } else {
                 ForEach(gains) { gain in
                     HStack {

@@ -20,6 +20,7 @@ struct TradingPostView: View {
     @EnvironmentObject private var store: GameStore
     @State private var tab: TradingPostTab = .buy
     @State private var opened: TradingPostListing?
+    @State private var openedMaterial: TradingPostMaterialListing?
 
     var body: some View {
         ScrollView {
@@ -34,7 +35,11 @@ struct TradingPostView: View {
                 .pickerStyle(.segmented)
                 .frame(minHeight: 44)
 
-                if listings.isEmpty {
+                if tab == .sell && !materialGroups.isEmpty {
+                    materialReserve
+                }
+
+                if listings.isEmpty && (tab != .sell || materialGroups.isEmpty) {
                     EmptyNote(emptyMessage)
                 } else {
                     SixAcrossItemGrid(data: listings, id: \.id) { listing in
@@ -58,6 +63,52 @@ struct TradingPostView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Trading Post")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var materialGroups: [(kind: MaterialKind, selections: [MaterialReserveSelection])] {
+        MaterialKind.allCases.compactMap { kind in
+            let selections = store.state.base.materialReserve.selections { $0.kind == kind }
+            return selections.isEmpty ? nil : (kind, selections)
+        }
+    }
+
+    private var materialReserve: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Resources").font(.headline)
+            ForEach(materialGroups, id: \.kind) { group in
+                DisclosureGroup("\(group.kind.displayName) · \(group.selections.count)") {
+                    VStack(spacing: 8) {
+                        ForEach(group.selections, id: \.unitID) { selection in
+                            let listing = TradingPostMaterialListing(
+                                selection: selection,
+                                revision: store.state.base.tradingPost.inventoryRevision,
+                                unitPrice: TradingPostRules.materialSaleUnitPrice(for: selection.sample)
+                            )
+                            AnchoredItemDetailButton(item: listing, selection: $openedMaterial) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(selection.sample.displayName).font(.subheadline)
+                                        Text(selection.sample.source.isEmpty ? "Source unknown" : selection.sample.source)
+                                            .font(.caption).foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Text("+\(TradingPostRules.materialSaleUnitPrice(for: selection.sample)) gold")
+                                        .font(.subheadline.monospacedDigit())
+                                }
+                                .frame(minHeight: 44)
+                            } detail: { selected in
+                                TradingPostMaterialSaleSheet(listing: selected).environmentObject(store)
+                            }
+                        }
+                    }
+                    .padding(.top, 6)
+                }
+            }
+            Text("Materials are reserve-backed Resources and never use Storehouse slots.")
+                .font(.caption).foregroundStyle(.secondary)
+        }
+        .padding(12)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
     }
 
     private var proprietorHeader: some View {
@@ -224,6 +275,63 @@ struct TradingPostView: View {
             return "The shelves are waiting for your next expedition to resolve."
         }
         return tab == .buy ? "The shelves are empty until the next expedition." : "Nothing here is currently transferable."
+    }
+}
+
+private struct TradingPostMaterialListing: Identifiable {
+    let selection: MaterialReserveSelection
+    let revision: UInt64
+    let unitPrice: Int
+    var id: MaterialReserveUnitID { selection.unitID }
+
+    var preview: TradingPostRules.MaterialSalePreview {
+        .init(revision: revision, selections: [selection], unitPrices: [unitPrice], goldTotal: unitPrice)
+    }
+}
+
+private struct TradingPostMaterialSaleSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    let listing: TradingPostMaterialListing
+    @State private var failure: TradingPostCommitResult?
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Exact resource unit") {
+                    LabeledContent("Kind", value: listing.selection.sample.kind.displayName)
+                    LabeledContent("Grade", value: listing.selection.sample.grade.formatted(.number.precision(.fractionLength(0...1))))
+                    LabeledContent("Source", value: listing.selection.sample.source.isEmpty ? "Unknown" : listing.selection.sample.source)
+                    LabeledContent("Qualifier", value: listing.selection.sample.qualifier ?? "None")
+                    LabeledContent("Value", value: "+\(price) gold")
+                    if let failure {
+                        Text(failure.message).font(.caption).foregroundStyle(.red)
+                            .accessibilityIdentifier("trading-post.material-failure")
+                    }
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                PersistentActionBar(message: "This exact reserve unit is checked again before anything changes.",
+                                    messageTint: failure == nil ? .secondary : .red) {
+                    Button("Sell for \(price) gold") { commit() }
+                        .buttonStyle(.borderedProminent).controlSize(.large)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            .navigationTitle(listing.selection.sample.displayName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        }
+    }
+
+    private var price: Int { listing.unitPrice }
+
+    private func commit() {
+        var result: TradingPostCommitResult = .invalid
+        store.mutate("trading post material sale", flush: true) { state in
+            result = TradingPostRules.commit(listing.preview, in: &state.base)
+        }
+        if result == .committed { dismiss() } else { failure = result }
     }
 }
 

@@ -83,10 +83,10 @@ enum SmithRules {
 
     /// One sample on the shelf that would satisfy a requirement, and where it lives.
     struct Candidate: Equatable, Sendable {
-        var binID: InstanceID
-        var index: Int
         var sample: MaterialSample
         var value: Double
+        var reserveSelection: MaterialReserveSelection
+        var stockKey: String { reserveSelection.unitID.rawValue }
     }
 
     /// **Everything in the storehouse hard enough (or supple enough, or…) to do the job**, worst
@@ -96,15 +96,16 @@ enum SmithRules {
     /// happened to be in the same bin would make you afraid to use the smith at all. It spends what
     /// clears the bar and leaves the rest of the hoard alone.
     static func candidates(for requirement: Requirement, in state: GameState) -> [Candidate] {
-        var found: [Candidate] = []
-        for bin in state.base.inventory.stacks {
-            for (index, sample) in bin.materials.enumerated() {
-                let value = sample.properties[requirement.property]
-                guard value >= requirement.minimum else { continue }
-                found.append(Candidate(binID: bin.id, index: index, sample: sample, value: value))
-            }
+        state.base.materialReserve.selections { sample in
+            sample.properties[requirement.property] >= requirement.minimum
+        }.map { selection in
+            Candidate(sample: selection.sample,
+                      value: selection.sample.properties[requirement.property],
+                      reserveSelection: selection)
+        }.sorted {
+            ($0.value, $0.sample.grade, $0.stockKey)
+                < ($1.value, $1.sample.grade, $1.stockKey)
         }
-        return found.sorted { ($0.value, $0.sample.grade) < ($1.value, $1.sample.grade) }
     }
 
     /// Whether a reforging can go ahead right now, and if not, what's short.
@@ -137,25 +138,17 @@ enum SmithRules {
     /// Split out from the two reforge paths because a worn piece and a stored one cost the same
     /// thing — only what happens to the piece afterwards differs.
     @discardableResult
+    static func consume(_ spending: [Candidate], in state: inout GameState) -> Bool {
+        guard Set(spending.map(\.stockKey)).count == spending.count else { return false }
+        return state.base.materialReserve.consume(spending.map(\.reserveSelection)) != nil
+    }
+
     private static func pay(_ requirement: Requirement, in state: inout GameState) -> Bool {
         let spending = Array(candidates(for: requirement, in: state).prefix(requirement.count))
         guard spending.count == requirement.count, state.base.essence >= requirement.essence
         else { return false }
 
-        // Remove the chosen samples highest-index-first within each bin, so earlier removals can't
-        // shift the indices of later ones.
-        let byBin = Dictionary(grouping: spending, by: \.binID)
-        for (binID, taken) in byBin {
-            guard let binIndex = state.base.inventory.stacks.firstIndex(where: { $0.id == binID })
-            else { continue }
-            for candidate in taken.sorted(by: { $0.index > $1.index }) {
-                state.base.inventory.stacks[binIndex].materials.remove(at: candidate.index)
-            }
-            state.base.inventory.stacks[binIndex].count =
-                state.base.inventory.stacks[binIndex].materials.count
-        }
-        state.base.inventory.stacks.removeAll { $0.materials.isEmpty && $0.count <= 0 }
-
+        guard consume(spending, in: &state) else { return false }
         state.base.essence -= requirement.essence
         return true
     }
@@ -421,7 +414,7 @@ enum AnchorFrameRules {
             -> [SmithRules.Candidate]? {
             guard position < slots.count else { return chosen }
             for candidate in candidates(for: slots[position].element, in: state) {
-                let key = "\(candidate.binID.rawValue):\(candidate.index)"
+                let key = candidate.stockKey
                 guard !used.contains(key) else { continue }
                 if let result = assign(position + 1, used: used.union([key]), chosen: chosen + [candidate]) {
                     return result
@@ -461,14 +454,7 @@ enum AnchorFrameRules {
 
     static func craft(in state: inout GameState) -> Bool {
         guard canCraft(in: state), let spending = selectedSamples(in: state) else { return false }
-        for (binID, candidates) in Dictionary(grouping: spending, by: \.binID) {
-            guard let bin = state.base.inventory.stacks.firstIndex(where: { $0.id == binID }) else { return false }
-            for candidate in candidates.sorted(by: { $0.index > $1.index }) {
-                state.base.inventory.stacks[bin].materials.remove(at: candidate.index)
-            }
-            state.base.inventory.stacks[bin].count = state.base.inventory.stacks[bin].materials.count
-        }
-        state.base.inventory.stacks.removeAll { $0.count == 0 }
+        guard SmithRules.consume(spending, in: &state) else { return false }
         state.base.essence -= essenceCost
         state.base.store(ItemStack(id: InstanceID(rawValue: state.base.nextItemID()),
                                    catalogID: Items.anchorFrame))

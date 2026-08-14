@@ -726,7 +726,7 @@ struct StorehouseView: View {
 
                 switch tab {
                 case .stockpiles:
-                    if base.resources.isEmpty {
+                    if base.resources.isEmpty && base.materialReserve.isEmpty {
                         EmptyNote("Nothing hauled home yet.")
                     } else {
                         SixAcrossItemGrid(data: resourceEntries, id: \.id) { entry in
@@ -744,6 +744,20 @@ struct StorehouseView: View {
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }
+                    if !reserveMaterialBins.isEmpty {
+                        Text("Materials").font(.headline).frame(maxWidth: .infinity, alignment: .leading)
+                        SixAcrossItemGrid(data: reserveMaterialBins, id: \.id) { bin in
+                            AnchoredItemDetailButton(item: bin, selection: $opened) {
+                                ItemIconTile(icon: bin.icon, catalogueID: bin.catalogID,
+                                             rarity: bin.rarity, quantity: bin.count,
+                                             identified: bin.identified, location: .stored,
+                                             accessibilityName: bin.displayName)
+                            } detail: { selected in
+                                MaterialReserveSheet(kind: selected.material!.kind)
+                                    .environmentObject(store)
+                            }
+                        }
+                    }
                 case .items:
                     HStack {
                         Label("Items", systemImage: "archivebox").font(.headline)
@@ -751,11 +765,11 @@ struct StorehouseView: View {
                         Text("\(base.inventory.stacks.count) of \(base.inventory.slots)")
                             .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                     }
-                    if base.inventory.stacks.isEmpty {
+                    if itemStacks.isEmpty {
                         EmptyNote("Eight slots, all empty. Items come from worlds.")
                     } else {
                         if !store.unidentifiedStacks.isEmpty { IdentifyCard() }
-                        SixAcrossItemGrid(data: base.inventory.stacks, id: \.id) { stack in
+                        SixAcrossItemGrid(data: itemStacks, id: \.id) { stack in
                             AnchoredItemDetailButton(item: stack, selection: $opened) {
                                 ItemIconTile(icon: stack.icon, catalogueID: stack.catalogID,
                                              rarity: stack.rarity,
@@ -820,9 +834,58 @@ struct StorehouseView: View {
         base.resources.nonZero.map { entry in
             let definition = ContentCatalog.shared.resource(entry.id)
             return StorehouseResourceEntry(id: entry.id,
-                                           name: definition?.name ?? entry.id.rawValue,
+                                           name: definition?.name ?? "Unknown resource",
                                            icon: definition?.icon ?? "cube",
                                            amount: entry.amount)
+        }
+    }
+
+    private var reserveMaterialBins: [ItemStack] {
+        Dictionary(grouping: base.materialReserve.units, by: { $0.sample.kind })
+            .map { kind, units in
+                let ordinal = MaterialKind.allCases.firstIndex(of: kind) ?? 0
+                return ItemStack(id: .init(rawValue: UInt64.max - 1_000 - UInt64(ordinal)),
+                                 catalogID: Items.material,
+                                 materials: units.sorted { $0.id < $1.id }.map(\.sample))
+            }
+            .sorted { $0.material!.kind.rawValue < $1.material!.kind.rawValue }
+    }
+    private var itemStacks: [ItemStack] { base.inventory.stacks.filter(\.materials.isEmpty) }
+}
+
+private struct MaterialReserveSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    let kind: MaterialKind
+
+    private var current: [MaterialReserveUnit] {
+        store.state.base.materialReserve.units(of: kind).sorted { $0.id < $1.id }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Reserve") {
+                    LabeledContent("Quantity", value: "\(current.count)")
+                    LabeledContent("Location", value: "Resources")
+                }
+                Section("Exact samples") {
+                    if current.isEmpty {
+                        Text("No longer stored").foregroundStyle(.secondary)
+                    } else {
+                        ForEach(current) { unit in
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(unit.sample.displayName).font(.headline)
+                                Text(unit.sample.source.isEmpty ? "Unknown source" : unit.sample.source)
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle(kind.pluralName.capitalisedSentence)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         }
     }
 }

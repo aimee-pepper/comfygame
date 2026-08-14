@@ -1144,7 +1144,7 @@ extension GameStore {
 
     /// How much stock is on the shelf at all, for the header — a hoard's worth in one number.
     var materialSampleCount: Int {
-        state.base.inventory.stacks.reduce(0) { $0 + $1.materials.count }
+        state.base.materialReserve.count
     }
 
     func physicalGearReadiness(_ recipe: PhysicalGearCraftingRules.Recipe)

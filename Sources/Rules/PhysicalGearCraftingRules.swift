@@ -43,8 +43,11 @@ enum PhysicalGearCraftingRules {
         var binID: InstanceID
         var sampleIndex: Int
         var sample: MaterialSample
+        var reserveSelection: MaterialReserveSelection? = nil
 
-        var stockKey: String { "\(binID.rawValue):\(sampleIndex)" }
+        var stockKey: String {
+            reserveSelection?.unitID.rawValue ?? "legacy:\(binID.rawValue):\(sampleIndex)"
+        }
     }
 
     struct CandidateAssessment: Identifiable, Equatable, Sendable {
@@ -388,31 +391,26 @@ enum PhysicalGearCraftingRules {
 
     static func assessments(for requirement: SampleRequirement,
                             in state: GameState) -> [CandidateAssessment] {
-        state.base.inventory.stacks.flatMap { bin in
-            bin.materials.enumerated().map { index, sample in
-                let selection = Selection(requirementID: requirement.id, binID: bin.id,
-                                          sampleIndex: index, sample: sample)
-                return CandidateAssessment(
-                    selection: selection,
-                    rejectionReason: rejectionReason(for: sample, requirement: requirement)
-                )
-            }
+        let reserve = state.base.materialReserve.selections().map { quote in
+            CandidateAssessment(selection: Selection(requirementID: requirement.id,
+                binID: .init(rawValue: 0), sampleIndex: 0, sample: quote.sample,
+                reserveSelection: quote),
+                rejectionReason: rejectionReason(for: quote.sample, requirement: requirement))
         }
+        return reserve
     }
 
     static func candidates(for requirement: SampleRequirement, in state: GameState) -> [Selection] {
-        state.base.inventory.stacks.flatMap { bin in
-            bin.materials.enumerated().compactMap { index, sample in
-                guard qualifies(sample, for: requirement) else { return nil }
-                return Selection(requirementID: requirement.id, binID: bin.id,
-                                 sampleIndex: index, sample: sample)
-            }
-        }.sorted { lhs, rhs in
+        let reserve = state.base.materialReserve.selections { qualifies($0, for: requirement) }
+            .map { quote in Selection(requirementID: requirement.id,
+                binID: .init(rawValue: 0), sampleIndex: 0, sample: quote.sample,
+                reserveSelection: quote) }
+        return reserve.sorted { lhs, rhs in
             let scoringFloors = requirement.floors + requirement.alternativeFloors
             let left = scoringFloors.map { lhs.sample.properties[$0.property] }.reduce(0, +)
             let right = scoringFloors.map { rhs.sample.properties[$0.property] }.reduce(0, +)
-            return (left, lhs.sample.grade, lhs.binID.rawValue, lhs.sampleIndex)
-                < (right, rhs.sample.grade, rhs.binID.rawValue, rhs.sampleIndex)
+            return (left, lhs.sample.grade, lhs.stockKey)
+                < (right, rhs.sample.grade, rhs.stockKey)
         }
     }
 
@@ -439,10 +437,7 @@ enum PhysicalGearCraftingRules {
         for requirement in recipe.requirements {
             guard let selection = chosen.first(where: { $0.requirementID == requirement.id }),
                   qualifies(selection.sample, for: requirement),
-                  state.base.inventory.stacks.contains(where: { bin in
-                      bin.id == selection.binID && bin.materials.indices.contains(selection.sampleIndex)
-                          && bin.materials[selection.sampleIndex] == selection.sample
-                  }) else { return nil }
+                  selectionIsCurrent(selection, in: state) else { return nil }
         }
         let unique = Set(chosen.map(\.stockKey))
         guard unique.count == chosen.count else { return nil }
@@ -476,9 +471,7 @@ enum PhysicalGearCraftingRules {
         }
         guard let preview = preview(recipe, in: state) else {
             let missing = recipe.requirements.filter { requirement in
-                !state.base.inventory.stacks.contains { bin in
-                    bin.materials.contains { qualifies($0, for: requirement) }
-                }
+                candidates(for: requirement, in: state).isEmpty
             }.map(\.id)
             return .needsSamples(requirementIDs: missing)
         }
@@ -495,15 +488,7 @@ enum PhysicalGearCraftingRules {
               let fresh = self.preview(preview.recipe, selections: preview.selections, in: state),
               fresh == preview, state.base.essence >= preview.essence else { return nil }
 
-        for (binID, selections) in Dictionary(grouping: preview.selections, by: \.binID) {
-            guard let bin = state.base.inventory.stacks.firstIndex(where: { $0.id == binID })
-            else { return nil }
-            for selection in selections.sorted(by: { $0.sampleIndex > $1.sampleIndex }) {
-                state.base.inventory.stacks[bin].materials.remove(at: selection.sampleIndex)
-            }
-            state.base.inventory.stacks[bin].count = state.base.inventory.stacks[bin].materials.count
-        }
-        state.base.inventory.stacks.removeAll { $0.count == 0 }
+        guard consume(preview.selections, in: &state) else { return nil }
         state.base.essence -= preview.essence
 
         let id = InstanceID(rawValue: state.base.nextItemID())
@@ -524,5 +509,22 @@ enum PhysicalGearCraftingRules {
             : "\(preview.recipe.displayName) · \(origin.joined(separator: " + "))"
         state.base.store(output)
         return output
+    }
+
+    static func consume(_ selections: [Selection], in state: inout GameState) -> Bool {
+        guard selections.allSatisfy({ selectionIsCurrent($0, in: state) }) else { return false }
+        let reserve = selections.compactMap(\.reserveSelection)
+        guard reserve.count == selections.count else { return false }
+        if !reserve.isEmpty, state.base.materialReserve.consume(reserve) == nil { return false }
+        return true
+    }
+
+    private static func selectionIsCurrent(_ selection: Selection, in state: GameState) -> Bool {
+        if let reserve = selection.reserveSelection {
+            return state.base.materialReserve.units.contains {
+                $0.id == reserve.unitID && $0.sample == reserve.sample
+            }
+        }
+        return false
     }
 }

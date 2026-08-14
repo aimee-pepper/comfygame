@@ -49,6 +49,8 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
             grade: 70, source: "ashen bloom")
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.material,
                                            material: sample))
+        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+                                                       location: "fixture.distillery.readiness")
         let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
 
         XCTAssertEqual(DistilleryRules.readiness(.heat, candidate: candidate,
@@ -72,6 +74,16 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
                                                   catalyst: Resources.sulfur, in: state), .ready)
         XCTAssertTrue(DistilleryRules.canAttune(.heat, candidate: candidate,
                                                 catalyst: Resources.sulfur, in: state))
+    }
+
+    func testInMemoryLegacyMaterialBinCannotBecomeADistilleryCandidate() {
+        var state = GameState.newGame()
+        let sample = MaterialSample(kind: .reagent,
+            properties: MaterialProperties(insulation: 30, reactivity: 80),
+            grade: 70, source: "legacy")
+        state.base.inventory.add(ItemStack(id: .init(rawValue: 991),
+                                           catalogID: Items.material, material: sample))
+        XCTAssertTrue(DistilleryRules.candidates(for: .heat, in: state).isEmpty)
     }
 
     func testCrystallisationReadinessNamesTheExactMissingInput() {
@@ -185,16 +197,36 @@ final class HomeSatchelTransferTests: XCTestCase {
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
                                 encoding: .utf8)
         XCTAssertTrue(source.contains("case items, stockpiles, satchel, waiting"))
-        XCTAssertTrue(source.contains("base.inventory.stacks.filter { !$0.materials.isEmpty }"))
-        XCTAssertTrue(source.contains("base.inventory.stacks.filter(\\.materials.isEmpty)"))
-        XCTAssertTrue(source.contains("case items, stockpiles, satchel, waiting"))
+        XCTAssertTrue(source.contains("if !reserveMaterialBins.isEmpty"))
+        XCTAssertTrue(source.contains("Dictionary(grouping: base.materialReserve.units"))
+        XCTAssertTrue(source.contains("private var itemStacks: [ItemStack] { base.inventory.stacks.filter(\\.materials.isEmpty) }"))
+        XCTAssertTrue(source.contains("Text(\"Materials\").font(.headline)"))
+        XCTAssertTrue(source.contains("case .stockpiles: \"Resources\""))
+        XCTAssertTrue(source.contains("case .items: \"Items\""))
+        XCTAssertTrue(source.contains("Text(\"\\(base.inventory.stacks.count) of \\(base.inventory.slots)\")"))
+        XCTAssertFalse(source.contains("base.inventory.stacks.filter { !$0.materials.isEmpty }"))
         XCTAssertTrue(source.contains("Suggested—review before departure"))
         XCTAssertTrue(source.contains("Button(\"Increase desired quantity\")"))
         XCTAssertTrue(source.contains("Button(\"Reduce desired quantity\")"))
     }
+
+    func testReserveMaterialsDoNotConsumeStorehouseItemSlots() {
+        var base = BaseState.newGame()
+        let slotsBefore = base.inventory.freeSlots
+        base.materialReserve.addHarvested(
+            MaterialSample(kind: .hide, properties: .init(flexibility: 72),
+                           grade: 68, source: "reserve fixture"),
+            count: 19, sourceReceipt: "storehouse-presentation", dropOrdinal: 0
+        )
+
+        XCTAssertEqual(base.materialReserve.units(of: .hide).count, 19)
+        XCTAssertEqual(base.inventory.freeSlots, slotsBefore)
+        XCTAssertFalse(base.inventory.stacks.contains { $0.catalogID == Items.material })
+    }
 }
 
-/// Items stack, and materials bin by kind (decisions-session-16 §1).
+/// Current items stack normally. The material-bin cases below preserve tolerant decoding behavior
+/// for retired Inventory-backed saves; they are not player-facing Storehouse authority.
 final class StackingTests: XCTestCase {
 
     func testStorehouseWaitingItemRequiresExactDestructiveConfirmation() throws {
@@ -247,6 +279,8 @@ final class StackingTests: XCTestCase {
                                            material: MaterialSample(kind: .reagent,
                                                properties: MaterialProperties(insulation: 30, reactivity: 80),
                                                grade: 70, source: "ashen bloom")))
+        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+                                                       location: "fixture.distillery.attune")
         let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
         XCTAssertTrue(DistilleryRules.attune(.heat, candidate: candidate,
                                              catalyst: Resources.sulfur, in: &state))
@@ -257,7 +291,7 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(core.sampleSource, "ashen bloom")
     }
 
-    func testFullStorehouseRefusesAttunementAtomically() throws {
+    func testMaterialReserveDoesNotConsumeTheOutputSlotDuringAttunement() throws {
         var state = GameState.newGame()
         state.base.stations[Stations.distillery] = StationState(isUnlocked: true, tier: 0)
         state.base.essence = 100
@@ -270,11 +304,13 @@ final class StackingTests: XCTestCase {
         let spare = MaterialSample(kind: .reagent, properties: MaterialProperties(), grade: 10, source: "b")
         state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 2), catalogID: Items.material,
                                            identified: true, materials: [qualifying, spare]))
-        let before = state
+        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+                                                       location: "fixture.distillery.capacity")
         let candidate = try XCTUnwrap(DistilleryRules.candidates(for: .heat, in: state).first)
-        XCTAssertFalse(DistilleryRules.attune(.heat, candidate: candidate,
-                                              catalyst: Resources.sulfur, in: &state))
-        XCTAssertEqual(state, before)
+        XCTAssertTrue(DistilleryRules.attune(.heat, candidate: candidate,
+                                             catalyst: Resources.sulfur, in: &state))
+        XCTAssertEqual(state.base.materialReserve.count, 1)
+        XCTAssertNotNil(state.base.inventory.stacks.first { $0.catalogID == Items.heatCore })
     }
 
     @MainActor func testBuildingChannelworksRestoresOdasFixtureExactlyOnce() throws {
@@ -363,12 +399,10 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(inventory.stacks.count, 2)
     }
 
-    // MARK: Materials bin by kind
+    // MARK: Legacy Inventory material-bin decode/migration compatibility
 
-    /// **All hides go in the hide bin**, whatever their grade or whichever animal they came off.
-    /// A world with six species produces a dozen variants; slot pressure has to be proportional to
-    /// *kinds*, not to variants.
-    func testEveryHideSharesOneSlotHoweverDifferentTheyAre() {
+    /// Retired Inventory saves grouped same-kind samples before decode migrates them to the reserve.
+    func testLegacyInventoryEveryHideSharesOneBinHoweverDifferentTheyAre() {
         var inventory = Inventory(slots: 8)
         inventory.add(material(.hide, grade: 20, source: "pale groper"))
         inventory.add(material(.hide, grade: 80, source: "shaggy browser"))
@@ -378,8 +412,8 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(inventory.stacks[0].count, 3)
     }
 
-    /// …and **nothing is lost by it**. Every sample keeps its own grade, name and source.
-    func testBinningLosesNothingAboutAnyOfThem() throws {
+    /// Legacy bin payloads must remain lossless long enough for reserve migration.
+    func testLegacyInventoryBinningLosesNothingAboutAnySample() throws {
         var inventory = Inventory(slots: 8)
         inventory.add(material(.hide, grade: 20, source: "pale groper"))
         inventory.add(material(.hide, grade: 80, source: "shaggy browser"))
@@ -390,7 +424,7 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(bin.finest?.source, "shaggy browser")
     }
 
-    func testDifferentMaterialKindsGetDifferentSlots() {
+    func testLegacyInventoryDifferentMaterialKindsDecodeAsDifferentBins() {
         var inventory = Inventory(slots: 8)
         inventory.add(material(.hide, grade: 40, source: "x"))
         inventory.add(material(.bone, grade: 40, source: "x"))
@@ -398,9 +432,8 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(inventory.stacks.count, 3)
     }
 
-    /// A bin is named for its kind and says what the best thing in it is — "12 hides" tells you how
-    /// much room it takes and nothing about whether it was worth the trip.
-    func testABinSaysWhatKindItIsAndHowGoodItsBestIs() {
+    /// Historical display metadata remains decodable; current presentation reads MaterialReserve.
+    func testLegacyInventoryBinRetainsKindAndBestGradeMetadata() {
         var inventory = Inventory(slots: 8)
         inventory.add(material(.hide, grade: 20, source: "x"))
         inventory.add(material(.hide, grade: 80, source: "y"))
@@ -410,11 +443,10 @@ final class StackingTests: XCTestCase {
         XCTAssertTrue(inventory.stacks[0].detail.contains("×2"), inventory.stacks[0].detail)
     }
 
-    // MARK: A full hold still takes more of what it already has
+    // MARK: Legacy Inventory capacity compatibility
 
-    /// The point of binning: a full storehouse can still accept another hide, because the hide bin
-    /// is already there. Only a *new kind* needs a slot.
-    func testAFullHoldStillTakesMoreOfWhatItAlreadyHolds() {
+    /// Retained solely so old Inventory payload behavior remains understood during migration.
+    func testLegacyInventoryFullHoldAcceptsSameBinButNotNewKind() {
         var inventory = Inventory(slots: 1)
         XCTAssertTrue(inventory.add(material(.hide, grade: 30, source: "x")))
         XCTAssertTrue(inventory.isFull)
@@ -428,8 +460,8 @@ final class StackingTests: XCTestCase {
 
     // MARK: Taking things back out
 
-    /// Losses come off the bottom — what a collapse or a trade costs you is what you'd miss least.
-    func testTakingFromABinTakesTheWorstFirst() throws {
+    /// Historical bin removal behavior is compatibility coverage, not current sale authority.
+    func testLegacyInventoryTakingFromBinTakesWorstFirst() throws {
         var bin = ItemStack(id: InstanceID(rawValue: 1), catalogID: Items.material,
                             materials: [sample(.hide, grade: 10, source: "a"),
                                         sample(.hide, grade: 90, source: "b"),
@@ -440,9 +472,8 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(bin.finest?.grade, 90)
     }
 
-    /// **A collapse costs half of what you're carrying, not half your slots.** Once a slot can hold
-    /// a dozen hides, dropping half the *slots* takes all twelve or none.
-    func testACollapseCostsThingsRatherThanSlots() {
+    /// Historical Inventory partitioning remains decodable; MaterialReserve owns current failures.
+    func testLegacyInventoryCollapsePartitionsSamplesRatherThanBins() {
         var rng = SeededRNG(seed: 4)
         var inventory = Inventory(slots: 8)
         for grade in stride(from: 10.0, through: 100.0, by: 10) {
@@ -470,13 +501,82 @@ final class StackingTests: XCTestCase {
         XCTAssertEqual(stack.materials.first?.kind, .pelt)
     }
 
-    func testABinRoundTripsThroughASave() throws {
+    func testLegacyInventoryBinRoundTripsBeforeReserveMigration() throws {
         var inventory = Inventory(slots: 8)
         inventory.add(material(.pelt, grade: 30, source: "a"))
         inventory.add(material(.pelt, grade: 70, source: "b"))
 
         let data = try SaveCodec.makeEncoder().encode(inventory)
         XCTAssertEqual(try SaveCodec.makeDecoder().decode(Inventory.self, from: data), inventory)
+    }
+
+    func testEveryLegacyMaterialKindMigratesOutsideSlotsLosslesslyAndIdempotently() throws {
+        var base = BaseState.newGame()
+        base.inventory = Inventory(slots: 1, stacks: [
+            ItemStack(id: .init(rawValue: 41), catalogID: Items.material, materials: [
+                sample(.hide, grade: 27, source: "pale groper"),
+                sample(.bone, grade: 83, source: "sable grazer"),
+                sample(.pelt, grade: 54, source: "shaggy browser")
+            ]),
+            ItemStack(id: .init(rawValue: 42), catalogID: "legacy_property_item", materials: [
+                sample(.quill, grade: 49, source: "non-material payload")
+            ])
+        ])
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(base)) as? [String: Any])
+        object.removeValue(forKey: "materialReserve")
+
+        let migrated = try SaveCodec.makeDecoder().decode(
+            BaseState.self, from: JSONSerialization.data(withJSONObject: object))
+
+        XCTAssertEqual(migrated.inventory.stacks.map(\.catalogID), ["legacy_property_item"])
+        XCTAssertEqual(migrated.inventory.freeSlots, migrated.inventory.slots - 1)
+        XCTAssertEqual(migrated.materialReserve.units.map(\.sample.source),
+                       ["pale groper", "sable grazer", "shaggy browser"])
+        XCTAssertEqual(Set(migrated.materialReserve.units.map(\.sample.kind)), [.hide, .bone, .pelt])
+        XCTAssertEqual(Set(migrated.materialReserve.units.map(\.id).map(\.rawValue)).count, 3)
+
+        let second = try SaveCodec.makeDecoder().decode(
+            BaseState.self, from: SaveCodec.makeEncoder().encode(migrated))
+        XCTAssertEqual(second.materialReserve, migrated.materialReserve)
+        XCTAssertEqual(second.inventory.stacks, migrated.inventory.stacks)
+    }
+
+    @MainActor
+    func testLegacyActiveRunExtractsSatchelAndOfferedReserveUnitsWithoutUsingSlots() throws {
+        let store = GameStore(io: .temporary(name: "reserve-run-\(UUID().uuidString)"))
+        store.mutate("fixture: fund") { $0.base.essence = 5_000 }
+        XCTAssertTrue(store.bindAndDepart())
+        var run = try XCTUnwrap(store.state.worlds.activeRun)
+        var carried = ItemStack(id: .init(rawValue: 51), catalogID: Items.material,
+                                materials: [sample(.hide, grade: 61, source: "carried")])
+        carried.protectedReturnCount = 1
+        run.satchelItems = Inventory(slots: 1, stacks: [carried])
+        run.offeredItems = [ItemStack(id: .init(rawValue: 52), catalogID: Items.material,
+                                      materials: [sample(.bone, grade: 72, source: "offered")])]
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(run)) as? [String: Any])
+        object.removeValue(forKey: "materialReserve")
+
+        let migrated = try SaveCodec.makeDecoder().decode(
+            WorldRun.self, from: JSONSerialization.data(withJSONObject: object))
+
+        XCTAssertTrue(migrated.satchelItems.stacks.isEmpty)
+        XCTAssertTrue(migrated.offeredItems.isEmpty)
+        XCTAssertEqual(migrated.satchelItems.freeSlots, 1)
+        XCTAssertEqual(Set(migrated.materialReserve.units.map(\.sample.source)), ["carried", "offered"])
+        XCTAssertEqual(migrated.materialReserve.units.first {
+            $0.sample.source == "carried"
+        }?.protectedReturn, true)
+        XCTAssertEqual(migrated.materialReserve.units.first {
+            $0.sample.source == "offered"
+        }?.protectedReturn, false)
+
+        let second = try SaveCodec.makeDecoder().decode(
+            WorldRun.self, from: SaveCodec.makeEncoder().encode(migrated))
+        XCTAssertEqual(second.materialReserve, migrated.materialReserve)
+        XCTAssertTrue(second.satchelItems.stacks.isEmpty)
+        XCTAssertTrue(second.offeredItems.isEmpty)
     }
 
     // MARK: It reaches the player

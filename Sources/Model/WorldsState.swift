@@ -171,7 +171,8 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
 
         struct Material: Codable, Equatable, Sendable {
             var lineID: String
-            var sourceStackID: InstanceID
+            var sourceStackID: InstanceID?
+            var reserveUnitID: MaterialReserveUnitID? = nil
             var catalogID: ItemID
             var sample: MaterialSample
             var identified: Bool
@@ -216,7 +217,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         }
 
         static func compatibilityResources(from lines: [Self]) -> [RunExitGain] {
-            lines.compactMap { line in
+            let ordinary = lines.compactMap { line -> RunExitGain? in
                 switch line {
                 case .resource: line.compatibilityGain
                 case .legacy(let legacy) where legacy.stableID.contains("resource-"):
@@ -224,15 +225,27 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
                 case .stackableItem, .uniqueItem, .materialSample, .legacy: nil
                 }
             }
+            let samples = lines.compactMap { line -> Material? in
+                guard case .materialSample(let material) = line else { return nil }
+                return material
+            }
+            let materials = Dictionary(grouping: samples, by: { $0.sample.kind })
+                .map { kind, grouped in
+                    RunExitGain(name: grouped.count == 1 ? kind.displayName
+                                                         : kind.pluralName.capitalisedSentence,
+                                icon: kind.icon, count: grouped.count)
+                }
+                .sorted { $0.name < $1.name }
+            return ordinary + materials
         }
 
         static func compatibilityItems(from lines: [Self]) -> [RunExitGain] {
             lines.compactMap { line in
                 switch line {
-                case .stackableItem, .uniqueItem, .materialSample: line.compatibilityGain
+                case .stackableItem, .uniqueItem: line.compatibilityGain
                 case .legacy(let legacy) where !legacy.stableID.contains("resource-"):
                     line.compatibilityGain
-                case .resource, .legacy: nil
+                case .resource, .materialSample, .legacy: nil
                 }
             }
         }
@@ -858,6 +871,8 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Unbanked haul. Kept 100% on portal exit, `collapseHaulKeptFraction` on collapse.
     var satchel: ResourcePool = ResourcePool()
     var satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
+    /// Exact harvested material haul. This reserve is carried, but never occupies a satchel slot.
+    var materialReserve: MaterialReserve = MaterialReserve()
     /// Frozen at departure: changing next trip's kit cannot alter a world already in progress.
     var carriedInstruments: Set<PressureTargetID> = []
     /// Grade is frozen at departure along with the packing choice.
@@ -916,6 +931,7 @@ struct WorldRun: Codable, Equatable, Sendable {
          companionHP: [Int: Int] = [:],
          healthCaps: [RunHealthCapEntry]? = nil,
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots),
+         materialReserve: MaterialReserve = MaterialReserve(),
          carriedInstruments: Set<PressureTargetID> = [],
          carriedInstrumentPrecisions: [PressureTargetID: RealityState.InstrumentPrecision] = [:],
          partyProgressAtStart: [RunProgressStart] = [],
@@ -947,6 +963,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.companionHP = companionHP
         self.healthCaps = healthCaps.map(Self.normalizedHealthCaps)
         self.satchelItems = satchelItems
+        self.materialReserve = materialReserve
         self.carriedInstruments = carriedInstruments
         self.carriedInstrumentPrecisions = carriedInstrumentPrecisions
         self.partyProgressAtStart = partyProgressAtStart
@@ -1036,6 +1053,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         satchel = try container.decodeIfPresent(ResourcePool.self, forKey: .satchel) ?? ResourcePool()
         satchelItems = try container.decodeIfPresent(Inventory.self, forKey: .satchelItems)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
+        materialReserve = try container.decodeIfPresent(MaterialReserve.self,
+                                                        forKey: .materialReserve) ?? MaterialReserve()
         carriedInstruments = try container.decodeIfPresent(Set<PressureTargetID>.self,
                                                             forKey: .carriedInstruments) ?? []
         carriedInstrumentPrecisions = try container.decodeIfPresent(
@@ -1070,6 +1089,8 @@ struct WorldRun: Codable, Equatable, Sendable {
                 remaining[id, default: 0] -= protected
             }
         }
+        materialReserve.migrateLegacyStacks(&satchelItems.stacks, location: "run.satchelItems")
+        materialReserve.migrateLegacyStacks(&offeredItems, location: "run.offeredItems")
         foundPagesAtStart = try container.decodeIfPresent(Set<DiaryPageID>.self,
                                                            forKey: .foundPagesAtStart) ?? []
         foundWritingsAtStart = try container.decodeIfPresent(Set<FoundWritingID>.self,
@@ -1123,6 +1144,7 @@ extension WorldRun {
         var snapshot = self
         snapshot.satchel = ResourcePool()
         snapshot.satchelItems = Inventory(slots: Tuning.Economy.startingSatchelSlots)
+        snapshot.materialReserve = MaterialReserve()
         snapshot.carriedInstruments = []
         snapshot.carriedInstrumentPrecisions = [:]
         snapshot.activeEncounter = nil

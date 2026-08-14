@@ -51,7 +51,8 @@ enum DistilleryRules {
         var sampleIndex: Int
         var sample: MaterialSample
         var relevantProperty: Double
-        var id: String { "\(binID.rawValue)-\(sampleIndex)" }
+        var reserveSelection: MaterialReserveSelection? = nil
+        var id: String { reserveSelection?.unitID.rawValue ?? "\(binID.rawValue)-\(sampleIndex)" }
     }
 
     enum AttunementReadiness: Equatable, Sendable {
@@ -75,22 +76,14 @@ enum DistilleryRules {
 
     static func candidates(for attunement: CoreAttunement, in state: GameState) -> [Candidate] {
         let requirement = requirement(for: attunement)
-        return state.base.inventory.stacks.flatMap { bin in
-            bin.materials.enumerated().compactMap { index, sample in
-                guard requirement.accepts(sample) else { return nil }
-                let relevant: Double
-                switch attunement {
-                case .heat:
-                    relevant = sample.properties.reactivity
-                case .caustic:
-                    relevant = sample.properties.reactivity
-                case .light:
-                    relevant = sample.properties.lustre
-                }
-                return Candidate(binID: bin.id, sampleIndex: index, sample: sample,
-                                 relevantProperty: relevant)
-            }
-        }.sorted { ($0.sample.grade, $0.relevantProperty) < ($1.sample.grade, $1.relevantProperty) }
+        let reserve = state.base.materialReserve.selections { requirement.accepts($0) }.map { quote in
+            let relevant = attunement == .light ? quote.sample.properties.lustre
+                                                : quote.sample.properties.reactivity
+            return Candidate(binID: .init(rawValue: 0), sampleIndex: 0, sample: quote.sample,
+                             relevantProperty: relevant, reserveSelection: quote)
+        }
+        return reserve.sorted { ($0.sample.grade, $0.relevantProperty, $0.id)
+            < ($1.sample.grade, $1.relevantProperty, $1.id) }
     }
 
     static func catalystOptions(for attunement: CoreAttunement) -> [(ResourceID, Int)] {
@@ -170,13 +163,17 @@ enum DistilleryRules {
         let requirement = requirement(for: attunement)
         guard canAttune(attunement, candidate: candidate, catalyst: catalyst, in: state),
               let required = requirement.catalysts.first(where: { $0.resource == catalyst }) else { return false }
+        var staged = state
         let catalystReceipt = (required.resource, required.amount)
         let core = provenance(for: attunement, candidate: candidate, catalyst: catalystReceipt)
-        guard removeOne(catalogID: Items.essenceCrystal, from: &state.base.inventory),
-              remove(candidate: candidate, from: &state.base.inventory) else { return false }
-        state.base.essence -= requirement.essence
-        state.base.resources.spend(required.amount, of: catalyst)
-        return state.base.inventory.add(output(catalogID: item(for: attunement), core: core, in: state))
+        guard removeOne(catalogID: Items.essenceCrystal, from: &staged.base.inventory),
+              remove(candidate: candidate, from: &staged.base),
+              staged.base.inventory.add(output(catalogID: item(for: attunement), core: core,
+                                               in: staged)) else { return false }
+        staged.base.essence -= requirement.essence
+        staged.base.resources.spend(required.amount, of: catalyst)
+        state = staged
+        return true
     }
 
     /// First Channelworks consumer: construction transfers the core receipt onto the fixture.
@@ -214,7 +211,7 @@ enum DistilleryRules {
                                  replacingOneBlank: Bool = false, consuming: Candidate? = nil) -> Bool {
         var inventory = state.base.inventory
         if replacingOneBlank { guard removeOne(catalogID: Items.essenceCrystal, from: &inventory) else { return false } }
-        if let consuming { guard remove(candidate: consuming, from: &inventory) else { return false } }
+        if let consuming, consuming.reserveSelection == nil { return false }
         return inventory.add(stack)
     }
 
@@ -225,13 +222,8 @@ enum DistilleryRules {
         return true
     }
 
-    @discardableResult private static func remove(candidate: Candidate, from inventory: inout Inventory) -> Bool {
-        guard let bin = inventory.stacks.firstIndex(where: { $0.id == candidate.binID }),
-              inventory.stacks[bin].materials.indices.contains(candidate.sampleIndex),
-              inventory.stacks[bin].materials[candidate.sampleIndex] == candidate.sample else { return false }
-        inventory.stacks[bin].materials.remove(at: candidate.sampleIndex)
-        inventory.stacks[bin].count = inventory.stacks[bin].materials.count
-        if inventory.stacks[bin].count == 0 { inventory.stacks.remove(at: bin) }
-        return true
+    @discardableResult private static func remove(candidate: Candidate, from base: inout BaseState) -> Bool {
+        guard let reserve = candidate.reserveSelection else { return false }
+        return base.materialReserve.consume([reserve]) != nil
     }
 }

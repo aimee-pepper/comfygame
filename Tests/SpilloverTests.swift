@@ -70,7 +70,7 @@ final class SpilloverTests: XCTestCase {
 
         XCTAssertTrue(anchorage.contains("VStack(alignment: .leading, spacing: 2)"))
         XCTAssertTrue(anchorage.contains("Worldwork \\(worker.worldwork) · +\\(contribution)"))
-        XCTAssertTrue(anchorage.contains("Button(\"Return\")"))
+        XCTAssertTrue(anchorage.contains("Button(\"Return Home\")"))
         XCTAssertTrue(anchorage.contains(".buttonStyle(.bordered)"))
         XCTAssertTrue(anchorage.contains(".frame(minHeight: 44)"))
     }
@@ -362,6 +362,26 @@ final class SpilloverTests: XCTestCase {
         let resumed = GameStore(io: io)
         XCTAssertEqual(resumed.spillover.map(\.id), [spilled.id],
                        "loot waiting to be sorted didn't survive a relaunch")
+    }
+
+    func testLegacyHideWaitingInSpilloverMigratesToReserveWithoutLoss() throws {
+        let sample = MaterialSample(kind: .hide,
+            properties: MaterialProperties(hardness: 44, flexibility: 71),
+            grade: 68, source: "marsh prowler", qualifier: "supple")
+        var base = BaseState.newGame()
+        base.inventory = Inventory(slots: 0)
+        base.spillover = [ItemStack(id: .init(rawValue: 404), catalogID: Items.material,
+                                    materials: [sample])]
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(base)) as? [String: Any])
+        object.removeValue(forKey: "materialReserve")
+
+        let migrated = try SaveCodec.makeDecoder().decode(
+            BaseState.self, from: JSONSerialization.data(withJSONObject: object))
+
+        XCTAssertTrue(migrated.spillover.isEmpty)
+        XCTAssertEqual(migrated.materialReserve.units.map(\.sample), [sample])
+        XCTAssertEqual(migrated.inventory.stacks.count, 0)
     }
 
     func testStorehouseDetailSheetsResolveCurrentStateInsteadOfFrozenQuantities() throws {

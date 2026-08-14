@@ -876,6 +876,31 @@ extension GameStore {
                 state.base.resources.add(amount, of: id)
             }
         }
+        let materialPartition = run.materialReserve.partitionedForFailure(
+            fraction: fraction, outcomeID: outcomeID)
+        func materialGains(_ reserve: MaterialReserve) -> [RunExitGain] {
+            Dictionary(grouping: reserve.units, by: { $0.sample.kind })
+                .map { kind, units in
+                    RunExitGain(name: units.count == 1 ? kind.displayName
+                                                       : kind.pluralName.capitalisedSentence,
+                                icon: kind.icon, count: units.count)
+                }
+                .sorted { $0.name < $1.name }
+        }
+        func materialLines(_ reserve: MaterialReserve, side: String)
+            -> [RunExitSummary.ReceiptLine] {
+            reserve.units.sorted { $0.id < $1.id }.map { unit in
+                .materialSample(.init(
+                    lineID: "\(outcomeID.rawValue)-\(side)-\(unit.id.rawValue)",
+                    sourceStackID: nil, reserveUnitID: unit.id,
+                    catalogID: Items.material, sample: unit.sample, identified: true,
+                    fallbackName: unit.sample.displayName, fallbackIcon: unit.sample.kind.icon))
+            }
+        }
+        for var unit in materialPartition.kept.units {
+            unit.protectedReturn = false
+            state.base.materialReserve.add(unit)
+        }
         var guaranteed = Inventory(slots: run.satchelItems.slots)
         var exposed = Inventory(slots: run.satchelItems.slots)
         for stack in run.satchelItems.stacks {
@@ -910,10 +935,14 @@ extension GameStore {
             // Full Storehouse. It waits rather than evaporating — see `BaseState.spillover`.
             state.base.spillover.append(stack)
         }
-        return BankedHaul(resources: resourceGains, items: itemGains,
-                          lostResources: lostResourceGains, lostItems: lostItemGains,
-                          recoveredLines: recoveredResourceLines + recoveredItemLines,
-                          lostLines: lostResourceLines + lostItemLines,
+        return BankedHaul(resources: resourceGains + materialGains(materialPartition.kept),
+                          items: itemGains,
+                          lostResources: lostResourceGains + materialGains(materialPartition.lost),
+                          lostItems: lostItemGains,
+                          recoveredLines: recoveredResourceLines + recoveredItemLines
+                            + materialLines(materialPartition.kept, side: "recovered"),
+                          lostLines: lostResourceLines + lostItemLines
+                            + materialLines(materialPartition.lost, side: "lost"),
                           unidentifiedItemIDs: retainedRisk.stacks.filter { !$0.identified }.map(\.catalogID),
                           returnedRawEssence: keptResources[Resources.essenceRaw] > 0,
                           rawEssence: keptResources[Resources.essenceRaw])

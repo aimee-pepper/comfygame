@@ -3110,7 +3110,8 @@ enum CombatRules {
             }
             if let traits = foe.traits {
                 found.append(contentsOf: butcher(traits, named: foe.stats.displayName,
-                                                 qualifier: foe.qualifier, run: &run))
+                                                 qualifier: foe.qualifier, foeID: foe.id,
+                                                 run: &run))
             }
             // **Gear drops too** (Aimee, 5 Aug). Sites were the only source, so a run that fought
             // its way across a world and found no ruin came home with nothing to wear — and now
@@ -3178,27 +3179,22 @@ enum CombatRules {
         } + found
     }
 
-    /// Cuts a body into the parts it was made of, into the satchel.
-    ///
-    /// A full satchel neither swallows a material nor discards it: it goes onto `offeredItems` and
-    /// waits on the player, the same rule curios follow, so a force-quit mid-decision resumes with
-    /// the decision still open.
+    /// Cuts a body into exact property-bearing reserve units. Material never consumes a satchel
+    /// slot or enters the loot-swap queue; source identity is the saved run + defeated combatant.
     private static func butcher(_ traits: CreatureTraits, named name: String,
-                                qualifier: String?, run: inout WorldRun) -> [String] {
+                                qualifier: String?, foeID: InstanceID,
+                                run: inout WorldRun) -> [String] {
         var lines: [String] = []
         let count = ButcheryRules.quantity(from: traits, rng: &run.rng)
 
-        for sample in ButcheryRules.materials(from: traits, named: name, qualifier: qualifier) {
-            let stack = ItemStack(id: InstanceID(rawValue: run.rng.next()),
-                                  catalogID: Items.material,
-                                  count: count,
-                                  material: sample)
-            if run.satchelItems.add(stack) {
-                lines.append(count > 1 ? "\(sample.displayName) ×\(count)" : sample.displayName)
-            } else {
-                run.offeredItems.append(stack)
-                lines.append("\(sample.displayName) — no room; waiting on you")
-            }
+        for (dropOrdinal, sample) in ButcheryRules.materials(
+            from: traits, named: name, qualifier: qualifier
+        ).enumerated() {
+            run.materialReserve.addHarvested(
+                sample, count: count,
+                sourceReceipt: "run:\(run.runIndex):foe:\(foeID.rawValue)",
+                dropOrdinal: dropOrdinal)
+            lines.append(count > 1 ? "\(sample.displayName) ×\(count)" : sample.displayName)
         }
         return lines
     }

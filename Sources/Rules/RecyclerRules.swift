@@ -177,15 +177,19 @@ enum RecyclerRules {
               current == preview else { return .invalid }
 
         var candidate = base
+        let returnedUnits = preview.returnedSamples.enumerated().map { ordinal, sample in
+            MaterialReserveUnit(
+                id: MaterialReserveUnitID(
+                    rawValue: "recycler-\(preview.stackID.rawValue)-\(ordinal)"),
+                sample: sample)
+        }
+        let existingReserveIDs = Set(candidate.materialReserve.selections().map(\.unitID))
+        guard returnedUnits.allSatisfy({ !existingReserveIDs.contains($0.id) }) else {
+            return .invalid
+        }
         guard remove(preview.stackID, at: preview.location, in: &candidate) else { return .invalid }
         candidate.resources.add(contentsOf: preview.returnedResources)
-        // A material bin has exactly one kind. Return each receipt entry through ordinary Storehouse
-        // binning so a plate and a fibre never become one malformed heterogeneous stack.
-        for sample in preview.returnedSamples {
-            candidate.store(ItemStack(id: InstanceID(rawValue: candidate.nextItemID()),
-                                      catalogID: Items.material, identified: true,
-                                      materials: [sample]))
-        }
+        for unit in returnedUnits { candidate.materialReserve.add(unit) }
         candidate.recycler.inventoryRevision &+= 1
         base = candidate
         return .committed

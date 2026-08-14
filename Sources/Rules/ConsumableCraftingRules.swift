@@ -91,14 +91,7 @@ enum ConsumableCraftingRules {
               shortfall(recipe, in: state).isEmpty else { return false }
         if let need = recipe.material {
             let spending = Array(qualifyingSamples(for: recipe, in: state).prefix(need.count))
-            for (binID, taken) in Dictionary(grouping: spending, by: \.binID) {
-                guard let bin = state.base.inventory.stacks.firstIndex(where: { $0.id == binID }) else { return false }
-                for candidate in taken.sorted(by: { $0.index > $1.index }) {
-                    state.base.inventory.stacks[bin].materials.remove(at: candidate.index)
-                }
-                state.base.inventory.stacks[bin].count = state.base.inventory.stacks[bin].materials.count
-            }
-            state.base.inventory.stacks.removeAll { $0.count == 0 }
+            guard SmithRules.consume(spending, in: &state) else { return false }
         }
         for (id, amount) in recipe.resources { state.base.resources.spend(amount, of: id) }
         state.reality.motes -= recipe.motes

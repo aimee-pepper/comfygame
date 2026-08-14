@@ -134,12 +134,30 @@ enum ArmouryRules {
     }
 
     static func defaultSelections(for profile: Profile, in state: GameState) -> [Selection]? {
-        let recipe = selectionRecipe(profile)
-        return PhysicalGearCraftingRules.defaultSelections(for: recipe, in: state)
+        var used: Set<String> = []
+        var result: [Selection] = []
+        for requirement in profile.requirements {
+            guard let candidate = candidates(for: requirement, in: state)
+                .first(where: { !used.contains($0.stockKey) }) else { return nil }
+            used.insert(candidate.stockKey)
+            result.append(candidate)
+        }
+        return result
     }
 
     static func candidates(for requirement: Requirement, in state: GameState) -> [Selection] {
-        PhysicalGearCraftingRules.candidates(for: requirement, in: state)
+        state.base.materialReserve.selections {
+            PhysicalGearCraftingRules.qualifies($0, for: requirement)
+        }.map { quote in
+            Selection(requirementID: requirement.id, binID: .init(rawValue: 0), sampleIndex: 0,
+                      sample: quote.sample, reserveSelection: quote)
+        }.sorted { lhs, rhs in
+            let scoringFloors = requirement.floors + requirement.alternativeFloors
+            let left = scoringFloors.map { lhs.sample.properties[$0.property] }.reduce(0, +)
+            let right = scoringFloors.map { rhs.sample.properties[$0.property] }.reduce(0, +)
+            return (left, lhs.sample.grade, lhs.stockKey)
+                < (right, rhs.sample.grade, rhs.stockKey)
+        }
     }
 
     static func preview(_ profile: Profile, target: Target, selections: [Selection]? = nil,
@@ -148,7 +166,7 @@ enum ArmouryRules {
               isAvailable(profile, for: target, in: state), currentTarget(matching: target, in: state) != nil
         else { return nil }
         let chosen = selections ?? defaultSelections(for: profile, in: state)
-        guard let chosen,
+        guard let chosen, chosen.allSatisfy({ $0.reserveSelection != nil }),
               PhysicalGearCraftingRules.preview(selectionRecipe(profile), selections: chosen, in: state) != nil
         else { return nil }
         let grades = chosen.map(\.sample.grade)
@@ -190,14 +208,7 @@ enum ArmouryRules {
         rebuilt.consumedSamples += preview.selections.map(\.sample)
         rebuilt.recipeVersion = 1
 
-        for (binID, selections) in Dictionary(grouping: preview.selections, by: \.binID) {
-            guard let bin = state.base.inventory.stacks.firstIndex(where: { $0.id == binID }) else { return false }
-            for selection in selections.sorted(by: { $0.sampleIndex > $1.sampleIndex }) {
-                state.base.inventory.stacks[bin].materials.remove(at: selection.sampleIndex)
-            }
-            state.base.inventory.stacks[bin].count = state.base.inventory.stacks[bin].materials.count
-        }
-        state.base.inventory.stacks.removeAll { $0.count == 0 }
+        guard PhysicalGearCraftingRules.consume(preview.selections, in: &state) else { return false }
         state.base.essence -= preview.essence
         apply(rebuilt, to: current, in: &state)
         return true

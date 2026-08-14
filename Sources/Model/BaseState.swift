@@ -13,6 +13,8 @@ struct BaseState: Codable, Equatable, Sendable {
     var essence: Int = Tuning.Economy.startingEssence
     /// Raw stockpiles hauled home (Ore, Fiber, Essence-raw…). Motes live in Reality.
     var resources: ResourcePool = ResourcePool()
+    /// Exact harvested material samples. Bulk reserves never consume Storehouse slots.
+    var materialReserve: MaterialReserve = MaterialReserve()
     var inventory: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
     /// Durable desired quantities for the next expedition. `nil` is a legacy save that has not
     /// yet reviewed the conservative suggested Field Kit; an explicit empty array is player intent.
@@ -332,7 +334,7 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Explicit because `companion` is no longer stored — it's a window onto the roster — and the
     /// decoder still has to be able to read it out of a save written before the roster existed.
     private enum CodingKeys: String, CodingKey {
-        case essence, resources, inventory, preparationLoadout, preparationLoadoutNeedsReview
+        case essence, resources, materialReserve, inventory, preparationLoadout, preparationLoadoutNeedsReview
         case satchelLoadout, spillover, goldCoins, tradingPost, recycler
         case lifetimeRawEssenceRefined, autoRefineReturnedRawEssence, lastAutoRefinedOutcomeID
         case ownedSymbols, ownedGambitComponents
@@ -350,6 +352,7 @@ struct BaseState: Codable, Equatable, Sendable {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(essence, forKey: .essence)
         try c.encode(resources, forKey: .resources)
+        try c.encode(materialReserve, forKey: .materialReserve)
         try c.encode(inventory, forKey: .inventory)
         try c.encodeIfPresent(preparationLoadout, forKey: .preparationLoadout)
         try c.encode(preparationLoadoutNeedsReview, forKey: .preparationLoadoutNeedsReview)
@@ -387,6 +390,8 @@ struct BaseState: Codable, Equatable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         essence = try container.decodeIfPresent(Int.self, forKey: .essence) ?? Tuning.Economy.startingEssence
         resources = try container.decodeIfPresent(ResourcePool.self, forKey: .resources) ?? ResourcePool()
+        materialReserve = try container.decodeIfPresent(MaterialReserve.self,
+                                                        forKey: .materialReserve) ?? MaterialReserve()
         inventory = try container.decodeIfPresent(Inventory.self, forKey: .inventory)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
         preparationLoadout = try container.decodeIfPresent([FieldKitPreparationEntry].self,
@@ -460,6 +465,8 @@ struct BaseState: Codable, Equatable, Sendable {
         binderCharacter = try container.decodeIfPresent(CharacterState.self, forKey: .binderCharacter)
             ?? CharacterState(rank: .front)
         spillover = try container.decodeIfPresent([ItemStack].self, forKey: .spillover) ?? []
+        materialReserve.migrateLegacyStacks(&inventory.stacks, location: "base.inventory")
+        materialReserve.migrateLegacyStacks(&spillover, location: "base.spillover")
         goldCoins = max(0, try container.decodeIfPresent(Int.self, forKey: .goldCoins) ?? 0)
         tradingPost = try container.decodeIfPresent(TradingPostState.self, forKey: .tradingPost)
             ?? TradingPostState()

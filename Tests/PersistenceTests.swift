@@ -4,6 +4,82 @@ import XCTest
 /// The interruptibility pillar, tested. Anything that breaks here breaks pillar 2.
 final class PersistenceTests: XCTestCase {
 
+    func testLegacyMaterialContainersMigrateEveryKindExactlyOnceAndReencodeCanonically() throws {
+        var state = GameState.newGame()
+        let samples = MaterialKind.allCases.enumerated().map { index, kind in
+            MaterialSample(
+                kind: kind,
+                properties: MaterialProperties(
+                    hardness: Double(index + 1), density: Double(index + 11),
+                    insulation: Double(index + 21), flexibility: Double(index + 31),
+                    lustre: Double(index + 41), reactivity: Double(index + 51)
+                ),
+                grade: Double(index + 61), source: "legacy-\(kind.rawValue)",
+                qualifier: "qualifier-\(index)"
+            )
+        }
+        var run = legacyMaterialRun()
+
+        for (index, sample) in samples.enumerated() {
+            var stack = ItemStack(
+                id: InstanceID(rawValue: UInt64(50_000 + index)), catalogID: Items.material,
+                identified: true, materials: [sample]
+            )
+            stack.protectedReturnCount = index.isMultiple(of: 2) ? 1 : 0
+            switch index % 4 {
+            case 0: state.base.inventory.stacks.append(stack)
+            case 1: state.base.spillover.append(stack)
+            case 2: run.satchelItems.stacks.append(stack)
+            default: run.offeredItems.append(stack)
+            }
+        }
+        state.worlds.activeRun = run
+
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.encode(state)) as? [String: Any])
+        var base = try XCTUnwrap(root["base"] as? [String: Any])
+        base.removeValue(forKey: "materialReserve")
+        root["base"] = base
+        var worlds = try XCTUnwrap(root["worlds"] as? [String: Any])
+        var activeRun = try XCTUnwrap(worlds["activeRun"] as? [String: Any])
+        activeRun.removeValue(forKey: "materialReserve")
+        worlds["activeRun"] = activeRun
+        root["worlds"] = worlds
+        let legacyData = try JSONSerialization.data(withJSONObject: root)
+
+        let migrated = try SaveCodec.decode(legacyData)
+        let migratedRun = try XCTUnwrap(migrated.worlds.activeRun)
+        let units = migrated.base.materialReserve.units + migratedRun.materialReserve.units
+
+        XCTAssertEqual(units.count, samples.count)
+        XCTAssertEqual(Set(units.map(\.sample.kind)), Set(MaterialKind.allCases))
+        XCTAssertTrue(samples.allSatisfy { sample in
+            units.filter { $0.sample == sample }.count == 1
+        })
+        XCTAssertEqual(Set(units.map(\.id)).count, units.count)
+        let protectedSamples = samples.enumerated().compactMap {
+            $0.offset.isMultiple(of: 2) ? $0.element : nil
+        }
+        XCTAssertEqual(units.filter(\.protectedReturn).count, protectedSamples.count)
+        XCTAssertTrue(protectedSamples.allSatisfy { sample in
+            units.contains { $0.protectedReturn && $0.sample == sample }
+        })
+        XCTAssertFalse(migrated.base.inventory.stacks.contains { $0.catalogID == Items.material })
+        XCTAssertFalse(migrated.base.spillover.contains { $0.catalogID == Items.material })
+        XCTAssertFalse(migratedRun.satchelItems.stacks.contains { $0.catalogID == Items.material })
+        XCTAssertFalse(migratedRun.offeredItems.contains { $0.catalogID == Items.material })
+
+        let canonical = try SaveCodec.encode(migrated)
+        let relaunched = try SaveCodec.decode(canonical)
+        XCTAssertEqual(relaunched, migrated)
+        let relaunchedRun = try XCTUnwrap(relaunched.worlds.activeRun)
+        let relaunchedUnits = relaunched.base.materialReserve.units
+            + relaunchedRun.materialReserve.units
+        XCTAssertEqual(relaunchedUnits.count, units.count)
+        XCTAssertEqual(Set(relaunchedUnits.map(\.id)).count, relaunchedUnits.count)
+        XCTAssertEqual(Set(relaunchedUnits.map(\.id)), Set(units.map(\.id)))
+    }
+
     func testLegacyPencilAndChainingDecodeToCanonicalResearchAndReencodeCanonically() throws {
         let data = Data(#"{"completedResearch":["pen_pencil","pen_desk"],"hasChainingUnlock":true}"#.utf8)
         let decoded = try JSONDecoder().decode(BaseState.self, from: data)
@@ -62,6 +138,14 @@ final class PersistenceTests: XCTestCase {
             try wrapped.write(data)
         }
         func deleteEverything() { wrapped.deleteEverything() }
+    }
+
+    private func legacyMaterialRun() -> WorldRun {
+        let book = BoundBook(symbols: [:], randomlyFilled: [], essencePaid: 0)
+        let generated = Worldgen.generate(book: book, seed: 812)
+        return WorldRun(runIndex: 3, book: book, mapSeed: 812,
+                        rng: SeededRNG(seed: 812), map: generated.map,
+                        playerPosition: generated.start)
     }
 
     private var io: SaveFileIO!

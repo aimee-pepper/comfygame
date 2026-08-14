@@ -21,15 +21,63 @@ final class SmithTests: XCTestCase {
                        grade: grade, source: source)
     }
 
+    func testDirectLegacyMaterialBinCannotFundSmithAndRefusalIsByteEquivalent() throws {
+        var state = GameState.newGame()
+        let exact = sample(hardness: 70)
+        let gear = ItemStack(id: .init(rawValue: 82), catalogID: "blade_chipped")
+        state.base.inventory = Inventory(slots: 2, stacks: [gear,
+            ItemStack(id: .init(rawValue: 81), catalogID: Items.material, materials: [exact])])
+        state.base.essence = 500
+        let encodedBefore = try SaveCodec.makeEncoder().encode(state)
+
+        XCTAssertTrue(SmithRules.candidates(
+            for: try XCTUnwrap(SmithRules.requirement(for: gear.catalogID, at: 0)),
+            in: state).isEmpty)
+        XCTAssertNil(SmithRules.reforge(stored: gear, in: &state))
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(state), encodedBefore)
+    }
+
+    func testDecodedLegacyMaterialBinMigratesBeforeSmithCanUseIt() throws {
+        var legacy = GameState.newGame()
+        let exact = sample(hardness: 70, source: "legacy bin")
+        legacy.base.inventory = Inventory(slots: 2, stacks: [
+            ItemStack(id: .init(rawValue: 81), catalogID: Items.material, materials: [exact])
+        ])
+
+        let restored = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: SaveCodec.makeEncoder().encode(legacy))
+        let requirement = SmithRules.Requirement(property: .hardness, minimum: 60,
+                                                 count: 1, essence: 0, level: 0)
+
+        XCTAssertTrue(restored.base.inventory.stacks.flatMap(\.materials).isEmpty)
+        XCTAssertEqual(restored.base.materialReserve.selections().map(\.sample), [exact])
+        XCTAssertEqual(SmithRules.candidates(for: requirement, in: restored).count, 1)
+    }
+
+    func testSmithCandidatesQuoteAndConsumeExactReserveUnit() throws {
+        var state = GameState.newGame()
+        let exact = sample(hardness: 70, source: "reserve source")
+        state.base.materialReserve.add(.init(id: .init(rawValue: "reserve-smith-1"), sample: exact))
+        let requirement = SmithRules.Requirement(property: .hardness, minimum: 60,
+                                                 count: 1, essence: 0, level: 0)
+        let candidate = try XCTUnwrap(SmithRules.candidates(for: requirement, in: state).first)
+        XCTAssertEqual(candidate.reserveSelection.unitID.rawValue, "reserve-smith-1")
+
+        XCTAssertTrue(SmithRules.consume([candidate], in: &state))
+        XCTAssertTrue(state.base.materialReserve.isEmpty)
+    }
+
     /// A storehouse with `count` pieces of hard stock and plenty of essence.
     @MainActor
     private func stocked(_ store: GameStore, hardness: Double = 90, count: Int = 8,
                          essence: Int = 500) {
         store.mutate("test: stock the shelf") { state in
             state.base.essence = essence
-            state.base.inventory.add(ItemStack(
-                id: InstanceID(rawValue: 900), catalogID: Items.material,
-                materials: (0..<count).map { _ in self.sample(hardness: hardness) }))
+            for ordinal in 0..<count {
+                state.base.materialReserve.add(MaterialReserveUnit(
+                    id: MaterialReserveUnitID(rawValue: "smith-fixture-\(ordinal)"),
+                    sample: self.sample(hardness: hardness)))
+            }
         }
     }
 
@@ -127,18 +175,21 @@ final class SmithTests: XCTestCase {
         let store = store()
         store.mutate("test: one treasure among the tat") { state in
             state.base.essence = 500
-            state.base.inventory.add(ItemStack(
-                id: InstanceID(rawValue: 900), catalogID: Items.material,
-                materials: [self.sample(hardness: 99, grade: 99, source: "monstrous bulwark"),
-                            self.sample(hardness: 40, grade: 20),
-                            self.sample(hardness: 41, grade: 21),
-                            self.sample(hardness: 42, grade: 22)]))
+            let samples = [self.sample(hardness: 99, grade: 99, source: "monstrous bulwark"),
+                           self.sample(hardness: 40, grade: 20),
+                           self.sample(hardness: 41, grade: 21),
+                           self.sample(hardness: 42, grade: 22)]
+            for (ordinal, sample) in samples.enumerated() {
+                state.base.materialReserve.add(MaterialReserveUnit(
+                    id: MaterialReserveUnitID(rawValue: "smith-quality-\(ordinal)"),
+                    sample: sample))
+            }
             state.base.inventory.add(ItemStack(id: InstanceID(rawValue: 1), catalogID: "blade_chipped"))
         }
         let target = try XCTUnwrap(store.reforgeable.first { $0.catalogID == "blade_chipped" })
         store.reforge(target)
 
-        let left = store.state.base.inventory.stacks.first { $0.catalogID == Items.material }?.materials ?? []
+        let left = store.state.base.materialReserve.selections().map(\.sample)
         XCTAssertTrue(left.contains { $0.grade == 99 }, "the smith ate the best thing in the bin")
         XCTAssertEqual(left.count, 2)
     }

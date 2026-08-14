@@ -52,12 +52,13 @@ final class ConsumableCraftingTests: XCTestCase {
         state.base.inventory.stacks = [ItemStack(
             id: InstanceID(rawValue: 800), catalogID: Items.material,
             materials: [sample(.flexibility, 90), sample(.flexibility, 26)])]
+        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+                                                       location: "fixture.consumable")
         state.base.resources.add(1, of: "resin")
 
         XCTAssertTrue(ConsumableCraftingRules.craft(recipe, in: &state))
         XCTAssertEqual(state.base.resources["resin"], 0)
-        XCTAssertEqual(state.base.inventory.stacks.first { !$0.materials.isEmpty }?
-            .materials.first?.properties.flexibility, 90)
+        XCTAssertEqual(state.base.materialReserve.units.first?.sample.properties.flexibility, 90)
         XCTAssertEqual(state.base.inventory.stacks.first { $0.catalogID == "salve_lesser" }?.count, 1)
     }
 
@@ -323,6 +324,8 @@ final class ConsumableCraftingTests: XCTestCase {
                 id: InstanceID(rawValue: 700), catalogID: Items.material,
                 materials: [MaterialSample(kind: .reagent, properties: properties,
                                            grade: 61, source: "test")])]
+            state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+                                                           location: "fixture.inference")
             state.base.resources.add(1, of: "mercury")
         }
 

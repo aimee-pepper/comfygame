@@ -17,10 +17,13 @@ enum InstrumentCraftingRules {
     }
 
     struct Candidate: Equatable, Sendable {
-        var binID: InstanceID
-        var index: Int
+        var unitID: MaterialReserveUnitID
         var sample: MaterialSample
         var value: Double
+
+        var selection: MaterialReserveSelection {
+            MaterialReserveSelection(unitID: unitID, sample: sample)
+        }
     }
 
     enum Readiness: Equatable, Sendable {
@@ -64,16 +67,16 @@ enum InstrumentCraftingRules {
     }
 
     static func candidates(for recipe: Recipe, in state: GameState) -> [Candidate] {
-        state.base.inventory.stacks.flatMap { bin in
-            bin.materials.enumerated().compactMap { index, sample in
-                let value = sample.properties[recipe.property]
-                return value >= recipe.minimum
-                    ? Candidate(binID: bin.id, index: index, sample: sample, value: value)
-                    : nil
-            }
+        state.base.materialReserve.selections { sample in
+            sample.properties[recipe.property] >= recipe.minimum
+        }
+        .map { selection in
+            Candidate(unitID: selection.unitID, sample: selection.sample,
+                      value: selection.sample.properties[recipe.property])
         }
         // Never silently eat the player's exceptional sample when an ordinary one qualifies.
-        .sorted { ($0.value, $0.sample.grade) < ($1.value, $1.sample.grade) }
+        .sorted { ($0.value, $0.sample.grade, $0.unitID)
+            < ($1.value, $1.sample.grade, $1.unitID) }
     }
 
     static func readiness(for target: PressureTargetID, in state: GameState) -> Readiness {
@@ -92,18 +95,10 @@ enum InstrumentCraftingRules {
     @discardableResult
     static func craftUpgrade(for target: PressureTargetID, in state: inout GameState) -> Bool {
         guard let recipe = recipe(for: target, in: state),
-              readiness(for: target, in: state) == .ready else { return false }
+              state.base.essence >= recipe.essence else { return false }
         let spending = Array(candidates(for: recipe, in: state).prefix(recipe.count))
-        let byBin = Dictionary(grouping: spending, by: \.binID)
-        for (binID, taken) in byBin {
-            guard let binIndex = state.base.inventory.stacks.firstIndex(where: { $0.id == binID })
-            else { return false }
-            for candidate in taken.sorted(by: { $0.index > $1.index }) {
-                state.base.inventory.stacks[binIndex].materials.remove(at: candidate.index)
-            }
-            state.base.inventory.stacks[binIndex].count = state.base.inventory.stacks[binIndex].materials.count
-        }
-        state.base.inventory.stacks.removeAll { $0.count == 0 }
+        guard spending.count == recipe.count,
+              state.base.materialReserve.consume(spending.map(\.selection)) != nil else { return false }
         state.base.essence -= recipe.essence
         state.reality.instrumentPrecisions[target] = recipe.output
         return true

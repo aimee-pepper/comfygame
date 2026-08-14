@@ -24,6 +24,132 @@ final class RecyclerPresentationTests: XCTestCase {
     }
 }
 
+final class TradingPostMaterialReserveRoutingTests: XCTestCase {
+    private func sample(_ grade: Double, source: String) -> MaterialSample {
+        MaterialSample(kind: .hide, properties: MaterialProperties(flexibility: grade),
+                       grade: grade, source: source)
+    }
+
+    func testMaterialSalePriceUsesBoundedRulesOwnedGradeBands() {
+        XCTAssertEqual(TradingPostRules.materialSaleUnitPrice(for: sample(-10, source: "low")), 1)
+        XCTAssertEqual(TradingPostRules.materialSaleUnitPrice(for: sample(0, source: "zero")), 1)
+        XCTAssertEqual(TradingPostRules.materialSaleUnitPrice(for: sample(25, source: "supplier")), 2)
+        XCTAssertEqual(TradingPostRules.materialSaleUnitPrice(for: sample(39, source: "supplier")), 2)
+        XCTAssertEqual(TradingPostRules.materialSaleUnitPrice(for: sample(500, source: "high")), 6)
+    }
+
+    func testExactSelectedReserveSalePaysInOrderAndFreezesRepurchaseStock() throws {
+        let ordinary = sample(25, source: "Vance's supplier")
+        let finest = sample(90, source: "apex")
+        var base = BaseState.newGame()
+        base.materialReserve = MaterialReserve(units: [
+            MaterialReserveUnit(id: .init(rawValue: "ordinary"), sample: ordinary),
+            MaterialReserveUnit(id: .init(rawValue: "finest"), sample: finest)
+        ])
+        let byID = Dictionary(uniqueKeysWithValues:
+            base.materialReserve.selections().map { ($0.unitID.rawValue, $0) })
+        let chosen = [try XCTUnwrap(byID["finest"]), try XCTUnwrap(byID["ordinary"])]
+        let preview = try XCTUnwrap(TradingPostRules.previewMaterialSale(chosen, in: base))
+
+        XCTAssertEqual(preview.unitPrices, [5, 2])
+        XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .committed)
+        XCTAssertTrue(base.materialReserve.isEmpty)
+        XCTAssertEqual(base.goldCoins, 7)
+        XCTAssertTrue(base.inventory.stacks.isEmpty)
+        XCTAssertTrue(base.spillover.isEmpty)
+        XCTAssertEqual(base.tradingPost.stock.map(\.kind),
+                       [.material(finest), .material(ordinary)])
+        XCTAssertEqual(base.tradingPost.stock.map(\.unitPrice), [6, 3])
+        XCTAssertEqual(base.tradingPost.stock.map { $0.frozenUnits.first?.materials },
+                       [[finest], [ordinary]])
+    }
+
+    func testMaterialSaleRequiresExplicitExactSelectionAndRejectsStaleAtomically() throws {
+        let ordinary = sample(30, source: "ordinary")
+        let finest = sample(95, source: "finest")
+        var base = BaseState.newGame()
+        base.materialReserve = MaterialReserve(units: [
+            MaterialReserveUnit(id: .init(rawValue: "ordinary"), sample: ordinary),
+            MaterialReserveUnit(id: .init(rawValue: "finest"), sample: finest)
+        ])
+        let selections = base.materialReserve.selections()
+        let ordinarySelection = try XCTUnwrap(selections.first { $0.unitID.rawValue == "ordinary" })
+        let preview = try XCTUnwrap(
+            TradingPostRules.previewMaterialSale([ordinarySelection], in: base))
+        XCTAssertNil(TradingPostRules.previewMaterialSale(
+            [ordinarySelection, ordinarySelection], in: base))
+
+        var stale = base
+        stale.tradingPost.inventoryRevision &+= 1
+        let staleBefore = try SaveCodec.makeEncoder().encode(stale)
+        XCTAssertEqual(TradingPostRules.commit(preview, in: &stale), .stale)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(stale), staleBefore)
+
+        var changed = base
+        let changedOrdinary = sample(31, source: "changed")
+        changed.materialReserve = MaterialReserve(units: [
+            MaterialReserveUnit(id: .init(rawValue: "ordinary"), sample: changedOrdinary),
+            MaterialReserveUnit(id: .init(rawValue: "finest"), sample: finest)
+        ])
+        let changedBefore = try SaveCodec.makeEncoder().encode(changed)
+        XCTAssertEqual(TradingPostRules.commit(preview, in: &changed), .invalid)
+        XCTAssertEqual(try SaveCodec.makeEncoder().encode(changed), changedBefore)
+
+        XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .committed)
+        XCTAssertEqual(base.materialReserve.selections().map(\.sample), [finest],
+                       "an explicit ordinary selection must never auto-sell the finest sample")
+    }
+
+    func testTradingPostMaterialPurchaseEntersReserveWithoutUsingItemSlotsOrWaiting() throws {
+        let sample = MaterialSample(kind: .hide,
+                                    properties: MaterialProperties(flexibility: 34),
+                                    grade: 31,
+                                    source: "Vance's supplier")
+        let frozen = ItemStack(id: InstanceID(rawValue: 808), catalogID: Items.material,
+                               identified: true, materials: [sample])
+        var base = BaseState.newGame()
+        base.inventory = Inventory(slots: 0)
+        base.goldCoins = 3
+        base.tradingPost.stock = [
+            TradingPostStockLine(id: 12, kind: .material(sample),
+                                 remainingQuantity: 1, unitPrice: 3,
+                                 frozenUnits: [frozen])
+        ]
+
+        let preview = try XCTUnwrap(
+            TradingPostRules.previewPurchase(lineID: 12, quantity: 1, in: base))
+        XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .committed)
+
+        XCTAssertEqual(base.materialReserve.selections().map(\.sample), [sample])
+        XCTAssertTrue(base.inventory.stacks.isEmpty)
+        XCTAssertTrue(base.spillover.isEmpty)
+        XCTAssertEqual(base.goldCoins, 0)
+        XCTAssertEqual(base.tradingPost.stock[0].remainingQuantity, 0)
+        XCTAssertTrue(base.tradingPost.stock[0].frozenUnits.isEmpty)
+    }
+
+    func testTradingPostMaterialIdentityCollisionRejectsAtomically() throws {
+        let sample = MaterialSample(kind: .plate, properties: MaterialProperties(hardness: 35),
+                                    grade: 30, source: "Vance's supplier")
+        let frozen = ItemStack(id: InstanceID(rawValue: 909), catalogID: Items.material,
+                               identified: true, materials: [sample])
+        var base = BaseState.newGame()
+        base.goldCoins = 3
+        base.materialReserve.add(MaterialReserveUnit(
+            id: MaterialReserveUnitID(rawValue: "trading-post-909"), sample: sample))
+        base.tradingPost.stock = [
+            TradingPostStockLine(id: 13, kind: .material(sample), remainingQuantity: 1,
+                                 unitPrice: 3, frozenUnits: [frozen])
+        ]
+        let preview = try XCTUnwrap(
+            TradingPostRules.previewPurchase(lineID: 13, quantity: 1, in: base))
+        let before = base
+
+        XCTAssertEqual(TradingPostRules.commit(preview, in: &base), .invalid)
+        XCTAssertEqual(base, before)
+    }
+}
+
 final class RecyclerTests: XCTestCase {
     func testRecoveryPreviewKeepsDestructiveActionOutsideScrollableDetails() throws {
         let root = URL(fileURLWithPath: #filePath)
@@ -238,7 +364,9 @@ final class RecyclerTests: XCTestCase {
                                                           serviceTier: 1, in: base))
         XCTAssertEqual(RecyclerRules.commit(preview, in: &base), .committed)
         XCTAssertFalse(base.inventory.stacks.contains { $0.id == stack.id })
-        XCTAssertEqual(base.inventory.stacks.flatMap(\.materials), [receipt[1]])
+        XCTAssertEqual(base.materialReserve.selections().map(\.sample), [receipt[1]])
+        XCTAssertTrue(base.inventory.stacks.flatMap(\.materials).isEmpty)
+        XCTAssertTrue(base.spillover.flatMap(\.materials).isEmpty)
         XCTAssertEqual(base.goldCoins, 9)
         XCTAssertEqual(base.essence, 17)
         XCTAssertEqual(base.recycler.inventoryRevision, 1)
@@ -255,11 +383,11 @@ final class RecyclerTests: XCTestCase {
                                                           serviceTier: 1, in: base))
         XCTAssertEqual(RecyclerRules.commit(preview, in: &base), .committed)
         XCTAssertFalse(base.spillover.contains { $0.id == stack.id })
-        XCTAssertEqual(base.spillover.count, 1)
-        XCTAssertEqual(base.spillover[0].materials, [receipt[1]])
+        XCTAssertEqual(base.spillover.count, 0)
+        XCTAssertEqual(base.materialReserve.selections().map(\.sample), [receipt[1]])
     }
 
-    func testMixedKindReceiptReturnsThroughSeparateMaterialBins() throws {
+    func testMixedKindReceiptReturnsThroughExactNonSlotReserveUnits() throws {
         let receipt = [sample(.plate, grade: 90, source: "plate"),
                        sample(.fibre, grade: 80, source: "fibre"),
                        sample(.hide, grade: 30, source: "hide"),
@@ -269,11 +397,10 @@ final class RecyclerTests: XCTestCase {
         let preview = try XCTUnwrap(RecyclerRules.preview(location: .stored, stackID: stack.id,
                                                           serviceTier: 2, in: base))
         XCTAssertEqual(RecyclerRules.commit(preview, in: &base), .committed)
-        XCTAssertEqual(Set(base.inventory.stacks.compactMap { $0.material?.kind }),
-                       Set([.plate, .fibre]))
-        XCTAssertTrue(base.inventory.stacks.allSatisfy { stack in
-            Set(stack.materials.map(\.kind)).count <= 1
-        })
+        XCTAssertEqual(base.materialReserve.selections().map(\.sample),
+                       Array(receipt.prefix(2)))
+        XCTAssertTrue(base.inventory.stacks.flatMap(\.materials).isEmpty)
+        XCTAssertTrue(base.spillover.flatMap(\.materials).isEmpty)
     }
 
     func testStaleRevisionAndChangedSnapshotAreAtomicNoOps() throws {
@@ -293,6 +420,23 @@ final class RecyclerTests: XCTestCase {
         let changedBefore = changedBase
         XCTAssertEqual(RecyclerRules.commit(changedPreview, in: &changedBase), .invalid)
         XCTAssertEqual(changedBase, changedBefore)
+    }
+
+    func testReserveIdentityCollisionRejectsRecyclerCommitBeforeRemovingGear() throws {
+        let receipt = [sample(.plate, grade: 30, source: "one"),
+                       sample(.fibre, grade: 60, source: "two")]
+        let stack = gear(receipt: receipt)
+        var base = base(containing: stack)
+        let preview = try XCTUnwrap(RecyclerRules.preview(
+            location: .stored, stackID: stack.id, serviceTier: 1, in: base))
+        let returned = try XCTUnwrap(preview.returnedSamples.first)
+        base.materialReserve.add(MaterialReserveUnit(
+            id: MaterialReserveUnitID(rawValue: "recycler-700-0"), sample: returned))
+        let before = base
+
+        XCTAssertEqual(RecyclerRules.commit(preview, in: &base), .invalid)
+        XCTAssertEqual(base, before)
+        XCTAssertNotNil(base.inventory.stacks.first { $0.id == stack.id })
     }
 
     func testExceptionalOneSampleReceiptReturnsNothingWithoutFabricatingSalvage() throws {

@@ -29,6 +29,8 @@ final class PhysicalGearCraftingTests: XCTestCase {
                 sample(.chitin, grade: 90, hardness: 70, source: "edge two"),
                 sample(.pelt, grade: 90, flexibility: 60, source: "carrier")
             ]))
+        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+                                                       location: "fixture.bowyer")
         return state
     }
 
@@ -43,6 +45,8 @@ final class PhysicalGearCraftingTests: XCTestCase {
                 sample(.hide, grade: 70, flexibility: 70, insulation: 50, source: "moss browser"),
                 sample(.fibre, grade: 45, flexibility: 35, reactivity: 20, source: "reed")
             ]))
+        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+                                                       location: "fixture.blacksmith")
         return state
     }
 
@@ -50,7 +54,17 @@ final class PhysicalGearCraftingTests: XCTestCase {
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.pointedBlade, in: readyState()))
         XCTAssertEqual(preview.selections.map(\.sample.source), ["reed grazer", "reed"])
-        XCTAssertEqual(Set(preview.selections.map { "\($0.binID):\($0.sampleIndex)" }).count, 2)
+        XCTAssertEqual(Set(preview.selections.map(\.stockKey)).count, 2)
+    }
+
+    func testInMemoryLegacyMaterialBinCannotSatisfyPhysicalRecipe() {
+        var state = GameState.newGame()
+        state.base.stations[Stations.blacksmith] = .init(isUnlocked: true, tier: 0)
+        state.base.inventory.add(ItemStack(id: .init(rawValue: 900), catalogID: Items.material,
+            materials: [sample(.fang, grade: 90, hardness: 90, source: "legacy"),
+                        sample(.hide, grade: 90, flexibility: 90, source: "legacy")]))
+        XCTAssertNil(PhysicalGearCraftingRules.preview(
+            PhysicalGearCraftingRules.pointedBlade, in: state))
     }
 
     func testBlacksmithCatalogueHasEightDistinctFoundationalFamilies() {
@@ -106,6 +120,8 @@ final class PhysicalGearCraftingTests: XCTestCase {
                 sample(.hide, grade: 50, flexibility: 50, insulation: 30, source: "hide one"),
                 sample(.pelt, grade: 55, flexibility: 45, insulation: 35, source: "pelt two")
             ]))
+        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+                                                       location: "fixture.tannery.craft")
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.suppleCoat, in: state))
         let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
@@ -137,6 +153,8 @@ final class PhysicalGearCraftingTests: XCTestCase {
                 sample(.hide, grade: 70, flexibility: 70, insulation: 60, source: "one"),
                 sample(.pelt, grade: 70, flexibility: 70, insulation: 60, source: "two")
             ]))
+        state.base.materialReserve.migrateLegacyStacks(&state.base.inventory.stacks,
+                                                       location: "fixture.tannery.tier")
         XCTAssertEqual(try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.suppleCoat, in: state)).outputTier, 1)
         state.base.completedResearch.insert(PhysicalGearCraftingRules.tanneryWearTierTwo)
@@ -185,10 +203,12 @@ final class PhysicalGearCraftingTests: XCTestCase {
     func testEveryBowyerFamilyAllowsLowGradePreviewButRejectsAStaleCommit() throws {
         for recipe in PhysicalGearCraftingRules.bowyerRecipes {
             var state = bowyerState(tier: 1)
-            for stackIndex in state.base.inventory.stacks.indices {
-                for sampleIndex in state.base.inventory.stacks[stackIndex].materials.indices {
-                    state.base.inventory.stacks[stackIndex].materials[sampleIndex].grade = 20
-                }
+            let original = state.base.materialReserve.units
+            XCTAssertEqual(state.base.materialReserve.consume(
+                state.base.materialReserve.selections()), original.map(\.sample))
+            for var unit in original {
+                unit.sample.grade = 20
+                state.base.materialReserve.add(unit)
             }
             let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, in: state), recipe.id)
             XCTAssertEqual(preview.outputTier, 1, recipe.id)
@@ -198,9 +218,7 @@ final class PhysicalGearCraftingTests: XCTestCase {
             }
 
             let first = try XCTUnwrap(preview.selections.first)
-            let bin = try XCTUnwrap(state.base.inventory.stacks.firstIndex { $0.id == first.binID })
-            state.base.inventory.stacks[bin].materials.remove(at: first.sampleIndex)
-            state.base.inventory.stacks[bin].count -= 1
+            _ = state.base.materialReserve.consume([try XCTUnwrap(first.reserveSelection)])
             let afterExternalChange = state
             XCTAssertNil(PhysicalGearCraftingRules.craft(preview, in: &state), recipe.id)
             XCTAssertEqual(state, afterExternalChange, "\(recipe.id) stale preview debited state")
@@ -210,12 +228,11 @@ final class PhysicalGearCraftingTests: XCTestCase {
     func testGradeUsesWeakestSixtyAverageFortyAndStationCap() throws {
         var state = readyState()
         let recipe = PhysicalGearCraftingRules.pointedBlade
-        let stock = state.base.inventory.stacks.first!.materials
         let selections = [
-            PhysicalGearCraftingRules.Selection(requirementID: "hard_point", binID: InstanceID(rawValue: 10),
-                                                 sampleIndex: 0, sample: stock[0]),
-            PhysicalGearCraftingRules.Selection(requirementID: "flexible_grip", binID: InstanceID(rawValue: 10),
-                                                 sampleIndex: 2, sample: stock[2])
+            try XCTUnwrap(PhysicalGearCraftingRules.candidates(
+                for: recipe.requirements[0], in: state).first { $0.sample.source == "great wolf" }),
+            try XCTUnwrap(PhysicalGearCraftingRules.candidates(
+                for: recipe.requirements[1], in: state).first { $0.sample.source == "moss browser" })
         ]
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(recipe, selections: selections,
                                                                       in: state))
@@ -230,12 +247,11 @@ final class PhysicalGearCraftingTests: XCTestCase {
         var state = readyState()
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.pointedBlade, in: state))
-        let beforeCount = state.base.inventory.stacks.first!.materials.count
+        let beforeCount = state.base.materialReserve.count
         let output = try XCTUnwrap(PhysicalGearCraftingRules.craft(preview, in: &state))
 
         XCTAssertEqual(state.base.essence, 200 - preview.essence)
-        XCTAssertEqual(state.base.inventory.stacks.first { $0.catalogID == Items.material }?.materials.count,
-                       beforeCount - 2)
+        XCTAssertEqual(state.base.materialReserve.count, beforeCount - 2)
         XCTAssertEqual(output.gearProfile?.familyID, "pointed_blade")
         XCTAssertEqual(output.gearProfile?.constructionTier, preview.outputTier)
         XCTAssertEqual(output.gearProfile?.damage, .pierce)
@@ -249,8 +265,9 @@ final class PhysicalGearCraftingTests: XCTestCase {
         var state = readyState()
         let preview = try XCTUnwrap(PhysicalGearCraftingRules.preview(
             PhysicalGearCraftingRules.pointedBlade, in: state))
-        state.base.inventory.stacks[0].materials.remove(at: preview.selections[0].sampleIndex)
-        state.base.inventory.stacks[0].count -= 1
+        _ = state.base.materialReserve.consume([
+            try XCTUnwrap(preview.selections[0].reserveSelection)
+        ])
         let essence = state.base.essence
         XCTAssertNil(PhysicalGearCraftingRules.craft(preview, in: &state))
         XCTAssertEqual(state.base.essence, essence)

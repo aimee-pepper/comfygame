@@ -6,6 +6,62 @@ import XCTest
 /// **No authored drop tables** — the parts that composed the creature compose what it leaves.
 final class MaterialTests: XCTestCase {
 
+    func testMaterialReserveRoundTripPreservesStableIdentityAndExactSample() throws {
+        let sample = MaterialSample(kind: .hide,
+            properties: MaterialProperties(hardness: 31, density: 42, insulation: 53,
+                                           flexibility: 64, lustre: 75, reactivity: 86),
+            grade: 67, source: "shaggy browser", qualifier: "ashen")
+        let reserve = MaterialReserve(units: [
+            MaterialReserveUnit(id: .init(rawValue: "sample-1"), sample: sample,
+                                protectedReturn: true)
+        ])
+
+        let restored = try SaveCodec.makeDecoder().decode(
+            MaterialReserve.self, from: SaveCodec.makeEncoder().encode(reserve))
+
+        XCTAssertEqual(restored, reserve)
+        XCTAssertEqual(restored.units.first?.sample, sample)
+        XCTAssertEqual(restored.units.first?.id.rawValue, "sample-1")
+        XCTAssertEqual(restored.units.first?.protectedReturn, true)
+    }
+
+    func testReserveSelectionUsesStableIDAndRefusesStaleBatchAtomically() throws {
+        let first = MaterialSample(kind: .hide, properties: MaterialProperties(hardness: 20),
+                                   grade: 30, source: "first")
+        let second = MaterialSample(kind: .bone, properties: MaterialProperties(density: 80),
+                                    grade: 70, source: "second")
+        var reserve = MaterialReserve(units: [
+            .init(id: .init(rawValue: "z"), sample: second),
+            .init(id: .init(rawValue: "a"), sample: first)
+        ])
+        let selections = reserve.selections()
+        XCTAssertEqual(selections.map(\.unitID.rawValue), ["a", "z"])
+
+        var stale = selections[1]
+        stale.sample.grade = 1
+        XCTAssertNil(reserve.consume([selections[0], stale]))
+        XCTAssertEqual(reserve.count, 2)
+
+        XCTAssertEqual(reserve.consume(selections), [first, second])
+        XCTAssertTrue(reserve.isEmpty)
+    }
+
+    func testHarvestReceiptIsStableAcrossReplayAndRelaunch() throws {
+        let sample = MaterialSample(kind: .quill,
+            properties: MaterialProperties(hardness: 72, flexibility: 31),
+            grade: 64, source: "barbed glider", qualifier: "ashen")
+        var reserve = MaterialReserve()
+        reserve.addHarvested(sample, count: 3, sourceReceipt: "run:8:foe:91", dropOrdinal: 0)
+        let first = reserve
+        reserve.addHarvested(sample, count: 3, sourceReceipt: "run:8:foe:91", dropOrdinal: 0)
+        XCTAssertEqual(reserve, first, "replaying combat conclusion duplicated its harvest")
+
+        let restored = try SaveCodec.makeDecoder().decode(
+            MaterialReserve.self, from: SaveCodec.makeEncoder().encode(reserve))
+        XCTAssertEqual(restored, first)
+        XCTAssertEqual(restored.units.map(\.id), first.units.map(\.id))
+    }
+
     // MARK: Covering decides which material
 
     func testWhatItWasWearingIsWhatItLeaves() {
@@ -148,7 +204,7 @@ final class MaterialTests: XCTestCase {
         XCTAssertEqual(store.activeEncounter?.outcome, .victory)
 
         let run = try XCTUnwrap(store.state.worlds.activeRun)
-        let materials = (run.satchelItems.stacks + run.offeredItems).compactMap(\.material)
+        let materials = run.materialReserve.units.map(\.sample)
         XCTAssertTrue(materials.contains { $0.kind == .pelt }, "the fur went nowhere")
         XCTAssertTrue(materials.contains { $0.kind == .bone })
         XCTAssertTrue(try XCTUnwrap(store.activeEncounter).spoils.contains { $0.lowercased().contains("pelt") },

@@ -1,6 +1,13 @@
 import Foundation
 
 enum TradingPostRules {
+    struct MaterialSalePreview: Equatable, Sendable {
+        var revision: UInt64
+        var selections: [MaterialReserveSelection]
+        var unitPrices: [Int]
+        var goldTotal: Int
+    }
+
     static let essenceSaleUnit = 10
     static let essencePurchaseQuantity = 10
     static let essencePurchasePrice = 8
@@ -289,6 +296,55 @@ enum TradingPostRules {
                      frozenUnits: Array(line.frozenUnits.prefix(quantity)))
     }
 
+    static func materialSaleUnitPrice(for sample: MaterialSample) -> Int {
+        guard sample.grade.isFinite else { return 1 }
+        return min(6, max(1, 1 + Int(floor(sample.grade / 20))))
+    }
+
+    /// Quotes only the exact reserve units the player selected. There is intentionally no
+    /// "best" or automatic material selection: provenance and grade are part of the choice.
+    static func previewMaterialSale(_ selections: [MaterialReserveSelection],
+                                    in base: BaseState) -> MaterialSalePreview? {
+        guard !selections.isEmpty,
+              Set(selections.map(\.unitID)).count == selections.count else { return nil }
+        guard selections.allSatisfy({ selection in
+            base.materialReserve.units.contains {
+                $0.id == selection.unitID && $0.sample == selection.sample
+            }
+        }) else { return nil }
+        let prices = selections.map { materialSaleUnitPrice(for: $0.sample) }
+        return MaterialSalePreview(revision: base.tradingPost.inventoryRevision,
+                                   selections: selections, unitPrices: prices,
+                                   goldTotal: prices.reduce(0, +))
+    }
+
+    static func commit(_ preview: MaterialSalePreview,
+                       in base: inout BaseState) -> TradingPostCommitResult {
+        guard preview.revision == base.tradingPost.inventoryRevision else { return .stale }
+        guard let fresh = previewMaterialSale(preview.selections, in: base), fresh == preview
+        else { return .invalid }
+
+        var candidate = base
+        guard candidate.materialReserve.consume(preview.selections) != nil else { return .invalid }
+        var nextItemID = candidate.nextItemID()
+        for selection in preview.selections {
+            let lineID = candidate.tradingPost.nextStockLineID
+            let repurchasePrice = materialSaleUnitPrice(for: selection.sample) + 1
+            let frozen = ItemStack(id: InstanceID(rawValue: nextItemID),
+                                   catalogID: Items.material, identified: true,
+                                   materials: [selection.sample])
+            candidate.tradingPost.stock.append(TradingPostStockLine(
+                id: lineID, kind: .material(selection.sample), remainingQuantity: 1,
+                unitPrice: repurchasePrice, frozenUnits: [frozen]))
+            candidate.tradingPost.nextStockLineID &+= 1
+            nextItemID &+= 1
+        }
+        candidate.goldCoins += preview.goldTotal
+        candidate.tradingPost.inventoryRevision &+= 1
+        base = candidate
+        return .committed
+    }
+
     static func previewEssencePurchase(bundles: Int, in base: BaseState) -> TradingPostPurchasePreview? {
         guard bundles > 0, base.tradingPost.essenceBundlesRemaining >= bundles else { return nil }
         let cost = bundles * essencePurchasePrice
@@ -311,9 +367,28 @@ enum TradingPostRules {
             else { return .invalid }
             switch kind {
             case .resource(let id): base.resources.add(preview.quantity, of: id)
-            case .item, .material:
+            case .item:
                 guard preview.frozenUnits.count == preview.quantity else { return .invalid }
                 for unit in preview.frozenUnits { base.store(unit) }
+                base.tradingPost.stock[index].frozenUnits.removeFirst(preview.quantity)
+            case .material(let sample):
+                guard preview.frozenUnits.count == preview.quantity else { return .invalid }
+                let reserveUnits = preview.frozenUnits.map { unit -> MaterialReserveUnit? in
+                    guard unit.catalogID == Items.material, unit.materials == [sample] else {
+                        return nil
+                    }
+                    return MaterialReserveUnit(
+                        id: MaterialReserveUnitID(rawValue: "trading-post-\(unit.id.rawValue)"),
+                        sample: sample)
+                }
+                guard reserveUnits.allSatisfy({ $0 != nil }) else { return .invalid }
+                let exactUnits = reserveUnits.compactMap { $0 }
+                guard Set(exactUnits.map(\.id)).count == exactUnits.count else { return .invalid }
+                let existingReserveIDs = Set(base.materialReserve.selections().map(\.unitID))
+                guard exactUnits.allSatisfy({ !existingReserveIDs.contains($0.id) }) else {
+                    return .invalid
+                }
+                for unit in exactUnits { base.materialReserve.add(unit) }
                 base.tradingPost.stock[index].frozenUnits.removeFirst(preview.quantity)
             }
             base.tradingPost.stock[index].remainingQuantity -= preview.quantity

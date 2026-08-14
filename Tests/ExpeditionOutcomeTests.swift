@@ -31,6 +31,125 @@ final class ExpeditionOutcomeTests: XCTestCase {
         XCTAssertEqual(store.state.base.tradingPost.expeditionOutcomeID, 2)
     }
 
+    func testMaterialReserveRecapAggregatesResourcesWhileFreezingEveryExactUnit() throws {
+        let store = fundedStore()
+        XCTAssertTrue(store.bindAndDepart())
+        var run = try XCTUnwrap(store.state.worlds.activeRun)
+        let hide = MaterialSample(kind: .hide, properties: MaterialProperties(flexibility: 62),
+                                  grade: 57, source: "plain grazer")
+        let bone = MaterialSample(kind: .bone, properties: MaterialProperties(density: 78),
+                                  grade: 71, source: "dense walker")
+        run.materialReserve.addHarvested(hide, count: 19,
+                                         sourceReceipt: "run:1:foe:100", dropOrdinal: 0)
+        run.materialReserve.addHarvested(bone, count: 6,
+                                         sourceReceipt: "run:1:foe:101", dropOrdinal: 0)
+        var state = store.state
+        let banked = GameStore.bankHaul(of: run, outcomeID: 44, into: &state, fraction: 1)
+
+        XCTAssertEqual(banked.resources.first { $0.name == "Hides" }?.count, 19)
+        XCTAssertEqual(banked.resources.first { $0.name == "Bones" }?.count, 6)
+        XCTAssertTrue(banked.items.isEmpty)
+        let materialLines = banked.recoveredLines.compactMap { line -> RunExitSummary.ReceiptLine.Material? in
+            guard case .materialSample(let material) = line else { return nil }
+            return material
+        }
+        XCTAssertEqual(materialLines.count, 25)
+        XCTAssertEqual(Set(materialLines.compactMap(\.reserveUnitID)).count, 25)
+        XCTAssertEqual(state.base.materialReserve.count, 25)
+
+        let summary = RunExitSummary(runIndex: 1, kind: .portal, reason: "fixture",
+                                     turnsTaken: 1, haulKeptFraction: 1,
+                                     resources: banked.resources, items: banked.items,
+                                     recoveredLines: banked.recoveredLines)
+        XCTAssertEqual(summary.resources.first { $0.name == "Hides" }?.count, 19)
+        XCTAssertEqual(summary.resources.first { $0.name == "Bones" }?.count, 6)
+        XCTAssertTrue(summary.items.isEmpty)
+    }
+
+    func testReturnRecapNamesResourcesAndItemsWithCategorySpecificEmptyCopy() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("recapSection(\"Resources\", gains: summary.resources)"))
+        XCTAssertTrue(source.contains("recapSection(\"Items\", gains: summary.items)"))
+        XCTAssertTrue(source.contains("No \\(title.lowercased()) this trip."))
+        XCTAssertFalse(source.contains("recapSection(\"Loot\""))
+    }
+
+    func testReserveUnitsConcludeExactlyAcrossFullPartialAndFailureOutcomes() throws {
+        for (label, fraction) in [("full", 1.0), ("partial", 0.5), ("failure", 0.0)] {
+            let store = fundedStore("reserve-\(label)")
+            XCTAssertTrue(store.bindAndDepart())
+            var run = try XCTUnwrap(store.state.worlds.activeRun)
+            run.tuning.collapseRecoveryFraction = fraction
+            for index in 0..<6 {
+                let kind: MaterialKind = index.isMultiple(of: 2) ? .hide : .bone
+                let sample = MaterialSample(
+                    kind: kind, properties: MaterialProperties(
+                        hardness: Double(20 + index), flexibility: Double(40 + index)
+                    ),
+                    grade: Double(60 + index), source: "\(label)-sample-\(index)",
+                    qualifier: index.isMultiple(of: 2) ? "pale" : "dense"
+                )
+                run.materialReserve.add(MaterialReserveUnit(
+                    id: .init(rawValue: "\(label)-unit-\(index)"), sample: sample,
+                    protectedReturn: index < 2
+                ))
+            }
+            let expected = run.materialReserve.partitionedForFailure(
+                fraction: fraction, outcomeID: 1
+            )
+            store.mutate("fixture: reserve outcome \(label)") {
+                $0.worlds.activeRun = run
+            }
+
+            store.endRunWithPartialHaul(reason: "fixture \(label)", kind: .defeat)
+
+            let summary = try XCTUnwrap(store.state.worlds.lastExit)
+            let recovered: [RunExitSummary.ReceiptLine.Material] = summary.recoveredLines.compactMap {
+                line in
+                guard case .materialSample(let material) = line else { return nil }
+                return material
+            }
+            let lost: [RunExitSummary.ReceiptLine.Material] = summary.lostLines.compactMap {
+                line in
+                guard case .materialSample(let material) = line else { return nil }
+                return material
+            }
+            XCTAssertEqual(Set(recovered.compactMap { $0.reserveUnitID }),
+                           Set(expected.kept.units.map(\.id)), label)
+            XCTAssertEqual(Set(lost.compactMap { $0.reserveUnitID }),
+                           Set(expected.lost.units.map(\.id)), label)
+            XCTAssertTrue(run.materialReserve.units.filter(\.protectedReturn).allSatisfy { unit in
+                recovered.contains { $0.reserveUnitID == unit.id && $0.sample == unit.sample }
+            }, label)
+            XCTAssertEqual(Set(store.state.base.materialReserve.units.map(\.id)),
+                           Set(expected.kept.units.map(\.id)), label)
+            XCTAssertTrue(store.state.base.materialReserve.units.allSatisfy {
+                !$0.protectedReturn
+            }, label)
+
+            let expectedCounts = Dictionary(grouping: expected.kept.units, by: \.sample.kind)
+                .mapValues(\.count)
+            for (kind, count) in expectedCounts {
+                let name = count == 1 ? kind.displayName : kind.pluralName.capitalisedSentence
+                XCTAssertEqual(summary.resources.first { $0.name == name }?.count, count, label)
+            }
+            XCTAssertTrue(summary.items.isEmpty, label)
+            XCTAssertFalse(store.state.base.inventory.stacks.contains {
+                $0.catalogID == Items.material
+            }, label)
+            XCTAssertFalse(store.state.base.spillover.contains {
+                $0.catalogID == Items.material
+            }, label)
+
+            let concluded = store.state
+            store.endRunWithPartialHaul(reason: "replayed \(label)", kind: .defeat)
+            XCTAssertEqual(store.state, concluded, "concluding \(label) twice must be idempotent")
+        }
+    }
+
     func testRepeatedVisitsToSameRunIndexReceiveDistinctOutcomeIDs() throws {
         let store = fundedStore()
         XCTAssertTrue(store.bindAndDepart())
