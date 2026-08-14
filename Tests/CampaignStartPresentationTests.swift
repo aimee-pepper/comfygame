@@ -93,7 +93,52 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertFalse(CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: .xxxLarge))
         XCTAssertTrue(CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: .accessibility1))
         XCTAssertTrue(CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: .accessibility5))
-        XCTAssertEqual(CampaignStartLayoutPolicy.compactCardMinimumWidth, 156)
+    }
+
+    func testEightOrdinarySlotsUseACompactTwoByFourShelf() {
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotColumnCount, 2)
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 0), 0)
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 1), 1)
+        XCTAssertEqual(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8), 4)
+        XCTAssertGreaterThanOrEqual(CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight, 44)
+
+        let shelfHeight =
+            CGFloat(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8))
+            * CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight
+            + 30 // three ten-point row gutters
+        XCTAssertLessThanOrEqual(shelfHeight, 446,
+                                 "Eight slots must leave ordinary-phone room for title and actions.")
+    }
+
+    func testOrdinaryCampaignSurfaceIsStaticWhileAccessibilityRetainsFallbackScrolling() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
+                                encoding: .utf8)
+        let bodyStart = try XCTUnwrap(source.range(of: "var body: some View {"))
+        let titleStart = try XCTUnwrap(source.range(of: "private var title:",
+                                                    range: bodyStart.upperBound..<source.endIndex))
+        let body = String(source[bodyStart.lowerBound..<titleStart.lowerBound])
+
+        XCTAssertTrue(body.contains("if dynamicTypeSize.isAccessibilitySize"))
+        XCTAssertTrue(body.contains("ScrollView { campaignContents(compactSlots: false)"))
+        XCTAssertTrue(body.contains("campaignContents(compactSlots: true)"))
+        XCTAssertFalse(body.contains("ScrollView { campaignContents(compactSlots: true)"))
+    }
+
+    func testCompactSlotKeepsIndependentLoadAndDetailsTargets() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
+                                encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "private var compactBody"))
+        let end = try XCTUnwrap(source.range(of: "private var expandedBody", range: start.upperBound..<source.endIndex))
+        let compact = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(compact.contains("if slot.health.canLoad"))
+        XCTAssertTrue(compact.contains("Button(\"Load\", action: onLoad)"))
+        XCTAssertTrue(compact.contains("Button(\"Details\", action: onDetails)"))
+        XCTAssertGreaterThanOrEqual(compact.components(separatedBy: ".frame(minHeight: 44)").count - 1, 2)
     }
 
     @MainActor

@@ -124,9 +124,8 @@ struct CampaignStartPresentation: Equatable, Sendable {
 }
 
 enum CampaignStartLayoutPolicy {
-    /// 336 points remain inside a 368-point phone after screen padding: two 162-point cards
-    /// plus their 12-point gutter fit without manufacturing horizontal scrolling.
-    static let compactCardMinimumWidth: CGFloat = 156
+    static let ordinarySlotColumnCount = 2
+    static let ordinarySlotCardMinimumHeight: CGFloat = 104
 
     static func primaryActionLabelHeight(dynamicTypeSize: DynamicTypeSize) -> CGFloat {
         dynamicTypeSize.isAccessibilitySize ? 88 : 52
@@ -140,6 +139,11 @@ enum CampaignStartLayoutPolicy {
     /// can continue, the two equally weighted actions share that same row.
     static func ordinaryPrimaryActionColumnCount(hasContinue: Bool) -> Int {
         hasContinue ? 2 : 1
+    }
+
+    static func ordinarySlotRowCount(slotCount: Int) -> Int {
+        guard slotCount > 0 else { return 0 }
+        return Int(ceil(Double(slotCount) / Double(ordinarySlotColumnCount)))
     }
 }
 
@@ -156,26 +160,14 @@ struct CampaignStartView: View {
     @State private var focusedSlot: CampaignSlotSummary?
 
     var body: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 20) {
-                title
-                primaryActions
-
-                if !presentation.slots.isEmpty {
-                    Text("Load Game")
-                        .font(.title2.bold())
-                        .accessibilityAddTraits(.isHeader)
-
-                    LazyVGrid(columns: slotColumns, spacing: 12) {
-                        ForEach(presentation.slots) { slot in
-                            CampaignSlotCard(slot: slot,
-                                             onLoad: { onLoad(slot.id) },
-                                             onDetails: { focusedSlot = slot })
-                        }
-                    }
-                }
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                ScrollView { campaignContents(compactSlots: false).padding(16) }
+            } else {
+                campaignContents(compactSlots: true)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
-            .padding(16)
         }
         .background(Color(.systemGroupedBackground))
         .sheet(item: $focusedSlot) { slot in
@@ -197,6 +189,28 @@ struct CampaignStartView: View {
             }
         } message: { slot in
             Text("Only this campaign will be removed. Other campaigns will not be changed.")
+        }
+    }
+
+    private func campaignContents(compactSlots: Bool) -> some View {
+        LazyVStack(alignment: .leading, spacing: compactSlots ? 14 : 20) {
+            title
+            primaryActions
+
+            if !presentation.slots.isEmpty {
+                Text("Load Game")
+                    .font(.title2.bold())
+                    .accessibilityAddTraits(.isHeader)
+
+                LazyVGrid(columns: slotColumns, spacing: 10) {
+                    ForEach(presentation.slots) { slot in
+                        CampaignSlotCard(slot: slot,
+                                         compact: compactSlots,
+                                         onLoad: { onLoad(slot.id) },
+                                         onDetails: { focusedSlot = slot })
+                    }
+                }
+            }
         }
     }
 
@@ -253,8 +267,8 @@ struct CampaignStartView: View {
         if CampaignStartLayoutPolicy.usesSingleColumn(dynamicTypeSize: dynamicTypeSize) {
             [GridItem(.flexible())]
         } else {
-            [GridItem(.adaptive(minimum: CampaignStartLayoutPolicy.compactCardMinimumWidth),
-                      spacing: 12)]
+            Array(repeating: GridItem(.flexible(), spacing: 10),
+                  count: CampaignStartLayoutPolicy.ordinarySlotColumnCount)
         }
     }
 
@@ -327,10 +341,51 @@ struct CampaignStartActionLabel: View {
 
 private struct CampaignSlotCard: View {
     let slot: CampaignSlotSummary
+    let compact: Bool
     let onLoad: () -> Void
     let onDetails: () -> Void
 
     var body: some View {
+        if compact { compactBody } else { expandedBody }
+    }
+
+    private var compactBody: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(slot.name)
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
+            Label(slot.health.label,
+                  systemImage: slot.health.canLoad ? "checkmark.circle" : "exclamationmark.triangle")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(slot.health.canLoad ? Color.secondary : Color.orange)
+                .lineLimit(1)
+
+            HStack(spacing: 6) {
+                if slot.health.canLoad {
+                    Button("Load", action: onLoad)
+                        .buttonStyle(.borderedProminent)
+                        .frame(minHeight: 44)
+                        .accessibilityIdentifier("campaign.slot.\(slot.id.uuidString).load")
+                }
+                Spacer(minLength: 0)
+                Button("Details", action: onDetails)
+                    .buttonStyle(.bordered)
+                    .frame(minHeight: 44)
+                    .accessibilityIdentifier("campaign.slot.\(slot.id.uuidString).details")
+            }
+            .controlSize(.small)
+        }
+        .padding(.horizontal, 10)
+        .padding(.top, 8)
+        .padding(.bottom, 6)
+        .frame(maxWidth: .infinity,
+               minHeight: CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight,
+               alignment: .leading)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .contain)
+    }
+
+    private var expandedBody: some View {
         VStack(alignment: .leading, spacing: 10) {
             CampaignBookplateMotif(id: slot.id, bookCount: slot.progressBookCount)
                 .frame(height: 42)
