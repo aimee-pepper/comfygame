@@ -381,7 +381,7 @@
       "detail": "Checkpoint bd2b5d2 integrates the accepted pack, frozen game-owned bind adapter, canonical receipt self-hash, immutable run/History persistence and exact native renderer/cache selection. No raw Illumination/Vitality or temperature/wetness tint is used.",
       "gate": "New binds freeze the exact accepted descriptor while legacy bound/anchored worlds remain world-grade-1; save/load/redraw/cache/fog/geometry tests pass; native color and literal grayscale show proportionate differentiation while similar worlds may remain related. Authority: docs/world-color-differentiation-current.md and docs/world-grade-2-native-handoff-current.md.",
       "workstream": "acceptance",
-      "isPrimary": true
+      "isPrimary": false
     },
     {
       "id": "bug-reporter",
@@ -407,7 +407,7 @@
       "id": "encounter-scaling",
       "priority": "B1.3",
       "title": "Party and apex difficulty",
-      "status": "readyToTest",
+      "status": "inProgress",
       "detail": "Source candidate is checkpointed through 910cc31. Vitality peak now controls cast abundance rather than individual creature power, authored trophic aspects redistribute one fixed creature budget, and multi-target delivery uses the accepted reversible 50% share. Controlled fresh Binder+Quill evidence: Normal 2–4 rounds/~2–20% HP and Teeming 2–4 rounds/~4–28%, all victories.",
       "gate": "Install the signed checkpoint and compare at least one disclosed Normal and one disclosed Teeming level-1 Binder+Quill contact on an ordinary phone build, recording the frozen scaling receipt and whether decisions/telegraphing feel fair. Keep or revise the 50% share from play, then retain the later two-/five-person ordinary and apex matrix; automated evidence is not final balance acceptance.",
       "workstream": "acceptance",
@@ -631,7 +631,7 @@
       "detail": "Decision279 makes coherent authored content live by default and uses play as review. Promote the 21 completed missing-live meeting drafts, Noll's replacement candidate, Auber's revision, Isolde's three optional-reply replacements and Sabine's seven-location clue sequence without waiting for prior Atlas ratings. Incomplete or contradictory units remain draft-only.",
       "gate": "All 29 travellers have coherent live meetings; stable exchange/page IDs, reply order, condition indices and old-save tolerance survive promotion; generated corpus freshness and catalogue-set validation pass; Atlas reviews the same live text; phone play can flag and revise individual units without blocking the rest. Authority: Decision279, traveller-meeting-corpus-plan-current.md and dialogue-review-first-batch-current.md.",
       "workstream": "acceptance",
-      "isPrimary": true
+      "isPrimary": false
     },
     {
       "id": "return-receipt-authority",

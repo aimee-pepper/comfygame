@@ -79,6 +79,14 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertFalse(try XCTUnwrap(byID["combat-tree-v2"]).isPrimary)
     }
 
+    func testCurrentBoardHasAtMostOnePrimaryPerWorkstreamAndScalingSolelyOwnsAcceptance() {
+        let board = DebugRoadmap.current
+        let primaries = Dictionary(grouping: board.items.filter(\.isPrimary), by: \.workstream)
+        XCTAssertTrue(primaries.values.allSatisfy { $0.count <= 1 },
+                      "each workstream may disclose at most one primary")
+        XCTAssertEqual(primaries[.acceptance]?.map(\.id), ["encounter-scaling"])
+    }
+
     func testWorldPageWorkFollowsReachabilityAndDoesNotPreemptScaling() throws {
         let board = DebugRoadmap.current
         let bands = Dictionary(uniqueKeysWithValues: board.campaignBands.map { ($0.id, $0.itemIDs) })
