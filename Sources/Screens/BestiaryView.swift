@@ -57,8 +57,8 @@ struct BestiaryView: View {
 
     private func tile(_ entry: BestiaryRules.Entry) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: entry.icon)
-                .font(.title)
+            CreaturePixelIdentity(traits: entry.latest?.traits,
+                                  fallbackSystemIcon: entry.icon)
                 .foregroundStyle(.tint)
                 .frame(width: 40, height: 40)
             VStack(alignment: .leading, spacing: 1) {
@@ -114,11 +114,15 @@ private struct EntrySheet: View {
                         }
                         ForEach(Array(entry.specimens.enumerated().reversed()), id: \.offset) { item in
                             HStack {
-                                Text(CreatureIdentity.name(for: item.element.traits).capitalisedSentence)
-                                    .font(.caption)
-                                Spacer(minLength: 6)
-                                Text("World \(item.element.runIndex)")
-                                    .font(.caption2).foregroundStyle(.secondary)
+                                CreaturePixelIdentity(traits: item.element.traits,
+                                                      fallbackSystemIcon: "pawprint")
+                                    .frame(width: 40, height: 40)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(CreatureIdentity.name(for: item.element.traits).capitalisedSentence)
+                                        .font(.caption)
+                                    Text("World \(item.element.runIndex)")
+                                        .font(.caption2).foregroundStyle(.secondary)
+                                }
                             }
                             .frame(minHeight: 32)
                         }

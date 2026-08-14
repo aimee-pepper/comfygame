@@ -33,6 +33,22 @@ final class BestiaryTests: XCTestCase {
         XCTAssertFalse(source.contains("specimens.count) kept"))
     }
 
+    func testBestiaryUsesPersistedCreatureMorphologyWithExistingFallbacks() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BestiaryView.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains("CreaturePixelIdentity(traits: entry.latest?.traits"),
+                      "species tiles should use the latest exact recorded morphology")
+        XCTAssertTrue(source.contains("fallbackSystemIcon: entry.icon"),
+                      "an entry without a specimen must retain its existing safe icon")
+        XCTAssertTrue(source.contains("CreaturePixelIdentity(traits: item.element.traits"),
+                      "each specimen tile must render that specimen rather than a species-generic mark")
+        XCTAssertTrue(source.contains("fallbackSystemIcon: \"pawprint\""),
+                      "the specimen renderer must remain fail-safe if its visual contract changes")
+    }
+
     private func traits(size: Double) -> CreatureTraits {
         var t = CreatureTraits()
         t.size = size
