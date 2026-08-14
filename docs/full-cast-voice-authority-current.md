@@ -1,8 +1,8 @@
 # Full-cast voice authority — current
 
 **Status:** personality and voice matrix settled; all five campaign-order meeting batches are
-production-authorized; opening diary voice batch Vance–Sela is source-complete; remaining diary
-revision stays behind playability implementation
+production-authorized; diary voice batches Vance–Sela and Bryn–Lys are source-complete; remaining
+diary revision stays behind playability implementation
 **Date:** 14 August 2026
 **Roadmap position:** Band 6.8; this authority must not pre-empt opening playability work
 
@@ -160,6 +160,17 @@ location clue keeps its already-approved plain observable description:
 This is a prose-only revision. Page IDs, owners, kinds, clue indices, teachings, targets, research
 leads, whereabouts references and condition preferences are unchanged. The previous prose remains
 recoverable in version history; location-clue clarity is not traded for personality.
+
+## Early-to-mid diary batch disposition — Bryn through Lys
+
+Twenty-seven reflective pages now distinguish the next eight voices: Bryn gives compact formation
+instructions; Orsa offers warm practical hospitality; Talin uses clipped timing sequences; Nessa
+records dose/route/symptom; Corrin writes through fit and material wear; Dagg is forceful and
+self-aware; Rook states range and warning rules; Lys uses lucid catalogue humour. Their 29 location
+clues remain unchanged.
+
+As with the opening batch, this is prose-only. Stable page identity and every mechanical field are
+unchanged, and the previous copy remains in version history.
 
 ## Promotion gate
 
