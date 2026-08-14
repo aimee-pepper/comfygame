@@ -705,6 +705,7 @@ struct StorehouseView: View {
     @EnvironmentObject private var store: GameStore
     @State private var opened: ItemStack?
     @State private var openedResource: StorehouseResourceEntry?
+    @State private var openedPacked: ItemStack?
     @State private var tab: StorehouseTab = .items
 
     private var base: BaseState { store.state.base }
@@ -763,6 +764,40 @@ struct StorehouseView: View {
                                              accessibilityName: stack.displayName)
                             } detail: { selected in
                                 StorehouseItemSheet(stack: selected).environmentObject(store)
+                            }
+                        }
+                    }
+                case .satchel:
+                    HStack {
+                        Label("Field Kit", systemImage: "backpack").font(.headline)
+                        Spacer()
+                        Text("\(store.fieldKitEntries.filter { $0.desiredCount > 0 }.count) of \(base.satchelCapacity)")
+                            .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    }
+                    Text("Choose desired quantities at Home. Exact available stock moves only when departure commits.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    if base.preparationLoadoutNeedsReview {
+                        Text("Suggested—review before departure")
+                            .font(.caption.weight(.semibold)).foregroundStyle(.orange)
+                        Button("Confirm suggested Field Kit") { _ = store.confirmSuggestedFieldKit() }
+                    }
+                    if store.fieldKitEntries.isEmpty {
+                        EmptyNote("No supplies selected.")
+                    } else {
+                        SixAcrossItemGrid(data: store.fieldKitEntries, id: \.id) { entry in
+                            let definition = ContentCatalog.shared.item(entry.itemID)
+                            let planned = ItemStack(
+                                id: InstanceID(rawValue: UInt64.max - UInt64(max(0, entry.order))),
+                                catalogID: entry.itemID, count: entry.desiredCount, identified: true)
+                            AnchoredItemDetailButton(item: planned, selection: $openedPacked) {
+                                ItemIconTile(icon: definition?.icon ?? "questionmark",
+                                             catalogueID: entry.itemID,
+                                             rarity: definition?.rarity ?? .common,
+                                             quantity: entry.desiredCount,
+                                             identified: true, location: .stored,
+                                             accessibilityName: definition?.name ?? "Planned supply")
+                            } detail: { selected in
+                                HomeSatchelItemSheet(stack: selected).environmentObject(store)
                             }
                         }
                     }
@@ -838,6 +873,7 @@ private struct StorehouseItemSheet: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dismiss) private var dismiss
     let stack: ItemStack
+    @State private var transferRefusal: String?
 
     private var currentStack: ItemStack? {
         store.state.base.inventory.stacks.first { $0.id == stack.id }
@@ -880,22 +916,90 @@ private struct StorehouseItemSheet: View {
                             Text(blurb)
                         }
                     }
+                    if currentStack != nil, displayedStack.identified,
+                       GameStore.isFieldKitEligible(displayedStack.catalogID) {
+                        Section("Next expedition") {
+                            Button("Add one to plan") {
+                                let desired = store.fieldKitDesiredCount(for: displayedStack.catalogID)
+                                if case .refused(let reason) = store.setFieldKitDesiredCount(
+                                    itemID: displayedStack.catalogID, desiredCount: desired + 1) {
+                                    transferRefusal = reason
+                                }
+                            }
+                        }
+                    }
                 }
                 .navigationTitle(displayedStack.identified ? displayedStack.displayName : "Unknown item")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
                 }
+                .alert("Transfer not completed", isPresented: Binding(
+                    get: { transferRefusal != nil }, set: { if !$0 { transferRefusal = nil } })) {
+                    Button("OK") { transferRefusal = nil }
+                } message: { Text(transferRefusal ?? "Review the current Storehouse and Field Kit.") }
             }
         }
     }
 }
 
+private struct HomeSatchelItemSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    let stack: ItemStack
+    @State private var transferRefusal: String?
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                ItemIconTile(icon: stack.icon, catalogueID: stack.catalogID, rarity: stack.rarity,
+                             quantity: stack.count, identified: stack.identified, location: .carried,
+                             accessibilityName: stack.displayName)
+                    .frame(width: 64, height: 64)
+                Text(stack.displayName).font(.headline)
+                Text("Wanted \(store.fieldKitDesiredCount(for: stack.catalogID)) · available \(store.fieldKitOwnedCount(for: stack.catalogID))")
+                    .font(.caption).foregroundStyle(.secondary)
+                Button("Increase desired quantity") {
+                    let desired = store.fieldKitDesiredCount(for: stack.catalogID)
+                    if case .refused(let reason) = store.setFieldKitDesiredCount(
+                        itemID: stack.catalogID, desiredCount: desired + 1) {
+                        transferRefusal = reason
+                    }
+                }
+                Button("Reduce desired quantity") {
+                    let desired = store.fieldKitDesiredCount(for: stack.catalogID)
+                    switch store.setFieldKitDesiredCount(itemID: stack.catalogID,
+                                                         desiredCount: max(0, desired - 1)) {
+                    case .committed: dismiss()
+                    case .refused(let reason): transferRefusal = reason
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                Spacer()
+            }
+            .padding(16)
+            .navigationTitle("Planned supply")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+            .alert("Transfer not completed", isPresented: Binding(
+                get: { transferRefusal != nil }, set: { if !$0 { transferRefusal = nil } })) {
+                Button("OK") { transferRefusal = nil }
+            } message: { Text(transferRefusal ?? "Review the current Storehouse and Field Kit.") }
+        }
+    }
+}
+
 private enum StorehouseTab: String, CaseIterable, Identifiable {
-    case items, stockpiles, waiting
+    case items, stockpiles, satchel, waiting
     var id: String { rawValue }
     var title: String {
-        switch self { case .items: "Items"; case .stockpiles: "Resources"; case .waiting: "Waiting" }
+        switch self {
+        case .items: "Items"
+        case .stockpiles: "Resources"
+        case .satchel: "Field Kit"
+        case .waiting: "Waiting"
+        }
     }
 }
 

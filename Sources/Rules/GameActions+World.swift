@@ -15,17 +15,141 @@ enum LootSwapEvaluation: Equatable, Sendable {
     case refused(String)
 }
 
+struct FieldKitShortage: Equatable, Sendable {
+    let itemID: ItemID
+    let wanted: Int
+    let available: Int
+}
+
+struct FieldKitDeparturePlan: Equatable, Sendable {
+    let packed: Inventory
+    let remainingInventory: Inventory
+    let shortages: [FieldKitShortage]
+}
+
+enum FieldKitDepartureEvaluation: Equatable, Sendable {
+    case allowed(FieldKitDeparturePlan)
+    case refused(String)
+}
+
 /// Player actions inside a world. Each one is a turn, and each one is saved.
 extension GameStore {
+    static func legacyFieldKitSuggestion(in state: GameState) -> [FieldKitPreparationEntry] {
+        let capacity = state.base.satchelCapacity
+        let available: (ItemID) -> Int = { itemID in
+            state.base.inventory.stacks.filter { $0.catalogID == itemID && $0.identified }
+                .reduce(0) { $0 + $1.count }
+        }
+        var result: [FieldKitPreparationEntry] = []
+        func append(_ itemID: ItemID, count: Int) {
+            guard count > 0, result.count < capacity else { return }
+            result.append(.init(itemID: itemID, desiredCount: count, order: result.count))
+        }
+        let salve: ItemID = "salve_lesser"
+        append(salve, count: min(2, available(salve)))
+        let eligible = ContentCatalog.shared.items.filter {
+            $0.kind == .consumable && available($0.id) > 0
+        }.sorted { $0.id.rawValue < $1.id.rawValue }
+        if let cure = eligible.first(where: {
+            [.clearPoison, .clearElemental, .clearAnyStatus].contains($0.consumable?.effect)
+        }) {
+            append(cure.id, count: 1)
+        }
+        if let escape = eligible.first(where: {
+            [.restoreStability, .returnHome].contains($0.consumable?.effect)
+        }) {
+            append(escape.id, count: 1)
+        } else if available(Items.anchorFrame) > 0 {
+            append(Items.anchorFrame, count: 1)
+        }
+        return result
+    }
+
+    static func isFieldKitEligible(_ itemID: ItemID) -> Bool {
+        itemID == Items.anchorFrame || ContentCatalog.shared.item(itemID)?.kind == .consumable
+    }
+
+    static func canonicalFieldKitEntries(_ entries: [FieldKitPreparationEntry])
+        -> [FieldKitPreparationEntry] {
+        var merged: [ItemID: FieldKitPreparationEntry] = [:]
+        for entry in entries where isFieldKitEligible(entry.itemID) {
+            let candidate = FieldKitPreparationEntry(itemID: entry.itemID,
+                                                      desiredCount: max(0, entry.desiredCount),
+                                                      order: entry.order)
+            if let current = merged[entry.itemID] {
+                merged[entry.itemID] = .init(itemID: entry.itemID,
+                                             desiredCount: max(current.desiredCount,
+                                                               candidate.desiredCount),
+                                             order: min(current.order, candidate.order))
+            } else {
+                merged[entry.itemID] = candidate
+            }
+        }
+        return merged.values.sorted {
+            $0.order != $1.order ? $0.order < $1.order : $0.itemID.rawValue < $1.itemID.rawValue
+        }
+    }
+
+    var fieldKitDepartureRefusal: String? {
+        if case .refused(let reason) = Self.fieldKitDepartureQuote(in: state) { return reason }
+        return nil
+    }
+
+    static func fieldKitDepartureQuote(in state: GameState) -> FieldKitDepartureEvaluation {
+        if state.base.preparationLoadoutNeedsReview || state.base.preparationLoadout == nil {
+            return .refused("Review and confirm the suggested Field Kit before departure.")
+        }
+        let capacity = state.base.satchelCapacity
+        let entries = canonicalFieldKitEntries(state.base.preparationLoadout ?? [])
+            .filter { $0.desiredCount > 0 }
+        if entries.count > capacity {
+            return .refused("Resolve \(entries.count - capacity) excess Field Kit selections.")
+        }
+        var source = state.base.inventory
+        var packed = Inventory(slots: capacity)
+        var shortages: [FieldKitShortage] = []
+        for entry in entries {
+            var remaining = entry.desiredCount
+            while remaining > 0,
+                  let selectedID = source.stacks.filter({
+                      $0.catalogID == entry.itemID && $0.identified
+                          && Self.isFieldKitEligible($0.catalogID)
+                  }).map(\.id).min(by: { $0.rawValue < $1.rawValue }),
+                  let index = source.stacks.firstIndex(where: { $0.id == selectedID }) {
+                let amount = min(remaining, source.stacks[index].count)
+                var candidateSource = source
+                guard let selected = candidateSource.stacks[index].removing(amount) else {
+                    return .refused("The Field Kit stock changed. Review it and try again.")
+                }
+                if candidateSource.stacks[index].isEmpty { candidateSource.stacks.remove(at: index) }
+                var candidatePacked = packed
+                guard candidatePacked.add(selected) else {
+                    return .refused("The selected supplies cannot share the available Field Kit bins.")
+                }
+                source = candidateSource
+                packed = candidatePacked
+                remaining -= amount
+            }
+            if remaining > 0 {
+                shortages.append(.init(itemID: entry.itemID, wanted: entry.desiredCount,
+                                       available: entry.desiredCount - remaining))
+            }
+        }
+        return .allowed(.init(packed: packed, remainingInventory: source, shortages: shortages))
+    }
+
     /// Re-enter a permanent realm without regenerating it. Layout, depleted sites and named life
     /// come from the saved snapshot; health, carried supplies and recap baselines belong to the
     /// new expedition and are rebuilt at the threshold.
     func revisitAnchoredRealm(_ id: Int) -> Bool {
-        guard state.worlds.activeRun == nil,
+        guard fieldKitDepartureRefusal == nil,
+              state.worlds.activeRun == nil,
               let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }),
               !realm.isDormant else { return false }
 
+        var didCommit = false
         mutate("revisit anchored realm", flush: true) { state in
+            guard case .allowed(let fieldKit) = Self.fieldKitDepartureQuote(in: state) else { return }
             guard let realm = state.worlds.anchoredRealms.first(where: { $0.id == id }),
                   !realm.isDormant else { return }
             var run = realm.world
@@ -39,14 +163,8 @@ extension GameStore {
                 if case .member(let index) = entry.member { hp[index] = entry.maximum }
             }
 
-            var packedItems = Inventory(slots: state.base.satchelCapacity)
-            let consumables = state.base.inventory.stacks.filter {
-                $0.identified && (ContentCatalog.shared.item($0.catalogID)?.kind == .consumable
-                                  || $0.catalogID == Items.anchorFrame)
-            }
-            for stack in consumables where packedItems.add(stack) {
-                state.base.inventory.remove(stack.id)
-            }
+            state.base.inventory = fieldKit.remainingInventory
+            var packedItems = fieldKit.packed
             for index in packedItems.stacks.indices {
                 packedItems.stacks[index].protectedReturnCount = packedItems.stacks[index].count
             }
@@ -74,8 +192,9 @@ extension GameStore {
             state.reality.lifetime.runsStarted += 1
             state.worlds.lastExit = nil
             state.worlds.activeRun = run
+            didCommit = true
         }
-        return true
+        return didCommit
     }
 
 

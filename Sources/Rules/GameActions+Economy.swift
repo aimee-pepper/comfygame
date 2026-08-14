@@ -121,6 +121,71 @@ enum RosterPlacementRules {
 
 /// Spending actions: the Workshop, the Storehouse, the Constellation, and opening a cache.
 extension GameStore {
+    var fieldKitEntries: [FieldKitPreparationEntry] {
+        Self.canonicalFieldKitEntries(
+            state.base.preparationLoadout ?? Self.legacyFieldKitSuggestion(in: state))
+            .filter { $0.desiredCount > 0 }
+    }
+
+    func fieldKitDesiredCount(for itemID: ItemID) -> Int {
+        fieldKitEntries.first(where: { $0.itemID == itemID })?.desiredCount ?? 0
+    }
+
+    func fieldKitOwnedCount(for itemID: ItemID) -> Int {
+        state.base.inventory.stacks.filter { $0.catalogID == itemID && $0.identified }
+            .reduce(0) { $0 + $1.count }
+    }
+
+    @discardableResult
+    func setFieldKitDesiredCount(itemID: ItemID, desiredCount: Int) -> CurrentStateCommitResult {
+        guard state.worlds.activeRun == nil else {
+            return .refused("Return Home before changing the Field Kit.")
+        }
+        guard Self.isFieldKitEligible(itemID) else {
+            return .refused("Only identified supplies can be assigned to the Field Kit.")
+        }
+        let desiredCount = max(0, desiredCount)
+        var result: CurrentStateCommitResult = .refused("The Field Kit changed. Review it and try again.")
+        mutate("change Field Kit preparation", flush: true) { state in
+            guard state.worlds.activeRun == nil else { return }
+            var entries = Self.canonicalFieldKitEntries(
+                state.base.preparationLoadout ?? Self.legacyFieldKitSuggestion(in: state))
+            let existing = entries.firstIndex(where: { $0.itemID == itemID })
+            if desiredCount > 0, existing == nil,
+               entries.filter({ $0.desiredCount > 0 }).count >= state.base.satchelCapacity {
+                result = .refused("All supply bins are assigned.")
+                return
+            }
+            if let existing {
+                if desiredCount == 0 { entries.remove(at: existing) }
+                else { entries[existing].desiredCount = desiredCount }
+            } else if desiredCount > 0 {
+                entries.append(.init(itemID: itemID, desiredCount: desiredCount,
+                                     order: (entries.map(\.order).max() ?? -1) + 1))
+            }
+            state.base.preparationLoadout = Self.canonicalFieldKitEntries(entries)
+            state.base.preparationLoadoutNeedsReview = false
+            result = .committed
+        }
+        return result
+    }
+
+    @discardableResult
+    func confirmSuggestedFieldKit() -> CurrentStateCommitResult {
+        var result: CurrentStateCommitResult = .refused("Return Home before confirming the Field Kit.")
+        mutate("confirm suggested Field Kit", flush: true) { state in
+            guard state.worlds.activeRun == nil else { return }
+            if state.base.preparationLoadout == nil {
+                state.base.preparationLoadout = Self.legacyFieldKitSuggestion(in: state)
+            }
+            state.base.preparationLoadout = Self.canonicalFieldKitEntries(
+                state.base.preparationLoadout ?? [])
+            state.base.preparationLoadoutNeedsReview = false
+            result = .committed
+        }
+        return result
+    }
+
     @discardableResult func crystalliseEssence() -> Bool {
         guard DistilleryRules.canCrystallise(in: state) else { return false }
         var made = false

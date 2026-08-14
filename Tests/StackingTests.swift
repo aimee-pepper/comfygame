@@ -93,6 +93,107 @@ final class DistilleryRequirementAuthorityTests: XCTestCase {
     }
 }
 
+@MainActor
+final class HomeSatchelTransferTests: XCTestCase {
+    func testFreshEmptyLoadoutStaysEmptyAndDesiredPlanPersistsAcrossDeparture() throws {
+        let store = GameStore(io: .temporary(name: "home-satchel-\(UUID().uuidString)"))
+        let salve = ItemStack(id: InstanceID(rawValue: 9_001), catalogID: "salve_lesser",
+                              count: 2, identified: true)
+        store.mutate("prepare packing fixture") { state in
+            state.base.inventory = Inventory(slots: 4, stacks: [salve])
+        }
+        XCTAssertEqual(store.state.base.preparationLoadout, [])
+        XCTAssertEqual(store.setFieldKitDesiredCount(itemID: salve.catalogID, desiredCount: 1),
+                       .committed)
+        XCTAssertEqual(store.state.base.inventory.stacks.first?.count, 2,
+                       "planning must not move physical stock")
+        store.write("plains")
+        XCTAssertTrue(store.bindAndDepart())
+        XCTAssertEqual(store.state.worlds.activeRun?.satchelItems.stacks.first?.count, 1)
+        XCTAssertEqual(store.state.base.inventory.stacks.first?.count, 1)
+        XCTAssertEqual(store.state.base.preparationLoadout?.first?.desiredCount, 1)
+    }
+
+    func testLegacySuggestionRequiresReviewAndEditingPreservesOtherSuggestedEntries() {
+        let store = GameStore(io: .temporary(name: "legacy-field-kit-\(UUID().uuidString)"))
+        store.mutate("legacy fixture") { state in
+            state.base.preparationLoadout = nil
+            state.base.preparationLoadoutNeedsReview = true
+            state.base.inventory = Inventory(slots: 8, stacks: [
+                ItemStack(id: .init(rawValue: 30), catalogID: "salve_lesser", count: 3, identified: true),
+                ItemStack(id: .init(rawValue: 20), catalogID: "draught_clearing", identified: true),
+                ItemStack(id: .init(rawValue: 10), catalogID: "stillwater", identified: true),
+            ])
+        }
+        XCTAssertEqual(store.fieldKitEntries.count, 3)
+        XCTAssertNotNil(store.fieldKitDepartureRefusal)
+        XCTAssertEqual(store.state.base.inventory.stacks.count, 3, "suggestion must move nothing")
+        XCTAssertEqual(store.setFieldKitDesiredCount(itemID: "salve_lesser", desiredCount: 1), .committed)
+        XCTAssertEqual(store.state.base.preparationLoadout?.count, 3)
+        XCTAssertFalse(store.state.base.preparationLoadoutNeedsReview)
+    }
+
+    func testCanonicalizationRejectsIneligibleMergesDuplicatesAndKeepsOverCapacityVisible() {
+        let entries = GameStore.canonicalFieldKitEntries([
+            .init(itemID: "salve_lesser", desiredCount: 1, order: 4),
+            .init(itemID: "salve_lesser", desiredCount: 3, order: 2),
+            .init(itemID: "weapon_blade", desiredCount: 9, order: 0),
+            .init(itemID: "draught_clearing", desiredCount: -2, order: 1),
+        ])
+        XCTAssertEqual(entries.map(\.itemID), ["draught_clearing", "salve_lesser"])
+        XCTAssertEqual(entries.map(\.desiredCount), [0, 3])
+        XCTAssertEqual(entries.last?.order, 2)
+    }
+
+    func testResolverUsesStableStackIDAndRetainsShortage() {
+        var state = GameState.newGame()
+        state.base.preparationLoadout = [.init(itemID: "salve_lesser", desiredCount: 3, order: 0)]
+        state.base.inventory = Inventory(slots: 4, stacks: [
+            ItemStack(id: .init(rawValue: 90), catalogID: "salve_lesser", identified: true),
+            ItemStack(id: .init(rawValue: 10), catalogID: "salve_lesser", identified: true),
+        ])
+        guard case .allowed(let quote) = GameStore.fieldKitDepartureQuote(in: state) else {
+            return XCTFail("expected an allowed quote")
+        }
+        XCTAssertEqual(quote.packed.stacks.reduce(0) { $0 + $1.count }, 2)
+        XCTAssertEqual(quote.packed.stacks.first?.id.rawValue, 10)
+        XCTAssertTrue(quote.remainingInventory.stacks.isEmpty)
+        XCTAssertEqual(state.base.inventory.stacks.count, 2, "quoting must not move stock")
+        XCTAssertEqual(state.base.preparationLoadout?.first?.desiredCount, 3)
+    }
+
+    func testIncompatibleBinsRefuseWithoutMovingAnyStock() {
+        var state = GameState.newGame()
+        state.base.satchelTier = 0
+        state.base.preparationLoadout = [.init(itemID: "salve_lesser", desiredCount: 2, order: 0)]
+        var favorite = ItemStack(id: .init(rawValue: 2), catalogID: "salve_lesser", identified: true)
+        favorite.isFavorite = true
+        state.base.inventory = Inventory(slots: 4, stacks: [
+            ItemStack(id: .init(rawValue: 1), catalogID: "salve_lesser", identified: true),
+            favorite,
+        ])
+        let before = state
+        guard case .refused = GameStore.fieldKitDepartureQuote(in: state) else {
+            return XCTFail("incompatible bins must refuse")
+        }
+        XCTAssertEqual(state, before)
+    }
+
+    func testStorehousePresentationSeparatesMaterialsFromItemsAndShowsSatchel() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("case items, stockpiles, satchel, waiting"))
+        XCTAssertTrue(source.contains("base.inventory.stacks.filter { !$0.materials.isEmpty }"))
+        XCTAssertTrue(source.contains("base.inventory.stacks.filter(\\.materials.isEmpty)"))
+        XCTAssertTrue(source.contains("case items, stockpiles, satchel, waiting"))
+        XCTAssertTrue(source.contains("Suggested—review before departure"))
+        XCTAssertTrue(source.contains("Button(\"Increase desired quantity\")"))
+        XCTAssertTrue(source.contains("Button(\"Reduce desired quantity\")"))
+    }
+}
+
 /// Items stack, and materials bin by kind (decisions-session-16 §1).
 final class StackingTests: XCTestCase {
 

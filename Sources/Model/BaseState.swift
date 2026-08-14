@@ -1,5 +1,12 @@
 import Foundation
 
+struct FieldKitPreparationEntry: Codable, Equatable, Sendable, Identifiable {
+    var itemID: ItemID
+    var desiredCount: Int
+    var order: Int
+    var id: ItemID { itemID }
+}
+
 /// Layer 2 — Home Base. Persists between runs; a future reset wipes this and keeps `RealityState`.
 struct BaseState: Codable, Equatable, Sendable {
     /// Refined common currency: binds books, identifies items, buys upgrades.
@@ -7,6 +14,10 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Raw stockpiles hauled home (Ore, Fiber, Essence-raw…). Motes live in Reality.
     var resources: ResourcePool = ResourcePool()
     var inventory: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
+    /// Durable desired quantities for the next expedition. `nil` is a legacy save that has not
+    /// yet reviewed the conservative suggested Field Kit; an explicit empty array is player intent.
+    var preparationLoadout: [FieldKitPreparationEntry]?
+    var preparationLoadoutNeedsReview: Bool = false
     /// Loot that came home to a full Storehouse.
     ///
     /// **Banking never discards** (Q10, session-5 audit). Anything that doesn't fit waits here
@@ -166,6 +177,7 @@ struct BaseState: Codable, Equatable, Sendable {
         }
         state.companion.gambits = GambitStarter.rules
         state.syncInventoryCapacity()
+        state.preparationLoadout = []
         return state
     }
 
@@ -312,7 +324,8 @@ struct BaseState: Codable, Equatable, Sendable {
     /// Explicit because `companion` is no longer stored — it's a window onto the roster — and the
     /// decoder still has to be able to read it out of a save written before the roster existed.
     private enum CodingKeys: String, CodingKey {
-        case essence, resources, inventory, spillover, goldCoins, tradingPost, recycler
+        case essence, resources, inventory, preparationLoadout, preparationLoadoutNeedsReview
+        case satchelLoadout, spillover, goldCoins, tradingPost, recycler
         case lifetimeRawEssenceRefined, autoRefineReturnedRawEssence, lastAutoRefinedOutcomeID
         case ownedSymbols, ownedGambitComponents
         case completedResearch, knownConsumableRecipes, odaFixtureRestored, stations, page, ownedHands, hasChainingUnlock, instrumentLoadout
@@ -328,6 +341,8 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(essence, forKey: .essence)
         try c.encode(resources, forKey: .resources)
         try c.encode(inventory, forKey: .inventory)
+        try c.encodeIfPresent(preparationLoadout, forKey: .preparationLoadout)
+        try c.encode(preparationLoadoutNeedsReview, forKey: .preparationLoadoutNeedsReview)
         try c.encode(spillover, forKey: .spillover)
         try c.encode(goldCoins, forKey: .goldCoins)
         try c.encode(tradingPost, forKey: .tradingPost)
@@ -362,6 +377,10 @@ struct BaseState: Codable, Equatable, Sendable {
         resources = try container.decodeIfPresent(ResourcePool.self, forKey: .resources) ?? ResourcePool()
         inventory = try container.decodeIfPresent(Inventory.self, forKey: .inventory)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
+        preparationLoadout = try container.decodeIfPresent([FieldKitPreparationEntry].self,
+                                                            forKey: .preparationLoadout)
+        preparationLoadoutNeedsReview = try container.decodeIfPresent(
+            Bool.self, forKey: .preparationLoadoutNeedsReview) ?? (preparationLoadout == nil)
         ownedSymbols = try container.decodeIfPresent(Set<SymbolID>.self, forKey: .ownedSymbols) ?? []
         ownedSources = try container.decodeIfPresent(Set<PressureSourceID>.self, forKey: .ownedSources) ?? []
         ownedGambitComponents = try container.decodeIfPresent(Set<GambitComponentID>.self,

@@ -12,6 +12,7 @@ enum BindAvailability: Equatable {
     case ready(totalCost: Int)
     case activeExpedition
     case anchorageLocked
+    case fieldKit(String)
     case insufficientEssence(available: Int, required: Int)
 
     var isReady: Bool {
@@ -27,6 +28,8 @@ enum BindAvailability: Equatable {
             "You are already in an expedition. Return Home before binding another world."
         case .anchorageLocked:
             "Born anchored requires the Anchorage. Turn it off or build the Anchorage first."
+        case .fieldKit(let reason):
+            reason
         case let .insufficientEssence(available, required):
             "This binding needs \(required) Essence; you currently have \(available)."
         }
@@ -232,6 +235,7 @@ extension GameStore {
     func bindAvailability(bornAnchored: Bool) -> BindAvailability {
         let total = bookProjection.cost + (bornAnchored ? bornAnchoredPremium : 0)
         if state.worlds.activeRun != nil { return .activeExpedition }
+        if let refusal = fieldKitDepartureRefusal { return .fieldKit(refusal) }
         if bornAnchored && !state.base.station(Stations.anchorage).isUnlocked {
             return .anchorageLocked
         }
@@ -293,7 +297,9 @@ extension GameStore {
             return false
         }
 
+        var didCommit = false
         mutate("bind book & depart", flush: true) { state in
+            guard case .allowed(let fieldKit) = Self.fieldKitDepartureQuote(in: state) else { return }
             // The actor is synchronous from preview through commit, so the peeked seed is exactly
             // the one consumed here. World generation and visual resolution use isolated streams.
             precondition(state.worlds.seeds.nextSeed() == seed,
@@ -331,17 +337,8 @@ extension GameStore {
             state.reality.lifetime.runsStarted += 1
             state.worlds.lastExit = nil
 
-            // There is no packing screen yet, so leaving every salve in the Storehouse made the
-            // world and combat item buttons truthfully show nothing forever. Until loadouts exist,
-            // identified consumables automatically occupy their own bins in the run satchel.
-            var packedItems = Inventory(slots: state.base.satchelCapacity)
-            let consumables = state.base.inventory.stacks.filter {
-                $0.identified && (ContentCatalog.shared.item($0.catalogID)?.kind == .consumable
-                                  || $0.catalogID == Items.anchorFrame)
-            }
-            for stack in consumables where packedItems.add(stack) {
-                state.base.inventory.remove(stack.id)
-            }
+            state.base.inventory = fieldKit.remainingInventory
+            var packedItems = fieldKit.packed
             let progressAtStart = state.base.partyMembers.map { member in
                 let character = state.base.character(member)
                 let name = member.rosterIndex.flatMap { index in
@@ -420,8 +417,12 @@ extension GameStore {
                                   world: departingRun.anchoredSnapshot)
                 )
             }
+            didCommit = true
         }
-        return true
+        if !didCommit, case .refused(let reason) = Self.fieldKitDepartureQuote(in: state) {
+            bindError = reason
+        }
+        return didCommit
     }
 
     // MARK: - Essence Spring
