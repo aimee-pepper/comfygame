@@ -57,10 +57,10 @@
       "id": "starter-world-pages",
       "priority": "B1.4",
       "title": "Three consumable starting World Pages",
-      "status": "queued",
-      "detail": "Give new campaigns three distinct affordable read-only curated pages after their exact marks and seeded level-one worlds pass Design review. They remain optional and consume only on successful departure.",
+      "status": "next",
+      "detail": "Content is complete and machine-validated: give new campaigns three exact affordable read-only curated pages after Band 1.3 scaling closes. They remain optional and consume only on successful departure.",
       "gate": "Three exact instances survive relaunch, never consume on refusal/failure-before-commit, enter World History after binding, preserve continuation runway and produce survivable distinct opening worlds without hidden enemy nerfs.",
-      "workstream": "design",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
@@ -90,7 +90,7 @@
       "status": "queued",
       "detail": "After the opening loop, add unique and repeatable curated pages as physical expedition finds with provenance, read-only unknown glyphs and exact-instance consumption.",
       "gate": "Drops never replace guaranteed writing, failure/capacity/recap are truthful, unique pages cannot duplicate, unknown meanings do not leak and successful binding alone consumes the selected instance.",
-      "workstream": "design",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
@@ -510,7 +510,7 @@
       "status": "queued",
       "detail": "Complete the requested non-skill encounter-avoidance route after Apothecary reachability: Nessa tier-0 Scent Mask consumes one Reagent plus one exact grade-25+ animal world resource, costs 0 Essence, and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation.",
       "gate": "Exact-instance preview/commit, all animal/flora material boundaries, chemo/mixed/direct-contact sensory matrix, Quiet Step composition, relaunch, protected Field Kit return and 368×800 presentation pass. Authority: scent-mask-first-slice-current.md and Decision155.",
-      "workstream": "design",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
@@ -580,7 +580,7 @@
       "status": "queued",
       "detail": "Migrate Pencil to Brush and implement the settled Penmanship fan/fork with Brush-gated sibling Ink Mixing, Compound Assembly and Chaining, then ruling frame and Fountain pen. Decision187 supplies a reversible coherent 40–220 Essence comparison profile rather than preserving the 150-Essence first-hand bottleneck.",
       "gate": "Legacy IDs/capabilities migrate losslessly; sibling routes stay independent; exact recipes and Low writing runway preview share rules-owned costs; ten ordinary returns measure worlds-to-purchase without anti-lock dependence; phone graph fits without list regression. Authority: penmanship-native-migration-current.md, penmanship-economy-runway-review-current.md and Decision187.",
-      "workstream": "design",
+      "workstream": "engineering",
       "isPrimary": false
     },
     {
