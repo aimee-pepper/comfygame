@@ -104,6 +104,24 @@ final class BaseBoardTests: XCTestCase {
         })
     }
 
+    func testTownPlotCoordinatesFollowTheAspectFilledBackdropCrop() {
+        let image = CGSize(width: 1408, height: 3048)
+        let container = CGSize(width: 344, height: 430)
+        let frame = BaseBoardRules.townAspectFillFrame(imageSize: image, containerSize: container)
+
+        XCTAssertEqual(frame.width, 344, accuracy: 0.001)
+        XCTAssertGreaterThan(frame.height, container.height)
+        XCTAssertLessThan(frame.minY, 0, "The tall source is cropped vertically in this frame")
+
+        let normalized = CGPoint(x: 0.75, y: 0.70)
+        let point = BaseBoardRules.townPlotPoint(normalized, imageSize: image,
+                                                 containerSize: container)
+        XCTAssertEqual(point.x, frame.minX + frame.width * normalized.x, accuracy: 0.001)
+        XCTAssertEqual(point.y, frame.minY + frame.height * normalized.y, accuracy: 0.001)
+        XCTAssertNotEqual(point.y, container.height * normalized.y,
+                          "Plot and image must share the aspect-fill crop transform")
+    }
+
     func testEveryNonHomeDistrictConsumesThePagedImageVillageScene() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

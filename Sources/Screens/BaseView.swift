@@ -41,6 +41,26 @@ enum BaseBoardRules {
         TownBuildingVisualRegistry.assetName(for: stationID)
     }
 
+    /// The district backdrop is aspect-filled, so its normalized plot coordinates must be mapped
+    /// through the same scaled-and-cropped rectangle instead of the containing SwiftUI frame.
+    static func townAspectFillFrame(imageSize: CGSize, containerSize: CGSize) -> CGRect {
+        guard imageSize.width > 0, imageSize.height > 0,
+              containerSize.width > 0, containerSize.height > 0 else { return .zero }
+        let scale = max(containerSize.width / imageSize.width,
+                        containerSize.height / imageSize.height)
+        let rendered = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
+        return CGRect(x: (containerSize.width - rendered.width) / 2,
+                      y: (containerSize.height - rendered.height) / 2,
+                      width: rendered.width, height: rendered.height)
+    }
+
+    static func townPlotPoint(_ normalized: CGPoint, imageSize: CGSize,
+                              containerSize: CGSize) -> CGPoint {
+        let frame = townAspectFillFrame(imageSize: imageSize, containerSize: containerSize)
+        return CGPoint(x: frame.minX + frame.width * normalized.x,
+                       y: frame.minY + frame.height * normalized.y)
+    }
+
 }
 
 @MainActor private enum TownVisualResource {
@@ -351,12 +371,13 @@ private struct TownDistrictScene: View {
         GeometryReader { geometry in
             ZStack {
                 if let backdrop = TownVisualResource.image(named: "town-empty-v1") {
+                    let renderedFrame = BaseBoardRules.townAspectFillFrame(
+                        imageSize: backdrop.size, containerSize: geometry.size)
                     Image(uiImage: backdrop)
                     .resizable()
                     .interpolation(.none)
-                    .scaledToFill()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
+                    .frame(width: renderedFrame.width, height: renderedFrame.height)
+                    .position(x: renderedFrame.midX, y: renderedFrame.midY)
                     .allowsHitTesting(false)
                 }
 
@@ -366,13 +387,16 @@ private struct TownDistrictScene: View {
 
                 ForEach(Array(stations.enumerated()), id: \.element.id) { index, station in
                     let position = BaseBoardRules.townPlotPositions[index]
+                    let backdropSize = TownVisualResource.image(named: "town-empty-v1")?.size
+                        ?? geometry.size
+                    let renderedPoint = BaseBoardRules.townPlotPoint(
+                        position, imageSize: backdropSize, containerSize: geometry.size)
                     TownStationPlot(station: station,
                                     stationState: stationState(station.id),
                                     openFoundation: { openFoundation(station) },
                                     openedRoute: openedRoute)
                         .frame(width: min(132, geometry.size.width * 0.38), height: 132)
-                        .position(x: geometry.size.width * position.x,
-                                  y: geometry.size.height * position.y)
+                        .position(renderedPoint)
                 }
 
                 if stations.isEmpty {
@@ -388,6 +412,8 @@ private struct TownDistrictScene: View {
                     .padding(20)
                 }
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .clipped()
         }
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18))
