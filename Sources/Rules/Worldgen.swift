@@ -219,9 +219,12 @@ enum Worldgen {
 
     static func generate(book: BoundBook, seed: UInt64, library: LibraryState = LibraryState(),
                          tuning: DebugTuningProfile = .defaults,
-                         isFreshFirstExpedition: Bool = false)
+                         isFreshFirstExpedition: Bool = false,
+                         wildPageSelection: WildWorldPageSelectionRules.Selection? = nil,
+                         wildPageOriginRunIndex: Int? = nil)
         -> (map: WorldMap, enemies: [WorldEnemy], sites: [PlacedSite],
-            pages: [DiaryPageID], writings: [FoundWritingRecord], travellers: [TravellerID], cast: [Species], flora: [Flora],
+            pages: [DiaryPageID], writings: [FoundWritingRecord], wildPage: WorldPageInstance?,
+            travellers: [TravellerID], cast: [Species], flora: [Flora],
             start: GridPoint, diagnostics: WorldGenerationDiagnostics) {
         // **Size is written, not fixed** (session 13 §5). The book carries the Scale it was
         // written at, so the same book always makes the same size of world.
@@ -349,6 +352,16 @@ enum Worldgen {
             occupied.insert(point)
             foundWritings.append(record)
         }
+
+        // The loose World Page reserves an already reachable empty host only after ordinary
+        // writing has been guaranteed. Adding optional nodes/sites below therefore cannot displace
+        // that writing or consume the page's host.
+        let wildPage = wildPageSelection.flatMap { selection in
+            WildWorldPagePlacementRules.place(
+                selection, originRunIndex: wildPageOriginRunIndex ?? 0,
+                originWorldSeed: seed, in: map)
+        }
+        if let point = wildPage?.fieldProvenance?.position { occupied.insert(point) }
 
         // 3. Resource nodes. Count and richness both come from the book — a bounty-heavy book is
         //    visibly denser on the grid, not just better per pull.
@@ -647,7 +660,8 @@ enum Worldgen {
         diagnostics.openingEnvelopeRequested = tuning.openingEncounterEnvelope
         diagnostics.openingEnvelopeApplied = envelopeApplied
         diagnostics.openingEnemiesRelocated = relocated
-        return (map, enemies, sites, placedPages, foundWritings, placedTravellers, cast, flora, entry,
+        return (map, enemies, sites, placedPages, foundWritings, wildPage, placedTravellers,
+                cast, flora, entry,
                 diagnostics)
     }
 

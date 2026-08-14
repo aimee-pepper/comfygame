@@ -108,6 +108,24 @@ final class WorldTests: XCTestCase {
             selection, originRunIndex: 6, originWorldSeed: 992, in: map))
     }
 
+    func testWorldgenReservesWildPageAfterGuaranteedWritingBeforeOptionalContent() throws {
+        let selection = try XCTUnwrap(WildWorldPageSelectionRules.select(
+            seed: 1_404,
+            context: .init(resolvedExpeditions: 5, drought: 5, ownedCopies: [:],
+                           worldContextTags: [], suppressesRandomPage: false)))
+        let generated = Worldgen.generate(
+            book: book([:]), seed: 1_404, wildPageSelection: selection,
+            wildPageOriginRunIndex: 6)
+        let page = try XCTUnwrap(generated.wildPage)
+        let point = try XCTUnwrap(page.fieldProvenance?.position)
+        XCTAssertTrue(generated.diagnostics.writingWasGuaranteed)
+        XCTAssertFalse(generated.pages.isEmpty && generated.writings.isEmpty)
+        XCTAssertEqual(generated.map[point].content, .empty,
+                       "later optional placement must preserve the reserved overlay host")
+        XCTAssertEqual(page.fieldProvenance?.originRunIndex, 6)
+        XCTAssertEqual(page.fieldProvenance?.originWorldSeed, 1_404)
+    }
+
     func testWorldRunKeepsPagesSeparateWhileChargingSharedSatchelSlots() throws {
         let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_moss_and_mist"))
         let page = WorldPageInstance(id: InstanceID(rawValue: 700), definition: definition,

@@ -795,12 +795,9 @@ extension GameStore {
                 suppressesRandomPage: false))
         let world = Worldgen.generate(book: book, seed: generationSeed, library: state.reality.library,
                                       tuning: tuning,
-                                      isFreshFirstExpedition: state.worlds.runIndex == 0)
-        let offeredWildPage = wildSelection.flatMap {
-            WildWorldPagePlacementRules.place(
-                $0, originRunIndex: state.worlds.runIndex + 1,
-                originWorldSeed: generationSeed, in: world.map)
-        }
+                                      isFreshFirstExpedition: state.worlds.runIndex == 0,
+                                      wildPageSelection: wildSelection,
+                                      wildPageOriginRunIndex: state.worlds.runIndex + 1)
         let visualReceipt: WorldVisualReceipt
         do {
             let authoredInkPairs: [(InstanceID, InkRecipe)] = sourcePage.runes.compactMap { mark in
@@ -922,7 +919,7 @@ extension GameStore {
                 // The satchel is its own, smaller capacity — separate from home storage, and
                 // separately upgradeable (decisions-log session 2).
                 satchelItems: packedItems,
-                offeredWorldPages: offeredWildPage.map { [$0] } ?? [],
+                offeredWorldPages: world.wildPage.map { [$0] } ?? [],
                 carriedInstruments: (state.base.hasConfiguredInstrumentLoadout
                                      ? state.base.instrumentLoadout
                                      : state.reality.instruments)
