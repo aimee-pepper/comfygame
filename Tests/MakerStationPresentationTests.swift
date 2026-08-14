@@ -2,6 +2,38 @@ import XCTest
 @testable import Bookbinder
 
 final class MakerStationPresentationTests: XCTestCase {
+    func testStationResourceNamesUseCatalogueAndNeverExposeUnknownIDs() throws {
+        let clay = try XCTUnwrap(ContentCatalog.shared.resource("clay"))
+        XCTAssertEqual(StationCataloguePresentation.resourceName(clay.id), clay.name)
+        let unknown: ResourceID = "internal_missing_station_resource"
+        let fallback = StationCataloguePresentation.resourceName(unknown)
+        XCTAssertEqual(fallback, "Unknown resource")
+        XCTAssertFalse(fallback.contains(unknown.rawValue))
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"), encoding: .utf8)
+        XCTAssertFalse(source.contains("option.resource.rawValue.capitalisedSentence"))
+        XCTAssertFalse(source.contains("resource(resource)?.name ?? resource.rawValue"))
+        XCTAssertTrue(source.contains("Text(\"From \\(sample.source)\")"))
+        XCTAssertFalse(source.contains("Text(\"off a \\(sample.source)\")"))
+    }
+
+    func testConstructionRowsDescribeRequirementsRatherThanClaimingASelection() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BlacksmithView.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains("Needs \\(recipe.requirements.count) samples"))
+        XCTAssertFalse(source.contains("\\(recipe.requirements.count) selected samples"))
+    }
+
+    func testReforgeUsesTheSamePowerTermAsEquipmentDetails() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BlacksmithView.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains("chip(\"+0.2 power\", .green)"))
+        XCTAssertTrue(source.contains("String(format: \"power %.1f\", target.effectivePower + 0.2)"))
+        XCTAssertTrue(source.contains("+0.2 power toward final"))
+        XCTAssertFalse(source.contains("+0.2 rating"))
+        XCTAssertFalse(source.contains("gear rating toward final"))
+    }
+
     func testArmouryUsesCompactProfileAndExactSampleGrids() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

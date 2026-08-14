@@ -1,5 +1,12 @@
 import SwiftUI
 
+enum StationCataloguePresentation {
+    static func resourceName(_ id: ResourceID,
+                             catalogue: ContentCatalog = .shared) -> String {
+        catalogue.resource(id)?.name ?? "Unknown resource"
+    }
+}
+
 struct DistilleryView: View {
     @EnvironmentObject private var store: GameStore
     @State private var selected: [CoreAttunement: String] = [:]
@@ -81,8 +88,7 @@ struct DistilleryView: View {
                     Picker("Catalyst", selection: $causticCatalyst) {
                         ForEach(DistilleryRules.requirement(for: attunement).catalysts,
                                 id: \.resource) { option in
-                            let name = ContentCatalog.shared.resource(option.resource)?.name
-                                ?? option.resource.rawValue.capitalisedSentence
+                            let name = StationCataloguePresentation.resourceName(option.resource)
                             Text("\(option.amount) \(name)").tag(option.resource)
                         }
                     }.pickerStyle(.segmented)
@@ -120,7 +126,7 @@ struct DistilleryView: View {
         case .sampleUnavailable: "Selected sample is no longer available"
         case .unsupportedCatalyst: "Selected catalyst is not valid for this core"
         case .needsCatalyst(let resource, let have, let need):
-            "Needs \(need) \(ContentCatalog.shared.resource(resource)?.name ?? resource.rawValue) · \(have) held"
+            "Needs \(need) \(StationCataloguePresentation.resourceName(resource)) · \(have) held"
         case .needsBlankCrystal: "Needs one blank Essence Crystal"
         case .needsRoom: "Needs room in the Storehouse"
         }
@@ -129,8 +135,7 @@ struct DistilleryView: View {
     private func requirement(_ value: CoreAttunement) -> String {
         let rule = DistilleryRules.requirement(for: value)
         let catalyst = rule.catalysts.map { option in
-            let name = ContentCatalog.shared.resource(option.resource)?.name
-                ?? option.resource.rawValue.capitalisedSentence
+            let name = StationCataloguePresentation.resourceName(option.resource)
             return "\(option.amount) \(name)"
         }.joined(separator: " or ")
         var sample: [String] = []
@@ -1612,7 +1617,7 @@ struct MaterialBinSheet: View {
                                     .font(.callout)
                                     .foregroundStyle(sample.rarity.tint)
                                 if !sample.source.isEmpty {
-                                    Text("off a \(sample.source)")
+                                    Text("From \(sample.source)")
                                         .font(.caption2).foregroundStyle(.secondary)
                                 }
                             }

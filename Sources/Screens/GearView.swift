@@ -125,9 +125,13 @@ struct GearView: View {
                       location: String, enabled: Bool) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top) {
-                Image(systemName: definition?.icon ?? "questionmark")
-                    .font(.title2)
-                    .foregroundStyle(definition?.rarity.tint ?? .secondary)
+                CatalogueItemPixelIdentity(
+                    itemID: piece.catalogID,
+                    identified: true,
+                    fallbackSystemIcon: definition?.icon ?? "questionmark",
+                    fallbackColor: definition?.rarity.tint ?? .secondary
+                )
+                .frame(width: 32, height: 32)
                 Spacer()
                 Text(location)
                     .font(.caption2.weight(.semibold))

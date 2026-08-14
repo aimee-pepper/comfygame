@@ -25,6 +25,15 @@ final class GearAndRulesTests: XCTestCase {
                        "The selected item decision must fit without another scroll gesture")
         XCTAssertFalse(detail.contains("Button(\"Done\")"),
                        "The pushed comparison page already owns one navigation back control")
+        XCTAssertTrue(source.contains("CatalogueItemPixelIdentity("))
+        XCTAssertTrue(source.contains("itemID: piece.catalogID"),
+                      "Gear candidates must consume stable catalogue identity")
+
+        let party = try String(contentsOf: root.appending(path: "Sources/Screens/PartyRosterView.swift"),
+                               encoding: .utf8)
+        XCTAssertTrue(party.contains("CatalogueItemPixelIdentity("))
+        XCTAssertTrue(party.contains("itemID: piece.catalogID"),
+                      "Equipped Party rows must consume the same stable catalogue identity")
     }
 
     func testItemTilesUseSolidRarityColourWhileOtherCharactersGearIsDashed() throws {

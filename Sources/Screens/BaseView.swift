@@ -741,7 +741,7 @@ private struct StationFoundationSheet: View {
         var parts: [String] = []
         if cost.essence > 0 { parts.append("\(cost.essence) essence") }
         for (id, amount) in cost.resources.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
-            parts.append("\(amount) \(ContentCatalog.shared.resource(id)?.name.lowercased() ?? id.rawValue)")
+            parts.append("\(amount) \(StationCataloguePresentation.resourceName(id).lowercased())")
         }
         return parts.isEmpty ? "free" : parts.joined(separator: " · ")
     }

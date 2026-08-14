@@ -222,7 +222,7 @@ private struct ConstructionRow: View {
     }
 
     private var summary: String {
-        "\(recipe.requirements.count) selected samples · Tier 1–\(PhysicalGearCraftingRules.constructionCap(for: recipe, in: store.state))"
+        "Needs \(recipe.requirements.count) samples · Tier 1–\(PhysicalGearCraftingRules.constructionCap(for: recipe, in: store.state))"
     }
 
     @ViewBuilder private var status: some View {
@@ -1077,7 +1077,7 @@ private struct ReadinessChip: View {
     var body: some View {
         switch readiness {
         case .ready:
-            chip("+0.2 rating", .green)
+            chip("+0.2 power", .green)
         case .finished:
             chip("finished", .secondary)
         case .needsMaterials(let have, let need):
@@ -1120,7 +1120,7 @@ private struct ReforgeSheet: View {
                         LabeledRow(icon: target.icon, label: target.displayName,
                                    value: "tier \(target.constructionTier)", tint: target.rarity.tint)
                         LabeledRow(icon: "arrow.up.circle", label: "Becomes",
-                                   value: String(format: "rating %.1f", target.effectivePower + 0.2))
+                                   value: String(format: "power %.1f", target.effectivePower + 0.2))
                         if let wearer = target.wearer {
                             LabeledRow(icon: "person.fill", label: "Worn by", value: wearer)
                         }
@@ -1223,6 +1223,6 @@ private struct ReforgeSheet: View {
     private var effectText: String {
         guard let slot = target.definition?.gear?.slot else { return "" }
         let unit = slot == .weapon ? "damage" : "protection"
-        return "+0.2 gear rating toward final \(unit). Construction tier stays \(target.constructionTier). This exact piece keeps it."
+        return "+0.2 power toward final \(unit). Construction tier stays \(target.constructionTier). This exact piece keeps it."
     }
 }

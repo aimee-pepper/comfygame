@@ -279,9 +279,19 @@ private struct GearSlotRow: View {
                 .environmentObject(store)
         } label: {
             HStack(spacing: 10) {
-                Image(systemName: piece?.definition?.icon ?? gearSlot.icon)
-                    .foregroundStyle(piece?.definition?.rarity.tint ?? Color.secondary)
-                    .frame(width: 22)
+                if let piece {
+                    CatalogueItemPixelIdentity(
+                        itemID: piece.catalogID,
+                        identified: true,
+                        fallbackSystemIcon: piece.definition?.icon ?? gearSlot.icon,
+                        fallbackColor: piece.definition?.rarity.tint ?? .secondary
+                    )
+                    .frame(width: 28, height: 28)
+                } else {
+                    Image(systemName: gearSlot.icon)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 28)
+                }
                 VStack(alignment: .leading, spacing: 0) {
                     Text(piece?.displayName ?? gearSlot.displayName)
                         .foregroundStyle(piece?.definition?.rarity.tint ?? Color.secondary)
