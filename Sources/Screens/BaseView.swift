@@ -41,6 +41,7 @@ struct BaseView: View {
         ScrollView {
             VStack(spacing: 12) {
                 contextRow
+                firstReturnRouteCard
                 sectionPicker
                 stationBoard
             }
@@ -48,11 +49,6 @@ struct BaseView: View {
             .padding(.bottom, 12)
         }
         .background(Color(.systemGroupedBackground))
-        .overlay(alignment: .top) {
-            firstReturnRouteCard
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-        }
         .navigationTitle("Base")
         .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .bottom) {
@@ -83,21 +79,14 @@ struct BaseView: View {
                             value: state.base.essence, tint: .teal)
             CompactCurrency(icon: "star.fill", label: "Motes",
                             value: state.reality.motes, tint: .purple)
-            Menu {
-                NavigationLink(value: AppRoute.settings) {
-                    Label("Settings", systemImage: "gearshape")
-                }
-                #if DEBUG
-                NavigationLink(value: AppRoute.harness) {
-                    Label("Testing", systemImage: "wrench.and.screwdriver")
-                }
-                #endif
-            } label: {
+            NavigationLink(value: AppRoute.settings) {
                 Image(systemName: "ellipsis.circle")
                     .font(.title3)
                     .frame(width: 44, height: 44)
             }
-            .accessibilityLabel("Base utilities")
+            .buttonStyle(.plain)
+            .contentShape(Rectangle())
+            .accessibilityLabel("Settings and save games")
         }
         .frame(minHeight: 44)
     }

@@ -2,6 +2,18 @@ import XCTest
 @testable import Bookbinder
 
 final class BaseBoardTests: XCTestCase {
+    func testBaseSaveMenuIsADirectFullSizeSettingsDestination() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("NavigationLink(value: AppRoute.settings)"))
+        XCTAssertTrue(source.contains(".accessibilityLabel(\"Settings and save games\")"))
+        XCTAssertFalse(source.contains("Menu {\n                NavigationLink(value: AppRoute.settings)"))
+        XCTAssertTrue(source.contains("contextRow\n                firstReturnRouteCard\n                sectionPicker"))
+        XCTAssertFalse(source.contains(".overlay(alignment: .top) {\n            firstReturnRouteCard"))
+    }
+
     func testEveryCurrentStationAuthorsOneUniqueBoardPosition() throws {
         let stations = ContentCatalog.shared.stations
         XCTAssertTrue(stations.allSatisfy { $0.homeSection != nil && $0.sectionOrder != nil })
