@@ -1,6 +1,8 @@
 import SwiftUI
 
 enum RecyclerPresentation {
+    static let proprietorID: TravellerID = "noll"
+
     static func resourceName(_ id: ResourceID,
                              catalogue: ContentCatalog = .shared) -> String {
         catalogue.resource(id)?.name ?? "Unknown resource"
@@ -21,6 +23,8 @@ struct RecyclerView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                proprietorHeader
+
                 Text("Select one eligible piece to see exactly what Noll can recover. Nothing is dismantled until you confirm.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -70,6 +74,29 @@ struct RecyclerView: View {
     }
 
     private var previews: [RecyclerPreview] { store.recyclerPreviews() }
+
+    private var proprietorHeader: some View {
+        let person = ContentCatalog.shared.traveller(RecyclerPresentation.proprietorID)
+        return HStack(spacing: 12) {
+            NamedCharacterPixelIdentity(
+                travellerID: person?.id,
+                fallbackSystemIcon: person?.icon ?? "arrow.3.trianglepath",
+                fallbackColor: .orange
+            )
+            .frame(width: 48, height: 48)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(person?.name ?? "Recycler")
+                    .font(.headline)
+                Text(person?.calling ?? "Salvager")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(.background, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
 
     private var recyclerEmptyState: some View {
         VStack(alignment: .leading, spacing: 8) {

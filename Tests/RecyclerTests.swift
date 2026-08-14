@@ -2,6 +2,12 @@ import XCTest
 @testable import Bookbinder
 
 final class RecyclerPresentationTests: XCTestCase {
+    func testRecyclerProprietorUsesExactNollIdentity() throws {
+        XCTAssertEqual(RecyclerPresentation.proprietorID, TravellerID(rawValue: "noll"))
+        let noll = try XCTUnwrap(ContentCatalog.shared.traveller(RecyclerPresentation.proprietorID))
+        XCTAssertEqual(noll.name, "Noll")
+    }
+
     func testRecoveredResourceNamesUseCatalogueAndHideUnknownIDs() throws {
         let clay = try XCTUnwrap(ContentCatalog.shared.resource("clay"))
         XCTAssertEqual(RecyclerPresentation.resourceName(clay.id), clay.name)
@@ -32,6 +38,9 @@ final class RecyclerTests: XCTestCase {
         XCTAssertTrue(source.contains("No gear to dismantle"))
         XCTAssertTrue(source.contains("gear without recorded provenance stay protected"))
         XCTAssertTrue(source.contains("ItemIconTile(icon: preview.snapshot.icon"))
+        XCTAssertTrue(source.contains("NamedCharacterPixelIdentity("))
+        XCTAssertTrue(source.contains("travellerID: person?.id"))
+        XCTAssertTrue(source.contains("RecyclerPresentation.proprietorID"))
         XCTAssertTrue(source.contains("SixAcrossItemGrid(data: preview.returnedResources.nonZero"))
         XCTAssertTrue(source.contains("ResourceIconTile(resourceID: entry.id"))
         XCTAssertTrue(source.contains("Text(\"Dismantle this piece\").frame(maxWidth: .infinity)"))
