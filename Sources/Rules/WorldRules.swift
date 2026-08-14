@@ -167,6 +167,20 @@ enum WorldRules {
         map.contains(point) && map[point].isPassable
     }
 
+    /// A blocked step says what the player can directly observe, in stable priority order.
+    /// Returning nil means the tile is enterable.
+    static func blockedMovementRefusal(to point: GridPoint, in map: WorldMap) -> String? {
+        guard map.contains(point) else { return "The edge of the world lies beyond that step." }
+        let tile = map[point]
+        if tile.isCrumbled { return "Crumbled away — nothing to stand on." }
+        switch tile.ground {
+        case .deepWater: return "The water is too deep to cross."
+        case .chasm: return "A chasm opens there — there is no footing."
+        default:
+            return tile.isPassable ? nil : "The \(tile.ground.displayName) blocks the way."
+        }
+    }
+
     static func isAdjacent(_ a: GridPoint, _ b: GridPoint) -> Bool {
         a.manhattanDistance(to: b) == 1
     }
@@ -239,8 +253,8 @@ enum WorldRules {
         guard isAdjacent(run.playerPosition, destination) else {
             return [.blocked("That's not a step away.")]
         }
-        guard canEnter(destination, in: run.map) else {
-            return [.blocked("Crumbled away — nothing to stand on.")]
+        if let refusal = blockedMovementRefusal(to: destination, in: run.map) {
+            return [.blocked(refusal)]
         }
         let preContact = preContactSnapshot(in: run, playerDestination: destination)
 

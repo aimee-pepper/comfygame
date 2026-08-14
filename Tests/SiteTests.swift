@@ -4,6 +4,45 @@ import XCTest
 /// Sites — the fourth layer. What a world *contains*, as opposed to what it *is*.
 final class SiteTests: XCTestCase {
 
+    @MainActor
+    func testBlockedMovementNamesObservableTerrainAndSpendsNoWorldTurn() throws {
+        var map = WorldMap(width: 2, height: 2,
+                           tiles: Array(repeating: Tile(ground: .soil), count: 4),
+                           entry: GridPoint(x: 0, y: 0))
+        map[GridPoint(x: 1, y: 0)] = Tile(ground: .deepWater)
+        map[GridPoint(x: 0, y: 1)] = Tile(ground: .chasm)
+        XCTAssertEqual(WorldRules.blockedMovementRefusal(
+            to: GridPoint(x: 2, y: 0), in: map),
+                       "The edge of the world lies beyond that step.")
+        XCTAssertEqual(WorldRules.blockedMovementRefusal(
+            to: GridPoint(x: 1, y: 0), in: map),
+                       "The water is too deep to cross.")
+        XCTAssertEqual(WorldRules.blockedMovementRefusal(
+            to: GridPoint(x: 0, y: 1), in: map),
+                       "A chasm opens there — there is no footing.")
+        map[GridPoint(x: 1, y: 0)].isCrumbled = true
+        XCTAssertEqual(WorldRules.blockedMovementRefusal(
+            to: GridPoint(x: 1, y: 0), in: map),
+                       "Crumbled away — nothing to stand on.")
+
+        let store = GameStore(io: .temporary(name: "blocked-step-\(UUID().uuidString)"))
+        XCTAssertTrue(store.bindAndDepart())
+        store.mutate("place adjacent deep water") { state in
+            guard var run = state.worlds.activeRun else { return }
+            let destination = run.map.neighbours(of: run.playerPosition).first!
+            run.map[destination].ground = .deepWater
+            run.map[destination].isCrumbled = false
+            run.enemies.removeAll()
+            state.worlds.activeRun = run
+        }
+        let before = try XCTUnwrap(store.state.worlds.activeRun)
+        let destination = try XCTUnwrap(before.map.neighbours(of: before.playerPosition).first)
+        store.step(to: destination)
+        let after = try XCTUnwrap(store.state.worlds.activeRun)
+        XCTAssertEqual(after, before)
+        XCTAssertEqual(store.recentEvents, [.blocked("The water is too deep to cross.")])
+    }
+
     // MARK: Content
 
     func testEverySiteIsReachableBySomeWorld() {
