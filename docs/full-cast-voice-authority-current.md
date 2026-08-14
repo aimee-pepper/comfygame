@@ -1,7 +1,8 @@
 # Full-cast voice authority — current
 
 **Status:** personality and voice matrix settled; all five campaign-order meeting batches are
-production-authorized; diary voice revision remains later and does not pre-empt playability implementation
+production-authorized; opening diary voice batch Vance–Sela is source-complete; remaining diary
+revision stays behind playability implementation
 **Date:** 14 August 2026
 **Roadmap position:** Band 6.8; this authority must not pre-empt opening playability work
 
@@ -140,6 +141,25 @@ Atlas state. Tovin's already-live meeting remains a separate retained object.
 
 Stable exchange IDs, recruitment facts, mechanics and rewards remain unchanged. This closes meeting
 voice production; diary voice remains a separate later campaign-order pass.
+
+## Opening diary batch disposition — Vance through Sela
+
+The first seven travellers' reflective diary pages now use their settled registers while every
+location clue keeps its already-approved plain observable description:
+
+| Character | Diary register |
+|---|---|
+| Vance | Appraisal, transport, scarcity and dry price humour |
+| Noll | Separation steps, sound parts and blunt repair judgements |
+| Halloway | Workable ground, heat, tool fit and steady practical instruction |
+| Mara | Measurement, fixed references and candid self-correction |
+| Edren | Evidence, dating, layers and qualified conclusions |
+| Isolde | Hand, pressure and tool demonstrations with cutting assessments |
+| Sela | Weather, water, routes and informal field advice |
+
+This is a prose-only revision. Page IDs, owners, kinds, clue indices, teachings, targets, research
+leads, whereabouts references and condition preferences are unchanged. The previous prose remains
+recoverable in version history; location-clue clarity is not traded for personality.
 
 ## Promotion gate
 

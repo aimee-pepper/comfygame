@@ -899,7 +899,7 @@
       "id": "mara_word_sela",
       "diary": "mara",
       "kind": "whereabouts",
-      "prose": "Sela went on ahead. She always did. If anyone is still walking, it is her.",
+      "prose": "Sela took the north path with two days of food and enough confidence for four. If the path was wrong, she will have found a better one by now.",
       "about": "sela",
       "prefersConditions": []
     },
@@ -907,7 +907,7 @@
       "id": "mara_scarp",
       "diary": "mara",
       "kind": "focus",
-      "prose": "A slope invites an ascent. A scarp ends the discussion.",
+      "prose": "I tried to sight across the slope and found the ground had stopped pretending to be gradual. A scarp: steep face, abrupt rise, no sensible route straight up.",
       "teachesFocus": "scarp",
       "prefersConditions": []
     },
@@ -915,7 +915,7 @@
       "id": "edren_ruin_workshop",
       "diary": "edren",
       "kind": "ruin",
-      "prose": "There are rooms under the ice that were rooms before the ice.",
+      "prose": "The walls beneath the ice meet at worked corners. This was a room before it froze, though I cannot yet date either event.",
       "site": "glacial_vault",
       "prefersConditions": [
         {
@@ -929,7 +929,7 @@
       "id": "edren_lead",
       "diary": "edren",
       "kind": "researchLead",
-      "prose": "The seams run in patterns. Patterns mean somebody put them there.",
+      "prose": "The lead seams repeat at measured intervals and terminate beside worked sockets. Natural deposition is possible, but deliberate placement better fits the evidence.",
       "researchNode": "study_growth",
       "prefersConditions": [
         {
@@ -943,7 +943,7 @@
       "id": "edren_ruin",
       "diary": "edren",
       "kind": "focus",
-      "prose": "A ruin is not empty stone. It is work whose worker is missing.",
+      "prose": "Ruin: a constructed place whose use has ended or become unclear. Record the surviving work before assigning a story to the absent workers.",
       "teachesFocus": "ruin",
       "prefersConditions": []
     },
@@ -973,14 +973,14 @@
       "id": "sela_world",
       "diary": "sela",
       "kind": "worldWorthWriting",
-      "prose": "Write yourself somewhere with weather. You will understand when you are standing in it.",
+      "prose": "Write somewhere the weather makes decisions for you. Pack for the forecast you wanted, then pack for the one that will actually turn up.",
       "prefersConditions": []
     },
     {
       "id": "sela_pond",
       "diary": "sela",
       "kind": "focus",
-      "prose": "A pond is enough water to stop for, and small enough that stopping remains a choice.",
+      "prose": "A pond is a small body of still water you can walk around. Check the bank before drinking. Check what is already drinking before choosing a bank.",
       "teachesFocus": "pond",
       "prefersConditions": []
     },
@@ -1006,7 +1006,7 @@
       "id": "sela_word_halloway",
       "diary": "sela",
       "kind": "whereabouts",
-      "prose": "There is a woman out there keeping a fire in. She said she would not put it out until somebody came for it.",
+      "prose": "Halloway is tending a banked fire somewhere warm. She said she would keep it alive until we arrived, so bring dry fuel and do not make her prove how long she can wait.",
       "about": "halloway",
       "prefersConditions": []
     },
@@ -1014,14 +1014,14 @@
       "id": "halloway_world",
       "diary": "halloway",
       "kind": "worldWorthWriting",
-      "prose": "Write somewhere hot, with soft ground under it. Everything else can be carried in.",
+      "prose": "Give me heat and ground I can shape. I can carry tools, fuel and iron; I cannot carry a workable floor in my pockets.",
       "prefersConditions": []
     },
     {
       "id": "halloway_gold_ore",
       "diary": "halloway",
       "kind": "focus",
-      "prose": "Gold scattered through stone is a rumour. Find the vein and it becomes material.",
+      "prose": "A few gold flecks will waste an afternoon. A continuous vein can be cut, weighed and worked. Follow the stone before celebrating the shine.",
       "teachesFocus": "gold_ore",
       "prefersConditions": []
     },
@@ -1047,14 +1047,14 @@
       "id": "isolde_worth_0",
       "diary": "isolde",
       "kind": "worldWorthWriting",
-      "prose": "A hand is not a tool you buy. It is a habit you are given, by somebody who had it first.",
+      "prose": "Your hand is the repeated motion behind the mark. A better tool can make that motion smaller or cleaner, but it cannot practise on your behalf.",
       "prefersConditions": []
     },
     {
       "id": "isolde_hush",
       "diary": "isolde",
       "kind": "focus",
-      "prose": "Still the air before you blame the hand. A line records every disturbance.",
+      "prose": "Hush the air, settle your sleeve, then draw. If the line still trembles, the movement came from your hand and you can work on it.",
       "teachesFocus": "hush",
       "prefersConditions": []
     },
@@ -1069,37 +1069,37 @@
     },
     {
       "id": "mara_world_fixed_line", "diary": "mara", "kind": "worldWorthWriting",
-      "prose": "A useful world gives you one line that stays put while everything else argues. Write for that line first. Decide what it meant after you have stood on it.",
+      "prose": "Give me one fixed horizon, ridge or shoreline and I can measure the rest against it. Write that reference first; interpretation can wait until we have observations.",
       "prefersConditions": []
     },
     {
       "id": "mara_site_crystal_cavern", "diary": "mara", "kind": "ruin",
-      "prose": "There is a cut in the stone where every face returns the same crooked horizon. I marked it twice. The fault is in the place, not the instrument.",
+      "prose": "A crystal cut in the stone repeats the same crooked horizon from every face. I checked the instrument twice. The distortion belongs to the cavern.",
       "site": "crystal_cavern", "prefersConditions": []
     },
     {
       "id": "mara_word_tovin", "diary": "mara", "kind": "whereabouts",
-      "prose": "Tovin measured distance in bindings instead of miles. If a world felt too costly to leave, that was the one he stayed in.",
+      "prose": "Tovin counted distance by the bindings needed to return. His figures were excellent. His habit of staying when the return grew expensive was not.",
       "about": "tovin", "prefersConditions": []
     },
     {
       "id": "edren_world_second_floor", "diary": "edren", "kind": "worldWorthWriting",
-      "prose": "Write somewhere the ground has been used more than once. A first floor tells you who arrived. A second tells you who refused to begin again.",
+      "prose": "Write a place with construction over older construction. The lower floor establishes first use; repairs and additions above it show later occupation without requiring a clean beginning.",
       "prefersConditions": []
     },
     {
       "id": "halloway_brush_ferrule", "diary": "halloway", "kind": "researchLead",
-      "prose": "A ferrule does not need to be precious. It needs to hold an even bundle without crushing it. Bring Isolde metal that can keep that promise.",
+      "prose": "A brush needs a thin ferrule that grips an even bundle without cutting the fibres. Bring Isolde workable metal; I will test the seam and replace it if it slips.",
       "researchNode": "pen_brush", "prefersConditions": []
     },
     {
       "id": "isolde_brush_hand", "diary": "isolde", "kind": "researchLead",
-      "prose": "Rough charcoal teaches confidence because it cannot hide a correction. A brush teaches revision. Do not call the second lesson refinement until you have learned both.",
+      "prose": "Rough charcoal makes every correction visible. Learn to commit the stroke. Then use a brush, where pressure and angle let you revise the shape while you draw it.",
       "researchNode": "pen_brush", "prefersConditions": []
     },
     {
       "id": "isolde_word_tovin", "diary": "isolde", "kind": "whereabouts",
-      "prose": "Tovin learned to close a binding neatly before he learned when not to make one. His lines improve whenever he is frightened. This is not the compliment he thinks it is.",
+      "prose": "Tovin closes a binding with excellent control and terrible judgement about when to stop. Fear steadies his hand. He remains annoyingly proud of the wrong half of that assessment.",
       "about": "tovin", "prefersConditions": []
     },
     {
@@ -1133,18 +1133,18 @@
     { "id": "orsa_site_wayfarers_camp", "diary": "orsa", "kind": "ruin", "prose": "The same fire ring has been rebuilt three times, each smaller than the last. Whoever stopped here understood that shelter can be inherited without being owned.", "site": "wayfarers_camp", "prefersConditions": [] },
 
     { "id": "vance_where_0", "diary": "vance", "kind": "locationClue", "prose": "The land is broad and open, with few barriers between one horizon and the next. A loaded cart could cross without the ground inventing a toll.", "about": "vance", "clueIndex": 0, "prefersConditions": [] },
-    { "id": "vance_where_1", "diary": "vance", "kind": "worldWorthWriting", "prose": "The useful ground keeps to seams. Value is easier to bargain over when both people can point to its edge.", "prefersConditions": [] },
-    { "id": "vance_where_2", "diary": "vance", "kind": "worldWorthWriting", "prose": "Life gathers in separate pockets. Moving something between them changes its price before it changes the thing.", "prefersConditions": [] },
-    { "id": "vance_amber", "diary": "vance", "kind": "focus", "prose": "Amber preserves by removing a thing from circulation. Sometimes that protects a history. Sometimes it only makes the theft last.", "teachesFocus": "amber", "prefersConditions": [] },
-    { "id": "vance_word_orsa", "diary": "vance", "kind": "whereabouts", "prose": "Orsa never charged for the fire. She did expect anyone using it to notice who else was cold. Some debts become clearer when nobody names them.", "about": "orsa", "prefersConditions": [] },
-    { "id": "vance_world_repaired_handle", "diary": "vance", "kind": "worldWorthWriting", "prose": "Write somewhere one material is common and another is scarce. Then look at what has been repaired. Need leaves better records than abundance.", "prefersConditions": [] },
-    { "id": "vance_site_binders_workshop", "diary": "vance", "kind": "ruin", "prose": "The tools in the old binder's room came from six hands. I know because every handle was changed for the next one. Ownership is rarely the longest fact about an object.", "site": "binders_workshop", "prefersConditions": [] },
+    { "id": "vance_where_1", "diary": "vance", "kind": "worldWorthWriting", "prose": "Useful material runs in visible seams here. Good. If buyer and seller can point to the same boundary, we can argue about price instead of quantity.", "prefersConditions": [] },
+    { "id": "vance_where_2", "diary": "vance", "kind": "worldWorthWriting", "prose": "Plants and animals gather in separate pockets. Something common in one pocket may be scarce in the next; transport changes the price even when the goods arrive unchanged.", "prefersConditions": [] },
+    { "id": "vance_amber", "diary": "vance", "kind": "focus", "prose": "Amber seals small things against air and handling. That can preserve a specimen—or preserve evidence that somebody took it. Ask where it came from before pricing it.", "teachesFocus": "amber", "prefersConditions": [] },
+    { "id": "vance_word_orsa", "diary": "vance", "kind": "whereabouts", "prose": "Orsa never charged for a place by the fire. Her rate was noticing who still needed a blanket, a bowl or the chair nearest the door. Cheap lodging, expensive attention.", "about": "orsa", "prefersConditions": [] },
+    { "id": "vance_world_repaired_handle", "diary": "vance", "kind": "worldWorthWriting", "prose": "Write one plentiful material and one scarce one. Repairs will show what people could replace, what they had to conserve, and what a trader might profitably bring next.", "prefersConditions": [] },
+    { "id": "vance_site_binders_workshop", "diary": "vance", "kind": "ruin", "prose": "Six people altered the handles in the old binder's room: new wrapping, shortened grips, two repairs and one left-handed guard. The last owner is only one line in the appraisal.", "site": "binders_workshop", "prefersConditions": [] },
 
     { "id": "noll_where_0", "diary": "noll", "kind": "locationClue", "prose": "Hard stone and compacted ground keep sharp edges when they break. The pieces could be fitted together again after the whole fails.", "about": "noll", "clueIndex": 0, "prefersConditions": [] },
     { "id": "noll_where_1", "diary": "noll", "kind": "locationClue", "prose": "Useful material is concentrated in a few narrow seams rather than spread across the ground. Separate pieces should be easy to recover.", "about": "noll", "clueIndex": 1, "prefersConditions": [] },
-    { "id": "noll_word_vance", "diary": "noll", "kind": "whereabouts", "prose": "Vance asks what an object will fetch. I ask which parts would have to lie for that price to be true. We usually arrive at the same table by different doors.", "about": "vance", "prefersConditions": [] },
-    { "id": "noll_word_halloway", "diary": "noll", "kind": "whereabouts", "prose": "Halloway can keep a whole thing alive past my estimate. When she says it can be mended, wait. When she says it cannot, wait once more; the admission cost her something.", "about": "halloway", "prefersConditions": [] },
-    { "id": "noll_world_join", "diary": "noll", "kind": "worldWorthWriting", "prose": "Write a place where hard matter keeps to a few clear seams. Scattered plenty makes careless salvagers. A boundary makes each removal answerable.", "prefersConditions": [] },
+    { "id": "noll_word_vance", "diary": "noll", "kind": "whereabouts", "prose": "Vance prices the whole object. I price the sound parts, subtract the work of separating them, and ask why the damaged joint is being hidden. Our totals usually agree. He finds this irritating.", "about": "vance", "prefersConditions": [] },
+    { "id": "noll_word_halloway", "diary": "noll", "kind": "whereabouts", "prose": "Halloway repairs objects I would dismantle. When she says a piece can be mended, let her try. When she says it cannot, stop asking. She has already tried in her head three times.", "about": "halloway", "prefersConditions": [] },
+    { "id": "noll_world_join", "diary": "noll", "kind": "worldWorthWriting", "prose": "Write hard material in a few clear seams. I can separate a clean boundary, count what came out, and leave the rest intact. Scattered fragments take longer and encourage sloppy sorting.", "prefersConditions": [] },
 
     { "id": "talin_where_0", "diary": "talin", "kind": "locationClue", "prose": "Hard ground breaks into rigid plates with clean edges. A blade or claw would glance away from the shallow angles.", "about": "talin", "clueIndex": 0, "prefersConditions": [] },
     { "id": "talin_where_1", "diary": "talin", "kind": "locationClue", "prose": "Nothing here hides an approach. That does not make deciding when to meet it easier.", "about": "talin", "clueIndex": 1, "prefersConditions": [] },
