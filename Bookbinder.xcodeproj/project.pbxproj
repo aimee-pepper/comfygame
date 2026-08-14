@@ -22,7 +22,6 @@
 		C1000000000000000000000B /* building-scriptorium-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C2000000000000000000000B /* building-scriptorium-v1.png */; };
 		C1000000000000000000000C /* building-apothecary-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C2000000000000000000000C /* building-apothecary-v1.png */; };
 		C50000000000000000000001 /* TownBuildingVisualRegistry.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60000000000000000000001 /* TownBuildingVisualRegistry.generated.swift */; };
-		D10000000000000000000001 /* town-starting-home-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000001 /* town-starting-home-v1.png */; };
 		D10000000000000000000002 /* starting-town-home-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000002 /* starting-town-home-v1.json */; };
 		D10000000000000000000003 /* StartingTownHomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000003 /* StartingTownHomeScene.swift */; };
 		E10000000000000000000001 /* StartingTownHomeSceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001 /* StartingTownHomeSceneTests.swift */; };
@@ -315,7 +314,6 @@
 		C2000000000000000000000B /* building-scriptorium-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-scriptorium-v1.png"; sourceTree = "<group>"; };
 		C2000000000000000000000C /* building-apothecary-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-apothecary-v1.png"; sourceTree = "<group>"; };
 		C60000000000000000000001 /* TownBuildingVisualRegistry.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TownBuildingVisualRegistry.generated.swift; sourceTree = "<group>"; };
-		D20000000000000000000001 /* town-starting-home-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "town-starting-home-v1.png"; path = "AssetLab/integration/starting-town-home-v1/town-starting-home-v1.png"; sourceTree = SOURCE_ROOT; };
 		D20000000000000000000002 /* starting-town-home-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "starting-town-home-v1.json"; path = "AssetLab/integration/starting-town-home-v1/starting-town-home-v1.json"; sourceTree = SOURCE_ROOT; };
 		D20000000000000000000003 /* StartingTownHomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartingTownHomeScene.swift; sourceTree = "<group>"; };
 		E20000000000000000000001 /* StartingTownHomeSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartingTownHomeSceneTests.swift; sourceTree = "<group>"; };
@@ -664,7 +662,6 @@
 			isa = PBXGroup;
 			children = (
 				95750F5CE1A87553D5246112 /* Data */,
-				D20000000000000000000001 /* town-starting-home-v1.png */,
 				D20000000000000000000002 /* starting-town-home-v1.json */,
 				C30000000000000000000001 /* TownVisuals */,
 				F87F4CA2A34122A6DEAFA2E0 /* CombatGraphModels.swift */,
@@ -1112,7 +1109,6 @@
 				C1000000000000000000000A /* building-reliquary-v1.png in Resources */,
 				C1000000000000000000000B /* building-scriptorium-v1.png in Resources */,
 				C1000000000000000000000C /* building-apothecary-v1.png in Resources */,
-				D10000000000000000000001 /* town-starting-home-v1.png in Resources */,
 				D10000000000000000000002 /* starting-town-home-v1.json in Resources */,
 				A10000000000000000000006 /* named-character-placeholders-v1.json in Resources */,
 				0FD9747174A22CF0CD20A419 /* LaunchScreen.storyboard in Resources */,

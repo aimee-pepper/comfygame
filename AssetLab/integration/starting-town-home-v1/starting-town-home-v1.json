@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "assetName": "town-starting-home-v1",
-  "pixelWidth": 1122,
-  "pixelHeight": 1402,
-  "sha256": "f4ca74c5c03b38f303ed921d7da95d06d154348211f64124028af42eaf379f63",
+  "assetName": "town-starting-v1",
+  "pixelWidth": 1408,
+  "pixelHeight": 3048,
+  "sha256": "287d28f294139a6ce9c37e10602c110c10202b5ebe24c7810088b9f53c0939c3",
   "hotspots": [
-    { "id": "writingDesk", "label": "Writing Desk", "route": "writingDesk", "x": 0.17, "y": 0.225, "width": 0.25, "height": 0.10 },
-    { "id": "workshop", "label": "Workshop", "route": "workshop", "x": 0.055, "y": 0.35, "width": 0.34, "height": 0.17 },
-    { "id": "storehouse", "label": "Storehouse", "route": "storehouse", "x": 0.60, "y": 0.205, "width": 0.33, "height": 0.19 },
-    { "id": "essenceSpring", "label": "Essence Spring", "route": "essenceSpring", "x": 0.07, "y": 0.65, "width": 0.37, "height": 0.22 },
-    { "id": "firepit", "label": "Firepit", "route": "firepit", "x": 0.70, "y": 0.69, "width": 0.28, "height": 0.19 }
+    { "id": "writingDesk", "label": "Writing Desk", "route": "writingDesk", "x": 0.17, "y": 0.25, "width": 0.20, "height": 0.07 },
+    { "id": "workshop", "label": "Workshop", "route": "workshop", "x": 0.06, "y": 0.36, "width": 0.32, "height": 0.12 },
+    { "id": "storehouse", "label": "Storehouse", "route": "storehouse", "x": 0.59, "y": 0.26, "width": 0.34, "height": 0.12 },
+    { "id": "essenceSpring", "label": "Essence Spring", "route": "essenceSpring", "x": 0.07, "y": 0.57, "width": 0.36, "height": 0.15 },
+    { "id": "firepit", "label": "Firepit", "route": "firepit", "x": 0.69, "y": 0.60, "width": 0.29, "height": 0.12 }
   ]
 }

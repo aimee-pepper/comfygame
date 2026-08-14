@@ -26,8 +26,8 @@ enum StartingTownHomeRules {
     }
 
     static let manifestName = "starting-town-home-v1"
-    static let assetName = "town-starting-home-v1"
-    static let authoredAssetSHA256 = "f4ca74c5c03b38f303ed921d7da95d06d154348211f64124028af42eaf379f63"
+    static let assetName = "town-starting-v1"
+    static let authoredAssetSHA256 = "287d28f294139a6ce9c37e10602c110c10202b5ebe24c7810088b9f53c0939c3"
 
     static func load(manifestURL: URL, assetURL: URL) -> Scene? {
         guard let data = try? Data(contentsOf: manifestURL),
@@ -36,7 +36,7 @@ enum StartingTownHomeRules {
               let decoded = try? JSONDecoder().decode(Scene.self, from: data),
               decoded.schemaVersion == 1,
               decoded.assetName == assetName,
-              decoded.pixelWidth == 1122, decoded.pixelHeight == 1402,
+              decoded.pixelWidth == 1408, decoded.pixelHeight == 3048,
               decoded.sha256.range(of: "^[0-9a-f]{64}$", options: .regularExpression) != nil,
               decoded.sha256 == authoredAssetSHA256,
               let image = UIImage(contentsOfFile: assetURL.path),

@@ -7,7 +7,7 @@ final class StartingTownHomeSceneTests: XCTestCase {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = root.appending(path:
-            "AssetLab/integration/starting-town-home-v1/town-starting-home-v1.png")
+            "Sources/Content/TownVisuals/town-starting-v1.png")
         let digest = try SHA256.hash(data: Data(contentsOf: source))
             .map { String(format: "%02x", $0) }.joined()
         XCTAssertEqual(digest, StartingTownHomeRules.authoredAssetSHA256)
@@ -33,8 +33,8 @@ final class StartingTownHomeSceneTests: XCTestCase {
             $0.size.width > 0 && $0.size.width <= 1 &&
             $0.size.height > 0 && $0.size.height <= 1
         })
-        XCTAssertEqual(scene.pixelWidth, 1122)
-        XCTAssertEqual(scene.pixelHeight, 1402)
+        XCTAssertEqual(scene.pixelWidth, 1408)
+        XCTAssertEqual(scene.pixelHeight, 3048)
     }
 
     func testHotspotsNeverCompeteForTheSameOrdinaryPhoneTap() throws {
@@ -59,14 +59,14 @@ final class StartingTownHomeSceneTests: XCTestCase {
     func testFullPageHomeConsumesTheEntireOrdinaryPhoneViewportWithoutCropping() {
         let container = CGSize(width: 344, height: 500)
         let rect = StartingTownHomeRules.renderedImageRect(
-            imageSize: CGSize(width: 1122, height: 1402), in: container)
+            imageSize: CGSize(width: 1408, height: 3048), in: container)
         XCTAssertEqual(rect, CGRect(origin: .zero, size: container))
     }
 
     func testOrdinaryPhoneHotspotsRemainMeaningfulAndFullyInsideTheViewport() throws {
         let container = CGSize(width: 344, height: 500)
         let imageRect = StartingTownHomeRules.renderedImageRect(
-            imageSize: CGSize(width: 1122, height: 1402), in: container)
+            imageSize: CGSize(width: 1408, height: 3048), in: container)
         let viewport = CGRect(origin: .zero, size: container)
         for hotspot in try loadedScene().hotspots {
             let authored = CGRect(
@@ -101,7 +101,7 @@ final class StartingTownHomeSceneTests: XCTestCase {
         let asset = try assetURL()
         let malformed = FileManager.default.temporaryDirectory
             .appending(path: UUID().uuidString).appendingPathExtension("json")
-        try Data(#"{"schemaVersion":1,"assetName":"town-starting-home-v1","hotspots":[]}"#.utf8)
+        try Data(#"{"schemaVersion":1,"assetName":"town-starting-v1","hotspots":[]}"#.utf8)
             .write(to: malformed)
         defer { try? FileManager.default.removeItem(at: malformed) }
         XCTAssertNil(StartingTownHomeRules.load(manifestURL: malformed, assetURL: asset))
