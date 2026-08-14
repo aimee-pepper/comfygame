@@ -239,6 +239,7 @@ private struct RunExitSummaryView: View {
                         in: summary.recoveredLines))
                     receiptSection("Items", lines: RunExitRecapPresentation.items(
                         in: summary.recoveredLines))
+                    worldPageSection("World Pages kept", pages: summary.keptWorldPages)
 
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Essence runway").font(.headline)
@@ -268,6 +269,7 @@ private struct RunExitSummaryView: View {
                         in: summary.lostLines))
                     receiptSection("Items", lines: RunExitRecapPresentation.items(
                         in: summary.lostLines))
+                    worldPageSection("World Pages lost", pages: summary.lostWorldPages)
 
                     sectionHeading("Kept for good")
                     writingSection
@@ -344,6 +346,24 @@ private struct RunExitSummaryView: View {
         Text(title)
             .font(.title3.bold())
             .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func worldPageSection(_ title: String, pages: [WorldPageInstance]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.headline)
+            if pages.isEmpty {
+                Text("None").foregroundStyle(.secondary)
+            } else {
+                ForEach(pages) { page in
+                    Label(page.inspected ? page.definition.title : "Unknown page",
+                          systemImage: "doc.text")
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 14))
     }
 
     private var experienceSources: [(name: String, amount: Int)] {

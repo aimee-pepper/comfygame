@@ -347,6 +347,8 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
     private(set) var lostItems: [RunExitGain] = []
     private(set) var recoveredLines: [ReceiptLine] = []
     private(set) var lostLines: [ReceiptLine] = []
+    private(set) var keptWorldPages: [WorldPageInstance] = []
+    private(set) var lostWorldPages: [WorldPageInstance] = []
     var progress: [RunProgressGain] = []
     var pages: [DiaryPageID] = []
     var writings: [RecoveredWriting] = []
@@ -361,6 +363,7 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
          resources: [RunExitGain] = [], items: [RunExitGain] = [],
          lostResources: [RunExitGain] = [], lostItems: [RunExitGain] = [],
          recoveredLines: [ReceiptLine]? = nil, lostLines: [ReceiptLine]? = nil,
+         keptWorldPages: [WorldPageInstance] = [], lostWorldPages: [WorldPageInstance] = [],
          progress: [RunProgressGain] = [],
          pages: [DiaryPageID] = [], writings: [RecoveredWriting] = [],
          recruitedTravellers: [TravellerID] = [],
@@ -378,6 +381,8 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
         self.lostLines = lostLines
             ?? (ReceiptLine.legacyLines(from: lostResources, category: "lost-resource")
                 + ReceiptLine.legacyLines(from: lostItems, category: "lost-item"))
+        self.keptWorldPages = keptWorldPages
+        self.lostWorldPages = lostWorldPages
         if recoveredLines != nil {
             self.resources = ReceiptLine.compatibilityResources(from: self.recoveredLines)
             self.items = ReceiptLine.compatibilityItems(from: self.recoveredLines)
@@ -434,6 +439,10 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
                 + ReceiptLine.legacyLines(from: lostItems, category: "lost-item")
         }
         progress = try c.decodeIfPresent([RunProgressGain].self, forKey: .progress) ?? []
+        keptWorldPages = try c.decodeIfPresent([WorldPageInstance].self,
+                                                forKey: .keptWorldPages) ?? []
+        lostWorldPages = try c.decodeIfPresent([WorldPageInstance].self,
+                                                forKey: .lostWorldPages) ?? []
         pages = try c.decodeIfPresent([DiaryPageID].self, forKey: .pages) ?? []
         writings = try c.decodeIfPresent([RecoveredWriting].self, forKey: .writings) ?? []
         recruitedTravellers = try c.decodeIfPresent([TravellerID].self,

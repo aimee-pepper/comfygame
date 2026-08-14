@@ -243,6 +243,63 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(store.state.worlds.activeRun?.carriedWorldPages, [taken])
     }
 
+    func testWildPagesShareOneFailureBudgetWithItemsAndBankIdempotently() throws {
+        let firstDefinition = try XCTUnwrap(WorldPageCatalog.definition("wild_moss_and_mist"))
+        let secondDefinition = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))
+        var run = wildPageRun(seed: 71)
+        run.runIndex = 4
+        run.carriedWorldPages = [
+            WorldPageInstance(id: InstanceID(rawValue: 901), definition: firstDefinition),
+            WorldPageInstance(id: InstanceID(rawValue: 902), definition: secondDefinition)
+        ]
+        _ = run.satchelItems.add(ItemStack(id: InstanceID(rawValue: 903),
+                                           catalogID: "salve", count: 2))
+        var state = GameState.newGame()
+        state.worlds.randomWorldPageDrought = 4
+        let beforeStarterCount = state.base.collectedWorldPages.count
+
+        let first = GameStore.bankHaul(of: run, outcomeID: 71, into: &state, fraction: 0.5)
+        let keptItemUnits = first.items.reduce(0) { $0 + $1.count }
+        XCTAssertEqual(keptItemUnits + first.keptWorldPages.count, 2,
+                       "ceil(4 × 0.5) is one outcome-wide object budget")
+        XCTAssertEqual(first.keptWorldPages.count + first.lostWorldPages.count, 2)
+        XCTAssertEqual(state.base.collectedWorldPages.count,
+                       beforeStarterCount + first.keptWorldPages.count)
+        XCTAssertEqual(state.worlds.randomWorldPageDrought,
+                       first.keptWorldPages.isEmpty ? 5 : 0)
+
+        let afterFirst = state
+        let replay = GameStore.bankHaul(of: run, outcomeID: 71, into: &state, fraction: 0.5)
+        XCTAssertEqual(replay.keptWorldPages, first.keptWorldPages)
+        XCTAssertEqual(replay.lostWorldPages, first.lostWorldPages)
+        XCTAssertEqual(state.base.collectedWorldPages, afterFirst.base.collectedWorldPages)
+        XCTAssertEqual(state.worlds.randomWorldPageDrought,
+                       afterFirst.worlds.randomWorldPageDrought)
+        XCTAssertEqual(state.worlds.worldPageBankedOutcomeIDs, [71])
+
+        let receipt = GameStore.makeReturnReceipt(
+            run: run, outcomeID: 71, kind: .collapse, reason: "fixture", fraction: 0.5,
+            banked: first, autoRefinedRaw: 0, autoRefinedEssence: 0, springYield: 0,
+            state: state)
+        let restored = try SaveCodec.makeDecoder().decode(
+            RunExitSummary.self, from: SaveCodec.makeEncoder().encode(receipt))
+        XCTAssertEqual(restored.keptWorldPages, first.keptWorldPages)
+        XCTAssertEqual(restored.lostWorldPages, first.lostWorldPages)
+    }
+
+    func testProtectedWildPageIsKeptOutsideZeroFailureBudget() throws {
+        var definition = try XCTUnwrap(WorldPageCatalog.definition("wild_mote_understone"))
+        definition.disposition = .uniqueProtected
+        var run = wildPageRun(seed: 72)
+        run.runIndex = 4
+        let page = WorldPageInstance(id: InstanceID(rawValue: 904), definition: definition)
+        run.carriedWorldPages = [page]
+        var state = GameState.newGame()
+        let banked = GameStore.bankHaul(of: run, outcomeID: 72, into: &state, fraction: 0)
+        XCTAssertEqual(banked.keptWorldPages, [page])
+        XCTAssertTrue(banked.lostWorldPages.isEmpty)
+    }
+
     func testSameSeedRegeneratesTheSameWorld() {
         let composition = book(["terrain": "caverns", "biome": "ashen", "bounty": "rich_ore", "quirk": "gilded_veins"])
         let first = Worldgen.generate(book: composition, seed: 8_675_309)

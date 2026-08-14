@@ -3,6 +3,17 @@ import XCTest
 
 @MainActor
 final class ExpeditionOutcomeTests: XCTestCase {
+    func testReturnRecapKeepsWorldPagesSeparateAndDoesNotLeakUninspectedTitles() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("World Pages kept"))
+        XCTAssertTrue(source.contains("World Pages lost"))
+        XCTAssertTrue(source.contains("page.inspected ? page.definition.title : \"Unknown page\""))
+        XCTAssertFalse(source.contains("recapSection(\"World Pages"),
+                       "physical pages must not be projected as generic item/resource gains")
+    }
     private func fundedStore(_ name: String = #function) -> GameStore {
         let store = GameStore(io: .temporary(name: "outcome-\(name)-\(UUID().uuidString)"))
         store.mutate("fixture: fund") { $0.base.essence = 5_000 }

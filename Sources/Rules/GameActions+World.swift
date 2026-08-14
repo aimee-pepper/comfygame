@@ -809,6 +809,8 @@ extension GameStore {
         var lostItems: [RunExitGain]
         var recoveredLines: [RunExitSummary.ReceiptLine] = []
         var lostLines: [RunExitSummary.ReceiptLine] = []
+        var keptWorldPages: [WorldPageInstance] = []
+        var lostWorldPages: [WorldPageInstance] = []
         var unidentifiedItemIDs: [ItemID]
         var returnedRawEssence: Bool
         var rawEssence: Int = 0
@@ -826,6 +828,7 @@ extension GameStore {
             resources: banked.resources, items: banked.items,
             lostResources: banked.lostResources, lostItems: banked.lostItems,
             recoveredLines: banked.recoveredLines, lostLines: banked.lostLines,
+            keptWorldPages: banked.keptWorldPages, lostWorldPages: banked.lostWorldPages,
             progress: progressGained(in: run, state: state),
             pages: pagesFound(in: run, state: state),
             writings: writingsFound(in: run, state: state),
@@ -939,9 +942,21 @@ extension GameStore {
             if let safe = parts.protected { _ = guaranteed.add(safe) }
             if let risk = parts.atRisk { _ = exposed.add(risk) }
         }
-        let exposedPartition = exposed.partitionedForFailure(fraction: fraction,
-                                                             outcomeID: outcomeID)
+        let protectedPages = run.carriedWorldPages.filter { $0.definition.disposition.isProtected }
+        let exposedPages = run.carriedWorldPages.filter { !$0.definition.disposition.isProtected }
+        func pageUnitKey(_ page: WorldPageInstance) -> String {
+            "world-page:\(page.definition.id.rawValue):\(page.id.rawValue)"
+        }
+        let exposedPartition = exposed.partitionedForFailure(
+            fraction: fraction, outcomeID: outcomeID,
+            additionalUnitKeys: exposedPages.map(pageUnitKey))
         let retainedRisk = exposedPartition.kept
+        let keptPages = protectedPages + exposedPages.filter {
+            exposedPartition.keptAdditionalUnitKeys.contains(pageUnitKey($0))
+        }
+        let lostPages = exposedPages.filter {
+            !exposedPartition.keptAdditionalUnitKeys.contains(pageUnitKey($0))
+        }
         var kept = guaranteed
         for stack in retainedRisk.stacks { _ = kept.add(stack) }
         let itemGains = kept.stacks.compactMap { stack -> RunExitGain? in
@@ -966,6 +981,24 @@ extension GameStore {
             // Full Storehouse. It waits rather than evaporating — see `BaseState.spillover`.
             state.base.spillover.append(stack)
         }
+        let isFirstBankForOutcome = outcomeID.rawValue > 0
+            && !state.worlds.worldPageBankedOutcomeIDs.contains(outcomeID)
+        if isFirstBankForOutcome {
+            var newlyBankedRandom = false
+            for page in keptPages.sorted(by: { $0.id.rawValue < $1.id.rawValue }) {
+                guard WorldPageCatalog.definition(page.definition.id) == page.definition,
+                      !state.base.collectedWorldPages.contains(where: { $0.id == page.id })
+                else { continue }
+                state.base.collectedWorldPages.append(page)
+                if page.definition.disposition.isRandom { newlyBankedRandom = true }
+            }
+            if newlyBankedRandom {
+                state.worlds.randomWorldPageDrought = 0
+            } else if run.runIndex >= 2 {
+                state.worlds.randomWorldPageDrought += 1
+            }
+            state.worlds.worldPageBankedOutcomeIDs.insert(outcomeID)
+        }
         return BankedHaul(resources: resourceGains + materialGains(materialPartition.kept),
                           items: itemGains,
                           lostResources: lostResourceGains + materialGains(materialPartition.lost),
@@ -974,6 +1007,8 @@ extension GameStore {
                             + materialLines(materialPartition.kept, side: "recovered"),
                           lostLines: lostResourceLines + lostItemLines
                             + materialLines(materialPartition.lost, side: "lost"),
+                          keptWorldPages: keptPages,
+                          lostWorldPages: lostPages,
                           unidentifiedItemIDs: retainedRisk.stacks.filter { !$0.identified }.map(\.catalogID),
                           returnedRawEssence: keptResources[Resources.essenceRaw] > 0,
                           rawEssence: keptResources[Resources.essenceRaw])

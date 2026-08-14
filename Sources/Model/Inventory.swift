@@ -436,6 +436,7 @@ struct Inventory: Codable, Equatable, Sendable {
     struct FailurePartition: Equatable, Sendable {
         var kept: Inventory
         var lost: Inventory
+        var keptAdditionalUnitKeys: Set<String> = []
     }
     var slots: Int
     var stacks: [ItemStack] = []
@@ -488,12 +489,15 @@ struct Inventory: Codable, Equatable, Sendable {
 
     /// Decision 207: select from one exposed-unit pool, never one budget per stack.
     func partitionedForFailure(fraction: Double,
-                               outcomeID: ExpeditionOutcomeID) -> FailurePartition {
+                               outcomeID: ExpeditionOutcomeID,
+                               additionalUnitKeys: [String] = []) -> FailurePartition {
         let fraction = min(1, max(0, fraction))
-        let total = stacks.reduce(0) { $0 + max(0, $1.count) }
+        let uniqueAdditionalKeys = Set(additionalUnitKeys)
+        let total = stacks.reduce(0) { $0 + max(0, $1.count) } + uniqueAdditionalKeys.count
         let budget = fraction > 0 ? min(total, Int(ceil(Double(total) * fraction))) : 0
         struct Unit {
-            let stack: ItemStack
+            let stack: ItemStack?
+            let additionalKey: String?
             let tie: UInt64
             let fallback: String
         }
@@ -510,7 +514,8 @@ struct Inventory: Codable, Equatable, Sendable {
             let unit = ItemStack(id: entry.stack.id, catalogID: entry.stack.catalogID,
                                  identified: entry.stack.identified, materials: [entry.sample])
             let key = "\(outcomeID.rawValue):material:\(entry.content):duplicate:\(ordinal)"
-            units.append(.init(stack: unit, tie: failureStableHash(key), fallback: key))
+            units.append(.init(stack: unit, additionalKey: nil,
+                               tie: failureStableHash(key), fallback: key))
         }
         for stack in stacks where stack.materials.isEmpty {
                 for index in 0..<max(0, stack.count) {
@@ -523,8 +528,14 @@ struct Inventory: Codable, Equatable, Sendable {
                     unit.isFavorite = stack.isFavorite
                     unit.isLocked = stack.isLocked
                     let key = "\(outcomeID.rawValue):item:\(stack.catalogID.rawValue):\(stack.id.rawValue):unit:\(index)"
-                    units.append(.init(stack: unit, tie: failureStableHash(key), fallback: key))
+                    units.append(.init(stack: unit, additionalKey: nil,
+                                       tie: failureStableHash(key), fallback: key))
                 }
+        }
+        for additionalKey in uniqueAdditionalKeys.sorted() {
+            let key = "\(outcomeID.rawValue):additional:\(additionalKey)"
+            units.append(.init(stack: nil, additionalKey: additionalKey,
+                               tie: failureStableHash(key), fallback: key))
         }
         let ordered = units.sorted {
             if $0.tie != $1.tie { return $0.tie < $1.tie }
@@ -532,10 +543,16 @@ struct Inventory: Codable, Equatable, Sendable {
         }
         var kept = Inventory(slots: slots)
         var lost = Inventory(slots: slots)
+        var keptAdditional: Set<String> = []
         for (index, unit) in ordered.enumerated() {
-            _ = index < budget ? kept.add(unit.stack) : lost.add(unit.stack)
+            if let stack = unit.stack {
+                _ = index < budget ? kept.add(stack) : lost.add(stack)
+            } else if index < budget, let key = unit.additionalKey {
+                keptAdditional.insert(key)
+            }
         }
-        return .init(kept: kept, lost: lost)
+        return .init(kept: kept, lost: lost,
+                     keptAdditionalUnitKeys: keptAdditional)
     }
 }
 
