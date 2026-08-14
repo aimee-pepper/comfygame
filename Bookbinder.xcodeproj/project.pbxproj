@@ -37,6 +37,7 @@
 		06C400B11A69ED49007381F4 /* CombatGraphTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0ED58C8EAA439ABE4A10DE /* CombatGraphTests.swift */; };
 		08E2FFDDC62269B7658BCC99 /* DebugRoadmapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A46FDFBE2EBCE6663BE00A40 /* DebugRoadmapTests.swift */; };
 		08F1B44EE071624D86A2CBD6 /* BaseBoardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */; };
+		H10000000000000000000001 /* CreaturePixelIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000000000000000000001 /* CreaturePixelIdentityTests.swift */; };
 		09C34648DD52FD6A92404726 /* InstrumentCraftingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8A444C3FE08E6935849BA8 /* InstrumentCraftingTests.swift */; };
 		0A77177F80047BBE6CD74591 /* skills.json in Resources */ = {isa = PBXBuildFile; fileRef = 2C4E5B7DC86948834FDAFFF9 /* skills.json */; };
 		0D0B63ACE19B51E89D5321F8 /* TravellerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C03E6819177D7EABE894A3 /* TravellerModels.swift */; };
@@ -195,6 +196,7 @@
 		B4A71AFB4A613C6430C0F185 /* StationStaffingRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF13E2576281E76FA92CD685 /* StationStaffingRules.swift */; };
 		B56D55D213A6CAE51A0EAF4A /* GeneratedCatalogueItemVisualRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A58B0D4893EF0AA2412B28 /* GeneratedCatalogueItemVisualRegistry.swift */; };
 		B711CA1EAFFCEBB62204C170 /* PhysicalGearCraftingRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3EDB1BAC65E07DA7319F3C6 /* PhysicalGearCraftingRules.swift */; };
+		F10000000000000000000001 /* CreaturePixelIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000001 /* CreaturePixelIdentity.swift */; };
 		B85571B991A8E79441EA5237 /* PixelCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7863FB4074F0CAF26EFEF01E /* PixelCommand.swift */; };
 		BC3FF1FD01FBED0889EEF383 /* TutorialOverlayLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C349BCC0BF69992DE71C7582 /* TutorialOverlayLayoutTests.swift */; };
 		BCB44A183A64B987C97BC1EA /* MaterialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E14C42A31CF4E0C858F212BF /* MaterialTests.swift */; };
@@ -287,6 +289,7 @@
 		B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterVisualAdapter.swift; sourceTree = "<group>"; };
 		B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPlaceholderPack.swift; sourceTree = "<group>"; };
 		B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPixelIdentity.swift; sourceTree = "<group>"; };
+		F20000000000000000000001 /* CreaturePixelIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreaturePixelIdentity.swift; sourceTree = "<group>"; };
 		B10000000000000000000004 /* NamedCharacterPlaceholderPackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPlaceholderPackTests.swift; sourceTree = "<group>"; };
 		B10000000000000000000005 /* NamedCharacterVisualAdapterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterVisualAdapterTests.swift; sourceTree = "<group>"; };
 		B10000000000000000000006 /* named-character-placeholders-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "named-character-placeholders-v1.json"; path = "AssetLab/integration/named-character-placeholders-v1/manifest.json"; sourceTree = SOURCE_ROOT; };
@@ -367,6 +370,7 @@
 		5AB1CD7D6C91CDD187B2410F /* CharacterRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterRules.swift; sourceTree = "<group>"; };
 		5B11474BCFC5AFD1111E98E7 /* ExpeditionOutcomeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpeditionOutcomeTests.swift; sourceTree = "<group>"; };
 		5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseBoardTests.swift; sourceTree = "<group>"; };
+		H20000000000000000000001 /* CreaturePixelIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreaturePixelIdentityTests.swift; sourceTree = "<group>"; };
 		5D960FCB6727D86D57A82BF4 /* travellers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = travellers.json; sourceTree = "<group>"; };
 		5DEBC912C792450657FADE4C /* SaveSlotFileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSlotFileIO.swift; sourceTree = "<group>"; };
 		5F756C7CBAE86A8565FB12DD /* Inventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inventory.swift; sourceTree = "<group>"; };
@@ -828,6 +832,7 @@
 				CA9D12FE35D80EBAAD321DB4 /* ApexTests.swift */,
 				29C0E5CEA72598582B970714 /* ArmouryTests.swift */,
 				5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */,
+				H20000000000000000000001 /* CreaturePixelIdentityTests.swift */,
 				E20000000000000000000001 /* StartingTownHomeSceneTests.swift */,
 				J20000000000000000000001 /* WorldVisibilityRulesTests.swift */,
 				74D9F704438225E8CFD8268D /* BestiaryTests.swift */,
@@ -914,6 +919,7 @@
 		E45320FE6F032D7A7F042557 /* VisualRuntime */ = {
 			isa = PBXGroup;
 			children = (
+				F20000000000000000000001 /* CreaturePixelIdentity.swift */,
 				B10000000000000000000006 /* named-character-placeholders-v1.json */,
 				B20000000000000000000001 /* CatalogueConsumablesPlaceholderV1Registry.swift */,
 				B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */,
@@ -1184,6 +1190,7 @@
 				F9A397FEF26E5A194578909E /* PageRules.swift in Sources */,
 				F1FD0C88EB8BB5568F3725C3 /* PartyRosterView.swift in Sources */,
 				B711CA1EAFFCEBB62204C170 /* PhysicalGearCraftingRules.swift in Sources */,
+				F10000000000000000000001 /* CreaturePixelIdentity.swift in Sources */,
 				B85571B991A8E79441EA5237 /* PixelCommand.swift in Sources */,
 				F96EB56E78791A3F6BFCA935 /* PixelRaster.swift in Sources */,
 				87DF0AB9EB7842560291C8A3 /* PressureModels.swift in Sources */,
@@ -1249,6 +1256,7 @@
 				3A849B10B8A116F089F9D49C /* ApexTests.swift in Sources */,
 				76925351AE69BDEB01BA072D /* ArmouryTests.swift in Sources */,
 				08F1B44EE071624D86A2CBD6 /* BaseBoardTests.swift in Sources */,
+				H10000000000000000000001 /* CreaturePixelIdentityTests.swift in Sources */,
 				E10000000000000000000001 /* StartingTownHomeSceneTests.swift in Sources */,
 				J10000000000000000000001 /* WorldVisibilityRulesTests.swift in Sources */,
 				52A3E7BA47AED80B02C9FFDA /* BestiaryTests.swift in Sources */,
