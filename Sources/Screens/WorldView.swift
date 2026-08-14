@@ -81,32 +81,44 @@ struct WorldView: View {
                 StabilityHeader(run: run)
                 PartyHealthStrip(run: run, state: store.state)
                 GeometryReader { viewport in
-                    ScrollView {
-                        VStack(spacing: 12) {
-                            LootDecisionCard()
-                            MapGrid(
-                                run: run,
-                                maximumSide: WorldMapLayout.maximumSide(
-                                    containerWidth: viewport.size.width,
-                                    viewportHeight: viewport.size.height,
-                                    viewportTiles: min(Tuning.World.viewportTiles,
-                                                       min(run.map.width, run.map.height)),
-                                    displayScale: displayScale
-                                )
-                            ) { point in
-                                tapped(point, in: run)
-                            }
-                            eventLog
+                    let viewportColumns = min(Tuning.World.viewportTiles, run.map.width)
+                    let mapWidth = WorldMapLayout.maximumSide(
+                        containerWidth: viewport.size.width,
+                        viewportHeight: viewport.size.height,
+                        viewportTiles: viewportColumns,
+                        displayScale: displayScale)
+                    let viewportRows = WorldMapLayout.viewportRows(
+                        mapWidth: mapWidth,
+                        availableHeight: max(0, viewport.size.height - 8),
+                        viewportColumns: viewportColumns,
+                        mapRows: run.map.height)
+                    let visibilityProfile = WorldRules.visibilityProfile(
+                        in: run, party: WorldRules.sightBonus(in: store.state))
+                    VStack(spacing: 0) {
+                        MapGrid(
+                            run: run,
+                            maximumWidth: mapWidth,
+                            viewportColumns: viewportColumns,
+                            viewportRows: viewportRows,
+                            visibilityProfile: visibilityProfile
+                        ) { point in
+                            tapped(point, in: run)
                         }
-                        .padding(.horizontal, 12)
                         .padding(.top, 8)
-                        .padding(.bottom, 12)
+                        Spacer(minLength: 0)
+                    }
+                    .overlay(alignment: .bottom) {
+                        eventLog
+                            .padding(.horizontal, 12)
+                            .padding(.bottom, 8)
+                    }
+                    .overlay(alignment: .top) {
+                        LootDecisionCard()
+                            .padding(12)
                     }
                 }
-            }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if let run {
+                .clipped()
+
                 VStack(spacing: 0) {
                     satchel(run)
                         .padding(.horizontal, 12)
@@ -114,6 +126,7 @@ struct WorldView: View {
                     controls(run)
                 }
                 .background(.bar)
+                .overlay(alignment: .top) { Divider() }
                 .zIndex(2)
             }
         }
@@ -210,7 +223,7 @@ struct WorldView: View {
 
     @ViewBuilder
     private var eventLog: some View {
-        let lines = narratedEvents
+        let lines = Array(narratedEvents.suffix(3))
         if !lines.isEmpty {
             VStack(alignment: .leading, spacing: 2) {
                 ForEach(Array(lines.enumerated()), id: \.offset) { _, entry in
@@ -226,7 +239,13 @@ struct WorldView: View {
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color(.systemBackground).opacity(0.42),
+                        in: RoundedRectangle(cornerRadius: 10))
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.primary.opacity(0.10), lineWidth: 0.5)
+            }
+            .allowsHitTesting(false)
         }
     }
 
@@ -370,68 +389,60 @@ struct WorldView: View {
     // MARK: Controls — thumb zone
 
     private func controls(_ run: WorldRun) -> some View {
-        VStack(spacing: 8) {
-            HStack(alignment: .center, spacing: 14) {
-                DirectionPad(isLooking: isLookArmed) { direction in
-                    let point = GridPoint(x: run.playerPosition.x + direction.dx,
-                                          y: run.playerPosition.y + direction.dy)
-                    if isLookArmed {
-                        inspection = InspectionPresentation(value: WorldRules.inspect(point, in: run))
-                        isLookArmed = false
-                    } else {
-                        store.step(to: point)
-                    }
+        HStack(alignment: .center, spacing: WorldControlsLayout.navigationSpacing) {
+            DirectionPad(isLooking: isLookArmed) { direction in
+                let point = GridPoint(x: run.playerPosition.x + direction.dx,
+                                      y: run.playerPosition.y + direction.dy)
+                if isLookArmed {
+                    inspection = InspectionPresentation(value: WorldRules.inspect(point, in: run))
+                    isLookArmed = false
+                } else {
+                    store.step(to: point)
                 }
-                .frame(maxWidth: .infinity)
+            }
+            .frame(maxWidth: .infinity)
 
-                // Navigation peers use the same square allocation. The minimap must not share its
-                // height with action buttons: doing so compressed a nominal square into the small
-                // remainder beneath the D-pad's intrinsic height.
+            VStack(spacing: 12) {
                 MinimapView(run: run)
-                    .frame(width: 132, height: 132)
+                    .frame(width: 96, height: 96)
                     .fixedSize()
                     .frame(maxWidth: .infinity)
-            }
 
-            // The two actions own half of the phone each instead of half of the minimap column.
-            // This keeps their visible labels readable without scale-down or icon-only fallback.
-            WorldActionRow {
-                ActionButton("Interact", icon: "hand.tap.fill",
-                             isProminent: canInteract,
-                             isEnabled: canInteract) {
-                    performInteraction()
-                }
-                .accessibilityValue(interactionDetail(in: run))
-                .accessibilityIdentifier("world.interact")
-
-            } look: {
-                Button {
-                    isLookArmed.toggle()
-                } label: {
-                    Label(isLookArmed ? "Cancel Look" : "Look",
-                          systemImage: isLookArmed ? "eye.fill" : "eye")
-                        .font(.callout.weight(.medium))
+                WorldActionRow {
+                    Button("Interact") { performInteraction() }
+                        .font(.caption.weight(.semibold))
                         .lineLimit(1)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                }
-                .buttonStyle(.bordered)
-                .overlay {
-                    if isLookArmed {
-                        RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2)
+                        .minimumScaleFactor(0.85)
+                        .frame(maxWidth: .infinity, minHeight: WorldControlsLayout.actionHeight)
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!canInteract)
+                        .accessibilityValue(interactionDetail(in: run))
+                        .accessibilityIdentifier("world.interact")
+                } look: {
+                    Button(isLookArmed ? "Cancel" : "Look") { isLookArmed.toggle() }
+                        .font(.caption.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                        .frame(maxWidth: .infinity, minHeight: WorldControlsLayout.actionHeight)
+                        .buttonStyle(.bordered)
+                        .overlay {
+                            if isLookArmed {
+                                RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2)
+                            }
+                        }
+                        .accessibilityLabel(isLookArmed ? "Cancel Look" : "Look")
+                        .accessibilityHint(isLookArmed
+                            ? "Look mode armed. Choose one direction."
+                            : "Inspect one adjacent tile without moving or spending a turn.")
+                        .accessibilityIdentifier("world.look")
                     }
-                }
-                .accessibilityLabel(isLookArmed ? "Cancel Look" : "Look")
-                .accessibilityHint(isLookArmed
-                    ? "Look mode armed. Choose one direction."
-                    : "Inspect one adjacent tile without moving or spending a turn.")
-                .accessibilityIdentifier("world.look")
+                    .accessibilityElement(children: .contain)
+                    .accessibilityIdentifier("world.action-row")
             }
-            .accessibilityElement(children: .contain)
-            .accessibilityIdentifier("world.action-row")
+            .frame(maxWidth: .infinity)
         }
         .padding(.horizontal, WorldControlsLayout.horizontalPadding)
-        .padding(.top, 8)
-        .padding(.bottom, 4)
+        .padding(.vertical, 8)
         .background(.bar)
     }
 
@@ -841,17 +852,26 @@ enum WorldMapLayout {
     /// system/card background. It is the same non-informative dark used by accepted fog art.
     static let backdropRGB: [UInt8] = [23, 23, 26]
 
-    /// Fits a complete square inside the region left by the fixed controls, then aligns every cell
-    /// to whole device pixels. A scroll viewport may contain narration below the map, but it never
-    /// acts as a crop window through a fractional final row.
+    /// The map is width-owned. Secondary chrome may make the page scroll, but it must never make
+    /// the map smaller. Every cell still lands on whole device pixels.
     static func maximumSide(containerWidth: CGFloat, viewportHeight: CGFloat,
                             viewportTiles: Int, displayScale: CGFloat) -> CGFloat {
-        let widthBound = max(0, containerWidth - 24)
-        let heightBound = max(0, viewportHeight - 16)
+        let widthBound = max(0, containerWidth)
+        _ = viewportHeight
         let tiles = CGFloat(max(1, viewportTiles))
         let scale = max(1, displayScale)
-        let cellPixels = floor(min(widthBound, heightBound) * scale / tiles)
+        let cellPixels = floor(widthBound * scale / tiles)
         return max(tiles, cellPixels) * tiles / scale
+    }
+
+    /// Use the available vertical field as well as the width. A phone world window is deliberately
+    /// taller than it is wide; additional rows reveal world, never stretched tiles or filler.
+    static func viewportRows(mapWidth: CGFloat, availableHeight: CGFloat,
+                             viewportColumns: Int, mapRows: Int) -> Int {
+        let columns = max(1, viewportColumns)
+        let tileSide = mapWidth / CGFloat(columns)
+        let completeRowsThatFit = Int(floor(max(0, availableHeight) / max(1, tileSide)))
+        return min(max(1, mapRows), max(1, completeRowsThatFit))
     }
 }
 
@@ -862,38 +882,48 @@ enum WorldMapLayout {
 /// until you reach an edge, where it stops rather than showing empty space past the border.
 private struct MapGrid: View {
     let run: WorldRun
-    let maximumSide: CGFloat
+    let maximumWidth: CGFloat
+    let viewportColumns: Int
+    let viewportRows: Int
+    let visibilityProfile: WorldRules.VisibilityProfile
     let onTap: (GridPoint) -> Void
 #if DEBUG
     @AppStorage("debug.simpleMapRenderer") private var useSimpleRenderer = false
 #endif
 
-    /// How many tiles across the window is. Small maps show whole; big ones scroll under you.
-    private var viewport: Int { min(Tuning.World.viewportTiles, min(run.map.width, run.map.height)) }
-
     /// Top-left of the window: centred on the player, then clamped to the map.
     private var origin: GridPoint {
-        GridPoint(x: clamp(run.playerPosition.x - viewport / 2, run.map.width),
-                  y: clamp(run.playerPosition.y - viewport / 2, run.map.height))
+        GridPoint(x: clamp(run.playerPosition.x - viewportColumns / 2,
+                           extent: run.map.width, viewport: viewportColumns),
+                  y: clamp(run.playerPosition.y - viewportRows / 2,
+                           extent: run.map.height, viewport: viewportRows))
     }
 
-    private func clamp(_ value: Int, _ extent: Int) -> Int {
+    private func clamp(_ value: Int, extent: Int, viewport: Int) -> Int {
         max(0, min(value, extent - viewport))
     }
 
     var body: some View {
         GeometryReader { proxy in
-            let side = proxy.size.width / CGFloat(viewport)
+            let side = proxy.size.width / CGFloat(viewportColumns)
             let grade = WorldGrade.from(BookRules.readings(for: run.book, seed: run.mapSeed))
             VStack(spacing: 0) {
-                ForEach(origin.y..<(origin.y + viewport), id: \.self) { y in
+                ForEach(origin.y..<(origin.y + viewportRows), id: \.self) { y in
                     HStack(spacing: 0) {
-                        ForEach(origin.x..<(origin.x + viewport), id: \.self) { x in
+                        ForEach(origin.x..<(origin.x + viewportColumns), id: \.self) { x in
                             let point = GridPoint(x: x, y: y)
-                            TileView(tile: run.map[point],
-                                     artRequest: artRequest(at: point, grade: grade),
-                                     enemy: enemy(at: point),
-                                     site: site(at: point),
+                            let visibility = WorldRules.visibility(
+                                of: point, from: run.playerPosition,
+                                in: run.map, profile: visibilityProfile)
+                            let displayTile = displayTile(at: point, visibility: visibility)
+                            TileView(tile: displayTile,
+                                     visibility: visibility,
+                                     visibilityProfile: visibilityProfile,
+                                     artRequest: artRequest(at: point, grade: grade,
+                                                            tile: displayTile,
+                                                            visibility: visibility),
+                                     enemy: enemy(at: point, visibility: visibility),
+                                     site: visibility == .full ? site(at: point) : nil,
                                      isPlayer: point == run.playerPosition,
                                      side: side,
                                      useSimpleRenderer: simpleRenderer)
@@ -904,7 +934,8 @@ private struct MapGrid: View {
                 }
             }
         }
-        .frame(width: maximumSide, height: maximumSide)
+        .frame(width: maximumWidth,
+               height: maximumWidth / CGFloat(viewportColumns) * CGFloat(viewportRows))
         .frame(maxWidth: .infinity)
         .background(
             Color(red: Double(WorldMapLayout.backdropRGB[0]) / 255,
@@ -912,6 +943,7 @@ private struct MapGrid: View {
                   blue: Double(WorldMapLayout.backdropRGB[2]) / 255),
             in: RoundedRectangle(cornerRadius: 10)
         )
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private var simpleRenderer: Bool {
@@ -922,8 +954,8 @@ private struct MapGrid: View {
 #endif
     }
 
-    private func artRequest(at point: GridPoint, grade: WorldGrade) -> MapTileArtRequest {
-        let tile = run.map[point]
+    private func artRequest(at point: GridPoint, grade: WorldGrade, tile: Tile,
+                            visibility: WorldRules.TileVisibility) -> MapTileArtRequest {
         var adjacency = 0
         for (bit, neighbour) in [(1, GridPoint(x: point.x, y: point.y-1)),
                                  (2, GridPoint(x: point.x+1, y: point.y)),
@@ -931,7 +963,9 @@ private struct MapGrid: View {
                                  (8, GridPoint(x: point.x-1, y: point.y))] {
             if run.map.contains(neighbour), run.map[neighbour].ground == tile.ground { adjacency |= bit }
         }
-        let flora = tile.flora.flatMap { id in run.flora.first { $0.id == id } }
+        let flora = visibility == .full
+            ? tile.flora.flatMap { id in run.flora.first { $0.id == id } }
+            : nil
         let south = GridPoint(x: point.x, y: point.y + 1)
         // Concealed neighbours and the map boundary never fabricate a visible side wall.
         let southExposure = MapAssetContract.southExposure(
@@ -944,10 +978,34 @@ private struct MapGrid: View {
                                  worldGrade2Descriptor: run.worldVisualReceipt?.descriptor)
     }
 
+    private func displayTile(at point: GridPoint,
+                             visibility: WorldRules.TileVisibility) -> Tile {
+        var tile = run.map[point]
+        switch visibility {
+        case .full:
+            tile.isRevealed = true
+        case .fringe:
+            tile.isRevealed = true
+            tile.content = .empty
+            tile.flora = nil
+            tile.isCracking = false
+        case .hidden:
+            tile.isRevealed = false
+            tile.content = .empty
+            tile.flora = nil
+            tile.isCracking = false
+        }
+        return tile
+    }
+
 
     /// Cryptic creatures don't show until they're on you — see `WorldRules.isVisible`.
-    private func enemy(at point: GridPoint) -> WorldEnemy? {
-        run.enemies.first { $0.position == point && WorldRules.isVisible($0, in: run) }
+    private func enemy(at point: GridPoint,
+                       visibility: WorldRules.TileVisibility) -> WorldEnemy? {
+        guard visibility == .full else { return nil }
+        return run.enemies.first {
+            $0.position == point && WorldRules.isVisible($0, in: run)
+        }
     }
 
     private func site(at point: GridPoint) -> SiteDef? {
@@ -957,6 +1015,8 @@ private struct MapGrid: View {
 
 private struct TileView: View {
     let tile: Tile
+    let visibility: WorldRules.TileVisibility
+    let visibilityProfile: WorldRules.VisibilityProfile
     let artRequest: MapTileArtRequest
     let enemy: WorldEnemy?
     /// Resolved by the caller: the tile only stores an instance id, and the grid is the one place
@@ -1015,6 +1075,19 @@ private struct TileView: View {
                     .offset(x: side * 0.30, y: -side * 0.30)
             }
         }
+        .blur(radius: visibility == .fringe
+              ? side * CGFloat(visibilityProfile.fringeBlurFraction) : 0)
+        .overlay {
+            switch visibility {
+            case .full:
+                Color.clear
+            case .fringe:
+                Color.black.opacity(1 - visibilityProfile.fringeOpacity)
+            case .hidden:
+                Color.black
+                    .blur(radius: CGFloat(visibilityProfile.fogEdgeBlurPoints))
+            }
+        }
         .frame(width: side, height: side)
         .contentShape(Rectangle())
     }
@@ -1026,7 +1099,7 @@ private struct TileView: View {
 
     private var symbol: String? {
         if isPlayer { return "figure.stand" }
-        guard tile.isRevealed, !tile.isCrumbled else { return nil }
+        guard visibility == .full, tile.isRevealed, !tile.isCrumbled else { return nil }
         if let enemy { return enemy.icon }
         switch tile.content {
         case .empty: return nil

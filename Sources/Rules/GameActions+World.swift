@@ -508,7 +508,8 @@ extension GameStore {
         mutate("travel") { state in
             for next in route {
                 if let current = state.worlds.activeRun,
-                   WorldRules.automaticTravelMustStop(before: next, in: current) {
+                   WorldRules.automaticTravelMustStop(before: next, in: current,
+                                                      partySightBonus: WorldRules.sightBonus(in: state)) {
                     events.append(.blocked("Something dangerous occupies that tile. Step onto it deliberately."))
                     break
                 }

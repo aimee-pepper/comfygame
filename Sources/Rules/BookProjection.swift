@@ -171,7 +171,8 @@ struct BookProjection {
         let turnsWorst = tunedTurns(BookRules.turnsAvailable(stabilityScore: worst))
         let turnsBest = tunedTurns(BookRules.turnsAvailable(stabilityScore: best))
         let tier = BookRules.enemyTier(symbolIDs: written)
-        let sight = WorldRules.visionRadius(for: book, base: tuning.baseVisionRadius)
+        let sight = WorldRules.visionRadius(for: book, seed: seed,
+                                            base: tuning.baseVisionRadius)
         let cost = book.essencePaid
         let clock = WorldClock(book: book, seed: seed)
         let clockBand: String? = analysisTier >= Tuning.Analysis.targetsTier

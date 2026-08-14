@@ -387,9 +387,6 @@ enum Worldgen {
             standing.isApex = true
             enemies.append(standing)
             occupied.insert(point)
-            // Revealed from the moment you can see that far — you are meant to be able to look at
-            // it and decide not to.
-            map[point].isRevealed = true
         }
         for _ in 0..<enemyCount {
             guard let species = enemyRNG.pickWeighted(dayRoster),
@@ -403,7 +400,7 @@ enum Worldgen {
         }
 
         WorldRules.reveal(around: entry, in: &map,
-                          radius: WorldRules.visionRadius(for: book,
+                          radius: WorldRules.visionRadius(for: book, seed: seed,
                                                           base: tuning.baseVisionRadius))
         let envelopeApplied = isFreshFirstExpedition
             && tuning.openingEncounterEnvelope != .natural

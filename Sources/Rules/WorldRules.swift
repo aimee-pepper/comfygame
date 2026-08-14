@@ -17,9 +17,11 @@ enum WorldRules {
     }
 
     static func preContactSnapshot(in run: WorldRun,
-                                   playerDestination: GridPoint? = nil) -> PreContactSnapshot {
+                                   playerDestination: GridPoint? = nil,
+                                   partySightBonus: Int = 0) -> PreContactSnapshot {
+        let profile = visibilityProfile(in: run, party: partySightBonus)
         let disclosed = Set(run.enemies.compactMap { enemy -> InstanceID? in
-            guard run.map[enemy.position].isRevealed, isVisible(enemy, in: run) else { return nil }
+            guard isCurrentlyVisible(enemy, in: run, profile: profile) else { return nil }
             return enemy.id
         })
         let approached = playerDestination.flatMap { destination in
@@ -105,10 +107,11 @@ enum WorldRules {
 
     /// How far the player can see. Dim Sky trades visibility for a longer-lived world — the paired
     /// tradeoff pattern from the decisions log, and the reason `visionDelta` exists on symbols.
-    static func visionRadius(for book: BoundBook,
+    static func visionRadius(for book: BoundBook, seed: UInt64,
                              base: Int = Tuning.World.baseVisionRadius) -> Int {
         let delta = book.allSymbolIDs.reduce(0) { $0 + (ContentCatalog.shared.symbol($1)?.visionDelta ?? 0) }
-        return max(Tuning.World.minimumVisionRadius, base + delta)
+        let light = BookRules.readings(for: book, seed: seed)["illumination"]
+        return visibilityProfile(illumination: light.peak, baseRadius: base + delta).fullRadius
     }
 
     /// Sight, after the dark has taken its share. **Darkness cuts sight** (session 13 §6) — which is
@@ -121,10 +124,7 @@ enum WorldRules {
     }
 
     static func visionRadius(in run: WorldRun, party: Int = 0) -> Int {
-        let base = visionRadius(for: run.book, base: run.tuning.baseVisionRadius)
-            + party + run.torchVisionBonus
-        guard run.isNight else { return base }
-        return max(Tuning.World.minimumVisionRadius, base - Tuning.DayNight.sightLostAtNight)
+        visibilityProfile(in: run, party: party).fullRadius
     }
 
     /// What you can see from where you're standing.
@@ -137,18 +137,24 @@ enum WorldRules {
         let standing = map[point].elevation
         map[point].isRevealed = true
 
-        for candidate in map.allPoints where candidate.chebyshevDistance(to: point) <= radius {
+        for candidate in map.allPoints where circularDistance(from: point, to: candidate) <= Double(radius) + 0.5 {
             if hasLineOfSight(from: point, to: candidate, in: map, standing: standing) {
                 map[candidate].isRevealed = true
             }
         }
     }
 
+    static func circularDistance(from: GridPoint, to: GridPoint) -> Double {
+        let dx = to.x - from.x
+        let dy = to.y - from.y
+        return sqrt(Double(dx * dx + dy * dy))
+    }
+
     /// Walks the line between two tiles and stops at the first thing that blocks it.
     ///
     /// The blocking tile is itself revealed — you can see the thicket, you just can't see past it.
-    private static func hasLineOfSight(from: GridPoint, to: GridPoint, in map: WorldMap,
-                                       standing: Int) -> Bool {
+    static func hasLineOfSight(from: GridPoint, to: GridPoint, in map: WorldMap,
+                               standing: Int) -> Bool {
         let steps = max(abs(to.x - from.x), abs(to.y - from.y))
         guard steps > 1 else { return true }
         for step in 1..<steps {
@@ -185,10 +191,11 @@ enum WorldRules {
         a.manhattanDistance(to: b) == 1
     }
 
-    static func automaticTravelMustStop(before point: GridPoint, in run: WorldRun) -> Bool {
+    static func automaticTravelMustStop(before point: GridPoint, in run: WorldRun,
+                                        partySightBonus: Int = 0) -> Bool {
         run.enemies.contains {
             $0.position == point && ($0.isApex || $0.isSessile)
-                && run.map[$0.position].isRevealed && isVisible($0, in: run)
+                && isCurrentlyVisible($0, in: run, party: partySightBonus)
         }
     }
 
@@ -256,7 +263,9 @@ enum WorldRules {
         if let refusal = blockedMovementRefusal(to: destination, in: run.map) {
             return [.blocked(refusal)]
         }
-        let preContact = preContactSnapshot(in: run, playerDestination: destination)
+        let partySightBonus = sightBonus(in: state)
+        let preContact = preContactSnapshot(in: run, playerDestination: destination,
+                                            partySightBonus: partySightBonus)
 
         let movementCost = movementCost(run.map[destination].ground,
                                         slowGroundExtraTurns: run.tuning.slowGroundExtraTurns)
@@ -265,7 +274,7 @@ enum WorldRules {
         run.previousPosition = run.playerPosition
         run.playerPosition = destination
         reveal(around: destination, in: &run.map,
-               radius: visionRadius(in: run, party: sightBonus(in: state)))
+               radius: visionRadius(in: run, party: partySightBonus))
 
         // **Defended flora fights back the moment you're in it** (`flora-system-spec.md` §6), and
         // before anything else on the tile resolves — you push through the thorns to reach whatever
@@ -448,12 +457,12 @@ enum WorldRules {
                 ?? run.playerPosition
             reveal(around: destination, in: &run.map, radius: max(1, effect.potency))
         case .lureCreature:
+            let visibility = visibilityProfile(in: run, party: sightBonus(in: state))
             guard let nearest = run.enemies.indices
                 .filter({ index in
                     let enemy = run.enemies[index]
                     return !enemy.isSessile && !enemy.isApex
-                        && run.map[enemy.position].isRevealed
-                        && isVisible(enemy, in: run)
+                        && isCurrentlyVisible(enemy, in: run, profile: visibility)
                 })
                 .min(by: { run.enemies[$0].position.manhattanDistance(to: run.playerPosition)
                     < run.enemies[$1].position.manhattanDistance(to: run.playerPosition) })
@@ -693,7 +702,9 @@ enum WorldRules {
         var events: [Event] = []
         // Non-movement actions can capture this at the turn boundary. A step supplies the snapshot
         // from before reveal/movement changed what the player was actually shown.
-        let preContact = suppliedSnapshot ?? preContactSnapshot(in: run)
+        let partySightBonus = sightBonus(in: state)
+        let preContact = suppliedSnapshot ?? preContactSnapshot(in: run,
+                                                                 partySightBonus: partySightBonus)
 
         let bandBefore = run.stabilityBand
         let wasNight = run.isNight
@@ -744,7 +755,8 @@ enum WorldRules {
         }
 
         let concealment = fieldConcealment(in: state)
-        events.append(contentsOf: moveEnemies(in: &run, concealment: concealment))
+        events.append(contentsOf: moveEnemies(in: &run, concealment: concealment,
+                                               partySightBonus: partySightBonus))
         state.worlds.activeRun = run
 
         if let bumped = enemyOnPlayer(in: run) {
@@ -932,9 +944,11 @@ enum WorldRules {
     }
 
     private static func moveEnemies(in run: inout WorldRun,
-                                    concealment: FieldConcealment) -> [Event] {
+                                    concealment: FieldConcealment,
+                                    partySightBonus: Int) -> [Event] {
         var events: [Event] = []
         var taken = Set(run.enemies.map(\.position))
+        let visibility = visibilityProfile(in: run, party: partySightBonus)
 
         for index in run.enemies.indices {
             var enemy = run.enemies[index]
@@ -958,12 +972,12 @@ enum WorldRules {
                 if canHesitate {
                     enemy.awareness = .alert(turn: run.turnsTaken, reason: .quietStep)
                     enemy.quietStepHesitationUsed = true
-                    if run.map[enemy.position].isRevealed {
+                    if isCurrentlyVisible(enemy, in: run, profile: visibility) {
                         events.append(.enemyAlerted(run.name(of: enemy)))
                     }
                 } else {
                     enemy.awareness = .pursuing
-                    if run.map[enemy.position].isRevealed {
+                    if isCurrentlyVisible(enemy, in: run, profile: visibility) {
                         events.append(.enemySighted(run.name(of: enemy)))
                     }
                 }
@@ -972,7 +986,7 @@ enum WorldRules {
                     enemy.awareness = .unaware
                 } else if run.turnsTaken > turn {
                     enemy.awareness = .pursuing
-                    if run.map[enemy.position].isRevealed {
+                    if isCurrentlyVisible(enemy, in: run, profile: visibility) {
                         events.append(.enemySighted(run.name(of: enemy)))
                     }
                 }
@@ -1070,7 +1084,8 @@ enum WorldRules {
     /// first; every companion body must already be awake, genuinely visible, and connected by a
     /// passable orthogonal path. Array order never decides who joins.
     static func encounterGroup(triggeredBy trigger: WorldEnemy, in run: WorldRun,
-                               partyCount: Int, adaptiveRadius: Bool = true)
+                               partyCount: Int, adaptiveRadius: Bool = true,
+                               partySightBonus: Int = 0)
         -> EncounterGroupSelection {
         if !adaptiveRadius {
             var foes = [trigger]
@@ -1110,8 +1125,8 @@ enum WorldRules {
                 exclusion[key] = "asleep"
                 continue
             }
-            guard run.map.contains(candidate.position), run.map[candidate.position].isRevealed,
-                  isVisible(candidate, in: run) else {
+            guard run.map.contains(candidate.position),
+                  isCurrentlyVisible(candidate, in: run, party: partySightBonus) else {
                 exclusion[key] = "not legitimately visible"
                 continue
             }
@@ -1206,7 +1221,8 @@ enum WorldRules {
                 >= DebugTuningProfile.currentEncounterScalingProfileSchemaVersion
         let grouping = encounterGroup(triggeredBy: enemy, in: run,
                                       partyCount: partyLevels.count,
-                                      adaptiveRadius: usesAdditiveScaling)
+                                      adaptiveRadius: usesAdditiveScaling,
+                                      partySightBonus: sightBonus(in: state))
         let group = grouping.foes
 
         // **What this world raises its animals to** (session 17 §3). Slowly with the party, and
@@ -1337,7 +1353,8 @@ enum WorldRules {
 
         // **Everybody who came gets a place in the order.** This is the line that makes a party of
         // five a party of five rather than a list on the Firepit screen.
-        let preContact = suppliedSnapshot ?? preContactSnapshot(in: run)
+        let preContact = suppliedSnapshot ?? preContactSnapshot(in: run,
+                                                                partySightBonus: sightBonus(in: state))
         let initialOpening: EncounterState.Opening
         if preContact.approachedEnemyID == enemy.id {
             initialOpening = .partyApproach

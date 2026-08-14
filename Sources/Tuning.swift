@@ -290,10 +290,9 @@ enum Tuning {
         static let lockedCacheChance: Double = 0.4                 // PLACEHOLDER
 
         // Sight
-        /// Raised from 2 on the designer's flag (decisions session 5): at 2 you see ~24 of 196
-        /// tiles, which reads as groping rather than exploring, and leaves the real Dim Sky
-        /// pressure nowhere to cut. At 3 that pressure can take a ring off and still leave sight.
-        static let baseVisionRadius: Int = 3         // PLACEHOLDER
+        /// Ordinary current visibility. Illumination and atmosphere contract this through the
+        /// visibility profile; pitch black still leaves the immediately adjacent ring.
+        static let baseVisionRadius: Int = 7         // PLACEHOLDER
         static let minimumVisionRadius: Int = 1      // even Dim Sky leaves you your own tile + 1
         /// Hazard tiles appear this often (in player turns) past the hazard threshold.
         static let hazardSpawnInterval: Int = 2      // PLACEHOLDER
@@ -303,6 +302,17 @@ enum Tuning {
         /// Extra tiles per turn for every turn spent in a world that has already collapsed, so a
         /// dead world genuinely runs out instead of nibbling its edges while you carry on working.
         static let crumbleAccelerationPerTurn: Double = 0.6 // PLACEHOLDER
+    }
+
+    enum Visibility {
+        static let defaultFringeWidth = 2
+        static let darkFringeWidth = 0
+        static let defaultFringeOpacity = 0.5
+        static let defaultFringeBlurFraction = 0.5
+        static let defaultFogEdgeBlurPoints = 2.0
+        static let lowLightUpperBound = 25.0
+        static let ordinaryLightFloor = 45.0
+        static let densityPerRadiusLoss = 25.0
     }
 
     // MARK: - Encounters

@@ -11,6 +11,8 @@
 		D10000000000000000000002 /* starting-town-home-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000002 /* starting-town-home-v1.json */; };
 		D10000000000000000000003 /* StartingTownHomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000003 /* StartingTownHomeScene.swift */; };
 		E10000000000000000000001 /* StartingTownHomeSceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001 /* StartingTownHomeSceneTests.swift */; };
+		I10000000000000000000001 /* WorldVisibilityRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000001 /* WorldVisibilityRules.swift */; };
+		J10000000000000000000001 /* WorldVisibilityRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000001 /* WorldVisibilityRulesTests.swift */; };
 		A10000000000000000000001 /* NamedCharacterVisualAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */; };
 		A10000000000000000000002 /* NamedCharacterPlaceholderPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */; };
 		A10000000000000000000003 /* NamedCharacterPixelIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */; };
@@ -280,6 +282,8 @@
 		D20000000000000000000002 /* starting-town-home-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "starting-town-home-v1.json"; path = "AssetLab/integration/starting-town-home-v1/starting-town-home-v1.json"; sourceTree = SOURCE_ROOT; };
 		D20000000000000000000003 /* StartingTownHomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartingTownHomeScene.swift; sourceTree = "<group>"; };
 		E20000000000000000000001 /* StartingTownHomeSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartingTownHomeSceneTests.swift; sourceTree = "<group>"; };
+		I20000000000000000000001 /* WorldVisibilityRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldVisibilityRules.swift; sourceTree = "<group>"; };
+		J20000000000000000000001 /* WorldVisibilityRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldVisibilityRulesTests.swift; sourceTree = "<group>"; };
 		B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterVisualAdapter.swift; sourceTree = "<group>"; };
 		B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPlaceholderPack.swift; sourceTree = "<group>"; };
 		B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPixelIdentity.swift; sourceTree = "<group>"; };
@@ -595,6 +599,7 @@
 				DB7EF8A95B3D944FE1BAE6DA /* WorldGrade2BindAdapter.swift */,
 				9A5E11DF83FB060B8C22D36A /* WorldInspectionRules.swift */,
 				8DB361F4E36998C9A7F31A44 /* WorldRules.swift */,
+				I20000000000000000000001 /* WorldVisibilityRules.swift */,
 			);
 			path = Rules;
 			sourceTree = "<group>";
@@ -824,6 +829,7 @@
 				29C0E5CEA72598582B970714 /* ArmouryTests.swift */,
 				5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */,
 				E20000000000000000000001 /* StartingTownHomeSceneTests.swift */,
+				J20000000000000000000001 /* WorldVisibilityRulesTests.swift */,
 				74D9F704438225E8CFD8268D /* BestiaryTests.swift */,
 				7582647B2841DB69559E3968 /* BookRulesTests.swift */,
 				B6B3681EEDB3DB65AE754495 /* CampaignStartPresentationTests.swift */,
@@ -1227,6 +1233,7 @@
 				F51758D1870B39749890B1A7 /* WorldInspectionRules.swift in Sources */,
 				D469496DC882C482CB83E721 /* WorldMap.swift in Sources */,
 				5BAABA4D069D949BB71CA216 /* WorldRules.swift in Sources */,
+				I10000000000000000000001 /* WorldVisibilityRules.swift in Sources */,
 				635C2692AD380102590270C3 /* WorldView.swift in Sources */,
 				F7A590456D85D35640519E0C /* WorldVisualReceipt.swift in Sources */,
 				56C2C67D2033B74FFD18EE24 /* Worldgen.swift in Sources */,
@@ -1243,6 +1250,7 @@
 				76925351AE69BDEB01BA072D /* ArmouryTests.swift in Sources */,
 				08F1B44EE071624D86A2CBD6 /* BaseBoardTests.swift in Sources */,
 				E10000000000000000000001 /* StartingTownHomeSceneTests.swift in Sources */,
+				J10000000000000000000001 /* WorldVisibilityRulesTests.swift in Sources */,
 				52A3E7BA47AED80B02C9FFDA /* BestiaryTests.swift in Sources */,
 				030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */,
 				7FAF1BB2BE9134A54D8E970C /* CampaignStartPresentationTests.swift in Sources */,
