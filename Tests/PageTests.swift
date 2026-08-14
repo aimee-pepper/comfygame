@@ -7,6 +7,48 @@ import XCTest
 /// sits never changes what it says — and **refinement is literacy, not power** — a better hand lets
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
+    func testRepeatableWorldPagesMatchGeneratedAuthorityAndCarryFieldIdentity() throws {
+        let definitions = WorldPageCatalog.repeatableDefinitions
+        XCTAssertEqual(definitions.map(\.id), [
+            "wild_moss_and_mist", "wild_salt_and_iron", "wild_winter_hollows",
+            "wild_cinder_fields", "wild_gilded_caverns", "wild_storm_coast",
+            "wild_blighted_garden", "wild_mote_understone"
+        ])
+        XCTAssertEqual(definitions.map(\.disposition),
+                       Array(repeating: .repeatable, count: 7) + [.repeatableRare])
+        XCTAssertEqual(definitions.map(\.minimumResolvedExpeditions), [1, 1, 1, 1, 2, 3, 3, 5])
+        XCTAssertEqual(definitions.map(\.worldPageCost), [17, 17, 16, 17, 19, 18, 18, 25])
+        XCTAssertEqual(definitions.map(\.baseWeightMultiplier), [1, 1, 1, 1, 1, 1, 1, 0.35])
+        XCTAssertEqual(definitions.map { $0.candidateUnknownSymbolIDs.map(\.rawValue) },
+                       [[], [], [], [], [], ["storm"], ["blight"], ["mote_vein"]])
+        XCTAssertTrue(definitions.allSatisfy { $0.seed == 0 && $0.disposition.isRandom })
+        XCTAssertEqual(WorldPageCatalog.definitions.count, 11)
+        XCTAssertEqual(WorldPageCatalog.definition("wild_storm_coast")?.title, "Storm Coast")
+
+        let page = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))
+        let instance = WorldPageInstance(
+            id: InstanceID(rawValue: 9001), definition: page, inspected: true,
+            fieldProvenance: .init(originRunIndex: 7, originWorldSeed: 55,
+                                   generationSeed: 77, position: GridPoint(x: 4, y: 9)))
+        XCTAssertFalse(instance.isProtectedReturn)
+        XCTAssertTrue(instance.isRandomDrop)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(
+            WorldPageInstance.self, from: SaveCodec.makeEncoder().encode(instance)), instance)
+    }
+
+    func testLegacyStarterPageInstanceDecodesWithUninspectedNoFieldOrigin() throws {
+        let legacy = WorldPageCatalog.starterInstances[0]
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(legacy)) as? [String: Any])
+        object.removeValue(forKey: "inspected")
+        object.removeValue(forKey: "fieldProvenance")
+        let decoded = try SaveCodec.makeDecoder().decode(
+            WorldPageInstance.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertFalse(decoded.inspected)
+        XCTAssertNil(decoded.fieldProvenance)
+        XCTAssertTrue(decoded.isProtectedReturn)
+    }
+
     func testStarterWorldPagesMatchFrozenAuthorityAndRulesOwnedPrices() throws {
         let definitions = WorldPageCatalog.starterDefinitions
         XCTAssertEqual(definitions.map(\.id), ["starter_open_meadow", "starter_rainwashed_shore",

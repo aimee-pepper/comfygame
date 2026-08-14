@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the compiled starter World Page registry from its design authority."""
+"""Generate the compiled starter and repeatable World Page registry."""
 
 from __future__ import annotations
 
@@ -16,13 +16,16 @@ BEGIN = "    // BEGIN GENERATED STARTER WORLD PAGES — Scripts/generate_world_p
 END = "    // END GENERATED STARTER WORLD PAGES"
 EXPECTED_IDS = ["starter_open_meadow", "starter_rainwashed_shore", "starter_stone_hollow"]
 ID_NAMES = ["openMeadowID", "rainwashedShoreID", "stoneHollowID"]
+EXPECTED_WILD_IDS = ["wild_moss_and_mist", "wild_salt_and_iron", "wild_winter_hollows",
+                     "wild_cinder_fields", "wild_gilded_caverns", "wild_storm_coast",
+                     "wild_blighted_garden", "wild_mote_understone"]
 
 
 def fail(message: str) -> None:
     raise ValueError(message)
 
 
-def load_and_validate() -> tuple[dict, list[dict], str]:
+def load_and_validate() -> tuple[dict, list[dict], list[dict], str]:
     raw = AUTHORITY.read_bytes()
     authority = json.loads(raw)
     if authority.get("schemaVersion") != 1 or authority.get("status") != "designAuthority":
@@ -71,14 +74,33 @@ def load_and_validate() -> tuple[dict, list[dict], str]:
                 fail(f"{entry['id']} has duplicate mark identity/origin")
             mark_ids.add(symbol["markID"])
             occupied_origins.add(tuple(origin))
-    return authority, starters, hashlib.sha256(raw).hexdigest()
+    wild = [entry for entry in authority.get("definitions", [])
+            if entry.get("disposition") in ("repeatable", "repeatableRare")]
+    if [entry.get("id") for entry in wild] != EXPECTED_WILD_IDS:
+        fail("authority must contain exactly the eight ordered repeatable definitions")
+    for entry in wild:
+        required_wild = {"id", "title", "disposition", "provenance", "hand", "symbols",
+                         "worldPageCost", "contextTags", "minimumResolvedExpeditions",
+                         "candidateUnknownSymbolIDs"}
+        missing = required_wild - entry.keys()
+        if missing:
+            fail(f"{entry.get('id')} missing fields: {sorted(missing)}")
+        if entry["hand"] not in ("crude", "plain"):
+            fail(f"{entry['id']} has unsupported hand")
+        if not isinstance(entry["minimumResolvedExpeditions"], int) or entry["minimumResolvedExpeditions"] < 1:
+            fail(f"{entry['id']} has invalid pacing gate")
+        if not isinstance(entry["contextTags"], list) or not entry["contextTags"]:
+            fail(f"{entry['id']} needs context tags")
+        if float(entry.get("baseWeightMultiplier", 1)) <= 0:
+            fail(f"{entry['id']} has invalid base weight")
+    return authority, starters, wild, hashlib.sha256(raw).hexdigest()
 
 
 def swift_string(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
-def generated(starters: list[dict], digest: str) -> str:
+def generated(starters: list[dict], wild: list[dict], digest: str) -> str:
     lines = [BEGIN, f'    static let authoritySHA256 = "{digest}"']
     for name, entry in zip(ID_NAMES, starters):
         lines.append(f"    static let {name}: WorldPageDefinitionID = {swift_string(entry['id'])}")
@@ -108,6 +130,24 @@ def generated(starters: list[dict], digest: str) -> str:
                      f"seed: {entry['seed']},")
         comma = "," if index < len(starters) - 1 else ""
         lines.append(f"                   promise: {swift_string(entry['promise'])}){comma}")
+    lines += ["    ]", "", "    static let repeatableDefinitions: [WorldPageDefinition] = ["]
+    for index, entry in enumerate(wild):
+        disposition = entry["disposition"]
+        lines.append(f"        fieldDefinition(id: {swift_string(entry['id'])}, title: {swift_string(entry['title'])},")
+        lines.append(f"                        disposition: .{disposition}, provenance: {swift_string(entry['provenance'])},")
+        lines.append(f"                        hand: .{entry['hand']},")
+        for mark_index, mark in enumerate(entry["symbols"]):
+            prefix = "                        marks: [" if mark_index == 0 else "                                "
+            suffix = "]" if mark_index == len(entry["symbols"]) - 1 else ""
+            lines.append(f"{prefix}({swift_string(mark['id'])}, {mark['markID']}, {swift_string(mark['shapeID'])}, "
+                         f"{mark['origin'][0]}, {mark['origin'][1]}){suffix},")
+        tags = ", ".join(swift_string(value) for value in entry["contextTags"])
+        unknown = ", ".join(swift_string(value) for value in entry["candidateUnknownSymbolIDs"])
+        comma = "," if index < len(wild) - 1 else ""
+        lines.append(f"                        worldPageCost: {entry['worldPageCost']}, contextTags: [{tags}],")
+        lines.append(f"                        minimumResolvedExpeditions: {entry['minimumResolvedExpeditions']},")
+        lines.append(f"                        candidateUnknownSymbolIDs: [{unknown}],")
+        lines.append(f"                        baseWeightMultiplier: {entry.get('baseWeightMultiplier', 1)}){comma}")
     lines += ["    ]", END]
     return "\n".join(lines)
 
@@ -126,9 +166,9 @@ def main() -> int:
                         help="fail if validation or generated Swift freshness differs")
     args = parser.parse_args()
     try:
-        _, starters, digest = load_and_validate()
+        _, starters, wild, digest = load_and_validate()
         source = TARGET.read_text()
-        expected = replaced_source(source, generated(starters, digest))
+        expected = replaced_source(source, generated(starters, wild, digest))
         if args.check:
             if expected != source:
                 print("Page.swift starter World Pages are stale; run Scripts/generate_world_pages.py",

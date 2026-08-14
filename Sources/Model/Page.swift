@@ -581,10 +581,13 @@ struct WorldPageDefinitionID: StringIdentifier {
 
 /// The immutable authored facts shared by every copy of a World Page definition.
 ///
-/// Only the three opening pages belong to this registry. Repeatable field pages, templates and
-/// unknown-glyph presentation are separate contracts and must not leak into the starter grant.
 struct WorldPageDefinition: Codable, Equatable, Identifiable, Sendable {
-    enum Disposition: String, Codable, Sendable { case starterUnique }
+    enum Disposition: String, Codable, Sendable {
+        case starterUnique, repeatable, repeatableRare, uniqueProtected
+
+        var isRandom: Bool { self == .repeatable || self == .repeatableRare }
+        var isProtected: Bool { self == .starterUnique || self == .uniqueProtected }
+    }
 
     var id: WorldPageDefinitionID
     var title: String
@@ -595,6 +598,54 @@ struct WorldPageDefinition: Codable, Equatable, Identifiable, Sendable {
     var worldPageCost: Int
     var seed: UInt64
     var promise: String
+    var contextTags: [String] = []
+    var minimumResolvedExpeditions: Int = 0
+    var candidateUnknownSymbolIDs: [SymbolID] = []
+    var baseWeightMultiplier: Double = 1
+
+    private enum CodingKeys: String, CodingKey {
+        case id, title, disposition, provenance, page, copiedCost, worldPageCost, seed, promise
+        case contextTags, minimumResolvedExpeditions, candidateUnknownSymbolIDs, baseWeightMultiplier
+    }
+
+    init(id: WorldPageDefinitionID, title: String, disposition: Disposition, provenance: String,
+         page: Page, copiedCost: Int, worldPageCost: Int, seed: UInt64, promise: String,
+         contextTags: [String] = [], minimumResolvedExpeditions: Int = 0,
+         candidateUnknownSymbolIDs: [SymbolID] = [], baseWeightMultiplier: Double = 1) {
+        self.id = id; self.title = title; self.disposition = disposition
+        self.provenance = provenance; self.page = page; self.copiedCost = copiedCost
+        self.worldPageCost = worldPageCost; self.seed = seed; self.promise = promise
+        self.contextTags = contextTags
+        self.minimumResolvedExpeditions = minimumResolvedExpeditions
+        self.candidateUnknownSymbolIDs = candidateUnknownSymbolIDs
+        self.baseWeightMultiplier = baseWeightMultiplier
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(WorldPageDefinitionID.self, forKey: .id)
+        title = try c.decode(String.self, forKey: .title)
+        disposition = try c.decode(Disposition.self, forKey: .disposition)
+        provenance = try c.decode(String.self, forKey: .provenance)
+        page = try c.decode(Page.self, forKey: .page)
+        copiedCost = try c.decode(Int.self, forKey: .copiedCost)
+        worldPageCost = try c.decode(Int.self, forKey: .worldPageCost)
+        seed = try c.decode(UInt64.self, forKey: .seed)
+        promise = try c.decode(String.self, forKey: .promise)
+        contextTags = try c.decodeIfPresent([String].self, forKey: .contextTags) ?? []
+        minimumResolvedExpeditions = try c.decodeIfPresent(
+            Int.self, forKey: .minimumResolvedExpeditions) ?? 0
+        candidateUnknownSymbolIDs = try c.decodeIfPresent(
+            [SymbolID].self, forKey: .candidateUnknownSymbolIDs) ?? []
+        baseWeightMultiplier = try c.decodeIfPresent(Double.self, forKey: .baseWeightMultiplier) ?? 1
+    }
+}
+
+struct WorldPageFieldProvenance: Codable, Equatable, Sendable {
+    var originRunIndex: Int
+    var originWorldSeed: UInt64
+    var generationSeed: UInt64
+    var position: GridPoint
 }
 
 /// One physical page in the campaign folio. Definition identity is not instance identity: the
@@ -602,6 +653,27 @@ struct WorldPageDefinition: Codable, Equatable, Identifiable, Sendable {
 struct WorldPageInstance: Codable, Equatable, Identifiable, Sendable {
     var id: InstanceID
     var definition: WorldPageDefinition
+    var inspected: Bool = false
+    var fieldProvenance: WorldPageFieldProvenance?
+
+    var isProtectedReturn: Bool { definition.disposition.isProtected }
+    var isRandomDrop: Bool { definition.disposition.isRandom }
+
+    init(id: InstanceID, definition: WorldPageDefinition, inspected: Bool = false,
+         fieldProvenance: WorldPageFieldProvenance? = nil) {
+        self.id = id; self.definition = definition; self.inspected = inspected
+        self.fieldProvenance = fieldProvenance
+    }
+
+    private enum CodingKeys: String, CodingKey { case id, definition, inspected, fieldProvenance }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(InstanceID.self, forKey: .id)
+        definition = try c.decode(WorldPageDefinition.self, forKey: .definition)
+        inspected = try c.decodeIfPresent(Bool.self, forKey: .inspected) ?? false
+        fieldProvenance = try c.decodeIfPresent(WorldPageFieldProvenance.self,
+                                                forKey: .fieldProvenance)
+    }
 }
 
 /// Frozen proof of the exact physical page used to create a world.
@@ -649,11 +721,92 @@ enum WorldPageCatalog {
                    copiedCost: 22, worldPageCost: 16, seed: 23,
                    promise: "Stone, enclosure and ordinary ore within the accepted level-one envelope.")
     ]
+
+    static let repeatableDefinitions: [WorldPageDefinition] = [
+        fieldDefinition(id: "wild_moss_and_mist", title: "Moss and Mist",
+                        disposition: .repeatable, provenance: "A copied field page, soft at the folds.",
+                        hand: .crude,
+                        marks: [("plains", 1, "crude_smear", 0, 0),
+                                ("verdant", 2, "crude_smear", 3, 0),
+                                ("dim_sky", 3, "crude_block", 2, 3)],
+                        worldPageCost: 17, contextTags: ["vitality", "atmosphere"],
+                        minimumResolvedExpeditions: 1,
+                        candidateUnknownSymbolIDs: [],
+                        baseWeightMultiplier: 1),
+        fieldDefinition(id: "wild_salt_and_iron", title: "Salt and Iron",
+                        disposition: .repeatable, provenance: "A practical page in a square, economical hand.",
+                        hand: .crude,
+                        marks: [("archipelago", 1, "crude_smear", 0, 1),
+                                ("common_ore", 2, "crude_block", 4, 3)],
+                        worldPageCost: 17, contextTags: ["hydrology", "substrate"],
+                        minimumResolvedExpeditions: 1,
+                        candidateUnknownSymbolIDs: [],
+                        baseWeightMultiplier: 1),
+        fieldDefinition(id: "wild_winter_hollows", title: "Winter Hollows",
+                        disposition: .repeatable, provenance: "The charcoal has silvered where the page was folded.",
+                        hand: .crude,
+                        marks: [("caverns", 1, "crude_smear", 0, 0),
+                                ("frostbound", 2, "crude_smear", 3, 3)],
+                        worldPageCost: 16, contextTags: ["thermal", "hydrology", "relief"],
+                        minimumResolvedExpeditions: 1,
+                        candidateUnknownSymbolIDs: [],
+                        baseWeightMultiplier: 1),
+        fieldDefinition(id: "wild_cinder_fields", title: "Cinder Fields",
+                        disposition: .repeatable, provenance: "Three blunt marks under a thumbprint of soot.",
+                        hand: .crude,
+                        marks: [("plains", 1, "crude_smear", 0, 0),
+                                ("ashen", 2, "crude_cross", 3, 1),
+                                ("sparse_ore", 3, "crude_block", 0, 4)],
+                        worldPageCost: 17, contextTags: ["atmosphere", "thermal", "substrate"],
+                        minimumResolvedExpeditions: 1,
+                        candidateUnknownSymbolIDs: [],
+                        baseWeightMultiplier: 1),
+        fieldDefinition(id: "wild_gilded_caverns", title: "Gilded Caverns",
+                        disposition: .repeatable, provenance: "The page is creased as though opened and reconsidered many times.",
+                        hand: .crude,
+                        marks: [("caverns", 1, "crude_smear", 0, 0),
+                                ("gilded_veins", 2, "crude_cross", 3, 2)],
+                        worldPageCost: 19, contextTags: ["substrate", "relief", "valuable"],
+                        minimumResolvedExpeditions: 2,
+                        candidateUnknownSymbolIDs: [],
+                        baseWeightMultiplier: 1),
+        fieldDefinition(id: "wild_storm_coast", title: "Storm Coast",
+                        disposition: .repeatable, provenance: "A neat brush hand. One mark is unfamiliar.",
+                        hand: .plain,
+                        marks: [("archipelago", 1, "plain_bar", 0, 1),
+                                ("storm", 2, "plain_bar", 3, 3)],
+                        worldPageCost: 18, contextTags: ["hydrology", "atmosphere", "danger"],
+                        minimumResolvedExpeditions: 3,
+                        candidateUnknownSymbolIDs: ["storm"],
+                        baseWeightMultiplier: 1),
+        fieldDefinition(id: "wild_blighted_garden", title: "Blighted Garden",
+                        disposition: .repeatable, provenance: "A garden plan crossed by a mark you cannot read.",
+                        hand: .plain,
+                        marks: [("plains", 1, "plain_bar", 0, 0),
+                                ("verdant", 2, "plain_bar", 3, 2),
+                                ("blight", 3, "plain_bar", 0, 4)],
+                        worldPageCost: 18, contextTags: ["vitality", "danger"],
+                        minimumResolvedExpeditions: 3,
+                        candidateUnknownSymbolIDs: ["blight"],
+                        baseWeightMultiplier: 1),
+        fieldDefinition(id: "wild_mote_understone", title: "Mote Understone",
+                        disposition: .repeatableRare, provenance: "A precise page that seems brighter at one crease.",
+                        hand: .plain,
+                        marks: [("caverns", 1, "plain_bar", 0, 0),
+                                ("common_ore", 2, "plain_pair", 2, 2),
+                                ("mote_vein", 3, "plain_bar", 3, 4)],
+                        worldPageCost: 25, contextTags: ["substrate", "strange", "valuable"],
+                        minimumResolvedExpeditions: 5,
+                        candidateUnknownSymbolIDs: ["mote_vein"],
+                        baseWeightMultiplier: 0.35)
+    ]
     // END GENERATED STARTER WORLD PAGES
 
     static func definition(_ id: WorldPageDefinitionID) -> WorldPageDefinition? {
-        starterDefinitions.first { $0.id == id }
+        definitions.first { $0.id == id }
     }
+
+    static var definitions: [WorldPageDefinition] { starterDefinitions + repeatableDefinitions }
 
     private static func definition(
         id: WorldPageDefinitionID, title: String, provenance: String,
@@ -667,5 +820,25 @@ enum WorldPageCatalog {
         return WorldPageDefinition(id: id, title: title, disposition: .starterUnique,
                                    provenance: provenance, page: page, copiedCost: copiedCost,
                                    worldPageCost: worldPageCost, seed: seed, promise: promise)
+    }
+
+    private static func fieldDefinition(
+        id: WorldPageDefinitionID, title: String, disposition: WorldPageDefinition.Disposition,
+        provenance: String, hand: Hand, marks: [(String, UInt64, String, Int, Int)],
+        worldPageCost: Int, contextTags: [String], minimumResolvedExpeditions: Int,
+        candidateUnknownSymbolIDs: [SymbolID], baseWeightMultiplier: Double
+    ) -> WorldPageDefinition {
+        let page = Page(runes: marks.map { symbol, markID, shapeID, column, row in
+            PlacedRune(id: InstanceID(rawValue: markID), content: .compound(SymbolID(rawValue: symbol)),
+                       hand: hand, origin: PageCell(column: column, row: row), shapeID: shapeID)
+        })
+        // Random pages take the campaign's frozen world seed at bind time. `seed == 0` is an
+        // explicit non-seed sentinel and must never be passed to world generation.
+        return WorldPageDefinition(
+            id: id, title: title, disposition: disposition, provenance: provenance, page: page,
+            copiedCost: worldPageCost, worldPageCost: worldPageCost, seed: 0, promise: provenance,
+            contextTags: contextTags, minimumResolvedExpeditions: minimumResolvedExpeditions,
+            candidateUnknownSymbolIDs: candidateUnknownSymbolIDs,
+            baseWeightMultiplier: baseWeightMultiplier)
     }
 }
