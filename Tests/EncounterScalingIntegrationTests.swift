@@ -556,6 +556,10 @@ final class EncounterScalingIntegrationTests: XCTestCase {
                     ? run.enemies[$0].id.rawValue < run.enemies[$1].id.rawValue : lhs < rhs
             }!
             let secondIndex = run.enemies.indices.first { $0 != triggerIndex }!
+            // This counterfactual is explicitly about two disclosed contacts. Historical reveal
+            // alone is not current sight, so anchor the observer at the generated trigger before
+            // placing the second body in its adjacent, currently visible tile.
+            run.playerPosition = run.enemies[triggerIndex].position
             let occupied = Set(run.enemies.indices.filter { $0 != secondIndex }
                 .map { run.enemies[$0].position })
             let adjacent = run.map.neighbours(of: run.enemies[triggerIndex].position)
