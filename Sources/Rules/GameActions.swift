@@ -782,9 +782,25 @@ extension GameStore {
         let book = selectedWorldPage.map(BookRules.resolveBook(worldPage:))
             ?? BookRules.resolveBook(page: sourcePage)
         let tuning = DebugTuningProfile.active
+        let ownedPageCopies = Dictionary(grouping: state.base.collectedWorldPages,
+                                         by: { $0.definition.id }).mapValues(\.count)
+        let wildSelection = WildWorldPageSelectionRules.select(
+            seed: generationSeed,
+            context: .init(
+                resolvedExpeditions: state.worlds.runIndex,
+                drought: state.worlds.randomWorldPageDrought,
+                ownedCopies: ownedPageCopies,
+                worldContextTags: WildWorldPageSelectionRules.contextTags(
+                    for: book, seed: generationSeed),
+                suppressesRandomPage: false))
         let world = Worldgen.generate(book: book, seed: generationSeed, library: state.reality.library,
                                       tuning: tuning,
                                       isFreshFirstExpedition: state.worlds.runIndex == 0)
+        let offeredWildPage = wildSelection.flatMap {
+            WildWorldPagePlacementRules.place(
+                $0, originRunIndex: state.worlds.runIndex + 1,
+                originWorldSeed: generationSeed, in: world.map)
+        }
         let visualReceipt: WorldVisualReceipt
         do {
             let authoredInkPairs: [(InstanceID, InkRecipe)] = sourcePage.runes.compactMap { mark in
@@ -906,6 +922,7 @@ extension GameStore {
                 // The satchel is its own, smaller capacity — separate from home storage, and
                 // separately upgradeable (decisions-log session 2).
                 satchelItems: packedItems,
+                offeredWorldPages: offeredWildPage.map { [$0] } ?? [],
                 carriedInstruments: (state.base.hasConfiguredInstrumentLoadout
                                      ? state.base.instrumentLoadout
                                      : state.reality.instruments)

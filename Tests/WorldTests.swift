@@ -70,6 +70,44 @@ final class WorldTests: XCTestCase {
                       "3x context weighting must not make other repeatables unreachable")
     }
 
+    func testWildPagePlacementIsDeterministicReachableAndNeverDisplacesWriting() throws {
+        let selection = try XCTUnwrap(WildWorldPageSelectionRules.select(
+            seed: 991,
+            context: .init(resolvedExpeditions: 5, drought: 5, ownedCopies: [:],
+                           worldContextTags: ["hydrology"], suppressesRandomPage: false)))
+        var map = WorldMap(width: 4, height: 3,
+                           tiles: Array(repeating: Tile(), count: 12),
+                           entry: GridPoint(x: 0, y: 1))
+        map[map.entry].content = .portal(isEntry: true)
+        let writing = GridPoint(x: 1, y: 1)
+        map[writing].content = .foundWriting("guaranteed")
+        map[GridPoint(x: 2, y: 0)].ground = .chasm
+        map[GridPoint(x: 2, y: 1)].ground = .chasm
+        map[GridPoint(x: 2, y: 2)].ground = .chasm
+
+        let first = try XCTUnwrap(WildWorldPagePlacementRules.place(
+            selection, originRunIndex: 6, originWorldSeed: 991, in: map))
+        let second = WildWorldPagePlacementRules.place(
+            selection, originRunIndex: 6, originWorldSeed: 991, in: map)
+        XCTAssertEqual(first, second)
+        XCTAssertNotEqual(first.fieldProvenance?.position, map.entry)
+        XCTAssertNotEqual(first.fieldProvenance?.position, writing)
+        XCTAssertLessThan(first.fieldProvenance?.position.x ?? 99, 2,
+                          "the host must be in the start-connected region")
+        XCTAssertEqual(map[writing].content, .foundWriting("guaranteed"))
+    }
+
+    func testWildPagePlacementFailsClosedWhenNoReachableEmptyHostExists() throws {
+        let selection = try XCTUnwrap(WildWorldPageSelectionRules.select(
+            seed: 992,
+            context: .init(resolvedExpeditions: 5, drought: 5, ownedCopies: [:],
+                           worldContextTags: [], suppressesRandomPage: false)))
+        var map = WorldMap(width: 1, height: 1, tiles: [Tile()], entry: GridPoint(x: 0, y: 0))
+        map[map.entry].content = .portal(isEntry: true)
+        XCTAssertNil(WildWorldPagePlacementRules.place(
+            selection, originRunIndex: 6, originWorldSeed: 992, in: map))
+    }
+
     func testWorldRunKeepsPagesSeparateWhileChargingSharedSatchelSlots() throws {
         let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_moss_and_mist"))
         let page = WorldPageInstance(id: InstanceID(rawValue: 700), definition: definition,

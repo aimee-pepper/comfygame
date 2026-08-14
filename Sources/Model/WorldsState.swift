@@ -950,6 +950,7 @@ struct WorldRun: Codable, Equatable, Sendable {
          healthCaps: [RunHealthCapEntry]? = nil,
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots),
          carriedWorldPages: [WorldPageInstance] = [],
+         offeredWorldPages: [WorldPageInstance] = [],
          materialReserve: MaterialReserve = MaterialReserve(),
          carriedInstruments: Set<PressureTargetID> = [],
          carriedInstrumentPrecisions: [PressureTargetID: RealityState.InstrumentPrecision] = [:],
@@ -983,6 +984,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.healthCaps = healthCaps.map(Self.normalizedHealthCaps)
         self.satchelItems = satchelItems
         self.carriedWorldPages = carriedWorldPages
+        self.offeredWorldPages = offeredWorldPages
         self.materialReserve = materialReserve
         self.carriedInstruments = carriedInstruments
         self.carriedInstrumentPrecisions = carriedInstrumentPrecisions

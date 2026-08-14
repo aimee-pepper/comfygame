@@ -19,6 +19,16 @@ enum WildWorldPageSelectionRules {
     static let guaranteeDrought = 5
     static let copyLimit = 2
 
+    static func contextTags(for book: BoundBook, seed: UInt64) -> Set<String> {
+        BookRules.readings(for: book, seed: seed).inOrder.reduce(into: Set<String>()) {
+            tags, reading in
+            if reading.peak > 0 || reading.demand > 0 || reading.floor > 0 {
+                tags.insert(reading.target.rawValue)
+                tags.formUnion(reading.tags)
+            }
+        }
+    }
+
     static func select(seed: UInt64, context: Context,
                        definitions: [WorldPageDefinition] = WorldPageCatalog.repeatableDefinitions)
         -> Selection? {
@@ -104,6 +114,40 @@ enum WildWorldPageFieldRules {
         let instance = run.offeredWorldPages.remove(at: index)
         run.carriedWorldPages.append(instance)
         return .taken(instance)
+    }
+}
+
+enum WildWorldPagePlacementRules {
+    static func place(_ selection: WildWorldPageSelectionRules.Selection,
+                      originRunIndex: Int, originWorldSeed: UInt64,
+                      in map: WorldMap) -> WorldPageInstance? {
+        let reachable = reachablePoints(from: map.entry, in: map)
+        let candidates = reachable.filter { point in
+            point != map.entry && map[point].content == .empty
+        }.sorted { ($0.y, $0.x) < ($1.y, $1.x) }
+        guard !candidates.isEmpty else { return nil }
+        var rng = SeededRNG(seed: selection.generationSeed).derived(0x504C_4143_45)
+        let point = candidates[rng.int(in: 0...(candidates.count - 1))]
+        return WorldPageInstance(
+            id: selection.instanceID, definition: selection.definition,
+            fieldProvenance: .init(originRunIndex: originRunIndex,
+                                   originWorldSeed: originWorldSeed,
+                                   generationSeed: selection.generationSeed,
+                                   position: point))
+    }
+
+    private static func reachablePoints(from entry: GridPoint, in map: WorldMap) -> Set<GridPoint> {
+        guard map.contains(entry), map[entry].isPassable else { return [] }
+        var reached: Set<GridPoint> = [entry]
+        var queue = [entry]
+        while !queue.isEmpty {
+            let point = queue.removeFirst()
+            for neighbour in map.neighbours(of: point)
+            where map[neighbour].isPassable && reached.insert(neighbour).inserted {
+                queue.append(neighbour)
+            }
+        }
+        return reached
     }
 }
 
