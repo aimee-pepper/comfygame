@@ -262,8 +262,10 @@ final class WorldTests: XCTestCase {
     func testDimSkyReducesVision() {
         let plain = book(["terrain": "plains"])
         let dim = book(["terrain": "plains", "quirk": "dim_sky"])
-        XCTAssertLessThan(WorldRules.visionRadius(for: dim), WorldRules.visionRadius(for: plain))
-        XCTAssertGreaterThanOrEqual(WorldRules.visionRadius(for: dim), Tuning.World.minimumVisionRadius)
+        XCTAssertLessThan(WorldRules.visionRadius(for: dim, seed: 0),
+                          WorldRules.visionRadius(for: plain, seed: 0))
+        XCTAssertGreaterThanOrEqual(WorldRules.visionRadius(for: dim, seed: 0),
+                                    Tuning.World.minimumVisionRadius)
 
         // Measure the two radii on deliberately open ground. A generated fixture makes this claim
         // depend on whichever chance-filled focuses happen to exist in the content catalogue: a
@@ -276,8 +278,8 @@ final class WorldTests: XCTestCase {
             WorldRules.reveal(around: centre, in: &map, radius: radius)
             return map.revealedCount
         }
-        XCTAssertLessThan(revealed(radius: WorldRules.visionRadius(for: dim)),
-                          revealed(radius: WorldRules.visionRadius(for: plain)),
+        XCTAssertLessThan(revealed(radius: WorldRules.visionRadius(for: dim, seed: 0)),
+                          revealed(radius: WorldRules.visionRadius(for: plain, seed: 0)),
                           "You arrive seeing less of a dim world")
     }
 
