@@ -2,9 +2,12 @@
 
 **Status:** implementation-ready interaction/presentation correction; combat effects, legality and
 turn resolution remain owned by current rules.
-**Owner:** Game Design; Engineering owns native state/action integration; Asset owns stable technique,
-item and stage glyphs.
-**Priority:** P2 after active playability/Base checkpoints and before broad combat-tree presentation.
+**Owner:** Game Design; Engineering owns native state/action integration and functional state
+grammar; Aimee owns final technique/item glyph art. AssetLab may use labelled placeholders for
+layout, accessibility and conformance only.
+**Priority:** P2 after the true combat-tree graph/mechanics checkpoint. This palette does not gate,
+precede or redirect the 72-node tree, its glyph vocabulary or scenario consumers. Tutorials are dead
+last and cannot gate ordinary combat UI.
 
 ## Audit result
 
@@ -14,7 +17,8 @@ The live encounter has sound atomic combat rules but uses another menu hierarchy
 - Skills opens a full modal `List` of prose rows;
 - Items opens a second full modal list that repeats every item once per living ally;
 - ally-targeted skills silently choose the lowest-health ally rather than exposing the target choice;
-- player-facing combat says **Flee** while the current tutorial teaches **Unbind**;
+- the live player-facing retreat vocabulary still collides with **Unbind**, the Binder's baseline
+  damage technique; the current reversible playtest authority is **Withdraw** for retreat;
 - selecting a skill then pressing Attack again to use it makes Attack temporarily mean a different
   action;
 - any party-card tap toggles companion automation instead of making ownership explicit.
@@ -45,11 +49,13 @@ Four stable 44-point-or-larger keys remain in the thumb region:
 | **Attack** | ordinary equipped/basic attack |
 | **Techniques** | learned active skills for the current actor |
 | **Items** | usable carried combat items |
-| **Unbind** | leave this encounter for the exact displayed Stability consequence |
+| **Withdraw** *(reversible playtest label; final wording remains under DRQ-159 review)* | leave this encounter for the exact displayed Stability consequence |
 
-Use **Unbind** everywhere player-facing. Internal `.flee`/`EncounterOutcome.fled` identities may
-remain compatibility code. Unbind opens a compact confirmation anchored above its key; it never
-commits from an accidental first tap.
+Use **Withdraw** everywhere player-facing in the combat-v2 playtest while preserving **Unbind** for
+the Binder's signature damage technique. DRQ-159 keeps final wording reviewable; it does not permit
+the native implementation to retain two different Unbind actions while waiting for that review.
+Internal `.flee`/`EncounterOutcome.fled` identities may remain compatibility code. Retreat opens a
+compact confirmation anchored above its key; it never commits from an accidental first tap.
 
 The four keys use stable glyph+label and one concise state badge. Do not shrink labels to preserve
 four columns; Dynamic Type uses two rows. Companion gambit/manual control is a separate explicit
@@ -153,7 +159,7 @@ Gambits remain ordered automation and are edited only at Party between fights. D
 
 ## Result, log and interruption
 
-- Opening/closing palettes, details, targeting and Unbind confirmation costs no turn.
+- Opening/closing palettes, details, targeting and retreat confirmation costs no turn.
 - One atomic commit validates actor/current turn, action/stack, cooldown, target, reach and fingerprint;
   stale state rejects without partial cooldown, item spend or turn advance.
 - Force-quit before commit resumes the encounter and may discard ephemeral selection. Force-quit
@@ -171,14 +177,16 @@ Gambits remain ordered automation and are edited only at Party between fights. D
 3. VoiceOver order follows actor → selected action → legal targets → palette. Every unavailable action
    names its reason and cooldown in rounds.
 4. Grayscale/High Contrast distinguish current actor, selected action, legal/cannot/protected targets,
-   cooldown, destructive Unbind and passed-out actors without color alone.
-5. Anchored details and Unbind confirmation flip/clamp inside screen edges and fixed controls.
+   cooldown, destructive retreat and passed-out actors without color alone.
+5. Anchored details and retreat confirmation flip/clamp inside screen edges and fixed controls.
 6. Selecting each target kind—foe, ally, self, all, none—commits exactly the rules-owned target and
    never substitutes weakest/first unless it was visibly the sole/default target chosen by shortcut.
 7. Item stacks appear once regardless of party size; using one preserves exact stack identity and
    decrements once.
 8. Direct/Gambits affects only the named acting companion and survives no unintended portrait tap.
-9. Tutorial and ordinary UI both say Unbind and use the selected-action second-tap rule.
+9. Ordinary UI, logs and VoiceOver use **Withdraw** for the current playtest. A later DRQ-159 naming
+   decision changes the stable presentation everywhere together. Tutorial copy is a later
+   consistency consumer, never an acceptance gate for this checkpoint.
 10. Opening every palette/detail, cancelling and relaunching before commit produces zero combat-state
     mutation; committed actions remain idempotent through relaunch.
 11. Ward, Emanation Strike, Quench and Fall Back round-trip their exact typed parameter through manual

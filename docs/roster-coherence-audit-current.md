@@ -5,9 +5,10 @@
 
 ## Composition
 
-The active comparison roster contains **29 named positions plus one intentionally open position**:
+The active comparison roster contains **30 named/working positions plus one intentionally open
+position**:
 
-- 18 trade-capable travellers including Tovin;
+- 19 trade-capable travellers including new Recycler keeper Noll and Tovin;
 - 8 dedicated fighters;
 - 3 strange travellers: Perren, Nine and held-but-retained Tam;
 - 1 open/additional position that is not a cap.
@@ -60,16 +61,17 @@ permitted person.
 | **Oda** | **Resolved** | Housing schematic is her teaching; Arc retired after the Channelworks pass |
 | **Dagg** | **Resolved direction** | Teaches `Self: recovery complete`; semantics are in `dagg-recovery-teaching-current.md` |
 | **Tam** | No focus reserved | Unique endgame act and Glass dependency are unresolved |
+| **Noll** *(working name)* | **Reversible direction** | `field_separation_kit` adds one-use tier-1 field dismantling; it creates no focus/scrap currency and never gates baseline Recycler correctness |
 
-No two active travellers currently own the same teaching. The remaining blanks are intentional,
-documented and do not justify inventing vocabulary.
+No two active travellers currently own the same teaching. Tam's remaining blank is intentional,
+documented and does not justify inventing vocabulary.
 
 ## Diary distribution
 
 | Shape | Travellers and current targets |
 |---|---|
-| **Compact opening** | Mara 6 · Halloway 6 · Edren 7 · Isolde 7 |
-| **Social/route midgame** | Orsa 7 · Vance 7 · Sela 7 · Lys 9 |
+| **Compact opening** | Vance 6 · Noll 6 target · Halloway 6 · Mara 6 · Edren 7 · Isolde 7 |
+| **Social/route midgame** | Orsa 7 · Sela 7 · Lys 9 |
 | **Material/process** | Corrin 8 · Nessa 8 · Bracken 8 · Fen 8 · Maud 8–9 · Grimmond 11 · Auber 12 |
 | **Living/emanation specialist** | Sabine 10 · Oda 11–12 |
 | **Dedicated fighters** | Bryn 7 · Talin 7 · Dagg 8 · Rook 8 · Wren 9 · Kestrel 9 · Marrick 10 · Ashe 12 |
@@ -94,6 +96,7 @@ be equally prominent or friendly:
 | Isolde | Tovin · Lys · Nine |
 | Orsa | Vance · Sela · Nessa · Nine |
 | Vance | Orsa · Auber · Halloway · Lys |
+| Noll *(working)* | Vance · Halloway · Corrin · Lys |
 | Sela | Mara · Orsa · Wren · Halloway |
 | Corrin | Bracken · Kestrel · Vance · Sabine |
 | Nessa | Auber · Sabine · Orsa · Perren |
@@ -122,17 +125,19 @@ Tam's isolation is a visible consequence of the design hold, not a forgotten rel
 
 ## Progression findings
 
-1. **Nessa should arrive early–mid**, near Corrin rather than after several equipment specialists, so
+1. **The opening sequence is Vance, Noll, Halloway**, so selling, material recovery and making are
+   learned through the first holdings without combining Trading Post and Recycler ownership.
+2. **Nessa should arrive early–mid**, near Corrin rather than after several equipment specialists, so
    preparation matters for most of the campaign.
-2. **Lys should arrive once the player has enough pages to need cross-reference**, but before long
+3. **Lys should arrive once the player has enough pages to need cross-reference**, but before long
    diaries make manual reading burdensome.
-3. **The fighter cadence should alternate with trade/social recruits**; do not present eight fighter
+4. **The fighter cadence should alternate with trade/social recruits**; do not present eight fighter
    hunts as a separate block.
-4. **Tovin remains late, but not endgame.** Anchoring arrives after disposable worlds are understood
+5. **Tovin remains late, but not endgame.** Anchoring arrives after disposable worlds are understood
    and becomes the last major systemic expansion before the interpretive/endgame travellers.
-5. Perren and Nine belong after the player understands ordinary diary structure; their fragmented
+6. Perren and Nine belong after the player understands ordinary diary structure; their fragmented
    books derive meaning from breaking an established expectation.
-6. A diary-exclusive focus cannot be required to deliberately reach its own teacher. Final signatures
+7. A diary-exclusive focus cannot be required to deliberately reach its own teacher. Final signatures
    need a dependency check against authored order before implementation.
 
 ## Remaining material decisions
@@ -146,5 +151,7 @@ Only these roster questions warrant pausing routine identity work:
 - Dagg's recovery teaching playtest; its component and minimal state semantics are now specified;
 - Tam's endgame act and the Glass/quartz distinction;
 - final signature conditions and measured accidental-match rates for unimplemented travellers.
+- Noll's final name/pronouns/voice, exclusive teaching and two-condition accidental-match rate; role,
+  opening order and separate Recycler ownership are current.
 
 Everything else can proceed as ordinary content production within the current documents.

@@ -1,14 +1,21 @@
 # Combat trees — true branching graph
 
 **Status:** current Game Design authority; implementation-ready topology and node placement.
-**Owner:** Game Design. Engineering owns schema/rules/migration; Asset owns connector and glyph
-rendering.
+**Owner:** Game Design. Engineering owns schema/rules/migration and functional connector/state
+rendering; Aimee owns final node/technique glyph art. AssetLab owns placeholder layout,
+accessibility and conformance only, per `handmade-art-ownership-current.md`.
 **Supersedes:** `combat-tree-graph-correction-current.md`. The prior three-column/eight-rank lattice
 was an improvement in presentation, but remained three mostly linear ladders and did not create
 enough build decisions.
 
 **Machine-readable authority:** `combat-tree-v2-authority.json`. The JSON and this document must
 change together; Asset and Engineering consume/validate the JSON rather than retyping topology.
+
+**11 August implementation-readiness audit:** the generated authority contains all 72 unique stable
+nodes, the true-graph and glyph contracts pass, and exhaustive legal-route enumeration finds 79
+Offense, 67 Defense and 66 Craft eight-point capstone routes. Every capstone has at least 13 legal
+routes; the larger centre-discipline counts are intentional because Precision, Protection and
+Emanation are the authored bridges. No tutorial overlay is part of this gate.
 
 ## Design decision
 
@@ -129,6 +136,104 @@ These are the only cross-discipline edges. Each arrow is an alternative parent, 
 
 An edge never grants the destination's lane root. A hybrid route that wants that lane's capstone must
 still buy its root and meet its five-node commitment.
+
+## Native phone integration handoff — accepted v0.4 functional layout
+
+**Status:** layout accepted; release promotion is blocked on production ownership and purchase, not
+on Asset work. `CombatGraphLayout` and the DEBUG route explorer can display and exercise the graph,
+but the explorer owns local fixture state. Production `CombatTreeView` still mutates legacy
+`branchDepth` through `spendPoint(in:)`; `CharacterState` has no durable arbitrary
+`Set<CombatNodeID>` purchase path. Do not ask Asset Design to revise or integrate the v0.4 graph as
+if this were a styling problem. The next actionable native boundary is typed, persisted stable-node
+ownership plus one atomic rules-owned legal-purchase transaction and migration gate. Until that
+exists and the required consumers are live, the functioning legacy purchase screen remains available.
+
+The current app UI is broadly provisional, but this graph must still be a coherent, attractive and
+pleasant ordinary-phone playtest surface—not bare engineering scaffolding. This checkpoint proves
+durable graph topology, stable-ID selection, connector semantics and rules-owned detail/purchase
+boundaries while also testing whether the current layout communicates branching well. Container,
+navigation chrome, typography and palette may change later; ordinary-phone layout iteration is in
+scope, while accessibility/device-edge hardening and claims of final UI acceptance are not.
+
+### Replace the legacy consumer, not only its styling
+
+`Sources/Screens/CombatTreeView.swift` still renders three `StationCard` branch ladders, derives one
+integer branch depth, and offers `Learn next`. It cannot express paired siblings, authored hybrid OR
+parents, connected-route rejection, or the capstone gate. Native must consume stable-node topology from
+`combat-tree-v2-authority.json` plus exact Effect copy, never the legacy branch array/index.
+
+This is a **promotion gate**, not permission to ship a disabled production tree. While v2 ownership
+and consumers are incomplete, the new graph is exercised through the DEBUG route explorer and native
+acceptance surface; ordinary saves retain the functioning legacy purchase route. Production promotion
+is one atomic checkpoint: graph presentation + stable-ID owned state + rules-owned legal purchase +
+lossless point migration + real node consumers. A disabled `Learn` action in place of existing working
+progression is a regression, not an honest intermediate state.
+
+### Ordinary 368×800 geometry
+
+- Present one selected 24-node tree below the compact person/points header and three-tree picker.
+- Use 44×44pt node targets. In the 368pt plane, discipline centres are x **70, 184, 298**. At depths
+  2–4, sibling A/B centres offset **−27/+27pt**. Roots and capstones use the discipline centre.
+- Accepted depth centres are y **148, 246, 344, 442, 534**, a **98pt** step. Native may translate the
+  plane below real navigation chrome, but retains these relative relationships and at least 10pt clear
+  space between sibling frames. Full names belong in selected detail, not inside node targets.
+- Capstones keep the 44pt target but use a distinct diamond role shape. Technique, capstone, purchase
+  state and selected focus are separate layers from the replaceable central glyph.
+- Nodes end at y556 in the proof; detail begins at **y574**, leaving 18pt. Reserve a non-covering detail
+  approximately **352×178pt** (`x8…360`) with 44pt actions. It owns name, state/role, exact Effect,
+  alternative parents joined by **OR**, capstone gate and the rules-owned action.
+- Keep the compact connector key: `Solid: own discipline · dashed: authored hybrid`. Add no first-point
+  tutorial overlay.
+
+### Connector and node layering
+
+Render in one stable coordinate space: background/guides → solid same-discipline connectors → dashed
+manifest-listed hybrid connectors → node role frame and state fill/border → temporary central mark and
+independent technique pip → selected focus ring → detail/key outside the graph plane. Connectors end at
+frame edges and remain behind targets. Selection may emphasize its paths but cannot hide topology or
+imply that OR parents are simultaneously required. Never infer mirrored or generic adjacent edges.
+
+### Scroll, selection and purchase behavior
+
+- Ordinary type keeps the complete five-depth graph at one stable scale. The screen may scroll graph
+  and detail together for real navigation chrome; do not independently pan, horizontally scroll or zoom.
+- A node tap selects by stable `CombatNodeID` and updates detail without purchasing. Selection survives
+  redraw and remains visible when detail opens. Purchase occurs only through the detail action.
+- Owned, available, blocked and selected are state/focus; technique and capstone are roles. Legality and
+  refusal copy are rules-owned. Never restore `buy next` or infer availability from depth.
+- DEBUG actor/fixture/A/B controls may sit above the graph only in DEBUG and never alter production
+  topology.
+
+### Large Text and VoiceOver
+
+Accessibility-size reflow, exhaustive VoiceOver ordering and a device-size matrix are deliberately
+deferred while the application-wide UI remains scheduled for redesign. This does not lower the current
+ordinary-phone standard: nodes must remain comfortably tappable, branches traceable without relying on
+colour alone, selected detail readable without covering the relevant route, and the whole surface
+coherent and attractive enough for meaningful playtesting. Accessibility work returns after the
+ordinary graph and broader interface direction are stable, unless Aimee explicitly promotes a concrete
+issue that also affects her ordinary play path.
+
+### `ResearchTreeLayout` reuse boundary
+
+Reusable after graph-generic extraction: `GeometryReader` + `ZStack`, `Canvas` connectors behind stable-ID
+buttons, positioned-node selection, `popover(item:)` adapting to an accessibility sheet, vertical
+accessible cards/scroll, combined VoiceOver, and 44pt detail actions.
+
+Do **not** reuse Research rank inference from `requires`, alphabetical ordering, three-per-row packing,
+64pt/94pt geometry, required-AND connectors, completed/keeper/stock states, `Study`/cost behavior, or
+generic `Requires A and B` speech. Combat parents are alternative OR paths and capstones add a separate
+route/discipline gate. Research tile anatomy is also not the combat node contract.
+
+### Native acceptance evidence
+
+Render the exact installed commit at 368×800 ordinary. Prove all 24 stable IDs, every manifest edge,
+sibling forks, authored hybrids, all state/focus channels, technique/capstone separation, readable
+non-covering detail and comfortably tappable nodes. Also judge whether the graph looks intentional and
+whether its branching can be understood in play; a technically complete but unpleasant engineering
+surface does not pass. Pixel parity and final-design acceptance are unnecessary; graph/state/semantic
+parity and playtest-quality ordinary-phone presentation are required. Record installed commit/build
+provenance with all evidence.
 
 ## The three concrete graphs
 

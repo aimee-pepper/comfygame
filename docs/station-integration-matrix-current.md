@@ -43,7 +43,8 @@ settled early/mid/late ladder and use resources reachable before each authored o
 | Isolde | Scriptorium · build | 2 | hands, chaining, compounds | live catalogue cost |
 | Sela | Wayfarer's Table · build | 1 | routes/provisions/field practice | live catalogue cost |
 | Orsa | Firepit → Tavern · upgrade | 1 | rotating visitors | 80 essence · 18 Timber · 16 Fibre · 10 Clay |
-| Vance | Exchange + Recycler · build | 1 | buy/sell staples and protected salvage | 80 essence · 12 Timber · 10 Iron Ore · 5 Gold |
+| Vance | Trading Post · build (`trading_post`) | 1 | rotating merchant stock, buy/sell identified goods and appraisal | 10 essence (opening placeholder) |
+| Noll *(working)* | Recycler · build | 2 | previewed found/crafted material recovery | 15 essence (opening placeholder) |
 | Corrin | Tannery · build | 1 | 3 flexible families; advanced capacity leads | 80 essence · 12 Timber · 20 Fibre · 8 Salt |
 | Nessa | Apothecary · build | 1 | currently authored remedies/coatings | 85 essence · 16 Clay · 6 Quartz · 12 Reagent |
 | Bracken | Armoury · build | 2 | tier-3 defensive profiles | 120 essence · 28 Iron Ore · 12 Clay · 8 Copper |
@@ -65,7 +66,9 @@ A built station must do one honest thing immediately. Do not make the player pay
 
 - **Orsa:** Tavern shows visitors immediately after upgrade; no separate research purchase for the
   basic three seats.
-- **Vance:** safe sell and staple stock exist at station tier 0; Recycler root may follow.
+- **Vance:** safe selling and rotating merchant stock exist at Trading Post tier 0.
+- **Noll:** Recycler tier 0 previews and recovers eligible found/crafted material honestly; baseline
+  provenance and transaction safety do not wait for the held diary teaching.
 - **Corrin:** at least Supple coat and one capacity lead appear at tier 0.
 - **Nessa:** the dependency-safe recipe catalogue becomes craftable when the station is built.
 - **Bracken/Fen/Maud:** one tier-3 family/profile root is usable with qualifying stock; tier 4 waits

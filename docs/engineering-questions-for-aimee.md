@@ -6,21 +6,65 @@ design decision; it remains here until Aimee or the game-design lead resolves it
 
 ## Open / temporarily implemented
 
-### EQ23 — Station ordering authority
+### EQ33 — Simplify three inert-prone reforge ranks to one honest improvement?
 
-- **Audit finding:** `stations.json` repeats presentation `sortOrder` values for the Essence Spring
-  and Firepit; Trading Post, Blacksmith and Bestiary; Tannery and Scriptorium; and several later
-  specialist stations. Swift compares only that number, so ties inherit incidental JSON/decode
-  order rather than an explicit contract.
-- **Design-lead recommendation:** Preserve the current visible sequence for now, but replace the
-  overloaded number with an explicit unique `displayOrder`. If the repeated values were intended to
-  express progression bands, retain that as a separately named `campaignBand`; do not alphabetize
-  ties, because that would move the Blacksmith ahead of the deliberately first Trading Post.
-- **Question for review:** Are the repeated numbers meaningful progression groups, or only remnants
-  of stations being inserted over time?
-- **Temporary implementation:** None. Existing order remains untouched until the semantic choice is
-  confirmed; adding Noll/Recycler must not silently become another comparator tie.
-- **Status:** Open, nonblocking static-authority cleanup.
+- **Audit finding:** Live reforging adds 0.2 effective power three times. Because weapons multiply by
+  2 and round final attack once, the three purchases change attack by 0, +1 and +1 relative to rank
+  0; the first and third purchases can do nothing. Protective ranks have the same boundary problem.
+- **Game Design recommendation:** Replace the meter with one +0.5 within-tier Reforge using the
+  current first-step price (2 qualifying samples at 30+, 8 Essence). Preserve existing rank 1/2/3
+  as exact frozen +0.2/+0.4/+0.6 paid power; do not fold it into Legacy-masterwork credit.
+- **Why:** One meaningful retained-object improvement is clearer and less chore-like than inventing
+  secondary mechanics to justify three pips. It remains below the next construction tier.
+- **Review:** Aimee approves, revises or rejects the simplification before native migration.
+  Authority: `reforge-progression-audit-current.md` / DRQ-065.
+
+### EQ31 — Noll exact prose and Field Separation Kit
+
+- **Playtest promotion:** Game Design has approved Noll/`noll`, they/them, Salvager, authored order 2,
+  story-arrival band 0, the two-condition signature, Recycler ownership and the
+  15-Essence/no-resource comparison cost as reversible playtest content. Current stable-ID
+  meeting/diary units may ship labelled Provisional in the DEBUG Atlas so the Recycler owner is no
+  longer blocked on final-copy review.
+- **Still open:** Aimee's exact prose selections and whether `field_separation_kit` is worth a packed
+  slot, turn and confirmation interaction.
+- **Boundary:** Do not grant or expose the Field Separation Kit. Later prose revision preserves
+  stable exchange/page IDs and cannot undo earned recruitment or Recycler state.
+- **Status:** Nonblocking review after native Noll promotion; `noll-opening-review-packet-current.md`.
+
+### EQ27 — Binder appearance and Quill authored identity
+
+- **Settled safety boundary:** Binder, Quill, named travellers and generated people are distinct
+  persisted visual-origin cases. The accepted 28 named travellers are not being reopened, and no
+  missing case may borrow another person's sprite or reroll from roster/world state.
+- **Design recommendation:** New Game includes a compact, non-stat Binder appearance chooser built
+  from bounded authored body/hair/garment/palette/accent options. Quill receives one fixed authored
+  descriptor reviewed against the entire Binder range, named cast and generated combinations.
+- **Questions for regular review:** Should Binder appearance be editable later at Base, or final at
+  campaign creation? What exact authored Quill descriptor should Asset promote?
+- **Nonblocking placeholder:** Persist the closed identity union first; keep the existing structured
+  fallback/diagnostic for Binder and Quill until their content is reviewed. Never use the proof-only
+  Binder template as a canonical default.
+- **Status:** Schema and migration are implementation-ready in
+  `binder-quill-generated-visual-identity-current.md`; exact visual content remains reviewable.
+
+### EQ24 — Color vocabulary and acquisition
+
+- **Settled direction:** Rough charcoal is the starting medium. Brush/Fountain marks use Ash by
+  default; both charcoal and Ash mean color unspecified and resolve randomly at bind. Deliberate
+  colored ink is an optional CMY+Depth recipe attached
+  to a source mark, not another rune or collectible qualifier. Flora and Creature remain separate
+  technical scopes.
+- **Progression owner:** Isolde's Scriptorium replaces Pencil with **Brush**. **Ink Mixing** is a
+  direct adjacent tier-1 node requiring Brush; it permanently exposes the Ink well and saved
+  mixtures at the Writing Desk. Fountain pen remains the final hand.
+- **Implementation recommendation:** Begin with the closed Sun/Smoke/Granite/Bloom allowlist. Store
+  exact recipes and conversion versions; distinguish nil/open from explicit mixed black. Prepared
+  vials use the current resource-derived base/application contract.
+- **Temporary proof choice:** AssetLab may retain named swatches as accessibility/gamut fixtures,
+  but they are not shipped vocabulary or acquisition authority.
+- **Status:** Ownership and semantics are current; exact upgrade cost and conversion coefficients
+  remain playtest/open tuning.
 
 ### EQ22 — Legacy gear power during specialist-shop migration
 
@@ -121,7 +165,10 @@ design decision; it remains here until Aimee or the game-design lead resolves it
   is the important part. See `anchored-realm-production-current.md`.
 - **Status:** Review after several staffed realms run across short and long sessions.
 
-### EQ13 — Opening expedition safety
+### EQ32 — Opening expedition safety
+
+*Renumbered from the accidentally duplicated `EQ13`; the earlier `EQ13` remains the resolved minimap
+disclosure decision.*
 
 - **Design-lead recommendation:** Do not create a secretly neutral or weakened tutorial world.
 - **Question after fresh-save testing:** Is a visible, debug-tunable opening-campaign encounter
@@ -153,15 +200,6 @@ design decision; it remains here until Aimee or the game-design lead resolves it
 - **Impact:** Late-game economy and how often a kept realm can be revisited.
 - **Status:** Open; model and tuning are deliberately reversible.
 
-### EQ2 — Traveller's Token placement rule
-
-- **Design-lead recommendation:** Cut the item. A complete signature already places its unrecruited
-  traveller deterministically; placing somebody in a non-matching world would make their diary clues
-  dishonest. See `travellers-token-audit-current.md`.
-- **Temporary choice:** Continue holding this one item; the other seventeen form a coherent catalog.
-- **Impact:** World generation and traveller pacing.
-- **Status:** Open for Aimee's review; no engineering placeholder is requested.
-
 ### EQ4 — Lure targeting
 
 - **Temporary implementation:** Using a Lure wakes the nearest non-sessile, non-apex creature and
@@ -190,19 +228,97 @@ design decision; it remains here until Aimee or the game-design lead resolves it
 - **Review:** Revisit with broader playtest telemetry; this is magnitude tuning only.
 - **Status:** Open, reversible playtest value.
 
-### EQ13 — Minimap writing disclosure
-
-- **Historical instruction:** The minimap once displayed apex, portal and page icons through fog.
-- **Superseding Aimee decision, 9 Aug 2026:** all POIs require exploration/discovery by default;
-  explicit invested skills/station research/consumables may disclose bounded information early.
-- **Current implementation requirement:** remove type-based portal/page/apex exceptions and use
-  game-owned reveal/discovery state per `minimap-disclosure-current.md`.
-- **Status:** Resolved; retain this entry as decision history.
-
 ## Resolved
 
 Move entries here with the deciding source and date; preserve the temporary choice so later audits
 can distinguish an intentional migration from an accidental behavior change.
+
+### EQ23 — Station ordering authority
+
+- **Resolved/built by 11 Aug 2026:** Native station definitions author `homeSection` plus unique
+  `sectionOrder`; Base presents Home/Make/Study/Realms through deterministic grid ordering and
+  foundation/built states. Array-shuffle and unique-position tests are live.
+- **Party boundary:** A hidden `party` station row remains in the compatibility map at Home 2 but is
+  filtered from destinations; Party appears exactly once in the persistent bottom utility. Visible
+  Home therefore need not use contiguous encoded order values.
+- **Expansion:** Recycler uses Make 1 between Trading Post/Blacksmith; Menagerie Realms 1 and Deep
+  Works Realms 2. Adding a row cannot reveal it before legitimate foundation/unlock state.
+- **Legacy `sortOrder`:** compatibility only; no presentation may read its duplicated values.
+  Authority: `base-destination-board-current.md` / DRQ-142.
+
+### EQ2 — Traveller's Token placement rule
+
+- **Resolved 11 Aug 2026 by Game Design Lead / Decision 189:** Cut Traveller's Token. A complete
+  signature already enters the one-person story-band selector; biasing an incomplete signature or
+  placing somebody in a nonmatching world would falsify recovered clues.
+- **Boundary:** Current consumable catalogue remains seventeen; legacy item IDs may decode only and
+  no recipe, stock, reward or UI may expose the Token. Scent Mask remains independently justified.
+  Authority: `travellers-token-audit-current.md` and `quirk-pattern-audit-current.md`.
+
+### EQ13 — Minimap writing disclosure
+
+- **Resolved 9 Aug 2026 by Aimee:** Every POI—including writing, sites, resources/items,
+  travellers, encounters, apexes and portals—is fog/discovery-gated by default. Only an explicit
+  invested skill/station/consumable may reveal bounded information early.
+- **Historical behavior:** type-based portal/page/apex exceptions leaked through fog. They remain
+  rejected. Authority: `minimap-disclosure-current.md` / DRQ-106.
+
+### EQ29 — Universal baseline combat skills
+
+- **Resolved 11 Aug 2026 by Game Design Lead / Decision 185:** Remove the universal four-technique
+  grant. Binder owns Unbind/Sight; Quill owns Mend/Read; Ashe owns Ground; exact graph nodes,
+  instruments/items and future authored-person sources grant everything else.
+- **Consequence accepted for reversible playtesting:** A Quill-free expedition may have no renewable
+  Mend. Departure/Party preview states that fact and carried healing uses; the system must not hide
+  it by cloning Quill's identity across the party.
+- **Migration:** Generic people gain no private replacement; obsolete catalogue owner strings and
+  the temporary baseline allowlist become decode/compatibility only. Authority:
+  `combat-v2-review-batch-current.md` and `combat-baseline-technique-ownership-review-current.md`.
+
+### EQ28 — Unbind damage versus Unbind retreat
+
+- **Resolved 11 Aug 2026 by Game Design Lead / Decision 185:** Keep **Unbind** for the Binder's
+  signature damage action. Ordinary retreat is **Withdraw**. Vanish modifies one confirmed Withdraw
+  per expedition; legacy Rout is decode-only and grants no turn/action.
+- **Boundary:** Never present two actions called Unbind and never preserve Rout as a duplicate escape
+  technique merely for migration convenience. Authority:
+  `combat-unbind-retreat-name-collision-review-current.md`.
+
+### EQ26 — Essence refining station ownership
+
+- **Resolved 11 Aug 2026 by Game Design Lead / Decision 186:** All player-facing Raw Essence
+  refinement moves to the Essence Spring. Workshop retains writing/research infrastructure;
+  Auber's Distillery retains crystals/attunement and never owns Raw conversion.
+- **Reversible progression:** free selected/all 2:1 baseline; Second pass at 50 lifetime Raw refined
+  + 80 Essence/10 Quartz changes future conversion to 3:1; Continuous settling follows at Spring
+  tier 1 for 120 Essence/12 Quartz/8 Pulp and auto-refines only newly retained Raw once per outcome;
+  Deepen remains parallel.
+- **Migration:** existing balances and completed Deepen state persist; no past conversion is
+  recomputed. Authority: `essence-spring-review-batch-current.md` and
+  `essence-refining-progression-current.md`.
+
+### EQ30 — Colored-ink processing interaction
+
+- **Resolved 11 Aug 2026 by Game Design Lead / Decision 164:** First native Ink Mixing uses one
+  atomic just-in-time vial transaction. Preview existing CMY+Depth measures plus exact
+  Copper/Ichor/Sulfur/Obsidian and Resin shortfall; confirmation processes only the minimum whole
+  source units, spends exact measures, retains excess and creates the 12-application vial.
+- **No separate ordinary process-pigment action or second screen.** Formula choice and limited use
+  are the decisions; deterministic conversion is accounting.
+- **Reversible boundary:** Persist station-local base measures so explicit batching can return only
+  if play demonstrates a meaningful timing/quantity choice. DRQ-156 is later feel review, not an
+  implementation blocker. Authority: `ink-economy-friction-audit-current.md` and
+  `authored-color-vocabulary-current.md`.
+
+### EQ25 — Uneven-party combat level reference
+
+- **Resolved 11 Aug 2026 by Game Design Lead:** Replace upper median in newly bound Recommended runs
+  with the additive Binder-anchored party-power budget in `encounter-scaling-playtest-current.md`.
+  Each companion contributes `clamp(0.5 × 1.09^(level-anchor), 0.25, 1.5)` to a total capped at 3.
+  Equal-level parties preserve 1/1.5/2/2.5/3; adding any member cannot lower pressure; apex
+  durability/offence read the same budget while action slots continue to read party count.
+- **Historical placeholder:** Upper median was retained only long enough to expose its odd-party
+  discontinuity. Maximum level was rejected because it makes low-level allies liabilities.
 
 ### EQ10 — Armour thresholds in gambit grammar
 

@@ -881,8 +881,8 @@ short reason for each intentional semantic change.
 
 No additional world-sheet content is required before the combat proof. Preserve two integration
 guardrails for later: passability/overlay inputs must come from game facts rather than duplicated
-AssetLab rules, and fog remains literally empty even when a golden fixture would look more balanced
-with decoration.
+AssetLab rules, and fog remains one invariant concealment fill with no informative pixels even when
+a golden fixture would look more balanced with decoration.
 
 #### Combat-stage proof review criteria
 
@@ -1504,12 +1504,12 @@ traveller, drop and chasm grammars distinct. Do not promote the current family s
    as the primary state read.
 4. **Strengthen related minerals in grayscale.** Organize loose piles, seams/outcrops, crystals,
    fluid deposits and unstable/exotic material through larger mass and negative-space differences;
-   pattern/accent may support those forms but cannot own exact recognition.
+pattern/accent may support those forms but cannot own exact recognition.
 
 The smallest correction is a native unlabeled collision strip for the similar mineral groups plus
 one remaining→exhausted example from each acquisition grammar, with explicit family/acquisition
-labels in the review legend. Fog remains literally empty; a revealed known minimap may identify a
-resource, while an unrevealed tile may not.
+labels in the review legend. Fog retains only its invariant non-informative fill; a revealed known
+minimap may identify a resource, while an unrevealed tile may not.
 
 ### 9 Aug 2026 — Character Lab identity proof v0.3 review
 
@@ -2154,6 +2154,30 @@ Retain the same tree line, water/ground masses and frame proportions across life
 the player recognizes one particular world. Collapse alone may break that actual geometry. Outcome
 names and descriptions remain accessible text; palette/frame colour cannot be the only distinction.
 
+#### Splash lifecycle proof v0.2 final disposition
+
+**Accepted for golden promotion with Abandon excluded, recommendations only.** Direct inspection of
+the lossless colour/grayscale sheet confirms that the same tree line, water/ground masses, portal and
+frame remain recognizable across every settled outcome; only genuine collapse breaks the world's
+geometry. The AssetLab suite passes and regression reports 196/196 unchanged before promotion.
+
+- Defeat now uses an abstract upward extraction trace with no body, death pose or invented world
+  fate. The intact scene owns the first read.
+- Waystone is a small carried edge-mark and no longer competes with the world's portal or implies a
+  placed site. Preserve its outlined geometry at final phone size so it never depends on violet alone.
+- Anchored departure keeps the ordinary exit available while an independent stable page-edge/frame
+  treatment communicates continuing addressability. It introduces no tether and no universal shore.
+- Abandon remains explicitly **reserved / noncanonical** and must be omitted from the golden manifest,
+  exports consumed by the game and player-facing lifecycle enumeration until its action and world
+  fate are settled. Its placeholder panel is review scaffolding only.
+- The disclosed-entry variant remains a separate data-gated fixture. A site uses its authored
+  identity without changing the settled camera contract, while the apex is a location-only mark.
+  Neither field may be supplied to the ordinary entry compositor from hidden complete-world data.
+
+Promote the six settled states plus the gated entry variant from v0.2 and retire v0.1 as competing
+evidence. The next useful asset proof should return to uncovered dynamic families rather than add
+more lifecycle outcomes or animation.
+
 ### 9 Aug 2026 — Splash lifecycle v0.1 engineering boundary audit
 
 **Disposition:** recommendations only; no AssetLab or game code was changed. The 720×650 RGBA
@@ -2213,3 +2237,2774 @@ opt-in site routing). They do not authorize changes to game lifecycle systems.
   collapse or entry.
 - Native UI still owns accessibility reading order, outcome description, reduced-motion behavior and
   when a splash is presented. The PNG compositor owns imagery only.
+
+### 9 Aug 2026 — Splash lifecycle proof v0.2 design disposition
+
+**Disposition:** recommendations only; the requested visual corrections pass, but two request-
+contract corrections remain before lifecycle golden promotion. The 720×650 lossless proof and
+focused source/tests were reviewed directly.
+
+#### Visual corrections accepted
+
+- Defeat now uses an abstract rising/extraction trace over intact world geometry. It depicts no
+  humanoid body, face, skin, clothing or dropped inventory and does not invent the world's fate.
+- Waystone is a small carried instrument/return mark at the page edge, clearly distinct from the
+  world's portal and not presented as a placed site left behind.
+- Anchored continuity is demonstrated independently on the portal transition as an outside-scene
+  book-edge tab. It preserves the same portal cause and intact scene, uses no tether/shore line and
+  does not canonise one anchoring route's landmark for every anchored realm.
+- Abandon rejects ordinary requests and appears only under explicit `allowNoncanonical` review
+  opt-in. Exclude that reserved card from exported/promoted lifecycle assets until its fiction is
+  settled; its black placeholder is not destruction, reset or void canon.
+- Ordinary entry remains disclosure-safe. The apex input is location-only, and forbidden identity
+  fields are rejected rather than ignored. Entry/portal/Waystone/defeat share an identical world-
+  facts prefix; collapse alone breaks that geometry. Colour and grayscale preserve the distinctions.
+
+#### Two final contract corrections
+
+1. **Anchored continuity must remain independent for collapse too.** The v0.2 validator rejects
+   `transition === "collapse" && continuity === "anchored"`. That re-couples the two channels the
+   correction was meant to separate. An anchored realm can suffer the run's actual collapse outcome
+   while its durable realm record remains addressable; the splash must be capable of showing broken
+   current scene geometry and the outside-scene anchored continuity tab together. Remove the
+   contradiction, fixture anchored+collapse, and assert both the collapse overlay and continuity
+   channel are retained. This does not claim that an anchored realm collapses while the app is closed.
+2. **Either render the accepted site profile or request only a generic marker.** `siteProfile` is
+   now closed to six valid IDs, but `intactScene` still draws the same generic box for every value.
+   This falsely suggests exact profile routing has been proven. Prefer delegating the legitimately
+   disclosed ID to the accepted authored top-down site renderer and add a two-profile pixel-difference
+   test. If this splash milestone intentionally wants only a generic discovered-site mass, replace
+   `siteProfile` with a boolean marker fact so exact identity never enters the compositor. Do not
+   accept exact data and silently discard it.
+
+No further visual redesign is requested. A compact anchored-collapse panel plus exact-profile routing
+(or the narrower generic-marker request) can close the gate while all accepted v0.2 panels remain
+unchanged. Treat this as world-facts lifecycle composition until a later versioned visual seed proves
+distinct per-world scene identity; that naming limitation does not block the corrected lifecycle
+grammar.
+
+#### Splash lifecycle v0.2 engineering re-audit
+
+**Disposition:** recommendations only; four prior boundary areas close, two residual blockers remain
+before Engineering boundary-golden acceptance. No AssetLab or game code was changed. The focused
+test passes and the 720×650 RGBA artifact was inspected.
+
+Accepted corrections:
+
+- no render defaults or palette fallback remain; transition, continuity, terrain, light, flora and
+  disclosure fields use closed allowlists, while extra world/disclosure fields and apex identity are
+  rejected;
+- portal/Waystone/defeat preserve the exact intact world-command prefix, continuity is independently
+  composable for the exercised portal case, caller input is not mutated, and repeated entry rendering
+  is deterministic;
+- Abandon requires the explicit noncanonical escape and is clearly excluded from the promotable set;
+- Waystone, defeat and anchored-continuity visuals now use the requested carried/party-scale/book-edge
+  channels rather than portal, canonical-body or tether grammar.
+
+Residual blockers:
+
+1. **A disclosed site profile is validated but still not routed.** Every accepted `siteProfile`
+   produces the same generic rectangle because `intactScene` tests only truthiness. Either delegate
+   the selected accepted profile to the authored top-down site renderer, proving different accepted
+   profiles change the site pixels, or replace `siteProfile` with a generic disclosed-site-marker
+   boolean. Carrying an exact profile that has no effect still gives false contract evidence.
+2. **Rejecting collapse × anchored contradicts the live lifecycle and the intended independent
+   continuity model.** `endRunWithPartialHaul` saves the anchored realm snapshot for collapse just as
+   it does for other exits; structural failure of the current expedition does not erase the permanent
+   realm. The v0.1 review explicitly required representing both truths. Permit collapse geometry plus
+   anchored continuity, or document and obtain a new settled design/game rule that collapse destroys
+   an anchored realm before making this rejection golden.
+
+One small strictness hardening may land with either correction: require `allowNoncanonical` to be a
+Boolean and reject extra top-level request keys, since a truthy string and ignored top-level fields
+currently bypass the otherwise exact-field posture. This is not a visual redesign.
+
+The later native schema/version/hash, structured diagnostics, Swift round-trip and presentation gates
+remain unchanged and separate from these two AssetLab blockers.
+
+#### Splash lifecycle proof v0.3 final disposition
+
+**Accepted for visual/boundary golden promotion, recommendations only.** Anchored continuity now
+composes with collapse rather than contradicting it, preserving both structural failure of the
+current expedition and the permanent realm's outside-scene continuity channel. Disclosed sites now
+delegate to the accepted authored `siteCommands`; Signal Cairn and Salt Pan produce distinct pixels,
+while apex disclosure remains location-only. Extra top-level fields and non-Boolean noncanonical
+flags are rejected. Promote v0.3, retain Abandon only as excluded review evidence, and retire v0.1/
+v0.2 as competing current proofs. The reported golden regression is 0/203 changed.
+
+### 9 Aug 2026 — App Launch proof v0.1 design review
+
+**Disposition:** recommendations only; the narrow launch/loading boundary and layout pass, but refine
+the central mark before visual promotion. This is correctly a boot surface, not another world-
+lifecycle splash.
+
+- The 390×844 light/dark compositions keep all meaningful content comfortably inside the supplied
+  portrait safe-area bounds. Frame, title and loading line occupy the same geometry in both themes,
+  with value contrast surviving without hue.
+- `Bookbinder` plus the restrained `Opening the Atlas…` line matches the current launch-loading
+  decision. The ellipsis is static copy, not a percentage, filling bar or claim that bounded work is
+  advancing.
+- No Binder face/body, world, flora, site, resource, apex, portal or save-dependent art appears.
+  Nothing in the composition says a new world is being generated on every app launch.
+- The page frame can transition to Base honestly: the system surface and first in-app frame should be
+  pixel-aligned; once actual initialization reaches Ready, reveal/crossfade directly to the existing
+  Base. Do not fill the frame with generated scenery, animate pages into a world, cycle fake progress
+  marks or delay a warm-ready launch merely to display the loader. Reduced Motion may use a direct cut.
+
+#### One visual correction
+
+The central gold mark does not yet read reliably as an abstract Atlas/book binding. Its long vertical
+stem, short upper crossbar, broad foot and detached dark square can read as a capital `I`, sword,
+cross, lectern or waypoint. Replace it with a small unmistakable binding/page silhouette: paired
+page masses or mirrored page edges around a central spine, with one restrained separation/notch that
+can suggest the torn Atlas without depicting a completed Atlas, literal world or portal. Keep it
+abstract enough to avoid lore illustration, but make “book/binding” the first read in native
+grayscale before the title is consulted.
+
+Retain the current frame, copy, placement and light/dark palettes. The correction proof only needs
+the revised mark at native and 2× scale in light, dark and grayscale. Add geometry assertions that
+non-background launch content and both copy baselines remain between `safeTop` and
+`canvasHeight - safeBottom`, and that light/dark themes share identical geometry. No animation,
+progress UI, world content or game-launch implementation is requested from AssetLab.
+
+#### App Launch proof v0.2 final disposition
+
+**Accepted for visual golden promotion, recommendations only.** The lossless proof shows native-derived
+2× light/dark colour and literal grayscale compositions. The revised central mark now reads as an
+abstract open binding/book through paired page fields, central spine, mirrored outer edges and
+restrained torn/worn notches; it no longer reads as an `I`, sword, cross, portal or generated-world
+aperture. Frame/copy alignment and value hierarchy remain stable across themes, safe-area assertions
+pass, and no face, world, site, apex, animation or progress claim has been introduced. Promote v0.2
+as the App Launch visual reference and retire v0.1 as competing evidence. The reported regression
+remains 0/203 changed.
+
+### 9 Aug 2026 — explicit `mapTopDown` character-profile proposal review
+
+**Disposition:** recommendations only; proceed with the additive profile. This is safer than changing
+accepted `world` pixels in place, but `mapTopDown` must become the only integration-facing character
+profile for explorable-map people. Mark the upright `world` profile legacy/proof-only in AssetLab so
+two apparently valid map cameras cannot coexist at the eventual manifest boundary.
+
+#### Camera and semantic criteria
+
+1. Use an overhead, foreshortened **human** footprint with a clear facing axis: crown/hair mass,
+   shoulders/upper back, body footprint and directional arms/feet. Avoid the proposed word/shape
+   `radial`; radial symmetry is already flora and many-creature grammar and can make a person read as
+   a rosette or spider.
+2. No face, frontal chest plane, horizon, ground strip or soil/grass patch belongs inside the sprite.
+   Terrain remains tile-owned. Hair/headwear should be read as crown shape from above, not a tiny hat
+   pasted above an upright face.
+3. Reuse the same resolved identity descriptor, not merely the same ID/palette. At native 16px each
+   person should retain at least two correspondence anchors into side-biased combat—normally overall
+   mass plus hair/headwear, garment shoulder shape, carried side or asymmetry. Not every fine descriptor
+   needs a unique pixel at map scale, but named/generated pairwise silhouette tests must remain honest.
+4. Keep authored `carry` distinct from equipped `gear`: carry may be a stable satchel/scroll/kit
+   identity feature; blade/spear/bow/protection is a render overlay and cannot reroll anatomy. Overhead
+   gear orientation follows facing and must not resemble route, crack, resource-node or site marks.
+5. `worldGrade` may apply the accepted bounded request-side colour transform only. Personal palette
+   remains descriptor-owned, geometry stays identical, and grayscale must preserve identity and
+   human-versus-content distinctions.
+6. Selected/current/targetability treatments remain tile/UI overlays with independent shape channels.
+   Test base sprite equality with overlays removed, and do not spend identity pixels on selection.
+   A selected/current person must still be recognisable where route and semantic content meet.
+7. Do not imply that every party member occupies a separate world tile if the live map owns one party
+   position. Exercise one solitary traveller/content occupant and one legitimate party/current marker
+   composition; crowd layout is outside this sprite-profile proof.
+
+#### Recommended first proof
+
+The proposed six contrasting named people plus four generated descriptors and the separate
+noncanonical Binder is a reasonable upper bound and need not be narrowed if the sheet remains legible.
+Before propagating to all 28, give Mara, Isolde and Tovin at least two opposing facings; they cover
+wide/coat/carry, slender/wrap/robe and hood/mantle extremes. Show the other identities in one settled
+facing, then add a small overlay/collision row containing:
+
+- ordinary terrain with one named traveller;
+- route beside—not through—the person;
+- accepted wild drop, resource node, flora, hostile creature and generic traveller marker;
+- selected and current treatments separately and combined; and
+- one close blade, mid melee spear and far bow footprint, with reach labels only in review chrome.
+
+Review at native 16px and nearest-neighbour 2× in colour and grayscale. Require pairwise silhouette
+separation for the fixture identities, deterministic generated descriptors across profiles/facings,
+Binder never resolving through named-cast identity, overlay mutual-exclusion/combination assertions,
+and zero face/stat/calling/rank/reach inputs in anatomy. Animation can wait until this static camera
+grammar is accepted.
+
+#### `mapTopDown` integrated proof v0.1 design review
+
+**Disposition:** recommendations only; the additive profile boundary and integrated fixture are
+useful, but the camera grammar is not accepted yet. Do not promote or integrate v0.1.
+
+The source still constructs north as the familiar upright stack—head with a centered skin/face
+rectangle above shoulders/chest, lateral arms and two feet below—and then rotates that complete paper
+doll for east, south and west. The proof therefore reads as an upright person laid sideways/upside
+down in several facings rather than one body observed from directly overhead. The caption's “no face/
+front-elevation baseline” claim is contradicted by the visible `p.skin` face patch in
+`mapTopDownIdentity`.
+
+This is clearest in the native grayscale row: broad mantle/robe figures, including Tovin and the
+Binder placeholder, become large rectangular furniture/site-like masses; narrower figures can read
+as tools or dropped objects. Pairwise command hashes prove difference, not human readability.
+
+#### Smallest correction
+
+1. Recompose the neutral north identity around **occlusion from above**: crown/hair or headwear mass
+   overlapping the upper-back/shoulder footprint, a foreshortened torso beneath it, and short
+   directional limb/foot hints. Remove the centered face patch. A tiny nape/ear/hand skin cue may be
+   visible only where the chosen facing honestly exposes it; no frontal face plane.
+2. Once that north footprint reads overhead, rotating the whole footprint for four cardinal facings
+   is acceptable. Re-prove Mara **and Tovin** in N/E/S/W so both an ordinary coat/carry and the worst-
+   case hood/mantle mass survive rotation as people rather than tables or beds.
+3. Keep the identity core away from a full rectangular tile fill. Mantle/robe may widen the shoulder/
+   trailing contour, but preserve negative space around limbs and at least a small terrain read so
+   site, flora and selected-frame grammar cannot own the same block silhouette.
+4. Strengthen tests from pairwise uniqueness to semantic invariants: no face-plane command in this
+   profile; base identity remains a strict subset/unchanged input beneath UI overlays; all six named
+   and generated proof identities are pairwise distinct in every exercised facing; and the separate
+   Binder descriptor never resolves through Tovin.
+5. The fixture shows current, selected and actionable individually, but not selected+current together.
+   Add that deliberate combined state and test both channels survive grayscale. Keep overlays in a
+   shared map-overlay helper rather than allowing the review page to become a second game-state
+   authority.
+
+The terrain/content row, literal grayscale export, route-before-person layer order, disclosure-safe
+content set, generated seeds and legacy `world: compact-upright-proof` labelling may remain. The next
+proof need only replace the person pixels, add Tovin's facing row and one selected+current collision;
+gear can continue to wait until the overhead human camera is accepted.
+
+#### `mapTopDown` integrated proof v0.2 design review
+
+**Disposition:** recommendations only; the true overhead camera grammar is accepted for the ordinary
+build/garment examples, with one hood/mantle collision correction before visual golden promotion.
+
+The v0.1 camera blocker is closed: crown/headwear now overlaps the nape/upper-back footprint, torso
+and limbs are foreshortened with terrain-facing negative space, the centered face plane is absent,
+and N/E/S/W rotate one overhead footprint rather than an upright paper doll. Mara, Halloway, Isolde,
+Wren, Ashe, Orsa and the generated examples read as people from above in native colour and literal
+grayscale. The legacy upright `world` profile remains explicitly non-integration-facing. Route,
+terrain, disclosed content and current+selected/actionable overlays keep their separate ownership.
+
+One native semantic collision remains: Tovin and the noncanonical Binder combine hood and mantle into
+a broad hollow ring. In north/south the paired dark voids can read as eyes/mask openings; in east/west
+the `C`-like mass approaches the accepted portal/site silhouette. At 8× this looks creature-like, and
+at native grayscale the portal comparison in the same sheet confirms that colour is doing too much
+of the separation.
+
+#### Smallest final correction
+
+- Keep the accepted overhead base and change only hood/mantle composition: make the crown a mostly
+  contiguous stepped mass over a visibly directional upper back, avoid paired central voids, and
+  preserve one asymmetric carry/arm plus separated boot/limb cues so the result cannot become a ring.
+- Add a native grayscale collision strip containing Tovin N/E/S/W, Binder N/E/S/W, portal, site and
+  one ordinary/unknown creature. Human identity must win by limb/back topology before labels or hue.
+- Extend pairwise tests across every fixture identity at each shared facing, not only the default
+  north silhouettes, and assert the hood/mantle result never matches the portal/site hollow-center
+  topology.
+- Treat the proof's locally drawn state marks as **review representations of game-owned state**, not
+  as an AssetLab authority for final UI pixels. The combined current+selected evidence passes, but
+  native integration will still own those overlays.
+
+No change is requested to Mara or the accepted ordinary overhead anatomy, terrain/content rows,
+generated descriptors, Binder's noncanonical status, palette grading or UI-state semantics. A small
+hood/mantle correction sheet can close the profile; gear remains outside this milestone.
+
+#### `mapTopDown` integrated proof v0.3 final disposition
+
+**Accepted for AssetLab visual golden promotion, recommendations only.** The narrow hood/mantle
+collision is closed without changing the accepted ordinary overhead anatomy. Tovin's contiguous
+stepped crown, directional back mass, asymmetric limb/carry and boots remain human in N/E/S/W;
+Binder retains a narrower separate noncanonical silhouette. Neither produces the rejected ring/eye
+void, and both separate from portal, site and unknown-creature grammar in literal native-derived
+grayscale. The original integrated colour/grayscale rows, current+selected evidence, bounds and
+identity tests remain intact. Promote v0.3 as the current `mapTopDown` camera proof, retire v0.1/v0.2
+as competing evidence, and keep the compact-upright `world` profile legacy/proof-only. The reported
+regression remains 0/205. This authorizes AssetLab fixture promotion only, not game integration;
+overhead gear/action animation remains a later milestone.
+
+### 9 Aug 2026 — full-cast `mapTopDown` proof v0.1 disposition
+
+**Accepted for AssetLab full-cast visual golden expansion, recommendations only.** All 28 authored
+travellers retain the accepted overhead human grammar in N/E/S/W, with no individual camera drift or
+blocking native grayscale collision found. The earlier large-axis descriptor corrections remain
+effective after rotation; the closest pairs (notably Bryn/Dagg and Orsa/Sabine) still preserve visible
+carry or apron/body distinctions rather than relying on hue. Hood, brim, wrap, loose hair,
+mantle/robe mass, asymmetry and stature remain readable without creating new portal/site/creature
+rings. Pairwise silhouette inequality in every facing supports the visual evidence. Promote this
+full-cast proof within AssetLab; the compact-upright `world` sheet remains legacy/proof-only and no
+game integration, gear, Binder/Quill persistence or renderer expansion is authorized. The reported
+regression remains 0/224.
+
+Nonblocking evidence note: the single-line key at the bottom clips the final names at the canvas
+edge. Wrap or number that review key on the next routine export so every cell remains independently
+auditable; this is review chrome and does not invalidate the accepted sprite pixels/order.
+
+### 9 Aug 2026 — equipment visual-boundary proposal review
+
+**Disposition:** recommendations only; proceed after the full-cast milestone with the following
+boundary refinements.
+
+- Treat the eight serialized slots as **coverage and attachment anchors**, not eight universal visual
+  identities. The unlabeled grayscale row should contain one representative item assigned to each
+  slot, with a separate key. Offhand, tool and keepsake can contain multiple honest visual families;
+  a slot must not force every future item into one silhouette.
+- Large silhouette may communicate a plainly visible functional family—blade, melee spear, bow,
+  shield, helm, body protection, gloves/hand tool, boots, carried tool or keepsake—but exact stats,
+  damage kind, ward, quality, reforge power, provenance and unique rule do not select shape. A visible
+  authored construction may correlate with mechanics; the renderer must not reverse-engineer hidden
+  mechanics into decorative codes.
+- Keep the accepted reach examples exact rather than universal: current blade/close, melee
+  spear/mid and bow/far are reviewed families. A throwing/far spear is a different visual/action
+  family. Reach remains validated render/game state, never character anatomy or an inventory badge.
+- Material may alter bounded colour, surface pattern, edge/inlay and wear where the material is
+  honestly visible. Provenance belongs primarily to accessible inventory/inspection text. Reforge
+  history and unique rules require explicit authored visible modules before changing pixels; no
+  standardized glow, rune or colour may disclose an unknown unique effect.
+- Resources and slotted items keep separate grammar. A resource pool/node uses the accepted resource
+  boundary; a world item drop uses an item/loot footprint. At distance the map may reveal an honest
+  broad family when visually obvious, but exact catalogue/unique identity appears only when
+  disclosure state owns it. Include resource drop, item drop, node, writing and keepsake in one
+  native grayscale collision row.
+- One persisted item instance should reuse its resolved visual identity across world drop, inventory
+  icon and character overlay. Those profiles may simplify detail but must retain the same dominant
+  family/construction anchors. A crafted instance must persist resolved modules plus pipeline version;
+  reopening, equipping or moving it cannot reroll appearance. A found authored catalogue item remains
+  authored; a unique lore item is never procedurally invented from a rule string.
+- Do not require every equipped slot to appear on a 16px map person. Inventory must represent all
+  eight; map/combat profiles render only legitimately exposed layers. Head/body/hand/foot gear must
+  preserve at least two character identity anchors, and tool/keepsake may be stowed. Layer order and
+  clipping need explicit fixtures so armour does not erase the person and gear does not become route,
+  crack, selection or protected-state UI.
+
+The smallest proof can remain narrow: eight representative slot-covering inventory silhouettes;
+close/mid/far and light/heavy families on two contrasting people; and one authored found item plus
+one persisted crafted instance across disclosed world drop, inventory and character overlay. Show
+native colour/grayscale, a separate review key, exact accessible item/slot labels and malformed/
+undisclosed fallbacks. No crafting mechanics, stat formula, random unique item or native integration
+is authorized by this asset proof.
+
+#### Splash lifecycle v0.3 engineering closure
+
+**Accepted for AssetLab boundary-golden promotion, recommendations only.** Source, focused tests and
+the 720×650 RGBA artifact were checked; the focused test passes. The final blockers are closed:
+collapse composes with anchored continuity and is explicitly tested; disclosed site profiles are
+strictly allowlisted, delegate to the authored `siteCommands` renderer and produce pixel-distinct
+Signal Cairn/Salt Pan evidence; extra top-level fields and non-Boolean `allowNoncanonical` values are
+rejected. Abandon remains an explicit noncanonical fixture outside the promotable transition set.
+No additional AssetLab contract correction is requested. Previously recorded native
+adapter/schema/version/hash, Swift round-trip and presentation gates remain later integration work.
+
+### 9 Aug 2026 — playable top-down map-slice export engineering review
+
+**Disposition:** recommendations only; urgent native-consumption boundary review. No game or
+AssetLab code was changed by Engineering. The pack correctly names all twelve live `GroundType` raw
+values, uses four-way N/E/S/W adjacency bits 1/2/4/8, distinguishes passable `water` from impassable
+`deepWater`, preserves straight-top-down flora, labels proof-only material clearly and exports
+individual 16×16 sRGB RGBA PNGs. The following must be corrected or explicitly narrowed before the
+pack is called integration-ready:
+
+1. Preserve the latest Design-owned draw order: terrain → flora → crack/warning → content →
+   route/action → party. Visibility is an early gate: unrevealed short-circuits every ordinary
+   layer, because a transparent fog PNG cannot suppress pixels. Add an overlap fixture proving that
+   the chosen content/party occlusion of the warning is deliberate; Engineering does not override
+   this settled ordering in the adapter.
+2. `elevation` and `isCrumbled` are listed as live inputs without matching assets/composition rules.
+   Export their reviewed variants/overlays or declare them native-owned and remove the unsupported
+   claim. Crumbled suppresses flora/content and owns the void result.
+3. Fixed pre-rendered terrain PNGs all use proof seed 404, while the seed contract promises native
+   hash-derived per-tile texture. Choose one contract: fixed lookup with no seed input, or a finite
+   exported variant bank plus an exact cross-language variant-index algorithm. Native code must not
+   reproduce the JavaScript command renderer.
+4. Separate compressed-file SHA-256 from decoded RGBA pixel SHA-256. The current `sha256` is a PNG
+   byte hash, not the canonical pixel hash required by the accepted asset boundary.
+5. Close the nested JSON schema. Top-level `additionalProperties: false` is useful, but version,
+   tile, input-contract and output objects currently accept arbitrary contents. Add required fields,
+   enums/consts and `additionalProperties: false` recursively, including exact ground, adjacency,
+   kind, owner, dimensions, colour space, alpha and filtering values.
+6. The four exported flora descriptors are conformance examples, not a live flora atlas. Do not map
+   arbitrary `Tile.flora` to them. Native resolves `Tile.flora: InstanceID?` through
+   `WorldRun.flora` to `Flora(id, traits, worldSeed)`; a later adapter/cache must export that exact
+   identity or use an explicitly labelled temporary fallback.
+
+Proof-only outputs that native must not consume as runtime authority remain: sample maps and
+placements, review route/party/site flags, minimap/grayscale/contact-sheet canvases, labels,
+checkerboards, `floraDefaults`/presets and JavaScript command arrays. Content and party PNGs in this
+pack are conformance fixtures unless their exact identity adapter says otherwise. Passability,
+movement cost, sight blocking, reveal, crumble, content ownership and minimap promises remain game
+rules; pixels never become those rules.
+
+#### Corrected map-slice v1 engineering disposition
+
+**Accepted as a native-adapter conformance contract, recommendations only.** The emitted canonical
+manifest hash is `cd402df8c3733a73bc68e81f4fc776ce53e565584a4b695982f1a3b03c966fd7`;
+both focused contract tests pass. All 138 PNG outputs are explicitly `conformanceFixture`, file and
+decoded-pixel hashes are separate, terrain state coverage includes adjacency/elevation/crumble, fog
+is an early composition short-circuit, and the closed live-flora mapping matches Swift's
+`InstanceID(UInt64)`, `FloraTraits` and `worldSeed(UInt64)` fields with two checked vectors. No live
+raw-value or unit mismatch was found.
+
+Before a native renderer can claim deterministic parity, Engineering must define, freeze and fixture
+the mandatory `terrainSeedUInt32` derivation from persisted `mapSeed`, tile coordinates and the full
+immutable version tuple; proof seed 404 is forbidden. Top-down party/character art remains explicitly
+uncovered, so the existing native party overlay stays in place for this slice. This acceptance does
+not turn the conformance PNG set into an exhaustive runtime atlas or authorize consuming proof pages,
+sample maps, JavaScript commands or placeholder flora identities.
+
+### 9 Aug 2026 — terrain dynamic-depth correction
+
+**Settled requirement from Aimee; game-design boundary for the revised AssetLab proof.** The playable
+terrain system is not one canonical coloured sprite per `GroundType`. Each ground owns an assortment
+of compatible feature templates, and every world applies a coherent world-conditioned visual grade.
+Placement variation is deterministic from persisted world/coordinate/version inputs. The prior
+single-output terrain fixtures remain useful conformance examples but cannot stand in for the live
+generative range.
+
+Keep three axes separate:
+
+1. **Ground identity, adjacency and live state** own affordance: passability, shore/deep-water edge,
+   elevation, crumble, cracking and other real interaction grammar.
+2. **World grade** changes the shared palette/material atmosphere from real world readings. It may
+   suggest the world's character, but must not disclose exact hidden values or written rune IDs.
+3. **Placement template** selects mechanically neutral pebbles, grain, clumps, ripples, wear and
+   compatible surface structure. It cannot invent a resource, hazard, route, crack, elevation, site,
+   content marker or false passability cue.
+
+Related ground families within one world share the grade so the map reads as one place rather than
+individually recoloured noise. Across worlds, invariant silhouette/value/edge grammar must keep all
+twelve grounds legible in grayscale, particularly ordinary versus deep water. Authored stations and
+sites may adapt palette/material wear, but procedural variation never distorts their functional
+silhouette identity.
+
+The expanded dynamic-depth audit should evaluate every generated family across authored identity,
+world adaptation, species/item identity, placement/specimen variation, lifecycle/state,
+camera/profile, disclosure, accessibility and deterministic persisted inputs. Any family collapsed
+to one canonical coloured output remains an explicit gap rather than being called complete.
+
+**Template semantic correction:** feature variety remains mechanically neutral. The first catalogue
+draft used names/forms such as rooted soil, duned sand, fractured ice, embered ash, reed-shadowed
+water, tracked mud and shelved chasm. Those collide with separately owned flora, elevation, cracking,
+heat, creature-presence and passability facts. Replace them with neutral microtexture families
+(granular/clodded/layered, ripple/speckle, cloudy/bubbled/striated, fine/coarse/banded,
+wave/dapple, mottled/glossy/ridged, mat/thread and broken-edge/stratified). A decorative template may
+vary surface character; it never supplies evidence for a live layer that is absent.
+
+#### Map-slice v1.1 final engineering verification
+
+**Accepted as the explicit integration-ready terrain/flora conformance handoff, recommendations
+only.** Canonical manifest hash
+`7172f4687d41df2a10f9f99b028ca44c4ee3757907320fd5f0438a2adef172e6` and all 198
+`conformanceFixture` outputs were verified through the focused AJV/export and live-contract tests.
+The immutable tuple is contract 1, terrain 1, flora 1, tile-content 1,
+`world-grade-1.0.0`, `map-slice-1.1.0`, `rect-compositor-0.2.0` and
+`top-down-map-16px-1.0.0`. Strict negative mutations pass at pipeline, flora, vector, grade and output
+levels. The deprecated terrain `speciesSeed` alias is removed by normalization and is not part of the
+runtime request.
+
+The world-grade vectors map cleanly from live readings: thermal/light midpoint means
+`(peak + floor) / 2`, available water is Hydrology's `availableMagnitude`, and Vitality/Substrate use
+`peak`. Geometry remains invariant under grade. No additional live raw-value, field or unit mismatch
+was found. The remaining native obligation is unchanged: define, freeze and fixture the prederived
+`terrainSeedUInt32` from persisted `mapSeed`, tile coordinate and the exact version tuple; runtime use
+of proof seed 404 is forbidden. Top-down party/character rendering remains uncovered and retains the
+existing native overlay for this slice.
+
+#### Map-slice v1.1 minimap disclosure correction
+
+**Verified; supersedes the immediately preceding manifest hash only.** The current canonical hash is
+`05e23c9b233940a1141636cf225d63089c8a7eb8754ba1bf853a6bddefb07a46`; output count remains 198 and
+the pipeline tuple is unchanged. Minimap visibility is now uniformly game-owned: every point of
+interest requires legitimate reveal/discovery, the entrance portal is visible only because its
+starting tile is revealed, and any future bounded knowledge must be explicitly supplied by the game.
+AssetLab infers no exception. The closed schema rejects a `portalException` mutation and the focused
+export test passes. Remaining native obligations are unchanged: freeze/fixture `terrainSeedUInt32`
+with proof seed 404 forbidden, and retain the existing party overlay.
+
+### 9 Aug 2026 — app-launch proof v0.1 disposition
+
+**Recommended for native reproduction; behavior remains governed by
+`app-launch-loading-current.md`.** The paired light/dark phone compositions establish the correct
+fiction: Bookbinder opens an Atlas, rather than generating a particular world. The restrained page
+frame, neutral binding mark and text disclose no Binder face, traveller, site, apex or save state;
+the static composition remains intelligible in grayscale and does not depend on animation or a fake
+progress claim.
+
+Engineering should reproduce the same frame geometry and palette with LaunchScreen-safe native
+constraints, then align the in-app loading view closely enough that the handoff does not jump. The
+mark is decorative and hidden from accessibility; VoiceOver owns the one-time “Opening the Atlas”
+announcement. Do not stretch the frame to chase every safe-area ratio: preserve its centered
+proportions with generous breathing room. This visual acceptance does not accept startup latency;
+cold/warm timing, failure recovery, malformed-save behavior and black-gap video evidence remain
+separate release gates.
+
+#### App-launch proof v0.2 superseding visual disposition
+
+**Accepted for golden/native reproduction.** The revised centered mark reads as an open binding/book
+rather than the ambiguous upright `I` in v0.1. The lossless proof covers light/dark and independent
+grayscale at native 390×844 rendered nearest-neighbour to 2×. Frame, title and restrained copy remain
+legible without a face, world disclosure, motion or progress fiction.
+
+Engineering should reproduce the v0.2 open-book mark in both LaunchScreen storyboard and SwiftUI
+loading surface; the plain `I` plus SwiftUI-only bottom bar is explicitly superseded. Match native
+geometry, not the proof sheet's labels/background. Visual golden status still does not accept timing,
+timeout/Retry serialization, save safety, diagnostics recovery or storyboard-to-first-frame evidence.
+
+### 9 Aug 2026 — mapTopDown character proof v0.1 disposition
+
+**Camera/disclosure direction accepted; golden/native promotion held for one focused readability
+revision.** Direct inspection of
+`AssetLab/artifacts/map-top-down-character-proof-v0.1.png` confirms a straight overhead camera,
+16-pixel bounds, nearest-neighbour color/grayscale evidence, noncanonical Binder color, game-owned
+interaction overlays and no hidden POI markers. Characters do not introduce a face/front-elevation
+baseline or silently own party state.
+
+At native scale, however, the unlabelled identity strip does not yet prove that all six named and
+three generated silhouettes read as people rather than small decor/containers, and Mara's N/S axis
+is too subtle to verify confidently before color. The smallest next proof keeps the integrated sheet
+unchanged and adds a labelled nearest-neighbour inspection strip (derived from the same 16-pixel
+sprites, not a new profile) at 8×: Mara N/E/S/W, the six named people, three generated people and the
+Binder. Strengthen only the shared person grammar and N/S shape cue if that strip confirms the
+ambiguity; preserve identity differences, overhead camera and POI ownership. Do not add faces,
+canonical blue bodies, floating nameplates or equipment-shaped POI glyphs. Recheck the revised
+silhouettes in the original native integrated row before golden promotion.
+
+#### mapTopDown character proof v0.2 final disposition
+
+**Accepted for golden promotion; native handoff remains a separate versioned contract.** Direct
+inspection of `AssetLab/artifacts/map-top-down-character-proof-v0.2.png` confirms that the v0.1
+ambiguity was a real source problem, not merely a labelling problem: its rotated upright paper doll
+and skin-coloured face plane are gone. The revised sprites use overhead crown/headwear occlusion,
+compact shoulders and foreshortened limb/garment geometry. Mara and mantle-heavy Tovin have
+shape-readable N/E/S/W facings in literal grayscale; the six named people, three generated people
+and noncanonical Binder retain a shared person grammar without collapsing their silhouettes.
+
+The native integrated row remains busy by design, but characters read as occupants rather than
+containers when paired with game-owned current/selected/actionable overlays. They do not borrow
+writing, drop, flora, site or portal glyph grammar, and hidden markers remain absent. Promote the
+reviewed fixtures and semantic/bounds tests. Then prepare an exact character adapter/version handoff
+without modifying the already frozen map-slice v1.1 tuple. Engineering should finish terrain/flora
+and disclosure integration first; adding characters is a subsequent bounded slice, not an excuse to
+expand the current native-map checkpoint.
+
+#### mapTopDown character proof v0.3 superseding golden disposition
+
+**Accepted after direct Game Design Lead inspection; supersedes v0.2 for golden promotion.** The
+focused hood/mantle correction removes the remaining hollow face-box topology from Tovin and the
+noncanonical Binder. In literal grayscale their contiguous crown/mantle masses remain recognizably
+people and are now structurally distinct from the nested-square portal, right-angle site and
+multi-legged unknown-creature fixtures shown on the same sheet. Tovin's N/E/S/W axis remains
+shape-readable without restoring a face plane or upright baseline, and the native integrated row
+retains game-owned state overlays and POI clarity.
+
+Promote only the reviewed identities/facings and their exact bounds/semantic fixtures. This is not a
+blanket approval of unreviewed full-cast outputs. The separate character adapter must distinguish
+named travellers, Quill, the player Binder and generated people from real persisted identity; it
+must report missing identity rather than silently inventing a seed. The frozen terrain/flora
+map-slice v1.1 tuple remains untouched.
+
+### 9 Aug 2026 — character-map adapter v1 engineering audit
+
+**Recommendations only; no AssetLab or game code changed.** The separate adapter is the right
+boundary and does not disturb the frozen map-slice v1.1 contract. Its identity taxonomy covers the
+currently relevant human map actors: exact authored `TravellerID`, persisted generated-person
+`visualSeedUInt32`, Binder, and Quill. No fifth native human identity case was found; tamed animal
+companions belong to a later creature-map contract. The exact pipeline tuple, signed world-grade
+units, four cardinal facings, deterministic generated descriptors, and deliberate exclusion of
+calling, statistics, gear, and game-owned overlays are appropriate. Unknown IDs, tuple drift,
+invalid grades, and unavailable Binder/Quill appearances produce structured diagnostics without a
+noncanonical visual fallback. The focused contract test passes.
+
+One AssetLab-side blocker remains before this becomes a safe consumption boundary: the exported
+adapter accepts unknown properties when called without prior JSON Schema validation. For example,
+extra top-level `calling`, identity `stats`, or world-grade fields currently survive and return a
+successful result even though the closed schema rejects them. Either make schema validation an
+unavoidable part of `adaptCharacterMapRequest`, or accept only a branded/validated request through
+the public API. Add direct public-adapter negative tests for excluded and nested extra fields; an
+AJV-only test is insufficient because a native caller can otherwise bypass the intended closure.
+
+Native integration gates are separate from that AssetLab blocker:
+
+- Stationary named travellers have no persisted facing in the current live model. Engineering must
+  freeze and test a canonical default or derivation (and persist it if direction becomes stateful)
+  before constructing this required request field.
+- Generated-person visual identity, Binder appearance, and Quill appearance are not yet persisted
+  in the live model. The adapter correctly diagnoses those absences; native code must not substitute
+  a proof seed or inferred appearance.
+- Reconcile the schema's 28 authored IDs automatically against the live traveller catalogue so a
+  future catalogue addition cannot silently lack a map identity.
+- Treat the adapter's 32-bit request/rectangle/pixel hashes as local conformance diagnostics only.
+  A production export/cache boundary needs canonical SHA-256 over the validated request including
+  the complete immutable tuple; the packager and native verifier must agree on canonical bytes.
+
+Subject to unavoidable schema validation, no additional AssetLab identity case or visual redesign
+blocks the reviewed v0.3 character scope.
+
+#### Character-map adapter v1 closure disposition
+
+**AssetLab boundary blocker closed.** The public adapter now enforces the closed request contract
+without relying on prior AJV execution. Unknown top-level, identity-nested, and world-grade-nested
+fields return structured `unknown-field` diagnostics with exact paths; direct tests cover
+`selected`, `identity.calling`, and `worldGrade.temperature`, and the focused adapter suite passes.
+Exact tuple comparison continues to reject pipeline-version shape or value drift. Character-map v1
+is therefore safe to promote for its reviewed AssetLab scope.
+
+The previously listed native obligations remain integration gates, not AssetLab blockers: define
+stationary-traveller facing, persist generated/Binder/Quill appearance where applicable, reconcile
+the authored ID catalogue, and use canonical SHA-256 plus the immutable tuple for durable export and
+cache identity. No proof seed or inferred appearance becomes canonical through this closure.
+
+### 9 Aug 2026 — first native map visual diagnosis (engineering verification)
+
+**Recommendations only; no game or AssetLab code changed.** Read-only inspection confirms both
+reported causes. `WorldView.TileView` currently draws the same half-point grid stroke around every
+tile after either renderer, which creates universal cell borders outside the accepted asset grammar.
+Perimeter ownership should remain with the adjacency-aware water, deep-water, ice, and chasm
+families; ordinary ground must not receive a separate universal grid outline.
+
+`MapAssetRenderer.TerrainPixelGrammar` also mirrors the current proof elevation treatment as a
+full-width dark brown bottom band plus a full-width highlight. That is the reported dirt bar and is
+not a safe independent native convention. Engineering should hold this portion and mirror the next
+accepted AssetLab contract/hash, where elevation becomes localized, interior, ground-derived height
+cues. Do not change water adjacency while making that correction. This disposition identifies the
+integration mismatch only and does not authorize Asset-side game edits.
+
+#### Map-slice 1.2 terrain-correction handoff
+
+**Engineering disposition; no AssetLab or game code changed.** The regenerated handoff closes the
+elevation blocker. Consume grammar `map-slice-1.2.0` and canonical manifest SHA-256
+`5b23f9e3eec4a424e99dc564c5a0080f280f284114997c350c76d7d2b89a3102`. The other tuple members and
+198-output boundary remain unchanged. Elevation levels 1–3 now add paired, strictly inset contour
+steps from the tile's graded ground palette; they contain neither a full-width/full-height cue nor
+the legacy fixed brown. Water, deep-water, ice, and chasm adjacency edges are unchanged.
+
+The exact Engineering-owned native change set is deliberately narrow:
+
+1. Remove `TileView`'s unconditional `Rectangle().stroke(Palette.mapGrid...)`. Do not replace it
+   with another universal tile border; adjacency-aware terrain commands own the permitted edges.
+2. Pin `MapAssetContract.manifestSHA256` to the hash above and change only the grammar member of its
+   tuple from `map-slice-1.1.0` to `map-slice-1.2.0` (including the stale 1.1 documentation label).
+3. Replace only the native elevation-band block with the AssetLab loop: for each level below the
+   tile elevation, place a five-pixel dark contour at `(2 + 3*level, 12 - 3*level)` and a three-pixel
+   light contour one pixel right and one pixel above, using the already graded `palette[0]` and
+   `palette[2]`. Preserve command ordering after adjacency edges and before later overlays.
+4. Update the frozen terrain-seed vector expectations because the current derivation includes the
+   complete tuple; the grammar-version bump intentionally changes its FNV payload. Do not retain
+   old expected values or introduce proof seed 404. Then run the existing every-terrain-output
+   SHA-256 conformance test, which should validate all elevation levels and unchanged adjacency
+   families against the regenerated manifest.
+
+This handoff does not authorize changes to ground facts, adjacency calculation, fog short-circuit,
+flora, disclosure, overlays, minimap semantics, or output roles. One expected consequence should be
+made explicit in Engineering notes: because terrain seed derivation includes the full tuple, this
+grammar bump retextures deterministic noise on all native tiles, not only elevated tiles, while
+remaining stable thereafter for the new tuple.
+
+#### Map-slice 1.2 pre-golden chasm correction
+
+**Hold native integration pending Design's integrated elevation-readability review.** Chasm is
+missing ground and therefore cannot carry elevation. AssetLab now suppresses elevation commands for
+chasm and omits the three impossible chasm-elevation conformance fixtures. The candidate remains
+grammar `map-slice-1.2.0`, now with 195 outputs and manifest SHA-256
+`6d0c21206a983d024a4b948fe7008a2be89676e5c934efa3f84bc8b194fd7996`. This candidate supersedes
+the 198-output `5b23f9e3eec4a424e99dc564c5a0080f280f284114997c350c76d7d2b89a3102` pack, but must not yet be
+pinned by native code. Full AssetLab tests pass with regression 0/224. Engineering should wait for
+the reviewed golden hash; the previously specified universal-grid removal and native inset-contour
+mirror remain the expected bounded change after approval.
+
+### 10 Aug 2026 — true elevation extrusion native-boundary assessment
+
+**Recommendations only; read-only review, with no game or AssetLab changes.** A true lifted surface
+cannot be represented faithfully by the current 16×16 raster inside a fixed square `TileView` while
+keeping flora, cracks, content and actors in separate unshifted SwiftUI overlays. The present raster
+clips every command to 16×16, `MapTileArt` expands that image to the cell, and every overlay is
+centred in the original cell. Simply moving terrain pixels upward would clip the surface and leave
+game-owned objects apparently floating below it.
+
+The smallest safe contract is one bottom-anchored tall terrain/composite sprite, not a larger map
+cell. Freeze these geometry facts in the next contract tuple:
+
+- logical footprint remains 16×16 and owns the unchanged tap/hit cell;
+- one integer `riserPixelsPerLevel` and `maximumElevation = 3` define
+  `maximumRiserPixels`; the raster canvas is exactly `16 × (16 + maximumRiserPixels)`;
+- the cell/base pivot is the bottom 16×16 footprint. For elevation `e`, surface commands authored at
+  `(x,y)` render at `y + maximumRiserPixels - e*riserPixelsPerLevel`; the exposed south face fills
+  from the lifted surface's bottom edge down to the base footprint's bottom using that ground's
+  already world-graded palette, never a fixed brown/material;
+- chasm and unrevealed fog force elevation zero. Fog fills only the logical 16×16 footprint at the
+  bottom of the tall transparent canvas, then short-circuits, so height cannot leak through fog;
+- flora and every surface-owned warning/content/route/actor anchor use the same surface transform.
+  Sidewall pixels render after the lifted ground surface but before surface occupants. Game-owned
+  SwiftUI overlays must receive the resolved surface offset; keeping their present cell-centred
+  placement is invalid;
+- cache identity and conformance hashes include canvas dimensions, pivot, riser constant, elevation,
+  full tuple and decoded pixels. Provide cross-language fixtures for every ground at elevations 0–3,
+  fog/chasm suppression, and at least north/south neighbour height differences.
+
+The existing per-tile `VStack`/`HStack` can support a bounded first implementation without replacing
+the map with one monolithic canvas, but not unchanged. SwiftUI offsets do not affect stack layout and
+stacks do not reserve overflow. Engineering must render each tall image bottom-aligned to its square
+cell, reserve `maximumRiserPixels` of scaled headroom above the map (or the north row will be clipped
+or overlap surrounding UI), and explicitly establish painter order by map row so southern rows draw
+over northern rows. Do not rely on incidental `ForEach` sibling ordering; assign row `zIndex` from
+world `y`. The map's outer container should clip only after including the reserved headroom, while
+the individual cells must not clip their upward overflow. Hit testing remains on the square logical
+cell through `contentShape`.
+
+Overlay ownership is the largest current blocker. Terrain and flora are combined in
+`MapPixelRaster`, but cracks, player, enemies, sites and other content are separate `TileView`
+children. Each must either (a) be composed into a typed tall tile layer in the accepted semantic
+order, or (b) share one exact pixel-to-point surface-offset transform and row painter order. The
+latter is the smaller native change, but it requires moving all surface overlays together and
+separating alert badges that intentionally float above an actor. A mixed policy will cause cracks,
+routes or characters to sit on the riser/base instead of the lifted surface.
+
+Before promotion, require an integrated native-scale fixture with elevation 0/1/2/3 north-south
+neighbours, multiple ground materials, flora, crack, route, site, enemy and party; verify color,
+grayscale, fog, top-row containment, tap ownership and row occlusion. The current 195-output inset-
+contour candidate must remain unpinned: true extrusion changes renderer dimensions, pivot, hashes and
+composition semantics and therefore requires a new grammar/profile version rather than a silent
+replacement under `map-slice-1.2.0`.
+
+#### Lifted extrusion candidate v0.1 engineering audit
+
+**Recommendations only; no code changed.** The separate 16×19, bottom-pivoted candidate proves the
+right basic native geometry: a complete 16×16 top surface shifts upward by one pixel per elevation
+level, the exposed south face belongs to the elevated centre tile and uses its graded material
+palette, and surface overlays can share the same translation. Keeping it outside the current map
+handoff is correct. It is not yet a closed integration API.
+
+Current AssetLab blockers before the integrated 5×4 proof:
+
+- `southElevation` and caller-overridable `maxElevation` are permissive authoring options, not safe
+  runtime facts. They clamp/round arbitrary values and allow callers to change canvas geometry. The
+  renderer must own fixed geometry; native must supply one schema-validated resolved neighbour fact.
+- Hidden ordinary ground retains its elevation, so the current candidate shifts the 16×16 fog fill
+  upward and can leave transparent base pixels, disclosing height. Crumbled raised ground similarly
+  produces a floating crumbled surface. Resolve rendered elevation to zero before geometry whenever
+  visibility short-circuits or the ground state no longer supports a raised surface, as already done
+  for water, deep water and chasm. Add pixel/bounds tests for unrevealed and crumbled inputs at all
+  authored elevations.
+- `liftedSurfaceLayerCommands` accepts arbitrary command arrays and silently shifts all of them. The
+  eventual request/layer contract must enumerate surface-owned layers; badges or other screen-space
+  overlays must be anchored relative to their actor after the actor shifts, not blindly treated as
+  ground commands.
+
+The smallest closed neighbour contract should expose a resolved south-face delta, not the south
+tile's unconstrained elevation. Recommended exact field:
+
+`southExposureLevels: 0 | 1 | 2 | 3`
+
+Engineering derives it after ground-state and visibility resolution as
+`max(0, renderedCentreElevation - renderedSouthElevation)`. The input schema is closed and fixes
+`maximumElevation = 3`, `riserPixelsPerLevel = 1`, canvas 16×19 and bottom pivot `(8,18)` in the
+immutable profile; none are request options. A concealed south neighbour must resolve through an
+explicit visibility policy without reading hidden elevation—recommended `0` exposure until that
+neighbour is revealed. Map boundary policy must likewise be explicit and fixture-backed rather than
+masquerading as elevation zero; recommended boundary exposure is `0` for this first proof so the map
+edge does not invent a cliff. If Design later wants an exposed world edge, add a distinct boundary
+enum and version the contract.
+
+Draw order for the integrated proof and native mirror should be contractual:
+
+1. rows paint north to south, with explicit world-`y` z-order;
+2. within a tile: lifted top surface, then its exposed south sidewall;
+3. surface-owned flora and neutral decoration;
+4. crack/warning;
+5. content/site/route/action and actors in the already accepted semantic order, all translated by
+   the same `surfaceOffsetY`;
+6. actor-relative floating badges after their actor.
+
+Later southern rows naturally occlude northern overflow and sidewalls. Hit ownership remains the
+unshifted logical 16×16 cell. The 5×4 acceptance artifact should include north/south rises and drops,
+equal terraces, a concealed neighbour, a boundary tile, a crumbled raised input, water/chasm, mixed
+ground palettes, flora, route, crack, content and actors in color/grayscale. It should assert no
+transparent hole in any logical footprint, no hidden-height pixel difference, and exact back-to-front
+occlusion. Only after that proof passes should the candidate receive a new schema, tuple, manifest
+hash and native-consumption role.
+
+#### Lifted extrusion candidate API re-audit after closure fixes
+
+**Recommendations only; no code changed.** The three previously reported implementation defects are
+substantially closed. Geometry is frozen as `terrain-lifted-1.0.0` (16×19, pivot 8/18, logical
+16×16, elevation maximum 3, one-pixel riser); hidden, crumbled, water, deep-water and chasm inputs
+resolve to elevation zero; and the surface transform rejects a floating alert badge while accepting
+only named surface-layer channels. Focused tests pass, including hidden/crumbled levels 1–3 and
+invalid exposure bounds. Fog no longer moves according to hidden elevation or leaves the logical
+base footprint uncovered.
+
+Two strictness issues should close before this API becomes the native handoff rather than a proof
+helper:
+
+- `southExposureLevels` still defaults to zero when omitted. A production request must require the
+  resolved neighbour fact; omission should produce a structured missing-field diagnostic rather than
+  silently suppress a real wall.
+- The renderer currently applies `min(resolvedCentreElevation, southExposureLevels)`. This prevents
+  out-of-bounds pixels but silently accepts an impossible fact such as exposure 3 on elevation 1.
+  Reject exposure greater than the resolved centre elevation (and require zero whenever centre
+  elevation is forced to zero) so an adapter error cannot become plausible but incorrect art.
+
+These checks belong in a closed request schema/public adapter with exact version tuple and structured
+diagnostics; the existing permissive terrain normalizer remains appropriate for authoring previews,
+not for native consumption. Add direct API negatives for omitted exposure, inconsistent exposure,
+extra request fields and tuple/profile drift.
+
+After those checks, the remaining gates are evidence/export gates rather than a geometry redesign:
+the Design-requested integrated 5×4 neighbour/occlusion proof; explicit north-to-south row-order and
+surface-layer-order assertions; and a conformance manifest containing canonical SHA-256, decoded
+pixel hashes, fixed dimensions/pivot, closed layer enums, resolved-elevation/exposure vectors and
+the same visibility/boundary policies. The proof caller must derive exposure from **resolved** centre
+and south elevations, not authored raw elevation. Boundary and concealed-neighbour exposure zero is
+acceptable for v1 when stated in that contract. Do not ask native Engineering to consume the helper
+or artifact directly before these gates pass.
+
+#### Map-slice v1.1 bounded contract correction
+
+Engineering consumption must use canonical manifest hash
+`f776ae97f252f462570014ca81d06df40e5a6de82aaa06c53671310e1912c28d`; it supersedes
+`05e23c9b233940a1141636cf225d63089c8a7eb8754ba1bf853a6bddefb07a46`. The immutable pipeline
+tuple, 198-output set, and renderer pixels are unchanged. Fog metadata now distinguishes the
+transparent conformance sentinel from the compositor-owned invariant `#17171a` fill and confirms
+that composition short-circuits after that fill. Cardinal adjacency is now exact: a bit is set only
+when the in-bounds N/E/S/W neighbour has the same `GroundType` raw value as the centre; out-of-bounds
+or different-ground neighbours clear it. Closed-schema and same-ground fixtures pass; regression
+remains 0/224.
+
+### 9 Aug 2026 — terrain border/elevation grammar 1.2.0 design review
+
+**Disposition:** recommendations only; accept the user-reported border/bar correction, with one
+semantic proof and one invalid-combination correction before treating elevation as a complete visual
+golden.
+
+The representative native exports confirm that ordinary soil, sand, stone, rubble, mud, ash, growth
+and groundcover no longer receive a universal perimeter. Elevation no longer draws the rejected
+full-width brown dirt bar: levels 1–3 add strictly inset paired contour steps using each ground's own
+dark/light palette. Water, deep water, ice and chasm retain sole ownership of adjacency perimeter
+edges, and those edge commands remain unchanged. This directly resolves the reported visual defect
+without turning every tile into a bordered platform.
+
+Two follow-ups remain:
+
+1. **Prove relational height, not only command inequality.** On several native tiles—especially
+   water/deep water, stone and growth—the small paired marks can read as ordinary ripples, cracks or
+   texture when viewed alone. Add one compact integrated strip of adjacent elevation 0→1→2→3 tiles
+   for a dry family and one wet/vegetated family, with the same seed/grade, in colour and literal
+   grayscale. The contour staircase should read across tile relationships while no perimeter appears.
+   Include one route/content overlay to prove the inset cue remains visible without taking semantic
+   ownership from the occupant. Pairwise hashes remain useful but are not a perceptual height test.
+2. **Do not draw a ground contour inside chasm.** Chasm's settled meaning is missing ground, not a
+   low dark substrate. Requiring elevation 1–3 cues for all twelve grounds makes the void contain
+   ledge-like interior marks and implies occupiable surface. Reject/suppress nonzero chasm elevation
+   at the validated render boundary (or prove a distinct authored rim owned by neighboring tiles,
+   not the chasm interior). Update the all-ground elevation assertion to reflect legitimate resolved
+   combinations rather than celebrating mechanically distinct invalid states.
+
+This does not request restoration of the brown bar, universal outlines or changed water/chasm
+adjacency masks. The regenerated 198-output pack and reported manifest hash may remain the current
+correction candidate; promote grammar 1.2.0 after the relational strip passes and chasm cannot emit an
+interior elevation cue. The reported full-suite and 0/224 regression results are noted.
+
+### 10 Aug 2026 — lifted-surface elevation contract recommendation
+
+**Disposition:** recommendations only; adopt Aimee's lifted-complete-surface direction and supersede
+the inset-contour candidate as the intended elevation grammar. Do not implement it as another band
+inside a clipped 16×16 tile.
+
+#### Camera and geometry contract
+
+- Keep the map's straight top-down footprint and cardinal grid. Elevation adds only a consistent
+  **downstage/south-facing low terrace face**; it does not introduce isometric x-offset, diagonal
+  rhombi, perspective convergence or side-view terrain objects.
+- One elevation unit should be a small fixed riser (start with 1 native pixel per level; levels 0–3
+  therefore expose at most 3px). Current movement ignores elevation, so the result must read as a
+  traversable terrace/grade rather than an impassable cliff. Do not increase wall height merely for
+  drama without changing gameplay authority.
+- Translate the complete 16×16 top surface upward by `elevation × riserHeight`. Terrain texture,
+  adjacency-owned shoreline/ice/chasm edge pixels, crack, route and tile content all keep their
+  top-surface relationship and anchor to the translated plane. Assert pixel equality against the
+  elevation-0 top after translation; elevation must not repaint or crop the surface.
+- Fill only the genuinely exposed gap with a wall derived from the **higher tile's resolved surface/
+  substrate material** and world grade, normally a darker/lighter pair from that palette. No legacy
+  brown, timber posts, universal outline, per-tile end stakes or full-width bar may appear. Adjacent
+  equal-height, same-material wall spans should merge continuously rather than advertising 16px tile
+  boundaries.
+
+#### Adjacency ownership
+
+1. Equal elevation: no elevation seam or wall. Same-ground surfaces join continuously; different
+   grounds use only their existing terrain-transition grammar.
+2. Different elevation north/south: the higher surface owns the exposed low riser facing the lower
+   surface. Wall height equals the exact elevation delta; material comes from the higher surface.
+3. Different elevation east/west: show only the silhouette/lip/end-cap necessary to close the terrace
+   geometry. Do not draw a second full lateral wall or vertical stake line. An L-shaped plateau must
+   remain watertight without making every east/west boundary a border.
+4. A route crossing a height change must remain continuous across the translated top and short riser
+   so the art does not falsely claim the legal move is blocked. The riser is not a new ramp/stair
+   mechanic and cannot alter passability or movement cost.
+5. Tile content, flora and people stand on the lifted top; selection/hit ownership follows the lifted
+   visual while logical navigation remains on the original grid coordinate. No actor may appear
+   embedded in the wall or on the unshifted baseline.
+
+#### Invalid and deferred cases
+
+- **Chasm:** no top surface and no elevation value. Reject/suppress nonzero chasm elevation. A visible
+  rim or cliff face is owned by an adjacent solid higher tile, never painted inside the void.
+- **Water/deep water:** do not extrude them as solid blue blocks in the first contract. Normalize them
+  to surface elevation 0 until waterfalls, raised basins or water-level transitions have explicit
+  gameplay/render facts. Deep water remains depth, not height.
+- **Ice:** include one review case only if it is treated as a solid traversable shelf with an ice-
+  material riser. Otherwise keep it at water-level elevation 0; do not silently choose between those
+  meanings in the renderer.
+- Growth/groundcover walls require the resolved underlying substrate/material. Vegetation remains on
+  the lifted top and cannot turn the exposed wall into a green hedge unless the live tile facts
+  explicitly describe one. If the substrate is unavailable, defer those combinations rather than
+  falling back to generic dirt.
+
+#### Rendering/export consequence
+
+The current clipped per-cell `MapTileArt` cannot express this truthfully. Use a taller anchored asset
+or map-wide compositor with top overflow of at least `maxElevation × riserHeight`, explicit top-plane/
+logical-cell anchor metadata, and back-to-front row composition. Do not squeeze, crop or offset the
+surface within 16×16. Terrain planes/walls render first; top-surface overlays and occupants then use
+the translated anchor; UI overlays remain last. Native Engineering must later prove unclipped layout,
+row ordering, hit testing and scroll/container behavior before consuming the profile.
+
+#### Smallest proof
+
+Build one native composed 6×4 terrace sheet, not isolated tile icons:
+
+- a same-material soil plateau spanning several tiles at elevations 0/1/2/3, including one continuous
+  front wall with no tile stakes;
+- soil beside stone at equal and unequal elevations, proving the higher material owns the face;
+- one L-shaped plateau exercising north/south and east/west joins;
+- one route and one person/resource/site occupant crossing or standing beside a height change;
+- chasm adjacent to solid height with no pixels inside the void;
+- optional solid ice shelf, clearly labelled as that chosen meaning; and
+- identical native colour and literal-grayscale panels at phone scale.
+
+Acceptance requires: complete top-surface translation equality, no universal perimeter/brown band,
+continuous same-material wall spans, exact delta-height faces, legal route readability, lifted content
+anchors, no water/deep-water blocks, and no chasm interior elevation. This proof necessarily precedes
+native integration; it is not a request to modify game passability, camera or elevation rules.
+
+#### Lifted strictness closure and economy-station proof engineering recheck
+
+**Recommendations only; file/artifact review only. No game, AssetLab, or Simulator changes.** The
+lifted helper now requires an exact one-field exposure object, rejects omitted/extra/non-integer/
+out-of-range exposure, rejects exposure greater than resolved centre elevation, and requires zero
+for every forced-zero state. Focused tests pass. The two remaining API strictness blockers are
+closed. Candidate golden still depends on Design's latest integrated terrace proof above; native
+handoff still needs its closed schema, immutable tuple, canonical hashes and fixture vectors. This
+does not authorize native consumption of the proof helper.
+
+One source-level semantic dependency from the latest Design review remains unresolved by strictness:
+`growth` and `groundcover` currently choose their green family palette for an exposed wall. If those
+live ground values describe vegetation over substrate, the renderer needs a resolved underlying-wall
+material input and must not invent a hedge-like green riser. Likewise, ice elevation remains a
+design-owned solid-shelf decision. Exclude those combinations from golden/export until those facts
+are settled or supplied; the strict exposure field alone cannot resolve material ownership.
+
+The new authored `trading_post` and `recycler` built silhouettes are a sensible playability-roadmap
+start. They use the settled Trading Post ID with no `exchange` alias; whole-mass grayscale tests and
+the proof distinguish both from Storehouse, Workshop and Blacksmith; built/tier-3/damaged states are
+shape-distinct; and staffing does not mutate station geometry. The artifact makes no live integration
+claim, appropriately, because neither station exists in the current game catalogue.
+
+One proof-coverage gap remains against the roadmap wording: the artifact shows built, tier stress and
+damaged, but not foundation. Source currently returns the same generic foundation commands for both
+new stations. Before calling their lifecycle evidence complete, either show that shared foundation
+and record pre-identity construction grammar as intentional, or author functionally distinct
+foundations and compare them in native color/grayscale. Keep tier additions physical as well: the
+Trading Post horizontal accent and Recycler vertical accent should be reviewed at native scale as
+structural additions, not generic colored state badges. These are AssetLab evidence questions only;
+live station and economy-rule DTOs remain Engineering-owned.
+
+### 10 Aug 2026 — Resource v0.5 native-handoff engineering audit
+
+**Recommendations only; read-only review. No code or Simulator changes.** Design's timing and
+composition boundary is coherent: version `resource-sheen-1.0.0`, 360 ms ticks, four moving frames
+plus four quiet ticks, frame 0 under Reduce Motion, and placement after the resolved resource body
+but before route/selection/party/UI. Pairwise silhouette tests cover all map resource families and
+all 23 inventory identities, and focused tests prove moving sheen pixels remain inside the supplied
+resource/cue footprint. Three integration blockers remain before native consumption.
+
+1. **Freeze the native phase key and hash bytes.** Live `ResourceNode` has no instance ID; tile
+   position is the available stable placement identity. Define one exact public ASCII key from the
+   persisted run identity plus coordinate (for example `run:<decimal>/tile:<x>,<y>`), rather than
+   coordinate alone, node fields, Swift `hashValue`, or an AssetLab proof string. Pin the FNV-1a
+   algorithm/encoding with cross-language phase vectors, including negative coordinates if legal.
+   The current JavaScript helper accepts any string/number and hashes JavaScript character units;
+   native parity is not specified for arbitrary text. A canonical ASCII key removes that ambiguity.
+
+2. **Make state/profile exclusions unavoidable.** `resourceSheenCommands` clips whatever command
+   list a caller supplies. It does not itself reject Mote, exhausted bodies, fog/minimap commands or
+   a zero/invalid public ID; Mote passes today only because its test supplies an empty list. Expose a
+   closed public request/adapter that resolves a world body's eligibility from exact resource ID,
+   revealed state, remaining state and world profile before producing sheen. It must return no sheen
+   for Mote, exhausted, fog, minimap, absent body, and any disallowed acquisition profile, with
+   direct negative tests. Raw Essence may animate only through its accepted revealed remaining
+   `wildDrop` body, never through a fabricated node.
+
+3. **Export a verifiable body+sheen contract.** The animation constant is frozen, but distinct
+   `resourceWorldCommands` silhouettes currently have no closed schema/version tuple or native
+   conformance vectors. Native cannot prove that its body mask—and therefore its clipped sheen—
+   matches AssetLab from the test suite alone. Publish at least representative mineral, flora cue,
+   unstable Rift-glass and Raw Essence vectors with canonical request, rectangle and decoded-pixel
+   hashes, plus the 23-ID/raw-value reconciliation. Include remaining versus exhausted and the four
+   active frames. Until then, Design acceptance is a visual golden, not an integration-safe renderer
+   handoff.
+
+For the native compositor, use one map-level tick source rather than a timer per tile, read the
+system Reduce Motion environment, and retain the exact game-owned reveal/remaining checks before
+requesting a frame. This avoids synchronized flashing, unnecessary full-grid timer ownership and
+disclosure leakage while preserving the accepted layer order.
+
+#### Resource sheen v1.1 closure re-audit
+
+**Recommendations only; read-only review. No code or Simulator changes.** The phase-key, FNV-1a
+UTF-8 encoding, UInt64 decimal transport, 23-ID fixture, exclusion routing and representative
+command/decoded-RGBA hashes close the prior cross-language and evidence gaps. Phase vectors include
+maximum UInt64 and negative coordinate transport; Ore, Fiber, Rift-glass and Raw Essence cover the
+important body families, exhausted state and all four active frames. Focused tests pass.
+
+One production-boundary blocker remains: `resourceMapSheenCommands` accepts an arbitrary
+`bodyCommands` array from its caller. Checking `bodyKind` against the resource acquisition kind does
+not prove that those commands are the accepted revealed remaining body for that resource. A caller
+can label fog, minimap, exhausted, unrelated-resource or invented commands as `resourceCue` and the
+adapter will sheen them, so the advertised exclusions and alpha clipping are not yet unavoidable.
+The production API should either resolve body commands internally from the exact resource/context,
+or accept only an opaque/branded output from the frozen resource-body renderer and verify its
+resource ID, profile, state and hash. Add direct negatives for mismatched resource body, minimap/fog
+commands and exhausted-body commands disguised as `state: remaining`. After that, no further
+AssetLab-side resource-sheen blocker was found; native still owns the single map-level clock, Reduce
+Motion environment and accepted compositor layer order.
+
+#### Lifted terrain v1 contract and neutral-foundation final engineering disposition
+
+**Recommendations only; read-only review. No code or Simulator changes.** The AssetLab lifted-
+terrain boundary is ready for candidate-golden/native adapter work. The Draft 2020-12 schema is
+closed at request, tuple and world-grade levels; the public adapter independently enforces closure,
+exact live ground values, Boolean/unit ranges, immutable tuple, required resolved exposure and the
+cross-field forced-zero/exposure rule with structured diagnostics. Ice, growth and groundcover now
+join water, deep water and chasm as forced-zero pending explicit shelf/substrate facts. Focused
+schema/adapter negatives pass.
+
+The two fixed vectors correctly pin canonical-request, rectangle-command and 16×19 row-major pixel-
+token SHA-256 values for distinct terrain/grade/elevation/crack cases. Their declared limitation is
+truthful: `pixelTokenSha256` is conformance-only, not a decoded RGBA or PNG hash. Native Engineering
+may use these vectors to build and cross-check the adapter, but production asset/export promotion
+still requires the integrated Design-approved terrace proof and, if PNGs become the consumption
+boundary, file plus decoded-RGBA SHA-256 fixtures. Do not substitute the helper's 32-bit hashes for
+durable cache identity.
+
+The economy-station artifact now explicitly shows the identical neutral pre-identity foundation and
+states that station identity begins when built. That closes the earlier evidence ambiguity: the
+shared foundation is intentional, visible, and not used to identify either station. Built Trading
+Post and Recycler remain whole-mass distinct in native grayscale, staffing remains an independent
+occupant, and tier/damage stress remains covered. This AssetLab proof is ready for its stated authored
+station scope; it does not claim live catalogue, economy-rule or screen integration.
+
+### 10 Aug 2026 — opening-economy station identity proof disposition
+
+**Disposition: recommendations only.** Direct review of
+`AssetLab/artifacts/economy-stations-proof-v0.1.png` and its source fixtures accepts this narrow proof
+for golden promotion. The five unlabeled native-grayscale silhouettes are distinguishable by whole
+mass and negative space: the Trading Post is an open, balanced canopy/counter with separated stock
+masses; the Recycler is an asymmetric dismantling line with a tall intake and offset separation
+bench; the Storehouse remains a broad enclosed storage body; the Workshop is a long workbench with a
+raised tool/chimney mass; and the Blacksmith retains its heavy forge/chimney profile. Trading Post and
+Storehouse share an architectural vocabulary appropriate to the village, but they do not collide at
+native size: open counter versus enclosed central body is the dominant read before emblem or color.
+
+The Trading Post built, tier-stress and damaged examples preserve the same merchant-workspace
+identity without drawing coins, conversion arrows, or a generic exchange device. Its form therefore
+promises a staffed counter and visible stock, but makes no hidden claim about exact eligibility,
+prices, quantities, refresh timing, or resource-to-resource conversion. Player-facing and manifest
+identity remains **Trading Post / `trading_post`**; the explicit rejection of `exchange` is correct.
+The Recycler likewise remains a physical intake/separation workspace through tier and damage, not a
+Blacksmith, Storehouse, or magical conversion badge. Its silhouette does not claim which item is
+eligible or what recovered material will result; those facts remain disclosed by the transaction UI.
+
+Tier additions and damage cuts are subordinate physical changes rather than replacement badges, and
+both stations remain recognizable in grayscale across all three reviewed states. Staffing is
+correctly outside station geometry: staffed and unstaffed hashes are identical, so Vance, Noll, or a
+future valid keeper must be a separately rendered visible occupant/accent and cannot recolor or
+reshape the building into a different station. Promotion should retain the existing collision,
+state-inequality, bounds, palette-invariance, no-`exchange`, and staffing-equality fixtures. No
+broader station redesign or additional economy symbol is requested.
+
+### 10 Aug 2026 — equipment item-grid bridge v0.2 disposition
+
+**Disposition: recommendations only.** Direct visual and source review accepts
+`AssetLab/artifacts/equipment-grid-bridge-proof-v0.2.png` as the candidate proof for this narrow
+sole-tester equipment-grid boundary. The default button, rendered heading, count, color tiles and
+literal-grayscale tiles now agree on the exact Weapon filter. The resolver audits All and all eight
+live serialized slot values, including player-facing **Body** for `armor` and **Off-hand** for
+`offhand`; filtering remains navigation and does not mutate item ownership.
+
+The Worn Mara Pointed Blade is a clear pinned comparison baseline. Stored, Worn, safe home Overflow
+and current-world Carried each occupy the same independent badge channel but now combine full text
+with a distinct small shape, so ownership survives grayscale without recoloring or rerolling the
+item icon. Overflow reads as a safe waiting location under a full Storehouse, with no loss glyph;
+Carried states that the item is in the current world and unavailable at home, and never implies
+Worn. The one-column accessibility-large example preserves name, slot, owner/location and exact
+comparison without clipping.
+
+The four labelled location snapshots correctly represent review snapshots rather than four
+simultaneous copies: one stable instance ID, one family and one icon hash persist while location
+changes mutually exclusively. Tests also pin the Worn Mara baseline and exact signed comparison
+strings (`current · 6 damage`, `−2 damage`, `+1 damage`, `+0 damage`), while rejecting a green/red or
+generic “better” claim. This is truthful comparison evidence, not an assertion that reach,
+availability or unknown properties can be collapsed into one quality rank. Unknown properties stay
+unknown and provenance remains inspection text when legitimately known.
+
+Promote with the focused resolver, slot-name, stable-identity, baseline and signed-string fixtures.
+This acceptance covers AssetLab item/tile/location grammar only; live Storehouse actions, capacity,
+transaction eligibility, VoiceOver implementation and native adaptive layout remain Engineering/UI
+integration responsibilities. No additional icon family or grid redesign is requested.
+
+### 10 Aug 2026 — six-across equipment and Pointed Blade checkpoint disposition
+
+**Disposition: recommendations only.** Direct review accepts
+`AssetLab/artifacts/equipment-six-across-proof-v0.3.png` as the current equipment-grid candidate and
+retires the earlier two-column v0.2 card proof to history-only status. Exactly six compact icon cells
+fit each 390pt phone row. Grid cells carry item shape, quantity, location, unknown state, rarity and
+selection without names underneath; the tapped detail correctly owns full name, known provenance,
+known stats, quantity, location and available actions. The All view and eight exact slot filters
+remain resolver-backed.
+
+Selection and rarity now remain independent in grayscale: an ordinary item is selected beside an
+unselected fine item in the color proof, and the combined selected-plus-fine case preserves a strong
+outer selection edge plus the separate inner fine border. Unknown and singular corner grammar do
+not replace those channels. The selected Worn Mara Pointed Blade now offers **Take off** and
+**Inspect**, never Equip. Resolver fixtures correctly give Stored **Equip**, safe Overflow **Store
+first**, and current-world Carried **Unavailable**, each retaining Inspect. These actions express
+location truth and do not mutate item identity.
+
+Direct review also accepts
+`AssetLab/artifacts/blacksmith-pointed-blade-checkpoint-proof-v0.1.png` for its narrow first-craft
+checkpoint. Empty names the two missing sample requirements; Shortfall shows selected sample
+identities, Essence `8 / 12`, and that nothing was consumed; Ready provides an exact Pointed Blade
+preview and **Review craft**; Confirm alone names the destructive losses and uses **Confirm craft**;
+Result records new instance `#9001`, Stored location, wallet `24 → 12`, removed inputs and **View
+stored**. The sequence makes no reforge claim and does not expose hidden provenance.
+
+Promote both proofs with the six-column, filter, orthogonal selection/rarity, location-action and
+transaction-state fixtures. This accepts AssetLab visual/semantic grammar only; native action
+availability, transactional atomicity, dynamic type, VoiceOver and save/reload persistence remain
+Engineering integration gates. No additional visual correction is requested.
+
+#### Resource sheen v1.1 final closure
+
+**AssetLab integration blocker closed; read-only recheck, with no code or Simulator changes.** The
+production adapter now derives the canonical remaining world-body silhouette from the exact resource
+ID and required body kind before considering sheen. Rift-glass resolves through unstable context and
+Raw Essence delegates to the accepted `wildDrop` body. Caller geometry must match that canonical
+silhouette; a disguised full-tile/fog mask now rejects with `resource-sheen-mask-mismatch`, while
+state/reveal/discovery exclusions still short-circuit to no sheen. The focused resource contract and
+conformance tests pass. No remaining AssetLab-side resource-sheen handoff blocker was found. Native
+Engineering retains the documented obligations for one map-level clock, Reduce Motion, persisted
+phase facts, exact fixture parity and compositor layer order.
+
+### 10 Aug 2026 — resource world-conditioning ownership recommendation
+
+**Recommendation only.** World conditioning belongs to the map presentation, not persisted resource
+identity. Resource family geometry, negative space, internal value ordering and canonical inventory
+palette remain stable. Terrain and exact host flora continue to receive their existing `worldGrade`;
+an on-map resource body or harvest cue may receive the same versioned, bounded environmental color
+transform only as local lighting. The transform must preserve the family’s signature hue/value
+relationships and minimum contrast against its resolved substrate or host. If a grade would collapse
+that contrast, clamp the transform while retaining a family-stable outline/highlight rather than
+changing silhouette or choosing a different semantic color.
+
+`worldGrade` may derive only from legitimate world-level visual facts. It must never encode resource
+rarity, grade, yield, eligibility, danger, provenance, exhaustion timing or other hidden properties.
+The same resource rendered in two worlds may therefore look warm/cool/dimly lit while retaining
+identical commands and grayscale silhouette; its neutral inventory/inspection icon remains the
+canonical ungraded identity. Flora-linked cues grade independently as resource accents over the
+already graded, unchanged host species. Exhausted remnants use the same bounded lighting rule but do
+not sheen. Mote remains inventory-only; Raw Essence retains the accepted `wildDrop` geometry and
+should receive map lighting only through that body’s shared presentation contract, not a special
+resource-only recolor.
+
+Sheen remains a disclosure-neutral luminance overlay after grading, clipped to canonical
+resource/cue pixels. Its cadence, mask and relative brightness do not vary with `worldGrade` or any
+resource property. A later proof should assert geometry equality across extreme accepted grades,
+family separation in literal grayscale, contrast floors on representative substrates/hosts, and
+canonical neutral inventory pixels. No new resource descriptor axis is required.
+
+### 10 Aug 2026 — Trading Post/Vance semantic fixture engineering audit
+
+**Recommendations only; read-only review. No code or Simulator changes.** This fixture must remain
+non-integration-golden. Its broad interaction grammar is useful, but the current contract and artifact
+make several claims that are not backed by live DTOs.
+
+Current AssetLab contradictions/unsafe claims:
+
+- `tradingPostContract` presents `persisted-snapshot`, `goldCoins`, confirm-only mutation and Vance
+  ownership as a versioned contract. The artifact reinforces these as “stock snapshot #4”, wallet
+  state and “saved atomically”. None exists in checked-in game source. Mark the entire fixture
+  explicitly **proposed/noncanonical semantic data** on the sheet and in exports; do not call it a
+  native resolver contract or persistence proof.
+- `commitTradingPostPreview` does not commit anything, validate a revision/token, or mutate saved
+  inventory/stock/wallet atomically. It accepts any object with `state: preview` and
+  `mutationAllowed: false`, then returns text claiming success and flips `mutationAllowed` true.
+  Rename/remove this pseudo-commit from evidence. A proof may render a hypothetical completed state,
+  but must not assert “saved atomically” until a real rules-owned transaction result supplies it.
+- The material row uses invented global identity `sample-301` and family `keepsake` for a Fang
+  sample. Live samples have no global ID; the truthful handle is bin ID + sample index + full receipt,
+  and Fang's material kind is `fang`. Its grade/receipt is also absent even though the four-gold
+  value depends on the proposed material grade band.
+- The bought Quartz result says “added to Stored”. Quartz is a stackable `ResourcePool` value, not a
+  slot item in Stored inventory. Use a resource-specific hypothetical destination such as
+  “Resource stockpile” and keep it labelled proposed until a live transaction DTO resolves wording.
+- “Locked · Keep”, stock sequence/outcome, stock quantities, Gold Coin wallet, all prices, eligibility
+  and Vance's station ownership are proposed design facts, not live facts. Vance's authored identity
+  itself is valid, but live data still classifies him as mid-campaign and does not link him to a
+  Trading Post station.
+
+The source's exact-key checks are helpful for a static fixture but do not make the model safe: stock
+row kind/resource identity/family/price consistency is not validated, holding identity branches are
+not typed, integer arithmetic is not bounded to safe totals, and there is no revision or duplicate-
+handle validation. Do not expand these proof helpers into an integration API. The eventual native
+resolver must use the closed rules-owned DTO recommended in the dynamic coverage audit. AssetLab may
+continue visual review of buy/sell tabs, preview/confirm/result separation, grayscale selection and
+cannot-act rows only when every invented value is visibly labelled noncanonical and no mutation or
+persistence claim is made.
+
+#### Trading Post/Vance proposed semantic fixture correction disposition
+
+**Accepted for its explicitly non-live semantic-fixture role; no code or Simulator changes.** The
+contract now declares `evidenceRole: proposedSemanticFixture` and `integrationReady: false`; the
+sheet visibly repeats “PROPOSED”, “NOT LIVE” and “NOT INTEGRATION-GOLDEN”; hypothetical results remain
+nonmutating and are named result DTOs rather than commits. Quartz routes to `Resource Pool`; the Fang
+sample uses a fixture bin/index handle and sample silhouette; Vance uses the accepted `baseSide`
+identity unchanged at the counter; cannot-buy, cancel, reopen and cannot-act evidence are present in
+color/grayscale and accessible text. The future rules-owned atomic boundary is stated rather than
+claimed.
+
+No remaining AssetLab blocker was found for this narrow proposed semantic proof. Its fixture prices,
+wallet, snapshot, locking, eligibility, Vance ownership and refresh behavior remain intentionally
+noncanonical and must never be promoted, hashed or consumed as a native resolver contract. Native
+integration remains blocked on the missing live Trading Post DTO/rules identified in the coverage
+audit; that is not an AssetLab correction request.
+
+### 10 Aug 2026 — Trading Post and Vance semantic-fixture v0.1 disposition
+
+**Disposition: recommendations only; semantic fixture remains pre-candidate.** Direct review of
+`AssetLab/artifacts/trading-post-vance-proof-v0.1.png` accepts the core Buy/Sell transaction grammar.
+Both 390pt color and literal-grayscale panels preserve six-across item identity, selected quantity,
+Gold Coin unit/total arithmetic, wallet and holding/stock consequences, and a single confirm-only
+mutation between frozen Preview and Result. The Quartz buy ends Stored with safe Overflow stated for
+a full Storehouse; the Rubble sale remains available while stock awaits refresh. Worn, unidentified
+and locked/Keep holdings remain visible, carry explicit reasons, show no tempting price and cannot
+enter the sale. Gold Coins are named as wallet currency and are not confused with Gold Ore.
+
+The accepted Trading Post silhouette and Vance are rendered separately, and Vance delegates to the
+existing authored character descriptor rather than generating merchant anatomy, palette or a class
+badge. That source boundary is correct. At the reviewed header size, however, the 16px legacy
+`world` cameo is too close to a counter sign/prop to prove a person standing beside a side-view
+village building. The smallest correction is a neutral authored side-view/base cameo derived from
+Vance's same stable descriptor axes, shown once outside and once at the counter with pixel-identical
+person geometry. Ledger, stock and weighing tools remain station-owned props. Do not borrow a combat
+stance, weapon overlay or map-top-down body merely to close this fixture.
+
+Two additional evidence gaps block candidate acceptance. First, rotating-stock ownership is only
+asserted by `snapshot #4`; add open → close → reopen equality for the same line IDs, quantities and
+prices, followed by a separately labelled post-expedition-resolved snapshot with a changed sequence.
+This remains fixture evidence and must not imply a live DTO. Second, the canonical panel shows only
+a successful Buy. Add one compact Buy cannot-act detail resolved from the existing fixture—such as
+`Need 5 more Gold`, `Only 2 remaining`, or `Stock awaiting expedition return`—with no active confirm
+and no mutation. Sell-side protection reasons already pass.
+
+Retain the explicit **semantic fixture only** label: Engineering confirms there is no live economy
+DTO, so fixture prices, stock and atomic results are not integration-golden. Also consider renaming
+the result field `mutationAllowed: true` to an unambiguous committed/result fact in a future schema;
+the resolver currently prevents recommitting a Result, but the field name reads as permission. No
+new item family, price tuning or native economy implementation is requested.
+
+### 10 Aug 2026 — Trading Post and Vance semantic-fixture v0.2 disposition
+
+**Disposition: recommendations only.** Direct review of the corrected artifact retained at
+`AssetLab/artifacts/trading-post-vance-proof-v0.1.png` accepts v0.2 for its explicitly proposed,
+non-live semantic-fixture boundary. The sheet labels its wallet, snapshot, preview/confirm/result DTO
+and completed result as proposed; it does not claim a live economy resolver or integration golden.
+
+The accepted Trading Post remains station-owned architecture. Vance now uses the neutral authored
+`baseSide` profile appropriate to the side-view village, and identical commands render him outside
+and at the counter. His person geometry, descriptor axes and palette do not acquire merchant anatomy
+or change with staffing position; stock, ledger and counter remain separate station props. The new
+profile also avoids borrowing the legacy upright/map-top-down body or a combat stance.
+
+Six-across Buy and Sell grids retain identity in color and literal grayscale. The Buy detail states
+exact Quartz quantity, proposed Gold Coin unit/total arithmetic, wallet and stock consequences, and
+correctly routes the purchased resource to the **Resource Pool**, not slot-limited Storehouse
+inventory. The compact Copper example visibly rejects a request above remaining stock and states
+that confirmation is inactive. Preview remains non-mutating, Confirm alone names the same frozen
+line/quantity, and the Result DTO remains rules-owned rather than pretending AssetLab committed it.
+
+Fixture tests now prove snapshot #4 survives open/close/reopen unchanged and that only separately
+labelled expedition snapshot #5 changes refresh identity. Sell remains available while Buy stock
+awaits that refresh. Rubble sale arithmetic and remaining holdings stay exact; Worn, unidentified and
+locked/Keep items remain visible without a price or active sale. The property-bearing sample now has
+its own sample icon rather than borrowing Keepsake identity. Gold Coins remain distinct from Gold Ore.
+
+Promote this as a visual/semantic proposal with its proposed/not-live labels, snapshot hashes,
+base-side identity equality, cannot-act, resource routing, sample identity and non-mutating result
+fixtures. Live price eligibility, inventory revision, atomic commit, stale-preview handling,
+VoiceOver and save/reload remain blocked on the future Engineering-owned economy DTO. No further
+AssetLab visual correction is requested.
+
+### 10 Aug 2026 — research-driven resource color v0.6 disposition
+
+**Disposition: recommendations only.** Direct review of the v0.6 candidate temporarily exported at
+`AssetLab/artifacts/resource-node-proof-v0.5.png` accepts the revised resource color/material grammar
+for promotion under a new canonical filename. The 21 map families retain their previously accepted
+whole-mass and negative-space separation in literal grayscale, while color now adds representative
+material information rather than allowing the owning substrate palette to absorb every node.
+
+Canonical accent pixels remain stable across the reviewed soil/stone, ice and ash contexts while
+the surrounding body tones belong to the resolved environment. Clay reads warm and smooth; iron ore
+reads rust-bearing rather than copper-like by its heavier vein mass; copper remains dendritic;
+silver reads wire/branch-like; gold is a compact nugget group; quartz, obsidian, salt, sulfur,
+adamant and Rift-glass retain distinct material families. Flora-linked cues preserve the exact host
+flora and use representative accents without recoloring the host into a resource species.
+
+Mercury now reads as a low, irregular reflective puddle with small bright beads/highlights. It
+remains distinct from silver's branching mass, ichor's darker organic deposit and the vertical
+crystal families in both color and grayscale. This is a legitimate disclosed material cue, not an
+encoding of grade, quantity, danger or hidden provenance. Retain a future native collision fixture
+against route, shallow water and ichor because all are low horizontal reads; this is a regression
+recommendation, not a blocker in the reviewed catalogue.
+
+The neutral sheen contract remains correctly downstream of material color, clipped to the revealed,
+discovered, remaining resource/cue body. Canonical accents and sheen do not vary by rarity, yield or
+other hidden properties; exhausted, fog, minimap and Mote exclusions remain intact, and Raw Essence
+continues to delegate the accepted `wildDrop` body. Literal grayscale continues to prove that sheen
+and hue are redundant to family identity.
+
+Promote with the pairwise silhouettes, environment comparison, canonical-accent, grayscale and sheen
+fixtures. Tighten `minimumIdentityPixels: 2` with a pixel-count assertion rather than only requiring
+one stable command when the color contract is next versioned; the reviewed shapes visibly exceed
+that floor, so this is test precision rather than a visual correction. No new descriptor axis or
+disclosure change is requested.
+
+### 10 Aug 2026 — DEBUG bug-reporting AssetLab boundary engineering audit
+
+**Disposition: recommendations only.** The current design in
+`docs/debug-bug-reporting-current.md` is internally coherent, but the live app does not yet contain a
+bug-report DTO, screenshot service, durable report outbox, route-observation seam or submission
+transport. AssetLab may therefore prove a clearly labelled proposed semantic fixture, not an
+integration-ready reporter or evidence that capture, force-quit recovery or delivery works.
+
+Several native facts are reusable without inventing new truth. `GameState.schemaVersion` and
+`SaveMeta.mutationCount`, `lastAction`, `lastSavedAt` and `launchCount` are real persisted save
+diagnostics. `AppRoute` is a closed string vocabulary. `WorldRun` owns the run index, bound book,
+map seed, player position, stability and captured tuning snapshot; `EncounterState.id` and
+`RunExitSummary.outcomeID` are real identifiers. `DebugTuningProfile` is Codable. `SaveFileIO`'s
+atomic write and `GameStore`'s serialized writer are useful implementation patterns, but reports
+must use a separate store so resetting or migrating the game save cannot erase diagnostic evidence.
+Never serialize `SaveDiagnostics.saveURL`, raw save bytes, filesystem paths or `SeedSequence.rootSeed`.
+
+The apparent near-matches must not be promoted into claims. `recentEvents` is an in-memory,
+four-entry world narration buffer, not the required persisted 20-action semantic trail.
+`SaveMeta.lastAction` is one mutation label, not that trail. The navigation stack is not bound to an
+observable current route, so only world/encounter/base-level inference is presently possible; an
+exact station/screen requires a native route-reporting seam. No stable campaign/report identity,
+commit-build injection, screenshot attachment metadata/failure reason, consent/redaction model,
+overlay-position persistence, remote destination, transport result or remote reference exists yet.
+A world/map seed is not a safe substitute for campaign identity.
+
+Use two closed records rather than mixing mutable delivery state into immutable evidence:
+
+1. `BugReportEnvelopeV1` is immutable after atomic creation. It has an explicit contract version,
+   `BugReportID`, creation timestamp and offset, bounded user description/expected text/tags,
+   allowlisted app/save/run/world/encounter facts, an optional bounded semantic-action trail, and a
+   screenshot union of `attached(relative leaf filename, pixel width, pixel height, scale)`,
+   `removed`, or `captureFailed(sanitized reason code)`. Unknown or unavailable native facts are
+   absent; they are never synthesized or defaulted.
+2. `BugReportOutboxRecordV1` is the only mutable record and is keyed by the same report ID. Its exact
+   UI states are `unsent`, `sending(attemptID, startedAt, attemptCount)`,
+   `submitted(remoteReference, submittedAt)`, and
+   `needsAttention(lastErrorCode, lastAttemptAt, retryable, attemptCount)`. Draft composition stays
+   in memory. Retrying reuses the report ID as the transport idempotency key and creates a new
+   attempt ID, never a new report. `submitted` is terminal and cannot change its remote reference.
+   Invoking a system share/export sheet is not proof of receipt and must not set `submitted`.
+
+The smallest durable package is one directory per report ID containing the immutable JSON and
+optional PNG. Build it in a sibling temporary directory and rename only after every member is
+flushed; enumerate complete packages to reconstruct the outbox instead of maintaining a second
+fallible index. Persist every delivery transition before performing its side effect. On launch, a
+stranded `sending` record must be reconciled or retried with the same idempotency key; it must never
+be silently discarded or duplicated. The future transport seam should accept the immutable package
+plus idempotency key and return `accepted`, `alreadyAccepted` with the same remote reference,
+`retryableFailure`, or `terminalFailure` using sanitized codes.
+
+AssetLab can truthfully fixture compose validation, attached/removed/capture-failed screenshot
+states, an allowlisted context disclosure summary, local-only saved confirmation, all four outbox
+rows, retry affordance and accessible reading order. Give that fixture fields such as
+`evidenceRole: proposedSemanticFixture` and `integrationReady: false`; do not embed a fake save,
+remote response, live screenshot or claimed current route.
+
+Contract tests should reject unknown fields/enums, blank or over-limit required text, traversal or
+non-leaf attachment names and unsanitized error data. Native acceptance must additionally prove:
+capture occurs before presentation and excludes the reporter control; atomic-package kill points
+never expose a partial report; duplicate creation with identical ID/content is idempotent while a
+different payload conflicts; every illegal state transition rejects; transient failure preserves
+the package; relaunch recovery and repeated submission use the same report ID; `alreadyAccepted`
+converges to one submitted record; share cancellation never submits; context absence stays absent;
+the semantic trail is ordered and capped at 20; reset-game does not clear the outbox; privacy
+allowlisting excludes paths, raw saves, secrets and account identity; and release builds contain no
+reporter entry point. These are later native gates, not AssetLab visual blockers.
+
+### 10 Aug 2026 — DEBUG bug-reporter proposed-fixture v0.2 engineering review
+
+**Disposition: recommendations only.** The source and artifact correctly declare
+`evidenceRole: proposedSemanticFixture`, `integrationReady: false` and DEBUG-only scope, and the
+focused test passes. Unknown top-level/context keys reject, submitted requires an acknowledgement
+reference, non-submitted records cannot carry one, included screenshots require the asserted
+pre-sheet ownership flag, and Release availability is false. The sheet has a useful 44-point
+placement/readability proof in color, literal grayscale and large text. It is not yet accepted even
+as the proposed semantic fixture because four AssetLab-side contradictions remain.
+
+First, the artifact says `PRE-SHEET: exact app scene`, `Captured before this sheet` and `report
+remains after relaunch` while its footer says there is no live capture or persistence claim. Those
+are native acceptance results that the fixture cannot possess. Relabel them as proposed lifecycle
+requirements or illustrative scene/attachment states, and say relaunch durability is **not tested**.
+
+Second, placement is not actually closed. Validate `preferredEdge` and `preferredFraction`, every
+required-action rectangle's finite non-negative geometry, safe-area ranges and that the 44-point
+target fits the available screen. Currently an action containing `NaN` is treated as non-
+intersecting, unknown edge strings silently behave as trailing, and a too-short screen can return a
+target outside its bounds. Add negative tests for those cases plus a fully blocked layout returning
+`no-safe-placement`.
+
+Third, the resolver closes key names but not the values it displays as context: arbitrary types,
+negative/unbounded `actionCount` and empty or path/secret-shaped strings pass. Give the semantic
+fixture explicit bounded string/nullable unions and `actionCount: 0...20`; use conspicuously
+illustrative values rather than plausible campaign/build identifiers. Closure must apply to the
+result records too, not only the input report.
+
+Fourth, `localSaveResult` and `transportResult` overwrite state without a legal transition check.
+They can regress `submitted` to `unsent`/`needsAttention`, resubmit a terminal report, or send a
+draft directly while `saving`/`sending` carry no attempt identity. For the proposed grammar, either
+render immutable sample rows without transition helpers or implement the already recommended exact
+state graph: draft → saving → unsent; unsent/retryable-needs-attention → sending with an attempt ID;
+sending → submitted or needs-attention; submitted terminal. Retry preserves the same report ID.
+Tests must enumerate every accepted and rejected transition. This remains a semantic-fixture check;
+atomic storage, actual capture, force-quit recovery, transport idempotency and remote acknowledgement
+remain later native gates.
+
+### 10 Aug 2026 — DEBUG bug-reporter proposed-fixture v0.3 follow-up
+
+**Disposition: recommendations only.** The corrected artifact is now honest about its boundary:
+capture ownership, local saving, relaunch behavior and acknowledgement are consistently labelled
+proposed/not native-tested, and the shared scene-command equality proves only the intended fixture
+composition. Placement now rejects invalid screen/safe geometry, edge, fraction and non-finite or
+non-positive action rectangles. Context keys and required strings are bounded, action count is
+integer `0...20`, and the focused suite passes. Local save rejects non-drafts; transport rejects
+draft and terminal input and accepts only unsent/retryable fixture rows. Color, literal grayscale,
+44-point ownership, capture-unavailable text fallback and empty-required-text behavior all read.
+
+Two small state-contract corrections remain before proposed-fixture acceptance. The screenshot DTO
+still uses two Booleans, so `includeScreenshot: false` cannot distinguish the artifact's three
+different truths: user removed the attachment, capture failed/unavailable, or no capture was
+requested. Replace them with the previously specified closed union (`attached` with asserted
+pre-sheet ownership, `removed`, or `captureFailed` with an allowlisted reason code), and test each
+branch. This does not claim a native screenshot service; it merely makes the fixture match its own
+visible states.
+
+Also require a non-empty bounded `remoteReference` for submitted acknowledgement. The current
+`typeof === "string"` check accepts `""`, allowing `transportResult(..., {acknowledged: true,
+remoteReference: ""})` to produce `submitted` without a usable acknowledgement identity. Apply the
+same non-empty/bounded rule to optional context identifiers when present so empty strings mean
+absence rather than a second representation of missing data. Add direct negatives. Attempt leases,
+atomic durability, relaunch reconciliation and server idempotency remain later native gates; the
+proposed fixture need not simulate them.
+
+### 10 Aug 2026 — DEBUG bug-reporter proposed-fixture final closure
+
+**Disposition: recommendations only.** The two remaining AssetLab blockers are closed. The public
+fixture now uses the exact closed screenshot-state union `attached | removed | captureFailed`;
+`captureFailed` alone requires one of the allowlisted failure reasons, while attached/removed reject
+that field. Both no-image states remain valid when the required text exists, so the visual fallback
+does not imply a screenshot dependency.
+
+Submitted acknowledgement now requires a non-empty destination reference bounded to 120
+characters, and direct tests reject null and empty references. Optional campaign/run/world/position
+identifiers likewise accept one non-empty bounded string representation or absence, not empty-string
+sentinels. Focused tests pass, and the reported full suite/regression is green at 240/0.
+
+Accept the DEBUG bug reporter v0.3 as the current **proposed semantic fixture**. It remains explicitly
+non-integration-ready: native screenshot timing/exclusion, a real route/context DTO, atomic package
+storage, force-quit recovery, transport idempotency/acknowledgement, privacy serialization and
+Release exclusion still require native implementation and acceptance evidence. No further AssetLab
+contract or visual correction is requested at this boundary.
+
+### 10 Aug 2026 — provisional Noll identity engineering boundary audit
+
+**Disposition: recommendations only.** The provisional boundary is safely isolated for review.
+`provisionalNollDescriptor` is not a member of the accepted 28-person
+`namedCharacterCatalogue`, and `characterDescriptor("noll")` therefore cannot resolve it as a live
+named identity. Tests prove its silhouette does not collide with any accepted named traveller in
+`baseSide`, combat, or each of the four straight-top-down map facings. Existing full-catalogue tests
+separately retain pairwise uniqueness of the accepted 28. The focused character suite passes.
+
+The artifact consistently labels Noll's name, pronouns and art as working/noncanonical. It renders
+the provisional person through the already reviewed character profiles instead of inventing a
+Recycler-specific body or integration adapter. Recycler commands are identical in the staffed and
+unstaffed evidence; Noll is drawn as a separate occupant, and the place test independently proves
+staffing cannot change station geometry. This is the correct ownership split.
+
+There is no current AssetLab integration blocker because this proof must not be consumed by native
+code. In particular, `characterCommands(..., descriptor:)` is an authoring escape hatch that bypasses
+catalogue identity resolution; `"provisional_noll"` is only a lab call-site label, not an accepted
+raw value, persisted identity or manifest `identityKind`. Engineering must not add either
+`provisional_noll` or `noll` to a native enum/catalogue from this evidence.
+
+If Aimee later accepts the identity, promotion requires an explicit canonical decision for stable
+ID, display name, pronouns and descriptor, followed by one atomic catalogue/version change. At that
+point add the named entry to the closed character identity schema/adapter, reserve its exact
+descriptor combination from generated identities, regenerate named/map/combat hashes and full-cast
+fixtures, and verify live persistence/migration and station-occupant mapping. Until then, exclude
+Noll from accepted catalogue counts, native manifests, save migrations, generated-identity reserve
+claims and Recycler staffing DTOs. No correction to the provisional visual proof is required for
+this engineering boundary.
+
+### 11 Aug 2026 — five-identity economy bridge v0.1 engineering audit
+
+**Disposition: recommendations only.** The artifact correctly labels itself an asset-correspondence
+fixture with `integrationReady: false`, keeps the five dominant icons pixel-identical across the four
+contexts, and says eligibility/provenance/requirements remain external. Its exact-object comparison
+rejects missing, extra, unknown and drifted fixture fields, the five icons remain distinct in color
+and literal grayscale, and the focused test passes. It is not yet a truthful live-model bridge.
+
+The live identity surfaces are heterogeneous and should not be flattened into the fixture's generic
+`stableID` strings:
+
+- Rubble is a `ResourceID(rawValue: "rubble")` entry in a quantity-valued `ResourcePool`; it has no
+  per-stack instance ID. `resource-rubble` is therefore a fixture label, not a native stable ID.
+- A `MaterialSample` has no identity field. A current selection is addressed by
+  `PhysicalGearCraftingRules.Selection(binID: InstanceID, sampleIndex: Int, sample: MaterialSample)`.
+  `binID + sampleIndex` is a selection handle, not durable sample identity: consuming/removing
+  samples can change indices. Rename `sample-bin-4-index-2` away from `stableID`, preserve the
+  structured UInt64 bin ID and integer index, and label it explicitly ephemeral/snapshot-scoped.
+- Lesser Salve is an `ItemStack` with `InstanceID(UInt64)`, `catalogID: "salve_lesser"`, count and
+  identified state. The invented string `item-801` does not round-trip the native ID type.
+- A found Chipped Blade is also an `ItemStack` whose catalogue ID is `blade_chipped`; its initialized
+  `GearInstanceProfile.stableInstanceID` matches the stack instance. The live model does not encode
+  “found salvage” as provenance, and the same catalogue item may be acquired through more than one
+  route. Call this an authored catalogue/found-gear **example**, not known salvage provenance.
+- A crafted Pointed Blade still has catalogue fallback `blade_chipped`. Its distinct frozen identity
+  is in `gearProfile`: `stableInstanceID`, `familyID: "pointed_blade"`, construction tier, damage,
+  reach, consumed samples, `recipeVersion: 1`, specialist profile and display provenance. A key made
+  only from `pointed_blade + 9001` omits the fallback catalogue and schema/version facts needed to
+  distinguish and reconstruct it safely.
+
+Before calling this an integration bridge, replace the six-field universal record with a closed
+`oneOf`/tagged union whose fields match each native kind and whose UInt64 identifiers remain decimal
+UInt64 values rather than prefixed display strings. Keep display name and provenance as resolver
+output, not identity input. For crafted gear, require the frozen gear-profile version/family/recipe
+facts; for found gear, do not synthesize an acquisition route; for material samples, name the
+bin/index pair `selectionHandle` and scope it to an inventory revision or immutable preview.
+Validation should reject cross-kind fields, overflow/negative IDs and indices, unknown resource/item/
+recipe raw values, a Pointed Blade without the `blade_chipped` fallback, and a purported crafted
+receipt whose selected samples do not match its frozen `consumedSamples`.
+
+The five icons and cross-screen pixel correspondence can remain accepted visual fixture evidence.
+Resource quantity, inventory revision, sample selection stability, identified/locked/favorite/worn
+state, Trading Post eligibility, Recycler recovery, Blacksmith readiness/preview, atomic mutation
+and post-save/reload identity remain rules/native DTO gates. In particular, no live Recycler
+salvage/recovery result is represented here, so the artifact must not imply that Chipped Blade has a
+currently implemented salvage receipt or yield.
+
+### 11 Aug 2026 — five-identity economy bridge v0.2 re-audit
+
+**Disposition: recommendations only.** v1.1 closes the generic-ID and player-language problems.
+Records are tagged by kind; ResourceID/quantity, decimal UInt64 stack/bin fields, catalogue fallback,
+sample index/kind and crafted profile facts are now structurally separated. “World resources” is the
+player-facing category, the material is a valid `quill`, exact canonical objects reject drift, icons
+remain pixel-identical across contexts and pairwise distinct in literal grayscale, and the focused
+test passes. Three live-model contradictions still block the word **bridge**.
+
+1. A live found Chipped Blade does not have `gearProfile: null`. Constructing any catalogue gear
+   `ItemStack` initializes `GearInstanceProfile` with version, matching stable instance ID,
+   construction tier, slot, damage and reach. Null is allowed only for transitional in-memory
+   fixtures according to the model comment. The found record must carry the exact authored fallback
+   profile (while leaving `familyID`, recipe receipt and display provenance absent), or be labelled a
+   non-live legacy/transitional fixture.
+2. `blade_chipped` already has an explicit Recycler authored-salvage route in live rules:
+   `authoredSalvage(profileID: "forged_edge_v1")`. The artifact's “Recycler route unresolved” is
+   false. This is not acquisition provenance and should not be placed in identity input, but a
+   rules-resolved detail may truthfully name the route/profile when the Recycler DTO supplies it.
+3. Pointed Blade cannot currently have `constructionTier: 3`. Its Blacksmith recipe has
+   `stationCap: 2`; live preview may compute natural tier 3 but freezes `outputTier: 2`, and the
+   crafting test proves that cap. Use a lawful tier 1–2 fixture. Also label
+   `consumedMaterialCount` as a derived correspondence summary: the persisted native field is the
+   exact ordered `[MaterialSample]` receipt, not a count.
+
+One scoping clarification remains important. `inventoryRevision` exists on the Trading Post and
+Recycler states, not as a universal inventory/sample identity field. The Blacksmith protects its
+selection by recomputing and comparing the exact `Preview`, while Recycler uses its own revision.
+Therefore the revision/bin/index tuple is a context-owned selection handle, not an identity shared
+unchanged across all four screens. Keep the specimen's visual correspondence stable, but have each
+future rules DTO supply its own opaque selection/preview handle and revision semantics.
+
+After correcting the found profile wording/shape and Pointed Blade tier, this can be accepted as a
+non-integration asset-correspondence fixture. Native DTOs must still own current location,
+identified/favorite/locked/worn state, exact receipt samples, preview revision/token, eligibility,
+recovery/crafting result and atomic mutation; AssetLab should not infer them from these records.
+
+### 11 Aug 2026 — Essence-continuity proof native-input audit
+
+**Disposition: recommendations only.** `RunExitSummary.EssenceEconomy` is a useful persisted return
+snapshot, but its six integers do not yet support the whole requested continuity headline. Preserve
+their exact units and meanings:
+
+- `rawCollected` is **retained Raw Essence units banked at this exit**, after collapse/partial-haul
+  retention. It is not generated/obtainable raw, and on a partial return it is not total raw picked
+  up during the expedition. The current UI label “collected” is looser than the stored fact.
+- `refinedEquivalent` is refined-Essence **potential** computed as
+  `EconomyRules.refine(rawUnits: rawCollected)` at summary creation. Current return flow banks raw
+  into the Base and does not refine it. This field is not an actual refinement receipt.
+- `bindCostPaid` is the departed `BoundBook.essencePaid`: the actual total charged for that book,
+  including page ink cost. It describes the expedition just completed, not the price of the next
+  ordinary authored book.
+- `springYield` is the actual per-return Spring dividend credited once for the minted
+  `ExpeditionOutcomeID`; `lastSpringOutcomeID` is the idempotency guard. It is separate from aid.
+- `antiLockSubsidy` is the exact post-return shortfall added only when spendable Essence remains
+  below `minimumBindCost`. It is initially zero and is updated by
+  `ensureDepartureIsPossible` after the summary is created.
+- `netRunway` is refined-Essence **spending capacity**, not wallet balance:
+  `base.essence + potential refinement of every Raw Essence unit currently held`. It is first
+  captured after banking and Spring credit, then replaced with the post-subsidy value if aid fires.
+  It may include raw retained from earlier expeditions as well as this return.
+
+Thus the live summary can truthfully feed retained raw, its potential refined value, prior bind cost,
+actual Spring dividend, exact exceptional subsidy and total spendable runway. It cannot feed actual
+raw refined from this outcome, generated/obtainable/raw-picked-before-loss totals, final refined
+wallet balance, raw balance composition of runway, or “ordinary authored binds available.” There is
+no persisted refinement transaction tied to the outcome, no wallet-at-summary field, and no recent
+median history/classification of non-blank ordinary authored bind costs. Reading current
+`base.essence` later would be mutable current state, not the atomic exit snapshot. Dividing runway by
+the just-finished `bindCostPaid` would not implement the settled recent-median rule.
+
+The smallest truthful AssetLab fixture today should be a closed resolver-shaped **partial** DTO,
+explicitly `integrationReady: false`, containing the summary/outcome identity and six native
+integers, plus resolver-owned semantic labels rather than invented arithmetic:
+
+```text
+EssenceReturnSnapshotV1
+  outcomeID, runIndex, outcomeKind
+  retainedRawUnits
+  retainedRawPotentialRefinedEssence
+  previousBindPaidEssence
+  springCreditEssence
+  antiLockAidEssence
+  spendableRunwayEssence
+  ordinaryAuthoredRunway: unavailable(reason: missingBindBenchmark)
+  refinedFromThisReturn: unavailable(reason: noOutcomeRefinementReceipt)
+  finalWallet: unavailable(reason: noExitWalletSnapshot)
+```
+
+All counts are non-negative integers; `outcomeID` is required for new summaries, and unavailable
+facts use closed reason enums rather than zero or placeholder values. The resolver must assert
+`refinedEquivalent == EconomyRules.refine(rawCollected)` using the native active rate/version,
+`antiLockSubsidy <= netRunway`, and must never merge Spring credit with anti-lock aid. AssetLab may
+fixture zero/nonzero aid, zero/nonzero retained raw, full/partial exit wording, and the distinction
+between potential refinement and actual credit. It must not show a completed raw→refined arrow or a
+numeric authored-bind count from this DTO.
+
+For the eventual complete native DTO, snapshot atomically at the settled post-return/post-aid point:
+`walletRefinedEssence`, `rawHeldUnits`, `activeRefinementRate`, `spendableRunwayEssence`, and a
+rules-owned `ordinaryAuthoredBindBenchmark` with exact cost, sample-window/count and benchmark
+version. If auto-refining is later implemented, add an outcome-keyed receipt with raw consumed and
+refined credited; do not reinterpret `refinedEquivalent`. Native tests should cover portal and
+partial exits, pre-existing raw, zero/nonzero aid, one Spring credit per outcome, save/reload, and
+wallet/runway arithmetic; median-window construction and bind classification require their own
+rules tests. These are native telemetry gates, not AssetLab visual decisions.
+
+### 11 Aug 2026 — five-identity economy bridge v0.3 final re-audit
+
+**Disposition: recommendations only.** The found/crafted headline distinction is now correct.
+Chipped Blade carries the initialized tier-1/rend/close fallback profile with no construction
+family/receipt and names the live Recycler resolver route `forged_edge_v1`. Pointed Blade retains
+catalogue fallback `blade_chipped`, freezes family `pointed_blade`, recipe/profile version 1,
+Blacksmith specialist, tier 2, pierce/close and a two-entry ordered receipt. The material value is
+separate from per-context handles, dominant icons remain identical across contexts and distinct in
+literal grayscale, and the focused test passes. Three narrow correspondence claims remain to fix.
+
+First, the crafted record calls `consumedMaterials` exact but omits each sample's six
+`MaterialProperties`. Native `GearInstanceProfile.consumedSamples` persists the complete ordered
+`MaterialSample` values: kind, all properties, grade, source and qualifier. Include the full values
+or rename the current array to a lossy display summary and keep it outside identity/conformance
+claims. The exact receipt cannot be reconstructed or equality-checked from the current record.
+
+Second, `revision 12 · bin 4 · entry 2` is not a live Inventory handle. Base Inventory has stack
+`InstanceID` plus material index but no general inventory revision. Revisions belong specifically to
+Trading Post and Recycler preview state. The Inventory context should use `binID + sampleIndex` only
+(and remain snapshot-scoped), or explicitly label a proposed UI snapshot token rather than a native
+field.
+
+Third, `stock line 404` is not a truthful Trading Post handle for this quill specimen. Live Trading
+Post stock/sale tables do not classify the material-bin catalogue entry as transferable stock, and
+a `TradingPostStockLine` is not a handle for an individual `MaterialSample`. The correspondence
+sheet may show the specimen as visible-but-ineligible if a future resolver supplies that row, but it
+must not claim a live stock line. Use an explicit unavailable/ineligible context row, or restrict
+the cross-context proof to contexts that possess the specimen today. Recycler returned-receipt and
+Blacksmith bin/index selection handles remain rules-owned preview facts rather than universal
+identity.
+
+After those corrections, accept v0.3's visual correspondence boundary. Integration still requires
+closed native resolver DTOs for location, eligibility/protection, exact previews and atomic results;
+AssetLab must not manufacture handles merely to make all five identities appear actionable in all
+four contexts.
+
+### 11 Aug 2026 — five-identity economy bridge v0.3 source closure / artifact re-export required
+
+**Disposition: recommendations only.** The current source and focused tests close all three prior
+contract blockers. Pointed Blade's ordered `consumedMaterials` now retain kind, all six
+`MaterialProperties`, grade, source and qualifier for each entry. Inventory uses only the
+snapshot-scoped bin/index handle, with no fictitious universal revision. Trading Post explicitly
+states the individual quill is not individually transferable rather than assigning it a stock line.
+Recycler and Blacksmith handles remain context-owned preview facts. The focused suite passes.
+
+The retained PNG at `AssetLab/artifacts/economy-five-identity-bridge-proof-v0.3.png` is stale,
+however. Its SHA-256 remains `76830c0b62cd051a65d150c55133a8207868a9ea0430aad993421cf4ea191333`
+and direct inspection still shows the superseded quill labels `revision 12` in Inventory and
+`stock line 40…` in Trading Post. That contradicts the corrected source and would preserve the exact
+misrouting the contract now rejects.
+
+Re-export the v0.3 artifact from the current `bridge-app.js`/contract and assert the PNG visibly says
+`bin 4 · entry 2` and `not individually transferable` (or their deliberately shortened but
+unambiguous equivalents). Pin its new hash or add an artifact text/evidence assertion so semantic
+source changes cannot leave a stale canonical proof. After that mechanical re-export, accept the
+five-identity AssetLab correspondence boundary; no additional source or visual redesign is needed.
+
+### 11 Aug 2026 — five-identity economy bridge v0.3 final closure
+
+**Disposition: recommendations only.** The mechanical artifact gate is closed. Direct inspection of
+the regenerated 800×760 PNG confirms the Inventory specimen handle now reads `bin 4 · entry 2` and
+the Trading Post row reads `not traded`; the latter is an accurate compact rendering of the source
+contract's exact `not individually transferable` state. Neither superseded revision nor fake stock-
+line wording remains. Color and literal-grayscale correspondence evidence is intact.
+
+The artifact SHA-256 is
+`a0c82b1c9f3de429e9b96943f238164b36e3af8f22e82147072a368dd4ee6d81`, and the focused
+economy-identity test passes; the reported full AssetLab suite/regression is green at 240/0. Accept
+v0.3 as the current five-identity **asset correspondence fixture** with
+`integrationReady: false`. No further AssetLab correction is requested. Rules-owned context DTOs,
+eligibility, previews and atomic mutations remain the later native integration boundary.
+
+### 11 Aug 2026 — launch handoff alignment engineering recommendation
+
+**Disposition: bounded native recommendation; no redesign.** Source inspection confirms the visible
+jump is deterministic layout drift, not a Simulator/device anomaly. The static storyboard owns a
+safe-area-centered 248×340 page with exact local coordinates: top rule `(18,22,212,2)`, mark
+`(87,74,74,58)`, Georgia Bold title `(28,172,192,37)`, system-15 copy
+`(28,225,192,21)`, and bottom rule `(18,316,212,2)`. SwiftUI `LaunchSurface` instead distributes the
+same elements through two flexible `Spacer`s, nested `VStack(spacing: 18)`, 18-point padding and
+dynamic/default text metrics. It cannot land on those coordinates consistently and its system
+`.serif` title is not the storyboard's explicit Georgia Bold font.
+
+Make only the idle/loading surface a fixed local-coordinate composition. Use a 248×340
+`ZStack(alignment: .topLeading)` (or equivalent overlay) and position the six elements with those
+exact storyboard rectangles. Use `Font.custom("Georgia-Bold", fixedSize: 30)` in a fixed 192×37
+title frame and `Font.system(size: 15)` in a fixed 192×21 copy frame; constrain both to one line with
+the storyboard alignment. Do not use flexible spacers, stack spacing, dynamic type or intrinsic text
+height in this loading-only composition. Preserve `BookbindingMark` at exactly 74×58 and reuse its
+existing internal rectangles.
+
+Center the 248×340 page in the root view's safe-area proposal, while applying the system-background
+fill separately through the full screen/unsafe regions. Do not calculate position from a hardcoded
+393×852 device. Draw the 2-point page frame inward (`strokeBorder` or four exact edge rectangles) so
+its outer extent remains 248×340; use the storyboard's fixed frame color rather than semantic
+`.brown.opacity(0.75)` if pixel continuity is required. The internal rules remain semantic
+secondary-label color, matching the storyboard. The loading view's accessibility remains one
+combined “Bookbinder. Opening the Atlas.” element even though visual text size is fixed.
+
+Do not force failure content into this static geometry. Split `LaunchSurface` into an exact
+`LoadingLaunchSurface` and a separate adaptive `LaunchFailureSurface`. Failure messaging, retry and
+copy-diagnostics controls may retain Dynamic Type, scrolling and accessible button layout; this
+state has no static-launch continuity requirement. The coordinator phase/state machine and launch
+timing behavior need no change.
+
+Add a small shared geometry specification or tests that parse/compare the storyboard and SwiftUI
+constants for page size, every local rectangle, title font name/size and copy size. Add a source or
+render assertion that the loading composition contains no `Spacer`, and native visual acceptance
+should compare the final storyboard frame to the first SwiftUI loading frame in light/dark and at
+the supported phone safe areas. This fix is confined to the native launch view; it does not require
+an AssetLab asset, new launch art, or any Simulator lifecycle/window manipulation.
+
+### 11 Aug 2026 — native campaign checkpoint / AssetLab bookplate v0.1 recheck
+
+**Disposition: recommendations only.** Read-only source inspection shows the five previously
+reported native presentation issues are now closed in current source:
+
+1. Cards expose Load plus More/Review; destructive delete is confined to the focused detail sheet
+   and its confirmation.
+2. DEBUG save-schema and full UUID text live in the focused Technical details section, not every
+   ordinary card.
+3. Both card and detail metadata rendering are guarded by `hasKnownMetadata`; corrupt/future slots
+   no longer display the internal Level 0 / Unavailable / distant-past sentinels.
+4. `CampaignBookplateMotif(id:)` supplies a UUID-owned, rename-stable neutral visual channel on card
+   and detail, separate from health and progress text.
+5. Confirmation title and destructive alert button both include the UUID prefix, so duplicate
+   names have distinct destructive accessibility labels. `CampaignStartPresentationTests` now
+   expects the same UUID-bearing title as source; the earlier source/test mismatch is gone.
+
+Continue still selects the most recent loadable slot while invalid slots remain visible, and the
+layout policy still changes the two-column compact grid to one column at accessibility sizes. These
+are source/test findings only; no device-runtime claim is made.
+
+AssetLab's `campaign-bookplate-proof-v0.1.png` is safe as explicitly proposed,
+recommendations-only visual evidence. It clearly says it is not a native capture, preserves invalid
+cards without fabricated metadata, demonstrates compact two-column, literal grayscale and large-
+text single-column layouts, keeps destructive action in a focused confirmation, and derives
+rename-stable bookplate geometry from UUID. Its closed resolver rejects unknown keys, malformed UUID,
+valid-without-metadata and non-null unknown metadata; the focused test passes.
+
+Do not promote v0.1 as a native contract or pixel fixture yet. Its illustrated 32px bookplate is an
+alternative to the native eight-mark `CampaignBookplateMotif`, not proof of current SwiftUI pixels.
+The AssetLab health copy `Made by a newer version` differs from native `From a newer version`, valid
+cards omit the native More action, and unknown-slot display names are illustrative rather than
+native descriptor output. Most importantly, AssetLab's destructive confirm label is only
+`Delete “name”`; native deliberately includes the UUID prefix in that button as well as the title.
+If the proposal is promoted beyond visual exploration, align those strings/actions and preserve the
+UUID-bearing confirm label.
+
+The proposed nullable unknown-metadata DTO is cleaner than native `CampaignSlotSummary`'s internal
+sentinel Date/level/location fields, but current rendering correctly hides those sentinels. Treat a
+future optional/union metadata refactor as contract hardening, not a visual checkpoint blocker.
+Bookplate collision-freedom is not established by either implementation's small visual mark space;
+the visible short UUID remains the disambiguating identity in focused detail. Native runtime,
+VoiceOver focus/order, destructive callback ownership and save deletion remain native acceptance
+gates.
+
+### 11 Aug 2026 — native terrain grading / feature and flora-variety source audit
+
+**Disposition: read-only engineering finding.** The ordinary native map renderer currently consumes
+both world-conditioned terrain recoloring and deterministic per-tile feature variation. This is
+live code, not merely AssetLab proof:
+
+- `MapGrid` resolves one `WorldGrade` from the active book/readings and map seed, then supplies it
+  to every `MapTileArtRequest`.
+- Native `WorldGrade.from` matches the three published `world-grade-1.0.0` cross-language vectors.
+  `TerrainPixelGrammar` applies its signed RGB plus value offsets to every ground palette and to
+  water/deep-water/ice/chasm perimeter edges. Geometry and rule ownership do not change with grade.
+- `MapAssetContract.terrainSeed` deterministically derives UInt32 variation from persisted map seed,
+  coordinate and the frozen seed tuple. `featureVariant = seed & 3` selects one of four implemented
+  patterns for all 12 ground families, while the same seed also controls bounded texture pixels.
+  Redraw/cache hits do not reroll them.
+- Live adjacency is derived N/E/S/W by exact `GroundType` equality, fog short-circuits to the
+  invariant fill, and the 16×19 lifted terrain/south exposure compositor is active. Native tests
+  pin seed examples, grade vectors, the corrected manifest and both lifted decoded-pixel fixtures.
+  The DEBUG-only simple renderer can intentionally bypass this art, but Release uses the asset
+  renderer.
+
+Dynamic flora variety is also live. World generation creates a deterministic flora cast from world
+readings and world seed, paints exact flora `InstanceID`s onto growth/groundcover tiles, and
+`MapGrid` resolves each ID against `WorldRun.flora`. `FloraRenderDescriptor` maps the live species ID,
+world seed and full stature/tissue/defence/habit/color/finish/metabolism facts into the published
+top-down descriptor. `FloraPixelGrammar` changes patch topology, dominant-tissue structure,
+species-owned hue/depth/opacity/finish, patterning and metabolic accents; its species seed controls
+bounded detail. Native tests match both published flora pixel vectors and prove a trait change
+changes both cache key and pixels.
+
+The intended stability boundary is important: every placement of one flora species renders the same
+16px species sprite. Variety among placements comes from which generated species owns the tile and
+from worldgen's ground/patch placement, not a per-tile specimen reroll. This agrees with the accepted
+flora contract. Flora is **not** post-tinted by `WorldGrade`; its world conditioning is upstream in
+generated traits/coloration. The current AssetLab flora contract likewise has no world-grade input.
+Do not add terrain grading to flora without a new design decision and version, because it could
+erase stable species identity.
+
+What remains proof-only or under-tested:
+
+- The map-slice PNG catalogue is explicitly a conformance set, not an exhaustive runtime atlas;
+  native code reimplements the command grammar rather than loading those PNGs.
+- Native tests exercise only two lifted terrain raster fixtures and two flora species vectors. They
+  do not yet prove all 12 grounds × four feature variants, all grade extremes, or a generated
+  multi-species live map in color and grayscale.
+- AssetLab's integrated multi-species/contact sheets are visual evidence, not a native screenshot.
+  Native tests do not sample real generated casts for pairwise 16px separation, accidental
+  silhouette collisions after integer normalization, or same-species pixel equality across many
+  placements.
+- No native test currently demonstrates that every feature variant remains semantically neutral in
+  grayscale and cannot resemble crack, route, resource or passability grammar. The code is active;
+  this is an acceptance-coverage gap, not a missing feature.
+- Player/enemy/site overlays still use game-owned SwiftUI symbols; top-down character-map artwork
+  is a separate remaining integration boundary and does not affect the terrain/flora answer.
+
+Smallest safe checkpoints are test/evidence slices rather than another renderer rewrite:
+
+1. Add a native raster matrix over every GroundType, variants 0–3 and neutral/warm/cool grades.
+   Assert deterministic pixels, grade-only geometry equality, four distinct variants, fog
+   invariance and grayscale separation of the key rule pairs.
+2. Generate several real worlds with flora, resolve every painted flora ID, and assert identical
+   pixels for repeated placements of one species plus distinct descriptor/cache/pixel evidence for
+   meaningfully different species. Export one native-scale color/grayscale multi-species map for
+   review without changing the contract.
+3. Add one integrated cache/request test proving changing grade, terrain seed, ground or flora
+   descriptor invalidates the image key while a redraw of identical facts reuses it.
+4. Keep flora ungraded for this checkpoint. If playtesting later shows it visually detached from
+   extreme worlds, first decide on a bounded identity-preserving adaptation, add `worldGrade` to a
+   new flora render tuple, and publish cross-language vectors before porting it.
+
+So the direct answer is **yes** for live terrain recoloring and feature variants, and **yes** for
+live generated flora species variety. The main remaining work is breadth/integrated visual
+acceptance, not wiring those facts into the current renderer.
+
+### 11 Aug 2026 — campaign deletion identity design correction
+
+**Disposition: settled design correction superseding the engineering inference immediately above.**
+The UUID-bearing alert title/button in current native source is **not** an accepted resolution of
+duplicate campaign names. Stable UUID owns storage and DEBUG Technical details, but must not appear
+in ordinary player-facing card, detail, accessibility or destructive-confirmation copy.
+
+Native campaign deletion therefore remains one open presentation issue: replace the UUID prefix in
+the alert title and destructive button with a player-legible discriminator derived from known
+metadata, such as last-played date/time and/or location. For unknown/corrupt metadata, use the
+already player-visible recovery label/name treatment rather than exposing technical identity; the
+focused selection still owns the exact UUID internally for callback correctness. Tests must cover
+two same-name known campaigns with distinct player-facing confirmation/accessibility labels and
+prove each invokes only its selected UUID, while release copy contains no UUID. DEBUG Technical
+details may retain the full UUID.
+
+Also align health-specific actions/copy: future-incompatible uses native wording `From a newer
+version` and `Compatibility details`; corrupt uses recovery wording/action; valid cards retain
+Load plus More. AssetLab v0.2 remains recommendations-only and its 32px motif remains proposed art,
+not a native pixel fixture. This correction supersedes only the prior UUID-as-player-discriminator
+approval; the focused destructive flow, metadata guards, DEBUG placement, neutral bookplate channel,
+Continue filtering and accessibility column behavior remain sound.
+
+### 11 Aug 2026 — catalogue item identity proof v0.1 visual review
+
+**Disposition: recommendations only; the exact-ID direction passes, but hold golden promotion for
+two small silhouette corrections and one disclosure adapter proof.** Direct inspection of
+`AssetLab/artifacts/catalogue-item-identity-proof-v0.1.png` confirms the corrected 30-item scope:
+eleven ordinary gear identities, seventeen consumables and two curios, plus a separate unknown
+item. The native 32-pixel color and literal-grayscale rows are lossless and the separate key allows
+the silhouettes to be judged without labels beneath the cells. Gear slots read as physical objects;
+the three salves and wider draught/treatment set share a controlled vessel language without being
+pixel-identical; Humming Shard and Bound Knot honestly read as a shard and tied object. The wrapped
+unknown parcel is distinct from the known catalogue and does not preview either curio's result.
+
+Two pairs remain too dependent on small detail at this scale:
+
+1. `long_pick` and `bent_pick` retain nearly the same horizontal head plus central vertical shaft in
+   native grayscale. They can coexist in an All-items grid even though their slots differ. Give the
+   Bent Pick a strongly hooked, shortened or visibly crooked outer mass while retaining Long Pick's
+   long balanced head; do not use color, rarity or a tool badge to separate them.
+2. `draught_clearing` and `farsight_draught` have closely related medium bottle bodies with small
+   lateral tabs. Preserve their shared draught ancestry, but change one large outer axis—shoulder,
+   neck, base or a carried optical attachment—so the distinction survives an unlabelled glance.
+   Do not turn the attachment into a standardized eye/effect glyph. Quenching Draught, the salves,
+   Stonebark Tonic, Stillwater and the treatment bottles are sufficiently separated for this slice.
+
+Waystone is recognizable as a tall carried object, but it currently sits near the bottle grammar.
+This is not a blocker if its next revision strengthens the already settled tiny carried edge-
+instrument fiction with paired frame/prong mass rather than a vial neck. It must not become a house,
+portal or promise that a particular world is anchored.
+
+The source exposes known-ID commands and one generic unknown command separately. Add one closed
+resolution fixture proving both unidentified curios resolve to the **same** unknown commands before
+identification, while their legitimately identified states resolve to their distinct authored
+forms. Merely proving that the generic unknown hash differs from every known hash does not prove a
+caller cannot select the known form from `catalogItemID` too early. The resolver must not inspect
+`identifiesInto`, rarity, stats or eventual kind while unidentified.
+
+Re-export the same compact proof after those focused changes, retaining the unlabelled native
+grayscale row and separate key. Add an at-risk row containing Long Pick, Bent Pick, Clearing
+Draught, Farsight Draught, Waystone, both known curios and the single unknown parcel. Keep the
+existing exact-ID coverage, pairwise silhouette, bounds and deterministic tests, and add the paired
+unidentified-curio equality assertion. No broader tier, apex weapon, key or progression-object
+expansion is requested for v0.1 closure.
+
+#### Catalogue item identity proof v0.2 closure
+
+**Accepted for AssetLab golden promotion as the first exact-ID catalogue slice; recommendations
+only, with no native integration authorization.** Direct inspection of
+`AssetLab/artifacts/catalogue-item-identity-proof-v0.2.png` confirms all three v0.1 blockers are
+closed at native 32-pixel scale in both color and literal grayscale.
+
+- Long Pick retains a long balanced horizontal head, while Bent Pick now has a short crooked stepped
+  hook and offset shaft. The pair no longer relies on color or a small surface mark.
+- Clearing Draught is now a broad offset-neck canteen, clearly separated from Farsight Draught's
+  round, symmetric vessel while preserving their related draught construction language.
+- Waystone reads as a three-prong carried edge instrument rather than a bottle, house or portal. It
+  makes no claim about a particular anchored world.
+
+The remaining related families are controlled and readable: three salves share jar ancestry but
+retain distinct mass; treatment bottles, Stillwater, Torch, the two known curios and all eleven
+ordinary gear identities remain separable in the unlabelled grayscale row. Names are represented by
+honest physical-object silhouettes rather than effect, stat, rarity or provenance badges.
+
+The new closed `resolveCatalogueItemIcon` boundary accepts exactly `catalogItemID` plus
+`identified`, rejects extra, unknown and unsupported requests, maps both unidentified curio IDs to
+identical wrapped-parcel commands, and maps their identified states to distinct authored forms.
+This closes the disclosure leak that a separate generic-unknown helper alone could not prevent.
+
+Promote v0.2 with its focused resolver, exact-ID coverage, pairwise silhouette, bounds and
+determinism tests. Keep rarity, tier, stats, provenance, quantity, location and selection outside the
+identity pixels. Later tier lines, apex weapons, keys and unique progression objects remain separate
+authored expansions; their absence does not block this 30-item golden boundary.
+
+### 11 Aug 2026 — illumination/vitality source and adapter audit
+
+Recommendations only; this is a read-only audit of the current native rules and frozen AssetLab
+boundaries. No native or AssetLab implementation was changed, and Simulator was untouched.
+
+#### Current illumination behavior
+
+- `WorldGrade.from` consumes the resolved illumination **midpoint** `(peak + floor) / 2`, maps it
+  through the signed centered scale, and contributes `16 * light` to the grade's value channel
+  (bounded to `-20...20`). Substrate contributes the remaining value term. This grade recolors
+  terrain pixels; it is not a light source, fog mask, current-visibility result or atmosphere
+  sprite.
+- Exploration sight is a separate rules path. Day sight is book base vision plus party sight plus
+  the persisted run's `torchVisionBonus`; night subtracts the fixed night penalty. Whether a world
+  has a day/night cycle is derived from illumination range and the `sourceless` tag, while the
+  turn-driven world clock decides whether it is presently night. Illumination magnitude itself is
+  not passed into `visionRadius`.
+- `WorldRules.reveal` permanently sets `Tile.isRevealed` after line-of-sight/elevation/cover tests.
+  Movement repeats that operation. There is no second per-turn `currentlyVisible` tile set and no
+  re-darkening of already revealed tiles. The map compositor consequently receives persistent
+  reveal, not current sight.
+- Torch is an ordinary consumable whose `lightWorld` potency is `2`. Applying it takes the maximum
+  of the existing and new run bonus, then immediately reveals from the current position using the
+  enlarged radius. The bonus lasts for that run and does not stack additively. It does not modify
+  WorldGrade, the world's illumination reading, atmosphere, clock, or tile pixels.
+- Smoke is a pressure source, not a render fact: it lowers illumination peak/floor, adds a small
+  thermal contribution, and raises atmosphere with `choking`. Atmosphere density separately alters
+  thermal range. Those resolved consequences can indirectly affect grade, night/life constraints
+  and generation, but there is no native smoke/haze/atmosphere map overlay request today.
+
+#### Current vitality/flora behavior
+
+- Resolved vitality peak directly sets flora cast capacity: viable worlds start at the configured
+  lower bound and gain one species per `vitalityPerExtraSpecies`, clamped to the configured range.
+  Zero vitality or no metabolism above the viability floor yields no flora.
+- Vitality peak also increases each generated species' purchasable trait budget and gates whether
+  active defence is affordable; vitality `trophicDepth` raises defence weighting and participates
+  in that active-defence gate. It does **not** directly pick a species' stature, habit, or color.
+- Placement uses resolved vitality peak again as productivity. `paintGrowth` multiplies it by mean
+  cast stature and coverage tuning to obtain a tile budget. Species then take turns spending that
+  budget. Each species' already-resolved habit determines patch walk length/topology, and its
+  already-resolved `blocksSight`/stature outcome chooses groundcover versus sight-blocking growth.
+  Thus vitality controls total quantity, but patch shape and tall/short classification belong to
+  the resolved species.
+- Stature tendencies are driven directly by illumination, water and thermal conditions; habit is
+  influenced by darkness, drought and cold. Color depth is directly biased by illumination, with
+  substrate/toxic-atmosphere affecting finish/defence-related tendencies. Vitality affects these
+  only indirectly through the shared species budget and environmental constraints; it is not a
+  second color/stature scalar.
+- Illumination can cap resolved vitality through `WorldConstraints` when photosynthesis is required.
+  Fungal/decaying or sufficiently chemosynthetic worlds relax that relationship. Consequently the
+  final vitality used by cast and placement is already constraint-resolved and must not be
+  recomputed by an asset adapter.
+
+#### Exact integration boundary and gaps
+
+- Keep `WorldGrade` as the closed terrain/character palette input. Its existing green channel also
+  contains resolved vitality (`22 * life`) while actual growth placement separately represents
+  vitality. This is a real double visual signal, especially on bare substrates; changing or
+  removing it requires a new world-grade adapter version and conformance vectors, not an
+  unversioned native tweak.
+- Keep flora identity requests pressure-free. The live flora descriptor already carries stable
+  resolved stature, tissue, defence, habit, coloration, finish, metabolism, species seed and ID.
+  Asset renderers must not accept vitality/illumination and re-derive size, color, density or threat
+  from them. Native world generation owns cast membership and each tile's flora ID; the renderer
+  draws that resolved occupant.
+- Persistent `isRevealed` remains the only safe fog input. If design wants illumination/Torch to
+  affect the appearance of what is visible **now**, rules first need a game-owned current-visibility
+  result with settled persistence/disclosure semantics. AssetLab should then accept that bounded
+  fact, never recompute sight from pressure readings.
+- A visible smoke, haze, choking-air or other atmosphere layer needs its own closed, versioned,
+  game-owned overlay descriptor: resolved visual kind/intensity, reveal/current-visibility policy,
+  seed/phase if animated, layer order, and Reduce Motion behavior. `WorldGrade` and the raw
+  atmosphere reading are insufficient and should not silently trigger decorative smoke.
+- Placement quantity and topology require no new asset field. Evidence sheets may fixture multiple
+  resolved tile placements, but those are proof inputs rather than claims that AssetLab owns
+  ecology. Likewise, illumination-driven stature/color differences should be proven by distinct
+  resolved species descriptors, not by applying a world tint to one species identity.
+
+#### Illumination correction — design disposition
+
+**Aimee's direction supersedes only the illumination portion of the preceding audit:** illumination
+must not recolor terrain. Remove the illumination midpoint from the next versioned world-grade
+adapter. Thermal, Hydrology, Vitality and Substrate may retain their separately reviewed bounded
+conditioning; the value channel may use a non-light material input or remain neutral. Do not alter
+`world-grade-1.0.0` in place: publish a new immutable tuple, vectors, cache identity and native/
+AssetLab conformance proof. Sun, moon, night and Torch then affect a separate visibility/light layer,
+not the saved terrain or flora identity pixels.
+
+Keep `Tile.isRevealed` as permanent, append-only knowledge and add a derived non-persisted
+`currentlyVisible` result. Rendering needs three closed states: (1) unrevealed uniform fog with no
+descriptor-dependent pixels; (2) revealed but presently unseen remembered terrain under a distinct
+darkness treatment, without live/moving/transient bodies; and (3) currently visible terrain and
+legitimately disclosed content. Newly current-visible tiles union into permanent reveal; nightfall,
+movement and Torch expiry never erase it. Fog and remembered darkness must remain visibly and
+accessibly distinct, and known water/chasm/passability shape must remain legible enough to navigate.
+
+Game rules should resolve current visibility from party position, LOS blockers, current light
+magnitude, party sight capacity, local light sources and Atmosphere. AssetLab receives only the
+per-tile visibility state plus a bounded display-light/falloff value; it must not calculate sight
+from raw pressure readings or inspect hidden content. For the first slice, current ambient light may
+truthfully use illumination `peak` during the light interval and `floor` during the dark interval;
+a continuous Cycle curve is later work. Torch remains a persisted run-local source with rules-owned
+radius/intensity/duration, rather than adding brightness to terrain colors.
+
+Atmosphere clarity and density may constrain radius/falloff and supply a static haze inside already
+visible space. Smoke may be named or drawn as smoke only from an explicit resolved visual-atmosphere
+kind; low clarity, density, mist, toxicity and smoke are not interchangeable. Use a binary threshold
+for disclosure and a separate bounded gradient for presentation, so low alpha never leaks a hidden
+silhouette. Creature detection remains separate: nonvisual creatures may detect the party without
+becoming player-visible.
+
+The safe remembered-state default retains known terrain, routes and legitimately discovered fixed
+landmarks, while hiding moving creatures/travellers and transient/current-state bodies. A disclosed
+apex may retain a knowledge marker, but its live sprite/location must not track through darkness
+without an explicit last-known-position rule. The minimap continues to represent permanent
+legitimate knowledge, not the current light pool.
+
+Smallest proof: one native-phone map in daylight, true dark without Torch, true dark with Torch, and
+low-clarity/explicit-smoke light, each in color and grayscale. Include fog, remembered terrain,
+newly visible ground, ordinary/deep water, chasm, elevation, low/tall growth, route, party, a fixed
+known site, transient drop and moving creature crossing the light boundary. Terrain/flora identity
+geometry and base pixels must remain identical before the separate darkness/haze layer. VoiceOver
+distinguishes “unrevealed” from remembered terrain and may announce “Dark beyond torchlight” without
+naming hidden content; High Contrast preserves all three states without alpha alone and Reduce
+Motion uses static haze.
+
+Open tuning decisions may use nonblocking placeholders: keep `trueDarkFloor == 5` only as the
+provisional no-usable-ambient-light boundary; let darkness cap ordinary visual sight at available
+light reach; preserve Torch's current rest-of-journey duration; use generic haze for low clarity and
+named smoke only for explicit smoke. Exact dim bands, Torch radius/intensity combination, remembered
+content list and apex last-known behavior remain Game Design/rules decisions before freezing the
+request schema.
+
+#### World-grade v2 exploratory calibration v0.2 — Design disposition
+
+**Accepted as a calibration foundation, not as a universal world-uniqueness rule.** Direct review of
+the color, grayscale and light-sequence artifacts plus the machine-readable distance report confirms
+that v0.2 now isolates the intended visual owners: material transform/family, Granite material color,
+explicit smoke density/palette/color, Sun emitter color, Bloom flora color, resolved flora cast and
+current visibility. It no longer uses arbitrary novelty as evidence of success.
+
+The governing rule is proportional: visual distance must reflect relative meaningful authored and
+resolved diversity. Worlds with very similar facts and construction should remain recognizably in
+the same visual family; worlds separated across several strong material, atmospheric, ecological or
+emitter facts should diverge correspondingly. Exact twins may look identical. Near neighbors must
+not be pushed apart merely because they are two different world records, seeds or expedition slots.
+Likewise, deterministic variation must not disguise genuinely opposed worlds as the same place.
+
+Under that rule, the controlled material sequence is directionally sound: normalized input distances
+`0.054 → 0.44 → 0.72` produce measured whole-frame ΔE `1.081 → 5.259 → 9.610`. The first pair reads
+as siblings, not as a failed differentiation. Scoped Bloom color is appropriately strong on flora
+while subtle over the whole frame (`18.763` on its eligible layer, `0.673` whole-frame); Granite is
+similarly bounded. The opposed composed pair is strongly distinct without changing map geometry.
+The grayscale sheet retains the established rule-bearing terrain/content hierarchy, and the light
+sequence reads as one known world under changing visibility rather than three differently colored
+world identities.
+
+This disposition does **not** freeze palette catalogues, blend coefficients or universal numeric
+thresholds. The next evidence should preserve intentionally similar controls, identify each
+comparison's exact eligible input facts, and add phone-size unlabeled recognition checks. Acceptance
+is based on truthful ordering and bounded ownership within each comparable layer; no single global
+distance or requirement that “two worlds must differ” may be introduced into generation, selection,
+tests or documentation.
+
+#### Authored-color vocabulary proof v0.1 — Design disposition
+
+**Accepted as an exploratory visual/accessibility foundation; not frozen content authority.** Direct
+inspection of `authored-color-vocabulary-proof-v0.1-color.png`, its literal-grayscale companion and
+the keyed JSON confirms that all twelve proposed marks retain a distinct redundant pattern when hue
+is absent. The Sun/Smoke/Granite/Bloom examples preserve their four separate scopes rather than
+reading as one global tint. Yellow, Orange and Ochre are visibly distinct; Ochre's relationship to
+ordinary earth ramps is desirable rather than a collision, so this proof supplies no reason to add a
+generic Brown word.
+
+The exact OKLCH coordinates and pattern geometry remain Asset recommendations. The twelve IDs,
+starter/common/later grouping and first-slice omission of Brown are reversible Game Design
+recommendations in `authored-color-vocabulary-current.md`, **not Aimee-settled decisions**. The
+artifact/report must not label them settled or migration authority. Settled structural authority is
+narrower: color is a connected scoped authored declaration rather than a global theme, Flora and
+Creature scopes remain separate, and visual distance follows relative meaningful diversity.
+
+Before native integration, show the same keyed name/pattern/swatch grammar at actual Writing Desk
+tile size and accessibility text sizes. Color-name text may live in a separate key or detail surface,
+but the interactive palette cannot require memorizing an unlabeled contact sheet. Keep
+`integrationReady: false` until Game schema, typed qualifier acquisition, bind persistence and the
+versioned renderer contract are jointly accepted.
+
+#### Authored-color correction — ink mixing progression
+
+**Superseding Game Design direction.** The twelve-swatch proof remains useful only for gamut,
+pattern and grayscale research. It is not a live vocabulary or acquisition catalogue. Color is now
+authored through optional **CMY + Depth ink recipes** stored on eligible source marks; it consumes no
+extra page cell. Starting **Ash** ink is nil/unspecified and leaves color open to a scope-valid
+bind-time random roll. Explicit mixed black is a distinct non-nil recipe.
+
+Isolde is the existing Penmaker progression owner. Her **Brush** is the first liquid-ink hand; the
+Scriptorium tier-1 **Ink Mixing** upgrade is a direct adjacent Brush prerequisite and unlocks the
+mixer and saved-mixture library at the Writing Desk. Asset UI proofs should therefore show Rough
+charcoal, Brush with Ash/open, and Brush with unlocked CMY+Depth states rather than
+a starter/common/later color-word catalogue. Preserve the accepted redundant-pattern work for mixed
+recipes and presets, and prove that Ash/open versus explicit black never relies on matching dark
+pixels alone. Do not begin native integration from the earlier fixed-swatch schema.
+
+**Resource-economy correction:** the unlock teaches mixing but does not grant infinite colored
+pigment. Cyan/Magenta/Yellow/Depth bases are prepared from provenance-honest world resources;
+saved recipes become bounded vials, with twelve focus applications as the first DEBUG candidate.
+Drafting/preview is free and applications are charged atomically at bind. Ash remains unlimited.
+Asset proofs should therefore include base stock, exact consumed-resource provenance, vial remaining
+applications and an Ash fallback, without making a generic resource's icon/color assert a pigment
+profile it does not actually persist. Exact base recipes remain Game Design review candidates.
+
+#### First-class authored color values — compositional grammar
+
+**Historical/superseded schema exploration.** The following fixed `BookColorValue`/named-swatch
+section predates the ink correction above. Retain it for scoped-composition and disclosure reasoning
+only. It does not override CMY+Depth recipes, Ash=nil/open, Isolde's unlock or resource-derived base
+stocks, and must not be used as native schema/acquisition authority.
+
+**Aimee approves the stronger color directions together.** Color should be a first-class declared
+book value that can attach to many legitimate written things—a Sun, smoke, water, substrate,
+flora-producing source or other eligible referent—rather than a single global Atmosphere tint.
+This extends, and does not undo, the illumination correction above: a colored Sun colors the light
+it emits; it does not rewrite the stored albedo/identity of every terrain tile.
+
+The first slice should expose an authored `BookColorValue` with a stable ID, player-facing name and
+canonical color coordinates. Use a small reviewed named-swatch vocabulary initially; a freeform
+picker can follow only when contrast, naming, save migration and cross-platform color-space behavior
+are settled. Canonical numeric values and weights are provisional, but composition must use fixed,
+versioned color-space math rather than platform `Color`, CSS parsing or page-order-dependent blends.
+
+Every attachment resolves to one explicit scope:
+
+| Scope | Eligible meaning | What color may change | What it must not change |
+|---|---|---|---|
+| **Emitter** | Sun, Moon, flame, luminous crystal/fungus or another actual light source | the hue/chroma of that source's current visible light contribution and source body | terrain/material identity, permanent reveal, visibility radius, heat, damage or source identity |
+| **Atmosphere** | smoke, mist, cloud, airborne ash or another resolved visible medium | haze/scattering color inside currently visible space | inventing smoke from low clarity, tinting fog, toxicity/density/radius, hidden content |
+| **Material** | substrate, sand, ice, water or another eligible physical material family | bounded base albedo/palette of the resolved material before lighting | passability, depth, cracks, adjacency, elevation, resource identity or rule-owned value separation |
+| **Ecology** | a flora-producing/living source or explicit ecology-wide declaration | generation-time palette tendency of legitimately generated flora/creatures | species anatomy, stats, defence/toxicity, placement density, exact hidden species or a runtime global recolor |
+
+An attachment is local to its referent. `Crimson → Sun` colors that Sun's emitted light; it does not
+mean “make the world red.” `Ochre → Substrate` affects eligible material palettes; it does not color
+water, people or sky unless separately attached. `Violet → Smoke` affects visible smoke scattering;
+it does not imply poisonous air. `Blue → Flora` biases the resolved ecology palette but still
+permits distinct species identities and value patterns.
+
+##### Composition and precedence
+
+Resolve color in physical/presentation order, never with one last-write-wins tint:
+
+1. game facts choose terrain/material, atmosphere kind, emitter bodies, species descriptors and
+   disclosure;
+2. material-scoped declarations resolve bounded base albedo while preserving invariant
+   affordance/value grammar;
+3. ecology-scoped declarations participate once in species generation and persist in the resolved
+   species descriptor;
+4. current emitter contributions combine into the visible lighting field according to actual
+   source presence/phase and the rules-resolved light amount;
+5. atmosphere-scoped color scatters/filters that light according to the rules-resolved visible
+   medium and density/falloff;
+6. darkness, current-visibility and accessibility overlays compose above the scene; interaction,
+   selection, crack and warning channels retain their independent invariant contrast.
+
+More-specific valid attachment beats a broader declaration only for the same eligible referent:
+source instance → source family → subject/world default. Equal-specificity declarations combine
+deterministically by rules-resolved contribution weight, not array order. Multiple emitters add
+their current light contributions; multiple pigments/material declarations mix as material color;
+multiple ecology declarations produce a bounded palette tendency. These are different blend modes
+and must not share one generic `mixColors` shortcut. Clamp chroma/value and preserve a stable
+outline/highlight whenever the result would collapse grayscale or substrate contrast.
+
+Two colors on one referent are not silently an error or an automatic contradiction. The closed
+resolver should either produce a deterministic mixed/multiband declaration supported by that
+referent, or reject the attachment with a visible authoring reason. It must not pick the last page,
+reroll, alternate by frame or infer dominance from rarity. Complementary colors may legitimately
+neutralize; the preview must show that outcome before binding. Exact mixing coefficients and the
+initial attachment-eligibility table remain provisional tuning/content data, versioned separately
+from renderer geometry.
+
+Absent color means the existing neutral/authored default for that referent. Unsupported, orphaned,
+cyclic or wrong-scope attachments reject at book validation; they never fall back to a global tint.
+Legacy books with no color declarations remain visually stable under the new adapter's neutral
+vectors. Changing a color declaration or attachment changes the bound world's descriptor; viewport
+redraw, save/load and anchored revisit do not reroll it.
+
+##### Disclosure boundary
+
+The Writing Desk may preview exactly what the player attached: swatch name, target name and scope,
+plus the bounded composed preview where all contributing declarations are already authored. It must
+not reveal rolled companion colors, hidden species, undiscovered emitters, toxicity, resource family
+or site identity. In-world appearance can show colored light or haze without naming its cause; later
+earned analysis may explain the source relationship.
+
+Unrevealed fog remains invariant and receives no emitter, material, ecology or atmosphere color.
+Remembered terrain may retain legitimately known material color under the darkness grammar, but no
+current colored light, haze body or moving content. The minimap remains symbolic and does not become
+a color thumbnail. Color is never a unique mechanic code: water depth, chasm, hazards, growth
+height, route, selection and warnings retain redundant shape/value/text channels in colorblind,
+grayscale and High Contrast modes.
+
+##### Smallest bookwriting and two-world proof
+
+Use one native 390-point Writing Desk fixture with four declared swatches and explicit attachment
+chips: one color attached to a Sun/emitter, one to visible smoke/atmosphere, one to Substrate/
+material and one to Flora/ecology. Show a valid multi-color composition, one unsupported attachment
+with its reason, neutral default behavior, and preview copy that names only authored facts. Include
+large text, grayscale/colorblind evidence, 44-point ownership and VoiceOver order from color value →
+attached referent → scope → composed preview/result.
+
+Bind two deterministic comparison worlds from the same terrain/flora placement seed and mechanical
+facts but different authored color attachments. Each world needs daylight, true dark and local Torch
+panels. Prove that:
+
+- material color persists as the same material identity while the colored Sun affects only present
+  lit space and disappears from remembered darkness;
+- explicit smoke colors only the resolved smoke/haze layer and changes neither light radius nor
+  disclosure by itself;
+- ecology color produces stable distinct species palettes at generation, with identical species
+  geometry/placement under redraw and no universal runtime wash;
+- terrain, flora and content geometry; current/permanent visibility; passability; minimap disclosure;
+  and VoiceOver labels are identical between color variants;
+- literal grayscale and colorblind simulations preserve every rule-bearing distinction; and
+- canonical request/rectangle/pixel hashes remain deterministic across relaunch.
+
+Open decisions before schema freeze are the initial named-color vocabulary, eligible source table,
+whether one referent supports bands/patterned color or only a resolved mix, fixed color space and
+blend coefficients, saturation/value clamps, and whether ecology-wide declarations affect flora,
+creatures or require separate Living/Flora attachments. None should be inferred by AssetLab while
+the rules contract is unsettled.
+
+### 11 Aug 2026 — true combat graph v0.3 Design disposition
+
+**Accepted as topology/presentation evidence after direct Game Design Lead inspection; not native
+implementation approval.** Aimee rejected combat v0.2 because three vertical eight-node lanes with
+occasional diagonal links remained ladders. That artifact is historical and `mustNotPromote`.
+
+The replacement `AssetLab/artifacts/combat-tree-true-graph-proof-v0.3.png` is generated from the
+hash-pinned `docs/combat-tree-v2-authority.json`, not a separately handwritten Offense graph. The
+exact 776×850 export contains complete paired 368×800 color and literal-grayscale phones. All three
+roots visibly fan into two fundamentals, two developments and two masteries before three capstones;
+solid own-discipline and dashed authored-hybrid edges read independently. All capstones, selected
+detail, exact parents, route gate, Learn/preview controls and legend remain onscreen without cropped
+bounds or colliding node labels.
+
+The validator rejects disconnected required mastery, premature capstone, unknown IDs, duplicate
+nodes and manifest hash drift. Exhaustive manifest-derived enumeration reports 79 Offense, 67
+Defense and 66 Craft legal connected eight-point capstone-route sets, exceeding the minimum 30 per
+tree; all six named design routes validate. The compact `F/P/S + depth/branch` codes are proof
+notation only. Final native nodes use authored glyphs and anchored full names, never these codes as
+player vocabulary. Technique identity remains explicit per node and cannot be inferred from graph
+role. Engineering promotion still requires all 72 scenario consumers, migration/point parity, typed
+technique parameters, full native accessibility and device evidence in the current combat design
+documents.
+
+### 11 Aug 2026 — research graph v0.1 Design review
+
+**Recommendations only; v0.1 is not yet accepted evidence.** The paired 368×800 color/grayscale
+composition, Hold diamond coverage, selected detail region and topology-preserving Large Text split
+are directionally correct. The proof also correctly keeps station/cost/keeper gates separate from
+node ownership.
+
+Small corrections are required before disposition:
+
+- Field Instruments' eight nodes are independent station-gated roots. The continuous horizontal
+  rail with vertical strokes currently uses connector geometry and reads as a shared hidden parent.
+  Replace it with a labelled enclosure/root-band background or eight unconnected placements; gate
+  membership must not resemble prerequisite edges.
+- Large Text must translate internal gates such as `externalKeeperRequirement` and
+  `springBranchCurrentLive` into authored player language. `gate none` should be omitted, not printed.
+  Exactness means exact player-facing requirements, not exposing schema enums.
+- The ordinary Hold proof's compact S/T/D codes may remain test notation only if selecting any node
+  exposes its full authored name and the final native glyph plan is recorded. The player-facing graph
+  cannot ship as numbered boxes.
+- Add a direct invariant that independent roots have zero rendered prerequisite connectors, alongside
+  the existing exact-edge-set check. Preserve a distinct non-edge grammar for keeper/station gates.
+
+After those corrections, the smallest final evidence remains these same two fixtures plus anchored
+edge-clamping and the already-generated Large Text rank outline; no broader art batch is needed.
+
+### 11 Aug 2026 — research graph v0.1 final disposition
+
+**Accepted as isolated presentation evidence after direct inspection; not native implementation
+approval.** The corrected Field Instruments proof removes the false shared-parent rail and places all
+eight station-gated studies inside a clearly labelled non-edge enclosure. Each root has zero rendered
+prerequisite connectors and its full authored instrument name/glyph remains visible in color and
+literal grayscale.
+
+Hold now uses stable pictograms rather than S/T/D proof codes, preserves every ordinary and keeper
+prerequisite edge, and keeps the selected full name/detail below the graph. Large Text replaces raw
+schema enums and `gate none` with exact readable prerequisites, preserves the full two-part rank
+outline and names keeper/Spring gates without inventing node edges. Native promotion still requires
+rules-derived affordability/gate copy, edge-clamped detail at phone bounds, VoiceOver order and all-
+branch exact-edge tests from `research-tree-graph-presentation-current.md`.
+
+### 11 Aug 2026 — Constellation first-slice v0.1 disposition
+
+**Accepted as isolated presentation evidence after direct inspection; not native implementation
+approval.** The proof honestly renders the Constellation's one live node as one quiet centred star,
+with no invented locked stars, branches or future-reset fiction. Affordable, shortfall and bought
+states preserve the same position and use redundant outline/fill/check geometry in color and literal
+grayscale. The bought state visibly reaches rank 1/1 and removes the purchase action; wallet, exact
+three-Mote cost, rank and campaign-wide current/future-person effect remain legible.
+
+The accessibility panel increases text without creating a catalogue/list or false graph. It also uses
+the exact settled Reality sentence rather than promising permanence beyond the campaign. Native
+promotion remains gated by atomic 0/1 purchase, current/future eligible-person Gambit consumers,
+relaunch, VoiceOver and 368×800/large-text evidence in `constellation-first-slice-current.md`.
+
+### 11 Aug 2026 — Consumable / Field Kit v0.1 Design review
+
+**Recommendations only; v0.1 is rejected as state-consistency evidence pending a contained fixture
+correction.** The three Apothecary families, six-across pictorial tray, selected persistent detail,
+world-resource terminology, shortage copy and large-text reflow follow the intended screen grammar.
+
+Two visible contradictions currently undermine the loadout proof:
+
+- Apothecary's selected Lesser Salve tile shows a `0` quantity badge while its detail says
+  **Owned 2**. One rules-owned quantity must feed both presentations; if the badge represents another
+  fact, it needs a redundant glyph/accessible label and the selected fixture must make that fact
+  intelligible.
+- Field Kit shows positive desired counts on all six item tiles (`3, 1, 1, 1, 2, 1`) while the footer
+  says **4 distinct bins selected / 4 available**. Desired count greater than zero defines a selected
+  family, so this fixture has six selected bins. The UI may prevent adding a fifth family, or visibly
+  show a saved over-cap migration state that must be resolved before departure; it cannot silently
+  pack only the first four by saved order.
+
+Corrected evidence should use exactly four positive desired families, show two zero-desired available
+families, attempt/disable a fifth-family `+`, and prove that increasing quantity within an already
+selected family does not consume another bin. Tile/detail owned and desired values must be generated
+from the same fixture. No broader visual redesign is needed.
+
+### 11 Aug 2026 — Consumable / Field Kit v0.1 corrected disposition
+
+**Accepted as isolated presentation and state-consistency evidence after direct inspection; not
+native implementation approval.** The regenerated proof now derives each selected tile and anchored
+detail from the same fixture: Lesser Salve consistently reads stored 1 / wanted 3 in both places.
+Exactly four families have positive desired quantities, two remain available at zero, and the footer
+truthfully reports 4 selected / 4 bins. The selected-family `+` remains available without increasing
+the distinct-bin count, while adding Torch as a fifth family is explicitly disabled at capacity.
+
+The six-across tray, three recipe-family tabs, shortage disclosure, literal grayscale treatment and
+Large Text reflow preserve the accepted player-facing grammar. Native promotion still requires one
+rules-owned loadout resolver, an explicit unavailable fifth-family action, migrated over-cap repair,
+atomic Bind/Revisit packing and return, and 368×800/VoiceOver evidence from
+`consumable-economy-field-kit-current.md`. The Asset proof remains a proposed semantic fixture and
+does not authorize native inventory mutation by itself.
+
+### 11 Aug 2026 — World History archive / comparison v0.1 Design review
+
+**Recommendations only; the ordinary archive and comparison semantics pass, but one promised
+accessibility state still needs visual evidence before acceptance.** Direct inspection of
+`AssetLab/artifacts/world-history-proof-v0.1.png` confirms that ordinary History is a compact
+two-column cover collection rather than forty expanded prose cards. Selection order is visibly
+numbered while chronology is record-owned: selecting World 12 then World 9 still compares Earlier
+World 9 against Later World 12. The structured comparison truthfully renders the stable-key union
+with added, removed and changed states, explicit **Not written**, and **Not measured in this record**.
+Color and literal grayscale preserve selection, kept/chance-led state and cover separation.
+
+The corrected adapter now keeps the settled `ecologyMarkID`, uses one neutral legacy cover without
+rerolling, rejects unrestricted numeric measurement maps, and consumes only prepared disclosed
+display values plus an earned relation. Keep that relation in the ephemeral comparison view; it is
+not a new pair-dependent fact stored on either frozen world record.
+
+The proof manifest asserts `accessibilityColumns: 1`, but the rendered sheet includes ordinary color,
+ordinary literal grayscale, ordinary comparison and Large Text comparison only. It does not show the
+required Large Text **archive** becoming one compact cover per row. Add the smallest separate 368×800
+archive Large Text fixture with at least four covers, both selection orders, kept/chance-led/ordinary
+states and the Compare footer. The cover must remain compact and must not expand full record prose.
+No broader redesign or another comparison export is needed. Native implementation remains gated by
+safe search/disclosure, erase/reconcile behavior, frozen-cover migration and VoiceOver tests in
+`world-history-collection-comparison-current.md`.
+
+The regenerated five-panel sheet closes the requested one-column Large Text archive, shows all four
+request-difference states, and keeps measurement relation out of saved records. One last tiny visual
+correction remains before final acceptance: the Large Text archive drops **Search** while the ordinary
+archive shows it. Reflow Search onto its own toolbar row or a labelled 44-point control; accessibility
+cannot make a settled browse function disappear. Preserve the current four covers, footer and all
+other panels unchanged.
+
+#### World History v0.1 final closure
+
+**Accepted as isolated archive/comparison presentation evidence; not native implementation
+approval.** The final 1864×850 lossless sheet restores a full-width labelled Search control above the
+one-column Large Text archive without expanding any record into prose. Four compact covers preserve
+kept, chance-led and ordinary states, both selected-order marks and the persistent comparison footer.
+The ordinary color/grayscale archive, complete added/removed/changed/unchanged comparison, Large Text
+comparison and disclosure-filtered measurement treatment remain unchanged. Native gates in
+`world-history-collection-comparison-current.md` still apply in full.
+
+### 11 Aug 2026 — world-grade-2 v0.2 resumed P0 Design review
+
+**Recommendations only; v0.2 closes the v0.1 control/schema defects, but the required keyed visual
+evidence is absent, so Design cannot honestly assign final calibration dispositions yet.** Direct
+inspection of the lossless color, literal-grayscale and light-sequence exports confirms several
+important boundaries: geometry and disclosure remain fixed; near/mid/far derived material changes
+are gradual rather than novelty-driven; strong composed oppositions separate; grayscale keeps route,
+water, chasm, growth and object structure; and dim/Torch presentation composes after inherent
+material color. Similar fixtures visibly remain related, satisfying the inverse half of relative
+diversity rather than forcing every world apart.
+
+The JSON now separates resolver-produced transforms, palette-family threshold steps, categorical
+authored colors, smoke density/family, explicit game-resolved flora geometry, opposed composition and
+current visibility. It records controlled input facts and per-layer/whole-frame distance, excludes
+Illumination and raw Vitality from inherent terrain grade, and does not runtime-optimize novelty.
+Those corrections align with `world-color-differentiation-current.md`.
+
+One manifest paragraph is historical and must not become integration schema:
+`authoredInputBoundary` still describes a connected named **Color qualifier** projected into
+`Sigil.color`, and the proof request calls its calibration swatch `colorID`. Decision 138 and
+`authored-color-vocabulary-current.md` supersede that route: the player mixes CMY+Depth ink, the exact
+`InkRecipe?` is stored on the placed source rune, and binding converts it through a versioned resolver
+into a frozen game-owned scoped color. Named red/blue/etc. fixtures may remain useful gamut labels,
+but they are calibration inputs—not the live authorship type, acquisition vocabulary or a reason to
+reduce mixed colors to named swatches. The keyed proof/report should say this explicitly; any future
+integration manifest must accept the resolved color representation and provenance/version, not the
+obsolete qualifier field.
+
+However, only the unlabeled 4×N map sheet is exported. The design brief explicitly requires a keyed
+copy, and the current files give no lossless visual mapping from each 112×112 frame to fixture ID,
+controlled layer, input-distance band and measured distance. JSON array order is not a usable visual
+review surface and makes a mistaken row/column interpretation too easy. Export one same-order keyed
+sheet (labels may sit outside map pixels) naming every fixture and annotate each comparison with its
+layer, input band/value and whole-frame/layer distance. Keep the current unlabeled sheet unchanged
+for unbiased gestalt review.
+
+No new palette work is requested before that export. Once keyed, Game Design will label each
+controlled comparison **too flat / proportionate / too divergent**, decide whether the categorical
+Granite/Smoke/Sun/Bloom treatments are strong enough at phone scale, and either accept palette-family
+breadth or request only named local adjustments. Native integration remains blocked until that
+calibration disposition and Engineering's version/cache/migration review.
+
+#### world-grade-2 v0.2 keyed calibration closure
+
+**Accepted as the isolated palette/relative-diversity candidate; not native integration approval.**
+Direct inspection of `world-grade-2-proof-v0.2-keyed.png` now maps every unchanged 112×112 frame to
+its fixture, controlled input and whole/layer distance. The manifest also correctly replaces the
+obsolete named-Color qualifier claim with exact optional CMY+Depth rune ink → versioned bind resolver
+→ frozen scoped color/provenance; named hues are calibration labels only.
+
+Game Design dispositions:
+
+- base→derived-near (`ΔE 1.081`), mid (`5.259`) and far (`9.61`): **proportionate**. Near remains
+  related, mid is perceptible and far is materially distinct without pretending to be unique;
+- pale-neutral→warm-mineral threshold (`5.947`): **proportionate** as a categorical family step;
+- red→blue Granite (`3.304`): **proportionate** because change remains local to eligible material;
+- Smoke density (`6.951`) and neutral→cool Smoke (`4.27`): **proportionate**; density changes strength
+  without inventing a medium and family changes hue without changing density;
+- orange→violet Smoke (`7.757`): **proportionate** at this first breadth, visibly atmospheric rather
+  than a material replacement;
+- white→yellow Sun (`7.629`) and yellow→violet Sun (`14.536`): **proportionate but upper-bound**.
+  Violet is deliberately strong; do not increase emitter blend strength before phone play;
+- blue→magenta Bloom (`whole 0.673`, flora layer `18.763`): **proportionate and correctly local**;
+- low→high resolved flora (`whole 3.699`, flora layer `37.697`): **proportionate**; the large local
+  difference is legitimate game-owned cast/coverage geometry, not a Vitality tint;
+- opposed composed warm/cool (`35.02`): **proportionate for an intentionally far pair**. It proves
+  breadth, not a minimum distance every two worlds must meet;
+- bright→dim (`16.095`) and dim→Torch (`11.94`): **proportionate as later-layer evidence** only.
+  They do not authorize the current-visibility system in the material checkpoint.
+
+The six candidate material palette families and three atmosphere families are sufficient breadth for
+the first versioned native checkpoint. Exact coefficients/distances remain playtest tuning, not a
+universal perceptual law. Engineering may now review the colorless world-grade-2 descriptor,
+version/cache/migration boundary and native conformance vectors. Preserve the unlabeled sheet for
+gestalt regression, the keyed sheet for diagnosis, similar-world relatedness, scoped identity accents,
+fog invariance and the no-Illumination/no-raw-Vitality terrain rule.
+
+#### Writing-tool progression correction — 11 August 2026
+
+Aimee replaces Pencil with **Brush**. The current three-hand visual grammar is Rough charcoal
+(4–6-cell irregular dry strokes) → Brush (2–3-cell controlled bristle-spread ink strokes) → Fountain
+pen (1-cell fine ink). Ink Mixing is a direct adjacent node unavailable until Brush is owned. Brush
+and Fountain pen both support Ash/open and, when separately unlocked, mixed colored inks; Rough
+charcoal cannot carry liquid-ink recipes. Preserve `Hand.plain` geometry for old saves but never
+present Pencil as a current tool. `writing-tool-progression-current.md` owns the exact migration and
+interaction matrix.
+### 11 August — 72-node combat placeholder disposition (Design)
+
+**Recommendation accepted within a narrow boundary:**
+`artifacts/combat-node-placeholder-proof-v0.1.png` is sufficient functional scaffolding for exact-ID
+coverage, state/technique/capstone layering, grayscale and collision-set validation. It is not final
+art and is not integration-ready as a learnable pictogram vocabulary. Hash-derived central marks may
+support temporary wiring only while names, exact Effect copy and accessibility labels remain visible;
+Aimee's handmade glyph system will replace their visual semantics. Do not spend further Asset time
+polishing these placeholders.
+
+### 11 August — combat-tree functional layout v0.4 disposition (Design)
+
+**Accepted as functional layout and accessibility evidence; deliberately not an art or native-integration
+approval.** Direct inspection of the 368×800 color/grayscale sheet, the five-position Large Text sheet,
+the exported semantic fixture and both SHA-256-matched PNGs confirms that the corrected presentation
+preserves the authoritative 24-node fan-and-fork topology for one tree. Roots, same-discipline forks,
+cross-discipline alternative parents and depth-five capstones remain traceable; owned, available,
+blocked, selected, technique and capstone states are redundant in geometry/mark/border rather than
+color-only. The edge-clamped detail region does not cover the selected node or sever its visible
+parents. DEBUG fixture, point and A/B controls are compact enough to support the route explorer
+without turning the production tree into a testing dashboard.
+
+At Large Text, replacing the impossible full-canvas overview with a depth-by-depth semantic traversal
+is the correct accessibility adaptation, not a regression to a progression list: every card names its
+discipline, depth, state, role, exact Effect and alternative prerequisites, while the position indicator
+and selected-route summary preserve graph context. VoiceOver follows that same graph-derived order.
+The ordinary-size graph remains the primary spatial presentation.
+
+The square/hash marks remain explicitly temporary. Aimee owns the final combat-node glyphs; native
+Engineering must consume `combat-tree-v2-authority.json` and generated Effect copy rather than treating
+this AssetLab artifact as mechanics authority. Keep `integrationReady: false` until native graph
+mechanics, purchase/respec behavior and the isolated DEBUG route explorer pass their own gates. No
+further Asset iteration is requested before Engineering has a concrete native-layout integration
+question.
+
+#### Native `CombatTreeView` reconciliation — recommendations only
+
+Read-only comparison confirms native `CombatTreeView` is a legacy semantic consumer, not merely an
+older skin: it groups three branch cards, computes integer branch depth, and exposes `Learn next`.
+It cannot represent the accepted fan/fork graph by restyling rows. The exact integration handoff is
+now recorded in `combat-tree-true-graph-current.md` under `Native phone integration handoff — accepted
+v0.4 functional layout`.
+
+Engineering may extract the Research graph's `GeometryReader`/`ZStack`/`Canvas`, stable-ID positioned
+buttons, selected-item popover→accessibility-sheet adaptation and accessible vertical-card patterns.
+It must not reuse Research rank inference, three-per-row packing, 64pt/94pt geometry, required-AND
+speech, keeper/stock states or Study/cost semantics. Combat positions are manifest-role owned;
+alternative parents are OR; capstones add the connected-seven/five-discipline gate.
+
+The accepted ordinary geometry is 44pt targets, x centres 70/184/298, sibling offsets −27/+27,
+98pt depth spacing, connectors behind nodes, and a non-covering 352×178 detail below the graph. Large
+Text uses depth-by-depth semantic graph traversal, never a scaled canvas or buy-next list. This is a
+recommendations-only handoff: no native files, mechanics, handmade glyph art or new visual variant
+changed. Exact installed-build phone and VoiceOver evidence remains the native acceptance gate.
+
+#### Handmade-art ownership boundary — 11 August 2026
+
+Aimee owns final handmade characters, buildings/stations, weapons, inventory/items, sigils and
+combat-node glyph art. AssetLab work in these families is limited to deliberately basic functional
+placeholders, layout/accessibility/conformance fixtures and replaceable integration wiring unless
+Aimee explicitly authorizes aesthetic work. Design semantic referents and collision sets remain
+useful requirements but are not assignments to generate competing pictograms. Asset's ordinary
+autonomous work remains functional UI, accessibility, layout, conformance and world-color support.
+
+### 11 August — world-grade-2 bind-adapter compatibility review (Asset)
+
+**Disposition: schema-compatible in ordinary cases, but not yet a canonical native bind receipt.**
+The adapter's material identities, five emitted material palette families, transform clamps,
+none/smoke medium, neutral-Smoke density, 0–3 Flora forms, UInt64-derived species IDs, stature,
+coverage, richness and resolved-color tuples all fit the frozen v1 request ranges. The material
+transform stays inside the pack's accepted near/mid/far envelope; Smoke density is monotone and
+separate from hue; Granite, Sun and Bloom remain scoped; Illumination and raw Vitality never enter
+inherent material recoloring. No frozen Asset-pack change is required.
+
+Four game-owned closure gates remain:
+
+1. The contract specifies an isolated open-color seed but does not freeze scope-salt values, PRNG,
+   draw order or sampling/rejection algorithm. The current Swift adapter deliberately requires an
+   injected resolver for this reason. Freeze cross-language vectors before claiming byte-identical
+   open-color receipts; renderer redraw must never resolve this randomness.
+2. A legitimate nonempty Flora cast can still paint zero tiles when the integer growth budget is
+   zero. The frozen schema requires coverage `0` iff the cast is empty, so that world currently
+   fails binding. Resolve this in game generation/adapter truth—do not invent epsilon coverage or
+   discard a persisted species merely to satisfy Asset schema.
+3. `explicitColorsBySigilID` accepts any externally supplied `authoredMix` sRGB tuple and verifies
+   eligibility, but does not prove it is the versioned conversion of that exact Sigil's persisted
+   `InkRecipe`. The bind transaction must own that join/conversion so forged or stale color input
+   cannot become an otherwise valid immutable receipt.
+4. “Byte-identical receipt” needs a frozen canonical receipt encoding. The descriptor hash is
+   canonical, but `selectedSourceByScope` is a Swift dictionary and ordinary Codable byte order is
+   not itself the pack's canonical serialization contract. Pin canonical receipt bytes/hash or
+   weaken the gate to semantic equality plus the already-canonical descriptor hash.
+
+The broad open-color gamut is not a relative-diversity violation: an eligible source deliberately
+left open is a meaningful authored fact and its persisted roll is part of the resolved input.
+Similar worlds with identical selected source IDs/seeds still match; runtime performs no novelty
+optimization. Native phone color/grayscale remains the final visual gate.
+
+### 12 Aug 2026 — first consumable identity native-pack boundary
+
+**Disposition: accepted as an immutable functional-placeholder conformance pack; integration-ready
+only in that explicitly provisional role.** The exact remaining native consumable gap is not stable
+identity transport: `ItemIconTile` already passes `catalogueID` through Storehouse, loot, equipment,
+Trading Post and Recycler-facing grids. The gap is that `GeneratedCatalogueItemVisualRegistry` has
+no provider, so `CatalogueItemVisualAdapter.live()` returns no pack and every item uses its SF Symbol
+fallback. In addition, Apothecary recipe cards, the encounter remedy chooser and the in-world Field
+Kit still bypass the shared pixel identity surface (or present names only), so installing a registry
+alone would not close every consumable consumer.
+
+The smallest frozen handoff is
+`AssetLab/integration/catalogue-consumables-placeholder-v1/manifest.json`. It contains exactly the
+17 live consumable IDs already accepted in the Field Kit proof, their existing 32×32 rectangle
+commands, canonical command and decoded-RGBA hashes, and an exact 61-ID unsupported list. Together
+those lists partition all 78 live catalogue IDs exactly once, matching native `Pack`'s fail-closed
+coverage requirement. Unknown IDs, absent unidentified variants and every unsupported item retain
+the native fallback rather than borrowing another identity.
+
+Canonical manifest self-hash is
+`70a6d7c6c71f93c9c8488969439aed051e35a47a3579d3c219d556c160fee4a9` under the omission rule;
+the source Field Kit PNG remains hash-pinned at
+`0af17200ab098258ee4e4460ece0dec11c891c7a451e467868818dd52bbf2b96`. The pack exporter and focused
+pack, Field Kit and item-kit tests pass. The manifest is `integrationReady: true` only as a plainly
+labelled `functionalPlaceholderConformancePack`, with `finalArt: false`; Aimee's later immutable
+`catalogue-items-v1` pack remains replacement authority.
+
+Engineering integration recommendations, without native edits in this checkpoint:
+
+1. Generate the native registry from the manifest, translating each `#RRGGBB` rectangle to the
+   runtime RGBA command while verifying every pinned hash and the exact 78-ID asset-or-unsupported
+   partition.
+2. Route Apothecary recipe tiles and the two carried-remedy/Field-Kit selectors through the same
+   stable-ID pixel identity component. Quantity, price, readiness, target, rarity, location and
+   effect remain separate UI facts and never alter the 32px commands.
+3. Preserve the disclosure-neutral fallback for unidentified/absent variants. Do not manufacture a
+   generic named consumable or infer identity from the catalogue's SF Symbol.
+4. Treat the pack as inventory/economy identity only. It creates no map sprite; any later world-
+   placed item must use a separately reviewed top-down profile. It does not alter world-color logic:
+   visual similarity between worlds continues to reflect similarity in resolved underlying facts,
+   never novelty optimization.
+
+This closes the missing frozen placeholder-pack seam, not the handmade item-art milestone or native
+phone acceptance. Final promotion still requires Aimee's pack plus installed-build six-across color,
+literal-grayscale and same-ID cross-context evidence.
+
+### 12 Aug 2026 — named-character compact/map placeholder pack boundary
+
+**Disposition: immutable functional-placeholder conformance pack complete; final character art is
+explicitly not claimed.** The live traveller catalogue now contains 29 stable IDs. AssetLab's
+accepted full-cast evidence still owns 28 provisional authored descriptors, while Noll's separately
+accepted v0.2 working placeholder remains outside that older catalogue. This checkpoint joins those
+two existing sources without redesigning either: it does not turn calling, profession, recruitment,
+equipment or array order into anatomy.
+
+The frozen handoff is
+`AssetLab/integration/named-character-placeholders-v1/manifest.json`, canonical self-hash
+`e0bccbfa9a6637c0a0aee9e536e842b555b3b2c2866566db06d98189ce55447b`. It covers every live
+TravellerID exactly once with one explicit 16×16 `compactCameo` and four 16×16 `mapTopDown`
+facings, for 145 exact key/command/RGBA records. `compactCameo` is a named pack profile whose current
+pixels come from the accepted compact-upright proof; Party, Library People and Library diary-author
+tiles share it. The map profile remains straight top-down and may never silently substitute the
+upright cameo.
+
+The source catalogue and four accepted/working proof artifacts are SHA-pinned. The focused pack,
+character-kit and character-map contract tests pass; each of the five profile/facing sets retains 29
+distinct decoded rasters. The manifest is `integrationReady: true` only as a
+`functionalPlaceholderConformancePack`, with `finalArt: false` and Aimee's handmade named-character
+pack as replacement authority. Noll's stable live identity is included using the already reviewed
+working descriptor, not promoted as finished appearance.
+
+Native handoff gates, without Source edits here:
+
+1. Generate one fail-closed stable-ID registry from this manifest and replace primary SF-symbol
+   identity in Party and Library with `compactCameo`; action/status symbols remain allowed.
+2. Route World traveller bodies through `mapTopDown` with the rules-owned facing. Do not reuse the
+   cameo on the map, and do not derive body features from `TravellerDef.calling` or `icon`.
+3. Preserve all command/RGBA hashes and reject unknown TravellerID/profile/facing to the existing
+   fallback. Selection, health, recruitment and equipment remain independent overlays/details.
+4. Keep Binder, Quill and generated-person persistence outside this pack. Their closed visual-origin
+   schema remains a separate gate rather than being guessed from a named traveller.
+5. Installed-phone acceptance must show the same stable person identity across map, Party and
+   Library at ordinary and literal grayscale sizes. Any later handmade replacement may change pixels
+   deliberately while retaining the stable keys and camera ownership.
+
+This closes the smallest named-character transport/consumer seam. It does not reopen character
+aesthetics, buildings/stations, weapons/items, sigils, combat mechanics or tutorials.

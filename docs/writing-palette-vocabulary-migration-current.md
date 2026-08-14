@@ -86,11 +86,30 @@ The old `symbols.json` content is not deleted as gameplay. Those entries are aut
 remain available under honest names. The retirement is of the false category and filename, not of
 the player's learned shorthand.
 
+### Rename boundary
+
+This is a **writing-domain semantic rename**, not a repository-wide word replacement. Rename only
+identifiers whose type/meaning is the concrete cause attached to a writing Subject, or the old
+precomposed writing mark category.
+
+Keep `source` wherever it means:
+
+- material/item provenance or sample origin;
+- an event, reward, telemetry or transaction source;
+- a physical light/heat/sound source in prose or analysis;
+- a migration source value; or
+- generic source/target programming vocabulary outside writing grammar.
+
+Likewise, ordinary uses of “symbol” for an SF Symbol/icon, typography or mathematical notation are
+not automatically `Compound`. Acceptance scans must classify occurrences by domain rather than
+demanding that the English words disappear from the repository.
+
 ## Save and integration safety
 
 - Stable raw IDs do not change. Old saves decode their focus/compound sets into the renamed types.
-- During one migration window, the catalogue loader may accept old root keys as fallbacks; newly
-  written data uses only current keys.
+- During one migration window, the catalogue loader accepts old root keys as decode-only fallbacks;
+  newly written bundled data and encoded saves use only current keys. The fallback has an explicit
+  schema version and removal audit rather than becoming a permanent second authority.
 - Any persisted enum/type-name wrappers migrate tolerantly rather than requiring save reset.
 - Code comments and tests update in the same change so future work does not reintroduce “symbols” as
   a parallel vocabulary.
@@ -105,6 +124,10 @@ the player's learned shorthand.
 2. Ash appears under Illumination → Shadow, Thermal → Cooling and Vitality → Consuming.
 3. A focus shown in multiple bins is one owned focus, not duplicated progression.
 4. Compound saves made before migration reopen with identical expansions.
-5. Repository search finds no player-facing use of the retired taxonomy outside archive/migration
-   notes.
+5. Repository search finds no player-facing use of the retired **writing taxonomy** outside
+   archive/migration notes; legitimate provenance/event/source and icon/symbol language remains.
 6. Empty subgroup headings do not occupy phone screen space.
+7. A before/after seeded fixture proves identical expanded statements, readings, price, stability,
+   world receipt and generated map—not merely successful save decode.
+8. Old-key fallback decodes an old fixture, while newly encoded content/save output contains only
+   the current writing-domain keys.

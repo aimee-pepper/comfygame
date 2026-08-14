@@ -1,5 +1,10 @@
 # Full Roster Framework — Initial Core Comparison Model
 
+> **Historical comparison model.** The opening economy was later split and reordered:
+> **Vance/Trading Post → Noll/Recycler → Halloway/Blacksmith**. Any row below assigning Recycler to
+> Vance or calling his station Exchange is superseded by `opening-economy-traveller-reorder-current.md`
+> and `trading-post-recycler-current.md`; do not implement it from this proposal.
+
 **Status:** Comprehensive proposal for review; no character finalized  
 **Purpose:** Put every traveller into one progression, relationship and reward structure before
 detailed prose is approved  
@@ -33,10 +38,10 @@ hard recruitment gate**: if the player can write a later signature, that person 
 | 1 | **Mara** | Opening | 1 | Survey Post, field instruments | Teaches that people can be deliberately sought and worlds measured |
 | 2 | **Edren** | Opening | 2 | Reliquary, sites | Points toward ruins and diary discovery early |
 | 3 | **Halloway** | Opening | 2 | Blacksmith | Makes the first material haul useful |
-| 4 | **Isolde** | Start of mid | 2 | Scriptorium, pencil, lens | Required hinge; expands what a page can say |
+| 4 | **Isolde** | Start of mid | 2 | Scriptorium, Brush, lens | Required hinge; expands what a page can say |
 | 5 | **Bryn** | Early–mid | 3 | Protection fighter, back-rank gambit | First dedicated fighter demonstrates party composition |
 | 6 | **Orsa** | Early–mid | 3 | Tavern, visitors and clues | Social search support arrives before the cast becomes broad |
-| 7 | **Sela** | Mid | 3 | Fieldcraft and organic harvest | First three-condition hunt validates the pencil |
+| 7 | **Sela** | Mid | 3 | Fieldcraft and organic harvest | First three-condition hunt validates the Brush |
 | 8 | **Vance** | Mid | 3 | Exchange and Recycler | Item circulation arrives after the player has accumulated gear |
 | 9 | **Talin** | Mid | 3 | Pierce/initiative fighter | First offensive specialist answers plated foes |
 | 10 | **Corrin** | Mid | 4 | Tannery, capacity and light protection | Expands hauling as material variety grows |

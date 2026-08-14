@@ -2,7 +2,9 @@
 
 > **Partially superseded reference.** Fixed classes are replaced by shared growth trees in
 > `combat-trees-full.md`. Current fighter identities and exclusive teachings are routed from
-> `current-design-index.md`. Retain this file only for earlier reasoning that does not conflict.
+> `current-design-index.md`. Its Vance/Exchange/Recycler row is also superseded: Vance owns the
+> Trading Post and Noll independently owns the Recycler. Retain this file only for earlier reasoning
+> that does not conflict.
 
 **Supersedes `companions-base-anchoring-spec.md` §1–2**, which predates session 12 (buildings come from people) and session 17 (stats, classes, levelling).
 

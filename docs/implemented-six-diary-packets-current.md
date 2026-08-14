@@ -47,7 +47,7 @@ Existing live pages remain: two location clues, Gold ore and one worthwhile worl
 
 | New ID | Kind / field | Prose | Status |
 |---|---|---|---|
-| `halloway_lead_pencil` | `researchLead`; node `pen_pencil` | “A nib does not need to be precious. It needs to wear at the same rate on both sides. Bring Isolde metal that can keep that promise.” | add now |
+| `halloway_brush_ferrule` | `researchLead`; node `pen_brush` | “A brush does not need a precious ferrule. It needs one that holds every hair under the same pressure. Bring Isolde metal that can keep that promise.” | add now |
 | `halloway_word_dagg` | `whereabouts`; about `dagg` | “Dagg waits before a strike until waiting becomes the work. Look for hard ground, changing pressure, and someone testing where his weight will go afterward.” | **defer until Dagg exists** |
 
 Shape: two location · focus · worthwhile world · hand-material lead · Dagg.
@@ -58,11 +58,11 @@ Existing live pages remain: two location clues, Hush and one worthwhile world.
 
 | New ID | Kind / field | Prose | Status |
 |---|---|---|---|
-| `isolde_lead_pencil` | `researchLead`; node `pen_pencil` | “Charcoal teaches confidence because it cannot hide a correction. A pencil teaches revision. Do not call the second lesson refinement until you have learned both.” | add now |
+| `isolde_brush_hand` | `researchLead`; node `pen_brush` | “Charcoal teaches commitment because it cannot carry a correction. A brush teaches pressure: how to release it, and how to keep the line alive.” | add now |
 | `isolde_word_tovin` | `whereabouts`; about `tovin` | “Tovin learned to close a binding neatly before he learned when not to make one. His lines improve whenever he is frightened. This is not the compliment he thinks it is.” | add now |
 | `isolde_word_lys` | `whereabouts`; about `lys` | “Lys reads the pressure left by a hand after the words are understood. If she found shelter, there will be pages arranged by disagreement rather than date.” | **defer until Lys exists** |
 
-Shape: two location · focus · worthwhile world · pencil lead · Tovin · Lys.
+Shape: two location · focus · worthwhile world · brush lead · Tovin · Lys.
 
 ## Sela — 7 pages
 
@@ -96,8 +96,10 @@ Shape: eight location · Drift · Edren · Isolde cross-clue · two lost/held wo
 3. Preserve live prose and IDs unless a separate honesty audit supersedes a line.
 4. Each `researchLead` grants progress only, never the finished node.
 5. A `ruin` page reveals the named site definition; it does not place that site in every world.
-6. The two Isolde/Halloway pencil leads may both point to `pen_pencil`: separate partial leads can
+6. The two Isolde/Halloway Brush leads may both point to `pen_brush`: separate partial leads can
    contribute toward one study, but neither page completes it alone.
 7. Diary completion remains a reward, never a gate. Location pages alone plus redundancy must suffice
    to find each person.
-
+8. Existing saves migrate `halloway_lead_pencil` → `halloway_brush_ferrule` and
+   `isolde_lead_pencil` → `isolde_brush_hand` exactly once, preserving collected/review state and
+   research progress rather than displaying duplicate historical Pencil pages.

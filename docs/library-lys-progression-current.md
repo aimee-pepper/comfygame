@@ -63,6 +63,10 @@ The first implementation needs Catalogue search, explicit cross-reference links 
 marker. Side-by-side comparison can follow the tutorial's second-binding World History comparison so
 both use one reusable component.
 
+The exact first-slice query, provenance schema, typed-reference and disclosure contract is now
+`library-lys-catalogue-current.md`. In particular, world search/page→History links require a durable
+first-read recovery record; they may not be reconstructed from the page's preferred conditions.
+
 ## Keeper/staffing semantics
 
 Library state needs a **keeper** relationship separate from station construction:

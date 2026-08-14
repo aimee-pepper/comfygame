@@ -1,8 +1,7 @@
 # Field Awareness and Encounter Avoidance — Current Direction
 
-**Status:** awareness/Shadow/Lure foundation implemented locally and green at 837 tests on 9 Aug
-2026; signed phone build succeeded, but device installation and git checkpoint remain pending because
-the approval service reached its usage limit. Scent Mask remains design-ready, not implemented;
+**Status:** awareness/Shadow/Lure foundation committed at `5731aa9`, regression-green and present in
+Aimee's installed `a77c9dd` phone checkpoint. Scent Mask remains design-ready, not implemented;
 exact durations/costs are reversible DEBUG values. Prompted by Aimee's playtest request for skills/
 items that reduce animal aggression, help avoid encounters and make a party harder to notice.
 
@@ -21,9 +20,10 @@ Every roaming creature has visible states:
 Implement this as a tolerant persisted awareness state on `WorldEnemy`. Old `isAwake == true`
 migrates to pursuing; old `false` migrates to unaware. Alert records the world turn and reason that
 created it. If the party remains within an effective notice radius on the next world action, alert
-becomes pursuing; if the party leaves every contributing radius, it returns to unaware. Direct
-adjacency/contact, party attack or an explicitly loud disturbance bypasses alert and wakes the
-creature immediately. `isAwake` may remain as a compatibility projection during migration, but two
+becomes pursuing; if the party leaves every contributing radius, it returns to unaware. For an
+ordinary roaming creature, direct adjacency, party attack or an explicitly loud disturbance bypasses
+alert and wakes the creature immediately; adjacency does not itself begin combat. `isAwake` may
+remain as a compatibility projection during migration, but two
 independent sources of truth are not allowed.
 
 Detection radius remains game-owned. Target/path preview may show whether the next committed step
@@ -41,7 +41,8 @@ field system before inventing another skill tree:
   moving closer/remaining exposed lets it wake normally. Track once per creature/party contact, not
   a reroll every step.
 - **Low Profile:** if at least one active traveller owns it, ordinary notice radius is reduced by 1.
-  Multiple owners do not stack the same node.
+  Multiple owners do not stack the same node. Its owner also gains the combat-side ambush-opening
+  evasion defined in `combat-node-viability-current.md`, so later Shadowed does not erase this point.
 - **Shadowed:** if at least one active traveller owns it, the active party reduces ordinary notice
   radius by another 1. Multiple owners do not stack the same node. Clamp to the honest minimum
   established by concealment rules; adjacency/contact is never ignored.
@@ -59,6 +60,10 @@ stepping away cannot refresh it.
 
 ### Scent Mask — recommended Apothecary addition
 
+`scent-mask-first-slice-current.md` now owns the exact reversible first-slice recipe and transaction:
+one Reagent plus one selected ordinary-or-better typed animal world resource, zero Essence, 12 world
+turns, no use/refresh while already active. The sensory semantics below remain authoritative.
+
 A real playtest need now justifies replacing the held, incoherent Traveller's Token slot rather than
 preserving an arbitrary catalogue count.
 
@@ -69,8 +74,11 @@ preserving an arbitrary catalogue count.
   harvest disturbance or an already-alert follow-up may still wake them.
 - It has no effect on hostile flora, constructs/guardians, apexes or already active combat.
 - HUD shows remaining world turns and the next-step preview names when scent masking matters.
-- Working recipe direction: one Reagent plus one animal-associated world resource and modest essence;
-  exact resource/grade/cost waits for economy simulation so the item is reachable before it is moot.
+- First-slice recipe: one Reagent plus one selected animal world resource (`MaterialSample` internally)
+  at grade 25 or greater,
+  with **zero refined Essence**, following the settled mundane-preparation boundary in
+  `consumable-economy-field-kit-current.md`. All current butchered animal kinds qualify; flora kinds
+  do not. Exact duration/floor remain reversible telemetry values.
 
 This is a preparation choice, not a universal “no encounters” potion.
 
@@ -112,14 +120,32 @@ hostile flora and cannot target an undiscovered creature.
 
 ## Boundaries
 
-- Apexes remain visible, stationary, opt-in challenges. Avoidance neither hides nor despawns them.
-- Sessile hostile flora follows its trigger geometry; scent has no meaning for it.
+- Once legitimately revealed/discovered, apexes remain unmistakably marked, stationary, opt-in
+  challenges. They do not bypass fog under `minimap-disclosure-current.md`, and avoidance neither
+  reveals, hides nor despawns them. Adjacency is safe; deliberate occupied-tile entry starts combat.
+- Sessile hostile flora follows its trigger geometry; scent has no meaning for it. For current active
+  defence, adjacency and Look are safe and entering its occupied tile starts combat.
 - Guardians and authored hostile sites obey their own warning/consent rules.
 - Predation/ecology still runs; party concealment changes only noticing the party, not whether
   animals perceive one another.
 - No effect reduces spawn rates after world generation. A world remains ecologically truthful.
 - Auto-path interrupts when a creature becomes alert, not only when combat begins, so the player can
   respond to the earned warning.
+
+## Interaction matrix
+
+| Effect/action | Unaware movement notice | Existing alert next action | Direct adjacency/contact | Attend / patient presence |
+|---|---|---|---|---|
+| **Quiet Step** | Once per creature, converts pursuit to one visible alert turn | Does not extend it | No protection | May make the ordinary alert readable, but never adds a trust turn by itself |
+| **Low Profile** | Reduces ordinary notice radius by 1; owner gains +6 evasion during ordinary foe-only ambush-opening actions | Alert clears if the party genuinely leaves the resulting radius | Minimum radius 1 remains | Progress uses the same post-modifier awareness plus the disclosed distance-2 floor |
+| **Shadowed** | Sets the stronger party radius reduction of 2 rather than stacking another copy | Same as Low Profile | Minimum radius 1 remains | Same as Low Profile |
+| **Scent Mask** | Converts chemo-dependent pursuit to one alert opportunity per continuous contact | Does not extend it | No protection | If masking removes the animal's only awareness of the party, patience neither progresses nor resets |
+| **Lure** | Deliberately wakes/draws one disclosed eligible creature | May advance it by the authored lure effect | Never protects | Resets patience for that animal and cannot substitute for trust |
+| **Attend** | Does not reduce notice or aggression | Allowed while unaware/alert, rejected while pursuing | Adjacent target is invalid | Reveals/saves one deterministic trust condition |
+
+This matrix is deliberately asymmetric. Avoidance, observation and taming share one awareness state,
+but no node/item earns trust merely by making contact easier, and no trust progress grants field
+concealment against other creatures.
 
 ## DEBUG and verification
 
@@ -141,7 +167,7 @@ Fixtures cover:
 10. Removing chemo never renormalizes or increases another channel; mask and Quiet Step do not grant
     two consecutive alert turns in one continuous approach.
 
-### Implemented foundation evidence — 9 Aug 2026
+### Implemented foundation evidence — installed 10 Aug 2026
 
 - persisted `unaware` / `alert` / `pursuing` authority with tolerant legacy `isAwake` migration;
 - stable semantic alert reasons and persisted one-use Quiet Step hesitation;
@@ -153,6 +179,14 @@ Fixtures cover:
   fixtures.
 
 This evidence does not claim Scent Mask complete. Its `.maskedScent` state seam exists, but recipe,
-timed party effect, sensory comparison, HUD and device play remain a later coherent slice. The local
-checkpoint must be installed/committed/pushed by Engineering when approval capacity returns; design
-documentation is not a substitute for that release evidence.
+timed party effect, sensory comparison, HUD and device play remain a later coherent slice.
+
+### Playability scheduling disposition — 10 Aug 2026
+
+Do not interrupt OutcomeID → Trading Post → Vance for Scent Mask. The installed Shadow foundation
+already gives Aimee a progression route for avoiding ordinary contact and is the correct first live
+test. After Vance, add one DEBUG test setup that grants Quiet Step/Low Profile/Shadowed and stages a
+visible creature at each awareness boundary; use that evidence before setting Scent Mask's recipe or
+duration. If the skills create readable route choices but leave early unskilled parties with no
+preparation option, Scent Mask becomes the next Apothecary slice. If awareness itself is unclear,
+fix its field feedback before adding an item that depends on it.

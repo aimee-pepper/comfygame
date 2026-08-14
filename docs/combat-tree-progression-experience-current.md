@@ -2,7 +2,8 @@
 
 **Status:** implementation-ready companion to the graph and node-consumer contracts.
 **Owner:** Game Design owns pacing and player understanding; Engineering owns point receipts,
-purchase state and migration; Asset Design owns graph/glyph presentation only.
+purchase state, migration and functional graph presentation; Asset Design owns layout,
+accessibility and placeholder-state conformance only; Aimee owns final glyph art.
 **Depends on:** `combat-tree-true-graph-current.md`, `combat-node-viability-current.md` and
 `combat-progression-current.md`.
 
@@ -30,6 +31,64 @@ Hybrid or broad investment can change/delay the sequence. Calling-lean bonus poi
 advance an authored companion's starting identity, but never reduce or replace their 24 standard
 level-earned points.
 
+### Equipment-dependent nodes are disclosed, never forced
+
+Force/Precision and some Craft effects deliberately reach full value only with a matching attack or
+weapon. Fresh campaigns and rotating stock do not guarantee every damage kind. The selected node
+detail therefore says both its exact requirement and whether this character's **current** loadout can
+trigger it: for example, **Works now with your Crush weapon** or **Learnable now; needs a Crush
+weapon to apply**. This is ordinary purchase information, not a tutorial overlay.
+
+Current equipment never blocks learning: gear can change later, and a banked point may remain
+unspent indefinitely. The graph must not describe a gear-dependent root as a universal damage bonus,
+nor leave a player to discover only in combat that their current weapon cannot trigger it.
+
+#### Fresh-save readiness audit — 11 August 2026
+
+Current `GameState.newGame()` creates no equipped weapon. Against the exact node semantics, four of
+the nine roots therefore may be inactive for a genuinely fresh character:
+
+- Heavy Hand needs a Crush attack;
+- Keen Eye needs a Pierce attack;
+- Tainted Edge and Sparkhand need a landed direct weapon hit.
+
+Quick Step, Thick Hide, Bulwark, Footwork and Quiet Step remain immediately operative without gear.
+This is not proof that the four equipment roots are bad: delayed build synergies and banking are
+legitimate, and changing them into generic bonuses would flatten the tree. It is a concrete early
+progression risk, especially while Aimee is also testing whether a new party can survive its first
+encounters.
+
+Do not resolve this by inference or an invisible unarmed damage kind. During the controlled
+fresh-save balance pass, record when the first combat point arrives, whether either traveller owns a
+weapon then, which root the screen says works now, and whether an ordinary route to a suitable weapon
+was visible through loot or the Trading Post. Acceptance is one of these evidenced outcomes:
+
+1. suitable gear ordinarily appears before the choice and the applicability copy is sufficient;
+2. banking the point feels like a meaningful visible option for only a short interval; or
+3. if neither holds, add an explicit early equipment route/starting-loadout decision as its own
+   balanced checkpoint.
+
+Do not quietly grant a fixed starter weapon while encounter balance is being measured: +weapon tier
+changes both fresh-party damage and which roots activate, so it would confound the current defeat
+diagnosis. Do not make learning require current gear either; that would turn rotating loot into a
+progression lock.
+
+### Route-quality audit — no topology redesign required
+
+The generated route audit reports 66–79 legal capstone paths per tree and at least 13 routes to every
+individual capstone under the authored hybrid alternatives. Those counts are diagnostics, not a goal
+to maximize. The five-node same-discipline capstone commitment prevents a cross-link from buying an
+identity for free, while alternate parents let a related technique open a hybrid route without
+turning the graph back into three isolated ladders.
+
+The current 72 effects also remain differentiated at the decision level: offense separates weight,
+target reading and tempo; defense separates endurance, protection and avoidance; Craft separates
+affliction, emanation and encounter control. Similar-looking effects occupy different timing or
+ownership boundaries—Sidestep preparation versus Ghost reserve, Slippery probability versus Watchful
+opening-order protection, Vanish retreat versus Quiet Step prevention—and should not be collapsed
+merely to reduce node count. The next design evidence comes from play and real consumers, not another
+topology or naming pass.
+
 ## Level-up and point receipt
 
 1. Experience resolution reports levels gained and combat points gained as separate facts.
@@ -45,18 +104,26 @@ level-earned points.
 The game may highlight currently available nodes, but it must not call one **best**, preselect Learn,
 or imply that an available capstone is mandatory.
 
-## First-point teaching
+## Persistent graph comprehension — not a tutorial checkpoint
 
-The Binder's first flexible point gets one short, dismissible overlay on the actual fan-and-fork graph:
+The true-tree implementation must not wait on or create a first-point teaching overlay. Aimee has
+placed tutorial work dead last; an instructional flag/modal is not part of graph migration,
+presentation or acceptance.
 
-- **Choose a direction:** every node is one point.
-- **Lines show what it can lead to:** paired choices divide inside a discipline; dashed authored
-  lines show the few adjacent-discipline hybrids.
-- **Nothing is permanent:** the Essence Spring can return all spent points later.
+The ordinary screen explains itself every time through:
 
-The overlay points at the three rank-1 roots and leaves the full tree at its settled size. It never
-reflows the graph, blocks inspection of node detail, or claims the player needs to spend immediately.
-Subsequent people do not repeat it. DEBUG can reset the teaching flag independently of progression.
+- a compact persistent key: **1 point per node · solid line prerequisite · dashed line alternate
+  hybrid route**;
+- clear owned/available/blocked frames and connector shapes;
+- anchored node detail naming exact parent alternatives and Learn consequences;
+- the visible unspent-point count and optional **How this graph works** help action;
+- respec availability/cost only inside the relevant detail/help, without claiming choices are free or
+  consequence-less.
+
+No first-point event opens, points at roots, changes focus, blocks taps, writes a tutorial receipt or
+needs a DEBUG reset. The existing **point ready** badge is sufficient notification. A future tutorial
+may reference this already-complete surface after higher priorities, but cannot become required graph
+state or migration data.
 
 ## Purchase feedback
 
@@ -121,7 +188,10 @@ Essence are zero-mutation outcomes.
 5. Arrival plans are connected, stable-ID based and never consume more than standard plus authored
    free points available at that level.
 6. Full respec failure/cancel/relaunch cannot lose Essence, points, choices or node ownership.
-7. At 368×800 the point count, three roots, five graph depths and anchored Learn detail remain usable;
-   the first-point teaching overlay does not resize the graph.
+7. At 368×800 the point count, persistent key, three roots, five graph depths and anchored Learn
+   detail remain usable without any tutorial overlay or first-point interruption.
 8. VoiceOver announces level, unspent points, owned/available state, prerequisites and the outcome of
    Learn/respec without relying on connector color.
+9. A character with no weapon, an off-kind weapon and a matching weapon sees truthful current-loadout
+   applicability on every equipment-dependent node; all three may bank or learn the node without a
+   hidden prerequisite.

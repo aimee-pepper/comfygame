@@ -2,6 +2,11 @@
 
 **Status:** first full spec of the payoff end of the loop. **[PROPOSAL]** marks my calls; all numbers **[PLACEHOLDER]**.
 
+> **Later ownership correction:** ordinary colored writing ink belongs to Isolde's Scriptorium /
+> Penmaker progression under `authored-color-vocabulary-current.md`, using world resources directly.
+> Older rows assigning generic “inks” to the Apothecary are historical proposal context only. Nessa
+> retains consumables, coatings, cures and any future specifically authored reactive stains.
+
 **The principle, already decided:** materials derive from the same trait vectors that produced the creature, flora, or substrate. **Recipes ask for properties, not item names** — so an exotic hide hoarded months ago can satisfy a recipe discovered later. That is the "held the bucket of drinks, found its perfect purpose" feeling, mechanised.
 
 ---
@@ -127,11 +132,13 @@ Anything qualifying works. Consequences, all intended:
 |---|---|---|
 | **Blacksmith** | Mineral, high hardness/density — Ingot, Stone, Shard, Plate, Fang | Weapons, heavy armour, tools, **instruments** (the pens) |
 | **Tannery** | Organic coverings — Hide, Pelt, Down, Chitin, Fiber | Light armour, **satchel and storehouse upgrades**, bindings, book covers |
-| **Apothecary** | Reactive and floral — Toxin, Resin, Reagent, Salt, Ichor | Consumables, tethers, identification aids, **inks** |
+| **Apothecary** | Reactive and floral — Toxin, Resin, Reagent, Salt, Ichor | Consumables, tethers, identification aids and specifically authored reactive stains; not ordinary writing ink |
 
 Existing buildings keep their jobs: **Refinery** (essence), **Library** (knowledge), **Workshop** (research), **Menagerie** (animals).
 
-**Nice consequence:** the writing system's own upgrades are crafted, not bought — **instruments at the Blacksmith, inks at the Apothecary, book covers at the Tannery.** So authoring better worlds is materially funded by the worlds you already authored, which closes the loop tightly.
+**Historical proposal consequence:** this originally placed inks at the Apothecary. Current design
+instead puts CMY+Depth pigment preparation at Isolde's Scriptorium; it is still materially funded by
+world resources. Instruments and cover ownership follow their newer current station documents.
 
 </details>
 
@@ -157,7 +164,8 @@ Existing buildings keep their jobs: **Refinery** (essence), **Library** (knowled
 3. **Flora and substrate drops.**
 4. **Grade + dual percentiles.**
 5. **Property-based recipes + one building (Blacksmith).**
-6. **Tannery, Apothecary** — including instruments, inks, covers.
+6. **Historical Tannery/Apothecary breadth** — later station authorities supersede the proposed
+   instruments/inks/covers grouping.
 7. **Gear slots + reforging.**
 8. **Unique site artefacts + Keepsake slot.**
 
@@ -166,7 +174,9 @@ Existing buildings keep their jobs: **Refinery** (essence), **Library** (knowled
 <details>
 <summary><b>9. Open</b></summary>
 
-1. Do materials stack, or does every instance keep its own property vector? (Leaning: **instances**, since properties vary per source — but that's a lot of inventory objects. May need grouping by identity with the best instance surfaced.)
+1. **Resolved by `world-resource-reserve-current.md`:** presentation groups by material kind while
+   the non-slot reserve retains every exact property-bearing sample. Materials do not consume item
+   or Field Kit slots.
 2. Is there a salvage/breakdown path for gear you don't want?
 3. Does grade decay, or are materials eternal? (Leaning: eternal — decay fights hoarding.)
 4. How many recipes ship, and how are they discovered in practice?

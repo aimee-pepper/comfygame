@@ -1,7 +1,9 @@
 # Current Design — Diary Teaching Registry
 
-**Status:** Authoritative ownership and singular-reward registry for all 28 designed travellers. Tam
-remains unassigned. This document controls IDs and reward kinds; packet documents control prose.
+**Status:** Authoritative ownership and singular-reward registry for all 29 designed travellers. Tam
+remains unassigned. Noll's pattern is reversible pending atlas/device review. This document controls
+IDs and reward kinds; packet documents control prose. Live coverage and promotion boundaries are
+tracked in `diary-teaching-registry-implementation-audit-current.md`.
 
 ## Reward schema
 
@@ -76,11 +78,13 @@ linked implementation note. Similar wording is not enough if the truth condition
 | Traveller | Field | Stable reward ID | Scope |
 |---|---|---|---|
 | Maud | `teachesPattern` | `maud_fitting_pattern` | One authored advanced physical-melee fitting pattern; no persistent fitted-item state |
-| Oda | `teachesSchematic` | `emanation_housing` | Unlocks the Channelworks housing route; no Arc focus, weapon grant or recipe bundle |
+| Noll | `teachesPattern` | `field_separation_kit` | One-use tier-1-efficiency field dismantle using ordinary exact Recycler preview/recovery routes |
+| Oda | `teachesSchematic` | `emanation_housing` | Unlocks later Contact/Projection housing recipes; the restored starter and basic Conduit route remain independent |
 
 ## Travellers without a private diary teaching
 
-- All 28 designed travellers have exactly one registered teaching above.
+- All 29 designed travellers other than held endgame traveller Tam have exactly one registered
+  teaching above.
 - Tam has none by design while the endgame hold is active. Do not reserve Glass or a placeholder ID.
 
 ## Validation fixture
@@ -94,4 +98,3 @@ For each registered page, automated content validation should prove:
 5. already-known acquisition is harmless;
 6. removed ordinary acquisition routes do not leak exclusives;
 7. the owner's signature can be satisfied without the reward.
-

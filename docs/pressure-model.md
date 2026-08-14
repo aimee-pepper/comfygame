@@ -250,7 +250,10 @@ At Moderate intensity; Intensity scales (Faint ×0.4, Moderate ×1.0, Great ×1.
 | **Peak > 70 + low Hydrology** | Water-conservation morphology; flora → succulent/spined/low stature | The arid syndrome; robust in the literature |
 | **Floor < 30 + aquatic** | **Meristic counts ↑** (Jordan's rule): more segments/appendages, more elongated bodies | Only fires with Hydrology |
 
-**Energy budget interaction:** insulation and large size both cost energy, so **cold + low Vitality caps size.** You cannot have huge, heavily insulated fauna on a world that can't feed them. This is the main cross-target constraint, and it's what stops cold worlds from producing everything-creatures.
+**Fixed-budget interaction:** insulation and large size compete inside the same ordinary-species
+budget. Cold may weight both, but buying one leaves less for the other; low Vitality reduces how many
+species/bodies exist rather than weakening each individual. This tradeoff prevents
+everything-creatures without making rich worlds secretly stronger.
 
 ### Instability
 

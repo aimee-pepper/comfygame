@@ -2,7 +2,8 @@
 
 **Status:** P1 minimum placement safety implemented; stable-ID migration and full screen contract queued.  
 **Owner:** Game Design owns player choices/presentation; Engineering owns stable identity, exclusive
-placement and visitor receipts; Asset Design owns person/visitor tile identity.  
+placement and visitor receipts; Aimee owns final person/visitor tile art, while Asset Design may
+validate placeholder state/layout only.
 **Extends:** `tavern-random-companions-current.md`, `party-member-identity-progression-current.md` and
 `anchorage-portfolio-assignment-current.md`.
 

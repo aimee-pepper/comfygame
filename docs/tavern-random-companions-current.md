@@ -1,6 +1,7 @@
 # Tavern and random companions — current design
 
-**Status:** Current structure with playtest-placeholder spawn and visitor numbers.  
+**Status:** Implementation-facing structure with playtest-placeholder spawn, recurrence and seat
+numbers.
 **Owners:** Orsa owns the Tavern; generated companions own no station.
 
 ## Critical capacity correction
@@ -29,6 +30,16 @@ They have:
 Once generated, a person is a persistent individual. The same unmet person may recur in later worlds
 or visit the Tavern; the game does not silently reroll their name, build or want. Recruitment is
 permanent under the finality pillar.
+
+Give every generated person a stable `GeneratedPersonID` and explicit origin; do not represent them
+only as `traveller == nil`, which already describes Quill and cannot distinguish two generated
+people. Named `TravellerID`, generated-person ID and starter identity are mutually exclusive origin
+cases on a roster member. Long-lived assignments and visitor/want records reference the stable person
+ID rather than a roster array index, which may change as the community grows or migrates.
+
+The generated visual descriptor is resolved once and stored with that durable person as required by
+`binder-quill-generated-visual-identity-current.md`; Tavern refresh, world recurrence, recruitment,
+want or build changes never regenerate it.
 
 ## World appearance
 
@@ -72,11 +83,14 @@ want and makes them eligible to recur or visit the Tavern.
 The Firepit exists from the start and holds the player's recruited community. Recruiting Orsa
 upgrades that same station into the Tavern; no second base door is created.
 
+The authoritative screen and exclusive-placement interaction is
+`community-party-tavern-current.md`: Firepit uses Departing/Community, Tavern adds Visitors, and a
+person cannot simultaneously travel, remain Home and work in a realm.
+
 On each resolved expedition, the Tavern refreshes up to three visitor seats from:
 
 1. previously met, unmet random companions;
-2. previously encountered but unresolved visitors, if later non-companion visitors are added;
-3. authored cast visitors only when their current narrative state explicitly permits it.
+2. no other category in v1.
 
 Named diary travellers never become random recruits at the Tavern. Their signature hunt remains the
 price of recruitment, and once genuinely found they join without an additional want.
@@ -93,6 +107,45 @@ Visitors refresh on expedition resolution, never wall-clock time. An unresolved 
 in the global met pool even when not currently seated; missing a visit never loses them. Orsa's
 upgrades may improve visitor-seat count, recurrence weighting, clue clarity and rest, but never sell
 people or guarantee named-traveller placement.
+
+### Persisted met pool and visitor snapshot
+
+Store generated people once in a tolerant campaign-level met pool. Each record includes identity and
+visual seed, pronouns/voice keys, first-met world/provenance, generated build plan/character, exact
+want and validation version, encounter state, recruitment state and latest legitimate clue. A world
+or Tavern seat holds only the stable person ID.
+
+The Tavern visitor list is a persisted outcome-refreshed snapshot with stable seat IDs and a refresh
+sequence. It uses a dedicated versioned RNG and the same durable expedition-outcome boundary as the
+Trading Post, but a separate seed namespace; opening the screen, relaunching or wall-clock time cannot
+change visitors. Never remove a person from the met pool when their seat rotates out.
+
+### Exact v1 seat rotation
+
+After each newly accepted `ExpeditionOutcomeID`, filter the met pool to generated people who are
+unrecruited. Rank them by:
+
+1. lowest `lastSeatedOutcomeSequence` (never seated first);
+2. lowest `firstMetSequence`;
+3. stable `GeneratedPersonID`.
+
+Take the first three and write them into stable seat positions 0–2, then stamp only those selected
+people with the current outcome sequence. If three or fewer are eligible, they remain visible; if
+more exist, this least-recently-seated rule rotates fairly without a wall-clock timer or hidden
+expiration. A repeated receipt for the same outcome is an exact no-op. Recruiting someone removes
+them on the next transaction reconciliation and fills the vacant seat from the same ranking without
+advancing the outcome sequence; inspecting or declining never does.
+
+This selection is deterministic rather than random because randomness adds no meaningful player
+choice after people have already been met. The separate seed namespace remains reserved for future
+visitor categories; it is not required to shuffle v1 generated people.
+
+After a world passes the ordinary random-companion appearance roll, generation chooses recurrence
+before creating a new identity. If eligible met/unrecruited people exist, use a DEBUG-tunable **60%**
+recurrence chance; on recurrence choose fewest world appearances, then oldest last appearance, then
+stable ID. Otherwise create one new person. The v1 encounter cap is **one generated-person encounter
+total**, whether recurring or new; recurrence never permits a second person in the same world.
+Opening/relaunch uses the frozen world receipt and cannot reroll either choice.
 
 ## Complexity boundaries
 
@@ -111,3 +164,16 @@ people or guarantee named-traveller placement.
    comparable reachable replacement without changing the person.
 5. Bulk inventory actions protect items reserved for an active want unless the player explicitly
    unlocks them.
+6. Want fulfillment is previewed and committed atomically. World-resource wants consume the named
+   amount; material wants consume the exact selected sample; knowledge/place/record/passage wants
+   consume nothing.
+7. A want reserves only an exact selection the player deliberately pins toward it. Merely having a
+   matching active want does not auto-lock every matching resource or sample in storage.
+8. Named travellers, Quill and generated people remain distinct across save migration, roster
+   reorder, Home/realm assignment and Tavern refresh.
+9. Four or more eligible met people rotate by least-recently-seated order; three or fewer remain,
+   and no screen-open/relaunch/wall-clock event changes the snapshot.
+10. One accepted outcome refreshes once; duplicate receipt processing is a no-op, and immediate
+    post-recruitment vacancy repair neither advances nor rerolls the outcome.
+11. A world contains at most one generated-person encounter total. Recurrence/new choice and fair
+    recurrence identity survive relaunch and catalogue order changes.

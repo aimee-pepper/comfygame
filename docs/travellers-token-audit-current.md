@@ -1,15 +1,18 @@
 # Current Design Audit — Traveller's Token
 
-**Status:** Recommendation to cut the held eighteenth Apothecary item. No implementation change is
-authorized until Aimee reviews the challenge.
+**Status:** cut from current design; retained here as rationale/history.
 
-## Current traveller placement rule
+## Current traveller placement direction
 
 - A traveller exists at their complete condition signature.
-- Every unrecruited traveller whose signature the generated world satisfies is placed on the map.
+- A newly bound world may place at most one unrecruited traveller; the old “place every match” rule
+  produced an unacceptable first-world Mara+Bryn crowd.
 - Placement is deterministic after world readings resolve; there is no separate appearance-chance
   roll for the token to improve.
-- Diary pages are guides, never gates. A lucky matching world may produce an accidental meeting.
+- Blind discovery uses an authored-order frontier and opening-economy priority. Diary pages remain
+  guides rather than universal gates.
+- When several full signatures match, deterministic selection weighs story order, recovered exact
+  clues and conditions the player's writing causally made true. It does not alter any signature.
 - Finding still requires reaching and speaking to the person; arrival alone does not recruit them.
 
 This is the intended search loop restored by the signature and diary work. Pacing comes from authored
@@ -27,11 +30,18 @@ condition complexity, available vocabulary and world-writing capacity—not an i
    ordinary system explicitly keeps clues non-gating.
 5. Consuming it on a non-match would be a costly hidden failure; refunding/persisting it would act as a
    covert signature validator.
+6. The accepted selection score already recognizes evidence and causal writing. Charging an item to
+   multiply the same facts would sell back agency the location page has already earned.
 
 ## Recommendation
 
-Cut Traveller's Token and ship the coherent seventeen-item Apothecary catalog. Eighteen is not a design
-target worth weakening the campaign spine to satisfy.
+Cut Traveller's Token. Eighteen is not a design target worth weakening the campaign spine to satisfy.
+
+A later physical playtest exposed a real field-preparation need: an animal-only **Scent Mask** is now
+the recommended replacement direction. It earns a catalogue place by making the existing awareness
+and Shadow-skill loop playable; it does not bias world writing or traveller eligibility. See
+`field-awareness-avoidance-current.md`. Scent Mask is a separately justified addition, not a
+one-for-one content-count replacement.
 
 Do not replace it merely to preserve a count. A future utility consumable should enter only when
 playtesting reveals a real expedition problem, and should affect a visible state rather than secretly
@@ -47,6 +57,6 @@ The current answer is:
 - Accidental rates are tuned through each signature and phase; they are not forced to zero.
 
 This preserves surprise without allowing the old situation where broad signatures made the diary loop
-optional. The expanded cast needs simulation before any global cap or “one traveller per world” rule is
-considered.
-
+optional. The one-traveller maximum and blind authored frontier are now settled in
+`traveller-world-pacing-current.md`; deterministic evidence scoring creates no legitimate appearance
+percentage for Traveller's Token to modify.

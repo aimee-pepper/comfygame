@@ -169,7 +169,7 @@ Better in two ways: a dry run makes **one specific thing** likelier rather than 
 | **Iron** | subs +8 | 2 | **d** | N | start — *the workhorse metal* |
 | **Salt** | hydr −10 · subs +8 · **vita −25** | 3 | d | N | mid wild · research · merchant |
 | **Sulfur** | subs +15 · vita −12 | 3 | d | P | mid wild · research · merchant |
-| **Crystal** | **illu +18/f+18** · subs +25 | 4 | **d** | P | **early-precise** wild · merchant — *see `isolde.md`; she depends on it preceding the pencil* |
+| **Crystal** | **illu +18/f+18** · subs +25 | 4 | **d** | P | **early-precise** wild · merchant; no longer a Brush prerequisite |
 | **Gold** | subs +40 | 4 | **d** | P | late wild · merchant |
 | **Gold ore** *(new)* | precise, richer | 4 | **d** | P | **diary — Halloway the smith** |
 
@@ -279,7 +279,8 @@ plus Moon and Amber secondaries. The old candidate cut is superseded; see
 3. **Which diary teaches which**, covered in `the-cast.md`.
 4. **Which branches end in an exclusive rune.**
 5. ~~**The Cycle cut**~~ — resolved by the live six-focus set and `cycle-system-current.md`.
-6. **Crystal's exact position** in the precise band, since Isolde depends on it arriving before the pencil.
+6. **Crystal's exact position** in the precise band, independent of the Brush's current
+   Copper/Fibre/Timber recipe.
 7. **Whether a subject arrives with its first focus**, or unlocks separately.
 
 
@@ -336,7 +337,7 @@ plus Moon and Amber secondaries. The old candidate cut is superseded; see
 | **Obsidian** | 3 | d | P | mid wild · merchant | Edges. Piercing weapons |
 | **Copper** | 2 | d | N | early wild · research · merchant | Alloys, conductive work |
 | **Silver** | 3 | **d** | P | mid wild · merchant | Fine work; **instrument nibs** |
-| **Lead** | 2 | d | N | early wild · research · merchant | **Pencils** — dense, soft, cheap |
+| **Lead** | 2 | d | N | early wild · research · merchant | **Brush ferrules and Fountain-pen parts** — dense, soft, workable |
 | **Mercury** | 4 | **d** | P | **diary — Grimmond the delver** | *Aimee's own example.* Strange work; **chaining** |
 | **Adamant** | 5 | **d** | P | **end of a research branch** | Endgame. Candidate anchoring material |
 | **Gold ore** *(new)* | 4 | **d** | P | **diary — Halloway the smith** | |
@@ -433,7 +434,7 @@ the current Cycle table above and `cycle-system-current.md`.
 
 ## What the expansion is actually for
 
-- **Substrate 7 → 20** is the biggest change and the most needed. Greed lives there, every material comes from there, and it had seven words. **Lead and Silver and Quartz aren't decoration** — they're what pencils, pen nibs and lenses are *made of*, so the writing and analysis progressions finally have material costs that make sense.
+- **Substrate 7 → 20** is the biggest change and the most needed. Greed lives there, every material comes from there, and it had seven words. **Lead and Silver and Quartz aren't decoration** — they support brush ferrules, pen parts and lenses, so the writing and analysis progressions finally have material costs that make sense.
 - **Relief 3 → 9** — a subject with no word for *mountain* or *plain*.
 - **Cycle 0 → 5** was the historical gap; the live six-focus set closes it. The remaining work is
   making the resolved Cycle drive the world clock.

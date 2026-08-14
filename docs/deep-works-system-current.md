@@ -40,6 +40,20 @@ Its mineral profile is derived from the world resources already resolved for tha
 invents Adamant, Mercury, Rift-glass or another rare resource absent from the world's own profile.
 Writing a resource focus may make that resource eligible/abundant; it does not guarantee a deep sign.
 
+For the first implementation, use this **reversible profile** rather than interpreting “hard” and
+“meaningful” differently in preview and generation:
+
+- substrate available magnitude ≥45;
+- substrate hardness aspect ≥55;
+- either substrate range ≥20 or force available magnitude ≥35;
+- a dedicated versioned deep-sign draw, seeded from the saved world seed, succeeds at 20%.
+
+The draw and candidate choice must not consume the ordinary site/resource RNG streams. Changing the
+ordinary site catalogue must therefore neither create nor move a sign in an existing seed. Place the
+sign on a reachable, passable, empty interior tile at Chebyshev distance ≥3 from entry where possible;
+fall back to any reachable legal tile, and omit it if none exists. There is no forced placement that
+overwrites another feature.
+
 Deep sites do not contain diary pages, traveller placement, gear caches or old-civilization lore by
 default. A future authored overlap may combine geological and constructed evidence explicitly, but
 the generic site does not steal Edren's reward identity.
@@ -62,6 +76,12 @@ there is no hidden cave-in roll.
 without one where the face is workable at all. Hardness beyond the party's current capability is
 shown as inaccessible rather than consuming a failed turn.
 
+Merely examining an unresolved sign costs no turn. **Sound depth** costs one turn only when it
+successfully records the saved profile for the first time; revisiting the known reading is free.
+Extraction recognises an equipped crafted item whose recipe/family is `field_pick`, not a particular
+fallback item ID or display name. Pull count, resource and grade are saved at bind and never recomputed
+from the world's later mutable nodes.
+
 ## Support reserve
 
 Every sounded site distinguishes **recoverable material** from a visible **support reserve** that
@@ -82,6 +102,11 @@ economy.
 
 Numbers are debug tuning. The permanent invariant is that the operation is deterministic, visibly
 changes saved site state and never risks a companion's life on a hidden roll.
+
+Automatic brace selection means the weakest qualifying **owned world-resource samples** by relevant
+property, breaking ties by lower grade and then stable instance ID. The preview names both exact
+samples. A player may replace either selection before confirming; confirmation is atomic, so no
+resource, Essence or turn is spent unless both samples still exist and qualify.
 
 ## Yield and provenance
 
@@ -115,6 +140,35 @@ trade-off only if that benefit is authored visibly later.
 No underground map, mining crew, lift, rail, fuel, cave-in chance, oxygen, permanent injury, ore
 processing queue, respawning deep deposit or offline excavation is added. Deep sites do not become
 anchored-world production nodes.
+
+## Persistence and map contract
+
+Implement Buried seam as a dedicated, non-weighted `SiteDef` plus optional deep state on its
+`PlacedSite`. Do not put it into `SiteRules.eligible` or the ordinary per-world site ceiling. A
+separate Deep Works placement pass may reuse the ordinary legal-position helper, but owns its own
+seed/version and saved state. This keeps normal site history, collision and map rendering while
+preventing the seam from behaving like a one-search loot container.
+
+The tolerant optional state is conceptually:
+
+- profile version and resource ID;
+- saved grade/properties and initial safe-pull count;
+- remaining safe pulls and the always-retained support count;
+- unresolved/sounded knowledge state;
+- braced flag and extraction/provenance history.
+
+Older saves with no deep state remain unchanged; the game must not synthesize a seam into an already
+bound world. New worlds save the complete profile at bind even while it is unresolved. The site has
+an ordinary fog-gated map/minimap presence: building the Deep Works may reinterpret a sign already
+discovered by walking, but may not disclose its coordinate through fog.
+
+The saved resource is drawn from the non-organic, non-Essence entries of that world's resolved yield
+table. If no eligible entry exists, no deep sign is placed. This is the authoritative meaning of
+“world resources already resolved”; it is not inferred from whichever harvest nodes happened to fit
+on the final map.
+
+Instrument upgrades may sharpen family, grade band or pull-count estimates. They do not reveal an
+undiscovered coordinate, exact hidden properties, or a resource the saved profile does not contain.
 
 ## Required fixtures
 

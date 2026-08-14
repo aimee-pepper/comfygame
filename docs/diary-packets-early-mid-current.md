@@ -1,8 +1,8 @@
 # Current Design — Early–Mid Diary Packets
 
-**Status:** implementation-ready authored content plan for Bryn, Orsa, Vance and Talin. Each diary has
-seven pages: three location pages plus four pages carrying teaching, relationship, site or world
-value.
+**Status:** implementation-ready for Bryn, Orsa and Talin. Vance's reordered six-page opening packet
+below supersedes his former three-location/seven-page shape; exact revised prose enters the atlas as
+review-needed where text changed.
 
 ## Required content schema
 
@@ -45,19 +45,20 @@ Arc coverage: intervention · consent · formation exclusion · Marrick · pract
 
 Arc coverage: temporary shelter · privacy · Sela · Vance · convergence without forced closeness.
 
-## Vance — 7 pages
+## Vance — 6 pages (opening reorder)
 
 | ID | Kind / unlock | Prose |
 |---|---|---|
-| `vance_where_0` | location clue 0: Relief openness ≥72 | “A load can cross the horizon here without the land inventing a toll.” |
-| `vance_where_1` | location clue 1: Substrate dispersion ≤35 | “The useful ground keeps to seams. Value is easier to bargain over when both people can point to its edge.” |
-| `vance_where_2` | location clue 2: Vitality dispersion ≤38 | “Life gathers in separate pockets. Moving something between them changes its price before it changes the thing.” |
+| `vance_where_0` | location clue 0: Relief openness ≥68 | “A load can cross the horizon here without the land inventing a toll.” |
+| `vance_world_seams` | world observation | “The useful ground keeps to seams. Value is easier to bargain over when both people can point to its edge.” |
+| `vance_world_pockets` | world observation | “Life gathers in separate pockets. Moving something between them changes its price before it changes the thing.” |
 | `vance_amber` | focus; `amber` | “Amber preserves by removing a thing from circulation. Sometimes that protects a history. Sometimes it only makes the theft last.” |
 | `vance_word_orsa` | whereabouts; `orsa` | “Orsa never charged for the fire. She did expect anyone using it to notice who else was cold. Some debts become clearer when nobody names them.” |
-| `vance_world_repaired_handle` | world worth writing | “Write somewhere one material is common and another is scarce. Then look at what has been repaired. Need leaves better records than abundance.” |
 | `vance_site_binders_workshop` | ruin/site; `binders_workshop` | “The tools in the old binder's room came from six hands. I know because every handle was changed for the next one. Ownership is rarely the longest fact about an object.” |
 
-Arc coverage: circulation · provenance · Orsa · unequal need · preservation versus use.
+Arc coverage: circulation · provenance · Orsa · unequal need · preservation versus use. The removed
+seventh page's repaired-handle idea is already carried by the Workshop page and should not be kept as
+near-duplicate padding.
 
 ## Talin — 7 pages
 
@@ -86,4 +87,3 @@ certainty.
    other pages provide redundancy, character and useful unlocks.
 5. Site pages reveal a known site definition and never guarantee placement in the current world.
 6. No prose page is mechanically blank and no page grants two unlocks.
-

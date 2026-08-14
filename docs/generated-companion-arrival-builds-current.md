@@ -18,6 +18,12 @@ the Tavern or when recruitment is delayed.
 This preserves the settled intent that a late find is immediately usable without letting players
 cycle visitors until one copies a temporarily over-levelled party member.
 
+It also preserves the Binder-anchor invariant used by encounter scaling: generated people arrive at,
+never above, the Binder's level, and active party members subsequently receive the same party XP
+award. No generated-person quality, want, delayed recruitment or build plan may grant a hidden level
+premium. If a later system deliberately creates an above-Binder companion, it must reopen the
+scaling contract rather than relying on its tolerant migration clamp as balance.
+
 ## Coherent spent graph build
 
 The generator creates and persists a **graph build plan**:

@@ -1,6 +1,6 @@
 # Named character stat growth — review boundary
 
-**Status:** design defect confirmed; recommendation awaiting Aimee review
+**Status:** reversible playtest authority; implement in campaign order and review through play
 **Priority:** P1 combat identity, after the active shared-armour checkpoint
 **Does not authorize:** silently rewriting existing characters, retuning encounter coefficients or
 displacing current playability work
@@ -32,11 +32,13 @@ This is preferable to “raise the current two highest” because that rule is o
 different after another system has already made stats unequal. It also makes late-arrival replay,
 save migration and UI explanation deterministic.
 
-### Provisional cast profile if the fixed-pair option is chosen
+### Cast profile
 
-These pairs are recommendations, not settled data. Sharing a pair is allowed when two practices
+The machine authority is `named-character-growth-authority.json`. Sharing a pair is allowed when two practices
 genuinely exercise the same capacities; the rule is relative identity, not artificial uniqueness.
 Combat-tree lean, equipment and player purchases still separate people who share stat growth.
+Run `python3 Scripts/validate_named_character_growth.py` to prove complete traveller coverage,
+stable IDs, valid stats and distinct pairs against the live traveller catalogue.
 
 | Traveller | Growth pair | Design reason |
 |---|---|---|
@@ -74,7 +76,7 @@ Quill's provisional pair is **Wit + Fortitude**: dependable care and rule execut
 all-rounder. The Binder's choice should be framed as “which two capacities have carried you this
 far?” and preview the mechanical effects; it must not be a class lock or a tutorial interruption.
 
-## Review choices
+## Alternatives retained for history
 
 1. **Authored fixed pair (recommended):** primary + secondary per named character; Binder chooses;
    generated companions freeze a generated pair.

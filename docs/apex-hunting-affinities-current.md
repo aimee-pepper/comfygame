@@ -6,12 +6,17 @@ wild weapon belongs to an apex/world; they never guarantee an apex or a particul
 ## Shared rule
 
 - The existing risk/value draw still decides whether an apex appears.
+- Encounter difficulty resolves independently under `encounter-scaling-playtest-current.md`.
+  Affinity matches never alter apex level, HP, offence, action slots, creature traits or nearby
+  ordinary foes.
 - If an apex or locked-cache bonus awards a wild weapon, each satisfied affinity condition adds one
   `characterBonus` weight to that weapon.
 - Conditions are independent bonuses, not an all-or-nothing signature. Deliberate writing can strongly
   favour a weapon while surprise remains possible elsewhere.
 - Pre-bind projection does not name an apex or weapon. After encountering a weapon, high analysis may
   describe its known environmental lean without showing exact odds.
+- A matching world does not disclose an undiscovered apex through the main map or minimap; the
+  explore-first default in `minimap-disclosure-current.md` has no affinity exception.
 - Save-compatible item ID `rimed_edge` continues to mean player-facing **Barbed Edge**.
 
 ## Affinity table
@@ -44,4 +49,3 @@ wild weapon belongs to an apex/world; they never guarantee an apex or a particul
 3. Neutral, blank and extreme-risk fixtures must leave every weapon at nonzero chance.
 4. Track empirical distributions separately for apex wins, ordinary-creature lottery and caches.
 5. A weapon affinity never makes an apex more likely; appearance remains on risk/value.
-

@@ -97,7 +97,7 @@ objects or movement without a separately approved gravity system.
 | Late world discovery | Eclipse, Ring, Shattered Moon | 3 |
 
 World-discovery entries use current rune pity when they are the authored target. None is
-merchant-only; the Exchange may later circulate already eligible non-diary vocabulary without
+merchant-only; the Trading Post may later circulate already eligible non-diary vocabulary without
 becoming its sole source.
 
 ## Required metadata and fixtures

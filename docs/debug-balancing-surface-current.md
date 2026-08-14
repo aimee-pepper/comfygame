@@ -43,6 +43,11 @@ frequency/yield, resource-node density, second-writing chance and creature densi
 The existing 0.25×–3× range is suitable for density/yield diagnosis. A value of zero should be
 available only where “none” is a valid world, and must not bypass the one-writing guarantee.
 
+For Raw Essence, the old 2–4 drops × 1–2 units default is a diagnostic legacy profile, not a viable
+balance center. The temporary current profile is 5–7 × 2–3 as specified in
+`essence-continuation-economy-current.md`. Add named Lean/Recommended/Generous presets alongside the
+independent multipliers so Aimee can compare complete, reproducible economy conditions.
+
 ## Batch two — expedition feel
 
 These have the highest value because they answer current playtest questions across a single evening.
@@ -86,7 +91,7 @@ encounter”; the three labels above name the actual outcomes.
 | Anchoring | Anchor-site appearance multiplier | Next world |
 | Anchoring | Renewable production rate and delivery capacity | Future production ticks; never erase stored progress |
 | Economy | Station build-cost multiplier | Future purchases only |
-| Economy | Exchange buy/sell spread | Future transactions only |
+| Economy | Trading Post buy/sell spread | Future transactions only |
 | Cycle | Period-band values and maximum regularity jitter | Next world |
 
 Keep authored station recipes and traveller conditions visible as read-only inspection rather than
@@ -112,6 +117,8 @@ For each generated world, show a compact read-only diagnostics page:
 
 - writing guaranteed/selected/placed and second-roll result;
 - raw essence eligible nodes, placed drops and obtainable total;
+- raw essence collected, refined-value equivalent, bind cost paid, Spring yield, anti-lock subsidy
+  use and net authored-book runway;
 - ordinary world-resource nodes by type;
 - creature/flora species and instance counts, apex roll and result;
 - stability score, turn budget, projected collapse and actual exit turn;

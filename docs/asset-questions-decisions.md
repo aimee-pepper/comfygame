@@ -1,5 +1,12 @@
 # Asset Questions and Decisions
 
+## Simulator-window handling — settled 10 Aug 2026
+
+- Do not close, reopen, boot, recreate, reposition or otherwise alter Aimee's existing iPhone
+  Simulator suites/windows. Reuse the already-running simulator only with non-lifecycle commands.
+- If no suitable simulator is already available, pause simulator QA rather than launching one.
+- AssetLab browser/unit work does not require Simulator and should leave it untouched.
+
 **Owner:** Asset lead  
 **Started:** 9 Aug 2026  
 **Authority:** Use alongside `current-design-index.md`. Settled asset direction and lead reviews
@@ -616,6 +623,16 @@ Superseded by the current anchoring system. Do not use tether visual language.
 - Light and dark launch command rasters are now protected by the golden regression catalogue. Full
   AssetLab tests pass; regression is 0/205.
 
+### 10 Aug 2026 — App Launch v0.2 frozen by Aimee
+
+- Aimee identified the preferred simple composition as the stark boxed page with two long horizontal
+  rules, matching the existing v0.2 lossless proof rather than v0.1's vertical I-like mark.
+- `AssetLab/artifacts/app-launch-proof-v0.2.png` remains the visual authority. No new launch variant
+  or revision is authorized.
+- **Freeze:** do not revise, review, expand or schedule App Launch work again unless Aimee explicitly
+  requests it. App Launch is removed from the active asset roadmap; higher-priority playable economy
+  and map work proceeds instead.
+
 ## Straight-top-down map characters v0.1 — in progress
 
 - **Placeholder decision:** preserve the accepted 16×16 compact-upright `world` renderer as
@@ -695,3 +712,823 @@ Superseded by the current anchoring system. Do not use tether visual language.
   run AJV first. Unknown top-level, identity and world-grade fields return structured `unknown-field`
   diagnostics with exact paths; direct tests cover `selected`, `identity.calling` and
   `worldGrade.temperature`. Full suite passes; regression remains 0/224.
+
+### Full-cast mapTopDown v0.1 — accepted AssetLab catalogue expansion
+
+- Exported `AssetLab/artifacts/map-top-down-full-cast-proof-v0.1.png`. All 28 authored traveller
+  descriptors appear in the accepted authored order in north/east/south/west panels, each rendered
+  at native 112×64 and scaled nearest-neighbour 2× in color and literal grayscale under the exact
+  cool-living `worldGrade` vector.
+- Tests now require pairwise silhouette inequality across all 28 named people independently in each
+  of the four facings. The browser console is clean; full tests pass and regression remains 0/224.
+- Corrected the older full-cast proof caption: its 16px `world` figures are compact-upright
+  legacy/proof-only, not straight top-down. `mapTopDown` remains the sole integration-facing map
+  camera.
+- Game Design accepted all 28×4 facings as the catalogue expansion. Bryn/Dagg and Orsa/Sabine are
+  the closest native-scale pairs but remain distinct through carry/apron/body mass. This does not
+  authorize native integration, add gear/animation, or resolve the persisted
+  Binder/Quill/generated/facing gates. The next review-key export should wrap or number the final
+  clipped labels; that presentation cleanup does not alter sprite acceptance.
+
+## Terrain border/elevation correction — 9 Aug 2026
+
+- **Observed native issue:** every tile was outlined by an app-owned debug grid, while the shared
+  elevation grammar added a full-width brown bottom band. Together these made ordinary terrain read
+  as bordered blocks or side-view dirt ledges.
+- **Asset decision:** ordinary ground has no perimeter border. Only water, deep water, ice and chasm
+  own adjacency edges. Elevation remains a real readable tile fact, but is now shown with one to
+  three strictly inset paired contour steps derived from that ground family's own graded palette.
+  The cue never reaches the tile perimeter and cannot become a horizon or baseline.
+- Chasm is missing ground, so nonzero elevation is suppressed and impossible chasm-elevation
+  fixtures are not exported.
+- Map grammar advances from `map-slice-1.1.0` to `map-slice-1.2.0`; other tuple members are
+  unchanged. The regenerated conformance pack contains 195 outputs and canonical manifest SHA-256
+  `6d0c21206a983d024a4b948fe7008a2be89676e5c934efa3f84bc8b194fd7996`.
+- Tests cover all 12 grounds at elevations 0–3, strictly inset geometry, removal of legacy brown,
+  and exclusive adjacency ownership by the four edge-bearing families. Full tests pass; golden
+  regression is 0/224.
+- **Engineering-owned follow-up:** remove the universal native tile stroke and mirror the accepted
+  AssetLab 1.2.0 elevation commands/hash. AssetLab does not modify the game implementation.
+- **Design disposition:** the border/bar correction and inset contour direction pass. Before golden
+  promotion, provide one integrated adjacent 0→1→2→3 dry plus wet/vegetated color/grayscale strip
+  with route/content overlays, proving the marks read as elevation rather than incidental texture.
+  Retain 1.1.0 in native until that focused artifact is accepted.
+
+### 10 Aug 2026 — elevation extrusion correction requested by Aimee
+
+- Aimee rejects generic elevation sidewalls that read as dirt or wooden stakes under unrelated
+  surfaces. Any exposed riser must be derived from the owning ground family's world-graded palette
+  and material texture.
+- Preferred direction: lift the complete surface composition upward by the resolved riser height and
+  fill only the newly exposed screen-south wall beneath it. Terrain detail, flora, crack, content,
+  route/action and party/selection remain surface-owned and shift together; hit ownership and logical
+  tile coordinates do not move.
+- A true lift cannot be faked as another strip inside a clipped 16×16 tile. Candidate contract uses a
+  16×`(16 + riserHeight)` render surface with a bottom/base-cell anchor and controlled upward
+  overflow. Native requires explicit overlap order and must not clip the raised surface back to the
+  logical cell.
+- Sidewall visibility must derive from neighboring elevation, not merely ground adjacency: an equal
+  or higher screen-south neighbor occludes the wall; a lower neighbor exposes only the positive
+  height difference. Chasm never receives a raised top. Fog still short-circuits all informative
+  pixels.
+- **Placeholder pending focused proof/review:** use one pixel of riser per elevation level, preserving
+  the current compact map scale. Prove adjacent 0→1→2→3 dry ground, mixed-material equal heights,
+  a drop back to zero, wet/vegetated surfaces, route/content/party surface alignment, map-edge
+  clipping, color/grayscale and native phone scale before replacing the current candidate grammar.
+
+#### Lifted extrusion candidate v0.1
+
+- Added a separate review-only `liftedTerrainSprite` contract rather than mutating the current native
+  pack. It returns a 16×19 bottom-anchored sprite, fixed logical 16×16 hit footprint, one pixel per
+  elevation level, intact translated top plane and a screen-south wall only for the positive delta to
+  the southern neighbour.
+- `liftedSurfaceLayerCommands` applies the exact surface offset to flora, crack, content, route and
+  actor layers. Tests cover fixed dimensions/pivot, complete-plane translation, same-height seam
+  suppression, positive-delta walls, removal of generic dirt/stake colors, overlay alignment and
+  water/deep-water/chasm normalization to elevation zero.
+- Lossless review artifact: `AssetLab/artifacts/terrain-lifted-extrusion-proof-v0.1.png`, showing a
+  5×4 color/grayscale composition with soil 0→3, stone, groundcover/flora, route/traveller and
+  water/chasm boundaries. Full tests pass; existing golden regression remains 0/224 because the
+  candidate has not replaced the current handoff or entered golden.
+
+#### Integrated review and closed-API corrections
+
+- Design accepted the revised native 5×4 back-to-front artifact for candidate/golden promotion:
+  equal heights have no seam; soil 0→3 and mixed soil/stone joins read as low owning-material
+  terraces; the turning route, flora and upper actor remain seated; the immediately southern actor
+  is not clipped; raised land remains distinct beside flat water/chasm in color and grayscale.
+- Engineering's source review found and closed three pre-handoff issues. The geometry is now frozen as
+  profile `terrain-lifted-1.0.0` (16×19, pivot 8/18, logical 16×16, max elevation 3, one pixel per
+  level). Fog, crumble, water, deep water and chasm resolve to rendered elevation zero. The renderer
+  accepts only exact `southExposureLevels` 0…3 rather than arbitrary neighbor height/geometry, and
+  surface translation is restricted to flora/decor, crack/warning, content, route/action/target and
+  actor/selection layers; floating alert badges are rejected.
+- Native derives exposure from one validated map snapshot after normalization:
+  `max(0, renderedCenterElevation - renderedSouthElevation)`. Concealed neighbors and map boundaries
+  expose zero levels in v1. Rows render north-to-south; logical hit ownership remains square and
+  unchanged. Tests cover hidden/crumbled levels 1–3, invalid exposure values and unsupported floating
+  layers.
+
+#### Lifted terrain candidate contract closure
+
+- The integration-facing lifted profile has its own immutable tuple rather than silently changing
+  map-slice v1.1: `lifted-terrain-adapter-1.0.0`, `terrain-lifted-1.0.0`,
+  `world-grade-1.0.0`, and `terrain-16x19-bottom-anchored-1.0.0`.
+- `southExposureLevels` is required and exact. Missing, extra, out-of-range, or greater-than-resolved
+  center elevation facts are diagnosed; unrevealed, crumbled, or forced-flat ground must pass zero.
+- Pending explicit substrate/shelf/basin facts, water, deep water, chasm, ice, growth and groundcover
+  resolve to elevation zero. This prevents green vegetation walls, invented ice shelves and implicit
+  waterfalls. Dry solid substrates retain same-material lifted faces.
+- The machine request is closed in `AssetLab/schemas/lifted-terrain-request.schema.json`; the public
+  adapter independently enforces closure and cross-field semantics. Two fixed SHA-256 rectangle and
+  pixel-token vectors live in `AssetLab/integration/lifted-terrain-v1/conformance-vectors.json`.
+- Verification: full AssetLab suite passes and regression is 0/224. Simulator was not used.
+
+#### Lifted terrain frozen native conformance pack
+
+- Engineering may claim the bounded native map renderer/compositor files. AssetLab remains walled and
+  does not edit them.
+- Frozen manifest: `AssetLab/integration/lifted-terrain-v1/manifest.json`; canonical SHA-256
+  `fdfe2744af523628dc7aacac3c5a901d2fbd499a02cdb205a76d21e9f3d3f399`.
+- The pack contains two 16×19 sRGB RGBA PNG conformance fixtures with file and independently decoded
+  RGBA SHA-256 hashes. Tests also pin recursive-canonical request and rectangle-command hashes.
+- The manifest fixes logical hit ownership, bottom pivot, north-to-south row order, sprite origin,
+  exact exposure derivation, shifted surface-owned layers and unshifted floating badges. This is the
+  native checkpoint that removes false sidewalls without flattening supported dry-land elevation.
+
+### 10 Aug 2026 — playability-first economy station identities
+
+- Added authored `trading_post` and `recycler` station identities. There is deliberately no
+  `exchange` alias: Trading Post means a merchant with rotating stock who buys eligible goods for gold.
+- Native grayscale evidence separates Trading Post, Recycler, Storehouse, Workshop and Blacksmith
+  through whole mass and negative space; built/tier-stress/damaged states preserve identity.
+- Staffing remains a separate occupant and does not mutate station geometry. Prices, eligibility,
+  recovery yield, refresh timing and transaction rules are not encoded in station art.
+- Placeholder decision: both stations share a lawful neutral pre-identity foundation slab. An
+  unfinished foundation does not reveal its future station kind; authored identity begins when built.
+- Design accepted `AssetLab/artifacts/economy-stations-proof-v0.1.png` for AssetLab golden promotion.
+
+### 10 Aug 2026 — equipment-grid bridge candidate
+
+- Added a narrow Equipment Grid Lab reachable from Resource Lab. It covers the exact eight live
+  `GearSlot` raw values (`armor` is displayed as Body) and keeps item-family identity independent
+  from location and comparison state.
+- The Weapon fixture pins Mara's worn Pointed Blade as baseline, then shows Stored, Worn, safe home
+  Overflow and current-world Carried ownership. Overflow never uses loss language; Carried remains
+  unavailable at home and is never presented as Worn.
+- Four location channels use full text plus separate shelf/person/open-tray/satchel shapes that
+  survive literal grayscale. Filter buttons are at least 44pt; a one-column accessibility-large
+  example and an ordered hidden semantic list are included.
+- The exported resolver tests All plus every exact slot, `armor`→Body and `offhand`→Off-hand labels,
+  stable instance ID/icon across four explicitly labelled snapshots, mutually distinct locations,
+  the pinned baseline and signed `current/−2/+1/+0` comparison strings.
+- Current review artifact: `AssetLab/artifacts/equipment-grid-bridge-proof-v0.2.png`. This is visual
+  and semantic evidence only; it does not authorize or invent merchant/recycler transaction rules.
+
+#### Six-across inventory direction supersedes the two-column bridge
+
+- Aimee rejected two-column prose cards as a reformatted list. The current phone grammar is six
+  square item icons per row; item names and descriptive prose appear only after tapping an icon.
+- `AssetLab/artifacts/equipment-six-across-proof-v0.3.png` proves six 54px cells across a 390pt
+  phone canvas, literal grayscale, quantity, unknown, location, rarity and selection without names
+  under icons. Location changes neither the central item identity nor its persisted instance.
+- Selection and rarity are independent channels: the fixture includes selected ordinary,
+  unselected fine and selected-plus-fine cases. A worn baseline offers Take off/Inspect; Stored may
+  Equip, Overflow must be stored/made accessible first, and Carried remains unavailable at home.
+- Item-family collision assertions now also hash occupied pixels rather than rectangle decomposition,
+  matching the strengthened resource test boundary.
+- The tapped detail owns the full name, known provenance/stats, quantity, location and truthful
+  actions. Slot filtering remains navigation only and covers all eight exact live slot values.
+- The prior v0.2 two-column artifact remains historical evidence only and is not a current UI
+  recommendation.
+
+#### Blacksmith Pointed Blade checkpoint
+
+- `AssetLab/artifacts/blacksmith-pointed-blade-checkpoint-proof-v0.1.png` shows five truthful states:
+  missing samples, samples ready but Essence short, exact preview, destructive confirmation, and a
+  newly persisted Stored output.
+- READY uses `Review craft`; only CONFIRM uses `Confirm craft`. RESULT offers `View stored` and does
+  not imply another mutation. No input is removed before confirmation, and the fixture separately
+  states wallet 24→12, exact consumed sample identities and new item instance #9001.
+
+### 10 Aug 2026 — resource readability and neutral sheen v0.5
+
+- The earlier reuse of shared node-profile silhouettes is retired. Each on-map resource family now
+  owns a pairwise-distinct dominant mass/negative-space profile at native grayscale; hue, label,
+  substrate and animation are not permitted to rescue a silhouette collision.
+- Pairwise automation hashes the union of occupied pixels, not the renderer's rectangle-command
+  decomposition, so two command lists that fill the same visible shape cannot falsely pass.
+- The highest-risk mineral groups are explicitly separated: cross-vein ore, broken-diagonal copper,
+  compact gold nuggets; single-prism quartz, multi-blade obsidian and split unstable Rift-glass.
+- The six actual flora-linked families preserve the exact host flora sprite while adding a distinct
+  disclosed harvest cue: fibre lattice, timber log, pulp sheets, toxin vessel, spore burst and
+  reagent steps. Cue-only and same-host comparisons are fixture-tested.
+- Revealed, remaining resources receive a restrained luminance sheen clipped strictly to occupied
+  resource/cue pixels. The eight-tick 360ms cycle has four rest ticks and uses only the public
+  persisted tile/instance identity for stable phase staggering. It never encodes rarity, grade,
+  yield, danger, eligibility, provenance or hidden properties.
+- The reusable constants are frozen as `resource-sheen-1.1.0`: 360ms tick, eight ticks, four active
+  plus four resting, static frame 0 under Reduce Motion, and composition after the resource body but
+  before route, selection, party and UI overlays.
+- Reduce Motion/static frame, literal grayscale silhouette and paused screenshots retain identity.
+  Fog, minimap, exhausted remnants and Mote do not sheen. Raw Essence keeps the accepted wildDrop
+  body; Rift-glass keeps its separately truthful unstable substrate.
+- Design accepted `AssetLab/artifacts/resource-node-proof-v0.5.png` for the revised candidate
+  boundary. Full AssetLab tests pass and the intentional resource golden update returns regression
+  to 0/224. Native must supply the actual public persisted identity rather than the Lab fixture key.
+
+#### Resource sheen native contract closure
+
+- The stable phase payload is ASCII/UTF-8
+  `resource-sheen-1.1.0|mapSeedUInt64Decimal|runIndex|x|y`, hashed with FNV-1a-32. It uses only
+  persisted public world/tile identity and never Swift `hashValue`, hidden properties or resource ID.
+- The closed map adapter rejects unknown/missing fields, Mote map rendering, a Raw Essence body that
+  is not the accepted wildDrop, and resource/body-kind mismatches. Legal unrevealed, undiscovered or
+  exhausted states return no sheen; Reduce Motion returns the static frame-zero glint.
+- `AssetLab/schemas/resource-sheen-request.schema.json` mirrors that closed machine request with
+  recursive phase/rectangle closure and strict types/ranges; AJV negative fixtures cover nested
+  extras and invalid ticks, while the public adapter independently enforces semantic cross-fields.
+- Before producing pixels, the adapter derives the accepted remaining body for the requested family
+  and requires exact silhouette-command equality. A caller cannot relabel fog, minimap, an exhausted
+  remnant, terrain or unrelated commands as a resource mask and receive a sheen.
+- `AssetLab/fixtures/resource-sheen-v1.1-conformance.json` reconciles all 23 IDs, pins two UInt64/
+  coordinate phase vectors, and supplies command plus decoded 16×16 RGBA SHA-256 hashes for ore,
+  fibre, Rift-glass and Raw Essence bodies, exhausted states and all four active frames.
+- Current fixture file SHA-256 is
+  `9e348ebb73a470452d2b80b4fb965d6c7786b347746c123c94e8a7c619476946`; the reviewed lossless
+  v0.5 contact sheet SHA-256 is
+  `c2570833dd13d777d5deea6be5155cd07ff349cebd00ae1282f5d3cf4a150601`.
+- Native should use one map-level 360ms clock, not one timer per tile. The game supplies the current
+  persisted run/map facts and composes route, selection, party and UI above the sheen.
+
+#### Placeholder boundary for later resource world conditioning
+
+- `worldGrade` is bounded shared map lighting, not a resource-property encoder. Resource geometry,
+  value order and canonical inventory palette remain family-stable; graded map bodies/cues require a
+  versioned clamped transform with a contrast floor and stable outline/highlight.
+- Terrain and exact host flora retain their own accepted grade ownership. A resource cue may share
+  the visible world's lighting but cannot encode rarity, material grade, yield, eligibility, danger,
+  provenance or hidden properties.
+- Sheen is applied after grading as the same neutral luminance treatment and never varies by world
+  grade or item property. Exhausted remnants may share visible lighting but never sheen. Mote stays
+  inventory-only; Raw Essence continues exclusively through the shared wildDrop presentation.
+- This is a recommendation for the next depth proof, not an authorization to change the accepted v0.5
+  pixels or native renderer during the current playtest checkpoint.
+
+### 10 Aug 2026 — web-tool functional audit follow-up
+
+- Every one of the eleven shared navigation buttons was clicked in sequence, and the linked
+  Equipment Lab was exercised separately. Every destination retained the complete eleven-link shared
+  navigation bar and reported no browser diagnostics. Narrow phone widths use the same horizontally
+  scrollable navigation rather than hiding or conditionally removing destinations.
+- Resource→Equipment navigation was exercised directly. The Equipment Lab retained the shared bar,
+  exact slot filters and semantic item list after navigation. All nine filter buttons were clicked;
+  their live counts matched the resolver, and the discovered `1 items` copy defect was corrected to
+  `1 item` with 0/1/many unit coverage.
+- That interaction pass also caught metadata being derived from filtered cell index. Quantity,
+  rarity, provenance and identified/unknown state now belong to stable fixture identity: filtering
+  Keepsake preserves `Unknown item · singular`, and filtering Head no longer gives the first hood the
+  Pointed Blade's crafted provenance. Cross-filter identity and unknown-state negatives are tested.
+- Two resource frames captured more than one 360ms tick apart produced different rendered hashes,
+  confirming that the live proof animates. Static ownership, cadence, clipping, rest and stagger
+  properties remain covered by deterministic source tests rather than screenshot timing alone.
+- The disclosed Quartz interaction control was clicked directly and returned the exact resolver-owned
+  `quartz · node · crystal profile · remaining` description; it does not infer a hidden family or
+  state from animation.
+- The audit found and corrected a stale Golden Review failure: the browser sheet initially rendered 36
+  representative outputs but compared itself against all 224 baseline keys, falsely reporting 188
+  deletions. It now compares only the outputs it actually renders, states its representative scope,
+  includes 31 resource remaining/exhausted/minimap/Raw Essence/Mote fixtures, reports
+  `67 visible checked · 224 canonical`, and points to the complete CLI regression gate. The corrected
+  live page reports `Visible sheet matches`; its PNG/report export controls were exercised without
+  browser diagnostics, and the complete gate remains 0/224.
+
+### 10 Aug 2026 — two-hour AssetLab checkpoint closure
+
+- The material-matched lifted-terrain contract is frozen and handed off separately from the older
+  16×16 contour candidate. Its native-consumption boundary is the 16×19 bottom-anchored pack at
+  `AssetLab/integration/lifted-terrain-v1/manifest.json`, canonical manifest SHA-256
+  `fdfe2744af523628dc7aacac3c5a901d2fbd499a02cdb205a76d21e9f3d3f399`, with two decoded-RGBA
+  conformance vectors. Native integration is authorized; AssetLab does not own the game renderer.
+- Resource v0.5 and resource-sheen v1.1 close the reported same-looking-node problem in the Lab:
+  every applicable map family owns an at-a-glance silhouette/cue, while a slow, staggered,
+  disclosure-neutral sheen distinguishes revealed remaining resources from background map art.
+  Animation is clipped to the accepted resource body and is never required for identity.
+- Equipment v0.3 replaces the rejected two-column prose-card direction with six icons per 390pt row
+  and tapped detail. Stable fixture identity owns quantity, rarity, provenance and unknown state, so
+  filtering cannot silently identify or rewrite an item. Blacksmith v0.1 proves the first truthful
+  Pointed Blade transaction without claiming reforge or salvage.
+- The complete web navigation was exercised without disappearing destinations or browser diagnostics.
+  Golden Review now reports only the representative outputs it renders instead of false deletions;
+  the authoritative CLI gate remains the complete comparison.
+- Final verification at the checkpoint: `npm test` passes, `npm run regression` reports 224 checked /
+  0 changed, and `git diff --check` reports no whitespace errors in the owned scope. Simulator was not
+  opened, closed, booted, repositioned or otherwise touched.
+- Next playability-first asset work is deliberately narrow: provisional reviewed Noll identity, the
+  five-identity economy bridge, then resolver-backed Trading Post and Recycler states. Broad combat,
+  splash animation, portraits and extra procedural breadth remain paused.
+
+### 10 Aug 2026 — Trading Post and Vance blocker proof
+
+- Placeholder decision: AssetLab may prove the compact transaction grammar from the current economy
+  design, but it must label every wallet, price, stock, eligibility and result value as a proposed
+  semantic fixture. The checked-in game currently has no Trading Post state, Gold Coins wallet,
+  stock refresh, preview token, revision guard or atomic transaction DTO, so this evidence is not
+  integration-golden and does not pretend to mutate a save.
+- Trading Post uses stable identity `trading_post`; there is no `exchange` alias. The accepted authored
+  open-counter station mass remains unchanged. Vance is a separate occupant using his authored
+  descriptor through the new neutral `baseSide` village cameo; identical commands are shown outside
+  and at the counter. Merchant meaning belongs to station placement and UI, never Vance's anatomy,
+  palette or a class badge.
+- The proposed phone grammar uses peer Buy/Sell tabs, exactly six icons per row, tapped detail, aligned
+  Gold Coin arithmetic, and separate Preview → Confirm → Result DTO evidence. Protected sell rows
+  remain visible without a tempting price and state their reason: Worn, unidentified, or Locked/Keep.
+- Stock snapshot #4 is fixture-tested as identical across open/close/reopen. A separately labelled
+  post-expedition snapshot #5 changes refresh identity. View opening, clocks and animation never
+  reroll it. Selling is shown as proposed to remain available while stock awaits refresh.
+- Buy evidence includes an affordable Quartz line and an inactive cannot-buy request for four Copper
+  when only two remain. Quartz routes to the Resource Pool, not Stored. The material sample uses a
+  fixture-local bin/index handle and its own sample icon rather than inventing a global item ID.
+- `proposedTradingPostResult` is intentionally non-mutating. A future rules-owned DTO must provide
+  wallet/stock/inventory revisions, opaque preview token, exact eligibility/reasons, and atomic result
+  before native integration can call the grammar truthful.
+- Accepted proposed-scope artifact: `AssetLab/artifacts/trading-post-vance-proof-v0.2.png` (800×1040).
+  v0.1 is superseded review history. Full AssetLab tests pass; regression remains 0/224. Simulator
+  was untouched.
+
+### 10 Aug 2026 — research-driven Resource v0.6 correction
+
+- Aimee rejected hash-distinct-but-abstract resources and settled a stronger requirement: each family
+  must resemble the physical material at a glance. Research references and the 23-family form grammar
+  are recorded in `docs/resource-visual-reference-current.md`.
+- Mineral and organic cues now use material-specific mass: broken rubble, smooth clay, rusty iron
+  rock, dendritic copper, wire silver, gold nuggets, quartz prisms, obsidian blades, salt cubes,
+  sulfur crystals, cut timber, gathered fibre, torn pulp, amber resin, dispersed spores and so on.
+  Fictional resources follow current game semantics rather than fabricated real-world geology.
+- Aimee specifically settled Mercury as a shiny liquid-silver puddle. It has a low irregular pool,
+  detached/specular bead pixels and the existing neutral sheen; it is not rendered as cinnabar ore.
+- World conditioning may recolor the host substrate or exact host flora, but identity-bearing material
+  pixels remain canonical and static. Gold stays gold in every world. `resource-color-1.0.0` forbids
+  whole-resource world recoloring and tests the occupied canonical-pixel floor across substrates.
+- The accepted sheen is retained unchanged and operates after static color. The conformance exporter
+  now regenerates ore, fibre, Mercury, Rift-glass and Raw Essence decoded-RGBA/frame vectors after a
+  reviewed body change.
+- Design accepted v0.6. The proof adds color/grayscale Mercury collisions against Ichor, shallow
+  water and route. Golden coverage now includes every remaining/exhausted map-renderable family rather
+  than a 13-family sample: full regression is 0/240.
+- Current lossless artifact: `AssetLab/artifacts/resource-node-proof-v0.6.png`, 720×960, SHA-256
+  `fdcb946561725a4a50c11dcbff6290625515339500f5cf632743133805157e5c`. Current sheen fixture SHA-256
+  is `6782990207e8c1e38179a72a9e6b4a34872d867a502fd8eaeea5bc158d28269d`.
+
+### 10 Aug 2026 — proposed DEBUG bug-reporter v0.3 fixture
+
+- Added an AssetLab-only visual/semantic proposal for the queued floating screenshot/text reporter.
+  It is explicitly `integrationReady: false` and makes no claim that native screenshot capture,
+  atomic persistence, keyboard/VoiceOver behavior or remote delivery currently exists.
+- A closed placement resolver proves a 44×44 reporter target can re-clamp around representative Base,
+  world and combat action rectangles. Invalid safe geometry, edge/fraction values and non-finite or
+  non-positive action rectangles reject. DEBUG exposes the control; Release removes it both visually
+  and accessibly.
+- One shared scene-command source owns the proposed Captured frame, Ready is exactly Captured plus the
+  reporter overlay, and the form thumbnail derives from Captured. Tests prove Ready-minus-overlay
+  command equality. Native pixel capture remains a later Engineering gate.
+- Screenshot state is a closed union: `attached`, `removed`, or `captureFailed`; failure uses only an
+  allowlisted reason. Both removed and failed screenshots preserve a valid text submission, while
+  blank required text owns an inline explanation and disabled Save.
+- Local Unsent owns `Share / export`; only Needs attention owns Retry; Submitted requires a nonempty
+  bounded remote acknowledgement. Illegal state regressions and direct draft transport reject.
+  Context fields are closed and bounded, with the semantic action count limited to 0…20.
+- Design accepted the v0.3 proposed fixture boundary. Current lossless artifact:
+  `AssetLab/artifacts/debug-bug-reporter-proof-v0.3.png`, color plus literal grayscale and a clearly
+  labelled large-text reflow sample. Full tests pass and regression remains 0/240. Simulator was
+  untouched.
+
+### 10 Aug 2026 — provisional Noll identity v0.2
+
+- The next playability-facing asset gap was Noll, the intended Recycler keeper after Vance. A working
+  descriptor is now available for review, but Noll remains deliberately outside the accepted
+  28-person catalogue. `noll` and `provisional_noll` are not native identity values.
+- Working axes are light build, wrapped crown, coat, free hands, right asymmetry and ochre personal
+  palette. A Noll-only authored headwear variant makes the wrap a compact layered crown with a small
+  right knot; it does not alter any accepted character pixels or derive anatomy from calling/stats.
+- Evidence covers straight-top-down N/E/S/W, village side view, side-biased combat, literal grayscale
+  collision against Vance/Halloway, and an unlabeled map row against traveller, wildDrop, portal,
+  site and block-like resource cues. Recycler geometry remains command-identical staffed/unstaffed;
+  Noll is always a separate occupant.
+- Design accepted v0.2 as the current working/provisional identity. Working name, they/them pronouns
+  and art remain reviewable by Aimee. Native promotion later requires one atomic canonical identity,
+  descriptor/catalogue/schema versioning, generated-reservation regeneration, persistence/staffing
+  mapping and new hashes; the authoring escape hatch must never become a saved identity.
+- Current lossless artifact: `AssetLab/artifacts/provisional-noll-identity-proof-v0.2.png`, 800×840.
+  Full tests pass and accepted regression remains 0/240. Simulator was untouched.
+## 11 Aug 2026 — native compact-surface identity QA
+
+Read-only QA of the `de2b71b` phone UI checkpoint found that the new spatial layouts are structurally sound, but several compact surfaces still substitute generic SF Symbols for accepted asset identities.
+
+- Resource tiles in Storehouse and Trading Post must reuse the canonical static Resource v0.6 body. Quantity and selection remain independent overlays; inventory art does not need map sheen. Engineering owned and installed this correction in `4d8da72`.
+- Party and Library People/diary-author tiles currently use `TravellerDef.icon` as the primary identity. Replace that with one shared descriptor-derived compact person cameo; never derive anatomy from calling or profession. The accepted `mapTopDown` profile remains map-only, so the later compact cameo needs an explicitly named profile rather than silently reusing the legacy upright world sprite.
+- The Base destination board currently uses station SF Symbols. This is materially misleading for `trading_post`, whose `arrow.left.arrow.right` icon resurrects the rejected Exchange fantasy, and it collapses Blacksmith/Weaponsmith onto the same hammer. Later native presentation should reuse the accepted authored base-side place identity; the unbuilt state uses the shared neutral foundation.
+- The six-across item grid exposes a real remaining asset gap: multiple distinct equipment families and progressions share the same SF Symbol. Rarity, quantity, location, and selection cannot substitute for item identity. Author a compact item-family icon contract before calling the inventory/equipment/merchant grid visually complete.
+- Bestiary and encounter collection tiles likewise use generic symbols rather than deterministic species identity. Queue the creature identity bridge after the item/place/person compact bridges; do not alter disclosure or percentile rules to compensate.
+- Phone-size check still required: Party remains three columns through `.xxxLarge` Dynamic Type while several labels are single-line. If a 390-point proof clips or scales identity text excessively, reflow to two or one columns earlier. Library's current two-to-one accessibility reflow has no source-level blocker.
+
+Settled cross-surface rule: spatial layout determines *where* an identity is shown; authored/generated asset grammar determines *what* the identity looks like. System symbols may support actions and state, but must not become the primary identity for tangible items, people, places, or generated species.
+
+## 11 Aug 2026 — P0 save-slot/start-screen visual recommendation
+
+Recommendations only; Engineering owns implementation and Game Design owns behavior. This surface begins only after truthful loading finishes. It does not make the static launch screen interactive and does not redesign the accepted launch art.
+
+### Smallest phone grammar
+
+- Treat campaigns as a compact **bookplate board**, not a settings list and not a six-across tangible-object tray. Ordinary phone layout uses two columns; accessibility text uses one column.
+- The start screen has three spatially distinct actions: a prominent `Continue · <campaign name>` bookplate when a valid recent slot exists, a `New Game` blank-bookplate tile, and `Load Game` leading to the complete campaign board. On an empty installation, omit Continue entirely and make New Game primary.
+- Each slot card owns a stable, disclosure-neutral cover/bookplate motif derived only from its stable slot UUID. Shape and value, not color alone, distinguish adjacent campaigns. The motif encodes no Binder face, world/site/apex content, difficulty, health, danger, rarity, or hidden progress.
+- Visible card facts are campaign name, last played, Binder level, and truthful current state/location. Use short labelled rows/chips within the tile rather than prose. Optional progression context must come from frozen slot metadata and remain broad (`At Base`, `In a world`, `In combat`, `Returning`); assets never infer it from payload contents.
+- A healthy card's primary 44-point action is `Load`. Secondary actions live behind a clearly labelled `More` control. Delete is never the entire card, never swipe-only, and never adjacent to Load without separation.
+- Corrupt and future-incompatible slots remain full members of the board with the same stable bookplate identity. Replace Load with a non-color warning shape plus exact text (`Needs recovery` or `Made by a newer version`) and expose `Export save`/recovery detail. Do not visually erase or silently skip them; Continue alone ignores them.
+
+### Delete and state evidence
+
+- Deletion opens a focused confirmation sheet repeating the exact campaign name and bookplate. Copy states that only this campaign will be removed. `Cancel` is the initial/safe action; the destructive action is text plus shape and requires an explicit tap. No typed-name ceremony is needed for the first slice unless testing shows accidental deletion remains likely.
+- After confirmed deletion, return to the board with a truthful completion announcement and the remaining cards in stable order. Cancel changes nothing. Deleting the active/final slot must land on a usable start screen, with New Game primary when none remain.
+- DEBUG-only metadata (build and save-schema version, slot UUID, export) belongs in card detail, never the ordinary card face. Duplicate Save remains absent until separately implemented.
+
+### Smallest acceptance artifact
+
+One lossless 390×844 contact sheet at native scale, with literal-grayscale partners and one accessibility-large column sample:
+
+1. empty installation: New Game primary, no Continue;
+2. one healthy migrated campaign: Continue names it and New/Load remain separate;
+3. four-card Load board: recent healthy, older healthy test campaign, corrupt, future-incompatible;
+4. named delete confirmation plus cancelled state and exact-one-slot removed result;
+5. DEBUG detail showing schema/export without polluting the ordinary card;
+6. 390-point large-text board proving every label/action remains reachable and each target is at least 44 points.
+
+Required fixture assertions: UUID—not name/index—owns bookplate identity; rename leaves identity pixels unchanged; card order does not change identity; invalid slots never become Continue; empty state contains no phantom slot; cancel is pixel/state stable; confirmed deletion removes only the exact UUID; ordinary Release cards contain no DEBUG metadata; light/dark and grayscale preserve selected/healthy/unavailable/destructive channels; VoiceOver order is campaign name → last played → level → state/location → Load or exact unavailable reason → More.
+
+Placeholder decisions to avoid blocking: use two columns at ordinary phone text, one at accessibility sizes; use deterministic nonsemantic bookplate motifs rather than screenshots; keep slot naming in New Game/detail rather than on the launch surface; preserve current app background/page-edge language with a direct reveal or short crossfade, and use a direct cut under Reduce Motion.
+
+## 11 Aug 2026 — exact catalogue item identity v0.2
+
+- Promoted the first compact catalogue slice: 30 exact live catalogue IDs plus one shared disclosure-neutral unknown-item presentation. Identity is mapped explicitly from `catalogItemID`; no visual is inferred from SF Symbol name, rarity, tier, stats, price, profession, provenance, or catalogue order.
+- The native 32-pixel proof uses six-across color and literal-grayscale rows with no item names beneath cells. Long Pick/Bent Pick and Clearing/Farsight now differ by large occupied mass and negative space. Waystone reads as a three-prong carried instrument rather than another bottle.
+- Both unidentified curios resolve to exactly the same opaque unknown commands until legitimate identification. Unsupported IDs, extra fields, and unsupported unidentified states reject instead of silently borrowing a known silhouette.
+- Design directly accepted v0.2 for AssetLab golden promotion. Native integration remains a later adapter/UI task; this promotion does not authorize replacing game code from the asset wall.
+- Current lossless artifact: `AssetLab/artifacts/catalogue-item-identity-proof-v0.2.png`, SHA-256 `93f79d302f5ff0608949ec686cd323982701d1b8f5463a4ea168529e3c0ab315`. Full tests pass. Golden regression now covers 271 outputs with 0 changes (30 known item icons + one unknown added to the prior 240).
+## 11 Aug 2026 — world palette differentiation audit
+
+Current native terrain recoloring is live and uses `WorldGrade.from(PressureReadings)` in
+`Sources/Screens/MapAssetRenderer.swift`. It reads exactly five resolved, post-constraint facts:
+
+- Thermal midpoint `(peak + floor) / 2` → warmth;
+- Hydrology `availableMagnitude` → wetness;
+- Vitality `peak` → life;
+- Illumination midpoint `(peak + floor) / 2` → light;
+- Substrate `peak` → mineral character.
+
+Each value is centered as `clamp((x - 50) / 50, -1, 1)`. The frozen v1 grade is:
+
+```text
+red   = round(clamp(24*warmth + 8*mineral, -32, 32))
+green = round(clamp(22*life + 8*wetness, -32, 32))
+blue  = round(clamp(20*wetness - 8*warmth, -32, 32))
+value = round(clamp(16*light + 4*mineral, -20, 20))
+```
+
+Native then applies the grade to every terrain palette color as:
+
+```text
+displayRed   = clamp(baseRed   + red   + value, 0, 255)
+displayGreen = clamp(baseGreen + green + value, 0, 255)
+displayBlue  = clamp(baseBlue  + blue  + value, 0, 255)
+```
+
+So `value` is added to all three channels. The transform does not currently rotate hue, change
+saturation, select a different authored palette bank, or recolor flora/resources/actors. Terrain
+geometry and four placement templates vary independently from color.
+
+Likely reasons worlds can still look too similar:
+
+1. Coefficients are intentionally bounded: channel offsets are at most ±32 and common brightness is
+   at most ±20. Base ground palettes remain dominant.
+2. Thermal and Illumination use midpoints, which compress broad peak/floor readings toward 50.
+3. If several world readings rise or fall together, the formula behaves mostly like brightness.
+   For example, all five inputs at 60 produce grade `(6,6,2,4)`, an effective displayed shift of
+   only `(+10,+10,+6)`—slightly warmer/brighter, not a new world palette.
+4. Only a few directional associations exist: warm→red, wet→blue+green, vitality→green,
+   illumination→brightness, substrate→small red+brightness. There is no independent authored color
+   intention, dominant/secondary palette choice, saturation axis, or material-atmosphere family.
+5. Flora currently retains its species palette exactly, and resources retain canonical identity
+   colors. Large map elements therefore do not participate in the shared atmosphere yet.
+6. Clamping can flatten distinctions in already-dark or already-bright palette channels.
+
+Before adding color choices to sigil/bookwriting, measure the actual bound-world distribution:
+record the five normalized inputs, resulting grade, effective per-channel delta, and a perceptual
+distance metric for a representative campaign sample. Render the same 12-ground sheet for every
+sample at phone scale and cluster near-duplicates. This separates a coefficient/range problem from
+a missing player-authored color axis.
+
+Placeholder recommendation: do not silently widen v1 coefficients. Treat any stronger transform as
+`world-grade-2` with anchored-world migration/version behavior. First test three bounded options:
+(a) stronger but still derived grade; (b) derived selection among authored atmosphere palette banks;
+(c) an explicit disclosed bookwriting color/atmosphere choice. Any option must preserve grayscale
+affordance, gold/copper/etc. canonical accents, species identity, fog invariance, and must not encode
+hidden stats or rune IDs by accident.
+
+## 11 Aug 2026 — illumination and vitality must leave the recoloring formula
+
+Aimee identified two incorrect responsibilities in `world-grade-1`:
+
+- **Illumination is not terrain brightness.** It is a gameplay light condition. Below a settled
+  threshold, the party should see less of the currently traversed map and the presentation should
+  darken outside a party-owned light radius. A Torch increases that radius. Atmospheric conditions
+  such as smoke may reduce the radius and/or steepen the darkness falloff. Exact thresholds and
+  curves remain Design authority rather than AssetLab assumptions.
+- **Vitality is not greenness.** It is ecological capacity. Higher resolved vitality should produce
+  more flora coverage and species abundance, and may support bounded larger/taller species where
+  resolved flora traits say so. It must not force green into flora whose legitimate generated hue
+  is red, blue, pale, fungal, mineral-like, or otherwise strange. Higher vitality may increase the
+  saturation/richness of that flora palette within contrast limits while preserving its hues.
+
+The live rules already implement part of this intent. `FloraRules.castSize` increases flora species
+count from Vitality within metabolic viability and the settled cast bounds. `TerrainRules.paintGrowth`
+derives covered-tile budget from Vitality and mean stature; habit controls patch topology and stature
+resolves groundcover versus sight-blocking growth. `WorldRules.visionRadius` already combines
+book-authored vision modifiers, party perception, the trip-persistent Torch bonus, and a night penalty;
+`WorldRules.reveal` applies that radius through line-of-sight blockers. The Torch already increases
+`torchVisionBonus` and immediately reveals through the larger radius.
+
+The current model also exposes the main gap: `Tile.isRevealed` is permanent accumulated knowledge,
+not a separate current-light visibility field, and the renderer has no darkness/falloff mask. A new
+game-owned current visibility/light field must therefore remain distinct from permanent reveal:
+
+1. Unrevealed remains invariant fog with no informative pixels.
+2. Revealed but currently unlit terrain may remain known while being darkened; transient actors or
+   content outside current sight remain disclosure-suppressed by game rules.
+3. Radius and falloff resolve from current illumination phase plus allowlisted atmosphere opacity or
+   particulate facts. Smoke affects sight only when that fact exists; gray art never implies smoke.
+4. Torch/light sources modify this light field, not terrain identity pixels. The field follows the
+   game-owned party position and map line of sight.
+5. Minimap discovery remains rules-owned. Darkness neither undiscoveries knowledge nor grants POI
+   exceptions.
+
+For the replacement world-color system, remove both `22*life` from green and `16*light` from value.
+Thermal, hydrology, substrate/material atmosphere, and any future explicit book-authored color intent
+may select the coherent palette family. Illumination composes afterward as dynamic light; Vitality
+composes through flora population, bounded stature, and flora-palette saturation. This is a versioned
+`world-grade-2` change because anchored worlds must not silently change appearance or hashes.
+
+Smallest proof: the same revealed 7×7 map under bright, dim, smoky-dim, and torch-lit conditions,
+plus low/high-Vitality versions using the same non-green flora hue family. Prove permanent reveal is
+unchanged; smoke reduces current visibility; Torch restores a bounded radius; high Vitality increases
+flora count/coverage and bounded stature/saturation without greening terrain; fog and undiscovered
+POIs remain unchanged; grayscale, Reduce Motion, and VoiceOver/game-rule visibility stay truthful.
+
+## 11 Aug 2026 — first-class authored color declarations
+
+Aimee accepts all three complementary palette mechanisms: a stronger derived transform, derived
+selection among authored atmosphere palette families, and explicit disclosed color/atmosphere choices
+in bookwriting. Explicit color is not limited to Atmosphere. It may qualify many legitimately written
+subjects—for example the hue of a Sun—and should remain attached to the thing it describes.
+
+Recommended compositional model (placeholder pending Game Design authority):
+
+- A color declaration is a persisted qualifier on a written source/sigil, not a hidden post-bind roll
+  and not page-position syntax. Existing books with no declaration resolve through a neutral/default
+  migration path.
+- **Emitter color** (Sun, Moon, Aurora, fire, other legitimate light sources) owns emitted-light hue.
+  It may tint currently illuminated surfaces through a separate light-composition layer; it does not
+  replace material identity or determine light intensity/radius.
+- **Atmosphere color** owns scattering, haze, and distance tint. Atmosphere density/clarity owns how
+  strongly that tint accumulates; an authored hue alone does not invent smoke, toxicity, or opacity.
+- **Material color** owns bounded palette tendencies for terrain/water/substrate that legitimately
+  belong to the written material. Ground families retain their invariant value/edge grammar.
+- **Ecology color** biases generated flora/creature palette families while each species retains its
+  resolved coloration and readable anatomy. Vitality controls abundance and bounded saturation, not hue.
+- Canonical resource/item identity accents remain recognizable; local light/atmosphere may affect their
+  displayed lighting but cannot recolor Gold into a different material or leak rarity/properties.
+
+Multiple declarations should compose by named scope rather than averaging every chosen color into one
+brown/gray tint. Material establishes local base color; ecology establishes living palettes; atmosphere
+adds bounded distance/scattering; emitters add bounded local illumination. Conflicting declarations in
+the same scope need an explicit, previewable rule (such as weighted mixture by written intensity and
+count) with a disclosed result swatch. They must never resolve by catalogue order, last-write-wins, or
+an undisclosed random winner.
+
+The Writing Desk should preview the declared color on the exact subject and separately preview the
+resolved world palette family. Color selection must be named as an authored fact, preserved in grayscale
+by shape/value semantics, and never become the sole carrier of passability, depth, hazard, discovery,
+toxicity, rarity, or defence. A red Sun is red light; it is not automatically hotter or more dangerous
+unless the written pressure contributions independently say so.
+
+Smallest proof: two otherwise identical books differing only in a declared Sun color, plus a third with
+the same Sun and a separately declared Atmosphere color. Show the Writing Desk swatches, resolved palette
+recipe, bright and dim map states, neutral/gold resources, water/deep-water, and two flora species. Prove
+Sun hue affects illuminated light but not radius; Atmosphere hue affects scattering but not smoke/density;
+flora hues remain species/world authored rather than Vitality-green; material/resource identities and all
+grayscale affordances survive. Version the declaration schema, palette resolver, and renderer tuple before
+anchored-world use.
+
+## 11 Aug 2026 — exact catalogue tier-2 slice accepted in AssetLab
+
+- Added the approved eleven exact tier-2 catalogue identities: Keen Blade, Raking Edge, Banded Mace,
+  Warded Spear, Banded Buckler, Ridged Helm, Banded Guard, Studded Gloves, Shod Boots, Balanced Pick,
+  and Cold Compass.
+- Counterpart rows communicate bounded construction ancestry only where the authored objects support it.
+  Warded Spear and Cold Compass remain honestly different objects from their mechanical-line counterparts;
+  no universal tier silhouette, scale, brightness, ornament, rarity, reach, or damage code is embedded.
+- Direct Design review caught and removed a repeated gold accent that initially read as `tier 2 = gold`.
+  Banded Mace alone retains an object-specific gold band; other accents derive from their object treatment.
+- The lossless proof includes native 32-pixel color and literal-grayscale pairs plus an unlabeled collision
+  row against the generic unknown body, Rubble, fine glassy quill, and Raw Essence. All remain distinct by
+  direct inspection and occupied-pixel tests.
+- Artifact: `AssetLab/artifacts/catalogue-tier2-proof-v0.1.png`, SHA-256
+  `3b66f65d4dbf835600ea361efb1a0f53f98b2296294766eed16dce62bb3115b0`; the separate JSON key explicitly
+  labels this as `assetlabReviewFixture`, `integrationReady:false`, and names the field `pngSHA256`.
+- Promoted only the eleven reviewed hashes. The full suite passes and the golden regression is now 282
+  checked / 0 changed. Native catalogue adapter/schema/version/cache work remains separately unauthorized.
+
+## 11 Aug 2026 — exact catalogue tier-3 slice accepted in AssetLab
+
+- Added the eleven exact tier-3 catalogue identities and kept tier, rarity, stats, context, and crafted
+  family identity outside catalogue pixels. Anvilfall's central head was corrected so its weight remains
+  visible against the proof background in literal grayscale.
+- Artifact: `AssetLab/artifacts/catalogue-tier3-proof-v0.1.png`, SHA-256
+  `73aafbb4a95e98239d77a04dadc31143747251d23eb0b938926475464ec3d169`.
+- Direct Design review accepted the isolated slice. Regression is 293 checked / 0 changed. The evidence
+  remains `integrationReady:false`; native catalogue resolution remains a separate gate.
+
+## 11 Aug 2026 — world-grade-2 v0.2 exploratory calibration candidate
+
+This candidate is deliberately unpromoted pending direct Design calibration. It removes Illumination and
+Vitality from inherent terrain recoloring and separates the future game resolver from the pixel renderer.
+The renderer consumes only resolved material identity, non-assertive palette-family ID, bounded material
+transform, explicit atmosphere medium/density/palette, explicit persisted flora cast and placements, and
+at most one eligible authored color contribution per technical scope. It consumes no raw pressures and no
+map seed. It never invents haze or a fictional material.
+
+The authoritative first-slice color allowlist is Sun → emitter, Smoke → atmosphere, Granite → material,
+and Bloom → flora. Granite color is restricted to legitimate stone/substrate surfaces; Bloom never colors
+creatures. Smoke density is measured separately from smoke palette. Flora coverage may change legitimately,
+but each rendered placement uses its resolved species' own stable form and stature rather than a global
+Vitality resize.
+
+Evidence comprises 23 otherwise-controlled native map fixtures in color and literal grayscale, a separate
+current-visibility/Torch sequence, and a keyed JSON measurement report. It records per-layer input facts and
+CIELAB output distances without total-ordering incomparable axes. Current artifact hashes are:
+
+- color: `9e52d9bc2bef593a86752e7eaebf4b6442b9607a7de32f610d881183daa5bf7b`
+- grayscale: `85be8f1352d9c65f3a5def4f0580d43d6afe1fe983e1cd2e3c53b907ce2262c1`
+- current visibility: `85afe83506f00fe0021191304400424b39056db8bab767d34fa9959afa2003f6`
+
+Design accepts v0.2 as a calibration foundation, not a palette/schema freeze. The governing rule is
+proportional meaningful diversity: identical resolved visual facts may render identically, near neighbors
+should read as relatives, and opposed authored/resolved facts should separate proportionally. Runtime must
+never optimize for novelty or uniqueness against earlier worlds. Open recommendations remain the
+palette catalogue/math, accepted perceptual bands, Ochre/Brown material anchor, color acquisition, compound
+semantics, and later separate Creature eligibility. No native integration is authorized.
+
+## 11 Aug 2026 — authored color vocabulary v0.1 Asset recommendations
+
+Settled structural authority remains limited to relative meaningful diversity, authored scoped connected
+color rather than a global tint, and Flora remaining separate from Creature. The proposed twelve IDs/names,
+starter/common/later grouping, Sun/Smoke/Granite/Bloom first-slice eligibility, achromatic treatment, and
+omission of Brown are implementation-ready but reversible Game Design recommendations/placeholders.
+
+Asset's v0.1 recommendations are deliberately separate and reversible:
+
+- canonical coordinates use versioned OKLCH triples converted deterministically to bounded sRGB;
+- every color receives a stable redundant pattern/glyph, while its player-facing name remains authoritative;
+- White, Black, and Grey are calibrated primarily through lightness and very low chroma, not treated as
+  arbitrary hue stops;
+- Ochre is lower-chroma and earthier than Orange, and is compared against Yellow plus ordinary earth ramps.
+  Asset recommends keeping Brown absent until phone play demonstrates an authored intention that Ochre and
+  actual material identities cannot express; neither the vocabulary nor Brown exclusion is Aimee-settled.
+
+The proof shows all twelve swatches in color and literal grayscale, scoped Yellow Sun / Violet Smoke / Red
+Granite / Blue Bloom examples, and the Ochre collision row. Artifacts:
+
+- `AssetLab/artifacts/authored-color-vocabulary-proof-v0.1-color.png`, SHA-256
+  `eb9959d18a1469e0f290e9faab4f402c31fa52b07268d3c1e88539681a21b97c`
+- `AssetLab/artifacts/authored-color-vocabulary-proof-v0.1-grayscale.png`, SHA-256
+  `ebb803af7e3db86269bf1dd3f0b6e55b0f2690f998dd36dd02aae9a7cfda0bf8`
+
+This is `integrationReady:false` exploratory evidence. Exact coordinates, gamut policy, pattern vocabulary,
+blend coefficients, and phone-play tuning remain recommendations pending direct review and native schema.
+
+## 11 Aug 2026 — fixed named-color acquisition direction superseded
+
+Aimee supersedes the proposed twelve-name ownership/acquisition direction before integration or promotion.
+The current direction is player-mixed colored ink, with Game Design recommending subtractive CMY plus a
+player-facing Depth control for review. Standard ash-black writing ink means **unspecified color** (`nil`),
+not an explicit Black declaration. An eligible unspecified Sigil remains open to full bind-time color
+resolution; the resolved color must then persist so redraw/relaunch/anchored revisit never rerolls it.
+Explicitly mixed black is a distinct authored instruction from ash/no instruction.
+
+The v0.1 vocabulary and Writing Desk/Library sheets are retained only as superseded exploratory evidence
+for grayscale patterns, named accessibility, connected-mark footprint and scoped preview layout. Their
+fixed swatches, ownership groups, starter/common/later acquisition, locked-color Library presentation and
+named-color round-trip are not the live design direction. They remain `integrationReady:false` and must not
+be promoted, migrated into native code or used as save authority while Game Design revises the contract.
+
+## 11 Aug 2026 — existing CMY/Depth reuse audit for mixed ink
+
+This is a source audit, not a proposed schema. Native `Coloration` already stores a CMY triangle normalized
+to sum 100 plus independent `depth` and `patterning`, and flora/creature trait persistence already proves
+that exact numeric coloration can survive saves. AssetLab's live flora adapter also transports normalized
+CMY and Depth deterministically. Those mechanics are useful reference implementations for color conversion,
+clamping and cross-language vectors.
+
+They cannot become authored ink unchanged:
+
+- `Coloration.normalise()` maps a zero-total CMY input to 33/33/34. It therefore cannot distinguish no
+  pigment/instruction from an equal balanced mixture. The new direction requires `nil` ash/no instruction
+  to remain semantically distinct from any explicit mix.
+- Current generated-life CMY is always a value, never optional. Its tolerant default is 33/33/34 at Depth
+  50. Applying that default to a Sigil would silently turn legacy ash writing into an authored color.
+- CMY normalization stores hue proportions, while Depth carries pale-to-near-black value. This can represent
+  an explicit mixed black only if the authored instruction is present independently from its numeric output.
+- `Sigil` currently persists Intensity, Scale, Count and negations but no authored or resolved color. Page
+  qualifier rules can enforce one rung per ladder, yet there is no mixed-ink mark/recipe or bind resolver.
+- Existing flora/creature randomness is species-generation randomness. It must not be reused as the seed or
+  cache identity for unspecified Sigil color resolution.
+
+## 11 Aug 2026 — Penmaker progression owner
+
+Aimee settles that deliberate ink mixing is an upgrade unlocked by the Penmaker. The existing
+progression owner is Isolde: her Scriptorium already owns Penmanship, pencils, pens, chaining and
+compounds, so this does not add another traveller or station. Game Design places **Ink mixing** at
+Scriptorium tier 1 after **A pencil**; exact cost is reversible tuning.
+
+Before that node, the Writing Desk is Ash-only and color remains open. After purchase, the Desk gains
+CMY+Depth mixing and saved mixtures everywhere; the fountain pen and tier 2 are not prerequisites.
+Asset evidence should compare those locked/unlocked states. Existing eligible saves must migrate
+without a duplicate purchase, and no UI may imply that fixed named colors are separately owned.
+
+**Superseded later 11 Aug:** see “Writing-tool progression correction” below. Pencil is no longer a
+current tool; Brush is the first ink-capable hand and direct prerequisite for Ink Mixing.
+
+## 11 Aug 2026 — colored bases derive from world resources
+
+Aimee further settles that CMYK/CMY+Depth bases must be derived from resources. The Scriptorium
+upgrade unlocks process and UI, not infinite colored stock. Current Game Design recommends saved
+formulas prepared as bounded vials; drafting remains free and applications commit only at bind, while
+unlimited Ash preserves the continuation floor. Twelve focus applications per vial is a reversible
+DEBUG candidate.
+
+Asset must not infer pigment from a generic resource's current icon or rendered color. Game Design
+has now settled the first recipe identities: Copper→Cyan, Ichor→Magenta, Sulfur→Yellow and
+Obsidian→Depth. Each resource processes into four integer base measures. Ichor is used because it is
+already an authored rare world resource with a canonical dark-magenta identity; no generic biological
+sample or retrospective color inference is needed.
+
+A vial consumes one Resin plus `ceil(channel / 25)` measures for each nonzero channel and currently
+provides twelve applications. Exact 0...100 formula values remain frozen even though inventory cost
+uses four bands. UI evidence should show source identity, exact measures before/after, Resin,
+applications, insufficient-stock rejection and atomic preparation. The twelve-use yield remains
+DEBUG tuning; the four resource identities are current.
+
+Schema/mechanical dispositions from the revised Game Design contract:
+
+1. Authored ink is `nil | {cyan, magenta, yellow, depth, conversionVersion}` with four exact integer
+   amounts in 0...100. It is not normalized into the generated-life CMY triangle.
+2. Zero CMY with nonzero Depth is a valid explicit neutral-dark recipe; all four zero is invalid/no mixture.
+3. Persist both authored provenance and the exact versioned resolved scope output.
+4. Bind-time rules resolve `nil` from stable world/source identity and immediately persist the output.
+   Viewport, catalogue order and redraw are never random authorities.
+5. What numeric domain, quantization, gamut policy and mixing curve are player-visible? Existing 0...100
+   Doubles and normalization are implementation precedent, not automatic writing authority.
+6. Is `patterning` excluded from ink authorship? The new direction names CMY+Depth only; Asset will not infer
+   texture/pattern from a pigment mix.
+7. The first allowlist remains Sun/Smoke/Granite/Bloom, projected only into emitter/atmosphere/material/flora
+   scope respectively. Flora color never projects into creatures.
+
+Exact conversion coefficients, quantization, gamut policy, preset recipes and pattern derivation remain
+open Asset/Engineering proof questions. No native integration is authorized yet.
+
+Engineering and Design independently confirm the safest future type boundary, still recommendations-only:
+
+- optional `AuthoredInk` (absence means ash/no instruction) must be distinct from the already-resolved native
+  `Coloration` type;
+- a separately persisted, versioned resolved declaration must record the scope output and whether it came
+  from an authored mix or bind-time random resolution;
+- authored ink should carry only the eventual CMY+Depth controls, never platform RGB, technical scope,
+  patterning, palette metadata or ownership/acquisition state;
+- resolved life identity may continue to carry normalized CMY, Depth and independently generated patterning.
+  Existing creature/flora coloration remains historical resolved output and must never be reinterpreted as
+  authored ink or rerolled;
+- Bloom-like flora influence, if retained, should persist a source-level generation tendency and final
+  per-species colors rather than painting every species with one vector.
+
+Additional implementation gates found in source: native `Coloration` decoding currently accepts unnormalised,
+negative, out-of-range and nonfinite channel values; it is therefore not a validation template. Any authored
+recipe needs exact closed fields, finite/range validation and pinned quantization. A future bind transaction
+must store its resolved declaration atomically with Essence spend; redraw-time seed derivation is conformance
+evidence only and cannot be the persistence mechanism.
+
+## 11 Aug 2026 — Writing-tool progression correction
+
+Aimee settles **Rough charcoal → Brush → Fountain pen**. Brush replaces Pencil as the plain 2–3-cell
+hand and is the first liquid-ink tool. Ink Mixing is a direct adjacent Scriptorium tier-1 unlock that
+cannot be learned before Brush; it remains independent from Compound Assembly and Chaining.
+
+Brush and Fountain pen use unlimited Ash/open ink by default and can use CMY+Depth mixtures only
+after Ink Mixing. Rough-charcoal marks cannot carry liquid ink. Existing `Hand.plain` page geometry
+remains unchanged and displays Brush; `pen_pencil` becomes one-way migration input for `pen_brush`,
+not a permanently mismatched internal identity. Asset glyph/stroke proofs use dry crumb, bristle
+spread and fine nib as the three distinct grammars. Exact current authority is
+`writing-tool-progression-current.md`.
+
+## 11 Aug 2026 — Handmade-art ownership boundary
+
+Aimee owns final handmade visual art for characters, buildings/stations, weapons, inventory/items,
+sigils and combat-node glyphs. AssetLab may retain basic functional placeholders for stable identity,
+layout, collision, accessibility and integration wiring, but Asset/Design must not commission
+aesthetic iteration, semantic pictogram candidates or competing final-art systems for those
+families unless Aimee explicitly reopens one.
+
+Asset Lead's ordinary autonomous scope remains functional UI, accessibility, layout, conformance,
+world-color support and other specifically authorized generated-world systems. Placeholder quality
+must be sufficient to test the game without becoming a shadow final-art queue. Game Design supplies
+mechanical meaning, names, interaction states and collision requirements; those semantic contracts
+do not authorize generated final art.

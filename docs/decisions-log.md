@@ -1033,3 +1033,67 @@ Traits are rolled straight from the world's distributions. **No role is decided 
 2. Whether elevation is worth having, or openness suffices.
 3. Energy budget severity.
 4. Whether Cycle amplitude driving trait variance is clever or confusing — **note this now interacts with §1**: it would presumably widen the *cast* draw rather than the jitter.
+
+---
+
+## 2026-08-14 — Prototype save compatibility
+
+**Locked:** preserve save compatibility whenever migration is contained and honest, but do not let
+early prototype saves block a necessary large change or force parallel obsolete gameplay systems.
+When compatibility must break, advance an explicit save-format version, identify the mismatch in the
+save shelf before load, leave the old file untouched, retain Export and confirmed Delete, and keep
+only the newest game implementation. An intentionally unsupported save is labelled “made with an
+older test version,” never “corrupt.” Full operational policy:
+`save-compatibility-policy-current.md`.
+
+## 2026-08-14 — World Pages, Templates and Dictionary
+
+**Direction settled:** new campaigns begin with three optional consumable World Pages; curated World
+Pages may also be found in worlds; player-written drafts may be saved as reusable Templates; and the
+Library gains a Dictionary where encountered but unidentified glyphs remain visible as `??`. Viewing,
+owning or binding an unknown glyph does not teach its meaning. World Pages and Templates remain
+separate: collected pages are read-only and consumed only by a successful atomic departure, while
+Templates never waive normal writing/binding cost or preserve a generated outcome.
+
+**Working balance authority:** `world-pages-authority.json` contains the exact initial 15-page
+catalogue and `world-pages-templates-dictionary-current.md` contains the reversible drop, storage,
+failure-retention, pricing and UI profile. Full authored topology remains Band 6+ under
+`authored-world-blueprints-current.md` so opening playability and ordinary generation are completed
+first.
+
+## 2026-08-14 — Named-character arrival and growth identity
+
+**Working playtest decision:** a newly recruited named traveller joins once at the Binder's current
+level, after the recruitment discovery award resolves, with ordinary level-earned combat points
+banked and their authored calling lean remaining a separate free bonus. Every named person also has
+an authored primary/secondary growth pair in `named-character-growth-authority.json`; Quill has a
+fixed pair, the Binder chooses a distinct pair at new-campaign creation, and generated people freeze
+a deterministic pair in their identity receipt. Existing saved stats are never rebuilt; migration
+assigns only future growth identity. This is deliberately reviewable through play, because level-1
+late recruits and enum-order all-equal growth currently make recruitment rewards unusable or
+indistinct.
+
+## 2026-08-14 — Teeming does not strengthen the individual species draw
+
+**Reaffirmed from Session 15 with controlled combat evidence:** Vitality peak increases cast size and
+population, not the total individual-species trait budget. Authored Vitality aspects remain causal:
+Herd/Swarm `trophicDepth` may redistribute a fixed budget toward armament and create a more predatory
+food web, but richness supplies no free extra attack/armour/affliction power. A Teeming world may be
+more dangerous through more bodies, legitimate groups and its explicitly written trophic shape. The
+`149c2c3` diagnostic blocks scaling-coefficient tuning until the peak-derived budget/affordance leak
+is corrected and rerun.
+
+**Source-level follow-up:** after the fixed-budget correction, exact counterfactuals attributed the
+remaining opening Normal misses to multi-target delivery, not Bleed, hidden action choice or additive
+party scaling. A reversible 50% per-target multi share brings all 12 controlled Normal/Teeming fights
+into 2–4 rounds with no defeat and the intended aggregate attrition bands. It proceeds to phone play;
+it is not declared final balance from automation alone.
+
+## 2026-08-14 — Combat graph Asset work is not the release blocker
+
+**Implementation boundary clarified:** the accepted v0.4 graph layout and native DEBUG explorer are
+not promotable by another visual pass. Production still purchases legacy branch depth and has no
+durable arbitrary stable-node ownership or typed atomic node-purchase transaction. Asset Design
+should not be asked to disguise that missing rules boundary. The ordinary graph replaces the legacy
+screen only when persisted stable-ID ownership, legal purchase, lossless migration and the required
+gameplay consumers can promote together; until then the working legacy purchase route remains.

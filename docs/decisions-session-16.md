@@ -6,6 +6,10 @@ Append to `docs/decisions-log.md`. Aimee's decisions, from testing.
 
 ## 1. Items must stack — and materials stack by KIND, not by exact source
 
+> **Historical decision, superseded 14 Aug 2026:** grouping by kind remains correct for
+> presentation, but harvested materials no longer consume item slots. See
+> `world-resource-reserve-current.md`. Exact samples and provenance survive in a non-slot reserve.
+
 **Current behaviour is a bug in effect.** `ItemStack` *has* a `count` field and **nothing ever increments it**. Every pickup creates a new stack in a new slot, so two identical hides consume two of eight slots.
 
 ### The rule
@@ -20,11 +24,14 @@ Append to `docs/decisions-log.md`. Aimee's decisions, from testing.
 
 Materials carry a `MaterialSample`, so a *pale hide* from a groper and a *shaggy hide* from a browser are genuinely different objects. Keeping them in separate slots is truthful but unusable: a world with six species produces a dozen variants, and slot pressure would explode.
 
-Binning by kind gives **slot pressure proportional to material kinds** (a manageable number) while **losing nothing** — every sample keeps its own grade, source and name inside the bin.
+Binning by kind originally gave **slot pressure proportional to material kinds** while losing no
+sample facts. The current design preserves the grouping and sample facts but removes that slot
+pressure entirely.
 
 ### Consequences
 
-- **Slot cost is per kind.** Twelve hides of five different grades cost one slot.
+- **Historical only:** slot cost was per kind. Current harvested world resources cost zero item
+  slots.
 - **Crafting picks from within the bin** — you choose which grade to spend, so a recipe can be satisfied cheaply or generously (feeding the overshoot-improves-quality rule in `materials-crafting-spec.md`).
 - **Percentiles still work.** The bin knows its best and worst, so "finest pelt you've recovered" is a query.
 - **The satchel uses the same rule in-world** — otherwise carrying is still miserable and the fix only helps at home.

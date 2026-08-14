@@ -1,8 +1,11 @@
 # Apex Encounters & Wild-Only Weapons
 
-**Implementation status, 8 Aug 2026:** the encounter generator, risk draw and consent rules are
-built. Five weapon rules work; three are inert, the locked-cache lottery is missing, and several
-open clauses require review. See `apex-system-audit.md`.
+**Current status, 11 Aug 2026:** the encounter/reward loop and all eight wild rules are wired; the
+ordinary-creature and locked-cache lottery routes are live. Fog-gated disclosure supersedes the old
+immediate-marker proposal, adjacency is safe, and deliberate occupied-tile entry starts combat.
+Recommended party-power scaling is integrated and awaiting the phone comparison defined in
+`apex-system-audit.md` and `encounter-scaling-phone-test-card-current.md`. This document preserves
+older proposal labels as design history; the audit owns current implementation disposition.
 
 > *"there need to be some rare weapon drops that only happen out in the wild. maybe there should be scary only-by-choice mob encounters out in the wild that they have a guaranteed drop from, but there's a tiny percent drop chance from normal mobs or locked caches?"*
 
@@ -27,7 +30,7 @@ open clauses require review. See `apex-system-audit.md`.
 | **Visible from range** | Marked on the map and the minimap from the moment its tile is revealed — **not** hidden by fog like ordinary spawns |
 | **Never ambushes** | Even if its traits are cryptic. **An apex that jumps you isn't a choice** |
 | **Doesn't hunt you** | It holds its ground, or patrols a small area. It is *somewhere*, not *coming* |
-| **Approach is the commitment** | Stepping adjacent starts it. Nothing else does |
+| **Contact is the commitment** | Adjacency never starts combat. Combat begins only when the player deliberately steps onto the apex's occupied tile |
 
 **[PROPOSAL] One per world, at most.** Two makes them scenery.
 
@@ -58,7 +61,7 @@ Spawn weight rises with the things that already mean *this world is dangerous an
 | **Two-natured blade** | Carries **two damage types** at once | No material has two dominant armaments |
 | **Long fang** | **Far reach** on a close weapon | Reach comes from the haft; this one doesn't |
 | **Ranked spear** | Strikes **both ranks** in one blow | Nothing crafted reaches past the front |
-| **Barbed edge** *(placeholder; replaces Rimed edge)* | Applies legacy bleed **without a coating** | Coatings are consumed; this isn't |
+| **Barbed Edge** | Landed hits apply one **3 damage / 3 round Severe Bleed** | Ordinary Rend/Briar Oil apply default 2/3 Bleed; the barbs raise severity without a second status |
 | **Living hook** | **Grade rises** as you use it | Grade is set by the material at forging |
 | **Quiet knife** | Attacking **doesn't break concealment** | Nothing else in Shadow allows it |
 | **Bloodletter** | Bleed that **doesn't expire** | Every status has a duration |
@@ -81,7 +84,8 @@ Spawn weight rises with the things that already mean *this world is dangerous an
 
 **Why both routes matter:** the apex is the *reliable* path and the lottery is the *surprise*. A player who never fights one still occasionally opens a cache and finds something they can't make — and that's a better memory than a guaranteed drop, precisely because it wasn't earned.
 
-**[PROPOSAL] Weight the lottery toward the world's own character**, so a cold world's rare drop is the rimed edge. It should feel like it came from *there*.
+**Weight the lottery toward the world's own character.** Barbed Edge follows defended-flora
+affinity, never cold/rime; the complete table is in `apex-hunting-affinities-current.md`.
 
 ## 6. What an apex is made of
 
@@ -103,10 +107,20 @@ Spawn weight rises with the things that already mean *this world is dangerous an
 
 **Four routes, four different feelings** — made, found, hunted, and stumbled upon. Nothing overlaps.
 
-## 8. Open
+## 8. Historical questions and current disposition
 
-1. **How many apexes** — eight proposed, one per weapon.
-2. **Do they respawn?** *(Leaning: a world holds one, and an anchored world's apex stays dead once killed — otherwise an anchored world becomes a farm.)*
-3. **Should an apex ever guard a named place?** It would make arriving somewhere hard-won mean more.
-4. **Do they appear in the pre-bind projection?** *(Leaning: **no** — like sites, silhouette only once met. Knowing one is there removes the choosing.)*
-5. **Should the strongest apexes require specific world conditions**, so hunting one means *writing* toward it — which would make apex hunting a use for the writing system rather than a thing that happens to you.
+These were the original open questions. They are retained to show the design's evolution, but are no
+longer unowned proposals:
+
+1. **How many apexes?** Eight wild-weapon identities are current; any one world contains at most one
+   apex. The apex itself remains trait-generated rather than one of eight fixed boss species.
+2. **Do they respawn?** No farming loop. A defeated apex stays absent for the current run, and an
+   anchored world must persist that defeat once anchored-encounter persistence exists.
+3. **May one guard a named place?** Yes, only for optional treasure/side space. It may never gate a
+   required traveller, core clue, sole route or campaign progression.
+4. **Does projection reveal it?** No. Pre-bind projection does not reveal apex presence, and the
+   minimap obeys ordinary fog/discovery unless the player has invested in an explicit scouting
+   effect.
+5. **Can writing help hunt one?** World conditions bias the awarded wild-weapon weights after an
+   apex is actually defeated. They do not guarantee appearance, disclose it before discovery or
+   alter its combat stats. See `apex-hunting-affinities-current.md`.

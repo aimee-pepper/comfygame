@@ -64,6 +64,10 @@ that they were secretly exceptional.
 
 ## Current review packet for Aimee
 
+`great-work-endgame-review-candidate.md` now develops one cohesive answer to this batch—joining a
+player-selected folio, continuation without destructive reset and Tam as the person who can Hold the
+join. It remains review-only and changes none of the safe implementation boundary above.
+
 When Aimee is ready, discuss these as one related batch rather than isolated yes/no questions:
 
 1. What emotional act should complete a long restoration campaign: joining, repairing, choosing,
@@ -74,4 +78,3 @@ When Aimee is ready, discuss these as one related batch rather than isolated yes
    player's chosen collection? No count should be chosen before this meaning is chosen.
 4. Only then: what endgame act remains impossible for everyone else, and what ordinary work taught Tam
    the part of it that is not magic?
-

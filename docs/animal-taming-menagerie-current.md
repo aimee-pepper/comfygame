@@ -17,8 +17,10 @@ dialogue, a friendship meter or a stack of gifts to grind.
 
 - Recruiting Sabine and building the **Menagerie** unlocks the field **Attend** action account-wide.
   Sabine does not have to occupy a party slot for every tame.
-- Attend costs one world turn and may target one visible, non-hostile animal within ordinary
-  interaction range.
+- Attend costs one world turn and may target one visible, mobile, non-apex animal within Chebyshev
+  distance 2 that is not currently pursuing the party. In the field-awareness model, unaware and
+  alert animals are eligible; pursuing is the concrete meaning of “hostile” here. A blocked target
+  costs no turn.
 - Apexes, sessile hazards/flora, summoned entities, narrative occupants and already-tamed animals
   are never eligible.
 - An animal the party attacked this expedition will not accept attention until a later visit. This
@@ -43,17 +45,27 @@ The first slice uses only two condition families:
   progress; merely defending against another creature does not.
 - The two-turn value is debug-tunable.
 
+For this trust condition, the visible watching band is distance 2 through
+`max(2, effectiveDetectionRadius)`. The minimum of 2 is deliberate: an animal whose ordinary aggro
+radius is only 1 must still have a non-adjacent patience solution. This does not enlarge ordinary
+aggro or reveal a hidden creature; it exists only after successful Attend and the progress UI shows
+whether the current tile counts. Use post-mitigation awareness: if Scent Mask makes the party
+undetectable to this animal's only useful sense, the turn neither progresses nor resets patience.
+Quiet Step may hold an alert animal for its normal one turn, but cannot manufacture an extra trust
+turn or stack with the condition outside the awareness rules.
+
 ### Useful offering — only when demonstrably reachable
 
 > It returns to the loose fibres caught along the stone. Something flexible would hold here.
 
-- Offer one ordinary world resource meeting one visible property threshold, such as flexibility,
-  insulation, hardness or reactivity.
+- Offer one property-bearing world-resource sample meeting one visible threshold, such as
+  flexibility, insulation, hardness or reactivity. Aggregate `ResourcePool` stock has no individual
+  properties and is never treated as though it does.
 - The generator may choose this family only if a qualifying renewable source has already been
   discovered in the current realm or the party presently carries a qualifying sample. It may not
   demand an undiscovered item, a unique reward, Gold, essence, equipment, an apex trophy or a
   carcass-only part.
-- The resource is consumed only on final confirmation. The preview names the exact selected sample
+- The sample is consumed only on final confirmation. The preview names the exact selected sample
   and defaults to the weakest qualifying one.
 
 Property choice follows an observable behavior/site need, not a claim about the animal's emotions:
@@ -78,6 +90,20 @@ not another roll.
   an unanchored world's ordinary loss rules still apply. The UI warns before departure.
 - Multiple individuals of one species may be tamed because their jittered traits and histories are
   real differences. No collection bonus rewards duplicates.
+
+### Saved individual and transition
+
+The wild `WorldEnemy.id` is only world-local. On first successful Attend, save a taming record keyed
+by `(world persistent identity, enemy instance ID)` containing the exact trait/species/visual receipt,
+trust-condition version/progress, attack-this-expedition state and interaction history. Do not roll a
+second animal record or copy mutable catalogue defaults on return.
+
+Confirming Join us atomically creates a stable `TamedAnimalID`, marks the wild individual claimed and
+adds the protected travelling record before removing its map body. Replaying after interruption must
+find either the still-wild pre-confirmation state or the one tamed record, never zero or two animals.
+The permanent Reality history owns identity/origin/taming completion; Base/Menagerie assignment owns
+current posting and party configuration. A future Base reset therefore cannot erase that the animal
+was tamed, while any reset behavior for active posting remains an explicit later migration decision.
 
 ## The Menagerie
 
@@ -129,3 +155,7 @@ fixtures:
 4. Reopening the same anchored realm cannot reroll the animal's condition.
 5. Apexes and previously attacked animals reject Attend for the correct visible reason.
 6. Party cap, dormancy and save migration cannot delete a tamed animal.
+7. A detection-radius-1 animal can complete Patient presence from the disclosed distance-2 watching
+   band without changing ordinary aggro.
+8. Scent Mask, Quiet Step and alert/pursuing transitions cannot double-count a trust turn.
+9. Force-quit at Join us yields exactly one stable tamed record and no duplicate/lost wild body.

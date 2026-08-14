@@ -52,7 +52,7 @@ History is permanently re-readable with current knowledge, which is correct. It 
 calibration and precision gate as the Desk:
 
 - Tier 2 lists only calibrated subjects recorded in that world's saved readings;
-- the pencil/die marker may reveal whether each readable subject was written or rolled;
+- the hand/die marker may reveal whether each readable subject was written or rolled;
 - Tier 3 focus-attribution lines are filtered by calibrated affected subject just like the Desk;
 - Tier 5 living analysis remains a distribution/tendency view, never exact undiscovered species
   identity.

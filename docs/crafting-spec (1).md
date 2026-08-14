@@ -1,5 +1,13 @@
 # Crafting — Instruments, Gear, Consumables, and the Material Audit
 
+> **Current-authority note:** implementation has overtaken this opening snapshot. In particular,
+> ordinary CMY+Depth writing ink is now unlocked and prepared through Isolde's Scriptorium/Penmaker
+> branch under `authored-color-vocabulary-current.md`; the older Apothecary “inks” shorthand below
+> does not assign that system to Nessa. Likewise, the older Vance-owned Exchange→Recycler row is
+> superseded by separate Vance/Trading Post and Noll/Recycler ownership. Keep Part Four for the
+> authored consumable catalogue and use newer current documents for live station ownership and
+> implementation status.
+
 **Nothing is craftable today.** 44 gear pieces exist and every one is *found*; there are no recipes anywhere. This specs what gets made, and audits whether the materials to make it can actually be obtained.
 
 ---
@@ -147,13 +155,23 @@ Made at the **Scriptorium** *(Isolde's)*, because reading your own page is writi
 
 # PART FOUR — Consumables
 
-**Implementation status (9 Aug):** seventeen are authored and implemented: all healing and cures,
+**Implementation status (11 Aug):** seventeen are authored and implemented: all healing and cures,
 four one-hit coatings, all world-facing items, Solvent and Lure. Recipes infer from qualifying
-natural stock plus named reagents, remain learned after the suggesting stock is gone, and consume
-the weakest qualifying sample first. Traveller's Token remains held on Q47. The Apothecary engine
-and debug route exist; production access waits on Nessa's final authored diary prose.
+property-bearing world resources plus named resources, remain learned after the suggesting stock is
+gone, and consume the weakest qualifying world-resource instance first. “Sample” is provenance/grade
+data, not a second player-facing inventory category. Traveller's Token is cut; signature placement
+has no honest appearance-chance input for it to modify. The
+Apothecary engine and route exist; `station-first-use-reachability-audit-current.md` supersedes the
+obsolete prose gate. Recruiting Nessa exposes her paid build site, and tier 0 provides the
+dependency-safe preparation catalogue.
 
-This proposes **eighteen**, all made at the **Apothecary** *(Nessa's)* except where noted.
+**Current economy/packing correction:** `consumable-economy-field-kit-current.md` supersedes the
+blanket Essence costs and automatic inventory-order departure packing. Mundane preparations use
+world resources only in the Recommended profile; Stillwater and Waystone retain Reality-level
+costs, and the player selects exact saved Field Kit supplies.
+
+The current catalogue contains **seventeen**, all made at the **Apothecary** *(Nessa's)* except where
+noted.
 
 ## Healing — 3
 
@@ -165,7 +183,9 @@ This proposes **eighteen**, all made at the **Apothecary** *(Nessa's)* except wh
 
 ## Status cures — 4
 
-*Five statuses exist and only the Steady skill can clear any.*
+*Player-facing afflictions are burn, poison and dazzle, plus separately implemented legacy bleed.
+Items clear only the outcomes named below; the combat-tree technique Quench removes one selected
+burn, poison or dazzle and deliberately leaves bleed alone.*
 
 | Item | Clears | Wants |
 |---|---|---|
@@ -180,10 +200,10 @@ This proposes **eighteen**, all made at the **Apothecary** *(Nessa's)* except wh
 
 | Coating | Applies | Wants |
 |---|---|---|
-| **Venom** | poison | toxin · fibre |
-| **Firebrand** | burn | reagent · sulfur |
-| **Briar Oil** *(placeholder name; replaces Rimeoil)* | bleed | thorn · fibre |
-| **Flashsalt** *(placeholder name; replaces Stormsalt)* | dazzle | reagent · mercury |
+| **Venom** | poison | toxin · fiber · reactive world resource 55+ |
+| **Firebrand** | burn | reagent · sulfur · reactive world resource 60+ |
+| **Briar Oil** | bleed | fiber · resin · flexible world resource 50+ |
+| **Flashsalt** | dazzle | reagent · mercury · lustrous world resource 55+ |
 
 **Design-lead decision, 9 Aug 2026:** coatings do not add freeze or shock. The settled combat
 taxonomy has three `StatusKind` cases because each has an actual producer: burn, poison and dazzle.
@@ -191,8 +211,9 @@ Bleed remains a separately implemented legacy affliction with real producers. Th
 those four existing outcomes rather than expanding the taxonomy to preserve old item names.
 
 Rimeoil and Stormsalt are superseded because their names promise freeze and shock. **Briar Oil** and
-**Flashsalt** are unblocker names and recipe directions, not final prose: keep their effects stable
-while names and exact ingredients remain available for playtest revision.
+**Flashsalt** are the settled first-slice names. All four recipes cost zero refined Essence; named
+and property-qualified world resources are their cost. Exact identity and implementation correction
+are governed by `apothecary-coating-identity-current.md`.
 
 Stonebark prevention is a one-use guard on the **selected party member**. The next attempted
 affliction—burn, poison, dazzle or bleed—is prevented and the guard expires immediately. It does not
@@ -211,13 +232,12 @@ it is not a persistent pre-buff carried between combats.
 | **Torch** | Raises vision in a dark world | resin · timber |
 | **Farsight Draught** | Reveals part of the map, or the nearest site | quartz · ichor |
 
-## Utility — 3
+## Utility — 2
 
 | Item | Does | Wants |
 |---|---|---|
 | **Solvent** | Identifies a curio without the Storehouse | reagent · salt |
 | **Lure** | Draws a creature to you | toxin · pulp |
-| **Traveller's Token** | Raises the chance a traveller stands in the next world written | mote · ichor |
 
 **Every one needs a matching curio**, unidentified, named to hint without telling — *Humming Shard* and *Bound Knot* are the right voice.
 
@@ -262,7 +282,7 @@ separate review item; see `adamant-demand-audit-current.md`.
 | Building | Makes | Whose |
 |---|---|---|
 | **Blacksmith** | Ordinary weapons · armour · tools · **reforging · salvage**; foundation for the two advanced equipment shops | Halloway |
-| **Apothecary** | Consumables · coatings · **inks** | Nessa |
+| **Apothecary** | Consumables · coatings · reactive stains *(if specifically authored; not CMY+Depth writing ink)* | Nessa |
 | **Tannery** | Soft armour · **satchel and storehouse capacity** · bindings | Corrin |
 | **Survey Post** | **Field instruments** | Mara |
 | **Scriptorium** | **The page lens** · pens · **compounds** | Isolde |

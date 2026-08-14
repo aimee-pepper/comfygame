@@ -25,8 +25,8 @@
 
 | Tier | Instrument | Rendering | Footprint |
 |---|---|---|---|
-| **Crude** | Burnt stick / charcoal | Thick, blunt, uneven strokes; visible grain and crumble; wobbling lines. | 4–6 cells, irregular shapes |
-| **Plain** | Pencil | More control, still loose and sketchy; visible construction lines, slight overshoot at corners. | 2–3 cells, simple shapes |
+| **Crude** | Rough charcoal | Thick, blunt, uneven strokes; visible grain and crumble; wobbling lines. | 4–6 cells, irregular shapes |
+| **Plain** | Brush | Controlled continuous ink strokes with slight bristle spread and soft terminals. | 2–3 cells, simple shapes |
 | **Refined** | Fountain pen | Precise and beautiful; fine consistent line weight, clean joins, confident terminals. | 1 cell, always a single square |
 
 **Why size differs is now physical, not symbolic:** charcoal cannot render fine detail, so the same mark must be drawn large to stay legible. The glyph is constant; the tool sets the minimum size at which it survives. This is more coherent than tying size to symbol complexity, and it means the player is always reading the same script.
@@ -36,7 +36,7 @@ Consequences:
 - **The same book rewritten later looks like a different document** — the same words in a better hand. Strong visual progression, and a real reason to revisit old work.
 - **A page can mix hands.** You write in whatever hand you have.
 
-**Production note:** because the form is constant, it may be possible to draw each rune **once** as a vector and render the three hands programmatically (rough charcoal stroke / sketchy pencil / fine ink). Worth testing on a few runes before committing to 3× the drawing. If it works, asset load drops to ~156 drawings rather than 395.
+**Production note:** because the form is constant, it may be possible to draw each rune **once** as a vector and render the three hands programmatically (rough charcoal stroke / bristle-spread brush ink / fine fountain-pen ink). Worth testing on a few runes before committing to 3× the drawing. If it works, asset load drops to ~156 drawings rather than 395.
 
 **Which runes need which hands:** all of them, in principle — it's a font. If hand-drawing each separately, Structural runes can stay tier-invariant (they're punctuation, and minimal marks change least between instruments).
 

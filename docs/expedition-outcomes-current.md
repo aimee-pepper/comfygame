@@ -10,6 +10,12 @@ stack before the saved-RNG selection. Old mid-run saves reconstruct the boundary
 Explicit exit kinds, collapse-only lifetime counting and the Recovered/Lost/Kept-for-good recap are
 also implemented. Random retention versus player-chosen recovery remains a later review/playtest.
 
+**Current implementation sequence, 11 Aug 2026:** the Tier-A correctness checkpoint consolidates
+one typed return receipt and corrects retention to one outcome-wide unit budget. It preserves the
+current deterministic automatic choice of which exposed discrete items survive. Do not add the
+proposed recovery-choice screen in the same checkpoint. That comparison remains a separate,
+reversible player-agency decision after the arithmetic and receipt are accepted on phone.
+
 ## The failure state
 
 The game has no campaign-ending death state. Expedition failure is meaningful through **lost
@@ -40,6 +46,44 @@ make the recap look harsher.
 | Binder passes out / combat defeat | Placeholder 50% of acquired haul | Party safely returns and recovers |
 | Floor/collapse ejection | Placeholder 50% of acquired haul | Party safely returns; anchored realm itself persists if already anchored |
 | Player leaves an unanchored run by an explicit future abandon action | Treat as partial-haul failure, never a free full return | Must confirm exact consequence before action exists |
+
+Combat victory, ordinary combat Unbind/flee and dismissing a recap are not expedition outcomes. They
+do not refresh stock, tick anchored production, pay the Spring or advance return-based pity. Only the
+transition from an active expedition to Base mints an outcome.
+
+## One shared expedition-outcome receipt
+
+Every transition from an active expedition to Base mints exactly one stable
+`ExpeditionOutcomeID`. This is the shared receipt consumed by return recap/history, tutorial facts,
+diary/rune pacing, Spring income, Trading Post stock refresh, anchored production/replenishment and
+telemetry. Those systems must not each infer completion independently from `lastExit != nil` or from
+opening/dismissing a screen.
+
+An anchored realm can be visited repeatedly with the same world `runIndex`, so run index cannot be
+the receipt. Use a campaign-local monotonic `outcomeSequence` persisted in `WorldsState`; an outcome
+ID contains that sequence (and may carry run index as descriptive metadata). It requires no RNG and
+cannot collide within one save lineage.
+
+The atomic exit commit performs this order:
+
+1. verify the active expedition has no committed outcome ID;
+2. increment the saved outcome sequence and freeze ID, run/world identity, explicit exit kind,
+   turns, bind cost, acquired/permanent partitions and return telemetry inputs;
+3. commit knowledge/XP/recruits/animals and either bank haul immediately or create an approved future
+   pending-recovery envelope;
+4. run each automatic outcome consumer only when its `lastProcessedOutcomeID` differs;
+5. persist the durable outcome/consumer receipts and clear the active expedition together;
+6. present recap or recovery UI as a projection of the committed record.
+
+UI dismissal may clear the presented `lastExit` card but never rolls back the sequence or consumer
+receipts. Relaunching, reopening the recap, visiting a station or confirming a later settlement
+cannot mint or process the outcome again. If a consumer has a player decision (Anchorage payment or
+future recovery selection), its pending envelope references the same outcome ID and completion is
+itself idempotent.
+
+Outcome consumers use dedicated derived RNG only when randomness is actually required, keyed from
+outcome ID plus a subsystem namespace. They never consume the old run/combat RNG merely because the
+player returned Home.
 
 Companions who pass out take no more turns and revive at Base. Other party members cannot continue
 walking the Binder's body through the world.
@@ -141,6 +185,18 @@ collapse and cannot answer whether combat or world duration is causing failed ex
 These rules are debug-tunable only through the overall retained fraction; safety categories are not
 tuning.
 
+**Current correction:** use one outcome-wide retained-unit budget, not independent per-resource or
+per-stack floors. For an exposed pool of `N` units and positive retained fraction `f`, retain
+`ceil(N × f)` units, clamped to `0...N`; at `f == 0`, retain zero. Allocate that exact resource budget
+by largest remainder after proportional shares, with outcome-ID-keyed stable tie breaks. Apply the
+same total-unit arithmetic to exposed discrete item quantities while preserving protected carried
+counts exactly. The current deterministic automatic selection remains in place for this checkpoint;
+do not conflate fixing the budget with adding player choice.
+
+This supersedes the earlier per-resource “keep at least one of each kind” mercy wording: that rule
+could retain an entire varied one-unit haul and make 50% mean 100%. The mercy is one retained unit
+from the complete acquired pool when `N > 0` and `f > 0`, not one from every category.
+
 ## Anchoring and settlement
 
 Failure after anchoring saves the durable realm snapshot, including depletion and discoveries, then
@@ -161,3 +217,17 @@ essence silently and dormancy returns assigned companions safely as already spec
    partial retention.
 9. Defeat and collapse produce distinct saved outcome kinds and lifetime counts.
 10. The recap names Recovered, Lost and Kept-for-good results, including honest empty sections.
+11. Portal/Waystone/defeat/collapse each mint one unique outcome ID; combat flee/victory and recap
+    dismissal mint none.
+12. Revisit one anchored realm across several expeditions: repeated run index never collides and
+    every stock/production/pity/Spring consumer processes each outcome at most once across force-quit.
+
+## Live-code audit notes — 9 Aug 2026
+
+- `WorldsState` currently has `lastExit` and a Boolean `pendingAnchorSettlement`, but no monotonic
+  outcome sequence or stable outcome ID.
+- Portal and partial-haul paths independently perform banking, Spring credit, recap, tutorial fact,
+  active-run clear and settlement preparation. They are atomic in the current direct flow but give
+  future stock/production/recovery consumers no shared idempotency receipt.
+- `runIndex` identifies a generated/anchored world, not a particular visit home, and is therefore not
+  sufficient for repeated anchored-realm outcomes.

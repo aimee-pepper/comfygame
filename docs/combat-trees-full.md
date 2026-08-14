@@ -3,9 +3,17 @@
 > **Current economy:** `combat-progression-current.md` resolves the implemented depth, point income,
 > level cap and respec questions below. This file remains the node-content authority.
 
+> **Current structure:** the 72 node effects remain content authority and are arranged by the
+> current five-depth fan-and-fork graphs in `combat-tree-true-graph-current.md`. The live
+> ordered depth ladders are legacy implementation, not current design.
+
+> **Current semantics:** `combat-node-viability-current.md` owns exact triggers, stacking, targeting
+> and receipts. Many live `Loadout` fields currently have no gameplay consumer; their JSON presence
+> does not prove that the node works.
+
 **Supersedes `combat-trees.md`**, which had the structure but no nodes. This has every branch and every node.
 
-**Three trees. Three branches each. Eight nodes per branch. 72 nodes total.**
+**Three trees. Three lanes each. Eight ranks per lane. 72 nodes total.**
 
 All numbers **[PLACEHOLDER]**. Skill names in **bold** are skills that already exist in `skills.json` — they now have homes.
 
@@ -16,19 +24,23 @@ All numbers **[PLACEHOLDER]**. Skill names in **bold** are skills that already e
 | Tree | Branch | Branch | Branch |
 |---|---|---|---|
 | **Offense** | **Force** | **Precision** | **Swiftness** |
-| **Defense** | **Fortitude** | **Evasion** | **Protection** |
-| **Craft** | **Venom** | **Shadow** | **Emanation** *(ID `kindling`)* |
+| **Defense** | **Fortitude** | **Protection** | **Evasion** |
+| **Craft** | **Venom** | **Emanation** *(legacy ID `kindling`)* | **Shadow** |
 
 **A class is where you spent.** Nobody is assigned one.
 
-**Max level: enough points to complete three branches, one per tree** (Aimee). A finished companion has **3 of 9 branches at full depth** and six untouched — so builds stay distinct forever, with **27 combinations** and no convergence.
+**Max level: 24 standard points, enough for three eight-node capstone routes.** A player may take
+one route through each tree, specialize more heavily in one tree, or leave several partial routes.
+The three chosen capstone lanes still produce the established 27 named combinations when one
+capstone is owned in each tree. Authored calling-lean points sit above the standard budget.
 
 ### Node economy — [PROPOSAL]
 
 - **8 nodes per branch, 1 point each.** Depth comes from nodes getting *stronger*, not costlier — easier to reason about on a phone.
-- **24 points** completes three branches.
+- **24 points** completes three valid capstone routes.
 - **1 point per level → max level 25.**
-- **Partial investment is legal.** The cap is on total points, so spreading gives you three unfinished branches rather than three finished ones. A worse choice, never an illegal one.
+- **Partial investment is legal.** The cap is on total points; prerequisites and the five-node
+  capstone commitment determine which routes remain reachable.
 
 ### Node kinds
 
@@ -76,7 +88,7 @@ Each branch runs **passive → skill → passive → skill → passive → capst
 | 3 | **Quicken** ⚔️ | Act twice next turn, then skip one |
 | 4 | Second Wind | Recover a little on a kill |
 | 5 | Flurry | Attacks strike a second foe |
-| 6 | **First Strike** ⚔️ | Act before the encounter properly begins |
+| 6 | **First Strike** ⚔️ | Your first committed attack gains force and cannot be retaliated against |
 | 7 | Cascade | Each kill grants initiative |
 | 8 | **Blur** ★ | Two full actions in a turn, once per fight |
 
@@ -117,8 +129,8 @@ Each branch runs **passive → skill → passive → skill → passive → capst
 
 | # | Node | Effect |
 |---|---|---|
-| 1 | Bulwark | +armour to one adjacent ally |
-| 2 | Watchful | You see ambushers before they strike |
+| 1 | Bulwark | +personal armour and a larger same-rank ally armour bonus |
+| 2 | Watchful | An ordinary ambush still occurs, but does not steal the opening order |
 | 3 | **Draw Off** ⚔️ | Force a foe to target you |
 | 4 | Cover | Take a share of damage aimed at the back rank |
 | 5 | Shieldwall | Front rank gains armour while you stand |
@@ -160,7 +172,7 @@ Each branch runs **passive → skill → passive → skill → passive → capst
 | 7 | Shadowed | The whole party is detected later |
 | 8 | **Unseen** ★ | Begin every encounter concealed |
 
-### Emanation *(implementation ID `kindling`)* — projection, affliction and resistance
+### Emanation *(new ID `emanation`; legacy decode ID `kindling`)* — projection, affliction and resistance
 *Answers warded and elemental foes.*
 
 | # | Node | Effect |
@@ -232,6 +244,6 @@ do not use human trees; see `animal-companion-combat-current.md`.
 2. **Point income:** current at 1 per level, cap 25.
 3. **Respec:** implemented as paid full respec at the Spring.
 4. **Animals:** current placeholder uses no tree; see `animal-companion-combat-current.md`.
-5. **Branch naming resolved:** keep `kindling` as the implementation ID and display **Emanation** for
-   the branch covering heat, caustic and light.
+5. **Discipline naming superseded by the graph migration:** new identity is `emanation`; decode-only
+   `kindling` maps one-way to it so old saves remain valid without two writable names.
 6. **Whether capstones are too strong.** Guardian and Killing Stroke especially — both are near-absolute, and near-absolute is what a capstone should be, but they want testing.

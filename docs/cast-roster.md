@@ -1,5 +1,12 @@
 # The Roster — expandable named cast
 
+> **Structural archive / identity source, not current discovery-order authority.** The opening
+> sequence and station split were revised after this table: **Vance/Trading Post first, Noll/Recycler
+> second, Halloway/Blacksmith third**. Use `opening-economy-traveller-reorder-current.md` and
+> `roster-progression-current.md` for current order and ownership. In particular, the older Vance
+> “Exchange + Recycler” row below is superseded; current station ID is `trading_post`. The remaining identity prose is retained so the
+> design's evolution stays legible.
+
 **Companion to `the-cast.md`**, which holds the structure. This holds the people. New or revised
 named travellers should be developed with `traveller-template.md` before implementation.
 
@@ -29,7 +36,7 @@ Auber and the Distillery’s developed proposal is in `traveller-identity-auber-
 | 1 | **Mara** ✅ | surveyor | **The Survey Post** | Vision · map revealed on entry · minimap depth · **field instruments** | **Scarp** | opening · 1 |
 | 2 | **Edren** ✅ | archaeologist | **The Reliquary** | Site locations revealed · richer site rewards · reading old ruins · **the people who came before** | **Ruin** | opening · 2 |
 | 3 | **Halloway** ✅ | smith | **The Blacksmith** | Reforging · salvage · **instruments and nibs** | **Gold ore** | opening · 2 |
-| 4 | **Isolde** ✅ | calligrapher | **The Scriptorium** | **The hands** — pencil, pen, chaining, compounds | **Hush** *(see §3)* | **start of mid** · 2 |
+| 4 | **Isolde** ✅ | calligrapher | **The Scriptorium** | **The hands** — Brush, Fountain pen, chaining, compounds, Ink Mixing | **Hush** *(see §3)* | **start of mid** · 2 |
 | 6 | **Orsa** | keeper | **The Tavern** — *upgrades the Firepit* | Visitors · clues · wants satisfied · resting | **Hive** | mid · 3 |
 | 7 | **Vance** | trader | **The Exchange** *(+ Recycler)* | Selling · buying · bulk · recycling | **Amber** | mid · 3 |
 | 8 | **Sela** ✅ | wanderer | **The Wayfarer's Table** | Routes · provisions · organic yields · flora identified on sight · capacity | **Pond** | mid · 3 |

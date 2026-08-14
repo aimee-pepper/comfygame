@@ -3,8 +3,12 @@
 **Status:** Identity directions approved; detailed prose and combat balance remain to draft  
 **Scope:** Value, creature knowledge, archives and embodied emanation
 
-> **Signature authority:** Vance's three-condition profile is in
-> `traveller-signatures-early-mid-current.md`; Lys's four-condition profile is in
+> **Naming/order authority (10 Aug 2026):** Vance owns the **Trading Post** (`trading_post`), is
+> intended first, and uses the one-condition opening profile in
+> `opening-economy-traveller-reorder-current.md`.
+
+> **Signature authority:** Vance's one-condition opening profile is in
+> `opening-economy-traveller-reorder-current.md`; Lys's four-condition profile is in
 > `traveller-signatures-mid-current.md`; Kestrel's five-condition profile is in
 > `traveller-signatures-five-condition-current.md`. Ashe's eight-condition profile is in
 > `traveller-signatures-auber-ashe-current.md`.
@@ -19,7 +23,7 @@ what a record cannot preserve. Ashe asks who gets to decide what a dangerous bod
 |---|---|---|---|---|
 | Reads | Objects in circulation | Living creatures and their traces | Records in relation to other records | Emanation as bodily sensation |
 | Central question | Is its price the same as its worth? | Does knowing a creature justify taking it? | What was lost when this became a record? | Am I a person carrying danger, or a danger shaped like a person? |
-| Player value | Exchange, appraisal, recycling | Tracking, butchery, bestiary combat logic | Library, cross-reference, page hints | Elemental combat and emanation detection |
+| Player value | Trading Post, appraisal, circulation | Tracking, butchery, bestiary combat logic | Library, cross-reference, page hints | Elemental combat and emanation detection |
 | Recommended teaching | **Amber** | **Foe: unrecorded species** gambit subject | **Echo** | **Foe: emanating** gambit subject |
 
 ---
@@ -32,9 +36,9 @@ what a record cannot preserve. Ashe asks who gets to decide what a dangerous bod
 |---|---|
 | **Pronouns** | he/him |
 | **Calling** | a trader and appraiser |
-| **Building** | The Exchange, including the Recycler |
-| **Campaign phase** | Mid |
-| **Signature complexity** | 3 conditions |
+| **Building** | The Trading Post only |
+| **Campaign phase** | Opening; intended first found person |
+| **Signature complexity** | 1 condition |
 | **Teaching** | **Amber**, diary-exclusive |
 | **Starting lean** | Precision + Ingenuity |
 
@@ -48,7 +52,7 @@ what a record cannot preserve. Ashe asks who gets to decide what a dangerous bod
 - **Habit:** Examines wear, repairs and alterations before pristine surfaces. He often knows an
   object's likely route before its origin.
 - **Attitude:** Sociable without being ingratiating; exact about prices and candid about uncertainty.
-  He does not pretend a fair exchange must feel equal to both people.
+  He does not pretend a fair trade must feel equal to both people.
 - **Tension:** Circulation keeps useful things from becoming hoards, but pricing can flatten need,
   history and affection into one comparable number.
 
@@ -58,23 +62,22 @@ that history while depending on it.
 
 ## Why the player seeks him
 
-The Exchange turns surplus into choice:
+The Trading Post turns surplus into choice:
 
 - buying and selling ordinary goods in useful quantities;
-- bulk exchanges that reduce repetitive transactions;
+- bulk selling that reduces repetitive transactions;
 - appraisal that exposes value, rarity or likely use;
-- recycling unwanted items into recoverable world resources;
 - later exchanges shaped by supply, relationships or unusual provenance.
 
-The Recycler should recover usefulness, not reproduce the Distillery or Blacksmith. It breaks down
-finished surplus; Auber transforms selected world resources with essence; Halloway repairs, reforges
-and salvages equipment.
+The separate Recycler keeper Noll recovers material usefulness; Auber transforms selected world
+resources with essence; Halloway repairs and reforges equipment intended to remain whole. Vance may
+price those outputs but does not perform or own their processes.
 
 ### Coherence sentence
 
 > Because Vance followed **objects through many owners rather than judging them at first glance**, he
-> understands both recoverable material and negotiated value, which is why recruiting him opens the
-> **Exchange, appraisal and Recycler**.
+> understands negotiated value and provenance in circulation, which is why recruiting him opens the
+> **Trading Post and appraisal**.
 
 ## Amber
 
@@ -87,18 +90,19 @@ its former late-wild/merchant route is superseded.
 
 ## Signature and diary shape
 
-Vance's three-condition world should be a natural exchange route: two materially distinct regions
-or ecologies connected by a traversable bottleneck, with evidence that objects moved between them.
+Vance's one-condition opening world is an unobstructed exchange route. Materially distinct regions,
+concentrated pockets and evidence of movement remain diary observations rather than recruitment
+conditions.
 
-**Initial target: 7 pages**
+**Current target: 6 pages**
 
 | Pages | Purpose |
 |---:|---|
-| 3 | One location page per signature condition |
+| 1 | Opening location page |
 | 1 | Amber teaching |
-| 1 | A repaired object whose successive owners changed its use |
+| 2 | Concentrated material/life observations formerly used as location gates |
 | 1 | Orsa, Corrin or Auber relationship page |
-| 1 | Failed exchange, abandoned cache or Vance whereabouts page |
+| 1 | Binder's Workshop / successive-owner object history |
 
 ### Diary arc
 

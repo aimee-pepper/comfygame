@@ -1,8 +1,10 @@
 # Armoury rebuild — implementation contract
 
-**Status:** Implementation-ready first specialist rebuild slice. Profile offsets and research costs
-are reversible playtest values under DRQ-123.  
-**Updated:** 9 Aug 2026
+**Status:** Implemented first specialist rebuild slice. Profile offsets are the recommended initial
+native playtest values under DRQ-123; `armoury-profile-offset-audit-current.md` owns comparison and
+retuning gates.
+
+**Updated:** 11 Aug 2026
 
 This specializes `gear-crafting-families-current.md` and `crafted-gear-migration-current.md` for
 Bracken. It adds one deliberate rebuild flow, not durability, fit stats, random affixes or a second

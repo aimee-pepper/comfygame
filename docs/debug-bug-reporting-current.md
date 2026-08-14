@@ -2,8 +2,9 @@
 
 **Status:** DEBUG capture, durable queue/export and receipt-gated HTTPS adapter are implemented;
 the real relay destination and installation credential remain unconfigured
-**Priority:** delivery/outbox state is the active post-save checkpoint. A real relay still requires
-an approved external host; local reporting remains usable meanwhile
+**Queue authority:** `Sources/Content/Data/playability-roadmap.json`. This design file does not declare
+itself active. The reporter is currently ready to test; launch handoff remains the sole active
+checkpoint. A real relay still requires an approved external host; local reporting remains usable.
 **Updated:** 11 Aug 2026
 
 ## Player outcome
@@ -21,10 +22,18 @@ Design and Engineering—not Aimee—assign priority and route the work.
 2. Tapping freezes a screenshot of the game **before** the report sheet obscures it.
 3. A sheet shows the screenshot thumbnail, a required “What happened?” text box, an optional “What
    did you expect?” box, and automatic context disclosure.
-4. **Submit** writes the report and screenshot atomically to a durable local outbox, immediately
-   confirms **Saved to bug queue**, and never blocks returning to play on network availability.
+4. **Save on this phone** writes the report and screenshot atomically to a durable local outbox,
+   immediately confirms **Saved on this phone — not submitted**, and never blocks returning to play
+   on network availability. A local-only action is never labelled merely **Save**, **Send** or
+   **Submit**.
 5. Reports show `Unsent`, `Sending`, `Submitted` or `Needs attention`. Retry is explicit and
    idempotent; the same report ID can never create two queue entries.
+
+After a successful local save, the form replaces its confirmation action with **Done** and offers
+**Open bug queue**. Done only dismisses; Open bug queue only navigates. Neither performs transport.
+The saved-state message remains visible until dismissal and VoiceOver announces the complete **not
+submitted** phrase. In the queue, manual export is **Share saved report…**; a configured network
+action is **Submit to triage**, the only client action allowed to imply delivery.
 
 No severity picker appears in Aimee's form. Optional lightweight tags such as **crash**, **layout**,
 **text**, **balance** and **other** may help retrieval, but omission is valid and they do not imply
@@ -41,6 +50,21 @@ Every report receives a stable `BugReportID` and captures:
 - current world seed/book ID, position, Stability and outcome/encounter IDs when relevant;
 - recent bounded semantic action trail (for example the last 20 game actions), not raw touch logs;
 - user text and transport state/remote reference.
+
+When capture occurs during combat, the report also carries one optional **frozen encounter evidence**
+payload. It copies rather than recomputes the active encounter's saved scaling receipt and present
+combat state:
+
+- scaling profile/rules version, world level inputs and stable party contribution entries;
+- trigger/group members, grouping radius and inclusion/exclusion reasons;
+- final foe IDs, level, maximum HP, attack, armour and apex flag;
+- ordinary HP allocation/follow-up slots or apex multipliers/action slots;
+- saved opening classification, round/turn position and current party/foe HP.
+
+This payload exists so a report such as “a fresh party was killed” can distinguish excess world
+level, grouping, durability, action pressure, opening burst and accumulated attrition. It is DEBUG
+evidence, not a diagnostic save or automatic balance verdict. Old reports decode with it absent;
+capturing it never advances RNG, derives from current global settings or mutates the encounter.
 
 Do not include player name, Apple account, filesystem paths, unrestricted save contents or secrets.
 The sheet lists the captured categories and lets Aimee remove the screenshot before submission. A
@@ -135,6 +159,14 @@ Do not expand this completion pass into general telemetry, save attachment or a 
 client. Close the real receipt, honest outbox/retry and promised safe context; downstream triage stays
 outside the phone.
 
+### Honest local-action checkpoint — 11 Aug 2026
+
+`f9be251` closes the misleading Save/Done behavior: **Save on this phone** creates the durable local
+package and makes zero transport calls; **Done** only dismisses and likewise makes zero transport
+calls. Direct delivery remains unconfigured and therefore unavailable. The remaining bounded context
+gap is the optional frozen encounter evidence above; it follows launch acceptance because it directly
+enables the fresh-save combat-scaling test already in progress.
+
 ## Triage contract
 
 New reports enter **Untriaged**. At regular check-ins, Game Design and Engineering classify:
@@ -153,9 +185,12 @@ canonical issue.
 1. The control is reachable on every ordinary game screen, movable and absent from Release builds.
 2. Screenshot represents the pre-sheet state and excludes the reporter control.
 3. Required text, screenshot removal and Cancel behave correctly with keyboard/large text/VoiceOver.
-4. Submit is atomic; force-quit at every boundary loses neither a confirmed report nor creates a
+4. Local save is atomic; force-quit at every boundary loses neither a confirmed report nor creates a
    duplicate.
 5. Offline submission remains safely queued; retry with the same ID creates one remote entry.
 6. Automatic context matches the visible build/world/screen and records missing context as absent,
    never guessed.
 7. A received report can be ingested into the shared triage queue and linked back to its source ID.
+8. The capture form never labels a local-only action simply **Save** or **Submit**. A UI test proves
+   **Save on this phone** produces `Unsent`, **Done** makes zero transport calls, and only a valid
+   **Submit to triage** receipt produces `Submitted`.

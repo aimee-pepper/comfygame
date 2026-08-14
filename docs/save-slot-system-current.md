@@ -1,6 +1,6 @@
 # Save-slot and start-screen system — current
 
-**Status:** P0 next, immediately after Engineering's active checkpoint
+**Status:** implemented, pushed and installed in `3549863`; phone acceptance pending
 **Owner:** Engineering implements; Game Design owns player-facing behavior and safety
 **Purpose:** let Aimee maintain independent campaigns and test states without overwriting the only
 playable save.
@@ -12,6 +12,9 @@ implicitly:
 
 - **Continue** opens the most recently played valid slot and names that campaign beneath the action;
 - **New Game** creates a distinct slot and never overwrites another campaign;
+- when both are present, Continue and New Game are peer primary actions with identical bordered
+  width, height, typography, icon allocation, padding and two-row subtitle reservation; emphasis may
+  differ, geometry may not. At Accessibility sizes both reflow to the same full-width stacked frame;
 - **Load Game** exposes every slot as a compact card with campaign name, last-played date, Binder
   level, current location/state and enough progression context to distinguish test saves;
 - a player-facing **Campaigns** action in Settings safely flushes the active slot and returns to this
@@ -66,5 +69,27 @@ this checkpoint. Do not make the splash screen itself interactive: static launch
 7. Force-quit during create/save/switch/delete cannot lose or cross-wire another campaign.
 8. Compact-phone and large-text layouts keep every slot action reachable without ambiguous row-wide
    destructive taps.
+   Continue and New Game have equal rendered bounds at ordinary and Accessibility text sizes; a
+   shared minimum height alone is insufficient evidence when their labels wrap differently.
 9. Campaign A → Settings/Campaigns → Campaign B → Campaigns → Campaign A works without relaunch and
    preserves both independent states.
+
+## Aimee's first phone pass
+
+This is a safety check, not a request to abandon the current playtest campaign:
+
+1. Open the migrated campaign with Continue and verify one memorable fact: current Essence, active
+   party or latest world history.
+2. From Settings choose **Save games**, create Campaign 2, make one harmless durable change there,
+   then return to Save games.
+3. Load the migrated campaign and confirm the remembered fact is unchanged. Return to Campaign 2
+   and confirm its separate change remains.
+4. Create a disposable third campaign. Cancel its deletion once, then confirm deletion and verify
+   neither surviving card changed.
+5. Force-quit on the chooser, relaunch, and verify Continue names/opens the campaign selected most
+   recently.
+6. Open details for one campaign and verify Export presents a recovery file without changing that
+   campaign. Sharing it is optional for this pass.
+
+Stop immediately and preserve the affected slots if any campaign opens with another campaign's
+Essence, party, history or location; cross-slot contamination is a blocker, not a cosmetic defect.

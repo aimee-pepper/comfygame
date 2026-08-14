@@ -3,6 +3,55 @@
 Status: implemented additive party-power candidate and default for newly bound worlds; coefficients
 remain reversible until Aimee's phone comparison.
 
+## 14 August controlled level-one evidence — correct species severity before coefficients
+
+The committed 12-seed diagnostic at `149c2c3` froze a fresh Binder + Quill at 54 aggregate HP and
+held party budget, grouping category, Stability contribution and world level constant. Results:
+
+- Normal isolated contacts: 3–4 rounds, 7.4–37% HP spent; two of six exceeded the 20% target.
+- Teeming isolated contacts: 3–8 rounds, 16.7–98.1% HP spent; one of six defeated the party.
+- Teeming selected pursuer identities in five of six samples, including an ATK-10 Pierce specimen.
+
+Do not tune additive party scaling from this result. It exposes two earlier authorities:
+
+1. Some level-one ordinary species/offence combinations exceed the isolated Normal opening band.
+2. Teeming is altering cast severity/composition, despite the settled ecology rule that Vitality
+   increases **cast size and abundance, not trait spread or individual strangeness**.
+
+Correct the sampling boundary first. **Vitality peak** may generate more species and bodies, but it
+cannot increase the total trait budget or add peak-derived armour/aposematism affordance. Authored
+Vitality **aspects** remain meaningful: Herd and Swarm legitimately raise `trophicDepth`, which may
+redistribute the same fixed budget toward armament and produce a more predatory food web. That is a
+tradeoff in composition, not free extra species power. After that correction, rerun the exact
+diagnostic. If isolated Normal contacts still exceed the healthy band, tune the level-one
+creature/offence or unarmed baseline that explains the outliers. Preserve the additive party-power
+coefficients until those causes are separated.
+
+Required counterfactual: with the same seed, all non-Vitality readings and all Vitality aspect shares
+held constant, changing only Vitality peak must yield an identical prefix of species gameplay trait
+vectors; only requested cast length/population and placement may differ. A separate fixed-budget
+fixture may change `trophicDepth` and prove that armament gains are paid by less investment elsewhere.
+Visual-only morphology may derive from those vectors but cannot perturb them.
+
+### Source-level candidate after causal isolation
+
+After the fixed-budget correction, identical-state counterfactuals showed that the remaining Normal
+upper-band misses came from `multi` delivery applying 70% attack to every member. Suppressing
+afflictions and replacing the action policy with explicit basic attacks were exact no-ops. The
+reversible first candidate is therefore **50% per target for multi delivery**: it spreads one
+opening-pair attack budget rather than receiving free extra total damage merely for choosing a free
+delivery axis.
+
+The corrected 12-seed result is source-acceptable pending ordinary-phone play:
+
+- Normal: every fight won in 2–4 rounds; 1–11 of 54 aggregate HP spent (about 2–20%).
+- Teeming: every fight won in 2–4 rounds; 2–15 of 54 HP spent (about 4–28%).
+
+Do not tune further from these fixtures alone. Confirm one ordinary Normal and one disclosed Teeming
+contact on phone, then retain or revise the 50% share from actual readability and player decisions.
+Larger-party delivery remains covered by the existing two-/five-person acceptance matrix; spread
+damage may scale across more bodies, but must not exceed that aggregate party band.
+
 ## 13 August design disposition — do not retune from the single uncontrolled defeat
 
 The available evidence still contains one fresh-save defeat whose world may have been Teeming and

@@ -16,6 +16,45 @@ A companion is in exactly one place:
 Use **assigned** in UI rather than “posted.” Assignment never taxes XP and never creates passive
 wall-clock progression.
 
+### One stable placement authority
+
+The live `activeParty: [Int]`, `assignedCompanions: [Int]` and “absent from both means Home” model
+is a migration source, not the durable target. Array positions cannot identify named travellers,
+generated people and tamed animals across roster changes, and two independently edited arrays can
+place one person in two locations.
+
+- Every non-Binder companion has one stable `PersistentPartyMemberID` and one authoritative saved
+  assignment: Home, Party or a specific stable anchored-realm ID.
+- Party display/formation order may be a separate ordered list of those stable IDs, but it cannot
+  grant placement independently. Reconciliation removes duplicates and never silently clones a
+  person between Party and realm work.
+- Changing assignment is one atomic Base action. Moving to Party removes realm work/Home benefit;
+  moving to a realm removes Party/Home benefit; dormancy returns assigned workers Home safely.
+- Generated people use the same placement contract. Tamed animals may use Party/Home(Menagerie)
+  placement but are ineligible for keeper discounts and first-slice Worldwork unless a later rule
+  explicitly grants it.
+- Legacy index references migrate only when they resolve unambiguously against the saved roster.
+  Invalid/duplicate references resolve safely Home with a diagnostic rather than guessing.
+
+Home remains a default place, not a separate building slot. A person with no keeper relationship is
+simply available at Base; the player does not have to assign every idle companion to decorative work.
+
+## Builder, keeper and lifecycle are separate facts
+
+`StationDef.builtBy` currently does two jobs: construction gating and keeper ownership. That is
+insufficient for an existing room with a later keeper (Lys/Library) and for Firepit becoming Orsa's
+Tavern. Current station metadata must distinguish:
+
+- **lifecycle** — opening infrastructure, found-then-built, or existing-room/later-keeper;
+- **builder/unlock traveller** — whose recruitment exposes construction, if any;
+- **keeper** — whose level and Home presence provide earned tiers/discounts, if any;
+- **keeper activation condition** — for example Tavern upgrade completed, rather than mere Orsa
+  recruitment while it is still the unowned Firepit.
+
+For simple found-then-built stations builder and keeper may contain the same Traveller ID, but rules
+must read the field appropriate to the question. Do not infer Library has no keeper because it has no
+builder, or give the opening Firepit an Orsa discount before it becomes the Tavern.
+
 ## Purchased and earned tiers
 
 The old proposal wrote `paid tier + keeper tier`. That would let a player buy and level past the
@@ -57,8 +96,10 @@ It does not discount:
 - recruitment wants or narrative choices;
 - anchoring/sustain obligations;
 - another station's costs;
-- inventory goods sold through the Exchange;
+- inventory goods sold through the Trading Post;
 - actions with no price.
+- the station's own initial construction cost; the workplace does not exist yet to supply its Home
+  benefit. Later upgrades and paid station actions are eligible.
 
 ## Firepit and Tavern
 
@@ -90,3 +131,21 @@ party and anchored work.
    station action.
 9. A keeper-earned Tier 1 satisfies the matching branch rung and permits purchase of a real Tier 2
    upgrade without charging the redundant Tier 1 cost; paid-history flags remain unchanged.
+10. Stable assignment cannot place one identity in Party and a realm, and roster reorder does not
+    change anyone's placement or benefit.
+11. Library recognizes Lys only through keeper metadata, while Firepit recognizes nobody until its
+    persisted Tavern upgrade activates Orsa.
+12. Initial construction receives no Home discount; a later station upgrade does.
+13. Generated people and animals remain valid stable placements without accidentally matching a
+    named keeper or receiving building discounts.
+
+## Live-code audit notes — 9 Aug 2026
+
+- `StationStaffingRules.keeperIndex` currently derives ownership solely from `builtBy` and then
+  searches by mutable roster index.
+- Party and anchored-realm placement currently use independent `[Int]` collections; Home is inferred
+  by absence. This cannot safely extend to reordered/generated/animal identities without the stable
+  placement authority above.
+- Current `stations.json` has no keeper/lifecycle field; Library has no `builtBy`, Firepit has no
+  owner, and later keeper stations are not all live. Those are schema gaps rather than intentional
+  exclusions from staffing.

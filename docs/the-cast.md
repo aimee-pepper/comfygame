@@ -1,9 +1,11 @@
 # The Cast
 
-> **Historical roster reference.** Current identity, ownership and diary decisions live in
-> `cast-roster.md`, `roster-coherence-audit-current.md` and the traveller documents routed from
+> **Historical roster reference.** Current identity, ownership, discovery order and diary decisions
+> live in `opening-economy-traveller-reorder-current.md`, `roster-progression-current.md`,
+> `roster-coherence-audit-current.md` and the traveller documents routed from
 > `current-design-index.md`. Keep this file for history; conflicting rows are not implementation
-> authority.
+> authority. The current opening find priority is **Vance/Trading Post → Noll/Recycler →
+> Halloway/Blacksmith**; the combined Exchange + Recycler row below is superseded.
 
 **The problem:** *"half the game is supposed to be seeking these people out"* — and there are **six travellers**, two of whom unlock anything, against **thirteen specced buildings** and **twelve specced classes**. The maximum signature is four conditions when a late-game page holds twelve.
 

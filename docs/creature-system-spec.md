@@ -9,7 +9,13 @@
 <details open>
 <summary><b>1. The mechanism in one paragraph</b></summary>
 
-A world's pressures produce **weights** over trait axes and a **budget** scaled by Vitality. Each species in the cast is made by **spending that budget across the costly axes, weighted-randomly** — so pressures decide what a world *tends* to build, the budget decides how much there is to build with, and randomness decides where each species actually lands. Free axes (colour, sensory allocation, body shape) are shaped by pressures without spending anything. Identity is read off the result afterwards. Combat stats and loot both derive from the same trait vector.
+A world's pressures produce **weights** over trait axes and every ordinary species spends the same
+fixed ecological budget across those axes, weighted-randomly. Pressures decide what a world tends to
+build, the fixed budget keeps richness from becoming free individual power, and randomness decides
+where each species lands. Vitality peak controls cast size/population only; authored aspects such as
+`trophicDepth` may redistribute the fixed budget. Free axes (colour, sensory allocation, body shape)
+are shaped by pressures without spending anything. Identity is read off the result afterwards.
+Combat stats and loot both derive from the same trait vector.
 
 **Why budget-allocation rather than independent rolls:** it produces trade-offs for free. A world pushing both size and armour cannot have both maxed — every species is a different answer to the same constrained problem, which is exactly what makes a cast feel like an ecosystem rather than a list.
 
@@ -69,7 +75,7 @@ Pressures produce a **weight per costly axis** (how much of the budget tends to 
 | Substrate volatile | — | emanation ↑ · finish → schiller |
 | Relief openness ↑ | size → mid · covering ↓ | build → sleek · reach → mid |
 | Relief openness ↓ | armament.pierce ↑ | build → compact · reach → close · **coloration → cryptic** |
-| Vitality ↑ | **budget ↑** (see §4) · ornament ↑ | |
+| Vitality peak ↑ | — | **cast size/population ↑ outside the individual draw** |
 | Trophic depth ↑ | armament ↑↑ on some species, ↓ on others | — |
 | Atmosphere density ↑ | size ↑ for small forms | |
 | Cycle amplitude ↑ | — | **widens the cast draw** (session 15), not the jitter |
@@ -82,8 +88,12 @@ Pressures produce a **weight per costly axis** (how much of the budget tends to 
 <summary><b>4. The budget</b></summary>
 
 ```
-budget = base + vitalityScale × vitality        [PLACEHOLDER]
+ordinary species budget = base                  [PLAYTEST TUNING]
 ```
+
+Vitality does not raise this number. A deep food web may weight armament more strongly, but every
+gain remains paid by less investment elsewhere. Apexes deliberately exceed the ordinary envelope
+through their separate rules.
 
 Every costly axis has a **cost curve**, superlinear so extremes are expensive:
 

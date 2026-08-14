@@ -2,6 +2,10 @@
 
 **Status:** Claude's design from Aimee's brief. **[PLACEHOLDER]** numbers.
 
+> **Superseded:** Current implementation authority is `trading-post-recycler-current.md`. Vance owns
+> the independent **Trading Post** (`trading_post`) with rotating merchant stock; Noll owns the
+> independent Recycler. The upgrade/Exchange model below is historical.
+
 **The brief:** a merchant or trader for converting and selling resources, so a player can offload things eating inventory space. **The recycler is an upgrade to the merchant.**
 
 ---

@@ -65,7 +65,7 @@ item. It changes what the player understands when another example appears.
 ## System boundaries
 
 - Vance's appraisal may estimate the unidentified family's value band but cannot reveal the result.
-- The Exchange cannot buy unidentified curios. Once recognized, resulting ordinary items follow
+- The Trading Post cannot buy unidentified curios. Once recognized, resulting ordinary items follow
   normal eligibility; keys and narrative objects remain protected.
 - Solvent remains valuable after recognition because other unknown families can exist; do not create
   a unique Solvent recipe for each curio.

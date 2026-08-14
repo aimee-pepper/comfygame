@@ -7,9 +7,10 @@ traveller data
 ## Shared decisions
 
 - Preserve all six names, identities and implemented meeting scenes.
-- Relative order among these six is **Mara → Edren → Halloway → Isolde → Sela → Tovin**. In the
-  full roster, other travellers occupy orders 6–25 and Tovin is global authored order **26**. Do not
-  rely on JSON array order once explicit order/phase fields exist.
+- Following Aimee's opening-economy reorder, relative order among these six is **Halloway → Mara →
+  Edren → Isolde → Sela → Tovin**. Vance and Noll precede Halloway; Tovin is now global authored
+  order **27**. Earlier Mara-first text remains historical, not current schema authority. Do not rely
+  on JSON array order once explicit order/phase fields exist.
 - Repair dishonest clue prose before expanding diaries. Keep current thresholds unless measured
   reachability later proves they should change.
 - Sela remains a **wanderer**. Fieldcraft follows from that life; it does not replace it.

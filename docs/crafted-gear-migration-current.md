@@ -2,7 +2,9 @@
 
 **Status:** Implementation-facing migration contract. It specializes
 `gear-crafting-families-current.md` without changing the settled shop hierarchy. Numerical reforge
-strength remains playtest tuning.
+strength is under active correction review: `reforge-progression-audit-current.md` supersedes this
+file's future-facing 0.2×3 recommendation if Aimee approves DRQ-065. Existing paid power and the
+legacy construction/credit migration remain invariant.
 
 ## Problem being migrated
 

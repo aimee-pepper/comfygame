@@ -7,7 +7,7 @@ what blocks what. Kept current by the implementation engineer.
 **For the overview** — where the whole build stands, what's blocked on a decision, and the long-term
 plan — read `state-of-the-build.md` first. This file is the detail under it.
 
-**Last updated 9 Aug 2026.** The partial-haul safety boundary now preserves unused supplies packed
+**Last updated 11 Aug 2026.** The partial-haul safety boundary now preserves unused supplies packed
 before departure while risking only newly acquired haul. Flora, instruments, apexes, the implemented-six traveller repair,
 Apothecary catalogue, and its field-item loop are complete. **Anchoring's first complete loop is
 built**: all three acquisition routes, durable saves/revisits, the Anchorage portfolio, explicit
@@ -36,8 +36,10 @@ harvest by tissue, defended flora.
   herbivores, therefore no predators. ~3% of worlds, and writable on purpose
 - **Organic nodes stand where something is growing**, and which one it is comes off the plant
 
-**Resolved Q48:** flora and creatures keep separate budgets, both scaled by Vitality, and influence
-one another through producer productivity and trophic depth.
+**Resolved Q48, corrected 14 Aug:** flora and creatures keep separate budgets. Flora tissue remains
+scaled by Vitality under its own authority; ordinary creature species use a fixed budget while
+Vitality peak controls cast/population and `trophicDepth` redistributes investment. They still
+influence one another through producer productivity and trophic depth.
 
 ### 2. The real instrument system — **complete**
 
@@ -57,15 +59,15 @@ The creature, restraint rules, greed draw, all eight weapon rules, locked-cache 
 explicit bestiary sightings work. Authored condition affinities remain the later layer that turns
 specific apex hunting into a world-writing goal. See `apex-system-audit.md`.
 
-### 4. The traveller roster — **28 live/recruitable; 29 designed**
+### 4. The traveller roster — **29 live/recruitable**
 
-The live catalogue contains 28 recruitable travellers. Seven have live meeting objects; the other
+The live catalogue contains 29 recruitable travellers. Eight have live meeting objects; the other
 twenty-one retain the generic recruitment fallback while their authored meetings remain review-only.
 Bryn through Lys also have authored
 signatures, global order/phase and dependency-safe diary packets. Bryn, Dagg and Rook's exclusive
 gambit teachings work end to end; diary-exclusive focus acquisition can no longer be pre-empted by
 random caches. Dangling relationship pages and Talin's configurable armour component remain deferred.
-All 28 live travellers have explicit authored order and campaign phase,
+All 29 live travellers have explicit authored order and campaign phase,
 one honest location page per condition, and their approved focus teachings. Mara's Survey Post,
 Edren's Reliquary, Halloway's forge, Isolde's Scriptorium, Sela's Wayfarer's Table and Tovin's
 Anchorage are represented. Tovin uses the current eight-condition late signature.
@@ -84,9 +86,9 @@ advanced melee recipe, so the page grants a real usable pattern rather than an i
 The Home roster is no longer incorrectly capped at five; five is active combat party size including
 the Binder.
 
-Perren and Nine complete the live 28-traveller rollout. Noll is the designed 29th traveller and
-second opening-economy identity, but remains deliberately absent from the live catalogue pending
-Aimee's identity/copy approval; their DEBUG meeting draft is not recruitment content. Perren has a fixed authored
+Perren and Nine completed the original 28-traveller rollout. Noll is now the live twenty-ninth
+traveller and second opening-economy identity with a provisional DEBUG-labelled meeting; the held
+Field Separation Kit remains separate review content. Perren has a fixed authored
 opposed-world fixture proving all nine conditions and at least ten playable turns. Nine's full packet
 is live; her reversible Thermal range placeholder was tightened to ≤12 after distribution testing.
 Tam remains deliberately held by the Great Work boundary.
@@ -100,23 +102,24 @@ Tam remains deliberately held by the Great Work boundary.
 | | Where | Note |
 |---|---|---|
 | **Debug balancing expansion** | `debug-balancing-surface-current.md` | Batch 2 controls are built and snapshotted, including the explicit fresh-first-expedition Natural/Gentle/Clear approach envelope; generation diagnostics now persist writing selection/placement, Raw Essence, populations, apex, duration, traveller and full-profile facts. Deterministic forcing/export remain before long-campaign breadth |
-| **Traveller meeting corpus** | `traveller-meeting-interaction-current.md`, `traveller-meeting-corpus-plan-current.md` | Ordered/terminal behavior and DEBUG atlas are built (`9cc0f10`); the generated review corpus covers 22 draft-only meetings (the 21 live identities without meetings plus designed Noll, 66 exchanges) and Auber's separate 3-exchange revision. None promotes without explicit review |
+| **Traveller meeting corpus** | `traveller-meeting-interaction-current.md`, `traveller-meeting-corpus-plan-current.md` | Ordered/terminal behavior and DEBUG atlas are built (`9cc0f10`); Noll's provisional meeting is live, while the generated review corpus retains 21 draft-only missing-live meetings plus Auber's separate revision. None of those remaining drafts promotes without explicit review |
 | **Party/minimap corrections** | `playtest-ui-corrections-current.md` | Core-stat strip removed; minimap sits beside D-pad above Portal home; every POI is now fog/discovery-gated by default per `minimap-disclosure-current.md` |
 | ~~**Crafting recipes**~~ | `gear-crafting-families-current.md` | **Built:** all 21 physical families/profiles, durable migration, exact selected-sample receipts, specialist tiers/confirmations, keeper-at-Home discounts and stale atomic commits |
 | ~~**Bowyer**~~ | `gear-crafting-families-current.md` | **Built:** Fen lifecycle/build bundle, immediate Longbow, tier-1 Sling/Throwing Set, tier-2 Tier-4 cap, exact samples, far-reach triangle and honest below-headline confirmation |
-| ~~**Armoury rebuild**~~ | `armoury-rebuild-implementation-current.md` | **Built:** stored/worn in-place rebuild, Rigid/Balanced/Insulated tier matrix, exact sample provenance/receipts, fractional protection offsets, legacy guard, atomic stale/affordability handling and keeper-supplied research presentation |
+| ~~**Armoury rebuild**~~ | `armoury-rebuild-implementation-current.md`, `armoury-profile-offset-audit-current.md` | **Built:** stored/worn in-place rebuild, Rigid/Balanced/Insulated tier matrix, exact sample provenance/receipts, fractional protection offsets, legacy guard, atomic stale/affordability handling and keeper-supplied research presentation. Initial 0/−0.5/−1.0 profile now has comparable-fight retuning gates under DRQ-123 |
+| **Reforge progression correction** | `reforge-progression-audit-current.md` | **Aimee review:** current 0.2×3 meter contains paid ranks with no final combat change. Recommend one +0.5 within-tier reforge, first-step price, and exact grandfathered 0/0.2/0.4/0.6 migration rather than inventing extra effects |
 | ~~**Weaponsmith**~~ | `weaponsmith-implementation-current.md` | **Built:** exact Maud lifecycle/rungs, fitted point/edge/maul, persistent diary-pattern polearm with chosen physical kind, visible lean advice, no wearer-fit subsystem, exact receipts and atomic commits |
 | ~~**Tannery**~~ | `tannery-system-current.md` | **Built:** exact lifecycle/bundle, free foundational Wear with old-save inference, paid Tier-2 fitting, paid Carry/Keep capabilities, advanced-capacity gates, exact samples and Corrin's three families |
 | ~~**Distillery first slice**~~ | `distillery-system-current.md` | **Built:** safe blank crystallisation, three attunements, potency/provenance, stacking/save behavior and first repeatable Heat Conduit consumer. Retuning and Infuse remain held by design |
 | **Deep Works** | `deep-works-system-current.md` | Implementation-audited one-site first slice: dedicated saved sign/profile state, isolated bind RNG, finite pulls and atomic brace selection; thresholds/frequency remain DRQ-129 playtest values |
 | **Channelworks** | `channelworks-system-current.md` | Implementation-audited first slice: receipt-bearing emanation profile, shared combat path, atomic construction/retuning and three reversible housing curves under DRQ-130 |
 | **Site catalogue** | `site-system-catalogue-current.md` | Implementation-audited six-profile expansion; stale Raw Essence yields, inert Stability data, typed placement predicates and independent writing hosting precede breadth under DRQ-131 |
-| **Consumables** | `crafting-spec (1).md` PART FOUR | **17 authored and craftable:** healing, cures, Stonebark, four coatings, all world items, Solvent and Lure. Traveller's Token remains held; Nessa is authored, so Apothecary production access now needs station integration rather than more design prose |
+| **Consumables** | `crafting-spec (1).md` PART FOUR, `apothecary-coating-identity-current.md` | **17 authored:** healing, cures, Stonebark, four coatings, all world items, Solvent and Lure. Nessa/Apothecary reachability remains queued; that checkpoint must also apply zero-Essence ordinary costs, fix invalid Venom `fibre`→`fiber`, and separate Briar Oil as Fiber + Resin |
 | **Building staffing** | `building-staffing-current.md` | ✅ Shared max(purchased, keeper-earned) tier and correct-owner-at-Home discount rules are built with assignment/rounding fixtures; extend paid-action consumers as each station surface lands |
 | **Station catalogue expansion** | `station-integration-matrix-current.md` | Design-ready lifecycle/cost/dependency matrix for every current keeper station |
 | **Compound assembly** | `compound-assembly-station-trees-current.md` | Design-ready; needs personal compound schema, runebook/popup and Scriptorium gate |
 | **Per-building research trees** | `compound-assembly-station-trees-current.md` | Core station ownership/gating architecture exists; expand it as specialist stations land |
-| **The Trading Post / Recycler** | `trading-post-recycler-current.md` | Implementation-audited: distinct goldCoins wallet, persisted outcome-refreshed stock, explicit transfer/salvage metadata, safe selling and one-route Recycler provenance; tune under DRQ-114 |
+| **The Trading Post / Recycler** | `trading-post-recycler-current.md` + `opening-economy-trio-promotion-audit-current.md` | **Built at `aaf6280`:** Vance/Trading Post, Noll/Recycler and Halloway/Blacksmith now form the opening 1/2/3 economy sequence. Source tests are green; signed-phone installation and fresh-save sell→recycle→make→bind acceptance remain. Exact Noll prose and Field Separation Kit stay separate review work |
 | **The Tavern** | `tavern-random-companions-current.md` | Implementation-audited: Firepit upgrade, stable generated-person identity, durable met pool, persisted outcome-refreshed visitors and atomic wants |
 | **Predation** | `predation-living-worlds-current.md` | Design-ready bounded behavior; group-motion texture may follow performance testing |
 | **Anchoring depth** | `anchoring-system-current.md`, `anchored-realm-production-current.md` | Core loop and authored Worldwork aptitudes built; renewable production is design-ready |
@@ -142,11 +145,11 @@ Tam remains deliberately held by the Great Work boundary.
 | **Count reaching the description** | Design-ready in `count-description-current.md`; focus-specific prose metadata remains content work |
 | **The vocabulary rename** | Migration-ready in `writing-palette-vocabulary-migration-current.md`; old symbols become compounds without content loss |
 | **Focus expansion 62→85** | Exact 23-entry scope plus 7/3/4/5/4 rollout in `focus-expansion-implementation-batches-current.md`; every obtainable batch passes consequence, acquisition and distribution gates |
-| **Qualifier grammar** | ✅ Scale offsets, strict prospective link validation, tolerant legacy warnings and decode-only hidden Hydrology Phase are implemented; replacement Phase vocabulary remains design review |
+| **Qualifier grammar** | ✅ Scale offsets, strict prospective link validation, tolerant legacy warnings and decode-only hidden Hydrology Phase are implemented; no replacement Water Form modifier in the first grammar |
 | **Found writing** | Core guarantee is built; resolved-fact Field-note grammar, all three remaining families and the complete 15-site fragment corpus are implementation-ready; telemetry/debug forcing remain |
 | **Expedition outcomes** | ✅ Explicit exit kinds, collapse-only loss counting, and Recovered/Lost/Kept-for-good recap ordering are implemented; recovery agency remains review-only |
 | **Cycle world clock** | Core clock built from `cycle-system-current.md`: magnitude bands, deterministic regularity jitter, stopped phase, migration, History, earned preview and read-only next-transition diagnostics; debug forcing remains |
-| **Quirk pattern** | Current audit in `quirk-pattern-audit-current.md`; keep systemic paired tradeoffs, while a separate quirk deck and veto/reroll are recommended for retirement pending review |
+| **Quirk pattern** | Current audit in `quirk-pattern-audit-current.md`; keep systemic paired tradeoffs; separate quirk deck and veto/reroll are retired |
 | **Contradiction / danger** | `contradiction-danger-audit-current.md`; keep narrow catalogue effects, disable stale Green-in-dark firing, and do not promise dormant Negate entries before a readable grammar exists |
 | **Description / analysis consistency** | Core correction built from `description-analysis-surface-current.md`: calibrated structured effects at Desk/History, tolerant legacy filtering, corrected copy and Tier-4 accessibility meaning; phone-density collapsing remains optional follow-up |
 
@@ -174,7 +177,7 @@ Constellation node written for one companion, and the site-`stabilityDelta` guar
 audit asked for. Plus **flora**, **the instruments** and **apexes**.
 
 **Q47:** signatures remain the placement truth; blank/accidental books may find a genuine match and
-clues remain guides rather than gates. The incompatible Traveller's Token is under review.
+clues remain guides rather than gates. The incompatible Traveller's Token is cut.
 
 **Q48:** flora and creatures keep separate budgets and influence one another through productivity and
 trophic depth.

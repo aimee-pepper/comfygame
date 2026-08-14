@@ -37,6 +37,19 @@
 Orsa is not the maternal caretaker of the cast. Her expertise is coexistence among people who have
 different needs, incomplete trust and reasons to leave again.
 
+## Campaign staging — no premature Tavern subsystem
+
+Recruiting Orsa in Band 3 does not silently unlock a miniature Tavern, visitor roll, relationship
+currency or generic clue bonus. Her immediate honest payoff is Orsa herself as a party/Home person,
+her authored combat lean, her diary route and eventual Hive teaching. The existing Firepit may
+acknowledge that she is using it, but flavour presentation cannot claim visitors, rumours, wants or
+improved rest before those transactions exist.
+
+The Firepit → Tavern upgrade is one later, complete social-loop checkpoint. It lands only when at
+least the first visitor, one authored want, one permission-safe rumour/clue exchange and the rest
+presentation work together. Until then **Tavern not yet built** is more coherent than granting Orsa
+an unrelated numerical perk merely so every traveller owns a room immediately.
+
 ## Why the player seeks her
 
 The Tavern makes the starting Firepit into the social centre of the search loop:
@@ -110,7 +123,7 @@ deciding whether a peaceful room is enough evidence that she handled it well.
 
 ## Relationship anchors
 
-- **Vance:** Exchange as a completed price versus hospitality as an ongoing relationship; both can
+- **Vance:** Trading Post sale as a completed price versus hospitality as an ongoing relationship; both can
   use private provenance as leverage.
 - **Sela:** Sela brings news from routes; Orsa decides how and whether news becomes communal knowledge.
 - **Nessa:** Informal conversation reveals lived effects and needs that controlled preparation misses.

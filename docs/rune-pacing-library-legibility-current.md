@@ -25,6 +25,12 @@ Rules:
 
 This makes the cast order the pity order without turning every unowned rune into a warmed-up pool.
 
+Location-page knowledge supplies the ahead-of-frontier exception and evidence score in
+`traveller-world-pacing-current.md`: it may make that traveller eligible early and strengthens them
+only when the full signature matches. A recovered condition that the player's writing causally made
+true receives the additional authored-match score, but evidence breaks ties only within one authored
+story-arrival band. Name/relationship pages do not substitute for a location clue.
+
 ## Authored pity lists
 
 These lists target only the non-exclusive capability words that materially open the intended hunt.
@@ -33,35 +39,36 @@ not an omission. Later entries are considered only after earlier ones are owned.
 
 | Order | Traveller | `pityFocuses` | Reason |
 |---:|---|---|---|
-| 1 | Mara | — | Sun/start vocabulary writes the single condition |
-| 2 | Edren | — | Granite/Ice routes are available at start |
+| 1 | Vance | — | Starter open-relief routes write his reordered single condition |
+| 2 | Noll *(working)* | — | Starter hard/concentrated Substrate routes write both provisional conditions |
 | 3 | Halloway | — | Starter heat and ductile substrate suffice |
-| 4 | Isolde | — | Her two raised thresholds remain starter-writable |
-| 5 | Sela | — | Starter hydrology and ordinary routes suffice |
-| 6 | Bryn | — | All three routes are starter-writable |
-| 7 | Orsa | — | Hush is earlier diary-guaranteed, not pity-eligible |
-| 8 | Vance | — | Starter seams/pockets/open terrain provide routes |
-| 9 | Talin | — | Starter hard/open/bright composition |
-| 10 | Nessa | `sulfur` | First intentional volatile-substrate route |
-| 11 | Corrin | — | Starter living/wind/rain composition |
-| 12 | Dagg | `tide` | Opens the required high cycle amplitude |
-| 13 | Rook | — | Hush is earlier diary-guaranteed; other routes are starters |
-| 14 | Lys | `orrery`, `crystal` | Exact cycle, then persistent light floor |
-| 15 | Bracken | — | Starter Ice/Sun/Granite/Cloud routes |
-| 16 | Fen | `orrery` | Exact recurring interval |
-| 17 | Wren | `tide` | High cycle amplitude |
-| 18 | Kestrel | — | Starter ecology plus earlier Hush |
-| 19 | Maud | `orrery` | Exact recurring interval |
-| 20 | Marrick | `orrery` | Formation-count regularity |
-| 21 | Sabine | `orrery` | Repeated care routine |
-| 22 | Grimmond | `thin_air` | Deliberately low atmosphere peak |
-| 23 | Oda | `crystal`, `orrery` | Persistent light, then exact testing interval |
-| 24 | Auber | `tide`, `mist` | Separation cycle, then retained vapour |
-| 25 | Ashe | `tide` | Bodily variation across a strong cycle |
-| 26 | Tovin | `orrery` | Exact time; Hush/Ruin-like needs are earlier diary knowledge |
-| 27 | Perren | `mist`, `orrery` | Context-obscuring distance, then coercive repetition |
-| 28 | Nine | — | Drift/Hush are earlier diary-guaranteed; other routes are established |
-| 29 | Tam | **held** | No pity entry until Tam's signature and act are settled |
+| 4 | Mara | — | Sun/start vocabulary writes the single condition |
+| 5 | Edren | — | Granite/Ice routes are available at start |
+| 6 | Isolde | — | Her two raised thresholds remain starter-writable |
+| 7 | Sela | — | Starter hydrology and ordinary routes suffice |
+| 8 | Bryn | — | All three routes are starter-writable |
+| 9 | Orsa | — | Hush is earlier diary-guaranteed, not pity-eligible |
+| 10 | Talin | — | Starter hard/open/bright composition |
+| 11 | Nessa | `sulfur` | First intentional volatile-substrate route |
+| 12 | Corrin | — | Starter living/wind/rain composition |
+| 13 | Dagg | `tide` | Opens the required high cycle amplitude |
+| 14 | Rook | — | Hush is earlier diary-guaranteed; other routes are starters |
+| 15 | Lys | `orrery`, `crystal` | Exact cycle, then persistent light floor |
+| 16 | Bracken | — | Starter Ice/Sun/Granite/Cloud routes |
+| 17 | Fen | `orrery` | Exact recurring interval |
+| 18 | Wren | `tide` | High cycle amplitude |
+| 19 | Kestrel | — | Starter ecology plus earlier Hush |
+| 20 | Maud | `orrery` | Exact recurring interval |
+| 21 | Marrick | `orrery` | Formation-count regularity |
+| 22 | Sabine | `orrery` | Repeated care routine |
+| 23 | Grimmond | `thin_air` | Deliberately low atmosphere peak |
+| 24 | Oda | `crystal`, `orrery` | Persistent light, then exact testing interval |
+| 25 | Auber | `tide`, `mist` | Separation cycle, then retained vapour |
+| 26 | Ashe | `tide` | Bodily variation across a strong cycle |
+| 27 | Tovin | `orrery` | Exact time; Hush/Ruin-like needs are earlier diary knowledge |
+| 28 | Perren | `mist`, `orrery` | Context-obscuring distance, then coercive repetition |
+| 29 | Nine | — | Drift/Hush are earlier diary-guaranteed; other routes are established |
+| 30 | Tam | **held** | No pity entry until Tam's signature and act are settled |
 
 Stable IDs above match current content. A future roster insertion receives its own list and shifts
 order without rewriting already-earned vocabulary.

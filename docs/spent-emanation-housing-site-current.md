@@ -1,7 +1,7 @@
-# Current Design Placeholder — Spent Emanation Housing Site
+# Current Design — Spent Emanation Housing Site
 
-**Status:** Reversible site definition for Ashe's diary lead. It may enter content after the site ID
-and conditions validate; exact weight, yields and stability are tuning.
+**Status:** Live reversible site and diary lead. Exact weight, yields and authored-but-currently
+uncharged stability value remain playtest tuning.
 
 ## Identity
 
@@ -36,7 +36,7 @@ related writing problem, not become a ninth password for finding Ashe.
 - Search time: **2 world turns**
 - Working yields: 3 raw essence and 2 ore
 - Items/teachings: none initially
-- Working stability delta: **-4**
+- Authored stability delta: **-4**, retained for comparison but not currently charged by worldgen
 
 The site's value is authored interpretation and a modest recovery, not a unique weapon or mandatory
 schematic. Oda's housing schematic remains her diary reward; this site cannot teach it early.
@@ -48,3 +48,9 @@ schematic. Oda's housing schematic remains her diary reward; this site cannot te
 - In anchored realms it persists after search, visibly exhausted; unique yields remain taken.
 - Ashe's diary page reveals the definition only. It never guarantees placement.
 
+## Live acceptance gap
+
+Generic site reachability, placement, persistence and search fixtures cover the shared machinery,
+but this named site still needs one exact content fixture proving its three-condition eligibility,
+two-turn search, 3 Raw Essence + 2 Ore yield, no item/teaching reward and exhausted anchored revisit.
+That is a test-coverage gap, not permission to defer or rename the live page/site.

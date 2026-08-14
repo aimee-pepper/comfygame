@@ -1,7 +1,7 @@
 # Qualifier grammar audit — live 17-rung catalogue
 
 **Status:** Generic ladder semantics and connection validity are implementation-ready. Hydrology
-Phase vocabulary is held for Aimee's review; hide it rather than ship inert choices.  
+Phase is cut from the first grammar; keep its legacy values inert/hidden.
 **Updated:** 9 Aug 2026
 
 ## What actually exists
@@ -84,7 +84,7 @@ the later target link must validate the whole prospective component. Do not sile
 lowest target ID, first link-set element or first rung. Invalid old pages remain loadable and receive
 the existing inert/ambiguous warning, but new edits cannot create the ambiguity.
 
-## Hydrology Phase — review, not silent canon
+## Hydrology Phase — cut from the first grammar
 
 The present four labels do not align with the simulation's actual Hydrology forms:
 
@@ -95,23 +95,20 @@ The present four labels do not align with the simulation's actual Hydrology form
 those labels directly would either create synonyms or make the resolver guess a mechanically
 important form.
 
-### Recommendation for Aimee
+### Superseded replacement candidate
 
-Replace the Phase choices with the four actual form directions:
+The earlier candidate would replace Phase with four actual form directions:
 
 - **Standing**
 - **Flowing**
 - **Frozen**
 - **Airborne**
 
-A Phase modifier would redirect that focus's positive Hydrology form contribution before
-cross-target constraints. Thermal constraints may still freeze liquid water afterward; the world
-should visibly record that the written form was changed by another pressure rather than pretending
-the qualifier was ignored.
-
-Until Aimee reviews this vocabulary correction, **hide the Phase palette section**. Preserve its
-catalogue IDs/save decoding, but do not let players spend page cells on a modifier known to be inert.
-This is a reversible correctness hold, not approval of the replacement names.
+A Water Form modifier would redirect a focus's positive Hydrology contribution, but the catalogue
+already makes the same choice concretely through Pond/Lake/River/Ice/Rain families. Do not implement
+the replacement in the first grammar. **Hide the Phase palette section**, preserve its catalogue
+IDs/save decoding and do not let players spend page cells on inert or duplicative vocabulary.
+Revisit only if play reveals a form choice source selection cannot express.
 
 ## Preview, Library and analysis
 
@@ -133,4 +130,3 @@ Expose Scale magnitude, Scale dispersion, Count exponent and world-size/stabilit
 5. Connection and resolution are deterministic regardless of set/placement order.
 6. Phase is absent from the writable palette until an approved mapping reaches `Sigil`, save/load,
    preview, resolver, constraints and History together.
-

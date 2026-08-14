@@ -1,13 +1,17 @@
-# State of the Build — 9 Aug 2026
+# State of the Build — current overview (reconciled 11 Aug 2026)
 
-**Who this is for:** Aimee, and the designer Claude. A single place to see what exists, what's next,
-what's blocked on a decision, and where the whole thing is going.
+**Who this is for:** Aimee and the game-design/engineering/asset leads. This is a high-level system
+overview; it does not own “what's next.” Live scheduling and checkpoint status are read from
+`Sources/Content/Data/playability-roadmap.json`. Exact system truth routes through
+`current-design-index.md`.
 
 **Where it sits in the docs:** `BACKLOG.md` is the milestone plan and is authoritative for *what v0
 is*. `the-queue.md` is the working list of specced-and-unbuilt. This is the overview above both.
 
-**Numbers as of today:** 809 tests at the current full-suite checkpoint; current content has all 28
-currently designed recruitable travellers, 233 validated diary pages, 62 focuses and 9 sites.
+**Current authored census:** 29 live recruitable travellers, 238 live diary pages and 8 live meeting
+objects. DEBUG review retains the missing-live meeting drafts and revisions across the same
+29-identity union. Test totals, installed build and active work are derived at build/runtime
+rather than manually copied here.
 
 ---
 
@@ -15,28 +19,30 @@ currently designed recruitable travellers, 233 validated diary pages, 62 focuses
 
 ## The one-paragraph version
 
-**The systems are done and the content is thin.** Every major mechanism in the design brief is built
-and end-to-end: you write on a page, it resolves into eight pressures, the pressures generate
-terrain, plants, animals, sites, resources and people, you walk around in it, fight things derived
-from the same numbers, and carry the results home to a base that grows. What's missing is *volume* —
-25 recruitable travellers against an expandable high-twenties+ cast, with later packets entering as
-their dependencies validate — plus authored meeting/station content and a handful of progression
-hooks. Anchoring's three-route core loop is now built.
+**The core loop is broad enough for sustained integration play, and current priority is correctness,
+readability, visual identity and honest progression.** Every major mechanism in the design brief is
+represented end-to-end: you write on a page, it resolves into eight pressures, the pressures generate
+terrain, plants, animals, sites, resources and people, you explore/fight and carry results home to a
+growing base. Trading Post/Vance, Recycler, save slots, world-color receipts, encounter scaling,
+bug-report capture and the main spatial UI corrections are implemented checkpoints awaiting varied
+phone play. Active engineering work is read from the live roadmap rather than copied into this
+overview; the next design-led combat work continues promoting the accepted 72-node fan-and-fork
+graphs through real effect consumers. Tutorials remain dead last.
 
 ## What's built, by system
 
 | System | State | Notes |
 |---|---|---|
 | **Persistence** | ✅ Complete | Three layers kept separate; atomic debounced save after every action; force-quit mid-encounter resumes exactly. **Still wants one on-device force-quit pass** |
-| **The writing system** | ✅ Complete | 6×6 page, polyomino footprints, three hands, target-first grammar with clusters and connectors, order-invariant. 62 focuses, 8 subjects, 17 qualifiers |
+| **The writing system** | ✅ Core / ⚠️ queued progression | 6×6 page, polyomino footprints, target-first grammar, clusters/connectors and order invariance are live. Current design replaces Pencil with Rough charcoal → Brush → Fountain pen and adds adjacent Ink Mixing/Compound Assembly; native migration is queued |
 | **The pressure model** | ✅ Complete | 8 subjects, dual-valued light and heat, diminishing returns, opposed magnitude tracked gross, cross-target constraints, the energy budget |
 | **Worldgen** | ✅ Complete | Seeded; terrain, water, chasms, reachability guarantees, sites, resource nodes, day/night |
 | **Creatures** | ✅ Complete | Budget-allocated traits, per-world cast, per-spawn jitter, derived identity and names, combat and loot both derived. No drop tables anywhere |
 | **Flora** | ✅ Complete | Trait model, the metabolism axis, growth writing the ground, harvest by tissue, hostile plants |
-| **Combat** | ✅ Complete | Party of five, ranks, damage triangle, statuses, gambits, 24 skills, three trees × three branches × eight nodes |
-| **The search loop** | ✅ Mechanism, ⚠️ content | Signatures, diary pages, the Library, meeting scenes, recruitment, the Firepit. **25 recruitable travellers and 195 validated pages** |
-| **The base** | ✅ Mechanism, ⚠️ content | Data-driven stations and found-then-built specialists, including Distillery and Channelworks; 73 research nodes across 8 branches |
-| **Analysis** | ⚠️ Partial, design resolved | Acquisition and tier 2 exist; session 18 specifies the missing field loop, grades and tier 3–5 outputs (`instrument-system-audit.md`) |
+| **Combat** | ✅ Encounter core / ⚠️ progression replacement queued | Party of five, ranks, damage triangle, statuses, gambits, scaling and persisted opening authority are live. The live combat trees remain linear legacy progression; current authority is the 72-node true fan-and-fork v2 graph with exact effects/technique grants and all-consumer promotion gates |
+| **The search loop** | ✅ Mechanism/content, ⚠️ authored review | Signatures, diary pages, the Library, meeting scenes, recruitment and Firepit. **29 live recruitable travellers and 238 validated pages**; Noll's provisional meeting is live for testing, ordered meeting behavior is fixed, and the remaining 21 missing-live meetings await atlas review |
+| **The base** | ✅ Mechanism, ⚠️ presentation/content | Data-driven stations and found-then-built specialists are live. Current Base authority is Home/Make/Study/Realms with five Home destinations plus compact Party/Bind & Depart utilities; broader keeper/station content and graph-style research remain queued |
+| **Analysis** | ✅ Complete first system | Eight carried instruments, grade crafting, one-turn Survey, persistent calibrated observations and tier 3–5 outputs are live; values remain playtest tuning (`instrument-system-audit.md`) |
 | **Apexes** | ✅ Core loop | Eight weapon rules, cache lottery, bestiary sightings and consent rules work; authored hunting affinities remain (`apex-system-audit.md`) |
 | **Crafting** | ⚠️ Partial | Apothecary and instrument crafting plus all 21 designed physical families/profiles across Blacksmith/Tannery/Bowyer/Armoury/Weaponsmith exist; later station systems remain |
 | **Anchoring** | ✅ Core loop | All three routes converge on durable realms; revisit, explicit sustain settlement, dormancy/reactivation and assignments work |
@@ -54,9 +60,28 @@ hooks. Anchoring's three-route core loop is now built.
 
 ---
 
-# PART TWO — What's next
+# PART TWO — Historical 9 Aug queue (superseded)
+
+Everything below this heading preserves the 9 Aug handoff rationale. It is **not executable current
+ordering** and must not be used to assign work. Use the live roadmap JSON and current design index.
 
 ## The immediate queue, in order
+
+### 0. Playtest stabilization and native presentation — **active P1/P2 work**
+
+1. ⚠️ The original direct-store launch path passed acceptance, but the later campaign-slot root
+   bypassed its progress and showed a frozen zero bar. The production-path correction and redundant
+   launch-write removal are in source verification under `app-launch-loading-current.md`; device
+   timing and transition evidence remain required.
+2. ✅ Exact top-down terrain/flora and explore-first minimap disclosure are pushed in `a7a99bc`.
+3. ✅ Ordered traveller interaction is pushed in `95d1778`; finish the active DEBUG authored-text
+   atlas and review prose there before any draft enters the live catalogue.
+4. Correct encounter scaling to read the full active party and simulate ordinary/apex pressure before
+   shipping tuning values.
+5. Implement readable field awareness and reduced-detection options after their balance simulation.
+
+Tutorial-content expansion remains lowest priority while Aimee is the sole tester. Existing tutorial
+layout defects are ordinary playtest bugs and are not deferred by that rule.
 
 ### 1. Anchoring — **core loop built**
 
@@ -67,12 +92,12 @@ survive as save-compatible Atlas records, revisit without regeneration, and ente
 player-choice essence settlement on return. Unpaid realms become dormant, never deleted, and can be
 reactivated. Companion assignment uses visible authored Worldwork aptitude plus level growth.
 
-### 2. The traveller roster — **25 implemented; expansion queued**
+### 2. The traveller roster — **29 live; presentation and authored meeting review queued**
 
-**25 recruitable travellers of an expandable high-twenties+ cast**. Bryn, Orsa, Vance, Talin,
-Nessa, Corrin, Dagg, Rook, Lys, Bracken, Fen, Wren, Kestrel, Maud, Marrick, Sabine, Grimmond, Oda and Auber now have authored signatures and dependency-safe diary slices; their stations
-and authored meeting prose remain later integration work. This is the single highest-value thing left,
-because **the cast is what the search loop is for**. Every mechanism is built: signatures, diary
+**All 29 current live recruitable travellers of an expandable cast are implemented.** Noll is the
+twenty-ninth live identity with a provisional DEBUG-labelled meeting; her exact replacement prose and
+Field Separation Kit remain review-only. Bryn, Orsa, Vance, Talin,
+Nessa, Corrin, Dagg, Rook, Lys, Bracken, Fen, Wren, Kestrel, Maud, Marrick, Sabine, Grimmond, Oda and Auber now have authored signatures and dependency-safe diary slices. All 21 missing-live meetings, Noll's replacement candidate and Auber's revision have complete review drafts across the four `traveller-meetings-*-review.md` files, but none replaces live/missing copy without atlas review. The immediate cast priority is that prose review, because **the cast is what the search loop is for**. Every mechanism is built: signatures, diary
 pages, the Library, meeting scenes, recruitment, found-then-built buildings, starting leans.
 
 **What each traveller needs, and only the first is mine:**
@@ -88,7 +113,7 @@ pages, the Library, meeting scenes, recruitment, found-then-built buildings, sta
 
 **Traveller placement is resolved.** Signatures are physical truth: a genuinely matching blank or
 accidental book may find somebody, and diary pages guide rather than gate. The incompatible
-Traveller's Token remains held for Aimee's review; see `travellers-token-audit-current.md`.
+Traveller's Token is cut; see `travellers-token-audit-current.md`.
 
 ### 3. Consumables and the Apothecary
 
@@ -96,7 +121,7 @@ Traveller's Token remains held for Aimee's review; see `travellers-token-audit-c
 all four world-facing items, Solvent and Lure. The **Waystone** immediately returns the full haul
 from anywhere in one atomic save; Torch, Stillwater, Farsight and Lure affect the active world, and
 Solvent identifies a carried curio in the field. Combat presents an item and recipient chooser
-rather than silently using the first carried stack. Traveller's Token remains held on Q47.
+rather than silently using the first carried stack. Traveller's Token is not part of the catalogue.
 
 The station, screen, recipe discovery and crafting rules are implemented and exercisable through the
 debug harness. Nessa's identity, signature and seven currently dependency-safe pages are live;
@@ -140,7 +165,7 @@ fit state, and use the same exact-sample, discount, confirmation and stale-commi
 | **Living worlds** — bounded visible predation | `predation-living-worlds-current.md` | Medium; design-ready |
 | **Building staffing** | `building-staffing-current.md` | Medium; design-ready |
 | **Compound assembly** + its gate | `compound-assembly-station-trees-current.md` | Medium; design-ready |
-| **The Exchange / Recycler** | `exchange-recycler-current.md` | Medium; design-ready |
+| **The Trading Post / Recycler** | `trading-post-recycler-current.md` | Medium; implementation-audited, tuning remains DRQ-114 |
 | **Identification becomes knowledge** | `curio-identification-knowledge-current.md` | Medium; design-ready |
 | **Movement cost from terrain** | built | Tall growth and mud cost one extra turn |
 | **Void as a cap** | `void-cap-current.md` | Small; design-ready |
@@ -173,7 +198,6 @@ The current running review list is `engineering-questions-for-aimee.md`. The mat
 |---|---|---|
 | **Great Work / Reality reset / Tam** | Deliberate hold; preserve realm history but invent no score or ending trigger | These require one dedicated emotional/endgame pass |
 | **Talin armour threshold grammar** | Design-ready; implementation pending | Absolute armour marks 1/3/5; HP percentages are not reused. See `gambit-stat-thresholds-current.md` |
-| **Traveller's Token** | Design lead recommends cutting it | It contradicts truthful signature placement; awaiting Aimee's review |
 | **Waystone material** | Rift-glass recommended over Adamant | Final repeatable demand and Glass vocabulary need review together |
 | **First anchoring balance** | Reversible live values | Needs multi-realm campaign play |
 | **Kestrel first-record timing** | Encounter-start snapshot placeholder | A deeper bestiary may later distinguish sighting from completed study |
@@ -316,5 +340,5 @@ stability→turns curve.
 | Contradictions | 9 | — | |
 | Description clauses | 50 | — | Every one reachable, by test |
 | Stations | **18** | More keeper stations queued | Lifecycle matrix is current |
-| Consumables | **17** | **17 + held Traveller's Token** | Current useful catalogue complete |
+| Consumables | **17** | **17** | Current useful catalogue complete; Traveller's Token is cut |
 | Physical gear recipe families | **21** | **21** | Halloway, Corrin, Bracken, Fen and Maud families are live; tuning remains playtest work |

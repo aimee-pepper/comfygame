@@ -49,6 +49,7 @@ writing types interleave while every world still contains writing.
 | **Route mark** | World has at least one meaningful navigable contrast | A short instruction about a nearby costly/safer terrain relationship using directions relative to the page tile | Reveals only the traversed local route segment; no remote map or site reveal |
 | **Site fragment** | A site is already revealed or the writing is physically hosted at that visible site | One authored fragment from the site's family | Records that site's known family and prose; never reveals a site through fog |
 | **Working scrap** | One currently reachable research/station lead is eligible | A finite authored partial lead tied to an existing node/recipe | Grants only the defined partial lead; never chooses locked future systems |
+| **Vocabulary trace** | One eligible unowned world-drop word exists | A stable typed source or qualifier teaching from a separately approved vocabulary track | Permanently teaches exactly that word; never grants an item or analysis |
 
 Selection within the other-writing pool starts at:
 
@@ -56,6 +57,11 @@ Selection within the other-writing pool starts at:
 - Route mark: 20%
 - Site fragment: 15% when eligible
 - Working scrap: 10% when eligible
+
+Vocabulary traces are selected only when a separately approved vocabulary track supplies eligible
+words and pacing. Ink colors are not vocabulary traces: deliberate mixing comes from Isolde's
+Scriptorium, while Ash leaves color open to world generation. A vocabulary floor may never create a
+third writing or displace a selected diary.
 
 Ineligible weight flows to Field note. These are debug/playtest weights, not story canon.
 
@@ -96,7 +102,9 @@ rolling that host.
 
 1. Resolve the diary and other-writing eligibility pools without changing them.
 2. Fill one guaranteed slot using the 70/30 starting mix, dynamically reweighted.
-3. Roll the 10% additional slot from remaining eligible content; do not duplicate the selected ID.
+3. Apply any due typed-vocabulary dry floor to the remaining optional slot, then otherwise roll the
+   10% additional slot from remaining eligible content; do not duplicate the selected ID or create
+   a third writing.
 4. Choose disclosure-safe content facts from the resolved world state.
 5. Choose reachable hosts independently, preferring distinct tiles when two writings appear.
 6. Persist chosen IDs, facts, prose variant and positions with the run; reload never rerolls them.

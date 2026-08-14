@@ -72,13 +72,19 @@ to snowball would become an optimization loop and require another invisible stat
 
 Group motion is a small visual layer, not flock simulation:
 
-- low-armament members of the same species prefer a local step that leaves them within two tiles of
-  one peer, provided it does not override fleeing or party pursuit;
-- high-armament members prefer not to end adjacent to the same species;
-- no creature takes an extra move solely for grouping.
+- it runs only as a **lexicographic tie-break** among neighbouring tiles already tied for the
+  creature's primary flee, hunt or party-pursuit movement score;
+- an unarmed specimen (`armament.isUnarmed`) prefers a tied tile that leaves it within two tiles of
+  its nearest visible same-species peer, then the smaller peer distance;
+- an armed specimen prefers a tied tile that is not adjacent to a visible same-species peer, then
+  the larger nearest-peer distance;
+- no creature moves solely for grouping, changes target, accepts a worse primary movement score or
+  searches beyond the already-enumerated local neighbours;
+- stable tile order is the final tie-break, so save/reload and creature-array shuffle agree.
 
-If this causes phone-turn latency, ship predation first and defer group motion. Predation is the
-gameplay-bearing behavior; grouping is texture.
+Expose one DEBUG on/off comparison. If the tie-break itself causes measurable phone-turn latency in
+a dense visible food web, disable it without changing predation receipts or saves. Predation is the
+gameplay-bearing behavior; grouping stores no independent state.
 
 ## Player interaction
 
@@ -108,3 +114,7 @@ other.
 5. Predator kills do not award party XP; harvesting the carcass awards materials only.
 6. A barren/no-producer world still cannot generate an ordinary food web; this system does not
    backfill prey into it.
+7. Group preference changes only an otherwise tied local step; it cannot alter target, movement
+   count, path length, awareness or whether predation/contact resolves.
+8. Unarmed cohesion and armed separation are deterministic under creature-array shuffle and add no
+   saved group/flock identity.

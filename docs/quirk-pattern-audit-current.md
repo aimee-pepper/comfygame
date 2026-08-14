@@ -1,7 +1,7 @@
 # Quirks — paired-tradeoff pattern, not a second world layer
 
-**Status:** Current audit. The paired-tradeoff principle is settled; retiring the separately rolled
-Quirk catalogue and its veto/reroll affordance is a recommendation awaiting Aimee's review.  
+**Status:** settled current boundary. Paired tradeoffs remain a system-wide principle; the separately
+rolled Quirk catalogue and veto/reroll affordance are retired.
 **Updated:** 9 Aug 2026
 
 ## Audit result
@@ -41,7 +41,9 @@ parallel hostility rule rather than a consequence of dimness. Recommended migrat
 4. update the blurb if the world-longevity claim is not visibly supported by current stability
    projection for representative Dim Sky pages.
 
-The last two items are not authorized silently; they are DRQ-099 review/playtest work.
+The last two items are not authorized silently. DRQ-099 now covers the coherent six-compound
+comparison in `compound-hostility-fossil-audit-current.md`; do not remove only Dim Sky's tier and
+leave the same parallel rule hidden on five peers.
 
 ### Gilded Veins
 
@@ -74,9 +76,9 @@ resolved facts with a real consumer. It must not be an independently rolled modi
 1. Dim Sky always reduces world vision by exactly one before party and torch bonuses.
 2. Its resolved light affects supported flora and creature traits without a hand-authored species.
 3. Removing legacy creature weights cannot change generated cast identity.
-4. Compare Dim Sky with and without the flat tier bump before retirement; do not hide a meaningful
-   difficulty drop behind cleanup wording.
+4. Compare all six ordinary flat tier compounds with and without their bump before coherent
+   retirement; do not hide a meaningful difficulty drop behind cleanup wording.
 5. Gilded Veins wealth and stability projection remain explained by composition/greed after legacy
    fields are removed.
 6. Old saves containing the `quirk` slot continue to load as their stable compound IDs.
-7. No UI promises a separate Quirk category, veto or reroll while DRQ-098 remains under review.
+7. No UI promises a separate Quirk category, veto or reroll.

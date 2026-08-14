@@ -1,8 +1,8 @@
 # Field-note grammar — resolved facts without free analysis
 
-**Status:** Implementation-facing content grammar for the repeatable fallback in
-`found-writing-system-current.md`. Template weights are playtest values; disclosure boundaries and
-fact persistence are current.
+**Status:** Checkpoint `8b32b51` is ready for phone variety acceptance; full device/test builds and
+focused runtime 4/4 are green. Template weights are playtest values; disclosure boundaries and fact
+persistence are current.
 
 ## Record shape
 
@@ -10,6 +10,24 @@ A Field note freezes a stable template ID and fact kind, only the qualitative to
 that template, exact generated prose, writing position and world/run ID. The Library may later place
 earned analysis beside the note, but never rewrites its recovered prose. Old three-line generic
 notes remain valid records with no structured fact.
+
+For the first native slice, extend `FoundWritingRecord` with tolerant optional fields rather than
+replacing its existing identity:
+
+- `templateID: String?` — one stable ID from this document;
+- `fieldFact: FieldNoteFact?` — a tagged, Codable payload containing only the safe tokens actually
+  interpolated into the prose;
+- `originWorldSeed: UInt64?` — the generating world's frozen seed.
+
+Existing `prose` remains authoritative for display and `position` remains the exact writing host.
+Missing structured fields mean a legacy frozen note and must never trigger attempted reconstruction.
+The world-history record ID is assigned only when a world is actually recorded on return; generation
+must not invent one before that receipt exists.
+
+`FieldNoteFact` is a closed tagged union for `terrain`, `lightAir`, `growth` and `water`. Each case
+stores its template-specific qualitative values—never a raw `PressureReadings`, hidden entity ID,
+resource table, species identity or numeric threshold. Decode of an unknown future fact kind retains
+the saved prose and treats structured detail as unavailable.
 
 ## Eligible fact families
 
@@ -26,6 +44,11 @@ describe what an earlier traveller observed there; it may not reveal a remote fa
 
 If no specialized relation is eligible, use a terrain fact about the host itself. Field note is
 therefore always available without becoming generic filler.
+
+**First native slice:** creature traces have weight zero because the current map persists and
+renders no trace dressing. Nearby enemies or the saved cast are not substitutes for a visible host
+fact. Renormalize across terrain, light/air, growth and water; enable trace prose only after the map
+stores and draws the exact trace the note describes.
 
 ## Stable template corpus
 
@@ -61,6 +84,7 @@ These are qualitative witness statements, not claims that the writer measured Cy
 - `field_growth_spread_01` — “The low growth crosses the path in one sheet; footsteps divide it, then it closes again.”
 - `field_growth_cluster_01` — “The growth gathers in separate knots. Bare ground remains between them.”
 - `field_growth_solitary_01` — “One tall form stands apart here. I could see its outline before its base.”
+- `field_growth_form_01` — “The {growthHeight} growth keeps a {habit} shape here. Bare ground shows its edge.”
 - `field_growth_sight_01` — “The tall growth swallowed the mark behind me. I made the next one higher.”
 
 Use only relations produced by saved patch/habit and stature. Do not name the species unless the
@@ -94,6 +118,16 @@ Default family weights within Field note are terrain 35, light/air 20, growth 20
 a relation not already represented by another Field note in the same world. A second Field note uses
 a different template ID and fact where possible.
 
+In the first native slice trace weight is zero, so renormalize 35/20/20/15. Build every eligible fact
+from the chosen host plus its in-bounds cardinal neighbours after terrain and flora placement. Sort
+facts by `(family order, templateID, direction, ground IDs)` before seeded weighted selection so
+dictionary/set iteration cannot change a world's prose. The first note consumes the ordinary writing
+RNG once; a second removes the first template and exact fact before selecting, falling back only when
+no distinct truthful option exists. Use the terrain-single template only when all visible cardinal
+neighbours actually share the host ground. Light/air is always locally observable and supplies the
+final guaranteed family when no truthful terrain relation exists; never claim local uniformity only
+to force a terrain result.
+
 ## Verification
 
 1. Every generated note's tokens can be recomputed from its saved local/world facts.
@@ -102,5 +136,4 @@ a different template ID and fact where possible.
 4. Growth prose matches saved stature/habit/patch topology and promises no harvest.
 5. Creature traces are visible at the host and never create a bestiary sighting.
 6. Prose, template and tokens survive save/load and anchored revisit exactly.
-7. Blank/unusual worlds still obtain a truthful terrain fallback.
-
+7. Blank/unusual worlds still obtain a truthful local observation without fabricated terrain.

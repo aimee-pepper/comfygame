@@ -90,7 +90,7 @@ If this sentence is strained, the rewards are probably attached to the wrong per
 | Field | Entry |
 |---|---|
 | **Target phase** | |
-| **Hand available** | Charcoal / pencil / fountain pen / refined + compounds |
+| **Hand available** | Rough charcoal / Brush / Fountain pen / refined + compounds |
 | **Condition count** | Opening 1–2; mid 3–5; late 6–9; endgame 9–10; absolute maximum 10 |
 | **Required vocabulary** | Every focus/qualifier needed to deliberately write the signature |
 | **Acquisition check** | Confirm every required word is obtainable before this authored order |

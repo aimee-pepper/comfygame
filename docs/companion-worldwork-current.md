@@ -51,7 +51,8 @@ These are content defaults for future data, not a new order gate:
 
 - **3 Expert:** Sela, Tovin, Kestrel, Grimmond.
 - **2 Skilled:** Mara, Edren, Halloway, Corrin, Nessa, Bracken, Fen, Sabine, Auber, Rook, Wren.
-- **1 Capable:** Isolde, Orsa, Vance, Maud, Oda, Lys, Bryn, Talin, Dagg, Marrick, Ashe, Perren, Nine.
+- **1 Capable:** Isolde, Orsa, Vance, Noll (working), Maud, Oda, Lys, Bryn, Talin, Dagg, Marrick,
+  Ashe, Perren, Nine.
 - **Tam:** held until their actual contribution exists.
 
 Ratings do not judge a person's worth. They describe fit for one posting. Fighters retain their party
@@ -65,4 +66,3 @@ two real realm assignments create meaningfully different companion choices that 
 express.
 
 Permanent injury/loss remains excluded. Dormancy returns workers safely to base.
-

@@ -140,16 +140,17 @@ requires flex or repeated movement, and a wet/dry or thermal cycle that changes 
   person's pain into an interesting problem and tempt the practitioner to value a measurable result
   above the person's experience of being treated.
 
-Nessa is not a generic healer. Her domain includes coatings, inks, antidotes, prepared hazards and
-escape tools as well as remedies. The same literacy serves care and harm; intent does not replace
-dosage or consequence.
+Nessa is not a generic healer. Her domain includes coatings, antidotes, prepared hazards, reactive
+stains and escape tools as well as remedies. The same literacy serves care and harm; intent does not
+replace dosage or consequence. Ordinary CMY+Depth writing ink is Isolde's Scriptorium/Penmaker
+system; “ink” in this older Apothecary identity never grants Nessa that color-authorship role.
 
 ## Why the player seeks her
 
 - the currently absent preparation verb: making consumables before difficult worlds and fights;
 - cures, antidotes and emergency options;
 - weapon/tool coatings and prepared reactive effects;
-- specialist inks shared with the writing and crafting loops;
+- specifically authored reactive stains or identifying preparations—not ordinary writing pigment;
 - the existing Waystone route if that item remains in the consumables design.
 
 Nessa should arrive early enough that preparation matters across much of the campaign. Her shop adds
@@ -159,7 +160,7 @@ not add another potency, toxicity or tolerance meter.
 ### Coherence sentence
 
 > Because Nessa understands **effects as relationships among substance, dose, body and moment**, she
-> can turn gathered materials into **consumables, cures, coatings and inks** without pretending any
+> can turn gathered materials into **consumables, cures, coatings and reactive stains** without pretending any
 > preparation has one universal meaning.
 
 ## Thorn

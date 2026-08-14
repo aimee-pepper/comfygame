@@ -42,7 +42,7 @@ Eight fields. Each is written by several targets, and **every target writes to a
 | **Extent** | width, height | Relief |
 | **Terrain** | ground-type weights, openness, elevation variance, water coverage & form, connectivity | Relief · Hydrology · Substrate · Thermal |
 | **Nodes** | resource-type weights, density, clustering | Substrate · Vitality · Hydrology |
-| **Life** | trait distributions (mean + variance per axis), population density, trophic depth, energy budget | Vitality (magnitude) · **all eight** (trait shaping) |
+| **Life** | fixed-budget trait distributions (mean + variance per axis), population density, trophic depth | Vitality magnitude (cast/population only) · Vitality aspects + **all eight** (trait shaping) |
 | **Flora** | stature/tissue/defence distributions, cover density | Vitality · Hydrology · Illumination · Substrate |
 | **Hazards** | types present, frequency | Thermal · Atmosphere · Substrate · contradiction · danger runes |
 | **Ambient** | vision modifier, day length, night rules, movement cost | Illumination · Cycle · Atmosphere · Hydrology |

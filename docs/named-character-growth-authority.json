@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "status": "playtestAuthority",
+  "updated": "14 Aug 2026",
+  "rule": "Each earned level adds one point to primary and one point to secondary.",
+  "binder": {
+    "selection": "newCampaignPlayerChoice",
+    "allowedStats": ["might", "finesse", "fortitude", "perception", "wit"],
+    "requiresDistinctPair": true
+  },
+  "fixedCharacters": [
+    { "id": "quill", "primary": "wit", "secondary": "fortitude" },
+    { "id": "mara", "primary": "perception", "secondary": "wit" },
+    { "id": "edren", "primary": "wit", "secondary": "fortitude" },
+    { "id": "sela", "primary": "perception", "secondary": "fortitude" },
+    { "id": "tovin", "primary": "wit", "secondary": "fortitude" },
+    { "id": "halloway", "primary": "might", "secondary": "fortitude" },
+    { "id": "isolde", "primary": "finesse", "secondary": "wit" },
+    { "id": "bryn", "primary": "fortitude", "secondary": "might" },
+    { "id": "orsa", "primary": "wit", "secondary": "perception" },
+    { "id": "vance", "primary": "perception", "secondary": "wit" },
+    { "id": "noll", "primary": "finesse", "secondary": "fortitude" },
+    { "id": "talin", "primary": "finesse", "secondary": "perception" },
+    { "id": "nessa", "primary": "wit", "secondary": "perception" },
+    { "id": "corrin", "primary": "finesse", "secondary": "fortitude" },
+    { "id": "dagg", "primary": "might", "secondary": "fortitude" },
+    { "id": "rook", "primary": "perception", "secondary": "fortitude" },
+    { "id": "lys", "primary": "wit", "secondary": "perception" },
+    { "id": "bracken", "primary": "fortitude", "secondary": "wit" },
+    { "id": "fen", "primary": "finesse", "secondary": "perception" },
+    { "id": "wren", "primary": "finesse", "secondary": "wit" },
+    { "id": "kestrel", "primary": "perception", "secondary": "finesse" },
+    { "id": "maud", "primary": "might", "secondary": "wit" },
+    { "id": "marrick", "primary": "wit", "secondary": "fortitude" },
+    { "id": "sabine", "primary": "perception", "secondary": "wit" },
+    { "id": "grimmond", "primary": "fortitude", "secondary": "perception" },
+    { "id": "oda", "primary": "wit", "secondary": "finesse" },
+    { "id": "auber", "primary": "wit", "secondary": "perception" },
+    { "id": "ashe", "primary": "fortitude", "secondary": "wit" },
+    { "id": "perren", "primary": "wit", "secondary": "perception" },
+    { "id": "nine", "primary": "wit", "secondary": "fortitude" }
+  ],
+  "generatedCharacters": {
+    "selection": "deterministicGeneratedIdentity",
+    "freezeAtFirstCreation": true,
+    "requiresDistinctPair": true
+  },
+  "migration": {
+    "preserveExistingStats": true,
+    "assignPairForFutureLevelsOnly": true,
+    "neverRebuildHistoricalLevels": true
+  }
+}

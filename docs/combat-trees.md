@@ -1,5 +1,9 @@
 # Combat Trees
 
+> **Historical structure draft.** Node content moved to `combat-trees-full.md`; current topology and
+> IDs are `combat-tree-true-graph-current.md` plus `combat-tree-v2-authority.json`. References below
+> to stable `kindling` are superseded by the one-way `kindling` → `emanation` graph-v2 migration.
+
 > *"why are you trying to redesign the wheel. come up with 3 combat trees with 3 branches each and that can create a myriad of classes. defense, magic, and offense maybe. so a rogue would go evasion in the defense tree, poison or stealth in the magic tree, and speed in the attack tree for example."*
 
 **Replaces** the per-companion combat branches I proposed in `cast-roster.md` §5 — nine bespoke trees where three shared ones do the job better.
@@ -60,7 +64,7 @@ Skills: envenom · **Flense** · corrode
 *Answers:* fights you'd rather not have; opening a fight on your terms.
 Skills: conceal · ambush · **Snuff**
 
-**Emanation** *(implementation ID `kindling`)* — heat, caustic and light · burn, poison and dazzle · resistances
+**Emanation** *(historical implementation ID `kindling`)* — heat, caustic and light · burn, poison and dazzle · resistances
 *Answers:* warded and elemental foes.
 Skills: elemental strikes · **Steady** · quench
 

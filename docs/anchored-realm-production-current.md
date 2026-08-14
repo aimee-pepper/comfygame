@@ -53,6 +53,24 @@ Each entry keeps its source identity, output kind, provenance qualifier, ordinar
 whether the source remains available. This is saved realm data, not regenerated from the current
 content catalogue after every balance patch.
 
+### Stable identity boundary
+
+The live `assignedCompanions: [Int]` and map-tile-only node representation are not safe persistence
+contracts for this system. Roster positions can change, and an exhausted node currently becomes an
+empty tile. Production must not build durable work on either value.
+
+- Assignments save a stable `PersistentPartyMemberID`, never a roster index. The shared identity
+  vocabulary must distinguish named travellers, generated people and tamed animals; eligibility may
+  initially admit only named/generated people, but the saved reference cannot make that assumption.
+- Each eligible source receives a stable realm-local `RenewableSourceID` when the manifest entry is
+  first registered. Its tile coordinate is location metadata, not its identity.
+- Exhaustion changes saved source state to depleted; it does not delete the source receipt by
+  rewriting the tile to semantically empty. Rendering may look empty, but inspection, replenishment
+  and production still resolve the saved source.
+- Legacy roster-index assignments migrate only when the saved roster position still resolves to one
+  unambiguous persistent identity. Invalid or ambiguous assignments return the worker safely to base
+  and emit a migration diagnostic; never guess.
+
 ## Choosing work
 
 - The Anchorage shows the realm's discovered eligible yields and their expected interval.
@@ -81,6 +99,25 @@ the player departs and exposed in debug tuning.
 Bulk stackable resources may occupy one tray entry per resource stack. Individually provenanced
 samples remain distinct instances even when the interface groups them.
 
+### Deliberately narrow first implementation
+
+The first end-to-end slice registers only ordinary generated `ResourceNode` sources whose output is
+already represented by `ResourcePool`. It produces the same bulk `ResourceID` and saved ordinary
+yield basis; it does **not** invent an individual material-sample object or reconstruct properties
+that the live node never stored. Flora and property-bearing samples wait for their existing exact
+instance/provenance receipts to be available. This keeps “one node produces one known resource”
+honest while proving the sustain/progress/tray loop.
+
+First-slice manifest entry fields are therefore:
+
+- stable `RenewableSourceID` and realm ID;
+- source tile/location and saved source kind;
+- exact output `ResourceID`, saved yield basis and renewable/finite classification;
+- current availability/depletion state and next eligible expedition outcome;
+- saved production progress and last settlement receipt that touched it.
+
+Do not derive output or renewability later from a possibly changed catalogue definition.
+
 ## World persistence and field replenishment
 
 Production does not erase map nodes or duplicate unique depletion. Field replenishment and posted
@@ -96,6 +133,30 @@ This prevents collecting the same renewal simultaneously in the field and at bas
 implementation may use one common **one completed-expedition** replenishment cadence for ordinary
 eligible sources; source-specific cadences should be added only when they create an observable
 choice.
+
+Production and field harvesting atomically reserve the same saved source. If field harvesting has
+depleted it, posted work pauses until replenishment. If posted work completes its output, it marks
+the source field-depleted before placing the output in the tray. There is no frame in which both
+routes can claim the same renewal.
+
+## Settlement receipt and save safety
+
+Every completed expedition mints one stable `ExpeditionOutcomeID`. Anchored production saves the
+last processed outcome ID (and, where useful for diagnostics, a monotonic outcome sequence). The
+entire settlement is one atomic persisted transition:
+
+1. verify this outcome has not already been processed;
+2. replenish sources whose saved cadence is due;
+3. resolve worker identity and total Worldwork;
+4. cover sustain, then advance exactly the selected source;
+5. reserve/deplete the source for every completed output and place it in the delivery tray;
+6. save realm progress, tray, worker assignments, Essence payment/dormancy decision and the outcome
+   receipt together.
+
+Reopening a return summary, force-quitting during it or replaying a dismissed UI action cannot tick
+production twice. A settlement that cannot commit leaves the prior state intact. RNG is unnecessary
+in the first deterministic slice; any later random event must use a dedicated stream derived from
+realm ID plus outcome ID rather than consuming world/combat RNG.
 
 ## Dormancy and reassignment
 
@@ -122,10 +183,23 @@ known renewable yield is too shallow.
 
 ## Implementation order
 
-1. Persist renewable-manifest entries, selected work, per-entry progress and delivery tray with
-   empty/default migration.
-2. Register one ordinary harvested node into the manifest and resolve one deterministic output.
-3. Make sustain consume Worldwork before surplus harvest progress.
-4. Add flora and explicitly non-lethal animal yields.
-5. Link field depletion/replenishment to production and expose debug rates/capacity.
-6. Add settlement prose and collection UI.
+1. Introduce stable persistent worker/source/outcome identities and preserve depleted node receipts;
+   migrate legacy roster-index assignments conservatively.
+2. Persist renewable-manifest entries, selected work, per-entry progress, delivery tray and last
+   processed outcome with empty/default migration.
+3. Register one discovered ordinary bulk `ResourceNode`; resolve one deterministic, idempotent
+   output through the shared source reservation.
+4. Make sustain consume Worldwork before surplus harvest progress and commit payment/dormancy in the
+   same settlement transition.
+5. Add collection UI, settlement prose and debug rate/capacity/receipt diagnostics.
+6. Add flora and explicitly non-lethal animal yields only after their exact source/sample receipts
+   exist.
+
+## Live-code audit notes — 9 Aug 2026
+
+- `AnchoredRealm.assignedCompanions: [Int]` is a migration source only, not the target schema.
+- `ResourceNode` presently stores resource/count/yield but no source ID or renewable classification.
+- `WorldRules.harvest` presently replaces an exhausted node with `.empty`; this must change before
+  field replenishment or production can be correct.
+- Live anchoring currently recalculates upkeep contribution but has no manifest, progress, tray or
+  processed-outcome receipt. These are implementation gaps, not evidence that production occurs.

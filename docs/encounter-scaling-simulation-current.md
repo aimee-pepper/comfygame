@@ -4,6 +4,12 @@
 coefficients. Prompted by playtest: ordinary encounters and especially apexes are too easy for a
 developed five-person party.
 
+**11 Aug correction:** the ordinary `+level`/random-remainder conversion below is retained only as
+implemented comparison history and is rejected for promotion. The current exact ordinary contract
+is path-reachable grouping followed by deterministic HP/pressure slots in
+`encounter-scaling-playtest-current.md`. Its Profile B apex section remains consistent with this
+document. Where ordinary mechanics conflict, the playtest document wins.
+
 ## Design goals
 
 - A larger, more developed active travel party faces materially more pressure.

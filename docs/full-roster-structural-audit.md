@@ -1,5 +1,9 @@
 # Full Named-Traveller Roster — Structural Audit
 
+> **Historical audit.** Current opening ownership is Vance/Trading Post, Noll/Recycler and
+> Halloway/Blacksmith in that order. Older Vance “Exchange + Recycler” findings below preserve the
+> reason the split was made but are not current implementation authority.
+
 **Status:** First comprehensive pass; recommendations pending Aimee’s review  
 **Scope:** The six implemented travellers plus every proposed traveller in `cast-roster.md`  
 **Rule:** No individual traveller is finalized until the roster works as a whole

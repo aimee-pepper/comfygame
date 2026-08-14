@@ -1,7 +1,7 @@
 # Design Homework — Current Contract
 
-**Status:** Initial 17-question slice installed in `4ed15ab`; launch trust and phone interaction check
-remain. Next 20-question/66-review-item catalogue revision is source-validated but not installed.
+**Status:** Initial slice installed in `4ed15ab`; current catalogue has 19 active questions after
+the location-clue batch retired into production; launch trust and phone interaction check remain.
 **Decision date:** 12 August 2026
 **Content authority:** `Sources/Content/Data/design-homework.json`
 
@@ -48,30 +48,29 @@ A later authenticated relay may add direct submission, but the UI must not call 
 3. Reforge’s mechanically honest progression (`reforge-progression`).
 4. Isolde's exact three-reply revision (`isolde-dialogue-revision`).
 5. Sabine's exact seven-clue revision (`sabine-clue-revision`).
-6. Marrick/Oda/Ashe/Wren's condition-validated location-clue batch
-   (`location-clue-revision-batch`).
-7. Rook's exact three-line meeting revision (`rook-meeting-voice-revision`).
-8. Marrick's exact three-line meeting revision (`marrick-meeting-voice-revision`).
-9. Ashe's exact three-line meeting revision (`ashe-meeting-voice-revision`).
-10. Dagg/Lys/Wren/Kestrel/Oda's medium-risk meeting revision batch
+6. Rook's exact three-line meeting revision (`rook-meeting-voice-revision`).
+7. Marrick's exact three-line meeting revision (`marrick-meeting-voice-revision`).
+8. Ashe's exact three-line meeting revision (`ashe-meeting-voice-revision`).
+9. Dagg/Lys/Wren/Kestrel/Oda's medium-risk meeting revision batch
     (`medium-risk-meeting-voice-revision`).
-11. Noll and Auber's differentiated salvage/transformation meeting lines
+10. Noll and Auber's differentiated salvage/transformation meeting lines
     (`noll-auber-meeting-voice-revision`).
-12. Grimmond and Nine's exact terminal-response revisions
+11. Grimmond and Nine's exact terminal-response revisions
     (`grimmond-nine-terminal-revision`).
-13. Reversible Penmanship Essence/resource comparison profile
+12. Reversible Penmanship Essence/resource comparison profile
     (`penmanship-price-profile`).
-14. Final player-facing combat retreat name (`combat-retreat-name`).
-15. Bryn/Talin/Nessa's five-line early-hinge voice correction
+13. Final player-facing combat retreat name (`combat-retreat-name`).
+14. Bryn/Talin/Nessa's five-line early-hinge voice correction
     (`early-hinge-meeting-voice-revision`).
-16. Corrin/Fen's three-line material-practice voice correction
+15. Corrin/Fen's three-line material-practice voice correction
     (`corrin-fen-meeting-voice-revision`).
-17. Named-traveller arrival level and permanent catch-up gap
+16. Named-traveller arrival level and permanent catch-up gap
     (`named-traveller-arrival-level`).
+17. failed-expedition item-retention agency after stack-independent arithmetic correction
+    (`failure-recovery-agency`).
 18. Named-character stat-growth identity and roster-upkeep trade-off
     (`named-character-stat-growth`).
 19. Bracken/Maud/Perren's four-line remaining abstract-reply correction
-20. failed-expedition item-retention agency after stack-independent arithmetic correction
     (`remaining-meeting-voice-revision`).
 
 The catalogue deliberately mixes held mechanical choices with exact authored-copy reviews. Each can

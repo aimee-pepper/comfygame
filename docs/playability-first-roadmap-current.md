@@ -1,10 +1,16 @@
 # Playability-first roadmap — Aimee's test campaign
 
-**Status:** current cross-lead priority authority  
+**Status:** historical/current system inventory; scheduling is subordinate to
+`player-progression-implementation-roadmap-current.md`
 **Owner:** Aimee; Game Design coordinates Engineering and Asset Design  
-**Updated:** 11 Aug 2026
+**Updated:** 14 Aug 2026
 **Supersedes for scheduling:** feature-breadth ordering in `the-queue.md` and `state-of-the-build.md`
 where they conflict. Those files remain useful inventories and history.
+
+The exact campaign-reachable cross-lead execution order is
+`player-progression-implementation-roadmap-current.md`. The JSON board owns live item status and its
+campaign bands. This document retains detailed acceptance history and system notes, but it cannot
+promote a later system ahead of the current campaign band.
 
 ## Operating assumption
 
@@ -59,12 +65,17 @@ test for new pickup art.
 **Player outcome:** unwanted equipment stops accumulating as dead inventory. The first two intended
 finds teach two distinct decisions: **sell for gold** and **dismantle for known materials**.
 
-This is not live. The design is ready in `opening-economy-traveller-reorder-current.md`,
-`trading-post-recycler-current.md`, `trading-post-recycler-economy-current.md` and
-`traveller-identity-noll-recycler-current.md`. Implement it as two check-ins so Aimee gets relief
-before the entire opening-trio migration is complete.
+The outcome receipt, sell-first Trading Post, Vance-first integration and independent Recycler
+rules engine are installed. Trading Post/Vance and Recycler remain separate phone-acceptance
+scripts. Decision 182 has since approved Noll's authored order-2 native playtest promotion; the live
+catalogue/player-facing station remains the missing checkpoint. Halloway is already order 3/band 0
+and does not need another recruitment migration. Detailed authority remains in
+`opening-economy-traveller-reorder-current.md`, `trading-post-recycler-current.md`,
+`trading-post-recycler-economy-current.md` and `traveller-identity-noll-recycler-current.md`.
 
 #### B1 prerequisite — one expedition-outcome receipt
+
+**Checkpoint:** installed and fixture-covered.
 
 Before stock refresh or other return consumers expand, land the monotonic campaign-local
 `ExpeditionOutcomeID` and idempotent atomic return contract in `expedition-outcomes-current.md`.
@@ -76,6 +87,8 @@ dismissal mint none; relaunch replays no consumer; repeated visits to one anchor
 distinct outcome IDs.
 
 #### B1a — sell-first Trading Post engine, then Vance integration
+
+**Checkpoint:** installed; phone acceptance remains.
 
 - land `goldCoins`, authored trade metadata and safe atomic selling before optional stock breadth;
 - selling must work independently of whether the first stock refresh has happened; persisted stock
@@ -92,12 +105,15 @@ several unrelated discoveries or an unknown post-opening rune, the authored-prio
 
 #### B1b — Recycler engine, then Noll/opening-order integration
 
+**Checkpoint:** Recycler rules engine installed; approved Noll + player-facing station promotion is
+queued after the active combat checkpoint.
+
 - first land an independent Recycler station/state plus exactly-one recovery route: real cumulative
   construction receipt when present, otherwise an explicit authored found-gear salvage profile;
 - preview names exact outputs and irreversible item loss; cancel/stale state costs nothing;
 - capacity, interruption/relaunch and no-invented-provenance fixtures are mandatory;
-- then add Noll as stable traveller order 2, construct the provisional 15-Essence Recycler, and move
-  Halloway to order 3 together after Aimee reviews Noll's live identity/meeting presentation;
+- add Noll as stable traveller order 2 and construct the provisional 15-Essence Recycler using the
+  Decision-182 provisional-copy boundary; Halloway is already live at order 3;
 - do not repurpose another person, grant Noll to old saves, or leave Recycler with Vance;
 - `field_separation_kit` remains review/playtest content and must not hold up baseline Recycler.
 
@@ -119,35 +135,110 @@ make**, and that provisional 10/15-Essence stations do not recreate the Essence 
 
 ### P1 — close current field/map checkpoints
 
-- install/commit/push the already-green awareness foundation (837 tests) when Engineering approval
-  capacity returns; Scent Mask is a later separate check-in;
-- integrate AssetLab's corrected terrain contract: remove the native universal grid, replace the
-  false full-width dirt ledge with inset terrain-coloured elevation contours, and never put elevation
-  marks on chasm;
+- awareness foundation and the corrected native terrain-border contract are installed; Scent Mask
+  remains a later separate check-in, while phone play still owns acceptance of field controls and
+  the absence of false sidewalls;
 - phone proof must show ordinary borderless terrain, valid water/ice/chasm adjacency, several nearby
   heights, route/content/flora ownership and a complete unclipped map.
 
 These are visible correctness fixes, but they do not outrank B0/B1 unless they prevent Aimee from
 reading or navigating the test world.
 
+### P1 — party-size and apex encounter pressure
+
+**Checkpoint installed; phone balance acceptance remains.** `encounter-scaling-playtest-current.md`
+owns the exact comparison. The rejected missing-foe `+level` conversion has been replaced by
+path-reachable real grouping followed by saved lighter pressure slots and bounded HP. Profile B's
+apex durability/offence/tempo remains isolated from ordinary synthetic pressure, and Recommended is
+the next-bind default without rewriting frozen fights. Aimee's two-/five-person phone matrix decides
+coefficient tuning; implementation correctness does not itself freeze the balance.
+
+### P1 — compact Base destination board
+
+After current blocker/device acceptance, replace the growing two-column station scroll with the
+Home/Make/Study/Realms contract in `base-destination-board-current.md`. Three compact place tiles
+across let opening Home and Study fit without manufactured scrolling; Make begins Trading Post →
+Recycler → Blacksmith. Party and blue Bind & Depart form one compact persistent bottom row rather
+than station/full-width cards, while Settings/Testing remain utilities. This checkpoint also removes
+tied JSON-order authority through explicit section-local ordering, but does not require broad new
+station art or redesign screens inside places.
+
+### P1 current Asset milestone — calibrated world-conditioned map identity
+
+**Immutable Asset contract accepted; native conformance is complete at `57d8850`.** Aimee
+reports that world sameness materially harms the play experience. Asset's exact
+`world-grade-2-v1` pack at canonical manifest `e601d2f7…824c1` is the new versioned boundary; the
+frozen `world-grade-1.0.0` remains historical. The next visual implementation boundary is the
+immutable bind receipt in `world-grade-2-bind-adapter-current.md`; native phone color and
+literal-grayscale evidence still gate promotion.
+
+`world-color-differentiation-current.md` is authoritative. Its central rule is **relative visual
+distance**, not universal uniqueness: similar authored/resolved worlds should look related, while
+meaningfully opposed material, ecological, atmospheric or emitter facts should separate
+proportionally. The proof must include near-neighbor and opposed pairs and compare input distance to
+perceptual output distance.
+
+`authored-color-vocabulary-current.md` supplies the current writing-side handoff: Ash ink leaves
+color fully open to bind-time resolution, while Isolde's tier-1 **Ink mixing** Penmanship upgrade
+unlocks exact CMY+Depth recipes at the Writing Desk. Ink is an attribute of an eligible source mark,
+not a second page rune or collectible Color qualifier. Sun/Smoke/Granite/Bloom remain the closed
+first-live allowlist. This package may prepare schema/Desk proofs after Asset calibration, but it
+does not authorize native renderer integration before the versioned world-grade contract passes
+conformance review.
+
+- Illumination leaves inherent terrain recoloring and later composes as current light/visibility.
+- Vitality leaves the green channel and composes through ecology without forcing hue.
+- Material palette families, scoped declared colors, atmospheric scattering and emitter light remain
+  separate, truth-preserving layers.
+- Neutral worlds are neither forced identical nor forced apart: resolved facts own their similarity.
+- Native-phone, literal-grayscale, disclosure, persistence and canonical-resource gates all apply.
+
+This milestone does not authorize broader creature, portrait, combat-animation, new-ground or native
+integration work. Engineering reviews the accepted schema/migration/cache boundary only after the
+calibrated Asset proof passes Design review.
+
+### P1 presentation checkpoint after the Base board — maker-station grammar
+
+Once the Home/Make/Study/Realms board is accepted, implement the Blacksmith-first reusable contract
+in `maker-station-screen-grammar-current.md`. Make/Reforge/Learn are real verb tabs; construction
+families use three-column tiles, exact object/material stock uses six-across icon trays, and one
+rules-owned preview drives requirements, result, cost and atomic commit. Item information opens in a
+screen-edge-aware anchored popup (or accessibility bottom sheet), never a new full-screen route.
+
+This is presentation reuse rather than a crafting rebalance. Existing recipe, tier, provenance,
+stable-instance and transaction rules remain authoritative. After Blacksmith phone acceptance,
+Tannery/Bowyer/Armoury/Weaponsmith adopt the same shell without copying thresholds into views or
+flattening their distinct verbs.
+
+### P2 writing-depth checkpoint — Scriptorium Runebook
+
+After higher playability and presentation checkpoints, implement personal compound formalization
+from `compound-assembly-station-trees-current.md`. A successful expanded bind records an idempotent
+proven-statement receipt; Isolde's Runebook may compress only that proven complete reading. The Desk
+places existing shorthand and never mints unproven meaning. This checkpoint should land with the
+three sibling tier-1 Penmanship capabilities represented honestly—Ink Mixing, Compound Assembly and
+Chaining—without requiring one merely to access another.
+
 ### P0 after Trading Post/resource visuals — repeatable playtest observability
 
 - DEBUG Roadmap tab mirrors this file's checkpoint status and next test;
 - existing Balancing and Authored-Text Atlas remain development-only tools;
-- immediately after the Trading Post/Vance checkpoint and resource-visual update, add the DEBUG bug
-  reporter specified in `debug-bug-reporting-current.md`: one
-  persistent floating button, screenshot + build/context capture, player text, durable untriaged
-  outbox and explicit transport state; Aimee never has to assign priority;
+- the DEBUG bug reporter's floating capture button, screenshot/context form and durable local
+  untriaged outbox are installed; the active checkpoint closes honest sending/retry/receipt state,
+  while a real direct destination still requires an approved relay host as specified in
+  `debug-bug-reporting-current.md`; Aimee never has to assign priority;
 - add deterministic grant/fixture actions only as a named test requires them; do not turn the debug
   screen into a second game state editor;
 - every installed checkpoint shows a build/commit identifier in DEBUG before Aimee reports results.
 
 ### P1 after baseline telemetry — Essence refining progression
 
-Add the keeper-free Spring branch in `essence-refining-progression-current.md`: Measured batches,
-Second pass (reversible 2→3 rate), Continuous settling, plus the existing distinct Deepen the Spring
-choice. This is long-campaign progression, not permission for the baseline economy to fail. Schedule
-its exact costs/rate only after B0's first ten returns and the B1 offloading blockers pass.
+Implement Decision 186's keeper-free Spring branch in `essence-refining-progression-current.md`:
+free selected/all baseline control at 2:1, practice-gated Second pass (reversible future 2→3 rate),
+Continuous settling, plus the existing parallel Deepen the Spring choice. This is long-campaign
+progression, not permission for the baseline economy to fail. The current 50-Raw/80-Essence profile
+may enter playtesting after the active opening-economy checkpoint; ten-return evidence tunes values
+without reopening Spring ownership or restoring a paid quantity selector.
 
 ## Explicitly paused
 
@@ -164,6 +255,25 @@ Until B0 and B1 pass on Aimee's phone:
 Nothing is deleted. Current specifications and historical decisions remain available, but this phase
 does not spend implementation attention on them.
 
+### Queued structural correction — combat trees
+
+After the currently active playability/UI checkpoint, replace the nine linear combat ladders with
+the implementation-ready three-tree fan-and-fork graph in `combat-tree-true-graph-current.md` and the
+72-node consumer contract in `combat-node-viability-current.md`. This is a playability correction,
+not cosmetic polish: the present layout and `buyNext` rule provide no build choice inside a
+discipline, while most passive/capstone Loadout fields are never consumed by gameplay. It must be
+scheduled as its own save-migration/semantic checkpoint, with exhaustive path validation, one actual
+consumer fixture per stable node ID and a 368×800 graph proof, rather than folded into an unrelated
+screen refactor.
+
+### Queued presentation correction — research graphs
+
+The research catalogue already contains real prerequisite DAGs, but the live branch screen converts
+them into cheapest-first full-width outlines with no visible edges. After the active maker-station
+shell and combat playability corrections, replace that ordinary presentation with the shared
+phone-width graph in `research-tree-graph-presentation-current.md`. This is one component migration
+for every station branch, not a research rebalance; costs, grants and completion IDs remain unchanged.
+
 ## Current board
 
 The operational status source of truth is
@@ -175,6 +285,14 @@ current work, checkpoint IDs and concise gates. Do not recreate a second status 
 Every JSON item ID is stable across status changes so tests, bug reports and review notes can refer
 to the same checkpoint. A missing or invalid bundled board is a DEBUG build failure rather than an
 empty/stale screen.
+
+The current exactly-one-global-`inProgress` assertion is a temporary implementation limitation, not
+the intended authority model. Design, Asset and Engineering can work concurrently. Each item should
+gain a stable workstream/owner; permit at most one primary active checkpoint per workstream and
+derive the Roadmap header from all active workstreams. `currentWork`/`currentNote` must not remain
+separate manual mirrors, and installed build identity comes from build metadata rather than a JSON
+field edited after installation. Until that checkpoint lands, an item marked `next` may be active in
+another lead task; the Markdown/current lead status remains necessary context for that known gap.
 
 ## Check-in record
 
@@ -195,11 +313,11 @@ Add one short entry after each device checkpoint:
   On 11 Aug Engineering owns the independent Recycler checkpoint plus the contained Look/field-layout
   and anchored item-detail work. It must not reopen accepted Trading Post/Vance/resource/terrain work
   without contradictory play evidence. Device evidence remains required at each installable checkpoint.
-- **Asset Design:** Resource v0.6 and the native terrain contract are accepted. On 11 Aug Asset owns
-  the compact five-identity economy bridge and subsequent Recycler transaction-state proof. Player-
-  facing language must retain Aimee's settled **world resources** terminology rather than inventing a
-  separate generic “material sample” category. Prices, yields, eligibility and provenance rules stay
-  outside the icon layer.
+- **Asset Design:** Resource v0.6 and the native terrain contract are accepted. The compact economy
+  and Recycler sheets remain functional layout/state proofs only; Aimee owns final item/resource and
+  station art under `handmade-art-ownership-current.md`. Player-facing language must retain Aimee's
+  settled **world resources** terminology rather than inventing a separate generic “material
+  sample” category. Prices, yields, eligibility and provenance rules stay outside the icon layer.
 
 ## Historical first check-in sequence
 

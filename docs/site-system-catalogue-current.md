@@ -99,7 +99,7 @@ Seam/Tear. IDs are stable recommendations.
 - **Weight/cap:** 3 / 1
 - **Placement:** interior hard/ash ground; distance ≥5
 - **Search:** 3 turns
-- **Yield:** 5 Obsidian, 5 Sulfur, 3 Raw Essence
+- **Yield:** 5 Obsidian, 5 Sulfur, 3 Quartz
 - **Identity:** cooled skin repeatedly opens over a reactive seam. Its ordinary tile/site interaction
   communicates hazard before confirmation; no hidden damage roll.
 
@@ -121,7 +121,7 @@ Seam/Tear. IDs are stable recommendations.
 - **Weight/cap:** 5 / 1
 - **Placement:** high/open traversable ground; distance ≥3
 - **Search:** 2 turns
-- **Yield:** 3 Pulp, 2 Quartz, 2 Raw Essence
+- **Yield:** 3 Pulp, 4 Quartz
 - **Identity:** stacked markers and protected scraps indicate somebody tried to make one visible fixed
   point after the sundering. It has elevated compatibility as a writing host, not a guaranteed page.
 
@@ -135,12 +135,41 @@ Seam/Tear. IDs are stable recommendations.
 - A site may be valuable without teaching a focus. Diary-exclusive teachings never enter generic
   site loot.
 - Search duration is visible before starting and each spent turn saves atomically.
+- Raw Essence is never a site yield. It has one settled world acquisition grammar: a dedicated
+  removable wild drop. Site rewards use world resources, items or knowledge without fabricating a
+  second Essence source.
+
+## Live-catalogue audit
+
+The current nine-entry JSON catalogue predates several settled boundaries. Treat these as migration
+work before adding the six profiles, not as precedent for new entries:
+
+- `essence_raw` still appears in several site-yield dictionaries. Remove it and replace value only
+  with fictionally supported world resources; do not compensate with hidden direct Essence.
+- `stabilityDelta` remains decoded and `SiteRules.stabilityDelta` remains callable, although the
+  world correctly does not apply it. Deprecate/tolerantly ignore the field before deleting it from
+  saved/content schema; no site is allowed to alter the undisclosed headline.
+- Several ordinary landmarks carry fixed catalogue gear. Review those individually; preserve gear
+  only where the place's fiction supports a left-behind object, and do not copy the pattern into
+  every new landmark.
+- Current `SitePlacement` can express anywhere/edge/interior plus entry distance, but not “beside
+  water”, “on open ground”, “adjacent to growth”, elevation or route ownership. Add typed placement
+  predicates evaluated against the final map rather than weakening the six identities into generic
+  interior placement.
+- Writing is currently placed before sites and has no host attachment. Add an optional saved host
+  link/presentation pass after both selections; never reroll the selected writing, and retain the
+  ordinary free-tile fallback.
+
+These corrections preserve old looted/search state by stable site and instance IDs. They must not
+reroll or relocate sites in an already bound world.
 
 ## Implementation order
 
-1. Retire/ignore authored site `stabilityDelta` in content schema and test no double charge.
-2. Add writing-host fallback and host-selection separation if not already explicit.
-3. Add Salt Pan and Signal Cairn as one natural/one recent-ruin fixture.
-4. Run condition reachability and full site-count distributions.
-5. Add the other four through the same placement/content schema.
-6. Add known-site likelihood bands only after instrument/preview disclosure tests are green.
+1. Retire/ignore authored site `stabilityDelta`, remove stale Raw Essence yields and test both
+   settled boundaries.
+2. Add typed final-map placement predicates with deterministic fallback/omission behavior.
+3. Add writing-host fallback and host-selection separation.
+4. Add Salt Pan and Signal Cairn as one natural/one recent-ruin fixture.
+5. Run condition reachability and full site-count distributions.
+6. Add the other four through the same placement/content schema.
+7. Add known-site likelihood bands only after instrument/preview disclosure tests are green.

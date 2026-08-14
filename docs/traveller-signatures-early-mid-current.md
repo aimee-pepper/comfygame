@@ -4,9 +4,10 @@
 writable from vocabulary available before each traveller and never require the traveller's own
 teaching.
 
-This batch follows Sela and covers Bryn, Orsa, Vance and Talin. Each has three conditions and therefore
-three location pages. Exact match rates must be measured before implementation thresholds become
-balance-final.
+This document now covers three early–mid signatures plus Vance's reordered opening signature. Bryn,
+Orsa and Talin retain three conditions/three location pages. Vance has one opening condition; his
+former two additional conditions survive as diary world observations, not recruitment gates. Exact
+match rates must be measured before thresholds become balance-final.
 
 ## Bryn — sheltered weight
 
@@ -34,16 +35,15 @@ permanent or private by default.
 
 **Reward dependency:** never requires Hive, Orsa's diary focus.
 
-## Vance — things with somewhere to go
+## Vance — an open route (opening order 1)
 
 | Condition | Threshold | Honest sensory passage | Available route |
 |---|---:|---|---|
-| Relief openness | ≥ 72 | “Nothing prevents a load from crossing the horizon except the distance itself.” | Sand/Sea/Wind are starter vocabulary |
-| Substrate dispersion | ≤ 35 | “What the ground offers gathers in seams rather than being spread thinly everywhere.” | Iron/Gold ore and other veining sources |
-| Vitality dispersion | ≤ 38 | “Life keeps to distinct pockets, rich in one place and absent a short walk later.” | Bloom is starter vocabulary and lowers dispersion |
+| Relief openness | ≥ 68 | “A load can cross the horizon here without the land inventing a toll.” | Sand/Sea/Wind and other opening relief routes |
 
-**Identity:** an open route joining concentrated pockets of unlike value. The world makes circulation
-useful without claiming that price and worth are identical.
+**Identity:** an unobstructed route that makes circulation possible without claiming that movement,
+price and worth are identical. Concentrated seams and pockets remain important observations in his
+diary, but no longer delay the first economy keeper behind a three-condition midgame hunt.
 
 **Reward dependency:** never requires Amber, Vance's diary focus.
 
@@ -66,7 +66,7 @@ gaps and openings without requiring literal armoured creatures to generate.
   Bryn encloses and holds; Talin exposes and commits.
 - Orsa's Hush dependency is allowed because Isolde is earlier and required. It also makes authored
   people influence one another without duplicating teachings.
-- Vance's Vitality-dispersion threshold uses starter Bloom and still needs accidental-match testing;
-  do not move Amber earlier or require a random drop merely to make his route rarer.
+- Vance's one-condition opening match needs fresh accidental-match testing. Do not make it rarer by
+  restoring hidden extra conditions, moving Amber into the route or requiring a random drop.
 - No passage claims a site, creature, building, resource name or social history that pressure
   conditions cannot guarantee.

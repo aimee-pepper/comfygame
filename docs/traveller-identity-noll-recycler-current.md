@@ -1,20 +1,24 @@
 # Noll and the Recycler — current working design
 
-**Status:** implementation-facing identity and diary structure; exact prose, name, pronouns and the
-field-kit tuning remain reviewable in the DEBUG authored-text atlas
+**Status:** reversible playtest identity approved for native promotion; exact prose and the field-kit
+reward remain reviewable in the DEBUG authored-text atlas
 **Updated:** 9 Aug 2026
+
+For the concise approval choices and current voice recommendation, use
+`noll-opening-review-packet-current.md`. This identity file remains the complete design; native
+promotion uses provisional-copy labels and does not imply final line-level approval.
 
 ## Identity
 
 | Field | Current direction |
 |---|---|
-| Name / ID | **Noll** / `noll` *(working name)* |
-| Pronouns | they/them *(working)* |
+| Name / ID | **Noll** / `noll` *(stable reversible playtest identity)* |
+| Pronouns | they/them *(reversible playtest identity)* |
 | Calling | salvager / unmaker |
 | Cast type | trade |
 | Blurb | Knows where an object will part before touching it. Keeps a ledger of the pieces that should not have been separated. |
 | Campaign place | opening; authored order 2, after Vance and before Halloway |
-| Required | no; the ordering is strong clue priority, never a hard spawn gate |
+| Required | no; same-band evidence and authored order resolve simultaneous full matches |
 | Station | Recycler, independently owned and built |
 
 ### Voice anchors
@@ -41,8 +45,9 @@ what can truthfully be recovered; Halloway judges what should be repaired or mad
 - Baseline preview, provenance truth, atomic commit and player selection are station correctness,
   never diary or research gates.
 - Noll staffs the Recycler under the shared Home keeper/effective-tier rules.
-- Their combat lean should favour **Guard** and **Control** by one bonus authored point each; this is
-  a reversible characterization value, not a private class.
+- Their combat lean grants one authored point in **Precision** and one in **Protection**. Precision
+  reads joins and failure lines; Protection decides what remains whole and who bears the cost. This
+  is a reversible characterization value in the shared graph, not a private Salvager class.
 
 ## Exclusive teaching — Field Separation Kit
 
