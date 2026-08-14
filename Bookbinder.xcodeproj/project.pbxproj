@@ -14,6 +14,7 @@
 		G10000000000000000000001 /* TerrainTransitionRenderingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G20000000000000000000001 /* TerrainTransitionRenderingTests.swift */; };
 		I10000000000000000000001 /* WorldVisibilityRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000001 /* WorldVisibilityRules.swift */; };
 		J10000000000000000000001 /* WorldVisibilityRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000001 /* WorldVisibilityRulesTests.swift */; };
+		K10000000000000000000001 /* FieldNoteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = K20000000000000000000001 /* FieldNoteTests.swift */; };
 		A10000000000000000000001 /* NamedCharacterVisualAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */; };
 		A10000000000000000000002 /* NamedCharacterPlaceholderPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */; };
 		A10000000000000000000003 /* NamedCharacterPixelIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */; };
@@ -288,6 +289,7 @@
 		G20000000000000000000001 /* TerrainTransitionRenderingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerrainTransitionRenderingTests.swift; sourceTree = "<group>"; };
 		I20000000000000000000001 /* WorldVisibilityRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldVisibilityRules.swift; sourceTree = "<group>"; };
 		J20000000000000000000001 /* WorldVisibilityRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldVisibilityRulesTests.swift; sourceTree = "<group>"; };
+		K20000000000000000000001 /* FieldNoteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldNoteTests.swift; sourceTree = "<group>"; };
 		B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterVisualAdapter.swift; sourceTree = "<group>"; };
 		B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPlaceholderPack.swift; sourceTree = "<group>"; };
 		B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPixelIdentity.swift; sourceTree = "<group>"; };
@@ -838,6 +840,7 @@
 				E20000000000000000000001 /* StartingTownHomeSceneTests.swift */,
 				G20000000000000000000001 /* TerrainTransitionRenderingTests.swift */,
 				J20000000000000000000001 /* WorldVisibilityRulesTests.swift */,
+				K20000000000000000000001 /* FieldNoteTests.swift */,
 				74D9F704438225E8CFD8268D /* BestiaryTests.swift */,
 				7582647B2841DB69559E3968 /* BookRulesTests.swift */,
 				B6B3681EEDB3DB65AE754495 /* CampaignStartPresentationTests.swift */,
@@ -1263,6 +1266,7 @@
 				E10000000000000000000001 /* StartingTownHomeSceneTests.swift in Sources */,
 				G10000000000000000000001 /* TerrainTransitionRenderingTests.swift in Sources */,
 				J10000000000000000000001 /* WorldVisibilityRulesTests.swift in Sources */,
+				K10000000000000000000001 /* FieldNoteTests.swift in Sources */,
 				52A3E7BA47AED80B02C9FFDA /* BestiaryTests.swift in Sources */,
 				030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */,
 				7FAF1BB2BE9134A54D8E970C /* CampaignStartPresentationTests.swift in Sources */,

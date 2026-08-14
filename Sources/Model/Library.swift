@@ -237,6 +237,56 @@ struct FoundWritingRecord: Codable, Equatable, Identifiable, Sendable {
     var family: Family
     var prose: String
     var position: GridPoint
+    /// Structured truth behind a generated Field note. Optional so every existing save and every
+    /// authored non-Field writing remains valid without reconstruction.
+    var templateID: String? = nil
+    var fieldFact: FieldNoteFact? = nil
+    var originWorldSeed: UInt64? = nil
+
+    private enum CodingKeys: String, CodingKey {
+        case id, family, prose, position, templateID, fieldFact, originWorldSeed
+    }
+
+    init(id: FoundWritingID, family: Family, prose: String, position: GridPoint,
+         templateID: String? = nil, fieldFact: FieldNoteFact? = nil,
+         originWorldSeed: UInt64? = nil) {
+        self.id = id
+        self.family = family
+        self.prose = prose
+        self.position = position
+        self.templateID = templateID
+        self.fieldFact = fieldFact
+        self.originWorldSeed = originWorldSeed
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(FoundWritingID.self, forKey: .id)
+        family = try c.decode(Family.self, forKey: .family)
+        prose = try c.decode(String.self, forKey: .prose)
+        position = try c.decode(GridPoint.self, forKey: .position)
+        templateID = try c.decodeIfPresent(String.self, forKey: .templateID)
+        // A future fact case must not make the recovered prose unreadable in an older build.
+        fieldFact = try? c.decodeIfPresent(FieldNoteFact.self, forKey: .fieldFact)
+        originWorldSeed = try c.decodeIfPresent(UInt64.self, forKey: .originWorldSeed)
+    }
+}
+
+/// Only qualitative tokens printed by a Field-note template. This deliberately cannot carry a
+/// hidden entity, resource table, species identity, pressure reading or numeric threshold.
+struct FieldNoteTokens: Codable, Equatable, Sendable {
+    var groundA: String? = nil
+    var groundB: String? = nil
+    var direction: String? = nil
+    var relation: String? = nil
+    var quality: String? = nil
+}
+
+enum FieldNoteFact: Codable, Equatable, Sendable {
+    case terrain(FieldNoteTokens)
+    case lightAir(FieldNoteTokens)
+    case growth(FieldNoteTokens)
+    case water(FieldNoteTokens)
 }
 
 /// The Library's page for one diary: everything known about where its author is.

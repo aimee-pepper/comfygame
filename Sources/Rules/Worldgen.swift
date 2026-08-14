@@ -130,12 +130,14 @@ enum Worldgen {
             placedPages.append(page)
         }
         var foundWritings: [FoundWritingRecord] = []
+        var usedFieldNoteKeys: Set<String> = []
         for index in 0..<noteCount {
             guard let point = writingPoint(in: map, from: entry, avoiding: occupied, rng: &pageRNG)
             else { continue }
             let id = FoundWritingID(rawValue: "world_\(seed)_field_\(index)")
-            let record = FoundWritingRecord(id: id, family: .fieldNote,
-                                            prose: fieldNoteProse(index: index), position: point)
+            let record = fieldNote(id: id, at: point, in: map, flora: flora,
+                                   readings: readings, seed: seed,
+                                   excluding: &usedFieldNoteKeys, rng: &pageRNG)
             map[point].content = .foundWriting(id)
             occupied.insert(point)
             foundWritings.append(record)
@@ -143,8 +145,9 @@ enum Worldgen {
         if placedPages.isEmpty, foundWritings.isEmpty,
            let point = writingPoint(in: map, from: entry, avoiding: occupied, rng: &pageRNG) {
             let id = FoundWritingID(rawValue: "world_\(seed)_field_fallback")
-            let record = FoundWritingRecord(id: id, family: .fieldNote,
-                                            prose: fieldNoteProse(index: 0), position: point)
+            let record = fieldNote(id: id, at: point, in: map, flora: flora,
+                                   readings: readings, seed: seed,
+                                   excluding: &usedFieldNoteKeys, rng: &pageRNG)
             map[point].content = .foundWriting(id)
             occupied.insert(point)
             foundWritings.append(record)
@@ -526,12 +529,239 @@ enum Worldgen {
         return rng.pick(Array(candidates.prefix(max(1, candidates.count / 3))))
     }
 
-    private static func fieldNoteProse(index: Int) -> String {
-        switch index % 3 {
-        case 0: "Someone marked the firmer way through this place, then carried on."
-        case 1: "A second hand noted where the ground changed, and chose the steadier edge."
-        default: "The marks turn back from broken footing and resume where the path holds."
+    private enum FieldNoteFamily: Int, CaseIterable { case terrain, lightAir, growth, water }
+
+    private struct FieldNoteCandidate {
+        var family: FieldNoteFamily
+        var templateID: String
+        var fact: FieldNoteFact
+        var prose: String
+        var signature: String
+        var weight: Int
+    }
+
+    /// Resolves one local witness statement and freezes both its safe fact and final prose. The
+    /// candidate list is sorted before the one weighted draw, so collection/dictionary ordering
+    /// can never rewrite an existing seed.
+    private static func fieldNote(id: FoundWritingID, at point: GridPoint, in map: WorldMap,
+                                  flora: [Flora], readings: PressureReadings, seed: UInt64,
+                                  excluding used: inout Set<String>, rng: inout SeededRNG)
+        -> FoundWritingRecord {
+        var candidates = fieldNoteCandidates(at: point, in: map, flora: flora, readings: readings)
+            .sorted { ($0.family.rawValue, $0.templateID, $0.signature)
+                < ($1.family.rawValue, $1.templateID, $1.signature) }
+        let distinct = candidates.filter {
+            !used.contains("template:\($0.templateID)") && !used.contains("fact:\($0.signature)")
         }
+        if !distinct.isEmpty { candidates = distinct }
+        let familyGroups = Dictionary(grouping: candidates, by: \FieldNoteCandidate.family)
+        let eligibleFamilies = FieldNoteFamily.allCases.filter { familyGroups[$0] != nil }
+        let total = eligibleFamilies.reduce(0) { total, family in
+            total + (familyGroups[family]?.first?.weight ?? 0)
+        }
+        var roll = rng.int(in: 1...total)
+        let selectedFamily = eligibleFamilies.first { family in
+            roll -= familyGroups[family]?.first?.weight ?? 0
+            return roll <= 0
+        } ?? .terrain
+        let familyCandidates = familyGroups[selectedFamily] ?? candidates
+        let index = Int(fieldNoteStableHash("\(seed)|\(id.rawValue)|\(selectedFamily.rawValue)")
+                        % UInt64(familyCandidates.count))
+        let selected = familyCandidates[index]
+        used.insert("template:\(selected.templateID)")
+        used.insert("fact:\(selected.signature)")
+        return FoundWritingRecord(id: id, family: .fieldNote, prose: selected.prose,
+                                  position: point, templateID: selected.templateID,
+                                  fieldFact: selected.fact, originWorldSeed: seed)
+    }
+
+    private static func fieldNoteCandidates(at point: GridPoint, in map: WorldMap,
+                                            flora: [Flora], readings: PressureReadings)
+        -> [FieldNoteCandidate] {
+        let host = map[point]
+        let neighbours = cardinalNeighbours(of: point, in: map)
+        var result: [FieldNoteCandidate] = []
+
+        func add(_ family: FieldNoteFamily, _ template: String, _ tokens: FieldNoteTokens,
+                 _ prose: String, _ signature: String) {
+            let fact: FieldNoteFact = switch family {
+            case .terrain: .terrain(tokens)
+            case .lightAir: .lightAir(tokens)
+            case .growth: .growth(tokens)
+            case .water: .water(tokens)
+            }
+            let weight = switch family {
+            case .terrain: 35
+            case .lightAir, .growth: 20
+            case .water: 15
+            }
+            result.append(.init(family: family, templateID: template, fact: fact,
+                                prose: prose, signature: signature, weight: weight))
+        }
+
+        for neighbour in neighbours {
+            let tile = map[neighbour.point]
+            let direction = neighbour.direction
+            if tile.ground != host.ground,
+               tile.isPassable,
+               tile.ground.movementCost == 1 {
+                let tokens = FieldNoteTokens(groundA: host.ground.displayName,
+                                             groundB: tile.ground.displayName,
+                                             direction: direction)
+                add(.terrain, "field_terrain_boundary_01", tokens,
+                    "The \(host.ground.displayName) ends \(direction). I kept to the \(tile.ground.displayName), where each step held.",
+                    "\(host.ground.rawValue)|\(tile.ground.rawValue)|\(direction)")
+            }
+            if tile.ground.movementCost == 2,
+               let clearer = neighbours.first(where: { map[$0.point].ground.movementCost == 1
+                   && map[$0.point].isPassable }) {
+                let tokens = FieldNoteTokens(groundA: tile.ground.displayName,
+                                             direction: clearer.direction, relation: "two turns")
+                add(.terrain, "field_terrain_cost_01", tokens,
+                    "The \(tile.ground.displayName) took twice the effort. I went \(clearer.direction) along the clearer edge.",
+                    "\(tile.ground.rawValue)|\(clearer.direction)")
+            }
+            if tile.ground.blocksSight {
+                let tokens = FieldNoteTokens(groundA: tile.ground.displayName,
+                                             direction: direction, relation: "blocks sight")
+                add(.terrain, "field_terrain_sight_01", tokens,
+                    "Past the \(tile.ground.displayName), I could no longer see the mark behind me.",
+                    "\(tile.ground.rawValue)|\(direction)")
+            }
+            if tile.elevation != host.elevation {
+                let relation = tile.elevation > host.elevation ? "rises" : "falls"
+                let tokens = FieldNoteTokens(direction: direction, relation: relation)
+                add(.terrain, "field_terrain_height_01", tokens,
+                    "The ground \(relation) toward the \(direction); the old scratches follow the same line.",
+                    "\(relation)|\(direction)")
+            }
+            if !tile.isPassable {
+                let tokens = FieldNoteTokens(groundA: tile.ground.displayName,
+                                             direction: direction, relation: "impassable")
+                add(.terrain, "field_terrain_edge_01", tokens,
+                    "I turned \(direction) before the \(tile.ground.displayName). The rim continues farther than this page.",
+                    "\(tile.ground.rawValue)|\(direction)")
+            }
+        }
+
+        if neighbours.allSatisfy({ map[$0.point].ground == host.ground }) {
+            let terrainTokens = FieldNoteTokens(groundA: host.ground.displayName,
+                                                relation: "continues locally")
+            add(.terrain, "field_terrain_single_01", terrainTokens,
+                "I set this down on \(host.ground.displayName). The same ground continues on every visible side.",
+                host.ground.rawValue)
+        }
+
+        let illumination = readings["illumination"]
+        if illumination.peak <= 25 {
+            add(.lightAir, "field_light_dark_01", .init(quality: "dark"),
+                "I counted the next few steps by touch and kept the written side covered.", "dark")
+        } else if illumination.floor >= 75 {
+            add(.lightAir, "field_light_bright_01", .init(quality: "bright"),
+                "I turned the page face-down. Even the unmarked side held the light.", "bright")
+        } else if illumination.range >= Tuning.Pressure.wideRangeThreshold {
+            add(.lightAir, "field_light_change_01", .init(relation: "changing light"),
+                "The light changed before the ink dried; the ground did not.", "changing")
+        } else {
+            add(.lightAir, "field_light_held_01", .init(relation: "steady light"),
+                "The light held while I wrote. I stopped waiting for it to turn.", "steady")
+        }
+        let movingAir = readings["atmosphere"].aspect("motion") > 50
+        add(.lightAir, movingAir ? "field_air_moving_01" : "field_air_still_01",
+            .init(relation: movingAir ? "moving air" : "still air"),
+            movingAir
+                ? "I weighted three corners. The air found the fourth whichever way I turned."
+                : "The dust on this line had not shifted when I came back.",
+            movingAir ? "moving" : "still")
+
+        let local = [(point: point, direction: "here")] + neighbours
+        for item in local where map[item.point].ground.isOvergrown {
+            let tile = map[item.point]
+            let height = tile.ground == .growth ? "tall" : "low"
+            if let bare = cardinalNeighbours(of: item.point, in: map)
+                .first(where: { !map[$0.point].ground.isOvergrown }) {
+                let tokens = FieldNoteTokens(groundA: map[bare.point].ground.displayName,
+                                             direction: bare.direction, quality: height)
+                add(.growth, "field_growth_boundary_01", tokens,
+                    "The \(height) growth stops at the \(map[bare.point].ground.displayName) as neatly as a cut thread.",
+                    "\(height)|\(map[bare.point].ground.rawValue)|\(bare.direction)")
+            }
+            if let floraID = tile.flora, let plant = flora.first(where: { $0.id == floraID }) {
+                let template: String
+                let prose: String
+                switch plant.traits.habit {
+                case .spreading where height == "low":
+                    template = "field_growth_spread_01"
+                    prose = "The low growth crosses the path in one sheet; footsteps divide it, then it closes again."
+                case .clustered:
+                    template = "field_growth_cluster_01"
+                    prose = "The growth gathers in separate knots. Bare ground remains between them."
+                case .solitary where height == "tall":
+                    template = "field_growth_solitary_01"
+                    prose = "One tall form stands apart here. I could see its outline before its base."
+                default:
+                    template = "field_growth_form_01"
+                    prose = "The \(height) growth keeps a \(plant.traits.habit.rawValue) shape here. Bare ground shows its edge."
+                }
+                add(.growth, template, .init(relation: plant.traits.habit.rawValue,
+                                              quality: height), prose,
+                    "\(floraID.rawValue)|\(plant.traits.habit.rawValue)|\(item.direction)")
+            }
+            if tile.ground.blocksSight {
+                add(.growth, "field_growth_sight_01",
+                    .init(direction: item.direction, relation: "blocks sight", quality: "tall"),
+                    "The tall growth swallowed the mark behind me. I made the next one higher.",
+                    "sight|\(item.direction)")
+            }
+        }
+
+        for item in local {
+            let ground = map[item.point].ground
+            let tokens = FieldNoteTokens(groundA: host.ground.displayName,
+                                         direction: item.direction, quality: ground.displayName)
+            switch ground {
+            case .water:
+                add(.water, "field_water_shallow_01", tokens,
+                    "The shallow water keeps the shape of the ground beneath it.", "water|\(item.direction)")
+            case .deepWater:
+                add(.water, "field_water_deep_01", tokens,
+                    "The colour changes past the \(item.direction) edge. I did not test the deeper part.",
+                    "deep|\(item.direction)")
+            case .ice:
+                add(.water, "field_water_ice_01", tokens,
+                    "The surface held my weight here; the trapped line beneath it points \(item.direction).",
+                    "ice|\(item.direction)")
+            case .mud:
+                if let firm = neighbours.first(where: { map[$0.point].ground.movementCost == 1
+                    && map[$0.point].isPassable }) {
+                    let firmTokens = FieldNoteTokens(direction: firm.direction,
+                                                     relation: "two turns", quality: "mud")
+                    add(.water, "field_water_mud_01", firmTokens,
+                        "The mud kept every step and charged for each one. Firmer ground lies \(firm.direction).",
+                        "mud|\(firm.direction)")
+                }
+            default: break
+            }
+        }
+        return result
+    }
+
+    private static func cardinalNeighbours(of point: GridPoint, in map: WorldMap)
+        -> [(point: GridPoint, direction: String)] {
+        [(GridPoint(x: point.x, y: point.y - 1), "north"),
+         (GridPoint(x: point.x + 1, y: point.y), "east"),
+         (GridPoint(x: point.x, y: point.y + 1), "south"),
+         (GridPoint(x: point.x - 1, y: point.y), "west")]
+            .filter { map.contains($0.0) }
+    }
+
+    private static func fieldNoteStableHash(_ text: String) -> UInt64 {
+        var hash: UInt64 = 0xcbf29ce484222325
+        for byte in text.utf8 {
+            hash ^= UInt64(byte)
+            hash = hash &* 0x100000001b3
+        }
+        return hash
     }
 
     // MARK: The roster
