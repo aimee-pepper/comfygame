@@ -86,16 +86,19 @@ struct BaseView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            ScrollView {
-                VStack(spacing: 12) {
-                    contextRow
-                    firstReturnRouteCard
-                    sectionPicker
+            VStack(spacing: 12) {
+                contextRow
+                firstReturnRouteCard
+                sectionPicker
+                if selectedSection == .home {
                     stationBoard(containerSize: geometry.size)
+                        .frame(maxHeight: .infinity)
+                } else {
+                    ScrollView { stationBoard(containerSize: geometry.size) }
                 }
-                .padding(12)
-                .padding(.bottom, 12)
             }
+            .padding(12)
+            .padding(.bottom, 12)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Base")
@@ -199,11 +202,9 @@ struct BaseView: View {
     private func stationBoard(containerSize: CGSize) -> some View {
         Group {
             if selectedSection == .home,
-               let scene = StartingTownHomeResource.scene(),
-               let sceneHeight = StartingTownHomeRules.sceneHeight(containerSize: containerSize) {
+               let scene = StartingTownHomeResource.scene() {
                 StartingTownHomeScene(scene: scene,
                                       openedRoute: { store.openedFirstReturnDestination($0) })
-                    .frame(height: sceneHeight)
             } else if selectedSection != .home,
                       TownVisualResource.image(named: "town-empty-v1") != nil {
                 townDistrictBoard(containerSize: containerSize)
@@ -218,8 +219,7 @@ struct BaseView: View {
         let destinations = stations(in: selectedSection)
         let populatedPages = BaseBoardRules.townPages(destinations)
         let pages = populatedPages.isEmpty ? [[]] : populatedPages
-        let sceneHeight = StartingTownHomeRules.sceneHeight(containerSize: containerSize)
-            ?? min(440, max(320, containerSize.height * 0.58))
+        let sceneHeight = min(440, max(320, containerSize.height * 0.58))
 
         return TabView {
             ForEach(Array(pages.enumerated()), id: \.offset) { _, page in

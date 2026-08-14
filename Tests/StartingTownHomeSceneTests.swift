@@ -56,10 +56,48 @@ final class StartingTownHomeSceneTests: XCTestCase {
         }
     }
 
-    func testSceneFitsOrdinaryPhoneOrFallsBackToGrid() {
-        let ordinary = StartingTownHomeRules.sceneHeight(containerSize: CGSize(width: 368, height: 732))
-        XCTAssertEqual(ordinary ?? 0, CGFloat(344) * CGFloat(1402) / CGFloat(1122), accuracy: 0.01)
-        XCTAssertNil(StartingTownHomeRules.sceneHeight(containerSize: CGSize(width: 320, height: 420)))
+    func testAspectFillOwnsTheFullUsableViewportAndKeepsCoordinatesInImageSpace() {
+        let container = CGSize(width: 344, height: 500)
+        let rect = StartingTownHomeRules.renderedImageRect(
+            imageSize: CGSize(width: 1122, height: 1402), in: container)
+        XCTAssertEqual(rect.height, container.height, accuracy: 0.01)
+        XCTAssertGreaterThanOrEqual(rect.width, container.width)
+        XCTAssertEqual(rect.midX, container.width / 2, accuracy: 0.01)
+        XCTAssertEqual(rect.midY, container.height / 2, accuracy: 0.01)
+    }
+
+    func testOrdinaryPhoneHotspotsRemainMeaningfulAndFullyInsideTheViewport() throws {
+        let container = CGSize(width: 344, height: 500)
+        let imageRect = StartingTownHomeRules.renderedImageRect(
+            imageSize: CGSize(width: 1122, height: 1402), in: container)
+        let viewport = CGRect(origin: .zero, size: container)
+        for hotspot in try loadedScene().hotspots {
+            let authored = CGRect(
+                x: imageRect.minX + imageRect.width * hotspot.x,
+                y: imageRect.minY + imageRect.height * hotspot.y,
+                width: imageRect.width * hotspot.width,
+                height: imageRect.height * hotspot.height)
+            let hit = StartingTownHomeRules.hotspotRect(
+                hotspot, imageRect: imageRect, containerSize: container)
+            XCTAssertGreaterThanOrEqual(hit.width, 44, hotspot.label)
+            XCTAssertGreaterThanOrEqual(hit.height, 44, hotspot.label)
+            XCTAssertTrue(viewport.contains(hit), "\(hotspot.label) is clipped")
+            XCTAssertFalse(hit.intersection(authored).isNull, "\(hotspot.label) lost its landmark")
+        }
+    }
+
+    func testHomeSceneOwnsRemainingHeightOutsideTheScrollingDistrictGrid() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                                encoding: .utf8)
+        let bodyStart = try XCTUnwrap(source.range(of: "var body: some View"))
+        let purse = try XCTUnwrap(source.range(of: "// MARK: Purse", range: bodyStart.upperBound..<source.endIndex))
+        let body = String(source[bodyStart.lowerBound..<purse.lowerBound])
+        XCTAssertTrue(body.contains("if selectedSection == .home"))
+        XCTAssertTrue(body.contains("stationBoard(containerSize: geometry.size)\n                        .frame(maxHeight: .infinity)"))
+        XCTAssertTrue(body.contains("else {\n                    ScrollView { stationBoard(containerSize: geometry.size) }"))
+        XCTAssertFalse(body.contains("ScrollView {\n                VStack"))
     }
 
     func testMalformedMetadataFailsClosed() throws {
@@ -83,7 +121,8 @@ final class StartingTownHomeSceneTests: XCTestCase {
         let scene = String(source[start.lowerBound..<end.lowerBound])
 
         XCTAssertTrue(scene.contains(".allowsHitTesting(false)"))
-        XCTAssertTrue(scene.contains(".scaledToFit()"))
+        XCTAssertTrue(scene.contains(".scaledToFill()"))
+        XCTAssertTrue(scene.contains("StartingTownHomeRules.hotspotRect("))
         XCTAssertTrue(scene.contains("NavigationLink(value: route)"))
         XCTAssertTrue(scene.contains(".zIndex(1)"))
         XCTAssertTrue(scene.contains("openedRoute(route)"))

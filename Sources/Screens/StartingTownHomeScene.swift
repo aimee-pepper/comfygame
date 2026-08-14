@@ -53,10 +53,27 @@ enum StartingTownHomeRules {
         return decoded
     }
 
-    static func sceneHeight(containerSize: CGSize, horizontalPadding: CGFloat = 24) -> CGFloat? {
-        let width = max(0, containerSize.width - horizontalPadding)
-        let ideal = width * CGFloat(1402) / CGFloat(1122)
-        return max(0, containerSize.height - 190) >= ideal ? ideal : nil
+    static func renderedImageRect(imageSize: CGSize, in containerSize: CGSize) -> CGRect {
+        guard imageSize.width > 0, imageSize.height > 0,
+              containerSize.width > 0, containerSize.height > 0 else { return .zero }
+        let scale = max(containerSize.width / imageSize.width,
+                        containerSize.height / imageSize.height)
+        let size = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
+        return CGRect(x: (containerSize.width - size.width) / 2,
+                      y: (containerSize.height - size.height) / 2,
+                      width: size.width, height: size.height)
+    }
+
+    static func hotspotRect(_ hotspot: Hotspot, imageRect: CGRect,
+                            containerSize: CGSize) -> CGRect {
+        let width = min(containerSize.width, max(54, imageRect.width * hotspot.size.width))
+        let height = min(containerSize.height, max(44, imageRect.height * hotspot.size.height))
+        let proposed = CGPoint(x: imageRect.minX + imageRect.width * hotspot.point.x,
+                               y: imageRect.minY + imageRect.height * hotspot.point.y)
+        let center = CGPoint(x: min(containerSize.width - width / 2, max(width / 2, proposed.x)),
+                             y: min(containerSize.height - height / 2, max(height / 2, proposed.y)))
+        return CGRect(x: center.x - width / 2, y: center.y - height / 2,
+                      width: width, height: height)
     }
 }
 
@@ -89,16 +106,22 @@ struct StartingTownHomeScene: View {
 
     var body: some View {
         GeometryReader { geometry in
+            let imageRect = StartingTownHomeRules.renderedImageRect(
+                imageSize: CGSize(width: scene.definition.pixelWidth,
+                                  height: scene.definition.pixelHeight),
+                in: geometry.size)
             ZStack {
                 Image(uiImage: scene.image)
                     .resizable()
                     .interpolation(.none)
-                    .scaledToFit()
+                    .scaledToFill()
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .allowsHitTesting(false)
 
                 ForEach(scene.definition.hotspots) { hotspot in
                     if let route = hotspot.appRoute {
+                        let hitRect = StartingTownHomeRules.hotspotRect(
+                            hotspot, imageRect: imageRect, containerSize: geometry.size)
                         NavigationLink(value: route) {
                             ZStack {
                                 Color.clear
@@ -110,13 +133,12 @@ struct StartingTownHomeScene: View {
                         .accessibilityIdentifier("base-town-\(route.rawValue)")
                         .simultaneousGesture(TapGesture().onEnded { openedRoute(route) })
                         .zIndex(1)
-                        .frame(width: max(54, geometry.size.width * hotspot.size.width),
-                               height: max(44, geometry.size.height * hotspot.size.height))
-                        .position(x: geometry.size.width * hotspot.point.x,
-                                  y: geometry.size.height * hotspot.point.y)
+                        .frame(width: hitRect.width, height: hitRect.height)
+                        .position(x: hitRect.midX, y: hitRect.midY)
                     }
                 }
             }
+            .clipped()
         }
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18))
