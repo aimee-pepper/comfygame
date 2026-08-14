@@ -1,8 +1,8 @@
 # Full-cast voice authority — current
 
 **Status:** personality and voice matrix settled; all five campaign-order meeting batches are
-production-authorized; diary voice batches Vance–Sela and Bryn–Lys are source-complete; remaining
-diary revision stays behind playability implementation
+production-authorized; diary voice batches Vance–Sela, Bryn–Lys and Bracken–Marrick are
+source-complete; final diary revision stays behind playability implementation
 **Date:** 14 August 2026
 **Roadmap position:** Band 6.8; this authority must not pre-empt opening playability work
 
@@ -171,6 +171,16 @@ clues remain unchanged.
 
 As with the opening batch, this is prose-only. Stable page identity and every mechanical field are
 unchanged, and the previous copy remains in version history.
+
+## Mid-campaign diary batch disposition — Bracken through Marrick
+
+Nineteen reflective pages now distinguish six more voices: Bracken gives sturdy fitting advice;
+Fen is laconic and trajectory-minded; Wren writes fast tactical fragments; Kestrel separates field
+evidence from assumptions; Maud challenges grip, leverage and repeatability; Marrick records explicit
+formation procedures and revisions. Their 31 location clues remain unchanged.
+
+The batch changes prose only. Stable page identity and all teaching, relationship and condition
+metadata remain unchanged.
 
 ## Promotion gate
 
