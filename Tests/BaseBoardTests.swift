@@ -69,8 +69,20 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertEqual(known.count { $0.id == "trading_post" }, 1)
         XCTAssertTrue(known.contains { $0.id == "writing_desk" })
         XCTAssertFalse(known.contains { $0.id == "blacksmith" })
-        XCTAssertEqual(BaseBoardRules.availableSections(for: known), [.home, .make])
+        XCTAssertEqual(BaseBoardRules.availableSections(for: known), StationHomeSection.allCases,
+                       "Unknown districts stay navigable even before they contain a known place")
         XCTAssertEqual(BaseBoardRules.stations(in: .make, from: known).map(\.id), ["trading_post"])
+    }
+
+    func testFreshBaseKeepsEveryDistrictVisibleAndNamesEmptyDistrictsTruthfully() throws {
+        XCTAssertEqual(BaseBoardRules.availableSections(for: []), StationHomeSection.allCases)
+
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("No known destinations"))
+        XCTAssertTrue(source.contains("No places are known in \\(selectedSection.title) yet."))
     }
 
     func testBoardUsesThreeColumnsNormallyAndTwoForAccessibilityText() {

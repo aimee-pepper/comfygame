@@ -10,10 +10,10 @@ enum BaseBoardRules {
         stations.filter { unlocked.contains($0.id) || foundations.contains($0.id) }
     }
 
-    static func availableSections(for stations: [StationDef]) -> [StationHomeSection] {
-        StationHomeSection.allCases.filter { section in
-            section == .home || stations.contains { $0.resolvedBoardPlacement.section == section }
-        }
+    static func availableSections(for _: [StationDef]) -> [StationHomeSection] {
+        // District navigation is permanent. A fresh save may know no destination in Make, Study,
+        // or Realms yet, but hiding those tabs makes the town itself appear to be missing.
+        StationHomeSection.allCases
     }
 
     static func stations(in section: StationHomeSection, from stations: [StationDef]) -> [StationDef] {
@@ -165,8 +165,25 @@ struct BaseView: View {
     }
 
     private var legacyStationGrid: some View {
-        LazyVGrid(columns: stationColumns, spacing: 12) {
-            ForEach(stations(in: selectedSection)) { station in stationDestination(station) }
+        let destinations = stations(in: selectedSection)
+        return Group {
+            if destinations.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    Label("No known destinations", systemImage: "signpost.right")
+                        .font(.headline)
+                    Text("No places are known in \(selectedSection.title) yet.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .background(Color(.secondarySystemGroupedBackground),
+                            in: RoundedRectangle(cornerRadius: 14))
+            } else {
+                LazyVGrid(columns: stationColumns, spacing: 12) {
+                    ForEach(destinations) { station in stationDestination(station) }
+                }
+            }
         }
     }
 
