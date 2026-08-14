@@ -168,7 +168,25 @@ final class ContentTests: XCTestCase {
     }
     func testEveryPlaceholderCatalogueHasFieldDispositionMetadata() throws {
         try ContentCatalog.validateBundledAuthorityMetadata()
-        XCTAssertEqual(ContentCatalog.provisionalAuthorityFileNames.count, 17)
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let dataDirectory = projectRoot.appending(path: "Sources/Content/Data")
+        let authorityFiles = try FileManager.default.contentsOfDirectory(
+            at: dataDirectory,
+            includingPropertiesForKeys: nil
+        ).filter { file in
+            guard file.pathExtension == "json",
+                  let object = try? JSONSerialization.jsonObject(with: Data(contentsOf: file)),
+                  let dictionary = object as? [String: Any] else { return false }
+            return dictionary["_authority"] != nil
+        }.map { $0.deletingPathExtension().lastPathComponent }
+
+        XCTAssertEqual(Set(ContentCatalog.provisionalAuthorityFileNames), Set(authorityFiles),
+                       "Every catalogue declaring _authority must enter metadata validation")
+        XCTAssertEqual(Set(ContentCatalog.provisionalAuthorityFileNames).count,
+                       ContentCatalog.provisionalAuthorityFileNames.count,
+                       "Authority-validation filenames must remain unique")
 
         let metadata = ContentCatalog.AuthorityMetadata(
             schemaVersion: 1,
