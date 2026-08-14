@@ -7,6 +7,28 @@ enum RootNavigationRules {
     }
 }
 
+enum RunExitRecapPresentation {
+    static func resources(in lines: [RunExitSummary.ReceiptLine]) -> [RunExitSummary.ReceiptLine] {
+        lines.filter {
+            switch $0 {
+            case .resource, .materialSample: true
+            case .legacy(let line): line.stableID.contains("resource-")
+            case .stackableItem, .uniqueItem: false
+            }
+        }
+    }
+
+    static func items(in lines: [RunExitSummary.ReceiptLine]) -> [RunExitSummary.ReceiptLine] {
+        lines.filter {
+            switch $0 {
+            case .stackableItem, .uniqueItem: true
+            case .legacy(let line): !line.stableID.contains("resource-")
+            case .resource, .materialSample: false
+            }
+        }
+    }
+}
+
 /// Top-level routing.
 ///
 /// Being inside a world is a *state*, not a navigation destination: if a run is active, that's the
@@ -187,6 +209,7 @@ private struct AnchorSettlementView: View {
 private struct RunExitSummaryView: View {
     @EnvironmentObject private var store: GameStore
     @State private var tutorialHidden = false
+    @State private var selectedReceipt: RunExitSummary.ReceiptLine?
     let summary: RunExitSummary
     let dismiss: () -> Void
 
@@ -212,8 +235,10 @@ private struct RunExitSummaryView: View {
                     .foregroundStyle(.secondary)
 
                     sectionHeading("Recovered")
-                    recapSection("Resources", gains: summary.resources)
-                    recapSection("Items", gains: summary.items)
+                    receiptSection("Resources", lines: RunExitRecapPresentation.resources(
+                        in: summary.recoveredLines))
+                    receiptSection("Items", lines: RunExitRecapPresentation.items(
+                        in: summary.recoveredLines))
 
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Essence runway").font(.headline)
@@ -239,8 +264,10 @@ private struct RunExitSummaryView: View {
                                 in: RoundedRectangle(cornerRadius: 14))
 
                     sectionHeading("Lost")
-                    recapSection("Resources", gains: summary.lostResources)
-                    recapSection("Items", gains: summary.lostItems)
+                    receiptSection("Resources", lines: RunExitRecapPresentation.resources(
+                        in: summary.lostLines))
+                    receiptSection("Items", lines: RunExitRecapPresentation.items(
+                        in: summary.lostLines))
 
                     sectionHeading("Kept for good")
                     writingSection
@@ -335,18 +362,17 @@ private struct RunExitSummaryView: View {
         }
     }
 
-    private func recapSection(_ title: String, gains: [RunExitGain]) -> some View {
+    private func receiptSection(_ title: String, lines: [RunExitSummary.ReceiptLine]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title).font(.headline)
-            if gains.isEmpty {
+            if lines.isEmpty {
                 Text("No \(title.lowercased()) this trip.").foregroundStyle(.secondary)
             } else {
-                ForEach(gains) { gain in
-                    HStack {
-                        Image(systemName: gain.icon).foregroundStyle(.tint).frame(width: 22)
-                        Text(gain.name)
-                        Spacer()
-                        Text("+\(gain.count)").monospacedDigit()
+                SixAcrossItemGrid(data: lines, id: \.id) { line in
+                    AnchoredItemDetailButton(item: line, selection: $selectedReceipt) {
+                        receiptTile(line)
+                    } detail: { selected in
+                        receiptDetail(selected)
                     }
                 }
             }
@@ -354,6 +380,53 @@ private struct RunExitSummaryView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    @ViewBuilder
+    private func receiptTile(_ line: RunExitSummary.ReceiptLine) -> some View {
+        switch line {
+        case .resource(let resource):
+            ResourceIconTile(resourceID: resource.id, icon: resource.fallbackIcon,
+                             quantity: resource.quantity,
+                             accessibilityName: resource.fallbackName)
+        case .stackableItem(let item), .uniqueItem(let item):
+            ItemIconTile(icon: item.fallbackIcon, catalogueID: item.snapshot.catalogID,
+                         rarity: ContentCatalog.shared.item(item.snapshot.catalogID)?.rarity ?? .common,
+                         quantity: item.quantity, identified: item.snapshot.identified,
+                         location: .carried, accessibilityName: item.fallbackName)
+        case .materialSample(let material):
+            ItemIconTile(icon: material.fallbackIcon, catalogueID: material.catalogID,
+                         rarity: ContentCatalog.shared.item(material.catalogID)?.rarity ?? .common,
+                         quantity: 1, identified: material.identified,
+                         location: .carried, accessibilityName: material.fallbackName)
+        case .legacy(let legacy):
+            LegacyReceiptIconTile(icon: legacy.fallbackIcon, quantity: legacy.quantity,
+                                  accessibilityName: legacy.fallbackName)
+        }
+    }
+
+    private func receiptDetail(_ line: RunExitSummary.ReceiptLine) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(line.compatibilityGain.name).font(.headline)
+            switch line {
+            case .resource(let resource):
+                LabeledContent("Quantity", value: "\(resource.quantity)")
+                LabeledContent("Resource", value: resource.id.rawValue)
+            case .stackableItem(let item), .uniqueItem(let item):
+                LabeledContent("Quantity", value: "\(item.quantity)")
+                LabeledContent("Identity", value: item.snapshot.catalogID.rawValue)
+                LabeledContent("State", value: item.snapshot.identified ? "Identified" : "Unidentified")
+            case .materialSample(let material):
+                LabeledContent("Kind", value: material.sample.kind.displayName)
+                LabeledContent("Grade", value: "\(material.sample.grade)")
+                LabeledContent("Source", value: material.sample.source)
+            case .legacy(let legacy):
+                LabeledContent("Quantity", value: "\(legacy.quantity)")
+                Text("Legacy receipt · visual identity unavailable")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+        }
+        .padding(16)
     }
 
     private var writingSection: some View {
@@ -414,6 +487,37 @@ private struct RunExitSummaryView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private struct LegacyReceiptIconTile: View {
+    let icon: String
+    let quantity: Int
+    let accessibilityName: String
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 9)
+                .fill(Color(.secondarySystemGroupedBackground))
+            RoundedRectangle(cornerRadius: 9)
+                .strokeBorder(Color.secondary.opacity(0.65), lineWidth: 1.5)
+            Image(systemName: icon).font(.title3).foregroundStyle(.secondary)
+            if quantity > 1 {
+                Text("\(quantity)")
+                    .font(.system(size: 10, weight: .bold, design: .rounded).monospacedDigit())
+                    .padding(.horizontal, 4).padding(.vertical, 1)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .padding(4)
+            }
+        }
+        .aspectRatio(1, contentMode: .fit)
+        .frame(minWidth: ItemGridMetrics.minimumCellSide,
+               minHeight: ItemGridMetrics.minimumCellSide)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityName)
+        .accessibilityValue("Quantity \(quantity)")
     }
 }
 

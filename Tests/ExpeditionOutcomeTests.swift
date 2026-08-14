@@ -71,8 +71,8 @@ final class ExpeditionOutcomeTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
                                 encoding: .utf8)
-        XCTAssertTrue(source.contains("recapSection(\"Resources\", gains: summary.resources)"))
-        XCTAssertTrue(source.contains("recapSection(\"Items\", gains: summary.items)"))
+        XCTAssertTrue(source.contains("receiptSection(\"Resources\", lines: RunExitRecapPresentation.resources("))
+        XCTAssertTrue(source.contains("receiptSection(\"Items\", lines: RunExitRecapPresentation.items("))
         XCTAssertTrue(source.contains("No \\(title.lowercased()) this trip."))
         XCTAssertFalse(source.contains("recapSection(\"Loot\""))
     }
@@ -331,6 +331,48 @@ final class ExpeditionOutcomeTests: XCTestCase {
             RunExitSummary.self, from: JSONSerialization.data(withJSONObject: object))
         XCTAssertEqual(restored.resources, summary.resources,
                        "typed frozen lines must override stale or tampered compatibility rows")
+    }
+
+    func testRunExitRecapSeparatesTypedResourcesAndItemsWithoutFlatteningIdentity() {
+        let lines: [RunExitSummary.ReceiptLine] = [
+            .resource(.init(lineID: "ore", id: Resources.ore, quantity: 3,
+                            fallbackName: "Ore", fallbackIcon: "cube")),
+            .materialSample(.init(lineID: "hide", sourceStackID: nil,
+                                  catalogID: Items.material,
+                                  sample: .init(kind: .hide, properties: .init(),
+                                                grade: 42, source: "browser"),
+                                  identified: true, fallbackName: "Hide",
+                                  fallbackIcon: "shippingbox")),
+            .stackableItem(.init(lineID: "tonic", instanceID: .init(rawValue: 71),
+                                 snapshot: .init(id: .init(rawValue: 71),
+                                                 catalogID: Items.essenceCrystal, count: 2),
+                                 quantity: 2, fallbackName: "Tonic", fallbackIcon: "flask")),
+            .legacy(.init(stableID: "legacy-resource-ore", fallbackName: "Old ore",
+                          fallbackIcon: "cube", quantity: 1)),
+            .legacy(.init(stableID: "legacy-item-tonic", fallbackName: "Old tonic",
+                          fallbackIcon: "flask", quantity: 1)),
+        ]
+
+        XCTAssertEqual(RunExitRecapPresentation.resources(in: lines).map(\.id),
+                       [lines[0].id, lines[1].id, lines[3].id])
+        XCTAssertEqual(RunExitRecapPresentation.items(in: lines).map(\.id),
+                       [lines[2].id, lines[4].id])
+    }
+
+    func testRunExitRecapSourceUsesTypedSixAcrossTilesAndAnchoredLegacyFallback() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("in: summary.recoveredLines"))
+        XCTAssertTrue(source.contains("in: summary.lostLines"))
+        XCTAssertTrue(source.contains("SixAcrossItemGrid(data: lines"))
+        XCTAssertTrue(source.contains("AnchoredItemDetailButton(item: line"))
+        XCTAssertTrue(source.contains("ResourceIconTile(resourceID:"))
+        XCTAssertTrue(source.contains("ItemIconTile(icon:"))
+        XCTAssertTrue(source.contains("LegacyReceiptIconTile(icon:"))
+        XCTAssertFalse(source.contains("recapSection(\"Resources\", gains: summary.resources)"))
+        XCTAssertFalse(source.contains("recapSection(\"Items\", gains: summary.items)"))
     }
 
     func testMaterialReceiptFreezesEverySampleAsItsOwnStableLine() throws {
