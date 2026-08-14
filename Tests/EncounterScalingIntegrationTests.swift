@@ -3,6 +3,46 @@ import XCTest
 
 @MainActor
 final class EncounterScalingIntegrationTests: XCTestCase {
+    func testFreshBinderAndQuillNormalVersusTeemingDiagnosticDistribution() throws {
+        let roots: [UInt64] = [101, 202, 303, 404, 505, 606, 707, 808, 909, 1_010, 1_111, 1_212]
+        let normal = try roots.prefix(6).map { try openingSample(rootSeed: $0, teeming: false) }
+        let teeming = try roots.prefix(6).map { try openingSample(rootSeed: $0, teeming: true) }
+        let normalAdjacent = try roots.prefix(3).map {
+            try adjacentGroupingSample(rootSeed: $0, teeming: false)
+        }
+        let teemingAdjacent = try roots.prefix(3).map {
+            try adjacentGroupingSample(rootSeed: $0, teeming: true)
+        }
+
+        for sample in normal + teeming {
+            XCTAssertEqual(sample.partyCount, 2)
+            XCTAssertEqual(sample.partyBudget, 1.5, accuracy: 0.000_001)
+            XCTAssertEqual(sample.anchorLevel, 1)
+            XCTAssertEqual(sample.scalingRulesVersion,
+                           EncounterScalingRules.additivePartyPowerRulesVersion)
+            XCTAssertFalse(sample.species.isEmpty)
+            XCTAssertGreaterThan(sample.groupSize, 0)
+            XCTAssertLessThanOrEqual(sample.groupSize, Tuning.Encounter.maxFoes)
+            XCTAssertGreaterThan(sample.worldLevel, 0)
+            XCTAssertGreaterThan(sample.startingAggregateHP, 0)
+            XCTAssertEqual(sample.startingAggregateHP, 54)
+            XCTAssertGreaterThanOrEqual(sample.aggregateHPSpent, 0)
+            XCTAssertLessThanOrEqual(sample.aggregateHPSpent, sample.startingAggregateHP)
+            XCTAssertGreaterThan(sample.rounds, 0)
+            XCTAssertLessThanOrEqual(sample.rounds, 30)
+            XCTAssertNotNil(sample.outcome)
+        }
+        XCTAssertGreaterThan(teeming.map(\.generatedPopulation).reduce(0, +),
+                             normal.map(\.generatedPopulation).reduce(0, +),
+                             "Teeming's density attribution must remain visible before grouping")
+        XCTAssertTrue((normalAdjacent + teemingAdjacent).allSatisfy { $0.groupSize == 2 })
+
+        printDistribution("Normal", normal)
+        printDistribution("Teeming", teeming)
+        print("SCALING adjacent Normal \(normalAdjacent)")
+        print("SCALING adjacent Teeming \(teemingAdjacent)")
+    }
+
     func testGroupingRadiusMatchesEverySupportedPartyCount() throws {
         let store = GameStore(io: .temporary(name: "scaling-radius-\(UUID().uuidString)"))
         store.write("plains")
@@ -194,5 +234,183 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         FoeState(id: InstanceID(rawValue: id),
                  stats: CombatStats(displayName: "Foe \(id)", icon: "pawprint",
                                     maxHP: hp, attack: 4), currentHP: hp)
+    }
+
+    private struct OpeningSample {
+        var rootSeed: UInt64
+        var mapSeed: UInt64
+        var generatedPopulation: Int
+        var groupSize: Int
+        var worldLevel: Int
+        var stabilityContribution: Double
+        var greedContribution: Double
+        var partyCount: Int
+        var partyBudget: Double
+        var anchorLevel: Int
+        var scalingRulesVersion: String
+        var species: [String]
+        var foeStats: [String]
+        var rounds: Int
+        var startingAggregateHP: Int
+        var aggregateHPSpent: Int
+        var outcome: EncounterOutcome?
+    }
+
+    private func openingSample(rootSeed: UInt64, teeming: Bool) throws -> OpeningSample {
+        let label = teeming ? "teeming" : "normal"
+        let store = GameStore(io: .temporary(
+            name: "scaling-sample-\(label)-\(rootSeed)-\(UUID().uuidString)"))
+        store.mutate("freeze diagnostic root seed") { state in
+            state.worlds.seeds = SeedSequence(rootSeed: rootSeed)
+            state.base.binderCharacter = CharacterState(rank: .front)
+            state.base.binderEquipped = [:]
+            var quill = CompanionState()
+            quill.maxHP = Tuning.Encounter.companionMaxHP
+            quill.character = CharacterState(rank: .front)
+            quill.gambits = GambitStarter.rules
+            quill.equipped = [:]
+            state.base.roster = [quill]
+            state.base.activeParty = [0]
+        }
+        XCTAssertTrue(store.write("plains"))
+        if teeming { XCTAssertTrue(store.write("teeming_life")) }
+        XCTAssertTrue(store.bindAndDepart())
+
+        store.mutate("stage disclosed opening contact") { state in
+            guard var run = state.worlds.activeRun, !run.enemies.isEmpty else { return }
+            run.tuning = .defaults
+            run.binderHP = Tuning.Encounter.binderMaxHP
+            run.companionHP = [0: Tuning.Encounter.companionMaxHP]
+            run.healthCaps = [
+                RunHealthCapEntry(member: .binder,
+                                  ordinaryMaximum: Tuning.Encounter.binderMaxHP, components: []),
+                RunHealthCapEntry(member: .member(0),
+                                  ordinaryMaximum: Tuning.Encounter.companionMaxHP, components: [])
+            ]
+            run.rng = SeededRNG(seed: run.mapSeed).derived(0xA11CE)
+            for point in run.map.allPoints { run.map[point].isRevealed = true }
+            for index in run.enemies.indices { run.enemies[index].isAwake = true }
+            let trigger = run.enemies.min {
+                let lhs = abs($0.position.x - run.playerPosition.x)
+                    + abs($0.position.y - run.playerPosition.y)
+                let rhs = abs($1.position.x - run.playerPosition.x)
+                    + abs($1.position.y - run.playerPosition.y)
+                return lhs == rhs ? $0.id.rawValue < $1.id.rawValue : lhs < rhs
+            }!
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: trigger, runsAutomaticTurns: false, in: &state)
+            CombatRules.runAutomaticTurns(in: &state)
+        }
+
+        let openingRun = try XCTUnwrap(store.activeRun,
+                                       "seed \(rootSeed) generated no usable opening run")
+        let opening = try XCTUnwrap(openingRun.activeEncounter,
+                                    "seed \(rootSeed) generated no ordinary encounter")
+        XCTAssertFalse(opening.foes.contains(where: \.isApex),
+                       "opening diagnostic excludes optional apex contact")
+        let preview = try XCTUnwrap(opening.scalingPreview)
+        let startingHP = try XCTUnwrap(openingRun.healthCaps).map(\.maximum).reduce(0, +)
+        let species = opening.foes.map(\.identityKey).sorted()
+        let stats = opening.foes.sorted { $0.id.rawValue < $1.id.rawValue }.map {
+            "\($0.identityKey):L\($0.level):HP\($0.stats.maxHP):ATK\($0.stats.attack):ARM\($0.stats.armour):\($0.stats.damageKind.rawValue):\($0.stats.delivery.rawValue)"
+        }
+
+        var actions = 0
+        while store.activeEncounter?.outcome == nil, actions < 30 {
+            guard let action = store.defaultCombatAction() else { break }
+            store.takeCombatAction(action)
+            actions += 1
+        }
+        let finished = try XCTUnwrap(store.activeEncounter)
+        let endingRun = try XCTUnwrap(store.activeRun)
+        let endingHP = endingRun.binderHP + endingRun.companionHP.values.reduce(0, +)
+        return OpeningSample(
+            rootSeed: rootSeed, mapSeed: openingRun.mapSeed,
+            generatedPopulation: openingRun.enemies.count,
+            groupSize: opening.foes.count, worldLevel: try XCTUnwrap(preview.worldLevel),
+            stabilityContribution: preview.stabilityLevelContribution,
+            greedContribution: preview.greedLevelContribution,
+            partyCount: preview.partyCount,
+            partyBudget: try XCTUnwrap(preview.cappedPartyPowerBudget),
+            anchorLevel: try XCTUnwrap(preview.anchorLevel),
+            scalingRulesVersion: try XCTUnwrap(preview.scalingRulesVersion),
+            species: species, foeStats: stats, rounds: finished.roundNumber,
+            startingAggregateHP: startingHP,
+            aggregateHPSpent: max(0, startingHP - endingHP), outcome: finished.outcome)
+    }
+
+    private func printDistribution(_ label: String, _ samples: [OpeningSample]) {
+        let rounds = samples.map(\.rounds).sorted()
+        let spent = samples.map(\.aggregateHPSpent).sorted()
+        let groups = samples.map(\.groupSize).sorted()
+        let populations = samples.map(\.generatedPopulation).sorted()
+        print("SCALING \(label) rounds=\(rounds) hpSpent=\(spent) groups=\(groups) populations=\(populations)")
+        for sample in samples {
+            print("SCALING \(label) root=\(sample.rootSeed) map=\(sample.mapSeed) population=\(sample.generatedPopulation) group=\(sample.groupSize) worldLevel=\(sample.worldLevel) stability=\(sample.stabilityContribution) greed=\(sample.greedContribution) rounds=\(sample.rounds) hp=\(sample.aggregateHPSpent)/\(sample.startingAggregateHP) outcome=\(String(describing: sample.outcome)) species=\(sample.species.joined(separator: "|")) stats=\(sample.foeStats.joined(separator: "|"))")
+        }
+    }
+
+    private struct AdjacentGroupingSample: CustomStringConvertible {
+        var rootSeed: UInt64
+        var generatedPopulation: Int
+        var groupSize: Int
+        var inclusionReasons: [String: String]
+        var description: String {
+            "root=\(rootSeed):population=\(generatedPopulation):group=\(groupSize):reasons=\(inclusionReasons)"
+        }
+    }
+
+    private func adjacentGroupingSample(rootSeed: UInt64, teeming: Bool) throws
+        -> AdjacentGroupingSample {
+        let label = teeming ? "teeming" : "normal"
+        let store = GameStore(io: .temporary(
+            name: "scaling-adjacent-\(label)-\(rootSeed)-\(UUID().uuidString)"))
+        store.mutate("freeze adjacent diagnostic") { state in
+            state.worlds.seeds = SeedSequence(rootSeed: rootSeed)
+            state.base.binderCharacter = CharacterState(rank: .front)
+            state.base.binderEquipped = [:]
+            var quill = CompanionState()
+            quill.character = CharacterState(rank: .front)
+            quill.gambits = GambitStarter.rules
+            state.base.roster = [quill]
+            state.base.activeParty = [0]
+        }
+        XCTAssertTrue(store.write("plains"))
+        if teeming { XCTAssertTrue(store.write("teeming_life")) }
+        XCTAssertTrue(store.bindAndDepart())
+        let generatedPopulation = try XCTUnwrap(store.activeRun).enemies.count
+        XCTAssertGreaterThanOrEqual(generatedPopulation, 2,
+                                    "counterfactual needs two generated bodies, never fabricated foes")
+
+        store.mutate("stage two disclosed adjacent generated bodies") { state in
+            guard var run = state.worlds.activeRun, run.enemies.count >= 2 else { return }
+            run.tuning = .defaults
+            for point in run.map.allPoints { run.map[point].isRevealed = true }
+            let triggerIndex = run.enemies.indices.min {
+                let lhs = abs(run.enemies[$0].position.x - run.playerPosition.x)
+                    + abs(run.enemies[$0].position.y - run.playerPosition.y)
+                let rhs = abs(run.enemies[$1].position.x - run.playerPosition.x)
+                    + abs(run.enemies[$1].position.y - run.playerPosition.y)
+                return lhs == rhs
+                    ? run.enemies[$0].id.rawValue < run.enemies[$1].id.rawValue : lhs < rhs
+            }!
+            let secondIndex = run.enemies.indices.first { $0 != triggerIndex }!
+            let occupied = Set(run.enemies.indices.filter { $0 != secondIndex }
+                .map { run.enemies[$0].position })
+            let adjacent = run.map.neighbours(of: run.enemies[triggerIndex].position)
+                .first { run.map[$0].isPassable && !occupied.contains($0) }!
+            for index in run.enemies.indices { run.enemies[index].isAwake = false }
+            run.enemies[triggerIndex].isAwake = true
+            run.enemies[secondIndex].isAwake = true
+            run.enemies[secondIndex].position = adjacent
+            let trigger = run.enemies[triggerIndex]
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: trigger, runsAutomaticTurns: false, in: &state)
+        }
+        let preview = try XCTUnwrap(store.activeEncounter?.scalingPreview)
+        return AdjacentGroupingSample(rootSeed: rootSeed,
+                                      generatedPopulation: generatedPopulation,
+                                      groupSize: try XCTUnwrap(preview.realFoeCount),
+                                      inclusionReasons: preview.inclusionReasons)
     }
 }
