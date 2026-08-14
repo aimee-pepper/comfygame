@@ -104,6 +104,73 @@ final class LifeTests: XCTestCase {
         XCTAssertNotEqual(first.map(\.traits), LifeRules.cast(for: readings, seed: 99).map(\.traits))
     }
 
+    func testBodyPlanAndAppendagesAreIndependentIdentityAxes() {
+        var fennec = CreatureTraits()
+        fennec.bodyPlan = .quadruped
+        fennec.cranialFeature = .longEars
+        fennec.appendages = Appendages(count: 4, type: .limbed)
+
+        var wingedSerpent = CreatureTraits()
+        wingedSerpent.bodyPlan = .serpentine
+        wingedSerpent.cranialFeature = .crest
+        wingedSerpent.appendages = Appendages(count: 2, type: .membrane)
+
+        XCTAssertEqual(fennec.bodyPlan, .quadruped)
+        XCTAssertEqual(fennec.cranialFeature, .longEars)
+        XCTAssertEqual(wingedSerpent.bodyPlan, .serpentine)
+        XCTAssertEqual(wingedSerpent.appendages.type, .membrane,
+                       "wings must not replace the serpent's axial body identity")
+        XCTAssertNotEqual(fennec, wingedSerpent)
+        XCTAssertNotEqual(CreaturePixelSilhouette.cells(for: fennec),
+                          CreaturePixelSilhouette.cells(for: wingedSerpent))
+        XCTAssertTrue(CreaturePixelSilhouette.cells(for: fennec).contains {
+            $0.layer == .accent && $0.height >= 4
+        }, "the fennec-like fixture lost its long-ear silhouette")
+        XCTAssertTrue(CreaturePixelSilhouette.cells(for: wingedSerpent).contains {
+            $0.layer == .accent && $0.width >= 5
+        }, "the winged-serpent fixture lost its wing silhouette")
+    }
+
+    func testLiveSamplingCanReachFennecAndWingedSerpentMorphologyFamilies() {
+        var foundFennec = false
+        var foundWingedSerpent = false
+
+        for seed in UInt64(1)...20_000 where !foundFennec || !foundWingedSerpent {
+            var rng = SeededRNG(seed: seed)
+            let traits = LifeRules.sampleSpecies(in: WorldTendencies(readings: world([:], seed: seed)),
+                                                 rng: &rng)
+            foundFennec = foundFennec || (traits.bodyPlan == .quadruped
+                && traits.cranialFeature == .longEars && traits.appendages.type == .limbed)
+            foundWingedSerpent = foundWingedSerpent || (traits.bodyPlan == .serpentine
+                && [.membrane, .feathered].contains(traits.appendages.type))
+        }
+
+        XCTAssertTrue(foundFennec, "the live sampler never reached a long-eared quadruped family")
+        XCTAssertTrue(foundWingedSerpent, "the live sampler never reached a winged serpentine family")
+    }
+
+    func testMorphologyDoesNotAdvanceOrRewriteTheLegacyGameplayGeneration() {
+        let tendencies = WorldTendencies(readings: world([:], seed: 7_141))
+        var baselineRNG = SeededRNG(seed: 93_771)
+        var currentRNG = SeededRNG(seed: 93_771)
+
+        let baseline = LifeRules.sampleGameplayTraits(in: tendencies, rng: &baselineRNG)
+        let generated = LifeRules.sampleSpecies(in: tendencies, rng: &currentRNG)
+
+        var generatedWithoutMorphology = generated
+        generatedWithoutMorphology.bodyPlan = .quadruped
+        generatedWithoutMorphology.cranialFeature = .none
+        XCTAssertEqual(generatedWithoutMorphology, baseline,
+                       "visual morphology changed a pre-existing gameplay trait")
+        XCTAssertEqual(currentRNG.next(), baselineRNG.next(),
+                       "visual morphology advanced the Worldgen RNG stream")
+
+        var reapplied = baseline
+        LifeRules.applyVisualMorphology(to: &reapplied)
+        XCTAssertEqual(reapplied.bodyPlan, generated.bodyPlan)
+        XCTAssertEqual(reapplied.cranialFeature, generated.cranialFeature)
+    }
+
     /// **Jitter must never change identity, combat behaviour, or which materials drop** (spec §5).
     func testAnIndividualVariesFromItsSpeciesButNotInAnythingThatMatters() {
         let species = LifeRules.cast(for: world(["bloom": "vitality"]), seed: 4242)[0]

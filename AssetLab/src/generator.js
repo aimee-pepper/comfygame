@@ -81,6 +81,8 @@ export const traitDefinitions = [
 ];
 
 export const presets = Object.freeze({
+  "Dune long-ear": { topology:"quadruped",size:24,build:24,boneDensity:18,ornament:20,coveringHardness:8,coveringLength:44,coveringCoverage:58,appendageCount:4,appendageType:"limbed",pierce:28,crush:2,rend:8,reach:"close",delivery:"single",cyan:18,magenta:25,yellow:57,colorDepth:42,patterning:12,opacity:92,shine:6,schiller:2,vision:42,mechano:18,chemo:12,thermo:28,emanationStrength:0,emanationKind:"light",defence:"speed",toxic:false },
+  "Membrane sky serpent": { topology:"serpentine",size:46,build:16,boneDensity:14,ornament:38,coveringHardness:18,coveringLength:6,coveringCoverage:64,appendageCount:2,appendageType:"membrane",pierce:62,crush:2,rend:24,reach:"mid",delivery:"single",cyan:52,magenta:30,yellow:18,colorDepth:54,patterning:48,opacity:82,shine:12,schiller:6,vision:55,mechano:18,chemo:18,thermo:9,emanationStrength:0,emanationKind:"light",defence:"speed",toxic:false },
   "Cold plated grazer": { topology:"quadruped",size:78,build:72,boneDensity:76,ornament:8,coveringHardness:88,coveringLength:62,coveringCoverage:92,appendageCount:4,appendageType:"limbed",pierce:12,crush:48,rend:4,reach:"close",delivery:"single",cyan:48,magenta:24,yellow:28,colorDepth:55,patterning:18,opacity:96,shine:12,schiller:2,vision:42,mechano:24,chemo:22,thermo:12,emanationStrength:0,emanationKind:"heat",defence:"armour",toxic:false },
   "Lightless cave serpent": { topology:"serpentine",size:64,build:18,boneDensity:30,ornament:5,coveringHardness:20,coveringLength:8,coveringCoverage:42,appendageCount:0,appendageType:"none",pierce:72,crush:5,rend:38,reach:"mid",delivery:"single",cyan:42,magenta:30,yellow:28,colorDepth:14,patterning:44,opacity:72,shine:32,schiller:10,vision:4,mechano:56,chemo:30,thermo:10,emanationStrength:24,emanationKind:"light",defence:"crypsis",toxic:true },
   "Sun-glass flier": { topology:"winged",size:38,build:30,boneDensity:16,ornament:86,coveringHardness:28,coveringLength:74,coveringCoverage:82,appendageCount:4,appendageType:"feathered",pierce:44,crush:2,rend:20,reach:"mid",delivery:"multi",cyan:18,magenta:48,yellow:72,colorDepth:82,patterning:66,opacity:76,shine:52,schiller:78,vision:82,mechano:8,chemo:6,thermo:4,emanationStrength:42,emanationKind:"light",defence:"speed",toxic:false },
@@ -259,6 +261,7 @@ function decorateWorld(c, d, p, random) {
   if (t.coveringLength > 60) for (let x = 4; x <= 12; x += 2) c.push(rect(x, 4 + Math.round(random()), 1, 2, p.light));
   if (t.boneDensity > 58) c.push(rect(6, 9, 5, 1, p.light));
   if (t.ornament > 45) c.push(...pixelLine(7,5,6,2,1,p.accent),...pixelLine(9,5,10,2,1,p.accent));
+  if (longEarProfile(t)) c.push(rect(10,2,1,4,p.accent),rect(12,1,1,5,p.accent));
   addWorldAppendageType(c,t,p);
   addPattern(c, t, p, 5, 7, 6, 3, 1);
   const arm = dominantArmament(t);
@@ -335,8 +338,11 @@ function drawAmorphous(c,t,p,s) {
   for(let i=0;i<3;i++)c.push(rect(x+2+i*6,y+h-1,3,4+(i%2),p.shadow));
 }
 function drawHead(c,t,p,x,y,s) {
-  const head=5+Math.round(t.size/30);c.push(rect(x,y,head+2,head+2,p.outline),rect(x+1,y+1,head,head,p.body));addSense(c,t,p,x+head-1,y+2,2);drawArmament(c,t,p,x+head+1,y+head-1);
+  const head=5+Math.round(t.size/30);c.push(rect(x,y,head+2,head+2,p.outline),rect(x+1,y+1,head,head,p.body));
+  if(longEarProfile(t))c.push(rect(x+1,y-7,2,7,p.accent),rect(x+head-1,y-8,2,8,p.accent));
+  addSense(c,t,p,x+head-1,y+2,2);drawArmament(c,t,p,x+head+1,y+head-1);
 }
+function longEarProfile(t){return t.topology==="quadruped"&&t.size<36&&t.build<38&&t.thermo>=24&&t.appendageType==="limbed";}
 function drawArmament(c,t,p,x,y) {
   const arm=dominantArmament(t), reach=t.reach==="far"?10:t.reach==="mid"?6:3;
   if(arm.value<18)return;

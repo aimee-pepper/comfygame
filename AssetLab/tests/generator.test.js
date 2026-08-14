@@ -109,4 +109,14 @@ for (const [name, traits] of Object.entries(presets)) {
   assert.ok(anatomySummary(candidate).includes(candidate.traits.topology));
 }
 
+const longEar = normalizeDescriptor({ ...defaults, logicalID:"dune-long-ear", traits:presets["Dune long-ear"] });
+const wingedSerpent = normalizeDescriptor({ ...defaults, logicalID:"membrane-sky-serpent", traits:presets["Membrane sky serpent"] });
+assert.equal(longEar.traits.topology,"quadruped");
+assert.equal(wingedSerpent.traits.topology,"serpentine");
+assert.equal(wingedSerpent.traits.appendageType,"membrane","wings must remain independent of axial topology");
+assert.notEqual(geometryHash(creatureCommands(longEar,"world")),geometryHash(creatureCommands(wingedSerpent,"world")));
+assert.notEqual(geometryHash(creatureCommands(longEar,"fight")),geometryHash(creatureCommands(wingedSerpent,"fight")));
+assert.ok(creatureCommands(longEar,"fight").some(command=>command.h>=7),"long-ear fixture needs a tall cranial silhouette");
+assert.ok(creatureCommands(wingedSerpent,"fight").some(command=>command.w>=8&&command.h===3),"winged serpent needs a membrane span");
+
 console.log("Asset Lab generator tests passed.");

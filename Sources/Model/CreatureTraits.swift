@@ -31,6 +31,12 @@ struct CreatureTraits: Codable, Equatable, Sendable {
 
     /// sinuous (0) → sleek (50) → bulky (100). Shape, not investment.
     var build: Double = 50
+    /// The axial body layout. Kept independent from appendages so a serpent may have wings and a
+    /// quadruped may have fins without either being flattened into a generic `winged` body.
+    var bodyPlan: CreatureBodyPlan = .quadruped
+    /// A small but identity-bearing head silhouette. This is morphology, not ornament value:
+    /// long ears remain long ears whether the animal is plain or extravagantly coloured.
+    var cranialFeature: CranialFeature = .none
     var appendages = Appendages()
     var coloration = Coloration()
     var finish = Finish()
@@ -61,6 +67,8 @@ struct CreatureTraits: Codable, Equatable, Sendable {
         armament = try c.decodeIfPresent(Armament.self, forKey: .armament) ?? Armament()
         ornament = try c.decodeIfPresent(Double.self, forKey: .ornament) ?? 0
         build = try c.decodeIfPresent(Double.self, forKey: .build) ?? 50
+        bodyPlan = try c.decodeIfPresent(CreatureBodyPlan.self, forKey: .bodyPlan) ?? .quadruped
+        cranialFeature = try c.decodeIfPresent(CranialFeature.self, forKey: .cranialFeature) ?? .none
         appendages = try c.decodeIfPresent(Appendages.self, forKey: .appendages) ?? Appendages()
         coloration = try c.decodeIfPresent(Coloration.self, forKey: .coloration) ?? Coloration()
         finish = try c.decodeIfPresent(Finish.self, forKey: .finish) ?? Finish()
@@ -69,6 +77,17 @@ struct CreatureTraits: Codable, Equatable, Sendable {
         defence = try c.decodeIfPresent(DefenceBranch.self, forKey: .defence)
         isToxic = try c.decodeIfPresent(Bool.self, forKey: .isToxic) ?? false
     }
+}
+
+/// Axial body identity. Flight is deliberately not a body plan: wings are appendages, which keeps
+/// combinations such as a winged serpent or a membrane-winged quadruped representable.
+enum CreatureBodyPlan: String, Codable, Equatable, Sendable, CaseIterable {
+    case quadruped, biped, serpentine, segmented, radial, piscine, amorphous
+}
+
+/// Coarse head features that remain legible in the 16-pixel map identity.
+enum CranialFeature: String, Codable, Equatable, Sendable, CaseIterable {
+    case none, longEars, horns, crest, sensoryFan
 }
 
 // MARK: - Covering

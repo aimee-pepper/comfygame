@@ -108,6 +108,15 @@ enum LifeRules {
     /// Allocate the budget across the axes this world favours, then dress the result in the free
     /// axes. **No role is decided in advance** — identity is read off afterwards.
     static func sampleSpecies(in world: WorldTendencies, rng: inout SeededRNG) -> CreatureTraits {
+        var traits = sampleGameplayTraits(in: world, rng: &rng)
+        applyVisualMorphology(to: &traits)
+        return traits
+    }
+
+    /// The pre-morphology generator, retained as an explicit counterfactual seam. Adding visual
+    /// identity must never consume another draw from the gameplay RNG or change any existing stat.
+    static func sampleGameplayTraits(in world: WorldTendencies,
+                                     rng: inout SeededRNG) -> CreatureTraits {
         var traits = CreatureTraits()
         var weights = world.axisWeights
 
@@ -130,6 +139,53 @@ enum LifeRules {
         applyFreeAxes(of: world, to: &traits, rng: &rng)
         if let branch { apply(branch, to: &traits, in: world, rng: &rng) }
         return traits
+    }
+
+    /// Derives visual-only morphology from the already-resolved gameplay vector. This deliberately
+    /// uses no `SeededRNG`: the caller's stream is byte-for-byte where the legacy generator left it.
+    static func applyVisualMorphology(to traits: inout CreatureTraits) {
+        let seed = morphologySeed(for: traits)
+        let bodyRoll = Int(seed % 100)
+        traits.bodyPlan = switch bodyRoll {
+        case 0..<43: .quadruped
+        case 43..<56: .biped
+        case 56..<72: .serpentine
+        case 72..<82: .segmented
+        case 82..<88: .piscine
+        case 88..<94: .radial
+        default: .amorphous
+        }
+
+        let headRoll = Int((seed >> 8) % 100)
+        traits.cranialFeature = switch headRoll {
+        case 0..<52: .none
+        case 52..<66: .longEars
+        case 66..<79: .horns
+        case 79..<91: .crest
+        default: .sensoryFan
+        }
+    }
+
+    private static func morphologySeed(for traits: CreatureTraits) -> UInt64 {
+        // Stable FNV-1a over pre-existing stored facts only. New morphology fields are intentionally
+        // excluded so tolerant legacy decode and re-derivation cannot become self-referential.
+        let values: [UInt64] = [
+            traits.size, traits.build, traits.covering.hardness, traits.covering.length,
+            traits.covering.coverage, traits.boneDensity, traits.armament.pierce,
+            traits.armament.crush, traits.armament.rend, traits.ornament,
+            traits.coloration.cyan, traits.coloration.magenta, traits.coloration.yellow,
+            traits.coloration.depth, traits.coloration.patterning
+        ].map { UInt64(max(0, min(100_000, Int(($0 * 100).rounded())))) }
+        var hash: UInt64 = 0xcbf29ce484222325
+        for value in values {
+            var word = value
+            for _ in 0..<8 {
+                hash ^= word & 0xff
+                hash &*= 0x100000001b3
+                word >>= 8
+            }
+        }
+        return hash
     }
 
     /// Spend the budget. Draw an axis by weight, raise it one step, pay the marginal price; stop
