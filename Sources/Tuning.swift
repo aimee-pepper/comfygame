@@ -410,9 +410,8 @@ enum Tuning {
 
         // MARK: The budget
 
-        /// What even a dead world can spend, so nothing is empty for reasons the player can't see.
+        /// The fixed ordinary species budget. Vitality controls abundance, not individual power.
         static let baseBudget: Double = 40
-        static let budgetPerVitality: Double = 2.0
         /// Superlinear, so extremes are dear. The exponent decides how rare a maxed axis is.
         static let costExponent: Double = 1.5
         /// How much bulk raises the price of covering and bone. [PROPOSAL] in spec §4.

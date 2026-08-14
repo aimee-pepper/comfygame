@@ -2,13 +2,12 @@ import Foundation
 
 /// **A creature the world cannot afford** (`apex-encounters.md`).
 ///
-/// `LifeRules` spends a budget scaled by Vitality, so a world only ever grows what it can feed. An
-/// apex breaks that rule on purpose: its budget is lifted far past what this world could support, so
-/// it is bigger, harder and stranger than anything that belongs here.
+/// `LifeRules` spends one fixed ordinary budget, while Vitality controls how many species and bodies
+/// the world supports. An apex breaks the ordinary ceiling on purpose: its budget is lifted far past
+/// that shared limit, so it is bigger, harder and stranger than anything else that belongs here.
 ///
-/// **That is a good fiction as well as a good mechanic.** Something too large for this world to feed
-/// either came from somewhere else, or is eating everything else — and both are true of what it does
-/// to the map.
+/// **That is a good fiction as well as a good mechanic.** It is the exceptional body in an ecology,
+/// either intruding from somewhere else or consuming far beyond an ordinary animal's share.
 ///
 /// **No new creature model.** It is the same trait system with the budget lifted, so its identity
 /// still derives, its butchery yields are exceptional because its traits are, and it fights through

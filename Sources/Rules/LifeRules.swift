@@ -3,9 +3,9 @@ import Foundation
 /// Turning a world's pressures into the animals in it.
 ///
 /// **The mechanism** (creature-system-spec §1): a world's pressures produce **weights** over trait
-/// axes and a **budget** scaled by Vitality. Each species is made by **spending that budget across
+/// axes and a **fixed ordinary budget**. Each species is made by **spending that budget across
 /// the costly axes, weighted-randomly** — so pressures decide what a world *tends* to build, the
-/// budget decides how much there is to build with, and randomness decides where each species
+/// shared budget decides how much there is to build with, and randomness decides where each species
 /// actually lands. Free axes are shaped by pressures without spending anything.
 ///
 /// **Why budget-allocation rather than independent rolls: it produces trade-offs for free.** A world
