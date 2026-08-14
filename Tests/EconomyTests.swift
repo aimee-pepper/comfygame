@@ -4,6 +4,19 @@ import XCTest
 /// Spending: refining, upgrades, identification, the key→cache payoff, and Constellation nodes.
 @MainActor
 final class EconomyTests: XCTestCase {
+    func testIdentificationShortfallNamesTheExactMissingEssence() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/SpendingViews.swift"), encoding: .utf8)
+
+        XCTAssertTrue(source.contains("Needs \\(identifyEssenceShortfall) more essence to identify."))
+        XCTAssertTrue(source.contains(
+            "max(0, Tuning.Economy.identifyCostEssence - store.state.base.essence)"
+        ))
+        XCTAssertFalse(source.contains("Not enough essence to identify anything."))
+    }
+
     func testSettingsDistinguishesPushDestinationsFromCampaignReturn() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

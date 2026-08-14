@@ -135,7 +135,7 @@ struct IdentifyCard: View {
 
             Text(store.canAffordIdentify
                  ? "Identifying costs \(Tuning.Economy.identifyCostEssence) essence."
-                 : "Not enough essence to identify anything.")
+                 : "Needs \(identifyEssenceShortfall) more essence to identify.")
                 .font(.caption)
                 .foregroundStyle(store.canAffordIdentify ? Color.secondary : Color.orange)
         }
@@ -161,6 +161,10 @@ struct IdentifyCard: View {
         return revealed.kind == .key
             ? "\(revealed.blurb)\n\nCarry it. Somewhere out there is a lock it fits."
             : revealed.blurb
+    }
+
+    private var identifyEssenceShortfall: Int {
+        max(0, Tuning.Economy.identifyCostEssence - store.state.base.essence)
     }
 }
 
