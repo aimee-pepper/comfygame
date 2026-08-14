@@ -113,6 +113,13 @@ enum GambitEngine {
         case "foe.any":
             return encounter.livingFoes.first { matches(rule, foe: $0) }.map { .foe($0.id) }
 
+        case "foe.armourAbove":
+            // Talin's subject is intentionally strict and current: no generic HP condition may
+            // hitch a ride, and the resolved combat armour is read on every evaluation.
+            guard rule.property == nil, rule.comparator == nil,
+                  let mark = FoeArmourGambit.mark(for: rule.threshold) else { return nil }
+            return encounter.livingFoes.first { $0.stats.armour > mark }.map { .foe($0.id) }
+
         case "foe.lowestHP":
             return encounter.livingFoes.filter { matches(rule, foe: $0) }
                 .min { $0.currentHP < $1.currentHP }.map { .foe($0.id) }

@@ -551,6 +551,11 @@ enum WorldRules {
             if let component = page.teachesGambit,
                !state.base.ownedGambitComponents.contains(component) {
                 state.base.ownedGambitComponents.insert(component)
+                if component == FoeArmourGambit.subject {
+                    // A specialised subject without one compatible mark is unusable. Grant its
+                    // first word in the same mutation as the subject; rereading remains a no-op.
+                    state.base.ownedGambitComponents.insert("armour_mark_1")
+                }
                 events.append(.learnedGambit(component))
             }
         case .pattern:

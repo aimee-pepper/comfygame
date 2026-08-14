@@ -19,6 +19,14 @@
       "selector": "foe.lowestHP"
     },
     {
+      "id": "subject_foe_armour_above",
+      "kind": "subject",
+      "name": "Foe: armour above",
+      "icon": "shield.lefthalf.filled",
+      "blurb": "The first living foe whose current armour is strictly above the chosen mark.",
+      "selector": "foe.armourAbove"
+    },
+    {
       "id": "subject_foe_highest",
       "kind": "subject",
       "name": "Foe: highest HP",
@@ -156,6 +164,30 @@
       "icon": "circle.dotted",
       "blurb": "Nearly gone.",
       "value": 0.1
+    },
+    {
+      "id": "armour_mark_1",
+      "kind": "threshold",
+      "name": "Armour mark 1",
+      "icon": "shield",
+      "blurb": "Current armour strictly above 1.",
+      "value": 1
+    },
+    {
+      "id": "armour_mark_3",
+      "kind": "threshold",
+      "name": "Armour mark 3",
+      "icon": "shield.fill",
+      "blurb": "Current armour strictly above 3.",
+      "value": 3
+    },
+    {
+      "id": "armour_mark_5",
+      "kind": "threshold",
+      "name": "Armour mark 5",
+      "icon": "checkmark.shield.fill",
+      "blurb": "Current armour strictly above 5.",
+      "value": 5
     },
 
     {

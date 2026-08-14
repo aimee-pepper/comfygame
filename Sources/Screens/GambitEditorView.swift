@@ -175,9 +175,13 @@ private struct GambitRow: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 4) {
                     segment(.subject, current: rule.subject, required: true)
-                    segment(.property, current: rule.property)
-                    segment(.comparator, current: rule.comparator)
-                    segment(.threshold, current: rule.threshold)
+                    if rule.isFoeArmourRule {
+                        armourMarkSegment
+                    } else {
+                        segment(.property, current: rule.property)
+                        segment(.comparator, current: rule.comparator)
+                        segment(.threshold, current: rule.threshold)
+                    }
                     Text("→").font(.caption2).foregroundStyle(.secondary)
                     segment(.action, current: rule.action, required: true)
                 }
@@ -186,6 +190,35 @@ private struct GambitRow: View {
             .opacity(isLive ? 1 : 0.45)
         }
         .frame(height: 44)
+    }
+
+    private var armourMarkSegment: some View {
+        let options = store.ownedComponents(.threshold).filter {
+            FoeArmourGambit.markIDs.contains($0.id)
+        }
+        let name = rule.threshold.flatMap { FoeArmourGambit.mark(for: $0) }.map(String.init)
+
+        return Menu {
+            ForEach(options) { option in
+                Button(option.name) {
+                    // The specialised grammar fixes property/current armour and comparator/above.
+                    // Clear stale generic pieces before setting its one explicit mark.
+                    store.setGambitPart(rule.id, kind: .property, to: nil, for: owner)
+                    store.setGambitPart(rule.id, kind: .comparator, to: nil, for: owner)
+                    store.setGambitPart(rule.id, kind: .threshold, to: option.id, for: owner)
+                }
+            }
+        } label: {
+            Text(name.map { "Armour mark \($0)" } ?? "·armour mark")
+                .font(.caption2.weight(name == nil ? .regular : .medium))
+                .foregroundStyle(name == nil ? Color.secondary : Color.primary)
+                .lineLimit(1)
+                .padding(.horizontal, 7)
+                .frame(height: 30)
+                .background(name == nil ? Color(.tertiarySystemFill) : Color(.secondarySystemFill),
+                            in: Capsule())
+        }
+        .disabled(options.isEmpty)
     }
 
     /// One tappable part of the sentence. A `Menu` keeps the list on screen — this is the "editing

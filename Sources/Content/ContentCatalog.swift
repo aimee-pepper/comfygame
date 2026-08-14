@@ -473,6 +473,19 @@ struct ContentCatalog: Sendable {
         let componentIDs = Set(gambitComponents.map(\.id))
         let symbolIDs = Set(symbols.map(\.id))
 
+        // Talin's authored grammar is deliberately narrower than the generic HP grammar. Validate
+        // the stable selector and exact absolute marks together so content cannot silently turn it
+        // into a percentage comparison while the editor still calls it armour.
+        guard gambitComponent(FoeArmourGambit.subject)?.selector == "foe.armourAbove" else {
+            throw ContentError.danglingReference("Talin's armour subject is missing its selector")
+        }
+        for (id, mark) in FoeArmourGambit.marks {
+            guard let component = gambitComponent(id), component.kind == .threshold,
+                  component.value == Double(mark) else {
+                throw ContentError.danglingReference("Talin's armour mark '\(id)' is not exactly \(mark)")
+            }
+        }
+
         for node in researchNodes {
             guard node.needsLifetimeRawRefined >= 0 else {
                 throw ContentError.danglingReference(
