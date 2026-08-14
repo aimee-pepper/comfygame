@@ -560,6 +560,8 @@ struct EncounterState: Codable, Equatable, Sendable {
     var initiallyUnrecordedSpecies: Set<String> = []
     /// Foes no longer giving anything off (Snuff).
     var snuffed: Set<InstanceID> = []
+    /// Modern Snuff counts complete scheduled foe turns. Nil preserves the legacy permanent set.
+    var snuffReceipts: [InstanceID: SnuffReceipt]?
     /// **Burns, poisons and dazzles**, per combatant. Emanation was a generated trait that reached
     /// the prose and never the fight; now it leaves something behind (Q42).
     var statuses: [Combatant: [StatusState]] = [:]
@@ -683,6 +685,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.ghostEvasionAvailable = ghostEvasionAvailable
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
         self.wardReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
+        self.snuffReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.unyieldingSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.braceReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.breakingBlowScheduledSpent = debugV2OwnedNodeIDs == nil ? nil : []
@@ -780,6 +783,9 @@ struct EncounterState: Codable, Equatable, Sendable {
         initiallyUnrecordedSpecies = try c.decodeIfPresent(Set<String>.self,
                                                            forKey: .initiallyUnrecordedSpecies) ?? []
         snuffed = try c.decodeIfPresent(Set<InstanceID>.self, forKey: .snuffed) ?? []
+        snuffReceipts = try c.decodeIfPresent([InstanceID: SnuffReceipt].self,
+                                               forKey: .snuffReceipts)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [:])
         statuses = try c.decodeIfPresent([Combatant: [StatusState]].self, forKey: .statuses) ?? [:]
         afflictions = try c.decodeIfPresent([AfflictionInstance].self, forKey: .afflictions)
         nextAfflictionReceipt = try c.decodeIfPresent(UInt64.self,
@@ -1127,6 +1133,12 @@ struct WardReceipt: Codable, Equatable, Sendable {
     var harm: Harm
     var activationRound: Int
     var expiresBeforeRound: Int
+}
+
+struct SnuffReceipt: Codable, Equatable, Sendable {
+    var remainingScheduledTurns: Int
+    /// Frozen at the primary slot so interleaved follow-ups use the same delivery truth.
+    var suppressedRound: Int?
 }
 
 enum EncounterOutcome: String, Codable, Equatable, Sendable {

@@ -5233,4 +5233,125 @@ final class CombatTests: XCTestCase {
         XCTAssertNil(decoded.wardReceipts)
         XCTAssertEqual(decoded.wards[.binder], legacy.wards[.binder])
     }
+
+    func testModernSnuffRequiresExactOwnerDisclosedLiveEmanationAndRejectsFullRefresh() throws {
+        var burning = CreatureTraits()
+        burning.size = 80; burning.build = 70
+        burning.emanation = emanation(of: .heat)
+        burning.armament.setTotal(60)
+        let store = inFightWith([burning])
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage modern Snuff") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.snuff],
+                                               .binder: []]
+            encounter.snuffReceipts = [:]
+            encounter.revealed.removeAll()
+            encounter.order = [.companion(0), .foe(foeID), .binder]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        store.mutate("hidden Snuff rejects") {
+            CombatRules.perform(.skill("snuff", foe: foeID), by: .companion(0), in: &$0)
+        }
+        XCTAssertTrue(store.activeEncounter?.snuffReceipts?.isEmpty == true)
+        XCTAssertEqual(store.activeEncounter?.companionSkillCooldown, 0)
+
+        store.mutate("disclose and Snuff") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.revealed.insert(foeID)
+            encounter.debugV2OwnedNodeIDs?[.companion(0)] = []
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.perform(.skill("snuff", foe: foeID), by: .companion(0), in: &state)
+        }
+        XCTAssertTrue(store.activeEncounter?.snuffReceipts?.isEmpty == true)
+        store.mutate("grant exact owner and Snuff") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs?[.companion(0)] = [CombatDerivedStatsRules.Node.snuff]
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.perform(.skill("snuff", foe: foeID), by: .companion(0), in: &state)
+        }
+        XCTAssertEqual(store.activeEncounter?.snuffReceipts?[foeID],
+                       .init(remainingScheduledTurns: 2, suppressedRound: nil))
+
+        store.mutate("try full refresh without spending") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.turnIndex = 0
+            encounter.cooldowns.removeAll(); encounter.companionSkillCooldown = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.perform(.skill("snuff", foe: foeID), by: .companion(0), in: &state)
+        }
+        XCTAssertEqual(store.activeEncounter?.snuffReceipts?[foeID],
+                       .init(remainingScheduledTurns: 2, suppressedRound: nil))
+        XCTAssertEqual(store.activeEncounter?.companionSkillCooldown, 0)
+    }
+
+    func testModernSnuffSuppressesCompleteScheduledTurnAndPersistsBetweenSlots() throws {
+        var burning = CreatureTraits()
+        burning.size = 80; burning.build = 70
+        burning.emanation = emanation(of: .heat)
+        burning.armament.setTotal(60)
+        let store = inFightWith([burning])
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage interleaved Snuff block") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.snuff]]
+            encounter.snuffReceipts = [foeID: .init(remainingScheduledTurns: 2, suppressedRound: nil)]
+            encounter.debugV2Evasion = .init(entries: CombatRules.party(of: state).map {
+                .init(actor: $0, characterEvasion: 0, components: [])
+            })
+            encounter.ghostEvasionAvailable = []
+            encounter.order = [.foe(foeID), .binder, .companion(0)]
+            encounter.turnSlots = [
+                .init(actor: .foe(foeID)), .init(actor: .binder),
+                .init(actor: .foe(foeID), kind: .ordinaryPressureFollowUp(1),
+                      strengthMultiplier: 0.55, suppressesAfflictions: true),
+                .init(actor: .binder)
+            ]
+            encounter.turnIndex = 0
+            run.rng = SeededRNG(seed: 0x5A11)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        store.mutate("resolve primary Snuffed slot") { state in
+            CombatRules.runAutomaticTurns(in: &state)
+        }
+        let betweenSlots = try XCTUnwrap(store.activeEncounter?.snuffReceipts?[foeID])
+        XCTAssertEqual(betweenSlots.remainingScheduledTurns, 2)
+        XCTAssertEqual(betweenSlots.suppressedRound, store.activeEncounter?.roundNumber)
+        let midBlockReload = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(try XCTUnwrap(store.activeEncounter)))
+        XCTAssertEqual(midBlockReload.snuffReceipts?[foeID], betweenSlots)
+        store.mutate("resolve saved Snuffed follow-up") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.turnIndex = 2
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.runAutomaticTurns(in: &state)
+        }
+        let receipt = try XCTUnwrap(store.activeEncounter?.snuffReceipts?[foeID])
+        XCTAssertEqual(receipt.remainingScheduledTurns, 1)
+        XCTAssertNil(receipt.suppressedRound)
+        XCTAssertFalse((store.activeEncounter?.afflictions ?? []).contains { $0.kind == .burn })
+        let reloaded = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(try XCTUnwrap(store.activeEncounter)))
+        XCTAssertEqual(reloaded.snuffReceipts?[foeID], receipt)
+    }
+
+    func testLegacySnuffSetRemainsFrozenAdapterAndModernEmptyDoesNotInfer() throws {
+        var encounter = try XCTUnwrap(inFight().activeEncounter)
+        let foeID = try XCTUnwrap(encounter.foes.first?.id)
+        encounter.debugV2OwnedNodeIDs = nil
+        encounter.snuffReceipts = nil
+        encounter.snuffed = [foeID]
+        let legacy = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(encounter))
+        XCTAssertNil(legacy.snuffReceipts)
+        XCTAssertTrue(CombatRules.isSnuffed(foeID, in: legacy))
+
+        encounter.debugV2OwnedNodeIDs = [:]
+        encounter.snuffReceipts = [:]
+        let modern = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(encounter))
+        XCTAssertFalse(CombatRules.isSnuffed(foeID, in: modern))
+    }
 }

@@ -699,7 +699,18 @@ enum CombatRules {
             // **Snuff.** Puts out whatever it was giving off — which is what was doing damage every
             // round whether you touched it or not.
             guard let foe else { return nil }
-            encounter.snuffed.insert(foe.id)
+            if encounter.snuffReceipts != nil {
+                guard encounter.debugV2OwnedNodeIDs?[actor]?.contains(
+                    CombatDerivedStatsRules.Node.snuff) == true,
+                      encounter.revealed.contains(foe.id), foe.isAlive,
+                      foe.stats.element != nil,
+                      (encounter.snuffReceipts?[foe.id]?.remainingScheduledTurns ?? 0) < 2
+                else { return nil }
+                encounter.snuffReceipts?[foe.id] = .init(remainingScheduledTurns: 2,
+                                                          suppressedRound: nil)
+            } else {
+                encounter.snuffed.insert(foe.id)
+            }
             encounter.note("\(foe.stats.displayName) goes dark.")
 
         case .quicken:
@@ -1384,10 +1395,20 @@ enum CombatRules {
 
     private static func owns(_ skill: SkillDef, actor: Combatant,
                              encounter: EncounterState, state: GameState) -> Bool {
+        if skill.kind == .snuff, let frozen = encounter.debugV2OwnedNodeIDs {
+            return frozen[actor]?.contains(CombatDerivedStatsRules.Node.snuff) == true
+        }
         if skill.id == "flense", let frozen = encounter.debugV2OwnedNodeIDs {
             return frozen[actor]?.contains(CombatDerivedStatsRules.Node.flense) == true
         }
         return skills(for: actor, in: state).contains(skill)
+    }
+
+    static func isSnuffed(_ foeID: InstanceID, in encounter: EncounterState) -> Bool {
+        if let receipts = encounter.snuffReceipts {
+            return receipts[foeID]?.suppressedRound == encounter.roundNumber
+        }
+        return encounter.snuffed.contains(foeID)
     }
 
     static func flenseTickDamage(power: Int = 9, covering: Covering) -> Int {
@@ -2544,6 +2565,12 @@ enum CombatRules {
               let foeID = actor.foeID, let foe = encounter.foes.first(where: { $0.id == foeID })
         else { return }
 
+        if advancesOrdinarySchedule, slot.kind == .primary,
+           var receipt = encounter.snuffReceipts?[foeID], receipt.remainingScheduledTurns > 0 {
+            receipt.suppressedRound = encounter.roundNumber
+            encounter.snuffReceipts?[foeID] = receipt
+        }
+
         let standing: [Combatant] = party(of: state).filter { isAlive($0, in: run) }
         let visibleTargets = standing.filter { (encounter.concealed[$0] ?? 0) <= 0 }
         // Concealment redirects attention while another legal target exists; an entirely concealed
@@ -2555,7 +2582,8 @@ enum CombatRules {
         // rank system. Something with far reach ignores the line entirely, which is what reach is
         // *for*, and if everybody is at the back there's nobody to hide behind.
         let front = targetable.filter { rank(of: $0, in: encounter, fallback: state) == .front }
-        let reachesPast = foe.stats.strikesFirst || foe.stats.element != nil
+        let reachesPast = foe.stats.strikesFirst
+            || (foe.stats.element != nil && !isSnuffed(foeID, in: encounter))
         let reachable = (reachesPast || front.isEmpty) ? targetable : front
 
         // **Draw Off.** Something you've taunted comes for you and doesn't get a choice — the only
@@ -2599,7 +2627,7 @@ enum CombatRules {
             }
             var target = originalTarget
             var grounded = false
-            if foe.stats.element != nil, !encounter.snuffed.contains(foeID),
+            if foe.stats.element != nil, !isSnuffed(foeID, in: encounter),
                let ashe = standing.first(where: { member in
                    member.rosterIndex.flatMap {
                        state.base.roster.indices.contains($0) ? state.base.roster[$0].traveller : nil
@@ -2629,7 +2657,7 @@ enum CombatRules {
 
             // **Ward.** Turns aside one harm, so you have to know what's coming — which is what
             // Sight is for. Guessing wrong costs you the round you spent setting it.
-            let incoming: Harm = (encounter.snuffed.contains(foeID) ? nil : foe.stats.element)
+            let incoming: Harm = (isSnuffed(foeID, in: encounter) ? nil : foe.stats.element)
                 .map(Harm.emanation) ?? .blow(foe.stats.damageKind)
             let wardMultiplier: Double
             if let modern = encounter.wardReceipts {
@@ -2647,7 +2675,7 @@ enum CombatRules {
             let amount: Int
             // **Snuff** puts out whatever it was giving off, and with it the damage nothing you
             // wear could stop.
-            if let element = foe.stats.element, !encounter.snuffed.contains(foeID) {
+            if let element = foe.stats.element, !isSnuffed(foeID, in: encounter) {
                 let wornMultiplier = element == .heat
                     ? 1 - min(Tuning.Encounter.maximumInsulation,
                               insulation(of: target, in: state) * Tuning.Encounter.insulationPerPoint)
@@ -2699,7 +2727,7 @@ enum CombatRules {
                 encounter.note("\(actorName(target, encounter: encounter)) goes down. They'll be all right at home.")
             }
 
-            let verb = (encounter.snuffed.contains(foeID) ? nil : foe.stats.element)
+            let verb = (isSnuffed(foeID, in: encounter) ? nil : foe.stats.element)
                 .map(elementalVerb) ?? foe.stats.damageKind.verb
             // "You" is a pronoun mid-sentence and "Quill" is a name, so only one of them lowers.
             let whom = target == .binder
@@ -2722,7 +2750,7 @@ enum CombatRules {
 
             // **And so does what it gives off** (Q42). Emanation was generated, named in the
             // description, and did nothing beyond one armour-ignoring hit. Snuff puts a stop to it.
-            if let element = foe.stats.element, !encounter.snuffed.contains(foeID), !slot.suppressesAfflictions {
+            if let element = foe.stats.element, !isSnuffed(foeID, in: encounter), !slot.suppressesAfflictions {
                 let status = StatusKind.from(element)
                 let outcome = applyAffliction(status.afflictionID, to: target,
                                               source: .foe(foeID), provenance: .direct,
@@ -2746,6 +2774,21 @@ enum CombatRules {
                   && receipt.round == encounter.roundNumber
                   && receipt.slotIndex == encounter.turnIndex)
             }
+        }
+
+        if advancesOrdinarySchedule, var receipt = encounter.snuffReceipts?[foeID],
+           receipt.suppressedRound == encounter.roundNumber {
+            let hasLaterOwnedSlot = encounter.turnSlots.indices.contains { index in
+                index > encounter.turnIndex && encounter.turnSlots[index].actor == actor
+            }
+            if !hasLaterOwnedSlot {
+                receipt.remainingScheduledTurns -= 1
+                receipt.suppressedRound = nil
+                encounter.snuffReceipts?[foeID] = receipt.remainingScheduledTurns > 0 ? receipt : nil
+            }
+        }
+        if encounter.foes.first(where: { $0.id == foeID })?.isAlive != true {
+            encounter.snuffReceipts?[foeID] = nil
         }
 
         run.activeEncounter = encounter
