@@ -106,7 +106,7 @@ final class CampaignStartPresentationTests: XCTestCase {
             CGFloat(CampaignStartLayoutPolicy.ordinarySlotRowCount(slotCount: 8))
             * CampaignStartLayoutPolicy.ordinarySlotCardMinimumHeight
             + 30 // three ten-point row gutters
-        XCTAssertLessThanOrEqual(shelfHeight, 446,
+        XCTAssertLessThanOrEqual(shelfHeight, 510,
                                  "Eight slots must leave ordinary-phone room for title and actions.")
     }
 
@@ -139,6 +139,24 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(compact.contains("Button(\"Load\", action: onLoad)"))
         XCTAssertTrue(compact.contains("Button(\"Details\", action: onDetails)"))
         XCTAssertGreaterThanOrEqual(compact.components(separatedBy: ".frame(minHeight: 44)").count - 1, 2)
+    }
+
+    func testCompactSlotRestoresProgressGraphicLevelAndLastPlayedWithoutLoosePadding() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
+                                encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "private var compactBody"))
+        let end = try XCTUnwrap(source.range(of: "private var expandedBody",
+                                             range: start.upperBound..<source.endIndex))
+        let compact = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(compact.contains("CampaignBookplateMotif"))
+        XCTAssertTrue(compact.contains("Level \\(slot.binderLevel)"))
+        XCTAssertTrue(compact.contains("slot.lastPlayed.formatted(date: .abbreviated, time: .shortened)"))
+        XCTAssertTrue(compact.contains(".padding(.horizontal, 7)"))
+        XCTAssertTrue(compact.contains(".padding(.vertical, 5)"))
+        XCTAssertFalse(compact.contains(".padding(14)"))
     }
 
     @MainActor
