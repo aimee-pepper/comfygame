@@ -31,6 +31,10 @@ struct WorldsState: Codable, Equatable, Sendable {
     var pendingAnchorSettlementOutcomeID: ExpeditionOutcomeID?
     /// Spring income is an automatic outcome consumer and must never replay after relaunch.
     var lastSpringOutcomeID: ExpeditionOutcomeID?
+    /// Resolved eligible expeditions since the last newly banked random World Page.
+    var randomWorldPageDrought: Int = 0
+    /// Return outcomes already applied to World Page ownership/pity.
+    var worldPageBankedOutcomeIDs: Set<ExpeditionOutcomeID> = []
 
     static func newGame(seeds: inout SeedSequence) -> WorldsState {
         WorldsState(activeRun: nil, runIndex: 0, seeds: seeds, lastExit: nil,
@@ -43,7 +47,9 @@ struct WorldsState: Codable, Equatable, Sendable {
          anchoredRealms: [AnchoredRealm] = [], pendingAnchorSettlement: Bool = false,
          outcomeSequence: UInt64 = 0,
          pendingAnchorSettlementOutcomeID: ExpeditionOutcomeID? = nil,
-         lastSpringOutcomeID: ExpeditionOutcomeID? = nil) {
+         lastSpringOutcomeID: ExpeditionOutcomeID? = nil,
+         randomWorldPageDrought: Int = 0,
+         worldPageBankedOutcomeIDs: Set<ExpeditionOutcomeID> = []) {
         self.activeRun = activeRun
         self.runIndex = runIndex
         self.outcomeSequence = outcomeSequence
@@ -53,6 +59,8 @@ struct WorldsState: Codable, Equatable, Sendable {
         self.pendingAnchorSettlement = pendingAnchorSettlement
         self.pendingAnchorSettlementOutcomeID = pendingAnchorSettlementOutcomeID
         self.lastSpringOutcomeID = lastSpringOutcomeID
+        self.randomWorldPageDrought = randomWorldPageDrought
+        self.worldPageBankedOutcomeIDs = worldPageBankedOutcomeIDs
     }
 
     init(from decoder: Decoder) throws {
@@ -68,6 +76,10 @@ struct WorldsState: Codable, Equatable, Sendable {
             ExpeditionOutcomeID.self, forKey: .pendingAnchorSettlementOutcomeID)
         lastSpringOutcomeID = try container.decodeIfPresent(ExpeditionOutcomeID.self,
                                                              forKey: .lastSpringOutcomeID)
+        randomWorldPageDrought = try container.decodeIfPresent(
+            Int.self, forKey: .randomWorldPageDrought) ?? 0
+        worldPageBankedOutcomeIDs = try container.decodeIfPresent(
+            Set<ExpeditionOutcomeID>.self, forKey: .worldPageBankedOutcomeIDs) ?? []
     }
 
     mutating func mintOutcomeID() -> ExpeditionOutcomeID {
@@ -871,6 +883,8 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// Unbanked haul. Kept 100% on portal exit, `collapseHaulKeptFraction` on collapse.
     var satchel: ResourcePool = ResourcePool()
     var satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots)
+    /// Physical pages are a separate payload, but each consumes one ordinary satchel slot.
+    var carriedWorldPages: [WorldPageInstance] = []
     /// Exact harvested material haul. This reserve is carried, but never occupies a satchel slot.
     var materialReserve: MaterialReserve = MaterialReserve()
     /// Frozen at departure: changing next trip's kit cannot alter a world already in progress.
@@ -888,6 +902,10 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// on the spot, because "drop something or leave it" is a decision the player makes — and a
     /// force-quit in the middle of making it has to resume with the choice still open (pillar 2).
     var offeredItems: [ItemStack] = []
+    var offeredWorldPages: [WorldPageInstance] = []
+
+    var occupiedSatchelSlots: Int { satchelItems.stacks.count + carriedWorldPages.count }
+    var freeSatchelSlots: Int { max(0, satchelItems.slots - occupiedSatchelSlots) }
 
     /// Where the player stood before their last step. Fleeing retreats here.
     var previousPosition: GridPoint?
@@ -931,6 +949,7 @@ struct WorldRun: Codable, Equatable, Sendable {
          companionHP: [Int: Int] = [:],
          healthCaps: [RunHealthCapEntry]? = nil,
          satchelItems: Inventory = Inventory(slots: Tuning.Economy.startingInventorySlots),
+         carriedWorldPages: [WorldPageInstance] = [],
          materialReserve: MaterialReserve = MaterialReserve(),
          carriedInstruments: Set<PressureTargetID> = [],
          carriedInstrumentPrecisions: [PressureTargetID: RealityState.InstrumentPrecision] = [:],
@@ -963,6 +982,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         self.companionHP = companionHP
         self.healthCaps = healthCaps.map(Self.normalizedHealthCaps)
         self.satchelItems = satchelItems
+        self.carriedWorldPages = carriedWorldPages
         self.materialReserve = materialReserve
         self.carriedInstruments = carriedInstruments
         self.carriedInstrumentPrecisions = carriedInstrumentPrecisions
@@ -1053,6 +1073,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         satchel = try container.decodeIfPresent(ResourcePool.self, forKey: .satchel) ?? ResourcePool()
         satchelItems = try container.decodeIfPresent(Inventory.self, forKey: .satchelItems)
             ?? Inventory(slots: Tuning.Economy.startingInventorySlots)
+        carriedWorldPages = try container.decodeIfPresent(
+            [WorldPageInstance].self, forKey: .carriedWorldPages) ?? []
         materialReserve = try container.decodeIfPresent(MaterialReserve.self,
                                                         forKey: .materialReserve) ?? MaterialReserve()
         carriedInstruments = try container.decodeIfPresent(Set<PressureTargetID>.self,
@@ -1063,6 +1085,8 @@ struct WorldRun: Codable, Equatable, Sendable {
         torchVisionBonus = try container.decodeIfPresent(Int.self, forKey: .torchVisionBonus) ?? 0
         activeEncounter = try container.decodeIfPresent(EncounterState.self, forKey: .activeEncounter)
         offeredItems = try container.decodeIfPresent([ItemStack].self, forKey: .offeredItems) ?? []
+        offeredWorldPages = try container.decodeIfPresent(
+            [WorldPageInstance].self, forKey: .offeredWorldPages) ?? []
         previousPosition = try container.decodeIfPresent(GridPoint.self, forKey: .previousPosition)
         encounterGraceTurns = try container.decodeIfPresent(Int.self, forKey: .encounterGraceTurns) ?? 0
         vanishWithdrawSpent = try container.decodeIfPresent(Bool.self, forKey: .vanishWithdrawSpent) ?? false
@@ -1144,12 +1168,14 @@ extension WorldRun {
         var snapshot = self
         snapshot.satchel = ResourcePool()
         snapshot.satchelItems = Inventory(slots: Tuning.Economy.startingSatchelSlots)
+        snapshot.carriedWorldPages = []
         snapshot.materialReserve = MaterialReserve()
         snapshot.carriedInstruments = []
         snapshot.carriedInstrumentPrecisions = [:]
         snapshot.activeEncounter = nil
         snapshot.vanishWithdrawSpent = false
         snapshot.offeredItems = []
+        snapshot.offeredWorldPages = []
         snapshot.partyProgressAtStart = []
         snapshot.experienceBreakdown = RunExperienceBreakdown()
         snapshot.carriedItemCountsAtStart = [:]

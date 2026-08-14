@@ -61,6 +61,47 @@ final class WorldTests: XCTestCase {
                       "3x context weighting must not make other repeatables unreachable")
     }
 
+    func testWorldRunKeepsPagesSeparateWhileChargingSharedSatchelSlots() throws {
+        let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_moss_and_mist"))
+        let page = WorldPageInstance(id: InstanceID(rawValue: 700), definition: definition,
+                                     fieldProvenance: .init(originRunIndex: 2,
+                                                            originWorldSeed: 20,
+                                                            generationSeed: 30,
+                                                            position: GridPoint(x: 1, y: 1)))
+        var run = WorldRun(runIndex: 2, book: book([:]), mapSeed: 20,
+                           rng: SeededRNG(seed: 20),
+                           map: WorldMap(width: 2, height: 2,
+                                         tiles: Array(repeating: Tile(), count: 4),
+                                         entry: GridPoint(x: 0, y: 0)),
+                           playerPosition: GridPoint(x: 0, y: 0),
+                           satchelItems: Inventory(slots: 2), carriedWorldPages: [page])
+        XCTAssertEqual(run.occupiedSatchelSlots, 1)
+        XCTAssertEqual(run.freeSatchelSlots, 1)
+        run.offeredWorldPages = [WorldPageInstance(id: InstanceID(rawValue: 701),
+                                                   definition: definition)]
+        XCTAssertEqual(run.freeSatchelSlots, 1, "offered pages do not occupy the satchel")
+
+        let restored = try SaveCodec.makeDecoder().decode(
+            WorldRun.self, from: SaveCodec.makeEncoder().encode(run))
+        XCTAssertEqual(restored.carriedWorldPages, [page])
+        XCTAssertEqual(restored.offeredWorldPages.map(\.id), [InstanceID(rawValue: 701)])
+        XCTAssertTrue(restored.anchoredSnapshot.carriedWorldPages.isEmpty)
+        XCTAssertTrue(restored.anchoredSnapshot.offeredWorldPages.isEmpty)
+    }
+
+    func testLegacyWorldStateAndRunDecodeWithNoWildPagePayload() throws {
+        var worldsObject = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(
+                WorldsState(activeRun: nil, runIndex: 3,
+                            seeds: SeedSequence(rootSeed: 9)))) as? [String: Any])
+        worldsObject.removeValue(forKey: "randomWorldPageDrought")
+        worldsObject.removeValue(forKey: "worldPageBankedOutcomeIDs")
+        let worlds = try SaveCodec.makeDecoder().decode(
+            WorldsState.self, from: JSONSerialization.data(withJSONObject: worldsObject))
+        XCTAssertEqual(worlds.randomWorldPageDrought, 0)
+        XCTAssertEqual(worlds.worldPageBankedOutcomeIDs, [])
+    }
+
     func testSameSeedRegeneratesTheSameWorld() {
         let composition = book(["terrain": "caverns", "biome": "ashen", "bounty": "rich_ore", "quirk": "gilded_veins"])
         let first = Worldgen.generate(book: composition, seed: 8_675_309)
