@@ -39,6 +39,25 @@ enum BindAvailability: Equatable {
     }
 }
 
+enum PageTemplateActionResult: Equatable {
+    case saved(PageTemplateID)
+    case updated(PageTemplateID)
+    case deleted(PageTemplateID)
+    case loaded(PageTemplateID)
+    case noChange
+    case emptyDraft
+    case invalidDraft
+    case capacityReached(Int)
+    case staleTemplate
+
+    var succeeded: Bool {
+        switch self {
+        case .saved, .updated, .deleted, .loaded, .noChange: true
+        case .emptyDraft, .invalidDraft, .capacityReached, .staleTemplate: false
+        }
+    }
+}
+
 /// Real player actions — the ones the shipping UI calls. Anything still faked lives in
 /// `Sources/Debug/` and says so.
 ///
@@ -200,6 +219,128 @@ extension GameStore {
 
     func clearPage() {
         mutate("clear the page") { $0.base.page = Page(width: $0.base.page.width, height: $0.base.page.height) }
+    }
+
+    // MARK: Saved page Templates
+
+    @discardableResult
+    func savePageTemplate(named proposedName: String) -> PageTemplateActionResult {
+        guard !state.base.page.runes.isEmpty else { return .emptyDraft }
+        guard Self.isLegalTemplatePage(state.base.page, in: state.base) else { return .invalidDraft }
+        guard state.base.savedPageTemplates.count < PageTemplateRules.capacity else {
+            return .capacityReached(PageTemplateRules.capacity)
+        }
+        let name = PageTemplateRules.normalizedName(proposedName)
+        var savedID: PageTemplateID?
+        let changed = mutateIf("save page Template") { state in
+            guard state.base.savedPageTemplates.count < PageTemplateRules.capacity,
+                  Self.isLegalTemplatePage(state.base.page, in: state.base)
+            else { return false }
+            let ordinal = state.base.nextPageTemplateID
+            let id = PageTemplateID(rawValue: ordinal)
+            state.base.nextPageTemplateID &+= 1
+            state.base.savedPageTemplates.append(SavedPageTemplate(
+                id: id, name: name, page: state.base.page, creationOrdinal: ordinal))
+            savedID = id
+            return true
+        }
+        guard changed, let savedID else { return .invalidDraft }
+        return .saved(savedID)
+    }
+
+    @discardableResult
+    func renamePageTemplate(_ id: PageTemplateID, to proposedName: String) -> PageTemplateActionResult {
+        guard let current = state.base.savedPageTemplates.first(where: { $0.id == id })
+        else { return .staleTemplate }
+        let name = PageTemplateRules.normalizedName(proposedName)
+        guard current.name != name else { return .noChange }
+        let changed = mutateIf("rename page Template") { state in
+            guard let index = state.base.savedPageTemplates.firstIndex(where: { $0.id == id })
+            else { return false }
+            state.base.savedPageTemplates[index].name = name
+            return true
+        }
+        return changed ? .updated(id) : .staleTemplate
+    }
+
+    @discardableResult
+    func overwritePageTemplate(_ id: PageTemplateID) -> PageTemplateActionResult {
+        guard !state.base.page.runes.isEmpty else { return .emptyDraft }
+        guard Self.isLegalTemplatePage(state.base.page, in: state.base) else { return .invalidDraft }
+        guard let current = state.base.savedPageTemplates.first(where: { $0.id == id })
+        else { return .staleTemplate }
+        guard !PageTemplateRules.structurallyEquivalent(current.page, state.base.page)
+        else { return .noChange }
+        let changed = mutateIf("overwrite page Template") { state in
+            guard let index = state.base.savedPageTemplates.firstIndex(where: { $0.id == id }),
+                  Self.isLegalTemplatePage(state.base.page, in: state.base)
+            else { return false }
+            state.base.savedPageTemplates[index].page = state.base.page
+            return true
+        }
+        return changed ? .updated(id) : .staleTemplate
+    }
+
+    @discardableResult
+    func deletePageTemplate(_ id: PageTemplateID) -> PageTemplateActionResult {
+        guard state.base.savedPageTemplates.contains(where: { $0.id == id })
+        else { return .staleTemplate }
+        let changed = mutateIf("delete page Template") { state in
+            guard let index = state.base.savedPageTemplates.firstIndex(where: { $0.id == id })
+            else { return false }
+            state.base.savedPageTemplates.remove(at: index)
+            return true
+        }
+        return changed ? .deleted(id) : .staleTemplate
+    }
+
+    @discardableResult
+    func loadPageTemplate(_ id: PageTemplateID) -> PageTemplateActionResult {
+        guard let current = state.base.savedPageTemplates.first(where: { $0.id == id })
+        else { return .staleTemplate }
+        guard Self.isLegalTemplatePage(current.page, in: state.base) else { return .invalidDraft }
+        guard !PageTemplateRules.structurallyEquivalent(current.page, state.base.page)
+        else { return .noChange }
+        let changed = mutateIf("load page Template") { state in
+            guard let current = state.base.savedPageTemplates.first(where: { $0.id == id }),
+                  Self.isLegalTemplatePage(current.page, in: state.base)
+            else { return false }
+            var nextID = state.base.nextTemplateMarkID
+            guard let fresh = PageTemplateRules.remap(current.page, nextID: &nextID) else { return false }
+            state.base.page = fresh
+            state.base.nextTemplateMarkID = nextID
+            return true
+        }
+        return changed ? .loaded(id) : .staleTemplate
+    }
+
+    nonisolated private static func isLegalTemplatePage(_ page: Page, in base: BaseState) -> Bool {
+        guard !page.runes.isEmpty,
+              Set(page.runes.map(\.id)).count == page.runes.count,
+              page.occupied.count == page.usedCells,
+              page.runes.allSatisfy({ rune in
+                  base.ownedHands.contains(rune.hand)
+                      && rune.shape?.hand == rune.hand
+                      && rune.cells.allSatisfy(page.contains)
+              })
+        else { return false }
+        let ids = Set(page.runes.map(\.id))
+        guard page.links.allSatisfy({ $0.a != $0.b && ids.contains($0.a) && ids.contains($0.b) })
+        else { return false }
+        let catalog = ContentCatalog.shared
+        let writableQualifiers = Set(PageRules.writableQualifiers().map(\.id))
+        return page.runes.allSatisfy { rune in
+            switch rune.content {
+            case .target(let id): catalog.pressureTarget(id) != nil
+            case .source(let id): base.ownedSources.contains(id) && catalog.pressureSource(id) != nil
+            case .qualifier(let id): writableQualifiers.contains(id) && catalog.qualifier(id) != nil
+            case .compound(let id): base.ownedSymbols.contains(id) && catalog.symbol(id) != nil
+            case .rune(let sigil):
+                base.ownedSources.contains(sigil.source)
+                    && catalog.pressureSource(sigil.source) != nil
+                    && catalog.pressureTarget(sigil.target) != nil
+            }
+        }
     }
 
     /// What the Writing Desk shows before committing.

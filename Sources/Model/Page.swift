@@ -333,6 +333,79 @@ struct Page: Codable, Equatable, Sendable {
     }
 }
 
+/// Stable identity for one player-authored reusable page Template.
+///
+/// Names and array positions are presentation; every destructive or replacing action targets this
+/// identity so a stale popover can never mutate a different Template.
+struct PageTemplateID: RawRepresentable, Codable, Equatable, Hashable, Comparable, Sendable {
+    var rawValue: UInt64
+    init(rawValue: UInt64) { self.rawValue = rawValue }
+    static func < (lhs: Self, rhs: Self) -> Bool { lhs.rawValue < rhs.rawValue }
+}
+
+struct SavedPageTemplate: Codable, Equatable, Identifiable, Sendable {
+    var id: PageTemplateID
+    var name: String
+    var page: Page
+    var creationOrdinal: UInt64
+}
+
+enum PageTemplateRules {
+    static let capacity = 20
+    static let maximumNameLength = 40
+    static let firstLoadedMarkID: UInt64 = 0x5450_0000_0000_0001
+
+    static func normalizedName(_ proposed: String) -> String {
+        let trimmed = proposed.trimmingCharacters(in: .whitespacesAndNewlines)
+        let chosen = trimmed.isEmpty ? "Untitled page" : trimmed
+        return String(chosen.prefix(maximumNameLength))
+    }
+
+    /// Copies a frozen Template into a fresh draft identity namespace. Mark order, geometry and
+    /// topology stay exact; only identities change.
+    static func remap(_ page: Page, nextID: inout UInt64) -> Page? {
+        let originalIDs = page.runes.map(\.id)
+        guard Set(originalIDs).count == originalIDs.count else { return nil }
+        let endpoints = Set(originalIDs)
+        guard page.links.allSatisfy({ $0.a != $0.b && endpoints.contains($0.a) && endpoints.contains($0.b) })
+        else { return nil }
+
+        var mapping: [InstanceID: InstanceID] = [:]
+        for id in originalIDs {
+            mapping[id] = InstanceID(rawValue: nextID)
+            nextID &+= 1
+        }
+        var runes = page.runes
+        for index in runes.indices {
+            guard let replacement = mapping[runes[index].id] else { return nil }
+            runes[index].id = replacement
+            if case .rune(var sigil) = runes[index].content {
+                sigil.id = InstanceID(rawValue: nextID)
+                nextID &+= 1
+                runes[index].content = .rune(sigil)
+            }
+        }
+        let links = Set(page.links.compactMap { link -> MarkLink? in
+            guard let a = mapping[link.a], let b = mapping[link.b] else { return nil }
+            return MarkLink(a, b)
+        })
+        guard links.count == page.links.count else { return nil }
+        return Page(width: page.width, height: page.height, runes: runes, links: links)
+    }
+
+    /// Template identity is composition, not the disposable instance IDs assigned on each load.
+    /// Canonical remapping lets the UI and actions recognize an already-loaded page without
+    /// weakening malformed-link validation.
+    static func structurallyEquivalent(_ lhs: Page, _ rhs: Page) -> Bool {
+        var lhsID: UInt64 = 1
+        var rhsID: UInt64 = 1
+        guard let canonicalLHS = remap(lhs, nextID: &lhsID),
+              let canonicalRHS = remap(rhs, nextID: &rhsID)
+        else { return false }
+        return canonicalLHS == canonicalRHS
+    }
+}
+
 /// Stable authored identity for a physical, pre-inscribed World Page.
 struct WorldPageDefinitionID: StringIdentifier {
     var rawValue: String

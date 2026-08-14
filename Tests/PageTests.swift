@@ -7,7 +7,6 @@ import XCTest
 /// sits never changes what it says — and **refinement is literacy, not power** — a better hand lets
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
-
     func testStarterWorldPagesMatchFrozenAuthorityAndRulesOwnedPrices() throws {
         let definitions = WorldPageCatalog.starterDefinitions
         XCTAssertEqual(definitions.map(\.id), ["starter_open_meadow", "starter_rainwashed_shore",
@@ -326,6 +325,135 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(source.contains("Every placed mark and connection on this page will be removed."))
         XCTAssertEqual(source.components(separatedBy: "store.clearPage()").count - 1, 1,
                        "Only the confirmed destructive action may clear the page.")
+    }
+
+    func testTemplateUIUsesThumbnailGridAnchoredActionsAndExactConfirmations() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
+            encoding: .utf8)
+        XCTAssertTrue(source.contains("case templates = \"Templates\""))
+        XCTAssertTrue(source.contains("SavedPageTemplateCard("))
+        XCTAssertTrue(source.contains(".popover(isPresented: $showsActions"))
+        XCTAssertTrue(source.contains(".presentationCompactAdaptation(.popover)"))
+        XCTAssertTrue(source.contains("\"Replace the current page?\""))
+        XCTAssertTrue(source.contains("\"Overwrite this Template?\""))
+        XCTAssertTrue(source.contains("\"Delete this Template?\""))
+        XCTAssertTrue(source.contains("PageTemplateRules.capacity) Templates"),
+                      "the bounded shelf must disclose current usage and its cap")
+        XCTAssertTrue(source.contains("Button(\"Save Template\")")
+                      || source.contains(".accessibilityLabel(\"Save Template\")"))
+    }
+
+    @MainActor
+    func testTemplateRoundTripRemapsEveryIdentityAndLinkWithoutChangingComposition() throws {
+        let store = GameStore(io: .temporary(name: "template-remap-\(UUID().uuidString)"))
+        let first = PlacedRune(id: InstanceID(rawValue: 11), content: .target("illumination"),
+                               hand: .crude, origin: .init(column: 0, row: 0),
+                               shapeID: "crude_block")
+        let second = PlacedRune(id: InstanceID(rawValue: 22), content: .source("sun"),
+                                hand: .crude, origin: .init(column: 2, row: 0),
+                                shapeID: "crude_block")
+        let legacy = PlacedRune(
+            id: InstanceID(rawValue: 33),
+            sigil: Sigil(id: InstanceID(rawValue: 44), source: "sun", target: "illumination"),
+            hand: .crude, origin: .init(column: 0, row: 2), shapeID: "crude_block")
+        let authored = Page(runes: [first, second, legacy], links: [MarkLink(first.id, second.id)])
+        store.mutate("test: authored template") { $0.base.page = authored }
+
+        guard case .saved(let templateID) = store.savePageTemplate(named: "  Morning path  ")
+        else { return XCTFail("valid page was not saved") }
+        let frozen = try XCTUnwrap(store.state.base.savedPageTemplates.first)
+        XCTAssertEqual(frozen.id, templateID)
+        XCTAssertEqual(frozen.name, "Morning path")
+        XCTAssertEqual(frozen.page, authored)
+
+        store.clearPage()
+        XCTAssertEqual(store.loadPageTemplate(templateID), .loaded(templateID))
+        let firstLoad = store.state.base.page
+        XCTAssertEqual(Array(firstLoad.runes.prefix(2)).map(\.content),
+                       Array(authored.runes.prefix(2)).map(\.content))
+        XCTAssertEqual(firstLoad.runes.map(\.origin), authored.runes.map(\.origin))
+        XCTAssertEqual(firstLoad.runes.map(\.shapeID), authored.runes.map(\.shapeID))
+        XCTAssertEqual(firstLoad.links.count, 1)
+        XCTAssertNotEqual(firstLoad.runes.map(\.id), authored.runes.map(\.id))
+        guard case .rune(let firstLegacy) = firstLoad.runes[2].content,
+              case .rune(let authoredLegacy) = authored.runes[2].content
+        else { return XCTFail("legacy rune was not preserved") }
+        XCTAssertNotEqual(firstLegacy.id, authoredLegacy.id)
+        XCTAssertEqual(firstLegacy.source, authoredLegacy.source)
+        XCTAssertEqual(firstLegacy.target, authoredLegacy.target)
+        XCTAssertTrue(firstLoad.links.contains(MarkLink(firstLoad.runes[0].id, firstLoad.runes[1].id)))
+        XCTAssertTrue(PageTemplateRules.structurallyEquivalent(authored, firstLoad))
+
+        XCTAssertEqual(store.loadPageTemplate(templateID), .noChange,
+                       "loading the composition already present is an identity-insensitive no-op")
+        XCTAssertEqual(store.state.base.page.runes.map(\.id), firstLoad.runes.map(\.id))
+
+        store.clearPage()
+        XCTAssertEqual(store.loadPageTemplate(templateID), .loaded(templateID))
+        XCTAssertNotEqual(store.state.base.page.runes.map(\.id), firstLoad.runes.map(\.id),
+                          "each actual load must issue fresh identities")
+        XCTAssertEqual(store.state.base.savedPageTemplates.first?.page, authored,
+                       "loading must never mutate the frozen Template")
+    }
+
+    @MainActor
+    func testTemplateActionsUseStableIDsAndRemainAtomicAtTheCap() throws {
+        let store = GameStore(io: .temporary(name: "template-actions-\(UUID().uuidString)"))
+        XCTAssertEqual(store.savePageTemplate(named: "Blank"), .emptyDraft)
+        XCTAssertTrue(store.write("plains"))
+        guard case .saved(let firstID) = store.savePageTemplate(named: "First")
+        else { return XCTFail("first Template did not save") }
+        let firstOrdinal = try XCTUnwrap(store.state.base.savedPageTemplates.first).creationOrdinal
+
+        XCTAssertEqual(store.renamePageTemplate(firstID, to: "  Renamed  "), .updated(firstID))
+        XCTAssertEqual(store.state.base.savedPageTemplates.first?.name, "Renamed")
+        XCTAssertTrue(store.write("frostbound"))
+        XCTAssertEqual(store.overwritePageTemplate(firstID), .updated(firstID))
+        XCTAssertEqual(store.state.base.savedPageTemplates.first?.id, firstID)
+        XCTAssertEqual(store.state.base.savedPageTemplates.first?.creationOrdinal, firstOrdinal)
+        XCTAssertEqual(store.state.base.savedPageTemplates.first?.name, "Renamed")
+
+        store.mutate("test: fill template cap") { state in
+            let page = state.base.page
+            while state.base.savedPageTemplates.count < PageTemplateRules.capacity {
+                let raw = state.base.nextPageTemplateID
+                state.base.nextPageTemplateID += 1
+                state.base.savedPageTemplates.append(.init(
+                    id: .init(rawValue: raw), name: "Template \(raw)", page: page,
+                    creationOrdinal: raw))
+            }
+        }
+        let before = store.state
+        XCTAssertEqual(store.savePageTemplate(named: "One too many"),
+                       .capacityReached(PageTemplateRules.capacity))
+        XCTAssertEqual(store.state, before)
+        XCTAssertEqual(store.deletePageTemplate(.init(rawValue: UInt64.max)), .staleTemplate)
+        XCTAssertEqual(store.state, before)
+        XCTAssertEqual(store.deletePageTemplate(firstID), .deleted(firstID))
+        XCTAssertFalse(store.state.base.savedPageTemplates.contains { $0.id == firstID })
+
+        let nextID = store.state.base.nextPageTemplateID
+        guard case .saved(let replacementID) = store.savePageTemplate(named: "After deletion")
+        else { return XCTFail("deleting at cap did not make room") }
+        XCTAssertEqual(replacementID.rawValue, nextID)
+        XCTAssertNotEqual(replacementID, firstID, "deleted stable IDs must never be reused")
+    }
+
+    @MainActor
+    func testTemplateRefusesMalformedLinksWithoutMutatingTheSave() {
+        let store = GameStore(io: .temporary(name: "template-invalid-link-\(UUID().uuidString)"))
+        XCTAssertTrue(store.write("plains"))
+        store.mutate("test: inject malformed link") { state in
+            let placed = state.base.page.runes[0]
+            state.base.page.links = [MarkLink(placed.id, .init(rawValue: UInt64.max))]
+        }
+        let before = store.state
+        XCTAssertEqual(store.savePageTemplate(named: "Broken"), .invalidDraft)
+        XCTAssertEqual(store.state, before, "a refused Template must be an atomic no-op")
     }
 
     @MainActor

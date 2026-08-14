@@ -38,6 +38,14 @@ struct WritingDeskView: View {
     @State private var tutorialLesson: TutorialLessonID?
     @State private var pageInteractionDismissalToken = 0
     @State private var isConfirmingClear = false
+    @State private var pagesSection: PagesSection = .collected
+    @State private var isNamingTemplate = false
+    @State private var templateName = ""
+    @State private var renamingTemplateID: PageTemplateID?
+    @State private var pendingTemplateLoad: PageTemplateID?
+    @State private var pendingTemplateOverwrite: PageTemplateID?
+    @State private var pendingTemplateDelete: PageTemplateID?
+    @State private var templateError: String?
 
     @State private var bin: Bin = .compounds
 
@@ -87,6 +95,12 @@ struct WritingDeskView: View {
         var id: String { rawValue }
     }
 
+    private enum PagesSection: String, CaseIterable, Identifiable {
+        case collected = "Collected"
+        case templates = "Templates"
+        var id: String { rawValue }
+    }
+
     private var state: GameState { store.state }
     private var projection: BookProjection {
         selectedWorldPageID.flatMap(store.worldPageProjection) ?? store.bookProjection
@@ -112,12 +126,20 @@ struct WritingDeskView: View {
                 .pickerStyle(.segmented)
                 .frame(width: 220)
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 if pane == .write {
+                    Button {
+                        templateName = ""
+                        isNamingTemplate = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                    }
+                    .disabled(state.base.page.runes.isEmpty)
+                    .accessibilityLabel("Save Template")
                     Button("Clear") {
                         isConfirmingClear = true
                     }
-                        .disabled(state.base.page.runes.isEmpty)
+                    .disabled(state.base.page.runes.isEmpty)
                 }
             }
         }
@@ -135,6 +157,20 @@ struct WritingDeskView: View {
         } message: {
             Text("Every placed mark and connection on this page will be removed.")
         }
+        .modifier(TemplatePresentationModifier(
+            markCount: state.base.page.runes.count,
+            isNaming: $isNamingTemplate,
+            name: $templateName,
+            renamingID: $renamingTemplateID,
+            loadingID: $pendingTemplateLoad,
+            overwritingID: $pendingTemplateOverwrite,
+            deletingID: $pendingTemplateDelete,
+            error: $templateError,
+            save: { reportTemplateResult(store.savePageTemplate(named: $0)) },
+            rename: { reportTemplateResult(store.renamePageTemplate($0, to: $1)) },
+            load: performTemplateLoad,
+            overwrite: { reportTemplateResult(store.overwritePageTemplate($0)) },
+            delete: { reportTemplateResult(store.deletePageTemplate($0)) }))
         .tutorialHoverOverlay(isPresented: tutorialLesson != nil) {
             if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
                 TutorialCard(lesson: lesson,
@@ -312,7 +348,28 @@ struct WritingDeskView: View {
     // MARK: Pane 2 — what you're about to make
 
     private var pagesPane: some View {
-        ScrollView {
+        VStack(spacing: 0) {
+            Picker("Page collection", selection: $pagesSection) {
+                ForEach(PagesSection.allCases) { Text($0.rawValue).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal, 12)
+            .padding(.top, 10)
+
+            ScrollView {
+                switch pagesSection {
+                case .collected: collectedPagesGrid
+                case .templates: templatesGrid
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private var collectedPagesGrid: some View {
+        if state.base.collectedWorldPages.isEmpty {
+            ContentUnavailableView("No collected pages", systemImage: "doc")
+                .padding(.top, 48)
+        } else {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
                 ForEach(state.base.collectedWorldPages) { instance in
                     Button {
@@ -350,10 +407,43 @@ struct WritingDeskView: View {
                 }
             }
             .padding(12)
-            if state.base.collectedWorldPages.isEmpty {
-                ContentUnavailableView("No collected pages", systemImage: "doc")
+        }
+    }
+
+    @ViewBuilder private var templatesGrid: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("\(state.base.savedPageTemplates.count) of \(PageTemplateRules.capacity) Templates")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .accessibilityLabel("\(state.base.savedPageTemplates.count) of \(PageTemplateRules.capacity) Templates saved")
+
+            if state.base.savedPageTemplates.isEmpty {
+                ContentUnavailableView(
+                    "No Templates",
+                    systemImage: "square.grid.2x2",
+                    description: Text("Write a page, then use Save Template to keep its layout."))
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 36)
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+                    ForEach(state.base.savedPageTemplates.sorted {
+                        $0.creationOrdinal < $1.creationOrdinal
+                    }) { template in
+                        SavedPageTemplateCard(
+                            template: template,
+                            canOverwrite: !state.base.page.runes.isEmpty,
+                            load: { requestTemplateLoad(template.id) },
+                            rename: {
+                                templateName = template.name
+                                renamingTemplateID = template.id
+                            },
+                            overwrite: { pendingTemplateOverwrite = template.id },
+                            delete: { pendingTemplateDelete = template.id })
+                    }
+                }
             }
         }
+        .padding(12)
     }
 
     private var worldPane: some View {
@@ -567,6 +657,183 @@ struct WritingDeskView: View {
         guard tutorialLesson == nil, store.state.tutorial[id].status != .completed else { return }
         store.tutorialEligible(id)
         tutorialLesson = id
+    }
+
+    private func requestTemplateLoad(_ id: PageTemplateID) {
+        guard let template = state.base.savedPageTemplates.first(where: { $0.id == id }) else {
+            templateError = "That Template is no longer available."
+            return
+        }
+        if !state.base.page.runes.isEmpty,
+           !PageTemplateRules.structurallyEquivalent(state.base.page, template.page) {
+            pendingTemplateLoad = id
+        } else {
+            performTemplateLoad(id)
+        }
+    }
+
+    private func performTemplateLoad(_ id: PageTemplateID) {
+        let result = store.loadPageTemplate(id)
+        reportTemplateResult(result)
+        guard result.succeeded else { return }
+        dismissPageInteraction()
+        ghost = nil
+        selectedWorldPageID = nil
+        pane = .write
+    }
+
+    private func reportTemplateResult(_ result: PageTemplateActionResult) {
+        switch result {
+        case .saved, .updated, .deleted, .loaded, .noChange:
+            break
+        case .emptyDraft:
+            templateError = "Write at least one mark before saving or overwriting a Template."
+        case .invalidDraft:
+            templateError = "This page contains a mark or connection that can no longer be copied safely."
+        case .capacityReached(let limit):
+            templateError = "You can keep up to \(limit) Templates. Delete one before saving another."
+        case .staleTemplate:
+            templateError = "That Template changed or was removed before the action completed."
+        }
+    }
+}
+
+private struct TemplatePresentationModifier: ViewModifier {
+    let markCount: Int
+    @Binding var isNaming: Bool
+    @Binding var name: String
+    @Binding var renamingID: PageTemplateID?
+    @Binding var loadingID: PageTemplateID?
+    @Binding var overwritingID: PageTemplateID?
+    @Binding var deletingID: PageTemplateID?
+    @Binding var error: String?
+    let save: (String) -> Void
+    let rename: (PageTemplateID, String) -> Void
+    let load: (PageTemplateID) -> Void
+    let overwrite: (PageTemplateID) -> Void
+    let delete: (PageTemplateID) -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .alert("Save Template", isPresented: $isNaming) {
+                TextField("Template name", text: $name)
+                Button("Save") { save(name) }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Save this \(markCount)-mark page as a reusable layout.")
+            }
+            .alert("Rename Template", isPresented: optionalBinding($renamingID)) {
+                TextField("Template name", text: $name)
+                Button("Rename") {
+                    if let id = renamingID { rename(id, name) }
+                    renamingID = nil
+                }
+                Button("Cancel", role: .cancel) { renamingID = nil }
+            }
+            .confirmationDialog(
+                "Replace the current page?", isPresented: optionalBinding($loadingID),
+                titleVisibility: .visible
+            ) {
+                Button("Replace \(markCount) marks", role: .destructive) {
+                    if let id = loadingID { load(id) }
+                    loadingID = nil
+                }
+                Button("Keep current page", role: .cancel) { loadingID = nil }
+            } message: {
+                Text("Loading this Template replaces every mark and connection in the current draft.")
+            }
+            .confirmationDialog(
+                "Overwrite this Template?", isPresented: optionalBinding($overwritingID),
+                titleVisibility: .visible
+            ) {
+                Button("Overwrite Template", role: .destructive) {
+                    if let id = overwritingID { overwrite(id) }
+                    overwritingID = nil
+                }
+                Button("Cancel", role: .cancel) { overwritingID = nil }
+            } message: {
+                Text("Its saved layout will be replaced by the current page.")
+            }
+            .confirmationDialog(
+                "Delete this Template?", isPresented: optionalBinding($deletingID),
+                titleVisibility: .visible
+            ) {
+                Button("Delete Template", role: .destructive) {
+                    if let id = deletingID { delete(id) }
+                    deletingID = nil
+                }
+                Button("Cancel", role: .cancel) { deletingID = nil }
+            } message: {
+                Text("The current page and previously bound worlds will not change.")
+            }
+            .alert("Template unavailable", isPresented: Binding(
+                get: { error != nil }, set: { if !$0 { error = nil } }
+            )) {
+                Button("OK") { error = nil }
+            } message: {
+                Text(error ?? "This Template could not be changed.")
+            }
+    }
+
+    private func optionalBinding<T>(_ value: Binding<T?>) -> Binding<Bool> {
+        Binding(get: { value.wrappedValue != nil },
+                set: { if !$0 { value.wrappedValue = nil } })
+    }
+}
+
+private struct SavedPageTemplateCard: View {
+    let template: SavedPageTemplate
+    let canOverwrite: Bool
+    let load: () -> Void
+    let rename: () -> Void
+    let overwrite: () -> Void
+    let delete: () -> Void
+    @State private var showsActions = false
+
+    var body: some View {
+        Button { showsActions = true } label: {
+            VStack(alignment: .leading, spacing: 7) {
+                WorldPageReadOnlyThumbnail(page: template.page)
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(1, contentMode: .fit)
+                Text(template.name)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Text("\(template.page.runes.count) \(template.page.runes.count == 1 ? "mark" : "marks")")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(10)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(template.name), Template, \(template.page.runes.count) marks")
+        .popover(isPresented: $showsActions, arrowEdge: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(template.name).font(.headline).padding(.bottom, 4)
+                Button("Load", systemImage: "doc.on.doc", action: dismissing(load))
+                Button("Rename", systemImage: "pencil", action: dismissing(rename))
+                Button("Overwrite", systemImage: "arrow.triangle.2.circlepath",
+                       action: dismissing(overwrite))
+                    .disabled(!canOverwrite)
+                Divider()
+                Button("Delete", systemImage: "trash", role: .destructive,
+                       action: dismissing(delete))
+            }
+            .buttonStyle(.borderless)
+            .padding(16)
+            .frame(idealWidth: 230)
+            .presentationCompactAdaptation(.popover)
+        }
+    }
+
+    private func dismissing(_ action: @escaping () -> Void) -> () -> Void {
+        {
+            showsActions = false
+            action()
+        }
     }
 }
 

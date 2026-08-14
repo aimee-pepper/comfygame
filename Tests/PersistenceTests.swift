@@ -642,6 +642,58 @@ final class PersistenceTests: XCTestCase {
         }
     }
 
+    func testSavedPageTemplatesRoundTripAndRepairMissingMonotonicCounters() throws {
+        var state = GameState.newGame()
+        let page = Page(runes: [
+            PlacedRune(id: .init(rawValue: 88), content: .compound("plains"), hand: .crude,
+                       origin: .init(column: 0, row: 0), shapeID: "crude_block")
+        ])
+        state.base.savedPageTemplates = [
+            .init(id: .init(rawValue: 12), name: "Old road", page: page, creationOrdinal: 12)
+        ]
+        state.base.nextPageTemplateID = 19
+        state.base.nextTemplateMarkID = PageTemplateRules.firstLoadedMarkID + 90
+
+        let roundTrip = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: SaveCodec.makeEncoder().encode(state))
+        XCTAssertEqual(roundTrip.base.savedPageTemplates, state.base.savedPageTemplates)
+        XCTAssertEqual(roundTrip.base.nextPageTemplateID, 19)
+        XCTAssertEqual(roundTrip.base.nextTemplateMarkID,
+                       PageTemplateRules.firstLoadedMarkID + 90)
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
+        var base = try XCTUnwrap(object["base"] as? [String: Any])
+        base.removeValue(forKey: "nextPageTemplateID")
+        base.removeValue(forKey: "nextTemplateMarkID")
+        object["base"] = base
+        let repaired = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertGreaterThan(repaired.base.nextPageTemplateID, 12)
+        XCTAssertGreaterThan(repaired.base.nextTemplateMarkID, 88)
+        XCTAssertGreaterThanOrEqual(repaired.base.nextTemplateMarkID,
+                                    PageTemplateRules.firstLoadedMarkID)
+        XCTAssertEqual(repaired.base.savedPageTemplates, state.base.savedPageTemplates)
+    }
+
+    func testLegacySaveWithoutTemplateFieldsDecodesToAnEmptyTemplateShelf() throws {
+        let state = GameState.newGame()
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(state)) as? [String: Any])
+        var base = try XCTUnwrap(object["base"] as? [String: Any])
+        base.removeValue(forKey: "savedPageTemplates")
+        base.removeValue(forKey: "nextPageTemplateID")
+        base.removeValue(forKey: "nextTemplateMarkID")
+        object["base"] = base
+
+        let decoded = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertTrue(decoded.base.savedPageTemplates.isEmpty)
+        XCTAssertEqual(decoded.base.nextPageTemplateID, 1)
+        XCTAssertGreaterThanOrEqual(decoded.base.nextTemplateMarkID,
+                                    PageTemplateRules.firstLoadedMarkID)
+    }
+
     // MARK: - Helpers
 
     @MainActor

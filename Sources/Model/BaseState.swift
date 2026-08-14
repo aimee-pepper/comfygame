@@ -78,6 +78,12 @@ struct BaseState: Codable, Equatable, Sendable {
     /// The page is a **fixed** grid — it never grows. Progression is learning to write smaller on
     /// it, through finer hands and learned compounds. Essence remains the per-bind consumable.
     var page: Page = Page()
+    /// Reusable copies of pages the player personally authored. Templates preserve composition,
+    /// not a generated world or discount; every action addresses the stable ID below.
+    var savedPageTemplates: [SavedPageTemplate] = []
+    var nextPageTemplateID: UInt64 = 1
+    /// Separate high namespace for identities issued when a Template becomes a fresh draft.
+    var nextTemplateMarkID: UInt64 = PageTemplateRules.firstLoadedMarkID
     /// Physical, pre-inscribed pages available to bind. These are separate from the editable
     /// draft and from the Library's Diary Pages: binding consumes one exact instance.
     var collectedWorldPages: [WorldPageInstance] = []
@@ -339,6 +345,7 @@ struct BaseState: Codable, Equatable, Sendable {
         case lifetimeRawEssenceRefined, autoRefineReturnedRawEssence, lastAutoRefinedOutcomeID
         case ownedSymbols, ownedGambitComponents
         case completedResearch, knownConsumableRecipes, odaFixtureRestored, stations, page
+        case savedPageTemplates, nextPageTemplateID, nextTemplateMarkID
         case collectedWorldPages, starterWorldPageBundleFulfilled
         case ownedHands, hasChainingUnlock, instrumentLoadout
         case hasConfiguredInstrumentLoadout
@@ -371,6 +378,9 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(hasConfiguredInstrumentLoadout, forKey: .hasConfiguredInstrumentLoadout)
         try c.encode(stations, forKey: .stations)
         try c.encode(page, forKey: .page)
+        try c.encode(savedPageTemplates, forKey: .savedPageTemplates)
+        try c.encode(nextPageTemplateID, forKey: .nextPageTemplateID)
+        try c.encode(nextTemplateMarkID, forKey: .nextTemplateMarkID)
         try c.encode(collectedWorldPages, forKey: .collectedWorldPages)
         try c.encode(starterWorldPageBundleFulfilled, forKey: .starterWorldPageBundleFulfilled)
         try c.encode(ownedHands, forKey: .ownedHands)
@@ -436,6 +446,27 @@ struct BaseState: Codable, Equatable, Sendable {
             knownConsumableRecipes.insert("salve_lesser")
         }
         page = try container.decodeIfPresent(Page.self, forKey: .page) ?? Page()
+        savedPageTemplates = try container.decodeIfPresent(
+            [SavedPageTemplate].self, forKey: .savedPageTemplates) ?? []
+        let highestTemplateID = savedPageTemplates.map(\.id.rawValue).max() ?? 0
+        nextPageTemplateID = max(
+            try container.decodeIfPresent(UInt64.self, forKey: .nextPageTemplateID) ?? 1,
+            highestTemplateID &+ 1)
+        let markIDs = page.runes.flatMap { rune -> [UInt64] in
+            var ids = [rune.id.rawValue]
+            if case .rune(let sigil) = rune.content { ids.append(sigil.id.rawValue) }
+            return ids
+        } + savedPageTemplates.flatMap { template in
+            template.page.runes.flatMap { rune -> [UInt64] in
+                var ids = [rune.id.rawValue]
+                if case .rune(let sigil) = rune.content { ids.append(sigil.id.rawValue) }
+                return ids
+            }
+        }
+        nextTemplateMarkID = max(
+            try container.decodeIfPresent(UInt64.self, forKey: .nextTemplateMarkID)
+                ?? PageTemplateRules.firstLoadedMarkID,
+            max(PageTemplateRules.firstLoadedMarkID, (markIDs.max() ?? 0) &+ 1))
         collectedWorldPages = try container.decodeIfPresent([WorldPageInstance].self,
                                                              forKey: .collectedWorldPages) ?? []
         starterWorldPageBundleFulfilled = try container.decodeIfPresent(
