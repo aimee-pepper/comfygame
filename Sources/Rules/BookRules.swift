@@ -35,6 +35,19 @@ enum BookRules {
         return book
     }
 
+    /// Resolves a frozen pre-inscribed physical page. Its writing has already been paid for, so
+    /// only the ordinary resolved book price remains; base, symbol value and future bind
+    /// surcharges are deliberately untouched.
+    static func resolveBook(worldPage instance: WorldPageInstance) -> BoundBook {
+        var book = resolveBook(page: instance.definition.page)
+        book.essencePaid -= inkCost(of: instance.definition.page)
+        precondition(book.essencePaid == instance.definition.worldPageCost,
+                     "Authored World Page price drifted from the rules-owned resolved price")
+        book.worldPageUseReceipt = WorldPageUseReceipt(
+            instanceID: instance.id, definition: instance.definition, essencePaid: book.essencePaid)
+        return book
+    }
+
     /// What the marks themselves cost to write, by the space they take up.
     static func inkCost(of page: Page) -> Int {
         Int((Double(page.usedCells) * Tuning.Book.essencePerCell).rounded())

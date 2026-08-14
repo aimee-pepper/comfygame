@@ -282,3 +282,100 @@ struct Page: Codable, Equatable, Sendable {
         runes.first { $0.cells.contains(cell) }
     }
 }
+
+/// Stable authored identity for a physical, pre-inscribed World Page.
+struct WorldPageDefinitionID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
+/// The immutable authored facts shared by every copy of a World Page definition.
+///
+/// Only the three opening pages belong to this registry. Repeatable field pages, templates and
+/// unknown-glyph presentation are separate contracts and must not leak into the starter grant.
+struct WorldPageDefinition: Codable, Equatable, Identifiable, Sendable {
+    enum Disposition: String, Codable, Sendable { case starterUnique }
+
+    var id: WorldPageDefinitionID
+    var title: String
+    var disposition: Disposition
+    var provenance: String
+    var page: Page
+    var copiedCost: Int
+    var worldPageCost: Int
+    var seed: UInt64
+    var promise: String
+}
+
+/// One physical page in the campaign folio. Definition identity is not instance identity: the
+/// latter is what an eventual bind transaction must quote, revalidate and consume exactly once.
+struct WorldPageInstance: Codable, Equatable, Identifiable, Sendable {
+    var id: InstanceID
+    var definition: WorldPageDefinition
+}
+
+/// Frozen proof of the exact physical page used to create a world.
+///
+/// History retains the complete authored snapshot instead of looking the definition up again, so
+/// later catalogue edits cannot rewrite what the player spent or what that departed world said.
+struct WorldPageUseReceipt: Codable, Equatable, Sendable {
+    var instanceID: InstanceID
+    var definition: WorldPageDefinition
+    var essencePaid: Int
+}
+
+enum WorldPageCatalog {
+    // BEGIN GENERATED STARTER WORLD PAGES — Scripts/generate_world_pages.py
+    static let authoritySHA256 = "04f73e3cb93850ec1f449d9f302c4ca276ac1091631ed81322458d8b8142c534"
+    static let openMeadowID: WorldPageDefinitionID = "starter_open_meadow"
+    static let rainwashedShoreID: WorldPageDefinitionID = "starter_rainwashed_shore"
+    static let stoneHollowID: WorldPageDefinitionID = "starter_stone_hollow"
+
+    /// Reserved, explicit physical identities. They do not depend on inventory insertion order or
+    /// the general item allocator and therefore remain byte-stable across relaunch and migration.
+    static let starterInstances: [WorldPageInstance] = zip(
+        [InstanceID(rawValue: 0x5750_0000_0000_0001),
+         InstanceID(rawValue: 0x5750_0000_0000_0002),
+         InstanceID(rawValue: 0x5750_0000_0000_0003)],
+        starterDefinitions
+    ).map { WorldPageInstance(id: $0.0, definition: $0.1) }
+
+    static let starterDefinitions: [WorldPageDefinition] = [
+        definition(id: openMeadowID, title: "Open Meadow",
+                   provenance: "A clean practice page, already written in rough charcoal.",
+                   marks: [("plains", 1, "crude_smear", 0, 0),
+                           ("verdant", 2, "crude_smear", 3, 3)],
+                   copiedCost: 21, worldPageCost: 14, seed: 2,
+                   promise: "Open, living, modestly resourced and safe enough to learn the opening loop."),
+        definition(id: rainwashedShoreID, title: "Rainwashed Shore",
+                   provenance: "A clean practice page with one broad charcoal mark.",
+                   marks: [("archipelago", 1, "crude_smear", 1, 2)],
+                   copiedCost: 18, worldPageCost: 14, seed: 26,
+                   promise: "A readable water-and-relief contrast without an opening lethality spike."),
+        definition(id: stoneHollowID, title: "Stone Hollow",
+                   provenance: "A clean practice page with charcoal rubbed into the grain.",
+                   marks: [("caverns", 1, "crude_smear", 0, 1),
+                           ("common_ore", 2, "crude_block", 4, 3)],
+                   copiedCost: 22, worldPageCost: 16, seed: 23,
+                   promise: "Stone, enclosure and ordinary ore within the accepted level-one envelope.")
+    ]
+    // END GENERATED STARTER WORLD PAGES
+
+    static func definition(_ id: WorldPageDefinitionID) -> WorldPageDefinition? {
+        starterDefinitions.first { $0.id == id }
+    }
+
+    private static func definition(
+        id: WorldPageDefinitionID, title: String, provenance: String,
+        marks: [(String, UInt64, String, Int, Int)], copiedCost: Int, worldPageCost: Int,
+        seed: UInt64, promise: String
+    ) -> WorldPageDefinition {
+        let page = Page(runes: marks.map { symbol, markID, shapeID, column, row in
+            PlacedRune(id: InstanceID(rawValue: markID), content: .compound(SymbolID(rawValue: symbol)),
+                       hand: .crude, origin: PageCell(column: column, row: row), shapeID: shapeID)
+        })
+        return WorldPageDefinition(id: id, title: title, disposition: .starterUnique,
+                                   provenance: provenance, page: page, copiedCost: copiedCost,
+                                   worldPageCost: worldPageCost, seed: seed, promise: promise)
+    }
+}

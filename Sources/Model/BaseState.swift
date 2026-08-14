@@ -76,6 +76,12 @@ struct BaseState: Codable, Equatable, Sendable {
     /// The page is a **fixed** grid — it never grows. Progression is learning to write smaller on
     /// it, through finer hands and learned compounds. Essence remains the per-bind consumable.
     var page: Page = Page()
+    /// Physical, pre-inscribed pages available to bind. These are separate from the editable
+    /// draft and from the Library's Diary Pages: binding consumes one exact instance.
+    var collectedWorldPages: [WorldPageInstance] = []
+    /// Distinguishes a fulfilled starter grant (including a deliberate no-grant for a progressed
+    /// legacy campaign) from a save written before physical World Pages existed.
+    var starterWorldPageBundleFulfilled = false
     /// Which hands the player owns. Everyone starts with charcoal, and better instruments let you
     /// say the same things in less space — never new things.
     var ownedHands: Set<Hand> = [.crude]
@@ -178,6 +184,8 @@ struct BaseState: Codable, Equatable, Sendable {
         state.companion.gambits = GambitStarter.rules
         state.syncInventoryCapacity()
         state.preparationLoadout = []
+        state.collectedWorldPages = WorldPageCatalog.starterInstances
+        state.starterWorldPageBundleFulfilled = true
         return state
     }
 
@@ -328,7 +336,9 @@ struct BaseState: Codable, Equatable, Sendable {
         case satchelLoadout, spillover, goldCoins, tradingPost, recycler
         case lifetimeRawEssenceRefined, autoRefineReturnedRawEssence, lastAutoRefinedOutcomeID
         case ownedSymbols, ownedGambitComponents
-        case completedResearch, knownConsumableRecipes, odaFixtureRestored, stations, page, ownedHands, hasChainingUnlock, instrumentLoadout
+        case completedResearch, knownConsumableRecipes, odaFixtureRestored, stations, page
+        case collectedWorldPages, starterWorldPageBundleFulfilled
+        case ownedHands, hasChainingUnlock, instrumentLoadout
         case hasConfiguredInstrumentLoadout
         case ownedSources
         case roster, activeCompanion, activeParty, binderEquipped, hasAutomateSelfUnlock, satchelTier
@@ -358,6 +368,8 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(hasConfiguredInstrumentLoadout, forKey: .hasConfiguredInstrumentLoadout)
         try c.encode(stations, forKey: .stations)
         try c.encode(page, forKey: .page)
+        try c.encode(collectedWorldPages, forKey: .collectedWorldPages)
+        try c.encode(starterWorldPageBundleFulfilled, forKey: .starterWorldPageBundleFulfilled)
         try c.encode(ownedHands, forKey: .ownedHands)
         try c.encode(roster, forKey: .roster)
         try c.encode(activeParty, forKey: .activeParty)
@@ -419,6 +431,10 @@ struct BaseState: Codable, Equatable, Sendable {
             knownConsumableRecipes.insert("salve_lesser")
         }
         page = try container.decodeIfPresent(Page.self, forKey: .page) ?? Page()
+        collectedWorldPages = try container.decodeIfPresent([WorldPageInstance].self,
+                                                             forKey: .collectedWorldPages) ?? []
+        starterWorldPageBundleFulfilled = try container.decodeIfPresent(
+            Bool.self, forKey: .starterWorldPageBundleFulfilled) ?? false
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
         if try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) == true {
             completedResearch.insert("pen_chaining")

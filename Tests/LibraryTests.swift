@@ -6,6 +6,35 @@ import XCTest
 @MainActor
 final class LibraryTests: XCTestCase {
 
+    func testWorldPageReceiptIsFrozenIntoHistoryAndSurvivesRoundTrip() throws {
+        let instance = try XCTUnwrap(WorldPageCatalog.starterInstances.first)
+        let book = BookRules.resolveBook(worldPage: instance)
+        let record = LibraryRules.record(book: book, page: instance.definition.page,
+                                         seed: instance.definition.seed, runIndex: 1,
+                                         travellers: [])
+
+        XCTAssertEqual(record.worldPageUseReceipt, book.worldPageUseReceipt)
+        XCTAssertEqual(record.worldPageUseReceipt?.instanceID, instance.id)
+        XCTAssertEqual(record.worldPageUseReceipt?.definition.title, "Open Meadow")
+        XCTAssertEqual(record.worldPageUseReceipt?.essencePaid, 14)
+
+        let data = try SaveCodec.makeEncoder().encode(record)
+        let reloaded = try SaveCodec.makeDecoder().decode(VisitedWorld.self, from: data)
+        XCTAssertEqual(reloaded.worldPageUseReceipt, record.worldPageUseReceipt)
+    }
+
+    func testLegacyHistoryDecodesWithoutWorldPageReceipt() throws {
+        let legacy = VisitedWorld(id: InstanceID(rawValue: 44), seed: 44, runIndex: 1,
+                                  descriptionSentence: "", written: [], inertModifiers: [],
+                                  readings: [:], travellersPresent: [])
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(legacy)) as? [String: Any])
+        object.removeValue(forKey: "worldPageUseReceipt")
+        let data = try JSONSerialization.data(withJSONObject: object)
+        let decoded = try SaveCodec.makeDecoder().decode(VisitedWorld.self, from: data)
+        XCTAssertNil(decoded.worldPageUseReceipt)
+    }
+
     func testWorkshopPatternRegistryRejectsDuplicateIDsRegardlessOfOrder() {
         let maud = WorkshopPatternRegistry.Definition(
             id: "maud_fitting_pattern", name: "Maud's fitting pattern")

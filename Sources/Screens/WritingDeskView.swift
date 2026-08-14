@@ -1,5 +1,11 @@
 import SwiftUI
 
+enum WritingDeskSourceRules {
+    static func selectedPage(afterEnteringWrite: Bool, current: InstanceID?) -> InstanceID? {
+        afterEnteringWrite ? nil : current
+    }
+}
+
 enum WritingDeskLayout {
     /// Three readable palette identities across an ordinary 368pt phone. Four technically fit,
     /// but authored names such as Frostbound and Archipelago collapse into ellipses.
@@ -27,6 +33,7 @@ struct WritingDeskView: View {
     /// same act.
     @State private var ghost: GhostRune?
     @State private var pane: Pane = .write
+    @State private var selectedWorldPageID: InstanceID?
     @State private var bornAnchored = false
     @State private var tutorialLesson: TutorialLessonID?
     @State private var pageInteractionDismissalToken = 0
@@ -74,17 +81,21 @@ struct WritingDeskView: View {
 
     private enum Pane: String, CaseIterable, Identifiable {
         case write = "Write"
+        case pages = "Pages"
         case world = "The world"
         var id: String { rawValue }
     }
 
     private var state: GameState { store.state }
-    private var projection: BookProjection { store.bookProjection }
+    private var projection: BookProjection {
+        selectedWorldPageID.flatMap(store.worldPageProjection) ?? store.bookProjection
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             switch pane {
             case .write: writePane
+            case .pages: pagesPane
             case .world: worldPane
             }
         }
@@ -101,12 +112,14 @@ struct WritingDeskView: View {
                 .frame(width: 220)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Clear") {
-                    dismissPageInteraction()
-                    store.clearPage()
-                    ghost = nil
+                if pane == .write {
+                    Button("Clear") {
+                        dismissPageInteraction()
+                        store.clearPage()
+                        ghost = nil
+                    }
+                        .disabled(state.base.page.runes.isEmpty)
                 }
-                    .disabled(state.base.page.runes.isEmpty)
             }
         }
         .tutorialHoverOverlay(isPresented: tutorialLesson != nil) {
@@ -116,7 +129,10 @@ struct WritingDeskView: View {
                              notNow: { store.deferTutorial(id); tutorialLesson = nil })
             }
         }
-        .onAppear { presentWritingRequestIfNeeded() }
+        .onAppear {
+            store.reconcileStarterWorldPageBundle()
+            presentWritingRequestIfNeeded()
+        }
         .onDisappear { dismissPageInteraction() }
         .onChange(of: ghost?.glyph) { _, glyph in
             guard glyph != nil else { return }
@@ -127,6 +143,8 @@ struct WritingDeskView: View {
         }
         .onChange(of: pane) { _, pane in
             dismissPageInteraction()
+            selectedWorldPageID = WritingDeskSourceRules.selectedPage(
+                afterEnteringWrite: pane == .write, current: selectedWorldPageID)
             guard pane == .world else { return }
             present(.writingPreview)
             store.completeTutorial(.writingPreview, fact: "world_pane_opened")
@@ -275,12 +293,55 @@ struct WritingDeskView: View {
 
     // MARK: Pane 2 — what you're about to make
 
+    private var pagesPane: some View {
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+                ForEach(state.base.collectedWorldPages) { instance in
+                    Button {
+                        selectedWorldPageID = instance.id
+                        pane = .world
+                    } label: {
+                        VStack(alignment: .leading, spacing: 7) {
+                            WorldPageReadOnlyThumbnail(page: instance.definition.page)
+                                .frame(maxWidth: .infinity)
+                                .aspectRatio(1, contentMode: .fit)
+                            Text(instance.definition.title)
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+                            Text(instance.definition.provenance)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
+                            Text("Bind · \(instance.definition.worldPageCost) Essence")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.tint)
+                        }
+                        .padding(10)
+                        .background(Color(.secondarySystemGroupedBackground),
+                                    in: RoundedRectangle(cornerRadius: 12))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(selectedWorldPageID == instance.id
+                                        ? Color.accentColor : Color.clear, lineWidth: 2)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("\(instance.definition.title), collected World Page, costs \(instance.definition.worldPageCost) Essence")
+                }
+            }
+            .padding(12)
+            if state.base.collectedWorldPages.isEmpty {
+                ContentUnavailableView("No collected pages", systemImage: "doc")
+            }
+        }
+    }
+
     private var worldPane: some View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 12) {
                     PreviewPanel(projection: projection, discovery: state.reality.discovery)
-                    if state.base.page.runes.isEmpty { blankPageNote }
+                    if selectedWorldPageID == nil && state.base.page.runes.isEmpty { blankPageNote }
                 }
                 .padding(.horizontal, 12)
                 .padding(.bottom, 8)
@@ -394,15 +455,25 @@ struct WritingDeskView: View {
                 Toggle(isOn: $bornAnchored) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Born anchored").font(.subheadline.weight(.semibold))
-                        Text("Keep this world in the Atlas · +\(store.bornAnchoredPremium) essence")
+                        Text("Keep this world in the Atlas · +\(activeAnchoredPremium) essence")
                             .font(.caption).foregroundStyle(.secondary)
                     }
                 }
                 .padding(.horizontal, 4)
                 .accessibilityIdentifier("writing.born-anchored")
             }
+            if selectedWorldPageID != nil {
+                Text("Collected World Page · consumed only when departure succeeds")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
             Button {
-                if store.bindAndDepart(bornAnchored: bornAnchored) {
+                let committed = if let id = selectedWorldPageID {
+                    store.bindAndDepart(worldPageInstanceID: id, bornAnchored: bornAnchored)
+                } else {
+                    store.bindAndDepart(bornAnchored: bornAnchored)
+                }
+                if committed {
                     store.completeTutorial(.writingPageRequest, fact: "first_bind")
                     store.completeTutorial(.writingBind, fact: "first_run_created")
                 }
@@ -417,7 +488,7 @@ struct WritingDeskView: View {
                 .padding(.horizontal, 4)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(!store.canBindAndDepart(bornAnchored: bornAnchored))
+            .disabled(!activeBindAvailability.isReady)
 
             if let error = store.bindError {
                 Text(error)
@@ -429,7 +500,7 @@ struct WritingDeskView: View {
 
             Text(bindFootnote)
                 .font(.caption)
-                .foregroundStyle(store.canBindAndDepart(bornAnchored: bornAnchored) ? Color.secondary : Color.orange)
+                .foregroundStyle(activeBindAvailability.isReady ? Color.secondary : Color.orange)
                 .multilineTextAlignment(.center)
         }
         .padding(.horizontal, 16)
@@ -438,11 +509,26 @@ struct WritingDeskView: View {
         .background(.bar)
     }
 
-    private var totalCost: Int { projection.cost + (bornAnchored ? store.bornAnchoredPremium : 0) }
+    private var activeBindAvailability: BindAvailability {
+        if let id = selectedWorldPageID {
+            return store.bindAvailability(worldPageInstanceID: id, bornAnchored: bornAnchored)
+        }
+        return store.bindAvailability(bornAnchored: bornAnchored)
+    }
+
+    private var totalCost: Int {
+        if case .ready(let total) = activeBindAvailability { return total }
+        let premium = bornAnchored ? GameStore.bornAnchoredPremium(forBookCost: projection.cost) : 0
+        return projection.cost + premium
+    }
+    private var activeAnchoredPremium: Int {
+        GameStore.bornAnchoredPremium(forBookCost: projection.cost)
+    }
     private var costLabel: String { "\(totalCost)" }
 
     private var bindFootnote: String {
-        if !store.canBindAndDepart(bornAnchored: bornAnchored) {
+        if !activeBindAvailability.isReady {
+            if let refusal = activeBindAvailability.refusalMessage { return refusal }
             if store.needsToRefine {
                 let raw = state.base.resources[Resources.essenceRaw]
                 return "You have \(state.base.essence) essence and \(raw) raw. Refine it at the Essence Spring — raw essence can't be written with."
@@ -461,6 +547,46 @@ struct WritingDeskView: View {
         guard tutorialLesson == nil, store.state.tutorial[id].status != .completed else { return }
         store.tutorialEligible(id)
         tutorialLesson = id
+    }
+}
+
+private struct WorldPageReadOnlyThumbnail: View {
+    let page: Page
+
+    var body: some View {
+        GeometryReader { proxy in
+            let side = min(proxy.size.width / CGFloat(page.width),
+                           proxy.size.height / CGFloat(page.height))
+            ZStack(alignment: .topLeading) {
+                LazyVGrid(columns: Array(repeating: GridItem(.fixed(side), spacing: 0),
+                                         count: page.width), spacing: 0) {
+                    ForEach(0..<(page.width * page.height), id: \.self) { _ in
+                        Rectangle().fill(Color(.systemBackground))
+                            .border(Color.secondary.opacity(0.15), width: 0.5)
+                            .frame(width: side, height: side)
+                    }
+                }
+                ForEach(page.runes) { rune in
+                    RuneGlyph(id: glyphID(for: rune.content))
+                        .frame(width: side * 0.75, height: side * 0.75)
+                        .offset(x: CGFloat(rune.origin.column) * side + side * 0.125,
+                                y: CGFloat(rune.origin.row) * side + side * 0.125)
+                }
+            }
+            .frame(width: side * CGFloat(page.width), height: side * CGFloat(page.height))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .accessibilityHidden(true)
+    }
+
+    private func glyphID(for content: MarkContent) -> String {
+        switch content {
+        case .target(let id): id.rawValue
+        case .source(let id): id.rawValue
+        case .qualifier(let id): id.rawValue
+        case .compound(let id): id.rawValue
+        case .rune(let sigil): sigil.source.rawValue
+        }
     }
 }
 

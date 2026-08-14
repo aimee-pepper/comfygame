@@ -308,6 +308,8 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
     /// Frozen visual authority captured with the world. Legacy History records omit it and remain
     /// on world-grade 1; History never re-resolves current catalogue facts into a newer receipt.
     var worldVisualReceipt: WorldVisualReceipt?
+    /// Frozen physical-page provenance. Legacy and ordinarily written worlds omit it.
+    var worldPageUseReceipt: WorldPageUseReceipt?
     /// Who was standing in it, whether or not you reached them.
     var travellersPresent: [TravellerID]
     /// **Kept on purpose.** The list is curated rather than infinite (Aimee, 6 Aug) — a kept world
@@ -345,7 +347,8 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
          focusAttributions: [String] = [], focusEffects: [RecordedFocusEffect] = [],
          semanticRequests: [String]? = nil,
          bindEssencePaid: Int? = nil,
-         worldVisualReceipt: WorldVisualReceipt? = nil) {
+         worldVisualReceipt: WorldVisualReceipt? = nil,
+         worldPageUseReceipt: WorldPageUseReceipt? = nil) {
         self.id = id
         self.seed = seed
         self.runIndex = runIndex
@@ -362,13 +365,14 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         self.livingAnalysis = nil
         self.clockAnalysis = nil
         self.worldVisualReceipt = worldVisualReceipt
+        self.worldPageUseReceipt = worldPageUseReceipt
     }
 
     /// Includes the retired `inertRungs`, so a history written before the rename still reads.
     private enum CodingKeys: String, CodingKey {
         case id, seed, runIndex, descriptionSentence, written, semanticRequests, bindEssencePaid, inertModifiers, readings
         case travellersPresent, isKept, focusAttributions, focusEffects, livingAnalysis, clockAnalysis
-        case worldVisualReceipt
+        case worldVisualReceipt, worldPageUseReceipt
         case inertRungs
     }
 
@@ -388,6 +392,7 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         try c.encodeIfPresent(livingAnalysis, forKey: .livingAnalysis)
         try c.encodeIfPresent(clockAnalysis, forKey: .clockAnalysis)
         try c.encodeIfPresent(worldVisualReceipt, forKey: .worldVisualReceipt)
+        try c.encodeIfPresent(worldPageUseReceipt, forKey: .worldPageUseReceipt)
         try c.encode(travellersPresent, forKey: .travellersPresent)
         try c.encode(isKept, forKey: .isKept)
     }
@@ -411,6 +416,8 @@ struct VisitedWorld: Codable, Equatable, Identifiable, Sendable {
         clockAnalysis = try c.decodeIfPresent(ClockAnalysis.self, forKey: .clockAnalysis)
         worldVisualReceipt = try c.decodeIfPresent(WorldVisualReceipt.self,
                                                     forKey: .worldVisualReceipt)
+        worldPageUseReceipt = try c.decodeIfPresent(WorldPageUseReceipt.self,
+                                                     forKey: .worldPageUseReceipt)
         travellersPresent = try c.decodeIfPresent([TravellerID].self, forKey: .travellersPresent) ?? []
         isKept = try c.decodeIfPresent(Bool.self, forKey: .isKept) ?? false
     }

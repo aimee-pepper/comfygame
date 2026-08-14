@@ -193,6 +193,21 @@ final class GameStore: ObservableObject {
         }
     }
 
+    /// Atomic commitment variant. Rules stage against a value copy and publish it only when every
+    /// stale-quote guard succeeds; refusal records no action and schedules no save.
+    @discardableResult
+    func mutateIf(_ label: String, flush: Bool = false,
+                  _ body: (inout GameState) -> Bool) -> Bool {
+        var candidate = state
+        guard body(&candidate) else { return false }
+        state = candidate
+        state.meta.mutationCount += 1
+        state.meta.recordSemanticAction(label)
+        state.meta.lastSavedAt = Date()
+        if flush { flushNow() } else { scheduleSave() }
+        return true
+    }
+
     /// Cancels any pending debounce and writes now, blocking until the bytes are handed to the
     /// filesystem. Called on every scene-phase change out of `.active`.
     func flushNow() {

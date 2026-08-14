@@ -13,6 +13,7 @@ enum BindAvailability: Equatable {
     case activeExpedition
     case anchorageLocked
     case fieldKit(String)
+    case unavailable(String)
     case insufficientEssence(available: Int, required: Int)
 
     var isReady: Bool {
@@ -29,6 +30,8 @@ enum BindAvailability: Equatable {
         case .anchorageLocked:
             "Born anchored requires the Anchorage. Turn it off or build the Anchorage first."
         case .fieldKit(let reason):
+            reason
+        case .unavailable(let reason):
             reason
         case let .insufficientEssence(available, required):
             "This binding needs \(required) Essence; you currently have \(available)."
@@ -245,6 +248,83 @@ extension GameStore {
         return .ready(totalCost: total)
     }
 
+    /// Reconciles the one-time starter folio for saves created before World Pages existed.
+    /// A progressed campaign is marked reconciled without receiving retroactive physical stock.
+    func reconcileStarterWorldPageBundle() {
+        guard !state.base.starterWorldPageBundleFulfilled,
+              state.worlds.activeRun == nil else { return }
+        mutate("reconcile starter World Pages", flush: true) { state in
+            guard !state.base.starterWorldPageBundleFulfilled else { return }
+            let mayAdopt = state.worlds.runIndex == 0
+                && state.worlds.activeRun == nil
+                && state.reality.library.visitedWorlds.isEmpty
+                && state.reality.visitedWorldSeeds.isEmpty
+                && state.reality.library.foundPages.isEmpty
+                && state.reality.library.foundWritings.isEmpty
+                && state.reality.library.foundTravellers.isEmpty
+                && state.reality.lifetime.runsStarted == 0
+                && state.base.collectedWorldPages.isEmpty
+            if mayAdopt { state.base.collectedWorldPages = WorldPageCatalog.starterInstances }
+            state.base.starterWorldPageBundleFulfilled = true
+        }
+    }
+
+    /// Returns the owned, exact instance only when its embedded authored snapshot still equals the
+    /// canonical generated catalogue. Unknown, stale or tampered definitions fail closed.
+    func collectedWorldPage(_ instanceID: InstanceID) -> WorldPageInstance? {
+        Self.resolvedWorldPage(instanceID, in: state)
+    }
+
+    nonisolated private static func resolvedWorldPage(
+        _ instanceID: InstanceID, in state: GameState
+    ) -> WorldPageInstance? {
+        let matches = state.base.collectedWorldPages.filter { $0.id == instanceID }
+        guard matches.count == 1, let owned = matches.first,
+              let canonical = WorldPageCatalog.definition(owned.definition.id),
+              owned.definition == canonical else { return nil }
+        return owned
+    }
+
+    func worldPageProjection(_ instanceID: InstanceID) -> BookProjection? {
+        guard let instance = collectedWorldPage(instanceID) else { return nil }
+        var projection = BookProjection.project(
+            page: instance.definition.page, seed: instance.definition.seed,
+            analysisTier: state.reality.analysisTier,
+            measuring: state.reality.calibratedSubjects,
+            precision: state.reality.observations.mapValues(\.bestPrecision),
+            tuning: DebugTuningProfile.active,
+            revealRolled: false)
+        projection.essenceCost = instance.definition.worldPageCost...instance.definition.worldPageCost
+        return projection
+    }
+
+    func bindAvailability(worldPageInstanceID: InstanceID, bornAnchored: Bool) -> BindAvailability {
+        guard let instance = collectedWorldPage(worldPageInstanceID) else {
+            return .unavailable("That collected page is no longer available.")
+        }
+        let premium = bornAnchored
+            ? Self.bornAnchoredPremium(forBookCost: instance.definition.worldPageCost) : 0
+        let total = instance.definition.worldPageCost + premium
+        if state.worlds.activeRun != nil { return .activeExpedition }
+        if let refusal = fieldKitDepartureRefusal { return .fieldKit(refusal) }
+        if bornAnchored && !state.base.station(Stations.anchorage).isUnlocked {
+            return .anchorageLocked
+        }
+        if state.base.essence < total {
+            return .insufficientEssence(available: state.base.essence, required: total)
+        }
+        return .ready(totalCost: total)
+    }
+
+    @discardableResult
+    func bindAndDepart(worldPageInstanceID: InstanceID, bornAnchored: Bool = false) -> Bool {
+        bindAndDepart(worldPageInstanceID: worldPageInstanceID, bornAnchored: bornAnchored,
+                      openColorResolver: { scope, sigil, seed in
+            try WorldGrade2BindAdapter.openColor(scope: scope, selectedSigilID: sigil.id,
+                                                 mapSeed: seed)
+        })
+    }
+
     /// Binds the current draft and departs into the world it describes.
     ///
     /// Flushed to disk before it returns: this is the commitment point where essence turns into a
@@ -266,27 +346,47 @@ extension GameStore {
         bornAnchored: Bool = false,
         openColorResolver: WorldGrade2BindAdapter.OpenColorResolver
     ) -> Bool {
+        bindAndDepart(worldPageInstanceID: nil, bornAnchored: bornAnchored,
+                      openColorResolver: openColorResolver)
+    }
+
+    @discardableResult
+    func bindAndDepart(
+        worldPageInstanceID: InstanceID?, bornAnchored: Bool = false,
+        openColorResolver: WorldGrade2BindAdapter.OpenColorResolver
+    ) -> Bool {
         bindError = nil
-        let availability = bindAvailability(bornAnchored: bornAnchored)
+        let selectedWorldPage = worldPageInstanceID.flatMap { collectedWorldPage($0) }
+        if worldPageInstanceID != nil && selectedWorldPage == nil {
+            bindError = "That collected page is no longer available."
+            return false
+        }
+        let availability = worldPageInstanceID.map {
+            bindAvailability(worldPageInstanceID: $0, bornAnchored: bornAnchored)
+        } ?? bindAvailability(bornAnchored: bornAnchored)
         guard availability.isReady else {
             bindError = availability.refusalMessage
             return false
         }
-        let anchorPremium = bornAnchored ? bornAnchoredPremium : 0
+        let pageCost = selectedWorldPage?.definition.worldPageCost ?? bookProjection.cost
+        let anchorPremium = bornAnchored ? Self.bornAnchoredPremium(forBookCost: pageCost) : 0
 
         // Build the complete world and its immutable visual authority before the commitment
         // mutation. A bad future adapter/schema can therefore spend no Essence, consume no seed,
         // change no page/history fact and create no half-world.
-        let seed = state.worlds.seeds.peekNextSeed()
-        let book = BookRules.resolveBook(page: state.base.page)
+        let reservedCampaignSeed = state.worlds.seeds.peekNextSeed()
+        let generationSeed = selectedWorldPage?.definition.seed ?? reservedCampaignSeed
+        let sourcePage = selectedWorldPage?.definition.page ?? state.base.page
+        let book = selectedWorldPage.map(BookRules.resolveBook(worldPage:))
+            ?? BookRules.resolveBook(page: sourcePage)
         let tuning = DebugTuningProfile.active
-        let world = Worldgen.generate(book: book, seed: seed, library: state.reality.library,
+        let world = Worldgen.generate(book: book, seed: generationSeed, library: state.reality.library,
                                       tuning: tuning,
                                       isFreshFirstExpedition: state.worlds.runIndex == 0)
         let visualReceipt: WorldVisualReceipt
         do {
             visualReceipt = try WorldGrade2BindAdapter.makeReceipt(
-                book: book, mapSeed: seed, map: world.map, flora: world.flora,
+                book: book, mapSeed: generationSeed, map: world.map, flora: world.flora,
                 openColorResolver: openColorResolver)
         } catch {
 #if DEBUG
@@ -297,16 +397,28 @@ extension GameStore {
             return false
         }
 
-        var didCommit = false
-        mutate("bind book & depart", flush: true) { state in
-            guard case .allowed(let fieldKit) = Self.fieldKitDepartureQuote(in: state) else { return }
+        let didCommit = mutateIf("bind book & depart", flush: true) { state in
+            guard state.worlds.activeRun == nil,
+                  state.base.essence >= book.essencePaid + anchorPremium,
+                  !bornAnchored || state.base.station(Stations.anchorage).isUnlocked else { return false }
+            guard case .allowed(let fieldKit) = Self.fieldKitDepartureQuote(in: state) else { return false }
+            var selectedIndex: Int?
+            if let staged = selectedWorldPage {
+                guard let current = Self.resolvedWorldPage(staged.id, in: state),
+                      current == staged,
+                      let index = state.base.collectedWorldPages.firstIndex(where: { $0.id == staged.id })
+                else { return false }
+                selectedIndex = index
+            }
+            guard state.worlds.seeds.peekNextSeed() == reservedCampaignSeed else { return false }
             // The actor is synchronous from preview through commit, so the peeked seed is exactly
             // the one consumed here. World generation and visual resolution use isolated streams.
-            precondition(state.worlds.seeds.nextSeed() == seed,
+            precondition(state.worlds.seeds.nextSeed() == reservedCampaignSeed,
                          "Bind seed changed inside one synchronous commitment")
+            if let selectedIndex { state.base.collectedWorldPages.remove(at: selectedIndex) }
             state.reality.library.applyTravellerArrival(world.diagnostics.travellerArrival)
             // Entering unseals this world: from here on its rolled values may be described.
-            state.reality.visitedWorldSeeds.insert(seed)
+            state.reality.visitedWorldSeeds.insert(generationSeed)
             // **Whose signature this world matches — not who you have met.**
             //
             // Arriving used to mark them found, silently, in the save. So the forge appeared at
@@ -322,7 +434,7 @@ extension GameStore {
             // **Recorded, before anything is spent.** The page you wrote and the world it became,
             // kept so you can come back with better instruments and read your own failure (Aimee,
             // 6 Aug). Nothing here is explained now — that would break "explanation is earned".
-            let historyRecord = LibraryRules.record(book: book, page: state.base.page, seed: seed,
+            let historyRecord = LibraryRules.record(book: book, page: sourcePage, seed: generationSeed,
                                                     runIndex: state.worlds.runIndex + 1,
                                                     travellers: world.travellers,
                                                     worldVisualReceipt: visualReceipt)
@@ -359,8 +471,8 @@ extension GameStore {
             let departingRun = WorldRun(
                 runIndex: state.worlds.runIndex,
                 book: book,
-                mapSeed: seed,
-                rng: SeededRNG(seed: seed).derived(0xA11CE),
+                mapSeed: generationSeed,
+                rng: SeededRNG(seed: generationSeed).derived(0xA11CE),
                 map: world.map,
                 playerPosition: world.start,
                 enemies: world.enemies,
@@ -417,10 +529,16 @@ extension GameStore {
                                   world: departingRun.anchoredSnapshot)
                 )
             }
-            didCommit = true
+            return true
         }
-        if !didCommit, case .refused(let reason) = Self.fieldKitDepartureQuote(in: state) {
-            bindError = reason
+        if !didCommit {
+            if case .refused(let reason) = Self.fieldKitDepartureQuote(in: state) {
+                bindError = reason
+            } else if worldPageInstanceID != nil {
+                bindError = "That collected page changed before departure. Nothing was spent."
+            } else {
+                bindError = "The binding changed before departure. Nothing was spent."
+            }
         }
         return didCommit
     }

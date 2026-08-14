@@ -8,6 +8,71 @@ import XCTest
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
 
+    func testStarterWorldPagesMatchFrozenAuthorityAndRulesOwnedPrices() throws {
+        let definitions = WorldPageCatalog.starterDefinitions
+        XCTAssertEqual(definitions.map(\.id), ["starter_open_meadow", "starter_rainwashed_shore",
+                                                "starter_stone_hollow"])
+        XCTAssertEqual(definitions.map(\.disposition), [.starterUnique, .starterUnique, .starterUnique])
+        XCTAssertEqual(definitions.map(\.seed), [2, 26, 23])
+        XCTAssertEqual(definitions.map(\.copiedCost), [21, 18, 22])
+        XCTAssertEqual(definitions.map(\.worldPageCost), [14, 14, 16])
+        XCTAssertEqual(definitions.map(\.title), ["Open Meadow", "Rainwashed Shore", "Stone Hollow"])
+        XCTAssertEqual(definitions.map(\.provenance), [
+            "A clean practice page, already written in rough charcoal.",
+            "A clean practice page with one broad charcoal mark.",
+            "A clean practice page with charcoal rubbed into the grain."
+        ])
+        XCTAssertEqual(definitions.map(\.promise), [
+            "Open, living, modestly resourced and safe enough to learn the opening loop.",
+            "A readable water-and-relief contrast without an opening lethality spike.",
+            "Stone, enclosure and ordinary ore within the accepted level-one envelope."
+        ])
+        XCTAssertTrue(definitions.allSatisfy { $0.page.width == 6 && $0.page.height == 6 })
+        XCTAssertTrue(definitions.allSatisfy { $0.page.runes.allSatisfy { $0.hand == .crude } })
+        XCTAssertEqual(definitions.map { $0.page.runes.map(\.id.rawValue) }, [[1, 2], [1], [1, 2]])
+        XCTAssertEqual(definitions.map { $0.page.runes.map(\.shapeID) },
+                       [["crude_smear", "crude_smear"], ["crude_smear"],
+                        ["crude_smear", "crude_block"]])
+        XCTAssertEqual(definitions.map { $0.page.symbolIDs.map(\.rawValue) },
+                       [["plains", "verdant"], ["archipelago"], ["caverns", "common_ore"]])
+        XCTAssertEqual(definitions.map { $0.page.runes.map(\.origin) }, [
+            [PageCell(column: 0, row: 0), PageCell(column: 3, row: 3)],
+            [PageCell(column: 1, row: 2)],
+            [PageCell(column: 0, row: 1), PageCell(column: 4, row: 3)]
+        ])
+
+        let instances = WorldPageCatalog.starterInstances
+        XCTAssertEqual(Set(instances.map(\.id)).count, 3)
+        XCTAssertEqual(instances.map(\.id.rawValue),
+                       [0x5750_0000_0000_0001, 0x5750_0000_0000_0002,
+                        0x5750_0000_0000_0003])
+        XCTAssertEqual(WorldPageCatalog.authoritySHA256,
+                       "04f73e3cb93850ec1f449d9f302c4ca276ac1091631ed81322458d8b8142c534")
+        XCTAssertNil(WorldPageCatalog.definition("not_authored"),
+                     "unknown content must fail closed rather than fabricate a page")
+        for instance in instances {
+            let ordinary = BookRules.resolveBook(page: instance.definition.page)
+            let preInscribed = BookRules.resolveBook(worldPage: instance)
+            XCTAssertEqual(ordinary.essencePaid, instance.definition.copiedCost)
+            XCTAssertEqual(preInscribed.essencePaid, instance.definition.worldPageCost)
+            XCTAssertEqual(preInscribed.essencePaid,
+                           ordinary.essencePaid - BookRules.inkCost(of: instance.definition.page))
+            XCTAssertEqual(preInscribed.worldPageUseReceipt?.instanceID, instance.id)
+            XCTAssertEqual(preInscribed.worldPageUseReceipt?.definition, instance.definition)
+        }
+
+        let data = try SaveCodec.makeEncoder().encode(instances)
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode([WorldPageInstance].self, from: data), instances)
+    }
+
+    func testLegacyBoundBookDecodesWithoutWorldPageReceipt() throws {
+        let data = Data(#"{"written":["plains"],"essencePaid":14}"#.utf8)
+        let book = try SaveCodec.makeDecoder().decode(BoundBook.self, from: data)
+        XCTAssertNil(book.worldPageUseReceipt)
+        XCTAssertEqual(book.allSymbolIDs, ["plains"])
+        XCTAssertEqual(book.essencePaid, 14)
+    }
+
     func testCancellingPageToolClearsEveryTransientFieldWithoutChangingThePage() {
         let link = MarkLink(InstanceID(rawValue: 1), InstanceID(rawValue: 2))
         let page = Page(links: [link])

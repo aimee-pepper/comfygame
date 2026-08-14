@@ -4,6 +4,165 @@ import XCTest
 /// Spending: refining, upgrades, identification, the key→cache payoff, and Constellation nodes.
 @MainActor
 final class EconomyTests: XCTestCase {
+
+    func testWritingDeskWritePaneReturnsToDraftWithoutConsumingCollectedSelection() {
+        let selected = WorldPageCatalog.starterInstances[0].id
+        XCTAssertNil(WritingDeskSourceRules.selectedPage(afterEnteringWrite: true,
+                                                         current: selected))
+        XCTAssertEqual(WritingDeskSourceRules.selectedPage(afterEnteringWrite: false,
+                                                           current: selected), selected)
+        XCTAssertEqual(GameState.newGame().base.collectedWorldPages.count, 3,
+                       "Changing the active source is not a physical-page mutation")
+    }
+
+    func testNewCampaignOwnsExactlyThreeStarterWorldPagesAndLegacyAdoptionIsOneTime() throws {
+        let fresh = GameState.newGame()
+        XCTAssertTrue(fresh.base.starterWorldPageBundleFulfilled)
+        XCTAssertEqual(fresh.base.collectedWorldPages, WorldPageCatalog.starterInstances)
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(fresh)) as? [String: Any])
+        var base = try XCTUnwrap(object["base"] as? [String: Any])
+        base.removeValue(forKey: "collectedWorldPages")
+        base.removeValue(forKey: "starterWorldPageBundleFulfilled")
+        object["base"] = base
+        let legacy = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertTrue(legacy.base.collectedWorldPages.isEmpty)
+        XCTAssertFalse(legacy.base.starterWorldPageBundleFulfilled)
+        let store = GameStore(io: .temporary(name: "starter-adopt-\(UUID().uuidString)"))
+        store.mutate("load legacy starter state") { $0 = legacy }
+        store.reconcileStarterWorldPageBundle()
+        XCTAssertEqual(store.state.base.collectedWorldPages, WorldPageCatalog.starterInstances)
+        XCTAssertTrue(store.state.base.starterWorldPageBundleFulfilled)
+        let adopted = store.state
+        store.reconcileStarterWorldPageBundle()
+        XCTAssertEqual(store.state, adopted)
+
+        let data = try SaveCodec.makeEncoder().encode(store.state)
+        let reloaded = try SaveCodec.makeDecoder().decode(GameState.self, from: data)
+        XCTAssertEqual(reloaded.base.collectedWorldPages, WorldPageCatalog.starterInstances)
+        XCTAssertTrue(reloaded.base.starterWorldPageBundleFulfilled)
+    }
+
+    func testProgressedLegacyCampaignNeverReceivesStarterWorldPages() {
+        var progressed = GameState.newGame()
+        progressed.base.collectedWorldPages = []
+        progressed.base.starterWorldPageBundleFulfilled = false
+        progressed.worlds.runIndex = 1
+        progressed.reality.lifetime.runsStarted = 1
+        let store = GameStore(io: .temporary(name: "starter-progressed-\(UUID().uuidString)"))
+        store.mutate("load progressed starter state") { $0 = progressed }
+
+        store.reconcileStarterWorldPageBundle()
+
+        XCTAssertTrue(store.state.base.starterWorldPageBundleFulfilled)
+        XCTAssertTrue(store.state.base.collectedWorldPages.isEmpty)
+    }
+
+    func testEachStarterWorldPageUsesExactPriceSeedAndFrozenHistoryWhileAdvancingCampaignSeed() throws {
+        for instance in WorldPageCatalog.starterInstances {
+            let store = GameStore(io: .temporary(
+                name: "starter-bind-\(instance.id.rawValue)-\(UUID().uuidString)"))
+            store.mutate("fund starter bind") { $0.base.essence = 100 }
+            let campaignSeed = store.state.worlds.seeds.peekNextSeed()
+            var expectedSequence = store.state.worlds.seeds
+            XCTAssertEqual(expectedSequence.nextSeed(), campaignSeed)
+            let expectedCost = instance.definition.worldPageCost
+
+            XCTAssertEqual(store.worldPageProjection(instance.id)?.cost, expectedCost)
+            XCTAssertTrue(store.bindAndDepart(worldPageInstanceID: instance.id))
+
+            let run = try XCTUnwrap(store.state.worlds.activeRun)
+            XCTAssertEqual(run.mapSeed, instance.definition.seed)
+            XCTAssertEqual(run.book.essencePaid, expectedCost)
+            XCTAssertEqual(run.book.worldPageUseReceipt?.definition, instance.definition)
+            XCTAssertEqual(store.state.base.essence, 100 - expectedCost)
+            XCTAssertFalse(store.state.base.collectedWorldPages.contains { $0.id == instance.id })
+            XCTAssertEqual(store.state.worlds.seeds.peekNextSeed(), expectedSequence.peekNextSeed(),
+                           "The next drafted world must follow exactly one reserved campaign seed")
+            let history = try XCTUnwrap(store.state.reality.library.visitedWorlds.last)
+            XCTAssertEqual(history.seed, instance.definition.seed)
+            XCTAssertEqual(history.bindEssencePaid, expectedCost)
+            XCTAssertEqual(history.worldPageUseReceipt, run.book.worldPageUseReceipt)
+        }
+    }
+
+    func testDuplicateWorldPageIdentityRefusesWithoutAnyMutation() throws {
+        let store = GameStore(io: .temporary(name: "starter-duplicate-\(UUID().uuidString)"))
+        let instance = try XCTUnwrap(store.state.base.collectedWorldPages.first)
+        store.mutate("duplicate physical identity") { $0.base.collectedWorldPages.append(instance) }
+        let before = store.state
+
+        XCTAssertFalse(store.bindAndDepart(worldPageInstanceID: instance.id))
+        XCTAssertEqual(store.state, before)
+    }
+
+    func testTamperedEmbeddedWorldPageDefinitionRefusesWithoutAnyMutation() throws {
+        let store = GameStore(io: .temporary(name: "starter-tamper-\(UUID().uuidString)"))
+        let instance = try XCTUnwrap(store.state.base.collectedWorldPages.first)
+        store.mutate("tamper frozen page authority") { state in
+            state.base.collectedWorldPages[0].definition.seed &+= 1
+        }
+        let before = store.state
+
+        XCTAssertFalse(store.bindAndDepart(worldPageInstanceID: instance.id))
+        XCTAssertEqual(store.state, before)
+    }
+
+    func testWorldPageAdapterFailureConsumesNoPageSeedOrEssence() throws {
+        enum Expected: Error { case failure }
+        let store = GameStore(io: .temporary(name: "starter-adapter-\(UUID().uuidString)"))
+        let instance = try XCTUnwrap(store.state.base.collectedWorldPages.first)
+        let before = store.state
+
+        XCTAssertFalse(store.bindAndDepart(worldPageInstanceID: instance.id,
+                                           openColorResolver: { _, _, _ in throw Expected.failure }))
+        XCTAssertEqual(store.state, before)
+    }
+
+    func testWorldPageCommitRevalidatesStagedAuthorityWithoutPartialBindMutation() throws {
+        enum Sabotage: CaseIterable { case essence, seed, page, anchorage }
+
+        for sabotage in Sabotage.allCases {
+            let store = GameStore(io: .temporary(name: "starter-stale-\(sabotage)-\(UUID().uuidString)"))
+            let instance = try XCTUnwrap(store.state.base.collectedWorldPages.first)
+            store.mutate("prepare stale bind") { state in
+                state.base.essence = 10_000
+                if sabotage == .anchorage {
+                    state.base.stations[Stations.anchorage] = StationState(isUnlocked: true, tier: 1)
+                }
+            }
+            var sabotaged = false
+            var expectedAfterSabotage: GameState?
+            let committed = store.bindAndDepart(
+                worldPageInstanceID: instance.id, bornAnchored: sabotage == .anchorage,
+                openColorResolver: { scope, sigil, seed in
+                    if !sabotaged {
+                        store.mutate("invalidate staged bind") { state in
+                            switch sabotage {
+                            case .essence: state.base.essence = 0
+                            case .seed: _ = state.worlds.seeds.nextSeed()
+                            case .page: state.base.collectedWorldPages[0].definition.seed &+= 1
+                            case .anchorage:
+                                state.base.stations[Stations.anchorage] = StationState(isUnlocked: false, tier: 0)
+                            }
+                        }
+                        expectedAfterSabotage = store.state
+                        sabotaged = true
+                    }
+                    return try WorldGrade2BindAdapter.openColor(
+                        scope: scope, selectedSigilID: sigil.id, mapSeed: seed)
+                })
+
+            XCTAssertTrue(sabotaged, "Fixture must cross the preparation/commit seam")
+            XCTAssertFalse(committed)
+            XCTAssertEqual(store.state, expectedAfterSabotage,
+                           "\(sabotage) must preserve the exact post-interference state")
+            XCTAssertNil(store.state.worlds.activeRun)
+            XCTAssertTrue(store.state.reality.library.visitedWorlds.isEmpty)
+        }
+    }
     func testWritingPaletteUsesThreeReadableColumnsOnAnOrdinaryPhone() {
         XCTAssertEqual(WritingDeskLayout.paletteChipMinimumWidth, 104)
         XCTAssertEqual(WritingDeskLayout.paletteColumnCount(containerWidth: 344), 3)

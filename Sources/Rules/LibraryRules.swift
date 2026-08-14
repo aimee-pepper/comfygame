@@ -389,7 +389,8 @@ enum LibraryRules {
             },
             semanticRequests: TutorialRules.semanticRequests(on: page),
             bindEssencePaid: book.essencePaid,
-            worldVisualReceipt: worldVisualReceipt
+            worldVisualReceipt: worldVisualReceipt,
+            worldPageUseReceipt: book.worldPageUseReceipt
         )
         record.livingAnalysis = LivingAnalysisRules.analyze(readings)
         let clock = WorldClock(book: book, seed: seed)
