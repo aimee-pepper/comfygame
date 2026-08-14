@@ -43,6 +43,43 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         print("SCALING adjacent Teeming \(teemingAdjacent)")
     }
 
+    func testCorrectedNormalUpperHPMissesHaveFrozenSingleFactorCounterfactuals() throws {
+        for root in [UInt64(202), 303, 606] {
+            let frozen = try frozenOpeningState(rootSeed: root)
+            let encounter = try XCTUnwrap(frozen.worlds.activeRun?.activeEncounter)
+            XCTAssertEqual(encounter.foes.count, 1)
+            XCTAssertTrue(encounter.foes.allSatisfy { $0.stats.damageKind != .rend },
+                          "root \(root) unexpectedly introduced a rend payload")
+
+            let observed = try counterfactual(from: frozen, variant: .observed,
+                                              strategy: .shippingDefault)
+            let explicitBasic = try counterfactual(from: frozen, variant: .observed,
+                                                   strategy: .explicitBasicAttack)
+            let noAfflictions = try counterfactual(from: frozen, variant: .suppressAfflictions,
+                                                   strategy: .shippingDefault)
+            let forcedSingle = try counterfactual(from: frozen, variant: .forceSingleDelivery,
+                                                  strategy: .shippingDefault)
+
+            XCTAssertEqual(observed, explicitBasic,
+                           "fresh-save Binder had an available action beyond the disclosed basic attack")
+            XCTAssertEqual(observed, noAfflictions,
+                           "non-rend root \(root) changed when affliction payloads were suppressed")
+            if encounter.foes[0].stats.delivery == .multi {
+                XCTAssertNotEqual(observed.hpSpent, forcedSingle.hpSpent,
+                                  "multi delivery had no measurable HP effect for root \(root)")
+            } else {
+                XCTAssertEqual(observed, forcedSingle,
+                               "forcing an already-single foe changed root \(root)")
+            }
+
+            print("SCALING_COUNTERFACTUAL root=\(root) foe=\(encounter.foes[0].identityKey) "
+                  + "stats=HP\(encounter.foes[0].stats.maxHP):ATK\(encounter.foes[0].stats.attack):"
+                  + "\(encounter.foes[0].stats.damageKind.rawValue):\(encounter.foes[0].stats.delivery.rawValue) "
+                  + "observed=\(observed) forcedSingle=\(forcedSingle) "
+                  + "noAfflictions=\(noAfflictions) explicitBasic=\(explicitBasic)")
+        }
+    }
+
     func testGroupingRadiusMatchesEverySupportedPartyCount() throws {
         let store = GameStore(io: .temporary(name: "scaling-radius-\(UUID().uuidString)"))
         store.write("plains")
@@ -254,6 +291,122 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         var startingAggregateHP: Int
         var aggregateHPSpent: Int
         var outcome: EncounterOutcome?
+    }
+
+    private enum CounterfactualVariant { case observed, forceSingleDelivery, suppressAfflictions }
+    private enum CounterfactualStrategy { case shippingDefault, explicitBasicAttack }
+
+    private struct CounterfactualReceipt: Equatable, CustomStringConvertible {
+        var hpSpent: Int
+        var binderHP: Int
+        var quillHP: Int
+        var rounds: Int
+        var playerActions: Int
+        var outcome: EncounterOutcome?
+        var rngState: UInt64
+        var afflictions: [AfflictionInstance]
+        var log: [String]
+
+        var description: String {
+            "hp=\(hpSpent)/54 binder=\(binderHP) quill=\(quillHP) rounds=\(rounds) "
+                + "actions=\(playerActions) outcome=\(String(describing: outcome)) "
+                + "rng=\(rngState) afflictions=\(afflictions.count)"
+        }
+    }
+
+    private func frozenOpeningState(rootSeed: UInt64) throws -> GameState {
+        let store = GameStore(io: .temporary(
+            name: "scaling-frozen-normal-\(rootSeed)-\(UUID().uuidString)"))
+        store.mutate("freeze counterfactual root") { state in
+            state.worlds.seeds = SeedSequence(rootSeed: rootSeed)
+            state.base.binderCharacter = CharacterState(rank: .front)
+            state.base.binderEquipped = [:]
+            var quill = CompanionState()
+            quill.maxHP = Tuning.Encounter.companionMaxHP
+            quill.character = CharacterState(rank: .front)
+            quill.gambits = GambitStarter.rules
+            quill.equipped = [:]
+            state.base.roster = [quill]
+            state.base.activeParty = [0]
+        }
+        XCTAssertTrue(store.write("plains"))
+        XCTAssertTrue(store.bindAndDepart())
+        store.mutate("stage frozen disclosed opening") { state in
+            guard var run = state.worlds.activeRun, !run.enemies.isEmpty else { return }
+            run.tuning = .defaults
+            run.binderHP = Tuning.Encounter.binderMaxHP
+            run.companionHP = [0: Tuning.Encounter.companionMaxHP]
+            run.healthCaps = [
+                .init(member: .binder, ordinaryMaximum: Tuning.Encounter.binderMaxHP, components: []),
+                .init(member: .member(0), ordinaryMaximum: Tuning.Encounter.companionMaxHP,
+                      components: [])
+            ]
+            run.rng = SeededRNG(seed: run.mapSeed).derived(0xA11CE)
+            for point in run.map.allPoints { run.map[point].isRevealed = true }
+            for index in run.enemies.indices { run.enemies[index].isAwake = true }
+            let trigger = run.enemies.min {
+                let lhs = abs($0.position.x - run.playerPosition.x)
+                    + abs($0.position.y - run.playerPosition.y)
+                let rhs = abs($1.position.x - run.playerPosition.x)
+                    + abs($1.position.y - run.playerPosition.y)
+                return lhs == rhs ? $0.id.rawValue < $1.id.rawValue : lhs < rhs
+            }!
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: trigger, runsAutomaticTurns: false, in: &state)
+            CombatRules.runAutomaticTurns(in: &state)
+        }
+        let frozen = try JSONDecoder().decode(GameState.self,
+                                               from: JSONEncoder().encode(store.state))
+        XCTAssertNotNil(frozen.worlds.activeRun?.activeEncounter)
+        return frozen
+    }
+
+    private func counterfactual(from frozen: GameState, variant: CounterfactualVariant,
+                                strategy: CounterfactualStrategy) throws -> CounterfactualReceipt {
+        let state = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(frozen))
+        let store = GameStore(io: .temporary(name: "scaling-counterfactual-\(UUID().uuidString)"))
+        store.mutate("adopt frozen opening") { $0 = state }
+        store.mutate("apply single-factor counterfactual") { state in
+            guard var encounter = state.worlds.activeRun?.activeEncounter else { return }
+            switch variant {
+            case .observed:
+                break
+            case .forceSingleDelivery:
+                for index in encounter.foes.indices { encounter.foes[index].stats.delivery = .single }
+            case .suppressAfflictions:
+                for index in encounter.turnSlots.indices {
+                    if encounter.turnSlots[index].actor.foeID != nil {
+                        encounter.turnSlots[index].suppressesAfflictions = true
+                    }
+                }
+            }
+            state.worlds.activeRun?.activeEncounter = encounter
+        }
+
+        var playerActions = 0
+        while store.activeEncounter?.outcome == nil, playerActions < 30 {
+            let action: CombatAction?
+            switch strategy {
+            case .shippingDefault:
+                action = store.defaultCombatAction()
+                if case .some(.attack) = action {} else {
+                    XCTFail("fresh Binder default was not the disclosed basic attack")
+                }
+            case .explicitBasicAttack:
+                action = store.activeEncounter?.livingFoes.first.map { .attack(foe: $0.id) }
+            }
+            guard let action else { break }
+            store.takeCombatAction(action)
+            playerActions += 1
+        }
+        let run = try XCTUnwrap(store.activeRun)
+        let encounter = try XCTUnwrap(run.activeEncounter)
+        let quillHP = run.companionHP[0] ?? Tuning.Encounter.companionMaxHP
+        return CounterfactualReceipt(
+            hpSpent: 54 - run.binderHP - quillHP,
+            binderHP: run.binderHP, quillHP: quillHP, rounds: encounter.roundNumber,
+            playerActions: playerActions, outcome: encounter.outcome, rngState: run.rng.state,
+            afflictions: encounter.afflictions ?? [], log: encounter.log)
     }
 
     private func openingSample(rootSeed: UInt64, teeming: Bool) throws -> OpeningSample {
