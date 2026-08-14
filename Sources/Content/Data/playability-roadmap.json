@@ -13,7 +13,7 @@
       "id": "band-1",
       "title": "Band 1 · First world, fight and return",
       "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
-      "itemIDs": ["encounter-scaling", "essence", "starter-world-pages", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
+      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
     },
     {
       "id": "band-2",
@@ -54,11 +54,21 @@
   ],
   "items": [
     {
+      "id": "field-kit-loadout",
+      "priority": "B1.3a",
+      "title": "Persistent Field Kit loadout",
+      "status": "readyToTest",
+      "detail": "Source checkpoint 530a205 replaces inventory-order auto-pack and the rejected one-shot bag with a durable desired-count supply plan. Exact stock moves only inside successful Bind/Revisit; shortages remain visible without erasing the plan.",
+      "gate": "Fresh campaigns begin with an explicit empty plan; legacy saves review a nonmoving typed suggestion; only identified consumables and Anchor Frames are eligible; capacity counts distinct families; malformed/over-cap saves fail visibly; preview and commit share one staged atomic quote; bind/revisit refusal loses nothing; relaunch and return retain desired quantities; six-across anchored UI uses plan language.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
       "id": "starter-world-pages",
       "priority": "B1.4",
       "title": "Three consumable starting World Pages",
       "status": "next",
-      "detail": "Content is complete and machine-validated: give new campaigns three exact affordable read-only curated pages after Band 1.3 scaling closes. They remain optional and consume only on successful departure.",
+      "detail": "The three exact post-scaling sampled starter pages are implementation-ready in world-pages-authority.json and begin immediately after the already-dirty Field Kit departure transaction is closed. New campaigns receive optional physical read-only instances; pre-inscribed pricing preserves continuation and the exact selected instance is consumed only by successful atomic departure.",
       "gate": "Three exact instances survive relaunch, never consume on refusal/failure-before-commit, enter World History after binding, preserve continuation runway and produce survivable distinct opening worlds without hidden enemy nerfs.",
       "workstream": "engineering",
       "isPrimary": false
