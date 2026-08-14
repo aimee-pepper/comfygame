@@ -27,6 +27,7 @@ final class DebugRoadmapTests: XCTestCase {
         for id in [
             "channelworks-restoration-receipt",
             "authored-text-first-review",
+            "compound-hostility-authority",
             "legacy-token-quirk-cleanup"
         ] {
             XCTAssertEqual(try XCTUnwrap(byID[id]).status, .readyToTest,

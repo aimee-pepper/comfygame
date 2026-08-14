@@ -306,9 +306,9 @@
       "id": "compound-hostility-authority",
       "priority": "P1",
       "title": "Replace hidden compound tier fossils coherently",
-      "status": "queued",
-      "detail": "Six ordinary compounds still add flat live enemy tiers even though pressure readings now own world composition, ecology and population. Compare the complete six-compound removal as one balance migration; do not silently remove only Dim Sky/Gilded Veins or touch typed Danger bargains.",
-      "gate": "Same-seed on/off fixtures cover all six compounds, pressure-equivalent controls, party sizes 1/3/5, early/established levels, ordinary/teeming/large worlds, encounter previews, apex invariance, XP/resources and tolerant old books. Retune only the systemic authority that explains any measured gap. Authority: compound-hostility-fossil-audit-current.md and Decision190."
+      "status": "readyToTest",
+      "detail": "Source-complete in 5825c3a: the obsolete enemyTierDelta schema, all 21 authored keys and the comparison toggle are removed together. Ordinary compounds now affect population through resolved pressures; typed Danger remains the sole authored hostility-tier authority. Focused DangerTests passed 20/20 and the generic simulator test build succeeded.",
+      "gate": "On phone, compare ordinary and teeming books containing each of Ashen, Rich Ore, Teeming Life, Dim Sky, Gilded Veins and Mote Vein against pressure-equivalent controls at ordinary and large map sizes. Confirm encounter previews, apex behavior, XP/resources and tolerant old books remain truthful; retune only the systemic authority that explains a measured gap. Authority: compound-hostility-fossil-audit-current.md and Decision190."
     },
     {
       "id": "combat-affliction-authority",
