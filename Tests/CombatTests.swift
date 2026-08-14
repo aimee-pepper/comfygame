@@ -5479,4 +5479,106 @@ final class CombatTests: XCTestCase {
         }
         XCTAssertTrue((legacy.activeEncounter?.afflictions ?? []).isEmpty)
     }
+
+    func testModernInterposeRequiresExactOwnerAndQueuesIndependentReceipts() throws {
+        let store = inFight()
+        store.mutate("stage modern Interpose") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.binder: [],
+                                               .companion(0): [CombatDerivedStatsRules.Node.interpose]]
+            encounter.interposeReceipts = []
+            encounter.order = [.binder, .companion(0), .foe(encounter.foes[0].id)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let before = store.activeEncounter
+        store.mutate("unowned Interpose rejects") {
+            CombatRules.perform(.skill("interpose"), by: .binder, in: &$0)
+        }
+        XCTAssertEqual(store.activeEncounter, before)
+        store.mutate("two exact owners Interpose") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs?[.binder] = [CombatDerivedStatsRules.Node.interpose]
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.perform(.skill("interpose"), by: .binder, in: &state)
+            guard var updated = state.worlds.activeRun?.activeEncounter else { return }
+            updated.cooldowns.removeAll(); updated.binderSkillCooldown = 0
+            updated.turnIndex = 1
+            state.worlds.activeRun?.activeEncounter = updated
+            CombatRules.perform(.skill("interpose"), by: .companion(0), in: &state)
+        }
+        XCTAssertEqual(store.activeEncounter?.interposeReceipts?.map(\.activationSequence), [1, 2])
+        XCTAssertEqual(store.activeEncounter?.nextInterposeActivationSequence, 3)
+        store.mutate("same owner replaces their queued Interpose") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.turnIndex = 1
+            encounter.cooldowns.removeAll(); encounter.companionSkillCooldown = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.perform(.skill("interpose"), by: .companion(0), in: &state)
+        }
+        XCTAssertEqual(store.activeEncounter?.interposeReceipts?.map(\.activationSequence), [1, 3])
+        XCTAssertTrue(CombatRules.skills(for: .binder, in: store.state).contains { $0.id == "interpose" })
+    }
+
+    func testInterposeReplacesFinalTargetBeforeGhostAndConsumesOnMissAcrossRelaunch() throws {
+        let store = inFight()
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage exact Interpose miss") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.interpose]]
+            encounter.interposeReceipts = [.init(owner: .companion(0), activationSequence: 7)]
+            encounter.nextInterposeActivationSequence = 8
+            encounter.taunts[foeID] = 2
+            encounter.concealed[.companion(0)] = 2
+            encounter.ghostEvasionAvailable = [.companion(0)]
+            encounter.order = [.foe(foeID), .binder, .companion(0)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }
+            encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let encoded = try JSONEncoder().encode(try XCTUnwrap(store.activeEncounter))
+        let decoded = try JSONDecoder().decode(EncounterState.self, from: encoded)
+        XCTAssertEqual(decoded.interposeReceipts, store.activeEncounter?.interposeReceipts)
+        let binderBefore = try XCTUnwrap(store.activeRun?.binderHP)
+        let companionBefore = try XCTUnwrap(store.activeRun?.companionHP[0])
+        store.mutate("resolve redirected miss") { CombatRules.runAutomaticTurns(in: &$0) }
+        XCTAssertEqual(store.activeRun?.binderHP, binderBefore)
+        XCTAssertEqual(store.activeRun?.companionHP[0], companionBefore)
+        XCTAssertTrue(store.activeEncounter?.interposeReceipts?.isEmpty == true)
+        XCTAssertFalse(store.activeEncounter?.ghostEvasionAvailable?.contains(.companion(0)) == true)
+        XCTAssertNil(store.activeEncounter?.concealed[.companion(0)])
+    }
+
+    func testInterposeDoesNotConsumeForAreaAndLegacyDurationRemainsLegacy() throws {
+        let store = inFight()
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage area Interpose exclusion") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.interpose]]
+            encounter.interposeReceipts = [.init(owner: .companion(0), activationSequence: 1)]
+            if let index = encounter.foes.firstIndex(where: { $0.id == foeID }) {
+                encounter.foes[index].stats.delivery = .area
+            }
+            encounter.debugV2Evasion = .init(entries: CombatRules.party(of: state).map {
+                .init(actor: $0, characterEvasion: 0, components: [])
+            })
+            encounter.ghostEvasionAvailable = []
+            encounter.order = [.foe(foeID), .binder, .companion(0)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }; encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        store.mutate("resolve area without Interpose") { CombatRules.runAutomaticTurns(in: &$0) }
+        XCTAssertEqual(store.activeEncounter?.interposeReceipts?.count, 1)
+
+        var legacy = try XCTUnwrap(store.activeEncounter)
+        legacy.debugV2OwnedNodeIDs = nil
+        legacy.interposeReceipts = nil
+        legacy.interposing[.binder] = 2
+        let decoded = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(legacy))
+        XCTAssertNil(decoded.interposeReceipts)
+        XCTAssertEqual(decoded.interposing[.binder], 2)
+    }
 }

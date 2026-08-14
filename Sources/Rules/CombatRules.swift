@@ -496,9 +496,15 @@ enum CombatRules {
     static func skills(for actor: Combatant, in state: GameState) -> [SkillDef] {
         var owned = CombatActionOwnershipRules.availableSkillIDs(for: actor, in: state)
         if let modern = state.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs {
-            owned.remove("steady")
+            owned.subtract(["steady", "snuff", "interpose"])
             if modern[actor]?.contains(CombatDerivedStatsRules.Node.quench) == true {
                 owned.insert("quench")
+            }
+            if modern[actor]?.contains(CombatDerivedStatsRules.Node.snuff) == true {
+                owned.insert("snuff")
+            }
+            if modern[actor]?.contains(CombatDerivedStatsRules.Node.interpose) == true {
+                owned.insert("interpose")
             }
         }
         return ContentCatalog.shared.skills.filter { owned.contains($0.id) }
@@ -837,7 +843,16 @@ enum CombatRules {
             encounter.note("\(skill.name): they lose sight of you.")
 
         case .intercept:
-            encounter.interposing[actor] = skill.rounds
+            if encounter.interposeReceipts != nil {
+                guard encounter.debugV2OwnedNodeIDs?[actor]?.contains(
+                    CombatDerivedStatsRules.Node.interpose) == true else { return nil }
+                encounter.interposeReceipts?.removeAll { $0.owner == actor }
+                encounter.interposeReceipts?.append(.init(
+                    owner: actor, activationSequence: encounter.nextInterposeActivationSequence))
+                encounter.nextInterposeActivationSequence &+= 1
+            } else {
+                encounter.interposing[actor] = skill.rounds
+            }
             encounter.note("\(skill.name): you step in front.")
 
         case .ground:
@@ -1449,6 +1464,9 @@ enum CombatRules {
 
     private static func owns(_ skill: SkillDef, actor: Combatant,
                              encounter: EncounterState, state: GameState) -> Bool {
+        if skill.kind == .intercept, let frozen = encounter.debugV2OwnedNodeIDs {
+            return frozen[actor]?.contains(CombatDerivedStatsRules.Node.interpose) == true
+        }
         if skill.kind == .snuff, let frozen = encounter.debugV2OwnedNodeIDs {
             return frozen[actor]?.contains(CombatDerivedStatsRules.Node.snuff) == true
         }
@@ -2691,6 +2709,27 @@ enum CombatRules {
                 target = ashe
                 grounded = true
                 encounter.note("Ground: Ashe receives the emanation meant for \(actorName(originalTarget, encounter: encounter).lowercased()).")
+            }
+            let redirectable = isFollowUp || foe.stats.delivery == .single
+            if redirectable, let receipts = encounter.interposeReceipts {
+                let intendedTarget = target
+                let candidates = receipts.filter {
+                    $0.owner != intendedTarget && isAlive($0.owner, in: run)
+                }.sorted {
+                    if $0.activationSequence != $1.activationSequence {
+                        return $0.activationSequence < $1.activationSequence
+                    }
+                    return $0.owner.storageKey < $1.owner.storageKey
+                }
+                if let chosen = candidates.first {
+                    target = chosen.owner
+                    grounded = false
+                    encounter.interposeReceipts?.removeAll {
+                        $0.owner == chosen.owner && $0.activationSequence == chosen.activationSequence
+                    }
+                    encounter.concealed[chosen.owner] = nil
+                    encounter.note("\(actorName(chosen.owner, encounter: encounter)) interposes.")
+                }
             }
             // **Not where the blow landed** (session 17 §1). Finesse on the party's side, the
             // mirror of the evasion creatures have had since they were generated.

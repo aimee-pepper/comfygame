@@ -617,6 +617,12 @@ struct EncounterState: Codable, Equatable, Sendable {
     var evasionAttempts: [EvasionAttempt] = []
     var concealed: [Combatant: Int] = [:]
     var interposing: [Combatant: Int] = [:]
+    struct InterposeReceipt: Codable, Equatable, Sendable {
+        var owner: Combatant
+        var activationSequence: UInt64
+    }
+    var interposeReceipts: [InterposeReceipt]?
+    var nextInterposeActivationSequence: UInt64 = 1
     /// Ashe's consented interception of one active emanation event aimed at somebody else.
     var grounding: [Combatant: Int] = [:]
     var envenomed: [Combatant: Int] = [:]
@@ -688,6 +694,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.debugV2OwnedNodeIDs = debugV2OwnedNodeIDs
         self.wardReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.snuffReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
+        self.interposeReceipts = debugV2OwnedNodeIDs == nil ? nil : []
         self.unyieldingSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.braceReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.breakingBlowScheduledSpent = debugV2OwnedNodeIDs == nil ? nil : []
@@ -776,6 +783,12 @@ struct EncounterState: Codable, Equatable, Sendable {
                                                  forKey: .evasionAttempts) ?? []
         concealed = try c.decodeIfPresent([Combatant: Int].self, forKey: .concealed) ?? [:]
         interposing = try c.decodeIfPresent([Combatant: Int].self, forKey: .interposing) ?? [:]
+        interposeReceipts = try c.decodeIfPresent([InterposeReceipt].self,
+                                                   forKey: .interposeReceipts)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [])
+        nextInterposeActivationSequence = try c.decodeIfPresent(
+            UInt64.self, forKey: .nextInterposeActivationSequence)
+            ?? ((interposeReceipts?.map(\.activationSequence).max() ?? 0) + 1)
         grounding = try c.decodeIfPresent([Combatant: Int].self, forKey: .grounding) ?? [:]
         envenomed = try c.decodeIfPresent([Combatant: Int].self, forKey: .envenomed) ?? [:]
         foeBleeds = try c.decodeIfPresent([InstanceID: BleedState].self, forKey: .foeBleeds) ?? [:]
