@@ -25,6 +25,27 @@ enum CombatRules {
         } == true
     }
 
+    /// Tests, DEBUG comparisons, and tolerant resumed saves can attach the frozen v2 ownership
+    /// authority after an encounter was originally constructed. Materialize its empty typed
+    /// ledgers together; otherwise producers write through nil optionals while consumers believe
+    /// the encounter is modern.
+    private static func adoptV2ReceiptLedgers(in encounter: inout EncounterState) {
+        guard encounter.debugV2OwnedNodeIDs != nil else { return }
+        if encounter.wardReceipts == nil { encounter.wardReceipts = [:] }
+        if encounter.snuffReceipts == nil { encounter.snuffReceipts = [:] }
+        if encounter.interposeReceipts == nil { encounter.interposeReceipts = [] }
+        if encounter.drawOffReceipts == nil { encounter.drawOffReceipts = [:] }
+        if encounter.unyieldingSpent == nil { encounter.unyieldingSpent = [] }
+        if encounter.braceReceipts == nil { encounter.braceReceipts = [:] }
+        if encounter.breakingBlowScheduledSpent == nil { encounter.breakingBlowScheduledSpent = [] }
+        if encounter.breakingBlowOpeningSpent == nil { encounter.breakingBlowOpeningSpent = [] }
+        if encounter.blurSpent == nil { encounter.blurSpent = [] }
+        if encounter.firstNormalActionCompleted == nil { encounter.firstNormalActionCompleted = [] }
+        if encounter.rankAtPreviousCompletedAction == nil {
+            encounter.rankAtPreviousCompletedAction = encounter.partyRanks
+        }
+    }
+
     // MARK: Starting a fight
 
     /// **Turn order comes off initiative** (creature-system-spec §7), not off a fixed party-first
@@ -1366,6 +1387,7 @@ enum CombatRules {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter, encounter.outcome == nil
         else { return }
         guard encounter.current == actor, isAlive(actor, in: run) else { return }
+        adoptV2ReceiptLedgers(in: &encounter)
         normalizeV2EvasionState(&encounter)
         normalizePersonalTurn(&encounter, actor: actor)
         if case .skill(let id, _, _) = action {
@@ -2824,6 +2846,7 @@ enum CombatRules {
         guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
               let foeID = actor.foeID, let foe = encounter.foes.first(where: { $0.id == foeID })
         else { return }
+        adoptV2ReceiptLedgers(in: &encounter)
 
         if advancesOrdinarySchedule, slot.kind == .primary,
            var receipt = encounter.snuffReceipts?[foeID], receipt.remainingScheduledTurns > 0 {
@@ -2857,7 +2880,6 @@ enum CombatRules {
         let forcedOwner: Combatant? = if let modern = encounter.drawOffReceipts {
             modern[foeID].flatMap { receipt in
                 isAlive(receipt.owner, in: run)
-                    && (encounter.concealed[receipt.owner] ?? 0) <= 0
                     && reachable.contains(receipt.owner) ? receipt.owner : nil
             }
         } else {

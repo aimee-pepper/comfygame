@@ -755,6 +755,25 @@ final class CombatTests: XCTestCase {
         return store
     }
 
+    /// Duration-shaped compatibility tests are about the legacy contract, not whichever DEBUG-v2
+    /// comparison the simulator last persisted. Freeze that authority explicitly at their edge.
+    private func freezeLegacyCombat(in store: GameStore) {
+        store.mutate("test: freeze legacy combat authority") { state in
+            state.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs = nil
+            state.worlds.activeRun?.activeEncounter?.wardReceipts = nil
+            state.worlds.activeRun?.activeEncounter?.snuffReceipts = nil
+            state.worlds.activeRun?.activeEncounter?.interposeReceipts = nil
+            state.worlds.activeRun?.activeEncounter?.drawOffReceipts = nil
+            state.worlds.activeRun?.activeEncounter?.braceReceipts = nil
+            state.worlds.activeRun?.activeEncounter?.partyRanks = [:]
+            state.worlds.activeRun?.activeEncounter?.debugV2BinderAttack = nil
+            state.worlds.activeRun?.activeEncounter?.debugV2Initiative = nil
+            state.worlds.activeRun?.activeEncounter?.debugV2Armour = nil
+            state.worlds.activeRun?.activeEncounter?.debugV2Evasion = nil
+            state.worlds.activeRun?.activeEncounter?.debugV2Resistance = nil
+        }
+    }
+
     private func armoured() -> CreatureTraits {
         var t = CreatureTraits()
         t.size = 85; t.build = 92; t.boneDensity = 75
@@ -1137,6 +1156,7 @@ final class CombatTests: XCTestCase {
 
         func onceHit(warding against: DamageKind?) -> Int {
             let store = inFightWith([crusher])
+            freezeLegacyCombat(in: store)
             store.mutate("test: stand and take it") { state in
                 guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
                 // Ward is the variable under test; the all-nodes fixture also owns Ghost.
@@ -1161,6 +1181,7 @@ final class CombatTests: XCTestCase {
     /// **Draw Off is the only way to take a hit meant for somebody else.**
     func testDrawOffMakesItComeForYou() throws {
         let store = inFightWith([armoured()])
+        freezeLegacyCombat(in: store)
         let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
         giveTheTurnTo(.binder, in: store)
         store.mutate("test: use it") { CombatRules.perform(.skill("draw_off", foe: foeID), by: .binder, in: &$0) }
@@ -1337,6 +1358,7 @@ final class CombatTests: XCTestCase {
         burning.armament.setTotal(60)
 
         let store = inFightWith([burning])
+        freezeLegacyCombat(in: store)
         let foeID = try XCTUnwrap(store.activeEncounter?.foes.first).id
         giveTheTurnTo(.companion(0), in: store)
         store.mutate("test: snuff it") { CombatRules.perform(.skill("snuff", foe: foeID), by: .companion(0), in: &$0) }
@@ -1350,6 +1372,7 @@ final class CombatTests: XCTestCase {
     /// **Steady clears them.** Otherwise a status is a tax rather than a problem with an answer.
     func testSteadyClearsWhatIsStillWorking() throws {
         let store = inFightWith([armoured()])
+        freezeLegacyCombat(in: store)
         store.mutate("test: poisoned") { state in
             guard var encounter = state.worlds.activeRun?.activeEncounter else { return }
             _ = CombatRules.applyAffliction(.poison, to: .binder, source: nil,
@@ -1373,6 +1396,7 @@ final class CombatTests: XCTestCase {
         burning.armament.setTotal(60)
 
         let store = inFightWith([burning])
+        freezeLegacyCombat(in: store)
         giveTheTurnTo(.companion(0), in: store)
         store.mutate("test: ward") { CombatRules.perform(.skill("ward"), by: .companion(0), in: &$0) }
 
@@ -1396,6 +1420,7 @@ final class CombatTests: XCTestCase {
         burning.emanation = emanation(of: .heat)
         burning.armament.setTotal(60)
         let store = inFightWith([burning])
+        freezeLegacyCombat(in: store)
         let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
         store.mutate("test: companion is Ashe") { state in
             state.base.roster[0].traveller = "ashe"
@@ -1513,6 +1538,8 @@ final class CombatTests: XCTestCase {
         var hitTheBack = 0
         for _ in 0..<14 {
             let store = inFightWith([brute])
+            freezeLegacyCombat(in: store)
+            let binderBefore = store.state.worlds.activeRun?.binderHP ?? 0
             store.mutate("test: Quill up front, you behind") { state in
                 state.base.binderCharacter.rank = .back
                 state.base.companion.character.rank = .front
@@ -1525,7 +1552,7 @@ final class CombatTests: XCTestCase {
                 CombatRules.runAutomaticTurns(in: &state)
             }
             let hp = store.state.worlds.activeRun?.binderHP ?? 0
-            if hp < CombatRules.maximumHealth(of: .binder, in: store.state) { hitTheBack += 1 }
+            if hp < binderBefore { hitTheBack += 1 }
         }
         XCTAssertLessThan(hitTheBack, 4,
                           "something in melee reached past the front rank \(hitTheBack) times in 14")
@@ -5379,6 +5406,9 @@ final class CombatTests: XCTestCase {
             run.activeEncounter = encounter; state.worlds.activeRun = run
         }
         let poison = try XCTUnwrap(store.activeEncounter?.afflictions?.first { $0.kind == .poison })
+        XCTAssertEqual(store.activeEncounter?.current, .companion(0))
+        XCTAssertNil(store.actingCombatant,
+                     "the exact Quench picker, not a general companion override, owns this input")
         store.takeCombatAction(.quench(ally: .binder, afflictionReceipt: poison.applicationReceipt))
         let remaining = store.activeEncounter?.afflictions ?? []
         XCTAssertFalse(remaining.contains { $0.applicationReceipt == poison.applicationReceipt })
@@ -5402,6 +5432,8 @@ final class CombatTests: XCTestCase {
             run.activeEncounter = encounter; state.worlds.activeRun = run
         }
         let bleed = try XCTUnwrap(store.activeEncounter?.afflictions?.first)
+        XCTAssertEqual(store.activeEncounter?.current, .companion(0))
+        XCTAssertNil(store.actingCombatant)
         let before = store.activeEncounter
         for receipt in [bleed.applicationReceipt, UInt64.max] {
             store.takeCombatAction(.quench(ally: .binder, afflictionReceipt: receipt))
@@ -5822,6 +5854,10 @@ final class CombatTests: XCTestCase {
                 encounter.partyRanks = [.binder: .front, .companion(0): .back]
                 if let index = encounter.foes.firstIndex(where: { $0.id == foeID }) {
                     encounter.foes[index].stats.element = .heat
+                    // Cover owns 30% rounded down and intentionally has no allocation below four
+                    // final damage. Stage a qualifying blow; Paper Moth's catalogue attack is too
+                    // small to exercise the production split at all.
+                    encounter.foes[index].stats.attack = max(12, encounter.foes[index].stats.attack)
                 }
                 encounter.drawOffReceipts = [foeID: .init(owner: .companion(0),
                     activationRound: 1, expiresBeforeRound: 3)]

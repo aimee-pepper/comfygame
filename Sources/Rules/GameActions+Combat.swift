@@ -191,9 +191,28 @@ extension GameStore {
     }
 
     func takeCombatAction(_ action: CombatAction) {
-        guard let actor = actingCombatant else { return }
+        let actor: Combatant?
+        if let waiting = actingCombatant {
+            actor = waiting
+        } else if case .quench = action,
+                  let current = activeEncounter?.current,
+                  current.rosterIndex != nil {
+            // Quench is an exact, player-selected companion transaction. Its picker is the input
+            // authority for this companion turn even when the general one-turn override toggle is
+            // not armed; routing it through `actingCombatant` used to discard the selection before
+            // CombatRules could revalidate its persisted affliction receipt.
+            actor = current
+        } else {
+            actor = nil
+        }
+        guard let actor else { return }
         mutate("combat: \(label(for: action))", flush: true) { state in
+            let before = state.worlds.activeRun?.activeEncounter
             CombatRules.perform(action, by: actor, in: &state)
+            // A stale exact selection is a refusal, not permission to let the rest of the fight
+            // advance. This also keeps companion-current typed actions atomic when their receipt
+            // disappears between presentation and commit.
+            guard state.worlds.activeRun?.activeEncounter != before else { return }
             CombatRules.runAutomaticTurns(in: &state)
         }
     }
