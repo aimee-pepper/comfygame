@@ -350,4 +350,23 @@ final class DescriptionTests: XCTestCase {
         XCTAssertEqual(store.state.worlds.activeRun?.mapSeed, seed,
                        "the world recorded as visited isn't the one that was entered")
     }
+
+    @MainActor
+    func testEmptyWorldComparisonNamesTheMissingAuthoredRecord() {
+        func world(_ index: Int) -> VisitedWorld {
+            VisitedWorld(
+                id: InstanceID(rawValue: UInt64(index)), seed: UInt64(index), runIndex: index,
+                descriptionSentence: index == 1 ? "Earlier." : "Later.",
+                written: [], inertModifiers: [], readings: [:], travellersPresent: []
+            )
+        }
+        let earlier = world(1)
+        let later = world(2)
+
+        XCTAssertTrue(WorldComparisonSheet.labelledChanges(
+            for: earlier, against: later, isLater: false
+        ).isEmpty)
+        XCTAssertEqual(WorldComparisonSheet.noAuthoredRequestsText,
+                       "Nothing was written in this record.")
+    }
 }
