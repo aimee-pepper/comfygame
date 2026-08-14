@@ -261,12 +261,12 @@ enum DebugRoadmap {
         func validationErrors() -> [String] {
             var errors: [String] = []
             for workstream in Workstream.allCases {
-                let active = items.filter {
-                    $0.workstream == workstream && $0.isPrimary && $0.status == .inProgress
+                let primaries = items.filter {
+                    $0.workstream == workstream && $0.isPrimary
                 }
-                if active.count > 1 {
+                if primaries.count > 1 {
                     errors.append("Multiple \(workstream.rawValue) primaries: "
-                                  + active.map(\.id).sorted().joined(separator: ", "))
+                                  + primaries.map(\.id).sorted().joined(separator: ", "))
                 }
             }
             for item in items where item.isPrimary && [.complete, .paused].contains(item.status) {

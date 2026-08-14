@@ -13,6 +13,7 @@ final class MakerStationPresentationTests: XCTestCase {
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"), encoding: .utf8)
         XCTAssertFalse(source.contains("option.resource.rawValue.capitalisedSentence"))
         XCTAssertFalse(source.contains("resource(resource)?.name ?? resource.rawValue"))
+        XCTAssertFalse(source.contains("definition?.name ?? entry.id.rawValue"))
         XCTAssertTrue(source.contains("Text(\"From \\(sample.source)\")"))
         XCTAssertFalse(source.contains("Text(\"off a \\(sample.source)\")"))
     }

@@ -5,6 +5,7 @@ build/
 *.xcuserdatad/
 xcuserdata/
 .swiftpm/
+AssetLab/node_modules/
 
 # Google Drive sync artefacts
 .tmp.driveupload/

@@ -53,9 +53,9 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertTrue(forward.currentWork.contains("Acceptance: Test now · world"))
     }
 
-    func testTwoEngineeringPrimariesDiagnoseBothIDsButZeroGlobalActiveIsValid() throws {
+    func testTwoPrimariesInOneWorkstreamDiagnoseBothIDsRegardlessOfActiveStatus() throws {
         let conflict = try decodeBoard(items: [
-            item("beta", status: "inProgress", workstream: "engineering", primary: true),
+            item("beta", status: "readyToTest", workstream: "engineering", primary: true),
             item("alpha", status: "inProgress", workstream: "engineering", primary: true)
         ])
         XCTAssertEqual(conflict.validationErrors(), ["Multiple engineering primaries: alpha, beta"])
@@ -164,7 +164,7 @@ final class DesignHomeworkTests: XCTestCase {
     func testBundledQuestionsAndChoicesHaveStableUniqueIDs() {
         let catalogue = DesignHomeworkCatalogue.current
         XCTAssertEqual(catalogue.schemaVersion, 1)
-        XCTAssertEqual(catalogue.questions.count, 20)
+        XCTAssertEqual(catalogue.questions.count, 19)
         XCTAssertEqual(Set(catalogue.questions.map(\.id)).count, catalogue.questions.count)
         for question in catalogue.questions {
             XCTAssertFalse(question.choices.isEmpty)
