@@ -7,6 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C10000000000000000000001 /* town-empty-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000001 /* town-empty-v1.png */; };
+		C10000000000000000000002 /* building-workshop-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000002 /* building-workshop-v1.png */; };
+		C10000000000000000000003 /* building-storehouse-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000003 /* building-storehouse-v1.png */; };
+		C10000000000000000000004 /* building-library-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000004 /* building-library-v1.png */; };
+		C10000000000000000000005 /* building-essence-spring-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000005 /* building-essence-spring-v1.png */; };
+		C10000000000000000000006 /* town-starting-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000006 /* town-starting-v1.png */; };
+		C10000000000000000000007 /* building-constellation-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000007 /* building-constellation-v1.png */; };
+		C10000000000000000000008 /* building-bestiary-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000008 /* building-bestiary-v1.png */; };
+		C10000000000000000000009 /* building-survey-post-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000009 /* building-survey-post-v1.png */; };
+		C1000000000000000000000A /* building-reliquary-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C2000000000000000000000A /* building-reliquary-v1.png */; };
+		C1000000000000000000000B /* building-scriptorium-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C2000000000000000000000B /* building-scriptorium-v1.png */; };
+		C1000000000000000000000C /* building-apothecary-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C2000000000000000000000C /* building-apothecary-v1.png */; };
+		C50000000000000000000001 /* TownBuildingVisualRegistry.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60000000000000000000001 /* TownBuildingVisualRegistry.generated.swift */; };
 		D10000000000000000000001 /* town-starting-home-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000001 /* town-starting-home-v1.png */; };
 		D10000000000000000000002 /* starting-town-home-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000002 /* starting-town-home-v1.json */; };
 		D10000000000000000000003 /* StartingTownHomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000003 /* StartingTownHomeScene.swift */; };
@@ -282,6 +295,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C20000000000000000000001 /* town-empty-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "town-empty-v1.png"; sourceTree = "<group>"; };
+		C20000000000000000000002 /* building-workshop-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-workshop-v1.png"; sourceTree = "<group>"; };
+		C20000000000000000000003 /* building-storehouse-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-storehouse-v1.png"; sourceTree = "<group>"; };
+		C20000000000000000000004 /* building-library-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-library-v1.png"; sourceTree = "<group>"; };
+		C20000000000000000000005 /* building-essence-spring-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-essence-spring-v1.png"; sourceTree = "<group>"; };
+		C20000000000000000000006 /* town-starting-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "town-starting-v1.png"; sourceTree = "<group>"; };
+		C20000000000000000000007 /* building-constellation-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-constellation-v1.png"; sourceTree = "<group>"; };
+		C20000000000000000000008 /* building-bestiary-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-bestiary-v1.png"; sourceTree = "<group>"; };
+		C20000000000000000000009 /* building-survey-post-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-survey-post-v1.png"; sourceTree = "<group>"; };
+		C2000000000000000000000A /* building-reliquary-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-reliquary-v1.png"; sourceTree = "<group>"; };
+		C2000000000000000000000B /* building-scriptorium-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-scriptorium-v1.png"; sourceTree = "<group>"; };
+		C2000000000000000000000C /* building-apothecary-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-apothecary-v1.png"; sourceTree = "<group>"; };
+		C60000000000000000000001 /* TownBuildingVisualRegistry.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TownBuildingVisualRegistry.generated.swift; sourceTree = "<group>"; };
 		D20000000000000000000001 /* town-starting-home-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "town-starting-home-v1.png"; path = "AssetLab/integration/starting-town-home-v1/town-starting-home-v1.png"; sourceTree = SOURCE_ROOT; };
 		D20000000000000000000002 /* starting-town-home-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "starting-town-home-v1.json"; path = "AssetLab/integration/starting-town-home-v1/starting-town-home-v1.json"; sourceTree = SOURCE_ROOT; };
 		D20000000000000000000003 /* StartingTownHomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartingTownHomeScene.swift; sourceTree = "<group>"; };
@@ -630,6 +656,7 @@
 				95750F5CE1A87553D5246112 /* Data */,
 				D20000000000000000000001 /* town-starting-home-v1.png */,
 				D20000000000000000000002 /* starting-town-home-v1.json */,
+				C30000000000000000000001 /* TownVisuals */,
 				F87F4CA2A34122A6DEAFA2E0 /* CombatGraphModels.swift */,
 				4924ECCC22AE9125898B039F /* CombatTreeModels.swift */,
 				D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */,
@@ -644,6 +671,25 @@
 				69C03E6819177D7EABE894A3 /* TravellerModels.swift */,
 			);
 			path = Content;
+			sourceTree = "<group>";
+		};
+		C30000000000000000000001 /* TownVisuals */ = {
+			isa = PBXGroup;
+			children = (
+				C20000000000000000000001 /* town-empty-v1.png */,
+				C20000000000000000000002 /* building-workshop-v1.png */,
+				C20000000000000000000003 /* building-storehouse-v1.png */,
+				C20000000000000000000004 /* building-library-v1.png */,
+				C20000000000000000000005 /* building-essence-spring-v1.png */,
+				C20000000000000000000006 /* town-starting-v1.png */,
+				C20000000000000000000007 /* building-constellation-v1.png */,
+				C20000000000000000000008 /* building-bestiary-v1.png */,
+				C20000000000000000000009 /* building-survey-post-v1.png */,
+				C2000000000000000000000A /* building-reliquary-v1.png */,
+				C2000000000000000000000B /* building-scriptorium-v1.png */,
+				C2000000000000000000000C /* building-apothecary-v1.png */,
+			);
+			path = TownVisuals;
 			sourceTree = "<group>";
 		};
 		3D392DB4F9B9CD74CF43A670 /* Screens */ = {
@@ -930,6 +976,7 @@
 				B20000000000000000000001 /* CatalogueConsumablesPlaceholderV1Registry.swift */,
 				B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */,
 				3B52219A7EE3D04B75EED3BE /* NativeVisualPack.swift */,
+				C60000000000000000000001 /* TownBuildingVisualRegistry.generated.swift */,
 				7863FB4074F0CAF26EFEF01E /* PixelCommand.swift */,
 				F3329464831CD9BBDA9B45C9 /* PixelRaster.swift */,
 				45E799C3EE2B9C4ADA352571 /* WorldGrade2V1.swift */,
@@ -1038,6 +1085,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C10000000000000000000001 /* town-empty-v1.png in Resources */,
+				C10000000000000000000002 /* building-workshop-v1.png in Resources */,
+				C10000000000000000000003 /* building-storehouse-v1.png in Resources */,
+				C10000000000000000000004 /* building-library-v1.png in Resources */,
+				C10000000000000000000005 /* building-essence-spring-v1.png in Resources */,
+				C10000000000000000000006 /* town-starting-v1.png in Resources */,
+				C10000000000000000000007 /* building-constellation-v1.png in Resources */,
+				C10000000000000000000008 /* building-bestiary-v1.png in Resources */,
+				C10000000000000000000009 /* building-survey-post-v1.png in Resources */,
+				C1000000000000000000000A /* building-reliquary-v1.png in Resources */,
+				C1000000000000000000000B /* building-scriptorium-v1.png in Resources */,
+				C1000000000000000000000C /* building-apothecary-v1.png in Resources */,
 				D10000000000000000000001 /* town-starting-home-v1.png in Resources */,
 				D10000000000000000000002 /* starting-town-home-v1.json in Resources */,
 				A10000000000000000000006 /* named-character-placeholders-v1.json in Resources */,
@@ -1187,6 +1246,7 @@
 				10EA98516A8B4CB4C9379D71 /* MinimapView.swift in Sources */,
 				4419D5E216F811B6E590C273 /* Naming.swift in Sources */,
 				A10000000000000000000003 /* NamedCharacterPixelIdentity.swift in Sources */,
+				C50000000000000000000001 /* TownBuildingVisualRegistry.generated.swift in Sources */,
 				A20000000000000000000001 /* CatalogueConsumablesPlaceholderV1Registry.swift in Sources */,
 				A10000000000000000000002 /* NamedCharacterPlaceholderPack.swift in Sources */,
 				A10000000000000000000001 /* NamedCharacterVisualAdapter.swift in Sources */,

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 enum BaseBoardRules {
     static func destinations(from stations: [StationDef]) -> [StationDef] {
@@ -21,6 +22,32 @@ enum BaseBoardRules {
     }
 
     static func columnCount(isAccessibilitySize: Bool) -> Int { isAccessibilitySize ? 2 : 3 }
+
+    // Parked later-town helpers. The Band-1 Home adapter does not consume them.
+    static let townPageCapacity = 4
+
+    static func townPages(_ stations: [StationDef]) -> [[StationDef]] {
+        stride(from: 0, to: stations.count, by: townPageCapacity).map {
+            Array(stations[$0..<min($0 + townPageCapacity, stations.count)])
+        }
+    }
+
+    static let townPlotPositions: [CGPoint] = [
+        CGPoint(x: 0.24, y: 0.49), CGPoint(x: 0.75, y: 0.42),
+        CGPoint(x: 0.25, y: 0.72), CGPoint(x: 0.75, y: 0.70)
+    ]
+
+    static func townBuildingAsset(for stationID: StationID) -> String? {
+        TownBuildingVisualRegistry.assetName(for: stationID)
+    }
+
+}
+
+@MainActor private enum TownVisualResource {
+    static func image(named name: String) -> UIImage? {
+        guard let path = Bundle.main.path(forResource: name, ofType: "png") else { return nil }
+        return UIImage(contentsOfFile: path)
+    }
 }
 
 /// The hub. Routes to station subscreens and out into a world.
@@ -157,11 +184,38 @@ struct BaseView: View {
                 StartingTownHomeScene(scene: scene,
                                       openedRoute: { store.openedFirstReturnDestination($0) })
                     .frame(height: sceneHeight)
+            } else if selectedSection != .home,
+                      TownVisualResource.image(named: "town-empty-v1") != nil {
+                townDistrictBoard(containerSize: containerSize)
             } else {
                 legacyStationGrid
             }
         }
         .accessibilityIdentifier("base-station-board-\(selectedSection.rawValue)")
+    }
+
+    private func townDistrictBoard(containerSize: CGSize) -> some View {
+        let destinations = stations(in: selectedSection)
+        let populatedPages = BaseBoardRules.townPages(destinations)
+        let pages = populatedPages.isEmpty ? [[]] : populatedPages
+        let sceneHeight = StartingTownHomeRules.sceneHeight(containerSize: containerSize)
+            ?? min(440, max(320, containerSize.height * 0.58))
+
+        return TabView {
+            ForEach(Array(pages.enumerated()), id: \.offset) { _, page in
+                TownDistrictScene(
+                    section: selectedSection,
+                    stations: page,
+                    stationState: { state.base.station($0) },
+                    openFoundation: { foundationStation = $0 },
+                    openedRoute: { store.openedFirstReturnDestination($0) }
+                )
+                .padding(.horizontal, 1)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: pages.count > 1 ? .automatic : .never))
+        .frame(height: sceneHeight)
+        .accessibilityIdentifier("base-town-scene-\(selectedSection.rawValue)")
     }
 
     private var legacyStationGrid: some View {
@@ -285,6 +339,156 @@ struct BaseView: View {
 }
 
 // MARK: - Pieces
+
+private struct TownDistrictScene: View {
+    let section: StationHomeSection
+    let stations: [StationDef]
+    let stationState: (StationID) -> StationState
+    let openFoundation: (StationDef) -> Void
+    let openedRoute: (AppRoute) -> Void
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                if let backdrop = TownVisualResource.image(named: "town-empty-v1") {
+                    Image(uiImage: backdrop)
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFill()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                    .allowsHitTesting(false)
+                }
+
+                LinearGradient(colors: [.black.opacity(0.04), .clear, .black.opacity(0.16)],
+                               startPoint: .top, endPoint: .bottom)
+                    .allowsHitTesting(false)
+
+                ForEach(Array(stations.enumerated()), id: \.element.id) { index, station in
+                    let position = BaseBoardRules.townPlotPositions[index]
+                    TownStationPlot(station: station,
+                                    stationState: stationState(station.id),
+                                    openFoundation: { openFoundation(station) },
+                                    openedRoute: openedRoute)
+                        .frame(width: min(132, geometry.size.width * 0.38), height: 132)
+                        .position(x: geometry.size.width * position.x,
+                                  y: geometry.size.height * position.y)
+                }
+
+                if stations.isEmpty {
+                    VStack(spacing: 6) {
+                        Label("No known destinations", systemImage: "signpost.right")
+                            .font(.headline)
+                        Text("No places are known in \(section.title) yet.")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(16)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .padding(20)
+                }
+            }
+        }
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.16)))
+    }
+}
+
+private struct TownStationPlot: View {
+    let station: StationDef
+    let stationState: StationState
+    let openFoundation: () -> Void
+    let openedRoute: (AppRoute) -> Void
+
+    var body: some View {
+        Group {
+            if stationState.isUnlocked {
+                let route = AppRoute(rawValue: station.route) ?? .base
+                NavigationLink(value: route) {
+                    content(isFoundation: false)
+                }
+                .accessibilityIdentifier("base-town-\(route.rawValue)")
+                .simultaneousGesture(TapGesture().onEnded { openedRoute(route) })
+            } else {
+                Button(action: openFoundation) { content(isFoundation: true) }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func content(isFoundation: Bool) -> some View {
+        VStack(spacing: 2) {
+            ZStack(alignment: .bottomTrailing) {
+                if !isFoundation,
+                   let asset = BaseBoardRules.townBuildingAsset(for: station.id),
+                   let image = TownVisualResource.image(named: asset) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .interpolation(.none)
+                        .scaledToFit()
+                } else if isFoundation {
+                    Image(systemName: "hammer.fill")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 48, height: 48)
+                        .background(.thickMaterial, in: Circle())
+                        .overlay(Circle().stroke(Color.white.opacity(0.8), style: StrokeStyle(lineWidth: 1.5, dash: [4, 3])))
+                        .shadow(color: .black.opacity(0.28), radius: 3, y: 2)
+                } else {
+                    Image(systemName: station.icon)
+                        .font(.title2.weight(.medium))
+                        .foregroundStyle(Color.accentColor)
+                        .frame(width: 58, height: 58)
+                        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.75)))
+                        .shadow(color: .black.opacity(0.28), radius: 3, y: 2)
+                }
+            }
+            .frame(height: 94)
+
+            HStack(spacing: 4) {
+                Text(station.name)
+                    .lineLimit(1)
+                if isFoundation {
+                    Text("Build").foregroundStyle(.secondary)
+                } else if stationState.tier > 0 {
+                    Text("T\(stationState.tier)").foregroundStyle(.secondary)
+                }
+            }
+            .font(.system(size: 11, weight: .bold, design: .rounded))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 4)
+            .background(Color.black.opacity(0.78), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    .stroke(Color(red: 0.91, green: 0.84, blue: 0.68).opacity(0.92), lineWidth: 1)
+            }
+            .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
+        }
+        .contentShape(Rectangle())
+    }
+}
+
+private struct TownHotspotSign: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .font(.system(size: 11, weight: .bold, design: .rounded))
+            .foregroundStyle(.white)
+            .lineLimit(1)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(Color.black.opacity(0.78), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    .stroke(Color(red: 0.91, green: 0.84, blue: 0.68).opacity(0.92), lineWidth: 1)
+            }
+            .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
+    }
+}
 
 private struct CompactCurrency: View {
     let icon: String

@@ -90,6 +90,80 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertEqual(BaseBoardRules.columnCount(isAccessibilitySize: true), 2)
     }
 
+    func testTownPagesPreserveEveryStationInOrderWithFourPlotsPerPage() {
+        let stations = BaseBoardRules.destinations(from: ContentCatalog.shared.stationsInOrder)
+        let pages = BaseBoardRules.townPages(stations)
+        XCTAssertTrue(pages.allSatisfy { !$0.isEmpty && $0.count <= 4 })
+        XCTAssertEqual(pages.flatMap { $0 }.map(\.id), stations.map(\.id))
+        XCTAssertEqual(BaseBoardRules.townPlotPositions, [
+            CGPoint(x: 0.24, y: 0.49), CGPoint(x: 0.75, y: 0.42),
+            CGPoint(x: 0.25, y: 0.72), CGPoint(x: 0.75, y: 0.70)
+        ])
+        XCTAssertTrue(BaseBoardRules.townPlotPositions.allSatisfy {
+            (0...1).contains($0.x) && (0...1).contains($0.y)
+        })
+    }
+
+    func testEveryNonHomeDistrictConsumesThePagedImageVillageScene() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains("selectedSection != .home"))
+        XCTAssertTrue(source.contains("townDistrictBoard(containerSize: containerSize)"))
+        XCTAssertTrue(source.contains("BaseBoardRules.townPages(destinations)"))
+        XCTAssertTrue(source.contains("TownDistrictScene("))
+        XCTAssertTrue(source.contains("base-town-scene-\\(selectedSection.rawValue)"))
+        XCTAssertTrue(source.contains("populatedPages.isEmpty ? [[]] : populatedPages"),
+                      "An empty district must retain its image-backed screen instead of disappearing")
+    }
+
+    func testTownBuildingArtIsExactIDOnlyAndUnknownStationsUseSemanticFallback() {
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "workshop"), "building-workshop-v1")
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "storehouse"), "building-storehouse-v1")
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "library"), "building-library-v1")
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "constellation"), "building-constellation-v1")
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "bestiary"), "building-bestiary-v1")
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "apothecary"), "building-apothecary-v1")
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "survey_post"), "building-survey-post-v1")
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "reliquary"), "building-reliquary-v1")
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "scriptorium"), "building-scriptorium-v1")
+        XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "essence_spring"), "building-essence-spring-v1")
+        XCTAssertNil(BaseBoardRules.townBuildingAsset(for: "blacksmith"))
+        XCTAssertNil(BaseBoardRules.townBuildingAsset(for: "invented"))
+    }
+
+    func testEveryMappedTownBuildingIsPresentInTheBuiltAppBundle() {
+        let mappedIDs: [StationID] = [
+            "workshop", "storehouse", "library", "constellation", "bestiary", "apothecary", "survey_post",
+            "reliquary", "scriptorium", "essence_spring"
+        ]
+
+        for stationID in mappedIDs {
+            guard let asset = BaseBoardRules.townBuildingAsset(for: stationID) else {
+                return XCTFail("Missing exact town-art mapping for \(stationID.rawValue)")
+            }
+            XCTAssertNotNil(
+                Bundle.main.url(forResource: asset, withExtension: "png"),
+                "\(asset).png is mapped but absent from the built app bundle"
+            )
+        }
+    }
+
+    func testGeneratedTownBuildingsPreserveFirstReturnRouteBookkeeping() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                                encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "private struct TownStationPlot"))
+        let end = try XCTUnwrap(source.range(of: "private struct TownHotspotSign",
+                                             range: start.upperBound..<source.endIndex))
+        let plot = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(plot.contains("openedRoute(route)"))
+    }
+
     func testPartyIsAUtilityAndNotADestinationTile() {
         let destinations = BaseBoardRules.destinations(from: ContentCatalog.shared.stationsInOrder)
         XCTAssertFalse(destinations.contains { $0.route == AppRoute.party.rawValue })
