@@ -319,7 +319,9 @@ struct AnchorageView: View {
                                                 .foregroundStyle(.secondary)
                                         }
                                         Spacer()
-                                        Button("Return") { store.unassignCompanion(index, fromAnchoredRealm: realm.id) }
+                                        Button("Return Home") {
+                                            store.unassignCompanion(index, fromAnchoredRealm: realm.id)
+                                        }
                                             .font(.caption.weight(.semibold))
                                             .buttonStyle(.bordered)
                                             .frame(minHeight: 44)

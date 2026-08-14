@@ -4,6 +4,17 @@ import XCTest
 /// Spending: refining, upgrades, identification, the key→cache payoff, and Constellation nodes.
 @MainActor
 final class EconomyTests: XCTestCase {
+    func testAnchorageNamesTheTravellerReturnDestination() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/StationViews.swift"), encoding: .utf8)
+
+        XCTAssertTrue(source.contains("Button(\"Return Home\")"))
+        XCTAssertTrue(source.contains("store.unassignCompanion(index, fromAnchoredRealm: realm.id)"))
+        XCTAssertFalse(source.contains("Button(\"Return\") { store.unassignCompanion"))
+    }
+
     func testLootDecisionConfirmsTheExactItemBeforeLeavingItBehind() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
