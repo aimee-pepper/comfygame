@@ -5,6 +5,29 @@ import XCTest
 /// Adding a symbol/creature/station to JSON and getting an ID wrong should fail here, loudly,
 /// rather than silently spawning nothing in a world.
 final class ContentTests: XCTestCase {
+    func testGeneratedMeetingCorpusMatchesItsAuthoredSources() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        var fingerprint: UInt64 = 0xcbf29ce484222325
+
+        for sourceFile in AuthoredMeetingCorpus.sourceFiles {
+            let sourceURL = projectRoot.appending(path: "docs/\(sourceFile)")
+            let bytes = Array(sourceFile.utf8) + [0] + Array(try Data(contentsOf: sourceURL)) + [0]
+            for byte in bytes {
+                fingerprint ^= UInt64(byte)
+                fingerprint &*= 0x100000001b3
+            }
+        }
+
+        XCTAssertEqual(
+            String(format: "%016llx", fingerprint),
+            AuthoredMeetingCorpus.sourceFingerprint,
+            "DraftMeetingCorpus.generated.swift is stale; run "
+                + "Scripts/generate_draft_meeting_corpus.py --write"
+        )
+    }
+
     func testEngineeringQuestionHeadingsHaveUniqueStableIDs() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

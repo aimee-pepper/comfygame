@@ -15,6 +15,17 @@ SOURCES = [
 ]
 
 
+def source_fingerprint() -> str:
+    """Stable, dependency-free FNV-1a fingerprint of the ordered authored inputs."""
+    value = 0xCBF29CE484222325
+    for source_name in SOURCES:
+        payload = source_name.encode() + b"\0" + (ROOT / "docs" / source_name).read_bytes() + b"\0"
+        for byte in payload:
+            value ^= byte
+            value = (value * 0x100000001B3) & 0xFFFFFFFFFFFFFFFF
+    return f"{value:016x}"
+
+
 def clean(value: str) -> str:
     value = re.sub(r"\s+", " ", value.strip())
     return value.replace("\\|", "|")
@@ -78,13 +89,15 @@ enum AuthoredMeetingCorpus {
         let declined: String
     }
 
+    static let sourceFiles = %s
+    static let sourceFingerprint = "%s"
     private static let encodedJSON = "%s"
     static let decodeResult: Result<[Meeting], Error> = Result { try JSONDecoder().decode([Meeting].self, from: Data(base64Encoded: encodedJSON)!) }
     static let meetings: [Meeting] = (try? decodeResult.get()) ?? []
     static let decodingError: String? = { if case .failure(let error) = decodeResult { return String(describing: error) }; return nil }()
     static func meeting(for id: TravellerID) -> Meeting? { meetings.first { $0.travellerID == id.rawValue } }
 }
-""" % encoded
+""" % (json.dumps(SOURCES, separators=(",", ":")), source_fingerprint(), encoded)
 
 output = ROOT / "Sources" / "Content" / "DraftMeetingCorpus.generated.swift"
 if "--check" in sys.argv:
