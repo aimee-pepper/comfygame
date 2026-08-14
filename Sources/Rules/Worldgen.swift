@@ -70,6 +70,7 @@ enum WildWorldPageFieldRules {
         guard matches.count == 1, let instance = matches.first,
               let position = instance.fieldProvenance?.position,
               position == run.playerPosition,
+              run.map.contains(position), run.map[position].isRevealed,
               WorldPageCatalog.definition(instance.definition.id) == instance.definition
         else { return nil }
         return Quote(instance: instance, position: position)

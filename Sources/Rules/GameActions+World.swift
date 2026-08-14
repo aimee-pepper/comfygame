@@ -218,6 +218,37 @@ extension GameStore {
 
     var activeRun: WorldRun? { state.worlds.activeRun }
 
+    func offeredWorldPageQuote(_ instanceID: InstanceID) -> WildWorldPageFieldRules.Quote? {
+        activeRun.flatMap { WildWorldPageFieldRules.quote(instanceID, in: $0) }
+    }
+
+    @discardableResult
+    func inspectOfferedWorldPage(_ quote: WildWorldPageFieldRules.Quote)
+        -> WildWorldPageFieldRules.Result {
+        var result: WildWorldPageFieldRules.Result = .stale
+        mutate("inspect loose World Page", flush: true) { state in
+            guard var run = state.worlds.activeRun else { return }
+            result = WildWorldPageFieldRules.inspect(quote, in: &run)
+            guard case .inspected(let page) = result else { return }
+            state.reality.recordEncounter(on: page.definition.page)
+            state.worlds.activeRun = run
+        }
+        return result
+    }
+
+    @discardableResult
+    func takeOfferedWorldPage(_ quote: WildWorldPageFieldRules.Quote)
+        -> WildWorldPageFieldRules.Result {
+        var result: WildWorldPageFieldRules.Result = .stale
+        mutate("take loose World Page", flush: true) { state in
+            guard var run = state.worlds.activeRun else { return }
+            result = WildWorldPageFieldRules.take(quote, in: &run)
+            guard case .taken = result else { return }
+            state.worlds.activeRun = run
+        }
+        return result
+    }
+
     /// The most recent turn's events, for the World screen to narrate. Not persisted — a resumed
     /// run shows the state, not a replay of how it got there.
     private static let eventLimit = 4

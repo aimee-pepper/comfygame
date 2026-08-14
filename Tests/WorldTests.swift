@@ -120,6 +120,7 @@ final class WorldTests: XCTestCase {
                                    position: position))
         var run = wildPageRun(seed: 44)
         run.playerPosition = position
+        run.map[position].isRevealed = true
         run.offeredWorldPages = [page]
 
         let quote = try XCTUnwrap(WildWorldPageFieldRules.quote(page.id, in: run))
@@ -150,6 +151,7 @@ final class WorldTests: XCTestCase {
                                    position: position))
         var run = wildPageRun(seed: 44)
         run.playerPosition = position
+        run.map[position].isRevealed = true
         run.offeredWorldPages = [page]
         let quote = try XCTUnwrap(WildWorldPageFieldRules.quote(page.id, in: run))
 
@@ -166,6 +168,41 @@ final class WorldTests: XCTestCase {
         let duplicate = run
         XCTAssertEqual(WildWorldPageFieldRules.take(quote, in: &run), .duplicateIdentity)
         XCTAssertEqual(run, duplicate)
+    }
+
+    @MainActor
+    func testStoreInspectionTeachesOnlyAfterExactVisibleQuoteCommits() throws {
+        let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_gilded_caverns"))
+        let position = GridPoint(x: 1, y: 1)
+        let page = WorldPageInstance(
+            id: InstanceID(rawValue: 882), definition: definition,
+            fieldProvenance: .init(originRunIndex: 3, originWorldSeed: 45,
+                                   generationSeed: 56, position: position))
+        var run = wildPageRun(seed: 45)
+        run.playerPosition = position
+        run.map[position].isRevealed = true
+        run.offeredWorldPages = [page]
+        let store = GameStore(io: .temporary(name: "wild-page-field-\(UUID().uuidString)"))
+        store.mutate("install wild page fixture") { $0.worlds.activeRun = run }
+
+        let quote = try XCTUnwrap(store.offeredWorldPageQuote(page.id))
+        XCTAssertEqual(store.state.reality.encounteredLexemes, [])
+        guard case .inspected = store.inspectOfferedWorldPage(quote) else {
+            return XCTFail("expected inspection")
+        }
+        XCTAssertEqual(store.state.reality.encounteredLexemes,
+                       definition.page.encounteredLexemes)
+
+        let afterInspectionRun = store.state.worlds.activeRun
+        let afterInspectionLexemes = store.state.reality.encounteredLexemes
+        XCTAssertEqual(store.takeOfferedWorldPage(quote), .stale)
+        XCTAssertEqual(store.state.worlds.activeRun, afterInspectionRun)
+        XCTAssertEqual(store.state.reality.encounteredLexemes, afterInspectionLexemes)
+        let fresh = try XCTUnwrap(store.offeredWorldPageQuote(page.id))
+        guard case .taken(let taken) = store.takeOfferedWorldPage(fresh) else {
+            return XCTFail("expected exact take")
+        }
+        XCTAssertEqual(store.state.worlds.activeRun?.carriedWorldPages, [taken])
     }
 
     func testSameSeedRegeneratesTheSameWorld() {
