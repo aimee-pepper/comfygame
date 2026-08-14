@@ -557,7 +557,7 @@ enum WorldRules {
             if let pattern = page.teachesPattern,
                !state.reality.library.knownPatterns.contains(pattern) {
                 state.reality.library.knownPatterns.insert(pattern)
-                events.append(.learnedPattern(pattern))
+                events.append(.learnedPattern(pattern.rawValue))
             }
         case .researchLead, .ruin, .worldWorthWriting, .account, .turn:
             // Recorded in the Library; the systems that read it come later.

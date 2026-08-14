@@ -39,8 +39,8 @@ final class LibraryTests: XCTestCase {
 
     func testMaudPatternAcquisitionIsIdempotentAndSurvivesSave() throws {
         let page = try XCTUnwrap(ContentCatalog.shared.diaryPage("maud_fitting_pattern"))
-        XCTAssertEqual(page.taughtPatternID, "maud_fitting_pattern")
-        XCTAssertEqual(WorkshopPatternRegistry.definition(try XCTUnwrap(page.taughtPatternID))?.name,
+        XCTAssertEqual(page.teachesPattern, "maud_fitting_pattern")
+        XCTAssertEqual(WorkshopPatternRegistry.definition(try XCTUnwrap(page.teachesPattern))?.name,
                        "Maud's fitting pattern")
         var state = GameState.newGame()
 
@@ -52,6 +52,18 @@ final class LibraryTests: XCTestCase {
 
         let restored = try SaveCodec.decode(SaveCodec.encode(state))
         XCTAssertEqual(restored.reality.library.knownPatterns, ["maud_fitting_pattern"])
+    }
+
+    func testTypedDiaryPatternPayloadPreservesSingleStringJSONWire() throws {
+        let decoded = try SaveCodec.makeDecoder().decode(
+            DiaryPageDef.self,
+            from: Data(#"{"id":"test_pattern","diary":"maud","kind":"pattern","prose":"A method.","teachesPattern":"maud_fitting_pattern","prefersConditions":[]}"#.utf8))
+        XCTAssertEqual(decoded.teachesPattern, "maud_fitting_pattern")
+
+        let encoded = try SaveCodec.makeEncoder().encode(decoded)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        XCTAssertEqual(object["teachesPattern"] as? String, "maud_fitting_pattern")
+        XCTAssertEqual(try SaveCodec.makeDecoder().decode(DiaryPageDef.self, from: encoded), decoded)
     }
 
     func testLegacyPatternStringsDecodeTypedAndUnknownKnowledgeReencodesLosslessly() throws {

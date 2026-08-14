@@ -16,6 +16,17 @@ final class WeaponsmithTests: XCTestCase {
             PhysicalGearCraftingRules.fittedPolearm(damage: .pierce), in: without),
             "an unknown retained legacy ID became a live pattern grant")
     }
+
+    func testTypedDiaryPayloadStillEmitsStableStringEvent() throws {
+        let page = try XCTUnwrap(ContentCatalog.shared.diaryPage("maud_fitting_pattern"))
+        XCTAssertEqual(page.teachesPattern, WorkshopPatternID(rawValue: "maud_fitting_pattern"))
+        var state = GameState.newGame()
+
+        XCTAssertTrue(WorldRules.readPage(page.id, in: &state)
+            .contains(.learnedPattern("maud_fitting_pattern")))
+        XCTAssertTrue(state.reality.library.knownPatterns.contains(
+            WorkshopPatternID(rawValue: "maud_fitting_pattern")))
+    }
     private func state(tier: Int = 0, grade: Double = 70, pattern: Bool = false) -> GameState {
         var state = GameState.newGame()
         state.base.stations[Stations.weaponsmith] = StationState(isUnlocked: true, tier: tier)

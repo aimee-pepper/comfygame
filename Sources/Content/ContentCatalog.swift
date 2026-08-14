@@ -791,7 +791,7 @@ struct ContentCatalog: Sendable {
                     throw ContentError.danglingReference("page '\(page.id)' teaches an unknown gambit phrase")
                 }
             case .pattern:
-                guard let id = page.taughtPatternID,
+                guard let id = page.teachesPattern,
                       WorkshopPatternRegistry.definition(id) != nil else {
                     throw ContentError.danglingReference("page '\(page.id)' teaches an unknown pattern")
                 }

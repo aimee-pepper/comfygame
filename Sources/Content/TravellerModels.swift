@@ -199,10 +199,7 @@ struct DiaryPageDef: Codable, Equatable, Identifiable, Sendable {
     /// `gambit`: one phrase in the combat rule grammar, taught outright.
     var teachesGambit: GambitComponentID?
     /// A complete, singular authored workshop pattern. This is not research progress.
-    var teachesPattern: String?
-    var taughtPatternID: WorkshopPatternID? {
-        teachesPattern.map(WorkshopPatternID.init(rawValue:))
-    }
+    var teachesPattern: WorkshopPatternID?
     /// `researchLead`: partial progress toward a node, never the finished thing.
     var researchNode: ResearchNodeID?
     /// `ruin`: a site whose existence this page reveals.
