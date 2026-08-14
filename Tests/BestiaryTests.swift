@@ -5,6 +5,21 @@ import XCTest
 /// displayed nowhere — the bestiary had no screen at all, so every specimen, trait vector and
 /// derived identity went into the save unreadable.
 final class BestiaryTests: XCTestCase {
+    func testReleaseLivingAnalysisDisclosesGeneratedAuthority() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/LivingAnalysisView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("Generated estimate"))
+        XCTAssertTrue(source.contains("deterministic samples"))
+        XCTAssertFalse(source.localizedCaseInsensitiveContains("observed population"))
+        XCTAssertFalse(source.localizedCaseInsensitiveContains("in nature"))
+        XCTAssertFalse(source.localizedCaseInsensitiveContains("live sample"))
+    }
+
     func testReleaseBestiaryDisclosesRecordedAndGeneratedAuthorities() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
