@@ -143,7 +143,7 @@ struct WorldHistoryView: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(selected.count) of 2 selected").font(.headline)
-                Text(selectedWorldNames).font(.caption).foregroundStyle(.secondary)
+                Text(comparisonSelectionDetail).font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
             Button("Compare") { openComparison() }
@@ -159,6 +159,14 @@ struct WorldHistoryView: View {
         selected.compactMap { id in
             store.state.reality.library.visitedWorlds.first { $0.id == id }.map { "World \($0.runIndex)" }
         }.joined(separator: " + ")
+    }
+
+    private var comparisonSelectionDetail: String {
+        switch selected.count {
+        case 0: "Choose two worlds"
+        case 1: "\(selectedWorldNames) · choose one more"
+        default: selectedWorldNames
+        }
     }
 
     private func activate(_ world: VisitedWorld) {

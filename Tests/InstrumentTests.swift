@@ -10,6 +10,18 @@ import XCTest
 /// bought with.**
 @MainActor
 final class InstrumentTests: XCTestCase {
+    func testWorldHistoryCompareFooterGuidesIncompleteSelection() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/WorldHistoryView.swift"), encoding: .utf8)
+
+        XCTAssertTrue(source.contains("Text(comparisonSelectionDetail)"))
+        XCTAssertTrue(source.contains("case 0: \"Choose two worlds\""))
+        XCTAssertTrue(source.contains("case 1: \"\\(selectedWorldNames) · choose one more\""))
+        XCTAssertTrue(source.contains("default: selectedWorldNames"))
+    }
+
     func testWorldHistoryLabelsLivingAnalysisAsDeterministicReferenceEvidence() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
