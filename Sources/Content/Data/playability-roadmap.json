@@ -242,7 +242,7 @@
       "id": "channelworks-restoration-receipt",
       "priority": "P2",
       "title": "Separate Oda's restored conduit from repeatable construction",
-      "status": "queued",
+      "status": "readyToTest",
       "detail": "Channelworks construction already grants Oda's authored Heat Conduit, but the station screen makes the separate player-core conversion look like the same pending restoration. Add/adopt one durable restoration receipt, confirm the restored fixture, and label the repeatable action Build another conduit.",
       "gate": "Fresh and unlocked-legacy saves, a moved/equipped/sold first fixture, repeated relaunch, and repeatable Heat-core conversion prove exactly one authored entitlement and truthful Oda-to-Auber progression. Authority: channelworks-system-current.md and DRQ-083."
     },
@@ -274,7 +274,7 @@
       "id": "authored-text-first-review",
       "priority": "P1",
       "title": "Promote and play-review authored dialogue",
-      "status": "queued",
+      "status": "readyToTest",
       "detail": "Decision279 makes coherent authored content live by default and uses play as review. Promote the 21 completed missing-live meeting drafts, Noll's replacement candidate, Auber's revision, Isolde's three optional-reply replacements and Sabine's seven-location clue sequence without waiting for prior Atlas ratings. Incomplete or contradictory units remain draft-only.",
       "gate": "All 29 travellers have coherent live meetings; stable exchange/page IDs, reply order, condition indices and old-save tolerance survive promotion; generated corpus freshness and catalogue-set validation pass; Atlas reviews the same live text; phone play can flag and revise individual units without blocking the rest. Authority: Decision279, traveller-meeting-corpus-plan-current.md and dialogue-review-first-batch-current.md."
     },
@@ -322,7 +322,7 @@
       "id": "legacy-token-quirk-cleanup",
       "priority": "P3",
       "title": "Remove retired Token and Quirk promises",
-      "status": "queued",
+      "status": "readyToTest",
       "detail": "Decision189 cuts Traveller's Token and the separately rolled Quirk/veto/reroll layer. Scent Mask remains independently justified; paired opportunity/consequence remains systemic. Clean only remaining current/runtime promises while preserving legacy decode aliases and archived rationale.",
       "gate": "Release/current-copy and route scans expose no Traveller's Token recipe, Quirk slot/deck or reroll affordance; 17 consumables remain complete; legacy compound/item IDs decode without becoming writable; Dim Sky/Gilded Veins and Danger runes retain their real pressure consumers."
     }

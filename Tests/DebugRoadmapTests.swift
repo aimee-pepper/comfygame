@@ -22,6 +22,18 @@ final class DebugRoadmapTests: XCTestCase {
         }
     }
 
+    func testSourceCompleteReviewCheckpointsCannotRegressToQueued() throws {
+        let byID = Dictionary(uniqueKeysWithValues: DebugRoadmap.current.items.map { ($0.id, $0) })
+        for id in [
+            "channelworks-restoration-receipt",
+            "authored-text-first-review",
+            "legacy-token-quirk-cleanup"
+        ] {
+            XCTAssertEqual(try XCTUnwrap(byID[id]).status, .readyToTest,
+                           "\(id) is source-complete and awaits acceptance, not implementation")
+        }
+    }
+
     func testBundledRoadmapIsDisclosedAsAClaimRatherThanInstalledEvidence() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
