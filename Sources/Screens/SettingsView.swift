@@ -50,7 +50,8 @@ struct SettingsView: View {
                     SettingsDestinationRow(
                         icon: "books.vertical",
                         title: "Save games",
-                        subtitle: "Return to the campaign chooser"
+                        subtitle: "Return to the campaign chooser",
+                        directionIcon: "chevron.backward"
                     )
                 }
                 .buttonStyle(.plain)
@@ -106,6 +107,7 @@ private struct SettingsDestinationRow: View {
     let icon: String
     let title: String
     let subtitle: String
+    var directionIcon = "chevron.right"
 
     var body: some View {
         HStack(spacing: 12) {
@@ -119,7 +121,7 @@ private struct SettingsDestinationRow: View {
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 8)
-            Image(systemName: "chevron.right")
+            Image(systemName: directionIcon)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.tertiary)
         }

@@ -4,6 +4,18 @@ import XCTest
 /// Spending: refining, upgrades, identification, the key→cache payoff, and Constellation nodes.
 @MainActor
 final class EconomyTests: XCTestCase {
+    func testSettingsDistinguishesPushDestinationsFromCampaignReturn() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/SettingsView.swift"), encoding: .utf8)
+
+        XCTAssertTrue(source.contains("var directionIcon = \"chevron.right\""))
+        XCTAssertTrue(source.contains("subtitle: \"Return to the campaign chooser\","))
+        XCTAssertTrue(source.contains("directionIcon: \"chevron.backward\""))
+        XCTAssertTrue(source.contains("Image(systemName: directionIcon)"))
+    }
+
     func testAnchorageNamesTheTravellerReturnDestination() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
