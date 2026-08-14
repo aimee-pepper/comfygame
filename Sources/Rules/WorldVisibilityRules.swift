@@ -104,6 +104,13 @@ extension WorldRules {
                    profile: visibilityProfile(in: run, party: party))
     }
 
+    /// Exploration is durable terrain memory. Leaving current sight may dim a fully explored tile
+    /// to the same terrain-only fringe used by the outer sight ring, but it never makes that ground
+    /// opaque and unknown again. Transient entities still use `visibility` directly.
+    static func terrainVisibility(current: TileVisibility, wasRevealed: Bool) -> TileVisibility {
+        wasRevealed ? max(current, .fringe) : current
+    }
+
     static func isCurrentlyVisible(_ enemy: WorldEnemy, in run: WorldRun,
                                    party: Int = 0) -> Bool {
         isCurrentlyVisible(enemy, in: run, profile: visibilityProfile(in: run, party: party))

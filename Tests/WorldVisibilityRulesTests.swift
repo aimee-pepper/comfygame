@@ -2,6 +2,21 @@ import XCTest
 @testable import Bookbinder
 
 final class WorldVisibilityRulesTests: XCTestCase {
+    func testFullyExploredTerrainNeverFallsBelowFringeAfterLeavingSight() {
+        XCTAssertEqual(WorldRules.terrainVisibility(current: .hidden, wasRevealed: true), .fringe)
+        XCTAssertEqual(WorldRules.terrainVisibility(current: .fringe, wasRevealed: true), .fringe)
+        XCTAssertEqual(WorldRules.terrainVisibility(current: .full, wasRevealed: true), .full)
+        XCTAssertEqual(WorldRules.terrainVisibility(current: .hidden, wasRevealed: false), .hidden)
+
+        let pitchBlack = WorldRules.visibilityProfile(illumination: 0)
+        XCTAssertEqual(WorldTileVisibilityPresentation.fringeOpacity(
+            profile: pitchBlack, remembered: true), Tuning.Visibility.defaultFringeOpacity)
+        XCTAssertEqual(WorldTileVisibilityPresentation.fringeBlurFraction(
+            profile: pitchBlack, remembered: true), Tuning.Visibility.defaultFringeBlurFraction)
+        XCTAssertEqual(WorldTileVisibilityPresentation.fringeOpacity(
+            profile: pitchBlack, remembered: false), 0)
+    }
+
     func testHiddenNeighboursCannotChangeVisibleTileArtContext() throws {
         let origin = GridPoint(x: 1, y: 1)
         let point = GridPoint(x: 2, y: 2)
@@ -50,12 +65,12 @@ final class WorldVisibilityRulesTests: XCTestCase {
         map[east].ground = .stone
         map[south].ground = .stone
         map[south].elevation = 3
-        let profile = WorldRules.visibilityProfile(illumination: 20)
+        let profile = WorldRules.visibilityProfile(illumination: 45)
 
         func resolved(_ candidate: WorldMap) throws -> MapTileArtRequest {
             let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
                                mapSeed: 78, rng: SeededRNG(seed: 78), map: candidate,
-                               playerPosition: origin)
+                               playerPosition: point)
             var tile = candidate[point]
             tile.isRevealed = true
             return try XCTUnwrap(WorldTileVisibilityPresentation.resolve(
@@ -66,6 +81,7 @@ final class WorldVisibilityRulesTests: XCTestCase {
         let connected = try resolved(map)
         map[east].ground = .water
         map[south].ground = .chasm
+        map[south].elevation = 0
         let separated = try resolved(map)
 
         XCTAssertNotEqual(connected.adjacency, separated.adjacency)

@@ -926,20 +926,25 @@ private struct MapGrid: View {
                     HStack(spacing: 0) {
                         ForEach(origin.x..<(origin.x + viewportColumns), id: \.self) { x in
                             let point = GridPoint(x: x, y: y)
-                            let visibility = WorldRules.visibility(
+                            let currentVisibility = WorldRules.visibility(
                                 of: point, from: run.playerPosition,
                                 in: run.map, profile: visibilityProfile)
+                            let visibility = WorldRules.terrainVisibility(
+                                current: currentVisibility, wasRevealed: run.map[point].isRevealed)
+                            let isRememberedTerrain = currentVisibility == .hidden
+                                && visibility == .fringe
                             let displayTile = displayTile(at: point, visibility: visibility)
                             let presentation = WorldTileVisibilityPresentation.resolve(
                                 run: run, point: point, tile: displayTile, visibility: visibility,
                                 profile: visibilityProfile, grade: grade)
                             TileView(tile: displayTile,
                                      visibility: visibility,
+                                     isRememberedTerrain: isRememberedTerrain,
                                      visibilityProfile: visibilityProfile,
                                      artRequest: presentation.artRequest,
                                      fogBoundaryEdges: presentation.fogBoundaryEdges,
-                                     enemy: enemy(at: point, visibility: visibility),
-                                     site: visibility == .full ? site(at: point) : nil,
+                                     enemy: enemy(at: point, visibility: currentVisibility),
+                                     site: currentVisibility == .full ? site(at: point) : nil,
                                      isPlayer: point == run.playerPosition,
                                      side: side,
                                      useSimpleRenderer: simpleRenderer)
@@ -1040,9 +1045,12 @@ struct WorldTileVisibilityPresentation {
                 fogBoundaryEdges.insert(neighbour.edge)
                 continue
             }
-            let neighbourVisibility = WorldRules.visibility(
+            let currentNeighbourVisibility = WorldRules.visibility(
                 of: neighbour.point, from: run.playerPosition,
                 in: run.map, profile: profile)
+            let neighbourVisibility = WorldRules.terrainVisibility(
+                current: currentNeighbourVisibility,
+                wasRevealed: run.map[neighbour.point].isRevealed)
             guard neighbourVisibility != .hidden else {
                 fogBoundaryEdges.insert(neighbour.edge)
                 continue
@@ -1070,11 +1078,25 @@ struct WorldTileVisibilityPresentation {
               count: MapAssetContract.spriteWidth * MapAssetContract.spriteHeight)
             .flatMap { $0 }
     }
+
+    static func fringeOpacity(profile: WorldRules.VisibilityProfile,
+                              remembered: Bool) -> Double {
+        remembered ? max(profile.fringeOpacity, Tuning.Visibility.defaultFringeOpacity)
+            : profile.fringeOpacity
+    }
+
+    static func fringeBlurFraction(profile: WorldRules.VisibilityProfile,
+                                   remembered: Bool) -> Double {
+        remembered ? min(profile.fringeBlurFraction,
+                          Tuning.Visibility.defaultFringeBlurFraction)
+            : profile.fringeBlurFraction
+    }
 }
 
 private struct TileView: View {
     let tile: Tile
     let visibility: WorldRules.TileVisibility
+    let isRememberedTerrain: Bool
     let visibilityProfile: WorldRules.VisibilityProfile
     let artRequest: MapTileArtRequest?
     let fogBoundaryEdges: FogBoundaryEdges
@@ -1138,13 +1160,15 @@ private struct TileView: View {
             }
         }
         .blur(radius: visibility == .fringe
-              ? side * CGFloat(visibilityProfile.fringeBlurFraction) : 0)
+              ? side * CGFloat(WorldTileVisibilityPresentation.fringeBlurFraction(
+                  profile: visibilityProfile, remembered: isRememberedTerrain)) : 0)
         .overlay {
             switch visibility {
             case .full:
                 Color.clear
             case .fringe:
-                Color.black.opacity(1 - visibilityProfile.fringeOpacity)
+                Color.black.opacity(1 - WorldTileVisibilityPresentation.fringeOpacity(
+                    profile: visibilityProfile, remembered: isRememberedTerrain))
             case .hidden:
                 Color.black
             }
