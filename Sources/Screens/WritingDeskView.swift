@@ -16,6 +16,11 @@ enum WritingDeskLayout {
     }
 }
 
+private enum WritingDeskSheet: String, Identifiable {
+    case inkWell
+    var id: String { rawValue }
+}
+
 /// Compose a book, see what it will cost you and what it will become, then commit.
 ///
 /// **Two panes.** *Write* is the page and the vocabulary — the page fixed at the top, never
@@ -46,6 +51,7 @@ struct WritingDeskView: View {
     @State private var pendingTemplateOverwrite: PageTemplateID?
     @State private var pendingTemplateDelete: PageTemplateID?
     @State private var templateError: String?
+    @State private var presentedSheet: WritingDeskSheet?
 
     @State private var bin: Bin = .compounds
 
@@ -171,6 +177,13 @@ struct WritingDeskView: View {
             load: performTemplateLoad,
             overwrite: { reportTemplateResult(store.overwritePageTemplate($0)) },
             delete: { reportTemplateResult(store.deletePageTemplate($0)) }))
+        .sheet(item: $presentedSheet) { sheet in
+            switch sheet {
+            case .inkWell:
+                InkWellSheet()
+                    .environmentObject(store)
+            }
+        }
         .tutorialHoverOverlay(isPresented: tutorialLesson != nil) {
             if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
                 TutorialCard(lesson: lesson,
@@ -221,6 +234,7 @@ struct WritingDeskView: View {
             VStack(spacing: 6) {
                 PageGridView(ghost: $ghost, side: side,
                              dismissalToken: pageInteractionDismissalToken)
+                inkWellBar
                 binTabs
                     .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
                 ScrollView { binContents.padding(.bottom, 8) }
@@ -234,6 +248,38 @@ struct WritingDeskView: View {
 
     private func dismissPageInteraction() {
         pageInteractionDismissalToken &+= 1
+    }
+
+    private var inkWellBar: some View {
+        let unlocked = state.base.completedResearch.contains("pen_ink_mixing")
+        let mixedCount = state.base.page.runes.filter { $0.inkRecipe != nil }.count
+        return Button {
+            if unlocked { presentedSheet = .inkWell }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: unlocked ? "eyedropper.halffull" : "pencil.and.scribble")
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(unlocked ? "Ink well" : "Ash ink")
+                        .font(.caption.weight(.semibold))
+                    Text(unlocked
+                         ? (mixedCount == 0 ? "Color left open" : "\(mixedCount) mixed focus\(mixedCount == 1 ? "" : "es")")
+                         : "Color left open · Ink Mixing not learned")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                if unlocked { Image(systemName: "chevron.up.chevron.down").font(.caption2) }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 10)
+            .frame(height: 38)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: 9))
+        }
+        .buttonStyle(.plain)
+        .disabled(!unlocked)
+        .accessibilityLabel(unlocked ? "Ink well, \(mixedCount) mixed focuses"
+                                    : "Ash ink, color left open, Ink Mixing not learned")
     }
 
     private var binTabs: some View {
@@ -834,6 +880,295 @@ private struct SavedPageTemplateCard: View {
             showsActions = false
             action()
         }
+    }
+}
+
+private struct InkWellSheet: View {
+    @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedMarkID: InstanceID?
+    @State private var cyan = 82.0
+    @State private var magenta = 0.0
+    @State private var yellow = 3.0
+    @State private var depth = 7.0
+    @State private var mixtureName = ""
+    @State private var message: String?
+
+    private var eligibleMarks: [PlacedRune] {
+        store.state.base.page.runes.filter {
+            $0.hand != .crude
+                && $0.inkEligibleSourceID.map(InkEconomyRules.supportedSourceIDs.contains) == true
+        }
+    }
+
+    private var recipe: InkRecipe? {
+        let channels = [cyan, magenta, yellow, depth].map {
+            UInt8(min(100, max(0, Int($0.rounded()))))
+        }
+        guard channels.contains(where: { $0 > 0 }) else { return nil }
+        return InkRecipe(cyan: channels[0], magenta: channels[1],
+                         yellow: channels[2], depth: channels[3])
+    }
+
+    private var preparedApplications: Int {
+        guard let recipe else { return 0 }
+        return store.state.base.preparedInkVials
+            .filter { $0.recipe == recipe }
+            .reduce(0) { $0 + $1.remainingApplications }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 12) {
+                    targetCard
+                    mixerCard
+                    savedCard
+                    preparationCard
+                    if let message {
+                        Text(message).font(.caption).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(16)
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("Ink well")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+        .onAppear {
+            if selectedMarkID == nil { selectedMarkID = eligibleMarks.first?.id }
+            loadSelectedMarkInk()
+        }
+        .onChange(of: selectedMarkID) { _, _ in loadSelectedMarkInk() }
+    }
+
+    private var targetCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("FOCUS").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+            if eligibleMarks.isEmpty {
+                Text("Place a Brush or Fountain pen Sun, Smoke, Granite or Bloom focus first.")
+                    .font(.subheadline).foregroundStyle(.secondary)
+            } else {
+                Picker("Focus", selection: $selectedMarkID) {
+                    ForEach(eligibleMarks) { mark in
+                        Text(mark.inkEligibleSourceID?.rawValue.capitalized ?? "Focus")
+                            .tag(Optional(mark.id))
+                    }
+                }
+                .pickerStyle(.menu)
+                HStack {
+                    Button("Apply mixture") { applyRecipe() }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(recipe == nil || selectedMarkID == nil)
+                    Button("Return to Ash") { returnToAsh() }
+                        .buttonStyle(.bordered)
+                        .disabled(selectedMarkID == nil)
+                }
+                Button("Use for next focus") {
+                    store.useInkForNextFocus(recipe)
+                    message = "The next eligible focus you place will use this mixture."
+                }
+                .buttonStyle(.bordered)
+                .disabled(recipe == nil)
+                if store.state.base.nextFocusInkRecipe != nil {
+                    Button("Next focus: return to Ash") {
+                        store.useInkForNextFocus(nil)
+                        message = "The next focus will use Ash."
+                    }
+                    .font(.caption)
+                }
+            }
+        }
+        .inkCard()
+    }
+
+    private var mixerCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("MIX").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+            inkSwatch
+            InkChannelSlider(name: "Cyan", value: $cyan)
+            InkChannelSlider(name: "Magenta", value: $magenta)
+            InkChannelSlider(name: "Yellow", value: $yellow)
+            InkChannelSlider(name: "Depth", value: $depth)
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 6) {
+                ForEach(Self.presets, id: \.name) { preset in
+                    Button(preset.name) { load(preset.recipe) }
+                        .buttonStyle(.bordered)
+                        .font(.caption2)
+                }
+            }
+        }
+        .inkCard()
+    }
+
+    private var inkSwatch: some View {
+        let rgb = recipe?.resolvedSRGB ?? [32, 30, 28]
+        let color = Color(red: Double(rgb[0]) / 255,
+                          green: Double(rgb[1]) / 255,
+                          blue: Double(rgb[2]) / 255)
+        return ZStack {
+            RoundedRectangle(cornerRadius: 10).fill(color)
+            HStack(spacing: 7) {
+                ForEach(0..<7, id: \.self) { _ in
+                    Rectangle().fill(Color.white.opacity(0.42)).frame(width: 2).rotationEffect(.degrees(28))
+                }
+            }
+            Text(recipe == nil ? "Ash · color left open" : "Mixed ink · explicit color")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white)
+                .shadow(radius: 2)
+        }
+        .frame(height: 58)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(recipe == nil ? "Ash ink, color left open"
+                            : "Mixed ink, Cyan \(Int(cyan)), Magenta \(Int(magenta)), Yellow \(Int(yellow)), Depth \(Int(depth))")
+    }
+
+    private var savedCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("SAVED MIXTURES").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+            if !store.state.base.savedInkMixtures.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(store.state.base.savedInkMixtures) { mixture in
+                            Button(mixture.name) { load(mixture.recipe) }
+                                .buttonStyle(.bordered)
+                        }
+                    }
+                }
+            }
+            HStack {
+                TextField("Mixture name", text: $mixtureName)
+                    .textFieldStyle(.roundedBorder)
+                Button("Save") { saveMixture() }
+                    .buttonStyle(.bordered)
+                    .disabled(recipe == nil)
+            }
+        }
+        .inkCard()
+    }
+
+    private var preparationCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("PREPARE FOR BINDING").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+            if let recipe {
+                let quote = store.inkVialPreparationQuote(recipe)
+                Text("Prepared: \(preparedApplications) focus applications")
+                    .font(.subheadline.weight(.semibold))
+                Text(preparationSummary(quote))
+                    .font(.caption).foregroundStyle(.secondary)
+                Button("Prepare 12 applications") { prepare(quote) }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!quote.isReady)
+                if let refusal = quote.refusal {
+                    Text(refusal).font(.caption).foregroundStyle(.orange)
+                }
+            } else {
+                Text("Ash is unlimited and never needs preparation.")
+                    .font(.subheadline).foregroundStyle(.secondary)
+            }
+        }
+        .inkCard()
+    }
+
+    private func loadSelectedMarkInk() {
+        guard let id = selectedMarkID,
+              let mark = eligibleMarks.first(where: { $0.id == id }),
+              let ink = mark.inkRecipe else { return }
+        load(ink)
+    }
+
+    private func load(_ value: InkRecipe) {
+        cyan = Double(value.cyan); magenta = Double(value.magenta)
+        yellow = Double(value.yellow); depth = Double(value.depth)
+    }
+
+    private func applyRecipe() {
+        guard let recipe, let selectedMarkID else { return }
+        switch store.applyInkRecipe(recipe, to: selectedMarkID) {
+        case .applied: message = "Mixture applied. Pigment is spent only when binding succeeds."
+        case .noChange: message = "That focus already uses this mixture."
+        default: message = "That focus could not be re-inked. Nothing was spent."
+        }
+    }
+
+    private func returnToAsh() {
+        guard let selectedMarkID else { return }
+        switch store.returnMarkToAsh(selectedMarkID) {
+        case .returnedToAsh: message = "Focus returned to Ash. Its world color is open again."
+        case .noChange: message = "That focus already uses Ash."
+        default: message = "That focus could not be changed."
+        }
+    }
+
+    private func saveMixture() {
+        guard let recipe else { return }
+        if case .savedMixture = store.saveInkMixture(named: mixtureName, recipe: recipe) {
+            message = "Mixture saved."
+            mixtureName = ""
+        }
+    }
+
+    private func prepare(_ quote: InkVialPreparationQuote) {
+        switch store.prepareInkVial(quote) {
+        case .prepared(_, let count): message = "Prepared \(count) focus applications."
+        case .insufficient(let reason): message = reason
+        case .staleQuote: message = "Stock changed. Review the preparation again; nothing was spent."
+        case .mixingLocked: message = "Ink Mixing is not learned."
+        }
+    }
+
+    private func preparationSummary(_ quote: InkVialPreparationQuote) -> String {
+        let measures = PigmentBase.allCases.compactMap { base -> String? in
+            let count = quote.measureCost[base] ?? 0
+            return count == 0 ? nil : "\(count) \(base.rawValue.capitalized)"
+        }.joined(separator: " · ")
+        let resources = quote.resourcesToProcess.map { id, count in
+            "\(count) \(ContentCatalog.shared.resource(id)?.name ?? id.rawValue)"
+        }.sorted().joined(separator: " · ")
+        return [measures, resources.isEmpty ? nil : "process \(resources)", "1 Resin"]
+            .compactMap { $0 }.joined(separator: "\n")
+    }
+
+    private static let presets: [(name: String, recipe: InkRecipe)] = [
+        ("Red", .init(cyan: 0, magenta: 82, yellow: 78, depth: 12)),
+        ("Yellow", .init(cyan: 0, magenta: 4, yellow: 88, depth: 5)),
+        ("Green", .init(cyan: 72, magenta: 0, yellow: 76, depth: 10)),
+        ("Cyan", .init(cyan: 82, magenta: 0, yellow: 3, depth: 7)),
+        ("Blue", .init(cyan: 76, magenta: 68, yellow: 0, depth: 14)),
+        ("Violet", .init(cyan: 48, magenta: 78, yellow: 0, depth: 12)),
+        ("Dark", .init(cyan: 68, magenta: 68, yellow: 68, depth: 76))
+    ]
+}
+
+private struct InkChannelSlider: View {
+    let name: String
+    @Binding var value: Double
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Text(name).font(.caption).frame(width: 58, alignment: .leading)
+            Slider(value: $value, in: 0...100, step: 1)
+                .accessibilityLabel(name)
+                .accessibilityValue("\(Int(value)) percent")
+            Text("\(Int(value))").font(.caption.monospacedDigit())
+                .frame(width: 28, alignment: .trailing)
+        }
+    }
+}
+
+private extension View {
+    func inkCard() -> some View {
+        padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

@@ -58,6 +58,38 @@ enum PageTemplateActionResult: Equatable {
     }
 }
 
+enum InkActionResult: Equatable {
+    case applied(InstanceID)
+    case returnedToAsh(InstanceID)
+    case savedMixture(InkMixtureID)
+    case deletedMixture(InkMixtureID)
+    case noChange
+    case mixingLocked
+    case staleMark
+    case ineligibleMark
+    case staleMixture
+}
+
+struct InkVialPreparationQuote: Equatable {
+    var recipe: InkRecipe
+    var existingMeasures: [PigmentBase: Int]
+    var measureCost: [PigmentBase: Int]
+    var resourcesToProcess: [ResourceID: Int]
+    var retainedMeasures: [PigmentBase: Int]
+    var resinRequired: Int
+    var applicationsProduced: Int
+    var refusal: String?
+
+    var isReady: Bool { refusal == nil }
+}
+
+enum InkVialPreparationResult: Equatable {
+    case prepared(vialID: UInt64, applications: Int)
+    case mixingLocked
+    case insufficient(String)
+    case staleQuote
+}
+
 /// Real player actions — the ones the shipping UI calls. Anything still faked lives in
 /// `Sources/Debug/` and says so.
 ///
@@ -130,10 +162,16 @@ extension GameStore {
         else { return false }
         mutate("write \(glyph)") { state in
             let next = (state.base.page.runes.map(\.id.rawValue).max() ?? 0) + 1
-            state.base.page.runes.append(PlacedRune(id: InstanceID(rawValue: next),
-                                                    content: content,
-                                                    hand: state.base.bestHand,
-                                                    origin: cell, shapeID: shape.id))
+            var placed = PlacedRune(id: InstanceID(rawValue: next), content: content,
+                                    hand: state.base.bestHand, origin: cell, shapeID: shape.id)
+            if state.base.completedResearch.contains("pen_ink_mixing"),
+               placed.hand != .crude,
+               placed.inkEligibleSourceID.map(InkEconomyRules.supportedSourceIDs.contains) == true,
+               let queued = state.base.nextFocusInkRecipe {
+                placed.inkRecipe = queued
+                state.base.nextFocusInkRecipe = nil
+            }
+            state.base.page.runes.append(placed)
         }
         return true
     }
@@ -314,6 +352,167 @@ extension GameStore {
         return changed ? .loaded(id) : .staleTemplate
     }
 
+    // MARK: Authored liquid ink
+
+    @discardableResult
+    func applyInkRecipe(_ recipe: InkRecipe, to markID: InstanceID) -> InkActionResult {
+        guard state.base.completedResearch.contains("pen_ink_mixing") else { return .mixingLocked }
+        guard let mark = state.base.page.runes.first(where: { $0.id == markID })
+        else { return .staleMark }
+        guard mark.hand != .crude, mark.canCarryInk,
+              mark.inkEligibleSourceID.map(InkEconomyRules.supportedSourceIDs.contains) == true
+        else { return .ineligibleMark }
+        guard mark.inkRecipe != recipe else { return .noChange }
+        let changed = mutateIf("apply mixed ink") { state in
+            guard let index = state.base.page.runes.firstIndex(where: { $0.id == markID }),
+                  state.base.page.runes[index].hand != .crude,
+                  state.base.page.runes[index].canCarryInk,
+                  state.base.page.runes[index].inkEligibleSourceID
+                    .map(InkEconomyRules.supportedSourceIDs.contains) == true
+            else { return false }
+            state.base.page.runes[index].inkRecipe = recipe
+            return true
+        }
+        return changed ? .applied(markID) : .staleMark
+    }
+
+    @discardableResult
+    func returnMarkToAsh(_ markID: InstanceID) -> InkActionResult {
+        guard let mark = state.base.page.runes.first(where: { $0.id == markID })
+        else { return .staleMark }
+        guard mark.hand != .crude, mark.canCarryInk else { return .ineligibleMark }
+        guard mark.inkRecipe != nil else { return .noChange }
+        let changed = mutateIf("return mark to Ash ink") { state in
+            guard let index = state.base.page.runes.firstIndex(where: { $0.id == markID }),
+                  state.base.page.runes[index].hand != .crude,
+                  state.base.page.runes[index].canCarryInk
+            else { return false }
+            state.base.page.runes[index].inkRecipe = nil
+            return true
+        }
+        return changed ? .returnedToAsh(markID) : .staleMark
+    }
+
+    @discardableResult
+    func saveInkMixture(named proposedName: String, recipe: InkRecipe) -> InkActionResult {
+        guard state.base.completedResearch.contains("pen_ink_mixing") else { return .mixingLocked }
+        if let existing = state.base.savedInkMixtures.first(where: { $0.recipe == recipe }) {
+            return .savedMixture(existing.id)
+        }
+        let name = InkMixtureRules.normalizedName(proposedName)
+        var savedID: InkMixtureID?
+        let changed = mutateIf("save ink mixture") { state in
+            if let existing = state.base.savedInkMixtures.first(where: { $0.recipe == recipe }) {
+                savedID = existing.id
+                return false
+            }
+            let raw = state.base.nextInkMixtureID
+            state.base.nextInkMixtureID &+= 1
+            let id = InkMixtureID(rawValue: raw)
+            state.base.savedInkMixtures.append(.init(
+                id: id, name: name, recipe: recipe, lastUsedOrdinal: raw))
+            savedID = id
+            return true
+        }
+        if let savedID { return .savedMixture(savedID) }
+        return changed ? .noChange : .mixingLocked
+    }
+
+    @discardableResult
+    func deleteInkMixture(_ id: InkMixtureID) -> InkActionResult {
+        guard state.base.savedInkMixtures.contains(where: { $0.id == id })
+        else { return .staleMixture }
+        let changed = mutateIf("delete ink mixture") { state in
+            guard let index = state.base.savedInkMixtures.firstIndex(where: { $0.id == id })
+            else { return false }
+            state.base.savedInkMixtures.remove(at: index)
+            return true
+        }
+        return changed ? .deletedMixture(id) : .staleMixture
+    }
+
+    func useInkForNextFocus(_ recipe: InkRecipe?) {
+        guard state.base.completedResearch.contains("pen_ink_mixing") else { return }
+        mutate("choose ink for next focus") { $0.base.nextFocusInkRecipe = recipe }
+    }
+
+    func inkVialPreparationQuote(_ recipe: InkRecipe) -> InkVialPreparationQuote {
+        Self.inkVialPreparationQuote(recipe, in: state.base)
+    }
+
+    nonisolated private static func inkVialPreparationQuote(
+        _ recipe: InkRecipe, in base: BaseState
+    ) -> InkVialPreparationQuote {
+        var existing: [PigmentBase: Int] = [:]
+        var costs: [PigmentBase: Int] = [:]
+        var resources: [ResourceID: Int] = [:]
+        var retained: [PigmentBase: Int] = [:]
+        var missing: [String] = []
+        for pigment in PigmentBase.allCases {
+            let have = base.pigmentStock[pigment]
+            let need = InkEconomyRules.measureCost(recipe, base: pigment)
+            let shortfall = max(0, need - have)
+            let units = shortfall == 0 ? 0
+                : Int(ceil(Double(shortfall) / Double(InkEconomyRules.measuresPerResource)))
+            existing[pigment] = have
+            costs[pigment] = need
+            retained[pigment] = have + units * InkEconomyRules.measuresPerResource - need
+            if units > 0 {
+                resources[pigment.sourceResource] = units
+                if base.resources[pigment.sourceResource] < units {
+                    missing.append(ContentCatalog.shared.resource(pigment.sourceResource)?.name
+                                   ?? pigment.sourceResource.rawValue)
+                }
+            }
+        }
+        if base.resources["resin"] < 1 { missing.append("Resin") }
+        let refusal = missing.isEmpty ? nil
+            : "Missing \(missing.joined(separator: ", ")). Nothing was consumed."
+        return InkVialPreparationQuote(
+            recipe: recipe, existingMeasures: existing, measureCost: costs,
+            resourcesToProcess: resources, retainedMeasures: retained,
+            resinRequired: 1, applicationsProduced: InkEconomyRules.applicationsPerVial,
+            refusal: refusal)
+    }
+
+    /// One atomic confirmation: process only the exact resource shortfall, retain excess pigment,
+    /// spend one Resin, and create a frozen 12-application vial. A stale preview changes nothing.
+    @discardableResult
+    func prepareInkVial(_ quote: InkVialPreparationQuote) -> InkVialPreparationResult {
+        guard state.base.completedResearch.contains("pen_ink_mixing") else {
+            return .mixingLocked
+        }
+        guard quote == Self.inkVialPreparationQuote(quote.recipe, in: state.base) else {
+            return .staleQuote
+        }
+        guard quote.isReady else { return .insufficient(quote.refusal ?? "Missing pigment.") }
+        var issuedID: UInt64?
+        let changed = mutateIf("prepare mixed ink vial") { state in
+            guard quote == Self.inkVialPreparationQuote(quote.recipe, in: state.base),
+                  quote.isReady else { return false }
+            for (resource, amount) in quote.resourcesToProcess {
+                guard state.base.resources.spend(amount, of: resource) else { return false }
+            }
+            guard state.base.resources.spend(1, of: "resin") else { return false }
+            for pigment in PigmentBase.allCases {
+                let produced = (quote.resourcesToProcess[pigment.sourceResource] ?? 0)
+                    * InkEconomyRules.measuresPerResource
+                state.base.pigmentStock.add(produced, of: pigment)
+                guard state.base.pigmentStock.spend(
+                    quote.measureCost[pigment] ?? 0, of: pigment) else { return false }
+            }
+            let id = state.base.nextPreparedInkVialID
+            state.base.nextPreparedInkVialID &+= 1
+            state.base.preparedInkVials.append(.init(
+                id: id, recipe: quote.recipe,
+                remainingApplications: InkEconomyRules.applicationsPerVial))
+            issuedID = id
+            return true
+        }
+        guard changed, let issuedID else { return .staleQuote }
+        return .prepared(vialID: issuedID, applications: InkEconomyRules.applicationsPerVial)
+    }
+
     nonisolated private static func isLegalTemplatePage(_ page: Page, in base: BaseState) -> Bool {
         guard !page.runes.isEmpty,
               Set(page.runes.map(\.id)).count == page.runes.count,
@@ -322,6 +521,7 @@ extension GameStore {
                   base.ownedHands.contains(rune.hand)
                       && rune.shape?.hand == rune.hand
                       && rune.cells.allSatisfy(page.contains)
+                      && (rune.inkRecipe == nil || (rune.hand != .crude && rune.canCarryInk))
               })
         else { return false }
         let ids = Set(page.runes.map(\.id))
@@ -385,6 +585,9 @@ extension GameStore {
         }
         if state.base.essence < total {
             return .insufficientEssence(available: state.base.essence, required: total)
+        }
+        if let refusal = Self.inkDepartureRefusal(page: state.base.page, in: state.base) {
+            return .unavailable(refusal)
         }
         return .ready(totalCost: total)
     }
@@ -465,7 +668,54 @@ extension GameStore {
         if state.base.essence < total {
             return .insufficientEssence(available: state.base.essence, required: total)
         }
+        if let refusal = Self.inkDepartureRefusal(page: instance.definition.page, in: state.base) {
+            return .unavailable(refusal)
+        }
         return .ready(totalCost: total)
+    }
+
+    nonisolated private static func inkRequirements(on page: Page) -> [InkRecipe: Int] {
+        page.runes.reduce(into: [:]) { result, mark in
+            guard mark.canCarryInk, let recipe = mark.inkRecipe else { return }
+            result[recipe, default: 0] += 1
+        }
+    }
+
+    nonisolated private static func inkDepartureRefusal(page: Page, in base: BaseState) -> String? {
+        if page.runes.contains(where: { mark in
+            mark.inkRecipe != nil
+                && mark.inkEligibleSourceID.map(InkEconomyRules.supportedSourceIDs.contains) != true
+        }) {
+            return "Colored ink cannot control that focus yet. Return it to Ash before binding."
+        }
+        let requirements = inkRequirements(on: page)
+        for (recipe, needed) in requirements {
+            let available = base.preparedInkVials
+                .filter { $0.recipe == recipe }
+                .reduce(0) { $0 + $1.remainingApplications }
+            if available < needed {
+                return "This page uses \(needed) mixed-ink focus application\(needed == 1 ? "" : "s"), but only \(available) matching application\(available == 1 ? " is" : "s are") prepared. Return that focus to Ash or prepare more ink."
+            }
+        }
+        return nil
+    }
+
+    nonisolated private static func consumeInkApplications(
+        for page: Page, in base: inout BaseState
+    ) -> Bool {
+        let requirements = inkRequirements(on: page)
+        guard inkDepartureRefusal(page: page, in: base) == nil else { return false }
+        for (recipe, required) in requirements {
+            var remaining = required
+            for index in base.preparedInkVials.indices
+                where base.preparedInkVials[index].recipe == recipe && remaining > 0 {
+                let consumed = min(remaining, base.preparedInkVials[index].remainingApplications)
+                base.preparedInkVials[index].remainingApplications -= consumed
+                remaining -= consumed
+            }
+        }
+        base.preparedInkVials.removeAll { $0.remainingApplications == 0 }
+        return true
     }
 
     @discardableResult
@@ -537,8 +787,17 @@ extension GameStore {
                                       isFreshFirstExpedition: state.worlds.runIndex == 0)
         let visualReceipt: WorldVisualReceipt
         do {
+            let authoredInkPairs: [(InstanceID, InkRecipe)] = sourcePage.runes.compactMap { mark in
+                    guard mark.canCarryInk, let recipe = mark.inkRecipe else { return nil }
+                    return (mark.id, recipe)
+                }
+            let authoredInkBySourceID = Dictionary(uniqueKeysWithValues: authoredInkPairs)
             visualReceipt = try WorldGrade2BindAdapter.makeReceipt(
                 book: book, mapSeed: generationSeed, map: world.map, flora: world.flora,
+                explicitInkResolver: { sigil in
+                    guard let recipe = authoredInkBySourceID[sigil.id] else { return nil }
+                    return try WorldGrade2BindAdapter.verifiedExplicitInk(recipe)
+                },
                 openColorResolver: openColorResolver)
         } catch {
 #if DEBUG
@@ -563,6 +822,7 @@ extension GameStore {
                 selectedIndex = index
             }
             guard state.worlds.seeds.peekNextSeed() == reservedCampaignSeed else { return false }
+            guard Self.consumeInkApplications(for: sourcePage, in: &state.base) else { return false }
             // The actor is synchronous from preview through commit, so the peeked seed is exactly
             // the one consumed here. World generation and visual resolution use isolated streams.
             precondition(state.worlds.seeds.nextSeed() == reservedCampaignSeed,

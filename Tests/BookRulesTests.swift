@@ -369,6 +369,62 @@ final class BookRulesTests: XCTestCase {
     }
 
     @MainActor
+    func testMixedInkRequiresPreparedApplicationsAndFreezesAuthoredWorldColor() throws {
+        let store = GameStore(io: .temporary(name: "mixed-ink-bind-\(UUID().uuidString)"))
+        let recipe = InkRecipe(cyan: 82, magenta: 0, yellow: 3, depth: 7)
+        let sun = PlacedRune(id: .init(rawValue: 44), content: .source("sun"), hand: .plain,
+                             origin: .init(column: 0, row: 0), shapeID: "plain_bar",
+                             inkRecipe: recipe)
+        let illumination = PlacedRune(id: .init(rawValue: 46), content: .target("illumination"),
+                                      hand: .plain, origin: .init(column: 0, row: 2),
+                                      shapeID: "plain_bar")
+        store.mutate("test: colored Sun") { state in
+            state.base.ownedHands.insert(.plain)
+            state.base.completedResearch.insert("pen_ink_mixing")
+            state.base.page = Page(runes: [sun, illumination],
+                                   links: [MarkLink(sun.id, illumination.id)])
+            state.base.essence = 500
+        }
+        let beforeRefusal = store.state
+        XCTAssertFalse(store.bindAndDepart())
+        XCTAssertEqual(store.state, beforeRefusal)
+        XCTAssertTrue(store.bindError?.contains("prepare more ink") == true)
+
+        store.mutate("test: prepared exact ink") { state in
+            state.base.preparedInkVials = [
+                .init(id: 1, recipe: recipe, remainingApplications: 2)
+            ]
+            state.base.nextPreparedInkVialID = 2
+        }
+        XCTAssertTrue(store.bindAndDepart())
+        XCTAssertEqual(store.state.base.preparedInkVials.first?.remainingApplications, 1)
+        let receipt = try XCTUnwrap(store.state.worlds.activeRun?.worldVisualReceipt)
+        XCTAssertEqual(receipt.selectedSourceByScope[.emitter], sun.id)
+        XCTAssertEqual(receipt.request.resolvedColors.emitter?.provenance, "authoredMix")
+        XCTAssertEqual(store.state.reality.library.visitedWorlds.last?.worldVisualReceipt, receipt)
+    }
+
+    @MainActor
+    func testUnsupportedMixedInkSourceFailsBeforeSpendingAnything() {
+        let store = GameStore(io: .temporary(name: "unsupported-ink-bind-\(UUID().uuidString)"))
+        let recipe = InkRecipe(cyan: 50, magenta: 0, yellow: 50, depth: 0)
+        let plains = PlacedRune(id: .init(rawValue: 45), content: .source("plains"), hand: .plain,
+                                origin: .init(column: 0, row: 0), shapeID: "plain_bar",
+                                inkRecipe: recipe)
+        store.mutate("test: unsupported colored source") { state in
+            state.base.page = Page(runes: [plains])
+            state.base.essence = 500
+            state.base.preparedInkVials = [
+                .init(id: 1, recipe: recipe, remainingApplications: 12)
+            ]
+        }
+        let before = store.state
+        XCTAssertFalse(store.bindAndDepart())
+        XCTAssertEqual(store.state, before)
+        XCTAssertNil(store.state.worlds.activeRun)
+    }
+
+    @MainActor
     func testBornAnchoredBindingPaysThePreviewedPremiumAndKeepsTheRealm() throws {
         let store = GameStore(io: .temporary(name: "anchor-bind-\(UUID().uuidString)"))
         store.mutate("prepare anchorage") { state in

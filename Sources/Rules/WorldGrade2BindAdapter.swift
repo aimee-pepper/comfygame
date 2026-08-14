@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 enum WorldGrade2BindAdapter {
     enum Error: Swift.Error, Equatable {
@@ -29,9 +30,25 @@ enum WorldGrade2BindAdapter {
         }
     }
 
+    /// Regenerates the exact versioned authored color from game-owned CMY+Depth, never from pixels.
+    static func verifiedExplicitInk(_ recipe: InkRecipe) throws -> VerifiedExplicitInkColor {
+        guard recipe.conversionVersion == InkRecipe.currentConversionVersion else {
+            throw Error.invalidExplicitColor
+        }
+        let canonical = "c=\(recipe.cyan);m=\(recipe.magenta);y=\(recipe.yellow);d=\(recipe.depth);v=\(recipe.conversionVersion)"
+        let digest = SHA256.hash(data: Data(canonical.utf8))
+            .map { String(format: "%02x", $0) }.joined()
+        let color = WorldGrade2V1.ResolvedColor(
+            srgb: recipe.resolvedSRGB, resolutionVersion: "resolved-color-1.0.0",
+            provenance: "authoredMix")
+        try validateExplicit(color)
+        return VerifiedExplicitInkColor(recipeCanonicalSHA256: digest,
+                                        conversionVersion: recipe.conversionVersion,
+                                        regeneratedColor: color)
+    }
+
 #if DEBUG
-    /// Test seam only. Production has no explicit-color constructor until the persisted InkRecipe
-    /// model and its registered conversion resolver land.
+    /// Test seam for malformed or future-version fixture receipts.
     static func fixtureVerifiedExplicitInk(recipeCanonicalSHA256: String,
                                             conversionVersion: String,
                                             regeneratedColor: WorldGrade2V1.ResolvedColor) throws

@@ -347,6 +347,28 @@ final class PageTests: XCTestCase {
                       || source.contains(".accessibilityLabel(\"Save Template\")"))
     }
 
+    func testInkWellUIExposesAshMixerPreparationAndOneSharedRecipePreview() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
+            encoding: .utf8)
+        XCTAssertTrue(source.contains("Ash ink"))
+        XCTAssertTrue(source.contains("Color left open"))
+        XCTAssertTrue(source.contains("InkChannelSlider(name: \"Cyan\""))
+        XCTAssertTrue(source.contains("InkChannelSlider(name: \"Magenta\""))
+        XCTAssertTrue(source.contains("InkChannelSlider(name: \"Yellow\""))
+        XCTAssertTrue(source.contains("InkChannelSlider(name: \"Depth\""))
+        XCTAssertTrue(source.contains("Button(\"Apply mixture\")"))
+        XCTAssertTrue(source.contains("Button(\"Return to Ash\")"))
+        XCTAssertTrue(source.contains("Button(\"Use for next focus\")"))
+        XCTAssertTrue(source.contains("Button(\"Prepare 12 applications\")"))
+        XCTAssertTrue(source.contains("store.inkVialPreparationQuote(recipe)"))
+        XCTAssertTrue(source.contains("store.prepareInkVial(quote)"))
+        XCTAssertTrue(source.contains("recipe?.resolvedSRGB"),
+                      "the page swatch must use the same recipe conversion as binding")
+    }
+
     @MainActor
     func testTemplateRoundTripRemapsEveryIdentityAndLinkWithoutChangingComposition() throws {
         let store = GameStore(io: .temporary(name: "template-remap-\(UUID().uuidString)"))
@@ -454,6 +476,144 @@ final class PageTests: XCTestCase {
         let before = store.state
         XCTAssertEqual(store.savePageTemplate(named: "Broken"), .invalidDraft)
         XCTAssertEqual(store.state, before, "a refused Template must be an atomic no-op")
+    }
+
+    @MainActor
+    func testMixedInkAppliesOnlyToInkCapableFocusMarksWithoutDraftCost() throws {
+        let store = GameStore(io: .temporary(name: "ink-application-\(UUID().uuidString)"))
+        let recipe = InkRecipe(cyan: 100, magenta: 0, yellow: 100, depth: 0)
+        let target = PlacedRune(id: .init(rawValue: 1), content: .target("illumination"),
+                                hand: .plain, origin: .init(column: 0, row: 0),
+                                shapeID: "plain_bar")
+        let charcoal = PlacedRune(id: .init(rawValue: 2), content: .source("sun"),
+                                  hand: .crude, origin: .init(column: 2, row: 0),
+                                  shapeID: "crude_block")
+        let brush = PlacedRune(id: .init(rawValue: 3), content: .source("sun"),
+                               hand: .plain, origin: .init(column: 0, row: 2),
+                               shapeID: "plain_bar")
+        store.mutate("test: ink page") { state in
+            state.base.ownedHands.insert(.plain)
+            state.base.page = Page(runes: [target, charcoal, brush])
+        }
+        let beforeLocked = store.state
+        XCTAssertEqual(store.applyInkRecipe(recipe, to: brush.id), .mixingLocked)
+        XCTAssertEqual(store.state, beforeLocked)
+
+        store.mutate("test: learn ink mixing") {
+            $0.base.completedResearch.insert("pen_ink_mixing")
+        }
+        let before = store.state
+        XCTAssertEqual(store.applyInkRecipe(recipe, to: target.id), .ineligibleMark)
+        XCTAssertEqual(store.applyInkRecipe(recipe, to: charcoal.id), .ineligibleMark)
+        XCTAssertEqual(store.applyInkRecipe(recipe, to: brush.id), .applied(brush.id))
+        XCTAssertEqual(store.state.base.page.runes.first { $0.id == brush.id }?.inkRecipe, recipe)
+        XCTAssertEqual(store.state.base.essence, before.base.essence,
+                       "draft re-inking spends no Essence")
+        XCTAssertEqual(store.applyInkRecipe(recipe, to: brush.id), .noChange)
+        XCTAssertEqual(store.returnMarkToAsh(brush.id), .returnedToAsh(brush.id))
+        XCTAssertNil(store.state.base.page.runes.first { $0.id == brush.id }?.inkRecipe)
+    }
+
+    @MainActor
+    func testSavedInkMixturesDeduplicateWithoutRewritingFrozenMarks() throws {
+        let store = GameStore(io: .temporary(name: "ink-mixtures-\(UUID().uuidString)"))
+        let recipe = InkRecipe(cyan: 40, magenta: 15, yellow: 70, depth: 5)
+        store.mutate("test: learn ink mixing") {
+            $0.base.completedResearch.insert("pen_ink_mixing")
+        }
+        guard case .savedMixture(let id) = store.saveInkMixture(named: "  Moss  ", recipe: recipe)
+        else { return XCTFail("mixture was not saved") }
+        XCTAssertEqual(store.state.base.savedInkMixtures.first?.name, "Moss")
+        XCTAssertEqual(store.saveInkMixture(named: "Duplicate", recipe: recipe), .savedMixture(id))
+        XCTAssertEqual(store.state.base.savedInkMixtures.count, 1)
+
+        let mark = PlacedRune(id: .init(rawValue: 9), content: .source("sun"), hand: .plain,
+                              origin: .init(column: 0, row: 0), shapeID: "plain_bar",
+                              inkRecipe: recipe)
+        store.mutate("test: freeze mixed mark") { $0.base.page = Page(runes: [mark]) }
+        XCTAssertEqual(store.deleteInkMixture(id), .deletedMixture(id))
+        XCTAssertEqual(store.state.base.page.runes.first?.inkRecipe, recipe,
+                       "deleting a saved formula cannot recolor an existing mark")
+    }
+
+    func testInkRecipeRejectsEmptyAndOutOfRangeDecodedRecipes() throws {
+        let decoder = JSONDecoder()
+        XCTAssertThrowsError(try decoder.decode(
+            InkRecipe.self,
+            from: Data(#"{"cyan":0,"magenta":0,"yellow":0,"depth":0,"conversionVersion":"cmy-depth-v1"}"#.utf8)))
+        XCTAssertThrowsError(try decoder.decode(
+            InkRecipe.self,
+            from: Data(#"{"cyan":101,"magenta":0,"yellow":0,"depth":0,"conversionVersion":"cmy-depth-v1"}"#.utf8)))
+        let legacyVersionless = try decoder.decode(
+            InkRecipe.self,
+            from: Data(#"{"cyan":25,"magenta":0,"yellow":0,"depth":0}"#.utf8))
+        XCTAssertEqual(legacyVersionless.conversionVersion, InkRecipe.currentConversionVersion)
+    }
+
+    @MainActor
+    func testPreparingInkProcessesOnlyShortfallRetainsExcessAndIsAtomic() throws {
+        let store = GameStore(io: .temporary(name: "ink-vial-\(UUID().uuidString)"))
+        let recipe = InkRecipe(cyan: 26, magenta: 0, yellow: 100, depth: 1)
+        store.mutate("test: stock Scriptorium") { state in
+            state.base.completedResearch.insert("pen_ink_mixing")
+            state.base.pigmentStock.add(1, of: .cyan)
+            state.base.resources.add(1, of: "copper")
+            state.base.resources.add(1, of: "sulfur")
+            state.base.resources.add(1, of: "obsidian")
+            state.base.resources.add(1, of: "resin")
+        }
+        let quote = store.inkVialPreparationQuote(recipe)
+        XCTAssertTrue(quote.isReady)
+        XCTAssertEqual(quote.measureCost[.cyan], 2)
+        XCTAssertEqual(quote.measureCost[.yellow], 4)
+        XCTAssertEqual(quote.measureCost[.depth], 1)
+        XCTAssertEqual(quote.resourcesToProcess, ["copper": 1, "sulfur": 1, "obsidian": 1])
+        XCTAssertEqual(quote.retainedMeasures[.cyan], 3)
+        XCTAssertEqual(quote.retainedMeasures[.depth], 3)
+
+        guard case .prepared(_, let applications) = store.prepareInkVial(quote)
+        else { return XCTFail("ready quote did not prepare") }
+        XCTAssertEqual(applications, 12)
+        XCTAssertEqual(store.state.base.preparedInkVials.first?.remainingApplications, 12)
+        XCTAssertEqual(store.state.base.pigmentStock[.cyan], 3)
+        XCTAssertEqual(store.state.base.pigmentStock[.yellow], 0)
+        XCTAssertEqual(store.state.base.pigmentStock[.depth], 3)
+        XCTAssertEqual(store.state.base.resources["resin"], 0)
+
+        let after = store.state
+        XCTAssertEqual(store.prepareInkVial(quote), .staleQuote)
+        XCTAssertEqual(store.state, after, "stale preparation must consume nothing")
+    }
+
+    @MainActor
+    func testInsufficientInkPreparationConsumesNothing() {
+        let store = GameStore(io: .temporary(name: "ink-vial-missing-\(UUID().uuidString)"))
+        let recipe = InkRecipe(cyan: 100, magenta: 100, yellow: 0, depth: 0)
+        store.mutate("test: unlock only") { $0.base.completedResearch.insert("pen_ink_mixing") }
+        let quote = store.inkVialPreparationQuote(recipe)
+        XCTAssertFalse(quote.isReady)
+        let before = store.state
+        guard case .insufficient = store.prepareInkVial(quote)
+        else { return XCTFail("missing stock was not refused") }
+        XCTAssertEqual(store.state, before)
+    }
+
+    @MainActor
+    func testQueuedInkWaitsForAndIsConsumedByNextEligibleFocus() {
+        let store = GameStore(io: .temporary(name: "next-focus-ink-\(UUID().uuidString)"))
+        let recipe = InkRecipe(cyan: 72, magenta: 0, yellow: 76, depth: 10)
+        store.mutate("test: unlock Brush ink") { state in
+            state.base.ownedHands.insert(.plain)
+            state.base.completedResearch.insert("pen_ink_mixing")
+        }
+        store.useInkForNextFocus(recipe)
+        XCTAssertTrue(store.write(.target("illumination"), glyph: "illumination",
+                                  at: .init(column: 0, row: 0)))
+        XCTAssertEqual(store.state.base.nextFocusInkRecipe, recipe,
+                       "targets must not consume a queued focus ink")
+        XCTAssertTrue(store.write(.source("sun"), glyph: "sun", at: .init(column: 0, row: 2)))
+        XCTAssertEqual(store.state.base.page.runes.last?.inkRecipe, recipe)
+        XCTAssertNil(store.state.base.nextFocusInkRecipe)
     }
 
     @MainActor

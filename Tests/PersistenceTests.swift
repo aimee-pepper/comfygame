@@ -694,6 +694,63 @@ final class PersistenceTests: XCTestCase {
                                     PageTemplateRules.firstLoadedMarkID)
     }
 
+    func testInkRecipesAndSavedMixturesRoundTripWhileLegacyPagesRemainOpenColor() throws {
+        var state = GameState.newGame()
+        let recipe = InkRecipe(cyan: 20, magenta: 80, yellow: 5, depth: 10)
+        state.base.page = Page(runes: [
+            PlacedRune(id: .init(rawValue: 71), content: .source("sun"), hand: .plain,
+                       origin: .init(column: 0, row: 0), shapeID: "plain_bar",
+                       inkRecipe: recipe)
+        ])
+        state.base.savedInkMixtures = [
+            .init(id: .init(rawValue: 8), name: "Dusk", recipe: recipe,
+                  isPinned: true, lastUsedOrdinal: 14)
+        ]
+        state.base.nextInkMixtureID = 20
+        state.base.nextFocusInkRecipe = recipe
+        state.base.pigmentStock.add(7, of: .cyan)
+        state.base.pigmentStock.add(3, of: .depth)
+        state.base.preparedInkVials = [
+            .init(id: 6, recipe: recipe, remainingApplications: 9)
+        ]
+        state.base.nextPreparedInkVialID = 12
+        let encoded = try SaveCodec.makeEncoder().encode(state)
+        let decoded = try SaveCodec.makeDecoder().decode(GameState.self, from: encoded)
+        XCTAssertEqual(decoded.base.page.runes.first?.inkRecipe, recipe)
+        XCTAssertEqual(decoded.base.savedInkMixtures, state.base.savedInkMixtures)
+        XCTAssertEqual(decoded.base.nextInkMixtureID, 20)
+        XCTAssertEqual(decoded.base.nextFocusInkRecipe, recipe)
+        XCTAssertEqual(decoded.base.pigmentStock, state.base.pigmentStock)
+        XCTAssertEqual(decoded.base.preparedInkVials, state.base.preparedInkVials)
+        XCTAssertEqual(decoded.base.nextPreparedInkVialID, 12)
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+        var base = try XCTUnwrap(object["base"] as? [String: Any])
+        base.removeValue(forKey: "savedInkMixtures")
+        base.removeValue(forKey: "nextInkMixtureID")
+        base.removeValue(forKey: "nextFocusInkRecipe")
+        base.removeValue(forKey: "pigmentStock")
+        base.removeValue(forKey: "preparedInkVials")
+        base.removeValue(forKey: "nextPreparedInkVialID")
+        if var page = base["page"] as? [String: Any],
+           var runes = page["runes"] as? [[String: Any]] {
+            for index in runes.indices { runes[index].removeValue(forKey: "inkRecipe") }
+            page["runes"] = runes
+            base["page"] = page
+        }
+        object["base"] = base
+        let legacy = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertNil(legacy.base.page.runes.first?.inkRecipe,
+                     "missing ink means Ash/open, never explicit black")
+        XCTAssertTrue(legacy.base.savedInkMixtures.isEmpty)
+        XCTAssertEqual(legacy.base.nextInkMixtureID, 1)
+        XCTAssertNil(legacy.base.nextFocusInkRecipe)
+        XCTAssertEqual(legacy.base.pigmentStock, PigmentStock())
+        XCTAssertTrue(legacy.base.preparedInkVials.isEmpty)
+        XCTAssertEqual(legacy.base.nextPreparedInkVialID, 1)
+    }
+
     // MARK: - Helpers
 
     @MainActor

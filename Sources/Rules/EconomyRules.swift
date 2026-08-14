@@ -100,11 +100,9 @@ enum EconomyRules {
 
     /// Capability nodes may be authored before their complete player-facing consumer exists, but
     /// they must never take payment while their grant would be inert. Keep this deliberately exact:
-    /// Brush, Chaining, station tiers and the Fountain pen already have live consequences.
+    /// Brush, Ink Mixing, Chaining, station tiers and the Fountain pen have live consequences.
     static func implementationAllows(_ node: ResearchNodeDef) -> String? {
         switch node.id {
-        case "pen_ink_mixing":
-            "Ink Mixing is not ready to learn yet."
         case "pen_compounds":
             "Compound Assembly is not ready to learn yet."
         default:

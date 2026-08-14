@@ -79,22 +79,16 @@ final class ExclusivityTests: XCTestCase {
                           "a better instrument has to buy room, or it buys nothing")
     }
 
-    func testUnimplementedPenmanshipCapabilitiesRejectWithoutChargingOrMutating() throws {
-        for id: ResearchNodeID in ["pen_ink_mixing", "pen_compounds"] {
-            let store = fundedScriptoriumStore()
-            let node = try XCTUnwrap(ContentCatalog.shared.researchNode(id))
-            let before = store.state
-
-            XCTAssertFalse(store.canResearch(node), id.rawValue)
-            XCTAssertEqual(store.missingPrerequisites(for: node), [
-                id == "pen_ink_mixing"
-                    ? "Ink Mixing is not ready to learn yet."
-                    : "Compound Assembly is not ready to learn yet."
-            ])
-            XCTAssertFalse(store.research(node), id.rawValue)
-            XCTAssertEqual(store.state, before, "\(id.rawValue) charged for an inert capability")
-            XCTAssertFalse(store.state.base.completedResearch.contains(id))
-        }
+    func testUnimplementedCompoundAssemblyRejectsWithoutChargingOrMutating() throws {
+        let store = fundedScriptoriumStore()
+        let node = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_compounds"))
+        let before = store.state
+        XCTAssertFalse(store.canResearch(node))
+        XCTAssertEqual(store.missingPrerequisites(for: node),
+                       ["Compound Assembly is not ready to learn yet."])
+        XCTAssertFalse(store.research(node))
+        XCTAssertEqual(store.state, before)
+        XCTAssertFalse(store.state.base.completedResearch.contains(node.id))
     }
 
     func testImplementedPenmanshipProgressionRemainsAvailable() throws {
@@ -108,6 +102,13 @@ final class ExclusivityTests: XCTestCase {
         XCTAssertTrue(chainingStore.canResearch(chaining))
         XCTAssertTrue(chainingStore.research(chaining))
         XCTAssertTrue(chainingStore.state.base.hasChainingUnlock)
+
+        let inkStore = fundedScriptoriumStore()
+        let ink = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_ink_mixing"))
+        XCTAssertNil(EconomyRules.implementationAllows(ink))
+        XCTAssertTrue(inkStore.canResearch(ink))
+        XCTAssertTrue(inkStore.research(ink))
+        XCTAssertTrue(inkStore.state.base.completedResearch.contains(ink.id))
 
         let fountainStore = fundedScriptoriumStore(
             completed: ["pen_brush", "pen_desk", "pen_chaining"], tier: 2)

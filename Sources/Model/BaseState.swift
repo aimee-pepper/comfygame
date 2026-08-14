@@ -84,6 +84,16 @@ struct BaseState: Codable, Equatable, Sendable {
     var nextPageTemplateID: UInt64 = 1
     /// Separate high namespace for identities issued when a Template becomes a fresh draft.
     var nextTemplateMarkID: UInt64 = PageTemplateRules.firstLoadedMarkID
+    /// Player-labelled formulas are durable conveniences, not pigment inventory. Marks freeze the
+    /// exact recipe they use, so editing or deleting a saved mixture never mutates written pages.
+    var savedInkMixtures: [SavedInkMixture] = []
+    var nextInkMixtureID: UInt64 = 1
+    /// One explicit convenience choice, consumed by the next eligible focus actually placed.
+    var nextFocusInkRecipe: InkRecipe?
+    /// Processed pigment and prepared applications are Scriptorium stock, not Storehouse slots.
+    var pigmentStock = PigmentStock()
+    var preparedInkVials: [PreparedInkVial] = []
+    var nextPreparedInkVialID: UInt64 = 1
     /// Physical, pre-inscribed pages available to bind. These are separate from the editable
     /// draft and from the Library's Diary Pages: binding consumes one exact instance.
     var collectedWorldPages: [WorldPageInstance] = []
@@ -346,6 +356,8 @@ struct BaseState: Codable, Equatable, Sendable {
         case ownedSymbols, ownedGambitComponents
         case completedResearch, knownConsumableRecipes, odaFixtureRestored, stations, page
         case savedPageTemplates, nextPageTemplateID, nextTemplateMarkID
+        case savedInkMixtures, nextInkMixtureID
+        case nextFocusInkRecipe, pigmentStock, preparedInkVials, nextPreparedInkVialID
         case collectedWorldPages, starterWorldPageBundleFulfilled
         case ownedHands, hasChainingUnlock, instrumentLoadout
         case hasConfiguredInstrumentLoadout
@@ -381,6 +393,12 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(savedPageTemplates, forKey: .savedPageTemplates)
         try c.encode(nextPageTemplateID, forKey: .nextPageTemplateID)
         try c.encode(nextTemplateMarkID, forKey: .nextTemplateMarkID)
+        try c.encode(savedInkMixtures, forKey: .savedInkMixtures)
+        try c.encode(nextInkMixtureID, forKey: .nextInkMixtureID)
+        try c.encodeIfPresent(nextFocusInkRecipe, forKey: .nextFocusInkRecipe)
+        try c.encode(pigmentStock, forKey: .pigmentStock)
+        try c.encode(preparedInkVials, forKey: .preparedInkVials)
+        try c.encode(nextPreparedInkVialID, forKey: .nextPreparedInkVialID)
         try c.encode(collectedWorldPages, forKey: .collectedWorldPages)
         try c.encode(starterWorldPageBundleFulfilled, forKey: .starterWorldPageBundleFulfilled)
         try c.encode(ownedHands, forKey: .ownedHands)
@@ -467,6 +485,22 @@ struct BaseState: Codable, Equatable, Sendable {
             try container.decodeIfPresent(UInt64.self, forKey: .nextTemplateMarkID)
                 ?? PageTemplateRules.firstLoadedMarkID,
             max(PageTemplateRules.firstLoadedMarkID, (markIDs.max() ?? 0) &+ 1))
+        savedInkMixtures = try container.decodeIfPresent(
+            [SavedInkMixture].self, forKey: .savedInkMixtures) ?? []
+        let highestInkID = savedInkMixtures.map(\.id.rawValue).max() ?? 0
+        nextInkMixtureID = max(
+            try container.decodeIfPresent(UInt64.self, forKey: .nextInkMixtureID) ?? 1,
+            highestInkID &+ 1)
+        nextFocusInkRecipe = try container.decodeIfPresent(
+            InkRecipe.self, forKey: .nextFocusInkRecipe)
+        pigmentStock = try container.decodeIfPresent(PigmentStock.self, forKey: .pigmentStock)
+            ?? PigmentStock()
+        preparedInkVials = try container.decodeIfPresent(
+            [PreparedInkVial].self, forKey: .preparedInkVials) ?? []
+        let highestVialID = preparedInkVials.map(\.id).max() ?? 0
+        nextPreparedInkVialID = max(
+            try container.decodeIfPresent(UInt64.self, forKey: .nextPreparedInkVialID) ?? 1,
+            highestVialID &+ 1)
         collectedWorldPages = try container.decodeIfPresent([WorldPageInstance].self,
                                                              forKey: .collectedWorldPages) ?? []
         starterWorldPageBundleFulfilled = try container.decodeIfPresent(

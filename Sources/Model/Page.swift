@@ -23,6 +23,124 @@ enum Hand: String, Codable, CaseIterable, Sendable, Comparable {
     static func < (lhs: Hand, rhs: Hand) -> Bool { lhs.order < rhs.order }
 }
 
+/// Exact authored liquid-ink recipe carried by one focus mark.
+///
+/// `nil` remains the important ordinary state: Rough charcoal and Ash ink both leave world colour
+/// open. A non-nil recipe is therefore always a deliberate, non-empty CMY + Depth instruction.
+/// Rendered colours and generated names are derived presentation and never enter the save.
+struct InkRecipe: Codable, Equatable, Hashable, Sendable {
+    static let currentConversionVersion = "cmy-depth-v1"
+
+    var cyan: UInt8
+    var magenta: UInt8
+    var yellow: UInt8
+    var depth: UInt8
+    var conversionVersion: String
+
+    init(cyan: UInt8, magenta: UInt8, yellow: UInt8, depth: UInt8,
+         conversionVersion: String = currentConversionVersion) {
+        precondition([cyan, magenta, yellow, depth].allSatisfy { $0 <= 100 })
+        precondition(cyan > 0 || magenta > 0 || yellow > 0 || depth > 0)
+        self.cyan = cyan
+        self.magenta = magenta
+        self.yellow = yellow
+        self.depth = depth
+        self.conversionVersion = conversionVersion
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case cyan, magenta, yellow, depth, conversionVersion
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        cyan = try c.decode(UInt8.self, forKey: .cyan)
+        magenta = try c.decode(UInt8.self, forKey: .magenta)
+        yellow = try c.decode(UInt8.self, forKey: .yellow)
+        depth = try c.decode(UInt8.self, forKey: .depth)
+        conversionVersion = try c.decodeIfPresent(String.self, forKey: .conversionVersion)
+            ?? Self.currentConversionVersion
+        guard [cyan, magenta, yellow, depth].allSatisfy({ $0 <= 100 }),
+              cyan > 0 || magenta > 0 || yellow > 0 || depth > 0,
+              !conversionVersion.isEmpty
+        else {
+            throw DecodingError.dataCorrupted(.init(
+                codingPath: decoder.codingPath,
+                debugDescription: "Ink channels must be 0...100 and at least one channel must be nonzero."))
+        }
+    }
+
+    /// One rules-owned preview/conversion input. Page swatches and bound-world receipts must never
+    /// carry separate color math.
+    var resolvedSRGB: [Int] {
+        let paper = [236.0, 228.0, 210.0]
+        let depthMultiplier = 1 - Double(depth) / 100 * 0.78
+        let absorption = [Double(cyan) * 0.82,
+                          Double(magenta) * 0.79,
+                          Double(yellow) * 0.84]
+        return zip(paper, absorption).map { paperChannel, pigment in
+            Int(min(244, max(12, (paperChannel * (1 - pigment / 100)
+                                 * depthMultiplier).rounded())))
+        }
+    }
+}
+
+enum PigmentBase: String, Codable, CaseIterable, Sendable {
+    case cyan, magenta, yellow, depth
+
+    var sourceResource: ResourceID {
+        switch self {
+        case .cyan: "copper"
+        case .magenta: "ichor"
+        case .yellow: "sulfur"
+        case .depth: "obsidian"
+        }
+    }
+}
+
+struct PigmentStock: Codable, Equatable, Sendable {
+    private var measures: [PigmentBase: Int] = [:]
+
+    subscript(base: PigmentBase) -> Int { measures[base] ?? 0 }
+
+    mutating func add(_ amount: Int, of base: PigmentBase) {
+        let value = max(0, self[base] + amount)
+        measures[base] = value == 0 ? nil : value
+    }
+
+    @discardableResult
+    mutating func spend(_ amount: Int, of base: PigmentBase) -> Bool {
+        guard amount >= 0, self[base] >= amount else { return false }
+        add(-amount, of: base)
+        return true
+    }
+}
+
+struct PreparedInkVial: Codable, Equatable, Sendable, Identifiable {
+    var id: UInt64
+    var recipe: InkRecipe
+    var remainingApplications: Int
+    var yieldVersion: String = InkEconomyRules.currentVersion
+}
+
+enum InkEconomyRules {
+    static let currentVersion = "ink-economy-1.0.0"
+    static let measuresPerResource = 4
+    static let applicationsPerVial = 12
+    static let supportedSourceIDs: Set<PressureSourceID> = ["sun", "smoke", "granite", "bloom"]
+
+    static func measureCost(_ recipe: InkRecipe, base: PigmentBase) -> Int {
+        let channel: UInt8
+        switch base {
+        case .cyan: channel = recipe.cyan
+        case .magenta: channel = recipe.magenta
+        case .yellow: channel = recipe.yellow
+        case .depth: channel = recipe.depth
+        }
+        return channel == 0 ? 0 : Int(ceil(Double(channel) / 25.0))
+    }
+}
+
 /// A footprint: the cells a rune occupies, as offsets from its origin.
 struct RuneShapeDef: Codable, Equatable, Identifiable, Sendable {
     var id: String
@@ -84,18 +202,24 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
     /// Which authored shape this mark draws as. Stored rather than recomputed so an existing page
     /// keeps its layout even if the shape catalogue is re-authored around it.
     var shapeID: String
+    /// Deliberate liquid colour on a focus. `nil` means Rough charcoal or Ash/open, never black.
+    var inkRecipe: InkRecipe?
 
-    init(id: InstanceID, content: MarkContent, hand: Hand, origin: PageCell, shapeID: String) {
+    init(id: InstanceID, content: MarkContent, hand: Hand, origin: PageCell, shapeID: String,
+         inkRecipe: InkRecipe? = nil) {
         self.id = id
         self.content = content
         self.hand = hand
         self.origin = origin
         self.shapeID = shapeID
+        self.inkRecipe = inkRecipe
     }
 
     /// Convenience for the atomic case, which is most of the tests and eventually most of the game.
-    init(id: InstanceID, sigil: Sigil, hand: Hand, origin: PageCell, shapeID: String) {
-        self.init(id: id, content: .rune(sigil), hand: hand, origin: origin, shapeID: shapeID)
+    init(id: InstanceID, sigil: Sigil, hand: Hand, origin: PageCell, shapeID: String,
+         inkRecipe: InkRecipe? = nil) {
+        self.init(id: id, content: .rune(sigil), hand: hand, origin: origin, shapeID: shapeID,
+                  inkRecipe: inkRecipe)
     }
 
     var shape: RuneShapeDef? { ContentCatalog.shared.runeShape(shapeID) }
@@ -129,6 +253,23 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
 
     var sourceID: PressureSourceID? {
         if case .source(let id) = content { id } else { nil }
+    }
+
+    /// Atomic and legacy whole-focus marks may carry authored colour. Targets, modifiers and
+    /// compounds cannot quietly become global colour instructions.
+    var canCarryInk: Bool {
+        switch content {
+        case .source, .rune: true
+        case .target, .qualifier, .compound: false
+        }
+    }
+
+    var inkEligibleSourceID: PressureSourceID? {
+        switch content {
+        case .source(let id): id
+        case .rune(let sigil): sigil.source
+        case .target, .qualifier, .compound: nil
+        }
     }
 
     var qualifierID: QualifierID? {
@@ -348,6 +489,32 @@ struct SavedPageTemplate: Codable, Equatable, Identifiable, Sendable {
     var name: String
     var page: Page
     var creationOrdinal: UInt64
+}
+
+struct InkMixtureID: RawRepresentable, Codable, Equatable, Hashable, Comparable, Sendable {
+    var rawValue: UInt64
+    init(rawValue: UInt64) { self.rawValue = rawValue }
+    static func < (lhs: Self, rhs: Self) -> Bool { lhs.rawValue < rhs.rawValue }
+}
+
+/// A named reusable formula. It owns no vial or pigment by itself; individual page marks freeze
+/// their own recipe so later edits to this convenience entry cannot rewrite history.
+struct SavedInkMixture: Codable, Equatable, Identifiable, Sendable {
+    var id: InkMixtureID
+    var name: String
+    var recipe: InkRecipe
+    var isPinned: Bool = false
+    var lastUsedOrdinal: UInt64
+}
+
+enum InkMixtureRules {
+    static let maximumNameLength = 40
+
+    static func normalizedName(_ proposed: String) -> String {
+        let trimmed = proposed.trimmingCharacters(in: .whitespacesAndNewlines)
+        let chosen = trimmed.isEmpty ? "Mixed ink" : trimmed
+        return String(chosen.prefix(maximumNameLength))
+    }
 }
 
 enum PageTemplateRules {

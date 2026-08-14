@@ -25,7 +25,7 @@
       "id": "band-3",
       "title": "Band 3 · Early knowledge and choices",
       "reach": "Worlds 5–15 · levels 4–10 · Mara through Orsa",
-      "itemIDs": ["wild-world-pages", "early-knowledge-stations", "combat-tree-opening-choices", "refining", "constellation-first-slice", "penmanship-native"]
+      "itemIDs": ["wild-world-pages", "early-knowledge-stations", "combat-tree-opening-choices", "refining", "constellation-first-slice", "penmanship-native", "colored-ink-mixing"]
     },
     {
       "id": "band-4",
@@ -651,6 +651,16 @@
       "detail": "Migrate Pencil to Brush and implement the settled Penmanship fan/fork with Brush-gated sibling Ink Mixing, Compound Assembly and Chaining, then ruling frame and Fountain pen. Decision187 supplies a reversible coherent 40–220 Essence comparison profile rather than preserving the 150-Essence first-hand bottleneck.",
       "gate": "Legacy IDs/capabilities migrate losslessly; sibling routes stay independent; exact recipes and Low writing runway preview share rules-owned costs; ten ordinary returns measure worlds-to-purchase without anti-lock dependence; phone graph fits without list regression. Authority: penmanship-native-migration-current.md, penmanship-economy-runway-review-current.md and Decision187.",
       "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "colored-ink-mixing",
+      "priority": "P2",
+      "title": "Mix colored inks and author world color",
+      "status": "readyToTest",
+      "detail": "Source-complete in the shared Design boundary: exact optional CMY+Depth recipes persist on eligible source marks, saved mixtures and a one-shot next-focus choice; 12-application vials atomically process the minimum Copper/Ichor/Sulfur/Obsidian shortfall into Cyan/Magenta/Yellow/Depth, retain excess, and spend one Resin; successful bind consumes one matching application per mixed-ink source and freezes explicit Sun/Smoke/Granite/Bloom color in the immutable world receipt. Ash remains unlimited/open. The Brush-gated native Ink well has four sliders, presets, shared-conversion swatch/pattern, placed/next-focus actions, Return to Ash, saved mixtures, exact stock quote and confirmation; Ink Mixing is purchasable. Focused rules/persistence tests and generic build-for-testing are green; ordinary-phone acceptance remains.",
+      "gate": "Locked/Ash and unlocked mixer phone states; exact quote/confirm with retained excess and stale no-op; unsupported focus refuses before spend; failed/cancelled/stale bind consumes nothing; successful bind consumes exact applications and persists scoped authoredMix while every open layer remains deterministic-random; relaunch and anchored revisit reproduce the receipt. Authority: authored-color-vocabulary-current.md and ink-economy-friction-audit-current.md.",
+      "workstream": "acceptance",
       "isPrimary": false
     },
     {
