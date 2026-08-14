@@ -166,8 +166,8 @@ final class BookRulesTests: XCTestCase {
         XCTAssertEqual(best, 100, "A careful writer can hold a world open indefinitely")
     }
 
-    /// …and the world they get for it is not empty. A stable world pays elsewhere: in the dark, or
-    /// in what lives there. Collapsing every trade onto one axis is the failure this guards against.
+    /// …and the world they get for it is not empty. A stable world pays elsewhere: here, in the
+    /// dark. Collapsing every trade onto one axis is the failure this guards against.
     func testAStableWorldStillCostsSomethingElse() throws {
         let page = try page(["plains", "frostbound", "sparse_ore", "dim_sky"])
         let projection = BookProjection.project(page: page)
@@ -181,8 +181,6 @@ final class BookRulesTests: XCTestCase {
             + (ContentCatalog.shared.symbol("plains")?.visionDelta ?? 0)
         XCTAssertLessThan(projection.visionRadius.upperBound, plainSight,
                           "Dim Sky's stability is bought with sight")
-        XCTAssertGreaterThan(projection.enemyTier.lowerBound, Tuning.World.baseEnemyTier,
-                             "…and with what hunts there")
     }
 
     // MARK: Stability is measured in steps

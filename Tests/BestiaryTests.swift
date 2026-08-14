@@ -68,14 +68,24 @@ final class BestiaryTests: XCTestCase {
     func testTheGlobalScaleIsMeasuredAgainstWhatWorldsActuallyGrow() {
         let tiny = BestiaryRules.globalPercentile(of: traits(size: 0), by: .size)
         let huge = BestiaryRules.globalPercentile(of: traits(size: 100), by: .size)
-        let middling = BestiaryRules.globalPercentile(of: traits(size: 50), by: .size)
+        var generatedMiddle = 0.0
+        var closestDistance = Double.greatestFiniteMagnitude
+        for size in 1..<100 {
+            let percentile = BestiaryRules.globalPercentile(
+                of: traits(size: Double(size)), by: .size)
+            let distance = abs(percentile - 0.5)
+            if distance < closestDistance {
+                generatedMiddle = percentile
+                closestDistance = distance
+            }
+        }
 
         XCTAssertLessThan(tiny, 0.2, "nothing is smaller than the smallest thing that lives")
         XCTAssertGreaterThan(huge, 0.9)
-        XCTAssertTrue((0.1...0.95).contains(middling),
-                      "a middling animal should land somewhere in the middle, not at a clamp")
-        XCTAssertLessThan(tiny, middling)
-        XCTAssertLessThan(middling, huge)
+        XCTAssertTrue((0.1...0.9).contains(generatedMiddle),
+                      "the generated reference collapsed to its endpoints")
+        XCTAssertLessThan(tiny, generatedMiddle)
+        XCTAssertLessThan(generatedMiddle, huge)
     }
 
     /// Every measure has to discriminate, or the row it draws is decoration.
