@@ -23,9 +23,15 @@ final class WeaponsmithTests: XCTestCase {
         var state = GameState.newGame()
 
         XCTAssertTrue(WorldRules.readPage(page.id, in: &state)
-            .contains(.learnedPattern("maud_fitting_pattern")))
+            .contains(.learnedPattern(WorkshopPatternID(rawValue: "maud_fitting_pattern"))))
         XCTAssertTrue(state.reality.library.knownPatterns.contains(
             WorkshopPatternID(rawValue: "maud_fitting_pattern")))
+    }
+
+    func testWeaponsmithPatternAuthorityIsTyped() {
+        let pattern: WorkshopPatternID = PhysicalGearCraftingRules.maudFittingPattern
+        XCTAssertEqual(pattern.rawValue, "maud_fitting_pattern")
+        XCTAssertNotNil(WorkshopPatternRegistry.definition(pattern))
     }
     private func state(tier: Int = 0, grade: Double = 70, pattern: Bool = false) -> GameState {
         var state = GameState.newGame()

@@ -46,7 +46,9 @@ final class LibraryTests: XCTestCase {
 
         let first = WorldRules.readPage(page.id, in: &state)
         let second = WorldRules.readPage(page.id, in: &state)
-        XCTAssertEqual(first.filter { $0 == .learnedPattern("maud_fitting_pattern") }.count, 1)
+        XCTAssertEqual(first.filter {
+            $0 == .learnedPattern(WorkshopPatternID(rawValue: "maud_fitting_pattern"))
+        }.count, 1)
         XCTAssertTrue(second.isEmpty)
         XCTAssertEqual(state.reality.library.knownPatterns, ["maud_fitting_pattern"])
 

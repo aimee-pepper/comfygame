@@ -58,7 +58,7 @@ enum WorldRules {
         /// A word for the page, carved somewhere out there.
         case learnedFocus(PressureSourceID)
         case learnedGambit(GambitComponentID)
-        case learnedPattern(String)
+        case learnedPattern(WorkshopPatternID)
         case gainedEssence(Int)
         case pickedUpItem(String)
         case satchelFull(String)
@@ -557,7 +557,7 @@ enum WorldRules {
             if let pattern = page.teachesPattern,
                !state.reality.library.knownPatterns.contains(pattern) {
                 state.reality.library.knownPatterns.insert(pattern)
-                events.append(.learnedPattern(pattern.rawValue))
+                events.append(.learnedPattern(pattern))
             }
         case .researchLead, .ruin, .worldWorthWriting, .account, .turn:
             // Recorded in the Library; the systems that read it come later.

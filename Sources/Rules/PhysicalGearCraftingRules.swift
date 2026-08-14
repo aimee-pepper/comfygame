@@ -309,7 +309,7 @@ enum PhysicalGearCraftingRules {
     static let tanneryWearRoot: ResearchNodeID = "tannery_wear_root"
     static let tanneryWearTierTwo: ResearchNodeID = "tannery_wear_tier_two"
     static let weaponsmithPointRoot: ResearchNodeID = "weaponsmith_point_root"
-    static let maudFittingPattern = "maud_fitting_pattern"
+    static let maudFittingPattern: WorkshopPatternID = "maud_fitting_pattern"
 
     static func requiredResearch(for recipe: Recipe) -> ResearchNodeID? {
         if recipe.station == Stations.tannery { return tanneryWearRoot }
