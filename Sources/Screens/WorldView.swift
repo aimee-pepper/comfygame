@@ -1,5 +1,24 @@
 import SwiftUI
 
+enum WorldDurationPresentation {
+    static func status(stability: Double, decayPerTurn: Double,
+                       collapsedOnTurn: Int?) -> String {
+        if collapsedOnTurn != nil || stability <= 0 { return "collapse underway" }
+        guard decayPerTurn > 0 else { return "steady" }
+        return "~\(Int(ceil(stability / decayPerTurn))) turns until collapse"
+    }
+
+    static func diagnostic(stability: Double, decayPerTurn: Double,
+                           collapsedOnTurn: Int?) -> (label: String, value: String) {
+        if collapsedOnTurn != nil || stability <= 0 {
+            let phase = collapsedOnTurn.map { "underway · started turn \($0)" } ?? "underway"
+            return ("Collapse status", phase)
+        }
+        return ("Turns until collapse", decayPerTurn > 0
+                ? "\(Int(ceil(stability / decayPerTurn)))" : "steady")
+    }
+}
+
 enum WorldControlsLayout {
     static let actionCount = 2
     static let actionRows = 1
@@ -567,9 +586,11 @@ private struct WorldDiagnosticsView: View {
                     }
                 }
                 Section("World duration") {
+                    let duration = WorldDurationPresentation.diagnostic(
+                        stability: run.stability, decayPerTurn: run.decayPerTurn,
+                        collapsedOnTurn: run.collapsedOnTurn)
                     LabeledRow(icon: "gauge", label: "Stability score", value: "\(run.effectiveStabilityScore)")
-                    LabeledRow(icon: "timer", label: "Turns remaining",
-                               value: "\(max(0, Int(ceil(run.stability / max(0.01, run.decayPerTurn)))))")
+                    LabeledRow(icon: "timer", label: duration.label, value: duration.value)
                     LabeledRow(icon: "flag.checkered", label: "Initial budget / projected collapse",
                                value: "\(run.generationDiagnostics.initialTurnBudget) / turn \(run.generationDiagnostics.projectedCollapseTurn)")
                     LabeledRow(icon: "shippingbox", label: "Collapse recovery",
@@ -788,19 +809,10 @@ private struct StabilityHeader: View {
         .background(.bar)
     }
 
-    private var turnsLeft: Int {
-        guard run.decayPerTurn > 0 else { return Tuning.World.indefiniteTurns }
-        return Int((run.stability / run.decayPerTurn).rounded(.down))
-    }
-
-    /// A world that isn't decaying has no countdown — saying so beats printing the sentinel.
-    ///
-    /// Measured against a *practical* ceiling rather than the sentinel itself: a world decaying by
-    /// a hundredth of a point a turn lasts ten thousand turns, which is not a countdown, and thirty
-    /// turns in it prints "~9969 turns left" and reads as a bug. The preview already says "holds
-    /// indefinitely" about the same world; these two must agree.
     private var turnsLeftText: String {
-        turnsLeft >= Tuning.World.countdownCeiling ? "steady" : "~\(turnsLeft) turns left"
+        WorldDurationPresentation.status(stability: run.stability,
+                                         decayPerTurn: run.decayPerTurn,
+                                         collapsedOnTurn: run.collapsedOnTurn)
     }
 
     private var bandText: String {

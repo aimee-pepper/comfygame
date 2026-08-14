@@ -10,6 +10,27 @@ import XCTest
 /// bought with.**
 @MainActor
 final class InstrumentTests: XCTestCase {
+
+    func testWorldDurationCopyDoesNotPromiseAnEjectionCountdownDuringCollapse() {
+        XCTAssertEqual(WorldDurationPresentation.status(
+            stability: 20, decayPerTurn: 0, collapsedOnTurn: nil), "steady")
+        XCTAssertEqual(WorldDurationPresentation.status(
+            stability: 5, decayPerTurn: 2, collapsedOnTurn: nil),
+                       "~3 turns until collapse")
+        XCTAssertEqual(WorldDurationPresentation.status(
+            stability: 0, decayPerTurn: 2, collapsedOnTurn: nil), "collapse underway")
+        XCTAssertEqual(WorldDurationPresentation.status(
+            stability: 12, decayPerTurn: 2, collapsedOnTurn: 9), "collapse underway")
+
+        let active = WorldDurationPresentation.diagnostic(
+            stability: -1, decayPerTurn: 2, collapsedOnTurn: 7)
+        XCTAssertEqual(active.label, "Collapse status")
+        XCTAssertEqual(active.value, "underway · started turn 7")
+        let pending = WorldDurationPresentation.diagnostic(
+            stability: 5, decayPerTurn: 2, collapsedOnTurn: nil)
+        XCTAssertEqual(pending.label, "Turns until collapse")
+        XCTAssertEqual(pending.value, "3")
+    }
     func testWorldHistoryCompareFooterGuidesIncompleteSelection() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
