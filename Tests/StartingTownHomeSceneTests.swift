@@ -56,14 +56,11 @@ final class StartingTownHomeSceneTests: XCTestCase {
         }
     }
 
-    func testAspectFitShowsTheFullAuthoredHomeAndKeepsCoordinatesInImageSpace() {
+    func testFullPageHomeConsumesTheEntireOrdinaryPhoneViewportWithoutCropping() {
         let container = CGSize(width: 344, height: 500)
         let rect = StartingTownHomeRules.renderedImageRect(
             imageSize: CGSize(width: 1122, height: 1402), in: container)
-        XCTAssertEqual(rect.width, container.width, accuracy: 0.01)
-        XCTAssertLessThanOrEqual(rect.height, container.height)
-        XCTAssertEqual(rect.midX, container.width / 2, accuracy: 0.01)
-        XCTAssertEqual(rect.midY, container.height / 2, accuracy: 0.01)
+        XCTAssertEqual(rect, CGRect(origin: .zero, size: container))
     }
 
     func testOrdinaryPhoneHotspotsRemainMeaningfulAndFullyInsideTheViewport() throws {
@@ -121,7 +118,10 @@ final class StartingTownHomeSceneTests: XCTestCase {
         let scene = String(source[start.lowerBound..<end.lowerBound])
 
         XCTAssertTrue(scene.contains(".allowsHitTesting(false)"))
-        XCTAssertTrue(scene.contains(".scaledToFit()"))
+        XCTAssertFalse(scene.contains(".scaledToFit()"))
+        XCTAssertFalse(scene.contains(".scaledToFill()"))
+        XCTAssertTrue(scene.contains(".frame(width: geometry.size.width, height: geometry.size.height)"))
+        XCTAssertTrue(scene.contains(".frame(width: imageRect.width, height: imageRect.height)"))
         XCTAssertTrue(scene.contains("StartingTownHomeRules.hotspotRect("))
         XCTAssertTrue(scene.contains("NavigationLink(value: route)"))
         XCTAssertTrue(scene.contains(".zIndex(1)"))

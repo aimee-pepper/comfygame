@@ -56,12 +56,10 @@ enum StartingTownHomeRules {
     static func renderedImageRect(imageSize: CGSize, in containerSize: CGSize) -> CGRect {
         guard imageSize.width > 0, imageSize.height > 0,
               containerSize.width > 0, containerSize.height > 0 else { return .zero }
-        let scale = min(containerSize.width / imageSize.width,
-                        containerSize.height / imageSize.height)
-        let size = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
-        return CGRect(x: (containerSize.width - size.width) / 2,
-                      y: (containerSize.height - size.height) / 2,
-                      width: size.width, height: size.height)
+        // This is authored as the complete Home page, not as a card inside the town viewport.
+        // Map its full normalized canvas onto the full available page so no authored edge is
+        // cropped and no unexplained letterbox/card gutter is introduced around it.
+        return CGRect(origin: .zero, size: containerSize)
     }
 
     static func hotspotRect(_ hotspot: Hotspot, imageRect: CGRect,
@@ -114,7 +112,6 @@ struct StartingTownHomeScene: View {
                 Image(uiImage: scene.image)
                     .resizable()
                     .interpolation(.none)
-                    .scaledToFit()
                     .frame(width: imageRect.width, height: imageRect.height)
                     .position(x: imageRect.midX, y: imageRect.midY)
                     .allowsHitTesting(false)
@@ -139,6 +136,7 @@ struct StartingTownHomeScene: View {
                     }
                 }
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
             .clipped()
         }
         .clipped()
