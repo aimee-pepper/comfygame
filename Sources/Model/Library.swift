@@ -17,7 +17,7 @@ struct LibraryState: Codable, Equatable, Sendable {
     /// Travellers you know to look for, whether or not you know where they are.
     var knownTravellers: Set<TravellerID> = []
     /// Singular authored workshop patterns learned from diary pages.
-    var knownPatterns: Set<String> = []
+    var knownPatterns: Set<WorkshopPatternID> = []
     /// Saved protection against repeated selected full-signature arrival failures.
     var travellerArrivalNearMisses: [TravellerID: Int] = [:]
     /// How many worlds have been generated since each page became eligible to appear.
@@ -84,7 +84,11 @@ struct LibraryState: Codable, Equatable, Sendable {
         foundWritings = try c.decodeIfPresent([FoundWritingRecord].self, forKey: .foundWritings) ?? []
         foundTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .foundTravellers) ?? []
         knownTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .knownTravellers) ?? []
-        knownPatterns = try c.decodeIfPresent(Set<String>.self, forKey: .knownPatterns) ?? []
+        // WorkshopPatternID has the same single-string wire representation as the historical
+        // Set<String>. Unknown saved IDs remain intact: content validation prevents authoring new
+        // dangling rewards, but migration must never erase knowledge from an older build.
+        knownPatterns = try c.decodeIfPresent(Set<WorkshopPatternID>.self,
+                                              forKey: .knownPatterns) ?? []
         travellerArrivalNearMisses = (try c.decodeIfPresent([TravellerID: Int].self,
             forKey: .travellerArrivalNearMisses) ?? [:]).mapValues { max(0, $0) }
         let decodedWaiting = try c.decodeIfPresent([DiaryPageID: Int].self, forKey: .pagesWaiting) ?? [:]
@@ -152,6 +156,25 @@ struct LibraryState: Codable, Equatable, Sendable {
             .compactMap { ContentCatalog.shared.diaryPage($0) }
             .filter { $0.kind == .locationClue && $0.about == traveller }
             .compactMap(\.clueIndex))
+    }
+}
+
+/// Transitional source compatibility while rules and presentation move to WorkshopPatternID.
+/// Persistence and ownership are typed now; these overloads prevent parallel string conversion
+/// logic from spreading through every existing consumer in the same checkpoint.
+extension Set where Element == WorkshopPatternID {
+    func contains(_ rawValue: String) -> Bool {
+        contains(WorkshopPatternID(rawValue: rawValue))
+    }
+
+    @discardableResult
+    mutating func insert(_ rawValue: String) -> (inserted: Bool, memberAfterInsert: Element) {
+        insert(WorkshopPatternID(rawValue: rawValue))
+    }
+
+    @discardableResult
+    mutating func remove(_ rawValue: String) -> Element? {
+        remove(WorkshopPatternID(rawValue: rawValue))
     }
 }
 

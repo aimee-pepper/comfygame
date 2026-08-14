@@ -54,6 +54,18 @@ final class LibraryTests: XCTestCase {
         XCTAssertEqual(restored.reality.library.knownPatterns, ["maud_fitting_pattern"])
     }
 
+    func testLegacyPatternStringsDecodeTypedAndUnknownKnowledgeReencodesLosslessly() throws {
+        let legacy = Data(#"{"knownPatterns":["retired_pattern","maud_fitting_pattern"]}"#.utf8)
+        let decoded = try SaveCodec.makeDecoder().decode(LibraryState.self, from: legacy)
+
+        XCTAssertTrue(decoded.knownPatterns.contains("maud_fitting_pattern"))
+        XCTAssertTrue(decoded.knownPatterns.contains("retired_pattern"))
+        let canonical = try SaveCodec.makeEncoder().encode(decoded)
+        let restored = try SaveCodec.makeDecoder().decode(LibraryState.self, from: canonical)
+        XCTAssertEqual(restored.knownPatterns, decoded.knownPatterns)
+        XCTAssertTrue(restored.knownPatterns.contains("retired_pattern"))
+    }
+
     func testLysCatalogueSearchesOnlyRecoveredVisibleContentInDiscoveryOrder() throws {
         let pages = Array(ContentCatalog.shared.diaryPages.prefix(3))
         XCTAssertEqual(pages.count, 3)

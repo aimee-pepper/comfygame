@@ -2,6 +2,20 @@ import XCTest
 @testable import Bookbinder
 
 final class WeaponsmithTests: XCTestCase {
+    func testTypedPatternKnowledgeRemainsTheExactCraftingGate() throws {
+        var without = state(tier: 4, pattern: false)
+        var with = without
+        with.reality.library.knownPatterns.insert("maud_fitting_pattern")
+
+        XCTAssertFalse(PhysicalGearCraftingRules.isUnlocked(
+            PhysicalGearCraftingRules.fittedPolearm(damage: .pierce), in: without))
+        XCTAssertTrue(PhysicalGearCraftingRules.isUnlocked(
+            PhysicalGearCraftingRules.fittedPolearm(damage: .pierce), in: with))
+        without.reality.library.knownPatterns.insert("retired_pattern")
+        XCTAssertFalse(PhysicalGearCraftingRules.isUnlocked(
+            PhysicalGearCraftingRules.fittedPolearm(damage: .pierce), in: without),
+            "an unknown retained legacy ID became a live pattern grant")
+    }
     private func state(tier: Int = 0, grade: Double = 70, pattern: Bool = false) -> GameState {
         var state = GameState.newGame()
         state.base.stations[Stations.weaponsmith] = StationState(isUnlocked: true, tier: tier)
