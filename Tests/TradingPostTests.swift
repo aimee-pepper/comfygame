@@ -2,6 +2,12 @@ import XCTest
 @testable import Bookbinder
 
 final class TradingPostTests: XCTestCase {
+    func testTradingPostProprietorUsesExactVanceIdentity() throws {
+        XCTAssertEqual(TradingPostPresentation.proprietorID, TravellerID(rawValue: "vance"))
+        let vance = try XCTUnwrap(ContentCatalog.shared.traveller(TradingPostPresentation.proprietorID))
+        XCTAssertEqual(vance.name, "Vance")
+    }
+
     func testTradingPostPresentationUsesAuthoredNamesAndHidesUnknownIDs() throws {
         let clay = try XCTUnwrap(ContentCatalog.shared.resource("clay"))
         let salve = try XCTUnwrap(ContentCatalog.shared.item("salve_lesser"))
@@ -29,6 +35,9 @@ final class TradingPostTests: XCTestCase {
         XCTAssertFalse(source.contains("case unavailable\n"))
         XCTAssertTrue(source.contains("You can inspect this stock, but Vance cannot sell it yet."))
         XCTAssertFalse(source.contains("capacity-safe purchase path"))
+        XCTAssertTrue(source.contains("NamedCharacterPixelIdentity("))
+        XCTAssertTrue(source.contains("travellerID: person?.id"))
+        XCTAssertTrue(source.contains("TradingPostPresentation.proprietorID"))
     }
 
     func testOldBaseSaveDefaultsToEmptyTradingPostAndSeparateZeroGoldWallet() throws {

@@ -1,6 +1,8 @@
 import SwiftUI
 
 enum TradingPostPresentation {
+    static let proprietorID: TravellerID = "vance"
+
     static func resourceName(_ id: ResourceID,
                              catalogue: ContentCatalog = .shared) -> String {
         catalogue.resource(id)?.name ?? "Unknown resource"
@@ -22,6 +24,7 @@ struct TradingPostView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
+                proprietorHeader
                 wallet
                 Picker("Trading Post section", selection: $tab) {
                     ForEach(TradingPostTab.allCases) { tab in
@@ -55,6 +58,29 @@ struct TradingPostView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Trading Post")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var proprietorHeader: some View {
+        let person = ContentCatalog.shared.traveller(TradingPostPresentation.proprietorID)
+        return HStack(spacing: 12) {
+            NamedCharacterPixelIdentity(
+                travellerID: person?.id,
+                fallbackSystemIcon: person?.icon ?? "shippingbox.fill",
+                fallbackColor: .orange
+            )
+            .frame(width: 48, height: 48)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(person?.name ?? "Trading Post")
+                    .font(.headline)
+                Text(person?.calling ?? "Merchant")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
     }
 
     @ViewBuilder private func listingTile(_ listing: TradingPostListing) -> some View {
