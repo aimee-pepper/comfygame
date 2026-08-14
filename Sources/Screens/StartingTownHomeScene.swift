@@ -56,10 +56,16 @@ enum StartingTownHomeRules {
     static func renderedImageRect(imageSize: CGSize, in containerSize: CGSize) -> CGRect {
         guard imageSize.width > 0, imageSize.height > 0,
               containerSize.width > 0, containerSize.height > 0 else { return .zero }
-        // This is authored as the complete Home page, not as a card inside the town viewport.
-        // Map its full normalized canvas onto the full available page so no authored edge is
-        // cropped and no unexplained letterbox/card gutter is introduced around it.
-        return CGRect(origin: .zero, size: containerSize)
+        // Home shares the exact aspect-fill contract used by the other village panes: preserve
+        // the authored proportions and crop only the centered overflow required to fill the
+        // available page. Hotspots use this same rendered rectangle below.
+        let scale = max(containerSize.width / imageSize.width,
+                        containerSize.height / imageSize.height)
+        let renderedSize = CGSize(width: imageSize.width * scale,
+                                  height: imageSize.height * scale)
+        return CGRect(x: (containerSize.width - renderedSize.width) / 2,
+                      y: (containerSize.height - renderedSize.height) / 2,
+                      width: renderedSize.width, height: renderedSize.height)
     }
 
     static func hotspotRect(_ hotspot: Hotspot, imageRect: CGRect,

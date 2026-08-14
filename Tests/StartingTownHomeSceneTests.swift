@@ -56,11 +56,18 @@ final class StartingTownHomeSceneTests: XCTestCase {
         }
     }
 
-    func testFullPageHomeConsumesTheEntireOrdinaryPhoneViewportWithoutCropping() {
+    func testFullPageHomeUsesTheSameCenteredAspectFillCropAsOtherVillagePanes() {
         let container = CGSize(width: 344, height: 500)
         let rect = StartingTownHomeRules.renderedImageRect(
             imageSize: CGSize(width: 1408, height: 3048), in: container)
-        XCTAssertEqual(rect, CGRect(origin: .zero, size: container))
+        let scale = max(container.width / 1408, container.height / 3048)
+        XCTAssertEqual(rect.width, 1408 * scale, accuracy: 0.001)
+        XCTAssertEqual(rect.height, 3048 * scale, accuracy: 0.001)
+        XCTAssertEqual(rect.midX, container.width / 2, accuracy: 0.001)
+        XCTAssertEqual(rect.midY, container.height / 2, accuracy: 0.001)
+        XCTAssertTrue(rect.contains(CGRect(origin: .zero, size: container)))
+        XCTAssertEqual(rect, BaseBoardRules.townAspectFillFrame(
+            imageSize: CGSize(width: 1408, height: 3048), containerSize: container))
     }
 
     func testOrdinaryPhoneHotspotsRemainMeaningfulAndFullyInsideTheViewport() throws {
