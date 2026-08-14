@@ -1,9 +1,9 @@
 # Traveller Meetings — Mature-Core Review Draft
 
-**Status:** authored review draft, not approved live copy. This is batch two of
-`traveller-meeting-corpus-plan-current.md`: Corrin, Dagg, Rook, Lys, Bracken and Fen. Engineering may
-load it into the DEBUG authored-text atlas and exercise schema/transcript behavior, but must preserve
-`Draft / needs Aimee review` and must not silently publish it in the traveller catalogue.
+**Status:** production-authorized authored copy. This is batch two of
+`traveller-meeting-corpus-plan-current.md`: Corrin, Dagg, Rook, Lys, Bracken and Fen. Coherent copy
+enters play without waiting for separate Atlas approval; Aimee reviews and flags it through play or
+the dialogue Atlas.
 
 Each meeting uses one visible practice, three order-independent semantic exchanges, one offer and
 separate terminal replies. Recruitment never tests agreement with the traveller or understanding of
@@ -112,9 +112,9 @@ hard crescent. “The outside retained its shape,” he says. “The wearer was 
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `bracken.intact_outside` | “Why ruin armour that still works?” | “It does not still work.” Bracken lifts the flattened lining. “It completed one instruction—keep the point outside—and transferred every unnamed consequence inward.” |
+| `bracken.intact_outside` | “Why ruin armour that still works?” | “Because it doesn't.” Bracken lifts the flattened lining. “The point stayed out. The force went straight through the padding and into the wearer.” |
 | `bracken.wearer` | “Who wore it?” | “Someone who twisted left after the blow, breathed shallowly and kept the lower strap too tight.” He studies the marks. “That is what the object proves. A name would be something I added.” |
-| `bracken.impenetrable` | “Can you make something nothing gets through?” | “Briefly.” He folds the plate until the hidden buckle catches. “If the wearer agrees not to turn, breathe well, shed heat or leave quickly.” |
+| `bracken.impenetrable` | “Can you make something nothing gets through?” | “If the wearer promises not to turn, breathe deeply, overheat, or leave in a hurry.” He lets the hidden buckle catch. “So no. I can make armour that handles the harm we expect.” |
 
 **Offer:** “Come home with me. Halloway's forge makes strong work. Build what comes after it: armour
 chosen for the expected harm and the cost a particular wearer can carry.”
@@ -129,15 +129,14 @@ convincing surface is how the same failure gets another wearer.”
 
 **Opening**
 
-Fen has tied six cords between two stones. None belongs to a weapon. They pluck one, wait while the
-wind passes through it, then cut it down. “It returned almost to the same note,” they say. “Almost is
-where the hundredth draw lives.”
+Fen has tied six cords between two stones. They pluck one, wait for the wind to pass, then cut it
+down. “Pitch dropped,” they say. “It stretched. Fine for a sling, poor for a bow.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `fen.hundred_draws` | “Are you making a bow?” | “Not yet. I am finding which material remains itself after being asked the same question a hundred times.” Fen coils the rejected cord instead of discarding it. “This one may prefer a sling.” |
-| `fen.path_before_target` | “What are you aiming at?” | “Nothing.” They watch loose fibres lift in the crosswind. “Choosing a target before understanding the path is how people blame weather for work they never prepared.” |
-| `fen.weapon_and_hunt` | “Did you hunt with what you made?” | “Sometimes. Making a path possible and deciding what should be at its end are different jobs.” Fen stills the next cord. “They remain different when one person performs both.” |
+| `fen.hundred_draws` | “Are you making a bow?” | “Testing bowstrings.” Fen coils the rejected cord. “A string that stretches on the hundredth draw changes every shot after it. This one can become a sling.” |
+| `fen.path_before_target` | “What are you aiming at?” | “Nothing yet.” They watch loose fibres lift in the crosswind. “First I learn what the wind will do. Then I choose a weapon and target that make sense in it.” |
+| `fen.weapon_and_hunt` | “Did you hunt with what you made?” | “Sometimes.” Fen stills the next cord. “I make things that can reach a target. I still decide whether the target should be hit.” |
 
 **Offer:** “Come with me. I have materials worth testing and journeys where distance matters. Make
 us bows, launchers and thrown weapons that account for the whole physical path.”
@@ -145,8 +144,8 @@ us bows, launchers and thrown weapons that account for the whole physical path.�
 **Accepted:** Fen cuts down the remaining cords in order and labels each coil. “Then they come too.
 Rejected for one use is not the same as useless.”
 
-**Declined:** “All right.” They pluck the next cord and listen past its first note. “A path may be
-understood before anyone is obliged to travel it.”
+**Declined:** “All right.” They pluck the next cord. “Stand downwind if you're staying. Your coat is
+making the test louder than the string.”
 
 ## Batch review checks
 
@@ -173,7 +172,7 @@ understood before anyone is obliged to travel it.”
 
 ## Atlas disposition fields
 
-Create six meeting-object rows and eighteen exchange rows with state `Draft / needs Aimee review`,
-this document as provenance and exact-text hashes. Keep review metadata outside bundled content and
-campaign saves. If a pronoun/name changes, preserve semantic IDs and mark the old hash stale rather
-than treating the revised row as previously approved.
+Create six meeting-object rows and eighteen exchange rows with state `Playable / unreviewed`, this
+document as provenance and exact-text hashes. That state invites playtest feedback but does not hold
+coherent copy out of the game. Keep review metadata outside bundled content and campaign saves. If a
+pronoun/name changes, preserve semantic IDs and mark the old hash stale.

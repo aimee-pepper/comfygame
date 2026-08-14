@@ -1,9 +1,9 @@
 # Traveller Meetings — Specialists Review Draft
 
-**Status:** authored review draft, not approved live copy. This is batch three of
-`traveller-meeting-corpus-plan-current.md`: Wren, Kestrel, Maud, Marrick, Sabine and Grimmond. It is
-valid DEBUG-atlas/schema input with review state `Draft / needs Aimee review`; it is not permission to
-populate the live catalogue.
+**Status:** production-authorized authored copy. This is batch three of
+`traveller-meeting-corpus-plan-current.md`: Wren, Kestrel, Maud, Marrick, Sabine and Grimmond.
+Coherent copy enters play without waiting for separate Atlas approval; Atlas state remains
+`Playable / unreviewed` until Aimee flags it through play or the dialogue Atlas.
 
 Each opening shows a practice before explaining it. Every meeting has three independent semantic
 exchanges, an offer, and separate accepted/declined replies. No question is a test and no meeting
@@ -13,15 +13,15 @@ requires the player to approve the traveller's central tension.
 
 **Opening**
 
-Wren stands beyond a knot of three circling threats, calmly shifting pebbles on a flat stone to match
-their routes. One pebble marks something slower than he is. The gap before it is narrowing. “I can
-leave now,” he says. “That is not yet an answer to what happens next.”
+Wren stands beyond three circling threats, shifting pebbles on a flat stone to track their routes.
+One pebble marks a slower traveller whose exit is narrowing. “I can get out,” he says. “They can't.
+So we're using their route first.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `wren.open_exit` | “Where is the exit?” | “I have four.” Wren taps the lone slow pebble. “They have one, and I borrowed half of it when I drew the third creature across their route.” |
-| `wren.threat_pattern` | “Will the creatures fight each other?” | “Briefly. Then the one that yields will close this gap.” He moves two pebbles together. “Chaos is only useful while you still account for where it settles.” |
-| `wren.tempo_debt` | “Can you reach them in time?” | “Yes, if I spend the next moment now.” He rolls his shoulders. “Speed creates no time. It decides who inherits the missing part.” |
+| `wren.open_exit` | “Where is the exit?” | “I have four.” Wren taps the lone slow pebble. “They have one, and I pulled a creature across half of it. I'm fixing that.” |
+| `wren.threat_pattern` | “Will the creatures fight each other?” | “For a moment. Then the smaller one gives ground and blocks this gap.” He moves two pebbles together. “Useful distraction, terrible long-term plan.” |
+| `wren.tempo_debt` | “Can you reach them in time?” | “Yes, if I move now.” He rolls his shoulders. “Ask the next question while we're running.” |
 
 **Offer:** “Come with me. My party meets crowds that make the current arrangement unsafe. Help us
 keep exits open and count the recovery after a burst as honestly as the burst itself.”
@@ -44,8 +44,8 @@ not yet the animal.”
 | Stable ID | Ask | Reply |
 |---|---|---|
 | `kestrel.ordinary_behavior` | “What changed when it calmed?” | “Its left leg still bears weight. It feeds uphill. It chooses cover near water but not the water itself.” Kestrel closes the notebook. “Facts that pursuit had hidden under fear.” |
-| `kestrel.take_or_leave` | “Are you going to kill it?” | “I have not decided.” She does not make the uncertainty ceremonial. “Knowing where a shot would land answers how. It does not answer whether.” |
-| `kestrel.trace_limit` | “What did you cross out?” | “I wrote that it travelled alone.” She points to a second, older track. “The trace proved separation. I supplied loneliness because it made a cleaner story.” |
+| `kestrel.take_or_leave` | “Are you going to kill it?” | “I haven't decided.” She lowers the bow. “I know I could make the shot. That isn't a reason to take it.” |
+| `kestrel.trace_limit` | “What did you cross out?” | “I wrote that it travelled alone.” She points to an older second track. “All I actually knew was that its companion passed earlier. 'Alone' was me improving the story.” |
 
 **Offer:** “Come with me. Teach my party to recognize an animal before reducing it to threat or
 material—and to waste less when taking one is the decision we actually make.”
@@ -66,9 +66,9 @@ she says. “That is the first measurement the metal could not give me.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `maud.not_weapon_yet` | “Is that a weapon?” | “Not yet. It has no chosen reach, recovery or use.” Maud balances the bar on her mark. “Calling every length of iron a weapon excuses the maker from deciding what they invited.” |
-| `maud.advanced_compromise` | “What makes a weapon advanced?” | “Knowing precisely which compromise was chosen, and for whose body.” She shifts the balance toward your upper hand. “Rare material cannot tell me whether your shoulder must pay for its reputation.” |
-| `maud.halloway` | “Did Halloway teach you?” | “Halloway taught me to listen when material changes under force. I learned elsewhere that the person holding it changes too.” Maud adds a second mark. “Neither lesson outranks the other.” |
+| `maud.not_weapon_yet` | “Is that a weapon?” | “It's an iron bar.” Maud balances it on her mark. “Give it a reach, balance, grip and intended use. Then we can call it a weapon and judge whether it's a good one.” |
+| `maud.advanced_compromise` | “What makes a weapon advanced?” | “Better materials, better construction, and a clear answer about who will use it.” She shifts the balance toward your upper hand. “Rare metal doesn't make a bad fit impressive.” |
+| `maud.halloway` | “Did Halloway teach you?” | “She taught me what metal says under force.” Maud adds a second mark. “Other teachers showed me what shoulders and wrists say. I listen to both.” |
 
 **Offer:** “Halloway keeps the forge. Come build the work that needs a hand beside hers: near enough
 to share heat, far enough not to share an anvil.”
@@ -84,14 +84,14 @@ fear puts them there without asking either of us.”
 **Opening**
 
 Marrick resets six formation markers around a defended space. Five are worn smooth by repeated
-footing. The sixth lies beyond the line, untouched. “The routine succeeded,” he says. “That sentence
-was how we avoided counting who could not stand inside it.”
+footing. The sixth lies beyond the line, untouched. “Five people knew exactly where to stand,” he
+says. “The sixth couldn't reach their place. We kept calling that a successful formation.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `marrick.sixth_marker` | “Who was the sixth place for?” | “Anyone slower, injured, newly arrived or unable to hold the assigned ground.” Marrick moves it within reach of two others. “In practice, that meant whoever the plan had already made easiest to forget.” |
-| `marrick.repeated_routine` | “Why repeat a formation?” | “So it remains usable when fear makes explanation expensive.” He walks the fallback route without looking down. “Repetition can distribute judgement. It can also harden one person's blind spot into everybody's habit.” |
-| `marrick.success_count` | “But it protected five people.” | “Yes.” Marrick does not diminish that. “A failure outside the count does not erase the protection. The protection does not erase whom the count excluded.” |
+| `marrick.sixth_marker` | “Who was the sixth place for?” | “Anyone slower, injured, or new to the formation.” Marrick moves it within reach of two others. “Which means it belonged to the person most likely to need help reaching it.” |
+| `marrick.repeated_routine` | “Why repeat a formation?” | “So everyone can use it while frightened and tired.” He walks the fallback route without looking down. “But repetition also hides bad assumptions. That's why we test every position.” |
+| `marrick.success_count` | “But it protected five people.” | “It did, and we keep what worked.” Marrick moves the sixth marker inside the line. “Then we fix the part that left one person out.” |
 
 **Offer:** “Come with me. My party needs routines that still work when nobody has attention left to
 spare. Build them with us, beginning with the person who cannot use them.”
@@ -175,7 +175,7 @@ unchanged place, and I have already asked this one a question.”
 
 ## Atlas disposition fields
 
-Create six meeting-object rows and eighteen exchange rows with `Draft / needs Aimee review`, this
-document as provenance and exact-text hashes. Review state remains external to content JSON and
-campaign saves. Revised copy inherits semantic IDs but never inherits a Good flag across a stale
-hash without explicit review.
+Create six meeting-object rows and eighteen exchange rows with `Playable / unreviewed`, this document
+as provenance and exact-text hashes. That state invites playtest feedback but does not block coherent
+copy from entering play. Review state remains external to content JSON and campaign saves. Revised
+copy inherits semantic IDs but never inherits a Good flag across a stale hash.
