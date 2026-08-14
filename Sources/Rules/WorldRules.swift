@@ -519,7 +519,12 @@ enum WorldRules {
         guard !state.reality.library.hasFound(id), let page = ContentCatalog.shared.diaryPage(id) else {
             return []
         }
-        state.reality.library.foundPages.append(id)
+        let run = state.worlds.activeRun
+        let worldID = run.map { InstanceID(rawValue: $0.mapSeed) }
+        let siteID = run.flatMap { current in
+            current.sites.first { $0.position == current.playerPosition }?.siteID
+        }
+        state.reality.library.recordPage(id, worldRecordID: worldID, siteID: siteID)
         state.reality.library.pagesWaiting[id] = nil
         if state.reality.library.patiencePage == id {
             state.reality.library.patiencePage = nil

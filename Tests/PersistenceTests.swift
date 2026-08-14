@@ -31,6 +31,21 @@ final class PersistenceTests: XCTestCase {
         XCTAssertFalse(encoded.contains("lead_pencil"))
     }
 
+    func testLegacyRecoveredPagesMigrateInOrderWithoutInventingProvenance() throws {
+        let data = Data(#"{"foundPages":["mara_where_0","retired_unknown","mara_where_0"]}"#.utf8)
+        let decoded = try JSONDecoder().decode(LibraryState.self, from: data)
+
+        XCTAssertEqual(decoded.recoveredPages.map(\.pageID), ["mara_where_0", "retired_unknown"])
+        XCTAssertEqual(decoded.recoveredPages.map(\.discoverySequence), [0, 1])
+        XCTAssertTrue(decoded.recoveredPages.allSatisfy {
+            $0.foundInOutcomeID == nil && $0.foundInWorldRecordID == nil && $0.foundAtSiteID == nil
+        })
+
+        let roundTrip = try JSONDecoder().decode(
+            LibraryState.self, from: JSONEncoder().encode(decoded))
+        XCTAssertEqual(roundTrip, decoded)
+    }
+
     private final class CountingIO: GamePersistenceIO, @unchecked Sendable {
         let wrapped: SaveFileIO
         private let lock = NSLock()

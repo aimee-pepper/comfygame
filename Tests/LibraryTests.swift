@@ -6,6 +6,34 @@ import XCTest
 @MainActor
 final class LibraryTests: XCTestCase {
 
+    func testRecoveredPageReceiptFreezesFirstWorldSiteAndOutcomeWithoutDuplication() {
+        var library = LibraryState()
+        let page: DiaryPageID = "mara_where_0"
+        let world = InstanceID(rawValue: 701)
+        let site: SiteID = "ruined_archive"
+        let outcome = ExpeditionOutcomeID(rawValue: 19)
+
+        library.recordPage(page, worldRecordID: world, siteID: site)
+        library.recordPage(page, worldRecordID: InstanceID(rawValue: 999), siteID: "other")
+        library.attachOutcome(outcome, toWorld: world)
+
+        XCTAssertEqual(library.recoveredPages, [RecoveredPageRecord(
+            pageID: page, discoverySequence: 0, foundInOutcomeID: outcome,
+            foundInWorldRecordID: world, foundAtSiteID: site)])
+        XCTAssertEqual(library.foundPages, [page])
+    }
+
+    func testOutcomeAttachmentChangesOnlyReceiptsFromThatExactWorld() {
+        var library = LibraryState()
+        library.recordPage("mara_where_0", worldRecordID: InstanceID(rawValue: 11), siteID: nil)
+        library.recordPage("edren_where_0", worldRecordID: InstanceID(rawValue: 12), siteID: nil)
+
+        library.attachOutcome(31, toWorld: InstanceID(rawValue: 12))
+
+        XCTAssertNil(library.recoveredPages[0].foundInOutcomeID)
+        XCTAssertEqual(library.recoveredPages[1].foundInOutcomeID, 31)
+    }
+
     // MARK: Distance is difficulty of description
 
     /// A traveller is not "N worlds away" — they are *at a signature*, and what varies is how hard

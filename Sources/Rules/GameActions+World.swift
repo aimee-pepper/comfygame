@@ -464,6 +464,8 @@ extension GameStore {
                 if run.satchelItems.stacks[index].isEmpty { run.satchelItems.stacks.remove(at: index) }
             }
             let outcomeID = state.worlds.mintOutcomeID()
+            state.reality.library.attachOutcome(outcomeID,
+                                                toWorld: InstanceID(rawValue: run.mapSeed))
             let banked = GameStore.bankHaul(of: run, outcomeID: outcomeID,
                                             into: &state, fraction: 1.0)
             if let index = state.worlds.anchoredRealms.firstIndex(where: { $0.runIndex == run.runIndex }) {
@@ -499,6 +501,8 @@ extension GameStore {
         mutate("run ended: \(reason)", flush: true) { state in
             guard var run = state.worlds.activeRun else { return }
             let outcomeID = state.worlds.mintOutcomeID()
+            state.reality.library.attachOutcome(outcomeID,
+                                                toWorld: InstanceID(rawValue: run.mapSeed))
             let fraction = min(1, max(0, run.tuning.collapseRecoveryFraction))
             let banked = GameStore.bankHaul(of: run, outcomeID: outcomeID,
                                             into: &state, fraction: fraction, rng: &run.rng)

@@ -5,6 +5,9 @@ import Foundation
 /// Lives in the **Reality** layer: pages read and people found are knowledge, and knowledge is
 /// never taken back. A collapse can cost you a haul; it can't cost you a page you've already read.
 struct LibraryState: Codable, Equatable, Sendable {
+    /// Canonical first-recovery receipts. `foundPages` remains a compatibility projection while
+    /// older saves and callers migrate to these provenance-bearing records.
+    var recoveredPages: [RecoveredPageRecord] = []
     /// Pages recovered, in the order found.
     var foundPages: [DiaryPageID] = []
     /// Anonymous notes recovered from worlds. These never affect diary completion or patience.
@@ -47,11 +50,37 @@ struct LibraryState: Codable, Equatable, Sendable {
             "halloway_lead_pencil": "halloway_brush_ferrule",
             "isolde_lead_pencil": "isolde_brush_hand"
         ]
+        let decodedRecords = try c.decodeIfPresent([RecoveredPageRecord].self,
+                                                   forKey: .recoveredPages) ?? []
         let decodedPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .foundPages) ?? []
-        foundPages = decodedPages.reduce(into: []) { result, page in
+        let canonicalPages = decodedPages.reduce(into: [DiaryPageID]()) { result, page in
             let canonical = aliases[page] ?? page
-            if !result.contains(canonical) { result.append(canonical) }
+            if !result.contains(where: { $0 == canonical }) { result.append(canonical) }
         }
+        if decodedRecords.isEmpty {
+            recoveredPages = canonicalPages.enumerated().map {
+                RecoveredPageRecord(pageID: $0.element, discoverySequence: $0.offset)
+            }
+        } else {
+            recoveredPages = decodedRecords.sorted {
+                $0.discoverySequence < $1.discoverySequence
+            }.reduce(into: [RecoveredPageRecord]()) { result, record in
+                var canonical = record
+                canonical.pageID = aliases[record.pageID] ?? record.pageID
+                guard !result.contains(where: { $0.pageID == canonical.pageID }) else { return }
+                result.append(canonical)
+            }
+            for page in canonicalPages where !recoveredPages.contains(where: { $0.pageID == page }) {
+                recoveredPages.append(RecoveredPageRecord(
+                    pageID: page, discoverySequence: recoveredPages.count))
+            }
+            recoveredPages = recoveredPages.enumerated().map { offset, record in
+                var canonical = record
+                canonical.discoverySequence = offset
+                return canonical
+            }
+        }
+        foundPages = recoveredPages.map(\.pageID)
         foundWritings = try c.decodeIfPresent([FoundWritingRecord].self, forKey: .foundWritings) ?? []
         foundTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .foundTravellers) ?? []
         knownTravellers = try c.decodeIfPresent(Set<TravellerID>.self, forKey: .knownTravellers) ?? []
@@ -68,7 +97,26 @@ struct LibraryState: Codable, Equatable, Sendable {
         visitedWorlds = try c.decodeIfPresent([VisitedWorld].self, forKey: .visitedWorlds) ?? []
     }
 
-    func hasFound(_ page: DiaryPageID) -> Bool { foundPages.contains(page) }
+    func hasFound(_ page: DiaryPageID) -> Bool {
+        recoveredPages.contains { $0.pageID == page }
+            || foundPages.contains(where: { $0 == page })
+    }
+
+    mutating func recordPage(_ page: DiaryPageID, worldRecordID: InstanceID?, siteID: SiteID?) {
+        guard !hasFound(page) else { return }
+        recoveredPages.append(RecoveredPageRecord(
+            pageID: page, discoverySequence: recoveredPages.count,
+            foundInWorldRecordID: worldRecordID, foundAtSiteID: siteID))
+        foundPages = recoveredPages.map(\.pageID)
+    }
+
+    mutating func attachOutcome(_ outcomeID: ExpeditionOutcomeID, toWorld worldID: InstanceID) {
+        for index in recoveredPages.indices
+        where recoveredPages[index].foundInWorldRecordID == worldID
+            && recoveredPages[index].foundInOutcomeID == nil {
+            recoveredPages[index].foundInOutcomeID = outcomeID
+        }
+    }
 
     mutating func applyTravellerArrival(_ receipt: TravellerArrivalReceipt) {
         guard let id = receipt.selectedTraveller else { return }
@@ -104,6 +152,24 @@ struct LibraryState: Codable, Equatable, Sendable {
             .compactMap { ContentCatalog.shared.diaryPage($0) }
             .filter { $0.kind == .locationClue && $0.about == traveller }
             .compactMap(\.clueIndex))
+    }
+}
+
+struct RecoveredPageRecord: Codable, Equatable, Sendable {
+    var pageID: DiaryPageID
+    var discoverySequence: Int
+    var foundInOutcomeID: ExpeditionOutcomeID?
+    var foundInWorldRecordID: InstanceID?
+    var foundAtSiteID: SiteID?
+
+    init(pageID: DiaryPageID, discoverySequence: Int,
+         foundInOutcomeID: ExpeditionOutcomeID? = nil,
+         foundInWorldRecordID: InstanceID? = nil, foundAtSiteID: SiteID? = nil) {
+        self.pageID = pageID
+        self.discoverySequence = discoverySequence
+        self.foundInOutcomeID = foundInOutcomeID
+        self.foundInWorldRecordID = foundInWorldRecordID
+        self.foundAtSiteID = foundAtSiteID
     }
 }
 
