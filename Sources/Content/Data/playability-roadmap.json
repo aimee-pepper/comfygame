@@ -1,18 +1,117 @@
 {
-  "schemaVersion": 1,
-  "updated": "13 Aug 2026",
-  "installedCheckpoint": "0eac8a0 · signed Debug build 234 / version 0.1 installed at 14:32 without launch (bundled claim; not device introspection)",
+  "schemaVersion": 3,
+  "updated": "14 Aug 2026",
   "essenceBaseline": "a816113",
-  "currentWork": "P1 combat-v2 · Breaking Blow exact consumer",
-  "currentNote": "HEAD/origin and the latest signed phone install are 0eac8a0; the in-app value is explicitly only a bundled claim. Combat v2 has 23 real scenario consumers through Flense 6bb37ca, while Breaking Blow is the sole active Engineering rules boundary. Recent source-complete economy, return, failure and affliction checkpoints remain phone acceptance work rather than completed playtest evidence. No Attunement work begins before a real Channelworks combat attack exists.",
+  "campaignBands": [
+    {
+      "id": "band-0",
+      "title": "Band 0 · Testable shell",
+      "reach": "Before starting or loading a campaign",
+      "itemIDs": ["launch-handoff", "save-slots", "bug-reporter", "spatial-ui"]
+    },
+    {
+      "id": "band-1",
+      "title": "Band 1 · First world, fight and return",
+      "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
+      "itemIDs": ["encounter-scaling", "essence", "starter-world-pages", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
+    },
+    {
+      "id": "band-2",
+      "title": "Band 2 · Opening economy and travellers",
+      "reach": "Worlds 2–8 · levels 2–6 · Vance, Noll, Halloway",
+      "itemIDs": ["rune-dictionary", "saved-page-templates", "traveller-world-pacing", "traveller-clue-distribution", "trading-post-stock-breadth", "recycler", "maker-stations", "item-popover", "item-character-identities", "library-collection-accuracy", "authored-text-first-review", "legacy-token-quirk-cleanup"]
+    },
+    {
+      "id": "band-3",
+      "title": "Band 3 · Early knowledge and choices",
+      "reach": "Worlds 5–15 · levels 4–10 · Mara through Orsa",
+      "itemIDs": ["wild-world-pages", "early-knowledge-stations", "combat-tree-opening-choices", "refining", "constellation-first-slice", "penmanship-native"]
+    },
+    {
+      "id": "band-4",
+      "title": "Band 4 · Midgame survival and one build",
+      "reach": "Worlds 10–30 · levels 8–15 · Talin through Lys",
+      "itemIDs": ["midgame-stations", "apothecary-reachability", "scent-mask", "combat-tree-first-route"]
+    },
+    {
+      "id": "band-5",
+      "title": "Band 5 · Specialists and alternatives",
+      "reach": "Levels 12–20 · Bracken through Maud",
+      "itemIDs": ["specialist-shops", "combat-tree-alternative-routes"]
+    },
+    {
+      "id": "band-6",
+      "title": "Band 6 · Late specialists and simulation",
+      "reach": "Level 18+ · Marrick through Auber",
+      "itemIDs": ["authored-world-blueprints", "late-specialist-stations", "channelworks-restoration-receipt", "compound-hostility-authority", "living-world-predation"]
+    },
+    {
+      "id": "band-7",
+      "title": "Band 7 · Anchoring and endgame",
+      "reach": "Ashe through Nine · long campaign",
+      "itemIDs": ["anchorage-settlement", "person-placement", "anchored-production", "combat-tree-v2", "great-work", "final-art-replacement", "dynamic-authority-audit", "tutorial-completion"]
+    }
+  ],
   "items": [
     {
+      "id": "starter-world-pages",
+      "priority": "B1.4",
+      "title": "Three consumable starting World Pages",
+      "status": "queued",
+      "detail": "Give new campaigns three distinct affordable read-only curated pages after their exact marks and seeded level-one worlds pass Design review. They remain optional and consume only on successful departure.",
+      "gate": "Three exact instances survive relaunch, never consume on refusal/failure-before-commit, enter World History after binding, preserve continuation runway and produce survivable distinct opening worlds without hidden enemy nerfs.",
+      "workstream": "design",
+      "isPrimary": false
+    },
+    {
+      "id": "rune-dictionary",
+      "priority": "B2.1",
+      "title": "Known and unknown Rune Dictionary",
+      "status": "queued",
+      "detail": "Add a Library grid backed by durable typed encounters: known vocabulary shows its meaning, while a seen but unidentified glyph remains ?? until a legitimate acquisition teaches it.",
+      "gate": "Old saves decode, starter knowledge is known, repeated sightings are idempotent, hidden catalogue names/effects never leak, legitimate teaching promotes the same entry and phone presentation remains compact.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "saved-page-templates",
+      "priority": "B2.2",
+      "title": "Reusable player-written page Templates",
+      "status": "queued",
+      "detail": "Save, name, load, rename and delete up to 20 exact player-authored page layouts. Loading replaces the editable draft after confirmation but never binds or waives ordinary cost.",
+      "gate": "The complete current Page representation round-trips; loaded marks receive fresh instance IDs; dirty drafts and overwrite/delete confirm; collected pages cannot be copied; relaunch and ordinary binding remain exact. Ink is added only when its canonical production receipt exists.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "wild-world-pages",
+      "priority": "B3.1",
+      "title": "Collected World Pages in expeditions",
+      "status": "queued",
+      "detail": "After the opening loop, add unique and repeatable curated pages as physical expedition finds with provenance, read-only unknown glyphs and exact-instance consumption.",
+      "gate": "Drops never replace guaranteed writing, failure/capacity/recap are truthful, unique pages cannot duplicate, unknown meanings do not leak and successful binding alone consumes the selected instance.",
+      "workstream": "design",
+      "isPrimary": false
+    },
+    {
+      "id": "authored-world-blueprints",
+      "priority": "B6.0",
+      "title": "Handcrafted story-world blueprints",
+      "status": "paused",
+      "detail": "World Pages may later reference fixed or constrained map blueprints for storyline worlds. This waits until generation, encounters, sites and persistence are stable enough to pin safely.",
+      "gate": "Blueprint versioning distinguishes fixed facts from permitted variation, preserves save/history identity, and never masquerades a curated procedural page as a handcrafted map.",
+      "workstream": "design",
+      "isPrimary": false
+    },
+    {
       "id": "essence",
-      "priority": "B0",
+      "priority": "B1.2",
       "title": "Essence continuation",
       "status": "readyToTest",
       "detail": "Recommended 5–7 drops × 2–3 raw is installed. Measure it; do not retune from memory.",
-      "gate": "Three ordinary returns now, building toward ten; another ordinary authored bind remains affordable."
+      "gate": "Three ordinary returns now, building toward ten; another ordinary authored bind remains affordable.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "awareness",
@@ -20,7 +119,9 @@
       "title": "Awareness housekeeping",
       "status": "complete",
       "detail": "Complete in 5731aa9: 837 tests passed; combined checkpoint installed and launched on iPhone.",
-      "gate": "Passed. Preserve scope; field play observations return through ordinary bug triage."
+      "gate": "Passed. Preserve scope; field play observations return through ordinary bug triage.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "outcome",
@@ -28,7 +129,9 @@
       "title": "Atomic expedition outcome",
       "status": "complete",
       "detail": "Complete in c34e5a9. One monotonic receipt makes return-driven consumers idempotent across relaunch and anchored revisits.",
-      "gate": "Passed; preserve the receipt contract as Recycler and later production consume outcomes."
+      "gate": "Passed; preserve the receipt contract as Recycler and later production consume outcomes.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "trading-post",
@@ -36,7 +139,9 @@
       "title": "Sell-first Trading Post",
       "status": "complete",
       "detail": "Installed merchant stock, gold, safe selling and idempotent stock refresh. Internal and player-facing naming agree on Trading Post.",
-      "gate": "Preserve sell/cancel/reload, locks and anti-loop behavior during later economy UI work."
+      "gate": "Preserve sell/cancel/reload, locks and anti-loop behavior during later economy UI work.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "trading-post-stock-breadth",
@@ -44,7 +149,9 @@
       "title": "Complete the merchant shelves",
       "status": "readyToTest",
       "detail": "Source-complete in 9ab833d: persisted refreshes freeze mixed resource, known consumable, exact material-sample and ordinary tier-1 equipment stock; the no-owned-weapon rule limits the first gear offer to a weapon, while weapon-owning campaigns may receive any ordinary tier-1 slot.",
-      "gate": "Decision258/DRQ-181: frozen stable purchase identity, exact sample preservation, knowledge eligibility, persisted no-weapon/weapon-owned refresh, capacity-safe Waiting, stale/unaffordable no-op and unique/apex/narrative exclusion all pass; phone buys mixed stock without reroll or duplication."
+      "gate": "Decision258/DRQ-181: frozen stable purchase identity, exact sample preservation, knowledge eligibility, persisted no-weapon/weapon-owned refresh, capacity-safe Waiting, stale/unaffordable no-op and unique/apex/narrative exclusion all pass; phone buys mixed stock without reroll or duplication.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "vance",
@@ -52,7 +159,9 @@
       "title": "Vance first + 10e Trading Post",
       "status": "complete",
       "detail": "Vance is the first intended find and sole Trading Post owner; the 10-Essence construction path is installed.",
-      "gate": "Preserve fresh/old-save reachability and opening Essence runway."
+      "gate": "Preserve fresh/old-save reachability and opening Essence runway.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "recycler",
@@ -60,7 +169,9 @@
       "title": "Noll and the player-facing Recycler",
       "status": "readyToTest",
       "detail": "Implemented and green: Noll is the 29th live traveller; the 15-Essence Recycler has a distinct Make route and atomic receipt-first recovery screen; station runway preview and corrected Sela/Halloway review IDs are included. Field Separation Kit remains held. Signed phone installation is waiting for Aimee's active fresh-save traveller test to finish.",
-      "gate": "Use opening-economy-trio-promotion-audit-current.md: 29-live catalogue, Noll band0/order2/signature, 15-Essence build, dormant old-state migration, atomic Recycler phone route, no Field Kit, corrected Sela/Halloway exchange IDs and complete sell→recycle→make→bind runway proof."
+      "gate": "Use opening-economy-trio-promotion-audit-current.md: 29-live catalogue, Noll band0/order2/signature, 15-Essence build, dormant old-state migration, atomic Recycler phone route, no Field Kit, corrected Sela/Halloway exchange IDs and complete sell→recycle→make→bind runway proof.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "anchorage-settlement",
@@ -68,7 +179,9 @@
       "title": "Safe Anchorage settlement",
       "status": "readyToTest",
       "detail": "Every due realm now requires an explicit Sustain or Let rest choice. The sticky summary shows payment, remaining Essence, authored-bind runway and rest count; incomplete or unaffordable matrices are rejected before mutation.",
-      "gate": "On phone, no-touch Confirm remains disabled; a mixed decision pays only sustained realms, rests only named realms and keeps every realm recoverable."
+      "gate": "On phone, no-touch Confirm remains disabled; a mixed decision pays only sustained realms, rests only named realms and keeps every realm recoverable.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "person-placement",
@@ -76,15 +189,19 @@
       "title": "Exclusive person placement",
       "status": "readyToTest",
       "detail": "Firepit transfers now distinguish Home, active Party and realm postings; taking a worker previews and atomically applies production/shortfall changes, returning sends them Home, and contradictory legacy projections reconcile deterministically.",
-      "gate": "Phone flow cannot leave one person travelling and producing remotely; keeper benefits pause visibly; Binder-only parties survive relaunch. Stable-ID migration remains one later cross-system boundary."
+      "gate": "Phone flow cannot leave one person travelling and producing remotely; keeper benefits pause visibly; Binder-only parties survive relaunch. Stable-ID migration remains one later cross-system boundary.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "save-slots",
-      "priority": "P0",
+      "priority": "B0.2",
       "title": "Start, load and delete saves",
       "status": "readyToTest",
       "detail": "Checkpointed through b3bc410: post-loading Continue/New/Load chooser, independent autosaves, lossless legacy adoption, safe details/delete/export, Settings return without relaunch, active-slot-first Continue semantics and progression-driven campaign shelves.",
-      "gate": "Existing single save migrates losslessly; new games never overwrite another slot; Continue chooses the persisted active valid slot then falls back to the most recently played valid slot; delete requires explicit confirmation and cannot strand the app; corrupted or incompatible slots fail visibly without harming healthy saves."
+      "gate": "Existing single save migrates losslessly; new games never overwrite another slot; Continue chooses the persisted active valid slot then falls back to the most recently played valid slot; delete requires explicit confirmation and cannot strand the app; corrupted or incompatible slots fail visibly without harming healthy saves.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "noll",
@@ -92,7 +209,9 @@
       "title": "Noll second + Halloway third",
       "status": "complete",
       "detail": "Complete in aaf6280: Noll is live at order 2/story-arrival band 0 as sole Recycler owner with provisional copy; Halloway remains order 3. The Field Separation Kit remains absent and old saves receive no free Noll.",
-      "gate": "Fresh-save signature/one-person selection, provisional-copy census, meeting/recruitment, 15e Recycler construction, sell-versus-recycle runway and old-save dormant-state migration are green without a free Noll or Field Separation Kit."
+      "gate": "Fresh-save signature/one-person selection, provisional-copy census, meeting/recruitment, 15e Recycler construction, sell-versus-recycle runway and old-save dormant-state migration are green without a free Noll or Field Separation Kit.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "terrain",
@@ -100,7 +219,9 @@
       "title": "Terrain border correction",
       "status": "complete",
       "detail": "Lifted-terrain conformance and resource v0.6 are installed through b709e7c.",
-      "gate": "Reopen only for a contradictory physical-phone screenshot and exact location."
+      "gate": "Reopen only for a contradictory physical-phone screenshot and exact location.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "spatial-ui",
@@ -108,7 +229,9 @@
       "title": "Spatial game hubs",
       "status": "readyToTest",
       "detail": "Library author-vs-subject indexes, compact Party fit, six-across Storehouse resources and the four-section Base destination board are checkpointed.",
-      "gate": "Full suite plus 368×800 and large-text inspection before the next phone install."
+      "gate": "Full suite plus 368×800 and large-text inspection before the next phone install.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "maker-stations",
@@ -116,7 +239,9 @@
       "title": "Maker-station workflows",
       "status": "readyToTest",
       "detail": "Blacksmith Make/Reforge/Learn now proves the shared shell: three-across rules-owned families, six-across exact worn/stored/waiting targets, requirement sockets, anchored stock detail and atomic stale rejection.",
-      "gate": "Aimee verifies the Blacksmith flow on phone; Tannery/Bowyer/Armoury/Weaponsmith reuse the shell without copying thresholds or flattening their distinct verbs."
+      "gate": "Aimee verifies the Blacksmith flow on phone; Tannery/Bowyer/Armoury/Weaponsmith reuse the shell without copying thresholds or flattening their distinct verbs.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "constellation-first-slice",
@@ -124,7 +249,9 @@
       "title": "Truthful one-star Constellation",
       "status": "readyToTest",
       "detail": "The single live Long Instruction is now one centred stateful star with anchored detail, campaign-scoped effect copy and atomic no-op rejection for insufficient or duplicate purchase attempts.",
-      "gate": "Phone proof preserves wallet, star state, exact 0/1 rank and Mote cost without implying a reset, prestige loop or unavailable constellation graph."
+      "gate": "Phone proof preserves wallet, star state, exact 0/1 rank and Mote cost without implying a reset, prestige loop or unavailable constellation graph.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "field-controls",
@@ -132,7 +259,9 @@
       "title": "Look + fixed field controls",
       "status": "readyToTest",
       "detail": "D-pad stays left; minimap stays right; Interact and Look are the only two buttons beneath it. Look retains zero-turn adjacent inspection and Interact owns the current tile action without adding vertical control rows.",
-      "gate": "368×800 shows the complete satchel/event row above the fixed pane, both action buttons below the minimap, exact movement/hazard parity, zero Look mutation and no white lifted-tile seams."
+      "gate": "368×800 shows the complete satchel/event row above the fixed pane, both action buttons below the minimap, exact movement/hazard parity, zero Look mutation and no white lifted-tile seams.",
+      "workstream": "engineering",
+      "isPrimary": false
     },
     {
       "id": "launch-handoff",
@@ -140,7 +269,9 @@
       "title": "Launch-screen handoff alignment",
       "status": "readyToTest",
       "detail": "Commit 29abf52/build 234 aligns the advancing SwiftUI loader to the static launch screen's safe-area center while preserving truthful progress. The later signed 4ed15ab Homework build is installed; physical launch acceptance remains blocked only by trusting the development profile on-device.",
-      "gate": "Ordinary-phone evidence records exact installed commit plus OS static, first SwiftUI, shelf-ready and selected-save-ready timestamps; no black/unowned interval remains; selected-save progress still advances; static, initial and save-loading compositions align; and the slowest phase is safely reduced or truthfully covered."
+      "gate": "Ordinary-phone evidence records exact installed commit plus OS static, first SwiftUI, shelf-ready and selected-save-ready timestamps; no black/unowned interval remains; selected-save progress still advances; static, initial and save-loading compositions align; and the slowest phase is safely reduced or truthfully covered.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "encounter-opening",
@@ -148,7 +279,9 @@
       "title": "Persisted encounter opening authority",
       "status": "readyToTest",
       "detail": "Approach, mutual contact, creature ambush and explicit scripted policy now freeze before action from disclosed state. Slippery, Watchful, Unseen and Ambush share that saved fact; foe-only opening actions preserve ordinary initiative.",
-      "gate": "Phone encounters preserve visible approach versus genuine ambush, Watchful suppresses without reclassifying, concealed actors redirect only while another target exists, and relaunch never rerolls the opening."
+      "gate": "Phone encounters preserve visible approach versus genuine ambush, Watchful suppresses without reclassifying, concealed actors redirect only while another target exists, and relaunch never rerolls the opening.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "item-popover",
@@ -156,7 +289,9 @@
       "title": "Anchored item details",
       "status": "readyToTest",
       "detail": "Trading Post, Storehouse, Gear and Loot grids use one anchored compact-detail presenter with accessibility sheet fallback.",
-      "gate": "Popover remains on-screen at every edge, supports large text and preserves action state."
+      "gate": "Popover remains on-screen at every edge, supports large text and preserves action state.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "refining",
@@ -164,7 +299,9 @@
       "title": "Spring refining skills",
       "status": "readyToTest",
       "detail": "Source-green reversible profile: the Essence Spring solely owns exact selected/all conversion at 1 Raw → 2 Essence; Second pass requires 50 lifetime committed Raw plus 80 Essence/10 Quartz and changes future conversion to 1 Raw → 3 Essence; Continuous settling auto-refines only newly retained Raw once per outcome; Deepen remains a parallel dividend branch.",
-      "gate": "Fresh/legacy saves preserve balances and Deepen completion; Workshop has no refinery claim; committed practice is exact and idempotent; 1 Raw → 2/3 Essence previews share rules; auto-refining handles retained outcomes once; phone/Large Text Spring graph fits without routine scrolling. Authority: essence-spring-review-batch-current.md and Decision186."
+      "gate": "Fresh/legacy saves preserve balances and Deepen completion; Workshop has no refinery claim; committed practice is exact and idempotent; 1 Raw → 2/3 Essence previews share rules; auto-refining handles retained outcomes once; phone/Large Text Spring graph fits without routine scrolling. Authority: essence-spring-review-batch-current.md and Decision186.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "world-color",
@@ -172,7 +309,9 @@
       "title": "Meaningful world color differentiation",
       "status": "readyToTest",
       "detail": "Checkpoint bd2b5d2 integrates the accepted pack, frozen game-owned bind adapter, canonical receipt self-hash, immutable run/History persistence and exact native renderer/cache selection. No raw Illumination/Vitality or temperature/wetness tint is used.",
-      "gate": "New binds freeze the exact accepted descriptor while legacy bound/anchored worlds remain world-grade-1; save/load/redraw/cache/fog/geometry tests pass; native color and literal grayscale show proportionate differentiation while similar worlds may remain related. Authority: docs/world-color-differentiation-current.md and docs/world-grade-2-native-handoff-current.md."
+      "gate": "New binds freeze the exact accepted descriptor while legacy bound/anchored worlds remain world-grade-1; save/load/redraw/cache/fog/geometry tests pass; native color and literal grayscale show proportionate differentiation while similar worlds may remain related. Authority: docs/world-color-differentiation-current.md and docs/world-grade-2-native-handoff-current.md.",
+      "workstream": "acceptance",
+      "isPrimary": true
     },
     {
       "id": "bug-reporter",
@@ -180,7 +319,9 @@
       "title": "In-game bug reporter",
       "status": "readyToTest",
       "detail": "Local capture, durable queue, canonical on-demand export, exact route/encounter context, privacy-safe campaign reference, active DEBUG tuning, a bounded 20-action semantic trail and an idempotent HTTPS relay adapter are checkpointed. cae4b7a adds a tolerant, read-only frozen encounter-scaling evidence payload for balance reports. f9be251 labels local Save/Done honestly and proves they make zero transport calls. Direct delivery remains disabled until an approved relay endpoint and Keychain credential exist.",
-      "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete."
+      "gate": "Verify save, dismiss, relaunch and Share on phone; real idempotent relay receipt remains required before calling direct submission complete.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "dynamic-authority-audit",
@@ -188,15 +329,19 @@
       "title": "Static/manual authority audit",
       "status": "queued",
       "detail": "The 13 Aug whole-game conformance ledger is current in design-implementation-conformance-audit-current.md; static/manual duplication remains detailed in static-manual-authority-audit-current.md. Combat schema-2 generation, Effect-copy linkage and normal freshness checks are green. Remaining systemic work is roadmap schema 2/build provenance, atlas review union, catalogue-owned Trading Post/Recycler classifications and a generated current-document drift report.",
-      "gate": "Combat and meeting generators pass normal freshness checks; roadmap summaries/build identity derive; review union includes draft-only identities without release promotion; catalogue classifications fail closed; history remains dated and authored judgment is never generated."
+      "gate": "Combat and meeting generators pass normal freshness checks; roadmap summaries/build identity derive; review union includes draft-only identities without release promotion; catalogue classifications fail closed; history remains dated and authored judgment is never generated.",
+      "workstream": "engineering",
+      "isPrimary": false
     },
     {
       "id": "encounter-scaling",
-      "priority": "P0",
+      "priority": "B1.3",
       "title": "Party and apex difficulty",
-      "status": "readyToTest",
+      "status": "inProgress",
       "detail": "Binder-anchored additive power, path-honest visible grouping, proportional encounter HP, saved 55% affliction-free follow-ups and apex-only scaling are integrated but not balance-accepted. Aimee's first new-save encounter killed the party in a possibly Teeming world; more samples are in progress before retuning.",
-      "gate": "After the active launch repair, compare level-1 Binder+Quill normal versus Teeming ordinary contacts with exact scaling receipts. Normal opening fights should usually last 2–4 rounds and spend about 5–20% aggregate HP, not routinely defeat the party. If failure repeats, isolate baseline stats, abundance/world level, grouping or species matchup before tuning. Then complete two-/five-person ordinary and apex phone bands."
+      "gate": "After the active launch repair, compare level-1 Binder+Quill normal versus Teeming ordinary contacts with exact scaling receipts. Normal opening fights should usually last 2–4 rounds and spend about 5–20% aggregate HP, not routinely defeat the party. If failure repeats, isolate baseline stats, abundance/world level, grouping or species matchup before tuning. Then complete two-/five-person ordinary and apex phone bands.",
+      "workstream": "engineering",
+      "isPrimary": true
     },
     {
       "id": "item-character-identities",
@@ -204,15 +349,139 @@
       "title": "Recognizable item and character tiles",
       "status": "queued",
       "detail": "Checkpoint 0911e2c freezes strict generated command/raster validation and carries stable ItemID through Storehouse, loot, equipment, Blacksmith and Trading Post. Existing fallbacks remain until Aimee provides the immutable catalogue-items-v1 art/registry.",
-      "gate": "Stable authored identity survives Storehouse, loot, equipment, Trading Post and Recycler; named-character identity survives map, Party and Library; rarity, stats and array order never invent identity."
+      "gate": "Stable authored identity survives Storehouse, loot, equipment, Trading Post and Recycler; named-character identity survives map, Party and Library; rarity, stats and array order never invent identity.",
+      "workstream": "asset",
+      "isPrimary": true
     },
     {
       "id": "combat-tree-v2",
       "priority": "P1",
       "title": "True combat trees and complete node consumers",
-      "status": "inProgress",
-      "detail": "Twenty-three nodes now have real scenario consumers through 6bb37ca: the prior derived-stat/armour/evasion/affliction slices plus Feint, Untouchable, Follow Through, Bracing Stance, Weak Point, Exploit, Pry, Finish, Steady Hand and Flense. The exact 20-action registry has 19 implementation-ready semantic contracts; Shatter alone is held at DRQ-197. Distiller remains a separate passive-economy review. Attunement waits on a real Channelworks combat attack, and Light Touch/Momentum wait on the wider gear-tempo receipt. Production promotion still requires every shared consumer plus no inert or contradictory node.",
-      "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md."
+      "status": "paused",
+      "detail": "Twenty-three implemented consumers are preserved. Blanket work across all 72 nodes is parked until the campaign reaches endgame; near-term combat work is split into opening choices, one midgame route and later alternatives.",
+      "gate": "All 72 stable node IDs have scenario-level consumer coverage; migration loses no points; the phone graph preserves every authored prerequisite and exact Effect copy without reverting to buy-next lists. Authority: DRQ-146/150 and combat-tree-v2-consumer-plan-current.md.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "combat-tree-opening-choices",
+      "priority": "B3.7",
+      "title": "First three combat-point choices",
+      "status": "queued",
+      "detail": "Implement and phone-test only the roots and forks a real early campaign can buy with its first three earned points. Deeper unsupported nodes remain unavailable rather than inert.",
+      "gate": "A level-appropriate fresh campaign can make three genuine branching purchases; every visible choice mutates play, prerequisites are truthful, migration loses no points, and the graph never becomes a buy-next list.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "early-knowledge-stations",
+      "priority": "B3.1",
+      "title": "Mara through Orsa early contributions",
+      "status": "queued",
+      "detail": "Promote Survey Post, Reliquary, Scriptorium, Wayfarer's Table and the coherent Bryn/Orsa contributions only after the opening economy loop passes.",
+      "gate": "Each recruited early traveller has a reachable, distinct first payoff used in a real expedition; no decorative room or implied late breadth counts.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "combat-tree-first-route",
+      "priority": "B4.7",
+      "title": "First complete combat route",
+      "status": "queued",
+      "detail": "Complete one representative eight-point route only when Aimee has a save within two levels or points of reaching it.",
+      "gate": "One naturally reached eight-point build has no inert purchase, false Effect copy or missing receipt, and remains viable against accepted midgame scaling.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "midgame-stations",
+      "priority": "B4.1",
+      "title": "Talin through Lys midgame contributions",
+      "status": "paused",
+      "detail": "Talin, Nessa, Corrin, Dagg, Rook and Lys become an implementation band after early knowledge and the first combat choices are accepted.",
+      "gate": "Every midgame traveller has a reachable distinct payoff, sustainable inputs and a real consumer in the current campaign band.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "combat-tree-alternative-routes",
+      "priority": "B5.5",
+      "title": "Alternative complete combat routes",
+      "status": "queued",
+      "detail": "Complete the second and third representative routes and reachable hybrids only after one route and the midgame curve are accepted.",
+      "gate": "Three materially different naturally reachable builds have complete consumers and comparable encounter evidence before endgame breadth resumes.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "specialist-shops",
+      "priority": "B5.1",
+      "title": "Armoury, Bowyer and Weaponsmith breadth",
+      "status": "paused",
+      "detail": "Bracken, Fen, Wren, Kestrel and Maud plus their specialist equipment breadth wait until one complete midgame build works.",
+      "gate": "The specialist shops support three materially different builds without duplicating Blacksmith, one another or the magic-weapon maker.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "late-specialist-stations",
+      "priority": "B6.1",
+      "title": "Menagerie, Deep Works, Channelworks and Distillery",
+      "status": "paused",
+      "detail": "Marrick through Auber and their expensive station systems remain parked until the campaign can naturally reach their people and inputs.",
+      "gate": "Every late station has a reachable owner, sustainable inputs, a distinct first payoff and a real downstream consumer.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "living-world-predation",
+      "priority": "B6.7",
+      "title": "Bounded living-world predation",
+      "status": "paused",
+      "detail": "Creature-on-creature simulation waits for ordinary world performance, encounter density and the currently visible core loop to pass.",
+      "gate": "Predation is bounded, observable and performant without destabilizing encounter availability or fresh-save survival.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "anchored-production",
+      "priority": "B7.3",
+      "title": "Anchored production and deliveries",
+      "status": "paused",
+      "detail": "Renewable anchored-world work, deliveries and portfolio management wait until disposable-world progression and Anchorage itself are accepted.",
+      "gate": "Production has durable receipts, visible staffing costs and no duplicate-return or remote-worker contradictions.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
+      "id": "great-work",
+      "priority": "B7.6",
+      "title": "Great Work and endgame boundary",
+      "status": "paused",
+      "detail": "The authored endgame receives dedicated emotional and mechanical review only after the long campaign can reach it; no reset or score loop is assumed.",
+      "gate": "A naturally reached long campaign has a coherent chosen-continuity result with no invented reset, score or ending trigger.",
+      "workstream": "design",
+      "isPrimary": false
+    },
+    {
+      "id": "final-art-replacement",
+      "priority": "B7.7",
+      "title": "Final stable-system art replacement",
+      "status": "paused",
+      "detail": "Functional identity art is replaced broadly only after the systems it depicts stop moving; Band 1/2 readability assets remain allowed now.",
+      "gate": "Every stable system uses an accepted immutable native pack without redoing art for mechanics still under redesign.",
+      "workstream": "asset",
+      "isPrimary": false
+    },
+    {
+      "id": "tutorial-completion",
+      "priority": "B7.8",
+      "title": "Finish tutorial content dead last",
+      "status": "paused",
+      "detail": "Tutorial completion is the final implementation band because the mechanics and UI it teaches are still changing. Existing popup regressions remain ordinary bugs, not tutorial expansion.",
+      "gate": "The complete ordinary UI and mechanics are stable before their final teaching sequence is authored and accepted.",
+      "workstream": "design",
+      "isPrimary": false
     },
     {
       "id": "world-contact",
@@ -220,7 +489,9 @@
       "title": "Deliberate world encounter contact",
       "status": "readyToTest",
       "detail": "Checkpoint cfe236c keeps apex and active-flora adjacency safe, stops long travel before the hazardous final step, begins party-approach combat only on direct entry, and gives neutral truthful Look warnings.",
-      "gate": "Adjacent Look, wait and Interact never start apex/flora combat; direct entry does; ordinary roaming creatures still wake nearby but encounter only on contact. Authority: world-encounter-contact-current.md."
+      "gate": "Adjacent Look, wait and Interact never start apex/flora combat; direct entry does; ordinary roaming creatures still wake nearby but encounter only on contact. Authority: world-encounter-contact-current.md.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "apothecary-reachability",
@@ -228,7 +499,9 @@
       "title": "Make Nessa's Apothecary reachable",
       "status": "readyToTest",
       "detail": "Source-complete in 13f0c13: Nessa owns a persistent 85-Essence Apothecary build path; construction teaches Lesser Salve without granting an item; partial-stock inference remains; recipe IDs, sustainable Essence costs and the distinct Venom/Briar recipes are corrected.",
-      "gate": "Fresh, already-recruited-Nessa and already-built saves prove exactly one atomic Make → build → visible Lesser Salve route; partial inference persists; ordinary recipes including all four coatings cost 0 Essence, Stillwater 6, and Waystone 12 plus one mote; every recipe resource ID resolves exactly; Venom/Briar recipes and four typed one-hit effects match apothecary-coating-identity-current.md; all locked stations validate an explicit lifecycle."
+      "gate": "Fresh, already-recruited-Nessa and already-built saves prove exactly one atomic Make → build → visible Lesser Salve route; partial inference persists; ordinary recipes including all four coatings cost 0 Essence, Stillwater 6, and Waystone 12 plus one mote; every recipe resource ID resolves exactly; Venom/Briar recipes and four typed one-hit effects match apothecary-coating-identity-current.md; all locked stations validate an explicit lifecycle.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "scent-mask",
@@ -236,7 +509,9 @@
       "title": "Prepared animal-avoidance route",
       "status": "queued",
       "detail": "Complete the requested non-skill encounter-avoidance route after Apothecary reachability: Nessa tier-0 Scent Mask consumes one Reagent plus one exact grade-25+ animal world resource, costs 0 Essence, and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation.",
-      "gate": "Exact-instance preview/commit, all animal/flora material boundaries, chemo/mixed/direct-contact sensory matrix, Quiet Step composition, relaunch, protected Field Kit return and 368×800 presentation pass. Authority: scent-mask-first-slice-current.md and Decision155."
+      "gate": "Exact-instance preview/commit, all animal/flora material boundaries, chemo/mixed/direct-contact sensory matrix, Quiet Step composition, relaunch, protected Field Kit return and 368×800 presentation pass. Authority: scent-mask-first-slice-current.md and Decision155.",
+      "workstream": "design",
+      "isPrimary": false
     },
     {
       "id": "channelworks-restoration-receipt",
@@ -244,7 +519,9 @@
       "title": "Separate Oda's restored conduit from repeatable construction",
       "status": "readyToTest",
       "detail": "Channelworks construction already grants Oda's authored Heat Conduit, but the station screen makes the separate player-core conversion look like the same pending restoration. Add/adopt one durable restoration receipt, confirm the restored fixture, and label the repeatable action Build another conduit.",
-      "gate": "Fresh and unlocked-legacy saves, a moved/equipped/sold first fixture, repeated relaunch, and repeatable Heat-core conversion prove exactly one authored entitlement and truthful Oda-to-Auber progression. Authority: channelworks-system-current.md and DRQ-083."
+      "gate": "Fresh and unlocked-legacy saves, a moved/equipped/sold first fixture, repeated relaunch, and repeatable Heat-core conversion prove exactly one authored entitlement and truthful Oda-to-Auber progression. Authority: channelworks-system-current.md and DRQ-083.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "traveller-world-pacing",
@@ -252,7 +529,9 @@
       "title": "Prevent first-world traveller crowds",
       "status": "readyToTest",
       "detail": "Installed from corrected checkpoint 634da20: each new world selects at most one full-signature match through blind frontier, immutable arrival band, causal evidence and stable tie-breaks. The authored-pressure counterfactual rerolls every newly silent target with the same world seed. One frozen confidence roll uses saved near-miss protection; failure substitutes nobody. Fresh-save phone acceptance remains.",
-      "gate": "Mara+Bryn/no-clue, cross/same-band full matches, clue counts, causal counterfactuals, opening order, DEBUG weights/window and seed/shuffle/relaunch prove one stable candidate; then arrival confidence proves 25/62.5/100% at zero/half/all authored, +25 saved near misses, guaranteed third match and no substitute on failure. Authority: traveller-world-pacing-current.md, roster-progression-current.md and traveller-arrival-confidence-review-current.md."
+      "gate": "Mara+Bryn/no-clue, cross/same-band full matches, clue counts, causal counterfactuals, opening order, DEBUG weights/window and seed/shuffle/relaunch prove one stable candidate; then arrival confidence proves 25/62.5/100% at zero/half/all authored, +25 saved near misses, guaranteed third match and no substitute on failure. Authority: traveller-world-pacing-current.md, roster-progression-current.md and traveller-arrival-confidence-review-current.md.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "traveller-clue-distribution",
@@ -260,7 +539,9 @@
       "title": "Keep long diaries from dominating clue drops",
       "status": "readyToTest",
       "detail": "Installed from corrected checkpoint 634da20: ordinary diary discovery selects an average-weighted location-subject or diary-author bucket before selecting the exact page. Context preference, writing rate and the due one-page patience override are preserved; seeded phone/campaign distribution remains to test.",
-      "gate": "Controlled one-page/ten-page buckets have equal aggregate weight; contextual preference still matters; exact patience nominee, writing floor, stable seed/shuffle/relaunch and seeded campaign distribution pass. Authority: traveller-clue-distribution-current.md."
+      "gate": "Controlled one-page/ten-page buckets have equal aggregate weight; contextual preference still matters; exact patience nominee, writing floor, stable seed/shuffle/relaunch and seeded campaign distribution pass. Authority: traveller-clue-distribution-current.md.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "library-collection-accuracy",
@@ -268,7 +549,9 @@
       "title": "Trustworthy Library page indexing",
       "status": "readyToTest",
       "detail": "Implemented at 7a798a6/de2b71b: Diaries groups pages written by an author; People groups clues about a person over the same stable recovered IDs; counts name their basis and unknown legacy IDs remain visible as Older records.",
-      "gate": "On the current phone build, a cross-author page appears through both correct routes without double-counting, recruitment invents no pages, and the four compact tabs/page details remain readable at ordinary and large text. Authority: library-collection-accuracy-current.md."
+      "gate": "On the current phone build, a cross-author page appears through both correct routes without double-counting, recruitment invents no pages, and the four compact tabs/page details remain readable at ordinary and large text. Authority: library-collection-accuracy-current.md.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "authored-text-first-review",
@@ -276,7 +559,9 @@
       "title": "Promote and play-review authored dialogue",
       "status": "readyToTest",
       "detail": "Decision279 makes coherent authored content live by default and uses play as review. Promote the 21 completed missing-live meeting drafts, Noll's replacement candidate, Auber's revision, Isolde's three optional-reply replacements and Sabine's seven-location clue sequence without waiting for prior Atlas ratings. Incomplete or contradictory units remain draft-only.",
-      "gate": "All 29 travellers have coherent live meetings; stable exchange/page IDs, reply order, condition indices and old-save tolerance survive promotion; generated corpus freshness and catalogue-set validation pass; Atlas reviews the same live text; phone play can flag and revise individual units without blocking the rest. Authority: Decision279, traveller-meeting-corpus-plan-current.md and dialogue-review-first-batch-current.md."
+      "gate": "All 29 travellers have coherent live meetings; stable exchange/page IDs, reply order, condition indices and old-save tolerance survive promotion; generated corpus freshness and catalogue-set validation pass; Atlas reviews the same live text; phone play can flag and revise individual units without blocking the rest. Authority: Decision279, traveller-meeting-corpus-plan-current.md and dialogue-review-first-batch-current.md.",
+      "workstream": "design",
+      "isPrimary": true
     },
     {
       "id": "return-receipt-authority",
@@ -284,7 +569,9 @@
       "title": "One trustworthy expedition return receipt",
       "status": "readyToTest",
       "detail": "Source-complete in 07c9aee: every exit uses one rules-owned typed receipt constructor; resource, stackable, unique gear and each material sample freeze stable identity; compatibility rows derive from typed lines; anti-lock subsidy and final runway are frozen atomically.",
-      "gate": "One seeded all-category run through portal, Waystone, collapse, defeat and abandon proves parity, exact retained/lost typed resource/stackable/unique lines, profile/provenance/identified round-trip, duplicate-label safety, atomic banking, relaunch, old receipt decode, six-across anchored detail and one constructor seam. Authority: expedition-return-receipt-current.md and Decision192."
+      "gate": "One seeded all-category run through portal, Waystone, collapse, defeat and abandon proves parity, exact retained/lost typed resource/stackable/unique lines, profile/provenance/identified round-trip, duplicate-label safety, atomic banking, relaunch, old receipt decode, six-across anchored detail and one constructor seam. Authority: expedition-return-receipt-current.md and Decision192.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "penmanship-native",
@@ -292,7 +579,9 @@
       "title": "Brush, ink and Fountain pen progression",
       "status": "queued",
       "detail": "Migrate Pencil to Brush and implement the settled Penmanship fan/fork with Brush-gated sibling Ink Mixing, Compound Assembly and Chaining, then ruling frame and Fountain pen. Decision187 supplies a reversible coherent 40–220 Essence comparison profile rather than preserving the 150-Essence first-hand bottleneck.",
-      "gate": "Legacy IDs/capabilities migrate losslessly; sibling routes stay independent; exact recipes and Low writing runway preview share rules-owned costs; ten ordinary returns measure worlds-to-purchase without anti-lock dependence; phone graph fits without list regression. Authority: penmanship-native-migration-current.md, penmanship-economy-runway-review-current.md and Decision187."
+      "gate": "Legacy IDs/capabilities migrate losslessly; sibling routes stay independent; exact recipes and Low writing runway preview share rules-owned costs; ten ordinary returns measure worlds-to-purchase without anti-lock dependence; phone graph fits without list regression. Authority: penmanship-native-migration-current.md, penmanship-economy-runway-review-current.md and Decision187.",
+      "workstream": "design",
+      "isPrimary": false
     },
     {
       "id": "failure-retention-correctness",
@@ -300,7 +589,9 @@
       "title": "Stack-independent failure retention",
       "status": "readyToTest",
       "detail": "Source-complete in f9ec86c: protected starting property is separated first; exposed discrete and resource property use outcome-wide budgets; exact item/material identity survives deterministic selection; resources use stable largest-remainder apportionment. Player-editable recovery remains a later Homework decision.",
-      "gate": "At 25/50/75%, merged/split discrete stacks and one-kind/many-kind bulk resources produce their exact total budgets; stable item identity survives; bulk ties and automatic item suggestions are outcome-ID deterministic; starting property remains protected; Raw Essence/Motes and relaunch receipts are exact; no agency UI is implied. Authority: failure-recovery-agency-recommendation.md, DRQ-089/179 and Decision193."
+      "gate": "At 25/50/75%, merged/split discrete stacks and one-kind/many-kind bulk resources produce their exact total budgets; stable item identity survives; bulk ties and automatic item suggestions are outcome-ID deterministic; starting property remains protected; Raw Essence/Motes and relaunch receipts are exact; no agency UI is implied. Authority: failure-recovery-agency-recommendation.md, DRQ-089/179 and Decision193.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "compound-hostility-authority",
@@ -308,7 +599,9 @@
       "title": "Replace hidden compound tier fossils coherently",
       "status": "readyToTest",
       "detail": "Source-complete in 5825c3a: the obsolete enemyTierDelta schema, all 21 authored keys and the comparison toggle are removed together. Ordinary compounds now affect population through resolved pressures; typed Danger remains the sole authored hostility-tier authority. Focused DangerTests passed 20/20 and the generic simulator test build succeeded.",
-      "gate": "On phone, compare ordinary and teeming books containing each of Ashen, Rich Ore, Teeming Life, Dim Sky, Gilded Veins and Mote Vein against pressure-equivalent controls at ordinary and large map sizes. Confirm encounter previews, apex behavior, XP/resources and tolerant old books remain truthful; retune only the systemic authority that explains a measured gap. Authority: compound-hostility-fossil-audit-current.md and Decision190."
+      "gate": "On phone, compare ordinary and teeming books containing each of Ashen, Rich Ore, Teeming Life, Dim Sky, Gilded Veins and Mote Vein against pressure-equivalent controls at ordinary and large map sizes. Confirm encounter previews, apex behavior, XP/resources and tolerant old books remain truthful; retune only the systemic authority that explains a measured gap. Authority: compound-hostility-fossil-audit-current.md and Decision190.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "combat-affliction-authority",
@@ -316,7 +609,9 @@
       "title": "Give every affliction one exact owner",
       "status": "readyToTest",
       "detail": "Source-complete in 16fab7a: Burn, Poison, Dazzle and Bleed share one exact-combatant typed collection; cures and Quench use authored membership; Stonebark consumes only for a meaningful standing application; coatings and Barbed/Bloodletter provenance are canonical; legacy paths adopt once without parallel ticking.",
-      "gate": "Burn/Poison/Dazzle/Bleed only; exact ally ownership, independent severity/duration, refresh/coexistence, Barbed single 3×3 instance and dual-legacy adoption, Bloodletter endless distinction, Briar ineligibility, Stonebark one-shot, typed cures, selected Broad Antidote, Bleed-excluding Quench, presentation and tolerant mid-encounter migration pass. Authority: combat-affliction-authority-current.md, barbed-edge-apex-identity-current.md, DRQ-013/177 and Decisions191/200."
+      "gate": "Burn/Poison/Dazzle/Bleed only; exact ally ownership, independent severity/duration, refresh/coexistence, Barbed single 3×3 instance and dual-legacy adoption, Bloodletter endless distinction, Briar ineligibility, Stonebark one-shot, typed cures, selected Broad Antidote, Bleed-excluding Quench, presentation and tolerant mid-encounter migration pass. Authority: combat-affliction-authority-current.md, barbed-edge-apex-identity-current.md, DRQ-013/177 and Decisions191/200.",
+      "workstream": "acceptance",
+      "isPrimary": false
     },
     {
       "id": "legacy-token-quirk-cleanup",
@@ -324,7 +619,9 @@
       "title": "Remove retired Token and Quirk promises",
       "status": "readyToTest",
       "detail": "Decision189 cuts Traveller's Token and the separately rolled Quirk/veto/reroll layer. Scent Mask remains independently justified; paired opportunity/consequence remains systemic. Clean only remaining current/runtime promises while preserving legacy decode aliases and archived rationale.",
-      "gate": "Release/current-copy and route scans expose no Traveller's Token recipe, Quirk slot/deck or reroll affordance; 17 consumables remain complete; legacy compound/item IDs decode without becoming writable; Dim Sky/Gilded Veins and Danger runes retain their real pressure consumers."
+      "gate": "Release/current-copy and route scans expose no Traveller's Token recipe, Quirk slot/deck or reroll affordance; 17 consumables remain complete; legacy compound/item IDs decode without becoming writable; Dim Sky/Gilded Veins and Danger runes retain their real pressure consumers.",
+      "workstream": "acceptance",
+      "isPrimary": false
     }
   ],
   "paused": [
