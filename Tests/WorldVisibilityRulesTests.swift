@@ -2,6 +2,104 @@ import XCTest
 @testable import Bookbinder
 
 final class WorldVisibilityRulesTests: XCTestCase {
+    func testHiddenNeighboursCannotChangeVisibleTileArtContext() throws {
+        let origin = GridPoint(x: 1, y: 1)
+        let point = GridPoint(x: 2, y: 2)
+        let east = GridPoint(x: 3, y: 2)
+        let south = GridPoint(x: 2, y: 3)
+        var map = openMap(width: 5, height: 5, entry: origin)
+        map[point].ground = .stone
+        map[point].elevation = 3
+        map[east].ground = .stone
+        map[south].ground = .stone
+        map[south].elevation = 3
+        let profile = WorldRules.visibilityProfile(illumination: 0)
+
+        func resolved(_ candidate: WorldMap) throws -> MapTileArtRequest {
+            let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                               mapSeed: 77, rng: SeededRNG(seed: 77), map: candidate,
+                               playerPosition: origin)
+            var tile = candidate[point]
+            tile.isRevealed = true
+            return try XCTUnwrap(WorldTileVisibilityPresentation.resolve(
+                run: run, point: point, tile: tile, visibility: .full,
+                profile: profile, grade: .neutral).artRequest)
+        }
+
+        let before = try resolved(map)
+        map[east].ground = .water
+        map[east].elevation = 0
+        map[south].ground = .chasm
+        map[south].elevation = 0
+        let after = try resolved(map)
+
+        XCTAssertEqual(before.adjacency, after.adjacency)
+        XCTAssertEqual(before.southExposureLevels, after.southExposureLevels)
+        XCTAssertEqual(before.adjacency, 0)
+        XCTAssertEqual(before.southExposureLevels, 0)
+    }
+
+    func testVisibleNeighboursParticipateInOrdinaryBoundaryGrammar() throws {
+        let origin = GridPoint(x: 1, y: 1)
+        let point = GridPoint(x: 2, y: 2)
+        let east = GridPoint(x: 3, y: 2)
+        let south = GridPoint(x: 2, y: 3)
+        var map = openMap(width: 5, height: 5, entry: origin)
+        map[point].ground = .stone
+        map[point].elevation = 3
+        map[east].ground = .stone
+        map[south].ground = .stone
+        map[south].elevation = 3
+        let profile = WorldRules.visibilityProfile(illumination: 20)
+
+        func resolved(_ candidate: WorldMap) throws -> MapTileArtRequest {
+            let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                               mapSeed: 78, rng: SeededRNG(seed: 78), map: candidate,
+                               playerPosition: origin)
+            var tile = candidate[point]
+            tile.isRevealed = true
+            return try XCTUnwrap(WorldTileVisibilityPresentation.resolve(
+                run: run, point: point, tile: tile, visibility: .full,
+                profile: profile, grade: .neutral).artRequest)
+        }
+
+        let connected = try resolved(map)
+        map[east].ground = .water
+        map[south].ground = .chasm
+        let separated = try resolved(map)
+
+        XCTAssertNotEqual(connected.adjacency, separated.adjacency)
+        XCTAssertNotEqual(connected.southExposureLevels, separated.southExposureLevels)
+    }
+
+    func testHiddenTerrainProducesIdenticalOpaquePixelsWithoutArtRequest() {
+        let point = GridPoint(x: 3, y: 1)
+        var stoneMap = openMap(width: 5, height: 3, entry: .init(x: 0, y: 1))
+        stoneMap[point].ground = .stone
+        var waterMap = stoneMap
+        waterMap[point].ground = .water
+        let profile = WorldRules.visibilityProfile(illumination: 0)
+
+        func hiddenRequest(in map: WorldMap) -> MapTileArtRequest? {
+            let run = WorldRun(runIndex: 1, book: BoundBook(written: [], essencePaid: 0),
+                               mapSeed: 9, rng: SeededRNG(seed: 9), map: map,
+                               playerPosition: map.entry)
+            return WorldTileVisibilityPresentation.resolve(
+                run: run, point: point, tile: map[point], visibility: .hidden,
+                profile: profile, grade: .neutral).artRequest
+        }
+
+        XCTAssertNil(hiddenRequest(in: stoneMap))
+        XCTAssertNil(hiddenRequest(in: waterMap))
+        let hiddenStone = WorldTileVisibilityPresentation.opaqueFogPixels()
+        let hiddenWater = WorldTileVisibilityPresentation.opaqueFogPixels()
+
+        XCTAssertEqual(hiddenStone, hiddenWater)
+        XCTAssertEqual(Set(stride(from: 0, to: hiddenStone.count, by: 4).map {
+            Array(hiddenStone[$0..<($0 + 4)])
+        }), Set([[UInt8(0), 0, 0, 255]]))
+    }
+
     func testOrdinaryLightProducesSevenPlusTwoProfile() {
         let profile = WorldRules.visibilityProfile(illumination: 45)
         XCTAssertEqual(profile.fullRadius, 7)
