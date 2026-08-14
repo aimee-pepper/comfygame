@@ -280,13 +280,14 @@ private enum TerrainPixelGrammar {
         }
         texture(tile.ground, palette, into: &result)
         feature(tile.ground, request.featureVariant, palette, into: &result)
-        if [.water, .deepWater, .ice, .chasm].contains(tile.ground) {
-            let edge = edgeColour(tile.ground).graded(grade)
-            if request.adjacency & 1 == 0 { result.append(rect(0, 0, 16, 2, edge)) }
-            if request.adjacency & 2 == 0 { result.append(rect(14, 0, 2, 16, edge)) }
-            if request.adjacency & 4 == 0 { result.append(rect(0, 14, 16, 2, edge)) }
-            if request.adjacency & 8 == 0 { result.append(rect(0, 0, 2, 16, edge)) }
-        }
+        // Every terrain family is an autotiled area. Cardinal neighbours of the exact same ground
+        // suppress this tile's corresponding perimeter; exposed sides and their overlapping corner
+        // squares form the familiar 3×3 centre/edge/corner grammar already used by water.
+        let edge = edgeColour(tile.ground, palette: palette).graded(grade)
+        if request.adjacency & 1 == 0 { result.append(rect(0, 0, 16, 2, edge)) }
+        if request.adjacency & 2 == 0 { result.append(rect(14, 0, 2, 16, edge)) }
+        if request.adjacency & 4 == 0 { result.append(rect(0, 14, 16, 2, edge)) }
+        if request.adjacency & 8 == 0 { result.append(rect(0, 0, 2, 16, edge)) }
         if tile.isCracking {
             result += line(7, 1, 9, 7, 0x171116) + line(9, 7, 5, 14, 0x171116)
                 + line(8, 1, 10, 7, 0xf0a84e) + line(10, 7, 6, 14, 0xf0a84e)
@@ -324,8 +325,14 @@ private enum TerrainPixelGrammar {
         }
     }
 
-    private static func edgeColour(_ ground: GroundType) -> RGB {
-        switch ground { case .water: 0x8fc4cc; case .deepWater: 0x2e6681; case .ice: 0xd9eef2; default: 0x55566a }
+    private static func edgeColour(_ ground: GroundType, palette: [RGB]) -> RGB {
+        switch ground {
+        case .water: 0x8fc4cc
+        case .deepWater: 0x2e6681
+        case .ice: 0xd9eef2
+        case .chasm: 0x55566a
+        default: palette[0]
+        }
     }
 
     private static func texture(_ ground: GroundType, _ p: [RGB], into c: inout [PixelCommand]) {

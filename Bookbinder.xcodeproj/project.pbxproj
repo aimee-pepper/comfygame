@@ -11,6 +11,7 @@
 		D10000000000000000000002 /* starting-town-home-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000002 /* starting-town-home-v1.json */; };
 		D10000000000000000000003 /* StartingTownHomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000003 /* StartingTownHomeScene.swift */; };
 		E10000000000000000000001 /* StartingTownHomeSceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001 /* StartingTownHomeSceneTests.swift */; };
+		G10000000000000000000001 /* TerrainTransitionRenderingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G20000000000000000000001 /* TerrainTransitionRenderingTests.swift */; };
 		I10000000000000000000001 /* WorldVisibilityRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000001 /* WorldVisibilityRules.swift */; };
 		J10000000000000000000001 /* WorldVisibilityRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000001 /* WorldVisibilityRulesTests.swift */; };
 		A10000000000000000000001 /* NamedCharacterVisualAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */; };
@@ -284,6 +285,7 @@
 		D20000000000000000000002 /* starting-town-home-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "starting-town-home-v1.json"; path = "AssetLab/integration/starting-town-home-v1/starting-town-home-v1.json"; sourceTree = SOURCE_ROOT; };
 		D20000000000000000000003 /* StartingTownHomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartingTownHomeScene.swift; sourceTree = "<group>"; };
 		E20000000000000000000001 /* StartingTownHomeSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartingTownHomeSceneTests.swift; sourceTree = "<group>"; };
+		G20000000000000000000001 /* TerrainTransitionRenderingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerrainTransitionRenderingTests.swift; sourceTree = "<group>"; };
 		I20000000000000000000001 /* WorldVisibilityRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldVisibilityRules.swift; sourceTree = "<group>"; };
 		J20000000000000000000001 /* WorldVisibilityRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldVisibilityRulesTests.swift; sourceTree = "<group>"; };
 		B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterVisualAdapter.swift; sourceTree = "<group>"; };
@@ -834,6 +836,7 @@
 				5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */,
 				H20000000000000000000001 /* CreaturePixelIdentityTests.swift */,
 				E20000000000000000000001 /* StartingTownHomeSceneTests.swift */,
+				G20000000000000000000001 /* TerrainTransitionRenderingTests.swift */,
 				J20000000000000000000001 /* WorldVisibilityRulesTests.swift */,
 				74D9F704438225E8CFD8268D /* BestiaryTests.swift */,
 				7582647B2841DB69559E3968 /* BookRulesTests.swift */,
@@ -1258,6 +1261,7 @@
 				08F1B44EE071624D86A2CBD6 /* BaseBoardTests.swift in Sources */,
 				H10000000000000000000001 /* CreaturePixelIdentityTests.swift in Sources */,
 				E10000000000000000000001 /* StartingTownHomeSceneTests.swift in Sources */,
+				G10000000000000000000001 /* TerrainTransitionRenderingTests.swift in Sources */,
 				J10000000000000000000001 /* WorldVisibilityRulesTests.swift in Sources */,
 				52A3E7BA47AED80B02C9FFDA /* BestiaryTests.swift in Sources */,
 				030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */,

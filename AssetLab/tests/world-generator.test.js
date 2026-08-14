@@ -59,8 +59,9 @@ assert.throws(()=>liftedTerrainSprite({ground:"soil",elevation:2},{southExposure
 for(const ground of groundTypes){
   const joined=transitionedTerrainCommands({ground,adjacency:15,terrainSeedUInt32:404});
   const isolated=transitionedTerrainCommands({ground,adjacency:0,terrainSeedUInt32:404});
-  const ownsEdges=["water","deepWater","ice","chasm"].includes(ground);
-  assert.equal(isolated.length-joined.length,ownsEdges?4:0,`${ground} adjacency must ${ownsEdges?"own four isolated":"not create any"} perimeter edges`);
+  assert.equal(isolated.length-joined.length,4,`${ground} adjacency must own four isolated perimeter edges`);
+  const masks=new Set();for(let adjacency=0;adjacency<16;adjacency++)masks.add(hash(transitionedTerrainCommands({ground,adjacency,terrainSeedUInt32:404})));
+  assert.equal(masks.size,16,`${ground} needs the complete centre/edge/corner adjacency grammar`);
 }
 assert.equal(groundTypes.length,12,"AssetLab must track every live GroundType");
 assert.equal(new Set(groundTypes.map((ground,index)=>hash(transitionedTerrainCommands({ground,speciesSeed:404+index})))).size,12,"every live ground needs distinct command grammar");
