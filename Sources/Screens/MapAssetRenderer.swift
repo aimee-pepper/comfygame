@@ -168,7 +168,7 @@ struct MapTileArtRequest {
                                         adjacency: 15, grade: .neutral, flora: nil,
                                         worldGrade2Descriptor: descriptor, explicitSeed: 404,
                                         explicitFeatureVariant: 0)
-        let resource = ResourcePixelGrammar.bodyCommands(for: id).map {
+        let resource = ResourceSpriteV1PixelGrammar.commands(for: id, profile: .map).map {
             PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
                          width: $0.width, height: $0.height, color: $0.color)
         }
@@ -191,6 +191,24 @@ struct MapTileArtRequest {
         MapPixelRaster.rawPixels(commands: ResourcePixelGrammar.inventoryCommands(for: id))
     }
 
+    static func productionMapResourcePixels(_ id: ResourceID) -> [UInt8] {
+        MapPixelRaster.rawPixels(commands: ResourceSpriteV1PixelGrammar.commands(for: id, profile: .map))
+    }
+
+    static func productionInventoryResourcePixels(_ id: ResourceID) -> [UInt8] {
+        guard let asset = ResourceSpriteV1Registry.asset(for: id, profile: .inventory) else { return [] }
+        return MapPixelRaster.rawPixels(
+            commands: ResourceSpriteV1PixelGrammar.commands(for: id, profile: .inventory),
+            width: asset.width, height: asset.height)
+    }
+
+    static func productionFieldResourcePixels(_ id: ResourceID) -> [UInt8] {
+        guard let asset = ResourceSpriteV1Registry.asset(for: id, profile: .field) else { return [] }
+        return MapPixelRaster.rawPixels(
+            commands: ResourceSpriteV1PixelGrammar.commands(for: id, profile: .field),
+            width: asset.width, height: asset.height)
+    }
+
     static func resourceSheenPhase(mapSeed: UInt64, runIndex: Int, point: GridPoint) -> UInt32 {
         ResourcePixelGrammar.phase(mapSeed: mapSeed, runIndex: runIndex, point: point)
     }
@@ -200,14 +218,34 @@ struct MapTileArtRequest {
     }
 }
 
-/// The accepted Resource v0.6 identity without map substrate or animated sheen.
-/// Inventory and merchant grids use this same raster grammar as world nodes.
+/// The collected-object profile from the exact-ID Resource v1 pack.
+/// World nodes and compact field markers deliberately use their own top-down and 8px profiles.
 struct ResourcePixelIdentity: View {
     let id: ResourceID
     let fallbackSystemIcon: String
 
     var body: some View {
         if let image = MapPixelRaster.resourceIdentityImage(for: id) {
+            Image(uiImage: image)
+                .resizable()
+                .interpolation(.none)
+                .antialiased(false)
+                .accessibilityHidden(true)
+        } else {
+            Image(systemName: fallbackSystemIcon)
+                .accessibilityHidden(true)
+        }
+    }
+}
+
+/// The independently authored 8px collection marker. It is not a scaled Storehouse object or a
+/// terrain node, so the compact World haul stays legible without changing either larger identity.
+struct ResourceFieldMarkerIdentity: View {
+    let id: ResourceID
+    let fallbackSystemIcon: String
+
+    var body: some View {
+        if let image = MapPixelRaster.resourceIdentityImage(for: id, profile: .field) {
             Image(uiImage: image)
                 .resizable()
                 .interpolation(.none)
@@ -468,6 +506,33 @@ private enum ResourcePixelGrammar {
     }
 }
 
+/// Exact decoded pixels from the immutable three-profile Resource Sprite v1 registry.
+///
+/// Map and inventory deliberately consume different authored profiles. Turning opaque pixels into
+/// one-pixel commands lets the existing terrain-first compositor and clipped sheen retain their
+/// established ordering without scaling or recoloring either identity.
+private enum ResourceSpriteV1PixelGrammar {
+    static func commands(for id: ResourceID, profile: ResourceSpriteV1Profile) -> [PixelCommand] {
+        guard let asset = ResourceSpriteV1Registry.asset(for: id, profile: profile) else { return [] }
+        let pixels = asset.rgbaPixels
+        guard pixels.count == asset.width * asset.height * 4 else { return [] }
+        var commands: [PixelCommand] = []
+        commands.reserveCapacity(asset.width * asset.height / 2)
+        for y in 0..<asset.height {
+            for x in 0..<asset.width {
+                let index = (y * asset.width + x) * 4
+                let alpha = pixels[index + 3]
+                guard alpha > 0 else { continue }
+                commands.append(PixelCommand(
+                    x: x, y: y, width: 1, height: 1,
+                    color: RGBA(red: pixels[index], green: pixels[index + 1],
+                                blue: pixels[index + 2], alpha: alpha)))
+            }
+        }
+        return commands
+    }
+}
+
 fileprivate struct FloraRenderDescriptor: Codable, Equatable {
     let logicalID: String
     let speciesSeed: UInt32
@@ -609,11 +674,16 @@ struct RGBA: Equatable {
 @MainActor private enum MapPixelRaster {
     static let cache = NSCache<NSString, UIImage>()
 
-    static func resourceIdentityImage(for id: ResourceID) -> UIImage? {
-        let key = "resource-static-v0.6-\(id.rawValue)" as NSString
+    static func resourceIdentityImage(for id: ResourceID,
+                                      profile: ResourceSpriteV1Profile = .inventory) -> UIImage? {
+        let key = "\(ResourceSpriteV1Registry.packID)-\(profile.rawValue)-\(id.rawValue)" as NSString
         if let cached = cache.object(forKey: key) { return cached }
-        let commands = ResourcePixelGrammar.inventoryCommands(for: id)
-        guard !commands.isEmpty, let image = raster(commands: commands, width: 16, height: 16) else {
+        guard let asset = ResourceSpriteV1Registry.asset(for: id, profile: profile) else {
+            return nil
+        }
+        let commands = ResourceSpriteV1PixelGrammar.commands(for: id, profile: profile)
+        guard !commands.isEmpty,
+              let image = raster(commands: commands, width: asset.width, height: asset.height) else {
             return nil
         }
         cache.setObject(image, forKey: key)
@@ -633,7 +703,9 @@ struct RGBA: Equatable {
             ResourcePixelGrammar.phase(mapSeed: request.mapSeed, runIndex: request.runIndex, point: request.point)
         }
         let sheenFrame = reduceMotion ? phase.map { _ in 0 } : phase.flatMap { ResourcePixelGrammar.frame(phase: $0, tick: tick) }
-        let resourceKey = request.resourceID.map { "\($0.rawValue)-\(sheenFrame.map(String.init) ?? "rest")" } ?? "none"
+        let resourceKey = request.resourceID.map {
+            "\(ResourceSpriteV1Registry.packID)-\($0.rawValue)-\(sheenFrame.map(String.init) ?? "rest")"
+        } ?? "none"
         let key = "\(MapAssetContract.rendererTuple)-\(grade2Key)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.southExposureLevels)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(gradeKey)-\(floraKey)-\(resourceKey)" as NSString
         if let cached = cache.object(forKey: key) { return cached }
         guard var commands = try? terrainCommands(for: request) else { return nil }
@@ -646,7 +718,7 @@ struct RGBA: Equatable {
             }
         }
         if request.tile.isRevealed, !request.tile.isCrumbled, let resource = request.resourceID {
-            let body = ResourcePixelGrammar.bodyCommands(for: resource)
+            let body = ResourceSpriteV1PixelGrammar.commands(for: resource, profile: .map)
             let shifted = body.map { PixelCommand(x: $0.x, y: $0.y + request.surfaceOffsetY,
                                                    width: $0.width, height: $0.height, color: $0.color) }
             commands += shifted

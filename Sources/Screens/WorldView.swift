@@ -358,34 +358,41 @@ struct WorldView: View {
     private func satchel(_ run: WorldRun) -> some View {
         HStack(spacing: 12) {
             if run.satchel.isEmpty {
-                Text("satchel empty").foregroundStyle(.secondary)
+                Text("satchel empty")
+                    .foregroundStyle(.secondary)
                 Spacer(minLength: 0)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 14) {
                         ForEach(run.satchel.nonZero, id: \.id) { entry in
-                            Label("\(entry.amount)",
-                                  systemImage: ContentCatalog.shared.resource(entry.id)?.icon ?? "cube")
+                            HStack(spacing: 3) {
+                                ResourceFieldMarkerIdentity(
+                                    id: entry.id,
+                                    fallbackSystemIcon: ContentCatalog.shared.resource(entry.id)?.icon ?? "cube"
+                                )
+                                .frame(width: 8, height: 8)
+                                Text("\(entry.amount)")
+                            }
                             .fixedSize()
                         }
                     }
                     .padding(.trailing, 4)
                 }
-                // Never lets its content dictate the row's width — the whole point of the fix.
                 .frame(maxWidth: .infinity)
             }
-
             Button { isShowingFieldKit = true } label: {
-                    Label("Field Kit", systemImage: "backpack.fill")
-                        .labelStyle(.titleAndIcon)
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
+                Label("Field Kit", systemImage: "backpack.fill")
+                    .labelStyle(.titleAndIcon)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .foregroundStyle(.teal)
             .fixedSize()
             .accessibilityIdentifier("world.field-kit")
-            Text("turn \(run.turnsTaken)").foregroundStyle(.secondary).fixedSize()
+            Text("turn \(run.turnsTaken)")
+                .foregroundStyle(.secondary)
+                .fixedSize()
         }
         .font(.footnote.monospacedDigit())
         .padding(10)
