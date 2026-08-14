@@ -12,17 +12,15 @@ enum DebugBugReporterPlacementPolicy {
 
     static func verticalRange(height: CGFloat, safeTop: CGFloat, safeBottom: CGFloat,
                               isBase: Bool, reservesTopChrome: Bool = false) -> ClosedRange<CGFloat> {
-        let safeMinimum = safeTop + 28
-        let safeMaximum = height - safeBottom - 28
-        if !isBase, reservesTopChrome {
-            let lower = min(safeMaximum, max(safeMinimum, height * 0.48))
-            let upper = max(lower, min(safeMaximum, height * 0.78))
-            return lower...upper
-        }
-        guard isBase else { return safeMinimum...safeMaximum }
-        let lower = min(safeMaximum, max(safeMinimum, height * 0.65))
-        let upper = max(lower, min(safeMaximum, height * 0.78))
-        return lower...upper
+        let buttonRadius: CGFloat = 24
+        // The reporter is a user-positioned tool, not screen chrome. Route-specific bands made
+        // its drag gesture appear broken and could pin it over the very control being reported.
+        // Keep only the button-radius bound so it can reach the visible screen edges.
+        _ = isBase
+        _ = reservesTopChrome
+        _ = safeTop
+        _ = safeBottom
+        return buttonRadius...max(buttonRadius, height - buttonRadius)
     }
 }
 
@@ -56,7 +54,7 @@ struct DebugBugReporterOverlay: View {
                                      minimumY(in: proxy), maximumY(in: proxy)))
                 .highPriorityGesture(DragGesture().onChanged { value in
                     savedX = Double(clamped(value.location.x / max(1, proxy.size.width), 0.08, 0.92))
-                    savedY = Double(clamped(value.location.y / max(1, proxy.size.height), 0.08, 0.92))
+                    savedY = Double(clamped(value.location.y / max(1, proxy.size.height), 0, 1))
                 })
             }
         }
@@ -109,7 +107,6 @@ struct DebugBugReporterOverlay: View {
     }
 
     private func verticalRange(in proxy: GeometryProxy) -> ClosedRange<CGFloat> {
-        // Base reserves its upper band for purse + district tabs and its lower band for Depart.
         DebugBugReporterPlacementPolicy.verticalRange(
             height: proxy.size.height, safeTop: proxy.safeAreaInsets.top,
             safeBottom: proxy.safeAreaInsets.bottom, isBase: route == .base,

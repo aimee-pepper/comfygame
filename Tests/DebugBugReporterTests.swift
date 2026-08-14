@@ -3,7 +3,7 @@ import XCTest
 @testable import Bookbinder
 
 final class DebugBugReporterTests: XCTestCase {
-    func testBaseReporterPlacementAvoidsPurseTabsAndDepartureBands() {
+    func testReporterCanTraverseTheEntireSafeScreenOnEveryRoute() {
         let base = DebugBugReporterPlacementPolicy.verticalRange(
             height: 800, safeTop: 59, safeBottom: 34, isBase: true)
         let ordinary = DebugBugReporterPlacementPolicy.verticalRange(
@@ -12,12 +12,16 @@ final class DebugBugReporterTests: XCTestCase {
             height: 800, safeTop: 59, safeBottom: 34, isBase: false,
             reservesTopChrome: true)
 
-        XCTAssertEqual(base.lowerBound, 520, accuracy: 0.01)
-        XCTAssertEqual(base.upperBound, 624, accuracy: 0.01)
-        XCTAssertEqual(ordinary.lowerBound, 87, accuracy: 0.01)
-        XCTAssertEqual(ordinary.upperBound, 738, accuracy: 0.01)
-        XCTAssertEqual(station.lowerBound, 384, accuracy: 0.01)
-        XCTAssertEqual(station.upperBound, 624, accuracy: 0.01)
+        XCTAssertEqual(base.lowerBound, 24, accuracy: 0.01)
+        XCTAssertEqual(base.upperBound, 776, accuracy: 0.01)
+        XCTAssertEqual(ordinary.lowerBound, 24, accuracy: 0.01)
+        XCTAssertEqual(ordinary.upperBound, 776, accuracy: 0.01)
+        XCTAssertEqual(station.lowerBound, 24, accuracy: 0.01)
+        XCTAssertEqual(station.upperBound, 776, accuracy: 0.01)
+        XCTAssertEqual(base, ordinary)
+        XCTAssertEqual(station, ordinary)
+        XCTAssertGreaterThan(ordinary.upperBound - ordinary.lowerBound, 750,
+                             "The reporter must traverse the full ordinary-phone height")
 
         let horizontal = DebugBugReporterPlacementPolicy.horizontalRange(
             width: 368, safeLeading: 0, safeTrailing: 0)
