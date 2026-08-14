@@ -31,6 +31,7 @@ enum WorldControlsLayout {
     static let actionHeight: CGFloat = 48
     static let horizontalPadding: CGFloat = 16
     static let actionSpacing: CGFloat = 6
+    static let navigationSpacing: CGFloat = 14
 
     static func actionFrames(containerWidth: CGFloat) -> [CGRect] {
         let usable = max(0, containerWidth - horizontalPadding * 2 - actionSpacing)
