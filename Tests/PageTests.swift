@@ -310,6 +310,24 @@ final class PageTests: XCTestCase {
 
     // MARK: The desk writes on the page
 
+    func testWritingDeskClearRequiresExactDestructiveConfirmation() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(source.contains("Button(\"Clear\") {\n                        isConfirmingClear = true"))
+        XCTAssertTrue(source.contains("\"Clear this page?\""))
+        XCTAssertTrue(source.contains("Button(clearPageActionLabel, role: .destructive)"))
+        XCTAssertTrue(source.contains("Button(\"Keep writing\", role: .cancel)"))
+        XCTAssertTrue(source.contains("Every placed mark and connection on this page will be removed."))
+        XCTAssertEqual(source.components(separatedBy: "store.clearPage()").count - 1, 1,
+                       "Only the confirmed destructive action may clear the page.")
+    }
+
     @MainActor
     func testWritingOnThePageIsWhatComposesTheBook() {
         let store = GameStore(io: .temporary(name: "desk-\(UUID().uuidString)"))

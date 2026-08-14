@@ -37,6 +37,7 @@ struct WritingDeskView: View {
     @State private var bornAnchored = false
     @State private var tutorialLesson: TutorialLessonID?
     @State private var pageInteractionDismissalToken = 0
+    @State private var isConfirmingClear = false
 
     @State private var bin: Bin = .compounds
 
@@ -114,13 +115,25 @@ struct WritingDeskView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 if pane == .write {
                     Button("Clear") {
-                        dismissPageInteraction()
-                        store.clearPage()
-                        ghost = nil
+                        isConfirmingClear = true
                     }
                         .disabled(state.base.page.runes.isEmpty)
                 }
             }
+        }
+        .confirmationDialog(
+            "Clear this page?",
+            isPresented: $isConfirmingClear,
+            titleVisibility: .visible
+        ) {
+            Button(clearPageActionLabel, role: .destructive) {
+                dismissPageInteraction()
+                store.clearPage()
+                ghost = nil
+            }
+            Button("Keep writing", role: .cancel) {}
+        } message: {
+            Text("Every placed mark and connection on this page will be removed.")
         }
         .tutorialHoverOverlay(isPresented: tutorialLesson != nil) {
             if let id = tutorialLesson, let lesson = TutorialRules.definition(id) {
@@ -151,6 +164,11 @@ struct WritingDeskView: View {
             store.openedComparisonPreview()
         }
         .onChange(of: bin) { _, _ in dismissPageInteraction() }
+    }
+
+    private var clearPageActionLabel: String {
+        let count = state.base.page.runes.count
+        return "Clear \(count) \(count == 1 ? "mark" : "marks")"
     }
 
     // MARK: Pane 1 — writing
