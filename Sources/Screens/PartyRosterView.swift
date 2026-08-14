@@ -48,19 +48,15 @@ struct PartyRosterView: View {
                 .foregroundStyle(.tint)
                 .frame(width: 32, height: 32)
                 .background(Color.accentColor.opacity(0.14), in: RoundedRectangle(cornerRadius: 8))
-            Text("Field Kit").font(.callout.weight(.semibold))
+            Text("Satchel").font(.callout.weight(.semibold))
             Spacer(minLength: 4)
-            Text("\(plannedFieldKitBins) of \(store.state.base.satchelCapacity) planned · \(store.state.base.inventory.slots) Storehouse bins")
+            Text("\(store.state.base.satchelCapacity) capacity · \(store.state.base.inventory.slots) Storehouse bins")
                 .font(.caption).foregroundStyle(.secondary)
                 .lineLimit(1).minimumScaleFactor(0.8)
         }
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
         .accessibilityElement(children: .combine)
-    }
-
-    private var plannedFieldKitBins: Int {
-        store.fieldKitEntries.filter { $0.desiredCount > 0 }.count
     }
 
     /// Thumbnail and brief stats. Enough to choose who to open, and nothing more.

@@ -13,7 +13,7 @@
       "id": "band-1",
       "title": "Band 1 · First world, fight and return",
       "reach": "Worlds 1–3 · Binder + Quill · levels 1–3",
-      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "field-note-generator", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
+      "itemIDs": ["encounter-scaling", "field-kit-loadout", "essence", "starter-world-pages", "collapse-hud-truth", "terrain-blocked-feedback", "world-visibility", "world-resource-reserve", "field-note-generator", "field-controls", "world-color", "world-contact", "encounter-opening", "return-receipt-authority", "failure-retention-correctness", "combat-affliction-authority"]
     },
     {
       "id": "band-2",
@@ -104,11 +104,21 @@
       "isPrimary": false
     },
     {
+      "id": "world-resource-reserve",
+      "priority": "B1.4e",
+      "title": "Slot-free harvested world resources",
+      "status": "readyToTest",
+      "detail": "Source checkpoint 8c6280a completes the slot-free world-resource reserve across acquisition, return, deterministic failure partitioning, crafting, commerce and Storehouse presentation. Hides, bones and every other property-bearing harvested material retain exact stable identity, grade, properties and provenance while ordinary presentation groups them by kind.",
+      "gate": "Nineteen hides render once as Hides +19 under Resources; hides and bones consume no expedition or Storehouse item slots and never enter item swap/spillover; exact properties, grade, source and qualifier survive return/relaunch; failure partitioning, crafting selection and legacy-bin migration are deterministic, atomic and lossless. Authority: world-resource-reserve-current.md.",
+      "workstream": "engineering",
+      "isPrimary": false
+    },
+    {
       "id": "world-visibility",
       "priority": "B1.4c",
       "title": "Illumination-driven current visibility",
-      "status": "inProgress",
-      "detail": "Asset Lead is implementing the directly assigned Band-1 visibility correction: current LOS is derived rather than saved, persistent reveal records only fully visible exploration, and Illumination plus Atmosphere control a full-visibility radius and a partially visible border without changing movement or gameplay RNG.",
+      "status": "readyToTest",
+      "detail": "Source checkpoints 1625915 and 6eb3988 derive current LOS instead of saving it, persist exploration only for fully visible tiles, and make Illumination plus obscuring Atmosphere control a full-visibility circle and transient terrain-only fringe. Hidden neighbours cannot affect visible edge/sidewall commands; hidden tiles construct no terrain art and render content-neutral opaque black, with softening confined to visible fog boundaries.",
       "gate": "Default, low-light and true-black profiles produce distinct rules-owned radii; density and LOS/elevation/cover affect both full and border visibility; only fully visible tiles persist as explored or enter the minimap; fog and partial visibility never disclose hidden content; relaunch derives the same current view from saved world facts; ordinary phone proof remains readable without map-scale changes.",
       "workstream": "asset",
       "isPrimary": false

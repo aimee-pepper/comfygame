@@ -120,17 +120,16 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertTrue(source.contains(".disabled(seatsLeft == 0)"))
     }
 
-    func testPartyStorageSummaryNamesTheFieldKitAndItsPlannedBinCount() throws {
+    func testPartyStorageSummaryNamesCapacitiesRatherThanClaimingItemCounts() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/PartyRosterView.swift"),
                                 encoding: .utf8)
 
-        XCTAssertTrue(source.contains("Text(\"Field Kit\")"))
-        XCTAssertTrue(source.contains("plannedFieldKitBins) of \\(store.state.base.satchelCapacity) planned"))
-        XCTAssertTrue(source.contains("store.fieldKitEntries.filter { $0.desiredCount > 0 }.count"))
+        XCTAssertTrue(source.contains("satchelCapacity) capacity"))
         XCTAssertTrue(source.contains("inventory.slots) Storehouse bins"))
-        XCTAssertFalse(source.contains("Text(\"Satchel\")"))
+        XCTAssertFalse(source.contains("satchelCapacity) carried"))
+        XCTAssertFalse(source.contains("inventory.slots) stored"))
         XCTAssertTrue(source.contains("Upgrade available"))
         XCTAssertFalse(source.contains("Text(\"something better\")"),
                        "Party gear status must use release-facing, actionable copy")
