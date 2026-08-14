@@ -38,15 +38,17 @@ struct BaseView: View {
     private var state: GameState { store.state }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 12) {
-                contextRow
-                firstReturnRouteCard
-                sectionPicker
-                stationBoard
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 12) {
+                    contextRow
+                    firstReturnRouteCard
+                    sectionPicker
+                    stationBoard(containerSize: geometry.size)
+                }
+                .padding(12)
+                .padding(.bottom, 12)
             }
-            .padding(12)
-            .padding(.bottom, 12)
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Base")
@@ -147,28 +149,42 @@ struct BaseView: View {
         .accessibilityIdentifier("base-section-picker")
     }
 
-    private var stationBoard: some View {
-        LazyVGrid(columns: stationColumns, spacing: 12) {
-            ForEach(stations(in: selectedSection)) { station in
-                if state.base.station(station.id).isUnlocked {
-                    let route = AppRoute(rawValue: station.route) ?? .base
-                    NavigationLink(value: route) {
-                        StationTile(station: station, tier: state.base.station(station.id).tier,
-                                    isFoundation: false)
-                    }
-                    .buttonStyle(.plain)
-                    .simultaneousGesture(TapGesture().onEnded {
-                        store.openedFirstReturnDestination(route)
-                    })
-                } else {
-                    Button { foundationStation = station } label: {
-                        StationTile(station: station, tier: 0, isFoundation: true)
-                    }
-                    .buttonStyle(.plain)
-                }
+    private func stationBoard(containerSize: CGSize) -> some View {
+        Group {
+            if selectedSection == .home,
+               let scene = StartingTownHomeResource.scene(),
+               let sceneHeight = StartingTownHomeRules.sceneHeight(containerSize: containerSize) {
+                StartingTownHomeScene(scene: scene,
+                                      openedRoute: { store.openedFirstReturnDestination($0) })
+                    .frame(height: sceneHeight)
+            } else {
+                legacyStationGrid
             }
         }
         .accessibilityIdentifier("base-station-board-\(selectedSection.rawValue)")
+    }
+
+    private var legacyStationGrid: some View {
+        LazyVGrid(columns: stationColumns, spacing: 12) {
+            ForEach(stations(in: selectedSection)) { station in stationDestination(station) }
+        }
+    }
+
+    @ViewBuilder private func stationDestination(_ station: StationDef) -> some View {
+        if state.base.station(station.id).isUnlocked {
+            let route = AppRoute(rawValue: station.route) ?? .base
+            NavigationLink(value: route) {
+                StationTile(station: station, tier: state.base.station(station.id).tier,
+                            isFoundation: false)
+            }
+            .buttonStyle(.plain)
+            .simultaneousGesture(TapGesture().onEnded { store.openedFirstReturnDestination(route) })
+        } else {
+            Button { foundationStation = station } label: {
+                StationTile(station: station, tier: 0, isFoundation: true)
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     private var stationColumns: [GridItem] {

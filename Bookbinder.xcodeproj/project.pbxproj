@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D10000000000000000000001 /* town-starting-home-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000001 /* town-starting-home-v1.png */; };
+		D10000000000000000000002 /* starting-town-home-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000002 /* starting-town-home-v1.json */; };
+		D10000000000000000000003 /* StartingTownHomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000003 /* StartingTownHomeScene.swift */; };
+		E10000000000000000000001 /* StartingTownHomeSceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001 /* StartingTownHomeSceneTests.swift */; };
 		A10000000000000000000001 /* NamedCharacterVisualAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */; };
 		A10000000000000000000002 /* NamedCharacterPlaceholderPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */; };
 		A10000000000000000000003 /* NamedCharacterPixelIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */; };
@@ -272,6 +276,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D20000000000000000000001 /* town-starting-home-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "town-starting-home-v1.png"; path = "AssetLab/integration/starting-town-home-v1/town-starting-home-v1.png"; sourceTree = SOURCE_ROOT; };
+		D20000000000000000000002 /* starting-town-home-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "starting-town-home-v1.json"; path = "AssetLab/integration/starting-town-home-v1/starting-town-home-v1.json"; sourceTree = SOURCE_ROOT; };
+		D20000000000000000000003 /* StartingTownHomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartingTownHomeScene.swift; sourceTree = "<group>"; };
+		E20000000000000000000001 /* StartingTownHomeSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartingTownHomeSceneTests.swift; sourceTree = "<group>"; };
 		B10000000000000000000001 /* NamedCharacterVisualAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterVisualAdapter.swift; sourceTree = "<group>"; };
 		B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPlaceholderPack.swift; sourceTree = "<group>"; };
 		B10000000000000000000003 /* NamedCharacterPixelIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedCharacterPixelIdentity.swift; sourceTree = "<group>"; };
@@ -607,6 +615,8 @@
 			isa = PBXGroup;
 			children = (
 				95750F5CE1A87553D5246112 /* Data */,
+				D20000000000000000000001 /* town-starting-home-v1.png */,
+				D20000000000000000000002 /* starting-town-home-v1.json */,
 				F87F4CA2A34122A6DEAFA2E0 /* CombatGraphModels.swift */,
 				4924ECCC22AE9125898B039F /* CombatTreeModels.swift */,
 				D12B3DBAA05B509156F44C42 /* ContentCatalog.swift */,
@@ -630,6 +640,7 @@
 				4FEC07E6110ABED3DA33EA3B /* ApothecaryView.swift */,
 				D5C0097382514786457FDE48 /* AuthoredTextAtlasView.swift */,
 				346EEEC616B8EBFE291C4A79 /* BaseView.swift */,
+				D20000000000000000000003 /* StartingTownHomeScene.swift */,
 				2C2AEBC30A9B7C63053F8A0F /* BestiaryView.swift */,
 				B9CABEB714204FCBDE32F8E4 /* BlacksmithView.swift */,
 				A7E1BF3ED787A28A4AEDAC85 /* CampaignStartView.swift */,
@@ -812,6 +823,7 @@
 				CA9D12FE35D80EBAAD321DB4 /* ApexTests.swift */,
 				29C0E5CEA72598582B970714 /* ArmouryTests.swift */,
 				5B5EAF43921CF15DDB7B1488 /* BaseBoardTests.swift */,
+				E20000000000000000000001 /* StartingTownHomeSceneTests.swift */,
 				74D9F704438225E8CFD8268D /* BestiaryTests.swift */,
 				7582647B2841DB69559E3968 /* BookRulesTests.swift */,
 				B6B3681EEDB3DB65AE754495 /* CampaignStartPresentationTests.swift */,
@@ -1008,6 +1020,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D10000000000000000000001 /* town-starting-home-v1.png in Resources */,
+				D10000000000000000000002 /* starting-town-home-v1.json in Resources */,
 				A10000000000000000000006 /* named-character-placeholders-v1.json in Resources */,
 				0FD9747174A22CF0CD20A419 /* LaunchScreen.storyboard in Resources */,
 				236C64B1C3B3B83BAD510425 /* combat_tree_v2.json in Resources */,
@@ -1076,6 +1090,7 @@
 				6BC23568E481573C2DB07E94 /* AuthoredTextAtlasView.swift in Sources */,
 				601014E078036FCE48CDAF06 /* BaseState.swift in Sources */,
 				6FDB8C79745125AEC66E0C4C /* BaseView.swift in Sources */,
+				D10000000000000000000003 /* StartingTownHomeScene.swift in Sources */,
 				8F6B0EF541120D379B1FD06B /* BestiaryRules.swift in Sources */,
 				3F566ECFBA89D9C89BF6CD76 /* BestiaryView.swift in Sources */,
 				2977BFA154F4613F7B75EF67 /* BlacksmithView.swift in Sources */,
@@ -1227,6 +1242,7 @@
 				3A849B10B8A116F089F9D49C /* ApexTests.swift in Sources */,
 				76925351AE69BDEB01BA072D /* ArmouryTests.swift in Sources */,
 				08F1B44EE071624D86A2CBD6 /* BaseBoardTests.swift in Sources */,
+				E10000000000000000000001 /* StartingTownHomeSceneTests.swift in Sources */,
 				52A3E7BA47AED80B02C9FFDA /* BestiaryTests.swift in Sources */,
 				030C56592AEBBE7776435964 /* BookRulesTests.swift in Sources */,
 				7FAF1BB2BE9134A54D8E970C /* CampaignStartPresentationTests.swift in Sources */,
