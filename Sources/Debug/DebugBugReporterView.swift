@@ -22,6 +22,27 @@ enum DebugBugReporterPlacementPolicy {
         _ = safeBottom
         return buttonRadius...max(buttonRadius, height - buttonRadius)
     }
+
+    static func position(normalizedX: CGFloat, normalizedY: CGFloat,
+                         width: CGFloat, height: CGFloat,
+                         safeLeading: CGFloat, safeTrailing: CGFloat,
+                         safeTop: CGFloat, safeBottom: CGFloat,
+                         reservesTopChrome: Bool) -> CGPoint {
+        let horizontal = horizontalRange(width: width, safeLeading: safeLeading,
+                                         safeTrailing: safeTrailing)
+        let vertical = verticalRange(height: height, safeTop: safeTop, safeBottom: safeBottom,
+                                     isBase: false, reservesTopChrome: reservesTopChrome)
+        var x = min(max(normalizedX * width, horizontal.lowerBound), horizontal.upperBound)
+        let y = min(max(normalizedY * height, vertical.lowerBound), vertical.upperBound)
+
+        // Station navigation titles occupy the leading/centre portion of the safe-area header.
+        // Keep the freely draggable reporter, but park it at the trailing edge whenever its
+        // persisted position would cover that title. Dragging below the header remains free.
+        if reservesTopChrome, y <= safeTop + 52 {
+            x = horizontal.upperBound
+        }
+        return CGPoint(x: x, y: y)
+    }
 }
 
 struct DebugBugReporterOverlay: View {
@@ -47,11 +68,7 @@ struct DebugBugReporterOverlay: View {
                 .foregroundStyle(.red)
                 .accessibilityLabel("Report Bug")
                 .accessibilityHint("Captures the current game screen, then opens a bug report form")
-                .position(x: clamped(CGFloat(savedX) * proxy.size.width,
-                                     horizontalRange(in: proxy).lowerBound,
-                                     horizontalRange(in: proxy).upperBound),
-                          y: clamped(CGFloat(savedY) * proxy.size.height,
-                                     minimumY(in: proxy), maximumY(in: proxy)))
+                .position(reporterPosition(in: proxy))
                 .highPriorityGesture(DragGesture().onChanged { value in
                     savedX = Double(clamped(value.location.x / max(1, proxy.size.width), 0.08, 0.92))
                     savedY = Double(clamped(value.location.y / max(1, proxy.size.height), 0, 1))
@@ -120,6 +137,19 @@ struct DebugBugReporterOverlay: View {
             width: proxy.size.width,
             safeLeading: proxy.safeAreaInsets.leading,
             safeTrailing: proxy.safeAreaInsets.trailing
+        )
+    }
+
+    private func reporterPosition(in proxy: GeometryProxy) -> CGPoint {
+        DebugBugReporterPlacementPolicy.position(
+            normalizedX: CGFloat(savedX), normalizedY: CGFloat(savedY),
+            width: proxy.size.width, height: proxy.size.height,
+            safeLeading: proxy.safeAreaInsets.leading,
+            safeTrailing: proxy.safeAreaInsets.trailing,
+            safeTop: proxy.safeAreaInsets.top,
+            safeBottom: proxy.safeAreaInsets.bottom,
+            reservesTopChrome: route != .world && route != .encounter
+                && route != .settings && route != .harness
         )
     }
 

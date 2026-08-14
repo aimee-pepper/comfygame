@@ -31,6 +31,39 @@ final class DebugBugReporterTests: XCTestCase {
                              "The floating reporter must traverse the full ordinary-phone width")
     }
 
+    func testStationReporterMovesToTrailingEdgeInsteadOfCoveringNavigationTitle() {
+        let position = DebugBugReporterPlacementPolicy.position(
+            normalizedX: 0.36, normalizedY: 0.10,
+            width: 368, height: 800,
+            safeLeading: 0, safeTrailing: 0, safeTop: 59, safeBottom: 34,
+            reservesTopChrome: true)
+
+        XCTAssertEqual(position.x, 340, accuracy: 0.01)
+        XCTAssertEqual(position.y, 80, accuracy: 0.01)
+    }
+
+    func testStationReporterRemainsFreelyPositionedBelowNavigationTitle() {
+        let position = DebugBugReporterPlacementPolicy.position(
+            normalizedX: 0.36, normalizedY: 0.25,
+            width: 368, height: 800,
+            safeLeading: 0, safeTrailing: 0, safeTop: 59, safeBottom: 34,
+            reservesTopChrome: true)
+
+        XCTAssertEqual(position.x, 132.48, accuracy: 0.01)
+        XCTAssertEqual(position.y, 200, accuracy: 0.01)
+    }
+
+    func testReporterOnScreenWithoutReservedTopChromeKeepsRequestedHeaderPosition() {
+        let position = DebugBugReporterPlacementPolicy.position(
+            normalizedX: 0.36, normalizedY: 0.10,
+            width: 368, height: 800,
+            safeLeading: 0, safeTrailing: 0, safeTop: 59, safeBottom: 34,
+            reservesTopChrome: false)
+
+        XCTAssertEqual(position.x, 132.48, accuracy: 0.01)
+        XCTAssertEqual(position.y, 80, accuracy: 0.01)
+    }
+
     func testOutboxAtomicallyPersistsUnicodeReportAndScreenshot() throws {
         let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
