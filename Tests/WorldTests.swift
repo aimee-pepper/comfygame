@@ -11,6 +11,15 @@ final class WorldTests: XCTestCase {
         BoundBook(symbols: symbols, randomlyFilled: [], essencePaid: 0)
     }
 
+    private func wildPageRun(seed: UInt64) -> WorldRun {
+        WorldRun(runIndex: 3, book: book([:]), mapSeed: seed,
+                 rng: SeededRNG(seed: seed),
+                 map: WorldMap(width: 2, height: 2,
+                               tiles: Array(repeating: Tile(), count: 4),
+                               entry: GridPoint(x: 0, y: 0)),
+                 playerPosition: GridPoint(x: 0, y: 0))
+    }
+
     // MARK: Worldgen
 
     func testWildWorldPageSelectionIsDeterministicOrderIndependentAndPityGuaranteed() throws {
@@ -100,6 +109,63 @@ final class WorldTests: XCTestCase {
             WorldsState.self, from: JSONSerialization.data(withJSONObject: worldsObject))
         XCTAssertEqual(worlds.randomWorldPageDrought, 0)
         XCTAssertEqual(worlds.worldPageBankedOutcomeIDs, [])
+    }
+
+    func testWildPageInspectAndTakeRevalidateExactPhysicalInstanceAtomically() throws {
+        let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_moss_and_mist"))
+        let position = GridPoint(x: 1, y: 1)
+        let page = WorldPageInstance(
+            id: InstanceID(rawValue: 880), definition: definition,
+            fieldProvenance: .init(originRunIndex: 3, originWorldSeed: 44, generationSeed: 55,
+                                   position: position))
+        var run = wildPageRun(seed: 44)
+        run.playerPosition = position
+        run.offeredWorldPages = [page]
+
+        let quote = try XCTUnwrap(WildWorldPageFieldRules.quote(page.id, in: run))
+        XCTAssertEqual(WildWorldPageFieldRules.inspect(quote, in: &run),
+                       .inspected(WorldPageInstance(id: page.id, definition: definition,
+                                                    inspected: true,
+                                                    fieldProvenance: page.fieldProvenance)))
+        let staleUninspectedQuote = quote
+        let beforeStale = run
+        XCTAssertEqual(WildWorldPageFieldRules.take(staleUninspectedQuote, in: &run), .stale)
+        XCTAssertEqual(run, beforeStale)
+
+        let fresh = try XCTUnwrap(WildWorldPageFieldRules.quote(page.id, in: run))
+        guard case .taken(let taken) = WildWorldPageFieldRules.take(fresh, in: &run) else {
+            return XCTFail("expected exact page to be taken")
+        }
+        XCTAssertTrue(taken.inspected)
+        XCTAssertEqual(run.carriedWorldPages, [taken])
+        XCTAssertTrue(run.offeredWorldPages.isEmpty)
+    }
+
+    func testWildPageTakeRefusesFullSatchelWrongTileAndDuplicateWithoutMutation() throws {
+        let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_storm_coast"))
+        let position = GridPoint(x: 1, y: 1)
+        let page = WorldPageInstance(
+            id: InstanceID(rawValue: 881), definition: definition,
+            fieldProvenance: .init(originRunIndex: 3, originWorldSeed: 44, generationSeed: 55,
+                                   position: position))
+        var run = wildPageRun(seed: 44)
+        run.playerPosition = position
+        run.offeredWorldPages = [page]
+        let quote = try XCTUnwrap(WildWorldPageFieldRules.quote(page.id, in: run))
+
+        run.playerPosition = GridPoint(x: 0, y: 0)
+        XCTAssertNil(WildWorldPageFieldRules.quote(page.id, in: run))
+        run.playerPosition = position
+        run.satchelItems.slots = 0
+        let full = run
+        XCTAssertEqual(WildWorldPageFieldRules.take(quote, in: &run), .satchelFull)
+        XCTAssertEqual(run, full)
+
+        run.satchelItems.slots = 1
+        run.carriedWorldPages = [page]
+        let duplicate = run
+        XCTAssertEqual(WildWorldPageFieldRules.take(quote, in: &run), .duplicateIdentity)
+        XCTAssertEqual(run, duplicate)
     }
 
     func testSameSeedRegeneratesTheSameWorld() {

@@ -50,6 +50,62 @@ enum WildWorldPageSelectionRules {
     }
 }
 
+enum WildWorldPageFieldRules {
+    struct Quote: Equatable, Sendable {
+        var instance: WorldPageInstance
+        var position: GridPoint
+    }
+
+    enum Result: Equatable, Sendable {
+        case inspected(WorldPageInstance)
+        case taken(WorldPageInstance)
+        case stale
+        case notHere
+        case satchelFull
+        case duplicateIdentity
+    }
+
+    static func quote(_ instanceID: InstanceID, in run: WorldRun) -> Quote? {
+        let matches = run.offeredWorldPages.filter { $0.id == instanceID }
+        guard matches.count == 1, let instance = matches.first,
+              let position = instance.fieldProvenance?.position,
+              position == run.playerPosition,
+              WorldPageCatalog.definition(instance.definition.id) == instance.definition
+        else { return nil }
+        return Quote(instance: instance, position: position)
+    }
+
+    @discardableResult
+    static func inspect(_ quote: Quote, in run: inout WorldRun) -> Result {
+        guard let current = self.quote(quote.instance.id, in: run), current == quote else {
+            return .stale
+        }
+        guard !run.carriedWorldPages.contains(where: { $0.id == quote.instance.id }) else {
+            return .duplicateIdentity
+        }
+        guard let index = run.offeredWorldPages.firstIndex(where: { $0.id == quote.instance.id })
+        else { return .stale }
+        run.offeredWorldPages[index].inspected = true
+        return .inspected(run.offeredWorldPages[index])
+    }
+
+    @discardableResult
+    static func take(_ quote: Quote, in run: inout WorldRun) -> Result {
+        guard let current = self.quote(quote.instance.id, in: run), current == quote else {
+            return .stale
+        }
+        guard !run.carriedWorldPages.contains(where: { $0.id == quote.instance.id }) else {
+            return .duplicateIdentity
+        }
+        guard run.freeSatchelSlots >= 1 else { return .satchelFull }
+        guard let index = run.offeredWorldPages.firstIndex(where: { $0.id == quote.instance.id })
+        else { return .stale }
+        let instance = run.offeredWorldPages.remove(at: index)
+        run.carriedWorldPages.append(instance)
+        return .taken(instance)
+    }
+}
+
 /// Turns (book, seed) into a tile grid.
 ///
 /// Every roll comes off a stream derived from the world's seed with a fixed salt per pass, so
