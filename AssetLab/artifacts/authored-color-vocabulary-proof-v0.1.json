@@ -1,0 +1,250 @@
+{
+  "evidenceRole": "assetlabExploratoryVocabularyFixture",
+  "integrationReady": false,
+  "version": "authored-color-vocabulary-candidate-0.1.0",
+  "authority": {
+    "settled": [
+      "relative meaningful diversity",
+      "authored scoped connected color rather than global tint",
+      "Flora remains separate from Creature"
+    ],
+    "recommended": [
+      "twelve candidate IDs and player names",
+      "starter/common/later grouping",
+      "achromatics are value/chroma cases",
+      "scope eligibility Sun/Smoke/Granite/Bloom",
+      "Brown excluded from first slice",
+      "exact OKLCH coordinates",
+      "exact redundant patterns",
+      "Ochre sufficient pending play"
+    ]
+  },
+  "entries": [
+    {
+      "id": "red",
+      "name": "Red",
+      "route": "starter",
+      "oklch": [
+        0.6,
+        0.2,
+        25
+      ],
+      "patternID": "split-vertical",
+      "srgb": [
+        222,
+        59,
+        61
+      ]
+    },
+    {
+      "id": "yellow",
+      "name": "Yellow",
+      "route": "starter",
+      "oklch": [
+        0.82,
+        0.16,
+        95
+      ],
+      "patternID": "sun-cross",
+      "srgb": [
+        229,
+        194,
+        38
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue",
+      "route": "starter",
+      "oklch": [
+        0.58,
+        0.18,
+        255
+      ],
+      "patternID": "double-wave",
+      "srgb": [
+        23,
+        121,
+        225
+      ]
+    },
+    {
+      "id": "grey",
+      "name": "Grey",
+      "route": "starter",
+      "oklch": [
+        0.62,
+        0.02,
+        260
+      ],
+      "patternID": "middle-band",
+      "srgb": [
+        127,
+        135,
+        147
+      ]
+    },
+    {
+      "id": "orange",
+      "name": "Orange",
+      "route": "common",
+      "oklch": [
+        0.7,
+        0.18,
+        55
+      ],
+      "patternID": "corner-step",
+      "srgb": [
+        240,
+        121,
+        0
+      ]
+    },
+    {
+      "id": "green",
+      "name": "Green",
+      "route": "common",
+      "oklch": [
+        0.62,
+        0.16,
+        145
+      ],
+      "patternID": "leaf-chevron",
+      "srgb": [
+        57,
+        158,
+        67
+      ]
+    },
+    {
+      "id": "violet",
+      "name": "Violet",
+      "route": "common",
+      "oklch": [
+        0.55,
+        0.18,
+        300
+      ],
+      "patternID": "diagonal-pair",
+      "srgb": [
+        132,
+        81,
+        201
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "route": "common",
+      "oklch": [
+        0.91,
+        0.015,
+        95
+      ],
+      "patternID": "open-center",
+      "srgb": [
+        228,
+        225,
+        214
+      ]
+    },
+    {
+      "id": "black",
+      "name": "Black",
+      "route": "common",
+      "oklch": [
+        0.25,
+        0.015,
+        260
+      ],
+      "patternID": "closed-center",
+      "srgb": [
+        29,
+        34,
+        41
+      ]
+    },
+    {
+      "id": "ochre",
+      "name": "Ochre",
+      "route": "common",
+      "oklch": [
+        0.64,
+        0.13,
+        75
+      ],
+      "patternID": "earth-strata",
+      "srgb": [
+        186,
+        127,
+        20
+      ]
+    },
+    {
+      "id": "cyan",
+      "name": "Cyan",
+      "route": "later",
+      "oklch": [
+        0.7,
+        0.14,
+        205
+      ],
+      "patternID": "three-dots",
+      "srgb": [
+        0,
+        182,
+        199
+      ]
+    },
+    {
+      "id": "magenta",
+      "name": "Magenta",
+      "route": "later",
+      "oklch": [
+        0.62,
+        0.2,
+        335
+      ],
+      "patternID": "diamond",
+      "srgb": [
+        202,
+        75,
+        181
+      ]
+    }
+  ],
+  "scopeExamples": [
+    {
+      "sourceID": "sun",
+      "scope": "emitter",
+      "colorID": "yellow"
+    },
+    {
+      "sourceID": "smoke",
+      "scope": "atmosphere",
+      "colorID": "violet"
+    },
+    {
+      "sourceID": "granite",
+      "scope": "material",
+      "colorID": "red"
+    },
+    {
+      "sourceID": "bloom",
+      "scope": "flora",
+      "colorID": "blue"
+    }
+  ],
+  "ochreCheck": {
+    "comparedAgainst": [
+      "yellow",
+      "orange",
+      "four ordinary earth material ramps"
+    ],
+    "brownRecommendation": "do not add Brown unless phone play exposes a distinct authored intention"
+  },
+  "artifacts": {
+    "colorSHA256": "eb9959d18a1469e0f290e9faab4f402c31fa52b07268d3c1e88539681a21b97c",
+    "grayscaleSHA256": "ebb803af7e3db86269bf1dd3f0b6e55b0f2690f998dd36dd02aae9a7cfda0bf8"
+  }
+}

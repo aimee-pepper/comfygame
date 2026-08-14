@@ -1,0 +1,21 @@
+{
+  "evidenceRole": "historicalSupersededFixture",
+  "supersededBy": "docs/combat-tree-true-graph-current.md / combat-true-graph-proof-0.3.0",
+  "mustNotPromote": true,
+  "integrationReady": false,
+  "version": "combat-graph-proof-0.2.0",
+  "pngSHA256": "8a1de34c4f05c11d75864f5c81f56c653487785ad1776bb1091faba54bda4e64",
+  "largeTextPNG_SHA256": "be46bd4b1ed65d99f85fba6cbb9cfdb0b1a2c2f2a43de89d8c7929e0fc479449",
+  "tree": "offense",
+  "dimensions": { "lanes": 3, "ranks": 8, "nodes": 24 },
+  "prerequisiteKinds": ["root", "all", "any"],
+  "junctionRanks": [4, 6],
+  "crossoverRule": "same or immediately adjacent lane only",
+  "capstoneMinimumLaneSpend": 5,
+  "stateAndRoleSeparated": true,
+  "states": ["owned", "available", "blocked", "selected"],
+  "roles": ["ordinary", "capstone"],
+  "profiles": ["390-point color", "390-point literal grayscale", "separate large-text scroll evidence positions 1/4 through 4/4 with two complete ranks each"],
+  "detailAuthority": "Decision137 owns topology, prerequisites, commitment and reachability; Decision139 owns effect and trigger truth",
+  "nativeClaims": []
+}

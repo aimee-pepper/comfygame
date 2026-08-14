@@ -1,0 +1,2263 @@
+{
+  "evidenceRole": "assetlabExploratoryCalibrationFixture",
+  "integrationReady": false,
+  "version": "world-grade-2-candidate-0.2.0",
+  "principle": "relative diversity: near/mid/far measured within controlled layers; incomparable axes are not total-ordered; runtime never novelty-optimizes",
+  "authoredInputBoundary": "Current authority is an exact optional CMY+Depth InkRecipe on the placed eligible source rune. Nil Ash leaves color open; bind resolves explicit or random color through a versioned rules-owned converter and freezes scoped color plus resolver version/provenance in the world. Named swatches in this calibration fixture are descriptive labels only, not live authored vocabulary, Sigil.color schema, or gamut restriction. A future integration adapter consumes the frozen resolved color declaration, never the obsolete named-Color qualifier model.",
+  "map": {
+    "tiles": [
+      7,
+      7
+    ],
+    "pixelSize": [
+      112,
+      112
+    ],
+    "samePlacementSeed": true
+  },
+  "fixtures": [
+    {
+      "id": "base",
+      "calibration": "reference",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "7ac12e43"
+      },
+      "frameSHA256": "295a46d715ba1acca32695fb5bd50e62b27e87270fe0989d81f25fc5f7dbe8d0"
+    },
+    {
+      "id": "derived-near",
+      "calibration": "resolver-produced-material-transform-near",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 3,
+            "saturation": 1.03,
+            "value": 1
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 3,
+          "saturation": 1.03,
+          "value": 1
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "340a2374"
+      },
+      "frameSHA256": "8e64594aeeb857f3e210fe52ef1f926b84627c69f8cb231e3cfea12e0a7b8861"
+    },
+    {
+      "id": "derived-mid",
+      "calibration": "resolver-produced-material-transform-mid",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 16,
+            "saturation": 1.16,
+            "value": 4
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 16,
+          "saturation": 1.16,
+          "value": 4
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "74833d8b"
+      },
+      "frameSHA256": "77d41dbeec5b23acf7873775c6960e78a248f97b293f62b802683da0b053d630"
+    },
+    {
+      "id": "derived-far",
+      "calibration": "resolver-produced-material-transform-far",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 34,
+            "saturation": 1.32,
+            "value": 7
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 34,
+          "saturation": 1.32,
+          "value": 7
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "d593b08a"
+      },
+      "frameSHA256": "0160fe417819ae4f732da41463484b3b401a45c84d18da88273caaae6f07d25a"
+    },
+    {
+      "id": "material-family-a",
+      "calibration": "resolved-palette-family-a",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 14,
+            "saturation": 1.14,
+            "value": 3
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 14,
+          "saturation": 1.14,
+          "value": 3
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "919bd16c"
+      },
+      "frameSHA256": "45f1b2c25099f838263dd7dd62f4532a467ad5bb2c0b146c14486c182107879c"
+    },
+    {
+      "id": "material-family-b",
+      "calibration": "resolved-palette-family-b",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "warmMineral",
+          "materialTransform": {
+            "hue": 14,
+            "saturation": 1.14,
+            "value": 3
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "warmMineral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 14,
+          "saturation": 1.14,
+          "value": 3
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "2d49b28a"
+      },
+      "frameSHA256": "a9d9a0185fa1f828b3f0f59bdcba015205e8e16222a56c1e762182a1c140a305"
+    },
+    {
+      "id": "granite-red",
+      "calibration": "material-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "granite",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "101",
+            "sourceID": "granite",
+            "colorID": "red"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "granite",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [
+            {
+              "sigilIDUInt64Decimal": "101",
+              "sourceID": "granite",
+              "colorID": "red"
+            }
+          ],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "d989bca7"
+      },
+      "frameSHA256": "a82cc1f63165d1142a9b475fa81b17d998db4cba0046f28e2285d6dcd9e00b05"
+    },
+    {
+      "id": "granite-blue",
+      "calibration": "material-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "granite",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "102",
+            "sourceID": "granite",
+            "colorID": "blue"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "granite",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [
+            {
+              "sigilIDUInt64Decimal": "102",
+              "sourceID": "granite",
+              "colorID": "blue"
+            }
+          ],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "5ba7a291"
+      },
+      "frameSHA256": "6f89a6bc83d1155ff46cdd826b9c66e97f1364c2cb79e57e3eb08f47b3928f51"
+    },
+    {
+      "id": "smoke-density-near",
+      "calibration": "resolved-smoke-density-near",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "smoke",
+            "density": 25,
+            "paletteFamilyID": "neutralSmoke"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "smoke",
+        "atmosphereDensity": 25,
+        "atmosphereFamily": "neutralSmoke",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "8a8a686c"
+      },
+      "frameSHA256": "a438003c4ef9cf2d5190be365fd257eb2701190616d15fa301562fd20310b7f5"
+    },
+    {
+      "id": "smoke-density-far",
+      "calibration": "resolved-smoke-density-far",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "smoke",
+            "density": 85,
+            "paletteFamilyID": "neutralSmoke"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "smoke",
+        "atmosphereDensity": 85,
+        "atmosphereFamily": "neutralSmoke",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "fd3b3c3a"
+      },
+      "frameSHA256": "3a8645a178ee9db9451ae8742fc90d2e8c79214af3532acc0ea0c4ab437ab879"
+    },
+    {
+      "id": "smoke-palette-neutral",
+      "calibration": "resolved-smoke-palette-neutral",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "smoke",
+            "density": 55,
+            "paletteFamilyID": "neutralSmoke"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "smoke",
+        "atmosphereDensity": 55,
+        "atmosphereFamily": "neutralSmoke",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "246481a1"
+      },
+      "frameSHA256": "54e3ad4e1dcc1074031ebb520c8c70fe054fbb66096a0ad17834362b2715d6b6"
+    },
+    {
+      "id": "smoke-palette-cool",
+      "calibration": "resolved-smoke-palette-cool",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "smoke",
+            "density": 55,
+            "paletteFamilyID": "coolSmoke"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "smoke",
+        "atmosphereDensity": 55,
+        "atmosphereFamily": "coolSmoke",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "23fe0c25"
+      },
+      "frameSHA256": "3c95d56f1b22ef55160c388e02503f85fe24be74d52f0b7602e01e488df148e7"
+    },
+    {
+      "id": "smoke-orange",
+      "calibration": "atmosphere-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "smoke",
+            "density": 45,
+            "paletteFamilyID": "neutralSmoke"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "201",
+            "sourceID": "smoke",
+            "colorID": "orange"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "smoke",
+        "atmosphereDensity": 45,
+        "atmosphereFamily": "neutralSmoke",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [
+            {
+              "sigilIDUInt64Decimal": "201",
+              "sourceID": "smoke",
+              "colorID": "orange"
+            }
+          ],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "a7e44bc8"
+      },
+      "frameSHA256": "838a6808a262aa837167469f8495fbf3224f4e315ab0931903fee219fb334fab"
+    },
+    {
+      "id": "smoke-violet",
+      "calibration": "atmosphere-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "smoke",
+            "density": 45,
+            "paletteFamilyID": "neutralSmoke"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "202",
+            "sourceID": "smoke",
+            "colorID": "violet"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "smoke",
+        "atmosphereDensity": 45,
+        "atmosphereFamily": "neutralSmoke",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [
+            {
+              "sigilIDUInt64Decimal": "202",
+              "sourceID": "smoke",
+              "colorID": "violet"
+            }
+          ],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "ac22563c"
+      },
+      "frameSHA256": "78fbbaa64e5bf2fa028690a87bebb3f0f70f7b070118bd16c007682ff602e97f"
+    },
+    {
+      "id": "sun-white",
+      "calibration": "emitter-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "301",
+            "sourceID": "sun",
+            "colorID": "white"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "301",
+              "sourceID": "sun",
+              "colorID": "white"
+            }
+          ],
+          "flora": []
+        },
+        "recipeHash": "ba09265e"
+      },
+      "frameSHA256": "348e8b1875b7d91c470fab59cacc742760d17c560ab6725e5ce78fa97f73d037"
+    },
+    {
+      "id": "sun-yellow",
+      "calibration": "emitter-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "302",
+            "sourceID": "sun",
+            "colorID": "yellow"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "302",
+              "sourceID": "sun",
+              "colorID": "yellow"
+            }
+          ],
+          "flora": []
+        },
+        "recipeHash": "e6066fe8"
+      },
+      "frameSHA256": "18d2acc0eda9834aa727361bcdbcb66568f566d19430c1dd59f979fb266e9292"
+    },
+    {
+      "id": "sun-violet",
+      "calibration": "emitter-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "303",
+            "sourceID": "sun",
+            "colorID": "violet"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "303",
+              "sourceID": "sun",
+              "colorID": "violet"
+            }
+          ],
+          "flora": []
+        },
+        "recipeHash": "22557ba8"
+      },
+      "frameSHA256": "5bf6d9323f1ed46a1aea1b224d9dfcb237b22c3a3cb4e0b82e8af58dbdb15471"
+    },
+    {
+      "id": "bloom-blue",
+      "calibration": "flora-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "401",
+            "sourceID": "bloom",
+            "colorID": "blue"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "401",
+              "sourceID": "bloom",
+              "colorID": "blue"
+            }
+          ]
+        },
+        "recipeHash": "c9235387"
+      },
+      "frameSHA256": "4984567025e806a7638d5e3114b7f491c76ab7e9ad0de75235339c089b72b97b"
+    },
+    {
+      "id": "bloom-magenta",
+      "calibration": "flora-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 40,
+            "paletteRichness": 50,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "402",
+            "sourceID": "bloom",
+            "colorID": "magenta"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 40,
+          "paletteRichness": 50,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "402",
+              "sourceID": "bloom",
+              "colorID": "magenta"
+            }
+          ]
+        },
+        "recipeHash": "e2dd4339"
+      },
+      "frameSHA256": "f0150f2b2e898fd936cbe31f5e1e00c81fe9c93ae4a0b7fbf54afd2f949c0444"
+    },
+    {
+      "id": "flora-low",
+      "calibration": "resolved-flora-low",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 12,
+            "paletteRichness": 20,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 24
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "401",
+            "sourceID": "bloom",
+            "colorID": "blue"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 12,
+          "paletteRichness": 20,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 24
+            }
+          ],
+          "richness": 0.82
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "401",
+              "sourceID": "bloom",
+              "colorID": "blue"
+            }
+          ]
+        },
+        "recipeHash": "b4c6073a"
+      },
+      "frameSHA256": "2137684acb046fb486b02132f289fcc4c3ce9b74beea03a5627b61006af9853d"
+    },
+    {
+      "id": "flora-high",
+      "calibration": "resolved-flora-high",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "mixedMineral",
+          "paletteFamilyID": "paleNeutral",
+          "materialTransform": {
+            "hue": 0,
+            "saturation": 1,
+            "value": 0
+          },
+          "atmosphere": {
+            "medium": "none",
+            "density": 0,
+            "paletteFamilyID": "clear"
+          },
+          "flora": {
+            "coveragePercent": 88,
+            "paletteRichness": 90,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 24
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              },
+              {
+                "speciesID": "flora-c",
+                "formID": 2,
+                "stature": 82
+              },
+              {
+                "speciesID": "flora-d",
+                "formID": 3,
+                "stature": 54
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "401",
+            "sourceID": "bloom",
+            "colorID": "blue"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "mixedMineral",
+        "paletteFamilyID": "paleNeutral",
+        "atmosphereMedium": "none",
+        "atmosphereDensity": 0,
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1,
+          "value": 0
+        },
+        "flora": {
+          "coveragePercent": 88,
+          "paletteRichness": 90,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 24
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            },
+            {
+              "speciesID": "flora-c",
+              "formID": 2,
+              "stature": 82
+            },
+            {
+              "speciesID": "flora-d",
+              "formID": 3,
+              "stature": 54
+            }
+          ],
+          "richness": 1.24
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "401",
+              "sourceID": "bloom",
+              "colorID": "blue"
+            }
+          ]
+        },
+        "recipeHash": "a99ca4b6"
+      },
+      "frameSHA256": "2fb3f30af398018f2be85a9be1b5505c4529fa97ffe3fac1e5ce7d7b0f68c7e0"
+    },
+    {
+      "id": "composed-warm",
+      "calibration": "composed",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "granite",
+          "paletteFamilyID": "warmMineral",
+          "materialTransform": {
+            "hue": 30,
+            "saturation": 1.3,
+            "value": 6
+          },
+          "atmosphere": {
+            "medium": "smoke",
+            "density": 45,
+            "paletteFamilyID": "neutralSmoke"
+          },
+          "flora": {
+            "coveragePercent": 78,
+            "paletteRichness": 82,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "501",
+            "sourceID": "granite",
+            "colorID": "red"
+          },
+          {
+            "sigilIDUInt64Decimal": "502",
+            "sourceID": "smoke",
+            "colorID": "orange"
+          },
+          {
+            "sigilIDUInt64Decimal": "503",
+            "sourceID": "sun",
+            "colorID": "yellow"
+          },
+          {
+            "sigilIDUInt64Decimal": "504",
+            "sourceID": "bloom",
+            "colorID": "magenta"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "granite",
+        "paletteFamilyID": "warmMineral",
+        "atmosphereMedium": "smoke",
+        "atmosphereDensity": 45,
+        "atmosphereFamily": "neutralSmoke",
+        "derived": {
+          "hue": 30,
+          "saturation": 1.3,
+          "value": 6
+        },
+        "flora": {
+          "coveragePercent": 78,
+          "paletteRichness": 82,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1.192
+        },
+        "scopedColors": {
+          "material": [
+            {
+              "sigilIDUInt64Decimal": "501",
+              "sourceID": "granite",
+              "colorID": "red"
+            }
+          ],
+          "atmosphere": [
+            {
+              "sigilIDUInt64Decimal": "502",
+              "sourceID": "smoke",
+              "colorID": "orange"
+            }
+          ],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "503",
+              "sourceID": "sun",
+              "colorID": "yellow"
+            }
+          ],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "504",
+              "sourceID": "bloom",
+              "colorID": "magenta"
+            }
+          ]
+        },
+        "recipeHash": "8e8e791b"
+      },
+      "frameSHA256": "2dcf696bca507a1ac0222f1a4e5771b42833addd32114e7ea338114979dac774"
+    },
+    {
+      "id": "composed-cool",
+      "calibration": "composed",
+      "request": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "rendererInputs": {
+          "materialIdentity": "granite",
+          "paletteFamilyID": "coolMineral",
+          "materialTransform": {
+            "hue": -30,
+            "saturation": 1.26,
+            "value": -5
+          },
+          "atmosphere": {
+            "medium": "smoke",
+            "density": 85,
+            "paletteFamilyID": "neutralSmoke"
+          },
+          "flora": {
+            "coveragePercent": 78,
+            "paletteRichness": 82,
+            "cast": [
+              {
+                "speciesID": "flora-a",
+                "formID": 0,
+                "stature": 35
+              },
+              {
+                "speciesID": "flora-b",
+                "formID": 1,
+                "stature": 68
+              }
+            ]
+          }
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "601",
+            "sourceID": "granite",
+            "colorID": "blue"
+          },
+          {
+            "sigilIDUInt64Decimal": "602",
+            "sourceID": "smoke",
+            "colorID": "cyan"
+          },
+          {
+            "sigilIDUInt64Decimal": "603",
+            "sourceID": "sun",
+            "colorID": "violet"
+          },
+          {
+            "sigilIDUInt64Decimal": "604",
+            "sourceID": "bloom",
+            "colorID": "green"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.2.0",
+        "materialIdentity": "granite",
+        "paletteFamilyID": "coolMineral",
+        "atmosphereMedium": "smoke",
+        "atmosphereDensity": 85,
+        "atmosphereFamily": "neutralSmoke",
+        "derived": {
+          "hue": -30,
+          "saturation": 1.26,
+          "value": -5
+        },
+        "flora": {
+          "coveragePercent": 78,
+          "paletteRichness": 82,
+          "cast": [
+            {
+              "speciesID": "flora-a",
+              "formID": 0,
+              "stature": 35
+            },
+            {
+              "speciesID": "flora-b",
+              "formID": 1,
+              "stature": 68
+            }
+          ],
+          "richness": 1.192
+        },
+        "scopedColors": {
+          "material": [
+            {
+              "sigilIDUInt64Decimal": "601",
+              "sourceID": "granite",
+              "colorID": "blue"
+            }
+          ],
+          "atmosphere": [
+            {
+              "sigilIDUInt64Decimal": "602",
+              "sourceID": "smoke",
+              "colorID": "cyan"
+            }
+          ],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "603",
+              "sourceID": "sun",
+              "colorID": "violet"
+            }
+          ],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "604",
+              "sourceID": "bloom",
+              "colorID": "green"
+            }
+          ]
+        },
+        "recipeHash": "6a8617ac"
+      },
+      "frameSHA256": "dde8dc4cbe1c34385156365843af38d1833b3fa37cd80ba17d599a882b4bb586"
+    }
+  ],
+  "measurements": [
+    {
+      "layer": "material-derived",
+      "a": "base",
+      "b": "derived-near",
+      "band": "near",
+      "inputDistance": {
+        "kind": "normalizedNumeric",
+        "value": 0.054
+      },
+      "wholeFrameDeltaE76": 1.081,
+      "layerDeltaE76": 1.081
+    },
+    {
+      "layer": "material-derived",
+      "a": "base",
+      "b": "derived-mid",
+      "band": "mid",
+      "inputDistance": {
+        "kind": "normalizedNumeric",
+        "value": 0.44
+      },
+      "wholeFrameDeltaE76": 5.259,
+      "layerDeltaE76": 5.259
+    },
+    {
+      "layer": "material-derived",
+      "a": "base",
+      "b": "derived-far",
+      "band": "far",
+      "inputDistance": {
+        "kind": "normalizedNumeric",
+        "value": 0.72
+      },
+      "wholeFrameDeltaE76": 9.61,
+      "layerDeltaE76": 9.61
+    },
+    {
+      "layer": "material-family",
+      "a": "material-family-a",
+      "b": "material-family-b",
+      "band": "threshold-step",
+      "inputDistance": {
+        "kind": "categoricalThreshold",
+        "changedFacts": [
+          "materialFamily"
+        ]
+      },
+      "wholeFrameDeltaE76": 5.947,
+      "layerDeltaE76": 5.947
+    },
+    {
+      "layer": "material-color",
+      "a": "granite-red",
+      "b": "granite-blue",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Granite",
+        "values": [
+          "red",
+          "blue"
+        ]
+      },
+      "wholeFrameDeltaE76": 3.304,
+      "layerDeltaE76": 3.304
+    },
+    {
+      "layer": "smoke-density",
+      "a": "smoke-density-near",
+      "b": "smoke-density-far",
+      "band": "numeric-far",
+      "inputDistance": {
+        "kind": "normalizedNumeric",
+        "field": "density",
+        "from": 25,
+        "to": 85,
+        "value": 0.6
+      },
+      "wholeFrameDeltaE76": 6.951,
+      "layerDeltaE76": 6.951
+    },
+    {
+      "layer": "atmosphere-palette",
+      "a": "smoke-palette-neutral",
+      "b": "smoke-palette-cool",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "paletteFamilyVariant",
+        "medium": "smoke",
+        "density": 55,
+        "values": [
+          "neutralSmoke",
+          "coolSmoke"
+        ]
+      },
+      "wholeFrameDeltaE76": 4.27,
+      "layerDeltaE76": 4.27
+    },
+    {
+      "layer": "atmosphere-color",
+      "a": "smoke-orange",
+      "b": "smoke-violet",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Smoke",
+        "values": [
+          "orange",
+          "violet"
+        ]
+      },
+      "wholeFrameDeltaE76": 7.757,
+      "layerDeltaE76": 7.757
+    },
+    {
+      "layer": "emitter-color",
+      "a": "sun-white",
+      "b": "sun-yellow",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Sun",
+        "values": [
+          "white",
+          "yellow"
+        ]
+      },
+      "wholeFrameDeltaE76": 7.629,
+      "layerDeltaE76": 7.629
+    },
+    {
+      "layer": "emitter-color",
+      "a": "sun-yellow",
+      "b": "sun-violet",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Sun",
+        "values": [
+          "yellow",
+          "violet"
+        ]
+      },
+      "wholeFrameDeltaE76": 14.536,
+      "layerDeltaE76": 14.536
+    },
+    {
+      "layer": "flora-color",
+      "a": "bloom-blue",
+      "b": "bloom-magenta",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Bloom",
+        "values": [
+          "blue",
+          "magenta"
+        ]
+      },
+      "wholeFrameDeltaE76": 0.673,
+      "layerDeltaE76": 18.763
+    },
+    {
+      "layer": "resolved-flora",
+      "a": "flora-low",
+      "b": "flora-high",
+      "band": "legitimate-geometry-change",
+      "inputDistance": {
+        "kind": "resolvedFloraVector",
+        "from": {
+          "cast": [
+            [
+              "flora-a",
+              0,
+              24
+            ]
+          ],
+          "coveragePercent": 12,
+          "paletteRichness": 20
+        },
+        "to": {
+          "cast": [
+            [
+              "flora-a",
+              0,
+              24
+            ],
+            [
+              "flora-b",
+              1,
+              68
+            ],
+            [
+              "flora-c",
+              2,
+              82
+            ],
+            [
+              "flora-d",
+              3,
+              54
+            ]
+          ],
+          "coveragePercent": 88,
+          "paletteRichness": 90
+        },
+        "normalizedDistance": 1.225
+      },
+      "wholeFrameDeltaE76": 3.699,
+      "layerDeltaE76": 37.697
+    },
+    {
+      "layer": "composition",
+      "a": "composed-warm",
+      "b": "composed-cool",
+      "band": "opposed-composed",
+      "inputDistance": {
+        "kind": "multiLayerOpposition",
+        "totalOrder": false
+      },
+      "wholeFrameDeltaE76": 35.02,
+      "layerDeltaE76": 35.02
+    },
+    {
+      "layer": "currentVisibility",
+      "a": "bright",
+      "b": "dim",
+      "band": "threshold-step",
+      "inputDistance": {
+        "kind": "resolvedVisibilityState",
+        "from": "bright",
+        "to": "dim"
+      },
+      "wholeFrameDeltaE76": 16.095
+    },
+    {
+      "layer": "currentVisibility",
+      "a": "dim",
+      "b": "torch",
+      "band": "bounded-restoration",
+      "inputDistance": {
+        "kind": "resolvedVisibilityState",
+        "from": "dim",
+        "to": "torch"
+      },
+      "wholeFrameDeltaE76": 11.94
+    }
+  ],
+  "reviewDisposition": "Design must label each controlled comparison too-flat, proportionate, or too-divergent; palette thresholds/plateaus are permitted when legitimate.",
+  "artifacts": {
+    "colorSHA256": "9e52d9bc2bef593a86752e7eaebf4b6442b9607a7de32f610d881183daa5bf7b",
+    "grayscaleSHA256": "85be8f1352d9c65f3a5def4f0580d43d6afe1fe983e1cd2e3c53b907ce2262c1",
+    "lightSequenceSHA256": "85afe83506f00fe0021191304400424b39056db8bab767d34fa9959afa2003f6",
+    "keyedCompanionSHA256": "7652b4ee8f6c17657d33474fe7bd5ba6f4ac71994995260d842ba2af737b7e8d"
+  },
+  "openQuestions": [
+    "whether an Ochre/Brown calibration anchor is needed beyond Orange/Yellow/Grey",
+    "material and atmosphere family catalogue",
+    "color space/blend math and accepted per-layer bands",
+    "self-contained compound color semantics",
+    "flora-only versus separate later Creature color scope"
+  ]
+}

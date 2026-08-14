@@ -1,0 +1,24 @@
+{
+  "evidenceRole": "supersededExploratoryAccessibilityFixture",
+  "integrationReady": false,
+  "superseded": true,
+  "supersededReason": "Fixed named-color ownership and acquisition were replaced by player-mixed ink semantics before review.",
+  "preservedEvidenceOnly": [
+    "redundant grayscale pattern exploration",
+    "connected mark footprint",
+    "phone layout",
+    "scoped preview and rejection layout"
+  ],
+  "unsafeForLiveDirection": [
+    "twelve fixed named swatches as writable identity",
+    "starter/common/later ownership",
+    "locked color acquisition",
+    "named fixed-swatch persistence"
+  ],
+  "currentDirection": {
+    "inkModelRecommendation": "subtractive CMY plus player-facing Depth",
+    "ashBlackMeaning": "unspecified color / nil",
+    "explicitMixedBlack": "authored explicit color distinct from ash/no instruction",
+    "unspecifiedEligibleSigil": "bind-time resolved random color persisted after resolution"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "fixtureVersion": "combat-node-placeholder-proof-0.1.0",
+  "evidenceRole": "functionalPlaceholderFixture",
+  "integrationReady": false,
+  "finalArt": false,
+  "nodeCount": 72,
+  "originalCollisionGroups": [
+    [
+      "heavy_hand",
+      "follow_through",
+      "breaking_blow"
+    ],
+    [
+      "quick_step",
+      "quicken",
+      "cascade",
+      "blur"
+    ],
+    [
+      "brace",
+      "bulwark",
+      "shieldwall",
+      "guardian"
+    ],
+    [
+      "footwork",
+      "sidestep",
+      "slippery",
+      "fall_back"
+    ],
+    [
+      "tainted_edge",
+      "envenom",
+      "virulence",
+      "blight"
+    ],
+    [
+      "sparkhand",
+      "emanation_strike",
+      "attunement",
+      "emanant"
+    ],
+    [
+      "conceal",
+      "ambush",
+      "shadowed",
+      "unseen"
+    ]
+  ],
+  "crossDisciplineCollisionGroups": [
+    [
+      "combat.defense.fortitude.ward",
+      "combat.craft.emanation.quench",
+      "combat.craft.emanation.snuff"
+    ],
+    [
+      "combat.defense.protection.cover",
+      "combat.defense.protection.interpose",
+      "combat.defense.protection.guardian"
+    ],
+    [
+      "combat.offense.swiftness.second_wind",
+      "combat.defense.protection.rally"
+    ],
+    [
+      "combat.offense.precision.anatomy",
+      "combat.craft.venom.flense"
+    ],
+    [
+      "combat.craft.shadow.low_profile",
+      "combat.craft.shadow.shadowed"
+    ],
+    [
+      "combat.craft.emanation.emanation_strike",
+      "combat.craft.emanation.conduction"
+    ]
+  ],
+  "effectCopyCount": 72,
+  "dimensions": {
+    "width": 2048,
+    "height": 2140
+  },
+  "pngSHA256": "797322f35d226e163317441fd4a7d223af131e10fa6e8e3972425e8e3220a270",
+  "assertions": {
+    "stableIDs": true,
+    "pairwisePlaceholderCommands": true,
+    "literalGrayscale": true,
+    "separateStateTechniqueCapstoneLayers": true,
+    "unknownIDsReject": true,
+    "exactEffectCopy": true
+  }
+}

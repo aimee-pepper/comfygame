@@ -1,0 +1,43 @@
+{
+  "proofVersion": "constellation-proof-0.1.0",
+  "evidenceRole": "proposedSemanticFixture",
+  "integrationReady": false,
+  "authority": {
+    "document": "docs/constellation-first-slice-current.md",
+    "liveCatalogue": "Sources/Content/Data/constellation.json"
+  },
+  "artifact": {
+    "path": "AssetLab/artifacts/constellation-proof-v0.1.png",
+    "pngSHA256": "8350ee1e2bf123e71ee18b32fd3ff464bc14f905b73ded07a42813947979c97a",
+    "pixelWidth": 1492,
+    "pixelHeight": 940,
+    "phoneWidth": 368,
+    "phoneHeight": 800
+  },
+  "profiles": [
+    "affordable-color",
+    "shortfall-literal-grayscale",
+    "bought-color",
+    "accessibility-large-text"
+  ],
+  "assertions": {
+    "liveNodeCount": 1,
+    "centeredLiveStarsPerPhone": 1,
+    "fakeEdges": 0,
+    "fakeLockedNodes": 0,
+    "selectedDetailAnchored": true,
+    "walletVisible": true,
+    "minimumActionTargetPoints": 44,
+    "staleOrInsufficientPreviewMutates": false,
+    "boughtStateHasIndependentCheckMark": true,
+    "proposedVoiceOverOrder": [
+      "wallet",
+      "node name and state",
+      "effect",
+      "rank and cost",
+      "action when available",
+      "Reality explanation"
+    ]
+  },
+  "nativeClaims": []
+}

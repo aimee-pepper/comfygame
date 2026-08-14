@@ -1,0 +1,115 @@
+{
+  "evidenceRole": "assetlabExhaustiveRouteAudit",
+  "integrationReady": false,
+  "authoritySHA256": "235abe8b86e4f39dec920c8dd47063be3adc4b2a8189e5adcefdc83ca1378d0f",
+  "distinctness": "unique seven-node owned sets per capstone; purchase order not multiplied",
+  "trees": {
+    "offense": {
+      "perCapstone": {
+        "combat.offense.force.breaking_blow": 13,
+        "combat.offense.precision.killing_stroke": 36,
+        "combat.offense.swiftness.blur": 30
+      },
+      "total": 79,
+      "thresholdPass": true
+    },
+    "defense": {
+      "perCapstone": {
+        "combat.defense.fortitude.immovable": 13,
+        "combat.defense.protection.guardian": 39,
+        "combat.defense.evasion.ghost": 15
+      },
+      "total": 67,
+      "thresholdPass": true
+    },
+    "craft": {
+      "perCapstone": {
+        "combat.craft.venom.blight": 13,
+        "combat.craft.emanation.emanant": 40,
+        "combat.craft.shadow.unseen": 13
+      },
+      "total": 66,
+      "thresholdPass": true
+    }
+  },
+  "namedRoutes": {
+    "Siegebreaker": {
+      "ok": true,
+      "stableIDs": [
+        "combat.offense.force.heavy_hand",
+        "combat.offense.force.follow_through",
+        "combat.offense.precision.keen_eye",
+        "combat.offense.precision.pry",
+        "combat.offense.force.bracing_stance",
+        "combat.offense.precision.exploit",
+        "combat.offense.force.shatter",
+        "combat.offense.force.breaking_blow"
+      ]
+    },
+    "Duelist": {
+      "ok": true,
+      "stableIDs": [
+        "combat.offense.precision.keen_eye",
+        "combat.offense.precision.pry",
+        "combat.offense.swiftness.quick_step",
+        "combat.offense.swiftness.quicken",
+        "combat.offense.precision.exploit",
+        "combat.offense.swiftness.flurry",
+        "combat.offense.precision.finish",
+        "combat.offense.precision.killing_stroke"
+      ]
+    },
+    "Vanguard": {
+      "ok": true,
+      "stableIDs": [
+        "combat.defense.fortitude.thick_hide",
+        "combat.defense.fortitude.brace",
+        "combat.defense.fortitude.endurance",
+        "combat.defense.fortitude.unyielding",
+        "combat.defense.protection.bulwark",
+        "combat.defense.protection.watchful",
+        "combat.defense.protection.cover",
+        "combat.defense.fortitude.immovable"
+      ]
+    },
+    "Skirmisher": {
+      "ok": true,
+      "stableIDs": [
+        "combat.defense.evasion.footwork",
+        "combat.defense.evasion.light_frame",
+        "combat.defense.evasion.slippery",
+        "combat.defense.evasion.feint",
+        "combat.defense.protection.bulwark",
+        "combat.defense.protection.draw_off",
+        "combat.defense.protection.shieldwall",
+        "combat.defense.evasion.ghost"
+      ]
+    },
+    "Saboteur": {
+      "ok": true,
+      "stableIDs": [
+        "combat.craft.venom.tainted_edge",
+        "combat.craft.venom.apothecary_s_hand",
+        "combat.craft.venom.virulence",
+        "combat.craft.emanation.sparkhand",
+        "combat.craft.emanation.emanation_strike",
+        "combat.craft.emanation.snuff",
+        "combat.craft.venom.corrode",
+        "combat.craft.venom.blight"
+      ]
+    },
+    "Nightflame": {
+      "ok": true,
+      "stableIDs": [
+        "combat.craft.shadow.quiet_step",
+        "combat.craft.shadow.conceal",
+        "combat.craft.shadow.ambush",
+        "combat.craft.shadow.shadowed",
+        "combat.craft.emanation.sparkhand",
+        "combat.craft.emanation.insulation",
+        "combat.craft.emanation.attunement",
+        "combat.craft.shadow.unseen"
+      ]
+    }
+  }
+}

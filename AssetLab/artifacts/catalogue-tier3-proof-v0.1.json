@@ -1,0 +1,86 @@
+{
+  "evidenceRole": "assetlabReviewFixture",
+  "integrationReady": false,
+  "version": "catalogue-tier3-proof-0.1.0",
+  "panelOrder": [
+    "color",
+    "literalGrayscale",
+    "literalGrayscaleCrossDomainRiskRow"
+  ],
+  "cellOrder": "tier2 counterpart then tier3",
+  "pairs": [
+    {
+      "number": 1,
+      "counterpart": "blade_keen",
+      "tier3": "ripping_hook"
+    },
+    {
+      "number": 2,
+      "counterpart": "raking_edge",
+      "tier3": "blade_binders"
+    },
+    {
+      "number": 3,
+      "counterpart": "banded_mace",
+      "tier3": "anvilfall"
+    },
+    {
+      "number": 4,
+      "counterpart": "warded_spear",
+      "tier3": "parting_needle"
+    },
+    {
+      "number": 5,
+      "counterpart": "banded_buckler",
+      "tier3": "tower_guard"
+    },
+    {
+      "number": 6,
+      "counterpart": "ridged_helm",
+      "tier3": "visored_casque"
+    },
+    {
+      "number": 7,
+      "counterpart": "guard_banded",
+      "tier3": "guard_vault"
+    },
+    {
+      "number": 8,
+      "counterpart": "studded_gloves",
+      "tier3": "gauntlets_of_hold"
+    },
+    {
+      "number": 9,
+      "counterpart": "shod_boots",
+      "tier3": "longstriders"
+    },
+    {
+      "number": 10,
+      "counterpart": "balanced_pick",
+      "tier3": "corebreaker"
+    },
+    {
+      "number": 11,
+      "counterpart": "cold_compass",
+      "tier3": "someones_ring"
+    }
+  ],
+  "riskRow": [
+    "ripping_hook",
+    "blade_binders",
+    "anvilfall",
+    "parting_needle",
+    "tower_guard",
+    "visored_casque",
+    "guard_vault",
+    "gauntlets_of_hold",
+    "longstriders",
+    "corebreaker",
+    "someones_ring",
+    "unknown",
+    "resource:rubble",
+    "material:glassy_quill",
+    "resource:essence_raw"
+  ],
+  "pngSHA256": "73aafbb4a95e98239d77a04dadc31143747251d23eb0b938926475464ec3d169"
+}

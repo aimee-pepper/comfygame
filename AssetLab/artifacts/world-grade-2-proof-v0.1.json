@@ -1,0 +1,1491 @@
+{
+  "evidenceRole": "assetlabExploratoryCalibrationFixture",
+  "integrationReady": false,
+  "version": "world-grade-2-candidate-0.1.0",
+  "principle": "relative diversity: near/mid/far measured within controlled layers; incomparable axes are not total-ordered; runtime never novelty-optimizes",
+  "authoredInputBoundary": "Color is a connected QualifierDef page mark projected into optional Sigil.color. Player selects no technical scope. Eligibility derives scope from sourceID. One color per Sigil; ordinary source marks only in this proof; self-contained compounds reject color pending a future whole-compound versus expanded-source rule. Acquisition is unresolved.",
+  "map": {
+    "tiles": [
+      7,
+      7
+    ],
+    "pixelSize": [
+      112,
+      112
+    ],
+    "samePlacementSeed": true
+  },
+  "fixtures": [
+    {
+      "id": "base",
+      "calibration": "reference",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "3c7c7df4"
+      },
+      "frameSHA256": "20569f9a0e678ecae8fd209ed83ea2061a39182998eecee912753aaf15895b26"
+    },
+    {
+      "id": "derived-near",
+      "calibration": "material-derived-near",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 54,
+          "availableWater": 48,
+          "substratePeak": 53
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 4,
+          "saturation": 1.15,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "6e6bf279"
+      },
+      "frameSHA256": "2885a191adcbe1e102900b2cae58bb788547ca3a5683f81a5bf69bb8f9065b21"
+    },
+    {
+      "id": "derived-mid",
+      "calibration": "material-derived-mid",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 72,
+          "availableWater": 34,
+          "substratePeak": 68
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 25,
+          "saturation": 1.302,
+          "value": 3
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "832dda22"
+      },
+      "frameSHA256": "d54220ca875467a6a00ceeec00d0dd9c4bd91c9133ffaa61cf54aa1ba674e0dd"
+    },
+    {
+      "id": "derived-far",
+      "calibration": "material-derived-far",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 88,
+          "availableWater": 16,
+          "substratePeak": 82
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 45,
+          "saturation": 1.458,
+          "value": 4
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "71097035"
+      },
+      "frameSHA256": "52056c5881f3d9ce1b803d0668d7a4f01e204bd314e42bcc9b01cffaf031dd37"
+    },
+    {
+      "id": "material-family-a",
+      "calibration": "material-family-threshold-a",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 70,
+          "availableWater": 32,
+          "substratePeak": 70
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 25,
+          "saturation": 1.306,
+          "value": 3
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "c4e08326"
+      },
+      "frameSHA256": "58d7b78afbf1611f60fbe254e761843b1deafafd8ba1d610554dcc89df76e36f"
+    },
+    {
+      "id": "material-family-b",
+      "calibration": "material-family-threshold-b",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 70,
+          "availableWater": 32,
+          "substratePeak": 70
+        },
+        "resolvedFamilies": {
+          "material": "emberstone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "emberstone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 25,
+          "saturation": 1.306,
+          "value": 3
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "b4fa331e"
+      },
+      "frameSHA256": "ef1bb66225f90f9cbbefd156c0ea7b450daa7b750c6b1a41a6bb7c3f1aa6daaa"
+    },
+    {
+      "id": "granite-red",
+      "calibration": "material-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "101",
+            "sourceID": "granite",
+            "colorID": "red"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [
+            {
+              "sigilIDUInt64Decimal": "101",
+              "sourceID": "granite",
+              "colorID": "red"
+            }
+          ],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "53005f21"
+      },
+      "frameSHA256": "6bc909083ce770b239d7a52be49bb4d57eed0220949e016b404c431ba3413289"
+    },
+    {
+      "id": "granite-blue",
+      "calibration": "material-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "102",
+            "sourceID": "granite",
+            "colorID": "blue"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [
+            {
+              "sigilIDUInt64Decimal": "102",
+              "sourceID": "granite",
+              "colorID": "blue"
+            }
+          ],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "2edec59b"
+      },
+      "frameSHA256": "cd4d51d62ab6de38c50a1dd300cc5509af22f753b267d7fed1cf4d2940a6f859"
+    },
+    {
+      "id": "atmosphere-family-a",
+      "calibration": "atmosphere-family-threshold-a",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "3c7c7df4"
+      },
+      "frameSHA256": "20569f9a0e678ecae8fd209ed83ea2061a39182998eecee912753aaf15895b26"
+    },
+    {
+      "id": "atmosphere-family-b",
+      "calibration": "atmosphere-family-threshold-b",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "violetVeil"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": []
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "violetVeil",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "7916b9e8"
+      },
+      "frameSHA256": "c686fbfbd809a19cc4406c832c771c126a1f2dd1582efb6f9bdc9042141b34d3"
+    },
+    {
+      "id": "smoke-orange",
+      "calibration": "atmosphere-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "mineralMist"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "201",
+            "sourceID": "smoke",
+            "colorID": "orange"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "mineralMist",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [
+            {
+              "sigilIDUInt64Decimal": "201",
+              "sourceID": "smoke",
+              "colorID": "orange"
+            }
+          ],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "47a658c8"
+      },
+      "frameSHA256": "6f717aadc810f6c07e64e5c60e1c5ea0ce7386502ff72dc43a5a9377f3ef292f"
+    },
+    {
+      "id": "smoke-violet",
+      "calibration": "atmosphere-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "mineralMist"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "202",
+            "sourceID": "smoke",
+            "colorID": "violet"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "mineralMist",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [
+            {
+              "sigilIDUInt64Decimal": "202",
+              "sourceID": "smoke",
+              "colorID": "violet"
+            }
+          ],
+          "emitter": [],
+          "flora": []
+        },
+        "recipeHash": "4be4633c"
+      },
+      "frameSHA256": "014a9166f6f8628e8604cc25707110129f0f087ccf3298e2b4c310e486b7da51"
+    },
+    {
+      "id": "sun-white",
+      "calibration": "emitter-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "301",
+            "sourceID": "sun",
+            "colorID": "white"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "301",
+              "sourceID": "sun",
+              "colorID": "white"
+            }
+          ],
+          "flora": []
+        },
+        "recipeHash": "a6a09f9f"
+      },
+      "frameSHA256": "71adf5fe5aafca89b7d75375b9e98c9d4160951e0d4a15cf227a399438b0ffb7"
+    },
+    {
+      "id": "sun-yellow",
+      "calibration": "emitter-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "302",
+            "sourceID": "sun",
+            "colorID": "yellow"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "302",
+              "sourceID": "sun",
+              "colorID": "yellow"
+            }
+          ],
+          "flora": []
+        },
+        "recipeHash": "3e432cff"
+      },
+      "frameSHA256": "b955225b9cfbd4fe563ca35b678e16f722df95413445e32237cf3d294d31a9dd"
+    },
+    {
+      "id": "sun-violet",
+      "calibration": "emitter-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "303",
+            "sourceID": "sun",
+            "colorID": "violet"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "303",
+              "sourceID": "sun",
+              "colorID": "violet"
+            }
+          ],
+          "flora": []
+        },
+        "recipeHash": "5a7d49c3"
+      },
+      "frameSHA256": "832e124e458c23dafafc9517af941374ec36bbe33ddd17ee0d111661a9bff8db"
+    },
+    {
+      "id": "bloom-blue",
+      "calibration": "flora-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "401",
+            "sourceID": "bloom",
+            "colorID": "blue"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "401",
+              "sourceID": "bloom",
+              "colorID": "blue"
+            }
+          ]
+        },
+        "recipeHash": "774ae364"
+      },
+      "frameSHA256": "b96bf91a0b6ba01f7b60b6dd32d70fc5844ab3e3014717520e3c6cba1354d670"
+    },
+    {
+      "id": "bloom-magenta",
+      "calibration": "flora-color-variant",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "402",
+            "sourceID": "bloom",
+            "colorID": "magenta"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 2,
+          "coveragePercent": 40,
+          "statureMedian": 50,
+          "paletteRichness": 50,
+          "richness": 1
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "402",
+              "sourceID": "bloom",
+              "colorID": "magenta"
+            }
+          ]
+        },
+        "recipeHash": "a737b380"
+      },
+      "frameSHA256": "9f81b59128534db4e20e4183f4cf18d92cab2e20f67d093a5630728e56011183"
+    },
+    {
+      "id": "flora-low",
+      "calibration": "resolved-flora-low",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 1,
+          "coveragePercent": 12,
+          "statureMedian": 20,
+          "paletteRichness": 20
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "401",
+            "sourceID": "bloom",
+            "colorID": "blue"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 1,
+          "coveragePercent": 12,
+          "statureMedian": 20,
+          "paletteRichness": 20,
+          "richness": 0.82
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "401",
+              "sourceID": "bloom",
+              "colorID": "blue"
+            }
+          ]
+        },
+        "recipeHash": "7db8ba9b"
+      },
+      "frameSHA256": "b0af6955f7c17db431e645d6177c079a74944699f4a5af38b7a5d00ea31553b1"
+    },
+    {
+      "id": "flora-high",
+      "calibration": "resolved-flora-high",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 50,
+          "availableWater": 50,
+          "substratePeak": 50
+        },
+        "resolvedFamilies": {
+          "material": "palelimestone",
+          "atmosphere": "clear"
+        },
+        "flora": {
+          "speciesCount": 4,
+          "coveragePercent": 88,
+          "statureMedian": 82,
+          "paletteRichness": 90
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "401",
+            "sourceID": "bloom",
+            "colorID": "blue"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "palelimestone",
+        "atmosphereFamily": "clear",
+        "derived": {
+          "hue": 0,
+          "saturation": 1.12,
+          "value": 0
+        },
+        "flora": {
+          "speciesCount": 4,
+          "coveragePercent": 88,
+          "statureMedian": 82,
+          "paletteRichness": 90,
+          "richness": 1.24
+        },
+        "scopedColors": {
+          "material": [],
+          "atmosphere": [],
+          "emitter": [],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "401",
+              "sourceID": "bloom",
+              "colorID": "blue"
+            }
+          ]
+        },
+        "recipeHash": "e85aefab"
+      },
+      "frameSHA256": "679b31f18cf881b611a09ebd337e5a56d7366d37b0e34f59d96c82d71a69f9dc"
+    },
+    {
+      "id": "composed-warm",
+      "calibration": "composed",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 86,
+          "availableWater": 22,
+          "substratePeak": 76
+        },
+        "resolvedFamilies": {
+          "material": "rediron",
+          "atmosphere": "dryHaze"
+        },
+        "flora": {
+          "speciesCount": 4,
+          "coveragePercent": 78,
+          "statureMedian": 68,
+          "paletteRichness": 82
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "501",
+            "sourceID": "granite",
+            "colorID": "red"
+          },
+          {
+            "sigilIDUInt64Decimal": "502",
+            "sourceID": "smoke",
+            "colorID": "orange"
+          },
+          {
+            "sigilIDUInt64Decimal": "503",
+            "sourceID": "sun",
+            "colorID": "yellow"
+          },
+          {
+            "sigilIDUInt64Decimal": "504",
+            "sourceID": "bloom",
+            "colorID": "magenta"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "rediron",
+        "atmosphereFamily": "dryHaze",
+        "derived": {
+          "hue": 40,
+          "saturation": 1.416,
+          "value": 4
+        },
+        "flora": {
+          "speciesCount": 4,
+          "coveragePercent": 78,
+          "statureMedian": 68,
+          "paletteRichness": 82,
+          "richness": 1.192
+        },
+        "scopedColors": {
+          "material": [
+            {
+              "sigilIDUInt64Decimal": "501",
+              "sourceID": "granite",
+              "colorID": "red"
+            }
+          ],
+          "atmosphere": [
+            {
+              "sigilIDUInt64Decimal": "502",
+              "sourceID": "smoke",
+              "colorID": "orange"
+            }
+          ],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "503",
+              "sourceID": "sun",
+              "colorID": "yellow"
+            }
+          ],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "504",
+              "sourceID": "bloom",
+              "colorID": "magenta"
+            }
+          ]
+        },
+        "recipeHash": "5be8fdc6"
+      },
+      "frameSHA256": "a7bdb9b2090cbc95c16ac75022eaa0545dc16d3f59a725f6adb5e94c74025ea9"
+    },
+    {
+      "id": "composed-cool",
+      "calibration": "composed",
+      "request": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "mapSeedUInt64Decimal": "8801",
+        "readings": {
+          "thermalMidpoint": 14,
+          "availableWater": 88,
+          "substratePeak": 72
+        },
+        "resolvedFamilies": {
+          "material": "bluebasalt",
+          "atmosphere": "marineHaze"
+        },
+        "flora": {
+          "speciesCount": 4,
+          "coveragePercent": 78,
+          "statureMedian": 68,
+          "paletteRichness": 82
+        },
+        "authoredSigils": [
+          {
+            "sigilIDUInt64Decimal": "601",
+            "sourceID": "granite",
+            "colorID": "blue"
+          },
+          {
+            "sigilIDUInt64Decimal": "602",
+            "sourceID": "smoke",
+            "colorID": "cyan"
+          },
+          {
+            "sigilIDUInt64Decimal": "603",
+            "sourceID": "sun",
+            "colorID": "violet"
+          },
+          {
+            "sigilIDUInt64Decimal": "604",
+            "sourceID": "bloom",
+            "colorID": "green"
+          }
+        ]
+      },
+      "recipe": {
+        "version": "world-grade-2-candidate-0.1.0",
+        "materialFamily": "bluebasalt",
+        "atmosphereFamily": "marineHaze",
+        "derived": {
+          "hue": -33,
+          "saturation": 1.438,
+          "value": 3
+        },
+        "flora": {
+          "speciesCount": 4,
+          "coveragePercent": 78,
+          "statureMedian": 68,
+          "paletteRichness": 82,
+          "richness": 1.192
+        },
+        "scopedColors": {
+          "material": [
+            {
+              "sigilIDUInt64Decimal": "601",
+              "sourceID": "granite",
+              "colorID": "blue"
+            }
+          ],
+          "atmosphere": [
+            {
+              "sigilIDUInt64Decimal": "602",
+              "sourceID": "smoke",
+              "colorID": "cyan"
+            }
+          ],
+          "emitter": [
+            {
+              "sigilIDUInt64Decimal": "603",
+              "sourceID": "sun",
+              "colorID": "violet"
+            }
+          ],
+          "flora": [
+            {
+              "sigilIDUInt64Decimal": "604",
+              "sourceID": "bloom",
+              "colorID": "green"
+            }
+          ]
+        },
+        "recipeHash": "1a12ce9a"
+      },
+      "frameSHA256": "4c84d01d0f4f085e46ea8e81aa7f63cd5b120fcbd27304b25aea15d5cce534f3"
+    }
+  ],
+  "measurements": [
+    {
+      "layer": "material-derived",
+      "a": "base",
+      "b": "derived-near",
+      "band": "near",
+      "inputDistance": {
+        "kind": "normalizedNumeric",
+        "value": 0.054
+      },
+      "wholeFrameDeltaE76": 2.167,
+      "layerDeltaE76": 2.167
+    },
+    {
+      "layer": "material-derived",
+      "a": "base",
+      "b": "derived-mid",
+      "band": "mid",
+      "inputDistance": {
+        "kind": "normalizedNumeric",
+        "value": 0.44
+      },
+      "wholeFrameDeltaE76": 16.46,
+      "layerDeltaE76": 16.46
+    },
+    {
+      "layer": "material-derived",
+      "a": "base",
+      "b": "derived-far",
+      "band": "far",
+      "inputDistance": {
+        "kind": "normalizedNumeric",
+        "value": 0.72
+      },
+      "wholeFrameDeltaE76": 24.749,
+      "layerDeltaE76": 24.749
+    },
+    {
+      "layer": "material-family",
+      "a": "material-family-a",
+      "b": "material-family-b",
+      "band": "threshold-step",
+      "inputDistance": {
+        "kind": "categoricalThreshold",
+        "changedFacts": [
+          "materialFamily"
+        ]
+      },
+      "wholeFrameDeltaE76": 14.424,
+      "layerDeltaE76": 14.424
+    },
+    {
+      "layer": "material-color",
+      "a": "granite-red",
+      "b": "granite-blue",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Granite",
+        "values": [
+          "red",
+          "blue"
+        ]
+      },
+      "wholeFrameDeltaE76": 19.264,
+      "layerDeltaE76": 19.264
+    },
+    {
+      "layer": "atmosphere-family",
+      "a": "atmosphere-family-a",
+      "b": "atmosphere-family-b",
+      "band": "threshold-step",
+      "inputDistance": {
+        "kind": "categoricalThreshold",
+        "changedFacts": [
+          "atmosphereFamily"
+        ]
+      },
+      "wholeFrameDeltaE76": 15.594,
+      "layerDeltaE76": 15.594
+    },
+    {
+      "layer": "atmosphere-color",
+      "a": "smoke-orange",
+      "b": "smoke-violet",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Smoke",
+        "values": [
+          "orange",
+          "violet"
+        ]
+      },
+      "wholeFrameDeltaE76": 10.653,
+      "layerDeltaE76": 10.653
+    },
+    {
+      "layer": "emitter-color",
+      "a": "sun-white",
+      "b": "sun-yellow",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Sun",
+        "values": [
+          "white",
+          "yellow"
+        ]
+      },
+      "wholeFrameDeltaE76": 9.218,
+      "layerDeltaE76": 9.218
+    },
+    {
+      "layer": "emitter-color",
+      "a": "sun-yellow",
+      "b": "sun-violet",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Sun",
+        "values": [
+          "yellow",
+          "violet"
+        ]
+      },
+      "wholeFrameDeltaE76": 17.636,
+      "layerDeltaE76": 17.636
+    },
+    {
+      "layer": "flora-color",
+      "a": "bloom-blue",
+      "b": "bloom-magenta",
+      "band": "categorical-variants",
+      "inputDistance": {
+        "kind": "namedColorVariants",
+        "anchor": "Bloom",
+        "values": [
+          "blue",
+          "magenta"
+        ]
+      },
+      "wholeFrameDeltaE76": 0.736,
+      "layerDeltaE76": 18.24
+    },
+    {
+      "layer": "resolved-flora",
+      "a": "flora-low",
+      "b": "flora-high",
+      "band": "legitimate-geometry-change",
+      "inputDistance": {
+        "kind": "resolvedFloraVector",
+        "from": [
+          1,
+          12,
+          20,
+          20
+        ],
+        "to": [
+          4,
+          88,
+          82,
+          90
+        ],
+        "normalizedDistance": 1.225
+      },
+      "wholeFrameDeltaE76": 4.464,
+      "layerDeltaE76": 38.168
+    },
+    {
+      "layer": "composition",
+      "a": "composed-warm",
+      "b": "composed-cool",
+      "band": "opposed-composed",
+      "inputDistance": {
+        "kind": "multiLayerOpposition",
+        "totalOrder": false
+      },
+      "wholeFrameDeltaE76": 58.155,
+      "layerDeltaE76": 58.155
+    },
+    {
+      "layer": "currentVisibility",
+      "a": "bright",
+      "b": "dim",
+      "band": "threshold-step",
+      "inputDistance": {
+        "kind": "resolvedVisibilityState",
+        "from": "bright",
+        "to": "dim"
+      },
+      "wholeFrameDeltaE76": 23.762
+    },
+    {
+      "layer": "currentVisibility",
+      "a": "dim",
+      "b": "torch",
+      "band": "bounded-restoration",
+      "inputDistance": {
+        "kind": "resolvedVisibilityState",
+        "from": "dim",
+        "to": "torch"
+      },
+      "wholeFrameDeltaE76": 17.948
+    }
+  ],
+  "reviewDisposition": "Design must label each controlled comparison too-flat, proportionate, or too-divergent; palette thresholds/plateaus are permitted when legitimate.",
+  "artifacts": {
+    "colorSHA256": "fb503e7e2d8b66dff25892db482a28eaf8a18c9f5d76c3ab22cc0f98d356984f",
+    "grayscaleSHA256": "779d15c67ba9a91b4432534b91bbffc0cc698b51f27b160e6bece969495a70d7",
+    "lightSequenceSHA256": "f469a5efa69c1af8fd0a9b00bb1c9f1933a5647c1bd8f1ddd7b6eb7255e29b94"
+  },
+  "openQuestions": [
+    "historical Color qualifier vocabulary and acquisition remain proposal-level",
+    "whether an Ochre/Brown material anchor is needed beyond Orange/Yellow/Grey",
+    "material and atmosphere family catalogue",
+    "color space/blend math and accepted per-layer bands",
+    "self-contained compound color semantics",
+    "flora-only versus flora+creature flora scope"
+  ]
+}

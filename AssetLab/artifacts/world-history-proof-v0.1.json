@@ -1,0 +1,31 @@
+{
+  "proofVersion": "world-history-proof-0.1.0",
+  "evidenceRole": "proposedSemanticFixture",
+  "integrationReady": false,
+  "authority": "docs/world-history-collection-comparison-current.md",
+  "artifact": {
+    "path": "AssetLab/artifacts/world-history-proof-v0.1.png",
+    "pngSHA256": "3b7c79a91cc91c52154f29781328af9b5c460fb531e2d4ebfa011a8317ea6d26",
+    "pixelWidth": 1864,
+    "pixelHeight": 850,
+    "phoneWidth": 368,
+    "phoneHeight": 800
+  },
+  "profiles": ["archive-color", "archive-literal-grayscale", "two-record-comparison", "comparison-accessibility-large-text", "archive-accessibility-large-text"],
+  "assertions": {
+    "ordinaryColumns": 2,
+    "accessibilityColumns": 1,
+    "legacyCoverRerolls": false,
+    "proposedComparisonSelectionLimit": 2,
+    "chronologyIndependentOfTapOrder": true,
+    "rawMeasurementsAccepted": false,
+    "missingRequestCopy": "Not written",
+    "missingMeasurementCopy": "Not measured in this record",
+    "requestStatesShown": ["added", "removed", "changed", "unchanged"]
+  },
+  "proposedVoiceOver": {
+    "archiveCoverOrder": ["world", "kept/chance/ordinary state", "authored summary", "selected order"],
+    "comparisonRowOrder": ["subject", "earlier value", "later value", "difference or measurement availability"]
+  },
+  "nativeClaims": []
+}

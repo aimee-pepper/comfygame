@@ -1,0 +1,40 @@
+{
+  "proofVersion": "consumable-field-kit-proof-0.1.0",
+  "evidenceRole": "proposedSemanticFixture",
+  "integrationReady": false,
+  "authority": {
+    "document": "docs/consumable-economy-field-kit-current.md",
+    "liveCatalogue": "Sources/Content/Data/items.json"
+  },
+  "artifact": {
+    "path": "AssetLab/artifacts/consumable-field-kit-proof-v0.1.png",
+    "pngSHA256": "0af17200ab098258ee4e4460ece0dec11c891c7a451e467868818dd52bbf2b96",
+    "pixelWidth": 1492,
+    "pixelHeight": 1150,
+    "phoneWidth": 368,
+    "phoneHeight": 800
+  },
+  "catalogue": {
+    "liveConsumables": 17,
+    "treatments": 7,
+    "coatings": 4,
+    "fieldwork": 6,
+    "exactAuthoredIcons": 17
+  },
+  "profiles": [
+    "apothecary-color",
+    "apothecary-literal-grayscale",
+    "field-kit-six-across",
+    "field-kit-accessibility-large-text"
+  ],
+  "proposedVoiceOverOrder": [
+    "surface and selected tab",
+    "item identity",
+    "owned and desired quantity",
+    "selection",
+    "anchored detail effect and shortage",
+    "minus and plus actions",
+    "distinct bins selected and capacity"
+  ],
+  "nativeClaims": []
+}

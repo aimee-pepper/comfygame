@@ -1,0 +1,35 @@
+{
+  "evidenceRole": "assetlabMixerProposal",
+  "integrationReady": false,
+  "version": "mixed-ink-candidate-0.1.0",
+  "pngSHA256": "496a848b4f33841e1e38595c1eadc7ac8b588c6caa5e40e7fba6af4813005ff0",
+  "settledStructure": [
+    "Ash ink stores nil and leaves eligible color open for persisted bind-time resolution",
+    "mixed ink stores an exact nonnil Cyan/Magenta/Yellow/Depth recipe",
+    "saved formulas are not inventory; prepared vials provide bounded applications",
+    "draft edits reserve nothing and only a successful bind consumes applications atomically",
+    "one Copper processes into four Cyan measures; one Ichor into four Magenta; one Sulfur into four Yellow; one Obsidian into four Depth",
+    "vial preparation consumes one Resin plus ceil(channel divided by 25) measures for every nonzero channel",
+    "explicit mixed black remains distinct from Ash even when page values are similar",
+    "Ink Mixing is unlocked by Isolde's Scriptorium as a tier-1 sibling after A pencil",
+    "Compound Assembly and Chaining are independent sibling capabilities",
+    "color is an attribute of the source focus and consumes no page cell"
+  ],
+  "recommendedAndTunable": [
+    "subtractive conversion coefficients",
+    "preset recipes",
+    "generated descriptive labels",
+    "redundant pattern selection",
+    "layout spacing and exact visual values",
+    "12 applications per vial DEBUG placeholder",
+    "vial yield after the current 12-application DEBUG placeholder"
+  ],
+  "proofStates": [
+    "locked Ash-only Writing Desk",
+    "unlocked CMY+Depth mixer",
+    "literal-grayscale and accessibility-large reflow sample",
+    "Ash versus explicit neutral-dark authorship",
+    "all-zero mixed recipe rejection"
+  ],
+  "nativeClaims": []
+}

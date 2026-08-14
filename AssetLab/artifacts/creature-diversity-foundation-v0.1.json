@@ -1,0 +1,38 @@
+{
+  "evidenceRole": "assetlabVisualOnlyCreatureDiversityFoundation",
+  "integrationReady": false,
+  "schemaVersion": 5,
+  "fixtureCount": 2,
+  "constraints": [
+    "visual-only morphology",
+    "body plan independent from appendage type",
+    "cranial feature does not imply a sensor mechanic",
+    "flight, reach and combat behavior are not inferred"
+  ],
+  "fixtures": [
+    {
+      "id": "fennec-like",
+      "bodyPlan": "quadruped",
+      "cranialFeature": "longEars",
+      "appendageCount": 4,
+      "appendageType": "limbed",
+      "worldCommandHash": "3c19ac20",
+      "fightCommandHash": "af32e448"
+    },
+    {
+      "id": "winged-serpent",
+      "bodyPlan": "serpentine",
+      "cranialFeature": "crest",
+      "appendageCount": 2,
+      "appendageType": "membrane",
+      "worldCommandHash": "1ac43f01",
+      "fightCommandHash": "522acc52"
+    }
+  ],
+  "artifact": {
+    "file": "creature-diversity-foundation-v0.1.png",
+    "pixelWidth": 720,
+    "pixelHeight": 360,
+    "sha256": "92271d14cc6981c8ebacb50663392f741075f71acd7adcde5fe1291b8b91a20e"
+  }
+}

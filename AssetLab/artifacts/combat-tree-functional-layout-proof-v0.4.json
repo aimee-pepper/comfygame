@@ -1,0 +1,381 @@
+{
+  "version": "combat-functional-layout-proof-0.4.0",
+  "evidenceRole": "assetlabFunctionalLayoutFixture",
+  "integrationReady": false,
+  "authority": "docs/combat-tree-v2-authority.json",
+  "effectCopy": "docs/combat-tree-v2-effect-copy.generated.json",
+  "temporaryMarksOnly": true,
+  "pngSHA256": "52a8d1a71c1eb5880b86cd11afc201e55ec3378ee49e9306f8bbebca809fcc4c",
+  "largeTextPNGSHA256": "a418d3684e2d91bf92b8f496331f3ff823aaf62afdd45cb8d7e85fc8d5ff37d5",
+  "voiceOverOrder": [
+    "tree and fixture context",
+    "depth",
+    "discipline and node name",
+    "purchase state",
+    "technique or capstone role",
+    "exact effect",
+    "alternative parents or capstone gate",
+    "available action"
+  ],
+  "accessibilityNodes": [
+    {
+      "id": "combat.offense.force.heavy_hand",
+      "depth": 1,
+      "name": "Heavy Hand",
+      "discipline": "Force",
+      "state": "available",
+      "role": "root",
+      "grantsTechnique": false,
+      "effect": "Your Crush attacks deal +2 raw damage.",
+      "prerequisites": [],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.force.follow_through",
+      "depth": 2,
+      "name": "Follow Through",
+      "discipline": "Force",
+      "state": "blocked",
+      "role": "fundamentalA",
+      "grantsTechnique": false,
+      "effect": "Deal +3 raw damage to a foe with 8 or more armour before the hit.",
+      "prerequisites": [
+        "Heavy Hand"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.force.overbear",
+      "depth": 2,
+      "name": "Overbear",
+      "discipline": "Force",
+      "state": "blocked",
+      "role": "fundamentalB",
+      "grantsTechnique": true,
+      "effect": "Make a heavy Crush attack now, then skip your next personal turn.",
+      "prerequisites": [
+        "Heavy Hand"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.force.bracing_stance",
+      "depth": 3,
+      "name": "Bracing Stance",
+      "discipline": "Force",
+      "state": "available",
+      "role": "developmentA",
+      "grantsTechnique": false,
+      "effect": "Deal +3 raw damage while you have held the same rank since your previous action.",
+      "prerequisites": [
+        "Follow Through",
+        "Pry"
+      ],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.force.stagger",
+      "depth": 3,
+      "name": "Stagger",
+      "discipline": "Force",
+      "state": "blocked",
+      "role": "developmentB",
+      "grantsTechnique": false,
+      "effect": "Landed Crush hits have a 30% chance to move the foe one place later next round.",
+      "prerequisites": [
+        "Overbear"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.force.shatter",
+      "depth": 4,
+      "name": "Shatter",
+      "discipline": "Force",
+      "state": "available",
+      "role": "masteryA",
+      "grantsTechnique": true,
+      "effect": "Strike one foe and permanently reduce its armour for this encounter, to a minimum of 0.",
+      "prerequisites": [
+        "Bracing Stance",
+        "Exploit"
+      ],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.force.momentum",
+      "depth": 4,
+      "name": "Momentum",
+      "discipline": "Force",
+      "state": "blocked",
+      "role": "masteryB",
+      "grantsTechnique": false,
+      "effect": "Gain raw damage from gear initiative penalty: 40% of the penalty, rounded down, maximum +4.",
+      "prerequisites": [
+        "Stagger"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.force.breaking_blow",
+      "depth": 5,
+      "name": "Breaking Blow",
+      "discipline": "Force",
+      "state": "blocked",
+      "role": "capstone",
+      "grantsTechnique": false,
+      "effect": "Crush hits ignore armour; the first landed Crush hit each personal turn also Staggers.",
+      "prerequisites": [
+        "Shatter",
+        "Momentum"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.precision.keen_eye",
+      "depth": 1,
+      "name": "Keen Eye",
+      "discipline": "Precision",
+      "state": "owned",
+      "role": "root",
+      "grantsTechnique": false,
+      "effect": "Your Pierce attacks deal +2 raw damage.",
+      "prerequisites": [],
+      "action": null
+    },
+    {
+      "id": "combat.offense.precision.weak_point",
+      "depth": 2,
+      "name": "Weak Point",
+      "discipline": "Precision",
+      "state": "available",
+      "role": "fundamentalA",
+      "grantsTechnique": false,
+      "effect": "Deal +3 raw damage when the foe's covering density is 50 or more.",
+      "prerequisites": [
+        "Keen Eye"
+      ],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.precision.pry",
+      "depth": 2,
+      "name": "Pry",
+      "discipline": "Precision",
+      "state": "owned",
+      "role": "fundamentalB",
+      "grantsTechnique": true,
+      "effect": "Make a lower-power Pierce attack that ignores armour.",
+      "prerequisites": [
+        "Keen Eye"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.precision.steady_hand",
+      "depth": 3,
+      "name": "Steady Hand",
+      "discipline": "Precision",
+      "state": "blocked",
+      "role": "developmentA",
+      "grantsTechnique": false,
+      "effect": "Landed attacks have a 12% chance to deal ×1.5 raw damage before armour.",
+      "prerequisites": [
+        "Weak Point",
+        "Overbear"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.precision.exploit",
+      "depth": 3,
+      "name": "Exploit",
+      "discipline": "Precision",
+      "state": "owned",
+      "role": "developmentB",
+      "grantsTechnique": false,
+      "effect": "Deal +4 raw damage to a foe with Burn, Poison, Dazzle or Bleed.",
+      "prerequisites": [
+        "Pry",
+        "Quicken"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.precision.finish",
+      "depth": 4,
+      "name": "Finish",
+      "discipline": "Precision",
+      "state": "selected",
+      "role": "masteryA",
+      "grantsTechnique": true,
+      "effect": "Strike one foe at full power below the shown HP threshold, or one-third power above it.",
+      "prerequisites": [
+        "Steady Hand",
+        "Stagger",
+        "Flurry"
+      ],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.precision.anatomy",
+      "depth": 4,
+      "name": "Anatomy",
+      "discipline": "Precision",
+      "state": "available",
+      "role": "masteryB",
+      "grantsTechnique": false,
+      "effect": "The party gains 35% more butchery output while you took part in the expedition; copies do not stack.",
+      "prerequisites": [
+        "Exploit"
+      ],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.precision.killing_stroke",
+      "depth": 5,
+      "name": "Killing Stroke",
+      "discipline": "Precision",
+      "state": "blocked",
+      "role": "capstone",
+      "grantsTechnique": false,
+      "effect": "Defeat a surviving non-apex foe at 15% HP or less after your hit; apexes take +4 damage instead.",
+      "prerequisites": [
+        "Finish",
+        "Anatomy"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.swiftness.quick_step",
+      "depth": 1,
+      "name": "Quick Step",
+      "discipline": "Swiftness",
+      "state": "owned",
+      "role": "root",
+      "grantsTechnique": false,
+      "effect": "Gain +4 initiative.",
+      "prerequisites": [],
+      "action": null
+    },
+    {
+      "id": "combat.offense.swiftness.light_touch",
+      "depth": 2,
+      "name": "Light Touch",
+      "discipline": "Swiftness",
+      "state": "available",
+      "role": "fundamentalA",
+      "grantsTechnique": false,
+      "effect": "Halve initiative penalties from equipped gear, rounding toward 0.",
+      "prerequisites": [
+        "Quick Step"
+      ],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.swiftness.quicken",
+      "depth": 2,
+      "name": "Quicken",
+      "discipline": "Swiftness",
+      "state": "owned",
+      "role": "fundamentalB",
+      "grantsTechnique": true,
+      "effect": "As zero-turn setup, take two ordinary actions now, then skip your next personal turn; cannot combine with Blur.",
+      "prerequisites": [
+        "Quick Step"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.swiftness.second_wind",
+      "depth": 3,
+      "name": "Second Wind",
+      "discipline": "Swiftness",
+      "state": "available",
+      "role": "developmentA",
+      "grantsTechnique": false,
+      "effect": "When you defeat a foe, recover 3 HP if still conscious.",
+      "prerequisites": [
+        "Light Touch",
+        "Pry"
+      ],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.swiftness.flurry",
+      "depth": 3,
+      "name": "Flurry",
+      "discipline": "Swiftness",
+      "state": "owned",
+      "role": "developmentB",
+      "grantsTechnique": false,
+      "effect": "A landed direct attack carries 40% of damage dealt to one other legal foe; it cannot chain.",
+      "prerequisites": [
+        "Quicken"
+      ],
+      "action": null
+    },
+    {
+      "id": "combat.offense.swiftness.first_strike",
+      "depth": 4,
+      "name": "First Strike",
+      "discipline": "Swiftness",
+      "state": "available",
+      "role": "masteryA",
+      "grantsTechnique": true,
+      "effect": "As your first normal-cost action, attack for +4 raw damage without allowing retaliation.",
+      "prerequisites": [
+        "Second Wind",
+        "Exploit"
+      ],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.swiftness.cascade",
+      "depth": 4,
+      "name": "Cascade",
+      "discipline": "Swiftness",
+      "state": "available",
+      "role": "masteryB",
+      "grantsTechnique": false,
+      "effect": "Each foe you defeat grants +3 initiative for this encounter, up to three times.",
+      "prerequisites": [
+        "Flurry"
+      ],
+      "action": "Add to sandbox"
+    },
+    {
+      "id": "combat.offense.swiftness.blur",
+      "depth": 5,
+      "name": "Blur",
+      "discipline": "Swiftness",
+      "state": "blocked",
+      "role": "capstone",
+      "grantsTechnique": false,
+      "effect": "Once per encounter, take two ordinary actions without spending this action; cannot combine with Quicken this turn.",
+      "prerequisites": [
+        "First Strike",
+        "Cascade"
+      ],
+      "action": null
+    }
+  ],
+  "selectedNode": {
+    "id": "combat.offense.precision.finish",
+    "state": "selected",
+    "effect": "Strike one foe at full power below the shown HP threshold, or one-third power above it.",
+    "parents": [
+      "Steady Hand",
+      "Stagger",
+      "Flurry"
+    ]
+  },
+  "assertions": [
+    "full fan-and-fork topology remains visible",
+    "sibling alternatives use OR",
+    "hybrid edges remain authored-only",
+    "detail does not cover selected node or edges",
+    "state and role are separate",
+    "no tutorial or handmade glyph claim"
+  ]
+}

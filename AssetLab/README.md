@@ -17,6 +17,7 @@ Open `http://127.0.0.1:4173`.
 - Golden Review: `http://127.0.0.1:4173/regression.html`
 - Combat Proof: `http://127.0.0.1:4173/combat.html`
 - Combat UI Proof: `http://127.0.0.1:4173/combat-ui.html`
+- Sprite Region Studio: `http://127.0.0.1:4173/sprite-regions.html`
 
 ## Test
 

@@ -1,0 +1,14 @@
+{
+  "evidenceRole": "assetlabCombatGraphPresentationProposal",
+  "integrationReady": false,
+  "version": "combat-graph-proof-0.1.0",
+  "pngSHA256": "0bb5d467abd26777b34c1d9b2573dbbf70cb0e225a98987dd4bb6af05fbfc26a",
+  "tree": "offense",
+  "dimensions": { "lanes": 3, "ranks": 8, "nodes": 24 },
+  "junctionRanks": [4, 6],
+  "crossoverRule": "same or immediately adjacent lane only",
+  "states": ["owned", "available", "blocked", "selected", "capstone"],
+  "detailAuthority": "Decision139 exact prerequisite, reachability, trigger and boundary copy",
+  "profiles": ["390-point color", "390-point literal grayscale", "topology-preserving accessibility outline"],
+  "nativeClaims": []
+}

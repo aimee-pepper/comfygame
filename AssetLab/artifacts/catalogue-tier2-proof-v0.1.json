@@ -1,0 +1,86 @@
+{
+  "evidenceRole": "assetlabReviewFixture",
+  "integrationReady": false,
+  "version": "catalogue-tier2-proof-0.1.0",
+  "panelOrder": [
+    "color",
+    "literalGrayscale",
+    "literalGrayscaleCrossDomainRiskRow"
+  ],
+  "cellOrder": "counterpart then tier2",
+  "pairs": [
+    {
+      "number": 1,
+      "accepted": "blade_chipped",
+      "tier2": "blade_keen"
+    },
+    {
+      "number": 2,
+      "accepted": "bone_awl",
+      "tier2": "raking_edge"
+    },
+    {
+      "number": 3,
+      "accepted": "field_maul",
+      "tier2": "banded_mace"
+    },
+    {
+      "number": 4,
+      "accepted": "long_pick",
+      "tier2": "warded_spear"
+    },
+    {
+      "number": 5,
+      "accepted": "split_board",
+      "tier2": "banded_buckler"
+    },
+    {
+      "number": 6,
+      "accepted": "padded_cap",
+      "tier2": "ridged_helm"
+    },
+    {
+      "number": 7,
+      "accepted": "guard_padded",
+      "tier2": "guard_banded"
+    },
+    {
+      "number": 8,
+      "accepted": "wrapped_hands",
+      "tier2": "studded_gloves"
+    },
+    {
+      "number": 9,
+      "accepted": "worn_boots",
+      "tier2": "shod_boots"
+    },
+    {
+      "number": 10,
+      "accepted": "bent_pick",
+      "tier2": "balanced_pick"
+    },
+    {
+      "number": 11,
+      "accepted": "pressed_leaf",
+      "tier2": "cold_compass"
+    }
+  ],
+  "riskRow": [
+    "blade_keen",
+    "raking_edge",
+    "banded_mace",
+    "warded_spear",
+    "banded_buckler",
+    "ridged_helm",
+    "guard_banded",
+    "studded_gloves",
+    "shod_boots",
+    "balanced_pick",
+    "cold_compass",
+    "unknown",
+    "resource:rubble",
+    "material:glassy_quill",
+    "resource:essence_raw"
+  ],
+  "pngSHA256": "3b66f65d4dbf835600ea361efb1a0f53f98b2296294766eed16dce62bb3115b0"
+}
