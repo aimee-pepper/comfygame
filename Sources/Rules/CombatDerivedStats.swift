@@ -168,6 +168,7 @@ enum CombatDerivedStatsRules {
         static let snuff: CombatNodeID = "combat.craft.emanation.snuff"
         static let quench: CombatNodeID = "combat.craft.emanation.quench"
         static let interpose: CombatNodeID = "combat.defense.protection.interpose"
+        static let guardian: CombatNodeID = "combat.defense.protection.guardian"
     }
 
     static func constitutionTicks(authored: Int, endless: Bool, ownsNode: Bool) -> Int {

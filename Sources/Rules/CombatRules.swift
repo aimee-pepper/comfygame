@@ -2337,6 +2337,22 @@ enum CombatRules {
         state.base.partyMembers.map(\.combatant)
     }
 
+    static func guardianFilteredTargets(_ targets: [Combatant], isSingleTargetDirect: Bool,
+                                        run: WorldRun, encounter: EncounterState,
+                                        state: GameState) -> [Combatant] {
+        guard isSingleTargetDirect, encounter.debugV2OwnedNodeIDs != nil else { return targets }
+        let front = targets.filter {
+            rank(of: $0, in: encounter, fallback: state) == .front && isAlive($0, in: run)
+        }
+        guard !front.isEmpty,
+              front.contains(where: { actor in
+                  isAlive(actor, in: run)
+                      && encounter.debugV2OwnedNodeIDs?[actor]?.contains(
+                          CombatDerivedStatsRules.Node.guardian) == true
+              }) else { return targets }
+        return front
+    }
+
     // MARK: Turn order
 
     /// Moves to the next living combatant, ticking the round over when the rotation wraps.
@@ -2656,11 +2672,18 @@ enum CombatRules {
         let front = targetable.filter { rank(of: $0, in: encounter, fallback: state) == .front }
         let reachesPast = foe.stats.strikesFirst
             || (foe.stats.element != nil && !isSnuffed(foeID, in: encounter))
-        let reachable = (reachesPast || front.isEmpty) ? targetable : front
+        let reachLegal = (reachesPast || front.isEmpty) ? targetable : front
+        let isSingleTargetIntent: Bool = switch slot.kind {
+        case .primary: foe.stats.delivery == .single
+        case .apexFollowUp, .ordinaryPressureFollowUp: true
+        }
+        let reachable = guardianFilteredTargets(reachLegal,
+            isSingleTargetDirect: isSingleTargetIntent, run: run, encounter: encounter, state: state)
 
         // **Draw Off.** Something you've taunted comes for you and doesn't get a choice — the only
         // way in the game to take a hit meant for somebody else.
         let taunted = (encounter.taunts[foeID] ?? 0) > 0 && isAlive(.binder, in: run)
+            && reachable.contains(.binder)
         let unused = reachable.filter { !(encounter.apexTargetsThisRound[foeID] ?? []).contains($0) }
         guard let primary = taunted ? .binder : run.rng.pick(unused.isEmpty ? reachable : unused) else {
             run.activeEncounter = encounter

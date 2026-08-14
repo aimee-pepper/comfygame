@@ -5581,4 +5581,84 @@ final class CombatTests: XCTestCase {
         XCTAssertNil(decoded.interposeReceipts)
         XCTAssertEqual(decoded.interposing[.binder], 2)
     }
+
+    func testGuardianFiltersSingleTargetFarReachToVisibleFrontWithoutAura() throws {
+        let store = inFight()
+        store.mutate("stage Guardian target set") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [
+                .binder: [CombatDerivedStatsRules.Node.guardian], .companion(0): []
+            ]
+            encounter.partyRanks = [.binder: .front, .companion(0): .back]
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        let run = try XCTUnwrap(store.activeRun)
+        XCTAssertEqual(CombatRules.guardianFilteredTargets([.binder, .companion(0)],
+            isSingleTargetDirect: true, run: run, encounter: encounter, state: store.state), [.binder])
+        XCTAssertEqual(CombatRules.guardianFilteredTargets([.binder, .companion(0)],
+            isSingleTargetDirect: false, run: run, encounter: encounter, state: store.state),
+                       [.binder, .companion(0)])
+
+        var noOwner = encounter
+        noOwner.debugV2OwnedNodeIDs?[.binder] = []
+        XCTAssertEqual(CombatRules.guardianFilteredTargets([.binder, .companion(0)],
+            isSingleTargetDirect: true, run: run, encounter: noOwner, state: store.state),
+                       [.binder, .companion(0)])
+    }
+
+    func testGuardianRequiresConsciousVisibleFrontOwnerAndSurvivesRelaunch() throws {
+        let store = inFight()
+        store.mutate("stage Guardian consciousness") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [
+                .companion(0): [CombatDerivedStatsRules.Node.guardian], .binder: []
+            ]
+            encounter.partyRanks = [.companion(0): .front, .binder: .back]
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let encoded = try JSONEncoder().encode(try XCTUnwrap(store.activeEncounter))
+        let reloaded = try JSONDecoder().decode(EncounterState.self, from: encoded)
+        let run = try XCTUnwrap(store.activeRun)
+        XCTAssertEqual(CombatRules.guardianFilteredTargets([.binder, .companion(0)],
+            isSingleTargetDirect: true, run: run, encounter: reloaded, state: store.state),
+                       [.companion(0)])
+
+        var passedOut = run
+        passedOut.companionHP[0] = 0
+        XCTAssertEqual(CombatRules.guardianFilteredTargets([.binder, .companion(0)],
+            isSingleTargetDirect: true, run: passedOut, encounter: reloaded, state: store.state),
+                       [.binder, .companion(0)])
+        var backOwner = reloaded
+        backOwner.partyRanks[.companion(0)] = .back
+        XCTAssertEqual(CombatRules.guardianFilteredTargets([.binder, .companion(0)],
+            isSingleTargetDirect: true, run: run, encounter: backOwner, state: store.state),
+                       [.binder, .companion(0)])
+    }
+
+    func testGuardianProductionPreventsIllegalLegacyTauntButNotAreaIntent() throws {
+        let store = inFight()
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage Guardian against taunt") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [
+                .companion(0): [CombatDerivedStatsRules.Node.guardian], .binder: []
+            ]
+            encounter.partyRanks = [.companion(0): .front, .binder: .back]
+            encounter.taunts[foeID] = 2
+            encounter.debugV2Evasion = .init(entries: CombatRules.party(of: state).map {
+                .init(actor: $0, characterEvasion: 0, components: [])
+            })
+            encounter.ghostEvasionAvailable = []
+            encounter.order = [.foe(foeID), .binder, .companion(0)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }; encounter.turnIndex = 0
+            run.rng = SeededRNG(seed: 0x6A12)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let binderBefore = try XCTUnwrap(store.activeRun?.binderHP)
+        let companionBefore = try XCTUnwrap(store.activeRun?.companionHP[0])
+        store.mutate("resolve Guardian-filtered foe") { CombatRules.runAutomaticTurns(in: &$0) }
+        XCTAssertEqual(store.activeRun?.binderHP, binderBefore)
+        XCTAssertLessThan(store.activeRun?.companionHP[0] ?? companionBefore, companionBefore)
+    }
 }
