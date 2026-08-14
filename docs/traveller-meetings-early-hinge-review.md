@@ -1,9 +1,8 @@
 # Traveller Meetings — Early-Hinge Review Draft
 
-**Status:** authored review draft, not approved live copy. This is the first complete meeting batch
-from `traveller-meeting-corpus-plan-current.md`. Engineering may use it to exercise the DEBUG atlas
-and schema validation, but must not replace `Missing` catalogue rows with these texts until Aimee
-reviews them.
+**Status:** production-authorized authored copy. This is the first complete meeting batch from
+`traveller-meeting-corpus-plan-current.md`. Coherent copy enters play without waiting for a separate
+Atlas approval; Aimee reviews and flags it through ordinary play or the dialogue Atlas.
 
 All exchanges have stable semantic IDs. The three questions are independent and must remain coherent
 in any order; none is a correct answer or recruitment requirement. Terminal replies are shown before
@@ -13,21 +12,21 @@ dismissal under `traveller-meeting-interaction-current.md`.
 
 **Opening**
 
-Bryn stands on the dangerous side of a narrow passage, one shoulder against a buckling sheet of
-stone. Behind her, three bedrolls and a cooking pot have been gathered beside an entirely different
-exit. “They are not trapped,” she says. “That was my first mistake.”
+Bryn braces one shoulder against a buckling sheet of stone. Behind her, three travellers are already
+carrying their bedrolls through another exit. “They found a safer way,” she says. “I'm keeping this
+one open until they're clear.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `bryn.held_route` | “What are you holding it open for?” | “For people who have decided not to use it.” She shifts her footing as the stone bears down. “The danger was real. So was their choice after I stopped it.” |
-| `bryn.protection_debt` | “You still saved them.” | “Yes. That does not purchase the rest of their decisions.” She looks back at the abandoned passage. “Gratitude becomes a leash very easily when the grateful person is frightened.” |
-| `bryn.chosen_exit` | “Which way will they go?” | “Ask them. I spent too long making this route safe to notice they had made another one.” |
+| `bryn.held_route` | “What are you holding it open for?” | “In case someone has to come back.” She adjusts her footing. “A safe retreat is still useful when nobody chooses the original route.” |
+| `bryn.protection_debt` | “You still saved them.” | “I helped. They don't owe me their next decision.” She checks the other exit. “Frightened people agree too quickly. I try not to collect those promises.” |
+| `bryn.chosen_exit` | “Which way will they go?” | “The other one, by the look of it.” One corner of her mouth lifts. “Good. I was getting tired of arguing with a wall on their behalf.” |
 
-**Offer:** “Come with me. I need someone who can see whom danger has chosen—and remember the choice
-returns to them afterward.”
+**Offer:** “Come with me. My party needs someone who can spot danger early, hold it off, and still
+let people choose their own way out.”
 
-**Accepted:** “Then help me move this brace before it decides endurance was the plan.” She waits for
-the people behind her to clear their own exit before stepping away.
+**Accepted:** “Then help me move this brace before my shoulder becomes part of the architecture.” She
+waits for the last traveller to clear the other exit before stepping away.
 
 **Declined:** “Fair.” Bryn settles her shoulder again. “If you pass them, tell them I heard the
 answer this time.”
@@ -36,24 +35,24 @@ answer this time.”
 
 **Opening**
 
-Orsa has turned a shallow shelter into several small places without building a single wall. A lamp
-faces away from the sleeping mat, every seat can see two exits, and a strip of bright cloth marks the
-one corner where she asks before entering. “Try the stool,” she says. “Not the welcome. The stool.”
+Orsa has made a shallow shelter comfortable without closing it in. A lamp faces away from the
+sleeping mat, every seat can see an exit, and bright cloth marks one private corner. “Try the stool,”
+she says. “I repaired it, but I don't trust its opinion of taller guests.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `orsa.room_test` | “What am I testing?” | “Whether you can sit without watching the door, and whether you can leave without asking me to move.” She nudges the lamp another inch. “Peace is made of embarrassingly practical things.” |
-| `orsa.disclosed_risk` | “Why mark that corner?” | “Because I told the last guest what frightened me, and they agreed not to surprise me there.” Orsa smooths the cloth flat. “Confidence is not permission. It is information someone trusted you to carry carefully.” |
-| `orsa.strangers` | “Do you trust everyone who stays here?” | “No. They do not have to perform friendship to earn dry ground.” She glances around the separate spaces. “Enough agreement for one night can still be honest agreement.” |
+| `orsa.room_test` | “What am I testing?” | “Whether you can sit without staring at the door, mostly. Also the repair.” She tests the stool with one foot. “Comfort usually has a very boring explanation.” |
+| `orsa.disclosed_risk` | “Why mark that corner?” | “It means ask before entering. The last guest wanted one place nobody would approach unexpectedly.” Orsa smooths the cloth. “Simple rule. Worked beautifully.” |
+| `orsa.strangers` | “Do you trust everyone who stays here?” | “Certainly not.” She glances around the separate spaces. “But we can share soup and dry ground without pretending we're lifelong friends. One night is allowed to be only one night.” |
 
-**Offer:** “Come home with me. Help me make the Firepit a place like this—shared food, clear exits,
-and no demand that strangers pretend to be family.”
+**Offer:** “Come home with me. Help me make the Firepit comfortable for travellers—good food,
+clear exits, and room for people who aren't ready to call us family.”
 
 **Accepted:** “Good. We begin with the chairs.” Orsa lifts the lamp. “People confess all sorts of
 things when furniture leaves them nowhere comfortable to look.”
 
-**Declined:** “Then this shelter remains enough for tonight.” She turns the lamp down. “Not every
-welcome needs to become a claim.”
+**Declined:** “Then sit as long as you like.” She turns the lamp down. “The stool doesn't require a
+long-term commitment.”
 
 ## Vance
 
@@ -61,22 +60,22 @@ welcome needs to become a claim.”
 
 Vance turns a repaired kettle over in his hands. Three ownership marks cross its base; a fourth has
 been filed away, but not deeply enough. Beside it lies a neat price card with the number still blank.
-“It boils,” he says. “That is the least interesting fact and, inconveniently, the easiest to sell.”
+“It boils,” he says. “Good start. Not much of a sales pitch.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `vance.repairs` | “What do the repairs tell you?” | “One owner carried it by the lid. One patched it with better metal than the kettle deserved. One needed the handle usable from the left.” He traces each change. “Use leaves a better ledger than pride.” |
-| `vance.missing_mark` | “Why was that mark removed?” | “That is the expensive question.” His thumb rests over the scar. “If I omit it, the kettle moves today. If I name it, the person buying can decide whether usefulness is the only history they are willing to inherit.” |
-| `vance.price` | “So what is it worth?” | “To someone cold, more than I should charge. To someone carrying three kettles, less than the repair cost.” He leaves the card blank. “A price compares offers. It does not settle need.” |
+| `vance.repairs` | “What do the repairs tell you?” | “One owner carried it by the lid. One patched it with excellent metal and terrible judgment. One needed the handle on the left.” He points to each repair. “People record how they use a thing, whether they intend to or not.” |
+| `vance.missing_mark` | “Why was that mark removed?” | “Someone wanted the previous owner forgotten.” His thumb rests over the scar. “I could ignore it and sell the kettle faster. I won't. The buyer gets to know what they are carrying.” |
+| `vance.price` | “So what is it worth?” | “Depends who needs it and what else they have.” He taps the blank card. “Unfortunately, the Trading Post requires a number rather than a philosophical crisis. Give me a minute.” |
 
-**Offer:** “Come home with me. I bring back more useful things than one household can keep. Run a
-counter where I can sell what we no longer need and find changing stock with its history intact.”
+**Offer:** “Come home with me. I bring back more useful things than we can keep. Run a Trading Post
+where I can sell the extras and buy what we actually need.”
 
-**Accepted:** Vance writes a price, then adds the missing ownership mark beneath it. “There. Now both
-of us have something awkward to explain.”
+**Accepted:** Vance writes a price, then adds the missing ownership mark beneath it. “There. Honest,
+useful, and slightly harder to sell. A respectable compromise.”
 
-**Declined:** “Keep the kettle in mind.” He turns the blank card face down. “A thing can wait for the
-right exchange without becoming worthless.”
+**Declined:** “All right.” He turns the blank card face down. “If you change your mind, I will still
+have the kettle. I may even have decided what it costs.”
 
 ## Noll
 
@@ -87,34 +86,33 @@ corner remains deliberately joined. They press that corner once, listen, and lea
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `noll.join_left` | “Why leave that corner together?” | “Because the join is evidence.” They press it once and stop. “Separated pieces tell you what may be used. A joined failure tells you what the maker expected to hold.” |
-| `noll.repair` | “Could the frame be repaired?” | “Yes. That is not the same as saying it should be.” They indicate the bowed edge. “Repair preserves a whole. Salvage preserves uses. Sentiment becomes waste when it refuses to name which one it wants.” |
-| `noll.vance` | “You know Vance?” | “He can price the story attached to a thing. I can tell him which part of the story will survive his buyer.” A brief look up. “He dislikes that distinction most when it saves him money.” |
+| `noll.join_left` | “Why leave that corner together?” | “I haven't finished checking why it failed.” They press it once and stop. “Once I separate it, I can reuse the pieces. I cannot put the break back together to inspect it again.” |
+| `noll.repair` | “Could the frame be repaired?” | “Yes. It would cost more than replacing it.” They indicate the bowed edge. “If someone needs this frame, repair it. If they need hinges and sound timber, take it apart. Which do you need?” |
+| `noll.vance` | “You know Vance?” | “Yes. He tells me what a whole object will sell for. I tell him which pieces are worth more than the whole.” A brief look up. “He calls that an attack on commerce.” |
 
 **Offer:** “Come back with me. We have things that need a second honest use.”
 
-**Accepted:** “Then do not call it rescue when we take something apart.” Noll folds the joined
-corner into cloth and gathers the reusable pieces separately. “Give each result its own name.”
+**Accepted:** “Good. Put sound parts together, damaged parts together, and sentimental parts wherever
+you can still find them.” Noll wraps the failed corner separately. “Do not make me price those.”
 
-**Declined:** “Go carefully.” They return to the failed join. “Whole ground can hide worse breaks
-than this.”
+**Declined:** “Go carefully.” They return to the failed join. “If the ground starts making that
+noise, leave before you learn which part was carrying the load.”
 
 ## Talin
 
 **Opening**
 
-Talin kneels within reach of a plated creature that has not yet noticed her. She is perfectly still.
-Only the point of her blade moves, following a seam that appears each time the creature draws breath
-and vanishes when the plates settle. “Not yet,” she says, though you have not moved.
+Talin crouches near a plated creature that has not noticed her. The point of her blade follows a seam
+that appears whenever it inhales. “Wait,” she whispers. “The gap closes before I can recover.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `talin.opening` | “What are you waiting for?” | “The same opening. Not merely a similar one.” The seam closes. “Knowing a weakness exists is not the same as having time to use it.” |
-| `talin.certainty` | “How will you know it is the right moment?” | “I will not.” Her grip remains loose. “I will know when the useful moment is leaving. Certainty and timeliness are different luxuries.” |
-| `talin.outcome` | “And if the strike works?” | “Then it worked.” Talin watches the next breath. “Success does not travel backward and improve the reasons I had before I chose.” |
+| `talin.opening` | “What are you waiting for?” | “A gap wide enough to strike and get my hand back.” The seam closes. “There. Too short again.” |
+| `talin.certainty` | “How will you know it is the right moment?” | “I won't be certain.” Her grip stays loose. “I'll know I have enough time. That's the standard I can actually use.” |
+| `talin.outcome` | “And if the strike works?” | “Then I judged this one correctly.” Talin watches the next breath. “If I get lucky, I still want to know it was luck.” |
 
-**Offer:** “Come with me. My party meets things that give us one useful moment and several convincing
-distractions. Teach us to act while the first is still true.”
+**Offer:** “Come with me. Teach my party how to recognize a real opening, use it, and recover before
+the enemy answers.”
 
 **Accepted:** The seam opens. Talin lowers the blade instead of striking. “Good. This one no longer
 needs to become proof.” She backs away with you.
@@ -126,15 +124,15 @@ can be sound without becoming permanent.”
 
 **Opening**
 
-Nessa scrapes the names from two identical blue vials and replaces them with longer labels. One
-includes a pawprint, a quantity and a time. The other bears a hand, half the quantity and the word
-*after*. “Same preparation,” she says. “That was the error.”
+Nessa scrapes the names from two identical blue vials and replaces them with longer labels. One gets
+a pawprint, a quantity and a time; the other gets a hand and half the dose. “Same mixture,” she says.
+“Different instructions. The old labels nearly made that expensive.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `nessa.same_substance` | “They contain the same thing?” | “Yes. They did not enter the same body, by the same route, at the same moment.” She caps both vials. “A substance is not an effect until it meets a situation.” |
-| `nessa.cure_or_poison` | “Is it medicine or poison?” | “For whom? How much? Before or after what?” Nessa holds up the shorter label she removed. “Those are not evasions. They are the parts the old name concealed.” |
-| `nessa.result` | “Did either one work?” | “One body improved and wanted the treatment stopped. The other worsened and asked me to continue.” She sets the vials apart. “A measured result matters. It does not answer on their behalf.” |
+| `nessa.same_substance` | “They contain the same thing?” | “Yes. One was swallowed by a person; one went on an animal's wound. Same mixture, different dose and route.” She caps both vials. |
+| `nessa.cure_or_poison` | “Is it medicine or poison?” | “Tell me who is taking it, how much, and when. Then I'll answer.” Nessa holds up the old label. “Anyone who answers faster is selling confidence.” |
+| `nessa.result` | “Did either one work?” | “The smaller dose helped. The larger one made the animal ill.” She sets the vials apart. “Both survived. I'd prefer not to repeat the experiment.” |
 
 **Offer:** “Come home with me. I'll bring you ingredients and tell you whose body, which route and
 what moment they are meant for. Make us remedies, coatings and tools that say what they are for.”
@@ -175,10 +173,15 @@ also competent fieldwork.”
 - Noll joins the canonical early-economy batch as the twenty-second missing meeting after the roster
   expanded from 28 to 29. `traveller-identity-noll-recycler-current.md` retains the original first
   draft for design history but points review/generation to this canonical copy.
+- **14 Aug voice pass:** Vance and Noll now answer in ordinary, role-specific language at their
+  settled 10% loftiness ceiling. Vance uses price, buyer and stock vocabulary with dry bargaining
+  humour; Noll uses break, repair and reusable-part vocabulary with blunt diagnostic questions.
+  Stable exchange IDs, actions, recruitment ownership and meeting facts are unchanged; Git history
+  retains the superseded exact copy.
 
 ## Atlas disposition fields
 
-The DEBUG atlas creates rows for the six meeting objects and eighteen exchanges with
-review state `Draft / needs Aimee review`, this document as provenance, and a hash of the exact
-opening/questions/offer/terminal copy. Review state remains external to content JSON and campaign
-saves.
+The DEBUG atlas creates rows for the six meeting objects and eighteen exchanges with review state
+`Playable / unreviewed`, this document as provenance, and a hash of the exact
+opening/questions/offer/terminal copy. That state invites playtest feedback but does not block the
+copy from entering play. Review state remains external to content JSON and campaign saves.

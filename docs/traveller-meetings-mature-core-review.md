@@ -20,8 +20,8 @@ is fine,” she says. “The shoulder that has to meet it eight hundred times is
 | Stable ID | Ask | Reply |
 |---|---|---|
 | `corrin.wear_point` | “Why work only that spot?” | “Because comfort fails locally.” She folds the strap where it rubbed. “A material can be strong everywhere and cruel in one repeated place.” |
-| `corrin.source_marks` | “What was it made from?” | Corrin turns the clean face down and shows you three faint grain changes. “Three sources, finished until they looked like none. Easier to sell. Harder to remember which piece should never have carried the same load.” |
-| `corrin.nothing_wasted` | “At least none of it was wasted.” | “Waste matters.” She tests the softened section again. “It does not travel backward and make taking justified. Useful is an answer about what happens next.” |
+| `corrin.source_marks` | “What was it made from?” | Corrin turns the clean face down and shows you three changes in the grain. “Three hides. Whoever finished it tried to make them look identical. They aren't, and one stretches badly.” |
+| `corrin.nothing_wasted` | “At least none of it was wasted.” | “That's good, but it doesn't tell me whether it was worth taking.” She tests the softened section. “Use every piece. Ask the other question first.” |
 
 **Offer:** “Come home with me. Make us bindings, capacity goods and protection that expects bodies
 to move. I'll bring what I know about each material's source too.”
@@ -42,9 +42,9 @@ clears a space behind his heel, and waits for his breath to become ordinary.
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `dagg.one_strike` | “Why only one?” | “Because the first changed the ground.” He presses a boot against the lifted edge. “Repeating a good answer after the question changes is only momentum pretending to be judgement.” |
-| `dagg.recovery_space` | “What are you measuring now?” | “Where the next choice can begin.” Dagg marks the distance behind him. “A blow includes the place the body must return to afterward.” |
-| `dagg.cost_of_waiting` | “What if someone cannot wait for the best moment?” | “Then their waiting is part of my calculation.” His expression tightens. “I learned that after being correct too late and calling the delay patience.” |
+| `dagg.one_strike` | “Why only one?” | “Because I moved the slab.” He braces a boot against its new edge. “A second swing from the same stance would be practice for a situation that no longer exists.” |
+| `dagg.recovery_space` | “What are you measuring now?” | “Whether I can step back without falling over.” Dagg marks the distance behind him. “The impressive part of a swing is useless if the recovery gets you killed.” |
+| `dagg.cost_of_waiting` | “What if someone cannot wait for the best moment?” | “Then I hit sooner.” His expression tightens. “Perfect timing that arrives after somebody gets hurt is just late.” |
 
 **Offer:** “Come with me. My party meets weight that punishes hurry and danger that punishes delay.
 Teach us to see commitment, impact and recovery as one action.”
@@ -67,8 +67,8 @@ mine.”
 | Stable ID | Ask | Reply |
 |---|---|---|
 | `rook.moved_line` | “Why move the markers?” | “A warning must arrive before the consequence.” Rook sights along the new row. “The old distance was clear to someone already trained to fear a spear.” |
-| `rook.boundary_owner` | “Is this your boundary?” | “I maintain it. That is not the same as owning every approach it crosses.” They glance toward the only dry passage. “A legible line can still be unjustly placed.” |
-| `rook.stopped_creature` | “You could reach it from here.” | “And it cannot reach me.” Rook lowers the spear. “That difference creates time. If I spend the time only on striking, distance has taught me nothing.” |
+| `rook.boundary_owner` | “Is this your boundary?” | “I maintain the markers. I didn't choose where the only dry path would be.” They glance toward the crossing. “If the line blocks the road, it needs a better reason than my convenience.” |
+| `rook.stopped_creature` | “You could reach it from here.” | “Yes, and it can't reach me.” Rook lowers the spear. “That gives me time to warn it, move, or strike. I prefer having three choices.” |
 
 **Offer:** “Come with me. My party should know where contact becomes inevitable while there is still
 room to warn, answer or turn away.”
@@ -89,9 +89,9 @@ either page,” she says. “Only the account of how one became the other.”
 
 | Stable ID | Ask | Reply |
 |---|---|---|
-| `lys.missing_relation` | “What belongs in the empty space?” | “A relationship, not necessarily another object.” Lys aligns the edges without closing the gap. “Sequence, contradiction, a person who chose not to be recorded. An archive loses these while every page remains present.” |
-| `lys.two_accounts` | “Which record is right?” | “They agree too neatly where neither writer was present and differ where both were.” She taps the repeated line. “Agreement is evidence. So is the route by which agreement became convenient.” |
-| `lys.living_subject` | “Can you preserve the full context?” | “No.” Lys does not soften the answer. “Context limits misuse; it does not return control to someone whose words outlived their chance to correct me.” |
+| `lys.missing_relation` | “What belongs in the empty space?” | “A note explaining what changed between these records.” Lys keeps the gap open. “It might be a correction, a disagreement, or somebody asking not to be included. I don't know yet.” |
+| `lys.two_accounts` | “Which record is right?” | “Neither is reliable by itself.” She taps the same sentence on both pages. “They copied each other here. Over there, both writers were present and disagree. I want the disagreement preserved.” |
+| `lys.living_subject` | “Can you preserve the full context?” | “No. I can record where a statement came from, what surrounded it, and who disputed it.” Lys looks up. “That makes misuse harder. It doesn't make my copy complete.” |
 
 **Offer:** “Come home with me. My Library is collecting fragments. Make their relationships
 searchable without pretending the gaps are solved, and keep the disagreements visible too.”
