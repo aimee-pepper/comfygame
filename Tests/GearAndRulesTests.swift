@@ -4,6 +4,48 @@ import XCTest
 /// Session 12: gear is found rather than researched, and rules are edited in place.
 @MainActor
 final class GearAndRulesTests: XCTestCase {
+    func testGearSlotUsesAPageAndItemsUseAnchoredDetailsWithoutScrolling() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/GearView.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains("AnchoredItemDetailButton(item: option, selection: $selectedOption)"))
+        XCTAssertTrue(source.contains("GearOptionDetailPane("))
+        XCTAssertTrue(source.contains("if lhsWorn != rhsWorn { return !lhsWorn }"),
+                      "Pieces worn by another character must sort after available pieces")
+        XCTAssertTrue(source.contains(".opacity(isWornByAnotherCharacter(option) ? 0.55 : 1)"),
+                      "Worn-by-another pieces remain inspectable but visually recede")
+        XCTAssertFalse(source.contains(".sheet(item: $selectedOption)"))
+        XCTAssertFalse(source.contains(".presentationDetents"))
+
+        let detailStart = try XCTUnwrap(source.range(of: "private struct GearOptionDetailPane"))
+        let detail = String(source[detailStart.lowerBound...])
+        XCTAssertFalse(detail.contains("ScrollView"),
+                       "The selected item decision must fit without another scroll gesture")
+        XCTAssertFalse(detail.contains("Button(\"Done\")"),
+                       "The pushed comparison page already owns one navigation back control")
+    }
+
+    func testItemTilesUseSolidRarityColourWhileOtherCharactersGearIsDashed() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/ItemGrid.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains(".strokeBorder(rarity.tint.opacity(isSelected ? 1 : 0.72),"))
+        XCTAssertFalse(source.contains("rarityDash"))
+        XCTAssertFalse(source.contains("rarityMark"))
+        XCTAssertFalse(source.contains("dash:"),
+                       "Shared item borders must not encode rarity or generic worn state")
+
+        let gear = try String(contentsOf: root.appending(path: "Sources/Screens/GearView.swift"),
+                              encoding: .utf8)
+        XCTAssertTrue(gear.contains("if isWornByAnotherCharacter(option)"))
+        XCTAssertTrue(gear.contains("dash: [5, 3]"),
+                      "Only candidates equipped on another character get a dashed border")
+    }
+
 
     func testFirepitPlacementPresentationDistinguishesHomePartyAndPostedRealm() {
         let home = FirepitPlacementPresentation(.home)
@@ -81,6 +123,9 @@ final class GearAndRulesTests: XCTestCase {
         XCTAssertTrue(source.contains("inventory.slots) Storehouse bins"))
         XCTAssertFalse(source.contains("satchelCapacity) carried"))
         XCTAssertFalse(source.contains("inventory.slots) stored"))
+        XCTAssertTrue(source.contains("Upgrade available"))
+        XCTAssertFalse(source.contains("Text(\"something better\")"),
+                       "Party gear status must use release-facing, actionable copy")
     }
 
     // MARK: Gear comes from the world, not from study

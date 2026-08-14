@@ -226,8 +226,7 @@ struct ItemIconTile: View {
                 .fill(Color(.secondarySystemGroupedBackground))
             RoundedRectangle(cornerRadius: 9)
                 .strokeBorder(rarity.tint.opacity(isSelected ? 1 : 0.72),
-                              style: StrokeStyle(lineWidth: isSelected ? 3 : 1.5,
-                                                 dash: rarityDash))
+                              lineWidth: isSelected ? 3 : 1.5)
             CatalogueItemPixelIdentity(
                 itemID: catalogueID,
                 identified: identified,
@@ -238,9 +237,6 @@ struct ItemIconTile: View {
 
             VStack {
                 HStack {
-                    Image(systemName: rarityMark)
-                        .font(.system(size: 8, weight: .black))
-                        .foregroundStyle(rarity.tint)
                     Spacer()
                     if quantity > 1 {
                         Text("\(quantity)")
@@ -275,21 +271,4 @@ struct ItemIconTile: View {
         return "\(identity), \(rarity.displayName), \(location.displayName)\(count)"
     }
 
-    private var rarityMark: String {
-        switch rarity {
-        case .common: "circle.fill"
-        case .uncommon: "diamond.fill"
-        case .rare: "star.fill"
-        case .mythic: "sparkles"
-        }
-    }
-
-    private var rarityDash: [CGFloat] {
-        switch rarity {
-        case .common: []
-        case .uncommon: [5, 2]
-        case .rare: [2, 2]
-        case .mythic: [6, 2, 1, 2]
-        }
-    }
 }

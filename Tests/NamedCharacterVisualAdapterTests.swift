@@ -262,28 +262,36 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
                       "Neither bundle resource name may bypass immutable pack validation")
     }
 
-    func testGearPopoverKeepsEquipVisibleAndComparesAgainstWornPiece() throws {
+    func testGearAnchoredPaneKeepsEquipVisibleAndComparesAgainstWornPiece() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
         let gear = try String(contentsOf: root.appending(path: "Sources/Screens/GearView.swift"),
                               encoding: .utf8)
-        let detailStart = try XCTUnwrap(gear.range(of: "private struct GearOptionDetailSheet"))
+        let party = try String(contentsOf: root.appending(path: "Sources/Screens/PartyRosterView.swift"),
+                               encoding: .utf8)
+        let detailStart = try XCTUnwrap(gear.range(of: "private struct GearOptionDetailPane"))
         let detail = String(gear[detailStart.lowerBound...])
 
         XCTAssertTrue(gear.contains("worn: worn"),
                       "The detail must receive the exact currently worn piece")
+        XCTAssertTrue(gear.contains("You don't own another piece for this slot yet."),
+                      "Empty equipment copy must not pluralize slot names as singular nouns")
+        XCTAssertFalse(gear.contains("another \\(slot.displayName.lowercased())"))
         XCTAssertTrue(detail.contains("Text(\"Compared with worn\")"))
         XCTAssertTrue(detail.contains("comparisonRow(\"Worn now\""))
+        XCTAssertTrue(party.contains("NavigationLink {"))
+        XCTAssertTrue(party.contains("GearView(slot: gearSlot, member: slot)"))
+        XCTAssertTrue(gear.contains("AnchoredItemDetailButton(item: option, selection: $selectedOption)"))
+        XCTAssertFalse(party.contains(".presentationDetents"))
+        XCTAssertFalse(party.contains(".presentationDragIndicator"))
         XCTAssertTrue(detail.contains("comparisonRow(\"This piece\""))
         XCTAssertTrue(detail.contains("ImprovementBadge(delta: delta, slot: slot)"))
         XCTAssertTrue(detail.contains("Button(\"Equip\")"))
         XCTAssertTrue(detail.contains(".frame(maxWidth: .infinity, minHeight: 44)"))
 
-        let scrollEnd = try XCTUnwrap(detail.range(of: "\n            Divider()\n\n            VStack(alignment: .leading, spacing: 4)"))
-        let equip = try XCTUnwrap(detail.range(of: "Button(\"Equip\")"))
-        XCTAssertLessThan(scrollEnd.lowerBound, equip.lowerBound,
-                          "Equip must live outside and below the metadata ScrollView")
+        XCTAssertFalse(detail.contains("ScrollView"),
+                       "The item decision must not require a second scroll gesture")
         XCTAssertFalse(detail.contains("List {"),
-                       "The compact anchored detail must not recreate a full-screen settings list")
+                       "The item page must not recreate a full-screen settings list")
     }
 }

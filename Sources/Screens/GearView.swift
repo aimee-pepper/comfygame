@@ -15,8 +15,7 @@ struct GearView: View {
 
     private var worn: EquippedPiece? { store.worn(slot, by: member) }
     var body: some View {
-        NavigationStack {
-            ScrollView {
+        ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     Text("Worn now").font(.headline)
                     if let worn, let definition = worn.definition {
@@ -31,7 +30,7 @@ struct GearView: View {
                     Text("Your \(slot.displayName.lowercased())").font(.headline)
                     let options = candidates
                     if options.isEmpty {
-                        Text("You don't own another \(slot.displayName.lowercased()) yet. Sites hold better pieces — ruins especially.")
+                        Text("You don't own another piece for this slot yet. Sites hold better gear — ruins especially.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .frame(minHeight: 44)
@@ -45,17 +44,21 @@ struct GearView: View {
                                          location: gridLocation(of: option),
                                          accessibilityName: option.piece.displayName,
                                          isEnabled: option.canEquipAtHome)
+                                .opacity(isWornByAnotherCharacter(option) ? 0.55 : 1)
+                                .overlay {
+                                    if isWornByAnotherCharacter(option) {
+                                        RoundedRectangle(cornerRadius: 9)
+                                            .stroke(style: StrokeStyle(lineWidth: 1.5,
+                                                                       dash: [5, 3]))
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
                         } detail: { selected in
-                            GearOptionDetailSheet(
+                            GearOptionDetailPane(
                                 option: selected, slot: slot, location: location(of: selected),
                                 worn: worn,
                                 delta: store.gearDelta(wearing: selected.piece, for: member),
-                                equip: {
-                                    guard store.equip(selected, on: member) else { return false }
-                                    selectedOption = nil
-                                    dismiss()
-                                    return true
-                                })
+                                equip: { store.equip(selected, on: member) })
                         }
                     }
 
@@ -77,7 +80,6 @@ struct GearView: View {
                     Button("Done") { dismiss() }
                 }
             }
-        }
     }
 
     /// **Every distinct piece on the shelf, best first, with how many of it you have.**
@@ -88,7 +90,17 @@ struct GearView: View {
     /// being worn by somebody else: if you have four, you can wear four.
     private var candidates: [GameStore.WearableGearOption] {
         store.wearableOptions(in: slot, excluding: member)
-            .sorted { $0.piece.effectivePower > $1.piece.effectivePower }
+            .sorted {
+                let lhsWorn = isWornByAnotherCharacter($0)
+                let rhsWorn = isWornByAnotherCharacter($1)
+                if lhsWorn != rhsWorn { return !lhsWorn }
+                return $0.piece.effectivePower > $1.piece.effectivePower
+            }
+    }
+
+    private func isWornByAnotherCharacter(_ option: GameStore.WearableGearOption) -> Bool {
+        if case .worn = option.source { return true }
+        return false
     }
 
     private func location(of option: GameStore.WearableGearOption) -> String {
@@ -161,7 +173,7 @@ struct GearView: View {
     }
 }
 
-private struct GearOptionDetailSheet: View {
+private struct GearOptionDetailPane: View {
     @Environment(\.dismiss) private var dismiss
     let option: GameStore.WearableGearOption
     let slot: GearSlot
@@ -172,20 +184,7 @@ private struct GearOptionDetailSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                Button("Done") { dismiss() }
-                    .buttonStyle(.bordered)
-                Text(option.piece.displayName)
-                    .font(.headline)
-                    .lineLimit(2)
-                Spacer(minLength: 0)
-            }
-            .padding(12)
-
-            Divider()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 12) {
                         ItemIconTile(icon: option.piece.definition?.icon ?? "questionmark",
                                      catalogueID: option.piece.catalogID,
@@ -227,14 +226,16 @@ private struct GearOptionDetailSheet: View {
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
-                }
-                .padding(12)
             }
+            .padding(12)
+            Spacer(minLength: 0)
 
             Divider()
 
             VStack(alignment: .leading, spacing: 4) {
-                Button("Equip") { _ = equip() }
+                Button("Equip") {
+                    if equip() { dismiss() }
+                }
                     .buttonStyle(.borderedProminent)
                     .frame(maxWidth: .infinity, minHeight: 44)
                     .disabled(!option.canEquipAtHome)
@@ -246,8 +247,8 @@ private struct GearOptionDetailSheet: View {
             }
             .padding(12)
         }
-        .frame(minWidth: 300, idealWidth: 320, maxWidth: 340,
-               minHeight: 280, idealHeight: 340, maxHeight: 420)
+        .frame(minWidth: 280, idealWidth: 320, maxWidth: 340,
+               minHeight: 320, idealHeight: 380, maxHeight: 440)
     }
 
     private func power(_ piece: EquippedPiece) -> String {

@@ -264,14 +264,16 @@ private struct CharacterPage: View {
 /// One equipment slot, for whoever's page you're on.
 private struct GearSlotRow: View {
     @EnvironmentObject private var store: GameStore
-    @State private var isChoosing = false
     let gearSlot: GearSlot
     let slot: PartySlot
 
     private var piece: EquippedPiece? { store.worn(gearSlot, by: slot) }
 
     var body: some View {
-        Button { isChoosing = true } label: {
+        NavigationLink {
+            GearView(slot: gearSlot, member: slot)
+                .environmentObject(store)
+        } label: {
             HStack(spacing: 10) {
                 Image(systemName: piece?.definition?.icon ?? gearSlot.icon)
                     .foregroundStyle(piece?.definition?.rarity.tint ?? Color.secondary)
@@ -286,7 +288,7 @@ private struct GearSlotRow: View {
                 }
                 Spacer()
                 if store.hasUpgradeAvailable(for: gearSlot, slot: slot) {
-                    Text("something better")
+                    Text("Upgrade available")
                         .font(.caption2.weight(.medium)).foregroundStyle(.green)
                         .padding(.horizontal, 7).padding(.vertical, 3)
                         .background(Color.green.opacity(0.14), in: Capsule())
@@ -297,8 +299,5 @@ private struct GearSlotRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .sheet(isPresented: $isChoosing) {
-            GearView(slot: gearSlot, member: slot).environmentObject(store)
-        }
     }
 }
