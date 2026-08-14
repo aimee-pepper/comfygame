@@ -85,6 +85,15 @@ struct RealityState: Codable, Equatable, Sendable {
     /// Pages read and people found. Knowledge, so it lives here and is never taken back.
     var library: LibraryState = LibraryState()
 
+    /// Glyph identities the player has actually inspected. Meaning is deliberately not persisted:
+    /// whether an entry is known is always derived from the same Base ownership that licenses the
+    /// Writing Desk. Unknown/retired IDs remain here so save migration never erases a sighting.
+    var encounteredLexemes: Set<LexemeIdentity> = []
+
+    mutating func recordEncounter(on page: Page) {
+        encounteredLexemes.formUnion(page.encounteredLexemes)
+    }
+
     static func newGame() -> RealityState { RealityState() }
 
     // MARK: Derived unlocks
@@ -126,6 +135,8 @@ struct RealityState: Codable, Equatable, Sendable {
                                                       forKey: .observations) ?? [:]
         visitedWorldSeeds = try container.decodeIfPresent(Set<UInt64>.self, forKey: .visitedWorldSeeds) ?? []
         library = try container.decodeIfPresent(LibraryState.self, forKey: .library) ?? LibraryState()
+        encounteredLexemes = try container.decodeIfPresent(
+            Set<LexemeIdentity>.self, forKey: .encounteredLexemes) ?? []
     }
 }
 

@@ -275,6 +275,17 @@ extension GameStore {
         Self.resolvedWorldPage(instanceID, in: state)
     }
 
+    /// Opening the exact read-only page is the encounter transaction. A thumbnail existing in the
+    /// folio teaches nothing; inspection records glyph identities but never their hidden meaning.
+    @discardableResult
+    func inspectWorldPage(_ instanceID: InstanceID) -> Bool {
+        guard let instance = collectedWorldPage(instanceID) else { return false }
+        mutate("inspect collected World Page") {
+            $0.reality.recordEncounter(on: instance.definition.page)
+        }
+        return true
+    }
+
     nonisolated private static func resolvedWorldPage(
         _ instanceID: InstanceID, in state: GameState
     ) -> WorldPageInstance? {

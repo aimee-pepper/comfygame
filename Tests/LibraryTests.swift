@@ -1333,6 +1333,105 @@ final class LibraryTests: XCTestCase {
         XCTAssertThrowsError(try catalogueCopy(catalog, pages: pages).validate())
     }
 
+    func testDictionarySightingsAreTypedIdempotentAndDoNotTeachMeaning() throws {
+        var state = GameState.newGame()
+        let catalog = ContentCatalog.shared
+        let source = try XCTUnwrap(catalog.pressureSources.first {
+            !state.base.ownedSources.contains($0.id)
+        })
+        let page = Page(runes: [
+            PlacedRune(id: InstanceID(rawValue: 1), content: .source(source.id),
+                       hand: .crude, origin: PageCell(column: 0, row: 0),
+                       shapeID: "crude_block")
+        ])
+
+        state.reality.recordEncounter(on: page)
+        state.reality.recordEncounter(on: page)
+        XCTAssertEqual(state.reality.encounteredLexemes, [.source(source.id)])
+        let entry = try XCTUnwrap(LibraryRules.dictionaryEntries(
+            reality: state.reality, base: state.base).first { $0.identity == .source(source.id) })
+        XCTAssertFalse(entry.isKnown)
+        XCTAssertEqual(entry.displayName, "??")
+        XCTAssertEqual(entry.accessibilityName, "Unknown mark")
+        XCTAssertNil(entry.name)
+        XCTAssertNil(entry.explanation)
+        XCTAssertFalse(state.base.ownedSources.contains(source.id))
+    }
+
+    func testCollectedWorldPageRecordsGlyphsOnlyWhenOpened() throws {
+        let store = GameStore(io: .temporary(name: "dictionary-page-\(UUID().uuidString)"))
+        store.resetEverything()
+        let instance = try XCTUnwrap(store.state.base.collectedWorldPages.first)
+        let expected = instance.definition.page.encounteredLexemes
+
+        XCTAssertNotNil(store.collectedWorldPage(instance.id), "reading the folio thumbnail")
+        XCTAssertTrue(store.state.reality.encounteredLexemes.isEmpty,
+                      "a thumbnail must not count as inspecting its marks")
+        XCTAssertTrue(store.inspectWorldPage(instance.id))
+        XCTAssertEqual(store.state.reality.encounteredLexemes, expected)
+        XCTAssertTrue(store.inspectWorldPage(instance.id))
+        XCTAssertEqual(store.state.reality.encounteredLexemes, expected)
+    }
+
+    func testDictionaryLegitimateAcquisitionPromotesTheSameEntry() throws {
+        var state = GameState.newGame()
+        let source = try XCTUnwrap(ContentCatalog.shared.pressureSources.first {
+            !state.base.ownedSources.contains($0.id)
+        })
+        state.reality.encounteredLexemes.insert(.source(source.id))
+        let unknown = try XCTUnwrap(LibraryRules.dictionaryEntries(
+            reality: state.reality, base: state.base).first { $0.identity == .source(source.id) })
+        XCTAssertFalse(unknown.isKnown)
+
+        state.base.ownedSources.insert(source.id)
+        let known = try XCTUnwrap(LibraryRules.dictionaryEntries(
+            reality: state.reality, base: state.base).first { $0.identity == .source(source.id) })
+        XCTAssertEqual(known.id, unknown.id)
+        XCTAssertTrue(known.isKnown)
+        XCTAssertEqual(known.name, source.name)
+        XCTAssertEqual(known.explanation, source.blurb)
+    }
+
+    func testLegacyRuneRecordsSourceAndTargetWithoutInventingAFifthCategory() {
+        var reality = RealityState.newGame()
+        let page = Page(runes: [
+            PlacedRune(id: InstanceID(rawValue: 9),
+                       sigil: Sigil(id: InstanceID(rawValue: 10), source: "sun",
+                                    target: "illumination"),
+                       hand: .crude, origin: PageCell(column: 0, row: 0),
+                       shapeID: "crude_block")
+        ])
+        reality.recordEncounter(on: page)
+        XCTAssertEqual(reality.encounteredLexemes,
+                       [.source("sun"), .target("illumination")])
+    }
+
+    func testUnknownRetiredDictionaryIdentitySurvivesSaveWithoutRawIDCopy() throws {
+        var state = GameState.newGame()
+        state.reality.encounteredLexemes.insert(.compound("retired_secret_name"))
+        let decoded = try JSONDecoder().decode(
+            GameState.self, from: JSONEncoder().encode(state))
+        let entry = try XCTUnwrap(LibraryRules.dictionaryEntries(
+            reality: decoded.reality, base: decoded.base).first {
+                $0.identity == .compound("retired_secret_name")
+            })
+        XCTAssertFalse(entry.isKnown)
+        XCTAssertEqual(entry.displayName, "??")
+        XCTAssertEqual(entry.accessibilityName, "Unknown mark")
+        XCTAssertNil(entry.name)
+    }
+
+    func testOldRealitySaveDecodesWithNoEncounteredLexemes() throws {
+        let data = try JSONEncoder().encode(GameState.newGame())
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var reality = try XCTUnwrap(root["reality"] as? [String: Any])
+        reality.removeValue(forKey: "encounteredLexemes")
+        root["reality"] = reality
+        let decoded = try JSONDecoder().decode(
+            GameState.self, from: JSONSerialization.data(withJSONObject: root))
+        XCTAssertTrue(decoded.reality.encounteredLexemes.isEmpty)
+    }
+
     private func catalogueCopy(_ catalog: ContentCatalog, pages: [DiaryPageDef]) -> ContentCatalog {
         ContentCatalog(symbols: catalog.symbols, creatures: catalog.creatures,
             resources: catalog.resources, items: catalog.items, skills: catalog.skills,

@@ -189,6 +189,56 @@ enum MarkContent: Codable, Equatable, Sendable {
     case rune(Sigil)
 }
 
+/// One durable written-vocabulary identity for the Library Dictionary.
+///
+/// The identity carries no player-facing name or effect, so seeing an unknown glyph cannot leak
+/// catalogue semantics through the save. Legacy whole-rune marks contribute their source and
+/// target identities rather than creating a fifth vocabulary family.
+enum LexemeIdentity: Codable, Equatable, Hashable, Sendable {
+    case target(PressureTargetID)
+    case source(PressureSourceID)
+    case qualifier(QualifierID)
+    case compound(SymbolID)
+
+    var glyphID: String {
+        switch self {
+        case .target(let id): id.rawValue
+        case .source(let id): id.rawValue
+        case .qualifier(let id): id.rawValue
+        case .compound(let id): id.rawValue
+        }
+    }
+
+    var categoryOrder: Int {
+        switch self {
+        case .target: 0
+        case .source: 1
+        case .qualifier: 2
+        case .compound: 3
+        }
+    }
+}
+
+extension MarkContent {
+    var encounteredLexemes: Set<LexemeIdentity> {
+        switch self {
+        case .target(let id): [.target(id)]
+        case .source(let id): [.source(id)]
+        case .qualifier(let id): [.qualifier(id)]
+        case .compound(let id): [.compound(id)]
+        case .rune(let sigil): [.source(sigil.source), .target(sigil.target)]
+        }
+    }
+}
+
+extension Page {
+    var encounteredLexemes: Set<LexemeIdentity> {
+        runes.reduce(into: Set<LexemeIdentity>()) { result, rune in
+            result.formUnion(rune.content.encounteredLexemes)
+        }
+    }
+}
+
 /// A declared connection between two adjacent marks.
 ///
 /// **Adjacency constrains; the connector declares intent** (session 14 §2). Adjacency alone can't

@@ -108,9 +108,20 @@ private extension DiaryPageDef.Kind {
 private enum LibraryTab: String, CaseIterable, Identifiable {
     case diaries = "Diaries"
     case people = "People"
+    case dictionary = "Dictionary"
     case notes = "World Notes"
     case history = "History"
     var id: String { rawValue }
+
+    var tabLabel: String {
+        switch self {
+        case .diaries: "Diaries"
+        case .people: "People"
+        case .dictionary: "Runes"
+        case .notes: "Notes"
+        case .history: "History"
+        }
+    }
 }
 
 /// The recovered-writing collection. Diaries index pages by author; People indexes the same stable
@@ -131,7 +142,9 @@ struct LibraryView: View {
     var body: some View {
         VStack(spacing: 0) {
             Picker("Library collection", selection: $tab) {
-                ForEach(LibraryTab.allCases) { Text($0.rawValue).tag($0) }
+                ForEach(LibraryTab.allCases) {
+                    Text($0.tabLabel).tag($0).accessibilityLabel($0.rawValue)
+                }
             }
             .pickerStyle(.segmented)
             .padding(.horizontal, 16)
@@ -142,6 +155,7 @@ struct LibraryView: View {
                     switch tab {
                     case .diaries: diariesGrid
                     case .people: peopleGrid
+                    case .dictionary: dictionaryGrid
                     case .notes: notesGrid
                     case .history: historyPane
                     }
@@ -271,6 +285,32 @@ struct LibraryView: View {
                            wide: dynamicTypeSize.isAccessibilitySize)
     }
 
+    @ViewBuilder private var dictionaryGrid: some View {
+        let entries = LibraryRules.dictionaryEntries(
+            reality: store.state.reality, base: store.state.base)
+        if entries.isEmpty {
+            EmptyCollection(icon: "character.book.closed",
+                            text: "Runes you can write or have inspected will gather here.")
+        } else {
+            VStack(alignment: .leading, spacing: 18) {
+                ForEach(LibraryRules.DictionaryCategory.allCases) { category in
+                    let group = entries.filter { $0.category == category }
+                    if !group.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(category.displayName).font(.headline)
+                            LazyVGrid(
+                                columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6),
+                                spacing: 8
+                            ) {
+                                ForEach(group) { DictionaryGlyphCell(entry: $0) }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @ViewBuilder private var notesGrid: some View {
         let families = LibraryPresentation.recoveredNoteFamilies(in: library)
         if families.isEmpty {
@@ -335,6 +375,51 @@ struct LibraryView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+        }
+    }
+}
+
+private struct DictionaryGlyphCell: View {
+    let entry: LibraryRules.DictionaryEntry
+    @State private var showsDetail = false
+
+    var body: some View {
+        Button { showsDetail = true } label: {
+            VStack(spacing: 3) {
+                RuneGlyph(id: entry.glyphID, lineWidth: 1.6)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                Text(entry.displayName)
+                    .font(.system(size: 9, weight: .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            .padding(4)
+            .aspectRatio(1, contentMode: .fit)
+            .background(Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: 9))
+            .overlay(RoundedRectangle(cornerRadius: 9).stroke(.secondary.opacity(0.25)))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(entry.accessibilityName)
+        .accessibilityHint("Shows Dictionary details")
+        .popover(isPresented: $showsDetail, arrowEdge: .top) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 10) {
+                    RuneGlyph(id: entry.glyphID)
+                        .frame(width: 44, height: 44)
+                    Text(entry.isKnown ? (entry.name ?? "Unknown mark") : "Unknown mark")
+                        .font(.headline)
+                }
+                if entry.isKnown, let explanation = entry.explanation {
+                    Text(explanation).font(.callout)
+                } else {
+                    Text("Its meaning has not been identified.")
+                        .font(.callout).foregroundStyle(.secondary)
+                }
+            }
+            .padding(16)
+            .frame(idealWidth: 260)
+            .presentationCompactAdaptation(.popover)
         }
     }
 }

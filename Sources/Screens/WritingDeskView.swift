@@ -316,8 +316,10 @@ struct WritingDeskView: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
                 ForEach(state.base.collectedWorldPages) { instance in
                     Button {
-                        selectedWorldPageID = instance.id
-                        pane = .world
+                        if store.inspectWorldPage(instance.id) {
+                            selectedWorldPageID = instance.id
+                            pane = .world
+                        }
                     } label: {
                         VStack(alignment: .leading, spacing: 7) {
                             WorldPageReadOnlyThumbnail(page: instance.definition.page)

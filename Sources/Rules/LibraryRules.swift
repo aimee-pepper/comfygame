@@ -8,6 +8,102 @@ import Foundation
 /// is not prevented anywhere in here.
 enum LibraryRules {
 
+    enum DictionaryCategory: Int, CaseIterable, Identifiable, Sendable {
+        case subjects, sources, qualifiers, compounds
+
+        var id: Int { rawValue }
+        var displayName: String {
+            switch self {
+            case .subjects: "Subjects"
+            case .sources: "Sources"
+            case .qualifiers: "Qualifiers"
+            case .compounds: "Compounds"
+            }
+        }
+    }
+
+    struct DictionaryEntry: Identifiable, Equatable, Sendable {
+        var identity: LexemeIdentity
+        var category: DictionaryCategory
+        var isKnown: Bool
+        var name: String?
+        var explanation: String?
+
+        var id: LexemeIdentity { identity }
+        var glyphID: String { identity.glyphID }
+        var displayName: String { isKnown ? (name ?? "Unknown mark") : "??" }
+        var accessibilityName: String { isKnown ? (name ?? "Unknown mark") : "Unknown mark" }
+    }
+
+    /// Projects the Dictionary from durable sightings plus the canonical authorities that license
+    /// writing. It never stores or infers a second knowledge flag.
+    static func dictionaryEntries(reality: RealityState, base: BaseState,
+                                  catalog: ContentCatalog = .shared) -> [DictionaryEntry] {
+        let writableQualifiers = PageRules.writableQualifiers()
+        var visible = reality.encounteredLexemes
+        visible.formUnion(catalog.pressureTargets.map { .target($0.id) })
+        visible.formUnion(writableQualifiers.map { .qualifier($0.id) })
+        visible.formUnion(base.ownedSources.map(LexemeIdentity.source))
+        visible.formUnion(base.ownedSymbols.map(LexemeIdentity.compound))
+
+        let targetOrder = Dictionary(uniqueKeysWithValues:
+            catalog.pressureTargetsInOrder.enumerated().map { ($0.element.id, $0.offset) })
+        let sourceOrder = Dictionary(uniqueKeysWithValues:
+            catalog.pressureSources.enumerated().map { ($0.element.id, $0.offset) })
+        let qualifierOrder = Dictionary(uniqueKeysWithValues:
+            writableQualifiers.enumerated().map { ($0.element.id, $0.offset) })
+        let compoundOrder = Dictionary(uniqueKeysWithValues:
+            catalog.symbols.enumerated().map { ($0.element.id, $0.offset) })
+
+        func entry(_ identity: LexemeIdentity) -> DictionaryEntry {
+            switch identity {
+            case .target(let id):
+                let definition = catalog.pressureTarget(id)
+                return .init(identity: identity, category: .subjects,
+                             isKnown: definition != nil, name: definition?.name,
+                             explanation: definition?.blurb)
+            case .source(let id):
+                let definition = catalog.pressureSource(id)
+                let known = base.ownedSources.contains(id) && definition != nil
+                return .init(identity: identity, category: .sources, isKnown: known,
+                             name: known ? definition?.name : nil,
+                             explanation: known ? definition?.blurb : nil)
+            case .qualifier(let id):
+                let definition = catalog.qualifier(id)
+                let known = writableQualifiers.contains { $0.id == id } && definition != nil
+                return .init(identity: identity, category: .qualifiers, isKnown: known,
+                             name: known ? definition?.name : nil,
+                             explanation: known ? definition.map {
+                                 "Changes \($0.ladder.job)."
+                             } : nil)
+            case .compound(let id):
+                let definition = catalog.symbol(id)
+                let known = base.ownedSymbols.contains(id) && definition != nil
+                return .init(identity: identity, category: .compounds, isKnown: known,
+                             name: known ? definition?.name : nil,
+                             explanation: known ? definition?.blurb : nil)
+            }
+        }
+
+        func authoredOrder(_ identity: LexemeIdentity) -> Int {
+            switch identity {
+            case .target(let id): targetOrder[id] ?? Int.max
+            case .source(let id): sourceOrder[id] ?? Int.max
+            case .qualifier(let id): qualifierOrder[id] ?? Int.max
+            case .compound(let id): compoundOrder[id] ?? Int.max
+            }
+        }
+        return visible.map(entry).sorted {
+            if $0.category.rawValue != $1.category.rawValue {
+                return $0.category.rawValue < $1.category.rawValue
+            }
+            let lhsOrder = authoredOrder($0.identity)
+            let rhsOrder = authoredOrder($1.identity)
+            if lhsOrder != rhsOrder { return lhsOrder < rhsOrder }
+            return $0.glyphID < $1.glyphID
+        }
+    }
+
     // MARK: Finding people
 
     /// Everyone whose signature this world satisfies.
