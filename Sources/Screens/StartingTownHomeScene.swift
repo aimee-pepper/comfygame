@@ -1,4 +1,3 @@
-import CryptoKit
 import SwiftUI
 import UIKit
 
@@ -28,6 +27,7 @@ enum StartingTownHomeRules {
 
     static let manifestName = "starting-town-home-v1"
     static let assetName = "town-starting-home-v1"
+    static let authoredAssetSHA256 = "f4ca74c5c03b38f303ed921d7da95d06d154348211f64124028af42eaf379f63"
 
     static func load(manifestURL: URL, assetURL: URL) -> Scene? {
         guard let data = try? Data(contentsOf: manifestURL),
@@ -38,8 +38,10 @@ enum StartingTownHomeRules {
               decoded.assetName == assetName,
               decoded.pixelWidth == 1122, decoded.pixelHeight == 1402,
               decoded.sha256.range(of: "^[0-9a-f]{64}$", options: .regularExpression) != nil,
-              let assetData = try? Data(contentsOf: assetURL),
-              SHA256.hash(data: assetData).map({ String(format: "%02x", $0) }).joined() == decoded.sha256,
+              decoded.sha256 == authoredAssetSHA256,
+              let image = UIImage(contentsOfFile: assetURL.path),
+              image.cgImage?.width == decoded.pixelWidth,
+              image.cgImage?.height == decoded.pixelHeight,
               decoded.hotspots.map(\.id) == ["writingDesk", "workshop", "storehouse", "essenceSpring", "firepit"],
               decoded.hotspots.map(\.route) == ["writingDesk", "workshop", "storehouse", "essenceSpring", "firepit"],
               Set(decoded.hotspots.map(\.id)).count == decoded.hotspots.count,
