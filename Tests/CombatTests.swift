@@ -5661,4 +5661,103 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(store.activeRun?.binderHP, binderBefore)
         XCTAssertLessThan(store.activeRun?.companionHP[0] ?? companionBefore, companionBefore)
     }
+
+    func testModernDrawOffRequiresExactOwnerDisclosedFoeAndEndsConceal() throws {
+        let store = inFight()
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage modern Draw Off") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.drawOff],
+                                               .binder: []]
+            encounter.drawOffReceipts = [:]
+            encounter.concealed[.companion(0)] = 2
+            encounter.revealed.removeAll()
+            encounter.order = [.companion(0), .binder, .foe(foeID)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }; encounter.turnIndex = 0
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let before = store.activeEncounter
+        store.mutate("hidden Draw Off rejects") {
+            CombatRules.perform(.skill("draw_off", foe: foeID), by: .companion(0), in: &$0)
+        }
+        XCTAssertEqual(store.activeEncounter, before)
+        store.mutate("disclose and Draw Off") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.revealed.insert(foeID)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+            CombatRules.perform(.skill("draw_off", foe: foeID), by: .companion(0), in: &state)
+        }
+        XCTAssertEqual(store.activeEncounter?.drawOffReceipts?[foeID],
+                       .init(owner: .companion(0), activationRound: 1, expiresBeforeRound: 3))
+        XCTAssertNil(store.activeEncounter?.concealed[.companion(0)])
+        XCTAssertTrue(CombatRules.skills(for: .companion(0), in: store.state).contains { $0.id == "draw_off" })
+    }
+
+    func testDrawOffExactCompanionOverridesPrimaryAndSurvivesRelaunch() throws {
+        let store = inFight()
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage exact Draw Off target") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.drawOff]]
+            encounter.drawOffReceipts = [foeID: .init(owner: .companion(0), activationRound: 1,
+                                                       expiresBeforeRound: 3)]
+            encounter.partyRanks = [.binder: .front, .companion(0): .front]
+            encounter.debugV2Evasion = .init(entries: CombatRules.party(of: state).map {
+                .init(actor: $0, characterEvasion: 0, components: [])
+            })
+            encounter.ghostEvasionAvailable = []
+            encounter.order = [.foe(foeID), .binder, .companion(0)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }; encounter.turnIndex = 0
+            run.rng = SeededRNG(seed: 0xD2A0)
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let decoded = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(try XCTUnwrap(store.activeEncounter)))
+        XCTAssertEqual(decoded.drawOffReceipts, store.activeEncounter?.drawOffReceipts)
+        let binderBefore = try XCTUnwrap(store.activeRun?.binderHP)
+        let companionBefore = try XCTUnwrap(store.activeRun?.companionHP[0])
+        store.mutate("resolve exact Draw Off") { CombatRules.runAutomaticTurns(in: &$0) }
+        XCTAssertEqual(store.activeRun?.binderHP, binderBefore)
+        XCTAssertLessThan(store.activeRun?.companionHP[0] ?? companionBefore, companionBefore)
+    }
+
+    func testDrawOffIllegalOwnerFallsBackAndGlobalExpiryIsExact() throws {
+        let store = inFight()
+        let foeID = try XCTUnwrap(store.activeEncounter?.foes.first?.id)
+        store.mutate("stage illegal back Draw Off") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else { return }
+            encounter.debugV2OwnedNodeIDs = [.companion(0): [CombatDerivedStatsRules.Node.drawOff],
+                                               .binder: []]
+            encounter.drawOffReceipts = [foeID: .init(owner: .companion(0), activationRound: 1,
+                                                       expiresBeforeRound: 3)]
+            encounter.partyRanks = [.binder: .front, .companion(0): .back]
+            encounter.order = [.foe(foeID), .binder, .companion(0)]
+            encounter.turnSlots = encounter.order.map { .init(actor: $0) }; encounter.turnIndex = 0
+            encounter.debugV2Evasion = .init(entries: CombatRules.party(of: state).map {
+                .init(actor: $0, characterEvasion: 0, components: [])
+            })
+            encounter.ghostEvasionAvailable = []
+            run.activeEncounter = encounter; state.worlds.activeRun = run
+        }
+        let binderBefore = try XCTUnwrap(store.activeRun?.binderHP)
+        let companionBefore = try XCTUnwrap(store.activeRun?.companionHP[0])
+        store.mutate("fallback from illegal Draw Off") { CombatRules.runAutomaticTurns(in: &$0) }
+        XCTAssertLessThan(store.activeRun?.binderHP ?? binderBefore, binderBefore)
+        XCTAssertEqual(store.activeRun?.companionHP[0], companionBefore)
+
+        var encounter = try XCTUnwrap(store.activeEncounter)
+        encounter.roundNumber = 3
+        encounter.drawOffReceipts = encounter.drawOffReceipts?.filter {
+            $0.value.expiresBeforeRound > encounter.roundNumber
+        }
+        XCTAssertTrue(encounter.drawOffReceipts?.isEmpty == true)
+
+        encounter.debugV2OwnedNodeIDs = nil
+        encounter.drawOffReceipts = nil
+        encounter.taunts[foeID] = 2
+        let legacy = try JSONDecoder().decode(EncounterState.self,
+            from: JSONEncoder().encode(encounter))
+        XCTAssertNil(legacy.drawOffReceipts)
+        XCTAssertEqual(legacy.taunts[foeID], 2)
+    }
 }

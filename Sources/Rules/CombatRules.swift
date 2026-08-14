@@ -496,7 +496,7 @@ enum CombatRules {
     static func skills(for actor: Combatant, in state: GameState) -> [SkillDef] {
         var owned = CombatActionOwnershipRules.availableSkillIDs(for: actor, in: state)
         if let modern = state.worlds.activeRun?.activeEncounter?.debugV2OwnedNodeIDs {
-            owned.subtract(["steady", "snuff", "interpose"])
+            owned.subtract(["steady", "snuff", "interpose", "draw_off"])
             if modern[actor]?.contains(CombatDerivedStatsRules.Node.quench) == true {
                 owned.insert("quench")
             }
@@ -505,6 +505,9 @@ enum CombatRules {
             }
             if modern[actor]?.contains(CombatDerivedStatsRules.Node.interpose) == true {
                 owned.insert("interpose")
+            }
+            if modern[actor]?.contains(CombatDerivedStatsRules.Node.drawOff) == true {
+                owned.insert("draw_off")
             }
         }
         return ContentCatalog.shared.skills.filter { owned.contains($0.id) }
@@ -720,7 +723,18 @@ enum CombatRules {
         case .taunt:
             // **Draw Off.** The only way to take a hit meant for somebody else.
             guard let foe else { return nil }
-            encounter.taunts[foe.id] = skill.rounds
+            if encounter.drawOffReceipts != nil {
+                guard encounter.debugV2OwnedNodeIDs?[actor]?.contains(
+                    CombatDerivedStatsRules.Node.drawOff) == true,
+                      foe.isAlive, encounter.revealed.contains(foe.id)
+                else { return nil }
+                encounter.drawOffReceipts?[foe.id] = .init(owner: actor,
+                    activationRound: encounter.roundNumber,
+                    expiresBeforeRound: encounter.roundNumber + 2)
+                encounter.concealed[actor] = nil
+            } else {
+                encounter.taunts[foe.id] = skill.rounds
+            }
             encounter.note("\(foe.stats.displayName) turns on you.")
 
         case .snuff:
@@ -1466,6 +1480,9 @@ enum CombatRules {
                              encounter: EncounterState, state: GameState) -> Bool {
         if skill.kind == .intercept, let frozen = encounter.debugV2OwnedNodeIDs {
             return frozen[actor]?.contains(CombatDerivedStatsRules.Node.interpose) == true
+        }
+        if skill.kind == .taunt, let frozen = encounter.debugV2OwnedNodeIDs {
+            return frozen[actor]?.contains(CombatDerivedStatsRules.Node.drawOff) == true
         }
         if skill.kind == .snuff, let frozen = encounter.debugV2OwnedNodeIDs {
             return frozen[actor]?.contains(CombatDerivedStatsRules.Node.snuff) == true
@@ -2421,6 +2438,11 @@ enum CombatRules {
             encounter.untouchableStates = states
         }
         encounter.roundNumber += 1
+        if encounter.drawOffReceipts != nil {
+            encounter.drawOffReceipts = encounter.drawOffReceipts?.filter {
+                $0.value.expiresBeforeRound > encounter.roundNumber
+            }
+        }
         if encounter.wardReceipts != nil {
             encounter.wardReceipts = encounter.wardReceipts?.filter {
                 $0.value.expiresBeforeRound > encounter.roundNumber
@@ -2682,10 +2704,18 @@ enum CombatRules {
 
         // **Draw Off.** Something you've taunted comes for you and doesn't get a choice — the only
         // way in the game to take a hit meant for somebody else.
-        let taunted = (encounter.taunts[foeID] ?? 0) > 0 && isAlive(.binder, in: run)
-            && reachable.contains(.binder)
+        let forcedOwner: Combatant? = if let modern = encounter.drawOffReceipts {
+            modern[foeID].flatMap { receipt in
+                isAlive(receipt.owner, in: run)
+                    && (encounter.concealed[receipt.owner] ?? 0) <= 0
+                    && reachable.contains(receipt.owner) ? receipt.owner : nil
+            }
+        } else {
+            (encounter.taunts[foeID] ?? 0) > 0 && isAlive(.binder, in: run)
+                && reachable.contains(.binder) ? .binder : nil
+        }
         let unused = reachable.filter { !(encounter.apexTargetsThisRound[foeID] ?? []).contains($0) }
-        guard let primary = taunted ? .binder : run.rng.pick(unused.isEmpty ? reachable : unused) else {
+        guard let primary = forcedOwner ?? run.rng.pick(unused.isEmpty ? reachable : unused) else {
             run.activeEncounter = encounter
             state.worlds.activeRun = run
             checkOutcome(in: &state)

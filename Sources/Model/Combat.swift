@@ -554,6 +554,13 @@ struct EncounterState: Codable, Equatable, Sendable {
     /// Foes that have to come for the Binder instead of choosing, and for how many rounds
     /// (Draw Off). The only way to take a hit meant for somebody else.
     var taunts: [InstanceID: Int] = [:]
+    struct DrawOffReceipt: Codable, Equatable, Sendable {
+        var owner: Combatant
+        var activationRound: Int
+        var expiresBeforeRound: Int
+    }
+    /// Nil is the legacy Binder-only duration adapter; modern receipts name the exact owner.
+    var drawOffReceipts: [InstanceID: DrawOffReceipt]?
     /// Foes whose traits you've actually looked at (Sight). Nothing else reveals a covering.
     var revealed: Set<InstanceID> = []
     /// Species absent from the bestiary when this fight began. World encounter setup records a
@@ -695,6 +702,7 @@ struct EncounterState: Codable, Equatable, Sendable {
         self.wardReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.snuffReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.interposeReceipts = debugV2OwnedNodeIDs == nil ? nil : []
+        self.drawOffReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.unyieldingSpent = debugV2OwnedNodeIDs == nil ? nil : []
         self.braceReceipts = debugV2OwnedNodeIDs == nil ? nil : [:]
         self.breakingBlowScheduledSpent = debugV2OwnedNodeIDs == nil ? nil : []
@@ -794,6 +802,9 @@ struct EncounterState: Codable, Equatable, Sendable {
         foeBleeds = try c.decodeIfPresent([InstanceID: BleedState].self, forKey: .foeBleeds) ?? [:]
         wards = try c.decodeIfPresent([Combatant: WardState].self, forKey: .wards) ?? [:]
         taunts = try c.decodeIfPresent([InstanceID: Int].self, forKey: .taunts) ?? [:]
+        drawOffReceipts = try c.decodeIfPresent([InstanceID: DrawOffReceipt].self,
+                                                 forKey: .drawOffReceipts)
+            ?? (debugV2OwnedNodeIDs == nil ? nil : [:])
         revealed = try c.decodeIfPresent(Set<InstanceID>.self, forKey: .revealed) ?? []
         initiallyUnrecordedSpecies = try c.decodeIfPresent(Set<String>.self,
                                                            forKey: .initiallyUnrecordedSpecies) ?? []
