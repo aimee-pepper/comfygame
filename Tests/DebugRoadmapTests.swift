@@ -39,6 +39,24 @@ final class DebugRoadmapTests: XCTestCase {
         }
     }
 
+    func testCommittedProgressionFeaturesAwaitAcceptanceInsteadOfImplementation() throws {
+        let byID = Dictionary(uniqueKeysWithValues: DebugRoadmap.current.items.map { ($0.id, $0) })
+        for id in [
+            "collapse-hud-truth",
+            "terrain-blocked-feedback",
+            "field-note-generator",
+            "rune-dictionary",
+            "saved-page-templates",
+            "wild-world-pages",
+            "starter-world-pages"
+        ] {
+            let item = try XCTUnwrap(byID[id])
+            XCTAssertEqual(item.status, .readyToTest,
+                           "\(id) is committed and awaits ordinary-phone acceptance")
+            XCTAssertFalse(item.isPrimary, "\(id) must not displace encounter scaling")
+        }
+    }
+
     func testIndependentWorkstreamPrimariesCoexistAndArrayOrderDoesNotChooseTheHeader() throws {
         let forward = try decodeBoard(items: [
             item("world", priority: "P0", status: "readyToTest", workstream: "acceptance", primary: true),
