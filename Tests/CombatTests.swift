@@ -2454,6 +2454,41 @@ final class CombatTests: XCTestCase {
         XCTAssertEqual(reloaded, before)
     }
 
+    func testOrdinaryStableOpeningOwnershipFreezesExistingConsumersWithoutDebugTuning() throws {
+        let io = SaveFileIO.temporary(name: "opening-stable-consumers-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        store.write("plains")
+        let heavy = CombatDerivedStatsRules.Node.heavyHand
+        let iron = CombatDerivedStatsRules.Node.ironSkin
+        let thick = CombatDerivedStatsRules.Node.thickHide
+        let held: CombatNodeID = "combat.offense.force.shatter"
+        store.mutate("own ordinary opening nodes") { state in
+            state.base.binderCharacter.ownedCombatNodeIDs = [heavy, iron, thick, held]
+            state.base.binderEquipped[.weapon] = EquippedPiece(catalogID: "field_maul")
+        }
+        XCTAssertTrue(store.bindAndDepart())
+        let cap = try XCTUnwrap(store.activeRun?.healthCap(for: .binder))
+        XCTAssertEqual(cap.maximum, cap.ordinaryMaximum + 6)
+        XCTAssertEqual(cap.components.map(\.nodeID), [thick])
+        store.mutate("begin ordinary stable encounter") { state in
+            guard var run = state.worlds.activeRun, let enemy = run.enemies.first else { return }
+            run.tuning.debugCombatV2BinderAttackEnabled = false
+            XCTAssertFalse(run.tuning.debugCombatV2BinderAttackEnabled)
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: enemy, runsAutomaticTurns: false, in: &state)
+        }
+        let encounter = try XCTUnwrap(store.activeEncounter)
+        XCTAssertEqual(encounter.debugV2OwnedNodeIDs?[.binder], [heavy, iron, thick])
+        XCTAssertFalse(try XCTUnwrap(encounter.debugV2OwnedNodeIDs?[.binder]).contains(held))
+        XCTAssertEqual(encounter.debugV2BinderAttack?.preMatchupBonus(for: .crush).total, 2)
+        XCTAssertTrue(try XCTUnwrap(encounter.debugV2Armour?.entry(for: .binder))
+            .ownedNodeIDs.contains(iron))
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.activeEncounter?.debugV2OwnedNodeIDs?[.binder], [heavy, iron, thick])
+    }
+
     func testImmovableUsesFrozenExactOwnerArmourForPierceAndEmanationOnly() throws {
         let immovable = CombatDerivedStatsRules.Node.immovable
         let receipt = EncounterState.DebugV2ArmourReceipt(entries: [

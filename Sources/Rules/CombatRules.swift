@@ -1273,7 +1273,18 @@ enum CombatRules {
                                      tuning: DebugTuningProfile) -> [RunHealthCapEntry] {
         state.base.partyMembers.map { member in
             let actor = member.combatant
-            let explicitV2 = tuning.debugCombatV2BinderAttackEnabled
+            let graph = ContentCatalog.shared.combatGraph
+            let opening = CombatGraphRules.implementedOpeningNodeIDs(in: graph)
+            var selected = (state.base.character(member).ownedCombatNodeIDs ?? [])
+                .intersection(opening)
+            if tuning.debugCombatV2BinderAttackEnabled {
+                switch member {
+                case .binder: selected.formUnion(tuning.debugCombatV2BinderNodeIDs)
+                case .member(let index):
+                    selected.formUnion(tuning.debugCombatV2CompanionNodeIDs[index] ?? [])
+                }
+            }
+            let explicitV2 = tuning.debugCombatV2BinderAttackEnabled || !selected.isEmpty
             let ordinary: Int
             switch actor {
             case .binder:
@@ -1288,11 +1299,6 @@ enum CombatRules {
                     + (explicitV2 ? 0 : loadout(of: actor, in: state).maxHP)
             case .foe:
                 ordinary = 1
-            }
-            let selected: Set<CombatNodeID>
-            switch member {
-            case .binder: selected = tuning.debugCombatV2BinderNodeIDs
-            case .member(let index): selected = tuning.debugCombatV2CompanionNodeIDs[index] ?? []
             }
             let components: [RunHealthCapEntry.Component] = explicitV2
                 && selected.contains(CombatDerivedStatsRules.Node.thickHide)

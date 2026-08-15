@@ -1393,39 +1393,67 @@ enum WorldRules {
         let resolvedOpening: EncounterState.Opening = slipperyPrevented ? .mutualContact : initialOpening
         let watchfulSuppressed = resolvedOpening == .creatureAmbush && watchful
 
+        let combatGraph = ContentCatalog.shared.combatGraph
+        let openingIDs = CombatGraphRules.implementedOpeningNodeIDs(in: combatGraph)
+        let binderCharacter = state.base.binderCharacter
+        var binderNodeIDs = (binderCharacter.ownedCombatNodeIDs ?? []).intersection(openingIDs)
+        var companionNodeIDs: [Int: Set<CombatNodeID>] = Dictionary(uniqueKeysWithValues: state.base.activeParty.compactMap { index in
+            guard state.base.roster.indices.contains(index) else { return nil }
+            let nodes = (state.base.roster[index].character.ownedCombatNodeIDs ?? [])
+                .intersection(openingIDs)
+            return (index, nodes)
+        })
+        var binderChoices = binderCharacter.combatNodeChoices.filter { openingIDs.contains($0.key) }
+        var companionChoices: [Int: [CombatNodeID: StableChoiceID]] = Dictionary(uniqueKeysWithValues: state.base.activeParty.compactMap { index in
+            guard state.base.roster.indices.contains(index) else { return nil }
+            return (index, state.base.roster[index].character.combatNodeChoices
+                .filter { openingIDs.contains($0.key) })
+        })
+        if run.tuning.debugCombatV2BinderAttackEnabled {
+            binderNodeIDs.formUnion(run.tuning.debugCombatV2BinderNodeIDs)
+            binderChoices.merge(run.tuning.debugCombatV2BinderChoices) { _, debug in debug }
+            for (index, nodes) in run.tuning.debugCombatV2CompanionNodeIDs {
+                companionNodeIDs[index, default: []].formUnion(nodes)
+            }
+            for (index, choices) in run.tuning.debugCombatV2CompanionChoices {
+                companionChoices[index, default: [:]].merge(choices) { _, debug in debug }
+            }
+        }
+        let usesStableCombatGraph = run.tuning.debugCombatV2BinderAttackEnabled || !binderNodeIDs.isEmpty
+            || companionNodeIDs.values.contains(where: { !$0.isEmpty })
+
         let debugAttackReceipt = CombatDerivedStatsRules.debugBinderAttackReceipt(
-            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
-            selectedNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
+            enabled: usesStableCombatGraph,
+            selectedNodeIDs: binderNodeIDs,
             ordinaryWeaponKind: CombatRules.damageKind(for: .binder, in: state))
         let debugInitiativeReceipt = CombatDerivedStatsRules.debugInitiativeReceipt(
-            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
+            enabled: usesStableCombatGraph,
             party: party, foes: foes,
-            binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
-            companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs)
+            binderNodeIDs: binderNodeIDs,
+            companionNodeIDs: companionNodeIDs)
         let debugArmourReceipt = CombatRules.debugArmourReceipt(
-            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
+            enabled: usesStableCombatGraph,
             party: party, in: state,
-            binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
-            companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs)
+            binderNodeIDs: binderNodeIDs,
+            companionNodeIDs: companionNodeIDs)
         let debugEvasionReceipt = CombatDerivedStatsRules.debugEvasionReceipt(
-            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
+            enabled: usesStableCombatGraph,
             party: party, in: state,
-            binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
-            companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs)
+            binderNodeIDs: binderNodeIDs,
+            companionNodeIDs: companionNodeIDs)
         let debugResistanceReceipt = CombatDerivedStatsRules.debugResistanceReceipt(
-            enabled: run.tuning.debugCombatV2BinderAttackEnabled,
+            enabled: usesStableCombatGraph,
             party: party,
-            binderNodeIDs: run.tuning.debugCombatV2BinderNodeIDs,
-            binderChoices: run.tuning.debugCombatV2BinderChoices,
-            companionNodeIDs: run.tuning.debugCombatV2CompanionNodeIDs,
-            companionChoices: run.tuning.debugCombatV2CompanionChoices)
+            binderNodeIDs: binderNodeIDs,
+            binderChoices: binderChoices,
+            companionNodeIDs: companionNodeIDs,
+            companionChoices: companionChoices)
         let ghostEvasionAvailable = Set(party.filter { actor in
-            if run.tuning.debugCombatV2BinderAttackEnabled {
+            if usesStableCombatGraph {
                 switch actor {
-                case .binder:
-                    return run.tuning.debugCombatV2BinderNodeIDs.contains(CombatDerivedStatsRules.Node.ghost)
+                case .binder: return binderNodeIDs.contains(CombatDerivedStatsRules.Node.ghost)
                 case .companion(let index):
-                    return (run.tuning.debugCombatV2CompanionNodeIDs[index] ?? [])
+                    return (companionNodeIDs[index] ?? [])
                         .contains(CombatDerivedStatsRules.Node.ghost)
                 case .foe: return false
                 }
@@ -1435,12 +1463,11 @@ enum WorldRules {
         let partyRanks = Dictionary(uniqueKeysWithValues: party.map {
             ($0, CombatRules.rank(of: $0, in: state))
         })
-        let debugOwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = run.tuning.debugCombatV2BinderAttackEnabled
+        let debugOwnedNodeIDs: [Combatant: Set<CombatNodeID>]? = usesStableCombatGraph
             ? Dictionary(uniqueKeysWithValues: party.map { actor in
                 switch actor {
-                case .binder: return (actor, run.tuning.debugCombatV2BinderNodeIDs)
-                case .companion(let index):
-                    return (actor, run.tuning.debugCombatV2CompanionNodeIDs[index] ?? [])
+                case .binder: return (actor, binderNodeIDs)
+                case .companion(let index): return (actor, companionNodeIDs[index] ?? [])
                 case .foe: return (actor, [])
                 }
             })
