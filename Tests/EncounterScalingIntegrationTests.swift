@@ -28,6 +28,77 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         }
     }
 
+    func testProgressionPhoneFixturesFreezeRulesOwnedLevelsHealthAndEnemyAllocation() throws {
+        let receipts = try EncounterScalingProgressionFixtureKind.allCases.map { kind in
+            let store = try GameStore.makeEncounterScalingProgressionFixture(kind: kind)
+            return try XCTUnwrap(GameStore.progressionReceipt(kind: kind, rootSeed: 101, from: store))
+        }
+        let fresh = try XCTUnwrap(receipts.first { $0.kind == .freshSolo })
+        let solo = try XCTUnwrap(receipts.first { $0.kind == .experiencedSolo })
+        let party = try XCTUnwrap(receipts.first { $0.kind == .experiencedParty })
+
+        XCTAssertEqual(fresh.partyLevels, [1])
+        XCTAssertEqual(solo.partyLevels, [8])
+        XCTAssertEqual(party.partyLevels, [8, 8, 6, 4])
+        XCTAssertEqual(receipts.map(\.rootSeed), [101, 101, 101])
+        XCTAssertEqual(Set(receipts.map(\.mapSeed)).count, 1)
+        XCTAssertTrue(receipts.allSatisfy {
+            $0.scalingRulesVersion == EncounterScalingRules.additivePartyPowerRulesVersion
+                && $0.foeIDs == $0.foeIDs.sorted { $0.rawValue < $1.rawValue }
+                && $0.partyCount == $0.partyLevels.count
+                && $0.healthCaps.count == $0.partyCount
+        })
+        XCTAssertEqual(fresh.anchorLevel, 1)
+        XCTAssertEqual(solo.anchorLevel, 8)
+        XCTAssertEqual(party.anchorLevel, 8)
+        XCTAssertEqual(fresh.healthCaps, [30])
+        XCTAssertEqual(solo.healthCaps, [30])
+        XCTAssertEqual(party.healthCaps, [30, 24, 24, 24])
+        XCTAssertEqual(fresh.worldLevel, 1)
+        XCTAssertEqual(solo.worldLevel, 6)
+        XCTAssertEqual(party.worldLevel, 6)
+        XCTAssertEqual(fresh.foeLevels, [1])
+        XCTAssertEqual(solo.foeLevels, [6])
+        XCTAssertEqual(party.foeLevels, [6])
+        XCTAssertEqual(fresh.foeHP, [12])
+        XCTAssertEqual(solo.foeHP, [18])
+        XCTAssertEqual(party.foeHP, [22])
+        XCTAssertEqual(fresh.groupingRadius, 1)
+        XCTAssertEqual(solo.groupingRadius, 1)
+        XCTAssertEqual(party.groupingRadius, 2)
+        XCTAssertEqual(party.cappedPartyPowerBudget, 2.275052602165878,
+                       accuracy: 0.000_000_001)
+        XCTAssertEqual(party.hpAllocationByFoeID.values.reduce(0, +), 4)
+        XCTAssertGreaterThan(solo.worldLevel, fresh.worldLevel)
+        XCTAssertTrue(zip(solo.foeLevels, fresh.foeLevels).allSatisfy { $0 >= $1 })
+        XCTAssertGreaterThan(solo.foeHP.reduce(0, +), fresh.foeHP.reduce(0, +))
+        XCTAssertGreaterThan(party.cappedPartyPowerBudget, solo.cappedPartyPowerBudget)
+        XCTAssertGreaterThanOrEqual(party.groupingRadius, solo.groupingRadius)
+        XCTAssertGreaterThanOrEqual(party.foeIDs.count, solo.foeIDs.count)
+        XCTAssertGreaterThanOrEqual(party.foeHP.reduce(0, +), solo.foeHP.reduce(0, +))
+        let expectedPressure = EncounterScalingRules.additivePressure(
+            partyPowerBudget: party.cappedPartyPowerBudget,
+            realFoeCount: party.foeIDs.count)
+        XCTAssertEqual(party.wholePressureSlots, expectedPressure.wholePressureSlots)
+        XCTAssertEqual(party.totalHPAdditionFraction,
+                       expectedPressure.totalHPAdditionFraction, accuracy: 0.000_001)
+        XCTAssertTrue(Set(party.hpAllocationByFoeID.keys).isSubset(of:
+            Set(party.foeIDs.map { String($0.rawValue) })))
+
+        let repeatedStore = try GameStore.makeEncounterScalingProgressionFixture(
+            kind: .experiencedParty)
+        let repeated = try XCTUnwrap(GameStore.progressionReceipt(
+            kind: .experiencedParty, rootSeed: 101, from: repeatedStore))
+        XCTAssertEqual(repeated, party,
+                       "the same disclosed root and party vector must freeze the same receipt")
+        let encodedEncounter = try JSONEncoder().encode(
+            try XCTUnwrap(repeatedStore.activeEncounter))
+        let resumed = try JSONDecoder().decode(EncounterState.self, from: encodedEncounter)
+        XCTAssertEqual(resumed.scalingPreview, repeatedStore.activeEncounter?.scalingPreview)
+
+        for receipt in receipts { print("SCALING_PROGRESSION \(receipt)") }
+    }
+
     func testFreshBinderAndQuillNormalVersusTeemingDiagnosticDistribution() throws {
         let roots: [UInt64] = [101, 202, 303, 404, 505, 606, 707, 808, 909, 1_010, 1_111, 1_212]
         let normal = try roots.prefix(6).map { try openingSample(rootSeed: $0, teeming: false) }

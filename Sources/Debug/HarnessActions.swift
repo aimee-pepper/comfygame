@@ -32,6 +32,54 @@ enum EncounterScalingPhoneFixtureError: Error, LocalizedError {
     }
 }
 
+enum EncounterScalingProgressionFixtureKind: String, Identifiable, CaseIterable, Sendable {
+    case freshSolo
+    case experiencedSolo
+    case experiencedParty
+
+    var id: String { rawValue }
+    var binderLevel: Int { self == .freshSolo ? 1 : 8 }
+    var memberLevels: [Int] {
+        switch self {
+        case .freshSolo, .experiencedSolo: []
+        case .experiencedParty: [8, 6, 4]
+        }
+    }
+    var title: String {
+        switch self {
+        case .freshSolo: "Solo · Binder level 1"
+        case .experiencedSolo: "Solo · Binder level 8"
+        case .experiencedParty: "Party · levels 8 / 8 / 6 / 4"
+        }
+    }
+    var detail: String {
+        memberLevels.isEmpty
+            ? "One disclosed contact · no equipment · frozen level \(binderLevel)"
+            : "Three explicit companions · disclosed grouping · frozen member levels"
+    }
+}
+
+struct EncounterScalingProgressionReceipt: Equatable, Sendable {
+    var kind: EncounterScalingProgressionFixtureKind
+    var rootSeed: UInt64
+    var mapSeed: UInt64
+    var partyLevels: [Int]
+    var healthCaps: [Int]
+    var anchorLevel: Int
+    var partyCount: Int
+    var uncappedPartyPowerBudget: Double
+    var cappedPartyPowerBudget: Double
+    var worldLevel: Int
+    var groupingRadius: Int
+    var foeIDs: [InstanceID]
+    var foeLevels: [Int]
+    var foeHP: [Int]
+    var hpAllocationByFoeID: [String: Int]
+    var wholePressureSlots: Int
+    var totalHPAdditionFraction: Double
+    var scalingRulesVersion: String
+}
+
 @MainActor
 final class EncounterScalingPhoneFixtureSession: ObservableObject, Identifiable {
     let id = UUID()
@@ -41,6 +89,18 @@ final class EncounterScalingPhoneFixtureSession: ObservableObject, Identifiable 
     init(kind: EncounterScalingPhoneFixtureKind) throws {
         self.kind = kind
         store = try GameStore.makeEncounterScalingPhoneFixture(kind: kind)
+    }
+}
+
+@MainActor
+final class EncounterScalingProgressionFixtureSession: ObservableObject, Identifiable {
+    let id = UUID()
+    let kind: EncounterScalingProgressionFixtureKind
+    let store: GameStore
+
+    init(kind: EncounterScalingProgressionFixtureKind) throws {
+        self.kind = kind
+        store = try GameStore.makeEncounterScalingProgressionFixture(kind: kind)
     }
 }
 
@@ -112,6 +172,88 @@ extension GameStore {
               encounter.scalingPreview?.cappedPartyPowerBudget == 1.5
         else { throw EncounterScalingPhoneFixtureError.invalidEncounter }
         return store
+    }
+
+    /// Deterministic progression vectors beside (and deliberately not replacing) the accepted
+    /// level-one Normal/Teeming pair. Every value is frozen through production departure and
+    /// encounter-entry rules; no gameplay RNG is consumed to manufacture a comparison result.
+    static func makeEncounterScalingProgressionFixture(
+        kind: EncounterScalingProgressionFixtureKind,
+        rootSeed: UInt64 = 101
+    ) throws -> GameStore {
+        let store = GameStore(io: .temporary(
+            name: "phone-scaling-progression-\(kind.rawValue)-\(rootSeed)-\(UUID().uuidString)"))
+        store.mutate("freeze progression scaling fixture") { state in
+            state.worlds.seeds = SeedSequence(rootSeed: rootSeed)
+            state.base.binderCharacter = CharacterState(level: kind.binderLevel, rank: .front)
+            state.base.binderEquipped = [:]
+            state.base.roster = kind.memberLevels.enumerated().map { index, level in
+                var member = CompanionState()
+                member.name = "Fixture \(index + 1)"
+                member.maxHP = Tuning.Encounter.companionMaxHP
+                member.character = CharacterState(level: level, rank: .front)
+                member.gambits = GambitStarter.rules
+                member.equipped = [:]
+                return member
+            }
+            state.base.activeParty = Array(kind.memberLevels.indices)
+        }
+        guard store.write("plains") else {
+            throw EncounterScalingPhoneFixtureError.couldNotWritePage
+        }
+        guard store.bindAndDepart() else {
+            throw EncounterScalingPhoneFixtureError.couldNotBind
+        }
+        store.mutate("stage disclosed progression contact", flush: true) { state in
+            guard var run = state.worlds.activeRun, !run.enemies.isEmpty else { return }
+            run.tuning = .defaults
+            for point in run.map.allPoints { run.map[point].isRevealed = true }
+            for index in run.enemies.indices { run.enemies[index].isAwake = true }
+            let trigger = run.enemies.min {
+                let lhs = abs($0.position.x - run.playerPosition.x)
+                    + abs($0.position.y - run.playerPosition.y)
+                let rhs = abs($1.position.x - run.playerPosition.x)
+                    + abs($1.position.y - run.playerPosition.y)
+                return lhs == rhs ? $0.id.rawValue < $1.id.rawValue : lhs < rhs
+            }
+            guard let trigger else { return }
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: trigger, runsAutomaticTurns: false, in: &state)
+        }
+        guard progressionReceipt(kind: kind, rootSeed: rootSeed, from: store) != nil else {
+            throw EncounterScalingPhoneFixtureError.invalidEncounter
+        }
+        return store
+    }
+
+    static func progressionReceipt(
+        kind: EncounterScalingProgressionFixtureKind,
+        rootSeed: UInt64,
+        from store: GameStore
+    ) -> EncounterScalingProgressionReceipt? {
+        guard let run = store.activeRun, let encounter = run.activeEncounter,
+              let preview = encounter.scalingPreview,
+              let anchor = preview.anchorLevel,
+              let uncapped = preview.uncappedPartyPowerBudget,
+              let capped = preview.cappedPartyPowerBudget,
+              let worldLevel = preview.worldLevel,
+              let allocation = preview.hpAllocationByFoeID,
+              let slots = preview.wholePressureSlots,
+              let hpFraction = preview.totalHPAdditionFraction,
+              let version = preview.scalingRulesVersion,
+              let healthCaps = run.healthCaps
+        else { return nil }
+        return .init(
+            kind: kind, rootSeed: rootSeed, mapSeed: run.mapSeed,
+            partyLevels: preview.partyLevels,
+            healthCaps: healthCaps.map(\.maximum), anchorLevel: anchor,
+            partyCount: preview.partyCount,
+            uncappedPartyPowerBudget: uncapped, cappedPartyPowerBudget: capped,
+            worldLevel: worldLevel, groupingRadius: preview.groupingRadius,
+            foeIDs: preview.foeIDs, foeLevels: encounter.foes.map(\.level),
+            foeHP: encounter.foes.map(\.stats.maxHP), hpAllocationByFoeID: allocation,
+            wholePressureSlots: slots, totalHPAdditionFraction: hpFraction,
+            scalingRulesVersion: version)
     }
 }
 #endif

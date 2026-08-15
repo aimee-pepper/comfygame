@@ -929,6 +929,7 @@ struct BalancingView: View {
 #if DEBUG
 private struct EncounterScalingPhoneAcceptanceView: View {
     @State private var session: EncounterScalingPhoneFixtureSession?
+    @State private var progressionSession: EncounterScalingProgressionFixtureSession?
     @State private var error: String?
 
     var body: some View {
@@ -953,6 +954,22 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                 Text("Use the red bug button at the opening and again immediately before the finishing action. Record readability, fairness and whether retreat looked viable. Close returns here without changing the selected campaign.")
                     .font(.callout)
             }
+            Section("Progression vectors") {
+                Text("These disclosed fixtures keep root 101 and production scaling fixed while only party level and membership change. They are additive to the accepted level-one pair above.")
+                    .font(.callout)
+                ForEach(EncounterScalingProgressionFixtureKind.allCases) { kind in
+                    Button {
+                        do { progressionSession = try EncounterScalingProgressionFixtureSession(kind: kind) }
+                        catch { self.error = error.localizedDescription }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(kind.title).font(.headline)
+                            Text(kind.detail).font(.caption).foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    }
+                }
+            }
             if let error {
                 Section { Text(error).foregroundStyle(.red) }
             }
@@ -976,6 +993,21 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                 .padding(.top, 4)
                 .padding(.trailing, 4)
                 .zIndex(20_000)
+            }
+        }
+        .fullScreenCover(item: $progressionSession) { fixture in
+            ZStack(alignment: .topTrailing) {
+                RootView().environmentObject(fixture.store)
+                Button { progressionSession = nil } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, .black.opacity(0.72))
+                        .frame(width: 48, height: 48)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityLabel("Close progression scaling fixture")
+                .padding(.top, 4).padding(.trailing, 4).zIndex(20_000)
             }
         }
     }
