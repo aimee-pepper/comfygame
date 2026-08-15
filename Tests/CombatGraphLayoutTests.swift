@@ -95,4 +95,17 @@ final class CombatGraphLayoutTests: XCTestCase {
         XCTAssertTrue(route.owned.isEmpty)
         XCTAssertEqual(route.pointsRemaining, 8)
     }
+
+    func testProductionTrainingUsesStableGraphPurchaseAndTruthfulOpeningHold() throws {
+        let source = try String(contentsOf: URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("Sources/Screens/CombatTreeView.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains("CombatGraphLayout(tree: tree)"))
+        XCTAssertTrue(source.contains("previewCombatNodePurchase(node.id, for: member)"))
+        XCTAssertTrue(source.contains("purchaseCombatNode(quote, for: member)"))
+        XCTAssertTrue(source.contains("node.depth > CombatGraphRules.openingMaximumDepth"))
+        XCTAssertTrue(source.contains("PurchaseRefusal.unavailable.rawValue"))
+        XCTAssertFalse(source.contains("spendPoint(in:"))
+        XCTAssertFalse(source.contains("buyNext"))
+    }
 }

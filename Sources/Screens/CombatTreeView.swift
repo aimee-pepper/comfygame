@@ -1,138 +1,175 @@
 import SwiftUI
 
-/// **Where you spend, which is what a class is.**
-///
-/// Nine branches shared by everybody (`docs/combat-trees-full.md`). Nobody is handed a role: a
-/// rogue is Swiftness, Evasion and Shadow, and a knight is Force, Fortitude and Emanation, and the
-/// game never says either word until you've finished three.
-///
-/// One tree at a time on a phone, because three columns of eight nodes is not a portrait layout.
+/// The authored combat graph in ordinary play. One tree fills the phone width; stable node IDs,
+/// not branch position, own selection and purchase.
 struct CombatTreeView: View {
     @EnvironmentObject private var store: GameStore
     let member: PartyMember
-    @State private var tree: CombatTreeID?
+    @State private var treeID: CombatTreeID?
+    @State private var selectedNodeID: CombatNodeID?
+    @State private var refusal: String?
 
+    private let catalogue = ContentCatalog.shared.combatGraph
     private var character: CharacterState { store.character(of: member) }
-    private var unspent: Int { CombatTreeRules.unspentPoints(character) }
-
-    private var openTree: CombatTreeDef? {
-        ContentCatalog.shared.combatTrees.first { $0.id == tree } ?? ContentCatalog.shared.combatTrees.first
+    private var owned: Set<CombatNodeID> {
+        CombatGraphRules.ownedNodes(for: character, catalogue: catalogue)
     }
+    private var points: Int {
+        CombatGraphRules.unspentPoints(for: character, catalogue: catalogue)
+    }
+    private var tree: CombatGraphTreeDef {
+        catalogue.trees.first { $0.id == treeID } ?? catalogue.trees[0]
+    }
+    private var layout: CombatGraphLayout { CombatGraphLayout(tree: tree) }
+    private var selectedNode: CombatGraphNodeDef? { selectedNodeID.flatMap(catalogue.node) }
 
     var body: some View {
         VStack(spacing: 0) {
             header
-            treePicker
-            ScrollView {
-                VStack(spacing: 12) {
-                    if let openTree {
-                        ForEach(openTree.branches) { branch in
-                            branchCard(branch)
-                        }
+            Picker("Combat tree", selection: Binding(get: { tree.id }, set: { treeID = $0 })) {
+                ForEach(catalogue.trees) { Text($0.name).tag($0.id) }
+            }
+            .pickerStyle(.segmented).padding(.horizontal, 12).padding(.top, 6)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        connectorKey
+                        graphCanvas
+                        if let selectedNode { detail(selectedNode) }
                     }
+                    .padding(12)
                 }
-                .padding(16)
+                .onChange(of: selectedNodeID) { _, id in
+                    guard let id else { return }
+                    withAnimation(.easeInOut(duration: 0.2)) { proxy.scrollTo(id, anchor: .bottom) }
+                }
             }
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Training")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: tree.id) { _, _ in selectedNodeID = nil; refusal = nil }
     }
 
     private var header: some View {
-        HStack(spacing: 10) {
+        HStack {
             VStack(alignment: .leading, spacing: 1) {
                 Text(store.name(of: member)).font(.callout.weight(.semibold))
-                Text(CombatTreeRules.className(for: character)
-                     ?? "Level \(character.level) · nothing decided yet")
+                Text("Level \(character.level) · \(owned.count) learned")
                     .font(.caption2).foregroundStyle(.secondary)
             }
-            Spacer(minLength: 6)
-            Text(unspent == 1 ? "1 point" : "\(unspent) points")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(unspent > 0 ? Color.accentColor : .secondary)
-                .padding(.horizontal, 9).padding(.vertical, 4)
-                .background((unspent > 0 ? Color.accentColor : Color.secondary).opacity(0.14),
-                            in: Capsule())
+            Spacer()
+            Text(points == 1 ? "1 point" : "\(points) points")
+                .font(.caption.weight(.semibold)).foregroundStyle(points > 0 ? Color.accentColor : .secondary)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(.bar)
+        .padding(.horizontal, 16).padding(.vertical, 8).background(.bar)
     }
 
-    private var treePicker: some View {
-        Picker("", selection: Binding(
-            get: { openTree?.id ?? ContentCatalog.shared.combatTrees[0].id },
-            set: { tree = $0 })) {
-            ForEach(ContentCatalog.shared.combatTrees) { Text($0.name).tag($0.id) }
+    private var connectorKey: some View {
+        HStack(spacing: 14) {
+            Label("own discipline", systemImage: "minus")
+            Label("hybrid alternative", systemImage: "ellipsis")
         }
-        .pickerStyle(.segmented)
-        .padding(.horizontal, 12)
-        .padding(.top, 6)
+        .font(.caption2).foregroundStyle(.secondary)
+        .accessibilityElement(children: .combine)
     }
 
-    private func branchCard(_ branch: CombatBranchDef) -> some View {
-        let depth = CombatTreeRules.depth(of: branch.id, in: character)
-        let canBuy = CombatTreeRules.canBuyNext(in: branch, for: character)
-        return StationCard(title: "\(branch.name) — \(depth) of \(branch.nodes.count)",
-                           icon: branch.icon) {
-            Text(branch.blurb)
-                .font(.caption2).foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            ForEach(Array(branch.nodes.enumerated()), id: \.offset) { item in
-                nodeRow(item.element, bought: item.offset < depth, isNext: item.offset == depth)
-            }
-
-            if canBuy {
-                Button {
-                    store.spendPoint(in: branch.id, for: member)
-                } label: {
-                    Text("Learn \(branch.nodes[depth].name)")
-                        .font(.caption.weight(.semibold))
-                        .frame(maxWidth: .infinity).frame(minHeight: 44)
-                }
-                .buttonStyle(.borderedProminent)
-            } else if depth == branch.nodes.count {
-                Text("Finished.").font(.caption2).foregroundStyle(.green)
-            } else if unspent == 0 {
-                Text("Nothing left to spend.").font(.caption2).foregroundStyle(.tertiary)
-            }
-        }
-    }
-
-    /// Bought nodes read plainly; the next one is offered; everything past it is dimmed but
-    /// **visible** — you should be able to see what committing to a branch would eventually get you,
-    /// because that is the decision.
-    private func nodeRow(_ node: CombatNodeDef, bought: Bool, isNext: Bool) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: bought ? "checkmark.circle.fill"
-                                     : (isNext ? "circle" : "circle.dotted"))
-                .font(.caption)
-                .foregroundStyle(bought ? Color.green : (isNext ? Color.accentColor : Color.tertiaryLabel))
-                .frame(width: 18)
-            VStack(alignment: .leading, spacing: 1) {
-                HStack(spacing: 5) {
-                    Text(node.name).font(.caption.weight(bought || isNext ? .medium : .regular))
-                    if node.grantsSkill != nil {
-                        Image(systemName: "sparkles").font(.system(size: 8)).foregroundStyle(.orange)
-                    }
-                    if node.index == 8 {
-                        Text("capstone").font(.system(size: 8).weight(.semibold))
-                            .foregroundStyle(.purple)
+    private var graphCanvas: some View {
+        GeometryReader { proxy in
+            let points = Dictionary(uniqueKeysWithValues: layout.placements.map {
+                ($0.id, layout.point(for: $0, width: proxy.size.width))
+            })
+            ZStack(alignment: .topLeading) {
+                Canvas { context, _ in
+                    for edge in layout.edges {
+                        guard let parent = points[edge.parent], let child = points[edge.child] else { continue }
+                        var path = Path(); path.move(to: parent); path.addLine(to: child)
+                        context.stroke(path, with: .color(.secondary.opacity(edge.isHybrid ? 0.5 : 0.78)),
+                                       style: StrokeStyle(lineWidth: edge.isHybrid ? 1.5 : 2,
+                                                          dash: edge.isHybrid ? [5, 4] : []))
                     }
                 }
-                Text(node.blurb)
-                    .font(.system(size: 10)).foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                ForEach(layout.placements) { placement in
+                    Button { selectedNodeID = placement.id; refusal = nil } label: {
+                        nodeTile(placement.node)
+                    }
+                    .buttonStyle(.plain).frame(width: 44, height: 44).position(points[placement.id]!)
+                }
             }
-            Spacer(minLength: 0)
         }
-        .opacity(bought || isNext ? 1 : 0.45)
-        .frame(minHeight: 30)
+        .frame(height: CombatGraphLayout.canvasHeight)
+        .accessibilityElement(children: .contain)
+    }
+
+    private func nodeTile(_ node: CombatGraphNodeDef) -> some View {
+        let state = state(of: node)
+        let selected = selectedNodeID == node.id
+        let frame = ProductionCombatGraphNodeFrame(isCapstone: node.role == .capstone)
+        let colour: Color = selected ? .accentColor : state == .owned ? .green
+            : state == .available ? .accentColor : .secondary
+        return ZStack {
+            frame.fill(state == .owned ? Color.green.opacity(0.82)
+                       : Color(.secondarySystemGroupedBackground))
+                .overlay { frame.stroke(colour, style: StrokeStyle(lineWidth: selected ? 4 : 2,
+                                                                    dash: state == .blocked ? [4, 3] : [])) }
+            Image(systemName: state == .owned ? "checkmark" : "circle.fill")
+                .font(.caption.bold()).foregroundStyle(state == .owned ? .white : colour)
+        }
+        .frame(width: 44, height: 44).contentShape(Rectangle())
+        .accessibilityLabel(node.name).accessibilityValue(state.rawValue)
+    }
+
+    private func detail(_ node: CombatGraphNodeDef) -> some View {
+        let state = state(of: node)
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack { Text(node.name).font(.headline); Spacer(); Text(state.rawValue).font(.caption.bold()) }
+            Text(node.effectCopy).font(.callout)
+            Text(parentText(node)).font(.caption).foregroundStyle(.secondary)
+            if node.depth > CombatGraphRules.openingMaximumDepth {
+                Text(CombatGraphRules.PurchaseRefusal.unavailable.rawValue)
+                    .font(.caption).foregroundStyle(.secondary)
+            } else if state != .owned {
+                Button("Learn \(node.name)") { purchase(node) }
+                    .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
+                    .disabled(state != .available)
+            }
+            if let refusal { Text(refusal).font(.caption).foregroundStyle(.secondary) }
+        }
+        .padding(12).background(Color(.secondarySystemGroupedBackground),
+                                in: RoundedRectangle(cornerRadius: 12)).id(node.id)
+    }
+
+    private func state(of node: CombatGraphNodeDef) -> CombatGraphNodeState {
+        if owned.contains(node.id) { return .owned }
+        guard node.depth <= CombatGraphRules.openingMaximumDepth else { return .blocked }
+        if case .success = store.previewCombatNodePurchase(node.id, for: member) { return .available }
+        return .blocked
+    }
+
+    private func purchase(_ node: CombatGraphNodeDef) {
+        switch store.previewCombatNodePurchase(node.id, for: member) {
+        case .failure(let reason): refusal = reason.rawValue
+        case .success(let quote):
+            switch store.purchaseCombatNode(quote, for: member) {
+            case .committed: refusal = nil
+            case .refused(let reason): refusal = reason.rawValue
+            }
+        }
+    }
+
+    private func parentText(_ node: CombatGraphNodeDef) -> String {
+        let names = node.ordinaryParentAlternatives.compactMap { catalogue.node($0)?.name }
+        return names.isEmpty ? "No node prerequisite" : "Requires " + names.joined(separator: " OR ")
     }
 }
 
-private extension ShapeStyle where Self == Color {
-    static var tertiaryLabel: Color { Color(uiColor: .tertiaryLabel) }
+private struct ProductionCombatGraphNodeFrame: Shape {
+    let isCapstone: Bool
+    func path(in rect: CGRect) -> Path {
+        guard isCapstone else { return Path(roundedRect: rect, cornerRadius: 10) }
+        var path = Path(); path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.midY)); path.closeSubpath(); return path
+    }
 }
