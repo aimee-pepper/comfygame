@@ -35,27 +35,39 @@ enum EncounterScalingPhoneFixtureError: Error, LocalizedError {
 enum EncounterScalingProgressionFixtureKind: String, Identifiable, CaseIterable, Sendable {
     case freshSolo
     case experiencedSolo
+    case ordinaryTwoPerson
     case experiencedParty
+    case ordinaryFivePerson
+    case apexParty
 
     var id: String { rawValue }
     var binderLevel: Int { self == .freshSolo ? 1 : 8 }
+    var rootSeed: UInt64 { self == .apexParty ? 909 : 101 }
+    var isApex: Bool { self == .apexParty }
     var memberLevels: [Int] {
         switch self {
         case .freshSolo, .experiencedSolo: []
+        case .ordinaryTwoPerson: [8]
         case .experiencedParty: [8, 6, 4]
+        case .ordinaryFivePerson: [8, 6, 4, 2]
+        case .apexParty: [8, 6, 4]
         }
     }
     var title: String {
         switch self {
         case .freshSolo: "Solo · Binder level 1"
         case .experiencedSolo: "Solo · Binder level 8"
+        case .ordinaryTwoPerson: "Ordinary · 2 people · levels 8 / 8"
         case .experiencedParty: "Party · levels 8 / 8 / 6 / 4"
+        case .ordinaryFivePerson: "Ordinary · 5 people · levels 8 / 8 / 6 / 4 / 2"
+        case .apexParty: "Apex · party levels 8 / 8 / 6 / 4"
         }
     }
     var detail: String {
-        memberLevels.isEmpty
-            ? "One disclosed contact · no equipment · frozen level \(binderLevel)"
-            : "Three explicit companions · disclosed grouping · frozen member levels"
+        if isApex { return "One disclosed apex contact · fixed root 909 · frozen member levels" }
+        return memberLevels.isEmpty
+            ? "One disclosed ordinary contact · no equipment · frozen level \(binderLevel)"
+            : "\(memberLevels.count) explicit companion\(memberLevels.count == 1 ? "" : "s") · disclosed ordinary grouping"
     }
 }
 
@@ -74,6 +86,7 @@ struct EncounterScalingProgressionReceipt: Equatable, Sendable {
     var foeIDs: [InstanceID]
     var foeLevels: [Int]
     var foeHP: [Int]
+    var foeIsApex: [Bool]
     var hpAllocationByFoeID: [String: Int]
     var wholePressureSlots: Int
     var totalHPAdditionFraction: Double
@@ -81,7 +94,9 @@ struct EncounterScalingProgressionReceipt: Equatable, Sendable {
 
     var phoneSummaryLines: [String] {
         let party = partyLevels.map(String.init).joined(separator: " / ")
-        let foes = zip(foeLevels, foeHP).map { "L\($0.0) · \($0.1) HP" }
+        let foes = zip(zip(foeLevels, foeHP), foeIsApex).map {
+            "\($0.1 ? "Apex " : "")L\($0.0.0) · \($0.0.1) HP"
+        }
             .joined(separator: ", ")
         let allocation = hpAllocationByFoeID.values.reduce(0, +)
         let pressure = String(format: "%.3f", locale: Locale(identifier: "en_US_POSIX"),
@@ -116,8 +131,10 @@ final class EncounterScalingProgressionFixtureSession: ObservableObject, Identif
 
     init(kind: EncounterScalingProgressionFixtureKind) throws {
         self.kind = kind
-        let fixture = try GameStore.makeEncounterScalingProgressionFixture(kind: kind)
-        guard let frozen = GameStore.progressionReceipt(kind: kind, rootSeed: 101, from: fixture)
+        let fixture = try GameStore.makeEncounterScalingProgressionFixture(
+            kind: kind, rootSeed: kind.rootSeed)
+        guard let frozen = GameStore.progressionReceipt(
+            kind: kind, rootSeed: kind.rootSeed, from: fixture)
         else { throw EncounterScalingPhoneFixtureError.invalidEncounter }
         store = fixture
         receipt = frozen
@@ -237,8 +254,16 @@ extension GameStore {
                 return lhs == rhs ? $0.id.rawValue < $1.id.rawValue : lhs < rhs
             }
             guard let trigger else { return }
+            if kind.isApex,
+               let triggerIndex = run.enemies.firstIndex(where: { $0.id == trigger.id }) {
+                run.enemies[triggerIndex].isApex = true
+            }
             state.worlds.activeRun = run
-            WorldRules.beginEncounter(triggeredBy: trigger, runsAutomaticTurns: false, in: &state)
+            let stagedTrigger = kind.isApex
+                ? run.enemies.first(where: { $0.id == trigger.id }) ?? trigger
+                : trigger
+            WorldRules.beginEncounter(triggeredBy: stagedTrigger,
+                                      runsAutomaticTurns: false, in: &state)
         }
         guard progressionReceipt(kind: kind, rootSeed: rootSeed, from: store) != nil else {
             throw EncounterScalingPhoneFixtureError.invalidEncounter
@@ -271,7 +296,8 @@ extension GameStore {
             uncappedPartyPowerBudget: uncapped, cappedPartyPowerBudget: capped,
             worldLevel: worldLevel, groupingRadius: preview.groupingRadius,
             foeIDs: preview.foeIDs, foeLevels: encounter.foes.map(\.level),
-            foeHP: encounter.foes.map(\.stats.maxHP), hpAllocationByFoeID: allocation,
+            foeHP: encounter.foes.map(\.stats.maxHP),
+            foeIsApex: encounter.foes.map(\.isApex), hpAllocationByFoeID: allocation,
             wholePressureSlots: slots, totalHPAdditionFraction: hpFraction,
             scalingRulesVersion: version)
     }

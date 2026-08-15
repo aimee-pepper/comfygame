@@ -30,18 +30,28 @@ final class EncounterScalingIntegrationTests: XCTestCase {
 
     func testProgressionPhoneFixturesFreezeRulesOwnedLevelsHealthAndEnemyAllocation() throws {
         let receipts = try EncounterScalingProgressionFixtureKind.allCases.map { kind in
-            let store = try GameStore.makeEncounterScalingProgressionFixture(kind: kind)
-            return try XCTUnwrap(GameStore.progressionReceipt(kind: kind, rootSeed: 101, from: store))
+            let store = try GameStore.makeEncounterScalingProgressionFixture(
+                kind: kind, rootSeed: kind.rootSeed)
+            return try XCTUnwrap(GameStore.progressionReceipt(
+                kind: kind, rootSeed: kind.rootSeed, from: store))
         }
         let fresh = try XCTUnwrap(receipts.first { $0.kind == .freshSolo })
         let solo = try XCTUnwrap(receipts.first { $0.kind == .experiencedSolo })
+        let two = try XCTUnwrap(receipts.first { $0.kind == .ordinaryTwoPerson })
         let party = try XCTUnwrap(receipts.first { $0.kind == .experiencedParty })
+        let five = try XCTUnwrap(receipts.first { $0.kind == .ordinaryFivePerson })
+        let apex = try XCTUnwrap(receipts.first { $0.kind == .apexParty })
 
         XCTAssertEqual(fresh.partyLevels, [1])
         XCTAssertEqual(solo.partyLevels, [8])
         XCTAssertEqual(party.partyLevels, [8, 8, 6, 4])
-        XCTAssertEqual(receipts.map(\.rootSeed), [101, 101, 101])
-        XCTAssertEqual(Set(receipts.map(\.mapSeed)).count, 1)
+        XCTAssertEqual(two.partyLevels, [8, 8])
+        XCTAssertEqual(five.partyLevels, [8, 8, 6, 4, 2])
+        XCTAssertEqual(apex.partyLevels, [8, 8, 6, 4])
+        XCTAssertEqual(receipts.filter { !$0.kind.isApex }.map(\.rootSeed),
+                       Array(repeating: 101, count: 5))
+        XCTAssertEqual(apex.rootSeed, 909)
+        XCTAssertEqual(Set(receipts.filter { !$0.kind.isApex }.map(\.mapSeed)).count, 1)
         XCTAssertTrue(receipts.allSatisfy {
             $0.scalingRulesVersion == EncounterScalingRules.additivePartyPowerRulesVersion
                 && $0.foeIDs == $0.foeIDs.sorted { $0.rawValue < $1.rawValue }
@@ -51,9 +61,36 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         XCTAssertEqual(fresh.anchorLevel, 1)
         XCTAssertEqual(solo.anchorLevel, 8)
         XCTAssertEqual(party.anchorLevel, 8)
+        XCTAssertEqual(two.partyCount, 2)
+        XCTAssertEqual(five.partyCount, 5)
+        XCTAssertTrue(apex.foeIsApex.allSatisfy { $0 })
+        XCTAssertFalse(two.foeIsApex.contains(true))
+        XCTAssertFalse(five.foeIsApex.contains(true))
         XCTAssertEqual(fresh.healthCaps, [30])
         XCTAssertEqual(solo.healthCaps, [30])
         XCTAssertEqual(party.healthCaps, [30, 24, 24, 24])
+        XCTAssertEqual(two.healthCaps, [30, 24])
+        XCTAssertEqual(five.healthCaps, [30, 24, 24, 24, 24])
+        XCTAssertEqual(two.worldLevel, 6)
+        XCTAssertEqual(five.worldLevel, 6)
+        XCTAssertEqual(apex.worldLevel, 6)
+        XCTAssertEqual(two.foeLevels, [6])
+        XCTAssertEqual(five.foeLevels, [6])
+        XCTAssertEqual(apex.foeLevels, [10])
+        XCTAssertEqual(two.foeHP, [21])
+        XCTAssertEqual(five.foeHP, [24])
+        XCTAssertEqual(apex.foeHP, [53])
+        XCTAssertEqual(two.groupingRadius, 1)
+        XCTAssertEqual(five.groupingRadius, 3)
+        XCTAssertEqual(apex.groupingRadius, 2)
+        XCTAssertEqual(two.cappedPartyPowerBudget, 1.5, accuracy: 0.000_000_001)
+        XCTAssertEqual(five.cappedPartyPowerBudget, 2.573186265605486,
+                       accuracy: 0.000_000_001)
+        XCTAssertEqual(apex.cappedPartyPowerBudget, 2.275052602165878,
+                       accuracy: 0.000_000_001)
+        XCTAssertEqual(two.hpAllocationByFoeID.values.reduce(0, +), 3)
+        XCTAssertEqual(five.hpAllocationByFoeID.values.reduce(0, +), 6)
+        XCTAssertTrue(apex.hpAllocationByFoeID.isEmpty)
         XCTAssertEqual(fresh.worldLevel, 1)
         XCTAssertEqual(solo.worldLevel, 6)
         XCTAssertEqual(party.worldLevel, 6)
@@ -76,6 +113,8 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(party.groupingRadius, solo.groupingRadius)
         XCTAssertGreaterThanOrEqual(party.foeIDs.count, solo.foeIDs.count)
         XCTAssertGreaterThanOrEqual(party.foeHP.reduce(0, +), solo.foeHP.reduce(0, +))
+        XCTAssertGreaterThanOrEqual(five.cappedPartyPowerBudget, two.cappedPartyPowerBudget)
+        XCTAssertGreaterThan(apex.foeHP.reduce(0, +), party.foeHP.reduce(0, +))
         let expectedPressure = EncounterScalingRules.additivePressure(
             partyPowerBudget: party.cappedPartyPowerBudget,
             realFoeCount: party.foeIDs.count)
@@ -86,7 +125,7 @@ final class EncounterScalingIntegrationTests: XCTestCase {
             Set(party.foeIDs.map { String($0.rawValue) })))
 
         let repeatedStore = try GameStore.makeEncounterScalingProgressionFixture(
-            kind: .experiencedParty)
+            kind: .experiencedParty, rootSeed: EncounterScalingProgressionFixtureKind.experiencedParty.rootSeed)
         let repeated = try XCTUnwrap(GameStore.progressionReceipt(
             kind: .experiencedParty, rootSeed: 101, from: repeatedStore))
         XCTAssertEqual(repeated, party,
@@ -117,6 +156,29 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         ])
         XCTAssertEqual(party.receipt, try XCTUnwrap(GameStore.progressionReceipt(
             kind: .experiencedParty, rootSeed: 101, from: party.store)))
+
+        let two = try EncounterScalingProgressionFixtureSession(kind: .ordinaryTwoPerson)
+        let five = try EncounterScalingProgressionFixtureSession(kind: .ordinaryFivePerson)
+        let apex = try EncounterScalingProgressionFixtureSession(kind: .apexParty)
+        XCTAssertEqual(two.receipt.phoneSummaryLines, [
+            "Party levels 8 / 8",
+            "Pressure 1.500 · radius 1",
+            "Foe L6 · 21 HP",
+            "Allocation +3 HP · 0 pressure slots"
+        ])
+        XCTAssertEqual(five.receipt.phoneSummaryLines, [
+            "Party levels 8 / 8 / 6 / 4 / 2",
+            "Pressure 2.573 · radius 3",
+            "Foe L6 · 24 HP",
+            "Allocation +6 HP · 1 pressure slot"
+        ])
+        XCTAssertEqual(apex.receipt.phoneSummaryLines, [
+            "Party levels 8 / 8 / 6 / 4",
+            "Pressure 2.275 · radius 2",
+            "Foe Apex L10 · 53 HP",
+            "Allocation +0 HP · 0 pressure slots"
+        ])
+        XCTAssertEqual(apex.receipt.rootSeed, 909)
     }
 
     func testFreshBinderAndQuillNormalVersusTeemingDiagnosticDistribution() throws {

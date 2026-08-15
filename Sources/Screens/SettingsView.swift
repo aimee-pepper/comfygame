@@ -955,7 +955,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                     .font(.callout)
             }
             Section("Progression vectors") {
-                Text("These disclosed fixtures keep root 101 and production scaling fixed while only party level and membership change. They are additive to the accepted level-one pair above.")
+                Text("Ordinary fixtures keep root 101 and production scaling fixed while only party level and membership change. The apex fixture uses disclosed root 909. All are additive to the accepted level-one pair above.")
                     .font(.callout)
                 ForEach(EncounterScalingProgressionFixtureKind.allCases) { kind in
                     Button {
