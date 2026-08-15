@@ -286,9 +286,16 @@ struct GearDef: Codable, Equatable, Sendable {
     var statusKind: String?
     var wardsAgainst: DamageKind?
 
+    /// Stable visual construction vocabulary for ordinary found gear. These are descriptive facts,
+    /// not inferred from name, tier or colour: family owns silhouette and material owns palette.
+    /// Crafted instances freeze equivalent facts in `GearInstanceProfile` instead.
+    var visualFamilyID: String?
+    var materialProfileID: String?
+
     init(slot: GearSlot, tier: Int, damage: DamageKind? = nil, reach: Reach = .close,
          insulation: Double = 0, reactivity: Double = 0, breaks: WildRule? = nil,
-         statusKind: String? = nil, wardsAgainst: DamageKind? = nil) {
+         statusKind: String? = nil, wardsAgainst: DamageKind? = nil,
+         visualFamilyID: String? = nil, materialProfileID: String? = nil) {
         self.slot = slot
         self.tier = tier
         self.damage = damage
@@ -298,6 +305,8 @@ struct GearDef: Codable, Equatable, Sendable {
         self.breaks = breaks
         self.statusKind = statusKind
         self.wardsAgainst = wardsAgainst
+        self.visualFamilyID = visualFamilyID
+        self.materialProfileID = materialProfileID
     }
 
     init(from decoder: Decoder) throws {
@@ -311,6 +320,8 @@ struct GearDef: Codable, Equatable, Sendable {
         breaks = try c.decodeIfPresent(WildRule.self, forKey: .breaks)
         statusKind = try c.decodeIfPresent(String.self, forKey: .statusKind)
         wardsAgainst = try c.decodeIfPresent(DamageKind.self, forKey: .wardsAgainst)
+        visualFamilyID = try c.decodeIfPresent(String.self, forKey: .visualFamilyID)
+        materialProfileID = try c.decodeIfPresent(String.self, forKey: .materialProfileID)
     }
 }
 

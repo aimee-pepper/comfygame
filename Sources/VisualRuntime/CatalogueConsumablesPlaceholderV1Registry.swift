@@ -204,5 +204,5 @@ struct CatalogueConsumablesPlaceholderV1Registry: NativeVisualRuntime.Registry {
 
 extension GeneratedCatalogueItemVisualRegistry: CatalogueItemVisualRegistryProvider {
     static let registry: any NativeVisualRuntime.Registry & Sendable =
-        CatalogueConsumablesPlaceholderV1Registry()
+        CatalogueItemCompositeV1Registry()
 }

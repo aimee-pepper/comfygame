@@ -1175,6 +1175,144 @@
       },
       "tradingPostDisposition": "protected",
       "recyclerDisposition": "protected"
+    },
+    {
+      "id": "rubble_sling", "name": "Rubble Sling", "icon": "circle.grid.cross",
+      "rarity": "common", "blurb": "A broad sling and a pouch of carefully matched roadside stone.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 1, "damage": "crush", "reach": "far", "visualFamilyID": "sling", "materialProfileID": "world:rubble" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "fired_clay_guard", "name": "Fired-Clay Guard", "icon": "shield.lefthalf.filled",
+      "rarity": "common", "blurb": "Layered fired plates tied over a wooden brace; brittle, but honest protection.",
+      "kind": "gear", "gear": { "slot": "offhand", "tier": 1, "visualFamilyID": "buckler", "materialProfileID": "world:clay" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "ironwork_blade", "name": "Ironwork Blade", "icon": "scissors",
+      "rarity": "uncommon", "blurb": "A practical iron chopping blade with enough weight to keep its cut moving.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "rend", "reach": "close", "visualFamilyID": "cutting_blade", "materialProfileID": "world:ore" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "copper_buckler", "name": "Copper Buckler", "icon": "shield.lefthalf.filled",
+      "rarity": "uncommon", "blurb": "A work-hardened copper face over a resilient timber core.",
+      "kind": "gear", "gear": { "slot": "offhand", "tier": 2, "visualFamilyID": "buckler", "materialProfileID": "world:copper" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "silvered_helm", "name": "Silvered Helm", "icon": "circle.dashed",
+      "rarity": "rare", "blurb": "A close helm whose pale fitted plates turn a glancing blow cleanly aside.",
+      "kind": "gear", "gear": { "slot": "head", "tier": 3, "visualFamilyID": "enclosed_helm", "materialProfileID": "world:silver" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "golden_keepsake", "name": "Golden Keepsake", "icon": "seal.fill",
+      "rarity": "rare", "blurb": "A small worked-gold pendant, made to outlast the story attached to it.",
+      "kind": "gear", "gear": { "slot": "keepsake", "tier": 3, "visualFamilyID": "keepsake", "materialProfileID": "world:gold" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "quartz_point", "name": "Quartz Point", "icon": "arrow.up.right",
+      "rarity": "uncommon", "blurb": "A clear mineral point fitted to a long shaft and kept away from lateral strain.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "pierce", "reach": "mid", "visualFamilyID": "long_spear", "materialProfileID": "world:quartz" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "obsidian_edge", "name": "Obsidian Edge", "icon": "scissors",
+      "rarity": "rare", "blurb": "A dark glass edge assembled from replaceable flakes rather than one fragile length.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 3, "damage": "rend", "reach": "close", "visualFamilyID": "fitted_edge", "materialProfileID": "world:obsidian" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "saltward_pendant", "name": "Saltward Pendant", "icon": "diamond.fill",
+      "rarity": "common", "blurb": "A sealed salt crystal worn close enough to cloud when the air changes.",
+      "kind": "gear", "gear": { "slot": "keepsake", "tier": 1, "visualFamilyID": "keepsake", "materialProfileID": "world:salt" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "sulfurous_maul", "name": "Sulfurous Maul", "icon": "hammer.fill",
+      "rarity": "uncommon", "blurb": "A dense hammer whose sealed yellow fitting leaves a reactive trace in a split surface.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "crush", "reach": "close", "reactivity": 28, "visualFamilyID": "hand_maul", "materialProfileID": "world:sulfur" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "mercurial_gloves", "name": "Mercurial Gloves", "icon": "hand.raised.fill",
+      "rarity": "rare", "blurb": "Jointed gloves balanced with enclosed liquid-metal weights.",
+      "kind": "gear", "gear": { "slot": "hands", "tier": 3, "visualFamilyID": "working_gloves", "materialProfileID": "world:mercury" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "adamant_cuirass", "name": "Adamant Cuirass", "icon": "shield.fill",
+      "rarity": "mythic", "blurb": "A fitted green-metal shell whose thin plates carry more force than their weight suggests.",
+      "kind": "gear", "gear": { "slot": "armor", "tier": 4, "visualFamilyID": "rigid_guard", "materialProfileID": "world:adamant" },
+      "tradingPostDisposition": "protected", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "woven_sling", "name": "Woven Sling", "icon": "circle.grid.cross",
+      "rarity": "common", "blurb": "Long fibres braided into a broad pocket and cords that release cleanly.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 1, "damage": "crush", "reach": "far", "visualFamilyID": "sling", "materialProfileID": "world:fiber" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "timber_longbow", "name": "Timber Longbow", "icon": "arrow.up.and.down.and.arrow.left.and.right",
+      "rarity": "common", "blurb": "A tall stave cut along the grain and backed where the bend asks most of it.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 1, "damage": "pierce", "reach": "far", "visualFamilyID": "longbow", "materialProfileID": "world:timber" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "pressed_pulp_cap", "name": "Pressed-Pulp Cap", "icon": "circle.dashed",
+      "rarity": "common", "blurb": "Layered pulp pressed into a light shell and sealed against rain.",
+      "kind": "gear", "gear": { "slot": "head", "tier": 1, "insulation": 18, "visualFamilyID": "padded_cap", "materialProfileID": "world:pulp" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "resinbound_boots", "name": "Resinbound Boots", "icon": "shoeprints.fill",
+      "rarity": "common", "blurb": "Working boots whose seams and soles have been repeatedly sealed with resin.",
+      "kind": "gear", "gear": { "slot": "feet", "tier": 1, "insulation": 14, "visualFamilyID": "working_boots", "materialProfileID": "world:resin" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "toxin_edge", "name": "Toxin Edge", "icon": "leaf.fill",
+      "rarity": "uncommon", "blurb": "A fitted cutting edge with a sealed channel for a stable toxic preparation.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "rend", "reach": "close", "reactivity": 34, "visualFamilyID": "fitted_edge", "materialProfileID": "world:toxin" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "sporeward_coat", "name": "Sporeward Coat", "icon": "shield",
+      "rarity": "uncommon", "blurb": "A supple coat quilted with dry spore-felt and kept behind a tight outer weave.",
+      "kind": "gear", "gear": { "slot": "armor", "tier": 2, "insulation": 38, "visualFamilyID": "supple_coat", "materialProfileID": "world:spore" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "reagent_field_pick", "name": "Reagent Field Pick", "icon": "wrench.and.screwdriver",
+      "rarity": "uncommon", "blurb": "A field pick with a treated head that shows fresh mineral under its first strike.",
+      "kind": "gear", "gear": { "slot": "tool", "tier": 2, "visualFamilyID": "field_pick", "materialProfileID": "world:reagent" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "ichor_hook", "name": "Ichor Hook", "icon": "arrow.triangle.turn.up.right.circle",
+      "rarity": "uncommon", "blurb": "A hooked edge whose reactive reservoir is isolated from the grip.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 2, "damage": "rend", "reach": "close", "reactivity": 42, "visualFamilyID": "wild_hook", "materialProfileID": "world:ichor" },
+      "tradingPostDisposition": "sellable", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "riftglass_rapier", "name": "Rift-glass Rapier", "icon": "arrow.up.right",
+      "rarity": "mythic", "blurb": "A narrow blue-glass point braced along facets that never quite meet.",
+      "kind": "gear", "gear": { "slot": "weapon", "tier": 4, "damage": "pierce", "reach": "close", "visualFamilyID": "fitted_point", "materialProfileID": "world:rift_glass" },
+      "tradingPostDisposition": "protected", "recyclerDisposition": "recyclable"
+    },
+    {
+      "id": "raw_essence_pendant", "name": "Raw-Essence Pendant", "icon": "sparkles",
+      "rarity": "mythic", "blurb": "Unrefined Essence held inside a fitted lattice rather than allowed to disperse.",
+      "kind": "gear", "gear": { "slot": "keepsake", "tier": 4, "visualFamilyID": "keepsake", "materialProfileID": "world:essence_raw" },
+      "tradingPostDisposition": "protected", "recyclerDisposition": "protected"
+    },
+    {
+      "id": "mote_compass", "name": "Mote Compass", "icon": "sparkles",
+      "rarity": "mythic", "blurb": "A singular compass whose captive Mote points toward changes in Reality, not north.",
+      "kind": "gear", "gear": { "slot": "keepsake", "tier": 4, "visualFamilyID": "keepsake", "materialProfileID": "world:mote" },
+      "tradingPostDisposition": "protected", "recyclerDisposition": "protected"
     }
   ]
 }

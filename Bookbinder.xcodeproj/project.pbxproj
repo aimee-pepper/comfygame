@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		L10000000000000000000001 /* ResourceSpriteV1Registry.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = L20000000000000000000001 /* ResourceSpriteV1Registry.generated.swift */; };
 		L10000000000000000000002 /* ResourceSpriteV1RegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = L20000000000000000000002 /* ResourceSpriteV1RegistryTests.swift */; };
+		M10000000000000000000001 /* MobGearSpriteV1Registry.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = M20000000000000000000001 /* MobGearSpriteV1Registry.generated.swift */; };
 		C10000000000000000000001 /* town-empty-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000001 /* town-empty-v1.png */; };
 		C10000000000000000000002 /* building-workshop-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000002 /* building-workshop-v1.png */; };
 		C10000000000000000000003 /* building-storehouse-v1.png in Resources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000003 /* building-storehouse-v1.png */; };
@@ -301,6 +302,7 @@
 /* Begin PBXFileReference section */
 		L20000000000000000000001 /* ResourceSpriteV1Registry.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceSpriteV1Registry.generated.swift; sourceTree = "<group>"; };
 		L20000000000000000000002 /* ResourceSpriteV1RegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceSpriteV1RegistryTests.swift; sourceTree = "<group>"; };
+		M20000000000000000000001 /* MobGearSpriteV1Registry.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobGearSpriteV1Registry.generated.swift; sourceTree = "<group>"; };
 		C20000000000000000000001 /* town-empty-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "town-empty-v1.png"; sourceTree = "<group>"; };
 		C20000000000000000000002 /* building-workshop-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-workshop-v1.png"; sourceTree = "<group>"; };
 		C20000000000000000000003 /* building-storehouse-v1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "building-storehouse-v1.png"; sourceTree = "<group>"; };
@@ -988,6 +990,7 @@
 				B10000000000000000000002 /* NamedCharacterPlaceholderPack.swift */,
 				3B52219A7EE3D04B75EED3BE /* NativeVisualPack.swift */,
 				L20000000000000000000001 /* ResourceSpriteV1Registry.generated.swift */,
+				M20000000000000000000001 /* MobGearSpriteV1Registry.generated.swift */,
 				C60000000000000000000001 /* TownBuildingVisualRegistry.generated.swift */,
 				7863FB4074F0CAF26EFEF01E /* PixelCommand.swift */,
 				F3329464831CD9BBDA9B45C9 /* PixelRaster.swift */,
@@ -1260,6 +1263,7 @@
 				4419D5E216F811B6E590C273 /* Naming.swift in Sources */,
 				A10000000000000000000003 /* NamedCharacterPixelIdentity.swift in Sources */,
 				L10000000000000000000001 /* ResourceSpriteV1Registry.generated.swift in Sources */,
+				M10000000000000000000001 /* MobGearSpriteV1Registry.generated.swift in Sources */,
 				C50000000000000000000001 /* TownBuildingVisualRegistry.generated.swift in Sources */,
 				A20000000000000000000001 /* CatalogueConsumablesPlaceholderV1Registry.swift in Sources */,
 				A10000000000000000000002 /* NamedCharacterPlaceholderPack.swift in Sources */,

@@ -1,0 +1,1595 @@
+{
+  "schemaVersion": 1,
+  "packID": "mob-gear-sprites-v1",
+  "integrationReady": true,
+  "profiles": {
+    "mobDropInventory": {
+      "size": [
+        32,
+        32
+      ],
+      "sprites": [
+        {
+          "id": "plate",
+          "file": "plate.png",
+          "sha256": "c3a5b2b4daf166f5db8c255685f437c28733e5f6a8240f6bf3f1ef8a7e0ceec4",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 395
+        },
+        {
+          "id": "quill",
+          "file": "quill.png",
+          "sha256": "758bc8a1b19d1b19cfb4a534f582479ed12d16fc118e7ed18905257bb405e7da",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 226
+        },
+        {
+          "id": "pelt",
+          "file": "pelt.png",
+          "sha256": "8c2d704229244ded55f615efd693877ca7469ed6a27e37d0ff2155c357bd6b11",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 431
+        },
+        {
+          "id": "down",
+          "file": "down.png",
+          "sha256": "d1acb8d28f21f59b2bf11ab9248293312e2ab3596f8774762ec8b293f9604a18",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 394
+        },
+        {
+          "id": "hide",
+          "file": "hide.png",
+          "sha256": "dbf8dc993d7b9df36545c41cc2332b05c9d708d2e670355b6ec67fc52b1ff892",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 389
+        },
+        {
+          "id": "chitin",
+          "file": "chitin.png",
+          "sha256": "ea7a03f2fda06bac2e3719fd98beccabc56820be24a06110c0968fb429f7957a",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 474
+        },
+        {
+          "id": "fang",
+          "file": "fang.png",
+          "sha256": "4986e8ef9f39889d8bbfc0f673349b923b05d3c808d74b09366e97df4d1ec0a0",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 250
+        },
+        {
+          "id": "tusk",
+          "file": "tusk.png",
+          "sha256": "caf6346bf6fb2f208309855fb25d92354db22c6abe45f9b4027c5b47e56fccfc",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 285
+        },
+        {
+          "id": "claw",
+          "file": "claw.png",
+          "sha256": "ab7628b908c228da8bf485eda5c8e425a729a29506e991c0e4c805b3bddc8ded",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 241
+        },
+        {
+          "id": "bone",
+          "file": "bone.png",
+          "sha256": "5ae5fc492c76b99bcde84e930571f80009cb33a397fbfaa221d16826a726ff7d",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 220
+        },
+        {
+          "id": "ichor",
+          "file": "ichor.png",
+          "sha256": "0bab25df7fdf7a6754a3e3061a6a5e1fbd66fd9929b330877cb89e04939a4136",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 253
+        },
+        {
+          "id": "timber",
+          "file": "timber.png",
+          "sha256": "2c4dda26823c06c313a298d9b66a120cd2d0613a2e676e5c4b9784fa014b5c51",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 415
+        },
+        {
+          "id": "fibre",
+          "file": "fibre.png",
+          "sha256": "8714db06732384d09efb1a7c026f3af0c26d3d7d645e24009ece94d06518078e",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 453
+        },
+        {
+          "id": "pulp",
+          "file": "pulp.png",
+          "sha256": "b590044e7a56f0e3722cba7d2beea1a9cb98f7a3d4d46ed6cd4c8b27c4f41aab",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 784
+        },
+        {
+          "id": "toxin",
+          "file": "toxin.png",
+          "sha256": "373e41191f5e04b9c409deacb246e3bef319dc7ed16476c60aaea199c4c9368c",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 588
+        },
+        {
+          "id": "reagent",
+          "file": "reagent.png",
+          "sha256": "15662477bdb4f538e40424ea6fd3322732832ea4b4c68200c46d06a33046de8e",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 391
+        }
+      ]
+    },
+    "gearInventory": {
+      "size": [
+        32,
+        32
+      ],
+      "sprites": [
+        {
+          "id": "pointed_blade",
+          "file": "pointed_blade.png",
+          "sha256": "862cb233577b4ad820353f3809066a5fc4a581c19429070c7e8529d6ff328e6e",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 124
+        },
+        {
+          "id": "cutting_blade",
+          "file": "cutting_blade.png",
+          "sha256": "3f98f4925fa7eb6d438eeda56fa732fc0c8607ca3a34a685fc07655a3c719dd7",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 185
+        },
+        {
+          "id": "hand_maul",
+          "file": "hand_maul.png",
+          "sha256": "906db1b1c65c7d667290e2a46087daf7fd4bc7ff3f7807564bdd9bc2d45e6508",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 185
+        },
+        {
+          "id": "long_spear",
+          "file": "long_spear.png",
+          "sha256": "a30a75f0be88e49b03b897df4659d65fb2575297054ebef70b2969638601b6ac",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 95
+        },
+        {
+          "id": "longbow",
+          "file": "longbow.png",
+          "sha256": "f0b8d41697d3b12736ba7fe99cc4191acb2e9a2b02b2740a4a184b9921dbf5d8",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 101
+        },
+        {
+          "id": "sling",
+          "file": "sling.png",
+          "sha256": "2206a2e72ccdfb9ca43727c7fc12039f9dc74bdd7c5001ca4ba6b121ed7f52df",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 201
+        },
+        {
+          "id": "throwing_set",
+          "file": "throwing_set.png",
+          "sha256": "dc78929e5ce79c1b5a66de2fb3fb19ac70706f09d75c47292e7327e6d9a411a2",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 234
+        },
+        {
+          "id": "fitted_point",
+          "file": "fitted_point.png",
+          "sha256": "c2f84d0a6299d808140a14b4fc06806fdd8b87dbc067e6b9691b43ba250a0af3",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 125
+        },
+        {
+          "id": "fitted_edge",
+          "file": "fitted_edge.png",
+          "sha256": "b8230ce89624474026c3d7160a2cdaa1e03f0721a469070bd36d700d23cb416e",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 216
+        },
+        {
+          "id": "fitted_maul",
+          "file": "fitted_maul.png",
+          "sha256": "ccd05daaf2542a880bd96a1961db0bd12a13e0da65d04db9d87fbd441ad61042",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 173
+        },
+        {
+          "id": "fitted_polearm",
+          "file": "fitted_polearm.png",
+          "sha256": "fe59a2b5df04f98303abb772cb5d63f5822a2f97a95139eb781bc99f18af790a",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 171
+        },
+        {
+          "id": "wild_hook",
+          "file": "wild_hook.png",
+          "sha256": "4c7105d0f49407ccd03748342ea0f936145853eb3c761822deaee5cbe27b22e4",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 197
+        },
+        {
+          "id": "buckler",
+          "file": "buckler.png",
+          "sha256": "611be59be47e1ea186262dd32fd5f4eff10a595044dbe09745d3c7ef6e29aac8",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 332
+        },
+        {
+          "id": "tower_shield",
+          "file": "tower_shield.png",
+          "sha256": "68a79c179a4c33f35ca890a65de9b24642ad7e6fdfb8a04633d721c09d6cb98d",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 352
+        },
+        {
+          "id": "padded_cap",
+          "file": "padded_cap.png",
+          "sha256": "d5e6d0a7aa38a47c3d1b4ab9696968a09a30a13f949f7fc8c4b89ee7069c3b48",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 322
+        },
+        {
+          "id": "enclosed_helm",
+          "file": "enclosed_helm.png",
+          "sha256": "756de62b615c8f773cbe02fc54beb0b221d37e629085e1288a6f282d1b095c3d",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 359
+        },
+        {
+          "id": "supple_coat",
+          "file": "supple_coat.png",
+          "sha256": "dce5743c3d0ab7d59ac7faf540777521d7d970af0330ddeb06d26e1a443372d2",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 454
+        },
+        {
+          "id": "rigid_guard",
+          "file": "rigid_guard.png",
+          "sha256": "d93dcf8d3628f2e7446ce6c18c1f716542b5371eab35be6fff397376402767a2",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 415
+        },
+        {
+          "id": "working_gloves",
+          "file": "working_gloves.png",
+          "sha256": "463c863a73fc80ac60d98c9bea8c24542ee50ac61ae2d1f896e1a2642b61207e",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 375
+        },
+        {
+          "id": "gauntlets",
+          "file": "gauntlets.png",
+          "sha256": "6db8e275d11d6837d19588643d52abc960dd49dfe93c27fd2ea72ecd8795da91",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 483
+        },
+        {
+          "id": "working_boots",
+          "file": "working_boots.png",
+          "sha256": "a44667c128d0e412330404a7866771e6e7682509a66bd6e135fd5bb33bc8b318",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 756
+        },
+        {
+          "id": "greaves",
+          "file": "greaves.png",
+          "sha256": "4bd27da4df9cb65abb5609c51df4c96fe7edee4b6180ebfb5b67eb15b1fcab53",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 455
+        },
+        {
+          "id": "field_pick",
+          "file": "field_pick.png",
+          "sha256": "5aebdd9aae5e1e6a477476685333530369da050e0b2a2717d2ee116e40c2ceb4",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 190
+        },
+        {
+          "id": "keepsake",
+          "file": "keepsake.png",
+          "sha256": "165af2ff53942ce895d5b29aa9d6a3c0648ffe24404281ce5e39ab55c3956c04",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 236
+        }
+      ]
+    },
+    "catalogueGear": {
+      "size": [
+        32,
+        32
+      ],
+      "sprites": [
+        {
+          "id": "rubble_sling",
+          "materialProfileID": "world:rubble",
+          "visualFamilyID": "sling",
+          "materialLevel": 1,
+          "file": "rubble_sling.png",
+          "sha256": "ff33fdf08fe40d7051afc73b152694282bf9bc32fd0c88a84aecefc5e58ead49",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 201
+        },
+        {
+          "id": "fired_clay_guard",
+          "materialProfileID": "world:clay",
+          "visualFamilyID": "buckler",
+          "materialLevel": 1,
+          "file": "fired_clay_guard.png",
+          "sha256": "2673d4251f471749b1dc2d4424611cf62221cd02189e25b68f40691bd75cb790",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 332
+        },
+        {
+          "id": "ironwork_blade",
+          "materialProfileID": "world:ore",
+          "visualFamilyID": "cutting_blade",
+          "materialLevel": 2,
+          "file": "ironwork_blade.png",
+          "sha256": "3ff8212109f852ec7f3d4d2892e996ae4f5aef71626d2fe9d83f6bbf55d58125",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 185
+        },
+        {
+          "id": "copper_buckler",
+          "materialProfileID": "world:copper",
+          "visualFamilyID": "buckler",
+          "materialLevel": 2,
+          "file": "copper_buckler.png",
+          "sha256": "9cebf6f7701e9f58a3d61a02746cbd98668779d0a7696cda87566333b99137a6",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 332
+        },
+        {
+          "id": "silvered_helm",
+          "materialProfileID": "world:silver",
+          "visualFamilyID": "enclosed_helm",
+          "materialLevel": 3,
+          "file": "silvered_helm.png",
+          "sha256": "ffebd975e3cdc4691421c364475a1aa8b3ecaf882dfee6683b706a3cafdfb9c3",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 359
+        },
+        {
+          "id": "golden_keepsake",
+          "materialProfileID": "world:gold",
+          "visualFamilyID": "keepsake",
+          "materialLevel": 3,
+          "file": "golden_keepsake.png",
+          "sha256": "8c32b4e7a99d0d90ea5cddcb5fe06194d853f60d210f4c0b13c6731a9b2dd4b3",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 236
+        },
+        {
+          "id": "quartz_point",
+          "materialProfileID": "world:quartz",
+          "visualFamilyID": "long_spear",
+          "materialLevel": 2,
+          "file": "quartz_point.png",
+          "sha256": "2bec450f9c078d93315532b4ac81c1e02216d96ad585f298fe8c6fae4dc4fbb9",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 95
+        },
+        {
+          "id": "obsidian_edge",
+          "materialProfileID": "world:obsidian",
+          "visualFamilyID": "fitted_edge",
+          "materialLevel": 3,
+          "file": "obsidian_edge.png",
+          "sha256": "3a569ad2624f333acd691a0001d7e039df34c1e71c4798aae46792552f9ae9a1",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 216
+        },
+        {
+          "id": "saltward_pendant",
+          "materialProfileID": "world:salt",
+          "visualFamilyID": "keepsake",
+          "materialLevel": 1,
+          "file": "saltward_pendant.png",
+          "sha256": "99672e7aba51be8176bf0a8a317345ed585c0292601391be7c9277dbdf566488",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 236
+        },
+        {
+          "id": "sulfurous_maul",
+          "materialProfileID": "world:sulfur",
+          "visualFamilyID": "hand_maul",
+          "materialLevel": 2,
+          "file": "sulfurous_maul.png",
+          "sha256": "0932ff8745815c051f9aa3b13aea06d42099bc46835a1124beed2fc540cb7708",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 185
+        },
+        {
+          "id": "mercurial_gloves",
+          "materialProfileID": "world:mercury",
+          "visualFamilyID": "working_gloves",
+          "materialLevel": 3,
+          "file": "mercurial_gloves.png",
+          "sha256": "3812a3fac25a6e61c8b948a711cb7eac788ab95838650c6af8398a3fe170cbcf",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 375
+        },
+        {
+          "id": "adamant_cuirass",
+          "materialProfileID": "world:adamant",
+          "visualFamilyID": "rigid_guard",
+          "materialLevel": 4,
+          "file": "adamant_cuirass.png",
+          "sha256": "9862e5a4bb9eb8a2068b444d6a0294797d4c9d3613bcaabde0da3ba2f49652f7",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 415
+        },
+        {
+          "id": "woven_sling",
+          "materialProfileID": "world:fiber",
+          "visualFamilyID": "sling",
+          "materialLevel": 1,
+          "file": "woven_sling.png",
+          "sha256": "12f8e0711ecf5fd9048621063cd96c088dfc039d5bd1ca4129e0f2af3e42566c",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 201
+        },
+        {
+          "id": "timber_longbow",
+          "materialProfileID": "world:timber",
+          "visualFamilyID": "longbow",
+          "materialLevel": 1,
+          "file": "timber_longbow.png",
+          "sha256": "d9e3a18f7ea4f31e26413ee554680785761f8eb5d6c370186cb26634280d6e5e",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 101
+        },
+        {
+          "id": "pressed_pulp_cap",
+          "materialProfileID": "world:pulp",
+          "visualFamilyID": "padded_cap",
+          "materialLevel": 1,
+          "file": "pressed_pulp_cap.png",
+          "sha256": "eaaae531d3ae91aa98e40e20ccd348ddd2a51b02e5d4f0c3c20738b7c3077b28",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 322
+        },
+        {
+          "id": "resinbound_boots",
+          "materialProfileID": "world:resin",
+          "visualFamilyID": "working_boots",
+          "materialLevel": 1,
+          "file": "resinbound_boots.png",
+          "sha256": "94a6f0d509a8ea63cd8fc4ff6a2340809e0e2d464a7f8aa4da872757754dea53",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 756
+        },
+        {
+          "id": "toxin_edge",
+          "materialProfileID": "world:toxin",
+          "visualFamilyID": "fitted_edge",
+          "materialLevel": 2,
+          "file": "toxin_edge.png",
+          "sha256": "06a060f80505cbf099faf97e46690484536cd0c0f480b1a4c29268e26ef222ee",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 216
+        },
+        {
+          "id": "sporeward_coat",
+          "materialProfileID": "world:spore",
+          "visualFamilyID": "supple_coat",
+          "materialLevel": 2,
+          "file": "sporeward_coat.png",
+          "sha256": "98db98116c9ee4817d9c3c7ebefee23667aa4ddc2a4114782180407c926070c5",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 454
+        },
+        {
+          "id": "reagent_field_pick",
+          "materialProfileID": "world:reagent",
+          "visualFamilyID": "field_pick",
+          "materialLevel": 2,
+          "file": "reagent_field_pick.png",
+          "sha256": "36431a227fef557693df21c839e751b635cc9988b6403c79b2a5a385e7dfb0a9",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 190
+        },
+        {
+          "id": "ichor_hook",
+          "materialProfileID": "world:ichor",
+          "visualFamilyID": "wild_hook",
+          "materialLevel": 2,
+          "file": "ichor_hook.png",
+          "sha256": "e106ceb075cd1bae6797682b2d94a738c15ad417411ab11e56faa5cbdb794d9a",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 197
+        },
+        {
+          "id": "riftglass_rapier",
+          "materialProfileID": "world:rift_glass",
+          "visualFamilyID": "fitted_point",
+          "materialLevel": 4,
+          "file": "riftglass_rapier.png",
+          "sha256": "f246434b2c2710f9ef5bc3fe7cdd9aec18a77d36e1ef05027539fd0933553b50",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 125
+        },
+        {
+          "id": "raw_essence_pendant",
+          "materialProfileID": "world:essence_raw",
+          "visualFamilyID": "keepsake",
+          "materialLevel": 4,
+          "file": "raw_essence_pendant.png",
+          "sha256": "9423291f84605fda0c0e476e226565bfb04628a3153713f26f07ace8a94ddc48",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 236
+        },
+        {
+          "id": "mote_compass",
+          "materialProfileID": "world:mote",
+          "visualFamilyID": "keepsake",
+          "materialLevel": 4,
+          "file": "mote_compass.png",
+          "sha256": "3d65ab342acc27e0fe5285361a7926ae6b3cd42824e779fc61444f362e9dd631",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 236
+        },
+        {
+          "id": "blade_chipped",
+          "materialProfileID": "world:ore",
+          "visualFamilyID": "pointed_blade",
+          "materialLevel": 2,
+          "file": "blade_chipped.png",
+          "sha256": "5b87d67a547a2bd3d24234a5404dbdb5193cda63aee3b097813e31a8b5be098e",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 124
+        },
+        {
+          "id": "blade_keen",
+          "materialProfileID": "world:copper",
+          "visualFamilyID": "cutting_blade",
+          "materialLevel": 2,
+          "file": "blade_keen.png",
+          "sha256": "32148f65a8d650f1d59426304023b222fe3b0c7691b865190ec22ebac3b0b18d",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 185
+        },
+        {
+          "id": "ripping_hook",
+          "materialProfileID": "world:obsidian",
+          "visualFamilyID": "wild_hook",
+          "materialLevel": 3,
+          "file": "ripping_hook.png",
+          "sha256": "7c8b2a2488b105330c2840b6958fbe3627d8ff7453f91a307e8d1f46dea53e61",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 197
+        },
+        {
+          "id": "the_long_grievance",
+          "materialProfileID": "world:adamant",
+          "visualFamilyID": "fitted_edge",
+          "materialLevel": 4,
+          "file": "the_long_grievance.png",
+          "sha256": "a6fe1ae3079c1d6f77abb85911a54d6754a11993b19685261cf2cd89b6e24abc",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 216
+        },
+        {
+          "id": "bone_awl",
+          "materialProfileID": "world:quartz",
+          "visualFamilyID": "pointed_blade",
+          "materialLevel": 2,
+          "file": "bone_awl.png",
+          "sha256": "c43f4f7125b9dea1e3376de5d5adaf53dc3f7aae67cd4e7ca006ef2e717f09dd",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 124
+        },
+        {
+          "id": "raking_edge",
+          "materialProfileID": "world:ore",
+          "visualFamilyID": "fitted_edge",
+          "materialLevel": 2,
+          "file": "raking_edge.png",
+          "sha256": "3ed554278fd974d6cffd8b14768ee6cd049a8c23b03deae83e287079e3febf01",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 216
+        },
+        {
+          "id": "blade_binders",
+          "materialProfileID": "world:silver",
+          "visualFamilyID": "cutting_blade",
+          "materialLevel": 3,
+          "file": "blade_binders.png",
+          "sha256": "fd4cf03591c962d2fbaf49bbc540a9996af572cf7d62e1f585735079a99d5403",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 185
+        },
+        {
+          "id": "hairsplitter",
+          "materialProfileID": "world:rift_glass",
+          "visualFamilyID": "fitted_point",
+          "materialLevel": 4,
+          "file": "hairsplitter.png",
+          "sha256": "f246434b2c2710f9ef5bc3fe7cdd9aec18a77d36e1ef05027539fd0933553b50",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 125
+        },
+        {
+          "id": "field_maul",
+          "materialProfileID": "world:timber",
+          "visualFamilyID": "hand_maul",
+          "materialLevel": 1,
+          "file": "field_maul.png",
+          "sha256": "ba599c6a6b9c2306824b941b953a910810e3828ec87ec177728521def5d72eca",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 185
+        },
+        {
+          "id": "banded_mace",
+          "materialProfileID": "world:copper",
+          "visualFamilyID": "fitted_maul",
+          "materialLevel": 2,
+          "file": "banded_mace.png",
+          "sha256": "b9d345a22400aa90ddbaf26d88a6a7a335d03b069ff2d2e5c22e6275eb84ecfd",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 173
+        },
+        {
+          "id": "anvilfall",
+          "materialProfileID": "world:ore",
+          "visualFamilyID": "fitted_maul",
+          "materialLevel": 2,
+          "file": "anvilfall.png",
+          "sha256": "ed387811a8dde69be92335a98d0281e3cdafa5db2e23c2bbdbf5773f6410f37f",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 173
+        },
+        {
+          "id": "the_settled_argument",
+          "materialProfileID": "world:adamant",
+          "visualFamilyID": "hand_maul",
+          "materialLevel": 4,
+          "file": "the_settled_argument.png",
+          "sha256": "17365771324c17da693002256506821b6b03aa326bb69b0807b87fc7c2de7caa",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 185
+        },
+        {
+          "id": "long_pick",
+          "materialProfileID": "world:timber",
+          "visualFamilyID": "long_spear",
+          "materialLevel": 1,
+          "file": "long_pick.png",
+          "sha256": "44a7a01f829afccc7215e2a3f6c3f09079f309ff208ccaa2d2dcf960292912ef",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 95
+        },
+        {
+          "id": "warded_spear",
+          "materialProfileID": "world:quartz",
+          "visualFamilyID": "fitted_polearm",
+          "materialLevel": 2,
+          "file": "warded_spear.png",
+          "sha256": "32ff0f4a1a4488c801d215d6b938cb78ce8a8b44f07fe5621077f39d97df7579",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 171
+        },
+        {
+          "id": "parting_needle",
+          "materialProfileID": "world:silver",
+          "visualFamilyID": "long_spear",
+          "materialLevel": 3,
+          "file": "parting_needle.png",
+          "sha256": "405f60546bab5dcde5cbfdff2a24a5b5f108b3cd284becae42b6c3e7e1902ba3",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 95
+        },
+        {
+          "id": "the_kept_distance",
+          "materialProfileID": "world:rift_glass",
+          "visualFamilyID": "fitted_polearm",
+          "materialLevel": 4,
+          "file": "the_kept_distance.png",
+          "sha256": "ce0bafbb358352f87949386cf3bb1cc3f10f992f0478b04298337a1ab09cc1d6",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 171
+        },
+        {
+          "id": "split_board",
+          "materialProfileID": "world:timber",
+          "visualFamilyID": "buckler",
+          "materialLevel": 1,
+          "file": "split_board.png",
+          "sha256": "c1258f91232629d2b04f8f7f610694b0ef451a878af9e3c697ebae52dc1450ab",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 332
+        },
+        {
+          "id": "banded_buckler",
+          "materialProfileID": "world:copper",
+          "visualFamilyID": "buckler",
+          "materialLevel": 2,
+          "file": "banded_buckler.png",
+          "sha256": "9cebf6f7701e9f58a3d61a02746cbd98668779d0a7696cda87566333b99137a6",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 332
+        },
+        {
+          "id": "tower_guard",
+          "materialProfileID": "world:ore",
+          "visualFamilyID": "tower_shield",
+          "materialLevel": 2,
+          "file": "tower_guard.png",
+          "sha256": "f18bcf58349cea5113a6594b889f8ff0033ec2c8f6e8bd545e6ba38b3ce669c3",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 352
+        },
+        {
+          "id": "the_unarguable",
+          "materialProfileID": "world:adamant",
+          "visualFamilyID": "tower_shield",
+          "materialLevel": 4,
+          "file": "the_unarguable.png",
+          "sha256": "8a53a238df198b32f512e8a5d34660d141a81f4659adac75e08de743b57dc78c",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 352
+        },
+        {
+          "id": "padded_cap",
+          "materialProfileID": "world:pulp",
+          "visualFamilyID": "padded_cap",
+          "materialLevel": 1,
+          "file": "padded_cap.png",
+          "sha256": "eaaae531d3ae91aa98e40e20ccd348ddd2a51b02e5d4f0c3c20738b7c3077b28",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 322
+        },
+        {
+          "id": "ridged_helm",
+          "materialProfileID": "world:copper",
+          "visualFamilyID": "enclosed_helm",
+          "materialLevel": 2,
+          "file": "ridged_helm.png",
+          "sha256": "c88125e9ae6cbb5f7b9ae5a7a8c9e44fdef3b59ac2b513efda44a5b2e6e6a3cf",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 359
+        },
+        {
+          "id": "visored_casque",
+          "materialProfileID": "world:silver",
+          "visualFamilyID": "enclosed_helm",
+          "materialLevel": 3,
+          "file": "visored_casque.png",
+          "sha256": "ffebd975e3cdc4691421c364475a1aa8b3ecaf882dfee6683b706a3cafdfb9c3",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 359
+        },
+        {
+          "id": "crown_of_quiet",
+          "materialProfileID": "world:gold",
+          "visualFamilyID": "enclosed_helm",
+          "materialLevel": 3,
+          "file": "crown_of_quiet.png",
+          "sha256": "def2f0549d0ee41d36d6b2d7a459227fd932d81df5eac31126aca74acc44869b",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 359
+        },
+        {
+          "id": "guard_padded",
+          "materialProfileID": "world:fiber",
+          "visualFamilyID": "supple_coat",
+          "materialLevel": 1,
+          "file": "guard_padded.png",
+          "sha256": "691b55a232a00dc2ec6da9c889a993bbc828e446594765ea28f17cb20731fd12",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 454
+        },
+        {
+          "id": "guard_banded",
+          "materialProfileID": "world:copper",
+          "visualFamilyID": "rigid_guard",
+          "materialLevel": 2,
+          "file": "guard_banded.png",
+          "sha256": "84d9c02c11ac697191fb259e4b0a41f607bf251511810024599b2a4133955abc",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 415
+        },
+        {
+          "id": "guard_vault",
+          "materialProfileID": "world:ore",
+          "visualFamilyID": "rigid_guard",
+          "materialLevel": 2,
+          "file": "guard_vault.png",
+          "sha256": "f677320e30062d5d4fa9a35dea6962da2b8d4614722ef1304d6b8eb631b6a0d2",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 415
+        },
+        {
+          "id": "the_standing_wall",
+          "materialProfileID": "world:adamant",
+          "visualFamilyID": "rigid_guard",
+          "materialLevel": 4,
+          "file": "the_standing_wall.png",
+          "sha256": "9862e5a4bb9eb8a2068b444d6a0294797d4c9d3613bcaabde0da3ba2f49652f7",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 415
+        },
+        {
+          "id": "wrapped_hands",
+          "materialProfileID": "world:fiber",
+          "visualFamilyID": "working_gloves",
+          "materialLevel": 1,
+          "file": "wrapped_hands.png",
+          "sha256": "2cfe3a3f34cda7082edd63317554a5f63d962bfbde0a64a3cc72535292948c51",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 375
+        },
+        {
+          "id": "studded_gloves",
+          "materialProfileID": "world:copper",
+          "visualFamilyID": "working_gloves",
+          "materialLevel": 2,
+          "file": "studded_gloves.png",
+          "sha256": "e12602eb6afc9c9247f2d0ad3cfa73129520f39e19b244e416bf298e2b9ba96d",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 375
+        },
+        {
+          "id": "gauntlets_of_hold",
+          "materialProfileID": "world:ore",
+          "visualFamilyID": "gauntlets",
+          "materialLevel": 2,
+          "file": "gauntlets_of_hold.png",
+          "sha256": "b4b2db2e8e394378a4c15e5e2086ce064cfb1fcaf59b81b10b2dab84561f6df6",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 483
+        },
+        {
+          "id": "the_sure_hands",
+          "materialProfileID": "world:adamant",
+          "visualFamilyID": "gauntlets",
+          "materialLevel": 4,
+          "file": "the_sure_hands.png",
+          "sha256": "92792f068bf69cd4c44627eb7bfd72f2c498f2dabd34a20e0ca56954934e1d5d",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 483
+        },
+        {
+          "id": "worn_boots",
+          "materialProfileID": "world:resin",
+          "visualFamilyID": "working_boots",
+          "materialLevel": 1,
+          "file": "worn_boots.png",
+          "sha256": "94a6f0d509a8ea63cd8fc4ff6a2340809e0e2d464a7f8aa4da872757754dea53",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 756
+        },
+        {
+          "id": "shod_boots",
+          "materialProfileID": "world:copper",
+          "visualFamilyID": "working_boots",
+          "materialLevel": 2,
+          "file": "shod_boots.png",
+          "sha256": "c95bb96bd731b087bc31ad13978f1769f7e8fc70712e593464ced175353bbae9",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 756
+        },
+        {
+          "id": "longstriders",
+          "materialProfileID": "world:silver",
+          "visualFamilyID": "greaves",
+          "materialLevel": 3,
+          "file": "longstriders.png",
+          "sha256": "52a48963790c4c01d0aa755498b1f99f0ed68f3848b417b0d6142b9ae0cf400d",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 455
+        },
+        {
+          "id": "the_unhurried",
+          "materialProfileID": "world:adamant",
+          "visualFamilyID": "greaves",
+          "materialLevel": 4,
+          "file": "the_unhurried.png",
+          "sha256": "fb232d58dfc4d4a738527e682b76ddd89683e90c942ba23e3be4596ad7cc4741",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 455
+        },
+        {
+          "id": "bent_pick",
+          "materialProfileID": "world:timber",
+          "visualFamilyID": "field_pick",
+          "materialLevel": 1,
+          "file": "bent_pick.png",
+          "sha256": "89e7a54f09ff85f34861ea0b9575a91907c9659562cc5ef3106ea21464311623",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 190
+        },
+        {
+          "id": "balanced_pick",
+          "materialProfileID": "world:copper",
+          "visualFamilyID": "field_pick",
+          "materialLevel": 2,
+          "file": "balanced_pick.png",
+          "sha256": "4f653281954961b3980915c50c274420f3dcc7ff24becb6bd92722c1cfe1fbc6",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 190
+        },
+        {
+          "id": "corebreaker",
+          "materialProfileID": "world:ore",
+          "visualFamilyID": "field_pick",
+          "materialLevel": 2,
+          "file": "corebreaker.png",
+          "sha256": "259c398e7adf96dbcde4e0a7430eddd8f8118f6c267d895230ecf6b1d6da98f2",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 190
+        },
+        {
+          "id": "the_willing_edge",
+          "materialProfileID": "world:adamant",
+          "visualFamilyID": "field_pick",
+          "materialLevel": 4,
+          "file": "the_willing_edge.png",
+          "sha256": "fba473bf48da612f9a24f95a029dd18e6860f4a64c1abbc1eb6e92b208499577",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 190
+        },
+        {
+          "id": "pressed_leaf",
+          "materialProfileID": "world:pulp",
+          "visualFamilyID": "keepsake",
+          "materialLevel": 1,
+          "file": "pressed_leaf.png",
+          "sha256": "cde014c39de432c8e08c0a69bd17cbcb9a9842fa1af90edd0d3a039822dd5fb3",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 236
+        },
+        {
+          "id": "cold_compass",
+          "materialProfileID": "world:quartz",
+          "visualFamilyID": "keepsake",
+          "materialLevel": 2,
+          "file": "cold_compass.png",
+          "sha256": "a7b3b8b08985945bfe4065c9f5f3ee5f19f736a6ad81d352914b673606ebbe0c",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 236
+        },
+        {
+          "id": "someones_ring",
+          "materialProfileID": "world:gold",
+          "visualFamilyID": "keepsake",
+          "materialLevel": 3,
+          "file": "someones_ring.png",
+          "sha256": "8c32b4e7a99d0d90ea5cddcb5fe06194d853f60d210f4c0b13c6731a9b2dd4b3",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 236
+        },
+        {
+          "id": "the_first_page",
+          "materialProfileID": "world:essence_raw",
+          "visualFamilyID": "keepsake",
+          "materialLevel": 4,
+          "file": "the_first_page.png",
+          "sha256": "9423291f84605fda0c0e476e226565bfb04628a3153713f26f07ace8a94ddc48",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 236
+        },
+        {
+          "id": "two_natured_blade",
+          "materialProfileID": "world:rift_glass",
+          "visualFamilyID": "fitted_point",
+          "materialLevel": 4,
+          "file": "two_natured_blade.png",
+          "sha256": "f246434b2c2710f9ef5bc3fe7cdd9aec18a77d36e1ef05027539fd0933553b50",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 125
+        },
+        {
+          "id": "long_fang",
+          "materialProfileID": "world:quartz",
+          "visualFamilyID": "long_spear",
+          "materialLevel": 2,
+          "file": "long_fang.png",
+          "sha256": "2bec450f9c078d93315532b4ac81c1e02216d96ad585f298fe8c6fae4dc4fbb9",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 95
+        },
+        {
+          "id": "ranked_spear",
+          "materialProfileID": "world:ore",
+          "visualFamilyID": "fitted_polearm",
+          "materialLevel": 2,
+          "file": "ranked_spear.png",
+          "sha256": "6f49bdd167600f70cd8e8168d3b0e0820b02402848b153a6392ce555ab65ec25",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 171
+        },
+        {
+          "id": "rimed_edge",
+          "materialProfileID": "world:obsidian",
+          "visualFamilyID": "wild_hook",
+          "materialLevel": 3,
+          "file": "rimed_edge.png",
+          "sha256": "7c8b2a2488b105330c2840b6958fbe3627d8ff7453f91a307e8d1f46dea53e61",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 197
+        },
+        {
+          "id": "living_hook",
+          "materialProfileID": "world:ichor",
+          "visualFamilyID": "wild_hook",
+          "materialLevel": 2,
+          "file": "living_hook.png",
+          "sha256": "e106ceb075cd1bae6797682b2d94a738c15ad417411ab11e56faa5cbdb794d9a",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 197
+        },
+        {
+          "id": "quiet_knife",
+          "materialProfileID": "world:obsidian",
+          "visualFamilyID": "pointed_blade",
+          "materialLevel": 3,
+          "file": "quiet_knife.png",
+          "sha256": "356b14fc1d680e7097702ad165374fe5acbc68445ba4b2ef5d19e2ca816ebf4d",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 124
+        },
+        {
+          "id": "bloodletter",
+          "materialProfileID": "world:toxin",
+          "visualFamilyID": "fitted_edge",
+          "materialLevel": 2,
+          "file": "bloodletter.png",
+          "sha256": "06a060f80505cbf099faf97e46690484536cd0c0f480b1a4c29268e26ef222ee",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 216
+        },
+        {
+          "id": "warded_haft",
+          "materialProfileID": "world:reagent",
+          "visualFamilyID": "fitted_maul",
+          "materialLevel": 2,
+          "file": "warded_haft.png",
+          "sha256": "2fe6253b684c7172b36e18277e896c6752f42c1c15c7f5c6009f16cf9307c78b",
+          "width": 32,
+          "height": 32,
+          "occupiedPixels": 173
+        }
+      ]
+    }
+  },
+  "materialRendering": {
+    "geometryAuthority": "gear family sprite",
+    "paletteAuthority": "structural material profile",
+    "qualityAndLevelDoNotSelectGeometry": true,
+    "fallback": "nil"
+  },
+  "coverage": {
+    "mobMaterialKinds": [
+      "plate",
+      "quill",
+      "pelt",
+      "down",
+      "hide",
+      "chitin",
+      "fang",
+      "tusk",
+      "claw",
+      "bone",
+      "ichor",
+      "timber",
+      "fibre",
+      "pulp",
+      "toxin",
+      "reagent"
+    ],
+    "gearFamilies": [
+      "pointed_blade",
+      "cutting_blade",
+      "hand_maul",
+      "long_spear",
+      "longbow",
+      "sling",
+      "throwing_set",
+      "fitted_point",
+      "fitted_edge",
+      "fitted_maul",
+      "fitted_polearm",
+      "wild_hook",
+      "buckler",
+      "tower_shield",
+      "padded_cap",
+      "enclosed_helm",
+      "supple_coat",
+      "rigid_guard",
+      "working_gloves",
+      "gauntlets",
+      "working_boots",
+      "greaves",
+      "field_pick",
+      "keepsake"
+    ],
+    "worldResourceMaterialProfiles": [
+      {
+        "id": "world:rubble",
+        "materialLevel": 1,
+        "roles": [
+          "structural"
+        ],
+        "visualFamilyID": "sling",
+        "paletteRGB": [
+          "#171516",
+          "#403a38",
+          "#68605c",
+          "#948a83",
+          "#c5bbb2"
+        ]
+      },
+      {
+        "id": "world:clay",
+        "materialLevel": 1,
+        "roles": [
+          "structural"
+        ],
+        "visualFamilyID": "buckler",
+        "paletteRGB": [
+          "#24130f",
+          "#643521",
+          "#9b5837",
+          "#c77c4d",
+          "#e4ac76"
+        ]
+      },
+      {
+        "id": "world:ore",
+        "materialLevel": 2,
+        "roles": [
+          "structural"
+        ],
+        "visualFamilyID": "cutting_blade",
+        "paletteRGB": [
+          "#17171a",
+          "#3b3d45",
+          "#686b74",
+          "#a2a6ae",
+          "#e0e0dc"
+        ]
+      },
+      {
+        "id": "world:copper",
+        "materialLevel": 2,
+        "roles": [
+          "structural"
+        ],
+        "visualFamilyID": "buckler",
+        "paletteRGB": [
+          "#2b140c",
+          "#6e321d",
+          "#a9552c",
+          "#d17b43",
+          "#f0b67b"
+        ]
+      },
+      {
+        "id": "world:silver",
+        "materialLevel": 3,
+        "roles": [
+          "structural",
+          "fitting"
+        ],
+        "visualFamilyID": "enclosed_helm",
+        "paletteRGB": [
+          "#20212a",
+          "#555c70",
+          "#858fa5",
+          "#bdc7d8",
+          "#f1f4f7"
+        ]
+      },
+      {
+        "id": "world:gold",
+        "materialLevel": 3,
+        "roles": [
+          "fitting",
+          "accessory"
+        ],
+        "visualFamilyID": "keepsake",
+        "paletteRGB": [
+          "#3a2108",
+          "#8a570d",
+          "#c98d1d",
+          "#f0c34d",
+          "#fff0a1"
+        ]
+      },
+      {
+        "id": "world:quartz",
+        "materialLevel": 2,
+        "roles": [
+          "structural",
+          "fitting"
+        ],
+        "visualFamilyID": "long_spear",
+        "paletteRGB": [
+          "#30252d",
+          "#725e73",
+          "#aa92a5",
+          "#dcc8d7",
+          "#fff2f6"
+        ]
+      },
+      {
+        "id": "world:obsidian",
+        "materialLevel": 3,
+        "roles": [
+          "structural"
+        ],
+        "visualFamilyID": "fitted_edge",
+        "paletteRGB": [
+          "#09080e",
+          "#201b31",
+          "#44395d",
+          "#745b82",
+          "#b28fb6"
+        ]
+      },
+      {
+        "id": "world:salt",
+        "materialLevel": 1,
+        "roles": [
+          "treatment",
+          "accessory"
+        ],
+        "visualFamilyID": "keepsake",
+        "paletteRGB": [
+          "#4a4442",
+          "#938984",
+          "#c7bcb5",
+          "#ece5dc",
+          "#fffdf6"
+        ]
+      },
+      {
+        "id": "world:sulfur",
+        "materialLevel": 2,
+        "roles": [
+          "treatment",
+          "fitting"
+        ],
+        "visualFamilyID": "hand_maul",
+        "paletteRGB": [
+          "#33200a",
+          "#79600e",
+          "#b89a17",
+          "#e0c533",
+          "#fff080"
+        ]
+      },
+      {
+        "id": "world:mercury",
+        "materialLevel": 3,
+        "roles": [
+          "treatment",
+          "fitting"
+        ],
+        "visualFamilyID": "working_gloves",
+        "paletteRGB": [
+          "#25272c",
+          "#626873",
+          "#929aa5",
+          "#c9d0d7",
+          "#f6fafc"
+        ]
+      },
+      {
+        "id": "world:adamant",
+        "materialLevel": 4,
+        "roles": [
+          "structural"
+        ],
+        "visualFamilyID": "rigid_guard",
+        "paletteRGB": [
+          "#111a18",
+          "#24493f",
+          "#377b68",
+          "#62af91",
+          "#b2e4c7"
+        ]
+      },
+      {
+        "id": "world:fiber",
+        "materialLevel": 1,
+        "roles": [
+          "structural",
+          "binding"
+        ],
+        "visualFamilyID": "sling",
+        "paletteRGB": [
+          "#231a10",
+          "#604628",
+          "#8d6d3e",
+          "#b69562",
+          "#dfc993"
+        ]
+      },
+      {
+        "id": "world:timber",
+        "materialLevel": 1,
+        "roles": [
+          "structural"
+        ],
+        "visualFamilyID": "longbow",
+        "paletteRGB": [
+          "#28150c",
+          "#60351d",
+          "#8d5630",
+          "#b97e4a",
+          "#dea96e"
+        ]
+      },
+      {
+        "id": "world:pulp",
+        "materialLevel": 1,
+        "roles": [
+          "padding",
+          "component"
+        ],
+        "visualFamilyID": "padded_cap",
+        "paletteRGB": [
+          "#3b342c",
+          "#766b5b",
+          "#a89c85",
+          "#d2c7ad",
+          "#efe7d3"
+        ]
+      },
+      {
+        "id": "world:resin",
+        "materialLevel": 1,
+        "roles": [
+          "binding",
+          "treatment"
+        ],
+        "visualFamilyID": "working_boots",
+        "paletteRGB": [
+          "#321a09",
+          "#70400f",
+          "#a56518",
+          "#d08c2b",
+          "#f2bb55"
+        ]
+      },
+      {
+        "id": "world:toxin",
+        "materialLevel": 2,
+        "roles": [
+          "treatment"
+        ],
+        "visualFamilyID": "fitted_edge",
+        "paletteRGB": [
+          "#13200f",
+          "#34532a",
+          "#578447",
+          "#83b967",
+          "#c2e69b"
+        ]
+      },
+      {
+        "id": "world:spore",
+        "materialLevel": 2,
+        "roles": [
+          "treatment",
+          "padding"
+        ],
+        "visualFamilyID": "supple_coat",
+        "paletteRGB": [
+          "#24172c",
+          "#563967",
+          "#805891",
+          "#ae83bc",
+          "#ddc3e2"
+        ]
+      },
+      {
+        "id": "world:reagent",
+        "materialLevel": 2,
+        "roles": [
+          "treatment",
+          "fitting"
+        ],
+        "visualFamilyID": "field_pick",
+        "paletteRGB": [
+          "#14272c",
+          "#28606c",
+          "#3d91a0",
+          "#70c0c6",
+          "#bce9e5"
+        ]
+      },
+      {
+        "id": "world:ichor",
+        "materialLevel": 2,
+        "roles": [
+          "treatment"
+        ],
+        "visualFamilyID": "wild_hook",
+        "paletteRGB": [
+          "#29101e",
+          "#651b42",
+          "#9b2d65",
+          "#cf4d89",
+          "#f498bd"
+        ]
+      },
+      {
+        "id": "world:rift_glass",
+        "materialLevel": 4,
+        "roles": [
+          "structural",
+          "fitting"
+        ],
+        "visualFamilyID": "fitted_point",
+        "paletteRGB": [
+          "#12182d",
+          "#293b72",
+          "#4668af",
+          "#72a3e5",
+          "#c5e5ff"
+        ]
+      },
+      {
+        "id": "world:essence_raw",
+        "materialLevel": 4,
+        "roles": [
+          "catalyst",
+          "accessory"
+        ],
+        "visualFamilyID": "keepsake",
+        "paletteRGB": [
+          "#281b3c",
+          "#5d3e83",
+          "#8d66b7",
+          "#c19ae0",
+          "#f1dfff"
+        ]
+      },
+      {
+        "id": "world:mote",
+        "materialLevel": 4,
+        "roles": [
+          "realityCurrency",
+          "accessory"
+        ],
+        "visualFamilyID": "keepsake",
+        "paletteRGB": [
+          "#2d1734",
+          "#70417a",
+          "#a962b0",
+          "#dc91dd",
+          "#ffd4fa"
+        ]
+      }
+    ]
+  },
+  "exclusions": [
+    "No rarity, quality, level or stat badge is baked into pixels.",
+    "No gameplay property is inferred from sprite color.",
+    "Quality and stat badges remain separate presentation metadata."
+  ],
+  "canonicalBodySHA256": "ee65afce662d74615ed3c602a7654650ab6e317df1e3d43b612820a6ede40fc9"
+}

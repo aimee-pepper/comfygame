@@ -212,6 +212,8 @@ struct ItemIconTile: View {
     /// Stable catalogue identity passed independently of name, rarity, slot and ordering.
     /// The generated visual adapter may consume it; nil/non-covered IDs retain the visible fallback.
     var catalogueID: ItemID? = nil
+    /// Property-bearing harvested materials are not catalogue items and use their own exact kind.
+    var materialKind: MaterialKind? = nil
     let rarity: Rarity
     let quantity: Int
     let identified: Bool
@@ -227,13 +229,19 @@ struct ItemIconTile: View {
             RoundedRectangle(cornerRadius: 9)
                 .strokeBorder(rarity.tint.opacity(isSelected ? 1 : 0.72),
                               lineWidth: isSelected ? 3 : 1.5)
-            CatalogueItemPixelIdentity(
-                itemID: catalogueID,
-                identified: identified,
-                fallbackSystemIcon: icon,
-                fallbackColor: identified ? rarity.tint : Color.secondary
-            )
-            .frame(width: 32, height: 32)
+            if let materialKind {
+                MaterialSamplePixelIdentity(kind: materialKind,
+                                            fallbackColor: identified ? rarity.tint : .secondary)
+                    .frame(width: 32, height: 32)
+            } else {
+                CatalogueItemPixelIdentity(
+                    itemID: catalogueID,
+                    identified: identified,
+                    fallbackSystemIcon: icon,
+                    fallbackColor: identified ? rarity.tint : Color.secondary
+                )
+                .frame(width: 32, height: 32)
+            }
 
             VStack {
                 HStack {

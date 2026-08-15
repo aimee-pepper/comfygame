@@ -640,6 +640,29 @@ final class ContentTests: XCTestCase {
         }
     }
 
+    func testWorldResourceGearExpansionHasExactMaterialOwnedLevels() {
+        let expected: [String: Int] = [
+            "rubble": 1, "clay": 1, "ore": 2, "copper": 2, "silver": 3, "gold": 3,
+            "quartz": 2, "obsidian": 3, "salt": 1, "sulfur": 2, "mercury": 3,
+            "adamant": 4, "fiber": 1, "timber": 1, "pulp": 1, "resin": 1,
+            "toxin": 2, "spore": 2, "reagent": 2, "ichor": 2, "rift_glass": 4,
+            "essence_raw": 4, "mote": 4,
+        ]
+        let materialGear = ContentCatalog.shared.items.filter {
+            $0.gear?.materialProfileID?.hasPrefix("world:") == true
+        }
+        XCTAssertEqual(materialGear.count, expected.count)
+        XCTAssertEqual(Set(materialGear.compactMap { $0.gear?.materialProfileID?.dropFirst(6) }),
+                       Set(expected.keys.map { Substring($0) }))
+        for item in materialGear {
+            let gear = item.gear!
+            let resourceID = String(gear.materialProfileID!.dropFirst(6))
+            XCTAssertEqual(gear.tier, expected[resourceID], item.id.rawValue)
+            XCTAssertNotNil(ContentCatalog.shared.resource(ResourceID(rawValue: resourceID)))
+            XCTAssertFalse(gear.visualFamilyID?.isEmpty ?? true)
+        }
+    }
+
     func testBundledGambitPiecesAndUpgradeAuthoritiesHaveStableUniqueIDs() throws {
         func object(named name: String) throws -> [String: Any] {
             let url = try XCTUnwrap(Bundle.contentBundle.url(forResource: name,

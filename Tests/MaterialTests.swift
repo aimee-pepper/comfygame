@@ -6,6 +6,15 @@ import XCTest
 /// **No authored drop tables** — the parts that composed the creature compose what it leaves.
 final class MaterialTests: XCTestCase {
 
+    func testEveryHarvestedMaterialKindHasAValidatedDistinctInventoryIdentity() throws {
+        let assets = try MaterialKind.allCases.map { kind in
+            let asset = try XCTUnwrap(MobGearSpriteV1Registry.mobDropAsset(for: kind), kind.rawValue)
+            XCTAssertNoThrow(try NativeVisualRuntime.validate(asset), kind.rawValue)
+            return asset
+        }
+        XCTAssertEqual(Set(assets.map(\.decodedRGBASHA256)).count, MaterialKind.allCases.count)
+    }
+
     func testMaterialReserveRoundTripPreservesStableIdentityAndExactSample() throws {
         let sample = MaterialSample(kind: .hide,
             properties: MaterialProperties(hardness: 31, density: 42, insulation: 53,

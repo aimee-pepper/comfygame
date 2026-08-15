@@ -845,6 +845,7 @@ private struct ConstructionSheet: View {
                     SixAcrossItemGrid(data: eligible, id: \.id) { assessment in
                         AnchoredItemDetailButton(item: assessment, selection: $openedCandidate) {
                             ItemIconTile(icon: assessment.selection.sample.kind.icon,
+                                         materialKind: assessment.selection.sample.kind,
                                          rarity: assessment.selection.sample.rarity,
                                          quantity: 1, identified: true, location: .stored,
                                          accessibilityName: assessment.selection.sample.displayName,

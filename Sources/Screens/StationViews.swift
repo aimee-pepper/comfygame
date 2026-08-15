@@ -754,6 +754,7 @@ struct StorehouseView: View {
                         SixAcrossItemGrid(data: reserveMaterialBins, id: \.id) { bin in
                             AnchoredItemDetailButton(item: bin, selection: $opened) {
                                 ItemIconTile(icon: bin.icon, catalogueID: bin.catalogID,
+                                             materialKind: bin.material?.kind,
                                              rarity: bin.rarity, quantity: bin.count,
                                              identified: bin.identified, location: .stored,
                                              accessibilityName: bin.displayName)
@@ -1609,9 +1610,9 @@ struct MaterialBinSheet: View {
                 Section {
                     ForEach(Array(sorted.enumerated()), id: \.offset) { _, sample in
                         HStack(spacing: 10) {
-                            Image(systemName: sample.kind.icon)
-                                .font(.footnote).frame(width: 20)
-                                .foregroundStyle(sample.rarity.tint)
+                            MaterialSamplePixelIdentity(kind: sample.kind,
+                                                        fallbackColor: sample.rarity.tint)
+                                .frame(width: 28, height: 28)
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(sample.displayName)
                                     .font(.callout)

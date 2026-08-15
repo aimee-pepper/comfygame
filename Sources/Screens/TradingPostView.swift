@@ -85,7 +85,10 @@ struct TradingPostView: View {
                                 unitPrice: TradingPostRules.materialSaleUnitPrice(for: selection.sample)
                             )
                             AnchoredItemDetailButton(item: listing, selection: $openedMaterial) {
-                                HStack {
+                                HStack(spacing: 10) {
+                                    MaterialSamplePixelIdentity(kind: selection.sample.kind,
+                                                                fallbackColor: selection.sample.rarity.tint)
+                                        .frame(width: 32, height: 32)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(selection.sample.displayName).font(.subheadline)
                                         Text(selection.sample.source.isEmpty ? "Source unknown" : selection.sample.source)

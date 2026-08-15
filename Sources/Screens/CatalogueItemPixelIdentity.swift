@@ -31,7 +31,7 @@ struct CatalogueItemPixelIdentity: View {
         .accessibilityHidden(true)
     }
 
-    private static func image(from asset: NativeVisualRuntime.GeneratedPixelAsset) -> UIImage? {
+    static func image(from asset: NativeVisualRuntime.GeneratedPixelAsset) -> UIImage? {
         guard let pixels = try? NativeVisualRuntime.decodedRGBA(
             width: asset.width, height: asset.height, commands: asset.commands),
               let provider = CGDataProvider(data: pixels as CFData),
@@ -44,5 +44,29 @@ struct CatalogueItemPixelIdentity: View {
                 provider: provider, decode: nil,
                 shouldInterpolate: false, intent: .defaultIntent) else { return nil }
         return UIImage(cgImage: image)
+    }
+}
+
+/// Exact harvested-material identity. Grade, provenance and inherited properties remain text/state;
+/// the central 32px silhouette is selected only by the stable material kind.
+struct MaterialSamplePixelIdentity: View {
+    let kind: MaterialKind
+    let fallbackColor: Color
+
+    var body: some View {
+        Group {
+            if let asset = MobGearSpriteV1Registry.mobDropAsset(for: kind),
+               let image = CatalogueItemPixelIdentity.image(from: asset) {
+                Image(uiImage: image)
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+            } else {
+                Image(systemName: kind.icon)
+                    .font(.system(size: 21, weight: .semibold))
+                    .foregroundStyle(fallbackColor)
+            }
+        }
+        .accessibilityHidden(true)
     }
 }

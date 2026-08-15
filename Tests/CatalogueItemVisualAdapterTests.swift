@@ -49,4 +49,28 @@ final class CatalogueItemVisualAdapterTests: XCTestCase {
         XCTAssertNil(CatalogueItemVisualAdapter(pack: nil)
             .asset(for: "salve", identified: true))
     }
+
+    func testLiveRegistryProvidesExactPixelsForNewAndExistingGear() throws {
+        let adapter = CatalogueItemVisualAdapter.live()
+        let riftGlass = try XCTUnwrap(adapter.asset(for: "riftglass_rapier", identified: true))
+        let timber = try XCTUnwrap(adapter.asset(for: "timber_longbow", identified: true))
+        let chippedBlade = try XCTUnwrap(adapter.asset(for: "blade_chipped", identified: true))
+        XCTAssertNoThrow(try NativeVisualRuntime.validate(riftGlass))
+        XCTAssertNoThrow(try NativeVisualRuntime.validate(timber))
+        XCTAssertNoThrow(try NativeVisualRuntime.validate(chippedBlade))
+        XCTAssertNotEqual(riftGlass.decodedRGBASHA256, timber.decodedRGBASHA256)
+        XCTAssertNotEqual(chippedBlade.decodedRGBASHA256, timber.decodedRGBASHA256)
+        XCTAssertNil(adapter.asset(for: "riftglass_rapier", identified: false),
+                     "Identified gear art must not disclose an unidentified variant")
+        XCTAssertNil(adapter.asset(for: "blade_chipped", identified: false),
+                     "Existing identified gear art must not disclose an unidentified variant")
+    }
+
+    func testLiveRegistryCoversEveryLiveGearCatalogueID() throws {
+        let adapter = CatalogueItemVisualAdapter.live()
+        for item in ContentCatalog.shared.items where item.gear != nil {
+            let asset = try XCTUnwrap(adapter.asset(for: item.id, identified: true), item.id.rawValue)
+            XCTAssertNoThrow(try NativeVisualRuntime.validate(asset), item.id.rawValue)
+        }
+    }
 }
