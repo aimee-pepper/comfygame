@@ -233,6 +233,7 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         for index in tiles.indices { tiles[index].isRevealed = true }
         run.map = WorldMap(width: 4, height: 1, tiles: tiles, entry: GridPoint(x: 0, y: 0))
         run.playerPosition = GridPoint(x: 0, y: 0)
+        run.torchVisionBonus = 10
         let trigger = enemy(1, 0, 0)
         let distant = enemy(2, 3, 0)
         run.enemies = [trigger, distant]
@@ -256,6 +257,7 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         for index in tiles.indices { tiles[index].isRevealed = true }
         run.map = WorldMap(width: 5, height: 3, tiles: tiles, entry: GridPoint(x: 0, y: 1))
         run.playerPosition = GridPoint(x: 0, y: 1)
+        run.torchVisionBonus = 10
         for y in 0..<3 { run.map[GridPoint(x: 3, y: y)].ground = .chasm }
 
         let trigger = enemy(100, 0, 1)
