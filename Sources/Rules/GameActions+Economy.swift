@@ -1049,6 +1049,33 @@ extension GameStore {
         }
     }
 
+    /// Stable graph purchase quote. Details hold their exact ownership/point snapshot so a stale
+    /// sheet can never spend against a character who changed underneath it.
+    func previewCombatNodePurchase(_ nodeID: CombatNodeID, for member: PartyMember)
+        -> Result<CombatGraphRules.PurchaseQuote, CombatGraphRules.PurchaseRefusal> {
+        CombatGraphRules.previewPurchase(nodeID, for: state.base.character(member),
+                                         catalogue: ContentCatalog.shared.combatGraph)
+    }
+
+    @discardableResult
+    func purchaseCombatNode(_ quote: CombatGraphRules.PurchaseQuote,
+                            for member: PartyMember) -> CombatGraphRules.PurchaseResult {
+        guard activeEncounter == nil else { return .refused(.unavailable) }
+        if case .member(let index) = member, !state.base.roster.indices.contains(index) {
+            return .refused(.stale)
+        }
+        var result: CombatGraphRules.PurchaseResult = .refused(.stale)
+        let changed = mutateIf("learn \(quote.nodeID.rawValue)", flush: true) { state in
+            var character = state.base.character(member)
+            result = CombatGraphRules.commit(quote, for: &character,
+                                             catalogue: ContentCatalog.shared.combatGraph)
+            guard case .committed = result else { return false }
+            state.base.withCharacter(member) { $0 = character }
+            return true
+        }
+        return changed ? result : .refused(.stale)
+    }
+
     /// Everybody who is walking out with you, you included.
     var partyMembers: [PartyMember] { state.base.partyMembers }
 

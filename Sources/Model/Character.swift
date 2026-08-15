@@ -145,6 +145,13 @@ struct CharacterState: Codable, Equatable, Sendable {
     /// leave somebody holding a node that no longer exists.
     var branchDepth: [CombatBranchID: Int] = [:]
 
+    /// Stable graph-v2 ownership. `nil` means this character has not yet reconciled a legacy
+    /// branch-depth save; an explicit empty set is canonical and must stay empty on relaunch.
+    var ownedCombatNodeIDs: Set<CombatNodeID>?
+    /// Stable typed selections belonging to purchased nodes. Opening depths currently require no
+    /// choice, but persistence lives beside ownership so later typed nodes cannot become indexes.
+    var combatNodeChoices: [CombatNodeID: StableChoiceID] = [:]
+
     /// Points that didn't come from levelling — a calling's starting lean. Kept as a count rather
     /// than baked into `branchDepth` alone, so the budget stays honest and a respec hands them back
     /// rather than quietly deleting them.
@@ -165,6 +172,10 @@ struct CharacterState: Codable, Equatable, Sendable {
         experience = try c.decodeIfPresent(Int.self, forKey: .experience) ?? 0
         rank = try c.decodeIfPresent(Rank.self, forKey: .rank) ?? .front
         branchDepth = try c.decodeIfPresent([CombatBranchID: Int].self, forKey: .branchDepth) ?? [:]
+        ownedCombatNodeIDs = try c.decodeIfPresent(Set<CombatNodeID>.self,
+                                                    forKey: .ownedCombatNodeIDs)
+        combatNodeChoices = try c.decodeIfPresent([CombatNodeID: StableChoiceID].self,
+                                                   forKey: .combatNodeChoices) ?? [:]
         freePoints = try c.decodeIfPresent(Int.self, forKey: .freePoints) ?? 0
     }
 

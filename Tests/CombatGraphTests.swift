@@ -130,6 +130,107 @@ final class CombatGraphTests: XCTestCase {
                                                     owned: Set(withoutConnectedMastery), catalogue: graph))
     }
 
+    func testExactFortyFiveDepthOneThroughThreeNodesAreImplemented() {
+        let opening = CombatGraphRules.implementedOpeningNodeIDs(in: graph)
+        XCTAssertEqual(opening.count, 45)
+        XCTAssertEqual(opening, Set(graph.nodes.filter { (1...3).contains($0.depth) }.map(\.id)))
+        XCTAssertTrue(graph.nodes.filter { $0.depth > 3 }.allSatisfy { !opening.contains($0.id) })
+    }
+
+    func testEveryOpeningHybridIsLegalFromEitherExactParentAndNotFromDestinationRoot() throws {
+        let hybrids = graph.nodes.filter { $0.depth == 3 && !$0.hybridAlternativeParents.isEmpty }
+        XCTAssertFalse(hybrids.isEmpty)
+        for node in hybrids {
+            for parent in node.ordinaryParentAlternatives {
+                XCTAssertTrue(CombatGraphRules.canPurchase(node, owned: [parent], catalogue: graph))
+            }
+            let root = try XCTUnwrap(graph.discipline(containing: node.id)?.nodes
+                .first(where: { $0.role == .root }))
+            XCTAssertFalse(CombatGraphRules.canPurchase(node, owned: [root.id], catalogue: graph))
+        }
+    }
+
+    func testStableOpeningPurchasesSpendOnePointPersistAndHoldLaterDepths() throws {
+        var character = CharacterState(level: 4)
+        let route: [CombatNodeID] = ["combat.offense.force.heavy_hand",
+                                     "combat.offense.force.follow_through",
+                                     "combat.offense.force.bracing_stance"]
+        for nodeID in route {
+            let before = CombatGraphRules.unspentPoints(for: character, catalogue: graph)
+            let quote = try CombatGraphRules.previewPurchase(nodeID, for: character,
+                                                             catalogue: graph).get()
+            XCTAssertEqual(CombatGraphRules.commit(quote, for: &character, catalogue: graph),
+                           .committed(nodeID))
+            XCTAssertEqual(CombatGraphRules.unspentPoints(for: character, catalogue: graph), before - 1)
+        }
+        XCTAssertEqual(character.ownedCombatNodeIDs, Set(route))
+        XCTAssertEqual(character.branchDepth, [:])
+        let relaunched = try JSONDecoder().decode(CharacterState.self,
+                                                   from: JSONEncoder().encode(character))
+        XCTAssertEqual(relaunched.ownedCombatNodeIDs, Set(route))
+        XCTAssertEqual(CombatGraphRules.previewPurchase("combat.offense.force.shatter",
+                                                        for: relaunched, catalogue: graph),
+                       .failure(.unavailable))
+    }
+
+    func testLegacyMigrationUsesOnlySettledIDsAndRefundsUnresolvedPoints() throws {
+        var legacy = CharacterState(level: Tuning.Character.maximumLevel)
+        legacy.branchDepth = ["force": 2, "removed_branch": 3]
+        let reconciliation = CombatGraphRules.reconcileLegacy(branchDepth: legacy.branchDepth,
+                                                               catalogue: graph)
+        let migrated: Set<CombatNodeID> = ["combat.offense.force.heavy_hand",
+                                           "combat.offense.force.follow_through"]
+        XCTAssertEqual(reconciliation.owned, migrated)
+        XCTAssertEqual(reconciliation.refundedPoints, 3)
+        XCTAssertNil(legacy.ownedCombatNodeIDs)
+        let root: CombatNodeID = "combat.defense.fortitude.thick_hide"
+        let quote = try CombatGraphRules.previewPurchase(root, for: legacy, catalogue: graph).get()
+        XCTAssertEqual(CombatGraphRules.commit(quote, for: &legacy, catalogue: graph),
+                       .committed(root))
+        XCTAssertEqual(legacy.ownedCombatNodeIDs, reconciliation.owned.union([root]))
+    }
+
+    func testIllegalInvalidAndStaleOpeningPurchasesMutateNothing() throws {
+        var character = CharacterState(level: 4)
+        let development: CombatNodeID = "combat.offense.force.stagger"
+        XCTAssertEqual(CombatGraphRules.previewPurchase(development, for: character,
+                                                        catalogue: graph),
+                       .failure(.illegalParent))
+        let root: CombatNodeID = "combat.offense.force.heavy_hand"
+        XCTAssertEqual(CombatGraphRules.previewPurchase(root, choice: "invented", for: character,
+                                                        catalogue: graph),
+                       .failure(.invalidChoice))
+        let stale = try CombatGraphRules.previewPurchase(root, for: character, catalogue: graph).get()
+        let other = try CombatGraphRules.previewPurchase("combat.defense.fortitude.thick_hide",
+                                                         for: character, catalogue: graph).get()
+        XCTAssertEqual(CombatGraphRules.commit(other, for: &character, catalogue: graph),
+                       .committed(other.nodeID))
+        let afterOther = character
+        XCTAssertEqual(CombatGraphRules.commit(stale, for: &character, catalogue: graph),
+                       .refused(.stale))
+        XCTAssertEqual(character, afterOther)
+    }
+
+    @MainActor
+    func testStorePurchaseFlushesStableOwnershipAndStaleRefusalRecordsNoMutation() throws {
+        let io = SaveFileIO.temporary(name: "combat-opening-\(UUID().uuidString)")
+        let store = GameStore(io: io)
+        store.mutate("reach level two", flush: true) { $0.base.binderCharacter.level = 2 }
+        let heavy: CombatNodeID = "combat.offense.force.heavy_hand"
+        let thick: CombatNodeID = "combat.defense.fortitude.thick_hide"
+        let heavyQuote = try store.previewCombatNodePurchase(heavy, for: .binder).get()
+        let staleThickQuote = try store.previewCombatNodePurchase(thick, for: .binder).get()
+        XCTAssertEqual(store.purchaseCombatNode(heavyQuote, for: .binder), .committed(heavy))
+        let mutationAfterPurchase = store.state.meta.mutationCount
+        XCTAssertEqual(store.purchaseCombatNode(staleThickQuote, for: .binder), .refused(.stale))
+        XCTAssertEqual(store.state.meta.mutationCount, mutationAfterPurchase)
+
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state.base.binderCharacter.ownedCombatNodeIDs, [heavy])
+        XCTAssertEqual(CombatGraphRules.unspentPoints(for: relaunched.state.base.binderCharacter,
+                                                      catalogue: graph), 0)
+    }
+
     private func id(_ tree: String, _ discipline: String, _ slug: String) -> CombatNodeID {
         CombatNodeID(rawValue: "combat.\(tree).\(discipline).\(slug)")
     }

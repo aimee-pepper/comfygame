@@ -17,11 +17,10 @@ enum CombatDerivedStatsRules {
         var total: Int { components.reduce(0) { $0 + $1.amount } }
     }
 
-    /// Compatibility adapter only. It does not persist ownership and does not activate v2.
+    /// Stable ownership authority with a tolerant legacy branch-depth fallback.
     static func legacyOwnedNodes(for character: CharacterState,
                                  catalogue: CombatGraphCatalogue) -> Set<CombatNodeID> {
-        CombatGraphRules.migratedLegacyNodes(branchDepth: character.branchDepth,
-                                             catalogue: catalogue)
+        CombatGraphRules.ownedNodes(for: character, catalogue: catalogue)
     }
 
     struct FormationMember: Equatable, Sendable {

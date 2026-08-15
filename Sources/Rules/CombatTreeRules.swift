@@ -21,7 +21,7 @@ enum CombatTreeRules {
     }
 
     static func spentPoints(_ character: CharacterState) -> Int {
-        character.branchDepth.values.reduce(0, +)
+        character.ownedCombatNodeIDs?.count ?? character.branchDepth.values.reduce(0, +)
     }
 
     static func unspentPoints(_ character: CharacterState) -> Int {
@@ -71,6 +71,8 @@ enum CombatTreeRules {
 
     static func forget(_ character: inout CharacterState) {
         character.branchDepth = [:]
+        character.ownedCombatNodeIDs = []
+        character.combatNodeChoices = [:]
     }
 
     /// **Partial investment is legal.** The cap is on total points, so spreading across nine
