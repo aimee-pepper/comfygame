@@ -598,23 +598,27 @@ struct WorldPageDefinition: Codable, Equatable, Identifiable, Sendable {
     var worldPageCost: Int
     var seed: UInt64
     var promise: String
+    /// An authored, disclosed item promised by this physical page. Nil on legacy and ordinary pages.
+    var knownFind: ItemID?
     var contextTags: [String] = []
     var minimumResolvedExpeditions: Int = 0
     var candidateUnknownSymbolIDs: [SymbolID] = []
     var baseWeightMultiplier: Double = 1
 
     private enum CodingKeys: String, CodingKey {
-        case id, title, disposition, provenance, page, copiedCost, worldPageCost, seed, promise
+        case id, title, disposition, provenance, page, copiedCost, worldPageCost, seed, promise, knownFind
         case contextTags, minimumResolvedExpeditions, candidateUnknownSymbolIDs, baseWeightMultiplier
     }
 
     init(id: WorldPageDefinitionID, title: String, disposition: Disposition, provenance: String,
          page: Page, copiedCost: Int, worldPageCost: Int, seed: UInt64, promise: String,
+         knownFind: ItemID? = nil,
          contextTags: [String] = [], minimumResolvedExpeditions: Int = 0,
          candidateUnknownSymbolIDs: [SymbolID] = [], baseWeightMultiplier: Double = 1) {
         self.id = id; self.title = title; self.disposition = disposition
         self.provenance = provenance; self.page = page; self.copiedCost = copiedCost
         self.worldPageCost = worldPageCost; self.seed = seed; self.promise = promise
+        self.knownFind = knownFind
         self.contextTags = contextTags
         self.minimumResolvedExpeditions = minimumResolvedExpeditions
         self.candidateUnknownSymbolIDs = candidateUnknownSymbolIDs
@@ -632,6 +636,7 @@ struct WorldPageDefinition: Codable, Equatable, Identifiable, Sendable {
         worldPageCost = try c.decode(Int.self, forKey: .worldPageCost)
         seed = try c.decode(UInt64.self, forKey: .seed)
         promise = try c.decode(String.self, forKey: .promise)
+        knownFind = try c.decodeIfPresent(ItemID.self, forKey: .knownFind)
         contextTags = try c.decodeIfPresent([String].self, forKey: .contextTags) ?? []
         minimumResolvedExpeditions = try c.decodeIfPresent(
             Int.self, forKey: .minimumResolvedExpeditions) ?? 0
@@ -688,7 +693,7 @@ struct WorldPageUseReceipt: Codable, Equatable, Sendable {
 
 enum WorldPageCatalog {
     // BEGIN GENERATED STARTER WORLD PAGES — Scripts/generate_world_pages.py
-    static let authoritySHA256 = "04f73e3cb93850ec1f449d9f302c4ca276ac1091631ed81322458d8b8142c534"
+    static let authoritySHA256 = "4190cd068463d3f5954d387987c726371da45c4989dbee149e686393045aa320"
     static let openMeadowID: WorldPageDefinitionID = "starter_open_meadow"
     static let rainwashedShoreID: WorldPageDefinitionID = "starter_rainwashed_shore"
     static let stoneHollowID: WorldPageDefinitionID = "starter_stone_hollow"
@@ -707,18 +712,18 @@ enum WorldPageCatalog {
                    provenance: "A clean practice page, already written in rough charcoal.",
                    marks: [("plains", 1, "crude_smear", 0, 0),
                            ("verdant", 2, "crude_smear", 3, 3)],
-                   copiedCost: 21, worldPageCost: 14, seed: 2,
+                   copiedCost: 21, worldPageCost: 14, seed: 2, knownFind: "field_maul",
                    promise: "Open, living, modestly resourced and safe enough to learn the opening loop."),
         definition(id: rainwashedShoreID, title: "Rainwashed Shore",
                    provenance: "A clean practice page with one broad charcoal mark.",
                    marks: [("archipelago", 1, "crude_smear", 1, 2)],
-                   copiedCost: 18, worldPageCost: 14, seed: 26,
+                   copiedCost: 18, worldPageCost: 14, seed: 26, knownFind: "bone_awl",
                    promise: "A readable water-and-relief contrast without an opening lethality spike."),
         definition(id: stoneHollowID, title: "Stone Hollow",
                    provenance: "A clean practice page with charcoal rubbed into the grain.",
                    marks: [("caverns", 1, "crude_smear", 0, 1),
                            ("common_ore", 2, "crude_block", 4, 3)],
-                   copiedCost: 22, worldPageCost: 16, seed: 23,
+                   copiedCost: 22, worldPageCost: 16, seed: 23, knownFind: "blade_chipped",
                    promise: "Stone, enclosure and ordinary ore within the accepted level-one envelope.")
     ]
 
@@ -811,7 +816,7 @@ enum WorldPageCatalog {
     private static func definition(
         id: WorldPageDefinitionID, title: String, provenance: String,
         marks: [(String, UInt64, String, Int, Int)], copiedCost: Int, worldPageCost: Int,
-        seed: UInt64, promise: String
+        seed: UInt64, knownFind: ItemID, promise: String
     ) -> WorldPageDefinition {
         let page = Page(runes: marks.map { symbol, markID, shapeID, column, row in
             PlacedRune(id: InstanceID(rawValue: markID), content: .compound(SymbolID(rawValue: symbol)),
@@ -819,7 +824,8 @@ enum WorldPageCatalog {
         })
         return WorldPageDefinition(id: id, title: title, disposition: .starterUnique,
                                    provenance: provenance, page: page, copiedCost: copiedCost,
-                                   worldPageCost: worldPageCost, seed: seed, promise: promise)
+                                   worldPageCost: worldPageCost, seed: seed, promise: promise,
+                                   knownFind: knownFind)
     }
 
     private static func fieldDefinition(

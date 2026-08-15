@@ -1290,6 +1290,7 @@ private struct TileView: View {
         if hasLooseWorldPage { return "doc.text.fill" }
         switch tile.content {
         case .empty: return nil
+        case .item(let stack): return ContentCatalog.shared.item(stack.catalogID)?.icon ?? "shippingbox.fill"
         case .node(let node): return useSimpleRenderer ? (ContentCatalog.shared.resource(node.resource)?.icon ?? "cube") : nil
         case .wildDrop: return useSimpleRenderer ? "sparkle" : nil
         case .hazard: return "exclamationmark.triangle.fill"
@@ -1308,6 +1309,7 @@ private struct TileView: View {
         if enemy != nil { return .red }
         if hasLooseWorldPage { return .indigo }
         switch tile.content {
+        case .item: return .yellow
         case .hazard: return .orange
         case .portal: return .blue
         case .lockedCache: return .purple

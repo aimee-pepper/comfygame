@@ -446,6 +446,16 @@ struct WritingDeskView: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                     .lineLimit(2)
+                                if let knownFind = instance.definition.knownFind,
+                                   let item = ContentCatalog.shared.item(knownFind) {
+                                    Label("Known find · \(item.name)", systemImage: item.icon)
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.primary)
+                                } else if instance.definition.disposition == .starterUnique {
+                                    Text("Legacy page · no known find")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                             Text("Bind · \(instance.definition.worldPageCost) Essence")
                                 .font(.caption.weight(.semibold))

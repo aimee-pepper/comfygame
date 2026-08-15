@@ -134,6 +134,71 @@ final class WorldTests: XCTestCase {
         XCTAssertEqual(page.fieldProvenance?.originWorldSeed, 1_404)
     }
 
+    func testStarterPagesPlaceExactDisclosedTierOneFindSafelyNearEntry() throws {
+        for instance in WorldPageCatalog.starterInstances {
+            let book = BookRules.resolveBook(worldPage: instance)
+            let first = Worldgen.generate(book: book, seed: instance.definition.seed)
+            let second = Worldgen.generate(book: book, seed: instance.definition.seed)
+            let finds = first.map.allPoints.compactMap { point -> (GridPoint, ItemStack)? in
+                guard case .item(let stack) = first.map[point].content else { return nil }
+                return (point, stack)
+            }
+            XCTAssertEqual(finds.count, 1)
+            let find = try XCTUnwrap(finds.first)
+            XCTAssertEqual(find.1.catalogID, instance.definition.knownFind)
+            XCTAssertEqual(find.1.id, StarterKnownFindPlacementRules.stableInstanceID(
+                for: try XCTUnwrap(book.worldPageUseReceipt)))
+            XCTAssertEqual(first.map[find.0], second.map[find.0])
+            XCTAssertTrue(first.map[find.0].isRevealed)
+            XCTAssertTrue(first.map[find.0].isPassable)
+            XCTAssertEqual(first.map[find.0].ground.movementCost, 1)
+            var distance: [GridPoint: Int] = [first.map.entry: 0]
+            var queue = [first.map.entry]
+            while !queue.isEmpty, distance[find.0] == nil {
+                let point = queue.removeFirst()
+                for next in first.map.neighbours(of: point)
+                where distance[next] == nil && first.map[next].isPassable {
+                    distance[next] = distance[point, default: 0] + 1
+                    queue.append(next)
+                }
+            }
+            XCTAssertTrue((1...2).contains(try XCTUnwrap(distance[find.0])))
+        }
+    }
+
+    func testKnownFindPickupIsAtomicAndLeavesExactItemWhenSatchelIsFull() throws {
+        let destination = GridPoint(x: 1, y: 0)
+        let promised = ItemStack(id: InstanceID(rawValue: 4_444), catalogID: "field_maul")
+        var map = WorldMap(width: 2, height: 1,
+                           tiles: [Tile(content: .portal(isEntry: true), isRevealed: true),
+                                   Tile(content: .item(promised), isRevealed: true)],
+                           entry: GridPoint(x: 0, y: 0))
+        var fullRun = WorldRun(runIndex: 1, book: book([:]), mapSeed: 1,
+                               rng: SeededRNG(seed: 1), map: map,
+                               playerPosition: map.entry,
+                               satchelItems: Inventory(slots: 1, stacks: [
+                                ItemStack(id: InstanceID(rawValue: 9), catalogID: "bone_awl")
+                               ]))
+        var fullState = GameState.newGame()
+        fullState.worlds.activeRun = fullRun
+
+        let refusal = WorldRules.step(to: destination, in: &fullState)
+        XCTAssertTrue(refusal.contains { if case .satchelFull = $0 { true } else { false } })
+        XCTAssertEqual(fullState.worlds.activeRun?.map[destination].content, .item(promised))
+        XCTAssertEqual(fullState.worlds.activeRun?.satchelItems.stacks.count, 1)
+
+        map[destination].content = .item(promised)
+        fullRun = WorldRun(runIndex: 1, book: book([:]), mapSeed: 1,
+                           rng: SeededRNG(seed: 1), map: map,
+                           playerPosition: map.entry, satchelItems: Inventory(slots: 1))
+        var openState = GameState.newGame()
+        openState.worlds.activeRun = fullRun
+        let pickup = WorldRules.step(to: destination, in: &openState)
+        XCTAssertTrue(pickup.contains { if case .pickedUpItem = $0 { true } else { false } })
+        XCTAssertEqual(openState.worlds.activeRun?.map[destination].content, .empty)
+        XCTAssertEqual(openState.worlds.activeRun?.satchelItems.stacks, [promised])
+    }
+
     func testWorldRunKeepsPagesSeparateWhileChargingSharedSatchelSlots() throws {
         let definition = try XCTUnwrap(WorldPageCatalog.definition("wild_moss_and_mist"))
         let page = WorldPageInstance(id: InstanceID(rawValue: 700), definition: definition,
@@ -510,7 +575,9 @@ final class WorldTests: XCTestCase {
             (.portal(isEntry: true), .portal), (.diaryPage("page"), .page),
             (.foundWriting("note"), .page), (.site(InstanceID(rawValue: 1)), .site),
             (.node(ResourceNode(resource: "ore", remainingHarvests: 1, yieldPerHarvest: 1)), .resource),
-            (.wildDrop(resource: "essence_raw", amount: 1), .resource), (.traveller("mara"), .traveller),
+            (.wildDrop(resource: "essence_raw", amount: 1), .resource),
+            (.item(ItemStack(id: InstanceID(rawValue: 44), catalogID: "field_maul")), .item),
+            (.traveller("mara"), .traveller),
             (.lockedCache, .cache), (.hazard, .hazard)
         ]
         for (content, expected) in cases {

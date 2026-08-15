@@ -69,10 +69,15 @@ final class PageTests: XCTestCase {
             with: SaveCodec.makeEncoder().encode(legacy)) as? [String: Any])
         object.removeValue(forKey: "inspected")
         object.removeValue(forKey: "fieldProvenance")
+        if var definition = object["definition"] as? [String: Any] {
+            definition.removeValue(forKey: "knownFind")
+            object["definition"] = definition
+        }
         let decoded = try SaveCodec.makeDecoder().decode(
             WorldPageInstance.self, from: JSONSerialization.data(withJSONObject: object))
         XCTAssertFalse(decoded.inspected)
         XCTAssertNil(decoded.fieldProvenance)
+        XCTAssertNil(decoded.definition.knownFind)
         XCTAssertTrue(decoded.isProtectedReturn)
     }
 
@@ -85,6 +90,7 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(definitions.map(\.copiedCost), [21, 18, 22])
         XCTAssertEqual(definitions.map(\.worldPageCost), [14, 14, 16])
         XCTAssertEqual(definitions.map(\.title), ["Open Meadow", "Rainwashed Shore", "Stone Hollow"])
+        XCTAssertEqual(definitions.map(\.knownFind), ["field_maul", "bone_awl", "blade_chipped"])
         XCTAssertEqual(definitions.map(\.provenance), [
             "A clean practice page, already written in rough charcoal.",
             "A clean practice page with one broad charcoal mark.",

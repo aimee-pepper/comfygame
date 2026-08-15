@@ -157,6 +157,8 @@ enum TileContent: Codable, Equatable, Sendable {
     case node(ResourceNode)
     /// A single wild drop — picked up just by walking over it. Essence-raw arrives this way.
     case wildDrop(resource: ResourceID, amount: Int)
+    /// One exact physical item disclosed and placed by world generation.
+    case item(ItemStack)
     /// Spawned at the map edges once stability falls past the hazard threshold.
     case hazard
     /// `isEntry` marks the one you arrived through.
@@ -178,7 +180,7 @@ enum TileContent: Codable, Equatable, Sendable {
     /// Whether losing this tile to crumbling costs the player something.
     var isLoseable: Bool {
         switch self {
-        case .node, .wildDrop, .lockedCache, .site, .diaryPage, .foundWriting: true
+        case .node, .wildDrop, .item, .lockedCache, .site, .diaryPage, .foundWriting: true
         // A person is not loot, and losing them to the floor is the point of the timer rather
         // than a cost to be tallied.
         case .empty, .hazard, .portal, .traveller: false

@@ -32,6 +32,7 @@
       "worldPageCost": 14,
       "seed": 2,
       "seedStatus": "sampledCandidate",
+      "knownFind": "field_maul",
       "promise": "Open, living, modestly resourced and safe enough to learn the opening loop."
     },
     {
@@ -47,6 +48,7 @@
       "worldPageCost": 14,
       "seed": 26,
       "seedStatus": "sampledCandidate",
+      "knownFind": "bone_awl",
       "promise": "A readable water-and-relief contrast without an opening lethality spike."
     },
     {
@@ -63,6 +65,7 @@
       "worldPageCost": 16,
       "seed": 23,
       "seedStatus": "sampledCandidate",
+      "knownFind": "blade_chipped",
       "promise": "Stone, enclosure and ordinary ore within the accepted level-one envelope."
     },
     {

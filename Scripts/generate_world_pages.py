@@ -40,13 +40,15 @@ def load_and_validate() -> tuple[dict, list[dict], list[dict], str]:
     if [entry.get("id") for entry in starters] != EXPECTED_IDS:
         fail("authority must contain exactly the three ordered starterUnique definitions")
     required = {"id", "title", "disposition", "provenance", "hand", "symbols",
-                "copiedCost", "worldPageCost", "seed", "seedStatus", "promise"}
+                "copiedCost", "worldPageCost", "seed", "seedStatus", "knownFind", "promise"}
     for entry in starters:
         missing = required - entry.keys()
         if missing:
             fail(f"{entry.get('id')} missing fields: {sorted(missing)}")
         if entry["seedStatus"] != "sampledCandidate" or entry["hand"] != "crude":
             fail(f"{entry['id']} must be a sampledCandidate written in crude hand")
+        if not isinstance(entry["knownFind"], str) or not entry["knownFind"]:
+            fail(f"{entry['id']} must name one known find")
         if not all(isinstance(entry[key], str) and entry[key] for key in
                    ("id", "title", "provenance", "promise")):
             fail(f"{entry['id']} has an empty or non-string authored field")
@@ -127,7 +129,7 @@ def generated(starters: list[dict], wild: list[dict], digest: str) -> str:
             lines.append(f"{prefix}({swift_string(mark['id'])}, {mark['markID']}, "
                          f"{swift_string(mark['shapeID'])}, {mark['origin'][0]}, {mark['origin'][1]}){suffix},")
         lines.append(f"                   copiedCost: {entry['copiedCost']}, worldPageCost: {entry['worldPageCost']}, "
-                     f"seed: {entry['seed']},")
+                     f"seed: {entry['seed']}, knownFind: {swift_string(entry['knownFind'])},")
         comma = "," if index < len(starters) - 1 else ""
         lines.append(f"                   promise: {swift_string(entry['promise'])}){comma}")
     lines += ["    ]", "", "    static let repeatableDefinitions: [WorldPageDefinition] = ["]

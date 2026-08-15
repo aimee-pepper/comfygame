@@ -63,6 +63,47 @@ enum WildWorldPageSelectionRules {
     }
 }
 
+enum StarterKnownFindPlacementRules {
+    static func stableInstanceID(for receipt: WorldPageUseReceipt) -> InstanceID {
+        InstanceID(rawValue: 0x4745_4152_0000_0000 | (receipt.instanceID.rawValue & 0xFFFF_FFFF))
+    }
+
+    /// Places the disclosed starter find only on an ordinary one-turn tile reached in one or two
+    /// steps. This runs after guaranteed writing, so it can replace only an otherwise empty host.
+    @discardableResult
+    static func place(receipt: WorldPageUseReceipt, in map: inout WorldMap,
+                      avoiding occupied: inout Set<GridPoint>) -> GridPoint? {
+        guard let itemID = receipt.definition.knownFind,
+              ContentCatalog.shared.item(itemID)?.gear?.tier == 1 else { return nil }
+        var distances: [GridPoint: Int] = [map.entry: 0]
+        var queue = [map.entry]
+        while !queue.isEmpty {
+            let point = queue.removeFirst()
+            let distance = distances[point, default: 0]
+            guard distance < 2 else { continue }
+            for next in map.neighbours(of: point) where distances[next] == nil {
+                let tile = map[next]
+                guard tile.isPassable, tile.ground.movementCost == 1,
+                      abs(tile.elevation - map[point].elevation) <= 1 else { continue }
+                distances[next] = distance + 1
+                queue.append(next)
+            }
+        }
+        let candidates = distances.compactMap { point, distance -> GridPoint? in
+            guard (1...2).contains(distance), !occupied.contains(point),
+                  map[point].content == .empty else { return nil }
+            return point
+        }.sorted { ($0.y, $0.x) < ($1.y, $1.x) }
+        guard !candidates.isEmpty else { return nil }
+        var rng = SeededRNG(seed: receipt.definition.seed).derived(0x4745_4152)
+        let point = candidates[rng.int(in: 0...(candidates.count - 1))]
+        map[point].content = .item(ItemStack(id: stableInstanceID(for: receipt), catalogID: itemID))
+        map[point].isRevealed = true
+        occupied.insert(point)
+        return point
+    }
+}
+
 enum WildWorldPageFieldRules {
     enum DiscardedPayload: Equatable, Sendable {
         case itemStack(ItemStack)
@@ -354,6 +395,12 @@ enum Worldgen {
             map[point].content = .foundWriting(id)
             occupied.insert(point)
             foundWritings.append(record)
+        }
+
+        // Starter pages disclose one ordinary opening weapon before Bind. Its exact physical
+        // identity and safe near-entry host are frozen before any optional content is placed.
+        if let receipt = book.worldPageUseReceipt {
+            StarterKnownFindPlacementRules.place(receipt: receipt, in: &map, avoiding: &occupied)
         }
 
         // The loose World Page reserves an already reachable empty host only after ordinary

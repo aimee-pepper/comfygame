@@ -62,6 +62,8 @@ extension WorldRules {
             "resource node: \(ContentCatalog.shared.resource(node.resource)?.name ?? "unknown material")"
         case .wildDrop(let resource, _):
             "loose \(ContentCatalog.shared.resource(resource)?.name.lowercased() ?? "resource")"
+        case .item(let stack):
+            "known find: \(ContentCatalog.shared.item(stack.catalogID)?.name ?? "item")"
         case .hazard: "the ground is hazardous"
         case .portal: "portal"
         case .lockedCache: "locked cache"

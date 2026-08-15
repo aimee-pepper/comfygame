@@ -52,6 +52,7 @@ struct MinimapView: View {
                 .tag("apex")
             Image(systemName: "building.columns.fill").font(.system(size: 9, weight: .bold)).foregroundStyle(.brown).tag("site")
             Image(systemName: "cube.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.teal).tag("resource")
+            Image(systemName: "shippingbox.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.yellow).tag("item")
             Image(systemName: "person.fill").font(.system(size: 9, weight: .bold)).foregroundStyle(.green).tag("traveller")
             Image(systemName: "pawprint.fill").font(.system(size: 9, weight: .bold)).foregroundStyle(.red).tag("encounter")
             Image(systemName: "lock.fill").font(.system(size: 8, weight: .bold)).foregroundStyle(.purple).tag("cache")
@@ -99,7 +100,7 @@ struct MinimapView: View {
 }
 
 enum MinimapDisclosure {
-    enum Marker: String, CaseIterable { case portal, page, apex, site, resource, traveller, encounter, cache, hazard }
+    enum Marker: String, CaseIterable { case portal, page, apex, site, resource, item, traveller, encounter, cache, hazard }
 
     static func marker(for tile: Tile, enemy: WorldEnemy?) -> Marker? {
         guard tile.isRevealed else { return nil }
@@ -110,6 +111,7 @@ enum MinimapDisclosure {
         case .diaryPage, .foundWriting: .page
         case .site: .site
         case .node, .wildDrop: .resource
+        case .item: .item
         case .traveller: .traveller
         case .lockedCache: .cache
         case .hazard: .hazard

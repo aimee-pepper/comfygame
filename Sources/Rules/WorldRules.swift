@@ -283,6 +283,15 @@ enum WorldRules {
 
         // Whatever is underfoot resolves before the world takes its turn.
         switch run.map[destination].content {
+        case .item(let stack):
+            if run.satchelItems.add(stack) {
+                run.map[destination].content = .empty
+                events.append(.pickedUpItem(ContentCatalog.shared.item(stack.catalogID)?.name
+                                            ?? "Something"))
+            } else {
+                events.append(.satchelFull(ContentCatalog.shared.item(stack.catalogID)?.name
+                                           ?? "Something"))
+            }
         case .wildDrop(let resource, let amount):
             run.satchel.add(amount, of: resource)
             run.map[destination].content = .empty
