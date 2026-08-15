@@ -1,0 +1,50 @@
+const $=selector=>document.querySelector(selector);
+const state={catalogue:[],selected:new Set(),worlds:[],current:0};
+const terrainColors={stone:"#77736d",soil:"#8c7456",sand:"#c9b57c",ice:"#a9c8ce",ash:"#59575d",water:"#397f9b",deepWater:"#173f62",rubble:"#6b625a",mud:"#66533f",growth:"#38673d",groundcover:"#648352",chasm:"#08090d"};
+const contentColors={resource:"#63c8ec",drop:"#87d9ff",item:"#f5cf67",hazard:"#e16055",portal:"#bd82dc",site:"#e79b67",diary:"#dfd5ff",writing:"#d6c790",traveller:"#59d6cf","locked-cache":"#ddb34d"};
+const legendEntries=[["#78b85e","vegetation"],["#f4f0e8","mob"],["#ff4f62","apex"],[contentColors.resource,"resource"],[contentColors.portal,"portal"],[contentColors.site,"site"],[contentColors.diary,"writing"],[contentColors.traveller,"traveller"]];
+
+function title(value){return String(value).replace(/[-_]/g," ").replace(/\b\w/g,c=>c.toUpperCase())}
+function total(rows){return rows.reduce((sum,row)=>sum+row.quantity,0)}
+function renderCatalogue(){
+  const query=$("#sigil-search").value.trim().toLowerCase();
+  const visible=state.catalogue.filter(item=>`${item.name} ${item.id}`.toLowerCase().includes(query));
+  $("#sigil-list").innerHTML=visible.map(item=>`<label class="sigil-choice"><input type="checkbox" value="${item.id}" ${state.selected.has(item.id)?"checked":""}><span><strong>${item.name}</strong><small>${item.id}</small></span></label>`).join("");
+  $("#sigil-list").querySelectorAll("input").forEach(input=>input.addEventListener("change",()=>{input.checked?state.selected.add(input.value):state.selected.delete(input.value);renderSelection()}));
+}
+function renderSelection(){
+  const selected=state.catalogue.filter(item=>state.selected.has(item.id));
+  $("#selected-count").textContent=`${selected.length} sigil${selected.length===1?"":"s"}`;
+  $("#selected-sigils").innerHTML=selected.length?selected.map(item=>`<span class="sigil-chip">${item.name}</span>`).join(""):`<span class="muted">No authored sigils — all world pressures remain open to the seed.</span>`;
+  renderCatalogue();
+}
+function contentKind(value){return value.split(":")[0]}
+function drawMap(world){
+  const canvas=$("#world-map"),ctx=canvas.getContext("2d"),dpr=Math.max(1,window.devicePixelRatio||1),logical=720;
+  canvas.width=logical*dpr;canvas.height=logical*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,logical,logical);
+  const cell=logical/Math.max(world.width,world.height),ox=(logical-world.width*cell)/2,oy=(logical-world.height*cell)/2;
+  for(const tile of world.cells){const x=ox+tile.x*cell,y=oy+tile.y*cell;ctx.fillStyle=terrainColors[tile.ground]||"#777";ctx.fillRect(x,y,Math.ceil(cell),Math.ceil(cell));ctx.fillStyle=`rgba(255,255,255,${tile.elevation*.07})`;ctx.fillRect(x,y,Math.ceil(cell),Math.ceil(cell));if(tile.floraID){ctx.fillStyle="#78b85e";ctx.beginPath();ctx.arc(x+cell*.25,y+cell*.28,Math.max(1.5,cell*.1),0,Math.PI*2);ctx.fill()}const kind=contentKind(tile.content);if(kind!=="empty"){ctx.strokeStyle=contentColors[kind]||"#fff";ctx.fillStyle=contentColors[kind]||"#fff";ctx.lineWidth=Math.max(1.5,cell*.08);const cx=x+cell/2,cy=y+cell/2,r=Math.max(2.5,cell*.22);if(kind==="portal"){ctx.beginPath();ctx.moveTo(cx,cy-r);ctx.lineTo(cx+r,cy);ctx.lineTo(cx,cy+r);ctx.lineTo(cx-r,cy);ctx.closePath();ctx.stroke()}else if(kind==="site"||kind==="locked-cache"){ctx.strokeRect(cx-r,cy-r,r*2,r*2)}else{ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill()}}}
+  for(const marker of world.markers){const x=ox+(marker.x+.5)*cell,y=oy+(marker.y+.5)*cell;ctx.fillStyle=marker.kind==="apex"?"#ff4f62":marker.kind==="hostile-flora"?"#ee8d48":"#f4f0e8";ctx.beginPath();ctx.moveTo(x,y-cell*.3);ctx.lineTo(x+cell*.27,y+cell*.22);ctx.lineTo(x-cell*.27,y+cell*.22);ctx.closePath();ctx.fill();ctx.strokeStyle="#16161a";ctx.lineWidth=1;ctx.stroke()}
+  ctx.strokeStyle="#dce5df";ctx.lineWidth=Math.max(1.5,cell*.08);ctx.strokeRect(ox+world.entry.x*cell+cell*.12,oy+world.entry.y*cell+cell*.12,cell*.76,cell*.76);
+}
+function census(container,rows,{resources=false}={}){$(container).innerHTML=rows.length?`<div class="census-table">${rows.map(row=>`<div class="census-row"><span class="name">${title(row.id)}</span>${resources?`<span class="detail">${row.placements} placement${row.placements===1?"":"s"}</span>`:"<span></span>"}<strong>${row.quantity}</strong></div>`).join("")}</div>`:`<p class="empty-census">None spawned.</p>`}
+function metric(value,label){return `<div class="metric"><strong>${value}</strong><span>${label}</span></div>`}
+function renderWorld(index){
+  state.current=index;const world=state.worlds[index];if(!world)return;
+  $("#world-title").textContent=`Seed ${world.seed}`;$("#world-size").textContent=`${world.width}×${world.height}`;$("#download-json").disabled=false;drawMap(world);
+  const resourceQuantity=world.resources.reduce((sum,row)=>sum+row.quantity,0),floraTiles=total(world.flora),poi=total(world.pointsOfInterest);
+  $("#headline-metrics").innerHTML=metric(world.mobs.length?total(world.mobs):0,"mobs")+metric(floraTiles,"vegetated tiles")+metric(resourceQuantity,"obtainable resources")+metric(poi,"points of interest")+metric(world.diagnostics.initialTurnBudget,"initial turn budget")+metric(world.diagnostics.apexPlaced?"yes":"no","apex placed");
+  census("#flora-census",world.flora);census("#mob-census",world.mobs);census("#resource-census",world.resources,{resources:true});census("#poi-census",world.pointsOfInterest);census("#terrain-census",world.terrain);
+  const writing=[...world.writings,...world.travellers.map(id=>({id:`Traveller · ${id}`,quantity:1}))];census("#writing-census",writing);
+  $("#flora-total").textContent=`${floraTiles} tiles · ${world.diagnostics.floraSpeciesCount} species`;$("#mob-total").textContent=`${total(world.mobs)} placed · ${world.diagnostics.creatureSpeciesCount} species`;$("#resource-total").textContent=`${resourceQuantity} obtainable`;$("#poi-total").textContent=`${poi} placed`;$("#writing-total").textContent=`${total(writing)} records`;$("#terrain-total").textContent=`${world.width*world.height} tiles`;$("#census-grid").hidden=false;
+  $("#batch-results").querySelectorAll("button").forEach((button,i)=>button.setAttribute("aria-current",String(i===index)));
+}
+function renderBatch(){const panel=$("#batch-panel");panel.hidden=state.worlds.length<2;$("#batch-results").innerHTML=state.worlds.map((world,index)=>`<button class="batch-card" data-index="${index}" aria-current="${index===state.current}"><strong>Seed ${world.seed}</strong><span>${total(world.mobs)} mobs · ${total(world.flora)} vegetation</span><span>${world.resources.reduce((sum,row)=>sum+row.quantity,0)} resources · ${total(world.pointsOfInterest)} POIs</span></button>`).join("");$("#batch-results").querySelectorAll("button").forEach(button=>button.addEventListener("click",()=>renderWorld(Number(button.dataset.index))))}
+async function generate(){
+  const button=$("#generate"),status=$("#status");button.disabled=true;$("#generate-secondary").disabled=true;status.className="status busy";status.textContent="Generating with the live Swift rules… The first run may spend about 20 seconds building the bridge.";
+  try{const response=await fetch("/__worldgen",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({seed:Number($("#seed").value),scale:$("#scale").value,count:Number($("#batch").value),symbols:[...state.selected]})});const payload=await response.json();if(!response.ok)throw new Error(payload.error||"Generation failed");state.worlds=payload.worlds;state.current=0;renderBatch();renderWorld(0);status.className="status";status.textContent=`Generated ${state.worlds.length} live world${state.worlds.length===1?"":"s"}. Select a batch card to compare.`}catch(error){status.className="status error";status.textContent=error.message}finally{button.disabled=false;$("#generate-secondary").disabled=false}
+}
+function download(){const world=state.worlds[state.current];if(!world)return;const blob=new Blob([JSON.stringify(world,null,2)],{type:"application/json"}),link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download=`bookbinder-world-${world.seed}.json`;link.click();URL.revokeObjectURL(link.href)}
+$("#generate").addEventListener("click",generate);$("#generate-secondary").addEventListener("click",generate);$("#next-seed").addEventListener("click",()=>{$("#seed").value=Number($("#seed").value)+1;generate()});$("#random-seed").addEventListener("click",()=>{$("#seed").value=Math.floor(Math.random()*2_000_000_000);generate()});$("#clear-sigils").addEventListener("click",()=>{state.selected.clear();renderSelection()});$("#sigil-search").addEventListener("input",renderCatalogue);$("#download-json").addEventListener("click",download);window.addEventListener("resize",()=>state.worlds[state.current]&&drawMap(state.worlds[state.current]));
+fetch("/__worldgen/catalogue").then(response=>response.json()).then(payload=>{state.catalogue=payload.symbols.sort((a,b)=>a.name.localeCompare(b.name));renderSelection();$("#status").textContent="Ready. Choose sigils or leave the page open to the seed."}).catch(error=>{$("#status").className="status error";$("#status").textContent=error.message});
+$("#legend").innerHTML=legendEntries.map(([color,label])=>`<span class="legend-entry"><span class="legend-swatch" style="background:${color}"></span>${label}</span>`).join("");

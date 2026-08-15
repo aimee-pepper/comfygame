@@ -1,7 +1,8 @@
 # Bookbinder Asset Lab
 
-An isolated, dependency-free pixel-art authoring prototype. Nothing in this directory imports,
-builds, or modifies the game. Engineering can later consume approved exported contracts.
+An isolated pixel-art authoring prototype plus one read-only live gameplay tool. Asset proofs do
+not import or modify the game. The World Generator Tester compiles a local command-line bridge from
+the game's real Swift generation sources so its maps and spawn counts cannot drift from production.
 
 ## Run
 
@@ -14,6 +15,7 @@ Open `http://127.0.0.1:4173`.
 
 - Creature Lab: `http://127.0.0.1:4173/index.html`
 - World Lab: `http://127.0.0.1:4173/world.html`
+- Live World Generator Tester: `http://127.0.0.1:4173/world-generator-tester.html`
 - Golden Review: `http://127.0.0.1:4173/regression.html`
 - Combat Proof: `http://127.0.0.1:4173/combat.html`
 - Combat UI Proof: `http://127.0.0.1:4173/combat-ui.html`
@@ -26,6 +28,10 @@ cd AssetLab
 npm test
 npm run regression
 ```
+
+The first live-world generation builds a cached Swift bridge and can take roughly 20 seconds.
+Later generations reuse it and are fast. The cache is ignored by Git and automatically rebuilds
+when any included game-generation source changes.
 
 ## Phase-0 capabilities
 

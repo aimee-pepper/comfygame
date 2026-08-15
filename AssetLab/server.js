@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { basename, extname, join, normalize } from "node:path";
+import { generateLiveWorld, liveSymbolCatalogue } from "./src/live-worldgen-bridge.js";
 
 const root = new URL(".", import.meta.url).pathname;
 const port = 4173;
@@ -9,11 +10,38 @@ const types = {
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
-  ".png": "image/png"
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg"
 };
+
+async function body(request, limit = 100_000) {
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of request) {
+    size += chunk.length;
+    if (size > limit) throw new Error("Request too large");
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
 
 createServer(async (request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`),pathname = decodeURIComponent(url.pathname);
+  if(request.method==="GET"&&pathname==="/__worldgen/catalogue"){
+    try{response.writeHead(200,{"Content-Type":types[".json"]}).end(JSON.stringify({symbols:await liveSymbolCatalogue()}));}
+    catch(error){response.writeHead(500,{"Content-Type":types[".json"]}).end(JSON.stringify({error:String(error.message??error)}));}return;
+  }
+  if(request.method==="POST"&&pathname==="/__worldgen"){
+    try{
+      const payload=JSON.parse((await body(request)).toString());
+      const start=Number(payload.seed),count=Math.min(12,Math.max(1,Number(payload.count)||1));
+      const scales=new Set(["minute","small","ordinary","large","vast"]);
+      if(!Number.isSafeInteger(start)||start<0||!Array.isArray(payload.symbols)||!payload.symbols.every(value=>typeof value==="string")||!scales.has(payload.scale)){response.writeHead(400).end("Invalid world request");return;}
+      const worlds=await Promise.all(Array.from({length:count},(_,index)=>generateLiveWorld({seed:start+index,symbols:payload.symbols,scale:payload.scale})));
+      response.writeHead(200,{"Content-Type":types[".json"]}).end(JSON.stringify({worlds}));
+    }catch(error){response.writeHead(500,{"Content-Type":types[".json"]}).end(JSON.stringify({error:String(error.message??error)}));}return;
+  }
   if(request.method==="POST"&&pathname==="/__artifact"){
     const requested=basename(url.searchParams.get("name")??"");
     if(!/^[a-zA-Z0-9._-]+\.png$/.test(requested)){response.writeHead(400).end("Invalid PNG filename");return;}

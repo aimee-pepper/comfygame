@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bookbinder World Generator Tester</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="world-generator-tester.css">
+</head>
+<body>
+  <nav class="tool-nav" aria-label="AssetLab tools"><a href="index.html">Creatures</a><a href="world.html">World &amp; Flora</a><a href="world-generator-tester.html">World Generator</a><a href="places.html">Places</a><a href="characters.html">Characters</a><a href="full-cast.html">Full Cast</a><a href="resources.html">Resources</a><a href="equipment.html">Items</a><a href="trading.html">Trading Post</a><a href="reporter.html">Bug Reporter</a><a href="noll.html">Noll Review</a><a href="bridge.html">Economy Bridge</a><a href="combat.html">Combat</a><a href="combat-ui.html">Combat UI</a><a href="campaigns.html">Campaigns</a><a href="launch.html">App Launch</a><a href="splashes.html">Splashes</a><a href="regression.html">Golden Review</a></nav>
+  <header>
+    <div><p class="eyebrow">Bookbinder · live gameplay tool</p><h1>World Generator Tester</h1><p class="subtitle">Generate with the game’s real Swift rules, reveal everything, and inspect what actually spawned.</p></div>
+    <div class="header-actions"><button id="next-seed">Next seed</button><button id="random-seed">Random seed</button><button id="generate" class="primary">Generate world</button></div>
+  </header>
+  <main class="worldgen-shell">
+    <aside class="panel worldgen-controls">
+      <div class="panel-heading"><div><p class="eyebrow">World input</p><h2>Draft</h2></div><span id="selected-count" class="hash">0 sigils</span></div>
+      <div class="control-grid">
+        <label><span>Seed</span><input id="seed" type="number" min="0" step="1" value="42"></label>
+        <label><span>Scale</span><select id="scale"><option value="minute">Minute · 12×12</option><option value="small">Small · 15×15</option><option value="ordinary" selected>Ordinary · 18×18</option><option value="large">Large · 23×23</option><option value="vast">Vast · 28×28</option></select></label>
+        <label><span>Generate</span><select id="batch"><option value="1">1 world</option><option value="4">4 consecutive seeds</option><option value="8">8 consecutive seeds</option><option value="12">12 consecutive seeds</option></select></label>
+      </div>
+      <div class="selected-sigils" id="selected-sigils"><span class="muted">No authored sigils — all world pressures remain open to the seed.</span></div>
+      <div class="sigil-heading"><label><span>Find sigils</span><input id="sigil-search" type="search" placeholder="Search name or ID"></label><button id="clear-sigils">Clear</button></div>
+      <div id="sigil-list" class="sigil-list" aria-label="Available sigils"></div>
+      <button id="generate-secondary" class="primary wide">Generate</button>
+      <p id="status" class="status" aria-live="polite">Loading the live sigil catalogue…</p>
+      <details><summary>What this tool guarantees</summary><p>Terrain, flora, creatures, resources, sites, writing, travellers, apex placement and diagnostics come from the same <code>Worldgen.generate</code> implementation used by the app. Only fog is overridden: this tester deliberately reveals the complete result.</p></details>
+    </aside>
+
+    <section class="worldgen-workspace">
+      <section class="panel current-world">
+        <div class="panel-heading"><div><p class="eyebrow">Complete reveal</p><h2 id="world-title">Generate a world</h2></div><div class="header-actions"><span id="world-size" class="hash"></span><button id="download-json" disabled>Snapshot JSON</button></div></div>
+        <div class="world-overview">
+          <div class="map-column"><div class="world-map-stage"><canvas id="world-map" width="720" height="720" aria-label="Fully revealed generated world map"></canvas></div><div id="legend" class="map-legend"></div></div>
+          <div class="summary-column">
+            <div id="headline-metrics" class="headline-metrics"></div>
+            <article class="splash-slot" id="splash-slot"><p class="eyebrow">Entry splash</p><h3>Awaiting generated-shot pipeline</h3><p>The live world snapshot is ready. When the entry-shot generator is complete, its output will appear here for the same seed and sigils.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel batch-panel" id="batch-panel" hidden>
+        <div class="panel-heading"><div><p class="eyebrow">Rapid comparison</p><h2>Generated batch</h2></div><span>Choose any card to inspect its full map.</span></div>
+        <div id="batch-results" class="batch-results"></div>
+      </section>
+
+      <section class="census-grid" id="census-grid" hidden>
+        <article class="panel census-card"><div class="panel-heading"><h2>Vegetation</h2><span id="flora-total"></span></div><div id="flora-census"></div></article>
+        <article class="panel census-card"><div class="panel-heading"><h2>Mobs</h2><span id="mob-total"></span></div><div id="mob-census"></div></article>
+        <article class="panel census-card"><div class="panel-heading"><h2>Resources</h2><span id="resource-total"></span></div><div id="resource-census"></div></article>
+        <article class="panel census-card"><div class="panel-heading"><h2>Points of interest</h2><span id="poi-total"></span></div><div id="poi-census"></div></article>
+        <article class="panel census-card"><div class="panel-heading"><h2>Writing &amp; people</h2><span id="writing-total"></span></div><div id="writing-census"></div></article>
+        <article class="panel census-card"><div class="panel-heading"><h2>Terrain</h2><span id="terrain-total"></span></div><div id="terrain-census"></div></article>
+      </section>
+    </section>
+  </main>
+  <script type="module" src="src/world-generator-tester-app.js"></script>
+</body>
+</html>
