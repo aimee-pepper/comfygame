@@ -417,8 +417,8 @@
       "id": "item-character-identities",
       "priority": "P1",
       "title": "Recognizable item and character tiles",
-      "status": "queued",
-      "detail": "Checkpoint 0911e2c freezes strict generated command/raster validation and carries stable ItemID through Storehouse, loot, equipment, Blacksmith and Trading Post. Existing fallbacks remain until Aimee provides the immutable catalogue-items-v1 art/registry.",
+      "status": "readyToTest",
+      "detail": "This source checkpoint freezes strict generated command/raster validation and carries stable ItemID through Storehouse, loot, equipment, Blacksmith, Trading Post and Recycler. Exact TravellerID selects the immutable map sprite as well as Party and Library cameos; missing, unknown, generated, Binder and Quill identities retain explicit visible fallbacks.",
       "gate": "Stable authored identity survives Storehouse, loot, equipment, Trading Post and Recycler; named-character identity survives map, Party and Library; rarity, stats and array order never invent identity.",
       "workstream": "asset",
       "isPrimary": true

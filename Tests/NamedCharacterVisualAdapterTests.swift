@@ -262,6 +262,22 @@ final class NamedCharacterVisualAdapterTests: XCTestCase {
                       "Neither bundle resource name may bypass immutable pack validation")
     }
 
+    func testMapPartyAndLibraryConsumePersistedTravellerIdentity() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let map = try String(contentsOf: root.appending(path: "Sources/Screens/WorldView.swift"), encoding: .utf8)
+        let party = try String(contentsOf: root.appending(path: "Sources/Screens/PartyRosterView.swift"), encoding: .utf8)
+        let library = try String(contentsOf: root.appending(path: "Sources/Screens/LibraryView.swift"), encoding: .utf8)
+        let identity = try String(contentsOf: root.appending(path: "Sources/Screens/NamedCharacterPixelIdentity.swift"), encoding: .utf8)
+
+        XCTAssertTrue(map.contains("NamedCharacterMapPixelIdentity("))
+        XCTAssertTrue(map.contains("travellerID: travellerID"))
+        XCTAssertTrue(identity.contains("mapSpriteAsset(for: travellerID, facing: facing)"))
+        XCTAssertTrue(identity.contains("Image(systemName: fallbackSystemIcon)"))
+        XCTAssertTrue(party.contains("store.state.base.roster[index].traveller"))
+        XCTAssertTrue(library.contains("travellerID: traveller.id"))
+    }
+
     func testGearAnchoredPaneKeepsEquipVisibleAndComparesAgainstWornPiece() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()

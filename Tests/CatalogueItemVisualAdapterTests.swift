@@ -73,4 +73,22 @@ final class CatalogueItemVisualAdapterTests: XCTestCase {
             XCTAssertNoThrow(try NativeVisualRuntime.validate(asset), item.id.rawValue)
         }
     }
+
+    func testExactCatalogueIdentityReachesEveryAcceptedItemSurface() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let expectations: [(String, [String])] = [
+            ("Sources/Screens/StationViews.swift", ["catalogueID: stack.catalogID"]),
+            ("Sources/Screens/LootDecisionView.swift", ["catalogueID: offered.catalogID", "catalogueID: carried.catalogID"]),
+            ("Sources/Screens/GearView.swift", ["itemID: piece.catalogID"]),
+            ("Sources/Screens/TradingPostView.swift", ["catalogueID: listing.catalogueItemID", "authoredCatalogueItemID: id"]),
+            ("Sources/Screens/RecyclerView.swift", ["catalogueID: preview.snapshot.catalogID"]),
+        ]
+        for (path, required) in expectations {
+            let source = try String(contentsOf: root.appending(path: path), encoding: .utf8)
+            for token in required {
+                XCTAssertTrue(source.contains(token), "\(path) must preserve exact identity via \(token)")
+            }
+        }
+    }
 }

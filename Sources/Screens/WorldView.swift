@@ -1217,7 +1217,17 @@ private struct TileView: View {
                         .stroke(Color.orange, style: StrokeStyle(lineWidth: max(2, side * 0.08), dash: [3, 2]))
                         .padding(side * 0.08)
                 }
-                if let symbol {
+                if case .traveller(let travellerID) = tile.content,
+                   visibility == .full, tile.isRevealed, !tile.isCrumbled {
+                    let traveller = ContentCatalog.shared.traveller(travellerID)
+                    NamedCharacterMapPixelIdentity(
+                        travellerID: travellerID,
+                        facing: .south,
+                        fallbackSystemIcon: traveller?.icon ?? "figure.wave",
+                        fallbackColor: .green
+                    )
+                    .frame(width: side * 0.72, height: side * 0.72)
+                } else if let symbol {
                     Image(systemName: symbol)
                         .font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
                         .foregroundStyle(tint)
@@ -1299,8 +1309,8 @@ private struct TileView: View {
         case .diaryPage: return "doc.text"
         case .foundWriting: return "note.text"
         case .site: return site?.icon ?? "building.columns"
-        // A person reads as a person, in their own colour — see `tint`.
-        case .traveller(let id): return ContentCatalog.shared.traveller(id)?.icon ?? "figure.wave"
+        // Named travellers are rendered by exact persisted identity in `body`.
+        case .traveller: return nil
         }
     }
 

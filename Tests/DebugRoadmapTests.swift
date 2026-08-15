@@ -12,7 +12,8 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertEqual(Set(board.items.map(\.id)).count, board.items.count,
                        "roadmap item IDs must remain stable and unique")
         XCTAssertTrue(board.validationErrors().isEmpty)
-        XCTAssertEqual(board.currentItems.first?.id, "encounter-scaling")
+        XCTAssertTrue(board.currentItems.contains { $0.id == "encounter-scaling" })
+        XCTAssertTrue(board.currentItems.contains { $0.id == "item-character-identities" })
         XCTAssertEqual(board.campaignBands.first?.id, "band-0")
         XCTAssertEqual(board.campaignBands.last?.id, "band-7")
         XCTAssertEqual(Set(board.campaignBands.flatMap(\.itemIDs)),
