@@ -78,6 +78,21 @@ struct EncounterScalingProgressionReceipt: Equatable, Sendable {
     var wholePressureSlots: Int
     var totalHPAdditionFraction: Double
     var scalingRulesVersion: String
+
+    var phoneSummaryLines: [String] {
+        let party = partyLevels.map(String.init).joined(separator: " / ")
+        let foes = zip(foeLevels, foeHP).map { "L\($0.0) · \($0.1) HP" }
+            .joined(separator: ", ")
+        let allocation = hpAllocationByFoeID.values.reduce(0, +)
+        let pressure = String(format: "%.3f", locale: Locale(identifier: "en_US_POSIX"),
+                              cappedPartyPowerBudget)
+        return [
+            "Party levels \(party)",
+            "Pressure \(pressure) · radius \(groupingRadius)",
+            "Foe \(foes)",
+            "Allocation +\(allocation) HP · \(wholePressureSlots) pressure slot\(wholePressureSlots == 1 ? "" : "s")"
+        ]
+    }
 }
 
 @MainActor
@@ -97,10 +112,15 @@ final class EncounterScalingProgressionFixtureSession: ObservableObject, Identif
     let id = UUID()
     let kind: EncounterScalingProgressionFixtureKind
     let store: GameStore
+    let receipt: EncounterScalingProgressionReceipt
 
     init(kind: EncounterScalingProgressionFixtureKind) throws {
         self.kind = kind
-        store = try GameStore.makeEncounterScalingProgressionFixture(kind: kind)
+        let fixture = try GameStore.makeEncounterScalingProgressionFixture(kind: kind)
+        guard let frozen = GameStore.progressionReceipt(kind: kind, rootSeed: 101, from: fixture)
+        else { throw EncounterScalingPhoneFixtureError.invalidEncounter }
+        store = fixture
+        receipt = frozen
     }
 }
 

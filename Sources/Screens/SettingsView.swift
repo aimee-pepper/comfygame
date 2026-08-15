@@ -998,6 +998,21 @@ private struct EncounterScalingPhoneAcceptanceView: View {
         .fullScreenCover(item: $progressionSession) { fixture in
             ZStack(alignment: .topTrailing) {
                 RootView().environmentObject(fixture.store)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Frozen scaling receipt").font(.caption.bold())
+                    ForEach(fixture.receipt.phoneSummaryLines, id: \.self) { line in
+                        Text(line).font(.caption2.monospacedDigit())
+                    }
+                }
+                .padding(10)
+                .background(.black.opacity(0.82), in: RoundedRectangle(cornerRadius: 10))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 52)
+                .padding(.horizontal, 10)
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("progression-scaling-receipt")
+                .zIndex(19_999)
                 Button { progressionSession = nil } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)

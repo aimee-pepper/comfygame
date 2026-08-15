@@ -99,6 +99,26 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         for receipt in receipts { print("SCALING_PROGRESSION \(receipt)") }
     }
 
+    func testProgressionPhoneReceiptNamesOnlyFrozenRulesAuthority() throws {
+        let solo = try EncounterScalingProgressionFixtureSession(kind: .experiencedSolo)
+        XCTAssertEqual(solo.receipt.phoneSummaryLines, [
+            "Party levels 8",
+            "Pressure 1.000 · radius 1",
+            "Foe L6 · 18 HP",
+            "Allocation +0 HP · 0 pressure slots"
+        ])
+
+        let party = try EncounterScalingProgressionFixtureSession(kind: .experiencedParty)
+        XCTAssertEqual(party.receipt.phoneSummaryLines, [
+            "Party levels 8 / 8 / 6 / 4",
+            "Pressure 2.275 · radius 2",
+            "Foe L6 · 22 HP",
+            "Allocation +4 HP · 1 pressure slot"
+        ])
+        XCTAssertEqual(party.receipt, try XCTUnwrap(GameStore.progressionReceipt(
+            kind: .experiencedParty, rootSeed: 101, from: party.store)))
+    }
+
     func testFreshBinderAndQuillNormalVersusTeemingDiagnosticDistribution() throws {
         let roots: [UInt64] = [101, 202, 303, 404, 505, 606, 707, 808, 909, 1_010, 1_111, 1_212]
         let normal = try roots.prefix(6).map { try openingSample(rootSeed: $0, teeming: false) }
