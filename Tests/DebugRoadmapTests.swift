@@ -105,6 +105,22 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertEqual(primaries[.acceptance]?.map(\.id), ["encounter-scaling"])
     }
 
+    func testEncounterScalingRecordsAcceptedPhoneEvidenceAndRemainingMatrix() throws {
+        let scaling = try XCTUnwrap(DebugRoadmap.current.items.first {
+            $0.id == "encounter-scaling"
+        })
+        XCTAssertEqual(scaling.status, .inProgress)
+        XCTAssertEqual(scaling.workstream, .acceptance)
+        XCTAssertTrue(scaling.isPrimary)
+        XCTAssertTrue(scaling.detail.contains("fresh level-1"))
+        XCTAssertTrue(scaling.detail.contains("Normal contacts as balanced"))
+        XCTAssertTrue(scaling.detail.contains("Teeming is intentionally overwhelming"))
+        XCTAssertTrue(scaling.detail.contains("damaging flora"))
+        XCTAssertTrue(scaling.gate.contains("player level"))
+        XCTAssertTrue(scaling.gate.contains("party count"))
+        XCTAssertTrue(scaling.gate.contains("party-member levels"))
+    }
+
     func testWorldPageWorkFollowsReachabilityAndDoesNotPreemptScaling() throws {
         let board = DebugRoadmap.current
         let bands = Dictionary(uniqueKeysWithValues: board.campaignBands.map { ($0.id, $0.itemIDs) })
