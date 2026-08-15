@@ -220,7 +220,8 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         let legacy = WorldRules.encounterGroup(triggeredBy: trigger, in: run,
                                                partyCount: 5, adaptiveRadius: false)
         let additive = WorldRules.encounterGroup(triggeredBy: trigger, in: run,
-                                                 partyCount: 5, adaptiveRadius: true)
+                                                 partyCount: 5, adaptiveRadius: true,
+                                                 partySightBonus: 10)
         XCTAssertEqual(legacy.foes.map(\.id), [trigger.id])
         XCTAssertEqual(legacy.exclusionReasons["2"], "outside historical radius 1")
         XCTAssertEqual(additive.foes.map(\.id), [trigger.id, distant.id])
@@ -238,22 +239,23 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         for y in 0..<3 { run.map[GridPoint(x: 3, y: y)].ground = .chasm }
 
         let trigger = enemy(100, 0, 1)
-        let stableTieFirst = enemy(10, 2, 1)
+        let fartherVisible = enemy(10, 2, 1)
         let nearer = enemy(30, 1, 1)
         let beyondWall = enemy(5, 4, 1)
         var asleep = enemy(6, 1, 2); asleep.isAwake = false
-        var hidden = enemy(7, 2, 0)
+        var brokenCover = enemy(7, 2, 0)
         var crypsis = CreatureTraits(); crypsis.defence = .crypsis
-        hidden.traits = crypsis
-        run.enemies = [beyondWall, stableTieFirst, asleep, trigger, hidden, nearer]
+        brokenCover.traits = crypsis
+        run.enemies = [beyondWall, fartherVisible, asleep, trigger, brokenCover, nearer]
 
-        let selection = WorldRules.encounterGroup(triggeredBy: trigger, in: run, partyCount: 5)
+        let selection = WorldRules.encounterGroup(triggeredBy: trigger, in: run,
+                                                  partyCount: 5, partySightBonus: 10)
         XCTAssertEqual(selection.radius, 3)
-        XCTAssertEqual(selection.foes.map(\.id), [100, 30].map { InstanceID(rawValue: UInt64($0)) })
-        XCTAssertEqual(selection.exclusionReasons["5"], "not legitimately visible")
+        XCTAssertEqual(selection.foes.map(\.id), [100, 30, 10].map { InstanceID(rawValue: UInt64($0)) })
+        XCTAssertEqual(selection.exclusionReasons["5"], "outside passable radius 3")
         XCTAssertEqual(selection.exclusionReasons["6"], "asleep")
-        XCTAssertEqual(selection.exclusionReasons["7"], "not legitimately visible")
-        XCTAssertEqual(selection.exclusionReasons["10"], "not legitimately visible")
+        XCTAssertEqual(selection.exclusionReasons["7"], "eligible after three-foe cap")
+        XCTAssertNil(selection.exclusionReasons["10"])
     }
 
     func testPressureHPAllocationIsExactStableAndOrderIndependent() {
