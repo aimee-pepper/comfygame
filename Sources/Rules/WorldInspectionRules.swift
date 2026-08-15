@@ -9,7 +9,8 @@ extension WorldRules {
 
     /// Read-only adjacent inspection. This deliberately accepts the run by value and returns prose;
     /// unlike `step`, it cannot reveal, wake, collect, move, spend Stability or advance a turn.
-    static func inspect(_ point: GridPoint, in run: WorldRun) -> TileInspection {
+    static func inspect(_ point: GridPoint, in run: WorldRun,
+                        base: BaseState? = nil) -> TileInspection {
         guard run.map.contains(point) else {
             return TileInspection(heading: "World boundary", details: ["There is no tile there."])
         }
@@ -30,12 +31,16 @@ extension WorldRules {
         if tile.isCracking { details.append("cracks warn that it may crumble") }
 
         if let plant = run.plant(at: point) {
+            details.append(floraAppearanceLabel(plant.traits))
             let harm = FloraRules.harm(of: plant.traits,
                                        severity: run.tuning.floraHazardSeverityMultiplier)
             if plant.traits.isDefended {
                 details.append(floraEntryWarning(plant.traits.defenceType))
-            } else {
-                details.append(harm.isSomething ? "Entering may be harmful" : "Visible growth")
+            } else if harm.isSomething {
+                details.append("Entering may be harmful")
+            }
+            if base?.station(Stations.wayfarersTable).isUnlocked == true {
+                details.append(floraFieldNote(for: plant, in: run))
             }
         }
 
@@ -49,10 +54,35 @@ extension WorldRules {
 
     static func floraEntryWarning(_ defence: DefenceType) -> String {
         switch defence {
-        case .physical: "Visible barbs. Entering will hurt the party"
+        case .physical: "Entering will hurt the party"
         case .chemical: "Entering carries a lingering hazard"
         case .active: "Entering will start an encounter"
         }
+    }
+
+    static func floraAppearanceLabel(_ traits: FloraTraits) -> String {
+        guard traits.isDefended else { return "Visible growth" }
+        return switch traits.defenceType {
+        case .physical: "Thorn growth"
+        case .chemical: "Visible growth"
+        case .active: "Coiled growth"
+        }
+    }
+
+    static func floraFieldNote(for plant: Flora, in run: WorldRun) -> String {
+        let name = run.floraNames[plant.id]?.name ?? plant.displayName
+        let family: String = if !plant.traits.isDefended {
+            "unguarded"
+        } else {
+            switch plant.traits.defenceType {
+            case .physical: "barbed"
+            case .chemical: "chemical"
+            case .active: "active"
+            }
+        }
+        let resource = FloraRules.yield(of: plant.traits)
+        let yieldName = ContentCatalog.shared.resource(resource)?.name ?? resource.rawValue.capitalized
+        return "Sela's field note · \(name) · \(family) · yields \(yieldName)"
     }
 
     private static func visibleContent(_ content: TileContent, in run: WorldRun) -> String? {

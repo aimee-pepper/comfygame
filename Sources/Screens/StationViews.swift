@@ -237,6 +237,8 @@ struct WayfarersTableView: View {
                                value: "\(store.state.base.satchelCapacity) slots")
                     LabeledRow(icon: "leaf.fill", label: "Organic harvests",
                                value: "+\(Tuning.Economy.fieldcraftOrganicYieldBonus) each")
+                    LabeledRow(icon: "eye.fill", label: "Visible flora",
+                               value: "identified on sight")
                     Text("Sela leaves routes, provisions and field notes here for whoever goes next. The table is useful precisely because nobody has to remain behind it.")
                         .font(.caption).foregroundStyle(.secondary)
                 }

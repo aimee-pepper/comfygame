@@ -441,7 +441,8 @@ struct WorldView: View {
                 let point = GridPoint(x: run.playerPosition.x + direction.dx,
                                       y: run.playerPosition.y + direction.dy)
                 if isLookArmed {
-                    inspection = InspectionPresentation(value: WorldRules.inspect(point, in: run))
+                    inspection = InspectionPresentation(value: WorldRules.inspect(
+                        point, in: run, base: store.state.base))
                     isLookArmed = false
                 } else {
                     store.step(to: point)
