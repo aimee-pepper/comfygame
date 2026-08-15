@@ -437,9 +437,9 @@
       "id": "combat-tree-opening-choices",
       "priority": "B3.7",
       "title": "First three combat-point choices",
-      "status": "queued",
-      "detail": "Implement and phone-test only the roots and forks a real early campaign can buy with its first three earned points. Deeper unsupported nodes remain unavailable rather than inert.",
-      "gate": "A level-appropriate fresh campaign can make three genuine branching purchases; every visible choice mutates play, prerequisites are truthful, migration loses no points, and the graph never becomes a buy-next list.",
+      "status": "readyToTest",
+      "detail": "Source checkpoints 13bb6ec, 825a8a2 and 3932c7e implement the first three earned-point roots and forks with typed ownership, current-companion dispatch and stable migration. Deeper unsupported nodes remain unavailable rather than inert.",
+      "gate": "Phone-test the three genuine branching purchases from a level-appropriate fresh campaign. Automated authority is green at 24/24 focused opening-choice tests and 200/200 full CombatTests: every visible choice mutates play, prerequisites are truthful, migration loses no points, and the graph never becomes a buy-next list.",
       "workstream": "engineering",
       "isPrimary": false
     },
