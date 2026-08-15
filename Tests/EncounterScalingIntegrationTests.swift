@@ -3,6 +3,31 @@ import XCTest
 
 @MainActor
 final class EncounterScalingIntegrationTests: XCTestCase {
+    func testPhonePairUsesDisposableExactIsolatedProductionEncounters() throws {
+        for kind in EncounterScalingPhoneFixtureKind.allCases {
+            let store = try GameStore.makeEncounterScalingPhoneFixture(kind: kind)
+            let run = try XCTUnwrap(store.activeRun)
+            let encounter = try XCTUnwrap(run.activeEncounter)
+            let preview = try XCTUnwrap(encounter.scalingPreview)
+
+            XCTAssertTrue(store.diagnostics.saveURL.path.contains("phone-scaling-"))
+            XCTAssertEqual(try XCTUnwrap(run.healthCaps).map(\.maximum).reduce(0, +), 54)
+            XCTAssertGreaterThan(run.binderHP + run.companionHP.values.reduce(0, +), 0)
+            XCTAssertLessThanOrEqual(run.binderHP + run.companionHP.values.reduce(0, +), 54)
+            XCTAssertTrue(store.state.base.binderEquipped.isEmpty)
+            XCTAssertTrue(store.state.base.roster[0].equipped.isEmpty)
+            XCTAssertEqual(encounter.foes.count, 1)
+            XCTAssertEqual(encounter.foes[0].identityKey, "grazer")
+            XCTAssertEqual(encounter.foes[0].level, 1)
+            XCTAssertEqual(preview.partyCount, 2)
+            XCTAssertEqual(preview.anchorLevel, 1)
+            XCTAssertEqual(preview.cappedPartyPowerBudget, 1.5)
+            XCTAssertEqual(preview.scalingRulesVersion,
+                           EncounterScalingRules.additivePartyPowerRulesVersion)
+            XCTAssertNotNil(DebugEncounterScalingEvidence.capture(from: store.state))
+        }
+    }
+
     func testFreshBinderAndQuillNormalVersusTeemingDiagnosticDistribution() throws {
         let roots: [UInt64] = [101, 202, 303, 404, 505, 606, 707, 808, 909, 1_010, 1_111, 1_212]
         let normal = try roots.prefix(6).map { try openingSample(rootSeed: $0, teeming: false) }
@@ -153,10 +178,11 @@ final class EncounterScalingIntegrationTests: XCTestCase {
 
         let selection = WorldRules.encounterGroup(triggeredBy: trigger, in: run, partyCount: 5)
         XCTAssertEqual(selection.radius, 3)
-        XCTAssertEqual(selection.foes.map(\.id), [100, 30, 10].map { InstanceID(rawValue: UInt64($0)) })
-        XCTAssertEqual(selection.exclusionReasons["5"], "outside passable radius 3")
+        XCTAssertEqual(selection.foes.map(\.id), [100, 30].map { InstanceID(rawValue: UInt64($0)) })
+        XCTAssertEqual(selection.exclusionReasons["5"], "not legitimately visible")
         XCTAssertEqual(selection.exclusionReasons["6"], "asleep")
-        XCTAssertEqual(selection.exclusionReasons["7"], "eligible after three-foe cap")
+        XCTAssertEqual(selection.exclusionReasons["7"], "not legitimately visible")
+        XCTAssertEqual(selection.exclusionReasons["10"], "not legitimately visible")
     }
 
     func testPressureHPAllocationIsExactStableAndOrderIndependent() {

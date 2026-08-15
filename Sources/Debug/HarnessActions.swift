@@ -1,5 +1,121 @@
 import Foundation
 
+#if DEBUG
+enum EncounterScalingPhoneFixtureKind: String, Identifiable, CaseIterable, Sendable {
+    case normal
+    case teeming
+
+    var id: String { rawValue }
+    var title: String { self == .normal ? "Normal · isolated grazer" : "Teeming · isolated grazer" }
+    var detail: String {
+        self == .normal
+            ? "Automated control: 3 rounds · 7 of 54 HP spent"
+            : "Automated control: 2 rounds · 8 of 54 HP spent"
+    }
+}
+
+enum EncounterScalingPhoneFixtureError: Error, LocalizedError {
+    case couldNotWritePage
+    case couldNotBind
+    case missingRun
+    case missingEnemy
+    case invalidEncounter
+
+    var errorDescription: String? {
+        switch self {
+        case .couldNotWritePage: "The fixture could not write its controlled Page."
+        case .couldNotBind: "The fixture could not bind its controlled world."
+        case .missingRun: "The fixture did not create an expedition."
+        case .missingEnemy: "The controlled world did not contain its expected contact."
+        case .invalidEncounter: "The controlled contact did not freeze as one level-one foe."
+        }
+    }
+}
+
+@MainActor
+final class EncounterScalingPhoneFixtureSession: ObservableObject, Identifiable {
+    let id = UUID()
+    let kind: EncounterScalingPhoneFixtureKind
+    let store: GameStore
+
+    init(kind: EncounterScalingPhoneFixtureKind) throws {
+        self.kind = kind
+        store = try GameStore.makeEncounterScalingPhoneFixture(kind: kind)
+    }
+}
+
+extension GameStore {
+    /// A disposable phone-play fixture. It uses the same production world generation, scaling,
+    /// combat actions and bug-report receipt as a campaign, but its temporary persistence URL can
+    /// never read or overwrite a campaign slot.
+    static func makeEncounterScalingPhoneFixture(
+        kind: EncounterScalingPhoneFixtureKind,
+        rootSeed: UInt64 = 101
+    ) throws -> GameStore {
+        let store = GameStore(io: .temporary(
+            name: "phone-scaling-\(kind.rawValue)-\(rootSeed)-\(UUID().uuidString)"))
+        store.mutate("freeze phone scaling fixture") { state in
+            state.worlds.seeds = SeedSequence(rootSeed: rootSeed)
+            state.base.binderCharacter = CharacterState(rank: .front)
+            state.base.binderEquipped = [:]
+            var quill = CompanionState()
+            quill.maxHP = Tuning.Encounter.companionMaxHP
+            quill.character = CharacterState(rank: .front)
+            quill.gambits = GambitStarter.rules
+            quill.equipped = [:]
+            state.base.roster = [quill]
+            state.base.activeParty = [0]
+        }
+        guard store.write("plains") else {
+            throw EncounterScalingPhoneFixtureError.couldNotWritePage
+        }
+        if kind == .teeming, !store.write("teeming_life") {
+            throw EncounterScalingPhoneFixtureError.couldNotWritePage
+        }
+        guard store.bindAndDepart() else {
+            throw EncounterScalingPhoneFixtureError.couldNotBind
+        }
+        guard store.activeRun != nil else { throw EncounterScalingPhoneFixtureError.missingRun }
+
+        store.mutate("stage disclosed isolated phone contact", flush: true) { state in
+            guard var run = state.worlds.activeRun, !run.enemies.isEmpty else { return }
+            run.tuning = .defaults
+            run.binderHP = Tuning.Encounter.binderMaxHP
+            run.companionHP = [0: Tuning.Encounter.companionMaxHP]
+            run.healthCaps = [
+                RunHealthCapEntry(member: .binder,
+                                  ordinaryMaximum: Tuning.Encounter.binderMaxHP, components: []),
+                RunHealthCapEntry(member: .member(0),
+                                  ordinaryMaximum: Tuning.Encounter.companionMaxHP, components: [])
+            ]
+            run.rng = SeededRNG(seed: run.mapSeed).derived(0xA11CE)
+            for point in run.map.allPoints { run.map[point].isRevealed = true }
+            for index in run.enemies.indices { run.enemies[index].isAwake = true }
+            let trigger = run.enemies.min {
+                let lhs = abs($0.position.x - run.playerPosition.x)
+                    + abs($0.position.y - run.playerPosition.y)
+                let rhs = abs($1.position.x - run.playerPosition.x)
+                    + abs($1.position.y - run.playerPosition.y)
+                return lhs == rhs ? $0.id.rawValue < $1.id.rawValue : lhs < rhs
+            }
+            guard let trigger else { return }
+            state.worlds.activeRun = run
+            WorldRules.beginEncounter(triggeredBy: trigger, runsAutomaticTurns: false, in: &state)
+            CombatRules.runAutomaticTurns(in: &state)
+        }
+
+        guard let encounter = store.activeEncounter,
+              encounter.foes.count == 1,
+              encounter.foes[0].level == 1,
+              encounter.foes[0].identityKey == "grazer",
+              encounter.scalingPreview?.partyCount == 2,
+              encounter.scalingPreview?.cappedPartyPowerBudget == 1.5
+        else { throw EncounterScalingPhoneFixtureError.invalidEncounter }
+        return store
+    }
+}
+#endif
+
 /// The last of the stand-ins.
 ///
 /// Milestone 2 made binding real, milestone 3 the world, milestone 4 combat. All that's left is a

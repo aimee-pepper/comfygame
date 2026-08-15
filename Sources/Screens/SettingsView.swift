@@ -481,6 +481,11 @@ struct BalancingView: View {
                 }
                 Text("Recommended anchors level to the Binder, adds only visible reachable foes, and freezes additive party pressure plus apex tempo when combat opens. Legacy, Reserved and Pressing remain historical DEBUG comparisons.")
                     .font(.caption).foregroundStyle(.secondary)
+#if DEBUG
+                NavigationLink("Open level-one Normal / Teeming phone pair") {
+                    EncounterScalingPhoneAcceptanceView()
+                }
+#endif
                 resetSection("Creatures") {
                     settings.debugTuning.creatureDensityMultiplier = 1
                     settings.debugTuning.apexChanceMultiplier = 1
@@ -920,6 +925,62 @@ struct BalancingView: View {
             .font(.caption)
     }
 }
+
+#if DEBUG
+private struct EncounterScalingPhoneAcceptanceView: View {
+    @State private var session: EncounterScalingPhoneFixtureSession?
+    @State private var error: String?
+
+    var body: some View {
+        List {
+            Section("Controlled pair") {
+                Text("Both disposable fixtures use root 101, a fresh level-one Binder and Quill, no equipped weapons, Recommended scaling, full expedition HP and one disclosed level-one grazer. They never read or write a campaign slot.")
+                    .font(.callout)
+                ForEach(EncounterScalingPhoneFixtureKind.allCases) { kind in
+                    Button {
+                        do { session = try EncounterScalingPhoneFixtureSession(kind: kind) }
+                        catch { self.error = error.localizedDescription }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(kind.title).font(.headline)
+                            Text(kind.detail).font(.caption).foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    }
+                }
+            }
+            Section("Capture") {
+                Text("Use the red bug button at the opening and again immediately before the finishing action. Record readability, fairness and whether retreat looked viable. Close returns here without changing the selected campaign.")
+                    .font(.callout)
+            }
+            if let error {
+                Section { Text(error).foregroundStyle(.red) }
+            }
+        }
+        .navigationTitle("Level-one scaling")
+        .navigationBarTitleDisplayMode(.inline)
+        .fullScreenCover(item: $session) { fixture in
+            ZStack(alignment: .topTrailing) {
+                RootView().environmentObject(fixture.store)
+                Button {
+                    session = nil
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, .black.opacity(0.72))
+                        .frame(width: 48, height: 48)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityLabel("Close scaling fixture")
+                .padding(.top, 4)
+                .padding(.trailing, 4)
+                .zIndex(20_000)
+            }
+        }
+    }
+}
+#endif
 #endif
 
 #Preview {
