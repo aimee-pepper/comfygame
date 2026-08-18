@@ -31,7 +31,7 @@ const requiredMarkers={
 };
 for(const [title,marker] of Object.entries(requiredMarkers))assert.match(renderScreen(title),new RegExp(marker),`${title} must reach its specialized composition`);
 assert.match(renderScreen("Constellation","Confirm"),/fixed in place/,"fixture states must execute stateful renderer branches");
-assert.match(renderScreen("Campaigns"),/OLDER TEST VERSION 12/,"campaign proposal must preserve explicit legacy-version handling");
+assert.match(renderScreen("Campaigns"),/OLDER TEST VERSION[\s\S]*Format 12[\s\S]*current format 13/,"campaign proposal must preserve explicit legacy/current-version handling");
 assert.match(renderScreen("Apothecary"),/Scent Mask/,"Apothecary must represent the live learned treatment truthfully");
 assert.match(renderScreen("Library"),/Unknown and legacy records remain unguessed/,"Library must not infer missing record identity");
 assert.match(renderScreen("Bestiary"),/quadruped · long ears[\s\S]*sinuous · membrane appendage/,"Bestiary must preserve materially different generated morphology");
@@ -40,6 +40,16 @@ assert.match(renderScreen("Trading Post"),/owned 2 · stock 5[\s\S]*properties u
 assert.match(renderScreen("Survey Post"),/EIGHT INDEPENDENT ROOTS[\s\S]*NO SHARED NODE EDGE/,"Survey instruments must not be flattened into a fake graph");
 assert.match(renderScreen("World"),/Field Kit 5[\s\S]*mini-map[\s\S]*FIXED 11×11 CAMERA/,"World must preserve fixed-scale map, minimap truth, and persistent Field Kit status");
 assert.match(renderScreen("Encounter"),/CURRENT ACTOR · BINDER[\s\S]*Glassback · 6\/13[\s\S]*Selected consequence/,"Encounter must expose current actor, exact target and consequence");
+const campaignsDefault=renderScreen("Campaigns","Default");
+assert.equal((campaignsDefault.match(/class="book-stack campaign-book/g)??[]).length,3,"Campaigns must keep three equally structured campaign buttons in the review fixture");
+for(const [label,title] of [["seven progress volumes","Aimee’s Book"],["four progress volumes","Field Notes"],["two legacy volumes","Old Test Book"]]){
+  const volumeIndex=campaignsDefault.indexOf(`aria-label="${label}"`),titleIndex=campaignsDefault.indexOf(`<h4>${title}</h4>`);
+  assert.ok(volumeIndex>=0&&volumeIndex<titleIndex,`${title} must show its progress-book row above its unchanged title and facts`);
+}
+assert.match(campaignsDefault,/13 \/ 13 health · Level 4[\s\S]*Base · played today/,"Campaigns must retain current health, level, location and last-played truth");
+assert.match(campaignsDefault,/OLDER TEST VERSION[\s\S]*Format 12[\s\S]*current format 13[\s\S]*Export unchanged · confirmed Delete/,"an older campaign must expose both versions and safe actions without implying load");
+assert.match(renderScreen("Campaigns","Selected"),/Selected campaign[\s\S]*Continue loads the newest playable campaign/,"Selected must explain Continue authority without changing card geometry");
+assert.match(renderScreen("Campaigns","Confirm"),/Delete “Old Test Book”\?[\s\S]*Cancel[\s\S]*Delete campaign/,"Confirm must name the exact campaign and keep cancellation available");
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
 assert.match(css,/@font-face\{font-family:"Pixelify Sans"/,"gallery must bundle its compact mixed-case pixel display font");
