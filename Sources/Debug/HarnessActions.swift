@@ -516,10 +516,25 @@ final class EncounterScalingAcceptanceRecorder: ObservableObject {
     }
 
     var completionCount: Int {
-        records.values.filter { record in
-            record.measurement?.status == .finished
-                && record.measurement?.receiptIdentity == record.receiptIdentity
-        }.count
+        EncounterScalingProgressionFixtureKind.allCases.filter(isComplete).count
+    }
+
+    /// The matrix order is the fixture catalogue order, rather than dictionary iteration order.
+    var nextUnrecorded: EncounterScalingProgressionFixtureKind? {
+        EncounterScalingProgressionFixtureKind.allCases.first { records[$0] == nil }
+    }
+
+    /// A saved legacy, unfinished, stale, or receipt-mismatched row is still incomplete.
+    var nextIncomplete: EncounterScalingProgressionFixtureKind? {
+        EncounterScalingProgressionFixtureKind.allCases.first { !isComplete($0) }
+    }
+
+    func isComplete(_ kind: EncounterScalingProgressionFixtureKind) -> Bool {
+        guard let record = records[kind], record.scenario == kind,
+              let measurement = record.measurement
+        else { return false }
+        return measurement.status == .finished
+            && measurement.receiptIdentity == record.receiptIdentity
     }
 
     @discardableResult

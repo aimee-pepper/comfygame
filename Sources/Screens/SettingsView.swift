@@ -1324,6 +1324,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
     @State private var progressionSession: EncounterScalingProgressionFixtureSession?
     @State private var error: String?
     @State private var acceptanceNotice: String?
+    @State private var highlightedProgressionKind: EncounterScalingProgressionFixtureKind?
     @State private var confirmsClearAcceptance = false
 
     var body: some View {
@@ -1354,17 +1355,36 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                 Text("\(acceptance.completionCount) of \(EncounterScalingProgressionFixtureKind.allCases.count) finished progression verdicts recorded")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
+                if let next = acceptance.nextIncomplete {
+                    Button {
+                        openProgressionFixture(next)
+                    } label: {
+                        Label("Open next unrecorded fixture", systemImage: "arrow.right.circle.fill")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, minHeight: 50, alignment: .leading)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityHint("Opens \(next.title), the first incomplete fixture in matrix order")
+                } else {
+                    Label("All six progression fixtures complete", systemImage: "checkmark.seal.fill")
+                        .font(.headline)
+                        .foregroundStyle(.green)
+                        .accessibilityIdentifier("progression-scaling-matrix-complete")
+                }
                 ForEach(EncounterScalingProgressionFixtureKind.allCases) { kind in
                     Button {
-                        do {
-                            acceptanceNotice = nil
-                            progressionSession = try EncounterScalingProgressionFixtureSession(
-                                kind: kind)
-                        }
-                        catch { self.error = error.localizedDescription }
+                        openProgressionFixture(kind)
                     } label: {
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(kind.title).font(.headline)
+                            HStack {
+                                Text(kind.title).font(.headline)
+                                if highlightedProgressionKind == kind {
+                                    Text("NEXT")
+                                        .font(.caption2.bold())
+                                        .foregroundStyle(.tint)
+                                        .accessibilityLabel("Next incomplete fixture")
+                                }
+                            }
                             Text(kind.detail).font(.caption).foregroundStyle(.secondary)
                             if let record = acceptance.records[kind] {
                                 Text("\(record.verdict.title) · receipt \(record.receiptIdentity)")
@@ -1381,6 +1401,9 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                         }
                         .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                     }
+                    .accessibilityIdentifier("progression-scaling-fixture-\(kind.rawValue)")
+                    .listRowBackground(highlightedProgressionKind == kind
+                        ? Color.accentColor.opacity(0.14) : Color.clear)
                 }
             }
             if !acceptance.records.isEmpty {
@@ -1396,6 +1419,11 @@ private struct EncounterScalingPhoneAcceptanceView: View {
         }
         .navigationTitle("Encounter scaling")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            if highlightedProgressionKind == nil {
+                highlightedProgressionKind = acceptance.nextIncomplete
+            }
+        }
         .confirmationDialog(
             "Clear encounter-scaling verdicts?",
             isPresented: $confirmsClearAcceptance,
@@ -1403,6 +1431,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
         ) {
             Button("Clear \(acceptance.records.count) saved verdicts", role: .destructive) {
                 acceptance.clear()
+                highlightedProgressionKind = acceptance.nextIncomplete
             }
             Button("Keep verdicts", role: .cancel) {}
         } message: {
@@ -1442,7 +1471,14 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                             Button(verdict.title) {
                                 let result = acceptance.record(
                                     verdict, for: fixture.receipt, observing: fixture.store)
-                                acceptanceNotice = result.refusalSummary
+                                switch result {
+                                case .recorded:
+                                    acceptanceNotice = nil
+                                    progressionSession = nil
+                                    highlightedProgressionKind = acceptance.nextIncomplete
+                                case .unfinished, .stale:
+                                    acceptanceNotice = result.refusalSummary
+                                }
                             }
                             .buttonStyle(.bordered)
                             .tint(acceptance.records[fixture.kind]?.verdict == verdict ? .green : .white)
@@ -1462,7 +1498,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 52)
                 .padding(.horizontal, 10)
-                .accessibilityElement(children: .combine)
+                .accessibilityElement(children: .contain)
                 .accessibilityIdentifier("progression-scaling-receipt")
                 .zIndex(19_999)
                 Button {
@@ -1479,6 +1515,16 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                 .accessibilityLabel("Close progression scaling fixture")
                 .padding(.top, 4).padding(.trailing, 4).zIndex(20_000)
             }
+        }
+    }
+
+    private func openProgressionFixture(_ kind: EncounterScalingProgressionFixtureKind) {
+        do {
+            acceptanceNotice = nil
+            highlightedProgressionKind = kind
+            progressionSession = try EncounterScalingProgressionFixtureSession(kind: kind)
+        } catch {
+            self.error = error.localizedDescription
         }
     }
 }

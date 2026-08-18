@@ -26,6 +26,8 @@ final class EncounterScalingIntegrationTests: XCTestCase {
 
         XCTAssertEqual(result, .recorded(try XCTUnwrap(recorder.records[.experiencedParty])))
         XCTAssertEqual(recorder.completionCount, 1)
+        XCTAssertEqual(recorder.nextUnrecorded, .freshSolo)
+        XCTAssertEqual(recorder.nextIncomplete, .freshSolo)
         XCTAssertEqual(recorder.records[.experiencedParty], EncounterScalingAcceptanceRecord(
             scenario: .experiencedParty,
             verdict: .overwhelmingButFair,
@@ -245,6 +247,41 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         let decoded = EncounterScalingAcceptanceRecorder(preferences: preferences)
         XCTAssertEqual(decoded.records.count, 4, "all summaries remain visible and clearable")
         XCTAssertEqual(decoded.completionCount, 1)
+        XCTAssertEqual(decoded.nextUnrecorded, .ordinaryFivePerson)
+        XCTAssertEqual(decoded.nextIncomplete, .experiencedSolo,
+                       "unfinished saved rows must not be skipped")
+    }
+
+    func testGuidedSequenceUsesCatalogueOrderAndFinishedReceiptBoundCompletionOnly() throws {
+        let suite = "EncounterScalingAcceptanceSequence.\(UUID().uuidString)"
+        let preferences = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { preferences.removePersistentDomain(forName: suite) }
+        let recorder = EncounterScalingAcceptanceRecorder(preferences: preferences)
+
+        XCTAssertEqual(recorder.nextUnrecorded, .freshSolo)
+        XCTAssertEqual(recorder.nextIncomplete, .freshSolo)
+
+        for (index, kind) in EncounterScalingProgressionFixtureKind.allCases.enumerated() {
+            let fixture = try EncounterScalingProgressionFixtureSession(kind: kind)
+            fixture.store.mutate("finish guided-sequence fixture") { state in
+                guard var run = state.worlds.activeRun,
+                      var encounter = run.activeEncounter else { return }
+                encounter.outcome = .victory
+                run.activeEncounter = encounter
+                state.worlds.activeRun = run
+            }
+            XCTAssertNotNil(recorder.record(.balanced, for: fixture.receipt,
+                                             observing: fixture.store))
+            let expected = EncounterScalingProgressionFixtureKind.allCases
+                .dropFirst(index + 1).first
+            XCTAssertEqual(recorder.nextUnrecorded, expected)
+            XCTAssertEqual(recorder.nextIncomplete, expected)
+        }
+
+        XCTAssertEqual(recorder.completionCount,
+                       EncounterScalingProgressionFixtureKind.allCases.count)
+        XCTAssertNil(recorder.nextUnrecorded)
+        XCTAssertNil(recorder.nextIncomplete)
     }
 
     func testPhoneMatrixShowsEveryVerdictStatusAndDestructiveAcceptanceOnlyClear() throws {
@@ -261,6 +298,9 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         XCTAssertTrue(source.contains("progression-scaling-record-refusal"))
         XCTAssertTrue(source.contains("Clear \\(acceptance.records.count) saved verdicts"))
         XCTAssertTrue(source.contains("Campaign saves are unchanged"))
+        XCTAssertTrue(source.contains("Open next unrecorded fixture"))
+        XCTAssertTrue(source.contains("All six progression fixtures complete"))
+        XCTAssertTrue(source.contains("highlightedProgressionKind = acceptance.nextIncomplete"))
     }
 
     func testPhoneHarnessNamesTheWholeScalingMatrixAndRequestsComparableEvidence() throws {
