@@ -79,16 +79,18 @@ final class ExclusivityTests: XCTestCase {
                           "a better instrument has to buy room, or it buys nothing")
     }
 
-    func testUnimplementedCompoundAssemblyRejectsWithoutChargingOrMutating() throws {
+    func testImplementedCompoundAssemblyIsPurchasableAndUnlocksItsLiveProvider() throws {
         let store = fundedScriptoriumStore()
         let node = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_compounds"))
-        let before = store.state
-        XCTAssertFalse(store.canResearch(node))
-        XCTAssertEqual(store.missingPrerequisites(for: node),
-                       ["Compound Assembly is not ready to learn yet."])
-        XCTAssertFalse(store.research(node))
-        XCTAssertEqual(store.state, before)
-        XCTAssertFalse(store.state.base.completedResearch.contains(node.id))
+        XCTAssertNil(EconomyRules.implementationAllows(node))
+        XCTAssertTrue(store.canResearch(node))
+        XCTAssertTrue(store.research(node))
+        XCTAssertTrue(store.state.base.completedResearch.contains(node.id))
+        XCTAssertNotEqual(
+            store.previewCompoundFormalization(fingerprint: "not-yet-proven", nickname: "Test"),
+            .refused(.locked),
+            "The completed node is the live provider's durable unlock"
+        )
     }
 
     func testImplementedPenmanshipProgressionRemainsAvailable() throws {
