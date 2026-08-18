@@ -1,24 +1,36 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {preservationLedger} from "../src/ui-preservation-ledger.js";
-const source=await readFile(new URL("../src/ui-gallery-app.js",import.meta.url),"utf8");
+import {renderers,renderScreen,screens} from "../src/ui-gallery-app.js";
 const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
 const required=["Campaigns","Home","Writing Desk","Storehouse","Workshop","Party","Essence Spring","Constellation","Library","Bestiary","Research","World History","Blacksmith","Trading Post","Recycler","Tannery","Bowyer","Armoury","Weaponsmith","Scriptorium","Survey Post","Apothecary","Reliquary","Wayfarer’s Table","Anchorage","Distillery","Channelworks","Firepit","Gear","World","Encounter","Loot Decision","Return Recap","Settings"];
-for(const title of required)assert.match(source,new RegExp(`\\[\\"${title.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\"`),`gallery must include ${title}`);
+assert.deepEqual(screens.map(({title})=>title),required,"screen order is an intentional ordinary-phone contract");
+assert.deepEqual([...renderers.keys()],required,"every gallery entry must have one explicit renderer");
 assert.deepEqual(Object.keys(preservationLedger).sort(),required.slice().sort(),"every proposed screen must audit the native structure it preserves");
 for(const [title,[nativeSource,...facts]] of Object.entries(preservationLedger)){assert.match(nativeSource,/\.swift/,`${title} must name its native source`);assert.ok(facts.length>=2,`${title} needs explicit preservation facts`)}
 assert.match(css,/width:368px;height:800px/);
-assert.match(source,/Bind & Depart/);
-assert.match(source,/fixed action rail|bottom rail/i);
-assert.match(source,/book-shelf/,"campaign proposal must preserve stacked-book progress identity");
-assert.match(source,/town-scene/,"Home proposal must preserve the authored town scene");
-assert.match(source,/page-grid/,"Writing proposal must preserve page geometry");
-assert.match(source,/constellation-field/,"Constellation must remain one live star, not a list");
-assert.match(source,/book-progress/,"Campaign books must expose their visible progress stack");
-assert.match(source,/utility-board/,"Utilities must use a compact owned board instead of settings rows");
-assert.match(source,/loot-balance/,"Loot must preserve symmetric Drop and Take comparison");
+for(const title of required){
+  for(const fixtureState of ["Default","Selected","Confirm"]){
+    const html=renderScreen(title,fixtureState);
+    assert.match(html,/class="safe-top"/,`${title} ${fixtureState} must render phone chrome`);
+    assert.match(html,/class="bottom-rail"/,`${title} ${fixtureState} must keep actions reachable`);
+    assert.ok(html.length>500,`${title} ${fixtureState} must render a substantive fixture`);
+  }
+}
+const requiredMarkers={
+  Campaigns:"book-progress",Home:"town-scene","Writing Desk":"page-grid",Workshop:"project-strip",
+  "Essence Spring":"spring-basin",Constellation:"constellation-field",Blacksmith:"comparison-rack",
+  Recycler:"salvage-table",Tannery:"hide-frame",Bowyer:"bow-jig",Armoury:"armour-stand",
+  Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"reliquary-room",
+  "Wayfarer’s Table":"route-table",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
+  Firepit:"camp-circle","Loot Decision":"loot-balance","Return Recap":"receipt-paper",Settings:"utility-board"
+};
+for(const [title,marker] of Object.entries(requiredMarkers))assert.match(renderScreen(title),new RegExp(marker),`${title} must reach its specialized composition`);
+assert.match(renderScreen("Constellation","Confirm"),/fixed in place/,"fixture states must execute stateful renderer branches");
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
-assert.match(css,/\.utility-board/);
-assert.match(css,/\.loot-balance/);
+for(const marker of new Set(Object.values(requiredMarkers))){
+  const className=marker.replace(/^class=\\?"|\\?"$/g,"");
+  assert.match(css,new RegExp(`\\.${className}`),`${className} needs an authored style contract`);
+}
 console.log(`UI gallery covers ${required.length} ordinary-phone screens.`);
