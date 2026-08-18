@@ -38,17 +38,15 @@ export async function handleAssetLabRequest(request, response) {
   if(request.method==="POST"&&pathname==="/__ui-reviews"){
     try{
       const payload=JSON.parse((await body(request,250_000)).toString());
-      const reviews=payload?.reviews;
-      if(payload?.schemaVersion!==1||!reviews||typeof reviews!=="object"||Array.isArray(reviews)){response.writeHead(400).end("Invalid UI review packet");return;}
-      const normalized={};
-      for(const [id,record] of Object.entries(reviews)){
-        if(!/^[a-z0-9-]{1,80}$/.test(id)||!record||typeof record!=="object"||!['yes','no'].includes(record.choice)||typeof record.notes!=="string"||record.notes.length>8_000){response.writeHead(400).end("Invalid UI review record");return;}
-        normalized[id]={choice:record.choice,notes:record.notes};
-      }
-      const packet={schemaVersion:1,updatedAt:new Date().toISOString(),reviews:normalized};
+      const {screenID,record}=payload??{};
+      if(payload?.schemaVersion!==1||!/^[a-z0-9-]{1,80}$/.test(screenID??"")||!record||typeof record!=="object"||!['yes','no'].includes(record.choice)||typeof record.notes!=="string"||record.notes.length>8_000){response.writeHead(400).end("Invalid UI review record");return;}
       await mkdir(dirname(uiReviewFile),{recursive:true});
+      let existing={};
+      try{const saved=JSON.parse((await readFile(uiReviewFile)).toString());if(saved?.schemaVersion===1&&saved.reviews&&typeof saved.reviews==="object"&&!Array.isArray(saved.reviews))existing=saved.reviews;}catch{}
+      const updatedAt=new Date().toISOString();
+      const packet={schemaVersion:1,updatedAt,reviews:{...existing,[screenID]:{choice:record.choice,notes:record.notes}}};
       await writeFile(uiReviewFile,`${JSON.stringify(packet,null,2)}\n`);
-      response.writeHead(201,{"Content-Type":types[".json"]}).end(JSON.stringify({path:"reviews/ui-gallery-reviews.json",count:Object.keys(normalized).length}));
+      response.writeHead(201,{"Content-Type":types[".json"]}).end(JSON.stringify({path:"reviews/ui-gallery-reviews.json",screenID,updatedAt,count:Object.keys(packet.reviews).length}));
     }catch(error){response.writeHead(500,{"Content-Type":types[".json"]}).end(JSON.stringify({error:String(error.message??error)}));}
     return;
   }

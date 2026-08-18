@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {preservationLedger} from "../src/ui-preservation-ledger.js";
-import {fontChoices,implementationReviewPacket,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
+import {fontChoices,implementationReviewPacket,implementationReviewRecordPacket,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
+const galleryApp=await readFile(new URL("../src/ui-gallery-app.js",import.meta.url),"utf8");
 const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
 const galleryHtml=await readFile(new URL("../ui-gallery.html",import.meta.url),"utf8");
 const required=["Campaigns","Home","Writing Desk","Storehouse","Workshop","Party","Essence Spring","Constellation","Library","Bestiary","Research","World History","Blacksmith","Trading Post","Recycler","Tannery","Bowyer","Armoury","Weaponsmith","Scriptorium","Survey Post","Apothecary","Reliquary","Wayfarer’s Table","Anchorage","Distillery","Channelworks","Firepit","Gear","World","Encounter","Loot Decision","Return Recap","Settings"];
@@ -46,9 +47,17 @@ assert.deepEqual(fontChoices.map(({id})=>id),["jersey-tiny","pixelify","jersey",
 assert.match(galleryHtml,/id="pixel-font-choice"/,"gallery must expose a live pixel-font chooser");
 assert.match(galleryHtml,/Yes, implementation ready[\s\S]*No, not ready/,"every selected preview must expose a mutually exclusive implementation gate");
 assert.match(galleryHtml,/id="implementation-feedback"[\s\S]*Required when this screen is not ready/,"a not-ready review must request specific feedback");
+assert.match(galleryHtml,/id="implementation-review-save"[\s\S]*Save feedback/,"review feedback must have an explicit Save button");
 assert.equal(reviewStorageKey,"bookbinder.assetlab.ui-gallery-reviews.v1");
 assert.deepEqual(normalizeImplementationReviews({campaigns:{choice:"no",notes:"Tighten spacing"},home:{choice:"yes",notes:""},invented:{choice:"yes",notes:"ignored"},gear:{choice:"maybe",notes:7}}),{campaigns:{choice:"no",notes:"Tighten spacing"},home:{choice:"yes",notes:""}},"stored reviews must be restricted to known screens and valid choices");
 assert.deepEqual(implementationReviewPacket({home:{choice:"yes",notes:""},invented:{choice:"no",notes:"ignored"}}),{schemaVersion:1,reviews:{home:{choice:"yes",notes:""}}},"the shared packet helper must emit only normalized gallery reviews");
+assert.deepEqual(implementationReviewRecordPacket("campaigns",{choice:"no",notes:"Keep the progress books"}),{schemaVersion:1,screenID:"campaigns",record:{choice:"no",notes:"Keep the progress books"}},"explicit Save must send only the current screen review");
+assert.equal(implementationReviewRecordPacket("invented",{choice:"yes",notes:"ignored"}),null,"explicit Save must fail closed for an unknown screen");
+assert.match(galleryApp,/Draft saved on this device · not shared yet\./,"typing must disclose that feedback remains a local draft");
+assert.doesNotMatch(galleryApp,/implementation-feedback"\)\.oninput[\s\S]{0,180}syncImplementationReviews/,"typing feedback must not POST to the shared ledger");
+assert.ok(galleryApp.indexOf('await fetch("/__ui-reviews"')<galleryApp.indexOf("delete implementationDrafts[screenID]"),"Save must retain the draft until the server responds");
+assert.ok(galleryApp.indexOf("if(!response.ok)throw")<galleryApp.indexOf('state:"shared"'),"Save must not display shared success for a failed response");
+assert.match(galleryApp,/Could not save to the shared project ledger\. Your draft is still on this device/,"a failed Save must visibly promise that the draft was retained");
 assert.match(css,/\.implementation-review/);
 for(const family of ["Jersey 10","Silkscreen","Tiny5"])assert.match(css,new RegExp(`font-family:\"${family}\"`),`${family} must be bundled for live comparison`);
 assert.match(css,/--font-reading/,"long prose must retain a separate readable face");

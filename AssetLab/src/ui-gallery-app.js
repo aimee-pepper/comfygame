@@ -48,7 +48,8 @@ const fontChoices=[
 ];
 let active=screens[0],category="All",state="Default",query="";
 let implementationReviews={};
-let reviewSyncTimer;
+let implementationDrafts={};
+let reviewSaveState={screenID:"",state:"idle",message:""};
 const marks={Campaign:"CB",Village:"VI",Writing:"IN",Making:"MK",People:"PE",Knowledge:"KN",Expedition:"EX",Utility:"UT"};
 const notes={
   campaign:["Book covers are the identity; metadata remains compact.","Continue is primary; Delete is never adjacent or equal-weight."],
@@ -138,43 +139,66 @@ function normalizeImplementationReviews(value){
   }));
 }
 function implementationReviewPacket(reviews=implementationReviews){return{schemaVersion:1,reviews:normalizeImplementationReviews(reviews)}}
-async function syncImplementationReviews(){
-  try{
-    const response=await fetch("/__ui-reviews",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(implementationReviewPacket())});
-    if(!response.ok)throw new Error(`Review sync failed (${response.status})`);
-    const status=$("implementation-review-status");
-    if(status)status.dataset.shared="true";
-  }catch{
-    const status=$("implementation-review-status");
-    if(status){status.dataset.shared="false";status.textContent="Saved in this browser; shared review ledger is unavailable until AssetLab is served by its local server."}
-  }
+function implementationReviewRecordPacket(screenID,record){
+  const normalized=normalizeImplementationReviews({[screenID]:record});
+  return normalized[screenID]?{schemaVersion:1,screenID,record:normalized[screenID]}:null;
 }
-function saveImplementationReviews(){
-  try{localStorage.setItem(reviewStorageKey,JSON.stringify(implementationReviews))}catch{}
-  clearTimeout(reviewSyncTimer);
-  reviewSyncTimer=setTimeout(syncImplementationReviews,250);
+function recordsEqual(left,right){return Boolean(left&&right&&left.choice===right.choice&&left.notes===right.notes)}
+function saveImplementationDrafts(){
+  try{localStorage.setItem(reviewStorageKey,JSON.stringify(implementationDrafts))}catch{}
+}
+async function shareImplementationReview(){
+  const screenID=active.id,record=implementationDrafts[screenID]??implementationReviews[screenID];
+  const packet=implementationReviewRecordPacket(screenID,record);
+  if(!packet||packet.record.choice==="no"&&!packet.record.notes.trim())return;
+  reviewSaveState={screenID,state:"saving",message:"Saving feedback to the shared project ledger…"};
+  renderImplementationReview();
+  try{
+    const response=await fetch("/__ui-reviews",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(packet)});
+    if(!response.ok)throw new Error(`Review sync failed (${response.status})`);
+    const result=await response.json();
+    implementationReviews[screenID]=packet.record;
+    if(recordsEqual(implementationDrafts[screenID],packet.record))delete implementationDrafts[screenID];
+    saveImplementationDrafts();
+    reviewSaveState={screenID,state:"shared",message:`Shared feedback saved for ${screens.find(screen=>screen.id===screenID)?.title??screenID}${result.updatedAt?` · ${new Date(result.updatedAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`:""}.`};
+  }catch{
+    reviewSaveState={screenID,state:"error",message:"Could not save to the shared project ledger. Your draft is still on this device; click Save feedback to retry."};
+  }
+  if(active.id===screenID)renderImplementationReview();
 }
 function renderImplementationReview(){
-  const record=implementationReviews[active.id]??{choice:"",notes:""};
+  const committed=implementationReviews[active.id],record=implementationDrafts[active.id]??committed??{choice:"",notes:""};
   document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>input.checked=input.value===record.choice);
   const feedbackWrap=$("implementation-feedback-wrap"),feedback=$("implementation-feedback");
   feedbackWrap.hidden=record.choice!=="no";
   feedback.required=record.choice==="no";
-  feedback.value=record.notes;
-  $("implementation-review-status").textContent=record.choice==="yes"?"Saved as ready.":record.choice==="no"?(record.notes.trim()?"Feedback saved.":"Feedback is required before this review is complete."):"Choose a readiness status for this screen.";
+  if(feedback.value!==record.notes)feedback.value=record.notes;
+  const valid=Boolean(record.choice)&&(record.choice!=="no"||Boolean(record.notes.trim()));
+  const dirty=!recordsEqual(record,committed);
+  const save=$("implementation-review-save"),status=$("implementation-review-status");
+  save.disabled=!valid||!dirty||reviewSaveState.state==="saving";
+  status.dataset.state="";
+  if(reviewSaveState.screenID===active.id&&reviewSaveState.message){status.textContent=reviewSaveState.message;status.dataset.state=reviewSaveState.state;return}
+  status.textContent=!record.choice?"Choose a readiness status, then save when you are finished.":record.choice==="no"&&!record.notes.trim()?"Feedback is required before this review can be saved.":dirty?"Draft saved on this device · not shared yet.":"Saved in the shared project ledger.";
+  status.dataset.state=dirty?"draft":"shared";
 }
 function updateImplementationReview(choice,notes=""){
-  implementationReviews[active.id]={choice,notes};
-  saveImplementationReviews();
+  implementationDrafts[active.id]={choice,notes};
+  reviewSaveState={screenID:active.id,state:"draft",message:"Draft saved on this device · not shared yet."};
+  saveImplementationDrafts();
   renderImplementationReview();
 }
 function renderIndex(){const list=filtered();$("screen-count").textContent=`${list.length} of ${screens.length} screens`;$("screen-list").innerHTML=list.map(s=>`<button class="screen-choice" data-id="${s.id}" aria-current="${s===active}"><span class="route-mark">${marks[s.category]}</span><span><strong>${s.title}</strong><small>${s.purpose.split(" ").slice(0,6).join(" ")}…</small></span></button>`).join("");document.querySelectorAll(".screen-choice").forEach(b=>b.onclick=()=>{active=screens.find(s=>s.id===b.dataset.id);render()})}
 function render(){renderIndex();const preservation=preservationFor(active.title);$("screen-category").textContent=active.category;$("screen-title").textContent=active.title;$("screen-purpose").textContent=active.purpose;$("phone").innerHTML=renderScreen(active.title,state);$("screen-notes").innerHTML=(notes[active.type]||notes.default).map(n=>`<li>${n}</li>`).join("");$("preserve-source").textContent=preservation.source;$("preserve-list").innerHTML=preservation.preserve.map(n=>`<li>${n}</li>`).join("");$("state-switcher").innerHTML=["Default","Selected","Confirm"].map(v=>`<button aria-pressed="${v===state}">${v}</button>`).join("");document.querySelectorAll("#state-switcher button").forEach(b=>b.onclick=()=>{state=b.textContent;render()});renderImplementationReview()}
 function step(delta){const i=screens.indexOf(active);active=screens[(i+delta+screens.length)%screens.length];category="All";document.querySelectorAll("#category-tabs button").forEach((x,j)=>x.setAttribute("aria-pressed",j===0));render()}
 if(typeof document!=="undefined"){
-  try{implementationReviews=normalizeImplementationReviews(JSON.parse(localStorage.getItem(reviewStorageKey)||"{}"))}catch{implementationReviews={}}
+  try{implementationDrafts=normalizeImplementationReviews(JSON.parse(localStorage.getItem(reviewStorageKey)||"{}"))}catch{implementationDrafts={}}
   fetch("/__ui-reviews",{cache:"no-store"}).then(response=>response.ok?response.json():null).then(packet=>{
-    if(packet?.schemaVersion===1){implementationReviews=normalizeImplementationReviews({...packet.reviews,...implementationReviews});saveImplementationReviews();render()}
+    if(packet?.schemaVersion===1){
+      implementationReviews=normalizeImplementationReviews(packet.reviews);
+      implementationDrafts=normalizeImplementationReviews(Object.fromEntries(Object.entries(implementationDrafts).filter(([id,record])=>!recordsEqual(record,implementationReviews[id]))));
+      saveImplementationDrafts();render();
+    }
   }).catch(()=>{});
   const fontSelect=$("pixel-font-choice");
   fontSelect.innerHTML=fontChoices.map(({id,label})=>`<option value="${id}">${label}</option>`).join("");
@@ -187,9 +211,10 @@ if(typeof document!=="undefined"){
   $("category-tabs").innerHTML=categories.map(c=>`<button aria-pressed="${c===category}">${c}</button>`).join("");
   document.querySelectorAll("#category-tabs button").forEach(b=>b.onclick=()=>{category=b.textContent;document.querySelectorAll("#category-tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(!filtered().includes(active))active=filtered()[0]||screens[0];render()});
   $("screen-search").oninput=e=>{query=e.target.value.toLowerCase().trim();renderIndex()};
-  document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>input.onchange=()=>updateImplementationReview(input.value,implementationReviews[active.id]?.notes??""));
+  document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>input.onchange=()=>updateImplementationReview(input.value,(implementationDrafts[active.id]??implementationReviews[active.id])?.notes??""));
   $("implementation-feedback").oninput=e=>updateImplementationReview("no",e.target.value);
+  $("implementation-review-save").onclick=shareImplementationReview;
   $("previous-screen").onclick=()=>step(-1);$("next-screen").onclick=()=>step(1);render();
 }
 
-export {fontChoices,implementationReviewPacket,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens};
+export {fontChoices,implementationReviewPacket,implementationReviewRecordPacket,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens};

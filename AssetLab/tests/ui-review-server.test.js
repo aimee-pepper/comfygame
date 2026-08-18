@@ -23,17 +23,26 @@ try{
   assert.equal(empty.headers["Cache-Control"],"no-store");
   assert.deepEqual(empty.json(),{schemaVersion:1,reviews:{}},"a missing shared ledger must read as an empty review packet");
 
-  const invalid=await invoke("POST",{schemaVersion:1,reviews:{home:{choice:"maybe",notes:""}}});
+  const invalid=await invoke("POST",{schemaVersion:1,screenID:"home",record:{choice:"maybe",notes:""}});
   assert.equal(invalid.status,400,"invalid review choices must be rejected without persistence");
 
   const reviews={home:{choice:"yes",notes:""},"writing-desk":{choice:"no",notes:"Keep the page larger"}};
-  const saved=await invoke("POST",{schemaVersion:1,reviews});
+  const homeSaved=await invoke("POST",{schemaVersion:1,screenID:"home",record:reviews.home});
+  assert.equal(homeSaved.status,201);
+  assert.equal(homeSaved.json().screenID,"home");
+  assert.equal(homeSaved.json().count,1);
+  const saved=await invoke("POST",{schemaVersion:1,screenID:"writing-desk",record:reviews["writing-desk"]});
   assert.equal(saved.status,201);
-  assert.deepEqual(saved.json(),{path:"reviews/ui-gallery-reviews.json",count:2});
+  assert.equal(saved.json().screenID,"writing-desk");
+  assert.equal(saved.json().count,2,"saving one screen must preserve reviews already saved for other screens");
   const persisted=JSON.parse(await readFile(ledger,"utf8"));
   assert.equal(persisted.schemaVersion,1);
   assert.match(persisted.updatedAt,/^\d{4}-\d\d-\d\dT/);
   assert.deepEqual(persisted.reviews,reviews);
+
+  const rejectedReplacement=await invoke("POST",{schemaVersion:1,screenID:"home",record:{choice:"no",notes:9}});
+  assert.equal(rejectedReplacement.status,400,"a failed Save must reject the malformed replacement");
+  assert.deepEqual(JSON.parse(await readFile(ledger,"utf8")),persisted,"a failed Save must leave the last shared review intact");
 
   const loaded=await invoke("GET");
   assert.deepEqual(loaded.json(),persisted,"GET must return the shared packet saved by POST");

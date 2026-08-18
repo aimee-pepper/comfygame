@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-18T20:13:50.208Z",
+  "reviews": {
+    "campaigns": {
+      "choice": "no",
+      "notes": "Need to fix the tex alignment on each book pane to be consistent. would be more easily solved by redesigning the buttons for each campaign to have the row of books on top of the info text as they had before. "
+    },
+    "home": {
+      "choice": "no",
+      "notes": "the row of buttons at the top that say \"home/make/etc\" are in a weird sub pane with green on green buttons. it feels messy to have it in a floating pane. just have it be the buttons. \n\nBind and depart should say where it takes you, because bind and depart should actually mean you bind it and go to the world, not just 'go to the writing desk'"
+    },
+    "writing-desk": {
+      "choice": "no",
+      "notes": "I like the side by side view but the single row of runes "
+    }
+  }
+}
