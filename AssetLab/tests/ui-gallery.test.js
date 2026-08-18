@@ -19,7 +19,7 @@ for(const title of required){
   }
 }
 const requiredMarkers={
-  Campaigns:"book-progress",Home:"town-scene","Writing Desk":"page-grid",Workshop:"project-strip",
+  Campaigns:"book-progress",Home:"town-scene","Writing Desk":"writing-desk",Storehouse:"storehouse-cabinet",Workshop:"project-strip",Party:"party-formation",
   "Essence Spring":"spring-basin",Constellation:"constellation-field",Blacksmith:"comparison-rack",
   Recycler:"salvage-table",Tannery:"hide-frame",Bowyer:"bow-jig",Armoury:"armour-stand",
   Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"reliquary-room",
@@ -33,7 +33,7 @@ assert.match(renderScreen("Apothecary"),/Scent Mask/,"Apothecary must represent 
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
 assert.match(css,/@font-face\{font-family:"Pixelify Sans"/,"gallery must bundle its compact mixed-case pixel display font");
-assert.deepEqual(fontChoices.map(({id})=>id),["pixelify","jersey","silkscreen","tiny5"],"font chooser order is a deliberate review contract");
+assert.deepEqual(fontChoices.map(({id})=>id),["jersey-tiny","pixelify","jersey","silkscreen","tiny5"],"font chooser order is a deliberate review contract");
 assert.match(galleryHtml,/id="pixel-font-choice"/,"gallery must expose a live pixel-font chooser");
 for(const family of ["Jersey 10","Silkscreen","Tiny5"])assert.match(css,new RegExp(`font-family:\"${family}\"`),`${family} must be bundled for live comparison`);
 assert.match(css,/--font-reading/,"long prose must retain a separate readable face");
