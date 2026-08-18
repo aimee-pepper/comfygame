@@ -1627,6 +1627,15 @@ private struct FieldKitSheet: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
 
+            if stack.catalogID == Items.scentMask, let run = store.activeRun {
+                Text(run.isScentMasked
+                     ? "Masked scent · \(run.scentMaskTurnsRemaining) turns remain"
+                     : "Ready · masks scent for 12 turns")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(run.isScentMasked ? Color.orange : Color.green)
+                    .accessibilityIdentifier("field-kit.scent-mask.status")
+            }
+
             Divider()
 
             if ContentCatalog.shared.item(stack.catalogID)?.consumable?.effect == .heal {
@@ -1660,13 +1669,22 @@ private struct FieldKitSheet: View {
                         .buttonStyle(.bordered)
                     }
                 }
+            } else if stack.catalogID == Items.scentMask,
+                      let run = store.activeRun, run.isScentMasked {
+                Button("Already masked · \(run.scentMaskTurnsRemaining) turns remain") {}
+                    .buttonStyle(.borderedProminent)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .disabled(true)
+                    .accessibilityIdentifier("field-kit.scent-mask.use")
             } else {
-                Button("Use now") {
+                Button(stack.catalogID == Items.scentMask ? "Apply Scent Mask" : "Use now") {
                     store.useItemInWorld(stack, on: .binder)
                     dismiss()
                 }
                 .buttonStyle(.borderedProminent)
                 .frame(maxWidth: .infinity, minHeight: 44)
+                .accessibilityIdentifier(stack.catalogID == Items.scentMask
+                                         ? "field-kit.scent-mask.use" : "field-kit.supply.use")
             }
         }
         .padding(14)
@@ -1693,6 +1711,7 @@ private struct FieldKitSheet: View {
         case .farsight: "Reveal the nearest site."
         case .lureCreature: "Draw the nearest creature closer."
         case .identifyCurio: "Identify one carried curio."
+        case .maskScent: "Animals relying only on scent hesitate for one action. Other senses and close contact still detect you. It does not hide creatures or affect apexes."
         default: ""
         }
     }

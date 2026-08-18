@@ -3,6 +3,33 @@ import XCTest
 
 @MainActor
 final class ConsumableCraftingTests: XCTestCase {
+    func testScentMaskApothecaryRequiresAnExplicitExactResourceAndUsesQuoteCommitAPI() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/ApothecaryView.swift"), encoding: .utf8)
+
+        XCTAssertTrue(source.contains("ConsumableCraftingRules.scentMaskAnimalResources(in: store.state)"))
+        XCTAssertTrue(source.contains("Text(\"Choose a resource\").tag(Optional<MaterialReserveUnitID>.none)"))
+        XCTAssertTrue(source.contains("store.scentMaskQuote(using: $0)"))
+        XCTAssertTrue(source.contains("store.craftScentMask(quote)"))
+        XCTAssertTrue(source.contains("That exact animal resource or the Reagent is no longer available."))
+        XCTAssertTrue(source.contains("1 Reagent + 1 selected animal resource (grade 25+) · 0 Essence · 12 turns"))
+    }
+
+    func testScentMaskFieldKitDisclosesRuntimeTruthAndDoesNotOfferARefresh() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent(
+            "Sources/Screens/WorldView.swift"), encoding: .utf8)
+
+        XCTAssertTrue(source.contains("run.scentMaskTurnsRemaining"))
+        XCTAssertTrue(source.contains("run.isScentMasked"))
+        XCTAssertTrue(source.contains("Already masked · "))
+        XCTAssertTrue(source.contains("It does not hide creatures or affect apexes."))
+        XCTAssertTrue(source.contains("case .maskScent:"))
+    }
+
     func testScentMaskAcceptsEveryAnimalKindAt25AndRejectsFloraAndBelowFloor() {
         let animalKinds = MaterialKind.allCases.filter(\.isAnimalWorldResource)
         XCTAssertEqual(Set(animalKinds), [.plate, .quill, .pelt, .down, .hide, .chitin,

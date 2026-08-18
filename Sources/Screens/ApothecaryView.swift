@@ -19,6 +19,7 @@ struct ApothecaryView: View {
     @EnvironmentObject private var store: GameStore
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var selectedRecipeID: ItemID?
+    @State private var selectedScentMaskUnitID: MaterialReserveUnitID?
     @State private var preparationFailure: String?
 
     private var known: [ConsumableCraftingRules.Recipe] {
@@ -29,6 +30,14 @@ struct ApothecaryView: View {
 
     private var selectedRecipe: ConsumableCraftingRules.Recipe? {
         known.first { $0.output == selectedRecipeID }
+    }
+
+    private var scentMaskAnimalResources: [MaterialReserveSelection] {
+        ConsumableCraftingRules.scentMaskAnimalResources(in: store.state)
+    }
+
+    private var selectedScentMaskResource: MaterialReserveSelection? {
+        scentMaskAnimalResources.first { $0.unitID == selectedScentMaskUnitID }
     }
 
     private var columns: [GridItem] {
@@ -68,8 +77,16 @@ struct ApothecaryView: View {
                     }
 
                     if let selectedRecipe {
-                        ConsumableRecipeDetail(recipe: selectedRecipe)
+                        if selectedRecipe.output == Items.scentMask {
+                            ScentMaskRecipeDetail(
+                                resources: scentMaskAnimalResources,
+                                selectedUnitID: $selectedScentMaskUnitID
+                            )
                             .id(selectedRecipe.output)
+                        } else {
+                            ConsumableRecipeDetail(recipe: selectedRecipe)
+                                .id(selectedRecipe.output)
+                        }
                     } else {
                         Text("Choose a preparation to see its exact stock and prepare it.")
                             .font(.callout)
@@ -96,6 +113,11 @@ struct ApothecaryView: View {
                 self.selectedRecipeID = ids.first
             } else if selectedRecipeID == nil {
                 selectedRecipeID = ids.first
+            }
+        }
+        .onChange(of: scentMaskAnimalResources.map(\.unitID)) { _, ids in
+            if let selectedScentMaskUnitID, !ids.contains(selectedScentMaskUnitID) {
+                self.selectedScentMaskUnitID = nil
             }
         }
         .alert("Preparation not made", isPresented: Binding(
@@ -125,6 +147,9 @@ struct ApothecaryView: View {
 
     @ViewBuilder private var preparationActionBar: some View {
         if let recipe = selectedRecipe {
+            if recipe.output == Items.scentMask {
+                scentMaskPreparationActionBar
+            } else {
             let missing = ConsumableCraftingRules.shortfall(recipe, in: store.state)
             let name = ConsumableRecipePresentation.displayName(for: recipe.output)
             PersistentActionBar(
@@ -145,7 +170,100 @@ struct ApothecaryView: View {
                 .disabled(!missing.isEmpty)
                 .accessibilityIdentifier("apothecary.craft.\(recipe.output.rawValue)")
             }
+            }
         }
+    }
+
+    private var scentMaskPreparationActionBar: some View {
+        let quote = selectedScentMaskResource.flatMap { store.scentMaskQuote(using: $0) }
+        return PersistentActionBar(
+            message: scentMaskActionMessage(quote: quote),
+            messageTint: quote == nil ? .orange : .secondary
+        ) {
+            Button {
+                guard let quote else {
+                    preparationFailure = "Choose one exact grade 25+ animal resource and keep 1 Reagent available."
+                    return
+                }
+                switch store.craftScentMask(quote) {
+                case .prepared:
+                    preparationFailure = nil
+                    selectedScentMaskUnitID = nil
+                case .stale:
+                    preparationFailure = "That exact animal resource or the Reagent is no longer available. Choose the resource again."
+                    selectedScentMaskUnitID = nil
+                }
+            } label: {
+                Label("Prepare Scent Mask", systemImage: "wind")
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(quote == nil)
+            .accessibilityIdentifier("apothecary.craft.scent_mask")
+        }
+    }
+
+    private func scentMaskActionMessage(
+        quote: ConsumableCraftingRules.ScentMaskQuote?
+    ) -> String {
+        if quote != nil { return "This exact resource + 1 Reagent · 0 Essence" }
+        if selectedScentMaskResource == nil { return "Choose one exact grade 25+ animal resource." }
+        return "Needs 1 Reagent."
+    }
+}
+
+private struct ScentMaskRecipeDetail: View {
+    @EnvironmentObject private var store: GameStore
+    let resources: [MaterialReserveSelection]
+    @Binding var selectedUnitID: MaterialReserveUnitID?
+
+    private var preparedCount: Int {
+        store.state.base.inventory.stacks
+            .filter { $0.catalogID == Items.scentMask }.map(\.count).reduce(0, +)
+        + store.state.base.spillover
+            .filter { $0.catalogID == Items.scentMask }.map(\.count).reduce(0, +)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Scent Mask").font(.headline)
+                Spacer()
+                Text("Prepared ×\(preparedCount)")
+                    .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            }
+
+            Text("1 Reagent + 1 selected animal resource (grade 25+) · 0 Essence · 12 turns")
+                .font(.callout).foregroundStyle(.secondary)
+
+            Picker("Exact animal resource", selection: $selectedUnitID) {
+                Text("Choose a resource").tag(Optional<MaterialReserveUnitID>.none)
+                ForEach(resources, id: \.unitID) { resource in
+                    Text(resourceLabel(resource)).tag(Optional(resource.unitID))
+                }
+            }
+            .pickerStyle(.menu)
+            .accessibilityIdentifier("apothecary.scent-mask.animal-resource")
+
+            if resources.isEmpty {
+                Label("No grade 25+ animal resources in reserve.", systemImage: "exclamationmark.circle")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
+            Text("Animals relying only on scent hesitate for one action. Other senses and close contact still detect you. It does not hide creatures or affect apexes.")
+                .font(.caption).foregroundStyle(.secondary)
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .contain)
+    }
+
+    private func resourceLabel(_ resource: MaterialReserveSelection) -> String {
+        let sample = resource.sample
+        let source = sample.source.isEmpty ? "unknown source" : sample.source
+        let grade = sample.grade.formatted(.number.precision(.fractionLength(0...1)))
+        return "\(sample.displayName) · grade \(grade) · from \(source)"
     }
 }
 
