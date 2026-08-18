@@ -961,7 +961,8 @@ enum WorldMapLayout {
 /// until you reach an edge, where it stops rather than showing empty space past the border.
 private struct MapGrid: View {
     private enum RenderLayer {
-        case softenedTerrain
+        case softenedCurrentTerrain
+        case softenedRememberedTerrain
         case crispFullVisibility
     }
 
@@ -997,12 +998,9 @@ private struct MapGrid: View {
             ZStack {
                 Color.black
                 mapCells(side: side, grade: grade, atmosphereMotion: atmosphereMotion,
-                         layer: .softenedTerrain)
-                    .compositingGroup()
-                    .blur(radius: side * CGFloat(
-                        WorldVisibilityCompositePresentation.viewportBlurFraction(
-                            profile: visibilityProfile,
-                            includesRememberedTerrain: viewportIncludesRememberedTerrain)))
+                         layer: .softenedCurrentTerrain)
+                mapCells(side: side, grade: grade, atmosphereMotion: atmosphereMotion,
+                         layer: .softenedRememberedTerrain)
                 visibilityFieldShade(side: side)
                 mapCells(side: side, grade: grade, atmosphereMotion: atmosphereMotion,
                          layer: .crispFullVisibility)
@@ -1046,44 +1044,61 @@ private struct MapGrid: View {
             current: currentVisibility, wasRevealed: run.map[point].isRevealed)
         let isRememberedTerrain = currentVisibility == .hidden && visibility == .fringe
         var layerTile = displayTile(at: point, visibility: visibility)
-        if layer == .softenedTerrain {
+        let rendersTerrain: Bool
+        switch layer {
+        case .softenedCurrentTerrain:
+            rendersTerrain = WorldVisibilityCompositePresentation.softenedLayerRendersTerrain(
+                currentVisibility: currentVisibility, terrainVisibility: visibility,
+                pass: .current)
+        case .softenedRememberedTerrain:
+            rendersTerrain = WorldVisibilityCompositePresentation.softenedLayerRendersTerrain(
+                currentVisibility: currentVisibility, terrainVisibility: visibility,
+                pass: .remembered)
+        case .crispFullVisibility:
+            rendersTerrain = visibility == .full
+        }
+        if layer != .crispFullVisibility {
             layerTile.content = .empty
             layerTile.flora = nil
             layerTile.isCracking = false
         }
-        let presentation = WorldTileVisibilityPresentation.resolve(
-            run: run, point: point, tile: layerTile, visibility: visibility,
-            profile: visibilityProfile, grade: grade, atmosphereMotion: atmosphereMotion)
+        let artRequest = rendersTerrain
+            ? WorldTileVisibilityPresentation.resolve(
+                run: run, point: point, tile: layerTile, visibility: visibility,
+                profile: visibilityProfile, grade: grade,
+                atmosphereMotion: atmosphereMotion).artRequest
+            : nil
         let isCrispLayer = layer == .crispFullVisibility
+        let terrainBlurFraction: Double
+        switch layer {
+        case .softenedCurrentTerrain:
+            terrainBlurFraction = WorldVisibilityCompositePresentation
+                .currentTerrainBlurFraction(profile: visibilityProfile)
+        case .softenedRememberedTerrain:
+            terrainBlurFraction = WorldVisibilityCompositePresentation
+                .rememberedTerrainBlurFraction(profile: visibilityProfile)
+        case .crispFullVisibility:
+            terrainBlurFraction = 0
+        }
         return TileView(
             tile: layerTile,
             visibility: visibility,
             isRememberedTerrain: isRememberedTerrain,
             visibilityProfile: visibilityProfile,
-            artRequest: presentation.artRequest,
+            artRequest: artRequest,
             enemy: isCrispLayer ? enemy(at: point, visibility: currentVisibility) : nil,
             site: isCrispLayer && currentVisibility == .full ? site(at: point) : nil,
             hasLooseWorldPage: isCrispLayer && currentVisibility == .full
                 && run.offeredWorldPages.contains { $0.fieldProvenance?.position == point },
             isPlayer: isCrispLayer && point == run.playerPosition,
             showsContent: isCrispLayer,
-            isTransparent: isCrispLayer && visibility != .full,
+            isTransparent: !rendersTerrain,
             appliesVisibilityShade: false,
+            terrainBlurFraction: terrainBlurFraction,
+            clipsTerrainBlurToTileBounds: WorldVisibilityCompositePresentation
+                .clipsTerrainBlurToTileBounds,
             side: side,
             useSimpleRenderer: simpleRenderer)
-    }
-
-    private var viewportIncludesRememberedTerrain: Bool {
-        for y in origin.y..<(origin.y + viewportRows) {
-            for x in origin.x..<(origin.x + viewportColumns) {
-                let point = GridPoint(x: x, y: y)
-                let current = WorldRules.visibility(
-                    of: point, from: run.playerPosition, in: run.map,
-                    profile: visibilityProfile)
-                if current == .hidden && run.map[point].isRevealed { return true }
-            }
-        }
-        return false
     }
 
     private func hiddenMaskGrid(side: CGFloat) -> some View {
@@ -1256,9 +1271,20 @@ struct WorldTileVisibilityPresentation {
     }
 }
 
-/// One map-space softening pass replaces independent tile blurs and directional edge wedges.
-/// Full tiles are redrawn sharply above this layer; hidden tiles never receive an art request.
+/// Tile-bounded terrain softening preserves each cell's identity without directional edge wedges.
+/// Full tiles are redrawn sharply above it; hidden tiles never receive an art request. Remembered
+/// terrain has its own lighter pass, while shade remains one player-centred radial field.
 struct WorldVisibilityCompositePresentation {
+    /// Explored terrain is legible memory, so its vision-border blur is exactly half the live
+    /// fringe blur. Keep the relationship named here rather than duplicating presentation values.
+    static let rememberedTerrainBlurRatio = 0.5
+    static let clipsTerrainBlurToTileBounds = true
+
+    enum TerrainSofteningPass {
+        case current
+        case remembered
+    }
+
     struct RadialField: Equatable {
         let centerX: Double
         let centerY: Double
@@ -1269,16 +1295,34 @@ struct WorldVisibilityCompositePresentation {
         let rememberedShadeOpacity: Double
     }
 
-    static func viewportBlurFraction(profile: WorldRules.VisibilityProfile,
-                                     includesRememberedTerrain: Bool) -> Double {
-        if profile.fringeWidth > 0 { return profile.fringeBlurFraction }
-        return includesRememberedTerrain ? Tuning.Visibility.defaultFringeBlurFraction : 0
+    static func currentTerrainBlurFraction(profile: WorldRules.VisibilityProfile) -> Double {
+        profile.fringeWidth > 0 ? profile.fringeBlurFraction : 0
+    }
+
+    static func rememberedTerrainBlurFraction(profile: WorldRules.VisibilityProfile) -> Double {
+        let unexploredBorderBlur = profile.fringeWidth > 0
+            ? profile.fringeBlurFraction
+            : Tuning.Visibility.defaultFringeBlurFraction
+        return unexploredBorderBlur * rememberedTerrainBlurRatio
     }
 
     static func softenedLayerRendersTerrain(
         visibility: WorldRules.TileVisibility
     ) -> Bool {
         visibility != .hidden
+    }
+
+    static func softenedLayerRendersTerrain(
+        currentVisibility: WorldRules.TileVisibility,
+        terrainVisibility: WorldRules.TileVisibility,
+        pass: TerrainSofteningPass
+    ) -> Bool {
+        switch pass {
+        case .current:
+            currentVisibility != .hidden
+        case .remembered:
+            currentVisibility == .hidden && terrainVisibility == .fringe
+        }
     }
 
     static func crispLayerRendersContent(
@@ -1326,6 +1370,8 @@ private struct TileView: View {
     let showsContent: Bool
     let isTransparent: Bool
     let appliesVisibilityShade: Bool
+    let terrainBlurFraction: Double
+    let clipsTerrainBlurToTileBounds: Bool
     let side: CGFloat
     let useSimpleRenderer: Bool
 
@@ -1344,13 +1390,8 @@ private struct TileView: View {
                                                    lineCap: .round, lineJoin: .round))
                         .padding(side * 0.12)
                 }
-            } else if let artRequest {
-                MapTileArt(request: artRequest)
-                    .frame(width: side,
-                           height: side * CGFloat(MapAssetContract.spriteHeight)
-                               / CGFloat(MapAssetContract.logicalSide))
-                    .offset(y: -side * CGFloat(MapAssetContract.maximumElevation)
-                            / CGFloat(MapAssetContract.logicalSide))
+            } else if artRequest != nil {
+                terrainArt
             }
             if !isTransparent {
                 ZStack {
@@ -1414,6 +1455,37 @@ private struct TileView: View {
     private var surfaceLift: CGFloat {
         guard !useSimpleRenderer, let artRequest else { return 0 }
         return -side * CGFloat(artRequest.resolvedElevation) / CGFloat(MapAssetContract.logicalSide)
+    }
+
+    @ViewBuilder private var terrainArt: some View {
+        if let artRequest {
+            if terrainBlurFraction > 0 {
+                // Blur each terrain sample inside its own logical tile. The radial field supplies
+                // the coherent circular boundary; clipping here prevents elevation and adjacency
+                // pixels from smearing into neighbouring cells.
+                let blurredArt = MapTileArt(request: artRequest)
+                    .frame(width: side,
+                           height: side * CGFloat(MapAssetContract.spriteHeight)
+                               / CGFloat(MapAssetContract.logicalSide))
+                    .offset(y: -side * CGFloat(MapAssetContract.maximumElevation)
+                            / CGFloat(MapAssetContract.logicalSide))
+                    .blur(radius: side * CGFloat(terrainBlurFraction))
+                if clipsTerrainBlurToTileBounds {
+                    blurredArt
+                        .frame(width: side, height: side)
+                        .clipped()
+                } else {
+                    blurredArt
+                }
+            } else {
+                MapTileArt(request: artRequest)
+                    .frame(width: side,
+                           height: side * CGFloat(MapAssetContract.spriteHeight)
+                               / CGFloat(MapAssetContract.logicalSide))
+                    .offset(y: -side * CGFloat(MapAssetContract.maximumElevation)
+                            / CGFloat(MapAssetContract.logicalSide))
+            }
+        }
     }
 
     private var symbol: String? {

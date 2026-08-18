@@ -2,13 +2,33 @@ import XCTest
 @testable import Bookbinder
 
 final class WorldVisibilityRulesTests: XCTestCase {
-    func testVisibilityCompositionUsesOneSoftenedTerrainLayerAndCrispFullLayer() {
+    func testVisibilityCompositionUsesHalfBlurForRememberedTerrain() {
         let ordinary = WorldRules.visibilityProfile(illumination: 45)
         XCTAssertEqual(
-            WorldVisibilityCompositePresentation.viewportBlurFraction(
-                profile: ordinary, includesRememberedTerrain: false),
+            WorldVisibilityCompositePresentation.currentTerrainBlurFraction(profile: ordinary),
             ordinary.fringeBlurFraction,
             accuracy: 0.000_001)
+        XCTAssertEqual(WorldVisibilityCompositePresentation.rememberedTerrainBlurRatio, 0.5,
+                       accuracy: 0.000_001)
+        XCTAssertTrue(WorldVisibilityCompositePresentation.clipsTerrainBlurToTileBounds,
+                      "terrain blur must never sample across tile boundaries")
+        XCTAssertEqual(
+            WorldVisibilityCompositePresentation.rememberedTerrainBlurFraction(profile: ordinary),
+            WorldVisibilityCompositePresentation.currentTerrainBlurFraction(profile: ordinary)
+                * WorldVisibilityCompositePresentation.rememberedTerrainBlurRatio,
+            accuracy: 0.000_001)
+
+        XCTAssertTrue(WorldVisibilityCompositePresentation.softenedLayerRendersTerrain(
+            currentVisibility: .fringe, terrainVisibility: .fringe, pass: .current))
+        XCTAssertFalse(WorldVisibilityCompositePresentation.softenedLayerRendersTerrain(
+            currentVisibility: .fringe, terrainVisibility: .fringe, pass: .remembered))
+        XCTAssertFalse(WorldVisibilityCompositePresentation.softenedLayerRendersTerrain(
+            currentVisibility: .hidden, terrainVisibility: .fringe, pass: .current))
+        XCTAssertTrue(WorldVisibilityCompositePresentation.softenedLayerRendersTerrain(
+            currentVisibility: .hidden, terrainVisibility: .fringe, pass: .remembered))
+        XCTAssertFalse(WorldVisibilityCompositePresentation.softenedLayerRendersTerrain(
+            currentVisibility: .hidden, terrainVisibility: .hidden, pass: .remembered),
+                       "opaque unseen terrain must not enter either blur pass")
 
         XCTAssertTrue(WorldVisibilityCompositePresentation.softenedLayerRendersTerrain(
             visibility: .full))
@@ -28,13 +48,12 @@ final class WorldVisibilityRulesTests: XCTestCase {
     func testPitchBlackCompositionDoesNotBlurOpaqueFog() {
         let pitchBlack = WorldRules.visibilityProfile(illumination: 0)
         XCTAssertEqual(
-            WorldVisibilityCompositePresentation.viewportBlurFraction(
-                profile: pitchBlack, includesRememberedTerrain: false), 0,
+            WorldVisibilityCompositePresentation.currentTerrainBlurFraction(profile: pitchBlack), 0,
             accuracy: 0.000_001)
         XCTAssertEqual(
-            WorldVisibilityCompositePresentation.viewportBlurFraction(
-                profile: pitchBlack, includesRememberedTerrain: true),
-            Tuning.Visibility.defaultFringeBlurFraction,
+            WorldVisibilityCompositePresentation.rememberedTerrainBlurFraction(profile: pitchBlack),
+            Tuning.Visibility.defaultFringeBlurFraction
+                * WorldVisibilityCompositePresentation.rememberedTerrainBlurRatio,
             accuracy: 0.000_001)
     }
 
