@@ -253,7 +253,7 @@ struct WritingDeskView: View {
     }
 
     private var inkWellBar: some View {
-        let unlocked = state.base.completedResearch.contains("pen_ink_mixing")
+        let unlocked = state.base.hasCapability("inkMixing")
         let mixedCount = state.base.page.runes.filter { $0.inkRecipe != nil }.count
         return Button {
             if unlocked { presentedSheet = .inkWell }

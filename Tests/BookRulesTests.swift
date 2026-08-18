@@ -397,6 +397,7 @@ final class BookRulesTests: XCTestCase {
             firstBoundRunIndex: 1)
         store.mutate("unlock and provision formalization") { state in
             state.base.completedResearch.insert("pen_compounds")
+            state.base.capabilities.insert("compoundAssembly")
             state.base.ownedSources.insert(source)
             state.base.provenStatementReceipts = [receipt]
             state.base.essence = 100
@@ -474,6 +475,7 @@ final class BookRulesTests: XCTestCase {
         store.mutate("test: colored Sun") { state in
             state.base.ownedHands.insert(.plain)
             state.base.completedResearch.insert("pen_ink_mixing")
+            state.base.capabilities.insert("inkMixing")
             state.base.page = Page(runes: [sun, illumination],
                                    links: [MarkLink(sun.id, illumination.id)])
             state.base.essence = 500

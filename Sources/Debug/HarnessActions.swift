@@ -209,6 +209,7 @@ extension GameStore {
         store.mutate("stage compound assembly phone acceptance", flush: true) { state in
             state.worlds.activeRun = nil
             state.base.completedResearch.insert("pen_compounds")
+            state.base.capabilities.insert("compoundAssembly")
             state.base.ownedSources.insert(source)
             state.base.provenStatementReceipts = [eligible, ineligible]
             state.base.personalCompounds = []

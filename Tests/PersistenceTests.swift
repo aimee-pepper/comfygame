@@ -87,13 +87,27 @@ final class PersistenceTests: XCTestCase {
                        ["pen_brush", "pen_desk", "pen_chaining"])
         XCTAssertFalse(decoded.completedResearch.contains("pen_pencil"))
         XCTAssertTrue(decoded.hasChainingUnlock)
+        XCTAssertTrue(decoded.capabilities.contains("chaining"))
 
         let encoded = String(decoding: try JSONEncoder().encode(decoded), as: UTF8.self)
         XCTAssertFalse(encoded.contains("pen_pencil"))
         XCTAssertFalse(encoded.contains("hasChainingUnlock"))
         XCTAssertTrue(encoded.contains("pen_chaining"))
+        XCTAssertTrue(encoded.contains("capabilities"))
         let roundTrip = try JSONDecoder().decode(BaseState.self, from: Data(encoded.utf8))
         XCTAssertEqual(roundTrip.completedResearch, decoded.completedResearch)
+        XCTAssertEqual(roundTrip.capabilities, decoded.capabilities)
+    }
+
+    func testLegacyPenmanshipCompletionsPopulateAndRoundTripTheCapabilitySet() throws {
+        let data = Data(#"{"completedResearch":["pen_ink_mixing","pen_compounds","pen_chaining"]}"#.utf8)
+        let decoded = try JSONDecoder().decode(BaseState.self, from: data)
+        XCTAssertEqual(decoded.capabilities.intersection(["inkMixing", "compoundAssembly", "chaining"]),
+                       ["inkMixing", "compoundAssembly", "chaining"])
+
+        let relaunched = try JSONDecoder().decode(
+            BaseState.self, from: JSONEncoder().encode(decoded))
+        XCTAssertEqual(relaunched.capabilities, decoded.capabilities)
     }
 
     func testLegacyBrushDiaryProgressAliasesEveryPersistedKeyWithoutDuplicates() throws {
@@ -105,6 +119,22 @@ final class PersistenceTests: XCTestCase {
 
         let encoded = String(decoding: try JSONEncoder().encode(decoded), as: UTF8.self)
         XCTAssertFalse(encoded.contains("lead_pencil"))
+    }
+
+    func testLegacyBrushDiaryIDsCanonicalizeAcrossPersistedRunReceipts() throws {
+        let outcomeData = Data(#"{"runIndex":1,"kind":"waystone","reason":"test","turnsTaken":2,"haulKeptFraction":1,"pages":["halloway_lead_pencil","isolde_lead_pencil"]}"#.utf8)
+        let outcome = try JSONDecoder().decode(RunExitSummary.self, from: outcomeData)
+        XCTAssertEqual(outcome.pages, ["halloway_brush_ferrule", "isolde_brush_hand"])
+        XCTAssertFalse(String(decoding: try JSONEncoder().encode(outcome), as: UTF8.self)
+            .contains("lead_pencil"))
+
+        let diagnosticsData = Data(#"{"selectedDiaryPages":["halloway_lead_pencil"],"placedDiaryPages":["isolde_lead_pencil"]}"#.utf8)
+        let diagnostics = try JSONDecoder().decode(WorldGenerationDiagnostics.self,
+                                                    from: diagnosticsData)
+        XCTAssertEqual(diagnostics.selectedDiaryPages, ["halloway_brush_ferrule"])
+        XCTAssertEqual(diagnostics.placedDiaryPages, ["isolde_brush_hand"])
+        XCTAssertFalse(String(decoding: try JSONEncoder().encode(diagnostics), as: UTF8.self)
+            .contains("lead_pencil"))
     }
 
     func testLegacyRecoveredPagesMigrateInOrderWithoutInventingProvenance() throws {

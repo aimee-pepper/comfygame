@@ -1121,8 +1121,8 @@ struct ScriptoriumView: View {
         Capability.allCases.filter {
             switch $0 {
             case .hands: true
-            case .inks: store.state.base.completedResearch.contains("pen_ink_mixing")
-            case .runebook: store.state.base.completedResearch.contains("pen_compounds")
+            case .inks: store.state.base.hasCapability("inkMixing")
+            case .runebook: store.state.base.hasCapability("compoundAssembly")
             }
         }
     }

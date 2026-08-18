@@ -698,6 +698,7 @@ final class PageTests: XCTestCase {
 
         store.mutate("test: learn ink mixing") {
             $0.base.completedResearch.insert("pen_ink_mixing")
+            $0.base.capabilities.insert("inkMixing")
         }
         let before = store.state
         XCTAssertEqual(store.applyInkRecipe(recipe, to: target.id), .ineligibleMark)
@@ -717,6 +718,7 @@ final class PageTests: XCTestCase {
         let recipe = InkRecipe(cyan: 40, magenta: 15, yellow: 70, depth: 5)
         store.mutate("test: learn ink mixing") {
             $0.base.completedResearch.insert("pen_ink_mixing")
+            $0.base.capabilities.insert("inkMixing")
         }
         guard case .savedMixture(let id) = store.saveInkMixture(named: "  Moss  ", recipe: recipe)
         else { return XCTFail("mixture was not saved") }
@@ -753,6 +755,7 @@ final class PageTests: XCTestCase {
         let recipe = InkRecipe(cyan: 26, magenta: 0, yellow: 100, depth: 1)
         store.mutate("test: stock Scriptorium") { state in
             state.base.completedResearch.insert("pen_ink_mixing")
+            state.base.capabilities.insert("inkMixing")
             state.base.pigmentStock.add(1, of: .cyan)
             state.base.resources.add(1, of: "copper")
             state.base.resources.add(1, of: "sulfur")
@@ -786,7 +789,10 @@ final class PageTests: XCTestCase {
     func testInsufficientInkPreparationConsumesNothing() {
         let store = GameStore(io: .temporary(name: "ink-vial-missing-\(UUID().uuidString)"))
         let recipe = InkRecipe(cyan: 100, magenta: 100, yellow: 0, depth: 0)
-        store.mutate("test: unlock only") { $0.base.completedResearch.insert("pen_ink_mixing") }
+        store.mutate("test: unlock only") {
+            $0.base.completedResearch.insert("pen_ink_mixing")
+            $0.base.capabilities.insert("inkMixing")
+        }
         let quote = store.inkVialPreparationQuote(recipe)
         XCTAssertFalse(quote.isReady)
         let before = store.state
@@ -802,6 +808,7 @@ final class PageTests: XCTestCase {
         store.mutate("test: unlock Brush ink") { state in
             state.base.ownedHands.insert(.plain)
             state.base.completedResearch.insert("pen_ink_mixing")
+            state.base.capabilities.insert("inkMixing")
         }
         store.useInkForNextFocus(recipe)
         XCTAssertTrue(store.write(.target("illumination"), glyph: "illumination",

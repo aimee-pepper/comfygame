@@ -53,8 +53,11 @@ struct BaseState: Codable, Equatable, Sendable {
     /// The parts you can build rules out of. Learned from the research tree, or found in the wild.
     var ownedGambitComponents: Set<GambitComponentID> = []
 
-    /// Research nodes completed. The tree's state, and the only place it's recorded.
+    /// Research nodes completed. This is topology/history; live entitlements use `capabilities`.
     var completedResearch: Set<ResearchNodeID> = []
+    /// Permanent rule entitlements granted by research. Kept separate from completion so a
+    /// capability is not coupled forever to the first node that happened to teach it.
+    var capabilities: Set<CapabilityID> = []
     /// Recipes inferred from stock once the Apothecary exists. Once understood, never forgotten.
     var knownConsumableRecipes: Set<ItemID> = []
     /// Durable entitlement for Oda's one authored restoration. The item may move or leave without
@@ -114,12 +117,14 @@ struct BaseState: Codable, Equatable, Sendable {
     /// A single unlock for now (session 11 §3); per-target chaining runes stay possible later if
     /// one blunt switch proves too coarse.
     var hasChainingUnlock: Bool {
-        get { completedResearch.contains("pen_chaining") }
+        get { capabilities.contains("chaining") }
         set {
-            if newValue { completedResearch.insert("pen_chaining") }
-            else { completedResearch.remove("pen_chaining") }
+            if newValue { capabilities.insert("chaining") }
+            else { capabilities.remove("chaining") }
         }
     }
+
+    func hasCapability(_ id: CapabilityID) -> Bool { capabilities.contains(id) }
 
     /// The finest hand available. Marks are written in it by default.
     var bestHand: Hand { ownedHands.max() ?? .crude }
@@ -359,7 +364,7 @@ struct BaseState: Codable, Equatable, Sendable {
         case satchelLoadout, spillover, goldCoins, tradingPost, recycler
         case lifetimeRawEssenceRefined, autoRefineReturnedRawEssence, lastAutoRefinedOutcomeID
         case ownedSymbols, ownedGambitComponents
-        case completedResearch, knownConsumableRecipes, odaFixtureRestored, stations, page
+        case completedResearch, capabilities, knownConsumableRecipes, odaFixtureRestored, stations, page
         case savedPageTemplates, nextPageTemplateID, nextTemplateMarkID
         case savedInkMixtures, nextInkMixtureID
         case provenStatementReceipts, personalCompounds
@@ -393,6 +398,7 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(ownedSources, forKey: .ownedSources)
         try c.encode(ownedGambitComponents, forKey: .ownedGambitComponents)
         try c.encode(completedResearch, forKey: .completedResearch)
+        try c.encode(capabilities, forKey: .capabilities)
         try c.encode(instrumentLoadout, forKey: .instrumentLoadout)
         try c.encode(hasConfiguredInstrumentLoadout, forKey: .hasConfiguredInstrumentLoadout)
         try c.encode(stations, forKey: .stations)
@@ -445,6 +451,25 @@ struct BaseState: Codable, Equatable, Sendable {
         completedResearch = try container.decodeIfPresent(Set<ResearchNodeID>.self, forKey: .completedResearch) ?? []
         if completedResearch.remove("pen_pencil") != nil {
             completedResearch.insert("pen_brush")
+        }
+        capabilities = try container.decodeIfPresent(Set<CapabilityID>.self, forKey: .capabilities) ?? []
+        // Saves written before capabilities became their own authority recorded the teaching node
+        // only. Canonicalize all shipped grants once at decode; unknown future completions remain
+        // untouched rather than being guessed.
+        let legacyCapabilityNodes: [ResearchNodeID: CapabilityID] = [
+            "tannery_wear_root": "tannery_wear",
+            "weaponsmith_point_root": "weaponsmith_fitted_point",
+            "tannery_carry_root": "tannery_carry",
+            "tannery_wear_tier_two": "tannery_tier_two",
+            "tannery_keep_root": "tannery_keep",
+            "essence_second_pass": "essence_second_pass",
+            "essence_continuous_settling": "essence_continuous_settling",
+            "pen_ink_mixing": "inkMixing",
+            "pen_compounds": "compoundAssembly",
+            "pen_chaining": "chaining"
+        ]
+        for (node, capability) in legacyCapabilityNodes where completedResearch.contains(node) {
+            capabilities.insert(capability)
         }
         lifetimeRawEssenceRefined = try container.decodeIfPresent(Int.self,
                                                                    forKey: .lifetimeRawEssenceRefined) ?? 0
@@ -534,6 +559,7 @@ struct BaseState: Codable, Equatable, Sendable {
             Bool.self, forKey: .starterWorldPageBundleFulfilled) ?? false
         ownedHands = try container.decodeIfPresent(Set<Hand>.self, forKey: .ownedHands) ?? [.crude]
         if try container.decodeIfPresent(Bool.self, forKey: .hasChainingUnlock) == true {
+            capabilities.insert("chaining")
             completedResearch.insert("pen_chaining")
         }
         // A save written before the roster existed holds exactly one companion; she becomes the

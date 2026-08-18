@@ -114,7 +114,7 @@ extension GameStore {
 
     func previewCompoundFormalization(fingerprint: String,
                                       nickname: String) -> CompoundFormalizationPreview {
-        guard state.base.completedResearch.contains("pen_compounds") else {
+        guard state.base.hasCapability("compoundAssembly") else {
             return .refused(.locked)
         }
         guard state.worlds.activeRun == nil else { return .refused(.awayFromBase) }
@@ -142,7 +142,7 @@ extension GameStore {
     func formalizeCompound(_ quote: CompoundFormalizationQuote) -> CompoundAssemblyResult {
         var result: CompoundAssemblyResult = .stale
         let changed = mutateIf("formalize personal compound", flush: true) { state in
-            guard state.base.completedResearch.contains("pen_compounds"),
+            guard state.base.hasCapability("compoundAssembly"),
                   state.worlds.activeRun == nil,
                   state.base.nextPersonalCompoundID == quote.compoundID.rawValue,
                   state.base.nextPersonalCompoundOrdinal == quote.creationOrdinal,
@@ -334,7 +334,7 @@ extension GameStore {
             let next = (state.base.page.runes.map(\.id.rawValue).max() ?? 0) + 1
             var placed = PlacedRune(id: InstanceID(rawValue: next), content: content,
                                     hand: state.base.bestHand, origin: cell, shapeID: shape.id)
-            if state.base.completedResearch.contains("pen_ink_mixing"),
+            if state.base.hasCapability("inkMixing"),
                placed.hand != .crude,
                placed.inkEligibleSourceID.map(InkEconomyRules.supportedSourceIDs.contains) == true,
                let queued = state.base.nextFocusInkRecipe {
@@ -526,7 +526,7 @@ extension GameStore {
 
     @discardableResult
     func applyInkRecipe(_ recipe: InkRecipe, to markID: InstanceID) -> InkActionResult {
-        guard state.base.completedResearch.contains("pen_ink_mixing") else { return .mixingLocked }
+        guard state.base.hasCapability("inkMixing") else { return .mixingLocked }
         guard let mark = state.base.page.runes.first(where: { $0.id == markID })
         else { return .staleMark }
         guard mark.hand != .crude, mark.canCarryInk,
@@ -565,7 +565,7 @@ extension GameStore {
 
     @discardableResult
     func saveInkMixture(named proposedName: String, recipe: InkRecipe) -> InkActionResult {
-        guard state.base.completedResearch.contains("pen_ink_mixing") else { return .mixingLocked }
+        guard state.base.hasCapability("inkMixing") else { return .mixingLocked }
         if let existing = state.base.savedInkMixtures.first(where: { $0.recipe == recipe }) {
             return .savedMixture(existing.id)
         }
@@ -602,7 +602,7 @@ extension GameStore {
     }
 
     func useInkForNextFocus(_ recipe: InkRecipe?) {
-        guard state.base.completedResearch.contains("pen_ink_mixing") else { return }
+        guard state.base.hasCapability("inkMixing") else { return }
         mutate("choose ink for next focus") { $0.base.nextFocusInkRecipe = recipe }
     }
 
@@ -649,7 +649,7 @@ extension GameStore {
     /// spend one Resin, and create a frozen 12-application vial. A stale preview changes nothing.
     @discardableResult
     func prepareInkVial(_ quote: InkVialPreparationQuote) -> InkVialPreparationResult {
-        guard state.base.completedResearch.contains("pen_ink_mixing") else {
+        guard state.base.hasCapability("inkMixing") else {
             return .mixingLocked
         }
         guard quote == Self.inkVialPreparationQuote(quote.recipe, in: state.base) else {

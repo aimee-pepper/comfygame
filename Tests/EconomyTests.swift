@@ -402,6 +402,7 @@ final class EconomyTests: XCTestCase {
             XCTAssertEqual(store.state.base.resources[resource], 0)
         }
         XCTAssertTrue(store.state.base.completedResearch.contains(compound.id))
+        XCTAssertTrue(store.state.base.capabilities.contains("compoundAssembly"))
         XCTAssertNotEqual(
             store.previewCompoundFormalization(fingerprint: "not-yet-proven", nickname: "Test"),
             .refused(.locked),

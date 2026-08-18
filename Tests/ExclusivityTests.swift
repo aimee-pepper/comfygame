@@ -86,6 +86,7 @@ final class ExclusivityTests: XCTestCase {
         XCTAssertTrue(store.canResearch(node))
         XCTAssertTrue(store.research(node))
         XCTAssertTrue(store.state.base.completedResearch.contains(node.id))
+        XCTAssertTrue(store.state.base.capabilities.contains("compoundAssembly"))
         XCTAssertNotEqual(
             store.previewCompoundFormalization(fingerprint: "not-yet-proven", nickname: "Test"),
             .refused(.locked),
@@ -104,6 +105,7 @@ final class ExclusivityTests: XCTestCase {
         XCTAssertTrue(chainingStore.canResearch(chaining))
         XCTAssertTrue(chainingStore.research(chaining))
         XCTAssertTrue(chainingStore.state.base.hasChainingUnlock)
+        XCTAssertTrue(chainingStore.state.base.capabilities.contains("chaining"))
 
         let inkStore = fundedScriptoriumStore()
         let ink = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_ink_mixing"))
@@ -111,6 +113,7 @@ final class ExclusivityTests: XCTestCase {
         XCTAssertTrue(inkStore.canResearch(ink))
         XCTAssertTrue(inkStore.research(ink))
         XCTAssertTrue(inkStore.state.base.completedResearch.contains(ink.id))
+        XCTAssertTrue(inkStore.state.base.capabilities.contains("inkMixing"))
 
         let fountainStore = fundedScriptoriumStore(
             completed: ["pen_brush", "pen_desk", "pen_chaining"], tier: 2)

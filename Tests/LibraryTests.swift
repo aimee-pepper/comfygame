@@ -987,6 +987,7 @@ final class LibraryTests: XCTestCase {
             // learning to join two statements is the grammar lesson, writing small enough for it
             // to matter is the one after.
             state.base.completedResearch.formUnion(["pen_brush", "pen_desk", "pen_chaining"])
+            state.base.capabilities.insert("chaining")
         }
         let fountain = try XCTUnwrap(ContentCatalog.shared.researchNode("pen_fountain"))
         XCTAssertFalse(store.canResearch(fountain), "the finest hand ignored the building's tier")

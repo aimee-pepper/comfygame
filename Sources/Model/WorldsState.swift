@@ -443,7 +443,8 @@ struct RunExitSummary: Codable, Equatable, Identifiable, Sendable {
                                                 forKey: .keptWorldPages) ?? []
         lostWorldPages = try c.decodeIfPresent([WorldPageInstance].self,
                                                 forKey: .lostWorldPages) ?? []
-        pages = try c.decodeIfPresent([DiaryPageID].self, forKey: .pages) ?? []
+        pages = (try c.decodeIfPresent([DiaryPageID].self, forKey: .pages) ?? [])
+            .map(\.canonicalLegacyID)
         writings = try c.decodeIfPresent([RecoveredWriting].self, forKey: .writings) ?? []
         recruitedTravellers = try c.decodeIfPresent([TravellerID].self,
                                                      forKey: .recruitedTravellers) ?? []
@@ -627,9 +628,13 @@ struct WorldGenerationDiagnostics: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         writingWasGuaranteed = try c.decodeIfPresent(Bool.self, forKey: .writingWasGuaranteed) ?? true
-        selectedDiaryPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .selectedDiaryPages) ?? []
+        selectedDiaryPages = (try c.decodeIfPresent([DiaryPageID].self,
+                                                     forKey: .selectedDiaryPages) ?? [])
+            .map(\.canonicalLegacyID)
         selectedOtherWritingCount = try c.decodeIfPresent(Int.self, forKey: .selectedOtherWritingCount) ?? 0
-        placedDiaryPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .placedDiaryPages) ?? []
+        placedDiaryPages = (try c.decodeIfPresent([DiaryPageID].self,
+                                                   forKey: .placedDiaryPages) ?? [])
+            .map(\.canonicalLegacyID)
         placedOtherWritings = try c.decodeIfPresent([FoundWritingID].self, forKey: .placedOtherWritings) ?? []
         secondWritingRollSucceeded = try c.decodeIfPresent(Bool.self, forKey: .secondWritingRollSucceeded) ?? false
         rawEssenceEligibleTiles = try c.decodeIfPresent(Int.self, forKey: .rawEssenceEligibleTiles) ?? 0
@@ -1141,8 +1146,9 @@ struct WorldRun: Codable, Equatable, Sendable {
         }
         materialReserve.migrateLegacyStacks(&satchelItems.stacks, location: "run.satchelItems")
         materialReserve.migrateLegacyStacks(&offeredItems, location: "run.offeredItems")
-        foundPagesAtStart = try container.decodeIfPresent(Set<DiaryPageID>.self,
-                                                           forKey: .foundPagesAtStart) ?? []
+        foundPagesAtStart = Set((try container.decodeIfPresent(Set<DiaryPageID>.self,
+                                                                forKey: .foundPagesAtStart) ?? [])
+            .map(\.canonicalLegacyID))
         foundWritingsAtStart = try container.decodeIfPresent(Set<FoundWritingID>.self,
                                                               forKey: .foundWritingsAtStart) ?? []
         foundTravellersAtStart = try container.decodeIfPresent(Set<TravellerID>.self,

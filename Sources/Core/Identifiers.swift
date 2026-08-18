@@ -89,6 +89,15 @@ struct TravellerID: StringIdentifier {
 struct DiaryPageID: StringIdentifier {
     var rawValue: String
     init(rawValue: String) { self.rawValue = rawValue }
+
+    /// One-way aliases accepted only while decoding historical saves.
+    var canonicalLegacyID: DiaryPageID {
+        switch rawValue {
+        case "halloway_lead_pencil": "halloway_brush_ferrule"
+        case "isolde_lead_pencil": "isolde_brush_hand"
+        default: self
+        }
+    }
 }
 
 /// A singular workshop method learned from authored writing, rather than research progress.
@@ -128,6 +137,14 @@ struct ResearchBranchID: StringIdentifier {
 }
 
 struct ResearchNodeID: StringIdentifier {
+    var rawValue: String
+    init(rawValue: String) { self.rawValue = rawValue }
+}
+
+/// A durable rule entitlement granted by research. This is deliberately distinct from the node
+/// that taught it: research completion records history/topology, while capabilities are what live
+/// rules consume.
+struct CapabilityID: StringIdentifier {
     var rawValue: String
     init(rawValue: String) { self.rawValue = rawValue }
 }

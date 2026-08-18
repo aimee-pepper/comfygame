@@ -353,9 +353,7 @@ enum EconomyRules {
             }
 
         case .capability:
-            // The completed research node is the durable capability flag. Do not mirror it into
-            // another save field that could drift out of sync.
-            break
+            if let id = grant.id { state.base.capabilities.insert(CapabilityID(rawValue: id)) }
 
         case .effect:
             guard let effect = grant.effect else { return }

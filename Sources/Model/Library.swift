@@ -48,15 +48,11 @@ struct LibraryState: Codable, Equatable, Sendable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        let aliases: [DiaryPageID: DiaryPageID] = [
-            "halloway_lead_pencil": "halloway_brush_ferrule",
-            "isolde_lead_pencil": "isolde_brush_hand"
-        ]
         let decodedRecords = try c.decodeIfPresent([RecoveredPageRecord].self,
                                                    forKey: .recoveredPages) ?? []
         let decodedPages = try c.decodeIfPresent([DiaryPageID].self, forKey: .foundPages) ?? []
         let canonicalPages = decodedPages.reduce(into: [DiaryPageID]()) { result, page in
-            let canonical = aliases[page] ?? page
+            let canonical = page.canonicalLegacyID
             if !result.contains(where: { $0 == canonical }) { result.append(canonical) }
         }
         if decodedRecords.isEmpty {
@@ -68,7 +64,7 @@ struct LibraryState: Codable, Equatable, Sendable {
                 $0.discoverySequence < $1.discoverySequence
             }.reduce(into: [RecoveredPageRecord]()) { result, record in
                 var canonical = record
-                canonical.pageID = aliases[record.pageID] ?? record.pageID
+                canonical.pageID = record.pageID.canonicalLegacyID
                 guard !result.contains(where: { $0.pageID == canonical.pageID }) else { return }
                 result.append(canonical)
             }
@@ -97,11 +93,11 @@ struct LibraryState: Codable, Equatable, Sendable {
             forKey: .travellerArrivalNearMisses) ?? [:]).mapValues { max(0, $0) }
         let decodedWaiting = try c.decodeIfPresent([DiaryPageID: Int].self, forKey: .pagesWaiting) ?? [:]
         pagesWaiting = decodedWaiting.reduce(into: [:]) { result, entry in
-            let canonical = aliases[entry.key] ?? entry.key
+            let canonical = entry.key.canonicalLegacyID
             result[canonical] = max(result[canonical] ?? 0, entry.value)
         }
         let decodedPatience = try c.decodeIfPresent(DiaryPageID.self, forKey: .patiencePage)
-        patiencePage = decodedPatience.map { aliases[$0] ?? $0 }
+        patiencePage = decodedPatience.map(\.canonicalLegacyID)
         visitedWorlds = try c.decodeIfPresent([VisitedWorld].self, forKey: .visitedWorlds) ?? []
     }
 
