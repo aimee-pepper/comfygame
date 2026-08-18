@@ -16,6 +16,7 @@ for(const [state,html] of Object.entries(rendered).filter(([name])=>!["Compare v
   assert.match(html,/world-expedition-header[\s\S]*Explore[\s\S]*world-header-status/,`${state} must retain the crafted Explore header with inline status`);
   assert.match(html,/world-header-status[\s\S]*STABILITY[\s\S]*COLLAPSE/,`${state} must preserve Stability and collapse truth beside Explore`);
   assert.match(html,/party-health-strip/,`${state} must preserve the party-health strip`);
+  assert.equal((html.match(/party-health-bar/g)??[]).length,3,`${state} must show one proportional health bar per visible party member`);
   assert.match(html,/world-map-grid/,`${state} must preserve the fixed map viewport`);
   assert.equal((html.match(/world-map-cell/g)??[]).length,121,`${state} must render an 11×11 fixed-scale viewport`);
   assert.doesNotMatch(html,/world-map-scale|FIXED 11×11/,`${state} must not show the redundant fixed-camera badge`);
@@ -23,7 +24,7 @@ for(const [state,html] of Object.entries(rendered).filter(([name])=>!["Compare v
   assert.match(html,/world-place-info/,`${state} must restore the place-information panel without embedding actions in it`);
   assert.ok(html.indexOf("world-map-stage")<html.indexOf("world-place-info")&&html.indexOf("world-place-info")<html.indexOf("world-field-strip"),`${state} must overlay place information inside the map before the compact field strip`);
   assert.match(html,/world-field-strip/,`${state} must keep Field Kit, resources, and turn visible`);
-  assert.match(html,/world-navigation-row[\s\S]*class="dpad[\s\S]*world-minimap/,`${state} must keep movement and minimap side by side`);
+  assert.match(html,/world-navigation-row[\s\S]*class="dpad[\s\S]*world-map-controls[\s\S]*world-minimap[\s\S]*world-actions/,`${state} must keep the larger movement pad beside a minimap with both actions directly beneath it`);
   assert.match(html,/class="dpad/,`${state} must preserve directional movement or inspection`);
   assert.match(html,/world-minimap/,`${state} must preserve the explored minimap`);
   assert.match(html,/world-actions/,`${state} must preserve native Interact and Look actions`);
