@@ -38,7 +38,7 @@ const screens=[
   ["Settings","Utility","settings","Keep utilities compact and clearly outside village navigation."]
 ].map(([title,category,type,purpose],index)=>({id:title.toLowerCase().replaceAll(/[^a-z0-9]+/g,"-"),title,category,type,purpose,index}));
 
-const priorityScreenIDs=new Set(["campaigns","home","writing-desk","world"]);
+const priorityScreenIDs=new Set(["campaigns","home","writing-desk","world","return-recap"]);
 const $=id=>document.getElementById(id),categories=["Priority","All",...new Set(screens.map(s=>s.category))];
 const fixtureStatesByScreen={"writing-desk":["Write","Runebook","Pages · Collected","Pages · Templates","Pages · Template actions","Pages · Replace draft","Pages · Rename Template","Pages · Overwrite Template","Pages · Delete Template","The world","Collected world","Born anchored","Clear Confirm"],world:["Compare versions","Previous layout","Travel","Look","Harvest","Search","Portal","Cache","Survey & anchor","Loose page","Night sight"],"return-recap":["Returned","Collapsed","Receipt detail"],constellation:["Default","Selected","Confirm","Bought"],settings:["Default","DEBUG"]};
 const reviewStorageKey="bookbinder.assetlab.ui-gallery-reviews.v1";

@@ -8,7 +8,7 @@ const galleryHtml=await readFile(new URL("../ui-gallery.html",import.meta.url),"
 const required=["Campaigns","Home","Writing Desk","Storehouse","Workshop","Party","Essence Spring","Constellation","Library","Bestiary","Research","World History","Blacksmith","Trading Post","Recycler","Tannery","Bowyer","Armoury","Weaponsmith","Scriptorium","Survey Post","Apothecary","Reliquary","Wayfarer’s Table","Anchorage","Distillery","Channelworks","Firepit","Gear","World","Encounter","Loot Decision","Return Recap","Settings"];
 assert.deepEqual(screens.map(({title})=>title),required,"screen order is an intentional ordinary-phone contract");
 assert.deepEqual([...renderers.keys()],required,"every gallery entry must have one explicit renderer");
-assert.deepEqual([...priorityScreenIDs],["campaigns","home","writing-desk","world"],"the default review lane must stay focused on the four explicitly prioritized gameplay screens");
+assert.deepEqual([...priorityScreenIDs],["campaigns","home","writing-desk","world","return-recap"],"the default review lane must stay focused on the four prioritized gameplay screens followed by the explicitly requested World exit screen");
 assert.match(galleryApp,/category="Priority"/,"the gallery must open in the focused review lane rather than the 34-screen backlog");
 assert.match(galleryApp,/function step\(delta\)\{const sequence=filtered\(\)/,"Previous and Next must stay inside the selected review lane");
 assert.deepEqual(Object.keys(preservationLedger).sort(),required.slice().sort(),"every proposed screen must audit the native structure it preserves");
