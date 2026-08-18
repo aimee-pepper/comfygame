@@ -23,7 +23,7 @@ export const preservationLedger={
 "Survey Post":["ResearchViews.swift","Eight independent instrument studies","Survey Post gate separate from node edges"],
 "Apothecary":["ApothecaryView.swift","Known preparation catalogue","Exact stock readiness","Persistent learned recipes"],
 "Reliquary":["StationViews.swift","Singular recovered identity and provenance","No generic inventory-wall treatment"],
-"Wayfarer’s Table":["StationViews.swift","Routes, provisions and field notes","Party assignment consequences"],
+"Wayfarer’s Table":["StationViews.swift","+2 satchel capacity","+1 organic harvest yield","Visible flora identified on sight","No route planning, party assignment, supply management or departure review"],
 "Anchorage":["StationViews.swift","Persisted anchored realms","Reactivation Essence shortfall","Assigned worker contribution"],
 "Distillery":["StationViews.swift","Heat-core attunement, potency and origin","Crystallisation separate from distillation"],
 "Channelworks":["StationViews.swift","One exact player-made core per conduit","Transferred attunement and origin receipt"],

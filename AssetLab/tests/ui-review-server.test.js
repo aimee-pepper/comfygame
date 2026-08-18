@@ -8,9 +8,9 @@ const ledger=join(temporary,"nested","ui-gallery-reviews.json");
 process.env.ASSETLAB_UI_REVIEW_FILE=ledger;
 const {handleAssetLabRequest}=await import("../server.js");
 
-function request(method,payload){
+function request(method,payload,path="/__ui-reviews"){
   const bytes=payload===undefined?[]:[Buffer.from(JSON.stringify(payload))];
-  return {method,url:"/__ui-reviews",headers:{host:"127.0.0.1"},async *[Symbol.asyncIterator](){yield* bytes}};
+  return {method,url:path,headers:{host:"127.0.0.1"},async *[Symbol.asyncIterator](){yield* bytes}};
 }
 function response(){
   return {status:0,headers:{},bytes:Buffer.alloc(0),writeHead(status,headers={}){this.status=status;this.headers=headers;return this},end(value=""){this.bytes=Buffer.isBuffer(value)?value:Buffer.from(value);return this},json(){return JSON.parse(this.bytes.toString())}};
@@ -22,6 +22,10 @@ try{
   assert.equal(empty.status,200);
   assert.equal(empty.headers["Cache-Control"],"no-store");
   assert.deepEqual(empty.json(),{schemaVersion:1,reviews:{}},"a missing shared ledger must read as an empty review packet");
+  const meta=response();await handleAssetLabRequest(request("GET",undefined,"/__assetlab-meta"),meta);
+  assert.equal(meta.status,200);
+  assert.equal(meta.headers["Cache-Control"],"no-store");
+  assert.match(meta.json().revision,/^[a-f0-9]{7,12}$|^unavailable$/,"review UI must expose the exact served source revision");
 
   const invalid=await invoke("POST",{schemaVersion:1,screenID:"home",record:{choice:"maybe",notes:""}});
   assert.equal(invalid.status,400,"invalid review choices must be rejected without persistence");

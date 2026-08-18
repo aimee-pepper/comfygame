@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-18T20:13:50.208Z",
+  "updatedAt": "2026-08-18T20:23:13.724Z",
   "reviews": {
     "campaigns": {
       "choice": "no",
@@ -12,7 +12,83 @@
     },
     "writing-desk": {
       "choice": "no",
-      "notes": "I like the side by side view but the single row of runes "
+      "notes": "the side by side view is nonviable for scrolling through the wide variety of runes we have"
+    },
+    "storehouse": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "workshop": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "party": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "essence-spring": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "library": {
+      "choice": "no",
+      "notes": "I don't see how this makes sense for the way the game works but the aesthetic is good. just needs to be way more functional for the actual game. "
+    },
+    "bestiary": {
+      "choice": "no",
+      "notes": "images should be smaller, item sized until you view them in detail"
+    },
+    "world-history": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "blacksmith": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "trading-post": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "recycler": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "tannery": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "bowyer": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "armoury": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "weaponsmith": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "scriptorium": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "survey-post": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "apothecary": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "reliquary": {
+      "choice": "yes",
+      "notes": ""
+    },
+    "wayfarer-s-table": {
+      "choice": "yes",
+      "notes": ""
     }
   }
 }

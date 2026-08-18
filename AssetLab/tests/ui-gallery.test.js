@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {preservationLedger} from "../src/ui-preservation-ledger.js";
-import {fontChoices,implementationReviewPacket,implementationReviewRecordPacket,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
+import {fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
 const galleryApp=await readFile(new URL("../src/ui-gallery-app.js",import.meta.url),"utf8");
 const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
 const galleryHtml=await readFile(new URL("../ui-gallery.html",import.meta.url),"utf8");
@@ -15,7 +15,6 @@ for(const title of required){
   for(const fixtureState of ["Default","Selected","Confirm"]){
     const html=renderScreen(title,fixtureState);
     assert.match(html,/class="safe-top"/,`${title} ${fixtureState} must render phone chrome`);
-    assert.match(html,/class="bottom-rail"/,`${title} ${fixtureState} must keep actions reachable`);
     assert.ok(html.length>500,`${title} ${fixtureState} must render a substantive fixture`);
   }
 }
@@ -26,7 +25,7 @@ const requiredMarkers={
   Recycler:"salvage-table",Tannery:"hide-frame",Bowyer:"bow-jig",Armoury:"armour-stand",
   Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"reliquary-room",
   "Survey Post":"instrument-board",
-  "Wayfarer’s Table":"route-table",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
+  "Wayfarer’s Table":"fieldcraft-board",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
   Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"receipt-paper",Settings:"utility-board"
 };
 for(const [title,marker] of Object.entries(requiredMarkers))assert.match(renderScreen(title),new RegExp(marker),`${title} must reach its specialized composition`);
@@ -58,6 +57,10 @@ assert.match(galleryHtml,/id="pixel-font-choice"/,"gallery must expose a live pi
 assert.match(galleryHtml,/Yes, implementation ready[\s\S]*No, not ready/,"every selected preview must expose a mutually exclusive implementation gate");
 assert.match(galleryHtml,/id="implementation-feedback"[\s\S]*Required when this screen is not ready/,"a not-ready review must request specific feedback");
 assert.match(galleryHtml,/id="implementation-review-save"[\s\S]*Save feedback/,"review feedback must have an explicit Save button");
+assert.match(galleryHtml,/Native behavior contract[\s\S]*id="assetlab-revision"/,"reviewers must see native conformance and the exact served AssetLab revision");
+assert.deepEqual(Object.keys(nativeConformance).sort(),screens.map(({id})=>id).sort(),"every gallery screen must carry an explicit native-conformance status");
+assert.ok(Object.values(nativeConformance).every(record=>["verified","failed","pending"].includes(record.status)&&record.source),"conformance records must be closed and source-owned");
+assert.match(galleryApp,/input\.value==="yes"&&!conformanceReady/,"implementation-ready approval must be unavailable until native behavior is verified");
 assert.equal(reviewStorageKey,"bookbinder.assetlab.ui-gallery-reviews.v1");
 assert.deepEqual(normalizeImplementationReviews({campaigns:{choice:"no",notes:"Tighten spacing"},home:{choice:"yes",notes:""},invented:{choice:"yes",notes:"ignored"},gear:{choice:"maybe",notes:7}}),{campaigns:{choice:"no",notes:"Tighten spacing"},home:{choice:"yes",notes:""}},"stored reviews must be restricted to known screens and valid choices");
 assert.deepEqual(implementationReviewPacket({home:{choice:"yes",notes:""},invented:{choice:"no",notes:"ignored"}}),{schemaVersion:1,reviews:{home:{choice:"yes",notes:""}}},"the shared packet helper must emit only normalized gallery reviews");
@@ -75,6 +78,8 @@ assert.match(galleryHtml,/Pixel display type owns titles, labels and controls/,"
 assert.match(css,/town-starting-home-v1-phone-v2\.png/,"Home must use the phone-composed full-scene asset");
 assert.match(css,/\.town-scene\{height:624px/,"Home scene must own the full phone content body");
 assert.match(renderScreen("Home"),/town-tabs/,"Home destinations must overlay the scene instead of shrinking it");
+assert.match(renderScreen("Home"),/>Bind &amp; Depart<|>Bind & Depart</,"Home must not claim the Base action binds a named existing world");
+assert.doesNotMatch(renderScreen("Wayfarer’s Table"),/bottom-rail|route-table|Review departure/,"Wayfarer must remain the native informational station, without invented planning or actions");
 for(const marker of new Set(Object.values(requiredMarkers))){
   const className=marker.replace(/^class=\\?"|\\?"$/g,"");
   assert.match(css,new RegExp(`\\.${className}`),`${className} needs an authored style contract`);

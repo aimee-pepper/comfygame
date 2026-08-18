@@ -1,12 +1,15 @@
 import { createServer } from "node:http";
+import { execFile } from "node:child_process";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import { generateLiveWorld, liveSymbolCatalogue } from "./src/live-worldgen-bridge.js";
 
 const root = new URL(".", import.meta.url).pathname;
 const port = Number(process.env.ASSETLAB_PORT ?? 4173);
 const uiReviewFile = process.env.ASSETLAB_UI_REVIEW_FILE ?? join(root, "reviews", "ui-gallery-reviews.json");
+const execFileAsync = promisify(execFile);
 const types = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -30,6 +33,13 @@ async function body(request, limit = 100_000) {
 
 export async function handleAssetLabRequest(request, response) {
   const url = new URL(request.url, `http://${request.headers.host}`),pathname = decodeURIComponent(url.pathname);
+  if(request.method==="GET"&&pathname==="/__assetlab-meta"){
+    try{
+      const {stdout}=await execFileAsync("git",["rev-parse","--short=12","HEAD"],{cwd:join(root,"..")} );
+      response.writeHead(200,{"Content-Type":types[".json"],"Cache-Control":"no-store"}).end(JSON.stringify({revision:stdout.trim()}));
+    }catch{response.writeHead(200,{"Content-Type":types[".json"],"Cache-Control":"no-store"}).end(JSON.stringify({revision:"unavailable"}));}
+    return;
+  }
   if(request.method==="GET"&&pathname==="/__ui-reviews"){
     try{const saved=await readFile(uiReviewFile);response.writeHead(200,{"Content-Type":types[".json"],"Cache-Control":"no-store"}).end(saved);}
     catch{response.writeHead(200,{"Content-Type":types[".json"],"Cache-Control":"no-store"}).end(JSON.stringify({schemaVersion:1,reviews:{}}));}
@@ -79,7 +89,7 @@ export async function handleAssetLabRequest(request, response) {
   }
   try {
     if (!(await stat(file)).isFile()) throw new Error("Not a file");
-    response.writeHead(200, { "Content-Type": types[extname(file)] ?? "application/octet-stream" });
+    response.writeHead(200, { "Content-Type": types[extname(file)] ?? "application/octet-stream", "Cache-Control": "no-store" });
     response.end(await readFile(file));
   } catch {
     response.writeHead(404).end("Not found");
