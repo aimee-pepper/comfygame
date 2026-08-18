@@ -111,6 +111,18 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.starter-world-pages-acceptance")
 
+                NavigationLink {
+                    WildWorldPagesPhoneAcceptanceView()
+                } label: {
+                    SettingsDestinationRow(
+                        icon: "doc.badge.arrow.up",
+                        title: "Wild World Pages acceptance",
+                        subtitle: "Disposable field, swap, return and later-bind paths"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.wild-world-pages-acceptance")
+
                 Button {
                     do { dictionaryFixture = try Band2DictionaryPhoneFixtureSession() }
                     catch { band2FixtureError = error.localizedDescription }
@@ -193,6 +205,77 @@ struct SettingsView: View {
 }
 
 #if DEBUG
+private struct WildWorldPagesPhoneAcceptanceView: View {
+    @State private var session: WildWorldPagesPhoneFixtureSession?
+    @State private var errorMessage: String?
+
+    var body: some View {
+        List {
+            Section("Production acceptance paths") {
+                ForEach(WildWorldPagesPhoneFixtureKind.allCases) { kind in
+                    Button {
+                        do { session = try WildWorldPagesPhoneFixtureSession(kind: kind) }
+                        catch { errorMessage = error.localizedDescription }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(kind.title).font(.headline)
+                            Text(kind.detail).font(.caption).foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    }
+                    .accessibilityIdentifier("wild-world-pages.launch.\(kind.rawValue)")
+                }
+            }
+            Section("Order") {
+                Text("First inspect before taking: the loose Page must say Unknown until the exact open records its marks. In the full-kit path, cancel once and confirm nothing changes, then reopen and swap an exact occupant. Read the failure recap before continuing. Finally bind either collected copy and confirm only its physical ID leaves the folio.")
+                    .font(.callout)
+            }
+        }
+        .navigationTitle("Wild World Pages")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("Fixture unavailable", isPresented: Binding(
+            get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } }
+        )) { Button("OK", role: .cancel) { errorMessage = nil } } message: {
+            Text(errorMessage ?? "Unknown fixture error")
+        }
+        .fullScreenCover(item: $session) { fixture in
+            ZStack(alignment: .topTrailing) {
+                if fixture.kind == .laterBind {
+                    NavigationStack {
+                        WritingDeskView()
+                            .toolbar {
+                                ToolbarItem(placement: .topBarLeading) {
+                                    Button("Close") { session = nil }
+                                }
+                            }
+                    }
+                    .environmentObject(fixture.store)
+                } else {
+                    RootView().environmentObject(fixture.store)
+                    Button { session = nil } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.white, .black.opacity(0.72))
+                            .frame(width: 48, height: 48)
+                            .contentShape(Rectangle())
+                    }
+                    .accessibilityLabel("Close wild World Pages fixture")
+                    .padding(.top, 4)
+                    .padding(.trailing, 4)
+                    .zIndex(20_000)
+                }
+            }
+            .overlay(alignment: .top) {
+                Band2FixtureReceiptOverlay(
+                    lines: fixture.receipt.lines,
+                    identifier: "wild-world-pages-fixture-receipt")
+                    .padding(.top, 48)
+            }
+        }
+    }
+}
+
 private struct Band2DictionaryPhoneAcceptanceView: View {
     @ObservedObject var session: Band2DictionaryPhoneFixtureSession
     let close: () -> Void

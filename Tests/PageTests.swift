@@ -90,6 +90,83 @@ final class PageTests: XCTestCase {
         XCTAssertTrue(harness.contains("bindAndDepart(worldPageInstanceID: instance.id)"))
     }
 
+    func testSettingsExposesWildWorldPagesAcceptanceAcrossRealSurfaces() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let settings = try String(contentsOf: root.appending(path:
+            "Sources/Screens/SettingsView.swift"), encoding: .utf8)
+        let harness = try String(contentsOf: root.appending(path:
+            "Sources/Debug/HarnessActions.swift"), encoding: .utf8)
+        XCTAssertTrue(settings.contains("settings.wild-world-pages-acceptance"))
+        XCTAssertTrue(settings.contains("RootView().environmentObject(fixture.store)"))
+        XCTAssertTrue(settings.contains("WritingDeskView()"))
+        XCTAssertTrue(settings.contains("wild-world-pages-fixture-receipt"))
+        XCTAssertTrue(harness.contains("endRunWithPartialHaul"))
+        XCTAssertTrue(harness.contains("bindAndDepart()"))
+        XCTAssertTrue(harness.contains("GameStore(io: fixture.io)"))
+    }
+
+    @MainActor
+    func testWildWorldPagesPhoneFieldFixturesUseExactProductionTransactions() throws {
+        let room = try GameStore.makeWildWorldPagesPhoneFixture(kind: .fieldWithRoom)
+        let offered = try XCTUnwrap(room.store.activeRun?.offeredWorldPages.first)
+        XCTAssertFalse(offered.inspected)
+        let beforeSightings = room.store.state.reality.encounteredLexemes
+        let quote = try XCTUnwrap(room.store.offeredWorldPageQuote(offered.id))
+        guard case .inspected(let inspected) = room.store.inspectOfferedWorldPage(quote) else {
+            return XCTFail("expected production inspection")
+        }
+        XCTAssertTrue(inspected.inspected)
+        XCTAssertEqual(room.store.state.reality.encounteredLexemes,
+                       beforeSightings.union(offered.definition.page.encounteredLexemes))
+        let fresh = try XCTUnwrap(room.store.offeredWorldPageQuote(offered.id))
+        XCTAssertEqual(room.store.takeOfferedWorldPage(fresh), .taken(inspected))
+
+        let full = try GameStore.makeWildWorldPagesPhoneFixture(kind: .fullSatchel)
+        let fullPage = try XCTUnwrap(full.store.activeRun?.offeredWorldPages.first)
+        let cancelledState = full.store.state
+        XCTAssertEqual(full.store.state, cancelledState, "cancelling is deliberately no action")
+        let stale = try XCTUnwrap(full.store.offeredWorldPageQuote(fullPage.id))
+        _ = full.store.inspectOfferedWorldPage(stale)
+        let afterInspection = full.store.state
+        XCTAssertEqual(full.store.takeOfferedWorldPage(stale), .stale)
+        XCTAssertEqual(full.store.activeRun?.offeredWorldPages,
+                       afterInspection.worlds.activeRun?.offeredWorldPages)
+        XCTAssertEqual(full.store.activeRun?.satchelItems,
+                       afterInspection.worlds.activeRun?.satchelItems)
+        XCTAssertEqual(full.store.activeRun?.carriedWorldPages,
+                       afterInspection.worlds.activeRun?.carriedWorldPages)
+        XCTAssertEqual(full.store.state.reality.encounteredLexemes,
+                       afterInspection.reality.encounteredLexemes)
+        let swapQuote = try XCTUnwrap(full.store.offeredWorldPageQuote(fullPage.id))
+        let itemID = try XCTUnwrap(full.store.activeRun?.satchelItems.stacks.first?.id)
+        guard case .swapped(let taken, discarded: .itemStack(let discarded)) =
+                full.store.swapOfferedWorldPage(swapQuote, discarding: .itemStack(itemID)) else {
+            return XCTFail("expected exact item-to-page swap")
+        }
+        XCTAssertEqual(taken.id, fullPage.id)
+        XCTAssertEqual(discarded.id, itemID)
+    }
+
+    @MainActor
+    func testWildWorldPagesPhoneFailureAndLaterBindReceiptsAreExactAndDurable() throws {
+        let failure = try GameStore.makeWildWorldPagesPhoneFixture(kind: .failureReceipt)
+        let summary = try XCTUnwrap(failure.store.state.worlds.lastExit)
+        XCTAssertNil(failure.store.activeRun)
+        XCTAssertFalse(summary.keptWorldPages.isEmpty)
+        XCTAssertTrue(summary.keptWorldPages.contains(where: \.isProtectedReturn))
+        XCTAssertEqual(failure.store.state.worlds.worldPageBankedOutcomeIDs,
+                       [try XCTUnwrap(summary.outcomeID)])
+
+        let bind = try GameStore.makeWildWorldPagesPhoneFixture(kind: .laterBind)
+        let pages = bind.store.state.base.collectedWorldPages
+        XCTAssertEqual(pages.count, 2)
+        XCTAssertTrue(bind.store.bindAndDepart(worldPageInstanceID: pages[0].id))
+        XCTAssertEqual(bind.store.activeRun?.book.worldPageUseReceipt?.instanceID, pages[0].id)
+        XCTAssertFalse(bind.store.state.base.collectedWorldPages.contains { $0.id == pages[0].id })
+        XCTAssertTrue(bind.store.state.base.collectedWorldPages.contains { $0.id == pages[1].id })
+    }
+
     func testWritingDeskConcealsUninspectedWildPageAuthorityUntilExactOpen() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             .deletingLastPathComponent()

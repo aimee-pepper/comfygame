@@ -142,6 +142,73 @@ struct StarterWorldPagePhoneFixtureReceipt: Equatable, Sendable {
     }
 }
 
+enum WildWorldPagesPhoneFixtureKind: String, CaseIterable, Identifiable, Sendable {
+    case fieldWithRoom
+    case fullSatchel
+    case failureReceipt
+    case laterBind
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .fieldWithRoom: "Find, inspect and take"
+        case .fullSatchel: "Full Field Kit swap"
+        case .failureReceipt: "Failure retention receipt"
+        case .laterBind: "Later exact-instance bind"
+        }
+    }
+    var detail: String {
+        switch self {
+        case .fieldWithRoom:
+            "Production world with guaranteed writing and one concealed repeatable loose Page."
+        case .fullSatchel:
+            "Production world with every shared slot occupied; cancel once, then choose an exact item or Page."
+        case .failureReceipt:
+            "Production collapse path with repeatable, protected and ordinary carried objects."
+        case .laterBind:
+            "Two physical copies at the real Writing Desk; bind one exact selected instance."
+        }
+    }
+}
+
+enum WildWorldPagesPhoneFixtureError: Error, LocalizedError {
+    case couldNotWritePage, couldNotBind, missingRun, missingLoosePage
+    case writingWasReplaced, persistenceMismatch, invalidReceipt, missingCatalogue
+
+    var errorDescription: String? {
+        switch self {
+        case .couldNotWritePage: "The disposable fixture could not write its controlled Page."
+        case .couldNotBind: "The disposable fixture could not enter a production world."
+        case .missingRun: "The production departure did not create an expedition."
+        case .missingLoosePage: "The guaranteed loose World Page was not placed."
+        case .writingWasReplaced: "Loose-page placement displaced the guaranteed writing."
+        case .persistenceMismatch: "The UUID-scoped fixture did not survive its relaunch check."
+        case .invalidReceipt: "The production return did not freeze the required exact receipt."
+        case .missingCatalogue: "The authored repeatable World Page catalogue is unavailable."
+        }
+    }
+}
+
+struct WildWorldPagesPhoneFixtureReceipt: Equatable, Sendable {
+    var kind: WildWorldPagesPhoneFixtureKind
+    var lines: [String]
+}
+
+@MainActor
+final class WildWorldPagesPhoneFixtureSession: ObservableObject, Identifiable {
+    let id = UUID()
+    let kind: WildWorldPagesPhoneFixtureKind
+    let store: GameStore
+    let receipt: WildWorldPagesPhoneFixtureReceipt
+
+    init(kind: WildWorldPagesPhoneFixtureKind) throws {
+        self.kind = kind
+        let fixture = try GameStore.makeWildWorldPagesPhoneFixture(kind: kind)
+        store = fixture.store
+        receipt = fixture.receipt
+    }
+}
+
 @MainActor
 final class StarterWorldPagePhoneFixtureSession: ObservableObject, Identifiable {
     let id = UUID()
@@ -399,6 +466,189 @@ final class EncounterScalingProgressionFixtureSession: ObservableObject, Identif
 }
 
 extension GameStore {
+    /// Builds one of four disposable, production-path acceptance states for collected World Pages.
+    /// The direct mutations below create only the deliberate fixture preconditions (standing on
+    /// the page, a full kit, or carried payloads). Discovery, inspection, take/swap, banking,
+    /// persistence and binding continue through the shipping transactions and screens.
+    static func makeWildWorldPagesPhoneFixture(
+        kind: WildWorldPagesPhoneFixtureKind
+    ) throws -> (store: GameStore, receipt: WildWorldPagesPhoneFixtureReceipt) {
+        switch kind {
+        case .fieldWithRoom, .fullSatchel:
+            let fixture = try makeWildWorldPagesProductionRun(fullSatchel: kind == .fullSatchel)
+            let store = fixture.store
+            guard let run = store.activeRun, let page = run.offeredWorldPages.first else {
+                throw WildWorldPagesPhoneFixtureError.missingLoosePage
+            }
+            let writingHosts = run.map.allPoints.filter { point in
+                switch run.map[point].content {
+                case .diaryPage, .foundWriting: true
+                default: false
+                }
+            }
+            guard !writingHosts.isEmpty else {
+                throw WildWorldPagesPhoneFixtureError.writingWasReplaced
+            }
+            let before = store.state
+            store.flushNow()
+            let relaunched = GameStore(io: fixture.io)
+            guard relaunched.state.worlds.activeRun == before.worlds.activeRun,
+                  relaunched.state.reality.encounteredLexemes
+                    == before.reality.encounteredLexemes,
+                  relaunched.state.base.collectedWorldPages
+                    == before.base.collectedWorldPages else {
+                throw WildWorldPagesPhoneFixtureError.persistenceMismatch
+            }
+            return (relaunched, .init(kind: kind, lines: [
+                "Production world \(run.runIndex) · seed \(run.mapSeed)",
+                "Guaranteed writing hosts \(writingHosts.count) · loose Page adds one separate host",
+                "Unknown physical Page #\(String(format: "%016llx", page.id.rawValue))",
+                kind == .fullSatchel
+                    ? "Shared Field Kit \(run.occupiedSatchelSlots) of \(run.satchelItems.slots) full"
+                    : "Shared Field Kit \(run.occupiedSatchelSlots) of \(run.satchelItems.slots) · room to take"
+            ]))
+
+        case .failureReceipt:
+            let fixture = try makeWildWorldPagesProductionRun(fullSatchel: false)
+            let staging = fixture.store
+            guard let quote = staging.activeRun.flatMap({ run in
+                run.offeredWorldPages.first.flatMap { WildWorldPageFieldRules.quote($0.id, in: run) }
+            }), case .taken(let repeatable) = staging.takeOfferedWorldPage(quote),
+                  let authored = WorldPageCatalog.starterInstances.first?.definition else {
+                throw WildWorldPagesPhoneFixtureError.missingLoosePage
+            }
+            let protected = WorldPageInstance(
+                id: InstanceID(rawValue: 0x5749_4C44_5052_4F54),
+                definition: authored, inspected: true)
+            var originalRun: WorldRun?
+            staging.mutate("stage wild-page failure acceptance", flush: true) { state in
+                guard var run = state.worlds.activeRun else { return }
+                run.carriedWorldPages.append(protected)
+                run.satchelItems = Inventory(slots: 4, stacks: [
+                    ItemStack(id: InstanceID(rawValue: 0x5749_4C44_4954_454D),
+                              catalogID: "salve_lesser", count: 2)
+                ])
+                originalRun = run
+                state.worlds.activeRun = run
+            }
+            guard let run = originalRun else { throw WildWorldPagesPhoneFixtureError.missingRun }
+            staging.endRunWithPartialHaul(reason: "Disposable World Page retention fixture.")
+            guard let summary = staging.state.worlds.lastExit,
+                  let outcomeID = summary.outcomeID,
+                  summary.keptWorldPages.contains(where: { $0.id == protected.id }),
+                  summary.keptWorldPages.contains(where: { $0.id == repeatable.id })
+                    || summary.lostWorldPages.contains(where: { $0.id == repeatable.id }) else {
+                throw WildWorldPagesPhoneFixtureError.invalidReceipt
+            }
+            let afterReturn = staging.state
+            var replayState = afterReturn
+            _ = GameStore.bankHaul(of: run, outcomeID: outcomeID,
+                                   into: &replayState, fraction: summary.haulKeptFraction)
+            guard replayState.base.collectedWorldPages == afterReturn.base.collectedWorldPages,
+                  replayState.worlds.randomWorldPageDrought
+                    == afterReturn.worlds.randomWorldPageDrought,
+                  replayState.worlds.worldPageBankedOutcomeIDs
+                    == afterReturn.worlds.worldPageBankedOutcomeIDs else {
+                throw WildWorldPagesPhoneFixtureError.invalidReceipt
+            }
+            staging.flushNow()
+            let relaunched = GameStore(io: fixture.io)
+            guard relaunched.state.worlds.lastExit?.outcomeID == summary.outcomeID,
+                  relaunched.state.worlds.lastExit?.keptWorldPages == summary.keptWorldPages,
+                  relaunched.state.worlds.lastExit?.lostWorldPages == summary.lostWorldPages,
+                  relaunched.state.base.collectedWorldPages
+                    == afterReturn.base.collectedWorldPages,
+                  relaunched.state.worlds.worldPageBankedOutcomeIDs
+                    == afterReturn.worlds.worldPageBankedOutcomeIDs else {
+                throw WildWorldPagesPhoneFixtureError.persistenceMismatch
+            }
+            return (relaunched, .init(kind: kind, lines: [
+                "Production collapse outcome #\(outcomeID.rawValue)",
+                "One shared retention budget · items and repeatable Pages together",
+                "Protected Page kept outside the failure budget",
+                "Exact replay no-op verified · receipt survived UUID relaunch"
+            ]))
+
+        case .laterBind:
+            guard WorldPageCatalog.repeatableDefinitions.count >= 2 else {
+                throw WildWorldPagesPhoneFixtureError.missingCatalogue
+            }
+            let io = SaveFileIO.temporary(name: "phone-wild-page-bind-\(UUID().uuidString)")
+            io.deleteEverything()
+            let staging = GameStore(io: io)
+            let pages = WorldPageCatalog.repeatableDefinitions.prefix(2).enumerated().map {
+                index, definition in
+                WorldPageInstance(
+                    id: InstanceID(rawValue: 0x5749_4C44_4249_4E40 + UInt64(index)),
+                    definition: definition, inspected: true,
+                    fieldProvenance: .init(originRunIndex: 5, originWorldSeed: 707,
+                                           generationSeed: UInt64(900 + index),
+                                           position: GridPoint(x: index + 1, y: 1)))
+            }
+            staging.mutate("stage exact World Page bind acceptance", flush: true) { state in
+                state.worlds.activeRun = nil
+                state.base.collectedWorldPages = pages
+                state.base.essence = pages.map(\.definition.worldPageCost).max() ?? 0
+                state.base.preparationLoadout = []
+                state.base.preparationLoadoutNeedsReview = false
+            }
+            let expected = staging.state
+            let relaunched = GameStore(io: io)
+            guard relaunched.state.base.collectedWorldPages
+                    == expected.base.collectedWorldPages,
+                  relaunched.state.base.essence == expected.base.essence,
+                  relaunched.state.base.preparationLoadout
+                    == expected.base.preparationLoadout,
+                  relaunched.state.worlds.activeRun == nil else {
+                throw WildWorldPagesPhoneFixtureError.persistenceMismatch
+            }
+            return (relaunched, .init(kind: kind, lines: [
+                "UUID-relaunched folio · no campaign slot",
+                "Two exact physical Pages · IDs \(pages.map { String(format: "%016llx", $0.id.rawValue) }.joined(separator: " / "))",
+                "Select either card and Bind through the real Desk",
+                "Departure must consume that ID only; the other remains collected"
+            ]))
+        }
+    }
+
+    private static func makeWildWorldPagesProductionRun(fullSatchel: Bool) throws
+        -> (store: GameStore, io: SaveFileIO) {
+        let io = SaveFileIO.temporary(name: "phone-wild-page-field-\(UUID().uuidString)")
+        io.deleteEverything()
+        let store = GameStore(io: io)
+        store.mutate("stage wild-page production eligibility", flush: true) { state in
+            state.worlds.runIndex = 5
+            state.worlds.randomWorldPageDrought = WildWorldPageSelectionRules.guaranteeDrought
+            state.worlds.seeds = SeedSequence(rootSeed: 707)
+            state.base.preparationLoadout = []
+            state.base.preparationLoadoutNeedsReview = false
+        }
+        guard store.write("plains") else {
+            throw WildWorldPagesPhoneFixtureError.couldNotWritePage
+        }
+        guard store.bindAndDepart() else {
+            throw WildWorldPagesPhoneFixtureError.couldNotBind
+        }
+        guard var run = store.activeRun else { throw WildWorldPagesPhoneFixtureError.missingRun }
+        guard let page = run.offeredWorldPages.first,
+              let position = page.fieldProvenance?.position else {
+            throw WildWorldPagesPhoneFixtureError.missingLoosePage
+        }
+        run.playerPosition = position
+        run.map[position].isRevealed = true
+        if fullSatchel {
+            let slots = run.satchelItems.slots
+            run.satchelItems = Inventory(slots: slots, stacks: (0..<slots).map { index in
+                ItemStack(id: InstanceID(rawValue: 0x5749_4C44_534C_0000 + UInt64(index)),
+                          catalogID: "salve_lesser", count: 1, identified: index.isMultiple(of: 2))
+            })
+        }
+        store.mutate("stand at loose World Page", flush: true) { state in
+            state.worlds.activeRun = run
+        }
+        return (store, io)
+    }
+
     /// Seeds typed sightings, commits them to a UUID-scoped temporary save, then constructs the
     /// store shown on phone by loading those bytes again. Save-slot adapters are never involved.
     static func makeBand2DictionaryPhoneFixture() throws -> (
