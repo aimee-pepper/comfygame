@@ -2,6 +2,17 @@ import XCTest
 @testable import Bookbinder
 
 final class WorldVisibilityRulesTests: XCTestCase {
+    func testWorldTilesDoNotPaintPerEdgeFogGradients() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appendingPathComponent("Sources/Screens/WorldView.swift"),
+            encoding: .utf8)
+        XCTAssertFalse(source.contains("fogBoundaryOverlay"))
+        XCTAssertFalse(source.contains("LinearGradient(colors: [.black, .clear]"))
+        XCTAssertFalse(source.contains("LinearGradient(colors: [.clear, .black]"))
+    }
+
     func testFullyExploredTerrainNeverFallsBelowFringeAfterLeavingSight() {
         XCTAssertEqual(WorldRules.terrainVisibility(current: .hidden, wasRevealed: true), .fringe)
         XCTAssertEqual(WorldRules.terrainVisibility(current: .fringe, wasRevealed: true), .fringe)

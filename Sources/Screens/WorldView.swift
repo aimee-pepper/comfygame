@@ -1259,7 +1259,6 @@ private struct TileView: View {
                 Color.black
             }
         }
-        .overlay { fogBoundaryOverlay }
         .frame(width: side, height: side)
         .contentShape(Rectangle())
     }
@@ -1267,31 +1266,6 @@ private struct TileView: View {
     private var surfaceLift: CGFloat {
         guard !useSimpleRenderer, let artRequest else { return 0 }
         return -side * CGFloat(artRequest.resolvedElevation) / CGFloat(MapAssetContract.logicalSide)
-    }
-
-    @ViewBuilder private var fogBoundaryOverlay: some View {
-        if visibility != .hidden {
-            let depth = min(side * 0.5, max(1, CGFloat(visibilityProfile.fogEdgeBlurPoints)))
-            ZStack {
-                if fogBoundaryEdges.contains(.north) {
-                    LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                        .frame(height: depth).frame(maxHeight: .infinity, alignment: .top)
-                }
-                if fogBoundaryEdges.contains(.east) {
-                    LinearGradient(colors: [.clear, .black], startPoint: .leading, endPoint: .trailing)
-                        .frame(width: depth).frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                if fogBoundaryEdges.contains(.south) {
-                    LinearGradient(colors: [.clear, .black], startPoint: .top, endPoint: .bottom)
-                        .frame(height: depth).frame(maxHeight: .infinity, alignment: .bottom)
-                }
-                if fogBoundaryEdges.contains(.west) {
-                    LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
-                        .frame(width: depth).frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            .allowsHitTesting(false)
-        }
     }
 
     private var symbol: String? {
