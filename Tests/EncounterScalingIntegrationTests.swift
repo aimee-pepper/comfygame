@@ -236,6 +236,44 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         XCTAssertEqual(apex.receipt.rootSeed, 909)
     }
 
+    func testProgressionFixturesHaveDeterministicEndToEndCombatDiagnostics() throws {
+        let first = try EncounterScalingProgressionFixtureKind.allCases.map {
+            try progressionCombatDiagnostic(kind: $0)
+        }
+        let repeated = try EncounterScalingProgressionFixtureKind.allCases.map {
+            try progressionCombatDiagnostic(kind: $0)
+        }
+
+        XCTAssertEqual(repeated, first,
+                       "the same disclosed fixture must reproduce the same complete combat")
+        XCTAssertTrue(first.allSatisfy { $0.outcome == .victory },
+                      "the disclosed progression controls must remain completable by shipping defaults")
+        XCTAssertTrue(first.allSatisfy {
+            $0.rounds > 0 && $0.playerActions > 0
+                && (0...$0.startingAggregateHP).contains($0.aggregateHPSpent)
+                && $0.retreatOutcome == .fled
+                && $0.retreatStabilitySpent == $0.disclosedRetreatStabilityCost
+        }, "combat or its always-available retreat path corrupted a progression fixture")
+
+        let byKind = Dictionary(uniqueKeysWithValues: first.map { ($0.kind, $0) })
+        let fresh = try XCTUnwrap(byKind[.freshSolo])
+        let experiencedSolo = try XCTUnwrap(byKind[.experiencedSolo])
+        let ordinaryTwo = try XCTUnwrap(byKind[.ordinaryTwoPerson])
+        let experiencedParty = try XCTUnwrap(byKind[.experiencedParty])
+        let ordinaryFive = try XCTUnwrap(byKind[.ordinaryFivePerson])
+        let apex = try XCTUnwrap(byKind[.apexParty])
+
+        // These comparisons are rules-owned receipt relationships, not a universal balance band.
+        XCTAssertGreaterThan(experiencedSolo.foeLevel, fresh.foeLevel)
+        XCTAssertGreaterThan(experiencedSolo.foeStartingHP, fresh.foeStartingHP)
+        XCTAssertGreaterThan(ordinaryFive.partyPowerBudget, ordinaryTwo.partyPowerBudget)
+        XCTAssertGreaterThanOrEqual(ordinaryFive.foeStartingHP, ordinaryTwo.foeStartingHP)
+        XCTAssertGreaterThan(apex.foeStartingHP, experiencedParty.foeStartingHP)
+        XCTAssertEqual(apex.partyLevels, experiencedParty.partyLevels)
+
+        for diagnostic in first { print("SCALING_PROGRESSION_COMBAT \(diagnostic)") }
+    }
+
     func testFreshBinderAndQuillNormalVersusTeemingDiagnosticDistribution() throws {
         let roots: [UInt64] = [101, 202, 303, 404, 505, 606, 707, 808, 909, 1_010, 1_111, 1_212]
         let normal = try roots.prefix(6).map { try openingSample(rootSeed: $0, teeming: false) }
@@ -541,6 +579,99 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         var startingAggregateHP: Int
         var aggregateHPSpent: Int
         var outcome: EncounterOutcome?
+    }
+
+    private struct ProgressionCombatDiagnostic: Equatable, CustomStringConvertible {
+        var kind: EncounterScalingProgressionFixtureKind
+        var acceptanceIdentity: String
+        var partyLevels: [Int]
+        var partyPowerBudget: Double
+        var foeComposition: [String]
+        var foeLevel: Int
+        var foeStartingHP: Int
+        var rounds: Int
+        var playerActions: Int
+        var startingAggregateHP: Int
+        var aggregateHPSpent: Int
+        var outcome: EncounterOutcome?
+        var disclosedRetreatStabilityCost: Double
+        var retreatStabilitySpent: Double
+        var retreatOutcome: EncounterOutcome?
+
+        var description: String {
+            let fraction = startingAggregateHP > 0
+                ? Double(aggregateHPSpent) / Double(startingAggregateHP) : 0
+            return "kind=\(kind.rawValue) receipt=\(acceptanceIdentity.prefix(12)) "
+                + "party=\(partyLevels) pressure=\(partyPowerBudget) "
+                + "foes=\(foeComposition.joined(separator: "|")) rounds=\(rounds) "
+                + "actions=\(playerActions) hp=\(aggregateHPSpent)/\(startingAggregateHP) "
+                + "fraction=\(String(format: "%.3f", fraction)) "
+                + "outcome=\(String(describing: outcome)) retreatCost=\(retreatStabilitySpent) "
+                + "retreat=\(String(describing: retreatOutcome))"
+        }
+    }
+
+    private func progressionCombatDiagnostic(
+        kind: EncounterScalingProgressionFixtureKind
+    ) throws -> ProgressionCombatDiagnostic {
+        let fixture = try EncounterScalingProgressionFixtureSession(kind: kind)
+        let initialState = try JSONDecoder().decode(
+            GameState.self, from: JSONEncoder().encode(fixture.store.state))
+        let openingRun = try XCTUnwrap(initialState.worlds.activeRun)
+        let openingEncounter = try XCTUnwrap(openingRun.activeEncounter)
+        let startingHP = try XCTUnwrap(openingRun.healthCaps).map(\.maximum).reduce(0, +)
+        let foeComposition = openingEncounter.foes.sorted { $0.id.rawValue < $1.id.rawValue }.map {
+            "\($0.identityKey):L\($0.level):HP\($0.stats.maxHP):ATK\($0.stats.attack):"
+                + "\($0.stats.damageKind.rawValue):\($0.stats.delivery.rawValue):"
+                + "\($0.isApex ? "apex" : "ordinary")"
+        }
+
+        let combat = GameStore(io: .temporary(
+            name: "scaling-progression-combat-\(kind.rawValue)-\(UUID().uuidString)"))
+        combat.mutate("adopt progression combat fixture") { $0 = initialState }
+        combat.mutate("run progression opening turns") { state in
+            CombatRules.runAutomaticTurns(in: &state)
+        }
+        var actions = 0
+        while combat.activeEncounter?.outcome == nil, actions < 100 {
+            guard let action = combat.defaultCombatAction() else { break }
+            combat.takeCombatAction(action)
+            actions += 1
+        }
+        let finishedRun = try XCTUnwrap(combat.activeRun)
+        let finishedEncounter = try XCTUnwrap(finishedRun.activeEncounter)
+        let endingHP = finishedRun.binderHP + finishedRun.companionHP.values.reduce(0, +)
+        let finishedReceipt = try XCTUnwrap(GameStore.progressionReceipt(
+            kind: kind, rootSeed: kind.rootSeed, from: combat))
+        XCTAssertEqual(finishedReceipt, fixture.receipt,
+                       "combat must not rewrite the encounter's frozen scaling receipt")
+
+        let retreat = GameStore(io: .temporary(
+            name: "scaling-progression-retreat-\(kind.rawValue)-\(UUID().uuidString)"))
+        retreat.mutate("adopt progression retreat fixture") { $0 = initialState }
+        retreat.mutate("run progression retreat opening turns") { state in
+            CombatRules.runAutomaticTurns(in: &state)
+        }
+        let retreatActor = try XCTUnwrap(retreat.actingCombatant)
+        let retreatCost = CombatRules.withdrawalStabilityCost(for: retreatActor,
+                                                               in: retreat.state)
+        let stabilityBefore = try XCTUnwrap(retreat.activeRun).stability
+        retreat.takeCombatAction(.flee)
+        let retreatRun = try XCTUnwrap(retreat.activeRun)
+
+        return ProgressionCombatDiagnostic(
+            kind: kind, acceptanceIdentity: fixture.receipt.acceptanceIdentity,
+            partyLevels: fixture.receipt.partyLevels,
+            partyPowerBudget: fixture.receipt.cappedPartyPowerBudget,
+            foeComposition: foeComposition,
+            foeLevel: openingEncounter.foes.map(\.level).max() ?? 0,
+            foeStartingHP: openingEncounter.foes.map(\.stats.maxHP).reduce(0, +),
+            rounds: finishedEncounter.roundNumber, playerActions: actions,
+            startingAggregateHP: startingHP,
+            aggregateHPSpent: max(0, startingHP - endingHP), outcome: finishedEncounter.outcome,
+            disclosedRetreatStabilityCost: retreatCost,
+            retreatStabilitySpent: stabilityBefore - retreatRun.stability,
+            retreatOutcome: retreatRun.activeEncounter?.outcome)
     }
 
     private enum CounterfactualVariant { case observed, forceSingleDelivery, suppressAfflictions }
