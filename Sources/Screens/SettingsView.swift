@@ -482,7 +482,7 @@ struct BalancingView: View {
                 Text("Recommended anchors level to the Binder, adds only visible reachable foes, and freezes additive party pressure plus apex tempo when combat opens. Legacy, Reserved and Pressing remain historical DEBUG comparisons.")
                     .font(.caption).foregroundStyle(.secondary)
 #if DEBUG
-                NavigationLink("Open level-one Normal / Teeming phone pair") {
+                NavigationLink("Open encounter scaling phone matrix") {
                     EncounterScalingPhoneAcceptanceView()
                 }
 #endif

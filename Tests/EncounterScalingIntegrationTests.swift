@@ -10,6 +10,8 @@ final class EncounterScalingIntegrationTests: XCTestCase {
                                 encoding: .utf8)
         XCTAssertTrue(source.contains(".navigationTitle(\"Encounter scaling\")"))
         XCTAssertFalse(source.contains(".navigationTitle(\"Level-one scaling\")"))
+        XCTAssertTrue(source.contains("NavigationLink(\"Open encounter scaling phone matrix\")"))
+        XCTAssertFalse(source.contains("Open level-one Normal / Teeming phone pair"))
         for required in [
             "rounds", "aggregate HP lost", "frozen receipt", "player level",
             "party count", "member levels", "apex pressure"
