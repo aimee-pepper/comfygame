@@ -10,11 +10,21 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         preferences.set("campaign-value", forKey: "unrelated-campaign-preference")
 
         let fixture = try EncounterScalingProgressionFixtureSession(kind: .experiencedParty)
+        fixture.store.mutate("finish persisted acceptance fixture") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else {
+                return
+            }
+            encounter.outcome = .victory
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
         let recorder = EncounterScalingAcceptanceRecorder(preferences: preferences)
         let measurement = EncounterScalingAcceptanceMeasurement.capture(
             receipt: fixture.receipt, from: fixture.store)
-        recorder.record(.overwhelmingButFair, for: fixture.receipt, observing: fixture.store)
+        let result = recorder.record(
+            .overwhelmingButFair, for: fixture.receipt, observing: fixture.store)
 
+        XCTAssertEqual(result, .recorded(try XCTUnwrap(recorder.records[.experiencedParty])))
         XCTAssertEqual(recorder.completionCount, 1)
         XCTAssertEqual(recorder.records[.experiencedParty], EncounterScalingAcceptanceRecord(
             scenario: .experiencedParty,
@@ -127,6 +137,114 @@ final class EncounterScalingIntegrationTests: XCTestCase {
         let decoded = EncounterScalingAcceptanceRecorder(preferences: preferences)
         XCTAssertEqual(decoded.records[.freshSolo]?.verdict, .balanced)
         XCTAssertNil(decoded.records[.freshSolo]?.measurement)
+        XCTAssertEqual(decoded.completionCount, 0)
+    }
+
+    func testAcceptanceRecorderRefusesUnfinishedAndStaleMeasurementsWithoutMutation() throws {
+        let suite = "EncounterScalingAcceptanceRefusal.\(UUID().uuidString)"
+        let preferences = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { preferences.removePersistentDomain(forName: suite) }
+        let fixture = try EncounterScalingProgressionFixtureSession(kind: .ordinaryTwoPerson)
+        let recorder = EncounterScalingAcceptanceRecorder(preferences: preferences)
+
+        let unfinished = recorder.record(.balanced, for: fixture.receipt,
+                                         observing: fixture.store)
+        guard case .unfinished(let unfinishedMeasurement) = unfinished else {
+            return XCTFail("An unfinished encounter must be refused explicitly")
+        }
+        XCTAssertEqual(unfinishedMeasurement.status, .unfinished)
+        XCTAssertNotNil(unfinished.refusalSummary)
+        XCTAssertTrue(recorder.records.isEmpty)
+        XCTAssertEqual(recorder.completionCount, 0)
+        XCTAssertNil(preferences.data(forKey: EncounterScalingAcceptanceRecorder.preferencesKey))
+
+        fixture.store.mutate("invalidate acceptance receipt before recording") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  var preview = encounter.scalingPreview else { return }
+            preview.scalingRulesVersion = "stale-refusal-test"
+            encounter.scalingPreview = preview
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let stale = recorder.record(.unfair, for: fixture.receipt, observing: fixture.store)
+        guard case .stale(let staleMeasurement) = stale else {
+            return XCTFail("A stale fixture must be refused explicitly")
+        }
+        XCTAssertEqual(staleMeasurement.status, .stale)
+        XCTAssertNotNil(stale.refusalSummary)
+        XCTAssertTrue(recorder.records.isEmpty)
+        XCTAssertEqual(recorder.completionCount, 0)
+        XCTAssertNil(preferences.data(forKey: EncounterScalingAcceptanceRecorder.preferencesKey))
+    }
+
+    func testAcceptanceCompletionCountsOnlyFinishedReceiptBoundMeasurements() throws {
+        let suite = "EncounterScalingAcceptanceCompletion.\(UUID().uuidString)"
+        let preferences = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { preferences.removePersistentDomain(forName: suite) }
+
+        let finishedFixture = try EncounterScalingProgressionFixtureSession(kind: .freshSolo)
+        finishedFixture.store.mutate("finish completion fixture") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else {
+                return
+            }
+            encounter.outcome = .victory
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let finished = EncounterScalingAcceptanceMeasurement.capture(
+            receipt: finishedFixture.receipt, from: finishedFixture.store)
+
+        let unfinishedFixture = try EncounterScalingProgressionFixtureSession(
+            kind: .experiencedSolo)
+        let unfinished = EncounterScalingAcceptanceMeasurement.capture(
+            receipt: unfinishedFixture.receipt, from: unfinishedFixture.store)
+
+        let staleFixture = try EncounterScalingProgressionFixtureSession(kind: .ordinaryTwoPerson)
+        staleFixture.store.mutate("stale persisted completion fixture") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  var preview = encounter.scalingPreview else { return }
+            preview.scalingRulesVersion = "stale-persisted-test"
+            encounter.scalingPreview = preview
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let stale = EncounterScalingAcceptanceMeasurement.capture(
+            receipt: staleFixture.receipt, from: staleFixture.store)
+
+        let mismatchedFixture = try EncounterScalingProgressionFixtureSession(
+            kind: .experiencedParty)
+        mismatchedFixture.store.mutate("finish mismatched completion fixture") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else {
+                return
+            }
+            encounter.outcome = .victory
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let mismatched = EncounterScalingAcceptanceMeasurement.capture(
+            receipt: mismatchedFixture.receipt, from: mismatchedFixture.store)
+
+        let records: [EncounterScalingProgressionFixtureKind: EncounterScalingAcceptanceRecord] = [
+            .freshSolo: .init(scenario: .freshSolo, verdict: .balanced,
+                              receiptIdentity: finishedFixture.receipt.acceptanceIdentity,
+                              measurement: finished),
+            .experiencedSolo: .init(
+                scenario: .experiencedSolo, verdict: .balanced,
+                receiptIdentity: unfinishedFixture.receipt.acceptanceIdentity,
+                measurement: unfinished),
+            .ordinaryTwoPerson: .init(
+                scenario: .ordinaryTwoPerson, verdict: .unfair,
+                receiptIdentity: staleFixture.receipt.acceptanceIdentity, measurement: stale),
+            .experiencedParty: .init(
+                scenario: .experiencedParty, verdict: .balanced,
+                receiptIdentity: "different-receipt", measurement: mismatched)
+        ]
+        preferences.set(try JSONEncoder().encode(records),
+                        forKey: EncounterScalingAcceptanceRecorder.preferencesKey)
+
+        let decoded = EncounterScalingAcceptanceRecorder(preferences: preferences)
+        XCTAssertEqual(decoded.records.count, 4, "all summaries remain visible and clearable")
+        XCTAssertEqual(decoded.completionCount, 1)
     }
 
     func testPhoneMatrixShowsEveryVerdictStatusAndDestructiveAcceptanceOnlyClear() throws {
@@ -134,12 +252,14 @@ final class EncounterScalingIntegrationTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/Screens/SettingsView.swift"),
                                 encoding: .utf8)
-        XCTAssertTrue(source.contains("progression verdicts recorded"))
+        XCTAssertTrue(source.contains("finished progression verdicts recorded"))
         XCTAssertTrue(source.contains("record.receiptIdentity"))
         XCTAssertTrue(source.contains("record.measurement?.summary"))
         XCTAssertTrue(source.contains("Legacy verdict · no saved measurement"))
         XCTAssertTrue(source.contains("ForEach(EncounterScalingAcceptanceVerdict.allCases"))
         XCTAssertTrue(source.contains("Clear recorded verdicts"))
+        XCTAssertTrue(source.contains("progression-scaling-record-refusal"))
+        XCTAssertTrue(source.contains("Clear \\(acceptance.records.count) saved verdicts"))
         XCTAssertTrue(source.contains("Campaign saves are unchanged"))
     }
 

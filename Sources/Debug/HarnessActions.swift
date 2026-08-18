@@ -477,6 +477,23 @@ struct EncounterScalingAcceptanceMeasurement: Codable, Equatable, Sendable {
     }
 }
 
+enum EncounterScalingAcceptanceRecordResult: Equatable, Sendable {
+    case recorded(EncounterScalingAcceptanceRecord)
+    case unfinished(EncounterScalingAcceptanceMeasurement)
+    case stale(EncounterScalingAcceptanceMeasurement)
+
+    var refusalSummary: String? {
+        switch self {
+        case .recorded:
+            nil
+        case .unfinished(let measurement):
+            "Verdict not recorded · finish this exact encounter first. \(measurement.summary)"
+        case .stale(let measurement):
+            "Verdict not recorded · this fixture receipt is stale. \(measurement.summary)"
+        }
+    }
+}
+
 @MainActor
 final class EncounterScalingAcceptanceRecorder: ObservableObject {
     static let preferencesKey = "debug.encounter-scaling.acceptance.v1"
@@ -498,18 +515,35 @@ final class EncounterScalingAcceptanceRecorder: ObservableObject {
         records = decoded.filter { $0.key == $0.value.scenario }
     }
 
-    var completionCount: Int { records.count }
+    var completionCount: Int {
+        records.values.filter { record in
+            record.measurement?.status == .finished
+                && record.measurement?.receiptIdentity == record.receiptIdentity
+        }.count
+    }
 
+    @discardableResult
     func record(_ verdict: EncounterScalingAcceptanceVerdict,
                 for receipt: EncounterScalingProgressionReceipt,
-                observing store: GameStore) {
-        records[receipt.kind] = EncounterScalingAcceptanceRecord(
+                observing store: GameStore) -> EncounterScalingAcceptanceRecordResult {
+        let measurement = EncounterScalingAcceptanceMeasurement.capture(
+            receipt: receipt, from: store)
+        switch measurement.status {
+        case .unfinished:
+            return .unfinished(measurement)
+        case .stale:
+            return .stale(measurement)
+        case .finished:
+            break
+        }
+        let record = EncounterScalingAcceptanceRecord(
             scenario: receipt.kind,
             verdict: verdict,
             receiptIdentity: receipt.acceptanceIdentity,
-            measurement: EncounterScalingAcceptanceMeasurement.capture(
-                receipt: receipt, from: store))
+            measurement: measurement)
+        records[receipt.kind] = record
         persist()
+        return .recorded(record)
     }
 
     func clear() {

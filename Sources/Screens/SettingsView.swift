@@ -1323,6 +1323,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
     @State private var session: EncounterScalingPhoneFixtureSession?
     @State private var progressionSession: EncounterScalingProgressionFixtureSession?
     @State private var error: String?
+    @State private var acceptanceNotice: String?
     @State private var confirmsClearAcceptance = false
 
     var body: some View {
@@ -1350,12 +1351,16 @@ private struct EncounterScalingPhoneAcceptanceView: View {
             Section("Progression vectors") {
                 Text("Ordinary fixtures keep root 101 and production scaling fixed while only party level and membership change. The apex fixture uses disclosed root 909. All are additive to the accepted level-one pair above.")
                     .font(.callout)
-                Text("\(acceptance.completionCount) of \(EncounterScalingProgressionFixtureKind.allCases.count) progression verdicts recorded")
+                Text("\(acceptance.completionCount) of \(EncounterScalingProgressionFixtureKind.allCases.count) finished progression verdicts recorded")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
                 ForEach(EncounterScalingProgressionFixtureKind.allCases) { kind in
                     Button {
-                        do { progressionSession = try EncounterScalingProgressionFixtureSession(kind: kind) }
+                        do {
+                            acceptanceNotice = nil
+                            progressionSession = try EncounterScalingProgressionFixtureSession(
+                                kind: kind)
+                        }
                         catch { self.error = error.localizedDescription }
                     } label: {
                         VStack(alignment: .leading, spacing: 3) {
@@ -1378,7 +1383,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                     }
                 }
             }
-            if acceptance.completionCount > 0 {
+            if !acceptance.records.isEmpty {
                 Section("Acceptance data") {
                     Button("Clear recorded verdicts", role: .destructive) {
                         confirmsClearAcceptance = true
@@ -1396,7 +1401,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
             isPresented: $confirmsClearAcceptance,
             titleVisibility: .visible
         ) {
-            Button("Clear \(acceptance.completionCount) recorded verdicts", role: .destructive) {
+            Button("Clear \(acceptance.records.count) saved verdicts", role: .destructive) {
                 acceptance.clear()
             }
             Button("Keep verdicts", role: .cancel) {}
@@ -1435,13 +1440,20 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                     HStack(spacing: 6) {
                         ForEach(EncounterScalingAcceptanceVerdict.allCases, id: \.self) { verdict in
                             Button(verdict.title) {
-                                acceptance.record(verdict, for: fixture.receipt,
-                                                  observing: fixture.store)
+                                let result = acceptance.record(
+                                    verdict, for: fixture.receipt, observing: fixture.store)
+                                acceptanceNotice = result.refusalSummary
                             }
                             .buttonStyle(.bordered)
                             .tint(acceptance.records[fixture.kind]?.verdict == verdict ? .green : .white)
                             .font(.caption2)
                         }
+                    }
+                    if let acceptanceNotice {
+                        Text(acceptanceNotice)
+                            .font(.caption2.bold())
+                            .foregroundStyle(.orange)
+                            .accessibilityIdentifier("progression-scaling-record-refusal")
                     }
                 }
                 .padding(10)
@@ -1453,7 +1465,10 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("progression-scaling-receipt")
                 .zIndex(19_999)
-                Button { progressionSession = nil } label: {
+                Button {
+                    acceptanceNotice = nil
+                    progressionSession = nil
+                } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)
                         .symbolRenderingMode(.palette)
