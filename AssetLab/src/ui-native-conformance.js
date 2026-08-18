@@ -9,7 +9,7 @@ export const nativeConformance={
   workshop:failed("StationViews.swift",["Native Workshop is resource context plus ResearchTree; the mock invents fabrication projects."]),
   party:failed("PartyRosterView.swift",["The mock invents formation roles and omits the native member pager and Gear/Training/Stats/Gambits structure."]),
   "essence-spring":failed("StationViews.swift + SpendingViews.swift",["Native Refine, Study and Unlearn modes and dynamic conversion are not represented."]),
-  constellation:failed("StationViews.swift + SpendingViews.swift",["The purchase action belongs to anchored detail with confirmation and stale refusal, not a global Fix/Back rail."]),
+  constellation:{status:"verified",source:"StationViews.swift:1557-1637 + SpendingViews.swift:183-299 + ConstellationPresentationTests.swift",issues:[],designVersion:"native-1"},
   library:failed("LibraryView.swift",["Native tabs are Diaries, People, Runes, Notes and History; the mock invents categories and root actions."]),
   bestiary:failed("BestiaryView.swift",["Native root is a searchable two-column Kinds met grid; Overview/Specimens exist only inside a species sheet."]),
   research:failed("ResearchViews.swift + ResearchTreeLayout.swift",["The mock uses placeholder graph data and invented tabs/actions instead of station-owned branch hubs and exact prerequisite DAGs."]),

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {preservationLedger} from "../src/ui-preservation-ledger.js";
-import {fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
+import {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
 const galleryApp=await readFile(new URL("../src/ui-gallery-app.js",import.meta.url),"utf8");
 const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
 const galleryHtml=await readFile(new URL("../ui-gallery.html",import.meta.url),"utf8");
@@ -20,7 +20,7 @@ for(const title of required){
 }
 const requiredMarkers={
   Campaigns:"book-progress",Home:"town-scene","Writing Desk":"writing-desk",Storehouse:"storehouse-cabinet",Workshop:"project-strip",Party:"party-formation",
-  "Essence Spring":"spring-basin",Constellation:"constellation-field",Library:"library-catalogue",Bestiary:"specimen-folio","World History":"world-archive",Blacksmith:"comparison-rack",
+  "Essence Spring":"spring-basin",Constellation:"constellation-surface",Library:"library-catalogue",Bestiary:"specimen-folio","World History":"world-archive",Blacksmith:"comparison-rack",
   "Trading Post":"market-stall",
   Recycler:"salvage-table",Tannery:"hide-frame",Bowyer:"bow-jig",Armoury:"armour-stand",
   Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"interpretation-board",
@@ -29,7 +29,14 @@ const requiredMarkers={
   Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"receipt-paper",Settings:"utility-board"
 };
 for(const [title,marker] of Object.entries(requiredMarkers))assert.match(renderScreen(title),new RegExp(marker),`${title} must reach its specialized composition`);
-assert.match(renderScreen("Constellation","Confirm"),/fixed in place/,"fixture states must execute stateful renderer branches");
+assert.deepEqual(fixtureStatesByScreen.constellation,["Default","Selected","Confirm","Bought"],"Constellation must expose its distinct shortfall, selection, confirmation and purchased states");
+assert.match(renderScreen("Constellation","Default"),/✦ 1 Motes[\s\S]*Needs 2 more Motes/,"Constellation Default must be the truthful shortfall fixture");
+assert.match(renderScreen("Constellation","Selected"),/Ready to fix in place[\s\S]*Rank[\s\S]*0\/1[\s\S]*Cost[\s\S]*3 Motes[\s\S]*Fix in place · 3 Motes/,"Constellation Selected must put the exact purchase facts and action inside anchored detail");
+assert.match(renderScreen("Constellation","Confirm"),/Fix The Long Instruction in place\?[\s\S]*This permanently changes Reality for the current campaign\.[\s\S]*Spend 3 Motes[\s\S]*Not yet/,"Constellation Confirm must remain pre-purchase and show the native confirmation dialog");
+assert.match(renderScreen("Constellation","Bought"),/✦ 1 Motes[\s\S]*Fixed in place[\s\S]*Rank[\s\S]*1\/1/,"Constellation Bought must show the post-purchase rank and independent bought state");
+assert.doesNotMatch(renderScreen("Constellation","Bought"),/Fix in place ·|Cost[\s\S]*3 Motes|bottom-rail/,"a bought Constellation node must expose no purchase or global action");
+assert.doesNotMatch(renderScreen("Constellation","Default"),/orbit-ring|star-inscription|0 → 1|costs 3|>slot<|>owned<|bottom-rail/,"Constellation must not invent graph structure, shorthand or global actions");
+assert.equal(nativeConformance.constellation.status,"verified","Constellation may reopen review only after all current purchase states match native behavior");
 assert.match(renderScreen("Campaigns"),/OLDER TEST VERSION[\s\S]*Format 12[\s\S]*current format 13/,"campaign proposal must preserve explicit legacy/current-version handling");
 assert.match(renderScreen("Apothecary"),/Scent Mask/,"Apothecary must represent the live learned treatment truthfully");
 assert.match(renderScreen("Library"),/Unknown and legacy records remain unguessed/,"Library must not infer missing record identity");
