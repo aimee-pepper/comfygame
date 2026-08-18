@@ -114,39 +114,55 @@ final class PageTests: XCTestCase {
         XCTAssertFalse(offered.inspected)
         let beforeSightings = room.store.state.reality.encounteredLexemes
         let quote = try XCTUnwrap(room.store.offeredWorldPageQuote(offered.id))
-        guard case .inspected(let inspected) = room.store.inspectOfferedWorldPage(quote) else {
-            return XCTFail("expected production inspection")
-        }
-        XCTAssertTrue(inspected.inspected)
-        XCTAssertEqual(room.store.state.reality.encounteredLexemes,
-                       beforeSightings.union(offered.definition.page.encounteredLexemes))
-        let fresh = try XCTUnwrap(room.store.offeredWorldPageQuote(offered.id))
-        XCTAssertEqual(room.store.takeOfferedWorldPage(fresh), .taken(inspected))
+        XCTAssertEqual(room.store.takeOfferedWorldPage(quote), .taken(offered))
+        XCTAssertEqual(room.store.state.reality.encounteredLexemes, beforeSightings,
+                       "picking up an unopened page must not record Dictionary sightings")
+        XCTAssertEqual(room.store.activeRun?.carriedWorldPages, [offered])
+        XCTAssertFalse(try XCTUnwrap(room.store.activeRun?.carriedWorldPages.first).inspected)
 
         let full = try GameStore.makeWildWorldPagesPhoneFixture(kind: .fullSatchel)
         let fullPage = try XCTUnwrap(full.store.activeRun?.offeredWorldPages.first)
         let cancelledState = full.store.state
         XCTAssertEqual(full.store.state, cancelledState, "cancelling is deliberately no action")
-        let stale = try XCTUnwrap(full.store.offeredWorldPageQuote(fullPage.id))
-        _ = full.store.inspectOfferedWorldPage(stale)
-        let afterInspection = full.store.state
-        XCTAssertEqual(full.store.takeOfferedWorldPage(stale), .stale)
-        XCTAssertEqual(full.store.activeRun?.offeredWorldPages,
-                       afterInspection.worlds.activeRun?.offeredWorldPages)
-        XCTAssertEqual(full.store.activeRun?.satchelItems,
-                       afterInspection.worlds.activeRun?.satchelItems)
-        XCTAssertEqual(full.store.activeRun?.carriedWorldPages,
-                       afterInspection.worlds.activeRun?.carriedWorldPages)
-        XCTAssertEqual(full.store.state.reality.encounteredLexemes,
-                       afterInspection.reality.encounteredLexemes)
         let swapQuote = try XCTUnwrap(full.store.offeredWorldPageQuote(fullPage.id))
+        XCTAssertEqual(full.store.takeOfferedWorldPage(swapQuote), .satchelFull)
+        XCTAssertEqual(full.store.activeRun?.offeredWorldPages,
+                       cancelledState.worlds.activeRun?.offeredWorldPages)
+        XCTAssertEqual(full.store.activeRun?.satchelItems,
+                       cancelledState.worlds.activeRun?.satchelItems)
+        XCTAssertEqual(full.store.activeRun?.carriedWorldPages,
+                       cancelledState.worlds.activeRun?.carriedWorldPages)
+        XCTAssertEqual(full.store.state.reality.encounteredLexemes,
+                       cancelledState.reality.encounteredLexemes)
         let itemID = try XCTUnwrap(full.store.activeRun?.satchelItems.stacks.first?.id)
         guard case .swapped(let taken, discarded: .itemStack(let discarded)) =
                 full.store.swapOfferedWorldPage(swapQuote, discarding: .itemStack(itemID)) else {
             return XCTFail("expected exact item-to-page swap")
         }
         XCTAssertEqual(taken.id, fullPage.id)
+        XCTAssertFalse(taken.inspected)
         XCTAssertEqual(discarded.id, itemID)
+        XCTAssertEqual(full.store.state.reality.encounteredLexemes,
+                       cancelledState.reality.encounteredLexemes,
+                       "swapping for an unopened page must not record Dictionary sightings")
+    }
+
+    func testWorldInteractTakesLoosePageDirectlyWithoutInspectOrSuccessModal() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path:
+            "Sources/Screens/WorldView.swift"), encoding: .utf8)
+        let interaction = try XCTUnwrap(source.components(separatedBy:
+            "private func performInteraction()").dropFirst().first)
+            .components(separatedBy: "private func completeWorldPageSwap")[0]
+
+        XCTAssertTrue(interaction.contains("store.takeOfferedWorldPage(quote)"))
+        XCTAssertFalse(interaction.contains("store.inspectOfferedWorldPage"),
+                       "field Interact must not require Inspect before Take")
+        XCTAssertFalse(interaction.contains("case .taken(let"),
+                       "successful pickup must not open a result alert")
+        XCTAssertTrue(source.contains("Take loose page · 1 satchel slot · no turn"))
+        XCTAssertFalse(source.contains("Inspect Loose page · no turn"))
     }
 
     @MainActor

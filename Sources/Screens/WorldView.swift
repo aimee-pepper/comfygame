@@ -507,7 +507,7 @@ struct WorldView: View {
         }
         if let page = store.offeredWorldPageHere {
             return page.inspected ? "Take \(page.definition.title) · 1 satchel slot"
-                                  : "Inspect Loose page · no turn"
+                                  : "Take loose page · 1 satchel slot · no turn"
         }
         if let site = store.searchableHere, let definition = site.definition {
             return "Search \(definition.name) · \(site.searchTurnsRemaining) turns left"
@@ -529,21 +529,15 @@ struct WorldView: View {
     private func performInteraction() {
         if let page = store.offeredWorldPageHere,
            let quote = store.offeredWorldPageQuote(page.id) {
-            if page.inspected {
-                switch store.takeOfferedWorldPage(quote) {
-                case .taken(let taken): fieldPageMessage = "Took \(taken.definition.title)."
-                case .satchelFull: pendingWorldPageSwap = quote
-                case .stale, .notHere, .duplicateIdentity:
-                    fieldPageMessage = "That page is no longer available here."
-                case .inspected, .swapped: break
-                }
-            } else {
-                switch store.inspectOfferedWorldPage(quote) {
-                case .inspected(let inspected): fieldPageMessage = inspected.definition.title
-                case .stale, .notHere, .duplicateIdentity:
-                    fieldPageMessage = "That page is no longer available here."
-                case .satchelFull, .taken, .swapped: break
-                }
+            switch store.takeOfferedWorldPage(quote) {
+            case .taken:
+                break
+            case .satchelFull:
+                pendingWorldPageSwap = quote
+            case .stale, .notHere, .duplicateIdentity:
+                fieldPageMessage = "That page is no longer available here."
+            case .inspected, .swapped:
+                break
             }
         } else if store.harvestableHere != nil {
             completeInteraction(); store.harvest()
@@ -569,7 +563,7 @@ struct WorldView: View {
     ) {
         pendingWorldPageSwap = nil
         switch store.swapOfferedWorldPage(quote, discarding: occupant) {
-        case .swapped(let page, _): fieldPageMessage = "Took \(page.definition.title)."
+        case .swapped: break
         case .stale, .notHere, .duplicateIdentity, .satchelFull:
             fieldPageMessage = "That choice is no longer current. Nothing was changed."
         case .inspected, .taken: break
