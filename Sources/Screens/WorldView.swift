@@ -1001,7 +1001,6 @@ private struct MapGrid: View {
                          layer: .softenedCurrentTerrain)
                 mapCells(side: side, grade: grade, atmosphereMotion: atmosphereMotion,
                          layer: .softenedRememberedTerrain)
-                visibilityFieldShade(side: side)
                 mapCells(side: side, grade: grade, atmosphereMotion: atmosphereMotion,
                          layer: .crispFullVisibility)
                 hiddenMaskGrid(side: side)
@@ -1093,7 +1092,7 @@ private struct MapGrid: View {
             isPlayer: isCrispLayer && point == run.playerPosition,
             showsContent: isCrispLayer,
             isTransparent: !rendersTerrain,
-            appliesVisibilityShade: false,
+            appliesVisibilityShade: !isCrispLayer,
             terrainBlurFraction: terrainBlurFraction,
             clipsTerrainBlurToTileBounds: WorldVisibilityCompositePresentation
                 .clipsTerrainBlurToTileBounds,
@@ -1118,28 +1117,6 @@ private struct MapGrid: View {
                 }
             }
         }
-        .allowsHitTesting(false)
-    }
-
-    /// A single map-space radial field makes the sight boundary read as one circle around the
-    /// player. It replaces independent per-cell gradients, whose seams looked like boxes and
-    /// directional wedges as the camera moved.
-    private func visibilityFieldShade(side: CGFloat) -> some View {
-        let geometry = WorldVisibilityCompositePresentation.radialField(
-            player: run.playerPosition, origin: origin,
-            viewportColumns: viewportColumns, viewportRows: viewportRows,
-            profile: visibilityProfile)
-        return RadialGradient(
-            stops: [
-                .init(color: .clear, location: geometry.clearStop),
-                .init(color: .black.opacity(geometry.fringeShadeOpacity),
-                      location: geometry.fringeStop),
-                .init(color: .black.opacity(geometry.rememberedShadeOpacity), location: 1),
-            ],
-            center: UnitPoint(x: geometry.centerX, y: geometry.centerY),
-            startRadius: 0,
-            endRadius: side * CGFloat(geometry.endRadiusInTiles)
-        )
         .allowsHitTesting(false)
     }
 
@@ -1273,7 +1250,8 @@ struct WorldTileVisibilityPresentation {
 
 /// Tile-bounded terrain softening preserves each cell's identity without directional edge wedges.
 /// Full tiles are redrawn sharply above it; hidden tiles never receive an art request. Remembered
-/// terrain has its own lighter pass, while shade remains one player-centred radial field.
+/// terrain has its own lighter pass. Visibility opacity is applied per logical tile so the visual
+/// system never paints a viewport-wide or tile-local radial gradient over terrain.
 struct WorldVisibilityCompositePresentation {
     /// Explored terrain is legible memory, so its vision-border blur is exactly half the live
     /// fringe blur. Keep the relationship named here rather than duplicating presentation values.
@@ -1283,16 +1261,6 @@ struct WorldVisibilityCompositePresentation {
     enum TerrainSofteningPass {
         case current
         case remembered
-    }
-
-    struct RadialField: Equatable {
-        let centerX: Double
-        let centerY: Double
-        let clearStop: Double
-        let fringeStop: Double
-        let endRadiusInTiles: Double
-        let fringeShadeOpacity: Double
-        let rememberedShadeOpacity: Double
     }
 
     static func currentTerrainBlurFraction(profile: WorldRules.VisibilityProfile) -> Double {
@@ -1331,28 +1299,6 @@ struct WorldVisibilityCompositePresentation {
         visibility == .full
     }
 
-    static func radialField(player: GridPoint, origin: GridPoint,
-                            viewportColumns: Int, viewportRows: Int,
-                            profile: WorldRules.VisibilityProfile) -> RadialField {
-        let columns = Double(max(1, viewportColumns))
-        let rows = Double(max(1, viewportRows))
-        let fullBoundary = Double(profile.fullRadius) + 0.5
-        let fringeBoundary = fullBoundary + Double(profile.fringeWidth)
-        // Extend to the farthest viewport corner so the final stop covers every remembered tile.
-        let localX = Double(player.x - origin.x) + 0.5
-        let localY = Double(player.y - origin.y) + 0.5
-        let endRadius = max(
-            fringeBoundary + 0.5,
-            hypot(max(localX, columns - localX), max(localY, rows - localY)))
-        return RadialField(
-            centerX: localX / columns,
-            centerY: localY / rows,
-            clearStop: min(1, fullBoundary / endRadius),
-            fringeStop: min(1, max(fullBoundary, fringeBoundary) / endRadius),
-            endRadiusInTiles: endRadius,
-            fringeShadeOpacity: 1 - profile.fringeOpacity,
-            rememberedShadeOpacity: 1 - Tuning.Visibility.defaultFringeOpacity)
-    }
 }
 
 private struct TileView: View {
@@ -1460,9 +1406,8 @@ private struct TileView: View {
     @ViewBuilder private var terrainArt: some View {
         if let artRequest {
             if terrainBlurFraction > 0 {
-                // Blur each terrain sample inside its own logical tile. The radial field supplies
-                // the coherent circular boundary; clipping here prevents elevation and adjacency
-                // pixels from smearing into neighbouring cells.
+                // Blur each terrain sample inside its own logical tile. Clipping prevents
+                // elevation and adjacency pixels from smearing into neighbouring cells.
                 let blurredArt = MapTileArt(request: artRequest)
                     .frame(width: side,
                            height: side * CGFloat(MapAssetContract.spriteHeight)

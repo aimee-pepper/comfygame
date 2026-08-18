@@ -57,33 +57,21 @@ final class WorldVisibilityRulesTests: XCTestCase {
             accuracy: 0.000_001)
     }
 
-    func testViewportVisibilityFieldIsOnePlayerCentredRadialGradient() {
-        let profile = WorldRules.visibilityProfile(illumination: 45)
-        let field = WorldVisibilityCompositePresentation.radialField(
-            player: GridPoint(x: 12, y: 8), origin: GridPoint(x: 7, y: 2),
-            viewportColumns: 11, viewportRows: 13, profile: profile)
+    func testWorldVisibilityUsesTileLocalOpacityWithoutRadialGradients() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: projectRoot
+            .appendingPathComponent("Sources/Screens/WorldView.swift"), encoding: .utf8)
 
-        XCTAssertEqual(field.centerX, 0.5, accuracy: 0.000_001)
-        XCTAssertEqual(field.centerY, 0.5, accuracy: 0.000_001)
-        XCTAssertLessThan(field.clearStop, field.fringeStop)
-        XCTAssertEqual(field.clearStop * field.endRadiusInTiles,
-                       Double(profile.fullRadius) + 0.5, accuracy: 0.000_001)
-        XCTAssertEqual(field.fringeStop * field.endRadiusInTiles,
-                       Double(profile.fullRadius + profile.fringeWidth) + 0.5,
-                       accuracy: 0.000_001)
-        XCTAssertEqual(field.fringeShadeOpacity, 1 - profile.fringeOpacity,
-                       accuracy: 0.000_001)
-    }
-
-    func testClampedCameraKeepsRadialFieldCentredOnPlayerWithinViewport() {
-        let field = WorldVisibilityCompositePresentation.radialField(
-            player: GridPoint(x: 1, y: 2), origin: GridPoint(x: 0, y: 0),
-            viewportColumns: 11, viewportRows: 13,
-            profile: WorldRules.visibilityProfile(illumination: 20))
-
-        XCTAssertEqual(field.centerX, 1.5 / 11, accuracy: 0.000_001)
-        XCTAssertEqual(field.centerY, 2.5 / 13, accuracy: 0.000_001)
-        XCTAssertGreaterThan(field.endRadiusInTiles, 10)
+        XCTAssertFalse(source.contains("RadialGradient"),
+                       "World visibility must never paint radial gradients over terrain")
+        XCTAssertFalse(source.contains("radialField("),
+                       "World visibility must remain tile-based, not viewport-radial")
+        XCTAssertTrue(source.contains("appliesVisibilityShade: !isCrispLayer"),
+                      "fringe and remembered opacity must be applied per logical tile")
+        XCTAssertTrue(source.contains("clipsTerrainBlurToTileBounds"),
+                      "visibility blur must stay clipped to each logical tile")
     }
 
     func testFullyExploredTerrainNeverFallsBelowFringeAfterLeavingSight() {
