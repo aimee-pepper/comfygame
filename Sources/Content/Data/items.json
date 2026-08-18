@@ -264,6 +264,20 @@
       "recyclerDisposition": "notGear"
     },
     {
+      "id": "scent_mask",
+      "name": "Scent Mask",
+      "icon": "wind",
+      "rarity": "common",
+      "blurb": "Animals relying on scent hesitate; other senses and close contact do not.",
+      "kind": "consumable",
+      "consumable": {
+        "effect": "maskScent",
+        "potency": 12
+      },
+      "tradingPostDisposition": "sellable",
+      "recyclerDisposition": "notGear"
+    },
+    {
       "id": "stillwater",
       "name": "Stillwater",
       "icon": "water.waves",

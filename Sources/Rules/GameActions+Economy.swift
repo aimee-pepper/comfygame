@@ -391,6 +391,21 @@ extension GameStore {
         return crafted
     }
 
+    func scentMaskQuote(using animalResource: MaterialReserveSelection)
+        -> ConsumableCraftingRules.ScentMaskQuote? {
+        ConsumableCraftingRules.previewScentMask(using: animalResource, in: state)
+    }
+
+    @discardableResult
+    func craftScentMask(_ quote: ConsumableCraftingRules.ScentMaskQuote)
+        -> ConsumableCraftingRules.ScentMaskCommitResult {
+        var result: ConsumableCraftingRules.ScentMaskCommitResult = .stale
+        mutate("prepare scent mask", flush: true) {
+            result = ConsumableCraftingRules.craftScentMask(quote, in: &$0)
+        }
+        return result
+    }
+
     // MARK: - Storehouse
 
     var unidentifiedStacks: [ItemStack] { state.base.inventory.stacks.filter { !$0.identified } }

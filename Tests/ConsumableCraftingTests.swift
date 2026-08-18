@@ -3,6 +3,90 @@ import XCTest
 
 @MainActor
 final class ConsumableCraftingTests: XCTestCase {
+    func testScentMaskAcceptsEveryAnimalKindAt25AndRejectsFloraAndBelowFloor() {
+        let animalKinds = MaterialKind.allCases.filter(\.isAnimalWorldResource)
+        XCTAssertEqual(Set(animalKinds), [.plate, .quill, .pelt, .down, .hide, .chitin,
+                                          .fang, .tusk, .claw, .bone, .ichor])
+        for kind in animalKinds {
+            XCTAssertTrue(kind.isAnimalWorldResource)
+            XCTAssertGreaterThanOrEqual(MaterialSample(kind: kind, properties: .init(), grade: 25,
+                                                        source: "animal").grade, 25)
+        }
+        XCTAssertTrue(MaterialKind.allCases.filter { !$0.isAnimalWorldResource }.allSatisfy {
+            [.timber, .fibre, .pulp, .toxin, .reagent].contains($0)
+        })
+
+        var state = scentMaskCraftingState()
+        state.base.materialReserve.add(.init(id: .init(rawValue: "below"),
+            sample: .init(kind: .hide, properties: .init(), grade: 24.999, source: "animal")))
+        state.base.materialReserve.add(.init(id: .init(rawValue: "flora"),
+            sample: .init(kind: .reagent, properties: .init(reactivity: 100), grade: 100,
+                          source: "claims to be animal")))
+        XCTAssertTrue(ConsumableCraftingRules.scentMaskAnimalResources(in: state).isEmpty)
+    }
+
+    func testScentMaskExactInstanceCommitIsAtomicAndCostsNoRealityCurrency() throws {
+        var state = scentMaskCraftingState()
+        let chosen = MaterialReserveUnit(id: .init(rawValue: "chosen"),
+            sample: .init(kind: .pelt, properties: .init(), grade: 25, source: "chosen beast"))
+        let twin = MaterialReserveUnit(id: .init(rawValue: "twin"), sample: chosen.sample)
+        state.base.materialReserve.add(chosen)
+        state.base.materialReserve.add(twin)
+        let selection = try XCTUnwrap(state.base.materialReserve.selections().first {
+            $0.unitID == chosen.id
+        })
+        let quote = try XCTUnwrap(ConsumableCraftingRules.previewScentMask(using: selection,
+                                                                          in: state))
+        let essence = state.base.essence
+        let motes = state.reality.motes
+        XCTAssertEqual(ConsumableCraftingRules.craftScentMask(quote, in: &state), .prepared)
+        XCTAssertEqual(state.base.resources["reagent"], 0)
+        XCTAssertEqual(state.base.essence, essence)
+        XCTAssertEqual(state.reality.motes, motes)
+        XCTAssertEqual(state.base.materialReserve.selections().map(\.unitID), [twin.id])
+        XCTAssertEqual(state.base.inventory.stacks.first?.catalogID, Items.scentMask)
+
+        var stale = scentMaskCraftingState()
+        stale.base.materialReserve.add(chosen)
+        _ = stale.base.materialReserve.consume([selection])
+        let before = stale
+        XCTAssertEqual(ConsumableCraftingRules.craftScentMask(quote, in: &stale), .stale)
+        XCTAssertEqual(stale, before)
+    }
+
+    func testScentMaskFullStorehouseUsesOrdinarySpillover() throws {
+        var state = scentMaskCraftingState()
+        state.base.inventory = Inventory(slots: 0)
+        let unit = MaterialReserveUnit(id: .init(rawValue: "animal"),
+            sample: .init(kind: .bone, properties: .init(), grade: 25, source: "animal"))
+        state.base.materialReserve.add(unit)
+        let quote = try XCTUnwrap(ConsumableCraftingRules.previewScentMask(
+            using: try XCTUnwrap(state.base.materialReserve.selections().first), in: state))
+        XCTAssertEqual(ConsumableCraftingRules.craftScentMask(quote, in: &state), .prepared)
+        XCTAssertEqual(state.base.spillover.map(\.catalogID), [Items.scentMask])
+    }
+
+    func testScentMaskFieldKitPacksExactDesiredQuantityAsProtectedReturn() throws {
+        var state = GameState.newGame()
+        state.base.inventory = Inventory(slots: 4, stacks: [
+            ItemStack(id: .init(rawValue: 90), catalogID: Items.scentMask, count: 2)
+        ])
+        state.base.preparationLoadout = [
+            .init(itemID: Items.scentMask, desiredCount: 1, order: 0)
+        ]
+        state.base.preparationLoadoutNeedsReview = false
+        guard case .allowed(let plan) = GameStore.fieldKitDepartureQuote(in: state) else {
+            return XCTFail("Scent Mask was not packable as a supply")
+        }
+        XCTAssertEqual(plan.packed.stacks.first?.count, 1)
+        XCTAssertEqual(plan.remainingInventory.stacks.first?.count, 1)
+
+        var packed = plan.packed
+        for index in packed.stacks.indices {
+            packed.stacks[index].protectedReturnCount = packed.stacks[index].count
+        }
+        XCTAssertEqual(packed.stacks.first?.protectedReturnCount, 1)
+    }
     func testApothecaryPreparationActionStaysOutsideScrollableRecipeCatalogue() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
@@ -345,6 +429,14 @@ final class ConsumableCraftingTests: XCTestCase {
         state.base.essence = 500
         state.base.inventory.slots = 20
         state.base.knownConsumableRecipes.insert(recipe)
+        return state
+    }
+
+    private func scentMaskCraftingState() -> GameState {
+        var state = GameState.newGame()
+        state.base.stations[Stations.apothecary] = .init(isUnlocked: true, tier: 0)
+        state.base.knownConsumableRecipes.insert(Items.scentMask)
+        state.base.resources.add(1, of: "reagent")
         return state
     }
 

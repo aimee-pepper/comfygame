@@ -769,6 +769,12 @@ struct RunHealthCapEntry: Codable, Equatable, Sendable {
 
 /// One instanced world run.
 struct WorldRun: Codable, Equatable, Sendable {
+    struct ScentMaskState: Codable, Equatable, Sendable {
+        var sourceItemInstanceID: InstanceID
+        var startTurn: Int
+        /// The twelfth world advance is protected; the state expires immediately afterwards.
+        var expiresAfterTurn: Int
+    }
     var runIndex: Int
     /// Composition this world was generated from. Kept so the map can be regenerated from the
     /// book + seed rather than serialising every tile.
@@ -816,6 +822,14 @@ struct WorldRun: Codable, Equatable, Sendable {
     /// you once and poison keeps costing — and a counter on the run is the only place that can
     /// survive a force-quit halfway through it.
     var floraPoisonTurns: Int = 0
+    var scentMask: ScentMaskState?
+
+    var scentMaskTurnsRemaining: Int {
+        guard let scentMask else { return 0 }
+        return max(0, scentMask.expiresAfterTurn - turnsTaken)
+    }
+
+    var isScentMasked: Bool { scentMask != nil && turnsTaken <= scentMask!.expiresAfterTurn }
 
     /// 0–100, always visible. Decays per *player turn* only — never wall-clock (pillar 2).
     var stability: Double = Tuning.World.startingStability
@@ -1073,6 +1087,7 @@ struct WorldRun: Codable, Equatable, Sendable {
         foundWritings = try container.decodeIfPresent([FoundWritingRecord].self,
                                                        forKey: .foundWritings) ?? []
         floraPoisonTurns = try container.decodeIfPresent(Int.self, forKey: .floraPoisonTurns) ?? 0
+        scentMask = try container.decodeIfPresent(ScentMaskState.self, forKey: .scentMask)
         stability = try container.decodeIfPresent(Double.self, forKey: .stability)
             ?? Tuning.World.startingStability
         resolvedStabilityScore = try container.decodeIfPresent(Int.self,

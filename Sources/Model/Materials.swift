@@ -23,6 +23,17 @@ enum MaterialKind: String, Codable, CaseIterable, Equatable, Hashable, Sendable 
     // vocabulary rather than two.
     case timber, fibre, pulp, toxin, reagent
 
+    /// Closed provenance boundary used by animal-only preparations. A resource's display source
+    /// and property values never get to imply that it came from an animal.
+    var isAnimalWorldResource: Bool {
+        switch self {
+        case .plate, .quill, .pelt, .down, .hide, .chitin, .fang, .tusk, .claw, .bone, .ichor:
+            true
+        case .timber, .fibre, .pulp, .toxin, .reagent:
+            false
+        }
+    }
+
     var displayName: String { rawValue.capitalisedSentence }
 
     /// What a binful of them is called. English, not a bolted-on "s" — *down* and *ichor* don't

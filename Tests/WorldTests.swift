@@ -1429,6 +1429,72 @@ final class WorldTests: XCTestCase {
         XCTAssertTrue(resumed.quietStepHesitationUsed)
     }
 
+    func testScentMaskIsChemoOnlyNonstackingAndPersistsForTwelveAdvances() throws {
+        var state = startedRun(book(["terrain": "plains"]), seed: 6_102)
+        state.base.binderCharacter.level = 3
+        state.base.binderCharacter.branchDepth["shadow"] = 1
+        var run = try XCTUnwrap(state.worlds.activeRun)
+        run.playerPosition = .init(x: 7, y: 7)
+        let position = GridPoint(x: 7, y: 9)
+        run.map[position].isRevealed = true
+        var traits = CreatureTraits()
+        traits.sensory.vision = 0
+        traits.sensory.mechano = 0
+        traits.sensory.thermo = 0
+        traits.sensory.chemo = 100
+        run.enemies = [WorldEnemy(id: .init(rawValue: 62), traits: traits, position: position)]
+        run.satchelItems = Inventory(slots: 2, stacks: [
+            ItemStack(id: .init(rawValue: 620), catalogID: Items.scentMask)
+        ])
+        state.worlds.activeRun = run
+
+        _ = WorldRules.useItem(.init(rawValue: 620), on: .binder, in: &state)
+        var enemy = try XCTUnwrap(state.worlds.activeRun?.enemies.first)
+        if case .alert(_, let reason) = enemy.awareness { XCTAssertEqual(reason, .maskedScent) }
+        else { XCTFail("Scent Mask did not supply the chemo-only alert") }
+        XCTAssertFalse(enemy.quietStepHesitationUsed,
+                       "Mask must be evaluated before and preserve Quiet Step")
+        XCTAssertEqual(state.worlds.activeRun?.scentMaskTurnsRemaining, 11)
+
+        let encoded = try JSONEncoder().encode(state.worlds.activeRun)
+        let resumed = try JSONDecoder().decode(WorldRun.self, from: encoded)
+        XCTAssertEqual(resumed.scentMask, state.worlds.activeRun?.scentMask)
+
+        for _ in 0..<11 { _ = WorldRules.advanceTurn(in: &state) }
+        XCTAssertNil(state.worlds.activeRun?.scentMask)
+        enemy = try XCTUnwrap(state.worlds.activeRun?.enemies.first)
+        XCTAssertFalse(enemy.maskedScentContact)
+    }
+
+    func testScentMaskDoesNotAffectOtherSensesAdjacencyFloraOrApex() throws {
+        func awareness(sensory: (vision: Double, mechano: Double, chemo: Double, thermo: Double),
+                       distance: Int = 2, sessile: Bool = false, apex: Bool = false)
+            throws -> WorldEnemy.Awareness {
+            var state = startedRun(book(["terrain": "plains"]), seed: 6_103)
+            var run = try XCTUnwrap(state.worlds.activeRun)
+            run.playerPosition = .init(x: 7, y: 7)
+            var traits = CreatureTraits()
+            traits.sensory.vision = sensory.vision
+            traits.sensory.mechano = sensory.mechano
+            traits.sensory.chemo = sensory.chemo
+            traits.sensory.thermo = sensory.thermo
+            run.enemies = [WorldEnemy(id: .init(rawValue: 63), traits: traits,
+                position: .init(x: 7, y: 7 + distance), isSessile: sessile, isApex: apex)]
+            run.scentMask = .init(sourceItemInstanceID: .init(rawValue: 630), startTurn: 0,
+                                  expiresAfterTurn: 12)
+            state.worlds.activeRun = run
+            _ = WorldRules.advanceTurn(in: &state)
+            return try XCTUnwrap(state.worlds.activeRun?.enemies.first?.awareness)
+        }
+
+        XCTAssertEqual(try awareness(sensory: (100, 0, 0, 0)), .pursuing)
+        XCTAssertEqual(try awareness(sensory: (0, 100, 0, 0)), .pursuing)
+        XCTAssertEqual(try awareness(sensory: (0, 0, 100, 0), distance: 1), .pursuing)
+        XCTAssertNotEqual(try awareness(sensory: (0, 0, 100, 0), sessile: true),
+                          .alert(turn: 1, reason: .maskedScent))
+        XCTAssertEqual(try awareness(sensory: (0, 0, 100, 0), apex: true), .unaware)
+    }
+
     func testEncounterOpeningFreezesApproachMutualContactAndAmbushFromPreActionDisclosure() throws {
         func opening(disclosed: Bool, approached: Bool, apex: Bool = false) throws -> EncounterState.OpeningResolution {
             var state = startedRun(book(["terrain": "plains"]), seed: apex ? 8_103 : 8_101)

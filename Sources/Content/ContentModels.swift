@@ -475,6 +475,7 @@ struct ConsumableDef: Codable, Equatable, Sendable {
         case coatDazzle
         case identifyCurio
         case lureCreature
+        case maskScent
     }
 
     var effect: Effect

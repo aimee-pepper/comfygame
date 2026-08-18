@@ -477,6 +477,13 @@ enum WorldRules {
                     < run.enemies[$1].position.manhattanDistance(to: run.playerPosition) })
             else { return [.blocked("No visible roaming creature answers the lure.")] }
             run.enemies[nearest].isAwake = true
+        case .maskScent:
+            guard run.scentMask == nil else {
+                return [.blocked("Already masked · \(run.scentMaskTurnsRemaining) turns remain")]
+            }
+            run.scentMask = .init(sourceItemInstanceID: stackID,
+                                  startTurn: run.turnsTaken,
+                                  expiresAfterTurn: run.turnsTaken + scentMaskDuration(effect))
         case .returnHome, .clearPoison, .clearElemental, .clearAnyStatus, .preventStatus,
              .coatPoison, .coatBurn, .coatBleed, .coatDazzle, .identifyCurio:
             return [.blocked("Use that at the appropriate moment.")]
@@ -488,6 +495,10 @@ enum WorldRules {
         var events: [Event] = [.usedItem(item.name, on: member)]
         events.append(contentsOf: advanceTurn(in: &state))
         return events
+    }
+
+    private static func scentMaskDuration(_ effect: ConsumableDef) -> Int {
+        max(1, effect.potency)
     }
 
     /// Harvests the node under the player. One pull per turn.
@@ -766,6 +777,10 @@ enum WorldRules {
         let concealment = fieldConcealment(in: state)
         events.append(contentsOf: moveEnemies(in: &run, concealment: concealment,
                                                partySightBonus: partySightBonus))
+        if let mask = run.scentMask, run.turnsTaken >= mask.expiresAfterTurn {
+            run.scentMask = nil
+            for index in run.enemies.indices { run.enemies[index].maskedScentContact = false }
+        }
         state.worlds.activeRun = run
 
         if let bumped = enemyOnPlayer(in: run) {
@@ -974,11 +989,22 @@ enum WorldRules {
             let baseSight = enemy.isApex ? 0 : detectionRadius(of: enemy, in: run)
             let skillReduction = enemy.isSessile ? 0 : concealment.radiusReduction
             let sight = max(1, baseSight - skillReduction)
+            if distance > baseSight { enemy.maskedScentContact = false }
             switch enemy.awareness {
             case .unaware where !enemy.isApex && distance <= sight:
+                let withoutChemo = detectionRadius(of: enemy, in: run, includingChemo: false)
+                let scentMaskHesitates = run.isScentMasked && enemy.traits != nil
+                    && !enemy.isSessile && distance > 1 && distance > withoutChemo
+                    && !enemy.maskedScentContact
                 let canHesitate = concealment.quietStep && !enemy.isSessile
                     && !enemy.quietStepHesitationUsed && distance > 1
-                if canHesitate {
+                if scentMaskHesitates {
+                    enemy.awareness = .alert(turn: run.turnsTaken, reason: .maskedScent)
+                    enemy.maskedScentContact = true
+                    if isCurrentlyVisible(enemy, in: run, profile: visibility) {
+                        events.append(.enemyAlerted(run.name(of: enemy)))
+                    }
+                } else if canHesitate {
                     enemy.awareness = .alert(turn: run.turnsTaken, reason: .quietStep)
                     enemy.quietStepHesitationUsed = true
                     if isCurrentlyVisible(enemy, in: run, profile: visibility) {
@@ -1042,7 +1068,8 @@ enum WorldRules {
     /// **Sight is only one way of noticing** (spec §7). A creature that hunts by touch or smell is
     /// unaffected by darkness, and one that lives by its eyes is half-blind at night — so night
     /// genuinely changes who has the advantage rather than only changing your own sight radius.
-    static func detectionRadius(of enemy: WorldEnemy, in run: WorldRun) -> Int {
+    static func detectionRadius(of enemy: WorldEnemy, in run: WorldRun,
+                                includingChemo: Bool = true) -> Int {
         guard let traits = enemy.traits else {
             // Legacy creature from a world bound before the cast.
             return enemy.creatureID.flatMap { ContentCatalog.shared.creature($0) }
@@ -1051,7 +1078,9 @@ enum WorldRules {
         }
         let byEye = traits.sensory.vision / Tuning.Pressure.scaleMaximum
             * (run.isNight ? Tuning.World.nightVisionFraction : 1)
-        let byEverythingElse = traits.sensory.nonVisual / Tuning.Pressure.scaleMaximum
+        let nonVisual = traits.sensory.mechano + traits.sensory.thermo
+            + (includingChemo ? traits.sensory.chemo : 0)
+        let byEverythingElse = nonVisual / Tuning.Pressure.scaleMaximum
             * Tuning.World.nonVisualSenseReach
         let open = BookRules.readings(for: run.book, seed: run.mapSeed)["relief"].aspect("openness")
         let inTheOpen = open > Tuning.Pressure.openTerrainThreshold ? Tuning.World.sightBonusInOpenGround : 0

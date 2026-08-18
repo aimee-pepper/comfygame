@@ -949,6 +949,7 @@ private struct CombatItemSheet: View {
         case .coatDazzle: return "Dazzles the next foe this party member strikes."
         case .identifyCurio: return "Identifies a curio outside combat."
         case .lureCreature: return "Draws a roaming creature outside combat."
+        case .maskScent: return "Masks the party's scent outside combat."
         }
     }
 }

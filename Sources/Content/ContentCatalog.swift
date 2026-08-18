@@ -979,6 +979,7 @@ enum Items {
     static let causticCore: ItemID = "caustic_core"
     static let lightCore: ItemID = "light_core"
     static let conduitFixture: ItemID = "conduit_fixture"
+    static let scentMask: ItemID = "scent_mask"
     /// **Reserved, and deliberately not in `items.json`.** A material is not an authored item: what
     /// it is and what it's good for came off the animal it was cut from, and travels on the stack
     /// as a `MaterialSample`. This id exists only so a material can share the slot machinery.
