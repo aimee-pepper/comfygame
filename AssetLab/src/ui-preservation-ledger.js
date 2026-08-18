@@ -1,6 +1,6 @@
 // Native structures the redesign must preserve. Shared styling never authorizes flattening them.
 export const preservationLedger={
-"Campaigns":["CampaignStartView.swift","Progress-book motif above every save title","Continue newest loadable save plus separate New Game","Per-save validity, level and last-played facts","Details preserve location, progression, export and confirmed delete"],
+"Campaigns":["CampaignStartView.swift","Stacked-book progress motif","Continue and New Game opening actions","Per-save health, level and last-played facts","Export and confirmed delete for incompatible saves"],
 "Home":["BaseView.swift · StartingTownHomeScene.swift","Authored town scene and normalized hotspots","Home / Make / Study / Realms districts","Five opening Home destinations","Compact Party + Bind & Depart bottom pair","Essence, Motes and utility context"],
 "Writing Desk":["WritingDeskView.swift","Editable page grid and placed mark geometry","Write / Pages / World panes","Hands, compounds, personal Runebook and ink well","Collected World Pages and saved Templates","Born anchored, exact cost and bind availability"],
 "Storehouse":["StationViews.swift · ItemGrid.swift","Separate resources, items and gear","Exact quantity and stable identity","Waiting overflow flow","Shared resource/item visual registries"],

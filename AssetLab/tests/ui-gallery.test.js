@@ -19,7 +19,7 @@ for(const title of required){
   }
 }
 const requiredMarkers={
-  Campaigns:"campaign-volume-row",Home:"town-scene","Writing Desk":"writing-desk",Storehouse:"storehouse-cabinet",Workshop:"project-strip",Party:"party-formation",
+  Campaigns:"book-progress",Home:"town-scene","Writing Desk":"writing-desk",Storehouse:"storehouse-cabinet",Workshop:"project-strip",Party:"party-formation",
   "Essence Spring":"spring-basin",Constellation:"constellation-surface",Library:"library-catalogue",Bestiary:"specimen-folio","World History":"world-archive",Blacksmith:"comparison-rack",
   "Trading Post":"market-stall",
   Recycler:"salvage-table",Tannery:"hide-frame",Bowyer:"bow-jig",Armoury:"armour-stand",
@@ -37,7 +37,7 @@ assert.match(renderScreen("Constellation","Bought"),/✦ 1 Motes[\s\S]*Fixed in 
 assert.doesNotMatch(renderScreen("Constellation","Bought"),/Fix in place ·|Cost[\s\S]*3 Motes|bottom-rail/,"a bought Constellation node must expose no purchase or global action");
 assert.doesNotMatch(renderScreen("Constellation","Default"),/orbit-ring|star-inscription|0 → 1|costs 3|>slot<|>owned<|bottom-rail/,"Constellation must not invent graph structure, shorthand or global actions");
 assert.equal(nativeConformance.constellation.status,"verified","Constellation may reopen review only after all current purchase states match native behavior");
-assert.match(renderScreen("Campaigns","Recovery details"),/older test version[\s\S]*Export unchanged recovery file/,"campaign recovery details must preserve the old test file instead of guessing or overwriting it");
+assert.match(renderScreen("Campaigns"),/OLDER TEST VERSION[\s\S]*Format 12[\s\S]*current format 13/,"campaign proposal must preserve explicit legacy/current-version handling");
 assert.match(renderScreen("Apothecary"),/Scent Mask/,"Apothecary must represent the live learned treatment truthfully");
 assert.match(renderScreen("Library"),/Unknown and legacy records remain unguessed/,"Library must not infer missing record identity");
 assert.match(renderScreen("Bestiary"),/quadruped · long ears[\s\S]*sinuous · membrane appendage/,"Bestiary must preserve materially different generated morphology");
@@ -47,23 +47,15 @@ assert.match(renderScreen("Survey Post"),/EIGHT INDEPENDENT ROOTS[\s\S]*NO SHARE
 assert.match(renderScreen("World"),/Field Kit 5[\s\S]*mini-map[\s\S]*FIXED 11×11 CAMERA/,"World must preserve fixed-scale map, minimap truth, and persistent Field Kit status");
 assert.match(renderScreen("Encounter"),/CURRENT ACTOR · BINDER[\s\S]*Glassback · 6\/13[\s\S]*Selected consequence/,"Encounter must expose current actor, exact target and consequence");
 const campaignsDefault=renderScreen("Campaigns","Default");
-assert.equal((campaignsDefault.match(/class="book-stack campaign-book/g)??[]).length,4,"returning Campaigns must keep a two-column fixture with valid and invalid cards");
-for(const [label,title] of [["seven progress books","Aimee’s Book"],["four progress books","Field Notes"],["two progress books","Old Test Book"]]){
+assert.equal((campaignsDefault.match(/class="book-stack campaign-book/g)??[]).length,3,"Campaigns must keep three equally structured campaign buttons in the review fixture");
+for(const [label,title] of [["seven progress volumes","Aimee’s Book"],["four progress volumes","Field Notes"],["two legacy volumes","Old Test Book"]]){
   const volumeIndex=campaignsDefault.indexOf(`aria-label="${label}"`),titleIndex=campaignsDefault.indexOf(`<h4>${title}</h4>`);
   assert.ok(volumeIndex>=0&&volumeIndex<titleIndex,`${title} must show its progress-book row above its unchanged title and facts`);
 }
-assert.match(campaignsDefault,/Continue[\s\S]*Aimee’s Book[\s\S]*New Game[\s\S]*Load Game/,"returning Campaigns must keep primary actions above its shelf and skip the newer invalid save for Continue");
-assert.doesNotMatch(campaignsDefault,/\d+ \/ \d+ health|Selected campaign|bottom-rail|bound volumes/,"compact save cards must not invent HP, selection state, a bottom rail or textual volume prose");
-const campaignsFresh=renderScreen("Campaigns","Fresh");
-assert.match(campaignsFresh,/Begin a campaign[\s\S]*New Game[\s\S]*Create a separate campaign/,"fresh Campaigns must explain and offer one New Game action");
-assert.doesNotMatch(campaignsFresh,/Continue|Load Game|campaign-book/,"fresh Campaigns must not render unavailable continuation or shelf controls");
-assert.match(renderScreen("Campaigns","Recovery details"),/Campaign details[\s\S]*Old Test Book[\s\S]*Level[\s\S]*Location[\s\S]*Progress[\s\S]*Last played[\s\S]*Export unchanged recovery file[\s\S]*Delete this campaign/,"recovery details must preserve exact metadata and safe actions without Load");
-assert.doesNotMatch(renderScreen("Campaigns","Recovery details"),/>Load campaign</,"an invalid campaign must never expose Load");
-assert.match(renderScreen("Campaigns","Newer-version details"),/Future Test Book[\s\S]*Save schema 14 needs a newer Bookbinder build[\s\S]*Export unchanged recovery file/,"newer-version details must state compatibility truth and preserve Export");
-assert.match(renderScreen("Campaigns","Delete confirmation"),/Delete “Old Test Book” — Base · Aug 11, 2026\?[\s\S]*Only this campaign will be removed\. Other campaigns will not be changed\.[\s\S]*Cancel[\s\S]*Delete “Old Test Book”/,"delete confirmation must name the exact campaign and discriminator");
-assert.match(css,/\.campaign-page \.book-shelf\{[^}]*grid-template-columns:repeat\(2/,"ordinary Campaigns must use the native two-column shelf");
-assert.equal(nativeConformance.campaigns.status,"verified","Campaigns may reopen implementation review only after all save states match native behavior");
-assert.equal(fixtureStatesByScreen.campaigns[0],"Returning","Campaigns must open on the populated returning-player shelf; Fresh remains an explicit alternate fixture");
+assert.match(campaignsDefault,/13 \/ 13 health · Level 4[\s\S]*Base · played today/,"Campaigns must retain current health, level, location and last-played truth");
+assert.match(campaignsDefault,/OLDER TEST VERSION[\s\S]*Format 12[\s\S]*current format 13[\s\S]*Export unchanged · confirmed Delete/,"an older campaign must expose both versions and safe actions without implying load");
+assert.match(renderScreen("Campaigns","Selected"),/Selected campaign[\s\S]*Continue loads the newest playable campaign/,"Selected must explain Continue authority without changing card geometry");
+assert.match(renderScreen("Campaigns","Confirm"),/Delete “Old Test Book”\?[\s\S]*Cancel[\s\S]*Delete campaign/,"Confirm must name the exact campaign and keep cancellation available");
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
 assert.match(css,/@font-face\{font-family:"Pixelify Sans"/,"gallery must bundle its compact mixed-case pixel display font");

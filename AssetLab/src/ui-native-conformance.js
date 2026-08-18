@@ -2,7 +2,7 @@ const failed=(source,issues)=>({status:"failed",source,issues,designVersion:"dra
 const pending=source=>({status:"pending",source,issues:["Native behavior audit has not been completed yet."],designVersion:"draft-0"});
 
 export const nativeConformance={
-  campaigns:{status:"verified",source:"CampaignStartView.swift:1-452 + CampaignStartPresentationTests.swift",issues:[],designVersion:"native-1"},
+  campaigns:failed("CampaignStartView.swift + CampaignStartPresentationTests.swift",["Native valid-save taps load immediately; the mock adds a persistent selection step and bottom rail.","The mock invents health metadata; native shelf facts are level, location, progression, last played, progress-book count and save validity."]),
   home:failed("BaseView.swift + StartingTownHomeScene.swift",["The current primary label claims a named world is bound, but native opens Writing Desk.","Make, Study and Realms states are not represented yet."]),
   "writing-desk":failed("WritingDeskView.swift",["The mock uses a fixed four-rune side rack and global Bind/Clear rail instead of the live palette, local Clear and The world-only Bind action."]),
   storehouse:failed("StationViews.swift",["Native modes are Items, Resources, Field Kit and Waiting; the mock invents Gear and Sort."]),
