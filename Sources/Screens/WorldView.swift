@@ -991,7 +991,10 @@ private struct MapGrid: View {
     var body: some View {
         GeometryReader { proxy in
             let side = proxy.size.width / CGFloat(viewportColumns)
-            let grade = WorldGrade.from(BookRules.readings(for: run.book, seed: run.mapSeed))
+            let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
+            let grade = WorldGrade.from(readings)
+            let atmosphereMotion = Int(readings["atmosphere"].aspect("motion")
+                .rounded(.toNearestOrAwayFromZero))
             VStack(spacing: 0) {
                 ForEach(origin.y..<(origin.y + viewportRows), id: \.self) { y in
                     HStack(spacing: 0) {
@@ -1007,7 +1010,8 @@ private struct MapGrid: View {
                             let displayTile = displayTile(at: point, visibility: visibility)
                             let presentation = WorldTileVisibilityPresentation.resolve(
                                 run: run, point: point, tile: displayTile, visibility: visibility,
-                                profile: visibilityProfile, grade: grade)
+                                profile: visibilityProfile, grade: grade,
+                                atmosphereMotion: atmosphereMotion)
                             TileView(tile: displayTile,
                                      visibility: visibility,
                                      isRememberedTerrain: isRememberedTerrain,
@@ -1100,7 +1104,8 @@ struct WorldTileVisibilityPresentation {
     static func resolve(run: WorldRun, point: GridPoint, tile: Tile,
                         visibility: WorldRules.TileVisibility,
                         profile: WorldRules.VisibilityProfile,
-                        grade: WorldGrade) -> Self {
+                        grade: WorldGrade,
+                        atmosphereMotion: Int = 0) -> Self {
         guard visibility != .hidden else {
             return Self(artRequest: nil, fogBoundaryEdges: [])
         }
@@ -1144,7 +1149,8 @@ struct WorldTileVisibilityPresentation {
             adjacency: adjacency,
             southExposureLevels: MapAssetContract.southExposure(center: tile, south: visibleSouth),
             grade: grade, flora: flora,
-            worldGrade2Descriptor: run.worldVisualReceipt?.descriptor)
+            worldGrade2Descriptor: run.worldVisualReceipt?.descriptor,
+            atmosphereMotion: atmosphereMotion)
         return Self(artRequest: request, fogBoundaryEdges: fogBoundaryEdges)
     }
 

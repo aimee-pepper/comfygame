@@ -7,6 +7,7 @@ import UIKit
 enum MapAssetContract {
     static let manifestSHA256 = "dda2412e6c9253087b7dadc80d4626df637a820631f2d0a5cc26aaacccc63c7a"
     static let seedVersion = "bookbinder-terrain-seed-v1"
+    static let animationVersion = "terrain-animation-v1"
     /// Placement variation was frozen with map-slice v1.1. The lifted compositor changes pixels,
     /// not the persisted world's neutral feature choice.
     static let seedTuple = "1|1|1|1|world-grade-1.0.0|map-slice-1.1.0|rect-compositor-0.2.0|top-down-map-16px-1.0.0"
@@ -76,27 +77,35 @@ struct MapTileArtRequest {
     let grade: WorldGrade
     let flora: Flora?
     let worldGrade2Descriptor: WorldGrade2V1.Descriptor?
+    /// Already-resolved atmospheric motion. Visual-only: it never advances world RNG or changes
+    /// movement, sight, encounters, or persistence.
+    let atmosphereMotion: Int
     let explicitSeed: UInt32?
     let explicitFeatureVariant: Int?
 
     init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0, adjacency: Int,
          southExposureLevels: Int = 0, grade: WorldGrade,
          flora: Flora?, worldGrade2Descriptor: WorldGrade2V1.Descriptor? = nil,
+         atmosphereMotion: Int = 0,
          explicitSeed: UInt32? = nil) {
         self.tile = tile; self.point = point; self.mapSeed = mapSeed; self.runIndex = runIndex; self.adjacency = adjacency
         self.southExposureLevels = southExposureLevels
         self.grade = grade; self.flora = flora
-        self.worldGrade2Descriptor = worldGrade2Descriptor; self.explicitSeed = explicitSeed
+        self.worldGrade2Descriptor = worldGrade2Descriptor
+        self.atmosphereMotion = min(100, max(0, atmosphereMotion))
+        self.explicitSeed = explicitSeed
         self.explicitFeatureVariant = nil
     }
 
     init(tile: Tile, point: GridPoint, mapSeed: UInt64, runIndex: Int = 0, adjacency: Int,
          southExposureLevels: Int = 0, grade: WorldGrade,
          flora: Flora?, worldGrade2Descriptor: WorldGrade2V1.Descriptor? = nil,
+         atmosphereMotion: Int = 0,
          explicitSeed: UInt32, explicitFeatureVariant: Int) {
         self.tile=tile; self.point=point; self.mapSeed=mapSeed; self.runIndex=runIndex; self.adjacency=adjacency
         self.southExposureLevels=southExposureLevels
         self.grade=grade; self.flora=flora; self.worldGrade2Descriptor=worldGrade2Descriptor
+        self.atmosphereMotion=min(100, max(0, atmosphereMotion))
         self.explicitSeed=explicitSeed
         self.explicitFeatureVariant=explicitFeatureVariant
     }
@@ -216,6 +225,31 @@ struct MapTileArtRequest {
     static func resourceSheenFrame(phase: UInt32, tick: Int) -> Int? {
         ResourcePixelGrammar.frame(phase: phase, tick: tick)
     }
+
+    static func animatedTerrainPixels(ground: GroundType, tick: Int, mapSeed: UInt64 = 71,
+                                      point: GridPoint = .init(x: 3, y: 4),
+                                      atmosphereMotion: Int = 0) -> [UInt8] {
+        let tile = Tile(ground: ground, isRevealed: true)
+        let request = MapTileArtRequest(
+            tile: tile, point: point, mapSeed: mapSeed, adjacency: 15,
+            grade: .neutral, flora: nil, atmosphereMotion: atmosphereMotion,
+            explicitSeed: MapAssetContract.terrainSeed(mapSeed: mapSeed, point: point),
+            explicitFeatureVariant: 0)
+        let frame = TerrainAnimationGrammar.frame(for: request, tick: tick)
+        return MapPixelRaster.rawPixels(commands: TerrainPixelGrammar.commands(
+            for: request, animationFrame: frame),
+            width: MapAssetContract.spriteWidth, height: MapAssetContract.spriteHeight)
+    }
+
+    static func terrainAnimationFrame(ground: GroundType, tick: Int, mapSeed: UInt64 = 71,
+                                      point: GridPoint = .init(x: 3, y: 4),
+                                      atmosphereMotion: Int = 0) -> Int? {
+        let request = MapTileArtRequest(
+            tile: Tile(ground: ground, isRevealed: true), point: point, mapSeed: mapSeed,
+            adjacency: 15, grade: .neutral, flora: nil,
+            atmosphereMotion: atmosphereMotion)
+        return TerrainAnimationGrammar.frame(for: request, tick: tick)
+    }
 }
 
 /// The collected-object profile from the exact-ID Resource v1 pack.
@@ -263,7 +297,7 @@ struct MapTileArt: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        if request.resourceID == nil {
+        if request.resourceID == nil && !TerrainAnimationGrammar.isAnimated(request) {
             image(tick: 0)
         } else {
             TimelineView(.periodic(from: .now, by: 0.36)) { context in
@@ -298,7 +332,8 @@ struct PixelCommand: Equatable {
 }
 
 private enum TerrainPixelGrammar {
-    static func commands(for request: MapTileArtRequest) -> [PixelCommand] {
+    static func commands(for request: MapTileArtRequest,
+                         animationFrame: Int? = nil) -> [PixelCommand] {
         let tile = request.tile
         let grade = request.worldGrade2Descriptor == nil ? request.grade : .neutral
         let palette = palette(for: tile.ground).map { $0.graded(grade) }
@@ -318,6 +353,8 @@ private enum TerrainPixelGrammar {
         }
         texture(tile.ground, palette, into: &result)
         feature(tile.ground, request.featureVariant, palette, into: &result)
+        TerrainAnimationGrammar.overlay(
+            ground: tile.ground, frame: animationFrame, palette: palette, into: &result)
         // Every terrain family is an autotiled area. Cardinal neighbours of the exact same ground
         // suppress this tile's corresponding perimeter; exposed sides and their overlapping corner
         // squares form the familiar 3×3 centre/edge/corner grammar already used by water.
@@ -410,6 +447,64 @@ private enum TerrainPixelGrammar {
         for (x,y,w,h) in patterns[variant-1] { c.append(rect(x, y, w, h, variant == 2 ? p[2] : p[0])) }
     }
 
+}
+
+/// Small, discrete animation vocabulary for terrain. Every phase is derived from immutable map
+/// identity, so visible tiles do not pulse in lockstep and rendering never consumes gameplay RNG.
+private enum TerrainAnimationGrammar {
+    static func isAnimated(_ request: MapTileArtRequest) -> Bool {
+        switch request.tile.ground {
+        case .water, .deepWater, .ice: true
+        case .groundcover: request.atmosphereMotion > 50
+        default: false
+        }
+    }
+
+    static func frame(for request: MapTileArtRequest, tick: Int) -> Int? {
+        let offset = Int(phase(mapSeed: request.mapSeed, point: request.point) % 32)
+        switch request.tile.ground {
+        case .water, .deepWater:
+            return (tick + offset) % 4
+        case .ice:
+            let step = (tick + offset) % 32
+            return step < 3 ? step : nil
+        case .groundcover where request.atmosphereMotion > 50:
+            let quiet = max(6, 18 - request.atmosphereMotion / 8)
+            let step = (tick + offset) % quiet
+            return step < 3 ? step : nil
+        default:
+            return nil
+        }
+    }
+
+    static func overlay(ground: GroundType, frame: Int?, palette: [RGB],
+                        into commands: inout [PixelCommand]) {
+        guard let frame else { return }
+        switch ground {
+        case .water, .deepWater:
+            let x = (frame * 4 + 1) % 13
+            commands += [rect(x, 4, 4, 1, palette[2]),
+                         rect((x + 7) % 13, 11, 3, 1, palette[0])]
+        case .ice:
+            let centre = frame == 0 ? (11, 4) : frame == 1 ? (10, 4) : (11, 3)
+            commands += [rect(centre.0, centre.1, 1, 1, palette[2]),
+                         rect(centre.0 - 1, centre.1 + 1, 3, 1, palette[2])]
+        case .groundcover:
+            let lean = frame - 1
+            for x in stride(from: 2, to: 15, by: 4) {
+                commands += line(x, 14, x + lean, 10 - (x % 3), palette[2])
+            }
+        default:
+            break
+        }
+    }
+
+    private static func phase(mapSeed: UInt64, point: GridPoint) -> UInt32 {
+        let payload = "\(MapAssetContract.animationVersion)|\(mapSeed)|\(point.x)|\(point.y)"
+        return payload.utf8.reduce(UInt32(0x811c9dc5)) {
+            ($0 ^ UInt32($1)) &* 0x01000193
+        }
+    }
 }
 
 /// Exact native port of AssetLab Resource v0.6's static identity bodies and sheen v1.1.
@@ -706,12 +801,14 @@ struct RGBA: Equatable {
             ResourcePixelGrammar.phase(mapSeed: request.mapSeed, runIndex: request.runIndex, point: request.point)
         }
         let sheenFrame = reduceMotion ? phase.map { _ in 0 } : phase.flatMap { ResourcePixelGrammar.frame(phase: $0, tick: tick) }
+        let terrainFrame = reduceMotion ? nil : TerrainAnimationGrammar.frame(for: request, tick: tick)
         let resourceKey = request.resourceID.map {
             "\(ResourceSpriteV1Registry.packID)-\($0.rawValue)-\(sheenFrame.map(String.init) ?? "rest")"
         } ?? "none"
-        let key = "\(MapAssetContract.rendererTuple)-\(grade2Key)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.southExposureLevels)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(gradeKey)-\(floraKey)-\(resourceKey)" as NSString
+        let terrainFrameKey = terrainFrame.map(String.init) ?? "rest"
+        let key = "\(MapAssetContract.rendererTuple)-\(MapAssetContract.animationVersion)-\(grade2Key)-\(request.seed)-\(request.tile.ground.rawValue)-\(request.adjacency)-\(request.southExposureLevels)-\(request.tile.isRevealed)-\(request.tile.isCrumbled)-\(request.tile.isCracking)-\(request.tile.elevation)-\(gradeKey)-\(floraKey)-\(resourceKey)-terrain-\(terrainFrameKey)" as NSString
         if let cached = cache.object(forKey: key) { return cached }
-        guard var commands = try? terrainCommands(for: request) else { return nil }
+        guard var commands = try? terrainCommands(for: request, animationFrame: terrainFrame) else { return nil }
         if request.tile.isRevealed, !request.tile.isCrumbled, let descriptor {
             guard let floraCommands = try? floraCommands(
                 descriptor, descriptor: request.worldGrade2Descriptor) else { return nil }
@@ -738,8 +835,9 @@ struct RGBA: Equatable {
         return image
     }
 
-    fileprivate static func terrainCommands(for request: MapTileArtRequest) throws -> [PixelCommand] {
-        let commands = TerrainPixelGrammar.commands(for: request)
+    fileprivate static func terrainCommands(for request: MapTileArtRequest,
+                                             animationFrame: Int? = nil) throws -> [PixelCommand] {
+        let commands = TerrainPixelGrammar.commands(for: request, animationFrame: animationFrame)
         guard request.tile.isRevealed, let descriptor = request.worldGrade2Descriptor else {
             return commands
         }
