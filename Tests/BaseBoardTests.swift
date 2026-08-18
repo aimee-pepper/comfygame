@@ -167,6 +167,25 @@ final class BaseBoardTests: XCTestCase {
                        "Station pagination must not compete with district swipe paging")
     }
 
+    func testApprovedHomeChromeKeepsDirectDistrictButtonsAndCompactDeparturePair() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains("HomeDistrictButtonStyle(isSelected: selectedSection == section)"))
+        XCTAssertTrue(source.contains("HomeBottomActionStyle(role: .secondary)"))
+        XCTAssertTrue(source.contains("HomeBottomActionStyle(role: .primary)"))
+        XCTAssertTrue(source.contains("NavigationLink(value: AppRoute.party)"))
+        XCTAssertTrue(source.contains("NavigationLink(value: AppRoute.writingDesk)"))
+        XCTAssertTrue(source.contains("Label(\"Party\", systemImage: \"person.2.fill\")"))
+        XCTAssertTrue(source.contains("Label(\"Bind & Depart\", systemImage: \"arrow.up.forward.circle.fill\")"))
+        XCTAssertTrue(source.contains("CompactCurrency(icon: \"drop.fill\", label: \"Essence\""))
+        XCTAssertTrue(source.contains("CompactCurrency(icon: \"star.fill\", label: \"Motes\""))
+        XCTAssertTrue(source.contains("Image(systemName: \"gearshape.fill\")"))
+        XCTAssertFalse(source.contains(".pickerStyle(.segmented)"))
+    }
+
     func testTownBuildingArtIsExactIDOnlyAndUnknownStationsUseSemanticFallback() {
         XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "workshop"), "building-workshop-v1")
         XCTAssertEqual(BaseBoardRules.townBuildingAsset(for: "storehouse"), "building-storehouse-v1")

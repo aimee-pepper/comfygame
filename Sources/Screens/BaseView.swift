@@ -88,25 +88,31 @@ struct BaseView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
-                VStack(spacing: 12) {
-                    contextRow
-                    firstReturnRouteCard
+                contextRow
+                firstReturnRouteCard
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, state.tutorial.firstReturnContext == nil ? 0 : 8)
+                ZStack(alignment: .top) {
+                    districtPager(containerSize: geometry.size)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     sectionPicker
+                        .padding(.horizontal, 6)
+                        .padding(.top, 6)
                 }
-                .padding(.horizontal, 12)
-                .padding(.top, 12)
-                districtPager(containerSize: geometry.size)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .background(Color(.systemGroupedBackground))
+        .background(HomePixelPalette.field)
         .navigationTitle("Base")
         .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .bottom) {
             departure
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(.bar)
+                .padding(.horizontal, 12)
+                .padding(.top, 8)
+                .padding(.bottom, 10)
+                .background(HomePixelPalette.paper)
+                .overlay(alignment: .top) {
+                    Rectangle().fill(HomePixelPalette.edge).frame(height: 3)
+                }
         }
         .onAppear { routeCardHidden = false }
         .onChange(of: availableSections) { _, sections in
@@ -122,8 +128,19 @@ struct BaseView: View {
 
     private var contextRow: some View {
         HStack(spacing: 12) {
+            Rectangle()
+                .fill(HomePixelPalette.gold)
+                .frame(width: 5, height: 36)
+                .overlay {
+                    VStack(spacing: 3) {
+                        ForEach(0..<5, id: \.self) { _ in
+                            Rectangle().fill(HomePixelPalette.edge).frame(height: 2)
+                        }
+                    }
+                }
             Text("Base")
-                .font(.title2.weight(.bold))
+                .font(.system(size: 25, weight: .heavy, design: .rounded))
+                .foregroundStyle(HomePixelPalette.ink)
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 4)
             CompactCurrency(icon: "drop.fill", label: "Essence",
@@ -131,15 +148,21 @@ struct BaseView: View {
             CompactCurrency(icon: "star.fill", label: "Motes",
                             value: state.reality.motes, tint: .purple)
             NavigationLink(value: AppRoute.settings) {
-                Image(systemName: "ellipsis.circle")
+                Image(systemName: "gearshape.fill")
                     .font(.title3)
+                    .foregroundStyle(HomePixelPalette.ink)
                     .frame(width: 44, height: 44)
             }
             .buttonStyle(.plain)
             .contentShape(Rectangle())
             .accessibilityLabel("Settings and save games")
         }
-        .frame(minHeight: 44)
+        .padding(.horizontal, 12)
+        .frame(minHeight: 62)
+        .background(HomePixelPalette.paper)
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(HomePixelPalette.edge).frame(height: 3)
+        }
     }
 
     @ViewBuilder private var firstReturnRouteCard: some View {
@@ -189,12 +212,21 @@ struct BaseView: View {
     // MARK: Stations
 
     private var sectionPicker: some View {
-        Picker("Base district", selection: $selectedSection) {
+        HStack(spacing: 3) {
             ForEach(availableSections, id: \.self) { section in
-                Text(section.title).tag(section)
+                Button {
+                    selectedSection = section
+                } label: {
+                    Text(section.title)
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .frame(maxWidth: .infinity, minHeight: 42)
+                }
+                .buttonStyle(HomeDistrictButtonStyle(isSelected: selectedSection == section))
+                .accessibilityAddTraits(selectedSection == section ? .isSelected : [])
             }
         }
-        .pickerStyle(.segmented)
+        .padding(3)
+        .background(Color.black.opacity(0.55))
         .accessibilityIdentifier("base-section-picker")
     }
 
@@ -347,7 +379,7 @@ struct BaseView: View {
                        maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : nil)
                 .frame(minHeight: 48)
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(HomeBottomActionStyle(role: .secondary))
         .accessibilityHint("Manage party members, gear and gambits")
 
         NavigationLink(value: AppRoute.writingDesk) {
@@ -356,7 +388,7 @@ struct BaseView: View {
                 .frame(maxWidth: .infinity)
                 .frame(minHeight: 48)
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(HomeBottomActionStyle(role: .primary))
         .accessibilityHint(departureHint)
         .simultaneousGesture(TapGesture().onEnded {
             store.openedFirstReturnDestination(.writingDesk)
@@ -530,12 +562,9 @@ private struct TownHotspotSign: View {
             .lineLimit(1)
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
-            .background(Color.black.opacity(0.78), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .stroke(Color(red: 0.91, green: 0.84, blue: 0.68).opacity(0.92), lineWidth: 1)
-            }
-            .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
+            .background(Color(red: 0.08, green: 0.11, blue: 0.09).opacity(0.88))
+            .overlay { Rectangle().stroke(HomePixelPalette.paperHighlight, lineWidth: 1) }
+            .shadow(color: .black.opacity(0.7), radius: 0, x: 3, y: 3)
     }
 }
 
@@ -548,11 +577,15 @@ private struct CompactCurrency: View {
     var body: some View {
         Label {
             Text(value, format: .number)
-                .font(.subheadline.weight(.semibold).monospacedDigit())
+                .font(.caption.weight(.bold).monospacedDigit())
         } icon: {
             Image(systemName: icon).foregroundStyle(tint)
         }
         .labelStyle(.titleAndIcon)
+        .padding(.horizontal, 7)
+        .frame(minHeight: 32)
+        .background(HomePixelPalette.paperHighlight.opacity(0.75))
+        .overlay { Rectangle().stroke(HomePixelPalette.edge.opacity(0.6), lineWidth: 1) }
         .accessibilityLabel("\(value) \(label)")
     }
 }
@@ -744,6 +777,57 @@ private struct StationFoundationSheet: View {
             parts.append("\(amount) \(StationCataloguePresentation.resourceName(id).lowercased())")
         }
         return parts.isEmpty ? "free" : parts.joined(separator: " · ")
+    }
+}
+
+private enum HomePixelPalette {
+    static let paper = Color(red: 0.89, green: 0.79, blue: 0.61)
+    static let paperHighlight = Color(red: 0.97, green: 0.89, blue: 0.72)
+    static let field = Color(red: 0.08, green: 0.12, blue: 0.11)
+    static let ink = Color(red: 0.16, green: 0.12, blue: 0.09)
+    static let edge = Color(red: 0.25, green: 0.18, blue: 0.12)
+    static let gold = Color(red: 0.82, green: 0.61, blue: 0.28)
+    static let selected = Color(red: 0.55, green: 0.72, blue: 0.72)
+    static let primary = Color(red: 0.24, green: 0.55, blue: 0.72)
+}
+
+private struct HomeDistrictButtonStyle: ButtonStyle {
+    let isSelected: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(isSelected ? HomePixelPalette.ink : HomePixelPalette.ink)
+            .background(isSelected ? HomePixelPalette.selected : HomePixelPalette.paper)
+            .overlay {
+                Rectangle().stroke(HomePixelPalette.edge, lineWidth: 2)
+            }
+            .overlay(alignment: .top) {
+                Rectangle()
+                    .fill(isSelected ? Color.white.opacity(0.42) : HomePixelPalette.paperHighlight)
+                    .frame(height: 2)
+            }
+            .shadow(color: Color.black.opacity(0.75), radius: 0, x: 2, y: 2)
+            .opacity(configuration.isPressed ? 0.72 : 1)
+    }
+}
+
+private struct HomeBottomActionStyle: ButtonStyle {
+    enum Role { case primary, secondary }
+    let role: Role
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(role == .primary ? Color.white : HomePixelPalette.ink)
+            .padding(.horizontal, 10)
+            .background(role == .primary ? HomePixelPalette.primary : HomePixelPalette.paper)
+            .overlay { Rectangle().stroke(HomePixelPalette.edge, lineWidth: 2) }
+            .overlay(alignment: .top) {
+                Rectangle()
+                    .fill(role == .primary ? Color.white.opacity(0.28) : HomePixelPalette.paperHighlight)
+                    .frame(height: 3)
+            }
+            .shadow(color: HomePixelPalette.edge, radius: 0, x: 3, y: 3)
+            .opacity(configuration.isPressed ? 0.75 : 1)
     }
 }
 
