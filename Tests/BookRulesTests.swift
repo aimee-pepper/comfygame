@@ -639,4 +639,50 @@ final class BookRulesTests: XCTestCase {
         XCTAssertEqual(store.state.base.essence, essenceInWorld + store.essenceSpringYield)
         XCTAssertGreaterThan(store.essenceSpringYield, 0, "Tier 1 of the Spring is built into the base")
     }
+
+#if DEBUG
+    @MainActor
+    func testCompoundPhoneFixtureUsesExactProductionQuotesAndRetainsProofThroughLifecycle() throws {
+        let fixture = try GameStore.makeCompoundAssemblyPhoneFixture()
+        let store = fixture.store
+        XCTAssertEqual(store.state.base.essence, 20)
+        XCTAssertEqual(store.state.base.resources[Resources.pulp], 4)
+        XCTAssertTrue(store.state.base.ownedSources.contains("sun"))
+
+        guard case .ready(let quote) = store.previewCompoundFormalization(
+            fingerprint: fixture.receipt.eligibleFingerprint,
+            nickname: "  Sunward shorthand  ") else {
+            return XCTFail("eligible retained proof must quote")
+        }
+        XCTAssertEqual(quote.essenceCost, 20)
+        XCTAssertEqual(quote.pulpCost, 4)
+        XCTAssertEqual(store.formalizeCompound(quote), .formalized(quote.compoundID))
+        XCTAssertEqual(store.state.base.essence, 0)
+        XCTAssertEqual(store.state.base.resources[Resources.pulp], 0)
+
+        let original = try XCTUnwrap(store.state.base.personalCompounds.first)
+        let placed = try XCTUnwrap(PageRules.place(
+            original, hand: .plain, at: .init(column: 0, row: 0), on: Page()))
+        let frozen = try XCTUnwrap(placed.runes.first?.personalCompound)
+        let rename = try XCTUnwrap(store.previewCompoundRename(original.id, nickname: "Solar note"))
+        XCTAssertEqual(store.renameCompound(rename), .renamed(original.id))
+        XCTAssertEqual(frozen.nickname, "Sunward shorthand")
+        let deletion = try XCTUnwrap(store.previewCompoundDeletion(original.id))
+        XCTAssertEqual(store.deleteCompound(deletion), .deleted(original.id))
+        XCTAssertTrue(store.state.base.personalCompounds.isEmpty)
+        XCTAssertTrue(store.state.base.provenStatementReceipts.contains {
+            $0.fingerprint == fixture.receipt.eligibleFingerprint
+        })
+    }
+
+    @MainActor
+    func testCompoundPhoneFixtureUnknownProofRefusesWithoutMutation() throws {
+        let fixture = try GameStore.makeCompoundAssemblyPhoneFixture()
+        let before = fixture.store.state
+        XCTAssertEqual(fixture.store.previewCompoundFormalization(
+            fingerprint: fixture.receipt.ineligibleFingerprint, nickname: "Must refuse"),
+            .refused(.ineligible(.unknownAtom)))
+        XCTAssertEqual(fixture.store.state, before)
+    }
+#endif
 }

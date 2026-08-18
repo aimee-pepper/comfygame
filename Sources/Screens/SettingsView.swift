@@ -82,6 +82,18 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.debug-tools")
 
+                NavigationLink {
+                    CompoundAssemblyPhoneAcceptanceView()
+                } label: {
+                    SettingsDestinationRow(
+                        icon: "square.stack.3d.up.fill",
+                        title: "Compound Assembly acceptance",
+                        subtitle: "Disposable exact-cost proof and refusal fixture"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.compound-assembly-acceptance")
+
                 StationCard(title: "Installed source", icon: "point.3.connected.trianglepath.dotted") {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(InstalledSourceRevisionPresentation.displayValue)
@@ -118,6 +130,51 @@ struct SettingsView: View {
 }
 
 #if DEBUG
+private struct CompoundAssemblyPhoneAcceptanceView: View {
+    @State private var session: CompoundAssemblyPhoneFixtureSession?
+    @State private var errorMessage: String?
+
+    var body: some View {
+        Form {
+            Section("Fixture") {
+                Text("A disposable campaign with retained Sun + Illumination proof, exact 20 Essence and 4 Pulp, and one deliberately unknown-source proof that must refuse.")
+                Button("Launch Compound Assembly fixture") {
+                    do { session = try CompoundAssemblyPhoneFixtureSession() }
+                    catch { errorMessage = error.localizedDescription }
+                }
+                .accessibilityIdentifier("compound-assembly-acceptance.launch")
+            }
+            Section("Acceptance") {
+                Text("Formalize Sunward shorthand, place it at the Writing Desk, rename it, then delete it. Its placed mark must remain frozen. The second proof must refuse and no resources may move.")
+                    .font(.callout)
+            }
+        }
+        .navigationTitle("Compound Assembly")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("Fixture unavailable", isPresented: Binding(
+            get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } }
+        )) { Button("OK", role: .cancel) { errorMessage = nil } } message: {
+            Text(errorMessage ?? "Unknown fixture error")
+        }
+        .fullScreenCover(item: $session) { fixture in
+            NavigationStack {
+                ScriptoriumView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button("Close") { session = nil }
+                                .accessibilityIdentifier("compound-assembly-acceptance.close")
+                        }
+                        ToolbarItem(placement: .topBarTrailing) {
+                            NavigationLink("Writing Desk") { WritingDeskView() }
+                                .accessibilityIdentifier("compound-assembly-acceptance.writing-desk")
+                        }
+                    }
+            }
+            .environmentObject(fixture.store)
+        }
+    }
+}
+
 enum InstalledSourceRevisionPresentation {
     static func revision(resourceURL: URL? = Bundle.main.url(
         forResource: "InstalledSourceRevision", withExtension: "txt")) -> String? {

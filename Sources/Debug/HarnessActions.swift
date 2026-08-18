@@ -1,6 +1,38 @@
 import Foundation
 
 #if DEBUG
+enum CompoundAssemblyPhoneFixtureError: Error, LocalizedError {
+    case missingAuthoredVocabulary
+    case invalidFixture
+
+    var errorDescription: String? {
+        switch self {
+        case .missingAuthoredVocabulary:
+            "The authored Sun / Illumination vocabulary is unavailable."
+        case .invalidFixture:
+            "The Compound Assembly fixture did not produce its required ready and refusal states."
+        }
+    }
+}
+
+struct CompoundAssemblyPhoneFixtureReceipt: Equatable, Sendable {
+    var eligibleFingerprint: String
+    var ineligibleFingerprint: String
+}
+
+@MainActor
+final class CompoundAssemblyPhoneFixtureSession: ObservableObject, Identifiable {
+    let id = UUID()
+    let store: GameStore
+    let receipt: CompoundAssemblyPhoneFixtureReceipt
+
+    init() throws {
+        let fixture = try GameStore.makeCompoundAssemblyPhoneFixture()
+        store = fixture.store
+        receipt = fixture.receipt
+    }
+}
+
 enum EncounterScalingPhoneFixtureKind: String, Identifiable, CaseIterable, Sendable {
     case normal
     case teeming
@@ -142,6 +174,62 @@ final class EncounterScalingProgressionFixtureSession: ObservableObject, Identif
 }
 
 extension GameStore {
+    /// A disposable campaign for phone acceptance. Direct mutation constructs only the deliberate
+    /// starting fixture; formalize, rename and delete remain production quoted transactions.
+    static func makeCompoundAssemblyPhoneFixture() throws -> (
+        store: GameStore, receipt: CompoundAssemblyPhoneFixtureReceipt
+    ) {
+        let target: PressureTargetID = "illumination"
+        let source: PressureSourceID = "sun"
+        guard ContentCatalog.shared.pressureTarget(target) != nil,
+              ContentCatalog.shared.pressureSource(source) != nil else {
+            throw CompoundAssemblyPhoneFixtureError.missingAuthoredVocabulary
+        }
+        let eligibleAtom = CompoundSemanticAtom(Sigil(
+            id: .init(rawValue: 0xCA00_0001), source: source, target: target))
+        let eligible = ProvenStatementReceipt(
+            fingerprint: PageRules.statementFingerprint(target: target, atoms: [eligibleAtom]),
+            target: target, atoms: [eligibleAtom],
+            vocabulary: [.target(target), .source(source)],
+            vocabularySchemaVersion: ProvenStatementReceipt.currentVocabularySchemaVersion,
+            firstBoundRunIndex: 1)
+
+        let unknownSource: PressureSourceID = "compound_phone_unknown_source"
+        let ineligibleAtom = CompoundSemanticAtom(Sigil(
+            id: .init(rawValue: 0xCA00_0002), source: unknownSource, target: target))
+        let ineligible = ProvenStatementReceipt(
+            fingerprint: PageRules.statementFingerprint(target: target, atoms: [ineligibleAtom]),
+            target: target, atoms: [ineligibleAtom],
+            vocabulary: [.target(target), .source(unknownSource)],
+            vocabularySchemaVersion: ProvenStatementReceipt.currentVocabularySchemaVersion,
+            firstBoundRunIndex: 1)
+
+        let store = GameStore(io: .temporary(
+            name: "phone-compound-assembly-\(UUID().uuidString)"))
+        store.mutate("stage compound assembly phone acceptance", flush: true) { state in
+            state.worlds.activeRun = nil
+            state.base.completedResearch.insert("pen_compounds")
+            state.base.ownedSources.insert(source)
+            state.base.provenStatementReceipts = [eligible, ineligible]
+            state.base.personalCompounds = []
+            state.base.nextPersonalCompoundID = 1
+            state.base.nextPersonalCompoundOrdinal = 1
+            state.base.essence = Tuning.Page.personalCompoundFormalizeEssence
+            state.base.resources = ResourcePool([
+                Resources.pulp: Tuning.Page.personalCompoundFormalizePulp
+            ])
+        }
+        guard case .ready = store.previewCompoundFormalization(
+            fingerprint: eligible.fingerprint, nickname: "Sunward shorthand"),
+              store.previewCompoundFormalization(
+                fingerprint: ineligible.fingerprint, nickname: "Must refuse")
+                == .refused(.ineligible(.unknownAtom)) else {
+            throw CompoundAssemblyPhoneFixtureError.invalidFixture
+        }
+        return (store, .init(eligibleFingerprint: eligible.fingerprint,
+                             ineligibleFingerprint: ineligible.fingerprint))
+    }
+
     /// A disposable phone-play fixture. It uses the same production world generation, scaling,
     /// combat actions and bug-report receipt as a campaign, but its temporary persistence URL can
     /// never read or overwrite a campaign slot.
