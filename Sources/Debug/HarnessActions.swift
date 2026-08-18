@@ -389,6 +389,92 @@ struct EncounterScalingAcceptanceRecord: Codable, Equatable, Sendable {
     var scenario: EncounterScalingProgressionFixtureKind
     var verdict: EncounterScalingAcceptanceVerdict
     var receiptIdentity: String
+    /// Nil only for verdicts saved by the earlier DEBUG recorder schema.
+    var measurement: EncounterScalingAcceptanceMeasurement? = nil
+}
+
+struct EncounterScalingAcceptanceMeasurement: Codable, Equatable, Sendable {
+    enum Status: String, Codable, Sendable {
+        case finished
+        case unfinished
+        case stale
+    }
+
+    var status: Status
+    var receiptIdentity: String
+    var outcome: EncounterOutcome?
+    var roundCount: Int?
+    var startingAggregateHP: Int?
+    var currentAggregateHP: Int?
+    var aggregateHPSpent: Int?
+    var aggregateHPSpentFraction: Double?
+    var retreatAvailable: Bool?
+    var disclosedRetreatStabilityCost: Double?
+
+    @MainActor
+    static func capture(
+        receipt: EncounterScalingProgressionReceipt,
+        from store: GameStore
+    ) -> Self {
+        let identity = receipt.acceptanceIdentity
+        guard let liveReceipt = GameStore.progressionReceipt(
+            kind: receipt.kind, rootSeed: receipt.rootSeed, from: store),
+              liveReceipt.acceptanceIdentity == identity,
+              let run = store.activeRun,
+              let encounter = run.activeEncounter
+        else {
+            return Self(status: .stale, receiptIdentity: identity, outcome: nil,
+                        roundCount: nil, startingAggregateHP: nil,
+                        currentAggregateHP: nil, aggregateHPSpent: nil,
+                        aggregateHPSpentFraction: nil, retreatAvailable: nil,
+                        disclosedRetreatStabilityCost: nil)
+        }
+
+        let startingHP = receipt.healthCaps.reduce(0, +)
+        let currentHP = (run.healthCaps ?? []).reduce(0) { total, cap in
+            total + CombatRules.health(of: cap.member.combatant, in: run).current
+        }
+        let spent = max(0, startingHP - currentHP)
+        let canRetreat = encounter.outcome == nil && encounter.current.isParty
+        let retreatCost = canRetreat
+            ? CombatRules.withdrawalStabilityCost(for: encounter.current, in: store.state)
+            : nil
+        return Self(
+            status: encounter.outcome == nil ? .unfinished : .finished,
+            receiptIdentity: identity,
+            outcome: encounter.outcome,
+            roundCount: encounter.roundNumber,
+            startingAggregateHP: startingHP,
+            currentAggregateHP: currentHP,
+            aggregateHPSpent: spent,
+            aggregateHPSpentFraction: startingHP > 0 ? Double(spent) / Double(startingHP) : 0,
+            retreatAvailable: canRetreat,
+            disclosedRetreatStabilityCost: retreatCost)
+    }
+
+    var summary: String {
+        switch status {
+        case .stale:
+            return "Measurement stale · receipt no longer matches the live fixture"
+        case .unfinished, .finished:
+            let outcomeText = outcome?.rawValue.capitalized ?? "Unfinished"
+            let rounds = roundCount.map(String.init) ?? "—"
+            let spent = aggregateHPSpent.map(String.init) ?? "—"
+            let starting = startingAggregateHP.map(String.init) ?? "—"
+            let percent = aggregateHPSpentFraction.map {
+                String(format: "%.1f%%", locale: Locale(identifier: "en_US_POSIX"), $0 * 100)
+            } ?? "—"
+            let retreat: String
+            if retreatAvailable == true, let cost = disclosedRetreatStabilityCost {
+                retreat = String(format: "retreat available · %.0f stability", cost)
+            } else if retreatAvailable == false {
+                retreat = "retreat unavailable"
+            } else {
+                retreat = "retreat unknown"
+            }
+            return "\(outcomeText) · round \(rounds) · HP \(spent)/\(starting) (\(percent)) · \(retreat)"
+        }
+    }
 }
 
 @MainActor
@@ -415,11 +501,14 @@ final class EncounterScalingAcceptanceRecorder: ObservableObject {
     var completionCount: Int { records.count }
 
     func record(_ verdict: EncounterScalingAcceptanceVerdict,
-                for receipt: EncounterScalingProgressionReceipt) {
+                for receipt: EncounterScalingProgressionReceipt,
+                observing store: GameStore) {
         records[receipt.kind] = EncounterScalingAcceptanceRecord(
             scenario: receipt.kind,
             verdict: verdict,
-            receiptIdentity: receipt.acceptanceIdentity)
+            receiptIdentity: receipt.acceptanceIdentity,
+            measurement: EncounterScalingAcceptanceMeasurement.capture(
+                receipt: receipt, from: store))
         persist()
     }
 

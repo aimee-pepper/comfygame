@@ -1365,6 +1365,9 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                                 Text("\(record.verdict.title) · receipt \(record.receiptIdentity)")
                                     .font(.caption2.monospaced())
                                     .foregroundStyle(record.verdict == .unfair ? .red : .secondary)
+                                Text(record.measurement?.summary ?? "Legacy verdict · no saved measurement")
+                                    .font(.caption2.monospacedDigit())
+                                    .foregroundStyle(record.measurement?.status == .stale ? .orange : .secondary)
                             } else {
                                 Text("Not recorded")
                                     .font(.caption2)
@@ -1432,7 +1435,8 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                     HStack(spacing: 6) {
                         ForEach(EncounterScalingAcceptanceVerdict.allCases, id: \.self) { verdict in
                             Button(verdict.title) {
-                                acceptance.record(verdict, for: fixture.receipt)
+                                acceptance.record(verdict, for: fixture.receipt,
+                                                  observing: fixture.store)
                             }
                             .buttonStyle(.bordered)
                             .tint(acceptance.records[fixture.kind]?.verdict == verdict ? .green : .white)

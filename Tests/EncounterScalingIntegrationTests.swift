@@ -11,13 +11,16 @@ final class EncounterScalingIntegrationTests: XCTestCase {
 
         let fixture = try EncounterScalingProgressionFixtureSession(kind: .experiencedParty)
         let recorder = EncounterScalingAcceptanceRecorder(preferences: preferences)
-        recorder.record(.overwhelmingButFair, for: fixture.receipt)
+        let measurement = EncounterScalingAcceptanceMeasurement.capture(
+            receipt: fixture.receipt, from: fixture.store)
+        recorder.record(.overwhelmingButFair, for: fixture.receipt, observing: fixture.store)
 
         XCTAssertEqual(recorder.completionCount, 1)
         XCTAssertEqual(recorder.records[.experiencedParty], EncounterScalingAcceptanceRecord(
             scenario: .experiencedParty,
             verdict: .overwhelmingButFair,
-            receiptIdentity: fixture.receipt.acceptanceIdentity))
+            receiptIdentity: fixture.receipt.acceptanceIdentity,
+            measurement: measurement))
         XCTAssertEqual(fixture.receipt.acceptanceIdentity.count, 64)
         XCTAssertEqual(EncounterScalingAcceptanceRecorder(preferences: preferences)
             .records[.experiencedParty]?.receiptIdentity, fixture.receipt.acceptanceIdentity)
@@ -29,6 +32,103 @@ final class EncounterScalingIntegrationTests: XCTestCase {
                        "campaign-value")
     }
 
+    func testAcceptanceRecorderCapturesFinishedCombatMeasurementsBoundToReceipt() throws {
+        let suite = "EncounterScalingAcceptanceMeasurements.\(UUID().uuidString)"
+        let preferences = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { preferences.removePersistentDomain(forName: suite) }
+        let fixture = try EncounterScalingProgressionFixtureSession(kind: .experiencedParty)
+        fixture.store.mutate("finish measured acceptance fixture") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter else {
+                return
+            }
+            run.binderHP = 20
+            run.companionHP = [0: 20, 1: 18, 2: 12]
+            encounter.roundNumber = 4
+            encounter.outcome = .victory
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+
+        let recorder = EncounterScalingAcceptanceRecorder(preferences: preferences)
+        recorder.record(.balanced, for: fixture.receipt, observing: fixture.store)
+        let measurement = try XCTUnwrap(recorder.records[.experiencedParty]?.measurement)
+        XCTAssertEqual(measurement.status, .finished)
+        XCTAssertEqual(measurement.receiptIdentity, fixture.receipt.acceptanceIdentity)
+        XCTAssertEqual(measurement.outcome, .victory)
+        XCTAssertEqual(measurement.roundCount, 4)
+        XCTAssertEqual(measurement.startingAggregateHP, 102)
+        XCTAssertEqual(measurement.currentAggregateHP, 70)
+        XCTAssertEqual(measurement.aggregateHPSpent, 32)
+        XCTAssertEqual(try XCTUnwrap(measurement.aggregateHPSpentFraction), 32.0 / 102.0,
+                       accuracy: 0.000_001)
+        XCTAssertEqual(measurement.retreatAvailable, false)
+        XCTAssertNil(measurement.disclosedRetreatStabilityCost)
+        XCTAssertTrue(measurement.summary.contains("Victory · round 4 · HP 32/102"))
+        XCTAssertEqual(EncounterScalingAcceptanceRecorder(preferences: preferences)
+            .records[.experiencedParty]?.measurement, measurement)
+    }
+
+    func testAcceptanceMeasurementCallsUnfinishedAndStaleStatesExactly() throws {
+        let fixture = try EncounterScalingProgressionFixtureSession(kind: .ordinaryTwoPerson)
+        fixture.store.mutate("place measurement on a disclosed retreat turn") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  let partyTurn = encounter.turnSlots.firstIndex(where: { $0.actor.isParty })
+            else { return }
+            encounter.turnIndex = partyTurn
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let unfinished = EncounterScalingAcceptanceMeasurement.capture(
+            receipt: fixture.receipt, from: fixture.store)
+        XCTAssertEqual(unfinished.status, .unfinished)
+        XCTAssertNil(unfinished.outcome)
+        XCTAssertNotNil(unfinished.roundCount)
+        XCTAssertEqual(unfinished.startingAggregateHP, 54)
+        XCTAssertEqual(unfinished.currentAggregateHP, 54)
+        XCTAssertEqual(unfinished.aggregateHPSpent, 0)
+        XCTAssertEqual(unfinished.retreatAvailable, true)
+        XCTAssertEqual(try XCTUnwrap(unfinished.disclosedRetreatStabilityCost),
+                       Tuning.Encounter.fleeStabilityCost)
+
+        fixture.store.mutate("invalidate frozen fixture receipt") { state in
+            guard var run = state.worlds.activeRun, var encounter = run.activeEncounter,
+                  var preview = encounter.scalingPreview else { return }
+            preview.scalingRulesVersion = "stale-test-version"
+            encounter.scalingPreview = preview
+            run.activeEncounter = encounter
+            state.worlds.activeRun = run
+        }
+        let stale = EncounterScalingAcceptanceMeasurement.capture(
+            receipt: fixture.receipt, from: fixture.store)
+        XCTAssertEqual(stale.status, .stale)
+        XCTAssertNil(stale.outcome)
+        XCTAssertNil(stale.roundCount)
+        XCTAssertNil(stale.aggregateHPSpent)
+        XCTAssertTrue(stale.summary.contains("Measurement stale"))
+    }
+
+    func testAcceptanceRecorderToleratesLegacyVerdictWithoutMeasurement() throws {
+        struct LegacyRecord: Codable {
+            var scenario: EncounterScalingProgressionFixtureKind
+            var verdict: EncounterScalingAcceptanceVerdict
+            var receiptIdentity: String
+        }
+        let suite = "EncounterScalingAcceptanceLegacy.\(UUID().uuidString)"
+        let preferences = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { preferences.removePersistentDomain(forName: suite) }
+        let fixture = try EncounterScalingProgressionFixtureSession(kind: .freshSolo)
+        let legacy: [EncounterScalingProgressionFixtureKind: LegacyRecord] = [
+            .freshSolo: LegacyRecord(scenario: .freshSolo, verdict: .balanced,
+                                     receiptIdentity: fixture.receipt.acceptanceIdentity)
+        ]
+        preferences.set(try JSONEncoder().encode(legacy),
+                        forKey: EncounterScalingAcceptanceRecorder.preferencesKey)
+
+        let decoded = EncounterScalingAcceptanceRecorder(preferences: preferences)
+        XCTAssertEqual(decoded.records[.freshSolo]?.verdict, .balanced)
+        XCTAssertNil(decoded.records[.freshSolo]?.measurement)
+    }
+
     func testPhoneMatrixShowsEveryVerdictStatusAndDestructiveAcceptanceOnlyClear() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
@@ -36,6 +136,8 @@ final class EncounterScalingIntegrationTests: XCTestCase {
                                 encoding: .utf8)
         XCTAssertTrue(source.contains("progression verdicts recorded"))
         XCTAssertTrue(source.contains("record.receiptIdentity"))
+        XCTAssertTrue(source.contains("record.measurement?.summary"))
+        XCTAssertTrue(source.contains("Legacy verdict · no saved measurement"))
         XCTAssertTrue(source.contains("ForEach(EncounterScalingAcceptanceVerdict.allCases"))
         XCTAssertTrue(source.contains("Clear recorded verdicts"))
         XCTAssertTrue(source.contains("Campaign saves are unchanged"))
