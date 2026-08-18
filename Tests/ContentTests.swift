@@ -26,8 +26,12 @@ final class ContentTests: XCTestCase {
 #endif
     func testReleaseContentDoesNotPromiseRetiredTokenOrQuirkSystems() throws {
         let catalogue = ContentCatalog.shared
-        XCTAssertEqual(catalogue.items.filter { $0.consumable != nil }.count, 17,
-                       "Decision189 retires Traveller's Token without shrinking the 17-item set")
+        XCTAssertEqual(catalogue.items.filter { $0.consumable != nil }.count, 18,
+                       "Scent Mask expands the intended release consumables; Traveller's Token stays retired")
+        let scentMask = try XCTUnwrap(catalogue.item(Items.scentMask))
+        XCTAssertEqual(scentMask.name, "Scent Mask")
+        XCTAssertEqual(scentMask.consumable?.effect, .maskScent,
+                       "Scent Mask is intended release content, not a retired placeholder")
 
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
