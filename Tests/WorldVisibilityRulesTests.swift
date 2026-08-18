@@ -61,7 +61,9 @@ final class WorldVisibilityRulesTests: XCTestCase {
 
         XCTAssertEqual(before.adjacency, after.adjacency)
         XCTAssertEqual(before.southExposureLevels, after.southExposureLevels)
-        XCTAssertEqual(before.adjacency, 0)
+        // East and south are hidden. Their exact terrain cannot affect visible art, but fog must
+        // suppress the renderer's exposed-edge strips rather than painting dark bars.
+        XCTAssertEqual(before.adjacency, 2 | 4)
         XCTAssertEqual(before.southExposureLevels, 0)
     }
 

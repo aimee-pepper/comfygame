@@ -1126,6 +1126,9 @@ struct WorldTileVisibilityPresentation {
                 current: currentNeighbourVisibility,
                 wasRevealed: run.map[neighbour.point].isRevealed)
             guard neighbourVisibility != .hidden else {
+                // Fog is not an exposed terrain edge. Suppress the renderer's 2 px perimeter
+                // without sampling the hidden tile's ground or elevation.
+                adjacency |= neighbour.bit
                 fogBoundaryEdges.insert(neighbour.edge)
                 continue
             }
