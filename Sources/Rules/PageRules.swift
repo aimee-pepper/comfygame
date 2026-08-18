@@ -238,6 +238,156 @@ enum PageRules {
     }
 }
 
+// MARK: - Personal compound authority
+
+extension PageRules {
+    enum CompoundEligibilityIssue: String, Codable, Equatable, Sendable {
+        case incomplete = "A compound needs one complete target-and-source statement."
+        case multipleTargets = "A compound can have exactly one target."
+        case tooFewAtoms = "A compound needs at least two atomic marks."
+        case tooManyAtoms = "A compound can contain at most five atomic marks."
+        case nestedCompound = "A personal compound cannot contain another compound."
+        case unknownAtom = "Every atomic mark must be known before this statement can be formalized."
+    }
+
+    struct CompoundStatementAssessment: Equatable, Sendable {
+        var markIDs: Set<InstanceID>
+        var receipt: ProvenStatementReceipt?
+        var issue: CompoundEligibilityIssue?
+        var isEligible: Bool { receipt != nil && issue == nil }
+    }
+
+    static func compoundStatementAssessments(on page: Page, knownBy base: BaseState,
+                                             boundRunIndex: Int) -> [CompoundStatementAssessment] {
+        clusters(on: page).map { group in
+            let ids = Set(group.map(\.id))
+            if group.contains(where: { $0.personalCompound != nil || $0.symbolID != nil }) {
+                return .init(markIDs: ids, receipt: nil, issue: .nestedCompound)
+            }
+            guard group.allSatisfy({ mark in
+                switch mark.content {
+                case .target, .source, .qualifier: true
+                case .compound, .rune: false
+                }
+            }) else {
+                return .init(markIDs: ids, receipt: nil, issue: .nestedCompound)
+            }
+            let targets = group.compactMap(\.targetID)
+            guard targets.count <= 1 else {
+                return .init(markIDs: ids, receipt: nil, issue: .multipleTargets)
+            }
+            guard let target = targets.first, group.contains(where: { $0.sourceID != nil }) else {
+                return .init(markIDs: ids, receipt: nil, issue: .incomplete)
+            }
+            let vocabulary = group.compactMap { mark -> LexemeIdentity? in
+                if let id = mark.targetID { return .target(id) }
+                if let id = mark.sourceID { return .source(id) }
+                if let id = mark.qualifierID { return .qualifier(id) }
+                return nil
+            }
+            guard vocabulary.count >= 2 else {
+                return .init(markIDs: ids, receipt: nil, issue: .tooFewAtoms)
+            }
+            guard vocabulary.count <= Tuning.Page.personalCompoundMaximumAtoms else {
+                return .init(markIDs: ids, receipt: nil, issue: .tooManyAtoms)
+            }
+            let writableQualifiers = Set(writableQualifiers().map(\.id))
+            let known = vocabulary.allSatisfy { identity in
+                switch identity {
+                case .target(let id): ContentCatalog.shared.pressureTarget(id) != nil
+                case .source(let id):
+                    base.ownedSources.contains(id) && ContentCatalog.shared.pressureSource(id) != nil
+                case .qualifier(let id):
+                    writableQualifiers.contains(id) && ContentCatalog.shared.qualifier(id) != nil
+                case .compound: false
+                }
+            }
+            guard known else {
+                return .init(markIDs: ids, receipt: nil, issue: .unknownAtom)
+            }
+            let groupSigils = clusterSigils(of: Page(width: page.width, height: page.height,
+                                                       runes: group,
+                                                       links: page.links.filter {
+                                                           ids.contains($0.a) && ids.contains($0.b)
+                                                       }))
+            guard !groupSigils.isEmpty, groupSigils.allSatisfy({ $0.target == target }) else {
+                return .init(markIDs: ids, receipt: nil, issue: .incomplete)
+            }
+            let atoms = normalizedAtoms(groupSigils)
+            let normalizedVocabulary = vocabulary.sorted(by: lexemeLessThan)
+            let receipt = ProvenStatementReceipt(
+                fingerprint: statementFingerprint(target: target, atoms: atoms),
+                target: target, atoms: atoms, vocabulary: normalizedVocabulary,
+                vocabularySchemaVersion: ProvenStatementReceipt.currentVocabularySchemaVersion,
+                firstBoundRunIndex: boundRunIndex)
+            return .init(markIDs: ids, receipt: receipt, issue: nil)
+        }
+    }
+
+    static func normalizedAtoms(_ sigils: [Sigil]) -> [CompoundSemanticAtom] {
+        sigils.map(CompoundSemanticAtom.init).sorted { atomKey($0) < atomKey($1) }
+    }
+
+    static func statementFingerprint(target: PressureTargetID,
+                                     atoms: [CompoundSemanticAtom]) -> String {
+        let body = normalizedAtoms(atoms.enumerated().map { $0.element.sigil(id: .init(rawValue: UInt64($0.offset))) })
+            .map(atomKey).joined(separator: "|")
+        return "statement-v1:\(target.rawValue):\(body)"
+    }
+
+    static func personalCompoundFootprint(_ record: PersonalCompoundRecord, hand: Hand) -> Int {
+        let footprints = record.vocabulary.compactMap { identity -> Int? in
+            switch identity {
+            case .target(let id): shape(for: .target(id), hand: hand)?.footprint
+            case .source(let id): shape(for: .source(id), hand: hand)?.footprint
+            case .qualifier(let id): shape(for: .qualifier(id), hand: hand)?.footprint
+            case .compound: nil
+            }
+        }
+        return compoundFootprint(ofParts: footprints)
+    }
+
+    static func shape(forPersonalCompound record: PersonalCompoundRecord,
+                      hand: Hand) -> RuneShapeDef? {
+        let wanted = personalCompoundFootprint(record, hand: hand)
+        return ContentCatalog.shared.runeShapes(in: hand).min {
+            (abs($0.footprint - wanted), $0.id) < (abs($1.footprint - wanted), $1.id)
+        }
+    }
+
+    static func place(_ record: PersonalCompoundRecord, hand: Hand, at origin: PageCell,
+                      on page: Page) -> Page? {
+        guard let shape = shape(forPersonalCompound: record, hand: hand),
+              let first = record.expansion.first,
+              canPlace(shape: shape, at: origin, on: page) else { return nil }
+        let markID = InstanceID(rawValue: nextMarkID(on: page))
+        let snapshot = PersonalCompoundMarkSnapshot(
+            id: record.id, nickname: record.nickname, expansion: record.expansion,
+            provenFingerprint: record.provenFingerprint, provenance: record.provenance)
+        var result = page
+        result.runes.append(PlacedRune(id: markID, content: .rune(first.sigil(id: markID)),
+                                       hand: hand, origin: origin, shapeID: shape.id,
+                                       personalCompound: snapshot))
+        return result
+    }
+
+    static func isEffectEquivalent(_ record: PersonalCompoundRecord,
+                                   to receipt: ProvenStatementReceipt) -> Bool {
+        record.target == receipt.target && record.expansion == receipt.atoms
+            && statementFingerprint(target: record.target, atoms: record.expansion) == receipt.fingerprint
+    }
+
+    private static func atomKey(_ atom: CompoundSemanticAtom) -> String {
+        let negated = atom.negatedTargets.map(\.rawValue).sorted().joined(separator: ",")
+        return [atom.source.rawValue, atom.target.rawValue, atom.intensity.rawValue,
+                String(atom.scale), String(atom.count), negated].joined(separator: ":")
+    }
+
+    private static func lexemeLessThan(_ lhs: LexemeIdentity, _ rhs: LexemeIdentity) -> Bool {
+        (lhs.categoryOrder, lhs.glyphID) < (rhs.categoryOrder, rhs.glyphID)
+    }
+}
+
 // MARK: - Clusters, connections and reading the page
 
 extension PageRules {

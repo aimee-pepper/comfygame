@@ -351,6 +351,99 @@ final class BookRulesTests: XCTestCase {
     }
 
     @MainActor
+    func testSuccessfulBindAloneMintsIdempotentPositionFreeStatementProof() throws {
+        let io = SaveFileIO.temporary(name: "compound-proof-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        let source = try XCTUnwrap(ContentCatalog.shared.pressureSources.first).id
+        let target = PlacedRune(id: .init(rawValue: 1), content: .target("illumination"),
+                                hand: .crude, origin: .init(column: 0, row: 0), shapeID: "refined_dot")
+        let focus = PlacedRune(id: .init(rawValue: 2), content: .source(source),
+                               hand: .crude, origin: .init(column: 1, row: 0), shapeID: "refined_dot")
+        store.mutate("install atomic statement") { state in
+            state.base.ownedSources.insert(source)
+            state.base.page = Page(runes: [target, focus], links: [MarkLink(target.id, focus.id)])
+        }
+        XCTAssertTrue(store.bindAndDepart())
+        let receipt = try XCTUnwrap(store.state.base.provenStatementReceipts.first)
+        XCTAssertEqual(store.activeRun?.book.provenStatementReceipts, [receipt])
+        XCTAssertEqual(receipt.firstBoundRunIndex, 1)
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state.base.provenStatementReceipts, [receipt])
+
+        let failed = GameStore(io: .temporary(name: "compound-proof-fail-\(UUID().uuidString)"))
+        failed.mutate("install unaffordable statement") { state in
+            state.base.ownedSources.insert(source)
+            state.base.page = Page(runes: [target, focus], links: [MarkLink(target.id, focus.id)])
+            state.base.essence = 0
+        }
+        XCTAssertFalse(failed.bindAndDepart())
+        XCTAssertTrue(failed.state.base.provenStatementReceipts.isEmpty)
+    }
+
+    @MainActor
+    func testFormalizeRenameDeleteAreQuotedAtomicAndNeverAliasHistory() throws {
+        let io = SaveFileIO.temporary(name: "compound-actions-\(UUID().uuidString)")
+        defer { io.deleteEverything() }
+        let store = GameStore(io: io)
+        let source = try XCTUnwrap(ContentCatalog.shared.pressureSources.first).id
+        let atom = CompoundSemanticAtom(Sigil(id: .init(rawValue: 1), source: source,
+                                               target: "illumination"))
+        let receipt = ProvenStatementReceipt(
+            fingerprint: PageRules.statementFingerprint(target: "illumination", atoms: [atom]),
+            target: "illumination", atoms: [atom],
+            vocabulary: [.target("illumination"), .source(source)], vocabularySchemaVersion: 1,
+            firstBoundRunIndex: 1)
+        store.mutate("unlock and provision formalization") { state in
+            state.base.completedResearch.insert("pen_compounds")
+            state.base.ownedSources.insert(source)
+            state.base.provenStatementReceipts = [receipt]
+            state.base.essence = 100
+            state.base.resources.add(20, of: Resources.pulp)
+        }
+        let beforeEssence = store.state.base.essence
+        let beforePulp = store.state.base.resources[Resources.pulp]
+        guard case .ready(let quote) = store.previewCompoundFormalization(
+            fingerprint: receipt.fingerprint, nickname: "  Bright shorthand  ") else {
+            return XCTFail("expected ready formalization")
+        }
+        XCTAssertEqual(store.formalizeCompound(quote), .formalized(.init(rawValue: 1)))
+        XCTAssertEqual(store.state.base.essence,
+                       beforeEssence - Tuning.Page.personalCompoundFormalizeEssence)
+        XCTAssertEqual(store.state.base.resources[Resources.pulp],
+                       beforePulp - Tuning.Page.personalCompoundFormalizePulp)
+        let original = try XCTUnwrap(store.state.base.personalCompounds.first)
+        XCTAssertEqual(original.nickname, "Bright shorthand")
+        XCTAssertTrue(PageRules.isEffectEquivalent(original, to: receipt))
+        XCTAssertEqual(store.formalizeCompound(quote), .stale)
+        XCTAssertEqual(store.state.base.personalCompounds.count, 1)
+
+        let placed = try XCTUnwrap(PageRules.place(original, hand: .refined,
+                                                   at: .init(column: 0, row: 0), on: Page()))
+        let historical = try XCTUnwrap(placed.runes.first?.personalCompound)
+        let rename = try XCTUnwrap(store.previewCompoundRename(original.id, nickname: "Sunward"))
+        XCTAssertEqual(store.renameCompound(rename), .renamed(original.id))
+        XCTAssertEqual(historical.nickname, "Bright shorthand")
+        let deletion = try XCTUnwrap(store.previewCompoundDeletion(original.id))
+        XCTAssertEqual(store.deleteCompound(deletion), .deleted(original.id))
+        XCTAssertTrue(store.state.base.personalCompounds.isEmpty)
+        XCTAssertEqual(store.state.base.provenStatementReceipts, [receipt])
+
+        guard case .ready(let secondQuote) = store.previewCompoundFormalization(
+            fingerprint: receipt.fingerprint, nickname: "Made again") else {
+            return XCTFail("expected retained proof to permit re-formalization")
+        }
+        XCTAssertNotEqual(secondQuote.compoundID, original.id)
+        XCTAssertEqual(store.formalizeCompound(secondQuote), .formalized(secondQuote.compoundID))
+        store.flushNow()
+        let relaunched = GameStore(io: io)
+        XCTAssertEqual(relaunched.state.base.personalCompounds.map(\.id), [secondQuote.compoundID])
+        XCTAssertGreaterThan(relaunched.state.base.nextPersonalCompoundID,
+                             secondQuote.compoundID.rawValue)
+    }
+
+    @MainActor
     func testVisualReceiptFailureLeavesTheEntireCampaignUnchanged() throws {
         let store = GameStore(io: .temporary(name: "visual-bind-fail-\(UUID().uuidString)"))
         store.write("caverns")

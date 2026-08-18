@@ -70,6 +70,176 @@ enum InkActionResult: Equatable {
     case staleMixture
 }
 
+struct CompoundFormalizationQuote: Equatable, Sendable {
+    var receipt: ProvenStatementReceipt
+    var nickname: String
+    var compoundID: PersonalCompoundID
+    var creationOrdinal: UInt64
+    var essenceCost: Int
+    var pulpCost: Int
+}
+
+struct CompoundRenameQuote: Equatable, Sendable {
+    var before: PersonalCompoundRecord
+    var nickname: String
+}
+
+struct CompoundDeleteQuote: Equatable, Sendable { var record: PersonalCompoundRecord }
+
+enum CompoundAssemblyResult: Equatable, Sendable {
+    case formalized(PersonalCompoundID)
+    case renamed(PersonalCompoundID)
+    case deleted(PersonalCompoundID)
+    case noChange
+    case locked
+    case awayFromBase
+    case missingReceipt
+    case ineligible(PageRules.CompoundEligibilityIssue)
+    case alreadyFormalized(PersonalCompoundID)
+    case insufficientResources
+    case stale
+}
+
+enum CompoundFormalizationPreview: Equatable, Sendable {
+    case ready(CompoundFormalizationQuote)
+    case refused(CompoundAssemblyResult)
+}
+
+extension GameStore {
+    nonisolated static func normalizedCompoundNickname(_ proposed: String) -> String {
+        let trimmed = proposed.trimmingCharacters(in: .whitespacesAndNewlines)
+        let chosen = trimmed.isEmpty ? "Untitled compound" : trimmed
+        return String(chosen.prefix(40))
+    }
+
+    func previewCompoundFormalization(fingerprint: String,
+                                      nickname: String) -> CompoundFormalizationPreview {
+        guard state.base.completedResearch.contains("pen_compounds") else {
+            return .refused(.locked)
+        }
+        guard state.worlds.activeRun == nil else { return .refused(.awayFromBase) }
+        guard let receipt = state.base.provenStatementReceipts.first(where: {
+            $0.fingerprint == fingerprint
+        }) else { return .refused(.missingReceipt) }
+        guard let issue = Self.compoundReceiptIssue(receipt, in: state.base) else {
+            if let existing = state.base.personalCompounds.first(where: {
+                $0.provenFingerprint == fingerprint
+            }) { return .refused(.alreadyFormalized(existing.id)) }
+            guard state.base.essence >= Tuning.Page.personalCompoundFormalizeEssence,
+                  state.base.resources[Resources.pulp] >= Tuning.Page.personalCompoundFormalizePulp
+            else { return .refused(.insufficientResources) }
+            return .ready(.init(
+                receipt: receipt, nickname: Self.normalizedCompoundNickname(nickname),
+                compoundID: PersonalCompoundID(rawValue: state.base.nextPersonalCompoundID),
+                creationOrdinal: state.base.nextPersonalCompoundOrdinal,
+                essenceCost: Tuning.Page.personalCompoundFormalizeEssence,
+                pulpCost: Tuning.Page.personalCompoundFormalizePulp))
+        }
+        return .refused(.ineligible(issue))
+    }
+
+    @discardableResult
+    func formalizeCompound(_ quote: CompoundFormalizationQuote) -> CompoundAssemblyResult {
+        var result: CompoundAssemblyResult = .stale
+        let changed = mutateIf("formalize personal compound", flush: true) { state in
+            guard state.base.completedResearch.contains("pen_compounds"),
+                  state.worlds.activeRun == nil,
+                  state.base.nextPersonalCompoundID == quote.compoundID.rawValue,
+                  state.base.nextPersonalCompoundOrdinal == quote.creationOrdinal,
+                  let receipt = state.base.provenStatementReceipts.first(where: {
+                      $0.fingerprint == quote.receipt.fingerprint
+                  }), receipt == quote.receipt,
+                  Self.compoundReceiptIssue(receipt, in: state.base) == nil,
+                  !state.base.personalCompounds.contains(where: {
+                      $0.provenFingerprint == receipt.fingerprint
+                  }),
+                  quote.essenceCost == Tuning.Page.personalCompoundFormalizeEssence,
+                  quote.pulpCost == Tuning.Page.personalCompoundFormalizePulp,
+                  state.base.essence >= quote.essenceCost,
+                  state.base.resources[Resources.pulp] >= quote.pulpCost
+            else { return false }
+            let record = PersonalCompoundRecord(
+                id: quote.compoundID, nickname: quote.nickname,
+                provenFingerprint: receipt.fingerprint, target: receipt.target,
+                expansion: receipt.atoms, vocabulary: receipt.vocabulary,
+                vocabularySchemaVersion: receipt.vocabularySchemaVersion,
+                provenance: "Formalized from a successfully bound statement.",
+                creationOrdinal: quote.creationOrdinal)
+            guard PageRules.isEffectEquivalent(record, to: receipt),
+                  state.base.resources.spend(quote.pulpCost, of: Resources.pulp) else { return false }
+            state.base.essence -= quote.essenceCost
+            state.base.personalCompounds.append(record)
+            state.base.nextPersonalCompoundID &+= 1
+            state.base.nextPersonalCompoundOrdinal &+= 1
+            result = .formalized(record.id)
+            return true
+        }
+        return changed ? result : .stale
+    }
+
+    func previewCompoundRename(_ id: PersonalCompoundID, nickname: String) -> CompoundRenameQuote? {
+        guard let record = state.base.personalCompounds.first(where: { $0.id == id }) else { return nil }
+        return .init(before: record, nickname: Self.normalizedCompoundNickname(nickname))
+    }
+
+    @discardableResult
+    func renameCompound(_ quote: CompoundRenameQuote) -> CompoundAssemblyResult {
+        if quote.before.nickname == quote.nickname { return .noChange }
+        let changed = mutateIf("rename personal compound", flush: true) { state in
+            guard let index = state.base.personalCompounds.firstIndex(where: {
+                $0.id == quote.before.id && $0 == quote.before
+            }) else { return false }
+            state.base.personalCompounds[index].nickname = quote.nickname
+            return true
+        }
+        return changed ? .renamed(quote.before.id) : .stale
+    }
+
+    func previewCompoundDeletion(_ id: PersonalCompoundID) -> CompoundDeleteQuote? {
+        state.base.personalCompounds.first(where: { $0.id == id }).map(CompoundDeleteQuote.init)
+    }
+
+    @discardableResult
+    func deleteCompound(_ quote: CompoundDeleteQuote) -> CompoundAssemblyResult {
+        let changed = mutateIf("delete personal compound", flush: true) { state in
+            guard let index = state.base.personalCompounds.firstIndex(of: quote.record) else { return false }
+            state.base.personalCompounds.remove(at: index)
+            return true
+        }
+        return changed ? .deleted(quote.record.id) : .stale
+    }
+
+    nonisolated private static func compoundReceiptIssue(
+        _ receipt: ProvenStatementReceipt, in base: BaseState
+    ) -> PageRules.CompoundEligibilityIssue? {
+        guard receipt.vocabularySchemaVersion == ProvenStatementReceipt.currentVocabularySchemaVersion,
+              ContentCatalog.shared.pressureTarget(receipt.target) != nil,
+              !receipt.atoms.isEmpty,
+              receipt.atoms.allSatisfy({ atom in
+                  atom.target == receipt.target
+                      && base.ownedSources.contains(atom.source)
+                      && ContentCatalog.shared.pressureSource(atom.source) != nil
+              }) else { return .unknownAtom }
+        guard receipt.vocabulary.count >= 2 else { return .tooFewAtoms }
+        guard receipt.vocabulary.count <= Tuning.Page.personalCompoundMaximumAtoms else {
+            return .tooManyAtoms
+        }
+        let writable = Set(PageRules.writableQualifiers().map(\.id))
+        guard receipt.vocabulary.allSatisfy({ identity in
+            switch identity {
+            case .target(let id): return ContentCatalog.shared.pressureTarget(id) != nil
+            case .source(let id):
+                return base.ownedSources.contains(id) && ContentCatalog.shared.pressureSource(id) != nil
+            case .qualifier(let id): return writable.contains(id)
+            case .compound: return false
+            }
+        }) else { return .unknownAtom }
+        guard PageRules.statementFingerprint(target: receipt.target, atoms: receipt.atoms)
+                == receipt.fingerprint else { return .unknownAtom }
+        return nil
+    }
+}
+
 struct InkVialPreparationQuote: Equatable {
     var recipe: InkRecipe
     var existingMeasures: [PigmentBase: Int]
@@ -783,8 +953,11 @@ extension GameStore {
         let reservedCampaignSeed = state.worlds.seeds.peekNextSeed()
         let generationSeed = selectedWorldPage?.definition.seed ?? reservedCampaignSeed
         let sourcePage = selectedWorldPage?.definition.page ?? state.base.page
-        let book = selectedWorldPage.map(BookRules.resolveBook(worldPage:))
+        var book = selectedWorldPage.map(BookRules.resolveBook(worldPage:))
             ?? BookRules.resolveBook(page: sourcePage)
+        book.provenStatementReceipts = PageRules.compoundStatementAssessments(
+            on: sourcePage, knownBy: state.base, boundRunIndex: state.worlds.runIndex + 1)
+            .compactMap(\.receipt)
         let tuning = DebugTuningProfile.active
         let ownedPageCopies = Dictionary(grouping: state.base.collectedWorldPages,
                                          by: { $0.definition.id }).mapValues(\.count)
@@ -873,6 +1046,13 @@ extension GameStore {
                                                     travellers: world.travellers,
                                                     worldVisualReceipt: visualReceipt)
             state.reality.library.record(world: historyRecord)
+            for receipt in book.provenStatementReceipts
+                where !state.base.provenStatementReceipts.contains(where: {
+                    $0.fingerprint == receipt.fingerprint
+                }) {
+                state.base.provenStatementReceipts.append(receipt)
+            }
+            state.base.provenStatementReceipts.sort { $0.fingerprint < $1.fingerprint }
             TutorialRules.reconcileComparisonPair(in: &state)
             TutorialRules.pairNewWorld(historyRecord, in: &state)
 

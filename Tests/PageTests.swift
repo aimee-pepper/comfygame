@@ -121,7 +121,7 @@ final class PageTests: XCTestCase {
                        [0x5750_0000_0000_0001, 0x5750_0000_0000_0002,
                         0x5750_0000_0000_0003])
         XCTAssertEqual(WorldPageCatalog.authoritySHA256,
-                       "04f73e3cb93850ec1f449d9f302c4ca276ac1091631ed81322458d8b8142c534")
+                       "4190cd068463d3f5954d387987c726371da45c4989dbee149e686393045aa320")
         XCTAssertNil(WorldPageCatalog.definition("not_authored"),
                      "unknown content must fail closed rather than fabricate a page")
         for instance in instances {
@@ -352,6 +352,110 @@ final class PageTests: XCTestCase {
             XCTAssertLessThan(PageRules.footprint(of: symbol, hand: .plain), parts.reduce(0, +),
                               "\(symbol.id.rawValue) costs as much as spelling it out")
         }
+    }
+
+    func testProvenStatementNormalizationIgnoresLayoutHandAndSourceOrder() throws {
+        var base = BaseState.newGame()
+        let sources = Array(ContentCatalog.shared.pressureSources.prefix(2).map(\.id))
+        XCTAssertEqual(sources.count, 2)
+        base.ownedSources.formUnion(sources)
+        let target: PressureTargetID = "illumination"
+        func page(ids: [UInt64], reversed: Bool, hand: Hand) -> Page {
+            let ordered = reversed ? Array(sources.reversed()) : sources
+            let targetMark = PlacedRune(id: .init(rawValue: ids[0]), content: .target(target),
+                                        hand: hand, origin: .init(column: 5, row: 5), shapeID: "refined_dot")
+            let sourceMarks = ordered.enumerated().map { offset, source in
+                PlacedRune(id: .init(rawValue: ids[offset + 1]), content: .source(source),
+                           hand: hand, origin: .init(column: offset, row: 0), shapeID: "refined_dot")
+            }
+            return Page(runes: [targetMark] + sourceMarks,
+                        links: Set(sourceMarks.map { MarkLink(targetMark.id, $0.id) }))
+        }
+        let first = try XCTUnwrap(PageRules.compoundStatementAssessments(
+            on: page(ids: [1, 2, 3], reversed: false, hand: .crude), knownBy: base,
+            boundRunIndex: 1).first?.receipt)
+        let rearranged = try XCTUnwrap(PageRules.compoundStatementAssessments(
+            on: page(ids: [91, 43, 12], reversed: true, hand: .refined), knownBy: base,
+            boundRunIndex: 7).first?.receipt)
+        XCTAssertEqual(first.fingerprint, rearranged.fingerprint)
+        XCTAssertEqual(first.atoms, rearranged.atoms)
+        XCTAssertEqual(first.vocabulary, rearranged.vocabulary)
+        XCTAssertNotEqual(first.firstBoundRunIndex, rearranged.firstBoundRunIndex)
+    }
+
+    func testCompoundEligibilityRejectsUnknownNestedAndOverFiveAtomsExactly() throws {
+        var base = BaseState.newGame()
+        let source = try XCTUnwrap(ContentCatalog.shared.pressureSources.first).id
+        base.ownedSources.remove(source)
+        let target = PlacedRune(id: .init(rawValue: 1), content: .target("illumination"),
+                                hand: .crude, origin: .init(column: 0, row: 0), shapeID: "refined_dot")
+        let focus = PlacedRune(id: .init(rawValue: 2), content: .source(source),
+                               hand: .crude, origin: .init(column: 1, row: 0), shapeID: "refined_dot")
+        let unknown = Page(runes: [target, focus], links: [MarkLink(target.id, focus.id)])
+        XCTAssertEqual(PageRules.compoundStatementAssessments(
+            on: unknown, knownBy: base, boundRunIndex: 1).first?.issue, .unknownAtom)
+
+        let nested = PlacedRune(id: .init(rawValue: 3), content: .compound("plains"),
+                                hand: .crude, origin: .init(column: 2, row: 0), shapeID: "crude_block")
+        XCTAssertEqual(PageRules.compoundStatementAssessments(
+            on: Page(runes: [target, nested], links: [MarkLink(target.id, nested.id)]),
+            knownBy: base, boundRunIndex: 1).first?.issue, .nestedCompound)
+
+        base.ownedSources.insert(source)
+        let qualifiers = (0..<4).map { offset in
+            PlacedRune(id: .init(rawValue: UInt64(10 + offset)), content: .qualifier("great"),
+                       hand: .crude, origin: .init(column: offset, row: 1), shapeID: "refined_dot")
+        }
+        let tooMany = Page(runes: [target, focus] + qualifiers,
+                           links: Set([MarkLink(target.id, focus.id)]
+                            + qualifiers.map { MarkLink(focus.id, $0.id) }))
+        XCTAssertEqual(PageRules.compoundStatementAssessments(
+            on: tooMany, knownBy: base, boundRunIndex: 1).first?.issue, .tooManyAtoms)
+    }
+
+    func testPersonalCompoundPlacementPreservesExactWorldEffectsAndShrinksFootprint() throws {
+        let source = try XCTUnwrap(ContentCatalog.shared.pressureSources.first).id
+        let atom = CompoundSemanticAtom(Sigil(id: .init(rawValue: 1), source: source,
+                                               target: "illumination", intensity: .great,
+                                               scale: 2, count: 1))
+        let receipt = ProvenStatementReceipt(
+            fingerprint: PageRules.statementFingerprint(target: "illumination", atoms: [atom]),
+            target: "illumination", atoms: [atom],
+            vocabulary: [.target("illumination"), .source(source), .qualifier("great")],
+            vocabularySchemaVersion: 1, firstBoundRunIndex: 1)
+        let record = PersonalCompoundRecord(
+            id: .init(rawValue: 9), nickname: "Bright reach",
+            provenFingerprint: receipt.fingerprint, target: receipt.target,
+            expansion: receipt.atoms, vocabulary: receipt.vocabulary,
+            vocabularySchemaVersion: 1, provenance: "Personal", creationOrdinal: 1)
+        let personal = try XCTUnwrap(PageRules.place(record, hand: .plain,
+                                                     at: .init(column: 0, row: 0), on: Page()))
+        let expanded = Page(runes: [
+            PlacedRune(id: .init(rawValue: 50), sigil: atom.sigil(id: .init(rawValue: 50)),
+                       hand: .plain, origin: .init(column: 0, row: 0),
+                       shapeID: try XCTUnwrap(PageRules.shape(for: source, hand: .plain)?.id))
+        ])
+        let personalBook = BookRules.resolveBook(page: personal)
+        let expandedBook = BookRules.resolveBook(page: expanded)
+        XCTAssertEqual(BookRules.readings(for: personalBook, seed: 77),
+                       BookRules.readings(for: expandedBook, seed: 77))
+        XCTAssertEqual(BookRules.dangerProfile(for: personalBook),
+                       BookRules.dangerProfile(for: expandedBook))
+        XCTAssertEqual(BookRules.stabilityScore(of: personalBook),
+                       BookRules.stabilityScore(of: expandedBook))
+        XCTAssertEqual(BookRules.greedDelta(for: personalBook.composition),
+                       BookRules.greedDelta(for: expandedBook.composition))
+        let atomicFootprint = record.vocabulary.compactMap { identity -> Int? in
+            switch identity {
+            case .target(let id): PageRules.shape(for: .target(id), hand: .plain)?.footprint
+            case .source(let id): PageRules.shape(for: .source(id), hand: .plain)?.footprint
+            case .qualifier(let id): PageRules.shape(for: .qualifier(id), hand: .plain)?.footprint
+            case .compound: nil
+            }
+        }.reduce(0, +)
+        XCTAssertEqual(PageRules.personalCompoundFootprint(record, hand: .plain),
+                       max(1, Int((Double(atomicFootprint) * 0.6).rounded(.up))))
+        XCTAssertLessThan(PageRules.personalCompoundFootprint(record, hand: .plain), atomicFootprint)
     }
 
     // MARK: Capacity

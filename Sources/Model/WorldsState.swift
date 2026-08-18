@@ -1225,6 +1225,8 @@ struct BoundBook: Codable, Equatable, Sendable {
     /// Slots that were random-filled at bind time — the UI reveals these as surprises.
     var randomlyFilled: Set<SlotID>
     var essencePaid: Int
+    /// Position-free successful-bind evidence, frozen with the book as well as merged into Base.
+    var provenStatementReceipts: [ProvenStatementReceipt] = []
     /// Present only when this world consumed a physical pre-inscribed page. Frozen at bind.
     var worldPageUseReceipt: WorldPageUseReceipt?
 
@@ -1256,6 +1258,7 @@ struct BoundBook: Codable, Equatable, Sendable {
         self.symbols = [:]
         self.randomlyFilled = []
         self.essencePaid = essencePaid
+        self.provenStatementReceipts = []
         self.worldPageUseReceipt = nil
     }
 
@@ -1266,6 +1269,7 @@ struct BoundBook: Codable, Equatable, Sendable {
         self.symbols = symbols
         self.randomlyFilled = randomlyFilled
         self.essencePaid = essencePaid
+        self.provenStatementReceipts = []
         self.worldPageUseReceipt = nil
     }
 
@@ -1277,6 +1281,8 @@ struct BoundBook: Codable, Equatable, Sendable {
         symbols = try c.decodeIfPresent([SlotID: SymbolID].self, forKey: .symbols) ?? [:]
         randomlyFilled = try c.decodeIfPresent(Set<SlotID>.self, forKey: .randomlyFilled) ?? []
         essencePaid = try c.decodeIfPresent(Int.self, forKey: .essencePaid) ?? 0
+        provenStatementReceipts = try c.decodeIfPresent(
+            [ProvenStatementReceipt].self, forKey: .provenStatementReceipts) ?? []
         worldPageUseReceipt = try c.decodeIfPresent(WorldPageUseReceipt.self,
                                                      forKey: .worldPageUseReceipt)
     }

@@ -88,6 +88,11 @@ struct BaseState: Codable, Equatable, Sendable {
     /// exact recipe they use, so editing or deleting a saved mixture never mutates written pages.
     var savedInkMixtures: [SavedInkMixture] = []
     var nextInkMixtureID: UInt64 = 1
+    /// Bind evidence and formalized shorthand are separate: deleting notation never deletes proof.
+    var provenStatementReceipts: [ProvenStatementReceipt] = []
+    var personalCompounds: [PersonalCompoundRecord] = []
+    var nextPersonalCompoundID: UInt64 = 1
+    var nextPersonalCompoundOrdinal: UInt64 = 1
     /// One explicit convenience choice, consumed by the next eligible focus actually placed.
     var nextFocusInkRecipe: InkRecipe?
     /// Processed pigment and prepared applications are Scriptorium stock, not Storehouse slots.
@@ -357,6 +362,8 @@ struct BaseState: Codable, Equatable, Sendable {
         case completedResearch, knownConsumableRecipes, odaFixtureRestored, stations, page
         case savedPageTemplates, nextPageTemplateID, nextTemplateMarkID
         case savedInkMixtures, nextInkMixtureID
+        case provenStatementReceipts, personalCompounds
+        case nextPersonalCompoundID, nextPersonalCompoundOrdinal
         case nextFocusInkRecipe, pigmentStock, preparedInkVials, nextPreparedInkVialID
         case collectedWorldPages, starterWorldPageBundleFulfilled
         case ownedHands, hasChainingUnlock, instrumentLoadout
@@ -395,6 +402,10 @@ struct BaseState: Codable, Equatable, Sendable {
         try c.encode(nextTemplateMarkID, forKey: .nextTemplateMarkID)
         try c.encode(savedInkMixtures, forKey: .savedInkMixtures)
         try c.encode(nextInkMixtureID, forKey: .nextInkMixtureID)
+        try c.encode(provenStatementReceipts, forKey: .provenStatementReceipts)
+        try c.encode(personalCompounds, forKey: .personalCompounds)
+        try c.encode(nextPersonalCompoundID, forKey: .nextPersonalCompoundID)
+        try c.encode(nextPersonalCompoundOrdinal, forKey: .nextPersonalCompoundOrdinal)
         try c.encodeIfPresent(nextFocusInkRecipe, forKey: .nextFocusInkRecipe)
         try c.encode(pigmentStock, forKey: .pigmentStock)
         try c.encode(preparedInkVials, forKey: .preparedInkVials)
@@ -491,6 +502,22 @@ struct BaseState: Codable, Equatable, Sendable {
         nextInkMixtureID = max(
             try container.decodeIfPresent(UInt64.self, forKey: .nextInkMixtureID) ?? 1,
             highestInkID &+ 1)
+        let decodedReceipts = try container.decodeIfPresent(
+            [ProvenStatementReceipt].self, forKey: .provenStatementReceipts) ?? []
+        provenStatementReceipts = decodedReceipts.reduce(into: []) { result, receipt in
+            guard !result.contains(where: { $0.fingerprint == receipt.fingerprint }) else { return }
+            result.append(receipt)
+        }.sorted { $0.fingerprint < $1.fingerprint }
+        personalCompounds = try container.decodeIfPresent(
+            [PersonalCompoundRecord].self, forKey: .personalCompounds) ?? []
+        let highestCompoundID = personalCompounds.map(\.id.rawValue).max() ?? 0
+        nextPersonalCompoundID = max(
+            try container.decodeIfPresent(UInt64.self, forKey: .nextPersonalCompoundID) ?? 1,
+            highestCompoundID &+ 1)
+        let highestCompoundOrdinal = personalCompounds.map(\.creationOrdinal).max() ?? 0
+        nextPersonalCompoundOrdinal = max(
+            try container.decodeIfPresent(UInt64.self, forKey: .nextPersonalCompoundOrdinal) ?? 1,
+            highestCompoundOrdinal &+ 1)
         nextFocusInkRecipe = try container.decodeIfPresent(
             InkRecipe.self, forKey: .nextFocusInkRecipe)
         pigmentStock = try container.decodeIfPresent(PigmentStock.self, forKey: .pigmentStock)

@@ -204,15 +204,17 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
     var shapeID: String
     /// Deliberate liquid colour on a focus. `nil` means Rough charcoal or Ash/open, never black.
     var inkRecipe: InkRecipe?
+    var personalCompound: PersonalCompoundMarkSnapshot?
 
     init(id: InstanceID, content: MarkContent, hand: Hand, origin: PageCell, shapeID: String,
-         inkRecipe: InkRecipe? = nil) {
+         inkRecipe: InkRecipe? = nil, personalCompound: PersonalCompoundMarkSnapshot? = nil) {
         self.id = id
         self.content = content
         self.hand = hand
         self.origin = origin
         self.shapeID = shapeID
         self.inkRecipe = inkRecipe
+        self.personalCompound = personalCompound
     }
 
     /// Convenience for the atomic case, which is most of the tests and eventually most of the game.
@@ -228,6 +230,11 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
     /// What this mark says **on its own**. Targets, sources and qualifiers say nothing alone —
     /// they say something once connected, which is `PageRules.sigils(of:)`'s job.
     var sigils: [Sigil] {
+        if let personalCompound {
+            return personalCompound.expansion.enumerated().map { offset, atom in
+                atom.sigil(id: InstanceID(rawValue: id.rawValue &* 31 &+ UInt64(offset)))
+            }
+        }
         switch content {
         case .target, .source, .qualifier:
             return []
@@ -244,7 +251,8 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
     }
 
     var symbolID: SymbolID? {
-        if case .compound(let id) = content { id } else { nil }
+        guard personalCompound == nil else { return nil }
+        return if case .compound(let id) = content { id } else { nil }
     }
 
     var targetID: PressureTargetID? {
@@ -258,14 +266,16 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
     /// Atomic and legacy whole-focus marks may carry authored colour. Targets, modifiers and
     /// compounds cannot quietly become global colour instructions.
     var canCarryInk: Bool {
-        switch content {
+        if personalCompound != nil { return false }
+        return switch content {
         case .source, .rune: true
         case .target, .qualifier, .compound: false
         }
     }
 
     var inkEligibleSourceID: PressureSourceID? {
-        switch content {
+        if personalCompound != nil { return nil }
+        return switch content {
         case .source(let id): id
         case .rune(let sigil): sigil.source
         case .target, .qualifier, .compound: nil
@@ -280,7 +290,8 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
     var needsConnection: Bool { sourceID != nil || qualifierID != nil }
 
     var displayName: String {
-        switch content {
+        if let personalCompound { return personalCompound.nickname }
+        return switch content {
         case .rune(let sigil): sigil.displayText
         case .compound(let id): ContentCatalog.shared.symbol(id)?.name ?? id.rawValue
         case .target(let id): ContentCatalog.shared.pressureTarget(id)?.name ?? id.rawValue
@@ -297,7 +308,8 @@ struct PlacedRune: Codable, Equatable, Identifiable, Sendable {
 
     /// The identity a glyph is drawn from, so a rune always looks like itself.
     var glyphID: String {
-        switch content {
+        if let personalCompound { return "personal-compound-\(personalCompound.id.rawValue)" }
+        return switch content {
         case .rune(let sigil): sigil.source.rawValue
         case .compound(let id): id.rawValue
         case .target(let id): id.rawValue
@@ -505,6 +517,72 @@ struct SavedInkMixture: Codable, Equatable, Identifiable, Sendable {
     var recipe: InkRecipe
     var isPinned: Bool = false
     var lastUsedOrdinal: UInt64
+}
+
+/// Stable identity for one player-authored shorthand. IDs are never recycled: deleting an entry
+/// removes it from the Runebook, not from historical pages that froze this identity and expansion.
+struct PersonalCompoundID: RawRepresentable, Codable, Equatable, Hashable, Comparable, Sendable {
+    var rawValue: UInt64
+    init(rawValue: UInt64) { self.rawValue = rawValue }
+    static func < (lhs: Self, rhs: Self) -> Bool { lhs.rawValue < rhs.rawValue }
+}
+
+/// Position-free meaning of one atomic source inside a complete statement.
+struct CompoundSemanticAtom: Codable, Equatable, Hashable, Sendable {
+    var source: PressureSourceID
+    var target: PressureTargetID
+    var intensity: Intensity
+    var negatedTargets: Set<PressureTargetID>
+    var scale: Int
+    var count: Int
+
+    init(_ sigil: Sigil) {
+        source = sigil.source
+        target = sigil.target
+        intensity = sigil.intensity
+        negatedTargets = sigil.negatedTargets
+        scale = sigil.scale
+        count = sigil.count
+    }
+
+    func sigil(id: InstanceID) -> Sigil {
+        Sigil(id: id, source: source, target: target, intensity: intensity,
+              negatedTargets: negatedTargets, scale: scale, count: count)
+    }
+}
+
+/// Durable evidence minted only by a successful bind. The fingerprint excludes mark IDs,
+/// positions, hand, RNG and world outcome; vocabulary identities preserve exactly what was known.
+struct ProvenStatementReceipt: Codable, Equatable, Identifiable, Sendable {
+    static let currentVocabularySchemaVersion = 1
+    var fingerprint: String
+    var target: PressureTargetID
+    var atoms: [CompoundSemanticAtom]
+    var vocabulary: [LexemeIdentity]
+    var vocabularySchemaVersion: Int
+    var firstBoundRunIndex: Int
+    var id: String { fingerprint }
+}
+
+struct PersonalCompoundRecord: Codable, Equatable, Identifiable, Sendable {
+    var id: PersonalCompoundID
+    var nickname: String
+    var provenFingerprint: String
+    var target: PressureTargetID
+    var expansion: [CompoundSemanticAtom]
+    var vocabulary: [LexemeIdentity]
+    var vocabularySchemaVersion: Int
+    var provenance: String
+    var creationOrdinal: UInt64
+}
+
+/// Frozen into a placed mark so renaming/deleting the Runebook entry cannot rewrite history.
+struct PersonalCompoundMarkSnapshot: Codable, Equatable, Sendable {
+    var id: PersonalCompoundID
+    var nickname: String
+    var expansion: [CompoundSemanticAtom]
+    var provenFingerprint: String
+    var provenance: String
 }
 
 enum InkMixtureRules {

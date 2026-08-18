@@ -694,6 +694,47 @@ final class PersistenceTests: XCTestCase {
                                     PageTemplateRules.firstLoadedMarkID)
     }
 
+    func testCompoundProofAndRecordsRoundTripDeduplicateAndRepairMonotonicIDs() throws {
+        var state = GameState.newGame()
+        let source = try XCTUnwrap(ContentCatalog.shared.pressureSources.first).id
+        state.base.ownedSources.insert(source)
+        let atom = CompoundSemanticAtom(Sigil(id: .init(rawValue: 4), source: source,
+                                               target: "illumination"))
+        let receipt = ProvenStatementReceipt(
+            fingerprint: PageRules.statementFingerprint(target: "illumination", atoms: [atom]),
+            target: "illumination", atoms: [atom],
+            vocabulary: [.target("illumination"), .source(source)], vocabularySchemaVersion: 1,
+            firstBoundRunIndex: 2)
+        state.base.provenStatementReceipts = [receipt, receipt]
+        state.base.personalCompounds = [
+            .init(id: .init(rawValue: 41), nickname: "Old light",
+                  provenFingerprint: receipt.fingerprint, target: receipt.target,
+                  expansion: receipt.atoms, vocabulary: receipt.vocabulary,
+                  vocabularySchemaVersion: 1, provenance: "Personal", creationOrdinal: 77)
+        ]
+        state.base.nextPersonalCompoundID = 2
+        state.base.nextPersonalCompoundOrdinal = 3
+        let decoded = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: SaveCodec.makeEncoder().encode(state))
+        XCTAssertEqual(decoded.base.provenStatementReceipts, [receipt])
+        XCTAssertEqual(decoded.base.personalCompounds, state.base.personalCompounds)
+        XCTAssertGreaterThan(decoded.base.nextPersonalCompoundID, 41)
+        XCTAssertGreaterThan(decoded.base.nextPersonalCompoundOrdinal, 77)
+
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: SaveCodec.makeEncoder().encode(GameState.newGame())) as? [String: Any])
+        var base = try XCTUnwrap(object["base"] as? [String: Any])
+        for key in ["provenStatementReceipts", "personalCompounds", "nextPersonalCompoundID",
+                    "nextPersonalCompoundOrdinal"] { base.removeValue(forKey: key) }
+        object["base"] = base
+        let legacy = try SaveCodec.makeDecoder().decode(
+            GameState.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertTrue(legacy.base.provenStatementReceipts.isEmpty)
+        XCTAssertTrue(legacy.base.personalCompounds.isEmpty)
+        XCTAssertEqual(legacy.base.nextPersonalCompoundID, 1)
+        XCTAssertEqual(legacy.base.nextPersonalCompoundOrdinal, 1)
+    }
+
     func testInkRecipesAndSavedMixturesRoundTripWhileLegacyPagesRemainOpenColor() throws {
         var state = GameState.newGame()
         let recipe = InkRecipe(cyan: 20, magenta: 80, yellow: 5, depth: 10)

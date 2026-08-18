@@ -347,6 +347,9 @@ enum Tuning {
         /// A compound costs this fraction of its parts, rounded up. Always worth learning, never
         /// free.
         static let compoundFootprintRate: Double = 0.6   // PLACEHOLDER — spec §3
+        static let personalCompoundMaximumAtoms: Int = 5 // PLACEHOLDER
+        static let personalCompoundFormalizeEssence: Int = 20 // PLACEHOLDER
+        static let personalCompoundFormalizePulp: Int = 4 // PLACEHOLDER
     }
 
     /// Diaries, pages, and the search for people.
