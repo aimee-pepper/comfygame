@@ -38,6 +38,7 @@ const screens=[
 ].map(([title,category,type,purpose],index)=>({id:title.toLowerCase().replaceAll(/[^a-z0-9]+/g,"-"),title,category,type,purpose,index}));
 
 const $=id=>document.getElementById(id),categories=["All",...new Set(screens.map(s=>s.category))];
+const reviewStorageKey="bookbinder.assetlab.ui-gallery-reviews.v1";
 const fontChoices=[
   {id:"jersey-tiny",label:"Chosen · Jersey 10 + Tiny5"},
   {id:"pixelify",label:"Pixelify Sans · readable"},
@@ -46,6 +47,7 @@ const fontChoices=[
   {id:"tiny5",label:"Tiny5 · tiny-grid"}
 ];
 let active=screens[0],category="All",state="Default",query="";
+let implementationReviews={};
 const marks={Campaign:"CB",Village:"VI",Writing:"IN",Making:"MK",People:"PE",Knowledge:"KN",Expedition:"EX",Utility:"UT"};
 const notes={
   campaign:["Book covers are the identity; metadata remains compact.","Continue is primary; Delete is never adjacent or equal-weight."],
@@ -126,10 +128,34 @@ function renderScreen(title,fixtureState="Default"){
 }
 
 function filtered(){return screens.filter(s=>(category==="All"||s.category===category)&&(!query||`${s.title} ${s.purpose}`.toLowerCase().includes(query)))}
+function normalizeImplementationReviews(value){
+  if(!value||typeof value!=="object"||Array.isArray(value))return{};
+  return Object.fromEntries(screens.flatMap(({id})=>{
+    const record=value[id];
+    if(!record||!['yes','no'].includes(record.choice))return[];
+    return [[id,{choice:record.choice,notes:typeof record.notes==="string"?record.notes:""}]];
+  }));
+}
+function saveImplementationReviews(){try{localStorage.setItem(reviewStorageKey,JSON.stringify(implementationReviews))}catch{}}
+function renderImplementationReview(){
+  const record=implementationReviews[active.id]??{choice:"",notes:""};
+  document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>input.checked=input.value===record.choice);
+  const feedbackWrap=$("implementation-feedback-wrap"),feedback=$("implementation-feedback");
+  feedbackWrap.hidden=record.choice!=="no";
+  feedback.required=record.choice==="no";
+  feedback.value=record.notes;
+  $("implementation-review-status").textContent=record.choice==="yes"?"Saved as ready.":record.choice==="no"?(record.notes.trim()?"Feedback saved.":"Feedback is required before this review is complete."):"Choose a readiness status for this screen.";
+}
+function updateImplementationReview(choice,notes=""){
+  implementationReviews[active.id]={choice,notes};
+  saveImplementationReviews();
+  renderImplementationReview();
+}
 function renderIndex(){const list=filtered();$("screen-count").textContent=`${list.length} of ${screens.length} screens`;$("screen-list").innerHTML=list.map(s=>`<button class="screen-choice" data-id="${s.id}" aria-current="${s===active}"><span class="route-mark">${marks[s.category]}</span><span><strong>${s.title}</strong><small>${s.purpose.split(" ").slice(0,6).join(" ")}…</small></span></button>`).join("");document.querySelectorAll(".screen-choice").forEach(b=>b.onclick=()=>{active=screens.find(s=>s.id===b.dataset.id);render()})}
-function render(){renderIndex();const preservation=preservationFor(active.title);$("screen-category").textContent=active.category;$("screen-title").textContent=active.title;$("screen-purpose").textContent=active.purpose;$("phone").innerHTML=renderScreen(active.title,state);$("screen-notes").innerHTML=(notes[active.type]||notes.default).map(n=>`<li>${n}</li>`).join("");$("preserve-source").textContent=preservation.source;$("preserve-list").innerHTML=preservation.preserve.map(n=>`<li>${n}</li>`).join("");$("state-switcher").innerHTML=["Default","Selected","Confirm"].map(v=>`<button aria-pressed="${v===state}">${v}</button>`).join("");document.querySelectorAll("#state-switcher button").forEach(b=>b.onclick=()=>{state=b.textContent;render()})}
+function render(){renderIndex();const preservation=preservationFor(active.title);$("screen-category").textContent=active.category;$("screen-title").textContent=active.title;$("screen-purpose").textContent=active.purpose;$("phone").innerHTML=renderScreen(active.title,state);$("screen-notes").innerHTML=(notes[active.type]||notes.default).map(n=>`<li>${n}</li>`).join("");$("preserve-source").textContent=preservation.source;$("preserve-list").innerHTML=preservation.preserve.map(n=>`<li>${n}</li>`).join("");$("state-switcher").innerHTML=["Default","Selected","Confirm"].map(v=>`<button aria-pressed="${v===state}">${v}</button>`).join("");document.querySelectorAll("#state-switcher button").forEach(b=>b.onclick=()=>{state=b.textContent;render()});renderImplementationReview()}
 function step(delta){const i=screens.indexOf(active);active=screens[(i+delta+screens.length)%screens.length];category="All";document.querySelectorAll("#category-tabs button").forEach((x,j)=>x.setAttribute("aria-pressed",j===0));render()}
 if(typeof document!=="undefined"){
+  try{implementationReviews=normalizeImplementationReviews(JSON.parse(localStorage.getItem(reviewStorageKey)||"{}"))}catch{implementationReviews={}}
   const fontSelect=$("pixel-font-choice");
   fontSelect.innerHTML=fontChoices.map(({id,label})=>`<option value="${id}">${label}</option>`).join("");
   let savedFont="jersey-tiny";
@@ -141,7 +167,9 @@ if(typeof document!=="undefined"){
   $("category-tabs").innerHTML=categories.map(c=>`<button aria-pressed="${c===category}">${c}</button>`).join("");
   document.querySelectorAll("#category-tabs button").forEach(b=>b.onclick=()=>{category=b.textContent;document.querySelectorAll("#category-tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(!filtered().includes(active))active=filtered()[0]||screens[0];render()});
   $("screen-search").oninput=e=>{query=e.target.value.toLowerCase().trim();renderIndex()};
+  document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>input.onchange=()=>updateImplementationReview(input.value,implementationReviews[active.id]?.notes??""));
+  $("implementation-feedback").oninput=e=>updateImplementationReview("no",e.target.value);
   $("previous-screen").onclick=()=>step(-1);$("next-screen").onclick=()=>step(1);render();
 }
 
-export {fontChoices,renderers,renderScreen,screens};
+export {fontChoices,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens};

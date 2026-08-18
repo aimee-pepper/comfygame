@@ -45,6 +45,20 @@
       <div class="phone-and-notes">
         <div class="phone-wrap"><div id="phone" class="phone" aria-label="368 by 800 point ordinary phone UI preview"></div><span class="phone-size">368 × 800 ordinary phone</span></div>
         <aside class="design-notes panel">
+          <section class="implementation-review" aria-labelledby="implementation-review-title">
+            <p class="eyebrow">Implementation gate</p>
+            <h2 id="implementation-review-title">Is this screen ready?</h2>
+            <fieldset id="implementation-readiness">
+              <legend class="sr-only">Implementation readiness for the selected screen</legend>
+              <label><input type="radio" name="implementation-ready" value="yes"> <span>Yes, implementation ready</span></label>
+              <label><input type="radio" name="implementation-ready" value="no"> <span>No, not ready</span></label>
+            </fieldset>
+            <label id="implementation-feedback-wrap" class="implementation-feedback" hidden>
+              <span>What needs to change?</span>
+              <textarea id="implementation-feedback" rows="4" placeholder="Required when this screen is not ready"></textarea>
+            </label>
+            <p id="implementation-review-status" class="implementation-review-status" aria-live="polite"></p>
+          </section>
           <p class="eyebrow">Design rationale</p>
           <h2>Shared grammar</h2>
           <ul id="screen-notes"></ul>
