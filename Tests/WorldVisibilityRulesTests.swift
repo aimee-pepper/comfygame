@@ -2,6 +2,15 @@ import XCTest
 @testable import Bookbinder
 
 final class WorldVisibilityRulesTests: XCTestCase {
+    func testFringeBlurKeepsEachTileOpaqueInsteadOfDarkeningItsEdges() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appendingPathComponent("Sources/Screens/WorldView.swift"),
+            encoding: .utf8)
+        XCTAssertTrue(source.contains("opaque: visibility == .fringe"))
+    }
+
     func testFullyExploredTerrainNeverFallsBelowFringeAfterLeavingSight() {
         XCTAssertEqual(WorldRules.terrainVisibility(current: .hidden, wasRevealed: true), .fringe)
         XCTAssertEqual(WorldRules.terrainVisibility(current: .fringe, wasRevealed: true), .fringe)
