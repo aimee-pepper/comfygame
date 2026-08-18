@@ -37,6 +37,8 @@ assert.match(renderScreen("Bestiary"),/quadruped · long ears[\s\S]*sinuous · m
 assert.match(renderScreen("World History"),/Earlier[\s\S]*World 9[\s\S]*Later[\s\S]*World 12/,"History must expose chronology independently of selection order");
 assert.match(renderScreen("Trading Post"),/owned 2 · stock 5[\s\S]*properties unknown/,"Trading Post must keep owned, stock and disclosure truth on its wares");
 assert.match(renderScreen("Survey Post"),/EIGHT INDEPENDENT ROOTS[\s\S]*NO SHARED NODE EDGE/,"Survey instruments must not be flattened into a fake graph");
+assert.match(renderScreen("World"),/Field Kit 5[\s\S]*mini-map[\s\S]*FIXED 11×11 CAMERA/,"World must preserve fixed-scale map, minimap truth, and persistent Field Kit status");
+assert.match(renderScreen("Encounter"),/CURRENT ACTOR · BINDER[\s\S]*Glassback · 6\/13[\s\S]*Selected consequence/,"Encounter must expose current actor, exact target and consequence");
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
 assert.match(css,/@font-face\{font-family:"Pixelify Sans"/,"gallery must bundle its compact mixed-case pixel display font");
