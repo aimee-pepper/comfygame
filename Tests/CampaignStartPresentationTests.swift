@@ -166,6 +166,35 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertFalse(compact.contains("HStack(spacing: 4) {\n                if slot.health.canLoad"))
     }
 
+    func testCompactBookCardsExposeTheApprovedCampaignTruthWithoutAnActionRail() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
+                                encoding: .utf8)
+        let start = try XCTUnwrap(source.range(of: "private var compactBody"))
+        let end = try XCTUnwrap(source.range(of: "private var expandedBody",
+                                             range: start.upperBound..<source.endIndex))
+        let compact = String(source[start.lowerBound..<end.lowerBound])
+
+        XCTAssertTrue(compact.contains("CampaignSlotStatusBadge(slot: slot)"))
+        XCTAssertTrue(compact.contains("CampaignShelfProgress.volumeLabel(for: slot.progressBookCount)"))
+        XCTAssertTrue(compact.contains("Text(slot.location)"))
+        XCTAssertTrue(compact.contains("slot.lastPlayed.formatted(date: .abbreviated, time: .shortened)"))
+        XCTAssertTrue(compact.contains("if let debugVersion = slot.debugVersion"))
+        XCTAssertFalse(compact.contains("slot.progression"),
+                       "The compact shelf must not squeeze paragraph-length progression prose into a card.")
+        XCTAssertTrue(compact.contains(".contextMenu"))
+        XCTAssertTrue(compact.contains("Button(\"Details\", systemImage: \"info.circle\""),
+                      "Details must remain available through the approved long-press menu.")
+        XCTAssertFalse(compact.contains(".buttonStyle(.bordered)"),
+                       "The compact card must not grow a permanent Details action rail.")
+    }
+
+    func testVolumeLabelsRemainTruthfulForOneAndManyBooks() {
+        XCTAssertEqual(CampaignShelfProgress.volumeLabel(for: 1), "1 volume")
+        XCTAssertEqual(CampaignShelfProgress.volumeLabel(for: 7), "7 volumes")
+    }
+
     @MainActor
     func testPrimaryCampaignActionsRenderAtEqualSizeNormallyAndAtAccessibilityText() {
         for dynamicTypeSize in [DynamicTypeSize.large, .accessibility3] {

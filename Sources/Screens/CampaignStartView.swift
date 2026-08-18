@@ -400,38 +400,55 @@ private struct CampaignSlotCard: View {
 
     private var compactBody: some View {
         Button(action: slot.health.canLoad ? onLoad : onDetails) {
-            VStack(alignment: .leading, spacing: 3) {
-                CampaignBookplateMotif(id: slot.id, bookCount: slot.progressBookCount)
-                    .frame(height: 20)
-                    .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .top, spacing: 6) {
+                    CampaignBookplateMotif(id: slot.id, bookCount: slot.progressBookCount)
+                        .frame(height: 25)
+                        .accessibilityHidden(true)
+                    Spacer(minLength: 0)
+                    CampaignSlotStatusBadge(slot: slot)
+                }
 
-                HStack(spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(slot.name)
                         .font(.subheadline.weight(.semibold))
                         .lineLimit(1)
                     Spacer(minLength: 0)
-                    Image(systemName: slot.health.canLoad
-                          ? "checkmark.circle" : "exclamationmark.triangle")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(slot.health.canLoad ? Color.secondary : Color.orange)
-                        .accessibilityLabel(slot.health.label)
                 }
 
                 if slot.hasKnownMetadata {
                     HStack(spacing: 5) {
-                        Label("Level \(slot.binderLevel)", systemImage: "figure.stand")
+                        Text("Level \(slot.binderLevel)")
+                        Text("·")
+                        Text(slot.location)
+                    }
+                    .font(.caption2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+
+                    HStack(spacing: 4) {
+                        Text(CampaignShelfProgress.volumeLabel(for: slot.progressBookCount))
                         Text("·")
                         Text(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))
                     }
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.82)
+                    .minimumScaleFactor(0.72)
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel(
-                        "Level \(slot.binderLevel), last played \(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))"
+                        "Level \(slot.binderLevel), \(slot.location), \(CampaignShelfProgress.volumeLabel(for: slot.progressBookCount)), last played \(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))"
                     )
                 }
+
+                #if DEBUG
+                if let debugVersion = slot.debugVersion {
+                    Text(debugVersion.uppercased())
+                        .font(.system(size: 7, weight: .bold, design: .monospaced))
+                        .lineLimit(1)
+                        .foregroundStyle(.secondary)
+                }
+                #endif
             }
             .padding(.horizontal, 7)
             .padding(.vertical, 5)
@@ -502,6 +519,24 @@ private struct CampaignSlotCard: View {
         Label(slot.location, systemImage: "location")
         Text(slot.progression)
         Text(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))
+    }
+}
+
+private struct CampaignSlotStatusBadge: View {
+    let slot: CampaignSlotSummary
+
+    var body: some View {
+        Label(slot.health.label.uppercased(),
+              systemImage: slot.health.canLoad ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+            .labelStyle(.titleAndIcon)
+            .font(.system(size: 7, weight: .bold, design: .monospaced))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(slot.health.canLoad ? CampaignShelfPalette.ink.opacity(0.74) : Color.orange)
+            .padding(.horizontal, 4)
+            .padding(.vertical, 2)
+            .background(CampaignShelfPalette.pageHighlight.opacity(0.62))
+            .overlay(Rectangle().stroke(CampaignShelfPalette.shelf.opacity(0.55), lineWidth: 1))
     }
 }
 
@@ -581,5 +616,11 @@ private struct CampaignBookplateMotif: View {
         .padding(.horizontal, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .overlay(alignment: .bottom) { Rectangle().fill(Color.primary.opacity(0.5)).frame(height: 2) }
+    }
+}
+
+extension CampaignShelfProgress {
+    static func volumeLabel(for count: Int) -> String {
+        "\(count) \(count == 1 ? "volume" : "volumes")"
     }
 }
