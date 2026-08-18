@@ -141,6 +141,31 @@ final class ReachableContentTests: XCTestCase {
         XCTAssertTrue(never.isEmpty, "resources no world yields: \(never.joined(separator: ", "))")
     }
 
+    func testIsoldePhaseHasWritableWorldRoutesForEveryBrushMaterial() {
+        var state = GameState.newGame()
+        state.reality.library.foundTravellers.insert("isolde")
+        let writable = ContentCatalog.shared.symbols.filter {
+            state.base.ownedSymbols.contains($0.id)
+        }
+        XCTAssertFalse(writable.isEmpty)
+
+        var routed: Set<ResourceID> = []
+        for symbol in writable {
+            let sigils = BookRules.sigils(of: symbol)
+            for seed in UInt64(1)...64 {
+                let readings = PressureRules.resolve(sigils, fillingUnwrittenWith: seed)
+                for resource in ContentCatalog.shared.resources
+                where resource.abundance(in: readings) > 0 {
+                    routed.insert(resource.id)
+                }
+            }
+        }
+
+        let brushMaterials: Set<ResourceID> = ["copper", "fiber", "timber"]
+        XCTAssertEqual(routed.intersection(brushMaterials), brushMaterials,
+                       "the Isolde-phase writable vocabulary must route every Brush material")
+    }
+
     // MARK: Contradictions
 
     func testEveryContradictionCanFire() {

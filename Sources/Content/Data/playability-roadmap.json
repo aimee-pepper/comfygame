@@ -647,8 +647,8 @@
       "id": "penmanship-native",
       "priority": "P2",
       "title": "Brush, ink and Fountain pen progression",
-      "status": "queued",
-      "detail": "Migrate Pencil to Brush and implement the settled Penmanship fan/fork with Brush-gated sibling Ink Mixing, Compound Assembly and Chaining, then ruling frame and Fountain pen. Decision187 supplies a reversible coherent 40–220 Essence comparison profile rather than preserving the 150-Essence first-hand bottleneck.",
+      "status": "readyToTest",
+      "detail": "Source-complete: Brush roots the settled Penmanship fan/fork; Ink Mixing, Compound Assembly and Chaining are independent tier-one capabilities; Chaining leads to the ruling frame and Fountain pen. Legacy research and diary IDs migrate canonically across persisted campaign/run receipts, capability grants round-trip independently from research history, exact purchase quotes preserve the authored bind runway, and an Isolde-phase fixture proves writable Copper, Fibre and Timber routes. Ordinary-phone graph and lifecycle acceptance remains.",
       "gate": "Legacy IDs/capabilities migrate losslessly; sibling routes stay independent; exact recipes and Low writing runway preview share rules-owned costs; ten ordinary returns measure worlds-to-purchase without anti-lock dependence; phone graph fits without list regression. Authority: penmanship-native-migration-current.md, penmanship-economy-runway-review-current.md and Decision187.",
       "workstream": "engineering",
       "isPrimary": false

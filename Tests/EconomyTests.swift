@@ -367,6 +367,36 @@ final class EconomyTests: XCTestCase {
         XCTAssertTrue(store.state.base.completedResearch.contains(brush.id))
     }
 
+    func testIsoldeBrushPurchaseNamesItsPartsAndKeepsThePreviewedNextBindRunway() throws {
+        let store = GameStore(io: .temporary(name: "isolde-brush-runway-\(UUID().uuidString)"))
+        let brush = try node("pen_brush")
+        XCTAssertTrue(brush.blurb.localizedCaseInsensitiveContains("ferrule"))
+        XCTAssertTrue(brush.blurb.localizedCaseInsensitiveContains("bristles"))
+        XCTAssertTrue(brush.blurb.localizedCaseInsensitiveContains("handle"))
+
+        store.mutate("force Isolde phase with one authored bind reserved") { state in
+            state.reality.library.foundTravellers.insert("isolde")
+            state.base.stations[Stations.scriptorium] = StationState(isUnlocked: true, tier: 0)
+            state.base.page = Page(runes: [
+                PlacedRune(id: InstanceID(rawValue: 1), content: .target("illumination"), hand: .crude,
+                           origin: .init(column: 0, row: 0), shapeID: "crude_block"),
+                PlacedRune(id: InstanceID(rawValue: 2), content: .source("sun"), hand: .crude,
+                           origin: .init(column: 2, row: 0), shapeID: "crude_block")
+            ], links: [MarkLink(InstanceID(rawValue: 1), InstanceID(rawValue: 2))])
+            let nextBind = BookRules.resolveBook(page: state.base.page).essencePaid
+            state.base.essence = brush.cost.essence + nextBind
+            for (resource, amount) in brush.cost.resources {
+                state.base.resources.add(amount, of: resource)
+            }
+        }
+
+        let preview = store.researchPurchasePreview(for: brush)
+        let nextBind = try XCTUnwrap(preview.authoredBindCost)
+        XCTAssertGreaterThanOrEqual(Double(preview.spendableEssenceAfter), nextBind)
+        XCTAssertEqual(store.research(preview, node: brush), .committed)
+        XCTAssertGreaterThanOrEqual(Double(store.state.base.essence), nextBind)
+    }
+
     func testCompoundAssemblyResearchRevalidatesExactPurchaseAndUnlocksProvider() throws {
         let store = GameStore(io: .temporary(name: "compound-research-\(UUID().uuidString)"))
         let compound = try node("pen_compounds")
