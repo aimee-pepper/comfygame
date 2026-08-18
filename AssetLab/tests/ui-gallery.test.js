@@ -1,10 +1,17 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
+import {preservationLedger} from "../src/ui-preservation-ledger.js";
 const source=await readFile(new URL("../src/ui-gallery-app.js",import.meta.url),"utf8");
 const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
 const required=["Campaigns","Home","Writing Desk","Storehouse","Workshop","Party","Essence Spring","Constellation","Library","Bestiary","Research","World History","Blacksmith","Trading Post","Recycler","Tannery","Bowyer","Armoury","Weaponsmith","Scriptorium","Survey Post","Apothecary","Reliquary","Wayfarer’s Table","Anchorage","Distillery","Channelworks","Firepit","Gear","World","Encounter","Loot Decision","Return Recap","Settings"];
 for(const title of required)assert.match(source,new RegExp(`\\[\\"${title.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\"`),`gallery must include ${title}`);
+assert.deepEqual(Object.keys(preservationLedger).sort(),required.slice().sort(),"every proposed screen must audit the native structure it preserves");
+for(const [title,[nativeSource,...facts]] of Object.entries(preservationLedger)){assert.match(nativeSource,/\.swift/,`${title} must name its native source`);assert.ok(facts.length>=2,`${title} needs explicit preservation facts`)}
 assert.match(css,/width:368px;height:800px/);
 assert.match(source,/Bind & Depart/);
 assert.match(source,/fixed action rail|bottom rail/i);
+assert.match(source,/book-shelf/,"campaign proposal must preserve stacked-book progress identity");
+assert.match(source,/town-scene/,"Home proposal must preserve the authored town scene");
+assert.match(source,/page-grid/,"Writing proposal must preserve page geometry");
+assert.match(source,/constellation-field/,"Constellation must remain one live star, not a list");
 console.log(`UI gallery covers ${required.length} ordinary-phone screens.`);
