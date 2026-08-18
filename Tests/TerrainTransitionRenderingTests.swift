@@ -27,4 +27,46 @@ import XCTest
             XCTAssertNotEqual(joinedNorth, joinedEast)
         }
     }
+
+    func testWaterAnimatesContinuouslyInFourCrispFrames() {
+        let frames = (0..<4).map {
+            MapAssetTestSupport.animatedTerrainPixels(ground: .water, tick: $0)
+        }
+        XCTAssertEqual(Set(frames).count, 4)
+        XCTAssertEqual(frames[0], MapAssetTestSupport.animatedTerrainPixels(
+            ground: .water, tick: 4))
+    }
+
+    func testIceGlintsBrieflyRatherThanPulsingContinuously() {
+        let frames = (0..<32).map {
+            MapAssetTestSupport.terrainAnimationFrame(ground: .ice, tick: $0)
+        }
+        XCTAssertEqual(frames.compactMap { $0 }.count, 3)
+        XCTAssertEqual(Set(frames.compactMap { $0 }), Set([0, 1, 2]))
+    }
+
+    func testGroundcoverMovesOnlyDuringWindGusts() {
+        XCTAssertTrue((0..<32).allSatisfy {
+            MapAssetTestSupport.terrainAnimationFrame(
+                ground: .groundcover, tick: $0, atmosphereMotion: 50) == nil
+        })
+        let windyFrames = (0..<32).map {
+            MapAssetTestSupport.terrainAnimationFrame(
+                ground: .groundcover, tick: $0, atmosphereMotion: 80)
+        }
+        XCTAssertTrue(windyFrames.contains(where: { $0 != nil }))
+        XCTAssertTrue(windyFrames.contains(where: { $0 == nil }))
+    }
+
+    func testOccasionalTerrainEffectsAreDesynchronisedByTileIdentity() {
+        let first = (0..<32).map {
+            MapAssetTestSupport.terrainAnimationFrame(
+                ground: .ice, tick: $0, point: .init(x: 1, y: 1))
+        }
+        let second = (0..<32).map {
+            MapAssetTestSupport.terrainAnimationFrame(
+                ground: .ice, tick: $0, point: .init(x: 2, y: 1))
+        }
+        XCTAssertNotEqual(first, second)
+    }
 }

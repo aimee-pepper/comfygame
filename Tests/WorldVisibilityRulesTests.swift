@@ -2,19 +2,51 @@ import XCTest
 @testable import Bookbinder
 
 final class WorldVisibilityRulesTests: XCTestCase {
-    func testFullyExploredTerrainNeverFallsBelowFringeAfterLeavingSight() {
+    func testExploredTerrainUsesExactPerTileBrightnessAndBlurStates() {
         XCTAssertEqual(WorldRules.terrainVisibility(current: .hidden, wasRevealed: true), .fringe)
         XCTAssertEqual(WorldRules.terrainVisibility(current: .fringe, wasRevealed: true), .fringe)
         XCTAssertEqual(WorldRules.terrainVisibility(current: .full, wasRevealed: true), .full)
         XCTAssertEqual(WorldRules.terrainVisibility(current: .hidden, wasRevealed: false), .hidden)
 
-        let pitchBlack = WorldRules.visibilityProfile(illumination: 0)
-        XCTAssertEqual(WorldTileVisibilityPresentation.fringeOpacity(
-            profile: pitchBlack, remembered: true), Tuning.Visibility.defaultFringeOpacity)
-        XCTAssertEqual(WorldTileVisibilityPresentation.fringeBlurFraction(
-            profile: pitchBlack, remembered: true), Tuning.Visibility.defaultFringeBlurFraction)
-        XCTAssertEqual(WorldTileVisibilityPresentation.fringeOpacity(
-            profile: pitchBlack, remembered: false), 0)
+        let ordinary = WorldRules.visibilityProfile(illumination: 45)
+        let exploredBorderline = WorldTileVisibilityPresentation.terrainTreatment(
+            currentVisibility: .fringe, wasExplored: true, profile: ordinary)
+        XCTAssertTrue(exploredBorderline.rendersTerrain)
+        XCTAssertLessThan(exploredBorderline.brightness, 0)
+        XCTAssertEqual(exploredBorderline.blurFraction, 0, accuracy: 0.000_001)
+
+        let unexploredBorderline = WorldTileVisibilityPresentation.terrainTreatment(
+            currentVisibility: .fringe, wasExplored: false, profile: ordinary)
+        XCTAssertEqual(unexploredBorderline.brightness, exploredBorderline.brightness,
+                       accuracy: 0.000_001)
+        XCTAssertEqual(unexploredBorderline.blurFraction, ordinary.fringeBlurFraction,
+                       accuracy: 0.000_001)
+
+        let exploredOutOfRange = WorldTileVisibilityPresentation.terrainTreatment(
+            currentVisibility: .hidden, wasExplored: true, profile: ordinary)
+        XCTAssertTrue(exploredOutOfRange.rendersTerrain)
+        XCTAssertLessThan(exploredOutOfRange.brightness, 0)
+        XCTAssertEqual(exploredOutOfRange.blurFraction, 0.5, accuracy: 0.000_001)
+
+        let unexploredOutOfRange = WorldTileVisibilityPresentation.terrainTreatment(
+            currentVisibility: .hidden, wasExplored: false, profile: ordinary)
+        XCTAssertFalse(unexploredOutOfRange.rendersTerrain)
+    }
+
+    func testWorldVisibilityUsesNoTileOrGroupedGradients() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: projectRoot
+            .appendingPathComponent("Sources/Screens/WorldView.swift"), encoding: .utf8)
+
+        XCTAssertFalse(source.contains("RadialGradient"))
+        XCTAssertFalse(source.contains("LinearGradient"))
+        XCTAssertFalse(source.contains("WorldVisibilityCompositePresentation"))
+        XCTAssertTrue(source.contains("let currentVisibility = WorldRules.visibility("),
+                      "each map point must use the rules-owned visibility calculation")
+        XCTAssertTrue(source.contains("terrainTreatment: treatment"),
+                      "each tile must receive its own exact treatment")
     }
 
     func testHiddenNeighboursCannotChangeVisibleTileArtContext() throws {

@@ -985,7 +985,10 @@ private struct MapGrid: View {
     var body: some View {
         GeometryReader { proxy in
             let side = proxy.size.width / CGFloat(viewportColumns)
-            let grade = WorldGrade.from(BookRules.readings(for: run.book, seed: run.mapSeed))
+            let readings = BookRules.readings(for: run.book, seed: run.mapSeed)
+            let grade = WorldGrade.from(readings)
+            let atmosphereMotion = Int(readings["atmosphere"].aspect("motion")
+                .rounded(.toNearestOrAwayFromZero))
             VStack(spacing: 0) {
                 ForEach(origin.y..<(origin.y + viewportRows), id: \.self) { y in
                     HStack(spacing: 0) {
@@ -994,20 +997,22 @@ private struct MapGrid: View {
                             let currentVisibility = WorldRules.visibility(
                                 of: point, from: run.playerPosition,
                                 in: run.map, profile: visibilityProfile)
+                            let wasExplored = run.map[point].isRevealed
                             let visibility = WorldRules.terrainVisibility(
-                                current: currentVisibility, wasRevealed: run.map[point].isRevealed)
-                            let isRememberedTerrain = currentVisibility == .hidden
-                                && visibility == .fringe
+                                current: currentVisibility, wasRevealed: wasExplored)
+                            let treatment = WorldTileVisibilityPresentation.terrainTreatment(
+                                currentVisibility: currentVisibility,
+                                wasExplored: wasExplored,
+                                profile: visibilityProfile)
                             let displayTile = displayTile(at: point, visibility: visibility)
                             let presentation = WorldTileVisibilityPresentation.resolve(
                                 run: run, point: point, tile: displayTile, visibility: visibility,
-                                profile: visibilityProfile, grade: grade)
+                                profile: visibilityProfile, grade: grade,
+                                atmosphereMotion: atmosphereMotion)
                             TileView(tile: displayTile,
                                      visibility: visibility,
-                                     isRememberedTerrain: isRememberedTerrain,
-                                     visibilityProfile: visibilityProfile,
+                                     terrainTreatment: treatment,
                                      artRequest: presentation.artRequest,
-                                     fogBoundaryEdges: presentation.fogBoundaryEdges,
                                      enemy: enemy(at: point, visibility: currentVisibility),
                                      site: currentVisibility == .full ? site(at: point) : nil,
                                      hasLooseWorldPage: currentVisibility == .full
@@ -1079,55 +1084,46 @@ private struct MapGrid: View {
     }
 }
 
-struct FogBoundaryEdges: OptionSet, Equatable {
-    let rawValue: Int
-    static let north = Self(rawValue: 1)
-    static let east = Self(rawValue: 2)
-    static let south = Self(rawValue: 4)
-    static let west = Self(rawValue: 8)
-}
-
 struct WorldTileVisibilityPresentation {
+    struct TerrainTreatment: Equatable {
+        let rendersTerrain: Bool
+        let brightness: Double
+        let blurFraction: Double
+    }
+
     let artRequest: MapTileArtRequest?
-    let fogBoundaryEdges: FogBoundaryEdges
 
     static func resolve(run: WorldRun, point: GridPoint, tile: Tile,
                         visibility: WorldRules.TileVisibility,
                         profile: WorldRules.VisibilityProfile,
-                        grade: WorldGrade) -> Self {
+                        grade: WorldGrade,
+                        atmosphereMotion: Int = 0) -> Self {
         guard visibility != .hidden else {
-            return Self(artRequest: nil, fogBoundaryEdges: [])
+            return Self(artRequest: nil)
         }
 
-        let neighbours: [(bit: Int, edge: FogBoundaryEdges, point: GridPoint)] = [
-            (1, .north, GridPoint(x: point.x, y: point.y - 1)),
-            (2, .east, GridPoint(x: point.x + 1, y: point.y)),
-            (4, .south, GridPoint(x: point.x, y: point.y + 1)),
-            (8, .west, GridPoint(x: point.x - 1, y: point.y)),
+        let neighbours: [(bit: Int, isSouth: Bool, point: GridPoint)] = [
+            (1, false, GridPoint(x: point.x, y: point.y - 1)),
+            (2, false, GridPoint(x: point.x + 1, y: point.y)),
+            (4, true, GridPoint(x: point.x, y: point.y + 1)),
+            (8, false, GridPoint(x: point.x - 1, y: point.y)),
         ]
         var adjacency = 0
-        var fogBoundaryEdges: FogBoundaryEdges = []
         var visibleSouth: Tile?
 
         for neighbour in neighbours {
-            guard run.map.contains(neighbour.point) else {
-                fogBoundaryEdges.insert(neighbour.edge)
-                continue
-            }
+            guard run.map.contains(neighbour.point) else { continue }
             let currentNeighbourVisibility = WorldRules.visibility(
                 of: neighbour.point, from: run.playerPosition,
                 in: run.map, profile: profile)
             let neighbourVisibility = WorldRules.terrainVisibility(
                 current: currentNeighbourVisibility,
                 wasRevealed: run.map[neighbour.point].isRevealed)
-            guard neighbourVisibility != .hidden else {
-                fogBoundaryEdges.insert(neighbour.edge)
-                continue
-            }
+            guard neighbourVisibility != .hidden else { continue }
             var visibleTile = run.map[neighbour.point]
             visibleTile.isRevealed = true
             if visibleTile.ground == tile.ground { adjacency |= neighbour.bit }
-            if neighbour.edge == .south { visibleSouth = visibleTile }
+            if neighbour.isSouth { visibleSouth = visibleTile }
         }
 
         let flora = visibility == .full
@@ -1138,8 +1134,9 @@ struct WorldTileVisibilityPresentation {
             adjacency: adjacency,
             southExposureLevels: MapAssetContract.southExposure(center: tile, south: visibleSouth),
             grade: grade, flora: flora,
-            worldGrade2Descriptor: run.worldVisualReceipt?.descriptor)
-        return Self(artRequest: request, fogBoundaryEdges: fogBoundaryEdges)
+            worldGrade2Descriptor: run.worldVisualReceipt?.descriptor,
+            atmosphereMotion: atmosphereMotion)
+        return Self(artRequest: request)
     }
 
     static func opaqueFogPixels() -> [UInt8] {
@@ -1148,27 +1145,37 @@ struct WorldTileVisibilityPresentation {
             .flatMap { $0 }
     }
 
-    static func fringeOpacity(profile: WorldRules.VisibilityProfile,
-                              remembered: Bool) -> Double {
-        remembered ? max(profile.fringeOpacity, Tuning.Visibility.defaultFringeOpacity)
-            : profile.fringeOpacity
-    }
+    /// Every tile resolves its own treatment from the rules-owned visibility result. There is no
+    /// shared mask, grouped field, or edge gradient that approximates the sight calculation.
+    static let exploredOutOfRangeBlurFraction = 0.5
 
-    static func fringeBlurFraction(profile: WorldRules.VisibilityProfile,
-                                   remembered: Bool) -> Double {
-        remembered ? min(profile.fringeBlurFraction,
-                          Tuning.Visibility.defaultFringeBlurFraction)
-            : profile.fringeBlurFraction
+    static func terrainTreatment(currentVisibility: WorldRules.TileVisibility,
+                                 wasExplored: Bool,
+                                 profile: WorldRules.VisibilityProfile) -> TerrainTreatment {
+        switch currentVisibility {
+        case .full:
+            return TerrainTreatment(rendersTerrain: true, brightness: 0, blurFraction: 0)
+        case .fringe:
+            return TerrainTreatment(
+                rendersTerrain: true,
+                brightness: profile.fringeOpacity - 1,
+                blurFraction: wasExplored ? 0 : profile.fringeBlurFraction)
+        case .hidden where wasExplored:
+            return TerrainTreatment(
+                rendersTerrain: true,
+                brightness: Tuning.Visibility.defaultFringeOpacity - 1,
+                blurFraction: exploredOutOfRangeBlurFraction)
+        case .hidden:
+            return TerrainTreatment(rendersTerrain: false, brightness: -1, blurFraction: 0)
+        }
     }
 }
 
 private struct TileView: View {
     let tile: Tile
     let visibility: WorldRules.TileVisibility
-    let isRememberedTerrain: Bool
-    let visibilityProfile: WorldRules.VisibilityProfile
+    let terrainTreatment: WorldTileVisibilityPresentation.TerrainTreatment
     let artRequest: MapTileArtRequest?
-    let fogBoundaryEdges: FogBoundaryEdges
     let enemy: WorldEnemy?
     /// Resolved by the caller: the tile only stores an instance id, and the grid is the one place
     /// that has the run to look it up in.
@@ -1180,7 +1187,7 @@ private struct TileView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            if visibility == .hidden {
+            if !terrainTreatment.rendersTerrain {
                 Rectangle().fill(Color.black)
             } else if useSimpleRenderer {
                 Rectangle().fill(background)
@@ -1239,21 +1246,8 @@ private struct TileView: View {
                     .offset(x: side * 0.30, y: -side * 0.30)
             }
         }
-        .blur(radius: visibility == .fringe
-              ? side * CGFloat(WorldTileVisibilityPresentation.fringeBlurFraction(
-                  profile: visibilityProfile, remembered: isRememberedTerrain)) : 0)
-        .overlay {
-            switch visibility {
-            case .full:
-                Color.clear
-            case .fringe:
-                Color.black.opacity(1 - WorldTileVisibilityPresentation.fringeOpacity(
-                    profile: visibilityProfile, remembered: isRememberedTerrain))
-            case .hidden:
-                Color.black
-            }
-        }
-        .overlay { fogBoundaryOverlay }
+        .blur(radius: side * CGFloat(terrainTreatment.blurFraction))
+        .brightness(terrainTreatment.brightness)
         .frame(width: side, height: side)
         .contentShape(Rectangle())
     }
@@ -1261,31 +1255,6 @@ private struct TileView: View {
     private var surfaceLift: CGFloat {
         guard !useSimpleRenderer, let artRequest else { return 0 }
         return -side * CGFloat(artRequest.resolvedElevation) / CGFloat(MapAssetContract.logicalSide)
-    }
-
-    @ViewBuilder private var fogBoundaryOverlay: some View {
-        if visibility != .hidden {
-            let depth = min(side * 0.5, max(1, CGFloat(visibilityProfile.fogEdgeBlurPoints)))
-            ZStack {
-                if fogBoundaryEdges.contains(.north) {
-                    LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                        .frame(height: depth).frame(maxHeight: .infinity, alignment: .top)
-                }
-                if fogBoundaryEdges.contains(.east) {
-                    LinearGradient(colors: [.clear, .black], startPoint: .leading, endPoint: .trailing)
-                        .frame(width: depth).frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                if fogBoundaryEdges.contains(.south) {
-                    LinearGradient(colors: [.clear, .black], startPoint: .top, endPoint: .bottom)
-                        .frame(height: depth).frame(maxHeight: .infinity, alignment: .bottom)
-                }
-                if fogBoundaryEdges.contains(.west) {
-                    LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
-                        .frame(width: depth).frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            .allowsHitTesting(false)
-        }
     }
 
     private var symbol: String? {
