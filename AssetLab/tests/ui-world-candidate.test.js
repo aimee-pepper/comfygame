@@ -21,6 +21,7 @@ for(const [state,html] of Object.entries(rendered).filter(([name])=>!["Compare v
   assert.doesNotMatch(html,/world-map-scale|FIXED 11×11/,`${state} must not show the redundant fixed-camera badge`);
   assert.doesNotMatch(html,/world-event-log/,`${state} must not keep the redundant narration bar`);
   assert.match(html,/world-place-info/,`${state} must restore the place-information panel without embedding actions in it`);
+  assert.ok(html.indexOf("world-map-stage")<html.indexOf("world-place-info")&&html.indexOf("world-place-info")<html.indexOf("world-field-strip"),`${state} must overlay place information inside the map before the compact field strip`);
   assert.match(html,/world-field-strip/,`${state} must keep Field Kit, resources, and turn visible`);
   assert.match(html,/world-navigation-row[\s\S]*class="dpad[\s\S]*world-minimap/,`${state} must keep movement and minimap side by side`);
   assert.match(html,/class="dpad/,`${state} must preserve directional movement or inspection`);
@@ -33,15 +34,15 @@ for(const [state,html] of Object.entries(rendered).filter(([name])=>!["Compare v
   assert.doesNotMatch(html,/LOOK \/ GATHER/,`${state} must not retain v1's redundant action label inside the information panel`);
 }
 
-assert.match(rendered.Travel,/disabled><b>Interact<\/b><small>Nothing to interact with here/);
-assert.match(rendered.Travel,/>Look<\/b><small>Inspect without moving/);
+assert.match(rendered.Travel,/pixel-btn primary" disabled>Interact<\/button>/);
+assert.match(rendered.Travel,/pixel-btn ">Look<\/button>/);
 assert.match(rendered.Look,/look-armed/);
 assert.match(rendered.Look,/Inspection directions/);
-assert.match(rendered.Look,/>Cancel<\/b><small>Choose a direction/);
+assert.match(rendered.Look,/pixel-btn active">Cancel<\/button>/);
 assert.match(rendered.Harvest,/Harvest Resin · 3 left/);
-assert.match(rendered.Search,/Search Fallen shrine · 2 turns remain/);
-assert.match(rendered.Portal,/Return home through Atlas Seam/);
-assert.match(rendered.Cache,/disabled><b>Interact<\/b><small>Locked cache · Key required/);
+assert.match(rendered.Search,/Fallen shrine[\s\S]*Search · 2 turns remain/);
+assert.match(rendered.Portal,/Atlas Seam[\s\S]*Return home/);
+assert.match(rendered.Cache,/Locked cache[\s\S]*Key required[\s\S]*pixel-btn primary" disabled>Interact<\/button>/);
 
 assert.match(rendered["Survey & anchor"],/world-context-sheet/);
 assert.match(rendered["Survey & anchor"],/Natural Atlas Seam/);
@@ -49,7 +50,7 @@ assert.match(rendered["Survey & anchor"],/Survey uses 1 turn/);
 assert.match(rendered["Survey & anchor"],/Place Anchor Frame/);
 assert.match(rendered["Loose page"],/world-context-sheet/);
 assert.match(rendered["Loose page"],/Field Kit full/);
-assert.match(rendered["Loose page"],/Take Unknown World Page/);
+assert.match(rendered["Loose page"],/Unknown World Page[\s\S]*Take or replace one carried family/);
 assert.match(rendered["Loose page"],/Choose a slot/);
 
 assert.match(rendered["Night sight"],/LOW ILLUMINATION · CLEAR 3/);
