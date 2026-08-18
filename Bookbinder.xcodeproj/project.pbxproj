@@ -1040,6 +1040,7 @@
 				8902EAFB98EB638C8DAB4A79 /* Verify generated combat-v2 authority */,
 				509F16D3D09C39C6391DEF93 /* Sources */,
 				F9EB483A0C481DEB209626BD /* Resources */,
+				A9D100000000000000000001 /* Embed DEBUG source revision */,
 			);
 			buildRules = (
 			);
@@ -1144,6 +1145,27 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A9D100000000000000000001 /* Embed DEBUG source revision */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)",
+				"$(SRCROOT)/.git",
+			);
+			name = "Embed DEBUG source revision";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "RECEIPT=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/InstalledSourceRevision.txt\"\nrm -f \"$RECEIPT\"\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n  exit 0\nfi\nSTATUS=$(/usr/bin/git -C \"$SRCROOT\" status --porcelain --untracked-files=normal 2>/dev/null) || exit 0\nif [ -n \"$STATUS\" ]; then\n  echo \"warning: Installed source revision unavailable because the source tree is dirty\"\n  exit 0\nfi\nREVISION=$(/usr/bin/git -C \"$SRCROOT\" rev-parse --verify HEAD 2>/dev/null) || exit 0\ncase \"$REVISION\" in\n  [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) printf '%s\\n' \"$REVISION\" > \"$RECEIPT\" ;;\n  *) echo \"warning: Installed source revision unavailable because HEAD is not canonical\" ;;\nesac\n";
+		};
 		8902EAFB98EB638C8DAB4A79 /* Verify generated combat-v2 authority */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;

@@ -5,6 +5,25 @@ import XCTest
 /// Adding a symbol/creature/station to JSON and getting an ID wrong should fail here, loudly,
 /// rather than silently spawning nothing in a world.
 final class ContentTests: XCTestCase {
+#if DEBUG
+    func testInstalledSourceRevisionFailsClosedAndAcceptsOnlyCanonicalGitIdentity() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("installed-source-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let receipt = directory.appendingPathComponent("InstalledSourceRevision.txt")
+
+        XCTAssertNil(InstalledSourceRevisionPresentation.revision(resourceURL: nil))
+        try "not-a-revision\n".write(to: receipt, atomically: true, encoding: .utf8)
+        XCTAssertNil(InstalledSourceRevisionPresentation.revision(resourceURL: receipt))
+        try String(repeating: "A", count: 40).write(to: receipt, atomically: true, encoding: .utf8)
+        XCTAssertNil(InstalledSourceRevisionPresentation.revision(resourceURL: receipt))
+
+        let revision = "0123456789abcdef0123456789abcdef01234567"
+        try "\(revision)\n".write(to: receipt, atomically: true, encoding: .utf8)
+        XCTAssertEqual(InstalledSourceRevisionPresentation.revision(resourceURL: receipt), revision)
+    }
+#endif
     func testReleaseContentDoesNotPromiseRetiredTokenOrQuirkSystems() throws {
         let catalogue = ContentCatalog.shared
         XCTAssertEqual(catalogue.items.filter { $0.consumable != nil }.count, 17,

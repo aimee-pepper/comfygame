@@ -81,6 +81,20 @@ struct SettingsView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.debug-tools")
+
+                StationCard(title: "Installed source", icon: "point.3.connected.trianglepath.dotted") {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(InstalledSourceRevisionPresentation.displayValue)
+                            .font(.caption.monospaced())
+                            .textSelection(.enabled)
+                        Text(InstalledSourceRevisionPresentation.revision() == nil
+                             ? "Revision unavailable — this build cannot prove its source."
+                             : "Git revision embedded when this DEBUG app was built.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
 #endif
 
                 Label {
@@ -102,6 +116,26 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+#if DEBUG
+enum InstalledSourceRevisionPresentation {
+    static func revision(resourceURL: URL? = Bundle.main.url(
+        forResource: "InstalledSourceRevision", withExtension: "txt")) -> String? {
+        guard let resourceURL,
+              let value = try? String(contentsOf: resourceURL, encoding: .utf8)
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+              value.count == 40,
+              value.allSatisfy({ $0.isHexDigit }),
+              value == value.lowercased()
+        else { return nil }
+        return value
+    }
+
+    static var displayValue: String {
+        revision().map { String($0.prefix(12)) } ?? "Unavailable"
+    }
+}
+#endif
 
 private struct SettingsDestinationRow: View {
     let icon: String
