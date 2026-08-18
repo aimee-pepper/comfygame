@@ -5,6 +5,11 @@ struct SettingsView: View {
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var store: GameStore
     @EnvironmentObject private var campaigns: CampaignAppCoordinator
+#if DEBUG
+    @State private var dictionaryFixture: Band2DictionaryPhoneFixtureSession?
+    @State private var templatesFixture: Band2TemplatesPhoneFixtureSession?
+    @State private var band2FixtureError: String?
+#endif
 
     var body: some View {
         ScrollView {
@@ -106,6 +111,32 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.starter-world-pages-acceptance")
 
+                Button {
+                    do { dictionaryFixture = try Band2DictionaryPhoneFixtureSession() }
+                    catch { band2FixtureError = error.localizedDescription }
+                } label: {
+                    SettingsDestinationRow(
+                        icon: "character.book.closed.fill",
+                        title: "Rune Dictionary acceptance",
+                        subtitle: "Disposable known, unknown and inspection proof"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.rune-dictionary-acceptance")
+
+                Button {
+                    do { templatesFixture = try Band2TemplatesPhoneFixtureSession() }
+                    catch { band2FixtureError = error.localizedDescription }
+                } label: {
+                    SettingsDestinationRow(
+                        icon: "square.grid.2x2.fill",
+                        title: "Page Templates acceptance",
+                        subtitle: "Disposable persisted shelf and production actions"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.page-templates-acceptance")
+
                 StationCard(title: "Installed source", icon: "point.3.connected.trianglepath.dotted") {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(InstalledSourceRevisionPresentation.displayValue)
@@ -138,10 +169,107 @@ struct SettingsView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
+#if DEBUG
+        .fullScreenCover(item: $dictionaryFixture) { session in
+            Band2DictionaryPhoneAcceptanceView(session: session) {
+                dictionaryFixture = nil
+            }
+        }
+        .fullScreenCover(item: $templatesFixture) { session in
+            Band2TemplatesPhoneAcceptanceView(session: session) {
+                templatesFixture = nil
+            }
+        }
+        .alert("Fixture unavailable", isPresented: Binding(
+            get: { band2FixtureError != nil },
+            set: { if !$0 { band2FixtureError = nil } }
+        )) {
+            Button("OK", role: .cancel) { band2FixtureError = nil }
+        } message: {
+            Text(band2FixtureError ?? "Unknown fixture error")
+        }
+#endif
     }
 }
 
 #if DEBUG
+private struct Band2DictionaryPhoneAcceptanceView: View {
+    @ObservedObject var session: Band2DictionaryPhoneFixtureSession
+    let close: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Production surfaces") {
+                    NavigationLink("Open Rune Dictionary") {
+                        LibraryView().environmentObject(session.store)
+                    }
+                    NavigationLink("Inspect the collected World Page") {
+                        WritingDeskView().environmentObject(session.store)
+                    }
+                }
+                Section("Acceptance path") {
+                    Text("In Library, choose Runes and open one named and one unknown glyph in every category. In the Writing Desk, choose Pages → Collected, open the page, then return to Runes and confirm its exact marks were added without teaching unknown meanings.")
+                }
+            }
+            .navigationTitle("Rune Dictionary")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Close", action: close) } }
+        }
+        .overlay(alignment: .bottom) {
+            Band2FixtureReceiptOverlay(lines: session.receipt.phoneSummaryLines,
+                                       identifier: "band2-dictionary-fixture-receipt")
+        }
+    }
+}
+
+private struct Band2TemplatesPhoneAcceptanceView: View {
+    @ObservedObject var session: Band2TemplatesPhoneFixtureSession
+    let close: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Production surface") {
+                    NavigationLink("Open Writing Desk") {
+                        WritingDeskView().environmentObject(session.store)
+                    }
+                }
+                Section("Acceptance path") {
+                    Text("Choose Pages → Templates. Load over the dirty draft and keep it once, then confirm replacement. Clear the page and load again to exercise the empty path. Use a card to rename, overwrite and delete; save the current legal draft to reach the visible 20-Template cap.")
+                }
+            }
+            .navigationTitle("Page Templates")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Close", action: close) } }
+        }
+        .overlay(alignment: .bottom) {
+            Band2FixtureReceiptOverlay(lines: session.receipt.phoneSummaryLines,
+                                       identifier: "band2-templates-fixture-receipt")
+        }
+    }
+}
+
+private struct Band2FixtureReceiptOverlay: View {
+    let lines: [String]
+    let identifier: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("Frozen fixture receipt").font(.caption.bold())
+            ForEach(lines, id: \.self) { Text($0).font(.caption2.monospacedDigit()) }
+        }
+        .padding(9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.black.opacity(0.84), in: RoundedRectangle(cornerRadius: 10))
+        .foregroundStyle(.white)
+        .padding(10)
+        .allowsHitTesting(false)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(identifier)
+    }
+}
+
 private struct StarterWorldPagesPhoneAcceptanceView: View {
     @State private var session: StarterWorldPagePhoneFixtureSession?
     @State private var errorMessage: String?

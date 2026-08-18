@@ -8,6 +8,47 @@ import XCTest
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
     @MainActor
+    func testBand2TemplatesPhoneFixtureRelaunchesNearCapWithDirtyLegalDraftAndStableIDs() throws {
+        let fixture = try GameStore.makeBand2TemplatesPhoneFixture()
+        let receipt = fixture.receipt
+        XCTAssertEqual(receipt.templateCount, PageTemplateRules.capacity - 1)
+        XCTAssertEqual(receipt.capacity, PageTemplateRules.capacity)
+        XCTAssertGreaterThan(receipt.currentDraftMarkCount, 0)
+        XCTAssertEqual(receipt.stableTemplateIDs,
+                       fixture.store.state.base.savedPageTemplates.sorted {
+                           $0.creationOrdinal < $1.creationOrdinal
+                       }.map(\.id))
+        XCTAssertEqual(Set(receipt.stableTemplateIDs).count, receipt.stableTemplateIDs.count)
+
+        let first = try XCTUnwrap(receipt.stableTemplateIDs.first)
+        let ordinal = try XCTUnwrap(fixture.store.state.base.savedPageTemplates.first {
+            $0.id == first
+        }?.creationOrdinal)
+        XCTAssertEqual(fixture.store.renamePageTemplate(first, to: "Phone renamed"),
+                       .updated(first))
+        XCTAssertEqual(fixture.store.overwritePageTemplate(first), .updated(first))
+        XCTAssertEqual(fixture.store.state.base.savedPageTemplates.first {
+            $0.id == first
+        }?.creationOrdinal, ordinal)
+        fixture.store.clearPage()
+        XCTAssertEqual(fixture.store.loadPageTemplate(first), .loaded(first))
+        XCTAssertEqual(fixture.store.deletePageTemplate(first), .deleted(first))
+    }
+
+    func testSettingsExposesDisposableTemplatesAcceptanceThroughProductionDesk() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path:
+            "Sources/Screens/SettingsView.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains("settings.page-templates-acceptance"))
+        XCTAssertTrue(source.contains("Page Templates acceptance"))
+        XCTAssertTrue(source.contains("WritingDeskView().environmentObject(session.store)"))
+        XCTAssertTrue(source.contains("band2-templates-fixture-receipt"))
+        XCTAssertTrue(source.contains("Load over the dirty draft"))
+        XCTAssertTrue(source.contains("rename, overwrite and delete"))
+    }
+
+    @MainActor
     func testStarterWorldPagePhoneFixturesUseProductionReceiptsRevealedFindsAndSafeRoutes() throws {
         for instance in WorldPageCatalog.starterInstances {
             let fixture = try GameStore.makeStarterWorldPagePhoneFixture(

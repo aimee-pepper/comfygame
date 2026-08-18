@@ -2,6 +2,82 @@ import Foundation
 import CryptoKit
 
 #if DEBUG
+enum Band2PhoneFixtureError: Error, LocalizedError {
+    case missingVocabulary
+    case missingCollectedPage
+    case persistenceMismatch
+    case couldNotStageTemplate
+
+    var errorDescription: String? {
+        switch self {
+        case .missingVocabulary: "The authored Rune Dictionary vocabulary is unavailable."
+        case .missingCollectedPage: "No collected World Page is available for inspection."
+        case .persistenceMismatch: "The disposable fixture did not survive its relaunch check."
+        case .couldNotStageTemplate: "The production Template actions could not stage the fixture."
+        }
+    }
+}
+
+struct Band2DictionaryPhoneFixtureReceipt: Equatable, Sendable {
+    var collectedPageID: InstanceID
+    var sightingsBeforeInspection: Set<LexemeIdentity>
+    var expectedInspectionSightings: Set<LexemeIdentity>
+    var knownCount: Int
+    var unknownCount: Int
+
+    var phoneSummaryLines: [String] {
+        [
+            "Relaunched disposable save · no campaign slot",
+            "\(knownCount) known · \(unknownCount) unknown typed entries",
+            "Collected Page #\(String(format: "%016llx", collectedPageID.rawValue))",
+            "Opening adds \(expectedInspectionSightings.subtracting(sightingsBeforeInspection).count) exact sighting(s)"
+        ]
+    }
+}
+
+struct Band2TemplatesPhoneFixtureReceipt: Equatable, Sendable {
+    var stableTemplateIDs: [PageTemplateID]
+    var templateCount: Int
+    var capacity: Int
+    var currentDraftMarkCount: Int
+
+    var phoneSummaryLines: [String] {
+        let ids = stableTemplateIDs.prefix(3).map { "T\($0.rawValue)" }.joined(separator: " · ")
+        return [
+            "Relaunched disposable save · no campaign slot",
+            "\(templateCount) of \(capacity) Templates · \(currentDraftMarkCount)-mark dirty draft",
+            "Stable IDs \(ids)\(stableTemplateIDs.count > 3 ? " …" : "")",
+            "Use the cards to load, rename, overwrite and delete"
+        ]
+    }
+}
+
+@MainActor
+final class Band2DictionaryPhoneFixtureSession: ObservableObject, Identifiable {
+    let id = UUID()
+    let store: GameStore
+    let receipt: Band2DictionaryPhoneFixtureReceipt
+
+    init() throws {
+        let fixture = try GameStore.makeBand2DictionaryPhoneFixture()
+        store = fixture.store
+        receipt = fixture.receipt
+    }
+}
+
+@MainActor
+final class Band2TemplatesPhoneFixtureSession: ObservableObject, Identifiable {
+    let id = UUID()
+    let store: GameStore
+    let receipt: Band2TemplatesPhoneFixtureReceipt
+
+    init() throws {
+        let fixture = try GameStore.makeBand2TemplatesPhoneFixture()
+        store = fixture.store
+        receipt = fixture.receipt
+    }
+}
+
 enum CompoundAssemblyPhoneFixtureError: Error, LocalizedError {
     case missingAuthoredVocabulary
     case invalidFixture
@@ -323,6 +399,106 @@ final class EncounterScalingProgressionFixtureSession: ObservableObject, Identif
 }
 
 extension GameStore {
+    /// Seeds typed sightings, commits them to a UUID-scoped temporary save, then constructs the
+    /// store shown on phone by loading those bytes again. Save-slot adapters are never involved.
+    static func makeBand2DictionaryPhoneFixture() throws -> (
+        store: GameStore, receipt: Band2DictionaryPhoneFixtureReceipt
+    ) {
+        let catalog = ContentCatalog.shared
+        guard let collected = WorldPageCatalog.starterInstances.first else {
+            throw Band2PhoneFixtureError.missingCollectedPage
+        }
+        let pageSightings = collected.definition.page.encounteredLexemes
+        guard let knownTarget = catalog.pressureTargetsInOrder.map(\.id).first(where: {
+                  !pageSightings.contains(.target($0))
+              }),
+              let knownSource = catalog.pressureSources.map(\.id).first(where: {
+                  !pageSightings.contains(.source($0))
+              }),
+              let knownQualifier = PageRules.writableQualifiers().map(\.id).first(where: {
+                  !pageSightings.contains(.qualifier($0))
+              }),
+              let knownCompound = catalog.symbols.map(\.id).first(where: {
+                  !pageSightings.contains(.compound($0))
+              }) else {
+            throw Band2PhoneFixtureError.missingVocabulary
+        }
+        let stagedSightings: Set<LexemeIdentity> = [
+            .target(knownTarget), .target("debug_retired_target"),
+            .source(knownSource), .source("debug_retired_source"),
+            .qualifier(knownQualifier), .qualifier("debug_retired_qualifier"),
+            .compound(knownCompound), .compound("debug_retired_compound")
+        ]
+        let io = SaveFileIO.temporary(name: "phone-band2-dictionary-\(UUID().uuidString)")
+        io.deleteEverything()
+        let staging = GameStore(io: io)
+        staging.mutate("stage Band 2 Dictionary acceptance", flush: true) { state in
+            state.worlds.activeRun = nil
+            state.base.ownedSources.insert(knownSource)
+            state.base.ownedSymbols.insert(knownCompound)
+            state.base.collectedWorldPages = [collected]
+            state.reality.encounteredLexemes = stagedSightings
+        }
+        let expectedState = staging.state
+        let relaunched = GameStore(io: io)
+        guard relaunched.state.reality.encounteredLexemes
+                == expectedState.reality.encounteredLexemes,
+              relaunched.state.base.ownedSources == expectedState.base.ownedSources,
+              relaunched.state.base.ownedSymbols == expectedState.base.ownedSymbols,
+              relaunched.state.base.collectedWorldPages == expectedState.base.collectedWorldPages,
+              let page = relaunched.state.base.collectedWorldPages.first else {
+            throw Band2PhoneFixtureError.persistenceMismatch
+        }
+        let entries = LibraryRules.dictionaryEntries(
+            reality: relaunched.state.reality, base: relaunched.state.base)
+        return (relaunched, .init(
+            collectedPageID: page.id,
+            sightingsBeforeInspection: relaunched.state.reality.encounteredLexemes,
+            expectedInspectionSightings: page.definition.page.encounteredLexemes,
+            knownCount: entries.filter(\.isKnown).count,
+            unknownCount: entries.filter { !$0.isKnown }.count
+        ))
+    }
+
+    /// Uses production writing and Template actions to build a nearly-full shelf, persists it, and
+    /// returns only the relaunched store. Phone interaction then crosses the unchanged Desk UI and
+    /// the same save/load/rename/overwrite/delete actions as a campaign.
+    static func makeBand2TemplatesPhoneFixture() throws -> (
+        store: GameStore, receipt: Band2TemplatesPhoneFixtureReceipt
+    ) {
+        let io = SaveFileIO.temporary(name: "phone-band2-templates-\(UUID().uuidString)")
+        io.deleteEverything()
+        let staging = GameStore(io: io)
+        guard staging.write("plains") else { throw Band2PhoneFixtureError.couldNotStageTemplate }
+        for index in 1..<PageTemplateRules.capacity {
+            guard case .saved = staging.savePageTemplate(named: "Fixture \(index)") else {
+                throw Band2PhoneFixtureError.couldNotStageTemplate
+            }
+        }
+        staging.clearPage()
+        guard staging.write("frostbound") else {
+            throw Band2PhoneFixtureError.couldNotStageTemplate
+        }
+        staging.flushNow()
+        let expectedState = staging.state
+        let relaunched = GameStore(io: io)
+        guard relaunched.state.base.page == expectedState.base.page,
+              relaunched.state.base.savedPageTemplates == expectedState.base.savedPageTemplates,
+              relaunched.state.base.nextPageTemplateID == expectedState.base.nextPageTemplateID,
+              relaunched.state.base.nextTemplateMarkID == expectedState.base.nextTemplateMarkID else {
+            throw Band2PhoneFixtureError.persistenceMismatch
+        }
+        let templates = relaunched.state.base.savedPageTemplates.sorted {
+            $0.creationOrdinal < $1.creationOrdinal
+        }
+        return (relaunched, .init(
+            stableTemplateIDs: templates.map(\.id),
+            templateCount: templates.count,
+            capacity: PageTemplateRules.capacity,
+            currentDraftMarkCount: relaunched.state.base.page.runes.count
+        ))
+    }
+
     /// Disposable ordinary-phone proof for the shipped starter catalogue. The fixture crosses the
     /// production bind transaction and generator exactly once; only its persistence destination is
     /// replaced with a UUID-named temporary store that cannot address a campaign slot.

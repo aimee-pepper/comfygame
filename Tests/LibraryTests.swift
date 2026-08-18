@@ -6,6 +6,40 @@ import XCTest
 @MainActor
 final class LibraryTests: XCTestCase {
 
+    func testBand2DictionaryPhoneFixtureRelaunchesTypedKnownUnknownAndExactInspection() throws {
+        let fixture = try GameStore.makeBand2DictionaryPhoneFixture()
+        let before = fixture.store.state.reality.encounteredLexemes
+        XCTAssertEqual(before, fixture.receipt.sightingsBeforeInspection)
+        XCTAssertEqual(before.count, 8, "the fixture must sight both states in all four types")
+        XCTAssertGreaterThanOrEqual(fixture.receipt.knownCount, 4)
+        XCTAssertEqual(fixture.receipt.unknownCount, 4)
+
+        let entries = LibraryRules.dictionaryEntries(
+            reality: fixture.store.state.reality, base: fixture.store.state.base)
+        for category in LibraryRules.DictionaryCategory.allCases {
+            XCTAssertTrue(entries.contains { $0.category == category && $0.isKnown })
+            XCTAssertTrue(entries.contains { $0.category == category && !$0.isKnown })
+        }
+        XCTAssertTrue(fixture.store.inspectWorldPage(fixture.receipt.collectedPageID))
+        XCTAssertEqual(fixture.store.state.reality.encounteredLexemes,
+                       before.union(fixture.receipt.expectedInspectionSightings))
+        XCTAssertEqual(LibraryRules.dictionaryEntries(
+            reality: fixture.store.state.reality, base: fixture.store.state.base)
+            .filter { !$0.isKnown }.count, 4,
+                       "inspection records exact marks but must not invent meaning")
+    }
+
+    func testSettingsExposesDisposableDictionaryAcceptanceThroughProductionScreens() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path:
+            "Sources/Screens/SettingsView.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains("settings.rune-dictionary-acceptance"))
+        XCTAssertTrue(source.contains("LibraryView().environmentObject(session.store)"))
+        XCTAssertTrue(source.contains("WritingDeskView().environmentObject(session.store)"))
+        XCTAssertTrue(source.contains("band2-dictionary-fixture-receipt"))
+    }
+
     func testWorldPageReceiptIsFrozenIntoHistoryAndSurvivesRoundTrip() throws {
         let instance = try XCTUnwrap(WorldPageCatalog.starterInstances.first)
         let book = BookRules.resolveBook(worldPage: instance)
