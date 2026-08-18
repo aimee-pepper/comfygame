@@ -26,7 +26,7 @@ const requiredMarkers={
   Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"interpretation-board",
   "Survey Post":"instrument-board",
   "Wayfarer’s Table":"fieldcraft-board",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
-  Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"receipt-paper",Settings:"appearance-board"
+  Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"return-outcome",Settings:"appearance-board"
 };
 for(const [title,marker] of Object.entries(requiredMarkers))assert.match(renderScreen(title),new RegExp(marker),`${title} must reach its specialized composition`);
 assert.deepEqual(fixtureStatesByScreen.constellation,["Default","Selected","Confirm","Bought"],"Constellation must expose its distinct shortfall, selection, confirmation and purchased states");
@@ -44,7 +44,8 @@ assert.match(renderScreen("Bestiary"),/quadruped · long ears[\s\S]*sinuous · m
 assert.match(renderScreen("World History"),/Earlier[\s\S]*World 9[\s\S]*Later[\s\S]*World 12/,"History must expose chronology independently of selection order");
 assert.match(renderScreen("Trading Post"),/owned 2 · stock 5[\s\S]*properties unknown/,"Trading Post must keep owned, stock and disclosure truth on its wares");
 assert.match(renderScreen("Survey Post"),/EIGHT INDEPENDENT ROOTS[\s\S]*NO SHARED NODE EDGE/,"Survey instruments must not be flattened into a fake graph");
-assert.match(renderScreen("World","Travel"),/FIXED 11×11[\s\S]*world-event-log[\s\S]*Field Kit[\s\S]*world-minimap/,"World must preserve fixed-scale map, narration, persistent Field Kit status, and minimap truth");
+assert.match(renderScreen("World","Travel"),/world-map-grid[\s\S]*world-place-info[\s\S]*Field Kit[\s\S]*world-minimap/,"World must preserve its fixed-scale map, place truth, persistent Field Kit status, and minimap");
+assert.doesNotMatch(renderScreen("World","Travel"),/world-event-log|world-map-scale|FIXED 11×11/,"World must not restore the rejected redundant narration bar or camera badge");
 assert.match(renderScreen("Encounter"),/CURRENT ACTOR · BINDER[\s\S]*Glassback · 6\/13[\s\S]*Selected consequence/,"Encounter must expose current actor, exact target and consequence");
 const campaignsDefault=renderScreen("Campaigns","Default");
 assert.equal((campaignsDefault.match(/class="book-stack campaign-book/g)??[]).length,3,"Campaigns must keep three equally structured campaign buttons in the review fixture");
