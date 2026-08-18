@@ -1,13 +1,21 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {preservationLedger} from "../src/ui-preservation-ledger.js";
-import {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
+import {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,priorityScreenIDs,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
 const galleryApp=await readFile(new URL("../src/ui-gallery-app.js",import.meta.url),"utf8");
 const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
 const galleryHtml=await readFile(new URL("../ui-gallery.html",import.meta.url),"utf8");
+assert.match(galleryHtml,/id="preview-appearance"[\s\S]*value="light"[\s\S]*value="dark"/,"the gallery must expose one shared Light/Dark appearance control");
+assert.match(css,/Appearance v1: one semantic palette shared by every review screen/,"appearance must be owned by one semantic palette rather than per-screen color copies");
+for(const token of ["--theme-screen","--theme-surface","--theme-surface-raised","--theme-surface-inset","--theme-rail","--theme-edge","--theme-text","--theme-muted","--theme-neutral","--theme-primary","--theme-selection","--theme-danger"]){
+  assert.ok(css.includes(token),`${token} must be defined by the shared appearance palette`);
+}
 const required=["Campaigns","Home","Writing Desk","Storehouse","Workshop","Party","Essence Spring","Constellation","Library","Bestiary","Research","World History","Blacksmith","Trading Post","Recycler","Tannery","Bowyer","Armoury","Weaponsmith","Scriptorium","Survey Post","Apothecary","Reliquary","Wayfarer’s Table","Anchorage","Distillery","Channelworks","Firepit","Gear","World","Encounter","Loot Decision","Return Recap","Settings"];
 assert.deepEqual(screens.map(({title})=>title),required,"screen order is an intentional ordinary-phone contract");
 assert.deepEqual([...renderers.keys()],required,"every gallery entry must have one explicit renderer");
+assert.deepEqual([...priorityScreenIDs],["campaigns","home","writing-desk","world","return-recap"],"the default review lane must stay focused on the four prioritized gameplay screens followed by the explicitly requested World exit screen");
+assert.match(galleryApp,/category="Priority"/,"the gallery must open in the focused review lane rather than the 34-screen backlog");
+assert.match(galleryApp,/function step\(delta\)\{const sequence=filtered\(\)/,"Previous and Next must stay inside the selected review lane");
 assert.deepEqual(Object.keys(preservationLedger).sort(),required.slice().sort(),"every proposed screen must audit the native structure it preserves");
 for(const [title,[nativeSource,...facts]] of Object.entries(preservationLedger)){assert.match(nativeSource,/\.swift/,`${title} must name its native source`);assert.ok(facts.length>=2,`${title} needs explicit preservation facts`)}
 assert.match(css,/width:368px;height:800px/);
@@ -26,7 +34,7 @@ const requiredMarkers={
   Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"interpretation-board",
   "Survey Post":"instrument-board",
   "Wayfarer’s Table":"fieldcraft-board",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
-  Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"receipt-paper",Settings:"appearance-board"
+  Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"return-outcome",Settings:"appearance-board"
 };
 for(const [title,marker] of Object.entries(requiredMarkers))assert.match(renderScreen(title),new RegExp(marker),`${title} must reach its specialized composition`);
 assert.deepEqual(fixtureStatesByScreen.constellation,["Default","Selected","Confirm","Bought"],"Constellation must expose its distinct shortfall, selection, confirmation and purchased states");
@@ -44,7 +52,8 @@ assert.match(renderScreen("Bestiary"),/quadruped · long ears[\s\S]*sinuous · m
 assert.match(renderScreen("World History"),/Earlier[\s\S]*World 9[\s\S]*Later[\s\S]*World 12/,"History must expose chronology independently of selection order");
 assert.match(renderScreen("Trading Post"),/owned 2 · stock 5[\s\S]*properties unknown/,"Trading Post must keep owned, stock and disclosure truth on its wares");
 assert.match(renderScreen("Survey Post"),/EIGHT INDEPENDENT ROOTS[\s\S]*NO SHARED NODE EDGE/,"Survey instruments must not be flattened into a fake graph");
-assert.match(renderScreen("World","Travel"),/FIXED 11×11[\s\S]*world-event-log[\s\S]*Field Kit[\s\S]*world-minimap/,"World must preserve fixed-scale map, narration, persistent Field Kit status, and minimap truth");
+assert.match(renderScreen("World","Travel"),/world-map-grid[\s\S]*world-place-info[\s\S]*Field Kit[\s\S]*world-minimap/,"World must preserve its fixed-scale map, place truth, persistent Field Kit status, and minimap");
+assert.doesNotMatch(renderScreen("World","Travel"),/world-event-log|world-map-scale|FIXED 11×11/,"World must not restore the rejected redundant narration bar or camera badge");
 assert.match(renderScreen("Encounter"),/CURRENT ACTOR · BINDER[\s\S]*Glassback · 6\/13[\s\S]*Selected consequence/,"Encounter must expose current actor, exact target and consequence");
 const campaignsDefault=renderScreen("Campaigns","Default");
 assert.equal((campaignsDefault.match(/class="book-stack campaign-book/g)??[]).length,3,"Campaigns must keep three equally structured campaign buttons in the review fixture");
@@ -67,7 +76,10 @@ assert.match(galleryHtml,/id="implementation-review-save"[\s\S]*Save feedback/,"
 assert.match(galleryHtml,/Native behavior contract[\s\S]*id="assetlab-revision"/,"reviewers must see native conformance and the exact served AssetLab revision");
 assert.deepEqual(Object.keys(nativeConformance).sort(),screens.map(({id})=>id).sort(),"every gallery screen must carry an explicit native-conformance status");
 assert.ok(Object.values(nativeConformance).every(record=>["verified","failed","pending"].includes(record.status)&&record.source&&record.designVersion),"conformance records must be closed, source-owned and design-versioned");
+assert.equal(nativeConformance["writing-desk"].designVersion,"native-2","the rebuilt Writing candidate must request a fresh review instead of inheriting feedback for the earlier layout");
+assert.equal(nativeConformance.world.designVersion,"native-2","the rebuilt World candidate must request a fresh review instead of inheriting feedback for the earlier layout");
 assert.match(galleryApp,/input\.value==="yes"&&!conformanceReady/,"implementation-ready approval must be unavailable until native behavior is verified");
+assert.match(galleryApp,/const staleApproval=Boolean\(storedRecord\.choice\)&&storedRecord\.designVersion!==conformance\.designVersion/,"every decision for a superseded mock must remain historical rather than silently applying to the rebuilt screen");
 assert.equal(reviewStorageKey,"bookbinder.assetlab.ui-gallery-reviews.v1");
 assert.deepEqual(normalizeImplementationReviews({campaigns:{choice:"no",notes:"Tighten spacing",designVersion:"draft-0"},home:{choice:"yes",notes:""},gear:{choice:"queue",notes:"Load after a details click",designVersion:"draft-0"},invented:{choice:"yes",notes:"ignored"}}),{campaigns:{choice:"no",notes:"Tighten spacing",designVersion:"draft-0"},home:{choice:"yes",notes:"",designVersion:""},gear:{choice:"queue",notes:"Load after a details click",designVersion:"draft-0"}},"stored reviews must retain the explicit queued-change override and reject unknown screens");
 assert.deepEqual(implementationReviewPacket({home:{choice:"yes",notes:"",designVersion:"native-1"},invented:{choice:"no",notes:"ignored"}}),{schemaVersion:1,reviews:{home:{choice:"yes",notes:"",designVersion:"native-1"}}},"the shared packet helper must emit only normalized, versioned gallery reviews");

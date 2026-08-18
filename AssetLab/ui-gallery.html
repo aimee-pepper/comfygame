@@ -13,7 +13,7 @@
     <div><p class="eyebrow">Bookbinder · ordinary-phone design candidate</p><h1>Complete UI Gallery</h1><p class="subtitle">One cohesive interaction language across campaign, village, writing, knowledge, expedition and combat.</p></div>
     <div class="header-actions"><button id="previous-screen">Previous</button><button id="next-screen" class="primary">Next screen</button></div>
   </header>
-  <main class="gallery-shell">
+  <main id="gallery-shell" class="gallery-shell">
     <aside class="gallery-index panel">
       <label class="search-label"><span>Find a screen</span><input id="screen-search" type="search" placeholder="Writing, gear, world…"></label>
       <div id="category-tabs" class="category-tabs" aria-label="Screen groups"></div>
@@ -26,6 +26,7 @@
         <div><p class="eyebrow" id="screen-category"></p><h2 id="screen-title"></h2><p id="screen-purpose" class="screen-purpose"></p></div>
         <div class="preview-controls">
           <label class="font-control" for="pixel-font-choice"><span>UI typeface</span><select id="pixel-font-choice" aria-label="Pixel UI typeface"></select></label>
+          <label class="appearance-control" for="preview-appearance"><span>Appearance</span><select id="preview-appearance" aria-label="UI preview appearance"><option value="light">Light</option><option value="dark">Dark</option></select></label>
           <div class="state-control"><span>Fixture state</span><div id="state-switcher" class="state-switcher"></div></div>
         </div>
       </div>
@@ -42,8 +43,12 @@
           <article><span class="specimen-label">Density rule</span><div class="density-ruler"><i></i><i></i><i></i><i></i><i></i><i></i></div><p>8px rhythm, 44px touch ownership, minimal dead air, no routine full-width rows.</p></article>
         </div>
       </section>
-      <div class="phone-and-notes">
-        <div class="phone-wrap"><div id="phone" class="phone" aria-label="368 by 800 point ordinary phone UI preview"></div><span class="phone-size">368 × 800 ordinary phone</span></div>
+      <div id="phone-and-notes" class="phone-and-notes">
+        <div id="phone-wrap" class="phone-wrap">
+          <div id="phone" class="phone" aria-label="368 by 800 point ordinary phone UI preview"></div>
+          <div id="phone-comparison" class="phone-comparison" aria-label="Two independent 368 by 800 point ordinary phone UI previews" hidden></div>
+          <span id="phone-size" class="phone-size">368 × 800 ordinary phone</span>
+        </div>
         <aside class="design-notes panel">
           <section class="native-conformance" aria-labelledby="native-conformance-title">
             <p class="eyebrow">Native behavior contract</p>
