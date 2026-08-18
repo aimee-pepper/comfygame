@@ -12,12 +12,13 @@ final class WorldVisibilityRulesTests: XCTestCase {
         let exploredBorderline = WorldTileVisibilityPresentation.terrainTreatment(
             currentVisibility: .fringe, wasExplored: true, profile: ordinary)
         XCTAssertTrue(exploredBorderline.rendersTerrain)
-        XCTAssertLessThan(exploredBorderline.brightness, 0)
+        XCTAssertEqual(exploredBorderline.dimOpacity, 1 - ordinary.fringeOpacity,
+                       accuracy: 0.000_001)
         XCTAssertEqual(exploredBorderline.blurFraction, 0, accuracy: 0.000_001)
 
         let unexploredBorderline = WorldTileVisibilityPresentation.terrainTreatment(
             currentVisibility: .fringe, wasExplored: false, profile: ordinary)
-        XCTAssertEqual(unexploredBorderline.brightness, exploredBorderline.brightness,
+        XCTAssertEqual(unexploredBorderline.dimOpacity, exploredBorderline.dimOpacity,
                        accuracy: 0.000_001)
         XCTAssertEqual(unexploredBorderline.blurFraction, ordinary.fringeBlurFraction,
                        accuracy: 0.000_001)
@@ -25,8 +26,10 @@ final class WorldVisibilityRulesTests: XCTestCase {
         let exploredOutOfRange = WorldTileVisibilityPresentation.terrainTreatment(
             currentVisibility: .hidden, wasExplored: true, profile: ordinary)
         XCTAssertTrue(exploredOutOfRange.rendersTerrain)
-        XCTAssertLessThan(exploredOutOfRange.brightness, 0)
-        XCTAssertEqual(exploredOutOfRange.blurFraction, 0.5, accuracy: 0.000_001)
+        XCTAssertEqual(exploredOutOfRange.dimOpacity,
+                       1 - Tuning.Visibility.defaultFringeOpacity, accuracy: 0.000_001)
+        XCTAssertEqual(exploredOutOfRange.blurFraction,
+                       ordinary.fringeBlurFraction * 0.5, accuracy: 0.000_001)
 
         let unexploredOutOfRange = WorldTileVisibilityPresentation.terrainTreatment(
             currentVisibility: .hidden, wasExplored: false, profile: ordinary)
@@ -47,6 +50,10 @@ final class WorldVisibilityRulesTests: XCTestCase {
                       "each map point must use the rules-owned visibility calculation")
         XCTAssertTrue(source.contains("terrainTreatment: treatment"),
                       "each tile must receive its own exact treatment")
+        XCTAssertTrue(source.contains(".clipped()"),
+                      "blurred terrain must not sample or spill across tile bounds")
+        XCTAssertFalse(source.contains(".brightness(terrainTreatment"),
+                       "visibility dimming must retain the established solid-black treatment")
     }
 
     func testHiddenNeighboursCannotChangeVisibleTileArtContext() throws {

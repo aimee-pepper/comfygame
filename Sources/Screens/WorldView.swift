@@ -1087,7 +1087,7 @@ private struct MapGrid: View {
 struct WorldTileVisibilityPresentation {
     struct TerrainTreatment: Equatable {
         let rendersTerrain: Bool
-        let brightness: Double
+        let dimOpacity: Double
         let blurFraction: Double
     }
 
@@ -1147,26 +1147,26 @@ struct WorldTileVisibilityPresentation {
 
     /// Every tile resolves its own treatment from the rules-owned visibility result. There is no
     /// shared mask, grouped field, or edge gradient that approximates the sight calculation.
-    static let exploredOutOfRangeBlurFraction = 0.5
+    static let exploredOutOfRangeBlurRatio = 0.5
 
     static func terrainTreatment(currentVisibility: WorldRules.TileVisibility,
                                  wasExplored: Bool,
                                  profile: WorldRules.VisibilityProfile) -> TerrainTreatment {
         switch currentVisibility {
         case .full:
-            return TerrainTreatment(rendersTerrain: true, brightness: 0, blurFraction: 0)
+            return TerrainTreatment(rendersTerrain: true, dimOpacity: 0, blurFraction: 0)
         case .fringe:
             return TerrainTreatment(
                 rendersTerrain: true,
-                brightness: profile.fringeOpacity - 1,
+                dimOpacity: 1 - profile.fringeOpacity,
                 blurFraction: wasExplored ? 0 : profile.fringeBlurFraction)
         case .hidden where wasExplored:
             return TerrainTreatment(
                 rendersTerrain: true,
-                brightness: Tuning.Visibility.defaultFringeOpacity - 1,
-                blurFraction: exploredOutOfRangeBlurFraction)
+                dimOpacity: 1 - Tuning.Visibility.defaultFringeOpacity,
+                blurFraction: profile.fringeBlurFraction * exploredOutOfRangeBlurRatio)
         case .hidden:
-            return TerrainTreatment(rendersTerrain: false, brightness: -1, blurFraction: 0)
+            return TerrainTreatment(rendersTerrain: false, dimOpacity: 1, blurFraction: 0)
         }
     }
 }
@@ -1187,25 +1187,7 @@ private struct TileView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            if !terrainTreatment.rendersTerrain {
-                Rectangle().fill(Color.black)
-            } else if useSimpleRenderer {
-                Rectangle().fill(background)
-                if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
-                    SimpleCrackShape()
-                        .stroke(Color.orange.opacity(0.95),
-                                style: StrokeStyle(lineWidth: max(1, side * 0.07),
-                                                   lineCap: .round, lineJoin: .round))
-                        .padding(side * 0.12)
-                }
-            } else if let artRequest {
-                MapTileArt(request: artRequest)
-                    .frame(width: side,
-                           height: side * CGFloat(MapAssetContract.spriteHeight)
-                               / CGFloat(MapAssetContract.logicalSide))
-                    .offset(y: -side * CGFloat(MapAssetContract.maximumElevation)
-                            / CGFloat(MapAssetContract.logicalSide))
-            }
+            treatedTerrain
             ZStack {
                 // The player gets a filled disc behind them: at 27pt a bare glyph disappears into
                 // the grid, and "where am I" has to be answerable at a glance.
@@ -1246,10 +1228,45 @@ private struct TileView: View {
                     .offset(x: side * 0.30, y: -side * 0.30)
             }
         }
-        .blur(radius: side * CGFloat(terrainTreatment.blurFraction))
-        .brightness(terrainTreatment.brightness)
         .frame(width: side, height: side)
         .contentShape(Rectangle())
+    }
+
+    @ViewBuilder private var treatedTerrain: some View {
+        if terrainTreatment.blurFraction > 0 {
+            terrain
+                .blur(radius: side * CGFloat(terrainTreatment.blurFraction))
+                .frame(width: side, height: side)
+                .clipped()
+                .overlay(Color.black.opacity(terrainTreatment.dimOpacity))
+        } else {
+            terrain
+                .overlay(Color.black.opacity(terrainTreatment.dimOpacity))
+        }
+    }
+
+    @ViewBuilder private var terrain: some View {
+        if !terrainTreatment.rendersTerrain {
+            Rectangle().fill(Color.black)
+        } else if useSimpleRenderer {
+            ZStack {
+                Rectangle().fill(background)
+                if tile.isRevealed && tile.isCracking && !tile.isCrumbled {
+                    SimpleCrackShape()
+                        .stroke(Color.orange.opacity(0.95),
+                                style: StrokeStyle(lineWidth: max(1, side * 0.07),
+                                                   lineCap: .round, lineJoin: .round))
+                        .padding(side * 0.12)
+                }
+            }
+        } else if let artRequest {
+            MapTileArt(request: artRequest)
+                .frame(width: side,
+                       height: side * CGFloat(MapAssetContract.spriteHeight)
+                           / CGFloat(MapAssetContract.logicalSide))
+                .offset(y: -side * CGFloat(MapAssetContract.maximumElevation)
+                        / CGFloat(MapAssetContract.logicalSide))
+        }
     }
 
     private var surfaceLift: CGFloat {
