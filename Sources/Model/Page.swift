@@ -906,7 +906,7 @@ enum WorldPageCatalog {
                        origin: PageCell(column: 3, row: 3), shapeID: "crude_block")
         ]),
         copiedCost: 34,
-        worldPageCost: 21,
+        worldPageCost: 0,
         seed: 101,
         promise: "Temperate land, water, plant life and ordinary resources for repeatable testing."
     )

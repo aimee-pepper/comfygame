@@ -13,7 +13,7 @@ final class PageTests: XCTestCase {
         let earth = WorldPageCatalog.earthlikeTestInstance
         XCTAssertEqual(earth.definition.id, "earthlike_test_world")
         XCTAssertEqual(earth.definition.disposition, .reusable)
-        XCTAssertEqual(earth.definition.worldPageCost, 21)
+        XCTAssertEqual(earth.definition.worldPageCost, 0)
         XCTAssertEqual(earth.definition.seed, 101)
         XCTAssertEqual(Set(earth.definition.page.symbolIDs),
                        Set(["plains", "verdant", "archipelago", "common_ore"]))
@@ -29,7 +29,10 @@ final class PageTests: XCTestCase {
             $0.definition.id == earth.definition.id
         }, [earth])
 
+        let essenceBeforeTestDeparture = store.state.base.essence
         XCTAssertTrue(store.bindAndDepart(worldPageInstanceID: earth.id))
+        XCTAssertEqual(store.state.base.essence, essenceBeforeTestDeparture,
+                       "the reusable testing page must never charge Essence")
         XCTAssertEqual(store.activeRun?.mapSeed, earth.definition.seed)
         XCTAssertEqual(store.activeRun?.book.worldPageUseReceipt?.instanceID, earth.id)
         XCTAssertTrue(store.state.base.collectedWorldPages.contains { $0 == earth },
