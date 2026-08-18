@@ -49,7 +49,8 @@ final class DebugRoadmapTests: XCTestCase {
             "rune-dictionary",
             "saved-page-templates",
             "wild-world-pages",
-            "starter-world-pages"
+            "starter-world-pages",
+            "early-knowledge-stations"
         ] {
             let item = try XCTUnwrap(byID[id])
             XCTAssertEqual(item.status, .readyToTest,
@@ -103,6 +104,22 @@ final class DebugRoadmapTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(byID["combat-tree-first-route"]).status, .queued)
         XCTAssertEqual(try XCTUnwrap(byID["combat-tree-v2"]).status, .paused)
         XCTAssertFalse(try XCTUnwrap(byID["combat-tree-v2"]).isPrimary)
+    }
+
+    func testEarlyKnowledgeContributionsAwaitPhoneAcceptanceInsteadOfImplementation() throws {
+        let item = try XCTUnwrap(DebugRoadmap.current.items.first {
+            $0.id == "early-knowledge-stations"
+        })
+        XCTAssertEqual(item.status, .readyToTest)
+        XCTAssertFalse(item.isPrimary)
+        for checkpoint in ["c917c27", "1f6cfce", "460c2cd", "12c5759"] {
+            XCTAssertTrue(item.detail.contains(checkpoint), "missing evidence \(checkpoint)")
+        }
+        XCTAssertTrue(item.detail.contains("visible-flora recognition"))
+        XCTAssertTrue(item.detail.contains("no decorative room"))
+        XCTAssertTrue(item.gate.contains("real expeditions"))
+        XCTAssertTrue(item.gate.contains("hidden flora never leaks"))
+        XCTAssertTrue(item.gate.contains("miniature Tavern"))
     }
 
     func testCurrentBoardHasAtMostOnePrimaryPerWorkstreamAndScalingSolelyOwnsAcceptance() {

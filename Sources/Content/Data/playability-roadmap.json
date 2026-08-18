@@ -447,9 +447,9 @@
       "id": "early-knowledge-stations",
       "priority": "B3.1",
       "title": "Mara through Orsa early contributions",
-      "status": "queued",
-      "detail": "Promote Survey Post, Reliquary, Scriptorium, Wayfarer's Table and the coherent Bryn/Orsa contributions only after the opening economy loop passes.",
-      "gate": "Each recruited early traveller has a reachable, distinct first payoff used in a real expedition; no decorative room or implied late breadth counts.",
+      "status": "readyToTest",
+      "detail": "The opening-economy checkpoint now exposes the real first contribution for Mara through Orsa: Survey Post instruments and field survey, Reliquary site interpretation/yield, Scriptorium Brush and persistent Ink Mixing, Wayfarer's Table packing/organic yield plus exact visible-flora recognition, and Bryn/Orsa's live meetings, diaries, party identities and combat leans. Source evidence includes c917c27, 1f6cfce, 460c2cd and 12c5759; no decorative room or premature Tavern subsystem is implied.",
+      "gate": "Phone-test each recruited early traveller's distinct first payoff in an ordinary campaign and use Mara, Edren and Sela's field contributions in real expeditions. Confirm Isolde's Brush/Ink flow persists, Bryn/Orsa remain honest people/diary/combat payoffs, hidden flora never leaks and Orsa recruitment does not invent a miniature Tavern.",
       "workstream": "engineering",
       "isPrimary": false
     },
