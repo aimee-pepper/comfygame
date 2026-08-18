@@ -272,13 +272,14 @@ final class ConsumableCraftingTests: XCTestCase {
             tiles: Array(repeating: Tile(isRevealed: false), count: 225),
             entry: GridPoint(x: 7, y: 7))
         state.worlds.activeRun?.playerPosition = GridPoint(x: 7, y: 7)
+        state.worlds.activeRun?.torchVisionBonus = 10
         var hiddenTraits = CreatureTraits()
         hiddenTraits.defence = .crypsis
         let hidden = WorldEnemy(id: InstanceID(rawValue: 910), traits: hiddenTraits,
                                 position: GridPoint(x: 7, y: 14))
         let visibleTraits = CreatureTraits()
         let visible = WorldEnemy(id: InstanceID(rawValue: 911), traits: visibleTraits,
-                                 position: GridPoint(x: 0, y: 0))
+                                 position: GridPoint(x: 8, y: 7))
         state.worlds.activeRun?.enemies = [hidden, visible]
         state.worlds.activeRun?.map[hidden.position].isRevealed = true
         state.worlds.activeRun?.map[visible.position].isRevealed = true
@@ -293,6 +294,7 @@ final class ConsumableCraftingTests: XCTestCase {
             tiles: Array(repeating: Tile(isRevealed: false), count: 225),
             entry: GridPoint(x: 7, y: 7))
         onlyHidden.worlds.activeRun?.playerPosition = GridPoint(x: 7, y: 7)
+        onlyHidden.worlds.activeRun?.torchVisionBonus = 10
         onlyHidden.worlds.activeRun?.enemies = [hidden]
         onlyHidden.worlds.activeRun?.map[hidden.position].isRevealed = true
         let hiddenLure = try XCTUnwrap(onlyHidden.worlds.activeRun?.satchelItems.stacks.first?.id)
