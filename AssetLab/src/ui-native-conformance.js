@@ -25,7 +25,7 @@ export const nativeConformance={
   "survey-post":failed("StationViews.swift",["Native owns measurement disclosure, trip packing, instrument improvement and ResearchTree; the mock invents a graph and Study rail."]),
   apothecary:failed("ApothecaryView.swift",["The mock invents category tabs and omits the learned-recipe workflow and Scent Mask source selection."]),
   reliquary:failed("StationViews.swift",["Native Reliquary is passive field interpretation; the singular-object collection and actions are invented."]),
-  "wayfarer-s-table":failed("StationViews.swift",["The mock still invents bottom actions and hardcodes a bonus instead of live total satchel capacity."]),
+  "wayfarer-s-table":{status:"verified",source:"StationViews.swift:229-250 + BaseState.swift:242-245 + Tuning.swift:925-931",issues:[]},
   anchorage:failed("StationViews.swift",["The mock invents a realm orbit and global actions while omitting Anchor Frame and per-realm lifecycle controls."]),
   distillery:failed("StationViews.swift",["The mock invents tabs and gauges and omits attunement cards, sample/catalyst selection and readiness."]),
   channelworks:failed("StationViews.swift",["The mock invents route planning; native owns one conduit housing and Build another."]),

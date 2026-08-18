@@ -80,6 +80,8 @@ assert.match(css,/\.town-scene\{height:624px/,"Home scene must own the full phon
 assert.match(renderScreen("Home"),/town-tabs/,"Home destinations must overlay the scene instead of shrinking it");
 assert.match(renderScreen("Home"),/>Bind &amp; Depart<|>Bind & Depart</,"Home must not claim the Base action binds a named existing world");
 assert.doesNotMatch(renderScreen("Wayfarer’s Table"),/bottom-rail|route-table|Review departure/,"Wayfarer must remain the native informational station, without invented planning or actions");
+assert.match(renderScreen("Wayfarer’s Table"),/Satchel capacity[\s\S]*10 slots[\s\S]*Organic harvests[\s\S]*\+1 each[\s\S]*Visible flora[\s\S]*identified on sight/,"Wayfarer must render the exact current tier-zero fieldcraft benefits");
+assert.equal(nativeConformance["wayfarer-s-table"].status,"verified","Wayfarer may reopen implementation review only after its passive native contract is exact");
 for(const marker of new Set(Object.values(requiredMarkers))){
   const className=marker.replace(/^class=\\?"|\\?"$/g,"");
   assert.match(css,new RegExp(`\\.${className}`),`${className} needs an authored style contract`);
