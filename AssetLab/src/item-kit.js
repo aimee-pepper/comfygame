@@ -9,7 +9,7 @@ export const itemIconHash=family=>{const occupied=new Set();for(const {x,y,w,h} 
 export const catalogueItemVisualVersion="catalogue-item-visual-1.0.0";
 export const catalogueItemIDs=Object.freeze([
   "blade_chipped","bone_awl","field_maul","long_pick","split_board","padded_cap","guard_padded","wrapped_hands","worn_boots","bent_pick","pressed_leaf",
-  "salve_lesser","salve","salve_greater","draught_clearing","draught_quenching","antidote_broad","stonebark_tonic","venom","firebrand","briar_oil","flashsalt","solvent","lure","stillwater","waystone","torch","farsight_draught",
+  "salve_lesser","salve","salve_greater","draught_clearing","draught_quenching","antidote_broad","stonebark_tonic","venom","firebrand","briar_oil","flashsalt","solvent","lure","scent_mask","stillwater","waystone","torch","farsight_draught",
   "curio_humming_shard","curio_bound_knot"
 ]);
 const green="#79b56f",blue="#72a7c4",red="#b96055",purple="#8d78b2",gold="#d8bd82";
@@ -38,6 +38,7 @@ const catalogueShapes=Object.freeze({
   flashsalt:[[7,11,18,16,gold],[11,6,10,6,light],[14,2,4,5,metal],[4,7,5,3,light],[23,6,5,3,light],[14,15,4,8,ink]],
   solvent:[[12,4,8,5,metal],[11,8,10,20,blue],[7,12,5,3,light],[20,17,6,3,light],[14,13,4,10,ink]],
   lure:[[8,10,16,16,cloth],[11,5,10,6,metal],[5,15,5,5,red],[22,15,5,5,red],[13,14,6,6,light],[15,25,2,5,cloth]],
+  scent_mask:[[9,9,14,18,cloth],[12,5,8,5,metal],[5,12,5,3,green],[3,17,8,3,green],[21,11,6,3,light],[23,16,6,3,light],[13,14,6,8,ink]],
   stillwater:[[6,13,20,13,blue],[9,8,14,6,light],[13,4,6,5,metal],[4,19,5,4,blue],[23,16,5,4,blue],[10,18,12,2,ink]],
   waystone:[[14,8,4,21,metal],[7,5,18,4,light],[7,2,4,8,gold],[14,1,4,8,gold],[21,2,4,8,gold],[10,13,12,4,purple],[5,26,22,3,ink]],
   torch:[[14,11,4,19,cloth],[10,6,12,8,red],[12,2,8,7,gold],[8,9,6,6,red],[18,8,6,6,gold]],

@@ -9,9 +9,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const live = JSON.parse(fs.readFileSync(path.join(root, "Sources/Content/Data/items.json"), "utf8"));
 const liveConsumables = live.items.filter((item) => item.kind === "consumable").map((item) => item.id);
 assert.deepEqual(allPreparationIDs, liveConsumables);
-assert.deepEqual(Object.values(preparationFamilies).map((items) => items.length), [7, 4, 6]);
+assert.deepEqual(Object.values(preparationFamilies).map((items) => items.length), [7, 4, 7]);
 assert.ok(allPreparationIDs.every((id) => catalogueItemIDs.includes(id)));
-assert.equal(new Set(allPreparationIDs.map(catalogueItemSilhouetteHash)).size, 17);
+assert.equal(new Set(allPreparationIDs.map(catalogueItemSilhouetteHash)).size, 18);
 const request = { capacity: 3, stock: [{ itemID: "salve_lesser", count: 1 }, { itemID: "torch", count: 4 }, { itemID: "waystone", count: 0 }, { itemID: "venom", count: 2 }], entries: [{ itemID: "torch", desiredCount: 2, order: 2 }, { itemID: "salve_lesser", desiredCount: 3, order: 1 }, { itemID: "waystone", desiredCount: 1, order: 3 }, { itemID: "venom", desiredCount: 1, order: 4 }] };
 const resolved = resolveFieldKit(request);
 assert.deepEqual(resolved.rows.map(({ itemID, packedCount, stockShortageCount, unpackedCount, exclusionReason }) => ({ itemID, packedCount, stockShortageCount, unpackedCount, exclusionReason })), [{ itemID: "salve_lesser", packedCount: 1, stockShortageCount: 2, unpackedCount: 2, exclusionReason: null }, { itemID: "torch", packedCount: 2, stockShortageCount: 0, unpackedCount: 0, exclusionReason: null }, { itemID: "waystone", packedCount: 0, stockShortageCount: 1, unpackedCount: 1, exclusionReason: "no-stock" }, { itemID: "venom", packedCount: 1, stockShortageCount: 0, unpackedCount: 0, exclusionReason: null }]);

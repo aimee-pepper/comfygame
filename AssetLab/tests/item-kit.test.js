@@ -15,7 +15,7 @@ assert.equal(itemDisplayMeta(equipmentFixtures[equipmentGridSelectionProof.selec
 for(const slot of gearSlots){for(const item of resolveEquipmentFilter(slot).items)assert.deepEqual(itemDisplayMeta(item),itemDisplayMeta(equipmentFixtures.find(candidate=>candidate.id===item.id)),`${item.id} metadata must not change under ${slot} filtering`);}assert.equal(itemDisplayMeta(resolveEquipmentFilter("keepsake").items[0]).known,false,"filtering must not identify an unknown item");assert.equal(itemDisplayMeta(resolveEquipmentFilter("head").items[0]).provenance,"Known inventory record","filtering must not assign first-cell crafted provenance");assert.throws(()=>itemDisplayMeta({id:"missing"}),/unknown-equipment-fixture/);
 assert.equal(itemCountLabel(0),"0 items");assert.equal(itemCountLabel(1),"1 item");assert.equal(itemCountLabel(11),"11 items");
 assert.equal(catalogueItemVisualVersion,"catalogue-item-visual-1.0.0");
-assert.equal(catalogueItemIDs.length,30,"first exact-ID slice is 11 ordinary gear + 17 consumables + 2 curios");
+assert.equal(catalogueItemIDs.length,31,"exact-ID slice is 11 ordinary gear + 18 consumables + 2 curios");
 assert.equal(new Set(catalogueItemIDs).size,catalogueItemIDs.length,"catalogue IDs map exactly once");
 const catalogueHashes=catalogueItemIDs.map(catalogueItemSilhouetteHash);assert.equal(new Set(catalogueHashes).size,catalogueHashes.length,"every known first-slice item requires a distinct native grayscale silhouette");
 for(const id of catalogueItemIDs){const bounds=commandBounds(catalogueItemIconCommands(id));assert.ok(bounds.minX>=0&&bounds.minY>=0&&bounds.maxX<=32&&bounds.maxY<=32,`${id} stays inside 32px`);assert.deepEqual(catalogueItemIconCommands(id),catalogueItemIconCommands(id),`${id} is deterministic`);}

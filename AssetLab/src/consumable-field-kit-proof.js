@@ -3,7 +3,7 @@ export const consumableFieldKitProofVersion = "consumable-field-kit-proof-0.1.0"
 export const preparationFamilies = Object.freeze({
   treatments: Object.freeze(["salve_lesser", "salve", "salve_greater", "draught_clearing", "draught_quenching", "antidote_broad", "stonebark_tonic"]),
   coatings: Object.freeze(["venom", "firebrand", "briar_oil", "flashsalt"]),
-  fieldwork: Object.freeze(["solvent", "lure", "stillwater", "waystone", "torch", "farsight_draught"]),
+  fieldwork: Object.freeze(["solvent", "lure", "scent_mask", "stillwater", "waystone", "torch", "farsight_draught"]),
 });
 
 export const allPreparationIDs = Object.freeze(Object.values(preparationFamilies).flat());
