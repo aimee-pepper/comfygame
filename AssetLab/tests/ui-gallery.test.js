@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {preservationLedger} from "../src/ui-preservation-ledger.js";
-import {renderers,renderScreen,screens} from "../src/ui-gallery-app.js";
+import {fontChoices,renderers,renderScreen,screens} from "../src/ui-gallery-app.js";
 const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
 const galleryHtml=await readFile(new URL("../ui-gallery.html",import.meta.url),"utf8");
 const required=["Campaigns","Home","Writing Desk","Storehouse","Workshop","Party","Essence Spring","Constellation","Library","Bestiary","Research","World History","Blacksmith","Trading Post","Recycler","Tannery","Bowyer","Armoury","Weaponsmith","Scriptorium","Survey Post","Apothecary","Reliquary","Wayfarer’s Table","Anchorage","Distillery","Channelworks","Firepit","Gear","World","Encounter","Loot Decision","Return Recap","Settings"];
@@ -32,7 +32,10 @@ assert.match(renderScreen("Campaigns"),/OLDER TEST VERSION 12/,"campaign proposa
 assert.match(renderScreen("Apothecary"),/Scent Mask/,"Apothecary must represent the live learned treatment truthfully");
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
-assert.match(css,/@font-face\{font-family:"Press Start 2P"/,"gallery must bundle its pixel display font");
+assert.match(css,/@font-face\{font-family:"Pixelify Sans"/,"gallery must bundle its compact mixed-case pixel display font");
+assert.deepEqual(fontChoices.map(({id})=>id),["pixelify","jersey","silkscreen","tiny5"],"font chooser order is a deliberate review contract");
+assert.match(galleryHtml,/id="pixel-font-choice"/,"gallery must expose a live pixel-font chooser");
+for(const family of ["Jersey 10","Silkscreen","Tiny5"])assert.match(css,new RegExp(`font-family:\"${family}\"`),`${family} must be bundled for live comparison`);
 assert.match(css,/--font-reading/,"long prose must retain a separate readable face");
 assert.match(galleryHtml,/Pixel display type owns titles, labels and controls/,"gallery must make the pixel/display prose split reviewable");
 assert.match(css,/town-starting-home-v1-phone-v2\.png/,"Home must use the phone-composed full-scene asset");

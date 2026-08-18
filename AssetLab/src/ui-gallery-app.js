@@ -38,6 +38,12 @@ const screens=[
 ].map(([title,category,type,purpose],index)=>({id:title.toLowerCase().replaceAll(/[^a-z0-9]+/g,"-"),title,category,type,purpose,index}));
 
 const $=id=>document.getElementById(id),categories=["All",...new Set(screens.map(s=>s.category))];
+const fontChoices=[
+  {id:"pixelify",label:"Pixelify Sans · readable"},
+  {id:"jersey",label:"Jersey 10 · compact"},
+  {id:"silkscreen",label:"Silkscreen · crisp"},
+  {id:"tiny5",label:"Tiny5 · tiny-grid"}
+];
 let active=screens[0],category="All",state="Default",query="";
 const marks={Campaign:"CB",Village:"VI",Writing:"IN",Making:"MK",People:"PE",Knowledge:"KN",Expedition:"EX",Utility:"UT"};
 const notes={
@@ -122,10 +128,18 @@ function renderIndex(){const list=filtered();$("screen-count").textContent=`${li
 function render(){renderIndex();const preservation=preservationFor(active.title);$("screen-category").textContent=active.category;$("screen-title").textContent=active.title;$("screen-purpose").textContent=active.purpose;$("phone").innerHTML=renderScreen(active.title,state);$("screen-notes").innerHTML=(notes[active.type]||notes.default).map(n=>`<li>${n}</li>`).join("");$("preserve-source").textContent=preservation.source;$("preserve-list").innerHTML=preservation.preserve.map(n=>`<li>${n}</li>`).join("");$("state-switcher").innerHTML=["Default","Selected","Confirm"].map(v=>`<button aria-pressed="${v===state}">${v}</button>`).join("");document.querySelectorAll("#state-switcher button").forEach(b=>b.onclick=()=>{state=b.textContent;render()})}
 function step(delta){const i=screens.indexOf(active);active=screens[(i+delta+screens.length)%screens.length];category="All";document.querySelectorAll("#category-tabs button").forEach((x,j)=>x.setAttribute("aria-pressed",j===0));render()}
 if(typeof document!=="undefined"){
+  const fontSelect=$("pixel-font-choice");
+  fontSelect.innerHTML=fontChoices.map(({id,label})=>`<option value="${id}">${label}</option>`).join("");
+  let savedFont="pixelify";
+  try{savedFont=localStorage.getItem("bookbinder-ui-font")||savedFont}catch{}
+  if(!fontChoices.some(({id})=>id===savedFont))savedFont="pixelify";
+  fontSelect.value=savedFont;
+  document.documentElement.dataset.pixelFont=savedFont;
+  fontSelect.onchange=()=>{document.documentElement.dataset.pixelFont=fontSelect.value;try{localStorage.setItem("bookbinder-ui-font",fontSelect.value)}catch{}};
   $("category-tabs").innerHTML=categories.map(c=>`<button aria-pressed="${c===category}">${c}</button>`).join("");
   document.querySelectorAll("#category-tabs button").forEach(b=>b.onclick=()=>{category=b.textContent;document.querySelectorAll("#category-tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(!filtered().includes(active))active=filtered()[0]||screens[0];render()});
   $("screen-search").oninput=e=>{query=e.target.value.toLowerCase().trim();renderIndex()};
   $("previous-screen").onclick=()=>step(-1);$("next-screen").onclick=()=>step(1);render();
 }
 
-export {renderers,renderScreen,screens};
+export {fontChoices,renderers,renderScreen,screens};
