@@ -274,11 +274,25 @@ function writingPreviewState(control,currentState){
   if(control==="Compounds")return "Runebook";
   return null;
 }
+function previewActionState(screenID,control,currentState){
+  if(screenID==="world"&&control==="Look")return "Look";
+  if(screenID==="world"&&control==="Cancel")return "Travel";
+  if(screenID==="return-recap"&&control==="receipt")return "Receipt detail";
+  if(screenID==="return-recap"&&control==="Done")return currentState==="Receipt detail"?"Returned":currentState;
+  return null;
+}
 function bindPreviewInteractions(){
-  if(active.id!=="writing-desk"||implementationApprovals[active.id])return;
-  document.querySelectorAll("#phone .writing-pane-tabs button,#phone .pages-section-tabs button,#phone .target-bin-rail button").forEach(button=>{
+  if(implementationApprovals[active.id])return;
+  if(active.id==="writing-desk")document.querySelectorAll("#phone .writing-pane-tabs button,#phone .pages-section-tabs button,#phone .target-bin-rail button").forEach(button=>{
     button.onclick=()=>{const next=writingPreviewState(button.textContent.trim(),state);if(next&&next!==state){state=next;render()}};
   });
+  if(active.id==="world")document.querySelectorAll("#phone .world-actions button").forEach(button=>{
+    button.onclick=()=>{const next=previewActionState(active.id,button.textContent.trim(),state);if(next&&next!==state){state=next;render()}};
+  });
+  if(active.id==="return-recap"){
+    document.querySelectorAll("#phone .recap-tile").forEach(button=>button.onclick=()=>{state=previewActionState(active.id,"receipt",state);render()});
+    const done=document.querySelector("#phone .recap-detail .detail-close");if(done)done.onclick=()=>{state=previewActionState(active.id,"Done",state);render()};
+  }
 }
 function updateImplementationReview(choice,notes=""){
   implementationDrafts[active.id]={choice,notes,designVersion:conformanceFor(active.id).designVersion};
@@ -317,4 +331,4 @@ if(typeof document!=="undefined"){
   $("previous-screen").onclick=()=>step(-1);$("next-screen").onclick=()=>step(1);render();
 }
 
-export {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens,writingPreviewState};
+export {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,previewActionState,renderers,renderScreen,reviewStorageKey,screens,writingPreviewState};

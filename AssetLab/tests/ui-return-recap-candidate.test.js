@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
-import {fixtureStatesByScreen,renderScreen} from "../src/ui-gallery-app.js";
+import {fixtureStatesByScreen,previewActionState,renderScreen} from "../src/ui-gallery-app.js";
 
 const states=["Returned","Collapsed","Receipt detail"];
 assert.deepEqual(fixtureStatesByScreen["return-recap"],states,"World exit must expose return, collapse and exact-detail review states");
 
 const rendered=Object.fromEntries(states.map(state=>[state,renderScreen("Return Recap",state)]));
+assert.equal(previewActionState("return-recap","receipt","Returned"),"Receipt detail","tapping an exact receipt tile must open its anchored detail");
+assert.equal(previewActionState("return-recap","Done","Receipt detail"),"Returned","Done must dismiss the anchored receipt detail");
 for(const [state,html] of Object.entries(rendered)){
   assert.match(html,/return-outcome/,`${state} must lead with the persisted expedition outcome`);
   assert.match(html,/Turns[\s\S]*Haul/,`${state} must preserve turns and haul fraction`);

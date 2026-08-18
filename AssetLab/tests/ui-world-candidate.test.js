@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
-import {fixtureStatesByScreen,renderScreen} from "../src/ui-gallery-app.js";
+import {fixtureStatesByScreen,previewActionState,renderScreen} from "../src/ui-gallery-app.js";
 
 const states=["Compare versions","Previous layout","Travel","Look","Harvest","Search","Portal","Cache","Survey & anchor","Loose page","Night sight"];
 
 assert.deepEqual(fixtureStatesByScreen.world,states,"World must expose the exact current travel and interaction proof states");
 
 const rendered=Object.fromEntries(states.map(state=>[state,renderScreen("World",state)]));
+
+assert.equal(previewActionState("world","Look","Travel"),"Look","the in-phone Look action must arm inspection mode");
+assert.equal(previewActionState("world","Cancel","Look"),"Travel","the in-phone Cancel action must return to travel controls");
 
 assert.match(rendered["Compare versions"],/world-candidate/,"the screen renderer must remain a full-size current phone while the gallery shell owns comparison layout");
 assert.doesNotMatch(rendered["Compare versions"],/world-version-compare|Previous layout/,"the screen renderer must never squeeze two versions into one phone pane");
