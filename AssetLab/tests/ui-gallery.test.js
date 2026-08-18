@@ -20,7 +20,7 @@ for(const title of required){
 }
 const requiredMarkers={
   Campaigns:"book-progress",Home:"town-scene","Writing Desk":"writing-desk",Storehouse:"storehouse-cabinet",Workshop:"project-strip",Party:"party-formation",
-  "Essence Spring":"spring-basin",Constellation:"constellation-field",Blacksmith:"comparison-rack",
+  "Essence Spring":"spring-basin",Constellation:"constellation-field",Library:"library-catalogue",Bestiary:"specimen-folio","World History":"world-archive",Blacksmith:"comparison-rack",
   Recycler:"salvage-table",Tannery:"hide-frame",Bowyer:"bow-jig",Armoury:"armour-stand",
   Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"reliquary-room",
   "Wayfarer’s Table":"route-table",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
@@ -30,6 +30,9 @@ for(const [title,marker] of Object.entries(requiredMarkers))assert.match(renderS
 assert.match(renderScreen("Constellation","Confirm"),/fixed in place/,"fixture states must execute stateful renderer branches");
 assert.match(renderScreen("Campaigns"),/OLDER TEST VERSION 12/,"campaign proposal must preserve explicit legacy-version handling");
 assert.match(renderScreen("Apothecary"),/Scent Mask/,"Apothecary must represent the live learned treatment truthfully");
+assert.match(renderScreen("Library"),/Unknown and legacy records remain unguessed/,"Library must not infer missing record identity");
+assert.match(renderScreen("Bestiary"),/quadruped · long ears[\s\S]*sinuous · membrane appendage/,"Bestiary must preserve materially different generated morphology");
+assert.match(renderScreen("World History"),/Earlier[\s\S]*World 9[\s\S]*Later[\s\S]*World 12/,"History must expose chronology independently of selection order");
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
 assert.match(css,/@font-face\{font-family:"Pixelify Sans"/,"gallery must bundle its compact mixed-case pixel display font");
