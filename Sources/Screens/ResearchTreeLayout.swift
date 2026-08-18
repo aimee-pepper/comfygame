@@ -275,16 +275,18 @@ private struct ResearchNodeDetail: View {
                 if !grant.isEmpty { LabeledContent("Grants", value: grant) }
                 prerequisites
                 LabeledContent("Cost", value: costText)
-                if !store.shortfall(for: node).isEmpty {
-                    Text("Needs: \(store.shortfall(for: node).joined(separator: " · "))")
+                let purchase = store.researchPurchasePreview(for: node)
+                if !purchase.shortfall.isEmpty {
+                    Text("Needs: \(purchase.shortfall.joined(separator: " · "))")
                         .font(.caption).foregroundStyle(.secondary)
                 }
+                if node.branch == "penmanship" { runway(purchase) }
                 if store.isSuppliedByKeeper(node) {
                     Label("Supplied by keeper", systemImage: "person.crop.circle.badge.checkmark")
                         .foregroundStyle(.teal)
                 } else if !store.isComplete(node) {
                     Button("Study") {
-                        if store.research(node) { dismiss() }
+                        if store.research(purchase, node: node) == .committed { dismiss() }
                     }
                     .buttonStyle(.borderedProminent)
                     .frame(maxWidth: .infinity, minHeight: 44)
@@ -294,6 +296,31 @@ private struct ResearchNodeDetail: View {
             .padding(16)
         }
         .frame(minWidth: 300, idealWidth: 330, maxWidth: 360, minHeight: 260)
+    }
+
+    @ViewBuilder
+    private func runway(_ preview: EconomyRules.ResearchPurchasePreview) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            LabeledContent("Spendable Essence now", value: "\(preview.spendableEssenceNow)")
+            LabeledContent("After study", value: "\(preview.spendableEssenceAfter)")
+            if let cost = preview.authoredBindCost,
+               let remaining = preview.authoredBindsRemaining {
+                LabeledContent(preview.bindCostBasis == .recentMedian
+                               ? "Recent median authored bind"
+                               : "Current authored bind preview",
+                               value: cost.formatted(.number.precision(.fractionLength(0...1))))
+                LabeledContent("Ordinary authored binds remaining",
+                               value: "≈ \(remaining.formatted(.number.precision(.fractionLength(1))))")
+            } else {
+                Text("Write an authored page to estimate the remaining binding runway.")
+            }
+            if preview.isLowWritingRunway {
+                Label("Low writing runway", systemImage: "exclamationmark.triangle")
+                    .foregroundStyle(.orange)
+            }
+        }
+        .font(.caption.monospacedDigit())
+        .foregroundStyle(.secondary)
     }
 
     private var prerequisites: some View {

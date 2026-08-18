@@ -8,6 +8,37 @@ import Foundation
 /// the player actually has.
 enum EconomyRules {
 
+    static let recentAuthoredBindLimit = 5
+
+    enum ResearchPurchaseRefusal: Equatable, Sendable {
+        case stalePreview
+        case unavailable
+        case shortfall([String])
+    }
+
+    enum ResearchPurchaseResult: Equatable, Sendable {
+        case committed
+        case refused(ResearchPurchaseRefusal)
+    }
+
+    enum BindRunwayBasis: Equatable, Sendable {
+        case recentMedian
+        case currentAuthoredPreview
+    }
+
+    struct ResearchPurchasePreview: Equatable, Sendable {
+        var nodeID: ResearchNodeID
+        var cost: UpgradeCost
+        var spendableEssenceNow: Int
+        var spendableEssenceAfter: Int
+        var authoredBindCost: Double?
+        var bindCostBasis: BindRunwayBasis?
+        var authoredBindsRemaining: Double?
+        var isLowWritingRunway: Bool
+        var shortfall: [String]
+        var isAvailable: Bool
+    }
+
     // MARK: Refining
 
     struct RefinementReceipt: Equatable, Sendable {
@@ -215,6 +246,65 @@ enum EconomyRules {
             resources: node.cost.resources.mapValues {
                 StationStaffingRules.discounted($0, at: station, in: state)
             })
+    }
+
+    /// The exact advisory shown before a research purchase. Continuation is never reserved, but
+    /// it is never hidden either. Paid authored history wins; a current authored draft is the
+    /// fallback for fresh/teleported fixtures. An empty page is deliberately not treated as a
+    /// healthy ordinary ten-Essence bind.
+    static func researchPurchasePreview(for node: ResearchNodeDef,
+                                        in state: GameState) -> ResearchPurchasePreview {
+        let cost = paidCost(for: node, in: state)
+        let spendableNow = spendableEssence(in: state)
+        let recentPaid = state.reality.library.visitedWorlds.reversed().compactMap { world -> Int? in
+            guard !world.semanticRequests.isEmpty,
+                  let paid = world.bindEssencePaid, paid > 0 else { return nil }
+            return paid
+        }.prefix(recentAuthoredBindLimit).sorted()
+
+        let median: Double? = {
+            guard !recentPaid.isEmpty else { return nil }
+            let middle = recentPaid.count / 2
+            if recentPaid.count.isMultiple(of: 2) {
+                return Double(recentPaid[middle - 1] + recentPaid[middle]) / 2
+            }
+            return Double(recentPaid[middle])
+        }()
+        let currentAuthoredCost: Double? = TutorialRules.semanticRequests(on: state.base.page).isEmpty
+            ? nil
+            : Double(BookRules.resolveBook(page: state.base.page).essencePaid)
+        let bindCost = median ?? currentAuthoredCost
+        let basis: BindRunwayBasis? = median != nil ? .recentMedian
+            : (currentAuthoredCost != nil ? .currentAuthoredPreview : nil)
+        let after = max(0, spendableNow - cost.essence)
+        let remaining = bindCost.map { $0 > 0 ? Double(after) / $0 : 0 }
+        return ResearchPurchasePreview(
+            nodeID: node.id,
+            cost: cost,
+            spendableEssenceNow: spendableNow,
+            spendableEssenceAfter: after,
+            authoredBindCost: bindCost,
+            bindCostBasis: basis,
+            authoredBindsRemaining: remaining,
+            isLowWritingRunway: remaining.map { $0 < 2 } ?? false,
+            shortfall: shortfall(cost, in: state),
+            isAvailable: isAvailable(node, in: state)
+        )
+    }
+
+    /// Revalidates the entire displayed quote before taking anything. A changed discount, stock,
+    /// authored-cost basis, prerequisite, or completion state refuses without partial payment.
+    static func commitResearchPurchase(_ preview: ResearchPurchasePreview,
+                                       node: ResearchNodeDef,
+                                       in state: inout GameState) -> ResearchPurchaseResult {
+        guard preview.nodeID == node.id,
+              preview == researchPurchasePreview(for: node, in: state)
+        else { return .refused(.stalePreview) }
+        guard preview.isAvailable else { return .refused(.unavailable) }
+        guard preview.shortfall.isEmpty else { return .refused(.shortfall(preview.shortfall)) }
+        pay(preview.cost, in: &state)
+        complete(node, in: &state)
+        return .committed
     }
 
     /// What you're short of, for the UI to say so plainly instead of just greying a button out.

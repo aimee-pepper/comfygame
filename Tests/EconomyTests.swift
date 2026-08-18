@@ -290,6 +290,83 @@ final class EconomyTests: XCTestCase {
 
     // MARK: Research
 
+    func testPenmanshipPreviewUsesRecentAuthoredMedianAndShowsLowRunway() throws {
+        var state = GameState.newGame()
+        state.base.essence = 45
+        state.base.resources.add(5, of: Resources.essenceRaw)
+        state.reality.library.visitedWorlds = [8, 10, 12].enumerated().map { offset, paid in
+            VisitedWorld(id: InstanceID(rawValue: UInt64(offset + 1)), seed: UInt64(offset + 1),
+                         runIndex: offset, descriptionSentence: "", written: ["Light ← Sun"],
+                         inertModifiers: [], readings: [:], travellersPresent: [],
+                         bindEssencePaid: paid)
+        }
+        let brush = try node("pen_brush")
+        let preview = EconomyRules.researchPurchasePreview(for: brush, in: state)
+
+        let expectedNow = 45 + EconomyRules.refine(rawUnits: 5, in: state)
+        XCTAssertEqual(preview.spendableEssenceNow, expectedNow)
+        XCTAssertEqual(preview.spendableEssenceAfter, expectedNow - brush.cost.essence)
+        XCTAssertEqual(preview.authoredBindCost, 10)
+        XCTAssertEqual(preview.bindCostBasis, .recentMedian)
+        XCTAssertEqual(preview.authoredBindsRemaining,
+                       Double(expectedNow - brush.cost.essence) / 10)
+        XCTAssertTrue(preview.isLowWritingRunway)
+    }
+
+    func testPenmanshipPreviewFallsBackToCurrentAuthoredDraftNotBlankMinimum() throws {
+        var state = GameState.newGame()
+        let target = PlacedRune(id: InstanceID(rawValue: 1), content: .target("illumination"),
+                                hand: .crude, origin: .init(column: 0, row: 0),
+                                shapeID: "crude_block")
+        let source = PlacedRune(id: InstanceID(rawValue: 2), content: .source("sun"),
+                                hand: .crude, origin: .init(column: 2, row: 0),
+                                shapeID: "crude_block")
+        state.base.page = Page(runes: [target, source], links: [MarkLink(target.id, source.id)])
+        let brush = try node("pen_brush")
+        let preview = EconomyRules.researchPurchasePreview(for: brush, in: state)
+
+        XCTAssertEqual(preview.bindCostBasis, .currentAuthoredPreview)
+        XCTAssertEqual(preview.authoredBindCost,
+                       Double(BookRules.resolveBook(page: state.base.page).essencePaid))
+
+        state.base.page = Page()
+        let blank = EconomyRules.researchPurchasePreview(for: brush, in: state)
+        XCTAssertNil(blank.authoredBindCost,
+                     "the ten-Essence emergency minimum is not an ordinary authored baseline")
+        XCTAssertNil(blank.authoredBindsRemaining)
+    }
+
+    func testPenmanshipQuoteHasExactShortfallAndStaleCommitLosesNothing() throws {
+        let store = GameStore(io: .temporary(name: "penmanship-runway-\(UUID().uuidString)"))
+        store.mutate("prepare brush") { state in
+            state.base.stations[Stations.scriptorium] = StationState(isUnlocked: true, tier: 0)
+            state.base.essence = 45
+            state.base.resources.add(2, of: "copper")
+            state.base.resources.add(5, of: Resources.fiber)
+            state.base.resources.add(4, of: Resources.timber)
+        }
+        let brush = try node("pen_brush")
+        let missing = store.researchPurchasePreview(for: brush)
+        XCTAssertEqual(missing.shortfall, ["1 fibre"])
+
+        store.mutate("finish stock") { $0.base.resources.add(1, of: Resources.fiber) }
+        let quote = store.researchPurchasePreview(for: brush)
+        XCTAssertTrue(quote.shortfall.isEmpty)
+        store.mutate("background stock change") { $0.base.resources.spend(1, of: "copper") }
+        let beforeRefusal = store.state
+        XCTAssertEqual(store.research(quote, node: brush), .refused(.stalePreview))
+        XCTAssertEqual(store.state, beforeRefusal)
+
+        store.mutate("restore exact stock") { $0.base.resources.add(1, of: "copper") }
+        let fresh = store.researchPurchasePreview(for: brush)
+        XCTAssertEqual(store.research(fresh, node: brush), .committed)
+        XCTAssertEqual(store.state.base.essence, 0)
+        XCTAssertEqual(store.state.base.resources["copper"], 0)
+        XCTAssertEqual(store.state.base.resources[Resources.fiber], 0)
+        XCTAssertEqual(store.state.base.resources[Resources.timber], 0)
+        XCTAssertTrue(store.state.base.completedResearch.contains(brush.id))
+    }
+
     func testResearchingANodeSpendsBothCurrenciesAndGrantsItsEffect() throws {
         let store = richStore()
         let shelving = try node("shelving_one")

@@ -309,6 +309,9 @@ extension GameStore {
         EconomyRules.missingPrerequisites(node, in: state)
     }
     func paidCost(for node: ResearchNodeDef) -> UpgradeCost { EconomyRules.paidCost(for: node, in: state) }
+    func researchPurchasePreview(for node: ResearchNodeDef) -> EconomyRules.ResearchPurchasePreview {
+        EconomyRules.researchPurchasePreview(for: node, in: state)
+    }
     func shortfall(for node: ResearchNodeDef) -> [String] {
         EconomyRules.shortfall(paidCost(for: node), in: state)
     }
@@ -321,12 +324,22 @@ extension GameStore {
     /// flat shopping list, only branches with prerequisites.
     @discardableResult
     func research(_ node: ResearchNodeDef) -> Bool {
-        guard canResearch(node) else { return false }
+        research(researchPurchasePreview(for: node), node: node) == .committed
+    }
+
+    @discardableResult
+    func research(_ preview: EconomyRules.ResearchPurchasePreview,
+                  node: ResearchNodeDef) -> EconomyRules.ResearchPurchaseResult {
+        guard preview.nodeID == node.id,
+              preview == EconomyRules.researchPurchasePreview(for: node, in: state)
+        else { return .refused(.stalePreview) }
+        guard preview.isAvailable else { return .refused(.unavailable) }
+        guard preview.shortfall.isEmpty else { return .refused(.shortfall(preview.shortfall)) }
+        var result: EconomyRules.ResearchPurchaseResult = .refused(.stalePreview)
         mutate("research \(node.id.rawValue)", flush: true) { state in
-            EconomyRules.pay(EconomyRules.paidCost(for: node, in: state), in: &state)
-            EconomyRules.complete(node, in: &state)
+            result = EconomyRules.commitResearchPurchase(preview, node: node, in: &state)
         }
-        return true
+        return result
     }
 
     /// How far along a branch is, for the Workshop's summary line.
