@@ -367,6 +367,48 @@ final class EconomyTests: XCTestCase {
         XCTAssertTrue(store.state.base.completedResearch.contains(brush.id))
     }
 
+    func testCompoundAssemblyResearchRevalidatesExactPurchaseAndUnlocksProvider() throws {
+        let store = GameStore(io: .temporary(name: "compound-research-\(UUID().uuidString)"))
+        let compound = try node("pen_compounds")
+
+        store.mutate("fund compound research") { state in
+            state.base.stations[Stations.scriptorium] = StationState(isUnlocked: true, tier: 1)
+            state.base.essence = compound.cost.essence
+            for (resource, amount) in compound.cost.resources {
+                state.base.resources.add(amount, of: resource)
+            }
+        }
+        XCTAssertFalse(store.isAvailable(compound), "Brush remains the authored prerequisite")
+        XCTAssertFalse(store.missingPrerequisites(for: compound).isEmpty)
+
+        store.mutate("learn prerequisite") { $0.base.completedResearch.insert("pen_brush") }
+        XCTAssertTrue(store.isAvailable(compound))
+        XCTAssertTrue(store.canResearch(compound))
+        let stale = store.researchPurchasePreview(for: compound)
+        store.mutate("background resource mutation") {
+            $0.base.resources.spend(1, of: Resources.pulp)
+        }
+        let beforeRefusal = store.state
+        XCTAssertEqual(store.research(stale, node: compound), .refused(.stalePreview))
+        XCTAssertEqual(store.state, beforeRefusal)
+        XCTAssertFalse(store.state.base.completedResearch.contains(compound.id))
+
+        store.mutate("restore exact stock") { $0.base.resources.add(1, of: Resources.pulp) }
+        let fresh = store.researchPurchasePreview(for: compound)
+        XCTAssertEqual(fresh.cost, compound.cost)
+        XCTAssertEqual(store.research(fresh, node: compound), .committed)
+        XCTAssertEqual(store.state.base.essence, 0)
+        for resource in compound.cost.resources.keys {
+            XCTAssertEqual(store.state.base.resources[resource], 0)
+        }
+        XCTAssertTrue(store.state.base.completedResearch.contains(compound.id))
+        XCTAssertNotEqual(
+            store.previewCompoundFormalization(fingerprint: "not-yet-proven", nickname: "Test"),
+            .refused(.locked),
+            "Completed research is the provider's durable Compound Assembly capability"
+        )
+    }
+
     func testResearchingANodeSpendsBothCurrenciesAndGrantsItsEffect() throws {
         let store = richStore()
         let shelving = try node("shelving_one")

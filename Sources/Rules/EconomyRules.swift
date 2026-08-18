@@ -130,15 +130,11 @@ enum EconomyRules {
     }
 
     /// Capability nodes may be authored before their complete player-facing consumer exists, but
-    /// they must never take payment while their grant would be inert. Keep this deliberately exact:
-    /// Brush, Ink Mixing, Chaining, station tiers and the Fountain pen have live consequences.
+    /// they must never take payment while their grant would be inert. All currently authored
+    /// capabilities have live consumers; keep this seam so a future incomplete capability can be
+    /// held without confusing its content prerequisites with implementation readiness.
     static func implementationAllows(_ node: ResearchNodeDef) -> String? {
-        switch node.id {
-        case "pen_compounds":
-            "Compound Assembly is not ready to learn yet."
-        default:
-            nil
-        }
+        nil
     }
 
     /// **Whether you have measured enough to be worth predicting with** (`crafting-spec.md` PART TWO).
