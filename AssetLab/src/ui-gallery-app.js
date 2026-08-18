@@ -38,7 +38,8 @@ const screens=[
   ["Settings","Utility","settings","Keep utilities compact and clearly outside village navigation."]
 ].map(([title,category,type,purpose],index)=>({id:title.toLowerCase().replaceAll(/[^a-z0-9]+/g,"-"),title,category,type,purpose,index}));
 
-const $=id=>document.getElementById(id),categories=["All",...new Set(screens.map(s=>s.category))];
+const priorityScreenIDs=new Set(["campaigns","home","writing-desk","world"]);
+const $=id=>document.getElementById(id),categories=["Priority","All",...new Set(screens.map(s=>s.category))];
 const fixtureStatesByScreen={"writing-desk":["Write","Runebook","Pages · Collected","Pages · Templates","Pages · Template actions","Pages · Replace draft","Pages · Rename Template","Pages · Overwrite Template","Pages · Delete Template","The world","Collected world","Born anchored","Clear Confirm"],world:["Compare versions","Previous layout","Travel","Look","Harvest","Search","Portal","Cache","Survey & anchor","Loose page","Night sight"],"return-recap":["Returned","Collapsed","Receipt detail"],constellation:["Default","Selected","Confirm","Bought"],settings:["Default","DEBUG"]};
 const reviewStorageKey="bookbinder.assetlab.ui-gallery-reviews.v1";
 const fontChoices=[
@@ -48,7 +49,7 @@ const fontChoices=[
   {id:"silkscreen",label:"Silkscreen · crisp"},
   {id:"tiny5",label:"Tiny5 · tiny-grid"}
 ];
-let active=screens[0],category="All",state="Default",query="";
+let active=screens[0],category="Priority",state="Default",query="";
 let implementationReviews={};
 let implementationDrafts={};
 let implementationApprovals={};
@@ -198,7 +199,7 @@ function renderScreen(title,fixtureState="Default"){
   try{return renderer()}finally{state=previousState}
 }
 
-function filtered(){return screens.filter(s=>(category==="All"||s.category===category)&&(!query||`${s.title} ${s.purpose}`.toLowerCase().includes(query)))}
+function filtered(){return screens.filter(s=>(category==="All"||category==="Priority"&&priorityScreenIDs.has(s.id)||s.category===category)&&(!query||`${s.title} ${s.purpose}`.toLowerCase().includes(query)))}
 function normalizeImplementationReviews(value){
   if(!value||typeof value!=="object"||Array.isArray(value))return{};
   return Object.fromEntries(screens.flatMap(({id})=>{
@@ -311,7 +312,7 @@ function updateImplementationReview(choice,notes=""){
 }
 function renderIndex(){const list=filtered();$("screen-count").textContent=`${list.length} of ${screens.length} screens`;$("screen-list").innerHTML=list.map(s=>`<button class="screen-choice" data-id="${s.id}" aria-current="${s===active}"><span class="route-mark">${marks[s.category]}</span><span><strong>${s.title}</strong><small>${s.purpose.split(" ").slice(0,6).join(" ")}…</small></span></button>`).join("");document.querySelectorAll(".screen-choice").forEach(b=>b.onclick=()=>{active=screens.find(s=>s.id===b.dataset.id);render()})}
 function render(){renderIndex();const preservation=preservationFor(active.title),approval=implementationApprovals[active.id],fixtureStates=approval?.fixtureStates??fixtureStatesByScreen[active.id]??["Default","Selected","Confirm"];if(!fixtureStates.includes(state))state=fixtureStates[0];const comparingWorld=!approval&&active.id==="world"&&state==="Compare versions";$("screen-category").textContent=active.category;$("screen-title").textContent=active.title;$("screen-purpose").textContent=active.purpose;$("gallery-shell").classList.toggle("comparing-phones-shell",comparingWorld);$("phone").hidden=comparingWorld;$("phone-comparison").hidden=!comparingWorld;$("phone-wrap").classList.toggle("comparing-phones",comparingWorld);$("phone-and-notes").classList.toggle("comparing-phones-layout",comparingWorld);$("phone-size").textContent=comparingWorld?"two independent 368 × 800 ordinary phones":"368 × 800 ordinary phone";if(comparingWorld){$("phone-comparison").innerHTML=`<article class="phone-comparison-column"><header><h3>Previous layout</h3><p>Earlier, denser lower-half composition.</p></header><div class="phone" aria-label="Previous World layout at 368 by 800 points">${renderWorldPrevious()}</div></article><article class="phone-comparison-column"><header><h3>Current redesign</h3><p>Current controls with the more open lower region.</p></header><div class="phone" aria-label="Current World redesign at 368 by 800 points">${renderWorldCurrent("Travel")}</div></article>`}else{$("phone").innerHTML=approval?`<iframe class="approved-ui-preview" title="Frozen approved ${active.title} · ${state}" sandbox src="/__ui-approved-preview?screenID=${encodeURIComponent(active.id)}&state=${encodeURIComponent(state)}"></iframe>`:renderScreen(active.title,state)}$("screen-notes").innerHTML=(notes[active.type]||notes.default).map(n=>`<li>${n}</li>`).join("");$("preserve-source").textContent=preservation.source;$("preserve-list").innerHTML=preservation.preserve.map(n=>`<li>${n}</li>`).join("");$("state-switcher").innerHTML=fixtureStates.map(v=>`<button aria-pressed="${v===state}">${v}</button>`).join("");document.querySelectorAll("#state-switcher button").forEach(b=>b.onclick=()=>{state=b.textContent;render()});renderImplementationReview()}
-function step(delta){const i=screens.indexOf(active);active=screens[(i+delta+screens.length)%screens.length];category="All";document.querySelectorAll("#category-tabs button").forEach((x,j)=>x.setAttribute("aria-pressed",j===0));render()}
+function step(delta){const sequence=filtered();if(!sequence.length)return;const i=Math.max(0,sequence.indexOf(active));active=sequence[(i+delta+sequence.length)%sequence.length];render()}
 if(typeof document!=="undefined"){
   try{implementationDrafts=normalizeImplementationReviews(JSON.parse(localStorage.getItem(reviewStorageKey)||"{}"))}catch{implementationDrafts={}}
   fetch("/__ui-reviews",{cache:"no-store"}).then(response=>response.ok?response.json():null).then(packet=>{
@@ -340,4 +341,4 @@ if(typeof document!=="undefined"){
   $("previous-screen").onclick=()=>step(-1);$("next-screen").onclick=()=>step(1);render();
 }
 
-export {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,previewActionState,renderers,renderScreen,reviewStorageKey,screens,writingPreviewState};
+export {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,previewActionState,priorityScreenIDs,renderers,renderScreen,reviewStorageKey,screens,writingPreviewState};

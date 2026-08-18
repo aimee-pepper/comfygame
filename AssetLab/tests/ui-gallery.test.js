@@ -1,13 +1,16 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {preservationLedger} from "../src/ui-preservation-ledger.js";
-import {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
+import {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,priorityScreenIDs,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
 const galleryApp=await readFile(new URL("../src/ui-gallery-app.js",import.meta.url),"utf8");
 const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
 const galleryHtml=await readFile(new URL("../ui-gallery.html",import.meta.url),"utf8");
 const required=["Campaigns","Home","Writing Desk","Storehouse","Workshop","Party","Essence Spring","Constellation","Library","Bestiary","Research","World History","Blacksmith","Trading Post","Recycler","Tannery","Bowyer","Armoury","Weaponsmith","Scriptorium","Survey Post","Apothecary","Reliquary","Wayfarer’s Table","Anchorage","Distillery","Channelworks","Firepit","Gear","World","Encounter","Loot Decision","Return Recap","Settings"];
 assert.deepEqual(screens.map(({title})=>title),required,"screen order is an intentional ordinary-phone contract");
 assert.deepEqual([...renderers.keys()],required,"every gallery entry must have one explicit renderer");
+assert.deepEqual([...priorityScreenIDs],["campaigns","home","writing-desk","world"],"the default review lane must stay focused on the four explicitly prioritized gameplay screens");
+assert.match(galleryApp,/category="Priority"/,"the gallery must open in the focused review lane rather than the 34-screen backlog");
+assert.match(galleryApp,/function step\(delta\)\{const sequence=filtered\(\)/,"Previous and Next must stay inside the selected review lane");
 assert.deepEqual(Object.keys(preservationLedger).sort(),required.slice().sort(),"every proposed screen must audit the native structure it preserves");
 for(const [title,[nativeSource,...facts]] of Object.entries(preservationLedger)){assert.match(nativeSource,/\.swift/,`${title} must name its native source`);assert.ok(facts.length>=2,`${title} needs explicit preservation facts`)}
 assert.match(css,/width:368px;height:800px/);
