@@ -1245,9 +1245,11 @@ private struct TileView: View {
                     .offset(x: side * 0.30, y: -side * 0.30)
             }
         }
-        .blur(radius: visibility == .fringe
-              ? side * CGFloat(WorldTileVisibilityPresentation.fringeBlurFraction(
-                  profile: visibilityProfile, remembered: isRememberedTerrain)) : 0)
+        .modifier(FringeTileBlur(
+            isActive: visibility == .fringe,
+            radius: side * CGFloat(WorldTileVisibilityPresentation.fringeBlurFraction(
+                profile: visibilityProfile, remembered: isRememberedTerrain)),
+            side: side))
         .overlay {
             switch visibility {
             case .full:
@@ -1362,6 +1364,27 @@ private struct TileView: View {
         if tile.isCrumbled { return Palette.mapVoid }
         // Unseen ground stays fog; seen ground shows what it's made of.
         return tile.isRevealed ? groundColour : Palette.mapFog
+    }
+}
+
+/// Fringe terrain keeps the same lifted sprite as full sight, but its blur must begin from the
+/// logical tile crop. Blurring the 16×19 lifted layer first pulls its off-tile padding into the
+/// visible 16×16 cell and creates a false dark band that full-sight tiles never show.
+private struct FringeTileBlur: ViewModifier {
+    let isActive: Bool
+    let radius: CGFloat
+    let side: CGFloat
+
+    @ViewBuilder func body(content: Content) -> some View {
+        if isActive {
+            content
+                .frame(width: side, height: side)
+                .clipped()
+                .compositingGroup()
+                .blur(radius: radius, opaque: true)
+        } else {
+            content
+        }
     }
 }
 

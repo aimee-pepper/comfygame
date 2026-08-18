@@ -2,6 +2,19 @@ import XCTest
 @testable import Bookbinder
 
 final class WorldVisibilityRulesTests: XCTestCase {
+    func testOnlyFringeTilesCropTheLiftedSpriteBeforeOpaqueBlur() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appendingPathComponent("Sources/Screens/WorldView.swift"),
+            encoding: .utf8)
+        XCTAssertTrue(source.contains(".modifier(FringeTileBlur("))
+        XCTAssertTrue(source.contains("if isActive {"))
+        XCTAssertTrue(source.contains(".frame(width: side, height: side)\n                .clipped()\n                .compositingGroup()\n                .blur(radius: radius, opaque: true)"))
+        XCTAssertTrue(source.contains("} else {\n            content\n        }"),
+                      "full-sight tiles must retain their existing unmodified rendering path")
+    }
+
     func testFullyExploredTerrainNeverFallsBelowFringeAfterLeavingSight() {
         XCTAssertEqual(WorldRules.terrainVisibility(current: .hidden, wasRevealed: true), .fringe)
         XCTAssertEqual(WorldRules.terrainVisibility(current: .fringe, wasRevealed: true), .fringe)
