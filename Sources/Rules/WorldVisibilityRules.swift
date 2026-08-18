@@ -84,33 +84,18 @@ extension WorldRules {
 
     static func visibility(of candidate: GridPoint, from origin: GridPoint,
                            in map: WorldMap, profile: VisibilityProfile) -> TileVisibility {
-        guard isWithinOuterVisibilityRange(candidate, from: origin, in: map, profile: profile)
-        else { return .hidden }
-        let distance = visibilityDistance(from: origin, to: candidate)
+        guard map.contains(candidate), map.contains(origin) else { return .hidden }
+        let dx = candidate.x - origin.x
+        let dy = candidate.y - origin.y
+        let distance = sqrt(Double(dx * dx + dy * dy))
         let fullBoundary = Double(profile.fullRadius) + 0.5
-        guard hasLineOfSight(from: origin, to: candidate, in: map,
+        let fringeBoundary = Double(profile.fullRadius + profile.fringeWidth) + 0.5
+        guard distance <= fringeBoundary,
+              hasLineOfSight(from: origin, to: candidate, in: map,
                              standing: map[origin].elevation)
         else { return .hidden }
         if distance <= fullBoundary { return .full }
         return profile.fringeOpacity > 0 ? .fringe : .hidden
-    }
-
-    /// Pure rules-owned range classification. Unlike `visibility`, this deliberately does not
-    /// conflate distance with line-of-sight occlusion or a dark fringe. Presentation uses it only
-    /// to distinguish remembered ground still inside the sight envelope from ground truly beyond
-    /// that envelope; entity and interaction disclosure continue to use `visibility`.
-    static func isWithinOuterVisibilityRange(_ candidate: GridPoint, from origin: GridPoint,
-                                             in map: WorldMap,
-                                             profile: VisibilityProfile) -> Bool {
-        guard map.contains(candidate), map.contains(origin) else { return false }
-        let boundary = Double(profile.fullRadius + profile.fringeWidth) + 0.5
-        return visibilityDistance(from: origin, to: candidate) <= boundary
-    }
-
-    private static func visibilityDistance(from origin: GridPoint, to candidate: GridPoint) -> Double {
-        let dx = candidate.x - origin.x
-        let dy = candidate.y - origin.y
-        return sqrt(Double(dx * dx + dy * dy))
     }
 
     static func visibility(of candidate: GridPoint, in run: WorldRun,
