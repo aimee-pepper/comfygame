@@ -519,7 +519,7 @@
       "signature": [
         { "condition": { "target": "substrate", "measure": "form", "key": "hard", "minimum": 50 }, "passage": "The ground is hard and unyielding under every step. Good. An honest consequence can be prepared for." },
         { "condition": { "target": "relief", "measure": "aspect", "key": "verticality", "minimum": 32 }, "passage": "Steep climbs and drops interrupt most routes, and many landings cannot be seen from above. A hurried step will not make the landing arrive sooner." },
-        { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 65 }, "passage": "Conditions swing from long quiet periods to sudden, extreme changes. Both parts of that cycle demand preparation." },
+        { "condition": { "target": "cycle", "measure": "aspect", "key": "amplitude", "minimum": 65 }, "passage": "Conditions swing from long quiet periods to sudden, extreme changes. Both extremes demand preparation." },
         { "condition": { "target": "atmosphere", "measure": "aspect", "key": "motion", "minimum": 58 }, "passage": "Strong gusts move through the world, then briefly fall still. Swinging is not different because the weapon has a name." }
       ],
       "leansToward": ["locationClue", "gambit"],
@@ -1171,7 +1171,7 @@
 
     { "id": "dagg_where_0", "diary": "dagg", "kind": "locationClue", "prose": "The ground is hard and unyielding under every step. Good. An honest consequence can be prepared for.", "about": "dagg", "clueIndex": 0, "prefersConditions": [] },
     { "id": "dagg_where_1", "diary": "dagg", "kind": "locationClue", "prose": "Steep climbs and drops interrupt most routes, and many landings cannot be seen from above. A hurried step will not make the landing arrive sooner.", "about": "dagg", "clueIndex": 1, "prefersConditions": [] },
-    { "id": "dagg_where_2", "diary": "dagg", "kind": "locationClue", "prose": "Conditions swing from long quiet periods to sudden, extreme changes. Both parts of that cycle demand preparation.", "about": "dagg", "clueIndex": 2, "prefersConditions": [] },
+    { "id": "dagg_where_2", "diary": "dagg", "kind": "locationClue", "prose": "Conditions swing from long quiet periods to sudden, extreme changes. Both extremes demand preparation.", "about": "dagg", "clueIndex": 2, "prefersConditions": [] },
     { "id": "dagg_where_3", "diary": "dagg", "kind": "locationClue", "prose": "Strong gusts move through the world, then briefly fall still. Swinging is not different because the weapon has a name.", "about": "dagg", "clueIndex": 3, "prefersConditions": [] },
     { "id": "dagg_teach_recovery_complete", "diary": "dagg", "kind": "gambit", "prose": "Recovery ends when your feet are set and you can choose the next action. Decide that action before the swing. Heavy weapons are excellent at making hesitation visible.", "teachesGambit": "subject_self_recovery_complete", "prefersConditions": [] },
     { "id": "dagg_word_halloway", "diary": "dagg", "kind": "whereabouts", "prose": "Halloway listens after every hammer strike and adjusts to the metal. Opponents adjust back. That is why I left the forge—and why she says I am wasting a perfectly good hammer arm.", "about": "halloway", "prefersConditions": [] },
