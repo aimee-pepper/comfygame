@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
 import {fixtureStatesByScreen,previewActionState,renderScreen} from "../src/ui-gallery-app.js";
 
 const states=["Compare versions","Previous layout","Travel","Look","Harvest","Search","Portal","Cache","Survey & anchor","Loose page","Night sight"];
@@ -6,6 +7,12 @@ const states=["Compare versions","Previous layout","Travel","Look","Harvest","Se
 assert.deepEqual(fixtureStatesByScreen.world,states,"World must expose the exact current travel and interaction proof states");
 
 const rendered=Object.fromEntries(states.map(state=>[state,renderScreen("World",state)]));
+const css=readFileSync(new URL("../ui-gallery.css",import.meta.url),"utf8");
+
+for(const [selector,height] of [["world-expedition-header",58],["party-health-strip",39],["world-map-stage",470],["world-field-strip",28],["world-controls",175]]){
+  assert.match(css,new RegExp(`\\.${selector}\\{[^}]*height:${height}px`),`${selector} must retain its measured ordinary-phone height`);
+}
+assert.equal(30+58+39+470+28+175,800,"World bands must exactly fill the ordinary 368×800 phone without overlap or dead space");
 
 assert.equal(previewActionState("world","Look","Travel"),"Look","the in-phone Look action must arm inspection mode");
 assert.equal(previewActionState("world","Cancel","Look"),"Travel","the in-phone Cancel action must return to travel controls");

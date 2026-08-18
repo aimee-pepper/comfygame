@@ -1,10 +1,15 @@
 import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
 import {fixtureStatesByScreen,previewActionState,renderScreen} from "../src/ui-gallery-app.js";
 
 const states=["Returned","Collapsed","Receipt detail"];
 assert.deepEqual(fixtureStatesByScreen["return-recap"],states,"World exit must expose return, collapse and exact-detail review states");
 
 const rendered=Object.fromEntries(states.map(state=>[state,renderScreen("Return Recap",state)]));
+const css=readFileSync(new URL("../ui-gallery.css",import.meta.url),"utf8");
+assert.match(css,/\.return-recap-content\{height:624px/,"World exit content must use the exact post-header ordinary-phone region");
+assert.match(css,/\.return-action-rail\{[^}]*height:84px/,"World exit dismissal must remain in its fixed 84pt bottom region");
+assert.equal(30+62+624+84,800,"World exit header, content and fixed action rail must fit the 800pt phone exactly");
 assert.equal(previewActionState("return-recap","receipt","Returned"),"Receipt detail","tapping an exact receipt tile must open its anchored detail");
 assert.equal(previewActionState("return-recap","Done","Receipt detail"),"Returned","Done must dismiss the anchored receipt detail");
 for(const [state,html] of Object.entries(rendered)){
