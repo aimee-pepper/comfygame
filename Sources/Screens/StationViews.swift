@@ -1106,8 +1106,26 @@ struct WorkshopView: View {
 /// what the game is about.
 struct ScriptoriumView: View {
     @EnvironmentObject private var store: GameStore
+    @State private var capability: Capability = .hands
 
     private var tier: Int { store.state.base.station(Stations.scriptorium).tier }
+
+    private enum Capability: String, CaseIterable, Identifiable {
+        case hands = "Hands"
+        case inks = "Inks"
+        case runebook = "Runebook"
+        var id: String { rawValue }
+    }
+
+    private var availableCapabilities: [Capability] {
+        Capability.allCases.filter {
+            switch $0 {
+            case .hands: true
+            case .inks: store.state.base.completedResearch.contains("pen_ink_mixing")
+            case .runebook: store.state.base.completedResearch.contains("pen_compounds")
+            }
+        }
+    }
 
     var body: some View {
         ScrollView {
@@ -1119,10 +1137,18 @@ struct ScriptoriumView: View {
                                  value: store.state.base.bestHand.displayName)
                 }
 
-                StationCard(title: "The Art", icon: "pencil.and.outline") {
-                    Text("A finer hand doesn't let you say new things. It lets you say the same things in less room — and a page is the only thing in this game that never gets bigger.")
-                        .font(.caption).foregroundStyle(.secondary)
-                    LabeledRow(icon: "chart.bar", label: "Tier", value: "\(tier)")
+                Picker("Scriptorium capability", selection: $capability) {
+                    ForEach(availableCapabilities) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.segmented)
+                .onChange(of: availableCapabilities) { _, available in
+                    if !available.contains(capability) { capability = .hands }
+                }
+
+                switch capability {
+                case .hands: handsCapability
+                case .inks: inksCapability
+                case .runebook: CompoundRunebookView()
                 }
 
                 ResearchTree(station: Stations.scriptorium)
@@ -1132,6 +1158,246 @@ struct ScriptoriumView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle("The Scriptorium")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var handsCapability: some View {
+        StationCard(title: "Hands", icon: "pencil.and.outline") {
+            Text("A finer hand doesn't let you say new things. It lets you say the same things in less room — and a page is the only thing in this game that never gets bigger.")
+                .font(.caption).foregroundStyle(.secondary)
+            LabeledRow(icon: "chart.bar", label: "Tier", value: "\(tier)")
+            ForEach(Hand.allCases, id: \.self) { hand in
+                LabeledRow(icon: store.state.base.ownedHands.contains(hand) ? "checkmark.circle.fill" : "circle",
+                           label: hand.displayName,
+                           value: store.state.base.ownedHands.contains(hand) ? "owned" : "not learned",
+                           isDimmed: !store.state.base.ownedHands.contains(hand))
+            }
+        }
+    }
+
+    private var inksCapability: some View {
+        StationCard(title: "Inks", icon: "eyedropper.halffull") {
+            Text("Mixed inks change a focus's authored colour, not its meaning. Prepare and apply them at the Writing Desk.")
+                .font(.caption).foregroundStyle(.secondary)
+            LabeledRow(icon: "paintpalette", label: "Saved mixtures",
+                       value: "\(store.state.base.savedInkMixtures.count)")
+            LabeledRow(icon: "drop", label: "Prepared applications",
+                       value: "\(store.state.base.preparedInkVials.map(\.remainingApplications).reduce(0, +))")
+        }
+    }
+}
+
+private struct CompoundRunebookView: View {
+    @EnvironmentObject private var store: GameStore
+    @State private var selectedFingerprint: String?
+    @State private var nickname = ""
+    @State private var editingID: PersonalCompoundID?
+    @State private var editingNickname = ""
+    @State private var deleting: CompoundDeleteQuote?
+    @State private var actionMessage: String?
+
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 3)
+
+    var body: some View {
+        VStack(spacing: 12) {
+            StationCard(title: "Formalize", icon: "square.stack.3d.up") {
+                if store.state.base.provenStatementReceipts.isEmpty {
+                    Text("Bind a complete statement once to preserve it here.")
+                        .font(.caption).foregroundStyle(.secondary)
+                } else {
+                    LazyVGrid(columns: columns, spacing: 6) {
+                        ForEach(store.state.base.provenStatementReceipts) { receipt in
+                            Button { select(receipt) } label: {
+                                VStack(spacing: 3) {
+                                    RuneGlyph(id: receipt.target.rawValue).frame(width: 24, height: 24)
+                                    Text(CompoundRunebookPresentation.targetName(receipt))
+                                        .font(.caption.weight(.semibold)).lineLimit(1)
+                                    Text("\(receipt.atoms.count) atoms")
+                                        .font(.caption2).foregroundStyle(.secondary)
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 64)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(selectedFingerprint == receipt.fingerprint ? .accentColor : .secondary)
+                            .accessibilityValue(CompoundRunebookPresentation.reading(receipt))
+                        }
+                    }
+                }
+            }
+
+            if let receipt = selectedReceipt { formalizationDetail(receipt) }
+
+            StationCard(title: "Personal compounds", icon: "books.vertical") {
+                if store.state.base.personalCompounds.isEmpty {
+                    Text("No personal notation has been formalized yet.")
+                        .font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ForEach(store.state.base.personalCompounds.sorted(by: {
+                        $0.creationOrdinal < $1.creationOrdinal
+                    })) { record in
+                        compoundRow(record)
+                    }
+                }
+            }
+
+            if let actionMessage {
+                Text(actionMessage).font(.caption).foregroundStyle(.orange)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .confirmationDialog("Delete this compound?", isPresented: Binding(
+            get: { deleting != nil }, set: { if !$0 { deleting = nil } }
+        ), titleVisibility: .visible) {
+            Button("Delete from Runebook", role: .destructive) {
+                guard let quote = deleting else { return }
+                report(store.deleteCompound(quote))
+                deleting = nil
+            }
+            Button("Keep compound", role: .cancel) { deleting = nil }
+        } message: {
+            Text("Placed pages keep their frozen meaning. Only future placement is removed.")
+        }
+    }
+
+    private var selectedReceipt: ProvenStatementReceipt? {
+        store.state.base.provenStatementReceipts.first { $0.fingerprint == selectedFingerprint }
+    }
+
+    private func select(_ receipt: ProvenStatementReceipt) {
+        selectedFingerprint = receipt.fingerprint
+        nickname = CompoundRunebookPresentation.targetName(receipt)
+        actionMessage = nil
+    }
+
+    private func formalizationDetail(_ receipt: ProvenStatementReceipt) -> some View {
+        let preview = store.previewCompoundFormalization(fingerprint: receipt.fingerprint,
+                                                         nickname: nickname)
+        return StationCard(title: CompoundRunebookPresentation.targetName(receipt),
+                           icon: "text.book.closed") {
+            Text(CompoundRunebookPresentation.reading(receipt)).font(.caption)
+            Text(CompoundRunebookPresentation.expansion(receipt))
+                .font(.caption2).foregroundStyle(.secondary)
+            ForEach(store.state.base.ownedHands.sorted(), id: \.self) { hand in
+                LabeledRow(icon: "rectangle.compress.vertical", label: hand.displayName,
+                           value: CompoundRunebookPresentation.footprint(receipt, hand: hand))
+            }
+            TextField("Compound name", text: $nickname).textFieldStyle(.roundedBorder)
+            switch preview {
+            case .ready(let quote):
+                LabeledRow(icon: "drop.fill", label: "Formalization cost",
+                           value: "\(quote.essenceCost) Essence · \(quote.pulpCost) pulp")
+                Button("Formalize compound") { report(store.formalizeCompound(quote)) }
+                    .buttonStyle(.borderedProminent).frame(maxWidth: .infinity, minHeight: 44)
+            case .refused(let refusal):
+                Label(CompoundRunebookPresentation.message(refusal), systemImage: "exclamationmark.circle")
+                    .font(.caption).foregroundStyle(.orange)
+            }
+        }
+    }
+
+    private func compoundRow(_ record: PersonalCompoundRecord) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(record.nickname).font(.callout.weight(.semibold))
+                    Text(CompoundRunebookPresentation.expansion(record))
+                        .font(.caption2).foregroundStyle(.secondary)
+                    Text(record.provenance).font(.caption2).foregroundStyle(.tertiary)
+                }
+                Spacer()
+                Menu {
+                    Button("Rename") {
+                        editingID = record.id; editingNickname = record.nickname
+                    }
+                    Button("Delete", role: .destructive) {
+                        deleting = store.previewCompoundDeletion(record.id)
+                    }
+                } label: { Image(systemName: "ellipsis.circle").frame(width: 44, height: 44) }
+            }
+            if editingID == record.id {
+                HStack {
+                    TextField("New name", text: $editingNickname).textFieldStyle(.roundedBorder)
+                    Button("Save") {
+                        guard let quote = store.previewCompoundRename(record.id,
+                                                                      nickname: editingNickname) else {
+                            actionMessage = "That Runebook entry changed. Review it and try again."
+                            return
+                        }
+                        report(store.renameCompound(quote)); editingID = nil
+                    }.buttonStyle(.bordered)
+                }
+            }
+        }
+        .padding(.vertical, 3)
+    }
+
+    private func report(_ result: CompoundAssemblyResult) {
+        switch result {
+        case .formalized: actionMessage = "Compound added to the Runebook."
+        case .renamed: actionMessage = "Runebook name updated."
+        case .deleted: actionMessage = "Compound removed from future placement."
+        case .noChange: actionMessage = nil
+        default: actionMessage = CompoundRunebookPresentation.message(result)
+        }
+    }
+}
+
+enum CompoundRunebookPresentation {
+    static func targetName(_ receipt: ProvenStatementReceipt) -> String {
+        ContentCatalog.shared.pressureTarget(receipt.target)?.name ?? "Unknown subject"
+    }
+
+    static func reading(_ receipt: ProvenStatementReceipt) -> String {
+        "\(targetName(receipt)): \(expansion(receipt))"
+    }
+
+    static func expansion(_ receipt: ProvenStatementReceipt) -> String {
+        receipt.atoms.map(atomDescription).joined(separator: " · ")
+    }
+
+    static func expansion(_ record: PersonalCompoundRecord) -> String {
+        record.expansion.map(atomDescription).joined(separator: " · ")
+    }
+
+    static func footprint(_ receipt: ProvenStatementReceipt, hand: Hand) -> String {
+        let temporary = PersonalCompoundRecord(
+            id: .init(rawValue: 0), nickname: "Preview", provenFingerprint: receipt.fingerprint,
+            target: receipt.target, expansion: receipt.atoms, vocabulary: receipt.vocabulary,
+            vocabularySchemaVersion: receipt.vocabularySchemaVersion, provenance: "Preview",
+            creationOrdinal: 0)
+        let atomic = receipt.vocabulary.compactMap { identity -> Int? in
+            guard let content = identity.markContent else { return nil }
+            return PageRules.shape(for: content, hand: hand)?.footprint
+        }.reduce(0, +)
+        return "\(PageRules.personalCompoundFootprint(temporary, hand: hand)) cells · \(atomic) spelled out"
+    }
+
+    static func message(_ result: CompoundAssemblyResult) -> String {
+        switch result {
+        case .locked: "Learn Compound Assembly first."
+        case .awayFromBase: "Return to the Scriptorium before changing the Runebook."
+        case .missingReceipt: "That proven statement is no longer available."
+        case .ineligible(let issue): issue.rawValue
+        case .alreadyFormalized: "This statement is already in the Runebook."
+        case .insufficientResources: "Formalization needs more Essence or pulp."
+        case .stale: "The receipt or cost changed. Review it and try again."
+        case .formalized, .renamed, .deleted, .noChange: ""
+        }
+    }
+
+    private static func atomDescription(_ atom: CompoundSemanticAtom) -> String {
+        let source = ContentCatalog.shared.pressureSource(atom.source)?.name ?? "Unknown focus"
+        return "\(atom.intensity.displayName) \(source) ×\(atom.count)"
+    }
+}
+
+private extension LexemeIdentity {
+    var markContent: MarkContent? {
+        switch self {
+        case .target(let id): .target(id)
+        case .source(let id): .source(id)
+        case .qualifier(let id): .qualifier(id)
+        case .compound(_): nil
+        }
     }
 }
 

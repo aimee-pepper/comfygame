@@ -506,6 +506,24 @@ final class PageTests: XCTestCase {
                        "Only the confirmed destructive action may clear the page.")
     }
 
+    func testWritingDeskPersonalCompoundPaletteUsesFrozenPlacementAuthorityAndAnchoredDetail() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
+            encoding: .utf8)
+
+        XCTAssertTrue(source.contains("sectionLabel(\"My Runebook\")"))
+        XCTAssertTrue(source.contains("PageRules.personalCompoundFootprint(record"))
+        XCTAssertTrue(source.contains("CompoundRunebookPresentation.expansion(record)"))
+        XCTAssertTrue(source.contains("Text(record.provenance)"))
+        XCTAssertTrue(source.contains("PageRules.place(record, hand: state.base.bestHand"))
+        XCTAssertTrue(source.contains("store.mutate(\"place personal compound\")"))
+        XCTAssertTrue(source.contains("exact frozen expansion"))
+        XCTAssertFalse(source.contains("formalizePersonalCompound"),
+                       "The Writing Desk places saved notation; it must not mint or charge for it")
+    }
+
     func testTemplateUIUsesThumbnailGridAnchoredActionsAndExactConfirmations() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

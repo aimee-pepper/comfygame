@@ -52,6 +52,8 @@ struct WritingDeskView: View {
     @State private var pendingTemplateDelete: PageTemplateID?
     @State private var templateError: String?
     @State private var presentedSheet: WritingDeskSheet?
+    @State private var selectedPersonalCompoundID: PersonalCompoundID?
+    @State private var personalCompoundMessage: String?
 
     @State private var bin: Bin = .compounds
 
@@ -369,6 +371,13 @@ struct WritingDeskView: View {
             }
 
         case .compounds:
+            if !state.base.personalCompounds.isEmpty {
+                sectionLabel("My Runebook")
+                personalCompoundPalette
+                if let record = selectedPersonalCompound {
+                    personalCompoundDetail(record)
+                }
+            }
             ForEach(sections, id: \.target.id) { section in
                 sectionLabel(section.target.name)
                 chips(section.symbols.map {
@@ -381,6 +390,77 @@ struct WritingDeskView: View {
                 })
             }
         }
+    }
+
+    private var selectedPersonalCompound: PersonalCompoundRecord? {
+        state.base.personalCompounds.first { $0.id == selectedPersonalCompoundID }
+    }
+
+    private var personalCompoundPalette: some View {
+        LazyVGrid(columns: chipColumns, spacing: 6) {
+            ForEach(state.base.personalCompounds.sorted(by: {
+                $0.creationOrdinal < $1.creationOrdinal
+            })) { record in
+                Button {
+                    selectedPersonalCompoundID = record.id
+                    personalCompoundMessage = nil
+                } label: {
+                    VStack(spacing: 2) {
+                        RuneGlyph(id: record.target.rawValue).frame(width: 22, height: 22)
+                        Text(record.nickname).font(.caption.weight(.medium)).lineLimit(1)
+                        Text("\(PageRules.personalCompoundFootprint(record, hand: state.base.bestHand)) cells")
+                            .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 58)
+                }
+                .buttonStyle(.bordered)
+                .tint(selectedPersonalCompoundID == record.id ? .accentColor : .secondary)
+            }
+        }
+    }
+
+    private func personalCompoundDetail(_ record: PersonalCompoundRecord) -> some View {
+        let footprint = PageRules.personalCompoundFootprint(record, hand: state.base.bestHand)
+        let canPlace = PageRules.shape(forPersonalCompound: record, hand: state.base.bestHand)
+            .map { !PageRules.validOrigins(for: $0, on: state.base.page).isEmpty } ?? false
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(record.nickname).font(.subheadline.weight(.semibold))
+                    Text(CompoundRunebookPresentation.expansion(record))
+                        .font(.caption).foregroundStyle(.secondary)
+                    Text(record.provenance).font(.caption2).foregroundStyle(.tertiary)
+                }
+                Spacer(minLength: 8)
+                Button("Place") { placePersonalCompound(record) }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!canPlace)
+                    .frame(minHeight: 44)
+            }
+            Text("\(state.base.bestHand.displayName) · \(footprint) cells · exact frozen expansion")
+                .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+            if let personalCompoundMessage {
+                Text(personalCompoundMessage).font(.caption2).foregroundStyle(.orange)
+            }
+        }
+        .padding(10)
+        .background(Color(.tertiarySystemGroupedBackground),
+                    in: RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .contain)
+    }
+
+    private func placePersonalCompound(_ record: PersonalCompoundRecord) {
+        guard let shape = PageRules.shape(forPersonalCompound: record, hand: state.base.bestHand),
+              let origin = PageRules.validOrigins(for: shape, on: state.base.page).first,
+              let updated = PageRules.place(record, hand: state.base.bestHand,
+                                            at: origin, on: state.base.page)
+        else {
+            personalCompoundMessage = "This compound does not fit in the current hand."
+            return
+        }
+        store.mutate("place personal compound") { $0.base.page = updated }
+        personalCompoundMessage = nil
+        dismissPageInteraction()
     }
 
     private func sectionLabel(_ text: String) -> some View {

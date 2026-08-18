@@ -2,6 +2,48 @@ import XCTest
 @testable import Bookbinder
 
 final class MakerStationPresentationTests: XCTestCase {
+    func testScriptoriumExposesOnlyRealHandsInksRunebookCapabilitiesAndFrozenTransactions() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/StationViews.swift"),
+                                encoding: .utf8)
+
+        XCTAssertTrue(source.contains("case hands = \"Hands\""))
+        XCTAssertTrue(source.contains("case inks = \"Inks\""))
+        XCTAssertTrue(source.contains("case runebook = \"Runebook\""))
+        XCTAssertTrue(source.contains("completedResearch.contains(\"pen_ink_mixing\")"))
+        XCTAssertTrue(source.contains("completedResearch.contains(\"pen_compounds\")"))
+        XCTAssertTrue(source.contains("previewCompoundFormalization(fingerprint:"))
+        XCTAssertTrue(source.contains("store.formalizeCompound(quote)"))
+        XCTAssertTrue(source.contains("store.previewCompoundRename(record.id"))
+        XCTAssertTrue(source.contains("store.renameCompound(quote)"))
+        XCTAssertTrue(source.contains("store.previewCompoundDeletion(record.id)"))
+        XCTAssertTrue(source.contains("store.deleteCompound(quote)"))
+        XCTAssertTrue(source.contains("Array(repeating: GridItem(.flexible(), spacing: 6), count: 3)"))
+        XCTAssertFalse(source.contains("selectedAtoms"), "Runebook must formalize proven receipts, not arbitrary atoms")
+    }
+
+    func testCompoundRunebookPresentationDisclosesReadingFootprintAndExactRefusal() throws {
+        let source = try XCTUnwrap(ContentCatalog.shared.pressureSources.first).id
+        let atom = CompoundSemanticAtom(Sigil(id: .init(rawValue: 1), source: source,
+                                               target: "illumination"))
+        let receipt = ProvenStatementReceipt(
+            fingerprint: PageRules.statementFingerprint(target: "illumination", atoms: [atom]),
+            target: "illumination", atoms: [atom],
+            vocabulary: [.target("illumination"), .source(source)],
+            vocabularySchemaVersion: ProvenStatementReceipt.currentVocabularySchemaVersion,
+            firstBoundRunIndex: 1)
+
+        XCTAssertTrue(CompoundRunebookPresentation.reading(receipt).contains("Illumination"))
+        XCTAssertTrue(CompoundRunebookPresentation.reading(receipt).contains("Moderate"))
+        XCTAssertTrue(CompoundRunebookPresentation.footprint(receipt, hand: .crude)
+            .contains("spelled out"))
+        XCTAssertEqual(CompoundRunebookPresentation.message(.ineligible(.nestedCompound)),
+                       PageRules.CompoundEligibilityIssue.nestedCompound.rawValue)
+        XCTAssertEqual(CompoundRunebookPresentation.message(.insufficientResources),
+                       "Formalization needs more Essence or pulp.")
+    }
+
     func testStationResourceNamesUseCatalogueAndNeverExposeUnknownIDs() throws {
         let clay = try XCTUnwrap(ContentCatalog.shared.resource("clay"))
         XCTAssertEqual(StationCataloguePresentation.resourceName(clay.id), clay.name)
