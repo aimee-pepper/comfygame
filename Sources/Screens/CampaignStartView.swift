@@ -147,6 +147,24 @@ enum CampaignStartLayoutPolicy {
     }
 }
 
+private enum CampaignShelfPalette {
+    static let page = Color(red: 0.92, green: 0.86, blue: 0.72)
+    static let pageHighlight = Color(red: 0.98, green: 0.93, blue: 0.82)
+    static let ink = Color(red: 0.16, green: 0.12, blue: 0.09)
+    static let shelf = Color(red: 0.34, green: 0.22, blue: 0.14)
+    static let shelfHighlight = Color(red: 0.57, green: 0.39, blue: 0.23)
+
+    static func cover(for id: UUID) -> Color {
+        let index = withUnsafeBytes(of: id.uuid) { Int($0[0]) % 4 }
+        return [
+            Color(red: 0.68, green: 0.48, blue: 0.28),
+            Color(red: 0.36, green: 0.51, blue: 0.49),
+            Color(red: 0.54, green: 0.36, blue: 0.43),
+            Color(red: 0.42, green: 0.45, blue: 0.31)
+        ][index]
+    }
+}
+
 struct CampaignStartView: View {
     let presentation: CampaignStartPresentation
     let onContinue: (UUID) -> Void
@@ -169,7 +187,7 @@ struct CampaignStartView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
         }
-        .background(Color(.systemGroupedBackground))
+        .background(CampaignShelfPalette.page)
         .sheet(item: $focusedSlot) { slot in
             CampaignSlotDetail(
                 slot: slot,
@@ -202,12 +220,27 @@ struct CampaignStartView: View {
                     .font(.title2.bold())
                     .accessibilityAddTraits(.isHeader)
 
-                LazyVGrid(columns: slotColumns, spacing: 10) {
-                    ForEach(presentation.slots) { slot in
-                        CampaignSlotCard(slot: slot,
-                                         compact: compactSlots,
-                                         onLoad: { onLoad(slot.id) },
-                                         onDetails: { focusedSlot = slot })
+                Group {
+                    if compactSlots {
+                        CampaignShelf {
+                            LazyVGrid(columns: slotColumns, spacing: 9) {
+                                ForEach(presentation.slots) { slot in
+                                    CampaignSlotCard(slot: slot,
+                                                     compact: true,
+                                                     onLoad: { onLoad(slot.id) },
+                                                     onDetails: { focusedSlot = slot })
+                                }
+                            }
+                        }
+                    } else {
+                        LazyVGrid(columns: slotColumns, spacing: 10) {
+                            ForEach(presentation.slots) { slot in
+                                CampaignSlotCard(slot: slot,
+                                                 compact: false,
+                                                 onLoad: { onLoad(slot.id) },
+                                                 onDetails: { focusedSlot = slot })
+                            }
+                        }
                     }
                 }
             }
@@ -288,19 +321,16 @@ struct CampaignStartPrimaryAction: View {
     let action: () -> Void
 
     var body: some View {
-        Group {
-            if emphasized { button.buttonStyle(.borderedProminent) }
-            else {
-                button
-                    .buttonStyle(.bordered)
-                    .tint(.accentColor)
-                    .overlay {
-                        Capsule()
-                            .stroke(Color.accentColor.opacity(0.55), lineWidth: 1)
-                            .allowsHitTesting(false)
-                    }
+        button
+            .buttonStyle(.plain)
+            .foregroundStyle(emphasized ? Color.white : CampaignShelfPalette.ink)
+            .background(emphasized ? Color.accentColor : CampaignShelfPalette.pageHighlight)
+            .overlay {
+                Rectangle()
+                    .stroke(emphasized ? Color.accentColor : CampaignShelfPalette.shelf, lineWidth: 2)
+                    .allowsHitTesting(false)
             }
-        }
+            .shadow(color: CampaignShelfPalette.shelf.opacity(0.45), radius: 0, x: 3, y: 3)
         .frame(maxWidth: .infinity)
     }
 
@@ -309,6 +339,25 @@ struct CampaignStartPrimaryAction: View {
             CampaignStartActionLabel(title: title, subtitle: subtitle, icon: icon)
         }
         .accessibilityIdentifier(identifier)
+    }
+}
+
+private struct CampaignShelf<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Rectangle().fill(CampaignShelfPalette.shelfHighlight).frame(height: 7)
+            content.padding(9)
+            Rectangle().fill(CampaignShelfPalette.shelf).frame(height: 11)
+        }
+        .background(CampaignShelfPalette.shelf.opacity(0.16))
+        .overlay(Rectangle().stroke(CampaignShelfPalette.shelf, lineWidth: 2))
+        .shadow(color: CampaignShelfPalette.shelf.opacity(0.42), radius: 0, x: 3, y: 4)
     }
 }
 
@@ -400,7 +449,13 @@ private struct CampaignSlotCard: View {
         .contextMenu {
             Button("Details", systemImage: "info.circle", action: onDetails)
         }
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        .foregroundStyle(CampaignShelfPalette.ink)
+        .background(CampaignShelfPalette.cover(for: slot.id))
+        .overlay(alignment: .leading) {
+            Rectangle().fill(CampaignShelfPalette.pageHighlight.opacity(0.72)).frame(width: 5)
+        }
+        .overlay(Rectangle().stroke(CampaignShelfPalette.shelf, lineWidth: 2))
+        .shadow(color: CampaignShelfPalette.shelf.opacity(0.48), radius: 0, x: 3, y: 3)
         .accessibilityElement(children: .contain)
     }
 

@@ -62,10 +62,11 @@ final class CampaignStartPresentationTests: XCTestCase {
                                              range: start.upperBound..<source.endIndex))
         let action = String(source[start.lowerBound..<end.lowerBound])
 
-        XCTAssertTrue(action.contains("buttonStyle(.borderedProminent)"))
-        XCTAssertTrue(action.contains("buttonStyle(.bordered)"))
-        XCTAssertTrue(action.contains("Capsule()"))
-        XCTAssertTrue(action.contains("stroke(Color.accentColor.opacity(0.55)"))
+        XCTAssertTrue(action.contains("buttonStyle(.plain)"))
+        XCTAssertTrue(action.contains("CampaignShelfPalette.pageHighlight"))
+        XCTAssertTrue(action.contains("Rectangle()"))
+        XCTAssertTrue(action.contains("CampaignShelfPalette.shelf"))
+        XCTAssertFalse(action.contains("Capsule()"))
         XCTAssertFalse(action.contains(".disabled("))
     }
 
@@ -142,6 +143,8 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(compact.contains(".accessibilityAction(named: \"Details\", onDetails)"))
         XCTAssertFalse(compact.contains("Button(\"Load\""))
         XCTAssertFalse(compact.contains(".buttonStyle(.borderedProminent)"))
+        XCTAssertTrue(compact.contains("CampaignShelfPalette.cover(for: slot.id)"))
+        XCTAssertTrue(compact.contains("Rectangle().stroke(CampaignShelfPalette.shelf"))
     }
 
     func testCompactSlotRestoresProgressGraphicLevelAndLastPlayedWithoutLoosePadding() throws {
