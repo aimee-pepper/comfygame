@@ -661,10 +661,11 @@ struct WorldPageDefinitionID: StringIdentifier {
 ///
 struct WorldPageDefinition: Codable, Equatable, Identifiable, Sendable {
     enum Disposition: String, Codable, Sendable {
-        case starterUnique, repeatable, repeatableRare, uniqueProtected
+        case starterUnique, repeatable, repeatableRare, uniqueProtected, reusable
 
         var isRandom: Bool { self == .repeatable || self == .repeatableRare }
-        var isProtected: Bool { self == .starterUnique || self == .uniqueProtected }
+        var isProtected: Bool { self == .starterUnique || self == .uniqueProtected || self == .reusable }
+        var isReusable: Bool { self == .reusable }
     }
 
     var id: WorldPageDefinitionID
@@ -885,11 +886,40 @@ enum WorldPageCatalog {
     ]
     // END GENERATED STARTER WORLD PAGES
 
+    /// A stable, ordinary-campaign control page for repeatedly checking World presentation and
+    /// traversal. Unlike physical finds it is never consumed by a successful bind.
+    static let earthlikeTestID: WorldPageDefinitionID = "earthlike_test_world"
+    static let earthlikeTestInstanceID = InstanceID(rawValue: 0x5750_0000_0000_00EE)
+    static let earthlikeTestDefinition = WorldPageDefinition(
+        id: earthlikeTestID,
+        title: "Earth-like Test World",
+        disposition: .reusable,
+        provenance: "A permanent reference page for testing an ordinary living world.",
+        page: Page(runes: [
+            PlacedRune(id: InstanceID(rawValue: 1), content: .compound("plains"), hand: .crude,
+                       origin: PageCell(column: 0, row: 0), shapeID: "crude_smear"),
+            PlacedRune(id: InstanceID(rawValue: 2), content: .compound("verdant"), hand: .crude,
+                       origin: PageCell(column: 3, row: 0), shapeID: "crude_smear"),
+            PlacedRune(id: InstanceID(rawValue: 3), content: .compound("archipelago"), hand: .crude,
+                       origin: PageCell(column: 0, row: 3), shapeID: "crude_smear"),
+            PlacedRune(id: InstanceID(rawValue: 4), content: .compound("common_ore"), hand: .crude,
+                       origin: PageCell(column: 3, row: 3), shapeID: "crude_block")
+        ]),
+        copiedCost: 34,
+        worldPageCost: 21,
+        seed: 101,
+        promise: "Temperate land, water, plant life and ordinary resources for repeatable testing."
+    )
+    static let earthlikeTestInstance = WorldPageInstance(
+        id: earthlikeTestInstanceID, definition: earthlikeTestDefinition, inspected: true)
+
     static func definition(_ id: WorldPageDefinitionID) -> WorldPageDefinition? {
         definitions.first { $0.id == id }
     }
 
-    static var definitions: [WorldPageDefinition] { starterDefinitions + repeatableDefinitions }
+    static var definitions: [WorldPageDefinition] {
+        starterDefinitions + [earthlikeTestDefinition] + repeatableDefinitions
+    }
 
     private static func definition(
         id: WorldPageDefinitionID, title: String, provenance: String,

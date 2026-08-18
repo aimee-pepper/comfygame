@@ -9,6 +9,34 @@ import CryptoKit
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
     @MainActor
+    func testEarthlikeTestWorldIsPermanentAndAddedToExistingCampaigns() throws {
+        let earth = WorldPageCatalog.earthlikeTestInstance
+        XCTAssertEqual(earth.definition.id, "earthlike_test_world")
+        XCTAssertEqual(earth.definition.disposition, .reusable)
+        XCTAssertEqual(earth.definition.worldPageCost, 21)
+        XCTAssertEqual(earth.definition.seed, 101)
+        XCTAssertEqual(Set(earth.definition.page.symbolIDs),
+                       Set(["plains", "verdant", "archipelago", "common_ore"]))
+        XCTAssertTrue(earth.inspected)
+
+        let store = GameStore(io: .temporary(name: "earthlike-page-\(UUID().uuidString)"))
+        store.mutate("simulate existing campaign without Earth page", flush: true) {
+            $0.base.collectedWorldPages.removeAll { $0.definition.id == earth.definition.id }
+            $0.base.starterWorldPageBundleFulfilled = true
+        }
+        store.reconcileStarterWorldPageBundle()
+        XCTAssertEqual(store.state.base.collectedWorldPages.filter {
+            $0.definition.id == earth.definition.id
+        }, [earth])
+
+        XCTAssertTrue(store.bindAndDepart(worldPageInstanceID: earth.id))
+        XCTAssertEqual(store.activeRun?.mapSeed, earth.definition.seed)
+        XCTAssertEqual(store.activeRun?.book.worldPageUseReceipt?.instanceID, earth.id)
+        XCTAssertTrue(store.state.base.collectedWorldPages.contains { $0 == earth },
+                      "the permanent Earth-like page must survive every successful bind")
+    }
+
+    @MainActor
     func testBand2TemplatesPhoneFixtureRelaunchesNearCapWithDirtyLegalDraftAndStableIDs() throws {
         let fixture = try GameStore.makeBand2TemplatesPhoneFixture()
         let receipt = fixture.receipt

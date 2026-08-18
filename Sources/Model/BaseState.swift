@@ -213,6 +213,7 @@ struct BaseState: Codable, Equatable, Sendable {
         state.syncInventoryCapacity()
         state.preparationLoadout = []
         state.collectedWorldPages = WorldPageCatalog.starterInstances
+            + [WorldPageCatalog.earthlikeTestInstance]
         state.starterWorldPageBundleFulfilled = true
         return state
     }
