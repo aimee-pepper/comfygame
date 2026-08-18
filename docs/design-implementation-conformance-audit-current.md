@@ -74,7 +74,7 @@ return receipts, outcome-wide failure retention and canonical afflictions were s
 | Trading Post | Source-complete | Sell/buy/refresh plus mixed resource/material/item shelves in `9ab833d` | Phone buy/sell/capacity/stale acceptance and later economy tuning |
 | Recycler | Source-complete | Receipt-first salvage, protected cases, exact identity and opening Noll route | Phone sell→recycle→make→bind acceptance |
 | Apothecary | Source-complete | Nessa lifecycle, build, Lesser Salve teaching, recipe-ID/cost/coating corrections in `13f0c13` | Phone build/inference/craft/use pass |
-| Scent Mask | **Designed only** | Exact recipe, 12-turn chemo-only hesitation and composition matrix specified | Implement only after Apothecary acceptance |
+| Scent Mask | Source-complete | Domain/provider `7772df0`, player UI `5e5aa14`, focused fixture `2ced55a`, release-content contract `543ddfe` | 368×800 physical-phone sensory/nonstacking/relaunch/protected-return acceptance |
 | Essence continuation/refining | Source-complete candidate | Raw drops, continuation subsidy and Spring 2:1→3:1/continuous-settling implementation/tests | Multi-expedition economy and Spring-phone acceptance |
 | Expedition return receipt | Source-complete | One typed constructor, stable resource/item/material identity and atomic runway in `07c9aee` | Phone all-category portal/failure recap and legacy display pass |
 | Failure retention | Source-complete | Outcome-wide discrete budgets and stable largest-remainder resources in `f9ec86c` | Phone defeat/collapse receipt pass; player recovery agency remains Homework-held |

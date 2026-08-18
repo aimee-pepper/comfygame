@@ -1,7 +1,8 @@
 # Scent Mask — first-slice candidate
 
-**Status:** implementation-ready reversible candidate; duration and material floor remain playtest
-tuning  
+**Status:** source-complete through domain/provider `7772df0`, player UI `5e5aa14`, focused fixture
+`2ced55a` and release-content checkpoint `543ddfe`; duration and material floor remain playtest tuning,
+and 368×800 physical-phone acceptance remains pending
 **Owner:** Nessa's Apothecary; existing Shadow nodes remain the skill route  
 **Purpose:** give a prepared-item route to avoiding ordinary animal encounters without deleting
 creatures, hiding apexes or spending refined Essence

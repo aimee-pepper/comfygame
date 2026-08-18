@@ -59,6 +59,18 @@ final class DebugRoadmapTests: XCTestCase {
         }
     }
 
+    func testScentMaskAwaitsHonestPhoneAcceptance() throws {
+        let item = try XCTUnwrap(DebugRoadmap.current.items.first { $0.id == "scent-mask" })
+        XCTAssertEqual(item.status, .readyToTest)
+        XCTAssertFalse(item.isPrimary, "Scent Mask must not displace encounter scaling")
+        for checkpoint in ["7772df0", "5e5aa14", "2ced55a", "543ddfe"] {
+            XCTAssertTrue(item.detail.contains(checkpoint), "missing Scent Mask evidence \(checkpoint)")
+        }
+        for pendingGate in ["Phone-only", "368×800", "sensory matrix", "nonstacking", "relaunch"] {
+            XCTAssertTrue(item.gate.contains(pendingGate), "missing pending phone gate: \(pendingGate)")
+        }
+    }
+
     func testIndependentWorkstreamPrimariesCoexistAndArrayOrderDoesNotChooseTheHeader() throws {
         let forward = try decodeBoard(items: [
             item("world", priority: "P0", status: "readyToTest", workstream: "acceptance", primary: true),

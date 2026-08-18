@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updated": "14 Aug 2026",
+  "updated": "18 Aug 2026",
   "essenceBaseline": "a816113",
   "campaignBands": [
     {
@@ -577,9 +577,9 @@
       "id": "scent-mask",
       "priority": "P2",
       "title": "Prepared animal-avoidance route",
-      "status": "queued",
-      "detail": "Complete the requested non-skill encounter-avoidance route after Apothecary reachability: Nessa tier-0 Scent Mask consumes one Reagent plus one exact grade-25+ animal world resource, costs 0 Essence, and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation.",
-      "gate": "Exact-instance preview/commit, all animal/flora material boundaries, chemo/mixed/direct-contact sensory matrix, Quiet Step composition, relaunch, protected Field Kit return and 368×800 presentation pass. Authority: scent-mask-first-slice-current.md and Decision155.",
+      "status": "readyToTest",
+      "detail": "Source-complete in 7772df0 (domain/provider rules), 5e5aa14 (player UI), 2ced55a (focused Lure visibility fixture) and 543ddfe (release consumable contract): Nessa tier-0 Scent Mask consumes one Reagent plus one exact grade-25+ animal world resource, costs 0 Essence, and grants 12 turns of chemo-only hesitation without hiding creatures, affecting apexes or stacking a second Quiet Step hesitation.",
+      "gate": "Phone-only acceptance remains: at 368×800 verify exact-instance preview/commit, all animal/flora material boundaries, the chemo/mixed/direct-contact sensory matrix, nonstacking Quiet Step composition, relaunch persistence and protected Field Kit return. Automated/source evidence does not accept the feature. Authority: scent-mask-first-slice-current.md and Decision155.",
       "workstream": "engineering",
       "isPrimary": false
     },

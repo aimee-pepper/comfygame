@@ -1,9 +1,11 @@
 # Field Awareness and Encounter Avoidance — Current Direction
 
 **Status:** awareness/Shadow/Lure foundation committed at `5731aa9`, regression-green and present in
-Aimee's installed `a77c9dd` phone checkpoint. Scent Mask remains design-ready, not implemented;
-exact durations/costs are reversible DEBUG values. Prompted by Aimee's playtest request for skills/
-items that reduce animal aggression, help avoid encounters and make a party harder to notice.
+Aimee's installed `a77c9dd` phone checkpoint. Scent Mask is source-complete through domain/provider
+`7772df0`, player UI `5e5aa14`, focused fixture `2ced55a` and release-content checkpoint `543ddfe`;
+exact durations/costs remain reversible DEBUG values and physical-phone acceptance remains pending.
+Prompted by Aimee's playtest request for skills/items that reduce animal aggression, help avoid
+encounters and make a party harder to notice.
 
 ## Core rule
 
@@ -178,8 +180,9 @@ Fixtures cover:
 - focused and broad regression suite passed **837/837** after excluding no design-owned awareness
   fixtures.
 
-This evidence does not claim Scent Mask complete. Its `.maskedScent` state seam exists, but recipe,
-timed party effect, sensory comparison, HUD and device play remain a later coherent slice.
+This evidence does not claim Scent Mask accepted. Its exact recipe, timed party effect, sensory
+comparison and player UI are source-complete in `7772df0` and `5e5aa14`; the 368×800 sensory,
+nonstacking, relaunch and protected-return physical-phone matrix remains pending.
 
 ### Playability scheduling disposition — 10 Aug 2026
 
