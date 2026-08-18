@@ -146,7 +146,19 @@ final class ContentTests: XCTestCase {
             "Sources/Screens/SettingsView.swift"), encoding: .utf8)
 
         XCTAssertTrue(source.contains("private struct SettingsDestinationRow: View"))
-        XCTAssertEqual(source.components(separatedBy: "SettingsDestinationRow(").count - 1, 4)
+        let requiredDestinations = [
+            (title: "Field Notes", identifier: "settings.field-notes"),
+            (title: "Save games", identifier: "settings.save-games"),
+            (title: "Homework", identifier: "settings.homework"),
+            (title: "Debug Tools", identifier: "settings.debug-tools"),
+            (title: "Compound Assembly acceptance", identifier: "settings.compound-assembly-acceptance")
+        ]
+        for destination in requiredDestinations {
+            XCTAssertTrue(source.contains("title: \"\(destination.title)\""),
+                          "missing Settings destination title: \(destination.title)")
+            XCTAssertTrue(source.contains(".accessibilityIdentifier(\"\(destination.identifier)\")"),
+                          "missing Settings destination identifier: \(destination.identifier)")
+        }
         XCTAssertTrue(source.contains("Image(systemName: directionIcon)"),
                       "the shared row must render its declared navigation direction")
         XCTAssertEqual(source.components(separatedBy: "directionIcon: \"rectangle.portrait.and.arrow.right\"").count - 1, 1,
