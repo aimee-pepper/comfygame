@@ -246,7 +246,7 @@ function renderImplementationReview(){
   $("native-conformance-source").textContent=`Authority: ${conformance.source}`;
   $("native-conformance-issues").innerHTML=conformance.issues.map(issue=>`<li>${issue}</li>`).join("");
   const committed=implementationReviews[active.id],storedRecord=implementationDrafts[active.id]??committed??{choice:"",notes:"",designVersion:""};
-  const staleApproval=["yes","queue"].includes(storedRecord.choice)&&storedRecord.designVersion!==conformance.designVersion;
+  const staleApproval=Boolean(storedRecord.choice)&&storedRecord.designVersion!==conformance.designVersion;
   const record=staleApproval?{choice:"",notes:"",designVersion:conformance.designVersion}:storedRecord;
   document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>{input.checked=input.value===record.choice;input.disabled=locked||input.value==="yes"&&!conformanceReady});
   const feedbackWrap=$("implementation-feedback-wrap"),feedback=$("implementation-feedback");
