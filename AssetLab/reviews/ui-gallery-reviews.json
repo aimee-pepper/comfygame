@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-18T20:23:13.724Z",
+  "updatedAt": "2026-08-18T20:59:01.211Z",
   "reviews": {
     "campaigns": {
       "choice": "no",
-      "notes": "Need to fix the tex alignment on each book pane to be consistent. would be more easily solved by redesigning the buttons for each campaign to have the row of books on top of the info text as they had before. "
+      "notes": "the books tallest edge overlaps the top edge of the buttons, the click continue button is an acceptable replacement for the original interaction. replace the health display with a more truthful/useful info source"
     },
     "home": {
       "choice": "no",

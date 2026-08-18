@@ -49,7 +49,7 @@ export async function handleAssetLabRequest(request, response) {
     try{
       const payload=JSON.parse((await body(request,250_000)).toString());
       const {screenID,record}=payload??{};
-      if(payload?.schemaVersion!==1||!/^[a-z0-9-]{1,80}$/.test(screenID??"")||!record||typeof record!=="object"||!['yes','no'].includes(record.choice)||typeof record.notes!=="string"||record.notes.length>8_000||(record.designVersion!==undefined&&(typeof record.designVersion!=="string"||record.designVersion.length>80))){response.writeHead(400).end("Invalid UI review record");return;}
+      if(payload?.schemaVersion!==1||!/^[a-z0-9-]{1,80}$/.test(screenID??"")||!record||typeof record!=="object"||!['yes','queue','no'].includes(record.choice)||typeof record.notes!=="string"||record.notes.length>8_000||(['queue','no'].includes(record.choice)&&!record.notes.trim())||(record.designVersion!==undefined&&(typeof record.designVersion!=="string"||record.designVersion.length>80))){response.writeHead(400).end("Invalid UI review record");return;}
       await mkdir(dirname(uiReviewFile),{recursive:true});
       let existing={};
       try{const saved=JSON.parse((await readFile(uiReviewFile)).toString());if(saved?.schemaVersion===1&&saved.reviews&&typeof saved.reviews==="object"&&!Array.isArray(saved.reviews))existing=saved.reviews;}catch{}

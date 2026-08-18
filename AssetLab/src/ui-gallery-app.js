@@ -39,7 +39,7 @@ const screens=[
 ].map(([title,category,type,purpose],index)=>({id:title.toLowerCase().replaceAll(/[^a-z0-9]+/g,"-"),title,category,type,purpose,index}));
 
 const $=id=>document.getElementById(id),categories=["All",...new Set(screens.map(s=>s.category))];
-const fixtureStatesByScreen={constellation:["Default","Selected","Confirm","Bought"],settings:["Default","DEBUG"]};
+const fixtureStatesByScreen={campaigns:["Fresh","Returning","Recovery details","Newer-version details","Delete confirmation"],constellation:["Default","Selected","Confirm","Bought"],settings:["Default","DEBUG"]};
 const reviewStorageKey="bookbinder.assetlab.ui-gallery-reviews.v1";
 const fontChoices=[
   {id:"jersey-tiny",label:"Chosen · Jersey 10 + Tiny5"},
@@ -72,17 +72,22 @@ function detail(title,body,stats=[]){return `<article class="detail"><span class
 function phone(inner,dark=false){return `<div class="${dark?"dark":""}">${inner}</div>`}
 
 function progressSpines(count){return Array.from({length:count},(_,i)=>`<i style="--volume-height:${24+(i%3)*4}px"><span>${i+1}</span></i>`).join("")}
-function campaignBook({title,status,volumes,volumeLabel,health,level,place,played,progress,selected=false,legacy=false}){
-  return `<article class="book-stack campaign-book${selected?" selected-book":""}${legacy?" legacy-book":""}"><div class="campaign-volume-row"><span class="book-spines" aria-label="${volumeLabel}">${progressSpines(volumes)}</span><span class="book-status">${status}</span></div><div class="campaign-info"><h4>${title}</h4><p class="campaign-vitals">${health} · Level ${level}</p><p class="campaign-place">${place} · ${played}</p><small class="book-progress">${progress}</small></div><span class="book-clasp" aria-hidden="true">${legacy?"×":selected?"◆":"◇"}</span></article>`;
+function campaignBook({title,status,volumes,volumeLabel,level,played,legacy=false}){
+  return `<button class="book-stack campaign-book${legacy?" legacy-book":""}" data-action="${legacy?"details":"load"}"><div class="campaign-volume-row"><span class="book-spines" aria-label="${volumeLabel}">${progressSpines(volumes)}</span><span class="book-status">${status}</span></div><div class="campaign-info"><h4>${title}</h4><p class="campaign-vitals">Level ${level}</p><p class="campaign-place">${played}</p></div><span class="book-clasp" aria-hidden="true">${legacy?"!":"›"}</span></button>`;
 }
 function renderCampaign(){
-  const books=[
-    campaignBook({title:"Aimee’s Book",status:"READY",volumes:7,volumeLabel:"seven progress volumes",health:"13 / 13 health",level:4,place:"Base",played:"played today",progress:"Seven bound volumes",selected:true}),
-    campaignBook({title:"Field Notes",status:"READY",volumes:4,volumeLabel:"four progress volumes",health:"8 / 11 health",level:2,place:"World",played:"played yesterday",progress:"Four bound volumes"}),
-    campaignBook({title:"Old Test Book",status:"OLDER TEST VERSION",volumes:2,volumeLabel:"two legacy volumes",health:"Last recorded 10 / 10",level:1,place:"Format 12",played:"current format 13",progress:"Details · Export unchanged · confirmed Delete",legacy:true})
-  ].join("");
-  const detail=state==="Selected"?`<div class="campaign-detail"><span>Selected campaign</span><strong>Aimee’s Book</strong><small>Continue loads the newest playable campaign.</small></div>`:state==="Confirm"?`<div class="campaign-delete-confirm"><strong>Delete “Old Test Book”?</strong><small>The older test file is never overwritten. Export remains available.</small><div><button>Cancel</button><button class="danger">Delete campaign</button></div></div>`:`<div class="shelf-caption"><span>Selected campaign</span><strong>Aimee’s Book</strong><span>Older test books open details; they never load or overwrite.</span></div>`;
-  return phone(top("Campaigns","3 campaign books")+`<div class="phone-content campaign-content"><div class="book-shelf">${books}</div>${detail}</div>`+rail("Continue Aimee’s Book","New Game"));
+  const empty=state==="Fresh";
+  const baseBooks=[
+    campaignBook({title:"Future Test Book",status:"FROM A NEWER VERSION",volumes:5,volumeLabel:"five progress books",level:5,played:"Aug 19, 7:10 AM",legacy:true}),
+    campaignBook({title:"Aimee’s Book",status:"READY",volumes:7,volumeLabel:"seven progress books",level:4,played:"Aug 18, 8:12 PM"}),
+    campaignBook({title:"Field Notes",status:"READY",volumes:4,volumeLabel:"four progress books",level:2,played:"Aug 17, 6:40 PM"}),
+    campaignBook({title:"Old Test Book",status:"NEEDS RECOVERY",volumes:2,volumeLabel:"two progress books",level:1,played:"Aug 11, 9:05 AM",legacy:true})
+  ];
+  const recovery=state==="Recovery details"||state==="Selected",newer=state==="Newer-version details";
+  const details=recovery?`<section class="campaign-sheet"><div class="sheet-head"><strong>Campaign details</strong><button>Done</button></div><div class="detail-book-row">${progressSpines(2)}</div><h4>Old Test Book</h4><div class="campaign-detail-facts"><span><b>Level</b>1</span><span><b>Location</b>Base</span><span><b>Progress</b>Opening road</span><span><b>Last played</b>Aug 11, 9:05 AM</span></div><p class="campaign-warning">This campaign belongs to an older test version. Review its recovery details before deciding whether to export or delete it.</p><div class="campaign-sheet-actions"><button>Export unchanged recovery file</button><button class="danger">Delete this campaign</button></div></section>`:newer?`<section class="campaign-sheet"><div class="sheet-head"><strong>Campaign details</strong><button>Done</button></div><h4>Future Test Book</h4><p class="campaign-warning">Save schema 14 needs a newer Bookbinder build.</p><div class="campaign-sheet-actions"><button>Export unchanged recovery file</button><button class="danger">Delete this campaign</button></div></section>`:"";
+  const confirm=state==="Delete confirmation"||state==="Confirm"?`<div class="campaign-delete-confirm"><strong>Delete “Old Test Book” — Base · Aug 11, 2026?</strong><small>Only this campaign will be removed. Other campaigns will not be changed.</small><div><button>Cancel</button><button class="danger">Delete “Old Test Book”</button></div></div>`:"";
+  const actions=`<div class="campaign-primary-actions">${empty?"":`<button class="campaign-primary emphasized"><b>Continue</b><small>Aimee’s Book</small></button>`}<button class="campaign-primary${empty?" emphasized":""}"><b>New Game</b><small>Create a separate campaign</small></button></div>`;
+  return phone(`<div class="safe-top"><span>10:22</span><span>● ◒ ▰</span></div><div class="campaign-page"><header class="campaign-title"><h3>Campaigns</h3><p>${empty?"Begin a campaign. Each new game keeps its own progress.":"Choose a campaign to continue."}</p></header>${actions}${empty?"":`<h4 class="load-heading">Load Game</h4><div class="book-shelf">${baseBooks.join("")}</div>`}${details}${confirm}</div>`);
 }
 function renderBase(){return phone(top("Base","◆ 40 Essence · ✦ 0 Motes · ⚙")+`<div class="phone-content base-content"><div class="town-scene"><nav class="town-tabs" aria-label="Base districts">${tabs(["Home","Make","Study","Realms"])}</nav><span class="town-caption">Home · five places ready</span><button class="hotspot desk" style="--x:17%;--y:25%;--w:20%;--h:7%" data-route="writingDesk"><span><b>Writing Desk</b><small>compose</small></span></button><button class="hotspot work" style="--x:6%;--y:36%;--w:32%;--h:12%" data-route="workshop"><span><b>Workshop</b><small>make</small></span></button><button class="hotspot store" style="--x:59%;--y:26%;--w:34%;--h:12%" data-route="storehouse"><span><b>Storehouse</b><small>stored goods</small></span></button><button class="hotspot spring" style="--x:7%;--y:57%;--w:36%;--h:15%" data-route="essenceSpring"><span><b>Essence Spring</b><small>refine</small></span></button><button class="hotspot fire" style="--x:69%;--y:60%;--w:29%;--h:12%" data-route="firepit"><span><b>Firepit</b><small>gather</small></span></button></div></div>`+rail("Bind & Depart","Party",false,"home-actions"))}
 function renderWriting(){return phone(top("Writing Desk","Brush · Ash")+`<div class="phone-content writing-content">${tabs(["Write","Pages","World"])}<div class="writing-layout writing-desk"><aside class="writing-tray writing-tool-rack"><span class="brush-rest" aria-label="Brush resting on the desk"><i></i></span><button class="rune-choice selected">☼<small>Sun</small></button><button class="rune-choice">≋<small>Smoke</small></button><button class="rune-choice">◆<small>Granite</small></button><button class="rune-choice">✤<small>Bloom</small></button><span class="inkwell" aria-label="Ash ink well">●</span><span class="eyeline">Hands · Inks · Runebook</span></aside><div class="page-sheet"><span class="page-cord"></span><span class="eyeline">Current page</span><div class="page-grid"><span class="connection-line"></span><span class="placed-rune sun">☼</span><span class="placed-rune smoke">≋</span></div><div class="page-caption"><span>2 marks · 1 connection</span><span>◆ 8</span></div></div></div></div>`+rail("Bind & Depart","Clear 2 marks",state==="Confirm"))}
@@ -159,7 +164,7 @@ function normalizeImplementationReviews(value){
   if(!value||typeof value!=="object"||Array.isArray(value))return{};
   return Object.fromEntries(screens.flatMap(({id})=>{
     const record=value[id];
-    if(!record||!['yes','no'].includes(record.choice))return[];
+    if(!record||!['yes','queue','no'].includes(record.choice))return[];
     return [[id,{choice:record.choice,notes:typeof record.notes==="string"?record.notes:"",designVersion:typeof record.designVersion==="string"?record.designVersion:""}]];
   }));
 }
@@ -175,7 +180,7 @@ function saveImplementationDrafts(){
 async function shareImplementationReview(){
   const screenID=active.id,record=implementationDrafts[screenID]??implementationReviews[screenID];
   const packet=implementationReviewRecordPacket(screenID,record);
-  if(!packet||packet.record.choice==="no"&&!packet.record.notes.trim())return;
+  if(!packet||["no","queue"].includes(packet.record.choice)&&!packet.record.notes.trim())return;
   reviewSaveState={screenID,state:"saving",message:"Saving feedback to the shared project ledger…"};
   renderImplementationReview();
   try{
@@ -199,21 +204,23 @@ function renderImplementationReview(){
   $("native-conformance-source").textContent=`Authority: ${conformance.source}`;
   $("native-conformance-issues").innerHTML=conformance.issues.map(issue=>`<li>${issue}</li>`).join("");
   const committed=implementationReviews[active.id],storedRecord=implementationDrafts[active.id]??committed??{choice:"",notes:"",designVersion:""};
-  const staleApproval=storedRecord.choice==="yes"&&storedRecord.designVersion!==conformance.designVersion;
+  const staleApproval=["yes","queue"].includes(storedRecord.choice)&&storedRecord.designVersion!==conformance.designVersion;
   const record=staleApproval?{choice:"",notes:"",designVersion:conformance.designVersion}:storedRecord;
   document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>{input.checked=input.value===record.choice;input.disabled=input.value==="yes"&&!conformanceReady});
   const feedbackWrap=$("implementation-feedback-wrap"),feedback=$("implementation-feedback");
-  feedbackWrap.hidden=record.choice!=="no";
-  feedback.required=record.choice==="no";
+  feedbackWrap.hidden=!["no","queue"].includes(record.choice);
+  feedback.required=["no","queue"].includes(record.choice);
+  feedbackWrap.querySelector("span").textContent=record.choice==="queue"?"What should be queued after implementation?":"What needs to change?";
+  feedback.placeholder=record.choice==="queue"?"Required: describe the noncritical changes to queue":"Required when this screen is not ready";
   if(feedback.value!==record.notes)feedback.value=record.notes;
-  const valid=Boolean(record.choice)&&(record.choice!=="no"||Boolean(record.notes.trim()));
+  const valid=Boolean(record.choice)&&(!["no","queue"].includes(record.choice)||Boolean(record.notes.trim()));
   const dirty=!recordsEqual(record,committed);
   const save=$("implementation-review-save"),status=$("implementation-review-status");
   save.disabled=!valid||!dirty||reviewSaveState.state==="saving";
   status.dataset.state="";
-  if(staleApproval){status.textContent="An earlier Yes is preserved for the previous mock. This rebuilt screen needs a fresh review.";status.dataset.state="stale";return}
+  if(staleApproval){status.textContent="An earlier implementation decision is preserved for the previous mock. This rebuilt screen needs a fresh review.";status.dataset.state="stale";return}
   if(reviewSaveState.screenID===active.id&&reviewSaveState.message){status.textContent=reviewSaveState.message;status.dataset.state=reviewSaveState.state;return}
-  status.textContent=!conformanceReady&&record.choice==="yes"?"Your earlier visual approval is preserved, but implementation readiness is blocked until this mock matches current native behavior.":!record.choice?"Choose a readiness status, then save when you are finished.":record.choice==="no"&&!record.notes.trim()?"Feedback is required before this review can be saved.":dirty?"Draft saved on this device · not shared yet.":"Saved in the shared project ledger.";
+  status.textContent=!conformanceReady&&record.choice==="yes"?"Full implementation readiness is blocked until this mock matches current native behavior. You can instead choose Implement, but queue changes to explicitly override noncritical differences.":!record.choice?"Choose a readiness status, then save when you are finished.":["no","queue"].includes(record.choice)&&!record.notes.trim()?"Notes are required before this review can be saved.":dirty?"Draft saved on this device · not shared yet.":record.choice==="queue"?"Implementation approved with queued changes in the shared project ledger.":"Saved in the shared project ledger.";
   status.dataset.state=dirty?"draft":"shared";
 }
 function updateImplementationReview(choice,notes=""){

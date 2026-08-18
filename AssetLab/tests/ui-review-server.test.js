@@ -29,6 +29,8 @@ try{
 
   const invalid=await invoke("POST",{schemaVersion:1,screenID:"home",record:{choice:"maybe",notes:""}});
   assert.equal(invalid.status,400,"invalid review choices must be rejected without persistence");
+  assert.equal((await invoke("POST",{schemaVersion:1,screenID:"home",record:{choice:"queue",notes:"  "}})).status,400,"queued implementation requires a concrete follow-up note");
+  assert.equal((await invoke("POST",{schemaVersion:1,screenID:"home",record:{choice:"no",notes:""}})).status,400,"not-ready feedback requires a concrete correction note");
 
   const reviews={home:{choice:"yes",notes:""},"writing-desk":{choice:"no",notes:"Keep the page larger"}};
   const homeSaved=await invoke("POST",{schemaVersion:1,screenID:"home",record:reviews.home});
@@ -44,12 +46,18 @@ try{
   assert.match(persisted.updatedAt,/^\d{4}-\d\d-\d\dT/);
   assert.deepEqual(persisted.reviews,reviews);
 
+  const queued=await invoke("POST",{schemaVersion:1,screenID:"campaigns",record:{choice:"queue",notes:"A details-first load is acceptable",designVersion:"native-1"}});
+  assert.equal(queued.status,201);
+  const queuedLedger=JSON.parse(await readFile(ledger,"utf8"));
+  assert.deepEqual(queuedLedger.reviews.campaigns,{choice:"queue",notes:"A details-first load is acceptable",designVersion:"native-1"});
+  assert.deepEqual(queuedLedger.reviews.home,reviews.home,"a queued override must preserve other screen reviews");
+
   const rejectedReplacement=await invoke("POST",{schemaVersion:1,screenID:"home",record:{choice:"no",notes:9}});
   assert.equal(rejectedReplacement.status,400,"a failed Save must reject the malformed replacement");
-  assert.deepEqual(JSON.parse(await readFile(ledger,"utf8")),persisted,"a failed Save must leave the last shared review intact");
+  assert.deepEqual(JSON.parse(await readFile(ledger,"utf8")),queuedLedger,"a failed Save must leave the last shared review intact");
 
   const loaded=await invoke("GET");
-  assert.deepEqual(loaded.json(),persisted,"GET must return the shared packet saved by POST");
+  assert.deepEqual(loaded.json(),queuedLedger,"GET must return the shared packet saved by POST");
 }finally{
   delete process.env.ASSETLAB_UI_REVIEW_FILE;
   await rm(temporary,{recursive:true,force:true});
