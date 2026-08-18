@@ -898,26 +898,37 @@ enum WorldPageCatalog {
         page: Page(runes: [
             PlacedRune(id: InstanceID(rawValue: 1), content: .compound("plains"), hand: .crude,
                        origin: PageCell(column: 0, row: 0), shapeID: "crude_smear"),
-            PlacedRune(id: InstanceID(rawValue: 2), content: .compound("verdant"), hand: .crude,
-                       origin: PageCell(column: 3, row: 0), shapeID: "crude_smear"),
             PlacedRune(id: InstanceID(rawValue: 3), content: .compound("archipelago"), hand: .crude,
                        origin: PageCell(column: 0, row: 3), shapeID: "crude_smear"),
             PlacedRune(id: InstanceID(rawValue: 4), content: .compound("common_ore"), hand: .crude,
                        origin: PageCell(column: 3, row: 3), shapeID: "crude_block"),
-            PlacedRune(
-                id: InstanceID(rawValue: 5),
-                sigil: Sigil(id: InstanceID(rawValue: 6), source: "sun", target: "illumination",
-                             intensity: .faint),
-                hand: .refined, origin: PageCell(column: 5, row: 5), shapeID: "refined_dot"),
-            PlacedRune(
-                id: InstanceID(rawValue: 7),
-                sigil: Sigil(id: InstanceID(rawValue: 8), source: "hush", target: "atmosphere"),
-                hand: .refined, origin: PageCell(column: 5, row: 4), shapeID: "refined_dot")
+            PlacedRune(id: InstanceID(rawValue: 5), content: .target("illumination"), hand: .refined,
+                       origin: PageCell(column: 3, row: 0), shapeID: "refined_dot"),
+            PlacedRune(id: InstanceID(rawValue: 6), content: .source("aurora"), hand: .refined,
+                       origin: PageCell(column: 4, row: 0), shapeID: "refined_dot"),
+            PlacedRune(id: InstanceID(rawValue: 11), content: .qualifier("faint"), hand: .refined,
+                       origin: PageCell(column: 5, row: 0), shapeID: "refined_dot"),
+            PlacedRune(id: InstanceID(rawValue: 7), content: .target("atmosphere"), hand: .refined,
+                       origin: PageCell(column: 3, row: 1), shapeID: "refined_dot"),
+            PlacedRune(id: InstanceID(rawValue: 8), content: .source("hush"), hand: .refined,
+                       origin: PageCell(column: 4, row: 1), shapeID: "refined_dot"),
+            PlacedRune(id: InstanceID(rawValue: 9), content: .target("vitality"), hand: .refined,
+                       origin: PageCell(column: 3, row: 2), shapeID: "refined_dot"),
+            PlacedRune(id: InstanceID(rawValue: 10), content: .source("salt"), hand: .refined,
+                       origin: PageCell(column: 4, row: 2), shapeID: "refined_dot"),
+            PlacedRune(id: InstanceID(rawValue: 12), content: .qualifier("overwhelming"), hand: .refined,
+                       origin: PageCell(column: 5, row: 2), shapeID: "refined_dot")
+        ], links: [
+            MarkLink(InstanceID(rawValue: 5), InstanceID(rawValue: 6)),
+            MarkLink(InstanceID(rawValue: 6), InstanceID(rawValue: 11)),
+            MarkLink(InstanceID(rawValue: 7), InstanceID(rawValue: 8)),
+            MarkLink(InstanceID(rawValue: 9), InstanceID(rawValue: 10)),
+            MarkLink(InstanceID(rawValue: 10), InstanceID(rawValue: 12))
         ]),
         copiedCost: 34,
         worldPageCost: 0,
         seed: 101,
-        promise: "Ordinary daylight, clear calm air, temperate land, water, plant life and common resources for repeatable testing."
+        promise: "Ordinary daylight and clear calm air, with deliberately limited plant and animal growth for visibility testing."
     )
     static let earthlikeTestInstance = WorldPageInstance(
         id: earthlikeTestInstanceID, definition: earthlikeTestDefinition, inspected: true)
