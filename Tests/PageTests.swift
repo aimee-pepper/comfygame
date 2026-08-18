@@ -1,4 +1,5 @@
 import XCTest
+import CryptoKit
 @testable import Bookbinder
 
 /// The page as a spatial grid (`writing-system-rune-spec.md` §2–3).
@@ -280,8 +281,13 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(instances.map(\.id.rawValue),
                        [0x5750_0000_0000_0001, 0x5750_0000_0000_0002,
                         0x5750_0000_0000_0003])
-        XCTAssertEqual(WorldPageCatalog.authoritySHA256,
-                       "4190cd068463d3f5954d387987c726371da45c4989dbee149e686393045aa320")
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let authority = projectRoot.appendingPathComponent("docs/world-pages-authority.json")
+        let sourceAuthoritySHA256 = try SHA256.hash(data: Data(contentsOf: authority))
+            .map { String(format: "%02x", $0) }.joined()
+        XCTAssertEqual(WorldPageCatalog.authoritySHA256, sourceAuthoritySHA256,
+                       "generated World Page authority must match its source document")
         XCTAssertNil(WorldPageCatalog.definition("not_authored"),
                      "unknown content must fail closed rather than fabricate a page")
         for instance in instances {
