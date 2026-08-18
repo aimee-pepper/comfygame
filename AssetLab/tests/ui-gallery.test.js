@@ -23,12 +23,15 @@ const requiredMarkers={
   Recycler:"salvage-table",Tannery:"hide-frame",Bowyer:"bow-jig",Armoury:"armour-stand",
   Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"reliquary-room",
   "Wayfarer’s Table":"route-table",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
-  Firepit:"camp-circle","Loot Decision":"loot-balance","Return Recap":"receipt-paper",Settings:"utility-board"
+  Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"receipt-paper",Settings:"utility-board"
 };
 for(const [title,marker] of Object.entries(requiredMarkers))assert.match(renderScreen(title),new RegExp(marker),`${title} must reach its specialized composition`);
 assert.match(renderScreen("Constellation","Confirm"),/fixed in place/,"fixture states must execute stateful renderer branches");
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
+assert.match(css,/town-starting-home-v1-phone-v2\.png/,"Home must use the phone-composed full-scene asset");
+assert.match(css,/\.town-scene\{height:624px/,"Home scene must own the full phone content body");
+assert.match(renderScreen("Home"),/town-tabs/,"Home destinations must overlay the scene instead of shrinking it");
 for(const marker of new Set(Object.values(requiredMarkers))){
   const className=marker.replace(/^class=\\?"|\\?"$/g,"");
   assert.match(css,new RegExp(`\\.${className}`),`${className} needs an authored style contract`);
