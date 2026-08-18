@@ -4,7 +4,7 @@ const pending=source=>({status:"pending",source,issues:["Native behavior audit h
 export const nativeConformance={
   campaigns:failed("CampaignStartView.swift + CampaignStartPresentationTests.swift",["Native valid-save taps load immediately; the mock adds a persistent selection step and bottom rail.","The mock invents health metadata; native shelf facts are level, location, progression, last played, progress-book count and save validity."]),
   home:failed("BaseView.swift + StartingTownHomeScene.swift",["The current primary label claims a named world is bound, but native opens Writing Desk.","Make, Study and Realms states are not represented yet."]),
-  "writing-desk":failed("WritingDeskView.swift",["The mock uses a fixed four-rune side rack and global Bind/Clear rail instead of the live palette, local Clear and The world-only Bind action."]),
+  "writing-desk":{status:"verified",source:"WritingDeskView.swift:99-167, 222-430, 479-797 + ui-writing-candidate.test.js",issues:[],designVersion:"native-1"},
   storehouse:failed("StationViews.swift",["Native modes are Items, Resources, Field Kit and Waiting; the mock invents Gear and Sort."]),
   workshop:failed("StationViews.swift",["Native Workshop is resource context plus ResearchTree; the mock invents fabrication projects."]),
   party:failed("PartyRosterView.swift",["The mock invents formation roles and omits the native member pager and Gear/Training/Stats/Gambits structure."]),
