@@ -14,4 +14,11 @@ assert.match(source,/book-shelf/,"campaign proposal must preserve stacked-book p
 assert.match(source,/town-scene/,"Home proposal must preserve the authored town scene");
 assert.match(source,/page-grid/,"Writing proposal must preserve page geometry");
 assert.match(source,/constellation-field/,"Constellation must remain one live star, not a list");
+assert.match(source,/book-progress/,"Campaign books must expose their visible progress stack");
+assert.match(source,/utility-board/,"Utilities must use a compact owned board instead of settings rows");
+assert.match(source,/loot-balance/,"Loot must preserve symmetric Drop and Take comparison");
+assert.match(css,/Foundation v0\.2/);
+assert.match(css,/\.foundation-board/);
+assert.match(css,/\.utility-board/);
+assert.match(css,/\.loot-balance/);
 console.log(`UI gallery covers ${required.length} ordinary-phone screens.`);
