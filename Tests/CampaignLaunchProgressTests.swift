@@ -156,6 +156,7 @@ final class CampaignLaunchProgressTests: XCTestCase {
         }, "No child screen may opt back into always-bouncing vertical content")
     }
 
+    @MainActor
     func testNonElasticPolicyDoesNotDisableOverflowScrolling() {
         let appearance = UIScrollView.appearance()
         defer {

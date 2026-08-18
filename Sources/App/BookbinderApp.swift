@@ -2,6 +2,7 @@ import SwiftUI
 import OSLog
 import UIKit
 
+@MainActor
 enum AppScrollInteractionPolicy {
     /// SwiftUI's size-aware behavior keeps fitting content still. UIKit remains the final owner of
     /// edge elasticity for the overflowing ScrollView/List it hosts, so disable that once here
