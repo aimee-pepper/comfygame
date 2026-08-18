@@ -35,7 +35,7 @@ export const nativeConformance={
   encounter:failed("EncounterView.swift",["Native actions are Attack, Techniques, Item and Withdraw; Confirm, Pass and Remedy are invented."]),
   "loot-decision":failed("LootDecisionView.swift",["The mock skips the carried-item selection step and irreversible Leave confirmation."]),
   "return-recap":failed("RootView.swift",["Native recap is one comprehensive scroll; Recovered/Lost tabs and History action are invented."]),
-  settings:failed("SettingsView.swift",["The mock invents Gameplay, Sound, Help and Reset and omits Appearance, Field Notes and Save games."])
+  settings:{status:"verified",source:"SettingsView.swift:14-183 + Theme.swift:9-31 + ContentTests.swift:146-172",issues:[],designVersion:"native-1"}
 };
 
 export function conformanceFor(screenID){return nativeConformance[screenID]??pending("Native source not yet assigned");}

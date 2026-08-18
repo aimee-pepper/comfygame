@@ -26,7 +26,7 @@ const requiredMarkers={
   Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"interpretation-board",
   "Survey Post":"instrument-board",
   "Wayfarer’s Table":"fieldcraft-board",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
-  Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"receipt-paper",Settings:"utility-board"
+  Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"receipt-paper",Settings:"appearance-board"
 };
 for(const [title,marker] of Object.entries(requiredMarkers))assert.match(renderScreen(title),new RegExp(marker),`${title} must reach its specialized composition`);
 assert.deepEqual(fixtureStatesByScreen.constellation,["Default","Selected","Confirm","Bought"],"Constellation must expose its distinct shortfall, selection, confirmation and purchased states");
@@ -93,6 +93,15 @@ assert.equal(nativeConformance["wayfarer-s-table"].status,"verified","Wayfarer m
 assert.match(renderScreen("Reliquary"),/The Reliquary[\s\S]*Field interpretation[\s\S]*Site locations[\s\S]*revealed on arrival[\s\S]*Recovered resources[\s\S]*\+1 each[\s\S]*Reaching and searching each place is still fieldwork/,"Reliquary must render only its exact passive native benefits and fieldwork caveat");
 assert.doesNotMatch(renderScreen("Reliquary"),/Glass Compass|singular object|provenance|inscription|bottom-rail|Read inscription/,"Reliquary must not invent an artifact collection workflow or actions");
 assert.equal(nativeConformance.reliquary.status,"verified","Reliquary may reopen implementation review only after its passive native contract is exact");
+assert.deepEqual(fixtureStatesByScreen.settings,["Default","DEBUG"],"Settings must separate release and DEBUG-only destinations");
+const settingsDefault=renderScreen("Settings","Default"),settingsDebug=renderScreen("Settings","DEBUG");
+assert.match(settingsDefault,/Appearance[\s\S]*System[\s\S]*Light[\s\S]*Dark[\s\S]*Field Notes[\s\S]*How writing and expeditions work[\s\S]*Save games[\s\S]*Return to the campaign chooser/,"release Settings must preserve its exact themes and two destinations");
+assert.match(settingsDefault,/System follows your phone, including its sunset schedule\. Dark overrides it — for when the phone is bright and you are not\./,"Settings must preserve the exact appearance explanation");
+assert.doesNotMatch(settingsDefault,/Gameplay|Sound|Help|Reset|Done|Homework|Debug Tools|acceptance|Installed source|bottom-rail/,"release Settings must contain neither invented utilities nor DEBUG-only content or actions");
+for(const label of ["Homework","Debug Tools","Compound Assembly acceptance","Starter World Pages acceptance","Wild World Pages acceptance","Rune Dictionary acceptance","Page Templates acceptance","Installed source"])assert.match(settingsDebug,new RegExp(label),`DEBUG Settings must retain ${label}`);
+assert.match(settingsDebug,/Save games[\s\S]*data-direction="exit"|data-direction="exit"[\s\S]*Save games/,"Save games must remain the sole campaign-exit destination");
+assert.equal((settingsDebug.match(/data-direction="exit"/g)??[]).length,1,"only Save games may use the exit direction grammar");
+assert.equal(nativeConformance.settings.status,"verified","Settings may reopen review only after release and DEBUG states match native behavior");
 for(const marker of new Set(Object.values(requiredMarkers))){
   const className=marker.replace(/^class=\\?"|\\?"$/g,"");
   assert.match(css,new RegExp(`\\.${className}`),`${className} needs an authored style contract`);

@@ -33,6 +33,6 @@ export const preservationLedger={
 "Encounter":["EncounterView.swift","Battlefield and current actor","Target selection","Technique and remedy chooser","HP, armour and typed conditions","Exact round/turn consequence"],
 "Loot Decision":["LootDecisionView.swift","Drop and Take symmetric facts","Identification-aware identity","Pending-loot count","Irreversible leave confirmation"],
 "Return Recap":["WorldView.swift","Recovered/lost catalogue identities","Quantity and exact instance snapshots","Legacy receipt fallback"],
-"Settings":["SettingsView.swift","Save/testing utilities outside village destinations","Exact DEBUG ownership controls","No implication of current encounter state"]};
+"Settings":["SettingsView.swift","Appearance choices System, Light and Dark","Field Notes push destination","Save games exits to campaign chooser","Exact DEBUG-only destinations and installed source receipt"]};
 
 export function preservationFor(title){const row=preservationLedger[title];if(!row)throw new Error(`No preservation audit for ${title}`);return{source:row[0],preserve:row.slice(1)}}
