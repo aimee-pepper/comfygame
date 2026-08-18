@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
 import {fixtureStatesByScreen,renderScreen} from "../src/ui-gallery-app.js";
 
 const states=["Write","Runebook","Pages · Collected","Pages · Templates","The world","Collected world","Born anchored","Clear Confirm"];
@@ -10,6 +11,13 @@ assert.deepEqual(
 );
 
 const rendered=Object.fromEntries(states.map(state=>[state,renderScreen("Writing Desk",state)]));
+const css=readFileSync(new URL("../ui-gallery.css",import.meta.url),"utf8");
+
+assert.match(css,/\.writing-content\.writing-candidate\{height:708px\}/,"Writing must use the full 708pt post-header region when no departure rail exists");
+assert.match(css,/\.writing-content\.writing-candidate\.has-bind-rail\{height:624px\}/,"The world must reserve only its real 84pt departure rail");
+assert.match(css,/\.writing-candidate \.write-page\{flex:0 0 354px;height:354px\}/,"the page must own half of the post-header region");
+assert.match(css,/\.writing-candidate \.write-page \.page-grid\{grid-template-rows:repeat\(6,1fr\);width:304px;height:304px/,"the page grid must be square rather than the rejected rectangle");
+assert.match(css,/\.writing-candidate \.vocabulary-drawer\{flex:1 1 auto;height:auto;min-height:0\}/,"the rune drawer must consume the remaining lower space");
 
 for(const [state,html] of Object.entries(rendered)){
   assert.match(html,/Write[\s\S]*Pages[\s\S]*The world/,`${state} must preserve the three native panes and their wording`);

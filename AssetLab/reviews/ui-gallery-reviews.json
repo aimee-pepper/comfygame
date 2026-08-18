@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-08-18T21:23:53.647Z",
+  "updatedAt": "2026-08-18T22:01:00.945Z",
   "reviews": {
     "campaigns": {
       "choice": "no",
@@ -13,7 +13,8 @@
     },
     "writing-desk": {
       "choice": "no",
-      "notes": "the side by side view is nonviable for scrolling through the wide variety of runes we have"
+      "notes": "aside from the header, the page should take up half the remaining space, and have a square instead of rectangular grid, and the scrollable bin for runes needs to take the remaining room left empty at the bottom for no reason",
+      "designVersion": "native-1"
     },
     "storehouse": {
       "choice": "yes",

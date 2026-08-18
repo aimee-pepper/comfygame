@@ -31,7 +31,7 @@ export const nativeConformance={
   channelworks:failed("StationViews.swift",["The mock invents route planning; native owns one conduit housing and Build another."]),
   firepit:failed("FirepitView.swift",["The mock invents seats, Binder membership and global transfer actions."]),
   gear:failed("GearView.swift",["The mock omits candidate locations, worn-by-other, empty, take-off and carried refusal states."]),
-  world:failed("WorldView.swift",["The mock invents direct Gather and omits native stability, D-pad, event, loot and Look-mode structure."]),
+  world:{status:"verified",source:"WorldView.swift:89-141, 438-501 + WorldTests.swift:920-963 + ui-world-candidate.test.js",issues:[],designVersion:"native-1"},
   encounter:failed("EncounterView.swift",["Native actions are Attack, Techniques, Item and Withdraw; Confirm, Pass and Remedy are invented."]),
   "loot-decision":failed("LootDecisionView.swift",["The mock skips the carried-item selection step and irreversible Leave confirmation."]),
   "return-recap":failed("RootView.swift",["Native recap is one comprehensive scroll; Recovered/Lost tabs and History action are invented."]),
