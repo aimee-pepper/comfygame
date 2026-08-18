@@ -17,6 +17,14 @@ final class PageTests: XCTestCase {
         XCTAssertEqual(earth.definition.seed, 101)
         XCTAssertEqual(Set(earth.definition.page.symbolIDs),
                        Set(["plains", "verdant", "archipelago", "common_ore"]))
+        let earthReadings = BookRules.readings(
+            for: BookRules.resolveBook(worldPage: earth), seed: earth.definition.seed)
+        XCTAssertEqual(earthReadings["illumination"].peak, 57)
+        XCTAssertEqual(earthReadings["atmosphere"].peak, 57.8, accuracy: 0.0001)
+        XCTAssertEqual(earthReadings["atmosphere"].aspect("clarity"), 75)
+        XCTAssertFalse(
+            DescriptionRules.describe(earthReadings).sentence
+                .localizedCaseInsensitiveContains("want of light"))
         XCTAssertTrue(earth.inspected)
 
         let store = GameStore(io: .temporary(name: "earthlike-page-\(UUID().uuidString)"))
@@ -35,6 +43,12 @@ final class PageTests: XCTestCase {
                        "the reusable testing page must never charge Essence")
         XCTAssertEqual(store.activeRun?.mapSeed, earth.definition.seed)
         XCTAssertEqual(store.activeRun?.book.worldPageUseReceipt?.instanceID, earth.id)
+        XCTAssertEqual(store.activeRun?.worldVisualReceipt?.request.atmosphere.medium, "none")
+        XCTAssertEqual(store.activeRun?.worldVisualReceipt?.request.atmosphere.density, 0)
+        let visibility = try XCTUnwrap(store.activeRun.map { WorldRules.visibilityProfile(in: $0) })
+        XCTAssertEqual(visibility.illumination, 57)
+        XCTAssertEqual(visibility.obscurantDensity, 0)
+        XCTAssertEqual(visibility.fringeWidth, Tuning.Visibility.defaultFringeWidth)
         XCTAssertTrue(store.state.base.collectedWorldPages.contains { $0 == earth },
                       "the permanent Earth-like page must survive every successful bind")
     }
