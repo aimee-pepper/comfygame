@@ -1247,8 +1247,7 @@ private struct TileView: View {
         }
         .blur(radius: visibility == .fringe
               ? side * CGFloat(WorldTileVisibilityPresentation.fringeBlurFraction(
-                  profile: visibilityProfile, remembered: isRememberedTerrain)) : 0,
-              opaque: visibility == .fringe)
+                  profile: visibilityProfile, remembered: isRememberedTerrain)) : 0)
         .overlay {
             switch visibility {
             case .full:
