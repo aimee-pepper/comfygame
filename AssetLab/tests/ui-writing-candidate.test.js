@@ -17,7 +17,8 @@ assert.match(css,/\.writing-content\.writing-candidate\{height:708px\}/,"Writing
 assert.match(css,/\.writing-content\.writing-candidate\.has-bind-rail\{height:624px\}/,"The world must reserve only its real 84pt departure rail");
 assert.match(css,/\.writing-candidate \.write-page\{flex:0 0 354px;height:354px\}/,"the page must own half of the post-header region");
 assert.match(css,/\.writing-candidate \.write-page \.page-grid\{grid-template-rows:repeat\(6,1fr\);width:304px;height:304px/,"the page grid must be square rather than the rejected rectangle");
-assert.match(css,/\.writing-candidate \.vocabulary-drawer\{flex:1 1 auto;height:auto;min-height:0\}/,"the rune drawer must consume the remaining lower space");
+assert.match(css,/\.writing-candidate \.vocabulary-drawer\{flex:1 1 auto;width:calc\(100% \+ 20px\);height:auto;min-height:0;margin:0 -10px -10px;border:0;border-top:3px solid/,"the sigil drawer must span the full lower screen without a boxed outer border");
+assert.match(css,/\.writing-candidate \.target-bin-rail\{padding-inline:10px\}/,"the full-width sigil sections must retain safe inner touch padding");
 
 for(const [state,html] of Object.entries(rendered)){
   assert.match(html,/Write[\s\S]*Pages[\s\S]*The world/,`${state} must preserve the three native panes and their wording`);
