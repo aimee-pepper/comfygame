@@ -2,6 +2,22 @@ import SwiftUI
 import OSLog
 import UIKit
 
+enum AppScrollInteractionPolicy {
+    /// SwiftUI's size-aware behavior keeps fitting content still. UIKit remains the final owner of
+    /// edge elasticity for the overflowing ScrollView/List it hosts, so disable that once here
+    /// without disabling scrolling itself.
+    static func install() {
+        UIScrollView.appearance().bounces = false
+        UIScrollView.appearance().alwaysBounceVertical = false
+    }
+}
+
+extension View {
+    func appScrollInteractionBoundary() -> some View {
+        scrollBounceBehavior(.basedOnSize, axes: .vertical)
+    }
+}
+
 @main
 struct BookbinderApp: App {
     @StateObject private var campaign: CampaignAppCoordinator
@@ -9,6 +25,7 @@ struct BookbinderApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        AppScrollInteractionPolicy.install()
         // Force the launch epoch before SwiftUI constructs the first view. Keeping this
         // eager makes the first-frame measurement include coordinator and loading work.
         LaunchClock.begin()
@@ -28,6 +45,7 @@ struct BookbinderApp: App {
         WindowGroup {
             CampaignAppRootView(coordinator: campaign)
                 .environmentObject(settings)
+                .appScrollInteractionBoundary()
                 // nil follows the phone; light/dark override it.
                 .preferredColorScheme(settings.theme.colorScheme)
         }

@@ -136,6 +136,62 @@ final class CampaignLaunchProgressTests: XCTestCase {
                       "Every published production phase must carry elapsed-time evidence")
     }
 
+    func testAppOwnsOneGlobalNonElasticVerticalScrollBoundary() throws {
+        let source = try String(contentsOf: projectRoot
+            .appending(path: "Sources/App/BookbinderApp.swift"), encoding: .utf8)
+        XCTAssertTrue(source.contains("AppScrollInteractionPolicy.install()"))
+        XCTAssertTrue(source.contains(".appScrollInteractionBoundary()"))
+        XCTAssertTrue(source.contains("scrollBounceBehavior(.basedOnSize, axes: .vertical)"))
+        XCTAssertTrue(source.contains("UIScrollView.appearance().bounces = false"))
+        XCTAssertTrue(source.contains("UIScrollView.appearance().alwaysBounceVertical = false"))
+
+        let sources = try FileManager.default.subpathsOfDirectory(
+            atPath: projectRoot.appending(path: "Sources").path
+        ).filter { $0.hasSuffix(".swift") }.map {
+            try String(contentsOf: projectRoot.appending(path: "Sources").appending(path: $0),
+                       encoding: .utf8)
+        }
+        XCTAssertFalse(sources.contains {
+            $0.contains("scrollBounceBehavior(.always, axes: .vertical)")
+        }, "No child screen may opt back into always-bouncing vertical content")
+    }
+
+    func testNonElasticPolicyDoesNotDisableOverflowScrolling() {
+        let appearance = UIScrollView.appearance()
+        defer {
+            appearance.bounces = true
+            appearance.alwaysBounceVertical = false
+        }
+
+        AppScrollInteractionPolicy.install()
+        let root = ScrollView {
+            Color.clear.frame(width: 320, height: 960)
+        }
+        .appScrollInteractionBoundary()
+        .frame(width: 320, height: 480)
+        let host = UIHostingController(rootView: root)
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        defer { window.isHidden = true }
+        host.view.layoutIfNeeded()
+
+        func scrollViews(in view: UIView) -> [UIScrollView] {
+            (view as? UIScrollView).map { [$0] } ?? view.subviews.flatMap(scrollViews)
+        }
+        guard let scroll = scrollViews(in: host.view).first(where: {
+            $0.contentSize.height > $0.bounds.height
+        }) else { return XCTFail("The overflowing SwiftUI surface did not create a scroll view") }
+
+        XCTAssertFalse(scroll.bounces)
+        XCTAssertFalse(scroll.alwaysBounceVertical)
+        XCTAssertTrue(scroll.isScrollEnabled)
+        XCTAssertGreaterThan(scroll.contentSize.height, scroll.bounds.height)
+        scroll.setContentOffset(CGPoint(x: 0, y: 240), animated: false)
+        XCTAssertEqual(scroll.contentOffset.y, 240,
+                       "Removing edge elasticity must not remove overflow scrolling")
+    }
+
     func testInitialSplashRemainsPerceptibleAfterFastInspection() async throws {
         let directory = temporaryDirectory("minimum-display")
         let clock = ContinuousClock()
