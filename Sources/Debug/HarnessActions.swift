@@ -21,6 +21,64 @@ struct CompoundAssemblyPhoneFixtureReceipt: Equatable, Sendable {
     var ineligibleFingerprint: String
 }
 
+enum StarterWorldPagePhoneFixtureError: Error, LocalizedError {
+    case missingPage
+    case couldNotBind
+    case missingRun
+    case missingReceipt
+    case missingPromisedFind
+    case unsafePromisedFind
+
+    var errorDescription: String? {
+        switch self {
+        case .missingPage: "The authored starter World Page is unavailable."
+        case .couldNotBind: "The disposable campaign could not bind that starter World Page."
+        case .missingRun: "The starter World Page did not create an expedition."
+        case .missingReceipt: "The expedition did not freeze the exact starter-page receipt."
+        case .missingPromisedFind: "The promised starter weapon was not placed exactly once."
+        case .unsafePromisedFind:
+            "The promised weapon is not revealed and reachable in one or two ordinary steps."
+        }
+    }
+}
+
+struct StarterWorldPagePhoneFixtureReceipt: Equatable, Sendable {
+    var pageDefinitionID: WorldPageDefinitionID
+    var pageInstanceID: InstanceID
+    var pageTitle: String
+    var mapSeed: UInt64
+    var itemID: ItemID
+    var itemInstanceID: InstanceID
+    var placement: GridPoint
+    var safePathToRevealedFind: [GridPoint]
+    var essencePaid: Int
+
+    var phoneSummaryLines: [String] {
+        let pageIdentity = String(format: "%016llx", pageInstanceID.rawValue)
+        let itemIdentity = String(format: "%016llx", itemInstanceID.rawValue)
+        let route = safePathToRevealedFind.map { "(\($0.x),\($0.y))" }.joined(separator: " → ")
+        return [
+            "Page \(pageDefinitionID.rawValue) · #\(pageIdentity)",
+            "Seed \(mapSeed) · paid \(essencePaid) Essence",
+            "Promised \(itemID.rawValue) · #\(itemIdentity)",
+            "Revealed find · safe route \(route) · \(safePathToRevealedFind.count - 1) step\(safePathToRevealedFind.count == 2 ? "" : "s")"
+        ]
+    }
+}
+
+@MainActor
+final class StarterWorldPagePhoneFixtureSession: ObservableObject, Identifiable {
+    let id = UUID()
+    let store: GameStore
+    let receipt: StarterWorldPagePhoneFixtureReceipt
+
+    init(definitionID: WorldPageDefinitionID) throws {
+        let fixture = try GameStore.makeStarterWorldPagePhoneFixture(definitionID: definitionID)
+        store = fixture.store
+        receipt = fixture.receipt
+    }
+}
+
 @MainActor
 final class CompoundAssemblyPhoneFixtureSession: ObservableObject, Identifiable {
     let id = UUID()
@@ -265,6 +323,75 @@ final class EncounterScalingProgressionFixtureSession: ObservableObject, Identif
 }
 
 extension GameStore {
+    /// Disposable ordinary-phone proof for the shipped starter catalogue. The fixture crosses the
+    /// production bind transaction and generator exactly once; only its persistence destination is
+    /// replaced with a UUID-named temporary store that cannot address a campaign slot.
+    static func makeStarterWorldPagePhoneFixture(
+        definitionID: WorldPageDefinitionID
+    ) throws -> (store: GameStore, receipt: StarterWorldPagePhoneFixtureReceipt) {
+        guard let instance = WorldPageCatalog.starterInstances.first(where: {
+            $0.definition.id == definitionID
+        }) else { throw StarterWorldPagePhoneFixtureError.missingPage }
+        let store = GameStore(io: .temporary(
+            name: "phone-starter-world-page-\(definitionID.rawValue)-\(UUID().uuidString)"))
+        guard store.bindAndDepart(worldPageInstanceID: instance.id) else {
+            throw StarterWorldPagePhoneFixtureError.couldNotBind
+        }
+        guard let run = store.activeRun else {
+            throw StarterWorldPagePhoneFixtureError.missingRun
+        }
+        guard let pageReceipt = run.book.worldPageUseReceipt,
+              pageReceipt.instanceID == instance.id,
+              pageReceipt.definition == instance.definition,
+              pageReceipt.essencePaid == instance.definition.worldPageCost else {
+            throw StarterWorldPagePhoneFixtureError.missingReceipt
+        }
+        let finds = run.map.allPoints.compactMap { point -> (GridPoint, ItemStack)? in
+            guard case .item(let stack) = run.map[point].content,
+                  stack.catalogID == instance.definition.knownFind else { return nil }
+            return (point, stack)
+        }
+        guard finds.count == 1, let find = finds.first,
+              let itemID = instance.definition.knownFind,
+              find.1.id == StarterKnownFindPlacementRules.stableInstanceID(for: pageReceipt)
+        else { throw StarterWorldPagePhoneFixtureError.missingPromisedFind }
+        guard run.map[find.0].isRevealed,
+              let path = safeStarterPath(in: run, destination: find.0) else {
+            throw StarterWorldPagePhoneFixtureError.unsafePromisedFind
+        }
+        return (store, .init(
+            pageDefinitionID: instance.definition.id,
+            pageInstanceID: instance.id,
+            pageTitle: instance.definition.title,
+            mapSeed: run.mapSeed,
+            itemID: itemID,
+            itemInstanceID: find.1.id,
+            placement: find.0,
+            safePathToRevealedFind: path,
+            essencePaid: pageReceipt.essencePaid
+        ))
+    }
+
+    private static func safeStarterPath(
+        in run: WorldRun, destination: GridPoint
+    ) -> [GridPoint]? {
+        var paths: [GridPoint: [GridPoint]] = [run.playerPosition: [run.playerPosition]]
+        var queue = [run.playerPosition]
+        while !queue.isEmpty {
+            let point = queue.removeFirst()
+            guard let path = paths[point], path.count <= 3 else { continue }
+            if point == destination { return path }
+            for next in run.map.neighbours(of: point) where paths[next] == nil {
+                let tile = run.map[next]
+                guard tile.isPassable, tile.ground.movementCost == 1,
+                      abs(tile.elevation - run.map[point].elevation) <= 1 else { continue }
+                paths[next] = path + [next]
+                queue.append(next)
+            }
+        }
+        return nil
+    }
+
     /// A disposable campaign for phone acceptance. Direct mutation constructs only the deliberate
     /// starting fixture; formalize, rename and delete remain production quoted transactions.
     static func makeCompoundAssemblyPhoneFixture() throws -> (

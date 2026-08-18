@@ -7,6 +7,48 @@ import XCTest
 /// sits never changes what it says — and **refinement is literacy, not power** — a better hand lets
 /// you say the same thing in less space and never unlocks a meaning.
 final class PageTests: XCTestCase {
+    @MainActor
+    func testStarterWorldPagePhoneFixturesUseProductionReceiptsRevealedFindsAndSafeRoutes() throws {
+        for instance in WorldPageCatalog.starterInstances {
+            let fixture = try GameStore.makeStarterWorldPagePhoneFixture(
+                definitionID: instance.definition.id)
+            let receipt = fixture.receipt
+            XCTAssertEqual(receipt.pageDefinitionID, instance.definition.id)
+            XCTAssertEqual(receipt.pageInstanceID, instance.id)
+            XCTAssertEqual(receipt.mapSeed, instance.definition.seed)
+            XCTAssertEqual(receipt.itemID, instance.definition.knownFind)
+            XCTAssertEqual(receipt.itemInstanceID,
+                           StarterKnownFindPlacementRules.stableInstanceID(for:
+                            try XCTUnwrap(fixture.store.activeRun?.book.worldPageUseReceipt)))
+            XCTAssertTrue((1...2).contains(receipt.safePathToRevealedFind.count - 1))
+            XCTAssertEqual(receipt.safePathToRevealedFind.first,
+                           fixture.store.activeRun?.playerPosition)
+            XCTAssertEqual(receipt.safePathToRevealedFind.last, receipt.placement)
+            XCTAssertTrue(fixture.store.activeRun?.map[receipt.placement].isRevealed == true)
+            XCTAssertTrue(receipt.safePathToRevealedFind.allSatisfy {
+                fixture.store.activeRun?.map[$0].ground.movementCost == 1
+            })
+            XCTAssertFalse(fixture.store.state.base.collectedWorldPages.contains {
+                $0.id == instance.id
+            }, "the production bind transaction must consume only the disposable copy")
+        }
+    }
+
+    func testSettingsExposesDisposableStarterWorldPageAcceptanceRoute() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let settings = try String(
+            contentsOf: root.appending(path: "Sources/Screens/SettingsView.swift"),
+            encoding: .utf8)
+        let harness = try String(
+            contentsOf: root.appending(path: "Sources/Debug/HarnessActions.swift"),
+            encoding: .utf8)
+        XCTAssertTrue(settings.contains("settings.starter-world-pages-acceptance"))
+        XCTAssertTrue(settings.contains("starter-world-page-receipt"))
+        XCTAssertTrue(harness.contains("GameStore(io: .temporary("))
+        XCTAssertTrue(harness.contains("bindAndDepart(worldPageInstanceID: instance.id)"))
+    }
+
     func testWritingDeskConcealsUninspectedWildPageAuthorityUntilExactOpen() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             .deletingLastPathComponent()

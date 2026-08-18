@@ -94,6 +94,18 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("settings.compound-assembly-acceptance")
 
+                NavigationLink {
+                    StarterWorldPagesPhoneAcceptanceView()
+                } label: {
+                    SettingsDestinationRow(
+                        icon: "map.fill",
+                        title: "Starter World Pages acceptance",
+                        subtitle: "Disposable worlds and exact nearby weapon receipts"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.starter-world-pages-acceptance")
+
                 StationCard(title: "Installed source", icon: "point.3.connected.trianglepath.dotted") {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(InstalledSourceRevisionPresentation.displayValue)
@@ -130,6 +142,83 @@ struct SettingsView: View {
 }
 
 #if DEBUG
+private struct StarterWorldPagesPhoneAcceptanceView: View {
+    @State private var session: StarterWorldPagePhoneFixtureSession?
+    @State private var errorMessage: String?
+
+    var body: some View {
+        List {
+            Section("Three authored openings") {
+                Text("Each launch binds one exact starter Page through production rules into a disposable campaign. It never reads or writes a save slot.")
+                    .font(.callout)
+                ForEach(WorldPageCatalog.starterInstances, id: \.definition.id) { instance in
+                    Button {
+                        do {
+                            session = try StarterWorldPagePhoneFixtureSession(
+                                definitionID: instance.definition.id)
+                        } catch {
+                            errorMessage = error.localizedDescription
+                        }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(instance.definition.title).font(.headline)
+                            Text("\(ContentCatalog.shared.item(instance.definition.knownFind ?? "")?.name ?? "Missing promised find") · seed \(instance.definition.seed) · \(instance.definition.worldPageCost) Essence")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    }
+                }
+            }
+            Section("Acceptance") {
+                Text("Confirm the named weapon is already visible, reachable from the entry in the receipt's one- or two-step route, inspectable before pickup, and collected by walking onto it. Close returns here without changing your selected campaign.")
+                    .font(.callout)
+            }
+        }
+        .navigationTitle("Starter World Pages")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("Fixture unavailable", isPresented: Binding(
+            get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { errorMessage = nil }
+        } message: {
+            Text(errorMessage ?? "Unknown fixture error")
+        }
+        .fullScreenCover(item: $session) { fixture in
+            ZStack(alignment: .topTrailing) {
+                RootView().environmentObject(fixture.store)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(fixture.receipt.pageTitle).font(.caption.bold())
+                    ForEach(fixture.receipt.phoneSummaryLines, id: \.self) { line in
+                        Text(line).font(.caption2.monospacedDigit())
+                    }
+                }
+                .padding(10)
+                .background(.black.opacity(0.82), in: RoundedRectangle(cornerRadius: 10))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 52)
+                .padding(.horizontal, 10)
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("starter-world-page-receipt")
+                .zIndex(19_999)
+                Button { session = nil } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, .black.opacity(0.72))
+                        .frame(width: 48, height: 48)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityLabel("Close starter World Page fixture")
+                .padding(.top, 4)
+                .padding(.trailing, 4)
+                .zIndex(20_000)
+            }
+        }
+    }
+}
+
 private struct CompoundAssemblyPhoneAcceptanceView: View {
     @State private var session: CompoundAssemblyPhoneFixtureSession?
     @State private var errorMessage: String?
