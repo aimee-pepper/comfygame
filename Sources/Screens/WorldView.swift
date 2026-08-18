@@ -507,7 +507,7 @@ struct WorldView: View {
         }
         if let page = store.offeredWorldPageHere {
             return page.inspected ? "Take \(page.definition.title) · 1 satchel slot"
-                                  : "Take loose page · 1 satchel slot · no turn"
+                                  : "Inspect Loose page · no turn"
         }
         if let site = store.searchableHere, let definition = site.definition {
             return "Search \(definition.name) · \(site.searchTurnsRemaining) turns left"
@@ -529,15 +529,21 @@ struct WorldView: View {
     private func performInteraction() {
         if let page = store.offeredWorldPageHere,
            let quote = store.offeredWorldPageQuote(page.id) {
-            switch store.takeOfferedWorldPage(quote) {
-            case .taken:
-                break
-            case .satchelFull:
-                pendingWorldPageSwap = quote
-            case .stale, .notHere, .duplicateIdentity:
-                fieldPageMessage = "That page is no longer available here."
-            case .inspected, .swapped:
-                break
+            if page.inspected {
+                switch store.takeOfferedWorldPage(quote) {
+                case .taken(let taken): fieldPageMessage = "Took \(taken.definition.title)."
+                case .satchelFull: pendingWorldPageSwap = quote
+                case .stale, .notHere, .duplicateIdentity:
+                    fieldPageMessage = "That page is no longer available here."
+                case .inspected, .swapped: break
+                }
+            } else {
+                switch store.inspectOfferedWorldPage(quote) {
+                case .inspected(let inspected): fieldPageMessage = inspected.definition.title
+                case .stale, .notHere, .duplicateIdentity:
+                    fieldPageMessage = "That page is no longer available here."
+                case .satchelFull, .taken, .swapped: break
+                }
             }
         } else if store.harvestableHere != nil {
             completeInteraction(); store.harvest()
@@ -563,7 +569,7 @@ struct WorldView: View {
     ) {
         pendingWorldPageSwap = nil
         switch store.swapOfferedWorldPage(quote, discarding: occupant) {
-        case .swapped: break
+        case .swapped(let page, _): fieldPageMessage = "Took \(page.definition.title)."
         case .stale, .notHere, .duplicateIdentity, .satchelFull:
             fieldPageMessage = "That choice is no longer current. Nothing was changed."
         case .inspected, .taken: break
@@ -960,6 +966,11 @@ enum WorldMapLayout {
 /// you compose on a page and walk through a world. The camera is **clamped follow**: centred on you
 /// until you reach an edge, where it stops rather than showing empty space past the border.
 private struct MapGrid: View {
+    private enum RenderLayer {
+        case softenedTerrain
+        case crispFullVisibility
+    }
+
     let run: WorldRun
     let maximumWidth: CGFloat
     let viewportColumns: Int
@@ -989,43 +1000,20 @@ private struct MapGrid: View {
             let grade = WorldGrade.from(readings)
             let atmosphereMotion = Int(readings["atmosphere"].aspect("motion")
                 .rounded(.toNearestOrAwayFromZero))
-            VStack(spacing: 0) {
-                ForEach(origin.y..<(origin.y + viewportRows), id: \.self) { y in
-                    HStack(spacing: 0) {
-                        ForEach(origin.x..<(origin.x + viewportColumns), id: \.self) { x in
-                            let point = GridPoint(x: x, y: y)
-                            let currentVisibility = WorldRules.visibility(
-                                of: point, from: run.playerPosition,
-                                in: run.map, profile: visibilityProfile)
-                            let visibility = WorldRules.terrainVisibility(
-                                current: currentVisibility, wasRevealed: run.map[point].isRevealed)
-                            let isRememberedTerrain = currentVisibility == .hidden
-                                && visibility == .fringe
-                            let displayTile = displayTile(at: point, visibility: visibility)
-                            let presentation = WorldTileVisibilityPresentation.resolve(
-                                run: run, point: point, tile: displayTile, visibility: visibility,
-                                profile: visibilityProfile, grade: grade,
-                                atmosphereMotion: atmosphereMotion)
-                            TileView(tile: displayTile,
-                                     visibility: visibility,
-                                     isRememberedTerrain: isRememberedTerrain,
-                                     visibilityProfile: visibilityProfile,
-                                     artRequest: presentation.artRequest,
-                                     fogBoundaryEdges: presentation.fogBoundaryEdges,
-                                     enemy: enemy(at: point, visibility: currentVisibility),
-                                     site: currentVisibility == .full ? site(at: point) : nil,
-                                     hasLooseWorldPage: currentVisibility == .full
-                                        && run.offeredWorldPages.contains {
-                                            $0.fieldProvenance?.position == point
-                                        },
-                                     isPlayer: point == run.playerPosition,
-                                     side: side,
-                                     useSimpleRenderer: simpleRenderer)
-                                .onTapGesture { onTap(point) }
-                        }
-                    }
-                    .zIndex(Double(y))
-                }
+            ZStack {
+                Color.black
+                mapCells(side: side, grade: grade, atmosphereMotion: atmosphereMotion,
+                         layer: .softenedTerrain)
+                    .compositingGroup()
+                    .blur(radius: side * CGFloat(
+                        WorldVisibilityCompositePresentation.viewportBlurFraction(
+                            profile: visibilityProfile,
+                            includesRememberedTerrain: viewportIncludesRememberedTerrain)))
+                visibilityFieldShade(side: side)
+                mapCells(side: side, grade: grade, atmosphereMotion: atmosphereMotion,
+                         layer: .crispFullVisibility)
+                hiddenMaskGrid(side: side)
+                tapGrid(side: side)
             }
         }
         .frame(width: maximumWidth,
@@ -1038,6 +1026,128 @@ private struct MapGrid: View {
             in: RoundedRectangle(cornerRadius: 10)
         )
         .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    private func mapCells(side: CGFloat, grade: WorldGrade, atmosphereMotion: Int,
+                          layer: RenderLayer) -> some View {
+        VStack(spacing: 0) {
+            ForEach(origin.y..<(origin.y + viewportRows), id: \.self) { y in
+                HStack(spacing: 0) {
+                    ForEach(origin.x..<(origin.x + viewportColumns), id: \.self) { x in
+                        let point = GridPoint(x: x, y: y)
+                        mapCell(at: point, side: side, grade: grade,
+                                atmosphereMotion: atmosphereMotion, layer: layer)
+                    }
+                }
+                .zIndex(Double(y))
+            }
+        }
+    }
+
+    private func mapCell(at point: GridPoint, side: CGFloat, grade: WorldGrade,
+                         atmosphereMotion: Int, layer: RenderLayer) -> some View {
+        let currentVisibility = WorldRules.visibility(
+            of: point, from: run.playerPosition, in: run.map, profile: visibilityProfile)
+        let visibility = WorldRules.terrainVisibility(
+            current: currentVisibility, wasRevealed: run.map[point].isRevealed)
+        let isRememberedTerrain = currentVisibility == .hidden && visibility == .fringe
+        var layerTile = displayTile(at: point, visibility: visibility)
+        if layer == .softenedTerrain {
+            layerTile.content = .empty
+            layerTile.flora = nil
+            layerTile.isCracking = false
+        }
+        let presentation = WorldTileVisibilityPresentation.resolve(
+            run: run, point: point, tile: layerTile, visibility: visibility,
+            profile: visibilityProfile, grade: grade, atmosphereMotion: atmosphereMotion)
+        let isCrispLayer = layer == .crispFullVisibility
+        return TileView(
+            tile: layerTile,
+            visibility: visibility,
+            isRememberedTerrain: isRememberedTerrain,
+            visibilityProfile: visibilityProfile,
+            artRequest: presentation.artRequest,
+            enemy: isCrispLayer ? enemy(at: point, visibility: currentVisibility) : nil,
+            site: isCrispLayer && currentVisibility == .full ? site(at: point) : nil,
+            hasLooseWorldPage: isCrispLayer && currentVisibility == .full
+                && run.offeredWorldPages.contains { $0.fieldProvenance?.position == point },
+            isPlayer: isCrispLayer && point == run.playerPosition,
+            showsContent: isCrispLayer,
+            isTransparent: isCrispLayer && visibility != .full,
+            appliesVisibilityShade: false,
+            side: side,
+            useSimpleRenderer: simpleRenderer)
+    }
+
+    private var viewportIncludesRememberedTerrain: Bool {
+        for y in origin.y..<(origin.y + viewportRows) {
+            for x in origin.x..<(origin.x + viewportColumns) {
+                let point = GridPoint(x: x, y: y)
+                let current = WorldRules.visibility(
+                    of: point, from: run.playerPosition, in: run.map,
+                    profile: visibilityProfile)
+                if current == .hidden && run.map[point].isRevealed { return true }
+            }
+        }
+        return false
+    }
+
+    private func hiddenMaskGrid(side: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            ForEach(origin.y..<(origin.y + viewportRows), id: \.self) { y in
+                HStack(spacing: 0) {
+                    ForEach(origin.x..<(origin.x + viewportColumns), id: \.self) { x in
+                        let point = GridPoint(x: x, y: y)
+                        let current = WorldRules.visibility(
+                            of: point, from: run.playerPosition, in: run.map,
+                            profile: visibilityProfile)
+                        let terrain = WorldRules.terrainVisibility(
+                            current: current, wasRevealed: run.map[point].isRevealed)
+                        (terrain == .hidden ? Color.black : Color.clear)
+                            .frame(width: side, height: side)
+                    }
+                }
+            }
+        }
+        .allowsHitTesting(false)
+    }
+
+    /// A single map-space radial field makes the sight boundary read as one circle around the
+    /// player. It replaces independent per-cell gradients, whose seams looked like boxes and
+    /// directional wedges as the camera moved.
+    private func visibilityFieldShade(side: CGFloat) -> some View {
+        let geometry = WorldVisibilityCompositePresentation.radialField(
+            player: run.playerPosition, origin: origin,
+            viewportColumns: viewportColumns, viewportRows: viewportRows,
+            profile: visibilityProfile)
+        return RadialGradient(
+            stops: [
+                .init(color: .clear, location: geometry.clearStop),
+                .init(color: .black.opacity(geometry.fringeShadeOpacity),
+                      location: geometry.fringeStop),
+                .init(color: .black.opacity(geometry.rememberedShadeOpacity), location: 1),
+            ],
+            center: UnitPoint(x: geometry.centerX, y: geometry.centerY),
+            startRadius: 0,
+            endRadius: side * CGFloat(geometry.endRadiusInTiles)
+        )
+        .allowsHitTesting(false)
+    }
+
+    private func tapGrid(side: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            ForEach(origin.y..<(origin.y + viewportRows), id: \.self) { y in
+                HStack(spacing: 0) {
+                    ForEach(origin.x..<(origin.x + viewportColumns), id: \.self) { x in
+                        let point = GridPoint(x: x, y: y)
+                        Color.clear
+                            .frame(width: side, height: side)
+                            .contentShape(Rectangle())
+                            .onTapGesture { onTap(point) }
+                    }
+                }
+            }
+        }
     }
 
     private var simpleRenderer: Bool {
@@ -1083,17 +1193,8 @@ private struct MapGrid: View {
     }
 }
 
-struct FogBoundaryEdges: OptionSet, Equatable {
-    let rawValue: Int
-    static let north = Self(rawValue: 1)
-    static let east = Self(rawValue: 2)
-    static let south = Self(rawValue: 4)
-    static let west = Self(rawValue: 8)
-}
-
 struct WorldTileVisibilityPresentation {
     let artRequest: MapTileArtRequest?
-    let fogBoundaryEdges: FogBoundaryEdges
 
     static func resolve(run: WorldRun, point: GridPoint, tile: Tile,
                         visibility: WorldRules.TileVisibility,
@@ -1101,38 +1202,31 @@ struct WorldTileVisibilityPresentation {
                         grade: WorldGrade,
                         atmosphereMotion: Int = 0) -> Self {
         guard visibility != .hidden else {
-            return Self(artRequest: nil, fogBoundaryEdges: [])
+            return Self(artRequest: nil)
         }
 
-        let neighbours: [(bit: Int, edge: FogBoundaryEdges, point: GridPoint)] = [
-            (1, .north, GridPoint(x: point.x, y: point.y - 1)),
-            (2, .east, GridPoint(x: point.x + 1, y: point.y)),
-            (4, .south, GridPoint(x: point.x, y: point.y + 1)),
-            (8, .west, GridPoint(x: point.x - 1, y: point.y)),
+        let neighbours: [(bit: Int, isSouth: Bool, point: GridPoint)] = [
+            (1, false, GridPoint(x: point.x, y: point.y - 1)),
+            (2, false, GridPoint(x: point.x + 1, y: point.y)),
+            (4, true, GridPoint(x: point.x, y: point.y + 1)),
+            (8, false, GridPoint(x: point.x - 1, y: point.y)),
         ]
         var adjacency = 0
-        var fogBoundaryEdges: FogBoundaryEdges = []
         var visibleSouth: Tile?
 
         for neighbour in neighbours {
-            guard run.map.contains(neighbour.point) else {
-                fogBoundaryEdges.insert(neighbour.edge)
-                continue
-            }
+            guard run.map.contains(neighbour.point) else { continue }
             let currentNeighbourVisibility = WorldRules.visibility(
                 of: neighbour.point, from: run.playerPosition,
                 in: run.map, profile: profile)
             let neighbourVisibility = WorldRules.terrainVisibility(
                 current: currentNeighbourVisibility,
                 wasRevealed: run.map[neighbour.point].isRevealed)
-            guard neighbourVisibility != .hidden else {
-                fogBoundaryEdges.insert(neighbour.edge)
-                continue
-            }
+            guard neighbourVisibility != .hidden else { continue }
             var visibleTile = run.map[neighbour.point]
             visibleTile.isRevealed = true
             if visibleTile.ground == tile.ground { adjacency |= neighbour.bit }
-            if neighbour.edge == .south { visibleSouth = visibleTile }
+            if neighbour.isSouth { visibleSouth = visibleTile }
         }
 
         let flora = visibility == .full
@@ -1145,7 +1239,7 @@ struct WorldTileVisibilityPresentation {
             grade: grade, flora: flora,
             worldGrade2Descriptor: run.worldVisualReceipt?.descriptor,
             atmosphereMotion: atmosphereMotion)
-        return Self(artRequest: request, fogBoundaryEdges: fogBoundaryEdges)
+        return Self(artRequest: request)
     }
 
     static func opaqueFogPixels() -> [UInt8] {
@@ -1168,25 +1262,84 @@ struct WorldTileVisibilityPresentation {
     }
 }
 
+/// One map-space softening pass replaces independent tile blurs and directional edge wedges.
+/// Full tiles are redrawn sharply above this layer; hidden tiles never receive an art request.
+struct WorldVisibilityCompositePresentation {
+    struct RadialField: Equatable {
+        let centerX: Double
+        let centerY: Double
+        let clearStop: Double
+        let fringeStop: Double
+        let endRadiusInTiles: Double
+        let fringeShadeOpacity: Double
+        let rememberedShadeOpacity: Double
+    }
+
+    static func viewportBlurFraction(profile: WorldRules.VisibilityProfile,
+                                     includesRememberedTerrain: Bool) -> Double {
+        if profile.fringeWidth > 0 { return profile.fringeBlurFraction }
+        return includesRememberedTerrain ? Tuning.Visibility.defaultFringeBlurFraction : 0
+    }
+
+    static func softenedLayerRendersTerrain(
+        visibility: WorldRules.TileVisibility
+    ) -> Bool {
+        visibility != .hidden
+    }
+
+    static func crispLayerRendersContent(
+        visibility: WorldRules.TileVisibility
+    ) -> Bool {
+        visibility == .full
+    }
+
+    static func radialField(player: GridPoint, origin: GridPoint,
+                            viewportColumns: Int, viewportRows: Int,
+                            profile: WorldRules.VisibilityProfile) -> RadialField {
+        let columns = Double(max(1, viewportColumns))
+        let rows = Double(max(1, viewportRows))
+        let fullBoundary = Double(profile.fullRadius) + 0.5
+        let fringeBoundary = fullBoundary + Double(profile.fringeWidth)
+        // Extend to the farthest viewport corner so the final stop covers every remembered tile.
+        let localX = Double(player.x - origin.x) + 0.5
+        let localY = Double(player.y - origin.y) + 0.5
+        let endRadius = max(
+            fringeBoundary + 0.5,
+            hypot(max(localX, columns - localX), max(localY, rows - localY)))
+        return RadialField(
+            centerX: localX / columns,
+            centerY: localY / rows,
+            clearStop: min(1, fullBoundary / endRadius),
+            fringeStop: min(1, max(fullBoundary, fringeBoundary) / endRadius),
+            endRadiusInTiles: endRadius,
+            fringeShadeOpacity: 1 - profile.fringeOpacity,
+            rememberedShadeOpacity: 1 - Tuning.Visibility.defaultFringeOpacity)
+    }
+}
+
 private struct TileView: View {
     let tile: Tile
     let visibility: WorldRules.TileVisibility
     let isRememberedTerrain: Bool
     let visibilityProfile: WorldRules.VisibilityProfile
     let artRequest: MapTileArtRequest?
-    let fogBoundaryEdges: FogBoundaryEdges
     let enemy: WorldEnemy?
     /// Resolved by the caller: the tile only stores an instance id, and the grid is the one place
     /// that has the run to look it up in.
     let site: SiteDef?
     let hasLooseWorldPage: Bool
     let isPlayer: Bool
+    let showsContent: Bool
+    let isTransparent: Bool
+    let appliesVisibilityShade: Bool
     let side: CGFloat
     let useSimpleRenderer: Bool
 
     var body: some View {
         ZStack(alignment: .top) {
-            if visibility == .hidden {
+            if isTransparent {
+                Color.clear
+            } else if visibility == .hidden {
                 Rectangle().fill(Color.black)
             } else if useSimpleRenderer {
                 Rectangle().fill(background)
@@ -1205,7 +1358,8 @@ private struct TileView: View {
                     .offset(y: -side * CGFloat(MapAssetContract.maximumElevation)
                             / CGFloat(MapAssetContract.logicalSide))
             }
-            ZStack {
+            if !isTransparent {
+                ZStack {
                 // The player gets a filled disc behind them: at 27pt a bare glyph disappears into
                 // the grid, and "where am I" has to be answerable at a glance.
                 if isPlayer {
@@ -1218,7 +1372,7 @@ private struct TileView: View {
                         .stroke(Color.orange, style: StrokeStyle(lineWidth: max(2, side * 0.08), dash: [3, 2]))
                         .padding(side * 0.08)
                 }
-                if case .traveller(let travellerID) = tile.content,
+                if showsContent, case .traveller(let travellerID) = tile.content,
                    visibility == .full, tile.isRevealed, !tile.isCrumbled {
                     let traveller = ContentCatalog.shared.traveller(travellerID)
                     NamedCharacterMapPixelIdentity(
@@ -1233,33 +1387,32 @@ private struct TileView: View {
                         .font(.system(size: side * (isPlayer ? 0.46 : 0.54), weight: isPlayer ? .bold : .regular))
                         .foregroundStyle(tint)
                 }
+                }
+                .frame(width: side, height: side)
+                .offset(y: surfaceLift)
             }
-            .frame(width: side, height: side)
-            .offset(y: surfaceLift)
 
             // Alert punctuation is a floating UI badge, not something painted on the ground.
-            if let enemy, case .alert = enemy.awareness {
+            if !isTransparent, let enemy, case .alert = enemy.awareness {
                 Image(systemName: "exclamationmark")
                     .font(.system(size: side * 0.28, weight: .black))
                     .foregroundStyle(.orange)
                     .offset(x: side * 0.30, y: -side * 0.30)
             }
         }
-        .blur(radius: visibility == .fringe
-              ? side * CGFloat(WorldTileVisibilityPresentation.fringeBlurFraction(
-                  profile: visibilityProfile, remembered: isRememberedTerrain)) : 0)
         .overlay {
-            switch visibility {
-            case .full:
+            switch (isTransparent || !appliesVisibilityShade, visibility) {
+            case (true, _):
                 Color.clear
-            case .fringe:
+            case (false, .full):
+                Color.clear
+            case (false, .fringe):
                 Color.black.opacity(1 - WorldTileVisibilityPresentation.fringeOpacity(
                     profile: visibilityProfile, remembered: isRememberedTerrain))
-            case .hidden:
+            case (false, .hidden):
                 Color.black
             }
         }
-        .overlay { fogBoundaryOverlay }
         .frame(width: side, height: side)
         .contentShape(Rectangle())
     }
@@ -1269,32 +1422,8 @@ private struct TileView: View {
         return -side * CGFloat(artRequest.resolvedElevation) / CGFloat(MapAssetContract.logicalSide)
     }
 
-    @ViewBuilder private var fogBoundaryOverlay: some View {
-        if visibility != .hidden {
-            let depth = min(side * 0.5, max(1, CGFloat(visibilityProfile.fogEdgeBlurPoints)))
-            ZStack {
-                if fogBoundaryEdges.contains(.north) {
-                    LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                        .frame(height: depth).frame(maxHeight: .infinity, alignment: .top)
-                }
-                if fogBoundaryEdges.contains(.east) {
-                    LinearGradient(colors: [.clear, .black], startPoint: .leading, endPoint: .trailing)
-                        .frame(width: depth).frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                if fogBoundaryEdges.contains(.south) {
-                    LinearGradient(colors: [.clear, .black], startPoint: .top, endPoint: .bottom)
-                        .frame(height: depth).frame(maxHeight: .infinity, alignment: .bottom)
-                }
-                if fogBoundaryEdges.contains(.west) {
-                    LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
-                        .frame(width: depth).frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            .allowsHitTesting(false)
-        }
-    }
-
     private var symbol: String? {
+        guard showsContent else { return nil }
         if isPlayer { return "figure.stand" }
         guard visibility == .full, tile.isRevealed, !tile.isCrumbled else { return nil }
         if let enemy { return enemy.icon }
