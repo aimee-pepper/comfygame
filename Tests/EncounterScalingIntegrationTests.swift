@@ -3,6 +3,21 @@ import XCTest
 
 @MainActor
 final class EncounterScalingIntegrationTests: XCTestCase {
+    func testPhoneHarnessNamesTheWholeScalingMatrixAndRequestsComparableEvidence() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/SettingsView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains(".navigationTitle(\"Encounter scaling\")"))
+        XCTAssertFalse(source.contains(".navigationTitle(\"Level-one scaling\")"))
+        for required in [
+            "rounds", "aggregate HP lost", "frozen receipt", "player level",
+            "party count", "member levels", "apex pressure"
+        ] {
+            XCTAssertTrue(source.contains(required), "phone capture copy omits \(required)")
+        }
+    }
+
     func testPhonePairUsesDisposableExactIsolatedProductionEncounters() throws {
         for kind in EncounterScalingPhoneFixtureKind.allCases {
             let store = try GameStore.makeEncounterScalingPhoneFixture(kind: kind)

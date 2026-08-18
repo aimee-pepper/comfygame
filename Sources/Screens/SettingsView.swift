@@ -951,7 +951,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                 }
             }
             Section("Capture") {
-                Text("Use the red bug button at the opening and again immediately before the finishing action. Record readability, fairness and whether retreat looked viable. Close returns here without changing the selected campaign.")
+                Text("Use the red bug button at the opening and again immediately before the finishing action. For the level-one pair, record rounds, aggregate HP lost, readability and whether retreat looked viable. For progression vectors, include the frozen receipt and compare player level, party count, member levels and apex pressure. Close returns here without changing the selected campaign.")
                     .font(.callout)
             }
             Section("Progression vectors") {
@@ -974,7 +974,7 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                 Section { Text(error).foregroundStyle(.red) }
             }
         }
-        .navigationTitle("Level-one scaling")
+        .navigationTitle("Encounter scaling")
         .navigationBarTitleDisplayMode(.inline)
         .fullScreenCover(item: $session) { fixture in
             ZStack(alignment: .topTrailing) {
