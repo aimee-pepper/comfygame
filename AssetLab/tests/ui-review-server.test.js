@@ -6,6 +6,8 @@ import {join} from "node:path";
 const temporary=await mkdtemp(join(tmpdir(),"bookbinder-ui-reviews-"));
 const ledger=join(temporary,"nested","ui-gallery-reviews.json");
 process.env.ASSETLAB_UI_REVIEW_FILE=ledger;
+process.env.ASSETLAB_UI_APPROVAL_STYLE_DIR=join(temporary,"approved-styles");
+process.env.ASSETLAB_UI_APPROVAL_ASSET_DIR=join(temporary,"approved-assets");
 const {handleAssetLabRequest}=await import("../server.js");
 
 function request(method,payload,path="/__ui-reviews"){
@@ -21,7 +23,7 @@ try{
   const empty=await invoke("GET");
   assert.equal(empty.status,200);
   assert.equal(empty.headers["Cache-Control"],"no-store");
-  assert.deepEqual(empty.json(),{schemaVersion:1,reviews:{}},"a missing shared ledger must read as an empty review packet");
+  assert.deepEqual(empty.json(),{schemaVersion:2,reviews:{},approvals:{}},"a missing shared ledger must read as an empty review packet");
   const meta=response();await handleAssetLabRequest(request("GET",undefined,"/__assetlab-meta"),meta);
   assert.equal(meta.status,200);
   assert.equal(meta.headers["Cache-Control"],"no-store");
@@ -42,15 +44,17 @@ try{
   assert.equal(saved.json().screenID,"writing-desk");
   assert.equal(saved.json().count,2,"saving one screen must preserve reviews already saved for other screens");
   const persisted=JSON.parse(await readFile(ledger,"utf8"));
-  assert.equal(persisted.schemaVersion,1);
+  assert.equal(persisted.schemaVersion,2);
   assert.match(persisted.updatedAt,/^\d{4}-\d\d-\d\dT/);
   assert.deepEqual(persisted.reviews,reviews);
+  assert.ok(persisted.approvals.home?.snapshotSHA256,"implementation-ready feedback must freeze the exact rendered Home fixtures");
 
   const queued=await invoke("POST",{schemaVersion:1,screenID:"campaigns",record:{choice:"queue",notes:"A details-first load is acceptable",designVersion:"native-1"}});
   assert.equal(queued.status,201);
   const queuedLedger=JSON.parse(await readFile(ledger,"utf8"));
   assert.deepEqual(queuedLedger.reviews.campaigns,{choice:"queue",notes:"A details-first load is acceptable",designVersion:"native-1"});
   assert.deepEqual(queuedLedger.reviews.home,reviews.home,"a queued override must preserve other screen reviews");
+  assert.equal(queuedLedger.approvals.campaigns.decision,"queue","queued implementation must freeze the reviewed Campaign fixtures");
 
   const rejectedReplacement=await invoke("POST",{schemaVersion:1,screenID:"home",record:{choice:"no",notes:9}});
   assert.equal(rejectedReplacement.status,400,"a failed Save must reject the malformed replacement");
@@ -60,6 +64,8 @@ try{
   assert.deepEqual(loaded.json(),queuedLedger,"GET must return the shared packet saved by POST");
 }finally{
   delete process.env.ASSETLAB_UI_REVIEW_FILE;
+  delete process.env.ASSETLAB_UI_APPROVAL_STYLE_DIR;
+  delete process.env.ASSETLAB_UI_APPROVAL_ASSET_DIR;
   await rm(temporary,{recursive:true,force:true});
 }
 

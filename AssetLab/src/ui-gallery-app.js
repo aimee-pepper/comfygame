@@ -51,6 +51,7 @@ const fontChoices=[
 let active=screens[0],category="All",state="Default",query="";
 let implementationReviews={};
 let implementationDrafts={};
+let implementationApprovals={};
 let reviewSaveState={screenID:"",state:"idle",message:""};
 const marks={Campaign:"CB",Village:"VI",Writing:"IN",Making:"MK",People:"PE",Knowledge:"KN",Expedition:"EX",Utility:"UT"};
 const notes={
@@ -183,6 +184,7 @@ async function shareImplementationReview(){
     if(!response.ok)throw new Error(`Review sync failed (${response.status})`);
     const result=await response.json();
     implementationReviews[screenID]=packet.record;
+    if(result.approval)implementationApprovals[screenID]=result.approval;
     if(recordsEqual(implementationDrafts[screenID],packet.record))delete implementationDrafts[screenID];
     saveImplementationDrafts();
     reviewSaveState={screenID,state:"shared",message:`Shared feedback saved for ${screens.find(screen=>screen.id===screenID)?.title??screenID}${result.updatedAt?` · ${new Date(result.updatedAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`:""}.`};
@@ -193,6 +195,7 @@ async function shareImplementationReview(){
 }
 function renderImplementationReview(){
   const conformance=conformanceFor(active.id),conformanceReady=conformance.status==="verified";
+  const approval=implementationApprovals[active.id],locked=Boolean(approval);
   const conformanceStatus=$("native-conformance-status");
   conformanceStatus.textContent=conformanceReady?"VERIFIED · matches current native behavior":conformance.status==="failed"?"BLOCKED · mock changes or invents current behavior":"PENDING · native behavior audit required";
   conformanceStatus.dataset.state=conformance.status;
@@ -201,7 +204,7 @@ function renderImplementationReview(){
   const committed=implementationReviews[active.id],storedRecord=implementationDrafts[active.id]??committed??{choice:"",notes:"",designVersion:""};
   const staleApproval=["yes","queue"].includes(storedRecord.choice)&&storedRecord.designVersion!==conformance.designVersion;
   const record=staleApproval?{choice:"",notes:"",designVersion:conformance.designVersion}:storedRecord;
-  document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>{input.checked=input.value===record.choice;input.disabled=input.value==="yes"&&!conformanceReady});
+  document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>{input.checked=input.value===record.choice;input.disabled=locked||input.value==="yes"&&!conformanceReady});
   const feedbackWrap=$("implementation-feedback-wrap"),feedback=$("implementation-feedback");
   feedbackWrap.hidden=!["no","queue"].includes(record.choice);
   feedback.required=["no","queue"].includes(record.choice);
@@ -211,8 +214,10 @@ function renderImplementationReview(){
   const valid=Boolean(record.choice)&&(!["no","queue"].includes(record.choice)||Boolean(record.notes.trim()));
   const dirty=!recordsEqual(record,committed);
   const save=$("implementation-review-save"),status=$("implementation-review-status");
-  save.disabled=!valid||!dirty||reviewSaveState.state==="saving";
+  save.disabled=locked||!valid||!dirty||reviewSaveState.state==="saving";
   status.dataset.state="";
+  if(locked){feedback.disabled=true;status.textContent=approval.decision==="baseline"?"Frozen restored baseline. Future changes must be reviewed as a separate candidate.":approval.decision==="queue"?"Approved version frozen. Implement this exact version; queued changes require a separate candidate.":"Approved version frozen. It cannot be overwritten.";status.dataset.state="locked";return}
+  feedback.disabled=false;
   if(staleApproval){status.textContent="An earlier implementation decision is preserved for the previous mock. This rebuilt screen needs a fresh review.";status.dataset.state="stale";return}
   if(reviewSaveState.screenID===active.id&&reviewSaveState.message){status.textContent=reviewSaveState.message;status.dataset.state=reviewSaveState.state;return}
   status.textContent=!conformanceReady&&record.choice==="yes"?"Full implementation readiness is blocked until this mock matches current native behavior. You can instead choose Implement, but queue changes to explicitly override noncritical differences.":!record.choice?"Choose a readiness status, then save when you are finished.":["no","queue"].includes(record.choice)&&!record.notes.trim()?"Notes are required before this review can be saved.":dirty?"Draft saved on this device · not shared yet.":record.choice==="queue"?"Implementation approved with queued changes in the shared project ledger.":"Saved in the shared project ledger.";
@@ -225,13 +230,14 @@ function updateImplementationReview(choice,notes=""){
   renderImplementationReview();
 }
 function renderIndex(){const list=filtered();$("screen-count").textContent=`${list.length} of ${screens.length} screens`;$("screen-list").innerHTML=list.map(s=>`<button class="screen-choice" data-id="${s.id}" aria-current="${s===active}"><span class="route-mark">${marks[s.category]}</span><span><strong>${s.title}</strong><small>${s.purpose.split(" ").slice(0,6).join(" ")}…</small></span></button>`).join("");document.querySelectorAll(".screen-choice").forEach(b=>b.onclick=()=>{active=screens.find(s=>s.id===b.dataset.id);render()})}
-function render(){renderIndex();const preservation=preservationFor(active.title),fixtureStates=fixtureStatesByScreen[active.id]??["Default","Selected","Confirm"];if(!fixtureStates.includes(state))state=fixtureStates[0];$("screen-category").textContent=active.category;$("screen-title").textContent=active.title;$("screen-purpose").textContent=active.purpose;$("phone").innerHTML=renderScreen(active.title,state);$("screen-notes").innerHTML=(notes[active.type]||notes.default).map(n=>`<li>${n}</li>`).join("");$("preserve-source").textContent=preservation.source;$("preserve-list").innerHTML=preservation.preserve.map(n=>`<li>${n}</li>`).join("");$("state-switcher").innerHTML=fixtureStates.map(v=>`<button aria-pressed="${v===state}">${v}</button>`).join("");document.querySelectorAll("#state-switcher button").forEach(b=>b.onclick=()=>{state=b.textContent;render()});renderImplementationReview()}
+function render(){renderIndex();const preservation=preservationFor(active.title),approval=implementationApprovals[active.id],fixtureStates=approval?.fixtureStates??fixtureStatesByScreen[active.id]??["Default","Selected","Confirm"];if(!fixtureStates.includes(state))state=fixtureStates[0];$("screen-category").textContent=active.category;$("screen-title").textContent=active.title;$("screen-purpose").textContent=active.purpose;$("phone").innerHTML=approval?`<iframe class="approved-ui-preview" title="Frozen approved ${active.title} · ${state}" sandbox src="/__ui-approved-preview?screenID=${encodeURIComponent(active.id)}&state=${encodeURIComponent(state)}"></iframe>`:renderScreen(active.title,state);$("screen-notes").innerHTML=(notes[active.type]||notes.default).map(n=>`<li>${n}</li>`).join("");$("preserve-source").textContent=preservation.source;$("preserve-list").innerHTML=preservation.preserve.map(n=>`<li>${n}</li>`).join("");$("state-switcher").innerHTML=fixtureStates.map(v=>`<button aria-pressed="${v===state}">${v}</button>`).join("");document.querySelectorAll("#state-switcher button").forEach(b=>b.onclick=()=>{state=b.textContent;render()});renderImplementationReview()}
 function step(delta){const i=screens.indexOf(active);active=screens[(i+delta+screens.length)%screens.length];category="All";document.querySelectorAll("#category-tabs button").forEach((x,j)=>x.setAttribute("aria-pressed",j===0));render()}
 if(typeof document!=="undefined"){
   try{implementationDrafts=normalizeImplementationReviews(JSON.parse(localStorage.getItem(reviewStorageKey)||"{}"))}catch{implementationDrafts={}}
   fetch("/__ui-reviews",{cache:"no-store"}).then(response=>response.ok?response.json():null).then(packet=>{
-    if(packet?.schemaVersion===1){
+    if([1,2].includes(packet?.schemaVersion)){
       implementationReviews=normalizeImplementationReviews(packet.reviews);
+      implementationApprovals=packet?.schemaVersion===2&&packet.approvals&&typeof packet.approvals==="object"&&!Array.isArray(packet.approvals)?packet.approvals:{};
       implementationDrafts=normalizeImplementationReviews(Object.fromEntries(Object.entries(implementationDrafts).filter(([id,record])=>!recordsEqual(record,implementationReviews[id]))));
       saveImplementationDrafts();render();
     }
@@ -249,7 +255,7 @@ if(typeof document!=="undefined"){
   document.querySelectorAll("#category-tabs button").forEach(b=>b.onclick=()=>{category=b.textContent;document.querySelectorAll("#category-tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(!filtered().includes(active))active=filtered()[0]||screens[0];render()});
   $("screen-search").oninput=e=>{query=e.target.value.toLowerCase().trim();renderIndex()};
   document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>input.onchange=()=>updateImplementationReview(input.value,(implementationDrafts[active.id]??implementationReviews[active.id])?.notes??""));
-  $("implementation-feedback").oninput=e=>updateImplementationReview("no",e.target.value);
+  $("implementation-feedback").oninput=e=>updateImplementationReview(document.querySelector('input[name="implementation-ready"]:checked')?.value??"no",e.target.value);
   $("implementation-review-save").onclick=shareImplementationReview;
   $("previous-screen").onclick=()=>step(-1);$("next-screen").onclick=()=>step(1);render();
 }
