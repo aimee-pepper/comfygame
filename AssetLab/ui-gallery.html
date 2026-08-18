@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bookbinder UI Design Gallery</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="ui-gallery.css">
+</head>
+<body>
+  <nav class="tool-nav" aria-label="AssetLab tools"><a href="index.html">Creatures</a><a href="world.html">World &amp; Flora</a><a href="world-generator-tester.html">World Generator</a><a href="ui-gallery.html" aria-current="page">UI Gallery</a><a href="places.html">Places</a><a href="characters.html">Characters</a><a href="full-cast.html">Full Cast</a><a href="resources.html">Resources</a><a href="equipment.html">Items</a><a href="trading.html">Trading Post</a><a href="reporter.html">Bug Reporter</a><a href="noll.html">Noll Review</a><a href="bridge.html">Economy Bridge</a><a href="combat.html">Combat</a><a href="combat-ui.html">Combat UI</a><a href="campaigns.html">Campaigns</a><a href="launch.html">App Launch</a><a href="splashes.html">Splashes</a><a href="regression.html">Golden Review</a></nav>
+  <header>
+    <div><p class="eyebrow">Bookbinder · ordinary-phone design candidate</p><h1>Complete UI Gallery</h1><p class="subtitle">One cohesive interaction language across campaign, village, writing, knowledge, expedition and combat.</p></div>
+    <div class="header-actions"><button id="previous-screen">Previous</button><button id="next-screen" class="primary">Next screen</button></div>
+  </header>
+  <main class="gallery-shell">
+    <aside class="gallery-index panel">
+      <label class="search-label"><span>Find a screen</span><input id="screen-search" type="search" placeholder="Writing, gear, world…"></label>
+      <div id="category-tabs" class="category-tabs" aria-label="Screen groups"></div>
+      <p id="screen-count" class="screen-count"></p>
+      <div id="screen-list" class="screen-list"></div>
+    </aside>
+
+    <section class="gallery-stage">
+      <div class="stage-toolbar panel">
+        <div><p class="eyebrow" id="screen-category"></p><h2 id="screen-title"></h2><p id="screen-purpose" class="screen-purpose"></p></div>
+        <div class="state-control"><span>Fixture state</span><div id="state-switcher" class="state-switcher"></div></div>
+      </div>
+      <div class="phone-and-notes">
+        <div class="phone-wrap"><div id="phone" class="phone" aria-label="368 by 800 point ordinary phone UI preview"></div><span class="phone-size">368 × 800 ordinary phone</span></div>
+        <aside class="design-notes panel">
+          <p class="eyebrow">Design rationale</p>
+          <h2>Shared grammar</h2>
+          <ul id="screen-notes"></ul>
+          <div class="token-swatch"><span class="swatch paper"></span><span>Warm paper: decisions and authored text</span></div>
+          <div class="token-swatch"><span class="swatch field"></span><span>Field slate: exploration and live state</span></div>
+          <div class="token-swatch"><span class="swatch blue"></span><span>Blue: one primary commitment</span></div>
+          <div class="token-swatch"><span class="swatch gold"></span><span>Gold: selection, ownership, comparison</span></div>
+          <details><summary>System rules</summary><ol><li>Gameplay remains the largest visual layer.</li><li>One anchored detail, never nested sheets.</li><li>Primary action stays reachable in the bottom rail.</li><li>Tiles carry identity; prose explains consequences.</li><li>Selection, rarity and availability never share one cue.</li></ol></details>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="src/ui-gallery-app.js"></script>
+</body>
+</html>

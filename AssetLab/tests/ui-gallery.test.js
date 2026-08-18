@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+const source=await readFile(new URL("../src/ui-gallery-app.js",import.meta.url),"utf8");
+const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
+const required=["Campaigns","Home","Writing Desk","Storehouse","Workshop","Party","Essence Spring","Constellation","Library","Bestiary","Research","World History","Blacksmith","Trading Post","Recycler","Tannery","Bowyer","Armoury","Weaponsmith","Scriptorium","Survey Post","Apothecary","Reliquary","Wayfarer’s Table","Anchorage","Distillery","Channelworks","Firepit","Gear","World","Encounter","Loot Decision","Return Recap","Settings"];
+for(const title of required)assert.match(source,new RegExp(`\\[\\"${title.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\"`),`gallery must include ${title}`);
+assert.match(css,/width:368px;height:800px/);
+assert.match(source,/Bind & Depart/);
+assert.match(source,/fixed action rail|bottom rail/i);
+console.log(`UI gallery covers ${required.length} ordinary-phone screens.`);
