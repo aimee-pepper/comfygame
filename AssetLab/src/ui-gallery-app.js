@@ -39,7 +39,7 @@ const screens=[
 ].map(([title,category,type,purpose],index)=>({id:title.toLowerCase().replaceAll(/[^a-z0-9]+/g,"-"),title,category,type,purpose,index}));
 
 const $=id=>document.getElementById(id),categories=["All",...new Set(screens.map(s=>s.category))];
-const fixtureStatesByScreen={campaigns:["Fresh","Returning","Recovery details","Newer-version details","Delete confirmation"],constellation:["Default","Selected","Confirm","Bought"],settings:["Default","DEBUG"]};
+const fixtureStatesByScreen={campaigns:["Returning","Fresh","Recovery details","Newer-version details","Delete confirmation"],constellation:["Default","Selected","Confirm","Bought"],settings:["Default","DEBUG"]};
 const reviewStorageKey="bookbinder.assetlab.ui-gallery-reviews.v1";
 const fontChoices=[
   {id:"jersey-tiny",label:"Chosen · Jersey 10 + Tiny5"},

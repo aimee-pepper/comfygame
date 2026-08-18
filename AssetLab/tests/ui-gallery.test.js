@@ -63,6 +63,7 @@ assert.match(renderScreen("Campaigns","Newer-version details"),/Future Test Book
 assert.match(renderScreen("Campaigns","Delete confirmation"),/Delete “Old Test Book” — Base · Aug 11, 2026\?[\s\S]*Only this campaign will be removed\. Other campaigns will not be changed\.[\s\S]*Cancel[\s\S]*Delete “Old Test Book”/,"delete confirmation must name the exact campaign and discriminator");
 assert.match(css,/\.campaign-page \.book-shelf\{[^}]*grid-template-columns:repeat\(2/,"ordinary Campaigns must use the native two-column shelf");
 assert.equal(nativeConformance.campaigns.status,"verified","Campaigns may reopen implementation review only after all save states match native behavior");
+assert.equal(fixtureStatesByScreen.campaigns[0],"Returning","Campaigns must open on the populated returning-player shelf; Fresh remains an explicit alternate fixture");
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
 assert.match(css,/@font-face\{font-family:"Pixelify Sans"/,"gallery must bundle its compact mixed-case pixel display font");
