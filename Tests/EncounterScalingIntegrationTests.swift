@@ -270,8 +270,12 @@ final class EncounterScalingIntegrationTests: XCTestCase {
                              "Teeming's density attribution must remain visible before grouping")
         XCTAssertTrue((normalAdjacent + teemingAdjacent).allSatisfy { $0.groupSize == 2 })
         XCTAssertTrue(normal.allSatisfy {
-            $0.outcome == .victory && (2...4).contains($0.rounds) && $0.aggregateHPSpent <= 11
-        }, "fresh Normal openings left the settled 2–4 round / roughly 20% HP band")
+            let lowerHPBound = Int(ceil(Double($0.startingAggregateHP) * 0.05))
+            let upperHPBound = Int(ceil(Double($0.startingAggregateHP) * 0.20))
+            return $0.outcome == .victory
+                && (2...4).contains($0.rounds)
+                && (lowerHPBound...upperHPBound).contains($0.aggregateHPSpent)
+        }, "fresh Normal openings left the settled 2–4 round / roughly 5–20% aggregate HP band")
         XCTAssertTrue(teeming.allSatisfy {
             $0.outcome == .victory && (2...4).contains($0.rounds)
         }, "an isolated Teeming opening became an ordinary death trap")
