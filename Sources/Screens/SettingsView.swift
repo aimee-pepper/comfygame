@@ -1019,9 +1019,11 @@ struct BalancingView: View {
 
 #if DEBUG
 private struct EncounterScalingPhoneAcceptanceView: View {
+    @StateObject private var acceptance = EncounterScalingAcceptanceRecorder()
     @State private var session: EncounterScalingPhoneFixtureSession?
     @State private var progressionSession: EncounterScalingProgressionFixtureSession?
     @State private var error: String?
+    @State private var confirmsClearAcceptance = false
 
     var body: some View {
         List {
@@ -1048,6 +1050,9 @@ private struct EncounterScalingPhoneAcceptanceView: View {
             Section("Progression vectors") {
                 Text("Ordinary fixtures keep root 101 and production scaling fixed while only party level and membership change. The apex fixture uses disclosed root 909. All are additive to the accepted level-one pair above.")
                     .font(.callout)
+                Text("\(acceptance.completionCount) of \(EncounterScalingProgressionFixtureKind.allCases.count) progression verdicts recorded")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
                 ForEach(EncounterScalingProgressionFixtureKind.allCases) { kind in
                     Button {
                         do { progressionSession = try EncounterScalingProgressionFixtureSession(kind: kind) }
@@ -1056,8 +1061,24 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                         VStack(alignment: .leading, spacing: 3) {
                             Text(kind.title).font(.headline)
                             Text(kind.detail).font(.caption).foregroundStyle(.secondary)
+                            if let record = acceptance.records[kind] {
+                                Text("\(record.verdict.title) · receipt \(record.receiptIdentity)")
+                                    .font(.caption2.monospaced())
+                                    .foregroundStyle(record.verdict == .unfair ? .red : .secondary)
+                            } else {
+                                Text("Not recorded")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                         .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    }
+                }
+            }
+            if acceptance.completionCount > 0 {
+                Section("Acceptance data") {
+                    Button("Clear recorded verdicts", role: .destructive) {
+                        confirmsClearAcceptance = true
                     }
                 }
             }
@@ -1067,6 +1088,18 @@ private struct EncounterScalingPhoneAcceptanceView: View {
         }
         .navigationTitle("Encounter scaling")
         .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog(
+            "Clear encounter-scaling verdicts?",
+            isPresented: $confirmsClearAcceptance,
+            titleVisibility: .visible
+        ) {
+            Button("Clear \(acceptance.completionCount) recorded verdicts", role: .destructive) {
+                acceptance.clear()
+            }
+            Button("Keep verdicts", role: .cancel) {}
+        } message: {
+            Text("This clears only DEBUG acceptance preferences. Campaign saves are unchanged.")
+        }
         .fullScreenCover(item: $session) { fixture in
             ZStack(alignment: .topTrailing) {
                 RootView().environmentObject(fixture.store)
@@ -1093,6 +1126,18 @@ private struct EncounterScalingPhoneAcceptanceView: View {
                     Text("Frozen scaling receipt").font(.caption.bold())
                     ForEach(fixture.receipt.phoneSummaryLines, id: \.self) { line in
                         Text(line).font(.caption2.monospacedDigit())
+                    }
+                    Divider().overlay(.white.opacity(0.5))
+                    Text("Record verdict").font(.caption.bold())
+                    HStack(spacing: 6) {
+                        ForEach(EncounterScalingAcceptanceVerdict.allCases, id: \.self) { verdict in
+                            Button(verdict.title) {
+                                acceptance.record(verdict, for: fixture.receipt)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(acceptance.records[fixture.kind]?.verdict == verdict ? .green : .white)
+                            .font(.caption2)
+                        }
                     }
                 }
                 .padding(10)

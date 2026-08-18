@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 #if DEBUG
 enum CompoundAssemblyPhoneFixtureError: Error, LocalizedError {
@@ -64,7 +65,7 @@ enum EncounterScalingPhoneFixtureError: Error, LocalizedError {
     }
 }
 
-enum EncounterScalingProgressionFixtureKind: String, Identifiable, CaseIterable, Sendable {
+enum EncounterScalingProgressionFixtureKind: String, Identifiable, CaseIterable, Codable, Sendable {
     case freshSolo
     case experiencedSolo
     case ordinaryTwoPerson
@@ -124,6 +125,33 @@ struct EncounterScalingProgressionReceipt: Equatable, Sendable {
     var totalHPAdditionFraction: Double
     var scalingRulesVersion: String
 
+    /// Canonical identity for the exact rules-owned fixture presented during phone acceptance.
+    /// Every collection is ordered so the persisted verdict cannot silently follow a changed
+    /// encounter, party vector or scaling implementation.
+    var acceptanceIdentity: String {
+        let levels = partyLevels.map(String.init).joined(separator: ",")
+        let caps = healthCaps.map(String.init).joined(separator: ",")
+        let foeIdentity = foeIDs.map { String($0.rawValue) }.joined(separator: ",")
+        let foeLevelIdentity = foeLevels.map(String.init).joined(separator: ",")
+        let foeHPIdentity = foeHP.map(String.init).joined(separator: ",")
+        let apexIdentity = foeIsApex.map { $0 ? "1" : "0" }.joined(separator: ",")
+        let allocation = hpAllocationByFoeID.keys.sorted().map {
+            "\($0):\(hpAllocationByFoeID[$0] ?? 0)"
+        }.joined(separator: ",")
+        let uncapped = String(uncappedPartyPowerBudget.bitPattern, radix: 16)
+        let capped = String(cappedPartyPowerBudget.bitPattern, radix: 16)
+        let fraction = String(totalHPAdditionFraction.bitPattern, radix: 16)
+        let canonical = [
+            scalingRulesVersion, kind.rawValue, String(rootSeed), String(mapSeed), levels, caps,
+            String(anchorLevel), String(partyCount), uncapped, capped, String(worldLevel),
+            String(groupingRadius), foeIdentity, foeLevelIdentity, foeHPIdentity, apexIdentity,
+            allocation, String(wholePressureSlots), fraction
+        ].joined(separator: "|")
+        return SHA256.hash(data: Data(canonical.utf8))
+            .map { String(format: "%02x", $0) }
+            .joined()
+    }
+
     var phoneSummaryLines: [String] {
         let party = partyLevels.map(String.init).joined(separator: " / ")
         let foes = zip(zip(foeLevels, foeHP), foeIsApex).map {
@@ -139,6 +167,69 @@ struct EncounterScalingProgressionReceipt: Equatable, Sendable {
             "Foe \(foes)",
             "Allocation +\(allocation) HP · \(wholePressureSlots) pressure slot\(wholePressureSlots == 1 ? "" : "s")"
         ]
+    }
+}
+
+enum EncounterScalingAcceptanceVerdict: String, CaseIterable, Codable, Sendable {
+    case balanced
+    case overwhelmingButFair
+    case unfair
+
+    var title: String {
+        switch self {
+        case .balanced: "Balanced"
+        case .overwhelmingButFair: "Overwhelming but fair"
+        case .unfair: "Unfair"
+        }
+    }
+}
+
+struct EncounterScalingAcceptanceRecord: Codable, Equatable, Sendable {
+    var scenario: EncounterScalingProgressionFixtureKind
+    var verdict: EncounterScalingAcceptanceVerdict
+    var receiptIdentity: String
+}
+
+@MainActor
+final class EncounterScalingAcceptanceRecorder: ObservableObject {
+    static let preferencesKey = "debug.encounter-scaling.acceptance.v1"
+
+    @Published private(set) var records: [EncounterScalingProgressionFixtureKind:
+        EncounterScalingAcceptanceRecord]
+    private let preferences: UserDefaults
+
+    init(preferences: UserDefaults = .standard) {
+        self.preferences = preferences
+        guard let data = preferences.data(forKey: Self.preferencesKey),
+              let decoded = try? JSONDecoder().decode(
+                [EncounterScalingProgressionFixtureKind: EncounterScalingAcceptanceRecord].self,
+                from: data)
+        else {
+            records = [:]
+            return
+        }
+        records = decoded.filter { $0.key == $0.value.scenario }
+    }
+
+    var completionCount: Int { records.count }
+
+    func record(_ verdict: EncounterScalingAcceptanceVerdict,
+                for receipt: EncounterScalingProgressionReceipt) {
+        records[receipt.kind] = EncounterScalingAcceptanceRecord(
+            scenario: receipt.kind,
+            verdict: verdict,
+            receiptIdentity: receipt.acceptanceIdentity)
+        persist()
+    }
+
+    func clear() {
+        records = [:]
+        preferences.removeObject(forKey: Self.preferencesKey)
+    }
+
+    private func persist() {
+        guard let data = try? JSONEncoder().encode(records) else { return }
+        preferences.set(data, forKey: Self.preferencesKey)
     }
 }
 

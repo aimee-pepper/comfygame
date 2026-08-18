@@ -3,6 +3,44 @@ import XCTest
 
 @MainActor
 final class EncounterScalingIntegrationTests: XCTestCase {
+    func testDebugAcceptanceRecorderPersistsExactReceiptSeparatelyAndClearsOnlyItsKey() throws {
+        let suite = "EncounterScalingAcceptanceRecorderTests.\(UUID().uuidString)"
+        let preferences = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { preferences.removePersistentDomain(forName: suite) }
+        preferences.set("campaign-value", forKey: "unrelated-campaign-preference")
+
+        let fixture = try EncounterScalingProgressionFixtureSession(kind: .experiencedParty)
+        let recorder = EncounterScalingAcceptanceRecorder(preferences: preferences)
+        recorder.record(.overwhelmingButFair, for: fixture.receipt)
+
+        XCTAssertEqual(recorder.completionCount, 1)
+        XCTAssertEqual(recorder.records[.experiencedParty], EncounterScalingAcceptanceRecord(
+            scenario: .experiencedParty,
+            verdict: .overwhelmingButFair,
+            receiptIdentity: fixture.receipt.acceptanceIdentity))
+        XCTAssertEqual(fixture.receipt.acceptanceIdentity.count, 64)
+        XCTAssertEqual(EncounterScalingAcceptanceRecorder(preferences: preferences)
+            .records[.experiencedParty]?.receiptIdentity, fixture.receipt.acceptanceIdentity)
+
+        recorder.clear()
+        XCTAssertTrue(recorder.records.isEmpty)
+        XCTAssertNil(preferences.data(forKey: EncounterScalingAcceptanceRecorder.preferencesKey))
+        XCTAssertEqual(preferences.string(forKey: "unrelated-campaign-preference"),
+                       "campaign-value")
+    }
+
+    func testPhoneMatrixShowsEveryVerdictStatusAndDestructiveAcceptanceOnlyClear() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/SettingsView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("progression verdicts recorded"))
+        XCTAssertTrue(source.contains("record.receiptIdentity"))
+        XCTAssertTrue(source.contains("ForEach(EncounterScalingAcceptanceVerdict.allCases"))
+        XCTAssertTrue(source.contains("Clear recorded verdicts"))
+        XCTAssertTrue(source.contains("Campaign saves are unchanged"))
+    }
+
     func testPhoneHarnessNamesTheWholeScalingMatrixAndRequestsComparableEvidence() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
