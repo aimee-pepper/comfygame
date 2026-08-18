@@ -21,6 +21,7 @@ for(const title of required){
 const requiredMarkers={
   Campaigns:"book-progress",Home:"town-scene","Writing Desk":"writing-desk",Storehouse:"storehouse-cabinet",Workshop:"project-strip",Party:"party-formation",
   "Essence Spring":"spring-basin",Constellation:"constellation-field",Library:"library-catalogue",Bestiary:"specimen-folio","World History":"world-archive",Blacksmith:"comparison-rack",
+  "Trading Post":"market-stall",
   Recycler:"salvage-table",Tannery:"hide-frame",Bowyer:"bow-jig",Armoury:"armour-stand",
   Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"reliquary-room",
   "Wayfarer’s Table":"route-table",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
@@ -33,6 +34,7 @@ assert.match(renderScreen("Apothecary"),/Scent Mask/,"Apothecary must represent 
 assert.match(renderScreen("Library"),/Unknown and legacy records remain unguessed/,"Library must not infer missing record identity");
 assert.match(renderScreen("Bestiary"),/quadruped · long ears[\s\S]*sinuous · membrane appendage/,"Bestiary must preserve materially different generated morphology");
 assert.match(renderScreen("World History"),/Earlier[\s\S]*World 9[\s\S]*Later[\s\S]*World 12/,"History must expose chronology independently of selection order");
+assert.match(renderScreen("Trading Post"),/owned 2 · stock 5[\s\S]*properties unknown/,"Trading Post must keep owned, stock and disclosure truth on its wares");
 assert.match(css,/Foundation v0\.2/);
 assert.match(css,/\.foundation-board/);
 assert.match(css,/@font-face\{font-family:"Pixelify Sans"/,"gallery must bundle its compact mixed-case pixel display font");
