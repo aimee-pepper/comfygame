@@ -1,13 +1,16 @@
 import assert from "node:assert/strict";
 import {fixtureStatesByScreen,renderScreen} from "../src/ui-gallery-app.js";
 
-const states=["Travel","Look","Harvest","Search","Portal","Cache","Survey & anchor","Loose page","Dense log","Night sight"];
+const states=["Compare versions","Travel","Look","Harvest","Search","Portal","Cache","Survey & anchor","Loose page","Dense log","Night sight"];
 
 assert.deepEqual(fixtureStatesByScreen.world,states,"World must expose the exact current travel and interaction proof states");
 
 const rendered=Object.fromEntries(states.map(state=>[state,renderScreen("World",state)]));
 
-for(const [state,html] of Object.entries(rendered)){
+assert.match(rendered["Compare versions"],/world-version-compare[\s\S]*Previous layout[\s\S]*Current redesign/,"World comparison must keep both actual compositions visible together");
+assert.match(rendered["Compare versions"],/Gather 1 Resin[\s\S]*world-candidate/,"comparison must place the preserved prior layout before the current candidate");
+
+for(const [state,html] of Object.entries(rendered).filter(([name])=>name!=="Compare versions")){
   assert.match(html,/world-candidate/,`${state} must use the dedicated World composition`);
   assert.match(html,/world-status-header/,`${state} must preserve Stability and collapse truth`);
   assert.match(html,/party-health-strip/,`${state} must preserve the party-health strip`);
