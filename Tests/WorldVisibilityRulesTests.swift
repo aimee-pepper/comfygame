@@ -24,16 +24,42 @@ final class WorldVisibilityRulesTests: XCTestCase {
                        accuracy: 0.000_001)
 
         let exploredOutOfRange = WorldTileVisibilityPresentation.terrainTreatment(
-            currentVisibility: .hidden, wasExplored: true, profile: ordinary)
+            currentVisibility: .hidden, wasExplored: true,
+            isWithinOuterRange: false, profile: ordinary)
         XCTAssertTrue(exploredOutOfRange.rendersTerrain)
         XCTAssertEqual(exploredOutOfRange.dimOpacity,
                        1 - Tuning.Visibility.defaultFringeOpacity, accuracy: 0.000_001)
         XCTAssertEqual(exploredOutOfRange.blurFraction,
                        ordinary.fringeBlurFraction * 0.5, accuracy: 0.000_001)
 
+        let exploredButOccludedInRange = WorldTileVisibilityPresentation.terrainTreatment(
+            currentVisibility: .hidden, wasExplored: true,
+            isWithinOuterRange: true, profile: ordinary)
+        XCTAssertTrue(exploredButOccludedInRange.rendersTerrain)
+        XCTAssertEqual(exploredButOccludedInRange.blurFraction, 0, accuracy: 0.000_001)
+
         let unexploredOutOfRange = WorldTileVisibilityPresentation.terrainTreatment(
             currentVisibility: .hidden, wasExplored: false, profile: ordinary)
         XCTAssertFalse(unexploredOutOfRange.rendersTerrain)
+    }
+
+    func testOuterRangeIsIndependentFromLineOfSightOcclusion() {
+        let origin = GridPoint(x: 1, y: 2)
+        let blocked = GridPoint(x: 3, y: 2)
+        let beyond = GridPoint(x: 6, y: 2)
+        var map = openMap(width: 8, height: 5, entry: origin)
+        map[GridPoint(x: 2, y: 2)].ground = .stone
+        map[GridPoint(x: 2, y: 2)].elevation = 4
+        let profile = WorldRules.visibilityProfile(illumination: 45, baseRadius: 2)
+
+        XCTAssertEqual(WorldRules.visibility(
+            of: blocked, from: origin, in: map, profile: profile), .hidden,
+            "the elevated intervening tile should still block current disclosure")
+        XCTAssertTrue(WorldRules.isWithinOuterVisibilityRange(
+            blocked, from: origin, in: map, profile: profile),
+            "occlusion must not misclassify nearby remembered terrain as beyond range")
+        XCTAssertFalse(WorldRules.isWithinOuterVisibilityRange(
+            beyond, from: origin, in: map, profile: profile))
     }
 
     func testWorldVisibilityUsesNoTileOrGroupedGradients() throws {

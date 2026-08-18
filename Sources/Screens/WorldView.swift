@@ -998,11 +998,15 @@ private struct MapGrid: View {
                                 of: point, from: run.playerPosition,
                                 in: run.map, profile: visibilityProfile)
                             let wasExplored = run.map[point].isRevealed
+                            let isWithinOuterRange = WorldRules.isWithinOuterVisibilityRange(
+                                point, from: run.playerPosition, in: run.map,
+                                profile: visibilityProfile)
                             let visibility = WorldRules.terrainVisibility(
                                 current: currentVisibility, wasRevealed: wasExplored)
                             let treatment = WorldTileVisibilityPresentation.terrainTreatment(
                                 currentVisibility: currentVisibility,
                                 wasExplored: wasExplored,
+                                isWithinOuterRange: isWithinOuterRange,
                                 profile: visibilityProfile)
                             let displayTile = displayTile(at: point, visibility: visibility)
                             let presentation = WorldTileVisibilityPresentation.resolve(
@@ -1151,6 +1155,7 @@ struct WorldTileVisibilityPresentation {
 
     static func terrainTreatment(currentVisibility: WorldRules.TileVisibility,
                                  wasExplored: Bool,
+                                 isWithinOuterRange: Bool = true,
                                  profile: WorldRules.VisibilityProfile) -> TerrainTreatment {
         switch currentVisibility {
         case .full:
@@ -1164,7 +1169,9 @@ struct WorldTileVisibilityPresentation {
             return TerrainTreatment(
                 rendersTerrain: true,
                 dimOpacity: 1 - Tuning.Visibility.defaultFringeOpacity,
-                blurFraction: profile.fringeBlurFraction * exploredOutOfRangeBlurRatio)
+                blurFraction: isWithinOuterRange
+                    ? 0
+                    : profile.fringeBlurFraction * exploredOutOfRangeBlurRatio)
         case .hidden:
             return TerrainTreatment(rendersTerrain: false, dimOpacity: 1, blurFraction: 0)
         }
