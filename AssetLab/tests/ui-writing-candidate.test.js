@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
-import {fixtureStatesByScreen,renderScreen} from "../src/ui-gallery-app.js";
+import {fixtureStatesByScreen,renderScreen,writingPreviewState} from "../src/ui-gallery-app.js";
 
 const states=["Write","Runebook","Pages · Collected","Pages · Templates","The world","Collected world","Born anchored","Clear Confirm"];
 
@@ -12,6 +12,14 @@ assert.deepEqual(
 
 const rendered=Object.fromEntries(states.map(state=>[state,renderScreen("Writing Desk",state)]));
 const css=readFileSync(new URL("../ui-gallery.css",import.meta.url),"utf8");
+
+assert.equal(writingPreviewState("Write","Pages · Collected"),"Write","the in-phone Write tab must open Write");
+assert.equal(writingPreviewState("Pages","Write"),"Pages · Collected","the in-phone Pages tab must open its Collected section by default");
+assert.equal(writingPreviewState("Pages","Pages · Templates"),"Pages · Templates","the in-phone Pages tab must preserve the selected Pages section");
+assert.equal(writingPreviewState("The world","Write"),"The world","the in-phone world tab must open the projection pane");
+assert.equal(writingPreviewState("Collected","Pages · Templates"),"Pages · Collected","Collected must switch the internal Pages section");
+assert.equal(writingPreviewState("Templates","Pages · Collected"),"Pages · Templates","Templates must switch the internal Pages section");
+assert.equal(writingPreviewState("Compounds","Write"),"Runebook","Compounds must open the personal Runebook fixture");
 
 assert.match(css,/\.writing-content\.writing-candidate\{height:708px\}/,"Writing must use the full 708pt post-header region when no departure rail exists");
 assert.match(css,/\.writing-content\.writing-candidate\.has-bind-rail\{height:624px\}/,"The world must reserve only its real 84pt departure rail");

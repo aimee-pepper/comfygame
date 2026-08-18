@@ -235,6 +235,7 @@ async function shareImplementationReview(){
   if(active.id===screenID)renderImplementationReview();
 }
 function renderImplementationReview(){
+  bindPreviewInteractions();
   const conformance=conformanceFor(active.id),conformanceReady=conformance.status==="verified";
   const approval=implementationApprovals[active.id],locked=Boolean(approval);
   const conformanceStatus=$("native-conformance-status");
@@ -263,6 +264,21 @@ function renderImplementationReview(){
   if(reviewSaveState.screenID===active.id&&reviewSaveState.message){status.textContent=reviewSaveState.message;status.dataset.state=reviewSaveState.state;return}
   status.textContent=!conformanceReady&&record.choice==="yes"?"Full implementation readiness is blocked until this mock matches current native behavior. You can instead choose Implement, but queue changes to explicitly override noncritical differences.":!record.choice?"Choose a readiness status, then save when you are finished.":["no","queue"].includes(record.choice)&&!record.notes.trim()?"Notes are required before this review can be saved.":dirty?"Draft saved on this device · not shared yet.":record.choice==="queue"?"Implementation approved with queued changes in the shared project ledger.":"Saved in the shared project ledger.";
   status.dataset.state=dirty?"draft":"shared";
+}
+function writingPreviewState(control,currentState){
+  if(control==="Write")return "Write";
+  if(control==="Pages")return currentState.startsWith("Pages ·")?currentState:"Pages · Collected";
+  if(control==="The world")return ["The world","Collected world","Born anchored"].includes(currentState)?currentState:"The world";
+  if(control==="Collected")return "Pages · Collected";
+  if(control==="Templates")return "Pages · Templates";
+  if(control==="Compounds")return "Runebook";
+  return null;
+}
+function bindPreviewInteractions(){
+  if(active.id!=="writing-desk"||implementationApprovals[active.id])return;
+  document.querySelectorAll("#phone .writing-pane-tabs button,#phone .pages-section-tabs button,#phone .target-bin-rail button").forEach(button=>{
+    button.onclick=()=>{const next=writingPreviewState(button.textContent.trim(),state);if(next&&next!==state){state=next;render()}};
+  });
 }
 function updateImplementationReview(choice,notes=""){
   implementationDrafts[active.id]={choice,notes,designVersion:conformanceFor(active.id).designVersion};
@@ -301,4 +317,4 @@ if(typeof document!=="undefined"){
   $("previous-screen").onclick=()=>step(-1);$("next-screen").onclick=()=>step(1);render();
 }
 
-export {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens};
+export {fixtureStatesByScreen,fontChoices,implementationReviewPacket,implementationReviewRecordPacket,nativeConformance,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens,writingPreviewState};
