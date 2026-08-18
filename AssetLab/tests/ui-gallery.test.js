@@ -23,7 +23,7 @@ const requiredMarkers={
   "Essence Spring":"spring-basin",Constellation:"constellation-field",Library:"library-catalogue",Bestiary:"specimen-folio","World History":"world-archive",Blacksmith:"comparison-rack",
   "Trading Post":"market-stall",
   Recycler:"salvage-table",Tannery:"hide-frame",Bowyer:"bow-jig",Armoury:"armour-stand",
-  Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"reliquary-room",
+  Weaponsmith:"weapon-rack",Apothecary:"bottle-shelf",Reliquary:"interpretation-board",
   "Survey Post":"instrument-board",
   "Wayfarer’s Table":"fieldcraft-board",Distillery:"class=\"still\"",Channelworks:"conduit-diagram",
   Firepit:"camp-circle","Loot Decision":"gear-balance","Return Recap":"receipt-paper",Settings:"utility-board"
@@ -59,18 +59,19 @@ assert.match(galleryHtml,/id="implementation-feedback"[\s\S]*Required when this 
 assert.match(galleryHtml,/id="implementation-review-save"[\s\S]*Save feedback/,"review feedback must have an explicit Save button");
 assert.match(galleryHtml,/Native behavior contract[\s\S]*id="assetlab-revision"/,"reviewers must see native conformance and the exact served AssetLab revision");
 assert.deepEqual(Object.keys(nativeConformance).sort(),screens.map(({id})=>id).sort(),"every gallery screen must carry an explicit native-conformance status");
-assert.ok(Object.values(nativeConformance).every(record=>["verified","failed","pending"].includes(record.status)&&record.source),"conformance records must be closed and source-owned");
+assert.ok(Object.values(nativeConformance).every(record=>["verified","failed","pending"].includes(record.status)&&record.source&&record.designVersion),"conformance records must be closed, source-owned and design-versioned");
 assert.match(galleryApp,/input\.value==="yes"&&!conformanceReady/,"implementation-ready approval must be unavailable until native behavior is verified");
 assert.equal(reviewStorageKey,"bookbinder.assetlab.ui-gallery-reviews.v1");
-assert.deepEqual(normalizeImplementationReviews({campaigns:{choice:"no",notes:"Tighten spacing"},home:{choice:"yes",notes:""},invented:{choice:"yes",notes:"ignored"},gear:{choice:"maybe",notes:7}}),{campaigns:{choice:"no",notes:"Tighten spacing"},home:{choice:"yes",notes:""}},"stored reviews must be restricted to known screens and valid choices");
-assert.deepEqual(implementationReviewPacket({home:{choice:"yes",notes:""},invented:{choice:"no",notes:"ignored"}}),{schemaVersion:1,reviews:{home:{choice:"yes",notes:""}}},"the shared packet helper must emit only normalized gallery reviews");
-assert.deepEqual(implementationReviewRecordPacket("campaigns",{choice:"no",notes:"Keep the progress books"}),{schemaVersion:1,screenID:"campaigns",record:{choice:"no",notes:"Keep the progress books"}},"explicit Save must send only the current screen review");
+assert.deepEqual(normalizeImplementationReviews({campaigns:{choice:"no",notes:"Tighten spacing",designVersion:"draft-0"},home:{choice:"yes",notes:""},invented:{choice:"yes",notes:"ignored"},gear:{choice:"maybe",notes:7}}),{campaigns:{choice:"no",notes:"Tighten spacing",designVersion:"draft-0"},home:{choice:"yes",notes:"",designVersion:""}},"stored reviews must be restricted to known screens and retain their reviewed design version");
+assert.deepEqual(implementationReviewPacket({home:{choice:"yes",notes:"",designVersion:"native-1"},invented:{choice:"no",notes:"ignored"}}),{schemaVersion:1,reviews:{home:{choice:"yes",notes:"",designVersion:"native-1"}}},"the shared packet helper must emit only normalized, versioned gallery reviews");
+assert.deepEqual(implementationReviewRecordPacket("campaigns",{choice:"no",notes:"Keep the progress books",designVersion:"draft-0"}),{schemaVersion:1,screenID:"campaigns",record:{choice:"no",notes:"Keep the progress books",designVersion:"draft-0"}},"explicit Save must send only the current screen review and reviewed design version");
 assert.equal(implementationReviewRecordPacket("invented",{choice:"yes",notes:"ignored"}),null,"explicit Save must fail closed for an unknown screen");
 assert.match(galleryApp,/Draft saved on this device · not shared yet\./,"typing must disclose that feedback remains a local draft");
 assert.doesNotMatch(galleryApp,/implementation-feedback"\)\.oninput[\s\S]{0,180}syncImplementationReviews/,"typing feedback must not POST to the shared ledger");
 assert.ok(galleryApp.indexOf('await fetch("/__ui-reviews"')<galleryApp.indexOf("delete implementationDrafts[screenID]"),"Save must retain the draft until the server responds");
 assert.ok(galleryApp.indexOf("if(!response.ok)throw")<galleryApp.indexOf('state:"shared"'),"Save must not display shared success for a failed response");
 assert.match(galleryApp,/Could not save to the shared project ledger\. Your draft is still on this device/,"a failed Save must visibly promise that the draft was retained");
+assert.match(galleryApp,/An earlier Yes is preserved for the previous mock\. This rebuilt screen needs a fresh review\./,"an approval must not silently transfer to a materially rebuilt screen");
 assert.match(css,/\.implementation-review/);
 for(const family of ["Jersey 10","Silkscreen","Tiny5"])assert.match(css,new RegExp(`font-family:\"${family}\"`),`${family} must be bundled for live comparison`);
 assert.match(css,/--font-reading/,"long prose must retain a separate readable face");
@@ -82,6 +83,9 @@ assert.match(renderScreen("Home"),/>Bind &amp; Depart<|>Bind & Depart</,"Home mu
 assert.doesNotMatch(renderScreen("Wayfarer’s Table"),/bottom-rail|route-table|Review departure/,"Wayfarer must remain the native informational station, without invented planning or actions");
 assert.match(renderScreen("Wayfarer’s Table"),/Satchel capacity[\s\S]*10 slots[\s\S]*Organic harvests[\s\S]*\+1 each[\s\S]*Visible flora[\s\S]*identified on sight/,"Wayfarer must render the exact current tier-zero fieldcraft benefits");
 assert.equal(nativeConformance["wayfarer-s-table"].status,"verified","Wayfarer may reopen implementation review only after its passive native contract is exact");
+assert.match(renderScreen("Reliquary"),/The Reliquary[\s\S]*Field interpretation[\s\S]*Site locations[\s\S]*revealed on arrival[\s\S]*Recovered resources[\s\S]*\+1 each[\s\S]*Reaching and searching each place is still fieldwork/,"Reliquary must render only its exact passive native benefits and fieldwork caveat");
+assert.doesNotMatch(renderScreen("Reliquary"),/Glass Compass|singular object|provenance|inscription|bottom-rail|Read inscription/,"Reliquary must not invent an artifact collection workflow or actions");
+assert.equal(nativeConformance.reliquary.status,"verified","Reliquary may reopen implementation review only after its passive native contract is exact");
 for(const marker of new Set(Object.values(requiredMarkers))){
   const className=marker.replace(/^class=\\?"|\\?"$/g,"");
   assert.match(css,new RegExp(`\\.${className}`),`${className} needs an authored style contract`);

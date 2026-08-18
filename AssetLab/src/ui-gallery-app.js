@@ -97,7 +97,7 @@ function renderBowyer(){return phone(top("Bowyer","2 maintained sets")+`<div cla
 function renderArmoury(){return phone(top("Armoury","4 protective pieces")+`<div class="phone-content">${tabs(["Profiles","Pieces","Materials"])}<div class="armour-stand"><span class="pauldron left"></span><span class="pauldron right"></span><span class="cuirass">⬟</span><span class="belt"></span><span class="scene-label">REINFORCED PROFILE</span></div><div class="profile-ribbon"><button>Light</button><button class="selected">Reinforced</button><button>Layered</button></div><div class="material-tray compact"><span class="material">◈ 2</span><span class="material">◒ 1</span><span class="material">⌁ 1</span></div><div class="receipt-line">${fact("Protection","3 → 5","good")}${fact("Weight","steady")}${fact("Cost","◆ 14")}</div></div>`+rail("Review rebuild","Back"))}
 function renderWeaponsmith(){return phone(top("Weaponsmith","3 families")+`<div class="phone-content">${tabs(["Family","Profile","Stock"])}<div class="weapon-rack"><button class="weapon selected"><span>╱</span><b>Blade</b><small>near</small></button><button class="weapon"><span>†</span><b>Spear</b><small>reach</small></button><button class="weapon"><span>⌒</span><b>Hook</b><small>control</small></button></div><div class="profile-compass"><span class="might">MIGHT</span><i></i><span class="finesse">FINESSE</span><b style="left:62%"></b></div><div class="receipt-line">${fact("Material","Copper")}${fact("Family","Blade")}${fact("Power","3.5")}</div><p class="process-copy">Advice describes the profile. It does not lock the weapon to a wearer.</p></div>`+rail("Review weapon","Back"))}
 function renderApothecary(){return phone(top("Apothecary","6 recipes known")+`<div class="phone-content">${tabs(["Treatments","Coatings","Fieldwork"])}<div class="bottle-shelf"><button class="bottle selected"><i class="round"></i><b>Lesser Salve</b><small>ready ×2</small></button><button class="bottle"><i class="tall"></i><b>Antidote</b><small>short Resin</small></button><button class="bottle"><i class="square"></i><b>Scent Mask</b><small>learned</small></button></div><div class="ingredient-line"><span>◈ Herb ×2</span><b>+</b><span>⌁ Resin ×1</span><b>→</b><span>⚗ ×2</span></div><div class="receipt-line">${fact("Stored","1 salve")}${fact("Prepare","2")}${fact("After","3 salves","good")}</div></div>`+rail("Prepare 2","Back"))}
-function renderReliquary(){return phone(top("Reliquary","1 singular object")+`<div class="phone-content"><div class="reliquary-room"><span class="light-beam"></span><div class="pedestal"><span class="relic">✦</span></div><span class="scene-label">RECOVERED FROM WORLD 12</span></div><article class="inscription"><span class="eyeline">Singular identity</span><h4>The Glass Compass</h4><p>Recovered intact. Provenance and authored description remain attached to this exact object.</p><div class="seal-row"><span>KEPT</span><span>WORLD 12</span><span>UNIQUE</span></div></article></div>`+rail("Read inscription","Back"))}
+function renderReliquary(){return phone(top("The Reliquary","Edren · fieldwork")+`<div class="phone-content"><article class="interpretation-board"><div class="interpretation-map" aria-hidden="true"><i></i><i></i><i></i><span>⌂</span></div><span class="eyeline">Permanent field interpretation</span><h4>Field interpretation</h4><div class="reliquary-benefits">${fact("Site locations","revealed on arrival","good")}${fact("Recovered resources","+1 each","good")}</div><p>Edren marks where a world shows signs of habitation. Reaching and searching each place is still fieldwork.</p></article></div>`)}
 function renderWayfarer(){return phone(top("Wayfarer’s Table","Sela · fieldcraft")+`<div class="phone-content"><article class="card hero-card fieldcraft-board"><span class="eyeline">Permanent fieldcraft benefits</span><h4>Packed for the route</h4><div class="wayfarer-benefits">${fact("Satchel capacity","10 slots","good")}${fact("Organic harvests","+1 each","good")}${fact("Visible flora","identified on sight","good")}</div><p>Sela leaves routes, provisions and field notes here for whoever goes next. The table is useful precisely because nobody has to remain behind it.</p></article></div>`)}
 function renderDistillery(){return phone(top("Distillery","Heat core · ember")+`<div class="phone-content">${tabs(["Distil","Crystallise","Stored"])}<div class="still"><span class="boiler">◉</span><span class="pipe"></span><span class="coil">≋</span><span class="receiver">◇</span><i class="heat">♨</i><span class="scene-label">ATTUNEMENT RETAINED</span></div><div class="process-gauges"><label>Heat<i><b style="width:72%"></b></i></label><label>Potency<i><b style="width:48%"></b></i></label></div><div class="receipt-line">${fact("Input","Ember extract")}${fact("Origin","World 7")}${fact("Result","Potency 3")}</div></div>`+rail("Review distillation","Back"))}
 function renderChannelworks(){return phone(top("Channelworks","1 conduit planned")+`<div class="phone-content">${tabs(["Conduits","Cores","Receipts"])}<div class="conduit-diagram"><span class="core">◆</span><span class="channel c1"></span><span class="channel c2"></span><span class="channel c3"></span><i class="port p1">1</i><i class="port p2">2</i><i class="port p3">3</i><span class="scene-label">ONE EXACT CORE · THREE ROUTES</span></div><div class="receipt-line">${fact("Core","Ember glass")}${fact("Origin","World 7")}${fact("Status","Ready","good")}</div><p class="process-copy">Construction transfers this core’s attunement and origin. A stale stock change refuses in place.</p></div>`+rail("Construct conduit","Back"))}
@@ -147,7 +147,7 @@ function normalizeImplementationReviews(value){
   return Object.fromEntries(screens.flatMap(({id})=>{
     const record=value[id];
     if(!record||!['yes','no'].includes(record.choice))return[];
-    return [[id,{choice:record.choice,notes:typeof record.notes==="string"?record.notes:""}]];
+    return [[id,{choice:record.choice,notes:typeof record.notes==="string"?record.notes:"",designVersion:typeof record.designVersion==="string"?record.designVersion:""}]];
   }));
 }
 function implementationReviewPacket(reviews=implementationReviews){return{schemaVersion:1,reviews:normalizeImplementationReviews(reviews)}}
@@ -155,7 +155,7 @@ function implementationReviewRecordPacket(screenID,record){
   const normalized=normalizeImplementationReviews({[screenID]:record});
   return normalized[screenID]?{schemaVersion:1,screenID,record:normalized[screenID]}:null;
 }
-function recordsEqual(left,right){return Boolean(left&&right&&left.choice===right.choice&&left.notes===right.notes)}
+function recordsEqual(left,right){return Boolean(left&&right&&left.choice===right.choice&&left.notes===right.notes&&left.designVersion===right.designVersion)}
 function saveImplementationDrafts(){
   try{localStorage.setItem(reviewStorageKey,JSON.stringify(implementationDrafts))}catch{}
 }
@@ -185,7 +185,9 @@ function renderImplementationReview(){
   conformanceStatus.dataset.state=conformance.status;
   $("native-conformance-source").textContent=`Authority: ${conformance.source}`;
   $("native-conformance-issues").innerHTML=conformance.issues.map(issue=>`<li>${issue}</li>`).join("");
-  const committed=implementationReviews[active.id],record=implementationDrafts[active.id]??committed??{choice:"",notes:""};
+  const committed=implementationReviews[active.id],storedRecord=implementationDrafts[active.id]??committed??{choice:"",notes:"",designVersion:""};
+  const staleApproval=storedRecord.choice==="yes"&&storedRecord.designVersion!==conformance.designVersion;
+  const record=staleApproval?{choice:"",notes:"",designVersion:conformance.designVersion}:storedRecord;
   document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>{input.checked=input.value===record.choice;input.disabled=input.value==="yes"&&!conformanceReady});
   const feedbackWrap=$("implementation-feedback-wrap"),feedback=$("implementation-feedback");
   feedbackWrap.hidden=record.choice!=="no";
@@ -196,12 +198,13 @@ function renderImplementationReview(){
   const save=$("implementation-review-save"),status=$("implementation-review-status");
   save.disabled=!valid||!dirty||reviewSaveState.state==="saving";
   status.dataset.state="";
+  if(staleApproval){status.textContent="An earlier Yes is preserved for the previous mock. This rebuilt screen needs a fresh review.";status.dataset.state="stale";return}
   if(reviewSaveState.screenID===active.id&&reviewSaveState.message){status.textContent=reviewSaveState.message;status.dataset.state=reviewSaveState.state;return}
   status.textContent=!conformanceReady&&record.choice==="yes"?"Your earlier visual approval is preserved, but implementation readiness is blocked until this mock matches current native behavior.":!record.choice?"Choose a readiness status, then save when you are finished.":record.choice==="no"&&!record.notes.trim()?"Feedback is required before this review can be saved.":dirty?"Draft saved on this device · not shared yet.":"Saved in the shared project ledger.";
   status.dataset.state=dirty?"draft":"shared";
 }
 function updateImplementationReview(choice,notes=""){
-  implementationDrafts[active.id]={choice,notes};
+  implementationDrafts[active.id]={choice,notes,designVersion:conformanceFor(active.id).designVersion};
   reviewSaveState={screenID:active.id,state:"draft",message:"Draft saved on this device · not shared yet."};
   saveImplementationDrafts();
   renderImplementationReview();

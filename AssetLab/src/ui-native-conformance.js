@@ -1,5 +1,5 @@
-const failed=(source,issues)=>({status:"failed",source,issues});
-const pending=source=>({status:"pending",source,issues:["Native behavior audit has not been completed yet."]});
+const failed=(source,issues)=>({status:"failed",source,issues,designVersion:"draft-0"});
+const pending=source=>({status:"pending",source,issues:["Native behavior audit has not been completed yet."],designVersion:"draft-0"});
 
 export const nativeConformance={
   campaigns:failed("CampaignStartView.swift + CampaignStartPresentationTests.swift",["Native valid-save taps load immediately; the mock adds a persistent selection step and bottom rail.","The mock invents health metadata; native shelf facts are level, location, progression, last played, progress-book count and save validity."]),
@@ -24,8 +24,8 @@ export const nativeConformance={
   scriptorium:failed("StationViews.swift",["Capability gating and Runebook transactions are missing; ink preparation belongs at Writing Desk."]),
   "survey-post":failed("StationViews.swift",["Native owns measurement disclosure, trip packing, instrument improvement and ResearchTree; the mock invents a graph and Study rail."]),
   apothecary:failed("ApothecaryView.swift",["The mock invents category tabs and omits the learned-recipe workflow and Scent Mask source selection."]),
-  reliquary:failed("StationViews.swift",["Native Reliquary is passive field interpretation; the singular-object collection and actions are invented."]),
-  "wayfarer-s-table":{status:"verified",source:"StationViews.swift:229-250 + BaseState.swift:242-245 + Tuning.swift:925-931",issues:[]},
+  reliquary:{status:"verified",source:"StationViews.swift:210-227 + Tuning.swift:932 + SiteTests.swift:297-311",issues:[],designVersion:"native-1"},
+  "wayfarer-s-table":{status:"verified",source:"StationViews.swift:229-250 + BaseState.swift:242-245 + Tuning.swift:925-931",issues:[],designVersion:"native-1"},
   anchorage:failed("StationViews.swift",["The mock invents a realm orbit and global actions while omitting Anchor Frame and per-realm lifecycle controls."]),
   distillery:failed("StationViews.swift",["The mock invents tabs and gauges and omits attunement cards, sample/catalyst selection and readiness."]),
   channelworks:failed("StationViews.swift",["The mock invents route planning; native owns one conduit housing and Build another."]),
