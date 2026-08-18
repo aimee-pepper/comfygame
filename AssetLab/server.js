@@ -1,10 +1,12 @@
 import { createServer } from "node:http";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
-import { basename, extname, join, normalize } from "node:path";
+import { basename, dirname, extname, join, normalize } from "node:path";
+import { fileURLToPath } from "node:url";
 import { generateLiveWorld, liveSymbolCatalogue } from "./src/live-worldgen-bridge.js";
 
 const root = new URL(".", import.meta.url).pathname;
-const port = 4173;
+const port = Number(process.env.ASSETLAB_PORT ?? 4173);
+const uiReviewFile = process.env.ASSETLAB_UI_REVIEW_FILE ?? join(root, "reviews", "ui-gallery-reviews.json");
 const types = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -26,8 +28,30 @@ async function body(request, limit = 100_000) {
   return Buffer.concat(chunks);
 }
 
-createServer(async (request, response) => {
+export async function handleAssetLabRequest(request, response) {
   const url = new URL(request.url, `http://${request.headers.host}`),pathname = decodeURIComponent(url.pathname);
+  if(request.method==="GET"&&pathname==="/__ui-reviews"){
+    try{const saved=await readFile(uiReviewFile);response.writeHead(200,{"Content-Type":types[".json"],"Cache-Control":"no-store"}).end(saved);}
+    catch{response.writeHead(200,{"Content-Type":types[".json"],"Cache-Control":"no-store"}).end(JSON.stringify({schemaVersion:1,reviews:{}}));}
+    return;
+  }
+  if(request.method==="POST"&&pathname==="/__ui-reviews"){
+    try{
+      const payload=JSON.parse((await body(request,250_000)).toString());
+      const reviews=payload?.reviews;
+      if(payload?.schemaVersion!==1||!reviews||typeof reviews!=="object"||Array.isArray(reviews)){response.writeHead(400).end("Invalid UI review packet");return;}
+      const normalized={};
+      for(const [id,record] of Object.entries(reviews)){
+        if(!/^[a-z0-9-]{1,80}$/.test(id)||!record||typeof record!=="object"||!['yes','no'].includes(record.choice)||typeof record.notes!=="string"||record.notes.length>8_000){response.writeHead(400).end("Invalid UI review record");return;}
+        normalized[id]={choice:record.choice,notes:record.notes};
+      }
+      const packet={schemaVersion:1,updatedAt:new Date().toISOString(),reviews:normalized};
+      await mkdir(dirname(uiReviewFile),{recursive:true});
+      await writeFile(uiReviewFile,`${JSON.stringify(packet,null,2)}\n`);
+      response.writeHead(201,{"Content-Type":types[".json"]}).end(JSON.stringify({path:"reviews/ui-gallery-reviews.json",count:Object.keys(normalized).length}));
+    }catch(error){response.writeHead(500,{"Content-Type":types[".json"]}).end(JSON.stringify({error:String(error.message??error)}));}
+    return;
+  }
   if(request.method==="GET"&&pathname==="/__worldgen/catalogue"){
     try{response.writeHead(200,{"Content-Type":types[".json"]}).end(JSON.stringify({symbols:await liveSymbolCatalogue()}));}
     catch(error){response.writeHead(500,{"Content-Type":types[".json"]}).end(JSON.stringify({error:String(error.message??error)}));}return;
@@ -62,6 +86,11 @@ createServer(async (request, response) => {
   } catch {
     response.writeHead(404).end("Not found");
   }
-}).listen(port, "127.0.0.1", () => {
-  console.log(`Bookbinder Asset Lab: http://127.0.0.1:${port}`);
-});
+}
+
+if(process.argv[1]&&fileURLToPath(import.meta.url)===normalize(process.argv[1])){
+  createServer(handleAssetLabRequest).listen(port, "127.0.0.1", function () {
+    const address=this.address();
+    console.log(`Bookbinder Asset Lab: http://127.0.0.1:${typeof address==="object"&&address?address.port:port}`);
+  });
+}

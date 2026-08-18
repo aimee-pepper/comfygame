@@ -48,6 +48,7 @@ const fontChoices=[
 ];
 let active=screens[0],category="All",state="Default",query="";
 let implementationReviews={};
+let reviewSyncTimer;
 const marks={Campaign:"CB",Village:"VI",Writing:"IN",Making:"MK",People:"PE",Knowledge:"KN",Expedition:"EX",Utility:"UT"};
 const notes={
   campaign:["Book covers are the identity; metadata remains compact.","Continue is primary; Delete is never adjacent or equal-weight."],
@@ -136,7 +137,23 @@ function normalizeImplementationReviews(value){
     return [[id,{choice:record.choice,notes:typeof record.notes==="string"?record.notes:""}]];
   }));
 }
-function saveImplementationReviews(){try{localStorage.setItem(reviewStorageKey,JSON.stringify(implementationReviews))}catch{}}
+function implementationReviewPacket(reviews=implementationReviews){return{schemaVersion:1,reviews:normalizeImplementationReviews(reviews)}}
+async function syncImplementationReviews(){
+  try{
+    const response=await fetch("/__ui-reviews",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(implementationReviewPacket())});
+    if(!response.ok)throw new Error(`Review sync failed (${response.status})`);
+    const status=$("implementation-review-status");
+    if(status)status.dataset.shared="true";
+  }catch{
+    const status=$("implementation-review-status");
+    if(status){status.dataset.shared="false";status.textContent="Saved in this browser; shared review ledger is unavailable until AssetLab is served by its local server."}
+  }
+}
+function saveImplementationReviews(){
+  try{localStorage.setItem(reviewStorageKey,JSON.stringify(implementationReviews))}catch{}
+  clearTimeout(reviewSyncTimer);
+  reviewSyncTimer=setTimeout(syncImplementationReviews,250);
+}
 function renderImplementationReview(){
   const record=implementationReviews[active.id]??{choice:"",notes:""};
   document.querySelectorAll('input[name="implementation-ready"]').forEach(input=>input.checked=input.value===record.choice);
@@ -156,6 +173,9 @@ function render(){renderIndex();const preservation=preservationFor(active.title)
 function step(delta){const i=screens.indexOf(active);active=screens[(i+delta+screens.length)%screens.length];category="All";document.querySelectorAll("#category-tabs button").forEach((x,j)=>x.setAttribute("aria-pressed",j===0));render()}
 if(typeof document!=="undefined"){
   try{implementationReviews=normalizeImplementationReviews(JSON.parse(localStorage.getItem(reviewStorageKey)||"{}"))}catch{implementationReviews={}}
+  fetch("/__ui-reviews",{cache:"no-store"}).then(response=>response.ok?response.json():null).then(packet=>{
+    if(packet?.schemaVersion===1){implementationReviews=normalizeImplementationReviews({...packet.reviews,...implementationReviews});saveImplementationReviews();render()}
+  }).catch(()=>{});
   const fontSelect=$("pixel-font-choice");
   fontSelect.innerHTML=fontChoices.map(({id,label})=>`<option value="${id}">${label}</option>`).join("");
   let savedFont="jersey-tiny";
@@ -172,4 +192,4 @@ if(typeof document!=="undefined"){
   $("previous-screen").onclick=()=>step(-1);$("next-screen").onclick=()=>step(1);render();
 }
 
-export {fontChoices,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens};
+export {fontChoices,implementationReviewPacket,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens};

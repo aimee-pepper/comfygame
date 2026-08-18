@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {preservationLedger} from "../src/ui-preservation-ledger.js";
-import {fontChoices,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
+import {fontChoices,implementationReviewPacket,normalizeImplementationReviews,renderers,renderScreen,reviewStorageKey,screens} from "../src/ui-gallery-app.js";
 const css=await readFile(new URL("../ui-gallery.css",import.meta.url),"utf8");
 const galleryHtml=await readFile(new URL("../ui-gallery.html",import.meta.url),"utf8");
 const required=["Campaigns","Home","Writing Desk","Storehouse","Workshop","Party","Essence Spring","Constellation","Library","Bestiary","Research","World History","Blacksmith","Trading Post","Recycler","Tannery","Bowyer","Armoury","Weaponsmith","Scriptorium","Survey Post","Apothecary","Reliquary","Wayfarer’s Table","Anchorage","Distillery","Channelworks","Firepit","Gear","World","Encounter","Loot Decision","Return Recap","Settings"];
@@ -48,6 +48,7 @@ assert.match(galleryHtml,/Yes, implementation ready[\s\S]*No, not ready/,"every 
 assert.match(galleryHtml,/id="implementation-feedback"[\s\S]*Required when this screen is not ready/,"a not-ready review must request specific feedback");
 assert.equal(reviewStorageKey,"bookbinder.assetlab.ui-gallery-reviews.v1");
 assert.deepEqual(normalizeImplementationReviews({campaigns:{choice:"no",notes:"Tighten spacing"},home:{choice:"yes",notes:""},invented:{choice:"yes",notes:"ignored"},gear:{choice:"maybe",notes:7}}),{campaigns:{choice:"no",notes:"Tighten spacing"},home:{choice:"yes",notes:""}},"stored reviews must be restricted to known screens and valid choices");
+assert.deepEqual(implementationReviewPacket({home:{choice:"yes",notes:""},invented:{choice:"no",notes:"ignored"}}),{schemaVersion:1,reviews:{home:{choice:"yes",notes:""}}},"the shared packet helper must emit only normalized gallery reviews");
 assert.match(css,/\.implementation-review/);
 for(const family of ["Jersey 10","Silkscreen","Tiny5"])assert.match(css,new RegExp(`font-family:\"${family}\"`),`${family} must be bundled for live comparison`);
 assert.match(css,/--font-reading/,"long prose must retain a separate readable face");
