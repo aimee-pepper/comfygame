@@ -1,3 +1,5 @@
+import SwiftUI
+import UIKit
 import XCTest
 @testable import Bookbinder
 
@@ -9,9 +11,90 @@ final class ExpeditionOutcomeTests: XCTestCase {
         let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
                                 encoding: .utf8)
         XCTAssertTrue(source.contains(".sheet(item: Binding(get: { store.state.worlds.lastExit }, set: { _ in"))
-        XCTAssertTrue(source.contains("Button(\"Continue\", action: dismiss)"))
+        XCTAssertTrue(source.contains("Button(\"Return to Base\", action: dismiss)"))
         XCTAssertTrue(source.contains(".interactiveDismissDisabled()"))
         XCTAssertFalse(source.contains("if value == nil { store.dismissRunExitSummary() }"))
+        XCTAssertFalse(source.contains("Recovered</button>"))
+        XCTAssertFalse(source.contains("Lost</button>"))
+        XCTAssertFalse(source.contains("Button(\"History\""))
+    }
+
+    func testReturnRecapUsesApprovedSingleReceiptComposition() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("Text(\"Expedition return\")"))
+        XCTAssertTrue(source.contains("outcomePanel"))
+        XCTAssertTrue(source.contains("sectionHeading(\"Recovered\")"))
+        XCTAssertTrue(source.contains("sectionHeading(\"Kept with you\")"))
+        XCTAssertTrue(source.contains("sectionHeading(\"Lost\")"))
+        XCTAssertTrue(source.contains("Text(\"NEXT DEPARTURE\")"))
+        XCTAssertTrue(source.contains(".scrollBounceBehavior(.basedOnSize)"))
+        XCTAssertTrue(source.contains(".recapPanel()"))
+    }
+
+    func testReturnRecapRendersAtApprovedOrdinaryPhoneSize() {
+        let store = GameStore(io: .temporary(name: "return-recap-render-\(UUID().uuidString)"))
+        func fixture(kind: RunExitSummary.Kind) -> RunExitSummary {
+            RunExitSummary(
+            runIndex: 12, kind: kind,
+            reason: kind == .collapse ? "The world ended before every carried thing crossed over."
+                                      : "The Atlas released the party at Base.",
+            turnsTaken: 24, haulKeptFraction: kind == .collapse ? 0.45 : 1,
+            resources: [RunExitGain(name: "Resin", icon: "leaf", count: 4),
+                        RunExitGain(name: "Copper", icon: "diamond", count: 2)],
+            items: [RunExitGain(name: "Lesser Salve", icon: "cross.case", count: 1)],
+            lostResources: [RunExitGain(name: "Briar", icon: "leaf", count: 1)],
+            lostItems: [RunExitGain(name: "Chipped blade", icon: "shield", count: 1)],
+            progress: [RunProgressGain(member: .binder, name: "Binder", experience: 2,
+                                       levels: 0, finalLevel: 4)],
+            writings: [.init(id: "fixture-writing", kind: .fieldNote,
+                             title: "Weathered field note", prose: "A route home, kept for good.")],
+            recruitedTravellers: ["mara"],
+            essenceEconomy: .init(rawCollected: 12, bindCostPaid: 8,
+                                  springYield: 4, netRunway: 40))
+        }
+        let returned = fixture(kind: .portal)
+        let collapsed = fixture(kind: .collapse)
+        store.mutate("fixture: approved return recap") { state in
+            for lesson in TutorialLessonID.allCases {
+                state.tutorial.complete(lesson, fact: "visual_fixture")
+            }
+        }
+
+        let states: [(name: String, summary: RunExitSummary,
+                      detail: RunExitSummary.ReceiptLine?)] = [
+            ("returned", returned, nil),
+            ("collapsed", collapsed, nil),
+            ("receipt-detail", returned, returned.recoveredLines.first)
+        ]
+        for state in states {
+          for scheme in [ColorScheme.light, .dark] {
+            let controller = UIHostingController(rootView:
+                RunExitSummaryView(summary: state.summary, dismiss: {},
+                                   selectedReceipt: state.detail).environmentObject(store)
+                    .environment(\.colorScheme, scheme)
+                    .environment(\.dynamicTypeSize, .large)
+                    .frame(width: 368, height: 800)
+            )
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 368, height: 800))
+            window.rootViewController = controller
+            window.makeKeyAndVisible()
+            controller.view.frame = window.bounds
+            controller.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.2))
+            let image = UIGraphicsImageRenderer(size: window.bounds.size).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            window.isHidden = true
+            XCTAssertEqual(image.size, CGSize(width: 368, height: 800))
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "return-recap-\(state.name)-\(scheme == .light ? "light" : "dark")"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+          }
+        }
     }
 
     func testReturnRecapKeepsWorldPagesSeparateAndDoesNotLeakUninspectedTitles() throws {
@@ -381,7 +464,7 @@ final class ExpeditionOutcomeTests: XCTestCase {
                        [lines[2].id, lines[4].id])
     }
 
-    func testRunExitRecapSourceUsesTypedSixAcrossTilesAndAnchoredLegacyFallback() throws {
+    func testRunExitRecapSourceUsesTypedSixAcrossTilesAndExactReceiptDetailFallback() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
@@ -389,7 +472,9 @@ final class ExpeditionOutcomeTests: XCTestCase {
         XCTAssertTrue(source.contains("in: summary.recoveredLines"))
         XCTAssertTrue(source.contains("in: summary.lostLines"))
         XCTAssertTrue(source.contains("SixAcrossItemGrid(data: lines"))
-        XCTAssertTrue(source.contains("AnchoredItemDetailButton(item: line"))
+        XCTAssertTrue(source.contains("Button { selectedReceipt = line }"))
+        XCTAssertTrue(source.contains("receiptDetailOverlay(selectedReceipt)"))
+        XCTAssertTrue(source.contains("run-exit.receipt-detail"))
         XCTAssertTrue(source.contains("ResourceIconTile(resourceID:"))
         XCTAssertTrue(source.contains("ItemIconTile(icon:"))
         XCTAssertTrue(source.contains("LegacyReceiptIconTile(icon:"))

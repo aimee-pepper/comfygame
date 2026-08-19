@@ -208,34 +208,26 @@ private struct AnchorSettlementView: View {
     }
 }
 
-private struct RunExitSummaryView: View {
+struct RunExitSummaryView: View {
     @EnvironmentObject private var store: GameStore
     @State private var tutorialHidden = false
     @State private var selectedReceipt: RunExitSummary.ReceiptLine?
     let summary: RunExitSummary
     let dismiss: () -> Void
 
+    init(summary: RunExitSummary, dismiss: @escaping () -> Void,
+         selectedReceipt: RunExitSummary.ReceiptLine? = nil) {
+        self.summary = summary
+        self.dismiss = dismiss
+        _selectedReceipt = State(initialValue: selectedReceipt)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
+            recapHeader
             ScrollView {
-                VStack(spacing: 18) {
-                    sectionHeading("Outcome")
-                    Image(systemName: summary.haulKeptFraction >= 1 ? "checkmark.circle.fill" : "heart.slash.fill")
-                        .font(.system(size: 42))
-                        .foregroundStyle(summary.haulKeptFraction >= 1 ? Color.green : Color.red)
-                    Text(summary.kind.title)
-                        .font(.title2.bold())
-                    Text(summary.reason)
-                        .multilineTextAlignment(.center)
-                    VStack(spacing: 6) {
-                        Text("World \(summary.runIndex) · \(summary.turnsTaken) turns")
-                        Text(summary.haulKeptFraction >= 1
-                             ? "All of your haul came home."
-                             : "About half of your haul came home.")
-                    }
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-
+                VStack(spacing: 9) {
+                    outcomePanel
                     sectionHeading("Recovered")
                     receiptSection("Resources", lines: RunExitRecapPresentation.resources(
                         in: summary.recoveredLines))
@@ -243,8 +235,25 @@ private struct RunExitSummaryView: View {
                         in: summary.recoveredLines))
                     worldPageSection("World Pages kept", pages: summary.keptWorldPages)
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Essence runway").font(.headline)
+                    sectionHeading("Kept with you")
+                    writingSection
+                    travellersSection
+                    partyProgressSection
+
+                    sectionHeading("Lost")
+                    receiptSection("Resources", lines: RunExitRecapPresentation.resources(
+                        in: summary.lostLines), isLost: true)
+                    receiptSection("Items", lines: RunExitRecapPresentation.items(
+                        in: summary.lostLines), isLost: true)
+                    worldPageSection("World Pages lost", pages: summary.lostWorldPages,
+                                     isLost: true)
+
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("NEXT DEPARTURE")
+                            .font(.custom("Tiny5", size: 10))
+                            .foregroundStyle(PixelUITheme.muted)
+                        Text("Essence runway")
+                            .font(.custom("Jersey 10", size: 18))
                         LabeledContent("Raw Essence collected", value: "\(summary.essenceEconomy.rawCollected)")
                         if summary.essenceEconomy.refinedEquivalent > 0 {
                             LabeledContent("Value at current rate",
@@ -261,71 +270,37 @@ private struct RunExitSummaryView: View {
                         }
                         LabeledContent("Spendable runway", value: "\(summary.essenceEconomy.netRunway)")
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(14)
-                    .background(Color(.secondarySystemGroupedBackground),
-                                in: RoundedRectangle(cornerRadius: 14))
-
-                    sectionHeading("Lost")
-                    receiptSection("Resources", lines: RunExitRecapPresentation.resources(
-                        in: summary.lostLines))
-                    receiptSection("Items", lines: RunExitRecapPresentation.items(
-                        in: summary.lostLines))
-                    worldPageSection("World Pages lost", pages: summary.lostWorldPages)
-
-                    sectionHeading("Kept for good")
-                    writingSection
-                    travellersSection
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Party progress").font(.headline)
-                        if summary.progress.isEmpty {
-                            Text("No progress recorded for this run.").foregroundStyle(.secondary)
-                        } else {
-                            if !experienceSources.isEmpty {
-                                Text("Each active party member earned")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.secondary)
-                                ViewThatFits(in: .horizontal) {
-                                    HStack(spacing: 12) { experienceSourceLabels }
-                                    VStack(alignment: .leading, spacing: 4) { experienceSourceLabels }
-                                }
-                                Divider()
-                            }
-                            ForEach(summary.progress) { gain in
-                                HStack {
-                                    Image(systemName: gain.member == .binder ? "person.fill" : "person.2.fill")
-                                        .foregroundStyle(.tint)
-                                    Text(gain.name)
-                                    Spacer()
-                                    VStack(alignment: .trailing, spacing: 2) {
-                                        Text("+\(gain.experience) XP").monospacedDigit()
-                                        if gain.levels > 0 {
-                                            Text("Level \(gain.finalLevel) · +\(gain.levels)")
-                                                .font(.caption.weight(.semibold))
-                                                .foregroundStyle(.green)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(14)
-                    .background(Color(.secondarySystemGroupedBackground),
-                                in: RoundedRectangle(cornerRadius: 14))
+                    .recapPanel()
                 }
-                .padding(24)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
             }
-            Button("Continue", action: dismiss)
-                .buttonStyle(.borderedProminent)
-                .frame(minHeight: 44)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 16)
-                .accessibilityIdentifier("run-exit.continue")
+            .scrollBounceBehavior(.basedOnSize)
+
+            VStack {
+                Button("Return to Base", action: dismiss)
+                    .font(.custom("Tiny5", size: 13))
+                    .foregroundStyle(Color.white)
+                    .frame(maxWidth: .infinity, minHeight: 54)
+                    .background(PixelUITheme.primary)
+                    .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("run-exit.continue")
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .background(PixelUITheme.headerB)
+            .overlay(alignment: .top) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
         }
+        .foregroundStyle(PixelUITheme.text)
+        .background(PixelUITheme.screen)
         .presentationDetents([.large])
         .interactiveDismissDisabled()
+        .overlay {
+            if let selectedReceipt {
+                receiptDetailOverlay(selectedReceipt)
+            }
+        }
         .tutorialHoverOverlay(
             isPresented: !tutorialHidden
                 && store.state.tutorial.firstReturnContext?.runIndex == summary.runIndex,
@@ -344,28 +319,111 @@ private struct RunExitSummaryView: View {
         }
     }
 
-    private func sectionHeading(_ title: String) -> some View {
-        Text(title)
-            .font(.title3.bold())
-            .frame(maxWidth: .infinity, alignment: .leading)
+    private var recapHeader: some View {
+        HStack(alignment: .center) {
+            Rectangle().fill(PixelUITheme.clasp).frame(width: 5, height: 38)
+            Text("Expedition return")
+                .font(.custom("Jersey 10", size: 25))
+            Spacer()
+            Text("World \(summary.runIndex) · \(summary.kind == .collapse ? "collapsed" : "returned")")
+                .font(.custom("Tiny5", size: 10))
+                .foregroundStyle(PixelUITheme.muted)
+        }
+        .padding(.horizontal, 12)
+        .frame(height: 62)
+        .background(PixelUITheme.headerB)
+        .overlay(alignment: .bottom) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
     }
 
-    private func worldPageSection(_ title: String, pages: [WorldPageInstance]) -> some View {
+    private var outcomePanel: some View {
+        HStack(spacing: 8) {
+            Text(summary.haulKeptFraction >= 1 ? "◆" : "×")
+                .font(.custom("Jersey 10", size: 24))
+                .frame(width: 46, height: 46)
+                .background(PixelUITheme.surfaceInset)
+                .overlay(Rectangle().stroke(PixelUITheme.clasp, lineWidth: 2))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(summary.haulKeptFraction >= 1 ? "RETURN COMPLETE" : "WORLD CLOSED")
+                    .font(.custom("Tiny5", size: 9))
+                    .foregroundStyle(PixelUITheme.muted)
+                Text(summary.kind.title)
+                    .font(.custom("Jersey 10", size: 18))
+                Text(summary.reason)
+                    .font(.system(size: 12))
+                    .lineLimit(2)
+            }
+            Spacer(minLength: 2)
+            VStack(alignment: .trailing, spacing: 4) {
+                recapFact("Turns", value: "\(summary.turnsTaken)")
+                recapFact("Haul", value: "\(recoveredThingCount) / \(recoveredThingCount + lostThingCount)")
+            }
+        }
+        .padding(10)
+        .foregroundStyle(PixelUITheme.text)
+        .background(PixelUITheme.surfaceInset)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+    }
+
+    private func recapFact(_ label: String, value: String) -> some View {
+        VStack(alignment: .trailing, spacing: 1) {
+            Text(label.uppercased()).font(.custom("Tiny5", size: 8))
+            Text(value).font(.custom("Tiny5", size: 10))
+        }
+    }
+
+    private var recoveredThingCount: Int {
+        summary.recoveredLines.reduce(0) { $0 + $1.compatibilityGain.count }
+            + summary.keptWorldPages.count
+    }
+
+    private var lostThingCount: Int {
+        summary.lostLines.reduce(0) { $0 + $1.compatibilityGain.count }
+            + summary.lostWorldPages.count
+    }
+
+    private func sectionHeading(_ title: String) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title.uppercased())
+                    .font(.custom("Tiny5", size: 9))
+                    .foregroundStyle(PixelUITheme.muted)
+                Text(sectionSubtitle(title))
+                    .font(.custom("Jersey 10", size: 16))
+            }
+            Spacer()
+        }
+        .padding(.bottom, 4)
+        .overlay(alignment: .bottom) { Rectangle().fill(PixelUITheme.edge).frame(height: 1) }
+    }
+
+    private func sectionSubtitle(_ title: String) -> String {
+        switch title {
+        case "Recovered": "Resources, items & pages"
+        case "Kept with you": "Writing, travellers & progress"
+        case "Lost": "Things left behind"
+        default: title
+        }
+    }
+
+    private func worldPageSection(_ title: String, pages: [WorldPageInstance],
+                                  isLost: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.headline)
+            HStack {
+                Text(title).font(.custom("Tiny5", size: 10))
+                Spacer()
+                Text("\(pages.count)").font(.custom("Tiny5", size: 9))
+            }
             if pages.isEmpty {
-                Text("None").foregroundStyle(.secondary)
+                Text("None").foregroundStyle(PixelUITheme.muted)
             } else {
                 ForEach(pages) { page in
                     Label(page.inspected ? page.definition.title : "Unknown page",
                           systemImage: "doc.text")
+                        .foregroundStyle(isLost ? PixelUITheme.muted : PixelUITheme.text)
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground),
-                    in: RoundedRectangle(cornerRadius: 14))
+        .recapPanel()
     }
 
     private var experienceSources: [(name: String, amount: Int)] {
@@ -384,24 +442,29 @@ private struct RunExitSummaryView: View {
         }
     }
 
-    private func receiptSection(_ title: String, lines: [RunExitSummary.ReceiptLine]) -> some View {
+    private func receiptSection(_ title: String, lines: [RunExitSummary.ReceiptLine],
+                                isLost: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(title).font(.headline)
+            HStack {
+                Text(title).font(.custom("Tiny5", size: 10))
+                Spacer()
+                Text("\(lines.reduce(0) { $0 + $1.compatibilityGain.count }) units")
+                    .font(.custom("Tiny5", size: 9))
+                    .foregroundStyle(PixelUITheme.muted)
+            }
             if lines.isEmpty {
-                Text("No \(title.lowercased()) this trip.").foregroundStyle(.secondary)
+                Text("No \(title.lowercased()) this trip.").foregroundStyle(PixelUITheme.muted)
             } else {
                 SixAcrossItemGrid(data: lines, id: \.id) { line in
-                    AnchoredItemDetailButton(item: line, selection: $selectedReceipt) {
-                        receiptTile(line)
-                    } detail: { selected in
-                        receiptDetail(selected)
+                    Button { selectedReceipt = line } label: {
+                        receiptTile(line).opacity(isLost ? 0.62 : 1)
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(selectedReceipt?.id == line.id ? .isSelected : [])
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .recapPanel()
     }
 
     @ViewBuilder
@@ -451,9 +514,43 @@ private struct RunExitSummaryView: View {
         .padding(16)
     }
 
+    private func receiptDetailOverlay(_ line: RunExitSummary.ReceiptLine) -> some View {
+        ZStack {
+            Color.black.opacity(0.32).ignoresSafeArea()
+                .onTapGesture { selectedReceipt = nil }
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("RECEIPT DETAIL")
+                        .font(.custom("Tiny5", size: 10))
+                        .foregroundStyle(PixelUITheme.muted)
+                    Spacer()
+                    Button("Done") { selectedReceipt = nil }
+                        .font(.custom("Tiny5", size: 10))
+                        .frame(minWidth: 54, minHeight: 44)
+                        .background(PixelUITheme.neutral)
+                        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+                        .buttonStyle(.plain)
+                }
+                receiptDetail(line)
+            }
+            .padding(12)
+            .foregroundStyle(PixelUITheme.text)
+            .background(PixelUITheme.surface)
+            .background {
+                Rectangle()
+                    .fill(PixelUITheme.shadow.opacity(0.7))
+                    .offset(x: 7, y: 7)
+            }
+            .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 3))
+            .padding(.horizontal, 16)
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("run-exit.receipt-detail")
+    }
+
     private var writingSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Writing recovered").font(.headline)
+            Text("Writing recovered").font(.custom("Tiny5", size: 10))
             if summary.pages.isEmpty && summary.writings.isEmpty {
                 Text("None this trip.").foregroundStyle(.secondary)
             } else {
@@ -486,14 +583,12 @@ private struct RunExitSummaryView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .recapPanel()
     }
 
     private var travellersSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("People who came home").font(.headline)
+            Text("People who came home").font(.custom("Tiny5", size: 10))
             if summary.recruitedTravellers.isEmpty {
                 Text("None this trip.").foregroundStyle(.secondary)
             } else {
@@ -506,9 +601,53 @@ private struct RunExitSummaryView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .recapPanel()
+    }
+
+    private var partyProgressSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Party progress").font(.custom("Tiny5", size: 10))
+            if summary.progress.isEmpty {
+                Text("No progress recorded for this run.").foregroundStyle(PixelUITheme.muted)
+            } else {
+                if !experienceSources.isEmpty {
+                    Text("Each active party member earned")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(PixelUITheme.muted)
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 12) { experienceSourceLabels }
+                        VStack(alignment: .leading, spacing: 4) { experienceSourceLabels }
+                    }
+                    Divider()
+                }
+                ForEach(summary.progress) { gain in
+                    HStack {
+                        Image(systemName: gain.member == .binder ? "person.fill" : "person.2.fill")
+                            .foregroundStyle(PixelUITheme.primary)
+                        Text(gain.name)
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("+\(gain.experience) XP").monospacedDigit()
+                            if gain.levels > 0 {
+                                Text("Level \(gain.finalLevel) · +\(gain.levels)")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.green)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .recapPanel()
+    }
+}
+
+private extension View {
+    func recapPanel() -> some View {
+        frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(PixelUITheme.surface)
+            .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
     }
 }
 
