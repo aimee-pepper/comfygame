@@ -396,14 +396,14 @@ struct WorldView: View {
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(placeEyebrow)
-                    .font(.custom("Tiny5", size: 7))
+                    .font(.custom("Tiny5", size: 10))
                     .foregroundStyle(PixelUITheme.muted)
                 Text(placeTitle)
-                    .font(.custom("Jersey 10", size: 16))
+                    .font(.custom("Jersey 10", size: 20))
                     .foregroundStyle(PixelUITheme.text)
                     .lineLimit(1)
                 Text(interactionDetail(in: run))
-                    .font(.custom("Tiny5", size: 7))
+                    .font(.custom("Tiny5", size: 10))
                     .foregroundStyle(PixelUITheme.muted)
                     .lineLimit(1)
             }
@@ -417,6 +417,7 @@ struct WorldView: View {
             LinearGradient(colors: [.clear, PixelUITheme.surfaceInset.opacity(0.96)],
                            startPoint: .top, endPoint: .bottom)
         )
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
         .allowsHitTesting(false)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("At this place. \(placeTitle). \(interactionDetail(in: run))")
@@ -925,7 +926,7 @@ private struct PartyHealthStrip: View {
                 Spacer(minLength: 2)
                 Text("\(current)/\(maximum)").monospacedDigit()
             }
-            .font(.custom("Tiny5", size: 7))
+            .font(.custom("Tiny5", size: 10))
             GeometryReader { proxy in
                 Rectangle()
                     .fill(PixelUITheme.edgeDark)
@@ -961,10 +962,10 @@ private struct StabilityHeader: View {
             Spacer(minLength: 4)
             VStack(alignment: .leading, spacing: 1) {
                 Text("STABILITY")
-                    .font(.custom("Tiny5", size: 6))
+                    .font(.custom("Tiny5", size: 9))
                     .foregroundStyle(PixelUITheme.muted)
                 Text("\(Int(run.stability.rounded()))%")
-                    .font(.custom("Tiny5", size: 8))
+                    .font(.custom("Tiny5", size: 11))
                     .foregroundStyle(colour)
             }
             GeometryReader { proxy in
@@ -980,17 +981,17 @@ private struct StabilityHeader: View {
             .frame(width: 78, height: 6)
             VStack(alignment: .trailing, spacing: 1) {
                 Text("COLLAPSE")
-                    .font(.custom("Tiny5", size: 6))
+                    .font(.custom("Tiny5", size: 9))
                     .foregroundStyle(PixelUITheme.muted)
                 Text(turnsLeftText)
-                    .font(.custom("Tiny5", size: 7))
+                    .font(.custom("Tiny5", size: 10))
                     .foregroundStyle(PixelUITheme.text)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                 }
         }
         .padding(.horizontal, 8)
-        .frame(height: 58)
+        .frame(height: 62)
         .background(PixelUITheme.headerB)
         .overlay(alignment: .bottom) { Rectangle().fill(PixelUITheme.edge).frame(height: 2) }
     }

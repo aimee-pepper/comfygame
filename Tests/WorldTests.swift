@@ -1022,6 +1022,14 @@ final class WorldTests: XCTestCase {
         XCTAssertTrue(source.contains("ground.displayName.capitalized"))
         XCTAssertTrue(source.contains("LinearGradient(colors: [.clear, PixelUITheme.surfaceInset.opacity(0.96)]"),
                       "Place copy must float over the approved transparent-to-field gradient")
+        XCTAssertTrue(source.contains(".font(.custom(\"Tiny5\", size: 10))"),
+                      "The live place context must remain readable on an ordinary phone")
+        XCTAssertTrue(source.contains(".font(.custom(\"Jersey 10\", size: 20))"))
+        XCTAssertFalse(source.contains(".font(.custom(\"Tiny5\", size: 6))"))
+        XCTAssertFalse(source.contains(".font(.custom(\"Tiny5\", size: 7))"),
+                       "No World chrome may fall below the readable compact-text floor")
+        XCTAssertTrue(source.contains(".overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))"),
+                      "The transparent information panel still needs a visible hard boundary")
         let minimapSource = try String(contentsOf: root.appending(path: "Sources/Screens/MinimapView.swift"),
                                        encoding: .utf8)
         XCTAssertTrue(minimapSource.contains("Rectangle().stroke(PixelUITheme.edge, lineWidth: 2)"),
