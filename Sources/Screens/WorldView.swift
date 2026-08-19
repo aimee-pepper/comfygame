@@ -92,7 +92,12 @@ struct WorldView: View {
                 StabilityHeader(run: run)
                 PartyHealthStrip(run: run, state: store.state)
                 GeometryReader { viewport in
-                    let viewportColumns = min(Tuning.World.viewportTiles, run.map.width)
+                    let visibilityProfile = WorldRules.visibilityProfile(
+                        in: run, party: WorldRules.sightBonus(in: store.state))
+                    let viewportColumns = WorldMapLayout.viewportColumns(
+                        mapColumns: run.map.width,
+                        minimumColumns: Tuning.World.viewportTiles,
+                        visibilityProfile: visibilityProfile)
                     let mapWidth = WorldMapLayout.maximumSide(
                         containerWidth: viewport.size.width,
                         viewportHeight: viewport.size.height,
@@ -103,8 +108,6 @@ struct WorldView: View {
                         availableHeight: max(0, viewport.size.height - 8),
                         viewportColumns: viewportColumns,
                         mapRows: run.map.height)
-                    let visibilityProfile = WorldRules.visibilityProfile(
-                        in: run, party: WorldRules.sightBonus(in: store.state))
                     VStack(spacing: 0) {
                         MapGrid(
                             run: run,
@@ -930,6 +933,16 @@ enum WorldMapLayout {
     /// Transparent pixels in a lifted 16×19 sprite reveal this game-owned field, never the
     /// system/card background. It is the same non-informative dark used by accepted fog art.
     static let backdropRGB: [UInt8] = [23, 23, 26]
+
+    /// Keep the rules-owned sight field inside the camera after it begins following the player.
+    /// This changes presentation scale only: sight, exploration, and interaction ranges remain
+    /// owned by `VisibilityProfile` and the World rules.
+    static func viewportColumns(mapColumns: Int, minimumColumns: Int,
+                                visibilityProfile: WorldRules.VisibilityProfile) -> Int {
+        let outerRadius = visibilityProfile.fullRadius + visibilityProfile.fringeWidth
+        let sightDiameter = outerRadius * 2 + 1
+        return min(max(1, mapColumns), max(max(1, minimumColumns), sightDiameter))
+    }
 
     /// The map is width-owned. Secondary chrome may make the page scroll, but it must never make
     /// the map smaller. Every cell still lands on whole device pixels.

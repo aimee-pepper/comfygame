@@ -913,6 +913,23 @@ final class WorldTests: XCTestCase {
                                "Only complete rows that fit may be admitted to the viewport")
     }
 
+    func testWorldCameraKeepsTheResolvedSightFringeOnscreenWhileFollowing() {
+        let ordinary = WorldRules.visibilityProfile(illumination: 100, baseRadius: 7)
+        XCTAssertEqual(ordinary.fullRadius, 7)
+        XCTAssertEqual(ordinary.fringeWidth, 2)
+        XCTAssertEqual(WorldMapLayout.viewportColumns(
+            mapColumns: 30, minimumColumns: 11, visibilityProfile: ordinary), 19,
+            "A centred camera must include full sight plus fringe on both sides")
+
+        let darkness = WorldRules.visibilityProfile(illumination: 0, baseRadius: 7)
+        XCTAssertEqual(WorldMapLayout.viewportColumns(
+            mapColumns: 30, minimumColumns: 11, visibilityProfile: darkness), 11,
+            "A smaller sight field must not zoom past the established phone framing")
+        XCTAssertEqual(WorldMapLayout.viewportColumns(
+            mapColumns: 14, minimumColumns: 11, visibilityProfile: ordinary), 14,
+            "Small maps remain bounded by their real columns")
+    }
+
     func testWorldControlsHaveExactlyTwoActionsInOneNonOverlappingBottomDock() throws {
         XCTAssertEqual(WorldControlsLayout.actionCount, 2)
         XCTAssertEqual(WorldControlsLayout.actionRows, 1,
