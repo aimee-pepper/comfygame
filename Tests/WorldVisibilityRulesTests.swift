@@ -13,6 +13,7 @@ final class WorldVisibilityRulesTests: XCTestCase {
         XCTAssertFalse(source.contains("LinearGradient(colors: [.clear, .black]"))
         XCTAssertFalse(source.contains("Color.black.opacity(1 - WorldTileVisibilityPresentation"))
         XCTAssertTrue(source.contains(".colorMultiply(visibility == .fringe ? fringeBrightness : .white)"))
+        XCTAssertTrue(source.contains(".blur(radius: visibility == .full"))
     }
 
     func testExploredStationaryContentsRemainWhileMovingEnemiesStayCurrentOnly() throws {
@@ -33,11 +34,12 @@ final class WorldVisibilityRulesTests: XCTestCase {
         XCTAssertEqual(WorldRules.terrainVisibility(current: .hidden, wasRevealed: false), .hidden)
 
         let pitchBlack = WorldRules.visibilityProfile(illumination: 0)
+        XCTAssertEqual(pitchBlack.fringeWidth, 1)
         XCTAssertEqual(WorldTileVisibilityPresentation.fringeOpacity(
-            profile: pitchBlack, remembered: true), Tuning.Visibility.defaultFringeOpacity)
+            profile: pitchBlack, remembered: true), 0.125)
         XCTAssertEqual(pitchBlack.atmosphericBlurPoints, 0)
         XCTAssertEqual(WorldTileVisibilityPresentation.fringeOpacity(
-            profile: pitchBlack, remembered: false), 0)
+            profile: pitchBlack, remembered: false), 0.125)
     }
 
     func testHiddenNeighboursCannotChangeVisibleTileArtContext() throws {
@@ -149,11 +151,11 @@ final class WorldVisibilityRulesTests: XCTestCase {
         XCTAssertEqual(profile.atmosphericBlurPoints, 0, accuracy: 0.000_001)
     }
 
-    func testPitchBlackLeavesOnlyImmediateRingAndNoFringe() {
+    func testPitchBlackRetainsAVisibleTerrainOnlyFringe() {
         let profile = WorldRules.visibilityProfile(illumination: 0)
         XCTAssertEqual(profile.fullRadius, 1)
-        XCTAssertEqual(profile.fringeWidth, 0)
-        XCTAssertEqual(profile.fringeOpacity, 0, accuracy: 0.000_001)
+        XCTAssertEqual(profile.fringeWidth, 1)
+        XCTAssertEqual(profile.fringeOpacity, 0.125, accuracy: 0.000_001)
     }
 
     func testLowLightContractsFullSightToTwoTiles() {
@@ -166,6 +168,8 @@ final class WorldVisibilityRulesTests: XCTestCase {
         XCTAssertEqual(profile.fringeWidth, 1)
         XCTAssertEqual(profile.fringeOpacity, 0.16, accuracy: 0.000_001)
         XCTAssertEqual(profile.atmosphericBlurPoints, 3.4, accuracy: 0.000_001)
+        XCTAssertEqual(WorldTileVisibilityPresentation.fringeOpacity(
+            profile: profile, remembered: true), profile.fringeOpacity, accuracy: 0.000_001)
     }
 
     func testObscurantCanNeverHideTheImmediateRing() {

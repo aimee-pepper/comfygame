@@ -134,6 +134,24 @@ struct MapTileArtRequest {
                                         height: MapAssetContract.spriteHeight)
     }
 
+    static func renderedTerrainPixels(ground: GroundType, adjacency: Int = 15,
+                                      elevation: Int = 0,
+                                      southExposureLevels: Int = 0,
+                                      seed: UInt32 = 404) throws -> [UInt8] {
+        let tile = Tile(ground: ground, elevation: elevation)
+        let request = MapTileArtRequest(
+            tile: tile, point: GridPoint(x: 0, y: 0), mapSeed: 0,
+            adjacency: adjacency, southExposureLevels: southExposureLevels,
+            grade: WorldGrade(red: 0, green: 0, blue: 0, value: 0), flora: nil,
+            explicitSeed: seed, explicitFeatureVariant: 0
+        )
+        return MapPixelRaster.rawPixels(
+            commands: try MapPixelRaster.terrainCommands(for: request),
+            width: MapAssetContract.spriteWidth,
+            height: MapAssetContract.spriteHeight
+        )
+    }
+
     static func floraPixels(_ flora: Flora) -> [UInt8] {
         MapPixelRaster.rawPixels(commands: FloraPixelGrammar.commands(for: FloraRenderDescriptor(flora)))
     }
@@ -382,11 +400,7 @@ private enum TerrainPixelGrammar {
         let exposure = elevation
         if exposure > 0 {
             let wallY = offset + 16
-            var wall = palette[1]
-            wall.red = wall.red * 3 / 5
-            wall.green = wall.green * 3 / 5
-            wall.blue = wall.blue * 3 / 5
-            result.append(rect(0, wallY, 16, exposure, wall))
+            result.append(rect(0, wallY, 16, exposure, palette[1]))
             result.append(rect(0, wallY, 16, 1, palette[1]))
         }
         return result
@@ -844,12 +858,23 @@ struct RGBA: Equatable {
     fileprivate static func terrainCommands(for request: MapTileArtRequest,
                                              animationFrame: Int? = nil) throws -> [PixelCommand] {
         let commands = TerrainPixelGrammar.commands(for: request, animationFrame: animationFrame)
-        guard request.tile.isRevealed, let descriptor = request.worldGrade2Descriptor else {
-            return commands
+        let recolored: [PixelCommand]
+        if request.tile.isRevealed, let descriptor = request.worldGrade2Descriptor {
+            try WorldGrade2V1.validateDescriptor(descriptor)
+            recolored = try recolor(commands, descriptor: descriptor, scope: .material,
+                                    groundType: request.tile.ground.rawValue)
+        } else {
+            recolored = commands
         }
-        try WorldGrade2V1.validateDescriptor(descriptor)
-        return try recolor(commands, descriptor: descriptor, scope: .material,
-                           groundType: request.tile.ground.rawValue)
+        let wallY = request.surfaceOffsetY + MapAssetContract.logicalSide
+        return recolored.map { command in
+            guard command.y >= wallY else { return command }
+            var shaded = command
+            shaded.color.red = shaded.color.red * 3 / 4
+            shaded.color.green = shaded.color.green * 3 / 4
+            shaded.color.blue = shaded.color.blue * 3 / 4
+            return shaded
+        }
     }
 
     fileprivate static func floraCommands(_ flora: FloraRenderDescriptor,

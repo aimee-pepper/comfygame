@@ -52,7 +52,9 @@ extension WorldRules {
         let fringeWidth = illumination <= Tuning.Pressure.trueDarkFloor
             ? Tuning.Visibility.darkFringeWidth
             : max(1, Tuning.Visibility.defaultFringeWidth - Int(density / 60))
-        let lightFraction = min(1, max(0, (illumination - Tuning.Pressure.trueDarkFloor)
+        // Even true darkness retains one vague, terrain-only fringe. Darkness limits disclosure;
+        // it must not collapse the Euclidean/LOS visibility field into a hard 3x3 black edge.
+        let lightFraction = min(1, max(0.25, (illumination - Tuning.Pressure.trueDarkFloor)
             / (Tuning.Visibility.ordinaryLightFloor - Tuning.Pressure.trueDarkFloor)))
         let obscurantTransmission = max(0, 1 - density / 125)
 
@@ -95,7 +97,7 @@ extension WorldRules {
                              standing: map[origin].elevation)
         else { return .hidden }
         if distance <= fullBoundary { return .full }
-        return profile.fringeOpacity > 0 ? .fringe : .hidden
+        return .fringe
     }
 
     static func visibility(of candidate: GridPoint, in run: WorldRun,

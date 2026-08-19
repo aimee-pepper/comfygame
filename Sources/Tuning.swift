@@ -306,7 +306,7 @@ enum Tuning {
 
     enum Visibility {
         static let defaultFringeWidth = 2
-        static let darkFringeWidth = 0
+        static let darkFringeWidth = 1
         static let defaultFringeOpacity = 0.5
         static let maximumAtmosphericBlurPoints = 4.0
         static let lowLightUpperBound = 25.0

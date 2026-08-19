@@ -1172,8 +1172,10 @@ struct WorldTileVisibilityPresentation {
 
     static func fringeOpacity(profile: WorldRules.VisibilityProfile,
                               remembered: Bool) -> Double {
-        remembered ? max(profile.fringeOpacity, Tuning.Visibility.defaultFringeOpacity)
-            : profile.fringeOpacity
+        _ = remembered
+        // Distance cannot make terrain brighter. Current fringe and remembered terrain share the
+        // same atmosphere-resolved brightness, preventing a dark ring followed by a brighter map.
+        return profile.fringeOpacity
     }
 
 }
@@ -1279,7 +1281,8 @@ private struct TileView: View {
                             / CGFloat(MapAssetContract.logicalSide))
             }
         }
-        .blur(radius: CGFloat(visibilityProfile.atmosphericBlurPoints))
+        .blur(radius: visibility == .full
+              ? 0 : CGFloat(visibilityProfile.atmosphericBlurPoints))
     }
 
     private var surfaceLift: CGFloat {

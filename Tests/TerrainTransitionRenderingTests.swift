@@ -29,11 +29,19 @@ import XCTest
     }
 
     func testLiftedStoneUsesTerrainDerivedSidewallInsteadOfBlackBackdrop() {
-        let pixels = MapAssetTestSupport.terrainPixels(
+        let pixels = try! MapAssetTestSupport.renderedTerrainPixels(
+            ground: .stone, adjacency: 15, elevation: 3,
+            southExposureLevels: 3, seed: 404)
+        let unshaded = MapAssetTestSupport.terrainPixels(
             ground: .stone, adjacency: 15, elevation: 3,
             southExposureLevels: 3, seed: 404)
         let face = Array(pixels[((17 * 16 + 8) * 4)..<((17 * 16 + 8) * 4 + 4)])
-        XCTAssertEqual(face, [54, 58, 60, 255])
+        let unshadedFace = Array(unshaded[((17 * 16 + 8) * 4)..<((17 * 16 + 8) * 4 + 4)])
+        XCTAssertEqual(face, [23, 23, 26, 255])
+        XCTAssertEqual(face[3], 255)
+        XCTAssertLessThan(face[0], unshadedFace[0])
+        XCTAssertLessThan(face[1], unshadedFace[1])
+        XCTAssertLessThan(face[2], unshadedFace[2])
     }
 
     func testEveryLiftedTileOwnsAnOpaqueLogicalFootprint() {
