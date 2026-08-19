@@ -163,6 +163,10 @@ private struct TownHotspotSign: View {
             .overlay {
                 Rectangle().stroke(PixelUITheme.neutralHighlight, lineWidth: 1)
             }
-            .shadow(color: PixelUITheme.shadow.opacity(0.6), radius: 0, x: 3, y: 3)
+            .background {
+                Rectangle()
+                    .fill(PixelUITheme.shadow.opacity(0.6))
+                    .offset(x: 3, y: 3)
+            }
     }
 }

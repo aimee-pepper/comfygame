@@ -142,6 +142,8 @@ final class StartingTownHomeSceneTests: XCTestCase {
         XCTAssertTrue(sign.contains("PixelUITheme.edgeDark"))
         XCTAssertTrue(sign.contains("PixelUITheme.neutralHighlight"))
         XCTAssertFalse(sign.contains("Color(red:"))
+        XCTAssertFalse(sign.contains(".shadow("),
+                       "Hotspot depth must not duplicate or soften the label text")
     }
 
     private func loadedScene() throws -> StartingTownHomeRules.Scene {

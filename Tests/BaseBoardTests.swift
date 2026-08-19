@@ -199,11 +199,15 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertTrue(source.contains("PixelUITheme.primaryHighlight"))
         XCTAssertTrue(source.contains("NavigationLink(value: AppRoute.party)"))
         XCTAssertTrue(source.contains("NavigationLink(value: AppRoute.writingDesk)"))
+        XCTAssertTrue(source.contains(".foregroundStyle(PixelUITheme.text)"))
+        XCTAssertTrue(source.contains(".background(PixelUITheme.surfaceRaised)"))
         let pickerStart = try XCTUnwrap(source.range(of: "private var sectionPicker"))
         let pagerStart = try XCTUnwrap(source.range(of: "private func districtPager",
                                                     range: pickerStart.upperBound..<source.endIndex))
         let picker = String(source[pickerStart.lowerBound..<pagerStart.lowerBound])
         XCTAssertFalse(picker.contains("Color(red:"))
+        XCTAssertFalse(picker.contains(".shadow("),
+                       "Section-button shadows must not be inherited by their text")
     }
 
     func testTownBuildingArtIsExactIDOnlyAndUnknownStationsUseSemanticFallback() {

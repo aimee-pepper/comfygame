@@ -240,7 +240,11 @@ struct BaseView: View {
                                                ? PixelUITheme.edgeDark : PixelUITheme.edge,
                                                lineWidth: 2)
                         }
-                        .shadow(color: PixelUITheme.shadow.opacity(0.55), radius: 0, x: 2, y: 2)
+                        .background {
+                            Rectangle()
+                                .fill(PixelUITheme.shadow.opacity(0.55))
+                                .offset(x: 2, y: 2)
+                        }
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(section == selectedSection ? .isSelected : [])
@@ -405,12 +409,18 @@ struct BaseView: View {
         NavigationLink(value: AppRoute.party) {
             Label("Party", systemImage: "person.2.fill")
                 .font(.subheadline.weight(.semibold))
+                .foregroundStyle(PixelUITheme.text)
                 .frame(minWidth: dynamicTypeSize.isAccessibilitySize ? 0 : 96,
                        maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : nil)
                 .frame(minHeight: 48)
+                .background(PixelUITheme.surfaceRaised)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(PixelUITheme.neutralHighlight, lineWidth: 1)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .buttonStyle(.bordered)
-        .tint(PixelUITheme.neutral)
+        .buttonStyle(.plain)
         .accessibilityHint("Manage party members, gear and gambits")
 
         NavigationLink(value: AppRoute.writingDesk) {
