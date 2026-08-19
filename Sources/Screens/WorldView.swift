@@ -997,24 +997,28 @@ private struct MapGrid: View {
                             let currentVisibility = WorldRules.visibility(
                                 of: point, from: run.playerPosition,
                                 in: run.map, profile: visibilityProfile)
+                            let wasExplored = run.map[point].isRevealed
                             let visibility = WorldRules.terrainVisibility(
-                                current: currentVisibility, wasRevealed: run.map[point].isRevealed)
+                                current: currentVisibility, wasRevealed: wasExplored)
                             let isRememberedTerrain = currentVisibility == .hidden
                                 && visibility == .fringe
+                            let showsStationaryContents = currentVisibility == .full || wasExplored
                             let displayTile = displayTile(at: point, visibility: visibility)
                             let presentation = WorldTileVisibilityPresentation.resolve(
                                 run: run, point: point, tile: displayTile, visibility: visibility,
                                 profile: visibilityProfile, grade: grade,
-                                atmosphereMotion: atmosphereMotion)
+                                atmosphereMotion: atmosphereMotion,
+                                showsStationaryContents: showsStationaryContents)
                             TileView(tile: displayTile,
                                      visibility: visibility,
                                      isRememberedTerrain: isRememberedTerrain,
+                                     showsStationaryContents: showsStationaryContents,
                                      visibilityProfile: visibilityProfile,
                                      artRequest: presentation.artRequest,
                                      fogBoundaryEdges: presentation.fogBoundaryEdges,
                                      enemy: enemy(at: point, visibility: currentVisibility),
-                                     site: currentVisibility == .full ? site(at: point) : nil,
-                                     hasLooseWorldPage: currentVisibility == .full
+                                     site: showsStationaryContents ? site(at: point) : nil,
+                                     hasLooseWorldPage: showsStationaryContents
                                         && run.offeredWorldPages.contains {
                                             $0.fieldProvenance?.position == point
                                         },
@@ -1056,8 +1060,10 @@ private struct MapGrid: View {
             tile.isRevealed = true
         case .fringe:
             tile.isRevealed = true
-            tile.content = .empty
-            tile.flora = nil
+            if !run.map[point].isRevealed {
+                tile.content = .empty
+                tile.flora = nil
+            }
             tile.isCracking = false
         case .hidden:
             tile.isRevealed = false
@@ -1099,7 +1105,8 @@ struct WorldTileVisibilityPresentation {
                         visibility: WorldRules.TileVisibility,
                         profile: WorldRules.VisibilityProfile,
                         grade: WorldGrade,
-                        atmosphereMotion: Int = 0) -> Self {
+                        atmosphereMotion: Int = 0,
+                        showsStationaryContents: Bool = false) -> Self {
         guard visibility != .hidden else {
             return Self(artRequest: nil, fogBoundaryEdges: [])
         }
@@ -1113,10 +1120,12 @@ struct WorldTileVisibilityPresentation {
         var adjacency = 0
         var fogBoundaryEdges: FogBoundaryEdges = []
         var visibleSouth: Tile?
+        var southIsUndisclosed = false
 
         for neighbour in neighbours {
             guard run.map.contains(neighbour.point) else {
                 fogBoundaryEdges.insert(neighbour.edge)
+                if neighbour.edge == .south { southIsUndisclosed = true }
                 continue
             }
             let currentNeighbourVisibility = WorldRules.visibility(
@@ -1130,6 +1139,7 @@ struct WorldTileVisibilityPresentation {
                 // without sampling the hidden tile's ground or elevation.
                 adjacency |= neighbour.bit
                 fogBoundaryEdges.insert(neighbour.edge)
+                if neighbour.edge == .south { southIsUndisclosed = true }
                 continue
             }
             var visibleTile = run.map[neighbour.point]
@@ -1138,13 +1148,16 @@ struct WorldTileVisibilityPresentation {
             if neighbour.edge == .south { visibleSouth = visibleTile }
         }
 
-        let flora = visibility == .full
+        let flora = showsStationaryContents
             ? tile.flora.flatMap { id in run.flora.first { $0.id == id } }
             : nil
+        let southExposure = southIsUndisclosed
+            ? MapAssetContract.resolvedElevation(for: tile)
+            : MapAssetContract.southExposure(center: tile, south: visibleSouth)
         let request = MapTileArtRequest(
             tile: tile, point: point, mapSeed: run.mapSeed, runIndex: run.runIndex,
             adjacency: adjacency,
-            southExposureLevels: MapAssetContract.southExposure(center: tile, south: visibleSouth),
+            southExposureLevels: southExposure,
             grade: grade, flora: flora,
             worldGrade2Descriptor: run.worldVisualReceipt?.descriptor,
             atmosphereMotion: atmosphereMotion)
@@ -1169,6 +1182,7 @@ private struct TileView: View {
     let tile: Tile
     let visibility: WorldRules.TileVisibility
     let isRememberedTerrain: Bool
+    let showsStationaryContents: Bool
     let visibilityProfile: WorldRules.VisibilityProfile
     let artRequest: MapTileArtRequest?
     let fogBoundaryEdges: FogBoundaryEdges
@@ -1267,13 +1281,7 @@ private struct TileView: View {
                             / CGFloat(MapAssetContract.logicalSide))
             }
         }
-        // Establish the logical tile before filtering. This prevents the lifted 16×19 sprite and
-        // neighbouring rows from becoming one blur input. `opaque` edge-clamps the already-cropped
-        // terrain instead of sampling transparent elevation padding.
-        .frame(width: side, height: side, alignment: .top)
-        .clipped()
-        .blur(radius: CGFloat(visibilityProfile.atmosphericBlurPoints), opaque: true)
-        .clipped()
+        .blur(radius: CGFloat(visibilityProfile.atmosphericBlurPoints))
     }
 
     private var surfaceLift: CGFloat {
@@ -1283,7 +1291,7 @@ private struct TileView: View {
 
     private var symbol: String? {
         if isPlayer { return "figure.stand" }
-        guard visibility == .full, tile.isRevealed, !tile.isCrumbled else { return nil }
+        guard showsStationaryContents, tile.isRevealed, !tile.isCrumbled else { return nil }
         if let enemy { return enemy.icon }
         if hasLooseWorldPage { return "doc.text.fill" }
         switch tile.content {

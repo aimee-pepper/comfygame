@@ -28,6 +28,14 @@ import XCTest
         }
     }
 
+    func testLiftedStoneUsesTerrainDerivedSidewallInsteadOfBlackBackdrop() {
+        let pixels = MapAssetTestSupport.terrainPixels(
+            ground: .stone, adjacency: 15, elevation: 3,
+            southExposureLevels: 3, seed: 404)
+        let face = Array(pixels[((17 * 16 + 8) * 4)..<((17 * 16 + 8) * 4 + 4)])
+        XCTAssertEqual(face, [60, 65, 66, 255])
+    }
+
     func testWaterAnimatesContinuouslyInFourCrispFrames() {
         let frames = (0..<4).map {
             MapAssetTestSupport.animatedTerrainPixels(ground: .water, tick: $0)

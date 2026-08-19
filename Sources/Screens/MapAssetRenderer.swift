@@ -379,9 +379,12 @@ private enum TerrainPixelGrammar {
         let exposure = min(elevation, max(0, request.southExposureLevels))
         if exposure > 0 {
             let wallY = offset + 16
-            result.append(rect(0, wallY, 16, exposure, palette[0]))
+            var wall = palette[1]
+            wall.red = wall.red * 2 / 3
+            wall.green = wall.green * 2 / 3
+            wall.blue = wall.blue * 2 / 3
+            result.append(rect(0, wallY, 16, exposure, wall))
             result.append(rect(0, wallY, 16, 1, palette[1]))
-            if exposure == 3 { result.append(rect(0, wallY + 2, 16, 1, palette[0])) }
         }
         return result
     }

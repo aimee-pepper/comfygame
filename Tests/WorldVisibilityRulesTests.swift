@@ -13,6 +13,17 @@ final class WorldVisibilityRulesTests: XCTestCase {
         XCTAssertFalse(source.contains("LinearGradient(colors: [.clear, .black]"))
     }
 
+    func testExploredStationaryContentsRemainWhileMovingEnemiesStayCurrentOnly() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appendingPathComponent("Sources/Screens/WorldView.swift"),
+            encoding: .utf8)
+        XCTAssertTrue(source.contains("currentVisibility == .full || wasExplored"))
+        XCTAssertTrue(source.contains("enemy(at: point, visibility: currentVisibility)"))
+        XCTAssertTrue(source.contains("guard visibility == .full else { return nil }"))
+    }
+
     func testFullyExploredTerrainNeverFallsBelowFringeAfterLeavingSight() {
         XCTAssertEqual(WorldRules.terrainVisibility(current: .hidden, wasRevealed: true), .fringe)
         XCTAssertEqual(WorldRules.terrainVisibility(current: .fringe, wasRevealed: true), .fringe)
@@ -63,7 +74,7 @@ final class WorldVisibilityRulesTests: XCTestCase {
         // East and south are hidden. Their exact terrain cannot affect visible art, but fog must
         // suppress the renderer's exposed-edge strips rather than painting dark bars.
         XCTAssertEqual(before.adjacency, 2 | 4)
-        XCTAssertEqual(before.southExposureLevels, 0)
+        XCTAssertEqual(before.southExposureLevels, 3)
     }
 
     func testVisibleNeighboursParticipateInOrdinaryBoundaryGrammar() throws {
