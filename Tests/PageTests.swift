@@ -18,6 +18,15 @@ final class PageTests: XCTestCase {
                 state.tutorial.complete(lesson, fact: "visual_fixture")
             }
         }
+        XCTAssertTrue(store.write(.target("illumination"), glyph: "illumination",
+                                  at: .init(column: 0, row: 0)))
+        XCTAssertTrue(store.write(.source("sun"), glyph: "sun",
+                                  at: .init(column: 0, row: 2)))
+        let marks = store.state.base.page.runes
+        XCTAssertEqual(marks.count, 2)
+        store.mutate("connect writing render fixture") {
+            $0.base.page.links.insert(MarkLink(marks[0].id, marks[1].id))
+        }
         for scheme in [ColorScheme.light, .dark] {
             let controller = UIHostingController(rootView:
                 NavigationStack { WritingDeskView().environmentObject(store) }

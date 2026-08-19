@@ -33,6 +33,7 @@ private enum WritingDeskSheet: String, Identifiable {
 /// off-stage.
 struct WritingDeskView: View {
     @EnvironmentObject private var store: GameStore
+    @Environment(\.dismiss) private var dismiss
     /// The rune picked from the palette and now hovering over the page, waiting to be dragged into
     /// place. Owned here so choosing from the scrolling list and placing on the fixed page are the
     /// same act.
@@ -116,6 +117,7 @@ struct WritingDeskView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            writingHeader
             writingPaneTabs
             switch pane {
             case .write: writePane
@@ -124,8 +126,7 @@ struct WritingDeskView: View {
             }
         }
         .background(WritingDeskPaperBackground())
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationTitle("Writing Desk")
+        .toolbar(.hidden, for: .navigationBar)
         .confirmationDialog(
             "Clear this page?",
             isPresented: $isConfirmingClear,
@@ -192,6 +193,40 @@ struct WritingDeskView: View {
         .onChange(of: bin) { _, _ in dismissPageInteraction() }
     }
 
+    private var writingHeader: some View {
+        HStack(spacing: 8) {
+            Button { dismiss() } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 13, weight: .bold))
+                    .frame(width: 32, height: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Back")
+
+            Text("Writing Desk")
+                .font(.custom("Jersey 10", size: 21))
+                .accessibilityAddTraits(.isHeader)
+            Spacer(minLength: 8)
+            Text(state.base.hasCapability("inkMixing") ? "Brush · Ink" : "Brush · Ash")
+                .font(.custom("Tiny5", size: 8))
+                .foregroundStyle(PixelUITheme.muted)
+                .padding(.horizontal, 8)
+                .frame(height: 28)
+                .background(PixelUITheme.surfaceInset)
+                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
+        }
+        .foregroundStyle(PixelUITheme.text)
+        .padding(.horizontal, 8)
+        .frame(height: 52)
+        .background(PixelUITheme.screen)
+        .overlay(alignment: .leading) {
+            Rectangle().fill(PixelUITheme.edge).frame(width: 4).padding(.vertical, 8)
+        }
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(PixelUITheme.edge).frame(height: 2)
+        }
+    }
+
     private var clearPageActionLabel: String {
         let count = state.base.page.runes.count
         return "Clear \(count) \(count == 1 ? "mark" : "marks")"
@@ -204,8 +239,8 @@ struct WritingDeskView: View {
                     Text(entry.rawValue)
                         .font(.custom("Tiny5", size: 10))
                         .frame(maxWidth: .infinity, minHeight: 38)
-                        .foregroundStyle(pane == entry ? PixelUITheme.screen : PixelUITheme.text)
-                        .background(pane == entry ? PixelUITheme.edgeDark : PixelUITheme.neutral)
+                        .foregroundStyle(PixelUITheme.text)
+                        .background(pane == entry ? PixelUITheme.neutralHighlight : PixelUITheme.surfaceRaised)
                         .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
                 }
                 .buttonStyle(.plain)
