@@ -33,7 +33,23 @@ import XCTest
             ground: .stone, adjacency: 15, elevation: 3,
             southExposureLevels: 3, seed: 404)
         let face = Array(pixels[((17 * 16 + 8) * 4)..<((17 * 16 + 8) * 4 + 4)])
-        XCTAssertEqual(face, [60, 65, 66, 255])
+        XCTAssertEqual(face, [54, 58, 60, 255])
+    }
+
+    func testEveryLiftedTileOwnsAnOpaqueLogicalFootprint() {
+        for ground in GroundType.allCases {
+            for elevation in 0...MapAssetContract.maximumElevation {
+                let pixels = MapAssetTestSupport.terrainPixels(
+                    ground: ground, adjacency: 15, elevation: elevation,
+                    southExposureLevels: 0, seed: 404)
+                for y in MapAssetContract.maximumElevation..<MapAssetContract.spriteHeight {
+                    for x in 0..<MapAssetContract.spriteWidth {
+                        XCTAssertEqual(pixels[(y * MapAssetContract.spriteWidth + x) * 4 + 3], 255,
+                                       "\(ground.rawValue) elevation \(elevation) left alpha at \(x),\(y)")
+                    }
+                }
+            }
+        }
     }
 
     func testWaterAnimatesContinuouslyInFourCrispFrames() {

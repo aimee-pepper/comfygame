@@ -11,6 +11,8 @@ final class WorldVisibilityRulesTests: XCTestCase {
         XCTAssertFalse(source.contains("fogBoundaryOverlay"))
         XCTAssertFalse(source.contains("LinearGradient(colors: [.black, .clear]"))
         XCTAssertFalse(source.contains("LinearGradient(colors: [.clear, .black]"))
+        XCTAssertFalse(source.contains("Color.black.opacity(1 - WorldTileVisibilityPresentation"))
+        XCTAssertTrue(source.contains(".colorMultiply(visibility == .fringe ? fringeBrightness : .white)"))
     }
 
     func testExploredStationaryContentsRemainWhileMovingEnemiesStayCurrentOnly() throws {

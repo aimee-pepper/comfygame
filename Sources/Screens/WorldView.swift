@@ -1244,19 +1244,17 @@ private struct TileView: View {
                     .offset(x: side * 0.30, y: -side * 0.30)
             }
         }
-        .overlay {
-            switch visibility {
-            case .full:
-                Color.clear
-            case .fringe:
-                Color.black.opacity(1 - WorldTileVisibilityPresentation.fringeOpacity(
-                    profile: visibilityProfile, remembered: isRememberedTerrain))
-            case .hidden:
-                Color.black
-            }
-        }
+        // Dim only pixels that actually exist. A black rectangle here would also fill the lifted
+        // sprite's transparent padding, producing false bands on remembered terrain.
+        .colorMultiply(visibility == .fringe ? fringeBrightness : .white)
         .frame(width: side, height: side)
         .contentShape(Rectangle())
+    }
+
+    private var fringeBrightness: Color {
+        let value = WorldTileVisibilityPresentation.fringeOpacity(
+            profile: visibilityProfile, remembered: isRememberedTerrain)
+        return Color(red: value, green: value, blue: value)
     }
 
     @ViewBuilder private var terrainLayer: some View {

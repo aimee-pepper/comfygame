@@ -376,13 +376,16 @@ private enum TerrainPixelGrammar {
             PixelCommand(x: $0.x, y: $0.y + offset, width: $0.width, height: $0.height,
                          color: $0.color)
         }
-        let exposure = min(elevation, max(0, request.southExposureLevels))
+        // Every lifted sprite owns a complete opaque logical footprint. The southern row is drawn
+        // later and naturally occludes any face it stands in front of; relying on transparent gaps
+        // here leaks the map's black backdrop whenever visibility suppresses that neighbour.
+        let exposure = elevation
         if exposure > 0 {
             let wallY = offset + 16
             var wall = palette[1]
-            wall.red = wall.red * 2 / 3
-            wall.green = wall.green * 2 / 3
-            wall.blue = wall.blue * 2 / 3
+            wall.red = wall.red * 3 / 5
+            wall.green = wall.green * 3 / 5
+            wall.blue = wall.blue * 3 / 5
             result.append(rect(0, wallY, 16, exposure, wall))
             result.append(rect(0, wallY, 16, 1, palette[1]))
         }
