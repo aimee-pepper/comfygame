@@ -228,49 +228,21 @@ struct RunExitSummaryView: View {
             ScrollView {
                 VStack(spacing: 9) {
                     outcomePanel
-                    sectionHeading("Recovered")
-                    receiptSection("Resources", lines: RunExitRecapPresentation.resources(
-                        in: summary.recoveredLines))
-                    receiptSection("Items", lines: RunExitRecapPresentation.items(
-                        in: summary.recoveredLines))
-                    worldPageSection("World Pages kept", pages: summary.keptWorldPages)
-
-                    sectionHeading("Kept with you")
-                    writingSection
-                    travellersSection
-                    partyProgressSection
-
-                    sectionHeading("Lost")
-                    receiptSection("Resources", lines: RunExitRecapPresentation.resources(
-                        in: summary.lostLines), isLost: true)
-                    receiptSection("Items", lines: RunExitRecapPresentation.items(
-                        in: summary.lostLines), isLost: true)
-                    worldPageSection("World Pages lost", pages: summary.lostWorldPages,
-                                     isLost: true)
-
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text("NEXT DEPARTURE")
-                            .font(.custom("Tiny5", size: 10))
-                            .foregroundStyle(PixelUITheme.muted)
-                        Text("Essence runway")
-                            .font(.custom("Jersey 10", size: 18))
-                        LabeledContent("Raw Essence collected", value: "\(summary.essenceEconomy.rawCollected)")
-                        if summary.essenceEconomy.refinedEquivalent > 0 {
-                            LabeledContent("Value at current rate",
-                                           value: "\(summary.essenceEconomy.refinedEquivalent) Essence")
-                        }
-                        if summary.essenceEconomy.rawAutoRefined > 0 {
-                            LabeledContent("Continuous settling",
-                                           value: "\(summary.essenceEconomy.rawAutoRefined) Raw → \(summary.essenceEconomy.automaticallyRefinedEssence) Essence")
-                        }
-                        LabeledContent("Bind cost paid", value: "\(summary.essenceEconomy.bindCostPaid)")
-                        LabeledContent("Spring yield", value: "+\(summary.essenceEconomy.springYield)")
-                        if summary.essenceEconomy.antiLockSubsidy > 0 {
-                            LabeledContent("Spring shortfall aid", value: "+\(summary.essenceEconomy.antiLockSubsidy)")
-                        }
-                        LabeledContent("Spendable runway", value: "\(summary.essenceEconomy.netRunway)")
-                    }
-                    .recapPanel()
+                    compactReceiptSection(
+                        eyebrow: "RECOVERED",
+                        title: "Resources · \(RunExitRecapPresentation.resources(in: summary.recoveredLines).reduce(0) { $0 + $1.compatibilityGain.count }) units",
+                        lines: summary.recoveredLines,
+                        pages: summary.keptWorldPages
+                    )
+                    keptLedger
+                    compactReceiptSection(
+                        eyebrow: "LOST",
+                        title: "\(lostThingCount) things left behind",
+                        lines: summary.lostLines,
+                        pages: summary.lostWorldPages,
+                        isLost: true
+                    )
+                    essenceRunway
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
@@ -379,6 +351,104 @@ struct RunExitSummaryView: View {
     private var lostThingCount: Int {
         summary.lostLines.reduce(0) { $0 + $1.compatibilityGain.count }
             + summary.lostWorldPages.count
+    }
+
+    private func compactReceiptSection(
+        eyebrow: String,
+        title: String,
+        lines: [RunExitSummary.ReceiptLine],
+        pages: [WorldPageInstance],
+        isLost: Bool = false
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(eyebrow).font(.custom("Tiny5", size: 9))
+                        .foregroundStyle(PixelUITheme.muted)
+                    Text(title).font(.custom("Jersey 10", size: 16))
+                }
+                Spacer()
+                if !isLost { Text("Storehouse").font(.custom("Tiny5", size: 9)) }
+            }
+            .padding(.bottom, 5)
+            .overlay(alignment: .bottom) { Rectangle().fill(PixelUITheme.edge).frame(height: 1) }
+
+            if lines.isEmpty && pages.isEmpty {
+                Text("None").font(.custom("Tiny5", size: 10)).foregroundStyle(PixelUITheme.muted)
+            } else {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 6), spacing: 4) {
+                    ForEach(lines, id: \.id) { line in
+                        Button { selectedReceipt = line } label: {
+                            receiptTile(line).opacity(isLost ? 0.62 : 1)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    ForEach(pages) { page in
+                        Image(systemName: "doc.text")
+                            .font(.system(size: 17))
+                            .frame(maxWidth: .infinity)
+                            .aspectRatio(1, contentMode: .fit)
+                            .foregroundStyle(isLost ? PixelUITheme.muted : PixelUITheme.text)
+                            .background(PixelUITheme.neutral)
+                            .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
+                            .accessibilityLabel(page.inspected ? page.definition.title : "Unknown page")
+                    }
+                }
+            }
+        }
+        .padding(8)
+        .background(PixelUITheme.surface)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+    }
+
+    private var keptLedger: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("KEPT WITH YOU").font(.custom("Tiny5", size: 9))
+                .foregroundStyle(PixelUITheme.muted)
+            Text("Writing & travellers").font(.custom("Jersey 10", size: 16))
+            HStack(spacing: 4) {
+                ledgerCell("\(summary.pages.count + summary.writings.count) marks", "current draft")
+                ledgerCell("\(summary.recruitedTravellers.count) returned", travellerNames)
+                ledgerCell("+\(summary.progress.reduce(0) { $0 + $1.levels }) progress", "party total")
+            }
+        }
+        .padding(8)
+        .background(PixelUITheme.surface)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+    }
+
+    private var travellerNames: String {
+        let names = summary.recruitedTravellers.compactMap { ContentCatalog.shared.traveller($0)?.name }
+        return names.isEmpty ? "none" : names.joined(separator: " · ")
+    }
+
+    private func ledgerCell(_ value: String, _ detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(value).font(.custom("Tiny5", size: 10)).lineLimit(1)
+            Text(detail).font(.custom("Tiny5", size: 8)).lineLimit(1)
+                .foregroundStyle(PixelUITheme.muted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(5)
+        .background(PixelUITheme.neutral)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
+    }
+
+    private var essenceRunway: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("NEXT DEPARTURE").font(.custom("Tiny5", size: 9))
+                    .foregroundStyle(PixelUITheme.muted)
+                Text("\(summary.essenceEconomy.netRunway) Essence held")
+                    .font(.custom("Tiny5", size: 10))
+            }
+            Spacer()
+            Text("Enough for the next bind")
+                .font(.custom("Tiny5", size: 9))
+        }
+        .padding(8)
+        .background(PixelUITheme.surfaceInset)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
     }
 
     private func sectionHeading(_ title: String) -> some View {

@@ -26,12 +26,13 @@ final class ExpeditionOutcomeTests: XCTestCase {
                                 encoding: .utf8)
         XCTAssertTrue(source.contains("Text(\"Expedition return\")"))
         XCTAssertTrue(source.contains("outcomePanel"))
-        XCTAssertTrue(source.contains("sectionHeading(\"Recovered\")"))
-        XCTAssertTrue(source.contains("sectionHeading(\"Kept with you\")"))
-        XCTAssertTrue(source.contains("sectionHeading(\"Lost\")"))
+        XCTAssertTrue(source.contains("compactReceiptSection("))
+        XCTAssertTrue(source.contains("eyebrow: \"RECOVERED\""))
+        XCTAssertTrue(source.contains("keptLedger"))
+        XCTAssertTrue(source.contains("eyebrow: \"LOST\""))
         XCTAssertTrue(source.contains("Text(\"NEXT DEPARTURE\")"))
         XCTAssertTrue(source.contains(".scrollBounceBehavior(.basedOnSize)"))
-        XCTAssertTrue(source.contains(".recapPanel()"))
+        XCTAssertTrue(source.contains("count: 6"))
     }
 
     func testReturnRecapRendersAtApprovedOrdinaryPhoneSize() {
@@ -102,8 +103,8 @@ final class ExpeditionOutcomeTests: XCTestCase {
             .deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
                                 encoding: .utf8)
-        XCTAssertTrue(source.contains("World Pages kept"))
-        XCTAssertTrue(source.contains("World Pages lost"))
+        XCTAssertTrue(source.contains("pages: summary.keptWorldPages"))
+        XCTAssertTrue(source.contains("pages: summary.lostWorldPages"))
         XCTAssertTrue(source.contains("page.inspected ? page.definition.title : \"Unknown page\""))
         XCTAssertFalse(source.contains("recapSection(\"World Pages"),
                        "physical pages must not be projected as generic item/resource gains")
@@ -171,14 +172,15 @@ final class ExpeditionOutcomeTests: XCTestCase {
         XCTAssertTrue(summary.items.isEmpty)
     }
 
-    func testReturnRecapNamesResourcesAndItemsWithCategorySpecificEmptyCopy() throws {
+    func testReturnRecapCombinesTypedResourcesAndItemsInOneApprovedReceipt() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
                                 encoding: .utf8)
-        XCTAssertTrue(source.contains("receiptSection(\"Resources\", lines: RunExitRecapPresentation.resources("))
-        XCTAssertTrue(source.contains("receiptSection(\"Items\", lines: RunExitRecapPresentation.items("))
-        XCTAssertTrue(source.contains("No \\(title.lowercased()) this trip."))
+        XCTAssertTrue(source.contains("eyebrow: \"RECOVERED\""))
+        XCTAssertTrue(source.contains("lines: summary.recoveredLines"))
+        XCTAssertTrue(source.contains("if lines.isEmpty && pages.isEmpty"))
+        XCTAssertTrue(source.contains("Text(\"None\")"))
         XCTAssertFalse(source.contains("recapSection(\"Loot\""))
     }
 
@@ -469,9 +471,9 @@ final class ExpeditionOutcomeTests: XCTestCase {
             .deletingLastPathComponent().deletingLastPathComponent()
         let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
                                 encoding: .utf8)
-        XCTAssertTrue(source.contains("in: summary.recoveredLines"))
-        XCTAssertTrue(source.contains("in: summary.lostLines"))
-        XCTAssertTrue(source.contains("SixAcrossItemGrid(data: lines"))
+        XCTAssertTrue(source.contains("lines: summary.recoveredLines"))
+        XCTAssertTrue(source.contains("lines: summary.lostLines"))
+        XCTAssertTrue(source.contains("count: 6"))
         XCTAssertTrue(source.contains("Button { selectedReceipt = line }"))
         XCTAssertTrue(source.contains("receiptDetailOverlay(selectedReceipt)"))
         XCTAssertTrue(source.contains("run-exit.receipt-detail"))
