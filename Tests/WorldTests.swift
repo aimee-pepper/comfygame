@@ -965,7 +965,8 @@ final class WorldTests: XCTestCase {
         XCTAssertFalse(source.contains("MapGrid(") && source.contains("eventLog.padding(8)"))
         XCTAssertTrue(source.contains("eventLog\n                            .padding(.horizontal, 12)\n                            .padding(.bottom, 8)"),
                       "Narration floats at the viewport boundary immediately above the bottom HUD")
-        XCTAssertTrue(source.contains("Color(.systemBackground).opacity(0.42)"))
+        XCTAssertTrue(source.contains("PixelUITheme.surfaceInset.opacity(0.36)"))
+        XCTAssertTrue(source.contains("PixelUITheme.surfaceInset.opacity(0.88)"))
         XCTAssertTrue(source.contains(".allowsHitTesting(false)"))
         XCTAssertTrue(source.contains("HStack(alignment: .center, spacing: WorldControlsLayout.navigationSpacing)"))
         XCTAssertTrue(source.contains("VStack(spacing: 12)"),
@@ -975,7 +976,10 @@ final class WorldTests: XCTestCase {
         XCTAssertTrue(source.contains("Button(isLookArmed ? \"Cancel\" : \"Look\")"))
         XCTAssertTrue(source.contains(".padding(.vertical, 8)"),
                       "The control pair must be vertically centered inside symmetric padding")
-        XCTAssertTrue(source.contains(".overlay(alignment: .top) { Divider() }"))
+        XCTAssertTrue(source.contains("Rectangle().fill(PixelUITheme.edge).frame(height: 2)"))
+        XCTAssertTrue(source.contains(".background(PixelUITheme.surfaceInset)"))
+        XCTAssertTrue(source.contains(".background(PixelUITheme.primary)"))
+        XCTAssertTrue(source.contains(".font(.custom(\"Tiny5\", size: 10))"))
         XCTAssertTrue(source.contains(".clipShape(RoundedRectangle(cornerRadius: 10))"),
                       "No map pixels may escape the viewport or render beneath the Field Kit border")
     }

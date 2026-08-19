@@ -139,12 +139,14 @@ struct WorldView: View {
                         .padding(.vertical, 6)
                     controls(run)
                 }
-                .background(.bar)
-                .overlay(alignment: .top) { Divider() }
+                .background(PixelUITheme.surfaceInset)
+                .overlay(alignment: .top) {
+                    Rectangle().fill(PixelUITheme.edge).frame(height: 2)
+                }
                 .zIndex(2)
             }
         }
-        .background(Color(.systemGroupedBackground))
+        .background(PixelUITheme.edgeDark)
 #if DEBUG
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -282,11 +284,13 @@ struct WorldView: View {
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.systemBackground).opacity(0.42),
-                        in: RoundedRectangle(cornerRadius: 10))
+            .background(
+                LinearGradient(colors: [PixelUITheme.surfaceInset.opacity(0.36),
+                                        PixelUITheme.surfaceInset.opacity(0.88)],
+                               startPoint: .top, endPoint: .bottom)
+            )
             .overlay {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.primary.opacity(0.10), lineWidth: 0.5)
+                Rectangle().stroke(PixelUITheme.edge, lineWidth: 2)
             }
             .allowsHitTesting(false)
         }
@@ -433,7 +437,9 @@ struct WorldView: View {
         .font(.footnote.monospacedDigit())
         .padding(10)
         .frame(maxWidth: .infinity)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+        .foregroundStyle(PixelUITheme.text)
+        .background(PixelUITheme.surfaceInset)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
     }
 
     // MARK: Controls — thumb zone
@@ -461,25 +467,29 @@ struct WorldView: View {
 
                 WorldActionRow {
                     Button("Interact") { performInteraction() }
-                        .font(.caption.weight(.semibold))
+                        .font(.custom("Tiny5", size: 10))
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
                         .frame(maxWidth: .infinity, minHeight: WorldControlsLayout.actionHeight)
-                        .buttonStyle(.borderedProminent)
+                        .foregroundStyle(PixelUITheme.screen)
+                        .background(PixelUITheme.primary)
+                        .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
+                        .buttonStyle(.plain)
                         .disabled(!canInteract)
                         .accessibilityValue(interactionDetail(in: run))
                         .accessibilityIdentifier("world.interact")
                 } look: {
                     Button(isLookArmed ? "Cancel" : "Look") { isLookArmed.toggle() }
-                        .font(.caption.weight(.semibold))
+                        .font(.custom("Tiny5", size: 10))
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
                         .frame(maxWidth: .infinity, minHeight: WorldControlsLayout.actionHeight)
-                        .buttonStyle(.bordered)
+                        .foregroundStyle(PixelUITheme.text)
+                        .background(isLookArmed ? PixelUITheme.primaryHighlight : PixelUITheme.neutral)
+                        .buttonStyle(.plain)
                         .overlay {
-                            if isLookArmed {
-                                RoundedRectangle(cornerRadius: 8).stroke(.primary, lineWidth: 2)
-                            }
+                            Rectangle().stroke(isLookArmed ? PixelUITheme.primary : PixelUITheme.edgeDark,
+                                               lineWidth: 2)
                         }
                         .accessibilityLabel(isLookArmed ? "Cancel Look" : "Look")
                         .accessibilityHint(isLookArmed
@@ -494,7 +504,7 @@ struct WorldView: View {
         }
         .padding(.horizontal, WorldControlsLayout.horizontalPadding)
         .padding(.vertical, 8)
-        .background(.bar)
+        .background(PixelUITheme.surfaceInset)
     }
 
     private var canInteract: Bool {
@@ -836,7 +846,8 @@ private struct PartyHealthStrip: View {
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
-        .background(.bar)
+        .foregroundStyle(PixelUITheme.text)
+        .background(PixelUITheme.headerB)
     }
 
     private func health(_ name: String, icon: String, current: Int, maximum: Int) -> some View {
@@ -851,13 +862,14 @@ private struct PartyHealthStrip: View {
                 }
                 .font(.caption2)
                 GeometryReader { proxy in
-                    Capsule()
-                        .fill(Color(.tertiarySystemFill))
+                    Rectangle()
+                        .fill(PixelUITheme.edgeDark)
                         .overlay(alignment: .leading) {
-                            Capsule()
+                            Rectangle()
                                 .fill(current <= maximum / 3 ? Color.red : Color.green)
                                 .frame(width: proxy.size.width * min(1, max(0, Double(current) / Double(maximum))))
                         }
+                        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
                 }
                 .frame(height: 5)
             }
@@ -890,16 +902,17 @@ private struct StabilityHeader: View {
             }
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
-                    Capsule().fill(Color(.tertiarySystemFill))
-                    Capsule().fill(colour)
+                    Rectangle().fill(PixelUITheme.edgeDark)
+                    Rectangle().fill(colour)
                         .frame(width: proxy.size.width * (run.stability / Tuning.World.startingStability))
                 }
+                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
             }
             .frame(height: 6)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
-        .background(.bar)
+        .background(PixelUITheme.headerB)
     }
 
     private var turnsLeftText: String {
@@ -1479,8 +1492,11 @@ private struct DirectionPad: View {
             Image(systemName: direction.icon)
                 .font(.headline)
                 .frame(width: 46, height: 46) // ≥44pt
+                .foregroundStyle(PixelUITheme.text)
+                .background(PixelUITheme.neutral)
+                .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 2))
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(.plain)
         .accessibilityLabel("\(isLooking ? "Look" : "Move") \(direction.accessibilityName)")
     }
 }
