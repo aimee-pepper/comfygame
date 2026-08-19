@@ -157,6 +157,11 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertTrue(ordinary.contains(".padding(.leading, 8)"))
         XCTAssertTrue(ordinary.contains("Older test books open Details; they never load or overwrite."))
         XCTAssertTrue(ordinary.contains(".overlay(alignment: .bottom)"))
+        XCTAssertTrue(source.contains(".font(.custom(\"Tiny5\", size: 11))"),
+                      "Campaign actions use the approved compact pixel face, not the display face.")
+        XCTAssertTrue(source.contains("HStack(alignment: .bottom, spacing: 3)"))
+        XCTAssertTrue(source.contains("maxHeight: .infinity, alignment: .bottomLeading"),
+                      "Unequal-height progress volumes must rest on one shelf baseline.")
     }
 
     func testCompactSlotUsesTheWholeCardForLoadAndLongPressForDetails() throws {

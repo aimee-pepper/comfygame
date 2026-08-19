@@ -547,7 +547,7 @@ struct CampaignStartActionLabel: View {
 
     var body: some View {
         Text(title)
-            .font(.custom("Jersey 10", size: 17))
+            .font(.custom("Tiny5", size: 11))
             .lineLimit(1)
             .minimumScaleFactor(0.72)
             .multilineTextAlignment(.center)
@@ -785,7 +785,7 @@ private struct CampaignBookplateMotif: View {
     let bookCount: Int
 
     var body: some View {
-        HStack(spacing: 3) {
+        HStack(alignment: .bottom, spacing: 3) {
             ForEach(0..<max(0, bookCount), id: \.self) { index in
                 ZStack(alignment: .bottom) {
                     Rectangle()
@@ -802,7 +802,7 @@ private struct CampaignBookplateMotif: View {
                 .frame(width: 12, height: CGFloat([24, 28, 32][index % 3]))
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
     }
 
     private func volumeColor(_ index: Int) -> Color {
