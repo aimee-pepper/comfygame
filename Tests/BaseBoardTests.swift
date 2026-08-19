@@ -93,6 +93,24 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertEqual(BaseBoardRules.columnCount(isAccessibilitySize: true), 2)
     }
 
+    func testDistrictCaptionNeverCallsAFoundationReady() {
+        XCTAssertEqual(BaseBoardRules.districtCaption(section: .home, readyCount: 0,
+                                                       foundationCount: 0),
+                       "Home · 5 places ready")
+        XCTAssertEqual(BaseBoardRules.districtCaption(section: .make, readyCount: 2,
+                                                       foundationCount: 1),
+                       "Make · 2 ready · 1 foundation")
+        XCTAssertEqual(BaseBoardRules.districtCaption(section: .study, readyCount: 1,
+                                                       foundationCount: 0),
+                       "Study · 1 place ready")
+        XCTAssertEqual(BaseBoardRules.districtCaption(section: .realms, readyCount: 0,
+                                                       foundationCount: 2),
+                       "Realms · 2 foundations")
+        XCTAssertEqual(BaseBoardRules.districtCaption(section: .realms, readyCount: 0,
+                                                       foundationCount: 0),
+                       "Realms · no known places")
+    }
+
     func testTownPagesPreserveEveryStationInOrderWithFourPlotsPerPage() {
         let stations = BaseBoardRules.destinations(from: ContentCatalog.shared.stationsInOrder)
         let pages = BaseBoardRules.townPages(stations)
@@ -160,11 +178,32 @@ final class BaseBoardTests: XCTestCase {
         XCTAssertTrue(source.contains("TabView(selection: $selectedSection)"))
         XCTAssertTrue(source.contains(".tag(section)"))
         XCTAssertTrue(source.contains("base-district-pager"))
+        XCTAssertTrue(source.contains("selectedSection = section"))
+        XCTAssertTrue(source.contains("base-section-picker"))
+        XCTAssertTrue(source.contains("base-district-caption"))
         XCTAssertTrue(source.contains("townPageBySection[section]"))
         XCTAssertTrue(source.contains("Button(\"Previous\")"))
         XCTAssertTrue(source.contains("Button(\"Next\")"))
         XCTAssertEqual(source.components(separatedBy: "TabView").count - 1, 1,
                        "Station pagination must not compete with district swipe paging")
+    }
+
+    func testApprovedHomeChromeUsesSharedThemeWithoutChangingRoutes() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/BaseView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("PixelUITheme.screen"))
+        XCTAssertTrue(source.contains("PixelUITheme.headerB"))
+        XCTAssertTrue(source.contains("PixelUITheme.surfaceRaised"))
+        XCTAssertTrue(source.contains("PixelUITheme.primaryHighlight"))
+        XCTAssertTrue(source.contains("NavigationLink(value: AppRoute.party)"))
+        XCTAssertTrue(source.contains("NavigationLink(value: AppRoute.writingDesk)"))
+        let pickerStart = try XCTUnwrap(source.range(of: "private var sectionPicker"))
+        let pagerStart = try XCTUnwrap(source.range(of: "private func districtPager",
+                                                    range: pickerStart.upperBound..<source.endIndex))
+        let picker = String(source[pickerStart.lowerBound..<pagerStart.lowerBound])
+        XCTAssertFalse(picker.contains("Color(red:"))
     }
 
     func testTownBuildingArtIsExactIDOnlyAndUnknownStationsUseSemanticFallback() {

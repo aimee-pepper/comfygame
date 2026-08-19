@@ -98,7 +98,8 @@ final class StartingTownHomeSceneTests: XCTestCase {
         let bodyStart = try XCTUnwrap(source.range(of: "var body: some View"))
         let purse = try XCTUnwrap(source.range(of: "// MARK: Purse", range: bodyStart.upperBound..<source.endIndex))
         let body = String(source[bodyStart.lowerBound..<purse.lowerBound])
-        XCTAssertTrue(body.contains("districtPager(containerSize: geometry.size)\n                    .frame(maxWidth: .infinity, maxHeight: .infinity)"))
+        XCTAssertTrue(body.contains("districtPager(containerSize: geometry.size)"))
+        XCTAssertTrue(body.contains(".frame(maxWidth: .infinity, maxHeight: .infinity)"))
         XCTAssertFalse(body.contains("if selectedSection == .home"))
         XCTAssertFalse(body.contains("ScrollView"))
         XCTAssertFalse(body.contains(".padding(12)"))
@@ -136,6 +137,11 @@ final class StartingTownHomeSceneTests: XCTestCase {
         XCTAssertTrue(scene.contains(".clipped()"))
         XCTAssertFalse(scene.contains("clipShape(RoundedRectangle"))
         XCTAssertFalse(scene.contains("overlay(RoundedRectangle"))
+
+        let sign = String(source[end.lowerBound...])
+        XCTAssertTrue(sign.contains("PixelUITheme.edgeDark"))
+        XCTAssertTrue(sign.contains("PixelUITheme.neutralHighlight"))
+        XCTAssertFalse(sign.contains("Color(red:"))
     }
 
     private func loadedScene() throws -> StartingTownHomeRules.Scene {

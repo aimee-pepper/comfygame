@@ -154,16 +154,15 @@ private struct TownHotspotSign: View {
 
     var body: some View {
         Text(title)
-            .font(.system(size: 11, weight: .bold, design: .rounded))
+            .font(.system(size: 11, weight: .bold, design: .monospaced))
             .foregroundStyle(.white)
             .lineLimit(1)
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
-            .background(Color.black.opacity(0.78), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .background(PixelUITheme.edgeDark.opacity(0.86))
             .overlay {
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .stroke(Color(red: 0.91, green: 0.84, blue: 0.68).opacity(0.92), lineWidth: 1)
+                Rectangle().stroke(PixelUITheme.neutralHighlight, lineWidth: 1)
             }
-            .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
+            .shadow(color: PixelUITheme.shadow.opacity(0.6), radius: 0, x: 3, y: 3)
     }
 }

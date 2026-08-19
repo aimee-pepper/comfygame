@@ -23,6 +23,19 @@ enum BaseBoardRules {
 
     static func columnCount(isAccessibilitySize: Bool) -> Int { isAccessibilitySize ? 2 : 3 }
 
+    static func districtCaption(section: StationHomeSection, readyCount: Int,
+                                foundationCount: Int) -> String {
+        if section == .home { return "Home · 5 places ready" }
+        if readyCount == 0, foundationCount == 0 { return "\(section.title) · no known places" }
+        if foundationCount == 0 {
+            return "\(section.title) · \(readyCount) place\(readyCount == 1 ? "" : "s") ready"
+        }
+        if readyCount == 0 {
+            return "\(section.title) · \(foundationCount) foundation\(foundationCount == 1 ? "" : "s")"
+        }
+        return "\(section.title) · \(readyCount) ready · \(foundationCount) foundation\(foundationCount == 1 ? "" : "s")"
+    }
+
     // Parked later-town helpers. The Band-1 Home adapter does not consume them.
     static let townPageCapacity = 4
 
@@ -88,25 +101,39 @@ struct BaseView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
-                VStack(spacing: 12) {
+                VStack(spacing: 0) {
                     contextRow
                     firstReturnRouteCard
-                    sectionPicker
                 }
-                .padding(.horizontal, 12)
-                .padding(.top, 12)
-                districtPager(containerSize: geometry.size)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                ZStack(alignment: .top) {
+                    districtPager(containerSize: geometry.size)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    VStack(spacing: 3) {
+                        sectionPicker
+                        Text(districtCaption)
+                            .font(.caption2.weight(.bold).monospaced())
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(PixelUITheme.edgeDark.opacity(0.82))
+                            .accessibilityIdentifier("base-district-caption")
+                    }
+                    .padding(.horizontal, 6)
+                    .padding(.top, 6)
+                }
             }
         }
-        .background(Color(.systemGroupedBackground))
+        .background(PixelUITheme.screen)
         .navigationTitle("Base")
         .toolbar(.hidden, for: .navigationBar)
         .safeAreaInset(edge: .bottom) {
             departure
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(.bar)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(PixelUITheme.surfaceRaised)
+                .overlay(alignment: .top) {
+                    Rectangle().fill(PixelUITheme.edge).frame(height: 2)
+                }
         }
         .onAppear { routeCardHidden = false }
         .onChange(of: availableSections) { _, sections in
@@ -140,6 +167,13 @@ struct BaseView: View {
             .accessibilityLabel("Settings and save games")
         }
         .frame(minHeight: 44)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .foregroundStyle(PixelUITheme.text)
+        .background(PixelUITheme.headerB)
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(PixelUITheme.edge).frame(height: 2)
+        }
     }
 
     @ViewBuilder private var firstReturnRouteCard: some View {
@@ -189,13 +223,41 @@ struct BaseView: View {
     // MARK: Stations
 
     private var sectionPicker: some View {
-        Picker("Base district", selection: $selectedSection) {
+        HStack(spacing: 3) {
             ForEach(availableSections, id: \.self) { section in
-                Text(section.title).tag(section)
+                Button {
+                    selectedSection = section
+                } label: {
+                    Text(section.title)
+                        .font(.caption.weight(.bold).monospaced())
+                        .foregroundStyle(section == selectedSection
+                                         ? PixelUITheme.edgeDark : PixelUITheme.text)
+                        .frame(maxWidth: .infinity, minHeight: 42)
+                        .background(section == selectedSection
+                                    ? PixelUITheme.primaryHighlight : PixelUITheme.surfaceRaised)
+                        .overlay {
+                            Rectangle().stroke(section == selectedSection
+                                               ? PixelUITheme.edgeDark : PixelUITheme.edge,
+                                               lineWidth: 2)
+                        }
+                        .shadow(color: PixelUITheme.shadow.opacity(0.55), radius: 0, x: 2, y: 2)
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(section == selectedSection ? .isSelected : [])
             }
         }
-        .pickerStyle(.segmented)
+        .padding(5)
+        .background(PixelUITheme.edgeDark.opacity(0.84))
         .accessibilityIdentifier("base-section-picker")
+    }
+
+    private var districtCaption: String {
+        let destinations = stations(in: selectedSection)
+        let readyCount = destinations.filter { state.base.station($0.id).isUnlocked }.count
+        return BaseBoardRules.districtCaption(
+            section: selectedSection,
+            readyCount: readyCount,
+            foundationCount: destinations.count - readyCount)
     }
 
     private func districtPager(containerSize: CGSize) -> some View {
@@ -348,6 +410,7 @@ struct BaseView: View {
                 .frame(minHeight: 48)
         }
         .buttonStyle(.bordered)
+        .tint(PixelUITheme.neutral)
         .accessibilityHint("Manage party members, gear and gambits")
 
         NavigationLink(value: AppRoute.writingDesk) {
@@ -357,6 +420,7 @@ struct BaseView: View {
                 .frame(minHeight: 48)
         }
         .buttonStyle(.borderedProminent)
+        .tint(PixelUITheme.primary)
         .accessibilityHint(departureHint)
         .simultaneousGesture(TapGesture().onEnded {
             store.openedFirstReturnDestination(.writingDesk)
