@@ -32,7 +32,6 @@ enum WorldControlsLayout {
     static let horizontalPadding: CGFloat = 16
     static let actionSpacing: CGFloat = 6
     static let navigationSpacing: CGFloat = 14
-    static let mapStageHeight: CGFloat = 374
 
     static func actionFrames(containerWidth: CGFloat) -> [CGRect] {
         let usable = max(0, containerWidth - horizontalPadding * 2 - navigationSpacing)
@@ -132,10 +131,6 @@ struct WorldView: View {
                             .padding(12)
                     }
                 }
-                // The map owns one fixed-scale stage. Letting this GeometryReader absorb
-                // every leftover point creates a dead band between the map and Field Kit even
-                // though the rendered map itself cannot grow beyond the phone width.
-                .frame(height: WorldControlsLayout.mapStageHeight)
                 .clipped()
 
                 VStack(spacing: 0) {
