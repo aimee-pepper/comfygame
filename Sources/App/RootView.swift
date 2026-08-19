@@ -72,8 +72,10 @@ struct RootView: View {
                 }
             }
         }
-        .sheet(item: Binding(get: { store.state.worlds.lastExit }, set: { value in
-            if value == nil { store.dismissRunExitSummary() }
+        .sheet(item: Binding(get: { store.state.worlds.lastExit }, set: { _ in
+            // The WorldView -> BaseView identity transition can ask the presentation host to
+            // dismiss. That is not player acknowledgement. Only the recap's Continue action may
+            // consume this durable receipt.
         })) { summary in
             RunExitSummaryView(summary: summary) {
                 store.acknowledgeFirstReturnRecap()

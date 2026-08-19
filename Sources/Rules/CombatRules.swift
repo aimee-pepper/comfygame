@@ -3244,6 +3244,7 @@ enum CombatRules {
     private static func awardSpoils(run: inout WorldRun, encounter: inout EncounterState, state: inout GameState) {
         var gained = ResourcePool()
         var found: [String] = []
+        var materialSpoils: [(sample: MaterialSample, count: Int)] = []
 
         for foe in encounter.foes {
             // How much a kill is worth follows what the world spent making it, rather than an
@@ -3264,9 +3265,9 @@ enum CombatRules {
                 state.reality.discovery.recordResource(resource, runIndex: run.runIndex)
             }
             if let traits = foe.traits {
-                found.append(contentsOf: butcher(traits, named: foe.stats.displayName,
-                                                 qualifier: foe.qualifier, foeID: foe.id,
-                                                 run: &run))
+                materialSpoils.append(contentsOf: butcher(
+                    traits, named: foe.stats.displayName,
+                    qualifier: foe.qualifier, foeID: foe.id, run: &run))
             }
             // **Gear drops too** (Aimee, 5 Aug). Sites were the only source, so a run that fought
             // its way across a world and found no ruin came home with nothing to wear — and now
@@ -3331,15 +3332,31 @@ enum CombatRules {
 
         encounter.spoils = gained.nonZero.map { entry in
             "\(entry.amount) \(ContentCatalog.shared.resource(entry.id)?.name.lowercased() ?? entry.id.rawValue)"
+        } + stackedMaterialSpoils(materialSpoils).map { drop in
+            drop.count > 1 ? "\(drop.sample.displayName) ×\(drop.count)" : drop.sample.displayName
         } + found
+    }
+
+    nonisolated static func stackedMaterialSpoils(
+        _ drops: [(sample: MaterialSample, count: Int)]
+    ) -> [(sample: MaterialSample, count: Int)] {
+        var stacked: [(sample: MaterialSample, count: Int)] = []
+        for drop in drops where drop.count > 0 {
+            if let index = stacked.firstIndex(where: { $0.sample == drop.sample }) {
+                stacked[index].count += drop.count
+            } else {
+                stacked.append(drop)
+            }
+        }
+        return stacked
     }
 
     /// Cuts a body into exact property-bearing reserve units. Material never consumes a satchel
     /// slot or enters the loot-swap queue; source identity is the saved run + defeated combatant.
     private static func butcher(_ traits: CreatureTraits, named name: String,
                                 qualifier: String?, foeID: InstanceID,
-                                run: inout WorldRun) -> [String] {
-        var lines: [String] = []
+                                run: inout WorldRun) -> [(sample: MaterialSample, count: Int)] {
+        var drops: [(sample: MaterialSample, count: Int)] = []
         let count = ButcheryRules.quantity(from: traits, rng: &run.rng)
 
         for (dropOrdinal, sample) in ButcheryRules.materials(
@@ -3349,9 +3366,9 @@ enum CombatRules {
                 sample, count: count,
                 sourceReceipt: "run:\(run.runIndex):foe:\(foeID.rawValue)",
                 dropOrdinal: dropOrdinal)
-            lines.append(count > 1 ? "\(sample.displayName) ×\(count)" : sample.displayName)
+            drops.append((sample, count))
         }
-        return lines
+        return drops
     }
 
     /// Closes out a finished fight: bestiary, and taking the defeated off the grid.

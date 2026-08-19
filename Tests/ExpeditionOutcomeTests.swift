@@ -3,6 +3,17 @@ import XCTest
 
 @MainActor
 final class ExpeditionOutcomeTests: XCTestCase {
+    func testReturnRecapCanOnlyCloseThroughItsExplicitContinueAction() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/App/RootView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains(".sheet(item: Binding(get: { store.state.worlds.lastExit }, set: { _ in"))
+        XCTAssertTrue(source.contains("Button(\"Continue\", action: dismiss)"))
+        XCTAssertTrue(source.contains(".interactiveDismissDisabled()"))
+        XCTAssertFalse(source.contains("if value == nil { store.dismissRunExitSummary() }"))
+    }
+
     func testReturnRecapKeepsWorldPagesSeparateAndDoesNotLeakUninspectedTitles() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             .deletingLastPathComponent()

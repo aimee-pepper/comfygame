@@ -6,6 +6,22 @@ import XCTest
 /// **No authored drop tables** — the parts that composed the creature compose what it leaves.
 final class MaterialTests: XCTestCase {
 
+    func testIdenticalMobMaterialsStackInVictoryPresentationWithoutFlatteningSamples() {
+        let hide = MaterialSample(kind: .hide, properties: .init(flexibility: 72),
+                                  grade: 68, source: "shaggy browser")
+        let otherHide = MaterialSample(kind: .hide, properties: .init(flexibility: 31),
+                                       grade: 42, source: "smooth browser")
+        let stacked = CombatRules.stackedMaterialSpoils([
+            (hide, 2), (otherHide, 1), (hide, 3)
+        ])
+
+        XCTAssertEqual(stacked.count, 2)
+        XCTAssertEqual(stacked[0].sample, hide)
+        XCTAssertEqual(stacked[0].count, 5)
+        XCTAssertEqual(stacked[1].sample, otherHide)
+        XCTAssertEqual(stacked[1].count, 1)
+    }
+
     func testEveryHarvestedMaterialKindHasAValidatedDistinctInventoryIdentity() throws {
         let assets = try MaterialKind.allCases.map { kind in
             let asset = try XCTUnwrap(MobGearSpriteV1Registry.mobDropAsset(for: kind), kind.rawValue)
