@@ -34,7 +34,7 @@ export const nativeConformance={
   world:{status:"verified",source:"WorldView.swift:89-141, 438-501 + WorldTests.swift:920-963 + ui-world-candidate.test.js",issues:[],designVersion:"native-2"},
   encounter:failed("EncounterView.swift",["Native actions are Attack, Techniques, Item and Withdraw; Confirm, Pass and Remedy are invented."]),
   "loot-decision":failed("LootDecisionView.swift",["The mock skips the carried-item selection step and irreversible Leave confirmation."]),
-  "return-recap":failed("RootView.swift",["Native recap is one comprehensive scroll; Recovered/Lost tabs and History action are invented."]),
+  "return-recap":{status:"verified",source:"RootView.swift:216-425 + ExpeditionOutcomeTests.swift:373-387 + ui-return-recap-candidate.test.js",issues:[],designVersion:"native-1"},
   settings:{status:"verified",source:"SettingsView.swift:14-183 + Theme.swift:9-31 + ContentTests.swift:146-172",issues:[],designVersion:"native-1"}
 };
 
