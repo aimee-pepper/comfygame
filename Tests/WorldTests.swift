@@ -1015,6 +1015,17 @@ final class WorldTests: XCTestCase {
         XCTAssertFalse(source.contains("MapGrid(") && source.contains("eventLog.padding(8)"))
         XCTAssertTrue(source.contains("placeInformation(run)"),
                       "The current redesign keeps place information inside the map stage")
+        XCTAssertTrue(source.contains("availableHeight: viewport.size.height"),
+                      "The square stage must admit all eleven square rows without a false gap")
+        XCTAssertFalse(source.contains("return \"Forest track\""),
+                       "Place copy must derive from the live tile rather than a static fixture")
+        XCTAssertTrue(source.contains("ground.displayName.capitalized"))
+        XCTAssertTrue(source.contains("LinearGradient(colors: [.clear, PixelUITheme.surfaceInset.opacity(0.96)]"),
+                      "Place copy must float over the approved transparent-to-field gradient")
+        let minimapSource = try String(contentsOf: root.appending(path: "Sources/Screens/MinimapView.swift"),
+                                       encoding: .utf8)
+        XCTAssertTrue(minimapSource.contains("Rectangle().stroke(PixelUITheme.edge, lineWidth: 2)"),
+                      "The minimap needs the approved visible hard border")
         XCTAssertTrue(source.contains(".aspectRatio(1, contentMode: .fit)"),
                       "The current redesign keeps the map stage square without a magic height")
         XCTAssertTrue(source.contains("Text(\"Explore\")"))

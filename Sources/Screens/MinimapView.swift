@@ -61,8 +61,7 @@ struct MinimapView: View {
         .aspectRatio(1, contentMode: .fit)
         .background(Color.black)
         .overlay {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.primary.opacity(0.08))
+            Rectangle().stroke(PixelUITheme.edge, lineWidth: 2)
         }
         .accessibilityLabel("Map overview")
         .accessibilityIdentifier("world.minimap")

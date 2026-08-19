@@ -104,7 +104,7 @@ struct WorldView: View {
                         displayScale: displayScale)
                     let viewportRows = WorldMapLayout.viewportRows(
                         mapWidth: mapWidth,
-                        availableHeight: max(0, viewport.size.height - 8),
+                        availableHeight: viewport.size.height,
                         viewportColumns: viewportColumns,
                         mapRows: run.map.height)
                     VStack(spacing: 0) {
@@ -117,13 +117,9 @@ struct WorldView: View {
                         ) { point in
                             tapped(point, in: run)
                         }
-                        .padding(.top, 8)
                         .overlay(alignment: .bottom) {
                             placeInformation(run)
-                                .padding(.horizontal, 8)
-                                .padding(.bottom, 8)
                         }
-                        Spacer(minLength: 0)
                     }
                     .overlay(alignment: .top) {
                         LootDecisionCard()
@@ -413,14 +409,14 @@ struct WorldView: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(8)
+        .padding(.horizontal, 10)
+        .padding(.top, 30)
+        .padding(.bottom, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            LinearGradient(colors: [PixelUITheme.surfaceInset.opacity(0.94),
-                                    PixelUITheme.surface.opacity(0.82)],
-                           startPoint: .leading, endPoint: .trailing)
+            LinearGradient(colors: [.clear, PixelUITheme.surfaceInset.opacity(0.96)],
+                           startPoint: .top, endPoint: .bottom)
         )
-        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
         .allowsHitTesting(false)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("At this place. \(placeTitle). \(interactionDetail(in: run))")
@@ -454,7 +450,8 @@ struct WorldView: View {
         if store.canUseNaturalAnchor { return "Natural Atlas Seam" }
         if store.canPlaceAnchorFrame { return "Anchor point" }
         if isLookArmed { return "Adjacent ground" }
-        return "Forest track"
+        guard let run else { return "Unknown ground" }
+        return run.map[run.playerPosition].ground.displayName.capitalized
     }
 
     /// What you're carrying, and how long you've been at it.
