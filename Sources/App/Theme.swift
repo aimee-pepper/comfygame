@@ -1,6 +1,92 @@
 import SwiftUI
 import UIKit
 
+/// Shared semantic colours for the approved pixel UI. Screens select roles; appearance owns the
+/// literal colour, and appearance remains a device preference rather than campaign state.
+enum PixelUITheme {
+    struct RGB: Equatable, Sendable {
+        let red: Double
+        let green: Double
+        let blue: Double
+
+        var relativeLuminance: Double {
+            func channel(_ value: Double) -> Double {
+                value <= 0.04045 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4)
+            }
+            return 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue)
+        }
+    }
+
+    struct Palette: Equatable, Sendable {
+        let screen: RGB
+        let headerB: RGB
+        let surface: RGB
+        let surfaceRaised: RGB
+        let surfaceInset: RGB
+        let edge: RGB
+        let edgeDark: RGB
+        let text: RGB
+        let muted: RGB
+        let neutral: RGB
+        let neutralHighlight: RGB
+        let primary: RGB
+        let primaryHighlight: RGB
+        let danger: RGB
+        let shadow: RGB
+    }
+
+    static let light = Palette(
+        screen: rgb(0xE6CFA1), headerB: rgb(0xEED9AA), surface: rgb(0xF0DFBC),
+        surfaceRaised: rgb(0xEAD6AA), surfaceInset: rgb(0xD8BD88), edge: rgb(0x62472E),
+        edgeDark: rgb(0x32261D), text: rgb(0x2D2118), muted: rgb(0x665542),
+        neutral: rgb(0xCFAA72), neutralHighlight: rgb(0xEFD39D), primary: rgb(0x2F718F),
+        primaryHighlight: rgb(0x63A7BD), danger: rgb(0x943D35), shadow: rgb(0x2F241C))
+
+    static let dark = Palette(
+        screen: rgb(0x111B1D), headerB: rgb(0x263B3E), surface: rgb(0x223538),
+        surfaceRaised: rgb(0x2A4043), surfaceInset: rgb(0x19292C), edge: rgb(0x607B78),
+        edgeDark: rgb(0x0A1214), text: rgb(0xF2EAD9), muted: rgb(0xA9BFBA),
+        neutral: rgb(0x31484B), neutralHighlight: rgb(0x526C6E), primary: rgb(0x347DA7),
+        primaryHighlight: rgb(0x69AFD4), danger: rgb(0xEF8A82), shadow: rgb(0x05090A))
+
+    static func palette(for scheme: ColorScheme) -> Palette { scheme == .dark ? dark : light }
+
+    static func contrastRatio(_ foreground: RGB, _ background: RGB) -> Double {
+        let brighter = max(foreground.relativeLuminance, background.relativeLuminance)
+        let darker = min(foreground.relativeLuminance, background.relativeLuminance)
+        return (brighter + 0.05) / (darker + 0.05)
+    }
+
+    static let screen = adaptive(\.screen)
+    static let headerB = adaptive(\.headerB)
+    static let surface = adaptive(\.surface)
+    static let surfaceRaised = adaptive(\.surfaceRaised)
+    static let surfaceInset = adaptive(\.surfaceInset)
+    static let edge = adaptive(\.edge)
+    static let edgeDark = adaptive(\.edgeDark)
+    static let text = adaptive(\.text)
+    static let muted = adaptive(\.muted)
+    static let neutral = adaptive(\.neutral)
+    static let neutralHighlight = adaptive(\.neutralHighlight)
+    static let primary = adaptive(\.primary)
+    static let primaryHighlight = adaptive(\.primaryHighlight)
+    static let danger = adaptive(\.danger)
+    static let shadow = adaptive(\.shadow)
+
+    private static func adaptive(_ role: KeyPath<Palette, RGB>) -> Color {
+        Color(uiColor: UIColor { traits in
+            let value = (traits.userInterfaceStyle == .dark ? dark : light)[keyPath: role]
+            return UIColor(red: value.red, green: value.green, blue: value.blue, alpha: 1)
+        })
+    }
+
+    private static func rgb(_ hex: UInt32) -> RGB {
+        RGB(red: Double((hex >> 16) & 0xFF) / 255,
+            green: Double((hex >> 8) & 0xFF) / 255,
+            blue: Double(hex & 0xFF) / 255)
+    }
+}
+
 /// Appearance preference.
 ///
 /// This game is meant to be played in bed, so the dark theme isn't a nicety — it's a feature of the

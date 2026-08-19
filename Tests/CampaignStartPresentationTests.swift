@@ -195,6 +195,42 @@ final class CampaignStartPresentationTests: XCTestCase {
         XCTAssertEqual(CampaignShelfProgress.volumeLabel(for: 7), "7 volumes")
     }
 
+    func testApprovedCampaignPaletteIsSharedReadableAndDistinctInLightAndDark() throws {
+        XCTAssertNotEqual(PixelUITheme.light, PixelUITheme.dark)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.light.text, PixelUITheme.light.screen), 7)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.dark.text, PixelUITheme.dark.screen), 7)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.light.text, PixelUITheme.light.surface), 7)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.dark.text, PixelUITheme.dark.surface), 7)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.light.muted, PixelUITheme.light.screen), 4.5)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.light.muted, PixelUITheme.light.surface), 4.5)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.dark.muted, PixelUITheme.dark.screen), 4.5)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.dark.muted, PixelUITheme.dark.surface), 4.5)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.light.danger,
+                                       PixelUITheme.light.surfaceRaised), 4.5)
+        XCTAssertGreaterThanOrEqual(
+            PixelUITheme.contrastRatio(PixelUITheme.dark.danger,
+                                       PixelUITheme.dark.surfaceRaised), 4.5)
+
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appending(path: "Sources/Screens/CampaignStartView.swift"),
+                                encoding: .utf8)
+        XCTAssertTrue(source.contains("static let page = PixelUITheme.screen"))
+        XCTAssertTrue(source.contains("static let ink = PixelUITheme.text"))
+        XCTAssertTrue(source.contains("PixelUITheme.primary"))
+        XCTAssertFalse(source.contains("Color(red:"),
+                       "Campaign must consume shared semantic roles, never copy literal theme colours.")
+    }
+
     @MainActor
     func testPrimaryCampaignActionsRenderAtEqualSizeNormallyAndAtAccessibilityText() {
         for dynamicTypeSize in [DynamicTypeSize.large, .accessibility3] {

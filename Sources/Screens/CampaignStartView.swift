@@ -148,19 +148,20 @@ enum CampaignStartLayoutPolicy {
 }
 
 private enum CampaignShelfPalette {
-    static let page = Color(red: 0.92, green: 0.86, blue: 0.72)
-    static let pageHighlight = Color(red: 0.98, green: 0.93, blue: 0.82)
-    static let ink = Color(red: 0.16, green: 0.12, blue: 0.09)
-    static let shelf = Color(red: 0.34, green: 0.22, blue: 0.14)
-    static let shelfHighlight = Color(red: 0.57, green: 0.39, blue: 0.23)
+    static let page = PixelUITheme.screen
+    static let pageHighlight = PixelUITheme.surface
+    static let ink = PixelUITheme.text
+    static let muted = PixelUITheme.muted
+    static let shelf = PixelUITheme.edgeDark
+    static let shelfHighlight = PixelUITheme.neutralHighlight
 
     static func cover(for id: UUID) -> Color {
         let index = withUnsafeBytes(of: id.uuid) { Int($0[0]) % 4 }
         return [
-            Color(red: 0.68, green: 0.48, blue: 0.28),
-            Color(red: 0.36, green: 0.51, blue: 0.49),
-            Color(red: 0.54, green: 0.36, blue: 0.43),
-            Color(red: 0.42, green: 0.45, blue: 0.31)
+            PixelUITheme.neutral,
+            PixelUITheme.surfaceRaised,
+            PixelUITheme.surfaceInset,
+            PixelUITheme.headerB
         ][index]
     }
 }
@@ -253,7 +254,7 @@ struct CampaignStartView: View {
             Text(presentation.isEmpty
                  ? "Begin a campaign. Each new game keeps its own progress."
                  : "Choose a campaign to continue.")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(CampaignShelfPalette.muted)
         }
     }
 
@@ -324,10 +325,11 @@ struct CampaignStartPrimaryAction: View {
         button
             .buttonStyle(.plain)
             .foregroundStyle(emphasized ? Color.white : CampaignShelfPalette.ink)
-            .background(emphasized ? Color.accentColor : CampaignShelfPalette.pageHighlight)
+            .background(emphasized ? PixelUITheme.primary : CampaignShelfPalette.pageHighlight)
             .overlay {
                 Rectangle()
-                    .stroke(emphasized ? Color.accentColor : CampaignShelfPalette.shelf, lineWidth: 2)
+                    .stroke(emphasized ? PixelUITheme.primaryHighlight : CampaignShelfPalette.shelf,
+                            lineWidth: 2)
                     .allowsHitTesting(false)
             }
             .shadow(color: CampaignShelfPalette.shelf.opacity(0.45), radius: 0, x: 3, y: 3)
@@ -432,7 +434,7 @@ private struct CampaignSlotCard: View {
                         Text(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))
                     }
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CampaignShelfPalette.muted)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
                     .accessibilityElement(children: .combine)
@@ -446,7 +448,7 @@ private struct CampaignSlotCard: View {
                     Text(debugVersion.uppercased())
                         .font(.system(size: 7, weight: .bold, design: .monospaced))
                         .lineLimit(1)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(CampaignShelfPalette.muted)
                 }
                 #endif
             }
@@ -486,7 +488,7 @@ private struct CampaignSlotCard: View {
             Label(slot.health.label,
                   systemImage: slot.health.canLoad ? "checkmark.circle" : "exclamationmark.triangle")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(slot.health.canLoad ? Color.secondary : Color.orange)
+                .foregroundStyle(slot.health.canLoad ? CampaignShelfPalette.muted : PixelUITheme.danger)
 
             if slot.hasKnownMetadata {
                 ViewThatFits(in: .horizontal) {
@@ -510,7 +512,7 @@ private struct CampaignSlotCard: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .background(PixelUITheme.surfaceRaised, in: RoundedRectangle(cornerRadius: 14))
         .accessibilityElement(children: .contain)
     }
 
@@ -532,10 +534,11 @@ private struct CampaignSlotStatusBadge: View {
             .font(.system(size: 7, weight: .bold, design: .monospaced))
             .lineLimit(1)
             .minimumScaleFactor(0.7)
-            .foregroundStyle(slot.health.canLoad ? CampaignShelfPalette.ink.opacity(0.74) : Color.orange)
+            .foregroundStyle(slot.health.canLoad
+                             ? CampaignShelfPalette.ink.opacity(0.74) : PixelUITheme.danger)
             .padding(.horizontal, 4)
             .padding(.vertical, 2)
-            .background(CampaignShelfPalette.pageHighlight.opacity(0.62))
+            .background(CampaignShelfPalette.pageHighlight)
             .overlay(Rectangle().stroke(CampaignShelfPalette.shelf.opacity(0.55), lineWidth: 1))
     }
 }
@@ -560,7 +563,7 @@ private struct CampaignSlotDetail: View {
                         Label(slot.location, systemImage: "location")
                         Text(slot.progression)
                         Text("Last played \(slot.lastPlayed.formatted(date: .abbreviated, time: .shortened))")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(CampaignShelfPalette.muted)
                     }
                     if let message = slot.health.recoveryMessage {
                         Label(message, systemImage: "exclamationmark.triangle")
