@@ -1002,6 +1002,10 @@ private struct MapGrid: View {
                                 current: currentVisibility, wasRevealed: wasExplored)
                             let isRememberedTerrain = currentVisibility == .hidden
                                 && visibility == .fringe
+                            let unexploredFringeGradient = UnexploredFringeGradient.resolve(
+                                tile: point, player: run.playerPosition,
+                                visibility: currentVisibility, wasExplored: wasExplored,
+                                profile: visibilityProfile)
                             let showsStationaryContents = currentVisibility == .full || wasExplored
                             let displayTile = displayTile(at: point, visibility: visibility)
                             let presentation = WorldTileVisibilityPresentation.resolve(
@@ -1012,6 +1016,7 @@ private struct MapGrid: View {
                             TileView(tile: displayTile,
                                      visibility: visibility,
                                      isRememberedTerrain: isRememberedTerrain,
+                                     unexploredFringeGradient: unexploredFringeGradient,
                                      showsStationaryContents: showsStationaryContents,
                                      visibilityProfile: visibilityProfile,
                                      artRequest: presentation.artRequest,
@@ -1180,10 +1185,43 @@ struct WorldTileVisibilityPresentation {
 
 }
 
+struct UnexploredFringeGradient: Equatable {
+    let startX: Double
+    let startY: Double
+    let endX: Double
+    let endY: Double
+    let startOpacity: Double
+    let endOpacity: Double
+
+    static func resolve(tile: GridPoint, player: GridPoint,
+                        visibility: WorldRules.TileVisibility, wasExplored: Bool,
+                        profile: WorldRules.VisibilityProfile) -> Self? {
+        guard visibility == .fringe, !wasExplored, profile.fringeWidth > 0 else { return nil }
+        let dx = Double(tile.x - player.x)
+        let dy = Double(tile.y - player.y)
+        let distance = sqrt(dx * dx + dy * dy)
+        guard distance > 0 else { return nil }
+
+        let unitX = dx / distance
+        let unitY = dy / distance
+        let innerBoundary = Double(profile.fullRadius) + 0.5
+        let width = Double(profile.fringeWidth)
+        let startOpacity = min(1, max(0, (distance - 0.5 - innerBoundary) / width))
+        let endOpacity = min(1, max(0, (distance + 0.5 - innerBoundary) / width))
+        return Self(startX: 0.5 - unitX * 0.5,
+                    startY: 0.5 - unitY * 0.5,
+                    endX: 0.5 + unitX * 0.5,
+                    endY: 0.5 + unitY * 0.5,
+                    startOpacity: startOpacity,
+                    endOpacity: endOpacity)
+    }
+}
+
 private struct TileView: View {
     let tile: Tile
     let visibility: WorldRules.TileVisibility
     let isRememberedTerrain: Bool
+    let unexploredFringeGradient: UnexploredFringeGradient?
     let showsStationaryContents: Bool
     let visibilityProfile: WorldRules.VisibilityProfile
     let artRequest: MapTileArtRequest?
@@ -1205,6 +1243,17 @@ private struct TileView: View {
                 terrainLayer
             } else if artRequest != nil {
                 terrainLayer
+            }
+            if let gradient = unexploredFringeGradient {
+                Rectangle().fill(
+                    LinearGradient(
+                        colors: [.black.opacity(gradient.startOpacity),
+                                 .black.opacity(gradient.endOpacity)],
+                        startPoint: UnitPoint(x: gradient.startX, y: gradient.startY),
+                        endPoint: UnitPoint(x: gradient.endX, y: gradient.endY)
+                    )
+                )
+                .allowsHitTesting(false)
             }
             ZStack {
                 // The player gets a filled disc behind them: at 27pt a bare glyph disappears into

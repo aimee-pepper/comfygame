@@ -2,6 +2,24 @@ import XCTest
 @testable import Bookbinder
 
 final class WorldVisibilityRulesTests: XCTestCase {
+    func testOnlyUnexploredFringeGetsOnePlayerFacingGradient() {
+        let profile = WorldRules.visibilityProfile(illumination: 100, baseRadius: 3)
+        let player = GridPoint(x: 5, y: 5)
+        let east = UnexploredFringeGradient.resolve(
+            tile: GridPoint(x: 9, y: 5), player: player,
+            visibility: .fringe, wasExplored: false, profile: profile)
+        let gradient = try! XCTUnwrap(east)
+        XCTAssertEqual(gradient.startX, 0, accuracy: 0.000_001)
+        XCTAssertEqual(gradient.endX, 1, accuracy: 0.000_001)
+        XCTAssertLessThan(gradient.startOpacity, gradient.endOpacity)
+        XCTAssertNil(UnexploredFringeGradient.resolve(
+            tile: GridPoint(x: 9, y: 5), player: player,
+            visibility: .fringe, wasExplored: true, profile: profile))
+        XCTAssertNil(UnexploredFringeGradient.resolve(
+            tile: GridPoint(x: 8, y: 5), player: player,
+            visibility: .full, wasExplored: false, profile: profile))
+    }
+
     func testWorldTilesDoNotPaintPerEdgeFogGradients() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
