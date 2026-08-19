@@ -116,24 +116,17 @@ struct WritingDeskView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            writingPaneTabs
             switch pane {
             case .write: writePane
             case .pages: pagesPane
             case .world: worldPane
             }
         }
-        .background(Color(.systemGroupedBackground))
+        .background(WritingDeskPaperBackground())
         .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Writing Desk")
         .toolbar {
-            // The pane switch *is* the title. A title bar and a picker underneath it were two rows
-            // spending screen on saying where you are twice.
-            ToolbarItem(placement: .principal) {
-                Picker("", selection: $pane) {
-                    ForEach(Pane.allCases) { Text($0.rawValue).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                .frame(width: 220)
-            }
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if pane == .write {
                     Button {
@@ -222,6 +215,25 @@ struct WritingDeskView: View {
         return "Clear \(count) \(count == 1 ? "mark" : "marks")"
     }
 
+    private var writingPaneTabs: some View {
+        HStack(spacing: 3) {
+            ForEach(Pane.allCases) { entry in
+                Button { pane = entry } label: {
+                    Text(entry.rawValue)
+                        .font(.custom("Tiny5", size: 10))
+                        .frame(maxWidth: .infinity, minHeight: 38)
+                        .foregroundStyle(pane == entry ? PixelUITheme.screen : PixelUITheme.text)
+                        .background(pane == entry ? PixelUITheme.edgeDark : PixelUITheme.neutral)
+                        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(PixelUITheme.screen)
+    }
+
     // MARK: Pane 1 — writing
 
     /// The page is sized from the space the pane actually has, so it fills the width and can't be
@@ -236,6 +248,13 @@ struct WritingDeskView: View {
             VStack(spacing: 6) {
                 PageGridView(ghost: $ghost, side: side,
                              dismissalToken: pageInteractionDismissalToken)
+                    .padding(10)
+                    .background(PixelUITheme.surface)
+                    .overlay(Rectangle().inset(by: 7).stroke(PixelUITheme.edge.opacity(0.45), lineWidth: 1))
+                    .overlay(Rectangle().stroke(PixelUITheme.edgeDark, lineWidth: 3))
+                    .background {
+                        Rectangle().fill(PixelUITheme.shadow).offset(x: 6, y: 6)
+                    }
                 inkWellBar
                 binTabs
                     .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
@@ -244,7 +263,8 @@ struct WritingDeskView: View {
                     .simultaneousGesture(TapGesture().onEnded { dismissPageInteraction() })
             }
             .padding(.horizontal, 12)
-            .padding(.bottom, 2)
+            .padding(.vertical, 10)
+            .background(WritingDeskWoodBackground())
         }
     }
 
@@ -275,8 +295,9 @@ struct WritingDeskView: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 10)
             .frame(height: 38)
-            .background(Color(.secondarySystemGroupedBackground),
-                        in: RoundedRectangle(cornerRadius: 9))
+            .foregroundStyle(PixelUITheme.text)
+            .background(PixelUITheme.surfaceInset)
+            .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
         }
         .buttonStyle(.plain)
         .disabled(!unlocked)
@@ -299,9 +320,9 @@ struct WritingDeskView: View {
                                 .lineLimit(1)
                         }
                         .frame(width: 76, height: 44)
-                        .background(bin == entry ? Color.accentColor.opacity(0.18) : Color.clear,
-                                    in: RoundedRectangle(cornerRadius: 8))
-                        .foregroundStyle(bin == entry ? Color.accentColor : Color.secondary)
+                        .background(bin == entry ? PixelUITheme.edgeDark : PixelUITheme.surfaceRaised)
+                        .foregroundStyle(bin == entry ? PixelUITheme.screen : PixelUITheme.text)
+                        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
@@ -310,15 +331,8 @@ struct WritingDeskView: View {
             .padding(.horizontal, 4)
         }
         .frame(height: 50)
-        .mask(
-            // Fades at both ends, so a cut-off tab reads as "keep going" rather than as a bug.
-            LinearGradient(stops: [.init(color: .clear, location: 0),
-                                   .init(color: .black, location: 0.035),
-                                   .init(color: .black, location: 0.965),
-                                   .init(color: .clear, location: 1)],
-                           startPoint: .leading, endPoint: .trailing)
-        )
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 10))
+        .background(PixelUITheme.surfaceInset)
+        .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
     }
 
     /// What's in the open bin.
@@ -475,11 +489,20 @@ struct WritingDeskView: View {
 
     private var pagesPane: some View {
         VStack(spacing: 0) {
-            Picker("Page collection", selection: $pagesSection) {
-                ForEach(PagesSection.allCases) { Text($0.rawValue).tag($0) }
+            HStack(spacing: 4) {
+                ForEach(PagesSection.allCases) { section in
+                    Button { pagesSection = section } label: {
+                        Text(section.rawValue)
+                            .font(.custom("Tiny5", size: 10))
+                            .frame(maxWidth: .infinity, minHeight: 38)
+                            .background(pagesSection == section ? PixelUITheme.edgeDark : PixelUITheme.neutral)
+                            .foregroundStyle(pagesSection == section ? PixelUITheme.screen : PixelUITheme.text)
+                            .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 2))
+                    }
+                    .buttonStyle(.plain)
+                }
             }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 38)
             .padding(.top, 10)
 
             ScrollView {
@@ -666,8 +689,12 @@ struct WritingDeskView: View {
                     .frame(minHeight: 58)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.bordered)
-                .tint(ghost?.glyph == item.glyph ? .accentColor : .secondary)
+                .buttonStyle(.plain)
+                .foregroundStyle(PixelUITheme.text)
+                .background(ghost?.glyph == item.glyph
+                            ? PixelUITheme.primaryHighlight.opacity(0.72)
+                            : PixelUITheme.surface)
+                .overlay(Rectangle().stroke(PixelUITheme.edge, lineWidth: 1))
                 .opacity(fits ? 1 : 0.4)
                 .disabled(!fits)
             }
@@ -1271,6 +1298,41 @@ private extension View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color(.secondarySystemGroupedBackground),
                         in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+private struct WritingDeskPaperBackground: View {
+    var body: some View {
+        Canvas { context, size in
+            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(PixelUITheme.screen))
+            var grid = Path()
+            stride(from: CGFloat.zero, through: size.width, by: 8).forEach { x in
+                grid.move(to: CGPoint(x: x, y: 0))
+                grid.addLine(to: CGPoint(x: x, y: size.height))
+            }
+            stride(from: CGFloat.zero, through: size.height, by: 8).forEach { y in
+                grid.move(to: CGPoint(x: 0, y: y))
+                grid.addLine(to: CGPoint(x: size.width, y: y))
+            }
+            context.stroke(grid, with: .color(PixelUITheme.edge.opacity(0.08)), lineWidth: 0.5)
+        }
+        .allowsHitTesting(false)
+    }
+}
+
+private struct WritingDeskWoodBackground: View {
+    var body: some View {
+        Canvas { context, size in
+            context.fill(Path(CGRect(origin: .zero, size: size)),
+                         with: .color(Color(red: 0.45, green: 0.28, blue: 0.17)))
+            stride(from: CGFloat.zero, through: size.width, by: 28).forEach { x in
+                context.fill(Path(CGRect(x: x, y: 0, width: 10, height: size.height)),
+                             with: .color(Color(red: 0.53, green: 0.33, blue: 0.20)))
+            }
+            context.stroke(Path(CGRect(origin: .zero, size: size)),
+                           with: .color(PixelUITheme.edgeDark), lineWidth: 3)
+        }
+        .allowsHitTesting(false)
     }
 }
 

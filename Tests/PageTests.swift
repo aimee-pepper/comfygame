@@ -739,6 +739,27 @@ final class PageTests: XCTestCase {
                        "Only the confirmed destructive action may clear the page.")
     }
 
+    func testWritingDeskUsesApprovedPageDrawerAndPaneHierarchyWithoutChangingActions() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(
+            contentsOf: root.appending(path: "Sources/Screens/WritingDeskView.swift"),
+            encoding: .utf8)
+
+        XCTAssertTrue(source.contains("private var writingPaneTabs"))
+        XCTAssertTrue(source.contains("WritingDeskPaperBackground()"))
+        XCTAssertTrue(source.contains("WritingDeskWoodBackground()"))
+        XCTAssertTrue(source.contains("PageGridView(ghost: $ghost"))
+        XCTAssertTrue(source.contains("PixelUITheme.surfaceInset"))
+        XCTAssertTrue(source.contains("HStack(spacing: 4)"),
+                      "Collected and Templates remain one internal two-choice shelf switch.")
+        XCTAssertFalse(source.contains("Picker(\"\", selection: $pane)"),
+                       "The approved three-pane rail belongs in the screen, not the navigation title.")
+        XCTAssertTrue(source.contains("store.bindAndDepart"))
+        XCTAssertTrue(source.contains("store.savePageTemplate"))
+        XCTAssertTrue(source.contains("store.clearPage()"))
+    }
+
     func testWritingDeskPersonalCompoundPaletteUsesFrozenPlacementAuthorityAndAnchoredDetail() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
